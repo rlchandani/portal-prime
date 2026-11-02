@@ -62,3 +62,12 @@ retains the accepted 1.68 identity. See the local-readiness delivery receipt.
 All fourteen mobile detail panels and the desktop update fit without horizontal
 overflow after reload; screenshots were visually reviewed and console errors
 were zero. Earlier filter and simulated-Portal checks retain their earlier scope.
+
+The connection-status snapshot records exact1.69 in both rooms, Family6/6
+installed-browser cancellation trials, zero extra status GETs over six connected
+tab switches and unchanged room configuration. It adds a small queued favicon
+polish finding (15tasks). Manifest/touch icons already work; phone hardware is
+unavailable. Earlier artifact/browser proofs retain their original scope.
+All15 mobile detail panels and the desktop update fit without horizontal overflow
+after reload; detail screenshots were visually reviewed. Roadmap console errors
+were zero. Earlier filter/simulated-Portal checks retain their earlier scope.

@@ -18,13 +18,13 @@ The updated whole-product objective is
   does not require creating every platform mentioned in its discovery checklist.
   Preserve the user's no-HA-music-deployment and no-GitHub-authentication/publication
   constraints, unapproved mocks, and 30-minute issue limits.
-- **Main owns two implemented fixes:** Photo Memory edit opens `sources` with idle
+- **Initial two implemented fixes:** Photo Memory edit opens `sources` with idle
   slideshow disabled; the alarm caption observes active-page configuration and
   refreshes at minute boundaries, rounding positive partial minutes up.
   [Independent source review](portal-hi-first-units-review-2026-11-02.md) found no
   concrete defects. **Coordinator update:** 3,779 JVM tests and both APK builds passed;
   Family routing/countdown/return checks passed, and both original
-  1.65 installed readbacks passed; current 1.68 preserves those fixes. Read the
+  1.65 installed readbacks passed; current 1.69 preserves those fixes. Read the
   [delivery receipt](portal-widget-fixes-release-2026-11-02.md) for native limits,
   artifact hashes, restored configuration and deployment evidence.
 - **World Clock clipping is now delivered:** complete-row fit and remaining-city
@@ -42,7 +42,15 @@ The updated whole-product objective is
   is corrected on the isolated branch, commit `d2ab3398`: 564 JVM tests / 74 suites
   and debug assembly passed. That phone APK is uninstalled; physical phone
   acceptance remains open. See the [delivery receipt](portal-settings-visibility-delivery-2026-11-02.md).
-- Gradle and `version.json` both currently declare **1.68 / versionCode 62**.
+- **Browser connection-status ownership is delivered:** the actual Family 1.68
+  cancellation reproduced false Offline. The 1.69 controller removes the unowned
+  continuation and promptly replaces missing status after navigation/resume.
+  Six installed Family trials passed (119–175ms browser click-to-metadata), six
+  connected tab switches added zero status GETs, controlled transport/401 handling
+  and original pairing worked. Exact 1.69 APK readbacks and unchanged complete
+  profile/screensaver/layout baselines passed on both rooms. Family’s original
+  photo Dream was observed again after cleanup. [Receipt](portal-pwa-connection-status-delivery-2026-11-02.md).
+- Gradle and `version.json` both currently declare **1.69 / versionCode 63**.
   These identify the verified local device iteration, not a published release.
 - **Completed parallel maintenance units:** native settings editor classification/projection
   coverage and native phone music-compatibility coverage. Nine focused Portal
@@ -52,16 +60,16 @@ The updated whole-product objective is
   passed 555 JVM tests / 73 suites, including fifteen new compatibility tests;
   debug and instrumentation APK builds passed. These are regression
   protection increments, not new visible features. Native settings maintenance
-  is included in delivered 1.68; scoped Slideshow acceptance does not prove every
+  is included in delivered 1.69; scoped Slideshow acceptance does not prove every
   editor. Companion maintenance remains uninstalled. Latest Portal gates passed
-  **3,800 JVM tests / 399 suites** and both APK builds.
+  **3,800 JVM tests / 399 suites**, 676 bundled JS, 161 Python and optimized assembly. Earlier debug APK gates retain their original scope.
   Native editor work is committed as `2682e3a9`; read its
   [receipt](portal-settings-editor-contract-2026-11-02.md). Companion maintenance
   is committed as `610899f7074323e24832caa9f0d52e3db8a7b5fd`; its receipt is
   `docs/companion-compatibility-validation-2026-11-02.md` in the isolated Toolkit
   checkout. Original 540 companion tests were unchanged and passed against the
   candidate; no separate unmodified-base run or physical phone check is claimed.
-- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents thirteen
+- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents fifteen
   tracked items with acceptance/evidence/limits and actual cropped clock captures.
   It is a saved priority-queue snapshot, not live telemetry or an exhaustive
   product acceptance report. Browser interactions passed at desktop/mobile
@@ -81,7 +89,7 @@ The updated whole-product objective is
 
 | Component | Purpose, dependencies and inspected evidence | Verification/release procedure and current limits |
 | --- | --- | --- |
-| **Portal Android** | Single Kotlin/Compose `:app`, `com.immortal.launcher`; minSdk 24, targetSdk 36; Portal API 28/29, no Google services/root. Home/apps/widgets, photo and clock Dreams, tools, store/updater, MQTT/HA, music, accessibility, boot/sleep. Inspected [README](../README.md), build configuration, Home and settings source, current review and existing audits. | `./gradlew :app:testDebugUnitTest --no-daemon`, `:app:assembleDebug`; optimized variant and native acceptance are separate. Debug has `.debug` suffix. Preserve signing identity and configuration for in-place updates. Current 1.68 checks and scoped Family Slideshow acceptance passed; both rooms have the exact artifact. Earlier timer acceptance remains separately scoped. Earlier World Clock acceptance remains recorded separately. Whole-product hardware acceptance remains incomplete. |
+| **Portal Android** | Single Kotlin/Compose `:app`, `com.immortal.launcher`; minSdk 24, targetSdk 36; Portal API 28/29, no Google services/root. Home/apps/widgets, photo and clock Dreams, tools, store/updater, MQTT/HA, music, accessibility, boot/sleep. Inspected [README](../README.md), build configuration, Home and settings source, current review and existing audits. | `./gradlew :app:testDebugUnitTest --no-daemon`, `:app:assembleDebug`; optimized variant and native acceptance are separate. Debug has `.debug` suffix. Preserve signing identity and configuration for in-place updates. Current 1.69 optimized gates and Family browser-status acceptance passed; both rooms have the exact artifact. Earlier 1.68 Slideshow acceptance remains separate. Earlier timer acceptance remains separately scoped. Earlier World Clock acceptance remains recorded separately. Whole-product hardware acceptance remains incomplete. |
 | **Native Android phone companion** | Paired management uses Portal protocol version 1: revision-guarded layout/scenes, settings/sources, photos, operations and Jarvis; music client supports capability fallback. Recovered source `422286e…` now has committed maintenance `610899f…` on isolated `codex/companion-compat-20261102`, still 1.7.0-music-preview/code 12. See [provenance](portal-companion-provenance-2026-11-02.md). | Earlier 555 JVM tests/73 suites and debug/test APKs passed. Latest group-preflight correction passed 564 tests/74 suites and debug assembly. Neither phone candidate was installed/run. Current phone identity, rendered UI, live networking/playback and parity remain unverified; historical Pixel receipts are separate. Primary/frozen/stale checkouts preserved. No shipped native iOS app identified. |
 | **Related Portal Toolkit checkout** | **Accessible and inspected:** `/Volumes/xHome/Github/portal-toolkit`. Compose/Dadb phone utility for USB/Wi-Fi ADB, APKs, photos, backups, files, logs, capture/mirror and OTA controls; Google Photos auth belongs on the phone. Build declares `com.portalinstaller`, minSdk 26/targetSdk 35, **1.4.0 / code 5**; README says release 1.1.0 and only Portal Mini tested. | Gradle `:app:testDebugUnitTest`, `:app:assembleDebug`; 34 JVM test source files found, none executed. No `.github` directory present; release signing/publication process not established. This checkout is not proof of the paired companion branch above. August audit checkboxes are stale: synchronous connection guards, error handling, shell quoting and capture cleanup already exist in inspected source. Revalidate before creating defects. |
 | **Browser remote / PWA** | APK-bundled `RemoteHtml` plus `remote/{core.mjs,control-center.js,control-center.css}`, served by Fleet on LAN. PIN/session pairing, room roster, input/media, photos, apps, registry settings, layout/scenes/snapshots, Jarvis. Inspected [control-center contract](features/browser-control-center.md), [remote docs](features/remote.md), routes and offline JS fixtures. Paired management requires session auth; do not equate it with unrestricted Fleet auth. | No separate web build/deploy: assets ship with the Portal APK. Offline Node tests cover controller behavior; rendered browser/mobile and live Portal checks are additional gates. Existing receipts establish selected cases only. Current browser/device sessions, PWA installation and native companion parity were not inspected. |
@@ -100,14 +108,14 @@ records **8 categories / 54 pages**, not 54 device-verified screens.
 
 | Gate | Inspected configuration / evidence | Status |
 | --- | --- | --- |
-| Portal local checks | Latest [editor contract receipt](portal-settings-editor-contract-2026-11-02.md); accepted [World Clock review](portal-world-clock-review-2026-11-02.md) and [device receipt](portal-world-clock-delivery-2026-11-02.md) retained separately. | Current 1.68: 3,800 JVM tests/399 suites, both APKs, R8, vital lint and version/signature checks passed. Both rooms have exact installed readbacks; Family scoped Slideshow acceptance passed. Every-editor and phone acceptance remain separate. Earlier World Clock proof remains scoped to its original receipt. |
+| Portal local checks | Latest [1.69 receipt](portal-pwa-connection-status-delivery-2026-11-02.md); earlier editor/clock/timer/visibility receipts retained separately. | Latest 3,800 JVM/399 suites, 40/676 JS, 161 Python, optimized APK/R8/vital lint and version/signature checks passed. Exact installed readbacks both rooms; Family browser-status acceptance passed. Earlier native Slideshow and World Clock proof retains its original scope; every-editor and physical phone acceptance remain separate. |
 | CI | `tests.yml`: JVM, existing slideshow JS, all 29 bundled-JS regression modules, and seven Portal Python regression files. Catalog: schema/network validation. Provisioning: Bash/PowerShell behavior, parse and ASCII. Docs: strict MkDocs plus main-push Pages deploy. Release guard: version/URL/notes consistency. | Newly added JS/Python gates passed locally (652/140); YAML parsed, shell prerequisite syntax checked. Hosted Ubuntu/Node 22/Python 3.12 execution remains unobserved. Native device checks and Rust compilation are not configured there. |
 | Public release | [Release procedure](releasing.md) and `cut-release.sh`: authenticate/fetch, version bump, signed build, published-key comparison, kit archive, commit/tag/push, draft/assets/publication and URL verification. | **Forbidden in this session. Do not run the script.** It has no local-only mode and does not run the unit gate. Source metadata agreement alone is not artifact/signature/release verification. |
-| Device delivery | Current [1.67 receipt](portal-home-timer-delivery-2026-11-02.md), installed APK `80895ce2…`; earlier clock receipt retained. | Family scoped timer acceptance and exact artifact readback passed. Living exact artifact/version/room readback passed after one dispatch; no repeated physical interaction run. |
+| Device delivery | Current [1.69 receipt](portal-pwa-connection-status-delivery-2026-11-02.md), installed APK `e7f6e0ce…`; earlier timer/clock receipts retained. | Family installed-browser acceptance and exact APK readback passed. Living exact artifact/version/room/config readback passed after one dispatch; no duplicate physical interaction run. |
 
 ## Prioritized backlog
 
-The original eight items and one new native visual finding are tracked below.
+The original eight items, native clock finding and two browser findings are tracked below.
 Estimates are planning estimates: **S** fits one bounded
 local unit; **M** requires decomposition before implementation. Preserve each
 existing issue's 30-minute cap, including cleanup; this document grants no
@@ -123,8 +131,9 @@ additional time or approval.
 | **6 — Home timer editor ownership — delivered** | Native 1.66 red reproduced: editor 5m created one kitchen timer while Home stayed Ready. Home editor now uses the shared countdown; Tools keeps its collection. | Family start/pause/Back/widget observation/reopen/resume/reset, custom 0:10, exact-alarm ring/Stop and both entry points passed. Original layout/settings/timer state restored. | Portal Home; full 3,796 JVM tests/398 suites and both APKs passed. Exact 1.67 in both rooms. [Receipt](portal-home-timer-delivery-2026-11-02.md) records native limits; no migration, new schema or performance claim. |
 | **7 — Companion lead: compatibility regression guards — locally verified** | Isolated branch `codex/companion-compat-20261102`, commit `610899f…`, adds fifteen tests and a behavior-preserving media fallback predicate extraction to recovered 1.7.0/code 12 source. | 404/405/501 fallback, auth/network/schema distinction, delayed former-room/session rejection and write-admission/cancellation guards passed. No new fallback behavior, HA service setup or phone rewrite. | Native phone + Portal contracts; **S**. Fresh 555 tests/73 suites and debug/test APK gates passed. No rendered Compose, physical phone, live playback, installation or deployment proof. Primary/frozen/stale/dirty checkouts preserved. |
 | **8 — Release engineering: local readiness — implemented and verified** | A separate standard-library checker now runs local gates and verifies the resulting package/version/signers against a mandatory baseline. It does not invoke the publication script. | Contract guards reject stale APKs, unsigned/different signers, missing/failed/reused reports, unsafe output locations, source changes and timed-out process groups. Prior reports are archived; selected SDK reaches Gradle. | Portal/release tooling; real run exited 0 in 152,626ms: 40/654 JS, 161 Python, 3,800 JVM/399suites, optimized APK/lint and actual SDK signatures passed. Exact existing1.68 APK; no reinstall. [Receipt](portal-local-readiness-delivery-2026-11-02.md). HostedCI/publication/hardware acceptance remain separate. |
-| **9 — Native UX: World Clock clipping — delivered** | Complete-row fit and truthful remaining-city counts replace clipped previews. Native enlarged-text finding was corrected within the same slot. | Normal two/three/four-city and 150% live/cold checks passed; original city order, font scale, Home page and screensaver configuration restored. | Portal; 3,788 JVM tests and both builds passed. Original exact 1.66 delivery passed; current 1.68 preserves the fix. [Receipt](portal-world-clock-delivery-2026-11-02.md) retains taller-card/locale/24-hour limits; no general performance claim. |
-| **10 — Browser UX: connection status after tab navigation — queued for reproduction** | Actual Family PWA showed an Offline banner while its settings actions succeeded; one companion request was aborted during navigation. This is an observed discrepancy, not an established root cause. | Reproduce in the existing paired mobile session, distinguish navigation cancellation from genuine connectivity/auth failure, and guard current-room/current-request ownership before changing behavior. | PWA/Portal HTTP consumer; one fresh 30-minute slot after release-readiness cleanup. Preserve pairing and settings, record actual status transitions; no phone rewrite or broad redesign. |
+| **9 — Native UX: World Clock clipping — delivered** | Complete-row fit and truthful remaining-city counts replace clipped previews. Native enlarged-text finding was corrected within the same slot. | Normal two/three/four-city and 150% live/cold checks passed; original city order, font scale, Home page and screensaver configuration restored. | Portal; 3,788 JVM tests and both builds passed. Original exact 1.66 delivery passed; current 1.69 preserves the fix. [Receipt](portal-world-clock-delivery-2026-11-02.md) retains taller-card/locale/24-hour limits; no general performance claim. |
+| **10 — Browser UX: connection status after tab navigation — delivered** | Actual delayed-startup cancellation showed false Offline. The duplicate unowned status writer is removed; missing metadata is replaced promptly. | 22 ownership guards (10 red before), 36 focused / 676 full JS, actual 6/6 Family trials, zero extra status GETs over six connected tab changes, controlled transport/401 handling and existing pairing passed. | Exact 1.69 APK in both rooms, complete config/profile/layout unchanged. [Receipt](portal-pwa-connection-status-delivery-2026-11-02.md). Browser 119–175ms samples are not optical/universal-network performance. |
+| **11 — Browser UX: tab branding — queued** | Actual served page has no favicon link; default /favicon.ico returns 401 while existing public app-icon returns 200 PNG. | Reuse public branding without adding endpoints or changing management auth. Fresh browser uses that icon, preserves manifest/touch icon and emits no default favicon401. | PWA; **S**, low risk, fresh 30-minute slot only. Physical phone deployment awaits a connected phone; current ADB/mDNS show none. |
 
 **Completed next unit:** CI protection was implemented in a separate write scope.
 All 29 existing `app/src/test/js/*.test.mjs` modules passed locally:
@@ -139,7 +148,9 @@ Disabled-parent presentation (item 4) now passed scoped Portal/PWA acceptance an
 both-room exact 1.68 delivery. Companion preflight is corrected, committed and
 locally verified (564 tests / 74 suites); physical installation/acceptance remains
 open. Local-only release readiness (item 8) is now implemented and verified. Browser
-connection-status reproduction (item 10) is next; previous exhausted units remain parked.
+connection-status ownership (item 10) is delivered on both rooms. Public tab branding
+(item 11) is the next small available polish unit; physical companion acceptance
+awaits a connected phone. Previous exhausted units remain parked.
 Do not reopen exhausted old issues through these units.
 
 ## Preserve parked work and scoped acceptance

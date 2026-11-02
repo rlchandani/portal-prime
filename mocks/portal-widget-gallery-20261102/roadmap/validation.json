@@ -90,5 +90,23 @@
     "consoleErrorsObserved": 0,
     "screenshotsVisuallyReviewed": true,
     "limits": "Saved roadmap browser checks only; build/test/artifact verification is in the named local-readiness delivery receipt."
+  },
+  "connectionStatusSnapshotUpdate": {
+    "version": "1.69",
+    "taskCount": 15,
+    "taskStatus": "delivered; Family actual installed-browser acceptance, exact APK/config both rooms",
+    "all15MobileDetailsCheckedAfterReload": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "detailScreenshotsVisuallyReviewed": true,
+    "roadmapConsoleErrorsObserved": 0,
+    "limits": "Saved roadmap checks only; Family controlled-request/browser and exact room verification have independent delivery evidence. No complete UI/accessibility or physical-phone proof."
   }
 }

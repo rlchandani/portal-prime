@@ -671,6 +671,8 @@ function go(next, sub = '') {
   closeSheet();
   scopeResults = [];
   render();
+  // Navigation retires the prior page's status read; replace missing metadata immediately.
+  if (connectionState === 'offline' || !data.companion) status();
   loadVisible();
   startPolling();
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -703,13 +705,6 @@ function selectRoom(base) {
   go(tab);
   updateHeader();
   if (target && connectionState !== 'expired') {
-    status().then(() => {
-      if (!data.companion && data.statusError?.status !== 404 && connectionState !== 'expired') {
-        connected = false;
-        connectionState = 'offline';
-        updateHeader();
-      }
-    });
     pullRoster(session.capture());
   }
 }
@@ -6296,7 +6291,7 @@ document.addEventListener('visibilitychange', () => {
     // Retire old queued input; a fresh pad admits gestures after visibility resumes.
     if ((tab === 'remote' || tab === 'photos') && !detail) render();
     loadVisible();
-    if (connectionState === 'offline') status();
+    if (connectionState === 'offline' || !data.companion) status();
     startPolling();
     if (musicSheetCurrent(musicSheet)) {
       renderMusicSheet(musicSheet);

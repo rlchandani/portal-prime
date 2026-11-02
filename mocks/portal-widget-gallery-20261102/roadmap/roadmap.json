@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 local release readiness verified; browser status reproduction next (UTC)",
+  "updatedLabel": "2 Nov 2026 · browser connection-status fix delivered to both rooms (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "local-readiness",
+  "defaultTask": "pwa-connection-status",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact 1.68 / code 62. Family scoped settings acceptance passed; phone maintenance remains uninstalled.",
@@ -19,7 +19,7 @@
       "summary": "564 tests / 74 suites passed. Multi-room inactive-settings preflight is corrected; the phone APK is not installed.",
       "description": "Protect capability fallback and stale room/session responses. Multi-room settings validation now reads complete per-domain inactive metadata while display reads remain visibility-filtered.",
       "status": "verified",
-      "verification": "Locally verified \u00b7 not deployed",
+      "verification": "Locally verified · not deployed",
       "kind": "Regression protection",
       "platforms": [
         "companion",
@@ -65,10 +65,10 @@
     {
       "id": "settings-contract",
       "title": "Native settings editor contract",
-      "summary": "3,800 tests / 399 suites passed; maintenance is included in installed 1.68. Scoped Slideshow UI acceptance is separate from every-editor acceptance.",
+      "summary": "3,800 tests / 399 suites passed; maintenance is included in installed 1.69. Scoped Slideshow UI acceptance is separate from every-editor acceptance.",
       "description": "Replace the obsolete inline-string prohibition with classification and projection coverage for the renderer's actual supported editors. This protects the existing settings behavior.",
       "status": "verified",
-      "verification": "Locally verified \u00b7 included in deployed APK",
+      "verification": "Locally verified · included in deployed APK",
       "kind": "Maintenance",
       "platforms": [
         "portal"
@@ -107,7 +107,7 @@
       "summary": "Fixed and installed in both rooms. Family verified shared countdown, controls, custom duration, alarm Stop and both editor entry points.",
       "description": "On Family 1.66, starting 5m in the Home editor created a kitchen timer while the widget stayed Ready. The Home editor now uses the existing shared countdown. Tools keeps its kitchen-timer collection.",
       "status": "delivered",
-      "verification": "Family native acceptance \u00b7 both exact APK readbacks",
+      "verification": "Family native acceptance · both exact APK readbacks",
       "kind": "Correctness fix",
       "platforms": [
         "portal"
@@ -152,10 +152,10 @@
     {
       "id": "settings-visibility",
       "title": "Screensaver settings: consistent parent visibility",
-      "summary": "Delivered in both rooms. Disabled schema 16 \u2192 1; actual mobile PWA 11 \u2192 1. Saved choices and validated inactive writes preserved.",
+      "summary": "Delivered in both rooms. Disabled schema 16 → 1; actual mobile PWA 11 → 1. Saved choices and validated inactive writes preserved.",
       "description": "Twenty-four registered parent predicates now align generic screensaver visibility. Advanced keeps inactive children hidden; calendar remains independent. Native, API and mobile checks passed on Family.",
       "status": "delivered",
-      "verification": "Family native/API/mobile acceptance \u00b7 exact APK in both rooms",
+      "verification": "Family native/API/mobile acceptance · exact APK in both rooms",
       "kind": "Shared settings correctness",
       "platforms": [
         "portal",
@@ -167,12 +167,12 @@
       "state": "3,800 JVM tests / 399 suites, both APK builds and 654 JS tests passed; all 36 Family configuration fields restored.",
       "acceptance": [
         "Document intended shared-setting exceptions and presentation eligibility.",
-        "Cover enabled/disabled \u00d7 Advanced \u00d7 source/style in real registered-domain projections and schemas.",
+        "Cover enabled/disabled × Advanced × source/style in real registered-domain projections and schemas.",
         "Preserve saved inactive values and intended validated API writes."
       ],
       "evidence": [
         {
-          "text": "Installed 1.67 baseline: disabled ordinary schema exposed 16 controls; the actual 390 \u00d7 844 mobile PWA exposed 11 ordinary settings rows, excluding category. Original settings were restored exactly.",
+          "text": "Installed 1.67 baseline: disabled ordinary schema exposed 16 controls; the actual 390 × 844 mobile PWA exposed 11 ordinary settings rows, excluding category. Original settings were restored exactly.",
           "source": "Private API/browser baseline receipts, 2026-11-02"
         },
         {
@@ -209,14 +209,14 @@
       "summary": "Real check passed in 2m33s: 40/654 JS, 161 Python, 3,800 JVM tests and optimized APK/signature checks. No authentication or publication.",
       "description": "A separate standard-library CLI runs existing local gates and verifies the resulting APK against a mandatory accepted local baseline. It records source/build-input and artifact identities without invoking the publication script.",
       "status": "delivered",
-      "verification": "Implemented / real local gates verified \u00b7 no publication",
+      "verification": "Implemented / real local gates verified · no publication",
       "kind": "Delivery tooling",
       "platforms": [
         "portal",
         "tooling"
       ],
       "owner": "Release engineering",
-      "deployment": "Tooling runs locally; no device install or published release. Candidate matches existing1.68 APK.",
+      "deployment": "Tooling runs locally; no device install or published release. Candidate matches existing 1.68 APK.",
       "state": "Real terminal status=ready, all15processes exit0; 399 prior JVM reports archived and replaced by fresh results.",
       "acceptance": [
         "Produce candidate version, source and artifact identity, local signing-baseline comparison and check receipts.",
@@ -229,7 +229,7 @@
           "source": "scripts/test_portal_release_readiness.py; scripts/test_portal_release_readiness_edges.py"
         },
         {
-          "text": "Actual SDK/optimized run exited0 in152,626ms. Full161 Python, 40/654JS and3,800JVM/399suites passed. Candidate25860666bytes hash271d3b1dc5b4dab2e57fb686ad7c19bf015d126b22271e536044cadca1e8e343 matches existing1.68.",
+          "text": "Actual SDK/optimized run exited0 in152,626ms. Full161 Python, 40/654JS and3,800JVM/399suites passed. Candidate25860666bytes hash271d3b1dc5b4dab2e57fb686ad7c19bf015d126b22271e536044cadca1e8e343 matches existing 1.68.",
           "source": "docs/portal-local-readiness-delivery-2026-11-02.md"
         },
         {
@@ -281,7 +281,7 @@
       "summary": "Separate browser mock. Portal / Android / iOS interpretations remain unapproved.",
       "description": "The gallery is a review artifact for possible future widget presentation. Its platform columns are design interpretations, not shipped platform implementations.",
       "status": "approval",
-      "verification": "Design mock \u00b7 unapproved",
+      "verification": "Design mock · unapproved",
       "kind": "Design",
       "platforms": [
         "design"
@@ -310,10 +310,10 @@
     {
       "id": "world-clock",
       "title": "World Clock: complete rows & city counts",
-      "summary": "World Clock normal and 150% acceptance passed on 1.66; the fix is preserved in current 1.68 on both rooms.",
-      "description": "The existing 488 \u00d7 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
+      "summary": "World Clock normal and 150% acceptance passed on 1.66; the fix is preserved in current 1.69 on both rooms.",
+      "description": "The existing 488 × 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
       "status": "delivered",
-      "verification": "Device proof \u00b7 both rooms",
+      "verification": "Device proof · both rooms",
       "kind": "Visible correctness fix",
       "platforms": [
         "portal"
@@ -322,8 +322,8 @@
       "deployment": "Preserved in exact1.68 APK in both rooms; original feature acceptance remains scoped to its named receipt.",
       "state": "Delivered within bounded acceptance",
       "acceptance": [
-        "Family normal text: two complete cities; three cities show \u201c1 more city\u201d; four show \u201c2 more cities.\u201d",
-        "Family 150% text live and cold: one complete city row and an unclipped \u201c2 more cities\u201d caption.",
+        "Family normal text: two complete cities; three cities show “1 more city”; four show “2 more cities.”",
+        "Family 150% text live and cold: one complete city row and an unclipped “2 more cities” caption.",
         "Restore original city order, font scale, Home page and all 36 original screensaver fields; preserve grid spans/order."
       ],
       "evidence": [
@@ -350,10 +350,10 @@
     {
       "id": "photo-alarm",
       "title": "Photo Memory routing & alarm countdown",
-      "summary": "1.65 scoped native acceptance passed; both fixes are preserved in current 1.68 on both rooms.",
+      "summary": "1.65 scoped native acceptance passed; both fixes are preserved in current 1.69 on both rooms.",
       "description": "Photo Memory editing opens Photo sources even with idle slideshow disabled. The active-page alarm caption observes saved configuration, rounds partial minutes up and refreshes at minute boundaries.",
       "status": "delivered",
-      "verification": "Device proof \u00b7 both rooms",
+      "verification": "Device proof · both rooms",
       "kind": "Visible correctness fixes",
       "platforms": [
         "portal"
@@ -386,7 +386,7 @@
     {
       "id": "ci-regressions",
       "title": "Bundled JavaScript & Python CI guards",
-      "summary": "Implemented and locally verified: latest full JS suite 654 tests; Python gate receipt 140 tests. Hosted execution remains unobserved.",
+      "summary": "Implemented and locally verified: latest bundled JS 676 tests; Portal Python 161 tests. Existing CI globs include the new guards; hosted execution remains unobserved.",
       "description": "The workflow now includes all 29 existing bundled-JavaScript regression modules and seven Portal Python modules, alongside retained JVM and slideshow gates.",
       "status": "delivered",
       "verification": "Implemented / locally verified",
@@ -427,7 +427,7 @@
       "summary": "Issue slot exhausted. No candidate retained; further work needs a new explicit decision.",
       "description": "The zero-black-frame candidate delayed complete Home to 1,169 ms versus 418 ms. The old handoff investigation remains parked.",
       "status": "parked",
-      "verification": "Parked \u00b7 30-minute rule",
+      "verification": "Parked · 30-minute rule",
       "kind": "Exhausted experiment",
       "platforms": [
         "portal"
@@ -456,7 +456,7 @@
       "summary": "Legacy motion work remains parked after rejected candidates and failed native cases.",
       "description": "The seven legacy night-style investigations retain their exhausted status. Three reopened motion candidates were rejected; the final run retained two native failures and only 5/11 strict cases.",
       "status": "parked",
-      "verification": "Parked \u00b7 30-minute rule",
+      "verification": "Parked · 30-minute rule",
       "kind": "Exhausted experiment",
       "platforms": [
         "portal"
@@ -485,7 +485,7 @@
       "summary": "Cold Shuffle, rejected Home / Apps / settings experiments and incomplete gesture cases stay parked.",
       "description": "Earlier rejected and timed-out investigations keep their original receipts and boundaries. Current correctness and maintenance results do not resolve these separate performance questions.",
       "status": "parked",
-      "verification": "Parked \u00b7 evidence limits retained",
+      "verification": "Parked · evidence limits retained",
       "kind": "Exhausted experiments",
       "platforms": [
         "portal"
@@ -511,34 +511,73 @@
     {
       "id": "pwa-connection-status",
       "title": "Browser connection status after tab navigation",
-      "summary": "Observed Offline banner while settings actions succeeded. Reproduction and a targeted fix are next.",
-      "description": "Check whether cancellation of a previous tab request can incorrectly mark the current paired room offline. Distinguish that hypothesis from genuine network, authentication or server failure.",
-      "status": "queued",
-      "verification": "Observed discrepancy \u00b7 root cause unverified",
+      "summary": "Fixed false Offline after cancelled startup reads. Six Family reproductions passed; metadata appeared 119–175ms after clicks. Connected tab changes add no status requests.",
+      "description": "An unowned initial-status continuation bypassed the existing page/request guards. It is removed; navigation and visibility resume replace missing metadata promptly through the normal owned reader.",
+      "status": "delivered",
+      "verification": "Family installed-browser acceptance · exact APK both rooms",
       "kind": "Browser UX/reliability",
       "platforms": [
         "browser",
         "portal"
       ],
       "owner": "Browser QA / Main",
-      "deployment": "No change built or deployed",
-      "state": "Queued after local release-readiness cleanup for one fresh 30-minute slot.",
+      "deployment": "Exact optimized 1.69 / code 63 in Family and Living. Living had one dispatch and three restart observations.",
+      "state": "Full 40/676 JS, 161 Python, 3,800 JVM / 399 suites and optimized/signing gates passed. Both rooms’ saved profiles, screensaver settings and layout remain unchanged.",
       "acceptance": [
-        "Reproduce status transitions in the actual paired mobile PWA without reconnecting.",
-        "Preserve genuine network/authentication failure reporting and current-room request ownership.",
-        "Run meaningful regression guards and verify the affected interaction; restore settings/session state."
+        "Initial cancellation cannot mark a successor page/room Offline; missing metadata is requested before the next poll.",
+        "Real transport failure retains Retry;401 retains Pair again and stops automatic reads.",
+        "Current connected tab navigation reuses status metadata; original pairing/configuration remain usable."
       ],
       "evidence": [
         {
-          "text": "Family visibility checks succeeded against the actual server, but a mobile screenshot displayed Offline. Navigation included one aborted companion request; successful management responses were also observed.",
-          "source": "docs/portal-settings-visibility-delivery-2026-11-02.md"
+          "text": "Independent 22 ownership guards:10 failed before correction; main 36 focused and 676 full JS passed. Actual readiness run passed in 399,875 ms.",
+          "source": "docs/portal-pwa-connection-status-delivery-2026-11-02.md"
+        },
+        {
+          "text": "Six installed Family mobile trials: zero false Offline traces, two initial/replacement GETs per trial,119–175ms click-to-metadata. Six connected tab switches add zero status GETs. Controlled transport/401 recovery passed.",
+          "source": "docs/portal-pwa-connection-status-delivery-2026-11-02.md"
+        },
+        {
+          "text": "APK 25,860,686 bytes SHA-256 e7f6e0ceffa2685d2db40a57cdf86b2f6746dea3087a9bdca463264e0c71ccb3, accepted signer. Exact readbacks both rooms; both complete config/profile/layout baselines compare unchanged.",
+          "source": "docs/portal-pwa-connection-status-delivery-2026-11-02.md"
         }
       ],
       "limits": [
-        "No definitive root cause, production patch or general connectivity fix is claimed.",
-        "Do not infer companion phone behavior from browser evidence."
+        "Family is the primary interactive target; Living has exact artifact/configuration verification, not duplicate physical tests.",
+        "Browser timing includes automation/DOM waiting. No arbitrary-network percentile, optical FPS, physical outage/revocation, phone acceptance or hosted CI claim.",
+        "Pre-existing missing favicon401 is a separate queued polish item. Broader gallery approval and parked issue limits remain."
       ],
-      "next": "Reproduce within a new bounded unit after the current checker is delivered."
+      "next": "Use the existing public app icon for browser-tab branding without changing auth routes; physical companion acceptance awaits a connected phone."
+    },
+    {
+      "id": "browser-tab-icon",
+      "title": "Browser tab icon: reuse the public app branding",
+      "summary": "The PWA has no favicon link; browsers request /favicon.ico and receive401. Its existing public app icon returns200PNG.",
+      "description": "Reuse the already public Immortal app-icon endpoint in the HTML head; avoid a new endpoint or any authentication-policy change.",
+      "status": "queued",
+      "verification": "Actual Family 1.69 HTTP responses and HTML inspected",
+      "kind": "Small browser polish",
+      "platforms": [
+        "web"
+      ],
+      "owner": "Browser UX / QA",
+      "deployment": "No fix installed. Public manifest/app icons already work.",
+      "state": "Observed /favicon.ico 401, /remote/app-icon?size=64 → 200 image/png, zero explicit favicon links.",
+      "acceptance": [
+        "A fresh paired/unpaired browser tab requests the public branding image instead of protected /favicon.ico.",
+        "Public icon stays credential-free; management authentication and existing PWA manifest/touch icon remain intact."
+      ],
+      "evidence": [
+        {
+          "text": "Actual served HTML/HTTP browser probe after1.69 acceptance; the manifest/touch icon are already public, so this finding concerns the browser tab icon.",
+          "source": "docs/portal-pwa-connection-status-delivery-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Low severity visual/console polish; no broken PWA installation claim.",
+        "Only a fresh bounded unit may implement it. Phone hardware acceptance remains unavailable."
+      ],
+      "next": "Add the explicit favicon link, guard its public endpoint identity, verify a fresh browser session and deliver a small local iteration."
     }
   ]
 }
