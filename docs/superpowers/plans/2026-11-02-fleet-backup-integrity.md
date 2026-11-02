@@ -10,6 +10,6 @@ Scope is defined in the corresponding spec; preserve parked issues.
 - [x] Add backup checks to the existing fleet CI job and document compatibility.
 - [x] Pass final regression/syntax gates and independent review.
 - [x] Verify read-only Family capture and unchanged saved configuration.
-- [ ] Commit source, update the roadmap/ledger and clean owned fixtures/workers.
+- [x] Commit source, update the roadmap/ledger and clean owned fixtures/workers.
 
 No Android source changed; no redundant APK builds or device deployment.

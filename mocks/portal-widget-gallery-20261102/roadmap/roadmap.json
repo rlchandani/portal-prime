@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T22:51:53.222897+00:00",
-  "updatedLabel": "Explicit fleet screen return verified on Family;60/60 helper tests;Portal1.87 unchanged",
+  "updatedAt": "2026-11-02T23:13:44.480843+00:00",
+  "updatedLabel": "Fleet backup integrity:23/23 tests;Family43/43 preference files;Portal1.87 unchanged",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "post-update-home-chooser",
+  "defaultTask": "fleet-backup-integrity",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms contain exact optimized Portal1.87/code81. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
@@ -13,6 +13,49 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-backup-integrity",
+      "title": "Fleet backups: publish complete private preference captures",
+      "summary": "Original false success reproduced with zero files.23/23 regression methods passed;actual Family43/43 maps captured privately with saved configuration unchanged.",
+      "description": "Validate metadata, exact safe preference listings and every XML map. Use owned private staging, unique completed folders and an atomic latest pointer; preserve prior backups and continue later rooms on failure.",
+      "status": "delivered",
+      "verification": "23/23 methods \u00b7Family43/43 XML maps \u00b7private permissions \u00b7unchanged saved configuration",
+      "kind": "Host backup data integrity",
+      "platforms": [
+        "fleet",
+        "portal"
+      ],
+      "owner": "Fleet engineering / independent fixture and static-review workers / Family read-only QA",
+      "deployment": "Local host source committed at d18ce87a. Existing fleet CI job extended;hosted CI unobserved. No new APK/install;Portal1.87/code81 unchanged.",
+      "state": "Original22:56:14\u201323:26:14UTC clock retained;owned native kit/secret copies removed,workers closed,original connection data preserved.",
+      "acceptance": [
+        "Reproduce old exit-zero/latest false success with ok:false listing and zero XML files.",
+        "Validate literal metadata success, exact safe readable listing and every XML map before publication.",
+        "Use private owned directories, reject symlink/obstructed parents and publish unique snapshots through atomic pointer replacement.",
+        "Preserve prior snapshot bytes,continue rooms,aggregate failure truthfully and tolerate closed console streams.",
+        "Pass final offline gates/review and actual Family read-only capture with complete saved configuration unchanged."
+      ],
+      "evidence": [
+        {
+          "text": "Grounded failure, implementation, final tests, actual Family capture and limits.",
+          "source": "docs/portal-fleet-backup-integrity-2026-11-02.md"
+        },
+        {
+          "text": "Sanitized source/test/native/private-cleanup receipt; no owner XML or credentials.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/fleet-backup-integrity-verification.json"
+        }
+      ],
+      "limits": [
+        "Preferences/install metadata only; not photos or other apps data.",
+        "Not an atomic snapshot of concurrently changing preferences or a power-loss durability guarantee.",
+        "Raw restore remains release-package-only; debug backup does not enable cross-package restore.",
+        "No restore, transfer-stall, Windows, physical-phone or hosted Ubuntu/Python3.12 acceptance.",
+        "Native success was accepted before two error-message guards; final failure guards are covered offline.",
+        "Temporary owner test snapshots/registry removed after acceptance; no production recovery backup retained from this test.",
+        "No general performance improvement or whole-product completion claim."
+      ],
+      "next": "Retain the integrity gate. Restore fidelity/package compatibility remains separate;continue authorized independent discovery without reopening parked issues."
+    },
     {
       "id": "apk-download-publication",
       "title": "App downloads: preserve the cached APK on transfer failure",

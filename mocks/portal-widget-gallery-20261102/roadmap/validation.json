@@ -1059,5 +1059,29 @@
     "queuedChooserMobileDesktopOverflow": false,
     "scope": "Two selected task details and proof response only; no all52 workflows or native UI audit.",
     "finalFooter187Code81AndProofCurrentVersion": true
+  },
+  "fleetBackupIntegrityScopedReview": {
+    "checkedAt": "2026-11-02T23:15:06.684495+00:00",
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844,
+        "horizontalOverflow": false,
+        "has23Tests": true,
+        "has43Maps": true,
+        "currentVersionVisible": true
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "horizontalOverflow": false,
+        "has23Tests": true,
+        "has43Maps": true,
+        "currentVersionVisible": true
+      }
+    ],
+    "receiptHttpStatus": 200,
+    "sourceCommitAnd23MethodsChecked": true,
+    "scope": "Selected backup detail/public receipt/mobile-desktop geometry only"
   }
 }

@@ -16,6 +16,18 @@ The updated whole-product objective is
 - **Latest APK transfer delivery:** both rooms contain exact optimized **1.87/code81**. Store/self-update transfer failures retain the cached file through shared staging;3,981 JVM/416 suites and debug/optimized/R8/vital-lint passed. Family actual optimized Store-facade shell checks improved4/9→9/9; valid-package installation and appContext remain unverified. Full saved configuration unchanged; normal frame restored. See [receipt](portal-apk-download-publication-2026-11-02.md).
 - **Latest fleet screen-return delivery:** host helper c5b5f652 adds optional `--after-install leave|home|screensaver`, preserving default leave.60/60 methods (23 added) passed in10.096s, including real slow-header TCP; three review findings corrected. The same chooser existed beneath the frame before update. Final Family replacement/return passed in15,105.550ms with exact1.87 readback and complete settings/default state unchanged; both destinations were visually reviewed at the documented phases. No Android default assignment, automatic OTA/flicker fix or new Living runtime delivery. Original22:26:30.941464–22:56:30.941464UTC clock retained; owned registry and workers cleaned. [Scoped receipt](portal-deploy-screen-return-2026-11-02.md).
 
+- **Latest host backup integrity:** source `d18ce87a` validates complete metadata/XML
+  before unique private snapshot publication and atomic `latest` replacement.
+  The original zero-file false success was reproduced; final **23/23** methods
+  passed in **14.136s** on Bash3.2/Python3.13. Family read-only acceptance captured
+  **43/43** listed XML maps with0700/0600 permissions, preserved complete saved
+  configuration and previous snapshot bytes even with stdout closed. Final
+  error-reporting guards are accepted offline; restore and concurrent-state
+  consistency remain unverified. Existing fleet CI extended, hosted execution
+  unobserved. Native secret test copies removed and workers closed; Portal1.87
+  unchanged. Original22:56:14–23:26:14UTC clock retained.
+  [Scoped receipt](portal-fleet-backup-integrity-2026-11-02.md).
+
 - **Latest Quick controls setup review:** a source-grounded functional mock proposes one shared setup destination for widget heading and Customize Settings, linking to the existing dashboard editor and Apps. Five inventory examples, address Save/Cancel/Escape and Back/Forward are clickable; handoffs remain simulations. Final43 browser interaction assertions and12 viewport/theme/text combinations passed; two actual browser captures were visually reviewed. Independent review corrections preserve focus and reject representative malformed addresses. Native routes, software and deployment are unchanged and require this design sign-off; no Portal performance claim. [Scope and acceptance](design/portal-quick-controls-setup-review-2026-11-02.md) / [interactive mock](http://127.0.0.1:8891/quick-controls-review.html).
 
 - **Latest phone photo-upload consistency:** companion1.7.3-music-preview/code15 is built, signed and fully read back in an ownedAPI34 emulator. Positive replies require literal success, exact destination/name and numeric byte count. Unconfirmed group uploads cannot be retried as failed; cleanup exceptions preserve the result, and failed refresh retains single-room guidance. Final590 JVM/76 suites and app/test builds passed;7/7 normal rendered cases and3/3 upload cases at130% text passed. Physical Pixel/live-network and whole-app acceptance remain open; no speedup claimed. Owned emulator removed, original AVD unchanged. Both exact Portal1.82 APKs, full room configuration and Family runtime retained; zero Portal writes/installs. Companion source committed as `6bf11bf`. [Scoped receipt](portal-companion-photo-upload-2026-11-02.md).
@@ -760,7 +772,7 @@ Roadmap: **52 tasks:23 delivered,20 scoped verified,5 parked,2 approval,2 queued
 
 ## Fleet screen-return unit — 2026-11-02
 
-Host helper `c5b5f652 delivered; Portal1.87 remains unchanged in both rooms.
+Host helper `c5b5f652` delivered; Portal1.87 remains unchanged in both rooms.
 Explicit return avoids leaving Family on its preexisting Home chooser after a
 selected deployment. Default Home XML/resolution stays unchanged. The missing
 default origin and automatic OTA behavior remain unverified; no silent preference
@@ -771,3 +783,27 @@ Roadmap: **52 tasks:24 delivered,20 scoped verified,5 parked,2 approval,1 queued
 Weather approval does not reopen its exhausted native geometry unit. Music playback
 requires normal human sign-in; continue authorized independent product discovery.
 The complete product goal remains open.
+
+## Fleet backup integrity unit — 2026-11-02
+
+Host backup source `d18ce87a` is locally delivered and included in the existing
+provisioning CI selection. A zero-exit `ok:false` listing originally published
+`latest` and claimed success with zero preferences. Complete capture validation,
+private owned staging, symlink rejection, unique publication, per-room continuation
+and best-effort reporting now guard this path. Final23/23 end-to-end methods,
+Bash syntax, whitespace and bounded independent review passed. Actual Family
+captured43/43 XML maps, with complete saved settings/layout/sources/screensaver
+unchanged. Closed-output success retained previous bytes. The two final
+error-message guards were subsequently verified offline.
+
+Temporary native registry/snapshot copies were removed; original private
+connections and preexisting scripts cache remain. No APK, device write,
+restore, Living native QA, GitHub authentication/publication or HA change.
+Restore/package migration, atomic changing-state capture, power-loss durability
+and hosted CI remain distinct limits.
+
+Roadmap: **53 tasks:25 delivered,20 scoped verified,5 parked,2 approval,1 queued**.
+Weather design approval is retained; its exhausted native geometry issue remains
+parked. Music account playback requires normal human sign-in, physical companion
+installation remains open and Quick Controls/gallery require approval. Continue
+authorized independent discovery; do not silently reopen exhausted issues.
