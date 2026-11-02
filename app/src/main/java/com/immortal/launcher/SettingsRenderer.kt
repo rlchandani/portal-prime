@@ -278,12 +278,12 @@ private fun <S> SettingControl(
     val help = if (advanced) fullHelp else SettingsPresentation.conciseHelp(domainId, spec.key, fullHelp)
     CompositionLocalProvider(LocalApprovedSettingsHelp provides help) {
         @Suppress("UNCHECKED_CAST")
-        when (spec) {
-            is BoolSpec<*> -> {
+        when (nativeSettingsEditor(spec)) {
+            NativeSettingsEditor.TOGGLE -> {
                 val s = spec as BoolSpec<S>
                 ToggleRow(s.title, s.get(snapshot), enabled = editsEnabled) { onApply(s.key, it) }
             }
-            is EnumSpec<*> -> {
+            NativeSettingsEditor.CHOICE -> {
                 val s = spec as EnumSpec<S>
                 val selected = if (domainId == "immortal" && s.key == "settingsTheme") {
                     if (com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark) "dark" else "light"
@@ -296,29 +296,29 @@ private fun <S> SettingControl(
                     onApply(s.key, it)
                 }
             }
-            is IntSpec<*> -> {
+            NativeSettingsEditor.CLOCK_TIME -> {
                 val s = spec as IntSpec<S>
-                if (s.timeOfDay) {
-                    ApprovedClockTimeSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
-                } else {
-                    ApprovedIntSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
-                }
+                ApprovedClockTimeSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
             }
-            is StringSpec<*> -> {
+            NativeSettingsEditor.INTEGER -> {
+                val s = spec as IntSpec<S>
+                ApprovedIntSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
+            }
+            NativeSettingsEditor.TEXT_NAVIGATION -> {
                 val s = spec as StringSpec<S>
-                val entry = s.entry
-                if (entry is Entry.Nav) {
-                    NavRow(s.title, s.get(snapshot).ifBlank { "Not set" }) {
-                        open(entry.activity)
-                    }
-                } else {
-                    ApprovedStringSetting(s, s.get(snapshot), help,
-                        preserveUneditedDraft = domainId == "fleet" && s.key == "name") {
-                        onApply(s.key, it)
-                    }
+                val entry = s.entry as Entry.Nav
+                NavRow(s.title, s.get(snapshot).ifBlank { "Not set" }) {
+                    open(entry.activity)
                 }
             }
-            is NavSpec<*> -> {
+            NativeSettingsEditor.TEXT -> {
+                val s = spec as StringSpec<S>
+                ApprovedStringSetting(s, s.get(snapshot), help,
+                    preserveUneditedDraft = domainId == "fleet" && s.key == "name") {
+                    onApply(s.key, it)
+                }
+            }
+            NativeSettingsEditor.NAVIGATION -> {
                 val s = spec as NavSpec<S>
                 if (s.valueOnWorker) {
                     WorkerNavigationRow(domainId, s, snapshot) { open(s.activity) }
@@ -326,7 +326,7 @@ private fun <S> SettingControl(
                     NavRow(s.title, s.value(context, snapshot)) { open(s.activity) }
                 }
             }
-            is DerivedSpec<*> -> Unit
+            NativeSettingsEditor.HIDDEN -> Unit
         }
     }
 }

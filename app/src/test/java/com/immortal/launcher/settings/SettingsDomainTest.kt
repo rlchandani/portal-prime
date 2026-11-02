@@ -386,38 +386,6 @@ class SettingsDomainTest {
   }
 
   @Test
-  fun onDeviceRenderedDomains_haveNoUnrenderableInlineStrings() {
-    // SettingsRenderer.SettingControl renders NOTHING for an Entry.Inline StringSpec (there's no
-    // inline free-text entry on a D-pad screen — those use a dedicated Entry.Nav Activity). So an
-    // inline string in a generically-rendered domain would silently show as a blank row only on the
-    // (manual-only) device. Mirror the exclude sets the two on-device screens pass to SettingsList
-    // and assert every spec they DO render is renderable. If these exclude sets change, update here.
-    val rendered =
-        listOf(
-            SettingsDomains.screensaver to setOf("enabled"),
-            SettingsDomains.calendar to emptySet(),
-            SettingsDomains.immortal to
-                setOf("multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword",
-                    "maApiToken", "maPlayerId"),
-            SettingsDomains.chime to setOf("spokenVoice"),
-            SettingsDomains.digitalclock to emptySet(),
-            SettingsDomains.welcome to emptySet(),
-            SettingsDomains.sunrise to emptySet(),
-        )
-    rendered.forEach { (dom, exclude) ->
-      val blank =
-          dom.specs
-              .filter { it.key !in exclude }
-              .filterIsInstance<StringSpec<*>>()
-              .filter { it.entry is Entry.Inline }
-              .map { it.key }
-      assertTrue(
-          "domain '${dom.id}' renders Entry.Inline StringSpec(s) on-device that show nothing: $blank",
-          blank.isEmpty())
-    }
-  }
-
-  @Test
   fun chimeRegistry_coversEveryPersistedField_orExplicitlyAccountsForIt() {
     // The on-device Chime screen renders its scalar controls from this domain, so a new
     // ChimeConfig.Settings field that nobody adds a spec for would silently never appear on-device
