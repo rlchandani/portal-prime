@@ -1,0 +1,10 @@
+{
+  "baseline-encoded-frames.json": "ace1705b993bbd3efabddaa12fd343b4112083d1bf546f56b990b31cb8ec514a",
+  "baseline-lifecycle.json": "5bfdc5791245e315278dccc516872b13766a9a5781ca67a79cf790df06b53aed",
+  "baseline-visual.json": "8a54e22c2fd2031cd18b8f194ef728a31f07f54b271b1ee6a5e4f7be804dd818",
+  "build-failure.json": "ae3e6932e072e967b8ffa5af899a01ad84b4a01ffc73483629959deb9b23c805",
+  "independent-baseline.json": "76b044dddaeb90e82c254e7c89ea8b85a213f796a9557ed535cc81bd74aa8380",
+  "outcome.json": "ee8d4920a17253c212a7305fc91a3398d8f125e5b2a387d2167ecb21b12b933f",
+  "restoration.json": "048c995f31172aa9d68c98fc66eb30b2e6b223d69f867bd83a387b7896858799",
+  "unverified-candidate.patch": "be5a042bce238900535579517e115a64f718903a2770f622dd021497d7d7e158"
+}

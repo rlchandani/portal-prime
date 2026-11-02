@@ -1,0 +1,17 @@
+{
+  "issue": "black flash leaving screensaver",
+  "slotStartUtc": "2026-11-01T23:58:52Z",
+  "slotDeadlineUtc": "2026-11-02T00:28:52Z",
+  "continuationObservedUtc": "2026-11-02T00:50:20Z",
+  "restoredUtc": "2026-11-02T00:51:25.498944+00:00",
+  "baselineReproduced": true,
+  "baselineNearBlackEncodedFrames": 6,
+  "candidateBuildPassed": false,
+  "candidateDeviceVerified": false,
+  "candidateInstalled": false,
+  "productionSourceRestored": true,
+  "reason": "R8 failed with No space left on device; user interruption followed; deadline elapsed before continuation. No build restart or candidate deployment after deadline.",
+  "localDiskSpaceBlockerResolved": true,
+  "broadGoalComplete": false,
+  "issueDisposition": "incomplete and parked"
+}

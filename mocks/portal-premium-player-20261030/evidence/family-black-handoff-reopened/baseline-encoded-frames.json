@@ -1,0 +1,114 @@
+[
+  {
+    "timestamp": 0.0,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.396,
+    "photoMeanError": 1.528
+  },
+  {
+    "timestamp": 0.661911,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.383,
+    "photoMeanError": 1.532
+  },
+  {
+    "timestamp": 0.688344,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.43,
+    "photoMeanError": 1.399
+  },
+  {
+    "timestamp": 0.700289,
+    "classification": "photo",
+    "nearBlack": false,
+    "homeMeanError": 42.46,
+    "photoMeanError": 1.381
+  },
+  {
+    "timestamp": 0.758856,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.818,
+    "photoMeanError": 84.894
+  },
+  {
+    "timestamp": 0.774956,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.818,
+    "photoMeanError": 84.894
+  },
+  {
+    "timestamp": 0.791056,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.818,
+    "photoMeanError": 84.894
+  },
+  {
+    "timestamp": 0.874644,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.818,
+    "photoMeanError": 84.894
+  },
+  {
+    "timestamp": 0.892489,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.818,
+    "photoMeanError": 84.894
+  },
+  {
+    "timestamp": 0.909511,
+    "classification": "transition",
+    "nearBlack": true,
+    "homeMeanError": 50.818,
+    "photoMeanError": 84.894
+  },
+  {
+    "timestamp": 0.925422,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.041,
+    "photoMeanError": 41.653
+  },
+  {
+    "timestamp": 0.942622,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.048,
+    "photoMeanError": 41.66
+  },
+  {
+    "timestamp": 1.023956,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.045,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 1.1582,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.049,
+    "photoMeanError": 41.659
+  },
+  {
+    "timestamp": 3.973456,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.047,
+    "photoMeanError": 41.661
+  },
+  {
+    "timestamp": 3.990011,
+    "classification": "home",
+    "nearBlack": false,
+    "homeMeanError": 1.041,
+    "photoMeanError": 41.656
+  }
+]

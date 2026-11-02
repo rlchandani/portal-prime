@@ -1,0 +1,18 @@
+{
+  "case": "baseline",
+  "scope": "all_encoded_frame_content_not_panel_fps",
+  "frameCount": 16,
+  "referenceDistance": 41.676007577242146,
+  "nearBlackFrames": 6,
+  "counts": {
+    "photo": 4,
+    "home": 6,
+    "transition": 6
+  },
+  "firstHomeTimestamp": 0.925422,
+  "photoFramesAfterFirstHome": 0,
+  "nonHomeFramesAfterFirstHome": 0,
+  "timestampSpanSeconds": 3.990011,
+  "largestTimestampGapSeconds": 2.815256,
+  "passed": false
+}

@@ -2,6 +2,18 @@
 
 **Overall status: incomplete.** The user now accepts Family Area’s natural brightness/photo-clock fades on current optimized APK **872b6af7…**. The explicitly reopened legacy-motion slot tested three candidates; none passed both the native and strict retained-motion checks, so the original software and configuration are restored. Other recorded delivery remains scoped to its stated evidence. Legacy recovery and parked startup/performance gaps keep the broader goal incomplete.
 
+**Newest bounded result, November 1–2 — reopened black-handoff slot.**
+The [newly authorized slot](portal-black-handoff-reopened-2026-11-01.md)
+reproduces **6 near-black frames / 16 encoded frames** on current **872b6af7…**.
+All **30** activity observations retain the original Home; an independent parser
+corroborates them. The prepared Activity-transition candidate could not build:
+R8 failed because the Mac's disk was full. It was never installed or verified.
+The user interrupted the turn, and continuation arrived after the unchanged
+thirty-minute deadline. Cleanup restores all 97 settings, sources, both face
+caches, services, pin, original software and photo preview; the unverified source
+change is archived and reverted. Disk space is now available, but no build is
+restarted after the deadline. This visual issue remains incomplete and parked.
+
 **Newest bounded result, November 1 — reopened legacy night-motion slot.**
 The [explicitly reopened thirty-minute slot](portal-night-legacy-reopened-2026-11-01.md)
 completed three candidates. The first two pass covered/continuity observations but

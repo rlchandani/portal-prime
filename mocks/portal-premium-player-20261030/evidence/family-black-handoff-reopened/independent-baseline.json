@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "summary": {
+    "observationCount": 30,
+    "resumedKinds": {
+      "home": 30
+    },
+    "homeCountDistribution": {
+      "1": 30
+    },
+    "previewCountDistribution": {
+      "0": 30
+    },
+    "resumedHomeIdentityMatchCount": 30,
+    "singleLiveHomeIdentityMatchCount": 30,
+    "continuationPresentBeforeDream": true,
+    "previewAbsentAtFirstObservation": true,
+    "previewAbsentThroughoutObservations": true,
+    "activityContractPass": true
+  },
+  "limits": [
+    "Activity dump samples only; no video analysis or panel timing.",
+    "Identity comparisons use private tokens in memory; the receipt contains no tokens.",
+    "Preview absence establishes sampled retirement, not the precise retirement instant or callback count.",
+    "Activity identities do not independently establish unchanged process identity."
+  ],
+  "parserSha256": "33068dba5cfd207841d922fa50f1cfb2e485f03e8c4605236aebff1a51ef656e"
+}

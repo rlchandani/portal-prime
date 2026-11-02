@@ -1,0 +1,9 @@
+{
+  "command": "./gradlew :app:assemblePerformance :app:testDebugUnitTest --no-daemon",
+  "passed": false,
+  "error": "java.io.IOException: No space left on device",
+  "r8TaskFailed": true,
+  "buildFailed": true,
+  "claimedFreshUnitPass": false,
+  "artifactInstalled": false
+}
