@@ -1,0 +1,38 @@
+{
+  "scope": "local-artifact-readiness",
+  "status": "ready",
+  "published": false,
+  "deployed": false,
+  "durationMs": 295144,
+  "javascript": {
+    "slideshow-js": 354,
+    "remote-js": 676
+  },
+  "pythonTests": 186,
+  "jvm": {
+    "tests": 3869,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 406
+  },
+  "tools": {
+    "python": "3.13.7",
+    "androidBuildTools": "36.0.0",
+    "node": "v22.13.1"
+  },
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionCode": 71,
+    "versionName": "1.77",
+    "signerSha256": [
+      "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    ],
+    "bytes": 25860686,
+    "sha256": "e31941c245a33c785946b678769072632539b0752b0355cd4a535394dd7c8321"
+  },
+  "baselineSha256": "5df871735ada5aae37375a6cd6129aa9fcb13329c982441a0cc90db2fd4f383e",
+  "sourceSha256": "6cfe0cc2ffdbe382db9a4f47ce6254666d8e29cec916fb296158e72c6f095867",
+  "nativeChanges": false,
+  "hostedCiObserved": false
+}

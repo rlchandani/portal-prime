@@ -11,7 +11,11 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Latest slideshow gate coverage:** CI and local readiness now select all20 existing slideshow modules, preserving source/label checks and placing Python3.12 before the Cinema fixture. Old guards reproduced19 omitted modules and a false-ready failing-module case. Full real local readiness passed in295,144ms:354 slideshow /676 remote JS /186 Python /3869 JVM406 suites, optimized assembly/R8/vital lint and artifact/source checks. Independent review found no important issues. No runtime change, deployment or publication; hosted Ubuntu/Python3.12 remains unobserved. [Receipt](portal-slideshow-regression-gates-2026-11-02.md).
+
 - **Latest Family auto-confirm readiness:** exact existing1.77 reinstallation recovered two own services stuck in Android Binding after target instrumentation. A controlled secure-list reconnect failed and was exactly restored; global flag unchanged. The final real Fleet-only smoke passed in14,012.595ms with a fresh automatic Install event, linked hardware identity, full app/original-test hashes and whole settings unchanged.19 focused /180 Portal Python tests passed; independent review corrected three tooling gaps. No new app release, Living operation, valid self-update/concurrency or universal performance claim. [Receipt](portal-installer-confirm-readiness-2026-11-02.md).
+
+- **Weather native candidate held:**1.78/code72 implements adaptive content, truthful loading/error labels, neutral unknown glyphs and the full-width settings action.3882 JVM tests/407 suites and debug/optimized/R8/vital lint passed. Native hourly is clean after spacing refinement; medium daily lows remain clipped, large grid placement and150% text acceptance are incomplete. Family was restored to exact1.77 with complete profile/layout/screensaver/font scale unchanged; Living was untouched. Original30-minute slot closed. [Receipt](portal-weather-native-refinement-2026-11-02.md).
 
 - **New explicit design approval:** Weather-only adaptive sizes, current conditions, hourly/daily/off forecasts and unavailable states using existing automatic location are approved for native implementation. Manual location and the whole widget gallery remain separate; actual Family visual/performance acceptance is required. This approval does not reopen parked issues.
 

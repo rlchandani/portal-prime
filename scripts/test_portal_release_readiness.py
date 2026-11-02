@@ -225,6 +225,63 @@ else:print('ℹ tests 1\\nℹ fail 0')
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertEqual(1, f.receipt()["javascript"]["remote-js"])
 
+    def test_slideshow_gate_selects_every_module_in_both_node_formats(self):
+        f = self.fixture
+        modules = {
+            "scripts/tests/slideshow_face_region_crop.test.mjs",
+            "scripts/tests/slideshow_future_lifecycle.test.cjs",
+            "scripts/tests/slideshow_future_resource.test.mjs",
+        }
+        for name in modules:
+            f.write(name, "// fixture\n")
+        helpers = {
+            "scripts/tests/slideshow_fixture.mjs",
+            "scripts/tests/remote_other.test.mjs",
+        }
+        for name in helpers:
+            f.write(name, "// not a slideshow module\n")
+        result = f.run()
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        calls = [json.loads(line) for line in (f.repo / "commands.log").read_text().splitlines()]
+        gate = next(call for call in calls
+                    if "scripts/test_slideshow_sources.mjs" in call)
+        self.assertTrue(modules.issubset(gate), f"Missing modules: {modules - set(gate)}")
+        self.assertTrue(helpers.isdisjoint(gate))
+        self.assertEqual(len(gate), len(set(gate)), "Each module must run once")
+
+    def test_failure_in_a_discovered_slideshow_module_blocks_readiness_before_build(self):
+        f = self.fixture
+        module = "scripts/tests/slideshow_future_failure.test.mjs"
+        f.write(module, "// failing fixture\n")
+        f.executable(f.tools / "node", f"""
+import json,pathlib,sys
+with open(pathlib.Path.cwd()/'commands.log','a') as f:f.write(json.dumps(['node']+sys.argv[1:])+'\\n')
+if '--version' in sys.argv: print('v24.0.0')
+elif {module!r} in sys.argv:
+ print('# tests 1\\n# fail 1')
+ sys.exit(9)
+else: print('# tests 1\\n# fail 0')
+""")
+        result = f.run()
+        self.assertNotEqual(0, result.returncode, result.stdout + result.stderr)
+        receipt = f.receipt()
+        self.assertEqual("failed", receipt["status"])
+        self.assertIn("slideshow-js", receipt["error"])
+        self.assertFalse(receipt["published"])
+        self.assertFalse(receipt["deployed"])
+        self.assertFalse((f.output / "candidate.apk").exists())
+        calls = [json.loads(line) for line in (f.repo / "commands.log").read_text().splitlines()]
+        self.assertFalse(any(call[0] == "gradlew" for call in calls))
+
+    def test_missing_required_native_module_cannot_leave_a_partial_slideshow_gate_ready(self):
+        f = self.fixture
+        (f.repo / "scripts/tests/slideshow_native_filmstrip.test.cjs").unlink()
+        f.write("scripts/tests/slideshow_other.test.mjs", "// fixture\n")
+        result = f.run()
+        self.assertNotEqual(0, result.returncode)
+        self.assertEqual("failed", f.receipt()["status"])
+        self.assertFalse((f.output / "candidate.apk").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

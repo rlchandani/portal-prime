@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T15:04:05.120482+00:00",
-  "updatedLabel": "2 November 2026 \u00b7 Family automatic confirmation recovered and verified",
+  "updatedAt": "2026-11-02T15:53:32.185981+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 Full slideshow regression gates locally verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "installer-confirm-service-readiness",
+  "defaultTask": "ci-regressions",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact optimized1.77/code71. Earlier task receipts retain their acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
@@ -13,6 +13,48 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "weather-native-layout",
+      "title": "Weather: approved adaptive native widget",
+      "summary": "Approved native candidate built; hourly is clean. Daily clipping and remaining native acceptance keep it off both installed Portals.",
+      "description": "Use the existing automatic location, current conditions and hourly/daily/off modes. Saved widget dimensions select content density; existing data ownership, refresh cadence and inactive-page behavior remain intact.",
+      "status": "parked",
+      "verification": "3,882 tests passed \u00b7 native acceptance incomplete",
+      "kind": "Approved native UX refinement",
+      "platforms": [
+        "portal",
+        "design"
+      ],
+      "owner": "Native UI / Family quality and performance",
+      "deployment": "1.78/code72 candidate preserved; exact1.77 restored on Family. Living unchanged on1.77.",
+      "state": "Original30-minute implementation slot closed; candidate retained on its new branch.",
+      "acceptance": [
+        "Adaptive compact/medium/large content based on actual saved size and font scale, preserving widget identity/order/placement.",
+        "Current condition label/city/high-low, hourly/daily/off, initial loading, unavailable current and missing selected forecast.",
+        "Existing automatic location and Weather settings destination; no manual location picker.",
+        "Both themes, normal/150% native text, resize/settings return and equivalent native performance checks before final two-room deployment."
+      ],
+      "evidence": [
+        {
+          "text": "Approved mock and exact existing-data scope.",
+          "source": "mocks/portal-widget-gallery-20261102/weather-review.html"
+        },
+        {
+          "text": "Bounded implementation, test and acceptance plan.",
+          "source": "docs/superpowers/plans/2026-11-02-weather-native-refinement.md"
+        },
+        {
+          "text": "Native candidate, measured performance and exact restoration receipt.",
+          "source": "docs/portal-weather-native-refinement-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Daily low temperatures remain clipped in the medium card.",
+        "Large4\u00d74 falls below the current grid viewport;150% text was not proved applied to the renderer.",
+        "Native unavailable/missing-forecast injection and network request counts remain unverified. Warm timing sample is scoped, not universal."
+      ],
+      "next": "A separately authorized bounded follow-up must resolve daily geometry and finish native acceptance before delivery."
+    },
     {
       "id": "companion-compat",
       "title": "Android companion compatibility guards",
@@ -397,11 +439,11 @@
     },
     {
       "id": "ci-regressions",
-      "title": "Bundled JavaScript & Python CI guards",
-      "summary": "Implemented and locally verified: latest bundled JS 676 tests; Portal Python 161 tests. Existing CI globs include the new guards; hosted execution remains unobserved.",
+      "title": "CI and local readiness: all slideshow regression modules",
+      "summary": "Both gates now run all20 existing slideshow modules:354 checks, up from40. No Portal runtime change.",
       "description": "The workflow now includes all 29 existing bundled-JavaScript regression modules and seven Portal Python modules, alongside retained JVM and slideshow gates.",
       "status": "delivered",
-      "verification": "Implemented / locally verified",
+      "verification": "Local full readiness passed \u00b7 hosted CI unobserved",
       "kind": "CI protection",
       "platforms": [
         "portal",
@@ -409,8 +451,8 @@
         "tooling"
       ],
       "owner": "CI",
-      "deployment": "Workflow source implemented; no device installation",
-      "state": "Local verification passed; hosted result unobserved",
+      "deployment": "Committed local tooling; no authentication, publication or APK deployment. Installed rooms remain1.77.",
+      "state": "Complete real local readiness passed in295,144ms:354 slideshow /676 remote JS /186 Python /3869 JVM; optimized build, R8, vital lint, signer and stable-source checks passed.",
       "acceptance": [
         "Protect room targeting, stale responses, operations, photos, install observation and validation contracts.",
         "Retain the existing JVM/slideshow checks and ordinary failure propagation.",
@@ -424,14 +466,22 @@
         {
           "text": "Workflow YAML parsed and shell prerequisite syntax checked. No app/UI change or live service was needed.",
           "source": ".github/workflows/tests.yml; docs/portal-python-ci-gate-2026-11-02.md"
+        },
+        {
+          "text": "Coverage defect, executable red cases and scoped verification.",
+          "source": "docs/portal-slideshow-regression-gates-2026-11-02.md"
+        },
+        {
+          "text": "Selected actual local readiness counts and artifact identity.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/slideshow-regression-gates-verification.json"
         }
       ],
       "limits": [
-        "Hosted Ubuntu / Node 22 / Python 3.12 execution remains unobserved; no hosted acceptance is claimed.",
-        "These offline gates do not establish current browser/device end-to-end behavior.",
-        "Native device checks and Rust compilation are not configured in this workflow."
+        "Hosted Ubuntu/Python3.12 execution remains unobserved; local Node22.13.1/Python3.13.7 passed.",
+        "Fixture coverage does not prove native slideshow smoothness or parked runtime issues.",
+        "No new app, physical-phone acceptance or music playback proof."
       ],
-      "next": "Record hosted evidence only when an authorized observation exists. Preserve current no-authentication/publication constraints."
+      "next": "Use the expanded local gate for warranted future releases; observe hosted CI only when authorized."
     },
     {
       "id": "black-handoff",

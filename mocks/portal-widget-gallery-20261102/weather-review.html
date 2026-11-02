@@ -32,7 +32,7 @@
     </nav>
     <h1>A clearer Weather widget.</h1>
     <p>Keep the temperature easy to read, with a calm condition label and a forecast that fits the space. This is a proposed Portal design using the Weather data already available in Immortal.</p>
-    <p class="review-status"><strong>Design approval pending.</strong> The image is a browser mock with example data. Native visual fidelity and performance still require Portal verification.</p>
+    <p class="review-status"><strong>Weather scope approved; native candidate built, acceptance incomplete.</strong> The image is a browser mock with example data. Native visual fidelity and performance still require Portal verification.</p>
     <figure>
       <img src="./evidence/weather-medium-review.png" width="580" height="372" alt="Proposed Weather card with 21 degrees, partly cloudy, example city, high and low, three hourly entries and a Weather settings button.">
       <figcaption>Actual capture of the existing medium mock. Open the interactive version to change size, state, theme and text size.</figcaption>
@@ -72,7 +72,7 @@
     <section aria-labelledby="limits-title">
       <h2 id="limits-title">Source limits kept visible</h2>
       <p>IP-based location can resolve to an ISP city. Current fields do not include humidity, wind, feels-like temperature or freshness timestamps. Forecast failures currently remove the forecast; this review does not promise offline forecast persistence.</p>
-      <p>A separate source review found two correctness concerns: hourly labels can retain the old clock format until refresh, and the exact-hour cutoff could select the previous hour as “Now.” The cutoff correction has a separate test receipt; the clock-format concern remains open.</p>
+      <p>A separate source review found two correctness concerns: hourly labels can retain the old clock format until refresh, and the exact-hour cutoff could select the previous hour as “Now.” The cutoff correction has a separate test receipt; the clock-format correction also has its own scoped receipt. Native Home/settings-return acceptance remains separate.</p>
     </section>
   </main>
 </body>

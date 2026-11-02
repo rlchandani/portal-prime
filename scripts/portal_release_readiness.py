@@ -215,10 +215,16 @@ def execute(args, receipt):
         raise CheckFailed("Baseline package differs from the selected variant.")
     receipt["baseline"] = baseline
 
-    slideshow = ["scripts/test_slideshow_sources.mjs", "scripts/test_slideshow_labels.mjs",
-                 "scripts/tests/slideshow_native_filmstrip.test.cjs"]
+    slideshow_sources = ["scripts/test_slideshow_sources.mjs", "scripts/test_slideshow_labels.mjs"]
+    slideshow = slideshow_sources + sorted(
+        str(path.relative_to(root))
+        for pattern in ("slideshow_*.test.mjs", "slideshow_*.test.cjs")
+        for path in (root / "scripts/tests").glob(pattern)
+        if path.is_file()
+    )
+    required_slideshow = slideshow_sources + ["scripts/tests/slideshow_native_filmstrip.test.cjs"]
     remote = sorted(str(p.relative_to(root)) for p in (root / "app/src/test/js").glob("*.test.mjs"))
-    if not remote or not all((root / p).is_file() for p in slideshow):
+    if not remote or not all((root / p).is_file() for p in required_slideshow):
         raise CheckFailed("Required JavaScript test files are missing.")
     receipt["javascript"] = {}
     for label, paths in (("slideshow-js", slideshow), ("remote-js", remote)):
