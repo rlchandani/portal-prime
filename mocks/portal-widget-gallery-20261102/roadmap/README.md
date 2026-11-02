@@ -274,3 +274,5 @@ requests and15 framework checks passed with restored resources/configuration.
 Family required wireless ADB after a missed Fleet confirmation; Living's final
 Fleet deployment verified the full installed hash. That missed confirmation now
 has a separate cause-first queued readiness item, with no assumed root cause.
+
+The confirmation-readiness checkpoint keeps32 tasks:14 delivered/implemented,12 scoped verified,2 approval,3 parked and1 queued account-dependent playback. Family's exact existing1.77 recovery and valid Fleet fixture confirmation passed.19 focused/180 Python tests protect linked device identity, actual completed binding, full hashes and timeout honesty. Original app/test/settings remain preserved; no new release or Living operation. Weather-only design scope is now approved for the next native unit; broader gallery approval stays pending.

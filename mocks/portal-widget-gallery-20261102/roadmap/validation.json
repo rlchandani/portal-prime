@@ -604,5 +604,32 @@
     "missingLabels": false,
     "pageErrors": 0,
     "scope": "Changed saved-page detail presentation only; no whole-native-UI/performance acceptance."
+  },
+  "confirmationReadinessSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T15:04:44.706310+00:00",
+    "taskIds": [
+      "installer-confirm-service-readiness",
+      "installer-confirm-ownership",
+      "qa-optimized-platform-fixture",
+      "widget-gallery"
+    ],
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "detailChecks": 8,
+    "renderedRows": 32,
+    "horizontalOverflow": false,
+    "missingLabels": false,
+    "versionFooterCorrect": true,
+    "readinessProofAndWeatherApprovalVisible": true,
+    "pageErrors": 0,
+    "scope": "Four changed saved-roadmap details; native acceptance independently recorded; no broad UI or performance reacceptance."
   }
 }

@@ -1,0 +1,48 @@
+{
+  "scope": "Family API29 automatic valid fixture installation and Fleet-only workstation smoke; no new Portal release",
+  "artifact": {
+    "versionCode": 71,
+    "versionName": "1.77"
+  },
+  "native": {
+    "nativeSmoke": {
+      "deploy": "passed",
+      "failures": [],
+      "postflight": "passed",
+      "preflight": "passed",
+      "status": "passed"
+    },
+    "elapsedMs": 14012.595,
+    "freshAutomaticInstallEvents": 1,
+    "profileUnchanged": true,
+    "screensaverUnchanged": true,
+    "version": {
+      "versionCode": 71,
+      "versionName": "1.77"
+    },
+    "originalChromeTaskListed": true,
+    "appSha256": "5df871735ada5aae37375a6cd6129aa9fcb13329c982441a0cc90db2fd4f383e",
+    "fixtureSha256": "b318d39ff76ce0ee59fce2bff4164745da6da28e48d4ed5ffcfa6dcc2635c136"
+  },
+  "recovery": {
+    "installerServiceRecordPresent": true,
+    "ownedComponentsRemainInBinding": false,
+    "enabledListUnchanged": true,
+    "globalFlagUnchanged": true
+  },
+  "secureReconnectAttempt": "Failed; original enabled list restored exactly, global flag unchanged",
+  "reviewFindingsCorrected": [
+    "ADB/Fleet target identity",
+    "local timeout descendant cleanup and unknown remote completion",
+    "published completed accessibility binding"
+  ],
+  "focusedHostTests": 19,
+  "allPortalPythonTests": 180,
+  "initialGateFailures": "One malformed null-binder fixture corrected; unrelated existing process-timeout fixture reported transient Operation not permitted, passed targeted and full reruns",
+  "limits": [
+    "No valid self-update, valid concurrency, real remote timeout or reboot-persistence verdict",
+    "Living unchanged this unit; current1.77 proof belongs to preceding delivery",
+    "Chrome task listed only; no foreground/process/music continuity claim",
+    "No app/JVM rebuild warranted for Python-only QA change"
+  ]
+}

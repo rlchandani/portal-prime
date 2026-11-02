@@ -30,6 +30,16 @@ Back up and restore the existing test APK when using this alternate test build.
 For the deliberate failing case, add `-e failAfterCreate true` to `am instrument`.
 An instrumentation completion code of 1 is expected for that case.
 
+**Lifecycle caution from the later Family readiness check:** Android 10
+internally force-stops the target package at instrumentation start and finish.
+Avoiding UiAutomation does not prevent that lifecycle effect. Family's services
+were later found enabled but stuck binding after teardown. Prefer the
+Fleet-API-based smoke tool for real installer confirmation; when this framework
+fixture is warranted, verify actual accessibility binding afterward and preserve
+the original app/test/configuration baseline. Read the
+[recovery receipt](portal-installer-confirm-readiness-2026-11-02.md).
+These later findings do not change the historical session-cleanup results below.
+
 Each invocation records the exact existing owned-session set, creates a fresh
 target and guard, abandons the target, and checks that the guard remains. Finally,
 it removes all newly created sessions and compares the exact final ID set to the

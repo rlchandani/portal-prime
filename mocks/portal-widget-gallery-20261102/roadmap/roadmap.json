@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T14:41:42.337744+00:00",
-  "updatedLabel": "2 November 2026 \u00b7 confirmation ownership delivered in1.77",
+  "updatedAt": "2026-11-02T15:04:05.120482+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 Family automatic confirmation recovered and verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "installer-confirm-ownership",
+  "defaultTask": "installer-confirm-service-readiness",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact optimized1.76/code70. Earlier task receipts retain their acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
+    "Both rooms have exact optimized1.77/code71. Earlier task receipts retain their acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -296,7 +296,7 @@
       ],
       "owner": "Design / product",
       "deployment": "Browser review artifact only",
-      "state": "No UI redesign approval",
+      "state": "No UI redesign approval Weather adaptive sizes/current conditions/hourly-daily-off/unavailable states using automatic location are now explicitly approved; broader gallery and manual location remain separate.",
       "acceptance": [
         "Review the separate mock and explicitly identify any approved design scope.",
         "Keep existing bounded correctness fixes distinct from a whole-widget redesign.",
@@ -317,7 +317,7 @@
         "No shipped native iOS application is identified.",
         "Mock screenshots do not prove native behavior."
       ],
-      "next": "Review the separate gallery; record an explicit decision without treating the mock as product delivery."
+      "next": "Implement only the approved Weather scope in a fresh bounded unit; broader gallery approval remains pending."
     },
     {
       "id": "world-clock",
@@ -393,7 +393,7 @@
         "Living did not receive a duplicate physical interaction run.",
         "Observer counts and equivalent-scenario performance comparisons remain unverified."
       ],
-      "next": "Keep the original scoped acceptance receipt; current room artifact is1.76. Broader native acceptance remains separate."
+      "next": "Keep the original scoped acceptance receipt; current room artifact is1.77. Broader native acceptance remains separate."
     },
     {
       "id": "ci-regressions",
@@ -1250,9 +1250,10 @@
         "Framework fixture only; existing Kotlin UI ABI compatibility remains unproved.",
         "Fresh empty guard session; no concurrent valid-install/timeout/confirmation acceptance.",
         "API29 Family only; no phone, API28, native UX/FPS or music playback claim.",
-        "JVM gate used up-to-date3858-test/405-suite results. No new Portal release or performance gain."
+        "JVM gate used up-to-date3858-test/405-suite results. No new Portal release or performance gain.",
+        "Android instrumentation internally stops its target package; avoiding UiAutomation alone does not preserve accessibility bindings. Later Family readiness receipt records actual recovery."
       ],
-      "next": "Reuse this scoped fixture when warranted. Normal Google sign-in/Premium playback and UI approvals remain separate; keep parked investigations closed."
+      "next": "Use Fleet-only smoke for actual automatic confirmation. Use this session API fixture only when warranted, with actual binding postflight and original app/test/configuration preservation."
     },
     {
       "id": "installer-confirm-ownership",
@@ -1287,44 +1288,49 @@
       ],
       "limits": [
         "No native two-valid-install confirmation, expiry/timeout or general performance verdict.",
-        "Family automatic confirmation on1.77 is still unverified; actual prior visible prompt/failure is queued separately.",
         "Framework session check does not inspect the production lease map or prove complete UI behavior.",
-        "No API28 or physical-phone acceptance."
+        "No API28 or physical-phone acceptance.",
+        "Family normal valid fixture confirmation now has a separate passing readiness receipt; production self-update is not inferred."
       ],
-      "next": "Retain the lease fix. Independently inspect Family automatic-confirmation service readiness; keep UI/physical-phone/music and parked boundaries."
+      "next": "Retain the lease fix and guarded Fleet smoke. No valid concurrent-install, expiry/timeout or universal performance verdict."
     },
     {
       "id": "installer-confirm-service-readiness",
       "title": "Family fleet installs: verify automatic confirmation",
-      "summary": "Family1.76 left a visible Install prompt and returned failure during the authorized update; wireless ADB delivered1.77.",
-      "description": "Cause-first readiness check of enabled/bound accessibility service and actual installer events on Family. Existing overlap source fix does not establish why its earlier prompt was missed.",
-      "status": "queued",
-      "verification": "Observed native prompt/failure \u00b7 cause unproved",
+      "summary": "Stale Android accessibility binding recovered. A real valid Fleet install and the guarded smoke test now automatically confirm on Family.",
+      "description": "Distinguish enabled configuration from actual bound readiness. Avoid target instrumentation for real installer smoke; use the Fleet API with linked device identity and exact original APK hashes.",
+      "status": "verified",
+      "verification": "Family valid Fleet confirmation \u00b7 19 focused / 180 Python tests",
       "kind": "Native reliability",
       "platforms": [
         "portal",
         "tooling"
       ],
       "owner": "Android runtime / QA",
-      "deployment": "No new readiness correction or OS configuration. Both rooms currently have exact1.77; Living updated normally.",
-      "state": "Family automatic confirmation on1.77 remains unverified. Prior valid self-update missed its prompt; no inactive-service, event-filter or expiry cause is assumed.",
+      "deployment": "Exact existing optimized1.77 reinstalled once over wireless ADB for recovery. Both rooms retain1.77; no new APK or Living operation.",
+      "state": "Both own services bound; final native smoke passed in14.013s with fresh automatic Install log, full app/test hashes and complete saved settings unchanged.",
       "acceptance": [
-        "Inspect current enabled/bound service state and actual foreground installer component before choosing a correction.",
-        "Use one fresh30-minute Family-only unit; preserve configuration, original test package and pending browser account work.",
-        "If warranted, verify the actual confirmation lifecycle with a bounded owned public fixture and restore it.",
-        "Publish a measured cause/fix or a precise unverified boundary; do not claim success from enabled-setting metadata alone."
+        "Link the selected registry room to ADB hardware identity before and after deployment.",
+        "Require published completed binding and no owned component stuck Binding; do not infer readiness from enabled metadata.",
+        "Reinstall only the already-installed exact original debug test APK through Fleet; verify full app/test hashes and secure settings before/after.",
+        "Kill local process descendants on timeout, report unknown remote completion honestly, and preserve complete settings/browser task."
       ],
       "evidence": [
         {
-          "text": "Failed Family Fleet update, visible prompt, terminal fallback and successful Living deployment are recorded.",
-          "source": "docs/portal-installer-confirm-ownership-2026-11-02.md"
+          "text": "Observed stale binding, failed reversible reconnect, exact-APK recovery, actual automatic Install logs, guarded native smoke and research sources.",
+          "source": "docs/portal-installer-confirm-readiness-2026-11-02.md"
+        },
+        {
+          "text": "Selected full-hash, binding, complete-profile and test evidence without secrets.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/installer-confirm-readiness-verification.json"
         }
       ],
       "limits": [
-        "Queued; no proven cause, source correction or new native acceptance.",
-        "No repeated Living native tests or reopened screensaver/performance experiments."
+        "Normal valid fixture path after recovery only; no valid self-update, valid concurrency, actual timeout, reboot-persistence or API28 verdict.",
+        "Chrome task retained in listing; browser foreground/process retention/sign-in/music continuity remain unverified.",
+        "No Living native repetition or new performance/screensaver work."
       ],
-      "next": "Read enabled/bound-service and installer-event evidence on Family, then select the smallest justified correction within the original30-minute unit."
+      "next": "Retain guarded Fleet-only smoke and instrumentation lifecycle warning. Approved Weather native refinement is next; preserve account/physical-phone and parked boundaries."
     }
   ]
 }
