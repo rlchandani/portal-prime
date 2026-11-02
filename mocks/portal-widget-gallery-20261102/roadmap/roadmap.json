@@ -1,0 +1,462 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-11-02",
+  "updatedLabel": "2 Nov 2026 (UTC)",
+  "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
+  "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
+  "sourceDocument": "docs/portal-product-operating-state.md",
+  "defaultTask": "companion-compat",
+  "boundaries": [
+    "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
+    "Existing rooms retain accepted 1.66 / code 60. No new maintenance APK deployment is planned.",
+    "No GitHub authentication, push or publication. No HA music deployment.",
+    "Exhausted work remains parked under the original 30-minute issue rule."
+  ],
+  "tasks": [
+    {
+      "id": "companion-compat",
+      "title": "Android companion compatibility guards",
+      "summary": "555 tests / 73 suites passed. Debug and test APKs built; physical phone acceptance remains open.",
+      "description": "Protect capability fallback and reject stale responses when a phone switches rooms or sessions. Work is isolated on codex/companion-compat-20261102, using the preserved companion source.",
+      "status": "verified",
+      "verification": "Locally verified · not deployed",
+      "kind": "Regression protection",
+      "platforms": [
+        "companion",
+        "portal"
+      ],
+      "owner": "Companion lead",
+      "deployment": "Local 1.7.0-music-preview / code 12 APK built; no phone installation",
+      "state": "Final full gate exited 0; 555 tests / 73 suites, no failures/errors/skips",
+      "acceptance": [
+        "Cover 404 / 405 / 501 capability fallback without treating authentication, network or schema failures as unsupported capability.",
+        "Reject a delayed response from a former room or session.",
+        "Preserve existing write admission, cancellation and music behavior."
+      ],
+      "evidence": [
+        {
+          "text": "Fifteen new test methods and a behavior-preserving media fallback predicate extraction are present on the separate branch.",
+          "source": "docs/portal-product-operating-state.md; codex/companion-compat-20261102"
+        },
+        {
+          "text": "Final XML: 555 tests / 73 suites, zero failures/errors/skips; compatibility class 15/15. Full JVM/debug gate and focused/test-APK gate exited 0.",
+          "source": "Coordinator independent XML update, 2026-11-02"
+        },
+        {
+          "text": "Preserved companion source was recovered at commit 422286e1d8e2afd51c9809315418681e2f868efd.",
+          "source": "docs/portal-companion-provenance-2026-11-02.md"
+        },
+        {
+          "text": "Maintenance committed as 610899f7074323e24832caa9f0d52e3db8a7b5fd. Debug APK SHA-256: 9ce56c077517e5a92ec5e10858926fe70b3c54aceb7ea46b873d40e5c1b1359e. Neither APK was installed or run.",
+          "source": "Toolkit docs/companion-compatibility-validation-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "APK and test APK assembly prove compilation/package readiness, not native interaction or performance.",
+        "Historical phone receipts do not prove current native UI, installed identity or end-to-end playback.",
+        "No phone rewrite or HA music service setup is included."
+      ],
+      "next": "Local maintenance is committed. Keep physical phone and live playback checks separate; timer ownership is next."
+    },
+    {
+      "id": "settings-contract",
+      "title": "Native settings editor contract",
+      "summary": "Full local gates passed: 3,796 tests / 398 suites. Maintenance verified; rooms stay on accepted 1.66.",
+      "description": "Replace the obsolete inline-string prohibition with classification and projection coverage for the renderer's actual supported editors. This protects the existing settings behavior.",
+      "status": "verified",
+      "verification": "Locally verified · not deployed",
+      "kind": "Maintenance",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Settings QA / Main",
+      "deployment": "No new device install planned; accepted room 1.66 unchanged",
+      "state": "Terminal local gates passed in 3m 58s",
+      "acceptance": [
+        "Cover real registry editor selection, including inline and Activity-backed strings, fleet name and dashboard URL.",
+        "Retain validation, secret handling and persistence coverage.",
+        "Demonstrate a meaningful negative case that catches unsupported hidden text."
+      ],
+      "evidence": [
+        {
+          "text": "Nine focused tests passed. A deliberate hidden-text mutant caused four expected assertion failures; the mutation was restored.",
+          "source": "docs/portal-settings-editor-contract-2026-11-02.md"
+        },
+        {
+          "text": "Final XML: 3,796 tests / 398 suites, zero failures, errors or skips. Debug and optimized APKs, R8, vital lint, version sync and signature checks passed.",
+          "source": "Coordinator terminal gate update, 2026-11-02"
+        },
+        {
+          "text": "Maintenance committed as 2682e3a99edb4210ea298eff6272c83273a974f5.",
+          "source": "Coordinator commit receipt, 2026-11-02"
+        }
+      ],
+      "limits": [
+        "Classification and projection tests do not prove composed controls or native interaction.",
+        "Built APKs are local verification artifacts; neither room has this maintenance increment deployed.",
+        "No new visible feature or widget redesign is claimed."
+      ],
+      "next": "Local maintenance is committed. Retain accepted 1.66 installations; timer ownership is the next bounded unit."
+    },
+    {
+      "id": "timer-ownership",
+      "title": "Reproduce timer widget / editor ownership",
+      "summary": "Next: first reproduce the TimerStore / TimerConfig mismatch before choosing semantics.",
+      "description": "The widget reads TimerStore while its approved editor hosts an overlay writing TimerConfig. A shared destination can hide different data owners; source inspection alone does not establish a device failure.",
+      "status": "queued",
+      "verification": "Source discrepancy · not reproduced",
+      "kind": "Correctness investigation",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Product / architecture",
+      "deployment": "No candidate built or deployed",
+      "state": "Next after active-unit gates and cleanup",
+      "acceptance": [
+        "Reproduce the widget/editor behavior on the existing owner path before labeling it a runtime defect.",
+        "Record the intended widget/editor semantics and show that the selected editor changes the displayed timer.",
+        "Preserve existing timers, pause/resume/ringing, cancel and Back behavior; any migration needs a separate decision."
+      ],
+      "evidence": [
+        {
+          "text": "ImmortalTimersWidget uses TimerStore; ApprovedHomeTimersPage hosts TimersOverlay writing TimerConfig.",
+          "source": "docs/portal-product-operating-state.md; docs/design/portal-widget-settings-map-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "The ownership mismatch is a source finding, not a reproduced device failure.",
+        "No migration, timer rewrite or new preference is approved by this queue."
+      ],
+      "next": "Run one bounded reproduction, then record an owner decision and acceptance cases before implementation."
+    },
+    {
+      "id": "settings-visibility",
+      "title": "Agree disabled-parent settings visibility",
+      "summary": "After timer reproduction: settle native / browser presentation policy before alignment.",
+      "description": "Native preparation hides disabled screensaver children while the remote schema can expose ordinary children through spec predicates. The intended shared policy needs to be explicit.",
+      "status": "queued",
+      "verification": "Policy pending · source only",
+      "kind": "Shared settings policy",
+      "platforms": [
+        "portal",
+        "browser"
+      ],
+      "owner": "Settings architecture",
+      "deployment": "No change built or deployed",
+      "state": "Queued after timer reproduction",
+      "acceptance": [
+        "Document intended shared-setting exceptions and presentation eligibility.",
+        "Cover enabled/disabled × Advanced × source/style in real registered-domain projections and schemas.",
+        "Preserve saved inactive values and intended validated API writes."
+      ],
+      "evidence": [
+        {
+          "text": "prepareSettingsVisibility and SettingsDomain.schemaJson use different presentation paths.",
+          "source": "docs/design/portal-settings-registry-audit-2026-11-02.md; docs/portal-product-operating-state.md"
+        }
+      ],
+      "limits": [
+        "No reproduced native/browser runtime failure is claimed.",
+        "Presentation alignment does not imply a blanket apply restriction.",
+        "Offline schema checks and later native/browser checks are separate gates."
+      ],
+      "next": "Agree the policy after timer reproduction, then test the shared domain matrix before changing presentation."
+    },
+    {
+      "id": "local-readiness",
+      "title": "Local-only release readiness",
+      "summary": "Prepare an honest local evidence gate without authentication or publication.",
+      "description": "The existing release script couples useful checks with forbidden publication steps and omits the unit gate. A local-only readiness path must keep missing evidence visible.",
+      "status": "queued",
+      "verification": "Specified next work · not implemented",
+      "kind": "Delivery tooling",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "Release engineering",
+      "deployment": "No public release authorized",
+      "state": "Requires decomposition",
+      "acceptance": [
+        "Produce candidate version, source and artifact identity, local signing-baseline comparison and check receipts.",
+        "Fail honestly when evidence is missing; never print credentials or invoke hooks.",
+        "Validate paths with isolated fixtures and stub commands; keep publication a separate explicit operation."
+      ],
+      "evidence": [
+        {
+          "text": "cut-release.sh has no local-only mode and does not run the unit gate.",
+          "source": "docs/releasing.md; scripts/cut-release.sh; docs/portal-product-operating-state.md"
+        }
+      ],
+      "limits": [
+        "Source version agreement alone is not artifact, signature or release verification.",
+        "GitHub authentication, push, tags and publication are forbidden in this session."
+      ],
+      "next": "Specify and review the local-only contract. Do not invoke the existing publication script."
+    },
+    {
+      "id": "quick-controls",
+      "title": "Quick controls: route to the real owner",
+      "summary": "Awaiting a destination decision; Display and Quick buttons do not own these tiles.",
+      "description": "The heading and edit action currently lead to different settings pages, while tile availability comes from app discovery and a dashboard URL. A truthful destination needs approval.",
+      "status": "approval",
+      "verification": "Awaiting destination approval",
+      "kind": "Navigation decision",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "UX / native",
+      "deployment": "No route change implemented",
+      "state": "Decision required",
+      "acceptance": [
+        "Approve a real owner destination, then make heading and edit reach it consistently.",
+        "Explain dashboard precedence and app availability, preserving Back and shared duplicate-widget owners.",
+        "Check configured/unconfigured and Advanced cases without adding discovery preferences or duplicate credentials."
+      ],
+      "evidence": [
+        {
+          "text": "The ownership audit shows neither current destination edits the discovered tiles.",
+          "source": "docs/design/portal-widget-settings-map-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "The destination is not decided; this task is not an implementation approval.",
+        "The broader widget mock remains unapproved."
+      ],
+      "next": "Record the approved destination before implementing the bounded routing change."
+    },
+    {
+      "id": "widget-gallery",
+      "title": "Whole widget gallery design review",
+      "summary": "Separate browser mock. Portal / Android / iOS interpretations remain unapproved.",
+      "description": "The gallery is a review artifact for possible future widget presentation. Its platform columns are design interpretations, not shipped platform implementations.",
+      "status": "approval",
+      "verification": "Design mock · unapproved",
+      "kind": "Design",
+      "platforms": [
+        "design"
+      ],
+      "owner": "Design / product",
+      "deployment": "Browser review artifact only",
+      "state": "No UI redesign approval",
+      "acceptance": [
+        "Review the separate mock and explicitly identify any approved design scope.",
+        "Keep existing bounded correctness fixes distinct from a whole-widget redesign.",
+        "Define implementation and platform acceptance only after a decision."
+      ],
+      "evidence": [
+        {
+          "text": "Gallery checkpoint explicitly preserves unapproved status and distinguishes platform interpretations.",
+          "source": "docs/portal-widget-gallery-checkpoint-2026-11-02.md; ../"
+        }
+      ],
+      "limits": [
+        "This roadmap does not authorize the gallery redesign.",
+        "No shipped native iOS application is identified.",
+        "Mock screenshots do not prove native behavior."
+      ],
+      "next": "Review the separate gallery; record an explicit decision without treating the mock as product delivery."
+    },
+    {
+      "id": "world-clock",
+      "title": "World Clock: complete rows & city counts",
+      "summary": "Accepted 1.66 / code 60, exact artifact in both rooms. Family normal and 150% checks passed.",
+      "description": "The existing 488 × 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
+      "status": "delivered",
+      "verification": "Device proof · both rooms",
+      "kind": "Visible correctness fix",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Native / QA",
+      "deployment": "Exact 1.66 / code 60 in Family Area and Living Area",
+      "state": "Delivered within bounded acceptance",
+      "acceptance": [
+        "Family normal text: two complete cities; three cities show “1 more city”; four show “2 more cities.”",
+        "Family 150% text live and cold: one complete city row and an unclipped “2 more cities” caption.",
+        "Restore original city order, font scale, Home page and all 36 original screensaver fields; preserve grid spans/order."
+      ],
+      "evidence": [
+        {
+          "text": "3,788 JVM tests / 397 suites; debug and optimized APKs, R8, vital lint and version sync passed for the accepted 1.66 artifact.",
+          "source": "docs/portal-world-clock-delivery-2026-11-02.md"
+        },
+        {
+          "text": "Family scoped hardware cases passed. Exact installed APK hash, version and room identity read back in both rooms.",
+          "source": "docs/portal-world-clock-delivery-2026-11-02.md"
+        },
+        {
+          "text": "Accepted APK SHA-256: c38b048ae8fe3ef1338bc1ac266997276e5fe484444e470a9f6bdf6762c9af9a. Visible before/after images are cropped card captures only.",
+          "source": "images/world-before-card.png; images/final-three-normal-card.png; images/final-three-large-font-cold-card.png"
+        }
+      ],
+      "limits": [
+        "Living has exact artifact/readiness proof; its physical interaction was not repeated.",
+        "Taller/resized, empty/tiny cards, 24-hour display, other locales/font scales and exact capacity-boundary rounding remain unverified on hardware.",
+        "No frame-rate, latency or whole-product performance claim. The earlier enlarged-text candidate was superseded."
+      ],
+      "next": "Retain the accepted artifact and scoped receipt. Extend hardware cases only in a separately authorized unit."
+    },
+    {
+      "id": "photo-alarm",
+      "title": "Photo Memory routing & alarm countdown",
+      "summary": "1.65 / code 59 delivered to both rooms; fixes retained in accepted 1.66.",
+      "description": "Photo Memory editing opens Photo sources even with idle slideshow disabled. The active-page alarm caption observes saved configuration, rounds partial minutes up and refreshes at minute boundaries.",
+      "status": "delivered",
+      "verification": "Device proof · both rooms",
+      "kind": "Visible correctness fixes",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Main / QA",
+      "deployment": "Delivered at 1.65 / code 59; rooms now retain accepted 1.66",
+      "state": "Scoped native acceptance passed",
+      "acceptance": [
+        "Family source entry works with idle slideshow disabled and enabled; Back returns through Photos to Home.",
+        "The live minute caption advances with unchanged config and stays current through three Apps/Home return cycles.",
+        "Restore the original alarm state and screensaver fields."
+      ],
+      "evidence": [
+        {
+          "text": "3,779 JVM tests / 396 suites and both APK builds passed for 1.65. Routing, minute-caption, return and restoration checks passed on Family.",
+          "source": "docs/portal-widget-fixes-release-2026-11-02.md"
+        },
+        {
+          "text": "Both rooms had exact 1.65 APK readbacks. The subsequent accepted 1.66 artifact retains these fixes.",
+          "source": "docs/portal-widget-fixes-release-2026-11-02.md; docs/portal-world-clock-delivery-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Native 24-hour/time-edit cases and API 28 acceptance were not executed in this unit.",
+        "Living did not receive a duplicate physical interaction run.",
+        "Observer counts and equivalent-scenario performance comparisons remain unverified."
+      ],
+      "next": "Keep the accepted receipt and current 1.66 device baseline; no maintenance reinstall is planned."
+    },
+    {
+      "id": "ci-regressions",
+      "title": "Bundled JavaScript & Python CI guards",
+      "summary": "Implemented / locally verified: 652 JS and 140 Python tests. Hosted execution unobserved.",
+      "description": "The workflow now includes all 29 existing bundled-JavaScript regression modules and seven Portal Python modules, alongside retained JVM and slideshow gates.",
+      "status": "delivered",
+      "verification": "Implemented / locally verified",
+      "kind": "CI protection",
+      "platforms": [
+        "portal",
+        "browser",
+        "tooling"
+      ],
+      "owner": "CI",
+      "deployment": "Workflow source implemented; no device installation",
+      "state": "Local verification passed; hosted result unobserved",
+      "acceptance": [
+        "Protect room targeting, stale responses, operations, photos, install observation and validation contracts.",
+        "Retain the existing JVM/slideshow checks and ordinary failure propagation.",
+        "Prepare the Python profile tool's intentional /private/tmp workspace on Ubuntu."
+      ],
+      "evidence": [
+        {
+          "text": "652 JavaScript tests passed locally on Node 24, with zero failures/skips. Python guards passed 140 tests.",
+          "source": "docs/portal-product-operating-state.md; docs/portal-python-ci-gate-2026-11-02.md"
+        },
+        {
+          "text": "Workflow YAML parsed and shell prerequisite syntax checked. No app/UI change or live service was needed.",
+          "source": ".github/workflows/tests.yml; docs/portal-python-ci-gate-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Hosted Ubuntu / Node 22 / Python 3.12 execution remains unobserved; no hosted acceptance is claimed.",
+        "These offline gates do not establish current browser/device end-to-end behavior.",
+        "Native device checks and Rust compilation are not configured in this workflow."
+      ],
+      "next": "Record hosted evidence only when an authorized observation exists. Preserve current no-authentication/publication constraints."
+    },
+    {
+      "id": "black-handoff",
+      "title": "Old black-handoff experiments",
+      "summary": "Issue slot exhausted. No candidate retained; further work needs a new explicit decision.",
+      "description": "The zero-black-frame candidate delayed complete Home to 1,169 ms versus 418 ms. The old handoff investigation remains parked.",
+      "status": "parked",
+      "verification": "Parked · 30-minute rule",
+      "kind": "Exhausted experiment",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Performance / native",
+      "deployment": "Rejected candidate; none retained",
+      "state": "Original issue slot exhausted",
+      "acceptance": [
+        "A future unit would need a separately agreed scope and evidence; this queue does not restart the investigation."
+      ],
+      "evidence": [
+        {
+          "text": "Second-slot receipt records the rejected tradeoff and exhausted status.",
+          "source": "docs/portal-black-handoff-second-slot-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Do not reopen through the current backlog.",
+        "Later accepted fade directions do not close this handoff or whole-product performance."
+      ],
+      "next": "Keep parked. Preserve its receipt and the original 30-minute boundary."
+    },
+    {
+      "id": "legacy-night",
+      "title": "Seven legacy night styles",
+      "summary": "Legacy motion work remains parked after rejected candidates and failed native cases.",
+      "description": "The seven legacy night-style investigations retain their exhausted status. Three reopened motion candidates were rejected; the final run retained two native failures and only 5/11 strict cases.",
+      "status": "parked",
+      "verification": "Parked · 30-minute rule",
+      "kind": "Exhausted experiment",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Native motion",
+      "deployment": "No new candidate accepted",
+      "state": "Original issue slots exhausted",
+      "acceptance": [
+        "Any restart needs an explicit new scope; current accepted photo/controller/SMB fixes must not be re-created from older findings."
+      ],
+      "evidence": [
+        {
+          "text": "Operating-state preservation section retains the rejected candidates, two native failures and 5/11 strict cases.",
+          "source": "docs/portal-product-operating-state.md"
+        }
+      ],
+      "limits": [
+        "Natural fade acceptance does not establish legacy-style motion or optical panel FPS.",
+        "This roadmap grants no extra investigation time."
+      ],
+      "next": "Keep parked; do not reopen under another queued task."
+    },
+    {
+      "id": "performance-experiments",
+      "title": "Prior performance & typography experiments",
+      "summary": "Cold Shuffle, rejected Home / Apps / settings experiments and incomplete gesture cases stay parked.",
+      "description": "Earlier rejected and timed-out investigations keep their original receipts and boundaries. Current correctness and maintenance results do not resolve these separate performance questions.",
+      "status": "parked",
+      "verification": "Parked · evidence limits retained",
+      "kind": "Exhausted experiments",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Performance / UX",
+      "deployment": "No new accepted performance candidate",
+      "state": "Original issue slots exhausted",
+      "acceptance": [
+        "A new explicit unit would need controlled equivalent-scenario evidence and its own bounded scope."
+      ],
+      "evidence": [
+        {
+          "text": "Operating state preserves Cold Shuffle startup, rejected Home/Apps/settings experiments, timed-out typography and incomplete playing-gesture cases.",
+          "source": "docs/portal-product-operating-state.md; docs/music-player-goal.md"
+        }
+      ],
+      "limits": [
+        "Passing JVM/browser fixtures and historical hardware samples do not prove zero lag or universal performance.",
+        "Live music providers/auth/audio/groups and final Living acceptance retain the music ledger's qualifications."
+      ],
+      "next": "Keep parked. Continue the tracked correctness queue without silently extending old issue slots."
+    }
+  ]
+}

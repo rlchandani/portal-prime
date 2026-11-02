@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-11-02",
+  "surface": "Local browser roadmap; no Portal app UI or phone APK interaction",
+  "taskCount": 13,
+  "desktop": {
+    "viewport": [1600, 1000],
+    "horizontalOverflow": false,
+    "queuedFilterCount": 3,
+    "emptyFilterRecoveryCount": 13,
+    "worldClockDetailNavigation": true,
+    "largeTextImageSelection": true,
+    "bothComparisonImagesLoaded": true,
+    "screenshotVisuallyReviewed": true
+  },
+  "mobile": {
+    "viewport": [390, 844],
+    "horizontalOverflowInAll13Details": false,
+    "samePageFragmentNavigation": true,
+    "fragmentNavigationResetsIncompatibleFilters": true,
+    "selectionFocusesDetail": true,
+    "returnFocusesSelectedQueueRow": true,
+    "screenshotVisuallyReviewed": true
+  },
+  "simulatedPortalViewport": {
+    "viewport": [2160, 1440],
+    "horizontalOverflow": false,
+    "twoPaneLayout": true
+  },
+  "consoleErrorsObserved": 0,
+  "copiedImages": "Three cropped clock captures byte-identical to recorded private originals",
+  "limits": [
+    "No physical Portal or phone interaction was performed for this roadmap.",
+    "This is a saved snapshot, not live progress or telemetry.",
+    "No complete accessibility, browser compatibility or performance audit is claimed."
+  ]
+}

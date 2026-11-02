@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Immortal's current priority queue, with scoped delivery evidence and honest verification limits.">
+  <title>Current roadmap · Immortal</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#roadmap">Skip to roadmap</a>
+  <div class="page">
+    <header class="masthead">
+      <a class="brand" href="./" aria-label="Immortal current roadmap"><span class="brand-mark" aria-hidden="true">i</span>Immortal <span class="brand-context">Product / Roadmap</span></a>
+      <a class="gallery-link" href="../">View design gallery <span aria-hidden="true">↗</span></a>
+    </header>
+    <main>
+      <div class="intro">
+        <div>
+          <h1>Current roadmap</h1>
+          <p class="lede">What’s delivered. What’s being built. What comes next.</p>
+          <p class="scope">A tracked priority queue across Portal, the Android companion, browser remote and delivery tooling. Whole-product acceptance remains open.</p>
+        </div>
+        <div class="snapshot">
+          <span class="snapshot-label"><span class="snapshot-dot" aria-hidden="true"></span>Saved snapshot</span>
+          <span id="snapshot-date">Last updated: 2 Nov 2026 (UTC)</span>
+          <span>No live progress or metrics</span>
+          <a href="roadmap.json">View snapshot data</a>
+        </div>
+      </div>
+      <section class="proof" aria-labelledby="proof-title">
+        <div class="proof-copy">
+          <span class="status-badge" data-status="delivered">Delivered to both rooms</span>
+          <h2 id="proof-title">A clock you can<br>actually read.</h2>
+          <p>Complete city rows replace a clipped preview. Extra saved cities get an honest count.</p>
+          <p class="proof-version">World Clock <strong>1.66 / code 60</strong><br>Exact artifact readback in both rooms</p>
+          <button class="text-button" id="clock-detail">Read acceptance &amp; limits <span aria-hidden="true">↗</span></button>
+        </div>
+        <div class="comparison">
+          <figure>
+            <figcaption><span>Before</span><span class="figure-note">Existing card</span></figcaption>
+            <img src="images/world-before-card.png" alt="Original World Clock card: London's time is visible but its city and day label are clipped below the card." width="488" height="380">
+          </figure>
+          <figure>
+            <figcaption><span>After</span><span id="after-caption" class="figure-note">Normal text · 3 cities</span></figcaption>
+            <img id="after-image" src="images/final-three-normal-card.png" alt="Verified World Clock card with complete New York and London rows and a 1 more city caption." width="488" height="380">
+          </figure>
+          <div class="comparison-footer">
+            <p>Actual cropped Family Area captures. Different capture times; card content only.</p>
+            <div class="image-options" role="group" aria-label="After screenshot text size">
+              <button type="button" data-image="normal" aria-pressed="true">Normal</button>
+              <button type="button" data-image="large" aria-pressed="false">150% · cold launch</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <p class="approval-note"><span aria-hidden="true">○</span><span>The whole widget gallery is a separate, unapproved design mock. This roadmap grants no UI redesign approval.</span></p>
+      <section id="roadmap" class="roadmap" aria-labelledby="queue-title">
+        <div class="queue">
+          <div class="queue-heading">
+            <div><h2 id="queue-title">The priority queue</h2><p>Open a task for acceptance, evidence and limits.</p></div>
+            <span id="result-count" class="result-count" aria-live="polite"></span>
+          </div>
+          <div class="filters">
+            <label>Status<select id="status-filter"><option value="all">All statuses</option></select></label>
+            <label>Platform<select id="platform-filter"><option value="all">All platforms</option></select></label>
+            <button type="button" id="reset-filters" class="reset-button" hidden>Clear filters</button>
+          </div>
+          <div id="task-list" class="task-list"><p class="loading">Loading saved roadmap…</p></div>
+          <div class="queue-note">Next after active-unit cleanup: reproduce timer ownership, then resolve the disabled-parent visibility policy. Parked issues keep their original 30-minute limits.</div>
+        </div>
+        <aside id="task-detail" class="detail" aria-label="Selected task details" tabindex="-1">
+          <p class="loading">Select a task to inspect its evidence.</p>
+        </aside>
+      </section>
+    </main>
+    <footer>
+      <p>Local review artifact · Existing room APK: accepted 1.66 / code 60</p>
+      <p>No GitHub authentication or publication. No new maintenance APK deployment planned.</p>
+    </footer>
+  </div>
+  <noscript><p class="noscript">JavaScript is needed for task filters and details. The complete saved queue is available in <a href="roadmap.json">roadmap.json</a>.</p></noscript>
+</body>
+</html>
