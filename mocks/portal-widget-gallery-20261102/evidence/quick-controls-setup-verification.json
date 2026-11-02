@@ -1,0 +1,215 @@
+{
+  "checkedAtUtc": "2026-11-02T19:06:07.907Z",
+  "interactionChecks": 43,
+  "results": [
+    "dashboard visibility/order",
+    "apps visibility/order",
+    "jarvis visibility/order",
+    "empty visibility/order",
+    "checking visibility/order",
+    "Checking is not unavailable",
+    "heading entry",
+    "heading Back",
+    "heading keyboard action/focus",
+    "edit entry",
+    "edit Back",
+    "edit keyboard action/focus",
+    "Correct dashboard owner",
+    "Owner keyboard focus",
+    "Reject javascript:alert(1)",
+    "Reject https://user:secret@home.example/",
+    "Reject https://home.example/with space",
+    "Reject https://home.example/%zz",
+    "Reject https://home.example:65536/",
+    "Reject https:////[2001:db8::1]/view",
+    "Reject https://-dashboard.example/view",
+    "Reject https://dashboard-.example/view",
+    "Reject https://home..example/",
+    "Cancel preserves address",
+    "Escape restores focus",
+    "Escape discards draft",
+    "Preserve https://home.example/floor%2Fone?name=A+B#zone",
+    "Save restores focus",
+    "Preserve https://[2001:db8::1]/view",
+    "Save restores focus",
+    "Clear reveals HA app shortcuts",
+    "Back focus",
+    "Forward destination/focus",
+    "lights same-app simulation",
+    "scenes same-app simulation",
+    "climate same-app simulation",
+    "home same-app simulation",
+    "Apps truthful handoff",
+    "Advanced preserves shortcut source",
+    "Customize keyboard focus/Settings",
+    "Branch truncates Forward",
+    "No page errors",
+    "No external requests"
+  ],
+  "layoutCases": 12,
+  "layouts": [
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "dark",
+      "fontScale": 1,
+      "overflow": false,
+      "twoPanes": false,
+      "clippedRows": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "dark",
+      "fontScale": 1.5,
+      "overflow": false,
+      "twoPanes": false,
+      "clippedRows": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "fontScale": 1,
+      "overflow": false,
+      "twoPanes": false,
+      "clippedRows": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "fontScale": 1.5,
+      "overflow": false,
+      "twoPanes": false,
+      "clippedRows": false
+    },
+    {
+      "width": 1600,
+      "height": 1000,
+      "theme": "dark",
+      "fontScale": 1,
+      "overflow": false,
+      "twoPanes": true,
+      "clippedRows": false
+    },
+    {
+      "width": 1600,
+      "height": 1000,
+      "theme": "dark",
+      "fontScale": 1.5,
+      "overflow": false,
+      "twoPanes": true,
+      "clippedRows": false
+    },
+    {
+      "width": 1600,
+      "height": 1000,
+      "theme": "light",
+      "fontScale": 1,
+      "overflow": false,
+      "twoPanes": true,
+      "clippedRows": false
+    },
+    {
+      "width": 1600,
+      "height": 1000,
+      "theme": "light",
+      "fontScale": 1.5,
+      "overflow": false,
+      "twoPanes": true,
+      "clippedRows": false
+    },
+    {
+      "width": 2160,
+      "height": 1440,
+      "theme": "dark",
+      "fontScale": 1,
+      "overflow": false,
+      "twoPanes": true,
+      "clippedRows": false
+    },
+    {
+      "width": 2160,
+      "height": 1440,
+      "theme": "dark",
+      "fontScale": 1.5,
+      "overflow": false,
+      "twoPanes": true,
+      "clippedRows": false
+    },
+    {
+      "width": 2160,
+      "height": 1440,
+      "theme": "light",
+      "fontScale": 1,
+      "overflow": false,
+      "twoPanes": true,
+      "clippedRows": false
+    },
+    {
+      "width": 2160,
+      "height": 1440,
+      "theme": "light",
+      "fontScale": 1.5,
+      "overflow": false,
+      "twoPanes": true,
+      "clippedRows": false
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "scope": "Final local browser prototype only; no native Portal or real app handoff acceptance",
+  "schemaVersion": 1,
+  "approval": "Required before native implementation",
+  "sourceReviewed": true,
+  "independentSourceReview": "Three concrete findings reproduced/corrected: focus, IPv6 authority, DNS host labels; final bounded review found no remaining significant regression.",
+  "initialIssues": [
+    "Detail-pane overflow let footer intercept shortcut; flex minimum heights corrected.",
+    "Combined fixture retained Customize state; explicit scenario reset corrected.",
+    "Tool VM dynamic import cannot export receipts; final accepted run used browser/file tools."
+  ],
+  "portalWrites": 0,
+  "portalInstalls": 0,
+  "performanceScope": "No native timing/CPU/FPS acceptance. No mock polling or external commands; native pilot must reuse bounded background inventory and avoid duplicated preview discovery.",
+  "nativeAcceptance": "Not implemented or verified; Family acceptance and identical Living deployment required after design approval",
+  "screenshots": [
+    {
+      "file": "quick-controls-portal-review.png",
+      "bytes": 182045,
+      "sha256": "131daa699ea8ec7b3c1e0957706f1360bd8a78277bd460d31ac7ba258530b872",
+      "pixelDimensions": [
+        2145,
+        1441
+      ],
+      "scope": "Actual browser mock capture, visually reviewed; not a device screenshot"
+    },
+    {
+      "file": "quick-controls-mobile-review.png",
+      "bytes": 205407,
+      "sha256": "120f322efb27d67f346470d347984ad8704566f1bd6c9e0c278a2ea2afb24e02",
+      "pixelDimensions": [
+        375,
+        2582
+      ],
+      "scope": "Actual browser mock capture, visually reviewed; not a device screenshot"
+    }
+  ],
+  "mockAssets": [
+    {
+      "file": "quick-controls-review.html",
+      "bytes": 4873,
+      "sha256": "0e5865e31371144840db11ec5e03fb8b7470f588b59aa14d2508a966e38d406f"
+    },
+    {
+      "file": "quick-controls-review.css",
+      "bytes": 11088,
+      "sha256": "9d5c32257911da48ffb51300d92489dcf6c8b2536bdbe643b75542efe8b20003"
+    },
+    {
+      "file": "quick-controls-review.js",
+      "bytes": 12029,
+      "sha256": "caf15a0421f306ba87a49ad80af8da91a10b7358256586f34733431584dc18d8"
+    }
+  ]
+}

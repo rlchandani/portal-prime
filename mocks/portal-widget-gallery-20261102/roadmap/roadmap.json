@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T18:48:49.800201+00:00",
-  "updatedLabel": "2 November2026 \u00b7 Phone upload candidate verified",
+  "updatedAt": "2026-11-02T19:08:43.113261+00:00",
+  "updatedLabel": "2 November2026 \u00b7 Quick controls setup review ready",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "companion-photo-upload-confirmation",
+  "defaultTask": "quick-controls",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms retain exact optimizedPortal1.82/code76. Companion1.7.3/code15 upload/deletion candidate verified in an isolated Android emulator; physical-phone installation remains open. Historical receipts keep their original versions.",
@@ -564,33 +564,46 @@
     {
       "id": "quick-controls",
       "title": "Quick controls: route to the real owner",
-      "summary": "Awaiting a destination decision; Display and Quick buttons do not own these tiles.",
-      "description": "The heading and edit action currently lead to different settings pages, while tile availability comes from app discovery and a dashboard URL. A truthful destination needs approval.",
+      "summary": "Functional mock ready for destination approval. Both setup entries reach one page; native routes remain unchanged.",
+      "description": "Propose one Quick controls setup page in the existing two-pane settings shell. Link to the existing dashboard owner and Apps; show truthful read-only launchable-app availability and dashboard precedence.",
       "status": "approval",
-      "verification": "Awaiting destination approval",
-      "kind": "Navigation decision",
+      "verification": "Mock:43 interaction checks /12 layouts \u00b7 awaiting native approval",
+      "kind": "Focused setup/navigation design proposal",
       "platforms": [
         "portal"
       ],
-      "owner": "UX / native",
-      "deployment": "No route change implemented",
-      "state": "Decision required",
+      "owner": "UX / independent source review / browser QA",
+      "deployment": "Browser review only. No Portal or companion APK change, install or native route patch.",
+      "state": "Five example inventories, actual mock entry actions, history, URL Save/Cancel/Escape and labelled app handoffs tested. Native implementation awaits sign-off.",
       "acceptance": [
-        "Approve a real owner destination, then make heading and edit reach it consistently.",
-        "Explain dashboard precedence and app availability, preserving Back and shared duplicate-widget owners.",
-        "Check configured/unconfigured and Advanced cases without adding discovery preferences or duplicate credentials."
+        "Approve one shared Quick controls setup destination for heading and Customize Settings.",
+        "Reuse existing dashboard editor/home_dashboard.url and existing Apps handoff; add no shortcut preferences or separate controls.",
+        "Explain launchability, dashboard precedence, shared instances and same-app HA shortcuts; distinguish Checking from unavailable.",
+        "Keep the approved two-pane shell and Back/Forward history; preserve keyboard focus and drafts.",
+        "After approval, verify native normal/150% text, both themes, configured/unconfigured/Advanced states and bounded background discovery on Family; deploy exact accepted APK to Living."
       ],
       "evidence": [
         {
-          "text": "The ownership audit shows neither current destination edits the discovered tiles.",
-          "source": "docs/design/portal-widget-settings-map-2026-11-02.md"
+          "text": "Source ownership, complete proposed scope, final browser checks, source-review corrections and native acceptance plan.",
+          "source": "docs/design/portal-quick-controls-setup-review-2026-11-02.md"
+        },
+        {
+          "text": "Click the focused functional mock: five inventories, editor, history and handoff simulations.",
+          "source": "http://127.0.0.1:8891/quick-controls-review.html"
+        },
+        {
+          "text": "Actual browser proof and two visually reviewed mock captures.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/quick-controls-setup-verification.json"
         }
       ],
       "limits": [
-        "The destination is not decided; this task is not an implementation approval.",
-        "The broader widget mock remains unapproved."
+        "This is a browser proposal, not native implementation or user approval.",
+        "Handoffs simulate intent only; no voice, browser sign-in, app installation or home control is verified.",
+        "Browser URL guard illustrates representative rules; native JVM URI validation remains authoritative.",
+        "Mobile stacked categories are a browser review adaptation; Portal retains two panes.",
+        "No native performance, pixel match or deployment claim; Weather and other exhausted issues remain separate."
       ],
-      "next": "Record the approved destination before implementing the bounded routing change."
+      "next": "User design sign-off is needed before the native setup/routes unit. Continue independent authorized work while it is pending."
     },
     {
       "id": "widget-gallery",

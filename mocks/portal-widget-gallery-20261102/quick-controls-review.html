@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Quick controls · Setup review</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./quick-controls-review.css">
+</head>
+<body>
+  <header class="review-bar">
+    <div><strong>Quick controls setup</strong><span>Interactive proposal · example device · no live commands</span></div>
+    <a href="./roadmap/#task=quick-controls">Roadmap</a>
+  </header>
+  <section class="review-controls" aria-label="Example device controls">
+    <label>Device example
+      <select id="scenario">
+        <option value="dashboard">Dashboard saved</option>
+        <option value="apps">App shortcuts only</option>
+        <option value="jarvis">Jarvis only</option>
+        <option value="empty">No dashboard or apps</option>
+        <option value="checking">Checking apps</option>
+      </select>
+    </label>
+    <label>Text size
+      <select id="text-size"><option value="1">Standard</option><option value="1.5">150%</option></select>
+    </label>
+    <div class="entry-actions" role="group" aria-label="Try widget setup entry points">
+      <button type="button" data-entry="heading">Try widget heading</button>
+      <button type="button" data-entry="edit">Try Customize → Settings</button>
+    </div>
+  </section>
+  <main class="portal" aria-label="Focused settings prototype">
+    <header class="portal-header">
+      <button id="home" type="button"><span aria-hidden="true">‹</span> Home</button>
+      <button id="theme" type="button">Light appearance</button>
+    </header>
+    <div class="panes">
+      <aside class="settings-sidebar" aria-label="Settings categories in this review">
+        <h1>Settings</h1>
+        <nav>
+          <button type="button" data-category="home"><span class="category-icon" aria-hidden="true">▦</span>Home &amp; widgets</button>
+          <button type="button" data-category="connections"><span class="category-icon" aria-hidden="true">⌁</span>Connections</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <label class="advanced-label">Advanced settings<input id="advanced" type="checkbox" role="switch"></label>
+          <strong>Example Portal+</strong>
+          <span>Focused setup review</span>
+        </div>
+      </aside>
+      <section class="detail" aria-labelledby="page-title">
+        <header class="detail-heading">
+          <div class="history" role="group" aria-label="Settings history">
+            <button id="back" type="button" aria-label="Settings Back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
+            <button id="forward" type="button" aria-label="Settings Forward"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+          </div>
+          <h2 id="page-title" tabindex="-1">Quick controls setup</h2>
+        </header>
+        <p id="page-subtitle" class="subtitle"></p>
+        <div id="detail-body" class="detail-body"></div>
+      </section>
+    </div>
+  </main>
+  <footer class="review-footer">
+    <p><strong>Proposed change:</strong> both widget setup actions open this same page. It links to the existing dashboard address and Apps; it adds no shortcut preferences or separate light controls.</p>
+    <p>Only Quick controls and its setup destinations are included here. Device inventory and address are simulated, held in memory and reset when you choose an example. The mobile browser stacks categories for review; the Portal keeps two panes. Native fonts, fit, app handoff and performance require Family Area verification after approval.</p>
+  </footer>
+  <dialog id="editor" aria-labelledby="editor-title">
+    <form id="address-form" novalidate>
+      <h2 id="editor-title">Dashboard address</h2>
+      <p>An HTTP or HTTPS dashboard address. Leave blank to disable.</p>
+      <label for="address">Address</label>
+      <input id="address" type="text" inputmode="url" autocomplete="off" spellcheck="false" aria-describedby="address-help address-error">
+      <p id="address-help" class="small">This edits the mock only. Sign-in stays in the Portal browser.</p>
+      <p id="address-error" class="error" role="alert"></p>
+      <div class="dialog-actions"><button id="cancel-edit" type="button">Cancel</button><button type="submit" class="primary">Save</button></div>
+    </form>
+  </dialog>
+  <dialog id="handoff" aria-labelledby="handoff-title">
+    <h2 id="handoff-title"></h2><p id="handoff-description"></p>
+    <button id="close-handoff" class="primary" type="button">Done</button>
+  </dialog>
+  <p id="announcement" class="sr-only" role="status"></p>
+  <script type="module" src="./quick-controls-review.js"></script>
+</body>
+</html>
