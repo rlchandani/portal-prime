@@ -152,5 +152,25 @@
     ],
     "desktopScreenshotVisuallyReviewed": true,
     "limits": "Saved roadmap checks only. Actual33 rendered Android tests/564JVM and exact installed emulator identity have independent receipts; live paired and physical Pixel acceptance remain open."
+  },
+  "companionLiveSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T10:22:16.394046+00:00",
+    "taskCount": 18,
+    "all18MobileDetailsCheckedAfterReload": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "missingPlatformLabels": false,
+    "roadmapPageErrors": 0,
+    "liveResultImageHttpStatus": 200,
+    "desktopPartialVerificationLabelVisible": true,
+    "coldFailureMentionVisible": true,
+    "limits": "Saved roadmap browser checks only. Warm live-room checks passed independently; cold native reconnect failed and native numeric editor acceptance was not run. No physical phone or performance acceptance."
   }
 }

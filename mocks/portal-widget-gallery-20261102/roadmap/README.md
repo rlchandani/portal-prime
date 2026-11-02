@@ -93,3 +93,12 @@ Fresh17-task desktop1600×1000 and mobile390×844 detail checks passed with
 no horizontal overflow, missing platform labels or page errors. Both actual
 category crops loaded at996×204; the desktop screenshot was visually reviewed.
 This saved-page proof does not establish live-room or physical-phone behavior.
+
+The18-task live-settings snapshot records five passed scoped check families on
+actual room APIs, plus failed cold native reconnect and an unrun numeric UI check.
+The actual cropped native ledger is companion-live-result.png. Complete profiles
+and screensaver config were restored in both rooms; owned emulator/relay stopped.
+No production patch or physical-phone deployment is implied. Fleet/provisioning
+local gates are the next independent unit; cold failure is not silently retried.
+
+Fresh 18-item snapshot browser check: every detail opened at 390 × 844 without horizontal overflow or undefined labels; the live-result image returned HTTP 200; desktop detail retained the partial-verification label and cold-failure limitation. No page errors were observed. These are roadmap presentation checks, not native acceptance.

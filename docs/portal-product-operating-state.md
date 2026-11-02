@@ -70,7 +70,7 @@ The updated whole-product objective is
   `docs/companion-compatibility-validation-2026-11-02.md` in the isolated Toolkit
   checkout. Original 540 companion tests were unchanged and passed against the
   candidate; no separate unmodified-base run or physical phone check is claimed.
-- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents seventeen
+- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents eighteen
   tracked items with acceptance/evidence/limits and actual cropped clock captures.
   It is a saved priority-queue snapshot, not live telemetry or an exhaustive
   product acceptance report. Browser interactions passed at desktop/mobile
@@ -166,6 +166,24 @@ completed at09:50:04 UTC with source AVD and original connections preserved.
 Both Portals remain exact1.70/code64. The saved roadmap now has17 tasks; the next
 bounded unit is live paired native companion acceptance. No new unit has started.
 See [delivery and limitations](portal-companion-rendered-settings-delivery-2026-11-02.md).
+
+## Latest native live settings checkpoint — 2 November 2026
+
+The09:53:31–10:23:31UTC unit adds **five passed scoped check families** on real
+Family/Living APIs: inactive metadata, one native grouped Shuffle action,
+basic/Advanced parent visibility, invalid API601 rejection and independent
+view/destination behavior. Both whole registry profiles and screensaver configs
+were exactly restored. Owned emulator/relay cleanup completed at10:16:56UTC.
+Source AVD files were unchanged; original Family transports remain present.
+
+**Cold native reconnect did not pass; the native numeric601 editor check was
+not run.** Direct emulator networking and a later ADB relay produced failures,
+including an actual pre-header EOF. Host sessions stayed valid. A product root
+cause was not established, so no speculative production patch was retained.
+Existing sessions were reused; fresh PIN pairing, physical Pixel and performance
+remain open. See [scoped acceptance](portal-companion-live-settings-acceptance-2026-11-02.md).
+The18-task roadmap preserves these limits and queues independent local
+fleet/provisioning checks next. No new unit has started.
 
 ## Preserve parked work and scoped acceptance
 

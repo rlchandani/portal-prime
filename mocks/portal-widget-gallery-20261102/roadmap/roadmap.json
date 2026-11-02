@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 · companion 1.7.1 rendered checks passed; live paired checks next (UTC)",
+  "updatedLabel": "2 Nov 2026 · warm native two-room settings verified; cold reconnect remains open (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -68,7 +68,7 @@
         "Historical phone receipts do not prove current native UI, installed identity or end-to-end playback.",
         "No phone rewrite or HA music service setup is included."
       ],
-      "next": "Compatibility guards and rendered fixtures are locally verified. Live paired-room and physical Pixel acceptance remain separate."
+      "next": "Retain local guards and scoped live warm proof. Cold reconnect and physical Pixel acceptance remain open."
     },
     {
       "id": "settings-contract",
@@ -627,23 +627,23 @@
         "No physical Pixel installation, folded/unfolded layout, touch, audible playback, FPS or hardware-performance acceptance.",
         "The numeric fixture uses the supported asText editor branch; it does not prove real Portal metadata. An optional manual five-tab smoke check was not completed and is not counted."
       ],
-      "next": "Next: native companion with live paired rooms, current per-room baselines and exact readback/restoration. Keep physical Pixel acceptance separately open."
+      "next": "Rendered fixtures are verified; subsequent warm live settings checks are separately recorded. Cold reconnect, remaining native numeric and physical Pixel acceptance remain open."
     },
     {
       "id": "companion-live-pairing",
-      "title": "Android companion: live paired-room acceptance",
-      "summary": "Next bounded unit: pair the current native app, verify grouped settings against real rooms and restore exact original values.",
+      "title": "Android companion: scoped live-room settings checks",
+      "summary": "Five live check families passed, including native two-room Shuffle. Cold reconnect failed; native numeric check remains unrun.",
       "description": "Close the gap between successful rendered fixtures and actual paired Portal HTTP behavior. Discover valid normal onboarding first; do not infer credentials or live acceptance from Fleet or fixture results.",
-      "status": "queued",
-      "verification": "Queued · live sessions and baseline required",
+      "status": "verified",
+      "verification": "Partially verified · warm live checks passed",
       "kind": "End-to-end integration",
       "platforms": [
         "companion",
         "portal"
       ],
       "owner": "Companion / integration QA",
-      "deployment": "No live companion session or grouped write performed in the rendered UI unit. Current Portal APK is1.70 in both rooms.",
-      "state": "Not started. Use a fresh30-minute unit including cleanup; physical Pixel is independently open.",
+      "deployment": "Exact companion1.7.1/code13 tested in disposable API34 emulator with existing sessions. No Portal APK or physical phone update.",
+      "state": "Bounded09:53:31–10:23:31UTC slot. Warm direct-LAN writes/readbacks passed. Later direct/relay cold transport failed; no speculative app patch. Owned emulator/relay closed and complete room baselines restored.",
       "acceptance": [
         "Use normal authorized pairing with secrets kept private; independently verify current client and room identity.",
         "Capture complete per-room settings before writes. Exercise disabled-parent group preflight and exact confirmed key readback through native UI.",
@@ -654,13 +654,56 @@
         {
           "text": "Current1.7.1/code13 passes564JVM and33rendered checks; the strict fixture tests are a prerequisite, not live acceptance.",
           "source": "docs/portal-companion-rendered-settings-delivery-2026-11-02.md"
+        },
+        {
+          "text": "One native Shuffle tap:2confirmed/0failed/0cancelled; fresh complete profiles showed only intended changes, with Living still disabled. Native basic/Advanced parent visibility and independent view/destination labels passed. API601 returned200/applied[] without changes. Both complete registry profiles and screensaver configs were exactly restored.",
+          "source": "docs/portal-companion-live-settings-acceptance-2026-11-02.md; images/companion-live-result.png"
+        },
+        {
+          "text": "Cold roster and one-target file persisted, but cold reconnect did not pass. Direct guest probes reported No route to host. The temporary relay also produced an actual native pre-header EOF failure although host requests returned200. The diagnostic source was removed; it is not a passing/shipped test.",
+          "source": "Private native-cold-failure.json and failing instrumentation receipt; scoped acceptance document"
         }
       ],
       "limits": [
-        "No physical phone is currently reachable; emulator live networking would still not establish Pixel touch/layout/audio/performance.",
-        "No GitHub authentication, HA music deployment or parked issue reopening."
+        "Five passed warm/settings check families do not establish full native companion acceptance. Cold reconnect failed and the planned native numeric601 UI check was not run.",
+        "Existing authorized sessions were seeded into the normal private QA store; no fresh PIN pairing was tested or credential minted.",
+        "No physical Pixel installation, folded/unfolded layout, touch, audio, FPS or direct cold LAN reliability acceptance.",
+        "Temporary emulator and relay closed at10:16:56UTC; source AVD unchanged. Other Hearth transports were absent at final snapshot, with no commands targeting them or cause attributed."
       ],
-      "next": "Inspect the normal pairing path and available private local session evidence, then run only the bounded live cases that can be fully restored."
+      "next": "Cold reconnect and native numeric acceptance remain open. Move to independent fleet/provisioning local gates; do not extend this investigation."
+    },
+    {
+      "id": "fleet-local-gates",
+      "title": "Fleet and provisioning: current local compatibility gates",
+      "summary": "Next independent unit: validate the current provisioning scripts and fleet CLI without altering device configuration.",
+      "description": "The product inventory still lacks current local provisioning/CLI evidence. Check the existing implementation before labeling any issue a defect; use the first-generation installer and signing constraints in the repository guide.",
+      "status": "queued",
+      "verification": "Queued · no new runtime acceptance",
+      "kind": "Platform and delivery verification",
+      "platforms": [
+        "tooling",
+        "portal"
+      ],
+      "owner": "Fleet / release engineering",
+      "deployment": "No deployment or provisioning change planned. Both Portals retain1.70/code64.",
+      "state": "Not started. One new30-minute unit including cleanup; current cold companion investigation is not reopened.",
+      "acceptance": [
+        "Run the relevant current local Bash parse, ASCII/PowerShell checks where available and std-only Rust compilation.",
+        "Keep secrets private and compile temporary binaries outside tracked delivery artifacts.",
+        "Use read-only known-room identity requests only if required, with current package/signature constraints explicit.",
+        "Distinguish local compilation/parsing from Windows hardware, fresh provisioning, reboot persistence and all-model acceptance."
+      ],
+      "evidence": [
+        {
+          "text": "The canonical repository guide defines provisioning parse, fleet compile, signing and first-generation installer constraints; inventory still records these current gates as unverified.",
+          "source": "AGENTS.md; docs/portal-product-operating-state.md; skills/immortal-fleet/SKILL.md"
+        }
+      ],
+      "limits": [
+        "No GitHub authentication/publication or device config mutation.",
+        "Passing local gates does not prove Windows5.1/actual hardware provisioning or wireless ADB survival after reboot."
+      ],
+      "next": "Inspect existing local gate commands and source, then execute only the bounded relevant checks."
     }
   ]
 }
