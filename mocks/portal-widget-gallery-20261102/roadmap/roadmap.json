@@ -1,18 +1,93 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T22:09:03.513839+00:00",
-  "updatedLabel": "Store metadata guard delivered in exact1.86 to both rooms; native normal catalog and saved configuration accepted",
+  "updatedAt": "2026-11-02T22:29:33.612629+00:00",
+  "updatedLabel": "APK transfer integrity delivered in exact1.87 to both rooms; Family9/9 native cases accepted",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "store-metadata-budget",
+  "defaultTask": "apk-download-publication",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.86/code80. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
+    "Both rooms contain exact optimized Portal1.87/code81. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "apk-download-publication",
+      "title": "App downloads: preserve the cached APK on transfer failure",
+      "summary": "Shared staging for Store/self-update delivered in1.87 to both rooms. Family optimized transfer checks4/9\u21929/9;3,981 JVM passed.",
+      "description": "Stream to a unique sibling temporary file, validate nonempty complete transfer, then replace the cached APK. Keep old bytes on failed transfer and reuse the existing fleet writer.",
+      "status": "delivered",
+      "verification": "3,981 JVM \u00b729 new cases \u00b7Family9/9 \u00b7exact two-room delivery",
+      "kind": "App installation reliability",
+      "platforms": [
+        "portal",
+        "browser",
+        "companion",
+        "fleet"
+      ],
+      "owner": "Store/update engineering / independent helper and fixture workers / Family QA",
+      "deployment": "Exact optimized1.87/code81 installed in both rooms, complete installed hashes verified. Browser/companion contracts and builds unchanged.",
+      "state": "Full saved settings unchanged, normal Family photo frame restored, owned fixtures and registry removed, workers closed. Original30-minute clock retained.",
+      "acceptance": [
+        "Reproduce original Store/self-update file corruption over real TCP before changes.",
+        "Stream bytes to disk and publish only after nonempty complete body and input/output close; preserve cached file on failed transfer.",
+        "Reject incomplete/empty/declared excess; keep request policy, APK streaming, installer behavior and signatures.",
+        "Pass full JVM/debug/optimized/R8/lint, independent review and actual optimized Family Store facade checks.",
+        "Verify exact installed artifact and complete saved configuration in both rooms; native functional QA on Family only."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, original failures, final native scope, gates, delivery and restoration.",
+          "source": "docs/portal-apk-download-publication-2026-11-02.md"
+        },
+        {
+          "text": "Structured final result and exact artifact identity; no owner captures or credentials.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/apk-download-publication-verification.json"
+        }
+      ],
+      "limits": [
+        "No valid package installation through the new download path, actual self-update flow, provider availability, appContext permission scope, power-loss durability, truncated native chunked/gzip negatives or API28 verdict.",
+        "Eight-KiB streaming buffer retained; temporary disk usage increases to retain the previous file. No whole-heap, UI latency or FPS improvement claimed.",
+        "Same-target successful writes remain last-writer-wins; owned cleanup is best effort. Unexpected disconnect exceptions after publication are outside the transfer-failure preservation claim.",
+        "Home-app chooser observed after replacement and frame restored through its explicit existing action; default-launcher preference was not changed or newly verified. Separate queued issue retains first-observation clock.",
+        "Physical companion, music sign-in and parked Weather/performance work retain their separate boundaries."
+      ],
+      "next": "Retain transfer guard. Investigate the separately observed post-replacement Home chooser within its original22:26:30.941464UTC clock."
+    },
+    {
+      "id": "post-update-home-chooser",
+      "title": "Self-replacement: restore the Home destination cleanly",
+      "summary": "Family showed Select a Home app after1.87 replacement. The photo frame was restored; root cause and default-preference behavior remain unverified.",
+      "description": "Determine why app replacement exposes Android Home selection and restore the pre-update destination without changing owner preference or reworking the parked Calls/dream navigation.",
+      "status": "queued",
+      "verification": "Actual ResolverActivity and native chooser observed \u00b7not diagnosed",
+      "kind": "Deployment recovery",
+      "platforms": [
+        "portal",
+        "fleet"
+      ],
+      "owner": "Release engineering / Family QA",
+      "deployment": "No fix or new artifact; current1.87 transfer release is verified.",
+      "state": "Original first-observation clock 2026-11-02T22:26:30.941464+00:00 to 2026-11-02T22:56:30.941464+00:00 retained. Current normal frame restored.",
+      "acceptance": [
+        "Use the existing observed chooser and actual launcher/default state to identify cause.",
+        "Preserve owner preference and saved configuration; avoid instrumentation/accessibility reconnect.",
+        "Implement only a grounded fix within the original30-minute slot; otherwise park with evidence."
+      ],
+      "evidence": [
+        {
+          "text": "Observed post-replacement chooser and explicit frame recovery are recorded in the APK transfer receipt; native captures remain private.",
+          "source": "docs/portal-apk-download-publication-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "No causal diagnosis, default-preference comparison or fix yet.",
+        "Not a fresh slot for the previously exhausted Calls/dream handoff investigation."
+      ],
+      "next": "Continue this separate deployment issue within retained22:56:30.941464UTC deadline; do not reset its clock."
+    },
     {
       "id": "store-metadata-budget",
       "title": "App store: bound catalog and version metadata",
@@ -1723,9 +1798,9 @@
         "Parser regression and exact installed artifact proof; no physical panel exact-hour observation or native visual/performance verdict.",
         "Living foreground was not inspected through ADB; Family browser foreground was preserved.",
         "Cached12/24-hour labels have a separate source/native formatter correction in1.74; actual Home/settings return acceptance remains open.",
-        "The whole widget gallery and proposed Weather layout still require user approval."
+        "Weather-only scope is approved; the whole widget gallery remains unapproved and native daily geometry is parked."
       ],
-      "next": "Await Weather-only design approval. Preserve the original parser acceptance scope; see the separate clock-format correction for its limits."
+      "next": "Weather scope is approved. Native daily geometry remains parked; retain the separate parser and formatter receipts."
     },
     {
       "id": "weather-clock-format",

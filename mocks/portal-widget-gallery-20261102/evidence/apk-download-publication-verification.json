@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-02T22:29:33.612629+00:00",
+  "status": "delivered",
+  "scope": "Store/self-update APK transfer file integrity; optimized Store facade in Family shell fixture, exact two-room delivery",
+  "sourceCommit": "3f0055f9ef570b00cb32a2b2d22af899401e7c77",
+  "issueClock": {
+    "startedAt": "2026-11-02T22:11:39+00:00",
+    "deadline": "2026-11-02T22:41:39+00:00",
+    "scope": "Store and self-update APK transfer file integrity and owned cleanup; no metadata/UI/provider account changes"
+  },
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.87",
+    "versionCode": 81,
+    "bytes": 25861122,
+    "sha256": "67d0bd131046b2bba6f7b264f64d316cc60584fb26e0999f7fc2c93045c7f502",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "signerMatchesAccepted186": true
+  },
+  "originalTcp": {
+    "cases": 16,
+    "failures": 10,
+    "errors": 0,
+    "explicitPreservation": "Both original production consumers replaced four cached bytes with123 truncated bytes."
+  },
+  "finalJvm": {
+    "tests": 3981,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 416
+  },
+  "newJvmCases": {
+    "helper": 13,
+    "realTcpAcrossTwoConsumers": 16,
+    "total": 29
+  },
+  "nativeFamily": {
+    "apiLevel": 29,
+    "baseline": {
+      "cases": 9,
+      "passed": 4,
+      "failed": 5,
+      "installedApkHashMatches186": true
+    },
+    "final": {
+      "cases": 9,
+      "passed": 9,
+      "failed": 0,
+      "terminalExit": 0,
+      "bootstrapOrInvocationErrors": 0,
+      "steps": 10
+    },
+    "method": "Actual optimized StoreCatalog.download facade; R8 static a(File,String)",
+    "execution": "DexClassLoader in separate shell app_process with generated scratch files; no appContext or instrumentation",
+    "generatedBodyBytes": 32769,
+    "gzipControlPassed": true,
+    "completeBodySha256": "346e2310c7233f7723048e8289ba7a299d635ded9723dfea5248773f5b7684b8",
+    "invalidMappingNegativeExit": 2,
+    "fixtureHistory": "Initial optimized candidate9/9 passed. Worker finalized fixture; frozen jar repeated. First repeat9/9 cases passed but receipt parser rejected an added summary field. Corrected parser, captured final exit0; production/APK unchanged."
+  },
+  "builds": {
+    "debug": true,
+    "optimizedPerformanceR8": true,
+    "vitalLint": true,
+    "terminalExit": 0,
+    "successfulRunSeconds": 131,
+    "compilerHeapMiB": 6144,
+    "persistentBuildConfigurationChanged": false
+  },
+  "review": {
+    "reviewer": "Mendel",
+    "readOnly": true,
+    "productionBlockerFound": false,
+    "finalGzipPassed": true,
+    "deliberateInvalidMappingExit": 2,
+    "limits": [
+      "Same-target concurrent successful downloads remain last-writer-wins; no ownership through installation guarantee.",
+      "Temporary deletion is best effort; unexpected disconnect exceptions after publication are outside the byte-preservation claim.",
+      "No truncated chunked/gzip native negative cases, power-loss durability or actual appContext installer acceptance."
+    ],
+    "agentsClosed": true
+  },
+  "delivery": {
+    "familyExactInstalledHashVerified": true,
+    "livingExactInstalledHashVerified": true,
+    "livingScope": "Final artifact/version/configuration only; no repeated functional QA"
+  },
+  "restoration": {
+    "family": {
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "sourcesUnchanged": true,
+      "screensaverUnchanged": true,
+      "exactExpectedVersion": true,
+      "devModeRetained": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "catalogContracts": [
+        {
+          "route": "/remote/catalog",
+          "entries": 27,
+          "literalSuccess": true,
+          "distinctPackageIds": true
+        },
+        {
+          "route": "/apps",
+          "entries": 27,
+          "literalSuccess": true,
+          "distinctPackageIds": true
+        }
+      ]
+    },
+    "living": {
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "sourcesUnchanged": true,
+      "screensaverUnchanged": true,
+      "exactExpectedVersion": true,
+      "devModeRetained": true
+    },
+    "bothInstalledHashesVerified": true,
+    "familyPhotoFrameVisuallyReviewed": true,
+    "familyPhotoFrameActivityRestored": true,
+    "postReplacementHomeChooserObserved": true,
+    "chooserDismissedThroughExistingExplicitFrameAction": true,
+    "defaultLauncherPreferenceNotChanged": true,
+    "chromeTask27174StillListed": true,
+    "chromeProcessRetentionNotInferred": true,
+    "ownedRegistryRemoved": true,
+    "ownedFixtureRootsRemoved": true,
+    "ownedReversePortsRemoved": true,
+    "ownedServersTerminal143": true,
+    "agentsClosed": true
+  },
+  "limits": [
+    "No valid package installation through the new download path, actual self-update flow, provider availability, appContext permission scope, power-loss durability, truncated native chunked/gzip negatives or API28 verdict.",
+    "Eight-KiB streaming buffer retained; temporary disk usage increases to retain the previous file. No whole-heap, UI latency or FPS improvement claimed.",
+    "Same-target successful writes remain last-writer-wins; owned cleanup is best effort. Unexpected disconnect exceptions after publication are outside the transfer-failure preservation claim.",
+    "Home-app chooser observed after replacement and frame restored through its explicit existing action; default-launcher preference was not changed or newly verified. Separate queued issue retains first-observation clock.",
+    "Physical companion, music sign-in and parked Weather/performance work retain their separate boundaries."
+  ],
+  "sources": [
+    "https://developer.android.com/reference/java/net/HttpURLConnection",
+    "https://developer.android.com/reference/java/io/File#renameTo(java.io.File)"
+  ]
+}

@@ -1035,5 +1035,29 @@
     "proofHttpStatus": 200,
     "proofSourceAndArtifactVerified": true,
     "scope": "Selected store metadata receipt and mobile/desktop layout only; no full roadmap interaction claim."
+  },
+  "apkDownloadScopedReview": {
+    "checkedAt": "2026-11-02T22:30:25.176006+00:00",
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844,
+        "taskRows": 52,
+        "horizontalOverflow": false
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "taskRows": 52,
+        "horizontalOverflow": false
+      }
+    ],
+    "deliveredDetail3981AndVersion187AndNative9of9": true,
+    "evidenceHttpStatus": 200,
+    "sourceAndArtifactMatch": true,
+    "queuedChooserNavigationAndOriginalDeadline": true,
+    "queuedChooserMobileDesktopOverflow": false,
+    "scope": "Two selected task details and proof response only; no all52 workflows or native UI audit.",
+    "finalFooter187Code81AndProofCurrentVersion": true
   }
 }
