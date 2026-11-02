@@ -683,5 +683,31 @@
     "publicEvidenceStatus": 200,
     "afterUploadLedgerVisuallyReviewed": true,
     "scope": "Three changed saved-roadmap details and current version footer; Weather checked by exact initial task hash after an earlier fallback selected its separate clock-format task. No whole-page/native/physical-phone acceptance."
+  },
+  "nativeSettingsSteppersSnapshot": {
+    "checkedAtUtc": "2026-11-02T17:33:37.624544+00:00",
+    "taskIds": [
+      "settings-native-steppers",
+      "settings-native-source-drafts"
+    ],
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "detailChecks": 4,
+    "renderedRows": 37,
+    "currentVersionFooter": "1.80 / code74",
+    "horizontalOverflow": false,
+    "undefinedLabels": false,
+    "pageErrors": 0,
+    "publicEvidenceStatus": 200,
+    "nativeDialogCropsVisuallyReviewed": 4,
+    "scope": "Two changed saved-roadmap details and row/version checks only; native observations independently recorded, no broad page or physical-phone acceptance."
   }
 }

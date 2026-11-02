@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-02T17:31:58.899207+00:00",
+  "scope": "23 coordinator-observed native cases in existing optimized1.80 on Family, normal font scale and dark appearance; no production change",
+  "startedAtUtc": "2026-11-02T17:10:31+00:00",
+  "deadlineUtc": "2026-11-02T17:40:31+00:00",
+  "receipt": "docs/portal-settings-native-steppers-2026-11-02.md",
+  "nativeCases": 23,
+  "controls": [
+    "chime.volume",
+    "chime.quietStartMin",
+    "chime.quietEndMin"
+  ],
+  "originalValues": {
+    "volume": 70,
+    "quietStartMin": 1320,
+    "quietEndMin": 480
+  },
+  "observedSavedValues": {
+    "volume": 80,
+    "quietStartMin": 1439,
+    "quietEndMin": 0
+  },
+  "allOriginalValuesRestored": true,
+  "automated": {
+    "suites": [
+      {
+        "name": "com.immortal.launcher.ChimeSaveStateTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "com.immortal.launcher.ClockTimeDraftTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "com.immortal.launcher.NativeSettingsEditorTest",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "com.immortal.launcher.SettingsNumberStepTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "com.immortal.launcher.settings.ClockTimeDomainsTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "com.immortal.launcher.settings.ClockTimeSpecTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "tests": 26,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "independentReview": "Source-only editor/constraints/scheduling review; no defect found, no device operations or tests",
+  "restoration": {
+    "checks": {
+      "profile": true,
+      "layout": true,
+      "screensaver": true,
+      "version": true,
+      "originalChromeTask": true,
+      "manualFrameResumed": true,
+      "enabledServicesAndBinding": true,
+      "font": true,
+      "installedApkUnchanged": true
+    },
+    "installedSha256": "988881568224a8bfe69b249789e05ed13395c51fad71adb092ac85a77c2b56d6",
+    "host": "manual PhotoFramePreviewActivity, baseline matched",
+    "notClaimed": "natural Dream recovery or universal performance",
+    "tooling": "Initial restoration assertion had a whitespace mismatch; corrected matcher. Actual enabled/binding lists match."
+  },
+  "images": [
+    "native-stepper-volume-max.png",
+    "native-clock-hour-validation.png",
+    "native-clock-saved-time.png",
+    "native-clock-midnight-time.png"
+  ],
+  "limits": [
+    "Coordinator observations are not automated Compose tests.",
+    "No D-pad, alternate theme/font scale or complete54-page acceptance.",
+    "No target instrumentation, secret-field or rich-source-form checks.",
+    "Native time picker accepts all valid minutes; separate wire wrap not tested.",
+    "No new build/release/deployment, Living operation or universal performance verdict.",
+    "Final photo-frame host is the baseline manual preview, not a newly verified system Dream."
+  ],
+  "tooling": "Initial test command needed explicit installed SDK; subsequent focused test run passed. Initial service matcher whitespace was corrected without changing device configuration."
+}

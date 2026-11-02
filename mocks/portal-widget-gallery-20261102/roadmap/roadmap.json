@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T17:04:19.215079+00:00",
-  "updatedLabel": "2 November 2026 \u00b7 Active-Portal import selection fixed",
+  "updatedAt": "2026-11-02T17:31:58.901939+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 Native clock and stepper acceptance",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "photo-upload-selected-room",
+  "defaultTask": "settings-native-steppers",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact optimized 1.80 / code 74. Earlier receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical-phone installation remains open.",
@@ -1480,17 +1480,17 @@
     {
       "id": "settings-native-steppers",
       "title": "Native Settings: time-of-day and bounded steppers",
-      "summary": "Text/numeric editors passed 12 Family cases; native time-of-day and bounded steppers remain unverified.",
-      "description": "Verify the existing SettingsRenderer/Stepper path on Family rather than inferring native acceptance from JVM validation or the browser remote.",
-      "status": "queued",
-      "verification": "Explicit acceptance gap \u00b7 new bounded unit not started",
+      "summary": "23 actual Family cases and 26 focused unit tests passed; all original values restored.",
+      "description": "Existing Volume and both quiet-hour clock dialogs passed endpoint, draft/Cancel, validation, keyboard/dial, persistence and reopen checks. No defect or speculative app change.",
+      "status": "verified",
+      "verification": "23 observed native cases \u00b7 26 unit tests / 6 suites \u00b7 complete restoration",
       "kind": "Native Settings interaction acceptance",
       "platforms": [
         "portal"
       ],
       "owner": "Family native QA / targeted fixes if reproduced",
-      "deployment": "Existing 1.80 UI; no new implementation or artifact proposed.",
-      "state": "Stepper and formatted/wrapping integer specs confirmed in current source; the prior native editor receipt excluded these.",
+      "deployment": "Existing exact optimized 1.80 unchanged; no new build, install or Living operation.",
+      "state": "Family dark appearance / font 1.0, actual Wi-Fi ADB touch/key input. Full installed APK remains SHA 9888815682\u2026; baseline manual photo frame restored.",
       "acceptance": [
         "Inspect actual reachable time-of-day and bounded integer controls and their declarative constraints.",
         "Check rendered value, plus/minus admission and applicable wrap/clamp behavior through the real native UI.",
@@ -1499,19 +1499,58 @@
       ],
       "evidence": [
         {
-          "text": "Prior native editor receipt explicitly leaves secret/time/stepper/rich-editor acceptance open.",
-          "source": "docs/portal-settings-native-editors-2026-11-02.md"
+          "text": "23 named cases, native dialog crops, constraints review and exact restoration.",
+          "source": "docs/portal-settings-native-steppers-2026-11-02.md"
         },
         {
-          "text": "Existing renderer uses Stepper; IntSpec models format, bounds, step and wrap.",
-          "source": "SettingsRenderer.kt; SettingsComponents.kt; settings/SettingSpec.kt"
+          "text": "26 focused JVM tests / 6 suites; full profile/layout/screensaver/font/services/Chrome and APK checks.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/native-settings-steppers-verification.json"
         }
       ],
       "limits": [
-        "Not a claim of a current defect or full 54-page acceptance.",
-        "Source/credential editors, physical-phone testing and parked Weather remain separate."
+        "Coordinator-observed native cases are not automated Compose tests.",
+        "No D-pad, alternate theme/font, wire-wrap, concurrent native draft or whole 54-page acceptance.",
+        "Secret/source-form editors remain separate; Weather and all exhausted slots retain their boundaries.",
+        "Final host is the baseline manual preview, not new natural Dream acceptance."
       ],
-      "next": "Start the next bounded Family native-control acceptance unit; patch only a reproduced defect."
+      "next": "Continue existing source credential-form masking and unsaved Cancel acceptance in a separate bounded unit."
+    },
+    {
+      "id": "settings-native-source-drafts",
+      "title": "Native Settings: source credential drafts and masking",
+      "summary": "Native scalar and time/stepper paths accepted; source credential form masking and Cancel still need device checks.",
+      "description": "Check existing Immich/SMB/WebDAV form controls without service connection or saved-source changes. Use only generated unsaved credential text; protect existing values from public evidence.",
+      "status": "queued",
+      "verification": "Explicit remaining native acceptance gap \u00b7 unit not started",
+      "kind": "Native Settings credential-form acceptance",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Family native QA / security review",
+      "deployment": "Existing 1.80; no new product implementation proposed.",
+      "state": "Current source calls ApprovedSourcesField(secret=true) for API keys/passwords; browser/JVM contracts cannot establish actual native masking.",
+      "acceptance": [
+        "Inspect current admission/masking/Cancel paths and choose a safely reachable existing form.",
+        "Use generated unsaved draft text; observe masking and reachable actions with keyboard.",
+        "Cancel or Back, confirm complete saved profile/layout/screensaver configuration unchanged.",
+        "No Test & connect, live auth/provider operation, real credential publication or service configuration.",
+        "Limit whole unit including cleanup to 30 minutes; patch only a reproduced defect."
+      ],
+      "evidence": [
+        {
+          "text": "Prior scalar and clock/stepper receipts explicitly exclude secret and rich-source native acceptance.",
+          "source": "docs/portal-settings-native-editors-2026-11-02.md; docs/portal-settings-native-steppers-2026-11-02.md"
+        },
+        {
+          "text": "Existing API key/password fields pass secret=true; connection writes occur only after explicit Test & connect success.",
+          "source": "ImmichConnectActivity.kt; SmbConnectActivity.kt; DavConnectActivity.kt"
+        }
+      ],
+      "limits": [
+        "This is an acceptance gap, not a claimed credential leak or new-design approval.",
+        "No physical-phone, existing-source connectivity, theme/text-scale or whole-product acceptance."
+      ],
+      "next": "Start one bounded Family form check, keeping all credentials and original full snapshots private."
     }
   ]
 }
