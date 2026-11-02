@@ -1,0 +1,184 @@
+{
+  "checkedAt": "2026-11-02T19:42:26.849433+00:00",
+  "unitClock": {
+    "startedAt": "2026-11-02T19:26:00Z",
+    "deadline": "2026-11-02T19:56:00Z",
+    "scope": "Calendar HTTP byte budget and transport cleanup, preserving existing fallback and rendering",
+    "parent": "db8d5beab44242972cf3232205c56be37ffcb6b6",
+    "firstSourceAuditClockRetained": true
+  },
+  "scope": "Calendar response body budget and cleanup, preserving existing parser and saved-event recovery",
+  "version": {
+    "name": "1.83",
+    "code": 77,
+    "package": "com.immortal.launcher.debug"
+  },
+  "artifact": {
+    "artifacts": [
+      {
+        "flavor": "debug",
+        "file": "debug-1.83.apk",
+        "bytes": 46685017,
+        "sha256": "0406f0e0e6a4dc61858c2d4b74a37e72919f5b37f59eceb314fd2f5515691aed"
+      },
+      {
+        "flavor": "performance",
+        "file": "candidate-1.83.apk",
+        "bytes": 25860990,
+        "sha256": "772681507fdf9695810319770db96033ac8225dabed70d5443da0976c3c72371"
+      }
+    ],
+    "jvm": {
+      "tests": 3887,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 408
+    }
+  },
+  "originalRegressions": {
+    "tests": 4,
+    "failures": 3,
+    "surface": "Actual production HTTP entry over owned loopback TCP"
+  },
+  "focusedFinal": {
+    "tests": 18,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "build": {
+    "debug": true,
+    "optimized": true,
+    "r8": true,
+    "vitalLint": true,
+    "seconds": 99
+  },
+  "bodyBoundary": {
+    "bytes": 8388608,
+    "knownOversizedInputStreamAcquisitions": 0,
+    "knownOversizedBodyReads": 0,
+    "unknownOverflowProbeBytes": 1,
+    "totalElapsedDeadlineAdded": false
+  },
+  "familyNative": {
+    "surface": "Existing Calendar Home widget on actual Android10, using ADB input and screenshot only",
+    "requests": [
+      {
+        "at": 1793648165.0973241,
+        "mode": "good-gzip",
+        "advertised": 148,
+        "sentBodyBytes": 148,
+        "acceptEncoding": "gzip"
+      },
+      {
+        "at": 1793648212.865333,
+        "mode": "oversized",
+        "advertised": 8388609,
+        "sentBodyBytes": 0,
+        "acceptEncoding": "gzip"
+      },
+      {
+        "at": 1793648326.9092338,
+        "mode": "truncated",
+        "advertised": 281,
+        "sentBodyBytes": 181,
+        "acceptEncoding": "gzip"
+      },
+      {
+        "at": 1793648368.152898,
+        "mode": "good-gzip",
+        "advertised": 148,
+        "sentBodyBytes": 148,
+        "acceptEncoding": "gzip"
+      }
+    ],
+    "observed": {
+      "gzipEventRendered": true,
+      "oversizedSavedEventRetained": true,
+      "incompleteReplacementRejected": true,
+      "savedEventAndExistingWarningVisible": true,
+      "validRetryClearedWarning": true
+    },
+    "images": [
+      "calendar-saved-event.png",
+      "calendar-recovered.png"
+    ],
+    "naturalSystemDreamTested": false
+  },
+  "delivery": {
+    "family": {
+      "calendarUrlRestored": true,
+      "installedSha256": "772681507fdf9695810319770db96033ac8225dabed70d5443da0976c3c72371",
+      "bytes": 25860990,
+      "candidateMatches": true
+    },
+    "living": {
+      "bytes": 25860990,
+      "installedSha256": "772681507fdf9695810319770db96033ac8225dabed70d5443da0976c3c72371",
+      "expectedSha256": "772681507fdf9695810319770db96033ac8225dabed70d5443da0976c3c72371",
+      "installReply": "incomplete HTTP headers; no resend",
+      "candidateMatches": true
+    },
+    "livingInstallResent": false
+  },
+  "restoration": {
+    "roomConfigurations": {
+      "family": {
+        "profile": true,
+        "layout": true,
+        "screensaver": true
+      },
+      "living": {
+        "profile": true,
+        "layout": true,
+        "screensaver": true
+      }
+    },
+    "familyRuntime": {
+      "originalChromeTaskRetained": true,
+      "manualFrameResumed": true,
+      "fontRetained": true,
+      "accessibilityRetained": true
+    },
+    "fixtureClosed": true
+  },
+  "finalCleanup": {
+    "livingFinalConfigurationsMatch": {
+      "profile": true,
+      "layout": true,
+      "screensaver": true
+    },
+    "ownedTemporaryFleetCredentialsRemoved": true,
+    "fixtureClosed": true
+  },
+  "limits": [
+    "8 MiB is a new supported response-body limit, not a total heap bound.",
+    "Existing per-operation timeouts retained; no total elapsed download deadline.",
+    "No frame-rate, universal latency or total memory reduction measurement.",
+    "Living verified by artifact/configuration only; no duplicate functional QA.",
+    "Private full screenshots contain user photos; public images contain only the generated Calendar card.",
+    "No Portal instrumentation, accessibility reconnect, GitHub or Home Assistant action."
+  ],
+  "cleanupCompletedAt": "2026-11-02T19:44:18.202166+00:00",
+  "roadmap": {
+    "checkedAt": "2026-11-02T19:44:18.201016+00:00",
+    "taskCount": 43,
+    "changedDetail": "calendar-download-budget",
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "newDetailAndCurrentVersionVerified": true,
+    "bothScreenshotsVisuallyReviewed": true,
+    "receiptAndTwoGeneratedCalendarImagesHttpStatus": 200,
+    "servedSnapshotMatchesSource": true,
+    "snapshotSha256": "1fd66e160ab96bf1528b9d0142fc55f72d0bbb97bef5ff4cf7a659e81176fb49",
+    "limits": "Checks cover the updated Calendar detail, queue count, current footer and public evidence; earlier all-task checks retain their earlier scope."
+  }
+}

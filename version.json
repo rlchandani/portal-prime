@@ -1,6 +1,6 @@
 {
-  "versionCode": 76,
-  "versionName": "1.82",
+  "versionCode": 77,
+  "versionName": "1.83",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Photo deletion now confirms the selected file before reporting success. Unexpected acknowledgments prompt review while preserving the existing single photo-list refresh."
+  "notes": "Calendar downloads reject oversized and incomplete responses before parsing, release their connections, and preserve the existing saved-event recovery."
 }

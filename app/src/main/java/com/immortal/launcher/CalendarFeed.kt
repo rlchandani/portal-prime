@@ -490,11 +490,6 @@ object CalendarFeed {
 
   private fun httpGet(spec: String): String? {
     val c = URL(spec).openConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = 12000
-    c.instanceFollowRedirects = true
-    c.setRequestProperty("User-Agent", "Immortal/1.0")
-    c.setRequestProperty("Accept", "text/calendar, text/plain, */*")
-    return runCatching { c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) } }.getOrNull()
+    return CalendarFeedHttp.fetch(c)
   }
 }

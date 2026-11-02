@@ -625,3 +625,22 @@ music sign-in/playback, UI approvals and all exhausted issue boundaries.
 ## Next independent native photo-transfer unit
 
 Native upload confirmation currently checks bytes after the general coercing success parser, without validating literal success or exact destination. This is source evidence, not a freshly reproduced runtime outcome. The41-item saved roadmap queues a separate bounded client/repository/group unit; reproduce first, preserve streaming/cleanup and401, and avoid any automatic image replay. This does not reopen exhausted work or claim physical-phone acceptance.
+
+## Calendar transport checkpoint — 2 November 2026
+
+The independent Calendar unit beginning **19:26 UTC** adds an **8 MiB response
+body budget**, incomplete-length rejection and connection cleanup while retaining
+saved-event recovery. Three original real HTTP regressions failed; all18 focused
+checks and **3,887 JVM tests /408 suites**, debug/optimized/R8/lint gates passed.
+Four generated HTTP cases on actual Family Android10 cover gzip, declared
+oversize, incomplete response and successful recovery. See the
+[delivery receipt](portal-calendar-download-budget-2026-11-02.md).
+
+Both rooms now contain the exact optimized **1.83 / code77** APK, established
+by full readback. Complete profiles, layouts and screensaver configuration
+match their baselines; Family's original Calendar URL and manual frame were
+restored, with Chrome task, font and accessibility retained. The owned server
+is stopped and temporary fleet credentials removed. This bounds downloaded
+bodies; it is not a measured frame-rate improvement or total heap guarantee.
+Weather clipping, other exhausted slots, UI approval, music sign-in/playback and
+physical companion acceptance keep their separate boundaries.

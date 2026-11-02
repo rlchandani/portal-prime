@@ -846,5 +846,25 @@
     "newEvidenceHttpStatus": 200,
     "harnessCorrection": "Initial data-task selector found0 rows; source task-row selector verified42. No page defect.",
     "limits": "Updated settings detail/footer/queue only. No repeat of all42 details, full browser QA or native acceptance inferred from this saved roadmap."
+  },
+  "calendarDownloadSnapshotUpdate": {
+    "checkedAt": "2026-11-02T19:44:18.201016+00:00",
+    "taskCount": 43,
+    "changedDetail": "calendar-download-budget",
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "newDetailAndCurrentVersionVerified": true,
+    "bothScreenshotsVisuallyReviewed": true,
+    "receiptAndTwoGeneratedCalendarImagesHttpStatus": 200,
+    "servedSnapshotMatchesSource": true,
+    "snapshotSha256": "1fd66e160ab96bf1528b9d0142fc55f72d0bbb97bef5ff4cf7a659e81176fb49",
+    "limits": "Checks cover the updated Calendar detail, queue count, current footer and public evidence; earlier all-task checks retain their earlier scope."
   }
 }
