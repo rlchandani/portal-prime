@@ -7,6 +7,15 @@ The page is a saved, manually maintained priority queue, not live telemetry,
 an exhaustive product inventory or whole-product acceptance. It does not grant
 UI redesign approval. The separate gallery remains unapproved.
 
+Latest native scalar editor snapshot:12 coordinator-observed Family cases
+passed on unchanged1.77, covering Device name and Photo interval. Valid35-second
+persistence/reopen and native restoration to30 passed; complete saved state,
+APK and accessibility bindings are preserved. Other editor types and all54
+pages remain separate. The existing Settings task was updated without adding
+a feature/task. Its33-row page passed390×844 and1600×1000 overflow/content
+checks, all three new cropped captures returned HTTP200, and console errors/
+warnings were zero.
+
 ## Update verified facts
 
 Edit `roadmap.json` and its `updatedAt` / `updatedLabel` fields. Each task separates:

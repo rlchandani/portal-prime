@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T15:53:32.185981+00:00",
-  "updatedLabel": "2 November 2026 \u00b7 Full slideshow regression gates locally verified",
+  "updatedAt": "2026-11-02T16:14:13.558012+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 Native scalar Settings checks passed",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "ci-regressions",
+  "defaultTask": "settings-contract",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact optimized1.77/code71. Earlier task receipts retain their acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
@@ -115,17 +115,17 @@
     {
       "id": "settings-contract",
       "title": "Native settings editor contract",
-      "summary": "Settings editor classification and projection tests passed; maintenance is included in current 1.76. Every-editor native acceptance remains separate.",
+      "summary": "Classification guards retained;12 actual Family text/numeric editor cases passed. Complete saved state and original1.77 restored; other editor types remain separate.",
       "description": "Replace the obsolete inline-string prohibition with classification and projection coverage for the renderer's actual supported editors. This protects the existing settings behavior.",
       "status": "verified",
-      "verification": "Locally verified \u00b7 included in deployed APK",
+      "verification": "12 Family cases passed \u00b7 full state restored",
       "kind": "Maintenance",
       "platforms": [
         "portal"
       ],
       "owner": "Settings QA / Main",
-      "deployment": "Current exact 1.76 includes the maintenance in both rooms; the original scoped Slideshow proof does not establish every editor.",
-      "state": "Terminal local gates passed in 3m 58s",
+      "deployment": "Both rooms retain exact1.77/code71. This QA unit installed no APK and operated only Family.",
+      "state": "Native Device name and Photo interval checks verified; no production defect or app patch.",
       "acceptance": [
         "Cover real registry editor selection, including inline and Activity-backed strings, fleet name and dashboard URL.",
         "Retain validation, secret handling and persistence coverage.",
@@ -143,13 +143,23 @@
         {
           "text": "Maintenance committed as 2682e3a99edb4210ea298eff6272c83273a974f5.",
           "source": "Coordinator commit receipt, 2026-11-02"
+        },
+        {
+          "text": "12 coordinator-observed native cases passed; valid35-second save/readback/reopen and restoration to30; exact APK and full configuration unchanged. Actual cropped captures included.",
+          "source": "docs/portal-settings-native-editors-2026-11-02.md"
+        },
+        {
+          "text": "Selected native case results, cleanup checks and capture hashes; no credentials or personal photos.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/native-settings-editors-verification.json"
         }
       ],
       "limits": [
-        "Classification and projection tests do not prove composed controls or native interaction.",
-        "No new visible feature or widget redesign is claimed."
+        "Classification tests do not compose every renderer branch.",
+        "Native acceptance covers two scalar editors in dark appearance at the original normal font scale.",
+        "Secret/time/stepper/rich forms, worker rows, concurrent drafts, other themes/text scales and complete54-page acceptance remain separate.",
+        "No new performance benchmark or app release."
       ],
-      "next": "Keep full renderer UI acceptance separate from classification tests; shared screensaver visibility is now delivered."
+      "next": "Continue an independent actionable product unit; retain separate native acceptance for the remaining editor types."
     },
     {
       "id": "timer-ownership",

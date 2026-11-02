@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "scope": "Coordinator-observed native scalar editor cases; not automated Compose tests or whole Settings acceptance.",
+  "device": "Family Area",
+  "androidApi": 29,
+  "installedVersion": "1.77",
+  "installedVersionCode": 71,
+  "start": "2026-11-02T15:55:54Z",
+  "deadline": "2026-11-02T16:25:54Z",
+  "observedCases": [
+    {
+      "id": "name-prefill",
+      "result": "passed"
+    },
+    {
+      "id": "name-keyboard-actions",
+      "result": "passed"
+    },
+    {
+      "id": "name-blank-rejected",
+      "result": "passed"
+    },
+    {
+      "id": "name-overlong-rejected",
+      "result": "passed"
+    },
+    {
+      "id": "name-cancel-reopen",
+      "result": "passed"
+    },
+    {
+      "id": "name-untouched-save",
+      "result": "passed"
+    },
+    {
+      "id": "interval-prefill-cancel-keyboard",
+      "result": "passed"
+    },
+    {
+      "id": "interval-below-min-rejected",
+      "result": "passed"
+    },
+    {
+      "id": "interval-above-max-rejected",
+      "result": "passed"
+    },
+    {
+      "id": "interval-blank-rejected",
+      "result": "passed"
+    },
+    {
+      "id": "interval-valid-save-readback-reopen",
+      "result": "passed"
+    },
+    {
+      "id": "interval-native-restore",
+      "result": "passed"
+    }
+  ],
+  "passedCases": 12,
+  "cleanup": {
+    "profileUnchanged": true,
+    "layoutUnchanged": true,
+    "screensaverUnchanged": true,
+    "fontUnchanged": true,
+    "originalChromeTaskRetained": true,
+    "originalPhotoDreamRestored": true,
+    "installedSha256": "5df871735ada5aae37375a6cd6129aa9fcb13329c982441a0cc90db2fd4f383e",
+    "originalApkUnchanged": true,
+    "enabledAccessibilityServicesUnchanged": true,
+    "noPendingAccessibilityBinding": true,
+    "ownedPreviewFinished": true
+  },
+  "appCodeChanged": false,
+  "apkInstalled": false,
+  "livingAreaOperated": false,
+  "targetInstrumentationUsed": false,
+  "published": false,
+  "sourceReview": "Independent bounded read-only review: no concrete finding.",
+  "limits": [
+    "Only existing Device name and Photo interval editors.",
+    "Dark appearance and original normal font scale.",
+    "Secret/time/stepper/rich/worker/concurrent-draft and full navigation acceptance remain separate.",
+    "No fresh build or performance benchmark."
+  ],
+  "images": {
+    "native-name-validation.png": "ac299f6f870b6898d9ac2eec17c50fc73eda904e46eda5a6f03945064d0d515f",
+    "native-interval-validation.png": "d2772f016b1831e952880547dc2b1ee3bbb2c3072cb2b03877a550d813640bac",
+    "native-interval-saved.png": "e70e6c30075a5f87289284086fa05e1b26764f492aa3bf13c593fa673a74f977"
+  },
+  "roadmapPresentation": {
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "taskCount": 33,
+    "horizontalOverflow": false,
+    "nativeCasesAndLimitsVisible": true,
+    "captureHttpStatus": [
+      200,
+      200,
+      200
+    ],
+    "consoleErrors": 0,
+    "consoleWarnings": 0
+  },
+  "verificationCompletedAt": "2026-11-02T16:17:03.907065+00:00"
+}
