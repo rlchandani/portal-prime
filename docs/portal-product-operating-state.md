@@ -454,6 +454,24 @@ delivered/implemented,9 scoped verified,2 approval,3 parked and1 queued.
 The clock-format producer concern remains open; it has not been reproduced or
 fixed by this parser correction. No exhausted issue was reopened.
 
+## Weather release checkpoint — 2 November 2026
+
+The same Weather issue window continued through its versioned release, without
+resetting the original30-minute deadline. Final gates passed **3,843 JVM tests
+/403 suites**, debug/optimized assembly, R8, vital lint, same signing key and
+version sync in92s. Exact **1.73 / code67** is now installed in both rooms,
+verified through complete installed APK hashes. Both complete settings profiles
+and screensaver configurations are unchanged; Family remained in normal Chrome
+for its pending human music sign-in. Living foreground was not inspected by ADB.
+The [delivery receipt](portal-weather-hour-correction-2026-11-02.md) records the
+artifact identity and separate physical visual/performance limits.
+
+The25-task roadmap now has **11 delivered/implemented,8 scoped verified,
+2 awaiting approval,3 parked and1 queued**. Weather presentation approval,
+actual YouTube playback, physical companion acceptance and parked investigations
+remain open. No Home Assistant service, account setup, native redesign or
+GitHub authentication/publication was performed.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:

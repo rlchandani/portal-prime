@@ -203,3 +203,17 @@ full3843 JVM/debug proof and a final strengthened18/18 Weather run. It is not
 installed; the current rooms remain1.72/code66. The Weather-only design review
 uses a public sample capture, maps current data and keeps manual-location,
 font fidelity and native performance limits explicit. Sign-off is pending.
+
+The Weather release snapshot records exact1.73/code67 in both rooms after
+full installed APK verification and unchanged complete settings. The final
+versioned local gate passed3843 JVM tests/403 suites plus debug/optimized
+assembly, R8, vital lint, signer and version sync. Family's normal Chrome
+foreground was preserved. The25-item queue has11 delivered/implemented,
+8 scoped verified,2 approval,3 parked and1 queued; Weather design sign-off
+and physical visual/performance acceptance remain separate. Earlier task
+receipts retain their original acceptance versions.
+The four changed Weather/gallery detail checks at1600×1000 and390×844
+passed with25 rendered queue rows, visible version/approval boundaries, zero
+horizontal overflow and no page errors. The desktop screenshot was visually
+reviewed. This is saved-page presentation evidence, not native visual or
+performance acceptance. See `weatherReleaseSnapshotUpdate` in `validation.json`.

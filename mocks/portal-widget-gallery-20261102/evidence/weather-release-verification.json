@@ -1,0 +1,59 @@
+{
+  "scope": "Weather parser correctness delivery; native Weather design and physical visual/performance acceptance remain open.",
+  "artifact": {
+    "versionName": "1.73",
+    "versionCode": 67,
+    "package": "com.immortal.launcher.debug",
+    "bytes": 25860686,
+    "sha256": "82916caf75fb238bac21f133034c4f04fdc35ed39722ea0d2a70e0d960be4ff8",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "jvmTests": 3843,
+    "jvmSuites": 403,
+    "failures": 0,
+    "buildExit": 0,
+    "buildSeconds": 92,
+    "debugBuild": true,
+    "optimizedBuild": true,
+    "r8": true,
+    "vitalLint": true,
+    "verifiedAtUtc": "2026-11-02T12:53:38.088794+00:00"
+  },
+  "rooms": [
+    {
+      "room": "Family Area",
+      "version": {
+        "versionCode": 67,
+        "versionName": "1.73"
+      },
+      "infoOk": true,
+      "devMode": true,
+      "profileComplete": true,
+      "profileUnchanged": true,
+      "screensaverUnchanged": true,
+      "foregroundChrome": true,
+      "installedExactSha256VerifiedByHelper": true,
+      "helperExit": 0,
+      "checkedAtUtc": "2026-11-02T12:54:14.463309+00:00"
+    },
+    {
+      "room": "Living Area",
+      "version": {
+        "versionCode": 67,
+        "versionName": "1.73"
+      },
+      "infoOk": true,
+      "devMode": true,
+      "profileComplete": true,
+      "profileUnchanged": true,
+      "screensaverUnchanged": true,
+      "installedExactSha256VerifiedByHelper": true,
+      "helperExit": 0,
+      "checkedAtUtc": "2026-11-02T12:54:43.978684+00:00"
+    }
+  ],
+  "limits": [
+    "Parser boundary behavior is established by regression tests, not a physical exact-hour panel observation.",
+    "Living foreground not inspected through ADB.",
+    "No Weather UI redesign, music account setup, Home Assistant service or GitHub publication."
+  ]
+}

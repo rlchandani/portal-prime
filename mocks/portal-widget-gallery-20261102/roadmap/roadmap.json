@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 Weather current-hour correction locally verified; design review pending (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 Weather correction installed as 1.73 in both rooms; design approval pending (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-current-hour",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact 1.72 / code 66. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
+    "Both rooms have exact 1.73 / code 67. Earlier task receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -73,7 +73,7 @@
     {
       "id": "settings-contract",
       "title": "Native settings editor contract",
-      "summary": "Settings editor classification and projection tests passed; maintenance is included in current 1.72. Every-editor native acceptance remains separate.",
+      "summary": "Settings editor classification and projection tests passed; maintenance is included in current 1.73. Every-editor native acceptance remains separate.",
       "description": "Replace the obsolete inline-string prohibition with classification and projection coverage for the renderer's actual supported editors. This protects the existing settings behavior.",
       "status": "verified",
       "verification": "Locally verified \u00b7 included in deployed APK",
@@ -322,7 +322,7 @@
     {
       "id": "world-clock",
       "title": "World Clock: complete rows & city counts",
-      "summary": "Complete city rows and counts passed normal and 150% native checks; the accepted fix is preserved in current 1.72 on both rooms.",
+      "summary": "Complete city rows and counts passed normal and 150% native checks; the accepted fix is preserved in current 1.73 on both rooms.",
       "description": "The existing 488 \u00d7 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
       "status": "delivered",
       "verification": "Device proof \u00b7 both rooms",
@@ -362,7 +362,7 @@
     {
       "id": "photo-alarm",
       "title": "Photo Memory routing & alarm countdown",
-      "summary": "Scoped native Photo Memory routing and alarm countdown checks passed; both fixes are preserved in current 1.72 on both rooms.",
+      "summary": "Scoped native Photo Memory routing and alarm countdown checks passed; both fixes are preserved in current 1.73 on both rooms.",
       "description": "Photo Memory editing opens Photo sources even with idle slideshow disabled. The active-page alarm caption observes saved configuration, rounds partial minutes up and refreshes at minute boundaries.",
       "status": "delivered",
       "verification": "Device proof \u00b7 both rooms",
@@ -739,7 +739,7 @@
     {
       "id": "fleet-upload-integrity",
       "title": "Fleet uploads: preserve files when interrupted",
-      "summary": "Cancelled uploads preserve the original. The accepted fix is retained in exact 1.72 on both rooms with unchanged settings.",
+      "summary": "Cancelled uploads preserve the original. Original room acceptance was on1.72; the fix is retained in exact1.73 on both rooms.",
       "description": "A real Family1.70 test declared100 bytes, sent6 and replaced a21-byte original while reporting success. The request now rejects incomplete bodies; a unique same-directory staging file is closed and renamed only after completion. Original files remain available until the upload succeeds.",
       "status": "delivered",
       "verification": "Delivered \u00b7 Family API checks and exact APK in both rooms",
@@ -782,7 +782,7 @@
     {
       "id": "fleet-json-body-integrity",
       "title": "Fleet JSON requests: reject incomplete bodies",
-      "summary": "Incomplete and oversized JSON now fail before command application. Exact 1.72 is installed in both rooms.",
+      "summary": "Incomplete and oversized JSON fail before command application. Original1.72 acceptance is retained in exact1.73 in both rooms.",
       "description": "Actual Family 1.71 accepted incomplete JSON, clipped over-limit input and an overflowing explicit length. The shared reader now requires complete bytes, rejects clipping and tracks consumed input. Invalid/overflowing lengths and guarded parsing catches return appropriate errors. The existing direct companion-response contract is preserved.",
       "status": "delivered",
       "verification": "Delivered \u00b7 22 Family API checks; exact APK in both rooms",
@@ -1014,17 +1014,17 @@
     {
       "id": "weather-current-hour",
       "title": "Weather: Now selects the current hour",
-      "summary": "Fixed the exact-hour boundary that could call the previous hour Now. Three red assertions reproduced it; 3,843 JVM tests/debug build passed, then final strengthened Weather18/18. Not installed.",
+      "summary": "Fixed the previous-hour Now selection. Final 3,843 JVM tests and optimized build passed; exact 1.73/code67 installed in both rooms.",
       "description": "The hourly parser now starts at the current hour in the weather response timezone, preserving half-/quarter-hour offsets and midnight behavior. This correctness change is separate from proposed widget presentation.",
-      "status": "verified",
-      "verification": "Implemented / locally verified \u00b7 not deployed",
+      "status": "delivered",
+      "verification": "Implemented / installed in both rooms \u00b7 parser correctness verified",
       "kind": "Weather correctness fix",
       "platforms": [
         "portal"
       ],
       "owner": "Native / QA",
-      "deployment": "Source correction on codex/weather-forecast-hour-20261102. Both rooms retain exact1.72/code66; the debug verification APK is not a versioned release.",
-      "state": "Original Weather18 tests had3 failures. Full3843/403 JVM gate plus debug APK passed in48s; final strengthened focused18/18 passed in7s.",
+      "deployment": "Exact optimized 1.73/code67 installed once per room; both complete installed APK hashes match the verified local artifact.",
+      "state": "Final3843/403 JVM gate, debug/optimized builds, R8, vital lint, version sync and same signer passed. Both room profiles/screensaver settings unchanged; Family Chrome stayed foreground.",
       "acceptance": [
         "At an exact hour boundary, Now selects that hour\u2019s temperature and condition, not the previous hour.",
         "Use the response location timezone for whole-, half- and quarter-hour offsets; keep the current hour just before midnight and advance at midnight.",
@@ -1034,15 +1034,19 @@
         {
           "text": "Private red/green XML verifies three original assertion failures. Independent source review found no introduced correction defect and a test-strengthening opportunity, which is included in the final focused passing run.",
           "source": "docs/portal-weather-hour-correction-2026-11-02.md; private local-verification.json"
+        },
+        {
+          "text": "Final versioned gate passed in92s. Family and Living deployment helpers exited0 with full installed byte/hash verification; authenticated readbacks confirmed1.73/code67 and unchanged complete settings. Family remained in Chrome. Release metadata commit160cc83.",
+          "source": "docs/portal-weather-hour-correction-2026-11-02.md; ../evidence/weather-release-verification.json"
         }
       ],
       "limits": [
-        "Local parser correctness and debug compilation only; no installed-room or native visual/performance verdict.",
-        "The current debug candidate retains the existing version number; it must be packaged as a new versioned optimized release before deployment.",
+        "Parser regression and exact installed artifact proof; no physical panel exact-hour observation or native visual/performance verdict.",
+        "Living foreground was not inspected through ADB; Family browser foreground was preserved.",
         "Hourly labels retaining a former12/24-hour preference remains a separate open producer issue.",
         "The whole widget gallery and proposed Weather layout still require user approval."
       ],
-      "next": "Prepare a versioned optimized release with signer/local gates and preserve Family\u2019s pending normal browser sign-in during any update; then verify exact installed identity in both rooms."
+      "next": "Await Weather-only design approval. Keep physical visual/performance acceptance and the separate clock-format producer concern open."
     }
   ]
 }

@@ -427,5 +427,31 @@
     "pageErrors": 0,
     "sourceFixNotDeployedAndDesignPendingVisible": true,
     "limits": "Four updated-detail saved-page checks only. Independent parser red/green/build and separate Weather review-page proofs have their own receipts; no installed-room or hardware-performance claim."
+  },
+  "weatherReleaseSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T12:57:18.373636+00:00",
+    "taskCount": 25,
+    "counts": {
+      "verified": 8,
+      "delivered": 11,
+      "approval": 2,
+      "parked": 3,
+      "queued": 1
+    },
+    "changedWeatherAndGalleryDetailsCheckedAtDesktopAndMobile": true,
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "all25QueueRowsRendered": true,
+    "newVersionAndApprovalLimitsVisible": true,
+    "pageErrors": 0,
+    "desktopScreenshotVisuallyReviewed": true,
+    "limits": "Four changed-detail presentation checks only; older all-detail/filter/image proofs retain their original scopes. Exact room deployment and parser gates have separate receipts; no native visual or general performance verdict."
   }
 }
