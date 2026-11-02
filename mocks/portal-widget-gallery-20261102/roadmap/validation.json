@@ -211,5 +211,25 @@
     "deliveredUploadAndHelperFailureVisible": true,
     "nextSourceHypothesisVisible": true,
     "limits": "Saved roadmap presentation only. Actual13 Family API checks, installed APK identity and both-room configuration equality have independent receipts. No full UI/phone/performance acceptance."
+  },
+  "jsonBodySnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T11:16:25.578511+00:00",
+    "portalVersion": "1.72 / code66",
+    "taskCount": 21,
+    "all21DesktopAndMobileDetailsCheckedAfterReload": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "missingPlatformLabels": false,
+    "roadmapPageErrors": 0,
+    "jsonDeliveryAndTimingIncreaseVisible": true,
+    "helperSourceFindingQueued": true,
+    "limits": "Saved roadmap presentation only. Actual22 Family JSON/header checks, binary compatibility, installed-APK identity and both-room profile/configuration equality have independent receipts. No native diagnostic/physical-phone/general performance acceptance."
   }
 }

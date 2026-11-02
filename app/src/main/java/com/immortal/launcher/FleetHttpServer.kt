@@ -11,6 +11,7 @@ import android.util.Log
 import java.io.ByteArrayOutputStream
 import java.io.Closeable
 import java.io.EOFException
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetAddress
@@ -43,6 +44,9 @@ class FleetHttpServer(
   @Volatile private var running = false
   private var acceptThread: Thread? = null
 
+  internal class IncompleteRequestBody : EOFException("Incomplete request body")
+  internal class RequestBodyTooLarge : IOException("Request body exceeds text limit")
+
   class Request(
       val method: String,
       val path: String,
@@ -67,18 +71,20 @@ class FleetHttpServer(
       return null
     }
 
-    /** Read the body (capped) as text — for small JSON command bodies. */
+    /** Read the complete remaining body as text; never return a clipped JSON prefix. */
     fun bodyText(maxBytes: Int = 1 * 1024 * 1024): String {
-      val want = minOf(contentLength, maxBytes)
+      require(maxBytes >= 0)
+      val want = contentLength - consumed
+      if (want > maxBytes) throw RequestBodyTooLarge()
       if (want <= 0) return ""
       val buf = ByteArray(want)
       var read = 0
       while (read < want) {
         val n = input.read(buf, read, want - read)
-        if (n == -1) break
+        if (n == -1) throw IncompleteRequestBody()
         read += n
+        consumed += n
       }
-      consumed += read
       return String(buf, 0, read, Charsets.UTF_8)
     }
 
@@ -220,8 +226,17 @@ class FleetHttpServer(
         runCatching { writeResponse(out, Response.preflight()) }
         return
       }
-      val len = head.headers["content-length"]?.toIntOrNull()?.coerceAtLeast(0) ?: 0
-      val req = Request(head.method, head.path, head.query, head.headers, input, len)
+      val lengthText = head.headers["content-length"]
+      if (lengthText != null && (lengthText.isEmpty() || lengthText.any { it !in '0'..'9' })) {
+        runCatching { writeResponse(out, Response(400, """{"ok":false,"error":"bad_content_length"}""")) }
+        return
+      }
+      val len = lengthText?.toIntOrNull()
+      if (lengthText != null && len == null) {
+        runCatching { writeResponse(out, Response(413, """{"ok":false,"error":"body_too_large"}""")) }
+        return
+      }
+      val req = Request(head.method, head.path, head.query, head.headers, input, len ?: 0)
       // Honour Expect: 100-continue (curl sends it for larger uploads) so the
       // client actually sends the body before we try to read it.
       if (req.header("expect")?.contains("100-continue", ignoreCase = true) == true) {
@@ -230,8 +245,10 @@ class FleetHttpServer(
       val resp =
           runCatching { handler(req) }
               .getOrElse {
-                Log.w(TAG, "handler error", it)
-                Response(500, """{"ok":false,"error":"server_error"}""")
+                requestBodyError(it) ?: run {
+                  Log.w(TAG, "handler error", it)
+                  Response(500, """{"ok":false,"error":"server_error"}""")
+                }
               }
       resp.use {
         runCatching { req.drainRemaining() } // so close() can't RST away our response
@@ -269,6 +286,13 @@ class FleetHttpServer(
     private const val MAX_HEAD_BYTES = 64 * 1024
     private const val CRLF_CRLF = 0x0D0A0D0A
 
+    /** Preserve request framing errors when a route also catches JSON parsing failures. */
+    internal fun requestBodyError(error: Throwable): Response? = when (error) {
+      is IncompleteRequestBody -> Response(400, """{"ok":false,"error":"incomplete_body"}""")
+      is RequestBodyTooLarge -> Response(413, """{"ok":false,"error":"body_too_large"}""")
+      else -> null
+    }
+
     /** Parse the request line + headers (text up to and including the blank line). */
     internal fun parseHead(text: String): Head? {
       val lines = text.split("\r\n")
@@ -305,6 +329,7 @@ class FleetHttpServer(
           404 -> "Not Found"
           405 -> "Method Not Allowed"
           409 -> "Conflict"
+          413 -> "Payload Too Large"
           500 -> "Internal Server Error"
           503 -> "Service Unavailable"
           else -> "OK"

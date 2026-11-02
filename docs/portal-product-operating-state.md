@@ -236,6 +236,40 @@ request-boundary tests before considering a fix. The deployment helper's false
 negative is also recorded for a future independent tooling slot. Exhausted
 native cold reconnect/screensaver/performance units remain parked.
 
+## Latest JSON request checkpoint — 2 November 2026
+
+The 10:56:13–11:26:13 UTC unit reproduced accepted incomplete/clipped JSON and
+overflowing-length normalization with nonmutating Family 1.71 requests. The
+reader now requires the complete declared body, rejects size clipping and
+accounts consumed bytes immediately. Explicit invalid/overflowing lengths are
+rejected; shared request-error mapping preserves direct companion and guarded
+diagnostic response contracts.
+
+Initial focused checks had 12 failures in 34 tests. The first full gate caught
+one direct companion contract regression and was not promoted. Review findings
+and that regression were corrected after an 11-test/3-failure baseline. Final
+**3,840 JVM / 403 suites, 716 JS / 161 Python**, optimized APK/R8/vital lint,
+version/signer/source and independent review checks passed. All 43 focused
+reader/server/stream/companion boundary cases pass.
+
+**Current exact 1.72/code66 is installed in both rooms.** Family's 22 JSON/header
+checks passed; complete 16,003-byte binary upload/readback and interrupted
+overwrite preservation passed. Both complete profiles/screensaver configs are
+unchanged. Owned scratch cleanup and Family slideshow foreground restoration
+are verified. Three no-op LAN round-trip medians were 9.50 → 13.24 ms: an observed
+3.74 ms increase, with no general performance claim. See
+[delivery and limits](portal-json-body-integrity-delivery-2026-11-02.md).
+
+The 21-task saved roadmap queues the observed **deploy-helper false negative**.
+The actual 1.72 self-update trace contains `incomplete HTTP headers` and a
+transport-error marker; the helper's qualified-loss branch accepts older
+`read failed:` wording but excludes this newer message. Independent exact
+installed-APK readback proved delivery. A fresh tooling unit should replay this
+actual transcript and retain strict changed-path/hash verification, without
+manufacturing another Portal release or reinstalling an already verified APK.
+The earlier native cold reconnect, physical phone and exhausted native issues
+retain their existing scope and status.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:

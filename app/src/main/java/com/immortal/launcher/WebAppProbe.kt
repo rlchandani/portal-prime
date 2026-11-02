@@ -48,7 +48,10 @@ internal object WebAppProbe {
     if (request.method !in setOf("GET", "POST")) return error(405, "method_not_allowed")
     val action = if (request.method == "POST") runCatching {
       command(JSONObject(request.bodyText()))
-    }.getOrNull() ?: return error(400, "invalid_probe_command") else null
+    }.getOrElse {
+      FleetHttpServer.requestBodyError(it)?.let { response -> return response }
+      null
+    } ?: return error(400, "invalid_probe_command") else null
     if (Looper.myLooper() == Looper.getMainLooper()) return error(503, "worker_required")
     val result = CompletableFuture<FleetHttpServer.Response>()
     val gate = FramePerformanceCommandGate()

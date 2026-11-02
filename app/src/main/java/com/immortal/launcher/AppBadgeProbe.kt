@@ -27,7 +27,9 @@ internal object AppBadgeProbe {
         MediaNotificationListenerService.badgeDiagnostics(context.packageName)
             .put("fixtureChannelExists", manager.getNotificationChannel(channel) != null).toString())
     if (req.method != "POST") return response(405, "method_not_allowed")
-    val action = runCatching { JSONObject(req.bodyText()).optString("action") }.getOrNull()
+    val action = runCatching { JSONObject(req.bodyText()).optString("action") }.getOrElse {
+      return FleetHttpServer.requestBodyError(it) ?: response(400, "unknown_action")
+    }
     when (action) {
       "post", "ongoing" -> {
         manager.createNotificationChannel(NotificationChannel(channel, "App badge verification", NotificationManager.IMPORTANCE_LOW))

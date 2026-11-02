@@ -1,6 +1,6 @@
 {
-  "versionCode": 65,
-  "versionName": "1.71",
+  "versionCode": 66,
+  "versionName": "1.72",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Local Portal iteration: interrupted fleet uploads preserve the original file and return failure. Completed uploads publish exact bytes through a same-directory staging file, using the existing 64 KB streaming buffer."
+  "notes": "Local Portal iteration: incomplete JSON bodies fail before command application, oversized text bodies are rejected instead of clipped, and invalid or overflowing explicit lengths are rejected. Shared error mapping and consumed-byte accounting preserve complete JSON, empty requests and binary upload compatibility."
 }

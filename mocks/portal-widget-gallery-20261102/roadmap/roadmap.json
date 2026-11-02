@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 upload integrity fixed; exact 1.71 installed in both rooms (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 JSON integrity fixed; exact 1.72 in both rooms; deploy-helper correction queued (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "fleet-upload-integrity",
+  "defaultTask": "fleet-json-body-integrity",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact 1.71 / code 65. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
+    "Both rooms have exact 1.72 / code 66. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -82,7 +82,7 @@
         "portal"
       ],
       "owner": "Settings QA / Main",
-      "deployment": "Current exact 1.71 includes the maintenance in both rooms; the original scoped Slideshow proof does not establish every editor.",
+      "deployment": "Current exact 1.72 includes the maintenance in both rooms; the original scoped Slideshow proof does not establish every editor.",
       "state": "Terminal local gates passed in 3m 58s",
       "acceptance": [
         "Cover real registry editor selection, including inline and Activity-backed strings, fleet name and dashboard URL.",
@@ -121,7 +121,7 @@
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Current exact 1.71 preserves the accepted 1.67 timer fix in both rooms; original feature acceptance remains scoped to its named receipt.",
+      "deployment": "Current exact 1.72 preserves the accepted 1.67 timer fix in both rooms; original feature acceptance remains scoped to its named receipt.",
       "state": "Accepted in the 30-minute slot; original Family layout, Home page and screensaver configuration restored.",
       "acceptance": [
         "Reproduce the widget/editor behavior on the existing owner path before labeling it a runtime defect.",
@@ -171,7 +171,7 @@
         "companion"
       ],
       "owner": "Settings architecture",
-      "deployment": "Exact1.71 preserves accepted1.68 Portal/PWA visibility in both rooms. Companion1.7.1 includes the preflight correction and has emulator fixture proof; live companion/physical acceptance remains open.",
+      "deployment": "Exact1.72 preserves accepted1.68 Portal/PWA visibility in both rooms. Companion1.7.1 includes the preflight correction and has emulator fixture proof; live companion/physical acceptance remains open.",
       "state": "3,800 JVM tests / 399 suites, both APK builds and 654 JS tests passed; all 36 Family configuration fields restored.",
       "acceptance": [
         "Document intended shared-setting exceptions and presentation eligibility.",
@@ -327,7 +327,7 @@
         "portal"
       ],
       "owner": "Native / QA",
-      "deployment": "Current exact 1.71 preserves the accepted 1.66 World Clock fix in both rooms; original normal/150% proof is separately recorded.",
+      "deployment": "Current exact 1.72 preserves the accepted 1.66 World Clock fix in both rooms; original normal/150% proof is separately recorded.",
       "state": "Delivered within bounded acceptance",
       "acceptance": [
         "Family normal text: two complete cities; three cities show \u201c1 more city\u201d; four show \u201c2 more cities.\u201d",
@@ -367,7 +367,7 @@
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Current exact 1.71 preserves the accepted 1.65 routing/caption fixes in both rooms; original acceptance limits remain.",
+      "deployment": "Current exact 1.72 preserves the accepted 1.65 routing/caption fixes in both rooms; original acceptance limits remain.",
       "state": "Scoped native acceptance passed",
       "acceptance": [
         "Family source entry works with idle slideshow disabled and enabled; Back returns through Photos to Home.",
@@ -529,7 +529,7 @@
         "portal"
       ],
       "owner": "Browser QA / Main",
-      "deployment": "Current exact 1.71 preserves the accepted 1.69 status fix in both rooms; the six-trial browser proof retains its original 1.69 scope.",
+      "deployment": "Current exact 1.72 preserves the accepted 1.69 status fix in both rooms; the six-trial browser proof retains its original 1.69 scope.",
       "state": "Full 40/676 JS, 161 Python, 3,800 JVM / 399 suites and optimized/signing gates passed. Both rooms\u2019 saved profiles, screensaver settings and layout remain unchanged.",
       "acceptance": [
         "Initial cancellation cannot mark a successor page/room Offline; missing metadata is requested before the next poll.",
@@ -685,7 +685,7 @@
         "portal"
       ],
       "owner": "Fleet / release engineering",
-      "deployment": "Workstation CLI built and used for read-only acceptance. This tooling unit made no Portal or phone APK deployment; the later upload fix delivered exact1.71/code65 to both rooms.",
+      "deployment": "Workstation CLI built and used for read-only acceptance. This tooling unit made no APK deployment; later upload/JSON units delivered exact 1.72/code66 to both rooms.",
       "state": "Implemented on codex/fleet-response-integrity-20261102. Final23 Rust /17 actual CLI /33 room-helper checks passed;38 Calls-access checks and local syntax/ASCII gates passed. Complete room configurations unchanged.",
       "acceptance": [
         "Interrupted downloads preserve an existing file, create no new file, emit no partial stdout payload and return failure across rooms.",
@@ -727,7 +727,7 @@
         "tooling"
       ],
       "owner": "Portal storage / fleet engineering",
-      "deployment": "Exact optimized1.71/code65, package com.immortal.launcher.debug, installed on Family and Living. Installed bytes/SHA-256 match the accepted candidate; complete room settings and screensaver configuration unchanged.",
+      "deployment": "Current exact 1.72/code66 preserves the accepted 1.71 upload fix in both rooms. Original 13-case acceptance remains scoped to its receipt; the later JSON unit rechecked complete and interrupted binary uploads.",
       "state": "Implemented on codex/fleet-upload-integrity-20261102. Fresh3,821 JVM/401 suites,716 JS,161 Python and optimized gates passed. Family13 API checks passed; owned scratch removed and slideshow resumed.",
       "acceptance": [
         "Reproduce cancellation and complete-upload behavior with isolated public scratch files.",
@@ -755,40 +755,87 @@
         "Living install helper initially reported failure; independent exact installed-APK readback proved successful delivery. No second install attempted; helper false negative remains separate.",
         "No owner-data corruption tests, GitHub publication, companion change or reopening of exhausted native issues."
       ],
-      "next": "Next independent30-minute unit: test truncated JSON request bodies at the pure request boundary; reproduce first, then choose a focused correction."
+      "next": "Upload integrity remains verified. The independently delivered JSON correction and queued deploy-helper fix have their own scoped records."
     },
     {
       "id": "fleet-json-body-integrity",
       "title": "Fleet JSON requests: reject incomplete bodies",
-      "summary": "Next bounded investigation: prevent a complete JSON prefix from being accepted when the declared request is incomplete.",
-      "description": "Request.bodyText currently breaks at EOF and returns the bytes received. A syntactically complete prefix may therefore reach a route despite an incomplete declared body. This is source-supported evidence; no runtime settings corruption is claimed. Start with pure Request tests and leave owner settings untouched.",
-      "status": "queued",
-      "verification": "Queued \u00b7 source finding; runtime behavior unverified",
+      "summary": "Incomplete and oversized JSON now fail before command application. Exact 1.72 is installed in both rooms.",
+      "description": "Actual Family 1.71 accepted incomplete JSON, clipped over-limit input and an overflowing explicit length. The shared reader now requires complete bytes, rejects clipping and tracks consumed input. Invalid/overflowing lengths and guarded parsing catches return appropriate errors. The existing direct companion-response contract is preserved.",
+      "status": "delivered",
+      "verification": "Delivered \u00b7 22 Family API checks; exact APK in both rooms",
       "kind": "Reliability and request integrity",
       "platforms": [
         "portal",
         "tooling"
       ],
       "owner": "Portal API / fleet engineering",
-      "deployment": "No new implementation or deployment. Both rooms retain the verified1.71/code65 upload fix.",
-      "state": "A new independent30-minute slot is available. Pure reader tests first; no personal photos, owner configuration or old exhausted issue is a test target.",
+      "deployment": "Exact optimized 1.72/code66, com.immortal.launcher.debug, installed on Family and Living. Actual APK bytes/SHA-256 match; complete room profiles/screensaver configuration unchanged.",
+      "state": "Implemented on codex/fleet-json-body-integrity-20261102. Final 3,840 JVM/403 suites, 716 JS, 161 Python and optimized gates passed. Family 22 JSON/header checks plus binary compatibility passed; owned scratch removed and slideshow resumed.",
       "acceptance": [
-        "Reproduce an incomplete declared body containing a complete JSON prefix with an actual Request object.",
-        "If reproduced, incomplete or capped bodies cannot silently become successful mutating requests.",
-        "Complete UTF-8 JSON and supported empty-body behavior retain explicit compatibility; error status is truthful.",
-        "Run regression/build gates and applicable Family verification before any final delivery; preserve whole room configuration."
+        "Incomplete bodies cannot become successful JSON commands, including complete-looking prefixes.",
+        "Over-limit text is rejected rather than clipped; invalid/overflowing explicit lengths fail before dispatch.",
+        "Complete UTF-8, exact byte limits, empty requests, authentication and binary uploads preserve supported behavior.",
+        "Required regression/build/review gates, Family acceptance, exact installed artifacts and full configuration preservation have independent receipts."
       ],
       "evidence": [
         {
-          "text": "bodyText uses if(n==-1) break and returns the received prefix; streamBodyTo is now strict after the delivered upload correction.",
-          "source": "app/src/main/java/com/immortal/launcher/FleetHttpServer.kt:71; docs/portal-fleet-upload-integrity-delivery-2026-11-02.md"
+          "text": "Actual nonmutating Family requests reproduced incomplete, clipped and overflow acknowledgements. Initial 34 tests/12 failures; first full gate caught one companion contract regression. Review baseline 11 tests/3 failures. Final 43 focused boundaries and all 3,840 JVM tests pass.",
+          "source": "docs/portal-json-body-integrity-delivery-2026-11-02.md; FleetJsonBodyRequestTest; FleetJsonBodyServerTest; RemoteCompanionRoutesTest"
+        },
+        {
+          "text": "22 Family JSON/header checks passed. Complete 16,003-byte binary upload/readback and interrupted overwrite preservation passed. Both actual installed APKs match 25,860,686 bytes and SHA-256 79468c50\u2026; both complete profiles/screensaver configs unchanged.",
+          "source": "Private /private/tmp/portal-json-body-integrity-20261102/ API, artifact, configuration, cleanup and foreground receipts"
+        },
+        {
+          "text": "Three identical no-op LAN round-trip medians: 9.50 \u2192 13.24 ms, an observed 3.74 ms increase. No speedup or statistically confirmed general regression is claimed. Independent review findings were corrected before promotion.",
+          "source": "Private before/after round-trip and full readiness receipts; named delivery document"
         }
       ],
       "limits": [
-        "Source evidence does not establish a reproduced runtime defect or a passing fix.",
-        "No settings mutation, token changes, GitHub publication or exhausted native issue reopening is authorized through this test."
+        "Three uncontrolled LAN samples do not establish UI/frame-rate performance; diagnostic wrappers have source/local gate evidence rather than native diagnostic-build acceptance.",
+        "Family Android 10 primary runtime; Android 9/all-model and real provider-command acceptance were not performed. Duplicate/conflicting headers and transfer-encoding policy are outside this correction.",
+        "Living install helper again reported failure; independent installed-APK readback proved delivery. Actual CLI trace is saved for a separate tooling fix; no second install attempted.",
+        "No owner preference was a mutation-test target; existing development mode/settings preserved. No GitHub publication or exhausted native issue reopening."
       ],
-      "next": "Create failing pure Request cases for early EOF and body-size limits before deciding whether and where to reject the request."
+      "next": "Next independent 30-minute unit: replay the actual lost install-response transcript against the room helper and preserve strict installed-APK verification."
+    },
+    {
+      "id": "fleet-deploy-ack-recovery",
+      "title": "Fleet deploys: report successful self-updates correctly",
+      "summary": "A Portal update succeeds, but the workstation helper reports failure when Android closes the old app\u2019s response.",
+      "description": "Actual Living updates to 1.71 and 1.72 installed the accepted APK despite a helper failure. The saved 1.72 CLI transcript prints its install marker, then incomplete HTTP headers and a transport-error marker. The helper recognizes older read failed wording but excludes this newer message. Its changed-path/hash proof must remain mandatory when accepting response loss.",
+      "status": "queued",
+      "verification": "Queued \u00b7 actual false negative and source predicate identified",
+      "kind": "Reliability and deployment verification",
+      "platforms": [
+        "tooling",
+        "portal"
+      ],
+      "owner": "Fleet / release engineering",
+      "deployment": "No helper correction yet. Exact 1.72/code66 is independently verified on both Portals; no reinstall is needed to establish the current deployment.",
+      "state": "Fresh 30-minute tooling slot available. Actual CLI transcript and exact installed-APK proof are saved. Replay transport loss in isolated tests before choosing a correction.",
+      "acceptance": [
+        "Reproduce the helper rejection with the actual incomplete-header/transport-error transcript.",
+        "Accept qualified response loss only when the actual changed installed APK exactly matches the intended artifact.",
+        "Continue rejecting ok:false, failed upload, wrong package/hash, unchanged APK and unqualified errors.",
+        "Run relevant helper/CLI/CI gates; do not manufacture an Android release or reinstall an already verified APK for a tooling-only fix."
+      ],
+      "evidence": [
+        {
+          "text": "Living 1.72 native CLI exit 1: install marker, incomplete HTTP headers, transport-error marker. Independent own-process installed APK readback matches the accepted SHA-256 exactly.",
+          "source": "docs/portal-json-body-integrity-delivery-2026-11-02.md; private living-native-cli-result-private.json and living-installed-apk-proof-private.json"
+        },
+        {
+          "text": "deploy() qualifies loss only for an empty tail or read failed prefix; the actual new CLI error text fails this predicate.",
+          "source": "provisioning/room-fleet.py:455; provisioning/fleet.rs:1114"
+        }
+      ],
+      "limits": [
+        "A source-supported cause and actual failure are established; a corrected helper has not been implemented or verified.",
+        "No new APK/configuration changes, GitHub publication or exhausted native issue reopening is implied."
+      ],
+      "next": "Add a failing helper regression using the saved actual transcript, then make the smallest correction that retains strict post-install hash verification."
     }
   ]
 }

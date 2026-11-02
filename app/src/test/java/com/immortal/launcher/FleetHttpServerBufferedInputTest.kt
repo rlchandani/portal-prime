@@ -103,15 +103,15 @@ class FleetHttpServerBufferedInputTest {
     assertArrayEquals(body, output.toByteArray())
   }
 
-  @Test fun cappedTextReadAndStreamingShareTheSamePosition() {
+  @Test fun rejectedTextLimitDoesNotConsumeTheUploadStream() {
     val body = "prefix-".toByteArray() + ByteArray(40_007) { (it % 95 + 32).toByte() }
     val output = ByteArrayOutputStream()
     serve(WireInput(wire(body))) {
-      assertEquals("prefix-", it.bodyText(7))
-      assertEquals((body.size - 7).toLong(), it.streamBodyTo(output))
+      assertThrows(java.io.IOException::class.java) { it.bodyText(7) }
+      assertEquals(body.size.toLong(), it.streamBodyTo(output))
       FleetHttpServer.Response(200, "{}")
     }
-    assertArrayEquals(body.copyOfRange(7, body.size), output.toByteArray())
+    assertArrayEquals(body, output.toByteArray())
   }
 
   @Test fun unreadLargeBodyIsDrainedBeforeResponseAndClose() {

@@ -49,9 +49,9 @@ class FleetUploadRequestTest {
     assertEquals(0L, request(input, 0).streamBodyTo(ByteArrayOutputStream()))
   }
 
-  @Test fun partiallyConsumedBodyStillRequiresEveryRemainingByte() {
+  @Test fun incompleteTextReadStillRequiresEveryRemainingUploadByte() {
     val req = request(ByteArrayInputStream("abc".toByteArray()), 5)
-    assertEquals("ab", req.bodyText(2))
+    assertThrows(EOFException::class.java) { req.bodyText() }
     assertThrows(EOFException::class.java) { req.streamBodyTo(ByteArrayOutputStream()) }
   }
 

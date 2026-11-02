@@ -289,8 +289,9 @@ internal object HomeUiDiagnostics {
     guard(context)?.let { return it }
     var point: Pair<Double, Double>? = null
     if (req.method == "POST") {
-      val body = runCatching { JSONObject(req.bodyText()) }.getOrNull()
-          ?: return error(400, "invalid_home_ui_command")
+      val body = runCatching { JSONObject(req.bodyText()) }.getOrElse {
+        return FleetHttpServer.requestBodyError(it) ?: error(400, "invalid_home_ui_command")
+      }
       val keys = body.keys().asSequence().toSet()
       val x = body.opt("x") as? Number
       val y = body.opt("y") as? Number

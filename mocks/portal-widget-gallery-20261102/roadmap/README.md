@@ -115,3 +115,11 @@ helper false negative is visible beside independent exact installed-APK proof.
 All20 detail panels were checked at390×844 and1600×1000 without horizontal
 overflow, undefined labels or page errors. The updated current-version footer
 was visible. These are saved-page checks, not repeat native/phone acceptance.
+
+The JSON-integrity snapshot records exact **1.72/code66** in both rooms,
+22 Family JSON/header checks, binary compatibility and unchanged complete room
+configuration. The three-sample no-op timing increase (9.50 → 13.24 ms) is visible,
+without a performance claim. All21 detail panels were checked at390×844 and
+1600×1000 without horizontal overflow, undefined labels or page errors. The
+21st task queues the actual deploy-helper false negative with its saved transport
+transcript; no helper correction or new Portal release is inferred.

@@ -38,7 +38,9 @@ internal class RemoteCompanionRoutes(private val context: Context) {
     if (req.method !in allowed) return json(405, error("method_not_allowed"))
     if (req.contentLength > 256 * 1024) return json(413, error("body_too_large"))
     val body = if (req.method == "POST") {
-      val text = req.bodyText(256 * 1024)
+      val text = try { req.bodyText(256 * 1024) } catch (error: Exception) {
+        return FleetHttpServer.requestBodyError(error) ?: throw error
+      }
       if (text.toByteArray(Charsets.UTF_8).size != req.contentLength) return json(400, error("incomplete_body"))
       runCatching { JSONObject(text) }.getOrNull() ?: return json(400, error("bad_json"))
     } else JSONObject()
