@@ -1,18 +1,65 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T20:50:29.179703+00:00",
-  "updatedLabel": "Local preview readiness verified \u00b7 Portal 1.85 retained",
+  "updatedAt": "2026-11-02T21:12:20.708358+00:00",
+  "updatedLabel": "Companion backup preview \u00b7 verified native cancellation",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "local-preview-readiness",
+  "defaultTask": "companion-backup-preview",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms retain exact optimized Portal 1.85 / code 79. Companion 1.7.5 / code 17 text candidate verified in an isolated Android emulator; earlier settings/upload/deletion receipts retain their original versions. Physical-phone installation remains open.",
+    "Both rooms retain exact optimized Portal1.85/code79. Companion1.7.6/code18 backup preview is verified in an isolated Android emulator; earlier receipts retain their versions. Physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "companion-backup-preview",
+      "title": "Phone backup preview: cancel safely and bound archive work",
+      "description": "Archive inspection previously inflated skipped entries without the existing total archive limit, hid Cancel and did not own its job. Add bounded inspection and cancellation ownership to retain responsiveness and reject obsolete outcomes.",
+      "summary": "Bounded cancellable preview implemented.632 JVM checks and 4 native methods at 100%/130% pass; late-reader settlement and exact installed emulator artifact verified. Physical phone remains open.",
+      "status": "verified",
+      "verification": "632 JVM \u00b74 native methods/8 workflow executions \u00b765/90 ms cancel-to-idle samples",
+      "kind": "Phone reliability, responsive cancellation and bounded resource use",
+      "platforms": [
+        "companion"
+      ],
+      "owner": "Companion engineering / independent archive worker / isolated native Android QA",
+      "deployment": "Candidate 1.7.6-music-preview/code 18 verified only in the owned API 34 clone, now removed. Physical phone remains unavailable; both Portals retain 1.85/code 79.",
+      "state": "Original 20:51:32\u201321:21:32 UTC audit clock retained. Independent review findings resolved; donor AVD and unrelated emulator preserved, owned fixtures removed.",
+      "acceptance": [
+        "Expose the existing Cancel action during preview and clear busy state immediately.",
+        "Reject late success/failure after cancellation, dismissal or disconnect, preserving newer work.",
+        "Stream all entries against the existing 3 GiB total and 1 MiB manifest budgets; retain format, checksums and complete archive validation.",
+        "Verify native actualVM/generated file and blocked FIFO at actual 100%/130% text.",
+        "Await actual reader-job settlement and verify owned process/fixture cleanup; preserve original AVD and all Portal state."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, original failures, actual native workflow and limits.",
+          "source": "docs/portal-companion-backup-preview-2026-11-02.md"
+        },
+        {
+          "text": "Sanitized budgets, native timing, artifact and cleanup proof.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/companion-backup-preview-verification.json"
+        },
+        {
+          "text": "Actual generated native BackupCard at100%/130% system text.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/companion-backup-preview-130.png"
+        }
+      ],
+      "limits": [
+        "No physical Pixel, actual owner archive, ADB backup/restore, universal file-provider cancellation or whole-app/FPS acceptance.",
+        "A blocked provider read can require return before its IO job terminates; UI is released and result ownership invalidated immediately.",
+        "No Portal commands, new backup format, publication or Home Assistant change."
+      ],
+      "next": "Install and verify this exact companion candidate when a physical phone is available; retain the scoped emulator evidence.",
+      "issueClock": {
+        "startedAt": "2026-11-02T20:51:32Z",
+        "deadline": "2026-11-02T21:21:32Z",
+        "firstAuditClockRetained": true
+      }
+    },
     {
       "id": "local-preview-readiness",
       "title": "Delivery tooling: verify local previews independently",
@@ -499,7 +546,7 @@
         "design"
       ],
       "owner": "Native UI / Family quality and performance",
-      "deployment": "Weather 1.78 / code 72 candidate held. Both rooms now have 1.80 browser import/preview corrections from the accepted 1.77 lineage; Weather candidate is not included.",
+      "deployment": "Weather1.78/code72 candidate is held on its separate branch and excluded from both currently installed optimized Portal1.85/code79 APKs.",
       "state": "Original30-minute implementation slot closed; candidate retained on its new branch.",
       "acceptance": [
         "Adaptive compact/medium/large content based on actual saved size and font scale, preserving widget identity/order/placement.",

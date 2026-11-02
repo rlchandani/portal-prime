@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-02T21:12:20.706288+00:00",
+  "scope": "Companion backup preview inspection and cancellation; generated archive/FIFO and isolated API34 Android checks",
+  "status": "verified",
+  "issueClock": {
+    "startedAt": "2026-11-02T20:51:32Z",
+    "deadline": "2026-11-02T21:21:32Z",
+    "firstAuditClockRetained": true,
+    "scope": "Bound and cancel backup preview inspection; discard obsolete preview outcomes; expose existing Cancel action"
+  },
+  "artifact": {
+    "package": "com.portalinstaller",
+    "versionCode": 18,
+    "versionName": "1.7.6-music-preview",
+    "bytes": 15014631,
+    "sha256": "972e5f75c22ebc6598553844a32ed9d51bebc9456d5d803200d7d45a3a0e2828",
+    "signerMatchesAcceptedPhone175": true
+  },
+  "originalFailures": {
+    "unchangedOldInspectorDeclaredOversize": true,
+    "old175NativeCancelMissing": true,
+    "declaredSizeFixtureBodyOmitted": true,
+    "actual3GiBInflationOrOomClaimed": false
+  },
+  "jvm": {
+    "tests": 632,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 80
+  },
+  "newJvmChecks": 23,
+  "archiveChecks": 17,
+  "lifecycleChecks": 6,
+  "native": {
+    "uniqueMethods": 4,
+    "workflowExecutions": 8,
+    "captureCorrectionExecutions": 2,
+    "actualFontScales": [
+      1.0,
+      1.3
+    ],
+    "normalDurationSeconds": 4.381,
+    "largeTextDurationSeconds": 4.396,
+    "cancellationSamples": [
+      {
+        "actualFontScale": 1,
+        "cancelToIdleMs": 65.004917
+      },
+      {
+        "actualFontScale": 1.2999999523162842,
+        "cancelToIdleMs": 90.373458
+      }
+    ],
+    "sampleCountPerScale": 1,
+    "deadlineAssertionMs": 1000,
+    "readerJobCompletionAndCancellationAsserted": true,
+    "newerPreviewRetainedAfterOldReaderSettled": true,
+    "generatedFilesOnly": true,
+    "fullDevicesPageAcceptance": false,
+    "pixelScope": "Generated BackupCard in the native Compose test activity, normal/130% system text; cropped from the captured Compose root"
+  },
+  "budgets": {
+    "maximumDecodedArchiveBytes": 3221225472,
+    "maximumManifestBytes": 1048576,
+    "maximumEntries": 500,
+    "formatVersion": 1,
+    "allEntriesCounted": true,
+    "restoreOrCreateFormatChanged": false
+  },
+  "verification": {
+    "debugAndAndroidTestBuildsPassed": true,
+    "signerMatchesAccepted175": true,
+    "fullInstalledEmulatorApkMatches": true,
+    "installedSha256": "972e5f75c22ebc6598553844a32ed9d51bebc9456d5d803200d7d45a3a0e2828",
+    "independentReviewCompleted": true,
+    "reviewFindingsFixed": 3
+  },
+  "restoration": {
+    "sourceUnchanged": true,
+    "ownedResourcesRemoved": true,
+    "runnerTerminalExit": 130,
+    "runnerInterruptedCleanupConfirmed": true,
+    "unrelatedEmulatorRetained": true,
+    "familyTransportsRetained": true,
+    "independentAgentClosed": true
+  },
+  "deployment": {
+    "ownedEmulatorOnly": true,
+    "physicalPhoneInstalled": false,
+    "portalSourceOrApkChanged": false,
+    "portalConfigOrOwnerArchiveUsed": false
+  },
+  "limits": [
+    "Single emulator cancel-to-idle samples; no physical Pixel latency, FPS, peak heap or archive throughput claim.",
+    "Blocked provider IO may need to return before its cancelled job terminates; result invalidation and busy release occur immediately.",
+    "No owner archive, ADB backup/restore, physical-phone installation, whole-app acceptance, GitHub publication or Home Assistant change.",
+    "UI captures cover the generated isolated card; not the complete Devices screen or a physical phone."
+  ],
+  "source": {
+    "repository": "portal-toolkit",
+    "branch": "codex/companion-backup-preview-20261102",
+    "commit": "2f675244b1cc8dd1b414ba5aec779f34bf748aef"
+  }
+}

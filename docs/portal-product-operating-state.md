@@ -708,3 +708,19 @@ acceptance, not hostedCI, publication or whole-product completion. Both rooms
 retain exact1.85/code79; companion1.7.5 remains physically uninstalled.
 The original **20:30–21:00UTC** source-audit clock is retained. No GitHub,
 Home Assistant, owner credential or device interaction occurred.
+
+## 2026-11-02 — Companion backup preview verified
+
+Companion **1.7.6/code18** bounds archive inspection and exposes the existing Cancel
+control. Invalidated previews cannot publish over newer work.632JVM/80suites,
+signed builds and4unique native methods at actual100%/130% passed (8workflow
+executions). Single emulator cancel-to-idle samples:65.005/90.373ms. Actual old
+manager size behavior and old APK missing Cancel were reproduced; no owner archive
+or OOM was involved. Exact installed emulator readback and source-AVD/owned cleanup
+passed. See [the receipt](portal-companion-backup-preview-2026-11-02.md).
+
+Roadmap: **48tracked tasks:21delivered/implemented,19scoped verified,5parked,
+2awaiting approval,1queued**. Physical-phone installation remains open. Both rooms
+retain Portal1.85/code79; Weather approval is retained while its exhausted clipping
+unit stays parked. No publication, HA or Portal command was performed. Original
+**20:51:32–21:21:32UTC** discovery clock includes cleanup.

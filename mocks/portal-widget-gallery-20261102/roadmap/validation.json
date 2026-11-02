@@ -966,5 +966,32 @@
     "receiptHttpStatus": 200,
     "footerVersion": "1.85 / code 79",
     "scope": "Updated tooling detail,47row count,footer and public receipt only; no all47 workflows/native or physical-phone acceptance."
+  },
+  "companionBackupPreviewUpdate": {
+    "checkedAt": "2026-11-02T21:13:40.377012+00:00",
+    "tasks": 48,
+    "statuses": {
+      "verified": 19,
+      "delivered": 21,
+      "parked": 5,
+      "approval": 2,
+      "queued": 1
+    },
+    "selectedTask": "companion-backup-preview",
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "changedDetailAndCurrentPhoneVersionChecked": true,
+    "receiptAndTwoNativeCropsHttpStatus": 200,
+    "twoNativeCropsVisuallyReviewed": true,
+    "servedSnapshotMatchesSource": true,
+    "snapshotSha256": "b8b776deb23e7ad730aa841ff62d22b3c8b6a62b54c2a66d3da4745bf42da60b",
+    "scope": "Updated backup task,48rows,version footer and public evidence only; not all48workflows, full Devices pixels or physical-phone acceptance."
   }
 }
