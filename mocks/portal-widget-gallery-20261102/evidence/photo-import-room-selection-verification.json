@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-02T17:04:19.215079+00:00",
+  "scope": "Bundled browser remote active-Portal selection during photo import",
+  "unitStartedAt": "2026-11-02T16:43:33+00:00",
+  "deadline": "2026-11-02T17:13:33+00:00",
+  "automated": {
+    "red": {
+      "tests": 21,
+      "failed": 2,
+      "passed": 19
+    },
+    "focused": 397,
+    "browserJavaScript": 688,
+    "slideshowJavaScript": 354,
+    "jvm": {
+      "suites": 406,
+      "tests": 3869,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "debugAndOptimizedBuilds": "passed",
+    "r8AndVitalLint": "passed",
+    "independentReview": {
+      "focusedPassed": 43,
+      "supplementaryOfflineCallerChecks": 4,
+      "concreteDefects": 0
+    }
+  },
+  "artifact": {
+    "sha256": "988881568224a8bfe69b249789e05ed13395c51fad71adb092ac85a77c2b56d6",
+    "bytes": 25860898,
+    "controllerMatches": true,
+    "metadata": {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 74,
+      "versionName": "1.80",
+      "outputFile": "app-performance.apk"
+    }
+  },
+  "before": {
+    "installedBaseline": "1.79/code73",
+    "viewport": [
+      390,
+      844
+    ],
+    "requestsStarted": 1,
+    "requestsForwardedToPortal": 0,
+    "queuedPhotoCancelled": true,
+    "firstCompletionUnconfirmed": true,
+    "controlledInput": "Shipped file picker with two generated PNGs; first upload route held, then active Selected button tapped"
+  },
+  "after": {
+    "viewport": [
+      390,
+      844
+    ],
+    "chooserClosed": true,
+    "metadataRestarts": 0,
+    "requestsBeforeRelease": 1,
+    "stillSendingAfterSelection": true,
+    "folderPreserved": "/sdcard/Download/qa-import-room-selection-20261102",
+    "requestsTotal": 2,
+    "bothConfirmed": true,
+    "fixtureTiles": 2,
+    "horizontalOverflow": false,
+    "actualPortalApiUsed": true,
+    "scope": "Browser route holds first real upload until selected-room interaction; thereafter both requests reach actual device API"
+  },
+  "storedOriginals": [
+    {
+      "name": "qa-import-selection-first.png",
+      "status": 200,
+      "bytes": 95,
+      "sha256": "e26471e35f890c006e1d20f929587804e00bb72beb157a4cf572013268fdd973",
+      "matchesOriginal": true
+    },
+    {
+      "name": "qa-import-selection-queued.png",
+      "status": 200,
+      "bytes": 96,
+      "sha256": "a2b4cd2d88b5a72212b56c1195e7407dd2ea3fe5c8a9b40c9ff81b4997a1854f",
+      "matchesOriginal": true
+    }
+  ],
+  "devices": {
+    "family": {
+      "version": {
+        "versionCode": 74,
+        "versionName": "1.80"
+      },
+      "installedSha256": "988881568224a8bfe69b249789e05ed13395c51fad71adb092ac85a77c2b56d6",
+      "servedControllerMatches": true,
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "screensaverUnchanged": true,
+      "manualPhotoFrameDispatched": true
+    },
+    "living": {
+      "version": {
+        "versionCode": 74,
+        "versionName": "1.80"
+      },
+      "installedSha256": "988881568224a8bfe69b249789e05ed13395c51fad71adb092ac85a77c2b56d6",
+      "servedControllerMatches": true,
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "screensaverUnchanged": true,
+      "manualPhotoFrameDispatched": true
+    }
+  },
+  "cleanup": {
+    "ownedPhotosDeleted": [
+      "qa-import-selection-first.png",
+      "qa-import-selection-queued.png"
+    ],
+    "ownedDirectoryRemoved": true,
+    "temporaryFilePickerInputsRemoved": true,
+    "extraTabClosed": true,
+    "routesRestored": true,
+    "fontPreserved": true,
+    "enabledAccessibilityPreserved": true,
+    "noPendingBinding": true,
+    "originalChromeTaskRetained": true,
+    "FamilyManualFrameResumed": true
+  },
+  "limits": [
+    "Negative credential/removal scenarios are offline controller checks; no user pairing invalidated.",
+    "No physical-phone, universal latency or native slideshow performance verdict.",
+    "Final visible return is the manual photo-frame host; natural system Dream recovery unverified.",
+    "Already-open browser tabs need a reload.",
+    "Weather1.78 remains held."
+  ]
+}

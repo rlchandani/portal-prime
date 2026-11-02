@@ -323,6 +323,76 @@ test('switching Portals during upload cannot refresh or publish that upload in t
   assert.doesNotMatch(h.document.getElementById('notice').textContent, /photos stored/i);
 });
 
+for (const renamed of [false, true]) {
+  test(`reselecting the active Portal keeps both imports and the folder view${renamed ? ' after a name update' : ''}`, async t => {
+    const f = await fixture(t), { h } = f;
+    h.click('Folders');
+    await h.settle();
+    await h.input('Folder on Portal', otherFolder);
+    h.click('Open folder');
+    await h.settle();
+    f.uploadModes.set('first.png', 'hold');
+    await f.import(['first.png', 'queued.png']);
+    const generation = h.eval('session.generation');
+    const pageGeneration = h.eval('session.pageGeneration');
+    const calls = h.calls.length;
+    if (renamed) h.eval('roster[0] = { ...roster[0], name: "Renamed A" }');
+    h.document.getElementById('room-button').click();
+    h.click('Selected');
+    await h.settle();
+    assert.equal(h.eval('upload.controller.signal.aborted'), false);
+    assert.equal(h.eval('session.generation'), generation);
+    assert.equal(h.eval('session.pageGeneration'), pageGeneration);
+    assert.equal(h.document.getElementById('sheet').open, false);
+    assert.equal(h.calls.length, calls, 'Selection adds no replacement reads or roster sync');
+    assert.equal(h.eval('photoPath'), otherFolder);
+    if (renamed)
+      assert.match(h.document.getElementById('room-button').textContent, /Renamed A/);
+    f.heldUploads[0].finish();
+    await h.settle();
+    assert.equal(f.uploads.length, 2);
+    assert.equal(f.uploads.every(item => item.base === saved[0].base), true);
+    assert.equal(f.uploads.every(item => item.path.startsWith(`${otherFolder}/`)), true);
+    assert.match(importStatus(h), /2 of 2 uploaded/);
+    assert.match(importStatus(h), /first.png: Stored and confirmed/);
+    assert.match(importStatus(h), /queued.png: Stored and confirmed/);
+    assert.doesNotMatch(importStatus(h), /Not sent|Completion unconfirmed/);
+  });
+}
+
+test('replacing the active pairing token still cancels its queued imports', async t => {
+  const f = await fixture(t), { h } = f;
+  f.uploadModes.set('first.png', 'hold');
+  await f.import(['first.png', 'queued.png']);
+  const oldSignal = f.uploads[0].signal;
+  const generation = h.eval('session.generation');
+  h.eval('roster[0] = { ...roster[0], token: "replacement-session" }; selectRoom(roster[0].base)');
+  await h.settle();
+  assert.equal(oldSignal.aborted, true);
+  assert.equal(h.eval('room().token'), 'replacement-session');
+  assert.equal(h.eval('session.generation'), generation + 1);
+  f.heldUploads[0].finish();
+  await h.settle();
+  assert.equal(f.uploads.length, 1, 'Old queued work must not start with replaced credentials');
+});
+
+test('reselecting an expired active pairing still retires its pending import', async t => {
+  const f = await fixture(t), { h } = f;
+  f.uploadModes.set('first.png', 'hold');
+  await f.import(['first.png', 'queued.png']);
+  const oldSignal = f.uploads[0].signal;
+  h.eval('expired.set(room().base, room().token); connectionState = "expired"');
+  h.document.getElementById('room-button').click();
+  h.click('Selected');
+  await h.settle();
+  assert.equal(oldSignal.aborted, true);
+  assert.equal(h.eval('connectionState'), 'expired');
+  f.heldUploads[0].finish();
+  await h.settle();
+  assert.equal(f.uploads.length, 1);
+  assert.match(h.document.getElementById('connection').textContent, /Pair again/);
+});
+
 for (const retirement of ['page', 'room', 'hidden']) {
   test(`late post-import listing cannot replace the gallery after ${retirement} retirement`, async t => {
     const f = await fixture(t), { h } = f;

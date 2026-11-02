@@ -656,5 +656,32 @@
     "undefinedLabels": false,
     "pageErrors": 0,
     "scope": "Three changed saved-roadmap details and current version footer; no all-page/native/physical-phone acceptance."
+  },
+  "photoImportRoomSelectionSnapshot": {
+    "checkedAtUtc": "2026-11-02T17:09:37.633652+00:00",
+    "taskIds": [
+      "photo-upload-selected-room",
+      "settings-native-steppers",
+      "weather-native-layout"
+    ],
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "detailChecks": 6,
+    "renderedRows": 36,
+    "currentVersionFooter": "1.80 / code74",
+    "horizontalOverflow": false,
+    "undefinedLabels": false,
+    "pageErrors": 0,
+    "publicEvidenceStatus": 200,
+    "afterUploadLedgerVisuallyReviewed": true,
+    "scope": "Three changed saved-roadmap details and current version footer; Weather checked by exact initial task hash after an earlier fallback selected its separate clock-format task. No whole-page/native/physical-phone acceptance."
   }
 }

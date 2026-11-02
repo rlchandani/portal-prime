@@ -1,6 +1,6 @@
 {
-  "versionCode": 73,
-  "versionName": "1.79",
+  "versionCode": 74,
+  "versionName": "1.80",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Interrupted browser photo previews resume when you return. Completed previews avoid extra downloads, and successful retries clear the previous error styling."
+  "notes": "Selecting the already-active Portal keeps photo imports running and preserves the current photo folder. Changed or expired pairings still retire old imports."
 }

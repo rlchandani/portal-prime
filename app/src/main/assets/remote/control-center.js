@@ -679,6 +679,15 @@ function go(next, sub = '') {
 }
 function selectRoom(base) {
   const target = roster.find((r) => r.base === base) || null;
+  const active = room();
+  if (target && target.base === active?.base && target.token === active?.token &&
+      connectionState !== 'expired' && expired.get(target.base) !== target.token) {
+    // Adopt renamed metadata without retiring reads or the captured upload session.
+    session.room = Object.freeze({ ...target });
+    closeSheet();
+    updateHeader();
+    return;
+  }
   abortReads();
   stopPolling();
   if (upload?.running) cancelUpload(upload, 'room_changed');

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T16:40:23.081577+00:00",
-  "updatedLabel": "2 November2026 \u00b7 Browser photo preview recovery delivered",
+  "updatedAt": "2026-11-02T17:04:19.215079+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 Active-Portal import selection fixed",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "photo-preview-recovery",
+  "defaultTask": "photo-upload-selected-room",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact optimized1.79/code73. Earlier receipts retain their original acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
+    "Both rooms have exact optimized 1.80 / code 74. Earlier receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -19,7 +19,7 @@
       "summary": "Delivered in both rooms. Pending previews resume; completed previews add zero preview downloads; successful Retry clears error styling.",
       "description": "Keep preview ownership across visibility interruption and recheck it at queued dispatch. Preserve gallery behavior and delete admission.",
       "status": "delivered",
-      "verification": "684 browser JS /354 slideshow /3869 JVM passed \u00b7 controlled Family PWA checks passed",
+      "verification": "684 browser JS / 354 slideshow / 3869 JVM passed \u00b7 controlled Family PWA checks passed",
       "kind": "Browser reliability and bounded work",
       "platforms": [
         "portal",
@@ -59,17 +59,17 @@
     {
       "id": "photo-upload-selected-room",
       "title": "Photo import: keep uploading when reselecting the active Portal",
-      "summary": "Independent review reproduced cancellation when tapping the already-selected Portal during a two-photo import.",
-      "description": "selectRoom cancels the running upload even when room and pairing are unchanged. First held request aborts and the queued photo is not sent.",
-      "status": "queued",
-      "verification": "Concrete controller reproduction \u00b7 implementation not started",
+      "summary": "Delivered in both rooms. Active-Portal reselection keeps both files importing and preserves the folder.",
+      "description": "Selecting an unchanged valid endpoint/token closes the chooser without resetting reads, imports, folder or generations. Renamed metadata updates the header; changed/expired credentials retain cancellation.",
+      "status": "delivered",
+      "verification": "688 browser JS / 354 slideshow / 3869 JVM passed \u00b7 two real stored originals matched",
       "kind": "Photo import selection reliability",
       "platforms": [
         "browser"
       ],
       "owner": "Browser engineering / independent review",
-      "deployment": "No fix or release yet. Separate from parked partial-upload transport investigation.",
-      "state": "New confirmed selection defect queued for its own30-minute slot.",
+      "deployment": "Exact optimized 1.80 / code 74 fully read back from Family and Living. Saved configurations unchanged.",
+      "state": "Actual 1.79 failure and 1.80 success observed in shipped Family 390\u00d7844 PWA. Selection added 0 metadata requests.",
       "acceptance": [
         "Reselecting the unchanged room/session keeps active and queued imports intact.",
         "An actual room or pairing change retains cancellation and stale-response guards.",
@@ -78,14 +78,25 @@
       ],
       "evidence": [
         {
-          "text": "Independent Nash reproduction against current controller: first request aborted and queued second photo was not sent.",
-          "source": "docs/portal-photo-preview-recovery-2026-11-02.md"
+          "text": "Clean regression sensitivity, independent caller review and actual two-file Family upload acceptance.",
+          "source": "docs/portal-photo-import-room-selection-2026-11-02.md"
+        },
+        {
+          "text": "Both stored originals match exactly: 95/96 bytes. Both installed APKs match SHA 9888815682\u2026; full saved configurations unchanged.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-import-room-selection-verification.json"
+        },
+        {
+          "text": "Generated-file-only transfer ledgers show cancellation before and two confirmed files afterward.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-import-reselection-before.png; photo-import-reselection-after.png"
         }
       ],
       "limits": [
-        "No current fix, new device test or native companion defect claimed."
+        "Credential replacement/expiry/removal checks are offline; no real pairing was invalidated.",
+        "No physical-phone or universal latency verdict.",
+        "Already-open browser tabs must reload the controller.",
+        "Final presentation is the baseline manual photo-frame host; natural Dream return was not verified."
       ],
-      "next": "Start a fresh bounded fix unit; include cleanup in the30-minute cap."
+      "next": "Retain ownership guards. Continue the previously unverified native time-of-day and bounded-stepper acceptance."
     },
     {
       "id": "weather-native-layout",
@@ -100,7 +111,7 @@
         "design"
       ],
       "owner": "Native UI / Family quality and performance",
-      "deployment": "Weather1.78/code72 candidate held. Both rooms now have1.79 browser recovery from the accepted1.77 lineage; this does not include the Weather candidate.",
+      "deployment": "Weather 1.78 / code 72 candidate held. Both rooms now have 1.80 browser import/preview corrections from the accepted 1.77 lineage; Weather candidate is not included.",
       "state": "Original30-minute implementation slot closed; candidate retained on its new branch.",
       "acceptance": [
         "Adaptive compact/medium/large content based on actual saved size and font scale, preserving widget identity/order/placement.",
@@ -1465,6 +1476,42 @@
         "No Living native repetition or new performance/screensaver work."
       ],
       "next": "Retain guarded Fleet-only smoke and instrumentation lifecycle warning. Approved Weather native refinement is next; preserve account/physical-phone and parked boundaries."
+    },
+    {
+      "id": "settings-native-steppers",
+      "title": "Native Settings: time-of-day and bounded steppers",
+      "summary": "Text/numeric editors passed 12 Family cases; native time-of-day and bounded steppers remain unverified.",
+      "description": "Verify the existing SettingsRenderer/Stepper path on Family rather than inferring native acceptance from JVM validation or the browser remote.",
+      "status": "queued",
+      "verification": "Explicit acceptance gap \u00b7 new bounded unit not started",
+      "kind": "Native Settings interaction acceptance",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Family native QA / targeted fixes if reproduced",
+      "deployment": "Existing 1.80 UI; no new implementation or artifact proposed.",
+      "state": "Stepper and formatted/wrapping integer specs confirmed in current source; the prior native editor receipt excluded these.",
+      "acceptance": [
+        "Inspect actual reachable time-of-day and bounded integer controls and their declarative constraints.",
+        "Check rendered value, plus/minus admission and applicable wrap/clamp behavior through the real native UI.",
+        "Verify acknowledged persistence only for safe reversible values and restore the full original configuration.",
+        "Timebox the complete unit, including cleanup, to 30 minutes."
+      ],
+      "evidence": [
+        {
+          "text": "Prior native editor receipt explicitly leaves secret/time/stepper/rich-editor acceptance open.",
+          "source": "docs/portal-settings-native-editors-2026-11-02.md"
+        },
+        {
+          "text": "Existing renderer uses Stepper; IntSpec models format, bounds, step and wrap.",
+          "source": "SettingsRenderer.kt; SettingsComponents.kt; settings/SettingSpec.kt"
+        }
+      ],
+      "limits": [
+        "Not a claim of a current defect or full 54-page acceptance.",
+        "Source/credential editors, physical-phone testing and parked Weather remain separate."
+      ],
+      "next": "Start the next bounded Family native-control acceptance unit; patch only a reproduced defect."
     }
   ]
 }
