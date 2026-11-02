@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-02T20:21:26.198560+00:00",
+  "scope": "Browser remote keyboard text-result confirmation; existing layout and retained draft unchanged",
+  "issueClock": {
+    "startedAt": "2026-11-02T19:56:33Z",
+    "deadline": "2026-11-02T20:26:33Z",
+    "firstSourceAuditClockRetained": true
+  },
+  "originalRegression": {
+    "tests": 9,
+    "failed": 7,
+    "passedControls": 2,
+    "log": "private red.log"
+  },
+  "focusedFinal": {
+    "tests": 12,
+    "failures": 0,
+    "realTransportTimeoutSeconds": 12
+  },
+  "remoteJavascriptRegression": {
+    "tests": 711,
+    "failures": 0,
+    "note": "Suite ran before three additional focused rejection/deadline tests; final focused12 passed separately"
+  },
+  "androidGates": {
+    "jvmTests": 3887,
+    "suites": 408,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "debugAssembly": true,
+    "performanceAssembly": true,
+    "r8": true,
+    "vitalLint": true,
+    "seconds": 88
+  },
+  "browserWorker": {
+    "testMethods": 1,
+    "cases": 24,
+    "textPosts": 24,
+    "widths": [
+      360,
+      402,
+      1200
+    ],
+    "retainedUnicode": true,
+    "clearConfirmation": true,
+    "noReplay": true,
+    "overflow": false,
+    "pageErrors": 0,
+    "outsideRequests": 0,
+    "seconds": 14.850277541,
+    "receipt": "Independent Sagan run; exec21663/chunk44cff0 captured stdout, no filesystem log",
+    "sourceReview": "No concrete regressions reported; callbacks exclusive to sendText",
+    "ownedBrowserClosed": true
+  },
+  "artifact": {
+    "sha256": "591ba118a00ec96c4b44c11e913b5a405cdbdc2216469fc320d7ca162632f9f1",
+    "bytes": 25861122,
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.84",
+    "versionCode": 78,
+    "packagedRemoteAssetsEqualSource": true,
+    "signerMatchesAccepted": true
+  },
+  "family": {
+    "room": "family",
+    "installedApkBytes": 25861122,
+    "sha256": "591ba118a00ec96c4b44c11e913b5a405cdbdc2216469fc320d7ca162632f9f1",
+    "candidateMatches": true
+  },
+  "living": {
+    "room": "living",
+    "installedApkBytes": 25861122,
+    "sha256": "591ba118a00ec96c4b44c11e913b5a405cdbdc2216469fc320d7ca162632f9f1",
+    "candidateMatches": true
+  },
+  "familyServedBrowser": {
+    "servedControllerMatchesCandidateSource": true,
+    "controllerSha256": "8bdae0181059a3ea940e2d0e1472e3d6a58cac8bb1035fdb1ed703d85cf4a14a",
+    "syntheticUnconfirmedReplies": 1,
+    "liveNoEditableFieldReplies": 1,
+    "explicitPosts": 2,
+    "draftRetained": true,
+    "noReplay": true,
+    "pageErrors": [],
+    "outsideRequests": [],
+    "scope": "Family served PWA in owned desktop Chrome mobile viewport; no actual successful text insertion or Android WebView acceptance"
+  },
+  "restoration": {
+    "family.profile": true,
+    "family.layout": true,
+    "family.screensaver": true,
+    "living.profile": true,
+    "living.layout": true,
+    "living.screensaver": true,
+    "accessibilityUnchanged": true,
+    "fontUnchanged": true,
+    "normalPhotoPreviewRestored": true,
+    "chromeTask27174Preserved": true,
+    "ownedTemporaryFleetCredentialsRemoved": true
+  },
+  "limits": [
+    "No live successful text insertion tested; controlled Chrome replies cover the positive result.",
+    "Family acceptance uses its actually served assets in desktop Chrome at mobile viewport, not Android WebView or a physical phone.",
+    "No FPS, latency improvement, settled pixel-quality or whole-app completeness claim.",
+    "No native phone changes; candidate1.7.5 remains emulator-only.",
+    "No duplicate Living functional QA, GitHub publication or Home Assistant change."
+  ],
+  "incidents": [
+    "Initial timeout test advanced DOM-only timers; corrected to await imported core real12s deadline, final passed.",
+    "Direct ADB preview start rejected as non-exported; restored through existing Home and remote screensaver action, actual PhotoFramePreviewActivity verified.",
+    "Restoration acknowledgment uses ok/result rather than dispatched; initial assertion failed, actual activity established restoration.",
+    "Living incomplete install reply resolved by full APK readback without resend."
+  ]
+}

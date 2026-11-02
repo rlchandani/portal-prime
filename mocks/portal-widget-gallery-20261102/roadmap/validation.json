@@ -888,5 +888,33 @@
     "servedSnapshotMatchesSource": true,
     "snapshotSha256": "ebaa9165f8ba9fca16224d7f56b136f7d631abb15aaa8689072db35b0aa35a1e",
     "limits": "Browser checks cover current new task/detail/footer/assets; not all45 workflow behavior or a settled130% native image."
+  },
+  "browserTextConfirmationUpdate": {
+    "checkedAt": "2026-11-02T20:22:29.465154+00:00",
+    "tasks": 45,
+    "statuses": {
+      "delivered": 20,
+      "verified": 17,
+      "parked": 5,
+      "approval": 2,
+      "queued": 1
+    },
+    "selectedTask": "browser-text-confirmation",
+    "desktop": {
+      "viewport": [
+        1600,
+        1000
+      ],
+      "horizontalOverflow": false
+    },
+    "mobile": {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontalOverflow": false
+    },
+    "receiptHttpStatus": 200,
+    "scope": "Current browser text task only; no all45workflow or whole-product quality claim"
   }
 }

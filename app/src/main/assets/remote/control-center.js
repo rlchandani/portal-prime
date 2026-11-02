@@ -404,6 +404,7 @@ function message(error) {
       'Transfer was interrupted. Refresh the library to check whether the photo arrived.',
     folder_not_found: 'That folder does not exist. Choose another public folder.',
     invalid_response: 'The Portal returned an unreadable response. Try refreshing.',
+    text_unconfirmed: 'Text sending is unconfirmed. Review the Portal before sending again.',
     companion_storage_unavailable:
       'Saved scenes and Activity metadata are unavailable. They are kept unchanged. Retry after restoring readable metadata on the Portal.',
     saved_presets_unavailable:
@@ -1196,6 +1197,8 @@ async function mutate(
     timeout,
     onError,
     errorToast = true,
+    validateResponse,
+    errorMessage = message,
   } = {},
 ) {
   const busyKey = `${target?.base}:${key}`;
@@ -1204,6 +1207,7 @@ async function mutate(
   try {
     const response = await api(target, path, { body, method, timeout });
     if (!session.current(ticket)) return null;
+    validateResponse?.(response);
     if (response.applied === false || response.dispatched === false)
       throw new ApiError(response.applied === false ? 'no_editable_field' : 'not_dispatched');
     if (success) toast(success);
@@ -1212,7 +1216,7 @@ async function mutate(
   } catch (error) {
     if (session.current(ticket)) {
       onError?.(error);
-      if (errorToast) toast(message(error), true);
+      if (errorToast) toast(errorMessage(error), true);
       if (error.data?.applied)
         scopeResults = (error.data.applied || []).map((a) => ({
           name: a.domain,
@@ -1411,7 +1415,17 @@ function sendText(mode) {
     'text',
     '/remote/text',
     { mode, text: ['set', 'append'].includes(mode) ? draft('keyboard') : '' },
-    { success: 'Text command sent to the focused field.' },
+    {
+      success: 'Text command sent to the focused field.',
+      validateResponse: (response) => {
+        if (response?.ok !== true || typeof response.applied !== 'boolean')
+          throw new ApiError('text_unconfirmed');
+      },
+      errorMessage: (error) => message(
+        ['invalid_response', 'unreachable', 'timeout'].includes(error?.code)
+          ? new ApiError('text_unconfirmed') : error,
+      ),
+    },
   );
 }
 function setupPad(pad) {
