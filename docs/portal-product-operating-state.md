@@ -1,6 +1,6 @@
 # Portal product operating state
 
-- Phone settings confirmation: source-only domain/type gaps queued for the original19:08–19:38UTC slot; no native correction claimed yet. See `portal-companion-settings-confirmation-audit-2026-11-02.md`.
+- Phone settings confirmation: native1.7.4/code16 candidate verified by602JVM/77suites,12focusedtests and3renderedcases at100%/130% text. Exact owned-emulator APK matched; source AVD retained and cleanup passed. Physical-phone installation remains open. Original19:08–19:38UTC clock retained; Portal1.82 unchanged. See `portal-companion-settings-confirmation-2026-11-02.md`.
 
 Snapshot: **2026-11-02 UTC**. Original inventory inspected
 `codex/portal-hi-widget-fixes-20261102` at base

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T19:14:56.663908+00:00",
-  "updatedLabel": "2 November2026 \u00b7 Quick controls setup review ready",
+  "updatedAt": "2026-11-02T19:23:38.964719+00:00",
+  "updatedLabel": "2 November2026 \u00b7 Quick controls mock ready; phone settings confirmation verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "quick-controls",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms retain exact optimizedPortal1.82/code76. Companion1.7.3/code15 upload/deletion candidate verified in an isolated Android emulator; physical-phone installation remains open. Historical receipts keep their original versions.",
+    "Both rooms retain exact optimizedPortal1.82/code76. Companion1.7.4/code16 settings candidate verified in an isolated Android emulator; earlier upload/deletion receipts retain their original versions. Physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -16,17 +16,17 @@
     {
       "id": "companion-settings-confirmation",
       "title": "Phone settings: verify the acknowledged section",
-      "summary": "Source audit found incomplete domain/type checks. Reproduction and correction pending in the original half-hour slot.",
+      "summary": "Built and emulator-verified. Wrong/missing section or malformed success/key list stays Unconfirmed and cannot be resent by Retry failed.",
       "description": "Confirm literal success, matching domain identity and all requested keys before reporting a settings write as confirmed.",
-      "status": "queued",
-      "verification": "Source findings only; runtime reproduction pending",
+      "status": "verified",
+      "verification": "602 JVM /77 suites \u00b7 12 focused tests \u00b7 3 rendered cases at100%/130% \u00b7 exact emulator candidate",
       "kind": "Native settings outcome correctness",
       "platforms": [
         "companion"
       ],
       "owner": "Phone engineering / independent source review / isolated native QA",
-      "deployment": "No new APK. Companion1.7.3/code15 remains the current emulator candidate; physical-phone installation open.",
-      "state": "Original issue clock19:08\u201319:38UTC, including cleanup. Do not reset this clock.",
+      "deployment": "Companion1.7.4/code16 fully read back in ownedAPI34 emulator. No physical Pixel deployment; Portal1.82 unchanged.",
+      "state": "Shared client acknowledgment guard plus group outcome classification. Original19:08\u201319:38UTC clock retained; owned emulator removed and source AVD unchanged.",
       "acceptance": [
         "Reproduce wrong/missing domain and non-Boolean success before changing production code.",
         "Require matching domain and complete requested keys; preserve explicit rejection,401 and cancellation.",
@@ -35,15 +35,21 @@
       ],
       "evidence": [
         {
-          "text": "Independent source findings, wire contract and original issue deadline.",
-          "source": "docs/portal-companion-settings-confirmation-audit-2026-11-02.md"
+          "text": "Reproduced initial seven and reviewed two failures; final JVM/build/native scope and limits.",
+          "source": "docs/portal-companion-settings-confirmation-2026-11-02.md"
+        },
+        {
+          "text": "Structured artifacts, actual native scope and source-preserving cleanup proof.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/companion-settings-confirmation-verification.json"
         }
       ],
       "limits": [
-        "Source findings do not establish that the installed Portal sends malformed replies.",
-        "No runtime fix, device writes, performance claim or whole-product acceptance."
+        "Memory-only controlled responses; no physical Pixel or live settings write acceptance.",
+        "No whole-app snackbar acceptance, cold reconnect, frame-rate or universal speed claim.",
+        "Zero Portal writes/installs, GitHub/HA action, polling or automatic resend.",
+        "Actual native uncertainty case covers wrong/missing domain; malformed applied-list coverage is JVM."
       ],
-      "next": "Reproduce and fix within the original deadline; otherwise park."
+      "next": "Install signed candidate when a physical phone is available. Quick controls production owner-routing still requires its mock sign-off."
     },
     {
       "id": "companion-photo-upload-confirmation",

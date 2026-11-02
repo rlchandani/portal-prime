@@ -1,0 +1,81 @@
+{
+  "artifacts": {
+    "candidate-1.7.4.apk": {
+      "bytes": 15376014,
+      "sha256": "a45e85e251dc36c37095e90edcce6fc56fff4021309c3aac759a914c82f0ca04"
+    },
+    "native-tests.apk": {
+      "bytes": 1717894,
+      "sha256": "920be34210eb50cd93db554ce98a7412ff1f5531ae933ab1f40e04dcb12e54e1"
+    }
+  },
+  "jvm": {
+    "tests": 602,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 77
+  },
+  "checkedAt": "2026-11-02T19:23:38.964719+00:00",
+  "scope": "Settings acknowledgment correctness in native companion; no Portal runtime changes",
+  "version": {
+    "package": "com.portalinstaller",
+    "name": "1.7.4-music-preview",
+    "code": 16
+  },
+  "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "red": {
+    "initialTests": 9,
+    "initialFailures": 7,
+    "reviewTests": 3,
+    "reviewFailures": 2
+  },
+  "focusedFinalTests": 12,
+  "native": {
+    "normal": {
+      "tests": 3,
+      "seconds": 3.278,
+      "cases": [
+        "Matching domain renders Confirmed",
+        "Wrong/missing domain renders Unconfirmed and cannot resend",
+        "Explicit rejection renders Failed and retries captured failed room only"
+      ]
+    },
+    "text130": {
+      "tests": 3,
+      "seconds": 3.104,
+      "cases": [
+        "Matching domain renders Confirmed",
+        "Wrong/missing domain renders Unconfirmed and cannot resend",
+        "Explicit rejection renders Failed and retries captured failed room only"
+      ]
+    }
+  },
+  "installedFullApkMatched": true,
+  "sourceAvdAndCleanup": {
+    "ready": true,
+    "sourceUnchanged": true,
+    "ownedResourcesRemoved": true,
+    "serial": "emulator-5558",
+    "avd": "PortalToolkitQAf0c57abcde1e"
+  },
+  "limits": [
+    "Memory-only controlled responses; no physical Pixel or live settings write acceptance.",
+    "No whole-app snackbar acceptance, cold reconnect, frame-rate or universal speed claim.",
+    "Zero Portal writes/installs, GitHub/HA action, polling or automatic resend.",
+    "Actual native uncertainty case covers wrong/missing domain; malformed applied-list coverage is JVM."
+  ],
+  "screenshots": {
+    "settings-unconfirmed-normal.png": {
+      "bytes": 137715,
+      "sha256": "dd838461fb13e03623b75d75ec66337f5f72f72e5d05e6bad1b12c660c9bbbeb",
+      "visuallyInspected": true
+    },
+    "settings-unconfirmed-130.png": {
+      "bytes": 170504,
+      "sha256": "ff0cc9e5792d971bef3064ea1092328e5cc2c6e315b59dc321ba976e494373b3",
+      "visuallyInspected": true
+    }
+  },
+  "companionCommit": "acb712dc4dfc7aee68016096bfec9d2b3b3e219b"
+}

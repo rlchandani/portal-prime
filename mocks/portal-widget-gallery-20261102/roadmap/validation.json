@@ -824,5 +824,27 @@
     "mockInteractionAssertions": 43,
     "mockLayoutCases": 12,
     "limits": "Only updated roadmap detail/footer/queue checked; scoped browser prototype evidence is separate. No native implementation, performance or device acceptance."
+  },
+  "companionSettingsConfirmationSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T19:24:53.871023+00:00",
+    "taskCount": 42,
+    "taskStatus": "verified native companion candidate; physical Pixel installation open",
+    "changedDetailCheckedAtMobileAndDesktop": true,
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        1600,
+        1000
+      ]
+    ],
+    "horizontalOverflow": false,
+    "final602TestsAndPhysicalLimitsVisible": true,
+    "servedJsonMatchesFile": true,
+    "newEvidenceHttpStatus": 200,
+    "harnessCorrection": "Initial data-task selector found0 rows; source task-row selector verified42. No page defect.",
+    "limits": "Updated settings detail/footer/queue only. No repeat of all42 details, full browser QA or native acceptance inferred from this saved roadmap."
   }
 }
