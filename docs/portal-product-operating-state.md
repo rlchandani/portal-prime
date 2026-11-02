@@ -349,6 +349,24 @@ No track, account cookie, Kotlin/APK change, HA action or Living interaction.
 The 24-task saved roadmap separates researched readiness from a queued,
 account-dependent playback check; the full native player goal stays incomplete.
 
+## Family retained runtime checkpoint — 2 November 2026
+
+The bounded unit starting **12:06:37 UTC** found three Immortal fatal records
+in the retained crash buffer, dated 31 October / 1 November. Matching each
+AndroidRuntime trace by PID separates a system-death record, an Android service
+manager `UidRecord` exception during Fleet startup, and the already documented
+isolated slideshow fixture's recursive callback registration. The fixture
+correction and failed legacy acceptance retain their original
+[scope](portal-night-legacy-2026-11-01.md); no parked issue was reopened.
+
+Current Family reports **1.72 / code66**, Fleet HTTP info succeeds, and the
+Fleet service is foreground with a live process. Android10's supported
+`dumpsys activity lastanr` reports no ANR since boot; `exit-info` is unsupported
+and is not evidence about exit history. These observations establish current
+service readiness and retained-log scope, not universal crash freedom or a
+reproduced current app defect. No speculative service retry/catch, APK,
+configuration or UI change was made. Private raw logs stay outside the repository.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:
