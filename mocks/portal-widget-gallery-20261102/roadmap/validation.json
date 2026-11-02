@@ -866,5 +866,27 @@
     "servedSnapshotMatchesSource": true,
     "snapshotSha256": "1fd66e160ab96bf1528b9d0142fc55f72d0bbb97bef5ff4cf7a659e81176fb49",
     "limits": "Checks cover the updated Calendar detail, queue count, current footer and public evidence; earlier all-task checks retain their earlier scope."
+  },
+  "keyboardConfirmationSnapshotUpdate": {
+    "checkedAt": "2026-11-02T20:13:14.740936+00:00",
+    "taskCount": 45,
+    "newDetail": "companion-text-confirmation",
+    "newQueuedSourceConcern": "browser-text-confirmation",
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "currentFooterAndSelectedHeadingChecked": true,
+    "receiptAndNormalNativeCropHttpStatus": 200,
+    "normalNativeCropVisuallyReviewed": true,
+    "largeFontPixelEvidencePublished": false,
+    "servedSnapshotMatchesSource": true,
+    "snapshotSha256": "ebaa9165f8ba9fca16224d7f56b136f7d631abb15aaa8689072db35b0aa35a1e",
+    "limits": "Browser checks cover current new task/detail/footer/assets; not all45 workflow behavior or a settled130% native image."
   }
 }

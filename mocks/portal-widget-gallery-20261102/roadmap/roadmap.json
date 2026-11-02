@@ -1,18 +1,62 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T19:42:26.850591+00:00",
-  "updatedLabel": "2 November 2026 · Calendar download recovery delivered in both rooms",
+  "updatedAt": "2026-11-02T20:08:50.238214+00:00",
+  "updatedLabel": "2 November 2026 · Phone keyboard keeps unconfirmed drafts; browser guard queued",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "calendar-download-budget",
+  "defaultTask": "companion-text-confirmation",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms retain exact optimized Portal 1.83 / code 77. Companion 1.7.4 / code 16 settings candidate verified in an isolated Android emulator; earlier upload/deletion receipts retain their original versions. Physical-phone installation remains open.",
+    "Both rooms retain exact optimized Portal 1.83 / code 77. Companion 1.7.5 / code 17 text candidate verified in an isolated Android emulator; earlier settings/upload/deletion receipts retain their original versions. Physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "companion-text-confirmation",
+      "title": "Phone keyboard: keep unconfirmed drafts",
+      "summary": "Built and emulator-verified. Missing, string or malformed application results keep the exact draft; no automatic resend.",
+      "description": "Require the text endpoint’s actual typed applied result before clearing the remote keyboard draft.",
+      "status": "verified",
+      "verification": "5 original failures · 609 JVM / 78 suites · 3 native methods at actual 100% / 130%",
+      "kind": "Remote keyboard correctness",
+      "platforms": [
+        "companion"
+      ],
+      "owner": "Phone engineering / independent review / owned native QA",
+      "deployment": "Companion 1.7.5 / code 17 fully read back in an owned API34 emulator. Physical Pixel remains open; Portal 1.83 unchanged.",
+      "state": "Original 19:45:25–20:15:25 UTC clock retained. Original AVD unchanged, owned clone removed and original device transports retained.",
+      "acceptance": [
+        "Reproduce incomplete/type-coerced application results being treated as confirmation.",
+        "Require literal positive success and applied Booleans; preserve explicit false, authorization errors and cancellation.",
+        "Keep the exact Unicode draft and send once without automatic replay.",
+        "Test the actual keyboard, controller, repository and client at verified system fonts.",
+        "Verify the candidate APK and source-preserving emulator cleanup."
+      ],
+      "evidence": [
+        {
+          "text": "Reproduction, current native scope, artifact and explicit physical/visual limits.",
+          "source": "docs/portal-companion-text-confirmation-2026-11-02.md"
+        },
+        {
+          "text": "Structured test, font-precondition, artifact and cleanup evidence.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/companion-text-confirmation-verification.json"
+        },
+        {
+          "text": "Actual native unconfirmed draft retained at system100%;130% pixel snapshot is excluded.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/companion-text-unconfirmed-100.png"
+        }
+      ],
+      "limits": [
+        "Controlled memory responses; no physical Pixel or real Wi-Fi text-entry acceptance.",
+        "Success state/semantics and reopened draft verified; no settled-success pixel claim.",
+        "No whole-app snackbar, folded layout or universal performance claim.",
+        "No Portal, GitHub, Home Assistant or real pairing write.",
+        "System130% resource, state, characters and reachable controls passed; its opening-animation screenshot is not settled pixel evidence."
+      ],
+      "next": "Install when the phone is reachable. Reproduce the separate browser text-result concern in its own fresh bounded unit."
+    },
     {
       "id": "calendar-download-budget",
       "title": "Calendar: bound downloads and keep saved events",
@@ -1823,6 +1867,50 @@
         "Candidate withdrawn; current both-room APK remains exact 1.80/code74. Weather and previously exhausted slots unchanged."
       ],
       "next": "Do not retry manifest-only resizing. Keyboard issue needs a fresh authorized bounded slot with a fullscreen-compatible approach; unrelated authorized backlog can proceed."
+    },
+    {
+      "id": "browser-text-confirmation",
+      "title": "Browser keyboard: verify the text result",
+      "summary": "Source concern: the success toast checks only literal false flags. Reproduction and correction have not started.",
+      "description": "Check whether a missing or malformed applied result can report a successful text command, while preserving the browser’s retained draft.",
+      "status": "queued",
+      "verification": "Source finding only · no runtime reproduction or fix yet",
+      "kind": "Cross-client text-result correctness",
+      "platforms": [
+        "browser",
+        "portal"
+      ],
+      "owner": "Browser engineering / Family served-PWA acceptance",
+      "deployment": "No candidate. Both rooms retain accepted Portal 1.83.",
+      "state": "Source assessment is queued after the phone fix. Conservative first audit clock 19:56:33 UTC is retained; deadline20:26:33 UTC includes cleanup. No parked slot reopened.",
+      "acceptance": [
+        "Reproduce the actual browser sendText path before modifying production.",
+        "Preserve exact draft, one explicit command and room/session ownership.",
+        "Distinguish confirmed application, explicit rejection and unconfirmed completion.",
+        "Keep existing keyboard layout and no automatic resend.",
+        "Use scoped browser and Family served-artifact acceptance; deploy only the final verified APK."
+      ],
+      "evidence": [
+        {
+          "text": "Current sendText and mutate source evidence; no reproduction claimed.",
+          "source": "app/src/main/assets/remote/control-center.js"
+        },
+        {
+          "text": "Separate browser boundary noted in the phone delivery receipt.",
+          "source": "docs/portal-companion-text-confirmation-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Existing browser draft is retained; no owner text-loss incident was observed.",
+        "Native phone acceptance does not prove this browser path."
+      ],
+      "next": "Reproduce and fix within the retained20:26:33UTC deadline; do not restart the original source-audit clock.",
+      "issueClock": {
+        "startedAt": "2026-11-02T19:56:33Z",
+        "deadline": "2026-11-02T20:26:33Z",
+        "firstSourceAuditClockRetained": true,
+        "scope": "Browser text-result contract; first inspected while checking phone/browser parity"
+      }
     }
   ]
 }

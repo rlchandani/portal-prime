@@ -644,3 +644,21 @@ is stopped and temporary fleet credentials removed. This bounds downloaded
 bodies; it is not a measured frame-rate improvement or total heap guarantee.
 Weather clipping, other exhausted slots, UI approval, music sign-in/playback and
 physical companion acceptance keep their separate boundaries.
+
+## Phone keyboard confirmation checkpoint — 2 November 2026
+
+Candidate **1.7.5 / code17** adds typed text-result confirmation before clearing
+the remote keyboard draft. Five original client/repository failures reproduced
+the defect. All 7 focused and **609 JVM /78 suites**, signed app/test assembly,
+and three rendered methods at actual system 100%/130% passed. Full installed
+emulator readback, independent source review and original-AVD cleanup passed.
+See the [scope and receipt](portal-companion-text-confirmation-2026-11-02.md).
+
+The font scope is enforced against actual system resources, including the
+sheet's separate window; a mismatched scale correctly fails. Public images show
+unconfirmed draft retention only. Physical phone installation, real Wi-Fi text
+entry and settled-success pixels are not claimed. No Portal APK/configuration/
+input changed; both rooms retain 1.83. A distinct browser positive-result guard
+concern is queued from source evidence, with no reproduction or fix claimed yet.
+Original clock **19:45:25–20:15:25 UTC** includes owned cleanup; parked work was
+not reopened.

@@ -1,0 +1,143 @@
+{
+  "checkedAt": "2026-11-02T20:08:50.236381+00:00",
+  "unitClock": {
+    "startedAt": "2026-11-02T19:45:25Z",
+    "deadline": "2026-11-02T20:15:25Z",
+    "scope": "Phone remote keyboard text acknowledgment, retaining existing draft and UI behavior",
+    "portalParent": "db474ebaa5611b841e6439dabe5a4dbe4bc5ee50",
+    "phoneParent": "acb712dc4dfc7aee68016096bfec9d2b3b3e219b",
+    "firstSourceAuditClockRetained": true
+  },
+  "scope": "Phone keyboard typed result confirmation and exact draft retention",
+  "version": {
+    "name": "1.7.5-music-preview",
+    "code": 17,
+    "package": "com.portalinstaller"
+  },
+  "artifacts": {
+    "jvm": {
+      "tests": 609,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 78
+    },
+    "artifacts": [
+      {
+        "file": "candidate-1.7.5.apk",
+        "bytes": 14722589,
+        "sha256": "dfc26b71f020e31936aac4d3ed7d2fb6f976e762f0eabc43c723a9a504cf84e4"
+      },
+      {
+        "file": "native-tests.apk",
+        "bytes": 1732386,
+        "sha256": "834a2200d158320be1adec7fa8febf0f4a2a188192dbca62074a44902cc6f3b2"
+      }
+    ],
+    "sameSigningCertificate": true,
+    "packages": {
+      "candidate-1.7.5.apk": "package: name='com.portalinstaller' versionCode='17' versionName='1.7.5-music-preview' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'",
+      "native-tests.apk": "package: name='com.portalinstaller.test' versionCode='' versionName='' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'"
+    }
+  },
+  "originalFocused": {
+    "tests": 7,
+    "failures": 5,
+    "source": "Client/repository controlled responses; not owner text loss over Wi-Fi"
+  },
+  "focusedFinal": {
+    "tests": 7,
+    "failures": 0
+  },
+  "nativeFinal": {
+    "100": {
+      "tests": 3,
+      "failures": 0,
+      "seconds": 7.09,
+      "actualSystemFontScale": 1.0,
+      "resourcesFontCheckedBeforeRendering": true
+    },
+    "130": {
+      "tests": 3,
+      "failures": 0,
+      "seconds": 9.377,
+      "actualSystemFontScale": 1.3,
+      "resourcesFontCheckedBeforeRendering": true
+    }
+  },
+  "nativeScope": {
+    "uniqueMethods": 3,
+    "replyVariantsPerFont": 9,
+    "logicalViewportDp": [
+      360,
+      800
+    ],
+    "api": 34,
+    "actualPanelControllerRepositoryClient": true,
+    "transportAndSessionStore": "Memory-only; no sockets or saved pairings",
+    "oneTextPostPerSend": true,
+    "automaticResendObserved": false,
+    "fontResourcePreconditionChecked": true,
+    "mismatchedFontRejectedBeforeRendering": true,
+    "publicImages": "System100% unconfirmed state only;130% screenshot caught opening animation and is not accepted pixel evidence"
+  },
+  "installedReadback": {
+    "bytes": 14722589,
+    "sha256": "dfc26b71f020e31936aac4d3ed7d2fb6f976e762f0eabc43c723a9a504cf84e4",
+    "candidateMatches": true
+  },
+  "independentReview": {
+    "currentProductionIssueFound": false,
+    "scope": "Source review; no independent build/device run",
+    "earlierMissingImportFinding": "Resolved; current class compiled and passed"
+  },
+  "cleanup": {
+    "sourceUnchanged": true,
+    "ownedResourcesRemoved": true,
+    "ownedEmulatorAbsent": true,
+    "familyUsbRetained": true,
+    "familyWifiRetained": true,
+    "preexistingEmulatorRetained": true,
+    "noPhysicalPhoneOrMdnsServiceDiscovered": true
+  },
+  "testCorrections": [
+    "Original130% full AnnotatedString equality failed despite expected text; final matcher compares exact characters while retaining controller/request checks.",
+    "Initial parent LocalDensity130% did not scale the separate sheet window; final actual system scale is required and validated.",
+    "Initial standard-runner lookup failed before tests; final runs use configured AwakeTestRunner."
+  ],
+  "portalActions": {
+    "writes": 0,
+    "installs": 0,
+    "instrumentationRuns": 0,
+    "state": "Existing1.83 unchanged; no Portal action in this unit"
+  },
+  "limits": [
+    "No physical Pixel installation or folded layout acceptance.",
+    "No real Wi-Fi text entry, provider account, microphone, whole-app snackbar, FPS or universal latency claim.",
+    "Success is proven through controller, semantics and reopened empty draft; its transient screenshot is not settled-success pixel evidence.",
+    "Separate browser text result concern is source-only and remains unimplemented.",
+    "System130% has actual resource, state, exact text and reachable-control checks; no settled130% pixel claim."
+  ],
+  "roadmap": {
+    "checkedAt": "2026-11-02T20:13:14.740936+00:00",
+    "taskCount": 45,
+    "newDetail": "companion-text-confirmation",
+    "newQueuedSourceConcern": "browser-text-confirmation",
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "currentFooterAndSelectedHeadingChecked": true,
+    "receiptAndNormalNativeCropHttpStatus": 200,
+    "normalNativeCropVisuallyReviewed": true,
+    "largeFontPixelEvidencePublished": false,
+    "servedSnapshotMatchesSource": true,
+    "snapshotSha256": "ebaa9165f8ba9fca16224d7f56b136f7d631abb15aaa8689072db35b0aa35a1e",
+    "limits": "Browser checks cover current new task/detail/footer/assets; not all45 workflow behavior or a settled130% native image."
+  }
+}
