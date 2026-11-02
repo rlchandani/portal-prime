@@ -140,9 +140,7 @@ object UpdateManager {
   }
 
   private fun download(spec: String, dest: File) {
-    open(spec).inputStream.use { input ->
-      java.io.FileOutputStream(dest).use { input.copyTo(it) }
-    }
+    ApkDownloadHttp.download(open(spec), dest)
   }
 
   private fun open(spec: String): HttpURLConnection {

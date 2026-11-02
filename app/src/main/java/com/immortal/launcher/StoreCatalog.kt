@@ -301,12 +301,8 @@ object StoreCatalog {
   /** Download [spec] to [dest]. Internal so the fleet agent's headless install can
    *  reuse the exact same fetch (resolve via [resolveApkUrl], then download). */
   internal fun download(spec: String, dest: File) {
-    val c = open(spec)
-    c.inputStream.use { input -> dest.outputStream.use { input.copyTo(it) } }
+    ApkDownloadHttp.download(open(spec), dest)
   }
-
-  private val File.outputStream
-    get() = java.io.FileOutputStream(this)
 
   private fun open(spec: String): HttpURLConnection {
     val c = URL(spec).openConnection() as HttpURLConnection
