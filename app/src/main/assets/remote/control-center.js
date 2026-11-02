@@ -127,7 +127,7 @@ const drafts = new Map(),
   uploadTransfers = new Map();
 const thumbs = new ImagePool(),
   artwork = new ImagePool({ limit: 1 }),
-  previewPool = new ImagePool({ limit: 1 });
+  previewPool = new ImagePool({ limit: 1, concurrency: 1 });
 let photoObservation = null,
   photoPreviewState = null,
   snapshotRestoreDraft = null;
@@ -3819,6 +3819,10 @@ function updatePhotoPreview() {
   owner.remove.disabled = !allowed;
   owner.hint.hidden = allowed;
 }
+function resumePhotoPreview() {
+  const owner = photoPreviewState;
+  if (owner?.pending) owner.reload();
+}
 function photoPreview(file, ticket) {
   if (!session.current(ticket) || tab !== 'photos' || detail || document.hidden ||
       connectionState === 'expired' || !currentPhotoCollection()?.files.includes(file)) return;
@@ -3874,29 +3878,40 @@ function photoPreview(file, ticket) {
     ),
     () => { photoPreviewState = null; },
   );
-  photoPreviewState = { file, ticket, collection, hint: refreshHint, remove };
+  const owner = { file, ticket, collection, hint: refreshHint, remove, pending: false, reload: load };
+  photoPreviewState = owner;
   updatePhotoPreview();
+  const current = () => photoPreviewState === owner && session.current(ticket) && sheet.open &&
+    image.isConnected && tab === 'photos' && !detail && !document.hidden &&
+    connectionState !== 'expired';
   async function load() {
+    if (!current()) return;
+    owner.pending = true;
     previewPool.clear();
     status.textContent = 'Loading preview…';
+    status.className = 'detail';
     retry.hidden = true;
     previewPool.add(
       file.path,
-      (signal) =>
-        api(ticket.room, `/remote/photo?path=${encodeURIComponent(file.path)}&thumbnail=1`, {
+      (signal) => {
+        if (!current()) throw new DOMException('Preview retired', 'AbortError');
+        return api(ticket.room, `/remote/photo?path=${encodeURIComponent(file.path)}&thumbnail=1`, {
           blob: true,
           maxBytes: 512 * 1024,
           signal,
-        }),
+        });
+      },
       (url) => {
-        if (session.current(ticket) && sheet.open && image.isConnected) {
+        if (current()) {
+          owner.pending = false;
           image.src = url;
           image.hidden = false;
           status.textContent = 'Thumbnail from your Portal.';
         }
       },
       (error) => {
-        if (session.current(ticket) && sheet.open) {
+        if (current()) {
+          owner.pending = false;
           status.textContent = message(error);
           status.className = 'error';
           retry.hidden = false;
@@ -6290,6 +6305,7 @@ document.addEventListener('visibilitychange', () => {
   } else {
     // Retire old queued input; a fresh pad admits gestures after visibility resumes.
     if ((tab === 'remote' || tab === 'photos') && !detail) render();
+    resumePhotoPreview();
     loadVisible();
     if (connectionState === 'offline' || !data.companion) status();
     startPolling();

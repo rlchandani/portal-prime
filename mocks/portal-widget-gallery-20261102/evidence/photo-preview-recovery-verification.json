@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-02T16:40:23.081577+00:00",
+  "scope": "Bundled PWA photo preview recovery; controlled visibility events on shipped Family page",
+  "unitStartedAt": "2026-11-02T16:18:12+00:00",
+  "deadline": "2026-11-02T16:48:12+00:00",
+  "automated": {
+    "previewTests": 8,
+    "remoteJavaScriptTests": 684,
+    "slideshowJavaScriptTests": 354,
+    "jvm": {
+      "suites": 406,
+      "tests": 3869,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "debugAndOptimizedBuilds": "passed",
+    "r8AndVitalLint": "passed"
+  },
+  "artifact": {
+    "sha256": "c106703c63c93977dc748d77d4f106c1ab1b7814b8c636618405fdc5a2766bce",
+    "bytes": 25860802,
+    "controllerMatches": true,
+    "metadata": {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 73,
+      "versionName": "1.79",
+      "outputFile": "app-performance.apk"
+    }
+  },
+  "familyBrowser": {
+    "width": 390,
+    "height": 844,
+    "interruptedPreviewDownloads": 2,
+    "downloadsAfterCompletedResume": 2,
+    "retainedDecodedImage": {
+      "width": 32,
+      "height": 32
+    },
+    "retryRequests": 2,
+    "errorStyledNodesBeforeRetry": 1,
+    "errorStyledNodesAfterRetry": 0,
+    "horizontalOverflow": false,
+    "naturalBackgroundingVerified": false,
+    "visibilityMethod": "Controlled document.hidden/visibilitychange; gallery viewport admission suppressed for preview counts",
+    "thumbnailSource": "Actual installed Family server",
+    "retryFailure": "Controlled503"
+  },
+  "devices": {
+    "family": {
+      "sha256": "c106703c63c93977dc748d77d4f106c1ab1b7814b8c636618405fdc5a2766bce",
+      "matchesCandidate": true,
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "screensaverUnchanged": true
+    },
+    "living": {
+      "sha256": "c106703c63c93977dc748d77d4f106c1ab1b7814b8c636618405fdc5a2766bce",
+      "matchesCandidate": true,
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "screensaverUnchanged": true
+    }
+  },
+  "cleanup": {
+    "generatedPhotoAndFolderRemoved": true,
+    "extraBrowserTabClosed": true,
+    "originalPhotoDreamRestored": "Initially observed; final host is PhotoFramePreviewActivity",
+    "enabledAccessibilityUnchanged": true,
+    "noPendingBinding": true,
+    "finalVisibleReturn": {
+      "family": {
+        "wakeSucceeded": true,
+        "normalPhotoFrameDispatched": true,
+        "host": "PhotoFramePreviewActivity; natural Dream restoration not claimed"
+      },
+      "living": {
+        "wakeSucceeded": true,
+        "normalPhotoFrameDispatched": true,
+        "host": "PhotoFramePreviewActivity; natural Dream restoration not claimed"
+      }
+    },
+    "finalFamilyNativeChecks": {
+      "originalChromeTaskRetained": true,
+      "manualPhotoFrameHostResumed": true,
+      "enabledServicesUnchanged": true,
+      "noPendingBinding": true
+    }
+  },
+  "limits": [
+    "Natural backgrounding and other engines unverified.",
+    "No native slideshow latency or optical transition claim.",
+    "Both returned to manual photo-frame host; natural Dream return not accepted.",
+    "Weather1.78 remains separately held."
+  ],
+  "closurePreservation": {
+    "family": {
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "screensaverUnchanged": true,
+      "servedControllerMatches": true
+    },
+    "living": {
+      "profileUnchanged": true,
+      "layoutUnchanged": true,
+      "screensaverUnchanged": true,
+      "servedControllerMatches": true
+    }
+  },
+  "roadmap": {
+    "changedDetails": 6,
+    "tasks": 35,
+    "horizontalOverflow": false,
+    "pageErrors": 0
+  }
+}

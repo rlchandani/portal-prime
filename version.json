@@ -1,6 +1,6 @@
 {
-  "versionCode": 71,
-  "versionName": "1.77",
+  "versionCode": 73,
+  "versionName": "1.79",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Overlapping fleet installs retain separate auto-confirm windows. Finishing one install releases only its own window, with the existing 30-second safety expiry."
+  "notes": "Interrupted browser photo previews resume when you return. Completed previews avoid extra downloads, and successful retries clear the previous error styling."
 }

@@ -1,18 +1,92 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T16:14:13.558012+00:00",
-  "updatedLabel": "2 November 2026 \u00b7 Native scalar Settings checks passed",
+  "updatedAt": "2026-11-02T16:40:23.081577+00:00",
+  "updatedLabel": "2 November2026 \u00b7 Browser photo preview recovery delivered",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "settings-contract",
+  "defaultTask": "photo-preview-recovery",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact optimized1.77/code71. Earlier task receipts retain their acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
+    "Both rooms have exact optimized1.79/code73. Earlier receipts retain their original acceptance versions. Companion1.7.1/code13 was verified in an isolated Android emulator; physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-preview-recovery",
+      "title": "Browser photos: recover interrupted previews",
+      "summary": "Delivered in both rooms. Pending previews resume; completed previews add zero preview downloads; successful Retry clears error styling.",
+      "description": "Keep preview ownership across visibility interruption and recheck it at queued dispatch. Preserve gallery behavior and delete admission.",
+      "status": "delivered",
+      "verification": "684 browser JS /354 slideshow /3869 JVM passed \u00b7 controlled Family PWA checks passed",
+      "kind": "Browser reliability and bounded work",
+      "platforms": [
+        "portal",
+        "browser"
+      ],
+      "owner": "Browser engineering / independent review / Family acceptance",
+      "deployment": "Exact optimized1.79/code73 fully read back from Family and Living. Saved settings/layout unchanged.",
+      "state": "Small delivery on codex/photo-preview-recovery-20261102; natural backgrounding remains unverified.",
+      "acceptance": [
+        "Resume only the same pending modal/session.",
+        "Retain a decoded completed image without another preview download.",
+        "Reject closed, navigated, changed-room and expired owners, including deferred dispatch.",
+        "Clear previous error styling after successful Retry.",
+        "Verify final artifact identity and preserve saved settings in both rooms."
+      ],
+      "evidence": [
+        {
+          "text": "Two reproduced defects, independent deferred-expiry regression and installed Family browser checks.",
+          "source": "docs/portal-photo-preview-recovery-2026-11-02.md"
+        },
+        {
+          "text": "Structured test, artifact, device and cleanup receipt.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-preview-recovery-verification.json"
+        },
+        {
+          "text": "Successful preview contains only the generated gray fixture.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-preview-recovered.png"
+        }
+      ],
+      "limits": [
+        "Headless tab switching kept documents visible; real served PWA was exercised with controlled visibility events.",
+        "Counts isolate preview from existing gallery reloads. No universal latency or native slideshow verdict.",
+        "Final presentation is the normal manual photo-frame host; natural system Dream return was not verified."
+      ],
+      "next": "Retain guards. Fix the separately confirmed same-room photo-import cancellation next."
+    },
+    {
+      "id": "photo-upload-selected-room",
+      "title": "Photo import: keep uploading when reselecting the active Portal",
+      "summary": "Independent review reproduced cancellation when tapping the already-selected Portal during a two-photo import.",
+      "description": "selectRoom cancels the running upload even when room and pairing are unchanged. First held request aborts and the queued photo is not sent.",
+      "status": "queued",
+      "verification": "Concrete controller reproduction \u00b7 implementation not started",
+      "kind": "Photo import selection reliability",
+      "platforms": [
+        "browser"
+      ],
+      "owner": "Browser engineering / independent review",
+      "deployment": "No fix or release yet. Separate from parked partial-upload transport investigation.",
+      "state": "New confirmed selection defect queued for its own30-minute slot.",
+      "acceptance": [
+        "Reselecting the unchanged room/session keeps active and queued imports intact.",
+        "An actual room or pairing change retains cancellation and stale-response guards.",
+        "Cover the real controller ordering and verify supported upload behavior on Family with owned fixtures.",
+        "Preserve both room settings and remove all temporary photos."
+      ],
+      "evidence": [
+        {
+          "text": "Independent Nash reproduction against current controller: first request aborted and queued second photo was not sent.",
+          "source": "docs/portal-photo-preview-recovery-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "No current fix, new device test or native companion defect claimed."
+      ],
+      "next": "Start a fresh bounded fix unit; include cleanup in the30-minute cap."
+    },
     {
       "id": "weather-native-layout",
       "title": "Weather: approved adaptive native widget",
@@ -26,7 +100,7 @@
         "design"
       ],
       "owner": "Native UI / Family quality and performance",
-      "deployment": "1.78/code72 candidate preserved; exact1.77 restored on Family. Living unchanged on1.77.",
+      "deployment": "Weather1.78/code72 candidate held. Both rooms now have1.79 browser recovery from the accepted1.77 lineage; this does not include the Weather candidate.",
       "state": "Original30-minute implementation slot closed; candidate retained on its new branch.",
       "acceptance": [
         "Adaptive compact/medium/large content based on actual saved size and font scale, preserving widget identity/order/placement.",

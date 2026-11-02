@@ -631,5 +631,30 @@
     "readinessProofAndWeatherApprovalVisible": true,
     "pageErrors": 0,
     "scope": "Four changed saved-roadmap details; native acceptance independently recorded; no broad UI or performance reacceptance."
+  },
+  "photoPreviewRecoverySnapshot": {
+    "checkedAtUtc": "2026-11-02T16:41:43.289205+00:00",
+    "taskIds": [
+      "photo-preview-recovery",
+      "photo-upload-selected-room",
+      "weather-native-layout"
+    ],
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "detailChecks": 6,
+    "renderedRows": 35,
+    "currentVersionFooter": "1.79 / code73",
+    "horizontalOverflow": false,
+    "undefinedLabels": false,
+    "pageErrors": 0,
+    "scope": "Three changed saved-roadmap details and current version footer; no all-page/native/physical-phone acceptance."
   }
 }
