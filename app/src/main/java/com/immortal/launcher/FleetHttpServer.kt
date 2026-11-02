@@ -251,8 +251,16 @@ class FleetHttpServer(
                 }
               }
       resp.use {
-        runCatching { req.drainRemaining() } // so close() can't RST away our response
+        val rejected = it.status >= 400
+        if (!rejected) runCatching { req.drainRemaining() }
         runCatching { writeResponse(out, it) }
+        // The client must receive a rejection before we wait for an upload it
+        // might no longer send. Half-close first, then drain to avoid resetting
+        // the connection before the client has read the completed response.
+        if (rejected) {
+          runCatching { socket.shutdownOutput() }
+          runCatching { req.drainRemaining() }
+        }
       }
     }
   }

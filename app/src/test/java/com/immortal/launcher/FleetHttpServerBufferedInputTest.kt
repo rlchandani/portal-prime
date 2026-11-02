@@ -114,7 +114,7 @@ class FleetHttpServerBufferedInputTest {
     assertArrayEquals(body, output.toByteArray())
   }
 
-  @Test fun unreadLargeBodyIsDrainedBeforeResponseAndClose() {
+  @Test fun unreadLargeRejectedBodyIsStillDrainedBeforeSocketClose() {
     val bytes = wire(ByteArray(70_001) { 42 })
     val input = WireInput(bytes)
     val response = serve(input) { FleetHttpServer.Response(403, "{}") }

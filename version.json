@@ -1,6 +1,6 @@
 {
-  "versionCode": 68,
-  "versionName": "1.74",
+  "versionCode": 69,
+  "versionName": "1.75",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Local Portal iteration: cached Home Weather hour labels follow the current 12/24-hour clock setting without fetching again. Provider location offsets, forecast data and refresh cadence are preserved."
+  "notes": "Local Portal iteration: Fleet errors are sent before waiting for an unread upload body. Successful uploads, request validation and authentication are preserved."
 }
