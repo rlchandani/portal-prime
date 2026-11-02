@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 · browser connection-status fix delivered to both rooms (UTC)",
+  "updatedLabel": "2 Nov 2026 · exact 1.70 both rooms; companion rendered UI acceptance next (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "pwa-connection-status",
+  "defaultTask": "companion-native-ui",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact 1.68 / code 62. Family scoped settings acceptance passed; phone maintenance remains uninstalled.",
+    "Both rooms have exact 1.70 / code 64. Family scoped acceptance is recorded per task; phone maintenance remains uninstalled.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -53,6 +53,10 @@
         {
           "text": "Group-preflight fix committed as d2ab33982af13693a8a984912e921cbf2f41802f. Nine new tests, 33 focused and 564 full JVM tests passed; debug APK SHA-256 e319fb1486e6ad06dfa4bb3418a469acc75ee815c1688ec1bafba06c4cec0d9b. APK is uninstalled.",
           "source": "docs/portal-settings-visibility-web-review-2026-11-02.md"
+        },
+        {
+          "text": "Read-only preparation verified the current APK identity and found no companion on either running emulator. A four-check rendered/live QA plan is documented; no new installation or interaction acceptance is claimed.",
+          "source": "docs/portal-companion-emulator-qa-plan-2026-11-02.md"
         }
       ],
       "limits": [
@@ -60,12 +64,12 @@
         "Historical phone receipts do not prove current native UI, installed identity or end-to-end playback.",
         "No phone rewrite or HA music service setup is included."
       ],
-      "next": "Physical companion installation and native/live acceptance remain open. Local-only release readiness is next."
+      "next": "Next: a bounded rendered UI check in an isolated Android emulator. Native live multi-room preflight and physical Pixel acceptance require their own current session/device evidence."
     },
     {
       "id": "settings-contract",
       "title": "Native settings editor contract",
-      "summary": "3,800 tests / 399 suites passed; maintenance is included in installed 1.69. Scoped Slideshow UI acceptance is separate from every-editor acceptance.",
+      "summary": "3,800 tests / 399 suites passed; maintenance is included in installed 1.70. Scoped Slideshow UI acceptance is separate from every-editor acceptance.",
       "description": "Replace the obsolete inline-string prohibition with classification and projection coverage for the renderer's actual supported editors. This protects the existing settings behavior.",
       "status": "verified",
       "verification": "Locally verified · included in deployed APK",
@@ -74,7 +78,7 @@
         "portal"
       ],
       "owner": "Settings QA / Main",
-      "deployment": "Included in exact1.68 APK in both rooms; scoped Slideshow checks do not establish every editor.",
+      "deployment": "Current exact 1.70 includes the maintenance in both rooms; the original scoped Slideshow proof does not establish every editor.",
       "state": "Terminal local gates passed in 3m 58s",
       "acceptance": [
         "Cover real registry editor selection, including inline and Activity-backed strings, fleet name and dashboard URL.",
@@ -113,7 +117,7 @@
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Preserved in exact1.68 APK in both rooms; original feature acceptance remains scoped to its named receipt.",
+      "deployment": "Current exact 1.70 preserves the accepted 1.67 timer fix in both rooms; original feature acceptance remains scoped to its named receipt.",
       "state": "Accepted in the 30-minute slot; original Family layout, Home page and screensaver configuration restored.",
       "acceptance": [
         "Reproduce the widget/editor behavior on the existing owner path before labeling it a runtime defect.",
@@ -163,7 +167,7 @@
         "companion"
       ],
       "owner": "Settings architecture",
-      "deployment": "Exact optimized 1.68 / code 62 installed on Family and Living; the separate phone fix is not installed.",
+      "deployment": "Current exact 1.70 preserves the accepted 1.68 visibility fix in both rooms; the separate companion preflight APK is not installed.",
       "state": "3,800 JVM tests / 399 suites, both APK builds and 654 JS tests passed; all 36 Family configuration fields restored.",
       "acceptance": [
         "Document intended shared-setting exceptions and presentation eligibility.",
@@ -310,7 +314,7 @@
     {
       "id": "world-clock",
       "title": "World Clock: complete rows & city counts",
-      "summary": "World Clock normal and 150% acceptance passed on 1.66; the fix is preserved in current 1.69 on both rooms.",
+      "summary": "World Clock normal and 150% acceptance passed on 1.66; the fix is preserved in current 1.70 on both rooms.",
       "description": "The existing 488 × 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
       "status": "delivered",
       "verification": "Device proof · both rooms",
@@ -319,7 +323,7 @@
         "portal"
       ],
       "owner": "Native / QA",
-      "deployment": "Preserved in exact1.68 APK in both rooms; original feature acceptance remains scoped to its named receipt.",
+      "deployment": "Current exact 1.70 preserves the accepted 1.66 World Clock fix in both rooms; original normal/150% proof is separately recorded.",
       "state": "Delivered within bounded acceptance",
       "acceptance": [
         "Family normal text: two complete cities; three cities show “1 more city”; four show “2 more cities.”",
@@ -350,7 +354,7 @@
     {
       "id": "photo-alarm",
       "title": "Photo Memory routing & alarm countdown",
-      "summary": "1.65 scoped native acceptance passed; both fixes are preserved in current 1.69 on both rooms.",
+      "summary": "1.65 scoped native acceptance passed; both fixes are preserved in current 1.70 on both rooms.",
       "description": "Photo Memory editing opens Photo sources even with idle slideshow disabled. The active-page alarm caption observes saved configuration, rounds partial minutes up and refreshes at minute boundaries.",
       "status": "delivered",
       "verification": "Device proof · both rooms",
@@ -359,7 +363,7 @@
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Preserved in exact1.68 APK in both rooms; original feature acceptance remains scoped to its named receipt.",
+      "deployment": "Current exact 1.70 preserves the accepted 1.65 routing/caption fixes in both rooms; original acceptance limits remain.",
       "state": "Scoped native acceptance passed",
       "acceptance": [
         "Family source entry works with idle slideshow disabled and enabled; Back returns through Photos to Home.",
@@ -521,7 +525,7 @@
         "portal"
       ],
       "owner": "Browser QA / Main",
-      "deployment": "Exact optimized 1.69 / code 63 in Family and Living. Living had one dispatch and three restart observations.",
+      "deployment": "Current exact 1.70 preserves the accepted 1.69 status fix in both rooms; the six-trial browser proof retains its original 1.69 scope.",
       "state": "Full 40/676 JS, 161 Python, 3,800 JVM / 399 suites and optimized/signing gates passed. Both rooms’ saved profiles, screensaver settings and layout remain unchanged.",
       "acceptance": [
         "Initial cancellation cannot mark a successor page/room Offline; missing metadata is requested before the next poll.",
@@ -552,17 +556,17 @@
     {
       "id": "browser-tab-icon",
       "title": "Browser tab icon: reuse the public app branding",
-      "summary": "The PWA has no favicon link; browsers request /favicon.ico and receive401. Its existing public app icon returns200PNG.",
+      "summary": "Delivered in both rooms. Paired/unpaired browser uses the public 64 × 64 PNG; zero default favicon requests and management auth preserved.",
       "description": "Reuse the already public Immortal app-icon endpoint in the HTML head; avoid a new endpoint or any authentication-policy change.",
-      "status": "queued",
-      "verification": "Actual Family 1.69 HTTP responses and HTML inspected",
+      "status": "delivered",
+      "verification": "Family paired/unpaired browser proof · exact APK both rooms",
       "kind": "Small browser polish",
       "platforms": [
-        "web"
+        "browser"
       ],
       "owner": "Browser UX / QA",
-      "deployment": "No fix installed. Public manifest/app icons already work.",
-      "state": "Observed /favicon.ico 401, /remote/app-icon?size=64 → 200 image/png, zero explicit favicon links.",
+      "deployment": "Exact optimized 1.70 / code 64 installed in Family and Living; full profiles/screensaver/layout unchanged.",
+      "state": "Local gates ready in3m 48s; Family natural icon requests/public auth checks passed; original PhotoDreamService restored.",
       "acceptance": [
         "A fresh paired/unpaired browser tab requests the public branding image instead of protected /favicon.ico.",
         "Public icon stays credential-free; management authentication and existing PWA manifest/touch icon remain intact."
@@ -571,13 +575,50 @@
         {
           "text": "Actual served HTML/HTTP browser probe after1.69 acceptance; the manifest/touch icon are already public, so this finding concerns the browser tab icon.",
           "source": "docs/portal-pwa-connection-status-delivery-2026-11-02.md"
+        },
+        {
+          "text": "3,800 JVM / 399 suites, 716 JS, 161 Python and optimized/signing gates passed. Actual mobile paired/unpaired icon requests were200 without Authorization, with no default favicon request; original pairing and public manifest/touch icons worked. Exact APK hash 6157a890… verified in both rooms.",
+          "source": "docs/portal-pwa-tab-branding-delivery-2026-11-02.md"
         }
       ],
       "limits": [
-        "Low severity visual/console polish; no broken PWA installation claim.",
-        "Only a fresh bounded unit may implement it. Phone hardware acceptance remains unavailable."
+        "Browser tab polish only; no new general performance, PWA installation or all-browser compatibility claim.",
+        "Fresh Pixel and whole-product acceptance remain separate; exhausted units stay parked."
       ],
-      "next": "Add the explicit favicon link, guard its public endpoint identity, verify a fresh browser session and deliver a small local iteration."
+      "next": "Move to current companion rendered UI acceptance; retain separate physical Pixel and live-session requirements."
+    },
+    {
+      "id": "companion-native-ui",
+      "title": "Android companion: rendered settings acceptance",
+      "summary": "Next: current settings, Portal selector and mobile layouts in an isolated emulator; physical Pixel proof remains separate.",
+      "description": "Exercise the built companion after its compatibility/preflight changes. Check disabled-parent settings, viewing versus destinations, input admission and dropdown/overlap regression smoke with explicit fixture/live evidence boundaries.",
+      "status": "queued",
+      "verification": "Queued · no current rendered acceptance",
+      "kind": "Functional and UI verification",
+      "platforms": [
+        "companion",
+        "portal"
+      ],
+      "owner": "Companion QA",
+      "deployment": "Current 1.7.0-music-preview/code 12 APK built and locally verified; no companion install in this unit.",
+      "state": "Four-check plan ready. Neither inspected running emulator contains the companion; their existing Hearth state is preserved.",
+      "acceptance": [
+        "Use an isolated QA environment; verify current artifact identity and actual composed settings/menu behavior.",
+        "For live grouped disabled-parent writes, require valid sessions, per-room baselines and exact key/readback confirmations; restore all changes.",
+        "Check independent viewing/destinations, invalid-value admission and narrow/enlarged-text dropdown/overlap behavior.",
+        "Reserve cleanup within one fresh 30-minute unit; keep physical Pixel performance and live integration verdicts separate."
+      ],
+      "evidence": [
+        {
+          "text": "Read-only source/APK/emulator preparation completed. The plan targets the new preflight acceptance gap rather than relisting previously fixed dropdown defects. No install, token generation or native acceptance was performed.",
+          "source": "docs/portal-companion-emulator-qa-plan-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "No physical phone is currently reachable. Emulator proof does not establish folded/unfolded Pixel layout, touch, audible music or hardware performance.",
+        "A JVM pass or account-free UI fixture cannot establish live multi-room writes. The inspected emulators have no current companion sessions."
+      ],
+      "next": "Execute a fresh bounded emulator UI unit, report fixture/live checks separately and preserve original emulator/Portal state."
     }
   ]
 }

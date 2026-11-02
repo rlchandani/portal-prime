@@ -71,3 +71,11 @@ unavailable. Earlier artifact/browser proofs retain their original scope.
 All15 mobile detail panels and the desktop update fit without horizontal overflow
 after reload; detail screenshots were visually reviewed. Roadmap console errors
 were zero. Earlier filter/simulated-Portal checks retain their earlier scope.
+
+The tab-branding snapshot records exact **1.70 / code 64** in both rooms, actual
+Family paired/unpaired public PNG requests, preserved management authentication
+and complete room configuration. Its16-task queue adds current companion rendered
+settings acceptance as the next bounded unit; the independent plan is preparation
+only. All16 desktop/mobile detail panels passed overflow/missing-label checks with
+zero page errors. The desktop queue screenshot was visually reviewed. Earlier
+filter and simulated Portal checks retain their original scope.

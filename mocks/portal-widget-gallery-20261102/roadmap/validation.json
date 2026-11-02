@@ -108,5 +108,25 @@
     "detailScreenshotsVisuallyReviewed": true,
     "roadmapConsoleErrorsObserved": 0,
     "limits": "Saved roadmap checks only; Family controlled-request/browser and exact room verification have independent delivery evidence. No complete UI/accessibility or physical-phone proof."
+  },
+  "tabBrandingSnapshotUpdate": {
+    "version": "1.70",
+    "taskCount": 16,
+    "browserTabTask": "delivered; Family paired/unpaired browser proof, exact APK/config both rooms",
+    "companionNativeUi": "queued; preparation only",
+    "all16DetailsCheckedAtDesktopAndMobileAfterReload": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "missingPlatformLabels": false,
+    "roadmapPageErrors": 0,
+    "desktopQueueScreenshotVisuallyReviewed": true,
+    "limits": "Saved roadmap browser checks only; installed browser/device acceptance has its own named receipt. No physical Pixel acceptance or repeat acceptance of historical features."
   }
 }

@@ -1,6 +1,6 @@
 {
-  "versionCode": 63,
-  "versionName": "1.69",
+  "versionCode": 64,
+  "versionName": "1.70",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Local Portal iteration: browser navigation no longer shows false Offline after a cancelled initial connection read. Missing connection metadata is refreshed immediately after navigation or visibility resume; real network and pairing failures remain visible."
+  "notes": "Local Portal iteration: the browser control center uses Immortal's existing public app icon for its tab, avoiding the default protected favicon request. Manifest, home-screen icons, pairing and management authentication are preserved."
 }

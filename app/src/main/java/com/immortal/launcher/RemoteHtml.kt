@@ -21,6 +21,7 @@ object RemoteHtml {
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Immortal Control Center</title>
+<link rel="icon" type="image/png" sizes="64x64" href="/remote/app-icon?size=64">
 <link rel="manifest" href="/remote/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/remote/app-icon?size=180">
 <link rel="stylesheet" href="/remote/assets/control-center.css">
