@@ -1,0 +1,156 @@
+{
+  "scope": "Host app restore selection, confirmation and single-device boundary; actual Family planning only",
+  "checkedAt": "2026-11-02T23:30:31.917444+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-02T23:15:37+00:00",
+    "deadline": "2026-11-02T23:45:37+00:00"
+  },
+  "sourceCommit": "d37c5702f93639050c16a9ca85e3cd61e75f67d6",
+  "branch": "codex/fleet-restore-apps-20261102",
+  "sourceFiles": {
+    "provisioning/fleet-restore.sh": "1b0f73b5e69eaa8f1f547981ec83f9e14ff712a64fbac65b2dca9a820b51e512",
+    "provisioning/fleet-backup-data.py": "931c39f34670b805fe32d510fc65999344e3c83b26df9d70f2db2486401d259f",
+    "provisioning/test_fleet_restore.py": "fcbea182fd171cd22eec8b41d66b1decd9924838298f1b74f9d6cf2c63b9377a",
+    ".github/workflows/provisioning.yml": "0960732ef8044e506fd0ed47bd1107d1cdb5ac9b4e8f09ec803734ac71313559"
+  },
+  "baseline": {
+    "exit": 0,
+    "calls": [
+      [
+        "install",
+        "org.example.absent",
+        "--device",
+        "public-room"
+      ]
+    ],
+    "wrongUninstalledPackageSelected": true,
+    "correctInstalledPackageOmitted": true,
+    "reportedDoneAfterRejectedInstallation": true,
+    "syntheticOnly": true
+  },
+  "tests": {
+    "originalRestoreMethods": 12,
+    "originalFailureEntries": 40,
+    "originalErrors": 1,
+    "targetRedMethods": 8,
+    "targetRedFailureEntries": 27,
+    "duplicateRegistryRedMethods": 1,
+    "duplicateRegistryRedFailureEntries": 1,
+    "finalRestoreMethods": 24,
+    "restoreElapsedSeconds": 10.768,
+    "finalBackupMethods": 23,
+    "backupElapsedSeconds": 16.625,
+    "failures": 0,
+    "errors": 0,
+    "runInParallel": true,
+    "python": "3.13.7",
+    "bash": "3.2.57",
+    "bashSyntaxPassed": true,
+    "whitespacePassed": true,
+    "registrySnapshotIsolationPrivacyAndCleanupPassed": true
+  },
+  "independentReview": {
+    "blockingTargetFindingAddressed": true,
+    "duplicateParserMismatchAlsoCorrected": true,
+    "finalVerdict": "No remaining blocking finding in scoped apps path",
+    "staticOnly": true
+  },
+  "family": {
+    "scope": "Final-source actual Family app-restore planning only; no installation, prefs/config restore or device writes",
+    "catalogEntries": 27,
+    "selectedInstalledPackages": 6,
+    "trials": [
+      {
+        "label": "live-metadata",
+        "exit": 0,
+        "selectedCount": 6,
+        "exactSortedExpectedSelection": true,
+        "cliCalls": 0,
+        "elapsedMs": 59.365
+      },
+      {
+        "label": "live-reordered-minified",
+        "exit": 0,
+        "selectedCount": 6,
+        "exactSortedExpectedSelection": true,
+        "cliCalls": 0,
+        "elapsedMs": 55.565
+      }
+    ],
+    "fullSavedConfigurationUnchanged": true,
+    "profileComplete": true,
+    "runtime": {
+      "versionCode": 81,
+      "versionName": "1.87"
+    },
+    "ownerMetadataPublished": false,
+    "allCliNetworkActionsGuardedOut": true,
+    "sourceFiles": {
+      "fleet-restore.sh": "1b0f73b5e69eaa8f1f547981ec83f9e14ff712a64fbac65b2dca9a820b51e512",
+      "fleet-backup-data.py": "931c39f34670b805fe32d510fc65999344e3c83b26df9d70f2db2486401d259f"
+    }
+  },
+  "runtime": {
+    "versionName": "1.87",
+    "versionCode": 81,
+    "androidSourceAndArtifactsUnchanged": true,
+    "livingNativeQa": false,
+    "ownerAppInstallations": 0,
+    "ownerDataRestores": 0
+  },
+  "ci": {
+    "existingFleetJobExtended": true,
+    "hostedExecutionObserved": false
+  },
+  "cleanup": {
+    "checkedAt": "2026-11-02T23:30:31.917444+00:00",
+    "ownedNativeMetadataAndSyntheticKitsRemoved": true,
+    "originalConnectionsPreserved": true,
+    "preexistingScriptsPycachePreserved": true,
+    "workersClosed": [
+      "Kant",
+      "Lovelace"
+    ],
+    "nativeCommandHandle": "Final read-only script terminal exit0",
+    "finalGateHandle": 67812,
+    "finalGateTerminalExit": 0,
+    "noDeviceWritesOrInstalls": true
+  },
+  "limits": [
+    "Actual owner app installation/provider availability and native app restore are not newly accepted.",
+    "Current catalog packages, not original APK bytes or guaranteed former versions.",
+    "Raw preference/config restoration, reboot and cross-package migration remain separate.",
+    "Later failure can leave earlier confirmed apps present; no transaction/rollback or automatic retry.",
+    "Hosted CI/Ubuntu/Python3.12, Windows and physical-phone execution remain unobserved.",
+    "Family acceptance is final-source planning against live metadata, not actual installation.",
+    "No general speedup or whole-product completion claim."
+  ],
+  "roadmapBrowser": {
+    "checkedAt": "2026-11-02T23:32:14.390192+00:00",
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844,
+        "horizontalOverflow": false,
+        "restore24Visible": true,
+        "backup23Visible": true,
+        "nativePlan6of27Visible": true,
+        "version187Visible": true
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "horizontalOverflow": false,
+        "restore24Visible": true,
+        "backup23Visible": true,
+        "nativePlan6of27Visible": true,
+        "version187Visible": true
+      }
+    ],
+    "receiptHttpStatus": 200,
+    "sourceCommitAndFinalCountsChecked": true,
+    "tasks": 54,
+    "weatherStatus": "parked",
+    "scope": "Selected restore detail/public receipt/mobile-desktop geometry only;no all54workflow or native installation acceptance"
+  }
+}

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T23:13:44.480843+00:00",
-  "updatedLabel": "Fleet backup integrity:23/23 tests;Family43/43 preference files;Portal1.87 unchanged",
+  "updatedAt": "2026-11-02T23:30:31.917444+00:00",
+  "updatedLabel": "App restore integrity:24/24 restore+23/23 backup tests;Family6/27 live plan;Portal1.87 unchanged",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "fleet-backup-integrity",
+  "defaultTask": "fleet-restore-apps",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms contain exact optimized Portal1.87/code81. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
@@ -13,6 +13,49 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-restore-apps",
+      "title": "Fleet app restore: correct selection, one Portal and confirmed presence",
+      "summary": "Old restore picked an absent app and claimed done after rejection.24/24 restore+23/23 backup tests passed;Family live/reordered plans selected6installed of27with0restore calls.",
+      "description": "Use structured metadata, exclude both launcher variants, validate exact installed result plus presence readback, and pin real commands to a private single-record registry. Reject ambiguous targets/data before mutation; no automatic retries.",
+      "status": "delivered",
+      "verification": "24/24 restore \u00b723/23 backup \u00b7Family6/27 plan \u00b7zero owner installs/restores",
+      "kind": "Host restore data integrity",
+      "platforms": [
+        "fleet",
+        "portal"
+      ],
+      "owner": "Fleet engineering / independent fixtures and static review / Family read-only planning QA",
+      "deployment": "Local source committed at d37c5702;existing CI extended,hosted execution unobserved. No Android artifact/install;Portal1.87/code81 unchanged.",
+      "state": "Original23:15:37\u201323:45:37UTC clock retained;native metadata/synthetic kits removed,workers closed,original connections preserved.",
+      "acceptance": [
+        "Reproduce wrong absent-package selection, omitted installed package and done after ok:false.",
+        "Prevalidate complete metadata;select by fields independent of order/format,deduplicate,skip both launcher variants.",
+        "Resolve exactly one canonical target;reject all/collisions/duplicate JSON and freeze one private registry record for real commands.",
+        "Require literal exact terminal install result then one same-device presence readback;stop uncertainty without retry or later prefs.",
+        "Pass final independent host gates/review and actual Family metadata dry-runs with complete saved configuration unchanged."
+      ],
+      "evidence": [
+        {
+          "text": "Grounded failures, host implementation, gates, actual planning and boundaries.",
+          "source": "docs/portal-fleet-restore-apps-2026-11-02.md"
+        },
+        {
+          "text": "Sanitized source/test/read-only planning/private-cleanup receipt;no owner contents or tokens.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/fleet-restore-apps-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual owner app installation/provider availability and native app restore are not newly accepted.",
+        "Current catalog packages, not original APK bytes or guaranteed former versions.",
+        "Raw preference/config restoration, reboot and cross-package migration remain separate.",
+        "Later failure can leave earlier confirmed apps present; no transaction/rollback or automatic retry.",
+        "Hosted CI/Ubuntu/Python3.12, Windows and physical-phone execution remain unobserved.",
+        "Family acceptance is final-source planning against live metadata, not actual installation.",
+        "No general speedup or whole-product completion claim."
+      ],
+      "next": "Retain the guarded app-restore path and CI gate;actual provider installation/raw restore remain separate. Continue authorized independent discovery without reopening parked issues."
+    },
     {
       "id": "fleet-backup-integrity",
       "title": "Fleet backups: publish complete private preference captures",

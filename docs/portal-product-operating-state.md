@@ -28,6 +28,18 @@ The updated whole-product objective is
   unchanged. Original22:56:14–23:26:14UTC clock retained.
   [Scoped receipt](portal-fleet-backup-integrity-2026-11-02.md).
 
+- **Latest host app-restore integrity:** source `d37c5702` selects correct installed
+  packages from structured metadata, excludes both launchers and requires exact
+  installation success plus presence readback. Single-device validation and a
+  private frozen registry prevent target fanout; duplicate JSON fails closed.
+  Final **24/24 restore +23/23 backup** methods passed; independent review
+  found no remaining blocker. Family's final-source live/reordered plans selected
+  **6 of27** packages with zero restore calls and complete saved configuration
+  unchanged. Actual installation/raw restore remain unverified. Owned kits
+  removed, workers closed, Portal1.87 unchanged; existing CI extended without
+  hosted execution. Original23:15:37–23:45:37UTC clock retained.
+  [Scoped receipt](portal-fleet-restore-apps-2026-11-02.md).
+
 - **Latest Quick controls setup review:** a source-grounded functional mock proposes one shared setup destination for widget heading and Customize Settings, linking to the existing dashboard editor and Apps. Five inventory examples, address Save/Cancel/Escape and Back/Forward are clickable; handoffs remain simulations. Final43 browser interaction assertions and12 viewport/theme/text combinations passed; two actual browser captures were visually reviewed. Independent review corrections preserve focus and reject representative malformed addresses. Native routes, software and deployment are unchanged and require this design sign-off; no Portal performance claim. [Scope and acceptance](design/portal-quick-controls-setup-review-2026-11-02.md) / [interactive mock](http://127.0.0.1:8891/quick-controls-review.html).
 
 - **Latest phone photo-upload consistency:** companion1.7.3-music-preview/code15 is built, signed and fully read back in an ownedAPI34 emulator. Positive replies require literal success, exact destination/name and numeric byte count. Unconfirmed group uploads cannot be retried as failed; cleanup exceptions preserve the result, and failed refresh retains single-room guidance. Final590 JVM/76 suites and app/test builds passed;7/7 normal rendered cases and3/3 upload cases at130% text passed. Physical Pixel/live-network and whole-app acceptance remain open; no speedup claimed. Owned emulator removed, original AVD unchanged. Both exact Portal1.82 APKs, full room configuration and Family runtime retained; zero Portal writes/installs. Companion source committed as `6bf11bf`. [Scoped receipt](portal-companion-photo-upload-2026-11-02.md).
@@ -807,3 +819,31 @@ Weather design approval is retained; its exhausted native geometry issue remains
 parked. Music account playback requires normal human sign-in, physical companion
 installation remains open and Quick Controls/gallery require approval. Continue
 authorized independent discovery; do not silently reopen exhausted issues.
+
+## Fleet app restore integrity unit — 2026-11-02
+
+Source `d37c5702` fixes the reproduced wrong absent-app selection and done-after-
+rejection result. Complete plans are validated before mutation, installed package
+selection is order/format independent, both launchers are excluded and each real
+install requires an exact terminal acknowledgment plus one presence readback.
+Uncertainty stops further apps/preferences without retry.
+
+Independent review identified target fanout; local single-device resolution,
+duplicate-field rejection and a private one-record registry now protect all restore
+entry modes. A targeted fixture exposed Rust-first/Python-last duplicate behavior;
+the final isolation fixture verifies stable targeting despite original-registry
+mutation, private full-record copies and cleanup.
+
+Final **24/24 restore methods in10.768s** and **23/23 backup in16.625s** passed
+in parallel, plus Bash syntax/whitespace and final static review. Family metadata
+plans both selected **6 installed of27** in59.365/55.565ms, with zero restore
+CLI calls and complete saved configuration unchanged. No actual app installation,
+raw config/prefs restore, reboot, artifact or Living native acceptance is claimed.
+Owner/synthetic kits removed, original private connections/cache preserved and
+workers closed. Existing CI extended; hosted execution remains unobserved.
+
+Roadmap: **54 tasks:26 delivered,20 scoped verified,5 parked,2 approval,1 queued**.
+The whole-product goal stays active. Native Weather's design approval is retained
+with its exhausted geometry issue parked; physical companion, music human sign-in
+and broader UI approvals keep their separate boundaries. Continue authorized
+independent discovery without resetting original issue clocks.

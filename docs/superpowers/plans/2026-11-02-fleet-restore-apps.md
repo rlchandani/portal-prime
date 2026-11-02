@@ -7,5 +7,5 @@ Retain original **23:15:37–23:45:37 UTC** issue clock, including cleanup.
 - [x] Guard exact installation result and installed-presence readback; no retry.
 - [x] Pass new independent restore regressions and existing backup regressions.
 - [x] Complete bounded independent review and read-only Family dry-run acceptance.
-- [ ] Extend existing CI, document limits, commit and update roadmap/ledger.
-- [ ] Clean owned private fixtures/workers and close within the original clock.
+- [x] Extend existing CI, document limits, commit and update roadmap/ledger.
+- [x] Clean owned private fixtures/workers and close within the original clock.
