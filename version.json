@@ -1,6 +1,6 @@
 {
-  "versionCode": 66,
-  "versionName": "1.72",
+  "versionCode": 67,
+  "versionName": "1.73",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
-  "notes": "Local Portal iteration: incomplete JSON bodies fail before command application, oversized text bodies are rejected instead of clipped, and invalid or overflowing explicit lengths are rejected. Shared error mapping and consumed-byte accounting preserve complete JSON, empty requests and binary upload compatibility."
+  "notes": "Local Portal iteration: hourly Weather forecasts select the current location hour at exact hour boundaries and midnight, preserving whole-, half- and quarter-hour timezone offsets. Requests, refresh cadence, saved widget placement and Weather settings are unchanged."
 }
