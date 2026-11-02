@@ -709,5 +709,19 @@
     "publicEvidenceStatus": 200,
     "nativeDialogCropsVisuallyReviewed": 4,
     "scope": "Two changed saved-roadmap details and row/version checks only; native observations independently recorded, no broad page or physical-phone acceptance."
+  },
+  "nativeSourceDrafts20261102": {
+    "recordedAtUtc": "2026-11-02T18:00:08.394179+00:00",
+    "viewports": [
+      "390x844",
+      "1600x1000"
+    ],
+    "taskRows": 37,
+    "detail": "settings-native-source-drafts",
+    "horizontalOverflow": false,
+    "undefinedOrObjectText": false,
+    "evidenceAssetHttp200": 4,
+    "footerVersion": "1.80/code74",
+    "nativeKeyboardFix": "failed; candidate withdrawn"
   }
 }

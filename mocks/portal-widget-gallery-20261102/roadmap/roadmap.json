@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T17:31:58.901939+00:00",
-  "updatedLabel": "2 November 2026 \u00b7 Native clock and stepper acceptance",
+  "updatedAt": "2026-11-02T17:59:28.379993+00:00",
+  "updatedLabel": "2 November 2026 \u00b7 Native credential drafts checked; keyboard candidate withdrawn",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "settings-native-steppers",
+  "defaultTask": "settings-native-source-drafts",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact optimized 1.80 / code 74. Earlier receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical-phone installation remains open.",
@@ -1517,18 +1517,18 @@
     },
     {
       "id": "settings-native-source-drafts",
-      "title": "Native Settings: source credential drafts and masking",
-      "summary": "Native scalar and time/stepper paths accepted; source credential form masking and Cancel still need device checks.",
-      "description": "Check existing Immich/SMB/WebDAV form controls without service connection or saved-source changes. Use only generated unsaved credential text; protect existing values from public evidence.",
-      "status": "queued",
-      "verification": "Explicit remaining native acceptance gap \u00b7 unit not started",
+      "title": "Native source drafts: masking accepted; SMB keyboard issue parked",
+      "summary": "Three forms mask generated secret drafts and discard them on Cancel. SMB keyboard defect reproduced; ineffective 1.81 candidate withdrawn.",
+      "description": "Observed WebDAV/SMB/Immich on Family. No provider connection or saved-source changes. Three manifest resize flags passed build/JVM gates but did not overcome Portal fullscreen keyboard policy.",
+      "status": "parked",
+      "verification": "Partial acceptance \u00b7 masking/Cancel passed \u00b7 keyboard fix failed native gate",
       "kind": "Native Settings credential-form acceptance",
       "platforms": [
         "portal"
       ],
       "owner": "Family native QA / security review",
-      "deployment": "Existing 1.80; no new product implementation proposed.",
-      "state": "Current source calls ApprovedSourcesField(secret=true) for API keys/passwords; browser/JVM contracts cannot establish actual native masking.",
+      "deployment": "Family candidate 1.81 withdrawn; exact original 1.80 restored. Both rooms fully read back; Living received no candidate.",
+      "state": "Whole saved settings/layout/screensaver profiles unchanged; Family font, accessibility, Chrome task and baseline manual photo frame preserved.",
       "acceptance": [
         "Inspect current admission/masking/Cancel paths and choose a safely reachable existing form.",
         "Use generated unsaved draft text; observe masking and reachable actions with keyboard.",
@@ -1538,19 +1538,21 @@
       ],
       "evidence": [
         {
-          "text": "Prior scalar and clock/stepper receipts explicitly exclude secret and rich-source native acceptance.",
-          "source": "docs/portal-settings-native-editors-2026-11-02.md; docs/portal-settings-native-steppers-2026-11-02.md"
+          "text": "Native observations, independent caveat, rejected candidate and exact restoration.",
+          "source": "docs/portal-settings-native-source-drafts-2026-11-02.md"
         },
         {
-          "text": "Existing API key/password fields pass secret=true; connection writes occur only after explicit Test & connect success.",
-          "source": "ImmichConnectActivity.kt; SmbConnectActivity.kt; DavConnectActivity.kt"
+          "text": "Structured candidate/gate/restoration receipt; generated form crops.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/native-source-drafts-verification.json"
         }
       ],
       "limits": [
-        "This is an acceptance gap, not a claimed credential leak or new-design approval.",
-        "No physical-phone, existing-source connectivity, theme/text-scale or whole-product acceptance."
+        "Credential masking and unsaved Cancel accepted only for these three observed forms at normal text size/dark appearance.",
+        "SMB keyboard/action reachability unresolved; no delivered keyboard fix or performance gain.",
+        "No provider connection, saved-secret mutation, natural Dream, D-pad or whole-product acceptance.",
+        "Candidate withdrawn; current both-room APK remains exact 1.80/code74. Weather and previously exhausted slots unchanged."
       ],
-      "next": "Start one bounded Family form check, keeping all credentials and original full snapshots private."
+      "next": "Do not retry manifest-only resizing. Keyboard issue needs a fresh authorized bounded slot with a fullscreen-compatible approach; unrelated authorized backlog can proceed."
     }
   ]
 }
