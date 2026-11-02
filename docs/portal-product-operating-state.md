@@ -367,6 +367,24 @@ service readiness and retained-log scope, not universal crash freedom or a
 reproduced current app defect. No speculative service retry/catch, APK,
 configuration or UI change was made. Private raw logs stay outside the repository.
 
+## Current companion layout acceptance — 2 November 2026
+
+Seven additional existing rendered tests passed in **11.174 seconds** on an
+owned API34 emulator using the unchanged, exact **1.7.1 / code13** APK.
+`SelectorPanelLayoutUiTest` checks four selector/theme/draft cases at 1.3× text;
+`ManagementPanelLayoutUiTest` checks three management/pagination cases at
+1.3× and 2× text, including actual glyph fit and original callbacks. Neither
+class was in the earlier 33-test run. This is additional scoped UI acceptance,
+not seven new features or live transport/physical Pixel/performance proof.
+
+Ctrl+C cleanup of the still-live isolated runner completed with exit130.
+Its whole-source comparison and owned-resource removal passed; the owned
+emulator is absent and Family's original transports remain. No Android code,
+app version, Portal UI/configuration or music account was changed. The existing
+24-item roadmap records this evidence under the companion/UI and isolation
+items. The remaining account, approval, cold-reconnect and physical-phone
+boundaries retain their original scope.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:

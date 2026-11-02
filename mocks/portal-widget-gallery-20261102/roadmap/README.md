@@ -173,3 +173,11 @@ silent48kHz audio and the signed-out official page were observed. The linked
 No Premium playback, native session/control, continuity or performance proof
 is implied. The custom native player still needs its full separately qualified
 integration; official website readiness is a smaller route. No MA/HA deployment.
+
+The current companion layout checkpoint retains the24-item queue and adds
+seven existing rendered tests under the existing UI record:11.174s,
+selector/theme drafts at1.3× and management labels/pagination at1.3×/2×.
+The unchanged1.7.1 APK matched actual installed bytes. Ctrl+C cleanup of the
+owned runner preserved the complete original AVD and both Family transports.
+Only the two changed details were checked at desktop/mobile sizes this unit;
+no whole-app, physical Pixel, cold transport or performance verdict.

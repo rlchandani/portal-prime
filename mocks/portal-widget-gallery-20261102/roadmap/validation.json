@@ -329,5 +329,24 @@
     "nativePublicCropVisuallyReviewed": true,
     "desktopSnapshotVisuallyReviewed": true,
     "limits": "Only changed music details and rendered queue checked. Existing details retain prior browser scope. Native official-page and silent-engine readiness do not establish signed-in YouTube playback, Android media-session/control, continuity or performance."
+  },
+  "companionLayoutSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T12:16:17.119937+00:00",
+    "taskCount": 24,
+    "changedCompanionAndIsolationDetailsCheckedAtDesktopAndMobile": true,
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "all24QueueRowsRendered": true,
+    "pageErrors": 0,
+    "newEvidenceVisible": true,
+    "desktopScreenshotVisuallyReviewed": true,
+    "limits": "Four changed-detail checks only; previous all-detail/filter/image checks retain their original scope. Seven additional actual native callback fixtures passed independently; no physical phone, cold transport or performance acceptance."
   }
 }
