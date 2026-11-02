@@ -231,5 +231,30 @@
     "jsonDeliveryAndTimingIncreaseVisible": true,
     "helperSourceFindingQueued": true,
     "limits": "Saved roadmap presentation only. Actual22 Family JSON/header checks, binary compatibility, installed-APK identity and both-room profile/configuration equality have independent receipts. No native diagnostic/physical-phone/general performance acceptance."
+  },
+  "deployAcknowledgementSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T11:24:24.661692+00:00",
+    "portalVersion": "1.72 / code66",
+    "taskCount": 21,
+    "counts": {
+      "delivered": 10,
+      "verified": 6,
+      "approval": 2,
+      "parked": 3
+    },
+    "updatedTaskCheckedAtDesktopAndMobile": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "pageErrors": 0,
+    "all21TaskRowsRendered": true,
+    "exactVerificationAndSimulationLimitVisible": true,
+    "limits": "Only the updated roadmap detail and rendered queue were checked this unit. Other detail/filter/image checks retain their historical scope. Saved-page presentation is separate from local replay and actual read-only room evidence."
   }
 }

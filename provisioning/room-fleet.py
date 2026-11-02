@@ -456,7 +456,8 @@ def deploy(cli, registry, rooms, apk, package):
             tail = result.stdout.rpartition(marker)[2].strip()
             lost = (result.returncode == 1 and marker in result.stdout
                     and re.search(r"\(transport error\)|RemoteDisconnected", result.stderr)
-                    and (not tail or tail.startswith("read failed:")))
+                    and (not tail or tail.startswith("read failed:")
+                         or tail == "incomplete HTTP headers"))
             if result.returncode not in (0, 1) or not (installed or (before and lost)):
                 raise FleetError("native install failed or returned no valid installed result")
             if before:

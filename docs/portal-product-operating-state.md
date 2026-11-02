@@ -270,6 +270,25 @@ manufacturing another Portal release or reinstalling an already verified APK.
 The earlier native cold reconnect, physical phone and exhausted native issues
 retain their existing scope and status.
 
+## Latest deployment helper checkpoint — 2 November 2026
+
+The subsequent **deployment acknowledgement correction** recognizes the exact
+new CLI response-loss text while retaining changed own-APK and exact size/hash
+proof. The saved actual Living transcript fails on the old helper and passes
+the corrected helper only with simulated exact replacement; an unchanged APK
+still fails. All **37 helper / 23 Rust / 17 compiled-CLI / 38 Calls-access**
+checks and relevant syntax/ASCII/workflow gates pass. Independent review found
+no concrete introduced regression.
+
+Actual read-only checks reconfirmed both room identities and exact installed
+1.72 APKs, with unchanged complete settings profiles/screensaver configuration.
+There was no new APK or reinstall. The 21-task roadmap now marks the helper
+**locally verified**, keeping a fresh real self-update acceptance distinct.
+See [delivery and limits](portal-deploy-ack-recovery-delivery-2026-11-02.md).
+The companion's unrun numeric-input UI case remains a separate acceptance
+opportunity; cold reconnect, physical phone and exhausted native issues retain
+their existing status.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:

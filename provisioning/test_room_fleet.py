@@ -429,7 +429,7 @@ class RoomFleetTest(unittest.TestCase):
 
     def deploy_fixture(self, before, after, remote=None, returncode=1, stdout=None,
                        info_losses=0, failed_room=None, maps_override=None, bad_listing=False,
-                       hash_elapsed=0):
+                       hash_elapsed=0, stderr=None):
         """Fake only HTTP, CLI, and time; run real ownership, hashing, and deployment."""
         package = "com.immortal.launcher.debug"
         apk = self.registry / "upload.apk"
@@ -522,7 +522,9 @@ class RoomFleetTest(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 0, '{"ok":false}\n', "")
             text = stdout if stdout is not None else f"installing {package} ...\n\n"
             return subprocess.CompletedProcess(
-                command, returncode, text, "(transport error)\n" if returncode == 1 else ""
+                command, returncode, text,
+                stderr if stderr is not None else
+                ("(transport error)\n" if returncode == 1 else "")
             )
 
         def sleep(seconds):
@@ -590,6 +592,84 @@ class RoomFleetTest(unittest.TestCase):
         self.assertIn("Family Area", output)
         self.assertGreater(observed["time"], 0)
         self.assertLessEqual(observed["time"], 90)
+
+    def test_deploy_recovers_incomplete_headers_only_after_exact_replacement_proof(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        text = ("dev mode: on (official updates paused)\n"
+                "pushing candidate.apk -> immortal-dev.apk\n"
+                "installing com.immortal.launcher.debug ...\n"
+                "incomplete HTTP headers\n")
+        result, output, observed = self.deploy_fixture(
+            before, after, stdout=text, info_losses=1,
+        )
+        self.assertEqual(result, 0)
+        self.assertIn("verified installed APK SHA-256", output)
+        self.assertEqual(observed["commands"], ["Family Area"])
+        self.assertTrue(observed["reads"], "the acknowledgement alone proves no install")
+        self.assertGreater(observed["time"], 0)
+        self.assertNotIn("incomplete HTTP headers", output)
+
+    def test_deploy_header_loss_rejects_missing_unchanged_or_wrong_apk(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        text = "installing com.immortal.launcher.debug ...\nincomplete HTTP headers\n"
+        for previous, current, remote in (
+            (None, None, None),
+            (before, None, None),
+            (before, before, None),
+            (before, after, b"different APK fixture!!"),
+            (before, after, b"same-version APK fixture" + b"extra"),
+        ):
+            with self.subTest(previous=previous, current=current, remote=remote):
+                result, output, observed = self.deploy_fixture(
+                    previous, current, stdout=text, remote=remote,
+                )
+                self.assertEqual(result, 1)
+                self.assertIn("deploy failed", output)
+                self.assertEqual(observed["commands"], ["Family Area"])
+                self.assertLessEqual(observed["time"], 90)
+                if current is None or current == previous:
+                    self.assertFalse(observed["reads"])
+
+    def test_deploy_header_loss_requires_install_marker_exit_and_transport_evidence(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        text = "installing com.immortal.launcher.debug ...\nincomplete HTTP headers\n"
+        for code, stdout, stderr in (
+            (0, text, "(transport error)\n"),
+            (2, text, "(transport error)\n"),
+            (1, text, ""),
+            (1, text, "installation failed\n"),
+            (1, "pushing candidate.apk\nincomplete HTTP headers\n", "(transport error)\n"),
+            (1, text.replace("com.immortal.launcher.debug", "other.app"), "(transport error)\n"),
+            (1, text + "unexpected install failure\n", "(transport error)\n"),
+            (1, text.replace("incomplete HTTP headers", "HTTP body mismatch"),
+             "(transport error)\n"),
+        ):
+            with self.subTest(code=code, stdout=stdout, stderr=stderr):
+                result, output, observed = self.deploy_fixture(
+                    before, after, returncode=code, stdout=stdout, stderr=stderr,
+                )
+                self.assertEqual(result, 1)
+                self.assertIn("deploy failed", output)
+                self.assertFalse(observed["reads"])
+
+    def test_deploy_header_loss_never_overrides_explicit_agent_rejection(self):
+        before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)
+        after = ("/data/app/com.immortal.launcher.debug-new/base.apk", 101)
+        text = "installing com.immortal.launcher.debug ...\nincomplete HTTP headers\n"
+        for stdout, stderr in (
+            ('{"ok":false}\n' + text, "(transport error)\n"),
+            (text, '{"ok":false}\n(transport error)\n'),
+        ):
+            with self.subTest(stdout=stdout, stderr=stderr):
+                result, output, observed = self.deploy_fixture(
+                    before, after, stdout=stdout, stderr=stderr,
+                )
+                self.assertEqual(result, 1)
+                self.assertIn("agent returned ok:false", output)
+                self.assertFalse(observed["reads"])
 
     def test_deploy_accepts_mtime_change_but_rejects_unchanged_artifact(self):
         before = ("/data/app/com.immortal.launcher.debug-old/base.apk", 100)

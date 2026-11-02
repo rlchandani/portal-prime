@@ -123,3 +123,15 @@ without a performance claim. All21 detail panels were checked at390×844 and
 1600×1000 without horizontal overflow, undefined labels or page errors. The
 21st task queues the actual deploy-helper false negative with its saved transport
 transcript; no helper correction or new Portal release is inferred.
+
+The subsequent deployment-helper snapshot keeps 21 tasks: 10 delivered,
+6 locally or partially verified, 2 awaiting approval and 3 parked. The helper
+now accepts the exact new response-loss wording while still requiring changed
+installed-APK identity and exact size/hash. Its 37 regression tests, saved actual
+transcript replay and actual read-only room checks have separate receipts.
+No fresh install with lost acknowledgement was performed.
+
+Only the updated detail and queue were checked this unit at 390 × 844 and
+1600 × 1000: all 21 task rows rendered, the exact-verification and simulated
+replay limits were visible, and there was no horizontal overflow or page error.
+Earlier all-detail/filter/image checks retain their original scope.
