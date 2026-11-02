@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 · native numeric settings verified against both rooms; QA source-isolation improvement queued (UTC)",
+  "updatedLabel": "2 Nov 2026 · native settings verified; disposable QA runner verified; no-HA music route review next (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "companion-live-pairing",
+  "defaultTask": "companion-qa-isolation",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact 1.72 / code 66. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
@@ -155,7 +155,7 @@
         "No audible judgement, background/screen-off or screensaver rendering test, enlarged-text/focus matrix or repeated Living interaction run.",
         "No FPS or latency improvement is claimed."
       ],
-      "next": "Move to shared disabled-parent settings visibility; keep exhausted issues parked."
+      "next": "Preserve the shared Home countdown and independent Tools timers; extend coverage only for a new observed concern."
     },
     {
       "id": "settings-visibility",
@@ -250,7 +250,7 @@
         "Real performance-variant acceptance only; no fresh real release/debug-variant build is claimed in this unit.",
         "Source checks compare selected before/after snapshots; they are not a continuous filesystem monitor. The execution receipt honestly records the uncommitted tooling state."
       ],
-      "next": "Reproduce the observed PWA Offline banner during successful settings interactions in a fresh 30-minute unit."
+      "next": "Reuse the local-only checker for the next warranted release, preserving no-authentication/publication constraints."
     },
     {
       "id": "quick-controls",
@@ -389,7 +389,7 @@
         "Living did not receive a duplicate physical interaction run.",
         "Observer counts and equivalent-scenario performance comparisons remain unverified."
       ],
-      "next": "Keep the original scoped acceptance receipt; current room artifact is 1.67. Broader native acceptance remains separate."
+      "next": "Keep the original scoped acceptance receipt; current room artifact is 1.72. Broader native acceptance remains separate."
     },
     {
       "id": "ci-regressions",
@@ -555,7 +555,7 @@
         "Browser timing includes automation/DOM waiting. No arbitrary-network percentile, optical FPS, physical outage/revocation, phone acceptance or hosted CI claim.",
         "Pre-existing missing favicon401 is a separate queued polish item. Broader gallery approval and parked issue limits remain."
       ],
-      "next": "Use the existing public app icon for browser-tab branding without changing auth routes; physical companion acceptance awaits a connected phone."
+      "next": "Retain the accepted status ownership and no-extra-request behavior; physical companion acceptance remains separate."
     },
     {
       "id": "browser-tab-icon",
@@ -589,7 +589,7 @@
         "Browser tab polish only; no new general performance, PWA installation or all-browser compatibility claim.",
         "Fresh Pixel and whole-product acceptance remain separate; exhausted units stay parked."
       ],
-      "next": "Move to current companion rendered UI acceptance; retain separate physical Pixel and live-session requirements."
+      "next": "Retain public branding and management authentication; current companion emulator and live receipts remain separately scoped."
     },
     {
       "id": "companion-native-ui",
@@ -675,7 +675,7 @@
         "Temporary emulator and relay closed at10:16:56UTC; source AVD unchanged. Other Hearth transports were absent at final snapshot, with no commands targeting them or cause attributed.",
         "Source AVD backing disks/snapshots/config unchanged by size/mtime; seven generated boot/modem sidecars changed. Entire-AVD preservation is not claimed."
       ],
-      "next": "Keep cold reconnect and physical Pixel acceptance open. Next independent quality item: isolate generated emulator sidecars from the source AVD."
+      "next": "Keep cold reconnect and physical Pixel acceptance open. Numeric input and generated-file QA isolation now have their own scoped passing receipts."
     },
     {
       "id": "fleet-local-gates",
@@ -717,12 +717,12 @@
         "No fresh provisioning, reboot-persistence or all-model acceptance; no GitHub authentication/publication or device config mutation.",
         "Tooling-only correctness checks do not establish general app performance. Native cold reconnect remains open."
       ],
-      "next": "Upload integrity is now independently delivered. A separate future tooling unit should reproduce the observed deploy-helper false negative without reinstalling an already verified APK."
+      "next": "Upload integrity is independently delivered and deploy-helper recovery is locally verified. Windows and hosted checks remain open."
     },
     {
       "id": "fleet-upload-integrity",
       "title": "Fleet uploads: preserve files when interrupted",
-      "summary": "Cancelled uploads now preserve the original; exact1.71 is installed in Family and Living with unchanged settings.",
+      "summary": "Cancelled uploads preserve the original. The accepted fix is retained in exact 1.72 on both rooms with unchanged settings.",
       "description": "A real Family1.70 test declared100 bytes, sent6 and replaced a21-byte original while reporting success. The request now rejects incomplete bodies; a unique same-directory staging file is closed and renamed only after completion. Original files remain available until the upload succeeds.",
       "status": "delivered",
       "verification": "Delivered · Family API checks and exact APK in both rooms",
@@ -803,7 +803,7 @@
         "Living install helper again reported failure; independent installed-APK readback proved delivery. Actual CLI trace is saved for a separate tooling fix; no second install attempted.",
         "No owner preference was a mutation-test target; existing development mode/settings preserved. No GitHub publication or exhausted native issue reopening."
       ],
-      "next": "Next independent 30-minute unit: replay the actual lost install-response transcript against the room helper and preserve strict installed-APK verification."
+      "next": "Deploy-helper recovery is now independently locally verified; retain strict body validation and exact artifact readbacks."
     },
     {
       "id": "fleet-deploy-ack-recovery",
@@ -850,18 +850,18 @@
     {
       "id": "companion-qa-isolation",
       "title": "Companion QA: keep generated emulator files disposable",
-      "summary": "Read-only emulator backing disks stayed intact, but seven generated boot/modem sidecars changed in the source AVD.",
+      "summary": "23 guards passed. Actual native companion boot and exact APK readback passed; original AVD changes dropped from 7 to 0.",
       "description": "Contain the emulator’s generated files in an owned disposable data directory as well as preserving its backing disks. Reuse the existing SDK/AVD; do not modify owner configuration or investigate parked cold transport.",
-      "status": "queued",
-      "verification": "Queued · actual source-sidecar changes observed",
+      "status": "verified",
+      "verification": "Locally verified · real isolated emulator boot",
       "kind": "QA isolation and repeatable verification",
       "platforms": [
         "tooling",
         "companion"
       ],
       "owner": "Companion QA / release engineering",
-      "deployment": "No runner correction implemented; no product APK change.",
-      "state": "Actual native numeric slot recorded unchanged backing disks/config but seven generated sidecar changes. An independent bounded correction is next.",
+      "deployment": "QA tooling implemented in Toolkit; companion remains 1.7.1 / code 13 and both Portals remain 1.72 / code 66. No app update.",
+      "state": "Owned clone stopped and removed after real API 34 native readiness; whole source AVD contents and metadata unchanged.",
       "acceptance": [
         "Launch one owned emulator from an isolated disposable data directory while preserving all original source files.",
         "Verify actual native app readiness and exact candidate identity; keep network or physical acceptance claims separate.",
@@ -872,13 +872,65 @@
         {
           "text": "The source AVD before/after snapshot showed changes to initrd, bootcompleted.ini, emulator-user.ini and four modem-simulator files; backing disks, snapshots and config retained size/mtime.",
           "source": "docs/portal-companion-numeric-acceptance-2026-11-02.md; private cleanup.json"
+        },
+        {
+          "text": "23 offline guards passed for ownership, existing output, symlinks, external images, copy failure, full fingerprints and custom internal userdata preservation.",
+          "source": "Toolkit qa/test_isolated_emulator.py; docs/portal-companion-qa-isolation-2026-11-02.md"
+        },
+        {
+          "text": "Actual macOS/API 34 clone opened the native companion at 360 × 800 dp. Full installed APK readback matched 14,722,589 bytes and the existing accepted SHA-256.",
+          "source": "Private native-readiness.json and actual UI XML/screenshot"
+        },
+        {
+          "text": "Terminal runner receipt: ready=true, sourceUnchanged=true, ownedResourcesRemoved=true. Original Family USB/Wi-Fi remained; owned emulator absent after exit.",
+          "source": "Private session/receipt.json; SDK ADB inventory"
         }
       ],
       "limits": [
-        "This is a QA-isolation finding, not an app defect or a claim of owner app-data loss.",
-        "No new runner, Android APK, physical Pixel, cold reconnect or general performance acceptance yet."
+        "This is QA tooling, not a visible app feature or a new Android release.",
+        "The real default-path run preceded the final custom-image mapping correction; custom preservation passed the new offline regression and all 23 guards.",
+        "Real interruption/timeout cleanup, custom-image boot, non-macOS hosts, fresh pairing, cold reconnect, physical Pixel and general performance remain unverified."
       ],
-      "next": "Inspect SDK data-directory behavior and implement the smallest source-preserving disposable runner in a fresh bounded unit."
+      "next": "Reuse this owned runner for warranted native checks. Next independent product item: review the standalone music route without Home Assistant."
+    },
+    {
+      "id": "music-without-ha",
+      "title": "Music without Home Assistant: choose a proven route",
+      "summary": "Native player UI/adapter exists. YouTube Music playback, login and continuity remain unverified; the HA-hosted route is cancelled.",
+      "description": "Review the existing standalone choices against current no-GMS Portal hardware. Determine which route can deliver useful music without Home Assistant before promising native library, queue or multi-room playback.",
+      "status": "queued",
+      "verification": "Queued · existing source and research, no playback proof",
+      "kind": "Product integration / compatibility review",
+      "platforms": [
+        "portal",
+        "companion",
+        "browser"
+      ],
+      "owner": "Product / integration engineering",
+      "deployment": "No replacement music service or YouTube provider deployed. Existing UI and adapter are not end-to-end playback acceptance.",
+      "state": "YouTube Music Premium confirmed; former HA Music Assistant/helper removed at user request. Existing music branches preserved.",
+      "acceptance": [
+        "Keep Home Assistant excluded and use the existing standalone research rather than restarting discovery.",
+        "Evaluate a normal official YouTube Music browser route versus standalone Music Assistant outside HA against Android 9/10 and no Google services.",
+        "Separate native library/queue/group requirements from what an official browser can actually provide.",
+        "Define bounded playback, login, interruption, screensaver continuity and performance checks before selecting an implementation."
+      ],
+      "evidence": [
+        {
+          "text": "Existing native player UI, adapter and historical scoped checks are recorded, but real YouTube authorization/playback and performance gates remain unpassed.",
+          "source": "docs/music-player-goal.md"
+        },
+        {
+          "text": "HA route cancellation and removal were verified. Standalone container, official browser and Android-app alternatives are documented with their separate limits.",
+          "source": "docs/music-without-home-assistant-2026-10-19.md"
+        }
+      ],
+      "limits": [
+        "Research and existing code do not prove audible YouTube playback, account login, groups or current hardware performance.",
+        "No HA service installation, Google cookie extraction or new server installation is authorized by this roadmap.",
+        "Exhausted receiver/audio/performance slots remain parked; do not relabel them as a fresh investigation."
+      ],
+      "next": "One bounded standalone-route compatibility review; present an evidence-backed route and implementation scope before any new infrastructure deployment."
     }
   ]
 }

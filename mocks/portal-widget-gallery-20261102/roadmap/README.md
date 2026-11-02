@@ -150,3 +150,17 @@ reconnect/physical Pixel remain open. Source backing disks/config were preserved
 by size/mtime, but seven generated sidecars changed; an independent runner
 isolation correction is queued. These saved-page checks do not prove native
 performance or cold connection behavior.
+
+The QA-isolation snapshot marks the disposable emulator runner locally verified:
+23 offline checks, real unpaired native readiness, exact existing companion APK
+readback and zero changes in the original AVD directory. Normal owned shutdown
+and clone removal passed. It adds the unfinished no-HA music direction explicitly
+to the queue. The current total is 23 tasks: 10 delivered/implemented, 7 local or
+partial verification, 2 approval, 3 parked and 1 queued standalone-route review.
+No fresh pairing, cold reconnect, physical Pixel, music playback or Android
+release is implied by this tooling/presentation update.
+
+Fresh checks opened all 23 details at 1600 × 1000 and 390 × 844: all task rows
+rendered, with no horizontal overflow, missing labels or page errors. Desktop
+queue and mobile QA detail captures were visually reviewed. These are saved-page
+presentation checks; native app and source-isolation proof is recorded separately.

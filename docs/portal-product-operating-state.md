@@ -308,6 +308,29 @@ boot/modem sidecars changed. The 22-task roadmap queues an independent disposabl
 runner improvement to contain those files as well. The successful initial warm
 route does not reopen the exhausted cold investigation.
 
+## Latest companion QA isolation and roadmap checkpoint — 2 November 2026
+
+The **11:40:49–12:10:49 UTC** unit implemented the disposable runner in the
+isolated Toolkit checkout. **23 offline checks passed**, including custom
+internal userdata preservation. A real macOS/API34 owned clone opened the
+existing native companion and matched its exact installed APK. Original AVD
+changes dropped **7 → 0** under whole-directory content/metadata comparison.
+Normal owned emulator shutdown and clone removal passed; original Family USB
+and Wi-Fi connections remained. No Android code, app version, Portal settings
+or Portal APK changed. See [scoped proof](portal-companion-qa-isolation-2026-11-02.md).
+
+The current saved [roadmap](http://127.0.0.1:8891/roadmap/) has **23 tracked tasks**:
+10 delivered/implemented, 7 locally or partially verified, 2 awaiting design
+decisions, 3 parked and 1 queued. Historical checkpoint counts above retain
+their original scope. It now explicitly includes unfinished music without HA:
+the native player UI/adapter exists, but YouTube authorization, audible playback
+and continuity remain unverified. The next independent item is a bounded
+standalone-route compatibility review, using the
+[existing research](music-without-home-assistant-2026-10-19.md) and current
+Portal constraints. It grants no server installation, credential extraction,
+HA deployment or reopening of exhausted music/performance investigations.
+The whole widget gallery and Quick controls destination remain unapproved.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:

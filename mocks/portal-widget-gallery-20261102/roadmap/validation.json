@@ -275,5 +275,31 @@
     "actualNativeCropsHttp200": true,
     "nativeCropsVisuallyReviewed": true,
     "limits": "Saved roadmap presentation only. Actual seven native draft checks, positive two-room Save and complete configuration restoration have independent receipts. Cold/physical acceptance remains open; seven generated source AVD sidecars changed."
+  },
+  "qaIsolationSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T11:51:34.330Z",
+    "taskCount": 23,
+    "counts": {
+      "delivered": 10,
+      "verified": 7,
+      "approval": 2,
+      "parked": 3,
+      "queued": 1
+    },
+    "all23DetailsCheckedAtDesktopAndMobile": true,
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "missingLabels": false,
+    "pageErrors": 0,
+    "all23RowsRendered": true,
+    "desktopAndMobileScreenshotsVisuallyReviewed": true,
+    "limits": "Saved-page presentation only. Actual unpaired Android readiness, exact APK readback and source-AVD preservation are independent receipts. No current music playback, cold reconnect, physical Pixel or general performance acceptance."
   }
 }
