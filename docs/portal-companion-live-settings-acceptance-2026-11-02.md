@@ -46,3 +46,13 @@ The [independent source review](portal-companion-live-contract-review-2026-11-02
 documents wire acknowledgements and partial-rejection semantics. No speculative
 production patch was retained. Cold/input acceptance stays open; move to an
 independent product item rather than extending this investigation.
+
+## Subsequent numeric-editor acceptance
+
+The independent 11:26:14 UTC unit passed the previously unrun numeric editor
+against actual room APIs: seven draft/admission states, disabled-button taps
+with unchanged profiles, and one native 60-second Save with
+**2 confirmed / 0 failed / 0 cancelled**. Both complete profiles and screensaver
+configurations were exactly restored. Cold reconnect and physical Pixel
+acceptance remain open. See
+[the scoped receipt](portal-companion-numeric-acceptance-2026-11-02.md).

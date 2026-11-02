@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 · exact 1.72 in both rooms; deployment acknowledgement helper locally verified (UTC)",
+  "updatedLabel": "2 Nov 2026 · native numeric settings verified against both rooms; QA source-isolation improvement queued (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "fleet-deploy-ack-recovery",
+  "defaultTask": "companion-live-pairing",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact 1.72 / code 66. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
@@ -209,7 +209,7 @@
         "The original visibility capture showed false Offline; the later accepted1.69 connection-status fix is separately recorded.",
         "Separate calendar/bespoke editors retain their owners; no storage migration or general performance claim."
       ],
-      "next": "Portal/PWA visibility is delivered. Current companion rendered checks are verified; native live paired acceptance is next."
+      "next": "Portal/PWA visibility and scoped companion warm grouped writes are verified. Cold reconnect and physical Pixel acceptance remain open."
     },
     {
       "id": "local-readiness",
@@ -627,23 +627,23 @@
         "No physical Pixel installation, folded/unfolded layout, touch, audible playback, FPS or hardware-performance acceptance.",
         "The numeric fixture uses the supported asText editor branch; it does not prove real Portal metadata. An optional manual five-tab smoke check was not completed and is not counted."
       ],
-      "next": "Rendered fixtures are verified; subsequent warm live settings checks are separately recorded. Cold reconnect, remaining native numeric and physical Pixel acceptance remain open."
+      "next": "Rendered fixtures and subsequent warm live numeric settings are verified separately. Cold reconnect and physical Pixel acceptance remain open."
     },
     {
       "id": "companion-live-pairing",
       "title": "Android companion: scoped live-room settings checks",
-      "summary": "Five live check families passed, including native two-room Shuffle. Cold reconnect failed; native numeric check remains unrun.",
-      "description": "Close the gap between successful rendered fixtures and actual paired Portal HTTP behavior. Discover valid normal onboarding first; do not infer credentials or live acceptance from Fleet or fixture results.",
+      "summary": "Warm live checks include seven numeric draft states and a native two-room Save: 2 confirmed, 0 failed. Cold reconnect and physical Pixel remain open.",
+      "description": "The actual companion uses current room schemas for parent visibility, grouped settings and numeric admission. Later native interval acceptance closes the previously unrun input case; cold and physical acceptance remain separate.",
       "status": "verified",
-      "verification": "Partially verified · warm live checks passed",
+      "verification": "Partially verified · warm live writes and native numeric editor passed",
       "kind": "End-to-end integration",
       "platforms": [
         "companion",
         "portal"
       ],
       "owner": "Companion / integration QA",
-      "deployment": "Exact companion1.7.1/code13 tested in disposable API34 emulator with existing sessions. No Portal APK or physical phone update.",
-      "state": "Bounded09:53:31–10:23:31UTC slot. Warm direct-LAN writes/readbacks passed. Later direct/relay cold transport failed; no speculative app patch. Owned emulator/relay closed and complete room baselines restored.",
+      "deployment": "Exact companion 1.7.1 / code 13 tested in an owned API 34 emulator with existing sessions; both Portal identities report 1.72 / code 66. No phone or Portal APK update.",
+      "state": "Original warm checks remain scoped to their receipt. Independent numeric slot: seven draft states passed; disabled 4/601 taps preserved whole profiles; one native 60-second Save confirmed both rooms and only the intended value changed. Complete profiles/screensaver configs restored; emulator stopped.",
       "acceptance": [
         "Use normal authorized pairing with secrets kept private; independently verify current client and room identity.",
         "Capture complete per-room settings before writes. Exercise disabled-parent group preflight and exact confirmed key readback through native UI.",
@@ -662,15 +662,20 @@
         {
           "text": "Cold roster and one-target file persisted, but cold reconnect did not pass. Direct guest probes reported No route to host. The temporary relay also produced an actual native pre-header EOF failure although host requests returned200. The diagnostic source was removed; it is not a passing/shipped test.",
           "source": "Private native-cold-failure.json and failing instrumentation receipt; scoped acceptance document"
+        },
+        {
+          "text": "Actual interval schemas: min 5 / max 600 / step 5 / asText. Drafts 4, 601, overflow, decimal and blank disable Save; 5/600 enable it. One native 60-second Save: 2 confirmed / 0 failed / 0 cancelled; only interval changed, Living stayed disabled, and complete profiles/screensaver configs restored. Enclosing-button probe correction retained.",
+          "source": "docs/portal-companion-numeric-acceptance-2026-11-02.md; images/companion-numeric-601.png; images/companion-numeric-600.png"
         }
       ],
       "limits": [
-        "Five passed warm/settings check families do not establish full native companion acceptance. Cold reconnect failed and the planned native numeric601 UI check was not run.",
+        "Prior cold reconnect remains unaccepted. Initial warm numeric acceptance is now verified; a successful initial warm connection does not prove cold reliability.",
         "Existing authorized sessions were seeded into the normal private QA store; no fresh PIN pairing was tested or credential minted.",
         "No physical Pixel installation, folded/unfolded layout, touch, audio, FPS or direct cold LAN reliability acceptance.",
-        "Temporary emulator and relay closed at10:16:56UTC; source AVD unchanged. Other Hearth transports were absent at final snapshot, with no commands targeting them or cause attributed."
+        "Temporary emulator and relay closed at10:16:56UTC; source AVD unchanged. Other Hearth transports were absent at final snapshot, with no commands targeting them or cause attributed.",
+        "Source AVD backing disks/snapshots/config unchanged by size/mtime; seven generated boot/modem sidecars changed. Entire-AVD preservation is not claimed."
       ],
-      "next": "Cold reconnect and native numeric acceptance remain open. Move to independent fleet/provisioning local gates; do not extend this investigation."
+      "next": "Keep cold reconnect and physical Pixel acceptance open. Next independent quality item: isolate generated emulator sidecars from the source AVD."
     },
     {
       "id": "fleet-local-gates",
@@ -840,7 +845,40 @@
         "No new APK, hosted CI, Windows execution, fresh provisioning, reboot persistence or general app-performance acceptance.",
         "Companion cold reconnect, physical Pixel and exhausted native issues retain their existing separate status."
       ],
-      "next": "Retain the qualified recovery for the next warranted update. The companion native numeric-input acceptance case remains unrun; cold reconnect and physical phone acceptance stay separately open."
+      "next": "Retain qualified recovery for the next warranted update. Subsequent native numeric-input acceptance passed; cold reconnect and physical phone remain separately open."
+    },
+    {
+      "id": "companion-qa-isolation",
+      "title": "Companion QA: keep generated emulator files disposable",
+      "summary": "Read-only emulator backing disks stayed intact, but seven generated boot/modem sidecars changed in the source AVD.",
+      "description": "Contain the emulator’s generated files in an owned disposable data directory as well as preserving its backing disks. Reuse the existing SDK/AVD; do not modify owner configuration or investigate parked cold transport.",
+      "status": "queued",
+      "verification": "Queued · actual source-sidecar changes observed",
+      "kind": "QA isolation and repeatable verification",
+      "platforms": [
+        "tooling",
+        "companion"
+      ],
+      "owner": "Companion QA / release engineering",
+      "deployment": "No runner correction implemented; no product APK change.",
+      "state": "Actual native numeric slot recorded unchanged backing disks/config but seven generated sidecar changes. An independent bounded correction is next.",
+      "acceptance": [
+        "Launch one owned emulator from an isolated disposable data directory while preserving all original source files.",
+        "Verify actual native app readiness and exact candidate identity; keep network or physical acceptance claims separate.",
+        "Reject invalid/missing inputs without damaging source state; stop owned process and remove only owned scratch.",
+        "Run focused helper checks and real source before/after comparison within a fresh 30-minute slot."
+      ],
+      "evidence": [
+        {
+          "text": "The source AVD before/after snapshot showed changes to initrd, bootcompleted.ini, emulator-user.ini and four modem-simulator files; backing disks, snapshots and config retained size/mtime.",
+          "source": "docs/portal-companion-numeric-acceptance-2026-11-02.md; private cleanup.json"
+        }
+      ],
+      "limits": [
+        "This is a QA-isolation finding, not an app defect or a claim of owner app-data loss.",
+        "No new runner, Android APK, physical Pixel, cold reconnect or general performance acceptance yet."
+      ],
+      "next": "Inspect SDK data-directory behavior and implement the smallest source-preserving disposable runner in a fresh bounded unit."
     }
   ]
 }

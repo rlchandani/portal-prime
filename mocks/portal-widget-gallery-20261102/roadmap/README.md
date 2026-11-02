@@ -135,3 +135,18 @@ Only the updated detail and queue were checked this unit at 390 × 844 and
 1600 × 1000: all 21 task rows rendered, the exact-verification and simulated
 replay limits were visible, and there was no horizontal overflow or page error.
 Earlier all-detail/filter/image checks retain their original scope.
+
+The subsequent 22-task snapshot closes the unrun native numeric editor case:
+seven draft states passed against actual room schemas, disabled-button taps left
+whole profiles unchanged, and one native 60-second Save confirmed both rooms.
+Only the intended control changed; Living stayed disabled, then whole profiles
+and screensaver configs were exactly restored. The owned emulator stopped.
+Actual 601-disabled and 600-enabled control crops are linked from the proof area.
+
+Only the changed live-settings/QA-isolation details were checked at 390 × 844 and
+1600 × 1000 this unit, with no horizontal overflow, missing labels or page errors.
+Both new native crops returned HTTP 200 and were visually reviewed. Cold
+reconnect/physical Pixel remain open. Source backing disks/config were preserved
+by size/mtime, but seven generated sidecars changed; an independent runner
+isolation correction is queued. These saved-page checks do not prove native
+performance or cold connection behavior.

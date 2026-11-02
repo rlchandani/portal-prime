@@ -289,6 +289,25 @@ The companion's unrun numeric-input UI case remains a separate acceptance
 opportunity; cold reconnect, physical phone and exhausted native issues retain
 their existing status.
 
+## Latest native numeric checkpoint — 2 November 2026
+
+The independent **11:26:14–11:56:14 UTC numeric companion slot** passed the
+previously unrun editor against actual Family/Living metadata: seven draft
+states, disabled Save taps with whole profiles unchanged, and one native
+60-second Save with **2 confirmed / 0 failed / 0 cancelled**. Independent
+complete-profile readbacks showed only interval changes; Living stayed
+disabled. Both whole profiles and screensaver configurations were exactly
+restored. Existing companion 1.7.1/code13 was unchanged and its full installed
+APK matched the accepted hash in an owned API34 emulator; no Portal/phone APK
+update. The emulator stopped and original Family transports remained.
+See [scoped acceptance](portal-companion-numeric-acceptance-2026-11-02.md).
+
+This closes the numeric acceptance gap, not cold reconnect or physical Pixel.
+Source AVD backing disks/snapshots/config retained size/mtime, but seven generated
+boot/modem sidecars changed. The 22-task roadmap queues an independent disposable
+runner improvement to contain those files as well. The successful initial warm
+route does not reopen the exhausted cold investigation.
+
 ## Preserve parked work and scoped acceptance
 
 - [Black handoff](portal-black-handoff-second-slot-2026-11-02.md) remains exhausted:

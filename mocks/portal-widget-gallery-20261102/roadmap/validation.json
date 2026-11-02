@@ -256,5 +256,24 @@
     "all21TaskRowsRendered": true,
     "exactVerificationAndSimulationLimitVisible": true,
     "limits": "Only the updated roadmap detail and rendered queue were checked this unit. Other detail/filter/image checks retain their historical scope. Saved-page presentation is separate from local replay and actual read-only room evidence."
+  },
+  "nativeNumericSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T11:39:13.077034+00:00",
+    "taskCount": 22,
+    "updatedLiveAndQaDetailsCheckedAtDesktopAndMobile": true,
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "missingLabels": false,
+    "pageErrors": 0,
+    "actualNativeCropsHttp200": true,
+    "nativeCropsVisuallyReviewed": true,
+    "limits": "Saved roadmap presentation only. Actual seven native draft checks, positive two-room Save and complete configuration restoration have independent receipts. Cold/physical acceptance remains open; seven generated source AVD sidecars changed."
   }
 }
