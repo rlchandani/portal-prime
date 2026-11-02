@@ -2,6 +2,12 @@
 
 Status: the HA-hosted music route was cancelled by the user on October 19. Music Assistant and its YouTube helper were removed from HA; Family's old server connection is disabled. Existing music branches are preserved. Standalone alternatives are researched; no replacement is deployed. The original managed goal is blocked and its playback/performance gates remain unpassed.
 
+Current standalone checkpoint: [2 November readiness review](music-standalone-readiness-2026-11-02.md)
+verified Chrome 138, a silent Web Audio check and the signed-out official page on
+Family. It also found the existing client's exact 2.10.7 pin while current MA docs
+advertise 2.10.9. Normal Google sign-in and playback proof remain pending; no
+replacement server, provider, native UI or audio acceptance is inferred.
+
 Approved by the user on October 18, 2026: implement the selected music player as a goal including functionality, performance and quality.
 
 Branch: `codex/portal-music-player-20261018`

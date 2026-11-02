@@ -164,3 +164,12 @@ Fresh checks opened all 23 details at 1600 × 1000 and 390 × 844: all task rows
 rendered, with no horizontal overflow, missing labels or page errors. Desktop
 queue and mobile QA detail captures were visually reviewed. These are saved-page
 presentation checks; native app and source-isolation proof is recorded separately.
+
+The standalone music snapshot has 24 tasks: 10 delivered/implemented, 8 locally
+verified or researched, 2 approval, 3 parked and 1 queued account-dependent
+browser acceptance. Actual Family normal-browser Chrome138, public media APIs,
+silent48kHz audio and the signed-out official page were observed. The linked
+2160 × 642 public crop excludes owner tabs/address bar and contains no account.
+No Premium playback, native session/control, continuity or performance proof
+is implied. The custom native player still needs its full separately qualified
+integration; official website readiness is a smaller route. No MA/HA deployment.

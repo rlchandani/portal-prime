@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 · native settings verified; disposable QA runner verified; no-HA music route review next (UTC)",
+  "updatedLabel": "2 Nov 2026 · no-HA music browser readiness verified; signed-in playback pending (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "companion-qa-isolation",
+  "defaultTask": "music-without-ha",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact 1.72 / code 66. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
@@ -895,25 +895,25 @@
     },
     {
       "id": "music-without-ha",
-      "title": "Music without Home Assistant: choose a proven route",
-      "summary": "Native player UI/adapter exists. YouTube Music playback, login and continuity remain unverified; the HA-hosted route is cancelled.",
-      "description": "Review the existing standalone choices against current no-GMS Portal hardware. Determine which route can deliver useful music without Home Assistant before promising native library, queue or multi-room playback.",
-      "status": "queued",
-      "verification": "Queued · existing source and research, no playback proof",
-      "kind": "Product integration / compatibility review",
+      "title": "Music without Home Assistant: current route readiness",
+      "summary": "Family reports Chrome 138; official signed-out YouTube Music renders and silent audio runs. Premium playback remains unverified.",
+      "description": "Current official requirements, native adapter source and real Family browser readiness are now compared. The full custom native player still needs a standalone backend outside HA; the official website is a smaller server-free option.",
+      "status": "verified",
+      "verification": "Research + Family browser readiness · playback open",
+      "kind": "Standalone route feasibility",
       "platforms": [
         "portal",
         "companion",
         "browser"
       ],
       "owner": "Product / integration engineering",
-      "deployment": "No replacement music service or YouTube provider deployed. Existing UI and adapter are not end-to-end playback acceptance.",
-      "state": "YouTube Music Premium confirmed; former HA Music Assistant/helper removed at user request. Existing music branches preserved.",
+      "deployment": "No replacement music service, provider or APK deployed. Existing native UI preserved; official normal-browser page left open for human sign-in.",
+      "state": "Chrome 138 reported; public media APIs and silent 48 kHz Web Audio passed. Actual signed-out official page rendered. Complete Family settings/profile and screensaver configuration unchanged.",
       "acceptance": [
-        "Keep Home Assistant excluded and use the existing standalone research rather than restarting discovery.",
-        "Evaluate a normal official YouTube Music browser route versus standalone Music Assistant outside HA against Android 9/10 and no Google services.",
-        "Separate native library/queue/group requirements from what an official browser can actually provide.",
-        "Define bounded playback, login, interruption, screensaver continuity and performance checks before selecting an implementation."
+        "Compare the existing standalone routes with current official requirements and no-GMS Android 9/10 constraints.",
+        "Separate real engine/page readiness from account playback, Android MediaSession, continuity and performance proof.",
+        "Record actual native capability gaps and server-version compatibility before any infrastructure deployment.",
+        "Remove owned probe resources and preserve original room configuration and browser tabs."
       ],
       "evidence": [
         {
@@ -923,14 +923,67 @@
         {
           "text": "HA route cancellation and removal were verified. Standalone container, official browser and Android-app alternatives are documented with their separate limits.",
           "source": "docs/music-without-home-assistant-2026-10-19.md"
+        },
+        {
+          "text": "Actual normal-browser capability report: Chrome138, media APIs present, MP3/AAC/Opus probably, running silent context at48kHz with advancing clock/worklet. Loopback secure-context scope is explicit.",
+          "source": "docs/music-standalone-readiness-2026-11-02.md; private browser-capabilities.json"
+        },
+        {
+          "text": "Actual signed-out YouTube Music page rendered with Sign in visible; public crop excludes owner tabs/address bar. No track or credential acquired.",
+          "source": "images/youtube-signed-out-native.png; private native UI XML"
+        },
+        {
+          "text": "Independent source map confirms conditional local MediaSession controls, no local library/queue, unused native browse components and exact MA greeting-version enforcement.",
+          "source": "MusicSessionPolicy.kt; MusicPlayerHost.kt; MusicBrowseUi.kt; MaMusicClient.kt"
+        },
+        {
+          "text": "Complete Family profile and screensaver reads matched the baseline. Temporary tab/server/reverse/XML cleaned up; original browser tabs preserved; YouTube tab intentionally retained for login.",
+          "source": "Private configuration-preservation.json; native cleanup capture"
         }
       ],
       "limits": [
-        "Research and existing code do not prove audible YouTube playback, account login, groups or current hardware performance.",
-        "No HA service installation, Google cookie extraction or new server installation is authorized by this roadmap.",
-        "Exhausted receiver/audio/performance slots remain parked; do not relabel them as a fresh investigation."
+        "No Premium sign-in, decoded YouTube stream, audible playback, Android browser-session bridge, native controls, continuity or performance acceptance.",
+        "Browser route does not supply the full custom native library/queue/room UI. Local native MediaSession controls cannot reconstruct those features.",
+        "Native MA client accepts only 2.10.7/schema65; current docs advertise2.10.9. Actual newer API compatibility remains untested.",
+        "Full native route still needs an authorized supported standalone host and server-side source setup; HA remains excluded.",
+        "Legacy receiver/audio/performance investigations remain parked."
       ],
-      "next": "One bounded standalone-route compatibility review; present an evidence-backed route and implementation scope before any new infrastructure deployment."
+      "next": "Normal human Google sign-in is pending in Family’s browser. After it, perform the separately scoped official-browser Premium playback and local native-session checks."
+    },
+    {
+      "id": "music-browser-playback",
+      "title": "YouTube Music: account playback and native control proof",
+      "summary": "Needs normal Google sign-in on Family first. No Premium track, Android session or screensaver-continuity verdict yet.",
+      "description": "Verify the independent official-browser route after human account setup. Reuse existing local media controls only if the real browser publishes a qualified Android session. Preserve the larger native-player goal and cancelled HA route.",
+      "status": "queued",
+      "verification": "Queued · normal Portal Google sign-in pending",
+      "kind": "Account-dependent browser integration acceptance",
+      "platforms": [
+        "portal",
+        "browser",
+        "companion"
+      ],
+      "owner": "Music integration / Family QA",
+      "deployment": "Official website open in Family normal browser; no music service, provider or new APK installed.",
+      "state": "One human sign-in request pending; no credential extraction, account login automation or actual playback performed.",
+      "acceptance": [
+        "Use normal human Google sign-in; never acquire or export account cookies.",
+        "Check one controlled Premium track, browser pause/next/seek as available, then inspect real qualified Android metadata/actions.",
+        "Verify existing native controls against that same browser session before claiming integration.",
+        "Measure Home/screensaver continuity and interruption behavior within a distinct bounded official-browser slot; restore playback/volume and preserve owner settings."
+      ],
+      "evidence": [
+        {
+          "text": "Current Family Chrome138 and signed-out official page/silent-audio readiness passed; public browser features do not establish Android-session or Premium playback.",
+          "source": "docs/music-standalone-readiness-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Required Google sign-in is still pending; elapsed time is not an account setup result.",
+        "This smaller route does not replace native library/queue/groups or reopen exhausted MA receiver/performance work.",
+        "No YouTube Premium playback, current native/companion controls, retention or performance acceptance."
+      ],
+      "next": "Start its bounded actual-playback unit only after normal human sign-in is confirmed; continue independent authorized work while pending."
     }
   ]
 }

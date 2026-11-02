@@ -301,5 +301,33 @@
     "all23RowsRendered": true,
     "desktopAndMobileScreenshotsVisuallyReviewed": true,
     "limits": "Saved-page presentation only. Actual unpaired Android readiness, exact APK readback and source-AVD preservation are independent receipts. No current music playback, cold reconnect, physical Pixel or general performance acceptance."
+  },
+  "standaloneMusicReadinessSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T12:04:20.800Z",
+    "taskCount": 24,
+    "counts": {
+      "delivered": 10,
+      "verified": 8,
+      "approval": 2,
+      "parked": 3,
+      "queued": 1
+    },
+    "twoChangedDetailsCheckedAtDesktopAndMobile": true,
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "all24RowsRendered": true,
+    "horizontalOverflow": false,
+    "missingLabels": false,
+    "pageErrors": 0,
+    "publicCropHttpStatus": 200,
+    "nativePublicCropVisuallyReviewed": true,
+    "desktopSnapshotVisuallyReviewed": true,
+    "limits": "Only changed music details and rendered queue checked. Existing details retain prior browser scope. Native official-page and silent-engine readiness do not establish signed-in YouTube playback, Android media-session/control, continuity or performance."
   }
 }
