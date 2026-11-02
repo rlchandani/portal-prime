@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 \u00b7 Weather clock-format correction in 1.74 on both rooms; Home/settings return acceptance open (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 Fleet error response correction installed as 1.75 in both rooms; Family 7/7 HTTP checks (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "weather-clock-format",
+  "defaultTask": "fleet-error-response",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact optimized 1.74 / code 68. Earlier receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
+    "Both rooms have exact optimized 1.75 / code 69. Earlier task receipts retain their original acceptance versions. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -1084,6 +1084,84 @@
         "Family retains one sealed installer session from the failed automatic confirmation. Its dialog is no longer foreground; original Chrome task27174 is resumed. Shell abandonment was rejected because the session belongs to the app. Session cleanup remains open."
       ],
       "next": "Resolve the stale app-owned installer session in a separate bounded slot, then verify Home/settings-return UI without interrupting the normal music sign-in."
+    },
+    {
+      "id": "fleet-error-response",
+      "title": "Fleet errors: reply before waiting on rejected bodies",
+      "summary": "Delivered in both rooms. Family stalled-body rejection: no reply within 3s \u2192 median 217ms without client disconnect. 7 HTTP checks and exact 70,001-byte upload/readback passed.",
+      "description": "The server had already rejected the request but waited to drain an unsent body before sending its error. Handler errors now flush and half-close the reply first, then drain; successful upload ordering and validation are preserved.",
+      "status": "delivered",
+      "verification": "Family actual HTTP acceptance \u00b7 both exact APK readbacks",
+      "kind": "Transport reliability correction",
+      "platforms": [
+        "portal",
+        "browser",
+        "companion",
+        "tooling"
+      ],
+      "owner": "Main / QA",
+      "deployment": "Exact optimized 1.75 / code 69 installed once per room. Family used one authorized ADB install; Living native Fleet helper exited 0 with full installed APK hash proof.",
+      "state": "3,849 JVM / 404 suites, 676 bundled JS and 37 helper checks passed. Signed debug/optimized build passed in 181s. Complete room profiles/screensaver configurations are unchanged.",
+      "acceptance": [
+        "Deliver a complete 401/413/405 response while the rejected request body remains unsent.",
+        "Keep successful data transfer, authentication and complete body validation intact.",
+        "Preserve response resource closure and each room\u2019s settings; verify the exact installed artifact in both rooms."
+      ],
+      "evidence": [
+        {
+          "text": "Actual 1.74 baseline: no response during 3,002ms; after write-half-close, 401 arrived in 213ms. Four original server-ordering assertion failures became four passing checks.",
+          "source": "docs/portal-fleet-error-response-2026-11-02.md"
+        },
+        {
+          "text": "Actual Family 1.75: 7/7 requests; three stalled 401 samples: 219.108, 216.547, 207.346ms. Exact 70,001-byte scratch transfer/readback and cleanup passed.",
+          "source": "../evidence/fleet-error-response-verification.json"
+        },
+        {
+          "text": "Both rooms match optimized SHA-256 e72bc9dac37a8d425ae3b84f31b84d436ce776ac82aa4d798486cf72e18d22ff, 25,860,686 bytes; complete profiles/screensaver settings unchanged.",
+          "source": "docs/portal-fleet-error-response-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "Baseline 3s is a no-response lower bound, not a 30s timing measurement or before median.",
+        "The four-worker pool and 30-second drainage timeout are unchanged; this does not solve pool exhaustion from an uncooperative peer.",
+        "No repeated Living interaction run, physical phone, optical FPS or general product performance claim.",
+        "Prior Family installer-session cleanup and actual Weather settings-return UI remain open."
+      ],
+      "next": "Retain prompt rejection and separate scoped small-response latency investigation."
+    },
+    {
+      "id": "fleet-small-response-latency",
+      "title": "Fleet small replies: isolate the remaining delay",
+      "summary": "Queued candidate: selected actual Family HTTP replies completed in 200\u2013268ms. Distinguish body delivery, EOF and client behavior before changing transport.",
+      "description": "The error-response verification recorded a repeated small-response delay. The server writes headers and body separately and does not explicitly disable Nagle. This is source context, not a proven cause; payload-phase measurements and actual client checks come first.",
+      "status": "queued",
+      "verification": "Observed timing candidate \u00b7 root cause unconfirmed",
+      "kind": "Bounded performance investigation",
+      "platforms": [
+        "portal",
+        "browser",
+        "companion",
+        "tooling"
+      ],
+      "owner": "Main / performance QA",
+      "deployment": "No TCP tuning or new candidate implemented; both rooms retain exact 1.75.",
+      "state": "Seven actual current-APK request receipts are preserved. No independent performance slot has started.",
+      "acceptance": [
+        "Split first header, complete body and EOF timing on Family using nonmutating requests.",
+        "Compare actual HTTP client behavior and establish a reproducible cause before modifying socket options or response buffering.",
+        "If a change is warranted, retain exact replies, upload integrity, authentication and bounded resource handling; compare against the same scenario."
+      ],
+      "evidence": [
+        {
+          "text": "Family 1.75 error/identity samples 200\u2013268ms, with stalled 401 median 216.547ms. These measure raw-socket response completion; they do not establish browser, phone or UI latency.",
+          "source": "../evidence/fleet-error-response-verification.json"
+        }
+      ],
+      "limits": [
+        "Nagle/delayed ACK is an untested hypothesis. No 20ms target, fix, native UI benefit or newer artifact is claimed.",
+        "This is independent of the exhausted Home/Apps/settings performance experiments; those remain parked."
+      ],
+      "next": "One fresh 30-minute unit for targeted phase measurement, cause verification and a warranted fix; preserve pending music sign-in."
     }
   ]
 }

@@ -11,6 +11,8 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Latest transport delivery:** exact optimized **1.75/code69** is installed in both rooms. Family7/7 HTTP cases passed; stalled rejection changed from no reply within3s to median217ms. One70001-byte upload/readback and cleanup passed, with complete room settings unchanged. [Scoped receipt](portal-fleet-error-response-2026-11-02.md). The remaining200–268ms completion is a separate queued hypothesis; no root cause or further tuning is claimed.
+
 - **Latest Weather clock-format maintenance:** exact optimized **1.74/code68** is installed in both rooms; complete settings are unchanged.3845 JVM tests and274 Family debug-runtime formatter checks passed. Actual Home/settings-return UI acceptance is still open. See [scoped receipt](portal-weather-clock-format-2026-11-02.md). Older versioned receipts below keep their historical scope.
 
 - The active goal covers the whole existing product: Portal, native Android
@@ -499,3 +501,15 @@ fresh companion device behavior, and external Jarvis source. Fresh companion
 local build/test identity is now recorded separately. Current Portal
 artifact identity and bounded Family checks are now inspected, as recorded above.
 This inventory is a resumption aid, not whole-product acceptance.
+
+## Fleet error reply checkpoint — 2 November 2026
+
+Source `d912e184` sends handler errors before waiting for unread upload bodies,
+using write-side half-close followed by drainage.3,849 JVM/404 suites,676 bundled
+JS and37 helper checks, signed debug/optimized artifacts and independent static
+review passed. Family7 actual HTTP checks and one70,001-byte public scratch
+transfer/readback/cleanup passed. Both rooms have exact1.75/code69 with unchanged
+complete profiles/screensaver settings. No prior installer/Weather/parked slot
+was reopened. The28-task roadmap records12 delivered,9 scoped verified,2 approval,
+3 parked and2 queued. Next is a separate cause-first small-response timing check;
+Nagle is a hypothesis, not an established finding.

@@ -1,0 +1,129 @@
+{
+  "sourceCommit": "d912e184",
+  "versionName": "1.75",
+  "versionCode": 69,
+  "artifact": {
+    "bytes": 25860686,
+    "sha256": "e72bc9dac37a8d425ae3b84f31b84d436ce776ac82aa4d798486cf72e18d22ff"
+  },
+  "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "jvm": {
+    "tests": 3849,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 404
+  },
+  "clientChecks": {
+    "bundledJs": 676,
+    "roomHelper": 37,
+    "exit": 0
+  },
+  "baseline": {
+    "noAuthNoMutation": true,
+    "declaredBodyBytes": 128,
+    "bodyBytesSent": 0,
+    "noResponseDuring3sObservation": true,
+    "observationMilliseconds": 3002.14,
+    "afterWriteHalfCloseMilliseconds": 213.18,
+    "httpStatusLine": "HTTP/1.1 401 Unauthorized",
+    "scope": "One actual Family1.74 socket request; no application configuration change."
+  },
+  "familyHttp": {
+    "checks": 7,
+    "rows": [
+      {
+        "case": "unauthenticated stalled body",
+        "status": 401,
+        "elapsedMs": 219.108,
+        "completeDeclaredReply": true,
+        "clientHalfClosedBeforeReply": false
+      },
+      {
+        "case": "unauthenticated stalled body",
+        "status": 401,
+        "elapsedMs": 216.547,
+        "completeDeclaredReply": true,
+        "clientHalfClosedBeforeReply": false
+      },
+      {
+        "case": "unauthenticated stalled body",
+        "status": 401,
+        "elapsedMs": 207.346,
+        "completeDeclaredReply": true,
+        "clientHalfClosedBeforeReply": false
+      },
+      {
+        "case": "authenticated oversized unsent body",
+        "status": 413,
+        "elapsedMs": 227.837,
+        "completeDeclaredReply": true,
+        "clientHalfClosedBeforeReply": false
+      },
+      {
+        "case": "wrong method unsent body",
+        "status": 405,
+        "elapsedMs": 205.876,
+        "completeDeclaredReply": true,
+        "clientHalfClosedBeforeReply": false
+      },
+      {
+        "case": "fully supplied rejected body",
+        "status": 401,
+        "elapsedMs": 225.826,
+        "completeDeclaredReply": true,
+        "clientHalfClosedBeforeReply": false
+      },
+      {
+        "case": "ordinary authenticated identity",
+        "status": 200,
+        "elapsedMs": 267.744,
+        "completeDeclaredReply": true
+      }
+    ],
+    "stalledUnauthenticatedMedianMs": 216.547,
+    "scope": "Family actual1.75 HTTP replies, no app config writes. Baseline no-response observation was a3s lower bound, not a30s measurement."
+  },
+  "upload": {
+    "uploadStatus": 200,
+    "readbackStatus": 200,
+    "exactBytes": 70001,
+    "sha256": "216c2bae161b9ec03b1346592d9ab53ff82b74817b6370f30d8037cc9df9d5e1",
+    "ownedFileAbsentBeforeAndAfter": true,
+    "scope": "One public70001-byte scratch upload/readback; no photos or settings changed."
+  },
+  "family": {
+    "installDispatches": 1,
+    "installExit": 0,
+    "fullOptimizedApkReadbackMatches": true,
+    "bytes": 25860686,
+    "sha256": "e72bc9dac37a8d425ae3b84f31b84d436ce776ac82aa4d798486cf72e18d22ff",
+    "method": "one authorized ADB install; existing failed app-owned installer session was not reopened",
+    "checkedAtUtc": "2026-11-02T13:37:25.496949+00:00"
+  },
+  "living": {
+    "versionName": "1.75",
+    "versionCode": 69,
+    "installDispatches": 1,
+    "nativeHelperExit": 0,
+    "nativeHelperFullInstalledApkSha256Matched": true,
+    "completeProfileUnchanged": true,
+    "screensaverSettingsUnchanged": true,
+    "devModePreserved": true,
+    "scope": "Exact installed artifact and authenticated settings identity; no repeated Living native interaction run.",
+    "checkedAtUtc": "2026-11-02T13:40:46.333378+00:00"
+  },
+  "familyState": {
+    "profileComplete": true,
+    "profileUnchanged": true,
+    "screensaverUnchanged": true,
+    "originalChromeTaskRetained": true,
+    "originalChromeForegroundClaimed": false,
+    "priorAppOwnedInstallerSessionStillRegistered": true
+  },
+  "limits": [
+    "Only named Family request cases and one scratch transfer; no universal UI/network performance claim.",
+    "Existing worker drain timeout/pool unchanged.",
+    "Prior app-owned installer session and actual Weather Home/settings-return UI remain open."
+  ]
+}

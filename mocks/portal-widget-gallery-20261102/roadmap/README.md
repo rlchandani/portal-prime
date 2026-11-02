@@ -226,3 +226,14 @@ automatic confirmation succeeded. Earlier browser/native proofs retain their sco
 Fresh changed-detail checks at390×844 and1600×1000 show26 rows, no horizontal
 overflow, and visible Home-return/session-cleanup limits. The desktop screenshot
 was visually reviewed. This does not repeat all-task/native acceptance.
+
+The28-task Fleet error-response snapshot records exact1.75/code69 in both rooms,
+Family7/7 HTTP cases, median216.547ms after a3s no-response baseline observation,
+and exact70,001-byte scratch transfer/cleanup. It retains the worker-timeout and
+older installer/Weather limits. A separate queued small-response candidate has
+no proven root cause or implementation. No existing parked slot is reopened.
+
+Fresh changed-detail presentation checks opened both new tasks at390×844 and
+1600×1000:28 rows, no horizontal overflow/missing labels, and visible limits.
+The desktop detail screenshot was visually reviewed. Existing all-task/filter
+proofs retain their earlier scope; this is not native product acceptance.

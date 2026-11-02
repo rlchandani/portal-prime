@@ -473,5 +473,28 @@
     "installerCleanupLimitVisible": true,
     "scope": "Changed task detail and current version presentation; earlier all-task/filter proofs retain their scope.",
     "desktopScreenshotVisuallyReviewed": true
+  },
+  "fleetErrorSnapshot": {
+    "date": "2026-11-02",
+    "taskCount": 28,
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        1600,
+        1000
+      ]
+    ],
+    "changedDetails": [
+      "fleet-error-response",
+      "fleet-small-response-latency"
+    ],
+    "horizontalOverflow": false,
+    "missingLabels": false,
+    "scope": "Two changed details and task count; older all-task/filter proofs retain their scope.",
+    "limitsVisible": true,
+    "desktopScreenshotVisuallyReviewed": true
   }
 }
