@@ -70,7 +70,7 @@ The updated whole-product objective is
   `docs/companion-compatibility-validation-2026-11-02.md` in the isolated Toolkit
   checkout. Original 540 companion tests were unchanged and passed against the
   candidate; no separate unmodified-base run or physical phone check is claimed.
-- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents sixteen
+- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents seventeen
   tracked items with acceptance/evidence/limits and actual cropped clock captures.
   It is a saved priority-queue snapshot, not live telemetry or an exhaustive
   product acceptance report. Browser interactions passed at desktop/mobile
@@ -150,8 +150,22 @@ Disabled-parent presentation (item 4) now passed scoped Portal/PWA acceptance an
 both-room exact 1.68 delivery. Companion preflight is corrected, committed and
 locally verified (564 tests / 74 suites); physical installation/acceptance remains
 open. Local-only release readiness (item 8) is now implemented and verified. Browser
-connection-status ownership (item 10) is delivered on both rooms. Public tab branding (item 11) is now delivered in exact 1.70 on both rooms. Current companion rendered UI acceptance (item 12) is next, starting with an isolated emulator; live paired writes and physical Pixel proof remain separate. Previous exhausted units remain parked.
+connection-status ownership (item 10) is delivered on both rooms. Public tab branding (item 11) is now delivered in exact 1.70 on both rooms. Current companion rendered UI acceptance (item12) passed33 tests in an isolated emulator; live paired native writes are next and physical Pixel proof remains separate. Previous exhausted units remain parked.
 Do not reopen exhausted old issues through these units.
+
+## Latest companion rendered checkpoint — 2 November 2026
+
+This checkpoint supersedes earlier “uninstalled/no rendered acceptance” statements
+for the emulator only. Companion **1.7.1-music-preview / code13**, local commit
+`3ae098044a0eaf4f42dadf2fff8184f3aa5a5646`, passed **564 JVM /74 suites** and
+**33/33 actual Android UI tests in40.425s**. Exact installed APK readback matched
+in owned API34 emulator-5558. The disconnected category placeholder is corrected.
+Strict two-room fixtures exercise the real UI/VM/repository pipeline; live room
+writes and physical Pixel acceptance remain open. Owned read-only overlay cleanup
+completed at09:50:04 UTC with source AVD and original connections preserved.
+Both Portals remain exact1.70/code64. The saved roadmap now has17 tasks; the next
+bounded unit is live paired native companion acceptance. No new unit has started.
+See [delivery and limitations](portal-companion-rendered-settings-delivery-2026-11-02.md).
 
 ## Preserve parked work and scoped acceptance
 

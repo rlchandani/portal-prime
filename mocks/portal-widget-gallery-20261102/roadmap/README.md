@@ -79,3 +79,17 @@ settings acceptance as the next bounded unit; the independent plan is preparatio
 only. All16 desktop/mobile detail panels passed overflow/missing-label checks with
 zero page errors. The desktop queue screenshot was visually reviewed. Earlier
 filter and simulated Portal checks retain their original scope.
+
+The companion rendered snapshot records **1.7.1-music-preview / code13** with
+564 fresh JVM tests and33 actual Android UI tests passed. The exact app was
+installed/read back only in an owned read-only emulator, which was closed
+at09:50:04 UTC. Source AVD files and original devices were preserved. Two
+category-picker crops show the actual native before/after; no personal photos
+or credentials were copied. The17-task queue keeps live paired-room acceptance
+queued and physical Pixel acceptance open. Earlier snapshot proofs retain
+their original scope. See the named rendered-settings delivery receipt.
+
+Fresh17-task desktop1600×1000 and mobile390×844 detail checks passed with
+no horizontal overflow, missing platform labels or page errors. Both actual
+category crops loaded at996×204; the desktop screenshot was visually reviewed.
+This saved-page proof does not establish live-room or physical-phone behavior.

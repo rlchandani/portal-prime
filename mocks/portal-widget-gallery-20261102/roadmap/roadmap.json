@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 · exact 1.70 both rooms; companion rendered UI acceptance next (UTC)",
+  "updatedLabel": "2 Nov 2026 · companion 1.7.1 rendered checks passed; live paired checks next (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "companion-native-ui",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms have exact 1.70 / code 64. Family scoped acceptance is recorded per task; phone maintenance remains uninstalled.",
+    "Both rooms have exact 1.70 / code 64. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -16,7 +16,7 @@
     {
       "id": "companion-compat",
       "title": "Android companion compatibility guards",
-      "summary": "564 tests / 74 suites passed. Multi-room inactive-settings preflight is corrected; the phone APK is not installed.",
+      "summary": "564 JVM tests / 74 suites passed. Inactive-settings preflight is included in 1.7.1; rendered checks now passed in an isolated emulator.",
       "description": "Protect capability fallback and stale room/session responses. Multi-room settings validation now reads complete per-domain inactive metadata while display reads remain visibility-filtered.",
       "status": "verified",
       "verification": "Locally verified · not deployed",
@@ -26,7 +26,7 @@
         "portal"
       ],
       "owner": "Companion lead",
-      "deployment": "Local 1.7.0-music-preview / code 12 APK built; no phone installation",
+      "deployment": "Current 1.7.1-music-preview / code 13 verified in isolated emulator; no physical phone installation.",
       "state": "Latest full JVM/debug gate exited 0; 564 tests / 74 suites, no failures, errors or skips.",
       "acceptance": [
         "Cover 404 / 405 / 501 capability fallback without treating authentication, network or schema failures as unsupported capability.",
@@ -57,6 +57,10 @@
         {
           "text": "Read-only preparation verified the current APK identity and found no companion on either running emulator. A four-check rendered/live QA plan is documented; no new installation or interaction acceptance is claimed.",
           "source": "docs/portal-companion-emulator-qa-plan-2026-11-02.md"
+        },
+        {
+          "text": "Subsequent1.7.1/code13 retained these guards and passed564JVM and33rendered checks in a read-only emulator. Historical uninstalled APK statements above retain their original time/scope.",
+          "source": "docs/portal-companion-rendered-settings-delivery-2026-11-02.md"
         }
       ],
       "limits": [
@@ -64,7 +68,7 @@
         "Historical phone receipts do not prove current native UI, installed identity or end-to-end playback.",
         "No phone rewrite or HA music service setup is included."
       ],
-      "next": "Next: a bounded rendered UI check in an isolated Android emulator. Native live multi-room preflight and physical Pixel acceptance require their own current session/device evidence."
+      "next": "Compatibility guards and rendered fixtures are locally verified. Live paired-room and physical Pixel acceptance remain separate."
     },
     {
       "id": "settings-contract",
@@ -167,7 +171,7 @@
         "companion"
       ],
       "owner": "Settings architecture",
-      "deployment": "Current exact 1.70 preserves the accepted 1.68 visibility fix in both rooms; the separate companion preflight APK is not installed.",
+      "deployment": "Exact1.70 preserves accepted1.68 Portal/PWA visibility in both rooms. Companion1.7.1 includes the preflight correction and has emulator fixture proof; live companion/physical acceptance remains open.",
       "state": "3,800 JVM tests / 399 suites, both APK builds and 654 JS tests passed; all 36 Family configuration fields restored.",
       "acceptance": [
         "Document intended shared-setting exceptions and presentation eligibility.",
@@ -201,11 +205,11 @@
         }
       ],
       "limits": [
-        "Companion group preflight is corrected and locally verified (564 tests); that phone APK is not installed. Older clients should enable selected rooms before editing children.",
-        "The live PWA capture showed an Offline banner despite successful management responses; this discrepancy is outside the visibility fix.",
+        "Companion preflight and actual rendered fixtures passed (564 JVM /33 UI); live companion room writes and physical phone acceptance remain open.",
+        "The original visibility capture showed false Offline; the later accepted1.69 connection-status fix is separately recorded.",
         "Separate calendar/bespoke editors retain their owners; no storage migration or general performance claim."
       ],
-      "next": "Local-only release readiness is next. Physical companion installation/acceptance remains open; exhausted issues stay parked."
+      "next": "Portal/PWA visibility is delivered. Current companion rendered checks are verified; native live paired acceptance is next."
     },
     {
       "id": "local-readiness",
@@ -589,36 +593,74 @@
     },
     {
       "id": "companion-native-ui",
-      "title": "Android companion: rendered settings acceptance",
-      "summary": "Next: current settings, Portal selector and mobile layouts in an isolated emulator; physical Pixel proof remains separate.",
+      "title": "Android companion: rendered settings and menus",
+      "summary": "564 unit tests + 33 rendered UI tests passed. Disconnected category guidance fixed; live rooms and physical Pixel remain separate.",
       "description": "Exercise the built companion after its compatibility/preflight changes. Check disabled-parent settings, viewing versus destinations, input admission and dropdown/overlap regression smoke with explicit fixture/live evidence boundaries.",
-      "status": "queued",
-      "verification": "Queued · no current rendered acceptance",
+      "status": "verified",
+      "verification": "Emulator UI verified · strict two-room fixture",
       "kind": "Functional and UI verification",
       "platforms": [
         "companion",
         "portal"
       ],
       "owner": "Companion QA",
-      "deployment": "Current 1.7.0-music-preview/code 12 APK built and locally verified; no companion install in this unit.",
-      "state": "Four-check plan ready. Neither inspected running emulator contains the companion; their existing Hearth state is preserved.",
+      "deployment": "Companion 1.7.1-music-preview / code 13 installed and full APK readback verified in owned API 34 emulator only; no physical phone update.",
+      "state": "09:27:30–09:57:30 UTC slot. 33/33 UI tests in 40.425s; owned read-only emulator stopped at09:50:04. Source AVD and original connections preserved.",
       "acceptance": [
-        "Use an isolated QA environment; verify current artifact identity and actual composed settings/menu behavior.",
-        "For live grouped disabled-parent writes, require valid sessions, per-room baselines and exact key/readback confirmations; restore all changes.",
-        "Check independent viewing/destinations, invalid-value admission and narrow/enlarged-text dropdown/overlap behavior.",
-        "Reserve cleanup within one fresh 30-minute unit; keep physical Pixel performance and live integration verdicts separate."
+        "Verify exact candidate identity and actual composed settings/menu behavior in an isolated Android environment.",
+        "Exercise captured multi-room destinations, disabled-parent metadata, acknowledgement and invalid input admission through the real UI/VM/repository pipeline with an explicitly simulated transport.",
+        "Check viewing versus destinations, right-side selectors, joined actions and narrow/enlarged-text menus.",
+        "Record actual unpaired before/after UI and clean up within the bounded slot; keep live and physical verdicts separate."
       ],
       "evidence": [
         {
           "text": "Read-only source/APK/emulator preparation completed. The plan targets the new preflight acceptance gap rather than relisting previously fixed dropdown defects. No install, token generation or native acceptance was performed.",
           "source": "docs/portal-companion-emulator-qa-plan-2026-11-02.md"
+        },
+        {
+          "text": "Fresh 564 JVM tests/74 suites and both app/test APK builds passed. Actual33/33 Android tests passed in40.425s. App SHA-256 b5a0feb0b0486c53553e3b8126417afa0fd45eae340efd116ab539283ddc10f4,14722589bytes; full installed readback matched. Actual screenshots confirm the category placeholder. Local commit3ae098044a0eaf4f42dadf2fff8184f3aa5a5646.",
+          "source": "docs/portal-companion-rendered-settings-delivery-2026-11-02.md; Toolkit rendered-settings validation receipt"
         }
       ],
       "limits": [
-        "No physical phone is currently reachable. Emulator proof does not establish folded/unfolded Pixel layout, touch, audible music or hardware performance.",
-        "A JVM pass or account-free UI fixture cannot establish live multi-room writes. The inspected emulators have no current companion sessions."
+        "The two-room transport is in-memory; no live Family/Living write or current pairing is established by these tests.",
+        "No physical Pixel installation, folded/unfolded layout, touch, audible playback, FPS or hardware-performance acceptance.",
+        "The numeric fixture uses the supported asText editor branch; it does not prove real Portal metadata. An optional manual five-tab smoke check was not completed and is not counted."
       ],
-      "next": "Execute a fresh bounded emulator UI unit, report fixture/live checks separately and preserve original emulator/Portal state."
+      "next": "Next: native companion with live paired rooms, current per-room baselines and exact readback/restoration. Keep physical Pixel acceptance separately open."
+    },
+    {
+      "id": "companion-live-pairing",
+      "title": "Android companion: live paired-room acceptance",
+      "summary": "Next bounded unit: pair the current native app, verify grouped settings against real rooms and restore exact original values.",
+      "description": "Close the gap between successful rendered fixtures and actual paired Portal HTTP behavior. Discover valid normal onboarding first; do not infer credentials or live acceptance from Fleet or fixture results.",
+      "status": "queued",
+      "verification": "Queued · live sessions and baseline required",
+      "kind": "End-to-end integration",
+      "platforms": [
+        "companion",
+        "portal"
+      ],
+      "owner": "Companion / integration QA",
+      "deployment": "No live companion session or grouped write performed in the rendered UI unit. Current Portal APK is1.70 in both rooms.",
+      "state": "Not started. Use a fresh30-minute unit including cleanup; physical Pixel is independently open.",
+      "acceptance": [
+        "Use normal authorized pairing with secrets kept private; independently verify current client and room identity.",
+        "Capture complete per-room settings before writes. Exercise disabled-parent group preflight and exact confirmed key readback through native UI.",
+        "Preserve viewing versus selected destinations, then restore all original room values and close only owned QA resources.",
+        "If setup prevents live acceptance within the cap, record that boundary without extending the investigation or claiming the fixture as live proof."
+      ],
+      "evidence": [
+        {
+          "text": "Current1.7.1/code13 passes564JVM and33rendered checks; the strict fixture tests are a prerequisite, not live acceptance.",
+          "source": "docs/portal-companion-rendered-settings-delivery-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "No physical phone is currently reachable; emulator live networking would still not establish Pixel touch/layout/audio/performance.",
+        "No GitHub authentication, HA music deployment or parked issue reopening."
+      ],
+      "next": "Inspect the normal pairing path and available private local session evidence, then run only the bounded live cases that can be fully restored."
     }
   ]
 }

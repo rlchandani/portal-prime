@@ -8,7 +8,7 @@
 
 const statuses = [
   { id: "building", label: "Building", note: "Active verification" },
-  { id: "verified", label: "Locally verified", note: "Maintenance · no device deployment" },
+  { id: "verified", label: "Locally verified", note: "Local gates or isolated UI" },
   { id: "queued", label: "Queued", note: "Next bounded units" },
   { id: "approval", label: "Awaiting approval", note: "Decision before implementation" },
   { id: "delivered", label: "Delivered / implemented", note: "Evidence level shown per task" },

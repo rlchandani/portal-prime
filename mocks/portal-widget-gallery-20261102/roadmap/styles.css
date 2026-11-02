@@ -39,6 +39,7 @@ h1 { font-size: clamp(34px, 4vw, 52px); line-height: 1.12; font-weight: 580; let
 .snapshot-dot { width: 7px; height: 7px; border: 1px solid var(--muted); border-radius: 50%; }
 .snapshot a { min-height: 44px; display: inline-flex; align-items: center; }
 .proof { display: grid; grid-template-columns: 0.8fr 1.8fr; gap: 42px; padding: 30px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.companion-proof { margin-top: 24px; }
 .proof-copy h2 { font-size: 34px; line-height: 1.16; letter-spacing: -.8px; font-weight: 550; margin: 18px 0 14px; }
 .proof-copy > p { font-size: 15px; color: var(--muted); max-width: 320px; margin: 0 0 20px; }
 .proof-copy .proof-version { font-size: 13px; line-height: 1.8; }

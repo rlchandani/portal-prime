@@ -56,6 +56,28 @@
           </div>
         </div>
       </section>
+      <section class="proof companion-proof" aria-labelledby="companion-proof-title">
+        <div class="proof-copy">
+          <span class="status-badge" data-status="verified">Verified in Android emulator</span>
+          <h2 id="companion-proof-title">Clearer settings.<br>Tested controls.</h2>
+          <p>564 unit tests and 33 rendered UI tests passed. The disconnected category picker now explains what to do.</p>
+          <p class="proof-version">Companion: <strong>1.7.1 / code 13</strong><br>Live rooms and physical Pixel checks remain open.</p>
+          <a class="text-button" href="#task=companion-native-ui">Read acceptance &amp; limits ↗</a>
+        </div>
+        <div class="comparison">
+          <figure>
+            <figcaption><span>Before</span><span class="figure-note">Internal category name</span></figcaption>
+            <img src="images/companion-category-before.png" alt="Unpaired Android settings picker showing the internal category name immortal." width="996" height="204">
+          </figure>
+          <figure>
+            <figcaption><span>After</span><span class="figure-note">Clear connection guidance</span></figcaption>
+            <img src="images/companion-category-after.png" alt="Unpaired Android settings picker saying Connect to load categories." width="996" height="204">
+          </figure>
+          <div class="comparison-footer">
+            <p>Actual cropped Android 14 emulator captures. These are rendered app screens, separate from the design gallery.</p>
+          </div>
+        </div>
+      </section>
       <p class="approval-note"><span aria-hidden="true">○</span><span>The whole widget gallery is a separate, unapproved design mock. This roadmap grants no UI redesign approval.</span></p>
       <section id="roadmap" class="roadmap" aria-labelledby="queue-title">
         <div class="queue">
@@ -69,7 +91,7 @@
             <button type="button" id="reset-filters" class="reset-button" hidden>Clear filters</button>
           </div>
           <div id="task-list" class="task-list"><p class="loading">Loading saved roadmap…</p></div>
-          <div class="queue-note">Timer ownership and Portal/PWA visibility are delivered. Companion preflight is locally verified; phone acceptance remains open. Local release readiness is verified. The browser connection-status fix is delivered; browser-tab branding is delivered. Companion rendered UI acceptance is next. Parked issues keep their original 30-minute limits.</div>
+          <div class="queue-note">Timer ownership, Portal/PWA visibility, browser connection status and tab branding are delivered. Companion preflight and rendered settings/menu checks passed locally. Live paired-room companion checks are next; physical Pixel acceptance remains open. Parked issues keep their original 30-minute limits.</div>
         </div>
         <aside id="task-detail" class="detail" aria-label="Selected task details" tabindex="-1">
           <p class="loading">Select a task to inspect its evidence.</p>
@@ -78,7 +100,7 @@
     </main>
     <footer>
       <p>Local review artifact · Current room APK: exact 1.70 / code 64</p>
-      <p>Phone maintenance is not installed. No GitHub authentication or publication.</p>
+      <p>Companion 1.7.1 verified in an isolated emulator; physical phone installation remains open. No GitHub authentication or publication.</p>
     </footer>
   </div>
   <noscript><p class="noscript">JavaScript is needed for task filters and details. The complete saved queue is available in <a href="roadmap.json">roadmap.json</a>.</p></noscript>
