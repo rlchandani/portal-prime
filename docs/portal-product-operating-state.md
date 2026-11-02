@@ -70,7 +70,7 @@ The updated whole-product objective is
   `docs/companion-compatibility-validation-2026-11-02.md` in the isolated Toolkit
   checkout. Original 540 companion tests were unchanged and passed against the
   candidate; no separate unmodified-base run or physical phone check is claimed.
-- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents eighteen
+- The [current local roadmap](http://127.0.0.1:8891/roadmap/) presents nineteen
   tracked items with acceptance/evidence/limits and actual cropped clock captures.
   It is a saved priority-queue snapshot, not live telemetry or an exhaustive
   product acceptance report. Browser interactions passed at desktop/mobile
@@ -184,6 +184,29 @@ Existing sessions were reused; fresh PIN pairing, physical Pixel and performance
 remain open. See [scoped acceptance](portal-companion-live-settings-acceptance-2026-11-02.md).
 The18-task roadmap preserves these limits and queues independent local
 fleet/provisioning checks next. No new unit has started.
+
+## Latest fleet transport checkpoint — 2 November 2026
+
+The10:22:40–10:52:40UTC unit implemented a local workstation CLI correction:
+incomplete HTTP responses now fail before file replacement, while the existing
+zero-length procfs convention requires clean EOF. Whole-input JSON validation
+preserves numeric-leading diagnostic text. The old binary produced five failed
+TCP and five failed compiled-CLI cases; review/device findings added reproduced
+procfs and JSON regressions before correction. Final **23 Rust /17 compiled-CLI
+/33 room-helper tests** passed;38 Calls-access checks, three Bash parses, three
+ASCII file checks and actionlint passed. The optimized CLI is675,912bytes.
+
+Actual CLI identity reads passed against both real rooms at1.70/code64; complete
+registry profiles and screensaver configurations were unchanged. Family procfs
+pull/raw each returned305,019bytes. No APK or provisioning/configuration change
+was made. HostedCI, Linux/Python3.12, PowerShell7/Windows5.1 and Windows runtime
+remain unverified. See [delivery and limits](portal-fleet-response-integrity-delivery-2026-11-02.md).
+
+The19-task saved roadmap queues **interrupted upload integrity** next. Source
+opens a destination before the request body completes; interruption remains a
+hypothesis until safely reproduced against a named public scratch file. This
+requires its own30-minute unit and cleanup; no new unit has started and the old
+native cold reconnect/screensaver/performance slots are not reopened.
 
 ## Preserve parked work and scoped acceptance
 

@@ -12,24 +12,68 @@ name: Provisioning scripts
 #     into a phantom quote and breaks parsing — pwsh 7 reads UTF-8 and never sees it.
 #     That false-green is exactly how a broken provision.ps1 shipped before.
 # The ASCII guard makes the most common cause fail fast with a clear message.
+# Fleet coverage builds the std-lib-only CLI and runs its Rust and room-helper
+# regression tests without devices or a real fleet registry.
 on:
   pull_request:
     paths:
+      - ".github/workflows/provisioning.yml"
       - "provisioning/provision.sh"
       - "provisioning/provision.ps1"
       - "provisioning/*.bat"
+      - "provisioning/fleet.rs"
+      - "provisioning/room-fleet.py"
+      - "provisioning/test_room_fleet.py"
+      - "provisioning/test_fleet_http.py"
       - "scripts/provision-access.test.mjs"
       - "scripts/test-provision-access.ps1"
   push:
     branches: [main]
     paths:
+      - ".github/workflows/provisioning.yml"
       - "provisioning/provision.sh"
       - "provisioning/provision.ps1"
       - "provisioning/*.bat"
+      - "provisioning/fleet.rs"
+      - "provisioning/room-fleet.py"
+      - "provisioning/test_room_fleet.py"
+      - "provisioning/test_fleet_http.py"
       - "scripts/provision-access.test.mjs"
       - "scripts/test-provision-access.ps1"
 
 jobs:
+  fleet-tests:
+    name: Fleet CLI and room helper tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build optimized fleet CLI
+        run: rustc -O provisioning/fleet.rs -o "$RUNNER_TEMP/fleetctl"
+
+      - name: Build fleet CLI test suite
+        run: rustc --test provisioning/fleet.rs -o "$RUNNER_TEMP/fleet-tests"
+
+      - name: Run fleet CLI tests
+        run: '"$RUNNER_TEMP/fleet-tests"'
+
+      - name: Run compiled fleet HTTP acceptance tests
+        env:
+          IMMORTAL_FLEET_CLI: ${{ runner.temp }}/fleetctl
+        run: python provisioning/test_fleet_http.py -v
+
+      - name: Run room fleet tests
+        run: python provisioning/test_room_fleet.py -v
+
   lint:
     runs-on: ubuntu-latest
     steps:

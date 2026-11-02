@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 · warm native two-room settings verified; cold reconnect remains open (UTC)",
+  "updatedLabel": "2 Nov 2026 · fleet download integrity fixed and locally verified; native cold reconnect remains open (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "companion-native-ui",
+  "defaultTask": "fleet-local-gates",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms have exact 1.70 / code 64. Companion 1.7.1 / code 13 was verified in an isolated Android emulator; physical phone installation remains open.",
@@ -674,36 +674,78 @@
     },
     {
       "id": "fleet-local-gates",
-      "title": "Fleet and provisioning: current local compatibility gates",
-      "summary": "Next independent unit: validate the current provisioning scripts and fleet CLI without altering device configuration.",
-      "description": "The product inventory still lacks current local provisioning/CLI evidence. Check the existing implementation before labeling any issue a defect; use the first-generation installer and signing constraints in the repository guide.",
-      "status": "queued",
-      "verification": "Queued · no new runtime acceptance",
-      "kind": "Platform and delivery verification",
+      "title": "Fleet CLI: interrupted downloads fail safely",
+      "summary": "Incomplete replies now fail without overwriting downloaded files; complete diagnostics and binary downloads keep working.",
+      "description": "Real TCP and compiled-CLI tests reproduced false success and file replacement on the old binary. The shared reader now validates response framing, preserves the existing zero-length procfs stream convention, and the JSON parser keeps numeric-leading diagnostic text intact.",
+      "status": "verified",
+      "verification": "Locally verified · actual CLI and both-room read-only checks",
+      "kind": "Reliability and continuous verification",
       "platforms": [
         "tooling",
         "portal"
       ],
       "owner": "Fleet / release engineering",
-      "deployment": "No deployment or provisioning change planned. Both Portals retain1.70/code64.",
-      "state": "Not started. One new30-minute unit including cleanup; current cold companion investigation is not reopened.",
+      "deployment": "Workstation CLI built and used for read-only acceptance. No Portal or phone APK deployment; both rooms remain1.70/code64.",
+      "state": "Implemented on codex/fleet-response-integrity-20261102. Final23 Rust /17 actual CLI /33 room-helper checks passed;38 Calls-access checks and local syntax/ASCII gates passed. Complete room configurations unchanged.",
       "acceptance": [
-        "Run the relevant current local Bash parse, ASCII/PowerShell checks where available and std-only Rust compilation.",
-        "Keep secrets private and compile temporary binaries outside tracked delivery artifacts.",
-        "Use read-only known-room identity requests only if required, with current package/signature constraints explicit.",
-        "Distinguish local compilation/parsing from Windows hardware, fresh provisioning, reboot persistence and all-model acceptance."
+        "Interrupted downloads preserve an existing file, create no new file, emit no partial stdout payload and return failure across rooms.",
+        "Complete binary and close-delimited responses still work; legacy procfs reads require clean EOF while ordinary lengths remain strict.",
+        "Actual Family diagnostics preserve numeric-leading text through pull and raw; real CLI identity reads succeed in both rooms.",
+        "Independent fleet workflow gates compile/test temporary binaries; secrets and tracked delivery artifacts stay protected."
       ],
       "evidence": [
         {
-          "text": "The canonical repository guide defines provisioning parse, fleet compile, signing and first-generation installer constraints; inventory still records these current gates as unverified.",
-          "source": "AGENTS.md; docs/portal-product-operating-state.md; skills/immortal-fleet/SKILL.md"
+          "text": "Baseline6 Rust tests passed;5 added TCP and5 compiled-CLI cases failed on the old binary. Final23 Rust /17 compiled-CLI /33 room-helper checks pass; optimized CLI is675,912bytes.",
+          "source": "docs/portal-fleet-response-integrity-delivery-2026-11-02.md; provisioning/fleet.rs; provisioning/test_fleet_http.py"
+        },
+        {
+          "text": "Review-found procfs regression and actual numeric-prefix JSON truncation were reproduced and corrected. Real Family pull/raw each returned305,019bytes; both real CLI identity reads passed with unchanged full settings profiles/screensaver configs.",
+          "source": "Independent source review; private baseline/red/green and actual device receipts in /private/tmp/portal-fleet-local-gates-20261102/"
+        },
+        {
+          "text": "New workflow triggers and separate std-only Rust, real CLI loopback and room-helper job added. actionlint passes; existing Bash/ASCII/PowerShell gates preserved.",
+          "source": ".github/workflows/provisioning.yml"
         }
       ],
       "limits": [
-        "No GitHub authentication/publication or device config mutation.",
-        "Passing local gates does not prove Windows5.1/actual hardware provisioning or wireless ADB survival after reboot."
+        "Hosted CI, Linux/Python3.12, PowerShell7/Windows5.1 and Windows fleet runtime are unobserved.",
+        "No fresh provisioning, reboot-persistence or all-model acceptance; no GitHub authentication/publication or device config mutation.",
+        "Tooling-only correctness checks do not establish general app performance. Native cold reconnect remains open."
       ],
-      "next": "Inspect existing local gate commands and source, then execute only the bounded relevant checks."
+      "next": "Next independent30-minute unit: reproduce interrupted upload behavior using a public scratch file before choosing an atomic-write fix."
+    },
+    {
+      "id": "fleet-upload-integrity",
+      "title": "Fleet uploads: preserve files when interrupted",
+      "summary": "Next data-integrity candidate: confirm whether a cancelled upload replaces an existing destination with partial content.",
+      "description": "Source inspection shows fsWrite opens the destination before streamBodyTo completes. This is a source-supported hypothesis, not yet a reproduced runtime defect. Use an isolated public scratch file on Family and clean it up; never use personal photos or application configuration as test data.",
+      "status": "queued",
+      "verification": "Queued · interruption not yet reproduced",
+      "kind": "Reliability and data integrity",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "Portal storage / fleet engineering",
+      "deployment": "No implementation or deployment yet. Both rooms retain1.70/code64.",
+      "state": "Not started. One fresh30-minute unit including cleanup; parked screensaver/performance and native cold reconnect are not reopened.",
+      "acceptance": [
+        "Reproduce cancellation and complete-upload behavior with isolated public scratch files.",
+        "If reproduced, failed uploads preserve the prior destination and leave no temporary or partial replacement.",
+        "Completed uploads retain existing API compatibility, exact bytes and successful acknowledgement.",
+        "Run relevant regression/build gates and Family acceptance before any delivery; remove owned test files and preserve whole room configuration."
+      ],
+      "evidence": [
+        {
+          "text": "fsWrite opens f.outputStream() before req.streamBodyTo completes, and returns write_failed if streaming throws. Current cancellation behavior has not been exercised.",
+          "source": "app/src/main/java/com/immortal/launcher/FleetRoutes.kt:507; docs/portal-fleet-response-integrity-delivery-2026-11-02.md"
+        }
+      ],
+      "limits": [
+        "No observed upload corruption is claimed yet.",
+        "No destructive owner-data test or GitHub publication; Living delivery requires a final accepted artifact if an Android change is made."
+      ],
+      "next": "Inspect the request streaming and write boundary, then perform one controlled cancellation on a named public scratch file."
     }
   ]
 }

@@ -172,5 +172,24 @@
     "desktopPartialVerificationLabelVisible": true,
     "coldFailureMentionVisible": true,
     "limits": "Saved roadmap browser checks only. Warm live-room checks passed independently; cold native reconnect failed and native numeric editor acceptance was not run. No physical phone or performance acceptance."
+  },
+  "fleetIntegritySnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T10:36:20.843756+00:00",
+    "taskCount": 19,
+    "all19DesktopAndMobileDetailsCheckedAfterReload": true,
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "horizontalOverflow": false,
+    "missingPlatformLabels": false,
+    "roadmapPageErrors": 0,
+    "fleetLocalVerificationAndWindowsLimitsVisible": true,
+    "uploadQueuedAndHypothesisVisible": true,
+    "limits": "Saved roadmap browser presentation only. Actual compiled CLI and real room GET evidence is recorded independently; no hosted/Windows, APK or app performance acceptance."
   }
 }

@@ -63,6 +63,10 @@ impl<'a> Parser<'a> {
     fn parse(&mut self) -> Result<Json, String> {
         self.ws();
         let v = self.value()?;
+        self.ws();
+        if self.i != self.b.len() {
+            return Err(format!("trailing JSON data at {}", self.i));
+        }
         Ok(v)
     }
     fn value(&mut self) -> Result<Json, String> {
@@ -568,27 +572,106 @@ fn request(
     let _ = stream.flush();
 
     let mut raw = Vec::new();
-    if let Err(e) = stream.read_to_end(&mut raw) {
-        // A partial read can still hold a complete response if the peer closed; only
-        // bail when we got nothing.
-        if raw.is_empty() {
-            return (0, format!("read failed: {}", e).into_bytes());
+    let read_failed = stream.read_to_end(&mut raw).is_err();
+    // Existing agents report File.length() == 0 for procfs despite streaming data.
+    // Limit that compatibility behavior to diagnostic paths, never ordinary files.
+    let procfs_stream = is_procfs_read_target(method, &target);
+    match parse_http_response(&raw, read_failed, procfs_stream) {
+        Ok(response) => response,
+        Err(message) => (0, message.as_bytes().to_vec()),
+    }
+}
+
+fn is_procfs_read_target(method: &str, target: &str) -> bool {
+    let query = match target.split_once('?') {
+        Some((route, query)) if method == "GET" && route == "/fs/read" => query,
+        _ => return false,
+    };
+    // Match the agent's queryParam: the first exact key wins, including for raw.
+    let value = match query.split('&').find_map(|pair| {
+        let (key, value) = pair.split_once('=')?;
+        if key == "path" { Some(value) } else { None }
+    }) {
+        Some(value) => value.as_bytes(),
+        None => return false,
+    };
+    let mut decoded = Vec::new();
+    let mut i = 0;
+    while i < value.len() {
+        match value[i] {
+            b'%' => {
+                let high = value.get(i + 1).and_then(|b| (*b as char).to_digit(16));
+                let low = value.get(i + 2).and_then(|b| (*b as char).to_digit(16));
+                match (high, low) {
+                    (Some(h), Some(l)) => decoded.push((h * 16 + l) as u8),
+                    _ => return false,
+                }
+                i += 3;
+            }
+            b'+' => { decoded.push(b' '); i += 1; }
+            byte => { decoded.push(byte); i += 1; }
         }
     }
+    match std::str::from_utf8(&decoded) {
+        Ok(path) => path.starts_with("/proc/") && !path.split('/').any(|part| part == ".."),
+        Err(_) => false,
+    }
+}
 
-    // Split headers / body on the first blank line.
-    let sep = raw.windows(4).position(|w| w == b"\r\n\r\n");
-    let (head, bdy) = match sep {
-        Some(p) => (&raw[..p], raw[p + 4..].to_vec()),
-        None => (&raw[..], Vec::new()),
-    };
-    let status = std::str::from_utf8(head)
-        .ok()
-        .and_then(|h| h.lines().next())
-        .and_then(|line| line.split_whitespace().nth(1))
-        .and_then(|code| code.parse::<u16>().ok())
-        .unwrap_or(0);
-    (status, bdy)
+// The agent uses fixed-length responses or clean EOF for unknown-length streams.
+// A status line alone cannot prove that a JSON reply or downloaded file is complete.
+fn parse_http_response(
+    raw: &[u8], read_failed: bool, procfs_stream: bool,
+) -> Result<(u16, Vec<u8>), &'static str> {
+    let sep = raw.windows(4).position(|w| w == b"\r\n\r\n").ok_or("incomplete HTTP headers")?;
+    let head = std::str::from_utf8(&raw[..sep]).map_err(|_| "invalid HTTP headers")?;
+    let body = &raw[sep + 4..];
+    let mut lines = head.split("\r\n");
+    let mut status_line = lines.next().ok_or("missing HTTP status")?.split_whitespace();
+    let version = status_line.next().ok_or("missing HTTP version")?;
+    if version != "HTTP/1.0" && version != "HTTP/1.1" {
+        return Err("invalid HTTP version");
+    }
+    let code = status_line.next().ok_or("missing HTTP status")?;
+    if code.len() != 3 || !code.bytes().all(|b| b.is_ascii_digit()) {
+        return Err("invalid HTTP status");
+    }
+    let status = code.parse::<u16>().map_err(|_| "invalid HTTP status")?;
+    if !(100..600).contains(&status) {
+        return Err("invalid HTTP status");
+    }
+    let mut content_length = None;
+    for line in lines {
+        let (name, value) = line.split_once(':').ok_or("invalid HTTP header")?;
+        if name.eq_ignore_ascii_case("transfer-encoding") {
+            // Never save undecoded chunks as though they were the original file.
+            return Err("unsupported HTTP transfer encoding");
+        }
+        if name.eq_ignore_ascii_case("content-length") {
+            let value = value.trim();
+            if value.is_empty() || !value.bytes().all(|b| b.is_ascii_digit()) {
+                return Err("invalid HTTP content length");
+            }
+            let length = value.parse::<usize>().map_err(|_| "invalid HTTP content length")?;
+            if content_length.is_some_and(|previous| previous != length) {
+                return Err("conflicting HTTP content lengths");
+            }
+            content_length = Some(length);
+        }
+    }
+    if status == 200 && content_length == Some(0) && procfs_stream {
+        if read_failed {
+            return Err("HTTP diagnostic stream read failed");
+        }
+    } else if let Some(length) = content_length {
+        if body.len() != length {
+            return Err("incomplete or mismatched HTTP body");
+        }
+    } else if read_failed {
+        // With no declared length, only a clean close establishes the end of a stream.
+        return Err("HTTP stream read failed");
+    }
+    Ok((status, body.to_vec()))
 }
 
 // Call + print a (likely JSON) response prettily. Returns process exit code.
@@ -1157,9 +1240,164 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::net::TcpListener;
+    use std::thread;
 
     fn parse(s: &str) -> Json {
         Json::parse(s.as_bytes()).expect("valid json")
+    }
+
+    // Exercise the production TCP request path against a public, isolated server.
+    fn served_response(response: &[u8]) -> (u16, Vec<u8>) {
+        let listener = TcpListener::bind("127.0.0.1:0").expect("loopback listener");
+        let port = listener.local_addr().unwrap().port();
+        let response = response.to_vec();
+        let server = thread::spawn(move || {
+            let (mut socket, _) = listener.accept().unwrap();
+            socket.set_read_timeout(Some(Duration::from_secs(2))).unwrap();
+            let mut header = Vec::new();
+            let mut buf = [0; 1024];
+            while !header.windows(4).any(|w| w == b"\r\n\r\n") {
+                let count = socket.read(&mut buf).unwrap();
+                assert!(count > 0, "client closed before request headers");
+                header.extend_from_slice(&buf[..count]);
+            }
+            assert!(header.starts_with(b"GET /info HTTP/1.1\r\n"));
+            assert!(header.windows(b"Authorization: Bearer PUBLIC-TEST".len())
+                .any(|w| w == b"Authorization: Bearer PUBLIC-TEST"));
+            socket.write_all(&response).unwrap();
+        });
+        let dev = Device {
+            name: "Public fixture".into(), host: "127.0.0.1".into(), port,
+            token: "PUBLIC-TEST".into(), serial: String::new(), model: String::new(),
+        };
+        let result = request(&dev, "GET", "/info", &[], None);
+        server.join().unwrap();
+        result
+    }
+
+    #[test]
+    fn http_rejects_truncated_fixed_length_body() {
+        let (status, body) = served_response(
+            b"HTTP/1.1 200 OK\r\nContent-Length: 20\r\nConnection: close\r\n\r\n{\"ok\":true}");
+        assert_eq!(status, 0, "an interrupted success response is a transport failure");
+        assert_eq!(show(status, body), 1);
+    }
+
+    #[test]
+    fn http_rejects_incomplete_headers() {
+        let (status, _) = served_response(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n");
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn http_rejects_invalid_content_length() {
+        let (status, _) = served_response(b"HTTP/1.1 200 OK\r\nContent-Length: nope\r\n\r\nabc");
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn http_rejects_conflicting_content_lengths() {
+        let (status, _) = served_response(
+            b"HTTP/1.1 200 OK\r\nContent-Length: 3\r\ncontent-length: 9\r\n\r\nabc");
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn http_rejects_unsupported_chunked_encoding() {
+        let (status, _) = served_response(
+            b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n3\r\nabc\r\n0\r\n\r\n");
+        assert_eq!(status, 0, "undecoded chunks must not be presented as a complete file");
+    }
+
+    #[test]
+    fn http_preserves_complete_binary_body() {
+        let response = b"HTTP/1.1 200 OK\r\ncOnTeNt-LeNgTh: 4\r\n\r\n\x00\xff\r\n";
+        let (status, body) = served_response(response);
+        assert_eq!(status, 200);
+        assert_eq!(body, b"\x00\xff\r\n");
+    }
+
+    #[test]
+    fn http_preserves_close_delimited_body() {
+        let (status, body) = served_response(b"HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nabc");
+        assert_eq!(status, 200);
+        assert_eq!(body, b"abc");
+    }
+
+    #[test]
+    fn http_preserves_auth_failure_status() {
+        let (status, body) = served_response(b"HTTP/1.1 401 Unauthorized\r\nContent-Length: 2\r\n\r\n{}");
+        assert_eq!(status, 401);
+        assert_eq!(show(status, body), 1);
+    }
+
+    #[test]
+    fn http_counts_unicode_bytes() {
+        let text = "Café 🛋️";
+        let response = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}", text.len(), text);
+        let (status, body) = served_response(response.as_bytes());
+        assert_eq!(status, 200);
+        assert_eq!(body, text.as_bytes());
+    }
+
+    #[test]
+    fn http_accepts_identical_repeated_lengths() {
+        let (status, body) = served_response(
+            b"HTTP/1.1 200 OK\r\nContent-Length: 3\r\ncontent-length: 3\r\n\r\nabc");
+        assert_eq!(status, 200);
+        assert_eq!(body, b"abc");
+    }
+
+    #[test]
+    fn http_rejects_bytes_beyond_declared_length() {
+        let (status, _) = served_response(b"HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nabc");
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn http_rejects_non_http_status_line() {
+        let (status, _) = served_response(b"PUBLIC 200 OK\r\nContent-Length: 3\r\n\r\nabc");
+        assert_eq!(status, 0);
+    }
+
+    #[test]
+    fn http_requires_clean_close_without_length() {
+        assert!(parse_http_response(b"HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nabc", true, false).is_err());
+    }
+
+    #[test]
+    fn http_accepts_complete_framed_reply_after_read_error() {
+        let (status, body) = parse_http_response(
+            b"HTTP/1.1 200 OK\r\nContent-Length: 3\r\n\r\nabc", true, false).unwrap();
+        assert_eq!(status, 200);
+        assert_eq!(body, b"abc");
+    }
+
+    #[test]
+    fn http_procfs_zero_metadata_requires_clean_close() {
+        let response = b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\nabc";
+        assert!(parse_http_response(response, true, true).is_err());
+        let (status, body) = parse_http_response(response, false, true).unwrap();
+        assert_eq!(status, 200);
+        assert_eq!(body, b"abc");
+    }
+
+    #[test]
+    fn json_rejects_trailing_non_json_data() {
+        for input in [
+            "12c00000-12c01000 r-xp /public.bin",
+            "{\"ok\":true}BROKEN",
+            "truefalse",
+        ] {
+            assert!(Json::parse(input.as_bytes()).is_err(), "not a complete JSON value: {}", input);
+        }
+    }
+
+    #[test]
+    fn json_accepts_trailing_whitespace() {
+        assert!(Json::parse(b"{\"ok\":true} \t\r\n").is_ok());
+        assert!(Json::parse(b"12 \t\r\n").is_ok());
     }
 
     #[test]

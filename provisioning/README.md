@@ -224,6 +224,18 @@ rustc -O fleet.rs -o fleetctl     # no Cargo needed; or:
 cargo build --release             # produces target/release/fleetctl
 ```
 
+The CLI rejects interrupted HTTP responses before reporting success or replacing
+a downloaded file. Legacy zero-length procfs diagnostics require a clean close;
+ordinary files still require their declared length. Run the local transport gates
+against a freshly built binary on macOS/Linux:
+
+```bash
+rustc --test fleet.rs -o /tmp/fleet-tests
+/tmp/fleet-tests
+IMMORTAL_FLEET_CLI="$PWD/fleetctl" python3 test_fleet_http.py -v
+python3 test_room_fleet.py -v
+```
+
 It reads the same `fleet/<serial>.json` files that `--fleet` records, so you can
 target devices by name:
 

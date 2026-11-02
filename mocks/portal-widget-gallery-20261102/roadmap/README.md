@@ -102,3 +102,7 @@ No production patch or physical-phone deployment is implied. Fleet/provisioning
 local gates are the next independent unit; cold failure is not silently retried.
 
 Fresh 18-item snapshot browser check: every detail opened at 390 × 844 without horizontal overflow or undefined labels; the live-result image returned HTTP 200; desktop detail retained the partial-verification label and cold-failure limitation. No page errors were observed. These are roadmap presentation checks, not native acceptance.
+
+The19-task fleet checkpoint records an implemented CLI transport/JSON correction with23 Rust,17 actual CLI and33 room-helper tests; both-room identity/config readbacks and Family procfs acceptance passed. Windows/hosted gates remain open. Interrupted uploads are a new source-supported candidate queued for isolated reproduction, not a claimed defect.
+
+Fresh19-task checks opened every detail at390×844 and1600×1000 without horizontal overflow, undefined platform labels or page errors. Fleet local verification/Windows limits and the queued upload hypothesis were visibly preserved. This is saved-page presentation evidence only.
