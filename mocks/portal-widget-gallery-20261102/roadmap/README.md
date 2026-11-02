@@ -26,7 +26,7 @@ Initial facts come from `docs/portal-product-operating-state.md`, the named
 delivery receipts and the coordinator's 2026-11-02 terminal native-gate update:
 3,796 tests / 398 suites; both APKs, R8, vital lint, version sync and signature
 checks passed; maintenance commit `2682e3a99edb4210ea298eff6272c83273a974f5`.
-Both rooms retain accepted 1.66 / code 60. No maintenance install is planned.
+Both rooms now have exact 1.67 / code 61 after the accepted Home timer fix. Native settings maintenance is included, without fresh settings UI acceptance. Phone maintenance remains uninstalled. See docs/portal-home-timer-delivery-2026-11-02.md.
 
 Only these cropped card captures were copied from the private temporary folder:
 `world-before-card.png`, `final-three-normal-card.png`, and
@@ -44,3 +44,5 @@ were zero. Desktop/mobile screenshots were visually reviewed. Main corrected
 same-page task-link synchronization and long evidence-string wrapping.
 See `validation.json` for the bounded browser receipt. This is not native device
 acceptance or a complete accessibility/performance audit.
+
+The later timer snapshot adds the accepted native timer fix and a dialog-only native capture (`images/timer-editor-native.png`). Browser data updates do not imply repeat acceptance of older features.

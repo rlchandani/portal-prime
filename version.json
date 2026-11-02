@@ -1,6 +1,6 @@
 {
-  "versionCode": 60,
-  "versionName": "1.66",
+  "versionCode": 61,
+  "versionName": "1.67",
   "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
   "notes": "World clock widgets fit complete city rows to their available height and text scale, with a clear count of remaining cities."
 }

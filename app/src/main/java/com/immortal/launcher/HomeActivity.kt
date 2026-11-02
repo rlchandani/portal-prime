@@ -3575,6 +3575,75 @@ private fun ImmortalTimersWidget(modifier: Modifier = Modifier) {
   if (showTimersPage) ApprovedHomeTimersPage { showTimersPage = false }
 }
 
+/** The Home editor shares the widget/screensaver countdown and its existing alarm. */
+@Composable
+internal fun ApprovedHomeTimerEditor(onDismiss: () -> Unit) {
+  val context = androidx.compose.ui.platform.LocalContext.current
+  var state by remember(context) { mutableStateOf(TimerStore.load(context)) }
+  var nowMs by remember { mutableStateOf(System.currentTimeMillis()) }
+  var showCustom by remember { mutableStateOf(false) }
+  DisposableEffect(context) {
+    val listener: () -> Unit = {
+      state = TimerStore.load(context)
+      nowMs = System.currentTimeMillis()
+    }
+    TimerStore.addListener(listener)
+    onDispose { TimerStore.removeListener(listener) }
+  }
+  val active = LocalApprovedLauncherPageActive.current
+  LaunchedEffect(state.running, state.endsAt, active) {
+    if (!active) return@LaunchedEffect
+    while (state.running) {
+      nowMs = System.currentTimeMillis()
+      if (state.remaining(nowMs) <= 0L) break
+      delay(1_000)
+    }
+  }
+  if (showCustom) {
+    CustomTimerDialog(
+        onStart = { duration ->
+          if (duration > 0L) {
+            if (state.ringing) TimerAlarm.stop(context)
+            TimerStore.start(context, duration)
+          }
+          showCustom = false
+        },
+        onDismiss = { showCustom = false },
+    )
+  } else {
+    ApprovedHomeDialog("Timer", onDismiss) {
+      val remaining = state.remaining(nowMs)
+      Text(
+          when {
+            state.ringing -> "Time's up"
+            remaining > 0L -> "%d:%02d".format(remaining / 60_000, remaining / 1_000 % 60)
+            else -> "Ready"
+          },
+          color = ApprovedHomePalette.Text, fontSize = 48.sp, lineHeight = 60.sp,
+      )
+      Text(
+          "Shown on Home and in the screensaver.",
+          color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp,
+      )
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        when {
+          state.ringing -> TimerChip("Stop") { TimerAlarm.stop(context) }
+          remaining > 0L -> {
+            TimerChip(if (state.running) "Pause" else "Resume") {
+              if (state.running) TimerStore.pause(context) else TimerStore.resume(context)
+            }
+            TimerChip("Reset") { TimerStore.clear(context) }
+          }
+          else -> listOf(5, 10, 30).forEach { minutes ->
+            TimerChip("${minutes}m") { TimerStore.start(context, minutes * 60_000L) }
+          }
+        }
+      }
+      if (!state.ringing) TimerChip("Custom duration") { showCustom = true }
+    }
+  }
+}
+
 /**
  * Home widget for the wake-up alarm ([AlarmConfig]). Shows the next fire time + label when armed,
  * or "No alarm" when off; a chip toggles it on/off, and tapping the body opens the alarm editor.

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-11-02",
-  "updatedLabel": "2 Nov 2026 (UTC)",
+  "updatedLabel": "2 Nov 2026 \u00b7 1.67 delivered to both rooms (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "companion-compat",
+  "defaultTask": "timer-ownership",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Existing rooms retain accepted 1.66 / code 60. No new maintenance APK deployment is planned.",
+    "Both rooms have exact 1.67 / code 61. Family timer acceptance passed; phone maintenance is not installed.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -19,7 +19,7 @@
       "summary": "555 tests / 73 suites passed. Debug and test APKs built; physical phone acceptance remains open.",
       "description": "Protect capability fallback and reject stale responses when a phone switches rooms or sessions. Work is isolated on codex/companion-compat-20261102, using the preserved companion source.",
       "status": "verified",
-      "verification": "Locally verified · not deployed",
+      "verification": "Locally verified \u00b7 not deployed",
       "kind": "Regression protection",
       "platforms": [
         "companion",
@@ -56,21 +56,21 @@
         "Historical phone receipts do not prove current native UI, installed identity or end-to-end playback.",
         "No phone rewrite or HA music service setup is included."
       ],
-      "next": "Local maintenance is committed. Keep physical phone and live playback checks separate; timer ownership is next."
+      "next": "Phone maintenance is committed but uninstalled. Keep live playback/native phone checks separate; settings visibility is next."
     },
     {
       "id": "settings-contract",
       "title": "Native settings editor contract",
-      "summary": "Full local gates passed: 3,796 tests / 398 suites. Maintenance verified; rooms stay on accepted 1.66.",
+      "summary": "3,796 tests / 398 suites passed; maintenance is included in installed 1.67. Fresh settings UI acceptance remains open.",
       "description": "Replace the obsolete inline-string prohibition with classification and projection coverage for the renderer's actual supported editors. This protects the existing settings behavior.",
       "status": "verified",
-      "verification": "Locally verified · not deployed",
+      "verification": "Locally verified \u00b7 included in deployed APK",
       "kind": "Maintenance",
       "platforms": [
         "portal"
       ],
       "owner": "Settings QA / Main",
-      "deployment": "No new device install planned; accepted room 1.66 unchanged",
+      "deployment": "Included in exact 1.67 APK in both rooms; no fresh native settings interaction run",
       "state": "Terminal local gates passed in 3m 58s",
       "acceptance": [
         "Cover real registry editor selection, including inline and Activity-backed strings, fleet name and dashboard URL.",
@@ -96,22 +96,22 @@
         "Built APKs are local verification artifacts; neither room has this maintenance increment deployed.",
         "No new visible feature or widget redesign is claimed."
       ],
-      "next": "Local maintenance is committed. Retain accepted 1.66 installations; timer ownership is the next bounded unit."
+      "next": "Keep renderer UI acceptance distinct from classification tests. Shared visibility policy is next."
     },
     {
       "id": "timer-ownership",
-      "title": "Reproduce timer widget / editor ownership",
-      "summary": "Next: first reproduce the TimerStore / TimerConfig mismatch before choosing semantics.",
-      "description": "The widget reads TimerStore while its approved editor hosts an overlay writing TimerConfig. A shared destination can hide different data owners; source inspection alone does not establish a device failure.",
-      "status": "queued",
-      "verification": "Source discrepancy · not reproduced",
-      "kind": "Correctness investigation",
+      "title": "Home timer editor uses the widget countdown",
+      "summary": "Fixed and installed in both rooms. Family verified shared countdown, controls, custom duration, alarm Stop and both editor entry points.",
+      "description": "On Family 1.66, starting 5m in the Home editor created a kitchen timer while the widget stayed Ready. The Home editor now uses the existing shared countdown. Tools keeps its kitchen-timer collection.",
+      "status": "delivered",
+      "verification": "Family native acceptance \u00b7 both exact APK readbacks",
+      "kind": "Correctness fix",
       "platforms": [
         "portal"
       ],
-      "owner": "Product / architecture",
-      "deployment": "No candidate built or deployed",
-      "state": "Next after active-unit gates and cleanup",
+      "owner": "Main / QA",
+      "deployment": "Exact optimized 1.67 / code 61 in Family Area and Living Area",
+      "state": "Accepted in the 30-minute slot; original Family layout, Home page and screensaver configuration restored.",
       "acceptance": [
         "Reproduce the widget/editor behavior on the existing owner path before labeling it a runtime defect.",
         "Record the intended widget/editor semantics and show that the selected editor changes the displayed timer.",
@@ -119,23 +119,40 @@
       ],
       "evidence": [
         {
-          "text": "ImmortalTimersWidget uses TimerStore; ApprovedHomeTimersPage hosts TimersOverlay writing TimerConfig.",
-          "source": "docs/portal-product-operating-state.md; docs/design/portal-widget-settings-map-2026-11-02.md"
+          "text": "1.66 native red: editor 5m created one kitchen timer while Home stayed Ready. 1.67 native green: shared countdown running, kitchen count zero.",
+          "source": "docs/portal-home-timer-delivery-2026-11-02.md"
+        },
+        {
+          "text": "Start, pause, Back/widget observation, reopen, resume, reset, custom 0:10, exact-alarm ringing, Stop, picker Cancel, Close and Customize Settings passed on Family.",
+          "source": "Private native UI and persisted-state receipts, 2026-11-02"
+        },
+        {
+          "text": "3,796 JVM tests / 398 suites, both APKs, R8 and vital lint passed. Source review found no concrete regression.",
+          "source": "docs/portal-home-timer-review-2026-11-02.md; delivery receipt"
+        },
+        {
+          "text": "Both installed APKs exactly match SHA-256 80895ce251f65b9f7a9018d0be974fd1c2c222cf4160539f970c1c9a93400262 (25,860,666 bytes). Living used one dispatch despite uncertain acknowledgement.",
+          "source": "Family readback; Living InstallObserver and independent readback"
+        },
+        {
+          "text": "Actual installed editor capture, cropped to exclude personal Home photos.",
+          "source": "images/timer-editor-native.png"
         }
       ],
       "limits": [
-        "The ownership mismatch is a source finding, not a reproduced device failure.",
-        "No migration, timer rewrite or new preference is approved by this queue."
+        "Tools kitchen timers, existing stores and alarm receivers were preserved; no migration or schema change.",
+        "No audible judgement, background/screen-off or screensaver rendering test, enlarged-text/focus matrix or repeated Living interaction run.",
+        "No FPS or latency improvement is claimed."
       ],
-      "next": "Run one bounded reproduction, then record an owner decision and acceptance cases before implementation."
+      "next": "Move to shared disabled-parent settings visibility; keep exhausted issues parked."
     },
     {
       "id": "settings-visibility",
       "title": "Agree disabled-parent settings visibility",
-      "summary": "After timer reproduction: settle native / browser presentation policy before alignment.",
+      "summary": "Next: settle native / browser disabled-parent presentation policy, then align the shared setting surfaces.",
       "description": "Native preparation hides disabled screensaver children while the remote schema can expose ordinary children through spec predicates. The intended shared policy needs to be explicit.",
       "status": "queued",
-      "verification": "Policy pending · source only",
+      "verification": "Policy pending \u00b7 source only",
       "kind": "Shared settings policy",
       "platforms": [
         "portal",
@@ -143,10 +160,10 @@
       ],
       "owner": "Settings architecture",
       "deployment": "No change built or deployed",
-      "state": "Queued after timer reproduction",
+      "state": "Queued next after accepted timer delivery and restored test state.",
       "acceptance": [
         "Document intended shared-setting exceptions and presentation eligibility.",
-        "Cover enabled/disabled × Advanced × source/style in real registered-domain projections and schemas.",
+        "Cover enabled/disabled \u00d7 Advanced \u00d7 source/style in real registered-domain projections and schemas.",
         "Preserve saved inactive values and intended validated API writes."
       ],
       "evidence": [
@@ -160,7 +177,7 @@
         "Presentation alignment does not imply a blanket apply restriction.",
         "Offline schema checks and later native/browser checks are separate gates."
       ],
-      "next": "Agree the policy after timer reproduction, then test the shared domain matrix before changing presentation."
+      "next": "Record the shared policy, then test the real domain visibility matrix before changing presentation."
     },
     {
       "id": "local-readiness",
@@ -168,7 +185,7 @@
       "summary": "Prepare an honest local evidence gate without authentication or publication.",
       "description": "The existing release script couples useful checks with forbidden publication steps and omits the unit gate. A local-only readiness path must keep missing evidence visible.",
       "status": "queued",
-      "verification": "Specified next work · not implemented",
+      "verification": "Specified next work \u00b7 not implemented",
       "kind": "Delivery tooling",
       "platforms": [
         "portal",
@@ -231,7 +248,7 @@
       "summary": "Separate browser mock. Portal / Android / iOS interpretations remain unapproved.",
       "description": "The gallery is a review artifact for possible future widget presentation. Its platform columns are design interpretations, not shipped platform implementations.",
       "status": "approval",
-      "verification": "Design mock · unapproved",
+      "verification": "Design mock \u00b7 unapproved",
       "kind": "Design",
       "platforms": [
         "design"
@@ -260,20 +277,20 @@
     {
       "id": "world-clock",
       "title": "World Clock: complete rows & city counts",
-      "summary": "Accepted 1.66 / code 60, exact artifact in both rooms. Family normal and 150% checks passed.",
-      "description": "The existing 488 × 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
+      "summary": "World Clock normal and 150% acceptance passed on 1.66; the fix is preserved in current 1.67 on both rooms.",
+      "description": "The existing 488 \u00d7 380 card now fits complete time/city/day rows and reports remaining saved cities. The final candidate also reserves enlarged-text space for the footer.",
       "status": "delivered",
-      "verification": "Device proof · both rooms",
+      "verification": "Device proof \u00b7 both rooms",
       "kind": "Visible correctness fix",
       "platforms": [
         "portal"
       ],
       "owner": "Native / QA",
-      "deployment": "Exact 1.66 / code 60 in Family Area and Living Area",
+      "deployment": "Delivered previously; preserved in current exact 1.67 / code 61 on both rooms. Original native acceptance is recorded separately.",
       "state": "Delivered within bounded acceptance",
       "acceptance": [
-        "Family normal text: two complete cities; three cities show “1 more city”; four show “2 more cities.”",
-        "Family 150% text live and cold: one complete city row and an unclipped “2 more cities” caption.",
+        "Family normal text: two complete cities; three cities show \u201c1 more city\u201d; four show \u201c2 more cities.\u201d",
+        "Family 150% text live and cold: one complete city row and an unclipped \u201c2 more cities\u201d caption.",
         "Restore original city order, font scale, Home page and all 36 original screensaver fields; preserve grid spans/order."
       ],
       "evidence": [
@@ -300,16 +317,16 @@
     {
       "id": "photo-alarm",
       "title": "Photo Memory routing & alarm countdown",
-      "summary": "1.65 / code 59 delivered to both rooms; fixes retained in accepted 1.66.",
+      "summary": "1.65 scoped native acceptance passed; both fixes are preserved in current 1.67 on both rooms.",
       "description": "Photo Memory editing opens Photo sources even with idle slideshow disabled. The active-page alarm caption observes saved configuration, rounds partial minutes up and refreshes at minute boundaries.",
       "status": "delivered",
-      "verification": "Device proof · both rooms",
+      "verification": "Device proof \u00b7 both rooms",
       "kind": "Visible correctness fixes",
       "platforms": [
         "portal"
       ],
       "owner": "Main / QA",
-      "deployment": "Delivered at 1.65 / code 59; rooms now retain accepted 1.66",
+      "deployment": "Delivered previously; preserved in current exact 1.67 / code 61 on both rooms. Original native acceptance is recorded separately.",
       "state": "Scoped native acceptance passed",
       "acceptance": [
         "Family source entry works with idle slideshow disabled and enabled; Back returns through Photos to Home.",
@@ -331,7 +348,7 @@
         "Living did not receive a duplicate physical interaction run.",
         "Observer counts and equivalent-scenario performance comparisons remain unverified."
       ],
-      "next": "Keep the accepted receipt and current 1.66 device baseline; no maintenance reinstall is planned."
+      "next": "Keep the original scoped acceptance receipt; current room artifact is 1.67. Broader native acceptance remains separate."
     },
     {
       "id": "ci-regressions",
@@ -377,7 +394,7 @@
       "summary": "Issue slot exhausted. No candidate retained; further work needs a new explicit decision.",
       "description": "The zero-black-frame candidate delayed complete Home to 1,169 ms versus 418 ms. The old handoff investigation remains parked.",
       "status": "parked",
-      "verification": "Parked · 30-minute rule",
+      "verification": "Parked \u00b7 30-minute rule",
       "kind": "Exhausted experiment",
       "platforms": [
         "portal"
@@ -406,7 +423,7 @@
       "summary": "Legacy motion work remains parked after rejected candidates and failed native cases.",
       "description": "The seven legacy night-style investigations retain their exhausted status. Three reopened motion candidates were rejected; the final run retained two native failures and only 5/11 strict cases.",
       "status": "parked",
-      "verification": "Parked · 30-minute rule",
+      "verification": "Parked \u00b7 30-minute rule",
       "kind": "Exhausted experiment",
       "platforms": [
         "portal"
@@ -435,7 +452,7 @@
       "summary": "Cold Shuffle, rejected Home / Apps / settings experiments and incomplete gesture cases stay parked.",
       "description": "Earlier rejected and timed-out investigations keep their original receipts and boundaries. Current correctness and maintenance results do not resolve these separate performance questions.",
       "status": "parked",
-      "verification": "Parked · evidence limits retained",
+      "verification": "Parked \u00b7 evidence limits retained",
       "kind": "Exhausted experiments",
       "platforms": [
         "portal"
