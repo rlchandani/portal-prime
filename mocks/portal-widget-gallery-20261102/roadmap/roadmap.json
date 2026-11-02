@@ -1,18 +1,59 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T18:32:26.493637+00:00",
-  "updatedLabel": "2 November2026 \u00b7 Phone deletion candidate verified",
+  "updatedAt": "2026-11-02T18:48:49.800201+00:00",
+  "updatedLabel": "2 November2026 \u00b7 Phone upload candidate verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "companion-photo-delete-confirmation",
+  "defaultTask": "companion-photo-upload-confirmation",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms retain exact optimizedPortal1.82/code76. Companion1.7.2/code14 deletion candidate verified in an isolated Android emulator; physical-phone installation remains open. Historical receipts keep their original versions.",
+    "Both rooms retain exact optimizedPortal1.82/code76. Companion1.7.3/code15 upload/deletion candidate verified in an isolated Android emulator; physical-phone installation remains open. Historical receipts keep their original versions.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "companion-photo-upload-confirmation",
+      "title": "Phone photo upload: confirm the destination",
+      "summary": "Built and emulator-verified. Uncertain uploads stay Unconfirmed and cannot be resent by Retry failed; physical-phone installation remains open.",
+      "description": "Require literal success, exact normalized destination/name and matching numeric bytes. Preserve confirmation through local cleanup errors and uncertainty through failed metadata refresh.",
+      "status": "verified",
+      "verification": "590 JVM /76 suites \u00b7 7 normal rendered cases \u00b7 3 upload cases at130% text \u00b7 exact emulator candidate",
+      "kind": "Native photo transfer outcome reliability",
+      "platforms": [
+        "companion",
+        "portal"
+      ],
+      "owner": "Phone engineering / independent source review / isolated native QA",
+      "deployment": "Companion1.7.3/code15 candidate fully read back in ownedAPI34 emulator. No physical Pixel deployment; Portal1.82 unchanged in both rooms.",
+      "state": "Client/repository/group outcome correction using existing panel. App/test builds and signing passed; owned emulator removed, original AVD and complete room configurations retained.",
+      "acceptance": [
+        "Require actual Boolean success, exact destination/file and matching numeric bytes.",
+        "Keep unreadable positive replies and transport loss Unconfirmed; preserve explicit rejection and401.",
+        "Exclude uncertain images from Retry failed; retry only captured failed room destinations.",
+        "Preserve confirmed results through local cleanup exceptions and uncertainty through failed photo-list refresh.",
+        "Verify actual group panel/repository/client with generated media at normal and130% text; preserve source AVD and remove owned emulator."
+      ],
+      "evidence": [
+        {
+          "text": "Reproduced old failures, corrected review defects, final gates and actual rendered scope.",
+          "source": "docs/portal-companion-photo-upload-2026-11-02.md"
+        },
+        {
+          "text": "Structured artifact, rendered native, room-retention and cleanup proof.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/companion-photo-upload-verification.json"
+        }
+      ],
+      "limits": [
+        "In-memory native fixture: no physical Pixel, live-network upload or whole-app snackbar acceptance.",
+        "Unconfirmed is not proof that an image was not stored.",
+        "Cleanup exception tests prove attempted disposal and preserved outcome; local cleanup can still need attention.",
+        "No cold reconnect, auth race, playback, FPS or universal speedup claim.",
+        "Zero Portal writes/installs or GitHub/HA action; exhausted issues remain parked."
+      ],
+      "next": "Install the signed candidate when a physical phone is available. Continue the independent Quick controls owner-routing mock; production route changes require design approval."
+    },
     {
       "id": "companion-photo-delete-confirmation",
       "title": "Phone photo deletion: verify the selected file",
@@ -52,41 +93,7 @@
         "No cold-reconnect, race, playback, FPS or universal performance claim.",
         "No Portal write/install or GitHub/HA action; exhausted issues remain parked."
       ],
-      "next": "Install the signed candidate when the physical phone is available. Continue independent upload-acknowledgment consistency work in its own bounded unit."
-    },
-    {
-      "id": "companion-photo-upload-confirmation",
-      "title": "Phone photo upload: audit acknowledgment identity",
-      "summary": "Source checks bytes but not literal success or destination identity. Reproduce the outcome before choosing a focused correction.",
-      "description": "An independent native client/repository/group contract unit. Browser upload proof does not establish equivalent phone behavior.",
-      "status": "queued",
-      "verification": "Source evidence only \u00b7 no new runtime defect claim",
-      "kind": "Native photo transfer outcome reliability",
-      "platforms": [
-        "companion",
-        "portal"
-      ],
-      "owner": "Phone engineering / QA",
-      "deployment": "No candidate or deployment for this item.",
-      "state": "Current uploadPhoto uses byte comparison after the general coercing success parser. Group and single-room completion need bounded verification.",
-      "acceptance": [
-        "Reproduce wrong/missing path or coerced success in current native client before patching.",
-        "Preserve real server rejection,401/session handling, streaming and cleanup.",
-        "Never silently resend an image when a response cannot confirm storage.",
-        "Use existing UI/error presentation unless a larger design is approved.",
-        "Run relevant whole JVM/build gates and targeted isolated native fixture; physical phone is separate."
-      ],
-      "evidence": [
-        {
-          "text": "Current native client uploadPhoto and single/group repositories are the next source boundary.",
-          "source": "app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt in the isolated Toolkit checkout"
-        }
-      ],
-      "limits": [
-        "No fresh reproduction or upload patch under the current deletion unit.",
-        "No reopening of cold reconnect, Weather, keyboard, music or performance slots."
-      ],
-      "next": "One fresh30-minute unit including reproduction, correction, verification and cleanup; preserve current candidate and pairings."
+      "next": "Deletion guard retained and its four native cases pass in1.7.3. Physical phone acceptance remains open; see the separately verified upload item."
     },
     {
       "id": "photo-delete-confirmation",

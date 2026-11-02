@@ -773,5 +773,36 @@
     "structuredProofHttpStatus": 200,
     "footerVersions": "Portal1.82/code76; Companion1.7.2/code14 candidate",
     "limits": "Roadmap content verification only; native fixture, gates, exact installed emulator artifact and unchanged Portal readbacks have separate receipts."
+  },
+  "companionUploadSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-02T18:50:01.220831+00:00",
+    "taskCount": 41,
+    "counts": {
+      "verified": 15,
+      "delivered": 18,
+      "parked": 5,
+      "approval": 2,
+      "queued": 1
+    },
+    "companionVersion": "1.7.3 /code15",
+    "portalVersion": "1.82 /code76",
+    "twoChangedDetailsCheckedAtDesktopAndMobile": true,
+    "desktopViewport": [
+      1600,
+      1000
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ],
+    "horizontalOverflow": false,
+    "pageErrors": 0,
+    "all41RowsRendered": true,
+    "servedRoadmapExactlyMatchesFile": true,
+    "structuredEvidenceHttpStatus": 200,
+    "nativeCountsVisible": true,
+    "physicalPhoneLimitVisible": true,
+    "harnessCorrection": "The first two presentation assertions expected Locally verified inside the badge. Source renders task verification text there; final check uses data-status=verified and passed. No product defect or page exception.",
+    "limits": "Updated roadmap details/queue/footer only. Actual Android fixtures, artifact/retention and cleanup have their own scoped receipt; no physical-phone acceptance or all41 detail repeat."
   }
 }

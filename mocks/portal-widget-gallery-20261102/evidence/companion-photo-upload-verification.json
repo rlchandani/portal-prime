@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "scope": "Native GroupProgressPanel/repository/client with generated PNGs and in-memory transport; owned emulator only",
+  "phoneVersion": "1.7.3-music-preview /code15",
+  "companionCommit": "6bf11bf1d35cffdab43a2c766fd57ae0595fef6f",
+  "initialJvm": {
+    "tests": 11,
+    "failures": 9
+  },
+  "reviewRegressions": {
+    "first": {
+      "tests": 16,
+      "failures": 2
+    },
+    "singleCleanup": {
+      "tests": 1,
+      "failures": 1
+    }
+  },
+  "jvm": {
+    "tests": 590,
+    "suites": 76,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "focusedJvm": {
+    "tests": 17,
+    "passed": 17
+  },
+  "assembly": {
+    "app": true,
+    "androidTest": true,
+    "combinedFinalSeconds": 9
+  },
+  "rendered": {
+    "normal": {
+      "tests": 7,
+      "passed": 7,
+      "uploadTests": 3,
+      "retainedDeleteTests": 4,
+      "seconds": 14.901,
+      "fontScale": 1.0
+    },
+    "largeText": {
+      "tests": 3,
+      "passed": 3,
+      "seconds": 8.765,
+      "fontScale": 1.3
+    },
+    "apiLevel": 34,
+    "viewportDp": [
+      360,
+      800
+    ]
+  },
+  "emulatorInstalled": {
+    "bytes": 15374817,
+    "sha256": "2c3361e926d6659e83eac51a60d7c51d81a80fa9503aac28fae7cb1e46c83436",
+    "matches": true
+  },
+  "sourceAvd": {
+    "ready": true,
+    "sourceUnchanged": true,
+    "ownedResourcesRemoved": true
+  },
+  "roomRetention": {
+    "rooms": {
+      "family": {
+        "checks": {
+          "profileUnchanged": true,
+          "layoutUnchanged": true,
+          "screensaverUnchanged": true,
+          "current182ArtifactUnchanged": true
+        },
+        "installedApkBytes": 25860990,
+        "installedSha256": "25ebd04107d0dfbf0b116a5992a547e83f182c0de98ae43e3bfaf36a9fc11939"
+      },
+      "living": {
+        "checks": {
+          "profileUnchanged": true,
+          "layoutUnchanged": true,
+          "screensaverUnchanged": true,
+          "current182ArtifactUnchanged": true
+        },
+        "installedApkBytes": 25860990,
+        "installedSha256": "25ebd04107d0dfbf0b116a5992a547e83f182c0de98ae43e3bfaf36a9fc11939"
+      }
+    },
+    "family": {
+      "fontUnchanged": true,
+      "servicesUnchanged": true,
+      "noPendingBinding": true,
+      "originalChromeRetained": true,
+      "manualPhotoFrameResumed": true
+    },
+    "portalWrites": 0,
+    "portalInstalls": 0
+  },
+  "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "performanceScope": "No automatic uncertain-upload replay or new polling; failed-only retry isolates captured failed destinations. No latency/FPS/speedup claim.",
+  "limits": [
+    "Physical Pixel and live-network upload acceptance open",
+    "No whole-app snackbar or all-screen visual acceptance",
+    "No cold reconnect, auth race, playback or general performance acceptance",
+    "No Portal write/install or real user-photo transfer",
+    "Disposal exception tests prove attempted cleanup and retained result, not successful cleanup"
+  ],
+  "app-debug.apk": {
+    "bytes": 15374817,
+    "sha256": "2c3361e926d6659e83eac51a60d7c51d81a80fa9503aac28fae7cb1e46c83436"
+  },
+  "app-debug-androidTest.apk": {
+    "bytes": 1701242,
+    "sha256": "2eef85b8ffe37078da7fdbbc6c62abe5ab7b2843f996994be1e0270b6a9caabd"
+  }
+}
