@@ -13,6 +13,22 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Current host CLI / Fleet endpoint port admission:** invalid supplied direct
+  or selected registry ports now fail validation before authenticated requests
+  and registry fanout. Missing defaults, valid integral ports, primary/legacy
+  precedence and explicit-host registry bypass remain. Twelve frozen actual-CLI
+  methods reproduce seven failing methods/35 assertions then pass; **182 host
+  tests**, zero skips. Exact tested macOS arm64 executable is atomically installed
+  in the ignored local `provisioning/fleetctl`, original bytes preserved privately;
+  installed copy separately passes the same 12 methods. Fresh compilation and
+  independent source review pass, with one unused-helper compiler warning.
+  YAML triggers/commands and shell syntax checked; hosted CI/Windows unobserved.
+  Generated loopback and normal cleanup only; no owner registry or room operation.
+  Portal remains **1.112/code106**, with its qualified Weather runtime-cache
+  exception retained below. **87 tasks: 53 delivered, 24 locally verified, 3 approval,
+  6 parked, 1 queued.** Original **08:14:58–08:44:58 UTC** audit clock retained;
+  broader goal stays active. [Receipt](portal-fleet-port-admission-2026-11-03.md).
+
 - **Current room APK / Snapcast connection ownership:** exact optimized
   **1.112/code106** is installed and fully hashed in both rooms. Each connected
   metadata exchange now closes its own socket on EOF or failure; request,

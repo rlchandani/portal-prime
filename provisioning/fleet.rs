@@ -428,11 +428,15 @@ fn load_registry() -> Vec<Device> {
             .or_else(|| j.get("host").and_then(|v| v.as_str()))
             .unwrap_or("")
             .to_string();
-        let port = j
-            .get("agentPort")
-            .and_then(|v| v.as_i64())
-            .or_else(|| j.get("port").and_then(|v| v.as_i64()))
-            .unwrap_or(DEFAULT_PORT as i64) as u16;
+        let port = match j.get("agentPort").or_else(|| j.get("port")) {
+            None => DEFAULT_PORT,
+            Some(Json::Num(port))
+                if port.is_finite() && port.fract() == 0.0 && (1.0..=65535.0).contains(port) =>
+            {
+                *port as u16
+            }
+            _ => die(&format!("invalid port in registry entry {}", path.display())),
+        };
         out.push(Device {
             name: j.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string(),
             host,
@@ -449,10 +453,11 @@ fn load_registry() -> Vec<Device> {
 fn resolve_targets(args: &Args) -> Vec<Device> {
     if let Some(host) = args.flag("host") {
         let token = args.flag("token").unwrap_or_else(|| die("--host requires --token"));
-        let port = args
-            .flag("port")
-            .and_then(|p| p.parse().ok())
-            .unwrap_or(DEFAULT_PORT);
+        let port = match args.flag("port") {
+            None => DEFAULT_PORT,
+            Some(value) => value.parse::<u16>().ok().filter(|port| *port != 0)
+                .unwrap_or_else(|| die("--port must be an integer from 1 to 65535")),
+        };
         return vec![Device {
             name: host.clone(),
             host,
@@ -1336,6 +1341,29 @@ mod tests {
 
     fn parse(s: &str) -> Json {
         Json::parse(s.as_bytes()).expect("valid json")
+    }
+
+    #[test]
+    fn direct_target_keeps_valid_port_boundaries() {
+        for port in [1, 65535] {
+            let argv: Vec<String> = [
+                "info", "--host", "127.0.0.1", "--token", "PUBLIC-TEST", "--port",
+                &port.to_string(),
+            ].iter().map(|value| value.to_string()).collect();
+            let targets = resolve_targets(&parse_args(&argv));
+            assert_eq!(targets.len(), 1);
+            assert_eq!(targets[0].port, port);
+            assert_eq!(targets[0].host, "127.0.0.1");
+        }
+    }
+
+    #[test]
+    fn direct_target_keeps_omitted_port_default() {
+        let argv: Vec<String> = ["info", "--host", "127.0.0.1", "--token", "PUBLIC-TEST"]
+            .iter().map(|value| value.to_string()).collect();
+        let targets = resolve_targets(&parse_args(&argv));
+        assert_eq!(targets.len(), 1);
+        assert_eq!(targets[0].port, DEFAULT_PORT);
     }
 
     // Exercise the production TCP request path against a public, isolated server.

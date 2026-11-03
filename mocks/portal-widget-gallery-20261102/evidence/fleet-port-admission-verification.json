@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "unit": "Fleet endpoint port admission",
+  "recordedAt": "2026-11-03T08:26:58.907880+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T08:14:58+00:00",
+    "deadline": "2026-11-03T08:44:58+00:00",
+    "originalIndependentAuditClockRetained": true
+  },
+  "baseCommit": "181eb52052e843a8774a5a39092d56c6285c49f1",
+  "status": "locally verified and exact host CLI installed",
+  "scope": "Native macOS arm64; generated private registries and owned127.0.0.1 peers. No owner registry/device/provider.",
+  "sourceHashes": {
+    "provisioning/fleet.rs": "05c7218802342d60e0cb39347c38feffd3d96cbcb69d89b1ef794290e0dc7887",
+    "provisioning/test_fleet_ports.py": "e995457709be722368239c46f8685b638513a995d4584c56c7e82ad482ddad39",
+    ".github/workflows/provisioning.yml": "0169ed2d03ef98bea6dd2b0d9e24de90467588ad665b5bb0c522985d4a2468a5",
+    "provisioning/README.md": "a9136e206f431f8ddef8178800721eaef6e767a5670b33c7c8b6bf55d4b080a1"
+  },
+  "artifacts": {
+    "compiler": {
+      "version": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+      "sha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1",
+      "reusedHistoricalOwnedToolchainReadOnly": true
+    },
+    "baseline": {
+      "sourceSha256": "75b50784186428ef5ff14975d8ec566fdd3d3572f235e89deb0cd9cd839f7362",
+      "binarySha256": "6ba472bc4d5e8f511717bb4f3bf3ba9cc1057932535d0966fbd913f020248ca4",
+      "bytes": 694352,
+      "compileTerminalExit": 0
+    },
+    "candidate": {
+      "sourceSha256": "05c7218802342d60e0cb39347c38feffd3d96cbcb69d89b1ef794290e0dc7887",
+      "binarySha256": "e49b00eb1de129a4f5e75ab9091aacbfcd09293a40197556a5b6e4249cb07555",
+      "bytes": 694352,
+      "compileTerminalExit": 0,
+      "rustTestCompileTerminalExit": 0
+    },
+    "frozenPortsTestSha256": "e995457709be722368239c46f8685b638513a995d4584c56c7e82ad482ddad39",
+    "compileAttemptHistory": {
+      "initialPathRustcTerminalExit": 127,
+      "reason": "Rust compiler not on shell PATH; reuse discovered existing private toolchain.",
+      "initialFixtureExecutions": 0
+    },
+    "architecture": "Mach-O 64-bit executable arm64",
+    "scope": "Host macOS arm64 native executable; no Android APK/release/version change."
+  },
+  "baseline": {
+    "terminalExit": 1,
+    "tests": 12,
+    "failedMethodCount": 7,
+    "assertionFailures": 35,
+    "errors": 0,
+    "skips": 0,
+    "failedMethods": [
+      "test_invalid_direct_port_never_falls_back_to_owned_default",
+      "test_invalid_legacy_types_are_rejected_without_network",
+      "test_invalid_primary_type_cannot_fall_through_to_valid_legacy_alias",
+      "test_invalid_registry_numeric_ranges_are_rejected_without_network",
+      "test_invalid_registry_record_blocks_entire_fanout",
+      "test_registry_fraction_does_not_truncate_to_owned_ephemeral_port",
+      "test_registry_overflow_does_not_wrap_to_owned_ephemeral_port"
+    ],
+    "sourceSha256": "1e270d34cb977d66f35faf6ca694c8b2b3fa99a163ddc1b8b58ccf000a308fc7",
+    "baselineCompiledSourceSha256": "75b50784186428ef5ff14975d8ec566fdd3d3572f235e89deb0cd9cd839f7362",
+    "testSha256": "e995457709be722368239c46f8685b638513a995d4584c56c7e82ad482ddad39",
+    "baselineBinarySha256": "6ba472bc4d5e8f511717bb4f3bf3ba9cc1057932535d0966fbd913f020248ca4",
+    "logSha256": "b2419225db81d372cb7f6dfbb5fa7be5524593c706af25ba202ff6a64ac55dd4",
+    "admissionOutcome": "Require existing validation die exit2 and stderr error: prefix containing port, no generated credential. Transport exit1 is not accepted as port validation.",
+    "excludedAttempts": [
+      "Attempt1: one default control skipped because fixture lacked SO_REUSEADDR; admission failures retained but excluded.",
+      "Attempt2: no fixture errors/skips, but weak nonzero/port diagnostic assertion allowed direct0 transport error to pass. Strengthened to validation outcome before freeze; no production edit."
+    ]
+  },
+  "hostGates": {
+    "recordedAt": "2026-11-03T08:21:59.036113+00:00",
+    "jobs": {
+      "rust": {
+        "terminalExit": 0,
+        "tests": 25,
+        "seconds": 0.15,
+        "skips": 0,
+        "logSha256": "8d51ec621fb34c0904fd055a53eba5a11417233655480234b122865eadea9dd7"
+      },
+      "ports": {
+        "terminalExit": 0,
+        "tests": 12,
+        "seconds": 0.72,
+        "skips": 0,
+        "logSha256": "cbb609de3dc658ac62a2f775331d9a9e28fbfb6ca8f7df421377435ab8d96312"
+      },
+      "http": {
+        "terminalExit": 0,
+        "tests": 28,
+        "seconds": 1.77,
+        "skips": 0,
+        "logSha256": "78934081af44ad495f1147da85abacdec85db78c94b29307f15578a8543a6e7b"
+      },
+      "room": {
+        "terminalExit": 0,
+        "tests": 60,
+        "seconds": 10.25,
+        "skips": 0,
+        "logSha256": "9a44d525e6df736cbe6d2fedbaed554edb7d48f97d9497c4fb8a36b3d3f7b361"
+      },
+      "backup": {
+        "terminalExit": 0,
+        "tests": 23,
+        "seconds": 15.51,
+        "skips": 0,
+        "logSha256": "ea984bd9a3003e7ddfd9624841d335786739a730cc37b5958b40f27f36c42333"
+      },
+      "restore": {
+        "terminalExit": 0,
+        "tests": 34,
+        "seconds": 13.25,
+        "skips": 0,
+        "logSha256": "6f006181d35e13bd0c9827cdfec71b25841cbe76c4dd4880cd66bef3f8d474fa"
+      }
+    },
+    "allActualJobsJoined": true,
+    "seconds": 15.53,
+    "freshCandidateCliSha256": "e49b00eb1de129a4f5e75ab9091aacbfcd09293a40197556a5b6e4249cb07555",
+    "frozenTestSha256": "e995457709be722368239c46f8685b638513a995d4584c56c7e82ad482ddad39",
+    "scope": "Actual local Rust25 and compiled CLI/generated loopback ports+HTTP; private generated room/backup/restore regression suites. No owner registry, devices, providers, publication, Windows or hosted CI."
+  },
+  "totalHostTests": 182,
+  "localDelivery": {
+    "installedAt": "2026-11-03T08:23:52.798027+00:00",
+    "localCliPath": "~/.codex/worktrees/portal-music-player/portal-prime/provisioning/fleetctl",
+    "sourceSha256": "05c7218802342d60e0cb39347c38feffd3d96cbcb69d89b1ef794290e0dc7887",
+    "installedBinarySha256": "e49b00eb1de129a4f5e75ab9091aacbfcd09293a40197556a5b6e4249cb07555",
+    "bytes": 694352,
+    "modePreserved": true,
+    "executable": true,
+    "atomicReplacement": true,
+    "originalBinaryPrivateBackupSha256": "c4c791adbdaef1df4db3df6c774c394ba7b950c3a2e7643835c9eb2395acecc5",
+    "originalSha256MatchedBeforeReplacement": true,
+    "noPendingReplacementFile": true,
+    "scope": "Exact tested macOS arm64 local CLI only. No owner registry edit, room update, Android APK mutation or publication."
+  },
+  "installedAcceptance": {
+    "recordedAt": "2026-11-03T08:25:59.677324+00:00",
+    "terminalExit": 0,
+    "tests": 12,
+    "errors": 0,
+    "failures": 0,
+    "skips": 0,
+    "installedBinarySha256": "e49b00eb1de129a4f5e75ab9091aacbfcd09293a40197556a5b6e4249cb07555",
+    "frozenTestSha256": "e995457709be722368239c46f8685b638513a995d4584c56c7e82ad482ddad39",
+    "logSha256": "829c1b74044788deaa86c35b5f6d76d9c0341c71ea442e3fc4db3194d5106445",
+    "scope": "Actual installed macOS arm64 CLI; same frozen generated private registries and owned loopback peers. Normal fixture cleanup; no owner registry, devices or external provider."
+  },
+  "ciStructure": {
+    "recordedAt": "2026-11-03T08:26:04.837211+00:00",
+    "parsed": true,
+    "sha256": "0169ed2d03ef98bea6dd2b0d9e24de90467588ad665b5bb0c522985d4a2468a5",
+    "bothTriggersContainNewTest": true,
+    "mainPushPreserved": true,
+    "compiledCliEnvironmentPreserved": true,
+    "httpThenPortsCommandsExact": true,
+    "hostedExecutionObserved": false,
+    "windowsExecutionObserved": false
+  },
+  "shellSyntax": {
+    "checks": 3,
+    "terminalExits": [
+      0,
+      0,
+      0
+    ],
+    "logSha256": "b9986aca92d9a99b127e844fdaf32ac345a15cbf8dd49b73d4d3688d6195b5ca"
+  },
+  "independentSourceReview": {
+    "blockingFindings": 0,
+    "reportSha256": "a1408a6e04642eadf5170d4105e0bba7fb55fa59a9782597c8896ba290270390"
+  },
+  "compilerWarning": "One dead_code warning for existing as_i64 now unused outside Rust test; no compiler error.",
+  "roomArtifact": "Existing1.112/code106 retained; no Android source/version change, build or install in this host unit.",
+  "resourceScope": "Fixture normal listener/thread/subprocess/temp cleanup covered; no external-runner timeout/fault injection. Existing deliverable preview server preserved. Original local binary privately retained.",
+  "backlog": {
+    "tasks": 87,
+    "delivered": 53,
+    "verified": 24,
+    "approval": 3,
+    "parked": 6,
+    "queued": 1,
+    "all86PriorTaskRecordsUnchanged": true,
+    "defaultWeatherAndBoundariesUnchanged": true
+  },
+  "limits": [
+    "Actual compiled macOS arm64 CLI and generated private registries/owned loopback peers only; no owner registry, real device command, Portal or phone operation.",
+    "Default-port cases require exclusive fixture ownership of 8723 and may skip on another host; all accepted runs have zero skips. Port 1/65535 use selection/listing, not listeners.",
+    "Existing malformed-JSON and empty/missing-token skip behavior, JSON duplicate keys, selector conflicts, hostname/token syntax and general deadlines remain. Numeric admission uses existing f64 JSON representation.",
+    "Normal fixture resource retirement is covered; external runner timeout/failure cleanup was not independently fault-injected.",
+    "Hosted Ubuntu/Windows/PowerShell execution is unobserved. One existing as_i64 helper becomes unused and emits a compiler warning.",
+    "Portal source and version remain at 1.112/code106; prior qualified Weather runtime-cache exception is retained. No Android build/install, HA, GitHub authentication, push or publication."
+  ],
+  "broaderGoal": "active",
+  "documentationAcceptance": {
+    "strictMkdocsTerminalExit": 0,
+    "warnings": 0,
+    "errors": 0,
+    "finalBuildSeconds": 2.44,
+    "finalBuildLogSha256": "63342d9c6f70f9cf404b94ba6bde3e2254f8040bfbe4757c631b954d4fe04da9",
+    "browser": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 87,
+          "checks": [
+            {
+              "id": "fleet-port-admission",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "snapcast-connection",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 87,
+          "checks": [
+            {
+              "id": "fleet-port-admission",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "snapcast-connection",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "screenshotsVisuallyInspected": [
+      390,
+      1600
+    ],
+    "qaReportSha256": "404f7ea51669dff5b9c6142e62230ebb3d88f3062c4ad3b3ea45b6c94ce38434",
+    "proofByteCheck": "Initial and final served-byte checks retained privately; final proof bytes rechecked after this metadata write."
+  }
+}

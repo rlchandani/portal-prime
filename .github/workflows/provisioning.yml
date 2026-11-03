@@ -25,6 +25,7 @@ on:
       - "provisioning/room-fleet.py"
       - "provisioning/test_room_fleet.py"
       - "provisioning/test_fleet_http.py"
+      - "provisioning/test_fleet_ports.py"
       - "provisioning/fleet-backup.sh"
       - "provisioning/fleet-backup-data.py"
       - "provisioning/test_fleet_backup.py"
@@ -43,6 +44,7 @@ on:
       - "provisioning/room-fleet.py"
       - "provisioning/test_room_fleet.py"
       - "provisioning/test_fleet_http.py"
+      - "provisioning/test_fleet_ports.py"
       - "provisioning/fleet-backup.sh"
       - "provisioning/fleet-backup-data.py"
       - "provisioning/test_fleet_backup.py"
@@ -76,10 +78,12 @@ jobs:
       - name: Run fleet CLI tests
         run: '"$RUNNER_TEMP/fleet-tests"'
 
-      - name: Run compiled fleet HTTP acceptance tests
+      - name: Run compiled fleet HTTP and endpoint acceptance tests
         env:
           IMMORTAL_FLEET_CLI: ${{ runner.temp }}/fleetctl
-        run: python provisioning/test_fleet_http.py -v
+        run: |
+          python provisioning/test_fleet_http.py -v
+          python provisioning/test_fleet_ports.py -v
 
       - name: Run room fleet tests
         run: python provisioning/test_room_fleet.py -v

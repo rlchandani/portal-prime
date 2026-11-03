@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T08:11:30.137464+00:00",
+  "updatedAt": "2026-11-03T08:26:58.904149+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,51 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-port-admission",
+      "title": "Fleet: validate ports before requests and fanout",
+      "summary": "Locally verified and installed: invalid supplied ports stop before authenticated requests; valid defaults and aliases remain.",
+      "description": "Validate the selected JSON numeric port before u16 conversion and direct port before target creation. Abort invalid token-bearing registry rows before any fanout; preserve explicit-host registry bypass.",
+      "status": "verified",
+      "verification": "12 frozen CLI methods:35 red assertions\u2192pass \u00b7 182 host tests \u00b7 installed copy 12/12",
+      "kind": "Host Fleet endpoint admission",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Fleet tooling / independent regression and artifact review",
+      "deployment": "Exact tested macOS arm64 CLI atomically installed locally; Portal APK remains 1.112/code106.",
+      "state": "Original ignored executable preserved privately. Generated registries and loopback fixtures only; no owner registry or room operation.",
+      "acceptance": [
+        "Require validation exit 2 before default, wrapped, fractional or invalid-primary alias endpoint requests.",
+        "Reject an invalid selected port before all registry fanout; retain primary precedence, default omission and valid legacy/named targeting.",
+        "Run frozen actual-CLI baseline and candidate, full relevant host suites and exact installed executable acceptance.",
+        "Retain source/artifact/log bindings, CI triggers, prior task records and all existing room/permission boundaries."
+      ],
+      "evidence": [
+        {
+          "text": "Port admission correction, frozen actual-CLI reproduction, host gates and exact local executable acceptance.",
+          "source": "docs/portal-fleet-port-admission-2026-11-03.md"
+        },
+        {
+          "text": "Bound source/compiler/executables, red/green logs and scoped local host delivery.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/fleet-port-admission-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual compiled macOS arm64 CLI and generated private registries/owned loopback peers only; no owner registry, real device command, Portal or phone operation.",
+        "Default-port cases require exclusive fixture ownership of 8723 and may skip on another host; all accepted runs have zero skips. Port 1/65535 use selection/listing, not listeners.",
+        "Existing malformed-JSON and empty/missing-token skip behavior, JSON duplicate keys, selector conflicts, hostname/token syntax and general deadlines remain. Numeric admission uses existing f64 JSON representation.",
+        "Normal fixture resource retirement is covered; external runner timeout/failure cleanup was not independently fault-injected.",
+        "Hosted Ubuntu/Windows/PowerShell execution is unobserved. One existing as_i64 helper becomes unused and emits a compiler warning.",
+        "Portal source and version remain at 1.112/code106; prior qualified Weather runtime-cache exception is retained. No Android build/install, HA, GitHub authentication, push or publication."
+      ],
+      "next": "Retain this local host delivery. Real-device endpoint acceptance and hosted cross-platform CI remain open; continue distinct authorized work without reopening parked clocks.",
+      "issueClock": {
+        "startedAt": "2026-11-03T08:14:58+00:00",
+        "deadline": "2026-11-03T08:44:58+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "snapcast-connection",
       "title": "Snapcast metadata: retire every connected socket",

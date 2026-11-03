@@ -254,6 +254,13 @@ For app updates, the CLI also validates the complete per-package batch, even on
 older agents that send `ok:true` with failed entries. The `count` must match the
 distinct result entries, and every installation must report `installed`.
 `update --check` requires a complete discovery array with package/version entries.
+Supplied ports must be integers from 1 to 65535. For `--host` targeting, invalid
+`--port` values stop before requests; invalid registry ports do the same.
+They do not fall back, wrap or truncate. `agentPort` takes priority over the
+legacy `port` field; the default 8723 applies when both are absent. An invalid port in any
+token-bearing registry entry stops registry-based commands before fanout, so
+valid rooms cannot receive a partial command. Explicit host targeting bypasses
+the registry.
 Legacy zero-length procfs diagnostics require a clean close;
 ordinary files still require their declared length. Run the local transport gates
 against a freshly built binary on macOS/Linux:
@@ -262,6 +269,7 @@ against a freshly built binary on macOS/Linux:
 rustc --test fleet.rs -o /tmp/fleet-tests
 /tmp/fleet-tests
 IMMORTAL_FLEET_CLI="$PWD/fleetctl" python3 test_fleet_http.py -v
+IMMORTAL_FLEET_CLI="$PWD/fleetctl" python3 test_fleet_ports.py -v
 python3 test_room_fleet.py -v
 ```
 
