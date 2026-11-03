@@ -72,9 +72,9 @@ object HomeWidgetStore {
   // disappears on update. New installs seed them too; users can now delete them.
   private const val KEY_DASH_MIGRATED = "dashboard_cards_migrated"
 
-  fun migrateDashboardCards(context: Context) {
+  fun migrateDashboardCards(context: Context) = synchronized(RemoteCompanionStore.mutationLock) {
     val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-    if (prefs.getBoolean(KEY_DASH_MIGRATED, false)) return
+    if (prefs.getBoolean(KEY_DASH_MIGRATED, false)) return@synchronized
     val current = load(context)
     val migrated =
         listOf(custom(KIND_TODAY, spanX = 2, spanY = 1, explicitSize = false)) +
@@ -99,13 +99,34 @@ object HomeWidgetStore {
     return placementSnapshot.read(raw)
   }
 
-  fun save(context: Context, widgets: List<HomeWidget>) {
+  fun save(context: Context, widgets: List<HomeWidget>) = synchronized(RemoteCompanionStore.mutationLock) {
     context
         .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit()
         .putString(KEY, serialize(widgets))
         .apply()
   }
+
+  /** Add is independent of the displayed layout; retain every currently saved widget. */
+  fun add(context: Context, widget: HomeWidget): List<HomeWidget> =
+      synchronized(RemoteCompanionStore.mutationLock) {
+        withAdded(load(context), widget).also { save(context, it) }
+      }
+
+  /** Editing an old display must never replace a newer remote restore or native edit. */
+  fun replaceIfUnchanged(
+      context: Context,
+      expected: List<HomeWidget>,
+      widgets: List<HomeWidget>,
+  ): Boolean = synchronized(RemoteCompanionStore.mutationLock) {
+    if (load(context) != expected) return@synchronized false
+    save(context, widgets)
+    return true
+  }
+
+  fun observe(context: Context, changed: () -> Unit): () -> Unit =
+      observeSettingsPreferenceChanges(
+          context.getSharedPreferences(PREFS, Context.MODE_PRIVATE), setOf(KEY), changed)
 
   fun custom(kind: String, spanX: Int = DEFAULT_SPAN_X, spanY: Int = DEFAULT_SPAN_Y,
       explicitSize: Boolean = false): HomeWidget =

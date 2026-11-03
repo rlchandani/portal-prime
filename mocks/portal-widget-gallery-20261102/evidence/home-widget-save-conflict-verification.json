@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "title": "Native Home edits preserve newer remote widget layouts",
+  "status": "delivered",
+  "checkedAtUtc": "2026-11-03T05:13:56.288613+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T04:53:22Z",
+    "deadline": "2026-11-03T05:23:22Z",
+    "originalDiscoveryClockRetained": true
+  },
+  "artifact": {
+    "versionName": "1.100",
+    "versionCode": 94,
+    "sha256": "ecf713dbf11abbe71e93f5e6fc1af5e0caa5df2599623c3535e9b4d4de13172b",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "debugSha256": "2d38f637bf32a5b414877f53206f25af64b6c1c9bda8e11611119d398d27c8c1",
+    "rollbackSha256": "27967ddb71cc8c91a486d912bb7b4952692f61cc0b4e6bcd754fd41d965a0ab9"
+  },
+  "reviewedHashes": {
+    "app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt": "63cbdfc607082f5dae8658e788599df95faf0de23ee6edc9560ac0adb24de7eb",
+    "app/src/main/java/com/immortal/launcher/HomeActivity.kt": "21993475e38e6956acfc3448f5a41b1af2007f031c9d8cf230ccf70ee662879b",
+    "app/src/test/java/com/immortal/launcher/HomeWidgetMutationTest.kt": "f08f9f2f6f849f1f91d2006c7347bfa2df574a34ac8d50e1ae5968fc76b90f5c",
+    "app/build.gradle.kts": "5488dd1343f06de3592465751aac9511c77c7f76a30f98ab3d5fa70ffa1cfe61"
+  },
+  "independentReview": {
+    "status": "clearAfterCorrections",
+    "corrections": [
+      "Join remote revision/preflight/apply lock for every native widget writer",
+      "Capture expected widget list at resize gesture start"
+    ]
+  },
+  "tests": {
+    "redMethods": 7,
+    "redFailures": 5,
+    "redScope": "Temporary old-replacement-behavior API adapter; retained-list Add reproduced separately",
+    "finalMutationMethods": 9,
+    "jvmTests": 4084,
+    "jvmSuites": 425,
+    "failures": 0,
+    "errors": 0,
+    "debugAssembly": true,
+    "optimizedAssembly": true,
+    "r8": true,
+    "vitalLint": true,
+    "finalAndroidGateSeconds": 95
+  },
+  "androidStoreFixture": {
+    "copiedDebugApkSha256": "2d38f637bf32a5b414877f53206f25af64b6c1c9bda8e11611119d398d27c8c1",
+    "status": "PASS",
+    "checks": {
+      "productionClassOwnedByApkLoader": true,
+      "actualRemoteRestoreAddsB": true,
+      "actualAddRetainsRemoteWidget": true,
+      "retainedSnapshotUnchanged": true,
+      "staleResizeRejectedWithoutWrite": true,
+      "staleRemoveCannotRestoreB": true,
+      "staleReorderCannotUndoRemoteSize": true,
+      "freshEditSucceeds": true,
+      "addDoesNotRestoreRemovedWidget": true,
+      "sameSnapshotHasOneWinner": true,
+      "nativeAddSharesRemotePreflightLock": true,
+      "writerCompletesAfterLockRelease": true,
+      "observerFiltersUnrelatedKey": true,
+      "actualObserverReceivesWidgetSave": true,
+      "observerStopsAndUnregistersOnce": true
+    },
+    "scope": "Actual debug-APK Android store/API with generated in-memory preferences",
+    "appPreferencesWritten": 0,
+    "fixturePreferenceWrites": 28,
+    "remainingFixtureListeners": 0,
+    "optimizedApkProof": false,
+    "nativeHomeUiProof": false,
+    "actualAppWidgetBindingDeletion": false,
+    "alarmsTouched": false,
+    "notificationDelivery": "Generated synchronous fixture notifications, not Android main-thread delivery"
+  },
+  "fixtureJavaSha256": "0d2271168a431bfe926905a3aa53eb8bc9b8e49ea80516d50d4fe3e2461a8ecd",
+  "optimizedFamilyUi": {
+    "baselineVersion": "1.99",
+    "candidateVersion": "1.100",
+    "baseline": {
+      "remoteWidgetBPreserved": false,
+      "nativeTodayAdded": true,
+      "originalFixtureAPreserved": true
+    },
+    "candidate": {
+      "remoteWidgetBPreserved": true,
+      "nativeTodayAdded": true,
+      "originalFixtureAPreserved": true
+    },
+    "remotePhase": {
+      "acknowledgedRemoteWidgetB": true,
+      "sameHomeActivityRecord": true
+    },
+    "openGallery": {
+      "old": {
+        "onHomeLabels": 1,
+        "calendarDescriptors": [],
+        "calendarVisible": true
+      },
+      "new": {
+        "onHomeLabels": 2,
+        "calendarDescriptors": [],
+        "calendarVisible": true
+      }
+    },
+    "resize": {
+      "freshNativeResizeChangesSpan": true,
+      "gestureActiveBeforeRemoteApply": true,
+      "gestureActiveAfterRemoteApply": true,
+      "remoteSizeRetainedAfterOverlappingNativeGesture": true,
+      "gestureDispatchesCompleted": true
+    },
+    "freshResizeSpan": {
+      "columns": 3,
+      "rows": 2
+    },
+    "remoteResizeSpan": {
+      "columns": 1,
+      "rows": 1
+    }
+  },
+  "trialCorrections": [
+    "Offscreen Stocks lookup refused the action; visible Today used for old/new sequence",
+    "Legacy presentation-hint resize assertion unsuitable; explicit 2x2 control rerun",
+    "Interim preservation captured Home open before final photo-frame return"
+  ],
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "primaryRegistryUnchanged": true,
+    "copiedRegistryRemoved": true,
+    "ownedDeviceUiXmlRemoved": true,
+    "ownedDeviceFixtureRemoved": true,
+    "familyFrameVisuallyReviewed": true
+  },
+  "publication": {
+    "publicManifestUnchanged": true,
+    "publicVersionName": "1.83",
+    "publicVersionCode": 77,
+    "versionGuardExit": 1,
+    "intentionalMismatchRejected": true,
+    "githubAuthentication": false,
+    "publication": false
+  },
+  "limits": [
+    "Debug-APK store fixture uses generated synchronous notifications, not real Android notification threading",
+    "No actual AppWidgetHost binding deletion/provider setup or full Move/Remove navigation acceptance",
+    "No API28, original Home page state, natural Dream recovery or Living visual acceptance",
+    "No phone operation, Home Assistant change or general performance claim",
+    "Existing design approvals, exhausted clocks and publication boundaries preserved"
+  ],
+  "documentationAndRoadmap": {
+    "strictDocumentationBuild": {
+      "exit": 0,
+      "warnings": 0,
+      "seconds": 1.92,
+      "informationalWorkstationAndAnchorNoticesRemain": true
+    },
+    "previousTaskRecordsPreserved": 72,
+    "totalTasks": 73,
+    "defaultTaskPreserved": true,
+    "newTaskPlatformLabel": "Portal, Browser remote",
+    "browserChecks": [
+      {
+        "width": 390,
+        "height": 844,
+        "defaultTaskPreserved": true,
+        "tasks": 73,
+        "checks": [
+          {
+            "id": "home-widget-save-conflicts",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          },
+          {
+            "id": "release-signing-baseline",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          }
+        ],
+        "pageErrors": 0,
+        "externalRequests": 0,
+        "proofHttp200AndByteIdentical": true
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "defaultTaskPreserved": true,
+        "tasks": 73,
+        "checks": [
+          {
+            "id": "home-widget-save-conflicts",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          },
+          {
+            "id": "release-signing-baseline",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          }
+        ],
+        "pageErrors": 0,
+        "externalRequests": 0,
+        "proofHttp200AndByteIdentical": true
+      }
+    ],
+    "ownedBrowserAndContextsClosed": true,
+    "existingServerPreserved": true,
+    "capturesVisuallyReviewed": true,
+    "mobileCaptureLimit": "Existing focused skip-link overlay; clean visual/accessibility acceptance not claimed"
+  }
+}

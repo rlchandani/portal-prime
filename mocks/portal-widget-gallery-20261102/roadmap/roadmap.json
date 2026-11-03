@@ -1,18 +1,62 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T04:48:15.712933+00:00",
-  "updatedLabel": "2 November 2026 Pacific \u00b7 1.99 in both rooms; mandatory release signing baseline locally verified",
+  "updatedAt": "2026-11-03T05:08:53.126705+00:00",
+  "updatedLabel": "2 November 2026 Pacific \u00b7 1.100 in both rooms; native widget edits preserve remote changes",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.99/code93. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.100/code94. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "home-widget-save-conflicts",
+      "title": "Home widgets: preserve newer remote layout edits",
+      "summary": "Delivered to both rooms: native Add preserves remote widgets, and stale resize/move/remove edits refresh without overwriting.",
+      "description": "Optimized1.99 lost an acknowledged remote Calendar when native Add used its retained list. Current writers share the remote revision lock; Add reads current storage and edits compare against their displayed or gesture-start snapshot.",
+      "status": "delivered",
+      "verification": "9 mutation / 4,084 JVM \u00b7 15 Android store checks \u00b7 optimized Add and 5 resize checks",
+      "kind": "Home layout persistence and remote consistency",
+      "platforms": [
+        "portal",
+        "browser"
+      ],
+      "owner": "Native Home / independent reliability review",
+      "deployment": "Exact optimized1.100/code94 installed and fully hashed in Family Area and Living Area.",
+      "state": "Complete maps and Home/timer preference bytes match originals. Family font/services/preflight Chrome retained; normal photo frame visibly restored. Owned scratch/XML/registry removed.",
+      "acceptance": [
+        "Keep acknowledged remote additions and removals when adding from native Home.",
+        "Reject stale whole-list edits and retain the snapshot from resize gesture start.",
+        "Share native writes and binding deletion with remote revision/preflight/apply locking.",
+        "Observe saved widgets while Home remains open and restore all owner state after native checks."
+      ],
+      "evidence": [
+        {
+          "text": "Failure, locking/snapshot correction, real native Add/resize, preservation and limits.",
+          "source": "docs/portal-home-widget-save-conflicts-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized reviewed hashes, tests, debug-APK Android checks and optimized room deployment.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/home-widget-save-conflict-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual Android widget binding deletion/provider setup and full Move/Remove navigation unverified.",
+        "Debug-APK fixture notification delivery is generated; optimized UI covers specified Add/resize only.",
+        "No API28, original Home page state, natural Dream recovery, Living visual or general performance acceptance.",
+        "No phone/HA/GitHub publication operations; public manifest1.83 remains guarded."
+      ],
+      "next": "Retain this delivered reliability fix; existing design approvals and parked work remain separate.",
+      "issueClock": {
+        "startedAt": "2026-11-03T04:53:22Z",
+        "deadline": "2026-11-03T05:23:22Z",
+        "originalDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "release-signing-baseline",
       "title": "Release safety: require the published signing baseline",

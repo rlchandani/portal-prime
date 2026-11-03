@@ -13,6 +13,23 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Current room APK / native widget save conflicts:** exact optimized
+  **1.100/code94** is installed and fully hashed in both rooms. Add retains the
+  latest saved list; stale whole-list edits reload and request a retry. Widget
+  writes share the remote revision/apply lock, resize captures its start
+  snapshot, and Android binding deletion follows a successful save. Nine
+  mutation / **4,084 JVM425 suites**, debug/optimized/R8/vital-lint pass.
+  Fifteen actual debug-APK Android store checks pass without app writes.
+  Optimized Family Add reproduces1.99's lost Calendar then retains it on1.100;
+  the open gallery reflects the update. Five resize checks include a normal
+  2×2→3×2 gesture and retained remote1×1 during an active gesture. Both complete
+  saved maps and Home/timer preference bytes match. Family frame/font/services/
+  preflight Chrome are retained; owned fixture/XML/registry removed. Binding
+  deletion, full Move/Remove, API28 and Living visuals remain unverified.
+  **73 tasks:41 delivered,22 locally verified,3 approval,6 parked,1 queued.**
+  Original **04:53:22–05:23:22UTC** clock retained; broader goal remains active.
+  [Receipt](portal-home-widget-save-conflicts-2026-11-03.md).
+
 - **Public release signing gate / locally verified:** failed published-APK
   downloads now stop the release instead of skipping the signing-key comparison.
   **8 methods/12 cases** reproduce6 failures then pass; complete **214 Python**
@@ -20,13 +37,13 @@ The updated whole-product objective is
   HTTP improves2/5→5/5. Independent mutation restores exactly6 failures; hashes
   match. Shell syntax and existing CI discovery pass. Full publishing script,
   GitHub/auth/device operations are excluded. App/public manifest/catalog remain
-  unchanged; the deliberate local1.99/public1.83 version guard still rejects
+  unchanged in that unit; the deliberate local1.100/public1.83 version guard still rejects
   promotion. Earlier version writes/builds remain for inspection after failure.
   Original **04:40:49–05:10:49UTC** clock retained.
   [Receipt](portal-release-signing-baseline-2026-11-03.md).
 
-- **Current room APK / kitchen timer identity:** exact optimized **1.99/code93**
-  is installed and fully hashed in both rooms. Full timer IDs now isolate alarms;
+- **Previous room APK / kitchen timer identity:** exact optimized **1.99/code93**
+  was installed and fully hashed in both rooms. Full timer IDs now isolate alarms;
   legacy handles are retired and startup/boot rearm saved timers. **29 timer /
   4,075 JVM424 suites**, debug/optimized/R8/vital-lint pass. Actual optimized
   Family framework checks improve0/6→6/6 plus3 cold-restore checks; AlarmManager

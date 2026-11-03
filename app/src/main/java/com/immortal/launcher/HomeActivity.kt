@@ -629,6 +629,9 @@ private fun HeroClockCard(
 private data class GalleryEntry(
     val kind: String, val label: String, val desc: String, val glyph: String, val accent: Color)
 
+private typealias HomeWidgetChange =
+    (List<HomeWidgetStore.HomeWidget>, List<HomeWidgetStore.HomeWidget>) -> Boolean
+
 /** A stable cell boundary keeps cached widget content out of paging recompositions. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -639,7 +642,7 @@ private fun ApprovedWidgetCell(
     editMode: Boolean,
     host: AppWidgetHost,
     manager: AppWidgetManager,
-    onChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
+    onChanged: HomeWidgetChange,
     onEnterEdit: () -> Unit,
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
     displaySpan: Pair<Int, Int> = widget.spanX to widget.spanY,
@@ -653,6 +656,7 @@ private fun ApprovedWidgetCell(
       var heightPx by remember { mutableStateOf(0) }
       var resizeAccum by remember { mutableStateOf(Offset.Zero) }
       var startSpan by remember { mutableStateOf(widget.spanX to widget.spanY) }
+      var resizeSnapshot by remember { mutableStateOf<List<HomeWidgetStore.HomeWidget>?>(null) }
       var resizeDraft by remember { mutableStateOf<Pair<Int, Int>?>(null) }
       var columnUnit by remember { mutableStateOf(1f) }
       var rowUnit by remember { mutableStateOf(1f) }
@@ -660,7 +664,7 @@ private fun ApprovedWidgetCell(
       val gapPx = with(density) { 24.dp.toPx() }
       val resizeRtl = androidx.compose.ui.platform.LocalLayoutDirection.current ==
           androidx.compose.ui.unit.LayoutDirection.Rtl
-      LaunchedEffect(editMode) { resizeDraft = null; resizeAccum = Offset.Zero }
+      LaunchedEffect(editMode) { resizeDraft = null; resizeSnapshot = null; resizeAccum = Offset.Zero }
       Box(cell.zIndex(if (resizeDraft != null) 2f else 0f)
           .onSizeChanged { widthPx = it.width; heightPx = it.height }
           .semantics { contentDescription = "${if (widget.isAppWidget) "App" else customWidgetLabel(widget.kind)} widget" }) {
@@ -685,7 +689,7 @@ private fun ApprovedWidgetCell(
             ApprovedWidgetAction("Move", Modifier.weight(1f), onClick = onMove)
             ApprovedWidgetAction("Size", Modifier.weight(1f)) {
               val next = HomeWidgetStore.nextWidgetSpan(displaySpan)
-              onChanged(widgets.map { if (it.key == widget.key) it.copy(
+              onChanged(widgets, widgets.map { if (it.key == widget.key) it.copy(
                   spanX = next.first, spanY = next.second, explicitSize = true) else it })
             }
             ApprovedWidgetAction("Settings", Modifier.weight(1f)) {
@@ -722,6 +726,7 @@ private fun ApprovedWidgetCell(
           }
           ResizeBadge(Modifier.align(Alignment.BottomEnd), onResizeStart = {
             startSpan = displaySpan
+            resizeSnapshot = widgets
             resizeAccum = Offset.Zero
             resizeDraft = displaySpan
             columnUnit = ((widthPx - gapPx * (displaySpan.first - 1)) / displaySpan.first).coerceAtLeast(1f) + gapPx
@@ -735,11 +740,13 @@ private fun ApprovedWidgetCell(
             resizeDraft = x to y
           }, onResizeEnd = {
             resizeDraft?.takeIf { it != startSpan }?.let { span ->
-              onChanged(widgets.map { if (it.key == widget.key) it.copy(
-                  spanX = span.first, spanY = span.second, explicitSize = true) else it })
+              resizeSnapshot?.let { expected ->
+                onChanged(expected, expected.map { if (it.key == widget.key) it.copy(
+                    spanX = span.first, spanY = span.second, explicitSize = true) else it })
+              }
             }
-            resizeDraft = null; resizeAccum = Offset.Zero
-          }, onResizeCancel = { resizeDraft = null; resizeAccum = Offset.Zero })
+            resizeDraft = null; resizeSnapshot = null; resizeAccum = Offset.Zero
+          }, onResizeCancel = { resizeDraft = null; resizeSnapshot = null; resizeAccum = Offset.Zero })
         }
       }
       if (showTimers) ApprovedHomeTimersPage { showTimers = false }
@@ -763,14 +770,14 @@ private fun ApprovedWidgetGrid(
     editMode: Boolean,
     host: AppWidgetHost,
     manager: AppWidgetManager,
-    onChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
+    onChanged: HomeWidgetChange,
     onEnterEdit: () -> Unit,
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
 ) {
   val spans = remember(visible) { HomePresentation.spans(visible) }
   var move by remember { mutableStateOf<HomeWidgetStore.HomeWidget?>(null) }
   ApprovedPackedWidgetGrid(visible, spans, editMode, gridModifier,
-      onMove = { source, target -> onChanged(HomePresentation.move(widgets, source, target)) }) { widget, cell, span, drag ->
+      onMove = { source, target -> onChanged(widgets, HomePresentation.move(widgets, source, target)) }) { widget, cell, span, drag ->
     ApprovedWidgetCell(widget, cell, widgets, editMode, host, manager, onChanged, onEnterEdit,
         onRemove, span.columns to span.rows, onMove = { move = widget }, dragHandle = drag)
   }
@@ -779,7 +786,7 @@ private fun ApprovedWidgetGrid(
       Text("Choose a position, including on another page.", color = ApprovedHomePalette.Secondary, fontSize = 23.sp)
       widgets.forEachIndexed { index, target ->
         if (target.key != selected.key) ApprovedHomeTextButton("${index + 1}. ${customWidgetLabel(target.kind)}") {
-          onChanged(HomePresentation.move(widgets, selected.key, target.key)); move = null
+          onChanged(widgets, HomePresentation.move(widgets, selected.key, target.key)); move = null
         }
       }
     }
@@ -793,7 +800,7 @@ private fun ApprovedWidgetPage(
     widgets: List<HomeWidgetStore.HomeWidget>,
     host: AppWidgetHost,
     manager: AppWidgetManager,
-    onChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
+    onChanged: HomeWidgetChange,
     onEnterEdit: () -> Unit,
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
     editMode: Boolean = false,
@@ -812,7 +819,7 @@ private fun ApprovedWidgetArea(
     editMode: Boolean,
     host: AppWidgetHost,
     manager: AppWidgetManager,
-    onChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
+    onChanged: HomeWidgetChange,
     onEnterEdit: () -> Unit,
     onPageChanged: (Int) -> Unit,
     navigation: ApprovedHomePagerNavigation,
@@ -913,8 +920,10 @@ private fun ApprovedWidgetArea(
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
         ApprovedHomeTextButton("Cancel") { remove = null }
         ApprovedHomeTextButton("Remove") {
-          if (widget.isAppWidget) runCatching { host.deleteAppWidgetId(widget.appWidgetId) }
-          onChanged(HomeWidgetStore.without(widgets, widget.key))
+          synchronized(RemoteCompanionStore.mutationLock) {
+            if (onChanged(widgets, HomeWidgetStore.without(widgets, widget.key)) && widget.isAppWidget)
+              runCatching { host.deleteAppWidgetId(widget.appWidgetId) }
+          }
           remove = null
         }
       }
@@ -996,7 +1005,7 @@ private fun ApprovedHomePagedWidgets(
     compact: Boolean,
     host: AppWidgetHost,
     manager: AppWidgetManager,
-    onChanged: (List<HomeWidgetStore.HomeWidget>) -> Unit,
+    onChanged: HomeWidgetChange,
     onEnterEdit: () -> Unit,
     onAddWidget: () -> Unit,
     onAllApps: () -> Unit,
@@ -1151,9 +1160,18 @@ private fun LauncherScreen(
     mutableStateOf(HomeWidgetStore.load(context))
   }
   OnResume { homeWidgets = HomeWidgetStore.load(context) }
-  val saveWidgets: (List<HomeWidgetStore.HomeWidget>) -> Unit = {
-    homeWidgets = it
-    HomeWidgetStore.save(context, it)
+  DisposableEffect(context) {
+    val stop = HomeWidgetStore.observe(context) { homeWidgets = HomeWidgetStore.load(context) }
+    // Read after subscribing so a restore between composition and this effect is visible.
+    homeWidgets = HomeWidgetStore.load(context)
+    onDispose { stop() }
+  }
+  val saveWidgets: HomeWidgetChange = { expected, updated ->
+    val saved = HomeWidgetStore.replaceIfUnchanged(context, expected, updated)
+    homeWidgets = HomeWidgetStore.load(context)
+    if (!saved) Toast.makeText(context,
+        "Widgets changed on another screen. Review the layout and try again.", Toast.LENGTH_LONG).show()
+    saved
   }
   val host = remember { AppWidgetHost(context, HOME_APP_WIDGET_HOST_ID) }
   val manager = remember { AppWidgetManager.getInstance(context) }
@@ -1161,10 +1179,10 @@ private fun LauncherScreen(
   val completeAdd: () -> Unit = {
     pending?.let { addition ->
       addition.provider.info?.let { info ->
-        saveWidgets(HomeWidgetStore.withAdded(homeWidgets, HomeWidgetStore.HomeWidget(
+        homeWidgets = HomeWidgetStore.add(context, HomeWidgetStore.HomeWidget(
             appWidgetId = addition.appWidgetId,
             providerPackage = info.provider.packageName, providerClass = info.provider.className,
-            spanX = addition.provider.spanX, spanY = addition.provider.spanY)))
+            spanX = addition.provider.spanX, spanY = addition.provider.spanY))
       }
     }
     pending = null
@@ -1339,7 +1357,7 @@ private fun LauncherScreen(
           onAdd = { kind ->
             val spanY = if (kind in listOf(HomeWidgetStore.KIND_TODAY, HomeWidgetStore.KIND_QUICK_CONTROLS,
                 HomeWidgetStore.KIND_PHOTO_MEMORY)) 1 else 2
-            saveWidgets(HomeWidgetStore.withAdded(homeWidgets, HomeWidgetStore.custom(kind, spanY = spanY)))
+            homeWidgets = HomeWidgetStore.add(context, HomeWidgetStore.custom(kind, spanY = spanY))
             showLibrary = false
           }, onProvider = { provider ->
             val info = provider.info
