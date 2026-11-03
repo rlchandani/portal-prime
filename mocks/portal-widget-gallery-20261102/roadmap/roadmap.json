@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T12:01:05.106591+00:00",
+  "updatedAt": "2026-11-03T12:32:39.895555+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,62 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.120/code114. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.121/code115. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "apk-incoming-snapshot",
+      "title": "APK opens: retain each prompt's copied file",
+      "summary": "Delivered 1.121: later APK imports and failed transfers preserve each earlier copied snapshot.",
+      "description": "Give each external open-with prompt a unique owned cache snapshot; clean only its own failed or consumed file.",
+      "status": "delivered",
+      "verification": "10 helper tests: 6 red to pass; 4,303 JVM; debug native 6/12 to 12/12",
+      "kind": "Incoming APK file ownership",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Installer reliability / independent helper and source review",
+      "deployment": "Exact optimized 1.121/code115 installed and fully hashed in Family Area and Living Area.",
+      "state": "Four complete maps and eleven preference states per room match. Family frame, font, accessibility and Chrome retained. Copied credentials removed; original registry unchanged.",
+      "acceptance": [
+        "Freeze literal generated streams against a reviewed extracted-equivalent copy baseline before correcting behavior.",
+        "Preserve first APK bytes across successive, empty and failed later imports; remove only each failed owned file.",
+        "Retain source close count, null/open failure, foreign cache, existing metadata and installer selection policies.",
+        "Distinguish helper JVM acceptance from source-reviewed lifecycle and installer consumption and from unverified native or valid installation.",
+        "Deliver exact signed optimized bytes and preserve complete maps and eleven preference states."
+      ],
+      "evidence": [
+        {
+          "text": "Owned snapshot correction, extracted baseline, frozen red/green and exact delivery with limits.",
+          "source": "docs/portal-apk-incoming-snapshot-2026-11-03.md"
+        },
+        {
+          "text": "Bound source, tests, artifacts, excluded Activity admission, preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/apk-incoming-snapshot-verification.json"
+        }
+      ],
+      "limits": [
+        "Generated-stream copy-helper JVM and debug native acceptance only; Activity lifecycle and daemon/session consumption are source-reviewed. Optimized helper, native Activity, valid package installation, prompt UI, actual daemon/system installer and API28 remain unverified.",
+        "Actual debug Family copy-helper checks improve 6/12 to 12/12: six corrected product checks, four retained product controls and two retained harness checks. Each variant makes 17 actual copy and 17 generated opener calls across ten generated case folders; all 14 generated source streams close exactly once. Two null sources and one generated open failure are retained.",
+        "Two accepted native parents and owned scratch retire normally, with zero faults. External-timeout or fault cleanup remains unverified. First native compile has three Java8 obsolescence warnings.",
+        "Original Activity admission failed before copy/archive metadata and is excluded from actual helper red; extracted-equivalent baseline is distinct from untouched rollback APK.",
+        "Ten helper tests originally fail six assertion-subclass checks and retain four controls; no test rerun or source change corrected the read-only failure-type inspection.",
+        "Unique cache allocation retains current empty-input acceptance, nested streaming and cleanup behavior. No signature, source-trust, metadata, UI, receiver or permission policy changes.",
+        "Daemon consuming flag is visible before worker launch and own cleanup precedes flag clearing; session adapter copies synchronously. These Activity routes are source-reviewed only.",
+        "Cache cleanup is best effort; process death can leave files. Existing callback routing, destroyed-Activity callbacks and daemon queue contention remain separate.",
+        "Eleven preference states per room match: Family ten byte-identical files and one unchanged absence; Living seven byte-identical files and four unchanged absences.",
+        "Family current frame is viewed; incoming APK UI and Living visual remain open. Normal /diag and /logcat?lines=1500 requests return HTTP200; actual log outputs contain 1644 Family and 2015 Living lines with zero fatal or ANR markers. This is limited observation, not complete runtime health.",
+        "Public manifest remains 1.83/code77. Phone control is prohibited; no HA, authentication, push or publication. All older held and exhausted clocks remain."
+      ],
+      "next": "Retain exact two-room delivery and helper regressions. Optimized helper, native Activity, valid installation, prompt UI, API28 and Living visual remain open; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T12:12:15.980481Z",
+        "deadline": "2026-11-03T12:42:15.980481Z",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "accessibility-reconnect-services",
       "title": "Accessibility: retain service changes during reconnect",

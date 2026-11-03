@@ -1,0 +1,1200 @@
+{
+  "recordedAt": "2026-11-03T12:35:29.406819+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T12:12:15.980481Z",
+    "deadline": "2026-11-03T12:42:15.980481Z",
+    "originalRetained": true,
+    "includes": "Discovery, excluded admission, extraction, frozen reproduction, source correction, all gates/native, delivery, observation, documentation and cleanup"
+  },
+  "finding": {
+    "activeConsumer": "External APK ACTION_VIEW or ACTION_INSTALL_PACKAGE to exported standard-mode ApkInstallActivity",
+    "witness": "Two prompts formerly shared cacheDir/incoming.apk; the later import could replace bytes retained by the earlier metadata prompt. Failed read or close could also leave changed bytes.",
+    "baselineSourceSha256": "e7d6a5bfc78a03f79afa12e7f5a1707ea534d92de67420a096f4aabdc74c69c8"
+  },
+  "correction": {
+    "scope": "Unique per-import cache snapshot, cleanup only its owned file",
+    "behavior": "Actual helper catches allocation/transfer failure and removes own partial. Activity idle-destruction cleanup, daemon consuming flag and finally, synchronous session finally are source-reviewed.",
+    "retained": "URI, metadata, complete prompt/receiver/status bodies, empty-success policy, nested source/output close, paused routing, settings and installer policy"
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/ApkInstallActivity.kt": "ad6bd02cd9b8d568f50feaedff911e7909b07b02e01a949c1b008706f991a736",
+    "app/src/main/java/com/immortal/launcher/IncomingApkSnapshot.kt": "dc902d27911d3d603ed4ce42ca59e59b347a3f3a9aa818980fd225fddb4eeb06",
+    "app/src/test/java/com/immortal/launcher/IncomingApkSnapshotTest.kt": "a559f80486e676b00cb24867f4a6d41331990d6578448b2fb2c13d26584f25b8",
+    "app/build.gradle.kts": "45f21d1fa709981aca26849dc0c86f1b8e15b513bac9f810ff48c093ab9e843b"
+  },
+  "baselineQualification": {
+    "extraction": {
+      "app/src/main/java/com/immortal/launcher/ApkInstallActivity.kt": {
+        "sha256": "581ec3a3f593bcdc13cabea2a569728dcf3a637de1d895f19cd9ab00de4bccbd",
+        "bytes": 9306,
+        "privatePath": "/private/tmp/portal-product-audit-20261103-121215/extracted-baseline-ApkInstallActivity.kt"
+      },
+      "app/src/main/java/com/immortal/launcher/IncomingApkSnapshot.kt": {
+        "sha256": "f327b8127acbd5ecdeff69898cb315efc52d819f312dc76b7f573e0dbe905575",
+        "bytes": 767,
+        "privatePath": "/private/tmp/portal-product-audit-20261103-121215/extracted-baseline-IncomingApkSnapshot.kt"
+      },
+      "qualification": "Semantics-preserving copy extraction before frozen tests/behavior correction; does not claim actual original Activity or untouched baseline APK acceptance."
+    },
+    "extractionReviewBinding": {
+      "sha256": "ebcfc8066a9efbb2ab4b692de2431c8395467eb309f2f8a14c21f6e4b0e5777b",
+      "bytes": 2388
+    },
+    "preparedAPK": {
+      "sha256": "cf4b1514fb0151dbdcff80afbfa564a277f8d6bd0025c917f93a7212bfcebf92",
+      "bytes": 51334221,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "package": "com.immortal.launcher.debug",
+      "versionName": "1.120",
+      "versionCode": 114
+    },
+    "untouchedRollback": {
+      "sha256": "927fc4ec5966aad6e3e07258545007422cfa7292c9352dd6c581571153ed7972",
+      "bytes": 25862702,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "package": "com.immortal.launcher.debug",
+      "versionName": "1.120",
+      "versionCode": 114
+    },
+    "preparedNotUntouchedActivity": true
+  },
+  "excludedActivityAdmission": {
+    "verdict": "JVM_ADMISSION_UNAVAILABLE — source hypothesis not frozen acceptance",
+    "initialJavaCompilationFailedOnProtectedAccess": true,
+    "correctedPrivateCompilationSucceeded": true,
+    "runtimeStoppedInInheritedActivityStub": true,
+    "actualOnCreateEntryCalls": 1,
+    "actualCopyExecutions": 0,
+    "actualArchiveMarkerCalls": 0,
+    "binding": {
+      "sha256": "282644d8b308c63874ef04a753f44ee8e6bee09f296f3aefda65c98138f02f50",
+      "bytes": 7593
+    },
+    "notProductRed": true
+  },
+  "red": {
+    "name": "com.immortal.launcher.IncomingApkSnapshotTest",
+    "tests": "10",
+    "skipped": "0",
+    "failures": "6",
+    "errors": "0",
+    "timestamp": "2026-11-03T12:21:33.116Z",
+    "time": "0.025",
+    "failedMethods": [
+      {
+        "method": "closeFailureRemovesItsPartialFileAndRetainsForeignCache",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[foreign-cache.bin]> but was:<[foreign-cache.bin, incoming.apk]>"
+      },
+      {
+        "method": "emptySuccessfulImportOwnsItsSnapshotWithoutChangingFirst",
+        "type": "org.junit.internal.ArrayComparisonFailure",
+        "message": "org.junit.internal.ArrayComparisonFailure: array lengths differed, expected.length=7 actual.length=0; arrays first differed at element [0]; expected:<65> but was:<end of array>"
+      },
+      {
+        "method": "secondReadFailureCannotChangeFirstSnapshot",
+        "type": "org.junit.internal.ArrayComparisonFailure",
+        "message": "org.junit.internal.ArrayComparisonFailure: array lengths differed, expected.length=7 actual.length=3; arrays first differed at element [0]; expected:<65> but was:<99>"
+      },
+      {
+        "method": "secondCloseFailureCannotChangeFirstSnapshot",
+        "type": "org.junit.internal.ArrayComparisonFailure",
+        "message": "org.junit.internal.ArrayComparisonFailure: arrays first differed at element [4]; expected:<65> but was:<66>"
+      },
+      {
+        "method": "readFailureLeavesOnlyEarlierSnapshotAndForeignCache",
+        "type": "org.junit.internal.ArrayComparisonFailure",
+        "message": "org.junit.internal.ArrayComparisonFailure: array lengths differed, expected.length=7 actual.length=3; arrays first differed at element [0]; expected:<65> but was:<99>"
+      },
+      {
+        "method": "successiveImportsRetainFirstBytesAndOwnDistinctPaths",
+        "type": "org.junit.internal.ArrayComparisonFailure",
+        "message": "org.junit.internal.ArrayComparisonFailure: arrays first differed at element [4]; expected:<65> but was:<66>"
+      }
+    ],
+    "frozenTestSha256": "a559f80486e676b00cb24867f4a6d41331990d6578448b2fb2c13d26584f25b8",
+    "actualGradleExit": 1,
+    "qualification": "Actual prepared semantics-preserving extracted helper baseline; original Activity import harness failure excluded; no original untouchedAPK runtime claim.",
+    "inspectionCorrection": "First read-only inspection required literal java.lang.AssertionError; actual five ArrayComparisonFailure are AssertionError subclasses. Predicate corrected without changing/rerunning tests or source."
+  },
+  "green": {
+    "suites": 446,
+    "tests": 4303,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualIncomingApkSnapshotFocusedTests": 10,
+    "allFocusedUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 3s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "native": {
+    "baseline": {
+      "status": "FAIL",
+      "checks": {
+        "oneSuccessfulCopyControl": true,
+        "successiveCopiesRetainFirstAndDistinctPaths": false,
+        "secondReadFailureRetainsFirst": false,
+        "secondCloseFailureRetainsFirst": false,
+        "secondNullSourceControl": true,
+        "secondOpenFailureControl": true,
+        "emptySuccessHasOwnSnapshot": false,
+        "readFailureCleansOnlyOwnPartial": false,
+        "closeFailureCleansOnlyOwnPartial": false,
+        "nullSourceNoFileControl": true,
+        "actualAPKClassLoader": true,
+        "allGeneratedStreamsClosedOnce": true
+      },
+      "observations": {
+        "oneSuccessfulCopyControl": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming.apk",
+          "secondName": null,
+          "matches": true
+        },
+        "successiveCopiesRetainFirstAndDistinctPaths": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d42212c",
+          "firstName": "incoming.apk",
+          "secondName": "incoming.apk",
+          "expectedSecondHex": "41504b2d42212c",
+          "actualSecondHex": "41504b2d42212c",
+          "matches": false
+        },
+        "secondReadFailureRetainsFirst": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "636261",
+          "firstName": "incoming.apk",
+          "secondName": null,
+          "matches": false
+        },
+        "secondCloseFailureRetainsFirst": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d42212c",
+          "firstName": "incoming.apk",
+          "secondName": null,
+          "matches": false
+        },
+        "secondNullSourceControl": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming.apk",
+          "secondName": null,
+          "matches": true
+        },
+        "secondOpenFailureControl": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming.apk",
+          "secondName": null,
+          "matches": true
+        },
+        "emptySuccessHasOwnSnapshot": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "",
+          "firstName": "incoming.apk",
+          "secondName": "incoming.apk",
+          "matches": false
+        },
+        "readFailureCleansOnlyOwnPartial": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "636261",
+          "firstName": "incoming.apk",
+          "secondName": null,
+          "beforeEntries": [
+            "foreign-cache.bin",
+            "incoming.apk"
+          ],
+          "afterEntries": [
+            "foreign-cache.bin",
+            "incoming.apk"
+          ],
+          "matches": false
+        },
+        "closeFailureCleansOnlyOwnPartial": {
+          "beforeEntries": [
+            "foreign-cache.bin"
+          ],
+          "afterEntries": [
+            "foreign-cache.bin",
+            "incoming.apk"
+          ],
+          "matches": false
+        },
+        "nullSourceNoFileControl": {
+          "beforeEntries": [
+            "foreign-cache.bin"
+          ],
+          "afterEntries": [
+            "foreign-cache.bin"
+          ],
+          "matches": true
+        }
+      },
+      "passed": 6,
+      "total": 12,
+      "actualCopyInvocations": 17,
+      "generatedOpenerInvocations": 17,
+      "generatedSourceStreams": 14,
+      "generatedSourceCloseCounts": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "generatedCaseFolders": 10,
+      "generatedNullSources": 2,
+      "generatedOpenFailures": 1,
+      "proxyFaults": [],
+      "apkSha256": "cf4b1514fb0151dbdcff80afbfa564a277f8d6bd0025c917f93a7212bfcebf92",
+      "actualAPKClassLoader": true,
+      "admittedMethod": "copy(java.io.File,kotlin.jvm.functions.Function0):java.io.File",
+      "buildVariant": "debug",
+      "optimizedCopyVerified": false,
+      "baselineQualification": "Behavior-preserving extracted shared-path copy baseline; not original untouched APK/Activity acceptance",
+      "contextOperations": 0,
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "activityLifecycleOperations": 0,
+      "metadataOrInstallOperations": 0,
+      "processTimezoneOrLocaleMutations": 0,
+      "scope": "Actual extracted debug copy method over generated streams and owned scratch files only. No Activity, Context, URI provider, archive metadata, Compose, installation, user cache or optimized call."
+    },
+    "candidate": {
+      "status": "PASS",
+      "checks": {
+        "oneSuccessfulCopyControl": true,
+        "successiveCopiesRetainFirstAndDistinctPaths": true,
+        "secondReadFailureRetainsFirst": true,
+        "secondCloseFailureRetainsFirst": true,
+        "secondNullSourceControl": true,
+        "secondOpenFailureControl": true,
+        "emptySuccessHasOwnSnapshot": true,
+        "readFailureCleansOnlyOwnPartial": true,
+        "closeFailureCleansOnlyOwnPartial": true,
+        "nullSourceNoFileControl": true,
+        "actualAPKClassLoader": true,
+        "allGeneratedStreamsClosedOnce": true
+      },
+      "observations": {
+        "oneSuccessfulCopyControl": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming-9069716578867557187.apk",
+          "secondName": null,
+          "matches": true
+        },
+        "successiveCopiesRetainFirstAndDistinctPaths": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming-3406615416276962940.apk",
+          "secondName": "incoming-7083111731844868539.apk",
+          "expectedSecondHex": "41504b2d42212c",
+          "actualSecondHex": "41504b2d42212c",
+          "matches": true
+        },
+        "secondReadFailureRetainsFirst": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming-2088862026452684494.apk",
+          "secondName": null,
+          "matches": true
+        },
+        "secondCloseFailureRetainsFirst": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming-7823181069691313363.apk",
+          "secondName": null,
+          "matches": true
+        },
+        "secondNullSourceControl": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming-1944147205359542841.apk",
+          "secondName": null,
+          "matches": true
+        },
+        "secondOpenFailureControl": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming-2927591832532961140.apk",
+          "secondName": null,
+          "matches": true
+        },
+        "emptySuccessHasOwnSnapshot": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming-1881173890483694039.apk",
+          "secondName": "incoming-5634506457405464446.apk",
+          "matches": true
+        },
+        "readFailureCleansOnlyOwnPartial": {
+          "expectedFirstHex": "41504b2d410b16",
+          "actualFirstHex": "41504b2d410b16",
+          "firstName": "incoming-3467253784592465995.apk",
+          "secondName": null,
+          "beforeEntries": [
+            "foreign-cache.bin",
+            "incoming-3467253784592465995.apk"
+          ],
+          "afterEntries": [
+            "foreign-cache.bin",
+            "incoming-3467253784592465995.apk"
+          ],
+          "matches": true
+        },
+        "closeFailureCleansOnlyOwnPartial": {
+          "beforeEntries": [
+            "foreign-cache.bin"
+          ],
+          "afterEntries": [
+            "foreign-cache.bin"
+          ],
+          "matches": true
+        },
+        "nullSourceNoFileControl": {
+          "beforeEntries": [
+            "foreign-cache.bin"
+          ],
+          "afterEntries": [
+            "foreign-cache.bin"
+          ],
+          "matches": true
+        }
+      },
+      "passed": 12,
+      "total": 12,
+      "actualCopyInvocations": 17,
+      "generatedOpenerInvocations": 17,
+      "generatedSourceStreams": 14,
+      "generatedSourceCloseCounts": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "generatedCaseFolders": 10,
+      "generatedNullSources": 2,
+      "generatedOpenFailures": 1,
+      "proxyFaults": [],
+      "apkSha256": "288c54e8229ae423c6cf1f58fc8617825645c9813a36b559a7217157f46ba0ef",
+      "actualAPKClassLoader": true,
+      "admittedMethod": "copy(java.io.File,kotlin.jvm.functions.Function0):java.io.File",
+      "buildVariant": "debug",
+      "optimizedCopyVerified": false,
+      "baselineQualification": "Behavior-preserving extracted shared-path copy baseline; not original untouched APK/Activity acceptance",
+      "contextOperations": 0,
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "activityLifecycleOperations": 0,
+      "metadataOrInstallOperations": 0,
+      "processTimezoneOrLocaleMutations": 0,
+      "scope": "Actual extracted debug copy method over generated streams and owned scratch files only. No Activity, Context, URI provider, archive metadata, Compose, installation, user cache or optimized call."
+    },
+    "process": {
+      "baseline": {
+        "terminalExit": 1,
+        "stdoutSha256": "c2090a15fa75e47e2aeea569ca3402f1a78a2da34b5e8ce5ef5cb57ab04da16d",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutBytes": 3275,
+        "stderrBytes": 0
+      },
+      "candidate": {
+        "terminalExit": 0,
+        "stdoutSha256": "c36f2f87891d7a0db4f2c7c27c07ed7d7e9f29eb4a7e37703a6be0f842f4611f",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutBytes": 3519,
+        "stderrBytes": 0
+      }
+    },
+    "binding": {
+      "sha256": "4b393c121e3a3b87d8b60a3ae82bf4fc88299102aa818bc6433e55b243c1794d",
+      "bytes": 943
+    },
+    "bindingPayloadPublished": false,
+    "environment": {
+      "sdk": "29",
+      "release": "10",
+      "abi": "arm64-v8a"
+    },
+    "compiler": {
+      "terminalExit": 0,
+      "java8ObsolescenceWarnings": 3,
+      "logBinding": {
+        "sha256": "61ece68e800ebd59643b60870723dc56c948771193ceabacc7180b53580ac13c",
+        "bytes": 823
+      },
+      "terminalBinding": {
+        "sha256": "ff6fe28137e525eecfddfbda223b9f186bbe06e6863fef3263f386da77b55747",
+        "bytes": 514
+      }
+    },
+    "cleanup": {
+      "parentsRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "ownedScratchRemoved": true,
+      "faults": [],
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "buildVariant": "debug",
+      "optimizedCopyVerified": false,
+      "householdCacheOperations": 0,
+      "activityLifecycleOperations": 0,
+      "externalTimeoutFailureCleanupFaultInjected": false
+    },
+    "correctedProductChecks": 6,
+    "retainedProductControls": 4,
+    "retainedHarnessChecks": 2,
+    "acceptedParents": 2,
+    "excludedNativeExecutions": 0,
+    "activityOrInstallationAcceptance": false,
+    "optimizedInvocations": 0
+  },
+  "artifact": {
+    "sha256": "dd13ab0ca23169f620ab800d8ee32ad4c17661778e269da71f932ca9102499c7",
+    "bytes": 25879086,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.121",
+    "versionCode": 115,
+    "variants": {
+      "performance": {
+        "sha256": "dd13ab0ca23169f620ab800d8ee32ad4c17661778e269da71f932ca9102499c7",
+        "bytes": 25879086,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.121",
+        "versionCode": 115
+      },
+      "debug": {
+        "sha256": "288c54e8229ae423c6cf1f58fc8617825645c9813a36b559a7217157f46ba0ef",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.121",
+        "versionCode": 115
+      },
+      "rollback": {
+        "sha256": "927fc4ec5966aad6e3e07258545007422cfa7292c9352dd6c581571153ed7972",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.120",
+        "versionCode": 114
+      },
+      "extractedEquivalentDebugBaseline": {
+        "sha256": "cf4b1514fb0151dbdcff80afbfa564a277f8d6bd0025c917f93a7212bfcebf92",
+        "bytes": 51334221,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.120",
+        "versionCode": 114
+      }
+    },
+    "debugSha256": "288c54e8229ae423c6cf1f58fc8617825645c9813a36b559a7217157f46ba0ef",
+    "rollbackSha256": "927fc4ec5966aad6e3e07258545007422cfa7292c9352dd6c581571153ed7972",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 3s"
+  },
+  "artifactBindings": {
+    "candidate-1.121.apk": {
+      "sha256": "dd13ab0ca23169f620ab800d8ee32ad4c17661778e269da71f932ca9102499c7",
+      "bytes": 25879086
+    },
+    "candidate-debug-1.121.apk": {
+      "sha256": "288c54e8229ae423c6cf1f58fc8617825645c9813a36b559a7217157f46ba0ef",
+      "bytes": 46703529
+    },
+    "rollback-1.120.apk": {
+      "sha256": "927fc4ec5966aad6e3e07258545007422cfa7292c9352dd6c581571153ed7972",
+      "bytes": 25862702
+    },
+    "baseline-debug-1.120.apk": {
+      "sha256": "f04f1efcf3e49a7426fdb3914091cbd12bec85c7c1d7106ad1daf76476e35835",
+      "bytes": 46703529
+    },
+    "baseline-extracted-debug-1.120.apk": {
+      "sha256": "cf4b1514fb0151dbdcff80afbfa564a277f8d6bd0025c917f93a7212bfcebf92",
+      "bytes": 51334221
+    },
+    "candidate-mapping.txt": {
+      "sha256": "cec3c270ec87ea43289b0e94bdd129f8bc571ff3c834f485a8a65d4b59495cb8",
+      "bytes": 83206184
+    }
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "preferenceStates": {
+    "family": {
+      "namedStates": 11,
+      "existingByteIdentical": 10,
+      "unchangedAbsences": 1,
+      "allStatesEqual": true
+    },
+    "living": {
+      "namedStates": 11,
+      "existingByteIdentical": 7,
+      "unchangedAbsences": 4,
+      "allStatesEqual": true
+    }
+  },
+  "familyDisplayObservation": {
+    "recordedAt": "2026-11-03T12:31:43.292867+00:00",
+    "rootVisuallyInspected": true,
+    "livingVisualVerified": false,
+    "observation": "Family screenshot shows a black digital clock frame with beige 4:31, Tuesday, November 3, and the debug badge; no visible dialog or error. This is current frame acceptance only.",
+    "binding": {
+      "sha256": "a975657192efe533eb26b144ef4ad647be1e3b4fabf92ec7700b2db213d9fdfd",
+      "bytes": 47976
+    },
+    "incomingApkPromptVisualVerified": false,
+    "validInstallationVerified": false
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1644,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 2015,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "cleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "observationTerminals": {
+    "postflight": {
+      "exitCode": 0,
+      "binding": {
+        "sha256": "5572c3760254aa82a8cce94b13da3fa90bc0d3e84f5bbeb8fbacabb08b7c485d",
+        "bytes": 263
+      },
+      "startedAt": "2026-11-03T12:31:12.724749+00:00",
+      "endedAt": "2026-11-03T12:31:13.923033+00:00",
+      "durationSeconds": 1.198284
+    },
+    "health": {
+      "exitCode": 0,
+      "binding": {
+        "sha256": "3797bcdb271f3ebcc1eb43448608aad1f433c8b377140c1af62c208d7b1d2e85",
+        "bytes": 251
+      },
+      "startedAt": "2026-11-03T12:31:20.166096+00:00",
+      "endedAt": "2026-11-03T12:31:20.994836+00:00",
+      "durationSeconds": 0.82874
+    },
+    "screenshot": {
+      "exitCode": 0,
+      "binding": {
+        "sha256": "a5f43f40e78b69a46c2b9493a068f857bf31f8936c446a6263bf21ecaf2aed81",
+        "bytes": 259
+      },
+      "startedAt": "2026-11-03T12:31:27.660560+00:00",
+      "endedAt": "2026-11-03T12:31:28.667393+00:00",
+      "durationSeconds": 1.006833
+    },
+    "versionGuard": {
+      "exitCode": 1,
+      "binding": {
+        "sha256": "93ea42a23213d64e28312936b0d742003caf237424e05b15dfdaa8ec2ad728c0",
+        "bytes": 218
+      },
+      "startedAt": "2026-11-03T12:27:35.498129+00:00",
+      "endedAt": "2026-11-03T12:27:35.546886+00:00",
+      "durationSeconds": 0.048757
+    },
+    "deploy": {
+      "exitCode": 0,
+      "binding": {
+        "sha256": "6757d4e84897a6dbbe373e749327a05ad20f444576251bdb98bb3e1b534df356",
+        "bytes": 252
+      },
+      "startedAt": "2026-11-03T12:30:42.847235+00:00",
+      "endedAt": "2026-11-03T12:30:56.503150+00:00",
+      "durationSeconds": 13.655915
+    },
+    "preflight": {
+      "exitCode": 0,
+      "binding": {
+        "sha256": "ff3c168de97c9fc39436b8002c2a1a4ac56d7fc496adff4172544f494a2690a7",
+        "bytes": 264
+      },
+      "startedAt": "2026-11-03T12:23:15.098990+00:00",
+      "endedAt": "2026-11-03T12:23:16.374637+00:00",
+      "durationSeconds": 1.275647
+    },
+    "credentialCleanup": {
+      "exitCode": 0,
+      "binding": {
+        "sha256": "12ec148a41e87b4b0612f7347eaa847fd8eac0886919833824cc1e30e9112f45",
+        "bytes": 264
+      },
+      "startedAt": "2026-11-03T12:31:36.532522+00:00",
+      "endedAt": "2026-11-03T12:31:36.608097+00:00",
+      "durationSeconds": 0.075575
+    }
+  },
+  "publicRelease": {
+    "manifestUnchanged": true,
+    "binding": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "version": {
+      "versionCode": 77,
+      "versionName": "1.83"
+    },
+    "publicPublicationOperations": 0,
+    "versionGuardTerminalOneExpectedLocal115VersusPublic77": true
+  },
+  "nativeFleetCli": {
+    "binding": {
+      "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+      "bytes": 694352
+    },
+    "rebuilt": false
+  },
+  "review": {
+    "focused": {
+      "verdict": "PASS",
+      "passedChecks": 24,
+      "binding": {
+        "sha256": "532aa51b3ca8fda304b4088c6c0fdfc4e931dcf052ae027926d0281dffc211e2",
+        "bytes": 5652
+      }
+    },
+    "gateNative": {
+      "verdict": "PASS",
+      "passedChecks": 45,
+      "binding": {
+        "sha256": "0ffad9018e8ecab49926b0d032377f9344f5351de3d15b72ef88a62b6714aec0",
+        "bytes": 16967
+      },
+      "inspectorHistory": "Initial excluded review used a wrong verdict-prefix predicate for the retained failed Activity admission. Corrected from actual schema and zero-copy/archive runtime values; no product or fixture rerun. Other44 actual checks unchanged.",
+      "initialExcludedBinding": {
+        "sha256": "c4190468312914740ee8d07c1357ca456081f1f1dd243deec758b4b57d22e8da",
+        "bytes": 16440
+      },
+      "inspectionCorrectionBinding": {
+        "sha256": "de2b4cf948f20b718faf3974ba3baaf0370c1a6702302b525607e530a7433489",
+        "bytes": 759
+      }
+    }
+  },
+  "documentation": {
+    "rootOwnsRenderingAcceptance": true,
+    "generatorBinding": {
+      "sha256": "be62ded00c3b6563579f6736e1ef2859014777b1afe9430af24b1f96972d1f3c",
+      "bytes": 34138
+    },
+    "rootAdmissionBinding": {
+      "sha256": "595f792f69059004234eaf5f536052c460a43441e97449dd5a7847d4a1580a86",
+      "bytes": 276
+    },
+    "written": {
+      "bindings": {
+        "docs/portal-apk-incoming-snapshot-2026-11-03.md": {
+          "sha256": "ebed703c59b9531ceb441543e834b7c8ac5504abb57723873e26ac06017bf2fe",
+          "bytes": 7963
+        },
+        "docs/portal-product-operating-state.md": {
+          "sha256": "955552b55595d601488908ed19a8685827d2b6510f086d0a87d95e1570ded915",
+          "bytes": 143960
+        },
+        "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+          "sha256": "97d9439fa2dc85ed2888fd4c6eb76352adc3a21440b088b283e2ceea8b709238",
+          "bytes": 317659
+        },
+        "mocks/portal-widget-gallery-20261102/roadmap/index.html": {
+          "sha256": "7171419c965ebcd8d94e8fa096618a5bb565496bc419eddfb10b3d5277f89461",
+          "bytes": 22177
+        }
+      },
+      "clock": {
+        "startedAt": "2026-11-03T12:12:15.980481Z",
+        "deadline": "2026-11-03T12:42:15.980481Z",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
+    "initialStrictMkDocs": {
+      "terminalExit": 0,
+      "terminalBinding": {
+        "sha256": "d40b452f4262f4411a1c1f96b08f5318e9c998c3fb15ad998f99370952137b1c",
+        "bytes": 358
+      },
+      "logBinding": {
+        "sha256": "e52a667712d381e16b61158d939c7788c931dc62ed83a0a3c26ddf6d6f7bcdcf",
+        "bytes": 31789
+      }
+    },
+    "ChromeAndClosingAcceptance": "Recorded externally by root after exact served-proof inspection; no future success inferred here"
+  },
+  "backlog": {
+    "tasks": 97,
+    "counts": {
+      "delivered": 62,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "priorTaskObjects": 96,
+    "allPriorObjectsIdentical": true,
+    "priorRawTaskSuffixByteIdentical": true,
+    "priorRawTaskSuffixBytes": 311706,
+    "priorRawTaskSuffixSha256": "86ec81db32e2dafa1cc45c6e5de883a2cd527a6bee52c849ddca362f2a7494da",
+    "defaultTask": "weather-native-layout",
+    "defaultUnchanged": true,
+    "onlyBoundaryChange": "Current room version1.120/code114 to1.121/code115",
+    "otherTopLevelKeysUnchanged": true,
+    "originalClock": {
+      "startedAt": "2026-11-03T12:12:15.980481Z",
+      "deadline": "2026-11-03T12:42:15.980481Z",
+      "originalIndependentAuditClockRetained": true
+    }
+  },
+  "deferredHypotheses": {
+    "sunrise": "Bounded repeat/config audit found no new grounded ordinary defect; prior one-shot, DST and settings scopes retained",
+    "intercom": "Ownership matches earlier source audit; retains earlier clock"
+  },
+  "privateEvidenceBindings": {
+    "ApkImportAdmissionProbe.java": {
+      "sha256": "c11816cf49d80a0c26c35b26560927476f8b5700b9bfbf06e6e120293fee519f",
+      "bytes": 5293
+    },
+    "NativeIncomingApkSnapshots.java": {
+      "sha256": "b63c788ca140aead80825805ee784ee6c1f076b02c4da05cbdda5a105e4f2be4",
+      "bytes": 13114
+    },
+    "apk-admission-compile-attempt-2-terminal.json": {
+      "sha256": "fbc6993d7b3452fa927fee2911bfd2791f2035f3670e96f66d15a7cf1a5cd39f",
+      "bytes": 31759
+    },
+    "apk-admission-compile-attempt-2.log": {
+      "sha256": "4d771ad6559b2f0d2fc6e3da5bba3a8a124187357c9fdf29b70ac25393a97b7a",
+      "bytes": 174
+    },
+    "apk-admission-compile-terminal.json": {
+      "sha256": "f9b3f64126f91d11f8b55f78bbb51ead74e56619b5e0d845c0bc16b76e7b02c5",
+      "bytes": 31759
+    },
+    "apk-admission-compile.log": {
+      "sha256": "62f15834340c550d62ca1f24f538688191c57996e7aa67497c35594484ed3811",
+      "bytes": 692
+    },
+    "apk-admission-initial-author/ApkImportAdmissionProbe.java": {
+      "sha256": "c30685aed5c5e19758ad512b420ded6454362949830b0a1b493eab0796b6cd67",
+      "bytes": 5261
+    },
+    "apk-admission-initial-author/apk-admission-compile-terminal.json": {
+      "sha256": "f9b3f64126f91d11f8b55f78bbb51ead74e56619b5e0d845c0bc16b76e7b02c5",
+      "bytes": 31759
+    },
+    "apk-admission-initial-author/apk-admission-compile.log": {
+      "sha256": "62f15834340c550d62ca1f24f538688191c57996e7aa67497c35594484ed3811",
+      "bytes": 692
+    },
+    "apk-admission-run-stderr.log": {
+      "sha256": "0ef9e55eff3e00a77bcae66bef78c6fa801ccd20b555d2cf3af1f7262b5857ca",
+      "bytes": 1301
+    },
+    "apk-admission-run-stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "apk-admission-run-terminal.json": {
+      "sha256": "9f597397a7eae0f5450dd1c2c595cc72c020596752cbd2329bd81d23c5930501",
+      "bytes": 31765
+    },
+    "apk-extraction-review.json": {
+      "sha256": "ebcfc8066a9efbb2ab4b692de2431c8395467eb309f2f8a14c21f6e4b0e5777b",
+      "bytes": 2388
+    },
+    "apk-import-jvm-feasibility.json": {
+      "sha256": "282644d8b308c63874ef04a753f44ee8e6bee09f296f3aefda65c98138f02f50",
+      "bytes": 7593
+    },
+    "apk-incoming-source-review.json": {
+      "sha256": "5d2e8fc1031508e950aaeec1eeb888640e9bd5eb59be686c62d46d90a651caf9",
+      "bytes": 6806
+    },
+    "artifact.json": {
+      "sha256": "9814707b2fcfb3194d9bc9a00a10b4d3857bcf314ea4b027e5acfa733f16bd16",
+      "bytes": 1869
+    },
+    "backlog-preservation.json": {
+      "sha256": "cba7dd6cd2c4e598b9a597236a711acd225bcf98f86e9ad3c6ba9a1bd4bc864d",
+      "bytes": 726
+    },
+    "baseline-ApkInstallActivity.kt": {
+      "sha256": "e7d6a5bfc78a03f79afa12e7f5a1707ea534d92de67420a096f4aabdc74c69c8",
+      "bytes": 9513
+    },
+    "baseline-focused-terminal.json": {
+      "sha256": "760d19569d0728760510428b5c654e20e2806afde9c0aa99b8a675a524411cb5",
+      "bytes": 303
+    },
+    "baseline-focused.xml": {
+      "sha256": "102745d10d4632e5dd5c0812dfdafa7b92b542cb88803762318ea9a196657799",
+      "bytes": 31675
+    },
+    "baseline-red.json": {
+      "sha256": "caa52c104d48b295fc620baf76331a1441be23031b0243475d66ac14f17ea861",
+      "bytes": 2517
+    },
+    "baseline-snapshot-native-process.json": {
+      "sha256": "a3c211fd935227deed1f323adf468c29e109d77dfc8f3842b4de3e53e4511fb1",
+      "bytes": 239
+    },
+    "baseline-snapshot-native-result.json": {
+      "sha256": "9b8f5cbe3913890d31f62b0822e10c2cb6a35914e51cd024138db6a97fa21445",
+      "bytes": 4167
+    },
+    "baseline-snapshot-native-stderr-private.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "baseline-snapshot-native-stdout-private.txt": {
+      "sha256": "c2090a15fa75e47e2aeea569ca3402f1a78a2da34b5e8ce5ef5cb57ab04da16d",
+      "bytes": 3275
+    },
+    "build-snapshot-native.py": {
+      "sha256": "223efd58ef3bf619f86d0e3537b13e8f25f1607b4bc782589709b6d986bd297e",
+      "bytes": 2753
+    },
+    "candidate-mapping.txt": {
+      "sha256": "cec3c270ec87ea43289b0e94bdd129f8bc571ff3c834f485a8a65d4b59495cb8",
+      "bytes": 83206184
+    },
+    "candidate-snapshot-native-process.json": {
+      "sha256": "51e2ba130a4e1e3da9e05e11fed85c9f4531729b73a909f7899c3beffb33c09c",
+      "bytes": 239
+    },
+    "candidate-snapshot-native-result.json": {
+      "sha256": "83454bdcb532e61f6d14391fd96c2a9c33f458bb712f7e81e41287ef9b78d817",
+      "bytes": 4402
+    },
+    "candidate-snapshot-native-stderr-private.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "candidate-snapshot-native-stdout-private.txt": {
+      "sha256": "c36f2f87891d7a0db4f2c7c27c07ed7d7e9f29eb4a7e37703a6be0f842f4611f",
+      "bytes": 3519
+    },
+    "classpath-admission.log": {
+      "sha256": "1a79f451c761a4af7f24b542cc2ade021ddf61064f5e47f7a23f41c11cab7879",
+      "bytes": 593
+    },
+    "credential-cleanup-terminal.json": {
+      "sha256": "12ec148a41e87b4b0612f7347eaa847fd8eac0886919833824cc1e30e9112f45",
+      "bytes": 264
+    },
+    "credential-cleanup.json": {
+      "sha256": "584d00c535583d9f5c6f035e521ab6f64eefddfd75629ef4a3518d05d6a25d76",
+      "bytes": 119
+    },
+    "debug-unit-runtime-classpath.txt": {
+      "sha256": "7bd182aaf50dbe7ae2c1c601b7223e5f58cb363a811beef5304fe5e3d828d2cf",
+      "bytes": 31310
+    },
+    "deploy-results.json": {
+      "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31",
+      "bytes": 231
+    },
+    "deploy-terminal.json": {
+      "sha256": "6757d4e84897a6dbbe373e749327a05ad20f444576251bdb98bb3e1b534df356",
+      "bytes": 252
+    },
+    "documentation-before.json": {
+      "sha256": "685bd4f4d190cf0f7d1dc7a269527abe04f387d1f3c6c02901fbce3a8818c70f",
+      "bytes": 834
+    },
+    "documentation-boundary-baseline.json": {
+      "sha256": "51d809b008a50bfb1cb14b5709fd923cc608e4c9fd994c45c96784a5e73ebeb4",
+      "bytes": 346
+    },
+    "documentation-draft-freeze.json": {
+      "sha256": "cb566e7f8914ee5722325b3d1b6e6b63baed94af069795f59e5cc84e34d78609",
+      "bytes": 2440
+    },
+    "documentation-terminal.json": {
+      "sha256": "147ecd70b1d9240f7357e68182cbbd7336591f036c90094aa6882a988b084cd8",
+      "bytes": 255
+    },
+    "documentation-written.json": {
+      "sha256": "8196aa0e17d3a887ce84da3a71d4446e4ca475bce94d069682b92112fead15ec",
+      "bytes": 872
+    },
+    "extracted-baseline-ApkInstallActivity.kt": {
+      "sha256": "581ec3a3f593bcdc13cabea2a569728dcf3a637de1d895f19cd9ab00de4bccbd",
+      "bytes": 9306
+    },
+    "extracted-baseline-IncomingApkSnapshot.kt": {
+      "sha256": "f327b8127acbd5ecdeff69898cb315efc52d819f312dc76b7f573e0dbe905575",
+      "bytes": 767
+    },
+    "extracted-baseline-apk-delta.json": {
+      "sha256": "259ecc4a42914e03e34ba3c22292d17ed954883fee07f269f9b31a81163920ff",
+      "bytes": 275
+    },
+    "extracted-baseline-source.json": {
+      "sha256": "7c2202b272790e3ea6a439755ff5a7a5cba758990069fbe9adbe7391aed5f0d2",
+      "bytes": 756
+    },
+    "focused-source-review.json": {
+      "sha256": "532aa51b3ca8fda304b4088c6c0fdfc4e931dcf052ae027926d0281dffc211e2",
+      "bytes": 5652
+    },
+    "frozen-test-plan.json": {
+      "sha256": "a6755df160acf914bd39d614f4d75f4af6ffd64af055da9324378f33b8be7ad8",
+      "bytes": 917
+    },
+    "full-gate-terminal.json": {
+      "sha256": "4dadd92159d3f5ec6d6ec9cd27b13a2f4cc47034f8288b5e92b24552737fa594",
+      "bytes": 328
+    },
+    "full-gate.log": {
+      "sha256": "b8cd932ebae48a2760029fd5a45b44ecef198e31013578c816262f8f4a7adb24",
+      "bytes": 13731
+    },
+    "gate-native-review.json": {
+      "sha256": "0ffad9018e8ecab49926b0d032377f9344f5351de3d15b72ef88a62b6714aec0",
+      "bytes": 16967
+    },
+    "health-terminal.json": {
+      "sha256": "3797bcdb271f3ebcc1eb43448608aad1f433c8b377140c1af62c208d7b1d2e85",
+      "bytes": 251
+    },
+    "health.json": {
+      "sha256": "d891cdafa21c0a8b6cd6e2e759f6dbf133dfd50ecdae3edd2eb896c8453c695a",
+      "bytes": 579
+    },
+    "independent-full-jvm-xml-manifest.json": {
+      "sha256": "dcb92568d6fb67f3be8fc1be73586835b9330bc00cd2e92dada3ac455406f7ca",
+      "bytes": 147453
+    },
+    "independent-gate-native-review-initial-excluded.json": {
+      "sha256": "c4190468312914740ee8d07c1357ca456081f1f1dd243deec758b4b57d22e8da",
+      "bytes": 16440
+    },
+    "independent-gate-review-inspection-correction.json": {
+      "sha256": "de2b4cf948f20b718faf3974ba3baaf0370c1a6702302b525607e530a7433489",
+      "bytes": 759
+    },
+    "initial-docs-qa-terminal.json": {
+      "sha256": "d40b452f4262f4411a1c1f96b08f5318e9c998c3fb15ad998f99370952137b1c",
+      "bytes": 358
+    },
+    "initial-docs-qa.log": {
+      "sha256": "e52a667712d381e16b61158d939c7788c931dc62ed83a0a3c26ddf6d6f7bcdcf",
+      "bytes": 31789
+    },
+    "intercom-session-ownership-audit.json": {
+      "sha256": "99a5880de65380a51757859130cecce82ede0fe70006403bf545570a69563e07",
+      "bytes": 9922
+    },
+    "jvm.json": {
+      "sha256": "fae5033809477e0c501532e3b87a27180565ac88e530e6408fa957bd65cb4a42",
+      "bytes": 265
+    },
+    "native-compile-terminal.json": {
+      "sha256": "ff6fe28137e525eecfddfbda223b9f186bbe06e6863fef3263f386da77b55747",
+      "bytes": 514
+    },
+    "native-compile.log": {
+      "sha256": "61ece68e800ebd59643b60870723dc56c948771193ceabacc7180b53580ac13c",
+      "bytes": 823
+    },
+    "native-environment.json": {
+      "sha256": "8e970a0739f485dcdd189e1fa07f7de9960f44dbec75958cc560f8a2b0c4dde4",
+      "bytes": 59
+    },
+    "native-run-terminal.json": {
+      "sha256": "c3120a55cdbb00a6de8527a41895266e0143f41b6f198177daec70c784385550",
+      "bytes": 430
+    },
+    "native-run.log": {
+      "sha256": "6ff063d1f1f5c538043de29cbb5f8e64dfaad94a1ce6f90a194bf84dc0a4c387",
+      "bytes": 425
+    },
+    "native-snapshot-compiled/compile-binding.json": {
+      "sha256": "b00cb2610051965844bfdd9347d6396c6519acaf9c59cd721301d44e8c5172ff",
+      "bytes": 575
+    },
+    "native-snapshot-compiled/fixture.jar": {
+      "sha256": "077ffdebc9578caf72f84ac948f8527c84dd9261d858382ba8f1067f65815b29",
+      "bytes": 8003
+    },
+    "observation-terminals.json": {
+      "sha256": "7b6e9c5848c91c3c48e26df02f783ad62b8a31b8df7255a84cdf4addd9b3e44a",
+      "bytes": 2138
+    },
+    "package-proof-terminal.json": {
+      "sha256": "97d8bd082d68728776ff6144c321260453bfa8b29354e3526c0b40c362708204",
+      "bytes": 258
+    },
+    "package-proof.log": {
+      "sha256": "9b2cb10ca0bc92a50554ab381ce9b7fb9949791e8bb08435b1967ebf28a132b4",
+      "bytes": 611
+    },
+    "package-proof.py": {
+      "sha256": "bd43e7e0cce774c2bf3ac837d37ab72e3f855b9569b83055f635a8b502cbc447",
+      "bytes": 3859
+    },
+    "postflight-terminal.json": {
+      "sha256": "5572c3760254aa82a8cce94b13da3fa90bc0d3e84f5bbeb8fbacabb08b7c485d",
+      "bytes": 263
+    },
+    "preflight-terminal.json": {
+      "sha256": "ff3c168de97c9fc39436b8002c2a1a4ac56d7fc496adff4172544f494a2690a7",
+      "bytes": 264
+    },
+    "preservation.json": {
+      "sha256": "2de61275dfa1480b50994ef53e781f275c02efce4e91569504dfda44473a7ed6",
+      "bytes": 718
+    },
+    "private-unit-classpath.init.gradle": {
+      "sha256": "4b44a264d5dd85c9e7b3c8f16067d246b70029f04e95e2a282f572b11fbdfd48",
+      "bytes": 588
+    },
+    "root-backlog-inspection.json": {
+      "sha256": "7ca073f21cbf586793df89b8c032bfe9db56753a819e9fbf51fd49e5e761f312",
+      "bytes": 379
+    },
+    "root-documentation-admission.json": {
+      "sha256": "595f792f69059004234eaf5f536052c460a43441e97449dd5a7847d4a1580a86",
+      "bytes": 276
+    },
+    "root-native-admission.json": {
+      "sha256": "3fd00de8bd9d321374145afe297963461b1eeda4177b9cd919ae833e71b26b53",
+      "bytes": 692
+    },
+    "run-snapshot-native.py": {
+      "sha256": "4ce3d4160baf6a2d0e0f1da1d360ddfa2757c61fb3e9334f18ef5d8b7f20781e",
+      "bytes": 11091
+    },
+    "screenshot-observation.json": {
+      "sha256": "231203a4d3528a2830dedf6c053ddbbe9b2d24c8b9e83b7f78c465e0971f26b4",
+      "bytes": 522
+    },
+    "screenshot-terminal.json": {
+      "sha256": "a5f43f40e78b69a46c2b9493a068f857bf31f8936c446a6263bf21ecaf2aed81",
+      "bytes": 259
+    },
+    "snapshot-native-author-freeze.json": {
+      "sha256": "63156d9e621cf506d75297b99466eb199abeb8ec29d22feedc9f7ae9a4175c55",
+      "bytes": 2827
+    },
+    "snapshot-native-binding-all.json": {
+      "sha256": "4b393c121e3a3b87d8b60a3ae82bf4fc88299102aa818bc6433e55b243c1794d",
+      "bytes": 943
+    },
+    "snapshot-native-cleanup-all.json": {
+      "sha256": "6dc986ff212072b35cc3ca57e1adce28f077ad5d57e8b601c8ba5210d325808d",
+      "bytes": 405
+    },
+    "snapshot-test-author-freeze.json": {
+      "sha256": "a0826bb7d669a739a644d2b88fecb879e11cda0429ffd5e443e961202994c4ed",
+      "bytes": 1947
+    },
+    "source-hashes.json": {
+      "sha256": "ce3e8bb0e651ac1918cbf1819fb50bc1d368c5e9ff3c55b90811551fbd134aa8",
+      "bytes": 508
+    },
+    "sunrise-repeat-config-audit.json": {
+      "sha256": "acf77def7695beef6c2aaaa640cbc5c71e034a4ad681a4fb5113ed0ffa563785",
+      "bytes": 5901
+    },
+    "version-guard-terminal.json": {
+      "sha256": "93ea42a23213d64e28312936b0d742003caf237424e05b15dfdaa8ec2ad728c0",
+      "bytes": 218
+    }
+  },
+  "limits": [
+    "Actual JVM and debug native helper acceptance uses generated streams and owned scratch. Extracted-equivalent baseline is distinct from untouched rollback APK and original Activity acceptance.",
+    "Activity cancellation/destruction and daemon/session file consumption are source-reviewed only. Native Activity, archive metadata, Compose/prompt UI, valid installation, real daemon/system installer and API28 remain unverified.",
+    "Candidate R8 inlines copy into ApkInstallActivity.onCreate and removes the isolated helper class. No optimized method attempt/call or keep rules; optimized Activity acceptance remains open.",
+    "Normal two-parent retirement and scratch removal are observed. No external-timeout/fault-cleanup injection; deletion is best effort and process death can leave cache files. No power-loss durability or universal cleanup claim.",
+    "Existing session result routing, destroyed-Activity status callbacks, daemon queue contention and older installer acceptance gaps are unchanged and retain established scopes.",
+    "Family screenshot verifies only its current clock frame; incoming APK prompt, valid installation and Living visual acceptance are open. Health is limited /diag and requested1500-line logcat output, with actual counts recorded.",
+    "Private serial-bearing binding, raw household captures/preferences and original registry payloads are not published. Phone control, HA, authentication, push/publication and all older held/exhausted scopes remain unchanged."
+  ]
+}

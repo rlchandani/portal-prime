@@ -13,8 +13,10 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / Accessibility reconnect service preservation:** exact
-  optimized **1.120/code114** is installed and fully hashed in both rooms. The
+- **Current room APK / Incoming APK snapshot ownership:** exact optimized **1.121/code115** is installed and fully hashed in both rooms. External open-with prompts own unique copied APK files, so later successful or failed imports preserve earlier bytes. Ten frozen copy-helper tests reproduce six assertion-subclass failures and four controls, then all pass unchanged. **4,303 JVM / 446 suites**, debug, optimized, R8 and vital lint pass in 2m 3s. The failing original Activity admission is excluded; actual regressions exercise the extracted-equivalent copy helper. Actual debug Family copy-helper checks improve 6/12 to 12/12: six corrected product checks, four retained product controls and two retained harness checks. Each variant makes 17 actual copy and 17 generated opener calls across ten generated case folders; all 14 generated source streams close exactly once. Two null sources and one generated open failure are retained. No optimized helper calls or keep rules. Two accepted native parents and scratch retire normally; compiler has three Java8 obsolescence warnings. Activity destruction and daemon/session file consumption are source-reviewed only. Generated-stream copy-helper JVM and debug native acceptance only; Activity lifecycle and daemon/session consumption are source-reviewed. Optimized helper, native Activity, valid package installation, prompt UI, actual daemon/system installer and API28 remain unverified. Cleanup is best effort and process death can retain cache files. Eleven preference states per room match: Family ten byte-identical files and one unchanged absence; Living seven byte-identical files and four unchanged absences. Four complete maps, room name and Dev Mode match. Family frame was viewed; font, accessibility, original Chrome, resumed frame and awake display remain. Living visual open. Limited lines=1500 requests produce 1644/2015 actual lines without fatal or ANR markers. Copied credentials removed, original registry and public1.83/code77 manifest unchanged. **97 tasks: 62 delivered, 25 locally verified, 3 approval, 6 parked, 1 queued.** Original **12:12:15.980481–12:42:15.980481 UTC** clock retained. Sunrise is a bounded negative audit; Intercom and all older scopes retain their clocks. Broader goal active. [Receipt](portal-apk-incoming-snapshot-2026-11-03.md).
+
+- **Previous room APK / Accessibility reconnect service preservation:** exact
+  optimized **1.120/code114** was installed and fully hashed in both rooms at that delivery's closure; the current APK snapshot build supersedes it. The
   delayed BarWatch callback reads the current list and preserves service changes
   during its two-second gap, including actual install-confirm append. Existing
   drop, delay, master flag, own-case repair and connected no-churn remain.
@@ -42,7 +44,7 @@ The updated whole-product objective is
 
 - **Previous room APK / Atom news article links:** exact optimized
   **1.119/code113** was installed and fully hashed in both rooms at that
-  delivery's closure; the current reconnect build supersedes it. Atom headlines
+  delivery's closure; the reconnect build superseded it. Atom headlines
   prefer the first nonblank alternate or omitted-relation link; self and
   enclosure targets do not become articles. Standard quoted attributes,
   existing RSS text priority, title cleanup, order and cap remain.

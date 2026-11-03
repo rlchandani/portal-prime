@@ -60,6 +60,9 @@ import kotlin.concurrent.thread
  */
 class ApkInstallActivity : ComponentActivity() {
 
+  @Volatile private var incomingApk: File? = null
+  @Volatile private var installInProgress = false
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val src: Uri? = intent?.data
@@ -70,19 +73,12 @@ class ApkInstallActivity : ComponentActivity() {
 
     // Copy the APK somewhere we control (the daemon needs a real file path, and
     // we parse it for the app's name/icon).
-    val apk = File(cacheDir, "incoming.apk")
-    val copied =
-        runCatching {
-              contentResolver.openInputStream(src).use { input ->
-                requireNotNull(input)
-                apk.outputStream().use { input.copyTo(it) }
-              }
-            }
-            .isSuccess
-    if (!copied) {
+    val apk = IncomingApkSnapshot.copy(cacheDir) { contentResolver.openInputStream(src) }
+    if (apk == null) {
       finish()
       return
     }
+    incomingApk = apk
 
     val info = packageManager.getPackageArchiveInfo(apk.absolutePath, 0)?.applicationInfo
     info?.sourceDir = apk.absolutePath
@@ -105,15 +101,38 @@ class ApkInstallActivity : ComponentActivity() {
     }
   }
 
+  override fun onDestroy() {
+    if (!installInProgress) releaseIncoming(incomingApk)
+    super.onDestroy()
+  }
+
+  private fun releaseIncoming(apk: File?) {
+    if (apk == null) return
+    runCatching { apk.delete() }
+    if (incomingApk === apk) incomingApk = null
+  }
+
   private fun doInstall(apk: File, pkg: String, setStatus: (String) -> Unit) {
     when {
       InstallDaemon.installPaused(this) ->
           setStatus("Paused — connect to your computer and run the Immortal installer again")
       InstallDaemon.isAvailable(this) -> {
         setStatus("Installing…")
-        thread {
-          val ok = InstallDaemon.install(this, apk, pkg)
-          runOnUiThread { setStatus(if (ok) "Installed ✓" else "Install failed") }
+        installInProgress = true
+        try {
+          thread {
+            try {
+              val ok = InstallDaemon.install(this, apk, pkg)
+              runOnUiThread { setStatus(if (ok) "Installed ✓" else "Install failed") }
+            } finally {
+              releaseIncoming(apk)
+              installInProgress = false
+            }
+          }
+        } catch (failure: Throwable) {
+          releaseIncoming(apk)
+          installInProgress = false
+          throw failure
         }
       }
       else -> {
@@ -124,7 +143,11 @@ class ApkInstallActivity : ComponentActivity() {
         // re-delegation to com.android.packageinstaller via ACTION_VIEW, which failed whenever
         // the source URI wasn't one that installer could read ("Couldn't install on this device").
         setStatus("Installing…")
-        commitSessionInstall(apk, setStatus)
+        try {
+          commitSessionInstall(apk, setStatus)
+        } finally {
+          releaseIncoming(apk)
+        }
       }
     }
   }
