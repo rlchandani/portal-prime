@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T02:27:20.714225+00:00",
+  "scope": "Protected Fleet file-download filename encoding and response header syntax",
+  "sourceBranch": "codex/file-download-headers-20261103",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.94",
+    "versionCode": 88,
+    "bytes": 25861122,
+    "sha256": "6e134cd75e93800d3b81e73cdbc9d7909c06587958de3bb1845ac550e3543d1e",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "tests": {
+    "initialRegressionMethods": 12,
+    "initialFailures": 11,
+    "initialErrors": 0,
+    "finalRegressionMethods": 12,
+    "finalRegressionFailures": 0,
+    "fullJvm": {
+      "suites": 423,
+      "tests": 4066,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "debugBuild": "Passed in initial combined invocation",
+    "initialCombinedBuild": {
+      "seconds": 227,
+      "outcome": "Failed at R8 due to local disk exhaustion; never promoted"
+    },
+    "optimizedRetry": {
+      "seconds": 58,
+      "terminalExitCode": 0,
+      "gates": [
+        "performance",
+        "R8",
+        "vital-lint"
+      ]
+    },
+    "independentSourceReview": "No concrete blocker; four reviewed source hashes unchanged"
+  },
+  "native": {
+    "device": "Family Area",
+    "apiLevel": 29,
+    "actualProtectedHttpRoute": "/fs/read",
+    "bodyBytesPerCase": 8192,
+    "generatedNonmediaFiles": 4,
+    "baseline": {
+      "passed": 1,
+      "cases": 4,
+      "allBodyBytesEqual": true,
+      "caseResults": [
+        {
+          "case": "normal",
+          "pass": true,
+          "failedChecks": [],
+          "injectedHeaderCount": 0,
+          "bodyBytesEqual": true,
+          "declaredLengthCorrect": true,
+          "oneDispositionField": true,
+          "preferredFilename": "normal.bin",
+          "filenameSource": "filename"
+        },
+        {
+          "case": "unicode",
+          "pass": false,
+          "failedChecks": [
+            "extended_parameter_requirement",
+            "canonical_extended_encoding",
+            "preferred_filename_matches_logical_name"
+          ],
+          "injectedHeaderCount": 0,
+          "bodyBytesEqual": true,
+          "declaredLengthCorrect": true,
+          "oneDispositionField": true,
+          "preferredFilename": "Family-??-??.bin",
+          "filenameSource": "filename"
+        },
+        {
+          "case": "quotes",
+          "pass": false,
+          "failedChecks": [
+            "one_safe_quoted_fallback",
+            "extended_parameter_requirement",
+            "canonical_extended_encoding",
+            "preferred_filename_matches_logical_name"
+          ],
+          "injectedHeaderCount": 0,
+          "bodyBytesEqual": true,
+          "declaredLengthCorrect": true,
+          "oneDispositionField": true,
+          "preferredFilename": "quotes-and-backslash.bin",
+          "filenameSource": "filename"
+        },
+        {
+          "case": "crlf",
+          "pass": false,
+          "failedChecks": [
+            "no_injected_x_immortal_qa",
+            "attachment_disposition",
+            "one_safe_quoted_fallback",
+            "extended_parameter_requirement",
+            "canonical_extended_encoding",
+            "preferred_filename_matches_logical_name",
+            "unique_parameter_names"
+          ],
+          "injectedHeaderCount": 1,
+          "bodyBytesEqual": true,
+          "declaredLengthCorrect": true,
+          "oneDispositionField": true,
+          "preferredFilename": null,
+          "filenameSource": null
+        }
+      ],
+      "finishedAtUtc": "2026-11-03T02:20:26.273937+00:00"
+    },
+    "candidate": {
+      "passed": 4,
+      "cases": 4,
+      "allBodyBytesEqual": true,
+      "caseResults": [
+        {
+          "case": "normal",
+          "pass": true,
+          "failedChecks": [],
+          "injectedHeaderCount": 0,
+          "bodyBytesEqual": true,
+          "declaredLengthCorrect": true,
+          "oneDispositionField": true,
+          "preferredFilename": "normal.bin",
+          "filenameSource": "filename*"
+        },
+        {
+          "case": "unicode",
+          "pass": true,
+          "failedChecks": [],
+          "injectedHeaderCount": 0,
+          "bodyBytesEqual": true,
+          "declaredLengthCorrect": true,
+          "oneDispositionField": true,
+          "preferredFilename": "Family-\u5bb6\u65cf-\ud83c\udfb5.bin",
+          "filenameSource": "filename*"
+        },
+        {
+          "case": "quotes",
+          "pass": true,
+          "failedChecks": [],
+          "injectedHeaderCount": 0,
+          "bodyBytesEqual": true,
+          "declaredLengthCorrect": true,
+          "oneDispositionField": true,
+          "preferredFilename": "quotes-\"and-\\backslash.bin",
+          "filenameSource": "filename*"
+        },
+        {
+          "case": "crlf",
+          "pass": true,
+          "failedChecks": [],
+          "injectedHeaderCount": 0,
+          "bodyBytesEqual": true,
+          "declaredLengthCorrect": true,
+          "oneDispositionField": true,
+          "preferredFilename": "header-__X-Immortal-QA: injected.bin",
+          "filenameSource": "filename*"
+        }
+      ],
+      "finishedAtUtc": "2026-11-03T02:22:27.381875+00:00"
+    },
+    "baselineOuterExitCode": 1,
+    "candidateOuterExitCode": 0,
+    "fullInstalledCandidateHashVerified": true
+  },
+  "deployment": {
+    "Family Area": "Terminal deploy success, fresh full installed APK SHA via fixed Family ADB,1.94/code88, visually checked normal frame",
+    "Living Area": "Terminal deploy success with full installed APK SHA verification, fresh1.94/code88 and complete saved maps; no duplicate native QA"
+  },
+  "preservationAndCleanup": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "manualPhotoFrameForeground": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true
+    },
+    "cleanup": {
+      "ownedNativeNonmediaFilesRemoved": 4,
+      "ownedMarkerAndDirectoryRemoved": true,
+      "independentNativeAbsenceConfirmed": true,
+      "ownedRegistryRemoved": true,
+      "ownedServerStarted": false,
+      "workerClosed": true,
+      "pixelCommandsAfterProhibition": 0,
+      "phoneCleanupDeferred": true,
+      "previousMappingBytesPreservedInVerifiedGzip": true,
+      "initialOptimizedBuildRejectedForDiskFailure": true,
+      "acceptedOptimizedRetryTerminalSuccess": true
+    }
+  },
+  "diskRecovery": {
+    "scope": "Completed owned older mapping snapshots only; current/rollback/phone artifacts protected",
+    "mappingArchives": 6,
+    "rawBytesRetained": true,
+    "allRoundTripSha256Verified": true,
+    "freedBytes": 450962214
+  },
+  "matchingMapping": {
+    "rawSha256": "f775b3696b258548704c4b1303df7134df7551b60ff7b5e393bd94a4e479a2b2",
+    "rawBytes": 83151736,
+    "gzipBytes": 7914875,
+    "roundTripVerified": true
+  },
+  "issueClock": {
+    "startedAtUtc": "2026-11-03T02:08:09Z",
+    "deadlineUtc": "2026-11-03T02:38:09Z",
+    "includesDiscoveryCleanupAndCommit": true
+  },
+  "research": [
+    "https://www.rfc-editor.org/rfc/rfc6266.html",
+    "https://www.rfc-editor.org/rfc/rfc8187.html"
+  ],
+  "limits": [
+    "Native HTTP checks cover four generated8KiB files, not real photos, browser save-dialog naming or rejected-token behavior. Existing auth/access boundaries were source-reviewed.",
+    "Only download filename metadata changed; concurrent source-file mutation/snapshot semantics and whole-product header serialization remain outside scope.",
+    "No optical FPS, general UI or whole-product performance claim. Living presentation not visually inspected; exact full installed APK and complete saved maps verified.",
+    "Pixel control/inspection prohibited; earlier phone cleanup deferred. No HA/GitHub/publication, preference or design change; exhausted issue clocks unchanged."
+  ],
+  "roadmapBrowser": {
+    "viewports": [
+      {
+        "width": 390,
+        "clientWidth": 375,
+        "scrollWidth": 375
+      },
+      {
+        "width": 1600,
+        "clientWidth": 1585,
+        "scrollWidth": 1585
+      }
+    ],
+    "currentVersionVisible": true,
+    "pixelControlBoundaryVisible": true,
+    "parkedVideoResearchVisible": true,
+    "trackedTasks": 64,
+    "newEvidenceLinksExist": true
+  }
+}

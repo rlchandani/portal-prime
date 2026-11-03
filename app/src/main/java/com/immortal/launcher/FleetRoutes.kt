@@ -498,12 +498,11 @@ class FleetRoutes(private val context: Context) {
     val path = req.queryParam("path") ?: return resp(400, err("path_required"))
     val f = File(path)
     if (!f.isFile || !f.canRead()) return resp(404, err("not_a_readable_file"))
-    val name = f.name.replace("\"", "")
     return FleetHttpServer.Response.stream(
         200,
         "application/octet-stream",
         f.length(),
-        headers = mapOf("Content-Disposition" to "attachment; filename=\"$name\"")) { out ->
+        headers = mapOf("Content-Disposition" to FleetFs.attachmentDisposition(f.name))) { out ->
           f.inputStream().use { it.copyTo(out) }
         }
   }

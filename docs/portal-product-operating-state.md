@@ -21,7 +21,35 @@ The updated whole-product objective is
   deferred because they would require another phone command. Companion source
   and isolated QA remain available.
 
-- **Current room APK / latest photo redirect delivery:** both rooms contain exact
+- **Current room APK / latest file-download delivery:** both rooms contain exact
+  optimized **1.94/code88**. Fleet attachment filenames use an ASCII fallback
+  and RFC8187 UTF-8 parameter; ISO controls cannot create response headers.
+  Initial12 methods reproduced11 failures; final12 and **4,066 JVM/423 suites**
+  passed. Debug passed; initial227sec combined build failed at R8 on local disk
+  exhaustion and was rejected. Six completed owned mapping snapshots were
+  archived losslessly with round-trip SHA proof; original bytes remain retained,
+  current/rollback/phone artifacts protected. Optimized/R8/vital-lint retry
+  passed58sec. Family actual protected HTTP improved **1/4→4/4**; synthetic
+  headers1→0, Unicode/quote/backslash names retained and all same8KiB bodies
+  unchanged. Independent review and four source hashes matched. Both full
+  installed APK hashes and complete maps match; Family frame/font/services/
+  original Chrome retained. Four owned nonmedia files/marker/root and registry
+  removed; worker closed. No Pixel access. Browser save dialogs, concurrent
+  source-file changes and general performance remain outside acceptance.
+  Original **02:08:09–02:38:09UTC** includes cleanup and commit.
+  [Scoped receipt](portal-file-download-headers-2026-11-03.md).
+
+- **Direct video redirect research remains parked:** uncached MediaPlayer URI
+  streaming bypasses the photo helper. Exact Android9/10 sources show the
+  internal redirect switch checks hostname/protocol without the effective port;
+  it is not being installed as full credential-origin protection. Native Meta
+  media/TLS/provider behavior is unverified; no real exposure observed. A ranged
+  transport or protected cache-first design needs playback/seek/cancellation and
+  equivalent hardware performance acceptance. Original **01:52:39–02:22:39UTC**
+  retained; source research committed within it, no fresh slot granted.
+  [Source findings](portal-platform-video-redirect-research-2026-11-03.md).
+
+- **Previous photo redirect delivery:** both rooms received exact
   optimized **1.93/code87**. Photo HTTP redirects with nonempty source headers
   remain on their initial origin, downgrade/malformed targets are rejected and
   five redirects/six requests bound loops. Initial10 JVM methods reproduced8

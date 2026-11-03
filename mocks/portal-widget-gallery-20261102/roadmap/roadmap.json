@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T02:05:00.804083+00:00",
-  "updatedLabel": "3 November 2026 \u00b7 photo HTTP redirect delivery",
+  "updatedAt": "2026-11-03T02:27:20.718108+00:00",
+  "updatedLabel": "3 November 2026 \u00b7 file-download header delivery",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,95 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "file-download-headers",
+      "title": "File downloads: safe headers and readable Unicode names",
+      "summary": "Delivered to both rooms. Filenames no longer create response headers; Unicode, quotes and backslashes survive standard encoded attachment names.",
+      "description": "The real Family file route reproduced a synthetic header from a generated CRLF filename, question-mark Unicode and lost quote/backslash characters. Encode the filename once while retaining protected streaming and exact body bytes.",
+      "status": "delivered",
+      "verification": "11 initial failures\u219212/12 \u00b74,066 JVM \u00b7Family1/4\u21924/4 \u00b7injected headers1\u21920 \u00b7all bodies identical",
+      "kind": "Fleet download reliability / header safety",
+      "platforms": [
+        "portal",
+        "fleet"
+      ],
+      "owner": "Portal engineering / independent review / Family native HTTP QA",
+      "deployment": "Exact optimized1.94/code88 installed and fully hashed in both rooms; complete saved settings/layout/source maps unchanged.",
+      "state": "Four same generated8KiB files on Family actual protected HTTP before/after; normal manual frame/font/services/original Chrome task retained.",
+      "acceptance": [
+        "Emit one ASCII attachment header with one safe fallback and one RFC8187 UTF-8 filename parameter.",
+        "Sanitize ISO controls and retain sanitized Unicode/quote/backslash names through percent encoding.",
+        "Preserve existing protected GET, access guard, streaming body and declared byte length.",
+        "Reproduce original filename/header defects on Family and verify every candidate body byte.",
+        "Verify exact both-room APKs, whole saved maps and removal of all owned native fixtures/registry copies."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, RFC research, native comparison, build disk recovery, delivery and limits.",
+          "source": "docs/portal-file-download-headers-2026-11-03.md"
+        },
+        {
+          "text": "Twelve methods, full suite, actual protected HTTP filenames/headers/body and complete cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/file-download-headers-verification.json"
+        }
+      ],
+      "limits": [
+        "Native HTTP checks cover four generated8KiB files, not real photos, browser save-dialog naming or rejected-token behavior. Existing auth/access boundaries were source-reviewed.",
+        "Only download filename metadata changed; concurrent source-file mutation/snapshot semantics and whole-product header serialization remain outside scope.",
+        "No optical FPS, general UI or whole-product performance claim. Living presentation not visually inspected; exact full installed APK and complete saved maps verified.",
+        "Pixel control/inspection prohibited; earlier phone cleanup deferred. No HA/GitHub/publication, preference or design change; exhausted issue clocks unchanged."
+      ],
+      "next": "Continue independent authorized work; browser download UI and concurrent source-file changes are separate acceptance. Do not control Pixel or reopen exhausted issues.",
+      "issueClock": {
+        "startedAt": "2026-11-03T02:08:09Z",
+        "deadline": "2026-11-03T02:38:09Z",
+        "firstSourceAuditClockRetained": true,
+        "scope": "Fleet file-download filename headers"
+      }
+    },
+    {
+      "id": "platform-video-redirects",
+      "title": "Direct video streaming: redirect boundary remains unresolved",
+      "summary": "Parked research item. Android9/10 source confirms its internal redirect switch omits port checks; no complete streaming fix is claimed.",
+      "description": "Uncached slideshow videos use the platform MediaPlayer data-source path and bypass the delivered photo HTTP helper. A host/protocol-only platform switch cannot provide the full source-origin boundary.",
+      "status": "parked",
+      "verification": "Two exact AOSP tag sources inspected and hashed \u00b7no native video verdict",
+      "kind": "Remaining source-qualified streaming risk",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Media transport / security / performance acceptance",
+      "deployment": "No production video patch, firmware change or streaming experiment installed. Existing cached-video behavior retained.",
+      "state": "Original01:52:39\u219202:22:39UTC clock retained; research committed within it as 0de3314d. No real credential exposure observed.",
+      "acceptance": [
+        "Use a full scheme/host/effective-port boundary for authenticated direct streams.",
+        "Preserve muted background playback, range/seek, cancellation, generation ownership and position retention.",
+        "Establish equivalent hardware playback/latency acceptance before a complete transport change."
+      ],
+      "evidence": [
+        {
+          "text": "Exact Android9/10 source findings, rejected shortcut and complete-design requirements.",
+          "source": "docs/portal-platform-video-redirect-research-2026-11-03.md"
+        },
+        {
+          "text": "Source hashes, original deadline and no native/production-change assertion.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/platform-video-redirect-research.json"
+        }
+      ],
+      "limits": [
+        "These AOSP revisions do not establish Meta firmware behavior or actual credential exposure.",
+        "Photo/video-prefetch protection does not cover the direct MediaPlayer URI path.",
+        "No actual TLS, provider playback, range/seek, cancellation or performance acceptance; no port-blind switch installed.",
+        "This task preserves the original exhausted clock; it does not authorize a fresh slot. Pixel remains prohibited."
+      ],
+      "next": "Keep parked with original observation/deadline. A ranged MediaDataSource or protected cache-first design needs a separately authorized bounded implementation and hardware acceptance.",
+      "issueClock": {
+        "startedAt": "2026-11-03T01:52:39Z",
+        "deadline": "2026-11-03T02:22:39Z",
+        "firstSourceAuditClockRetained": true,
+        "scope": "Direct platform video redirect boundary"
+      }
+    },
     {
       "id": "photo-source-redirects",
       "title": "Photo redirects: keep source keys on the intended server",

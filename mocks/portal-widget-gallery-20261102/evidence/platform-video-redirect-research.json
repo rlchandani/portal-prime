@@ -1,0 +1,31 @@
+{
+  "scope": "Direct platform media source research, not a native privacy verdict",
+  "firstObservedAtUtc": "2026-11-03T01:52:39Z",
+  "originalDeadlineUtc": "2026-11-03T02:22:39Z",
+  "platformSources": {
+    "android9": {
+      "sha256": "327a06df31204b66a55b34525c13bb42fb41ee580bcca1f43ee6904a43f924fc",
+      "internalSwitchPresent": true,
+      "hostOnlyComparisonPresent": true,
+      "protocolComparisonPresent": true,
+      "twentyRedirectConstantPresent": true,
+      "noGetPortComparisonInSource": true
+    },
+    "android10": {
+      "sha256": "2b7c8e6047281ae26ce2203ea82047968646f906e2e7dfa8962855274fd711f8",
+      "internalSwitchPresent": true,
+      "hostOnlyComparisonPresent": true,
+      "protocolComparisonPresent": true,
+      "twentyRedirectConstantPresent": true,
+      "noGetPortComparisonInSource": true
+    }
+  },
+  "actualFirmwareOrPlatformMediaTested": false,
+  "productionVideoPatchMade": false,
+  "decision": "Do not ship the port-blind internal switch as complete source-origin protection; a ranged transport/cache design needs separate performance and playback acceptance; no original-clock extension",
+  "commit": "0de3314d032a3a5dc82c8dcc82c0605bfd8147a7",
+  "completedAtUtc": "2026-11-03T02:22:14.194285+00:00",
+  "originalClockRetained": true,
+  "state": "parked; no native/media privacy completion claim",
+  "wholeProductGoal": "active"
+}

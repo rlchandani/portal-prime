@@ -50,5 +50,30 @@ object FleetFs {
         else -> "other"
       }
 
+  /** ASCII HTTP syntax with a legacy fallback and RFC8187 UTF-8 filename. */
+  internal fun attachmentDisposition(name: String): String {
+    val safe = name.map { if (it.isISOControl()) '_' else it }.joinToString("")
+        .ifEmpty { "download" }
+    // Some legacy clients mishandle quoted-pair escapes; keep their fallback simple.
+    val fallback = safe.map {
+      if (it.code in 32..126 && it != '"' && it != '\\') it else '_'
+    }.joinToString("")
+    val encoded = buildString {
+      for (byte in safe.toByteArray(Charsets.UTF_8)) {
+        val value = byte.toInt() and 255
+        val char = value.toChar()
+        if (char in 'a'..'z' || char in 'A'..'Z' || char in '0'..'9' ||
+            char in "!#$&+-.^_`|~") {
+          append(char)
+        } else {
+          append('%')
+          append("0123456789ABCDEF"[value ushr 4])
+          append("0123456789ABCDEF"[value and 15])
+        }
+      }
+    }
+    return "attachment; filename=\"$fallback\"; filename*=UTF-8''$encoded"
+  }
+
   private fun err(code: String) = JSONObject().put("ok", false).put("error", code)
 }
