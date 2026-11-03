@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T19:48:17.841432+00:00",
+  "status": "locally_verified",
+  "scope": "Standalone Immich audit rejects repeated/backward page markers before another request",
+  "originalClock": {
+    "startedAt": "2026-11-03T19:38:59Z",
+    "deadline": "2026-11-03T20:08:59Z",
+    "reset": false,
+    "discoveryIncluded": true
+  },
+  "baseline": {
+    "tests": 7,
+    "failures": 3,
+    "errors": 0,
+    "skipped": 0,
+    "runStart": "2026-11-03T19:44:50.298658+00:00",
+    "runEnd": "2026-11-03T19:44:50.357332+00:00",
+    "exitCode": 1,
+    "logBytes": 6556,
+    "logSha256": "b08099ed88390add1b2fdddec555fd70a510418553d5e01b4dd651a920dad0ff",
+    "controls": 4,
+    "sourceSha256": "6b9f1555ced3e8fcd7cdd52d0d5cc470815d2c470f958ff7f61e46cbfeebc382"
+  },
+  "focused": {
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "runStart": "2026-11-03T19:44:57.872459+00:00",
+    "runEnd": "2026-11-03T19:44:57.926315+00:00",
+    "exitCode": 0,
+    "logBytes": 1337,
+    "logSha256": "06c2675bd3b1b00856c224675fbf78fe2355976254eaabeef39fca6152e59947"
+  },
+  "candidate": {
+    "tests": 248,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "runStart": "2026-11-03T19:45:05.026864+00:00",
+    "runEnd": "2026-11-03T19:45:29.008097+00:00",
+    "exitCode": 0,
+    "logBytes": 40455,
+    "logSha256": "f4805d69b2a44c5e4d990a4c5c27fa216cdf3725195fb25798431db84206d055",
+    "focused": 7,
+    "sourceSha256": "2565b022de3adff99510d5b5fa76dc8cc610c0bee34b9e22ae43b90b6a80038b",
+    "fixtureBytes": 5916,
+    "fixtureSha256": "ddd07b62babedafb2cb3a6e606a0660d110cbd92ccdcf99ce6be3ef7b2b880b7"
+  },
+  "integration": {
+    "ImmortalCommit": "74b7a48afaa4ac217666cf7234feb33146def778",
+    "parent": "cdfe7c21162380b41cf2894e6da1ba48cd6a7f4b",
+    "recordedAtUtc": "2026-11-03T19:47:29.319774+00:00",
+    "localOnly": true,
+    "deployed": false,
+    "published": false
+  },
+  "independentReview": {
+    "checks": 12,
+    "passed": 12,
+    "blockers": 0,
+    "reportSha256": "fc1ed57aa71acad1f57032dd3112041307413fc6150fc5b6fb29ac4dfce9484e"
+  },
+  "fixtureAdmission": {
+    "checks": 9,
+    "passed": 9,
+    "preRedMessage": true,
+    "qualification": "Early source/fixture admission preceded RED; the later durable report binds both original and corrected source separately.",
+    "reportSha256": "b826884d8c0b6c5ba8407cf1085240418e3bcc6b6232eba53c8cf57d6527738d"
+  },
+  "discovery": {
+    "usb": {
+      "status": "bounded_negative_no_distinct_supported_defect",
+      "reportSha256": "405b678952ec07da2807935aaa6bd419a7786115250c49c1517a1c25f77de889"
+    },
+    "photos": {
+      "status": "unselected_source_spec_observation_no_runtime_admission",
+      "reportSha256": "1f9cdfe85c487ac6c69c80ac9a42469f6af5c66f641fb63ad3195fb7bc5609de"
+    }
+  },
+  "ci": {
+    "existingConfiguredWorkflowCoversNewTest": true,
+    "hostedRunsObserved": 0
+  },
+  "inspectorCorrection": "The first unquoted wildcard was rejected by zsh before Python execution. The corrected quoted command ran the full gate.",
+  "limits": [
+    "Actual host Immich client and CLI with finite generated JSON and an inert urlopen boundary. No live Immich, NAS, auth, TLS or provider compatibility acceptance.",
+    "Three extra-request AssertionErrors reproduce the baseline through the real request path; no infinite live-server run is measured. Seven fixture methods and bytes stay frozen across RED/GREEN.",
+    "Strictly advancing pages, including sparse jumps, remain allowed. No request, total-time or memory cap; endlessly advancing responses remain outside this fix.",
+    "Empty, missing and malformed-marker stop behavior remains. No cursor migration, asset dedup, broad input-type or partial-data policy change beyond repeated/backward markers.",
+    "Focused cases do not execute real album resolution, asset measurements, compression/load estimates or a successful full audit report.",
+    "The existing CI wildcard discovers the new tests; hosted CI was not observed. Python host-only change; no Android code, version, dependency, workflow, device, push or publication action.",
+    "Old Android Immich pagination retains 01:27:16\u201301:57:16 and photo redirects retain 01:47:02\u201302:17:02 UTC. Earlier APK and all expired scopes stay held.",
+    "USB discovery is bounded negative. Toolkit photo expiry guidance is an unselected source/spec observation without a fixture, reproduction or fix under this same clock."
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T19:34:55.565199+00:00",
+  "updatedAt": "2026-11-03T19:48:17.841432+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,54 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "immich-audit-pagination",
+      "title": "Immich audit: stop nonadvancing pages",
+      "summary": "The standalone audit exits clearly on repeated or backward pages before issuing another request or reporting a partial library. Seven focused cases and all 248 Python tests pass.",
+      "description": "Validate page progress in the real audit client and route the failure through the existing CLI error exit.",
+      "status": "verified",
+      "verification": "3 baseline failures / 4 controls → 7 pass · 248 Python · independent 12/12",
+      "kind": "Host audit pagination",
+      "platforms": [
+        "tooling"
+      ],
+      "owner": "Immortal tooling / independent source and result review",
+      "deployment": "Local Immortal 74b7a48a only; live provider and hosted CI unverified.",
+      "state": "Only two production fragments change. Real client/request parsing and actual CLI exercised with finite inert responses; fixture bytes frozen. Previous holds remain.",
+      "acceptance": [
+        "Reproduce first-page repeat and backward continuation through the real client, and a later repeat through the actual CLI on unchanged source.",
+        "Reject covered nonadvancing markers before a further request and exit 1 before library totals.",
+        "Retain sparse forward jumps, album/type fields and existing empty/missing/malformed stop controls.",
+        "Pass all seven frozen cases and the complete existing Python CI wildcard."
+      ],
+      "evidence": [
+        {
+          "text": "Baseline, correction and scoped acceptance.",
+          "source": "docs/portal-immich-audit-pagination-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized run/source and review bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/immich-audit-pagination-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual host Immich client and CLI with finite generated JSON and an inert urlopen boundary. No live Immich, NAS, auth, TLS or provider compatibility acceptance.",
+        "Three extra-request AssertionErrors reproduce the baseline through the real request path; no infinite live-server run is measured. Seven fixture methods and bytes stay frozen across RED/GREEN.",
+        "Strictly advancing pages, including sparse jumps, remain allowed. No request, total-time or memory cap; endlessly advancing responses remain outside this fix.",
+        "Empty, missing and malformed-marker stop behavior remains. No cursor migration, asset dedup, broad input-type or partial-data policy change beyond repeated/backward markers.",
+        "Focused cases do not execute real album resolution, asset measurements, compression/load estimates or a successful full audit report.",
+        "The existing CI wildcard discovers the new tests; hosted CI was not observed. Python host-only change; no Android code, version, dependency, workflow, device, push or publication action.",
+        "Old Android Immich pagination retains 01:27:16–01:57:16 and photo redirects retain 01:47:02–02:17:02 UTC. Earlier APK and all expired scopes stay held.",
+        "USB discovery is bounded negative. Toolkit photo expiry guidance is an unselected source/spec observation without a fixture, reproduction or fix under this same clock."
+      ],
+      "next": "Retain the local verified correction. Continue distinct authorized work while provider, phone, publication and exhausted clocks remain held.",
+      "issueClock": {
+        "startedAt": "2026-11-03T19:38:59Z",
+        "deadline": "2026-11-03T20:08:59Z",
+        "reset": false,
+        "discoveryIncluded": true
+      }
+    },
     {
       "id": "toolkit-input-pixels",
       "title": "Portal Toolkit: keep mirror input inside valid pixels",
