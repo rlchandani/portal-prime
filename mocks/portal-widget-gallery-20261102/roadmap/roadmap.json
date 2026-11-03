@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T07:33:45.909648+00:00",
+  "updatedAt": "2026-11-03T07:49:42.394531+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,56 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.110/code104. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.111/code105. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-diag-process",
+      "title": "Fleet diagnostics: close capped output before waiting",
+      "summary": "Delivered to both rooms: capped diagnostic output now releases its pipe so the child and Fleet worker can finish.",
+      "description": "Close the selected diagnostic output stream before waitFor and retire the owned process on all exits. Preserve fixed commands, prefix byte caps, UTF-8 decoding and existing error strings.",
+      "status": "delivered",
+      "verification": "11 unchanged regressions / 4,197 JVM \u00b7 debug and optimized helper 9/11\u219211/11",
+      "kind": "Fleet diagnostics process liveness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Fleet engineering / independent process and native review",
+      "deployment": "Exact signed optimized 1.111/code105 installed and full APK hash verified in Family Area and Living Area.",
+      "state": "Complete maps and Home, timer, Sunrise, Chime, Weather, packs and camera preference bytes match. Family current frame, clock, font, services and original Chrome task retained. Four parents, sixteen generated children, scratch and registry copy removed.",
+      "acceptance": [
+        "Reproduce the capped-pipe wait and ownership failures through actual helper/public logcat regression methods.",
+        "Retain fixed commands, byte caps, UTF-8 boundaries, normal output and error surface while retiring selected stream and process.",
+        "Observe actual native older-build Process.waitFor noncompletion on generated large stdout; candidate returns exact prefix without fixture intervention.",
+        "Run unchanged full gates, actual debug and optimized differential, exact signed room delivery and complete state preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Capped pipe correction, frozen regressions, actual native process comparison and scope.",
+          "source": "docs/portal-fleet-diag-process-2026-11-03.md"
+        },
+        {
+          "text": "Bound source and fixture hashes, actual wait stacks, full gates and preserved room delivery.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/fleet-diag-process-verification.json"
+        }
+      ],
+      "limits": [
+        "Native acceptance invokes actual APK private diagnostics exec with generated read-only child output in a separate shell process. HTTP transport/authentication, public logcat admission, actual oversized owner logs and all diagnostic commands were not exercised by that fixture.",
+        "The correction closes capped output before waiting and retires the created process. It does not add a universal command deadline or guarantee termination of unrelated long-lived/non-writing children or arbitrary process trees.",
+        "Native baselines did not finish within the 1.5-second protected wait and were observed at java.lang.UNIXProcess.waitFor. Identified generated cat children were terminated by the fixture so the real helper could return its exact prefix. These are bounded noncompletion observations, not arbitrary duration benchmarks.",
+        "JVM acquisition/read/close/wait failures use inert doubles. Native exception injection and external runner failure/timeout cleanup were not exercised; normal cleanup of four parents and sixteen generated children was verified.",
+        "Family Android10 generated-child helper behavior is verified; positive installed normal diagnostics separately pass in both rooms. API28, native UI and Living generated-child/visual acceptance remain unverified. Existing UI approvals and exhausted issue clocks retain their boundaries.",
+        "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+      ],
+      "next": "Retain delivered output-pipe correction. Authentication rejection, real oversized owner logcat and API28 acceptance remain open; continue distinct authorized work without reopening parked clocks.",
+      "issueClock": {
+        "startedAt": "2026-11-03T07:36:53+00:00",
+        "deadline": "2026-11-03T08:06:53+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "camera-legacy-identity",
       "title": "Saved cameras: stable unique identities",

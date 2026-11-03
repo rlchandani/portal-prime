@@ -13,8 +13,29 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / saved camera identities:** exact optimized
-  **1.110/code104** is installed and fully hashed in both rooms. Legacy duplicate
+- **Current room APK / Fleet diagnostic output ownership:** exact optimized
+  **1.111/code105** is installed and fully hashed in both rooms. The helper closes
+  its capped output before waiting and retires the created process on all exits;
+  fixed commands, byte caps, UTF-8 and error strings remain. Eleven unchanged
+  methods reproduce seven failures then pass; **4,197 JVM/436
+  suites**, debug/optimized/R8/vital lint pass in 2m 16s. Actual debug and
+  optimized Family private helper both improve **9/11→11/11**, two noncompletion
+  corrections/nine retained checks. Older cases are observed at UNIXProcess.waitFor;
+  candidate returns exact generated prefixes without fixture intervention. Four
+  parents and sixteen generated children retired, scratch removed; native exception/
+  external timeout cleanup unverified. No universal command deadline. Separate
+  positive authenticated normal `/diag` and five-line `/logcat` HTTP checks pass
+  in both rooms; authentication rejection and oversized owner logs remain open.
+  Complete maps and captured Home/timer/
+  Sunrise/Chime/Weather/packs/camera bytes match; Family frame, clock, font, services
+  and original Chrome retained. Registry copy removed. Public1.83 guard rejects
+  local1.111; no phone/HA/auth/publication. **85 tasks:52 delivered,23 locally
+  verified,3 approval,6 parked,1 queued.** Original **07:36:53–08:06:53 UTC** audit
+  clock retained; broader goal stays active.
+  [Receipt](portal-fleet-diag-process-2026-11-03.md).
+
+- **Previous room APK / saved camera identities:** exact optimized
+  **1.110/code104** was installed and fully hashed in both rooms. Legacy duplicate
   and missing camera IDs now normalize deterministically; valid first IDs, fields,
   order and JSON coercion remain. Read-only load writes nothing; ordinary locked
   Add/Remove persist the unique snapshot. Twelve unchanged methods reproduce ten

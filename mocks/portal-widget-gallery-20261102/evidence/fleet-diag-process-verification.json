@@ -1,0 +1,1214 @@
+{
+  "recordedAt": "2026-11-03T07:49:42.394531+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T07:36:53+00:00",
+    "deadline": "2026-11-03T08:06:53+00:00",
+    "baseCommit": "2f3ddc49016f799d5615c22261b071411c89fc41",
+    "scope": "Read-only room runtime-health observation and independent keyless Tools helper correctness discovery. Review existing84-task queue before any selected defect. Exclude all parked UI/performance/redirect/SMB keyboard/music/Weather issues, delivered camera identity and Prayer tomorrow corrections, and previously audited MQTT ownership. Any selected issue retains this original audit clock through final tests/delivery/docs/cleanup/commit.",
+    "selectedScope": "Fleet diagnostic capped output stream and owned process retirement: close selected output before waiting; preserve fixed command allow-list, prefix caps, UTF8 and existing error surface."
+  },
+  "scope": "Fleet diagnostic output-pipe and owned process retirement; retain fixed commands, output caps, UTF8 and existing error surface.",
+  "finding": {
+    "trigger": "An allowed diagnostic command produces more than its byte cap plus the process pipe capacity. readCapped stops consuming before EOF; exec calls waitFor without closing stdout. The child can be blocked writing unread bytes while the worker awaits child exit.",
+    "source": "app/src/main/java/com/immortal/launcher/FleetDiag.kt:79",
+    "sourceSha256": "fbd0fd91f096e172b209c263751cd54c541830202b36226e4afc279b07c7297f",
+    "route": "GET /logcat?lines=20000 uses actual 4MiB cap; fixed allow-list unchanged.",
+    "status": "Reproduced by frozen JVM regressions and generated actual APK process comparison; corrected, locally delivered and verified within the recorded scope.",
+    "backlogRecordsReviewed": 84,
+    "duplicateTaskFound": false,
+    "liveRecentSamples": "Each room current1.110; sampled1500lines perroom contain0fatal/ANRmarkers. This is not proof of complete runtime health or actual occurrence of the cap deadlock.",
+    "limits": [
+      "No existing owner log was deliberately inflated or command allow-list bypass added to product.",
+      "Native generated command fixture calls private helper in separate shell process; HTTP route/authentication and real oversized owner logcat output remain outside fixture.",
+      "No arbitrary hung-child global timeout or general process-tree guarantee."
+    ],
+    "issueClock": {
+      "startedAt": "2026-11-03T07:36:53+00:00",
+      "deadline": "2026-11-03T08:06:53+00:00",
+      "baseCommit": "2f3ddc49016f799d5615c22261b071411c89fc41",
+      "scope": "Read-only room runtime-health observation and independent keyless Tools helper correctness discovery. Review existing84-task queue before any selected defect. Exclude all parked UI/performance/redirect/SMB keyboard/music/Weather issues, delivered camera identity and Prayer tomorrow corrections, and previously audited MQTT ownership. Any selected issue retains this original audit clock through final tests/delivery/docs/cleanup/commit.",
+      "selectedScope": "Fleet diagnostic capped output stream and owned process retirement: close selected output before waiting; preserve fixed command allow-list, prefix caps, UTF8 and existing error surface."
+    },
+    "initialStatus": "grounded source candidate; product regression and native actual-process reproduction pending"
+  },
+  "discovery": {
+    "runtimeHealthSamples": {
+      "family": {
+        "info": {
+          "versionCode": 104,
+          "versionName": "1.110"
+        },
+        "diagHttp200": true,
+        "logLines": 1502,
+        "fatalOrAnrMarkers": 0,
+        "immortalFatalProcessMarkers": 0
+      },
+      "living": {
+        "info": {
+          "versionCode": 104,
+          "versionName": "1.110"
+        },
+        "diagHttp200": true,
+        "logLines": 1502,
+        "fatalOrAnrMarkers": 0,
+        "immortalFatalProcessMarkers": 0
+      }
+    },
+    "scope": "Recent1500-line samples perroom had no fatal/ANR markers; no comprehensive runtime-health claim. Keyless Tools audit produced no selected stronger finding."
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/FleetDiag.kt": "9fe3fe0a2b8616bfc5a7b39e0e9ccccab852b20e68cd50363e67c8391ef12bb1",
+    "app/src/main/java/com/immortal/launcher/FleetRoutes.kt": "35aad6e808d64709d5a0682310e8975e061e2fbb62c6581382bb84c6435b8ad7",
+    "app/src/test/java/com/immortal/launcher/FleetDiagProcessOwnershipTest.kt": "7cce25aa8791f44f07da2b939ff2f13d6fae0adad04f54dc4457cd60e0258b0a",
+    "app/build.gradle.kts": "bd9633b88fd95cc06cf68bd65cd306e0d64993856ccb5cdf965250443ae6a0bc"
+  },
+  "red": {
+    "scope": {
+      "startedAt": "2026-11-03T07:36:53+00:00",
+      "deadline": "2026-11-03T08:06:53+00:00",
+      "baseCommit": "2f3ddc49016f799d5615c22261b071411c89fc41",
+      "scope": "Read-only room runtime-health observation and independent keyless Tools helper correctness discovery. Review existing84-task queue before any selected defect. Exclude all parked UI/performance/redirect/SMB keyboard/music/Weather issues, delivered camera identity and Prayer tomorrow corrections, and previously audited MQTT ownership. Any selected issue retains this original audit clock through final tests/delivery/docs/cleanup/commit.",
+      "selectedScope": "Fleet diagnostic capped output stream and owned process retirement: close selected output before waiting; preserve fixed command allow-list, prefix caps, UTF8 and existing error surface."
+    },
+    "recordedAt": "2026-11-03T07:41:14.982587+00:00",
+    "terminalExitCode": 1,
+    "tests": 11,
+    "failures": 7,
+    "errors": 0,
+    "skips": 0,
+    "failedTests": {
+      "readFailureClosesTheStreamAndRetiresTheProcessWithoutWaiting": "java.lang.AssertionError",
+      "normalEofRetiresItsStreamAndOwnedProcess": "java.lang.AssertionError",
+      "cappedProducerReturnsItsPrefixInsteadOfWaitingOnAnOpenFullPipe": "org.junit.ComparisonFailure",
+      "publicLogcatKeepsTheFourMiBByteCap": "java.lang.AssertionError",
+      "inputAcquisitionFailureStillRetiresTheStartedProcess": "java.lang.AssertionError",
+      "streamCloseFailureStillRetiresTheProcessAndKeepsTheErrorSurface": "org.junit.ComparisonFailure",
+      "waitFailureOccursAfterStreamClosureAndStillRetiresTheProcess": "java.lang.AssertionError"
+    },
+    "retainedControls": [
+      "utf8PrefixAndPartialMultibyteBoundaryKeepTheExistingDecoder",
+      "publicLogcatKeepsItsFixedCommandAndClampsRequestedLineCount",
+      "emptyOutputKeepsItsEmptySuccessfulResult",
+      "startFailureDoesNotPretendToOwnAProcess"
+    ],
+    "sourceHashes": {
+      "source": "fbd0fd91f096e172b209c263751cd54c541830202b36226e4afc279b07c7297f",
+      "test": "7cce25aa8791f44f07da2b939ff2f13d6fae0adad04f54dc4457cd60e0258b0a",
+      "build": "c73339a3b17e24f80c48cdbb59393049ad0514032b1abc99fa088fdbcd6d45fc"
+    },
+    "xmlSha256": "1107e2c2402b9b443234f6c306c4e35859725996e7437ce1e18b7441731c28e4",
+    "logSha256": "d691879ced61aaf787350d0c9ab921c24b40587688170055f5d109ae5f6bea85",
+    "fixtureScope": "Actual private exec plus public logcat using inert Mockito ProcessBuilder construction and strict generated Process/InputStream doubles. The oversized-pipe wait condition throws an owned IOException rather than performing a real blocked wait. No real processes, owner logs, socket/network, Android services, audio or devices. Eleven unchanged methods, no fixture errors, skips or rejected construction attempts.",
+    "redMeaning": "Seven actual assertion failures: capped producer and public4MiB prefixes are replaced by error text; EOF/read/wait ownership fails closure or retirement; input acquisition leaks the started process; configured close failure is never surfaced because stream is never closed."
+  },
+  "green": {
+    "suites": 436,
+    "tests": 4197,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualFleetDiagFocusedTests": 11,
+    "allElevenUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 16s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "native": {
+    "runs": {
+      "baseline-debug": {
+        "status": "FAIL",
+        "passed": 9,
+        "total": 11,
+        "checks": {
+          "actualApkClassLoader": true,
+          "cap4MiBCompletesWithoutFixtureKill": false,
+          "cap4MiBExactPrefixAndCap": true,
+          "cap1024CompletesWithoutFixtureKill": false,
+          "cap1024ExactPrefixAndCap": true,
+          "shortUtf8CompletesWithoutFixtureKill": true,
+          "shortUtf8ExactPrefixAndCap": true,
+          "emptyCompletesWithoutFixtureKill": true,
+          "emptyExactPrefixAndCap": true,
+          "missingCommandRetainsErrorSurface": true,
+          "allFourOwnedChildrenRetired": true
+        },
+        "observations": {
+          "cap4MiB": {
+            "generatedBytes": 6291456,
+            "capBytes": 4194304,
+            "returnedBytes": 4194304,
+            "returnedSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "expectedPrefixSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "completedBeforeFixtureIntervention": false,
+            "fixtureKilledIdentifiedChild": true,
+            "timeoutAtActualProcessWaitFor": true,
+            "stackAtTimeout": [
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.UNIXProcess.waitFor",
+              "com.immortal.launcher.FleetDiag.exec",
+              "java.lang.reflect.Method.invoke",
+              "NativeFleetDiagProcess.invoke",
+              "NativeFleetDiagProcess.lambda$run$1",
+              "NativeFleetDiagProcess$$ExternalSyntheticLambda1.call",
+              "java.util.concurrent.FutureTask.run",
+              "java.util.concurrent.ThreadPoolExecutor.runWorker",
+              "java.util.concurrent.ThreadPoolExecutor$Worker.run",
+              "java.lang.Thread.run"
+            ],
+            "observedElapsedMs": 1643
+          },
+          "cap1024": {
+            "generatedBytes": 6291456,
+            "capBytes": 1024,
+            "returnedBytes": 1024,
+            "returnedSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "expectedPrefixSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "completedBeforeFixtureIntervention": false,
+            "fixtureKilledIdentifiedChild": true,
+            "timeoutAtActualProcessWaitFor": true,
+            "stackAtTimeout": [
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.UNIXProcess.waitFor",
+              "com.immortal.launcher.FleetDiag.exec",
+              "java.lang.reflect.Method.invoke",
+              "NativeFleetDiagProcess.invoke",
+              "NativeFleetDiagProcess.lambda$run$1",
+              "NativeFleetDiagProcess$$ExternalSyntheticLambda1.call",
+              "java.util.concurrent.FutureTask.run",
+              "java.util.concurrent.ThreadPoolExecutor.runWorker",
+              "java.util.concurrent.ThreadPoolExecutor$Worker.run",
+              "java.lang.Thread.run"
+            ],
+            "observedElapsedMs": 1535
+          },
+          "shortUtf8": {
+            "generatedBytes": 30,
+            "capBytes": 1024,
+            "returnedBytes": 30,
+            "returnedSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "expectedPrefixSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 64
+          },
+          "empty": {
+            "generatedBytes": 0,
+            "capBytes": 1024,
+            "returnedBytes": 0,
+            "returnedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "expectedPrefixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 62
+          }
+        },
+        "apkSha256": "9b9bb44cd3093450930114ee37b061831b09ddcfceab7905051fe5a222f9ef21",
+        "actualMethod": "private final java.lang.String com.immortal.launcher.FleetDiag.exec(java.lang.String[],int)",
+        "generatedChildCount": 4,
+        "ownerPreferencesWritten": 0,
+        "scope": "Actual APK private diagnostics exec with generated read-only child output; no HTTP/authentication, owner logs, services or command allow-list change"
+      },
+      "candidate-debug": {
+        "status": "PASS",
+        "passed": 11,
+        "total": 11,
+        "checks": {
+          "actualApkClassLoader": true,
+          "cap4MiBCompletesWithoutFixtureKill": true,
+          "cap4MiBExactPrefixAndCap": true,
+          "cap1024CompletesWithoutFixtureKill": true,
+          "cap1024ExactPrefixAndCap": true,
+          "shortUtf8CompletesWithoutFixtureKill": true,
+          "shortUtf8ExactPrefixAndCap": true,
+          "emptyCompletesWithoutFixtureKill": true,
+          "emptyExactPrefixAndCap": true,
+          "missingCommandRetainsErrorSurface": true,
+          "allFourOwnedChildrenRetired": true
+        },
+        "observations": {
+          "cap4MiB": {
+            "generatedBytes": 6291456,
+            "capBytes": 4194304,
+            "returnedBytes": 4194304,
+            "returnedSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "expectedPrefixSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 263
+          },
+          "cap1024": {
+            "generatedBytes": 6291456,
+            "capBytes": 1024,
+            "returnedBytes": 1024,
+            "returnedSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "expectedPrefixSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 60
+          },
+          "shortUtf8": {
+            "generatedBytes": 30,
+            "capBytes": 1024,
+            "returnedBytes": 30,
+            "returnedSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "expectedPrefixSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 57
+          },
+          "empty": {
+            "generatedBytes": 0,
+            "capBytes": 1024,
+            "returnedBytes": 0,
+            "returnedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "expectedPrefixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 52
+          }
+        },
+        "apkSha256": "8f978fccdec4bbf20da4ac8166f500db64841d76e38faa2fe07b1dde7cd01a81",
+        "actualMethod": "private final java.lang.String com.immortal.launcher.FleetDiag.exec(java.lang.String[],int)",
+        "generatedChildCount": 4,
+        "ownerPreferencesWritten": 0,
+        "scope": "Actual APK private diagnostics exec with generated read-only child output; no HTTP/authentication, owner logs, services or command allow-list change"
+      },
+      "baseline-optimized": {
+        "status": "FAIL",
+        "passed": 9,
+        "total": 11,
+        "checks": {
+          "actualApkClassLoader": true,
+          "cap4MiBCompletesWithoutFixtureKill": false,
+          "cap4MiBExactPrefixAndCap": true,
+          "cap1024CompletesWithoutFixtureKill": false,
+          "cap1024ExactPrefixAndCap": true,
+          "shortUtf8CompletesWithoutFixtureKill": true,
+          "shortUtf8ExactPrefixAndCap": true,
+          "emptyCompletesWithoutFixtureKill": true,
+          "emptyExactPrefixAndCap": true,
+          "missingCommandRetainsErrorSurface": true,
+          "allFourOwnedChildrenRetired": true
+        },
+        "observations": {
+          "cap4MiB": {
+            "generatedBytes": 6291456,
+            "capBytes": 4194304,
+            "returnedBytes": 4194304,
+            "returnedSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "expectedPrefixSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "completedBeforeFixtureIntervention": false,
+            "fixtureKilledIdentifiedChild": true,
+            "timeoutAtActualProcessWaitFor": true,
+            "stackAtTimeout": [
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.UNIXProcess.waitFor",
+              "com.immortal.launcher.FleetFs.u",
+              "java.lang.reflect.Method.invoke",
+              "NativeFleetDiagProcess.invoke",
+              "NativeFleetDiagProcess.lambda$run$1",
+              "NativeFleetDiagProcess$$ExternalSyntheticLambda1.call",
+              "java.util.concurrent.FutureTask.run",
+              "java.util.concurrent.ThreadPoolExecutor.runWorker",
+              "java.util.concurrent.ThreadPoolExecutor$Worker.run",
+              "java.lang.Thread.run"
+            ],
+            "observedElapsedMs": 1653
+          },
+          "cap1024": {
+            "generatedBytes": 6291456,
+            "capBytes": 1024,
+            "returnedBytes": 1024,
+            "returnedSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "expectedPrefixSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "completedBeforeFixtureIntervention": false,
+            "fixtureKilledIdentifiedChild": true,
+            "timeoutAtActualProcessWaitFor": true,
+            "stackAtTimeout": [
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.UNIXProcess.waitFor",
+              "com.immortal.launcher.FleetFs.u",
+              "java.lang.reflect.Method.invoke",
+              "NativeFleetDiagProcess.invoke",
+              "NativeFleetDiagProcess.lambda$run$1",
+              "NativeFleetDiagProcess$$ExternalSyntheticLambda1.call",
+              "java.util.concurrent.FutureTask.run",
+              "java.util.concurrent.ThreadPoolExecutor.runWorker",
+              "java.util.concurrent.ThreadPoolExecutor$Worker.run",
+              "java.lang.Thread.run"
+            ],
+            "observedElapsedMs": 1529
+          },
+          "shortUtf8": {
+            "generatedBytes": 30,
+            "capBytes": 1024,
+            "returnedBytes": 30,
+            "returnedSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "expectedPrefixSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 74
+          },
+          "empty": {
+            "generatedBytes": 0,
+            "capBytes": 1024,
+            "returnedBytes": 0,
+            "returnedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "expectedPrefixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 59
+          }
+        },
+        "apkSha256": "90e0c67fdce9022e46a96e53d7857a06f86e2717ba6ccd3f16f756731a0f4bb6",
+        "actualMethod": "public static java.lang.String com.immortal.launcher.FleetFs.u(java.lang.String[],int)",
+        "generatedChildCount": 4,
+        "ownerPreferencesWritten": 0,
+        "scope": "Actual APK private diagnostics exec with generated read-only child output; no HTTP/authentication, owner logs, services or command allow-list change"
+      },
+      "candidate-optimized": {
+        "status": "PASS",
+        "passed": 11,
+        "total": 11,
+        "checks": {
+          "actualApkClassLoader": true,
+          "cap4MiBCompletesWithoutFixtureKill": true,
+          "cap4MiBExactPrefixAndCap": true,
+          "cap1024CompletesWithoutFixtureKill": true,
+          "cap1024ExactPrefixAndCap": true,
+          "shortUtf8CompletesWithoutFixtureKill": true,
+          "shortUtf8ExactPrefixAndCap": true,
+          "emptyCompletesWithoutFixtureKill": true,
+          "emptyExactPrefixAndCap": true,
+          "missingCommandRetainsErrorSurface": true,
+          "allFourOwnedChildrenRetired": true
+        },
+        "observations": {
+          "cap4MiB": {
+            "generatedBytes": 6291456,
+            "capBytes": 4194304,
+            "returnedBytes": 4194304,
+            "returnedSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "expectedPrefixSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 322
+          },
+          "cap1024": {
+            "generatedBytes": 6291456,
+            "capBytes": 1024,
+            "returnedBytes": 1024,
+            "returnedSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "expectedPrefixSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 90
+          },
+          "shortUtf8": {
+            "generatedBytes": 30,
+            "capBytes": 1024,
+            "returnedBytes": 30,
+            "returnedSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "expectedPrefixSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 65
+          },
+          "empty": {
+            "generatedBytes": 0,
+            "capBytes": 1024,
+            "returnedBytes": 0,
+            "returnedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "expectedPrefixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 56
+          }
+        },
+        "apkSha256": "98d593dc92a3d9f57bc003546ae56b4d061deb878e76bcc8a6440f1135de9d37",
+        "actualMethod": "public static java.lang.String com.immortal.launcher.FleetFs.u(java.lang.String[],int)",
+        "generatedChildCount": 4,
+        "ownerPreferencesWritten": 0,
+        "scope": "Actual APK private diagnostics exec with generated read-only child output; no HTTP/authentication, owner logs, services or command allow-list change"
+      }
+    },
+    "process": {
+      "baseline-debug": {
+        "terminalExit": 1,
+        "stdoutBytes": 3430,
+        "stderrBytes": 0
+      },
+      "candidate-debug": {
+        "terminalExit": 0,
+        "stdoutBytes": 2492,
+        "stderrBytes": 0
+      },
+      "baseline-optimized": {
+        "terminalExit": 1,
+        "stdoutBytes": 3415,
+        "stderrBytes": 0
+      },
+      "candidate-optimized": {
+        "terminalExit": 0,
+        "stdoutBytes": 2487,
+        "stderrBytes": 0
+      }
+    },
+    "binding": {
+      "sourceSha256": "85e2b5b23d3bff5f99eb858602e7abc2e518f81218d11b1aa681560e0e0f438b",
+      "fixtureSha256": "224d92bcc4c151e155dd189c0ff31c0616bcc3c3e8a6ce6e7b0db4714fb41879",
+      "compilerSha256": "a70e2c11e9e74b50faf21ba0581909a665e30794a711de152e8bf1fd61f6ea40",
+      "runnerSha256": "e2efeb10953b01b77a03c380d242280e8f96e47bac02e9ec557547c28d2eeefa",
+      "mappedBindings": {
+        "baseline": [
+          "com.immortal.launcher.FleetFs",
+          "u"
+        ],
+        "candidate": [
+          "com.immortal.launcher.FleetFs",
+          "u"
+        ]
+      }
+    },
+    "cleanup": {
+      "ownedParentProcessesRetired": {
+        "baseline-debug": true,
+        "candidate-debug": true,
+        "baseline-optimized": true,
+        "candidate-optimized": true
+      },
+      "ownedGeneratedChildrenRetired": {
+        "baseline-debug": {
+          "child-baseline-debug-cap1024.pid": true,
+          "child-baseline-debug-cap4MiB.pid": true,
+          "child-baseline-debug-empty.pid": true,
+          "child-baseline-debug-shortUtf8.pid": true
+        },
+        "candidate-debug": {
+          "child-candidate-debug-cap1024.pid": true,
+          "child-candidate-debug-cap4MiB.pid": true,
+          "child-candidate-debug-empty.pid": true,
+          "child-candidate-debug-shortUtf8.pid": true
+        },
+        "baseline-optimized": {
+          "child-baseline-optimized-cap1024.pid": true,
+          "child-baseline-optimized-cap4MiB.pid": true,
+          "child-baseline-optimized-empty.pid": true,
+          "child-baseline-optimized-shortUtf8.pid": true
+        },
+        "candidate-optimized": {
+          "child-candidate-optimized-cap1024.pid": true,
+          "child-candidate-optimized-cap4MiB.pid": true,
+          "child-candidate-optimized-empty.pid": true,
+          "child-candidate-optimized-shortUtf8.pid": true
+        }
+      },
+      "ownerPreferencesWritten": 0,
+      "httpOrOwnerLogsInvoked": false,
+      "generatedReadOnlyChildCommandsOnly": true,
+      "ownedDeviceScratchRemoved": true,
+      "cleanupFaults": []
+    },
+    "baselinePassed": 9,
+    "candidatePassed": 11,
+    "total": 11,
+    "correctedChecks": 2,
+    "retainedControls": 9,
+    "actualDebugAndOptimizedPrivateExecVerified": true,
+    "scope": "Actual private exec, generated6MiB stdout at4MiB and1024-byte caps, small UTF8/empty output and missing generated command; no HTTP/owner logs."
+  },
+  "artifact": {
+    "sha256": "98d593dc92a3d9f57bc003546ae56b4d061deb878e76bcc8a6440f1135de9d37",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.111",
+    "versionCode": 105,
+    "variants": {
+      "performance": {
+        "sha256": "98d593dc92a3d9f57bc003546ae56b4d061deb878e76bcc8a6440f1135de9d37",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.111",
+        "versionCode": 105
+      },
+      "debug": {
+        "sha256": "8f978fccdec4bbf20da4ac8166f500db64841d76e38faa2fe07b1dde7cd01a81",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.111",
+        "versionCode": 105
+      },
+      "rollback": {
+        "sha256": "90e0c67fdce9022e46a96e53d7857a06f86e2717ba6ccd3f16f756731a0f4bb6",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.110",
+        "versionCode": 104
+      }
+    },
+    "debugSha256": "8f978fccdec4bbf20da4ac8166f500db64841d76e38faa2fe07b1dde7cd01a81",
+    "rollbackSha256": "90e0c67fdce9022e46a96e53d7857a06f86e2717ba6ccd3f16f756731a0f4bb6",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 16s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "visual": {
+    "familyFrameVisuallyInspected": true,
+    "description": "current night clock with date",
+    "screenshotSha256": "ce515e120c3852fb78bd27a90aaf3a8c585b47431f2a2c8bd56a116d8b5b8ef9",
+    "liveDiagnosticUiVisuallyInspected": false,
+    "livingVisualInspected": false
+  },
+  "installedNormalDiagnostics": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagOk": true,
+        "normalCommandFieldsReturned": true,
+        "logcatHttp200": true,
+        "smallLogcatTextReturned": true,
+        "logcatBytes": 1286
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagOk": true,
+        "normalCommandFieldsReturned": true,
+        "logcatHttp200": true,
+        "smallLogcatTextReturned": true,
+        "logcatBytes": 1283
+      }
+    },
+    "scope": "Positive authenticated installed normal diag and5-line logcat requests only; no large-owner-output or authentication rejection/admission boundary proof."
+  },
+  "cleanup": {
+    "originalRegistryByteHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "ownedNativeParentsChildrenAndDeviceScratchRemoved": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "googlePhoneCommands": 0,
+    "familyFrameVisuallyInspected": true,
+    "familyChromeTaskRetained": true
+  },
+  "review": {
+    "scope": {
+      "startedAt": "2026-11-03T07:36:53+00:00",
+      "deadline": "2026-11-03T08:06:53+00:00",
+      "baseCommit": "2f3ddc49016f799d5615c22261b071411c89fc41",
+      "scope": "Read-only room runtime-health observation and independent keyless Tools helper correctness discovery. Review existing84-task queue before any selected defect. Exclude all parked UI/performance/redirect/SMB keyboard/music/Weather issues, delivered camera identity and Prayer tomorrow corrections, and previously audited MQTT ownership. Any selected issue retains this original audit clock through final tests/delivery/docs/cleanup/commit.",
+      "selectedScope": "Fleet diagnostic capped output stream and owned process retirement: close selected output before waiting; preserve fixed command allow-list, prefix caps, UTF8 and existing error surface."
+    },
+    "reviewedAt": "2026-11-03T07:46:38.571203+00:00",
+    "blockingProductionFindings": 0,
+    "sourceHashes": {
+      "source": "9fe3fe0a2b8616bfc5a7b39e0e9ccccab852b20e68cd50363e67c8391ef12bb1",
+      "test": "7cce25aa8791f44f07da2b939ff2f13d6fae0adad04f54dc4457cd60e0258b0a",
+      "build": "bd9633b88fd95cc06cf68bd65cd306e0d64993856ccb5cdf965250443ae6a0bc",
+      "nativeJava": "85e2b5b23d3bff5f99eb858602e7abc2e518f81218d11b1aa681560e0e0f438b",
+      "nativeCompiler": "a70e2c11e9e74b50faf21ba0581909a665e30794a711de152e8bf1fd61f6ea40",
+      "nativeJar": "224d92bcc4c151e155dd189c0ff31c0616bcc3c3e8a6ce6e7b0db4714fb41879",
+      "nativeCompileLog": "2ea9339dd333805c00cf714dcacd709839f8cf4cbdc059fb9ae47593f6d259a8",
+      "nativeRunner": "e2efeb10953b01b77a03c380d242280e8f96e47bac02e9ec557547c28d2eeefa"
+    },
+    "frozenRedTestUnchanged": true,
+    "sourceReview": [
+      "Selected output stream is use-closed before waitFor. Capped producer can observe closed read end rather than retain a full open pipe.",
+      "Owned started Process is destroyed in finally on ordinary output, input acquisition, read, close and wait failure. Missing command still degrades through existing error string.",
+      "Fixed public snapshot/logcat command arguments, 1..20000 line clamp, 256KiB/8KiB/4MiB caps, merged stderr and prefix UTF8 decoder unchanged.",
+      "No production hooks or test changes beyond the independently written test. No universal child execution deadline is introduced; a command that remains alive for reasons unrelated to its output pipe can still delay waitFor."
+    ],
+    "jvmBaseline": {
+      "tests": 11,
+      "assertionFailures": 7,
+      "errors": 0,
+      "skips": 0,
+      "terminalExitCode": 1
+    },
+    "nativeReview": {
+      "status": "All four actual debug/optimized APK results, mappings, fixture bindings, raw stdout/process records and normal cleanup independently accepted.",
+      "methodScope": "Actual APK private exec via reflection with generated owned shell/cat payloads; not HTTP/authentication, public allow-list, owner logcat data or global room health acceptance.",
+      "generatedCases": "6MiB ASCII producers at4MiB and1024 caps; short UTF8; empty; missing generated command.",
+      "baselineDiagnosis": "Requires live exact cat+owned payload and actual java.lang Process.waitFor stack at1500ms; fixture kills only that child then awaits actual prefix result. Candidate should complete without fixture intervention.",
+      "followups": [],
+      "cleanupLimits": "No failure/timeout runner cleanup fault injection performed by this reviewer.",
+      "compiledFinalBindingVerified": true,
+      "resolvedGuardFindings": [
+        "Native unreadable/empty child cmdline requires confirmed absence; persistent unknown identity fails without kill.",
+        "Runner child and parent retirement are attempted independently; any fault prevents scratch removal.",
+        "Runner empty parent cmdline waits for confirmed absence or raises rather than assuming retirement."
+      ],
+      "normalObservedCleanup": {
+        "ownedParentProcessesRetired": {
+          "baseline-debug": true,
+          "candidate-debug": true,
+          "baseline-optimized": true,
+          "candidate-optimized": true
+        },
+        "ownedGeneratedChildrenRetired": {
+          "baseline-debug": {
+            "child-baseline-debug-cap1024.pid": true,
+            "child-baseline-debug-cap4MiB.pid": true,
+            "child-baseline-debug-empty.pid": true,
+            "child-baseline-debug-shortUtf8.pid": true
+          },
+          "candidate-debug": {
+            "child-candidate-debug-cap1024.pid": true,
+            "child-candidate-debug-cap4MiB.pid": true,
+            "child-candidate-debug-empty.pid": true,
+            "child-candidate-debug-shortUtf8.pid": true
+          },
+          "baseline-optimized": {
+            "child-baseline-optimized-cap1024.pid": true,
+            "child-baseline-optimized-cap4MiB.pid": true,
+            "child-baseline-optimized-empty.pid": true,
+            "child-baseline-optimized-shortUtf8.pid": true
+          },
+          "candidate-optimized": {
+            "child-candidate-optimized-cap1024.pid": true,
+            "child-candidate-optimized-cap4MiB.pid": true,
+            "child-candidate-optimized-empty.pid": true,
+            "child-candidate-optimized-shortUtf8.pid": true
+          }
+        },
+        "ownerPreferencesWritten": 0,
+        "httpOrOwnerLogsInvoked": false,
+        "generatedReadOnlyChildCommandsOnly": true,
+        "ownedDeviceScratchRemoved": true,
+        "cleanupFaults": []
+      },
+      "runtimeLimits": "Only actual APK private exec with generated read-only cat producers and a missing generated command. No HTTP/authentication/admission, no actual owner logcat, no public native allow-list proof, no universal process deadline or global room health claim. Baseline child intervention is intentional reproduction cleanup. Runner abnormal remote timeout/failure cleanup was not fault-injected; normal four-label retirement and scratch cleanup were verified. Read/acquire/close/wait exceptions remain inert JVM coverage."
+    },
+    "actionsPerformed": "Read source/test/private fixture; wrote private review only. No Gradle after baseline, devices, network, real child processes or repository mutations.",
+    "fullJvm": {
+      "suites": 436,
+      "tests": 4197,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "focusedTests": 11,
+      "focusedFailuresErrorsSkips": 0,
+      "allXmlIndependentlyReaggregated": true,
+      "testSourceUnchangedFromRed": true,
+      "buildLogConfirmsSuccessDuration": "2m 16s",
+      "terminalExitVerifiedFromCoordinatorAndArtifact": 0
+    },
+    "artifact": {
+      "performance": {
+        "sha256": "98d593dc92a3d9f57bc003546ae56b4d061deb878e76bcc8a6440f1135de9d37",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.111",
+        "versionCode": 105
+      },
+      "debug": {
+        "sha256": "8f978fccdec4bbf20da4ac8166f500db64841d76e38faa2fe07b1dde7cd01a81",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.111",
+        "versionCode": 105
+      },
+      "rollback": {
+        "sha256": "90e0c67fdce9022e46a96e53d7857a06f86e2717ba6ccd3f16f756731a0f4bb6",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.110",
+        "versionCode": 104
+      }
+    },
+    "nativeAcceptance": {
+      "baseline-debug": {
+        "apkSha256": "9b9bb44cd3093450930114ee37b061831b09ddcfceab7905051fe5a222f9ef21",
+        "passed": 9,
+        "total": 11,
+        "terminalExit": 1,
+        "stderrBytes": 0,
+        "exactCorrectionKeys": [
+          "cap1024CompletesWithoutFixtureKill",
+          "cap4MiBCompletesWithoutFixtureKill"
+        ],
+        "actualMethod": "private final java.lang.String com.immortal.launcher.FleetDiag.exec(java.lang.String[],int)",
+        "observations": {
+          "cap4MiB": {
+            "generatedBytes": 6291456,
+            "capBytes": 4194304,
+            "returnedBytes": 4194304,
+            "returnedSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "expectedPrefixSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "completedBeforeFixtureIntervention": false,
+            "fixtureKilledIdentifiedChild": true,
+            "timeoutAtActualProcessWaitFor": true,
+            "stackAtTimeout": [
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.UNIXProcess.waitFor",
+              "com.immortal.launcher.FleetDiag.exec",
+              "java.lang.reflect.Method.invoke",
+              "NativeFleetDiagProcess.invoke",
+              "NativeFleetDiagProcess.lambda$run$1",
+              "NativeFleetDiagProcess$$ExternalSyntheticLambda1.call",
+              "java.util.concurrent.FutureTask.run",
+              "java.util.concurrent.ThreadPoolExecutor.runWorker",
+              "java.util.concurrent.ThreadPoolExecutor$Worker.run",
+              "java.lang.Thread.run"
+            ],
+            "observedElapsedMs": 1643
+          },
+          "cap1024": {
+            "generatedBytes": 6291456,
+            "capBytes": 1024,
+            "returnedBytes": 1024,
+            "returnedSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "expectedPrefixSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "completedBeforeFixtureIntervention": false,
+            "fixtureKilledIdentifiedChild": true,
+            "timeoutAtActualProcessWaitFor": true,
+            "stackAtTimeout": [
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.UNIXProcess.waitFor",
+              "com.immortal.launcher.FleetDiag.exec",
+              "java.lang.reflect.Method.invoke",
+              "NativeFleetDiagProcess.invoke",
+              "NativeFleetDiagProcess.lambda$run$1",
+              "NativeFleetDiagProcess$$ExternalSyntheticLambda1.call",
+              "java.util.concurrent.FutureTask.run",
+              "java.util.concurrent.ThreadPoolExecutor.runWorker",
+              "java.util.concurrent.ThreadPoolExecutor$Worker.run",
+              "java.lang.Thread.run"
+            ],
+            "observedElapsedMs": 1535
+          },
+          "shortUtf8": {
+            "generatedBytes": 30,
+            "capBytes": 1024,
+            "returnedBytes": 30,
+            "returnedSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "expectedPrefixSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 64
+          },
+          "empty": {
+            "generatedBytes": 0,
+            "capBytes": 1024,
+            "returnedBytes": 0,
+            "returnedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "expectedPrefixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 62
+          }
+        },
+        "resultSha256": "3c13cf2bfb452d9706a65e34b8d396612b4ee10e4b0f0f6b6a7212f7b4254f27",
+        "processRecordSha256": "c6865d95214b80cda2453284e93057d17f206140a819ac7f123e0be2123c5d9d"
+      },
+      "candidate-debug": {
+        "apkSha256": "8f978fccdec4bbf20da4ac8166f500db64841d76e38faa2fe07b1dde7cd01a81",
+        "passed": 11,
+        "total": 11,
+        "terminalExit": 0,
+        "stderrBytes": 0,
+        "exactCorrectionKeys": [],
+        "actualMethod": "private final java.lang.String com.immortal.launcher.FleetDiag.exec(java.lang.String[],int)",
+        "observations": {
+          "cap4MiB": {
+            "generatedBytes": 6291456,
+            "capBytes": 4194304,
+            "returnedBytes": 4194304,
+            "returnedSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "expectedPrefixSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 263
+          },
+          "cap1024": {
+            "generatedBytes": 6291456,
+            "capBytes": 1024,
+            "returnedBytes": 1024,
+            "returnedSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "expectedPrefixSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 60
+          },
+          "shortUtf8": {
+            "generatedBytes": 30,
+            "capBytes": 1024,
+            "returnedBytes": 30,
+            "returnedSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "expectedPrefixSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 57
+          },
+          "empty": {
+            "generatedBytes": 0,
+            "capBytes": 1024,
+            "returnedBytes": 0,
+            "returnedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "expectedPrefixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 52
+          }
+        },
+        "resultSha256": "3089004f8826f4ac3e8ab17b6e27ebe355075bc7256e75231591e22da6388257",
+        "processRecordSha256": "552f5d83a563d72ebb9585f4a9e90701b4f5bb306d5b14dd4db25ee861832983"
+      },
+      "baseline-optimized": {
+        "apkSha256": "90e0c67fdce9022e46a96e53d7857a06f86e2717ba6ccd3f16f756731a0f4bb6",
+        "passed": 9,
+        "total": 11,
+        "terminalExit": 1,
+        "stderrBytes": 0,
+        "exactCorrectionKeys": [
+          "cap1024CompletesWithoutFixtureKill",
+          "cap4MiBCompletesWithoutFixtureKill"
+        ],
+        "actualMethod": "public static java.lang.String com.immortal.launcher.FleetFs.u(java.lang.String[],int)",
+        "observations": {
+          "cap4MiB": {
+            "generatedBytes": 6291456,
+            "capBytes": 4194304,
+            "returnedBytes": 4194304,
+            "returnedSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "expectedPrefixSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "completedBeforeFixtureIntervention": false,
+            "fixtureKilledIdentifiedChild": true,
+            "timeoutAtActualProcessWaitFor": true,
+            "stackAtTimeout": [
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.UNIXProcess.waitFor",
+              "com.immortal.launcher.FleetFs.u",
+              "java.lang.reflect.Method.invoke",
+              "NativeFleetDiagProcess.invoke",
+              "NativeFleetDiagProcess.lambda$run$1",
+              "NativeFleetDiagProcess$$ExternalSyntheticLambda1.call",
+              "java.util.concurrent.FutureTask.run",
+              "java.util.concurrent.ThreadPoolExecutor.runWorker",
+              "java.util.concurrent.ThreadPoolExecutor$Worker.run",
+              "java.lang.Thread.run"
+            ],
+            "observedElapsedMs": 1653
+          },
+          "cap1024": {
+            "generatedBytes": 6291456,
+            "capBytes": 1024,
+            "returnedBytes": 1024,
+            "returnedSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "expectedPrefixSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "completedBeforeFixtureIntervention": false,
+            "fixtureKilledIdentifiedChild": true,
+            "timeoutAtActualProcessWaitFor": true,
+            "stackAtTimeout": [
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.Object.wait",
+              "java.lang.UNIXProcess.waitFor",
+              "com.immortal.launcher.FleetFs.u",
+              "java.lang.reflect.Method.invoke",
+              "NativeFleetDiagProcess.invoke",
+              "NativeFleetDiagProcess.lambda$run$1",
+              "NativeFleetDiagProcess$$ExternalSyntheticLambda1.call",
+              "java.util.concurrent.FutureTask.run",
+              "java.util.concurrent.ThreadPoolExecutor.runWorker",
+              "java.util.concurrent.ThreadPoolExecutor$Worker.run",
+              "java.lang.Thread.run"
+            ],
+            "observedElapsedMs": 1529
+          },
+          "shortUtf8": {
+            "generatedBytes": 30,
+            "capBytes": 1024,
+            "returnedBytes": 30,
+            "returnedSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "expectedPrefixSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 74
+          },
+          "empty": {
+            "generatedBytes": 0,
+            "capBytes": 1024,
+            "returnedBytes": 0,
+            "returnedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "expectedPrefixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 59
+          }
+        },
+        "resultSha256": "11af54a18857d8546d717f68508783210150e9c41e1495acd262b45f22fc9e8c",
+        "processRecordSha256": "442760b46d0a0217de513b42e8d92116d4d731be8a94553d63e9f9cb248ef5cb"
+      },
+      "candidate-optimized": {
+        "apkSha256": "98d593dc92a3d9f57bc003546ae56b4d061deb878e76bcc8a6440f1135de9d37",
+        "passed": 11,
+        "total": 11,
+        "terminalExit": 0,
+        "stderrBytes": 0,
+        "exactCorrectionKeys": [],
+        "actualMethod": "public static java.lang.String com.immortal.launcher.FleetFs.u(java.lang.String[],int)",
+        "observations": {
+          "cap4MiB": {
+            "generatedBytes": 6291456,
+            "capBytes": 4194304,
+            "returnedBytes": 4194304,
+            "returnedSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "expectedPrefixSha256": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 322
+          },
+          "cap1024": {
+            "generatedBytes": 6291456,
+            "capBytes": 1024,
+            "returnedBytes": 1024,
+            "returnedSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "expectedPrefixSha256": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 90
+          },
+          "shortUtf8": {
+            "generatedBytes": 30,
+            "capBytes": 1024,
+            "returnedBytes": 30,
+            "returnedSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "expectedPrefixSha256": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 65
+          },
+          "empty": {
+            "generatedBytes": 0,
+            "capBytes": 1024,
+            "returnedBytes": 0,
+            "returnedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "expectedPrefixSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "completedBeforeFixtureIntervention": true,
+            "fixtureKilledIdentifiedChild": false,
+            "timeoutAtActualProcessWaitFor": false,
+            "stackAtTimeout": [],
+            "observedElapsedMs": 56
+          }
+        },
+        "resultSha256": "a7f85be6e064de2f6215e5147c944cd24e80d3fa7af5b5a78a92de4cde9575b5",
+        "processRecordSha256": "1c47b3707b0b9d8efb5c1391aedd9526da8980d8bea46911001ebb1dfdda4820"
+      }
+    },
+    "nativeMappingHashes": {
+      "baseline": "b93e211648e835900dfe06699683f0b43c1e8078f966afc5b0037ebac94a7d39",
+      "candidate": "75db3955a8c93386861018de4999dfb0f1b5fa6649756cd7545f780dfb2e1c80"
+    },
+    "expectedGeneratedPrefixSha256": {
+      "cap4MiB": "1ae637fd9e433e21ef60bab963e55744f10fbe9e0e566ffd8851f115ff274244",
+      "cap1024": "5e691ae66b0f9360be3fcc2e71f7e53a72c42992764373ac98c675b6742d1517",
+      "shortUtf8": "80951676aa103e4311814d25d6543789b7c9a7abccb6273a93c8efd0387801c2",
+      "empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "blockingFindings": 0,
+    "allPendingFollowupsResolved": true
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestUnchanged": true,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false
+  },
+  "limits": [
+    "Native acceptance invokes actual APK private diagnostics exec with generated read-only child output in a separate shell process. HTTP transport/authentication, public logcat admission, actual oversized owner logs and all diagnostic commands were not exercised by that fixture.",
+    "The correction closes capped output before waiting and retires the created process. It does not add a universal command deadline or guarantee termination of unrelated long-lived/non-writing children or arbitrary process trees.",
+    "Native baselines did not finish within the 1.5-second protected wait and were observed at java.lang.UNIXProcess.waitFor. Identified generated cat children were terminated by the fixture so the real helper could return its exact prefix. These are bounded noncompletion observations, not arbitrary duration benchmarks.",
+    "JVM acquisition/read/close/wait failures use inert doubles. Native exception injection and external runner failure/timeout cleanup were not exercised; normal cleanup of four parents and sixteen generated children was verified.",
+    "Family Android10 generated-child helper behavior is verified; positive installed normal diagnostics separately pass in both rooms. API28, native UI and Living generated-child/visual acceptance remain unverified. Existing UI approvals and exhausted issue clocks retain their boundaries.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+  ],
+  "documentation": {
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 85,
+          "checks": [
+            {
+              "id": "fleet-diag-process",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "camera-legacy-identity",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 85,
+          "checks": [
+            {
+              "id": "fleet-diag-process",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "camera-legacy-identity",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "imagesVisuallyInspectedByCoordinator": [
+      "390x844",
+      "1600x1000"
+    ],
+    "strictDocsInitial": {
+      "exitCode": 0,
+      "warnings": 0,
+      "seconds": 2.12
+    },
+    "review": {
+      "blockingFindings": 0,
+      "twoWordingAdvisoriesCorrected": true,
+      "privateReport": "documentation-review.json"
+    },
+    "scope": "Final strict docs and two-viewport browser checks pass after scope corrections; source/test/native/artifact bindings remain frozen. Final served-proof bytes are rebound separately after recording this metadata.",
+    "strictDocsFinal": {
+      "terminalExit": 0,
+      "warnings": 0,
+      "errors": 0,
+      "seconds": 1.94,
+      "logSha256": "337e444ac1a8a9441a276f51363378ec59522ca535f57502b16933579a2318ce"
+    },
+    "browserFinalTerminalExit": 0
+  }
+}

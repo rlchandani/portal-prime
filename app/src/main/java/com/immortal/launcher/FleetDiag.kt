@@ -79,9 +79,14 @@ object FleetDiag {
   private fun exec(cmd: Array<String>, maxBytes: Int = 256 * 1024): String =
       runCatching {
             val p = ProcessBuilder(*cmd).redirectErrorStream(true).start()
-            val out = p.inputStream.readCapped(maxBytes)
-            p.waitFor()
-            out
+            try {
+              // At the cap, close the pipe before waiting so a blocked writer can exit.
+              val out = p.inputStream.use { it.readCapped(maxBytes) }
+              p.waitFor()
+              out
+            } finally {
+              p.destroy()
+            }
           }
           .getOrElse { "error: ${it.message ?: it.javaClass.simpleName}" }
 
