@@ -216,8 +216,8 @@ private fun decodeHomePhoto(open: () -> InputStream?): Bitmap? {
     ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
     ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.preScale(-1f, 1f)
     ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.preScale(1f, -1f)
-    ExifInterface.ORIENTATION_TRANSPOSE -> { matrix.postRotate(90f); matrix.preScale(-1f, 1f) }
-    ExifInterface.ORIENTATION_TRANSVERSE -> { matrix.postRotate(-90f); matrix.preScale(-1f, 1f) }
+    ExifInterface.ORIENTATION_TRANSPOSE -> { matrix.postRotate(-90f); matrix.preScale(-1f, 1f) }
+    ExifInterface.ORIENTATION_TRANSVERSE -> { matrix.postRotate(90f); matrix.preScale(-1f, 1f) }
     else -> return bitmap
   }
   return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true).also {
