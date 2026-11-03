@@ -1270,6 +1270,92 @@ test('replacing a profile waits for confirmation and then captures current compl
   assert.deepEqual(storedProfiles(h).Wake.sunrise, { enabled: false, hour: 23, minute: 59 });
 });
 
+test('profile capture preserves a same-name profile created in another tab while reading', async () => {
+  let release;
+  const h = await profileCaptureHarness(({ response }) => new Promise(resolve => {
+    release = () => resolve(response({ ok: true, profileComplete: true, settings: fullProfileFixture }));
+  }));
+  h.click('Save current settings'); await h.settle();
+  const newer = { Wake: { sunrise: { hour: 8 } }, Other: { sunrise: { hour: 9 } } };
+  h.eval(`localStorage.setItem(STORAGE.profiles,${JSON.stringify(JSON.stringify(newer))})`);
+  release(); await h.settle();
+  assert.deepEqual(storedProfiles(h), newer);
+  assert.match(h.document.getElementById('notice').textContent, /not saved.*changed.*review/i);
+  assert.equal(h.eval('draft("profile-name")'), 'Wake');
+  assert.equal(h.eval('busy.has(profileCaptureKey())'), false);
+  h.click('Save current settings'); await h.settle();
+  assert.equal(profileReads(h).length, 1);
+  assert.equal(h.document.getElementById('sheet-title').textContent, 'Replace “Wake”?');
+});
+
+test('profile replacement preserves a same-name edit arriving during approved capture', async () => {
+  let release;
+  const h = await profileCaptureHarness(({ response }) => new Promise(resolve => {
+    release = () => resolve(response({ ok: true, profileComplete: true, settings: fullProfileFixture }));
+  }));
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.click('Save current settings');
+  h.document.getElementById('sheet-actions').querySelectorAll('button').find(b => b.textContent === 'Replace').click();
+  await h.settle();
+  const newer = { Wake: { sunrise: { hour: 8 } } };
+  h.eval(`localStorage.setItem(STORAGE.profiles,${JSON.stringify(JSON.stringify(newer))})`);
+  release(); await h.settle();
+  assert.deepEqual(storedProfiles(h), newer);
+  assert.match(h.document.getElementById('notice').textContent, /not saved.*changed.*review/i);
+});
+
+test('profile replacement rejects a stale confirmation before starting capture', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.click('Save current settings');
+  const newer = { Wake: { sunrise: { hour: 8 } } };
+  h.eval(`localStorage.setItem(STORAGE.profiles,${JSON.stringify(JSON.stringify(newer))})`);
+  h.document.getElementById('sheet-actions').querySelectorAll('button').find(b => b.textContent === 'Replace').click();
+  await h.settle();
+  assert.deepEqual(storedProfiles(h), newer);
+  assert.equal(profileReads(h).length, 0);
+  assert.match(h.document.getElementById('notice').textContent, /not saved.*changed.*review/i);
+});
+
+test('profile Save checks current storage even when its rendered list is stale', async () => {
+  const h = await profileCaptureHarness();
+  const newer = { Wake: { sunrise: { hour: 8 } } };
+  h.eval(`localStorage.setItem(STORAGE.profiles,${JSON.stringify(JSON.stringify(newer))})`);
+  h.click('Save current settings'); await h.settle();
+  assert.deepEqual(storedProfiles(h), newer);
+  assert.equal(profileReads(h).length, 0);
+  assert.equal(h.document.getElementById('sheet-title').textContent, 'Replace “Wake”?');
+});
+
+test('profile capture does not recreate a reviewed profile removed in another tab', async () => {
+  let release;
+  const h = await profileCaptureHarness(({ response }) => new Promise(resolve => {
+    release = () => resolve(response({ ok: true, profileComplete: true, settings: fullProfileFixture }));
+  }));
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.click('Save current settings');
+  h.document.getElementById('sheet-actions').querySelectorAll('button').find(b => b.textContent === 'Replace').click();
+  await h.settle();
+  h.eval('localStorage.setItem(STORAGE.profiles,"{}")');
+  release(); await h.settle();
+  assert.deepEqual(storedProfiles(h), {});
+  assert.match(h.document.getElementById('notice').textContent, /not saved.*changed.*review/i);
+});
+
+test('profile capture retains unrelated concurrent saves and literal prototype-like names', async () => {
+  let release;
+  const h = await profileCaptureHarness(({ response }) => new Promise(resolve => {
+    release = () => resolve(response({ ok: true, profileComplete: true, settings: fullProfileFixture }));
+  }));
+  h.eval('setDraft("profile-name","__proto__");render()');
+  h.click('Save current settings'); await h.settle();
+  h.eval('localStorage.setItem(STORAGE.profiles,JSON.stringify({Other:{sunrise:{hour:8}}}))');
+  release(); await h.settle();
+  assert.deepEqual(storedProfiles(h).Other, { sunrise: { hour: 8 } });
+  assert.deepEqual(storedProfiles(h).__proto__.sunrise, { enabled: false, hour: 23, minute: 59 });
+  assert.match(h.document.getElementById('notice').textContent, /Profile saved/i);
+});
+
 test('browser storage rejection never announces that a complete profile was saved', async () => {
   const h = await profileCaptureHarness();
   h.eval('storage.set=()=>false');

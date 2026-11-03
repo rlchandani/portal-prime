@@ -13,6 +13,22 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Current room APK / browser profile Save delivery:** both rooms contain exact
+  optimized **1.95/code89**. Pending Save or stale replacement confirmation can
+  no longer overwrite a changed same-name browser profile. Five original
+  failures became six passing cases; **721 browser / 4,066 JVM423 suites** and
+  debug/optimized/R8/vital-lint passed. Family-served assets reproduced two
+  original90→30 overwrites and two final90-preserved cases with fresh Cancel/
+  Replace and success/error notices. Management replies were generated; zero
+  write APIs or real-profile changes. Root-font100%/130% emulation is not full
+  system-font acceptance. Both complete APK hashes and saved maps match;
+  Family frame/font/services/original Chrome retained. Owned contexts/registry/
+  worker closed or removed; Pixel untouched. Source/fixture hashes match
+  independent review. Simultaneous atomic writers, Delete/Apply semantics and
+  general performance remain outside acceptance. Original
+  **02:35:00–03:05:00UTC** includes cleanup and commit.
+  [Scoped receipt](portal-browser-profile-conflicts-2026-11-03.md).
+
 - **Pixel control prohibited:** user explicitly asked on 3 November to stop
   controlling the Google phone. No Pixel UI, ADB commands, installations or
   deployment until explicit reauthorization. The physical browse check opened
@@ -21,7 +37,7 @@ The updated whole-product objective is
   deferred because they would require another phone command. Companion source
   and isolated QA remain available.
 
-- **Current room APK / latest file-download delivery:** both rooms contain exact
+- **Previous file-download delivery:** both rooms received exact
   optimized **1.94/code88**. Fleet attachment filenames use an ASCII fallback
   and RFC8187 UTF-8 parameter; ISO controls cannot create response headers.
   Initial12 methods reproduced11 failures; final12 and **4,066 JVM/423 suites**

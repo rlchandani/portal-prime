@@ -42,6 +42,11 @@ the user's per-issue time limit. Parallel workers need disjoint write scopes; th
 owns shared-file integration and device operations. A matching signed APK and an install
 acknowledgment do not replace post-install identity and functional checks.
 
+The user prohibited Google phone/Pixel inspection, control and installation on
+3 November 2026. Do not use that phone until the user explicitly reauthorizes it.
+Portal ADB commands must target the authorized Portal explicitly; do not use
+unscoped ADB commands or device inventory to work around this boundary.
+
 ## Repository layout
 
 ```

@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "status": "delivered",
+  "scope": "Pending browser settings profile Save and replacement confirmation",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.95",
+    "versionCode": 89,
+    "bytes": 25861270,
+    "sha256": "d3aeb06e90db618a13ebfb5430690d5baaadc9e368e3e0c02b2b267ec56ff9d2",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "servedControllerExpectedSha256": "b17018764aca2dfcbbb9d7e915d6e07bce83bae823737efce716c7e7c5b2233e"
+  },
+  "automated": {
+    "red": {
+      "tests": 6,
+      "failed": 5,
+      "passed": 1
+    },
+    "browserJS": {
+      "passed": 721,
+      "failed": 0
+    },
+    "workflowJS": {
+      "passed": 374,
+      "failed": 0
+    },
+    "jvm": {
+      "tests": 4066,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 423
+    },
+    "debugOptimizedR8VitalLint": {
+      "terminalExit": 0,
+      "seconds": 156
+    }
+  },
+  "independentReview": {
+    "blockingFindings": 0,
+    "profileMethodsPassed": 45,
+    "privateContractMethodsPassed": 4,
+    "productionAndFixtureHashesMatch": true
+  },
+  "renderedBrowser": {
+    "actualFamilyServedAssets": true,
+    "generatedManagementResponsesOnly": true,
+    "viewportWidth": 390,
+    "rootFontEmulationPercents": [
+      100,
+      130
+    ],
+    "fullSystemTextScalingClaimed": false,
+    "baseline": {
+      "profileReadsA": 2,
+      "profileReadsB": 2,
+      "writes": 0,
+      "outside": 0,
+      "errors": [],
+      "assetHashes": [
+        "8bdae0181059a3ea940e2d0e1472e3d6a58cac8bb1035fdb1ed703d85cf4a14a",
+        "8bdae0181059a3ea940e2d0e1472e3d6a58cac8bb1035fdb1ed703d85cf4a14a"
+      ],
+      "cases": [
+        {
+          "rootFontEmulationPercent": 100,
+          "computedFontSizes": {
+            "root": "16px",
+            "input": "16px",
+            "save": "15px",
+            "notice": "13px"
+          },
+          "name": "QA Evening 100",
+          "protectedNewerProfile": false,
+          "observedAfterPendingCapture": 30,
+          "retainedName": true,
+          "noHorizontalOverflow": true,
+          "conflictNotice": "Profile saved in this browser.",
+          "freshConfirmationThenIntentionalReplacement": false
+        },
+        {
+          "rootFontEmulationPercent": 130,
+          "computedFontSizes": {
+            "root": "20.8px",
+            "input": "20.8px",
+            "save": "15px",
+            "notice": "13px"
+          },
+          "name": "QA Evening 130",
+          "protectedNewerProfile": false,
+          "observedAfterPendingCapture": 30,
+          "retainedName": true,
+          "noHorizontalOverflow": true,
+          "conflictNotice": "Profile saved in this browser.",
+          "freshConfirmationThenIntentionalReplacement": false
+        }
+      ]
+    },
+    "candidate": {
+      "profileReadsA": 4,
+      "profileReadsB": 2,
+      "writes": 0,
+      "outside": 0,
+      "errors": [],
+      "assetHashes": [
+        "b17018764aca2dfcbbb9d7e915d6e07bce83bae823737efce716c7e7c5b2233e",
+        "b17018764aca2dfcbbb9d7e915d6e07bce83bae823737efce716c7e7c5b2233e"
+      ],
+      "cases": [
+        {
+          "rootFontEmulationPercent": 100,
+          "computedFontSizes": {
+            "root": "16px",
+            "input": "16px",
+            "save": "15px",
+            "notice": "13px"
+          },
+          "name": "QA Evening 100",
+          "protectedNewerProfile": true,
+          "observedAfterPendingCapture": 90,
+          "retainedName": true,
+          "noHorizontalOverflow": true,
+          "conflictNotice": "Profile not saved. \u201cQA Evening 100\u201d has changed. Review it and save again.",
+          "freshConfirmationThenIntentionalReplacement": true
+        },
+        {
+          "rootFontEmulationPercent": 130,
+          "computedFontSizes": {
+            "root": "20.8px",
+            "input": "20.8px",
+            "save": "15px",
+            "notice": "13px"
+          },
+          "name": "QA Evening 130",
+          "protectedNewerProfile": true,
+          "observedAfterPendingCapture": 90,
+          "retainedName": true,
+          "noHorizontalOverflow": true,
+          "conflictNotice": "Profile not saved. \u201cQA Evening 130\u201d has changed. Review it and save again.",
+          "freshConfirmationThenIntentionalReplacement": true
+        }
+      ]
+    },
+    "baselineServedAssetMatchesCommittedSource": true,
+    "candidateServedAssetMatchesExactApk": true,
+    "newErrorAndSuccessNoticesObserved": true
+  },
+  "deployment": {
+    "Family Area": "Terminal deploy success; full installed APK readback and final normal photo frame visually checked",
+    "Living Area": "Terminal deploy success; full installed APK SHA,1.95/code89 and complete saved maps verified; no duplicate rendered QA"
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "manualPhotoFrameForeground": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true
+    }
+  },
+  "cleanup": {
+    "ownedIsolatedBrowserContextsClosed": true,
+    "desktopReviewReturnedHome": true,
+    "ownedRegistryRemoved": true,
+    "primaryRegistryBytesPreserved": true,
+    "workerClosed": true,
+    "pixelCommands": 0,
+    "nativeFixtureFilesCreated": 0,
+    "previousRollbackApkRetained": true,
+    "familyNormalFrameVisuallyChecked": true,
+    "livingVisualAcceptanceClaimed": false,
+    "generatedBrowserStorageClearAttempted": true
+  },
+  "matchingMapping": {
+    "rawSha256": "f775b3696b258548704c4b1303df7134df7551b60ff7b5e393bd94a4e479a2b2",
+    "rawBytes": 83151736,
+    "gzipBytes": 5983320,
+    "roundTripVerified": true
+  },
+  "issueClock": {
+    "startedAt": "2026-11-03T02:35:00Z",
+    "deadline": "2026-11-03T03:05:00Z",
+    "scope": "Browser settings profile Save: detect changes to reviewed target before and during capture; preserve newer named profile, draft and unrelated names",
+    "phoneProhibited": true
+  },
+  "limits": [
+    "Generated backend replies exercise installed served browser assets; no live account/provider timing or actual owner profile writes.",
+    "Root-font emulation enlarges root/input text; fixed-pixel controls do not establish full130% system-font acceptance.",
+    "Per-name reviewed-value guard does not claim atomic simultaneous storage transactions or changed Delete/Apply/ABA semantics.",
+    "No general FPS, whole-product performance, physical phone or Living visual acceptance; parked clocks and publication restrictions retained."
+  ],
+  "roadmapBrowser": {
+    "viewports": [
+      {
+        "width": 390,
+        "clientWidth": 375,
+        "scrollWidth": 375
+      },
+      {
+        "width": 1600,
+        "clientWidth": 1585,
+        "scrollWidth": 1585
+      }
+    ],
+    "current195Visible": true,
+    "phoneProhibitionVisible": true,
+    "trackedTasks": 65,
+    "latestSelected": true,
+    "receiptHttp": 200,
+    "generatedImageHttp": 200
+  }
+}

@@ -1,18 +1,68 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T02:27:20.718108+00:00",
-  "updatedLabel": "3 November 2026 \u00b7 file-download header delivery",
+  "updatedAt": "2026-11-03T02:48:03.135676+00:00",
+  "updatedLabel": "3 November 2026 \u00b7 1.95 browser profile Save delivered to both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.91/code85. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are now prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.95/code89. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "browser-profile-conflicts",
+      "title": "Settings profiles: preserve newer browser saves",
+      "summary": "Delivered 1.95 to both rooms. A pending Save keeps a same-name profile changed in another tab and requests fresh replacement review.",
+      "description": "Browser tabs share local profiles. The original delayed capture silently overwrote a profile saved by another tab; the same reviewed name/value is now checked at click, before capture and after capture.",
+      "status": "delivered",
+      "verification": "721 browser JS \u00b7 4,066 JVM \u00b7 2/2 Family-served rendered conflict cases",
+      "kind": "Browser settings profile data integrity",
+      "platforms": [
+        "browser",
+        "portal"
+      ],
+      "owner": "PWA engineering / independent review / release QA",
+      "deployment": "Exact optimized 1.95/code89 installed and fully hashed in both rooms; complete saved maps unchanged.",
+      "state": "Five initial failures, all six final methods pass. Actual served assets preserved the newer 90-second interval instead of overwriting it with30 seconds, retaining fresh Cancel/Replace.",
+      "acceptance": [
+        "Preserve same-name profiles added/edited/removed while confirmation or capture is pending.",
+        "Read current browser storage at Save click; require the same reviewed target before and after capture.",
+        "Keep the typed name and unrelated profiles; release busy state without automatic retry.",
+        "Verify rendered two-tab conflict, Cancel and fresh intentional replacement using actual served assets.",
+        "Pass regression/build/signing gates and preserve complete room configuration on deployment."
+      ],
+      "evidence": [
+        {
+          "text": "Actual source, test, rendered acceptance, release and limits.",
+          "source": "docs/portal-browser-profile-conflicts-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized artifact, actual served-asset hashes, generated browser cases and preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/browser-profile-conflicts-verification.json"
+        },
+        {
+          "text": "Generated conflict notice at390px with130% root-font emulation; fixed pixel controls remain fixed.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/browser-profile-conflict-130.png"
+        }
+      ],
+      "limits": [
+        "Generated backend replies exercise installed served browser assets; no live account/provider timing or actual owner profile writes.",
+        "Root-font emulation enlarges root/input text; fixed-pixel controls do not establish full130% system-font acceptance.",
+        "Per-name reviewed-value guard does not claim atomic simultaneous storage transactions or changed Delete/Apply/ABA semantics.",
+        "No general FPS, whole-product performance, physical phone or Living visual acceptance; parked clocks and publication restrictions retained.",
+        "A related Delete-confirmation staleness observation is source-only and retains this same02:35:00\u201303:05:00UTC clock; no fresh slot is authorized."
+      ],
+      "next": "Reload already-open browser tabs for the updated controller. Preserve separate approval, account and parked-issue boundaries.",
+      "issueClock": {
+        "startedAt": "2026-11-03T02:35:00Z",
+        "deadline": "2026-11-03T03:05:00Z",
+        "originalAuditClockRetained": true
+      }
+    },
     {
       "id": "file-download-headers",
       "title": "File downloads: safe headers and readable Unicode names",
@@ -26,7 +76,7 @@
         "fleet"
       ],
       "owner": "Portal engineering / independent review / Family native HTTP QA",
-      "deployment": "Exact optimized1.94/code88 installed and fully hashed in both rooms; complete saved settings/layout/source maps unchanged.",
+      "deployment": "Exact optimized1.94/code88 received and fully hashed in both rooms; complete saved settings/layout/source maps unchanged.",
       "state": "Four same generated8KiB files on Family actual protected HTTP before/after; normal manual frame/font/services/original Chrome task retained.",
       "acceptance": [
         "Emit one ASCII attachment header with one safe fallback and one RFC8187 UTF-8 filename parameter.",
@@ -49,7 +99,8 @@
         "Native HTTP checks cover four generated8KiB files, not real photos, browser save-dialog naming or rejected-token behavior. Existing auth/access boundaries were source-reviewed.",
         "Only download filename metadata changed; concurrent source-file mutation/snapshot semantics and whole-product header serialization remain outside scope.",
         "No optical FPS, general UI or whole-product performance claim. Living presentation not visually inspected; exact full installed APK and complete saved maps verified.",
-        "Pixel control/inspection prohibited; earlier phone cleanup deferred. No HA/GitHub/publication, preference or design change; exhausted issue clocks unchanged."
+        "Pixel control/inspection prohibited; earlier phone cleanup deferred. No HA/GitHub/publication, preference or design change; exhausted issue clocks unchanged.",
+        "The concurrent file metadata/open observation belongs to the same02:08:09\u201302:38:09UTC audit; no native reproduction or fresh investigation slot is authorized."
       ],
       "next": "Continue independent authorized work; browser download UI and concurrent source-file changes are separate acceptance. Do not control Pixel or reopen exhausted issues.",
       "issueClock": {

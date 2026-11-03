@@ -2906,12 +2906,24 @@ function deleteProfile(name) {
 function profileCaptureKey(ticket = session.capture()) {
   return `${ticket.room?.base}:profile-capture:${ticket.generation}:${ticket.pageGeneration}`;
 }
-async function saveCurrentProfile(name, ticket) {
+function profileRevision(profiles, name) {
+  return Object.hasOwn(profiles, name) ? JSON.stringify(profiles[name]) : null;
+}
+function profileSaveStillReviewed(profiles, name, reviewedRevision) {
+  if (profileRevision(profiles, name) === reviewedRevision) return true;
+  toast(`Profile not saved. “${name}” has changed. Review it and save again.`, true);
+  return false;
+}
+async function saveCurrentProfile(name, ticket, reviewedRevision) {
   const key = profileCaptureKey(ticket);
   if (!session.current(ticket) || profileControlsLocked(ticket)) return;
   const opening = readProfiles();
   if (!opening.ok) {
     toast(`Profile not saved. ${opening.error}`, true);
+    render();
+    return;
+  }
+  if (!profileSaveStillReviewed(opening.profiles, name, reviewedRevision)) {
     render();
     return;
   }
@@ -2932,6 +2944,7 @@ async function saveCurrentProfile(name, ticket) {
       toast(`Profile not saved. ${current.error}`, true);
       return;
     }
+    if (!profileSaveStillReviewed(current.profiles, name, reviewedRevision)) return;
     const updated = { ...current.profiles, [name]: captureProfile(response.settings) };
     if (!storage.set(STORAGE.profiles, JSON.stringify(updated))) {
       toast('Profile not saved. Browser storage is unavailable. Try again when storage is available.', true);
@@ -3016,8 +3029,15 @@ function profilesPage() {
             return;
           }
           const ticket = session.capture();
-          const save = () => saveCurrentProfile(name, ticket);
-          if (Object.hasOwn(profiles, name))
+          const current = readProfiles();
+          if (!current.ok) {
+            toast(`Profile not saved. ${current.error}`, true);
+            render();
+            return;
+          }
+          const reviewedRevision = profileRevision(current.profiles, name);
+          const save = () => saveCurrentProfile(name, ticket, reviewedRevision);
+          if (reviewedRevision !== null)
             confirmAction(
               `Replace “${name}”?`,
               'Replace the existing browser profile with current Portal settings.',
