@@ -156,13 +156,18 @@ object CalendarFeed {
   private data class PreparedEvent(
       val start: Long,
       val duration: Long,
+      val allDayDays: Int?,
       val title: String,
       val allDay: Boolean,
       val location: String?,
       val rrule: String?,
       val exdates: List<Long>,
   )
-  private data class PreparedDocument(val events: List<PreparedEvent>)
+  private data class PreparedDocument(
+      val events: List<PreparedEvent>,
+      val zone: TimeZone,
+      val locale: Locale,
+  )
 
   private fun prepareDocument(ics: String, zone: TimeZone, locale: Locale): PreparedDocument {
     val lines = unfold(ics)
@@ -176,13 +181,14 @@ object CalendarFeed {
         i = end + 1
       } else i++
     }
-    return PreparedDocument(events.toList())
+    return PreparedDocument(events.toList(), zone, locale)
   }
 
   private fun prepareEvent(body: List<String>, zone: TimeZone, locale: Locale): PreparedEvent? {
     var start: Long? = null
     var startAllDay = false
     var end: Long? = null
+    var endAllDay = false
     var title = ""
     var location: String? = null
     var rrule: String? = null
@@ -192,7 +198,7 @@ object CalendarFeed {
       when (p.name.uppercase(Locale.US)) {
         "STATUS" -> if (p.value.equals("CANCELLED", ignoreCase = true)) return null
         "DTSTART" -> parseDt(p, zone, locale)?.let { (m, allDay) -> start = m; startAllDay = allDay }
-        "DTEND" -> parseDt(p, zone, locale)?.let { (m, _) -> end = m }
+        "DTEND" -> parseDt(p, zone, locale)?.let { (m, allDay) -> end = m; endAllDay = allDay }
         "SUMMARY" -> title = unescapeText(p.value)
         "LOCATION" -> location = unescapeText(p.value).ifBlank { null }
         "RRULE" -> rrule = p.value
@@ -203,9 +209,16 @@ object CalendarFeed {
       }
     }
     val s = start ?: return null
+    val e = end
     if (title.isBlank()) title = "(busy)"
-    val duration = (end ?: if (startAllDay) s + 24L * 60 * 60 * 1000 else s) - s
-    return PreparedEvent(s, duration, title, startAllDay, location, rrule, exdates.toList())
+    val duration = (e ?: s) - s
+    val allDayDays = if (startAllDay && (e == null || endAllDay)) {
+      // Local date boundaries count calendar days, independent of their UTC offsets.
+      if (e == null) 1 else
+          ((e + zone.getOffset(e).toLong() - s - zone.getOffset(s).toLong()) /
+              (24L * 60 * 60 * 1000)).toInt()
+    } else null
+    return PreparedEvent(s, duration, allDayDays, title, startAllDay, location, rrule, exdates.toList())
   }
 
   private fun evaluateDocument(document: PreparedDocument, nowMillis: Long, horizonDays: Int): List<Event> {
@@ -215,7 +228,12 @@ object CalendarFeed {
       val starts = if (event.rrule.isNullOrBlank()) listOf(event.start)
           else expandRecurrence(event.start, event.rrule, event.exdates, horizonEnd)
       for (start in starts) {
-        val end = start + event.duration
+        val end = if (event.allDayDays != null) {
+          Calendar.getInstance(document.zone, document.locale).apply {
+            timeInMillis = start
+            add(Calendar.DAY_OF_MONTH, event.allDayDays)
+          }.timeInMillis
+        } else start + event.duration
         if (end < nowMillis || start > horizonEnd) continue
         out.offer(start) { Event(start, end, event.title, event.allDay, event.location) }
       }

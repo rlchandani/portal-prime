@@ -1,0 +1,770 @@
+{
+  "recordedAt": "2026-11-03T06:57:49.350525+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T06:48:28Z",
+    "deadline": "2026-11-03T07:18:28Z",
+    "baseCommit": "6f2b8dc7f9f81d468c3426c6b587e50cbc5833f6",
+    "scope": "Calendar date-only exclusive ends and recurring calendar-day spans across DST; preserve timed elapsed durations. Original independent audit clock retained. No DURATION/RFC expansion, recurrence timezone redesign, ownerfeed/UI/calendar config writes."
+  },
+  "scope": "All-day exclusive ends and recurring calendar-day spans across daylight-saving changes.",
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/CalendarFeed.kt": "7de84c5cf50852c01f0ad9401c1f750bf4a1fd8e6f450e7a39ee812e54afaf2d",
+    "app/src/main/java/com/immortal/launcher/CalendarPreparedFeed.kt": "83b383cf24d9006e128f9bc8959623b9b7b25d1ea64173ed3422f49e38e904be",
+    "app/src/test/java/com/immortal/launcher/CalendarAllDayDurationTest.kt": "799b61adb10a18bff64d07d5382c21e37edeb4a6430f68a28cf04a78cacfa613",
+    "app/build.gradle.kts": "18ff58326894ea7f842030d18fca34d2512661dcce2f0762628f579f5a171fb8"
+  },
+  "red": {
+    "issueClock": {
+      "startedAt": "2026-11-03T06:48:28Z",
+      "deadline": "2026-11-03T07:18:28Z",
+      "originalDiscoveryClockRetained": true
+    },
+    "tests": 12,
+    "failures": 9,
+    "errors": 0,
+    "skipped": 0,
+    "terminalExit": 1,
+    "failed": [
+      {
+        "name": "recurringExplicitFallSpanDoesNotReuseFirstOccurrenceElapsedHours",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[1793595600000, 1793682000000, 1793768400000]> but was:<[1793595600000, 1793682000000, 1793772000000]>"
+      },
+      {
+        "name": "fallDateEventRemainsVisibleThroughItsLastLocalHour",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[fall-window]> but was:<[]>"
+      },
+      {
+        "name": "missingDateEndUsesNextMidnightOnFallTransition",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<1793595600000> but was:<1793592000000>"
+      },
+      {
+        "name": "missingDateEndUsesNextMidnightOnSpringTransition",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<1773028800000> but was:<1773032400000>"
+      },
+      {
+        "name": "springDateEventCannotRemainVisibleAfterItsExclusiveDateEnd",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError"
+      },
+      {
+        "name": "recurringImplicitDateEndsUseEachSpringOccurrenceCalendarDay",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[1772946000000, 1773028800000, 1773115200000]> but was:<[1772946000000, 1773032400000, 1773115200000]>"
+      },
+      {
+        "name": "warmPreparedDateEventStillExpiresAtTheCorrectMidnight",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError"
+      },
+      {
+        "name": "recurringExplicitSpringSpanDoesNotReuseFirstOccurrenceElapsedHours",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[1773028800000, 1773115200000, 1773201600000]> but was:<[1773028800000, 1773115200000, 1773198000000]>"
+      },
+      {
+        "name": "recurringImplicitDateEndsUseEachFallOccurrenceCalendarDay",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[1793505600000, 1793595600000, 1793682000000]> but was:<[1793505600000, 1793592000000, 1793682000000]>"
+      }
+    ],
+    "passed": [
+      "timedRecurrenceRetainsItsExistingElapsedDuration",
+      "explicitMultiDayDateEndsKeepTheirExclusiveMidnights",
+      "ordinaryAndUtcDateEventsKeepOneDayDuration"
+    ],
+    "sourceSha256": {
+      "app/src/main/java/com/immortal/launcher/CalendarFeed.kt": "99bbbd5886c02e27ca80f91d597664cb91e71ea050d47a6944c957293831d9bb",
+      "app/src/main/java/com/immortal/launcher/CalendarPreparedFeed.kt": "83b383cf24d9006e128f9bc8959623b9b7b25d1ea64173ed3422f49e38e904be",
+      "app/src/test/java/com/immortal/launcher/CalendarAllDayDurationTest.kt": "799b61adb10a18bff64d07d5382c21e37edeb4a6430f68a28cf04a78cacfa613",
+      "app/build.gradle.kts": "6ada158235944a0c29488e7027abd52e62da83ba0dc590dcbe7c48ab5e74e0b8"
+    },
+    "xmlSha256": "e42ec279c3a3790a6db52ae1611992b2e37410912112d94d9729d4da14df5f65",
+    "scope": "Actual CalendarFeed.parse and CalendarFeed.window with unique generated ICS sources, pinned/restoreddefault timezone and independent UTC expectedinstants; missing-end and recurringall-day calendar spans only. No HTTP/device/native/calendarUI or broadRFC/DURATION/TZIDrecurrence proof."
+  },
+  "green": {
+    "suites": 433,
+    "tests": 4162,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualParserFocusedTests": 12,
+    "allTwelveUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "1m 53s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "native": {
+    "comparison": {
+      "baseline": {
+        "passed": 7,
+        "total": 15
+      },
+      "candidate": {
+        "passed": 15,
+        "total": 15
+      },
+      "exactlyEightChecksDiffer": true,
+      "differingChecks": [
+        "missingSpringEndsAtNextMidnight",
+        "missingFallEndsAtNextMidnight",
+        "warmSpringParseExpiresAfterMidnight",
+        "warmFallParseRetainsLateEvening",
+        "implicitSpringSeriesKeepsDateEnds",
+        "implicitFallSeriesKeepsDateEnds",
+        "explicitSpringSeriesKeepsTwoDates",
+        "explicitFallSeriesKeepsTwoDates"
+      ],
+      "allSevenOriginalControlsRetained": true,
+      "scope": "Actual optimized parser with generated all-day/timed dates and process-local NY/UTC timezone changes; native window inlined and not invoked."
+    },
+    "runs": [
+      {
+        "status": "FAIL",
+        "checks": {
+          "actualOptimizedApkClassLoader": true,
+          "missingSpringEndsAtNextMidnight": false,
+          "missingFallEndsAtNextMidnight": false,
+          "warmSpringParseExpiresAfterMidnight": false,
+          "warmFallParseRetainsLateEvening": false,
+          "implicitSpringSeriesKeepsDateEnds": false,
+          "implicitFallSeriesKeepsDateEnds": false,
+          "explicitSpringSeriesKeepsTwoDates": false,
+          "explicitFallSeriesKeepsTwoDates": false,
+          "explicitNonRecurringDateEndRetained": true,
+          "ordinaryLocalDayRetained": true,
+          "timedSpringElapsed23HoursRetained": true,
+          "timedFallElapsed25HoursRetained": true,
+          "utcDateAndPreparedZoneKeyRetained": true,
+          "processDefaultTimezoneRestored": true
+        },
+        "observations": {
+          "missingSpringEndsAtNextMidnight": [
+            {
+              "startMillis": 1772946000000,
+              "endMillis": 1773032400000,
+              "elapsedMillis": 86400000
+            }
+          ],
+          "missingFallEndsAtNextMidnight": [
+            {
+              "startMillis": 1793505600000,
+              "endMillis": 1793592000000,
+              "elapsedMillis": 86400000
+            }
+          ],
+          "implicitSpringSeriesKeepsDateEnds": [
+            {
+              "startMillis": 1772859600000,
+              "endMillis": 1772946000000,
+              "elapsedMillis": 86400000
+            },
+            {
+              "startMillis": 1772946000000,
+              "endMillis": 1773032400000,
+              "elapsedMillis": 86400000
+            },
+            {
+              "startMillis": 1773028800000,
+              "endMillis": 1773115200000,
+              "elapsedMillis": 86400000
+            }
+          ],
+          "implicitFallSeriesKeepsDateEnds": [
+            {
+              "startMillis": 1793419200000,
+              "endMillis": 1793505600000,
+              "elapsedMillis": 86400000
+            },
+            {
+              "startMillis": 1793505600000,
+              "endMillis": 1793592000000,
+              "elapsedMillis": 86400000
+            },
+            {
+              "startMillis": 1793595600000,
+              "endMillis": 1793682000000,
+              "elapsedMillis": 86400000
+            }
+          ],
+          "explicitSpringSeriesKeepsTwoDates": [
+            {
+              "startMillis": 1772859600000,
+              "endMillis": 1773028800000,
+              "elapsedMillis": 169200000
+            },
+            {
+              "startMillis": 1772946000000,
+              "endMillis": 1773115200000,
+              "elapsedMillis": 169200000
+            },
+            {
+              "startMillis": 1773028800000,
+              "endMillis": 1773198000000,
+              "elapsedMillis": 169200000
+            }
+          ],
+          "explicitFallSeriesKeepsTwoDates": [
+            {
+              "startMillis": 1793419200000,
+              "endMillis": 1793595600000,
+              "elapsedMillis": 176400000
+            },
+            {
+              "startMillis": 1793505600000,
+              "endMillis": 1793682000000,
+              "elapsedMillis": 176400000
+            },
+            {
+              "startMillis": 1793595600000,
+              "endMillis": 1793772000000,
+              "elapsedMillis": 176400000
+            }
+          ],
+          "explicitNonRecurringDateEndRetained": [
+            {
+              "startMillis": 1772859600000,
+              "endMillis": 1773028800000,
+              "elapsedMillis": 169200000
+            }
+          ],
+          "ordinaryLocalDayRetained": [
+            {
+              "startMillis": 1767589200000,
+              "endMillis": 1767675600000,
+              "elapsedMillis": 86400000
+            }
+          ],
+          "timedSpringElapsed23HoursRetained": [
+            {
+              "startMillis": 1772902800000,
+              "endMillis": 1772985600000,
+              "elapsedMillis": 82800000
+            },
+            {
+              "startMillis": 1772985600000,
+              "endMillis": 1773068400000,
+              "elapsedMillis": 82800000
+            },
+            {
+              "startMillis": 1773072000000,
+              "endMillis": 1773154800000,
+              "elapsedMillis": 82800000
+            }
+          ],
+          "timedFallElapsed25HoursRetained": [
+            {
+              "startMillis": 1793462400000,
+              "endMillis": 1793552400000,
+              "elapsedMillis": 90000000
+            },
+            {
+              "startMillis": 1793552400000,
+              "endMillis": 1793642400000,
+              "elapsedMillis": 90000000
+            },
+            {
+              "startMillis": 1793638800000,
+              "endMillis": 1793728800000,
+              "elapsedMillis": 90000000
+            }
+          ],
+          "utcDateAndPreparedZoneKeyRetained": [
+            {
+              "startMillis": 1772928000000,
+              "endMillis": 1773014400000,
+              "elapsedMillis": 86400000
+            }
+          ]
+        },
+        "passed": 7,
+        "total": 15,
+        "optimizedApkSha256": "9438d6b056ffbba353acde8f1018c17a38767645c7b8e3b72e6545e278106703",
+        "appPreferencesWritten": 0,
+        "networkRequests": 0,
+        "frameworkServicesTouched": 0,
+        "scope": "Actual optimized parser with generated dates and process-local timezone changes; no calendar UI or app-state writes"
+      },
+      {
+        "status": "PASS",
+        "checks": {
+          "actualOptimizedApkClassLoader": true,
+          "missingSpringEndsAtNextMidnight": true,
+          "missingFallEndsAtNextMidnight": true,
+          "warmSpringParseExpiresAfterMidnight": true,
+          "warmFallParseRetainsLateEvening": true,
+          "implicitSpringSeriesKeepsDateEnds": true,
+          "implicitFallSeriesKeepsDateEnds": true,
+          "explicitSpringSeriesKeepsTwoDates": true,
+          "explicitFallSeriesKeepsTwoDates": true,
+          "explicitNonRecurringDateEndRetained": true,
+          "ordinaryLocalDayRetained": true,
+          "timedSpringElapsed23HoursRetained": true,
+          "timedFallElapsed25HoursRetained": true,
+          "utcDateAndPreparedZoneKeyRetained": true,
+          "processDefaultTimezoneRestored": true
+        },
+        "observations": {
+          "missingSpringEndsAtNextMidnight": [
+            {
+              "startMillis": 1772946000000,
+              "endMillis": 1773028800000,
+              "elapsedMillis": 82800000
+            }
+          ],
+          "missingFallEndsAtNextMidnight": [
+            {
+              "startMillis": 1793505600000,
+              "endMillis": 1793595600000,
+              "elapsedMillis": 90000000
+            }
+          ],
+          "implicitSpringSeriesKeepsDateEnds": [
+            {
+              "startMillis": 1772859600000,
+              "endMillis": 1772946000000,
+              "elapsedMillis": 86400000
+            },
+            {
+              "startMillis": 1772946000000,
+              "endMillis": 1773028800000,
+              "elapsedMillis": 82800000
+            },
+            {
+              "startMillis": 1773028800000,
+              "endMillis": 1773115200000,
+              "elapsedMillis": 86400000
+            }
+          ],
+          "implicitFallSeriesKeepsDateEnds": [
+            {
+              "startMillis": 1793419200000,
+              "endMillis": 1793505600000,
+              "elapsedMillis": 86400000
+            },
+            {
+              "startMillis": 1793505600000,
+              "endMillis": 1793595600000,
+              "elapsedMillis": 90000000
+            },
+            {
+              "startMillis": 1793595600000,
+              "endMillis": 1793682000000,
+              "elapsedMillis": 86400000
+            }
+          ],
+          "explicitSpringSeriesKeepsTwoDates": [
+            {
+              "startMillis": 1772859600000,
+              "endMillis": 1773028800000,
+              "elapsedMillis": 169200000
+            },
+            {
+              "startMillis": 1772946000000,
+              "endMillis": 1773115200000,
+              "elapsedMillis": 169200000
+            },
+            {
+              "startMillis": 1773028800000,
+              "endMillis": 1773201600000,
+              "elapsedMillis": 172800000
+            }
+          ],
+          "explicitFallSeriesKeepsTwoDates": [
+            {
+              "startMillis": 1793419200000,
+              "endMillis": 1793595600000,
+              "elapsedMillis": 176400000
+            },
+            {
+              "startMillis": 1793505600000,
+              "endMillis": 1793682000000,
+              "elapsedMillis": 176400000
+            },
+            {
+              "startMillis": 1793595600000,
+              "endMillis": 1793768400000,
+              "elapsedMillis": 172800000
+            }
+          ],
+          "explicitNonRecurringDateEndRetained": [
+            {
+              "startMillis": 1772859600000,
+              "endMillis": 1773028800000,
+              "elapsedMillis": 169200000
+            }
+          ],
+          "ordinaryLocalDayRetained": [
+            {
+              "startMillis": 1767589200000,
+              "endMillis": 1767675600000,
+              "elapsedMillis": 86400000
+            }
+          ],
+          "timedSpringElapsed23HoursRetained": [
+            {
+              "startMillis": 1772902800000,
+              "endMillis": 1772985600000,
+              "elapsedMillis": 82800000
+            },
+            {
+              "startMillis": 1772985600000,
+              "endMillis": 1773068400000,
+              "elapsedMillis": 82800000
+            },
+            {
+              "startMillis": 1773072000000,
+              "endMillis": 1773154800000,
+              "elapsedMillis": 82800000
+            }
+          ],
+          "timedFallElapsed25HoursRetained": [
+            {
+              "startMillis": 1793462400000,
+              "endMillis": 1793552400000,
+              "elapsedMillis": 90000000
+            },
+            {
+              "startMillis": 1793552400000,
+              "endMillis": 1793642400000,
+              "elapsedMillis": 90000000
+            },
+            {
+              "startMillis": 1793638800000,
+              "endMillis": 1793728800000,
+              "elapsedMillis": 90000000
+            }
+          ],
+          "utcDateAndPreparedZoneKeyRetained": [
+            {
+              "startMillis": 1772928000000,
+              "endMillis": 1773014400000,
+              "elapsedMillis": 86400000
+            }
+          ]
+        },
+        "passed": 15,
+        "total": 15,
+        "optimizedApkSha256": "efb0aa0e5ff47002ae24fd1a5a58999d641bbe2fc9c9a4bf86347c8909411615",
+        "appPreferencesWritten": 0,
+        "networkRequests": 0,
+        "frameworkServicesTouched": 0,
+        "scope": "Actual optimized parser with generated dates and process-local timezone changes; no calendar UI or app-state writes"
+      }
+    ],
+    "process": [
+      {
+        "terminalExit": 1,
+        "stdoutBytes": 3223,
+        "stderrBytes": 0
+      },
+      {
+        "terminalExit": 0,
+        "stdoutBytes": 3216,
+        "stderrBytes": 0
+      }
+    ],
+    "cleanup": {
+      "ownedProcessRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "appPreferencesWritten": 0,
+      "installerInvoked": false,
+      "networkRequests": 0,
+      "ownedDeviceScratchRemoved": true,
+      "cleanupFaults": []
+    },
+    "fixtureSha256": {
+      "java": "8fcc9dd7d1453680a639fb9d4aa9ac08ebeb5055b7b006c2b8094bf1df445a3e",
+      "jar": "77077c37d1b591507acadd7c38313bdfa09bb10cb59607a64eaf480947990835",
+      "compiler": "09e2abb58a93272242d898b68efe61d2b439b72cb4ce7fc0d8ba806135c4b585",
+      "runner": "179b6b61e86f0de90de9f5659077257ad156fe36c3195e88672c3d5a5a92ed27"
+    },
+    "firstAttemptRetainedPrivately": true,
+    "finalGuardedRerunExactlyMatchesFirstComparison": true,
+    "actualNativeWindowVerified": false,
+    "scope": "Actual optimized parser with generated dates and process-local timezone changes; no app writes or network."
+  },
+  "artifact": {
+    "sha256": "efb0aa0e5ff47002ae24fd1a5a58999d641bbe2fc9c9a4bf86347c8909411615",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.108",
+    "versionCode": 102,
+    "variants": {
+      "performance": {
+        "sha256": "efb0aa0e5ff47002ae24fd1a5a58999d641bbe2fc9c9a4bf86347c8909411615",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.108",
+        "versionCode": 102
+      },
+      "debug": {
+        "sha256": "d4121542a4f5458dc086dce7a1b871ef16a62c8da348e716559b94b959dc9b5d",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.108",
+        "versionCode": 102
+      },
+      "rollback": {
+        "sha256": "9438d6b056ffbba353acde8f1018c17a38767645c7b8e3b72e6545e278106703",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.107",
+        "versionCode": 101
+      }
+    },
+    "debugSha256": "d4121542a4f5458dc086dce7a1b871ef16a62c8da348e716559b94b959dc9b5d",
+    "rollbackSha256": "9438d6b056ffbba353acde8f1018c17a38767645c7b8e3b72e6545e278106703",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "1m 53s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "originalRegistryByteHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "ownedNativeProcessesAndDeviceScratchRemoved": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "googlePhoneCommands": 0,
+    "currentNightClockFrameVisuallyInspected": true,
+    "familyChromeTaskRetained": true
+  },
+  "review": {
+    "blockingFindings": 0,
+    "reviewedSourceSha256": {
+      "app/src/main/java/com/immortal/launcher/CalendarFeed.kt": "7de84c5cf50852c01f0ad9401c1f750bf4a1fd8e6f450e7a39ee812e54afaf2d",
+      "app/src/main/java/com/immortal/launcher/CalendarPreparedFeed.kt": "83b383cf24d9006e128f9bc8959623b9b7b25d1ea64173ed3422f49e38e904be",
+      "app/src/test/java/com/immortal/launcher/CalendarAllDayDurationTest.kt": "799b61adb10a18bff64d07d5382c21e37edeb4a6430f68a28cf04a78cacfa613",
+      "app/build.gradle.kts": "18ff58326894ea7f842030d18fca34d2512661dcce2f0762628f579f5a171fb8"
+    },
+    "testUnchangedFromRed": true,
+    "preparedFeedUnchangedFromRed": true,
+    "baselineTests": 12,
+    "baselineAssertionFailures": 9,
+    "baselineControlsPassed": 3,
+    "baselineFixtureErrors": 0,
+    "scope": "Valid date-only missing/explicit end calendar-day spans, per-occurrence exclusive end in privately captured preparation timezone/locale; timed or mismatched-typed ends retain elapsed-duration policy. No DURATION/RFC expansion, recurrence start timezone redesign, network, native parser or calendar UI acceptance.",
+    "fullJvmAndArtifactVerificationPending": false,
+    "nativeParserVerified": true,
+    "calendarUiVerified": false,
+    "fullJvmIndependentlyVerified": {
+      "suites": 433,
+      "tests": 4162,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "actualRetainedApkSha256": {
+      "candidate-1.108.apk": "efb0aa0e5ff47002ae24fd1a5a58999d641bbe2fc9c9a4bf86347c8909411615",
+      "candidate-debug-1.108.apk": "d4121542a4f5458dc086dce7a1b871ef16a62c8da348e716559b94b959dc9b5d",
+      "baseline-1.107.apk": "9438d6b056ffbba353acde8f1018c17a38767645c7b8e3b72e6545e278106703"
+    },
+    "artifactHashesAndByteLengthsMatch": true,
+    "qualityGateSuccessAndDurationObserved": "BUILD SUCCESSFUL in 1m 53s",
+    "sourceHashesUnchangedAfterGates": true,
+    "nativeInitialResultsIndependentlyVerified": {
+      "baseline": {
+        "passed": 7,
+        "total": 15
+      },
+      "candidate": {
+        "passed": 15,
+        "total": 15
+      },
+      "exactlyEightDifferences": [
+        "missingSpringEndsAtNextMidnight",
+        "missingFallEndsAtNextMidnight",
+        "warmSpringParseExpiresAfterMidnight",
+        "warmFallParseRetainsLateEvening",
+        "implicitSpringSeriesKeepsDateEnds",
+        "implicitFallSeriesKeepsDateEnds",
+        "explicitSpringSeriesKeepsTwoDates",
+        "explicitFallSeriesKeepsTwoDates"
+      ],
+      "candidateEndInstantsIndependentlyVerified": true,
+      "scope": "Actual optimized parser only; displaywindow JVM-only. Normal cleanup result recorded, failure/timeout paths not injected."
+    },
+    "nativeFixtureFinalReviewPending": false,
+    "nativeFixtureFollowups": [],
+    "nativeWindowVerified": false,
+    "jvmDisplayWindowVerified": true,
+    "nativeFixtureFollowupsResolvedInFinalSource": true,
+    "finalNativeFixtureSha256": {
+      "java": "8fcc9dd7d1453680a639fb9d4aa9ac08ebeb5055b7b006c2b8094bf1df445a3e",
+      "runner": "179b6b61e86f0de90de9f5659077257ad156fe36c3195e88672c3d5a5a92ed27",
+      "jar": "77077c37d1b591507acadd7c38313bdfa09bb10cb59607a64eaf480947990835",
+      "compiler": "09e2abb58a93272242d898b68efe61d2b439b72cb4ce7fc0d8ba806135c4b585"
+    },
+    "finalNativeResultsIndependentlyVerified": {
+      "baseline": {
+        "passed": 7,
+        "total": 15
+      },
+      "candidate": {
+        "passed": 15,
+        "total": 15
+      },
+      "exactlyEightDifferences": [
+        "missingSpringEndsAtNextMidnight",
+        "missingFallEndsAtNextMidnight",
+        "warmSpringParseExpiresAfterMidnight",
+        "warmFallParseRetainsLateEvening",
+        "implicitSpringSeriesKeepsDateEnds",
+        "implicitFallSeriesKeepsDateEnds",
+        "explicitSpringSeriesKeepsTwoDates",
+        "explicitFallSeriesKeepsTwoDates"
+      ],
+      "allSevenControlsAndTheirObservationsRetained": true,
+      "allElevenCandidateObservationGroupsIndependentlyVerified": true,
+      "process": {
+        "baseline": {
+          "terminalExit": 1,
+          "stdoutBytes": 3223,
+          "stderrBytes": 0
+        },
+        "candidate": {
+          "terminalExit": 0,
+          "stdoutBytes": 3216,
+          "stderrBytes": 0
+        }
+      },
+      "normalCleanup": {
+        "ownedProcessRetired": {
+          "baseline": true,
+          "candidate": true
+        },
+        "appPreferencesWritten": 0,
+        "installerInvoked": false,
+        "networkRequests": 0,
+        "ownedDeviceScratchRemoved": true,
+        "cleanupFaults": []
+      },
+      "scope": "Actual optimized parser only, generateddates and process-local timezone; native displaywindow inlined and uninvoked; full window verification JVM-only. Normal process/scratch cleanup verified; timeout/failure paths not fault-injected."
+    }
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestUnchanged": true,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false
+  },
+  "limits": [
+    "Valid date-only ends now preserve calendar-day spans; timed elapsed durations and mismatched-type DTEND fallback remain. No DURATION/RFC expansion or recurrence start-timezone redesign.",
+    "Native checks call the actual optimized parser with generated dates and process-local New York/UTC timezone changes. R8 inlines window; display-window edge checks are JVM-only.",
+    "No live calendar feed, asynchronous refresh, calendar UI/widget, real timezone/configuration write or whole-product acceptance was exercised.",
+    "First native run passed the same comparison with normal cleanup but lacked stronger private harness guards. It is retained privately; the guarded final rerun matches exactly. Normal cleanup passed; timeout/failure cleanup was not fault-injected.",
+    "API28, other timezone transitions/calendars and Living native/visual acceptance remain unverified. Existing UI approvals and exhausted issue clocks retain their boundaries.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+  ],
+  "documentation": {
+    "strictMkdocsExit": 0,
+    "strictWarnings": 0,
+    "seconds": 1.9,
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 82,
+          "checks": [
+            {
+              "id": "calendar-all-day-dst",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "chime-player-cleanup",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 82,
+          "checks": [
+            {
+              "id": "calendar-all-day-dst",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "chime-player-cleanup",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingServerPreserved": true
+    },
+    "detailCapturesVisuallyInspected": true,
+    "captureWaitsForFocusRestorationThenBlurs": true,
+    "earlier81TaskRecordsDefaultAndOtherBoundariesPreserved": true,
+    "scope": "Two selected details at two widths; no full-product accessibility or visual acceptance."
+  }
+}

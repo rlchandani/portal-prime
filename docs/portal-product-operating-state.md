@@ -13,8 +13,25 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / bundled sound player cleanup:** exact optimized
-  **1.107/code101** is installed and fully hashed in both rooms. Chime/timer/ping/
+- **Current room APK / all-day calendar date spans:** exact optimized
+  **1.108/code102** is installed and fully hashed in both rooms. Date-only events
+  retain calendar-day spans and exclusive local midnight ends through 23/25-hour
+  days; timed elapsed durations remain. Twelve unchanged actual-parser/window
+  methods reproduce nine failures then pass; **4,162 JVM/433 suites**,
+  debug/optimized/R8/vital lint pass in 1m 53s. Actual optimized Family
+  parser improves **7/15→15/15**, eight differences/seven controls; all 11 endpoint
+  groups independently recomputed. Window is R8-inlined and JVM-only. Final guarded
+  native rerun matches initial comparison; first attempt retained. UI/feed/async/
+  other-zone/API28 acceptance remains open. Complete maps and Home/timer/Sunrise/
+  Chime bytes match; Family current night frame/font/services/original Chrome
+  retained. Owned processes/scratch/registry removed; normal cleanup only, no
+  timeout fault injection. Public1.83 guard rejects local1.108; no phone/HA/auth/
+  publication. **82 tasks:49 delivered,23 locally verified,3 approval,6 parked,
+  1 queued.** Original **06:48:28–07:18:28 UTC** audit clock retained;
+  broader goal stays active. [Receipt](portal-calendar-all-day-dst-2026-11-03.md).
+
+- **Previous room APK / bundled sound player cleanup:** exact optimized
+  **1.107/code101** was installed and fully hashed in both rooms. Chime/timer/ping/
   golden-hour players now use the existing one-shot owner before setup, closing on
   failures and deduplicating terminal cleanup. Twelve unchanged actual-method tests
   reproduce ten assertion failures (35 missed-cleanup and8 duplicate-release cases)
