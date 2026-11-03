@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T16:17:31.278556+00:00",
+  "updatedAt": "2026-11-03T17:00:20.727876+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,50 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "provisioning-ascii-preflight",
+      "title": "Provisioning preflight: enforce the Windows ASCII rule",
+      "summary": "Locally verified: the manual checker rejects forbidden Windows bytes.",
+      "description": "Local provisioning preflight now rejects non-ASCII bytes in the existing CI Windows targets, while preserving UTF-8 Bash and ASCII CRLF/tab text. Seven frozen whole-script cases improve from 3 assertion failures and 4 controls to 7 passing. The full local CI Python command passes 241 tests; Bash syntax and the real repository byte scan pass. PowerShell parsing is explicitly skipped because pwsh is unavailable; native Windows and hosted CI remain unverified.",
+      "status": "verified",
+      "verification": "7 frozen whole-script cases:3 assertion failures/4 controls →7 pass;241 local Python CI tests, zero failures/errors/skips; Bash syntax and actual repository byte scan pass. PowerShell explicitly skipped.",
+      "kind": "Local provisioning preflight",
+      "platforms": [
+        "tooling"
+      ],
+      "owner": "Delivery tooling / independent source, fixture and implementation review",
+      "deployment": "Local host verification only; no APK, room or public release deployment.",
+      "state": "App source/version, public manifest/catalogs, native Fleet CLI and existing workflows unchanged. Prior room 1.128/code122 delivery retained without recheck.",
+      "acceptance": [
+        "Reject non-ASCII bytes in the exact existing CI Windows target set.",
+        "Preserve UTF-8 provision.sh, ASCII tabs/CRLF and optional-target semantics.",
+        "Keep real Bash syntax checking and qualify optional/native PowerShell parsing honestly.",
+        "Pass frozen whole-script cases and existing local Python CI command."
+      ],
+      "evidence": [
+        {
+          "text": "Actual baseline, correction, local gates and limits.",
+          "source": "docs/portal-provisioning-ascii-preflight-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized actual source/test/command and protected-path bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/provisioning-ascii-preflight-verification.json"
+        }
+      ],
+      "limits": [
+        "Focused tests use generated ordinary script files, the real complete production checker and real Bash syntax checking. Only PowerShell parsing is stubbed to return success; no byte scanner is mocked.",
+        "Actual local preflight records PowerShell parsing SKIPPED; no real PowerShell 7/5.1 parsing, Windows codepage, provisioning execution or hosted CI proof.",
+        "Existing CI workflow already discovers the new test through test_portal_*.py. CI and cut-release behavior are unchanged. No actual release-flow acceptance.",
+        "Host tooling only: no app build/version change, APK or room delivery, device/phone/provider/audio/HA action, GitHub authentication, push or publication. Historical room delivery remains 1.128/code122 without a new recheck.",
+        "All prior 106 task objects and original parked/approval clocks remain. Prepared photo-import/Quick-controls decisions remain pending; broader goal active."
+      ],
+      "next": "Retain the local guard. Native Windows parsing, actual provisioning and hosted CI remain separate; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T16:50:58Z",
+        "deadline": "2026-11-03T17:20:58Z",
+        "reset": false
+      }
+    },
     {
       "id": "image-cache-write-ownership",
       "title": "Image cache: own staged writes and clean up failed writes",

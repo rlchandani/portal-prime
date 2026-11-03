@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Pre-release sanity check for the provisioning kit: bash syntax + PowerShell parse.
-# CI runs the same checks (.github/workflows/provisioning.yml); run this locally
-# before a release so a .ps1 typo never ships to Windows users.
+# Pre-release sanity check: Bash syntax, Windows ASCII, optional PowerShell parse.
+# CI also parses under Windows PowerShell 5.1 (.github/workflows/provisioning.yml).
+# Run this locally before a release to catch script syntax and encoding mistakes.
 #
 #   scripts/check-provisioning.sh
 #
@@ -14,6 +14,20 @@ fail=0
 
 echo "• provision.sh — bash syntax"
 if bash -n provisioning/provision.sh; then echo "  OK"; else echo "  FAILED"; fail=1; fi
+
+echo "• Windows scripts — pure ASCII"
+windows_ascii_fail=0
+for f in provisioning/provision.ps1 provisioning/*.bat scripts/test-provision-access.ps1; do
+  [ -e "$f" ] || continue
+  # Byte ranges work with BSD and GNU tr; pwsh 7 parsing alone misses this rule.
+  non_ascii_bytes=$(LC_ALL=C tr -d '\000-\177' < "$f")
+  if [ -n "$non_ascii_bytes" ]; then
+    echo "  FAILED: $f contains non-ASCII bytes (Windows PowerShell 5.1 requires ASCII)."
+    windows_ascii_fail=1
+    fail=1
+  fi
+done
+if [ "$windows_ascii_fail" -eq 0 ]; then echo "  OK"; fi
 
 echo "• provision.ps1 — PowerShell parse"
 if command -v pwsh >/dev/null 2>&1; then

@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "status": "locally_verified",
+  "recordedAt": "2026-11-03T17:00:20.727876+00:00",
+  "scope": "Existing Windows ASCII rule at manual local provisioning preflight; no full CI-parity or Windows parser acceptance.",
+  "issueClock": {
+    "startedAt": "2026-11-03T16:50:58Z",
+    "deadline": "2026-11-03T17:20:58Z",
+    "reset": false
+  },
+  "base": "d49cef2043215e5a74493840778ab8a535c9c63a",
+  "implementation": {
+    "path": "scripts/check-provisioning.sh",
+    "bytes": 1752,
+    "sha256": "ba991148501fa82e3edaf106ca2dea9dc8389eeefde603aa30e8dbe6abbd23cd"
+  },
+  "beforeImplementation": {
+    "path": "scripts/check-provisioning.sh",
+    "bytes": 1184,
+    "sha256": "a1d0cccc9806b074b5b00dae7bf3b6b6358d3cd3743963f419db450ac9181e48"
+  },
+  "frozenTest": {
+    "path": "scripts/test_portal_provisioning_preflight.py",
+    "bytes": 4139,
+    "sha256": "271acc3d9dcd6377ff222ded5b3d88528a54198a2f7a91d11b704ea90f91fa07"
+  },
+  "actualBaseline": {
+    "status": "OBSERVED_UNCHANGED_BASELINE",
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts",
+      "-p",
+      "test_portal_provisioning_preflight.py",
+      "-v"
+    ],
+    "startedAt": "2026-11-03T16:56:06.148962+00:00",
+    "endedAt": "2026-11-03T16:56:06.599393+00:00",
+    "elapsedSeconds": 0.450431,
+    "exitCode": 1,
+    "scriptBeforeSha256": "a1d0cccc9806b074b5b00dae7bf3b6b6358d3cd3743963f419db450ac9181e48",
+    "frozenTestSha256": "271acc3d9dcd6377ff222ded5b3d88528a54198a2f7a91d11b704ea90f91fa07",
+    "log": {
+      "path": "/private/tmp/portal-product-audit-20261103-165058/baseline.log",
+      "bytes": 4896,
+      "sha256": "4da7099fc94b5860e2d80bb80753bfd05b7db299384967f216ba98ece02863aa"
+    },
+    "tests": 7,
+    "assertionFailures": 3,
+    "controlsPassed": 4,
+    "errors": 0,
+    "skips": 0
+  },
+  "actualFocusedGates": {
+    "commands": [
+      {
+        "label": "focused-green",
+        "command": [
+          "python3",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "scripts",
+          "-p",
+          "test_portal_provisioning_preflight.py",
+          "-v"
+        ],
+        "startedAt": "2026-11-03T16:56:36.764547+00:00",
+        "endedAt": "2026-11-03T16:56:37.036216+00:00",
+        "elapsedSeconds": 0.271669,
+        "exitCode": 0,
+        "log": {
+          "path": "/private/tmp/portal-product-audit-20261103-165058/focused-green.log",
+          "bytes": 1240,
+          "sha256": "39942b58ff33f21ef185f64d1d4f2e02cafd14b9d0dc124094bebf050ae72f12"
+        }
+      },
+      {
+        "label": "checker-syntax",
+        "command": [
+          "bash",
+          "-n",
+          "scripts/check-provisioning.sh"
+        ],
+        "startedAt": "2026-11-03T16:56:37.036550+00:00",
+        "endedAt": "2026-11-03T16:56:37.039449+00:00",
+        "elapsedSeconds": 0.002899,
+        "exitCode": 0,
+        "log": {
+          "path": "/private/tmp/portal-product-audit-20261103-165058/checker-syntax.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "label": "local-preflight",
+        "command": [
+          "bash",
+          "scripts/check-provisioning.sh"
+        ],
+        "startedAt": "2026-11-03T16:56:37.039604+00:00",
+        "endedAt": "2026-11-03T16:56:37.057120+00:00",
+        "elapsedSeconds": 0.017516,
+        "exitCode": 0,
+        "log": {
+          "path": "/private/tmp/portal-product-audit-20261103-165058/local-preflight.log",
+          "bytes": 204,
+          "sha256": "b0fd02916d454f0df2c2acdc13064a70299be3671806dfc89d7d44554565ed8d"
+        }
+      }
+    ],
+    "testSha256": "271acc3d9dcd6377ff222ded5b3d88528a54198a2f7a91d11b704ea90f91fa07",
+    "scriptSha256": "ba991148501fa82e3edaf106ca2dea9dc8389eeefde603aa30e8dbe6abbd23cd",
+    "nativePowerShellLimit": "pwsh was not installed; actual local-preflight records SKIPPED. Focused tests use a parser-success stub. No native PowerShell5.1 acceptance."
+  },
+  "actualPython CICommand": {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts",
+      "-p",
+      "test_portal_*.py",
+      "-v"
+    ],
+    "startedAt": "2026-11-03T16:57:22.048250+00:00",
+    "endedAt": "2026-11-03T16:57:45.628426+00:00",
+    "elapsedSeconds": 23.580176,
+    "exitCode": 0,
+    "log": {
+      "path": "/private/tmp/portal-product-audit-20261103-165058/python-ci.log",
+      "bytes": 39216,
+      "sha256": "c2f271799915869c8d097fc0ec3707223067f3987a402e42fc098041f0180ab2"
+    },
+    "testSha256": "271acc3d9dcd6377ff222ded5b3d88528a54198a2f7a91d11b704ea90f91fa07",
+    "tests": 241,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "windowsTargetByteScan": [
+    {
+      "path": "provisioning/provision.ps1",
+      "bytes": 56325,
+      "sha256": "e7973d24466b480b50ae7a2cb0db1feb1a0382b6fb1a064a464a9535adb9a19f",
+      "nonAsciiBytes": 0
+    },
+    {
+      "path": "provisioning/Provision-Portal.bat",
+      "bytes": 183,
+      "sha256": "46f3a34873e474bdb382dbdd203a45986aa03251c7ab92a7f35d0e00e135c271",
+      "nonAsciiBytes": 0
+    },
+    {
+      "path": "provisioning/Restore-Portal.bat",
+      "bytes": 191,
+      "sha256": "3915cb50740b776738e787bd677bc70e87f3eb5098636e16e80505ef84aa6315",
+      "nonAsciiBytes": 0
+    },
+    {
+      "path": "scripts/test-provision-access.ps1",
+      "bytes": 19095,
+      "sha256": "5472e3286cf8901d1dd9791c0cd247a5bbc74565560c19a887ecfdd55b5c935a",
+      "nonAsciiBytes": 0
+    }
+  ],
+  "protectedPaths": {
+    "catalog.json": {
+      "path": "catalog.json",
+      "bytes": 24043,
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+    },
+    "app/src/main/assets/catalog.json": {
+      "path": "app/src/main/assets/catalog.json",
+      "bytes": 24043,
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+    },
+    "version.json": {
+      "path": "version.json",
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    },
+    "provisioning/fleetctl": {
+      "path": "provisioning/fleetctl",
+      "bytes": 694352,
+      "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae"
+    },
+    "app/src/main/java/com/immortal/launcher/PhotoCaption.kt": {
+      "path": "app/src/main/java/com/immortal/launcher/PhotoCaption.kt",
+      "bytes": 7123,
+      "sha256": "cd9428ff9be0d067db4a263b72fe5e4215a95fea38f2914765f600f2a37f81b9"
+    },
+    "app/src/test/java/com/immortal/launcher/PhotoCaptionTimeZoneTest.kt": {
+      "path": "app/src/test/java/com/immortal/launcher/PhotoCaptionTimeZoneTest.kt",
+      "bytes": 4011,
+      "sha256": "8e5e60cb5d7a30e0bdefc33523f29a0b58165ccd94e0537ef6a2f9030c613d5b"
+    },
+    "scripts/test_portal_catalog_parity.py": {
+      "path": "scripts/test_portal_catalog_parity.py",
+      "bytes": 4370,
+      "sha256": "846632bea2d5955f12b47791bef78d2aa583fb99c9fcfdd1a15e4941469b838c"
+    },
+    ".github/workflows/tests.yml": {
+      "path": ".github/workflows/tests.yml",
+      "bytes": 1975,
+      "sha256": "c8d796a2e2f9330ba9399cdc84606bbbfe0a43327ec4a37c2466c9fc9ce45497"
+    },
+    "scripts/check-version-sync.sh": {
+      "path": "scripts/check-version-sync.sh",
+      "bytes": 2080,
+      "sha256": "67724ed76ed380afce2008ec8592e5c3bbe31a98eb2f2535ed3677db1d7a5e65"
+    },
+    "scripts/cut-release.sh": {
+      "path": "scripts/cut-release.sh",
+      "bytes": 9763,
+      "sha256": "d4cddb07f857eaa9b7b7d1155dcf91a6de33eb4fdec359961213581c98f92598"
+    },
+    "scripts/portal_release_readiness.py": {
+      "path": "scripts/portal_release_readiness.py",
+      "bytes": 17648,
+      "sha256": "6769d97fcfbb4ece0e2d41bd14bf1db782be49cffda3c676e38f04fc392587d6"
+    },
+    "app/proguard-rules.pro": {
+      "path": "app/proguard-rules.pro",
+      "bytes": 915,
+      "sha256": "28e78cb4c9a43082dba4ffb1eecf27b7a167d4333fe0b467641e3ca97ef6d6a8"
+    },
+    "app/portal-r8-rules.pro": {
+      "path": "app/portal-r8-rules.pro",
+      "bytes": 830,
+      "sha256": "641288488c5cb2c71d007c61d37c9dd8a975b36b1d0ee017647bf71fa6ee36ae"
+    },
+    "app/benchmark-r8-native-rules.pro": {
+      "path": "app/benchmark-r8-native-rules.pro",
+      "bytes": 4210,
+      "sha256": "221e966b90d9a21a63694dbd299b027550689457bfb34e884b05d1e84316ac66"
+    },
+    ".github/workflows/release-guard.yml": {
+      "path": ".github/workflows/release-guard.yml",
+      "bytes": 738,
+      "sha256": "e69e6dd3f13d0595fb3360bc8e1e02ec7ddd575c760dc20b9aa94372a35e653b"
+    },
+    ".github/workflows/provisioning.yml": {
+      "path": ".github/workflows/provisioning.yml",
+      "bytes": 7418,
+      "sha256": "32818140f900b60b62576f5569bf1fc8950188585b9bf7c637bd390610383c70"
+    },
+    "app/build.gradle.kts": {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "ade7cb9cff9a2210bcefd48dc4a49ca2ad5873759ac3b6c977936f40ea97c049"
+    }
+  },
+  "limits": [
+    "Focused tests use generated ordinary script files, the real complete production checker and real Bash syntax checking. Only PowerShell parsing is stubbed to return success; no byte scanner is mocked.",
+    "Actual local preflight records PowerShell parsing SKIPPED; no real PowerShell 7/5.1 parsing, Windows codepage, provisioning execution or hosted CI proof.",
+    "Existing CI workflow already discovers the new test through test_portal_*.py. CI and cut-release behavior are unchanged. No actual release-flow acceptance.",
+    "Host tooling only: no app build/version change, APK or room delivery, device/phone/provider/audio/HA action, GitHub authentication, push or publication. Historical room delivery remains 1.128/code122 without a new recheck.",
+    "All prior 106 task objects and original parked/approval clocks remain. Prepared photo-import/Quick-controls decisions remain pending; broader goal active."
+  ]
+}

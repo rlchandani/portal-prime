@@ -44,6 +44,16 @@ hardware acceptance. After output creation, a failed check writes
 No source bump, authentication, Git fetch, tag, push, publication or device install
 is performed. The publishing workflow below remains a separate explicit operation.
 
+## Check provisioning scripts locally
+
+Run `scripts/check-provisioning.sh` before packaging the provisioning kit. It
+checks Bash syntax and the existing ASCII rule for `provisioning/provision.ps1`,
+`provisioning/*.bat` and `scripts/test-provision-access.ps1`; UTF-8 `provision.sh`
+remains allowed. PowerShell parsing runs when `pwsh` is installed and otherwise
+reports `SKIPPED`. That skip does not prove Windows compatibility: CI separately
+parses with Windows PowerShell 5.1. This local command does not provision devices
+or publish a release.
+
 ## Cutting a release (the one safe command)
 
 ```sh
