@@ -38,15 +38,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
     runCatching {
       val vol = ChimeConfig.load(context).volume / 100f
       if (vol <= 0f) return
-      val mp = MediaPlayer()
-      mp.setAudioAttributes(ambientAttrs)
-      val afd = context.resources.openRawResourceFd(R.raw.chime) ?: return
-      afd.use { mp.setDataSource(it.fileDescriptor, it.startOffset, it.length) }
-      mp.setVolume(vol, vol)
-      mp.setOnCompletionListener { it.release() }
-      mp.setOnErrorListener { p, _, _ -> p.release(); true }
-      mp.prepare()
-      mp.start()
+      playBundled(context, R.raw.chime, vol, "chime playback failed")
     }.onFailure { Log.w(TAG, "chime playback failed", it) }
   }
 
@@ -56,16 +48,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
     val h = Handler(Looper.getMainLooper())
     for (i in 0 until repeats) {
       h.postDelayed({
-        runCatching {
-          val mp = MediaPlayer()
-          mp.setAudioAttributes(ambientAttrs)
-          val afd = context.resources.openRawResourceFd(R.raw.chime) ?: return@postDelayed
-          afd.use { mp.setDataSource(it.fileDescriptor, it.startOffset, it.length) }
-          mp.setOnCompletionListener { it.release() }
-          mp.setOnErrorListener { p, _, _ -> p.release(); true }
-          mp.prepare()
-          mp.start()
-        }.onFailure { Log.w(TAG, "timer ring failed", it) }
+        playBundled(context, R.raw.chime, null, "timer ring failed")
       }, i * 1400L)
     }
   }
@@ -78,17 +61,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
     val h = Handler(Looper.getMainLooper())
     for (i in 0 until repeats) {
       h.postDelayed({
-        runCatching {
-          val mp = MediaPlayer()
-          mp.setAudioAttributes(ambientAttrs)
-          val afd = context.resources.openRawResourceFd(R.raw.ping) ?: return@postDelayed
-          afd.use { mp.setDataSource(it.fileDescriptor, it.startOffset, it.length) }
-          mp.setVolume(vol, vol)
-          mp.setOnCompletionListener { it.release() }
-          mp.setOnErrorListener { p, _, _ -> p.release(); true }
-          mp.prepare()
-          mp.start()
-        }.onFailure { Log.w(TAG, "ping ring failed", it) }
+        playBundled(context, R.raw.ping, vol, "ping ring failed")
       }, i * 1400L)
     }
   }
@@ -159,20 +132,36 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
     runCatching {
       val vol = (ChimeConfig.load(context).volume / 100f).coerceIn(0f, 1f)
       if (vol <= 0f) return
-      val mp = MediaPlayer()
-      mp.setAudioAttributes(
-          AudioAttributes.Builder()
-              .setUsage(AudioAttributes.USAGE_ALARM)
-              .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-              .build())
-      val afd = context.resources.openRawResourceFd(resId) ?: return
-      afd.use { mp.setDataSource(it.fileDescriptor, it.startOffset, it.length) }
-      mp.setVolume(vol, vol)
-      mp.setOnCompletionListener { it.release() }
-      mp.setOnErrorListener { p, _, _ -> p.release(); true }
-      mp.prepare()
-      mp.start()
+      playBundled(context, resId, vol, "golden-hour tone failed")
     }.onFailure { Log.w(TAG, "golden-hour tone failed", it) }
+  }
+
+  /** Own the player before setup so failures and terminal callbacks share one cleanup path. */
+  private fun playBundled(context: Context, resId: Int, volume: Float?, failureMessage: String) {
+    runCatching {
+      lateinit var owner: OneShotSpeechOwner<MediaPlayer>
+      owner = OneShotSpeechOwner(
+          ready = { mp ->
+            try {
+              mp.setAudioAttributes(ambientAttrs)
+              val afd = context.resources.openRawResourceFd(resId)
+                  ?: error("Bundled sound unavailable")
+              afd.use { mp.setDataSource(it.fileDescriptor, it.startOffset, it.length) }
+              if (volume != null) mp.setVolume(volume, volume)
+              mp.setOnCompletionListener { owner.finish() }
+              mp.setOnErrorListener { _, _, _ -> owner.finish(); true }
+              mp.prepare()
+              mp.start()
+            } catch (t: Throwable) {
+              Log.w(TAG, failureMessage, t)
+              throw t
+            }
+          },
+          release = { it.release() },
+      )
+      owner.created(MediaPlayer())
+      owner.initialized(true)
+    }.onFailure { Log.w(TAG, failureMessage, it) }
   }
 
   private fun speak(

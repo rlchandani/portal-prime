@@ -1,0 +1,307 @@
+{
+  "recordedAt": "2026-11-03T06:48:53.278701+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T06:27:46Z",
+    "deadline": "2026-11-03T06:57:46Z",
+    "baseCommit": "158eeef1bad444cd6420119a3bc3cb560f4011bf",
+    "scope": "Earlier parallel-audit ChimePlayer raw-cue MediaPlayer setup/terminal cleanup hypothesis; originaldiscoveryclock retained withremaining15minutes. No alarmdelivery/settings/quietpolicy/TTS/audioquality/performance/nativeMediaPlayer claim."
+  },
+  "scope": "Bundled ambient-cue MediaPlayer setup/terminal ownership and exactly-once release.",
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/ChimePlayer.kt": "a41a179605ca0c6bb94ef4827045f56a40179c2de828dd02cf8498b33cb6803e",
+    "app/src/main/java/com/immortal/launcher/OneShotSpeechOwner.kt": "3e361c4d08451a6b9ec0ab2684dcf4ce3dc59007ca820230e796fb1490946cee",
+    "app/src/test/java/com/immortal/launcher/ChimePlayerResourceTest.kt": "d681a6e8c61bf7ecf4c5f4f6e418fc2e677cb38a36eb26085f68d8b9b1192834",
+    "app/build.gradle.kts": "6ada158235944a0c29488e7027abd52e62da83ba0dc590dcbe7c48ab5e74e0b8"
+  },
+  "red": {
+    "tests": 12,
+    "failures": 10,
+    "errors": 0,
+    "skipped": 0,
+    "terminalExit": 1,
+    "failed": [
+      {
+        "name": "assetOpenExceptionRetiresEveryAllocatedCuePlayer",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [CHIME, TIMER, PING, SUNSET]"
+      },
+      {
+        "name": "startExceptionRetiresEveryAllocatedCuePlayer",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [CHIME, TIMER, PING, SUNSET]"
+      },
+      {
+        "name": "listenerInstallationExceptionsRetirePlayers",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [completion, error]"
+      },
+      {
+        "name": "errorCallbackThenThrowAndDuplicateCallbacksReleaseOnlyOnce",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [CHIME, TIMER, PING, SUNSET]"
+      },
+      {
+        "name": "attributesExceptionRetiresEveryAllocatedCuePlayer",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [CHIME, TIMER, PING, SUNSET]"
+      },
+      {
+        "name": "dataSourceExceptionRetiresPlayerAndClosesAsset",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [CHIME, TIMER, PING, SUNSET]"
+      },
+      {
+        "name": "volumeExceptionRetiresVolumeControlledPlayers",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [CHIME, PING, SUNSET]"
+      },
+      {
+        "name": "nullAssetRetiresEveryAllocatedCuePlayer",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [CHIME, TIMER, PING, SUNSET]"
+      },
+      {
+        "name": "successfulPlaybackWaitsForCompletionThenReleasesOnlyOnce",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [CHIME, TIMER, PING, SUNSET]"
+      },
+      {
+        "name": "prepareExceptionRetiresEveryAllocatedCuePlayer",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Failed actual cue cases: [CHIME, TIMER, PING, SUNSET]"
+      }
+    ],
+    "passed": [
+      "mutedVolumeControlledCuesAllocateNothing",
+      "resourceVolumeAndQueuedRepeatContractsRemain"
+    ],
+    "sourceSha256": {
+      "app/src/main/java/com/immortal/launcher/ChimePlayer.kt": "9e615c8c7bf31add39fe96c84ded2dcb0fb6569e29d0c8fce49c4c4a30a90d48",
+      "app/src/main/java/com/immortal/launcher/OneShotSpeechOwner.kt": "3e361c4d08451a6b9ec0ab2684dcf4ce3dc59007ca820230e796fb1490946cee",
+      "app/src/test/java/com/immortal/launcher/ChimePlayerResourceTest.kt": "d681a6e8c61bf7ecf4c5f4f6e418fc2e677cb38a36eb26085f68d8b9b1192834",
+      "app/build.gradle.kts": "a66b3447a0f01543a45cd730e1a5195503900d8e9b269f64ec17f97729bc6d5f"
+    },
+    "xmlSha256": "892eb837e5d5ab323851ec24cc5e98de336762f3dfb9948a015976a70baa1b4d",
+    "scope": "Actual ChimePlayer cue methods with generated Mockito player/resource/context/handler doubles; every cue/stage matrix runs fully before reporting assertion failures. No native MediaPlayer/audio/framework/device proof."
+  },
+  "green": {
+    "suites": 432,
+    "tests": 4150,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualCueFocusedTests": 12,
+    "allTwelveUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "1m 57s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "deploymentPreparation": {
+    "firstAttemptBothHelperExit": 2,
+    "reason": "Owned private registry directory lacked search permission; registry read refused before device command.",
+    "ownedDirectoryModeCorrected": "0700",
+    "firstAttemptLogsRetainedPrivately": true
+  },
+  "artifact": {
+    "sha256": "9438d6b056ffbba353acde8f1018c17a38767645c7b8e3b72e6545e278106703",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.107",
+    "versionCode": 101,
+    "variants": {
+      "performance": {
+        "sha256": "9438d6b056ffbba353acde8f1018c17a38767645c7b8e3b72e6545e278106703",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.107",
+        "versionCode": 101
+      },
+      "debug": {
+        "sha256": "87bcb9331b69b80ee7b31321d6b5d5c1a3a3b46fc3b4fd1a8795c87230116742",
+        "bytes": 46703533,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.107",
+        "versionCode": 101
+      },
+      "rollback": {
+        "sha256": "b4b49a9c2c39b3bc59ec7ff5575217cd5e726c3da0a0178374b51f7e9b5027e6",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.106",
+        "versionCode": 100
+      }
+    },
+    "debugSha256": "87bcb9331b69b80ee7b31321d6b5d5c1a3a3b46fc3b4fd1a8795c87230116742",
+    "rollbackSha256": "b4b49a9c2c39b3bc59ec7ff5575217cd5e726c3da0a0178374b51f7e9b5027e6",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "1m 57s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "originalRegistryByteHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "googlePhoneCommands": 0,
+    "nativeFixtureProcessesCreated": 0,
+    "currentNightClockFrameVisuallyInspected": true,
+    "familyChromeTaskRetained": true
+  },
+  "review": {
+    "blockingFindings": 0,
+    "reviewedSourceSha256": {
+      "app/src/main/java/com/immortal/launcher/ChimePlayer.kt": "a41a179605ca0c6bb94ef4827045f56a40179c2de828dd02cf8498b33cb6803e",
+      "app/src/main/java/com/immortal/launcher/OneShotSpeechOwner.kt": "3e361c4d08451a6b9ec0ab2684dcf4ce3dc59007ca820230e796fb1490946cee",
+      "app/src/test/java/com/immortal/launcher/ChimePlayerResourceTest.kt": "d681a6e8c61bf7ecf4c5f4f6e418fc2e677cb38a36eb26085f68d8b9b1192834",
+      "app/build.gradle.kts": "6ada158235944a0c29488e7027abd52e62da83ba0dc590dcbe7c48ab5e74e0b8"
+    },
+    "testUnchangedFromRed": true,
+    "ownerUnchangedFromRed": true,
+    "focusedXml": {
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "focusedXmlSha256": "1c337ad273be96e5d50efb80ff2eb43f5121c247325265d765da786d20881528",
+    "scope": "Actual ChimePlayer cue methods with inert JVM MediaPlayer/resource/context/handler doubles; ownership before setup, deferred cleanup during active setup/start, exactly-once terminal retirement and preserved cue resource/volume/mute/repeat contracts.",
+    "nativeMediaPlayerVerified": false,
+    "audibilityVerified": false,
+    "frameworkCallbackThreadVerified": false,
+    "resourceCensusVerified": false,
+    "fullJvmAndArtifactVerificationPending": false,
+    "fullJvmIndependentlyVerified": {
+      "suites": 432,
+      "tests": 4150,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "actualRetainedApkSha256": {
+      "candidate-1.107.apk": "9438d6b056ffbba353acde8f1018c17a38767645c7b8e3b72e6545e278106703",
+      "candidate-debug-1.107.apk": "87bcb9331b69b80ee7b31321d6b5d5c1a3a3b46fc3b4fd1a8795c87230116742",
+      "baseline-1.106.apk": "b4b49a9c2c39b3bc59ec7ff5575217cd5e726c3da0a0178374b51f7e9b5027e6"
+    },
+    "artifactHashesAndByteLengthsMatch": true,
+    "qualityGateSuccessAndDurationObserved": "BUILD SUCCESSFUL in 1m 57s",
+    "sourceHashesUnchangedAfterGates": true
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestUnchanged": true,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false
+  },
+  "limits": [
+    "JVM tests exercise actual cue methods with inert player/resource/context/handler doubles; native MediaPlayer, audible playback, framework callback-thread behavior and physical resource census remain unverified.",
+    "Existing resources, configured volumes, muted admission and 1400ms repeat intervals are retained; no alarm scheduling, quiet policy, TTS, audio quality or performance change.",
+    "No real sound was triggered for this verification. Exact signed optimized delivery and saved-state preservation do not establish audible cue acceptance.",
+    "API28 and Living visual acceptance remain unverified. Existing UI approvals and exhausted issue clocks retain their boundaries.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+  ],
+  "documentation": {
+    "strictMkdocsExit": 0,
+    "strictWarnings": 0,
+    "seconds": 2.22,
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 81,
+          "checks": [
+            {
+              "id": "chime-player-cleanup",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "fleet-file-read",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 81,
+          "checks": [
+            {
+              "id": "chime-player-cleanup",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "fleet-file-read",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingServerPreserved": true
+    },
+    "detailCapturesVisuallyInspected": true,
+    "earlier80TaskRecordsDefaultAndOtherBoundariesPreserved": true,
+    "scope": "Two selected details at two widths; no full-product accessibility or visual acceptance."
+  }
+}

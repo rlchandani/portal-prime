@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T06:40:18.540091+00:00",
+  "updatedAt": "2026-11-03T06:48:53.278701+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,55 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.106/code100. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.107/code101. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "chime-player-cleanup",
+      "title": "Bundled sounds: release each player once",
+      "summary": "Delivered to both rooms: failed setup closes the player; repeated completion/error callbacks share one cleanup path.",
+      "description": "Own the MediaPlayer before opening/configuring each bundled sound, using the existing one-shot owner. Preserve resources, mute, volume and timer/ping repeat intervals.",
+      "status": "delivered",
+      "verification": "12 unchanged cue methods / 4,150 JVM \u00b7 inert player/resource/handler doubles",
+      "kind": "Ambient sound resource lifecycle correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Audio engineering / independent lifecycle regression review",
+      "deployment": "Exact signed optimized 1.107/code101 installed and full APK hash verified in Family Area and Living Area.",
+      "state": "Complete maps and Home/timer/Sunrise/Chime bytes match. Family current night frame/font/services/original Chrome retained. Owned registry copy removed; no real sound triggered.",
+      "acceptance": [
+        "Reproduce missed player cleanup and duplicate terminal release in actual cue methods before production edits.",
+        "Own each player before setup; release exactly once after failure or terminal callbacks, waiting for active setup/start to exit.",
+        "Retain muted admission, resource IDs, configured volume, timer default volume and 1400ms repeat delays.",
+        "Run unchanged regressions, full gates and exact signed room delivery with saved-state preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Lifecycle correction, unchanged regressions, exact delivery and native audio limits.",
+          "source": "docs/portal-chime-player-cleanup-2026-11-03.md"
+        },
+        {
+          "text": "Frozen baseline/source/artifact hashes, full gates, room preservation and cleanup receipt.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/chime-player-cleanup-verification.json"
+        }
+      ],
+      "limits": [
+        "JVM tests exercise actual cue methods with inert player/resource/context/handler doubles; native MediaPlayer, audible playback, framework callback-thread behavior and physical resource census remain unverified.",
+        "Existing resources, configured volumes, muted admission and 1400ms repeat intervals are retained; no alarm scheduling, quiet policy, TTS, audio quality or performance change.",
+        "No real sound was triggered for this verification. Exact signed optimized delivery and saved-state preservation do not establish audible cue acceptance.",
+        "API28 and Living visual acceptance remain unverified. Existing UI approvals and exhausted issue clocks retain their boundaries.",
+        "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+      ],
+      "next": "Retain this delivered cleanup correction. Native audible/callback-thread acceptance remains open; continue independent authorized backlog without reopening parked clocks.",
+      "issueClock": {
+        "startedAt": "2026-11-03T06:27:46Z",
+        "deadline": "2026-11-03T06:57:46Z",
+        "originalParallelDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "fleet-file-read",
       "title": "Fleet downloads: retain the selected file",

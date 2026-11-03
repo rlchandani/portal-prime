@@ -13,8 +13,23 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / Fleet file-read descriptor ownership:** exact optimized
-  **1.106/code100** is installed and fully hashed in both rooms. Generic file
+- **Current room APK / bundled sound player cleanup:** exact optimized
+  **1.107/code101** is installed and fully hashed in both rooms. Chime/timer/ping/
+  golden-hour players now use the existing one-shot owner before setup, closing on
+  failures and deduplicating terminal cleanup. Twelve unchanged actual-method tests
+  reproduce ten assertion failures (35 missed-cleanup and8 duplicate-release cases)
+  then pass; **4,150 JVM/432 suites**, debug/optimized/R8/vital lint
+  pass in1m 57s. Resource/mute/volume/1400ms controls remain. Tests use inert
+  Android doubles; native MediaPlayer/audibility/callback threads/API28 acceptance
+  remains open. Complete maps and Home/timer/Sunrise/Chime bytes match; Family current
+  night frame/font/services/original Chrome retained. Owned registry copy removed;
+  no real sound triggered. Public1.83 guard rejects local1.107; no phone/HA/auth/
+  publication. **81 tasks:48 delivered,23 locally verified,3 approval,6 parked,
+  1 queued.** Original **06:27:46–06:57:46 UTC** parallel audit clock retained;
+  broader goal stays active. [Receipt](portal-chime-player-cleanup-2026-11-03.md).
+
+- **Previous room APK / Fleet file-read descriptor ownership:** exact optimized
+  **1.106/code100** was installed and fully hashed in both rooms. Generic file
   responses bind length/body to one open descriptor; replacement/unlink retain
   the selected inode, appends remain bounded and truncation fails. Response and
   writer cleanup retire the descriptor; procfs remains close-delimited. Twelve
