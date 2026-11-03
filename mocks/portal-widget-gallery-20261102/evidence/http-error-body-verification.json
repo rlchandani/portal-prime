@@ -1,0 +1,842 @@
+{
+  "recordedAt": "2026-11-03T08:45:19.325443+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T08:32:00+00:00",
+    "deadline": "2026-11-03T09:02:00+00:00",
+    "baseCommit": "9ce673add942679a2cc376877f00c632f88be58b",
+    "previousGoalTurn": "Progress: committed port admission and exact local host CLI delivery;182+12 tests and independent review.",
+    "scope": "Fresh product consumer audit after87-task backlog; original clock includes discovery, selected implementation, validation, permitted delivery, documentation, cleanup and commit. No parked clock restart, phone/HA/GitHub/auth/publication or owner config mutation.",
+    "selectedScope": "Shared HTTP rejection diagnostics: bound error-body decoding to existing300UTF16 prefix and close owned reader/stream; preserve success bodies, failure/status wording and Tools cancellation. No URL/origin, response-success budget, prefs/UI, HA/provider or generic deadline redesign."
+  },
+  "scope": "Read only the existing300UTF16 diagnostic prefix of a rejected HTTP response, close its reader and retain existing formatting and connection ownership.",
+  "finding": {
+    "backlogRecordsReviewed": 87,
+    "duplicateTaskFound": false,
+    "trigger": "The old logger materializes an entire error stream before take(300); large bodies consume unused tails and late read failure discards an available prefix.",
+    "status": "Frozen reproduction corrected; exact optimized local delivery verified in both rooms."
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/Http.kt": "442c3285682ae7467cde959417c40477d1373dd893e1e267bd355c4fd2322422",
+    "app/src/test/java/com/immortal/launcher/HttpErrorBodyTest.kt": "3586c144b73b09585a35864b603a0f5a063b4f76eb4d185e3d1644211dcbf66a",
+    "app/build.gradle.kts": "cef38aa3962afa10b31a949d912cdfc84f040d6dc822628b467527ce795556a8"
+  },
+  "red": {
+    "recordedAt": "2026-11-03T08:36:43.350219+00:00",
+    "terminalExit": 1,
+    "tests": 10,
+    "failures": 5,
+    "errors": 0,
+    "skips": 0,
+    "failedMethods": [
+      {
+        "name": "fragmentedMultibyteUtf8PreservesDecodedPrefix",
+        "message": "java.lang.AssertionError: Consumed 14000 bytes for a 300-unit diagnostic"
+      },
+      {
+        "name": "failureBeyondDiagnosticReadAheadDoesNotEraseAvailablePrefix",
+        "message": "org.junit.ComparisonFailure: expected:<...enerated -> HTTP 503[: Retained rejection: abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabca]> but was:<...enerated -> HTTP 503[]>"
+      },
+      {
+        "name": "largeBodyKeepsPrefixWithoutConsumingWholeError",
+        "message": "java.lang.AssertionError: Consumed 240021 bytes for a 300-unit diagnostic"
+      },
+      {
+        "name": "nonEofBodyStopsBeforeGeneratedFailureCeiling",
+        "message": "org.junit.ComparisonFailure: expected:<...enerated -> HTTP 503[: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]> but was:<...enerated -> HTTP 503[]>"
+      },
+      {
+        "name": "utf16LimitRetainsExistingSplitSurrogateSemantics",
+        "message": "java.lang.AssertionError: Consumed 10303 bytes for a 300-unit diagnostic"
+      }
+    ],
+    "frozenTestSha256": "3586c144b73b09585a35864b603a0f5a063b4f76eb4d185e3d1644211dcbf66a",
+    "baselineSourceSha256": "1f9e471cb3514a01dd175fafac93ee6e1cce2645b0e512614f03ce9c26502e74",
+    "xmlSha256": "d63c76b88b63f426b4511d5deabfd3227344ad73504f45d36a5e2563ea36ca39",
+    "logSha256": "d8805d2417c241cc152701b9b6a02d85b9c34e8b8f7983b3f1fbcb47dbd1645c",
+    "scope": "Actual private logger reflection; generated inert HttpURLConnection/InputStream and captured static Log. No public HTTP/provider or native verdict."
+  },
+  "green": {
+    "suites": 438,
+    "tests": 4215,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualHttpFocusedTests": 10,
+    "allTenUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 2s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "buildBindings": {
+    "logSha256": "fa5e32d74ced355b3636e865d32c11372dd6802e8d526ba44759ef76a056806e",
+    "packageProofLogSha256": "f40731f8d98cd535e2821270c846f40514d2869f38a15211fe61631d3d100e91",
+    "fullXmlAggregateSha256": "c017873e9b8a275c9f455f29e29b7f3c59d739f4f460bdf5ac95148ac81422e8"
+  },
+  "native": {
+    "runs": {
+      "baseline-debug": {
+        "result": {
+          "apkSha256": "785aec638d18706f2b4917d9a2966f9815e97eac2bbcd9bc23b9c776110ada71",
+          "actualAPKClassLoader": true,
+          "ownerPreferencesWritten": 0,
+          "providerOrServiceStarted": false,
+          "networkOperations": 0,
+          "actualMethodCandidates": [
+            "private final void com.immortal.launcher.Http.logFailure(java.lang.String,java.lang.String,java.net.HttpURLConnection)"
+          ],
+          "observations": [
+            {
+              "case": "large",
+              "errorStreamReads": 1,
+              "bytesConsumed": 524288,
+              "readCalls": 65,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "tail",
+              "errorStreamReads": 1,
+              "bytesConsumed": 16384,
+              "readCalls": 3,
+              "closeCalls": 1,
+              "reachedTailFault": true,
+              "eof": false
+            },
+            {
+              "case": "short",
+              "errorStreamReads": 1,
+              "bytesConsumed": 23,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "unicode",
+              "errorStreamReads": 1,
+              "bytesConsumed": 120,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "empty",
+              "errorStreamReads": 1,
+              "bytesConsumed": 0,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "absent",
+              "errorStreamReads": 1
+            },
+            {
+              "case": "read-failure",
+              "errorStreamReads": 1,
+              "bytesConsumed": 0,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": true,
+              "eof": false
+            },
+            {
+              "case": "close-failure",
+              "errorStreamReads": 1,
+              "bytesConsumed": 23,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            }
+          ],
+          "checks": {
+            "largeBodyBounded": false,
+            "largeBodyClosedOnce": true,
+            "tailFaultNotReached": false,
+            "tailStreamClosedOnce": true,
+            "shortStreamRetained": true,
+            "unicodeStreamRetained": true,
+            "emptyStreamRetained": true,
+            "absentStreamRetained": true,
+            "readFailureClosedOnce": true,
+            "closeFailureAttemptRetained": true
+          },
+          "passed": 8,
+          "total": 10,
+          "actualHelperInvocations": 8,
+          "status": "FAIL",
+          "limits": "Generated inert connection/stream helper only; no public HTTP, actual provider, Log message readback or Tools cancellation."
+        },
+        "process": {
+          "terminalExit": 1,
+          "stdoutBytes": 1769,
+          "stderrBytes": 0
+        },
+        "resultSha256": "6618d45f474446471bcd6528fb0f9ed7e0fa6fd1e65b66c4d7eeb103b97c8395",
+        "processSha256": "e14c6e9e39812bca713474f4026861eed82b2378fa44755397ea1ed7fafe7bbd"
+      },
+      "baseline-optimized": {
+        "result": {
+          "apkSha256": "fcdcffe7132878b731eea4139a79ba2ef5c4f578c0f0db2c204c96773db53f4a",
+          "actualAPKClassLoader": true,
+          "ownerPreferencesWritten": 0,
+          "providerOrServiceStarted": false,
+          "networkOperations": 0,
+          "actualMethodCandidates": [
+            "public static void com.immortal.launcher.Http.J(java.lang.String,java.lang.String,java.net.HttpURLConnection)"
+          ],
+          "observations": [
+            {
+              "case": "large",
+              "errorStreamReads": 1,
+              "bytesConsumed": 524288,
+              "readCalls": 65,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "tail",
+              "errorStreamReads": 1,
+              "bytesConsumed": 16384,
+              "readCalls": 3,
+              "closeCalls": 1,
+              "reachedTailFault": true,
+              "eof": false
+            },
+            {
+              "case": "short",
+              "errorStreamReads": 1,
+              "bytesConsumed": 23,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "unicode",
+              "errorStreamReads": 1,
+              "bytesConsumed": 120,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "empty",
+              "errorStreamReads": 1,
+              "bytesConsumed": 0,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "absent",
+              "errorStreamReads": 1
+            },
+            {
+              "case": "read-failure",
+              "errorStreamReads": 1,
+              "bytesConsumed": 0,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": true,
+              "eof": false
+            },
+            {
+              "case": "close-failure",
+              "errorStreamReads": 1,
+              "bytesConsumed": 23,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            }
+          ],
+          "checks": {
+            "largeBodyBounded": false,
+            "largeBodyClosedOnce": true,
+            "tailFaultNotReached": false,
+            "tailStreamClosedOnce": true,
+            "shortStreamRetained": true,
+            "unicodeStreamRetained": true,
+            "emptyStreamRetained": true,
+            "absentStreamRetained": true,
+            "readFailureClosedOnce": true,
+            "closeFailureAttemptRetained": true
+          },
+          "passed": 8,
+          "total": 10,
+          "actualHelperInvocations": 8,
+          "status": "FAIL",
+          "limits": "Generated inert connection/stream helper only; no public HTTP, actual provider, Log message readback or Tools cancellation."
+        },
+        "process": {
+          "terminalExit": 1,
+          "stdoutBytes": 1760,
+          "stderrBytes": 0
+        },
+        "resultSha256": "882b91c6980b9a2bd3c3a5adc649d87b8e3e8be7e3a137716ed5ecfe06e41a1c",
+        "processSha256": "5acc8820ffdd5796ada13a3b9d1f48f293481f62611ac5503885cc1aceba76de"
+      },
+      "candidate-debug": {
+        "result": {
+          "apkSha256": "3d568e4631b6b004b0f03db44dc834299e5a279cc44d97a8fa9dc4d0a149c6ca",
+          "actualAPKClassLoader": true,
+          "ownerPreferencesWritten": 0,
+          "providerOrServiceStarted": false,
+          "networkOperations": 0,
+          "actualMethodCandidates": [
+            "private final void com.immortal.launcher.Http.logFailure(java.lang.String,java.lang.String,java.net.HttpURLConnection)"
+          ],
+          "observations": [
+            {
+              "case": "large",
+              "errorStreamReads": 1,
+              "bytesConsumed": 8192,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": false
+            },
+            {
+              "case": "tail",
+              "errorStreamReads": 1,
+              "bytesConsumed": 8192,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": false
+            },
+            {
+              "case": "short",
+              "errorStreamReads": 1,
+              "bytesConsumed": 23,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "unicode",
+              "errorStreamReads": 1,
+              "bytesConsumed": 120,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "empty",
+              "errorStreamReads": 1,
+              "bytesConsumed": 0,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "absent",
+              "errorStreamReads": 1
+            },
+            {
+              "case": "read-failure",
+              "errorStreamReads": 1,
+              "bytesConsumed": 0,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": true,
+              "eof": false
+            },
+            {
+              "case": "close-failure",
+              "errorStreamReads": 1,
+              "bytesConsumed": 23,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            }
+          ],
+          "checks": {
+            "largeBodyBounded": true,
+            "largeBodyClosedOnce": true,
+            "tailFaultNotReached": true,
+            "tailStreamClosedOnce": true,
+            "shortStreamRetained": true,
+            "unicodeStreamRetained": true,
+            "emptyStreamRetained": true,
+            "absentStreamRetained": true,
+            "readFailureClosedOnce": true,
+            "closeFailureAttemptRetained": true
+          },
+          "passed": 10,
+          "total": 10,
+          "actualHelperInvocations": 8,
+          "status": "PASS",
+          "limits": "Generated inert connection/stream helper only; no public HTTP, actual provider, Log message readback or Tools cancellation."
+        },
+        "process": {
+          "terminalExit": 0,
+          "stdoutBytes": 1766,
+          "stderrBytes": 0
+        },
+        "resultSha256": "e7f67a1f8a089b3a2f8eab767b01c242f211580400421e1413b5a780044d5f47",
+        "processSha256": "0d6394586fffe4fce16bb7a62fc78e60a369ae6f9ea31314d349be95b7f88cbb"
+      },
+      "candidate-optimized": {
+        "result": {
+          "apkSha256": "34706507bc80bf69b88511444df6d02d575975728e5cba63906e8da2c7cda5ca",
+          "actualAPKClassLoader": true,
+          "ownerPreferencesWritten": 0,
+          "providerOrServiceStarted": false,
+          "networkOperations": 0,
+          "actualMethodCandidates": [
+            "public static void com.immortal.launcher.Http.J(java.lang.String,java.lang.String,java.net.HttpURLConnection)"
+          ],
+          "observations": [
+            {
+              "case": "large",
+              "errorStreamReads": 1,
+              "bytesConsumed": 8192,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": false
+            },
+            {
+              "case": "tail",
+              "errorStreamReads": 1,
+              "bytesConsumed": 8192,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": false
+            },
+            {
+              "case": "short",
+              "errorStreamReads": 1,
+              "bytesConsumed": 23,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "unicode",
+              "errorStreamReads": 1,
+              "bytesConsumed": 120,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "empty",
+              "errorStreamReads": 1,
+              "bytesConsumed": 0,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            },
+            {
+              "case": "absent",
+              "errorStreamReads": 1
+            },
+            {
+              "case": "read-failure",
+              "errorStreamReads": 1,
+              "bytesConsumed": 0,
+              "readCalls": 1,
+              "closeCalls": 1,
+              "reachedTailFault": true,
+              "eof": false
+            },
+            {
+              "case": "close-failure",
+              "errorStreamReads": 1,
+              "bytesConsumed": 23,
+              "readCalls": 2,
+              "closeCalls": 1,
+              "reachedTailFault": false,
+              "eof": true
+            }
+          ],
+          "checks": {
+            "largeBodyBounded": true,
+            "largeBodyClosedOnce": true,
+            "tailFaultNotReached": true,
+            "tailStreamClosedOnce": true,
+            "shortStreamRetained": true,
+            "unicodeStreamRetained": true,
+            "emptyStreamRetained": true,
+            "absentStreamRetained": true,
+            "readFailureClosedOnce": true,
+            "closeFailureAttemptRetained": true
+          },
+          "passed": 10,
+          "total": 10,
+          "actualHelperInvocations": 8,
+          "status": "PASS",
+          "limits": "Generated inert connection/stream helper only; no public HTTP, actual provider, Log message readback or Tools cancellation."
+        },
+        "process": {
+          "terminalExit": 0,
+          "stdoutBytes": 1757,
+          "stderrBytes": 0
+        },
+        "resultSha256": "0dc9704e87e7f2cae333724c91ae117d8f7b30eaacc2501ac690a0a0e34774fc",
+        "processSha256": "f383697f0ccb831e241f8e2be6487ff35a36b3d93fe6cde4a8c569d7671d8339"
+      }
+    },
+    "bindings": {
+      "fixtureSourceSha256": "a885841c5111cc4f4cac75c4ed25e2cc4c854c2dba2be0a2b5ec56dfa64ccdbd",
+      "fixtureJarSha256": "5c34432bac7efb1e16816011ac5a26e62350f56344e55537d04e4aa3d6458522",
+      "compilerSha256": "240f30ac28de6e12b180eaee8d2698c36c254df34aad2b7ef9a46e81e9bf4b83",
+      "runnerSha256": "18c40ef6e8b255c82f81f83254e9439e80b24bb1edd415ffa65440acc94666eb",
+      "phases": [
+        "baseline",
+        "candidate"
+      ],
+      "mappedBindings": {
+        "baseline-debug": [
+          "com.immortal.launcher.Http",
+          "logFailure"
+        ],
+        "baseline-optimized": [
+          "com.immortal.launcher.Http",
+          "J"
+        ],
+        "candidate-debug": [
+          "com.immortal.launcher.Http",
+          "logFailure"
+        ],
+        "candidate-optimized": [
+          "com.immortal.launcher.Http",
+          "J"
+        ]
+      },
+      "scope": "Actual APK private diagnostic; generated inert connection/streams only, no public HTTP/Log message readback or provider."
+    },
+    "cleanup": {
+      "parentsRetired": {
+        "baseline-debug": true,
+        "baseline-optimized": true,
+        "candidate-debug": true,
+        "candidate-optimized": true
+      },
+      "ownerPreferencesWritten": 0,
+      "providerOrServiceStarted": false,
+      "networkOperations": 0,
+      "externalTimeoutFailureCleanupFaultInjected": false,
+      "ownedScratchRemoved": true,
+      "faults": []
+    },
+    "comparison": {
+      "eachVariantBaselinePassed": 8,
+      "eachVariantCandidatePassed": 10,
+      "totalPerVariant": 10,
+      "correctedChecks": [
+        "largeBodyBounded",
+        "tailFaultNotReached"
+      ],
+      "retainedControlsPerVariant": 8,
+      "finalProtectedParents": 4,
+      "finalProtectedHelperInvocations": 32,
+      "finalProtectedNonNullStreams": 28
+    },
+    "guardHistory": {
+      "recordedAt": "2026-11-03T08:39:06.988606+00:00",
+      "initialBaselineRunnerTerminalExit": 0,
+      "baselineObservedBothVariants": "8/10 expectedFAIL,8helper invocations each",
+      "initialNormalCleanupPassed": true,
+      "reason": "Independent fixture review requested exact canonical root, marker and APK-parent/name admission. Initial runner supplied exact owned paths but Java guard was broader; original observations retained separately. Recompile protected fixture and compare both baselines/candidates before final acceptance.",
+      "productionBehaviorChangedByGuard": false,
+      "originalIssueClockRetained": true
+    },
+    "guardHistorySha256": "dfe412004fd7ca747016a9145a88431f36a1ec586b43f3324684e62cbeb1bdcc",
+    "initialExcludedBaselineParents": 2,
+    "initialExcludedBaselineInvocations": 16,
+    "initialExcludedNormalCleanup": {
+      "parentsRetired": {
+        "baseline-debug": true,
+        "baseline-optimized": true
+      },
+      "ownerPreferencesWritten": 0,
+      "providerOrServiceStarted": false,
+      "networkOperations": 0,
+      "externalTimeoutFailureCleanupFaultInjected": false,
+      "ownedScratchRemoved": true,
+      "faults": []
+    },
+    "sourceReviewSha256": "0cad228967178fe7c94391ded04356258c6cda71d81627f1d122389d43a1da3c",
+    "compileFinalLogSha256": "be664a5c0fd6975a54d8215218be66f3c49103f6fba8a5a7279812fc7e128b51"
+  },
+  "artifact": {
+    "sha256": "34706507bc80bf69b88511444df6d02d575975728e5cba63906e8da2c7cda5ca",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.113",
+    "versionCode": 107,
+    "variants": {
+      "performance": {
+        "sha256": "34706507bc80bf69b88511444df6d02d575975728e5cba63906e8da2c7cda5ca",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.113",
+        "versionCode": 107
+      },
+      "debug": {
+        "sha256": "3d568e4631b6b004b0f03db44dc834299e5a279cc44d97a8fa9dc4d0a149c6ca",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.113",
+        "versionCode": 107
+      },
+      "rollback": {
+        "sha256": "fcdcffe7132878b731eea4139a79ba2ef5c4f578c0f0db2c204c96773db53f4a",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.112",
+        "versionCode": 106
+      }
+    },
+    "debugSha256": "3d568e4631b6b004b0f03db44dc834299e5a279cc44d97a8fa9dc4d0a149c6ca",
+    "rollbackSha256": "fcdcffe7132878b731eea4139a79ba2ef5c4f578c0f0db2c204c96773db53f4a",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 2s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "strictPostflightTerminalExit": 0,
+    "checks": {
+      "family": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true,
+        "fontUnchanged": true,
+        "accessibilityUnchanged": true,
+        "originalChromeTaskRetained": true,
+        "photoFrameResumed": true,
+        "displayOn": true,
+        "installedFullSha256Matches": true
+      },
+      "living": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true
+      }
+    },
+    "ownerPreferencesEditedOrRestored": false,
+    "scope": "Complete captured settings/profile/screensaver/layout/source maps and eight named preference states per room, including unchanged absences; no universal state-preservation claim.",
+    "capturedPreferenceStatesPerRoom": 8,
+    "preferenceCounts": {
+      "family": {
+        "namedPreferenceStatesMatched": 8,
+        "existingFilesByteIdentical": 8,
+        "matchingAbsences": 0
+      },
+      "living": {
+        "namedPreferenceStatesMatched": 8,
+        "existingFilesByteIdentical": 5,
+        "matchingAbsences": 3
+      }
+    }
+  },
+  "visual": {
+    "familyScreenshotVisuallyInspected": true,
+    "familyAppearance": "Black night frame with tan clock and Tuesday, November3 date; frame host and awake display verified separately.",
+    "livingVisualAcceptance": false,
+    "familyBeforeSha256": "1e355e2cfeb9a41d3fd889bcd88a2a784fdaa0dc7c9e051300d0c3b14c194fdf",
+    "familyAfterSha256": "a3879153052879a57a2c23c3e05a07004eca2cba6665bd5c33592c6c464da1e2"
+  },
+  "runtimeObservation": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1644,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1707,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Positive installed normal diagnostics and logcat samples requested with lines=1500 only; actual output line counts recorded below. No complete runtime health, live provider, negative authentication or public HTTP-helper acceptance."
+  },
+  "credentialCleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "independentReview": {
+    "blockingFindings": 0,
+    "gateNativeReportSha256": "cc4dc5e87485738c52a50fd497f16571e802f06b72e69cdd51617056f2fb8e21",
+    "sourceReportSha256": "0cad228967178fe7c94391ded04356258c6cda71d81627f1d122389d43a1da3c"
+  },
+  "publicRelease": {
+    "exit": 1,
+    "expectedLocalOnlyMismatch": true,
+    "localVersion": "1.113/107",
+    "publicManifest": "1.83/77",
+    "publicPublicationEligible": false,
+    "manifestSha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+    "published": false
+  },
+  "limits": [
+    "Actual native APK private logger runs on Family Android 10 with generated inert connections and streams only. Public HTTP GET/POST, provider responses, Tools cancellation, API28 and live rejection UI are unverified.",
+    "JVM static Log capture verifies exact diagnostic text, UTF-8 replacement and existing 300 UTF-16 semantics. Native fixture observes read/close behavior; it does not read back Log text.",
+    "The generated native large/tail cases consume 8,192 bytes after the change. This is standard decoder read-ahead behavior, not a universal raw-byte budget, connection deadline or successful-response limit.",
+    "Normal owned fixture parent/scratch cleanup is observed. External runner timeout/failure cleanup is not independently fault-injected. Initial broader Java admission guards and baseline observations are retained separately and excluded from final acceptance.",
+    "Captured maps and eight named preference states per room match: Family 8 existing files and Living 5 existing files are byte-identical, with three Living absences unchanged. Family frame appearance, font, services, original Chrome task and awake display are checked; Living visual acceptance remains open.",
+    "Positive installed normal diagnostics and recent logcat samples requested with lines=1500 are limited observations, not complete health, negative-authentication or live shared HTTP feature acceptance.",
+    "Public manifest remains 1.83/code77 and its guard rejects local 1.113/code107. No Google phone operation, HA change, GitHub authentication, push or publication; design approvals and exhausted clocks remain."
+  ],
+  "documentation": {
+    "strictDocsInitial": {
+      "terminalExit": 0,
+      "seconds": 2.55,
+      "warnings": 0,
+      "errors": 0
+    },
+    "strictDocsFinal": {
+      "terminalExit": 0,
+      "seconds": 2.09,
+      "warnings": 0,
+      "errors": 0,
+      "logSha256": "5b425d70fc1cea7301c36f65ab18fd9a3511463f4b036da65db7070a0f9be0be"
+    },
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 88,
+          "checks": [
+            {
+              "id": "http-error-body",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "fleet-port-admission",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 88,
+          "checks": [
+            {
+              "id": "http-error-body",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "fleet-port-admission",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "browserFinalTerminalExit": 0,
+    "imagesVisuallyInspectedByCoordinator": [
+      "390x844",
+      "1600x1000"
+    ],
+    "scope": "Final strict docs and two-viewport browser checks pass. Current fact cells and page fit; previous host delivery selection has page-overflow check only. Final served proof bytes and immutable-file hashes are rebound before commit.",
+    "review": {
+      "blockingFindings": 0,
+      "historicalVersionWordingAdvisoryResolved": true,
+      "namedPreferenceStatesWordingAdvisoryResolved": true,
+      "reportSha256": "ca33852f122ae9bf7f9ad6bbf2ef8507d06ce7024bb62ae4958b16d34a7f1c7f",
+      "scope": "Source/runtime/preservation/backlog facts independently checked. Final immutable public file and served-proof bindings are retained privately before commit."
+    },
+    "strictDocsAfterStateWordingCorrection": {
+      "terminalExit": 0,
+      "seconds": 2.27,
+      "warnings": 0,
+      "errors": 0,
+      "logSha256": "c5bafb62e268fe449816775992f7e335891203599728df2efc71519a7234fddc"
+    }
+  },
+  "backlogPreservation": {
+    "tasks": 88,
+    "counts": {
+      "delivered": 54,
+      "verified": 24,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "prior87TasksExact": true,
+    "priorRawBytesExactOutsideExplicitTimestampCurrentBoundaryAndNewTask": true,
+    "defaultWeatherPreserved": true
+  },
+  "normalCleanupTotalsIncludingExcludedInitialBaseline": {
+    "parentsRetired": 6,
+    "helperInvocations": 48,
+    "nonNullStreams": 42,
+    "protectedFinalAcceptanceParents": 4,
+    "initialBroaderGuardBaselineExcludedFromFinalAcceptance": true
+  }
+}

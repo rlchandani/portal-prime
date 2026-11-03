@@ -13,6 +13,28 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Current room APK / shared HTTP rejection diagnostics:** exact optimized
+  **1.113/code107** is installed and fully hashed in both rooms. Decode only the
+  existing300UTF16 log prefix and close its reader; status/empty/null/failure
+  wording and connection ownership remain. Ten frozen methods reproduce five
+  assertion failures then pass; **4,215 JVM/438 suites**, debug/optimized/R8/vital
+  lint pass in2m2s. Actual debug and optimized Family private helper both improve
+  **8/10→10/10**, two unused-tail corrections/eight retained controls. Native
+  generated cases observe8192byte decoder read-ahead; no universal raw-byte budget
+  or deadline. JVM checks Log text; public HTTP/providers/cancellation/API28 remain
+  open. Complete captured maps and **eight named preference states per room** match
+  strictly: Family 8 files and Living 5 files are byte-identical, with three Living
+  absences unchanged. No exception or owner edit/restore. Family frame/font/services/original
+  Chrome/awake display remain; Living visual open. Four protected parents/32
+  invocations and scratch retired; initial broader-guard two-parent baseline is
+  retained separately and excluded. Normal cleanup only; external timeout faults
+  untested. Original registry unchanged, copied credentials removed. Positive
+  normal diagnostics/recent samples are limited observations. Public1.83 guard
+  rejects local1.113; no phone/HA/auth/publication. **88 tasks:54 delivered,24 locally
+  verified,3 approval,6 parked,1 queued.** Original **08:32:00–09:02:00 UTC** audit
+  clock retained; broader goal stays active.
+  [Receipt](portal-http-error-body-2026-11-03.md).
+
 - **Current host CLI / Fleet endpoint port admission:** invalid supplied direct
   or selected registry ports now fail validation before authenticated requests
   and registry fanout. Missing defaults, valid integral ports, primary/legacy
@@ -24,13 +46,13 @@ The updated whole-product objective is
   independent source review pass, with one unused-helper compiler warning.
   YAML triggers/commands and shell syntax checked; hosted CI/Windows unobserved.
   Generated loopback and normal cleanup only; no owner registry or room operation.
-  Portal remains **1.112/code106**, with its qualified Weather runtime-cache
+  Portal was **1.112/code106** at that host unit, with its qualified Weather runtime-cache
   exception retained below. **87 tasks: 53 delivered, 24 locally verified, 3 approval,
   6 parked, 1 queued.** Original **08:14:58–08:44:58 UTC** audit clock retained;
   broader goal stays active. [Receipt](portal-fleet-port-admission-2026-11-03.md).
 
-- **Current room APK / Snapcast connection ownership:** exact optimized
-  **1.112/code106** is installed and fully hashed in both rooms. Each connected
+- **Previous room APK / Snapcast connection ownership:** exact optimized
+  **1.112/code106** was installed and fully hashed in both rooms. Each connected
   metadata exchange now closes its own socket on EOF or failure; request,
   metadata, reconnect and stop behavior remain. Eight unchanged methods reproduce
   five failures then pass; **4,205 JVM/437 suites**, debug/optimized/R8/vital lint

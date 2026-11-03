@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T08:26:58.904149+00:00",
+  "updatedAt": "2026-11-03T08:45:19.392633+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,57 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.112/code106. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.113/code107. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "http-error-body",
+      "title": "HTTP: stop after the rejection diagnostic prefix",
+      "summary": "Delivered 1.113: decode the existing 300 UTF-16 diagnostic prefix without materializing unused rejection tails.",
+      "description": "Shared Http.logFailure now reads into a fixed character buffer and closes the UTF-8 reader after its displayed prefix. Preserve null/empty/status/error formatting and request connection ownership.",
+      "status": "delivered",
+      "verification": "10 frozen methods: 5 red failures \u2192 pass \u00b7 4,215 JVM \u00b7 debug and optimized native 8/10 \u2192 10/10",
+      "kind": "Shared HTTP rejection diagnostic",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal reliability / independent regression and artifact review",
+      "deployment": "Exact optimized 1.113/code107 installed and fully hashed in Family Area and Living Area.",
+      "state": "All captured maps and eight named preference states per room match. Family 8 existing files and Living 5 existing files are byte-identical; three Living absences remain. Family current frame/font/services/original Chrome remain. Four protected native parents and scratch retired; copied credentials removed.",
+      "acceptance": [
+        "Reproduce unused large/non-EOF tails and late read faults with frozen actual logger regression methods.",
+        "Preserve exact300UTF16, split-surrogate, malformed UTF-8, short/empty/null/status and read/close failure semantics.",
+        "Run full JVM/debug/optimized/R8/vital lint and actual APK private-helper differential with fixed owned fixture admission.",
+        "Deliver exact signed artifact to both rooms; compare complete captured maps and named preference states and record scoped visual/runtime observations."
+      ],
+      "evidence": [
+        {
+          "text": "Bounded decoded rejection prefix, frozen red/green gates and exact local two-room delivery.",
+          "source": "docs/portal-http-error-body-2026-11-03.md"
+        },
+        {
+          "text": "Bound source/APKs/protected native comparison, state preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/http-error-body-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual native APK private logger runs on Family Android 10 with generated inert connections and streams only. Public HTTP GET/POST, provider responses, Tools cancellation, API28 and live rejection UI are unverified.",
+        "JVM static Log capture verifies exact diagnostic text, UTF-8 replacement and existing 300 UTF-16 semantics. Native fixture observes read/close behavior; it does not read back Log text.",
+        "The generated native large/tail cases consume 8,192 bytes after the change. This is standard decoder read-ahead behavior, not a universal raw-byte budget, connection deadline or successful-response limit.",
+        "Normal owned fixture parent/scratch cleanup is observed. External runner timeout/failure cleanup is not independently fault-injected. Initial broader Java admission guards and baseline observations are retained separately and excluded from final acceptance.",
+        "Captured maps and eight named preference states per room match: Family 8 existing files and Living 5 existing files are byte-identical, with three Living absences unchanged. Family frame appearance, font, services, original Chrome task and awake display are checked; Living visual acceptance remains open.",
+        "Positive installed normal diagnostics and recent logcat samples requested with lines=1500 are limited observations, not complete health, negative-authentication or live shared HTTP feature acceptance.",
+        "Public manifest remains 1.83/code77 and its guard rejects local 1.113/code107. No Google phone operation, HA change, GitHub authentication, push or publication; design approvals and exhausted clocks remain."
+      ],
+      "next": "Retain the two-room delivery. Public HTTP/provider, API28 and Living visual acceptance remain open; continue distinct authorized work without reopening parked clocks.",
+      "issueClock": {
+        "startedAt": "2026-11-03T08:32:00+00:00",
+        "deadline": "2026-11-03T09:02:00+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "fleet-port-admission",
       "title": "Fleet: validate ports before requests and fanout",

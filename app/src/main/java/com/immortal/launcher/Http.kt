@@ -140,7 +140,19 @@ object Http {
   /** Keep the server's own rejection words — the one clue a user report can carry. */
   private fun logFailure(method: String, url: String, c: HttpURLConnection) {
     val detail =
-        runCatching { c.errorStream?.use { it.readBytes().toString(Charsets.UTF_8).take(300) } }
+        runCatching {
+          c.errorStream?.reader(Charsets.UTF_8)?.use { reader ->
+            // Decode only the displayed prefix; the reader owns a fixed read-ahead buffer.
+            val chars = CharArray(300)
+            var size = 0
+            while (size < chars.size) {
+              val count = reader.read(chars, size, chars.size - size)
+              if (count < 0) break
+              size += count
+            }
+            String(chars, 0, size)
+          }
+        }
             .getOrNull()
     Log.w(TAG, "$method $url -> HTTP ${c.responseCode}${detail?.let { ": $it" } ?: ""}")
   }
