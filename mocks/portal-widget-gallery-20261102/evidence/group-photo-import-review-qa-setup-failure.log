@@ -1,0 +1,10 @@
+locator.evaluate: Error: strict mode violation: locator('.dialog-content') resolved to 2 elements:
+    1) <div class="dialog-content">…</div> aka locator('div').filter({ hasText: 'Photos JPEG, PNG, WebP or GIF' })
+    2) <div class="dialog-content">…</div> aka locator('div').filter({ hasText: 'This removes the result list' })
+
+Call log:
+[2m  - waiting for locator('.dialog-content')[22m
+
+    at /private/tmp/portal-browser-group-photo-review-20261103/review-qa.cjs:37:110 {
+  log: [ "  - waiting for locator('.dialog-content')" ]
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T03:00:27.578673+00:00",
-  "updatedLabel": "3 November2026 \u00b71.96 browser profile Delete protection delivered to both rooms",
+  "updatedAt": "2026-11-03T03:14:19.316176+00:00",
+  "updatedLabel": "3 November2026 \u00b7 group photo import review ready; Portal1.96 remains current",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,61 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "browser-group-photo-import",
+      "title": "Browser photos: send to multiple Portals",
+      "summary": "Functional mobile-first review ready. Choose recipients independently from the viewed library; keep separate room/file results. Design sign-off is pending.",
+      "description": "The native companion has captured group photo targets; production browser imports still use one viewed session. The proposal adds explicit destinations, bounded room lanes, per-room folders, cancellation and failure-only retry while retaining uncertainty.",
+      "status": "approval",
+      "verification": "80 rendered checks \u00b724 responsive cases \u00b7 independent contract review",
+      "kind": "Browser and companion photo workflow parity",
+      "platforms": [
+        "browser",
+        "portal",
+        "companion"
+      ],
+      "owner": "Browser UX / group contract review / QA",
+      "deployment": "Review artifact only. Portal production remains exact1.96/code90; no phone or Portal operation.",
+      "state": "Generated outcome examples cover success, offline, pairing expiry, missing confirmation, filename collision and independent room folders. Empty/invalid selection, view changes, cancellation, reset retirement and eight-row paging are checked.",
+      "acceptance": [
+        "View a Portal independently of captured import recipients.",
+        "Select files and one or both destination rooms, with per-room folders and truthful count.",
+        "Preserve confirmed copies through mixed outcomes; retry only definite failed pairs.",
+        "Keep missing acknowledgments unconfirmed even after a matching filename is listed.",
+        "Keep sheet actions reachable on narrow and enlarged-text layouts; bound rendered rows.",
+        "Obtain design sign-off before production controller/UI and real Family/Living transfer acceptance."
+      ],
+      "evidence": [
+        {
+          "text": "Functional local mock; illustrative library and generated outcomes only.",
+          "source": "../group-photo-import-review.html"
+        },
+        {
+          "text": "Implementation scope, builder choices and separate production gates.",
+          "source": "docs/design/portal-browser-group-photo-import-review-2026-11-03.md"
+        },
+        {
+          "text": "Verified source parity, acknowledgment and session/folder boundaries.",
+          "source": "docs/design/portal-browser-group-photo-import-contract-2026-11-03.md"
+        },
+        {
+          "text": "80 rendered checks, 24 geometry cases; receipt SHA-256 741480daed56989f6c7e47158c30bb4207fc3c84bd15b835bf4cbbc72e05183c; source, QA and both screenshot hashes recorded.",
+          "source": "../evidence/group-photo-import-review-verification.json"
+        }
+      ],
+      "limits": [
+        "Generated in-memory room/file outcomes, not actual uploads or pairing renewal.",
+        "Desktop Chrome at320/390/768px and100%/130% root-font emulation; no physical phone/system-font/hardware acceptance.",
+        "Background/closed-page continuity, real server acknowledgment, live CORS/LAN permission, credential/session replacement and actual per-room photo refresh remain implementation gates.",
+        "Broader library browsing, bulk deletion and group slideshow activation are outside this import-flow design."
+      ],
+      "next": "Review the local mock. Implement approved import UI/controller only after design sign-off, then separately prove real transfers and per-room preservation. Phone control remains prohibited.",
+      "issueClock": {
+        "startedAt": "2026-11-03T03:02:13Z",
+        "deadline": "2026-11-03T03:32:13Z",
+        "originalDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "browser-profile-delete-conflicts",
       "title": "Settings profiles: preserve newer profiles during Delete",

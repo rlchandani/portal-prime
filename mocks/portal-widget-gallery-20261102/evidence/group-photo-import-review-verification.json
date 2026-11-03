@@ -1,0 +1,601 @@
+{
+  "verifiedAt": "2026-11-03T03:22:08.830Z",
+  "checks": [
+    {
+      "name": "initial recipients default to viewed Family only",
+      "passed": true
+    },
+    {
+      "name": "unselected recipients follow newly viewed Living only",
+      "passed": true
+    },
+    {
+      "name": "default recipients keep following viewing until explicit choice",
+      "passed": true
+    },
+    {
+      "name": "explicit checkbox recipients survive a viewed-room change",
+      "passed": true
+    },
+    {
+      "name": "explicit Select both survives reopening on another viewed room",
+      "passed": true
+    },
+    {
+      "name": "empty file selection blocks Start",
+      "passed": true
+    },
+    {
+      "name": "empty target selection blocks Start",
+      "passed": true
+    },
+    {
+      "name": "Cancel does not create an operation",
+      "passed": true
+    },
+    {
+      "name": "reopened import starts at top",
+      "passed": true
+    },
+    {
+      "name": "all three example photos visible on narrow screen",
+      "passed": true
+    },
+    {
+      "name": "invalid folder rejected: /sdcard/../secret",
+      "passed": true
+    },
+    {
+      "name": "invalid folder rejected: /sdcard/Android/data",
+      "passed": true
+    },
+    {
+      "name": "invalid folder rejected: /sdcard/.private",
+      "passed": true
+    },
+    {
+      "name": "invalid folder rejected: /sdcard/a:b",
+      "passed": true
+    },
+    {
+      "name": "invalid folder rejected: /sdcard/a\\b",
+      "passed": true
+    },
+    {
+      "name": "invalid folder rejected: /sdcard//photos",
+      "passed": true
+    },
+    {
+      "name": "shared-storage alias normalized; directory whitespace retained",
+      "passed": true
+    },
+    {
+      "name": "view change retains both captured recipients",
+      "passed": true
+    },
+    {
+      "name": "two simulated room lanes, no extra in-flight attempt",
+      "passed": true
+    },
+    {
+      "name": "offline room has separate definite failures",
+      "passed": true
+    },
+    {
+      "name": "failed ledger blocks a new import",
+      "passed": true
+    },
+    {
+      "name": "failure-only retry never resends confirmed Family copies",
+      "passed": true
+    },
+    {
+      "name": "pairing failure stays visible",
+      "passed": true
+    },
+    {
+      "name": "simulated pairing renewal retries only failed room",
+      "passed": true
+    },
+    {
+      "name": "lost acknowledgment does not count as stored",
+      "passed": true
+    },
+    {
+      "name": "filename presence does not erase uncertainty or resend",
+      "passed": true
+    },
+    {
+      "name": "reviewing uncertain file changes only viewing",
+      "passed": true
+    },
+    {
+      "name": "unconfirmed ledger blocks a new import",
+      "passed": true
+    },
+    {
+      "name": "openImport guard retains unresolved ledger even for dispatched click",
+      "passed": true
+    },
+    {
+      "name": "unresolved dismissal asks for explicit confirmation",
+      "passed": true
+    },
+    {
+      "name": "Keep results closes confirmation and preserves exact ledger",
+      "passed": true
+    },
+    {
+      "name": "explicit Dismiss removes ledger without simulated resend",
+      "passed": true
+    },
+    {
+      "name": "new import becomes available only after explicit dismissal",
+      "passed": true
+    },
+    {
+      "name": "filename collision preserves original without automatic retry",
+      "passed": true
+    },
+    {
+      "name": "explicit new name retries only rejected copy",
+      "passed": true
+    },
+    {
+      "name": "128-character filename is admitted and confirmed in both rooms",
+      "passed": true
+    },
+    {
+      "name": "repeated 128-character filename retains both collision failures",
+      "passed": true
+    },
+    {
+      "name": "collision rename keeps 128-character limit and untouched other room",
+      "passed": true
+    },
+    {
+      "name": "long-name retry sends only explicitly renamed collision",
+      "passed": true
+    },
+    {
+      "name": "each captured room retains its own folder",
+      "passed": true
+    },
+    {
+      "name": "repeated batch preserves existing filenames",
+      "passed": true
+    },
+    {
+      "name": "stop retains current confirmations and does not send queued copies",
+      "passed": true
+    },
+    {
+      "name": "unsent ledger blocks a new import",
+      "passed": true
+    },
+    {
+      "name": "reset retires delayed completion without reviving ledger",
+      "passed": true
+    },
+    {
+      "name": "oversized metadata blocks Start",
+      "passed": true
+    },
+    {
+      "name": "invalid filename blocks Start",
+      "passed": true
+    },
+    {
+      "name": "large selection renders only eight file rows",
+      "passed": true
+    },
+    {
+      "name": "remaining selected photo reachable through pagination",
+      "passed": true
+    },
+    {
+      "name": "large ledger renders at most eight rows per room",
+      "passed": true
+    },
+    {
+      "name": "remaining result reachable without truncating ledger",
+      "passed": true
+    },
+    {
+      "name": "page fits 320/1/dark",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 320/1/dark",
+      "passed": true
+    },
+    {
+      "name": "page fits 320/1/light",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 320/1/light",
+      "passed": true
+    },
+    {
+      "name": "page fits 320/1.3/dark",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 320/1.3/dark",
+      "passed": true
+    },
+    {
+      "name": "page fits 320/1.3/light",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 320/1.3/light",
+      "passed": true
+    },
+    {
+      "name": "page fits 390/1/dark",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 390/1/dark",
+      "passed": true
+    },
+    {
+      "name": "page fits 390/1/light",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 390/1/light",
+      "passed": true
+    },
+    {
+      "name": "page fits 390/1.3/dark",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 390/1.3/dark",
+      "passed": true
+    },
+    {
+      "name": "page fits 390/1.3/light",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 390/1.3/light",
+      "passed": true
+    },
+    {
+      "name": "page fits 768/1/dark",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 768/1/dark",
+      "passed": true
+    },
+    {
+      "name": "page fits 768/1/light",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 768/1/light",
+      "passed": true
+    },
+    {
+      "name": "page fits 768/1.3/dark",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 768/1.3/dark",
+      "passed": true
+    },
+    {
+      "name": "page fits 768/1.3/light",
+      "passed": true
+    },
+    {
+      "name": "sheet fits; actions visible 768/1.3/light",
+      "passed": true
+    },
+    {
+      "name": "screenshot sheet opens after explicit failed-ledger dismissal",
+      "passed": true
+    },
+    {
+      "name": "application never reads chosen file contents",
+      "passed": true
+    },
+    {
+      "name": "no browser persistence used",
+      "passed": true
+    },
+    {
+      "name": "only owned local static GETs",
+      "passed": true
+    },
+    {
+      "name": "no page errors",
+      "passed": true
+    },
+    {
+      "name": "review source hashes unchanged during the complete QA run",
+      "passed": true
+    }
+  ],
+  "geometry": [
+    {
+      "width": 320,
+      "font": "16px",
+      "client": 320,
+      "scroll": 320,
+      "theme": "dark",
+      "kind": "results"
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "client": 280,
+      "scroll": 280,
+      "footerVisible": true,
+      "dialogTop": 12,
+      "dialogBottom": 832,
+      "font": "16px",
+      "kind": "sheet"
+    },
+    {
+      "width": 320,
+      "font": "16px",
+      "client": 320,
+      "scroll": 320,
+      "theme": "light",
+      "kind": "results"
+    },
+    {
+      "width": 320,
+      "theme": "light",
+      "client": 280,
+      "scroll": 280,
+      "footerVisible": true,
+      "dialogTop": 12,
+      "dialogBottom": 832,
+      "font": "16px",
+      "kind": "sheet"
+    },
+    {
+      "width": 320,
+      "font": "20.8px",
+      "client": 320,
+      "scroll": 320,
+      "theme": "dark",
+      "kind": "results"
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "client": 270,
+      "scroll": 270,
+      "footerVisible": true,
+      "dialogTop": 15.59375,
+      "dialogBottom": 828.390625,
+      "font": "20.8px",
+      "kind": "sheet"
+    },
+    {
+      "width": 320,
+      "font": "20.8px",
+      "client": 320,
+      "scroll": 320,
+      "theme": "light",
+      "kind": "results"
+    },
+    {
+      "width": 320,
+      "theme": "light",
+      "client": 270,
+      "scroll": 270,
+      "footerVisible": true,
+      "dialogTop": 15.59375,
+      "dialogBottom": 828.390625,
+      "font": "20.8px",
+      "kind": "sheet"
+    },
+    {
+      "width": 390,
+      "font": "16px",
+      "client": 390,
+      "scroll": 390,
+      "theme": "dark",
+      "kind": "results"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "client": 350,
+      "scroll": 350,
+      "footerVisible": true,
+      "dialogTop": 12,
+      "dialogBottom": 832,
+      "font": "16px",
+      "kind": "sheet"
+    },
+    {
+      "width": 390,
+      "font": "16px",
+      "client": 390,
+      "scroll": 390,
+      "theme": "light",
+      "kind": "results"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "client": 350,
+      "scroll": 350,
+      "footerVisible": true,
+      "dialogTop": 12,
+      "dialogBottom": 832,
+      "font": "16px",
+      "kind": "sheet"
+    },
+    {
+      "width": 390,
+      "font": "20.8px",
+      "client": 390,
+      "scroll": 390,
+      "theme": "dark",
+      "kind": "results"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "client": 340,
+      "scroll": 340,
+      "footerVisible": true,
+      "dialogTop": 15.59375,
+      "dialogBottom": 828.390625,
+      "font": "20.8px",
+      "kind": "sheet"
+    },
+    {
+      "width": 390,
+      "font": "20.8px",
+      "client": 390,
+      "scroll": 390,
+      "theme": "light",
+      "kind": "results"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "client": 340,
+      "scroll": 340,
+      "footerVisible": true,
+      "dialogTop": 15.59375,
+      "dialogBottom": 828.390625,
+      "font": "20.8px",
+      "kind": "sheet"
+    },
+    {
+      "width": 768,
+      "font": "16px",
+      "client": 768,
+      "scroll": 768,
+      "theme": "dark",
+      "kind": "results"
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "client": 510,
+      "scroll": 510,
+      "footerVisible": true,
+      "dialogTop": 12,
+      "dialogBottom": 832,
+      "font": "16px",
+      "kind": "sheet"
+    },
+    {
+      "width": 768,
+      "font": "16px",
+      "client": 768,
+      "scroll": 768,
+      "theme": "light",
+      "kind": "results"
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "client": 510,
+      "scroll": 510,
+      "footerVisible": true,
+      "dialogTop": 12,
+      "dialogBottom": 832,
+      "font": "16px",
+      "kind": "sheet"
+    },
+    {
+      "width": 768,
+      "font": "20.8px",
+      "client": 768,
+      "scroll": 768,
+      "theme": "dark",
+      "kind": "results"
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "client": 664,
+      "scroll": 664,
+      "footerVisible": true,
+      "dialogTop": 15.59375,
+      "dialogBottom": 828.390625,
+      "font": "20.8px",
+      "kind": "sheet"
+    },
+    {
+      "width": 768,
+      "font": "20.8px",
+      "client": 768,
+      "scroll": 768,
+      "theme": "light",
+      "kind": "results"
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "client": 664,
+      "scroll": 664,
+      "footerVisible": true,
+      "dialogTop": 15.59375,
+      "dialogBottom": 828.390625,
+      "font": "20.8px",
+      "kind": "sheet"
+    }
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/group-photo-import-review.html",
+      "allowed": true
+    },
+    {
+      "method": "GET",
+      "path": "/group-photo-import-review.css",
+      "allowed": true
+    },
+    {
+      "method": "GET",
+      "path": "/group-photo-import-review.js",
+      "allowed": true
+    },
+    {
+      "method": "GET",
+      "path": "/favicon.svg",
+      "allowed": true
+    }
+  ],
+  "errors": [],
+  "phoneCommands": 0,
+  "portalCommands": 0,
+  "realUploads": 0,
+  "fileContentReads": 0,
+  "scope": "Desktop rendered functional review with generated results; no hardware, actual transfer, browser pairing or background acceptance",
+  "sourceArtifacts": [
+    "group-photo-import-review.html",
+    "group-photo-import-review.css",
+    "group-photo-import-review.js"
+  ],
+  "artifactHashes": {
+    "group-photo-import-review.html": "bf17b109fb62a03fafe26d08e67e28e2af06b2fdc198a87daa4076cb25c85754",
+    "group-photo-import-review.css": "9464f1e785422132393f5106579ddeb6a025f48911131f65f1a37f0d7fae9833",
+    "group-photo-import-review.js": "b701c0de38f257412f36ab8cd5a34eef7e98c983e53f371d483e2016f1fb2b0d"
+  },
+  "qaScript": "/private/tmp/portal-browser-group-photo-review-20261103/review-qa.cjs",
+  "qaScriptSha256": "2dc87a9e3fa21f3d5646faf18e877f10387ff8d476ebf4fb3eba1cc26c2bdc6d",
+  "screenshotHashes": {
+    "group-photo-import-partial-failure.png": "dfa04369187cada0072c2ae5f3d47f529522e8967900fc0994d145a8fc6546be",
+    "group-photo-import-destination-sheet.png": "3b0ab49fa1db9ea37fb69f135a7c646743755be537599f8272acc9c4c3b22c6e"
+  },
+  "ownedQaContextClosed": true,
+  "terminalExit": 0
+}
