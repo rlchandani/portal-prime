@@ -201,6 +201,13 @@ object SleepScheduler {
   /** Cancel the one-shot sleep timer. */
   fun cancelSleepTimer(context: Context) = cancel(context, ACTION_SLEEP_TIMER, RC_SLEEP_TIMER)
 
+  /** An explicitly started timer expired; disabled timers stay harmless after cancellation. */
+  fun onSleepTimerElapsed(context: Context) {
+    val cfg = ScreensaverConfig.load(context)
+    if (!cfg.sleepTimerEnabled) return
+    sleepNow(context, pauseAudio = cfg.pauseAudioOnSleep, closeApp = cfg.closeAppOnSleep)
+  }
+
   // ----- overnight window ----------------------------------------------------
 
   fun isOvernightNow(context: Context): Boolean {

@@ -1,0 +1,428 @@
+{
+  "recordedAt": "2026-11-03T06:16:51.380700+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T06:08:14Z",
+    "deadline": "2026-11-03T06:38:14Z",
+    "originalDiscoveryClockRetained": true
+  },
+  "scope": "Route explicit SLEEP_TIMER expiry to existing sleepNow with current enabled/audio/app policy; no countdown clock or UI redesign.",
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/SleepReceiver.kt": "0e7e69a260123f9698bbf8ea9fc65ef8fe7873a401fd2d0203ee6262262ba86d",
+    "app/src/main/java/com/immortal/launcher/SleepScheduler.kt": "f3f124a9d3109d4ab5effe7bfab42288781b5135e44753c166a0b1c776b9e4c4",
+    "app/src/test/java/com/immortal/launcher/SleepTimerReceiverTest.kt": "6136f5dbf3ca162f3cc8abbbea4403977e15d104f643789788703487176c84d5",
+    "app/build.gradle.kts": "8bf2131ef40f56366580e669e782dd8c678253f7c4f63c2cbb96c2fcbe7c3972"
+  },
+  "red": {
+    "tests": 9,
+    "failures": 6,
+    "errors": 0,
+    "failed": [
+      "pauseOnlyNeverClosesTheCurrentApp",
+      "absentDeviceAdminKeepsTheExistingSleepNoOp",
+      "expirationUsesCurrentOptionsRatherThanTheArmTimeSnapshot",
+      "timerWithBothOptionalEffectsOffStillSuppressesDreamAndSleeps",
+      "closeOnlyNeverDispatchesMediaPause",
+      "armedTimerExpiresWithPauseCloseDreamSuppressionAndSleepInOrder"
+    ]
+  },
+  "green": {
+    "suites": 429,
+    "tests": 4117,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "newReceiverMethods": 9,
+    "debugAndOptimizedBuildExit": 0,
+    "r8AndVitalLintExit": 0,
+    "combinedDuration": "2m 36s"
+  },
+  "native": {
+    "platform": "Family Android10/API29, explicitly scoped WiFi ADB",
+    "results": [
+      {
+        "optimizedApkSha256": "e12a1370c901635084d1798dd7f759036e5116ecfc2b0489e254ae6b726eee2f",
+        "actualProductionReceiver": "com.immortal.launcher.SleepReceiver",
+        "checks": {
+          "actualApkReceiverLoaded": true,
+          "defaultPauseAndCloseDispatch": false,
+          "defaultSavedFieldsUnchanged": true,
+          "pausefalseClosefalseDispatch": false,
+          "pausefalseClosefalseSavedFieldsUnchanged": true,
+          "pausefalseClosetrueDispatch": false,
+          "pausefalseClosetrueSavedFieldsUnchanged": true,
+          "pausetrueClosefalseDispatch": false,
+          "pausetrueClosefalseSavedFieldsUnchanged": true,
+          "pausetrueClosetrueDispatch": false,
+          "pausetrueClosetrueSavedFieldsUnchanged": true,
+          "currentDisabledFlagSuppressesAllEffects": true,
+          "disabledSavedFieldsUnchanged": true,
+          "unrelatedAndMissingActionsInert": true
+        },
+        "observations": {
+          "default": {
+            "capturedLockCalls": 0,
+            "capturedMediaKeys": 0,
+            "capturedHomeIntents": 0,
+            "secureSettingAttemptsRefusedBeforeProvider": 0,
+            "fixturePreferenceWrites": 0
+          },
+          "pausefalseClosefalse": {
+            "capturedLockCalls": 0,
+            "capturedMediaKeys": 0,
+            "capturedHomeIntents": 0,
+            "secureSettingAttemptsRefusedBeforeProvider": 0,
+            "fixturePreferenceWrites": 0
+          },
+          "pausefalseClosetrue": {
+            "capturedLockCalls": 0,
+            "capturedMediaKeys": 0,
+            "capturedHomeIntents": 0,
+            "secureSettingAttemptsRefusedBeforeProvider": 0,
+            "fixturePreferenceWrites": 0
+          },
+          "pausetrueClosefalse": {
+            "capturedLockCalls": 0,
+            "capturedMediaKeys": 0,
+            "capturedHomeIntents": 0,
+            "secureSettingAttemptsRefusedBeforeProvider": 0,
+            "fixturePreferenceWrites": 0
+          },
+          "pausetrueClosetrue": {
+            "capturedLockCalls": 0,
+            "capturedMediaKeys": 0,
+            "capturedHomeIntents": 0,
+            "secureSettingAttemptsRefusedBeforeProvider": 0,
+            "fixturePreferenceWrites": 0
+          },
+          "disabledCurrentFlag": {
+            "capturedLockCalls": 0,
+            "capturedMediaKeys": 0,
+            "capturedHomeIntents": 0,
+            "secureSettingAttemptsRefusedBeforeProvider": 0,
+            "fixturePreferenceWrites": 0
+          }
+        },
+        "scope": "Actual optimized APK receiver/policy with framework service doubles and captured navigation; secure provider access deliberately refused",
+        "secureSettingWriteCorrectnessVerified": false,
+        "actualTimerArmingVerified": false,
+        "realLocksApplied": 0,
+        "realMediaKeysDispatched": 0,
+        "realActivitiesLaunched": 0,
+        "realSecureSettingsAccesses": 0,
+        "appPreferencesWritten": 0,
+        "networkRequests": 0,
+        "realPendingIntentsRegistered": 0,
+        "realAlarmsRegistered": 0,
+        "cleanup": {
+          "processLocalServicesRestored": true,
+          "inMemoryHandlesRetired": true
+        },
+        "interceptedServiceCalls": [],
+        "unsupportedInterceptedServiceCalls": [],
+        "passed": 9,
+        "total": 14,
+        "status": "FAIL"
+      },
+      {
+        "optimizedApkSha256": "3e8f530a500452b73037223977ad7540c9d484b632c3fc986eb508b8254ada21",
+        "actualProductionReceiver": "com.immortal.launcher.SleepReceiver",
+        "checks": {
+          "actualApkReceiverLoaded": true,
+          "defaultPauseAndCloseDispatch": true,
+          "defaultSavedFieldsUnchanged": true,
+          "pausefalseClosefalseDispatch": true,
+          "pausefalseClosefalseSavedFieldsUnchanged": true,
+          "pausefalseClosetrueDispatch": true,
+          "pausefalseClosetrueSavedFieldsUnchanged": true,
+          "pausetrueClosefalseDispatch": true,
+          "pausetrueClosefalseSavedFieldsUnchanged": true,
+          "pausetrueClosetrueDispatch": true,
+          "pausetrueClosetrueSavedFieldsUnchanged": true,
+          "currentDisabledFlagSuppressesAllEffects": true,
+          "disabledSavedFieldsUnchanged": true,
+          "unrelatedAndMissingActionsInert": true
+        },
+        "observations": {
+          "default": {
+            "capturedLockCalls": 1,
+            "capturedMediaKeys": 2,
+            "capturedHomeIntents": 1,
+            "secureSettingAttemptsRefusedBeforeProvider": 1,
+            "fixturePreferenceWrites": 0
+          },
+          "pausefalseClosefalse": {
+            "capturedLockCalls": 1,
+            "capturedMediaKeys": 0,
+            "capturedHomeIntents": 0,
+            "secureSettingAttemptsRefusedBeforeProvider": 1,
+            "fixturePreferenceWrites": 0
+          },
+          "pausefalseClosetrue": {
+            "capturedLockCalls": 1,
+            "capturedMediaKeys": 0,
+            "capturedHomeIntents": 1,
+            "secureSettingAttemptsRefusedBeforeProvider": 1,
+            "fixturePreferenceWrites": 0
+          },
+          "pausetrueClosefalse": {
+            "capturedLockCalls": 1,
+            "capturedMediaKeys": 2,
+            "capturedHomeIntents": 0,
+            "secureSettingAttemptsRefusedBeforeProvider": 1,
+            "fixturePreferenceWrites": 0
+          },
+          "pausetrueClosetrue": {
+            "capturedLockCalls": 1,
+            "capturedMediaKeys": 2,
+            "capturedHomeIntents": 1,
+            "secureSettingAttemptsRefusedBeforeProvider": 1,
+            "fixturePreferenceWrites": 0
+          },
+          "disabledCurrentFlag": {
+            "capturedLockCalls": 0,
+            "capturedMediaKeys": 0,
+            "capturedHomeIntents": 0,
+            "secureSettingAttemptsRefusedBeforeProvider": 0,
+            "fixturePreferenceWrites": 0
+          }
+        },
+        "scope": "Actual optimized APK receiver/policy with framework service doubles and captured navigation; secure provider access deliberately refused",
+        "secureSettingWriteCorrectnessVerified": false,
+        "actualTimerArmingVerified": false,
+        "realLocksApplied": 0,
+        "realMediaKeysDispatched": 0,
+        "realActivitiesLaunched": 0,
+        "realSecureSettingsAccesses": 0,
+        "appPreferencesWritten": 0,
+        "networkRequests": 0,
+        "realPendingIntentsRegistered": 0,
+        "realAlarmsRegistered": 0,
+        "cleanup": {
+          "processLocalServicesRestored": true,
+          "inMemoryHandlesRetired": true
+        },
+        "interceptedServiceCalls": [
+          "MediaSessionManager.dispatchMediaKeyEvent",
+          "MediaSessionManager.dispatchMediaKeyEvent",
+          "DevicePolicyManager.isAdminActive",
+          "DevicePolicyManager.lockNow",
+          "DevicePolicyManager.isAdminActive",
+          "DevicePolicyManager.lockNow",
+          "DevicePolicyManager.isAdminActive",
+          "DevicePolicyManager.lockNow",
+          "MediaSessionManager.dispatchMediaKeyEvent",
+          "MediaSessionManager.dispatchMediaKeyEvent",
+          "DevicePolicyManager.isAdminActive",
+          "DevicePolicyManager.lockNow",
+          "MediaSessionManager.dispatchMediaKeyEvent",
+          "MediaSessionManager.dispatchMediaKeyEvent",
+          "DevicePolicyManager.isAdminActive",
+          "DevicePolicyManager.lockNow"
+        ],
+        "unsupportedInterceptedServiceCalls": [],
+        "passed": 14,
+        "total": 14,
+        "status": "PASS"
+      }
+    ],
+    "cleanup": [
+      {
+        "ownedProcessRetired": true,
+        "ownedDeviceScratchRemoved": true,
+        "appPreferencesWritten": 0,
+        "installerInvoked": false,
+        "networkRequests": 0,
+        "faults": []
+      },
+      {
+        "ownedProcessRetired": true,
+        "ownedDeviceScratchRemoved": true,
+        "appPreferencesWritten": 0,
+        "installerInvoked": false,
+        "networkRequests": 0,
+        "faults": []
+      }
+    ],
+    "fixtureSha256": {
+      "java": "eb8e327f3041bcacaf59333e630a26fb8ddf0e06f49a0864c98f38388b40cef0",
+      "jar": "7f84250c965914acd0cd2f16d79bc8992732f3d5135af998ac2d2ef6110b4baf",
+      "compiler": "6b60397d31ca6cf852359f5327cd8eda96ecab73e8dc99967591f22ddf0f9dce",
+      "runner": "1dd2b09e381781b9f075f9217e74425bfb540715327ff677afe3510ba9f4cdf4"
+    },
+    "scope": "Actual optimized receiver/policy; framework device-policy/audio wrappers backed by process-local service doubles; navigation captured; resolver refused before any provider.",
+    "secureSettingWriteCorrectnessVerified": false,
+    "actualTimerArmingVerified": false
+  },
+  "artifact": {
+    "sha256": "3e8f530a500452b73037223977ad7540c9d484b632c3fc986eb508b8254ada21",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.104",
+    "versionCode": 98,
+    "variants": {
+      "performance": {
+        "sha256": "3e8f530a500452b73037223977ad7540c9d484b632c3fc986eb508b8254ada21",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.104",
+        "versionCode": 98
+      },
+      "debug": {
+        "sha256": "fc0def3f0768c7ed444e2ceefee0d3a187c936f747e3a8b6c3099ec92fb92caa",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.104",
+        "versionCode": 98
+      },
+      "rollback": {
+        "sha256": "e12a1370c901635084d1798dd7f759036e5116ecfc2b0489e254ae6b726eee2f",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.103",
+        "versionCode": 97
+      }
+    },
+    "debugSha256": "fc0def3f0768c7ed444e2ceefee0d3a187c936f747e3a8b6c3099ec92fb92caa",
+    "rollbackSha256": "e12a1370c901635084d1798dd7f759036e5116ecfc2b0489e254ae6b726eee2f",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 36s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "originalRegistryByteHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "ownedNativeProcessesAndDeviceScratchRemoved": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "googlePhoneCommands": 0,
+    "normalFamilyFrameVisuallyInspected": true,
+    "familyChromeTaskRetained": true
+  },
+  "review": {
+    "blockingFindings": 0,
+    "reviewedSourceHashesMatch": true,
+    "reviewedNativeFixtureAndApkHashesMatch": true,
+    "jvmAggregateIndependentlyVerified": true,
+    "normalCleanupVerified": true,
+    "scope": "Native direct receiver/policy with framework service doubles; arming/secure-call ordering captured on JVM only."
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestUnchanged": true,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false
+  },
+  "limits": [
+    "Real alarm delivery, actual screen-off, audible media pause, app-close navigation and secure-setting provider acceptance remain unverified.",
+    "Native fixture deliberately refuses resolver access; expected secure-setting call and operation order are covered with JVM captures only.",
+    "Native timer arming is unverified; JVM captures actual arm/action/deadline before direct receiver delivery.",
+    "Countdown UI, reopen/running-state persistence, clock changes and concurrent Stop/delivery or settings races are outside this correction.",
+    "API28, reboot/boot lifecycle, Living visuals and fault-injected native timeout cleanup remain unverified.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+  ],
+  "documentation": {
+    "strictMkdocsExit": 0,
+    "strictWarnings": 0,
+    "seconds": 2.08,
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 78,
+          "checks": [
+            {
+              "id": "sleep-timer-dispatch",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "sunrise-one-shot",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 78,
+          "checks": [
+            {
+              "id": "sleep-timer-dispatch",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "sunrise-one-shot",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingServerPreserved": true
+    },
+    "detailCapturesVisuallyInspected": true,
+    "earlier77TaskRecordsDefaultAndOtherBoundariesPreserved": true,
+    "scope": "Two selected details at two widths; no full-product accessibility or visual acceptance."
+  }
+}

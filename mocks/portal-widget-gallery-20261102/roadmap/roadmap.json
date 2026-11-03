@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T06:06:28.925779+00:00",
+  "updatedAt": "2026-11-03T06:16:51.388100+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,56 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.103/code97. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.104/code98. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "sleep-timer-dispatch",
+      "title": "Sleep timer: handle countdown expiry",
+      "summary": "Delivered to both rooms: explicitly started timers now execute their sleep action with current audio/app preferences.",
+      "description": "Add the missing SLEEP_TIMER receiver route to the existing scheduler policy. Guard the current enabled flag; preserve settings and current-option behavior with no new screen or countdown clock design.",
+      "status": "delivered",
+      "verification": "9 regressions / 4,117 JVM \u00b7 optimized Android 9/14\u219214/14",
+      "kind": "Sleep timer expiry correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Sleep policy engineering / independent receiver and Android fixture review",
+      "deployment": "Exact signed optimized 1.104/code98 installed and full APK hash verified in Family Area and Living Area.",
+      "state": "Complete maps and Home/timer/Sunrise preference bytes match. Family frame/font/services/original Chrome retained. Owned process/scratch/registry copy removed.",
+      "acceptance": [
+        "Reproduce an armed explicit countdown expiring without any sleep effects.",
+        "Dispatch expiry to existing sleepNow using current enabled/audio/app preferences.",
+        "Verify all four option combinations, ordered secure suppression/sleep, disabled/Stop/no-admin/inert controls and unchanged saved fields.",
+        "Run full gates and actual optimized production policy on Android; deliver exact signed artifacts while preserving owner state."
+      ],
+      "evidence": [
+        {
+          "text": "Missing route, existing policy reuse, regressions, native comparison, room delivery and limits.",
+          "source": "docs/portal-sleep-timer-dispatch-2026-11-03.md"
+        },
+        {
+          "text": "Reviewed hashes, nine regressions, actual optimized receiver, cleanup, artifact and preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/sleep-timer-dispatch-verification.json"
+        }
+      ],
+      "limits": [
+        "Real alarm delivery, actual screen-off, audible media pause, app-close navigation and secure-setting provider acceptance remain unverified.",
+        "Native fixture deliberately refuses resolver access; expected secure-setting call and operation order are covered with JVM captures only.",
+        "Native timer arming is unverified; JVM captures actual arm/action/deadline before direct receiver delivery.",
+        "Countdown UI, reopen/running-state persistence, clock changes and concurrent Stop/delivery or settings races are outside this correction.",
+        "API28, reboot/boot lifecycle, Living visuals and fault-injected native timeout cleanup remain unverified.",
+        "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+      ],
+      "next": "Retain this delivered expiry correction. Existing design approvals, human sign-in dependency and original parked clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-03T06:08:14Z",
+        "deadline": "2026-11-03T06:38:14Z",
+        "originalDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "sunrise-one-shot",
       "title": "Sunrise: consume one-shot wake alarms",

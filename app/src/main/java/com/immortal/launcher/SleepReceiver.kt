@@ -19,6 +19,7 @@ class SleepReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
     when (intent.action) {
       SleepScheduler.ACTION_IDLE -> SleepScheduler.onIdleElapsed(context)
+      SleepScheduler.ACTION_SLEEP_TIMER -> SleepScheduler.onSleepTimerElapsed(context)
       SleepScheduler.ACTION_OVERNIGHT_START -> SleepScheduler.onWindowStart(context)
       SleepScheduler.ACTION_OVERNIGHT_END -> SleepScheduler.onWindowEnd(context)
     }

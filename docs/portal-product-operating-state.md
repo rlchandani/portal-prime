@@ -13,8 +13,24 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / Sunrise one-shot consumption:** exact optimized
-  **1.103/code97** is installed and fully hashed in both rooms. An enabled alarm
+- **Current room APK / Sleep timer expiry dispatch:** exact optimized
+  **1.104/code98** is installed and fully hashed in both rooms. Explicitly started
+  countdowns now dispatch their previously ignored expiry action to the existing
+  sleep policy, using current enable/audio/app preferences. Nine regressions
+  reproduce six failures then pass; **4,117 JVM/429 suites**, debug/optimized/
+  R8/vital lint pass in2m36s. Actual optimized Family Android10 receiver/policy
+  improves **9/14→14/14**, using captured framework service calls. Real alarm,
+  sleep/audio/navigation/secure-provider/UI/API28 acceptance remains open; JVM
+  captures arm/action/deadline, secure suppression and order. Complete maps and
+  Home/timer/Sunrise bytes match. Family normal frame/font/services/original Chrome
+  retained; owned process/scratch/registry copy removed. No clock/UI/running-state
+  redesign. Public1.83 guard rejects local1.104; no phone/HA/auth/publication.
+  **78 tasks:45 delivered,23 locally verified,3 approval,6 parked,1 queued.**
+  Original **06:08:14–06:38:14 UTC** retained; broader goal stays active.
+  [Receipt](portal-sleep-timer-dispatch-2026-11-03.md).
+
+- **Previous room APK / Sunrise one-shot consumption:** exact optimized
+  **1.103/code97** was installed and fully hashed in both rooms. An enabled alarm
   with no selected weekdays now consumes only its enabled flag after presentation;
   the existing scheduler cancels instead of arming tomorrow. Time/ramp/chime and
   repeating weekdays are retained. Seven regressions reproduce four failures then
