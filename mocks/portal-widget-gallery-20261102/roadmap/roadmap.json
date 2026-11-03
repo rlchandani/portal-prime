@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T19:48:17.841432+00:00",
+  "updatedAt": "2026-11-03T20:11:46.387266+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,54 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "browser-pairing-keyboard",
+      "title": "Browser pairing: submit with Enter",
+      "summary": "Enter in the address or PIN field now submits through the existing pairing form, with the action still in its sticky footer. Six real-browser cases and all 724 JavaScript tests pass.",
+      "description": "Associate the native submit button with the pairing form after the shared sheet moves it into the footer.",
+      "status": "verified",
+      "verification": "4 baseline assertions / 2 controls → 6 browser cases pass · 724 JavaScript · cached debug/JVM gates",
+      "kind": "Browser pairing form",
+      "platforms": [
+        "browser"
+      ],
+      "owner": "Immortal remote / independent fixture and source and result review",
+      "deployment": "Local Immortal ef4048c3 only; no live pairing or native install.",
+      "state": "Native form association and one existing submit handler; exact final fixture bytes frozen across fresh RED/GREEN. Previous holds remain.",
+      "acceptance": [
+        "Reproduce Enter failing from both address and PIN fields on the exact original shipped controller, with click and Close controls.",
+        "Keep the native submit action associated after sticky-footer relocation and send one generated pairing request.",
+        "Retain invalid-PIN correction, pending Enter suppression, failed retry, Close and all 12 existing pairing ownership controls.",
+        "Pass the six corrected frozen browser cases and all 724 existing JavaScript cases; complete debug/JVM commands with cache qualification."
+      ],
+      "evidence": [
+        {
+          "text": "Native form correction and scoped acceptance.",
+          "source": "docs/portal-browser-pairing-keyboard-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized source, run, artifact and review bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/browser-pairing-keyboard-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual shipped HTML/controller in isolated system Chrome with fresh contexts and generated HTTP 400 bad_pin replies only. No Portal, phone, live pairing, LAN/CORS, real token, roster-success or Android WebView acceptance.",
+        "Six browser leaf cases: Enter in PIN/address, click/retry, invalid PIN, pending Enter/retry and Close. Node also counts their parent; seven records do not mean seven independent cases.",
+        "The first post-fix attempt hit a pending-label locator timeout; corrected locator was frozen before a fresh exact-source RED/GREEN. The first JavaScript gate exposed an adapter disabled-default mismatch. Both attempts remain retained and are not product failures or passing gates.",
+        "All 724 JavaScript cases execute and pass. Debug and JVM commands succeed with cached tasks; no fresh JVM execution/count is claimed. The APK ZIP contains the exact corrected controller; no install or native delivery.",
+        "The new browser fixture is opt-in via IMMORTAL_REMOTE_CHROME=1; no workflow/dependency change or hosted CI observation. Existing 12 pairing ownership controls remain unchanged and pass in the JavaScript gate.",
+        "The existing submission logic, PIN validation/clearing, pending/current guard, cancellation, discovery and retry remain. No generic button or pairing/auth policy redesign.",
+        "Old browser-text, profile/photo, NSD/native-input, provider, phone, publication and all exhausted/approval-stage scopes keep their clocks and holds.",
+        "Almanac/store/speed contracts are duplicate-stopped under their original clocks; locale/install-observation reviews are bounded negatives. No crypto locale defect was selected: Kotlin lowercase() uses invariant mapping."
+      ],
+      "next": "Keep the local verified correction; continue distinct authorized work while existing holds and original clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-03T19:53:38Z",
+        "deadline": "2026-11-03T20:23:38Z",
+        "reset": false,
+        "discoveryIncluded": true
+      }
+    },
     {
       "id": "immich-audit-pagination",
       "title": "Immich audit: stop nonadvancing pages",

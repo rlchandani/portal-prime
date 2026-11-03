@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T20:11:46.387266+00:00",
+  "status": "locally_verified",
+  "scope": "Browser pairing native Enter submission with the existing sticky footer",
+  "originalClock": {
+    "startedAt": "2026-11-03T19:53:38Z",
+    "deadline": "2026-11-03T20:23:38Z",
+    "reset": false,
+    "discoveryIncluded": true
+  },
+  "baseline": {
+    "startUtc": "2026-11-03T20:06:30.984602+00:00",
+    "endUtc": "2026-11-03T20:06:34.941031+00:00",
+    "exitCode": 1,
+    "log": {
+      "path": "private-local-run/pairing-red-final.log",
+      "bytes": 6675,
+      "sha256": "ca94616b2573acd240761038e01fa328e0410effc694b5e9adf21fcf72cf3454"
+    },
+    "leafCases": 6,
+    "assertionFailures": 4,
+    "controls": 2,
+    "nodeRecordsIncludingParent": 7,
+    "nodeFailuresIncludingParent": 5,
+    "controllerSha256": "94b8f9afe0670d321ed4365af5aba6080d2bea875dfb7512ad7c0f9782070e44"
+  },
+  "focused": {
+    "startUtc": "2026-11-03T20:06:53.100900+00:00",
+    "endUtc": "2026-11-03T20:06:55.328991+00:00",
+    "exitCode": 0,
+    "log": {
+      "path": "private-local-run/pairing-green-final.log",
+      "bytes": 1416,
+      "sha256": "41202bb065c8d8a2a5cf951874be1e42a549e3b21d10a5fdf3e0dfee9969ca7d"
+    },
+    "leafCases": 6,
+    "leafPassed": 6,
+    "nodeRecordsIncludingParent": 7,
+    "failures": 0,
+    "skipped": 0,
+    "fixture": {
+      "bytes": 8480,
+      "sha256": "c38c4f6b97f32f60f1a9668ae1fa703aa39bc18257663556ba56df27e36bef6c"
+    }
+  },
+  "javascript": {
+    "startUtc": "2026-11-03T20:06:59.125034+00:00",
+    "endUtc": "2026-11-03T20:07:13.300694+00:00",
+    "exitCode": 0,
+    "log": {
+      "path": "private-local-run/pairing-js-gate-final.log",
+      "bytes": 73066,
+      "sha256": "fcfc394b84dea2b554c8b22065499e76f8b0ea1211ceb51784829f714be1b65d"
+    },
+    "cases": 724,
+    "uniqueCases": 724,
+    "failures": 0,
+    "skipped": 0
+  },
+  "debugBuild": {
+    "startUtc": "2026-11-03T20:06:59.125234+00:00",
+    "endUtc": "2026-11-03T20:07:04.039040+00:00",
+    "exitCode": 0,
+    "log": {
+      "path": "private-local-run/pairing-debug-build-final.log",
+      "bytes": 2444,
+      "sha256": "dac5fc8aff6c88c7bd46a41ba170811b74cacfce0289de9e0bd18ae894339a8f"
+    },
+    "cachedTasks": true,
+    "tasks": 38
+  },
+  "jvmGate": {
+    "startUtc": "2026-11-03T20:07:04.039463+00:00",
+    "endUtc": "2026-11-03T20:07:08.025645+00:00",
+    "exitCode": 0,
+    "log": {
+      "path": "private-local-run/pairing-jvm-gate-final.log",
+      "bytes": 1893,
+      "sha256": "c27908ea8c8540a646d5d47d5c0e7aee7a6846e4a55c7086cf6ed7ca8f33e5e4"
+    },
+    "cachedTasks": true,
+    "tasks": 26,
+    "freshTestExecutions": 0
+  },
+  "artifact": {
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 46803078,
+    "sha256": "24fe24e9cd43df005c5c3a59b9c705405339861ae5e125a69b35f707ef578da9",
+    "controllerMatches": true,
+    "controllerSha256": "e5d9b6da9fcce4af37f25cade291fb78b809b879f84330f068e872d3a6da6e51",
+    "installOrLaunch": false
+  },
+  "sourceBindings": [
+    {
+      "path": "app/src/main/assets/remote/control-center.js",
+      "bytes": 263621,
+      "sha256": "e5d9b6da9fcce4af37f25cade291fb78b809b879f84330f068e872d3a6da6e51"
+    },
+    {
+      "path": "app/src/test/js/remote-browser-harness.mjs",
+      "bytes": 11317,
+      "sha256": "b5d54b14e0f0a47c675dba4028828fcd206cb1032b9cc21349b0d918277e68c6"
+    },
+    {
+      "path": "scripts/tests/remote_pairing_keyboard_browser.test.mjs",
+      "bytes": 8480,
+      "sha256": "c38c4f6b97f32f60f1a9668ae1fa703aa39bc18257663556ba56df27e36bef6c"
+    }
+  ],
+  "integration": {
+    "ImmortalCommit": "ef4048c38eec5ed65cf6828ac252006c52fc1502",
+    "parent": "3128a82ad7012be7cbf72862b90644f7024e8205",
+    "recordedAtUtc": "2026-11-03T20:09:17.925651+00:00",
+    "localOnly": true,
+    "deployed": false,
+    "published": false
+  },
+  "fixtureAdmission": {
+    "checks": 12,
+    "passed": 12,
+    "blockers": 0,
+    "reportSha256": "55397dbf908eeba8b46dbbecbce011b133b63c97eba5e56f4f75e2f58bbd38b0",
+    "qualification": "Conditional source/fixture review preceded execution. Durable report was frozen after source advance and corrected runs; no backdating."
+  },
+  "independentReview": {
+    "counts": {
+      "checks": 14,
+      "passed": 14,
+      "bindings": 33,
+      "browserLeafTests": 6,
+      "acceptedBaselineLeafAssertionFailures": 4,
+      "acceptedBaselineControlsPassed": 2,
+      "finalBrowserLeafPassed": 6,
+      "fullJsUniqueTests": 724,
+      "fullJsFailures": 0,
+      "fullJsSkipped": 0,
+      "priorPairingControls": 12,
+      "freshJvmTestsClaimed": 0
+    },
+    "blockers": 0,
+    "reportSha256": "ed9c7eaf21f737abf5110250ad590e9f0a9bc2e050c8d80e9e82189fc2c4bb31",
+    "qualification": "At the source checkpoint, the positive independent review message had arrived and the durable report was pending. It was frozen afterward at 2026-11-03T20:11:28.114Z; no precommit report claim."
+  },
+  "browserDiagnostics": {
+    "contexts": 6,
+    "pageErrors": 0,
+    "outsideRequests": 0,
+    "unexpectedRequests": 0,
+    "webSockets": 0
+  },
+  "ci": {
+    "browserFixtureOptIn": true,
+    "workflowChanged": false,
+    "hostedRunsObserved": 0
+  },
+  "retainedAttempts": [
+    {
+      "name": "Initial focused post-fix run",
+      "exitCode": 1,
+      "reason": "Pending button changes its accessible name to Pairing\u2026; initial exact Pair Portal locator timed out."
+    },
+    {
+      "name": "Initial full JavaScript run",
+      "exitCode": 1,
+      "reason": "The small DOM adapter lacked native disabled=false default for the newly constructed submit button."
+    }
+  ],
+  "limits": [
+    "Actual shipped HTML/controller in isolated system Chrome with fresh contexts and generated HTTP 400 bad_pin replies only. No Portal, phone, live pairing, LAN/CORS, real token, roster-success or Android WebView acceptance.",
+    "Six browser leaf cases: Enter in PIN/address, click/retry, invalid PIN, pending Enter/retry and Close. Node also counts their parent; seven records do not mean seven independent cases.",
+    "The first post-fix attempt hit a pending-label locator timeout; corrected locator was frozen before a fresh exact-source RED/GREEN. The first JavaScript gate exposed an adapter disabled-default mismatch. Both attempts remain retained and are not product failures or passing gates.",
+    "All 724 JavaScript cases execute and pass. Debug and JVM commands succeed with cached tasks; no fresh JVM execution/count is claimed. The APK ZIP contains the exact corrected controller; no install or native delivery.",
+    "The new browser fixture is opt-in via IMMORTAL_REMOTE_CHROME=1; no workflow/dependency change or hosted CI observation. Existing 12 pairing ownership controls remain unchanged and pass in the JavaScript gate.",
+    "The existing submission logic, PIN validation/clearing, pending/current guard, cancellation, discovery and retry remain. No generic button or pairing/auth policy redesign.",
+    "Old browser-text, profile/photo, NSD/native-input, provider, phone, publication and all exhausted/approval-stage scopes keep their clocks and holds.",
+    "Almanac/store/speed contracts are duplicate-stopped under their original clocks; locale/install-observation reviews are bounded negatives. No crypto locale defect was selected: Kotlin lowercase() uses invariant mapping."
+  ]
+}
