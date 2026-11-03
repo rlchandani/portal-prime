@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T14:35:03.788625+00:00",
+  "updatedAt": "2026-11-03T15:05:23.568898+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,53 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.125/code119. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.126/code120. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-caption-timezone",
+      "title": "Photo captions: follow the current timezone on new reads",
+      "summary": "Delivered 1.126: new EXIF reads refresh the parser's current timezone. ",
+      "description": "Exact optimized 1.126/code120 is installed and fully hashed in both rooms. Newly read EXIF captions refresh the current default timezone inside the existing synchronized parser, preserving the local capture date and on-this-day comparison after a zone change. Six unchanged repaired tests pass; 4,343 JVM tests/451 suites pass with zero failures, errors or skips. Debug, optimized, R8 and vital lint pass. Four complete maps and 13 raw preference states per room remain unchanged; limited HTTP200 diagnostics record 1682/2015 lines with no fatal/ANR markers. Credentials are cleaned; public 1.83/code77 remains.",
+      "status": "delivered",
+      "verification": "Six unchanged repaired tests pass; 4,343 JVM tests/451 suites pass with zero failures, errors or skips. Debug, optimized, R8 and vital lint pass.",
+      "kind": "Photo caption date consistency",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Screensaver metadata",
+      "deployment": "Exact optimized 1.126/code120 installed and fully hashed in both rooms.",
+      "state": "Four complete maps and 13 raw preference states preserved; limited health only.",
+      "acceptance": [
+        "Retain literal fresh-read epochs and date/memory consistency after default-zone changes.",
+        "Retain four metadata/null/fallback/label controls.",
+        "Deliver exact candidate and preserve complete room state."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped baseline, correction, delivery and limits.",
+          "source": "docs/portal-photo-caption-timezone-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized actual evidence bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-caption-timezone-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual production read/parser/formatDate/memoryYears use mocked EXIF getters; Android Log is mocked only during EXIF mock setup. No real EXIF decoder, physical timezone change, caption UI, native/optimized caption-correction execution, provider or SMB acceptance.",
+        "Already parsed Meta values, EXIF offset tags and concurrent default-zone changes remain unselected. This fixes newly read captions only; existing memory/fallback rules remain. The one current Family screenshot shows clock/date without a photo or caption and supplies no caption visual acceptance.",
+        "Initial 6-test attempt had 5 fixture-initialization failures and 1 control; excluded from timezone acceptance. Fresh repaired unchanged-source baseline has 2 AssertionErrors and 4 controls. Same six bodies and literal expectations are retained.",
+        "Public manifest remains1.83/code77. No phone, publication, HA, prior-scope reopening or broader completion claim; original cohort clock includes all discovery and delivery."
+      ],
+      "next": "Real EXIF decoding, physical timezone/caption UI, native/optimized caption-correction execution, retained old Meta/offset tags and simultaneous defaults remain open.",
+      "issueClock": {
+        "startedAt": "2026-11-03T14:41:14.795668Z",
+        "deadline": "2026-11-03T15:11:14.795668Z",
+        "reset": false
+      }
+    },
     {
       "id": "version-sync-comments",
       "title": "Release guard: ignore preceding version comments",

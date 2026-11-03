@@ -1,0 +1,463 @@
+{
+  "schemaVersion": 1,
+  "taskId": "photo-caption-timezone",
+  "recordedAt": "2026-11-03T15:05:23.568898+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T14:41:14.795668Z",
+    "deadline": "2026-11-03T15:11:14.795668Z",
+    "reset": false
+  },
+  "baseline": {
+    "initialExcluded": {
+      "tests": 6,
+      "fixtureFailures": 5,
+      "controls": 1,
+      "timezoneWitness": false
+    },
+    "repairedActual": {
+      "tests": 6,
+      "assertionFailures": 2,
+      "controls": 4,
+      "errors": 0,
+      "skips": 0,
+      "actualExit": 1,
+      "frozenTestSha256": "8e5e60cb5d7a30e0bdefc33523f29a0b58165ccd94e0537ef6a2f9030c613d5b"
+    }
+  },
+  "candidateJVM": {
+    "tests": 4343,
+    "suites": 451,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "focusedCases": 6,
+  "artifact": {
+    "sha256": "561cabc331fcaf8ad698102810ee89ade8cea16c77dcbe5590068be02f6e1518",
+    "bytes": 25879086,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.126",
+    "versionCode": 120
+  },
+  "sourceBindings": {
+    "app/src/main/java/com/immortal/launcher/PhotoCaption.kt": {
+      "sha256": "cd9428ff9be0d067db4a263b72fe5e4215a95fea38f2914765f600f2a37f81b9",
+      "bytes": 7123
+    },
+    "app/src/test/java/com/immortal/launcher/PhotoCaptionTimeZoneTest.kt": {
+      "sha256": "8e5e60cb5d7a30e0bdefc33523f29a0b58165ccd94e0537ef6a2f9030c613d5b",
+      "bytes": 4011
+    },
+    "app/build.gradle.kts": {
+      "sha256": "3751e1c0d41e0e8ac567a763caad6f5431722c45c6205ae35aa52355a056845c",
+      "bytes": 11816
+    }
+  },
+  "delivery": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "preferenceStates": {
+    "family": {
+      "states": 13,
+      "presentByteIdentical": 12,
+      "unchangedAbsences": 1
+    },
+    "living": {
+      "states": 13,
+      "presentByteIdentical": 8,
+      "unchangedAbsences": 5
+    }
+  },
+  "limitedHealth": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1682,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 2015,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "credentialCleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "terminals": {
+    "baseline-focused-terminal.json": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T14:55:10.965955+00:00",
+      "endedAt": "2026-11-03T14:55:20.558266+00:00",
+      "durationSeconds": 9.592311
+    },
+    "baseline-focused-repaired-terminal.json": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T14:56:57.065134+00:00",
+      "endedAt": "2026-11-03T14:57:06.065975+00:00",
+      "durationSeconds": 9.000841
+    },
+    "full-gate-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:57:38.368483+00:00",
+      "endedAt": "2026-11-03T14:59:29.788551+00:00",
+      "durationSeconds": 111.420068
+    },
+    "package-proof-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T15:04:52.117795+00:00",
+      "endedAt": "2026-11-03T15:04:52.768282+00:00",
+      "durationSeconds": 0.650487
+    },
+    "preflight-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:55:25.721363+00:00",
+      "endedAt": "2026-11-03T14:55:27.460865+00:00",
+      "durationSeconds": 1.739502
+    },
+    "room-deploy-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T15:00:12.088062+00:00",
+      "endedAt": "2026-11-03T15:00:27.192392+00:00",
+      "durationSeconds": 15.10433
+    },
+    "postflight-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T15:00:48.630065+00:00",
+      "endedAt": "2026-11-03T15:00:49.942266+00:00",
+      "durationSeconds": 1.312201
+    },
+    "health-observation-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T15:00:48.638496+00:00",
+      "endedAt": "2026-11-03T15:00:49.470780+00:00",
+      "durationSeconds": 0.832284
+    },
+    "cleanup-credentials-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T15:01:30.069471+00:00",
+      "endedAt": "2026-11-03T15:01:30.148846+00:00",
+      "durationSeconds": 0.079375
+    }
+  },
+  "backlog": {
+    "before": 102,
+    "after": 103,
+    "all102ObjectsIdentical": true,
+    "exactPriorRawSuffix": {
+      "sha256": "8956aaaf952b70a91e0d882f86a5b26cb7abb43579cdf26d26d88d3bece72842",
+      "bytes": 340607
+    },
+    "defaultTask": "weather-native-layout"
+  },
+  "limits": [
+    "Actual production read/parser/formatDate/memoryYears use mocked EXIF getters; Android Log is mocked only during EXIF mock setup. No real EXIF decoder, physical timezone change, caption UI, native/optimized caption-correction execution, provider or SMB acceptance.",
+    "Already parsed Meta values, EXIF offset tags and concurrent default-zone changes remain unselected. This fixes newly read captions only; existing memory/fallback rules remain. The one current Family screenshot shows clock/date without a photo or caption and supplies no caption visual acceptance.",
+    "Initial 6-test attempt had 5 fixture-initialization failures and 1 control; excluded from timezone acceptance. Fresh repaired unchanged-source baseline has 2 AssertionErrors and 4 controls. Same six bodies and literal expectations are retained.",
+    "Public manifest remains1.83/code77. No phone, publication, HA, prior-scope reopening or broader completion claim; original cohort clock includes all discovery and delivery."
+  ],
+  "privateEvidenceBindings": {
+    "photo-caption-final-source-review.json": {
+      "sha256": "7c3b6c1760e0f8f5e1912f1f22c618943579d656d247dfc5a5c5976f170aa0be",
+      "bytes": 13975
+    },
+    "final-gate-review.json": {
+      "sha256": "994231b5bc86e94c726dc1203af504c2d888d6b131e56937f0550271efd504ee",
+      "bytes": 23476
+    },
+    "final-gate-binding-manifest.json": {
+      "sha256": "d5581afab80d84f1580b10ad7e339271fe5c6c5212a1e2a51328cba032c6f5ec",
+      "bytes": 381501
+    },
+    "package-proof.json": {
+      "sha256": "c75acf488a0d5159b0bd17b5e0d9dccda34dd684a1c768fe2cc9e185f3f7e418",
+      "bytes": 573
+    },
+    "family-current-visual-review.json": {
+      "sha256": "183302ca4f9a5eee57d87b6d9777140931efe58ece73e22cdd5c7c1c701035bc",
+      "bytes": 431
+    },
+    "baseline-red.json": {
+      "sha256": "ac9698082bab885e3c9ca6e98f49e7a3248a515d5729ab94b4463c6c03da6f43",
+      "bytes": 3092
+    },
+    "baseline-repaired-red.json": {
+      "sha256": "6b8d6089175c6162085d6a48845284a210264414bfd8b90874b65a9b3e669e06",
+      "bytes": 1875
+    },
+    "baseline-focused.xml": {
+      "sha256": "bada68fae551d0e8b4299e93c8e5a1a4582b9ac9dc89fa233f0a6e9186a27d10",
+      "bytes": 42404
+    },
+    "baseline-repaired.xml": {
+      "sha256": "d35472b466a9065dc04f2cccf779f5a5c5e7f95e6c3a1dfce47d3533c5838b0d",
+      "bytes": 10558
+    },
+    "baseline-focused.log": {
+      "sha256": "b33feb42d653a08a1d5485bf610ff2d57d98d0fc3269651a42cb01176b8c2064",
+      "bytes": 3596
+    },
+    "baseline-focused-repaired.log": {
+      "sha256": "a45bb8108435259ad1465ba84eb171588bf13c85c745430bb899427d4d6eeb0b",
+      "bytes": 2581
+    },
+    "PhotoCaptionTimeZoneTest-initial.kt": {
+      "sha256": "8b695fca8c0769782f5caa610d03b688f36f49427071c0c2fee4a606d25a447f",
+      "bytes": 3922
+    },
+    "PhotoCaptionTimeZoneTest.kt": {
+      "sha256": "8e5e60cb5d7a30e0bdefc33523f29a0b58165ccd94e0537ef6a2f9030c613d5b",
+      "bytes": 4011
+    },
+    "photo-caption-timezone-fixture-plan.json": {
+      "sha256": "97f97ad1e32728620942dc068697278b95a86e0ee5bd6ef9fcc245146cbbd940",
+      "bytes": 6818
+    },
+    "photo-caption-boundary-repair.json": {
+      "sha256": "6631792ebb2e51c909d6a3576c133838e347edd78613da60b6f46c3132d0211d",
+      "bytes": 4523
+    },
+    "frozen-caption-plan.json": {
+      "sha256": "308197881ba20663a8850869cd1bac4f17b08c2de53fc3536583fc0138071ad5",
+      "bytes": 4998
+    },
+    "photo-caption-prior-scope-review.json": {
+      "sha256": "89489d390c83477df901d0ed0effe0f731b7f87e05e7f77083874bb316c40438",
+      "bytes": 9074
+    },
+    "photo-caption-prior-scope-binding-manifest.json": {
+      "sha256": "fd3a61946547920efffb645ec266450ae459df4a8377b8c167b72704df26b6ff",
+      "bytes": 20578
+    },
+    "photo-caption-independent-source-plan-review.json": {
+      "sha256": "49981cff99cc6dd85ca0e563f82affafb8d7662879fdd5d34fa992081543982a",
+      "bytes": 11224
+    },
+    "photo-caption-independent-repair-baseline-review.json": {
+      "sha256": "703f79831c47ed8165de1cd5eec062a415d93cc518458cea8b8774bfdb707fc5",
+      "bytes": 9562
+    },
+    "root-boundary-repair-admission.json": {
+      "sha256": "01ecfb1dbc4f92f35a2957f5ce1faecbc8c13c139981c56b6f057ead512ed6dd",
+      "bytes": 530
+    },
+    "caption-baseline.kt": {
+      "sha256": "a2f325cdc4e9af368039d552c2a3eba617cb307306d55bb3a42dc290ebd09b4c",
+      "bytes": 6951
+    },
+    "gradle-baseline.kts": {
+      "sha256": "43ad17c89ca17e3d78debcfb07e505603976734d727b18042c50144ff4c69bea",
+      "bytes": 11816
+    },
+    "artifact.json": {
+      "sha256": "d9710ce10859c44a4329f4f2dc340ccdb88e61b308f22f524171373b1fc307f0",
+      "bytes": 1696
+    },
+    "jvm.json": {
+      "sha256": "275873f0023b02cc99a123725e6cb56f672bde84639237b95fec13a54800a471",
+      "bytes": 938
+    },
+    "source-hashes.json": {
+      "sha256": "f4541841b460f94a7ca674f2338cf9f92f49113858704ca02f4fe8445f606d4c",
+      "bytes": 367
+    },
+    "full-gate.log": {
+      "sha256": "4c630a860faccf209d80db8057a0d0fe4f4ae5fd5454ce8440075eb8628a3de2",
+      "bytes": 13732
+    },
+    "deploy-results.json": {
+      "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31",
+      "bytes": 231
+    },
+    "preservation.json": {
+      "sha256": "2de61275dfa1480b50994ef53e781f275c02efce4e91569504dfda44473a7ed6",
+      "bytes": 718
+    },
+    "health.json": {
+      "sha256": "aff9e74178524be880d9469988e5e9f530809709f269b99e0611cf3c774b5dfd",
+      "bytes": 579
+    },
+    "credential-cleanup.json": {
+      "sha256": "584d00c535583d9f5c6f035e521ab6f64eefddfd75629ef4a3518d05d6a25d76",
+      "bytes": 119
+    },
+    "caption-docs-before-operating": {
+      "sha256": "8cb178613d54a9f11d1aa03d6f7aa085d469b593bddf930ff69fad908d6f5a9d",
+      "bytes": 153197
+    },
+    "caption-docs-before-roadmap": {
+      "sha256": "d3f1099458fa6f2445c8deebdab2ce45d4f5f2115c076c0e1e1e79c86dd37d14",
+      "bytes": 341605
+    },
+    "caption-docs-before-index": {
+      "sha256": "22036486626f7ac41c9ec0222ad11756f7d91c27e39bdf6e25ed4fbaca13790c",
+      "bytes": 30834
+    },
+    "write-caption-delivery.py": {
+      "sha256": "629575b7b2cf93fe3a9357177a18c229976507718393d1979764d83448028f9f",
+      "bytes": 15613
+    },
+    "write-caption-delivery-initial.py": {
+      "sha256": "b6b4ef5c4817ffb8098ca18b05e75e80afdc2f17f4e74ef40bda2d6868533472",
+      "bytes": 15108
+    },
+    "caption-writer-root-read.json": {
+      "sha256": "33dc4560d1164be96c568f8f2a43ec2f9e6680507051dab04a52cb8470a68314",
+      "bytes": 723
+    },
+    "caption-writer-freeze.json": {
+      "sha256": "06af530fe11f87068a3dc455a67c6945726b482647723fd35d9d97c23e6a4231",
+      "bytes": 610
+    },
+    "baseline-focused-terminal.json": {
+      "sha256": "3210ce9e7b8047e4024cfe52a17f32c99f91a4fbe10240075ae2ab106c331d2e",
+      "bytes": 304
+    },
+    "baseline-focused-repaired-terminal.json": {
+      "sha256": "f13ac2412a7ee706b026ca8cf3083d42828febb3852164c7e0b14210b42485c3",
+      "bytes": 304
+    },
+    "full-gate-terminal.json": {
+      "sha256": "a788c913c037d0bb9412371282c4969cbe724514616dcd126fe5f0ce5db0182d",
+      "bytes": 328
+    },
+    "package-proof-terminal.json": {
+      "sha256": "5a8777fbeac7ba3b9c9d3b98362635ff32a5ebefb9f07376a654af65d203c050",
+      "bytes": 258
+    },
+    "preflight-terminal.json": {
+      "sha256": "aeb30bb73d97541a3540b62b2c89074b5f61704d8edc9d45d4cc1688e18fb4a9",
+      "bytes": 264
+    },
+    "room-deploy-terminal.json": {
+      "sha256": "c7ee0891e8cf1e921b121527c9a60863b1234c0b13024f299ac1752b16aec326",
+      "bytes": 251
+    },
+    "postflight-terminal.json": {
+      "sha256": "e803135f0e1da0720373a73f76ce08fb32df86680d8cba3f4eceef63d24121cd",
+      "bytes": 263
+    },
+    "health-observation-terminal.json": {
+      "sha256": "227540864f39a9ef74580ae00a2a58bf7ef0947a897ffe6e5bd061b819057525",
+      "bytes": 252
+    },
+    "cleanup-credentials-terminal.json": {
+      "sha256": "c241a74da65ee240652c2224e21aaf08b08c9f2241fce6f75bca7efe1c780550",
+      "bytes": 264
+    },
+    "family-before-private.json": {
+      "sha256": "3b2bc7b5c601046b3c033d0a059b5b3ca6ea6cb7b0c6f65c07460a3c6788ceef",
+      "bytes": 62666
+    },
+    "family-after-private.json": {
+      "sha256": "216f8904585b23f2d75f5d0b27b5e1cc3e1be5ae01fe930d22ec2cad559f388b",
+      "bytes": 62667
+    },
+    "family-prefs-before-private.json": {
+      "sha256": "e05f67795d2b5835b38c7e7e396afbcd46d59848fb5ed81f23508e49d190d0a8",
+      "bytes": 15708
+    },
+    "family-prefs-after-private.json": {
+      "sha256": "e05f67795d2b5835b38c7e7e396afbcd46d59848fb5ed81f23508e49d190d0a8",
+      "bytes": 15708
+    },
+    "family-diag-private.bin": {
+      "sha256": "51c0bd81c4bf1751fe05209c8a4d1c2e8e8be044374ea446138ccf54cba9f1d5",
+      "bytes": 2239
+    },
+    "family-logcat-private.bin": {
+      "sha256": "50a88d798be77f958e3ada63c3117f4b11e7c89183dd0135f5166e06bbcd58ed",
+      "bytes": 242936
+    },
+    "living-before-private.json": {
+      "sha256": "ed29cb1e9bee9dfecdccde94cb6953253c46b597451da9964fa2a8181add0924",
+      "bytes": 62553
+    },
+    "living-after-private.json": {
+      "sha256": "2397f1441076cd907ab0e5380430813303ec57b5682f1e7fbd44b2b9d3fb8c4d",
+      "bytes": 62554
+    },
+    "living-prefs-before-private.json": {
+      "sha256": "222a587bbc37b83c9b4f75339aaadf574cccedd9773eb706c52a89eb4bee1a20",
+      "bytes": 14076
+    },
+    "living-prefs-after-private.json": {
+      "sha256": "222a587bbc37b83c9b4f75339aaadf574cccedd9773eb706c52a89eb4bee1a20",
+      "bytes": 14076
+    },
+    "living-diag-private.bin": {
+      "sha256": "c3adee41e08fd9e77a852b431580e16cc1ba853c047eebb9da9ec78480e3514d",
+      "bytes": 2062
+    },
+    "living-logcat-private.bin": {
+      "sha256": "9748731e8ca30ef78d4e853d17930e50a0c24344d9b500ff152a981f2ae5d94b",
+      "bytes": 275271
+    }
+  },
+  "documentBindings": {
+    "docs/portal-photo-caption-timezone-2026-11-03.md": {
+      "sha256": "59ffecae1a1958e29467329980ffbc84cfe2fa790e1af8bff5154d87896409eb",
+      "bytes": 2310
+    },
+    "docs/portal-product-operating-state.md": {
+      "sha256": "796827cc8d91668435638804b14703d46deafcd522bfd7a2cca04bc65a48fb5a",
+      "bytes": 154086
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+      "sha256": "35be41d08ec6fc6e15f12a17e6db41afde9578bf152ecb392979bb036afb6f77",
+      "bytes": 345013
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/index.html": {
+      "sha256": "d03a00288ee4989899a7ffd77de061b3eda74cef532ac055648f32df25bb5eba",
+      "bytes": 31727
+    }
+  },
+  "sanitization": "Only relative source paths, public hashes/counters and safe booleans are emitted; no raw owner data, hostname, IP, token, serial, private paths or XML.",
+  "closure": "Future docs/browser QA and commit are separate private closure records; broader goal remains active."
+}

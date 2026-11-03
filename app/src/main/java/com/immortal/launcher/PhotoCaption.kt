@@ -13,6 +13,7 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import java.util.concurrent.ConcurrentHashMap
 import org.json.JSONObject
 
@@ -44,7 +45,12 @@ object PhotoCaption {
               val raw =
                   exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
                       ?: exif.getAttribute(ExifInterface.TAG_DATETIME)
-              raw?.let { synchronized(EXIF_DATE) { EXIF_DATE.parse(it) }?.time }
+              raw?.let {
+                synchronized(EXIF_DATE) {
+                  EXIF_DATE.timeZone = TimeZone.getDefault()
+                  EXIF_DATE.parse(it)
+                }?.time
+              }
             }
             .getOrNull()
     val latLng = runCatching { exif.getLatLong() }.getOrNull()
@@ -52,7 +58,7 @@ object PhotoCaption {
   }
 
   // EXIF stores capture time as "yyyy:MM:dd HH:mm:ss". SimpleDateFormat isn't thread-safe,
-  // so callers (which run on a background thread) synchronize on it.
+  // so callers synchronize on it and refresh the current zone before parsing a new photo.
   private val EXIF_DATE = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.US)
 
   /** Friendly capture date, e.g. "June 22, 2026" in the device locale. Null when absent. */
