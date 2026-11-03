@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "status": "locally_verified_source_contract",
+  "recordedAt": "2026-11-03T21:21:58.285585Z",
+  "issueClock": {
+    "startedAt": "2026-11-03T21:08:44Z",
+    "deadline": "2026-11-03T21:38:44Z",
+    "reset": false,
+    "discoveryIncluded": true
+  },
+  "integration": {
+    "immortalCommit": "60b1fc00027f29087a490bba5c69d3e2d5bbf4c1",
+    "localOnly": true,
+    "deviceInstalls": 0,
+    "hostedRunsObserved": 0
+  },
+  "contract": {
+    "scope": "Active Home Photo Memory decoder, EXIF transpose 5/transverse 7 angle ordering",
+    "authority": "https://developer.android.com/reference/android/graphics/Matrix",
+    "authorityDocument": "documents/developer.android.com/reference/android/graphics/Matrix",
+    "postRotate": "M'=R*M",
+    "preScale": "M'=M*S",
+    "tag5Baseline": [
+      0,
+      -1,
+      -1,
+      0
+    ],
+    "tag5Corrected": [
+      0,
+      1,
+      1,
+      0
+    ],
+    "tag7Baseline": [
+      0,
+      1,
+      1,
+      0
+    ],
+    "tag7Corrected": [
+      0,
+      -1,
+      -1,
+      0
+    ],
+    "sourceDelta": "Only TRANSPOSE +90 \u2192 -90 and TRANSVERSE -90 \u2192 +90; every other Home source byte unchanged",
+    "homePixelRedObserved": false,
+    "nativePixelAcceptance": false,
+    "newRegressionMethods": 0
+  },
+  "controls": {
+    "existingOracleCases": 12,
+    "existingOracleExitCode": 0,
+    "existingOracleIsHomeRegression": false,
+    "fullJvmUniqueCases": 4358,
+    "suites": 453,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "includesExistingOracleCases": 12,
+    "uniqueCaseCountIsNotSumOfRuns": true
+  },
+  "gates": {
+    "startedAt": "2026-11-03T21:17:34.740978+00:00",
+    "finishedAt": "2026-11-03T21:18:19.500116+00:00",
+    "jvmExitCode": 0,
+    "debugAssembleExitCode": 0,
+    "allSuiteTimestampsWithinRun": true,
+    "kotlinAndUnitTasksExecuted": true
+  },
+  "builtArtifact": {
+    "kind": "debug APK",
+    "bytes": 51438540,
+    "sha256": "1a4aef15085df4e151803e536da5fa496bbb3d3222a8bea33d62c1a705d9704b",
+    "installed": false,
+    "signerOrVersionInspected": false
+  },
+  "reviews": {
+    "sourceChecksPassed": 6,
+    "verificationQualificationChecksPassed": 8,
+    "runtimeChecksPassed": 10,
+    "rootFullReadAndDirectRehashBeforeSourceCommit": true
+  },
+  "sourceBindings": [
+    {
+      "label": "current Home source",
+      "bytes": 10461,
+      "sha256": "a1cdfe35456b82f5a3253e42beced197add120f45ac6a7b115a2e41d55446e9d"
+    },
+    {
+      "label": "retained Home source before correction",
+      "bytes": 10461,
+      "sha256": "a7f7641ff57cee578e1ddcf1ba05cb5c4f162dbce9d2027e13153d820c9012f7"
+    },
+    {
+      "label": "unchanged shared transform helper",
+      "bytes": 2809,
+      "sha256": "03d4a094dedd9307272728508eb6d5ccb26492c6e4f838f4e36966d68b51a8c5"
+    },
+    {
+      "label": "unchanged shared oracle tests",
+      "bytes": 5113,
+      "sha256": "67a1f38c60ee989d1dce77cfe09180ded4d91695d99a75139aafa2fb709df41d"
+    }
+  ],
+  "privateEvidenceBindings": [
+    {
+      "label": "unit-start.json",
+      "bytes": 1602,
+      "sha256": "73a1ac9ea25d737d0f3f757d8788da430fc7ddd91eb02fe833330db48ab85c29"
+    },
+    {
+      "label": "home-exif-source-contract.json",
+      "bytes": 2637,
+      "sha256": "04fe5f72243902977b2c65ae1a42b2e81facb64a1bbe937d76c44bc67b92fe88"
+    },
+    {
+      "label": "thumbnail-discovery.json",
+      "bytes": 17171,
+      "sha256": "23820db62818b55b7aa5ba394c3e8bfcce5b086f77c9ab00c3dbe31fa37ff717"
+    },
+    {
+      "label": "thumbnail-home-exif-dedup.json",
+      "bytes": 17813,
+      "sha256": "01e671b905eaa339e09f9c1e0f5e424d778b587beeb8358535fde59de1bd83a8"
+    },
+    {
+      "label": "ma-websocket-discovery.json",
+      "bytes": 12262,
+      "sha256": "bb330cabe53bb8a931628843aed4609783d0538cccb28d2c7e8d1a0a0cd61757"
+    },
+    {
+      "label": "webapp-load-error-discovery.json",
+      "bytes": 12953,
+      "sha256": "c58366460258ce170968d2841a253eef14bb08101b1c929b19020811eb7db343"
+    },
+    {
+      "label": "home-photo-baseline.kt",
+      "bytes": 10461,
+      "sha256": "a7f7641ff57cee578e1ddcf1ba05cb5c4f162dbce9d2027e13153d820c9012f7"
+    },
+    {
+      "label": "home-exif-source-qualification-final.json",
+      "bytes": 8418,
+      "sha256": "5f6abb9e01393bbc29e64061ba0cf53354a9d58e339dc39fd594a00dc4106c5d"
+    },
+    {
+      "label": "home-exif-verification-qualification.json",
+      "bytes": 9896,
+      "sha256": "8180f61a52a5130a8c7aef43eb3d3b70e6cfe5d0c0177187d18134aa67f80022"
+    },
+    {
+      "label": "home-exif-runtime-review.json",
+      "bytes": 12033,
+      "sha256": "c5d27dab907deae06c038ed9fcc8f878cf179d22658956482a3384d77fe26082"
+    },
+    {
+      "label": "home-exif-existing-oracle-baseline.json",
+      "bytes": 743,
+      "sha256": "bcb83e965b7714fe5b54a6cdf2f22f7cdb31b6c56a8f4250b2b549c5e640aed9"
+    },
+    {
+      "label": "home-exif-existing-oracle-baseline.log",
+      "bytes": 1894,
+      "sha256": "7c17f2bf794afdbfb98a3d6ef057495657eb70b88b062f92fd51b6e980b1bd86"
+    },
+    {
+      "label": "existing-oracle-results.xml",
+      "bytes": 2101,
+      "sha256": "e21c15248a57db20108f89f9a2a25ac3fcfb3b6547a51f670fbdf9d849082331"
+    },
+    {
+      "label": "home-exif-app-gates.json",
+      "bytes": 240561,
+      "sha256": "14c163db3d68d2706a2a40c61496f28fa58246a0b37a2a33571920f15d40e3a3"
+    },
+    {
+      "label": "home-exif-app-gates.log",
+      "bytes": 3210,
+      "sha256": "52f1b9f5d47c6f7ca37f3362a0a10530eafbb5b6e60829d026fd9e04e0719b00"
+    },
+    {
+      "label": "home-exif-jvm-results.zip",
+      "bytes": 331398,
+      "sha256": "a0b4010aa78043fce2d1af3312d66d59260bfdcde880b5d16eb6a74f48eb137f"
+    },
+    {
+      "label": "home-exif-debug.apk",
+      "bytes": 51438540,
+      "sha256": "1a4aef15085df4e151803e536da5fa496bbb3d3222a8bea33d62c1a705d9704b"
+    },
+    {
+      "label": "home-exif-root-source-check.json",
+      "bytes": 4393,
+      "sha256": "b995bb29559af0edc180604fda5a36779d5f1aad741790dc46d11aae833e212e"
+    },
+    {
+      "label": "home-exif-root-gate-check.json",
+      "bytes": 2063,
+      "sha256": "0b955668cce1d820170d425a8a0983ee96710050d186e4b0343aef8ce2275f0b"
+    },
+    {
+      "label": "home-exif-root-precommit-runtime-review.json",
+      "bytes": 2180,
+      "sha256": "32e6c6100589673f946f5900251c3bd5de61c9017bb249a85398c209429d892f"
+    },
+    {
+      "label": "home-exif-source-commit.json",
+      "bytes": 617,
+      "sha256": "07ed20f139a7cb962b9d5966fed3068deebd3ba2f9e0e71fcbe663bcaf38ba88"
+    }
+  ],
+  "limits": [
+    "Source/API-contract algebra establishes reversed diagonal mappings; no executed Home pixel RED/GREEN, native Matrix/bitmap/EXIF parser, generated-image or physical UI result.",
+    "All 12 existing oracle methods use the shared pure helper and cannot detect this Home branch; no new regression coverage. They are included in 4,358 unique full-suite cases, not added again.",
+    "Host JVM/debug build only. No device/phone/install, real provider/household photo, source credential/settings, release/version/manifest/catalog, push/publication or hosted acceptance.",
+    "Gradle offline limits dependency resolution; no whole-suite DNS/network isolation claim. Existing MA fake endpoint may resolve before fake connect; no DNS delay/reliability defect observed or new task admitted.",
+    "Positive named prior scope/write-set distinctions only; no exhaustive historical absence certificate. Earlier cache/slideshow/source/performance/held clocks remain.",
+    "MA framing and WebApp error checks are bounded negatives; Thumbnails and old PhotoMemoryStrip lack executable current callers and remain excluded."
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T21:02:39.661168+00:00",
-  "updatedLabel": "3 Nov 2026 (UTC)",
+  "updatedAt": "2026-11-03T21:21:58.285585Z",
+  "updatedLabel": "3 November 2026 \u00b7 Home EXIF source correction",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,52 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "home-photo-exif-diagonals",
+      "title": "Home photos: correct diagonal EXIF reflections",
+      "summary": "Local source correction: EXIF 5/7 rotation signs follow Android Matrix order. All 4,358 JVM cases and debug assembly pass; native Home pixels remain unverified.",
+      "description": "Correct only the two diagonal-reflection rotation signs in the active Home Photo Memory decoder. Documented API algebra and the shared literal corner oracle distinguish the mappings.",
+      "status": "verified",
+      "verification": "Source/API contract \u00b7 12 existing shared controls \u00b7 4,358 JVM / 453 suites \u00b7 debug assembly",
+      "kind": "Home photo source-contract correction",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent source and gate review",
+      "deployment": "Local Immortal 60b1fc00 only; debug APK retained, no device install or pixel acceptance.",
+      "state": "Exact two-sign correction; all other Home bytes preserved. Existing controls do not execute Home/Matrix; no pixel RED or new coverage.",
+      "acceptance": [
+        "Follow documented Matrix composition for transpose 5 and transverse 7.",
+        "Change only the two rotation signs and retain other source behavior.",
+        "Pass the full existing JVM CI gate and debug assembly.",
+        "Record native-pixel and regression-coverage limits explicitly."
+      ],
+      "evidence": [
+        {
+          "text": "Source correction, actual host gates, artifact and limits.",
+          "source": "docs/portal-home-photo-exif-diagonals-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized source/run/artifact evidence.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/home-photo-exif-diagonals-verification.json"
+        }
+      ],
+      "limits": [
+        "No executed Home pixel RED/GREEN, native Matrix/bitmap/EXIF parser, generated image, physical Home or provider acceptance.",
+        "12 existing shared-helper controls cannot detect the Home branch; no new regression coverage. They are included in 4,358 unique full-suite cases.",
+        "Source/API algebra and exact two-sign comparison only; no crop, dimension, source/cache/lifecycle or UI policy changes.",
+        "Debug APK built and retained; no signer/version inspection, installation, release, phone, live provider/account, household photo or publication action.",
+        "Gradle dependencies offline; whole existing test suite not certified DNS-isolated. MA fake hostname dependency is unobserved qualification, not a reproduced defect or new task.",
+        "Earlier named cache/slideshow/preview/buffer/UI and performance scopes retain clocks; bounded positive scope distinction is not exhaustive historical absence."
+      ],
+      "next": "Retain the local source correction. Native Home pixels and deployment remain separate; continue distinct authorized work within previous holds.",
+      "issueClock": {
+        "startedAt": "2026-11-03T21:08:44Z",
+        "deadline": "2026-11-03T21:38:44Z",
+        "reset": false,
+        "discoveryIncluded": true
+      }
+    },
     {
       "id": "ci-sdk-install-exit",
       "title": "Android CI: preserve SDK installer failures",
