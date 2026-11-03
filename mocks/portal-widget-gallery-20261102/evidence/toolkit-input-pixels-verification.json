@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T19:34:55.565199+00:00",
+  "status": "locally_verified",
+  "scope": "Toolkit mirror mapping clamps to valid pixel indices",
+  "originalClock": {
+    "startedAt": "2026-11-03T19:24:33Z",
+    "deadline": "2026-11-03T19:54:33Z",
+    "reset": false,
+    "discoveryIncluded": true
+  },
+  "baseline": {
+    "tests": 20,
+    "assertionFailures": 5,
+    "controls": 15,
+    "errors": 0,
+    "skipped": 0,
+    "newFixtureFailures": 3,
+    "newFixtureControls": 5,
+    "revisedExistingFailures": 2,
+    "sourceSha256": "a34361df235fccb7d691d98b62fdb48e5870a2906576d0422cb79defddcbb926",
+    "runStart": "2026-11-03T19:26:55.064698+00:00",
+    "runEnd": "2026-11-03T19:27:11.926051+00:00",
+    "exitCode": 1
+  },
+  "candidate": {
+    "tests": 220,
+    "suites": 37,
+    "focused": 20,
+    "newFixtureMethods": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "sourceSha256": "e3e85fe59f052e74e37e41d3474902b38d0f3010b34596ccb087435543c6dab7",
+    "fixtureSha256": "8eaf8f53c6519d8f470d1960276fdc6cf3df851789f882bc646e06fcf60e0273",
+    "existingFixtureSha256": "6f8a335c5408bb48e89393371baeece33bed60dea095e525f1a64ebecb69467d",
+    "runStart": "2026-11-03T19:27:52.125259+00:00",
+    "runEnd": "2026-11-03T19:28:12.464779+00:00",
+    "exitCode": 0,
+    "apkSha256": "f56f662786983d92ac93074e663098037d618070b70112cbee6dc27ccf669974",
+    "apkBytes": 13901710
+  },
+  "integration": {
+    "ToolkitCommit": "685adb1cd358a7af794e053fa84f3deaaa06454c",
+    "parent": "a74f5663d4ee38367e7a1769f55f4075a4befc92",
+    "localOnly": true,
+    "deployed": false,
+    "published": false
+  },
+  "independentReviewReportSha256": "00974cb2190ac7e0971b123c2c2822cc8513c300017e10f6b7b25309c32c37b7",
+  "independentReview": {
+    "checks": 14,
+    "passed": 14,
+    "blockers": 0
+  },
+  "ci": {
+    "existingConfiguredWorkflowCoversNewTest": true,
+    "hostedRunsObserved": 0
+  },
+  "limits": [
+    "Actual pure InputInjector mapping and command builders only; MirrorScreen/ViewModel gesture callers and wm-size dimensions are source-reviewed, not instantiated.",
+    "No native gesture, rendering, codec, orientation, input injection, phone/Portal, provider, ADB transport or performance acceptance.",
+    "Letterbox gestures still clamp to edges; no suppression or UX redesign. Interior scaling and invalid-dimension fallback remain.",
+    "Two old methods deliberately encoded width/height as inclusive bounds. Three assertion literals and two comments were corrected before RED; all 20 focused methods remain frozen thereafter.",
+    "One-pixel99/100 is a passing control, not a baseline failure. No NaN/infinity/overflow or malformed-size policy claim.",
+    "Initial result collector failed on a Z timestamp after Gradle exited 1. Same XML was parsed and archived without rerunning tests or changing fixtures.",
+    "Debug assembly/bytes only; no signer, installed identity, version/dependency change, hosted CI, device action, push or publication.",
+    "Earlier APK candidate stays parked; expired screenshot, scanner and other scopes retain their original clocks."
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T19:17:27.415824+00:00",
+  "updatedAt": "2026-11-03T19:34:55.565199+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,55 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "toolkit-input-pixels",
+      "title": "Portal Toolkit: keep mirror input inside valid pixels",
+      "summary": "Letterbox taps and overshooting drags now target the last valid device pixel. Five baseline assertions become 20 passing focused cases; 220 host tests pass.",
+      "description": "Clamp positive device coordinates to width-1 and height-1 before the existing tap/swipe/long-press commands.",
+      "status": "verified",
+      "verification": "5 baseline assertions/15 controls → 20 pass ·220 JVM/37 suites ·debug assembly ·independent 14/14",
+      "kind": "Toolkit mirror input",
+      "platforms": [
+        "companion",
+        "tooling"
+      ],
+      "owner": "Toolkit engineering / independent source and result review",
+      "deployment": "Local Toolkit 685adb1c only; no native/phone/device or hosted CI acceptance.",
+      "state": "Exact two-line upper-clamp correction. Real pure mapper and command builders; caller path reviewed statically. Two historical inclusive expectations corrected before RED. All previous holds remain.",
+      "acceptance": [
+        "Reproduce ordinary in-view letterbox commands on unchanged source.",
+        "Emit valid final pixel indices for covered tap, long-press and drag endpoints.",
+        "Retain interior/negative/invalid-size controls and all original methods.",
+        "Pass frozen focused cases, full host tests and debug assembly."
+      ],
+      "evidence": [
+        {
+          "text": "Actual baseline, correction and scoped acceptance.",
+          "source": "docs/portal-toolkit-input-pixels-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized run/source/artifact facts.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/toolkit-input-pixels-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual pure InputInjector mapping and command builders only; MirrorScreen/ViewModel gesture callers and wm-size dimensions are source-reviewed, not instantiated.",
+        "No native gesture, rendering, codec, orientation, input injection, phone/Portal, provider, ADB transport or performance acceptance.",
+        "Letterbox gestures still clamp to edges; no suppression or UX redesign. Interior scaling and invalid-dimension fallback remain.",
+        "Two old methods deliberately encoded width/height as inclusive bounds. Three assertion literals and two comments were corrected before RED; all 20 focused methods remain frozen thereafter.",
+        "One-pixel99/100 is a passing control, not a baseline failure. No NaN/infinity/overflow or malformed-size policy claim.",
+        "Initial result collector failed on a Z timestamp after Gradle exited 1. Same XML was parsed and archived without rerunning tests or changing fixtures.",
+        "Debug assembly/bytes only; no signer, installed identity, version/dependency change, hosted CI, device action, push or publication.",
+        "Earlier APK candidate stays parked; expired screenshot, scanner and other scopes retain their original clocks."
+      ],
+      "next": "Retain local verified correction; physical input/rendering and hosted CI remain separate. Continue distinct authorized work without resetting earlier holds.",
+      "issueClock": {
+        "startedAt": "2026-11-03T19:24:33Z",
+        "deadline": "2026-11-03T19:54:33Z",
+        "reset": false,
+        "discoveryIncluded": true
+      }
+    },
     {
       "id": "toolkit-backup-completeness",
       "title": "Portal Toolkit: reject incomplete app restores",
