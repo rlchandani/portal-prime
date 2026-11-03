@@ -10,6 +10,7 @@ package com.immortal.launcher
 import android.util.Base64
 import android.util.Log
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 
 /**
@@ -84,27 +85,27 @@ object DavSource {
   ): List<Media>? =
       runCatching {
             val headers = authHeaders(user, pass)
-            val origin = origin(baseUrl) ?: return null
             val out = ArrayList<Media>()
             val stack = ArrayDeque<String>()
-            val rootUrl = dir(baseUrl)
+            val rootUrl = resolveHref(dir(baseUrl), dir(baseUrl)) ?: return null
             stack.addLast(rootUrl)
             val seen = HashSet<String>()
             while (stack.isNotEmpty() && out.size < cap) {
               PhotoSourceWork.checkpoint()
               val url = stack.removeLast()
               if (!seen.add(url)) continue
-              val selfPath = URL(url).path
+              val selfPath = URI(url).rawPath
               val body = propfind(url, headers, "1") ?: if (url == rootUrl) return null else continue
               for ((href, isCollection) in parseEntries(body)) {
                 PhotoSourceWork.checkpoint()
                 if (out.size >= cap) break
-                if (href.trimEnd('/') == selfPath.trimEnd('/')) continue // the folder itself
-                val full = origin + href
+                val full = resolveHref(url, href) ?: continue
+                val resource = URI(full)
+                if (resource.rawPath.trimEnd('/') == selfPath.trimEnd('/')) continue // the folder itself
                 if (isCollection) {
                   stack.addLast(dir(full))
                 } else
-                    when (LocalMedia.classify(href)) {
+                    when (LocalMedia.classify(resource.path)) {
                       LocalMedia.Kind.IMAGE -> out.add(Media(full, false))
                       LocalMedia.Kind.VIDEO -> if (includeVideo) out.add(Media(full, true))
                       else -> {}
@@ -116,12 +117,21 @@ object DavSource {
           .onFailure { Log.w(TAG, "WebDAV listing failed for ${baseUrl.take(60)}", it) }
           .getOrNull()
 
-  /** `scheme://host[:port]` for a URL. */
-  private fun origin(url: String): String? =
+  /** RFC 4918 hrefs are absolute URIs or absolute paths; credentials stay on this origin. */
+  private fun resolveHref(folder: String, href: String): String? =
       runCatching {
-            val u = URL(url)
-            val port = if (u.port == -1) "" else ":${u.port}"
-            "${u.protocol}://${u.host}$port"
+            val base = URI(folder)
+            val ref = URI(href)
+            if (!ref.isAbsolute && (!href.startsWith('/') || ref.rawAuthority != null)) return null
+            val resolved = base.resolve(ref).normalize()
+            fun port(uri: URI): Int = if (uri.port != -1) uri.port
+                else if (uri.scheme.equals("https", true)) 443 else 80
+            if (!base.scheme.equals("http", true) && !base.scheme.equals("https", true)) return null
+            if (base.host == null || base.rawUserInfo != null || base.rawFragment != null ||
+                resolved.host == null || resolved.rawUserInfo != null || resolved.rawFragment != null ||
+                !base.scheme.equals(resolved.scheme, true) ||
+                !base.host.equals(resolved.host, true) || port(base) != port(resolved)) return null
+            resolved.toASCIIString()
           }
           .getOrNull()
 
@@ -133,10 +143,37 @@ object DavSource {
     val collRe = Regex("<[A-Za-z0-9]*:?collection\\b")
     for (m in response.findAll(xml)) {
       val block = m.value
-      val href = hrefRe.find(block)?.groupValues?.get(1)?.trim() ?: continue
+      val href = hrefRe.find(block)?.groupValues?.get(1)?.trim()?.let(::decodeXmlText) ?: continue
       out.add(href to collRe.containsMatchIn(block))
     }
     return out
+  }
+
+  /** Decode XML text once, without resolving DTD/custom entities or URL percent escapes. */
+  private fun decodeXmlText(text: String): String? {
+    val out = StringBuilder(text.length)
+    var start = 0
+    while (start < text.length) {
+      val amp = text.indexOf('&', start)
+      if (amp < 0) return out.append(text, start, text.length).toString()
+      out.append(text, start, amp)
+      val end = text.indexOf(';', amp + 1)
+      if (end < 0) return null
+      val entity = text.substring(amp + 1, end)
+      val code = when (entity) {
+        "amp" -> 38; "lt" -> 60; "gt" -> 62; "apos" -> 39; "quot" -> 34
+        else -> when {
+          entity.startsWith("#x") -> entity.substring(2).toIntOrNull(16)
+          entity.startsWith('#') -> entity.substring(1).toIntOrNull()
+          else -> null
+        }
+      } ?: return null
+      if (code !in 0x20..0xD7FF && code !in 0xE000..0xFFFD &&
+          code !in 0x10000..0x10FFFF && code != 9 && code != 10 && code != 13) return null
+      out.append(Character.toChars(code))
+      start = end + 1
+    }
+    return out.toString()
   }
 
   // --- HTTP PROPFIND ----------------------------------------------------------

@@ -21,7 +21,22 @@ The updated whole-product objective is
   deferred because they would require another phone command. Companion source
   and isolated QA remain available.
 
-- **Current room APK / latest local-folder delivery:** both rooms contain exact
+- **Current room APK / latest WebDAV delivery:** both rooms contain exact
+  optimized **1.91/code85**. The reader resolves absolute paths and same-origin
+  absolute URLs, decodes XML entities once, preserves percent escapes and
+  classifies download-query photos by path. Other-origin/malformed hrefs are
+  excluded. Eight initial HTTP failures became twelve passing cases;
+  **4,026 JVM/420 suites**, debug/optimized/R8/vital-lint gates passed.
+  Family's exact optimized reader improved **2/8→8/8** through separate shell
+  APK loading; all nine generated-auth PROPFIND requests matched and no foreign
+  request occurred. Real NAS accounts, photo decoding, app-UID networking and
+  redirect policy remain unverified. Both complete APK hashes and saved
+  configurations match; Family normal frame/font/services/Chrome retained.
+  Owned scratch, server and token registry removed; workers closed.
+  Original **01:10:42–01:40:42 UTC** clock includes cleanup and commit.
+  [Scoped receipt](portal-webdav-href-resolution-2026-11-03.md).
+
+- **Previous local-folder delivery:** both rooms received exact
   optimized **1.90/code84**. Canonical directory visits and a20,000-entry search
   budget prevent repeated alias/parent traversal; the media loop now stops at its
   cap. Initial10 host cases reproduced5 failures; final14 cases and

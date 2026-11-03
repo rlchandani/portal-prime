@@ -1,18 +1,66 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T01:07:21.911549+00:00",
-  "updatedLabel": "Phone photo activation guarded;16 native checks passed;1.7.8 installed on Pixel",
+  "updatedAt": "2026-11-03T01:23:36.466162+00:00",
+  "updatedLabel": "WebDAV photo links corrected; Family8/8; exact1.91 deployed to both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms retain exact optimized Portal1.90/code84. Companion1.7.8/code20 is installed on Pixel with exact APK proof and unchanged saved settings; its new photo action has isolated native acceptance. Historical receipts retain their versions. Physical full-app and real-network acceptance remain open.",
+    "Both rooms contain exact optimized Portal1.91/code85. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are now prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "webdav-href-resolution",
+      "title": "WebDAV photos: resolve server links and escaped filenames correctly",
+      "summary": "Delivered to both rooms. Absolute photo URLs, nested folders and XML-escaped filenames now resolve correctly.",
+      "description": "The original crawler appended absolute URLs to an origin and retained literal XML entity text. Resolve URLs on the configured origin, decode XML text once and keep percent escapes intact.",
+      "status": "delivered",
+      "verification": "8 original HTTP failures \u219212/12 \u00b74,026 JVM \u00b7Family2/8\u21928/8 \u00b7exact both-room APKs",
+      "kind": "Photo-source compatibility and reliable discovery",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent review / Family native QA",
+      "deployment": "Optimized1.91/code85 installed and completely hashed in Family Area and Living Area; whole saved configurations unchanged.",
+      "state": "Family Android10 exact optimized APK fixture; nine generated-auth PROPFIND requests, zero foreign requests; normal manual frame restored and visually checked.",
+      "acceptance": [
+        "Reproduce malformed absolute URLs and un-decoded XML filenames.",
+        "Accept absolute paths and same-origin absolute URIs, avoiding current-folder recursion.",
+        "Decode named/numeric XML references once while preserving URL percent encoding.",
+        "Exclude malformed,non-HTTP,user-info,fragment and other-origin hrefs.",
+        "Retain image/video selection,media caps and cancellation checkpoints.",
+        "Verify actual optimized Android reader,identical installed APKs and complete saved-state preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Reproduction,reader scope,delivery and limitations.",
+          "source": "docs/portal-webdav-href-resolution-2026-11-03.md"
+        },
+        {
+          "text": "Twelve HTTP tests,full suite,native before/after and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/webdav-href-resolution-verification.json"
+        }
+      ],
+      "limits": [
+        "Generated metadata and Basic-auth values only; no real NAS/source changes, image downloads or app-UID networking acceptance.",
+        "Native cases do not establish redirect credential behavior, full XML parsing or collection URLs with query parameters.",
+        "Cap,video,download-query and malformed-reference controls also pass JVM tests; no native video/query acceptance claimed.",
+        "Living visual presentation not inspected; exact installed bytes and complete saved configuration checked.",
+        "No FPS,latency or whole-product performance claim; local preview only, publication metadata unchanged.",
+        "Pixel is excluded; exhausted issue clocks and design approvals remain unchanged."
+      ],
+      "next": "Continue independent whole-product work; real NAS/photo decoding and redirect policy remain separate acceptance. Do not reopen exhausted issues or control Pixel.",
+      "issueClock": {
+        "startedAt": "2026-11-03T01:10:42Z",
+        "deadline": "2026-11-03T01:40:42Z",
+        "firstSourceAuditClockRetained": true,
+        "scope": "WebDAV href resolution and one-pass XML text decoding"
+      }
+    },
     {
       "id": "companion-photo-activation",
       "title": "Phone photos: authorize slideshow activation from a confirmed listing",

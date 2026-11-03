@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T01:23:36.466162+00:00",
+  "scope": "WebDAV href resolution and one-pass XML text decoding",
+  "sourceBranch": "codex/webdav-href-resolution-20261103",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.91",
+    "versionCode": 85,
+    "bytes": 25861122,
+    "sha256": "6f678251acf096b5cf99337f41a25da17168a621f49881852b57e48b86b415e7",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "tests": {
+    "initialRegressionCases": 10,
+    "initialFailures": 8,
+    "initialErrors": 0,
+    "finalRegressionCases": 12,
+    "finalRegressionFailures": 0,
+    "fullJvm": {
+      "suites": 420,
+      "tests": 4026,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "builds": [
+      "debug",
+      "performance",
+      "R8",
+      "vital-lint"
+    ],
+    "combinedBuildSeconds": 159,
+    "independentStaticReview": "No actionable blocker within href-resolution scope"
+  },
+  "native": {
+    "device": "Family Area",
+    "apiLevel": 29,
+    "baseline": "Exact installed optimized1.90 APK in separate shell DexClassLoader",
+    "candidate": "Byte-identical optimized1.91 candidate pushed to owned scratch, tested before installation",
+    "before": {
+      "type": "summary",
+      "cases": 8,
+      "failures": 6,
+      "invocationErrors": 0,
+      "pass": false
+    },
+    "after": {
+      "type": "summary",
+      "cases": 8,
+      "failures": 0,
+      "invocationErrors": 0,
+      "pass": true
+    },
+    "baselineCases": [
+      {
+        "case": "root-relative",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": true
+      },
+      {
+        "case": "same-origin-absolute",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": false
+      },
+      {
+        "case": "self-collection-and-child",
+        "expectedCount": 2,
+        "actualCount": 0,
+        "returnedNull": true,
+        "pass": false
+      },
+      {
+        "case": "ampersand-xml",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": false
+      },
+      {
+        "case": "numeric-ampersand-xml",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": false
+      },
+      {
+        "case": "once-decoded-entity",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": false
+      },
+      {
+        "case": "percent-escaped-path",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": true
+      },
+      {
+        "case": "other-origin-excluded",
+        "expectedCount": 1,
+        "actualCount": 0,
+        "returnedNull": true,
+        "pass": false
+      }
+    ],
+    "candidateCases": [
+      {
+        "case": "root-relative",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": true
+      },
+      {
+        "case": "same-origin-absolute",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": true
+      },
+      {
+        "case": "self-collection-and-child",
+        "expectedCount": 2,
+        "actualCount": 2,
+        "returnedNull": false,
+        "pass": true
+      },
+      {
+        "case": "ampersand-xml",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": true
+      },
+      {
+        "case": "numeric-ampersand-xml",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": true
+      },
+      {
+        "case": "once-decoded-entity",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": true
+      },
+      {
+        "case": "percent-escaped-path",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": true
+      },
+      {
+        "case": "other-origin-excluded",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "returnedNull": false,
+        "pass": true
+      }
+    ],
+    "methodDescriptor": "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/util/ArrayList;",
+    "bindings": "Verified mapping and APK disassembly: static cap,baseUrl,user,pass; includeVideo=false",
+    "classLoaderProvenanceVerified": true,
+    "generatedAuthenticationRequests": 9,
+    "foreignRequestCount": 0,
+    "candidateServerAuditPass": true,
+    "installedBaselineUnchangedDuringFixture": true,
+    "initialFixtureSyntaxFailure": "No device command; corrected and all4 Python fixture files compiled before native execution"
+  },
+  "deployment": {
+    "Family Area": "Full installed APK SHA matches accepted candidate;1.91/code85 and ordinary manual frame verified",
+    "Living Area": "Full installed APK SHA matches accepted candidate;1.91/code85; screensaver return acknowledged"
+  },
+  "preservationAndCleanup": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "manualPhotoFrameForeground": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true
+    },
+    "cleanup": {
+      "ownedDeviceScratchRemoved": 2,
+      "absenceChecks": 2,
+      "ownedServerTerminal": true,
+      "ownedRegistryRemoved": true,
+      "workersClosed": true,
+      "pixelCommandsAfterProhibition": 0,
+      "phoneCheckCleanupDeferred": true
+    }
+  },
+  "issueClock": {
+    "startedAtUtc": "2026-11-03T01:10:42Z",
+    "deadlineUtc": "2026-11-03T01:40:42Z",
+    "includesDiscoveryCleanupAndCommit": true
+  },
+  "limits": [
+    "Generated metadata and Basic-auth values only; no real NAS/source changes, image downloads or app-UID networking acceptance.",
+    "Native cases do not establish redirect credential behavior, full XML parsing or collection URLs with query parameters.",
+    "Cap,video,download-query and malformed-reference controls also pass JVM tests; no native video/query acceptance claimed.",
+    "Living visual presentation not inspected; exact installed bytes and complete saved configuration checked.",
+    "No FPS,latency or whole-product performance claim; local preview only, publication metadata unchanged.",
+    "Pixel is excluded; exhausted issue clocks and design approvals remain unchanged."
+  ],
+  "roadmapBrowser": {
+    "viewports": [
+      {
+        "width": 390,
+        "clientWidth": 375,
+        "scrollWidth": 375
+      },
+      {
+        "width": 1600,
+        "clientWidth": 1585,
+        "scrollWidth": 1585
+      }
+    ],
+    "currentVersionVisible": true,
+    "pixelControlBoundaryVisible": true,
+    "trackedTasks": 60,
+    "evidenceLinksResolve": true
+  }
+}
