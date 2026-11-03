@@ -13,6 +13,18 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Latest installed Weather return check:** approval is recorded; the adaptive
+  layout candidate remains held under its original geometry deadline. Family's
+  unchanged optimized1.88 passed native selector persistence and the same-Home
+  24-hour clock/solar return. The hourly row was not established, so retained
+  hourly12→24→12 acceptance remains incomplete. Later Weather Open probes did
+  not navigate; no cause or speculative patch is inferred. All complete saved
+  configurations, font/services and APK hash match baseline; original manual frame
+  restored and visually checked. No build, install or Living operation.
+  This separate acceptance unit began00:07:45UTC on3November; cleanup closed
+  early within its00:37:45UTC cap.
+  [Scoped receipt](portal-weather-settings-return-2026-11-03.md).
+
 - **Current room APK / latest bulk-update delivery:** both rooms contain exact
   optimized **1.88/code82**, source `23eb995d`. This supersedes earlier room
   versions below; historical receipts keep their scoped evidence. Bulk results

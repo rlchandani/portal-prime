@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "scope": "Installed Weather Home→Settings→Home presentation acceptance; no parked geometry reopening",
+  "startedAt": "2026-11-03T00:07:45Z",
+  "deadline": "2026-11-03T00:37:45Z",
+  "deviceChecksEndedAt": "2026-11-03T00:20:27.061917+00:00",
+  "sourceDeliveryCommit": "23eb995da3a2eb094ca24e926a865a3da448323a",
+  "branch": "codex/weather-format-native-20261103",
+  "platform": "Family Area Portal / Android10 API29",
+  "appVersion": "1.88",
+  "versionCode": 82,
+  "installedApkSha256": "2b23a0f807ba2be739bf547a0ebd97fee573bf63f66f97b388832b68b7f45b9e",
+  "productionPathsChanged": [],
+  "buildPerformed": false,
+  "livingOperations": 0,
+  "result": "Native hourly-format acceptance incomplete; current Home/solar 24-hour return observed",
+  "observations": [
+    {
+      "case": "Existing Weather Open and enum selector",
+      "result": "observed",
+      "detail": "Off/Hourly/Daily native selector appeared"
+    },
+    {
+      "case": "Native Hourly persistence",
+      "result": "confirmed",
+      "detail": "Whole-profile readback weatherWidget=hourly"
+    },
+    {
+      "case": "Native 24-hour persistence",
+      "result": "confirmed",
+      "detail": "Whole-profile readback clockFormat=24"
+    },
+    {
+      "case": "Same Home activity returns",
+      "result": "observed",
+      "detail": "ActivityRecord de592c1, task27218 retained"
+    },
+    {
+      "case": "Home and solar 24-hour presentation",
+      "result": "observed",
+      "detail": "16:13; sunrise06:55; sunset16:49"
+    },
+    {
+      "case": "Hourly Weather relabeling",
+      "result": "unverified",
+      "detail": "No hourly row established; no populated12→24→12 comparison"
+    },
+    {
+      "case": "Apps/Home and subsequent Weather Open probes",
+      "result": "partial",
+      "detail": "Pages appeared; subsequent Open probes did not navigate; cause unconfirmed"
+    }
+  ],
+  "restorationChecks": {
+    "info": true,
+    "profile": true,
+    "layout": true,
+    "sources": true,
+    "screensaver": true,
+    "font": true,
+    "accessibility": true,
+    "apk": true,
+    "photoFrameForeground": true,
+    "originalChromeListed": true
+  },
+  "personalPhotosPublished": false,
+  "publicWeatherCrop": "weather-return-hourly-unconfirmed.png",
+  "limits": [
+    "Coordinator-observed native interactions, not automated Compose tests.",
+    "No retained forecast-object or zero-request proof; host168-hour provider reply is not device data.",
+    "No two-way hourly, performance/FPS, font/theme or adaptive/daily-geometry acceptance.",
+    "No speculative correction, build, install, owner account or Home Assistant operation.",
+    "Approval applies only to Weather scope; held adaptive candidate and previously parked clocks stay separate."
+  ],
+  "receipt": "docs/portal-weather-settings-return-2026-11-03.md",
+  "independentEvidenceReview": "No concrete blocker; hourly acceptance, cause and performance limits remain explicit.",
+  "browserEvidence": {
+    "proofHttpStatus": 200,
+    "desktop": {
+      "width": 1600,
+      "scrollWidth": 1585,
+      "overflow": false
+    },
+    "mobile": {
+      "width": 390,
+      "scrollWidth": 375,
+      "overflow": false
+    },
+    "hourlyLimitVisible": true
+  }
+}

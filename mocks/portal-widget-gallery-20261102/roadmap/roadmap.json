@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T00:03:36.507817+00:00",
-  "updatedLabel": "Bulk updates: 1.88 in both rooms; 3,991 JVM, 28 HTTP and 23 Rust checks; Family API verified",
+  "updatedAt": "2026-11-03T00:20:27.061917+00:00",
+  "updatedLabel": "Weather scope approved; adaptive candidate held; installed hourly return still unverified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "fleet-bulk-update-results",
+  "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
     "Both rooms contain exact optimized Portal1.88/code82. Companion1.7.7/code19 is verified only in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
@@ -52,7 +52,8 @@
         "Optimized served-API cases include admission, dry-run and a zero-target sentinel, not a selected package installation.",
         "Store provider scan/error semantics remain; completed callback is not proof of every provider being reachable.",
         "No rollback, independently verified bulk APK identity, general performance or whole-product acceptance claim.",
-        "Physical companion installation remains open; no HA change or GitHub publication."
+        "Physical companion installation remains open; no HA change or GitHub publication.",
+        "Related provider-error propagation is unverified; its first-observation23:38\u201300:08UTC issue clock is exhausted and must not be silently reopened."
       ],
       "next": "Keep selected-app update/provider/physical-phone acceptance separate. Continue independent authorized backlog; all exhausted issue clocks stay parked.",
       "issueClock": {
@@ -899,8 +900,8 @@
         "design"
       ],
       "owner": "Native UI / Family quality and performance",
-      "deployment": "Weather1.78/code72 candidate is held on its separate branch and excluded from both currently installed optimized Portal1.85/code79 APKs.",
-      "state": "Original30-minute implementation slot closed; candidate retained on its new branch.",
+      "deployment": "Weather1.78/code72 candidate remains held on its separate branch and excluded from installed optimized Portal1.88/code82 in both rooms.",
+      "state": "Weather scope approval is recorded. Original geometry slot remains closed; the separate installed1.88 settings-return check leaves hourly acceptance incomplete.",
       "acceptance": [
         "Adaptive compact/medium/large content based on actual saved size and font scale, preserving widget identity/order/placement.",
         "Current condition label/city/high-low, hourly/daily/off, initial loading, unavailable current and missing selected forecast.",
@@ -919,6 +920,10 @@
         {
           "text": "Native candidate, measured performance and exact restoration receipt.",
           "source": "docs/portal-weather-native-refinement-2026-11-02.md"
+        },
+        {
+          "text": "Latest approval acknowledged. Separate installed1.88 selector/clock return observed; hourly row not established. Complete restoration, no new build or deployment; geometry issue remains parked.",
+          "source": "docs/portal-weather-settings-return-2026-11-03.md"
         }
       ],
       "limits": [
@@ -1234,7 +1239,7 @@
       ],
       "owner": "Design / product",
       "deployment": "Browser review artifact only",
-      "state": "No UI redesign approval Weather adaptive sizes/current conditions/hourly-daily-off/unavailable states using automatic location are now explicitly approved; broader gallery and manual location remain separate.",
+      "state": "Weather adaptive sizes/current conditions/hourly-daily-off/unavailable states using automatic location are explicitly approved. Broader gallery and manual location remain separate.",
       "acceptance": [
         "Review the separate mock and explicitly identify any approved design scope.",
         "Keep existing bounded correctness fixes distinct from a whole-widget redesign.",
@@ -1246,7 +1251,7 @@
           "source": "docs/portal-widget-gallery-checkpoint-2026-11-02.md; ../"
         },
         {
-          "text": "Weather-only implementation review maps current fields and adaptive-size work, excludes the separate manual-location proposal and states browser/native font and hardware acceptance limits. Existing sample mock has a public capture and checked desktop/mobile review routes. Design sign-off has been requested; no approval or native redesign is inferred.",
+          "text": "Weather-only scope approved; automatic location retained, manual location and whole gallery separate. Candidate built but held by native daily-geometry acceptance.",
           "source": "../weather-review.html; ../evidence/weather-review-validation.json"
         }
       ],
@@ -1997,17 +2002,17 @@
     {
       "id": "weather-clock-format",
       "title": "Weather: cached labels follow 12/24-hour settings",
-      "summary": "Corrected cached forecast presentation.3,845 JVM tests and 274 native formatter checks passed; exact optimized 1.74 installed in both rooms. Home/settings return UI acceptance remains open.",
+      "summary": "Source and formatter correction retained in1.88. Native Home/solar24-hour return observed; hourly row absent, so12\u219224\u219212 acceptance remains incomplete.",
       "description": "Home re-reads the clock preference on resume and derives labels from retained forecast timestamps and location offsets. A settings change no longer needs a forecast download to format cached labels. Network producer keys and refresh cadence are unchanged.",
       "status": "verified",
-      "verification": "Source/native formatter verified \u00b7 both rooms installed \u00b7 Home return UI open",
+      "verification": "Source/formatter verified \u00b7 native clock return partly observed \u00b7 hourly acceptance open",
       "kind": "Weather presentation correctness",
       "platforms": [
         "portal"
       ],
       "owner": "Native / QA",
-      "deployment": "Exact optimized 1.74/code68 installed in both rooms. Family needed one shell recovery after a terminal automatic-confirmation failure; Living deploy helper exited0 with installed hash proof.",
-      "state": "Final 3,845 / 403 JVM gate and signed debug/test/optimized artifacts passed. Family debug-runtime fixtures passed 274/274 including 108 cached-label checks; original test APK restored. Complete room profiles/screensaver settings unchanged.",
+      "deployment": "Original1.74 formatter delivery is retained in current1.88/code82 in both rooms. Latest check used unchanged Family1.88; no build, install or Living operation.",
+      "state": "Family native Hourly and24-hour selections persisted. Same Home activity returned with16:13 and solar06:55/16:49, but no hourly row was established. Complete settings/layout/sources/screensaver/font/services and APK restored/unchanged; normal frame verified.",
       "acceptance": [
         "Switch retained forecast labels 12\u219224\u219212 without changing temperatures, conditions, Now or day data.",
         "Preserve location offsets, midnight and timestamp-free legacy entries.",
@@ -2021,15 +2026,19 @@
         {
           "text": "Family API29 debug runtime passed 274/274 public fixtures, including 108 cached format checks. Original test package restored; final optimized APK SHA-256 2443d2fd3f3634f73117de02cbc75c6463735413adef6886f98ceb5664dd8189, 25,860,686 bytes.",
           "source": "../evidence/weather-clock-format-verification.json"
+        },
+        {
+          "text": "Observed installed1.88 native return and exact restoration; hourly relabeling remains unverified. No production change or fresh test-suite claim.",
+          "source": "../evidence/weather-settings-return-verification.json"
         }
       ],
       "limits": [
-        "Native fixtures ran on the temporary debug build, not the optimized Home renderer.",
-        "Actual Home/settings return, request counts, deadline measurement, physical visual judgement and latency/FPS are unverified.",
-        "Weather/gallery redesign approval and normal Google sign-in remain separate; no HA service or account automation.",
-        "The original1.74 delivery left a sealed app-owned session. Separate1.76 cleanup removed it on Family; actual Home/settings-return UI acceptance remains open."
+        "Earlier formatter fixtures ran in debug runtime; latest native observations use installed optimized1.88.",
+        "Hourly12\u219224\u219212 remains unaccepted: no populated hourly row established; later Weather Open probes did not navigate, cause unknown.",
+        "No forecast-object, request-count, deadline-timing, physical judgement, FPS or adaptive-geometry proof.",
+        "Weather scope approval is recorded; broad gallery, normal Google sign-in and held adaptive candidate remain separate."
       ],
-      "next": "Installer cleanup is delivered in1.76. Actual Home/settings-return UI remains separate; preserve pending human music sign-in."
+      "next": "Retain observed native clock/solar result and incomplete hourly acceptance. Do not restart the closed geometry issue or infer a speculative mode/data/input fix."
     },
     {
       "id": "fleet-error-response",
