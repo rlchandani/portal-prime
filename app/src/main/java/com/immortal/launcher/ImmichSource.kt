@@ -170,11 +170,9 @@ object ImmichSource {
 
   // --- HTTP (mirrors the app's other best-effort fetchers) --------------------
   private fun httpGet(spec: String, headers: Map<String, String>): String? {
-    val c = URL(spec).openPhotoSourceConnection()
+    val c = PhotoSourceRedirects.open(spec, headers, readTimeoutMs = 10000,
+        opened = { PhotoSourceWork.track(it) })
     try {
-      c.connectTimeout = 8000
-      c.readTimeout = 10000
-      headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
       return if (c.responseCode in 200..299) PhotoSourceHttp.readText(c)
       else null.also { logHttpFailure("GET", spec, c) }
     } finally {
@@ -183,15 +181,14 @@ object ImmichSource {
   }
 
   private fun httpPostJson(spec: String, headers: Map<String, String>, json: String): String? {
-    val c = URL(spec).openPhotoSourceConnection()
+    val c = PhotoSourceRedirects.open(spec, headers,
+        opened = { PhotoSourceWork.track(it) }, configure = {
+          it.requestMethod = "POST"
+          it.doOutput = true
+          it.setRequestProperty("Content-Type", "application/json")
+          it.outputStream.use { output -> output.write(json.toByteArray(Charsets.UTF_8)) }
+        })
     try {
-      c.connectTimeout = 8000
-      c.readTimeout = 12000
-      c.requestMethod = "POST"
-      c.doOutput = true
-      c.setRequestProperty("Content-Type", "application/json")
-      headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
-      c.outputStream.use { it.write(json.toByteArray(Charsets.UTF_8)) }
       return if (c.responseCode in 200..299) PhotoSourceHttp.readText(c)
       else null.also { logHttpFailure("POST", spec, c) }
     } finally {

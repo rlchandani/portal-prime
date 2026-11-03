@@ -21,7 +21,25 @@ The updated whole-product objective is
   deferred because they would require another phone command. Companion source
   and isolated QA remain available.
 
-- **Current room APK / latest Immich delivery:** both rooms contain exact
+- **Current room APK / latest photo redirect delivery:** both rooms contain exact
+  optimized **1.93/code87**. Photo HTTP redirects with nonempty source headers
+  remain on their initial origin, downgrade/malformed targets are rejected and
+  five redirects/six requests bound loops. Initial10 JVM methods reproduced8
+  failures; final16 and **4,054 JVM/422 suites**, debug/optimized/R8/vital-lint
+  passed after independent review corrected video-prefetch ownership ordering.
+  Family actual optimized album GET improved **8/20→20/20 combined** checks;
+  generated key deliveries to alternate host/port10→0, loop requests21→6.
+  Same-origin GET301/302/303/307/308 retained. Native candidate/complete server
+  receipt passed; lost outer session handle did not trigger a rerun. Both full
+  installed APK hashes and complete configurations match; Family normal frame,
+  font/services/original Chrome task retained. Owned scratch/server/registry
+  removed, worker closed. Direct platform video streaming is outside this
+  helper; native TLS/POST/PROPFIND/decode/real-account compatibility and controller
+  pause interleavings remain unverified. Pixel prohibited. Original
+  **01:47:02–02:17:02 UTC** includes cleanup and commit.
+  [Scoped receipt](portal-photo-redirects-2026-11-03.md).
+
+- **Previous Immich delivery:** both rooms received exact
   optimized **1.92/code86**. Strictly advancing page continuations and a separate
   100-request budget prevent repeated/backward/unbounded discovery; playable
   asset IDs are unique across pages and the cap counts those uniques.

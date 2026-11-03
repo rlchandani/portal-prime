@@ -178,14 +178,13 @@ object DavSource {
 
   // --- HTTP PROPFIND ----------------------------------------------------------
   private fun propfind(url: String, headers: Map<String, String>, depth: String): String? {
-    val c = URL(url).openPhotoSourceConnection()
+    val c = PhotoSourceRedirects.open(url, headers,
+        opened = { PhotoSourceWork.track(it) }, configure = {
+          setMethod(it, "PROPFIND")
+          it.setRequestProperty("Depth", depth)
+          it.setRequestProperty("User-Agent", "PortalPhotoFrame/1.0")
+        })
     return try {
-      c.connectTimeout = 8000
-      c.readTimeout = 12000
-      setMethod(c, "PROPFIND")
-      c.setRequestProperty("Depth", depth)
-      c.setRequestProperty("User-Agent", "PortalPhotoFrame/1.0")
-      headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
       if (c.responseCode in 200..299) PhotoSourceHttp.readText(c) else null
     } finally {
       runCatching { c.disconnect() }

@@ -3183,18 +3183,20 @@ class PhotoFrameController(
       read: (java.io.InputStream) -> T,
   ): T {
     if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
-    val c = URL(spec).openConnection() as HttpURLConnection
-    c.connectTimeout = 8000
-    c.readTimeout = timeout
-    c.instanceFollowRedirects = true
-    c.setRequestProperty("User-Agent", USER_AGENT)
-    headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
+    val c = PhotoSourceRedirects.open(spec, headers, readTimeoutMs = timeout,
+        configure = { it.setRequestProperty("User-Agent", USER_AGENT) },
+        opened = { connection ->
+          synchronized(photoTransportLock) {
+            if (!photoRequestCurrent(generation))
+              throw java.io.InterruptedIOException("Photo request canceled")
+            photoConnections.add(connection)
+          }
+        },
+        closed = { connection ->
+          synchronized(photoTransportLock) { photoConnections.remove(connection) }
+        })
     var input: java.io.InputStream? = null
     try {
-      synchronized(photoTransportLock) {
-        if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
-        photoConnections.add(c)
-      }
       val stream = c.inputStream
       input = stream
       synchronized(photoTransportLock) {
@@ -3320,15 +3322,18 @@ class PhotoFrameController(
   /** Stream an authed HTTP GET straight to [dst] (for the video prefetch source). */
   private fun downloadToFile(spec: String, headers: Map<String, String>, dst: java.io.File): Boolean =
       runCatching {
-            val c = URL(spec).openConnection() as HttpURLConnection
-            videoPrefetchConnection = c
+            if (!hostActive || stopped) return@runCatching false
+            val c = PhotoSourceRedirects.open(spec, headers, readTimeoutMs = 20000,
+                configure = { it.setRequestProperty("User-Agent", USER_AGENT) },
+                opened = { connection ->
+                  videoPrefetchConnection = connection
+                  if (!hostActive || stopped)
+                    throw java.io.InterruptedIOException("Video prefetch canceled")
+                },
+                closed = { connection ->
+                  if (videoPrefetchConnection === connection) videoPrefetchConnection = null
+                })
             try {
-              if (!hostActive || stopped) return@runCatching false
-              c.connectTimeout = 8000
-              c.readTimeout = 20000
-              c.instanceFollowRedirects = true
-              c.setRequestProperty("User-Agent", USER_AGENT)
-              headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
               c.inputStream.use { input ->
                 dst.outputStream().use { output ->
                   val buffer = ByteArray(32 * 1024)

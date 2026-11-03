@@ -159,14 +159,18 @@ class FaceFocusStore(context: Context) : AutoCloseable {
     val bitmap = when {
       url.startsWith("file://") -> SlideshowDecoder.file(url.removePrefix("file://"), TARGET_PX)
       url.startsWith("http://") || url.startsWith("https://") -> {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.connectTimeout = 8000
-        connection.readTimeout = 12000
-        connection.instanceFollowRedirects = true
-        connection.setRequestProperty("User-Agent", Http.DEFAULT_UA)
-        authHeaders.forEach { (k, v) -> connection.setRequestProperty(k, v) }
-        val transport = AutoCloseable { connection.disconnect() }
-        request.own(transport) // Track before the first blocking connect/read.
+        var transport: AutoCloseable? = null
+        val connection = PhotoSourceRedirects.open(url, authHeaders,
+            configure = { it.setRequestProperty("User-Agent", Http.DEFAULT_UA) },
+            opened = {
+              val owner = AutoCloseable { it.disconnect() }
+              transport = owner
+              request.own(owner) // Track each hop before its blocking connect/read.
+            },
+            closed = {
+              transport?.let(request::release)
+              transport = null
+            })
         var input: java.io.InputStream? = null
         try {
           val stream = connection.inputStream
@@ -174,7 +178,7 @@ class FaceFocusStore(context: Context) : AutoCloseable {
           request.own(stream)
           SlideshowDecoder.stream(stream, TARGET_PX)
         } finally {
-          request.release(transport)
+          transport?.let(request::release)
           input?.let { request.release(it) }
         }
       }

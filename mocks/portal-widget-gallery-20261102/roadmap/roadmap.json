@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T01:45:35.680423+00:00",
-  "updatedLabel": "Immich discovery guarded; Family9/9; exact1.92 deployed to both rooms",
+  "updatedAt": "2026-11-03T02:05:00.804083+00:00",
+  "updatedLabel": "3 November 2026 \u00b7 photo HTTP redirect delivery",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,54 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-source-redirects",
+      "title": "Photo redirects: keep source keys on the intended server",
+      "summary": "Delivered to both rooms. Authenticated photo HTTP redirects stay on their original server; loops stop after six requests.",
+      "description": "The actual original Family album reader forwarded a generated API key to ten alternate-host/port destinations. Validate each redirect before opening a destination, retain same-origin redirects and cancellation ownership, and bound hops. No real credential exposure was observed.",
+      "status": "delivered",
+      "verification": "16/16 HTTP/policy methods \u00b74,054 JVM \u00b7Family8/20\u219220/20 combined \u00b7foreign key deliveries10\u21920 \u00b7exact both-room APKs",
+      "kind": "Photo-source security and bounded HTTP work",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent security review / Family native QA",
+      "deployment": "Exact optimized1.93/code87 installed in Family Area and Living Area; complete saved configuration maps unchanged.",
+      "state": "Family Android10 actual optimized album GET on generated metadata and keys;20/20 output/request checks. Family normal frame/font/services/original Chrome task retained.",
+      "acceptance": [
+        "Prevent nonempty photo source headers from following another scheme, hostname or effective port.",
+        "Retain same-origin GET301/302/303/307/308 and method/body-preserving307/308 for custom requests.",
+        "Reject malformed targets, missing locations and HTTPS downgrade; bound to five redirects/six requests.",
+        "Register each migrated hop before blocking work and release rejected/intermediate transports.",
+        "Verify exact candidate on Family, full installed APK hashes and complete saved configurations in both rooms."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, primary research, device before/after, delivery and explicit limits.",
+          "source": "docs/portal-photo-redirects-2026-11-03.md"
+        },
+        {
+          "text": "Sixteen regression methods, full suite, actual Android request counts and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/photo-redirects-verification.json"
+        }
+      ],
+      "limits": [
+        "Only migrated HttpURLConnection photo paths; direct platform video streaming and other app networking remain unmodified and unverified.",
+        "Native checks prove authenticated Immich album GET; native POST, PROPFIND, public redirects, TLS, decoding, app-UID and controller pause interleavings are not established.",
+        "Any nonempty source header map is origin-bound; real account/CDN compatibility is unverified and authenticated cross-origin redirects are intentionally refused.",
+        "Generated credentials and metadata only; no current real NAS bug or real credential exposure claim.",
+        "A five-redirect/six-request cap is not an aggregate wall-time, response-memory or FPS budget; no general slideshow performance claim.",
+        "Living presentation not visually inspected; its exact installed full APK and complete saved configuration maps were verified.",
+        "Pixel control and inspection remain prohibited; earlier phone cleanup is deferred. Publication metadata, APIs, Home Assistant, design approvals and exhausted clocks unchanged."
+      ],
+      "next": "Continue independently actionable whole-product work. Direct platform video streaming remains outside this helper; retain its original discovery clock. Do not control Pixel or reopen exhausted issues.",
+      "issueClock": {
+        "startedAt": "2026-11-03T01:47:02Z",
+        "deadline": "2026-11-03T02:17:02Z",
+        "firstSourceAuditClockRetained": true,
+        "scope": "Photo HttpURLConnection redirects, credential origin and per-hop cancellation ownership"
+      }
+    },
     {
       "id": "immich-pagination",
       "title": "Immich photos: stop repeated pages and keep unique photos",

@@ -1,0 +1,428 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T02:05:00.802498+00:00",
+  "scope": "Photo HTTP redirect source headers and bounded per-hop ownership",
+  "sourceBranch": "codex/photo-source-redirects-20261103",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.93",
+    "versionCode": 87,
+    "bytes": 25861122,
+    "sha256": "408976c6c44ece08ac65efd76354c52fb3be34f57a25e6d2714763273a29830c",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "tests": {
+    "initialRegressionMethods": 10,
+    "initialFailures": 8,
+    "initialErrors": 0,
+    "finalRegressionMethods": 16,
+    "finalRegressionFailures": 0,
+    "fullJvm": {
+      "suites": 422,
+      "tests": 4054,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "builds": [
+      "debug",
+      "performance",
+      "R8",
+      "vital-lint"
+    ],
+    "finalCombinedBuildSeconds": 170,
+    "independentStaticReview": "Video-prefetch ownership ordering finding resolved; no open finding within the reviewed scope; gates repeated after fix",
+    "preReviewArtifactNeverInstalledOrNativeTested": true
+  },
+  "native": {
+    "device": "Family Area",
+    "apiLevel": 29,
+    "method": "Actual optimized Immich album GET through separate shell DexClassLoader",
+    "cases": 20,
+    "baseline": {
+      "combinedPassed": 8,
+      "caseCount": 20,
+      "destinationRequests": 10,
+      "destinationKeyMatches": 10,
+      "sourceRequests": 56,
+      "boundedCases": [
+        {
+          "case": "five-hops",
+          "sourceRequests": 6,
+          "pass": true
+        },
+        {
+          "case": "six-hops",
+          "sourceRequests": 7,
+          "pass": false
+        },
+        {
+          "case": "loop",
+          "sourceRequests": 21,
+          "pass": false
+        }
+      ]
+    },
+    "candidate": {
+      "combinedPassed": 20,
+      "caseCount": 20,
+      "destinationRequests": 0,
+      "destinationKeyMatches": 0,
+      "sourceRequests": 40,
+      "boundedCases": [
+        {
+          "case": "five-hops",
+          "sourceRequests": 6,
+          "pass": true
+        },
+        {
+          "case": "six-hops",
+          "sourceRequests": 6,
+          "pass": true
+        },
+        {
+          "case": "loop",
+          "sourceRequests": 6,
+          "pass": true
+        }
+      ]
+    },
+    "generatedFixtureOnly": true,
+    "sameOriginGetStatusControls": [
+      301,
+      302,
+      303,
+      307,
+      308
+    ],
+    "classLoaderAndBindingProvenanceVerified": true,
+    "installedBaselineUnchangedDuringFixtures": true,
+    "nativeCandidateExitCode": 0,
+    "outerCandidateSessionHandleUnavailable": true,
+    "completePassingReceiptAndAbsentRunnerVerified": true,
+    "sameOwnedServerInstanceForBothRuns": true,
+    "baselineCases": [
+      {
+        "case": "direct",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "relative-301",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-301",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "cross-hostname-301",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "relative-302",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-302",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "cross-hostname-302",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "relative-303",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-303",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "cross-hostname-303",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "relative-307",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-307",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "cross-hostname-307",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "relative-308",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-308",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "cross-hostname-308",
+        "pass": false,
+        "sourceRequests": 1,
+        "destinationRequests": 1
+      },
+      {
+        "case": "five-hops",
+        "pass": true,
+        "sourceRequests": 6,
+        "destinationRequests": 0
+      },
+      {
+        "case": "six-hops",
+        "pass": false,
+        "sourceRequests": 7,
+        "destinationRequests": 0
+      },
+      {
+        "case": "loop",
+        "pass": false,
+        "sourceRequests": 21,
+        "destinationRequests": 0
+      },
+      {
+        "case": "missing-location",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      }
+    ],
+    "candidateCases": [
+      {
+        "case": "direct",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "relative-301",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-301",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-hostname-301",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "relative-302",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-302",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-hostname-302",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "relative-303",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-303",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-hostname-303",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "relative-307",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-307",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-hostname-307",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "relative-308",
+        "pass": true,
+        "sourceRequests": 2,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-port-308",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "cross-hostname-308",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      },
+      {
+        "case": "five-hops",
+        "pass": true,
+        "sourceRequests": 6,
+        "destinationRequests": 0
+      },
+      {
+        "case": "six-hops",
+        "pass": true,
+        "sourceRequests": 6,
+        "destinationRequests": 0
+      },
+      {
+        "case": "loop",
+        "pass": true,
+        "sourceRequests": 6,
+        "destinationRequests": 0
+      },
+      {
+        "case": "missing-location",
+        "pass": true,
+        "sourceRequests": 1,
+        "destinationRequests": 0
+      }
+    ]
+  },
+  "deployment": {
+    "Family Area": "Terminal deploy success; exact full installed APK SHA independently read through fixed Family ADB;1.93/code87; normal photo frame visually verified",
+    "Living Area": "Terminal deploy success with full installed APK SHA verification; fresh1.93/code87 and full saved configuration readback; no duplicate native QA"
+  },
+  "preservationAndCleanup": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "manualPhotoFrameForeground": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true
+    },
+    "cleanup": {
+      "ownedPort8975Closed": true,
+      "ownedPort8976Closed": true,
+      "ownedServerProcessAbsent": true,
+      "ownedRunnerProcessAbsent": true,
+      "ownedRegistryRemoved": true,
+      "ownedDeviceScratchRemoved": 2,
+      "independentScratchAbsenceChecks": 2,
+      "ownedServerTerminalShutdownConfirmed": true,
+      "workersClosed": true,
+      "pixelCommandsAfterProhibition": 0,
+      "phoneCheckCleanupDeferred": true
+    }
+  },
+  "issueClock": {
+    "startedAtUtc": "2026-11-03T01:47:02Z",
+    "deadlineUtc": "2026-11-03T02:17:02Z",
+    "includesDiscoveryCleanupAndCommit": true
+  },
+  "research": [
+    "https://developer.android.com/reference/java/net/HttpURLConnection",
+    "https://android.googlesource.com/platform/external/okhttp/+/ba6e9e9/okhttp/src/main/java/com/squareup/okhttp/internal/http/HttpEngine.java",
+    "https://www.rfc-editor.org/rfc/rfc9110.html#name-307-temporary-redirect"
+  ],
+  "limits": [
+    "Only migrated HttpURLConnection photo paths; direct platform video streaming and other app networking remain unmodified and unverified.",
+    "Native checks prove authenticated Immich album GET; native POST, PROPFIND, public redirects, TLS, decoding, app-UID and controller pause interleavings are not established.",
+    "Any nonempty source header map is origin-bound; real account/CDN compatibility is unverified and authenticated cross-origin redirects are intentionally refused.",
+    "Generated credentials and metadata only; no current real NAS bug or real credential exposure claim.",
+    "A five-redirect/six-request cap is not an aggregate wall-time, response-memory or FPS budget; no general slideshow performance claim.",
+    "Living presentation not visually inspected; its exact installed full APK and complete saved configuration maps were verified.",
+    "Pixel control and inspection remain prohibited; earlier phone cleanup is deferred. Publication metadata, APIs, Home Assistant, design approvals and exhausted clocks unchanged."
+  ],
+  "roadmapBrowser": {
+    "viewports": [
+      {
+        "width": 390,
+        "clientWidth": 375,
+        "scrollWidth": 375
+      },
+      {
+        "width": 1600,
+        "clientWidth": 1585,
+        "scrollWidth": 1585
+      }
+    ],
+    "currentVersionVisible": true,
+    "pixelControlBoundaryVisible": true,
+    "trackedTasks": 62,
+    "newTaskEvidenceLinksResolve": true
+  }
+}

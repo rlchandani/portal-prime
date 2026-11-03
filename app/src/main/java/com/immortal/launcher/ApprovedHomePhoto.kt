@@ -170,11 +170,9 @@ private fun remoteHomePhoto(context: Context, url: String, headers: Map<String, 
   val hash = MessageDigest.getInstance("SHA-1").digest(url.toByteArray()).joinToString("") { "%02x".format(it) }
   val cached = File(context.filesDir, "${MediaCache.DIR}/$hash.jpg")
   if (cached.isFile) return decodeHomePhoto { cached.inputStream() }
-  val connection = URL(url).openPhotoSourceConnection()
+  val connection = PhotoSourceRedirects.open(url, headers,
+      opened = { PhotoSourceWork.track(it) })
   return try {
-    connection.connectTimeout = 8_000
-    connection.readTimeout = 12_000
-    headers.forEach { (key, value) -> connection.setRequestProperty(key, value) }
     if (connection.responseCode !in 200..299) null else {
       // Bound the transfer and memory before decoding; Home never encodes or writes an image.
       val bytes = connection.inputStream.use { stream ->
