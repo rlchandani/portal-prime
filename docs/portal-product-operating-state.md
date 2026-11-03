@@ -13,6 +13,21 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Current room APK / latest bulk-update delivery:** both rooms contain exact
+  optimized **1.88/code82**, source `23eb995d`. This supersedes earlier room
+  versions below; historical receipts keep their scoped evidence. Bulk results
+  now reflect every installer outcome, report counts and reject expired
+  discovery; the CLI also guards misleading legacy batches. **3,991JVM/417suites
+  +28HTTP +23Rust** passed, with8 focused Kotlin failures and28 original CLI
+  failure entries reproduced. Family **9/9 installed optimized API** checks
+  passed; **9/9 debug APK Android helper** controls passed separately. R8 direct
+  helper invocation was unavailable; real selected-app batches/provider failures
+  remain unverified. Both complete APK hashes and whole saved configurations
+  matched; Family frame/font/services preserved. Owned scratch/registry/cache
+  removed and workers closed. No owner catalog app installs or publication.
+  Original23:38–00:08UTC clock retained.
+  [Scoped receipt](portal-fleet-bulk-update-results-2026-11-02.md).
+
 - **Latest fleet CLI command confirmation:** source `18730fdb` requires HTTP2xx,
   complete unambiguous object and literal success for known JSON paths. Failed
   pause/upload stops later update stages for that room without retry; opaque

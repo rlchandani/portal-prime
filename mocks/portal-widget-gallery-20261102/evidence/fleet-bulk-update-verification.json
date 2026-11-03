@@ -1,0 +1,262 @@
+{
+  "sourceCommit": "23eb995da3a2eb094ca24e926a865a3da448323a",
+  "scope": "Bulk installer-result aggregate, discovery wait completion and legacy CLI result validation",
+  "originalClock": {
+    "startedAt": "2026-11-02T23:38:00+00:00",
+    "deadline": "2026-11-03T00:08:00+00:00",
+    "scope": "Fleet bulk update aggregate outcomes and unconfirmed discovery; existing install machinery retained",
+    "firstObservationClockRetained": true,
+    "status": "verified"
+  },
+  "baseline": {
+    "kotlin": {
+      "tests": 10,
+      "failures": 8,
+      "errors": 0,
+      "cases": [
+        {
+          "name": "mixedResultsReportFailureAndContinueAfterFirstFailureWithoutRetry",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "name": "completedDiscoveryPreservesSuppliedPackagesAndLongVersions",
+          "failureType": null
+        },
+        {
+          "name": "completedDiscoveryWithNoUpdatesIsSuccessfulEmptyResult",
+          "failureType": null
+        },
+        {
+          "name": "emptyTargetsAreCompletedSuccessWithoutCallingInstaller",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "name": "allFailedReportsFailureAndPreservesEveryOutcome",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "name": "unknownProgressBusyPausedAndTimeoutNeverCountAsInstalled",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "name": "successfulFirstPackageDoesNotHideLaterFailure",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "name": "allInstalledReportsLiteralSuccessAndExactOrderedReceipts",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "name": "incompleteDiscoveryWithEmptyMapIsUnconfirmed",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "name": "incompleteDiscoveryWithPartialResultsIsUnconfirmed",
+          "failureType": "java.lang.AssertionError"
+        }
+      ]
+    },
+    "cli": {
+      "focusedMethods": 5,
+      "failureEntries": 28,
+      "fixtureErrors": 0
+    },
+    "nativeMalformedRequest": {
+      "baselineVersion": "1.87/code81",
+      "case": "malformed JSON; no selector and no installations",
+      "httpStatus": 400,
+      "ok": false,
+      "error": "specify_all_or_packageName",
+      "elapsedMs": 1898.012
+    }
+  },
+  "gates": {
+    "jvm": {
+      "suites": 417,
+      "tests": 3991,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "debugBuild": "passed",
+    "optimizedBuildR8VitalLint": "passed",
+    "buildSeconds": 146,
+    "cliHttpMethods": 28,
+    "cliHttpSeconds": 1.704,
+    "cliRustTests": 23,
+    "failures": 0,
+    "independentStaticReview": "no scoped blocker",
+    "hostedCiObserved": false
+  },
+  "nativeHelperControl": {
+    "exit": 0,
+    "artifactKind": "actual final-source debug APK, not optimized installed APK",
+    "apkSha256": "3ecd03d607f9fdd85f6d643008e8b981993162cae41a404d865d9dfcf93751b3",
+    "fixtureSha256": "bb3fb40cd1ac8f63b1f873aa4fee506d868e496f33d702d5dee0b2300726270c",
+    "optimizedHelperDirectInvocation": "unavailable: R8 inlined helper and removed companion",
+    "productionKeepsAdded": false,
+    "helperFallbackUsed": false
+  },
+  "nativeHelperCases": {
+    "cases": 9,
+    "failures": 0,
+    "artifactKind": "debug APK only; optimized helper inlined"
+  },
+  "negativeControl": {
+    "exit": 2,
+    "expectedExit": 2,
+    "passed": true
+  },
+  "optimizedServedApi": {
+    "room": "Family Area",
+    "version": "1.88/code82",
+    "cases": [
+      {
+        "case": "malformed JSON",
+        "httpStatus": 400,
+        "error": "bad_json",
+        "elapsedMs": 14.194,
+        "passed": true
+      },
+      {
+        "case": "array JSON",
+        "httpStatus": 400,
+        "error": "bad_json",
+        "elapsedMs": 9.052,
+        "passed": true
+      },
+      {
+        "case": "missing selector",
+        "httpStatus": 400,
+        "error": "specify_all_or_packageName",
+        "elapsedMs": 9.889,
+        "passed": true
+      },
+      {
+        "case": "blank package",
+        "httpStatus": 400,
+        "error": "specify_all_or_packageName",
+        "elapsedMs": 7.866,
+        "passed": true
+      },
+      {
+        "case": "disabled all",
+        "httpStatus": 400,
+        "error": "specify_all_or_packageName",
+        "elapsedMs": 7.793,
+        "passed": true
+      },
+      {
+        "case": "wrong method",
+        "httpStatus": 405,
+        "error": "method_not_allowed",
+        "elapsedMs": 8.162,
+        "passed": true
+      },
+      {
+        "case": "completed dry run",
+        "httpStatus": 200,
+        "updates": 1,
+        "elapsedMs": 1487.504,
+        "passed": true
+      },
+      {
+        "case": "completed zero-selected-target no-op",
+        "sentinelNotInCatalog": true,
+        "httpStatus": 200,
+        "count": 0,
+        "installedCount": 0,
+        "failedCount": 0,
+        "elapsedMs": 543.608,
+        "passed": true
+      },
+      {
+        "case": "actual new CLI dry-run round trip",
+        "exit": 0,
+        "updates": 1,
+        "passed": true
+      }
+    ],
+    "ownerCatalogAppsInstalled": 0,
+    "passed": true,
+    "passedCases": 9
+  },
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionCode": 82,
+    "versionName": "1.88",
+    "bytes": 25861122,
+    "sha256": "2b23a0f807ba2be739bf547a0ebd97fee573bf63f66f97b388832b68b7f45b9e",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "signerPreserved": true
+  },
+  "delivery": {
+    "rooms": {
+      "family": {
+        "version": "1.88/code82",
+        "installedBytes": 25861122,
+        "installedSha256": "2b23a0f807ba2be739bf547a0ebd97fee573bf63f66f97b388832b68b7f45b9e",
+        "completeSavedConfigurationUnchanged": true,
+        "ownerCatalogAppVersionsUnchanged": true,
+        "passed": true
+      },
+      "living": {
+        "version": "1.88/code82",
+        "installedBytes": 25861122,
+        "installedSha256": "2b23a0f807ba2be739bf547a0ebd97fee573bf63f66f97b388832b68b7f45b9e",
+        "completeSavedConfigurationUnchanged": true,
+        "ownerCatalogAppVersionsUnchanged": true,
+        "passed": true
+      }
+    },
+    "artifactSha256": "2b23a0f807ba2be739bf547a0ebd97fee573bf63f66f97b388832b68b7f45b9e",
+    "bytes": 25861122,
+    "failed": [],
+    "passed": true
+  },
+  "familyPreservation": {
+    "completeSavedConfigurationUnchanged": true,
+    "ownerCatalogAppVersionsUnchanged": true,
+    "fontAndEnabledServicesUnchanged": true,
+    "screenCapturedPrivately": true
+  },
+  "cleanup": {
+    "ownedDeviceScratchRemoved": true,
+    "ownedRegistryRemoved": true,
+    "ownedPythonCacheRemoved": true,
+    "preexistingScriptCachePreserved": true,
+    "workersClosed": 2,
+    "originalPrivateConnectionsPreserved": true,
+    "devModeUnchangedBothRooms": true,
+    "localVerifiedCliInstalled": true,
+    "localCliSha256": "c4c791adbdaef1df4db3df6c774c394ba7b950c3a2e7643835c9eb2395acecc5",
+    "localCliBytes": 694344,
+    "normalPhotoFrameVisuallyReviewedFamily": true,
+    "noOwnerCatalogAppInstalls": true
+  },
+  "limits": [
+    "Real selected owner-app success/failure batches and real discovery timeout were not exercised.",
+    "Generated Android helper cases use the debug APK; R8 removed direct optimized helper access.",
+    "Optimized served-API cases include admission, dry-run and a zero-target sentinel, not a selected package installation.",
+    "Store provider scan/error semantics remain; completed callback is not proof of every provider being reachable.",
+    "No rollback, independently verified bulk APK identity, general performance or whole-product acceptance claim.",
+    "Physical companion installation remains open; no HA change or GitHub publication."
+  ],
+  "updatedAt": "2026-11-03T00:05:37.439331+00:00",
+  "browserRoadmap": {
+    "viewports": [
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "horizontalOverflow": false,
+    "proofHttpStatus": 200,
+    "currentVersionFooter": true,
+    "initialMetadataOverflowCorrected": true
+  }
+}

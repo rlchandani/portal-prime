@@ -1,18 +1,68 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T23:41:37.891378+00:00",
-  "updatedLabel": "Fleet CLI confirmation:23Rust+23HTTP+47helper tests;7Family reads;local tool installed;Portal1.87 unchanged",
+  "updatedAt": "2026-11-03T00:03:36.507817+00:00",
+  "updatedLabel": "Bulk updates: 1.88 in both rooms; 3,991 JVM, 28 HTTP and 23 Rust checks; Family API verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
-  "defaultTask": "fleet-command-status",
+  "defaultTask": "fleet-bulk-update-results",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.87/code81. Companion1.7.7/code19 display decoding/preview is verified in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
+    "Both rooms contain exact optimized Portal1.88/code82. Companion1.7.7/code19 is verified only in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-bulk-update-results",
+      "title": "Bulk app updates: show failure and preserve every result",
+      "summary": "Delivered 1.88 to both rooms. 3,991 JVM tests, 28 HTTP methods and 23 Rust tests passed; Family passed nine served API checks with saved configuration unchanged.",
+      "description": "Overall success now requires every selected installer result to be installed. Preserve ordered per-package receipts and counts, reject expired discovery before installs, and validate older agents in the CLI. Early admission skips unnecessary scans.",
+      "status": "delivered",
+      "verification": "3,991 JVM \u00b7 28 HTTP \u00b7 23 Rust \u00b7 9 debug Android cases \u00b7 9 optimized API checks \u00b7 exact APK in both rooms",
+      "kind": "Fleet bulk-update result integrity",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "Fleet engineering / parallel JVM and HTTP regressions / native fixture / independent review / Family API QA",
+      "deployment": "Source 23eb995d committed; exact optimized 1.88 / code 82 installed and fully read back in both rooms. Local CLI updated. Hosted CI and publication unobserved.",
+      "state": "Saved settings, layout, photo sources, screensaver configuration and catalog app versions are unchanged in both rooms. Family font and services are unchanged; normal photo frame reviewed. Owned scratch, registry and cache removed; workers closed.",
+      "acceptance": [
+        "Reproduce unconditional bulk success and ignored discovery completion.",
+        "Preserve every ordered result and exact counts;success only if all selected packages report installed.",
+        "Use one catalog snapshot and reject bad admission/unconfirmed wait before installs.",
+        "Validate legacy batch receipts and retain opaque raw/file/text compatibility.",
+        "Run required builds/JVM/compiledCLI checks and scoped Family acceptance;deliver only final exact artifact to Living.",
+        "Complete cleanup/commits within original23:38\u201300:08 UTC clock."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation,device checks,single-sample timing and native acceptance boundaries.",
+          "source": "docs/portal-fleet-bulk-update-results-2026-11-02.md"
+        },
+        {
+          "text": "Sanitized source,tests,artifact,room preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/fleet-bulk-update-verification.json"
+        }
+      ],
+      "limits": [
+        "Real selected owner-app success/failure batches and real discovery timeout were not exercised.",
+        "Generated Android helper cases use the debug APK; R8 removed direct optimized helper access.",
+        "Optimized served-API cases include admission, dry-run and a zero-target sentinel, not a selected package installation.",
+        "Store provider scan/error semantics remain; completed callback is not proof of every provider being reachable.",
+        "No rollback, independently verified bulk APK identity, general performance or whole-product acceptance claim.",
+        "Physical companion installation remains open; no HA change or GitHub publication."
+      ],
+      "next": "Keep selected-app update/provider/physical-phone acceptance separate. Continue independent authorized backlog; all exhausted issue clocks stay parked.",
+      "issueClock": {
+        "startedAt": "2026-11-02T23:38:00+00:00",
+        "deadline": "2026-11-03T00:08:00+00:00",
+        "scope": "Fleet bulk update aggregate outcomes and unconfirmed discovery; existing install machinery retained",
+        "firstObservationClockRetained": true,
+        "status": "verified"
+      }
+    },
     {
       "id": "fleet-command-status",
       "title": "Fleet CLI: confirm command results and stop failed update stages",
