@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "unit": "Fleet registry UTF-8 BOM compatibility",
+  "recordedAt": "2026-11-03T09:01:21.787959+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T08:51:50+00:00",
+    "deadline": "2026-11-03T09:21:50+00:00"
+  },
+  "baseCommit": "361c09ce4657edda97c3799e970a04e5bccd8ba4",
+  "status": "locally verified and exact host CLI installed",
+  "sourceHashes": {
+    "provisioning/fleet.rs": "d4f7664bade9149eba4679935f4e983d933fd0359bc98b3f8f9db074b6d66544",
+    "provisioning/room-fleet.py": "0d56c1c4c4b0dc9cf026ba9938a7d16180980571ba619f9186ea96ec88fb8d82",
+    "provisioning/test_fleet_registry_encoding.py": "c5a47c9b83659c6c44e35c02114b0fc94bc54224339c3091e1290b9fcb8a85af",
+    ".github/workflows/provisioning.yml": "d510daf469dd211de8e72dfd77a9da8344b5b8e4e58c5c3a241a8afe772f517f",
+    "provisioning/README.md": "a58971595570c2bd00aedc15030f9fba91bac539eb661f84dfb12dfb588f0885"
+  },
+  "scope": "Native macOS arm64 CLI and actual Python room reader with generated private registries and exclusively owned loopback peers. No owner registry or device operation.",
+  "formatContract": {
+    "singleLeadingUtf8BomAccepted": true,
+    "bomFreeUtf8Preserved": true,
+    "unicodeFieldsAndEmbeddedFeffPreserved": true,
+    "doubleMisplacedBomAndInvalidUtf8Utf16Rejected": true,
+    "registryBytesNeverRewritten": true,
+    "genericNetworkJsonParserUnchanged": true,
+    "windowsWriterSourceUnchanged": true,
+    "authority": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_character_encoding?view=powershell-5.1",
+    "actualWindowsWriterExecutionObserved": false
+  },
+  "artifacts": {
+    "compilerSha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1",
+    "compilerVersion": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "baselineSourceSha256": "05c7218802342d60e0cb39347c38feffd3d96cbcb69d89b1ef794290e0dc7887",
+    "baselineHelperSha256": "2bdc79f2ca8530cc810d9ee6c57e01683198ee8809f45b58e07dc80864ec505a",
+    "baselineBinarySha256": "4e98f493036e321dfbc171db3c920e6389735d7a8f19f790be546266398c871f",
+    "candidateBinarySha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "architecture": "Mach-O arm64",
+    "frozenTestSha256": "c5a47c9b83659c6c44e35c02114b0fc94bc54224339c3091e1290b9fcb8a85af",
+    "historicalCompilerReusedReadOnly": true,
+    "baselineBytes": 695520,
+    "candidateAndInstalledBytes": 694352,
+    "preservedOriginalBytes": 694352
+  },
+  "baseline": {
+    "compileExit": 0,
+    "terminalExit": 1,
+    "tests": 10,
+    "failures": 6,
+    "errors": 0,
+    "skips": 0,
+    "retainedControls": 4,
+    "logSha256": "8b386ece58d7663c097168aff0b6ff04a929118d70d659740cc68a490322b472",
+    "compiledSourceMatchesBaseCommit": true,
+    "testUnchangedThroughGreenAndInstall": true
+  },
+  "hostGates": {
+    "candidate-compile": {
+      "exit": 0,
+      "seconds": 1.222,
+      "count": null,
+      "log_sha256": "9f43a2ec8ccb741d00a3f32b0bbac70ef4e241ced8e0f256570e24a6d8c29c39",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/candidate-compile.log"
+    },
+    "rust-test-compile": {
+      "exit": 0,
+      "seconds": 0.211,
+      "count": null,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/rust-test-compile.log"
+    },
+    "syntax-provision.sh": {
+      "exit": 0,
+      "seconds": 0.006,
+      "count": null,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/syntax-provision.sh.log"
+    },
+    "syntax-fleet-backup.sh": {
+      "exit": 0,
+      "seconds": 0.006,
+      "count": null,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/syntax-fleet-backup.sh.log"
+    },
+    "syntax-fleet-restore.sh": {
+      "exit": 0,
+      "seconds": 0.004,
+      "count": null,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/syntax-fleet-restore.sh.log"
+    },
+    "rust-tests": {
+      "exit": 0,
+      "seconds": 0.1,
+      "count": 25,
+      "log_sha256": "cc000a924fccfe0cb3122c263ce9b302d2969cffff46701a72f54b6cddcc367d",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/rust-tests.log"
+    },
+    "registry-tests": {
+      "exit": 0,
+      "seconds": 0.465,
+      "count": 10,
+      "log_sha256": "de3117c1aa96b5ac1da9c539f870b40f526a400496e674f99adb8d378ca5d777",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/registry-tests.log"
+    },
+    "port-tests": {
+      "exit": 0,
+      "seconds": 0.749,
+      "count": 12,
+      "log_sha256": "8dab433f1969e2b9b92bf8e8f65682f8acc67d73130c64b082421a69117d06ae",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/port-tests.log"
+    },
+    "access-tests": {
+      "exit": 0,
+      "seconds": 0.955,
+      "count": null,
+      "log_sha256": "0063c7f8c0cd169803a291bbbbd66311255d1774b490148e5facd9b018094606",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/access-tests.log"
+    },
+    "http-tests": {
+      "exit": 0,
+      "seconds": 1.891,
+      "count": 28,
+      "log_sha256": "1a56915a636110c7e31b2dd207e9e519c35448cfecc1f0f334048d8ede773cbb",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/http-tests.log"
+    },
+    "room-tests": {
+      "exit": 0,
+      "seconds": 10.288,
+      "count": 60,
+      "log_sha256": "bbbd01a0072d7f6785a0cef65cc87a217ea4d256578f3e81e568706b73172e5c",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/room-tests.log"
+    },
+    "restore-tests": {
+      "exit": 0,
+      "seconds": 15.494,
+      "count": 34,
+      "log_sha256": "6a22bc99ae0b24f3f83be79f09de1a5825520080269e2ce7b739fa0a1a0e42b0",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/restore-tests.log"
+    },
+    "backup-tests": {
+      "exit": 0,
+      "seconds": 18.046,
+      "count": 23,
+      "log_sha256": "bc672c5960492f696c66af80ea2f15fea20fd7febb5b8c8f09594c4df3dc57e8",
+      "log": "/private/tmp/portal-product-audit-20261103-085150/backup-tests.log"
+    },
+    "total_test_count": 192,
+    "parallel_seconds": 18.075,
+    "candidate_sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "test_sha256": "c5a47c9b83659c6c44e35c02114b0fc94bc54224339c3091e1290b9fcb8a85af",
+    "windows_source_unchanged": true,
+    "windows_ascii": true,
+    "python_ast": true,
+    "hosted_windows_observed": false
+  },
+  "totalFleetHostTests": 192,
+  "additionalBashAccessTests": 38,
+  "allGatesTerminalExit": 0,
+  "allAcceptedTestsZeroSkips": true,
+  "localDelivery": {
+    "binarySha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "bytes": 694352,
+    "originalPrivateBackupSha256": "e49b00eb1de129a4f5e75ab9091aacbfcd09293a40197556a5b6e4249cb07555",
+    "modePreserved": true,
+    "atomicReplacement": true,
+    "noPendingReplacement": true,
+    "installedAcceptance": {
+      "exit": 0,
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "seconds": 0.408,
+      "logSha256": "bbe5c8a091ae06c8ae3a83253344ecd8e19da6092d60560a9b361fb9229fa5c5",
+      "frozenTestSha256": "c5a47c9b83659c6c44e35c02114b0fc94bc54224339c3091e1290b9fcb8a85af"
+    },
+    "installedAndAcceptedAt": "2026-11-03T09:00:31.074938+00:00"
+  },
+  "ciStructure": {
+    "parsed": true,
+    "bothTriggersContainFrozenTest": true,
+    "linuxFreshCompiledCliConfigured": true,
+    "windowsNativeFreshCompiledCliConfigured": true,
+    "windowsPowerShell51ParseAndAccessPreserved": true,
+    "hostedLinuxObserved": false,
+    "hostedWindowsObserved": false,
+    "actualWindowsWriterObserved": false,
+    "sha256": "d510daf469dd211de8e72dfd77a9da8344b5b8e4e58c5c3a241a8afe772f517f"
+  },
+  "independentSourceReview": {
+    "blockingFindings": 0,
+    "reportSha256": "b5a38370d465ac246f76c810d08a91753db99a3a781c490a0f42a17855b99a4c"
+  },
+  "preservedBaseFiles": {
+    "app/build.gradle.kts": "cef38aa3962afa10b31a949d912cdfc84f040d6dc822628b467527ce795556a8",
+    "version.json": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+    "app/src/main/java/com/immortal/launcher/Http.kt": "442c3285682ae7467cde959417c40477d1373dd893e1e267bd355c4fd2322422"
+  },
+  "roomArtifact": "Previous exact optimized1.113/code107 delivery retained; no Android build/install or device inspection for this host unit.",
+  "backlog": {
+    "tasks": 89,
+    "delivered": 54,
+    "verified": 25,
+    "approval": 3,
+    "parked": 6,
+    "queued": 1,
+    "all88PriorTaskRecordsAndRawSerializationUnchanged": true,
+    "defaultWeatherAndAllBoundariesUnchanged": true
+  },
+  "limits": [
+    "Generated files implement the documented PowerShell5.1 UTF8-with-BOM byte contract; the actual writer and native Windows CLI were not executed locally. Hosted Windows/Linux CI is configured but unobserved.",
+    "Normal listener/thread/subprocess/temporary registry cleanup is exercised. External runner failure and timeout cleanup were not independently fault-injected.",
+    "Existing JSON schema, duplicate-key and selector-collision behavior, malformed-row CLI skip versus strict helper failure, port validation, token handling and general command deadlines remain.",
+    "One existing as_i64 dead_code compiler warning; no compiler errors.",
+    "No owner registry or token copy, real-device/phone/provider/HA operation, GitHub authentication, push or publication. Existing permissions, approvals and original parked clocks remain."
+  ],
+  "broaderGoal": "active",
+  "documentationAcceptance": {
+    "strictMkdocsTerminalExit": 0,
+    "warnings": 0,
+    "errors": 0,
+    "buildSeconds": 2.635,
+    "buildLogSha256": "ae86240b8a1802acd44241edf3b2b72e5e0f0f2784bdc0b705853a682068d5d6",
+    "browser": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 89,
+          "checks": [
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "http-error-body",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 89,
+          "checks": [
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "http-error-body",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "browserSeconds": 4.545,
+    "screenshotsVisuallyInspected": [
+      390,
+      1600
+    ],
+    "qaReportSha256": "136e21fe3e4f1a96a57e7dfe1f522769cf4479e0818ef0a4eb50629d672ab59c",
+    "proofByteCheck": "Initial and final served-byte checks are retained privately; exact final public proof bytes are checked after metadata finalization, with the final hash bound in the private closing record."
+  }
+}

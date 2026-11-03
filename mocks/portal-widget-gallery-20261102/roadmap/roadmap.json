@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T08:45:19.392633+00:00",
+  "updatedAt": "2026-11-03T09:01:21.787959+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,50 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-registry-encoding",
+      "title": "Fleet: read Windows-provisioned UTF-8 registries",
+      "summary": "Locally verified and installed: a single leading UTF-8 BOM no longer hides Windows-provisioned devices.",
+      "description": "Accept the PowerShell5.1 file marker at both registry readers; preserve Unicode fields, original bytes and existing validation. Generic network JSON parsing remains unchanged.",
+      "status": "verified",
+      "verification": "10 frozen methods:6 red failures\u2192pass \u00b7 192 Fleet host tests +38 Bash checks \u00b7 installed copy10/10",
+      "kind": "Host Fleet registry compatibility",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Fleet tooling / independent regression and artifact review",
+      "deployment": "Exact tested macOS arm64 CLI atomically installed locally; previous Portal1.113/code107 delivery retained.",
+      "state": "Original ignored executable preserved privately. Generated registries and owned loopback fixtures only; no owner registry or device operation.",
+      "acceptance": [
+        "Reproduce CLI omitted inventory/fanout and strict helper rejection using frozen actual-reader methods.",
+        "Accept exactly one leading UTF-8 file marker while preserving Unicode, BOM-free files, embedded U+FEFF and malformed-input policies.",
+        "Run fresh native CLI/full host gates and exact installed executable acceptance.",
+        "Preserve original file bytes, prior task objects, room delivery, permissions and original issue clocks."
+      ],
+      "evidence": [
+        {
+          "text": "Registry compatibility correction, frozen red/green gates and exact local executable acceptance.",
+          "source": "docs/portal-fleet-registry-encoding-2026-11-03.md"
+        },
+        {
+          "text": "Bound source/compiler/executables, logs, unchanged format controls and scoped local delivery.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/fleet-registry-encoding-verification.json"
+        }
+      ],
+      "limits": [
+        "Generated files implement the documented PowerShell5.1 UTF8-with-BOM byte contract; the actual writer and native Windows CLI were not executed locally. Hosted Windows/Linux CI is configured but unobserved.",
+        "Normal listener/thread/subprocess/temporary registry cleanup is exercised. External runner failure and timeout cleanup were not independently fault-injected.",
+        "Existing JSON schema, duplicate-key and selector-collision behavior, malformed-row CLI skip versus strict helper failure, port validation, token handling and general command deadlines remain.",
+        "One existing as_i64 dead_code compiler warning; no compiler errors.",
+        "No owner registry or token copy, real-device/phone/provider/HA operation, GitHub authentication, push or publication. Existing permissions, approvals and original parked clocks remain."
+      ],
+      "next": "Retain local host delivery; actual Windows writer/native CLI and hosted cross-platform CI remain open. Continue distinct authorized work without reopening parked clocks.",
+      "issueClock": {
+        "startedAt": "2026-11-03T08:51:50+00:00",
+        "deadline": "2026-11-03T09:21:50+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "http-error-body",
       "title": "HTTP: stop after the rejection diagnostic prefix",

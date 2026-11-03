@@ -131,6 +131,10 @@ Provisioning records this device — name, IP, and the agent's auth token — to
 `fleet/<serial>.json` for the laptop tool. (That folder holds secrets and is
 gitignored.)
 
+Both `fleetctl` and `room-fleet.py` accept UTF-8 registry files with or without
+the leading byte-order mark written by Windows PowerShell 5.1. Unicode device
+names and credentials are preserved, and reading a registry never rewrites it.
+
 ```bash
 ./provision.sh --fleet          # macOS/Linux: name + enable the agent, record the device
 # powershell ... provision.ps1 -Fleet   # Windows

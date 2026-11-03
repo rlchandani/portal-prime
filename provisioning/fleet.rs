@@ -411,7 +411,9 @@ fn load_registry() -> Vec<Device> {
             Ok(t) => t,
             Err(_) => continue,
         };
-        let j = match Json::parse(&text) {
+        // Windows PowerShell 5.1 writes a UTF-8 BOM when recording the registry.
+        let text = text.strip_prefix(b"\xEF\xBB\xBF").unwrap_or(&text);
+        let j = match Json::parse(text) {
             Ok(j) => j,
             Err(e) => {
                 eprintln!("warning: skipping {} ({})", path.display(), e);

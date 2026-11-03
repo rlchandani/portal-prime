@@ -26,6 +26,7 @@ on:
       - "provisioning/test_room_fleet.py"
       - "provisioning/test_fleet_http.py"
       - "provisioning/test_fleet_ports.py"
+      - "provisioning/test_fleet_registry_encoding.py"
       - "provisioning/fleet-backup.sh"
       - "provisioning/fleet-backup-data.py"
       - "provisioning/test_fleet_backup.py"
@@ -45,6 +46,7 @@ on:
       - "provisioning/test_room_fleet.py"
       - "provisioning/test_fleet_http.py"
       - "provisioning/test_fleet_ports.py"
+      - "provisioning/test_fleet_registry_encoding.py"
       - "provisioning/fleet-backup.sh"
       - "provisioning/fleet-backup-data.py"
       - "provisioning/test_fleet_backup.py"
@@ -84,6 +86,7 @@ jobs:
         run: |
           python provisioning/test_fleet_http.py -v
           python provisioning/test_fleet_ports.py -v
+          python provisioning/test_fleet_registry_encoding.py -v
 
       - name: Run room fleet tests
         run: python provisioning/test_room_fleet.py -v
@@ -150,6 +153,7 @@ jobs:
     # The real thing: parse under Windows PowerShell 5.1, exactly what the .bat runs
     # on a user's machine. `shell: powershell` is 5.1 on the runner; `pwsh` is 7.
     runs-on: windows-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -168,3 +172,20 @@ jobs:
       - name: Calls access behavior (Windows PowerShell 5.1)
         shell: powershell
         run: ./scripts/test-provision-access.ps1
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build optimized Windows fleet CLI
+        shell: powershell
+        run: rustc -O provisioning/fleet.rs -o "$env:RUNNER_TEMP/fleetctl.exe"
+
+      - name: Run compiled fleet registry encoding tests
+        shell: powershell
+        env:
+          IMMORTAL_FLEET_CLI: ${{ runner.temp }}/fleetctl.exe
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python provisioning/test_fleet_registry_encoding.py -v

@@ -60,7 +60,8 @@ def load_rooms(registry):
         for path in sorted(registry.glob("*.json")):
             if path.is_symlink():
                 raise FleetError("registry entries must be regular files")
-            data = json.loads(path.read_text(encoding="utf-8"))
+            # Accept the single UTF-8 BOM emitted by Windows PowerShell 5.1.
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
             if not isinstance(data, dict):
                 raise FleetError("invalid registry entry")
             for key in ("serial", "name", "token"):

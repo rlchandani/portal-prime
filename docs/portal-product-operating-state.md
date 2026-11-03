@@ -13,6 +13,19 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Current host CLI / Windows registry compatibility:** native macOS Fleet CLI
+  and room helper accept one leading UTF-8 BOM emitted by PowerShell5.1. Unicode
+  fields, BOM-free files and existing malformed-input policies remain; registry
+  bytes and network JSON parsing are unchanged. Ten frozen methods reproduce six
+  assertion failures then pass; **192 Fleet host tests +38 Bash access checks**,
+  zero skips. Exact tested CLI is atomically installed locally and separately
+  passes10/10. Original bytes are privately preserved. Actual Windows writer/native
+  executable and hosted CI remain unobserved; Linux and Windows CI are wired.
+  No owner registry or device operation; prior **1.113/code107** room delivery
+  remains. **89 tasks:54 delivered,25 locally verified,3 approval,6 parked,1 queued.**
+  Original **08:51:50–09:21:50 UTC** audit clock retained; broader goal stays active.
+  [Receipt](portal-fleet-registry-encoding-2026-11-03.md).
+
 - **Current room APK / shared HTTP rejection diagnostics:** exact optimized
   **1.113/code107** is installed and fully hashed in both rooms. Decode only the
   existing300UTF16 log prefix and close its reader; status/empty/null/failure
@@ -35,7 +48,7 @@ The updated whole-product objective is
   clock retained; broader goal stays active.
   [Receipt](portal-http-error-body-2026-11-03.md).
 
-- **Current host CLI / Fleet endpoint port admission:** invalid supplied direct
+- **Previous host CLI / Fleet endpoint port admission:** invalid supplied direct
   or selected registry ports now fail validation before authenticated requests
   and registry fanout. Missing defaults, valid integral ports, primary/legacy
   precedence and explicit-host registry bypass remain. Twelve frozen actual-CLI
