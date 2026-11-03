@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T12:59:48.017599+00:00",
+  "updatedAt": "2026-11-03T13:26:43.575869+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,58 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.122/code116. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.123/code117. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "remote-discovery-callbacks",
+      "title": "Remote discovery: retire stale callbacks",
+      "summary": "Delivered 1.123: late discovery callbacks preserve current peer ownership.",
+      "description": "Late resolves cannot restore lost peers or publish after stop/restart; old-session Lost and registration callbacks cannot erase current peers or change current self-exclusion. Lost/refound creates a new occurrence, while duplicate Found retains the current occurrence. Session/occurrence checks and peer changes share one monitor; teardown retires ownership before platform calls.",
+      "status": "delivered",
+      "verification": "10 frozen tests: 6 red to pass; 4,323 JVM / 448 suites; inert NSD only",
+      "kind": "Remote discovery callback ownership",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Remote discovery / independent source and gate review",
+      "deployment": "Exact optimized 1.123/code117 installed and fully hashed in Family Area and Living Area.",
+      "state": "Four complete maps, room name and Dev Mode match; twelve preference states per room match: Family eleven byte-identical files and one unchanged absence; Living eight byte-identical files and four unchanged absences. Family font, accessibility, original Chrome, resumed frame and awake display remain. The current Family frame was viewed privately; Living visual remains open. Limited HTTP200 /diag and /logcat?lines=1500 observations produce 1644/2015 actual lines without fatal or ANR markers. Copied credentials are removed; original registry, public1.83/code77 manifest and native fleet CLI remain unchanged.",
+      "acceptance": [
+        "Freeze literal production-listener regressions before correction on unchanged source.",
+        "Retire lost, stopped and restarted callback ownership without stale peer or self-name changes.",
+        "Preserve current host/port, self-exclusion, duplicate Found and best-effort failure controls.",
+        "Deliver exact signed optimized bytes and preserve complete maps plus twelve preference states."
+      ],
+      "evidence": [
+        {
+          "text": "Actual listener regressions, source correction, exact delivery and limits.",
+          "source": "docs/portal-remote-discovery-callbacks-2026-11-03.md"
+        },
+        {
+          "text": "Bound baseline, gate, artifacts, room preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/remote-discovery-callback-verification.json"
+        }
+      ],
+      "limits": [
+        "Acceptance exercises actual public start/stop/peersJson and production listener objects on the JVM at inert Mockito NSD boundaries. It does not execute Android NSD, Binder, a provider or a real network.",
+        "No native NSD fixture is admitted: supported start obtains a live final Android NsdManager and immediately registers/discovers. No private-field injection, null manager, copied listener model, keep rule or platform workaround is used.",
+        "Native callback scheduling, Android API28/29 discovery, optimized candidate callback runtime, authenticated /remote/devices execution, phone pairing and physical multi-room discovery remain unverified. Exact optimized package delivery establishes installation and bytes only.",
+        "A Found callback admitted before retirement may issue its external resolve request after stop; its result cannot publish after ownership is retired. No platform cancellation or universal callback ordering claim is made.",
+        "Baseline optimized structural inspection retains rewritten start and concrete callbacks; it does not imply candidate optimized runtime acceptance or that all callback methods were removed.",
+        "Family visual review covers the current frame only. Living visual acceptance and discovery UI acceptance remain open. Limited lines=1500 diagnostics do not establish complete runtime health.",
+        "The original 13:09:28–13:39:28 UTC clock includes inventory, tests, delivery and documentation. Prayer tomorrow, NotificationOverlay, artwork, Snapcast and every older held or exhausted scope retain their original clocks.",
+        "Public manifest remains1.83/code77. Existing phone-control, publication, HA and design-approval restrictions remain."
+      ],
+      "next": "Retain exact room delivery and regressions; physical discovery, platform timing, optimized callbacks, phone/UI and API28 acceptance remain open.",
+      "issueClock": {
+        "startedAt": "2026-11-03T13:09:28Z",
+        "deadline": "2026-11-03T13:39:28Z",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "user-layout-save-conflicts",
       "title": "Folders and favorites: reject stale native saves",
