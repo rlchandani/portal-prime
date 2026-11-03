@@ -1,0 +1,765 @@
+{
+  "recordedAt": "2026-11-03T07:13:35.492746+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T07:01:27Z",
+    "deadline": "2026-11-03T07:31:27Z",
+    "baseCommit": "8829916252d306480d7cd57898f9927b63bbeb25",
+    "scope": "Prayer header after today: recompute tomorrow Fajr using the next local calendar date. Preserve today selection/input Calendar/astronomy/settings. No live weather/feed/network, high-latitude or UI redesign scope."
+  },
+  "scope": "Prayer header after the last prayer recomputes Fajr on the next local calendar date.",
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/PrayerTimes.kt": "b632a79cfb8618474a7c30ca2c4bc0f2ba63d284a71d4e909ccb2c1eb93cbe98",
+    "app/src/main/java/com/immortal/launcher/CalendarPacks.kt": "eb56f3b408c70bdd98006e4f8d311b3b178a7f2a201f2e5e5351b35a85a0701f",
+    "app/src/main/java/com/immortal/launcher/Weather.kt": "7b185d1d7896e33cc98e040e60de23b25c518f74e886966521487fc4a6618f98",
+    "app/src/test/java/com/immortal/launcher/PrayerTimesNextLineTest.kt": "0c59edf82c8e05d76bc45fe8c58730f73ab547dc313eef6778ddcad870d35005",
+    "app/build.gradle.kts": "1b977f7e8ca1c9e30e920b980cf06d45e9799423aad28befccd49ba85cf5a444"
+  },
+  "red": {
+    "originalStartUtc": "2026-11-03T07:01:27Z",
+    "deadlineUtc": "2026-11-03T07:31:27Z",
+    "command": "JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home ./gradlew :app:testDebugUnitTest --tests com.immortal.launcher.PrayerTimesNextLineTest --no-daemon",
+    "terminalExit": 1,
+    "tests": 12,
+    "failures": 7,
+    "errors": 0,
+    "skipped": 0,
+    "cases": [
+      {
+        "name": "tomorrowFajrRecomputesSpringDstDateAndOffset",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<\ud83d\udd4c Fajr 0[5:48] (tomorrow)> but was:<\ud83d\udd4c Fajr 0[4:50] (tomorrow)>"
+      },
+      {
+        "name": "enabledCalendarPackDisplaysRecomputedTomorrowHeader",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[\ud83d\udd4c Fajr 05:48 (tomorrow)]> but was:<[\ud83d\udd4c Fajr 04:50 (tomorrow)]>"
+      },
+      {
+        "name": "disabledCalendarPacksDoNotResolveLocation",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "tomorrowSelectionDoesNotMutateTheSuppliedCalendar",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "tomorrowFajrAdvancesPastTheEndOfApril",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<\ud83d\udd4c Fajr 04:1[0] (tomorrow)> but was:<\ud83d\udd4c Fajr 04:1[1] (tomorrow)>"
+      },
+      {
+        "name": "tomorrowFajrRecomputesAnOrdinarySeasonalDay",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<\ud83d\udd4c Fajr 04:4[7] (tomorrow)> but was:<\ud83d\udd4c Fajr 04:4[9] (tomorrow)>"
+      },
+      {
+        "name": "tomorrowFajrRecomputesFallDstDateAndOffset",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<\ud83d\udd4c Fajr 0[4:53] (tomorrow)> but was:<\ud83d\udd4c Fajr 0[5:52] (tomorrow)>"
+      },
+      {
+        "name": "tomorrowFajrAdvancesPastTheEndOfFebruary",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<\ud83d\udd4c Fajr 0[4:59] (tomorrow)> but was:<\ud83d\udd4c Fajr 0[5:01] (tomorrow)>"
+      },
+      {
+        "name": "beforeFajrSelectsTheCurrentDatesFajr",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "tomorrowFajrAdvancesAcrossTheYearBoundary",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<\ud83d\udd4c Fajr 05:4[1] (tomorrow)> but was:<\ud83d\udd4c Fajr 05:4[0] (tomorrow)>"
+      },
+      {
+        "name": "everyExactPrayerMinuteStillSelectsThatCurrentPrayer",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "oneMinuteAfterFajrSelectsTheCurrentDatesDhuhr",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      }
+    ],
+    "sourceHashes": {
+      "prayer": "193217a6ec792e7e10296ececdfadfa6808f11ae6097cf30968cd4f4631f4442",
+      "packs": "eb56f3b408c70bdd98006e4f8d311b3b178a7f2a201f2e5e5351b35a85a0701f",
+      "weather": "7b185d1d7896e33cc98e040e60de23b25c518f74e886966521487fc4a6618f98",
+      "test": "0c59edf82c8e05d76bc45fe8c58730f73ab547dc313eef6778ddcad870d35005",
+      "build": "18ff58326894ea7f842030d18fca34d2512661dcce2f0762628f579f5a171fb8"
+    },
+    "fixtureAttempts": [
+      {
+        "directory": "baseline-attempt-1",
+        "scope": "JDK URL instrumentation abort before functional assertions; no product finding"
+      },
+      {
+        "directory": "baseline-attempt-2",
+        "scope": "Unsupported static default-bridge interception self-check; all 12 fixture-only failures"
+      }
+    ],
+    "scope": "Actual PrayerTimes.nextLine/forToday and CalendarPacks.headerLines using generated exact fresh cached coordinate triples; unknown prefs/edits/context operations fail. Current Weather fresh-cache branch returns before transport; no transport counter accepted. No native, network, device, UI or astronomical-reference accuracy proof."
+  },
+  "green": {
+    "suites": 434,
+    "tests": 4174,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualPrayerHeaderFocusedTests": 12,
+    "allTwelveUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "1m 53s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "native": {
+    "comparison": {
+      "baselineDebug": {
+        "passed": 16,
+        "total": 22,
+        "sha256": "d4121542a4f5458dc086dce7a1b871ef16a62c8da348e716559b94b959dc9b5d",
+        "terminalExit": 1
+      },
+      "candidateDebug": {
+        "passed": 22,
+        "total": 22,
+        "sha256": "60a90d2118faf44685066f3171b0221a3cc498185231747e283112c38bb7e2dc",
+        "terminalExit": 0
+      },
+      "exactDifferentialChecks": [
+        "springDst",
+        "fallDst",
+        "seasonalDay",
+        "aprilBoundary",
+        "februaryBoundary",
+        "yearBoundary"
+      ],
+      "retainedControls": 16,
+      "observations": {
+        "springDst": {
+          "frozenJvmRedExpected": "\ud83d\udd4c Fajr 05:48 (tomorrow)",
+          "frozenJvmRedActual": "\ud83d\udd4c Fajr 04:50 (tomorrow)",
+          "baselineActual": "\ud83d\udd4c Fajr 04:50 (tomorrow)",
+          "candidateActual": "\ud83d\udd4c Fajr 05:48 (tomorrow)",
+          "baselineFreshCacheReads": 9,
+          "candidateFreshCacheReads": 12,
+          "currentOffsetMinutes": -300,
+          "nextOffsetMinutes": -240,
+          "matchesFrozenJvmActualMethodEvidence": true,
+          "dateOffsetsIndependentlyChecked": true
+        },
+        "fallDst": {
+          "frozenJvmRedExpected": "\ud83d\udd4c Fajr 04:53 (tomorrow)",
+          "frozenJvmRedActual": "\ud83d\udd4c Fajr 05:52 (tomorrow)",
+          "baselineActual": "\ud83d\udd4c Fajr 05:52 (tomorrow)",
+          "candidateActual": "\ud83d\udd4c Fajr 04:53 (tomorrow)",
+          "baselineFreshCacheReads": 9,
+          "candidateFreshCacheReads": 12,
+          "currentOffsetMinutes": -240,
+          "nextOffsetMinutes": -300,
+          "matchesFrozenJvmActualMethodEvidence": true,
+          "dateOffsetsIndependentlyChecked": true
+        },
+        "seasonalDay": {
+          "frozenJvmRedExpected": "\ud83d\udd4c Fajr 04:47 (tomorrow)",
+          "frozenJvmRedActual": "\ud83d\udd4c Fajr 04:49 (tomorrow)",
+          "baselineActual": "\ud83d\udd4c Fajr 04:49 (tomorrow)",
+          "candidateActual": "\ud83d\udd4c Fajr 04:47 (tomorrow)",
+          "baselineFreshCacheReads": 9,
+          "candidateFreshCacheReads": 12,
+          "currentOffsetMinutes": -240,
+          "nextOffsetMinutes": -240,
+          "matchesFrozenJvmActualMethodEvidence": true,
+          "dateOffsetsIndependentlyChecked": true
+        },
+        "aprilBoundary": {
+          "frozenJvmRedExpected": "\ud83d\udd4c Fajr 04:10 (tomorrow)",
+          "frozenJvmRedActual": "\ud83d\udd4c Fajr 04:11 (tomorrow)",
+          "baselineActual": "\ud83d\udd4c Fajr 04:11 (tomorrow)",
+          "candidateActual": "\ud83d\udd4c Fajr 04:10 (tomorrow)",
+          "baselineFreshCacheReads": 9,
+          "candidateFreshCacheReads": 12,
+          "currentOffsetMinutes": -240,
+          "nextOffsetMinutes": -240,
+          "matchesFrozenJvmActualMethodEvidence": true,
+          "dateOffsetsIndependentlyChecked": true
+        },
+        "februaryBoundary": {
+          "frozenJvmRedExpected": "\ud83d\udd4c Fajr 04:59 (tomorrow)",
+          "frozenJvmRedActual": "\ud83d\udd4c Fajr 05:01 (tomorrow)",
+          "baselineActual": "\ud83d\udd4c Fajr 05:01 (tomorrow)",
+          "candidateActual": "\ud83d\udd4c Fajr 04:59 (tomorrow)",
+          "baselineFreshCacheReads": 9,
+          "candidateFreshCacheReads": 12,
+          "currentOffsetMinutes": -300,
+          "nextOffsetMinutes": -300,
+          "matchesFrozenJvmActualMethodEvidence": true,
+          "dateOffsetsIndependentlyChecked": true
+        },
+        "yearBoundary": {
+          "frozenJvmRedExpected": "\ud83d\udd4c Fajr 05:41 (tomorrow)",
+          "frozenJvmRedActual": "\ud83d\udd4c Fajr 05:40 (tomorrow)",
+          "baselineActual": "\ud83d\udd4c Fajr 05:40 (tomorrow)",
+          "candidateActual": "\ud83d\udd4c Fajr 05:41 (tomorrow)",
+          "baselineFreshCacheReads": 9,
+          "candidateFreshCacheReads": 12,
+          "currentOffsetMinutes": -300,
+          "nextOffsetMinutes": -300,
+          "matchesFrozenJvmActualMethodEvidence": true,
+          "dateOffsetsIndependentlyChecked": true
+        }
+      },
+      "optimizedProbes": {
+        "baselineSha256": "efb0aa0e5ff47002ae24fd1a5a58999d641bbe2fc9c9a4bf86347c8909411615",
+        "candidateSha256": "4e1811cb3f4b2b25446b2ee91035d09d01e03b4ba0d5f681dc6d04ddb810126c",
+        "dateArgumentRetained": false,
+        "headerInvocations": 0,
+        "scope": "No date-controlled optimized header acceptance; both reflected methods accept Context only."
+      },
+      "cleanup": {
+        "ownedProcessRetired": {
+          "baseline-debug": true,
+          "candidate-debug": true,
+          "baseline-optimized": true,
+          "candidate-optimized": true
+        },
+        "appPreferencesWritten": 0,
+        "installerInvoked": false,
+        "freshGeneratedCacheBranch": true,
+        "transportInterception": false,
+        "ownedDeviceScratchRemoved": true,
+        "cleanupFaults": []
+      },
+      "scope": "Actual debug APK header integration on generated dates; expected values come from actual APK next-date headers and match frozen actual-method JVM regression. No external astronomy accuracy, UI/network/app writes, or native optimized seasonal matrix. Normal cleanup only, no injected timeout path."
+    },
+    "runs": [
+      {
+        "status": "FAIL",
+        "checks": {
+          "actualApkClassLoader": true,
+          "springDst": false,
+          "springDstInputUnchanged": true,
+          "springDstFreshCacheReadOnly": true,
+          "fallDst": false,
+          "fallDstInputUnchanged": true,
+          "fallDstFreshCacheReadOnly": true,
+          "seasonalDay": false,
+          "seasonalDayInputUnchanged": true,
+          "seasonalDayFreshCacheReadOnly": true,
+          "aprilBoundary": false,
+          "aprilBoundaryInputUnchanged": true,
+          "aprilBoundaryFreshCacheReadOnly": true,
+          "februaryBoundary": false,
+          "februaryBoundaryInputUnchanged": true,
+          "februaryBoundaryFreshCacheReadOnly": true,
+          "yearBoundary": false,
+          "yearBoundaryInputUnchanged": true,
+          "yearBoundaryFreshCacheReadOnly": true,
+          "disabledPackSkipsLocation": true,
+          "currentDateBeforeFajrRetained": true,
+          "processDefaultsRestored": true
+        },
+        "observations": {
+          "springDst": {
+            "todayFajr": "\ud83d\udd4c Fajr 04:50",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 05:48",
+            "actual": "\ud83d\udd4c Fajr 04:50 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 05:48 (tomorrow)",
+            "weatherReads": 9,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -300,
+            "nextOffsetMinutes": -240
+          },
+          "fallDst": {
+            "todayFajr": "\ud83d\udd4c Fajr 05:52",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 04:53",
+            "actual": "\ud83d\udd4c Fajr 05:52 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 04:53 (tomorrow)",
+            "weatherReads": 9,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -240,
+            "nextOffsetMinutes": -300
+          },
+          "seasonalDay": {
+            "todayFajr": "\ud83d\udd4c Fajr 04:49",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 04:47",
+            "actual": "\ud83d\udd4c Fajr 04:49 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 04:47 (tomorrow)",
+            "weatherReads": 9,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -240,
+            "nextOffsetMinutes": -240
+          },
+          "aprilBoundary": {
+            "todayFajr": "\ud83d\udd4c Fajr 04:11",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 04:10",
+            "actual": "\ud83d\udd4c Fajr 04:11 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 04:10 (tomorrow)",
+            "weatherReads": 9,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -240,
+            "nextOffsetMinutes": -240
+          },
+          "februaryBoundary": {
+            "todayFajr": "\ud83d\udd4c Fajr 05:01",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 04:59",
+            "actual": "\ud83d\udd4c Fajr 05:01 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 04:59 (tomorrow)",
+            "weatherReads": 9,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -300,
+            "nextOffsetMinutes": -300
+          },
+          "yearBoundary": {
+            "todayFajr": "\ud83d\udd4c Fajr 05:40",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 05:41",
+            "actual": "\ud83d\udd4c Fajr 05:40 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 05:41 (tomorrow)",
+            "weatherReads": 9,
+            "longitude": "-73.92",
+            "currentOffsetMinutes": -300,
+            "nextOffsetMinutes": -300
+          }
+        },
+        "passed": 16,
+        "total": 22,
+        "apkSha256": "d4121542a4f5458dc086dce7a1b871ef16a62c8da348e716559b94b959dc9b5d",
+        "appPreferencesWritten": 0,
+        "scope": "Actual debug APK header; generated fresh location and dates; no UI/installer/app preference writes"
+      },
+      {
+        "status": "PASS",
+        "checks": {
+          "actualApkClassLoader": true,
+          "springDst": true,
+          "springDstInputUnchanged": true,
+          "springDstFreshCacheReadOnly": true,
+          "fallDst": true,
+          "fallDstInputUnchanged": true,
+          "fallDstFreshCacheReadOnly": true,
+          "seasonalDay": true,
+          "seasonalDayInputUnchanged": true,
+          "seasonalDayFreshCacheReadOnly": true,
+          "aprilBoundary": true,
+          "aprilBoundaryInputUnchanged": true,
+          "aprilBoundaryFreshCacheReadOnly": true,
+          "februaryBoundary": true,
+          "februaryBoundaryInputUnchanged": true,
+          "februaryBoundaryFreshCacheReadOnly": true,
+          "yearBoundary": true,
+          "yearBoundaryInputUnchanged": true,
+          "yearBoundaryFreshCacheReadOnly": true,
+          "disabledPackSkipsLocation": true,
+          "currentDateBeforeFajrRetained": true,
+          "processDefaultsRestored": true
+        },
+        "observations": {
+          "springDst": {
+            "todayFajr": "\ud83d\udd4c Fajr 04:50",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 05:48",
+            "actual": "\ud83d\udd4c Fajr 05:48 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 05:48 (tomorrow)",
+            "weatherReads": 12,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -300,
+            "nextOffsetMinutes": -240
+          },
+          "fallDst": {
+            "todayFajr": "\ud83d\udd4c Fajr 05:52",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 04:53",
+            "actual": "\ud83d\udd4c Fajr 04:53 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 04:53 (tomorrow)",
+            "weatherReads": 12,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -240,
+            "nextOffsetMinutes": -300
+          },
+          "seasonalDay": {
+            "todayFajr": "\ud83d\udd4c Fajr 04:49",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 04:47",
+            "actual": "\ud83d\udd4c Fajr 04:47 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 04:47 (tomorrow)",
+            "weatherReads": 12,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -240,
+            "nextOffsetMinutes": -240
+          },
+          "aprilBoundary": {
+            "todayFajr": "\ud83d\udd4c Fajr 04:11",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 04:10",
+            "actual": "\ud83d\udd4c Fajr 04:10 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 04:10 (tomorrow)",
+            "weatherReads": 12,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -240,
+            "nextOffsetMinutes": -240
+          },
+          "februaryBoundary": {
+            "todayFajr": "\ud83d\udd4c Fajr 05:01",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 04:59",
+            "actual": "\ud83d\udd4c Fajr 04:59 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 04:59 (tomorrow)",
+            "weatherReads": 12,
+            "longitude": "-74.006",
+            "currentOffsetMinutes": -300,
+            "nextOffsetMinutes": -300
+          },
+          "yearBoundary": {
+            "todayFajr": "\ud83d\udd4c Fajr 05:40",
+            "tomorrowFajr": "\ud83d\udd4c Fajr 05:41",
+            "actual": "\ud83d\udd4c Fajr 05:41 (tomorrow)",
+            "expected": "\ud83d\udd4c Fajr 05:41 (tomorrow)",
+            "weatherReads": 12,
+            "longitude": "-73.92",
+            "currentOffsetMinutes": -300,
+            "nextOffsetMinutes": -300
+          }
+        },
+        "passed": 22,
+        "total": 22,
+        "apkSha256": "60a90d2118faf44685066f3171b0221a3cc498185231747e283112c38bb7e2dc",
+        "appPreferencesWritten": 0,
+        "scope": "Actual debug APK header; generated fresh location and dates; no UI/installer/app preference writes"
+      }
+    ],
+    "optimizedDateProbes": [
+      {
+        "status": "UNAVAILABLE",
+        "dateArgumentRetained": false,
+        "actualApkClassLoader": true,
+        "apkSha256": "efb0aa0e5ff47002ae24fd1a5a58999d641bbe2fc9c9a4bf86347c8909411615",
+        "signatures": [
+          "public static java.util.ArrayList com.immortal.launcher.CalendarPacks.b(android.content.Context)"
+        ],
+        "headerInvocations": 0
+      },
+      {
+        "status": "UNAVAILABLE",
+        "dateArgumentRetained": false,
+        "actualApkClassLoader": true,
+        "apkSha256": "4e1811cb3f4b2b25446b2ee91035d09d01e03b4ba0d5f681dc6d04ddb810126c",
+        "signatures": [
+          "public static java.util.ArrayList com.immortal.launcher.CalendarPacks.b(android.content.Context)"
+        ],
+        "headerInvocations": 0
+      }
+    ],
+    "process": [
+      {
+        "terminalExit": 1,
+        "stdoutBytes": 2455,
+        "stderrBytes": 0
+      },
+      {
+        "terminalExit": 0,
+        "stdoutBytes": 2455,
+        "stderrBytes": 0
+      },
+      {
+        "terminalExit": 0,
+        "stdoutBytes": 297,
+        "stderrBytes": 0
+      },
+      {
+        "terminalExit": 0,
+        "stdoutBytes": 297,
+        "stderrBytes": 0
+      }
+    ],
+    "cleanup": {
+      "ownedProcessRetired": {
+        "baseline-debug": true,
+        "candidate-debug": true,
+        "baseline-optimized": true,
+        "candidate-optimized": true
+      },
+      "appPreferencesWritten": 0,
+      "installerInvoked": false,
+      "freshGeneratedCacheBranch": true,
+      "transportInterception": false,
+      "ownedDeviceScratchRemoved": true,
+      "cleanupFaults": []
+    },
+    "fixtureSha256": {
+      "java": "7ab16f9b47387bcd8197b764c22fa4be12dbc6e031b6ff2fa22d974080844355",
+      "jar": "c4d07b358706cb95e66ef4d2cb00337cda174b4198032176387bed70e4e6be22",
+      "compiler": "b320f5052703c42af0930df2be044924236fd9db83b0f88c4f3e0c01779d9bbf",
+      "runner": "c62be65d6ce47e00e8a7ab59ef0a3ec8a4d625358f98c71b274c6c013809152b"
+    },
+    "actualOptimizedDateControlledHeaderVerified": false,
+    "scope": "Actual debug APK header with generated dates; optimized date injection unavailable."
+  },
+  "artifact": {
+    "sha256": "4e1811cb3f4b2b25446b2ee91035d09d01e03b4ba0d5f681dc6d04ddb810126c",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.109",
+    "versionCode": 103,
+    "variants": {
+      "performance": {
+        "sha256": "4e1811cb3f4b2b25446b2ee91035d09d01e03b4ba0d5f681dc6d04ddb810126c",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.109",
+        "versionCode": 103
+      },
+      "debug": {
+        "sha256": "60a90d2118faf44685066f3171b0221a3cc498185231747e283112c38bb7e2dc",
+        "bytes": 46703533,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.109",
+        "versionCode": 103
+      },
+      "rollback": {
+        "sha256": "efb0aa0e5ff47002ae24fd1a5a58999d641bbe2fc9c9a4bf86347c8909411615",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.108",
+        "versionCode": 102
+      }
+    },
+    "debugSha256": "60a90d2118faf44685066f3171b0221a3cc498185231747e283112c38bb7e2dc",
+    "rollbackSha256": "efb0aa0e5ff47002ae24fd1a5a58999d641bbe2fc9c9a4bf86347c8909411615",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "1m 53s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "originalRegistryByteHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "ownedNativeProcessesAndDeviceScratchRemoved": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "googlePhoneCommands": 0,
+    "currentFamilyPhotoFrameWithClockVisuallyInspected": true,
+    "familyChromeTaskRetained": true
+  },
+  "review": {
+    "blockingProductionFindings": 0,
+    "reviewedHashes": {
+      "prayer": "b632a79cfb8618474a7c30ca2c4bc0f2ba63d284a71d4e909ccb2c1eb93cbe98",
+      "packs": "eb56f3b408c70bdd98006e4f8d311b3b178a7f2a201f2e5e5351b35a85a0701f",
+      "weather": "7b185d1d7896e33cc98e040e60de23b25c518f74e886966521487fc4a6618f98",
+      "test": "0c59edf82c8e05d76bc45fe8c58730f73ab547dc313eef6778ddcad870d35005",
+      "build": "1b977f7e8ca1c9e30e920b980cf06d45e9799423aad28befccd49ba85cf5a444",
+      "nativeJava": "7ab16f9b47387bcd8197b764c22fa4be12dbc6e031b6ff2fa22d974080844355",
+      "nativeCompiler": "b320f5052703c42af0930df2be044924236fd9db83b0f88c4f3e0c01779d9bbf",
+      "nativeJar": "c4d07b358706cb95e66ef4d2cb00337cda174b4198032176387bed70e4e6be22",
+      "nativeRunner": "c62be65d6ce47e00e8a7ab59ef0a3ec8a4d625358f98c71b274c6c013809152b"
+    },
+    "unchangedFromRed": {
+      "test": true,
+      "packs": true,
+      "weather": true
+    },
+    "nativeCompileSourceJarBinding": true,
+    "findings": [
+      "Production fallback clones and advances the requested Calendar by one local date and recomputes actual forToday; current-day selection and original Calendar stay unchanged.",
+      "Six native expected headers use actual next-date APK CalendarPacks calls at 03:00; for the generated dates this has the same UTC offset as next-date 23:59 and remains before Fajr.",
+      "Strict generated prefs reject writes and unknown keys/methods. Exact fresh cached fixes return from unchanged Weather before transport; transport instrumentation is explicitly not accepted.",
+      "Runner strengthened to exact six failing baseline tomorrow checks, 16 retained controls, 22 candidate checks, six observations, and variant-specific 9/12 cached reads."
+    ],
+    "pending": [],
+    "scope": "Date-controlled actual debug APK header integration only; optimized date-argument unavailability is a separate reflection probe with zero header invocations. No external astronomy accuracy, actual UI, network, preferences mutation, alarm, native optimized seasonal matrix, or fault-injected timeout cleanup proof.",
+    "fullJVM": {
+      "suites": 434,
+      "tests": 4174,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "focusedTests": 12,
+      "retainedXmlVerified": true
+    },
+    "actualApkHashesVerified": {
+      "performance": {
+        "sha256": "4e1811cb3f4b2b25446b2ee91035d09d01e03b4ba0d5f681dc6d04ddb810126c",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.109",
+        "versionCode": 103
+      },
+      "debug": {
+        "sha256": "60a90d2118faf44685066f3171b0221a3cc498185231747e283112c38bb7e2dc",
+        "bytes": 46703533,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.109",
+        "versionCode": 103
+      },
+      "rollback": {
+        "sha256": "efb0aa0e5ff47002ae24fd1a5a58999d641bbe2fc9c9a4bf86347c8909411615",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.108",
+        "versionCode": 102
+      }
+    },
+    "nativeDifferential": {
+      "baseline": 16,
+      "candidate": 22,
+      "total": 22,
+      "exactDifferentialChecks": [
+        "springDst",
+        "fallDst",
+        "seasonalDay",
+        "aprilBoundary",
+        "februaryBoundary",
+        "yearBoundary"
+      ],
+      "retainedControls": 16,
+      "matchesFrozenJvmExpected": true,
+      "fourProcessExitCodesAndApkBindingsVerified": true,
+      "normalCleanupVerified": true,
+      "timeoutFailureInjected": false
+    },
+    "finalBlockingFindings": 0
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestUnchanged": true,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false
+  },
+  "limits": [
+    "The existing astronomical model and requested-instant UTC-offset policy are retained; this change establishes next-date selection, not astronomical/reference accuracy, high-latitude behavior or an early-DST-day offset-policy redesign.",
+    "Native acceptance calls actual debug APK CalendarPacks.headerLines with generated dates and fresh cached coordinates. Optimized APK reflection probes confirm the Calendar argument is removed; both probes invoke zero headers. Date-controlled optimized native acceptance remains unavailable.",
+    "Fresh complete cached-location reads establish the existing Weather early-return branch. Unsupported URL/default-bridge interception attempts are retained privately and excluded; no independent transport counter is claimed.",
+    "No enabled-owner prayer pack, live location, screensaver prayer UI, external service or timezone setting was changed. Normal native cleanup passed; timeout/failure cleanup was not fault-injected.",
+    "API28, other timezone transitions/calendars and Living native/visual acceptance remain unverified. Existing UI approvals and exhausted issue clocks retain their boundaries.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+  ],
+  "documentation": {
+    "strictMkdocsTerminalExit": 0,
+    "strictMkdocsDuration": "1.93 seconds",
+    "strictMkdocsWarnings": 0,
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 83,
+          "checks": [
+            {
+              "id": "prayer-tomorrow",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "calendar-all-day-dst",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 83,
+          "checks": [
+            {
+              "id": "prayer-tomorrow",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "calendar-all-day-dst",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingServerWasUnavailableAndLocalPreviewRestored": true
+    },
+    "detailImagesVisuallyInspected": [
+      390,
+      1600
+    ],
+    "initialPreviewFailureRetainedPrivately": true,
+    "priorPreviewListenerAbsent": true,
+    "ownedLoopbackPreviewRestoredAndKeptRunning": true,
+    "pageLevelPassWithClippedCellRetainedPrivately": true,
+    "newStatusCopyCorrectedAndPerCellOverflowChecked": true,
+    "finalStrictMkdocsTerminalExit": 0
+  }
+}

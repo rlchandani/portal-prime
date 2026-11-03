@@ -13,8 +13,24 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / all-day calendar date spans:** exact optimized
-  **1.108/code102** is installed and fully hashed in both rooms. Date-only events
+- **Current room APK / tomorrow prayer header:** exact optimized
+  **1.109/code103** is installed and fully hashed in both rooms. After the last
+  prayer, Fajr uses the next calendar date and its UTC offset; caller date and
+  current-minute selection remain. Twelve unchanged methods reproduce seven
+  failures then pass; **4,174 JVM/434 suites**, debug/optimized/R8/
+  vital lint pass in 1m 53s. Actual debug Family header improves
+  **16/22→22/22**, six differences/sixteen retained checks. Optimized date argument
+  is R8-pruned; actual probes record unavailable acceptance with zero invocations.
+  No independent astronomical accuracy or transport counter is claimed. Complete
+  maps and Home/timer/Sunrise/Chime/Weather/packs bytes match; Family current photo
+  frame/clock/font/services/original Chrome retained. Owned processes/scratch/registry
+  removed; normal cleanup only. Public1.83 guard rejects local1.109; no phone/HA/
+  auth/publication. **83 tasks:50 delivered,23 locally verified,3 approval,6 parked,
+  1 queued.** Original **07:01:27–07:31:27 UTC** audit clock retained; broader goal
+  stays active. [Receipt](portal-prayer-tomorrow-2026-11-03.md).
+
+- **Previous room APK / all-day calendar date spans:** exact optimized
+  **1.108/code102** was installed and fully hashed in both rooms. Date-only events
   retain calendar-day spans and exclusive local midnight ends through 23/25-hour
   days; timed elapsed durations remain. Twelve unchanged actual-parser/window
   methods reproduce nine failures then pass; **4,162 JVM/433 suites**,

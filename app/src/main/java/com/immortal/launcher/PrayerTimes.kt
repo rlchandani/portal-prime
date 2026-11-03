@@ -48,7 +48,8 @@ object PrayerTimes {
       if (h * 60 + m >= nowMin) return "🕌 $name $t"
     }
     // All passed today → first prayer tomorrow.
-    return times["Fajr"]?.let { "🕌 Fajr $it (tomorrow)" } ?: ""
+    val tomorrow = (now.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 1) }
+    return forToday(context, tomorrow)?.get("Fajr")?.let { "🕌 Fajr $it (tomorrow)" } ?: ""
   }
 
   /** Pure computation, exposed for tests. [tzHours] is the UTC offset in hours.

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T06:57:49.350525+00:00",
+  "updatedAt": "2026-11-03T07:13:35.492746+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,56 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.108/code102. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.109/code103. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "prayer-tomorrow",
+      "title": "Prayer header: compute tomorrow's Fajr",
+      "summary": "Delivered to both rooms: after the last prayer, tomorrow's Fajr uses the next date and its UTC offset.",
+      "description": "Recompute Fajr on a cloned next-day Calendar after today's prayers finish. Preserve current-day and exact-minute selection, caller date and existing astronomical model.",
+      "status": "delivered",
+      "verification": "12 unchanged regressions / 4,174 JVM \u00b7 actual debug header16/22\u219222/22",
+      "kind": "Prayer calendar date correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Prayer engineering / independent date and native header review",
+      "deployment": "Exact signed optimized 1.109/code103 installed and full APK hash verified in Family Area and Living Area.",
+      "state": "Configuration maps and saved preference files match. Family's photo frame, clock, font, services and Chrome task remain. Owned native processes, scratch files and copied registry removed.",
+      "acceptance": [
+        "Reproduce after-Isha stale tomorrow times across both daylight-saving changes and ordinary/month/year rollover dates.",
+        "Use the actual calculator for the next local date without mutating input or changing today's selection.",
+        "Verify actual enabled header integration, exact-minute selection and disabled-pack location suppression.",
+        "Run unchanged full gates, actual debug header differential and exact signed optimized room delivery with state preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Next-date correction, unchanged regressions, actual native header comparison and scope.",
+          "source": "docs/portal-prayer-tomorrow-2026-11-03.md"
+        },
+        {
+          "text": "Frozen hashes, native date probes, full gates and preserved room delivery.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/prayer-tomorrow-verification.json"
+        }
+      ],
+      "limits": [
+        "The existing astronomical model and requested-instant UTC-offset policy are retained; this change establishes next-date selection, not astronomical/reference accuracy, high-latitude behavior or an early-DST-day offset-policy redesign.",
+        "Native acceptance calls actual debug APK CalendarPacks.headerLines with generated dates and fresh cached coordinates. Optimized APK reflection probes confirm the Calendar argument is removed; both probes invoke zero headers. Date-controlled optimized native acceptance remains unavailable.",
+        "Fresh complete cached-location reads establish the existing Weather early-return branch. Unsupported URL/default-bridge interception attempts are retained privately and excluded; no independent transport counter is claimed.",
+        "No enabled-owner prayer pack, live location, screensaver prayer UI, external service or timezone setting was changed. Normal native cleanup passed; timeout/failure cleanup was not fault-injected.",
+        "API28, other timezone transitions/calendars and Living native/visual acceptance remain unverified. Existing UI approvals and exhausted issue clocks retain their boundaries.",
+        "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+      ],
+      "next": "Retain delivered next-date correction. Astronomical accuracy, early-DST-day offset policy and UI/API28 acceptance remain open; continue distinct authorized backlog without reopening parked clocks.",
+      "issueClock": {
+        "startedAt": "2026-11-03T07:01:27Z",
+        "deadline": "2026-11-03T07:31:27Z",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "calendar-all-day-dst",
       "title": "All-day calendar: keep local midnight ends",
