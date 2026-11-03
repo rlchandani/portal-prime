@@ -32,12 +32,32 @@ object CameraConfig {
     val raw = prefs(context).getString(KEY, null) ?: return emptyList()
     return runCatching {
       val arr = JSONArray(raw)
-      (0 until arr.length()).map { i ->
-        val o = arr.getJSONObject(i)
-        Camera(o.optLong("id", System.nanoTime()), o.optString("name", "Camera"), o.optString("url", ""))
-      }.filter { it.url.isNotBlank() }
+      val rows = (0 until arr.length()).map { arr.getJSONObject(it) }
+          .filter { it.optString("url", "").isNotBlank() }
+      val storedIds = rows.map(::storedId)
+      // Reserve later rows too: repairing a duplicate must not take an existing camera's ID.
+      val reserved = storedIds.filterNotNull().toHashSet()
+      val used = HashSet<Long>()
+      var replacement = 0L
+      rows.mapIndexed { index, o ->
+        val original = storedIds[index]
+        val id = if (original != null && original !in used) original else {
+          while (replacement in reserved || replacement in used) replacement = nextId(replacement)
+          replacement
+        }
+        used.add(id)
+        Camera(id, o.optString("name", "Camera"), o.optString("url", ""))
+      }
     }.getOrDefault(emptyList())
   }
+
+  private fun storedId(o: JSONObject): Long? {
+    val id = o.optLong("id", Long.MIN_VALUE)
+    // Distinct defaults detect missing/unconvertible IDs while retaining a real Long.MIN_VALUE.
+    return if (id != Long.MIN_VALUE || o.optLong("id", Long.MAX_VALUE) == id) id else null
+  }
+
+  private fun nextId(id: Long): Long = if (id == Long.MAX_VALUE) Long.MIN_VALUE else id + 1
 
   private fun save(context: Context, cams: List<Camera>) {
     val arr = JSONArray()
@@ -60,7 +80,7 @@ object CameraConfig {
     // Serialized rapid adds can still share a millisecond; lazy rows need distinct IDs.
     val ids = cameras.mapTo(HashSet()) { it.id }
     var id = System.currentTimeMillis()
-    while (id in ids) id = if (id == Long.MAX_VALUE) Long.MIN_VALUE else id + 1
+    while (id in ids) id = nextId(id)
     val updated = cameras + Camera(id, name.ifBlank { "Camera" }, url.trim())
     save(context, updated)
     return updated

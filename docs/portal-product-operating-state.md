@@ -13,8 +13,24 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / tomorrow prayer header:** exact optimized
-  **1.109/code103** is installed and fully hashed in both rooms. After the last
+- **Current room APK / saved camera identities:** exact optimized
+  **1.110/code104** is installed and fully hashed in both rooms. Legacy duplicate
+  and missing camera IDs now normalize deterministically; valid first IDs, fields,
+  order and JSON coercion remain. Read-only load writes nothing; ordinary locked
+  Add/Remove persist the unique snapshot. Twelve unchanged methods reproduce ten
+  failures then pass; **4,186 JVM/435 suites**, debug/optimized/R8/
+  vital lint pass in 2m 1s. Actual debug and optimized Family config both
+  improve **14/21→21/21**, seven differences/fourteen retained controls. Caller-equivalent
+  lookup is covered; live Viewer/RTSP/UI remains open. Complete maps and captured
+  Home/timer/Sunrise/Chime/Weather/packs/camera bytes match; Family frame, clock,
+  font, services and original Chrome retained. Owned processes/scratch/registry
+  removed; normal cleanup only. Public1.83 guard rejects local1.110; no phone/HA/
+  auth/publication. **84 tasks:51 delivered,23 locally verified,3 approval,6 parked,
+  1 queued.** Original **07:18:54.250284–07:48:54.250284 UTC** audit clock retained;
+  broader goal stays active. [Receipt](portal-camera-legacy-identity-2026-11-03.md).
+
+- **Previous room APK / tomorrow prayer header:** exact optimized
+  **1.109/code103** was installed and fully hashed in both rooms. After the last
   prayer, Fajr uses the next calendar date and its UTC offset; caller date and
   current-minute selection remain. Twelve unchanged methods reproduce seven
   failures then pass; **4,174 JVM/434 suites**, debug/optimized/R8/

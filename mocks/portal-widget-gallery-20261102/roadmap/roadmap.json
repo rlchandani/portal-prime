@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T07:13:35.492746+00:00",
+  "updatedAt": "2026-11-03T07:33:45.909648+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,56 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.109/code103. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.110/code104. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "camera-legacy-identity",
+      "title": "Saved cameras: stable unique identities",
+      "summary": "Delivered to both rooms: legacy duplicate IDs now identify each camera independently for View and Remove.",
+      "description": "Normalize retained camera IDs at the existing config boundary. Reserve all valid IDs before assigning deterministic replacements; preserve fields, order, coercion and read-only load. Existing synchronized mutations persist repaired snapshots.",
+      "status": "delivered",
+      "verification": "12 unchanged regressions / 4,186 JVM \u00b7 debug and optimized config 14/21\u219221/21",
+      "kind": "Camera configuration identity integrity",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Tools engineering / independent config and native review",
+      "deployment": "Exact signed optimized 1.110/code104 installed and full APK hash verified in Family Area and Living Area.",
+      "state": "Complete maps and Home, timer, Sunrise, Chime, Weather, packs and camera preference bytes match. Family current frame, clock, font, services and original Chrome task retained. Owned process, scratch and registry copy removed.",
+      "acceptance": [
+        "Reproduce later-duplicate lookup and both removal directions through actual config methods.",
+        "Reserve all existing IDs, preserve names, URLs and order, and return stable missing-ID replacements without load writes.",
+        "Verify ordinary Add/Remove persist a unique snapshot and Android JSON retains Long boundaries and numeric-string coercion.",
+        "Run unchanged full gates, actual debug and optimized config differential, exact signed room delivery and complete state preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Identity correction, unchanged regressions, actual native config comparison and scope.",
+          "source": "docs/portal-camera-legacy-identity-2026-11-03.md"
+        },
+        {
+          "text": "Frozen hashes, native bindings, full gates and preserved room delivery.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/camera-legacy-identity-verification.json"
+        }
+      ],
+      "limits": [
+        "Native acceptance invokes actual APK CameraConfig with generated process-local preferences and Android JSON. ID lookup mirrors the existing caller; CameraViewerActivity, VideoView, RTSP, camera connectivity, routing and UI acceptance were not exercised.",
+        "Read-only load does not rewrite owner preferences. Ordinary Add/Remove persist the repaired snapshot; externally replaced preference arrays and already-open cross-version ambiguous Intents are outside this contract.",
+        "Owner camera URLs and credentials are not used by the fixture. Complete camera preference bytes, alongside the other captured room maps and preference files, remain unchanged across local delivery.",
+        "Normal owned-process and scratch cleanup passed. Failure/timeout cleanup was not fault-injected. The initial runner mapping initialization error occurred before any fixture execution, was retained privately and excluded from product evidence.",
+        "Family Android10 config behavior is verified; API28 and Living native/visual camera acceptance remain unverified. Existing UI approvals and exhausted issue clocks retain their boundaries.",
+        "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+      ],
+      "next": "Retain delivered identity correction. Live camera and viewer acceptance, API28 and out-of-band preference replacements remain open; continue distinct authorized work without reopening parked clocks.",
+      "issueClock": {
+        "startedAt": "2026-11-03T07:18:54.250284+00:00",
+        "deadline": "2026-11-03T07:48:54.250284+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "prayer-tomorrow",
       "title": "Prayer header: compute tomorrow's Fajr",

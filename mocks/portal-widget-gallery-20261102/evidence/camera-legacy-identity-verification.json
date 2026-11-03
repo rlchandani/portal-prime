@@ -1,0 +1,1339 @@
+{
+  "recordedAt": "2026-11-03T07:33:45.909648+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T07:18:54.250284+00:00",
+    "deadline": "2026-11-03T07:48:54.250284+00:00",
+    "scope": "Independent read-only Tools audit: bedtime-story selection/data boundaries and camera configuration/viewer failure handling. Check existing 83-task backlog before proposing work. Exclude delivered speech/player ownership, parked video redirects/music gestures and approval-gated UI routes. Any selected issue retains this original audit clock through final delivery/cleanup/documentation.",
+    "baseCommit": "99081cb84442fa2ffa56d5e8718ab734f9865cb7",
+    "selectedScope": "Stable unique camera identities at the existing config read/mutation boundary. Preserve names/URLs/order/existing unique IDs, no load writes or UI/player/network/route redesign."
+  },
+  "scope": "Repair legacy duplicate/missing camera IDs at the existing config boundary, preserving saved fields and unique identities.",
+  "finding": {
+    "scope": {
+      "startedAt": "2026-11-03T07:18:54.250284+00:00",
+      "deadline": "2026-11-03T07:48:54.250284+00:00",
+      "scope": "Independent read-only Tools audit: bedtime-story selection/data boundaries and camera configuration/viewer failure handling. Check existing 83-task backlog before proposing work. Exclude delivered speech/player ownership, parked video redirects/music gestures and approval-gated UI routes. Any selected issue retains this original audit clock through final delivery/cleanup/documentation."
+    },
+    "roadmapRecordsReviewed": 83,
+    "roadmapDuplicateFound": false,
+    "sourceHashes": {
+      "app/src/main/java/com/immortal/launcher/CameraConfig.kt": "6ac80405800bb790ce1c39de52aa8381547a7c082e631b3cd50e4d9bb989e52f",
+      "app/src/main/java/com/immortal/launcher/CameraViewerActivity.kt": "e5dfed37260d9148d4a709ab38080644d9ecf2e24f627d5781e707c8c1046ad5",
+      "app/src/main/java/com/immortal/launcher/ApprovedToolsHome.kt": "780526cd65080f43e798ce5fbc819dcf7fe00a7b90ba97e1f9b4328b9a97de1d",
+      "app/src/main/java/com/immortal/launcher/Stories.kt": "5718d5488ce76b986cc1f580380bab810cc0c351f691a0270f86fb9f27f360d0",
+      "app/src/main/java/com/immortal/launcher/BedtimeStoryActivity.kt": "79a46c7e1ef711d3020b5a11b8fae01c2688b6437efa2fb43a609b839d76a0f2",
+      "app/src/test/java/com/immortal/launcher/CameraConfigTest.kt": "3985162b8a653e6850f93789bd2047412717b160602eed426fe575641f325d7c"
+    },
+    "status": "grounded source finding; no runtime reproduction authorized yet",
+    "selectedCandidate": "Legacy duplicate camera IDs delete unrelated saved cameras and select the wrong stream",
+    "trigger": "Two otherwise valid saved camera records share an ID, e.g. generated Front and Back rows with id 42 and distinct rtsp://*.local/live URLs. Load returns both IDs unchanged; removing one ID filters both records.",
+    "sourceEvidence": [
+      {
+        "path": "app/src/main/java/com/immortal/launcher/CameraConfig.kt",
+        "lines": "35-38",
+        "fact": "load retains each valid row ID without duplicate normalization"
+      },
+      {
+        "path": "app/src/main/java/com/immortal/launcher/CameraConfig.kt",
+        "lines": "69-73",
+        "fact": "removeAndLoad uses filterNot by ID and saves resulting list, deleting every matching row"
+      },
+      {
+        "path": "app/src/main/java/com/immortal/launcher/ApprovedToolsHome.kt",
+        "lines": "252-258",
+        "fact": "UI explicitly acknowledges legacy millisecond ID duplicates and uses index only to avoid duplicate lazy keys; View/Remove still use camera ID"
+      },
+      {
+        "path": "app/src/main/java/com/immortal/launcher/CameraViewerActivity.kt",
+        "lines": "113-117",
+        "fact": "stream viewer firstOrNull by ID selects first duplicate regardless of selected row"
+      },
+      {
+        "path": "app/src/main/java/com/immortal/launcher/ApprovedToolsHome.kt",
+        "lines": "137-141",
+        "fact": "confirmed Remove passes only selected ID to actual store mutation"
+      }
+    ],
+    "historyEvidence": {
+      "commit": "0378c9a0",
+      "file": "app/src/main/java/com/immortal/launcher/CameraConfig.kt",
+      "fact": "Original add saved Camera(System.currentTimeMillis(),...), so same-millisecond rapid adds could create duplicate IDs; current new-add uniqueness prevents only new collisions."
+    },
+    "userImpact": "Confirming removal of one legacy camera silently removes all cameras with its ID; selecting a later duplicate opens the first saved stream. No invented security/audio/media claim.",
+    "existingTests": "CameraConfigTest covers ordinary append, exact removal with distinct IDs, concurrent new add/remove uniqueness; no legacy duplicate-ID or missing-ID stability case.",
+    "minimalSafeReproduction": "Generated in-memory SharedPreferences array with two valid same-ID rows. Actual CameraConfig.load then removeAndLoad(selected second ID) should preserve first row; original deletes both. Independently show load(...).firstOrNull{id==selected.id} resolves wrong row. No real URL connection or owner preferences required.",
+    "candidateScope": "Repair saved-camera identity uniqueness at CameraConfig boundary while preserving names/URLs/order and all already-unique IDs. Ensure returned IDs remain stable across reload and actual remove saves only selected row. Keep View/Remove callers and UI geometry unchanged; avoid player/TTS/network/route redesign.",
+    "validationFeasibility": "Focused actual-method JVM regression using existing CameraConfigTest in-memory persistence fixture. Actual debug APK CameraConfig store native differential with process-local in-memory prefs and Android JSON is feasible, excludes VideoView/RTSP/UI/audio acceptance.",
+    "scopeLimits": [
+      "Legacy duplicate IDs are an explicit existing compatibility state, not newly claimed widespread owner incidence.",
+      "No runtime test, network, device, production edit or Gradle action performed in this audit.",
+      "Stories static data/selection supplied no comparably grounded allowed-scope defect; old legacy TTS and delivered speech ownership excluded."
+    ],
+    "secondaryObservation": "Missing IDs currently use System.nanoTime on every load, so fallback identity is unstable; treat only as an integration case if selected duplicate identity repair requires it, not a separate issue."
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/CameraConfig.kt": "550dd059d2a378f860f31052f80dafde4fb30e6dc155563dbd32fdcedfd106fc",
+    "app/src/main/java/com/immortal/launcher/CameraViewerActivity.kt": "e5dfed37260d9148d4a709ab38080644d9ecf2e24f627d5781e707c8c1046ad5",
+    "app/src/main/java/com/immortal/launcher/ApprovedToolsHome.kt": "780526cd65080f43e798ce5fbc819dcf7fe00a7b90ba97e1f9b4328b9a97de1d",
+    "app/src/test/java/com/immortal/launcher/CameraConfigLegacyIdentityTest.kt": "3220eb371e703997e04bbca0183d620512d0205693ffec33ed2522805149b81e",
+    "app/src/test/java/com/immortal/launcher/CameraConfigTest.kt": "3985162b8a653e6850f93789bd2047412717b160602eed426fe575641f325d7c",
+    "app/build.gradle.kts": "c73339a3b17e24f80c48cdbb59393049ad0514032b1abc99fa088fdbcd6d45fc"
+  },
+  "red": {
+    "originalStartUtc": "2026-11-03T07:18:54.250284Z",
+    "deadlineUtc": "2026-11-03T07:48:54.250284Z",
+    "terminalExit": 1,
+    "duration": "11s",
+    "tests": 12,
+    "failures": 10,
+    "errors": 0,
+    "skips": 0,
+    "cases": [
+      {
+        "name": "multipleDuplicateGroupsPreserveNamesUrlsOrderAndFirstIds",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Every retained row needs a distinct stable identity expected:<4> but was:<2>"
+      },
+      {
+        "name": "removePersistsRemainingReplacementIdsWithoutReassigningThem",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[Camera(id=42, name=First, url=rtsp://generated.local/live), Camera(id=42, name=Third, url=rtsp://generated.local/live)]> but was:<[]>"
+      },
+      {
+        "name": "duplicateMaximumIdDoesNotStealTheReservedMinimumId",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Every retained row needs a distinct stable identity expected:<4> but was:<3>"
+      },
+      {
+        "name": "selectingTheLaterDuplicateResolvesThatCameraAcrossReload",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<[Back]> but was:<[Front]>"
+      },
+      {
+        "name": "removingTheSecondDuplicatePreservesTheFirstCamera",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[Camera(id=42, name=Front, url=rtsp://front.local/live)]> but was:<[]>"
+      },
+      {
+        "name": "addPersistsTheNormalizedSnapshotAndKeepsAllExistingCameras",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Every retained row needs a distinct stable identity expected:<3> but was:<2>"
+      },
+      {
+        "name": "replacementIdsReserveAllLaterExistingIdsIncludingLongBoundaries",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Every retained row needs a distinct stable identity expected:<7> but was:<6>"
+      },
+      {
+        "name": "uniqueIdsIncludingZeroAndNegativeRemainExactlyUnchangedAndReadOnly",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "blankUrlsStillFilterOutWithoutChangingVisibleCameraFields",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "removingTheFirstDuplicatePreservesTheSecondCamera",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[Camera(id=42, name=Back, url=rtsp://back.local/live)]> but was:<[]>"
+      },
+      {
+        "name": "missingNullAndInvalidIdsAreStableWithoutPreferenceWrites",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[Camera(id=2997193241981750, name=Missing, url=rtsp://generated.local/live), Camera(id=2997193241983333, name=Null, url=rtsp://generated.local/live), Camera(id=2997193241983958, name=Invalid, url=rtsp://generated.local/live), Camera(id=0, name=Existing zero, url=rtsp://generated.local/live)]> but was:<[Camera(id=2997193242117750, name=Missing, url=rtsp://generated.local/live), Camera(id=2997193242118875, name=Null, url=rtsp://generated.local/live), Camera(id=2997193242119458, name=Invalid, url=rtsp://generated.local/live), Camera(id=0, name=Existing zero, url=rtsp://generated.local/live)]>"
+      },
+      {
+        "name": "identicalDuplicateRecordsRemainTwoIndependentlyAddressableCameras",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Every retained row needs a distinct stable identity expected:<2> but was:<1>"
+      }
+    ],
+    "sourceHashes": {
+      "config": "6ac80405800bb790ce1c39de52aa8381547a7c082e631b3cd50e4d9bb989e52f",
+      "viewer": "e5dfed37260d9148d4a709ab38080644d9ecf2e24f627d5781e707c8c1046ad5",
+      "tools": "780526cd65080f43e798ce5fbc819dcf7fe00a7b90ba97e1f9b4328b9a97de1d",
+      "test": "3220eb371e703997e04bbca0183d620512d0205693ffec33ed2522805149b81e",
+      "existingTests": "3985162b8a653e6850f93789bd2047412717b160602eed426fe575641f325d7c",
+      "build": "1b977f7e8ca1c9e30e920b980cf06d45e9799423aad28befccd49ba85cf5a444"
+    },
+    "scope": "Actual CameraConfig parsing/mutation and caller-equivalent ID lookup with generated strict SharedPreferences/Context; no VideoView/RTSP/network/UI/owner data or native behavior. 10 product assertions, 2 retained controls, no fixture errors."
+  },
+  "green": {
+    "suites": 435,
+    "tests": 4186,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualCameraConfigFocusedTests": 12,
+    "allTwelveUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 1s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "native": {
+    "runs": {
+      "baseline-debug": {
+        "status": "FAIL",
+        "checks": {
+          "actualApkClassLoader": true,
+          "duplicateIdsUnique": false,
+          "repeatedDuplicateSnapshotStable": true,
+          "readOnlyLoadPreservesRawPreferences": true,
+          "namesUrlsOrderPreserved": true,
+          "firstExistingIdRetained": true,
+          "selectedLaterDuplicateLookup": false,
+          "removeLaterPreservesFirst": false,
+          "removeLaterPersistsUniqueSnapshot": true,
+          "removeFirstPreservesLater": false,
+          "addPersistsUniqueSnapshot": false,
+          "addRetainsNormalNameUrlSemantics": true,
+          "allLaterReservedIdsRetained": true,
+          "numericStringCoercionRetained": true,
+          "repairSkipsEveryReservedId": false,
+          "missingInvalidIdsStable": false,
+          "missingRepairReservesLaterZero": true,
+          "missingLoadReadOnly": true,
+          "ordinaryUniqueAndBlankFilteringRetained": true,
+          "unknownRemoveRetainsCamera": true,
+          "strictGeneratedPreferencesOnly": true
+        },
+        "observations": {
+          "duplicateRead": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 42,
+              "name": "Back",
+              "urlSha256": "2fd676f68438e078e4dada0d973d59d1cabdbdf1b24c67ce086b3973dbe4cfdf"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "afterRemoveLater": [
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "reservedRead": [
+            {
+              "id": 42,
+              "name": "First",
+              "urlSha256": "5ab2ec789366ca88a05be5c4e9d7e36547fcae7a719d433cdcafde86cf103173"
+            },
+            {
+              "id": 42,
+              "name": "Duplicate",
+              "urlSha256": "295b831fce745722466cf9e2ae74b531365eba55148d707d0e5e96cba03eae9c"
+            },
+            {
+              "id": 0,
+              "name": "Reserved 0",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 1,
+              "name": "Reserved 1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 43,
+              "name": "Reserved 43",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -1,
+              "name": "Reserved -1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -9223372036854775808,
+              "name": "Reserved -9223372036854775808",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 9223372036854775807,
+              "name": "Reserved 9223372036854775807",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 45,
+              "name": "String ID",
+              "urlSha256": "bbf5db21b9999f753d01cf01516b2277daf107b3e6740e2d914add6a1ae45465"
+            }
+          ],
+          "missingRead": [
+            {
+              "id": 11126191839034,
+              "name": "Missing",
+              "urlSha256": "5328913bacffaf3966348b271949ec438cf2f3be45ea1b87b02f530468d2110b"
+            },
+            {
+              "id": 11126191859034,
+              "name": "Null",
+              "urlSha256": "6b0e580057d2a7dd00db8e3ff09d073c704350fe93d42e7c8b781977413df8d7"
+            },
+            {
+              "id": 11126191867732,
+              "name": "Invalid",
+              "urlSha256": "4e2ad79c15162299cc48e14eaf89d9ef231536275ab4aaee2f182d168bab35b4"
+            },
+            {
+              "id": 0,
+              "name": "Zero",
+              "urlSha256": "e917fcda470d53b5bfd19d720e13745b2a34ca3a25fa99f67dfb99119554d8ad"
+            }
+          ]
+        },
+        "passed": 14,
+        "total": 21,
+        "apkSha256": "60a90d2118faf44685066f3171b0221a3cc498185231747e283112c38bb7e2dc",
+        "actualMethods": [
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.load(android.content.Context)",
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.addAndLoad$app(android.content.Context,java.lang.String,java.lang.String)",
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.removeAndLoad$app(android.content.Context,long)"
+        ],
+        "ownerAppPreferencesWritten": 0,
+        "generatedPreferencesApplies": 4,
+        "scope": "Actual APK camera config with generated in-memory preferences; no viewer/RTSP/UI/network/owner-data writes"
+      },
+      "candidate-debug": {
+        "status": "PASS",
+        "checks": {
+          "actualApkClassLoader": true,
+          "duplicateIdsUnique": true,
+          "repeatedDuplicateSnapshotStable": true,
+          "readOnlyLoadPreservesRawPreferences": true,
+          "namesUrlsOrderPreserved": true,
+          "firstExistingIdRetained": true,
+          "selectedLaterDuplicateLookup": true,
+          "removeLaterPreservesFirst": true,
+          "removeLaterPersistsUniqueSnapshot": true,
+          "removeFirstPreservesLater": true,
+          "addPersistsUniqueSnapshot": true,
+          "addRetainsNormalNameUrlSemantics": true,
+          "allLaterReservedIdsRetained": true,
+          "numericStringCoercionRetained": true,
+          "repairSkipsEveryReservedId": true,
+          "missingInvalidIdsStable": true,
+          "missingRepairReservesLaterZero": true,
+          "missingLoadReadOnly": true,
+          "ordinaryUniqueAndBlankFilteringRetained": true,
+          "unknownRemoveRetainsCamera": true,
+          "strictGeneratedPreferencesOnly": true
+        },
+        "observations": {
+          "duplicateRead": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 0,
+              "name": "Back",
+              "urlSha256": "2fd676f68438e078e4dada0d973d59d1cabdbdf1b24c67ce086b3973dbe4cfdf"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "afterRemoveLater": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "reservedRead": [
+            {
+              "id": 42,
+              "name": "First",
+              "urlSha256": "5ab2ec789366ca88a05be5c4e9d7e36547fcae7a719d433cdcafde86cf103173"
+            },
+            {
+              "id": 2,
+              "name": "Duplicate",
+              "urlSha256": "295b831fce745722466cf9e2ae74b531365eba55148d707d0e5e96cba03eae9c"
+            },
+            {
+              "id": 0,
+              "name": "Reserved 0",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 1,
+              "name": "Reserved 1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 43,
+              "name": "Reserved 43",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -1,
+              "name": "Reserved -1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -9223372036854775808,
+              "name": "Reserved -9223372036854775808",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 9223372036854775807,
+              "name": "Reserved 9223372036854775807",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 45,
+              "name": "String ID",
+              "urlSha256": "bbf5db21b9999f753d01cf01516b2277daf107b3e6740e2d914add6a1ae45465"
+            }
+          ],
+          "missingRead": [
+            {
+              "id": 1,
+              "name": "Missing",
+              "urlSha256": "5328913bacffaf3966348b271949ec438cf2f3be45ea1b87b02f530468d2110b"
+            },
+            {
+              "id": 2,
+              "name": "Null",
+              "urlSha256": "6b0e580057d2a7dd00db8e3ff09d073c704350fe93d42e7c8b781977413df8d7"
+            },
+            {
+              "id": 3,
+              "name": "Invalid",
+              "urlSha256": "4e2ad79c15162299cc48e14eaf89d9ef231536275ab4aaee2f182d168bab35b4"
+            },
+            {
+              "id": 0,
+              "name": "Zero",
+              "urlSha256": "e917fcda470d53b5bfd19d720e13745b2a34ca3a25fa99f67dfb99119554d8ad"
+            }
+          ]
+        },
+        "passed": 21,
+        "total": 21,
+        "apkSha256": "9b9bb44cd3093450930114ee37b061831b09ddcfceab7905051fe5a222f9ef21",
+        "actualMethods": [
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.load(android.content.Context)",
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.addAndLoad$app(android.content.Context,java.lang.String,java.lang.String)",
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.removeAndLoad$app(android.content.Context,long)"
+        ],
+        "ownerAppPreferencesWritten": 0,
+        "generatedPreferencesApplies": 4,
+        "scope": "Actual APK camera config with generated in-memory preferences; no viewer/RTSP/UI/network/owner-data writes"
+      },
+      "baseline-optimized": {
+        "status": "FAIL",
+        "checks": {
+          "actualApkClassLoader": true,
+          "duplicateIdsUnique": false,
+          "repeatedDuplicateSnapshotStable": true,
+          "readOnlyLoadPreservesRawPreferences": true,
+          "namesUrlsOrderPreserved": true,
+          "firstExistingIdRetained": true,
+          "selectedLaterDuplicateLookup": false,
+          "removeLaterPreservesFirst": false,
+          "removeLaterPersistsUniqueSnapshot": true,
+          "removeFirstPreservesLater": false,
+          "addPersistsUniqueSnapshot": false,
+          "addRetainsNormalNameUrlSemantics": true,
+          "allLaterReservedIdsRetained": true,
+          "numericStringCoercionRetained": true,
+          "repairSkipsEveryReservedId": false,
+          "missingInvalidIdsStable": false,
+          "missingRepairReservesLaterZero": true,
+          "missingLoadReadOnly": true,
+          "ordinaryUniqueAndBlankFilteringRetained": true,
+          "unknownRemoveRetainsCamera": true,
+          "strictGeneratedPreferencesOnly": true
+        },
+        "observations": {
+          "duplicateRead": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 42,
+              "name": "Back",
+              "urlSha256": "2fd676f68438e078e4dada0d973d59d1cabdbdf1b24c67ce086b3973dbe4cfdf"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "afterRemoveLater": [
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "reservedRead": [
+            {
+              "id": 42,
+              "name": "First",
+              "urlSha256": "5ab2ec789366ca88a05be5c4e9d7e36547fcae7a719d433cdcafde86cf103173"
+            },
+            {
+              "id": 42,
+              "name": "Duplicate",
+              "urlSha256": "295b831fce745722466cf9e2ae74b531365eba55148d707d0e5e96cba03eae9c"
+            },
+            {
+              "id": 0,
+              "name": "Reserved 0",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 1,
+              "name": "Reserved 1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 43,
+              "name": "Reserved 43",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -1,
+              "name": "Reserved -1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -9223372036854775808,
+              "name": "Reserved -9223372036854775808",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 9223372036854775807,
+              "name": "Reserved 9223372036854775807",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 45,
+              "name": "String ID",
+              "urlSha256": "bbf5db21b9999f753d01cf01516b2277daf107b3e6740e2d914add6a1ae45465"
+            }
+          ],
+          "missingRead": [
+            {
+              "id": 11132303387574,
+              "name": "Missing",
+              "urlSha256": "5328913bacffaf3966348b271949ec438cf2f3be45ea1b87b02f530468d2110b"
+            },
+            {
+              "id": 11132303395699,
+              "name": "Null",
+              "urlSha256": "6b0e580057d2a7dd00db8e3ff09d073c704350fe93d42e7c8b781977413df8d7"
+            },
+            {
+              "id": 11132303398720,
+              "name": "Invalid",
+              "urlSha256": "4e2ad79c15162299cc48e14eaf89d9ef231536275ab4aaee2f182d168bab35b4"
+            },
+            {
+              "id": 0,
+              "name": "Zero",
+              "urlSha256": "e917fcda470d53b5bfd19d720e13745b2a34ca3a25fa99f67dfb99119554d8ad"
+            }
+          ]
+        },
+        "passed": 14,
+        "total": 21,
+        "apkSha256": "4e1811cb3f4b2b25446b2ee91035d09d01e03b4ba0d5f681dc6d04ddb810126c",
+        "actualMethods": [
+          "public synchronized java.util.List com.immortal.launcher.Http.H(android.content.Context)",
+          "public synchronized java.util.ArrayList com.immortal.launcher.Http.e(android.content.Context,java.lang.String,java.lang.String)",
+          "public synchronized java.util.ArrayList com.immortal.launcher.Http.Y(android.content.Context,long)"
+        ],
+        "ownerAppPreferencesWritten": 0,
+        "generatedPreferencesApplies": 4,
+        "scope": "Actual APK camera config with generated in-memory preferences; no viewer/RTSP/UI/network/owner-data writes"
+      },
+      "candidate-optimized": {
+        "status": "PASS",
+        "checks": {
+          "actualApkClassLoader": true,
+          "duplicateIdsUnique": true,
+          "repeatedDuplicateSnapshotStable": true,
+          "readOnlyLoadPreservesRawPreferences": true,
+          "namesUrlsOrderPreserved": true,
+          "firstExistingIdRetained": true,
+          "selectedLaterDuplicateLookup": true,
+          "removeLaterPreservesFirst": true,
+          "removeLaterPersistsUniqueSnapshot": true,
+          "removeFirstPreservesLater": true,
+          "addPersistsUniqueSnapshot": true,
+          "addRetainsNormalNameUrlSemantics": true,
+          "allLaterReservedIdsRetained": true,
+          "numericStringCoercionRetained": true,
+          "repairSkipsEveryReservedId": true,
+          "missingInvalidIdsStable": true,
+          "missingRepairReservesLaterZero": true,
+          "missingLoadReadOnly": true,
+          "ordinaryUniqueAndBlankFilteringRetained": true,
+          "unknownRemoveRetainsCamera": true,
+          "strictGeneratedPreferencesOnly": true
+        },
+        "observations": {
+          "duplicateRead": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 0,
+              "name": "Back",
+              "urlSha256": "2fd676f68438e078e4dada0d973d59d1cabdbdf1b24c67ce086b3973dbe4cfdf"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "afterRemoveLater": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "reservedRead": [
+            {
+              "id": 42,
+              "name": "First",
+              "urlSha256": "5ab2ec789366ca88a05be5c4e9d7e36547fcae7a719d433cdcafde86cf103173"
+            },
+            {
+              "id": 2,
+              "name": "Duplicate",
+              "urlSha256": "295b831fce745722466cf9e2ae74b531365eba55148d707d0e5e96cba03eae9c"
+            },
+            {
+              "id": 0,
+              "name": "Reserved 0",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 1,
+              "name": "Reserved 1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 43,
+              "name": "Reserved 43",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -1,
+              "name": "Reserved -1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -9223372036854775808,
+              "name": "Reserved -9223372036854775808",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 9223372036854775807,
+              "name": "Reserved 9223372036854775807",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 45,
+              "name": "String ID",
+              "urlSha256": "bbf5db21b9999f753d01cf01516b2277daf107b3e6740e2d914add6a1ae45465"
+            }
+          ],
+          "missingRead": [
+            {
+              "id": 1,
+              "name": "Missing",
+              "urlSha256": "5328913bacffaf3966348b271949ec438cf2f3be45ea1b87b02f530468d2110b"
+            },
+            {
+              "id": 2,
+              "name": "Null",
+              "urlSha256": "6b0e580057d2a7dd00db8e3ff09d073c704350fe93d42e7c8b781977413df8d7"
+            },
+            {
+              "id": 3,
+              "name": "Invalid",
+              "urlSha256": "4e2ad79c15162299cc48e14eaf89d9ef231536275ab4aaee2f182d168bab35b4"
+            },
+            {
+              "id": 0,
+              "name": "Zero",
+              "urlSha256": "e917fcda470d53b5bfd19d720e13745b2a34ca3a25fa99f67dfb99119554d8ad"
+            }
+          ]
+        },
+        "passed": 21,
+        "total": 21,
+        "apkSha256": "90e0c67fdce9022e46a96e53d7857a06f86e2717ba6ccd3f16f756731a0f4bb6",
+        "actualMethods": [
+          "public synchronized java.util.List com.immortal.launcher.Http.H(android.content.Context)",
+          "public synchronized java.util.ArrayList com.immortal.launcher.Http.e(android.content.Context,java.lang.String,java.lang.String)",
+          "public synchronized java.util.ArrayList com.immortal.launcher.Http.Y(android.content.Context,long)"
+        ],
+        "ownerAppPreferencesWritten": 0,
+        "generatedPreferencesApplies": 4,
+        "scope": "Actual APK camera config with generated in-memory preferences; no viewer/RTSP/UI/network/owner-data writes"
+      }
+    },
+    "process": {
+      "baseline-debug": {
+        "terminalExit": 1,
+        "stdoutBytes": 3464,
+        "stderrBytes": 0
+      },
+      "candidate-debug": {
+        "terminalExit": 0,
+        "stdoutBytes": 3520,
+        "stderrBytes": 0
+      },
+      "baseline-optimized": {
+        "terminalExit": 1,
+        "stdoutBytes": 3400,
+        "stderrBytes": 0
+      },
+      "candidate-optimized": {
+        "terminalExit": 0,
+        "stdoutBytes": 3456,
+        "stderrBytes": 0
+      }
+    },
+    "binding": {
+      "sourceSha256": "88d30c25da08fd436fd42479593d7694d09d0e42f7f94af4ff998e38bf4f9014",
+      "fixtureSha256": "b6e17eac6669f8536eeafea540f6284c83c75e921303ba4786d2da6c0729208a",
+      "compilerSha256": "be74ecaa47816cf11779ed81d4280f972c1878f80f7036278ba1ae6a3aaac601",
+      "runnerSha256": "3d2cb4265d6a1239ab5b5cc45cd6710f24632496a6ec7ba22a76475987d4a2b1",
+      "mappedBindings": {
+        "baseline": [
+          "com.immortal.launcher.Http",
+          "a",
+          "b",
+          "c",
+          "H",
+          "e",
+          "Y",
+          "k"
+        ],
+        "candidate": [
+          "com.immortal.launcher.Http",
+          "a",
+          "b",
+          "c",
+          "H",
+          "e",
+          "Y",
+          "k"
+        ]
+      }
+    },
+    "cleanup": {
+      "ownedProcessRetired": {
+        "baseline-debug": true,
+        "candidate-debug": true,
+        "baseline-optimized": true,
+        "candidate-optimized": true
+      },
+      "appPreferencesWritten": 0,
+      "installerInvoked": false,
+      "generatedPreferencesOnly": true,
+      "viewerOrNetworkInvoked": false,
+      "ownedDeviceScratchRemoved": true,
+      "cleanupFaults": []
+    },
+    "baselinePassed": 14,
+    "candidatePassed": 21,
+    "total": 21,
+    "correctedChecks": 7,
+    "retainedControls": 14,
+    "actualDebugAndOptimizedConfigVerified": true,
+    "scope": "Actual APK config parsing and mutation, generated process-local preferences, caller-equivalent ID lookup; no camera/viewer/network."
+  },
+  "artifact": {
+    "sha256": "90e0c67fdce9022e46a96e53d7857a06f86e2717ba6ccd3f16f756731a0f4bb6",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.110",
+    "versionCode": 104,
+    "variants": {
+      "performance": {
+        "sha256": "90e0c67fdce9022e46a96e53d7857a06f86e2717ba6ccd3f16f756731a0f4bb6",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.110",
+        "versionCode": 104
+      },
+      "debug": {
+        "sha256": "9b9bb44cd3093450930114ee37b061831b09ddcfceab7905051fe5a222f9ef21",
+        "bytes": 46703533,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.110",
+        "versionCode": 104
+      },
+      "rollback": {
+        "sha256": "4e1811cb3f4b2b25446b2ee91035d09d01e03b4ba0d5f681dc6d04ddb810126c",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.109",
+        "versionCode": 103
+      }
+    },
+    "debugSha256": "9b9bb44cd3093450930114ee37b061831b09ddcfceab7905051fe5a222f9ef21",
+    "rollbackSha256": "4e1811cb3f4b2b25446b2ee91035d09d01e03b4ba0d5f681dc6d04ddb810126c",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 1s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "visual": {
+    "familyFrameVisuallyInspected": true,
+    "description": "current night clock with date",
+    "screenshotSha256": "912595655366a26bfaa3b81e827e2dfc6dba328fdeadca46cd7324ddf69ebff6",
+    "liveCameraViewerVisuallyInspected": false,
+    "livingVisualInspected": false
+  },
+  "cleanup": {
+    "originalRegistryByteHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "ownedNativeProcessesAndDeviceScratchRemoved": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "googlePhoneCommands": 0,
+    "familyFrameVisuallyInspected": true,
+    "familyChromeTaskRetained": true
+  },
+  "review": {
+    "blockingProductionFindings": 0,
+    "reviewedHashes": {
+      "config": "550dd059d2a378f860f31052f80dafde4fb30e6dc155563dbd32fdcedfd106fc",
+      "viewer": "e5dfed37260d9148d4a709ab38080644d9ecf2e24f627d5781e707c8c1046ad5",
+      "tools": "780526cd65080f43e798ce5fbc819dcf7fe00a7b90ba97e1f9b4328b9a97de1d",
+      "test": "3220eb371e703997e04bbca0183d620512d0205693ffec33ed2522805149b81e",
+      "existingTests": "3985162b8a653e6850f93789bd2047412717b160602eed426fe575641f325d7c",
+      "build": "c73339a3b17e24f80c48cdbb59393049ad0514032b1abc99fa088fdbcd6d45fc"
+    },
+    "unchangedFromRed": {
+      "test": true,
+      "existingTests": true,
+      "viewer": true,
+      "tools": true
+    },
+    "findings": [
+      "Two optLong defaults retain existing JSON coercion while distinguishing missing/unconvertible IDs from real Long.MIN_VALUE.",
+      "All converted IDs of retained nonblank-URL rows are reserved before allocation; first occurrence retains ID, later duplicates and missing IDs receive deterministic unique replacements.",
+      "The deterministic snapshot is stable on repeated loads, with no new preference writes. Existing synchronized mutations persist the normalized list under the same config monitor.",
+      "Existing viewer/Tools callers and UI geometry are unchanged; names, URL strings, order and already-unique IDs are preserved."
+    ],
+    "pending": [],
+    "scope": "Actual debug and optimized APK CameraConfig load/Add/Remove with Android JSON and generated in-memory preferences. Selected-camera lookup is caller-equivalent ID lookup, not actual Viewer/UI/RTSP. No owner preference writes, network/camera/player/credential use, all-firmware acceptance, concurrent raw restore/ABA or already-open old Intent migration guarantee; no injected timeout cleanup proof.",
+    "blockingNativeFindings": 0,
+    "fullJvmVerified": {
+      "suites": 435,
+      "tests": 4186,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "focused": 12,
+      "testFrozenFromRed": true
+    },
+    "nativeBinding": {
+      "sourceSha256": "88d30c25da08fd436fd42479593d7694d09d0e42f7f94af4ff998e38bf4f9014",
+      "fixtureSha256": "b6e17eac6669f8536eeafea540f6284c83c75e921303ba4786d2da6c0729208a",
+      "compilerSha256": "be74ecaa47816cf11779ed81d4280f972c1878f80f7036278ba1ae6a3aaac601",
+      "runnerSha256": "3d2cb4265d6a1239ab5b5cc45cd6710f24632496a6ec7ba22a76475987d4a2b1",
+      "mappedBindings": {
+        "baseline": [
+          "com.immortal.launcher.Http",
+          "a",
+          "b",
+          "c",
+          "H",
+          "e",
+          "Y",
+          "k"
+        ],
+        "candidate": [
+          "com.immortal.launcher.Http",
+          "a",
+          "b",
+          "c",
+          "H",
+          "e",
+          "Y",
+          "k"
+        ]
+      }
+    },
+    "actualApkHashesAndExitCodes": {
+      "baseline-debug": {
+        "sha256": "60a90d2118faf44685066f3171b0221a3cc498185231747e283112c38bb7e2dc",
+        "terminalExit": 1,
+        "stderrBytes": 0,
+        "passed": 14,
+        "total": 21,
+        "actualMethods": [
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.load(android.content.Context)",
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.addAndLoad$app(android.content.Context,java.lang.String,java.lang.String)",
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.removeAndLoad$app(android.content.Context,long)"
+        ]
+      },
+      "candidate-debug": {
+        "sha256": "9b9bb44cd3093450930114ee37b061831b09ddcfceab7905051fe5a222f9ef21",
+        "terminalExit": 0,
+        "stderrBytes": 0,
+        "passed": 21,
+        "total": 21,
+        "actualMethods": [
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.load(android.content.Context)",
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.addAndLoad$app(android.content.Context,java.lang.String,java.lang.String)",
+          "public final synchronized java.util.List com.immortal.launcher.CameraConfig.removeAndLoad$app(android.content.Context,long)"
+        ]
+      },
+      "baseline-optimized": {
+        "sha256": "4e1811cb3f4b2b25446b2ee91035d09d01e03b4ba0d5f681dc6d04ddb810126c",
+        "terminalExit": 1,
+        "stderrBytes": 0,
+        "passed": 14,
+        "total": 21,
+        "actualMethods": [
+          "public synchronized java.util.List com.immortal.launcher.Http.H(android.content.Context)",
+          "public synchronized java.util.ArrayList com.immortal.launcher.Http.e(android.content.Context,java.lang.String,java.lang.String)",
+          "public synchronized java.util.ArrayList com.immortal.launcher.Http.Y(android.content.Context,long)"
+        ]
+      },
+      "candidate-optimized": {
+        "sha256": "90e0c67fdce9022e46a96e53d7857a06f86e2717ba6ccd3f16f756731a0f4bb6",
+        "terminalExit": 0,
+        "stderrBytes": 0,
+        "passed": 21,
+        "total": 21,
+        "actualMethods": [
+          "public synchronized java.util.List com.immortal.launcher.Http.H(android.content.Context)",
+          "public synchronized java.util.ArrayList com.immortal.launcher.Http.e(android.content.Context,java.lang.String,java.lang.String)",
+          "public synchronized java.util.ArrayList com.immortal.launcher.Http.Y(android.content.Context,long)"
+        ]
+      }
+    },
+    "nativeDifferential": {
+      "debug": {
+        "baselinePassed": 14,
+        "candidatePassed": 21,
+        "total": 21,
+        "exactDifferentialChecks": [
+          "addPersistsUniqueSnapshot",
+          "duplicateIdsUnique",
+          "missingInvalidIdsStable",
+          "removeFirstPreservesLater",
+          "removeLaterPreservesFirst",
+          "repairSkipsEveryReservedId",
+          "selectedLaterDuplicateLookup"
+        ],
+        "retainedControls": 14,
+        "observations": {
+          "duplicateRead": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 0,
+              "name": "Back",
+              "urlSha256": "2fd676f68438e078e4dada0d973d59d1cabdbdf1b24c67ce086b3973dbe4cfdf"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "afterRemoveLater": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "reservedRead": [
+            {
+              "id": 42,
+              "name": "First",
+              "urlSha256": "5ab2ec789366ca88a05be5c4e9d7e36547fcae7a719d433cdcafde86cf103173"
+            },
+            {
+              "id": 2,
+              "name": "Duplicate",
+              "urlSha256": "295b831fce745722466cf9e2ae74b531365eba55148d707d0e5e96cba03eae9c"
+            },
+            {
+              "id": 0,
+              "name": "Reserved 0",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 1,
+              "name": "Reserved 1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 43,
+              "name": "Reserved 43",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -1,
+              "name": "Reserved -1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -9223372036854775808,
+              "name": "Reserved -9223372036854775808",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 9223372036854775807,
+              "name": "Reserved 9223372036854775807",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 45,
+              "name": "String ID",
+              "urlSha256": "bbf5db21b9999f753d01cf01516b2277daf107b3e6740e2d914add6a1ae45465"
+            }
+          ],
+          "missingRead": [
+            {
+              "id": 1,
+              "name": "Missing",
+              "urlSha256": "5328913bacffaf3966348b271949ec438cf2f3be45ea1b87b02f530468d2110b"
+            },
+            {
+              "id": 2,
+              "name": "Null",
+              "urlSha256": "6b0e580057d2a7dd00db8e3ff09d073c704350fe93d42e7c8b781977413df8d7"
+            },
+            {
+              "id": 3,
+              "name": "Invalid",
+              "urlSha256": "4e2ad79c15162299cc48e14eaf89d9ef231536275ab4aaee2f182d168bab35b4"
+            },
+            {
+              "id": 0,
+              "name": "Zero",
+              "urlSha256": "e917fcda470d53b5bfd19d720e13745b2a34ca3a25fa99f67dfb99119554d8ad"
+            }
+          ]
+        }
+      },
+      "optimized": {
+        "baselinePassed": 14,
+        "candidatePassed": 21,
+        "total": 21,
+        "exactDifferentialChecks": [
+          "addPersistsUniqueSnapshot",
+          "duplicateIdsUnique",
+          "missingInvalidIdsStable",
+          "removeFirstPreservesLater",
+          "removeLaterPreservesFirst",
+          "repairSkipsEveryReservedId",
+          "selectedLaterDuplicateLookup"
+        ],
+        "retainedControls": 14,
+        "observations": {
+          "duplicateRead": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 0,
+              "name": "Back",
+              "urlSha256": "2fd676f68438e078e4dada0d973d59d1cabdbdf1b24c67ce086b3973dbe4cfdf"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "afterRemoveLater": [
+            {
+              "id": 42,
+              "name": "Front",
+              "urlSha256": "475e7b6b36a205d4ec4d643cc3bbf85105f55d59148426acd887436bbb5969ad"
+            },
+            {
+              "id": 43,
+              "name": "Later",
+              "urlSha256": "e6137343d08bdcbaedc51d069c74518a9f21c81b833b682f87e7c989993142b0"
+            }
+          ],
+          "reservedRead": [
+            {
+              "id": 42,
+              "name": "First",
+              "urlSha256": "5ab2ec789366ca88a05be5c4e9d7e36547fcae7a719d433cdcafde86cf103173"
+            },
+            {
+              "id": 2,
+              "name": "Duplicate",
+              "urlSha256": "295b831fce745722466cf9e2ae74b531365eba55148d707d0e5e96cba03eae9c"
+            },
+            {
+              "id": 0,
+              "name": "Reserved 0",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 1,
+              "name": "Reserved 1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 43,
+              "name": "Reserved 43",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -1,
+              "name": "Reserved -1",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": -9223372036854775808,
+              "name": "Reserved -9223372036854775808",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 9223372036854775807,
+              "name": "Reserved 9223372036854775807",
+              "urlSha256": "13352797916df2af72c4aa9ea76047ae112a1226f78f51889f5c8dc027d00d09"
+            },
+            {
+              "id": 45,
+              "name": "String ID",
+              "urlSha256": "bbf5db21b9999f753d01cf01516b2277daf107b3e6740e2d914add6a1ae45465"
+            }
+          ],
+          "missingRead": [
+            {
+              "id": 1,
+              "name": "Missing",
+              "urlSha256": "5328913bacffaf3966348b271949ec438cf2f3be45ea1b87b02f530468d2110b"
+            },
+            {
+              "id": 2,
+              "name": "Null",
+              "urlSha256": "6b0e580057d2a7dd00db8e3ff09d073c704350fe93d42e7c8b781977413df8d7"
+            },
+            {
+              "id": 3,
+              "name": "Invalid",
+              "urlSha256": "4e2ad79c15162299cc48e14eaf89d9ef231536275ab4aaee2f182d168bab35b4"
+            },
+            {
+              "id": 0,
+              "name": "Zero",
+              "urlSha256": "e917fcda470d53b5bfd19d720e13745b2a34ca3a25fa99f67dfb99119554d8ad"
+            }
+          ]
+        }
+      }
+    },
+    "candidateDebugOptimizedObservationsIdentical": true,
+    "generatedUrlHashesIndependentlyVerified": true,
+    "normalCleanupVerified": {
+      "ownedProcessRetired": {
+        "baseline-debug": true,
+        "candidate-debug": true,
+        "baseline-optimized": true,
+        "candidate-optimized": true
+      },
+      "appPreferencesWritten": 0,
+      "installerInvoked": false,
+      "generatedPreferencesOnly": true,
+      "viewerOrNetworkInvoked": false,
+      "ownedDeviceScratchRemoved": true,
+      "cleanupFaults": []
+    }
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestUnchanged": true,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false
+  },
+  "limits": [
+    "Native acceptance invokes actual APK CameraConfig with generated process-local preferences and Android JSON. ID lookup mirrors the existing caller; CameraViewerActivity, VideoView, RTSP, camera connectivity, routing and UI acceptance were not exercised.",
+    "Read-only load does not rewrite owner preferences. Ordinary Add/Remove persist the repaired snapshot; externally replaced preference arrays and already-open cross-version ambiguous Intents are outside this contract.",
+    "Owner camera URLs and credentials are not used by the fixture. Complete camera preference bytes, alongside the other captured room maps and preference files, remain unchanged across local delivery.",
+    "Normal owned-process and scratch cleanup passed. Failure/timeout cleanup was not fault-injected. The initial runner mapping initialization error occurred before any fixture execution, was retained privately and excluded from product evidence.",
+    "Family Android10 config behavior is verified; API28 and Living native/visual camera acceptance remain unverified. Existing UI approvals and exhausted issue clocks retain their boundaries.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+  ],
+  "documentation": {
+    "strictMkdocsTerminalExit": 0,
+    "warnings": 0,
+    "buildSeconds": 2.13,
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 84,
+          "checks": [
+            {
+              "id": "camera-legacy-identity",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "prayer-tomorrow",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 84,
+          "checks": [
+            {
+              "id": "camera-legacy-identity",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "prayer-tomorrow",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "phoneAndDesktopDetailImagesVisuallyInspected": true,
+    "all83EarlierRecordsExactlyPreserved": true,
+    "finalStrictMkdocsTerminalExit": 0,
+    "finalBuildSeconds": 1.9,
+    "factualReviewNoBlockingFindings": true,
+    "reviewScope": "Independent comparison to accepted private JVM/native/artifact/deployment/preservation evidence and prior roadmap; coordinator supplied visual observations."
+  }
+}
