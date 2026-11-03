@@ -960,6 +960,34 @@ records **8 categories / 54 pages**, not 54 device-verified screens.
 
 ## Build, CI and release state
 
+### Current configuration review — 3 November 2026
+
+Reviewed local configuration at Immortal `7e75e1f9` and the isolated Toolkit
+candidate `d15912d0`. The initial platform inventory remains a dated record of
+its original checkout. Current CI configuration is summarized here; hosted runs
+have not been observed.
+
+| Component / gate | Current configured checks | Execution evidence and limits |
+| --- | --- | --- |
+| Portal host tests | `tests.yml` sets JDK 21, Android SDK 36, Node 22 and Python 3.12. It selects JVM tests, slideshow JavaScript, bundled JavaScript and `test_portal_*.py` guards. Required SDK installation preserves the installer exit status. | Latest retained [Home EXIF receipt](portal-home-photo-exif-diagonals-2026-11-03.md): 4,358 unique JVM cases / 453 suites and debug assembly passed locally. Home pixels and new regression coverage remain open; debug assembly is a local gate, not a task in this workflow. |
+| Browser pairing | `remote-browser.yml` selects the six existing pairing keyboard browser cases with Node 22, pinned Playwright 1.62.1 and managed Chromium; available JUnit reports upload after failure. | [Browser CI receipt](portal-remote-pairing-browser-ci-2026-11-03.md): local default/explicit Chrome paths each passed six cases, with 724 bundled JavaScript cases. Ubuntu browser setup, hosted execution and live pairing remain unobserved. |
+| Fleet and provisioning | `provisioning.yml` builds optimized Rust CLIs on Ubuntu and Windows, builds/runs Rust tests on Ubuntu, and selects compiled-CLI HTTP/port/registry, room-helper, backup and restore regressions. Bash, PowerShell 7 / Windows 5.1 and ASCII checks remain configured. | Source configuration reviewed; no fresh compiler, provisioning fixture, hosted runner or hardware execution in this inventory unit. Private device registries remain excluded. |
+| Catalog | `catalog.yml` selects `test_portal_catalog_*.py` and the catalog schema/network validator. | Configuration only in this review; no fresh catalog network or hosted acceptance. |
+| Documentation and release metadata | `docs.yml` builds with strict MkDocs and configures Pages deployment after a main-branch push. `release-guard.yml` runs version synchronization checks. | The existing publication prohibition remains. Configured deploy steps and source metadata do not establish release, signing or device acceptance. |
+| Related Toolkit host tests | Its local `tests.yml` configures push, PR and manual runs on Ubuntu with JDK 21 / SDK 35, all JVM tests plus debug assembly, a 15-minute limit and superseded-run cancellation. Available reports are attempted after failure; APK upload requires success. | [Toolkit CI receipt](portal-toolkit-monitor-ci-2026-11-03.md) records the local workflow addition. Latest retained [uptime receipt](portal-toolkit-uptime-validity-2026-11-03.md): 227 unique JVM cases / 38 suites and debug assembly passed. The original checkout remains separate; hosted, phone and native acceptance remain open. |
+
+These local test totals are retained results from the linked units; application
+tests and builds were not rerun for this documentation review. Workflow files,
+product source, release metadata, all 118 saved tasks and the Weather default
+remain unchanged. No new task, deployment, publication or issue-clock reset is
+created by this clarification.
+
+### Historical build and delivery checkpoint
+
+The table below retains the earlier 1.70 delivery and initial CI observations.
+Use the current configuration review above and the dated receipts for subsequent
+changes; preserve the scope of each historical result.
+
 | Gate | Inspected configuration / evidence | Status |
 | --- | --- | --- |
 | Portal local checks | Latest [1.70 receipt](portal-pwa-tab-branding-delivery-2026-11-02.md); earlier editor/clock/timer/visibility receipts retained separately. | Latest 3,800 JVM/399 suites, 40/676 JS, 161 Python, optimized APK/R8/vital lint and version/signature checks passed. Exact installed readbacks both rooms; Family browser-status acceptance passed. Earlier native Slideshow and World Clock proof retains its original scope; every-editor and physical phone acceptance remain separate. |
