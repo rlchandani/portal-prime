@@ -9,12 +9,26 @@ are recorded below, with the native editor unit committed at `2682e3a9`.
 Resume from this inventory and the
 linked receipts; update implementation, checks, deployment and acceptance separately.
 The updated whole-product objective is
-`~/.codex/attachments/4832b00e-0492-44a6-a521-a970bf2ea968/goal-objective.md`.
+`~/.codex/attachments/e1ac08b5-a8c8-4f3e-9d81-6508e323ce04/pasted-text-1.txt`.
 
 ## Current delivery and boundaries
 
-- **Current room APK / bundled catalog parity:** exact optimized **1.98/code92**
-  is installed and fully hashed in both rooms. The first-load/offline catalog
+- **Current room APK / kitchen timer identity:** exact optimized **1.99/code93**
+  is installed and fully hashed in both rooms. Full timer IDs now isolate alarms;
+  legacy handles are retired and startup/boot rearm saved timers. **29 timer /
+  4,075 JVM424 suites**, debug/optimized/R8/vital-lint pass. Actual optimized
+  Family framework checks improve0/6→6/6 plus3 cold-restore checks; AlarmManager
+  is intercepted, with no real ring or app-preference writes. Both complete saved
+  maps/timer files match. After a reported poweron_dcplug restart, Family's
+  original Chrome task ended; its component reopened, prior tabs unverified.
+  Original font/services and WiFi ADB restored; normal frame visibly restored.
+  Native handles/scratch/copied registry removed. No phone access or publication.
+  Real alarm timing, UI Cancel, running-timer reboot and Living visuals remain
+  outside acceptance. Original **04:12:30–04:42:30UTC** clock retained.
+  [Receipt](portal-kitchen-timer-identity-2026-11-03.md).
+
+- **Previous room APK / bundled catalog parity:** exact optimized **1.98/code92**
+  was installed and fully hashed in both rooms. The first-load/offline catalog
   now matches the repository's26 apps rather than22, including current
   Kasa/Jarvis release metadata. Canonical JSON validation and CI triggers protect
   both copies; review's Boolean/integer equality gap was reproduced and fixed.

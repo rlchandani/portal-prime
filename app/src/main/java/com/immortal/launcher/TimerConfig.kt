@@ -98,12 +98,19 @@ object TimerConfig {
     save(context, load(context).filterNot { it.id == id })
   }
 
-  /** Re-arm alarms for every still-pending timer (boot / app start). Expired ones
-   *  are dropped. */
-  @Synchronized fun rearmAll(context: Context) {
-    val now = System.currentTimeMillis()
-    val (live, dead) = load(context).partition { it.endAtMillis > now }
-    if (dead.isNotEmpty()) save(context, live)
-    live.forEach { TimerScheduler.schedule(context, it) }
+  /** Boot drops missed timers. Process startup also re-arms due timers: it may be starting
+   *  to deliver that very alarm, and the receiver must still be able to claim it once. */
+  @Synchronized fun rearmAll(context: Context, dropExpired: Boolean = true) {
+    val timers = load(context)
+    val retained = if (dropExpired) {
+      val now = System.currentTimeMillis()
+      val (live, dead) = timers.partition { it.endAtMillis > now }
+      if (dead.isNotEmpty()) {
+        save(context, live)
+        dead.forEach { TimerScheduler.cancel(context, it) }
+      }
+      live
+    } else timers
+    retained.forEach { TimerScheduler.schedule(context, it) }
   }
 }

@@ -11,6 +11,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 
 /** Arms an exact AlarmManager alarm for each kitchen timer; [TimerReceiver] rings
  *  when one fires. Mirrors [ChimeScheduler]'s exact-and-allow-while-idle pattern. */
@@ -21,20 +22,29 @@ object TimerScheduler {
 
   private fun alarms(c: Context) = c.getSystemService(AlarmManager::class.java)
 
-  // A stable, positive request code per timer id so cancel() targets the same alarm.
+  // Keep legacy request codes for lookup; the full ID in Intent.data owns the new identity.
   private fun rc(id: String): Int = (id.hashCode() and 0x7FFFFFFF) or 1
 
-  private fun pi(c: Context, t: TimerConfig.Timer, create: Boolean): PendingIntent? {
+  private fun pi(c: Context, t: TimerConfig.Timer, create: Boolean, legacy: Boolean = false): PendingIntent? {
     val flags = (if (create) PendingIntent.FLAG_UPDATE_CURRENT else PendingIntent.FLAG_NO_CREATE) or
         PendingIntent.FLAG_IMMUTABLE
     val intent = Intent(c, TimerReceiver::class.java)
         .setAction(ACTION_FIRE)
         .putExtra(EXTRA_ID, t.id)
         .putExtra(EXTRA_LABEL, t.label)
+    // Extras do not participate in PendingIntent identity. Distinct timer IDs must survive
+    // request-code collisions, while changing a label/deadline must still update the same alarm.
+    if (!legacy) intent.data = Uri.fromParts("immortal-timer", t.id, null)
     return PendingIntent.getBroadcast(c, rc(t.id), intent, flags)
   }
 
+  private fun cancelPending(context: Context, pending: PendingIntent?) {
+    pending?.let { alarms(context).cancel(it); it.cancel() }
+  }
+
   fun schedule(context: Context, t: TimerConfig.Timer) {
+    // Startup restores every retained timer, retiring old no-data alarms as it migrates them.
+    cancelPending(context, pi(context, t, create = false, legacy = true))
     val p = pi(context, t, create = true) ?: return
     runCatching { alarms(context).setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, t.endAtMillis, p) }
         .onFailure {
@@ -43,6 +53,7 @@ object TimerScheduler {
   }
 
   fun cancel(context: Context, t: TimerConfig.Timer) {
-    pi(context, t, create = false)?.let { alarms(context).cancel(it); it.cancel() }
+    cancelPending(context, pi(context, t, create = false))
+    cancelPending(context, pi(context, t, create = false, legacy = true))
   }
 }

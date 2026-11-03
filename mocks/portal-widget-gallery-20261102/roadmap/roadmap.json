@@ -1,18 +1,60 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T04:07:36.795948+00:00",
-  "updatedLabel": "2 November 2026 Pacific \u00b7 1.98 in both rooms; strict docs build locally verified",
+  "updatedAt": "2026-11-03T04:35:51.567895+00:00",
+  "updatedLabel": "2 November 2026 Pacific \u00b7 1.99 in both rooms; independent kitchen timer alarms verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.98/code92. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.99/code93. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "kitchen-timer-alarm-identity",
+      "title": "Kitchen timers: preserve independent alarms",
+      "summary": "Delivered 1.99 to both rooms. Full timer IDs isolate alarms; startup and boot restore saved schedules.",
+      "description": "Two generated IDs created 23 seconds apart shared a folded request code. Intent data now carries the full ID; legacy handles retire and due/future startup restoration preserves saved bytes.",
+      "status": "delivered",
+      "verification": "29 timer \u00b7 4,075 JVM \u00b7 9/9 optimized native framework checks",
+      "kind": "Timer reliability and lifecycle",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering and release QA",
+      "deployment": "Exact optimized 1.99/code93 fully hashed in Family Area and Living Area; saved maps and timer files unchanged.",
+      "state": "After a reported poweron_dcplug restart, Family frame/font/services and WiFi ADB are restored. Original Chrome task ended; component reopened, prior tabs unverified.",
+      "acceptance": [
+        "Keep colliding timer IDs independent across schedule, reschedule and cancellation.",
+        "Retire legacy no-data identities and restore retained timers through existing lifecycle owners.",
+        "Preserve saved data during process-start restoration.",
+        "Verify exact optimized code, full installed hashes and saved room configurations."
+      ],
+      "evidence": [
+        {
+          "text": "Problem, regression evidence, rollout, restart recovery and limits.",
+          "source": "docs/portal-kitchen-timer-identity-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized source/artifact hashes, native results and preservation proof.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/kitchen-timer-identity-verification.json"
+        }
+      ],
+      "limits": [
+        "AlarmManager intercepted; no real ring, UI Cancel or running-timer reboot acceptance.",
+        "Original Chrome task ended after restart; prior tabs unverified.",
+        "Android9/API28 and Living native appearance uninspected."
+      ],
+      "next": "Retain scoped delivery and all existing approval, phone and parked-clock boundaries.",
+      "issueClock": {
+        "startedAt": "2026-11-03T04:12:30Z",
+        "deadline": "2026-11-03T04:42:30Z",
+        "originalClockRetained": true
+      }
+    },
     {
       "id": "catalog-fallback-parity",
       "title": "App store: keep the bundled catalog current",

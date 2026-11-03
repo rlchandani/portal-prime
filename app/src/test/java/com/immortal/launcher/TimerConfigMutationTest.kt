@@ -12,6 +12,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
@@ -57,6 +58,21 @@ class TimerConfigMutationTest {
     race(fixture, first = { TimerConfig.forget(fixture.context, "first") },
         second = { TimerConfig.rearmAll(fixture.context) })
     assertTrue(TimerConfig.load(fixture.context).isEmpty())
+  }
+
+  @Test fun coldProcessRestoreKeepsAndRearmsDueTimersWithoutRewritingStorage() {
+    val fixture = Fixture(DUE_AND_FUTURE_TIMERS)
+    fixture.withPlatform { TimerConfig.rearmAll(fixture.context, dropExpired = false) }
+    assertEquals(DUE_AND_FUTURE_TIMERS, fixture.raw.get())
+    assertEquals(2, fixture.armed.size)
+  }
+
+  @Test fun coldProcessRestoreLeavesDueDeliveryClaimableExactlyOnce() {
+    val fixture = Fixture(DUE_AND_FUTURE_TIMERS)
+    fixture.withPlatform { TimerConfig.rearmAll(fixture.context, dropExpired = false) }
+    assertEquals("Due", TimerConfig.consumeDue(fixture.context, "due")?.label)
+    assertNull(TimerConfig.consumeDue(fixture.context, "due"))
+    assertEquals(listOf("future"), TimerConfig.load(fixture.context).map { it.id })
   }
 
   @Test fun cancellingDuringAddCannotLeaveAnAlarmForADeletedTimer() {
@@ -157,7 +173,7 @@ class TimerConfigMutationTest {
     val context = Mockito.mock(Context::class.java)
     val raw = AtomicReference(initial)
     val armed = ConcurrentHashMap.newKeySet<PendingIntent>()
-    private val pending = ConcurrentHashMap<Int, PendingIntent>()
+    private val pending = ConcurrentHashMap<Pair<Int, String?>, PendingIntent>()
     private val prefs = Mockito.mock(SharedPreferences::class.java)
     private val alarms = Mockito.mock(AlarmManager::class.java)
     @Volatile var beforeApply: (() -> Unit)? = null
@@ -194,24 +210,36 @@ class TimerConfigMutationTest {
 
     // Mockito constructor/static interception is thread-local; install it in each worker.
     fun withPlatform(operation: () -> Unit) {
-      Mockito.mockConstruction(Intent::class.java,
-          Mockito.withSettings().defaultAnswer(Mockito.RETURNS_SELF)).use {
-        Mockito.mockStatic(PendingIntent::class.java, Answer<Any?> { call ->
-          if (call.method.name != "getBroadcast") Mockito.RETURNS_DEFAULTS.answer(call)
-          else {
-            val code = call.getArgument<Int>(1)
-            val flags = call.getArgument<Int>(3)
-            if (flags and PendingIntent.FLAG_NO_CREATE != 0) pending[code]
+      Mockito.mockStatic(Uri::class.java, Answer<Any?> { call ->
+        if (call.method.name != "fromParts") Mockito.RETURNS_DEFAULTS.answer(call)
+        else Mockito.mock(Uri::class.java).also {
+          Mockito.`when`(it.toString()).thenReturn(call.getArgument<String>(1))
+        }
+      }).use {
+        Mockito.mockConstruction(Intent::class.java,
+            Mockito.withSettings().defaultAnswer(Mockito.RETURNS_SELF)) { intent, _ ->
+          Mockito.doAnswer {
+            Mockito.`when`(intent.data).thenReturn(it.getArgument(0))
+            intent
+          }.`when`(intent).setData(Mockito.any(Uri::class.java))
+        }.use {
+          Mockito.mockStatic(PendingIntent::class.java, Answer<Any?> { call ->
+            if (call.method.name != "getBroadcast") Mockito.RETURNS_DEFAULTS.answer(call)
             else {
-              beforeSchedule?.invoke()
-              pending.computeIfAbsent(code) {
-                Mockito.mock(PendingIntent::class.java).also { intent ->
-                  Mockito.doAnswer { pending.remove(code); null }.`when`(intent).cancel()
+              val key = call.getArgument<Int>(1) to call.getArgument<Intent>(2).data?.toString()
+              val flags = call.getArgument<Int>(3)
+              if (flags and PendingIntent.FLAG_NO_CREATE != 0) pending[key]
+              else {
+                beforeSchedule?.invoke()
+                pending.computeIfAbsent(key) {
+                  Mockito.mock(PendingIntent::class.java).also { intent ->
+                    Mockito.doAnswer { pending.remove(key); null }.`when`(intent).cancel()
+                  }
                 }
               }
             }
-          }
-        }).use { operation() }
+          }).use { operation() }
+        }
       }
     }
   }
@@ -225,6 +253,10 @@ class TimerConfigMutationTest {
     const val EXPIRED_TIMERS = """[
       {"id":"first","label":"First","dur":1000,"end":1},
       {"id":"second","label":"Second","dur":1000,"end":2}
+    ]"""
+    const val DUE_AND_FUTURE_TIMERS = """[
+      {"id":"due","label":"Due","dur":1000,"end":1},
+      {"id":"future","label":"Future","dur":1000,"end":4102444800000}
     ]"""
   }
 }

@@ -13,6 +13,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.media.AudioAttributes
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -153,27 +154,38 @@ class TimerReceiverDeliveryTest {
     }
 
     fun withPlatform(operation: () -> Unit) {
-      Mockito.mockStatic(Log::class.java).use {
-        Mockito.mockStatic(Looper::class.java).use { loopers ->
-          val main = Mockito.mock(Looper::class.java)
-          loopers.`when`<Looper> { Looper.getMainLooper() }.thenReturn(main)
-          val attrs = Mockito.mock(AudioAttributes::class.java)
-          Mockito.mockConstruction(AudioAttributes.Builder::class.java,
-              Mockito.withSettings().defaultAnswer(Mockito.RETURNS_SELF)) { builder, _ ->
-            Mockito.`when`(builder.build()).thenReturn(attrs)
-          }.use {
-            Mockito.mockConstruction(Handler::class.java) { handler, _ ->
-              Mockito.doAnswer { call ->
-                jobs.add(Job(call.getArgument<Runnable>(0), call.getArgument<Long>(1)))
-                true
-              }.`when`(handler).postDelayed(Mockito.any(Runnable::class.java), Mockito.anyLong())
+      Mockito.mockStatic(Uri::class.java).use { uris ->
+        uris.`when`<Uri> { Uri.fromParts(Mockito.anyString(), Mockito.anyString(), Mockito.isNull()) }
+            .thenAnswer { Mockito.mock(Uri::class.java) }
+        Mockito.mockStatic(Log::class.java).use {
+          Mockito.mockStatic(Looper::class.java).use { loopers ->
+            val main = Mockito.mock(Looper::class.java)
+            loopers.`when`<Looper> { Looper.getMainLooper() }.thenReturn(main)
+            val attrs = Mockito.mock(AudioAttributes::class.java)
+            Mockito.mockConstruction(AudioAttributes.Builder::class.java,
+                Mockito.withSettings().defaultAnswer(Mockito.RETURNS_SELF)) { builder, _ ->
+              Mockito.`when`(builder.build()).thenReturn(attrs)
             }.use {
-              Mockito.mockConstruction(Intent::class.java,
-                  Mockito.withSettings().defaultAnswer(Mockito.RETURNS_SELF)).use {
-                Mockito.mockStatic(PendingIntent::class.java, Answer<Any?> { call ->
-                  if (call.method.name == "getBroadcast") pending
-                  else Mockito.RETURNS_DEFAULTS.answer(call)
-                }).use { operation() }
+              Mockito.mockConstruction(Handler::class.java) { handler, _ ->
+                Mockito.doAnswer { call ->
+                  jobs.add(Job(call.getArgument<Runnable>(0), call.getArgument<Long>(1)))
+                  true
+                }.`when`(handler).postDelayed(Mockito.any(Runnable::class.java), Mockito.anyLong())
+              }.use {
+                Mockito.mockConstruction(Intent::class.java,
+                    Mockito.withSettings().defaultAnswer(Mockito.RETURNS_SELF)) { intent, _ ->
+                  Mockito.doAnswer {
+                    Mockito.`when`(intent.data).thenReturn(it.getArgument(0))
+                    intent
+                  }.`when`(intent).setData(Mockito.any(Uri::class.java))
+                }.use {
+                  Mockito.mockStatic(PendingIntent::class.java, Answer<Any?> { call ->
+                    if (call.method.name == "getBroadcast") {
+                      if (call.getArgument<Intent>(2).data == null) null else pending
+                    }
+                    else Mockito.RETURNS_DEFAULTS.answer(call)
+                  }).use { operation() }
+                }
               }
             }
           }

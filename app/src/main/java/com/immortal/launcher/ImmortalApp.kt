@@ -80,6 +80,9 @@ class ImmortalApp : Application() {
     // Arm the next wake-up alarm per the user's config.
     AlarmScheduler.reschedule(this, cancelSnooze = false)
 
+    // Restore kitchen timer ownership, including a due timer waking this cold process.
+    TimerConfig.rearmAll(this, dropExpired = false)
+
     // Bring up the WiFi fleet agent if provisioning enabled it (no-op otherwise).
     FleetAgentService.ensureRunning(this)
 

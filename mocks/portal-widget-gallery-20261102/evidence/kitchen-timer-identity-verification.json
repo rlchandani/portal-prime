@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "status": "delivered-with-scoped-acceptance",
+  "checkedAtUtc": "2026-11-03T04:35:51.567895+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T04:12:30Z",
+    "deadline": "2026-11-03T04:42:30Z",
+    "originalClockRetained": true
+  },
+  "problem": {
+    "collisionIds": [
+      "mw069oc0-102",
+      "mw06a62w-8470"
+    ],
+    "creationIntervalSeconds": 23,
+    "sharedFoldedRequestCode": 1304899673,
+    "fullIdNowParticipatesInPendingIntentIdentity": true
+  },
+  "sourceSha256": {
+    "app/build.gradle.kts": "38cdd56ec47df8019b21393b967ffc97b477eaa50c87b857ce37c0ef47b7abb0",
+    "app/src/main/java/com/immortal/launcher/TimerScheduler.kt": "5d8c8b498fb1b82906c5a9a9db97b944b28bde0ad73391ae65032d0f250eda35",
+    "app/src/main/java/com/immortal/launcher/TimerConfig.kt": "a759fd1295283244c49d8ce3383db8525af2231ab426d1742c1be3d7cb7c16f0",
+    "app/src/main/java/com/immortal/launcher/ImmortalApp.kt": "4e7ea5b8fc0e8947ca6a32c3bd9a1dc0428d6837421a81f93d81bd28789bf1c6",
+    "app/src/main/java/com/immortal/launcher/BootReceiver.kt": "85708614ae5ce0efb920735cf2eb15161d2e89fc7203a331e90268c52560088a",
+    "app/src/test/java/com/immortal/launcher/TimerSchedulerIdentityTest.kt": "b28cf65a98c42483b289e67118be7498c8d6b8424c7dbf0bc16d02a41f0af3b6",
+    "app/src/test/java/com/immortal/launcher/TimerConfigMutationTest.kt": "f45ad0009884b5f23dcf91eb71e85a5afb95d8171a4102fb2459e9223eaa25e7",
+    "app/src/test/java/com/immortal/launcher/TimerReceiverDeliveryTest.kt": "cf3ca3f5d50189896dee19c82035e2bdeae9a2276d1a91b78643428cd2d1a969"
+  },
+  "independentReview": {
+    "productionHashesMatch": true,
+    "reviewedProductionSha256": {
+      "TimerScheduler.kt": "5d8c8b498fb1b82906c5a9a9db97b944b28bde0ad73391ae65032d0f250eda35",
+      "TimerConfig.kt": "a759fd1295283244c49d8ce3383db8525af2231ab426d1742c1be3d7cb7c16f0",
+      "ImmortalApp.kt": "4e7ea5b8fc0e8947ca6a32c3bd9a1dc0428d6837421a81f93d81bd28789bf1c6",
+      "BootReceiver.kt": "85708614ae5ce0efb920735cf2eb15161d2e89fc7203a331e90268c52560088a"
+    },
+    "nativeFixtureSha256": "4de754066eae4bf29cbaee07c55a253a673ef404c32310e1060392f941c14eaa",
+    "finding": "No actionable production or fixture-cleanup findings after final review.",
+    "receiptClaimCorrections": [
+      "Deadline belongs to AlarmManager timing metadata; only ID and label are payload extras.",
+      "Chrome task exception phrased as after reported restart, without causal attribution."
+    ]
+  },
+  "regressions": {
+    "initialIdentityTests": 7,
+    "initialIdentityFailures": 5,
+    "initialColdRestoreTests": 2,
+    "initialColdRestoreFailures": 2,
+    "coldRestoreRedScope": "Existing logic with Boolean API-only signature; no behavior fix yet.",
+    "finalFocusedTimerTests": 29,
+    "finalFocusedFailures": 0,
+    "finalFormattingRecheckSeconds": 11
+  },
+  "jvm": {
+    "tests": 4075,
+    "suites": 424,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "timerTests": 29
+  },
+  "androidBuilds": {
+    "debug": "passed",
+    "performanceOptimizedR8VitalLint": "passed",
+    "combinedGateSeconds": 118
+  },
+  "native": {
+    "old": {
+      "productionCancellationInvoked": false,
+      "actualProductionMethod": "com.immortal.launcher.TodoStore.p",
+      "loaderOwnsProductionClasses": true,
+      "realAlarmServiceUsed": false,
+      "appPreferencesWritten": 0,
+      "fixturePreferenceWrites": 0,
+      "checks": {
+        "distinctPendingIdentities": false,
+        "bothDeadlinesRetained": false,
+        "rescheduleOnlyItsOwnDeadline": false,
+        "cancellationPreservesNeighbor": false,
+        "legacyRetiredAndBothRearmed": false,
+        "fullEncodedIdParticipatesInIdentity": false
+      },
+      "ownedPendingIntentsRemoved": true
+    },
+    "new": {
+      "productionCancellationInvoked": true,
+      "productionCancellationPath": "rearmAll(dropExpired=true) -> TimerScheduler.cancel",
+      "actualProductionMethod": "com.immortal.launcher.TodoStore.q",
+      "loaderOwnsProductionClasses": true,
+      "realAlarmServiceUsed": false,
+      "appPreferencesWritten": 0,
+      "fixturePreferenceWrites": 1,
+      "checks": {
+        "distinctPendingIdentities": true,
+        "bothDeadlinesRetained": true,
+        "rescheduleOnlyItsOwnDeadline": true,
+        "cancellationPreservesNeighbor": true,
+        "legacyRetiredAndBothRearmed": true,
+        "fullEncodedIdParticipatesInIdentity": true,
+        "coldRestoreArmsDueAndFuture": true,
+        "coldRestorePreservesExactSavedTimers": true,
+        "coldRestoreRetiresLegacyIdentity": true
+      },
+      "ownedPendingIntentsRemoved": true
+    },
+    "oldSharedChecksPassed": 0,
+    "sharedChecks": 6,
+    "newSharedChecksPassed": 6,
+    "newColdRestoreChecksPassed": 3,
+    "scope": "Actual optimized APK production code in a separate Family shell process; real framework PendingIntent identity, intercepted AlarmManager, in-memory generated preference store. Old cancellation case uses direct framework cancellation; candidate cancellation uses production expiry cleanup."
+  },
+  "artifact": {
+    "file": "candidate-1.99.apk",
+    "bytes": 25862706,
+    "sha256": "27967ddb71cc8c91a486d912bb7b4952692f61cc0b4e6bcd754fd41d965a0ab9",
+    "package": "package: name='com.immortal.launcher.debug' versionCode='93' versionName='1.99' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "deployment": {
+    "Family Area": {
+      "helperExit": 0,
+      "fullInstalledApkSha256Verified": true
+    },
+    "Living Area": {
+      "helperExit": 0,
+      "fullInstalledApkSha256Verified": true
+    }
+  },
+  "preservation": {
+    "Family Area": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": false,
+      "photoFrameListedAsResumed": true,
+      "displayOn": true,
+      "dreaming": true,
+      "installedFullSha256Matches": true,
+      "timerPreferenceFilesByteIdentical": true,
+      "reopenedChromeComponentPresent": true,
+      "originalChromeTaskChangedAfterReportedRestart": true,
+      "photoFrameScreenshotVisuallyReviewed": true
+    },
+    "Living Area": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "timerPreferenceFilesByteIdentical": true
+    },
+    "familyInitialPostflight": {
+      "allChecksPassed": true,
+      "originalChromeTaskRetained": true,
+      "provenance": "Initial successful structured tool transcript; raw check file was overwritten by later recovery checks."
+    }
+  },
+  "familyRestart": {
+    "checkedAtUtc": "2026-11-03T04:29:24.347550+00:00",
+    "reportedBootReason": "poweron_dcplug",
+    "reportedUptimeAtDetection": "3 min",
+    "savedConfigurationAndTimerMapsMatchAfterRestart": true,
+    "originalChromeTaskIdentityRetainedAfterRestart": false,
+    "originalChromeComponentReopened": "org.chromium.chrome/.browser.ChromeTabbedActivity",
+    "priorAccessibilityListRestored": true,
+    "photoFrameRestoreRequested": true,
+    "accountOrTabUrlsWritten": 0,
+    "causeAttribution": "Device report only; no app-cause or human-cause attribution.",
+    "photoFrameRestoreAccepted": true,
+    "restorePath": "Existing authenticated /remote/key screensaver action",
+    "initialShellLaunchesRejected": true,
+    "finalPhotoFrameVisible": true,
+    "displayOn": true,
+    "priorTabStateVerified": false,
+    "wifiAdbPortRestored": true
+  },
+  "cleanup": {
+    "checkedAtUtc": "2026-11-03T04:27:44.103916+00:00",
+    "nativeOwnedRootRemoved": true,
+    "nativePendingIntentsRemovedOld": true,
+    "nativePendingIntentsRemovedNew": true,
+    "copiedRegistryByteIdenticalToPrimary": true,
+    "copiedRegistryRemoved": true,
+    "candidateWindowAppFatalRecords": 0,
+    "fatalWindowStartsAtUtc": "2026-11-03T04:24:16Z",
+    "cleanupTransport": "explicit Family USB serial; WiFi port temporarily refused"
+  },
+  "limits": [
+    "No real AlarmManager timing, audible ring, UI Cancel or running-timer reboot-order acceptance.",
+    "The observed restart had no saved running kitchen timers; no cause attribution beyond reported poweron_dcplug.",
+    "Chrome component reopened after restart; original task identity and prior tabs were not retained or verified.",
+    "Android9/API28 and Living native appearance uninspected.",
+    "No Google phone control, Home Assistant change, GitHub publication or public self-update manifest change."
+  ],
+  "strictDocs": {
+    "exit": 0,
+    "warnings": 0,
+    "durationSeconds": 2.14
+  },
+  "roadmapReview": {
+    "checkedAtUtc": "2026-11-03T04:37:59.481Z",
+    "taskCount": 71,
+    "cases": [
+      {
+        "width": 390,
+        "height": 844,
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "currentVersionVisible": true,
+        "focusedAndFullGatesVisible": true,
+        "scopeLimitVisible": true,
+        "phoneBoundaryVisible": true,
+        "taskCountVisible": true,
+        "evidenceHttpStatus": 200
+      },
+      {
+        "width": 390,
+        "task": "strict-docs-links",
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "warningCountVisible": true,
+        "strictValidationPreserved": true,
+        "deadlineVisible": true,
+        "evidenceHttpStatus": 200,
+        "proofBytesMatch": true,
+        "publicationLimitRetained": true
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "currentVersionVisible": true,
+        "focusedAndFullGatesVisible": true,
+        "scopeLimitVisible": true,
+        "phoneBoundaryVisible": true,
+        "taskCountVisible": true,
+        "evidenceHttpStatus": 200
+      },
+      {
+        "width": 1600,
+        "task": "strict-docs-links",
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "warningCountVisible": true,
+        "strictValidationPreserved": true,
+        "deadlineVisible": true,
+        "evidenceHttpStatus": 200,
+        "proofBytesMatch": true,
+        "publicationLimitRetained": true
+      }
+    ],
+    "pageErrors": 0,
+    "externalRequests": 0,
+    "ownedContextsClosed": true,
+    "scope": "Selected timer and locally verified docs details, current version/boundaries and exact proof availability only; no all71workflow or native UI claim. Existing focused skip-link state is present in the mobile element screenshot; no broad visual or accessibility acceptance.",
+    "selectedPanelScreenshotsReviewed": true
+  },
+  "preparedForCommitAtUtc": "2026-11-03T04:38:43.684268+00:00"
+}
