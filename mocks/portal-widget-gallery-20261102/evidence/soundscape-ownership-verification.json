@@ -1,0 +1,690 @@
+{
+  "schemaVersion": 1,
+  "taskId": "soundscape-ownership",
+  "recordedAt": "2026-11-03T13:52:21.072390+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T13:35:36Z",
+    "deadline": "2026-11-03T14:05:36Z",
+    "originalIndependentAuditClockRetained": true
+  },
+  "scope": "Exact deferred production Runnable on inert JVM Thread/audio boundaries; exact optimized delivery, preservation and limited observations.",
+  "baseline": {
+    "tests": 8,
+    "failures": 5,
+    "controls": 3,
+    "errors": 0,
+    "skips": 0,
+    "actualExit": 1,
+    "sourceSha256": "3a9832761b368fa73492fc52569001ded35596c32267306131cdb700a5890e3d",
+    "frozenTestSha256": "0e3c34870c415b77470334a4b153a8e4527e4b3fda31a0d78939e91162fe5abe",
+    "methods": [
+      {
+        "method": "negativeWriteReleasesTheAcquiredTrackWithoutAnotherStop",
+        "failed": true,
+        "failureType": "org.mockito.exceptions.verification.WantedButNotInvoked",
+        "rawMessageSha256": "9fc65d21c10dc3977955ec71a144dc6dbe1349293c6b84340cc1eb37dcaedfc5",
+        "rawMessageBytes": 118427
+      },
+      {
+        "method": "stoppedDeferredWorkerCannotBeginPlayback",
+        "failed": true,
+        "failureType": "org.mockito.exceptions.verification.NeverWantedButInvoked",
+        "rawMessageSha256": "f9424ebbc946f921eab6fe1d279f5c6061eb5dbf40a600722bd702908cc3da9d",
+        "rawMessageBytes": 264
+      },
+      {
+        "method": "currentPlaybackExplicitStopReleasesExactlyOnce",
+        "failed": false
+      },
+      {
+        "method": "writeFailureReleasesTheAcquiredTrackWithoutAnotherStop",
+        "failed": true,
+        "failureType": "org.mockito.exceptions.verification.WantedButNotInvoked",
+        "rawMessageSha256": "7eb58a9e0df1f7c3093c67686a9e12810e36d894014624725df028b2c3313dd3",
+        "rawMessageBytes": 118383
+      },
+      {
+        "method": "zeroVolumeCreatesNoWorkerOrTrack",
+        "failed": false
+      },
+      {
+        "method": "retiredWorkerCannotUseTheNextRunsPlayingFlag",
+        "failed": true,
+        "failureType": "org.mockito.exceptions.verification.NeverWantedButInvoked",
+        "rawMessageSha256": "f9424ebbc946f921eab6fe1d279f5c6061eb5dbf40a600722bd702908cc3da9d",
+        "rawMessageBytes": 264
+      },
+      {
+        "method": "playFailureReleasesTheAcquiredTrackWithoutAnotherStop",
+        "failed": true,
+        "failureType": "org.mockito.exceptions.verification.WantedButNotInvoked",
+        "rawMessageSha256": "78422eb062b2ed419a21c729130e7aa6b8a0a4f7b718e3bdeffde4e2a478e801",
+        "rawMessageBytes": 314
+      },
+      {
+        "method": "offStartPreservesCurrentRunUntilItsExplicitStop",
+        "failed": false
+      }
+    ],
+    "untouchedSource": true,
+    "excludedInspectorOutput": "First XML inspection printed full message attributes containing8820 generated random samples and was truncated. All8 methods and complete failure types and diagnostic prefixes are separately parsed here, with full raw XML retained. No sample-content or full-stack read claimed."
+  },
+  "candidateJVM": {
+    "suites": 449,
+    "tests": 4331,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualSoundscapeFocusedTests": 8,
+    "allFocusedUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "1m 47s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "artifacts": {
+    "sha256": "ca66cd6f29af3a635c1bddfb406a3420e45c37de52f040b5a6b26180268bb4e6",
+    "bytes": 25879086,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.124",
+    "versionCode": 118,
+    "variants": {
+      "performance": {
+        "sha256": "ca66cd6f29af3a635c1bddfb406a3420e45c37de52f040b5a6b26180268bb4e6",
+        "bytes": 25879086,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.124",
+        "versionCode": 118
+      },
+      "debug": {
+        "sha256": "0a2b19b0d68ffce0922dd99f59e44744c73988b049db5faf2d529bce93ceb523",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.124",
+        "versionCode": 118
+      },
+      "rollback": {
+        "sha256": "fca29795d891b86f660356ecfc9f104271cab886ede85b81af1713260e1dcd29",
+        "bytes": 25879086,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.123",
+        "versionCode": 117
+      }
+    },
+    "debugSha256": "0a2b19b0d68ffce0922dd99f59e44744c73988b049db5faf2d529bce93ceb523",
+    "rollbackSha256": "fca29795d891b86f660356ecfc9f104271cab886ede85b81af1713260e1dcd29",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "1m 47s"
+  },
+  "sourceBindings": {
+    "app/src/main/java/com/immortal/launcher/SoundscapePlayer.kt": {
+      "sha256": "95820815d7dc1442c9ff56d21760e0de297beb1cef3ede85bb46e68f9d4c5020",
+      "bytes": 10856
+    },
+    "app/src/test/java/com/immortal/launcher/SoundscapeOwnershipTest.kt": {
+      "sha256": "0e3c34870c415b77470334a4b153a8e4527e4b3fda31a0d78939e91162fe5abe",
+      "bytes": 6819
+    },
+    "app/build.gradle.kts": {
+      "sha256": "932d084a69fa8c109d7a9f488ea7b46000a4de96813ff05f9032c06e118bb4c8",
+      "bytes": 11816
+    }
+  },
+  "preservedDSPSuffix": {
+    "sha256": "6434ff9a7dd4a4e957541cf684e84d9ec7e552472827599ae67dca7e13525e96",
+    "bytes": 6189,
+    "byteIdenticalToParent": true
+  },
+  "implementationScope": {
+    "capturedAt": "2026-11-03T13:42:23.884008+00:00",
+    "productionSource": {
+      "sha256": "95820815d7dc1442c9ff56d21760e0de297beb1cef3ede85bb46e68f9d4c5020",
+      "bytes": 10856
+    },
+    "baselineSource": {
+      "sha256": "3a9832761b368fa73492fc52569001ded35596c32267306131cdb700a5890e3d",
+      "bytes": 10299
+    },
+    "frozenTestSha256": "0e3c34870c415b77470334a4b153a8e4527e4b3fda31a0d78939e91162fe5abe",
+    "dspAndPcmSuffixByteIdentical": true,
+    "sampleRateBufferModeFadeGainPreserved": true,
+    "callerAndSettingsUnchanged": true,
+    "playVsStopAtomicityClaim": false,
+    "platformCleanup500msDeadlineClaim": false,
+    "nativeAudioAndRealSchedulingAcceptance": false
+  },
+  "reviews": {
+    "focused": {
+      "verdict": "PASS_FOCUSED_SOURCE_AND_FROZEN_TEST_REVIEW",
+      "blockers": [],
+      "passedChecks": 29,
+      "totalChecks": 29
+    },
+    "gate": {
+      "status": "PASS",
+      "counts": {
+        "passed": 29,
+        "total": 29
+      },
+      "blockers": []
+    },
+    "delivery": {
+      "status": "PASS",
+      "counts": {
+        "passed": 37,
+        "total": 37
+      },
+      "blockers": []
+    },
+    "candidateDEX": {
+      "status": "PASS",
+      "counts": {
+        "passed": 16,
+        "total": 16
+      },
+      "blockers": [],
+      "structuralOnly": true,
+      "runtimeCalls": 0,
+      "nativeAudioCalls": 0
+    },
+    "baselineFixture": {
+      "status": "PASS",
+      "blockers": [],
+      "nativeAdmission": {
+        "nativeAudioInvocations": 0,
+        "realWorkers": 0,
+        "optimizedRuntimeInvocations": 0,
+        "verdict": "No inert native admission established. Actual Android AudioTrack.Builder builds a live track; production API has no injectable factory, and Java-instrumentation Mockito is not supported on Android. A native fixture would require real audio or unsupported private/extracted/model/keep boundaries, which are not authorized.",
+        "futureStructuralInspection": "Actual candidate APK declarations/code ownership may be inspected after packaging; static evidence will not upgrade runtime acceptance."
+      }
+    }
+  },
+  "delivery": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "preferenceStates": {
+    "family": {
+      "states": 12,
+      "byteIdenticalPresent": 11,
+      "unchangedAbsences": 1
+    },
+    "living": {
+      "states": 12,
+      "byteIdenticalPresent": 8,
+      "unchangedAbsences": 4
+    }
+  },
+  "limitedHealth": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1644,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 2017,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "credentialCleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "visual": {
+    "reviewedByCoordinator": true,
+    "familyCurrentFrameVisible": true,
+    "captureSha256": "0af4b79a6d6dada82b8384e9843a3ad2b0a9c6d1071c6daf84661116e9b55daa",
+    "captureBytes": 1814888,
+    "livingVisualAcceptance": false
+  },
+  "terminals": {
+    "baseline-focused-terminal.json": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T13:40:14.772159+00:00",
+      "endedAt": "2026-11-03T13:40:25.413835+00:00",
+      "durationSeconds": 10.641676
+    },
+    "full-gate-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T13:42:04.403769+00:00",
+      "endedAt": "2026-11-03T13:43:52.474540+00:00",
+      "durationSeconds": 108.070771
+    },
+    "package-proof-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T13:44:02.454895+00:00",
+      "endedAt": "2026-11-03T13:44:03.352160+00:00",
+      "durationSeconds": 0.897265
+    },
+    "preflight-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T13:39:14.916920+00:00",
+      "endedAt": "2026-11-03T13:39:16.322877+00:00",
+      "durationSeconds": 1.405957
+    },
+    "room-deploy-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T13:49:07.117454+00:00",
+      "endedAt": "2026-11-03T13:49:20.990609+00:00",
+      "durationSeconds": 13.873155
+    },
+    "postflight-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T13:49:27.625186+00:00",
+      "endedAt": "2026-11-03T13:49:29.010105+00:00",
+      "durationSeconds": 1.384919
+    },
+    "health-observation-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T13:49:29.048989+00:00",
+      "endedAt": "2026-11-03T13:49:29.750448+00:00",
+      "durationSeconds": 0.701459
+    },
+    "family-capture-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T13:49:29.778142+00:00",
+      "endedAt": "2026-11-03T13:49:31.584862+00:00",
+      "durationSeconds": 1.80672
+    },
+    "cleanup-credentials-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T13:49:31.623063+00:00",
+      "endedAt": "2026-11-03T13:49:31.707200+00:00",
+      "durationSeconds": 0.084137
+    },
+    "public-version-guard-terminal.json": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T13:43:00.861608+00:00",
+      "endedAt": "2026-11-03T13:43:00.943436+00:00",
+      "durationSeconds": 0.081828
+    }
+  },
+  "backlogPreservation": {
+    "beforeTasks": 99,
+    "afterTasks": 100,
+    "allPriorTaskObjectsIdentical": true,
+    "completePriorRawSuffixIdentical": true,
+    "priorRawSuffix": {
+      "sha256": "3e8a9b2c996acaa0d9a83bdd9a52c39d441df174c4f8745f3f79e85e33728e8a",
+      "bytes": 326627
+    },
+    "defaultTask": "weather-native-layout",
+    "beforeCounts": {
+      "delivered": 64,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "afterCounts": {
+      "delivered": 65,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    }
+  },
+  "unchangedBoundaries": {
+    "version.json": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "provisioning/fleetctl": {
+      "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+      "bytes": 694352
+    },
+    "publicManifestVersion": {
+      "versionName": "1.83",
+      "versionCode": 77
+    }
+  },
+  "limits": [
+    "Acceptance delivers the exact production render Runnable captured at mocked Thread construction/start on the fixture owner. Android builders, AudioTrack and static calls are inert; no real worker, native allocation, playback or audio occurs.",
+    "Controlled deferred Runnable and track-interaction histories establish lifetime and cleanup regressions. Actual thread scheduling, blocking builder, the 500ms join timeout, native/API28/29, optimized worker and audio quality remain unverified.",
+    "Already admitted play or an in-progress chunk write can race retirement. No universal cancellation or play-vs-stop ordering promise is made. The 500ms join argument does not guarantee completion of platform stop/release within 500ms.",
+    "Atomic track claim gives one cleanup owner; stop and release are independent best-effort attempts. Platform cleanup failures/completion and stop-throws behavior are not native acceptance; release-after-stop-failure is source-reviewed only.",
+    "Public start/stop retain the single-owner contract and serialized PhotoFrameController executor. No cross-thread caller guarantee, unknown-sound policy, synthesis/settings or audio quality redesign.",
+    "Five baseline failures are Mockito WantedButNotInvoked/NeverWantedButInvoked verification failures. Full random-sample diagnostic printing was truncated and excluded; raw XML is bound. No full-stack or PCM-content review claim or excluded product rerun is made.",
+    "Family frame review covers the current frame only. Living visual and physical soundscape UI remain open. Limited lines=1500 diagnostics do not establish complete runtime health.",
+    "The original 13:35:36–14:05:36 UTC clock includes all inventory and delivery work. Date audit is bounded negative; CountdownDates/IrishHolidays 10:07:54 negatives, Prayer 07:01:27, TimerAlarm 08:51:50 and all older scopes keep their original clocks.",
+    "Public manifest remains 1.83/code77. Existing phone-control, publication, HA and design-approval restrictions remain."
+  ],
+  "privateEvidenceBindings": {
+    "baseline-red.json": {
+      "sha256": "7e7e4a1899a38952504d1d1d89a75dc96db0b98c5a787371cc7ec370997b7a20",
+      "bytes": 5058
+    },
+    "baseline-focused.xml": {
+      "sha256": "e831649920869a585cb0efeeed30c4b4ce2bddc71c847dbfef87b245057ce802",
+      "bytes": 498750
+    },
+    "baseline-focused.log": {
+      "sha256": "c131875276907c1d4eb000f74b140193548a098fe3708c2fba8da860f46e7d5e",
+      "bytes": 3183
+    },
+    "frozen-test-plan.json": {
+      "sha256": "a7167351655d4bd9c245522d03b1cd282b86efb56d8dbb8c6871ef117f809d5d",
+      "bytes": 6764
+    },
+    "baseline-SoundscapePlayer.kt": {
+      "sha256": "3a9832761b368fa73492fc52569001ded35596c32267306131cdb700a5890e3d",
+      "bytes": 10299
+    },
+    "baseline-fixture-review.json": {
+      "sha256": "a5ff6ffe7034369ddec34562fe178949ee6352af9e063a5c693a286f8fcd2a0a",
+      "bytes": 9096
+    },
+    "root-source-admission.json": {
+      "sha256": "c9cd847241be3e27e02c61e62a174f50db6560743666512961258845b85c1670",
+      "bytes": 2083
+    },
+    "mockito-thread-admission-bytecode.txt": {
+      "sha256": "9133faef8386d164819bb556f6ebfbafdf73382d14112aaceebd42387971449e",
+      "bytes": 83474
+    },
+    "implementation-scope.json": {
+      "sha256": "0c05503f48da1fe2d426c7dbb26791fd6e4a725bb98eb8ebc457950cd7c6ade6",
+      "bytes": 664
+    },
+    "soundscape-source-approach-review.json": {
+      "sha256": "54113b4ad775b5249fdb0819a124d257c19c2aeeb9f54839e7c9da620de40c08",
+      "bytes": 10229
+    },
+    "date-arithmetic-audit.json": {
+      "sha256": "de0aa4e5f333db0f3a3e0c85bf8d6220d87c6add3a5057e22af0d0d3fd8d2f44",
+      "bytes": 22407
+    },
+    "update-metadata-audit.json": {
+      "sha256": "83d0fa4fcf1c4b938d46979a8ec06e5072eb4b8a85cf256a1239ede8b7b20f0c",
+      "bytes": 33233
+    },
+    "focused-source-review.json": {
+      "sha256": "62e10485343d5bd164c1b441b1a760380c5b8244769a961f06f3700a11d72593",
+      "bytes": 7255
+    },
+    "gate-native-review.json": {
+      "sha256": "8875c3c7a797851a0d4a41a97571ecca98d878e040460b6a8d7aebb666f77fdf",
+      "bytes": 15615
+    },
+    "delivery-preservation-review.json": {
+      "sha256": "6b20e1b27cc25698f713322aec0ce19fa0df53db21b705d8381aa9308f1f5bec",
+      "bytes": 18156
+    },
+    "candidate-dex-ownership-review.json": {
+      "sha256": "e9ce2472c7f0fe05fd12c193134bebf8565a1b0efb529bccf366ffca012a969d",
+      "bytes": 195165
+    },
+    "write-delivery-initial-root-read.py": {
+      "sha256": "d3ac0f9a33e01a36ae2e540c200f4a53359180712c43b6e05a3338317eb91abd",
+      "bytes": 29235
+    },
+    "write-delivery.py": {
+      "sha256": "f42ca13a95ebb51df10ce85fd0e16bfeb0a5830e22bc8fe3e3f7a9d0b58dd9e4",
+      "bytes": 29235
+    },
+    "delivery-writer-freeze.json": {
+      "sha256": "29660fdcd4b933e15719bbe538713ccd68c030642cafc759ed232010f2c8374f",
+      "bytes": 9067
+    },
+    "full-gate.log": {
+      "sha256": "1f626529ed36fef7a2f0da1815a0118ce568dcf1d044bb9cae1f1b8656fdf827",
+      "bytes": 13732
+    },
+    "full-jvm-xml-bindings.json": {
+      "sha256": "9c39efffa07ec2308fe5b4b0a2a56134a27189ff4082a554263278629aae5431",
+      "bytes": 75320
+    },
+    "independent-full-jvm-manifest.json": {
+      "sha256": "be62f187b7ff0abf1b92e04a12892f9cd312e4d115b5631de82ba362abdbd31a",
+      "bytes": 202853
+    },
+    "independent-artifact-identity-review.json": {
+      "sha256": "453233ab4aa4ab14b3c31c89004a65d095e68492a00ae3db60ffc7505766df16",
+      "bytes": 2238
+    },
+    "baseline-soundscape-dex.json": {
+      "sha256": "1abc29cf7b96f2e8a97d16811ddf61819a55ad84dc195730449cde469fce25b0",
+      "bytes": 15734
+    },
+    "inspect-soundscape-structure.py": {
+      "sha256": "2c9f0c35986f88f9d6dbb8778ae6a49d2ea86bf659b89aaec3e6b709d6eca3b1",
+      "bytes": 4840
+    },
+    "package-proof.py": {
+      "sha256": "8962b417e30871f215bb03aa486a77c543a376f5b91ca7e9c6b1f1a7f780e8f3",
+      "bytes": 3548
+    },
+    "package-proof.log": {
+      "sha256": "ed77bb936d87bf536b88ac1ef147dfbb1bcba4cfd98ec876d7075c39a3cde9aa",
+      "bytes": 602
+    },
+    "public-version-guard.log": {
+      "sha256": "e77858cff525088f930f5471858ad0915158c45263f51d5a569e19fc8d570bb5",
+      "bytes": 223
+    },
+    "jvm.json": {
+      "sha256": "ef2fc04c4965a3f4c6fb18275e124e4bd0317ad11eee9c0ab29e75ad4bf9cb2f",
+      "bytes": 256
+    },
+    "artifact.json": {
+      "sha256": "5bda98466dec504ccdf6665c968fcc668667bff787d596a7f29137bb49201657",
+      "bytes": 1519
+    },
+    "source-hashes.json": {
+      "sha256": "e19c026291727465f938cfa2136058aa60ee2a586bf728722fa0dc07e6a0956b",
+      "bytes": 370
+    },
+    "cohort-scope.json": {
+      "sha256": "a2e701a915d1da8e3170c8db95f37594105fac5a393b343bb8ca945c96d5981e",
+      "bytes": 1123
+    },
+    "prior-roadmap.raw": {
+      "sha256": "24b052b1012879412fc94bcb4ed10f064c4730d37fa385a26acf15bbb2db637e",
+      "bytes": 327625
+    },
+    "deploy-results.json": {
+      "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31",
+      "bytes": 231
+    },
+    "preservation.json": {
+      "sha256": "2de61275dfa1480b50994ef53e781f275c02efce4e91569504dfda44473a7ed6",
+      "bytes": 718
+    },
+    "health.json": {
+      "sha256": "8c77665ce7466402dd47816e6005ea548ad6ad86a6586b59ce1441047dc0529b",
+      "bytes": 579
+    },
+    "credential-cleanup.json": {
+      "sha256": "584d00c535583d9f5c6f035e521ab6f64eefddfd75629ef4a3518d05d6a25d76",
+      "bytes": 119
+    },
+    "visual-review.json": {
+      "sha256": "24d4005d9d640c691c637736edcf92ea016dc8ad23c7986932ec62516bf36964",
+      "bytes": 505
+    },
+    "documentation-before.json": {
+      "sha256": "15eecdee2a4c5278eb89c62db766e7b6622237647d795a5e5900a4ffc31fdc5c",
+      "bytes": 770
+    },
+    "documentation-boundary-baseline.json": {
+      "sha256": "a089842ea28d722d7bfddcdec28a2bafbdc707aea9781389f7af89c3a7dfaef2",
+      "bytes": 346
+    },
+    "baseline-focused-terminal.json": {
+      "sha256": "f0514c19260e8d06c5642388fc390e859faa91d9a37cffc4c41638ac7bf38e7a",
+      "bytes": 304
+    },
+    "full-gate-terminal.json": {
+      "sha256": "a3efc859531719440351fa704e2e250e4ec50876d06a69acdb4fd364ec7b5334",
+      "bytes": 328
+    },
+    "package-proof-terminal.json": {
+      "sha256": "49af04281692988f0fad9bdaa4a19ba584f65bd914a187e5d066c480120e690a",
+      "bytes": 258
+    },
+    "preflight-terminal.json": {
+      "sha256": "430538d25bcfa9089e58d05d640357c0fbe02f5ee752a39f125d7c7b536b400b",
+      "bytes": 264
+    },
+    "room-deploy-terminal.json": {
+      "sha256": "91b9ac7a2da48e2d3dd5baefa3a8aa449159cf669fd33d8d3f62eab7524f9a77",
+      "bytes": 252
+    },
+    "postflight-terminal.json": {
+      "sha256": "9088295e99efaed82d063706caffb5bc97efcb08f5cb055c98a2d8e1e0316120",
+      "bytes": 263
+    },
+    "health-observation-terminal.json": {
+      "sha256": "8ff82801c8fb144cb6826f6dc3851f33a8ca3c6d1c71fe543cc499951b40d588",
+      "bytes": 252
+    },
+    "family-capture-terminal.json": {
+      "sha256": "57105b288c5259b489da65b22327e07eeac02ce36646d79dccb1975fa6227e97",
+      "bytes": 258
+    },
+    "cleanup-credentials-terminal.json": {
+      "sha256": "7fee2e1c8366185a945157e5700ef1a46b5d392c8944b001a72711257d4bf6b1",
+      "bytes": 264
+    },
+    "public-version-guard-terminal.json": {
+      "sha256": "3232cc5e56a169e7957ed9230597e300650a1776ad4882dd0024a1f7e92aef45",
+      "bytes": 218
+    },
+    "family-before-private.json": {
+      "sha256": "b55e8134d32b50d3d6b5347b8b2ab82864b9c1335dbea4cfc642ffe8b972c57e",
+      "bytes": 62666
+    },
+    "family-prefs-before-private.json": {
+      "sha256": "f24d54d455082fb9388979ba12e17e55e629b31472aed3e10d62458865787fd5",
+      "bytes": 15353
+    },
+    "family-after-private.json": {
+      "sha256": "256af53fef1512484c16c907c88ac5cfe7602615f24d95aad28270e80550df89",
+      "bytes": 62666
+    },
+    "family-prefs-after-private.json": {
+      "sha256": "f24d54d455082fb9388979ba12e17e55e629b31472aed3e10d62458865787fd5",
+      "bytes": 15353
+    },
+    "family-diag-private.bin": {
+      "sha256": "0a20a797093ef54329ae9fc62ebe6066586728b3739066c544f4d7cd1c77e6f8",
+      "bytes": 2239
+    },
+    "family-logcat-private.bin": {
+      "sha256": "c3e3ba39bb3b8b0aab85baef6e29b993263df03de68c42e3b0d936003daca8a9",
+      "bytes": 292357
+    },
+    "living-before-private.json": {
+      "sha256": "31c4704c4a5589a14a4f1e29302325e346203fe177fbc1542c46e389047f3efe",
+      "bytes": 62553
+    },
+    "living-prefs-before-private.json": {
+      "sha256": "014bf5d43115569d97bd2adc297d79f344b7301376ce00d7c60bc3cbdd8fcff6",
+      "bytes": 14053
+    },
+    "living-after-private.json": {
+      "sha256": "3f2eb63f2227826ddec358aea0d4fd2cf9b2aaedfa6614887b29d0e6409b4ea1",
+      "bytes": 62554
+    },
+    "living-prefs-after-private.json": {
+      "sha256": "014bf5d43115569d97bd2adc297d79f344b7301376ce00d7c60bc3cbdd8fcff6",
+      "bytes": 14053
+    },
+    "living-diag-private.bin": {
+      "sha256": "b73f36d99e082af22602aeb3cd2d321d3d0da2633247a0fb532254c6e49b55e5",
+      "bytes": 2062
+    },
+    "living-logcat-private.bin": {
+      "sha256": "2c042656f00280fc05f2aa85e00ab29d738eb7e255cc06dcb5e15540cc4a4c04",
+      "bytes": 273173
+    },
+    "family-after.png": {
+      "sha256": "0af4b79a6d6dada82b8384e9843a3ad2b0a9c6d1071c6daf84661116e9b55daa",
+      "bytes": 1814888
+    },
+    "activity-before-private.txt": {
+      "sha256": "f80a32387020cb5e5728d5a357222bf6065484d25fa3d8f2f9f711c1f70edb9b",
+      "bytes": 15071
+    },
+    "power-before-private.txt": {
+      "sha256": "89fefb67dbe43f6eeb768e6217d548b06cf4428839a7d4e8bf3ec84e4182c5e2",
+      "bytes": 9782
+    },
+    "font-before-private.txt": {
+      "sha256": "5717e7c840171019a4eeab5b79a7f894a4986eaff93d04ec5b12c9a189f594bf",
+      "bytes": 4
+    },
+    "accessibility-before-private.txt": {
+      "sha256": "0b87a9e4d4e2c1dcd3dd847f134838af9d711d031081b2c5ad0507be311f4826",
+      "bytes": 323
+    }
+  },
+  "documentBindings": {
+    "docs/portal-soundscape-ownership-2026-11-03.md": {
+      "sha256": "047a775ceb24e1df0d426b132654ffd1c23339cbc4007cc0f18150ae3c9818d2",
+      "bytes": 4809
+    },
+    "docs/portal-product-operating-state.md": {
+      "sha256": "ef0debed27ed0dc30edabe15751774b5782c9a7fcedf33906797c2bc9129812a",
+      "bytes": 150354
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+      "sha256": "de55f0811066134b5228a9afdf6c6830cbe849c44aeebdd392c1fce8fcd4d799",
+      "bytes": 332754
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/index.html": {
+      "sha256": "67138fcd631327f5f09a7f292c68adbadeafe5d82ed4a3b99fab53d987472793",
+      "bytes": 27959
+    }
+  },
+  "sanitization": "Raw maps/preferences, registry, logs, serials and screenshot contents are omitted; only their exact byte bindings are public.",
+  "closure": "Initial/closing documentation and browser QA plus commit are subsequent private closure evidence; no future QA or commit claim is made here."
+}

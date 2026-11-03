@@ -39,9 +39,12 @@ class SoundscapePlayer {
   private val TAG = "ImmortalSound"
   private val SAMPLE_RATE = 44100
 
-  @Volatile private var running = false
-  private var thread: Thread? = null
-  private var track: AudioTrack? = null
+  private class Run {
+    @Volatile var running = true
+    var thread: Thread? = null
+    var track: AudioTrack? = null
+  }
+  private var current: Run? = null
 
   /** Start playing [soundscape] (a `ScreensaverConfig.SOUND_*`) at [volume] (0..100).
    * No-op for SOUND_OFF or an unknown id. Safe to call when already stopped. */
@@ -50,21 +53,30 @@ class SoundscapePlayer {
     stop()
     val gain = (volume.coerceIn(0, 100) / 100f)
     if (gain <= 0f) return
-    running = true
-    thread = Thread { runCatching { render(soundscape, gain) }.onFailure { Log.w(TAG, "render stopped", it) } }
+    val run = Run()
+    current = run
+    run.thread = Thread { runCatching { render(run, soundscape, gain) }.onFailure { Log.w(TAG, "render stopped", it) } }
         .also { it.isDaemon = true; it.start() }
   }
 
   /** Stop playback and release the track. Idempotent. */
   fun stop() {
-    running = false
-    thread?.let { runCatching { it.join(500) } }
-    thread = null
-    track?.let { t -> runCatching { t.stop() }; runCatching { t.release() } }
-    track = null
+    val run = current ?: return
+    current = null
+    synchronized(run) { run.running = false }
+    run.thread?.let { runCatching { it.join(500) } }
+    close(run)
   }
 
-  private fun render(soundscape: String, gain: Float) {
+  private fun close(run: Run) {
+    val track = synchronized(run) {
+      run.running = false
+      run.track.also { run.track = null }
+    }
+    track?.let { t -> runCatching { t.stop() }; runCatching { t.release() } }
+  }
+
+  private fun render(run: Run, soundscape: String, gain: Float) {
     val minBuf = AudioTrack.getMinBufferSize(
         SAMPLE_RATE, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT)
     val bufFrames = (SAMPLE_RATE / 10) // ~100 ms chunks
@@ -83,25 +95,34 @@ class SoundscapePlayer {
         .setBufferSizeInBytes(maxOf(minBuf, bufFrames * 4))
         .setTransferMode(AudioTrack.MODE_STREAM)
         .build()
-    track = t
-    t.play()
-
-    val gen = Generator(soundscape, SAMPLE_RATE)
-    val out = ShortArray(bufFrames * 2) // interleaved stereo
-    val lr = FloatArray(2)
-    // Slow fade-in (~0.4 s) so starting the screensaver doesn't pop.
-    var fade = 0f
-    val fadeStep = 1f / (SAMPLE_RATE * 0.4f)
-    while (running) {
-      for (i in 0 until bufFrames) {
-        gen.next(lr)
-        if (fade < 1f) fade = (fade + fadeStep).coerceAtMost(1f)
-        // tanh soft-clip keeps peaks musical instead of rasping at the rails.
-        out[i * 2] = toPcm(tanh(lr[0] * gain * fade))
-        out[i * 2 + 1] = toPcm(tanh(lr[1] * gain * fade))
+    try {
+      // A late allocation belongs to this run even after stop's bounded join.
+      val active = synchronized(run) {
+        run.track = t
+        run.running
       }
-      val n = t.write(out, 0, out.size)
-      if (n < 0) break
+      if (!active) return
+      t.play()
+
+      val gen = Generator(soundscape, SAMPLE_RATE)
+      val out = ShortArray(bufFrames * 2) // interleaved stereo
+      val lr = FloatArray(2)
+      // Slow fade-in (~0.4 s) so starting the screensaver doesn't pop.
+      var fade = 0f
+      val fadeStep = 1f / (SAMPLE_RATE * 0.4f)
+      while (run.running) {
+        for (i in 0 until bufFrames) {
+          gen.next(lr)
+          if (fade < 1f) fade = (fade + fadeStep).coerceAtMost(1f)
+          // tanh soft-clip keeps peaks musical instead of rasping at the rails.
+          out[i * 2] = toPcm(tanh(lr[0] * gain * fade))
+          out[i * 2 + 1] = toPcm(tanh(lr[1] * gain * fade))
+        }
+        val n = t.write(out, 0, out.size)
+        if (n < 0) break
+      }
+    } finally {
+      close(run)
     }
   }
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T13:26:43.575869+00:00",
+  "updatedAt": "2026-11-03T13:52:21.072390+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,60 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.123/code117. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.124/code118. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "soundscape-ownership",
+      "title": "Soundscapes: retain each render run's ownership",
+      "summary": "Delivered 1.124: stopped deferred workers stay retired and render exits clean their own track.",
+      "description": "Stopped deferred workers no longer begin playback or borrow another run's playing flag. Each start owns its run, thread and track; retirement precedes join. Render exit atomically claims its own track for independent best-effort stop/release, including negative write, play and write failure. DSP, gain, buffer, fade, Off and zero-volume behavior remain.",
+      "status": "delivered",
+      "verification": "8 frozen tests: 5 verification failures to pass; 4,331 JVM / 449 suites; inert audio only",
+      "kind": "Soundscape run and track ownership",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Screensaver sound / independent source and gate review",
+      "deployment": "Exact optimized 1.124/code118 installed and fully hashed in Family Area and Living Area.",
+      "state": "Four complete maps, room name and Dev Mode match; twelve preference states per room match: Family eleven byte-identical files and one unchanged absence; Living eight byte-identical files and four unchanged absences. Family font, accessibility, original Chrome, resumed frame and awake display remain. The current Family frame was viewed privately; Living visual remains open. Limited HTTP200 /diag and /logcat?lines=1500 observations produce 1644/2017 actual lines without fatal or ANR markers. Copied credentials are removed; original registry, public 1.83/code77 manifest and native fleet CLI remain unchanged.",
+      "acceptance": [
+        "Freeze actual public start/stop and deferred production-Runnable predicates before correction on unchanged source.",
+        "Retire stopped deferred workers and isolate their running/track state from later starts.",
+        "Claim each acquired track once on render exit while retaining independent best-effort stop/release.",
+        "Retain literal explicit-stop, zero-volume and Off controls and unchanged DSP/settings/caller behavior.",
+        "Deliver exact signed optimized bytes and preserve complete maps plus twelve preference states."
+      ],
+      "evidence": [
+        {
+          "text": "Actual worker predicates, per-run source correction, exact delivery and limits.",
+          "source": "docs/portal-soundscape-ownership-2026-11-03.md"
+        },
+        {
+          "text": "Bound unchanged baseline, gate, artifacts, room preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/soundscape-ownership-verification.json"
+        }
+      ],
+      "limits": [
+        "Acceptance delivers the exact production render Runnable captured at mocked Thread construction/start on the fixture owner. Android builders, AudioTrack and static calls are inert; no real worker, native allocation, playback or audio occurs.",
+        "Controlled deferred Runnable and track-interaction histories establish lifetime and cleanup regressions. Actual thread scheduling, blocking builder, the 500ms join timeout, native/API28/29, optimized worker and audio quality remain unverified.",
+        "Already admitted play or an in-progress chunk write can race retirement. No universal cancellation or play-vs-stop ordering promise is made. The 500ms join argument does not guarantee completion of platform stop/release within 500ms.",
+        "Atomic track claim gives one cleanup owner; stop and release are independent best-effort attempts. Platform cleanup failures/completion and stop-throws behavior are not native acceptance; release-after-stop-failure is source-reviewed only.",
+        "Public start/stop retain the single-owner contract and serialized PhotoFrameController executor. No cross-thread caller guarantee, unknown-sound policy, synthesis/settings or audio quality redesign.",
+        "Five baseline failures are Mockito WantedButNotInvoked/NeverWantedButInvoked verification failures. Full random-sample diagnostic printing was truncated and excluded; raw XML is bound. No full-stack or PCM-content review claim or excluded product rerun is made.",
+        "Family frame review covers the current frame only. Living visual and physical soundscape UI remain open. Limited lines=1500 diagnostics do not establish complete runtime health.",
+        "The original 13:35:36–14:05:36 UTC clock includes all inventory and delivery work. Date audit is bounded negative; CountdownDates/IrishHolidays 10:07:54 negatives, Prayer 07:01:27, TimerAlarm 08:51:50 and all older scopes keep their original clocks.",
+        "Public manifest remains 1.83/code77. Existing phone-control, publication, HA and design-approval restrictions remain."
+      ],
+      "next": "Retain exact room delivery and regressions; real scheduling, audio, optimized worker, platform cleanup timing, UI and API28 acceptance remain open.",
+      "issueClock": {
+        "startedAt": "2026-11-03T13:35:36Z",
+        "deadline": "2026-11-03T14:05:36Z",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "remote-discovery-callbacks",
       "title": "Remote discovery: retire stale callbacks",
