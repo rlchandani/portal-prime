@@ -149,6 +149,69 @@ def validate_presence(path, package):
         raise ValueError("installed package is not present")
 
 
+def restore_config(path, screensaver_plan, calendar_plan):
+    root = ET.parse(path).getroot()
+    if root.tag != "map":
+        raise ValueError("not a preference map")
+    types = {
+        "source": "string", "folder_path": "string", "album_url": "string",
+        "fit": "string", "interval_sec": "int", "shuffle": "boolean",
+        "include_video": "boolean", "calendar_url": "string", "calendar_range": "string",
+    }
+    values = {}
+    for entry in root:
+        name = entry.get("name")
+        if name not in types:
+            continue
+        if name in values or entry.tag != types[name] or len(entry):
+            raise ValueError("invalid config field")
+        if entry.tag == "string":
+            value = entry.text or ""
+        else:
+            value = entry.get("value", "")
+            if (entry.text or "").strip():
+                raise ValueError("unexpected scalar text")
+            if entry.tag == "boolean":
+                if value not in ("true", "false"):
+                    raise ValueError("invalid Boolean")
+            else:
+                if not re.fullmatch(r"[+-]?[0-9]+", value):
+                    raise ValueError("invalid integer")
+                number = int(value)
+                if not -(2 ** 31) <= number < 2 ** 31:
+                    raise ValueError("invalid Android integer")
+                value = str(number)
+        values[name] = value
+
+    # Preserve the existing endpoint subset and its source-selection policy.
+    screensaver = ["--source", "default"] if values.get("source") == "default" else []
+    for name, flag in (
+        ("folder_path", "--folder"), ("album_url", "--album-url"), ("fit", "--fit"),
+        ("interval_sec", "--interval"), ("shuffle", "--shuffle"), ("include_video", "--videos"),
+    ):
+        if values.get(name):
+            screensaver.extend((flag, values[name]))
+    calendar = []
+    if values.get("calendar_url"):
+        calendar.extend(("--url", values["calendar_url"]))
+        if values.get("calendar_range"):
+            calendar.extend(("--range", values["calendar_range"]))
+
+    # Validate both plans before writing either. NUL framing preserves newlines
+    # and shell metacharacters without evaluating or splitting decoded values.
+    for destination, arguments in ((screensaver_plan, screensaver), (calendar_plan, calendar)):
+        descriptor = os.open(destination, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(descriptor, "wb") as stream:
+            for argument in arguments:
+                stream.write(argument.encode("utf-8") + b"\0")
+
+
+def validate_config_result(path):
+    value = success_json(path)
+    if "error" in value:
+        raise ValueError("contradictory config response")
+
+
 def preference_names(path, expected):
     value = success_json(path)
     if value.get("path") != expected or not isinstance(value.get("entries"), list):
@@ -239,6 +302,10 @@ def main():
             validate_install(*args)
         elif mode == "installed-presence" and len(args) == 2:
             validate_presence(*args)
+        elif mode == "restore-config" and len(args) == 3:
+            restore_config(*args)
+        elif mode == "config-result" and len(args) == 1:
+            validate_config_result(args[0])
         elif mode == "names" and len(args) == 2:
             print("\n".join(preference_names(*args)))
         elif mode == "xml" and len(args) == 1:

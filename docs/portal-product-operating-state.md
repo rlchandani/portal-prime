@@ -13,6 +13,22 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Fleet soft restore XML / locally verified:** `--config` parses the saved map
+  once, rejects invalid selected XML/types before earlier restore actions and
+  freezes both literal endpoint plans. Private replies require process success
+  and unambiguous literal `ok:true` without an error field; unconfirmed commands
+  stop later config commands and `done`. Ten new methods reproduce nine failing
+  methods/24 entries; all34 restore, **145 provisioning +226 script tests** pass.
+  Actual existing CLI/generated loopback improves **1/7→7/7**; no fresh Rust
+  compile, owner restore or per-field applied-state readback. Registry collision,
+  modes and normal scratch/server cleanup are verified. Endpoint subset/source
+  precedence and partial-state limits remain; raw prefs/cross-package/atomic
+  restoration are separate. Room APK remains last verified **1.102/code96**.
+  No owner registry/device/phone/build/install/HA/auth/publication operation.
+  **76 tasks:43 delivered,23 locally verified,3 approval,6 parked,1 queued.**
+  Original **05:39:37–06:09:37 UTC** retained; broader goal stays active.
+  [Receipt](portal-fleet-config-xml-2026-11-03.md).
+
 - **Current room APK / cancelled calendar status:** exact optimized
   **1.102/code96** is installed and fully hashed in both rooms. Event preparation
   omits `STATUS:CANCELLED` before caching/recurrence; active statuses retain their

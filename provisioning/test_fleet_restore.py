@@ -4,7 +4,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Offline end-to-end app restore checks with synthetic backups and CLI replies."""
+"""Offline end-to-end restore checks with synthetic backups and CLI replies."""
 
 import json
 import os
@@ -33,6 +33,8 @@ if config.get("mutate_original_registry"):
     observation = {
         "command": args[0], "selector": args[-1], "registry_path": str(active),
         "record_count": len(records), "directory_mode": active.stat().st_mode & 0o7777,
+        "scratch_mode": active.parent.stat().st_mode & 0o7777,
+        "plan_file_modes": [path.stat().st_mode & 0o7777 for path in sorted(active.parent.glob("*.args"))],
         "file_modes": [path.stat().st_mode & 0o7777 for path in records],
         "selected_record_matches": (
             len(records) == 1
@@ -40,12 +42,14 @@ if config.get("mutate_original_registry"):
     }
     with open(os.environ["FAKE_RESTORE_REGISTRY_OBSERVATIONS"], "a") as stream:
         stream.write(json.dumps(observation) + "\n")
-    if args[0] == "install":
-        # Change the original after this command reads its registry, before readback.
+    if args[0] in ("install", "screensaver"):
+        # Change the original after this command reads its registry, before the next command.
         injected = dict(config["expected_registry_record"])
         injected.update(serial="public-injected-room", name=args[-1])
         (original / "public-injected-room.json").write_text(json.dumps(injected))
 if args[0] == "install":
+    if config.get("mutate_config_xml"):
+        pathlib.Path(config["config_xml_path"]).write_text(config["mutate_config_xml"])
     package = args[1]
     reply = config.get("install", {}).get(package, {})
     default = {"ok": True, "packageName": package, "result": "installed"}
@@ -56,8 +60,8 @@ elif args[0] == "apps":
         {"packageName": "org.beta", "installed": True},
         {"packageName": "org.gamma", "installed": True},
     ]}
-elif args[0] in ("push", "action"):
-    reply, default = {}, {"ok": True}
+elif args[0] in ("push", "action", "screensaver", "calendar"):
+    reply, default = config.get(args[0], {}), {"ok": True}
 else:
     sys.exit(95)
 body = reply.get("body", default)
@@ -94,6 +98,8 @@ class FleetRestoreTest(unittest.TestCase):
         self.calls = self.root / "calls.jsonl"
         self.registry_observations = self.root / "registry-observations.jsonl"
         self.replies = {}
+        self.scratch_parent = self.root / "scratch"
+        self.scratch_parent.mkdir(mode=0o700)
 
     def write_registry(self, serial=SERIAL, name="Public Restore Room", filename=None):
         registry = self.registry / (filename or (serial + ".json"))
@@ -113,6 +119,7 @@ class FleetRestoreTest(unittest.TestCase):
             self.calls.unlink()
         self.config.write_text(json.dumps(self.replies))
         env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1",
+               "TMPDIR": str(self.scratch_parent),
                "FLEETCTL": str(self.cli), "IMMORTAL_FLEET_DIR": str(self.registry),
                "FAKE_RESTORE_CONFIG": str(self.config), "FAKE_RESTORE_CALLS": str(self.calls),
                "FAKE_ORIGINAL_REGISTRY": str(self.registry),
@@ -128,6 +135,7 @@ class FleetRestoreTest(unittest.TestCase):
         )
         output = result.stdout + result.stderr
         self.assertNotIn(TOKEN, output)
+        self.assertEqual(list(self.scratch_parent.iterdir()), [], "owned restore scratch must be removed")
         calls = [json.loads(line) for line in self.calls.read_text().splitlines()] if self.calls.exists() else []
         for args in calls:
             self.assertEqual(args[-2:], ["--device", expected_serial])
@@ -457,6 +465,179 @@ class FleetRestoreTest(unittest.TestCase):
         self.assertEqual(calls, [
             ["install", "org.alpha", "--device", SERIAL], ["apps", "--device", SERIAL],
         ])
+
+    def write_config(self, xml):
+        path = self.backup / "shared_prefs" / "immortal_screensaver.xml"
+        path.write_text(xml, encoding="utf-8")
+        return path
+
+    def test_config_entities_unicode_and_shell_text_are_literal_arguments(self):
+        marker = self.root / "must-not-exist"
+        folder = f'/storage/Public & Café <2026> "$(touch {marker})"'
+        self.write_config(
+            '<map><string name="source">default</string>\n'
+            '<string name="folder_path">/storage/Public &amp; Café &lt;2026&gt; '
+            f'&quot;$(touch {marker})&quot;</string>\n'
+            '<string name="album_url">https://example.test/share?a=1&amp;b=2</string>\n'
+            '<string name="calendar_url">https://example.test/feed.ics?a=1&amp;b=2</string>\n'
+            '<string name="calendar_range">week</string></map>')
+        code, output, calls = self.run_restore("--config")
+        self.assertEqual(code, 0, output)
+        self.assertEqual(calls, [
+            ["screensaver", "set", "--source", "default", "--folder", folder,
+             "--album-url", "https://example.test/share?a=1&b=2", "--device", SERIAL],
+            ["calendar", "set", "--url", "https://example.test/feed.ics?a=1&b=2",
+             "--range", "week", "--device", SERIAL],
+        ])
+        self.assertFalse(marker.exists())
+
+    def test_config_minified_attribute_order_and_single_quotes_are_supported(self):
+        self.write_config(
+            "<map><string name='fit'>fit</string>"
+            "<int value='20' name='interval_sec'/>"
+            "<boolean value='false' name='shuffle'/>"
+            "<boolean name='include_video' value='true'/>"
+            "<string name='calendar_url'>https://example.test/feed.ics</string></map>")
+        code, output, calls = self.run_restore("--config")
+        self.assertEqual(code, 0, output)
+        self.assertEqual(calls, [
+            ["screensaver", "set", "--fit", "fit", "--interval", "20",
+             "--shuffle", "false", "--videos", "true", "--device", SERIAL],
+            ["calendar", "set", "--url", "https://example.test/feed.ics", "--device", SERIAL],
+        ])
+
+    def test_config_multiline_cdata_and_numeric_entities_preserve_values(self):
+        self.write_config(
+            '<map>\n<string name="folder_path"><![CDATA[/storage/First\nSecond & Café]]></string>\n'
+            '<string name="album_url"><![CDATA[https://example.test/share?a=1&b=2]]></string>\n'
+            '<string name="calendar_url">https://example.test/feed.ics?a=1&#38;b=2</string>\n'
+            '</map>')
+        code, output, calls = self.run_restore("--config")
+        self.assertEqual(code, 0, output)
+        self.assertEqual(calls, [
+            ["screensaver", "set", "--folder", "/storage/First\nSecond & Café",
+             "--album-url", "https://example.test/share?a=1&b=2", "--device", SERIAL],
+            ["calendar", "set", "--url", "https://example.test/feed.ics?a=1&b=2",
+             "--device", SERIAL],
+        ])
+
+    def test_config_invalid_xml_or_known_types_prevent_every_earlier_operation(self):
+        for xml in (
+            "", "<map>", "<other/>",
+            '<map><string name="album_url">https://example.test/?a=1&b=2</string></map>',
+            '<map><int name="folder_path" value="1"/></map>',
+            '<map><string name="shuffle">true</string></map>',
+            '<map><boolean name="shuffle" value="maybe"/></map>',
+            '<map><int name="interval_sec" value="not-an-integer"/></map>',
+            '<map><string name="fit">fit</string><string name="fit">cover</string></map>',
+            '<map><string name="folder_path">First<string>Second</string></string></map>',
+        ):
+            with self.subTest(xml=xml):
+                self.write_config(xml)
+                code, output, calls = self.run_restore("--apps", "--prefs", "--config")
+                self.assertNotEqual(code, 0)
+                self.assertEqual(calls, [], "complete config preflight must precede all writes")
+                self.assertNotIn("done.", output)
+
+    def test_config_empty_missing_and_unsupported_source_keep_existing_subset_policy(self):
+        for xml in (None, "<map/>",
+                    '<map><string name="album_url"/><string name="calendar_url"></string>'
+                    '<string name="source">immich</string>'
+                    '<string name="immich_api_key">ignored synthetic credential</string></map>'):
+            with self.subTest(xml=xml):
+                path = self.backup / "shared_prefs" / "immortal_screensaver.xml"
+                if xml is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    self.write_config(xml)
+                code, output, calls = self.run_restore("--config")
+                self.assertEqual(code, 0, output)
+                self.assertEqual(calls, [])
+                self.assertNotIn("ignored synthetic credential", output)
+
+    def test_config_dry_run_is_decoded_and_has_no_cli_or_reboot(self):
+        self.write_config(
+            '<map><string name="album_url">https://example.test/share?a=1&amp;b=2</string>\n'
+            '<string name="calendar_url">https://example.test/feed.ics?a=1&amp;b=2</string></map>')
+        code, output, calls = self.run_restore("--config", "--dry-run")
+        self.assertEqual(code, 0, output)
+        self.assertEqual(calls, [])
+        self.assertIn("https://example.test/share?a=1&b=2", output)
+        self.assertIn("https://example.test/feed.ics?a=1&b=2", output)
+        self.assertNotIn("&amp;", output)
+        self.assertNotIn("reboot", output)
+
+    def test_config_plan_is_frozen_before_earlier_app_commands(self):
+        path = self.write_config(
+            '<map><string name="calendar_url">https://example.test/original.ics</string></map>')
+        self.replies = {
+            "config_xml_path": str(path),
+            "mutate_config_xml": '<map><string name="calendar_url">'
+                                 'https://example.test/replaced.ics</string></map>',
+        }
+        code, output, calls = self.run_restore("--apps", "--config")
+        self.assertEqual(code, 0, output)
+        self.assertEqual(calls, [
+            ["install", "org.alpha", "--device", SERIAL], ["apps", "--device", SERIAL],
+            ["calendar", "set", "--url", "https://example.test/original.ics",
+             "--device", SERIAL],
+        ])
+        self.assertIn("replaced.ics", path.read_text())
+
+    def test_config_unconfirmed_reply_stops_without_later_call_or_done(self):
+        xml = ('<map><string name="fit">fit</string>\n'
+               '<string name="calendar_url">https://example.test/feed.ics</string></map>')
+        for reply in (
+            {"body": {"ok": False, "detail": TOKEN}},
+            {"body": {"ok": 1}},
+            {"body": {"ok": "true"}},
+            {"body": {"ok": True, "error": "synthetic failure"}},
+            {"body": '{"ok":false,"ok":true}'},
+            {"body": "malformed " + TOKEN},
+            {"exit": 1, "stderr": TOKEN},
+        ):
+            with self.subTest(reply=reply):
+                self.write_config(xml)
+                self.replies = {"screensaver": reply}
+                code, output, calls = self.run_restore("--config")
+                self.assertNotEqual(code, 0)
+                self.assertEqual(calls, [
+                    ["screensaver", "set", "--fit", "fit", "--device", SERIAL],
+                ])
+                self.assertNotIn("done.", output)
+
+    def test_config_calendar_failure_reports_no_success_after_prior_screen_change(self):
+        self.write_config(
+            '<map><string name="fit">fit</string>\n'
+            '<string name="calendar_url">https://example.test/feed.ics</string></map>')
+        self.replies = {"calendar": {"body": {"ok": False, "detail": TOKEN}}}
+        code, output, calls = self.run_restore("--config")
+        self.assertNotEqual(code, 0)
+        self.assertEqual([args[0] for args in calls], ["screensaver", "calendar"])
+        self.assertNotIn("done.", output)
+
+    def test_config_private_plans_and_frozen_registry_are_removed_after_use(self):
+        self.write_config(
+            '<map><string name="fit">fit</string>'
+            '<string name="calendar_url">https://example.test/feed.ics</string></map>')
+        self.replies = {
+            "mutate_original_registry": True,
+            "expected_registry_record": json.loads((self.registry / (SERIAL + ".json")).read_text()),
+        }
+        code, output, calls = self.run_restore("--config")
+        self.assertEqual(code, 0, output)
+        self.assertEqual([args[0] for args in calls], ["screensaver", "calendar"])
+        observations = [json.loads(line) for line in self.registry_observations.read_text().splitlines()]
+        self.assertEqual(len(observations), 2)
+        self.assertTrue((self.registry / "public-injected-room.json").exists())
+        for observation in observations:
+            self.assertTrue(observation["selected_record_matches"])
+            self.assertEqual(observation["record_count"], 1)
+            self.assertEqual(observation["directory_mode"], 0o700)
+            self.assertEqual(observation["scratch_mode"], 0o700)
+            self.assertEqual(observation["file_modes"], [0o600])
+            self.assertEqual(observation["plan_file_modes"], [0o600, 0o600])
+            self.assertFalse(Path(observation["registry_path"]).exists())
 
 
 if __name__ == "__main__":

@@ -73,8 +73,22 @@ if [ $do_apps -eq 1 ]; then
   # Validate the entire plan before any install or preference write can begin.
   pkgs="$("$PYTHON3" "$here/fleet-backup-data.py" restore-packages "$backup/apps.json")" || exit 1
 fi
-if [ $dry -eq 0 ]; then
+config_planned=0
+ss_args=()
+cal_args=()
+if [ $dry -eq 0 ] || { [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" ]; }; then
   scratch="$(mktemp -d "${TMPDIR:-/tmp}/immortal-restore-apps.XXXXXX")" || exit 1
+fi
+if [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" ]; then
+  # Decode and validate the complete subset before installs, prefs or reboot.
+  # Check the producer directly: process substitution can hide parser failures.
+  "$PYTHON3" "$here/fleet-backup-data.py" restore-config \
+    "$backup/shared_prefs/immortal_screensaver.xml" "$scratch/screensaver.args" "$scratch/calendar.args" || exit 1
+  while IFS= read -r -d '' value; do ss_args+=("$value"); done < "$scratch/screensaver.args"
+  while IFS= read -r -d '' value; do cal_args+=("$value"); done < "$scratch/calendar.args"
+  config_planned=1
+fi
+if [ $dry -eq 0 ]; then
   frozen="$("$PYTHON3" "$here/fleet-backup-data.py" restore-target "$FLEET_DIR" "$serial" "$scratch/registry")" || exit 1
   [ "$frozen" = "$serial" ] || exit 1
   # Fleetctl reloads its registry on every call. Keep this run pinned to the
@@ -84,6 +98,19 @@ fi
 
 report "restoring '$serial' from $backup  (apps=$do_apps prefs=$do_prefs config=$do_config dry-run=$dry)"
 run() { if [ $dry -eq 1 ]; then report "  + $*"; else "$@"; fi; }
+run_config() {
+  local domain="$1"; shift
+  if [ $dry -eq 1 ]; then
+    run "$FLEETCTL" "$domain" set "$@" --device "$serial"
+    return
+  fi
+  if ! "$FLEETCTL" "$domain" set "$@" --device "$serial" > "$scratch/config-$domain.json" 2> "$scratch/config-$domain-errors.log" ||
+     ! "$PYTHON3" "$here/fleet-backup-data.py" config-result "$scratch/config-$domain.json"; then
+    report "error: $domain configuration unconfirmed; inspect the device before retrying" >&2
+    exit 1
+  fi
+  report "  confirmed: $domain"
+}
 
 # 1) Reinstall third-party apps (never Immortal itself). apps.json lists the whole
 #    catalog with a Boolean or legacy versionCode marker, independently of formatting.
@@ -134,33 +161,15 @@ fi
 
 # 3) Alternative soft restore: re-apply the endpoint-covered screensaver/calendar
 #    subset from the saved prefs (no stored credentials, no reboot).
-if [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" ]; then
+if [ $config_planned -eq 1 ]; then
   echo "-- config (screensaver + calendar via endpoints) --"
-  ss="$backup/shared_prefs/immortal_screensaver.xml"
-  sval() { sed -n "s/.*<string name=\"$1\"[^>]*>\([^<]*\)<.*/\1/p" "$ss" | head -1; }
-  bval() { sed -n "s/.*<boolean name=\"$1\"[^>]*value=\"\([^\"]*\)\".*/\1/p" "$ss" | head -1; }
-  ival() { sed -n "s/.*<int name=\"$1\"[^>]*value=\"\([^\"]*\)\".*/\1/p" "$ss" | head -1; }
-
-  source_v="$(sval source)"; folder_v="$(sval folder_path)"; album_v="$(sval album_url)"
-  fit_v="$(sval fit)"; interval_v="$(ival interval_sec)"; shuffle_v="$(bval shuffle)"
-  video_v="$(bval include_video)"; cal_url="$(sval calendar_url)"; cal_range="$(sval calendar_range)"
-
-  args=()
-  case "$source_v" in default) args+=(--source default);; esac
-  [ -n "$folder_v" ]   && args+=(--folder "$folder_v")
-  [ -n "$album_v" ]    && args+=(--album-url "$album_v")
-  [ -n "$fit_v" ]      && args+=(--fit "$fit_v")
-  [ -n "$interval_v" ] && args+=(--interval "$interval_v")
-  [ -n "$shuffle_v" ]  && args+=(--shuffle "$shuffle_v")
-  [ -n "$video_v" ]    && args+=(--videos "$video_v")
-  if [ ${#args[@]} -gt 0 ]; then
-    echo "  screensaver ${args[*]}"
-    run "$FLEETCTL" screensaver set "${args[@]}" --device "$serial"
+  if [ ${#ss_args[@]} -gt 0 ]; then
+    report "  screensaver"
+    run_config screensaver "${ss_args[@]}"
   fi
-  if [ -n "$cal_url" ]; then
-    cargs=(--url "$cal_url"); [ -n "$cal_range" ] && cargs+=(--range "$cal_range")
-    echo "  calendar ${cargs[*]}"
-    run "$FLEETCTL" calendar set "${cargs[@]}" --device "$serial"
+  if [ ${#cal_args[@]} -gt 0 ]; then
+    report "  calendar"
+    run_config calendar "${cal_args[@]}"
   fi
   echo "  note: --config does NOT restore Immich/SMB/WebDAV/multiroom credentials;"
   echo "        use --prefs for those."

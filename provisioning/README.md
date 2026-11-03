@@ -376,6 +376,23 @@ the app reloads them from disk. `--config` is a lighter alternative that re-appl
 only the endpoint-covered screensaver + calendar subset (no stored credentials, no
 reboot). `--prefs`, `--apps`, and `--dry-run` can be combined as needed.
 
+When `--config` is selected, restore parses the saved screensaver XML and freezes
+both endpoint argument lists before any install, preference push or reboot.
+XML entities, Unicode, CDATA and multiline strings are decoded as literal
+arguments. Malformed XML, duplicate selected keys or wrong selected field types
+stop the run before any action. Each config command must exit successfully and
+return one unambiguous JSON object with literal `ok: true` and no `error` field.
+Unconfirmed replies stop later commands; an earlier successful command can
+remain applied, so inspect the partial state before retrying. Response bodies
+are kept in private scratch and removed on exit.
+
+The existing subset policy still omits empty strings, explicitly selects only
+the `default` source and submits nonempty folder/album values in the same order.
+Those fields can change the active source through endpoint precedence; this is
+not a guarantee that every saved source or setting is restored.
+`--config --dry-run` validates and prints the decoded plan locally without contacting the
+Portal. Raw `--prefs` restore behavior is separate.
+
 Provisioning deliberately does **not** switch the Portal into raw adb-over-WiFi:
 `adb tcpip` restarts adbd, which would stop Shizuku, and it doesn't survive a
 reboot anyway. The agent is the persistent channel. If

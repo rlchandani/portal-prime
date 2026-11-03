@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T05:37:24.022573+00:00",
+  "updatedAt": "2026-11-03T05:51:46.666962+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,51 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-config-xml",
+      "title": "Fleet: decode and freeze soft restore config",
+      "summary": "Locally verified: --config decodes XML values, freezes both plans before earlier actions and stops unconfirmed command replies.",
+      "description": "Replace layout-dependent text extraction with one XML/type-validated NUL-framed plan. Preserve the existing endpoint subset and source precedence; capture and validate command acknowledgments privately.",
+      "status": "verified",
+      "verification": "10 new config / 34 restore methods \u00b7 371 Python \u00b7 actual CLI 1/7\u21927/7",
+      "kind": "Host fleet restore reliability",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Fleet tooling / independent restore review",
+      "deployment": "Host tooling verified locally; no actual owner restore. Last verified room APK remains exact optimized 1.102/code96.",
+      "state": "Generated private registry and loopback only; owned scratch/server fixtures removed. No owner registry/device/phone access.",
+      "acceptance": [
+        "Decode entities, Unicode, CDATA, multiline and differently formatted maps into literal arguments.",
+        "Reject invalid selected XML/types before every earlier restore action; freeze both plans before commands.",
+        "Require process success and unambiguous literal JSON success without contradictory errors.",
+        "Verify pinned one-device registry, private plan modes and cleanup with actual shell and generated loopback transport."
+      ],
+      "evidence": [
+        {
+          "text": "Root cause, selected XML validation, command acknowledgment checks, local verification and retained limits.",
+          "source": "docs/portal-fleet-config-xml-2026-11-03.md"
+        },
+        {
+          "text": "Reviewed hashes, red/green tests, actual CLI loopback results, cleanup and no-owner-operation scope.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/fleet-config-xml-verification.json"
+        }
+      ],
+      "limits": [
+        "No real device restore or applied-field readback; endpoint semantic constraints are not fully prevalidated.",
+        "Separate config commands can leave partial state on later failure; no rollback or retry.",
+        "Only default explicitly selects source; empty/missing values and folder/album source precedence remain.",
+        "Stored credentials, raw prefs behavior, backup atomicity and cross-package migration are outside this fix.",
+        "Existing prebuilt CLI exercised; no fresh Rust compilation or fault-injected server timeout cleanup.",
+        "No owner registry/device/phone/Android build/install/HA/auth/GitHub/publication operation."
+      ],
+      "next": "Retain this local host-tooling fix; actual owner restore requires its own justified acceptance scope. Existing design approvals, sign-in dependency and parked clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-03T05:39:37Z",
+        "deadline": "2026-11-03T06:09:37Z",
+        "originalDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "calendar-cancelled-status",
       "title": "Calendar: omit cancelled event blocks",

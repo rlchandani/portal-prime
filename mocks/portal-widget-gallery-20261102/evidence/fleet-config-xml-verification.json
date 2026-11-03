@@ -1,0 +1,364 @@
+{
+  "recordedAt": "2026-11-03T05:51:04.314229+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T05:39:37Z",
+    "deadline": "2026-11-03T06:09:37Z",
+    "originalDiscoveryClockRetained": true
+  },
+  "scope": "Host --config XML/type prevalidation, frozen literal argument plans and unambiguous acknowledgments; no real owner restore or applied-state readback.",
+  "sourceSha256": {
+    "provisioning/fleet-restore.sh": "e94158f1040974afa66d3e1be226f73a532d6a277dbc411ad026164bf9373bbf",
+    "provisioning/fleet-backup-data.py": "2d49a0ff848263774649c847b22f34c547ee0c7ab0918368015c0d92f2f22ec9",
+    "provisioning/test_fleet_restore.py": "d5aea86dfbea06f72dece9ebee19e3f30407ba2060e9f81f97b1c14f48dd8c07"
+  },
+  "red": {
+    "methods": 10,
+    "failureEntries": 24,
+    "errors": 0,
+    "failedMethods": [
+      "test_config_calendar_failure_reports_no_success_after_prior_screen_change",
+      "test_config_dry_run_is_decoded_and_has_no_cli_or_reboot",
+      "test_config_entities_unicode_and_shell_text_are_literal_arguments",
+      "test_config_invalid_xml_or_known_types_prevent_every_earlier_operation",
+      "test_config_minified_attribute_order_and_single_quotes_are_supported",
+      "test_config_multiline_cdata_and_numeric_entities_preserve_values",
+      "test_config_plan_is_frozen_before_earlier_app_commands",
+      "test_config_private_plans_and_frozen_registry_are_removed_after_use",
+      "test_config_unconfirmed_reply_stops_without_later_call_or_done"
+    ]
+  },
+  "green": {
+    "newConfigMethods": 10,
+    "allRestoreMethods": 34,
+    "provisioningDiscovery": 145,
+    "scriptsDiscovery": 226,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "bashSyntaxExit": 0,
+    "diffCheckExit": 0
+  },
+  "actualCliLoopback": {
+    "binary": "existing repository prebuilt fleetctl; Rust source unchanged; no fresh Rust compilation",
+    "binarySha256": "c4c791adbdaef1df4db3df6c774c394ba7b950c3a2e7643835c9eb2395acecc5",
+    "transport": "actual CLI to generated loopback HTTP server and private generated registry only",
+    "results": [
+      {
+        "variant": "baseline",
+        "passed": 1,
+        "total": 7,
+        "cases": [
+          {
+            "case": "entities",
+            "passed": false,
+            "checks": {
+              "exactPostBodies": false,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 2,
+            "expectedRequestCount": 2,
+            "exit": 0
+          },
+          {
+            "case": "minified",
+            "passed": false,
+            "checks": {
+              "exactPostBodies": false,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 0,
+            "expectedRequestCount": 1,
+            "exit": 0
+          },
+          {
+            "case": "multiline-cdata",
+            "passed": false,
+            "checks": {
+              "exactPostBodies": false,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 0,
+            "expectedRequestCount": 1,
+            "exit": 0
+          },
+          {
+            "case": "ordinary-control",
+            "passed": true,
+            "checks": {
+              "exactPostBodies": true,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 1,
+            "expectedRequestCount": 1,
+            "exit": 0
+          },
+          {
+            "case": "duplicate-config",
+            "passed": false,
+            "checks": {
+              "exactPostBodies": false,
+              "terminalVerdict": false,
+              "doneVerdict": false,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 1,
+            "expectedRequestCount": 0,
+            "exit": 0
+          },
+          {
+            "case": "contradictory-ack",
+            "passed": false,
+            "checks": {
+              "exactPostBodies": false,
+              "terminalVerdict": false,
+              "doneVerdict": false,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 2,
+            "expectedRequestCount": 1,
+            "exit": 0
+          },
+          {
+            "case": "private-failed-calendar",
+            "passed": false,
+            "checks": {
+              "exactPostBodies": true,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": false,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 2,
+            "expectedRequestCount": 2,
+            "exit": 1
+          }
+        ]
+      },
+      {
+        "variant": "candidate",
+        "passed": 7,
+        "total": 7,
+        "cases": [
+          {
+            "case": "entities",
+            "passed": true,
+            "checks": {
+              "exactPostBodies": true,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 2,
+            "expectedRequestCount": 2,
+            "exit": 0
+          },
+          {
+            "case": "minified",
+            "passed": true,
+            "checks": {
+              "exactPostBodies": true,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 1,
+            "expectedRequestCount": 1,
+            "exit": 0
+          },
+          {
+            "case": "multiline-cdata",
+            "passed": true,
+            "checks": {
+              "exactPostBodies": true,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 1,
+            "expectedRequestCount": 1,
+            "exit": 0
+          },
+          {
+            "case": "ordinary-control",
+            "passed": true,
+            "checks": {
+              "exactPostBodies": true,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 1,
+            "expectedRequestCount": 1,
+            "exit": 0
+          },
+          {
+            "case": "duplicate-config",
+            "passed": true,
+            "checks": {
+              "exactPostBodies": true,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 0,
+            "expectedRequestCount": 0,
+            "exit": 1
+          },
+          {
+            "case": "contradictory-ack",
+            "passed": true,
+            "checks": {
+              "exactPostBodies": true,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 1,
+            "expectedRequestCount": 1,
+            "exit": 1
+          },
+          {
+            "case": "private-failed-calendar",
+            "passed": true,
+            "checks": {
+              "exactPostBodies": true,
+              "terminalVerdict": true,
+              "doneVerdict": true,
+              "replyMarkerHidden": true,
+              "scratchRemoved": true,
+              "ownedServerClosed": true
+            },
+            "requestCount": 2,
+            "expectedRequestCount": 2,
+            "exit": 1
+          }
+        ]
+      }
+    ],
+    "allOwnedServersClosed": true,
+    "noOwnerRegistryOrDeviceOperation": true
+  },
+  "review": {
+    "blockingFindings": 0,
+    "positiveFitControl": "Endpoint-supported fit replaces contain; independent reviewer identified correction.",
+    "acceptanceLimit": "Selected XML types and acknowledged commands, not full semantic validation or applied-state readback.",
+    "sourceHashesMatch": true,
+    "privateLoopbackFixtureSha256": "034c5f3a3a8128fe41461788316be220ed9fa0f7e6dba0ec0ac265c7ee7c3bfc"
+  },
+  "cleanup": {
+    "scratchAndRegistryExitCleanup": true,
+    "privateDirectoriesMode": "0700",
+    "privatePlanAndRegistryFilesMode": "0600",
+    "allOwnedLoopbackServersClosed": true,
+    "generatedFixtureDirectoriesRemoved": true
+  },
+  "deployment": {
+    "hostTooling": "Locally verified in worktree; actual owner restore not performed.",
+    "lastVerifiedRoomApk": "Exact optimized 1.102/code96 in Family Area and Living Area from prior receipt.",
+    "roomApkUnchangedByThisUnit": true,
+    "publicManifest": "1.83/code77; unchanged"
+  },
+  "limits": [
+    "Missing maps and empty strings keep existing no-command behavior.",
+    "Only default explicitly selects source; nonempty folder/album precedence can change active source.",
+    "Endpoint-specific semantic constraints and per-field readback are outside preflight.",
+    "Separate endpoint commands can leave partial state after later failure; no rollback or retry.",
+    "Stored credentials, raw prefs behavior, backup atomicity and cross-package migration remain outside this change.",
+    "Existing prebuilt fleetctl exercised; no fresh Rust compilation.",
+    "No owner registry/device/phone/Android build/install/HA/GitHub/auth/publication operation.",
+    "Loopback servers establish normal cleanup; fault-injected timeout cleanup and actual endpoint application are unverified."
+  ],
+  "documentation": {
+    "strictMkdocsExit": 0,
+    "strictWarnings": 0,
+    "seconds": 2.2,
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 76,
+          "checks": [
+            {
+              "id": "fleet-config-xml",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "calendar-cancelled-status",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 76,
+          "checks": [
+            {
+              "id": "fleet-config-xml",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "calendar-cancelled-status",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingServerPreserved": true
+    },
+    "detailCapturesVisuallyInspected": true,
+    "earlier75TaskRecordsDefaultAndBoundariesPreserved": true,
+    "scope": "Two selected details at two widths; no whole-page accessibility or full-product acceptance claim."
+  }
+}
