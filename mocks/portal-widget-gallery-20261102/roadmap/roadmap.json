@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T17:00:20.727876+00:00",
+  "updatedAt": "2026-11-03T17:56:18.691210+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,54 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "toolkit-monitor-ci",
+      "title": "Portal Toolkit: retire canceled probes and automate host checks",
+      "summary": "Locally verified: nine baseline failures fixed; 195 tests and debug assembly pass. CI configured, hosted run pending.",
+      "description": "The actual monitor now preserves cancellation and checks its owning coroutine after ping/reconnect. Twelve new methods retain the original five. A local GitHub Actions workflow configures the same host tests and debug assembly, with available reports after failures and APK artifacts after success.",
+      "status": "verified",
+      "verification": "17 frozen methods:9 baseline AssertionErrors/8 controls \u219217 pass;195 JVM/34 suites;debug assembly;actionlint and Bash syntax pass",
+      "kind": "Related Toolkit reliability and repeated delivery checks",
+      "platforms": [
+        "companion",
+        "tooling"
+      ],
+      "owner": "Toolkit engineering / independent source, regression and CI review",
+      "deployment": "Two isolated local Toolkit commits; no merge, push, hosted run or device install.",
+      "state": "Monitor0c9a37ca; CI44d75050; original Toolkit clean at4e1dadb8. Immortal/current-room delivery remains unchanged without recheck.",
+      "acceptance": [
+        "Preserve cancellation and retire covered late ping/reconnect event and signal publication.",
+        "Keep ordinary failure threshold, backoff, recovery and original five methods/helper unchanged.",
+        "Reproduce with the actual monitor before correction and pass the same frozen fixture plus full host gate.",
+        "Configure bounded read-only CI with failure propagation, available reports and success-only debug artifact."
+      ],
+      "evidence": [
+        {
+          "text": "Actual baseline, narrow correction, local commits and unresolved runtime/hosted limits.",
+          "source": "docs/portal-toolkit-monitor-ci-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized source, fixture, result, APK and CI validation bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/toolkit-monitor-ci-verification.json"
+        }
+      ],
+      "limits": [
+        "Real ConnectionMonitor host execution with virtual callbacks; no ViewModel, Dadb, native UI, transport or phone execution.",
+        "Post-callback cancellation check does not roll back callback holder/socket effects and does not establish atomic publication against arbitrary concurrent stop.",
+        "Wi-Fi Reconnecting UI has no Disconnect action; covered manual-disconnect route is Connected with a third pending ping.",
+        "Hosted Ubuntu/actions/fresh SDK/dependency setup and workflow artifacts remain unobserved. Existing source declares Toolkit1.4.0/code5; no release-version or signing change.",
+        "Debug assembly and APK bytes only; no signer/package/native/install acceptance. Build retains two unstripped-native-library warnings.",
+        "Immortal app, current room delivery and historical companion acceptance unchanged and not rechecked; phone control, publication and older clocks/holds remain.",
+        "APK copy-failure candidate is source triage only under this same original discovery clock; no fresh reproduction or automatic clock reset."
+      ],
+      "next": "First hosted CI and native Toolkit connection acceptance remain open. Custom-URI APK copy failure is source triage only: admit a frozen real-AppsViewModel fixture before execution within the original clock; preserve expiry and all older holds. Continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T17:40:01Z",
+        "deadline": "2026-11-03T18:10:01Z",
+        "reset": false,
+        "includesDiscovery": true
+      }
+    },
     {
       "id": "provisioning-ascii-preflight",
       "title": "Provisioning preflight: enforce the Windows ASCII rule",

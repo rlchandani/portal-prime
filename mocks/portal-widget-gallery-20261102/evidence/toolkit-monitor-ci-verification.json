@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T17:56:18.691210+00:00",
+  "status": "locally_verified",
+  "scope": "Related Portal Toolkit monitor cancellation and repeated host delivery checks",
+  "originalClock": {
+    "startedAt": "2026-11-03T17:40:01Z",
+    "deadline": "2026-11-03T18:10:01Z",
+    "reset": false,
+    "includesDiscovery": true
+  },
+  "commits": {
+    "monitor": "0c9a37ca62353dfbce97a4efc21c92b00d24263a",
+    "ci": "44d75050b85c2c14e72bc30b4e4fb1b554e1c68c",
+    "priorPathGuard": "5bee76745775af97454e46768fa6abdbb541c9b6",
+    "originalCheckout": "4e1dadb8ec2ec018b6fdc250486e0c476467a7c4",
+    "localOnly": true
+  },
+  "baseline": {
+    "startedAt": "2026-11-03T17:48:06.544418+00:00",
+    "finishedAt": "2026-11-03T17:48:23.993890+00:00",
+    "exitCode": 1,
+    "tests": 17,
+    "assertionFailures": 9,
+    "passingControls": 8,
+    "errors": 0,
+    "skipped": 0,
+    "production": {
+      "path": "private-baseline/connection-monitor-baseline.kt",
+      "bytes": 5619,
+      "sha256": "9d104ce95e83655ad74129647248e73a0abe069e7d25904ac9a3754ea0684e8b"
+    },
+    "xml": {
+      "path": "private-baseline/toolkit-monitor-red.xml",
+      "bytes": 60056,
+      "sha256": "9a49b68a98f77e60d08166811a8423787f22f56664ae289be388caba5bd9ff88"
+    }
+  },
+  "candidate": {
+    "startedAt": "2026-11-03T17:49:44.374088+00:00",
+    "finishedAt": "2026-11-03T17:50:04.411687+00:00",
+    "exitCode": 0,
+    "command": [
+      "./gradlew",
+      ":app:testDebugUnitTest",
+      ":app:assembleDebug",
+      "--no-daemon",
+      "--offline",
+      "--rerun-tasks"
+    ],
+    "suites": 34,
+    "tests": 195,
+    "focusedTests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "production": {
+      "path": "toolkit/app/src/main/java/com/portalinstaller/data/ConnectionMonitor.kt",
+      "bytes": 5962,
+      "sha256": "731c87a466a63dec94395ae913afed1ad6c8cab1c94a8abefd98fe175ba49553"
+    },
+    "fixture": {
+      "path": "toolkit/app/src/test/java/com/portalinstaller/data/ConnectionMonitorTest.kt",
+      "bytes": 17439,
+      "sha256": "60da5428f995b8e1014d728584533eb23e33a8ccccce2943fa4fae07ea9f028e"
+    },
+    "sameFixtureAcrossBaselineAndCandidate": true,
+    "oldFiveMethodsAndHelperByteExact": true,
+    "apk": {
+      "path": "toolkit/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 13901710,
+      "sha256": "cd61d2919bd9f955661bf8871dd779e1eb2fbd53e97086f46896371db16cb4bd"
+    }
+  },
+  "ci": {
+    "workflow": {
+      "path": "toolkit/.github/workflows/tests.yml",
+      "bytes": 1333,
+      "sha256": "d2c144ab995716134389d5f8e5bdabcebb9900c8ee366ec125f731d43bb7ad86"
+    },
+    "readme": {
+      "path": "toolkit/README.md",
+      "bytes": 2593,
+      "sha256": "516e015d532bafd2551f39ed57e13e8094d7cf2a06588ed6f7cf65830cc772b2"
+    },
+    "actionlintExitCode": 0,
+    "shellSyntaxExitCodes": [
+      0,
+      0
+    ],
+    "events": [
+      "push",
+      "pull_request",
+      "workflow_dispatch"
+    ],
+    "permissions": {
+      "contents": "read"
+    },
+    "jobTimeoutMinutes": 15,
+    "availableReportsAfterFailure": true,
+    "debugApkAfterSuccess": true,
+    "hostedRunsObserved": 0
+  },
+  "independentReview": {
+    "monitorChecks": 16,
+    "ciChecks": 10,
+    "blockers": 0,
+    "actual195XmlRowsIndependentlyParsed": true
+  },
+  "preservation": {
+    "originalToolkitSelectedBindings": 152,
+    "originalToolkitHeadAndCleanStatusRetained": true,
+    "candidateUntouchedSelectedBindings": 146,
+    "newWorkflowOutsideOriginalSelection": true,
+    "prior107TaskObjectsAndRawSuffixRetained": true,
+    "defaultTask": "weather-native-layout",
+    "devicesUsed": 0,
+    "networkProviderOperations": 0,
+    "published": false
+  },
+  "deferredCandidate": {
+    "scope": "Toolkit custom-URI APK copy failure",
+    "status": "source-supported triage only; fixture not frozen or admitted, no baseline execution or fix",
+    "originalClockRetained": true,
+    "consequence": "A partial InputStream copy failure can skip explicit Failed state, input close and temporary-file cleanup in installApkFromUri. Cancel or new selection can reset Idle; permanent lockout is not claimed.",
+    "requiredNextBoundary": "Actual AppsViewModel route with inert Android/container/holder dependencies and generated host stream/temp files, admitted before execution; a copied helper is insufficient."
+  },
+  "limits": [
+    "Real ConnectionMonitor host execution with virtual callbacks; no ViewModel, Dadb, native UI, transport or phone execution.",
+    "Post-callback cancellation check does not roll back callback holder/socket effects and does not establish atomic publication against arbitrary concurrent stop.",
+    "Wi-Fi Reconnecting UI has no Disconnect action; covered manual-disconnect route is Connected with a third pending ping.",
+    "Hosted Ubuntu/actions/fresh SDK/dependency setup and workflow artifacts remain unobserved. Existing source declares Toolkit1.4.0/code5; no release-version or signing change.",
+    "Debug assembly and APK bytes only; no signer/package/native/install acceptance. Build retains two unstripped-native-library warnings.",
+    "Immortal app, current room delivery and historical companion acceptance unchanged and not rechecked; phone control, publication and older clocks/holds remain.",
+    "APK copy-failure candidate is source triage only under this same original discovery clock; no fresh reproduction or automatic clock reset."
+  ],
+  "artifactPathQualification": "Toolkit source labels are relative to the separate repository; private-baseline labels identify retained private test evidence, not published downloadable files."
+}
