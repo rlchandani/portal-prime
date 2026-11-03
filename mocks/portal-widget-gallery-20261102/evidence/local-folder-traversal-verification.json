@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T00:52:16.863391+00:00",
+  "scope": "Local photo-folder traversal budgets and canonical directory visits",
+  "sourceBranch": "codex/local-photo-folder-scan-20261103",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.90",
+    "versionCode": 84,
+    "sha256": "3697c00ae84c17ff8060f37d3c0f25e3f81b6e7a1846320ff295dcc96b91a285",
+    "bytes": 25861122,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "tests": {
+    "initialRegressionCases": 10,
+    "initialFailures": 5,
+    "initialErrors": 0,
+    "finalRegressionCases": 14,
+    "finalRegressionFailures": 0,
+    "fullJvm": {
+      "suites": 419,
+      "tests": 4014,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "builds": [
+      "debug",
+      "performance",
+      "R8",
+      "vital-lint"
+    ],
+    "combinedBuildSeconds": 117,
+    "independentStaticReview": "No actionable blocker; unbounded directory listing/sorting identified as a limit"
+  },
+  "native": {
+    "device": "Family Area",
+    "apiLevel": 29,
+    "baseline": "Installed optimized1.89 APK; exact hash verified before/after",
+    "candidate": "Exact optimized1.90 APK loaded on Android through shell DexClassLoader before deployment",
+    "baselineCases": [
+      {
+        "case": "ordinary-images",
+        "expectedCount": 2,
+        "actualCount": 2,
+        "canonicalUniqueCount": 2,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "ordinary-images-videos",
+        "expectedCount": 3,
+        "actualCount": 3,
+        "canonicalUniqueCount": 3,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "explicit-screenshots-root",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "canonicalUniqueCount": 1,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "nested-junk-skipped",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "canonicalUniqueCount": 1,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "directory-alias-deduplicated",
+        "expectedCount": 1,
+        "actualCount": 2,
+        "canonicalUniqueCount": 1,
+        "canonicalResolutionFailures": 0,
+        "pass": false
+      },
+      {
+        "case": "parent-self-cycle-deduplicated",
+        "expectedCount": 1,
+        "actualCount": 32,
+        "canonicalUniqueCount": 0,
+        "canonicalResolutionFailures": 32,
+        "pass": false
+      },
+      {
+        "case": "default-visit-budget",
+        "expectedCount": 0,
+        "actualCount": 1,
+        "canonicalUniqueCount": 1,
+        "canonicalResolutionFailures": 0,
+        "pass": false
+      }
+    ],
+    "candidateCases": [
+      {
+        "case": "ordinary-images",
+        "expectedCount": 2,
+        "actualCount": 2,
+        "canonicalUniqueCount": 2,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "ordinary-images-videos",
+        "expectedCount": 3,
+        "actualCount": 3,
+        "canonicalUniqueCount": 3,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "explicit-screenshots-root",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "canonicalUniqueCount": 1,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "nested-junk-skipped",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "canonicalUniqueCount": 1,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "directory-alias-deduplicated",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "canonicalUniqueCount": 1,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "parent-self-cycle-deduplicated",
+        "expectedCount": 1,
+        "actualCount": 1,
+        "canonicalUniqueCount": 1,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      },
+      {
+        "case": "default-visit-budget",
+        "expectedCount": 0,
+        "actualCount": 0,
+        "canonicalUniqueCount": 0,
+        "canonicalResolutionFailures": 0,
+        "pass": true
+      }
+    ],
+    "before": {
+      "type": "summary",
+      "cases": 7,
+      "failures": 3,
+      "invocationErrors": 0,
+      "pass": false,
+      "summarizeInvoked": false
+    },
+    "after": {
+      "type": "summary",
+      "cases": 7,
+      "failures": 0,
+      "invocationErrors": 0,
+      "pass": true,
+      "summarizeInvoked": false
+    },
+    "candidateDescriptor": "(IILjava/lang/String;Z)Ljava/util/ArrayList;",
+    "candidateBindings": "max,default-argument mask0,path,videos; scan20,000 folded into body by R8,confirmed by actual disassembly",
+    "initialVerifierLimit": "Old cycle exceeded canonicalization limits; returned counts and canonical failures separated,never treated as zero physical media"
+  },
+  "deployment": {
+    "Family Area": "Complete installed APK hash matches accepted candidate; identity1.90/code84 and ordinary manual photo frame checked",
+    "Living Area": "Complete installed APK hash matches accepted candidate; identity1.90/code84; return acknowledged"
+  },
+  "preservationAndCleanup": {
+    "family": {
+      "/remote/settings/profile unchanged": true,
+      "/remote/layout unchanged": true,
+      "/remote/sources unchanged": true,
+      "/screensaver unchanged": true,
+      "name unchanged": true,
+      "devMode unchanged": true,
+      "version1.90/code84": true,
+      "font_scale unchanged": true,
+      "enabled_accessibility_services unchanged": true,
+      "manualPhotoFrameForeground": true,
+      "originalChromeTaskRetained": true
+    },
+    "living": {
+      "/remote/settings/profile unchanged": true,
+      "/remote/layout unchanged": true,
+      "/remote/sources unchanged": true,
+      "/screensaver unchanged": true,
+      "name unchanged": true,
+      "devMode unchanged": true,
+      "version1.90/code84": true
+    },
+    "cleanup": {
+      "ownedScratchRootsRemoved": 3,
+      "existenceChecksPassed": 3,
+      "workersClosed": true,
+      "originalAppDataUntouched": true,
+      "ownedTokenRegistryRemoved": true
+    }
+  },
+  "issueClock": {
+    "startedAtUtc": "2026-11-03T00:37:12Z",
+    "deadlineUtc": "2026-11-03T01:07:12Z",
+    "includesDiscoveryCleanupAndCommit": true
+  },
+  "limits": [
+    "Native checks load the exact optimized APK in a separate shell process; application-UID storage permissions,image decoding and whole photo-source UI are not established.",
+    "Summary helper has no production caller and is stripped in R8; its acceptance is JVM-only.",
+    "The20,000-entry cap can omit later media and does not bound listFiles allocation or per-directory sorting.",
+    "No FPS,latency or whole-product performance claim.",
+    "Living visual presentation not inspected; exact installed bytes and complete saved configuration checked.",
+    "Local preview only; publication metadata unchanged. Exhausted issue clocks remain parked."
+  ]
+}

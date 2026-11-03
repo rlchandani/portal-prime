@@ -13,7 +13,21 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / latest calendar delivery:** both rooms contain exact
+- **Current room APK / latest local-folder delivery:** both rooms contain exact
+  optimized **1.90/code84**. Canonical directory visits and a20,000-entry search
+  budget prevent repeated alias/parent traversal; the media loop now stops at its
+  cap. Initial10 host cases reproduced5 failures; final14 cases and
+  **4,014 JVM/419 suites**, debug/optimized/R8/vital-lint gates passed.
+  Family's actual optimized Android scanner cases improved4/7→7/7:
+  aliases2→1, cycle32→1 and the late-image budget case1→0. Shell fixtures do not
+  prove app-UID permissions or image decoding; listing/sorting remain outside
+  the visit cap. Exact APK hashes and complete saved configurations match both
+  rooms. Family normal photo frame/font/services/Chrome retained, all three
+  native scratch roots and token registry copies removed, workers closed.
+  Original **00:37:12–01:07:12 UTC** clock includes cleanup and commit.
+  [Scoped receipt](portal-local-folder-traversal-2026-11-03.md).
+
+- **Previous calendar delivery:** both rooms received exact
   optimized **1.89/code83**. Calendar cancellation lists now honour every
   `EXDATE` value while retaining timezone parameters and original recurrence
   counts. Six original failures became nine passing regression cases; full
@@ -919,3 +933,30 @@ UI approvals retain their separate boundaries. Native calendar acceptance covers
 one generated UTC recurrence; other formats have JVM coverage. No broad
 performance or complete-product claim. Original **00:23:57–00:53:57 UTC** clock
 includes cleanup and commit; no exhausted issue was reopened.
+
+## Local photo-folder traversal delivery — 2026-11-03
+
+Both rooms contain exact optimized **1.90/code84**. Active Home/frame/wallpaper
+enumeration now guards canonical directory visits and limits traversal to20,000
+entries. The summary helper also counts directories toward its existing budget;
+it has no current production caller. Initial10 host cases reproduced5 failures;
+final14 cases and full4,014 JVM/419 suites passed. Debug/optimized/R8/vital-lint
+gates passed in117seconds. Actual Family Android scanner cases improved4/7→7/7:
+aliases2→1, parent/self cycle32→1 and the deliberately late-image budget case1→0.
+Corrected baseline verification distinguishes returned counts from paths that
+exceed canonicalization limits; final candidate has zero invocation/canonical
+errors. Final R8 bindings were established by real disassembly.
+
+The native candidate is the exact later-installed APK, loaded in a separate
+shell process. This does not establish application-UID permissions, image
+decoding, summary native behavior or whole photo-source UX. Entry processing
+is bounded, but listing/sorting and photos beyond the budget retain explicit
+limits. Complete saved room configurations match originals; Family normal
+manual frame/font/services/Chrome task retained. All three shell scratch roots
+and temporary token registry copies removed; workers closed.
+
+Roadmap: **58 tasks:30 delivered,20 scoped verified,5 parked,2 approval,1 queued**.
+Desktop/mobile metadata rendering and proof availability passed. Weather
+approval, held geometry acceptance, physical companion and human music sign-in
+keep their existing boundaries. No general FPS/latency or whole-product claim;
+original **00:37:12–01:07:12 UTC** clock includes cleanup and commit.

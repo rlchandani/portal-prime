@@ -1,18 +1,65 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T00:35:06.402292+00:00",
-  "updatedLabel": "Calendar cancellations fixed in both rooms; Weather candidate remains held",
+  "updatedAt": "2026-11-03T00:52:16.864665+00:00",
+  "updatedLabel": "Local photo scans guarded in both rooms; native7/7 and4,014JVM passed",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.89/code83. Companion1.7.7/code19 is verified only in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
+    "Both rooms contain exact optimized Portal1.90/code84. Companion1.7.7/code19 is verified only in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "local-folder-traversal",
+      "title": "Local photos: stop repeated folder visits and bound the search",
+      "summary": "Delivered 1.90 to both rooms. All 4,014 JVM tests passed; Family scanner checks improved 4/7 to 7/7.",
+      "description": "Visit each canonical directory once and count all entries toward a 20,000-entry traversal budget. Stop at the media cap instead of continuing through remaining children. Preserve ordinary media, video and explicit-root filters.",
+      "status": "delivered",
+      "verification": "Aliases 2\u21921 \u00b7 cycle 32\u21921 \u00b7 7/7 Android scanner checks \u00b7 4,014 JVM \u00b7 exact APK both rooms",
+      "kind": "Local photo-source traversal reliability",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Photo-source engineering / parallel filesystem regressions / native fixture and independent static review / Family rollout QA",
+      "deployment": "Exact optimized 1.90/code84 installed and fully read back in both rooms. Local preview only.",
+      "state": "Complete settings,layout,sources and screensaver configuration match originals. Family frame,font,services and Chrome task preserved. Three shell scratch roots and token registry copies removed; workers closed.",
+      "acceptance": [
+        "Reproduce alias and parent-link duplicates plus the ineffective directory-only summary budget.",
+        "Visit physical directories once and count every encountered entry toward a finite traversal budget.",
+        "Preserve ordinary images,optional videos,explicit Screenshots roots and junk-child rules.",
+        "Pass real filesystem regressions,required builds and seven actual Android scanner cases.",
+        "Deploy the exact accepted artifact and preserve saved room configuration within the original clock."
+      ],
+      "evidence": [
+        {
+          "text": "Source scope,before/after counts,native process boundaries and limits.",
+          "source": "docs/portal-local-folder-traversal-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized case results,artifact,room preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/local-folder-traversal-verification.json"
+        }
+      ],
+      "limits": [
+        "Native checks load the exact optimized APK in a separate shell process; application-UID storage permissions,image decoding and whole photo-source UI are not established.",
+        "Summary helper has no production caller and is stripped in R8; its acceptance is JVM-only.",
+        "The20,000-entry cap can omit later media and does not bound listFiles allocation or per-directory sorting.",
+        "No FPS,latency or whole-product performance claim.",
+        "Living visual presentation not inspected; exact installed bytes and complete saved configuration checked.",
+        "Local preview only; publication metadata unchanged. Exhausted issue clocks remain parked."
+      ],
+      "next": "Continue independent authorized backlog; Weather approval is retained and its exhausted geometry unit stays held.",
+      "issueClock": {
+        "startedAt": "2026-11-03T00:37:12+00:00",
+        "deadline": "2026-11-03T01:07:12+00:00",
+        "scope": "Local folder entry budgets and canonical directory visits; no image pipeline or old performance investigation reopening",
+        "status": "verified"
+      }
+    },
     {
       "id": "calendar-exdate-lists",
       "title": "Calendar: keep cancelled recurring appointments excluded",

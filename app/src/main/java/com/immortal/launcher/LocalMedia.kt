@@ -80,22 +80,33 @@ object LocalMedia {
 
   /**
    * Recursively collect images (and videos, if [includeVideo]) under [path], capped
-   * at [max] so a huge drive can't stall the screensaver. Stable order by path; the
-   * caller shuffles if the user asked for it.
+   * at [max] media items and [maxScan] directory entries. Each physical directory
+   * is visited once, including when aliases or parent links appear in the tree.
+   * Stable order by path; the caller shuffles if the user asked for it.
    */
-  fun enumerate(path: String, includeVideo: Boolean, max: Int = 2000): List<MediaItem> {
+  fun enumerate(
+      path: String,
+      includeVideo: Boolean,
+      max: Int = 2000,
+      maxScan: Int = 20_000,
+  ): List<MediaItem> {
     val out = ArrayList<MediaItem>()
+    if (max <= 0 || maxScan <= 0) return out
     val root = runCatching { File(path) }.getOrNull() ?: return out
     if (!root.isDirectory) return out
     val stack = ArrayDeque<File>()
+    val visited = HashSet<String>()
+    var scanned = 0
     stack.addLast(root)
-    while (stack.isNotEmpty() && out.size < max) {
+    while (stack.isNotEmpty() && out.size < max && scanned < maxScan) {
       PhotoSourceWork.checkpoint()
       val dir = stack.removeLast()
+      if (!visitDirectory(dir, visited)) continue
       val children = runCatching { dir.listFiles() }.getOrNull() ?: continue
-      children.sortedBy { it.name.lowercase() }.forEach { f ->
+      for (f in children.sortedBy { it.name.lowercase() }) {
         PhotoSourceWork.checkpoint()
-        if (out.size >= max) return@forEach
+        if (out.size >= max || scanned >= maxScan) break
+        scanned++
         when {
           f.isDirectory -> if (!isJunkDir(f.name)) stack.addLast(f)
           else ->
@@ -112,8 +123,8 @@ object LocalMedia {
 
   /**
    * Recursively count photos/videos under [path] and grab the first few as preview
-   * samples — for the folder picker. Bounded by [maxCount] and [maxScan] so a huge
-   * tree can't stall browsing; when hit, [MediaSummary.capped] is true (show "N+").
+   * samples. Bounded by [maxCount] and [maxScan], including directory entries;
+   * when hit, [MediaSummary.capped] is true (show "N+"). Aliases do not inflate counts.
    */
   fun summarize(
       path: String,
@@ -128,28 +139,33 @@ object LocalMedia {
     val samples = ArrayList<MediaItem>()
     val root = runCatching { File(path) }.getOrNull()
     if (root == null || !root.isDirectory) return MediaSummary(0, 0, false, emptyList())
+    if (maxCount <= 0 || maxScan <= 0) return MediaSummary(0, 0, true, emptyList())
     val stack = ArrayDeque<File>()
+    val visited = HashSet<String>()
     stack.addLast(root)
     loop@ while (stack.isNotEmpty()) {
+      PhotoSourceWork.checkpoint()
       val dir = stack.removeLast()
+      if (!visitDirectory(dir, visited)) continue
       val children = runCatching { dir.listFiles() }.getOrNull() ?: continue
       for (f in children) {
+        PhotoSourceWork.checkpoint()
+        scanned++
         if (f.isDirectory) {
           if (!isJunkDir(f.name)) stack.addLast(f)
-          continue
-        }
-        when (classify(f.name)) {
-          Kind.IMAGE -> {
-            photos++
-            if (samples.size < sampleCount) samples.add(MediaItem(f.absolutePath, false))
+        } else {
+          when (classify(f.name)) {
+            Kind.IMAGE -> {
+              photos++
+              if (samples.size < sampleCount) samples.add(MediaItem(f.absolutePath, false))
+            }
+            Kind.VIDEO -> {
+              videos++
+              if (samples.size < sampleCount) samples.add(MediaItem(f.absolutePath, true))
+            }
+            Kind.OTHER -> {}
           }
-          Kind.VIDEO -> {
-            videos++
-            if (samples.size < sampleCount) samples.add(MediaItem(f.absolutePath, true))
-          }
-          Kind.OTHER -> {}
         }
-        scanned++
         if (photos + videos >= maxCount || scanned >= maxScan) {
           capped = true
           break@loop
@@ -158,6 +174,9 @@ object LocalMedia {
     }
     return MediaSummary(photos, videos, capped, samples)
   }
+
+  private fun visitDirectory(dir: File, visited: MutableSet<String>): Boolean =
+      runCatching { visited.add(dir.canonicalPath) }.getOrDefault(false)
 
   /**
    * Storage volumes the user can browse: internal storage plus any mounted SD/USB

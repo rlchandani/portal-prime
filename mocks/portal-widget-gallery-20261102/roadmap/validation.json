@@ -1141,5 +1141,32 @@
       "calendar-exdate-verification.json": 200
     },
     "limits": "Saved roadmap rendering and evidence availability only. Native and full-test evidence has its separate scoped receipt; no whole-product or general performance claim."
+  },
+  "localFolderTraversalSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-03T00:54:04.095286+00:00",
+    "snapshotSha256": "7ef1aa539b8dad5c994df792f8b32cab739cc0e09ff5f8a6e99e6d8525f62c08",
+    "taskCount": 58,
+    "counts": {
+      "delivered": 30,
+      "verified": 20,
+      "parked": 5,
+      "approval": 2,
+      "queued": 1
+    },
+    "desktop": {
+      "width": 1600,
+      "documentScrollWidth": 1585,
+      "horizontalOverflow": false
+    },
+    "mobile": {
+      "width": 390,
+      "documentScrollWidth": 375,
+      "horizontalOverflow": false
+    },
+    "selectedTask": "local-folder-traversal",
+    "currentRoomApk": "1.90/code84",
+    "evidenceHttpStatus": 200,
+    "listingAndSortingLimitVisibleInAccessibilitySnapshot": true,
+    "limits": "Saved metadata rendering and proof availability only; actual Android scanner and full-suite acceptance have separate scoped receipts."
   }
 }
