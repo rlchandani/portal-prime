@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "status": "locally_verified_ci_configuration",
+  "recordedAt": "2026-11-03T20:44:52.500570+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-03T20:32:25Z",
+    "deadline": "2026-11-03T21:02:25Z",
+    "reset": false,
+    "discoveryIncluded": true
+  },
+  "integration": {
+    "localOnly": true,
+    "ImmortalCommit": "a29609fb4383060b438746bf016a4f5a2b27d3b0",
+    "parent": "61735db871d5dac365e00c4d3ae84b74e81b46fc",
+    "hostedRunsObserved": 0
+  },
+  "scope": "A new isolated CI job for the existing six native browser pairing cases; launcher-only portability, unchanged product UI and assertions.",
+  "sources": {
+    ".github/workflows/remote-browser.yml": {
+      "bytes": 1599,
+      "sha256": "939e9c4566bce00ce30121660d7ba314a3bb0f5c377ec9bdbc7638ff6a472bbe"
+    },
+    "scripts/tests/remote_pairing_keyboard_browser.test.mjs": {
+      "bytes": 8576,
+      "sha256": "eea02edb91353dfbda234934750bfca32dacddf950137c56539edfc625cc3c1a"
+    }
+  },
+  "dependencyInstall": {
+    "startedAt": "2026-11-03T20:38:35.708498+00:00",
+    "finishedAt": "2026-11-03T20:38:36.992386+00:00",
+    "exitCode": 0,
+    "nodeVersion": "v22.13.1",
+    "npmVersion": "11.7.0",
+    "packages": {
+      "playwright": {
+        "version": "1.62.1",
+        "bytes": 1416,
+        "sha256": "ca170ec143a88ed3043ac953eb3b2377b2b97304104f4e1e23316684ce2c35af"
+      },
+      "playwright-core": {
+        "version": "1.62.1",
+        "bytes": 876,
+        "sha256": "07c47543631fef9508760365dee9fbe958c562093ec8d122543949ed231f233f"
+      }
+    },
+    "lock": {
+      "bytes": 1599,
+      "sha256": "fa2707ab31de06de0da22d8b71eee783f717d376d1f705617d0e3213595981f8"
+    },
+    "result": {
+      "label": "private-local-run/ci-dependency-install.json",
+      "bytes": 1211,
+      "sha256": "903c61ed28f952d55e96fc77d035846f6620144e2c7a1568d7616b5260cdab30"
+    },
+    "log": {
+      "label": "private-local-run/ci-dependency-install.log",
+      "bytes": 235,
+      "sha256": "9ab0294fba5004a36580c846372a3ca6ad8344393886a463e56763786f4d9c98"
+    },
+    "publicMetadata": {
+      "label": "private-local-run/playwright-public-metadata-check.json",
+      "bytes": 1494,
+      "sha256": "c74ec8e0773390e1c67cf9d23be31eece67b5c04f27bca66109f07cce3925a1b"
+    },
+    "qualification": "Public npm package installation in an owned temporary directory using isolated empty configs and disabled scripts/audit/fund/optional dependencies. No browser or system dependency installation; signatures and every installed package file not independently verified."
+  },
+  "browserExecution": {
+    "runtime": "Node22.13.1 / Playwright1.62.1 / macOS headless system Chrome",
+    "distinctCases": 6,
+    "consoleRecordsPerRun": 7,
+    "default": {
+      "startedAt": "2026-11-03T20:39:46.473314+00:00",
+      "finishedAt": "2026-11-03T20:39:48.802909+00:00",
+      "exitCode": 0,
+      "junit": {
+        "leafCases": 6,
+        "names": [
+          "Enter in PIN submits the displayed form",
+          "Enter in address submits the displayed form",
+          "click submits once and a failed request can be retried",
+          "invalid PIN reports the existing correction without sending a request",
+          "pending Enter cannot duplicate the request",
+          "closing a filled form sends no pairing request"
+        ],
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "bytes": 1792,
+        "sha256": "67292956566829ca8d0a1ababc1edb93b6b6643d71a508181a62d7d24834a607"
+      },
+      "browserCases": {
+        "count": 6,
+        "postCounts": [
+          1,
+          1,
+          2,
+          0,
+          2,
+          0
+        ],
+        "errors": 0,
+        "outside": 0,
+        "unexpected": 0,
+        "websockets": 0
+      },
+      "result": {
+        "label": "private-local-run/pairing-node22-default.json",
+        "bytes": 1366,
+        "sha256": "9c2e4497256238243a7e37c0a3100a47b43d716ba2ffdd78397d46ad3b6a7b3c"
+      },
+      "log": {
+        "label": "private-local-run/pairing-node22-default.log",
+        "bytes": 1414,
+        "sha256": "8a9fca75258e1b1d7ff4c38e8850efa25b85a10e30d32f711db4d74c3a22e16b"
+      },
+      "report": {
+        "label": "private-local-run/pairing-node22-default-junit.xml",
+        "bytes": 1792,
+        "sha256": "67292956566829ca8d0a1ababc1edb93b6b6643d71a508181a62d7d24834a607"
+      }
+    },
+    "explicit": {
+      "startedAt": "2026-11-03T20:39:48.803595+00:00",
+      "finishedAt": "2026-11-03T20:39:51.009532+00:00",
+      "exitCode": 0,
+      "junit": {
+        "leafCases": 6,
+        "names": [
+          "Enter in PIN submits the displayed form",
+          "Enter in address submits the displayed form",
+          "click submits once and a failed request can be retried",
+          "invalid PIN reports the existing correction without sending a request",
+          "pending Enter cannot duplicate the request",
+          "closing a filled form sends no pairing request"
+        ],
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "bytes": 1792,
+        "sha256": "8495195fa5e3d643dce4d39213cadc8d1292341c1833e4b5ada998b3c52cc276"
+      },
+      "browserCases": {
+        "count": 6,
+        "postCounts": [
+          1,
+          1,
+          2,
+          0,
+          2,
+          0
+        ],
+        "errors": 0,
+        "outside": 0,
+        "unexpected": 0,
+        "websockets": 0
+      },
+      "result": {
+        "label": "private-local-run/pairing-node22-explicit.json",
+        "bytes": 1367,
+        "sha256": "8c2574e0b93b2b78681165014167859b4953fc8d98ebea3f2e080ad2d22ba1f4"
+      },
+      "log": {
+        "label": "private-local-run/pairing-node22-explicit.log",
+        "bytes": 1414,
+        "sha256": "8ac18e82233b6b156b04e948096801d77307e6a1259c30525ad2e4bbc18ba150"
+      },
+      "report": {
+        "label": "private-local-run/pairing-node22-explicit-junit.xml",
+        "bytes": 1792,
+        "sha256": "8495195fa5e3d643dce4d39213cadc8d1292341c1833e4b5ada998b3c52cc276"
+      }
+    },
+    "qualification": "Same six cases executed twice through default and explicit system-Chrome paths. JUnit has six leaf cases; console includes the parent. Non-Darwin managed browser path is source-reviewed only."
+  },
+  "bundledJs": {
+    "tests": 724,
+    "uniqueNames": 724,
+    "pass": 724,
+    "fail": 0,
+    "skipped": 0,
+    "startedAt": "2026-11-03T20:39:32.369363+00:00",
+    "finishedAt": "2026-11-03T20:39:46.472341+00:00",
+    "exitCode": 0,
+    "log": {
+      "label": "private-local-run/bundled-js.log",
+      "bytes": 159351,
+      "sha256": "72d1a3551c3bc504dfb926b918b44c85293c8800a87ba564cdf423462b6f210a"
+    },
+    "inventory": {
+      "label": "private-local-run/root-js-inventory.json",
+      "bytes": 419,
+      "sha256": "4ad71dc86fbc28e3946bd1ff88a11e4a02ba840517b80da5d88cd562f29ed252"
+    },
+    "qualification": "Existing synthetic-DOM/module gate; native browser fixture is verified separately."
+  },
+  "workflowValidation": {
+    "actionlintExitCode": 0,
+    "shellChecks": [
+      {
+        "step": "Prepare temporary browser paths",
+        "exitCode": 0,
+        "output": ""
+      },
+      {
+        "step": "Install pinned browser test dependency",
+        "exitCode": 0,
+        "output": ""
+      },
+      {
+        "step": "Install managed Chromium and system dependencies",
+        "exitCode": 0,
+        "output": ""
+      },
+      {
+        "step": "Run pairing browser cases",
+        "exitCode": 0,
+        "output": ""
+      }
+    ],
+    "preparationExitCode": 0,
+    "result": {
+      "label": "private-local-run/final-workflow-checks.json",
+      "bytes": 4856,
+      "sha256": "0eb35fcca762d2463ee10ec3a142922e9dd9fe4fdcd57e32c308e427412be939"
+    },
+    "qualification": "Local expression/shell checks and actual preparation text against synthetic owned paths only; Actions environment ingestion is unobserved."
+  },
+  "reviews": {
+    "source": {
+      "checks": 10,
+      "passed": 10,
+      "blockers": [],
+      "record": {
+        "label": "private-local-run/remote-browser-ci-source-review.json",
+        "bytes": 20508,
+        "sha256": "5ee26f0a7e2f2d45aeb33f9e5052c3f9db82a98f37b2e86f6b30f62396a8517f"
+      },
+      "rootFullyReadAndRehashedBeforeSourceCommit": true
+    },
+    "execution": {
+      "checks": 14,
+      "passed": 14,
+      "blockers": [],
+      "record": {
+        "label": "private-local-run/remote-browser-ci-execution-review.json",
+        "bytes": 28126,
+        "sha256": "512f11f66ae3b4454d603d2a8e5ec392a4bccca4fb16dd93d0016741a115267e"
+      },
+      "rootFullyReadAndRehashedBeforeSourceCommit": true
+    }
+  },
+  "retainedCorrections": [
+    {
+      "label": "Initial asset-path preflight",
+      "qualification": "Guessed paths stopped the inspector before runtime; corrected from actual fixture imports.",
+      "record": {
+        "label": "private-local-run/preflight-correction.json",
+        "bytes": 317,
+        "sha256": "26ebca86486abd7fa0667f0d050ffebda44f8ff40ce142de0443a2e130bf58b1"
+      }
+    },
+    {
+      "label": "Initial npm configuration rejection",
+      "qualification": "A shared empty user/global config path was rejected before fetching; separate empty files enabled the later successful install.",
+      "record": {
+        "label": "private-local-run/ci-dependency-install-config-rejection.json",
+        "bytes": 471,
+        "sha256": "4b85b2d43d515e5ad31a2f268e4b4eead5b6919ecffc2e4c235a3cb5608095eb"
+      }
+    },
+    {
+      "label": "Initial actionlint rejection",
+      "qualification": "runner.temp in job env was invalid. The rejected workflow is retained; final preparation-step configuration passes. No product RED claim.",
+      "log": {
+        "label": "private-local-run/actionlint.log",
+        "bytes": 855,
+        "sha256": "c987c750b3339b8cdfddd82abd66ea9610b90c1fc3a7e01fd80667ea2b6d1e99"
+      },
+      "rejectedWorkflow": {
+        "label": "private-local-run/remote-browser-rejected-job-env.yml",
+        "bytes": 1490,
+        "sha256": "6def00c45a8544b66cc052de6d4d3c1ac471a6c00793c8954bb99c0fec8017b6"
+      }
+    }
+  ],
+  "preservation": {
+    "all17ProtectedHashesMatch": true,
+    "all5ExistingWorkflowsMatchUnitStartCommit": true,
+    "sixOriginalUiOraclesExact": true,
+    "noAppSourceChange": true
+  },
+  "limits": [
+    "No Ubuntu/managed Chromium launch, browser/system dependency installation, GitHub trigger/runner environment/report upload or hosted acceptance.",
+    "Generated bad_pin responses only; no successful authentication, real token/roster, live Portal/provider pairing, LAN/CORS, Android WebView, physical phone or device acceptance.",
+    "No new APK/build/JVM/install/signer/release/version claim. The earlier pairing product clock19:53:38\u201320:23:38 and all older holds remain.",
+    "Local configuration and macOS browser verification do not authorize publication or phone/provider control. Whole goal remains active."
+  ]
+}

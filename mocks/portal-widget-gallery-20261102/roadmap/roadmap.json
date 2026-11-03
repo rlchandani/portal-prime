@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T20:25:26.052298+00:00",
+  "updatedAt": "2026-11-03T20:44:52.500570+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,51 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "remote-pairing-browser-ci",
+      "title": "Browser remote: automate native pairing regression",
+      "summary": "Prepared local CI runs the existing six browser cases. Both Node 22 macOS launch paths and all 724 bundled JavaScript results pass; Ubuntu and hosted execution remain open.",
+      "description": "A separate bounded workflow configures temporary pinned Playwright, managed Chromium and JUnit reporting; the fixture retains every existing UI oracle and changes only browser path selection.",
+      "status": "delivered",
+      "verification": "6 native browser cases / both macOS paths \u00b7724 JS \u00b7actionlint/four shell checks \u00b7independent10/10 +14/14",
+      "kind": "Repeated native browser protection",
+      "platforms": [
+        "browser",
+        "tooling"
+      ],
+      "owner": "CI / independent source and execution review",
+      "deployment": "Local Immortal a29609fb only; no push, hosted run, report upload or device installation.",
+      "state": "Exact temporary public package install and local Node 22 checks pass. Existing product behavior and all five prior workflows remain unchanged.",
+      "acceptance": [
+        "Select the actual opt-in native browser fixture in a separate push-main/PR job.",
+        "Use exact pinned temporary dependencies and one managed Chromium cache for installation and launch.",
+        "Preserve all six UI assertions, generated routes and context/cleanup boundaries.",
+        "Keep test failure propagation and upload available JUnit reports after failure."
+      ],
+      "evidence": [
+        {
+          "text": "Actual configuration, local checks, retained corrections and hosted limits.",
+          "source": "docs/portal-remote-pairing-browser-ci-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized source, runtime, report and independent-review bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/remote-pairing-browser-ci-verification.json"
+        }
+      ],
+      "limits": [
+        "No Ubuntu/managed Chromium launch, browser/system dependency installation, GitHub trigger/runner environment/report upload or hosted acceptance.",
+        "Generated bad_pin responses only; no successful authentication, real token/roster, live Portal/provider pairing, LAN/CORS, Android WebView, physical phone or device acceptance.",
+        "No new APK/build/JVM/install/signer/release/version claim. The earlier pairing product clock19:53:38\u201320:23:38 and all older holds remain.",
+        "Local configuration and macOS browser verification do not authorize publication or phone/provider control. Whole goal remains active."
+      ],
+      "next": "Observe the first Ubuntu/hosted run only after the GitHub hold is lifted. Retain the earlier product pairing clock and every older hold; continue distinct authorized whole-product work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T20:32:25Z",
+        "deadline": "2026-11-03T21:02:25Z",
+        "reset": false,
+        "discoveryIncluded": true
+      }
+    },
     {
       "id": "toolkit-uptime-validity",
       "title": "Portal Toolkit: reject invalid uptime values",
