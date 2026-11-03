@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T06:16:51.388100+00:00",
+  "updatedAt": "2026-11-03T06:25:58.336963+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,56 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.104/code98. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.105/code99. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "lan-audio-pcm",
+      "title": "LAN intercom: retain complete PCM samples",
+      "summary": "Delivered to both rooms: fragmented reads and short writes preserve complete samples; failed playback stops consuming peer data.",
+      "description": "Carry one incomplete PCM16 sample byte and drain accepted prefixes before the next read, using the existing session retirement and playback cleanup paths.",
+      "status": "delivered",
+      "verification": "9 regressions / 4,126 JVM \u00b7 actual debug Android helper 16/16",
+      "kind": "Intercom receive stream correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "LAN audio engineering / independent playback and Android helper review",
+      "deployment": "Exact signed optimized 1.105/code99 installed and full APK hash verified in Family Area and Living Area.",
+      "state": "Complete maps and Home/timer/Sunrise preference bytes match. Family frame/font/services/original Chrome retained. Owned process/scratch/registry copy removed.",
+      "acceptance": [
+        "Reproduce sample loss in the actual playback method with odd TCP reads and aligned short writes.",
+        "Preserve complete samples, drain accepted prefixes and stop on invalid or non-progressing sink results.",
+        "Retain existing playback cleanup and replacement-session ownership; cover read errors and cancellation.",
+        "Run full gates, actual APK helper checks and exact signed room delivery while preserving owner state."
+      ],
+      "evidence": [
+        {
+          "text": "Framing correction, regressions, native helper scope, room delivery and limits.",
+          "source": "docs/portal-lan-audio-pcm-2026-11-03.md"
+        },
+        {
+          "text": "Reviewed hashes, nine unchanged playback tests, actual debug helper and optimized fixture limit.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/lan-audio-pcm-verification.json"
+        }
+      ],
+      "limits": [
+        "Real AudioTrack acceptance counts, native playFrom, audible intercom quality, sockets/microphone, full UI and performance remain unverified.",
+        "Native framing checks invoke the actual debug APK helper only; optimized direct-helper execution is unverified after R8 specialized callbacks to concrete lambda classes.",
+        "The optimized fixture attempt returned no result; it is retained as a fixture limitation with verified normal cleanup, not a product failure or baseline comparison.",
+        "The before/after differential is six original assertion failures then nine unchanged actual-playFrom JVM passes; generated native ledger checks have no baseline-helper comparison.",
+        "API28, Living visuals, all concurrent cancellation interleavings and fault-injected timeout cleanup remain unverified.",
+        "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+      ],
+      "next": "Retain this delivered framing correction. Audible/native playback acceptance remains open; design approvals, human sign-in and original parked clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-03T06:08:14Z",
+        "deadline": "2026-11-03T06:38:14Z",
+        "originalParallelDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "sleep-timer-dispatch",
       "title": "Sleep timer: handle countdown expiry",

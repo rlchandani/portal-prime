@@ -13,8 +13,25 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / Sleep timer expiry dispatch:** exact optimized
-  **1.104/code98** is installed and fully hashed in both rooms. Explicitly started
+- **Current room APK / LAN intercom PCM framing:** exact optimized
+  **1.105/code99** is installed and fully hashed in both rooms. The receiver now
+  carries incomplete samples and drains short writes; invalid or non-progressing
+  writes stop through existing cleanup. Nine actual-playback regressions reproduce
+  six failures then pass; **4,126 JVM/430 suites**, debug/optimized/R8/vital lint
+  pass in1m53s. Actual debug-APK framing helper passes **16/16** on Family Android10,
+  including2KiB boundaries and cancellation, with no audio/socket/mic/framework
+  operations. Optimized direct-helper execution is unverified because R8 specializes
+  callback parameters; the first fixture attempt and normal cleanup are retained
+  separately. Native playback, real write counts, audible/UI/performance/API28
+  acceptance remain open. Complete maps and Home/timer/Sunrise bytes match.
+  Family frame/font/services/original Chrome retained; owned process/scratch/
+  registry copy removed. Public1.83 guard rejects local1.105; no phone/HA/auth/
+  publication. **79 tasks:46 delivered,23 locally verified,3 approval,6 parked,
+  1 queued.** Original **06:08:14–06:38:14 UTC** parallel audit clock retained;
+  broader goal stays active. [Receipt](portal-lan-audio-pcm-2026-11-03.md).
+
+- **Previous room APK / Sleep timer expiry dispatch:** exact optimized
+  **1.104/code98** was installed and fully hashed in both rooms. Explicitly started
   countdowns now dispatch their previously ignored expiry action to the existing
   sleep policy, using current enable/audio/app preferences. Nine regressions
   reproduce six failures then pass; **4,117 JVM/429 suites**, debug/optimized/

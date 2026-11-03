@@ -1,0 +1,465 @@
+{
+  "recordedAt": "2026-11-03T06:25:58.336963+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T06:08:14Z",
+    "deadline": "2026-11-03T06:38:14Z",
+    "baseCommit": "a3a1dbe341d6a7c95fa6e6663b9b413063774994",
+    "scope": "LAN intercom receive PCM16 frame carry/shortwrite drain and failurestop; actualplayFrom regression. Original parallel discoveryclock retained; no sockets/mic/audio/UI/performance claim.",
+    "originalParallelDiscoveryClockRetained": true
+  },
+  "scope": "LAN intercom PCM16 receive framing and accepted-prefix drain; existing playback/session cleanup retained.",
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/LanAudio.kt": "812abe09cbaaffd40277f417251ada62038f4aaf3f5c04df1d632d30d4840e76",
+    "app/src/main/java/com/immortal/launcher/LanPcmStream.kt": "fbd765dee0b75160ab2514d7d2ea7c209d6d902a347cc40fdd682b5fdbdceeb0",
+    "app/src/main/java/com/immortal/launcher/LanAudioSessions.kt": "3db250e6ba33c2486afdc5c12c24863fde3fe59167740f10f09b2d19a8859851",
+    "app/src/test/java/com/immortal/launcher/LanAudioPcmWriteTest.kt": "6f04365ea5c895a3b66d0e017660438de129ea7d400552dd5d70a4759e1087d0",
+    "app/build.gradle.kts": "4a3be7c6254a4b435cd46586bfa01f1c1cba183dc1866838ecbc3ee2752e6f74"
+  },
+  "red": {
+    "originalDiscoveryStart": "2026-11-03T06:08:14Z",
+    "originalDeadline": "2026-11-03T06:38:14Z",
+    "tests": 9,
+    "failures": 6,
+    "errors": 0,
+    "skipped": 0,
+    "terminalExit": 1,
+    "failed": [
+      {
+        "name": "alignedShortWritesDrainTheRemainderBeforeReadingMorePcm",
+        "message": "org.junit.internal.ArrayComparisonFailure: array lengths differed, expected.length=8 actual.length=2; arrays first differed at element [2]; expected:<50> but was:<end of array>"
+      },
+      {
+        "name": "zeroSinkProgressEndsPlaybackWithoutConsumingAnotherPeerChunk",
+        "message": "java.lang.AssertionError: expected:<1> but was:<3>"
+      },
+      {
+        "name": "oddTcpFragmentsAreJoinedBeforeWritingCompleteSamples",
+        "message": "org.junit.internal.ArrayComparisonFailure: array lengths differed, expected.length=8 actual.length=4; arrays first differed at element [0]; expected:<16> but was:<33>"
+      },
+      {
+        "name": "oddEofRetainsCompleteSamplesWithoutSubmittingATruncatedSample",
+        "message": "org.junit.internal.ArrayComparisonFailure: arrays first differed at element [2]; expected:<50> but was:<67>"
+      },
+      {
+        "name": "negativeSinkResultEndsPlaybackWithoutReadingLaterPeerData",
+        "message": "java.lang.AssertionError: expected:<1> but was:<3>"
+      },
+      {
+        "name": "fragmentedReadsAndShortWritesPreserveTheSamePcmSequence",
+        "message": "org.junit.internal.ArrayComparisonFailure: array lengths differed, expected.length=8 actual.length=4; arrays first differed at element [2]; expected:<50> but was:<84>"
+      }
+    ],
+    "passed": [
+      "retirementDuringShortWriteDoesNotDrainOrStopTheReplacementSession",
+      "contiguousFullWritesPreserveEveryCompleteSample",
+      "readFailureReleasesPlaybackAndRetiresTheListeningSession"
+    ],
+    "scope": "Actual private LanAudio.playFrom and real sessions; fragmented in-memory InputStream and AudioTrack construction/write doubles. No native AudioTrack, socket, microphone, device or audible-output evidence.",
+    "sourceSha256": {
+      "app/src/main/java/com/immortal/launcher/LanAudio.kt": "d4f2eb014957ba8485fee894d2d6d4bc57f46ef7860e1d4e0cd44f8c729125ee",
+      "app/src/main/java/com/immortal/launcher/LanAudioSessions.kt": "3db250e6ba33c2486afdc5c12c24863fde3fe59167740f10f09b2d19a8859851",
+      "app/src/test/java/com/immortal/launcher/LanAudioPcmWriteTest.kt": "6f04365ea5c895a3b66d0e017660438de129ea7d400552dd5d70a4759e1087d0"
+    },
+    "xmlSha256": "b5977033d75bf66d34e6771131d7753dd47daf6db2c9cc1be65ed845cb04ffa0"
+  },
+  "green": {
+    "suites": 430,
+    "tests": 4126,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualPlayFromFocusedTests": 9,
+    "allNineUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "1m 53s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "native": {
+    "candidate": {
+      "status": "PASS",
+      "checks": {
+        "actualApkHelperLoaded": true,
+        "contiguousFullWrite": true,
+        "oddFragmentsPreserveSamples": true,
+        "shortWritesDrainEveryByte": true,
+        "fragmentsAndShortWritesPreserveSamples": true,
+        "carryAcross2048ByteBufferBoundary": true,
+        "manySingleByteFragmentsPreserveSamples": true,
+        "zeroProgressStopsBeforeNextRead": true,
+        "negativeProgressStopsBeforeNextRead": true,
+        "oddEofRetainsOnlyCompleteSamples": true,
+        "readFailurePreservesAcceptedPrefix": true,
+        "retirementDuringWriteStopsBeforeDrain": true,
+        "oddWriteResultRejected": true,
+        "oversizedWriteResultRejected": true,
+        "retiredBeforeStartDoesNotReadOrWrite": true,
+        "retirementAfterReadPreventsWrite": true
+      },
+      "observations": {
+        "contiguousFullWrite": {
+          "acceptedBytes": 8,
+          "acceptedSha256": "c27f9de2a163dfffae624d0ddf81cb779c5235a663663807488ef54d43937eab",
+          "readCalls": 2,
+          "sourceBytesConsumed": 8,
+          "writeCalls": 1,
+          "allWritesFrameAligned": true,
+          "exception": null
+        },
+        "oddFragmentsPreserveSamples": {
+          "acceptedBytes": 8,
+          "acceptedSha256": "c27f9de2a163dfffae624d0ddf81cb779c5235a663663807488ef54d43937eab",
+          "readCalls": 5,
+          "sourceBytesConsumed": 8,
+          "writeCalls": 2,
+          "allWritesFrameAligned": true,
+          "exception": null
+        },
+        "shortWritesDrainEveryByte": {
+          "acceptedBytes": 8,
+          "acceptedSha256": "c27f9de2a163dfffae624d0ddf81cb779c5235a663663807488ef54d43937eab",
+          "readCalls": 2,
+          "sourceBytesConsumed": 8,
+          "writeCalls": 4,
+          "allWritesFrameAligned": true,
+          "exception": null
+        },
+        "fragmentsAndShortWritesPreserveSamples": {
+          "acceptedBytes": 8,
+          "acceptedSha256": "c27f9de2a163dfffae624d0ddf81cb779c5235a663663807488ef54d43937eab",
+          "readCalls": 5,
+          "sourceBytesConsumed": 8,
+          "writeCalls": 4,
+          "allWritesFrameAligned": true,
+          "exception": null
+        },
+        "carryAcross2048ByteBufferBoundary": {
+          "acceptedBytes": 4098,
+          "acceptedSha256": "3e6edb137069dd2a7eaaf94dd0a11b9985e3a65e54f3facea7b3dc4e1ba6a2c2",
+          "readCalls": 4,
+          "sourceBytesConsumed": 4098,
+          "writeCalls": 229,
+          "allWritesFrameAligned": true,
+          "exception": null
+        },
+        "manySingleByteFragmentsPreserveSamples": {
+          "acceptedBytes": 4098,
+          "acceptedSha256": "3e6edb137069dd2a7eaaf94dd0a11b9985e3a65e54f3facea7b3dc4e1ba6a2c2",
+          "readCalls": 4099,
+          "sourceBytesConsumed": 4098,
+          "writeCalls": 2049,
+          "allWritesFrameAligned": true,
+          "exception": null
+        },
+        "zeroProgressStopsBeforeNextRead": {
+          "acceptedBytes": 0,
+          "acceptedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readCalls": 1,
+          "sourceBytesConsumed": 4,
+          "writeCalls": 1,
+          "allWritesFrameAligned": true,
+          "exception": "java.io.IOException"
+        },
+        "negativeProgressStopsBeforeNextRead": {
+          "acceptedBytes": 0,
+          "acceptedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readCalls": 1,
+          "sourceBytesConsumed": 4,
+          "writeCalls": 1,
+          "allWritesFrameAligned": true,
+          "exception": "java.io.IOException"
+        },
+        "oddEofRetainsOnlyCompleteSamples": {
+          "acceptedBytes": 4,
+          "acceptedSha256": "af3a7937cabc7737fcd108d547405880fbc4aaa7a74dfbaa599fef55fffae3fc",
+          "readCalls": 3,
+          "sourceBytesConsumed": 5,
+          "writeCalls": 2,
+          "allWritesFrameAligned": true,
+          "exception": null
+        },
+        "readFailurePreservesAcceptedPrefix": {
+          "acceptedBytes": 4,
+          "acceptedSha256": "af3a7937cabc7737fcd108d547405880fbc4aaa7a74dfbaa599fef55fffae3fc",
+          "readCalls": 2,
+          "sourceBytesConsumed": 4,
+          "writeCalls": 1,
+          "allWritesFrameAligned": true,
+          "exception": "java.io.IOException"
+        },
+        "retirementDuringWriteStopsBeforeDrain": {
+          "acceptedBytes": 2,
+          "acceptedSha256": "ba45ab77f353aaf84faca956d410e320cf1f0afdee9568bb7a4cbe2a4d956547",
+          "readCalls": 1,
+          "sourceBytesConsumed": 8,
+          "writeCalls": 1,
+          "allWritesFrameAligned": true,
+          "exception": null
+        },
+        "oddWriteResultRejected": {
+          "acceptedBytes": 0,
+          "acceptedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readCalls": 1,
+          "sourceBytesConsumed": 4,
+          "writeCalls": 1,
+          "allWritesFrameAligned": true,
+          "exception": "java.io.IOException"
+        },
+        "oversizedWriteResultRejected": {
+          "acceptedBytes": 0,
+          "acceptedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readCalls": 1,
+          "sourceBytesConsumed": 4,
+          "writeCalls": 1,
+          "allWritesFrameAligned": true,
+          "exception": "java.io.IOException"
+        },
+        "retiredBeforeStartDoesNotReadOrWrite": {
+          "acceptedBytes": 0,
+          "acceptedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readCalls": 0,
+          "sourceBytesConsumed": 0,
+          "writeCalls": 0,
+          "allWritesFrameAligned": true,
+          "exception": null
+        },
+        "retirementAfterReadPreventsWrite": {
+          "acceptedBytes": 0,
+          "acceptedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readCalls": 1,
+          "sourceBytesConsumed": 8,
+          "writeCalls": 0,
+          "allWritesFrameAligned": true,
+          "exception": null
+        }
+      },
+      "passed": 16,
+      "total": 16,
+      "apkSha256": "6f6007315678f1e9c20e9798d1dabce36e495c7ff55be9183835de2f0227debf",
+      "actualHelperClass": "com.immortal.launcher.LanPcmStream",
+      "actualHelperMethod": "copy16BitMono",
+      "scope": "Actual APK framing helper with generated in-memory streams and PCM write ledger",
+      "nativeAudioTrackVerified": false,
+      "actualLanAudioPlayFromVerified": false,
+      "realAudioTracksCreated": 0,
+      "realSocketsCreated": 0,
+      "realMicrophonesCreated": 0,
+      "appPreferencesWritten": 0,
+      "networkRequests": 0,
+      "frameworkServicesTouched": 0,
+      "cleanup": {
+        "noFrameworkHandlesAcquired": true
+      },
+      "artifactVariant": "debug"
+    },
+    "cleanup": {
+      "ownedProcessRetired": true,
+      "ownedDeviceScratchRemoved": true,
+      "appPreferencesWritten": 0,
+      "installerInvoked": false,
+      "networkRequests": 0,
+      "faults": []
+    },
+    "fixtureSha256": {
+      "java": "577b82ed22411fafc9f897f4ea057131b7b4604cf1431104b6d7ea329d713ca7",
+      "jar": "39107cbfad442f8e6837375d436e9b835686957444d46550836f6a7a8cb67916",
+      "compiler": "4408d186e2b1d9084820b4913527e618a548f1526848a2daa1849fd0e34b6914",
+      "runner": "72274e9097ec60aca59d1ab03e2ef8ac79a153cf4fd5ee13720d71bbe5b11650"
+    },
+    "scope": "Actual debug APK framing helper with generated in-memory InputStream and accepted-byte ledger; no native AudioTrack/playFrom invocation.",
+    "optimizedAttempt": {
+      "fixtureResultReturned": false,
+      "runnerExit": 1,
+      "stdoutBytes": 0,
+      "stderrBytes": 0,
+      "mappedClass": "com.immortal.launcher.FleetFs",
+      "mappedMethod": "p",
+      "residualSignature": "(java.io.InputStream,tt0,xy)",
+      "interfaceProxyCompatible": false,
+      "productFailureClaimed": false,
+      "baselineComparisonClaimed": false,
+      "cleanup": {
+        "ownedProcessRetired": true,
+        "ownedDeviceScratchRemoved": true,
+        "appPreferencesWritten": 0,
+        "installerInvoked": false,
+        "networkRequests": 0,
+        "faults": []
+      }
+    },
+    "optimizedDirectHelperVerified": false,
+    "nativeActualPlayFromVerified": false,
+    "nativeAudioTrackVerified": false
+  },
+  "artifact": {
+    "sha256": "f762f6ea741292c22c3d3f70d0e349ae9e21560433bbfa29779a832b6a4b081f",
+    "bytes": 25862702,
+    "signer": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.105",
+    "versionCode": 99,
+    "variants": {
+      "performance": {
+        "sha256": "f762f6ea741292c22c3d3f70d0e349ae9e21560433bbfa29779a832b6a4b081f",
+        "bytes": 25862702,
+        "signer": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.105",
+        "versionCode": 99
+      },
+      "debug": {
+        "sha256": "6f6007315678f1e9c20e9798d1dabce36e495c7ff55be9183835de2f0227debf",
+        "bytes": 46703529,
+        "signer": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.105",
+        "versionCode": 99
+      },
+      "rollback": {
+        "sha256": "3e8f530a500452b73037223977ad7540c9d484b632c3fc986eb508b8254ada21",
+        "bytes": 25862702,
+        "signer": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.104",
+        "versionCode": 98
+      }
+    },
+    "debugSha": "6f6007315678f1e9c20e9798d1dabce36e495c7ff55be9183835de2f0227debf",
+    "rollbackSha": "3e8f530a500452b73037223977ad7540c9d484b632c3fc986eb508b8254ada21",
+    "combinedBuildTerminalExit": 0,
+    "combinedBuildDuration": "1m 53s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "originalRegistryByteHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "ownedNativeProcessesAndDeviceScratchRemoved": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "googlePhoneCommands": 0,
+    "normalFamilyFrameVisuallyInspected": true,
+    "familyChromeTaskRetained": true
+  },
+  "review": {
+    "blockingFindings": 0,
+    "reviewedSourceFixtureAndApkHashesMatch": true,
+    "jvmAggregateIndependentlyVerified": true,
+    "allNineMeaningfulNativeAcceptedByteHashesIndependentlyVerified": true,
+    "normalCleanupVerified": true,
+    "scope": "Actual playFrom JVM regressions and debug APK framing helper; optimized callback ABI limitation retained."
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestUnchanged": true,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false
+  },
+  "limits": [
+    "Real AudioTrack acceptance counts, native playFrom, audible intercom quality, sockets/microphone, full UI and performance remain unverified.",
+    "Native framing checks invoke the actual debug APK helper only; optimized direct-helper execution is unverified after R8 specialized callbacks to concrete lambda classes.",
+    "The optimized fixture attempt returned no result; it is retained as a fixture limitation with verified normal cleanup, not a product failure or baseline comparison.",
+    "The before/after differential is six original assertion failures then nine unchanged actual-playFrom JVM passes; generated native ledger checks have no baseline-helper comparison.",
+    "API28, Living visuals, all concurrent cancellation interleavings and fault-injected timeout cleanup remain unverified.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+  ],
+  "documentation": {
+    "strictMkdocsExit": 0,
+    "strictWarnings": 0,
+    "seconds": 2.07,
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 79,
+          "checks": [
+            {
+              "id": "lan-audio-pcm",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "sleep-timer-dispatch",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 79,
+          "checks": [
+            {
+              "id": "lan-audio-pcm",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "sleep-timer-dispatch",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingServerPreserved": true
+    },
+    "detailCapturesVisuallyInspected": true,
+    "earlier78TaskRecordsDefaultAndOtherBoundariesPreserved": true,
+    "scope": "Two selected details at two widths; no full-product accessibility or visual acceptance."
+  }
+}

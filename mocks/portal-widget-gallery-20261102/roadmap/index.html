@@ -35,7 +35,7 @@
           <span class="status-badge" data-status="delivered">Delivered to both rooms</span>
           <h2 id="proof-title">A clock you can <br>actually read.</h2>
           <p>Complete city rows replace a clipped preview. Extra saved cities get an honest count.</p>
-          <p class="proof-version">World Clock proof: <strong>1.66 / code 60</strong><br>Fix preserved in current 1.104 on both rooms</p>
+          <p class="proof-version">World Clock proof: <strong>1.66 / code 60</strong><br>Fix preserved in current 1.105 on both rooms</p>
           <button class="text-button" id="clock-detail">Read acceptance &amp; limits <span aria-hidden="true">↗</span></button>
         </div>
         <div class="comparison">
@@ -92,7 +92,7 @@
             <button type="button" id="reset-filters" class="reset-button" hidden>Clear filters</button>
           </div>
           <div id="task-list" class="task-list"><p class="loading">Loading saved roadmap…</p></div>
-          <div class="queue-note">Current Portal delivery: exact 1.104/code98 in both rooms. Explicitly started sleep timers now dispatch their previously ignored expiry action, using current audio/app preferences. Nine regressions and 4,117 JVM tests pass; actual optimized Android receiver/policy checks improve 9/14 to 14/14 with captured framework service calls. Complete maps and Home/timer/Sunrise preference bytes match; Family frame/font/services/original Chrome are retained. <a href="../evidence/sleep-timer-dispatch-verification.json">Room delivery proof</a> records real alarm/UI/sleep/audio and secure-provider limits. Prior <a href="../evidence/sunrise-one-shot-verification.json">Sunrise one-shot consumption</a> and <a href="../evidence/calendar-cancelled-status-verification.json">cancelled calendar filtering</a> fixes remain. Google phone control remains prohibited. Design approvals, parked clocks and publication restrictions remain. Fleet soft restore also has a locally verified <a href="../evidence/fleet-config-xml-verification.json">XML and command-plan correction</a>: 34 restore methods, 371 Python tests and actual CLI loopback 1/7 to 7/7; no owner restore or applied-state readback. Release automation still requires its published signing baseline; <a href="../evidence/release-signing-baseline-verification.json">local release-gate proof</a> records 214 Python tests and 5/5 real-tool cases, with no publication.</div>
+          <div class="queue-note">Current Portal delivery: exact 1.105/code99 in both rooms. LAN intercom now carries incomplete PCM samples and drains short writes; invalid or non-progressing writes stop through existing cleanup. Nine actual-playback regressions and 4,126 JVM tests pass; actual debug-APK framing helper passes 16/16 on Android. Optimized direct-helper execution remains unverified after R8 specializes its callbacks. Complete maps and Home/timer/Sunrise preference bytes match; Family frame/font/services/original Chrome retained. <a href="../evidence/lan-audio-pcm-verification.json">Room delivery proof</a> records native playback/audio/UI/performance limits. Prior <a href="../evidence/sleep-timer-dispatch-verification.json">sleep timer expiry dispatch</a>, <a href="../evidence/sunrise-one-shot-verification.json">Sunrise one-shot consumption</a> and <a href="../evidence/calendar-cancelled-status-verification.json">cancelled calendar filtering</a> fixes remain. Google phone control remains prohibited. Design approvals, parked clocks and publication restrictions remain. Fleet soft restore has a locally verified <a href="../evidence/fleet-config-xml-verification.json">XML and command-plan correction</a>: 34 restore methods, 371 Python tests and actual CLI loopback 1/7 to 7/7; no owner restore or applied-state readback. Release automation requires its published signing baseline; <a href="../evidence/release-signing-baseline-verification.json">local release-gate proof</a> records 214 Python tests and 5/5 real-tool cases, with no publication.</div>
         </div>
         <aside id="task-detail" class="detail" aria-label="Selected task details" tabindex="-1">
           <p class="loading">Select a task to inspect its evidence.</p>
@@ -100,7 +100,7 @@
       </section>
     </main>
     <footer>
-      <p>Local review artifact · Current room APK: exact 1.104 / code 98</p>
+      <p>Local review artifact · Current room APK: exact 1.105 / code 99</p>
       <p>Companion 1.7.8 was previously installed on Pixel; saved settings were verified. Pixel control and inspection are prohibited until explicitly authorized. Full physical workflows remain open. <a href="../quick-controls-review.html">Review Quick controls setup</a>. <a href="../group-photo-import-review.html">Review multi-Portal photo import</a>. No GitHub authentication or publication.</p>
     </footer>
   </div>

@@ -184,10 +184,8 @@ class LanAudio {
     } ?: return
     try {
       if (!ownedPlayback.start { track.play() }) return
-      val buf = ByteArray(2048)
-      while (session.isActive) {
-        val n = input.read(buf)
-        if (n > 0 && session.isActive) track.write(buf, 0, n) else break
+      LanPcmStream.copy16BitMono(input, { session.isActive }) { buffer, offset, count ->
+        track.write(buffer, offset, count)
       }
     } finally {
       ownedPlayback.close()
