@@ -17,6 +17,7 @@ class Element {
     this.dataset = {};
     this.listeners = {};
     this.value = '';
+    this.disabled = false;
     this.hidden = false;
     this.open = false;
     this.text = '';
@@ -161,6 +162,17 @@ class Element {
       for (const name of ['input', 'change']) {
         this[`on${name}`]?.({ target: this });
         for (const listener of this.listeners[name] || []) listener({ target: this });
+      }
+    }
+    // Model a submit button's click default, including a detached sticky footer.
+    // Native Enter/default-submitter behavior remains covered by isolated Chrome.
+    if (this.tagName === 'BUTTON' && this.type === 'submit') {
+      let form = this.attrs.form ? this.doc.getElementById(this.attrs.form) : this.parent;
+      while (form && form.tagName !== 'FORM') form = form.parent;
+      if (form) {
+        const submit = { target: form, submitter: this, preventDefault() {} };
+        form.onsubmit?.(submit);
+        for (const listener of form.listeners.submit || []) listener(submit);
       }
     }
   }

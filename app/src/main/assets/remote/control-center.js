@@ -908,9 +908,10 @@ function pairDialog(address = location.origin, pinValue = '') {
   const originTicket = session.capture();
   const error = el('p', { role: 'status', 'aria-live': 'polite' });
   const peers = el('div', { class: 'sections' });
-  const submitButton = button('Pair Portal', submit, { kind: 'primary' });
+  const submitButton = el('button', { class: 'button primary', type: 'submit',
+    form: 'pair-portal-form', text: 'Pair Portal' });
   const form = el(
-    'form', {},
+    'form', { id: 'pair-portal-form' },
     field('Portal address or pairing link', addressDraft,
       value => { if (current() && !pairing) addressDraft = value; }, {
         type: 'text', key: 'pair-address',
