@@ -122,12 +122,15 @@ object CountdownConfig {
     prefs(context).edit().putString(KEY, arr.toString()).apply()
   }
 
+  /** Tools IO and Settings UI share this read/modify/write boundary. */
+  @Synchronized
   fun add(context: Context, label: String, emoji: String, month: Int, day: Int, year: Int) {
     val e = Event(System.currentTimeMillis(), label.ifBlank { "Event" }, emoji,
         month.coerceIn(1, 12), day.coerceIn(1, 31), if (year < 0) 0 else year)
     save(context, load(context) + e)
   }
 
+  @Synchronized
   fun remove(context: Context, id: Long) {
     save(context, load(context).filterNot { it.id == id })
   }

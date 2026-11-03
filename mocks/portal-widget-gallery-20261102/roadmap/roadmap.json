@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T09:38:31.996647+00:00",
+  "updatedAt": "2026-11-03T10:00:45.863428+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,58 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.114/code108. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.115/code109. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "countdown-mutations",
+      "title": "Countdowns: preserve concurrent additions and removals",
+      "summary": "Delivered 1.115: overlapping list edits keep every completed Add and Remove.",
+      "description": "Serialize complete public CountdownConfig Add and Remove operations on the existing object monitor. Preserve date and identity policy, saved fields, ordering and read-only load.",
+      "status": "delivered",
+      "verification": "7 frozen methods: 4 red failures to pass · 4,238 JVM · optimized native 4/8 to 8/8",
+      "kind": "Countdown collection mutation integrity",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Tools reliability / independent mutation and artifact review",
+      "deployment": "Exact optimized 1.115/code109 installed and fully hashed in Family Area and Living Area.",
+      "state": "Complete captured maps and ten preference states per room match. Family 10 existing files and Living 7 existing files are byte identical; three Living absences remain. Family night clock view, font, accessibility, Chrome, resumed frame and awake display retained. Two native parents and scratch retired; copied credentials removed.",
+      "acceptance": [
+        "Reproduce lost additions and resurrected removals through actual public config operations with deterministic editor barriers.",
+        "Serialize Add and Remove together while retaining ordinary payloads, saved IDs and ordering, date policy and read-only bytes.",
+        "Run frozen full gates and actual optimized APK CRUD differential with strict generated storage and bounded worker ownership.",
+        "Deliver the exact signed artifact to both rooms and compare complete captured maps and ten preference states per room."
+      ],
+      "evidence": [
+        {
+          "text": "Countdown mutation correction, frozen regressions and exact two-room delivery.",
+          "source": "docs/portal-countdown-mutations-2026-11-03.md"
+        },
+        {
+          "text": "Bound artifacts, native interleavings, state preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/countdown-mutations-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual optimized config on Family Android 10 uses generated in-memory preferences only. Physical UI interleaving, native debug, API28 and live editors remain unverified.",
+        "Nineteen public CRUD calls, eleven generated applies and four retired executors per variant. Four mutation corrections and four retained controls; no household preference writes by the fixture.",
+        "In-process serialization retains asynchronous apply. Cross-process or arbitrary raw preference writers, storage fault injection and disk durability remain unverified.",
+        "Normal native parent and scratch cleanup is observed. External runner failure and timeout cleanup remain untested.",
+        "Ten preference states per room match: Family 10 existing files, Living 7 existing files and 3 unchanged absences. No exception or household preference edit or restore.",
+        "Family frame appearance and original runtime state are checked. Living visual remains open; normal diagnostics and recent samples are limited observations.",
+        "Public manifest stays 1.83/code77 and rejects local 1.115/code109. No phone, HA, authentication, push or publication; approvals and parked clocks remain.",
+        "Older malformed ISS and invalid Aurora hypotheses retain their exhausted clock. New Aurora forecast wording shares this audit clock and was not implemented."
+      ],
+      "next": "Retain the two-room delivery. Physical UI interleaving, API28, raw writers and disk durability remain open; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T09:46:04+00:00",
+        "deadline": "2026-11-03T10:16:04+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "calendar-recurring-window",
       "title": "Calendar: keep current events from old recurring feeds",

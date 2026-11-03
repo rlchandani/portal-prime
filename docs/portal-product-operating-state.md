@@ -13,8 +13,33 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / old recurring calendar series:** exact optimized
-  **1.114/code108** is installed and fully hashed in both rooms. Seek near the
+- **Current room APK / countdown list mutations:** exact optimized
+  **1.115/code109** is installed and fully hashed in both rooms. Shared object
+  monitor serialization keeps overlapping Add and Remove results; identity,
+  dates, payloads, order and asynchronous preference apply remain. Seven frozen
+  methods reproduce four failures then pass; **4,238 JVM/440 suites**,
+  debug/optimized/R8/vital lint pass in 2m 7s. Actual optimized Family CRUD improves
+  **4/8 to 8/8**, four corrections and four controls, 19 public calls and 11
+  generated applies per variant. All four owned executors per variant and both
+  native parents retire; scratch is removed. Complete captured maps and ten
+  preference states per room match: Family10 files and Living7 files are byte
+  identical, with three Living absences unchanged. No exception, edit or restore.
+  Family shows a tan digital night clock and November 3 date on black; font,
+  accessibility, original Chrome, resumed frame and awake display remain. Living
+  visual stays open. Normal diagnostics and recent samples are limited checks;
+  original registry unchanged, copied credentials removed.
+  Physical UI interleaving, native debug/API28, raw cross-process writers, storage
+  faults, asynchronous disk durability and external timeout cleanup remain open.
+  Public 1.83 guard rejects local 1.115; no phone/HA/auth/publication. **91 tasks:
+  56 delivered,25 locally verified,3 approval,6 parked,1 queued.** Original
+  **09:46:04–10:16:04 UTC** audit clock retained. Older ISS/Aurora hypotheses stay
+  on their exhausted clock; fresh Aurora forecast wording shares this clock and
+  was not implemented. Broader goal remains active.
+  [Receipt](portal-countdown-mutations-2026-11-03.md).
+
+- **Previous room APK / old recurring calendar series:** exact optimized
+  **1.114/code108** was installed and fully hashed in both rooms at that
+  delivery’s closure; the current countdown build supersedes it. Seek near the
   overlap window while preserving generated COUNT before EXDATE, BYDAY order,
   UNTIL, horizon and legacy monthly/yearly clamping. Original366 prospective
   periods and bounded pre-window attempts remain; first366 legacy steps replay.

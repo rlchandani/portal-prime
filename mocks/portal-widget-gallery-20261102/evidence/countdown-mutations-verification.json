@@ -1,0 +1,764 @@
+{
+  "recordedAt": "2026-11-03T10:00:39.970190+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T09:46:04+00:00",
+    "deadline": "2026-11-03T10:16:04+00:00",
+    "base": "19d2e303b7332a707e37cf5c7b1017094e0bf5a2",
+    "scope": "Fresh cross-product consumer audit after90-task backlog; no old parked clock or same-calendar cutoff restart. Discovery, selected implementation, verification, release, docs, cleanup and commit share this original clock."
+  },
+  "finding": {
+    "backlogRecordsReviewed": 90,
+    "trigger": "An in-flight Approved Tools IO countdown edit can overlap a Settings UI Add or Remove. Settings bypasses the private global Tools storage mutex. Individual preference writes do not serialize the complete load/modify/save transaction.",
+    "status": "Four actual public-config mutation races corrected and exact optimized delivery verified in both rooms.",
+    "twoToolsInstancesAlone": "Existing global EverydayStorageMutex already serializes the Approved Tools instances; that is not the bypass being corrected."
+  },
+  "correction": {
+    "scope": "Two @Synchronized public mutations on the existing CountdownConfig object; one boundary comment. Both Add and Remove hold the same monitor through load, modify and save.",
+    "retained": "Read-only load, JSON schema, fields, ordering, identity normalization, coercion, date policy, existing UI and asynchronous SharedPreferences.apply remain.",
+    "limits": "In-process only; raw preference writers, cross-process transactions and asynchronous disk durability are not established."
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/CountdownConfig.kt": "7de6805d2c5d79b0dc034ec612a63725e119977f769de598ca89c094b4259afa",
+    "app/src/test/java/com/immortal/launcher/CountdownConfigMutationTest.kt": "4bc64a94c8c91537d1600c3e859bc67d1fe42ee089d76a821f72ddb8aebd4a88",
+    "app/build.gradle.kts": "8cd119828cbceecc65f90a34bc58b4fb2c4d4232b388e4f44807ff7791faf23b"
+  },
+  "red": {
+    "terminalExit": 1,
+    "tests": 7,
+    "failures": 4,
+    "passingControls": 3,
+    "errors": 0,
+    "skips": 0,
+    "failedMethods": [
+      "concurrentAddsRetainBothEventsAndSavedNeighbors",
+      "concurrentRemovalsKeepBothDeletions",
+      "removalRacingAddCannotDiscardTheAddedEvent",
+      "addRacingRemovalCannotResurrectTheRemovedEvent"
+    ],
+    "frozenTestSha256": "4bc64a94c8c91537d1600c3e859bc67d1fe42ee089d76a821f72ddb8aebd4a88",
+    "baselineSourceSha256": "e545b4f458923b337e7033ba210ad84b05317d3fe84bcc98120296dc3fc7ff22",
+    "logBinding": {
+      "sha256": "abc9ebab99e88695fca5a97f929e1e415642ded81b168d9f39f1e61235b662bc",
+      "bytes": 2883
+    },
+    "xmlBinding": {
+      "sha256": "2502e353d6a90429ca349116ae4801e6ccb0afccce4d783246750095ff31d040",
+      "bytes": 20560
+    },
+    "scope": "Actual CountdownConfig calls under independent generated editor staged values. First apply is held. A contender completes or blocks at the actual Add/Remove frame. Both workers join and terminate before product assertions; no sleeps or annotation inspection.",
+    "excludedExecutionAttempts": 0
+  },
+  "green": {
+    "suites": 440,
+    "tests": 4238,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualCountdownMutationFocusedTests": 7,
+    "allSevenUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 7s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "buildBindings": {
+    "log": {
+      "sha256": "22ef8a0ec9801b6b01e081961ff3f531ac301664ba207116bc092d29c0448f4d",
+      "bytes": 13731
+    },
+    "packageProofLog": {
+      "sha256": "82f26fe3eeac9cd7a5da42bbe5eae35fdc24f6523b53f59fa8b7efe5692838c9",
+      "bytes": 607
+    },
+    "fullXmlAggregateSha256": "5e4f99ccf6dade6e77699ba2dd2c776abf3d6fb7a915230404e7f59578ee3cc8",
+    "fullXmlFiles": 440,
+    "independentlyRecountedTotals": {
+      "tests": 4238,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "native": {
+    "runs": {
+      "baseline": {
+        "result": {
+          "status": "FAIL",
+          "checks": {
+            "actualOptimizedAPKClassLoader": true,
+            "concurrentAddsKeepBothDates": false,
+            "addThenRemoveKeepsAdditionAndRemoval": false,
+            "removeThenAddCannotResurrectDate": false,
+            "concurrentRemovesDoNotResurrectDates": false,
+            "sequentialCrudAndExistingCoercionRetained": true,
+            "legacyIdentityLoadRemainsStableAndReadOnly": true,
+            "strictGeneratedStorageAndAllWorkersRetired": true
+          },
+          "observations": {
+            "concurrentAddsKeepBothDates": {
+              "actualLabels": [
+                "Remove A",
+                "Remove B",
+                "Keep Ω",
+                "First"
+              ],
+              "expectedLabels": [
+                "Remove A",
+                "Remove B",
+                "Keep Ω",
+                "First",
+                "Second"
+              ],
+              "competitorBeforeRelease": "completedBeforeFirstWrite",
+              "competitorBlockedAt": "none",
+              "generatedApplies": 2,
+              "workersRetired": true
+            },
+            "addThenRemoveKeepsAdditionAndRemoval": {
+              "actualLabels": [
+                "Remove A",
+                "Remove B",
+                "Keep Ω",
+                "New"
+              ],
+              "expectedLabels": [
+                "Remove B",
+                "Keep Ω",
+                "New"
+              ],
+              "competitorBeforeRelease": "completedBeforeFirstWrite",
+              "competitorBlockedAt": "none",
+              "generatedApplies": 2,
+              "workersRetired": true
+            },
+            "removeThenAddCannotResurrectDate": {
+              "actualLabels": [
+                "Remove B",
+                "Keep Ω"
+              ],
+              "expectedLabels": [
+                "Remove B",
+                "Keep Ω",
+                "New"
+              ],
+              "competitorBeforeRelease": "completedBeforeFirstWrite",
+              "competitorBlockedAt": "none",
+              "generatedApplies": 2,
+              "workersRetired": true
+            },
+            "concurrentRemovesDoNotResurrectDates": {
+              "actualLabels": [
+                "Remove B",
+                "Keep Ω"
+              ],
+              "expectedLabels": [
+                "Keep Ω"
+              ],
+              "competitorBeforeRelease": "completedBeforeFirstWrite",
+              "competitorBlockedAt": "none",
+              "generatedApplies": 2,
+              "workersRetired": true
+            }
+          },
+          "passed": 4,
+          "total": 8,
+          "apkSha256": "28509be865cc279d5d002a3021034ffacb6fcffa9d89970c65820cacb0849df9",
+          "actualPublicConfigInvocations": 19,
+          "generatedPreferencesApplies": 11,
+          "generatedExecutorsRetired": 4,
+          "ownerPreferencesWritten": 0,
+          "networkOperations": 0,
+          "providerOrServiceStarted": false,
+          "actualMethods": [
+            "public static java.util.List com.immortal.launcher.DavSource.m0(android.content.Context)",
+            "public static void com.immortal.launcher.DavSource.P(android.content.Context,java.lang.String,java.lang.String,int,int,int)",
+            "public static void com.immortal.launcher.DavSource.z0(android.content.Context,long)"
+          ],
+          "scope": "Actual optimized public CRUD with deterministic generated editor contention; no owner prefs, date UI, services, provider or network"
+        },
+        "process": {
+          "terminalExit": 1,
+          "stdoutBytes": 2175,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "974dd66fbce97cc00b5c9a07542edf9c58aa9e1a2ede1ba2c2cfd7f11e06ecdf",
+          "bytes": 2844
+        },
+        "processBinding": {
+          "sha256": "6c76542f571a089567f4e1320219090d27c7b7f9a393ba43c28f1b51d8ea93d3",
+          "bytes": 67
+        },
+        "stdoutBinding": {
+          "sha256": "e1c5ce74cf597fc48afb57a44633495bca95f1b13e33984da233b29bf425939d",
+          "bytes": 2175
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "candidate": {
+        "result": {
+          "status": "PASS",
+          "checks": {
+            "actualOptimizedAPKClassLoader": true,
+            "concurrentAddsKeepBothDates": true,
+            "addThenRemoveKeepsAdditionAndRemoval": true,
+            "removeThenAddCannotResurrectDate": true,
+            "concurrentRemovesDoNotResurrectDates": true,
+            "sequentialCrudAndExistingCoercionRetained": true,
+            "legacyIdentityLoadRemainsStableAndReadOnly": true,
+            "strictGeneratedStorageAndAllWorkersRetired": true
+          },
+          "observations": {
+            "concurrentAddsKeepBothDates": {
+              "actualLabels": [
+                "Remove A",
+                "Remove B",
+                "Keep Ω",
+                "First",
+                "Second"
+              ],
+              "expectedLabels": [
+                "Remove A",
+                "Remove B",
+                "Keep Ω",
+                "First",
+                "Second"
+              ],
+              "competitorBeforeRelease": "BLOCKED",
+              "competitorBlockedAt": "com.immortal.launcher.Http.e",
+              "generatedApplies": 2,
+              "workersRetired": true
+            },
+            "addThenRemoveKeepsAdditionAndRemoval": {
+              "actualLabels": [
+                "Remove B",
+                "Keep Ω",
+                "New"
+              ],
+              "expectedLabels": [
+                "Remove B",
+                "Keep Ω",
+                "New"
+              ],
+              "competitorBeforeRelease": "BLOCKED",
+              "competitorBlockedAt": "com.immortal.launcher.Http.b0",
+              "generatedApplies": 2,
+              "workersRetired": true
+            },
+            "removeThenAddCannotResurrectDate": {
+              "actualLabels": [
+                "Remove B",
+                "Keep Ω",
+                "New"
+              ],
+              "expectedLabels": [
+                "Remove B",
+                "Keep Ω",
+                "New"
+              ],
+              "competitorBeforeRelease": "BLOCKED",
+              "competitorBlockedAt": "com.immortal.launcher.Http.e",
+              "generatedApplies": 2,
+              "workersRetired": true
+            },
+            "concurrentRemovesDoNotResurrectDates": {
+              "actualLabels": [
+                "Keep Ω"
+              ],
+              "expectedLabels": [
+                "Keep Ω"
+              ],
+              "competitorBeforeRelease": "BLOCKED",
+              "competitorBlockedAt": "com.immortal.launcher.Http.b0",
+              "generatedApplies": 2,
+              "workersRetired": true
+            }
+          },
+          "passed": 8,
+          "total": 8,
+          "apkSha256": "60ac84d47756fa97cf9fab0dbcaa9a2eb4beba7931111782c3c8b62fe5066f6a",
+          "actualPublicConfigInvocations": 19,
+          "generatedPreferencesApplies": 11,
+          "generatedExecutorsRetired": 4,
+          "ownerPreferencesWritten": 0,
+          "networkOperations": 0,
+          "providerOrServiceStarted": false,
+          "actualMethods": [
+            "public static java.util.List com.immortal.launcher.Http.J(android.content.Context)",
+            "public synchronized void com.immortal.launcher.Http.e(android.content.Context,java.lang.String,java.lang.String,int,int,int)",
+            "public synchronized void com.immortal.launcher.Http.b0(android.content.Context,long)"
+          ],
+          "scope": "Actual optimized public CRUD with deterministic generated editor contention; no owner prefs, date UI, services, provider or network"
+        },
+        "process": {
+          "terminalExit": 0,
+          "stdoutBytes": 2186,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "a2ac5b88519665de6a75248c2bc7cc2fe194801fd4ffa91e0a2cac699a3a2fc6",
+          "bytes": 2855
+        },
+        "processBinding": {
+          "sha256": "4338a6591d95eb952d7c271b98be60055290fc0210867e47743f147335531b0d",
+          "bytes": 67
+        },
+        "stdoutBinding": {
+          "sha256": "cedae8fa2da0ed3a392aa46061da9981a066b7ec35f0edd55ddfad884aaa5b27",
+          "bytes": 2186
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    },
+    "binding": {
+      "fixtureSourceSha256": "bb3516bdbb8aa38fd6f888b245f342840584e535e37237318c74bb50212c1a64",
+      "fixtureJarSha256": "6e8bd6c0e458e4120e74a783e6a88bdaee73918e3b0809324adb15a0f6045da9",
+      "compilerSha256": "24ac1684fd81f8bcfb472377668c733448e411f39ada45880afdbc755d66a12e",
+      "runnerSha256": "be5bba1da178513b4db2093f3ea6a65f44d8b707a3a7eb95c9a40ae4920e842d",
+      "phases": [
+        "baseline",
+        "candidate"
+      ],
+      "mappedBindings": {
+        "baseline": [
+          "com.immortal.launcher.DavSource",
+          "m0",
+          "-",
+          "com.immortal.launcher.DavSource",
+          "P",
+          "-",
+          "com.immortal.launcher.DavSource",
+          "z0",
+          "-",
+          "a",
+          "b"
+        ],
+        "candidate": [
+          "com.immortal.launcher.Http",
+          "J",
+          "n",
+          "com.immortal.launcher.Http",
+          "e",
+          "n",
+          "com.immortal.launcher.Http",
+          "b0",
+          "n",
+          "a",
+          "b"
+        ]
+      },
+      "apkSha256": {
+        "baseline": "28509be865cc279d5d002a3021034ffacb6fcffa9d89970c65820cacb0849df9",
+        "candidate": "60ac84d47756fa97cf9fab0dbcaa9a2eb4beba7931111782c3c8b62fe5066f6a"
+      },
+      "scope": "Actual optimized public CRUD with generated strict in-memory preferences and deterministic first-apply contention; normal executor/process cleanup only"
+    },
+    "cleanup": {
+      "parentsRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "ownedScratchRemoved": true,
+      "faults": [],
+      "ownerPreferencesWritten": 0,
+      "networkOperations": 0,
+      "providerOrServiceStarted": false,
+      "externalTimeoutFailureCleanupFaultInjected": false
+    },
+    "compilerLog": {
+      "sha256": "a928bfe14e9d90376e9a93e19e3f70cac4e735afc24bbcae1ff5bf326f04f681",
+      "bytes": 578
+    },
+    "compilerWarnings": 3,
+    "compilerWarningScope": "Java source/target8 obsolescence only; actual compile exit0.",
+    "runnerLog": {
+      "sha256": "97c3ccdee47f4660bcf9a8789ef572303daa3c7bb738b348156bb046acc038e1",
+      "bytes": 308
+    },
+    "acceptedParents": 2,
+    "acceptedPublicConfigInvocations": 38,
+    "generatedAppliesTotal": 22,
+    "ownedExecutorsRetiredTotal": 8,
+    "correctedChecks": 4,
+    "retainedControls": 4,
+    "preExecutionMonitorGuardCorrection": {
+      "correctedAt": "2026-11-03T09:54:00.337124+00:00",
+      "beforeSourceSha256": "ab3f03da1675ebf61d415a1958be32dca8c834acc67a3cff3b5f865c263d2111",
+      "finalSourceSha256": "bb3516bdbb8aa38fd6f888b245f342840584e535e37237318c74bb50212c1a64",
+      "finalRunnerSha256": "be5bba1da178513b4db2093f3ea6a65f44d8b707a3a7eb95c9a40ae4920e842d",
+      "compilerSha256": "24ac1684fd81f8bcfb472377668c733448e411f39ada45880afdbc755d66a12e",
+      "reason": "Require actual exact mapped add/remove top stack frame while BLOCKED; exclude unrelated proxy/class-initialization contention. Product expectations unchanged.",
+      "fixtureCompilationsBeforeCorrection": 0,
+      "fixtureExecutionsBeforeCorrection": 0
+    },
+    "preExecutionGuardHistoryBinding": {
+      "sha256": "7572a482de003be8a6028e3490e3a2af7cb6e14bb6d3f77af37c324b9a119cbe",
+      "bytes": 678
+    },
+    "executedExcludedAttempts": 0,
+    "scope": "Family Android10 actual optimized public config CRUD, generated strict in-memory preferences and deterministic first-apply contention. Exact mapped blocked frame admission; source/JAR/runner, canonical scratch owner and LF marker, APK allowlist and full bytes guarded. No household preferences, providers, services, UI or network calls by fixture.",
+    "limits": "Physical Tools-to-Settings interleaving, native debug, API28, cross-process/raw preference writers, storage failures, disk durability and external timeout/failure cleanup fault injection remain unverified."
+  },
+  "artifact": {
+    "sha256": "60ac84d47756fa97cf9fab0dbcaa9a2eb4beba7931111782c3c8b62fe5066f6a",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.115",
+    "versionCode": 109,
+    "variants": {
+      "performance": {
+        "sha256": "60ac84d47756fa97cf9fab0dbcaa9a2eb4beba7931111782c3c8b62fe5066f6a",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.115",
+        "versionCode": 109
+      },
+      "debug": {
+        "sha256": "ab0d8b91d1e9cf9de69dd5c6b1d48c2c5d7c1e2b70e0fd4a0d5f284530cf5c8f",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.115",
+        "versionCode": 109
+      },
+      "rollback": {
+        "sha256": "28509be865cc279d5d002a3021034ffacb6fcffa9d89970c65820cacb0849df9",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.114",
+        "versionCode": 108
+      }
+    },
+    "debugSha256": "ab0d8b91d1e9cf9de69dd5c6b1d48c2c5d7c1e2b70e0fd4a0d5f284530cf5c8f",
+    "rollbackSha256": "28509be865cc279d5d002a3021034ffacb6fcffa9d89970c65820cacb0849df9",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 7s"
+  },
+  "artifactBindings": {
+    "baselineMapping": {
+      "sha256": "1579aa4523c92a1ee3045181d46f5e3adc16cbec63e928d438989c4e33bde2cb",
+      "bytes": 83197348
+    },
+    "candidateMapping": {
+      "sha256": "cd80b7cbb24f993e3940b0064de111057722a225c5de0a46b1ee8f119c29a163",
+      "bytes": 83199447
+    },
+    "baselineSource": {
+      "sha256": "e545b4f458923b337e7033ba210ad84b05317d3fe84bcc98120296dc3fc7ff22",
+      "bytes": 4927
+    },
+    "baselineVersion": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "nativeSource": {
+      "sha256": "bb3516bdbb8aa38fd6f888b245f342840584e535e37237318c74bb50212c1a64",
+      "bytes": 14444
+    },
+    "nativePriorUnexecutedSource": {
+      "sha256": "ab3f03da1675ebf61d415a1958be32dca8c834acc67a3cff3b5f865c263d2111",
+      "bytes": 13880
+    },
+    "nativeCompiler": {
+      "sha256": "24ac1684fd81f8bcfb472377668c733448e411f39ada45880afdbc755d66a12e",
+      "bytes": 1846
+    },
+    "nativeRunner": {
+      "sha256": "be5bba1da178513b4db2093f3ea6a65f44d8b707a3a7eb95c9a40ae4920e842d",
+      "bytes": 9004
+    },
+    "nativeJar": {
+      "sha256": "6e8bd6c0e458e4120e74a783e6a88bdaee73918e3b0809324adb15a0f6045da9",
+      "bytes": 10039
+    }
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "terminalExit": 0,
+    "checks": {
+      "family": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true,
+        "fontUnchanged": true,
+        "accessibilityUnchanged": true,
+        "originalChromeTaskRetained": true,
+        "photoFrameResumed": true,
+        "displayOn": true,
+        "installedFullSha256Matches": true
+      },
+      "living": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true
+      }
+    },
+    "preferenceStates": {
+      "family": {
+        "states": 10,
+        "existingFilesByteIdentical": 10,
+        "absencesUnchanged": 0
+      },
+      "living": {
+        "states": 10,
+        "existingFilesByteIdentical": 7,
+        "absencesUnchanged": 3
+      }
+    },
+    "preferenceNames": [
+      "immortal_countdown",
+      "immortal_home_widgets",
+      "immortal_timers",
+      "immortal_timer",
+      "immortal_sunrise",
+      "immortal_chime",
+      "immortal_weather",
+      "immortal_packs",
+      "immortal_cameras",
+      "immortal_screensaver"
+    ],
+    "exceptions": [],
+    "ownerPreferenceEditsOrRestores": 0,
+    "scope": "Complete captured screensaver/profile/layout/photo-source maps and ten named preference states per room. Name/devMode retained. Family font/services/original Chrome/frame/awake/full APK hash checked. Living Fleet only; visual acceptance open.",
+    "familyScreenshotBinding": {
+      "sha256": "a87b141504e0473d7bf1c95fe77629b6462a341dcaf6a99b6e8385a9af479de4",
+      "bytes": 57948
+    },
+    "familyScreenshotRootVisuallyInspected": true,
+    "familyScreenshotObservation": "Large tan digital night clock and Tuesday November3 date on black. Resumed frame and awake display independently checked; this screenshot does not show photos or Weather.",
+    "livingVisualAcceptance": "Unverified"
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1607,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1504,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "cleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "observationTerminals": {
+    "health": {
+      "terminalExit": 0,
+      "stdoutSha256": "0847a636fddc748eebcc59e9befc07d8fcbc69bec61fadcd3c72389ffbc252cf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 307
+    },
+    "credentials": {
+      "terminalExit": 0,
+      "stdoutSha256": "8b9a40758c4c5b2d70128c944dcd3fe5781051f6fe0c4723229d6b50028566d8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 65
+    },
+    "guard": {
+      "terminalExit": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "0775793de49d442979b3247600a95f65d0e69af6eda81229eeb70f0800af2a98",
+      "stdoutBytes": 0
+    },
+    "screenshot": {
+      "terminalExit": 0,
+      "stdoutSha256": "a87b141504e0473d7bf1c95fe77629b6462a341dcaf6a99b6e8385a9af479de4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 57948
+    }
+  },
+  "publicRelease": {
+    "guardTerminalExit": 1,
+    "expectedRejection": true,
+    "guardLogBinding": {
+      "sha256": "0775793de49d442979b3247600a95f65d0e69af6eda81229eeb70f0800af2a98",
+      "bytes": 223
+    },
+    "publicManifestByteUnchanged": true,
+    "publicVersionName": "1.83",
+    "publicVersionCode": 77,
+    "localVersionName": "1.115",
+    "localVersionCode": 109,
+    "githubAuthenticationPushOrPublication": false
+  },
+  "nativeFleetCli": {
+    "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "bytes": 694352,
+    "unchanged": true,
+    "rebuiltOrReinstalled": false
+  },
+  "review": {
+    "blockingFindings": [],
+    "sourceReviewBinding": {
+      "sha256": "08f021b24b6aaa9e0ae1780c9c705068ec22ddc8d440943bb28cffc9aa0bc51c",
+      "bytes": 5031
+    },
+    "independentSourceReviewBinding": {
+      "sha256": "f62215b69ec20a1380b3c91adf309ab34e39b8f6b5ba5c8f822e55996e0f4ea7",
+      "bytes": 5592
+    },
+    "independentGateNativeReviewBinding": {
+      "sha256": "6b7e59a6fde77942e0c15109c36b9491b9dc5279e7e8a077e771a19e5677012e",
+      "bytes": 10352
+    }
+  },
+  "documentation": {
+    "closingVerificationPending": false,
+    "initialFinalContentTerminalChecks": {
+      "strict-docs": {
+        "terminalExit": 0,
+        "durationSeconds": 2.269,
+        "logSha256": "d8c9e88635ed353313e0099251fbb0d8b962d6913db704bd9d2c1d010a08dcca",
+        "logBytes": 31507
+      },
+      "roadmap": {
+        "terminalExit": 0,
+        "durationSeconds": 5.125,
+        "logSha256": "636c009aff0da003688a17d5c70bef274670c2943bb6f3bebd2eac69eaeb9a10",
+        "logBytes": 1457
+      }
+    },
+    "strictMkdocsWarnings": 0,
+    "strictMkdocsErrors": 0,
+    "roadmapAcceptance": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 91,
+          "checks": [
+            {
+              "id": "countdown-mutations",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 91,
+          "checks": [
+            {
+              "id": "countdown-mutations",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "rootInspectedBothScreenshots": true,
+    "screenshotBindings": {
+      "390": {
+        "sha256": "3cc7a8f67ded8331da4e4b2c18bc1639d41f19578d39790ea3f1277aa4386457",
+        "bytes": 228076
+      },
+      "1600": {
+        "sha256": "bf33d45983579e90d9f0f1c5decf1aea54992b3cfb7019ea657c007c6b7b6982",
+        "bytes": 129844
+      }
+    },
+    "prior90ObjectsAndCompleteRawSerializationSuffixVerified": true,
+    "priorRawTaskSuffixSha256": "d423e8298c75b6e1b599cd0c1304b18e3b3806ac96fa3af28697cd3db85dadca",
+    "defaultAndOtherBoundariesPreserved": true,
+    "noProductUiOrCssChange": true,
+    "finalServedProofCheck": "A separate closing check must bind these final proof bytes; its receipt is private to avoid recursive proof hashes."
+  },
+  "backlog": {
+    "tasks": 91,
+    "delivered": 56,
+    "verified": 25,
+    "approval": 3,
+    "parked": 6,
+    "queued": 1,
+    "priorTaskObjects": 90,
+    "priorTaskObjectsAndRawSerializationUnchanged": true,
+    "defaultTaskPreserved": "weather-native-layout",
+    "boundaryChange": "Only current room version1.114/code108 to1.115/code109; all other boundary text remains."
+  },
+  "deferredHypotheses": {
+    "olderMalformedISSAndInvalidAurora": "Previously recorded under07:36:53–08:06:53UTC, exhausted; not reopened.",
+    "olderTimerAlarmAudioTrackCleanup": "Previously observed under08:51:50–09:21:50UTC, exhausted; not reopened.",
+    "bedtimeTtsCompletion": "Already documented in older Tools inventory; not a fresh finding.",
+    "freshAuroraForecastDetail": "Source hypothesis: forecast peak is labelled Kp now. First discovered in this09:46:04–10:16:04UTC audit; not implemented, no new clock."
+  },
+  "limits": [
+    "No phone/Pixel access, HA changes, provider login, GitHub authentication, push or publication.",
+    "Public1.83/code77 stays unchanged and local1.115/code109 is not publication eligible.",
+    "Normal worker/parent/scratch cleanup is observed, not externally fault-injected timeout or crash cleanup.",
+    "Existing design approvals and exhausted issue clocks remain; broader goal remains active."
+  ]
+}
