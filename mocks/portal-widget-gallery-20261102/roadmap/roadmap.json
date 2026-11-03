@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T13:52:21.072390+00:00",
+  "updatedAt": "2026-11-03T14:20:27.770563+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,58 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.124/code118. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.125/code119. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "crash-guard-clock-reset",
+      "title": "Crash guard: reset the streak after a backward clock correction",
+      "summary": "Delivered 1.125: backward wall-clock movement starts a fresh rapid-crash streak.",
+      "description": "A backward wall-clock correction now starts a fresh rapid-crash streak with count 1 and a relaunch decision. Equal timestamps and forward gaps below 10000ms retain rapid counting and the three-crash cap; exactly 10000ms resets. Handler installation, persisted keys/commit and relaunch scheduling remain unchanged.",
+      "status": "delivered",
+      "verification": "6 frozen tests: 2 AssertionErrors to pass; 4,337 JVM / 450 suites; pure decision only",
+      "kind": "Crash guard elapsed-time decision",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Launcher recovery / independent source and gate review",
+      "deployment": "Exact optimized 1.125/code119 installed and fully hashed in Family Area and Living Area.",
+      "state": "Four complete maps, room name and Dev Mode match. Thirteen raw preference states per room match: Family 12 byte-identical files and 1 unchanged absence; Living 8 byte-identical files and 5 unchanged absences. The captured crash_guard file stays byte-identical in Family and absent in Living. Family font, accessibility, original Chrome, resumed frame and awake display remain. The current Family frame was viewed privately; Living visual remains open. Limited HTTP200 /diag and /logcat?lines=1500 observations produce 1644/2023 actual lines without fatal or ANR markers. Copied credentials are removed; original registry, public 1.83/code77 manifest and native fleet CLI remain unchanged.",
+      "acceptance": [
+        "Freeze literal actual CrashGuard.decide expectations on unchanged production source.",
+        "Reset negative elapsed time to count 1 with a relaunch decision.",
+        "Retain equal-time, inside-window, exact-boundary and spaced-recovery controls.",
+        "Retain handler, committed preference keys and RTC relaunch wiring.",
+        "Deliver exact signed optimized bytes while preserving four maps and thirteen raw preference states."
+      ],
+      "evidence": [
+        {
+          "text": "Actual pure decision, unchanged baseline, correction, delivery and limits.",
+          "source": "docs/portal-crash-guard-clock-reset-2026-11-03.md"
+        },
+        {
+          "text": "Bound frozen tests, gate, static branches, artifacts and state preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/crash-guard-clock-reset-verification.json"
+        }
+      ],
+      "limits": [
+        "Acceptance calls actual production CrashGuard.decide directly with six frozen literal pairs. There is no modeled decision, extraction, private-state injection, Android mock, actual crash or wall-clock change.",
+        "The pure decision resets a prior rapid streak after backward wall-clock movement. Equal timestamps and forward gaps below 10000ms retain the existing rapid-count policy; exactly 10000ms resets. This does not reconstruct a monotonic history or change corrupt/extreme input policy.",
+        "Uncaught-handler installation, committed preferences and RTC relaunch wiring are source-reviewed. Static debug and optimized branch inspection is structural only; no native or optimized execution, real crash, process relaunch, alarm delivery, chooser, API28/29 or physical recovery acceptance.",
+        "Two baseline failures are java.lang.AssertionError from literal Pair comparisons, with four retained controls. Broad inventory/static pretty-print truncations and a private annotation-count predicate failure are excluded from full-read/runtime claims and retained privately; no product rerun is attributed to those inspections.",
+        "Family frame review covers the current private frame only. Living visual remains open. Limited lines=1500 diagnostics do not establish complete runtime health.",
+        "The original 13:59:29–14:29:29 UTC clock includes all remote/media inventory and delivery work. Unselected cursor ordering and all older keyboard, phone, control, Quickbar and held scopes retain their original clocks.",
+        "Public manifest remains 1.83/code77. Existing phone-control, publication, HA and design-approval restrictions remain."
+      ],
+      "next": "Retain decision regression; real crash, clock changes, relaunch, native/optimized execution, alarm, UI and API28 acceptance remain open.",
+      "issueClock": {
+        "startedAt": "2026-11-03T13:59:29Z",
+        "deadline": "2026-11-03T14:29:29Z",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "soundscape-ownership",
       "title": "Soundscapes: retain each render run's ownership",

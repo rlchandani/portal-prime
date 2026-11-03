@@ -81,10 +81,12 @@ object CrashGuard {
 
   /**
    * Pure loop-breaker decision (no Android deps, so it's unit-tested directly). Crashes within
-   * [WINDOW_MS] of the previous one accumulate; spacing them out resets the streak to 1.
+   * [WINDOW_MS] of the previous one accumulate; spacing them out or moving the wall clock backward
+   * resets the streak to 1.
    */
   internal fun decide(nowMs: Long, lastCrashMs: Long, prevCount: Int): Pair<Boolean, Int> {
-    val count = if (nowMs - lastCrashMs < WINDOW_MS) prevCount + 1 else 1
+    val elapsedMs = nowMs - lastCrashMs
+    val count = if (elapsedMs >= 0 && elapsedMs < WINDOW_MS) prevCount + 1 else 1
     return (count <= MAX_RAPID) to count
   }
 

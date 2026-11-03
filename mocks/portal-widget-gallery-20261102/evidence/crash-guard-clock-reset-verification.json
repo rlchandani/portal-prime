@@ -1,0 +1,831 @@
+{
+  "schemaVersion": 1,
+  "taskId": "crash-guard-clock-reset",
+  "recordedAt": "2026-11-03T14:20:27.770563+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T13:59:29Z",
+    "deadline": "2026-11-03T14:29:29Z",
+    "originalIndependentAuditClockRetained": true
+  },
+  "scope": "Direct actual pure CrashGuard.decide; exact optimized delivery, preservation and limited observations. Packaged structural inspection only.",
+  "baseline": {
+    "tests": 6,
+    "failures": 2,
+    "controls": 4,
+    "errors": 0,
+    "skips": 0,
+    "actualExit": 1,
+    "sourceSha256": "a172777cdd034df0d2982a243fd26b9476fe74f2c1b21dac3ba9994009597557",
+    "frozenTestSha256": "690dcd40f89984dc0940c2fee1c8f9124c637c52ad9cbcd41a94bdc8e68ec5e3",
+    "methods": [
+      {
+        "name": "exactWindowBoundaryResetsTheRapidStreak",
+        "failure": false,
+        "message": null
+      },
+      {
+        "name": "backwardClockCorrectionReenablesRelaunchAfterTheRapidCap",
+        "failure": true,
+        "message": "java.lang.AssertionError: expected:<(true, 1)> but was:<(false, 4)>"
+      },
+      {
+        "name": "wellSpacedForwardCrashReenablesASuppressedStreak",
+        "failure": false,
+        "message": null
+      },
+      {
+        "name": "equalTimestampStillContinuesTheRapidStreakPastTheCap",
+        "failure": false,
+        "message": null
+      },
+      {
+        "name": "forwardCrashInsideTheWindowRetainsTheRapidStreak",
+        "failure": false,
+        "message": null
+      },
+      {
+        "name": "backwardClockCorrectionResetsANormalStreak",
+        "failure": true,
+        "message": "java.lang.AssertionError: expected:<(true, 1)> but was:<(true, 2)>"
+      }
+    ],
+    "untouchedSource": true,
+    "literalCases": [
+      {
+        "method": "backwardClockCorrectionResetsANormalStreak",
+        "nowMs": 1700000000000,
+        "lastCrashMs": 1700000001000,
+        "prevCount": 1,
+        "literalExpected": [
+          true,
+          1
+        ]
+      },
+      {
+        "method": "backwardClockCorrectionReenablesRelaunchAfterTheRapidCap",
+        "nowMs": 1700000000000,
+        "lastCrashMs": 1700000060000,
+        "prevCount": 3,
+        "literalExpected": [
+          true,
+          1
+        ]
+      },
+      {
+        "method": "equalTimestampStillContinuesTheRapidStreakPastTheCap",
+        "nowMs": 1700000000000,
+        "lastCrashMs": 1700000000000,
+        "prevCount": 3,
+        "literalExpected": [
+          false,
+          4
+        ]
+      },
+      {
+        "method": "forwardCrashInsideTheWindowRetainsTheRapidStreak",
+        "nowMs": 1700000009999,
+        "lastCrashMs": 1700000000000,
+        "prevCount": 2,
+        "literalExpected": [
+          true,
+          3
+        ]
+      },
+      {
+        "method": "exactWindowBoundaryResetsTheRapidStreak",
+        "nowMs": 1700000010000,
+        "lastCrashMs": 1700000000000,
+        "prevCount": 3,
+        "literalExpected": [
+          true,
+          1
+        ]
+      },
+      {
+        "method": "wellSpacedForwardCrashReenablesASuppressedStreak",
+        "nowMs": 1700000060000,
+        "lastCrashMs": 1700000000000,
+        "prevCount": 4,
+        "literalExpected": [
+          true,
+          1
+        ]
+      }
+    ]
+  },
+  "candidateJVM": {
+    "suites": 450,
+    "tests": 4337,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualCrashGuardFocusedTests": 6,
+    "allFocusedUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "1m 45s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "artifacts": {
+    "sha256": "88e0915362f98cc9f76ff7420a6569351b8509b12b37b380f3566b8ea32b30e1",
+    "bytes": 25879086,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.125",
+    "versionCode": 119,
+    "variants": {
+      "performance": {
+        "sha256": "88e0915362f98cc9f76ff7420a6569351b8509b12b37b380f3566b8ea32b30e1",
+        "bytes": 25879086,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.125",
+        "versionCode": 119
+      },
+      "debug": {
+        "sha256": "75b475c0f8646ab60eb99f2945e4145e58703456925b9cd0c6e504c20c55f013",
+        "bytes": 46703533,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.125",
+        "versionCode": 119
+      },
+      "rollback": {
+        "sha256": "ca66cd6f29af3a635c1bddfb406a3420e45c37de52f040b5a6b26180268bb4e6",
+        "bytes": 25879086,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.124",
+        "versionCode": 118
+      }
+    },
+    "debugSha256": "75b475c0f8646ab60eb99f2945e4145e58703456925b9cd0c6e504c20c55f013",
+    "rollbackSha256": "ca66cd6f29af3a635c1bddfb406a3420e45c37de52f040b5a6b26180268bb4e6",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "1m 45s"
+  },
+  "sourceBindings": {
+    "app/src/main/java/com/immortal/launcher/CrashGuard.kt": {
+      "sha256": "5d4348881002683f3ded105800ad62e1dfc57135f5f1c5c9421fd5466eb5efc5",
+      "bytes": 4888
+    },
+    "app/src/test/java/com/immortal/launcher/CrashGuardClockTest.kt": {
+      "sha256": "690dcd40f89984dc0940c2fee1c8f9124c637c52ad9cbcd41a94bdc8e68ec5e3",
+      "bytes": 1876
+    },
+    "app/build.gradle.kts": {
+      "sha256": "43ad17c89ca17e3d78debcfb07e505603976734d727b18042c50144ff4c69bea",
+      "bytes": 11816
+    }
+  },
+  "reviews": {
+    "baseline": {
+      "status": "PASS",
+      "counts": {
+        "passed": 12,
+        "total": 12
+      },
+      "blockers": []
+    },
+    "gate": {
+      "status": "PASS",
+      "counts": {
+        "checks": 25,
+        "passed": 25,
+        "suites": 450,
+        "tests": 4337,
+        "focusedTests": 6,
+        "baselineFailures": 2,
+        "baselineControls": 4
+      },
+      "blockers": []
+    },
+    "delivery": {
+      "status": "PASS",
+      "counts": {
+        "checks": 35,
+        "passed": 35,
+        "rooms": 2,
+        "mapsPerRoom": 4,
+        "rawPreferenceStatesPerRoom": 13,
+        "rawPreferenceStates": 26,
+        "familyPresent": 12,
+        "familyAbsent": 1,
+        "livingPresent": 8,
+        "livingAbsent": 5,
+        "familyLogLines": 1644,
+        "livingLogLines": 2023
+      },
+      "blockers": []
+    },
+    "candidateDEX": {
+      "status": "PASS",
+      "counts": {
+        "checks": 15,
+        "passed": 15,
+        "CrashGuardMappingRows": 33,
+        "debugBaselineDecisionUnits": 31,
+        "debugCandidateDecisionUnits": 37,
+        "optimizedHandlerUnits": 178,
+        "selectedMethodDataBindings": 23,
+        "CrashGuardMappingCommentRows": 5
+      },
+      "blockers": []
+    },
+    "focused": {
+      "verdict": "PASS_FOCUSED_SOURCE_AND_FROZEN_TEST_REVIEW",
+      "passedChecks": 26,
+      "totalChecks": 26,
+      "blockers": []
+    }
+  },
+  "staticInspection": {
+    "status": "STATIC_ONLY",
+    "runtimeCalls": 0,
+    "nativeCalls": 0,
+    "realCrashCalls": 0,
+    "clockChanges": 0,
+    "optimizedOwner": "Lob0;",
+    "optimizedMethod": "uncaughtException",
+    "selectedEvidence": "Debug 31→37 units; optimized handler 178 units retains inlined nonnegative and 10000ms bounds. Original singleton removed; initial Application installs handler. Unrelated Application tails are byte-bound only.",
+    "limits": "Pure structural evidence; zero native/optimized execution or real recovery. Actual 33 selected mapping rows include 5 R8 comments; excluded private count predicate retained by admission-review binding."
+  },
+  "delivery": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "preferenceStates": {
+    "family": {
+      "states": 13,
+      "byteIdenticalPresent": 12,
+      "unchangedAbsences": 1,
+      "crashGuardPresent": true
+    },
+    "living": {
+      "states": 13,
+      "byteIdenticalPresent": 8,
+      "unchangedAbsences": 5,
+      "crashGuardPresent": false
+    }
+  },
+  "limitedHealth": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1644,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 2023,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "credentialCleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "visual": {
+    "status": "OBSERVED_CURRENT_FAMILY_FRAME",
+    "viewedAt": "2026-11-03T14:13:02.602765+00:00",
+    "screenshotSha256": "5ffe91b09ddb8e6269d07250cbaa8a51d7ebe428331f9091e85a340c8b7e5f05",
+    "screenshotBytes": 3156415,
+    "scope": "Private current Family frame only; Living visual and crash recovery unverified."
+  },
+  "terminals": {
+    "baseline-focused-terminal.json": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T14:05:02.056637+00:00",
+      "endedAt": "2026-11-03T14:05:11.119608+00:00",
+      "durationSeconds": 9.062971
+    },
+    "full-gate-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:05:36.438958+00:00",
+      "endedAt": "2026-11-03T14:07:22.889321+00:00",
+      "durationSeconds": 106.450363
+    },
+    "package-proof-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:07:41.380854+00:00",
+      "endedAt": "2026-11-03T14:07:42.272747+00:00",
+      "durationSeconds": 0.891893
+    },
+    "preflight-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:05:08.101754+00:00",
+      "endedAt": "2026-11-03T14:05:09.226138+00:00",
+      "durationSeconds": 1.124384
+    },
+    "room-deploy-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:12:14.904271+00:00",
+      "endedAt": "2026-11-03T14:12:29.044072+00:00",
+      "durationSeconds": 14.139801
+    },
+    "postflight-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:12:33.147687+00:00",
+      "endedAt": "2026-11-03T14:12:34.543396+00:00",
+      "durationSeconds": 1.395709
+    },
+    "health-observation-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:12:34.580720+00:00",
+      "endedAt": "2026-11-03T14:12:35.355238+00:00",
+      "durationSeconds": 0.774518
+    },
+    "family-capture-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:12:35.391203+00:00",
+      "endedAt": "2026-11-03T14:12:37.592013+00:00",
+      "durationSeconds": 2.20081
+    },
+    "cleanup-credentials-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:12:37.632315+00:00",
+      "endedAt": "2026-11-03T14:12:37.718636+00:00",
+      "durationSeconds": 0.086321
+    },
+    "static-bytecode-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:09:24.548137+00:00",
+      "endedAt": "2026-11-03T14:09:25.443026+00:00",
+      "durationSeconds": 0.894889
+    },
+    "public-version-guard-terminal.json": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T14:07:59.264886+00:00",
+      "endedAt": "2026-11-03T14:07:59.305068+00:00",
+      "durationSeconds": 0.040182
+    }
+  },
+  "backlogPreservation": {
+    "beforeTasks": 100,
+    "afterTasks": 101,
+    "allPriorTaskObjectsIdentical": true,
+    "completePriorRawSuffixIdentical": true,
+    "priorRawSuffix": {
+      "sha256": "dbc1c4d3b3ac229e95e9a7b54cd198496e6c7a2581653606b20c221009228a18",
+      "bytes": 331756
+    },
+    "defaultTask": "weather-native-layout",
+    "beforeCounts": {
+      "delivered": 65,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "afterCounts": {
+      "delivered": 66,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    }
+  },
+  "unchangedBoundaries": {
+    "publicManifestVersion": {
+      "versionName": "1.83",
+      "versionCode": 77
+    },
+    "version.json": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "provisioning/fleetctl": {
+      "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+      "bytes": 694352
+    }
+  },
+  "limits": [
+    "Acceptance calls actual production CrashGuard.decide directly with six frozen literal pairs. There is no modeled decision, extraction, private-state injection, Android mock, actual crash or wall-clock change.",
+    "The pure decision resets a prior rapid streak after backward wall-clock movement. Equal timestamps and forward gaps below 10000ms retain the existing rapid-count policy; exactly 10000ms resets. This does not reconstruct a monotonic history or change corrupt/extreme input policy.",
+    "Uncaught-handler installation, committed preferences and RTC relaunch wiring are source-reviewed. Static debug and optimized branch inspection is structural only; no native or optimized execution, real crash, process relaunch, alarm delivery, chooser, API28/29 or physical recovery acceptance.",
+    "Two baseline failures are java.lang.AssertionError from literal Pair comparisons, with four retained controls. Broad inventory/static pretty-print truncations and a private annotation-count predicate failure are excluded from full-read/runtime claims and retained privately; no product rerun is attributed to those inspections.",
+    "Family frame review covers the current private frame only. Living visual remains open. Limited lines=1500 diagnostics do not establish complete runtime health.",
+    "The original 13:59:29–14:29:29 UTC clock includes all remote/media inventory and delivery work. Unselected cursor ordering and all older keyboard, phone, control, Quickbar and held scopes retain their original clocks.",
+    "Public manifest remains 1.83/code77. Existing phone-control, publication, HA and design-approval restrictions remain."
+  ],
+  "privateEvidenceBindings": {
+    "baseline-red.json": {
+      "sha256": "61c07c980e948b63ac39298276fe3804e4d50776e0c299ea271b7832c30e1e2f",
+      "bytes": 1456
+    },
+    "frozen-red-xml/TEST-com.immortal.launcher.CrashGuardClockTest.xml": {
+      "sha256": "cb6512fb6cd563d83a0dbca747f4c549a0f827923a2aab1a483bc7c1ca579e12",
+      "bytes": 9747
+    },
+    "baseline-focused.log": {
+      "sha256": "3e1a1d57178bf288a680328f814f4520d60d0ed33dfa490bee3d4b175672d679",
+      "bytes": 2430
+    },
+    "frozen-test-plan.json": {
+      "sha256": "4a71e94f99e8bf6ee22a1f18841caa409f7d053c8a478731f426f6963864ca9b",
+      "bytes": 5875
+    },
+    "baseline-CrashGuard.kt": {
+      "sha256": "a172777cdd034df0d2982a243fd26b9476fe74f2c1b21dac3ba9994009597557",
+      "bytes": 4801
+    },
+    "source-baseline-review.json": {
+      "sha256": "d24cdf710167460f85bbf04f839699df19e45651f02df86377c62ccaba611e0b",
+      "bytes": 8049
+    },
+    "root-source-admission.json": {
+      "sha256": "1c96fadbf9d6b876decadba6004f3c07f4fdb6cef91120134ca676482806a4bc",
+      "bytes": 604
+    },
+    "root-focused-admission.json": {
+      "sha256": "f05169d7814561276d090dbbce1e593a56a0eb40e041f33ab5c5624142290913",
+      "bytes": 197
+    },
+    "implementation-scope.json": {
+      "sha256": "e196318956404e2489f1e9f2708315ca4636933613f8bea6d130fbba62236b9b",
+      "bytes": 1904
+    },
+    "crashguard-source-approach-review.json": {
+      "sha256": "72217358d3a23f57b2c78db5f3973f95576f4f151e5c3f9b2bb8309019153fb4",
+      "bytes": 9167
+    },
+    "crashguard-source-audit.json": {
+      "sha256": "a088af73b3ef1a55a9ac4967dc476d2b7ccadcfa3f7f3409dc592574d5c61ccd",
+      "bytes": 10918
+    },
+    "crashguard-history.json": {
+      "sha256": "ecd96c1bfc4496e61c3d2f6df06f6c01027b5ec03341705529b440a03cb30ef9",
+      "bytes": 29651
+    },
+    "remote-input-audit.json": {
+      "sha256": "2302ae39cd0fe061eea0daced25f5ac5d34ac65608f6e090c407df8d4caa8cc7",
+      "bytes": 42402
+    },
+    "media-listener-audit.json": {
+      "sha256": "df1c9c6af3351a9b54c54850cac053e6419bd28e53dce7272f9982c826441775",
+      "bytes": 39916
+    },
+    "focused-source-review.json": {
+      "sha256": "ec20367ad9bc7bb88986b2e221c9db11a663e44d9f684f1cc3886eed67d2bb94",
+      "bytes": 6915
+    },
+    "gate-native-review.json": {
+      "sha256": "f1049b852118b6375ffc098ba566182ae44a1cbfefb7503787798a82f8dd2848",
+      "bytes": 19205
+    },
+    "delivery-preservation-review.json": {
+      "sha256": "cdc2e480986087e164aac8c84ec277774e4c5701f2e07bfa46e5b1e0fe837104",
+      "bytes": 19820
+    },
+    "candidate-dex-ownership-review.json": {
+      "sha256": "d215db9d863a4cf739fb4c999a152ddf1e85c98db5bec566aaadbd29b03bd718",
+      "bytes": 650247
+    },
+    "candidate-dex-admission-review.json": {
+      "sha256": "4df39709851f044b7e7f95de68ff1a24609fff10f3e4e93ed87348eaf8df4575",
+      "bytes": 17219
+    },
+    "root-static-bytecode-review.json": {
+      "sha256": "5272e12500cf3cf2178d8ee617956ed6ba520c76786d7729309a064789898ec8",
+      "bytes": 1404
+    },
+    "root-static-count-clarification.json": {
+      "sha256": "af8e78af279381adb55e883d0f0a3a614627c941d28c9c6a7c38eac81ba5dd87",
+      "bytes": 730
+    },
+    "static-inspector-freeze.json": {
+      "sha256": "e186ba25d293f1c8b2efaac83c25e091c5a076b8835ab87ad7ce0910468055b8",
+      "bytes": 1950
+    },
+    "static-inspector-root-admission.json": {
+      "sha256": "688799611165d74df708a90c798241b5be4be3f2995f8958860983c75043d036",
+      "bytes": 260
+    },
+    "inspect-crashguard-structure.py": {
+      "sha256": "d3999b156e118a609b02a0e924441944d8da08bee30d4d1ac91088432755ef7f",
+      "bytes": 11956
+    },
+    "static-bytecode.log": {
+      "sha256": "0e1d65687bc2f175ea03519f734ebc2987353a5d0f430a515d8d6469112b9257",
+      "bytes": 388
+    },
+    "candidate-mapping.txt": {
+      "sha256": "46a5a4b91ceedf61807c5090572c7c30d4eb73a9e4ef69f031587c44fb1dd477",
+      "bytes": 83202877
+    },
+    "write-delivery-initial-root-read.py": {
+      "sha256": "6b7a6b8c961d4385a54fafe0681021240d4375ded5bf701f025bf6f80fd66290",
+      "bytes": 30115
+    },
+    "delivery-writer-root-read.json": {
+      "sha256": "54caa6cb83977860d405b833faf01970c6a16e9250ae7e03cfb638e007b127a1",
+      "bytes": 701
+    },
+    "write-delivery.py": {
+      "sha256": "282a2fa32a0b418980716194f5d76799d38fc6377e5ecd89e206559b7f74632c",
+      "bytes": 30114
+    },
+    "delivery-writer-freeze.json": {
+      "sha256": "44377dda3bf8b29588cc488d019fe6eb4370acd190d3efe8110b28284506b0be",
+      "bytes": 24406
+    },
+    "full-gate.log": {
+      "sha256": "8a726df038f0dc34e9c4dd6fc1e1f129bc43594b1a5cc2b9f5484a4191d440cb",
+      "bytes": 13732
+    },
+    "full-jvm-xml-bindings.json": {
+      "sha256": "edfcf4d1e26280a95d9ffe25cdc7260dd0c44afd1d2e7ec9402906b158f07f55",
+      "bytes": 113949
+    },
+    "independent-full-jvm-manifest.json": {
+      "sha256": "028d7bf0a38759e4bfab2af028d17eaf4df41230348cfeacc6c549e3e66db16a",
+      "bytes": 533159
+    },
+    "independent-artifact-identity.json": {
+      "sha256": "ab54ec7f7dc5ba11bd1725a44d66b61218241b0600d4631090b3c72d46fd0602",
+      "bytes": 2396
+    },
+    "root-secondary-gate-admission.json": {
+      "sha256": "2b34a4782f3c2beac79e6f25d0e75074abf11d27e720c3747efd761638594051",
+      "bytes": 382
+    },
+    "package-proof.py": {
+      "sha256": "14752f9045df99ed0a881a8e2c362e0504c3ca93a5ee61bd721dbaa6a02ed63d",
+      "bytes": 3534
+    },
+    "package-proof.log": {
+      "sha256": "c03885838188a4413f8d7755eb89eed42243dd70751a31c323c9653fac9ce840",
+      "bytes": 602
+    },
+    "public-version-guard.log": {
+      "sha256": "3301a83d1b7246a242ae1ec3d358af7ed35b782863e1daa61cfac1785f203d3b",
+      "bytes": 223
+    },
+    "jvm.json": {
+      "sha256": "c367f95f2fe9c875fe388766273a12ca21f9e308ac774f304e6d2b76f76d92bb",
+      "bytes": 256
+    },
+    "artifact.json": {
+      "sha256": "5152ae905055d75318d8e52e11421abfe019a4d36c2c7c048e271c4c65bf4db7",
+      "bytes": 1519
+    },
+    "source-hashes.json": {
+      "sha256": "d98f48a5852476137973a1188a07272f0d2d2800cc6b34341ff17f55757d5796",
+      "bytes": 360
+    },
+    "cohort-scope.json": {
+      "sha256": "b73400738d7583bca796e0db318aefb82d1a587b91cbbd75b6f905a084d32b2f",
+      "bytes": 794
+    },
+    "prior-roadmap.raw": {
+      "sha256": "de55f0811066134b5228a9afdf6c6830cbe849c44aeebdd392c1fce8fcd4d799",
+      "bytes": 332754
+    },
+    "preflight-scope.json": {
+      "sha256": "026c769c07c3d3ffd2acff45ad3f854c0004d99273bc114618d7e19efecbe186",
+      "bytes": 563
+    },
+    "state.py": {
+      "sha256": "cf11300098fbcd610f4f007b047784ab7b77955e6ef52920f6b73219d7de523c",
+      "bytes": 5040
+    },
+    "deploy.py": {
+      "sha256": "c9727d65f093a9466160145e19b85015140b2b5d3e3e065996c2050262c35583",
+      "bytes": 1142
+    },
+    "observe.py": {
+      "sha256": "ea5809b788f477747020cba2f4db2e9413f6da4665d5e5b3cca4e5dafa3aa237",
+      "bytes": 1090
+    },
+    "capture-family.py": {
+      "sha256": "773d528f1b9ba063afdc0c4e746f4ab900e5024d77fe3fb9ed91b92931ede52e",
+      "bytes": 429
+    },
+    "cleanup-credentials.py": {
+      "sha256": "860b4b890aa4b2cda40e1d9f0eb1012e56620e60e45f79ec56336bd89a72113a",
+      "bytes": 762
+    },
+    "deploy-results.json": {
+      "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31",
+      "bytes": 231
+    },
+    "preservation.json": {
+      "sha256": "2de61275dfa1480b50994ef53e781f275c02efce4e91569504dfda44473a7ed6",
+      "bytes": 718
+    },
+    "health.json": {
+      "sha256": "3d028a7b28ff5f6487d98b7b24bc7b0f1cc23e9333781cf25fde75bd29cd1278",
+      "bytes": 579
+    },
+    "credential-cleanup.json": {
+      "sha256": "584d00c535583d9f5c6f035e521ab6f64eefddfd75629ef4a3518d05d6a25d76",
+      "bytes": 119
+    },
+    "root-preservation-verification.json": {
+      "sha256": "b6d8a9e7a8c790dd4be17dd766eda206c740a521a30d9037cb93e8678828e5ca",
+      "bytes": 636
+    },
+    "visual-review.json": {
+      "sha256": "59d35ddc131b9b86308a994e8264797ea1a423fefb162215f5ef7723550753a9",
+      "bytes": 465
+    },
+    "documentation-before.json": {
+      "sha256": "dfa7efb08400c40c1a54e25e687aa23da99f66071c34513161eb2ea88cb03307",
+      "bytes": 791
+    },
+    "documentation-boundary-baseline.json": {
+      "sha256": "b4c45c3d358427abc1abcbe3f5abceeaec22439712b93b6f3eb36438a8e9694a",
+      "bytes": 346
+    },
+    "baseline-focused-terminal.json": {
+      "sha256": "9db1a578d9b24709b6ca51b802d8e737f536bd6f0c862b3b8fd10e675f55f0c1",
+      "bytes": 299
+    },
+    "full-gate-terminal.json": {
+      "sha256": "fa218ecfa3d94614d665a711d2a479cf433adc0f94a7c690f86b719f7bb4fd76",
+      "bytes": 328
+    },
+    "package-proof-terminal.json": {
+      "sha256": "627a37cb28244dadcc007a1cc0301ad050ba2eb6a6c4d93347acda21d1e26989",
+      "bytes": 258
+    },
+    "preflight-terminal.json": {
+      "sha256": "4198ea62c09bce6f9385fed7d30a15d2821ad48bfaef5595b53052dfeb7299ed",
+      "bytes": 264
+    },
+    "room-deploy-terminal.json": {
+      "sha256": "bc0a9f8160cfe9a2948653aa3119634436aa7299d361918b664dc0d0575f44e0",
+      "bytes": 252
+    },
+    "postflight-terminal.json": {
+      "sha256": "32fdc6aaf531a28d14b6487646814a028a682ad698676c8c8c3cdc9df7b9f3c7",
+      "bytes": 263
+    },
+    "health-observation-terminal.json": {
+      "sha256": "7eb40860c42d7563907ba82b7368b6d4bd35df32138f39a2810003dcb36c6b66",
+      "bytes": 252
+    },
+    "family-capture-terminal.json": {
+      "sha256": "54b580ef989b2cb3cc114511c6bcec9e81be704629d3e4c43558db1693bd67eb",
+      "bytes": 258
+    },
+    "cleanup-credentials-terminal.json": {
+      "sha256": "2e3d1251164a588085fb1558210052c315f924148d5113e26e53d0799ca56554",
+      "bytes": 264
+    },
+    "static-bytecode-terminal.json": {
+      "sha256": "88ba4244c901692faf686b71bf3ca04b9f4bdab000b137337a45dd2626cbca56",
+      "bytes": 273
+    },
+    "public-version-guard-terminal.json": {
+      "sha256": "8ee8e2c0c10d901b8dfe7ecb78ab68acd5c430a4b0ae2153645398dc7da782c9",
+      "bytes": 218
+    },
+    "family-before-private.json": {
+      "sha256": "256af53fef1512484c16c907c88ac5cfe7602615f24d95aad28270e80550df89",
+      "bytes": 62666
+    },
+    "family-prefs-before-private.json": {
+      "sha256": "e05f67795d2b5835b38c7e7e396afbcd46d59848fb5ed81f23508e49d190d0a8",
+      "bytes": 15708
+    },
+    "family-after-private.json": {
+      "sha256": "bb45409056fb9b1ab88a276358274837c5164b3c82d45b12818f0fa268760952",
+      "bytes": 62667
+    },
+    "family-prefs-after-private.json": {
+      "sha256": "e05f67795d2b5835b38c7e7e396afbcd46d59848fb5ed81f23508e49d190d0a8",
+      "bytes": 15708
+    },
+    "family-diag-private.bin": {
+      "sha256": "3986d92ff7daa506b0b7cddc8128958482fb65364cc268e524952128ca83bc78",
+      "bytes": 2241
+    },
+    "family-logcat-private.bin": {
+      "sha256": "18425fc418a28f1b1facdfb5fe5ec8520d668e582a90e17bc557af56e3863354",
+      "bytes": 245083
+    },
+    "living-before-private.json": {
+      "sha256": "3f2eb63f2227826ddec358aea0d4fd2cf9b2aaedfa6614887b29d0e6409b4ea1",
+      "bytes": 62554
+    },
+    "living-prefs-before-private.json": {
+      "sha256": "222a587bbc37b83c9b4f75339aaadf574cccedd9773eb706c52a89eb4bee1a20",
+      "bytes": 14076
+    },
+    "living-after-private.json": {
+      "sha256": "83ad33ce56e499b676b0269233d132370e6ee99ea292cf7539a064fd6f880395",
+      "bytes": 62554
+    },
+    "living-prefs-after-private.json": {
+      "sha256": "222a587bbc37b83c9b4f75339aaadf574cccedd9773eb706c52a89eb4bee1a20",
+      "bytes": 14076
+    },
+    "living-diag-private.bin": {
+      "sha256": "bec91c3f6d89b664e5e6d4e5312f7ee644a64483b8bb8b6abe2c64b2a3397e8c",
+      "bytes": 2062
+    },
+    "living-logcat-private.bin": {
+      "sha256": "1fab59f892b4299ab89ca4bbf15295e72095463fb19c67cd17ec3244c86ec561",
+      "bytes": 274469
+    },
+    "family-after.png": {
+      "sha256": "5ffe91b09ddb8e6269d07250cbaa8a51d7ebe428331f9091e85a340c8b7e5f05",
+      "bytes": 3156415
+    },
+    "activity-before-private.txt": {
+      "sha256": "0d5da0e465fbf854c46a16bfad4672defa1633edf9c1552a327dd7f48cd14a02",
+      "bytes": 15075
+    },
+    "activity-after-private.txt": {
+      "sha256": "1a0e4195c491f5b7fb6a3035ebf94569c4a3b791b05fac8fe0e3a046083dcbf2",
+      "bytes": 15056
+    },
+    "power-before-private.txt": {
+      "sha256": "3be56656d0994f3daabc4d17fd3cb8238b191b5ca1fdb1fb5b99bdb0201c1558",
+      "bytes": 9828
+    },
+    "power-after-private.txt": {
+      "sha256": "e28f8d9cd4f7aadd88c48d2a82e90e74e8c74cf79a4d660d70ba4a1accfc7dc0",
+      "bytes": 9830
+    },
+    "font-before-private.txt": {
+      "sha256": "5717e7c840171019a4eeab5b79a7f894a4986eaff93d04ec5b12c9a189f594bf",
+      "bytes": 4
+    },
+    "font-after-private.txt": {
+      "sha256": "5717e7c840171019a4eeab5b79a7f894a4986eaff93d04ec5b12c9a189f594bf",
+      "bytes": 4
+    },
+    "accessibility-before-private.txt": {
+      "sha256": "0b87a9e4d4e2c1dcd3dd847f134838af9d711d031081b2c5ad0507be311f4826",
+      "bytes": 323
+    },
+    "accessibility-after-private.txt": {
+      "sha256": "0b87a9e4d4e2c1dcd3dd847f134838af9d711d031081b2c5ad0507be311f4826",
+      "bytes": 323
+    }
+  },
+  "documentBindings": {
+    "docs/portal-crash-guard-clock-reset-2026-11-03.md": {
+      "sha256": "2fc40bf48e0bbc6a1d5b837ca7103ef687a0bc1a98ffa5d57fde14ffbaa3366c",
+      "bytes": 4816
+    },
+    "docs/portal-product-operating-state.md": {
+      "sha256": "f14dd28eed00408a8f413a2f161f287d26e86c443d840beef91209b449425e73",
+      "bytes": 152096
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+      "sha256": "f67f9b9cc0da380bc4690967fffa46d5a105961086ea5f2ab08425c11b0f958b",
+      "bytes": 337423
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/index.html": {
+      "sha256": "8fe63986f7416db41c4be656e42d4343d10bd8e73d6ad5631ce430d1d13ab7b5",
+      "bytes": 29651
+    }
+  },
+  "sanitization": "Raw maps/preferences, registry, logs, serials and screenshot contents are omitted; their exact byte bindings are public.",
+  "closure": "Documentation/browser QA and commit are subsequent private closure evidence; no future QA or commit claim is made here."
+}
