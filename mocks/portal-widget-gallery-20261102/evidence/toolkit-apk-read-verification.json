@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T18:13:08.739296+00:00",
+  "status": "parked_verified_candidate",
+  "scope": "Toolkit APK input-copy error and cancellation cleanup",
+  "originalClock": {
+    "startedAt": "2026-11-03T17:40:01Z",
+    "deadline": "2026-11-03T18:10:01Z",
+    "reset": false
+  },
+  "baseline": {
+    "tests": 5,
+    "assertionFailures": 3,
+    "controls": 2,
+    "errors": 0,
+    "skipped": 0,
+    "sourceSha256": "750e5861ce42ad85a8a782f8f36c4104406869b25c594aed1294f838437d436c"
+  },
+  "candidate": {
+    "tests": 200,
+    "suites": 35,
+    "focused": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "sourceSha256": "5901649217756b7ca90774d5fc4055b984271e76bf1790881aa9afcc086816bd",
+    "fixtureSha256": "49bb156b22db5ac76f33dc675c37f7a6d37c9d9c2c455e85deeadbc9e6b4b2fc",
+    "apkSha256": "5f182d75520c220b5119cd14fca741aeae30c04b15ab4a464221d38e66fba9b8",
+    "apkBytes": 13901710,
+    "runStart": "2026-11-03T18:08:00.990376+00:00",
+    "runEnd": "2026-11-03T18:08:25.516633+00:00",
+    "withdrawnAfterGate": true
+  },
+  "ci": {
+    "hostedRunsObserved": 0,
+    "existingConfiguredWorkflowCoversNewTest": true
+  },
+  "limits": [
+    "Actual AppsViewModel/public installState with mocked Android/container/holder/manager/history/Dadb and generated host streams/cache; no real provider/ADB/device.",
+    "Metadata query and successful install are unexecuted; later metadata-query failure remains outside the correction.",
+    "Three regression assertions cover partial read, input close failure and directly thrown cancellation; two controls cover null input and disconnected state.",
+    "No unrelated-file sentinel, real cancellation latency, deletion failure or universal setup/teardown-fault cleanup acceptance.",
+    "Hosted CI and physical phone acceptance remain unverified; no install, version change, auth, push or publication."
+  ],
+  "previousReceipt": "docs/portal-toolkit-monitor-ci-2026-11-03.md",
+  "earlierUnadmittedTriageSupersededByActualFixture": true,
+  "integration": {
+    "sourceWithdrawn": true,
+    "retainedToolkitHead": "44d75050b85c2c14e72bc30b4e4fb1b554e1c68c",
+    "candidateCommitted": false,
+    "candidatePublished": false,
+    "cutoff": "2026-11-03T18:10:01Z",
+    "cutoffObservedAt": "2026-11-03T18:10:06Z",
+    "reason": "Original slot expired before integration commit; no clock reset. Candidate/source/dependency/fixture/APK/result bytes retained privately, source restored as post-cutoff cleanup.",
+    "sourceRestoredAtUtc": "2026-11-03T18:12:11.621031+00:00"
+  },
+  "initialEvidenceRecordedAtUtc": "2026-11-03T18:09:37.312547+00:00"
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T17:56:18.691210+00:00",
+  "updatedAt": "2026-11-03T18:13:08.739296+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,52 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "toolkit-apk-read",
+      "title": "Portal Toolkit: APK read candidate parked at cutoff",
+      "summary": "Verified candidate:3 baseline failures fixed;200 tests passed. Withdrawn before integration; original slot expired.",
+      "description": "The actual ViewModel candidate passed its five frozen cases and full host/build gate. The original discovery window expired before integration commit; candidate bytes and evidence are retained privately, and source is restored to clean Toolkit44d75050.",
+      "status": "parked",
+      "verification": "Verified candidate only \u00b73 baseline AssertionErrors/2 controls \u21925 pass \u00b7200 JVM/35 suites \u00b7debug assembly \u00b7withdrawn",
+      "kind": "Toolkit upload input reliability",
+      "platforms": [
+        "companion",
+        "tooling"
+      ],
+      "owner": "Toolkit engineering / independent source and result review",
+      "deployment": "Candidate not committed or deployed; withdrawn from working source. Toolkit remains clean at44d75050.",
+      "state": "Original17:40:01\u201318:10:01 UTC slot expired; observed18:10:06. Source/APK/test/dependency archived privately; post-cutoff cleanup recorded honestly.",
+      "acceptance": [
+        "Exercise actual public AppsViewModel.installApkFromUri before correcting production.",
+        "Close input and remove the generated owned upload on partial-copy and close failure.",
+        "Preserve cancellation, null input and disconnected admission.",
+        "Pass unchanged fixture, all existing host tests and debug assembly."
+      ],
+      "evidence": [
+        {
+          "text": "Actual baseline, correction and scoped limits.",
+          "source": "docs/portal-toolkit-apk-read-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized actual run/source/fixture/artifact facts.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/toolkit-apk-read-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual AppsViewModel/public installState with mocked Android/container/holder/manager/history/Dadb and generated host streams/cache; no real provider/ADB/device.",
+        "Metadata query and successful install are unexecuted; later metadata-query failure remains outside the correction.",
+        "Three regression assertions cover partial read, input close failure and directly thrown cancellation; two controls cover null input and disconnected state.",
+        "No unrelated-file sentinel, real cancellation latency, deletion failure or universal setup/teardown-fault cleanup acceptance.",
+        "Hosted CI and physical phone acceptance remain unverified; no install, version change, auth, push or publication.",
+        "Original slot expired before integration; no fresh clock or promotion permitted. Current source remains prior Toolkit44d75050."
+      ],
+      "next": "Keep the verified candidate parked under its original expired clock. Continue unrelated authorized work; no automatic retry or reset.",
+      "issueClock": {
+        "startedAt": "2026-11-03T17:40:01Z",
+        "deadline": "2026-11-03T18:10:01Z",
+        "reset": false
+      }
+    },
     {
       "id": "toolkit-monitor-ci",
       "title": "Portal Toolkit: retire canceled probes and automate host checks",
