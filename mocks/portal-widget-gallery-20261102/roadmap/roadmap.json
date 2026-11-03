@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T18:13:08.739296+00:00",
+  "updatedAt": "2026-11-03T18:29:31.990649+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,51 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "toolkit-shell-exit",
+      "title": "Portal Toolkit: report failed shell commands correctly",
+      "summary": "Returned nonzero exits now mark errors and skip success-only history;3 baseline assertions fixed,203 tests passed.",
+      "description": "Keep the actual Dadb response until transcript classification. Existing output trimming, zero-exit stderr success and exception/disconnected/blank controls remain.",
+      "status": "verified",
+      "verification": "Locally verified \u00b73 baseline assertions/5 controls \u21928 pass \u00b7203 JVM/35 suites \u00b7debug assembly \u00b714 independent checks",
+      "kind": "Toolkit shell result reliability",
+      "platforms": [
+        "companion",
+        "tooling"
+      ],
+      "owner": "Toolkit engineering / independent source and result review",
+      "deployment": "Local Toolkit commit23073a5 only; no device installation, publication or hosted CI observation.",
+      "state": "Actual generated-response host gate and independent review passed; broader runtime acceptance remains open.",
+      "acceptance": [
+        "Exercise actual public ShellViewModel.run with real generated returned responses.",
+        "Treat nonzero exit as transcript error and exclude it from successful history.",
+        "Preserve successful stderr, output trim, exception, disconnected and blank controls.",
+        "Pass unchanged fixture, all host tests and debug assembly."
+      ],
+      "evidence": [
+        {
+          "text": "Actual baseline, correction, local commit and scoped limits.",
+          "source": "docs/portal-toolkit-shell-exit-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized run, source, fixture and assembled-artifact facts.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/toolkit-shell-exit-verification.json"
+        }
+      ],
+      "limits": [
+        "Generated responses through the actual public ShellViewModel and mocked Android/container/holder/Dadb/history; no real command, network, provider, phone or device operation.",
+        "History add invocation is covered; persistent storage, recall UI and remote command effects remain unverified.",
+        "Cancellation, overlapping-run admission, connection changes and wider concurrency are unchanged and unverified.",
+        "A nonzero exit with no output retains an empty output string; no new fallback error label or UI redesign.",
+        "Debug assembly/bytes only: no signer, installed identity, native runtime, hosted CI, push, version change or publication."
+      ],
+      "next": "Keep the local verified checkpoint. Continue distinct authorized work while phone, hosted CI and publication holds remain; retain every prior issue clock.",
+      "issueClock": {
+        "startedAt": "2026-11-03T18:18:11Z",
+        "deadline": "2026-11-03T18:48:11Z",
+        "reset": false
+      }
+    },
     {
       "id": "toolkit-apk-read",
       "title": "Portal Toolkit: APK read candidate parked at cutoff",

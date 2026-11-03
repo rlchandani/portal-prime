@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T18:29:31.990649+00:00",
+  "status": "locally_verified",
+  "scope": "Toolkit returned shell exit status drives transcript error and successful-history admission",
+  "originalClock": {
+    "startedAt": "2026-11-03T18:18:11Z",
+    "deadline": "2026-11-03T18:48:11Z",
+    "reset": false
+  },
+  "baseline": {
+    "tests": 8,
+    "assertionFailures": 3,
+    "controls": 5,
+    "errors": 0,
+    "skipped": 0,
+    "sourceSha256": "1634fdeab1bae850f7b1b95193be2ca7c616da46aac33ee0409054f24c7abcd7",
+    "runStart": "2026-11-03T18:24:17.267563+00:00",
+    "runEnd": "2026-11-03T18:24:53.982220+00:00",
+    "exitCode": 1
+  },
+  "candidate": {
+    "tests": 203,
+    "suites": 35,
+    "focused": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "sourceSha256": "dbb4ba6584b09c42346c660ce0a98f748b09890976d691ce328ae1368d81fe45",
+    "fixtureSha256": "f38cf2e1091c44cc03c34c8d736718b5aec463a4c883240e4caadd09d3defc94",
+    "runStart": "2026-11-03T18:25:07.029074+00:00",
+    "runEnd": "2026-11-03T18:25:28.118047+00:00",
+    "exitCode": 0,
+    "apkSha256": "faddc3a3e405991d1f72af9fd6fbd802a2080ef03ba881371d591f942d33c792",
+    "apkBytes": 13901710
+  },
+  "integration": {
+    "ToolkitCommit": "23073a5538191cde30b64058f558859d602f7c5b",
+    "parent": "44d75050b85c2c14e72bc30b4e4fb1b554e1c68c",
+    "localOnly": true,
+    "deployed": false,
+    "published": false
+  },
+  "independentReview": {
+    "checks": 14,
+    "passed": 14,
+    "blockers": 0
+  },
+  "ci": {
+    "existingConfiguredWorkflowCoversNewTest": true,
+    "hostedRunsObserved": 0
+  },
+  "limits": [
+    "Generated responses through the actual public ShellViewModel and mocked Android/container/holder/Dadb/history; no real command, network, provider, phone or device operation.",
+    "History add invocation is covered; persistent storage, recall UI and remote command effects remain unverified.",
+    "Cancellation, overlapping-run admission, connection changes and wider concurrency are unchanged and unverified.",
+    "A nonzero exit with no output retains an empty output string; no new fallback error label or UI redesign.",
+    "Debug assembly/bytes only: no signer, installed identity, native runtime, hosted CI, push, version change or publication."
+  ],
+  "unselectedDiscovery": "File-browser ordering, Logcat stream ownership and screenshot encoding remain source observations under this same clock; no fixture, correction or reset.",
+  "earlierApkCandidate": "Remains parked and withdrawn under its original17:40:01\u201318:10:01 clock. Current debug output belongs to this separately tested Shell commit."
+}
