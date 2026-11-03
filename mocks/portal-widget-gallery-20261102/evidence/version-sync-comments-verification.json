@@ -1,0 +1,528 @@
+{
+  "schemaVersion": 1,
+  "taskId": "version-sync-comments",
+  "recordedAt": "2026-11-03T14:35:03.788625+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T14:13:39Z",
+    "deadline": "2026-11-03T14:43:39Z",
+    "reset": false
+  },
+  "status": "verified",
+  "scope": "Local complete production Bash version guard and existing full Python CI fixtures; no new app/room/release delivery.",
+  "baseline": {
+    "status": "ACTUAL_UNCHANGED_WHOLE_GUARD_BASELINE",
+    "tests": 8,
+    "failures": 4,
+    "controls": 4,
+    "errors": 0,
+    "skips": 0,
+    "failureTypes": [
+      "AssertionError"
+    ],
+    "methods": [
+      {
+        "name": "test_blank_notes_still_reject",
+        "result": "ok"
+      },
+      {
+        "name": "test_commented_previous_code_does_not_override_current_code",
+        "result": "FAIL"
+      },
+      {
+        "name": "test_commented_previous_name_does_not_override_current_name",
+        "result": "FAIL"
+      },
+      {
+        "name": "test_commented_previous_pair_cannot_accept_a_stale_manifest",
+        "result": "FAIL"
+      },
+      {
+        "name": "test_commented_previous_pair_does_not_reject_matching_current_manifest",
+        "result": "FAIL"
+      },
+      {
+        "name": "test_indented_matching_declarations_still_pass",
+        "result": "ok"
+      },
+      {
+        "name": "test_normal_mismatch_still_rejects_both_fields",
+        "result": "ok"
+      },
+      {
+        "name": "test_wrong_stable_url_still_rejects",
+        "result": "ok"
+      }
+    ],
+    "actualExit": 1,
+    "baselineGuardSha256": "4e93a93785d5ccd2cadd3b3676387439b3b34335b9bd7b05838901048b2e80b8",
+    "frozenTestSha256": "4fc4b41e72058cce6630c9417c2dddba211906962031ff9a7ba266f5e30271d4"
+  },
+  "literalCases": [
+    {
+      "method": "test_commented_previous_pair_does_not_reject_matching_current_manifest",
+      "literalExit": 0,
+      "baselinePrediction": 1,
+      "reason": "Matching current declarations90/2.9 win over both preceding // previous declarations80/1.8."
+    },
+    {
+      "method": "test_commented_previous_pair_cannot_accept_a_stale_manifest",
+      "literalExit": 1,
+      "baselinePrediction": 0,
+      "reason": "Both actual current90/2.9 mismatch stale JSON80/1.8; clear mismatch messages contain each actual field."
+    },
+    {
+      "method": "test_commented_previous_code_does_not_override_current_code",
+      "literalExit": 0,
+      "baselinePrediction": 1,
+      "reason": "A preceding // versionCode80 must not hide current90."
+    },
+    {
+      "method": "test_commented_previous_name_does_not_override_current_name",
+      "literalExit": 0,
+      "baselinePrediction": 1,
+      "reason": "A preceding // versionName1.8 must not hide current2.9."
+    },
+    {
+      "method": "test_indented_matching_declarations_still_pass",
+      "literalExit": 0,
+      "baselinePrediction": 0,
+      "reason": "Ordinary indented matching declarations retain success."
+    },
+    {
+      "method": "test_normal_mismatch_still_rejects_both_fields",
+      "literalExit": 1,
+      "baselinePrediction": 1,
+      "reason": "Ordinary active field mismatch retains both explicit mismatch reasons."
+    },
+    {
+      "method": "test_wrong_stable_url_still_rejects",
+      "literalExit": 1,
+      "baselinePrediction": 1,
+      "reason": "Wrong stable self-update URL retains clear rejection."
+    },
+    {
+      "method": "test_blank_notes_still_reject",
+      "literalExit": 1,
+      "baselinePrediction": 1,
+      "reason": "Whitespace-only release notes retain clear rejection."
+    }
+  ],
+  "actualLocalCI": {
+    "tests": 226,
+    "focusedTests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualExit": 0
+  },
+  "retainedInitialCI": {
+    "initialFullGate": {
+      "tests": 226,
+      "passes": 225,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "actualExit": 1,
+      "failedMethod": "test_timeout_terminates_gradle_child_before_delayed_side_effect",
+      "scope": "Existing unchanged readiness timeout fixture. Assertion fails before later child-start/no-side-effect checks, so initial attempt does not accept them.",
+      "actualNormalizedReceiptMessage": "could not run android-gates: operation not permitted."
+    },
+    "isolatedExistingTest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "actualExit": 0
+    },
+    "freshFullGate": {
+      "tests": 226,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "actualExit": 0
+    },
+    "rootCause": "Not established. Production OSError boundary covers spawn, wait and group cleanup; no causal attribution to one operation. No product or fixture changes between failed/isolation/retry. Passing repeat does not prove absence of a transient host/cleanup issue.",
+    "sourceTestsChangedBetweenAttempts": false
+  },
+  "unchangedBoundary": {
+    "status": "PASS_UNCHANGED_SELECTED_BYTES_NO_DEVICE_RECHECK",
+    "parent": "43dd658f36cc6d68722118639bf4a26b572f3725",
+    "publicManifestVersion": {
+      "versionName": "1.83",
+      "versionCode": 77
+    },
+    "currentRoomAPKFromPriorDeliveryOnly": {
+      "versionName": "1.125",
+      "versionCode": 119
+    },
+    "selectedPaths": {
+      "version.json": {
+        "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+        "bytes": 310
+      },
+      "app/build.gradle.kts": {
+        "sha256": "43ad17c89ca17e3d78debcfb07e505603976734d727b18042c50144ff4c69bea",
+        "bytes": 11816
+      },
+      "scripts/cut-release.sh": {
+        "sha256": "d4cddb07f857eaa9b7b7d1155dcf91a6de33eb4fdec359961213581c98f92598",
+        "bytes": 9763
+      },
+      "scripts/portal_release_readiness.py": {
+        "sha256": "6769d97fcfbb4ece0e2d41bd14bf1db782be49cffda3c676e38f04fc392587d6",
+        "bytes": 17648
+      },
+      ".github/workflows/release-guard.yml": {
+        "sha256": "e69e6dd3f13d0595fb3360bc8e1e02ec7ddd575c760dc20b9aa94372a35e653b",
+        "bytes": 738
+      },
+      ".github/workflows/tests.yml": {
+        "sha256": "c8d796a2e2f9330ba9399cdc84606bbbfe0a43327ec4a37c2466c9fc9ce45497",
+        "bytes": 1975
+      },
+      "app/src/main/java/com/immortal/launcher/CrashGuard.kt": {
+        "sha256": "5d4348881002683f3ded105800ad62e1dfc57135f5f1c5c9421fd5466eb5efc5",
+        "bytes": 4888
+      },
+      "app/src/test/java/com/immortal/launcher/CrashGuardClockTest.kt": {
+        "sha256": "690dcd40f89984dc0940c2fee1c8f9124c637c52ad9cbcd41a94bdc8e68ec5e3",
+        "bytes": 1876
+      },
+      "provisioning/fleetctl": {
+        "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+        "bytes": 694352
+      }
+    },
+    "newAPKBuilds": 0,
+    "newDeviceCommands": 0,
+    "newReleasePublicationCalls": 0,
+    "roomAndDeviceClaim": "Prior CrashGuard closure only; this host unit performs no room observation or writes."
+  },
+  "reviews": {
+    "source": {
+      "status": "INDEPENDENT_SOURCE_AND_ACTUAL_BASELINE_REVIEW_PASS_CANDIDATE_GATE_SEPARATE",
+      "passedChecks": 15,
+      "blockers": []
+    },
+    "gate": {
+      "status": "PASS",
+      "counts": {
+        "checks": 21,
+        "passed": 21,
+        "freshTests": 226,
+        "freshFailures": 0,
+        "freshErrors": 0,
+        "freshSkips": 0,
+        "focusedTests": 8,
+        "baselineFailures": 4,
+        "baselineControls": 4,
+        "initialTests": 226,
+        "initialFailures": 1,
+        "isolatedTests": 1,
+        "bindings": 41
+      },
+      "blockers": []
+    }
+  },
+  "sourceBindings": {
+    "scripts/check-version-sync.sh": {
+      "sha256": "67724ed76ed380afce2008ec8592e5c3bbe31a98eb2f2535ed3677db1d7a5e65",
+      "bytes": 2080
+    },
+    "scripts/test_portal_version_sync.py": {
+      "sha256": "4fc4b41e72058cce6630c9417c2dddba211906962031ff9a7ba266f5e30271d4",
+      "bytes": 4690
+    }
+  },
+  "unchangedInputs": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "sha256": "6769d97fcfbb4ece0e2d41bd14bf1db782be49cffda3c676e38f04fc392587d6",
+      "bytes": 17648
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/cut-release.sh",
+      "sha256": "d4cddb07f857eaa9b7b7d1155dcf91a6de33eb4fdec359961213581c98f92598",
+      "bytes": 9763
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/.github/workflows/release-guard.yml",
+      "sha256": "e69e6dd3f13d0595fb3360bc8e1e02ec7ddd575c760dc20b9aa94372a35e653b",
+      "bytes": 738
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/.github/workflows/tests.yml",
+      "sha256": "c8d796a2e2f9330ba9399cdc84606bbbfe0a43327ec4a37c2466c9fc9ce45497",
+      "bytes": 1975
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/version.json",
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "sha256": "43ad17c89ca17e3d78debcfb07e505603976734d727b18042c50144ff4c69bea",
+      "bytes": 11816
+    }
+  ],
+  "unchangedPublicManifest": {
+    "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+    "bytes": 310
+  },
+  "unchangedNativeFleetCLI": {
+    "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "bytes": 694352
+  },
+  "priorRoomDelivery": {
+    "versionName": "1.125",
+    "versionCode": 119,
+    "newRoomOperations": false
+  },
+  "terminals": {
+    "baseline-version-sync-terminal.json": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T14:25:35.381735+00:00",
+      "endedAt": "2026-11-03T14:25:35.709845+00:00",
+      "durationSeconds": 0.32811
+    },
+    "python-ci-terminal.json": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T14:26:26.952739+00:00",
+      "endedAt": "2026-11-03T14:26:48.871448+00:00",
+      "durationSeconds": 21.918709
+    },
+    "python-ci-retry-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:28:28.238600+00:00",
+      "endedAt": "2026-11-03T14:28:52.546366+00:00",
+      "durationSeconds": 24.307766
+    },
+    "timeout-isolation-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:28:02.577729+00:00",
+      "endedAt": "2026-11-03T14:28:06.028096+00:00",
+      "durationSeconds": 3.450367
+    },
+    "actual-metadata-guard-terminal.json": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T14:28:32.823290+00:00",
+      "endedAt": "2026-11-03T14:28:32.865526+00:00",
+      "durationSeconds": 0.042236
+    },
+    "guard-syntax-terminal.json": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T14:26:26.952576+00:00",
+      "endedAt": "2026-11-03T14:26:26.956230+00:00",
+      "durationSeconds": 0.003654
+    }
+  },
+  "backlogPreservation": {
+    "beforeTasks": 101,
+    "afterTasks": 102,
+    "allPriorTaskObjectsIdentical": true,
+    "completePriorRawSuffixIdentical": true,
+    "priorRawSuffix": {
+      "sha256": "ca000e2b17f0cf8849a9cdb794adb6f5cd04ad8ac1efa1a507e0da2d27c6703a",
+      "bytes": 336425
+    },
+    "defaultTask": "weather-native-layout",
+    "beforeCounts": {
+      "delivered": 66,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "afterCounts": {
+      "verified": 26,
+      "delivered": 66,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    }
+  },
+  "limits": [
+    "Local acceptance executes the complete copied production Bash guard in temporary ordinary projects, using real Bash/sed/head/python3 JSON parsing. No parser model, PATH/tool mocks, Gradle or APK invocation.",
+    "This scope addresses preceding // comment examples before active version declarations. Active duplicate declarations, block comments, alternate Gradle formatting and malformed input policies are unchanged; first matching declaration and existing capture/head semantics remain.",
+    "The direct CI release guard and cut-release's guard call consume this script. Cut-release's own initial version parser and later actual APK checks are unchanged. No cut-release, signing, publication or release-flow acceptance.",
+    "The existing Python CI wildcard discovers the new test. Local execution is recorded; hosted CI remains unobserved. Any failed full-CI attempt is preserved and qualified separately from the four actual new-test baseline failures.",
+    "Both rooms retain their prior exact 1.125/code119 delivery record. The selected guard fixture makes no external provider/device/publication action; the existing full Python suite uses its own process/SDK/loopback fixtures. No new APK build/installation or room health/visual acceptance. The current CrashGuard room paragraph remains byte-identical.",
+    "Public manifest remains 1.83/code77; APK, app Gradle, native fleet CLI and existing workflows/readiness/cut-release callers remain unchanged. Existing phone, publication, HA and design approvals remain.",
+    "The original 14:13:39–14:43:39 UTC clock includes the initial AppSwitcher audit and host guard follow-up; all older negative/held scopes retain their original clocks."
+  ],
+  "privateEvidenceBindings": {
+    "baseline-red.json": {
+      "sha256": "6de5b1312a810229abfeaaf144ca5a3bbf8d870b0358296d03b53b3e98890b3f",
+      "bytes": 1413
+    },
+    "baseline-check-version-sync.sh": {
+      "sha256": "4e93a93785d5ccd2cadd3b3676387439b3b34335b9bd7b05838901048b2e80b8",
+      "bytes": 2058
+    },
+    "baseline-version-sync.log": {
+      "sha256": "6e9414fa2795a9644e180d547e953bd4729d0e709078a0a7ece09890206acb78",
+      "bytes": 5953
+    },
+    "version-sync-frozen-test-plan.json": {
+      "sha256": "563c619da92e5a8b46e8bb20d1fe3672f1f0a587a0c2efdede9e90e6f60d678b",
+      "bytes": 5123
+    },
+    "release-guard-comment-audit.json": {
+      "sha256": "44d79d42b53eabf877876d0de9010d5f8fca963f523144d4c98cb965042c19ae",
+      "bytes": 18462
+    },
+    "app-switcher-audit.json": {
+      "sha256": "1d61e3b761ec7a7c81a0aaf73ab755a40ef25425c9de114d55a30aa4ec3781af",
+      "bytes": 11339
+    },
+    "app-switcher-prior-history.json": {
+      "sha256": "32699942553ec69cf98de57318510c4eb2e3f24ddf0c3ce98673b273e0354a8f",
+      "bytes": 40738
+    },
+    "cohort-scope.json": {
+      "sha256": "978afba71b7cecaa42538eb66da4e30dc589d7f6ad13c2bcb4281418c838ad2b",
+      "bytes": 694
+    },
+    "root-guard-source-admission.json": {
+      "sha256": "5be5589aebf7c4d5344f011cb4fa6865b96a00d3824a7e74c711b20dfaf1eb30",
+      "bytes": 767
+    },
+    "version-sync-source-plan-review.json": {
+      "sha256": "023a4498018b3f369daad78923938e9cc644d1e1fbafc36491bfee06bb6e2d52",
+      "bytes": 11747
+    },
+    "version-sync-implementation-scope.json": {
+      "sha256": "f3a0d2ee07eef3d20b80c966146f10739937eeecf602743b98816d44e71e2551",
+      "bytes": 1329
+    },
+    "version-sync-independent-source-review.json": {
+      "sha256": "9cf923805996a17acdcb086c4cfeeb09402565f4802669d569003e055cb7672c",
+      "bytes": 16288
+    },
+    "gate-review.json": {
+      "sha256": "a4cd8231ef6a0a3c3a5c4d332dcb7609bfdc4ea9ec079eedd5246979d5bbe52d",
+      "bytes": 27274
+    },
+    "root-gate-review-admission.json": {
+      "sha256": "4030bd09961655393721c096696d3353efc1cccd78e616c670e83f47a499b51d",
+      "bytes": 400
+    },
+    "gate-summary.json": {
+      "sha256": "dd15b05a99f2d9fba02152564a55ee3558540605d179a0c4d63fe4315d0e5f29",
+      "bytes": 3408
+    },
+    "failed-ci-history.json": {
+      "sha256": "cb99bf8adc452d9649e7d7af3dfa5f18802b782ac2c0e89075202285f324960f",
+      "bytes": 2020
+    },
+    "boundary-preservation.json": {
+      "sha256": "bd3e0f6442b2813311151db9180aa6a9001d86b028bd60bb56927364f2840074",
+      "bytes": 1902
+    },
+    "independent-python-ci-manifest.json": {
+      "sha256": "7895c16b90e7332f7188bbee8cdbac40074fdd0df8884a27b906197971947850",
+      "bytes": 53601
+    },
+    "write-delivery.py": {
+      "sha256": "2a75e8740a2ba77d723da3553ff8a0ee1fd26ea86037091d5215d3c59207e82a",
+      "bytes": 21945
+    },
+    "write-delivery-initial-root-read.py": {
+      "sha256": "dfbdbed540dce296c97cb06331a5aba0b833166c6f088ca1dcc1e3506d74dd07",
+      "bytes": 21770
+    },
+    "delivery-writer-root-read.json": {
+      "sha256": "5b6b0fc7dbee9b44561f0d55eaecea3e7607a4f543599be1b003fa9d26a6aa28",
+      "bytes": 716
+    },
+    "delivery-writer-freeze.json": {
+      "sha256": "64a901a294298c0ab8334f92ad2a961250ad5a11f99815bff0131eea25750d7c",
+      "bytes": 14027
+    },
+    "prior-portal-product-operating-state.md": {
+      "sha256": "f14dd28eed00408a8f413a2f161f287d26e86c443d840beef91209b449425e73",
+      "bytes": 152096
+    },
+    "prior-roadmap.raw": {
+      "sha256": "f67f9b9cc0da380bc4690967fffa46d5a105961086ea5f2ab08425c11b0f958b",
+      "bytes": 337423
+    },
+    "prior-index.html": {
+      "sha256": "8fe63986f7416db41c4be656e42d4343d10bd8e73d6ad5631ce430d1d13ab7b5",
+      "bytes": 29651
+    },
+    "python-ci.log": {
+      "sha256": "d7d201b449c737a90979ac6baa3aa0c53cde3002870341c515172c679af2158c",
+      "bytes": 37895
+    },
+    "python-ci-retry.log": {
+      "sha256": "84a67482468dd33c1e2ac9e5d9262422bc68ba2f007d09a0f2ce6b57f33a3c36",
+      "bytes": 36914
+    },
+    "timeout-isolation.log": {
+      "sha256": "a13f81909b304ed0164250949dd5c27e54a0f1e7e6f97dab93179b6882a627b3",
+      "bytes": 296
+    },
+    "actual-metadata-guard.log": {
+      "sha256": "3301a83d1b7246a242ae1ec3d358af7ed35b782863e1daa61cfac1785f203d3b",
+      "bytes": 223
+    },
+    "guard-syntax.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-owned.py": {
+      "sha256": "5646455634d2c7db9479a608e112ce76f18a1e186cd14434fe8c113dc75ca86d",
+      "bytes": 1077
+    },
+    "roadmap-qa-final.cjs": {
+      "sha256": "8689f77813d5dc71d825242e75ff60375d0e8b5353056627480708fc34314692",
+      "bytes": 4221
+    },
+    "baseline-version-sync-terminal.json": {
+      "sha256": "dea430e37dc364c025e4a988de800295e7944c4dc72c67e22f8c46f76d4025e7",
+      "bytes": 315
+    },
+    "python-ci-terminal.json": {
+      "sha256": "ef7c67ce8e652464015f6b14a0ac605d950963abbe43e09820c209b0d949f8aa",
+      "bytes": 306
+    },
+    "python-ci-retry-terminal.json": {
+      "sha256": "6456fbbacfe2e0adcbf9e87b98a41d488c29dedcb8017113bbe3adb241945444",
+      "bytes": 306
+    },
+    "timeout-isolation-terminal.json": {
+      "sha256": "c8572b58a0afe1c531a7c8b7d8d7b9d0f8b0b7786ec371990d5a0dbca4a6e9af",
+      "bytes": 352
+    },
+    "actual-metadata-guard-terminal.json": {
+      "sha256": "06f5399dbf85abaa085709a14a64f007f7b6494039d01a1168e18436e3413786",
+      "bytes": 218
+    },
+    "guard-syntax-terminal.json": {
+      "sha256": "a0670023fec6deeff88f751a35a697cc41562e489ad38b8d1868968cb03c89d7",
+      "bytes": 228
+    }
+  },
+  "documentBindings": {
+    "docs/portal-version-sync-comments-2026-11-03.md": {
+      "sha256": "901512ace086c4002f4dab5520ee167ba77eceac155bfe53ea85966c36735be6",
+      "bytes": 4435
+    },
+    "docs/portal-product-operating-state.md": {
+      "sha256": "8cb178613d54a9f11d1aa03d6f7aa085d469b593bddf930ff69fad908d6f5a9d",
+      "bytes": 153197
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+      "sha256": "d3f1099458fa6f2445c8deebdab2ce45d4f5f2115c076c0e1e1e79c86dd37d14",
+      "bytes": 341605
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/index.html": {
+      "sha256": "22036486626f7ac41c9ec0222ad11756f7d91c27e39bdf6e25ed4fbaca13790c",
+      "bytes": 30834
+    }
+  },
+  "sanitization": "No raw owner device/profile/preferences/credentials/serial/screenshot values are read or published by this host writer.",
+  "closure": "Initial/closing docs and browser QA plus commit follow in private closure records; no future QA or hosted CI/publication claim."
+}

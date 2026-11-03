@@ -14,8 +14,8 @@ cd "$(dirname "$0")/.."
 repo="${RELEASE_REPO:-starbrightlab/immortal}"
 stable_apk_url="https://github.com/$repo/releases/latest/download/immortal.apk"
 
-g_code="$(sed -n 's/.*versionCode = \([0-9]*\).*/\1/p' app/build.gradle.kts | head -1)"
-g_name="$(sed -n 's/.*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -1)"
+g_code="$(sed -n 's/^[[:space:]]*versionCode = \([0-9]*\).*/\1/p' app/build.gradle.kts | head -1)"
+g_name="$(sed -n 's/^[[:space:]]*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts | head -1)"
 [ -n "$g_code" ] || { echo "✗ could not read versionCode from app/build.gradle.kts" >&2; exit 1; }
 [ -n "$g_name" ] || { echo "✗ could not read versionName from app/build.gradle.kts" >&2; exit 1; }
 

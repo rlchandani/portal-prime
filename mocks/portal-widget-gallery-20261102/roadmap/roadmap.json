@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T14:20:27.770563+00:00",
+  "updatedAt": "2026-11-03T14:35:03.788625+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,52 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "version-sync-comments",
+      "title": "Release guard: ignore preceding version comments",
+      "status": "verified",
+      "summary": "Locally verified: actual Gradle declarations drive the whole production version guard.",
+      "description": "Preceding // versionCode and versionName examples no longer override actual indented Gradle declarations. A matching current manifest passes, and a manifest matching only the old comments is rejected with the actual current values.",
+      "verification": "Eight frozen whole-script cases reproduce four AssertionErrors and four controls on unchanged source, then all eight pass unchanged. The complete local Python CI wildcard passes 226 tests; Bash syntax passes. The existing workflow discovers the test; hosted CI is unobserved.",
+      "kind": "Release metadata guard",
+      "platforms": [
+        "tooling"
+      ],
+      "owner": "Fleet & delivery tooling",
+      "state": "Host verification only. Current room delivery remains 1.125/code119; no new app build, installation, room/device recheck, external provider action or publication is performed. Public 1.83/code77 manifest, app Gradle, native fleet CLI, workflows, readiness tooling and cut-release remain unchanged.",
+      "deployment": "Locally verified host script only; no APK, room or public release deployment.",
+      "acceptance": [
+        "Freeze eight literal complete-command exit/reason cases against unchanged production guard.",
+        "Select active indented declarations after preceding // examples.",
+        "Reject stale manifests while preserving mismatch, URL, notes and matching controls.",
+        "Pass existing local Python CI discovery and syntax without app/release/device mutation."
+      ],
+      "evidence": [
+        {
+          "text": "Whole-script baseline, two-line correction, local gate and limits.",
+          "source": "docs/portal-version-sync-comments-2026-11-03.md"
+        },
+        {
+          "text": "Exact source/test/attempt and unchanged-boundary bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/version-sync-comments-verification.json"
+        }
+      ],
+      "limits": [
+        "Local acceptance executes the complete copied production Bash guard in temporary ordinary projects, using real Bash/sed/head/python3 JSON parsing. No parser model, PATH/tool mocks, Gradle or APK invocation.",
+        "This scope addresses preceding // comment examples before active version declarations. Active duplicate declarations, block comments, alternate Gradle formatting and malformed input policies are unchanged; first matching declaration and existing capture/head semantics remain.",
+        "The direct CI release guard and cut-release's guard call consume this script. Cut-release's own initial version parser and later actual APK checks are unchanged. No cut-release, signing, publication or release-flow acceptance.",
+        "The existing Python CI wildcard discovers the new test. Local execution is recorded; hosted CI remains unobserved. Any failed full-CI attempt is preserved and qualified separately from the four actual new-test baseline failures.",
+        "Both rooms retain their prior exact 1.125/code119 delivery record. The selected guard fixture makes no external provider/device/publication action; the existing full Python suite uses its own process/SDK/loopback fixtures. No new APK build/installation or room health/visual acceptance. The current CrashGuard room paragraph remains byte-identical.",
+        "Public manifest remains 1.83/code77; APK, app Gradle, native fleet CLI and existing workflows/readiness/cut-release callers remain unchanged. Existing phone, publication, HA and design approvals remain.",
+        "The original 14:13:39–14:43:39 UTC clock includes the initial AppSwitcher audit and host guard follow-up; all older negative/held scopes retain their original clocks."
+      ],
+      "next": "Retain host regressions; hosted CI and actual release-flow acceptance remain open.",
+      "issueClock": {
+        "startedAt": "2026-11-03T14:13:39Z",
+        "deadline": "2026-11-03T14:43:39Z",
+        "reset": false
+      }
+    },
     {
       "id": "crash-guard-clock-reset",
       "title": "Crash guard: reset the streak after a backward clock correction",
