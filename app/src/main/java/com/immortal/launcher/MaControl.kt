@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import java.util.concurrent.Executors
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -122,20 +123,28 @@ object MaControl {
     val idle = NowPlayingState(PlaybackState.IDLE)
     val arr = JSONObject(playersAllJson).optJSONArray("result") ?: return idle
     val byId = HashMap<String, JSONObject>()
-    var ours: JSONObject? = null
     for (i in 0 until arr.length()) {
       val p = arr.getJSONObject(i)
       byId[p.optString("player_id")] = p
-      val pid = p.optString("player_id")
-      val name = p.optString("display_name")
-      if ((clientId != null && pid == clientId) || (clientName != null && name == clientName)) ours = p
     }
-    val me = ours ?: return idle
+    val me = selectPlayer(arr, clientId, clientName) ?: return idle
     // When synced, the queue + current track live on the group / leader player.
     val leaderId =
         me.optString("active_group").ifBlank { me.optString("synced_to") }.ifBlank { me.optString("player_id") }
     val leader = byId[leaderId] ?: me
     return stateOf(leader) ?: stateOf(me) ?: idle
+  }
+
+  /** Prefer stable identity; display names are only a fallback and may repeat. */
+  private fun selectPlayer(arr: JSONArray, clientId: String?, clientName: String?): JSONObject? {
+    var idMatch: JSONObject? = null
+    var nameMatch: JSONObject? = null
+    for (i in 0 until arr.length()) {
+      val p = arr.getJSONObject(i)
+      if (clientId != null && p.optString("player_id") == clientId) idMatch = p
+      if (clientName != null && p.optString("display_name") == clientName) nameMatch = p
+    }
+    return idMatch ?: nameMatch
   }
 
   /** Build a now-playing state from a player's `current_media` + `state`, or null if it isn't
@@ -229,13 +238,7 @@ object MaControl {
     send(ws, "players/all", null)
     val r = await(ws, "players/all") ?: return null
     val arr = JSONObject(r).optJSONArray("result") ?: return null
-    var ours: JSONObject? = null
-    for (i in 0 until arr.length()) {
-      val p = arr.getJSONObject(i)
-      val pid = p.optString("player_id")
-      val name = p.optString("display_name")
-      if ((clientId != null && pid == clientId) || (clientName != null && name == clientName)) ours = p
-    }
+    val ours = selectPlayer(arr, clientId, clientName)
     if (ours == null) {
       Log.w(TAG, "MA: no player matched our snapclient")
       return null

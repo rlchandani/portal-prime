@@ -1,0 +1,1703 @@
+{
+  "recordedAt": "2026-11-03T10:50:44.059207+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T10:30:21+00:00",
+    "deadline": "2026-11-03T11:00:21+00:00",
+    "base": "2176ae8d702dc9aed5e5fe77aa7bdeef6607549e",
+    "backlogTasks": 92,
+    "scope": "Fresh distinct source audit of intercom lifecycle, media metadata and photo-source reliability. Every new issue retains this original discovery clock through reproduction, fix, verification, delivery, docs, cleanup and commit. No earlier issue clock reset.",
+    "existingRoomVersion": "1.116/code110",
+    "excludedOlderFindings": [
+      "PresenceHub cross-thread fanout, MQTT fourth Remaining Length and active-broker reconnect source hypotheses retain10:07:54–10:37:54 clock; no newslot.",
+      "Aurora forecast wording retains09:46:04–10:16:04 clock; no newslot.",
+      "MalformedISS/invalidAurora07:36–08:06 and TimerAlarmAudioTrack08:51–09:21 exhausted.",
+      "BedtimeTTS completion already older inventory; no freshslot.",
+      "Prior MQTT socket ownership source audit already recorded; no reopen."
+    ],
+    "boundaries": [
+      "No phone or Pixel operations, HA or MQTT experiments, real provider/network discovery, logins, GitHub authentication, push or publication.",
+      "Only Family192.168.0.70:5555 ADB and explicitly scoped two-room Fleet delivery after a verified candidate; no device work during discovery.",
+      "Preserve preexisting scripts/__pycache__/ and ignored native Fleet CLI. All prior backlog objects unchanged."
+    ]
+  },
+  "finding": {
+    "backlogRecordsReviewed": 92,
+    "trigger": "Legacy players/all includes an exact Portal client-ID match followed by another player with the same display name. The OR-loop overwrites the exact identity with the name decoy.",
+    "actualWitness": "Baseline parser returns the decoy track and private resolver returns the decoy player/group. A renamed exact ID also loses to a stale name; an inactive own player borrows the decoy track.",
+    "status": "Eight frozen selection assertions corrected with eight compatibility methods retained; actual debug differential and exact optimized delivery verified.",
+    "duplicateAuditBinding": {
+      "sha256": "889d5e192df7c91bc875d65b3d91fc9f14fa50cac257adbc7a4b75cabbcef023",
+      "bytes": 13861
+    },
+    "distinctComponent": "MaControl legacy metadata and private target selection, separate from strict MaMusicProtocol provider IDs, receivers, group queues and audio."
+  },
+  "correction": {
+    "scope": "One private full-array selectPlayer helper retains separate ID/name matches and returns idMatch before nameMatch. Both metadata and private target resolution consume it.",
+    "retained": "Existing last-name fallback when no ID matches, case and JSON traversal behavior, active_group before synced_to before own ID, missing leader and own-track fallback, every media field, auth/correlation/socket policy and cache writes.",
+    "limits": "No new name ambiguity, canonical provider-ID, schema, group topology, authentication or public transport policy."
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/MaControl.kt": "0e650b987ce2b71b6709734240f6a39afde1a19c21aec4f5d6784a7c67af5eb6",
+    "app/src/test/java/com/immortal/launcher/MaControlPlayerSelectionTest.kt": "021751b5cf3f9c71aae161e3836f2a9cbbc9230bf926a97a22dc82275fefa755",
+    "app/build.gradle.kts": "c0a8fd5b0473ad2fd7d45834e9decead7b4fc6d4719850445029fa02ede61a85"
+  },
+  "red": {
+    "terminalExit": 1,
+    "tests": 16,
+    "failures": 8,
+    "passingControls": 8,
+    "errors": 0,
+    "skips": 0,
+    "failedMethods": [
+      {
+        "name": "commandTargetExactIdUsesItsGroupInsteadOfTheNameDecoysGroup",
+        "type": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "metadataInactiveExactIdDoesNotBorrowTheNameDecoysTrack",
+        "type": "java.lang.AssertionError"
+      },
+      {
+        "name": "commandTargetExactIdWinsRegardlessOfNameMatchOrder",
+        "type": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "commandTargetRenamedExactIdWinsOverStaleName",
+        "type": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "commandTargetInactiveExactIdStillBelongsToThisPortal",
+        "type": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "metadataExactIdWinsRegardlessOfNameMatchOrder",
+        "type": "java.lang.AssertionError"
+      },
+      {
+        "name": "metadataRenamedExactIdWinsOverStaleName",
+        "type": "java.lang.AssertionError"
+      },
+      {
+        "name": "metadataExactIdUsesItsGroupInsteadOfTheNameDecoysGroup",
+        "type": "java.lang.AssertionError"
+      }
+    ],
+    "frozenTestSha256": "021751b5cf3f9c71aae161e3836f2a9cbbc9230bf926a97a22dc82275fefa755",
+    "baselineSourceSha256": "1a5fd1a4dab16c1077245ea6b33a1ed24b0e4021622b398a4b3fc30691ece6c5",
+    "logBinding": {
+      "sha256": "bd7a877b4e1ffa50143ebd856eccc0e4ed0be147fe3fef40acdd008dd43a21fd",
+      "bytes": 3559
+    },
+    "xmlBinding": {
+      "sha256": "dd40370ba9461669cfa10d25c4590706001f7db3d435b30f0e155b79b82bc0dd",
+      "bytes": 40701
+    },
+    "recordBinding": {
+      "sha256": "4b6ae98d23ad4114ac868df03625acb7ee120c47a37528586387748f2c898f19",
+      "bytes": 1838
+    },
+    "scope": "Actual internal metadata parser and separately reflected private resolver using actual MaWebSocket with a generated numeric Socket. Four regression methods per path and eight retained methods exercising both paths.",
+    "cleanup": "Generated sockets close and process-local cachedPlayerId is restored in finally before assertions. Android boundaries inert; no public method or executor submission.",
+    "executedExcludedAttempts": 0
+  },
+  "green": {
+    "suites": 442,
+    "tests": 4264,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualMaPlayerIdentityFocusedTests": 16,
+    "allSixteenUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "1m 56s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "buildBindings": {
+    "log": {
+      "sha256": "daede886b2fa0a9e48d061973483506bcc46f570685c22e682ec72679d330f50",
+      "bytes": 13732
+    },
+    "packageProofLog": {
+      "sha256": "1aeb3b91512cfd91348775730ae3f2a63a295cdfb3aa8600a17b1f723656d8f1",
+      "bytes": 609
+    },
+    "fullXmlAggregateSha256": "323d18796600c12da6c37e61d3c9e2e88eb0297469909a76b33fd61d24747628",
+    "fullXmlFiles": 442,
+    "independentlyRecountedTotals": {
+      "tests": 4264,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "native": {
+    "runs": {
+      "baseline": {
+        "result": {
+          "status": "FAIL",
+          "checks": {
+            "actualDebugAPKClassLoader": true,
+            "idBeforeSameNameDecoyMetadata": false,
+            "idBeforeSameNameDecoyTarget": false,
+            "idAfterSameNameDecoyMetadata": true,
+            "idAfterSameNameDecoyTarget": true,
+            "renamedIdStaleDuplicateNameMetadata": false,
+            "renamedIdStaleDuplicateNameTarget": false,
+            "ownLeaderVersusDecoyGroupMetadata": false,
+            "ownLeaderVersusDecoyGroupTarget": false,
+            "inactiveOwnPlayerStaysIdleMetadata": false,
+            "inactiveOwnPlayerStaysIdleTarget": false,
+            "idOnlyRetainedMetadata": true,
+            "idOnlyRetainedTarget": true,
+            "nameOnlyRetainedMetadata": true,
+            "nameOnlyRetainedTarget": true,
+            "missingIdNameFallbackRetainedMetadata": true,
+            "missingIdNameFallbackRetainedTarget": true,
+            "noMatchRetainedMetadata": true,
+            "noMatchRetainedTarget": true,
+            "activeGroupPrecedesSyncedToMetadata": true,
+            "activeGroupPrecedesSyncedToTarget": true,
+            "syncedToPrecedesOwnPlayerMetadata": true,
+            "syncedToPrecedesOwnPlayerTarget": true,
+            "missingActiveGroupRetainsExistingFallbackMetadata": true,
+            "missingActiveGroupRetainsExistingFallbackTarget": true,
+            "isolatedMaExecutorTerminated": true,
+            "noMaExecutorWorkerStarted": true,
+            "strictGeneratedWireContracts": true
+          },
+          "observations": {
+            "idBeforeSameNameDecoy": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Decoy track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "decoy",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "461f80e25d07df2d5d55dc05391fd5cdda891fd6afcb9521e86845424e9c670e",
+                "replyFrameSha256": "3af70583b337c564b19b76ae931f331b02e9b878bb2681adaf3de1fccc3b93ba",
+                "inputBytesConsumed": 583
+              }
+            },
+            "idAfterSameNameDecoy": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "own",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "86705a55b99e7781e740db27e2fa277702df09c582380b2e672c54412685032b",
+                "replyFrameSha256": "49e2559a4ffd711a9df38136fe9b91f8e1c2783f0b3c2059d64e510cca188540",
+                "inputBytesConsumed": 583
+              }
+            },
+            "renamedIdStaleDuplicateName": {
+              "expectedMetadata": {
+                "state": "PAUSED",
+                "title": "Renamed track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Decoy track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "decoy",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "077b63f5304ae3bbfebb6087fb0eca476465b611e91b243ae5065f6f72f74747",
+                "replyFrameSha256": "7d9ae2d158c23ffa38fcac39687454bc3995ad32e8c6353a73e93a51a153b5b3",
+                "inputBytesConsumed": 588
+              }
+            },
+            "ownLeaderVersusDecoyGroup": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own group track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Decoy group track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own-group",
+              "actualTarget": "decoy-group",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "39b130da54fb41422e6617db810057f191fc84262f43340a0f6845aad70f6aa2",
+                "replyFrameSha256": "9501e227b2966dc31037bbc667af6dfab0469c8aa7fd4b393945274f14cd4561",
+                "inputBytesConsumed": 793
+              }
+            },
+            "inactiveOwnPlayerStaysIdle": {
+              "expectedMetadata": {
+                "state": "IDLE",
+                "title": "",
+                "artist": "",
+                "album": "",
+                "artUrl": "",
+                "durationMs": 0,
+                "positionMs": 0,
+                "source": ""
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Decoy track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "decoy",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "ecdfd1bbbb1249ca4cf82ba7bf02bf60b0eab849c605f8614001245f1583f2e4",
+                "replyFrameSha256": "ca8e58d5daade3d27996b877ac4a92a5e24e26617186f9df24b222e15af2cb21",
+                "inputBytesConsumed": 449
+              }
+            },
+            "idOnlyRetained": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "own",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "14c6e784f6b6af7015946cd994c0e331cd1e76c7dbf1ddb0da3eebdfef2c4bcc",
+                "replyFrameSha256": "f8ba5f81eea3b84b273f581b8a72684475012c59d9c73612be4b7c8bc9c2fe29",
+                "inputBytesConsumed": 580
+              }
+            },
+            "nameOnlyRetained": {
+              "expectedMetadata": {
+                "state": "PAUSED",
+                "title": "Name track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PAUSED",
+                "title": "Name track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "legacy",
+              "actualTarget": "legacy",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "5e88c09d30d0cf35181e824e79ac6f29c10e51c01a28c00ed223f94f2b880b88",
+                "replyFrameSha256": "b66edea63ffa17ce45519ec5b8fcb188a3ae701ed9755dd784f149192847d223",
+                "inputBytesConsumed": 385
+              }
+            },
+            "missingIdNameFallbackRetained": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Fallback track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Fallback track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "legacy",
+              "actualTarget": "legacy",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "474d352526f69e40df5785972fed25db5f5cb1c4900c1f708a403fdf2f09e973",
+                "replyFrameSha256": "9ee3116eefae8a0a50fa1bf012e0315628c874eb281df72df54064cfc46e8586",
+                "inputBytesConsumed": 590
+              }
+            },
+            "noMatchRetained": {
+              "expectedMetadata": {
+                "state": "IDLE",
+                "title": "",
+                "artist": "",
+                "album": "",
+                "artUrl": "",
+                "durationMs": 0,
+                "positionMs": 0,
+                "source": ""
+              },
+              "actualMetadata": {
+                "state": "IDLE",
+                "title": "",
+                "artist": "",
+                "album": "",
+                "artUrl": "",
+                "source": "",
+                "durationMs": 0,
+                "positionMs": 0
+              },
+              "expectedTarget": null,
+              "actualTarget": null,
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "d9fc6bb7b8647c669d7d89d2267074a5df7927c0f13fe0cf81a18ee405c02ec1",
+                "replyFrameSha256": "b29df17b89382b5b5c89730dee85e26b5429c1f0572e9cf3a1db86ad8ffa2c73",
+                "inputBytesConsumed": 385
+              }
+            },
+            "activeGroupPrecedesSyncedTo": {
+              "expectedMetadata": {
+                "state": "PAUSED",
+                "title": "Active group track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PAUSED",
+                "title": "Active group track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "active",
+              "actualTarget": "active",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "93a5813946234ad2336a88da79169dfc6c8dcc57fdaaee9250bbc8efb1086b7e",
+                "replyFrameSha256": "12ceb800653d8129df4fc6104c05c545120b8eb4ca18c2a6f248b87bb49f05e9",
+                "inputBytesConsumed": 837
+              }
+            },
+            "syncedToPrecedesOwnPlayer": {
+              "expectedMetadata": {
+                "state": "PAUSED",
+                "title": "Synced track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PAUSED",
+                "title": "Synced track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "synced",
+              "actualTarget": "synced",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "c6d27fa71bcae626185a8cce8c53e2d72d24a863017b52f362322733e60999a1",
+                "replyFrameSha256": "b1899c2e4f2015c615d804b9106990e328ee29b5ffe9fde24e7c1a1414714e48",
+                "inputBytesConsumed": 602
+              }
+            },
+            "missingActiveGroupRetainsExistingFallback": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "absent-group",
+              "actualTarget": "absent-group",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "91a2228f61628331ca7e7a6723d75ff51c93b7fd1ea613b5c622fb411a2f9d1a",
+                "replyFrameSha256": "90b9e28a3af837b5da632b3155558b00db148aa89b33332fb01242855e301d6e",
+                "inputBytesConsumed": 632
+              }
+            }
+          },
+          "passed": 20,
+          "total": 28,
+          "actualParserInvocations": 12,
+          "actualResolverInvocations": 12,
+          "actualMaControlFunctionInvocations": 24,
+          "actualMaWebSocketConnectInvocations": 12,
+          "actualMaWebSocketCloseInvocations": 12,
+          "generatedSocketInstances": 12,
+          "apkSha256": "11665dbc22076ef62e5ec249bc1e0a96d0513981376cb60680020236d2eddb8d",
+          "actualAPKClassLoader": true,
+          "buildVariant": "debug",
+          "optimizedSelectionVerified": false,
+          "publicNowPlayingInvocations": 0,
+          "publicCommandInvocations": 0,
+          "testLoginInvocations": 0,
+          "ownerPreferencesWritten": 0,
+          "realNetworkOperations": 0,
+          "authenticationInvocations": 0,
+          "providerOrServiceStarted": false,
+          "mainLooperPreparedOnlyInIsolatedHarness": true,
+          "scope": "Actual debug internal metadata parser and private target resolver; generated in-memory Socket transport only. No public command routing, authentication, provider, Context, configuration or owner state acceptance."
+        },
+        "process": {
+          "terminalExit": 1,
+          "stdoutSha256": "dc87b05b2dd1c151155c46bfa9ba61a6ab549b5646f5de7d2ed5ff099ffe82af",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutBytes": 11463,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "8b9813723b04c28fa8296807d127de951c18f4cd091f507781edc05a2810b6f8",
+          "bytes": 15850
+        },
+        "processBinding": {
+          "sha256": "03b3773987d75b17bc8ad9b08ffa420d01db1aaa9d7e6f431322fc153156db69",
+          "bytes": 240
+        },
+        "stdoutBinding": {
+          "sha256": "dc87b05b2dd1c151155c46bfa9ba61a6ab549b5646f5de7d2ed5ff099ffe82af",
+          "bytes": 11463
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "candidate": {
+        "result": {
+          "status": "PASS",
+          "checks": {
+            "actualDebugAPKClassLoader": true,
+            "idBeforeSameNameDecoyMetadata": true,
+            "idBeforeSameNameDecoyTarget": true,
+            "idAfterSameNameDecoyMetadata": true,
+            "idAfterSameNameDecoyTarget": true,
+            "renamedIdStaleDuplicateNameMetadata": true,
+            "renamedIdStaleDuplicateNameTarget": true,
+            "ownLeaderVersusDecoyGroupMetadata": true,
+            "ownLeaderVersusDecoyGroupTarget": true,
+            "inactiveOwnPlayerStaysIdleMetadata": true,
+            "inactiveOwnPlayerStaysIdleTarget": true,
+            "idOnlyRetainedMetadata": true,
+            "idOnlyRetainedTarget": true,
+            "nameOnlyRetainedMetadata": true,
+            "nameOnlyRetainedTarget": true,
+            "missingIdNameFallbackRetainedMetadata": true,
+            "missingIdNameFallbackRetainedTarget": true,
+            "noMatchRetainedMetadata": true,
+            "noMatchRetainedTarget": true,
+            "activeGroupPrecedesSyncedToMetadata": true,
+            "activeGroupPrecedesSyncedToTarget": true,
+            "syncedToPrecedesOwnPlayerMetadata": true,
+            "syncedToPrecedesOwnPlayerTarget": true,
+            "missingActiveGroupRetainsExistingFallbackMetadata": true,
+            "missingActiveGroupRetainsExistingFallbackTarget": true,
+            "isolatedMaExecutorTerminated": true,
+            "noMaExecutorWorkerStarted": true,
+            "strictGeneratedWireContracts": true
+          },
+          "observations": {
+            "idBeforeSameNameDecoy": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "own",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "66cbaa25bcbb31cbba8949c34c241b1ee6d1a83d870a3d60220b89e39de705cc",
+                "replyFrameSha256": "3af70583b337c564b19b76ae931f331b02e9b878bb2681adaf3de1fccc3b93ba",
+                "inputBytesConsumed": 583
+              }
+            },
+            "idAfterSameNameDecoy": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "own",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "0640e1174282af2bc121da5e1350358bd2e53f79770a53b4d57cc30e5df71ffd",
+                "replyFrameSha256": "49e2559a4ffd711a9df38136fe9b91f8e1c2783f0b3c2059d64e510cca188540",
+                "inputBytesConsumed": 583
+              }
+            },
+            "renamedIdStaleDuplicateName": {
+              "expectedMetadata": {
+                "state": "PAUSED",
+                "title": "Renamed track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PAUSED",
+                "title": "Renamed track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "own",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "805a42f4277b99330e4626dcccdc46b6f3fabc1fcd11f704a9303c9a6a37fb11",
+                "replyFrameSha256": "7d9ae2d158c23ffa38fcac39687454bc3995ad32e8c6353a73e93a51a153b5b3",
+                "inputBytesConsumed": 588
+              }
+            },
+            "ownLeaderVersusDecoyGroup": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own group track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Own group track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own-group",
+              "actualTarget": "own-group",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "26a97bc6a685679bbbc9aa0deb92e6be9670d704100d9fcb7d98234b58805a47",
+                "replyFrameSha256": "9501e227b2966dc31037bbc667af6dfab0469c8aa7fd4b393945274f14cd4561",
+                "inputBytesConsumed": 793
+              }
+            },
+            "inactiveOwnPlayerStaysIdle": {
+              "expectedMetadata": {
+                "state": "IDLE",
+                "title": "",
+                "artist": "",
+                "album": "",
+                "artUrl": "",
+                "durationMs": 0,
+                "positionMs": 0,
+                "source": ""
+              },
+              "actualMetadata": {
+                "state": "IDLE",
+                "title": "",
+                "artist": "",
+                "album": "",
+                "artUrl": "",
+                "source": "",
+                "durationMs": 0,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "own",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "ca928b55e477a1868f416282ac1c61663512ed3fd0da88dfeafc0dfec99c6275",
+                "replyFrameSha256": "ca8e58d5daade3d27996b877ac4a92a5e24e26617186f9df24b222e15af2cb21",
+                "inputBytesConsumed": 449
+              }
+            },
+            "idOnlyRetained": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "own",
+              "actualTarget": "own",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "80cafdbe18e6714dd9e1722a54d724342227341508bb1fb73847f4bec8342d2b",
+                "replyFrameSha256": "f8ba5f81eea3b84b273f581b8a72684475012c59d9c73612be4b7c8bc9c2fe29",
+                "inputBytesConsumed": 580
+              }
+            },
+            "nameOnlyRetained": {
+              "expectedMetadata": {
+                "state": "PAUSED",
+                "title": "Name track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PAUSED",
+                "title": "Name track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "legacy",
+              "actualTarget": "legacy",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "33329d49e02088771bde10046b16021030b417163747acfc1168d3866d4def6d",
+                "replyFrameSha256": "b66edea63ffa17ce45519ec5b8fcb188a3ae701ed9755dd784f149192847d223",
+                "inputBytesConsumed": 385
+              }
+            },
+            "missingIdNameFallbackRetained": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Fallback track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Fallback track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "legacy",
+              "actualTarget": "legacy",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "c0ad5af4663ca7defb8876b3ed0426478cdb528211a0eb36e2e7f4179025fbef",
+                "replyFrameSha256": "9ee3116eefae8a0a50fa1bf012e0315628c874eb281df72df54064cfc46e8586",
+                "inputBytesConsumed": 590
+              }
+            },
+            "noMatchRetained": {
+              "expectedMetadata": {
+                "state": "IDLE",
+                "title": "",
+                "artist": "",
+                "album": "",
+                "artUrl": "",
+                "durationMs": 0,
+                "positionMs": 0,
+                "source": ""
+              },
+              "actualMetadata": {
+                "state": "IDLE",
+                "title": "",
+                "artist": "",
+                "album": "",
+                "artUrl": "",
+                "source": "",
+                "durationMs": 0,
+                "positionMs": 0
+              },
+              "expectedTarget": null,
+              "actualTarget": null,
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "1fd7ba910dd8357919523da079ebb0da30845e7e7570f9786c08f3049eb6d8fc",
+                "replyFrameSha256": "b29df17b89382b5b5c89730dee85e26b5429c1f0572e9cf3a1db86ad8ffa2c73",
+                "inputBytesConsumed": 385
+              }
+            },
+            "activeGroupPrecedesSyncedTo": {
+              "expectedMetadata": {
+                "state": "PAUSED",
+                "title": "Active group track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PAUSED",
+                "title": "Active group track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "active",
+              "actualTarget": "active",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "af460b620fedd0cd19b4fa7e01cfefb52c84328b9fa33dc0e986072dc5f61a51",
+                "replyFrameSha256": "12ceb800653d8129df4fc6104c05c545120b8eb4ca18c2a6f248b87bb49f05e9",
+                "inputBytesConsumed": 837
+              }
+            },
+            "syncedToPrecedesOwnPlayer": {
+              "expectedMetadata": {
+                "state": "PAUSED",
+                "title": "Synced track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PAUSED",
+                "title": "Synced track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "synced",
+              "actualTarget": "synced",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "914bb35e39d2896f9e65891870929881f1c3c0125eb5e49802ed67fccacd9a48",
+                "replyFrameSha256": "b1899c2e4f2015c615d804b9106990e328ee29b5ffe9fde24e7c1a1414714e48",
+                "inputBytesConsumed": 602
+              }
+            },
+            "missingActiveGroupRetainsExistingFallback": {
+              "expectedMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "durationMs": 123500,
+                "positionMs": 0,
+                "source": "ma"
+              },
+              "actualMetadata": {
+                "state": "PLAYING",
+                "title": "Own track",
+                "artist": "Fixture artist",
+                "album": "Fixture album",
+                "artUrl": "fixture-art",
+                "source": "ma",
+                "durationMs": 123500,
+                "positionMs": 0
+              },
+              "expectedTarget": "absent-group",
+              "actualTarget": "absent-group",
+              "generatedWire": {
+                "contractPassed": true,
+                "connectRequests": 1,
+                "closeRequests": 1,
+                "closeOutputBytes": 0,
+                "request": {
+                  "command": "players/all",
+                  "message_id": "players/all"
+                },
+                "wireOutputSha256": "66415d2263531cd3ec725bcdfe635a1cc394d40bf7ccc17049bedae46de8b51a",
+                "replyFrameSha256": "90b9e28a3af837b5da632b3155558b00db148aa89b33332fb01242855e301d6e",
+                "inputBytesConsumed": 632
+              }
+            }
+          },
+          "passed": 28,
+          "total": 28,
+          "actualParserInvocations": 12,
+          "actualResolverInvocations": 12,
+          "actualMaControlFunctionInvocations": 24,
+          "actualMaWebSocketConnectInvocations": 12,
+          "actualMaWebSocketCloseInvocations": 12,
+          "generatedSocketInstances": 12,
+          "apkSha256": "c5172c22f4155b2ae84d482bf0c79079983f2c476319b8a65b3020d9826e5550",
+          "actualAPKClassLoader": true,
+          "buildVariant": "debug",
+          "optimizedSelectionVerified": false,
+          "publicNowPlayingInvocations": 0,
+          "publicCommandInvocations": 0,
+          "testLoginInvocations": 0,
+          "ownerPreferencesWritten": 0,
+          "realNetworkOperations": 0,
+          "authenticationInvocations": 0,
+          "providerOrServiceStarted": false,
+          "mainLooperPreparedOnlyInIsolatedHarness": true,
+          "scope": "Actual debug internal metadata parser and private target resolver; generated in-memory Socket transport only. No public command routing, authentication, provider, Context, configuration or owner state acceptance."
+        },
+        "process": {
+          "terminalExit": 0,
+          "stdoutSha256": "c66a3e6c13afdb21a5ef39a4d95e7d252c73ad63f33df5a494d9307f2890c9c8",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutBytes": 11385,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "84566d7577627fa7cac8cb74771116ce0c6a70fea8985427d8910f8c982b3286",
+          "bytes": 15772
+        },
+        "processBinding": {
+          "sha256": "23588479993556e879dd4af0efc33e17288318c94c24533f917644fe79507463",
+          "bytes": 240
+        },
+        "stdoutBinding": {
+          "sha256": "c66a3e6c13afdb21a5ef39a4d95e7d252c73ad63f33df5a494d9307f2890c9c8",
+          "bytes": 11385
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    },
+    "bindings": {
+      "baseline": {
+        "fixtureSourceSha256": "c8463968d00f56a76f3a9027e1b4fc5d28342c981325a3f232397e076bde7e02",
+        "fixtureJarSha256": "0dff8a42ed30654ce5e1d4f31adb1682e55845c28439027a0ab252fac4a5a870",
+        "compilerSha256": "da49b2139a4c141e899264a9a3022685ed22d185683a1bbda2070e83ad93c0e3",
+        "runnerSha256": "9d7994cd8452208d72f7c4fe2c97e3e40798c9c6c7dd48e33513480b1a2d8114",
+        "phases": [
+          "baseline"
+        ],
+        "apkSha256": {
+          "baseline": "11665dbc22076ef62e5ec249bc1e0a96d0513981376cb60680020236d2eddb8d"
+        },
+        "buildVariant": "debug",
+        "optimizedSelectionVerified": false,
+        "scope": "Actual debug internal parser and private resolver using actual MaWebSocket over generated inert Socket; no auth, public commands, Context, config, provider or real network"
+      },
+      "candidate": {
+        "fixtureSourceSha256": "c8463968d00f56a76f3a9027e1b4fc5d28342c981325a3f232397e076bde7e02",
+        "fixtureJarSha256": "0dff8a42ed30654ce5e1d4f31adb1682e55845c28439027a0ab252fac4a5a870",
+        "compilerSha256": "da49b2139a4c141e899264a9a3022685ed22d185683a1bbda2070e83ad93c0e3",
+        "runnerSha256": "9d7994cd8452208d72f7c4fe2c97e3e40798c9c6c7dd48e33513480b1a2d8114",
+        "phases": [
+          "candidate"
+        ],
+        "apkSha256": {
+          "candidate": "c5172c22f4155b2ae84d482bf0c79079983f2c476319b8a65b3020d9826e5550"
+        },
+        "buildVariant": "debug",
+        "optimizedSelectionVerified": false,
+        "scope": "Actual debug internal parser and private resolver using actual MaWebSocket over generated inert Socket; no auth, public commands, Context, config, provider or real network"
+      }
+    },
+    "cleanup": {
+      "baseline": {
+        "parentsRetired": {
+          "baseline": true
+        },
+        "ownedScratchRemoved": true,
+        "faults": [],
+        "ownerPreferencesWritten": 0,
+        "realNetworkOperations": 0,
+        "providerOrServiceStarted": false,
+        "buildVariant": "debug",
+        "optimizedSelectionVerified": false,
+        "externalTimeoutFailureCleanupFaultInjected": false
+      },
+      "candidate": {
+        "parentsRetired": {
+          "candidate": true
+        },
+        "ownedScratchRemoved": true,
+        "faults": [],
+        "ownerPreferencesWritten": 0,
+        "realNetworkOperations": 0,
+        "providerOrServiceStarted": false,
+        "buildVariant": "debug",
+        "optimizedSelectionVerified": false,
+        "externalTimeoutFailureCleanupFaultInjected": false
+      }
+    },
+    "compilerLog": {
+      "sha256": "529ac00eafe1cff7deec7fd1e9f2e0baa5ea57482aa9f1f2af1b4815a52ac173",
+      "bytes": 988
+    },
+    "compilerTerminalExit": 0,
+    "compilerWarnings": 3,
+    "compilerWarningScope": "Java8 source/target obsolescence; separate deprecation note.",
+    "runnerLogs": {
+      "baseline": {
+        "sha256": "62f0868e040aa73ca6a00e32059c1fce6d10e44c83ae7d1a2dd0314046cea48a",
+        "bytes": 181
+      },
+      "candidate": {
+        "sha256": "216e4c951d01c446755afc3675da273f5bd584f460ecdccb2c2a87dd9af2a6df",
+        "bytes": 182
+      }
+    },
+    "acceptedParents": 2,
+    "actualMaControlFunctionInvocations": 48,
+    "actualParserInvocations": 24,
+    "actualResolverInvocations": 24,
+    "actualGeneratedWireConnectAndCloseInvocationsEach": 24,
+    "correctedSelectionChecks": [
+      "idBeforeSameNameDecoyMetadata",
+      "idBeforeSameNameDecoyTarget",
+      "renamedIdStaleDuplicateNameMetadata",
+      "renamedIdStaleDuplicateNameTarget",
+      "ownLeaderVersusDecoyGroupMetadata",
+      "ownLeaderVersusDecoyGroupTarget",
+      "inactiveOwnPlayerStaysIdleMetadata",
+      "inactiveOwnPlayerStaysIdleTarget"
+    ],
+    "retainedProductChecks": 16,
+    "retainedHarnessChecks": 4,
+    "preExecutionHistoryBinding": {
+      "sha256": "2a8720ba904529d817d643177ed7fb3099f9e1d609806c744fc784e5f5dda827",
+      "bytes": 6508
+    },
+    "runtimeEnvironment": {
+      "familySdk": 29,
+      "terminalExit": 0,
+      "api28Executed": false
+    },
+    "executedExcludedAttempts": 0,
+    "scope": "Family Android10 actual debug internal parser and private target resolver, twelve cases per variant. Exact classloader, full immutable source/JAR/compiler/runner/APK bytes, canonical unsymlinked allowlist/LF marker and fresh dex guarded. MainLooper only in isolated parent; lazy executor shut down/awaited without worker submission.",
+    "limits": "Optimized constructor specialization and removed state getters prevent this debug fixture admission; zero optimized selection invocations and no keep rules. No public command send, auth/server/provider, Context/preferences, live network, playback/UI, API28 or external timeout/crash cleanup fault injection."
+  },
+  "artifact": {
+    "sha256": "c8eafff85be1f47211d5e09089c0807bdbeacf9c212830a592bd3892de234ce1",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.117",
+    "versionCode": 111,
+    "variants": {
+      "performance": {
+        "sha256": "c8eafff85be1f47211d5e09089c0807bdbeacf9c212830a592bd3892de234ce1",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.117",
+        "versionCode": 111
+      },
+      "debug": {
+        "sha256": "c5172c22f4155b2ae84d482bf0c79079983f2c476319b8a65b3020d9826e5550",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.117",
+        "versionCode": 111
+      },
+      "rollback": {
+        "sha256": "644d148df8285e92fc70c00a87232a30dfffe05965f52a2e08c2e5dc1666d43b",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.116",
+        "versionCode": 110
+      }
+    },
+    "debugSha256": "c5172c22f4155b2ae84d482bf0c79079983f2c476319b8a65b3020d9826e5550",
+    "rollbackSha256": "644d148df8285e92fc70c00a87232a30dfffe05965f52a2e08c2e5dc1666d43b",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "1m 56s"
+  },
+  "artifactBindings": {
+    "baselinePerformance": {
+      "sha256": "644d148df8285e92fc70c00a87232a30dfffe05965f52a2e08c2e5dc1666d43b",
+      "bytes": 25862702
+    },
+    "candidatePerformance": {
+      "sha256": "c8eafff85be1f47211d5e09089c0807bdbeacf9c212830a592bd3892de234ce1",
+      "bytes": 25862702
+    },
+    "baselineDebug": {
+      "sha256": "11665dbc22076ef62e5ec249bc1e0a96d0513981376cb60680020236d2eddb8d",
+      "bytes": 46703529
+    },
+    "candidateDebug": {
+      "sha256": "c5172c22f4155b2ae84d482bf0c79079983f2c476319b8a65b3020d9826e5550",
+      "bytes": 46703529
+    },
+    "baselineMapping": {
+      "sha256": "0709d8e7466cbb3fada07341142eee4f27b4414ce4c5c95ce127fe76e43c846b",
+      "bytes": 83198573
+    },
+    "candidateMapping": {
+      "sha256": "06a8f018b4fece0160b4b8e37f494e0e9cb4809548544d274e6dbd2207eb8083",
+      "bytes": 83198249
+    },
+    "baselineSource": {
+      "sha256": "1a5fd1a4dab16c1077245ea6b33a1ed24b0e4021622b398a4b3fc30691ece6c5",
+      "bytes": 10680
+    },
+    "baselinePublicVersion": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "nativeSource": {
+      "sha256": "c8463968d00f56a76f3a9027e1b4fc5d28342c981325a3f232397e076bde7e02",
+      "bytes": 20678
+    },
+    "nativeCompiler": {
+      "sha256": "da49b2139a4c141e899264a9a3022685ed22d185683a1bbda2070e83ad93c0e3",
+      "bytes": 2701
+    },
+    "nativeRunner": {
+      "sha256": "9d7994cd8452208d72f7c4fe2c97e3e40798c9c6c7dd48e33513480b1a2d8114",
+      "bytes": 10814
+    },
+    "nativeJar": {
+      "sha256": "0dff8a42ed30654ce5e1d4f31adb1682e55845c28439027a0ab252fac4a5a870",
+      "bytes": 11622
+    }
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "terminalExit": 0,
+    "checks": {
+      "family": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true,
+        "fontUnchanged": true,
+        "accessibilityUnchanged": true,
+        "originalChromeTaskRetained": true,
+        "photoFrameResumed": true,
+        "displayOn": true,
+        "installedFullSha256Matches": true
+      },
+      "living": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true
+      }
+    },
+    "preferenceStates": {
+      "family": {
+        "states": 10,
+        "existingFilesByteIdentical": 10,
+        "absencesUnchanged": 0
+      },
+      "living": {
+        "states": 10,
+        "existingFilesByteIdentical": 7,
+        "absencesUnchanged": 3
+      }
+    },
+    "preferenceNames": [
+      "immortal_countdown",
+      "immortal_home_widgets",
+      "immortal_timers",
+      "immortal_timer",
+      "immortal_sunrise",
+      "immortal_chime",
+      "immortal_weather",
+      "immortal_packs",
+      "immortal_cameras",
+      "immortal_screensaver"
+    ],
+    "exceptions": [],
+    "ownerPreferenceEditsOrRestores": 0,
+    "scope": "Complete captured screensaver/profile/layout/photo-source maps and ten named preference states per room; name/devMode retained. Family font/services/original Chrome/frame/awake/full installed hash checked. Living Fleet only.",
+    "familyScreenshotBinding": {
+      "sha256": "01462313b3abf272cfc5d83f5fdd3b7c6bb387f9c71b3334ac6cb26cd4c16f37",
+      "bytes": 55570
+    },
+    "familyScreenshotRootVisuallyInspected": true,
+    "familyScreenshotObservation": "Large tan 2:45 digital night clock and Tuesday November3 date on black; accessibility button visible. Frame/awake verified separately. No music, provider, photos or Weather acceptance inferred from this view.",
+    "livingVisualAcceptance": "Unverified"
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1644,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 2007,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "cleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "observationTerminals": {
+    "health": {
+      "terminalExit": 0
+    },
+    "credentials": {
+      "terminalExit": 0
+    },
+    "guard": {
+      "terminalExit": 1
+    },
+    "screenshot": {
+      "terminalExit": 0
+    }
+  },
+  "publicRelease": {
+    "guardTerminalExit": 1,
+    "expectedRejection": true,
+    "guardLogBinding": {
+      "sha256": "da4c1ad6de7e2a3c67cc5c290a34071d2c245759dc8434d2c36bdc85932b9aaa",
+      "bytes": 223
+    },
+    "publicManifestByteUnchanged": true,
+    "publicVersionName": "1.83",
+    "publicVersionCode": 77,
+    "localVersionName": "1.117",
+    "localVersionCode": 111,
+    "githubAuthenticationPushOrPublication": false
+  },
+  "nativeFleetCli": {
+    "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "bytes": 694352,
+    "unchanged": true,
+    "rebuiltOrReinstalled": false
+  },
+  "review": {
+    "blockingFindings": [],
+    "sourceReviewBinding": {
+      "sha256": "4ae3ef20affed21a9ba28feb2ce15fab46087bc8e2d8cdb119b0d28eb6029b58",
+      "bytes": 4530
+    },
+    "gateNativeReviewBinding": {
+      "sha256": "098f87cce2d287bcee78769d2305231c7079d433e74bca2723aa404956c28701",
+      "bytes": 139976
+    },
+    "additionalIndependentReviewBinding": {
+      "sha256": "0caac5d91e6556b16ec9e027e6ce34c9b57487ac5664a7aeb1169018524dfd6b",
+      "bytes": 6710
+    },
+    "finalEightPathReviewLocation": "Separate private closing receipt binds final eight artifact hashes after final documentation QA; no self-referential proof hash."
+  },
+  "documentation": {
+    "strictMkDocs": {
+      "terminalExit": 0,
+      "durationSeconds": 2.261,
+      "warnings": 0,
+      "errors": 0
+    },
+    "chromeTerminals": {
+      "terminalExit": 0,
+      "durationSeconds": 4.702,
+      "warnings": 0,
+      "errors": 0
+    },
+    "chrome": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 93,
+          "checks": [
+            {
+              "id": "ma-player-identity",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 93,
+          "checks": [
+            {
+              "id": "ma-player-identity",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "terminalBinding": {
+      "sha256": "68cdf5c4ea8141dc14d0cb5a7f86d243016211e495c425f9131b8ee34bf2ea04",
+      "bytes": 218
+    },
+    "mkdocsLogBinding": {
+      "sha256": "1eef52d8fcc9c5f6206da123711930fe11c5aebe313abf067a69c1c3dceeb104",
+      "bytes": 31594
+    },
+    "chromeLogBinding": {
+      "sha256": "c6704588a108ecc0bdd632ebd476b45e90f9520f4dfc9dee5984499a5415829b",
+      "bytes": 1455
+    },
+    "chromeResultBinding": {
+      "sha256": "f518d9283d11635a22af010ed264f4114d0939820fa79f28151a183470012967",
+      "bytes": 1508
+    },
+    "screenshots": {
+      "390": {
+        "sha256": "b1f4fc4873b2e2349fc31cf099214197b7ff107c30c1ed468ae3e5df16cc0316",
+        "bytes": 246115,
+        "rootVisuallyInspected": true,
+        "observation": "Readable selection title, Portal platform, complete artifact/state facts and visible evidence text; horizontal containment checks pass. Phone full detail readable; desktop detail uses its existing vertical scroll."
+      },
+      "1600": {
+        "sha256": "2b0ee8798e8317a256a50b4cac54e1333f3944fbb3bd9d64a05b75f819f84e78",
+        "bytes": 124686,
+        "rootVisuallyInspected": true,
+        "observation": "Readable selection title, Portal platform, complete artifact/state facts and visible evidence text; horizontal containment checks pass. Phone full detail readable; desktop detail uses its existing vertical scroll."
+      }
+    },
+    "closingChecksLocation": "Separate private closing receipt verifies exact final HTTP proof bytes and unchanged screenshots; final proof omits recursive screenshot metadata."
+  },
+  "backlog": {
+    "tasks": 93,
+    "delivered": 58,
+    "verified": 25,
+    "approval": 3,
+    "parked": 6,
+    "queued": 1,
+    "priorTaskObjects": 92,
+    "defaultTaskPreserved": "weather-native-layout",
+    "boundaryChange": "Only current room version 1.116/code110 to 1.117/code111.",
+    "preservation": {
+      "tasks": 93,
+      "counts": {
+        "delivered": 58,
+        "verified": 25,
+        "approval": 3,
+        "parked": 6,
+        "queued": 1
+      },
+      "priorTaskObjects": 92,
+      "allPriorObjectsIdentical": true,
+      "priorRawTaskSuffixBytes": 293550,
+      "priorRawTaskSuffixSha256": "f7a8009d5376a19462d74d332bd3c8f22a66661a483dc8bd2047c3d74fb86bb7",
+      "priorRawTaskSuffixByteIdentical": true,
+      "defaultTask": "weather-native-layout",
+      "defaultUnchanged": true,
+      "onlyBoundaryChange": "Current room version1.116/code110 to1.117/code111",
+      "otherTopLevelKeysUnchanged": true
+    },
+    "preservationBinding": {
+      "sha256": "8f5ed40475d89e210f8a7ade9266a9e54a7dcb3585dac0aee4a6699c51982b39",
+      "bytes": 555
+    }
+  },
+  "deferredHypotheses": {
+    "originalDiscoveryClockRetained": "2026-11-03T10:30:21+00:00",
+    "deadlineRetained": "2026-11-03T11:00:21+00:00",
+    "sameClockSourceOnly": [
+      "SMB remote File ownership",
+      "SMB/DAV empty-directory work caps",
+      "album/duration dedupe"
+    ],
+    "photoAuditBinding": {
+      "sha256": "2094d6aed5a61d609913a5bd0c78f0b09e4c184a8da9c1b344b3e6dd27f4f0c9",
+      "bytes": 3677
+    },
+    "smbjBytecodeBinding": {
+      "sha256": "b870025c497bd6cf2720422534dc359f0cf22327753aba2b24e91db21b3bfe06",
+      "bytes": 440
+    },
+    "intercomNegativeAuditBinding": {
+      "sha256": "9791d054a0961ef912e1cf64e3587b445f7586d02dfd52671ed3a5df8377aa3f",
+      "bytes": 13371
+    },
+    "policy": "No implementation, actual product execution or future reset for deferred hypotheses; older held/exhausted issue clocks remain."
+  },
+  "limits": [
+    "Actual generated metadata and private target selection are debug only; exact optimized artifact build/install is separate.",
+    "Real provider identity mapping, public authenticated command sends, decoded/audible playback and physical controls remain open.",
+    "Existing name fallback, JSON schema and group topology policy retained; API28 unverified.",
+    "Normal two-parent/scratch cleanup observed; external timeout/crash fault injection unverified.",
+    "No phone/Pixel, HA/MQTT experiment, login, GitHub auth, push or publication.",
+    "Public1.83/code77 unchanged; local1.117/code111 is not publication eligible.",
+    "Existing approvals and all prior raw task records remain; whole-product goal stays active."
+  ],
+  "finalEvidenceFrozenAt": "2026-11-03T10:51:27.538382+00:00"
+}

@@ -13,8 +13,39 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / Orthodox feast civil dates:** exact optimized
-  **1.116/code110** is installed and fully hashed in both rooms. Gregorian civil
+- **Current room APK / Music Assistant player identity:** exact optimized
+  **1.117/code111** is installed and fully hashed in both rooms. An exact client
+  ID now wins over display-name fallback for legacy metadata and private command
+  targeting. Missing-ID name fallback, current metadata, group precedence,
+  authentication and transport remain. Sixteen frozen methods reproduce eight
+  failures then pass; **4,264 JVM / 442 suites**, debug, optimized, R8 and vital
+  lint pass in 1m 56s. Actual debug Family selection improves **20/28 to 28/28**:
+  eight corrections, sixteen retained product checks and four harness controls.
+  Each variant makes twelve parser calls, twelve private resolver calls and
+  twelve generated wire connections and closes. The isolated lazy executor and
+  two final native parents retire; owned scratch is removed. No excluded execution.
+  Compiler succeeds with three Java 8 obsolescence warnings and a deprecation note.
+  Optimized native selection is unavailable; no keep rules or public command,
+  authentication, provider or real network acceptance. Complete captured maps
+  and ten preference states per room match: Family ten existing files, Living
+  seven existing files and three unchanged absences. No exception, edit or restore.
+  Family tan 2:45 night clock and November 3 date were viewed; font, accessibility,
+  original Chrome, resumed frame and awake display remain. Living visual and
+  physical music acceptance remain open. Normal diagnostics and logcat requests
+  for 1500 lines are limited checks; actual outputs have 1644 Family and 2007
+  Living lines without fatal or ANR markers. Original registry unchanged, copied
+  credentials removed; native CLI unchanged. API28, actual player topology,
+  public transport, playback and external timeout cleanup remain unverified.
+  Public 1.83 guard rejects local 1.117; no phone, HA, auth or publication.
+  **93 tasks: 58 delivered, 25 locally verified, 3 approval, 6 parked, 1 queued.**
+  Original **10:30:21–11:00:21 UTC** audit clock retained. Metadata dedupe and
+  SMB ownership remain source-only under this clock; older held or exhausted
+  scopes remain. Broader goal remains active.
+  [Receipt](portal-ma-player-identity-2026-11-03.md).
+
+- **Previous room APK / Orthodox feast civil dates:** exact optimized
+  **1.116/code110** was installed and fully hashed in both rooms at that
+  delivery's closure; the current MA identity build supersedes it. Gregorian civil
   offsets keep the existing feast labels on their mapped dates across clock
   changes and differing input/default zones. Labels, precedence, fixed fallback
   and the documented 1900–2099 Easter algorithm remain. Ten frozen methods
@@ -41,7 +72,7 @@ The updated whole-product objective is
 
 - **Previous room APK / countdown list mutations:** exact optimized
   **1.115/code109** was installed and fully hashed in both rooms at that
-  delivery's closure; the current feast build supersedes it. Shared object
+  delivery's closure; the feast build superseded it. Shared object
   monitor serialization keeps overlapping Add and Remove results; identity,
   dates, payloads, order and asynchronous preference apply remain. Seven frozen
   methods reproduce four failures then pass; **4,238 JVM/440 suites**,
