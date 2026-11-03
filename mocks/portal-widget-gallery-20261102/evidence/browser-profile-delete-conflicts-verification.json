@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "status": "delivered",
+  "scope": "Preserve a newer same-name browser profile during stale Delete confirmation; preceding Save protection retained",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.96",
+    "versionCode": 90,
+    "bytes": 25861294,
+    "sha256": "208e26f1688aed74788a26a5f7ee4de796f19d27a356d4f38ad85a5664e09aa4",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "servedControllerExpectedSha256": "94b8f9afe0670d321ed4365af5aba6080d2bea875dfb7512ad7c0f9782070e44"
+  },
+  "automated": {
+    "red": {
+      "tests": 3,
+      "failed": 3,
+      "passed": 0
+    },
+    "browserJS": {
+      "passed": 724,
+      "failed": 0
+    },
+    "jvm": {
+      "tests": 4066,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 423
+    },
+    "debugOptimizedR8VitalLint": {
+      "terminalExit": 0,
+      "seconds": 165
+    }
+  },
+  "independentReview": {
+    "blockingFindings": 0,
+    "sourceAndFixtureHashesMatch": true,
+    "reviewScope": "Static source and fixture review; reviewer did not execute tests or access devices"
+  },
+  "renderedBrowser": {
+    "actualFamilyServedAssets": true,
+    "generatedManagementResponsesOnly": true,
+    "viewportWidth": 390,
+    "rootFontEmulationPercents": [
+      100,
+      130
+    ],
+    "fullSystemTextScalingClaimed": false,
+    "baseline": {
+      "profileReadsA": 0,
+      "profileReadsB": 2,
+      "writes": 0,
+      "outside": 0,
+      "errors": [],
+      "assetHashes": [
+        "b17018764aca2dfcbbb9d7e915d6e07bce83bae823737efce716c7e7c5b2233e",
+        "b17018764aca2dfcbbb9d7e915d6e07bce83bae823737efce716c7e7c5b2233e"
+      ],
+      "cases": [
+        {
+          "rootFontEmulationPercent": 100,
+          "computedFontSizes": {
+            "root": "16px",
+            "input": "16px"
+          },
+          "name": "QA Delete 100",
+          "protectedNewerProfile": false,
+          "unrelatedProfileRetained": true,
+          "noHorizontalOverflow": true,
+          "conflictNotice": "Profile deleted from this browser.",
+          "freshCancelAndIntentionalDeletion": false
+        },
+        {
+          "rootFontEmulationPercent": 130,
+          "computedFontSizes": {
+            "root": "20.8px",
+            "input": "20.8px"
+          },
+          "name": "QA Delete 130",
+          "protectedNewerProfile": false,
+          "unrelatedProfileRetained": true,
+          "noHorizontalOverflow": true,
+          "conflictNotice": "Profile deleted from this browser.",
+          "freshCancelAndIntentionalDeletion": false
+        }
+      ]
+    },
+    "candidate": {
+      "profileReadsA": 0,
+      "profileReadsB": 2,
+      "writes": 0,
+      "outside": 0,
+      "errors": [],
+      "assetHashes": [
+        "94b8f9afe0670d321ed4365af5aba6080d2bea875dfb7512ad7c0f9782070e44",
+        "94b8f9afe0670d321ed4365af5aba6080d2bea875dfb7512ad7c0f9782070e44"
+      ],
+      "cases": [
+        {
+          "rootFontEmulationPercent": 100,
+          "computedFontSizes": {
+            "root": "16px",
+            "input": "16px"
+          },
+          "name": "QA Delete 100",
+          "protectedNewerProfile": true,
+          "unrelatedProfileRetained": true,
+          "noHorizontalOverflow": true,
+          "conflictNotice": "Profile not deleted. \u201cQA Delete 100\u201d has changed. Review it and delete again.",
+          "freshCancelAndIntentionalDeletion": true
+        },
+        {
+          "rootFontEmulationPercent": 130,
+          "computedFontSizes": {
+            "root": "20.8px",
+            "input": "20.8px"
+          },
+          "name": "QA Delete 130",
+          "protectedNewerProfile": true,
+          "unrelatedProfileRetained": true,
+          "noHorizontalOverflow": true,
+          "conflictNotice": "Profile not deleted. \u201cQA Delete 130\u201d has changed. Review it and delete again.",
+          "freshCancelAndIntentionalDeletion": true
+        }
+      ]
+    },
+    "baselineServedAssetMatchesCommitted195Source": true,
+    "candidateServedAssetMatchesExact196Apk": true,
+    "newErrorAndSuccessNoticesObserved": true
+  },
+  "deployment": {
+    "Family Area": "Terminal install success; full installed APK SHA matches; normal photo frame visually checked",
+    "Living Area": "Terminal install success; full installed APK SHA matches;1.96/code90 and complete saved maps verified; presentation not separately inspected"
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "manualPhotoFrameForeground": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true
+    }
+  },
+  "cleanup": {
+    "ownedBrowserContextsClosed": true,
+    "generatedBrowserStorageClearAttempted": true,
+    "workerClosed": true,
+    "ownedRegistryRemoved": true,
+    "primaryRegistryBytesPreserved": true,
+    "familyNormalFrameVisuallyChecked": true,
+    "pixelCommands": 0,
+    "realProfileWrites": 0,
+    "nativeFixtureFilesCreated": 0,
+    "rollback195Retained": true
+  },
+  "matchingMapping": {
+    "rawSha256": "f775b3696b258548704c4b1303df7134df7551b60ff7b5e393bd94a4e479a2b2",
+    "rawBytes": 83151736,
+    "gzipBytes": 5983320,
+    "roundTripVerified": true
+  },
+  "issueClock": {
+    "startedAt": "2026-11-03T02:35:00Z",
+    "deadline": "2026-11-03T03:05:00Z",
+    "originalAuditClockRetained": true,
+    "phoneProhibited": true
+  },
+  "limits": [
+    "Generated management replies exercise the actual installed Family-served controller; no real browser profile or Portal setting writes.",
+    "100% and130% root-font emulation checks root/input scaling, not full system-font acceptance of fixed-pixel controls.",
+    "Reviewed-value protection does not establish atomic simultaneous localStorage transactions or detect equivalent-value ABA changes.",
+    "General performance, whole-product acceptance and Living visual acceptance remain separate; parked deadlines and publication boundaries remain unchanged."
+  ],
+  "roadmapBrowser": {
+    "viewports": [
+      {
+        "width": 390,
+        "clientWidth": 375,
+        "scrollWidth": 375
+      },
+      {
+        "width": 1600,
+        "clientWidth": 1585,
+        "scrollWidth": 1585
+      }
+    ],
+    "current196Visible": true,
+    "phoneProhibitionVisible": true,
+    "trackedTasks": 66,
+    "latestSelected": true,
+    "receiptHttp": 200,
+    "generatedImageHttp": 200
+  }
+}

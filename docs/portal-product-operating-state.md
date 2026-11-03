@@ -13,7 +13,23 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / browser profile Save delivery:** both rooms contain exact
+- **Current room APK / browser profile Delete delivery:** both rooms contain
+  exact optimized **1.96/code90**, preserving the preceding Save fix. Stale
+  Delete confirmation now retains a changed same-name browser profile and asks
+  for fresh review. Three original failures became three passes; **724 browser /
+  4,066 JVM423 suites**, debug/optimized/R8/vital-lint passed in165sec.
+  Family-served assets protected2/2 generated two-tab cases, including fresh
+  Cancel/Delete, unrelated profiles and fresh notices. Management replies were
+  generated; zero write APIs or real-profile changes. Both complete APK hashes
+  and saved maps match; Family normal frame/font/services/Chrome retained.
+  Source/fixture hashes match independent review; owned contexts/registry/worker
+  closed or removed. Pixel untouched. This continued the original
+  **02:35:00–03:05:00UTC** clock from the preceding Save fix, including all
+  cleanup and commits; no fresh slot. Atomic writers/ABA, system-font,
+  general performance and Living visual acceptance remain separate.
+  [Scoped receipt](portal-browser-profile-delete-conflicts-2026-11-03.md).
+
+- **Previous browser profile Save delivery:** both rooms received exact
   optimized **1.95/code89**. Pending Save or stale replacement confirmation can
   no longer overwrite a changed same-name browser profile. Five original
   failures became six passing cases; **721 browser / 4,066 JVM423 suites** and

@@ -2880,7 +2880,7 @@ function readProfiles() {
     return { ok: false, error: 'Saved profiles could not be read. The original data has not been changed.' };
   }
 }
-function deleteProfile(name) {
+function deleteProfile(name, reviewedRevision) {
   if (profileControlsLocked()) return;
   const current = readProfiles();
   if (!current.ok) {
@@ -2890,6 +2890,11 @@ function deleteProfile(name) {
   }
   if (!Object.hasOwn(current.profiles, name)) {
     toast('This profile was already removed.');
+    render();
+    return;
+  }
+  if (profileRevision(current.profiles, name) !== reviewedRevision) {
+    toast(`Profile not deleted. “${name}” has changed. Review it and delete again.`, true);
     render();
     return;
   }
@@ -3011,7 +3016,7 @@ function profilesPage() {
                 confirmAction(
                   `Delete “${name}”?`,
                   'Remove this profile from browser storage.',
-                  () => deleteProfile(name),
+                  () => deleteProfile(name, profileRevision(profiles, name)),
                   'Delete',
                 ),
               { kind: 'danger', disabled: locked },

@@ -1,18 +1,68 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T02:48:03.135676+00:00",
-  "updatedLabel": "3 November 2026 \u00b7 1.95 browser profile Save delivered to both rooms",
+  "updatedAt": "2026-11-03T03:00:27.578673+00:00",
+  "updatedLabel": "3 November2026 \u00b71.96 browser profile Delete protection delivered to both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.95/code89. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.96/code90. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "browser-profile-delete-conflicts",
+      "title": "Settings profiles: preserve newer profiles during Delete",
+      "summary": "Delivered1.96 to both rooms. A stale Delete confirmation preserves a profile changed in another tab and requests fresh review.",
+      "description": "A Delete confirmation originally removed whatever profile currently had the reviewed name. Delete now rereads storage and checks the reviewed value before writing; a fresh confirmed deletion still works.",
+      "status": "delivered",
+      "verification": "724 browser JS \u00b74,066 JVM \u00b72/2 Family-served rendered conflict cases",
+      "kind": "Browser settings profile data integrity",
+      "platforms": [
+        "browser",
+        "portal"
+      ],
+      "owner": "PWA engineering / independent review / release QA",
+      "deployment": "Exact optimized1.96/code90 installed and fully hashed in both rooms; complete saved maps unchanged.",
+      "state": "Three original failures became three passing regression methods. Actual installed assets retain the newer90-second profile; fresh Cancel and intentional Delete work, retaining unrelated profiles.",
+      "acceptance": [
+        "Preserve changed profiles during an open Delete confirmation or a stale rendered row.",
+        "On conflict, preserve exact stored bytes and require fresh review without automatic retry.",
+        "Keep Cancel, already-removed handling, unrelated profiles and literal prototype-like names.",
+        "Verify actual served assets in two tabs with generated management responses.",
+        "Pass regression, build and signing gates; preserve full room configuration and normal Family frame."
+      ],
+      "evidence": [
+        {
+          "text": "Source, tests, rendered acceptance, rollout and limits.",
+          "source": "docs/portal-browser-profile-delete-conflicts-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized artifact, served-asset hashes, generated two-tab cases and preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/browser-profile-delete-conflicts-verification.json"
+        },
+        {
+          "text": "Generated conflict notice at390px with130% root-font emulation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/browser-profile-delete-conflict-130.png"
+        }
+      ],
+      "limits": [
+        "Generated management replies exercise the actual installed Family-served controller; no real browser profile or Portal setting writes.",
+        "100% and130% root-font emulation checks root/input scaling, not full system-font acceptance of fixed-pixel controls.",
+        "Reviewed-value protection does not establish atomic simultaneous localStorage transactions or detect equivalent-value ABA changes.",
+        "General performance, whole-product acceptance and Living visual acceptance remain separate; parked deadlines and publication boundaries remain unchanged."
+      ],
+      "next": "Reload existing control-center tabs for the current controller. Preserve account, approval and parked-issue boundaries.",
+      "issueClock": {
+        "startedAt": "2026-11-03T02:35:00Z",
+        "deadline": "2026-11-03T03:05:00Z",
+        "originalAuditClockRetained": true,
+        "phoneProhibited": true
+      }
+    },
     {
       "id": "browser-profile-conflicts",
       "title": "Settings profiles: preserve newer browser saves",
@@ -54,7 +104,7 @@
         "Root-font emulation enlarges root/input text; fixed-pixel controls do not establish full130% system-font acceptance.",
         "Per-name reviewed-value guard does not claim atomic simultaneous storage transactions or changed Delete/Apply/ABA semantics.",
         "No general FPS, whole-product performance, physical phone or Living visual acceptance; parked clocks and publication restrictions retained.",
-        "A related Delete-confirmation staleness observation is source-only and retains this same02:35:00\u201303:05:00UTC clock; no fresh slot is authorized."
+        "The source-only Delete staleness observation was subsequently reproduced, fixed and separately verified in1.96 under this same02:35:00\u201303:05:00UTC audit clock; see browser-profile-delete-conflicts."
       ],
       "next": "Reload already-open browser tabs for the updated controller. Preserve separate approval, account and parked-issue boundaries.",
       "issueClock": {

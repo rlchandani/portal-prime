@@ -1492,6 +1492,43 @@ test('profile store confirmed Delete rereads and preserves newly added other pro
   assert.match(h.document.getElementById('notice').textContent, /Profile deleted/i);
 });
 
+test('profile Delete preserves a replacement arriving while confirmation is open', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  h.click('Delete');
+  const newer = { Wake: { sunrise: { hour: 8 } }, Other: { sunrise: { hour: 9 } } };
+  const raw = JSON.stringify(newer);
+  h.eval(`localStorage.setItem(STORAGE.profiles,${JSON.stringify(raw)})`);
+  confirmProfileDelete(h); await h.settle();
+  assert.equal(profileStoreRaw(h), raw);
+  assert.match(h.document.getElementById('notice').textContent, /not deleted.*changed.*review/i);
+  assert.equal(settingsPosts(h).length, 0);
+  h.click('Delete'); confirmProfileDelete(h); await h.settle();
+  assert.deepEqual(storedProfiles(h), { Other: { sunrise: { hour: 9 } } });
+  assert.match(h.document.getElementById('notice').textContent, /Profile deleted/i);
+});
+
+test('profile Delete refuses a changed entry from a stale rendered row', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
+  const raw = '{"Wake":{"sunrise":{"hour":8}}}';
+  h.eval(`localStorage.setItem(STORAGE.profiles,${JSON.stringify(raw)})`);
+  h.click('Delete'); confirmProfileDelete(h); await h.settle();
+  assert.equal(profileStoreRaw(h), raw);
+  assert.match(h.document.getElementById('notice').textContent, /not deleted.*changed.*review/i);
+});
+
+test('profile Delete protects replaced literal prototype-like names', async () => {
+  const h = await profileCaptureHarness();
+  putProfileStore(h, '{"__proto__":{"sunrise":{"hour":7}},"constructor":{"sunrise":{"hour":9}}}');
+  h.click('Delete');
+  const raw = '{"__proto__":{"sunrise":{"hour":8}},"constructor":{"sunrise":{"hour":9}}}';
+  h.eval(`localStorage.setItem(STORAGE.profiles,${JSON.stringify(raw)})`);
+  confirmProfileDelete(h); await h.settle();
+  assert.equal(profileStoreRaw(h), raw);
+  assert.match(h.document.getElementById('notice').textContent, /not deleted.*changed.*review/i);
+});
+
 test('profile store Delete preserves malformed data discovered after confirmation opens', async () => {
   const h = await profileCaptureHarness();
   putProfileStore(h, JSON.stringify({ Wake: { sunrise: { hour: 7 } } }));
