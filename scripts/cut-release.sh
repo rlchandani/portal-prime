@@ -117,7 +117,7 @@ if curl -fsSL -o "$tmp/cur.apk" "$stable_apk_url" 2>/dev/null; then
     || die "signing key changed! new=$new_fp vs published=$cur_fp — installing this would BREAK self-update on every device"
   echo "  signing key matches the currently-published release ✓"
 else
-  echo "  ⚠ no published immortal.apk to compare against (first release?) — skipping signing-key match"
+  die "could not download the published immortal.apk — signing-key comparison is required; restore access to $stable_apk_url before retrying"
 fi
 
 step "Build portal-kit.zip from the committed provisioning/ tree"

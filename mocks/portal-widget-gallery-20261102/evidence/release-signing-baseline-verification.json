@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 1,
+  "status": "locally-verified",
+  "checkedAtUtc": "2026-11-03T04:48:15.712933+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T04:40:49Z",
+    "deadline": "2026-11-03T05:10:49Z",
+    "originalDiscoveryClockRetained": true
+  },
+  "problem": "A failed published-APK download was treated as a first release, skipping the signing-key comparison before packaging and publication steps.",
+  "change": "Only the failed-download branch changes: it terminates with an error. No first-release escape or local-baseline substitution was added.",
+  "focusedRegressions": {
+    "focusedMethods": 8,
+    "focusedCases": 12,
+    "initialFailures": 6,
+    "finalFailures": 0,
+    "greenExit": 0,
+    "checkedAtUtc": "2026-11-03T04:44:53.445925+00:00"
+  },
+  "fullPython": {
+    "exit": 0,
+    "tests": 214,
+    "elapsedSeconds": 25.664,
+    "unittestSeconds": 25.592
+  },
+  "shellSyntax": {
+    "command": "bash -n scripts/cut-release.sh",
+    "exit": 0
+  },
+  "independentReview": {
+    "reviewedSourceSha256": {
+      "scripts/cut-release.sh": "d4cddb07f857eaa9b7b7d1155dcf91a6de33eb4fdec359961213581c98f92598",
+      "scripts/test_portal_cut_release_signing.py": "119e14c206317099704177404b2f53352147db779aee955f241fa308dbb65b8e",
+      "docs/releasing.md": "91707b18ead4ce9ceb1a751a65760dcbd5f416dfd40bcb4087dd635eeacddc7b"
+    },
+    "mutationFailures": 6,
+    "mutationErrors": 0,
+    "concerns": [],
+    "appManifestCatalogCiBytesUnchangedFrom": "db704eb0",
+    "publicVersionGuardExpectedExit": 1,
+    "receiptScopeReviewed": true
+  },
+  "realToolGate": {
+    "scope": "Only the exact signing source gate. Real loopback curl transport and Android SDK apksigner; retained actual signed APKs. No full release script, auth, build, git mutation, publication or device command.",
+    "candidateSha256": "27967ddb71cc8c91a486d912bb7b4952692f61cc0b4e6bcd754fd41d965a0ab9",
+    "baselineSha256": "9051906e3c9a2a7ee6abaa348fb4fd9e2f9eade59601577dc7cd00fe0439e638",
+    "cases": [
+      {
+        "revision": "old",
+        "route": "signed",
+        "exit": 0,
+        "packagingGateReached": true,
+        "correct": true
+      },
+      {
+        "revision": "old",
+        "route": "missing",
+        "exit": 0,
+        "packagingGateReached": true,
+        "correct": false
+      },
+      {
+        "revision": "old",
+        "route": "unavailable",
+        "exit": 0,
+        "packagingGateReached": true,
+        "correct": false
+      },
+      {
+        "revision": "old",
+        "route": "truncated",
+        "exit": 0,
+        "packagingGateReached": true,
+        "correct": false
+      },
+      {
+        "revision": "old",
+        "route": "invalid",
+        "exit": 1,
+        "packagingGateReached": false,
+        "correct": true
+      },
+      {
+        "revision": "new",
+        "route": "signed",
+        "exit": 0,
+        "packagingGateReached": true,
+        "correct": true
+      },
+      {
+        "revision": "new",
+        "route": "missing",
+        "exit": 1,
+        "packagingGateReached": false,
+        "correct": true
+      },
+      {
+        "revision": "new",
+        "route": "unavailable",
+        "exit": 1,
+        "packagingGateReached": false,
+        "correct": true
+      },
+      {
+        "revision": "new",
+        "route": "truncated",
+        "exit": 1,
+        "packagingGateReached": false,
+        "correct": true
+      },
+      {
+        "revision": "new",
+        "route": "invalid",
+        "exit": 1,
+        "packagingGateReached": false,
+        "correct": true
+      }
+    ],
+    "oldCorrect": 2,
+    "newCorrect": 5,
+    "requests": [
+      "/signed",
+      "/missing",
+      "/unavailable",
+      "/truncated",
+      "/invalid",
+      "/signed",
+      "/missing",
+      "/unavailable",
+      "/truncated",
+      "/invalid"
+    ],
+    "seconds": 3.761,
+    "serverClosed": true,
+    "ownedScratchRemoved": true
+  },
+  "ci": {
+    "workflow": ".github/workflows/tests.yml",
+    "existingCommand": "python3 -m unittest discover -s scripts -p 'test_portal_*.py'",
+    "newTestIncludedAutomatically": true,
+    "workflowChanged": false,
+    "hostedExecutionVerified": false
+  },
+  "runtime": {
+    "unchangedFromCommit": "db704eb0",
+    "appSourceAndBuildMetadataUnchanged": true,
+    "publicVersionManifestUnchanged": true,
+    "catalogUnchanged": true,
+    "newApkBuilt": false,
+    "lastVerifiedRoomVersion": "1.99/code93",
+    "devicesAccessed": false,
+    "newDeploymentPerformed": false
+  },
+  "publication": {
+    "published": false,
+    "fullReleaseScriptExecuted": false,
+    "authOrGitRemoteOperationsPerformed": false,
+    "publicVersionGuardExit": 1,
+    "publicVersionGuardReason": "Intentional local1.99/code93 versus public1.83 mismatch remains; release eligibility is not claimed."
+  },
+  "limits": [
+    "Only the exact signing-gate source slice ran. Full authentication/build/packaging/commit/tag/push/draft/publication flow was excluded.",
+    "Real-tool checks used retained signed performance APKs of com.immortal.launcher.debug, real Android SDK apksigner and loopback HTTP curl. No new production release artifact was built.",
+    "DNS/timeout/TLS outcomes were controlled process exits, not real provider/TLS acceptance.",
+    "A failed signing gate leaves earlier local version bump/build outputs; it performs no automatic rollback.",
+    "No live GitHub outage, credential check, hosted CI, device acceptance or full release eligibility claim."
+  ],
+  "strictDocs": {
+    "exit": 0,
+    "warnings": 0,
+    "elapsedSeconds": 2.593,
+    "reportedBuildSeconds": 2.29
+  },
+  "roadmapReview": {
+    "checkedAtUtc": "2026-11-03T04:50:58.860Z",
+    "taskCount": 72,
+    "cases": [
+      {
+        "width": 390,
+        "height": 844,
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "currentVersionVisible": true,
+        "focusedAndFullGatesVisible": true,
+        "scopeLimitVisible": true,
+        "phoneBoundaryVisible": true,
+        "taskCountVisible": true,
+        "evidenceHttpStatus": 200
+      },
+      {
+        "width": 390,
+        "task": "strict-docs-links",
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "warningCountVisible": true,
+        "strictValidationPreserved": true,
+        "deadlineVisible": true,
+        "evidenceHttpStatus": 200,
+        "proofBytesMatch": true,
+        "publicationLimitRetained": true
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "currentVersionVisible": true,
+        "focusedAndFullGatesVisible": true,
+        "scopeLimitVisible": true,
+        "phoneBoundaryVisible": true,
+        "taskCountVisible": true,
+        "evidenceHttpStatus": 200
+      },
+      {
+        "width": 1600,
+        "task": "strict-docs-links",
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "warningCountVisible": true,
+        "strictValidationPreserved": true,
+        "deadlineVisible": true,
+        "evidenceHttpStatus": 200,
+        "proofBytesMatch": true,
+        "publicationLimitRetained": true
+      }
+    ],
+    "pageErrors": 0,
+    "externalRequests": 0,
+    "ownedContextsClosed": true,
+    "scope": "Selected release-signing and locally verified docs details, current version/boundaries and exact proof availability only; no all72workflow or native UI claim. Existing focused skip link is visible in the mobile element screenshot; no broad visual/accessibility claim.",
+    "initialObservationTimeoutSeconds": 30,
+    "initialObservationLimit": "First detail wait timed out. Direct page inspection showed the requested task and no page errors; bounded retry passed. Initial transient cause unproven.",
+    "selectedPanelScreenshotsReviewed": true
+  },
+  "priorTaskRecordsDefaultAndBoundariesPreserved": true,
+  "preparedForCommitAtUtc": "2026-11-03T04:52:11.217623+00:00"
+}

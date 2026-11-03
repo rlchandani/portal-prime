@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T04:35:51.567895+00:00",
-  "updatedLabel": "2 November 2026 Pacific \u00b7 1.99 in both rooms; independent kitchen timer alarms verified",
+  "updatedAt": "2026-11-03T04:48:15.712933+00:00",
+  "updatedLabel": "2 November 2026 Pacific \u00b7 1.99 in both rooms; mandatory release signing baseline locally verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,48 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "release-signing-baseline",
+      "title": "Release safety: require the published signing baseline",
+      "summary": "Locally verified: failed APK downloads stop the release before packaging or publication instead of skipping certificate comparison.",
+      "description": "HTTP, DNS, timeout and TLS failures were treated as a possible first release. One fatal branch now requires restored access to the published APK; successful same-key verification is preserved.",
+      "status": "verified",
+      "verification": "8 methods / 12 cases \u00b7 214 Python \u00b7 5/5 real-tool signing-gate outcomes",
+      "kind": "Release automation and update integrity",
+      "platforms": [
+        "tooling"
+      ],
+      "owner": "Release engineering / independent safety review",
+      "deployment": "Local source only. No APK build, device operation or publication; last verified room artifact remains 1.99/code93.",
+      "state": "The public version guard still rejects local1.99/public1.83 drift. Earlier local version bump/build outputs remain for inspection after a failed signing gate.",
+      "acceptance": [
+        "Block every unavailable published-baseline download before later release steps.",
+        "Preserve same-key continuation and wrong/absent/invalid certificate rejection.",
+        "Exercise the actual gate with controlled failures and real loopback curl/SDK verification.",
+        "Keep full publication commands excluded and existing release guards enabled."
+      ],
+      "evidence": [
+        {
+          "text": "Failure, minimal correction, regressions, real-tool verification and limits.",
+          "source": "docs/portal-release-signing-baseline-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized reviewed hashes, test results, real-tool cases and publication boundary.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/release-signing-baseline-verification.json"
+        }
+      ],
+      "limits": [
+        "Only the actual signing source slice ran; full authentication/build/publishing flow excluded.",
+        "Real-tool tests use retained signed performance APKs and loopback HTTP; provider TLS/DNS/timeouts and hosted CI unverified.",
+        "No public release eligibility or automatic rollback; current metadata drift remains rejected."
+      ],
+      "next": "Retain this local verification. Publication still requires authorization and all existing release gates.",
+      "issueClock": {
+        "startedAt": "2026-11-03T04:40:49Z",
+        "deadline": "2026-11-03T05:10:49Z",
+        "originalDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "kitchen-timer-alarm-identity",
       "title": "Kitchen timers: preserve independent alarms",

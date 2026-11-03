@@ -13,6 +13,18 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Public release signing gate / locally verified:** failed published-APK
+  downloads now stop the release instead of skipping the signing-key comparison.
+  **8 methods/12 cases** reproduce6 failures then pass; complete **214 Python**
+  tests pass. Real curl/Android apksigner against retained signed APKs and loopback
+  HTTP improves2/5→5/5. Independent mutation restores exactly6 failures; hashes
+  match. Shell syntax and existing CI discovery pass. Full publishing script,
+  GitHub/auth/device operations are excluded. App/public manifest/catalog remain
+  unchanged; the deliberate local1.99/public1.83 version guard still rejects
+  promotion. Earlier version writes/builds remain for inspection after failure.
+  Original **04:40:49–05:10:49UTC** clock retained.
+  [Receipt](portal-release-signing-baseline-2026-11-03.md).
+
 - **Current room APK / kitchen timer identity:** exact optimized **1.99/code93**
   is installed and fully hashed in both rooms. Full timer IDs now isolate alarms;
   legacy handles are retired and startup/boot rearm saved timers. **29 timer /

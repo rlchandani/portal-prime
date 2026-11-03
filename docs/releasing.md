@@ -75,6 +75,13 @@ Requires `gh` (write access), the Android SDK build-tools, and `keystore.propert
 [Signing](#signing)). A release attaches exactly two assets: `immortal.apk` and
 `portal-kit.zip` — nothing else, no versioned APK copies.
 
+The currently published `immortal.apk` is a mandatory signing baseline. HTTP,
+DNS, timeout or TLS failures stop the release before packaging, commit, push or
+publication; they never skip the signing-key comparison. Restore access to the
+published asset and retry. There is no automatic first-release exception.
+The version bump and local build happen before this gate, so inspect those local
+changes after a failure before starting another release attempt.
+
 !!! note "Drift is blocked in CI too"
     [`release-guard.yml`](https://github.com/starbrightlab/immortal/blob/main/.github/workflows/release-guard.yml)
     runs `scripts/check-version-sync.sh` on every change to `version.json` or
