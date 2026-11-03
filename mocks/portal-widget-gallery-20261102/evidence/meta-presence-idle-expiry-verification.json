@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-03T15:56:50.935386+00:00",
+  "status": "delivered-with-scoped-acceptance",
+  "issueClock": {
+    "startedAt": "2026-11-03T15:31:50.284080Z",
+    "deadline": "2026-11-03T16:01:50.284080Z",
+    "reset": false
+  },
+  "goalStatus": "active",
+  "baseline": {
+    "exit": 1,
+    "elapsedIdleMs": 47509,
+    "publicPresence": "PRESENT",
+    "providerEOF": false,
+    "cleanupPassed": true
+  },
+  "candidate": {
+    "exit": 0,
+    "elapsedIdleMs": 45202,
+    "publicPresence": "ABSENT",
+    "providerEOF": false,
+    "cleanupPassed": true
+  },
+  "jvm": {
+    "suites": 452,
+    "tests": 4350,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "newControls": 7
+  },
+  "nativeGate": {
+    "args": [
+      "./gradlew",
+      ":app:testDebugUnitTest",
+      ":app:assembleDebug",
+      ":app:assemblePerformance",
+      ":app:lintVitalPerformance",
+      "--no-daemon"
+    ],
+    "startedAt": "2026-11-03T15:51:11.947319+00:00",
+    "endedAt": "2026-11-03T15:53:04.552002+00:00",
+    "durationSeconds": 112.604683,
+    "actualExit": 0
+  },
+  "artifacts": {
+    "performance": {
+      "bytes": 25879086,
+      "sha256": "176f6b36abb9dbccdaa354d874e267e5a7669dc774663dbdaca075e725dcad9e",
+      "package": "com.immortal.launcher.debug",
+      "versionName": "1.127",
+      "versionCode": 121,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "debug": {
+      "bytes": 46719917,
+      "sha256": "d7752d6e6ed5fb90872bf31485c161f3b6c8bfbed41eb2f62048df2a3fbfcff3",
+      "package": "com.immortal.launcher.debug",
+      "versionName": "1.127",
+      "versionCode": 121,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "rollback": {
+      "bytes": 25879086,
+      "sha256": "561cabc331fcaf8ad698102810ee89ade8cea16c77dcbe5590068be02f6e1518",
+      "package": "com.immortal.launcher.debug",
+      "versionName": "1.126",
+      "versionCode": 120,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "packageProof": {
+    "checks": {
+      "performance": {
+        "hashAndBytesMatch": true,
+        "packageAndVersionMatch": true,
+        "signatureVerified": true,
+        "signerMatches": true
+      },
+      "debug": {
+        "hashAndBytesMatch": true,
+        "packageAndVersionMatch": true,
+        "signatureVerified": true,
+        "signerMatches": true
+      },
+      "rollback": {
+        "hashAndBytesMatch": true,
+        "packageAndVersionMatch": true,
+        "signatureVerified": true,
+        "signerMatches": true
+      }
+    },
+    "tools": [
+      "aapt2 dump badging",
+      "apksigner verify --print-certs"
+    ]
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1639,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 2021,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "credentialCleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "roadmap": {
+    "tasks": 105,
+    "counts": {
+      "delivered": 68,
+      "verified": 27,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "old104ObjectsPreserved": true,
+    "oldSuffixBytes": 347842,
+    "oldSuffixSha256": "5ba12577b2f28b9a230cffeff06ad74e1769d793ebb7404937133a960f499ffa",
+    "defaultTask": "weather-native-layout"
+  },
+  "evidenceBindings": {
+    "presence-fixture-freeze.json": {
+      "bytes": 3785,
+      "sha256": "ace758bad1015e673061ae6f04deebe51edb3cd20f0fa46e3d8bd3122bc6cccd"
+    },
+    "presence-fixture-pre-execution-review-initial.json": {
+      "bytes": 8353,
+      "sha256": "55c1be647b1cd3c0728a4a05ffe1783d0cb94da02e8826bac03a1923aabdbb89"
+    },
+    "presence-fixture-pre-execution-review.json": {
+      "bytes": 9227,
+      "sha256": "839bb76f969984c039c041528bf79cb709532ab23dc171b8f0c7321fa50dd0d2"
+    },
+    "presence-source-review.json": {
+      "bytes": 15647,
+      "sha256": "ad8621d107b19c6e7e1c8be476eab977000cca84b514698f478acfb55d4fba96"
+    },
+    "fixture-run-red/terminal.json": {
+      "bytes": 32043,
+      "sha256": "9f1bdcfc1e1ccc134c3a29ddd1bf9198cb4a90380ab67c4e4398cbd76b2f9353"
+    },
+    "fixture-run-red/terminal.log": {
+      "bytes": 1194,
+      "sha256": "fcfdf617c625d7badabc5c8cc6ab08f2765026d8a538975bf0589b8e918f9886"
+    },
+    "fixture-run-green/terminal.json": {
+      "bytes": 32045,
+      "sha256": "289c5822080dca82bbc039e8be54dd128f1d516b9687e762c59189ca4be89616"
+    },
+    "fixture-run-green/terminal.log": {
+      "bytes": 950,
+      "sha256": "066703c384f2d892e2af607a949ad185359473810ac2b3639cb719cb7932a13c"
+    },
+    "presence-candidate-freeze.json": {
+      "bytes": 2703,
+      "sha256": "f32be1af8b76b51a31c3db99933df4cdfc790cbc407b8915c3786a2a8a1aab97"
+    },
+    "presence-candidate-classes.json": {
+      "bytes": 1768,
+      "sha256": "b91ea2431f2a40b5e54ff546d20f3dd1e6e98a0e7df5c4fa5b5da62f63657736"
+    },
+    "native-gate-terminal.json": {
+      "bytes": 328,
+      "sha256": "200a3733c4c7106060650c3ca9df49684d5bd101ee3e8f61fe02053620b8b783"
+    },
+    "jvm-counts.json": {
+      "bytes": 105,
+      "sha256": "5532d2c914a7debacd3ed6ffc6ebabfc4f80baf52221b1ecbe749d4061ccde2d"
+    },
+    "package-proof.json": {
+      "bytes": 573,
+      "sha256": "c75acf488a0d5159b0bd17b5e0d9dccda34dd684a1c768fe2cc9e185f3f7e418"
+    },
+    "deploy-results.json": {
+      "bytes": 231,
+      "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31"
+    },
+    "preservation.json": {
+      "bytes": 718,
+      "sha256": "2de61275dfa1480b50994ef53e781f275c02efce4e91569504dfda44473a7ed6"
+    },
+    "health.json": {
+      "bytes": 579,
+      "sha256": "c8b1183adcdb7552b61c1df3b994c3ccd47eb4e84982580b11bb5d0dc35599ed"
+    },
+    "credential-cleanup.json": {
+      "bytes": 119,
+      "sha256": "584d00c535583d9f5c6f035e521ab6f64eefddfd75629ef4a3518d05d6a25d76"
+    }
+  },
+  "limits": [
+    "Whole-reader JVM fixture uses actual compiled Reader, worker, ProcessBuilder, readLine, wall clock and public Hub listener with inert Android Log/Context and a generated local logcat provider. No physical sensor, Android READ_LOGS/logcat, CV, API28 or native/optimized expiry execution acceptance.",
+    "Seven injected-clock Delivery controls cover grace boundary, fresh beat, unknown cases, deduplication and timer retirement; they do not establish real timer cadence. The separate unchanged whole-reader fixture observes actual 45-second expiry.",
+    "Preexisting blocked-input reader/process stop and old worker ownership across restart remain outside this unit. Timer generation does not establish global Hub fanout ordering, callback reentry, callback failure retry or hard latency guarantees.",
+    "Limited installed diagnostics only; no physical occupancy/sleep, camera, MQTT/HA, audio, provider mutation, phone control, public release or publication. Public manifest remains 1.83/code77. All prior clocks, approvals and parked scopes remain; broader goal active."
+  ],
+  "historicalFixtureCorrection": "Initial pre-execution review rejected missing runner timeout cleanup and runner binding. Corrected review passed before actual baseline execution; excluded drafts retained.",
+  "closure": "Documentation/browser checks and commit are separate subsequent observations, not preclaimed here."
+}

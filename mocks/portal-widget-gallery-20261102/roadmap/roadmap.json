@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T15:27:30.095636+00:00",
+  "updatedAt": "2026-11-03T15:56:50.935386+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,53 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.126/code120. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.127/code121. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "meta-presence-idle-expiry",
+      "title": "Presence reader: evaluate idle expiry during silence",
+      "summary": "Delivered 1.127: quiet log input no longer prevents the existing idle expiry.",
+      "description": "Exact optimized 1.127/code121 is installed and fully hashed in both rooms. The presence reader now samples the existing tracker during quiet log input, so a prior BEAT followed by IDLE publishes absence after the existing 45,000ms grace. The same frozen real-time whole-reader fixture improves from PRESENT at 47,509ms to ABSENT at 45,202ms before provider EOF. Seven Delivery controls and all 4,350 JVM tests/452 suites pass with zero failures, errors or skips. Debug, optimized, R8 and vital lint pass. Four complete maps and 13 raw preference states per room match. Limited HTTP200 diagnostics contain 1639/2021 lines with zero fatal/ANR markers; copied credentials are removed.",
+      "status": "delivered",
+      "verification": "Frozen whole-reader real-time RED→GREEN; seven Delivery controls; 4,350 JVM tests/452 suites, zero failures/errors/skips; debug, optimized, R8 and vital lint pass.",
+      "kind": "Presence idle expiry and reader-owned sampling",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Presence reader / independent source and fixture review",
+      "deployment": "Exact optimized 1.127/code121 installed and fully hashed in both rooms.",
+      "state": "Four complete maps and 13 raw preference states per room preserved; Family font, accessibility, original Chrome, resumed frame and awake display retained.",
+      "acceptance": [
+        "Publish absence through the actual public Hub after documented BEAT then later IDLE, while the local provider remains open and quiet.",
+        "Preserve the existing grace, unknown and fresh-beat policies; retire timer callbacks by generation.",
+        "Deliver the exact signed APK and preserve captured room state."
+      ],
+      "evidence": [
+        {
+          "text": "Actual baseline, correction, gates, room delivery and limits.",
+          "source": "docs/portal-meta-presence-idle-expiry-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized actual evidence bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/meta-presence-idle-expiry-verification.json"
+        }
+      ],
+      "limits": [
+        "Whole-reader JVM fixture uses actual compiled Reader, worker, ProcessBuilder, readLine, wall clock and public Hub listener with inert Android Log/Context and a generated local logcat provider. No physical sensor, Android READ_LOGS/logcat, CV, API28 or native/optimized expiry execution acceptance.",
+        "Seven injected-clock Delivery controls cover grace boundary, fresh beat, unknown cases, deduplication and timer retirement; they do not establish real timer cadence. The separate unchanged whole-reader fixture observes actual 45-second expiry.",
+        "Preexisting blocked-input reader/process stop and old worker ownership across restart remain outside this unit. Timer generation does not establish global Hub fanout ordering, callback reentry, callback failure retry or hard latency guarantees.",
+        "Limited installed diagnostics only; no physical occupancy/sleep, camera, MQTT/HA, audio, provider mutation, phone control, public release or publication. Public manifest remains 1.83/code77. All prior clocks, approvals and parked scopes remain; broader goal active."
+      ],
+      "next": "Retain the scoped delivery. Physical/native expiry, old reader/process ownership and global Hub ordering remain separate; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T15:31:50.284080Z",
+        "deadline": "2026-11-03T16:01:50.284080Z",
+        "reset": false
+      }
+    },
     {
       "id": "catalog-version-types",
       "title": "Catalog guard: reject Boolean version codes",

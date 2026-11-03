@@ -32,7 +32,9 @@ class MetaPresenceReader(private val context: Context) {
   @Volatile private var running = false
   private var worker: Thread? = null
   private val tracker = MetaPresence.Tracker()
-  @Volatile private var lastReported: Boolean? = null
+  private val delivery = MetaPresenceDelivery(tracker) { present ->
+    PresenceHub.onMetaPresence(context, present)
+  }
 
   fun start() {
     if (running) return
@@ -42,6 +44,7 @@ class MetaPresenceReader(private val context: Context) {
       return
     }
     running = true
+    delivery.start()
     worker =
         Thread({ loop() }, "MetaPresenceReader").apply {
           isDaemon = true
@@ -51,6 +54,7 @@ class MetaPresenceReader(private val context: Context) {
 
   fun stop() {
     running = false
+    delivery.stop()
     worker?.interrupt()
     worker = null
   }
@@ -79,25 +83,12 @@ class MetaPresenceReader(private val context: Context) {
           while (running) {
             val line = r.readLine() ?: break // logcat died; respawn
             val signal = MetaPresence.classify(line) ?: continue
-            tracker.onSignal(signal, System.currentTimeMillis())
-            report()
+            delivery.onSignal(signal)
           }
         }
       }
       runCatching { proc.destroy() }
       if (running && !sleepQuietly(backoffMs)) return
-    }
-  }
-
-  /** Push a changed verdict into the hub (dedup here keeps the hub's log readable). */
-  private fun report() {
-    val state = tracker.state(System.currentTimeMillis())
-    if (state == lastReported) return
-    lastReported = state
-    when (state) {
-      true -> PresenceHub.onMetaPresence(context, present = true)
-      false -> PresenceHub.onMetaPresence(context, present = false)
-      null -> Unit // unknown: no evidence — never push "unknown" over a good proxy state
     }
   }
 
