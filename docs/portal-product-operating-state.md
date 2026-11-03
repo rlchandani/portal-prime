@@ -13,6 +13,19 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Current room APK / latest calendar delivery:** both rooms contain exact
+  optimized **1.89/code83**. Calendar cancellation lists now honour every
+  `EXDATE` value while retaining timezone parameters and original recurrence
+  counts. Six original failures became nine passing regression cases; full
+  **4,000 JVM/418 suites**, debug/optimized/R8/vital-lint gates passed.
+  Family's same generated calendar changed from two appointments to only the
+  correct third occurrence in both Calendar and Today. Original complete room
+  configurations are unchanged; Family empty calendar and normal photo frame
+  restored, font/services/Chrome task preserved. Both full installed APK hashes
+  matched. Owned server/reverse/registry removed; workers closed. Original
+  **00:23:57–00:53:57 UTC** clock includes cleanup and commit.
+  [Scoped receipt](portal-calendar-exclusion-lists-2026-11-03.md).
+
 - **Latest installed Weather return check:** approval is recorded; the adaptive
   layout candidate remains held under its original geometry deadline. Family's
   unchanged optimized1.88 passed native selector persistence and the same-Home
@@ -25,7 +38,7 @@ The updated whole-product objective is
   early within its00:37:45UTC cap.
   [Scoped receipt](portal-weather-settings-return-2026-11-03.md).
 
-- **Current room APK / latest bulk-update delivery:** both rooms contain exact
+- **Previous bulk-update delivery:** both rooms received exact
   optimized **1.88/code82**, source `23eb995d`. This supersedes earlier room
   versions below; historical receipts keep their scoped evidence. Bulk results
   now reflect every installer outcome, report counts and reject expired
@@ -885,3 +898,24 @@ The whole-product goal stays active. Native Weather's design approval is retaine
 with its exhausted geometry issue parked; physical companion, music human sign-in
 and broader UI approvals keep their separate boundaries. Continue authorized
 independent discovery without resetting original issue clocks.
+
+## Calendar exclusion-list delivery — 2026-11-03
+
+Both rooms contain exact optimized **1.89/code83**. The narrow parser change
+honours each comma-separated cancelled recurrence date with the original property
+parameters. Six original regressions failed; nine final cases and the complete
+4,000-test/418-suite JVM gate passed. Debug/optimized/R8/vital-lint builds passed
+in127seconds. Family's same controlled feed improved from two visible appointments
+to the correct one in Calendar and Today. Both full installed APK hashes matched.
+Original complete configuration is restored; Family empty calendar, font/services,
+Chrome task and normal manual photo frame were verified. Owned fixture server,
+reverse mapping and token registry are removed; both workers are closed.
+
+Roadmap: **57 tasks:29 delivered,20 scoped verified,5 parked,2 approval,1 queued**.
+Desktop/mobile saved snapshot checks passed without horizontal overflow, and both
+clean generated-event crops are served. Weather approval is retained with its
+native candidate held. Companion physical-phone, human music sign-in and broader
+UI approvals retain their separate boundaries. Native calendar acceptance covers
+one generated UTC recurrence; other formats have JVM coverage. No broad
+performance or complete-product claim. Original **00:23:57–00:53:57 UTC** clock
+includes cleanup and commit; no exhausted issue was reopened.

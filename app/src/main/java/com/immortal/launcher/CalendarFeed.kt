@@ -194,7 +194,10 @@ object CalendarFeed {
         "SUMMARY" -> title = unescapeText(p.value)
         "LOCATION" -> location = unescapeText(p.value).ifBlank { null }
         "RRULE" -> rrule = p.value
-        "EXDATE" -> parseDt(p, zone, locale)?.let { (m, _) -> exdates.add(m) }
+        "EXDATE" ->
+            p.value.split(',').forEach { value ->
+              parseDt(p.copy(value = value), zone, locale)?.let { (m, _) -> exdates.add(m) }
+            }
       }
     }
     val s = start ?: return null
@@ -265,8 +268,7 @@ object CalendarFeed {
    *  - `;TZID=Zone:yyyyMMdd'T'HHmmss` → that zone
    *  - `yyyyMMdd'T'HHmmss` → device-local (floating)
    *
-   * EXDATE values can carry a comma-separated list; only the first is parsed here
-   * (multiple exclusions on one line are rare and degrade safely to "not excluded").
+   * EXDATE lists are split by the caller so every value retains the property's parameters.
    */
   private fun parseDt(p: Prop, defaultZone: TimeZone, locale: Locale): Pair<Long, Boolean>? {
     val v = p.value.substringBefore(',').trim()

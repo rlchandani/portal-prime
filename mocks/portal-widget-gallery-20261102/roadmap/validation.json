@@ -1111,5 +1111,35 @@
     "tasks": 54,
     "weatherStatus": "parked",
     "scope": "Selected restore detail/public receipt/mobile-desktop geometry only;no all54workflow or native installation acceptance"
+  },
+  "calendarExclusionListsSnapshotUpdate": {
+    "checkedAtUtc": "2026-11-03T00:35:45.972461+00:00",
+    "snapshotSha256": "05505832887f2a5d4046dedc7c9e19c45bea53e8f749b649a228f45b60133f0f",
+    "taskCount": 57,
+    "counts": {
+      "delivered": 29,
+      "verified": 20,
+      "parked": 5,
+      "approval": 2,
+      "queued": 1
+    },
+    "desktop": {
+      "width": 1600,
+      "documentScrollWidth": 1585,
+      "horizontalOverflow": false
+    },
+    "mobile": {
+      "width": 390,
+      "documentScrollWidth": 375,
+      "horizontalOverflow": false
+    },
+    "selectedTask": "calendar-exdate-lists",
+    "currentRoomApk": "1.89/code83",
+    "evidenceHttpStatus": {
+      "calendar-exdate-before.png": 200,
+      "calendar-exdate-after.png": 200,
+      "calendar-exdate-verification.json": 200
+    },
+    "limits": "Saved roadmap rendering and evidence availability only. Native and full-test evidence has its separate scoped receipt; no whole-product or general performance claim."
   }
 }

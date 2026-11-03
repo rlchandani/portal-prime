@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T00:35:06.401077+00:00",
+  "scope": "Comma-separated calendar EXDATE exclusions",
+  "sourceBranch": "codex/calendar-exdate-list-20261103",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.89",
+    "versionCode": 83,
+    "sha256": "8b1e080bb9a9f5653f4bd4f30bf5cfd2ae81bffd2af9deb29e4d188216d3dd0c",
+    "bytes": 25861122,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "tests": {
+    "before": {
+      "newCases": 9,
+      "failures": 6,
+      "errors": 0
+    },
+    "after": {
+      "suites": 418,
+      "tests": 4000,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "newCasesPassed": 9,
+    "builds": [
+      "debug",
+      "performance"
+    ],
+    "combinedBuildSeconds": 127,
+    "independentReview": "No actionable static findings; tests not independently run"
+  },
+  "native": {
+    "device": "Family Area",
+    "platform": "Android10/API29",
+    "kind": "Coordinator-observed installed optimized UI with generated UTC calendar",
+    "beforeOccurrences": 2,
+    "afterOccurrences": 1,
+    "expectedRemainingDate": "Wednesday November4,2026 5:28PM device-local",
+    "calendarAndTodayCorrect": true,
+    "originalEmptyCalendarVisuallyRestored": true,
+    "normalPhotoFrameVisuallyRestored": true,
+    "chromeTask27174Retained": true,
+    "screenshots": [
+      "calendar-exdate-before.png",
+      "calendar-exdate-after.png"
+    ]
+  },
+  "deployment": {
+    "Family Area": "Complete installed APK SHA-256 matched via room-fleet helper; served version1.89/code83",
+    "Living Area": "Complete installed APK SHA-256 matched via room-fleet helper; served version1.89/code83; calendar UI not exercised"
+  },
+  "preservationAndCleanup": {
+    "family": {
+      "remote-settings-profile unchanged": true,
+      "remote-layout unchanged": true,
+      "remote-sources unchanged": true,
+      "screensaver unchanged": true,
+      "name unchanged": true,
+      "devMode unchanged": true,
+      "version1.89/code83": true,
+      "font_scale unchanged": true,
+      "enabled_accessibility_services unchanged": true
+    },
+    "living": {
+      "remote-settings-profile unchanged": true,
+      "remote-layout unchanged": true,
+      "remote-sources unchanged": true,
+      "screensaver unchanged": true,
+      "name unchanged": true,
+      "devMode unchanged": true,
+      "version1.89/code83": true
+    },
+    "cleanup": {
+      "ownedReverseRemoved": true,
+      "fixtureServerStopped": true,
+      "ownedTokenRegistryRemoved": true,
+      "workersClosed": true
+    }
+  },
+  "issueClock": {
+    "startedAtUtc": "2026-11-03T00:23:57Z",
+    "deadlineUtc": "2026-11-03T00:53:57Z",
+    "includesCleanupAndCommit": true
+  },
+  "limits": [
+    "One generated UTC native recurrence; other date formats covered by JVM cases",
+    "No general FPS/latency improvement or whole-product acceptance claim",
+    "Other recurrence,DST and lenient-date behavior unchanged",
+    "Weather candidate remains held; exhausted clocks remain parked",
+    "Local preview only; publication manifest unchanged,no GitHub or Home Assistant change"
+  ]
+}
