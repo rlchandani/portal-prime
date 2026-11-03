@@ -1,0 +1,948 @@
+{
+  "recordedAt": "2026-11-03T10:23:25.113694+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T10:07:54+00:00",
+    "deadline": "2026-11-03T10:37:54+00:00",
+    "base": "32646ea81486758c5d0cceefa2723b3f23a78cc3",
+    "backlogTasks": 91,
+    "scope": "Fresh distinct cross-product source audit. All newly discovered issues retain this original clock including checks, delivery, documentation, cleanup and commit. No prior Countdown/Aurora/ISS/timer/performance/phone work clock reset."
+  },
+  "finding": {
+    "backlogRecordsReviewed": 91,
+    "trigger": "An enabled Romanian almanac uses FeastDays.forToday. Local midnight elapsed hours across a spring clock change yield a truncated negative civil offset; different supplied and default timezones also lose intended labels.",
+    "actualWitness": "Bucharest 2037-03-29 should retain Palm Sunday at civil offset -7 from 2037-04-05. The baseline omits it and instead labels 2037-03-28; historical 2010 and the existing minus48 mapping reproduce the same error.",
+    "status": "Seven frozen wrong-label methods corrected; actual debug APK dated differential and exact optimized delivery verified.",
+    "duplicateAuditBinding": {
+      "sha256": "544e987a54c3402bc2f89304d65420124d91df226999b6bb44f17b8ff7dc5662",
+      "bytes": 11609
+    },
+    "distinctComponent": "FeastDays civil offset, separate from earlier CalendarFeed all-day duration and recurrence acceptance."
+  },
+  "correction": {
+    "scope": "Subtract same-year Gregorian DAY_OF_YEAR fields from requested Calendar and orthodoxEaster result; remove unused private midnight and 24-hour helpers.",
+    "retained": "Public signatures, input Calendar, every fixed and movable label, precedence, existing minus48 mapping and documented 1900–2099 Gregorian Easter algorithm.",
+    "limits": "No expanded century, era, nonGregorian Calendar, religious-table or date-mapping policy claim."
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/FeastDays.kt": "d85014d9a3ab892a5417ab9d5990313c4c91be42602b958602cb74c5e4b50e9a",
+    "app/src/test/java/com/immortal/launcher/FeastDaysCivilOffsetTest.kt": "0ffa4cf12ffc5cfdaa95b1fbd79fd8cd9b1362098449ca58b72da1a71a98d3ac",
+    "app/build.gradle.kts": "3a945688d6ea0279a27b4fa4ad80817bdd3a1280c9a68eccadbe39779f1bb5ae"
+  },
+  "red": {
+    "terminalExit": 1,
+    "tests": 10,
+    "failures": 7,
+    "passingControls": 3,
+    "errors": 0,
+    "skips": 0,
+    "failedMethods": [
+      {
+        "method": "adjacentDateDoesNotBorrowTheExistingMinus48Label",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: 2026-2-22 in Europe/Bucharest, default Europe/Bucharest expected:<[]> but was:<[Lăsatul secului]>"
+      },
+      {
+        "method": "utcInputKeepsItsAscensionWhenDefaultZoneIsBehindUtc",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: 2026-5-21 in UTC, default America/New_York expected:<[Înălțarea Domnului]> but was:<[]>"
+      },
+      {
+        "method": "existingMinus48MappingSurvivesSpringClockChange",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: 2026-2-23 in Europe/Bucharest, default Europe/Bucharest expected:<[Lăsatul secului]> but was:<[]>"
+      },
+      {
+        "method": "historicalPalmSundayUsesTheSameCivilDateRule",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: 2010-3-28 in Europe/Bucharest, default Europe/Bucharest expected:<[Florii (Palm Sunday)]> but was:<[]>"
+      },
+      {
+        "method": "palmSundaySurvivesBucharestSpringClockChange",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: 2037-3-29 in Europe/Bucharest, default Europe/Bucharest expected:<[Florii (Palm Sunday)]> but was:<[]>"
+      },
+      {
+        "method": "utcInputKeepsItsPalmSundayWhenDefaultZoneDiffers",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: 2037-3-29 in UTC, default Europe/Bucharest expected:<[Florii (Palm Sunday)]> but was:<[]>"
+      },
+      {
+        "method": "saturdayBeforePalmSundayDoesNotBorrowSundaysLabel",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: 2037-3-28 in Europe/Bucharest, default Europe/Bucharest expected:<[]> but was:<[Florii (Palm Sunday)]>"
+      }
+    ],
+    "frozenTestSha256": "0ffa4cf12ffc5cfdaa95b1fbd79fd8cd9b1362098449ca58b72da1a71a98d3ac",
+    "baselineSourceSha256": "2472544d5211000d9d47c4b9668844a2b0342f36346d96823e6b4c091c705803",
+    "logBinding": {
+      "sha256": "1a1649ee479de182e96c46a610a8e9371b6140f62e62773f3c72a2aefdc7b710",
+      "bytes": 3207
+    },
+    "xmlBinding": {
+      "sha256": "b78ab728eded872037dfb445c0ff52f461d02b0d5c655e8b043455bcb07d307b",
+      "bytes": 34734
+    },
+    "recordBinding": {
+      "sha256": "1a3d747617761d326f19c291e4fbd32f03c97d58c3891ac459f87d3e2dbcfc63",
+      "bytes": 2863
+    },
+    "scope": "Actual public FeastDays.forToday with literal independent civil dates and labels. Future/historical Palm Sunday, adjacent false labels, existing minus48 mapping, both directions of input/default zone difference, ordinary UTC labels, fixed/blank fallback, leap years, time of day and caller immutability.",
+    "receiptParserCorrectionOnly": "Initial record parser assumed exact java.lang.AssertionError; actual string assertions are org.junit.ComparisonFailure subclasses. Receipt assumption corrected without source/test changes or test rerun.",
+    "excludedExecutionAttempts": 0,
+    "timezoneAndGeneralDisplayFormatLocalesRestoredFinally": true
+  },
+  "green": {
+    "suites": 441,
+    "tests": 4248,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualFeastCivilDateFocusedTests": 10,
+    "allTenUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 1s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "buildBindings": {
+    "log": {
+      "sha256": "26786207f393b38a03b191236e49e9c3bf8b019da80e57773b7ed73fba2458d6",
+      "bytes": 13731
+    },
+    "packageProofLog": {
+      "sha256": "5f426ca4e722bc6273bb89bec9a61ff63c4e75a9cf04ebcda7e20b50fbc2007e",
+      "bytes": 602
+    },
+    "fullXmlAggregateSha256": "d9080797f43d098411a79bf1a21d83cc2efec2844e9934b16139597c4bf32940",
+    "fullXmlFiles": 441,
+    "independentlyRecountedTotals": {
+      "tests": 4248,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "native": {
+    "runs": {
+      "baseline": {
+        "result": {
+          "status": "FAIL",
+          "checks": {
+            "actualDebugAPKClassLoader": true,
+            "bucharest2037PalmSunday": false,
+            "bucharest2037PreviousDayNotPalm": false,
+            "bucharest2010PalmSunday": false,
+            "bucharest2010PreviousDayNotPalm": false,
+            "bucharest2026ExistingMinus48Label": false,
+            "bucharest2026PreviousDayNotMinus48": false,
+            "utc2037PalmSundayUnchanged": true,
+            "fixedChristmasUnchanged": true,
+            "ordinaryNonFeastUnchanged": true,
+            "bucharest2026PaschaUnchanged": true,
+            "bucharest2026Positive39Unchanged": true,
+            "bucharest2026Positive49Unchanged": true,
+            "leapYearInputZoneIndependentOfDefault": false,
+            "callerCalendarsUnchanged": true,
+            "processTimezoneAndLocaleRestored": true
+          },
+          "observations": {
+            "bucharest2037PalmSunday": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2037-03-29",
+              "expected": "Florii (Palm Sunday)",
+              "actual": "",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2037PreviousDayNotPalm": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2037-03-28",
+              "expected": "",
+              "actual": "Florii (Palm Sunday)",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2010PalmSunday": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2010-03-28",
+              "expected": "Florii (Palm Sunday)",
+              "actual": "",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2010PreviousDayNotPalm": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2010-03-27",
+              "expected": "",
+              "actual": "Florii (Palm Sunday)",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026ExistingMinus48Label": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-02-23",
+              "expected": "Lăsatul secului",
+              "actual": "",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026PreviousDayNotMinus48": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-02-22",
+              "expected": "",
+              "actual": "Lăsatul secului",
+              "callerCalendarUnchanged": true
+            },
+            "utc2037PalmSundayUnchanged": {
+              "inputZone": "UTC",
+              "processDefaultZone": "UTC",
+              "civilDate": "2037-03-29",
+              "expected": "Florii (Palm Sunday)",
+              "actual": "Florii (Palm Sunday)",
+              "callerCalendarUnchanged": true
+            },
+            "fixedChristmasUnchanged": {
+              "inputZone": "UTC",
+              "processDefaultZone": "UTC",
+              "civilDate": "2026-12-25",
+              "expected": "Nașterea Domnului (Crăciun)",
+              "actual": "Nașterea Domnului (Crăciun)",
+              "callerCalendarUnchanged": true
+            },
+            "ordinaryNonFeastUnchanged": {
+              "inputZone": "UTC",
+              "processDefaultZone": "UTC",
+              "civilDate": "2026-02-01",
+              "expected": "",
+              "actual": "",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026PaschaUnchanged": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-04-12",
+              "expected": "Învierea Domnului (Paște)",
+              "actual": "Învierea Domnului (Paște)",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026Positive39Unchanged": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-05-21",
+              "expected": "Înălțarea Domnului",
+              "actual": "Înălțarea Domnului",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026Positive49Unchanged": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-05-31",
+              "expected": "Rusaliile (Pentecost)",
+              "actual": "Rusaliile (Pentecost)",
+              "callerCalendarUnchanged": true
+            },
+            "leapYearInputZoneIndependentOfDefault": {
+              "inputZone": "UTC",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2024-03-18",
+              "expected": "Lăsatul secului",
+              "actual": "",
+              "callerCalendarUnchanged": true
+            }
+          },
+          "passed": 9,
+          "total": 16,
+          "actualPublicFunctionInvocations": 13,
+          "apkSha256": "ab0d8b91d1e9cf9de69dd5c6b1d48c2c5d7c1e2b70e0fd4a0d5f284530cf5c8f",
+          "actualAPKClassLoader": true,
+          "buildVariant": "debug",
+          "optimizedHistoricalDatesVerified": false,
+          "ownerPreferencesWritten": 0,
+          "networkOperations": 0,
+          "providerOrServiceStarted": false,
+          "scope": "Actual debug FeastDays.forToday with fixed generated civil dates; no labels or Pascha algorithm changes; optimized historical-date entry point is inlined and unverified"
+        },
+        "process": {
+          "terminalExit": 1,
+          "stdoutBytes": 3856,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "311dfe4569bd784f13d28c6770270a668456e124d40600e3a9b9601d735d8574",
+          "bytes": 4831
+        },
+        "processBinding": {
+          "sha256": "677887c7b2efd8cfc72036d2a94ea6ecb4a7eb3dd3540b3a894a75a8f9da56e5",
+          "bytes": 67
+        },
+        "stdoutBinding": {
+          "sha256": "fb2be65a749045c2c19269fd112582129f31f0963d97c35e8d1dc87cbfcf2e28",
+          "bytes": 3856
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "candidate": {
+        "result": {
+          "status": "PASS",
+          "checks": {
+            "actualDebugAPKClassLoader": true,
+            "bucharest2037PalmSunday": true,
+            "bucharest2037PreviousDayNotPalm": true,
+            "bucharest2010PalmSunday": true,
+            "bucharest2010PreviousDayNotPalm": true,
+            "bucharest2026ExistingMinus48Label": true,
+            "bucharest2026PreviousDayNotMinus48": true,
+            "utc2037PalmSundayUnchanged": true,
+            "fixedChristmasUnchanged": true,
+            "ordinaryNonFeastUnchanged": true,
+            "bucharest2026PaschaUnchanged": true,
+            "bucharest2026Positive39Unchanged": true,
+            "bucharest2026Positive49Unchanged": true,
+            "leapYearInputZoneIndependentOfDefault": true,
+            "callerCalendarsUnchanged": true,
+            "processTimezoneAndLocaleRestored": true
+          },
+          "observations": {
+            "bucharest2037PalmSunday": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2037-03-29",
+              "expected": "Florii (Palm Sunday)",
+              "actual": "Florii (Palm Sunday)",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2037PreviousDayNotPalm": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2037-03-28",
+              "expected": "",
+              "actual": "",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2010PalmSunday": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2010-03-28",
+              "expected": "Florii (Palm Sunday)",
+              "actual": "Florii (Palm Sunday)",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2010PreviousDayNotPalm": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2010-03-27",
+              "expected": "",
+              "actual": "",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026ExistingMinus48Label": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-02-23",
+              "expected": "Lăsatul secului",
+              "actual": "Lăsatul secului",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026PreviousDayNotMinus48": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-02-22",
+              "expected": "",
+              "actual": "",
+              "callerCalendarUnchanged": true
+            },
+            "utc2037PalmSundayUnchanged": {
+              "inputZone": "UTC",
+              "processDefaultZone": "UTC",
+              "civilDate": "2037-03-29",
+              "expected": "Florii (Palm Sunday)",
+              "actual": "Florii (Palm Sunday)",
+              "callerCalendarUnchanged": true
+            },
+            "fixedChristmasUnchanged": {
+              "inputZone": "UTC",
+              "processDefaultZone": "UTC",
+              "civilDate": "2026-12-25",
+              "expected": "Nașterea Domnului (Crăciun)",
+              "actual": "Nașterea Domnului (Crăciun)",
+              "callerCalendarUnchanged": true
+            },
+            "ordinaryNonFeastUnchanged": {
+              "inputZone": "UTC",
+              "processDefaultZone": "UTC",
+              "civilDate": "2026-02-01",
+              "expected": "",
+              "actual": "",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026PaschaUnchanged": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-04-12",
+              "expected": "Învierea Domnului (Paște)",
+              "actual": "Învierea Domnului (Paște)",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026Positive39Unchanged": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-05-21",
+              "expected": "Înălțarea Domnului",
+              "actual": "Înălțarea Domnului",
+              "callerCalendarUnchanged": true
+            },
+            "bucharest2026Positive49Unchanged": {
+              "inputZone": "Europe/Bucharest",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2026-05-31",
+              "expected": "Rusaliile (Pentecost)",
+              "actual": "Rusaliile (Pentecost)",
+              "callerCalendarUnchanged": true
+            },
+            "leapYearInputZoneIndependentOfDefault": {
+              "inputZone": "UTC",
+              "processDefaultZone": "Europe/Bucharest",
+              "civilDate": "2024-03-18",
+              "expected": "Lăsatul secului",
+              "actual": "Lăsatul secului",
+              "callerCalendarUnchanged": true
+            }
+          },
+          "passed": 16,
+          "total": 16,
+          "actualPublicFunctionInvocations": 13,
+          "apkSha256": "11665dbc22076ef62e5ec249bc1e0a96d0513981376cb60680020236d2eddb8d",
+          "actualAPKClassLoader": true,
+          "buildVariant": "debug",
+          "optimizedHistoricalDatesVerified": false,
+          "ownerPreferencesWritten": 0,
+          "networkOperations": 0,
+          "providerOrServiceStarted": false,
+          "scope": "Actual debug FeastDays.forToday with fixed generated civil dates; no labels or Pascha algorithm changes; optimized historical-date entry point is inlined and unverified"
+        },
+        "process": {
+          "terminalExit": 0,
+          "stdoutBytes": 3866,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "26c72c2901af32c132f3f7556da1d3d59bb34df06a5fa72ac37b49efd88e9221",
+          "bytes": 4845
+        },
+        "processBinding": {
+          "sha256": "b6d72b16482feeb732800e7fa5a478528af9eecb95d7adeec1b4294ba4a0edc3",
+          "bytes": 67
+        },
+        "stdoutBinding": {
+          "sha256": "698a5bd7990d432f9c2fc8a3c9d33fce2b54c3294a475cffd0526289c51a7679",
+          "bytes": 3866
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    },
+    "binding": {
+      "fixtureSourceSha256": "bb962dd2f5e76f5929c7315765bc051fd80e0b377a69f0935d41004e1e6c2ff5",
+      "fixtureJarSha256": "e0d654b5ecc8ab76239355dd92e52c0289e97eee8e93d0b1b1f72a65316c9104",
+      "compilerSha256": "72d0a67ecd37c0e1a87e6addc4a41645cf6434ae2568bd66696db8830c38286f",
+      "runnerSha256": "b9b35437fc91e1c4df3196fb546e6eb6bc786f4535ce5ae620239e4a1310b7b7",
+      "phases": [
+        "baseline",
+        "candidate"
+      ],
+      "apkSha256": {
+        "baseline": "ab0d8b91d1e9cf9de69dd5c6b1d48c2c5d7c1e2b70e0fd4a0d5f284530cf5c8f",
+        "candidate": "11665dbc22076ef62e5ec249bc1e0a96d0513981376cb60680020236d2eddb8d"
+      },
+      "buildVariant": "debug",
+      "optimizedHistoricalDatesVerified": false,
+      "scope": "Actual public FeastDays.forToday(Calendar) with generated fixed civil dates; no Context, preferences, provider, service, UI or network"
+    },
+    "cleanup": {
+      "parentsRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "ownedScratchRemoved": true,
+      "faults": [],
+      "ownerPreferencesWritten": 0,
+      "networkOperations": 0,
+      "providerOrServiceStarted": false,
+      "buildVariant": "debug",
+      "optimizedHistoricalDatesVerified": false,
+      "externalTimeoutFailureCleanupFaultInjected": false
+    },
+    "compilerLog": {
+      "sha256": "c109aac1b16e2b4aaeee147f2f978bdd076621ae26b501333cb89a3ca77161c3",
+      "bytes": 747
+    },
+    "compilerWarnings": 3,
+    "compilerWarningScope": "Java 8 source/target obsolescence; actual compiler terminal exit 0.",
+    "runnerLog": {
+      "sha256": "0ef1537a184354e48d6991e92843e8a43b15de4fe8c6b79744b1c26166337c6a",
+      "bytes": 301
+    },
+    "acceptedParents": 2,
+    "actualPublicFunctionInvocations": 26,
+    "correctedLabelChecks": [
+      "bucharest2037PalmSunday",
+      "bucharest2037PreviousDayNotPalm",
+      "bucharest2010PalmSunday",
+      "bucharest2010PreviousDayNotPalm",
+      "bucharest2026ExistingMinus48Label",
+      "bucharest2026PreviousDayNotMinus48",
+      "leapYearInputZoneIndependentOfDefault"
+    ],
+    "retainedDateAndLabelChecks": 6,
+    "retainedHarnessChecks": 3,
+    "preExecutionLocaleCategoryGuardCorrection": {
+      "recordedAt": "2026-11-03T10:16:30.192013+00:00",
+      "reason": "Root review requires preserving and restoring Locale DISPLAY and FORMAT categories as well as the general default.",
+      "initialSource": "/private/tmp/portal-product-audit-20261103-100754/NativeFeastDaysCivilDate-initial-before-locale-category-guard.java",
+      "initialSourceSha256": "ea8c6d04b920a462374beb2824af35449b1dc49f640d81cc21cc38ed35213dba",
+      "finalSource": "/private/tmp/portal-product-audit-20261103-100754/NativeFeastDaysCivilDate.java",
+      "finalSourceSha256": "bb962dd2f5e76f5929c7315765bc051fd80e0b377a69f0935d41004e1e6c2ff5",
+      "compilerSha256": "72d0a67ecd37c0e1a87e6addc4a41645cf6434ae2568bd66696db8830c38286f",
+      "runnerSha256": "b9b35437fc91e1c4df3196fb546e6eb6bc786f4535ce5ae620239e4a1310b7b7",
+      "authorCompilationInvocations": 0,
+      "runtimeCompilationInvocations": 0,
+      "fixtureExecutions": 0,
+      "deviceOperations": 0,
+      "invocationsUnchanged": 13,
+      "checksUnchanged": 16,
+      "dateExpectationsUnchanged": true,
+      "originalAuditClock": "2026-11-03T10:07:54Z–2026-11-03T10:37:54Z"
+    },
+    "preExecutionGuardHistoryBinding": {
+      "sha256": "3e996541b451492c5424067966e2676a5342877100f123acd5e1a681593db133",
+      "bytes": 1074
+    },
+    "executedExcludedAttempts": 0,
+    "scope": "Family Android 10 actual debug APK public forToday(Calendar), thirteen generated fixed date calls per variant and sixteen checks. Full source/JAR/runner/APK bytes, exact actual classloader, canonical unsymlinked scratch owner/LF marker and fresh dex guarded. No Context, household preference, provider, service, UI or network operation by fixture.",
+    "limits": "R8 fully inlines the optimized dated function into the context-only CalendarPacks header default. Zero direct optimized historical-date calls and no keep-rule change. API28, live pack rendering, physical feast-date display and external runner failure/timeout cleanup fault injection remain unverified."
+  },
+  "artifact": {
+    "sha256": "644d148df8285e92fc70c00a87232a30dfffe05965f52a2e08c2e5dc1666d43b",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.116",
+    "versionCode": 110,
+    "variants": {
+      "performance": {
+        "sha256": "644d148df8285e92fc70c00a87232a30dfffe05965f52a2e08c2e5dc1666d43b",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.116",
+        "versionCode": 110
+      },
+      "debug": {
+        "sha256": "11665dbc22076ef62e5ec249bc1e0a96d0513981376cb60680020236d2eddb8d",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.116",
+        "versionCode": 110
+      },
+      "rollback": {
+        "sha256": "60ac84d47756fa97cf9fab0dbcaa9a2eb4beba7931111782c3c8b62fe5066f6a",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.115",
+        "versionCode": 109
+      }
+    },
+    "debugSha256": "11665dbc22076ef62e5ec249bc1e0a96d0513981376cb60680020236d2eddb8d",
+    "rollbackSha256": "60ac84d47756fa97cf9fab0dbcaa9a2eb4beba7931111782c3c8b62fe5066f6a",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 1s"
+  },
+  "artifactBindings": {
+    "baselinePerformance": {
+      "sha256": "60ac84d47756fa97cf9fab0dbcaa9a2eb4beba7931111782c3c8b62fe5066f6a",
+      "bytes": 25862702
+    },
+    "candidatePerformance": {
+      "sha256": "644d148df8285e92fc70c00a87232a30dfffe05965f52a2e08c2e5dc1666d43b",
+      "bytes": 25862702
+    },
+    "baselineDebug": {
+      "sha256": "ab0d8b91d1e9cf9de69dd5c6b1d48c2c5d7c1e2b70e0fd4a0d5f284530cf5c8f",
+      "bytes": 46703529
+    },
+    "candidateDebug": {
+      "sha256": "11665dbc22076ef62e5ec249bc1e0a96d0513981376cb60680020236d2eddb8d",
+      "bytes": 46703529
+    },
+    "baselineMapping": {
+      "sha256": "cd80b7cbb24f993e3940b0064de111057722a225c5de0a46b1ee8f119c29a163",
+      "bytes": 83199447
+    },
+    "candidateMapping": {
+      "sha256": "0709d8e7466cbb3fada07341142eee4f27b4414ce4c5c95ce127fe76e43c846b",
+      "bytes": 83198573
+    },
+    "baselineSource": {
+      "sha256": "2472544d5211000d9d47c4b9668844a2b0342f36346d96823e6b4c091c705803",
+      "bytes": 3249
+    },
+    "baselineVersion": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "nativeSource": {
+      "sha256": "bb962dd2f5e76f5929c7315765bc051fd80e0b377a69f0935d41004e1e6c2ff5",
+      "bytes": 7958
+    },
+    "nativePriorUnexecutedSource": {
+      "sha256": "ea8c6d04b920a462374beb2824af35449b1dc49f640d81cc21cc38ed35213dba",
+      "bytes": 7492
+    },
+    "nativeCompiler": {
+      "sha256": "72d0a67ecd37c0e1a87e6addc4a41645cf6434ae2568bd66696db8830c38286f",
+      "bytes": 2303
+    },
+    "nativeRunner": {
+      "sha256": "b9b35437fc91e1c4df3196fb546e6eb6bc786f4535ce5ae620239e4a1310b7b7",
+      "bytes": 9308
+    },
+    "nativeJar": {
+      "sha256": "e0d654b5ecc8ab76239355dd92e52c0289e97eee8e93d0b1b1f72a65316c9104",
+      "bytes": 4942
+    }
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "terminalExit": 0,
+    "checks": {
+      "family": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true,
+        "fontUnchanged": true,
+        "accessibilityUnchanged": true,
+        "originalChromeTaskRetained": true,
+        "photoFrameResumed": true,
+        "displayOn": true,
+        "installedFullSha256Matches": true
+      },
+      "living": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true
+      }
+    },
+    "preferenceStates": {
+      "family": {
+        "states": 10,
+        "existingFilesByteIdentical": 10,
+        "absencesUnchanged": 0
+      },
+      "living": {
+        "states": 10,
+        "existingFilesByteIdentical": 7,
+        "absencesUnchanged": 3
+      }
+    },
+    "preferenceNames": [
+      "immortal_countdown",
+      "immortal_home_widgets",
+      "immortal_timers",
+      "immortal_timer",
+      "immortal_sunrise",
+      "immortal_chime",
+      "immortal_weather",
+      "immortal_packs",
+      "immortal_cameras",
+      "immortal_screensaver"
+    ],
+    "exceptions": [],
+    "ownerPreferenceEditsOrRestores": 0,
+    "scope": "Complete captured screensaver/profile/layout/photo-source maps and ten named preference states per room; name/devMode retained. Family font/services/original Chrome task/frame/awake/full APK hash checked. Living Fleet only.",
+    "familyScreenshotBinding": {
+      "sha256": "c11e308cf9fb6dbcabd661ae33863cbaae4dc6df505ac3755bf9428262824e61",
+      "bytes": 56923
+    },
+    "familyScreenshotRootVisuallyInspected": true,
+    "familyScreenshotObservation": "Large tan 2:19 digital night clock and Tuesday November 3 date on black. Frame and awake display independently checked; no feast pack rendering or photos/weather acceptance from this view.",
+    "livingVisualAcceptance": "Unverified"
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1661,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1743,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "cleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "observationTerminals": {
+    "health": {
+      "terminalExit": 0,
+      "stdoutSha256": "ea680904d8e05296b3dd1ce9dbe98c9dc8b311a61b85e46c17eeae3a7aa85d36",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 307
+    },
+    "credentials": {
+      "terminalExit": 0,
+      "stdoutSha256": "8b9a40758c4c5b2d70128c944dcd3fe5781051f6fe0c4723229d6b50028566d8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 65
+    },
+    "guard": {
+      "terminalExit": 1,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "dfce86033bfc03396e01050f511e6d5640c1d1fe322f5450c7f246ff0f9d46e0",
+      "stdoutBytes": 0
+    },
+    "screenshot": {
+      "terminalExit": 0,
+      "stdoutSha256": "c11e308cf9fb6dbcabd661ae33863cbaae4dc6df505ac3755bf9428262824e61",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 56923
+    }
+  },
+  "publicRelease": {
+    "guardTerminalExit": 1,
+    "expectedRejection": true,
+    "guardLogBinding": {
+      "sha256": "dfce86033bfc03396e01050f511e6d5640c1d1fe322f5450c7f246ff0f9d46e0",
+      "bytes": 223
+    },
+    "publicManifestByteUnchanged": true,
+    "publicVersionName": "1.83",
+    "publicVersionCode": 77,
+    "localVersionName": "1.116",
+    "localVersionCode": 110,
+    "githubAuthenticationPushOrPublication": false
+  },
+  "nativeFleetCli": {
+    "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "bytes": 694352,
+    "unchanged": true,
+    "rebuiltOrReinstalled": false
+  },
+  "review": {
+    "blockingFindings": [],
+    "sourceReviewBinding": {
+      "sha256": "2a413ac95980a3c4f469b231932b04b568af7e645d0a4e0ff267d81f7b489aa7",
+      "bytes": 3729
+    },
+    "gateNativeReviewBinding": {
+      "sha256": "fa5b4d3c0ccc2f22c402454f06bda94ed48f5553bbea6cdf851b23d3975c149e",
+      "bytes": 8249
+    },
+    "independentGateNativeReviewBinding": {
+      "sha256": "211ec74ff1b92afbba9653f48cfe888ba1e38f82595bb468c88f4c53bea8efe1",
+      "bytes": 68737
+    },
+    "finalEightPathReviewStoredInSeparatePrivateClosureRecord": true
+  },
+  "documentation": {
+    "strictBuildAndTwoViewportQa": {
+      "strict-docs": {
+        "terminalExit": 0,
+        "durationSeconds": 2.229,
+        "logSha256": "07a0663bf8ae62362ad9f21f14b4ac0e1f344fc6cb402c643de9bcafff31d700",
+        "logBytes": 31550
+      },
+      "roadmap-qa": {
+        "terminalExit": 0,
+        "durationSeconds": 5.37,
+        "logSha256": "5454c2b67f2c8a75cd894fb3cf7d0d6bf12f27fa88f685feb0899feea058a633",
+        "logBytes": 1453
+      }
+    },
+    "roadmapQa": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 92,
+          "checks": [
+            {
+              "id": "feast-civil-dates",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 92,
+          "checks": [
+            {
+              "id": "feast-civil-dates",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "rootViewedScreenshotBindings": {
+      "390": {
+        "sha256": "c3bf57d8d1228eeafd93ebd7917afc37e34f35693fec3c5b40172cdfc3272b51",
+        "bytes": 239405
+      },
+      "1600": {
+        "sha256": "26200306d0c55c749ee66ea27b3b1adba9a223983607ea0d73f08b4869688486",
+        "bytes": 118395
+      }
+    },
+    "rootViewedBothScreenshots": true,
+    "strictBuildWarningsAndErrors": 0,
+    "fileSha256": {
+      "docs/portal-feast-civil-dates-2026-11-03.md": "656b025690c770bc8da42f41b9aac8549dc8ea87ac0c79eac3c18bbc9f62ca1c",
+      "docs/portal-product-operating-state.md": "e4900b85c0df15af1c4a4829bec3bf7e96f31795bd20bb1cfa2fd8913fb25bb8",
+      "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": "72eeb3598019dac8d61b93cf06fc6beefa75d3d90491f8b53748a7131ba05360",
+      "mocks/portal-widget-gallery-20261102/roadmap/index.html": "6034ca09d067031454bf2297e7905f8ddadb5b934f8a23599ce0561ed986e7b6"
+    },
+    "documentationReviewBinding": {
+      "sha256": "e1b06aacbad6080ec770543dd99840cfb20398f47f8abbd384f8c9103c31a50f",
+      "bytes": 2311
+    },
+    "finalServedProofAndClosingCheckRecordedSeparatelyToAvoidSelfReference": true
+  },
+  "backlog": {
+    "tasks": 92,
+    "delivered": 57,
+    "verified": 25,
+    "approval": 3,
+    "parked": 6,
+    "queued": 1,
+    "priorTaskObjects": 91,
+    "defaultTaskPreserved": "weather-native-layout",
+    "boundaryChange": "Only current room version 1.115/code109 to 1.116/code110.",
+    "invariants": {
+      "all91PriorTaskObjectsUnchanged": true,
+      "completePriorRawSuffixUnchanged": true,
+      "completePriorRawSuffixBytes": 289335,
+      "completePriorRawSuffixSha256": "3c169526fb75695848debee155d161686b0b044628b3d04892a598787c736969",
+      "tasks": 92,
+      "counts": {
+        "delivered": 57,
+        "verified": 25,
+        "approval": 3,
+        "parked": 6,
+        "queued": 1
+      },
+      "defaultTask": "weather-native-layout",
+      "allOtherMetadataAndBoundariesUnchanged": true,
+      "currentBoundaryVersionOnly": "1.115/code109 -> 1.116/code110",
+      "earlierSummaryByteCountCorrection": "288796 was a status typo; actual immutable raw suffix is289335 bytes, same full SHA."
+    },
+    "invariantsBinding": {
+      "sha256": "8fdfc9d93cbe3a602e830910bd3f95d5aa1dfe19941133c62fef2ded76f6376d",
+      "bytes": 643
+    }
+  },
+  "deferredHypotheses": {
+    "selected": "FeastDays civil offset across daylight-saving changes",
+    "baselineSourceSha256": "2472544d5211000d9d47c4b9668844a2b0342f36346d96823e6b4c091c705803",
+    "expectedCorrection": "Use Gregorian day-of-year field difference between requested date and Easter in the same documented year; preserve mappings and default Easter algorithm.",
+    "originalClock": {
+      "startedAt": "2026-11-03T10:07:54+00:00",
+      "deadline": "2026-11-03T10:37:54+00:00",
+      "base": "32646ea81486758c5d0cceefa2723b3f23a78cc3",
+      "backlogTasks": 91,
+      "scope": "Fresh distinct cross-product source audit. All newly discovered issues retain this original clock including checks, delivery, documentation, cleanup and commit. No prior Countdown/Aurora/ISS/timer/performance/phone work clock reset."
+    },
+    "nativeScope": "Actual debug APK public function differential; R8 inlines optimized historical-date entry point, so that native optimized coverage remains unverified.",
+    "deferredSameClock": [
+      "PresenceHub cross-thread fanout ordering source hypothesis, no reproduction.",
+      "MQTT fourth Remaining Length rejection at2MiB, source hypothesis, no public-function run and budget choice unresolved.",
+      "MQTT active-broker Apply reconnect may overlap prior ownership scan; no reproduction."
+    ],
+    "olderClocksNeverReset": [
+      "Countdown mutation delivery complete prior clock09:46–10:16; Aurora forecast wording remains on that clock.",
+      "MalformedISS/invalidAurora earlier07:36–08:06 exhausted.",
+      "TimerAlarmAudioTrack08:51–09:21 exhausted.",
+      "Prior MQTT socket ownership previously audited, no new slot."
+    ]
+  },
+  "limits": [
+    "Historical date execution is debug only; exact optimized artifacts build and install but dated function execution is unverified.",
+    "Documented Gregorian 1900–2099 support and all existing mappings are retained.",
+    "Normal two-parent and owned scratch cleanup observed; no external timeout/crash or storage fault injection.",
+    "No phone/Pixel access, HA changes, provider login, GitHub authentication, push or publication.",
+    "Public 1.83/code77 stays unchanged and local 1.116/code110 is not publication eligible.",
+    "Existing approvals and exhausted or held issue clocks remain; broader goal stays active."
+  ]
+}

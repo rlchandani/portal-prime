@@ -13,8 +13,35 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / countdown list mutations:** exact optimized
-  **1.115/code109** is installed and fully hashed in both rooms. Shared object
+- **Current room APK / Orthodox feast civil dates:** exact optimized
+  **1.116/code110** is installed and fully hashed in both rooms. Gregorian civil
+  offsets keep the existing feast labels on their mapped dates across clock
+  changes and differing input/default zones. Labels, precedence, fixed fallback
+  and the documented 1900–2099 Easter algorithm remain. Ten frozen methods
+  reproduce seven failures then pass; **4,248 JVM/441 suites**,
+  debug/optimized/R8/vital lint pass in 2m 1s. Actual debug Family date execution
+  improves **9/16 to 16/16**, seven corrections and nine controls, with 13 public
+  date calls per variant. Optimized dated entry point is inlined and unverified;
+  no keep rule is added. Caller Calendars and process timezone and Locale defaults
+  remain. Two native parents and owned scratch retire normally. Complete captured
+  maps and ten preference states per room match: Family ten existing files,
+  Living seven existing files and three unchanged absences. No exception, edit
+  or restore. Family tan digital night clock and date were viewed; font,
+  accessibility, original Chrome, resumed frame and awake display remain. Pack
+  rendering and Living visual remain open. Normal diagnostics and logcat requests
+  for 1500 lines are limited checks; actual outputs have 1661 Family and 1743
+  Living lines without fatal or ANR markers. Original registry unchanged, copied
+  credentials removed. API28, live pack rendering, calendar-range redesign and
+  external timeout cleanup remain unverified. Public 1.83 guard rejects local
+  1.116; no phone/HA/auth/publication. **92 tasks:57 delivered,25 locally
+  verified,3 approval,6 parked,1 queued.** Original **10:07:54–10:37:54 UTC**
+  audit clock retained. Fresh Presence and MQTT hypotheses share this clock
+  without reproduction or a new slot; older held or exhausted scopes remain.
+  Broader goal remains active. [Receipt](portal-feast-civil-dates-2026-11-03.md).
+
+- **Previous room APK / countdown list mutations:** exact optimized
+  **1.115/code109** was installed and fully hashed in both rooms at that
+  delivery's closure; the current feast build supersedes it. Shared object
   monitor serialization keeps overlapping Add and Remove results; identity,
   dates, payloads, order and asynchronous preference apply remain. Seven frozen
   methods reproduce four failures then pass; **4,238 JVM/440 suites**,
@@ -39,7 +66,7 @@ The updated whole-product objective is
 
 - **Previous room APK / old recurring calendar series:** exact optimized
   **1.114/code108** was installed and fully hashed in both rooms at that
-  delivery’s closure; the current countdown build supersedes it. Seek near the
+  delivery’s closure; the later countdown build superseded it. Seek near the
   overlap window while preserving generated COUNT before EXDATE, BYDAY order,
   UNTIL, horizon and legacy monthly/yearly clamping. Original366 prospective
   periods and bounded pre-window attempts remain; first366 legacy steps replay.

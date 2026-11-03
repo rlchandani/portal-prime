@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T10:00:45.863428+00:00",
+  "updatedAt": "2026-11-03T10:22:22.451060+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,59 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.115/code109. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.116/code110. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "feast-civil-dates",
+      "title": "Orthodox feasts: keep labels on their civil dates",
+      "summary": "Delivered 1.116: existing feast labels keep their mapped civil dates across clock changes.",
+      "description": "Compute same-year Gregorian civil offsets from Pascha. Preserve the documented Easter range, exact existing mappings and precedence, fixed fallback and caller Calendar.",
+      "status": "delivered",
+      "verification": "10 frozen methods pass; 4,248 JVM; debug date checks 9/16 to 16/16.",
+      "kind": "Almanac civil-date calculation",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Tools reliability / independent date and artifact review",
+      "deployment": "Exact optimized 1.116/code110 installed and fully hashed in Family Area and Living Area.",
+      "state": "Four captured maps and ten preference states per room match. Family clock, font, accessibility and Chrome retained. Two debug parents and scratch retired; copied credentials removed.",
+      "acceptance": [
+        "Reproduce missing intended labels and false-early labels through actual public FeastDays.forToday.",
+        "Retain every existing label, Gregorian Easter algorithm and range, fixed fallback and supplied Calendar.",
+        "Run unchanged focused/full gates and actual debug APK historical-date differential; qualify optimized date-function availability.",
+        "Deliver the exact signed artifact to both rooms and compare complete captured maps and named preference states."
+      ],
+      "evidence": [
+        {
+          "text": "Civil-date correction, frozen regressions and exact two-room delivery.",
+          "source": "docs/portal-feast-civil-dates-2026-11-03.md"
+        },
+        {
+          "text": "Bound artifacts, actual date observations, preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/feast-civil-dates-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual debug APK on Family Android 10: 13 generated date calls per variant, seven corrected checks and nine retained controls. Caller Calendars and process timezone and Locale defaults remain.",
+        "The optimized dated function is inlined and unavailable for direct historical-date calls; zero such calls and no added keep rules. API28, live pack rendering and physical feast-date display remain unverified.",
+        "The existing Gregorian 1900–2099 Easter range, fixed and movable label maps and precedence remain. The existing minus48 label mapping is preserved; no religious-table or calendar-type redesign.",
+        "Both final debug parents and owned scratch retire normally. External runner failure and timeout cleanup remain untested. Locale category restoration was tightened before the first native compilation or execution.",
+        "Ten preference states per room match: Family ten existing files, Living seven existing files and three unchanged absences. No exception or household preference edit or restore.",
+        "Family tan digital night clock and date were viewed; font, accessibility, original Chrome, resumed frame and awake display remain. Pack rendering and Living visual acceptance remain open.",
+        "Normal diagnostics and logcat requests for 1500 lines are limited observations. Actual output has 1661 Family and 1743 Living lines, with zero fatal or ANR markers; broader runtime health and negative authentication remain open.",
+        "Public manifest stays 1.83/code77 and rejects local 1.116/code110. No phone, HA, authentication, push or publication; design approvals and parked clocks remain.",
+        "Fresh Presence and MQTT source-only hypotheses share this original audit clock without reproduction or a new slot. Earlier ISS, Aurora, TimerAlarm and bedtime findings keep their original scopes."
+      ],
+      "next": "Retain the exact two-room delivery. Optimized dated calls, API28, live pack rendering and Living visual acceptance remain open; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T10:07:54+00:00",
+        "deadline": "2026-11-03T10:37:54+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "countdown-mutations",
       "title": "Countdowns: preserve concurrent additions and removals",

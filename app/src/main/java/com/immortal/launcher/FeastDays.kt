@@ -67,21 +67,10 @@ object FeastDays {
   /** Today's feast name, or "" if today isn't a tracked feast. Movable feasts win
    * ties (they're the rarer, more notable events). */
   fun forToday(now: Calendar = Calendar.getInstance()): String {
-    val today = startOfDay(now)
-    val pascha = startOfDay(orthodoxEaster(now.get(Calendar.YEAR)))
-    val offset = ((today.timeInMillis - pascha.timeInMillis) / DAY_MS).toInt()
+    val pascha = orthodoxEaster(now.get(Calendar.YEAR))
+    // Both Gregorian dates share a year; civil-day fields don't drift across clock changes.
+    val offset = now.get(Calendar.DAY_OF_YEAR) - pascha.get(Calendar.DAY_OF_YEAR)
     MOVABLE[offset]?.let { return it }
     return FIXED[(now.get(Calendar.MONTH) + 1) * 100 + now.get(Calendar.DAY_OF_MONTH)] ?: ""
-  }
-
-  private const val DAY_MS = 24L * 60 * 60 * 1000
-
-  private fun startOfDay(c: Calendar): Calendar {
-    val x = c.clone() as Calendar
-    x.set(Calendar.HOUR_OF_DAY, 0)
-    x.set(Calendar.MINUTE, 0)
-    x.set(Calendar.SECOND, 0)
-    x.set(Calendar.MILLISECOND, 0)
-    return x
   }
 }
