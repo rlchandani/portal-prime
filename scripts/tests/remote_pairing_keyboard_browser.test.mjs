@@ -26,7 +26,8 @@ test('pairing uses native Enter submission with its sticky footer action', {
     .map(name => [`/remote/assets/${name}`, read(`app/src/main/assets/remote/${name}`)]));
   const browser = await chromium.launch({
     headless: true,
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    executablePath: process.env.IMMORTAL_REMOTE_BROWSER_PATH || (process.platform === 'darwin'
+      ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : undefined),
     timeout: 15000,
     args: ['--disable-background-networking', '--disable-component-update', '--no-proxy-server',
       '--host-resolver-rules=MAP * ~NOTFOUND'],

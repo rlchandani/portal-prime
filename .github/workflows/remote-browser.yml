@@ -1,0 +1,53 @@
+name: remote browser
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pairing-browser:
+    name: Pairing keyboard regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      IMMORTAL_REMOTE_CHROME: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Prepare temporary browser paths
+        run: |
+          printf '%s\n' \
+            "NODE_PATH=$RUNNER_TEMP/immortal-remote-dependencies/node_modules" \
+            "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/immortal-remote-browsers" >> "$GITHUB_ENV"
+
+      - name: Install pinned browser test dependency
+        run: >-
+          npm install --prefix "$RUNNER_TEMP/immortal-remote-dependencies"
+          --ignore-scripts --no-audit --no-fund --omit=optional playwright@1.62.1
+
+      - name: Install managed Chromium and system dependencies
+        run: node "$NODE_PATH/playwright/cli.js" install --with-deps chromium
+
+      - name: Run pairing browser cases
+        run: >-
+          node --test
+          --test-reporter=spec --test-reporter-destination=stdout
+          --test-reporter=junit
+          --test-reporter-destination="$RUNNER_TEMP/remote-pairing-browser.xml"
+          scripts/tests/remote_pairing_keyboard_browser.test.mjs
+
+      - name: Upload browser test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: remote-pairing-browser-report
+          path: ${{ runner.temp }}/remote-pairing-browser.xml
+          if-no-files-found: warn
