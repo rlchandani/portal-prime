@@ -13,7 +13,19 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / browser profile Delete delivery:** both rooms contain
+- **Current room APK / slim slideshow frame:** exact optimized **1.97/code91**
+  is installed and fully hashed in both rooms. Framed Print uses a 4-pixel mat
+  and 2-pixel edge; the existing zoom is confined to the photo opening.
+  Baseline narrow-frame checks failed8/8; final16/16 rendered still/animated
+  geometry and pixel cases pass. **354 slideshow / 4,066 JVM tests**, debug,
+  optimized/R8/vital lint pass. Family's actual portrait transitions retain the
+  thin frame; native landscape acceptance is not claimed. Original shuffle,
+  complete room settings/sources/layouts, Family font/accessibility and Chrome
+  task are preserved. The Google phone remains prohibited. The takeover keeps
+  the original **03:17:14.224–03:47:14.224UTC** clock and a bounded monitor.
+  [Receipt](portal-slideshow-slim-frame-2026-11-02.md).
+
+- **Previous room APK / browser profile Delete delivery:** both rooms received
   exact optimized **1.96/code90**, preserving the preceding Save fix. Stale
   Delete confirmation now retains a changed same-name browser profile and asks
   for fresh review. Three original failures became three passes; **724 browser /

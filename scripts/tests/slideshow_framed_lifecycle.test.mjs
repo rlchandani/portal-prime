@@ -384,8 +384,8 @@ test('cached face hints show a whole still upright print; reused no-hint slots b
     assert.equal(r.state(first).promotion, 'auto');
     assert.equal(first.style.backgroundSize, 'contain');
     assert.equal(first.style.backgroundPosition, 'center');
-    assert.equal(r.computed(first.parent.parent).padding, '46px');
-    assert.equal(r.computed(first.parent.parent.parent).padding, '10px');
+    assert.equal(r.computed(first.parent.parent).padding, '4px');
+    assert.equal(r.computed(first.parent.parent.parent).padding, '2px');
     await r.advanceTo(5000);
     const second = r.incoming();
     assert.equal(second.style.width, '1296px'); assert.equal(second.style.height, '810px');

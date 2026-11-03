@@ -1,7 +1,8 @@
 # Browser photos: import to multiple Portals
 
 This is an **unapproved functional design review**, not a delivered browser
-feature. Current production remains exact Portal **1.96/code90** in both rooms.
+feature. At review creation both rooms contained exact Portal **1.96/code90**;
+see the operating state for subsequent independent deliveries.
 No Portal, Google phone, Home Assistant or account is accessed by this unit.
 
 Review: [Photos to your Portals](http://127.0.0.1:8891/group-photo-import-review.html).

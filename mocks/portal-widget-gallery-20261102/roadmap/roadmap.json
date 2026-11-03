@@ -1,18 +1,69 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T03:14:19.316176+00:00",
-  "updatedLabel": "3 November2026 \u00b7 group photo import review ready; Portal1.96 remains current",
+  "updatedAt": "2026-11-03T03:42:48.428540+00:00",
+  "updatedLabel": "2 November 2026 Pacific \u00b7 1.97 slim slideshow frame delivered to both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.96/code90. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.97/code91. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "slideshow-slim-frame",
+      "title": "Slideshow: a slim frame for every photo shape",
+      "summary": "Delivered 1.97 to both Portals. Framed Print uses a thin mat that remains visible during the existing zoom.",
+      "description": "The former 46-pixel mat and 10-pixel edge dominated narrow portraits. A 4-pixel mat and 2-pixel edge now follow the existing measured photograph; the bevel confines the zoom to the opening.",
+      "status": "delivered",
+      "verification": "354 slideshow \u00b7 4,066 JVM \u00b7 16 rendered shape/motion cases",
+      "kind": "Slideshow visual correction",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering and release QA",
+      "deployment": "Exact optimized 1.97/code91 fully hashed in Family Area and Living Area; complete saved room configuration preserved.",
+      "state": "Real Family portrait captures retain the thin border; landscape, square and panorama geometry verified in generated rendering of the shipped engine. Original shuffle restored.",
+      "acceptance": [
+        "Keep decoration tiny around portrait and landscape photographs.",
+        "Retain measured aspect, orientation, photo selection and motion preference.",
+        "Keep the mat visible through the maximum existing zoom.",
+        "Pass slideshow/JVM gates and debug/optimized/R8/vital lint.",
+        "Verify exact installed artifact and preserve settings, sources and layout in both rooms."
+      ],
+      "evidence": [
+        {
+          "text": "Scope, tests, native observations, rollout and limits.",
+          "source": "docs/portal-slideshow-slim-frame-2026-11-02.md"
+        },
+        {
+          "text": "Sanitized artifact, generated geometry and room preservation checks.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/slideshow-slim-frame-verification.json"
+        },
+        {
+          "text": "Generated portrait with the slim mat.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/slideshow-slim-frame-portrait.png"
+        },
+        {
+          "text": "Generated landscape with the slim mat.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/slideshow-slim-frame-landscape.png"
+        }
+      ],
+      "limits": [
+        "Native visual observations cover portrait photos; other shapes use generated desktop rendering.",
+        "No other-style, general performance, natural Dream recovery or whole-product acceptance.",
+        "Owner photos and actual native before/after comparison remain private."
+      ],
+      "next": "Retain the scoped delivery and original clock. Browser group photo-import review, broader UI approvals, phone prohibition and parked issues retain their separate boundaries.",
+      "issueClock": {
+        "startedAt": "2026-11-03T03:17:14.224Z",
+        "deadline": "2026-11-03T03:47:14.224Z",
+        "originalUserRequestClockRetained": true
+      }
+    },
     {
       "id": "browser-group-photo-import",
       "title": "Browser photos: send to multiple Portals",

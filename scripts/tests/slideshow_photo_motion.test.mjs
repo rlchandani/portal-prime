@@ -46,10 +46,11 @@ function snapshot(r) {
 // Captured by executing the current source before adding the preference gates.
 // Pin geometry, publication order, CSS inputs and timers; matching two new paths alone
 // would miss a common regression in both. Coercions count the existing random selections.
+// Framed Print's approved slim mat and clipped zoom update its CSS inputs only.
 const legacyOutput = [
   ['kenBurns', 30, '1ec9a0c298c708acbc653e8987006355af4bea462fbe0e7606cba08f9666b675'],
   ['diptych', 12, '1306f202be7a187821287abc97d0bd6ab6664f761f9052081b157fa85fd116b0'],
-  ['framed', 6, '6c84dd7e8fb48d8d0d0e705c878857ccd1849bfa4645c8f19c99210bc73c89a0'],
+  ['framed', 6, 'c0ea1c6dcd90ac4d71a8e10d864368a1db0a0b7ac90b48c294d2d3895283b7d3'],
   ['push', 0, 'fb2b28a70e305ae83268e4e5b933276258f6811750ee8ce4beecd602efe35e8c'],
   ['memories', 0, '6f642dfabcc126c561f90a9e0507820b53b5a9bcb6039c0e4facd602e388a1a3'],
   ['panorama', 0, '03a82e8bf80c00c8a1aeef2c9135a050a2b91c7df7ec75cd9e5bbf22d348cb1f'],
@@ -61,7 +62,7 @@ const legacyOutput = [
   ['filmstrip', 0, 'e55bbd40fc31709d71052f73d61ea3de6333fa2b804527a014cb5d79bde5e677'],
 ];
 for (const [mode, selections, output] of legacyOutput) {
-  test(`${mode}: default output matches the pre-change source without extra random selections`, async () => {
+  test(`${mode}: default output matches its reviewed snapshot without extra random selections`, async () => {
     for (const photoMotion of [undefined, true, false]) {
       let draws = 0;
       const r = fixture(mode, { photoMotion, random: { valueOf() { draws++; return .5; } } });
@@ -205,7 +206,7 @@ test('still Mosaic retains edge face points inside complete contained photos', a
   }
 });
 
-test('still Framed Print keeps the complete upright portrait centered inside its original mat', async () => {
+test('still Framed Print keeps the complete upright portrait centered inside its slim mat', async () => {
   const r = fixture('framed', { photoMotion: false,
     photos: [{ seed: 'portrait', w: 1000, h: 1600 }] });
   try {
@@ -215,8 +216,8 @@ test('still Framed Print keeps the complete upright portrait centered inside its
     assert.equal(image.style.height, '1037px');
     assert.equal(image.style.backgroundSize, 'contain');
     assert.equal(image.style.backgroundPosition, 'center');
-    assert.equal(r.computed(image.parent.parent).padding, '46px');
-    assert.equal(r.computed(image.parent.parent.parent).padding, '10px');
+    assert.equal(r.computed(image.parent.parent).padding, '4px');
+    assert.equal(r.computed(image.parent.parent.parent).padding, '2px');
     assert.equal(scene(image).style.transform, undefined);
     still(r, image);
   } finally { r.cleanup(); }

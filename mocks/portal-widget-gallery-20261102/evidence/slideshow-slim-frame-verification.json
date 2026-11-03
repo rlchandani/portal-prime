@@ -1,0 +1,538 @@
+{
+  "schemaVersion": 1,
+  "status": "delivered",
+  "scope": "Framed Print slim mat and zoom confinement",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.97",
+    "versionCode": 91,
+    "bytes": 25861350,
+    "sha256": "92e8a3b0d394f1cbd6ad47b4566e1f969031ff967c6f27e5ddf54b5f48202278",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "jvm": {
+      "tests": 4066,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "suites": 423,
+    "slideshowTests": 354,
+    "renderedCases": 16,
+    "cssSha256": "a0e3994ba80885e51a8c0087d002aeee1a4b9d177502c06973e87eb4c9ce1177"
+  },
+  "rendered": {
+    "phase": "candidate",
+    "cases": [
+      {
+        "name": "portrait",
+        "W": 2160,
+        "H": 1440,
+        "motion": false,
+        "photo": {
+          "w": 691,
+          "h": 1037
+        },
+        "frame": {
+          "x": 728.5,
+          "y": 195.5,
+          "w": 703,
+          "h": 1049
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "portrait",
+        "W": 2160,
+        "H": 1440,
+        "motion": true,
+        "photo": {
+          "w": 732.4599609375,
+          "h": 1099.219970703125
+        },
+        "frame": {
+          "x": 728.5,
+          "y": 195.5,
+          "w": 703,
+          "h": 1049
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "landscape",
+        "W": 2160,
+        "H": 1440,
+        "motion": false,
+        "photo": {
+          "w": 1296,
+          "h": 864
+        },
+        "frame": {
+          "x": 426,
+          "y": 282,
+          "w": 1308,
+          "h": 876
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "landscape",
+        "W": 2160,
+        "H": 1440,
+        "motion": true,
+        "photo": {
+          "w": 1373.759765625,
+          "h": 915.8399047851562
+        },
+        "frame": {
+          "x": 426,
+          "y": 282,
+          "w": 1308,
+          "h": 876
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "square",
+        "W": 2160,
+        "H": 1440,
+        "motion": false,
+        "photo": {
+          "w": 1037,
+          "h": 1037
+        },
+        "frame": {
+          "x": 555.5,
+          "y": 195.5,
+          "w": 1049,
+          "h": 1049
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "square",
+        "W": 2160,
+        "H": 1440,
+        "motion": true,
+        "photo": {
+          "w": 1099.219970703125,
+          "h": 1099.219970703125
+        },
+        "frame": {
+          "x": 555.5,
+          "y": 195.5,
+          "w": 1049,
+          "h": 1049
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "panorama",
+        "W": 2160,
+        "H": 1440,
+        "motion": false,
+        "photo": {
+          "w": 1296,
+          "h": 432
+        },
+        "frame": {
+          "x": 426,
+          "y": 498,
+          "w": 1308,
+          "h": 444
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "panorama",
+        "W": 2160,
+        "H": 1440,
+        "motion": true,
+        "photo": {
+          "w": 1373.759765625,
+          "h": 457.9199523925781
+        },
+        "frame": {
+          "x": 426,
+          "y": 498,
+          "w": 1308,
+          "h": 444
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "portrait",
+        "W": 1024,
+        "H": 600,
+        "motion": false,
+        "photo": {
+          "w": 288,
+          "h": 432
+        },
+        "frame": {
+          "x": 362,
+          "y": 78,
+          "w": 300,
+          "h": 444
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "portrait",
+        "W": 1024,
+        "H": 600,
+        "motion": true,
+        "photo": {
+          "w": 305.2799987792969,
+          "h": 457.9199523925781
+        },
+        "frame": {
+          "x": 362,
+          "y": 78,
+          "w": 300,
+          "h": 444
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "landscape",
+        "W": 1024,
+        "H": 600,
+        "motion": false,
+        "photo": {
+          "w": 614,
+          "h": 410
+        },
+        "frame": {
+          "x": 199,
+          "y": 89,
+          "w": 626,
+          "h": 422
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "landscape",
+        "W": 1024,
+        "H": 600,
+        "motion": true,
+        "photo": {
+          "w": 650.8399658203125,
+          "h": 434.5999755859375
+        },
+        "frame": {
+          "x": 199,
+          "y": 89,
+          "w": 626,
+          "h": 422
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "square",
+        "W": 1024,
+        "H": 600,
+        "motion": false,
+        "photo": {
+          "w": 432,
+          "h": 432
+        },
+        "frame": {
+          "x": 290,
+          "y": 78,
+          "w": 444,
+          "h": 444
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "square",
+        "W": 1024,
+        "H": 600,
+        "motion": true,
+        "photo": {
+          "w": 457.9199523925781,
+          "h": 457.9199523925781
+        },
+        "frame": {
+          "x": 290,
+          "y": 78,
+          "w": 444,
+          "h": 444
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "panorama",
+        "W": 1024,
+        "H": 600,
+        "motion": false,
+        "photo": {
+          "w": 614,
+          "h": 205
+        },
+        "frame": {
+          "x": 199,
+          "y": 191.5,
+          "w": 626,
+          "h": 217
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      },
+      {
+        "name": "panorama",
+        "W": 1024,
+        "H": 600,
+        "motion": true,
+        "photo": {
+          "w": 650.8399658203125,
+          "h": 217.29998779296875
+        },
+        "frame": {
+          "x": 199,
+          "y": 191.5,
+          "w": 626,
+          "h": 217
+        },
+        "decoration": 6,
+        "narrow": true,
+        "contained": true,
+        "aspectPreserved": true,
+        "matPixel": [
+          244,
+          241,
+          234
+        ],
+        "matVisible": true
+      }
+    ],
+    "errors": [],
+    "outsideRequests": [],
+    "ownedContextClosed": true
+  },
+  "baseline": {
+    "cases": 8,
+    "narrowPassed": 0,
+    "aspectPassed": 8,
+    "containedPassed": 8
+  },
+  "thinMatWithoutClip": {
+    "cases": 16,
+    "matVisiblePassed": 8
+  },
+  "native": {
+    "Family Area": {
+      "exactInstalledHashVerified": true,
+      "portraitPhotosVisuallyObserved": 3,
+      "subsequentSnapshots": 4,
+      "landscapeVisualAcceptance": false,
+      "originalShuffleRestored": true
+    },
+    "Living Area": {
+      "exactInstalledHashVerified": true,
+      "visualAcceptance": false
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "manualPhotoFrameForeground": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true
+    }
+  },
+  "phoneCommands": 0,
+  "publicPublication": false,
+  "issueClock": {
+    "startedAt": "2026-11-03T03:17:14.224Z",
+    "deadline": "2026-11-03T03:47:14.224Z",
+    "originalUserRequestClockRetained": true
+  },
+  "limits": [
+    "Native visual evidence covers portrait photos; other shapes use generated desktop rendering of the shipped engine.",
+    "No whole-product, other-style, natural Dream recovery or general performance acceptance.",
+    "Owner photos, native screenshots and credentials are retained privately."
+  ],
+  "ownedRegistryRemoved": true,
+  "normalShuffleFrameVisuallyRestored": true,
+  "boundedMonitorStatus": "PAUSED after completed observation",
+  "generatedContextsClosed": true,
+  "roadmapBrowser": {
+    "reports": [
+      {
+        "width": 390,
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "current": true,
+        "task": true,
+        "phoneBoundary": true
+      },
+      {
+        "width": 1600,
+        "scrollWidth": 1600,
+        "clientWidth": 1600,
+        "current": true,
+        "task": true,
+        "phoneBoundary": true
+      }
+    ],
+    "errors": []
+  },
+  "sourceHashes": {
+    "app/src/main/assets/screensaver/styles.css": "a0e3994ba80885e51a8c0087d002aeee1a4b9d177502c06973e87eb4c9ce1177",
+    "app/build.gradle.kts": "267fcdca1082cabd355e247f240fefbb72237b1b3ddd37c9c98b9a2e9d9d0807",
+    "scripts/tests/slideshow_framed_lifecycle.test.mjs": "89d9864a2ce0d34259bcf78869ac36deeae7dbfbeb64450e9e86f523017dadea",
+    "scripts/tests/slideshow_photo_motion.test.mjs": "7d3ea85fd3e4986b41f0a0b70a58233acf1ebbadf83bcffe979dda9042ce1686"
+  }
+}
