@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "status": "locally_verified_ci_stage",
+  "recordedAtUtc": "2026-11-03T21:02:39.661168+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T20:50:43Z",
+    "deadline": "2026-11-03T21:20:43Z",
+    "discoveryIncluded": true,
+    "reset": false
+  },
+  "problem": "The required Android SDK installation step masked sdkmanager failure with trailing true.",
+  "change": "This one shell step disables pipefail and returns the rightmost sdkmanager status. The yes license producer and exact package arguments remain.",
+  "integration": {
+    "localOnly": true,
+    "ImmortalCommit": "1ea1ed63659c9bdc5596d7263329662751436736",
+    "hostedRunsObserved": 0,
+    "AndroidProductCodeChanged": false
+  },
+  "sourceBindings": [
+    {
+      "artifact": ".github/workflows/tests.yml",
+      "bytes": 2178,
+      "sha256": "624c9988f3f38dd92019136b9540e9e50d044f15ba159364f18ab5d98ae2092f"
+    },
+    {
+      "artifact": "scripts/test_portal_ci_sdk_install.py",
+      "bytes": 3777,
+      "sha256": "73989e13dba108c45a8e8b931910b1d67da77db2760c5d92121342b8363466f6"
+    },
+    {
+      "artifact": "private-baseline/tests.yml",
+      "bytes": 1975,
+      "sha256": "c8d796a2e2f9330ba9399cdc84606bbbfe0a43327ec4a37c2466c9fc9ce45497"
+    }
+  ],
+  "fixture": {
+    "uniqueCases": 6,
+    "modes": [
+      "Bash -e",
+      "Bash -e -o pipefail"
+    ],
+    "installerExits": [
+      0,
+      2,
+      7
+    ],
+    "baseline": {
+      "startedAt": "2026-11-03T20:57:10.225124+00:00",
+      "finishedAt": "2026-11-03T20:57:10.503812+00:00",
+      "exitCode": 1,
+      "assertionFailures": 4,
+      "controls": 2,
+      "setupErrors": 0
+    },
+    "green": {
+      "startedAt": "2026-11-03T20:57:35.657439+00:00",
+      "finishedAt": "2026-11-03T20:57:35.870013+00:00",
+      "exitCode": 0,
+      "passed": 6,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "boundary": "Actual named workflow shell text and host Bash/yes; generated inert sdkmanager consumes one y line, records package arguments and returns a literal result. No real SDK invocation.",
+    "timeoutCleanup": "Five-second owned session timeout/group retirement is source-reviewed; not exercised by passing cases. No independent descendant PID census."
+  },
+  "python": {
+    "startedAt": "2026-11-03T20:57:35.658941+00:00",
+    "finishedAt": "2026-11-03T20:57:59.431731+00:00",
+    "exitCode": 0,
+    "uniqueTests": 254,
+    "includesFocusedCases": 6,
+    "errors": 0,
+    "failures": 0,
+    "skips": 0
+  },
+  "workflowValidation": {
+    "actionlintExitCode": 0,
+    "sdkStepBashSyntaxExitCode": 0,
+    "observedHostBash": "3.2.57(1)-release arm64-apple-darwin26",
+    "otherFiveWorkflowsUnchanged": true,
+    "priorProtectedFilesUnchanged": 16,
+    "selectedPriorProtectedDelta": ".github/workflows/tests.yml"
+  },
+  "reviews": [
+    {
+      "artifact": "sdk-install-admission.json",
+      "status": "ADMIT_NARROW_COMPILE_SDK_EXIT_PROPAGATION_SOURCE_CANDIDATE",
+      "binding": {
+        "artifact": "private-local-run/sdk-install-admission.json",
+        "bytes": 15752,
+        "sha256": "3960341e6e55ab26890c29d679c25738aa170e2e314beab2b8c822e4bcbc4111"
+      }
+    },
+    {
+      "artifact": "sdk-install-source-review.json",
+      "status": "PASS_SCOPED_SDK_INSTALL_SOURCE_AND_FROZEN_FIXTURE_REVIEW",
+      "binding": {
+        "artifact": "private-local-run/sdk-install-source-review.json",
+        "bytes": 10491,
+        "sha256": "f5391e4430ce63f304b057666ba7799ff7c98771c0bc517f201345837f15bb56"
+      }
+    },
+    {
+      "artifact": "sdk-install-fixture-review.json",
+      "status": "PASS_SCOPED_REAL_WORKFLOW_SDK_STATUS_FIXTURE_SOURCE_AND_RECORDED_HOST_GATES",
+      "binding": {
+        "artifact": "private-local-run/sdk-install-fixture-review.json",
+        "bytes": 25917,
+        "sha256": "4d5d66b864e80c25d3e41c4e4acdf28ab7c5f9956dfde253bfca58e78e91778a"
+      }
+    }
+  ],
+  "privateProof": [
+    {
+      "artifact": "private-local-run/sdk-install-admission.json",
+      "bytes": 15752,
+      "sha256": "3960341e6e55ab26890c29d679c25738aa170e2e314beab2b8c822e4bcbc4111"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-source-review.json",
+      "bytes": 10491,
+      "sha256": "f5391e4430ce63f304b057666ba7799ff7c98771c0bc517f201345837f15bb56"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-fixture-review.json",
+      "bytes": 25917,
+      "sha256": "4d5d66b864e80c25d3e41c4e4acdf28ab7c5f9956dfde253bfca58e78e91778a"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-fixture-review-first.json",
+      "bytes": 23995,
+      "sha256": "af9546a48c4d1ccf4589358ce0020eb2660a9fcd5bc2798b96e0b7adda7c112e"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-red.json",
+      "bytes": 964,
+      "sha256": "0a107d7ee7747179fa51551472b821ec7f93e70bd276bc59aba5fdd95ff1e47b"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-red.log",
+      "bytes": 3692,
+      "sha256": "5ea152fa6a5e9f8c1af4ec736a3661dcfd2814282e6cc9fb4741490a1ff132c1"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-green.json",
+      "bytes": 982,
+      "sha256": "4b7433fa603cb394073d8df28ff59e1a51269cbcc70cf39103c110baeef5011b"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-green.log",
+      "bytes": 744,
+      "sha256": "8fb1bae0517eb62f21fc80bbab2e142008fae49c823f5c8478fd71f9ad883494"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-python.json",
+      "bytes": 1041,
+      "sha256": "71589ef51dc9645e235fe764fd1432ead38eaf5b5d3d07563cb21a47bd019b83"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-python.log",
+      "bytes": 41209,
+      "sha256": "4b3e427d8b683eb3edfd99545a061fa78d3167eb02ec76e279d2544e588bc150"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-actionlint.json",
+      "bytes": 951,
+      "sha256": "2a5d0a978caf925feef22748d6401cff63dbe28561e8696fe9faeed44f1af0ce"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-actionlint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-bash-syntax.json",
+      "bytes": 1190,
+      "sha256": "6d489cd5bd9224c600776b3c92a9ee3833f9e2007396db4faea3dfba84440752"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-bash-syntax.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-bash-version.log",
+      "bytes": 109,
+      "sha256": "de9dadf321eb1d8a2dfe2e67f7c00652983f1fcf5cde14a28596fc3f0cbb508f"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-root-source-validation.json",
+      "bytes": 4634,
+      "sha256": "fc5b4b41d1cd1708e7712ee45981463966894e92137710565a0a5b4113c777b8"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-root-review-rehash.json",
+      "bytes": 1348,
+      "sha256": "26b065841213b70d230c7cfce4e6a13b633d81bdc803a27d400b7f7a549b6cbf"
+    },
+    {
+      "artifact": "private-local-run/sdk-install-source-commit.json",
+      "bytes": 865,
+      "sha256": "827458daf4a36db16253bc2b500cb77fab7f1ccbee9390d213097e29d661e33e"
+    },
+    {
+      "artifact": "private-local-run/news-feed-discovery.json",
+      "bytes": 11476,
+      "sha256": "f7428f3556e652a54c34cad2634aa3bda9b0ce8e1f762952ce1c2e99e6b54d05"
+    },
+    {
+      "artifact": "private-local-run/fleet-watch-discovery.json",
+      "bytes": 12590,
+      "sha256": "c7cf8481dcd633d5b24f1c4988a6c397e2f73a51ecf39cb514878cc7398e3947"
+    }
+  ],
+  "retainedDiscovery": "News reader/parser/cache overlaps retain prior clocks; Fleet watch is a bounded negative with no active command. Neither creates a task, fixture or execution. Prior Toolkit SDK propagation belongs to its separate repository/clock.",
+  "collectorCorrections": "Two private protection-collector assertions stopped before report output: extra schema key, then the intended workflow delta. Corrected validation records16 exact files and1 selected delta; these are not product RED. The first execution review also falsely matched skipped inside a passing method name; corrected result-status selection and original report are retained.",
+  "limits": [
+    "Host shell/configuration only; no Ubuntu runner, GitHub trigger, hosted run/report upload or real sdkmanager licensing/download/install acceptance.",
+    "No Android build/APK/native/device/phone/provider/account action or package/version/license policy change.",
+    "Four baseline exit assertions fail before later argv/stdout postchecks; controls and GREEN reach all checks. Expected producer SIGPIPE is not separately measured.",
+    "All earlier acceptance clocks and phone/GitHub/provider/design holds remain. Local commits do not authorize publication; whole goal remains active."
+  ]
+}

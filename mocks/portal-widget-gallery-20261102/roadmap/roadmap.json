@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T20:44:52.500570+00:00",
+  "updatedAt": "2026-11-03T21:02:39.661168+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,50 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "ci-sdk-install-exit",
+      "title": "Android CI: preserve SDK installer failures",
+      "summary": "Required SDK setup now returns the installer result. Six host-shell cases and all 254 Python tests pass; real SDK and hosted execution remain open.",
+      "description": "The existing SDK install step preserves sdkmanager failure while tolerating the license producer\u2019s expected broken pipe. A finite fixture executes the actual workflow shell text.",
+      "status": "delivered",
+      "verification": "6 frozen shell cases \u00b7 254 Python \u00b7actionlint and Bash syntax \u00b7independent source and execution review",
+      "kind": "Delivery reliability",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "CI / independent source and execution review",
+      "deployment": "Local Immortal 1ea1ed63 only; no push, hosted runner, real SDK install or device action.",
+      "state": "Four baseline failure assertions and two success controls become six passing cases. All other five workflows and 16 prior protected files remain; tests.yml is the selected change.",
+      "acceptance": [
+        "Execute the actual named workflow SDK shell step through an inert installer boundary.",
+        "Preserve successful installer0 and propagate failed installer2/7 with and without pipefail.",
+        "Retain exact package arguments, license answer stream, stdout/stderr handling and automatic Python selection."
+      ],
+      "evidence": [
+        {
+          "text": "Correction, actual checks, delivery and hosted limits.",
+          "source": "docs/portal-ci-sdk-install-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized source, runtime and independent-review bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/ci-sdk-install-verification.json"
+        }
+      ],
+      "limits": [
+        "macOS host Bash/configuration only; no Ubuntu/GitHub runner, real SDK licensing/download/install or hosted acceptance.",
+        "No Android product code/build/APK, phone/device/provider/account or release/version claim.",
+        "Expected yesSIGPIPE is handled by shell semantics, not a separately measured producer result. Timeout cleanup is source-reviewed only.",
+        "All earlier clocks and holds remain; the whole goal stays active."
+      ],
+      "next": "Observe real SDK/hosted CI only after the GitHub hold is lifted. Continue distinct authorized work and retain every earlier acceptance boundary.",
+      "issueClock": {
+        "startedAt": "2026-11-03T20:50:43Z",
+        "deadline": "2026-11-03T21:20:43Z",
+        "discoveryIncluded": true,
+        "reset": false
+      }
+    },
     {
       "id": "remote-pairing-browser-ci",
       "title": "Browser remote: automate native pairing regression",
