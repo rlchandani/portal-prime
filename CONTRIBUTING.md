@@ -25,10 +25,12 @@ Immortal is a single Android app (Jetpack Compose, minSdk 24, targetSdk 36).
 
     ./gradlew :app:assembleDebug
     adb install -r app/build/outputs/apk/debug/app-debug.apk
-    adb shell am start -n com.immortal.launcher/.HomeActivity
+    adb shell am start -n com.immortal.launcher.debug/com.immortal.launcher.HomeActivity
 
 The debug build uses a `.debug` application-id suffix so it installs alongside a
-provisioned release. The provisioning kit lives in [`provisioning/`](provisioning/).
+provisioned release. Its Activity classes keep the `com.immortal.launcher` namespace,
+so the launch command uses the full class name. The provisioning kit lives in
+[`provisioning/`](provisioning/).
 
 To iterate against **real release conditions** (home role, device admin, self-update
 signature checks) without the install friction, build the **`dev`** variant:

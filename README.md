@@ -93,8 +93,11 @@ To build from source instead:
 ```bash
 ./gradlew :app:assembleDebug
 adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell am start -n com.immortal.launcher/.HomeActivity
+adb shell am start -n com.immortal.launcher.debug/com.immortal.launcher.HomeActivity
 ```
+
+The debug build installs as `com.immortal.launcher.debug`; its Activity classes remain in
+`com.immortal.launcher`, so the launch command uses the full class name.
 
 ## On first-gen Portals (Portal+ Gen-1, Android 9)
 

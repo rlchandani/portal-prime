@@ -21,7 +21,7 @@ Always run the relevant check below after a change and fix failures before finis
 | Build the app (debug) | `./gradlew :app:assembleDebug` |
 | Run unit tests (CI gate) | `./gradlew :app:testDebugUnitTest --no-daemon` |
 | Install to a connected Portal | `adb install -r app/build/outputs/apk/debug/app-debug.apk` |
-| Launch | `adb shell am start -n com.immortal.launcher/.HomeActivity` |
+| Launch the debug app | `adb shell am start -n com.immortal.launcher.debug/com.immortal.launcher.HomeActivity` |
 | Validate the store catalog | `python3 scripts/validate_catalog.py --network` |
 | Lint provisioning scripts | `bash -n provisioning/provision.sh` |
 | Build the fleet CLI | `cd provisioning && rustc -O fleet.rs -o fleetctl` |
@@ -31,7 +31,8 @@ CI workflows live in [`.github/workflows/`](.github/workflows/): `tests.yml` (un
 ASCII guard), `docs.yml`, `release-guard.yml`.
 
 The debug build uses a `.debug` application-id suffix so it installs alongside a provisioned
-release.
+release. Its Activity classes keep the `com.immortal.launcher` namespace, so the launch
+command uses the full class name.
 
 ## Ongoing product delivery
 
