@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T18:29:31.990649+00:00",
+  "updatedAt": "2026-11-03T19:17:27.415824+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,56 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "toolkit-backup-completeness",
+      "title": "Portal Toolkit: reject incomplete app restores",
+      "summary": "Missing or empty declared APKs fail that app before installation; later complete apps still restore. Nine focused cases and212 host tests pass.",
+      "description": "Require the complete ordered declared APK list to exist and contain data before metadata/install; report incomplete app through existing per-app failure handling and retain following complete app restore.",
+      "status": "verified",
+      "verification": "5 baseline AssertionErrors/4 controls →9 pass ·212 JVM/36 suites ·debug assembly ·independent13/13",
+      "kind": "Toolkit restore integrity",
+      "platforms": [
+        "companion",
+        "tooling"
+      ],
+      "owner": "Toolkit engineering / independent archive and result review",
+      "deployment": "Local Toolkit a74f5663 only. Original checkout unchanged; no phone/native/remote restore, hosted CI or deployment acceptance.",
+      "state": "Exact declared APK set validated inside existing per-app handling; generated ZIP/files and mocked metadata/transport. Earlier APK candidate remains parked. Source checkpoint18:46:51 is in-window; initial records19:17:27 and later docs/browser checks are post-cutoff maintenance only, with no new source/test work or reset.",
+      "acceptance": [
+        "Use real public restoreBackup with generated archives before changing production.",
+        "Reject missing/empty declared base or split before any installation of that app.",
+        "Retain following complete app restore and existing per-app summary.",
+        "Pass unchanged frozen cases, existing host tests and debug assembly."
+      ],
+      "evidence": [
+        {
+          "text": "Actual baseline, correction, controls and scoped limits.",
+          "source": "docs/portal-toolkit-backup-completeness-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized source/run/fixture/artifact facts.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/toolkit-backup-completeness-verification.json"
+        }
+      ],
+      "limits": [
+        "Real public manager restore with generated JSON/ZIP and owned host files; Android input/URI/package metadata and Dadb are mocks. No real APK parsing or installation.",
+        "Legacy host metadata branch only; SDK33 PackageInfoFlags, phone/native/provider/remote filesystem and hosted CI remain unverified.",
+        "Empty settings preserve zero restored count; actual settings writes and their exit policy are outside this fixture.",
+        "Two-app continuation is covered; actual three-consecutive restore stop is not newly exercised. Existing pure threshold test remains unchanged and passes.",
+        "Moving declared-file construction into per-app handling also captures existing filename/path validation errors there; malformed declarations are not separately exercised.",
+        "Input close, owned work-directory cleanup and an unrelated-file sentinel are checked after each actual restore. Universal pre-try setup cleanup, cancellation, concurrency and disk durability remain open.",
+        "The initial nine fixture setup failures are retained and excluded from product baseline. Only helper matchers changed; all nine case bodies remain byte-identical.",
+        "No device, version, dependency, publication or deployment change. Earlier APK read candidate and every prior hold/clock remain.",
+        "Source checkpoint was completed before cutoff; complete record closure occurred afterward as maintenance, and is not claimed within the issue window."
+      ],
+      "next": "Keep local verified source; real APK/provider/native restore and hosted CI remain separate acceptance. Continue unrelated authorized work without resetting unselected scanner or earlier held scopes.",
+      "issueClock": {
+        "startedAt": "2026-11-03T18:35:45Z",
+        "deadline": "2026-11-03T19:05:45Z",
+        "reset": false,
+        "discoveryIncluded": true
+      }
+    },
     {
       "id": "toolkit-shell-exit",
       "title": "Portal Toolkit: report failed shell commands correctly",

@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "status": "locally_verified",
+  "recordedAtUtc": "2026-11-03T19:19:27.223790+00:00",
+  "component": "Portal Toolkit backup restore",
+  "issueClock": {
+    "startedAt": "2026-11-03T18:35:45Z",
+    "deadline": "2026-11-03T19:05:45Z",
+    "reset": false,
+    "discoveryIncluded": true
+  },
+  "problem": "Missing or empty APKs named by an app manifest were silently filtered; surviving subsets could install and count as a restored app.",
+  "result": "Require the complete ordered declared APK list to exist and contain data before metadata/install; report incomplete app through existing per-app failure handling and retain following complete app restore.",
+  "excludedSetup": {
+    "tests": 9,
+    "failures": 9,
+    "acceptedProductFailures": 0,
+    "startUtc": "2026-11-03T18:39:51.979844+00:00",
+    "endUtc": "2026-11-03T18:40:38.409709+00:00",
+    "cause": "Kotlin non-null File/Mockito matcher setup and cascading matcher state; corrected helper interception before accepted baseline."
+  },
+  "baseline": {
+    "tests": 9,
+    "assertionFailures": 5,
+    "controls": 4,
+    "errors": 0,
+    "skipped": 0,
+    "startUtc": "2026-11-03T18:42:05.948361+00:00",
+    "endUtc": "2026-11-03T18:42:37.674880+00:00",
+    "exitCode": 1,
+    "log": "47c583a4a6b07c3eb983f43e5ad8886f96d91d8624dd2f92137232d7e0d8ebff"
+  },
+  "candidate": {
+    "tests": 212,
+    "suites": 36,
+    "uniqueRows": 212,
+    "focusedTests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "freshAllXml": true,
+    "startUtc": "2026-11-03T18:42:50.711383+00:00",
+    "endUtc": "2026-11-03T18:43:31.319642+00:00",
+    "exitCode": 0,
+    "command": [
+      "./gradlew",
+      ":app:testDebugUnitTest",
+      ":app:assembleDebug",
+      "--no-daemon",
+      "--offline",
+      "--rerun-tasks"
+    ],
+    "log": "c041ba66a87ff3be1cdf77b3f36876ed65aefdb7778d9735e6a01c44533cb466"
+  },
+  "source": {
+    "path": "app/src/main/java/com/portalinstaller/data/PortalBackupManager.kt",
+    "before": {
+      "bytes": 20144,
+      "sha256": "b2df280cf96a3792cdc3e135f8ee8f3f381108b3c3d0000507ccbbb58b5711f4"
+    },
+    "after": {
+      "bytes": 20317,
+      "sha256": "dc268622d70be2e4fbec13caaa0f73b4122934cbba2b1ac1fe07d82e68498c9f"
+    },
+    "exactSingleBlockTransform": true,
+    "unchangedRemainder": true
+  },
+  "fixture": {
+    "path": "app/src/test/java/com/portalinstaller/data/BackupDeclaredFilesTest.kt",
+    "bytes": 10579,
+    "sha256": "50c21c59679783ff688ee8c6f689da1f9d036da1f3e976e8037c9b63058ae681",
+    "acceptedRedGreenBytesEqual": true,
+    "methods": [
+      "missing declared split fails the app without installing the base",
+      "empty declared split fails the app without installing the base",
+      "missing declared base fails the app without installing the split",
+      "empty declared base fails the app without installing the split",
+      "complete split restore retains declared order and actual bytes",
+      "complete single APK retains push install and remote cleanup",
+      "all declared files absent retains a failed package and owned cleanup",
+      "complete archive with mismatched package retains failure before transport",
+      "incomplete app fails independently while the following complete app installs"
+    ],
+    "initialCaseBodiesRetained": true
+  },
+  "independentReview": {
+    "checks": 13,
+    "passed": 13,
+    "blockers": 0,
+    "reportSha256": "18c36b1b520069ca79ee56c31b1e75f89eebf857fcb9d860899ee8b2edb275b9"
+  },
+  "artifact": {
+    "kind": "debug APK assembled only",
+    "bytes": 13901710,
+    "sha256": "190407c6dc0bdfba81ae56e6ef19436c94dfd631a4e2fccbe77847c548461b32"
+  },
+  "integration": {
+    "ToolkitCommit": "a74f5663d4ee38367e7a1769f55f4075a4befc92",
+    "parent": "23073a5538191cde30b64058f558859d602f7c5b",
+    "localOnly": true,
+    "paths": [
+      "app/src/main/java/com/portalinstaller/data/PortalBackupManager.kt",
+      "app/src/test/java/com/portalinstaller/data/BackupDeclaredFilesTest.kt"
+    ],
+    "originalToolkitHead": "4e1dadb8ec2ec018b6fdc250486e0c476467a7c4",
+    "originalToolkitClean": true,
+    "dependencyVersionPackageWorkflowChanges": 0,
+    "parkedApkCandidatePromoted": false
+  },
+  "ci": {
+    "hostedRunsObserved": 0
+  },
+  "deployment": "Not performed",
+  "queue": {
+    "tasks": 111,
+    "delivered": 69,
+    "verified": 31,
+    "approval": 3,
+    "parked": 7,
+    "queued": 1,
+    "allPrior110ObjectsPreserved": true,
+    "defaultTask": "weather-native-layout"
+  },
+  "otherDiscovery": {
+    "stores": "Bounded negative; no distinct supported store defect selected.",
+    "scanner": "Inconsistent concurrent progress snapshot is source-predicted only; no fixture, reproduction or fix. Same original clock retained."
+  },
+  "limits": [
+    "Real public manager restore with generated JSON/ZIP and owned host files; Android input/URI/package metadata and Dadb are mocks. No real APK parsing or installation.",
+    "Legacy host metadata branch only; SDK33 PackageInfoFlags, phone/native/provider/remote filesystem and hosted CI remain unverified.",
+    "Empty settings preserve zero restored count; actual settings writes and their exit policy are outside this fixture.",
+    "Two-app continuation is covered; actual three-consecutive restore stop is not newly exercised. Existing pure threshold test remains unchanged and passes.",
+    "Moving declared-file construction into per-app handling also captures existing filename/path validation errors there; malformed declarations are not separately exercised.",
+    "Input close, owned work-directory cleanup and an unrelated-file sentinel are checked after each actual restore. Universal pre-try setup cleanup, cancellation, concurrency and disk durability remain open.",
+    "The initial nine fixture setup failures are retained and excluded from product baseline. Only helper matchers changed; all nine case bodies remain byte-identical.",
+    "No device, version, dependency, publication or deployment change. Earlier APK read candidate and every prior hold/clock remain."
+  ],
+  "timing": {
+    "sourceCheckpointAtUtc": "2026-11-03T18:46:51.631573+00:00",
+    "sourceCheckpointBeforeDeadline": true,
+    "initialRecordsWrittenAtUtc": "2026-11-03T19:17:27.415824+00:00",
+    "initialRecordsAfterDeadline": true,
+    "cutoffObservedAtUtc": "2026-11-03T19:18:45Z",
+    "maintenanceOnly": "Post-cutoff changes and docs/browser checks close records only; no implementation, fixture, app test/build, device acceptance or clock reset after cutoff.",
+    "wholeUnitWithinDeadlineClaimed": false
+  }
+}
