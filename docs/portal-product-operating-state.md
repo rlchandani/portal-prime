@@ -13,8 +13,32 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / Fleet diagnostic output ownership:** exact optimized
-  **1.111/code105** is installed and fully hashed in both rooms. The helper closes
+- **Current room APK / Snapcast connection ownership:** exact optimized
+  **1.112/code106** is installed and fully hashed in both rooms. Each connected
+  metadata exchange now closes its own socket on EOF or failure; request,
+  metadata, reconnect and stop behavior remain. Eight unchanged methods reproduce
+  five failures then pass; **4,205 JVM/437 suites**, debug/optimized/R8/vital lint
+  pass in2m. Actual debug Family private helper improves **5/8→8/8**, three
+  closure corrections/five retained checks; stop occurs during observed readLine.
+  Both optimized constructors are R8-specialized: unavailable native helper
+  acceptance, zero invocations. I/O faults are inert JVM-only; callback failure
+  is native-tested. Real service/reconnect/provider/audio/API28 remain open.
+  Complete captured maps match; Living8/8 and Family7/8 preference files are
+  byte-identical. Initial strict postflight exits1: Family Weather changes only
+  its expired `resolved_at` cache timestamp, with location values unchanged.
+  Unchanged Weather source and seven-day TTL support the named runtime-cache
+  exception; write-origin instrumentation is absent. Qualified preservation passes,
+  original failure retained, no owner preference edit/restore. Family current
+  frame/clock/font/services/original Chrome remain. Four parents, eight generated
+  exchanges, scratch and registry copy retired; external timeout cleanup unverified.
+  Positive installed diagnostics pass both rooms; recent samples are not full
+  health acceptance. Public1.83 guard rejects local1.112; no phone/HA/auth/publication.
+  **86 tasks:53 delivered,23 locally verified,3 approval,6 parked,1 queued.**
+  Original **07:55:54–08:25:54 UTC** audit clock retained; broader goal stays active.
+  [Receipt](portal-snapcast-connection-2026-11-03.md).
+
+- **Previous room APK / Fleet diagnostic output ownership:** exact optimized
+  **1.111/code105** was installed and fully hashed in both rooms. The helper closes
   its capped output before waiting and retires the created process on all exits;
   fixed commands, byte caps, UTF-8 and error strings remain. Eleven unchanged
   methods reproduce seven failures then pass; **4,197 JVM/436

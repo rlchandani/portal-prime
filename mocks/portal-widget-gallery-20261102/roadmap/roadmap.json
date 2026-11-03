@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T07:49:42.394531+00:00",
+  "updatedAt": "2026-11-03T08:11:30.137464+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,58 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.111/code105. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.112/code106. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "snapcast-connection",
+      "title": "Snapcast metadata: retire every connected socket",
+      "summary": "Delivered to both rooms: completed metadata exchanges close their own socket before reconnect can replace it.",
+      "description": "Scope connected socket ownership through EOF/setup/request/read/callback exits. Preserve literal JSON-RPC status request, metadata parsing, reconnect and stop behavior.",
+      "status": "delivered",
+      "verification": "8 unchanged regressions / 4,205 JVM \u00b7 native debug 5/8\u21928/8 \u00b7 optimized helper unavailable",
+      "kind": "Snapcast metadata connection ownership",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Transport engineering / independent ownership and native review",
+      "deployment": "Exact signed optimized 1.112/code106 installed and full APK hash verified in Family Area and Living Area.",
+      "state": "Complete captured maps match. Living8/8 and Family7/8 preference files byte-identical; Family Weather only expired resolved_at timestamp changes, location unchanged. Initial strict failure retained; qualified preservation passes. Family frame/clock/font/services/original Chrome retained; four parents, eight generated exchanges, scratch and registry copy retired.",
+      "acceptance": [
+        "Reproduce actual connected EOF/callback/successive-exchange ownership before editing production; preserve malformed/blank/foreign-group and stop controls.",
+        "Use strict inert setup/write/flush/read failure cases, with unchanged frozen test methods and full build gates.",
+        "Compare actual debug APK loopback sockets before fixture cleanup; retain request/metadata/terminal behavior and observed active-read stop.",
+        "Report optimized R8 constructor limitations with zero helper invocations; verify exact signed room artifact separately.",
+        "Retain complete map readback and initial strict preference failure with independently verified resolved_at-only expired-cache exception; no owner preference repair."
+      ],
+      "evidence": [
+        {
+          "text": "Socket ownership correction, frozen regressions, actual debug differential and qualified room preservation.",
+          "source": "docs/portal-snapcast-connection-2026-11-03.md"
+        },
+        {
+          "text": "Bound source/fixture/APK hashes, optimized limitation, original strict failure and scoped delivery.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/snapcast-connection-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual native debug acceptance calls the private connected exchange with generated loopback peers in a separate shell process. Real Snapcast provider, background reconnect/service, audio and HA are not exercised.",
+        "Both optimized APK constructors specialize the port/callback types under R8. Native optimized exchange acceptance is unavailable with zero helper invocations; exact optimized room installation is separately verified.",
+        "Output/input acquisition, write, flush and read failures use inert JVM sockets. Native connected-callback failure is exercised. External runner timeout/failure cleanup is not fault-injected.",
+        "Family Android10 helper and current frame appearance are verified; API28, native feature UI and Living generated-exchange/visual acceptance remain open. No connection deadline or stop/start generation redesign.",
+        "Initial strict postflight exits1: only Family Weather resolved_at changes. All location values and other captured preference bytes match; Living8/8 and Family7/8 files byte-identical. Expired cache/source write is consistent with the timestamp advance, without provider/write-origin instrumentation. Original failed comparison retained; no owner preference edit or restore.",
+        "Positive installed diagnostics and recent1500-line samples are limited observations, not complete runtime-health, negative authentication or live Snapcast feature acceptance.",
+        "No Google phone operation, Home Assistant change, GitHub authentication, push or publication. Existing UI approvals and exhausted clocks retain their boundaries."
+      ],
+      "next": "Retain delivered ownership correction. Real provider/service/audio, optimized native exchange and API28 acceptance remain open; continue distinct authorized work without reopening parked clocks.",
+      "issueClock": {
+        "startedAt": "2026-11-03T07:55:54+00:00",
+        "deadline": "2026-11-03T08:25:54+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "fleet-diag-process",
       "title": "Fleet diagnostics: close capped output before waiting",

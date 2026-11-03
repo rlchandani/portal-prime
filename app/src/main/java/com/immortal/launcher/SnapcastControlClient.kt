@@ -82,14 +82,16 @@ class SnapcastControlClient(
   private fun connectAndRead() {
     Log.i(TAG, "connecting control to $host:$port")
     val s = Socket(host, port).also { socket = it }
-    val out = s.getOutputStream()
-    val reader = BufferedReader(InputStreamReader(s.getInputStream(), Charsets.UTF_8))
-    requestStatus(out)
-    onConnected(true) // socket up, status requested — the UI can show "Connected"
-    while (running) {
-      val line = reader.readLine() ?: break
-      if (line.isBlank()) continue
-      runCatching { handle(JSONObject(line)) }.onFailure { Log.w(TAG, "bad message", it) }
+    s.use {
+      val out = s.getOutputStream()
+      val reader = BufferedReader(InputStreamReader(s.getInputStream(), Charsets.UTF_8))
+      requestStatus(out)
+      onConnected(true) // socket up, status requested — the UI can show "Connected"
+      while (running) {
+        val line = reader.readLine() ?: break
+        if (line.isBlank()) continue
+        runCatching { handle(JSONObject(line)) }.onFailure { Log.w(TAG, "bad message", it) }
+      }
     }
   }
 
@@ -170,7 +172,7 @@ class SnapcastControlClient(
     return null
   }
 
-  /** Snapcast reports IPs as IPv4-mapped IPv6 (`::ffff:192.168.4.37`); take the v4 tail. */
+  /** Snapcast reports IPs as IPv4-mapped IPv6 (`::ffff:192.168.0.37`); take the v4 tail. */
   private fun normalizeIp(ip: String): String =
       if (ip.contains(".")) ip.substringAfterLast(":") else ip
 

@@ -1,0 +1,651 @@
+{
+  "recordedAt": "2026-11-03T08:11:30.137464+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T07:55:54+00:00",
+    "deadline": "2026-11-03T08:25:54+00:00",
+    "baseCommit": "1108ff0b2c2db05be3e560d11086a5650ef10f8a",
+    "scope": "Fresh reliability discovery for unscheduled filesystem/data-transfer and backend helper ownership paths after85-task backlog review. Exclude all delivered fixes, parked issue clocks, earlier ISS candidate and MQTT ownership scan, UI design approvals, Google phone, HA and publication. Any selected new finding retains this clock through all implementation/gates/local acceptance/docs/cleanup/commit.",
+    "previousGoalTurn": "progress: signed1.111 Fleet output ownership delivered and committed1108ff0b, proof/state/cleanup verified.",
+    "selectedScope": "Snapcast metadata transport connected-socket ownership on EOF/setup/write/read/callback exits; preserve JSON-RPC request, metadata protocol and reconnect/stop behavior. Source hypothesis until frozen regression reproduces; no HA, real Snapcast provider or audio."
+  },
+  "scope": "Retire each created connected Snapcast metadata socket on EOF and exceptional exits; preserve request, metadata, reconnect and stop policy.",
+  "finding": {
+    "trigger": "After a generated peer half-closes output, connectAndRead returns while its Socket and peer input remain open. A later exchange overwrites the stored socket, beyond public stop ownership. Callback failure also leaves its socket open.",
+    "backlogRecordsReviewed": 85,
+    "duplicateTaskFound": false,
+    "status": "Frozen reproduction corrected and signed optimized artifact locally delivered; native debug differential accepted, optimized native exchange unavailable."
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/SnapcastControlClient.kt": "a23de5e6cc166a6a3cf3c82b5d2786edf5f3fd4b588a5441aceb61e17477f45a",
+    "app/src/main/java/com/immortal/launcher/MultiRoomService.kt": "adfe3612cf5e42f7826daf7398bc56d8e3813807746da4ce3fd6f3f705ab4715",
+    "app/src/test/java/com/immortal/launcher/SnapcastConnectionOwnershipTest.kt": "4bdbdeadbf96af2b666e3d281727410317b43c0a9bdd5ef38c19f747778b8a69",
+    "app/build.gradle.kts": "043ac6e292e23ce81bb43c01dce4e9e1063e582746aae2ee3f34a8e692168cf2"
+  },
+  "red": {
+    "recordedAt": "2026-11-03T08:00:47.009712+00:00",
+    "scope": {
+      "startedAt": "2026-11-03T07:55:54+00:00",
+      "deadline": "2026-11-03T08:25:54+00:00",
+      "baseCommit": "1108ff0b2c2db05be3e560d11086a5650ef10f8a",
+      "scope": "Fresh reliability discovery for unscheduled filesystem/data-transfer and backend helper ownership paths after85-task backlog review. Exclude all delivered fixes, parked issue clocks, earlier ISS candidate and MQTT ownership scan, UI design approvals, Google phone, HA and publication. Any selected new finding retains this clock through all implementation/gates/local acceptance/docs/cleanup/commit.",
+      "previousGoalTurn": "progress: signed1.111 Fleet output ownership delivered and committed1108ff0b, proof/state/cleanup verified.",
+      "selectedScope": "Snapcast metadata transport connected-socket ownership on EOF/setup/write/read/callback exits; preserve JSON-RPC request, metadata protocol and reconnect/stop behavior. Source hypothesis until frozen regression reproduces; no HA, real Snapcast provider or audio."
+    },
+    "terminalExitCode": 1,
+    "duration": "13s",
+    "tests": 8,
+    "failures": 5,
+    "errors": 0,
+    "skips": 0,
+    "sourceHashes": {
+      "source": "73cf6eadce6ab3fcd4bf0e6a3e28c407c29dfb0f2f218dc99619fe9748962d92",
+      "test": "4bdbdeadbf96af2b666e3d281727410317b43c0a9bdd5ef38c19f747778b8a69",
+      "build": "bd9633b88fd95cc06cf68bd65cd306e0d64993856ccb5cdf965250443ae6a0bc",
+      "service": "adfe3612cf5e42f7826daf7398bc56d8e3813807746da4ce3fd6f3f705ab4715"
+    },
+    "failedTests": {
+      "successiveEofExchangesRetireEverySocketBeforeItCanBeReplaced": "java.lang.AssertionError: Earlier connection must not survive publication of the next",
+      "peerOutputEofClosesTheConnectedClientSocket": "java.lang.AssertionError: Completed EOF exchange must close its peer input",
+      "readFailureRetiresTheConnectedSocketAfterItsStatusRequest": "java.lang.AssertionError: expected:<1> but was:<0>",
+      "setupAndInitialRequestFailuresRetireEachCreatedSocket": "java.lang.AssertionError: Every setup/request failure must close its owned connection expected:<[]> but was:<[output, input, write, flush]>",
+      "connectedCallbackFailureClosesTheRealConnectedSocket": "java.lang.AssertionError: Callback failure must retire its connected socket"
+    },
+    "retainedControls": [
+      "publicStopClosesTheCurrentSocketAndUnblocksAnActiveRead",
+      "malformedMessageDoesNotPreventOurGroupsValidMetadata",
+      "anotherGroupsPlayingMetadataKeepsThisClientsCardIdle"
+    ],
+    "xmlSha256": "a2fcccb6acd367c676ead4a27aee7b402c917b2735729ce5da0123b8458c5d5b",
+    "logSha256": "9fb0e878d7afb3706021eabe35962f08f7eec861f6b67074653026bb142ed841",
+    "fixtureScope": "Six actual loopback method cases (three failures, three controls) plus two strict inert socket method cases (five generated acquisition/write/flush/read failure stages). Generated127.0.0.1 only; Android Log mocked on actual invoking worker. No production seam, service start, reconnect backoff timing, real Snapcast provider, HA, audio, device, owner preference or other network.",
+    "reproduction": "After client connectAndRead returns on generated peer outputEOF, peer input stays open for protected400ms; ownership tests assert closure and fail. Connected callback throw similarly leaks its connected socket. Two successive exchanges leave the old connection open. Input/output acquisition/write/flush and read faults miss close in inert cases.",
+    "testCleanup": "Public stop plus captured exact selected sockets, accepted peers, loopback server and invocation executor are closed in finally; worker awaitTermination asserted. Real network failures are only expected closure assertions, no timeout/setup/API fixture errors.",
+    "rejectedFixtureAttempts": 0
+  },
+  "green": {
+    "suites": 437,
+    "tests": 4205,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualSnapcastFocusedTests": 8,
+    "allEightUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "native": {
+    "runs": {
+      "baseline-debug": {
+        "apkSha256": "8f978fccdec4bbf20da4ac8166f500db64841d76e38faa2fe07b1dde7cd01a81",
+        "actualAPKClassLoader": true,
+        "privateMethod": "com.immortal.launcher.SnapcastControlClient.connectAndRead",
+        "ownerPreferencesWritten": 0,
+        "serviceOrProviderStarted": false,
+        "actualConstructors": [
+          [
+            "java.lang.String",
+            "int",
+            "kotlin.jvm.functions.Function0",
+            "kotlin.jvm.functions.Function1",
+            "kotlin.jvm.functions.Function1"
+          ]
+        ],
+        "checks": {
+          "cleanEOFClosedBeforeCleanup": false,
+          "cleanEOFProtocolAndTerminalRetained": true,
+          "metadataEOFClosedBeforeCleanup": false,
+          "metadataEOFProtocolAndTerminalRetained": true,
+          "callbackFailureClosedBeforeCleanup": false,
+          "callbackFailureProtocolAndTerminalRetained": true,
+          "stopWhileReadingClosedBeforeCleanup": true,
+          "stopWhileReadingProtocolAndTerminalRetained": true
+        },
+        "observations": [
+          {
+            "mode": "cleanEOF",
+            "statusRequestExact": true,
+            "clientSocketClosedBeforeFixtureCleanup": false,
+            "peerObservedEOFBeforeFixtureCleanup": false,
+            "connectedCallbackExactlyOnce": true,
+            "expectedTerminalOutcome": true,
+            "terminalException": null,
+            "metadataMatchesAfterMalformedAndBlank": true,
+            "metadataCallbacks": 0,
+            "ownedSocketsClosedInFixtureFinally": true,
+            "ownedPeerServerAndExecutorRetired": true
+          },
+          {
+            "mode": "metadataEOF",
+            "statusRequestExact": true,
+            "clientSocketClosedBeforeFixtureCleanup": false,
+            "peerObservedEOFBeforeFixtureCleanup": false,
+            "connectedCallbackExactlyOnce": true,
+            "expectedTerminalOutcome": true,
+            "terminalException": null,
+            "metadataMatchesAfterMalformedAndBlank": true,
+            "metadataCallbacks": 1,
+            "ownedSocketsClosedInFixtureFinally": true,
+            "ownedPeerServerAndExecutorRetired": true
+          },
+          {
+            "mode": "callbackFailure",
+            "statusRequestExact": true,
+            "clientSocketClosedBeforeFixtureCleanup": false,
+            "peerObservedEOFBeforeFixtureCleanup": false,
+            "connectedCallbackExactlyOnce": true,
+            "expectedTerminalOutcome": true,
+            "terminalException": "java.lang.IllegalStateException",
+            "metadataMatchesAfterMalformedAndBlank": true,
+            "metadataCallbacks": 0,
+            "ownedSocketsClosedInFixtureFinally": true,
+            "ownedPeerServerAndExecutorRetired": true
+          },
+          {
+            "mode": "stopWhileReading",
+            "statusRequestExact": true,
+            "blockedReadObservedBeforeStop": true,
+            "clientSocketClosedBeforeFixtureCleanup": true,
+            "peerObservedEOFBeforeFixtureCleanup": true,
+            "connectedCallbackExactlyOnce": true,
+            "expectedTerminalOutcome": true,
+            "terminalException": "java.net.SocketException",
+            "metadataMatchesAfterMalformedAndBlank": true,
+            "metadataCallbacks": 0,
+            "ownedSocketsClosedInFixtureFinally": true,
+            "ownedPeerServerAndExecutorRetired": true
+          }
+        ],
+        "actualHelperInvocations": 4,
+        "passed": 5,
+        "total": 8,
+        "status": "FAIL"
+      },
+      "candidate-debug": {
+        "apkSha256": "785aec638d18706f2b4917d9a2966f9815e97eac2bbcd9bc23b9c776110ada71",
+        "actualAPKClassLoader": true,
+        "privateMethod": "com.immortal.launcher.SnapcastControlClient.connectAndRead",
+        "ownerPreferencesWritten": 0,
+        "serviceOrProviderStarted": false,
+        "actualConstructors": [
+          [
+            "java.lang.String",
+            "int",
+            "kotlin.jvm.functions.Function0",
+            "kotlin.jvm.functions.Function1",
+            "kotlin.jvm.functions.Function1"
+          ]
+        ],
+        "checks": {
+          "cleanEOFClosedBeforeCleanup": true,
+          "cleanEOFProtocolAndTerminalRetained": true,
+          "metadataEOFClosedBeforeCleanup": true,
+          "metadataEOFProtocolAndTerminalRetained": true,
+          "callbackFailureClosedBeforeCleanup": true,
+          "callbackFailureProtocolAndTerminalRetained": true,
+          "stopWhileReadingClosedBeforeCleanup": true,
+          "stopWhileReadingProtocolAndTerminalRetained": true
+        },
+        "observations": [
+          {
+            "mode": "cleanEOF",
+            "statusRequestExact": true,
+            "clientSocketClosedBeforeFixtureCleanup": true,
+            "peerObservedEOFBeforeFixtureCleanup": true,
+            "connectedCallbackExactlyOnce": true,
+            "expectedTerminalOutcome": true,
+            "terminalException": null,
+            "metadataMatchesAfterMalformedAndBlank": true,
+            "metadataCallbacks": 0,
+            "ownedSocketsClosedInFixtureFinally": true,
+            "ownedPeerServerAndExecutorRetired": true
+          },
+          {
+            "mode": "metadataEOF",
+            "statusRequestExact": true,
+            "clientSocketClosedBeforeFixtureCleanup": true,
+            "peerObservedEOFBeforeFixtureCleanup": true,
+            "connectedCallbackExactlyOnce": true,
+            "expectedTerminalOutcome": true,
+            "terminalException": null,
+            "metadataMatchesAfterMalformedAndBlank": true,
+            "metadataCallbacks": 1,
+            "ownedSocketsClosedInFixtureFinally": true,
+            "ownedPeerServerAndExecutorRetired": true
+          },
+          {
+            "mode": "callbackFailure",
+            "statusRequestExact": true,
+            "clientSocketClosedBeforeFixtureCleanup": true,
+            "peerObservedEOFBeforeFixtureCleanup": true,
+            "connectedCallbackExactlyOnce": true,
+            "expectedTerminalOutcome": true,
+            "terminalException": "java.lang.IllegalStateException",
+            "metadataMatchesAfterMalformedAndBlank": true,
+            "metadataCallbacks": 0,
+            "ownedSocketsClosedInFixtureFinally": true,
+            "ownedPeerServerAndExecutorRetired": true
+          },
+          {
+            "mode": "stopWhileReading",
+            "statusRequestExact": true,
+            "blockedReadObservedBeforeStop": true,
+            "clientSocketClosedBeforeFixtureCleanup": true,
+            "peerObservedEOFBeforeFixtureCleanup": true,
+            "connectedCallbackExactlyOnce": true,
+            "expectedTerminalOutcome": true,
+            "terminalException": "java.net.SocketException",
+            "metadataMatchesAfterMalformedAndBlank": true,
+            "metadataCallbacks": 0,
+            "ownedSocketsClosedInFixtureFinally": true,
+            "ownedPeerServerAndExecutorRetired": true
+          }
+        ],
+        "actualHelperInvocations": 4,
+        "passed": 8,
+        "total": 8,
+        "status": "PASS"
+      },
+      "baseline-optimized": {
+        "apkSha256": "98d593dc92a3d9f57bc003546ae56b4d061deb878e76bcc8a6440f1135de9d37",
+        "actualAPKClassLoader": true,
+        "privateMethod": "com.immortal.launcher.SnapcastControlClient.a",
+        "ownerPreferencesWritten": 0,
+        "serviceOrProviderStarted": false,
+        "actualConstructors": [
+          [
+            "java.lang.String",
+            "vt1",
+            "a12",
+            "kf"
+          ]
+        ],
+        "status": "UNAVAILABLE",
+        "actualHelperInvocations": 0,
+        "reason": "R8 specialized the port and callback parameter types; generated interface callbacks cannot construct this APK client without using service-owned callbacks."
+      },
+      "candidate-optimized": {
+        "apkSha256": "fcdcffe7132878b731eea4139a79ba2ef5c4f578c0f0db2c204c96773db53f4a",
+        "actualAPKClassLoader": true,
+        "privateMethod": "com.immortal.launcher.SnapcastControlClient.a",
+        "ownerPreferencesWritten": 0,
+        "serviceOrProviderStarted": false,
+        "actualConstructors": [
+          [
+            "java.lang.String",
+            "vt1",
+            "a12",
+            "kf"
+          ]
+        ],
+        "status": "UNAVAILABLE",
+        "actualHelperInvocations": 0,
+        "reason": "R8 specialized the port and callback parameter types; generated interface callbacks cannot construct this APK client without using service-owned callbacks."
+      }
+    },
+    "bindings": {
+      "sourceSha256": "a6a16ac3a4c53f84e22204a937b349eb59d74f29ac4fce9798c0bc014b2852bf",
+      "fixtureSha256": "0a89ff669b9ca95fff9c0cb0262465be8eac279ec0b52266d824d5d2301fd2dd",
+      "compilerSha256": "a63dcb4a1a5d022e16a67ba5da4f0a66e86072af698e6d98d88f47a5ada9a6a1",
+      "runnerSha256": "d90b0d8601eeb0bc53c3ce02a3977ba3c79a8c3024c737d136642b5dee168597",
+      "mappedBindings": {
+        "baseline": [
+          "com.immortal.launcher.SnapcastControlClient",
+          "a",
+          "e",
+          "f",
+          "-"
+        ],
+        "candidate": [
+          "com.immortal.launcher.SnapcastControlClient",
+          "a",
+          "e",
+          "f",
+          "-"
+        ]
+      }
+    },
+    "rawRunBindings": {
+      "baseline-debug": {
+        "resultSha256": "fe8378898a33582809d3653a16faf198fc4b9e6cc9102e24dd8e12a49f5aa226",
+        "processRecordSha256": "c805d136b2baaac699fbc43184f534cfcbf23ddbce20152525e8a79e28df16ce",
+        "stdoutSha256": "e1bbdb4dcabf437b648eddf58d9e65d1c26ae774839cbc5dede0ef46b8185566",
+        "stderrBytes": 0,
+        "terminalExit": 1
+      },
+      "candidate-debug": {
+        "resultSha256": "9c707b02957671aa4a423a3ef350ed0cda3c3544b3a7db8be4d4c98ebd196644",
+        "processRecordSha256": "91eaf732a9284c609d696743a989222b89aedfaf301d5ba9bcf8fcd3beed06d6",
+        "stdoutSha256": "0bd915599fbbd3de77ce5b58b92db3dbc69baa58698826118f77f33856c4d3be",
+        "stderrBytes": 0,
+        "terminalExit": 0
+      },
+      "baseline-optimized": {
+        "resultSha256": "5238b89144a8599cc496f3a5e34c426bd2ef5cbab31e9c0e45a30dbcd2ae07c2",
+        "processRecordSha256": "99340980fce92f1003f68ca0355d98e547e924bb1d36f6385f821947581b84a5",
+        "stdoutSha256": "97f6b1e27bc50f7ae61091b0bf8fdd77296722bb56505d25e8cc63871ab3de5b",
+        "stderrBytes": 0,
+        "terminalExit": 0
+      },
+      "candidate-optimized": {
+        "resultSha256": "2f24949d7899a60a49fe8a29e1e4196d2f51b15d1769767cb06f03a0735861d7",
+        "processRecordSha256": "99340980fce92f1003f68ca0355d98e547e924bb1d36f6385f821947581b84a5",
+        "stdoutSha256": "9520be4dcc0a6befbd5abf0ec62b531ab1882e133dfc16241d804fe2c2e0537f",
+        "stderrBytes": 0,
+        "terminalExit": 0
+      }
+    },
+    "comparison": {
+      "debugBaselinePassed": 5,
+      "debugCandidatePassed": 8,
+      "total": 8,
+      "exactCorrectedChecks": [
+        "callbackFailureClosedBeforeCleanup",
+        "cleanEOFClosedBeforeCleanup",
+        "metadataEOFClosedBeforeCleanup"
+      ],
+      "retainedControls": 5,
+      "generatedDebugExchanges": 8,
+      "optimizedHelperInvocations": 0,
+      "allFourParentsRetired": true,
+      "normalScratchRemoved": true,
+      "cleanupFaults": []
+    },
+    "cleanup": {
+      "ownedParentProcessesRetired": {
+        "baseline-debug": true,
+        "candidate-debug": true,
+        "baseline-optimized": true,
+        "candidate-optimized": true
+      },
+      "ownerPreferencesWritten": 0,
+      "providerOrServiceStarted": false,
+      "loopbackGeneratedPeerOnly": true,
+      "externalTimeoutOrFailureCleanupFaultInjected": false,
+      "ownedDeviceScratchRemoved": true,
+      "cleanupFaults": []
+    },
+    "compileHistory": {
+      "initialAttempt": "Ambiguous wildcard Proxy import; compile failed before any device operation or APK invocation. Qualified java.lang.reflect.Proxy and compiled into fresh owned output.",
+      "initialDeviceOperations": 0,
+      "initialFixtureExecutions": 0,
+      "preExecutionGuardReviews": [
+        {
+          "change": "Inspect specialized optimized constructor before attempting mapped stop lookup; unsupported ABI reports UNAVAILABLE/zero invocations.",
+          "deviceExecutionsBeforeCorrection": 0
+        },
+        {
+          "change": "Observe actual BufferedReader.readLine stack before public stop; connection callback latch alone is insufficient for blocked-read acceptance.",
+          "deviceExecutionsBeforeCorrection": 0
+        }
+      ]
+    },
+    "compileFinalLogSha256": "54d55d2e59acfd8edc6bf766fcf63e82fcc2dba8358d41e585acc340ebb45d8d",
+    "mappingSha256": {
+      "baseline": "75db3955a8c93386861018de4999dfb0f1b5fa6649756cd7545f780dfb2e1c80",
+      "candidate": "0b44ff5a825203e3485113cf80800cf7227f0e1a91250c68ba3bae26b7845e8c"
+    },
+    "scope": "Actual debug generated connected-callback exception, clean EOF, metadata EOF and stop during observed read are exercised. Stream acquisition/write/flush/read faults are inert JVM only. No actual optimized exchange, service/reconnect thread, real Snapcast provider, HA, audio, owner preferences or external network. External runner timeout/failure cleanup not fault-injected."
+  },
+  "artifact": {
+    "sha256": "fcdcffe7132878b731eea4139a79ba2ef5c4f578c0f0db2c204c96773db53f4a",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.112",
+    "versionCode": 106,
+    "variants": {
+      "performance": {
+        "sha256": "fcdcffe7132878b731eea4139a79ba2ef5c4f578c0f0db2c204c96773db53f4a",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.112",
+        "versionCode": 106
+      },
+      "debug": {
+        "sha256": "785aec638d18706f2b4917d9a2966f9815e97eac2bbcd9bc23b9c776110ada71",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.112",
+        "versionCode": 106
+      },
+      "rollback": {
+        "sha256": "98d593dc92a3d9f57bc003546ae56b4d061deb878e76bcc8a6440f1135de9d37",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.111",
+        "versionCode": 105
+      }
+    },
+    "debugSha256": "785aec638d18706f2b4917d9a2966f9815e97eac2bbcd9bc23b9c776110ada71",
+    "rollbackSha256": "98d593dc92a3d9f57bc003546ae56b4d061deb878e76bcc8a6440f1135de9d37",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "initialStrictPostflightTerminalExit": 1,
+    "originalStrictChecks": {
+      "family": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": false,
+        "fontUnchanged": true,
+        "accessibilityUnchanged": true,
+        "originalChromeTaskRetained": true,
+        "photoFrameResumed": true,
+        "displayOn": true,
+        "installedFullSha256Matches": true
+      },
+      "living": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true
+      }
+    },
+    "qualified": {
+      "initialStrictPostflightTerminalExit": 1,
+      "initialStrictEvidenceUnmodified": true,
+      "roomChecks": {
+        "family": {
+          "unchangedCapturedPreferenceFiles": 7,
+          "totalCapturedPreferenceFiles": 8,
+          "onlyChangedFile": [
+            "immortal_weather"
+          ],
+          "allOtherStrictChecksPass": true,
+          "strictAllPreferenceBytesIdentical": false
+        },
+        "living": {
+          "unchangedCapturedPreferenceFiles": 8,
+          "totalCapturedPreferenceFiles": 8,
+          "onlyChangedFile": [],
+          "allOtherStrictChecksPass": true,
+          "strictAllPreferenceBytesIdentical": true
+        }
+      },
+      "weatherCacheException": {
+        "changedFile": "immortal_weather",
+        "onlyChangedField": "resolved_at",
+        "locationValuesUnchanged": true,
+        "resolutionTimestampAdvanced": true,
+        "weatherSourceByteUnchangedFromBase": true,
+        "weatherSourceSha256": "7b185d1d7896e33cc98e040e60de23b25c518f74e886966521487fc4a6618f98",
+        "normalSourceWrite": "Weather.location refreshes its successful cached fix and stamps resolved_at; no user settings/city/coordinates changed.",
+        "initialStrictByteCheck": "Failed on Family weather XML; original postflight and both snapshots retained. Do not claim all preference bytes unchanged.",
+        "ownerPreferencesRestoredOrEdited": false,
+        "cachedFixExpiredAtRefresh": true,
+        "resolutionAgeAtRefreshMs": 605171779
+      },
+      "capturedUserStatePreservedWithNamedRuntimeCacheException": true,
+      "ownerPreferencesRestoredOrEdited": false,
+      "qualifiedValidationTerminalExit": 0,
+      "scope": "Complete captured maps and eight named preference files only; no universal state-preservation claim."
+    },
+    "originalStrictEvidenceSha256": {
+      "postflightLog": "83dcc529b97e309b3955294b332c2524e66d66a90071094e1063b2dd37008f5f",
+      "preservation": "bbc551b79da4fcb3526f6cff23de7532ea10153aaa16ba00a87e2bca7e1fcf3d"
+    },
+    "qualifiedEvidenceSha256": "b8b45043a572f46291617cb785526c1d09a03be13a0281c6ff586748e3aee851",
+    "independentWeatherReviewSha256": "bd3d8357a7b48cd04e55de7e8bd4a1da663099596dc7f34072a0d35b3a84785d"
+  },
+  "visual": {
+    "familyScreenshotVisuallyInspected": true,
+    "familyAppearance": "Black night clock with tan time and Tuesday, November 3 date; frame host and awake display verified separately.",
+    "livingVisualAcceptance": false
+  },
+  "runtimeObservation": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "recentLogcatHttp200": true,
+        "recentLogLines": 1502,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "recentLogcatHttp200": true,
+        "recentLogLines": 1502,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Positive installed normal diagnostics and recent1500-line samples only; no complete runtime health, live Snapcast/audio or negative authentication acceptance."
+  },
+  "credentialCleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "independentReview": {
+    "blockingFindings": 0,
+    "sourceAndNativeReportSha256": "407c7ba04e6ebfae7dbb0fb3abc65c6150625e064fd1073d090f15aca4ae36fe",
+    "weatherReportSha256": "bd3d8357a7b48cd04e55de7e8bd4a1da663099596dc7f34072a0d35b3a84785d",
+    "limits": "Actual debug generated connected-callback exception, clean EOF, metadata EOF and stop during observed read are exercised. Stream acquisition/write/flush/read faults are inert JVM only. No actual optimized exchange, service/reconnect thread, real Snapcast provider, HA, audio, owner preferences or external network. External runner timeout/failure cleanup not fault-injected."
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false,
+    "manifestSha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+  },
+  "limits": [
+    "Actual native debug acceptance calls the private connected exchange with generated loopback peers in a separate shell process. Real Snapcast provider, background reconnect/service, audio and HA are not exercised.",
+    "Both optimized APK constructors specialize the port/callback types under R8. Native optimized exchange acceptance is unavailable with zero helper invocations; exact optimized room installation is separately verified.",
+    "Output/input acquisition, write, flush and read failures use inert JVM sockets. Native connected-callback failure is exercised. External runner timeout/failure cleanup is not fault-injected.",
+    "Family Android10 helper and current frame appearance are verified; API28, native feature UI and Living generated-exchange/visual acceptance remain open. No connection deadline or stop/start generation redesign.",
+    "Initial strict postflight exits1: only Family Weather resolved_at changes. All location values and other captured preference bytes match; Living8/8 and Family7/8 files byte-identical. Expired cache/source write is consistent with the timestamp advance, without provider/write-origin instrumentation. Original failed comparison retained; no owner preference edit or restore.",
+    "Positive installed diagnostics and recent1500-line samples are limited observations, not complete runtime-health, negative authentication or live Snapcast feature acceptance.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication. Existing UI approvals and exhausted clocks retain their boundaries."
+  ],
+  "documentation": {
+    "strictDocsInitial": {
+      "terminalExit": 0,
+      "warnings": 0,
+      "errors": 0,
+      "seconds": 2.11
+    },
+    "strictDocsFinal": {
+      "terminalExit": 0,
+      "warnings": 0,
+      "errors": 0,
+      "seconds": 1.94,
+      "logSha256": "baca8aba958bdd26d0f796e6e9860a5a0ae1482e5ff5545b566785346935758e"
+    },
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 86,
+          "checks": [
+            {
+              "id": "snapcast-connection",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "fleet-diag-process",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 86,
+          "checks": [
+            {
+              "id": "snapcast-connection",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true
+            },
+            {
+              "id": "fleet-diag-process",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "browserFinalTerminalExit": 0,
+    "imagesVisuallyInspectedByCoordinator": [
+      "390x844",
+      "1600x1000"
+    ],
+    "scope": "Final strict docs and two-viewport browser checks pass. Current fact cells and page fit; previous delivery selection has page-overflow check only. Final served proof bytes and independent immutable-file hashes rebound before commit.",
+    "review": {
+      "blockingFindings": 0,
+      "historicalVersionWordingAdvisoryResolved": true,
+      "privateReport": "documentation-review.json",
+      "scope": "Source/runtime/preservation/backlog facts independently checked; final report binds immutable public file hashes before commit."
+    }
+  }
+}
