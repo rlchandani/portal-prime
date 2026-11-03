@@ -135,8 +135,13 @@ object UpdateManager {
           }
           .getOrDefault(0L)
 
-  private fun httpGet(spec: String): String = open(spec).inputStream.use {
-    it.readBytes().toString(Charsets.UTF_8)
+  private fun httpGet(spec: String): String {
+    val connection = open(spec)
+    return try {
+      StoreMetadataHttp.readText(connection)
+    } finally {
+      connection.disconnect()
+    }
   }
 
   private fun download(spec: String, dest: File) {

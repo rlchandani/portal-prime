@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 1,
+  "title": "Self-updates bound manifest reads and disconnect owned connections",
+  "status": "delivered",
+  "checkedAtUtc": "2026-11-03T05:26:08.715634+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T05:14:20Z",
+    "deadline": "2026-11-03T05:44:20Z",
+    "originalDiscoveryClockRetained": true
+  },
+  "artifact": {
+    "sha256": "7bc1ee8b70f873e23bb35c88983bda6f0843a7bab4c77d2d91134a6f0f931045",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.101",
+    "versionCode": 95,
+    "debugSha256": "c87d3840c4cae7040de272a674a5c398958626201f0c7756fa826a47190c9e07",
+    "rollbackSha256": "ecf713dbf11abbe71e93f5e6fc1af5e0caa5df2599623c3535e9b4d4de13172b",
+    "variants": {
+      "performance": {
+        "sha256": "7bc1ee8b70f873e23bb35c88983bda6f0843a7bab4c77d2d91134a6f0f931045",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.101",
+        "versionCode": 95
+      },
+      "debug": {
+        "sha256": "c87d3840c4cae7040de272a674a5c398958626201f0c7756fa826a47190c9e07",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.101",
+        "versionCode": 95
+      }
+    }
+  },
+  "reviewedHashes": {
+    "app/src/main/java/com/immortal/launcher/UpdateManager.kt": "21e4667040009ccfefb2104a5d4c91e3175fb7c4303c0719f25c571bac3e07f9",
+    "app/src/test/java/com/immortal/launcher/UpdateManifestTransportTest.kt": "62c16ceb3a3d62331a4227debaca63cb8baff5a7bb5e4d9c2683762f98f7e682",
+    "app/build.gradle.kts": "579d775e7e7f3d8dac4141b7eecc38268e1d3a6efe0cf49139debb5654d1a19b"
+  },
+  "independentReview": {
+    "status": "clearAfterFixtureCleanupCorrections",
+    "productionChange": "Reuse existing bounded reader and disconnect in finally",
+    "fixtureCorrections": [
+      "Attempt independent cleanup stages",
+      "Capture uniquely named owned PID and retire/check it",
+      "Require explicit process absence after failed reads; signal only exact owned name"
+    ]
+  },
+  "tests": {
+    "redMethods": 9,
+    "redFailures": 4,
+    "finalTransportMethods": 9,
+    "suites": 426,
+    "tests": 4093,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "debugAssembly": true,
+    "optimizedAssembly": true,
+    "r8": true,
+    "vitalLint": true,
+    "androidGateSeconds": 110
+  },
+  "androidReader": {
+    "baseline": {
+      "debugApkSha256": "2d38f637bf32a5b414877f53206f25af64b6c1c9bda8e11611119d398d27c8c1",
+      "status": "FAIL",
+      "checks": {
+        "productionClassOwnedByApkLoader": true,
+        "ordinaryDeclaredUtf8": true,
+        "ordinaryChunkedUtf8": true,
+        "exactBudgetAccepted": true,
+        "declaredOversizeRejected": false,
+        "chunkedOversizeRejected": false,
+        "gzipDecodedOversizeRejected": false,
+        "truncatedBodyRejected": true,
+        "normalRedirectWorks": true,
+        "ordinaryAfterRejection": true,
+        "ownedConnectionClosedOnSuccess": false,
+        "announcedOversizeDoesNotOpenStreamAndDisconnects": false,
+        "acquisitionFailureDisconnects": false,
+        "readFailureClosesAndDisconnects": false,
+        "interruptionDisconnectsWithoutBodyAndRetainsInterrupt": false
+      },
+      "scope": "Actual debug-APK self-update HTTP reader/parser in isolated Android shell process",
+      "appPreferencesWritten": 0,
+      "applicationStartup": false,
+      "installerInvoked": false,
+      "optimizedApkProof": false,
+      "asyncCheckCallbackProof": false
+    },
+    "candidate": {
+      "debugApkSha256": "c87d3840c4cae7040de272a674a5c398958626201f0c7756fa826a47190c9e07",
+      "status": "PASS",
+      "checks": {
+        "productionClassOwnedByApkLoader": true,
+        "ordinaryDeclaredUtf8": true,
+        "ordinaryChunkedUtf8": true,
+        "exactBudgetAccepted": true,
+        "declaredOversizeRejected": true,
+        "chunkedOversizeRejected": true,
+        "gzipDecodedOversizeRejected": true,
+        "truncatedBodyRejected": true,
+        "normalRedirectWorks": true,
+        "ordinaryAfterRejection": true,
+        "ownedConnectionClosedOnSuccess": true,
+        "announcedOversizeDoesNotOpenStreamAndDisconnects": true,
+        "acquisitionFailureDisconnects": true,
+        "readFailureClosesAndDisconnects": true,
+        "interruptionDisconnectsWithoutBodyAndRetainsInterrupt": true
+      },
+      "scope": "Actual debug-APK self-update HTTP reader/parser in isolated Android shell process",
+      "appPreferencesWritten": 0,
+      "applicationStartup": false,
+      "installerInvoked": false,
+      "optimizedApkProof": false,
+      "asyncCheckCallbackProof": false
+    },
+    "realHttpChecks": 9,
+    "classLoaderOwnershipChecks": 1,
+    "connectionDoubleChecks": 5,
+    "baselinePassed": 7,
+    "candidatePassed": 15,
+    "checks": 15,
+    "gzipCompressedBytes": 4222,
+    "gzipDecodedBytes": 4194305,
+    "requests": 20,
+    "serverFaults": [],
+    "truncationScope": "Old Android reader already rejects this incomplete body; old JVM TCP reader did not"
+  },
+  "fixtureHashes": {
+    "javaSha256": "822cce31a0b13fa8f6517a7d57530bb34c64010e8a38bff5792cc1b0d477ce56",
+    "runnerSha256": "21277894a85debdbd130a8e08aa7e029b01df7b5270cbbebfb2e238ca717e79d"
+  },
+  "privateRunnerGuard": {
+    "scope": "Private runner ownership/absence guard with generated process doubles; not native timeout proof",
+    "checks": {
+      "already_absent": true,
+      "live_owned": true,
+      "adb_read_failure": true,
+      "existing_unreadable": true,
+      "different_process": true
+    }
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "primaryRegistryUnchanged": true,
+    "copiedRegistryRemoved": true,
+    "nativeFixtureCleanupVerified": true,
+    "phoneOperations": 0,
+    "publication": false,
+    "familyPhotoFrameVisuallyObserved": true,
+    "nativeFixture": {
+      "ownedProcessRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "appPreferencesWritten": 0,
+      "installerInvoked": false,
+      "ownedDeviceScratchRemoved": true,
+      "ownedReverseRemoved": true,
+      "ownedLoopbackServerAndWorkerClosed": true,
+      "cleanupFaults": []
+    }
+  },
+  "publication": {
+    "publicManifestUnchanged": true,
+    "publicVersionName": "1.83",
+    "publicVersionCode": 77,
+    "versionGuardExit": 1,
+    "intentionalMismatchRejected": true,
+    "githubAuthentication": false,
+    "publication": false
+  },
+  "limits": [
+    "Actual Android checks load debug APK; optimized reader, asynchronous check callback and update offer UI remain unverified",
+    "No APK self-install, public update availability, live hosted manifest, HTTPS/redirect security or API28 acceptance",
+    "4MiB actual-byte budget is not a total request deadline, whole-heap measurement or OOM reproduction",
+    "Native timeout retirement is source-reviewed; failure guards use generated process doubles",
+    "No natural Dream recovery, Home page retention, Living visual acceptance or general performance claim",
+    "No phone operation, Home Assistant change or GitHub authentication/publication"
+  ],
+  "documentationAndRoadmap": {
+    "strictDocumentationBuild": {
+      "exit": 0,
+      "seconds": 2.12,
+      "warnings": 0,
+      "informationalWorkstationAndAnchorNoticesRemain": true
+    },
+    "firstDocsAttempt": "Incorrect retained environment path; command127 before build; corrected actual environment used",
+    "previousTaskRecordsPreserved": 73,
+    "totalTasks": 74,
+    "defaultTaskPreserved": true,
+    "newTaskPlatformLabel": "Portal",
+    "browserChecks": [
+      {
+        "width": 390,
+        "height": 844,
+        "defaultTaskPreserved": true,
+        "tasks": 74,
+        "checks": [
+          {
+            "id": "self-update-manifest-budget",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          },
+          {
+            "id": "home-widget-save-conflicts",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          }
+        ],
+        "pageErrors": 0,
+        "externalRequests": 0,
+        "proofHttp200AndByteIdentical": true
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "defaultTaskPreserved": true,
+        "tasks": 74,
+        "checks": [
+          {
+            "id": "self-update-manifest-budget",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          },
+          {
+            "id": "home-widget-save-conflicts",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          }
+        ],
+        "pageErrors": 0,
+        "externalRequests": 0,
+        "proofHttp200AndByteIdentical": true
+      }
+    ],
+    "ownedBrowserAndContextsClosed": true,
+    "existingServerPreserved": true,
+    "selectedDetailCapturesVisuallyReviewed": true,
+    "wholePageAndAccessibilityAcceptance": false
+  }
+}

@@ -13,8 +13,24 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / native widget save conflicts:** exact optimized
-  **1.100/code94** is installed and fully hashed in both rooms. Add retains the
+- **Current room APK / self-update manifest budget:** exact optimized
+  **1.101/code95** is installed and fully hashed in both rooms. The independent
+  updater now reuses the existing 4 MiB actual-byte reader and disconnects in
+  `finally`, preserving request/parse/version/dev-mode/install policies. Nine
+  TCP methods reproduce 4 failures then pass; **4,093 JVM/426 suites**, debug,
+  optimized/R8/vital-lint pass in 110 sec. Actual debug-APK Android transport and
+  lifecycle checks improve **7/15→15/15**, including exact-limit admission and
+  4,222-byte gzip expanding to 4,194,305 bytes. Five generated retirement guards
+  pass; both owned processes/scratch/reverse/server/registry copy are removed.
+  Complete maps/Home/timer bytes and Family frame/font/services/original Chrome
+  are retained. Optimized reader/async callback/UI/self-install/API28 and real
+  timeout cleanup remain unverified. Public 1.83 guard rejects local 1.101; no
+  phone/HA/auth/publication. **74 tasks: 42 delivered, 22 locally verified,
+  3 approval, 6 parked, 1 queued.** Original **05:14:20–05:44:20 UTC** retained;
+  broader goal remains active. [Receipt](portal-self-update-manifest-budget-2026-11-03.md).
+
+- **Previous room APK / native widget save conflicts:** exact optimized
+  **1.100/code94** was installed and fully hashed in both rooms. Add retains the
   latest saved list; stale whole-list edits reload and request a retry. Widget
   writes share the remote revision/apply lock, resize captures its start
   snapshot, and Android binding deletion follows a successful save. Nine
@@ -37,7 +53,7 @@ The updated whole-product objective is
   HTTP improves2/5→5/5. Independent mutation restores exactly6 failures; hashes
   match. Shell syntax and existing CI discovery pass. Full publishing script,
   GitHub/auth/device operations are excluded. App/public manifest/catalog remain
-  unchanged in that unit; the deliberate local1.100/public1.83 version guard still rejects
+  unchanged in that unit; the deliberate local 1.101/public 1.83 version guard still rejects
   promotion. Earlier version writes/builds remain for inspection after failure.
   Original **04:40:49–05:10:49UTC** clock retained.
   [Receipt](portal-release-signing-baseline-2026-11-03.md).

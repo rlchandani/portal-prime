@@ -1,18 +1,61 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T05:08:53.126705+00:00",
-  "updatedLabel": "2 November 2026 Pacific \u00b7 1.100 in both rooms; native widget edits preserve remote changes",
+  "updatedAt": "2026-11-03T05:24:19.480632+00:00",
+  "updatedLabel": "2 Nov 2026 (Pacific) \u00b7 self-update manifest bounds delivered in 1.101",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.100/code94. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.101/code95. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "self-update-manifest-budget",
+      "title": "Self-updates: bound manifest downloads",
+      "summary": "Delivered to both rooms: self-update checks reject oversized or incomplete manifests and close their connections.",
+      "description": "The self-updater bypassed the store metadata limit with an independent readBytes path. It now reuses the 4 MiB actual-byte reader and disconnects in finally; existing request, parse, version and install policies remain.",
+      "status": "delivered",
+      "verification": "9 transport / 4,093 JVM \u00b7 Android reader 7/15\u219215/15",
+      "kind": "Independent self-update transport reliability",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Updater / reliability / Android verification",
+      "deployment": "Exact optimized 1.101/code95 installed and fully hashed in Family Area and Living Area.",
+      "state": "Complete maps and Home/timer preference bytes match. Family frame/font/services/preflight Chrome retained. Owned processes, scratch, reverse, server and registry copy removed.",
+      "acceptance": [
+        "Reject oversized declared and actual-byte manifests before parsing.",
+        "Retain ordinary UTF-8, exact-budget admission, redirects and post-failure recovery.",
+        "Disconnect owned connections on success and failure; count Android decoded gzip bytes.",
+        "Verify exact signed deployment and preserve every owner configuration."
+      ],
+      "evidence": [
+        {
+          "text": "Root cause, before/after transport checks, native scope, preservation and limitations.",
+          "source": "docs/portal-self-update-manifest-budget-2026-11-03.md"
+        },
+        {
+          "text": "Reviewed source hashes, nine TCP tests, scoped Android checks, artifacts and room preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/self-update-manifest-budget-verification.json"
+        }
+      ],
+      "limits": [
+        "Native probe loads debug APK; optimized reader, async callback/UI and APK self-install are unverified.",
+        "No real hosted/private manifest, HTTPS, API28, total deadline, OOM or general performance proof.",
+        "Lifecycle and retirement fault guards use generated doubles; native timeout injection not run.",
+        "No phone/HA/GitHub publication operations; public manifest 1.83 remains guarded."
+      ],
+      "next": "Retain this delivered transport fix; existing design decisions, sign-in dependency and parked clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-03T05:14:20Z",
+        "deadline": "2026-11-03T05:44:20Z",
+        "originalDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "home-widget-save-conflicts",
       "title": "Home widgets: preserve newer remote layout edits",
