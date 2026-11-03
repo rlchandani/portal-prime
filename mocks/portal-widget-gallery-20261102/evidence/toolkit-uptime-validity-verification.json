@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T20:25:26.052298+00:00",
+  "status": "locally_verified",
+  "scope": "Toolkit uptime rejects nonfinite and negative elapsed values before conversion",
+  "originalClock": {
+    "startedAt": "2026-11-03T20:18:18Z",
+    "deadline": "2026-11-03T20:48:18Z",
+    "reset": false,
+    "discoveryIncluded": true
+  },
+  "baseline": {
+    "startedAt": "2026-11-03T20:20:52.025637+00:00",
+    "finishedAt": "2026-11-03T20:20:59.015994+00:00",
+    "exitCode": 1,
+    "summary": {
+      "tests": 14,
+      "failures": 4,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 2
+    },
+    "freshTestTaskExecuted": true,
+    "privateRecord": {
+      "label": "private-local-run/uptime-red-results.json",
+      "bytes": 4573,
+      "sha256": "3b65ee3642d3845ae00e156b0e2cac4f69cd7ca243c2fa736fb4c60f7905b420"
+    },
+    "privateLog": {
+      "label": "private-local-run/uptime-red.log",
+      "bytes": 2647,
+      "sha256": "cec6356cae33245bd83121d9d58368f94b9734cef6c2c5ad9c6a3255339761be"
+    }
+  },
+  "focusedGreen": {
+    "startedAt": "2026-11-03T20:21:23.636826+00:00",
+    "finishedAt": "2026-11-03T20:21:30.195773+00:00",
+    "exitCode": 0,
+    "summary": {
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 2
+    },
+    "freshTestTaskExecuted": true,
+    "privateRecord": {
+      "label": "private-local-run/uptime-green-results.json",
+      "bytes": 4825,
+      "sha256": "ac4e2455ebcfc45d66e5c640c7653f0b0da6523b6f215c85a6bda686b57ed080"
+    },
+    "privateLog": {
+      "label": "private-local-run/uptime-green.log",
+      "bytes": 1744,
+      "sha256": "ac986dd438adf53c816ce7e271d986c184b8acef8c97064a62f9ddcf5c30aa18"
+    }
+  },
+  "fullGate": {
+    "startedAt": "2026-11-03T20:21:30.198269+00:00",
+    "finishedAt": "2026-11-03T20:21:36.166262+00:00",
+    "exitCode": 0,
+    "summary": {
+      "tests": 227,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 38
+    },
+    "freshTestTaskExecuted": true,
+    "privateRecord": {
+      "label": "private-local-run/uptime-full-results.json",
+      "bytes": 59187,
+      "sha256": "201361067816be82f50ccb95d7d923092dc77a60291cfa0c0e22a1f78e11f85f"
+    },
+    "privateLog": {
+      "label": "private-local-run/uptime-full.log",
+      "bytes": 2896,
+      "sha256": "4002d62f55907f45267179b00cb82b72b124d6ff0f5639f032912baaa4237ae8"
+    }
+  },
+  "fixture": {
+    "newMethods": 7,
+    "originalMethods": 7,
+    "baselineAssertionFailures": 4,
+    "baselineControls": 10,
+    "bytesUnchangedAcrossRedGreenFull": true,
+    "regressionInputs": [
+      "NaN 12.00",
+      "Infinity 12.00",
+      "-Infinity 12.00",
+      "-0.50 12.00"
+    ],
+    "controls": "All seven original cases plus zero, positive fractional and positive subsecond values."
+  },
+  "sourceBindings": [
+    {
+      "bytes": 543,
+      "sha256": "2bbd7f2cfe7c6b7939d33390b9af07e3a9e13a3ab1dc7d55f21de0d47392e523",
+      "repository": "Portal Toolkit",
+      "path": "app/src/main/java/com/portalinstaller/data/UptimeParser.kt"
+    },
+    {
+      "bytes": 1271,
+      "sha256": "218ca3446c4eda2083b27f81977f4463f3f34a2cac27c3343803e84608a5288b",
+      "repository": "Portal Toolkit",
+      "path": "app/src/test/java/com/portalinstaller/data/UptimeValidityTest.kt"
+    },
+    {
+      "bytes": 1264,
+      "sha256": "699f30d95000770f5deab32a7eba5f50c184108ff6b6999b5881f938b530a31b",
+      "repository": "Portal Toolkit",
+      "path": "app/src/test/java/com/portalinstaller/data/UptimeParserTest.kt"
+    }
+  ],
+  "baselineSource": {
+    "bytes": 486,
+    "sha256": "b37e3c8df8f430bf90f471a73cb590d188ac90cb8ee967955867fb755f8e0e36"
+  },
+  "debugArtifact": {
+    "repository": "Portal Toolkit",
+    "path": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 14007650,
+    "sha256": "252f8a854342b0b5114cd8be724062797a881a3b88c95d68067678eb581af211",
+    "builtOnly": true
+  },
+  "integration": {
+    "ToolkitCommit": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+    "parent": "685adb1cd358a7af794e053fa84f3deaaa06454c",
+    "checkpointAt": "2026-11-03T20:24:41.735310+00:00",
+    "localOnly": true,
+    "deployed": false,
+    "published": false
+  },
+  "independentReview": {
+    "checks": 12,
+    "passed": 12,
+    "blockers": 0,
+    "reportBytes": 18038,
+    "reportSha256": "6eb58266f5a93f428ff2e29449cba42461bd0dc4fc0f4dff80be25dd309fa8d8",
+    "recordedAt": "2026-11-03T20:23:53.460Z",
+    "readBeforeSourceCommit": true,
+    "reviewerExecutedGates": false
+  },
+  "ci": {
+    "existingConfiguredWorkflowCoversNewTest": true,
+    "hostedRunsObserved": 0
+  },
+  "limits": [
+    "Direct pure parser and existing formatter tests only. The active status reader and dashboard null/unavailable branch are source-reviewed; no live proc, ADB, Portal, phone, native UI or kernel-output acceptance.",
+    "The guard preserves the existing conversion of finite nonnegative values. No finite upper bound, duration cap, whitespace/token grammar, idle-field validation or sign-text policy was added.",
+    "Debug build and artifact hash only; no installation, signed release, version/dependency change, hosted CI, push or publication. Earlier phone, provider, approval and expired-issue holds remain.",
+    "Profile application discovery is a bounded negative. Duplicate store/editor and scanner scopes retain their earlier clocks; the APK read candidate remains parked."
+  ]
+}

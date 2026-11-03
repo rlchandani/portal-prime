@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T20:11:46.387266+00:00",
+  "updatedAt": "2026-11-03T20:25:26.052298+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,51 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "toolkit-uptime-validity",
+      "title": "Portal Toolkit: reject invalid uptime values",
+      "summary": "Nonfinite and negative elapsed values now remain unavailable instead of turning into zero or an enormous uptime. The frozen focused cases and all 227 host tests pass.",
+      "description": "Validate finite nonnegative elapsed seconds before the existing whole-second conversion, using the current dashboard unavailable path.",
+      "status": "verified",
+      "verification": "4 baseline assertions / 10 controls \u2192 14 pass \u00b7 227 JVM / 38 suites \u00b7 debug assembly \u00b7 independent 12/12",
+      "kind": "Toolkit status parsing",
+      "platforms": [
+        "companion",
+        "tooling"
+      ],
+      "owner": "Toolkit engineering / independent source and result review",
+      "deployment": "Local Toolkit d15912d0 only; no installation or native dashboard acceptance.",
+      "state": "One predicate added before conversion; original seven tests and the frozen seven-method fixture remain unchanged. All previous holds remain.",
+      "acceptance": [
+        "Reproduce non-null values for NaN, positive/negative infinity and a negative fraction on unchanged source.",
+        "Return null before conversion for the covered invalid values and retain zero and positive fractional values.",
+        "Keep all seven original parse/format controls byte-identical.",
+        "Pass the frozen focused fixture, complete fresh host tests and debug assembly."
+      ],
+      "evidence": [
+        {
+          "text": "Actual baseline, minimal correction and scoped acceptance.",
+          "source": "docs/portal-toolkit-uptime-validity-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized run, source, artifact and independent-review bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/toolkit-uptime-validity-verification.json"
+        }
+      ],
+      "limits": [
+        "Direct pure parser and existing formatter tests only. The active status reader and dashboard null/unavailable branch are source-reviewed; no live proc, ADB, Portal, phone, native UI or kernel-output acceptance.",
+        "The guard preserves the existing conversion of finite nonnegative values. No finite upper bound, duration cap, whitespace/token grammar, idle-field validation or sign-text policy was added.",
+        "Debug build and artifact hash only; no installation, signed release, version/dependency change, hosted CI, push or publication. Earlier phone, provider, approval and expired-issue holds remain.",
+        "Profile application discovery is a bounded negative. Duplicate store/editor and scanner scopes retain their earlier clocks; the APK read candidate remains parked."
+      ],
+      "next": "Retain the local verified correction. Native dashboard/provider acceptance and hosted CI remain separate; continue distinct authorized work without resetting earlier holds.",
+      "issueClock": {
+        "startedAt": "2026-11-03T20:18:18Z",
+        "deadline": "2026-11-03T20:48:18Z",
+        "reset": false,
+        "discoveryIncluded": true
+      }
+    },
     {
       "id": "browser-pairing-keyboard",
       "title": "Browser pairing: submit with Enter",
