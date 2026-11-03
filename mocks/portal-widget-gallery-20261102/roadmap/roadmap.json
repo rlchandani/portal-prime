@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T11:36:39.695299+00:00",
+  "updatedAt": "2026-11-03T12:01:05.106591+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,62 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.119/code113. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.120/code114. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "accessibility-reconnect-services",
+      "title": "Accessibility: retain service changes during reconnect",
+      "summary": "Delivered 1.120: delayed BarWatch rejoin keeps the current service list, including late install confirmation.",
+      "description": "Read the latest enabled-service list after the existing reconnect gap; preserve additions and removals.",
+      "status": "delivered",
+      "verification": "10 frozen tests: 7 red to pass; 4,293 JVM; debug native 6/12 to 12/12",
+      "kind": "Delayed accessibility list preservation",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Launcher reliability / independent method and artifact review",
+      "deployment": "Exact optimized 1.120/code114 installed and fully hashed in Family Area and Living Area.",
+      "state": "Four complete captured maps and eleven preference states per room match. Family frame, font, accessibility and Chrome retained. Two native parents and scratch retired; copied credentials removed.",
+      "acceptance": [
+        "Freeze literal lists against the actual reconnect method before production changes.",
+        "Call the real install-confirm enabler during the held callback gap.",
+        "Retain immediate drop, delay, master flag and connected no-churn controls.",
+        "Bind generated debug provider results separately from real OS, remote and installer acceptance.",
+        "Deliver exact signed optimized bytes and preserve complete maps and eleven preference states."
+      ],
+      "evidence": [
+        {
+          "text": "Current-list correction, frozen red and green checks, native differential and exact delivery.",
+          "source": "docs/portal-accessibility-reconnect-services-2026-11-03.md"
+        },
+        {
+          "text": "Bound source, tests, artifacts, generated provider observations, preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/accessibility-reconnect-services-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual debug Family checks improve 6/12 to 12/12: 6 corrected checks, 2 retained product controls and 4 retained phase or harness checks. Each variant invokes the actual reconnect method 8 times, install-confirm append 1 time and availability 1 time across 8 generated cases.",
+        "The generated in-memory provider handles 9 GET and 34 PUT calls on baseline, and 17 GET and 33 PUT calls on candidate (43 and 50 total calls). Each variant acquires it 1 time and records 0 releases.",
+        "Native debug generated Context and RAM provider only. Original secure provider, household preference writes, network and service starts are zero. Optimized method admission and API28 remain open; no keep rules.",
+        "Native retains empty and unchanged-foreign-list product controls plus four phase or harness checks. Connected no-churn and callback overlap are JVM checks only.",
+        "The existing own-service drop, two-second delay and master flag remain. A service edit after the fresh callback read and before its write remains outside this correction.",
+        "OS observer timing, actual accessibility rebinding, phone pairing/navigation, automatic installation and external timeout/failure cleanup remain unverified.",
+        "Two accepted native parents retire and scratch is removed normally. Looper cleanup occurs by parent retirement; process defaults are not restored in place. Compile-only SDK shim is absent from fixture DEX.",
+        "Eleven preference states per room match: Family has ten byte-identical files and one unchanged absence; Living has seven byte-identical files and four unchanged absences. The news preference remains absent in both rooms. No exception, household preference edit or restore.",
+        "Family current frame is viewed; reconnect UI and Living visual remain open. Logcat lines=1500 requests produce 1644 and 2023 actual lines; limited health scope.",
+        "Public manifest remains 1.83/code77. Phone control stays prohibited; no HA, auth, push or publication. Older held and exhausted clocks remain.",
+        "Stories metadata and reading audit found no grounded fresh defect. Older bedtime narration findings are excluded without a new slot."
+      ],
+      "next": "Retain exact two-room delivery. Optimized method, API28, actual rebinding, authorized remote pairing, automatic installs and Living visual acceptance remain open; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T11:43:07+00:00",
+        "deadline": "2026-11-03T12:13:07+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "news-atom-article-link",
       "title": "News: open the Atom article link",

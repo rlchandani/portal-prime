@@ -264,8 +264,11 @@ object SettingsGuard {
       Handler(Looper.getMainLooper()).postDelayed({
         runCatching {
           Settings.Secure.putInt(cr, Settings.Secure.ACCESSIBILITY_ENABLED, 1)
-          Settings.Secure.putString(
-              cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, (others + comp).joinToString(":"))
+          // Other services may change during the gap; rejoin the current list, not the old snapshot.
+          val current = Settings.Secure.getString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: ""
+          val next = BarWatchServiceList.updated(current, comp, true)
+          if (next != current)
+            Settings.Secure.putString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, next)
           android.util.Log.i("ImmortalQuickBar", "BarWatch a11y re-bound (was enabled but not connected)")
         }
       }, 2000)

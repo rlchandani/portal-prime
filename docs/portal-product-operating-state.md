@@ -13,8 +13,36 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / Atom news article links:** exact optimized
-  **1.119/code113** is installed and fully hashed in both rooms. Atom headlines
+- **Current room APK / Accessibility reconnect service preservation:** exact
+  optimized **1.120/code114** is installed and fully hashed in both rooms. The
+  delayed BarWatch callback reads the current list and preserves service changes
+  during its two-second gap, including actual install-confirm append. Existing
+  drop, delay, master flag, own-case repair and connected no-churn remain.
+  Ten frozen tests reproduce seven ComparisonFailure assertions then pass;
+  **4,293 JVM / 445 suites**, debug, optimized, R8 and vital
+  lint pass in 2m 14s. Actual debug Family checks improve 6/12 to 12/12: 6 corrected checks, 2 retained product controls and 4 retained phase or harness checks. Each variant invokes the actual reconnect method 8 times, install-confirm append 1 time and availability 1 time across 8 generated cases.
+  Native uses real generated Context and RAM-provider calls; original secure
+  provider, household preference, network and service operations are zero.
+  Debug only, no keep rules; API28, OS rebinding, phone pairing/navigation,
+  automatic installs and the fresh-read/write atomicity gap remain open.
+  Two parents and scratch retire normally; process Looper cleanup is retirement,
+  not in-place default restoration. Compiler has 3 Java 8 obsolescence
+  warnings and a deprecation note; compile-only shim excluded from fixture DEX.
+  Eleven preference states per room match: Family has ten byte-identical files and one unchanged absence; Living has seven byte-identical files and four unchanged absences. The news preference remains absent in both rooms. Four complete maps, room name and Dev Mode match; no exception, edit or
+  restore. Family frame was viewed; font, accessibility, original Chrome,
+  resumed frame and awake display remain. Living visual open. Limited logcat
+  lines=1500 requests produce 1644 Family and 2023 Living
+  actual lines without fatal or ANR markers. Copied credentials removed;
+  original registry unchanged. Public manifest remains 1.83; no phone, HA, auth
+  or publication. **96 tasks: 61 delivered, 25 locally verified, 3 approval,
+  6 parked, 1 queued.** Original **11:43:07–12:13:07 UTC** clock retained.
+  Stories audit is negative; known bedtime and older scopes retain their clocks.
+  Broader goal active.
+  [Receipt](portal-accessibility-reconnect-services-2026-11-03.md).
+
+- **Previous room APK / Atom news article links:** exact optimized
+  **1.119/code113** was installed and fully hashed in both rooms at that
+  delivery's closure; the current reconnect build supersedes it. Atom headlines
   prefer the first nonblank alternate or omitted-relation link; self and
   enclosure targets do not become articles. Standard quoted attributes,
   existing RSS text priority, title cleanup, order and cap remain.
@@ -41,7 +69,7 @@ The updated whole-product objective is
 
 - **Previous room APK / Sky palette on short days:** exact optimized
   **1.118/code112** was installed and fully hashed in both rooms at that
-  delivery's closure; the current News build supersedes it. Ordered short
+  delivery's closure; the News build superseded it. Ordered short
   days reach the existing noon and twilight palettes without overlapping
   daytime phases. Interior distances shrink only below eight hours; seven
   named palettes, exterior twilight distances and existing long-day midpoint

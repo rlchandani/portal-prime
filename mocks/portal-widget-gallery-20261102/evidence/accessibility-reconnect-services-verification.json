@@ -1,0 +1,1015 @@
+{
+  "recordedAt": "2026-11-03T11:58:56.756685+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T11:43:07Z",
+    "deadline": "2026-11-03T12:13:07Z",
+    "originalRetained": true,
+    "includes": "Discovery, frozen reproduction, correction, gates, native checks, two-room delivery, documentation, cleanup and local commit"
+  },
+  "finding": {
+    "activeConsumer": "RemotePairUi.enableRemoteAndMintPin reconnects BarWatch before FleetAgentService.ensureRunning; newly started FleetAgentService.onCreate appends InstallConfirm",
+    "witness": "Baseline delayed callback overwrites the current accessibility list with its pre-gap snapshot, losing InstallConfirm or another newly enabled service and resurrecting removed entries",
+    "baselineSourceSha256": "c7692660621ce107b642be6529b32d0f3c828b94a6fb170bf2fcf9ca110f48ef"
+  },
+  "correction": {
+    "scope": "SettingsGuard.ensureBarWatchConnected delayed callback only plus frozen regressions, documentation and local version",
+    "behavior": "Re-read current list at callback time, apply existing BarWatchServiceList.updated and write only when changed",
+    "retained": "Initial BarWatch drop, master flag,2000ms delay, connected early return and existing list normalization policy"
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/SettingsGuard.kt": "7e3188da32e446204cacd63b9a60ec23406763d6496eccf454b0c5a667133e77",
+    "app/src/test/java/com/immortal/launcher/BarWatchReconnectTest.kt": "f950116af270dcd486a3f220df99a9ecace0efe483eb5d7dd66379bca867f67a",
+    "app/build.gradle.kts": "374cac2c035d5b7bfb8b7b34b3b6e59dec20ba6cd7d8baca6f422feb0f648d66"
+  },
+  "red": {
+    "terminalExit": 1,
+    "tests": 10,
+    "assertionFailures": 7,
+    "errors": 0,
+    "skips": 0,
+    "failedMethods": [
+      "currentMixedCaseWatcherDuplicatesRepairWithoutLosingForeignEntries",
+      "overlappingReconnectCallbacksCannotReplayAnOlderForeignList",
+      "actualInstallConfirmAppendSurvivesReconnectGap",
+      "foreignServiceRemovedDuringGapIsNotResurrected",
+      "alreadyReaddedCanonicalWatcherKeepsCurrentRawList",
+      "replacementForeignListAndItsOrderSurviveReconnect",
+      "foreignServiceAddedDuringGapRemainsEnabled"
+    ],
+    "passingControls": [
+      "connectedWatcherDoesNotReadWriteOrScheduleReconnect",
+      "unchangedForeignListRetainsDropAndDelayedRejoin",
+      "emptyAndWatcherOnlyListsReconnectWithoutForeignEntries"
+    ],
+    "frozenTestSha256": "f950116af270dcd486a3f220df99a9ecace0efe483eb5d7dd66379bca867f67a",
+    "baselineSourceSha256": "c7692660621ce107b642be6529b32d0f3c828b94a6fb170bf2fcf9ca110f48ef",
+    "failureType": "org.junit.ComparisonFailure",
+    "assertionErrorSubtype": true,
+    "actualProductAssertionsNotCompileErrors": true,
+    "bindings": {
+      "baseline-jvm.xml": {
+        "sha256": "faf62b30ecf7c732dee609ffb7269fdd76aa6afb773101eb5d75b78164e200a9",
+        "bytes": 33840
+      },
+      "baseline-jvm.log": {
+        "sha256": "f6e54c739ffb19fbc94e13178c3bcd85c06288a51f9d5ef41b0b424307602e42",
+        "bytes": 3324
+      },
+      "baseline-terminal.json": {
+        "sha256": "078a3b93b62538e98ba1d04e9d981c44746dc96c4dfc9b907ae4ea1d4f7e7567",
+        "bytes": 281
+      },
+      "acceptance-freeze.json": {
+        "sha256": "c3736543a71fb936d93007f197cb7f50bc85d22e9a1bc2717683f09ceced87f7",
+        "bytes": 738
+      }
+    }
+  },
+  "green": {
+    "suites": 445,
+    "tests": 4293,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualBarWatchReconnectFocusedTests": 10,
+    "allFocusedUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 14s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "buildBindings": {
+    "full-gate.log": {
+      "sha256": "3f537f9aee105e3c312bb80354086fbdbda20af45abc286871b8008d0c680bbd",
+      "bytes": 13732
+    },
+    "gate-terminal.json": {
+      "sha256": "e894b56b81af2af1feedb99d6251470ef53d1446b5e8273f4259a2cb110e7f0d",
+      "bytes": 306
+    },
+    "package-proof.log": {
+      "sha256": "1456d1395b231eb487e01d29b2f59a5b49c331587ae02ad20ca897d61f7e5e0f",
+      "bytes": 610
+    },
+    "package-terminal.json": {
+      "sha256": "c453aa4df753dbd6ca1b4fa406e142bc032e95c3d0488f9ebd5706c8fc9f5d82",
+      "bytes": 120
+    },
+    "independent-full-jvm-xml-manifest.json": {
+      "sha256": "d0d2e0849a0476a8adc768a38837f633cb6ddc048b0c236b58e402ed31aad597",
+      "bytes": 147466
+    }
+  },
+  "native": {
+    "baseline": {
+      "status": "FAIL",
+      "checks": {
+        "appendInstallConfirmDuringGap": false,
+        "foreignRemovalDuringGap": false,
+        "foreignReplacementDuringGap": false,
+        "foreignAppendDuringGap": false,
+        "canonicalOwnEntryDuringGap": false,
+        "duplicateOwnRepairDuringGap": false,
+        "emptyListControl": true,
+        "unchangedForeignOrderControl": true,
+        "immediateDropAndMasterPreserved": true,
+        "actualAPKClassLoader": true,
+        "generatedProviderOnly": true,
+        "noForbiddenContextOperations": true
+      },
+      "observations": {
+        "appendInstallConfirmDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.InstallConfirmService",
+          "expected": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.InstallConfirmService:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 2,
+          "generatedProviderPuts": 6
+        },
+        "foreignRemovalDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.beta/.Reader",
+          "expected": "public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 1,
+          "generatedProviderPuts": 4
+        },
+        "foreignReplacementDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.gamma/.Reader",
+          "expected": "public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 1,
+          "generatedProviderPuts": 4
+        },
+        "foreignAppendDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "afterImmediateDrop": "public.alpha/.Reader",
+          "duringGap": "public.alpha/.Reader:public.gamma/.Reader",
+          "expected": "public.alpha/.Reader:public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 1,
+          "generatedProviderPuts": 4
+        },
+        "canonicalOwnEntryDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.alpha/.Reader",
+          "expected": "public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.alpha/.Reader",
+          "actual": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 1,
+          "generatedProviderPuts": 4
+        },
+        "duplicateOwnRepairDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "afterImmediateDrop": "public.alpha/.Reader",
+          "duringGap": "public.alpha/.Reader:PUBLIC.FIXTURE/COM.IMMORTAL.LAUNCHER.BARWATCHSERVICE:public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "expected": "public.alpha/.Reader:public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 1,
+          "generatedProviderPuts": 4
+        },
+        "emptyListControl": {
+          "initial": "public.fixture/com.immortal.launcher.BarWatchService",
+          "afterImmediateDrop": "",
+          "duringGap": "",
+          "expected": "public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 1,
+          "generatedProviderPuts": 4
+        },
+        "unchangedForeignOrderControl": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.alpha/.Reader:public.beta/.Reader",
+          "expected": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 1,
+          "generatedProviderPuts": 4
+        }
+      },
+      "passed": 6,
+      "total": 12,
+      "actualEnsureInvocations": 8,
+      "actualInstallConfirmInvocations": 1,
+      "actualAvailableInvocations": 1,
+      "generatedCaseSeeds": 8,
+      "generatedGapEdits": 5,
+      "providerGetCount": 9,
+      "providerPutCount": 34,
+      "providerCallCount": 43,
+      "providerAcquireCount": 1,
+      "providerReleaseCount": 0,
+      "providerFaults": [],
+      "unexpectedProviderCalls": 0,
+      "forbiddenContextCalls": 0,
+      "apkSha256": "9a711913a6a90be2286a0490e806b5e9a18260ce5ec46374c0cfe56f5b2a7736",
+      "actualAPKClassLoader": true,
+      "buildVariant": "debug",
+      "optimizedEnsureVerified": false,
+      "ownerSecureSettingsOperations": 0,
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "processMainLooperPrepared": true,
+      "processDefaultsRestored": false,
+      "scope": "Actual debug ensure and install-confirm append over one generated RAM provider, own main Looper and generated Context. No original provider, services, network, UI or household settings; process retirement owns Looper cleanup."
+    },
+    "candidate": {
+      "status": "PASS",
+      "checks": {
+        "appendInstallConfirmDuringGap": true,
+        "foreignRemovalDuringGap": true,
+        "foreignReplacementDuringGap": true,
+        "foreignAppendDuringGap": true,
+        "canonicalOwnEntryDuringGap": true,
+        "duplicateOwnRepairDuringGap": true,
+        "emptyListControl": true,
+        "unchangedForeignOrderControl": true,
+        "immediateDropAndMasterPreserved": true,
+        "actualAPKClassLoader": true,
+        "generatedProviderOnly": true,
+        "noForbiddenContextOperations": true
+      },
+      "observations": {
+        "appendInstallConfirmDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.InstallConfirmService",
+          "expected": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.InstallConfirmService:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.InstallConfirmService:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 3,
+          "generatedProviderPuts": 6
+        },
+        "foreignRemovalDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.beta/.Reader",
+          "expected": "public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 2,
+          "generatedProviderPuts": 4
+        },
+        "foreignReplacementDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.gamma/.Reader",
+          "expected": "public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 2,
+          "generatedProviderPuts": 4
+        },
+        "foreignAppendDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "afterImmediateDrop": "public.alpha/.Reader",
+          "duringGap": "public.alpha/.Reader:public.gamma/.Reader",
+          "expected": "public.alpha/.Reader:public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 2,
+          "generatedProviderPuts": 4
+        },
+        "canonicalOwnEntryDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.alpha/.Reader",
+          "expected": "public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.alpha/.Reader",
+          "actual": "public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.alpha/.Reader",
+          "master": "1",
+          "generatedProviderGets": 2,
+          "generatedProviderPuts": 3
+        },
+        "duplicateOwnRepairDuringGap": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "afterImmediateDrop": "public.alpha/.Reader",
+          "duringGap": "public.alpha/.Reader:PUBLIC.FIXTURE/COM.IMMORTAL.LAUNCHER.BARWATCHSERVICE:public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "expected": "public.alpha/.Reader:public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.gamma/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 2,
+          "generatedProviderPuts": 4
+        },
+        "emptyListControl": {
+          "initial": "public.fixture/com.immortal.launcher.BarWatchService",
+          "afterImmediateDrop": "",
+          "duringGap": "",
+          "expected": "public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 2,
+          "generatedProviderPuts": 4
+        },
+        "unchangedForeignOrderControl": {
+          "initial": "public.alpha/.Reader:public.fixture/com.immortal.launcher.BarWatchService:public.beta/.Reader",
+          "afterImmediateDrop": "public.alpha/.Reader:public.beta/.Reader",
+          "duringGap": "public.alpha/.Reader:public.beta/.Reader",
+          "expected": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "actual": "public.alpha/.Reader:public.beta/.Reader:public.fixture/com.immortal.launcher.BarWatchService",
+          "master": "1",
+          "generatedProviderGets": 2,
+          "generatedProviderPuts": 4
+        }
+      },
+      "passed": 12,
+      "total": 12,
+      "actualEnsureInvocations": 8,
+      "actualInstallConfirmInvocations": 1,
+      "actualAvailableInvocations": 1,
+      "generatedCaseSeeds": 8,
+      "generatedGapEdits": 5,
+      "providerGetCount": 17,
+      "providerPutCount": 33,
+      "providerCallCount": 50,
+      "providerAcquireCount": 1,
+      "providerReleaseCount": 0,
+      "providerFaults": [],
+      "unexpectedProviderCalls": 0,
+      "forbiddenContextCalls": 0,
+      "apkSha256": "f04f1efcf3e49a7426fdb3914091cbd12bec85c7c1d7106ad1daf76476e35835",
+      "actualAPKClassLoader": true,
+      "buildVariant": "debug",
+      "optimizedEnsureVerified": false,
+      "ownerSecureSettingsOperations": 0,
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "processMainLooperPrepared": true,
+      "processDefaultsRestored": false,
+      "scope": "Actual debug ensure and install-confirm append over one generated RAM provider, own main Looper and generated Context. No original provider, services, network, UI or household settings; process retirement owns Looper cleanup."
+    },
+    "binding": {
+      "fixtureSourceSha256": "5fdc1e3e9a6e6e9efc7c0d055d0b3667e3a9e5ca64a924c57552e2e6a151598f",
+      "fixtureJarSha256": "725d214112c2f5050ea70c44f37161d5066f7593cd3cbfecb8326f58fad6095c",
+      "compilerSha256": "b4e4ac1b2f44a02fc75e4d4e6b725d452d6412730a3036589ad5b6b638c51c75",
+      "runnerSha256": "404afad2e10f0fbe02fc6d688a620444f782c4a61b7b4d44809d88a6edf233e3",
+      "phases": [
+        "baseline",
+        "candidate"
+      ],
+      "apkSha256": {
+        "baseline": "9a711913a6a90be2286a0490e806b5e9a18260ce5ec46374c0cfe56f5b2a7736",
+        "candidate": "f04f1efcf3e49a7426fdb3914091cbd12bec85c7c1d7106ad1daf76476e35835"
+      },
+      "buildVariant": "debug",
+      "optimizedEnsureVerified": false,
+      "compileOnlyShimSha256": "faa71a7befc9d18b4705e0f58f4f3615e910f8e92eabcc4554b68a05c6702160",
+      "scope": "Actual debug SettingsGuard ensure and install-confirm append, generated Context and RAM provider; no original secure provider, services, preferences, UI, network, remote pairing or actual accessibility binding"
+    },
+    "process": {
+      "baseline": {
+        "terminalExit": 1,
+        "stdoutSha256": "2442795963ee978f71232c2d2c69626280b35f8285ca7bc19cf0d14f6930755c",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutBytes": 17463,
+        "stderrBytes": 0
+      },
+      "candidate": {
+        "terminalExit": 0,
+        "stdoutSha256": "9b1fe778e807cf0f588f4957fc10dcb7ca0e03704498e6de4341d735a8045fbb",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutBytes": 19473,
+        "stderrBytes": 0
+      }
+    },
+    "environment": {
+      "device": "Family Area",
+      "sdk": "29",
+      "release": "10",
+      "abi": "arm64-v8a",
+      "api28Verified": false
+    },
+    "compiler": {
+      "terminalExit": 0,
+      "warnings": 3,
+      "obsoleteJava8Warnings": true,
+      "deprecatedAPINote": true,
+      "actualCompileBinding": {
+        "fixture": "/private/tmp/portal-product-audit-20261103-114307/native-rebind-compiled/fixture.jar",
+        "fixtureJarSha256": "725d214112c2f5050ea70c44f37161d5066f7593cd3cbfecb8326f58fad6095c",
+        "fixtureSourceSha256": "5fdc1e3e9a6e6e9efc7c0d055d0b3667e3a9e5ca64a924c57552e2e6a151598f",
+        "compilerSha256": "b4e4ac1b2f44a02fc75e4d4e6b725d452d6412730a3036589ad5b6b638c51c75",
+        "runnerSha256": "404afad2e10f0fbe02fc6d688a620444f782c4a61b7b4d44809d88a6edf233e3",
+        "buildVariant": "debug",
+        "optimizedEnsureVerified": false,
+        "fixtureExecutions": 0,
+        "deviceOperations": 0,
+        "compileOnlyShimSha256": "faa71a7befc9d18b4705e0f58f4f3615e910f8e92eabcc4554b68a05c6702160",
+        "compileOnlyShimExcludedFromProgramInputs": true,
+        "generatedProviderOnly": true,
+        "fixtureProgramClassDefinitions": [
+          "LNativeBarWatchRebind$$ExternalSyntheticLambda0;",
+          "LNativeBarWatchRebind$$ExternalSyntheticLambda1;",
+          "LNativeBarWatchRebind$$ExternalSyntheticLambda2;",
+          "LNativeBarWatchRebind$GeneratedContext;",
+          "LNativeBarWatchRebind$GeneratedResolver;",
+          "LNativeBarWatchRebind;"
+        ],
+        "compileOnlyShimAbsentFromDEXDefinitions": true
+      },
+      "binding": {
+        "sha256": "6799185625ac2c6aafdebd7ae6d225269079ddd2401c3c9e9cbc4240f0c595cf",
+        "bytes": 1522
+      }
+    },
+    "cleanup": {
+      "parentsRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "ownedScratchRemoved": true,
+      "faults": [],
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "ownerSecureSettingsOperations": 0,
+      "processMainLooperCleanupByParentRetirement": true,
+      "buildVariant": "debug",
+      "optimizedEnsureVerified": false,
+      "externalTimeoutFailureCleanupFaultInjected": false
+    },
+    "executionHistoryBindings": {
+      "rebind-native-author-freeze.json": {
+        "sha256": "6c638c2553da8b732af49604aebb9dd39d3d30fbe5a7dff953980865d9896ee5",
+        "bytes": 2547
+      },
+      "root-native-admission.json": {
+        "sha256": "16ebe241530353025b26220fb965e9b5b5ee5ea0bf7fddacb6a327f2790b64ea",
+        "bytes": 1186
+      },
+      "native-wrapper-admission-history.json": {
+        "sha256": "315f580a0e90593cf92a870cba428f8d0b9af19b5de2ce988a9e435836026fd4",
+        "bytes": 420
+      },
+      "native-compile-terminal.json": {
+        "sha256": "dca975d629973b42c8ecb2d3a155391d909757dd14560575cccf8027f280cbcf",
+        "bytes": 477
+      },
+      "native-run-terminal.json": {
+        "sha256": "16dd6576deb1d8fb3cfd875da751d919251dfb3bdaf3bb59817f8670c0bfd8d3",
+        "bytes": 214
+      }
+    },
+    "rawOutputBindings": {
+      "baseline-rebind-native-result.json": {
+        "sha256": "62e3f265161ae63b35190351acb185eef77db258c9d7c914394af456477b353f",
+        "bytes": 19638
+      },
+      "baseline-rebind-native-process.json": {
+        "sha256": "13e8cf30efd65c8ba76dadd66ff907e2cb133fb96970bd19f76341d8345b60c7",
+        "bytes": 240
+      },
+      "baseline-rebind-native-stdout-private.txt": {
+        "sha256": "2442795963ee978f71232c2d2c69626280b35f8285ca7bc19cf0d14f6930755c",
+        "bytes": 17463
+      },
+      "baseline-rebind-native-stderr-private.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "candidate-rebind-native-result.json": {
+        "sha256": "862add2c76c57bd556ecc9b2b9434b97a3e3c3a85b2e8be9acf5b518623088d6",
+        "bytes": 21885
+      },
+      "candidate-rebind-native-process.json": {
+        "sha256": "e8ce164f5065a2baf6fcc3b92dcff5a170cd05ba2e49fde8322237d823bb15b2",
+        "bytes": 240
+      },
+      "candidate-rebind-native-stdout-private.txt": {
+        "sha256": "9b1fe778e807cf0f588f4957fc10dcb7ca0e03704498e6de4341d735a8045fbb",
+        "bytes": 19473
+      },
+      "candidate-rebind-native-stderr-private.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "classAdmission": {
+      "independentReviewBinding": {
+        "sha256": "c2dbdbbe3c59dc6d39d1343da08782aab20c5d633226cb35836bb654372c0360",
+        "bytes": 42872
+      },
+      "passed": 14,
+      "total": 14,
+      "bothOptimizedOriginalSettingsGuardAbsentAndMethodsInlined": true,
+      "optimizedInvocations": 0,
+      "keepRulesAdded": false
+    }
+  },
+  "artifact": {
+    "sha256": "927fc4ec5966aad6e3e07258545007422cfa7292c9352dd6c581571153ed7972",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.120",
+    "versionCode": 114,
+    "variants": {
+      "performance": {
+        "sha256": "927fc4ec5966aad6e3e07258545007422cfa7292c9352dd6c581571153ed7972",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.120",
+        "versionCode": 114
+      },
+      "debug": {
+        "sha256": "f04f1efcf3e49a7426fdb3914091cbd12bec85c7c1d7106ad1daf76476e35835",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.120",
+        "versionCode": 114
+      },
+      "rollback": {
+        "sha256": "a2062892d83bd4bf774629ca51ce2f885505ec6865a8fc18481c1e142da7e29a",
+        "bytes": 25879086,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.119",
+        "versionCode": 113
+      }
+    },
+    "debugSha256": "f04f1efcf3e49a7426fdb3914091cbd12bec85c7c1d7106ad1daf76476e35835",
+    "rollbackSha256": "a2062892d83bd4bf774629ca51ce2f885505ec6865a8fc18481c1e142da7e29a",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 14s"
+  },
+  "artifactBindings": {
+    "candidate-1.120.apk": {
+      "sha256": "927fc4ec5966aad6e3e07258545007422cfa7292c9352dd6c581571153ed7972",
+      "bytes": 25862702
+    },
+    "candidate-debug-1.120.apk": {
+      "sha256": "f04f1efcf3e49a7426fdb3914091cbd12bec85c7c1d7106ad1daf76476e35835",
+      "bytes": 46703529
+    },
+    "baseline-1.119.apk": {
+      "sha256": "a2062892d83bd4bf774629ca51ce2f885505ec6865a8fc18481c1e142da7e29a",
+      "bytes": 25879086
+    },
+    "baseline-debug-1.119.apk": {
+      "sha256": "9a711913a6a90be2286a0490e806b5e9a18260ce5ec46374c0cfe56f5b2a7736",
+      "bytes": 46703533
+    },
+    "candidate-mapping.txt": {
+      "sha256": "c6f860ee2079b02e457f3d7cc39640d6fa3fdd704371367e0913f91325b0d0ec",
+      "bytes": 83204304
+    },
+    "baseline-mapping.txt": {
+      "sha256": "4bd8e7cc5f146423bb84606fe90a4731d9584bb013870634a03e47157963462c",
+      "bytes": 83203630
+    }
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "preferenceStates": {
+    "family": {
+      "states": 11,
+      "existingFilesByteIdentical": 10,
+      "absencesUnchanged": 1
+    },
+    "living": {
+      "states": 11,
+      "existingFilesByteIdentical": 7,
+      "absencesUnchanged": 4
+    }
+  },
+  "familyDisplayObservation": {
+    "rootVisuallyInspected": true,
+    "viewedAtUtc": "2026-11-03T11:58:18.832718+00:00",
+    "observation": "Photo frame displays a photograph within a black border, with3:57 clock/date/cloud44degree weather at lower left and bug icon at lower right. Only current screensaver frame inspected.",
+    "binding": {
+      "sha256": "466021447e41faf91671996377025810bbf1f4d8d58a7a8994a7c1d12be8de32",
+      "bytes": 2455053
+    },
+    "physicalAccessibilityReconnectVerified": false,
+    "livingVisualVerified": false
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1644,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 2023,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "cleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "observationTerminals": {
+    "postflight": {
+      "exitCode": 0,
+      "startedAt": "2026-11-03T11:57:46.544845+00:00",
+      "endedAt": "2026-11-03T11:57:47.726112+00:00"
+    },
+    "health": {
+      "exitCode": 0,
+      "startedAt": "2026-11-03T11:57:46.545231+00:00",
+      "endedAt": "2026-11-03T11:57:47.324467+00:00"
+    },
+    "versionGuard": {
+      "exitCode": 1,
+      "startedAt": "2026-11-03T11:57:46.547663+00:00",
+      "endedAt": "2026-11-03T11:57:46.595497+00:00"
+    },
+    "screenshot": {
+      "exitCode": 0,
+      "startedAt": "2026-11-03T11:57:46.547860+00:00",
+      "endedAt": "2026-11-03T11:57:48.842416+00:00"
+    }
+  },
+  "credentialTerminal": {
+    "exitCode": 0,
+    "startedAt": "2026-11-03T11:58:18.834306+00:00",
+    "endedAt": "2026-11-03T11:58:18.932907+00:00"
+  },
+  "publicRelease": {
+    "manifestUnchanged": true,
+    "binding": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "version": {
+      "versionCode": 77,
+      "versionName": "1.83",
+      "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
+      "notes": "Calendar downloads reject oversized and incomplete responses before parsing, release their connections, and preserve the existing saved-event recovery."
+    },
+    "publicPublicationOperations": 0,
+    "versionGuardTerminalOneExpectedLocal114VersusPublic77": true
+  },
+  "nativeFleetCli": {
+    "binding": {
+      "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+      "bytes": 694352
+    },
+    "rebuilt": false
+  },
+  "review": {
+    "focused-source-review.json": {
+      "passedChecks": 22,
+      "totalChecks": 22,
+      "blockers": [],
+      "binding": {
+        "sha256": "65c48937e72d87a58ce55886f00e0c8e5f3b3a2791ec9f561dba451bc68ca8b4",
+        "bytes": 5383
+      }
+    },
+    "gate-native-review.json": {
+      "passedChecks": 42,
+      "totalChecks": 42,
+      "blockers": [],
+      "binding": {
+        "sha256": "268eef2c84a07bad428876134f85b5cc93baa075f862ab61563157bb61931b08",
+        "bytes": 12741
+      }
+    },
+    "documentation-review.json": {
+      "passedChecks": 23,
+      "totalChecks": 23,
+      "blockers": [],
+      "binding": {
+        "sha256": "48cc089532efe2c69d7b6bedc8adbfd9389c813a7aed6ecde996fc09784c1e42",
+        "bytes": 7179
+      }
+    }
+  },
+  "documentation": {
+    "rootOwnsRenderingAcceptance": true,
+    "generatorBinding": {
+      "sha256": "93f2fb88b38c9edfa7b88868ff903a667206e76c6b24cac89698fa6f3cf19787",
+      "bytes": 30738
+    },
+    "rootAdmissionBinding": {
+      "sha256": "8774a97d74c8985a2e900a060eb14fc0b12eaa8471c5a23bf61779257834d651",
+      "bytes": 521
+    },
+    "generatedActualInputBindings": {
+      "status": "Four public documentation paths generated from actual accepted inputs; root owns QA",
+      "writtenAtUtc": "2026-11-03T12:01:05.106591+00:00",
+      "files": {
+        "docs/portal-accessibility-reconnect-services-2026-11-03.md": {
+          "sha256": "c0cf970619310f8a0c2530f901977424e1638d4b7ed93a5f136cf210695eceef",
+          "bytes": 6796
+        },
+        "docs/portal-product-operating-state.md": {
+          "sha256": "eb24d950584b5251bfdfd292877d7d126d467de056c6705243eafc296b5c8383",
+          "bytes": 141564
+        },
+        "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+          "sha256": "c2d8d88c9bfbe4843ba021c17836d5d839deacbbb516d7f5265186ac6b69ec7f",
+          "bytes": 312705
+        },
+        "mocks/portal-widget-gallery-20261102/roadmap/index.html": {
+          "sha256": "731940ecd45ec3ab877486bee91adc38c60937c045737ec6e8a43f1e0029fb66",
+          "bytes": 20473
+        }
+      },
+      "inputBindings": {
+        "jvm.json": {
+          "sha256": "8369eefba315c23e285547175eb44b202145e849f97cd134c572df3320cd7a19",
+          "bytes": 264
+        },
+        "artifact.json": {
+          "sha256": "b1a66b64b6ae3708e8d4c0eace4d6e9f190be6f3b6d90a8767ac8d441b757981",
+          "bytes": 1519
+        },
+        "baseline-red.json": {
+          "sha256": "e4765753d3025786ad8208864c5b99651060b99edff3772a1404ca82fe048aad",
+          "bytes": 1630
+        },
+        "source-hashes.json": {
+          "sha256": "b268df6d67166513459b40580f2821e02217a0568f8cc97abef4bfbcc5ea191f",
+          "bytes": 365
+        },
+        "focused-source-review.json": {
+          "sha256": "65c48937e72d87a58ce55886f00e0c8e5f3b3a2791ec9f561dba451bc68ca8b4",
+          "bytes": 5383
+        },
+        "gate-native-review.json": {
+          "sha256": "268eef2c84a07bad428876134f85b5cc93baa075f862ab61563157bb61931b08",
+          "bytes": 12741
+        },
+        "baseline-rebind-native-result.json": {
+          "sha256": "62e3f265161ae63b35190351acb185eef77db258c9d7c914394af456477b353f",
+          "bytes": 19638
+        },
+        "candidate-rebind-native-result.json": {
+          "sha256": "862add2c76c57bd556ecc9b2b9434b97a3e3c3a85b2e8be9acf5b518623088d6",
+          "bytes": 21885
+        },
+        "baseline-rebind-native-process.json": {
+          "sha256": "13e8cf30efd65c8ba76dadd66ff907e2cb133fb96970bd19f76341d8345b60c7",
+          "bytes": 240
+        },
+        "candidate-rebind-native-process.json": {
+          "sha256": "e8ce164f5065a2baf6fcc3b92dcff5a170cd05ba2e49fde8322237d823bb15b2",
+          "bytes": 240
+        },
+        "rebind-native-binding-all.json": {
+          "sha256": "2712e1ea817050c9cf3ac44e7d685b7ffdbd408eb6a11242d6f36336d1c0ae49",
+          "bytes": 1016
+        },
+        "rebind-native-cleanup-all.json": {
+          "sha256": "f6c4189702755152c0fee14de53e48dccb446f71374f2046001d411cfb29d17d",
+          "bytes": 430
+        },
+        "native-rebind-compiled/compile-binding.json": {
+          "sha256": "5a440587fe8ef484e1488859e7c222f5a188ec59d58c567f18f1ef824e6d2970",
+          "bytes": 1141
+        },
+        "native-compile-terminal.json": {
+          "sha256": "dca975d629973b42c8ecb2d3a155391d909757dd14560575cccf8027f280cbcf",
+          "bytes": 477
+        },
+        "native-compile.log": {
+          "sha256": "6799185625ac2c6aafdebd7ae6d225269079ddd2401c3c9e9cbc4240f0c595cf",
+          "bytes": 1522
+        },
+        "native-wrapper-admission-history.json": {
+          "sha256": "315f580a0e90593cf92a870cba428f8d0b9af19b5de2ce988a9e435836026fd4",
+          "bytes": 420
+        },
+        "deploy-results.json": {
+          "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31",
+          "bytes": 231
+        },
+        "preservation.json": {
+          "sha256": "2de61275dfa1480b50994ef53e781f275c02efce4e91569504dfda44473a7ed6",
+          "bytes": 718
+        },
+        "health.json": {
+          "sha256": "3d028a7b28ff5f6487d98b7b24bc7b0f1cc23e9333781cf25fde75bd29cd1278",
+          "bytes": 579
+        },
+        "screenshot-observation.json": {
+          "sha256": "b97db412dd055843668f29bdd599d7d503827b96f0946956059ee96c0ca3c64c",
+          "bytes": 500
+        },
+        "credential-cleanup.json": {
+          "sha256": "584d00c535583d9f5c6f035e521ab6f64eefddfd75629ef4a3518d05d6a25d76",
+          "bytes": 119
+        },
+        "observation-terminals.json": {
+          "sha256": "dfbf982a91b34434fabb005ac3622039b8a476c2358bf24845904972882316b1",
+          "bytes": 581
+        }
+      },
+      "sourceTestBuildOrCssWrites": 0,
+      "publicProofShaEmbedded": false
+    },
+    "strictMkDocs": {
+      "terminalExit": 0,
+      "buildSeconds": 2.05,
+      "binding": {
+        "sha256": "27eef18424faa2aabb0f4f244954f84c7c1aeb47c212b46e53933eb47802163b",
+        "bytes": 31742
+      },
+      "existingInfoMessagesRetained": true
+    },
+    "initialActualChrome": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 96,
+          "checks": [
+            {
+              "id": "accessibility-reconnect-services",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 96,
+          "checks": [
+            {
+              "id": "accessibility-reconnect-services",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "initialRenderingBinding": {
+      "sha256": "08b2f8312eb589257f79b776111e9ee73b9e5a1ba1dd800be2ad38f6a59542b9",
+      "bytes": 1536
+    },
+    "visualObservation": {
+      "rootActuallyViewedBoth": true,
+      "viewedAtUtc": "2026-11-03T12:02:07.578669+00:00",
+      "mobile": "Full current accessibility card is visible; title, two-column facts, acceptance, evidence, all limits and next action wrap within the card without overlaps.",
+      "desktop": "Title, two-column facts, acceptance and evidence align within the card. Remaining limits/full-content containment checked by actual layout assertions.",
+      "bindings": {
+        "initial-roadmap-390.png": {
+          "sha256": "16043365a0962a60c3c717f9b65d04b084196c805132f1c7332e6b182129c4cb",
+          "bytes": 258126
+        },
+        "initial-roadmap-1600.png": {
+          "sha256": "23602704d73e885b2437b7d0257d214be9318caae78bcb0a8dcaf4b6d2aebbe6",
+          "bytes": 114719
+        }
+      }
+    },
+    "closingPlan": "Final frozen proof and eight paths checked again with strict MkDocs and actual Chrome390/1600; final receipts retained privately to avoid self-hashing."
+  },
+  "deferredHypotheses": {
+    "camera": {
+      "binding": {
+        "sha256": "b99e4cd795232eedd7a6a26855bc989d0adb7cfef3eae024d1cf397404c3d8bc",
+        "bytes": 9312
+      },
+      "noFreshGroundedDefect": true
+    },
+    "stories": {
+      "binding": {
+        "sha256": "bd50a4a2b3c8dadbef13df21a9faf51f8e63e3f39b921e0b79ad7c1479f85094",
+        "bytes": 9610
+      },
+      "noFreshGroundedDefect": true
+    },
+    "quickbar": {
+      "binding": {
+        "sha256": "6c17bdd6ce975076804f43d3c594577d5689bb24857260b163319852aea64609",
+        "bytes": 1195
+      },
+      "selectedNewDelayedCallbackReplay": true
+    }
+  },
+  "limits": [
+    "Fresh callback read/write is not atomic with an arbitrary external writer between those operations.",
+    "Native calls actual debug SettingsGuard methods using a generated Context, resolver and RAM settings provider; positive fixture-local GET/PUT operations are recorded. Zero original secure-provider or household writes.",
+    "Both optimized APKs lack the original standalone SettingsGuard class and map inlined methods; zero optimized isolated entrypoint calls and no keep rules.",
+    "Connected early-return and reversed overlapping callbacks verified by JVM fixtures only. Native has six corrected rows, two product controls and four aggregate harness checks.",
+    "No actual OS observer/rebind, physical remote pairing, installer dialog or service startup acceptance. Both exact optimized APK installations and ordinary state preservation are separately verified.",
+    "Owned main Looper is prepared and not restored; observed normal process retirement owns cleanup. External timeout fault injection remains unverified.",
+    "Family screenshot checks only current photo-frame display. Living visual and API28 runtime remain unverified. Limited HTTP200 diagnostics/recent logs do not establish full runtime health."
+  ],
+  "backlog": {
+    "tasks": 96,
+    "counts": {
+      "delivered": 61,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "priorTaskObjects": 95,
+    "allPriorObjectsIdentical": true,
+    "priorRawTaskSuffixByteIdentical": true,
+    "priorRawTaskSuffixBytes": 307045,
+    "priorRawTaskSuffixSha256": "b22680c92c61198f40804816a769ea2c884e6ddebf5914d91d59fce8c3dfc176",
+    "defaultTask": "weather-native-layout",
+    "defaultUnchanged": true,
+    "onlyBoundaryChange": "Current room version1.119/code113 to1.120/code114",
+    "otherTopLevelKeysUnchanged": true,
+    "originalClock": {
+      "startedAt": "2026-11-03T11:43:07+00:00",
+      "deadline": "2026-11-03T12:13:07+00:00",
+      "retained": true
+    },
+    "rootIndependentInspectionBinding": {
+      "sha256": "8f3e818a5af757dd2676e299a3e0f5e5224d5cda2a5fa50f9eeb484a87630d68",
+      "bytes": 425
+    }
+  }
+}
