@@ -143,6 +143,26 @@ private fun ApprovedAppsContent(
   var renameFolder by remember { mutableStateOf(false) }
   var newFolderName by remember { mutableStateOf("") }
   var moveApp by remember { mutableStateOf<AppItem?>(null) }
+  fun saveAssignments(updated: Map<String, String>): Boolean {
+    val saved = UserLayout.saveAssignmentsFromSnapshot(context, assignments, updated)
+    assignments = UserLayout.load(context)
+    if (!saved) {
+      renameFolder = false
+      editFolder = false
+      android.widget.Toast.makeText(context,
+          "Folders changed on another screen. Review the layout and try again.",
+          android.widget.Toast.LENGTH_LONG).show()
+    }
+    return saved
+  }
+  fun saveAppOrder(updated: List<String>): Boolean {
+    val saved = UserLayout.saveOrderFromSnapshot(context, order, updated)
+    order = UserLayout.loadOrder(context)
+    if (!saved) android.widget.Toast.makeText(context,
+        "Favorites changed on another screen. Review the layout and try again.",
+        android.widget.Toast.LENGTH_LONG).show()
+    return saved
+  }
   // Retain the page's place, but end temporary menus/edit sessions when it is hidden.
   // AppsDialog already removes its window on this same visibility boundary.
   LaunchedEffect(pageActive) {
@@ -353,8 +373,8 @@ private fun ApprovedAppsContent(
       AppsMenuRow(if (isFavorite) "Remove from favorites" else "Add to favorites") {
         val id = app.component.flattenToString()
         val remaining = (ordered.map { it.component.flattenToString() } + order).distinct().filterNot { it == id }
-        order = if (isFavorite) remaining + id else listOf(id) + remaining
-        UserLayout.saveOrder(context, order); menuFor = null
+        saveAppOrder(if (isFavorite) remaining + id else listOf(id) + remaining)
+        menuFor = null
       }
       AppsMenuRow("Move to folder") { menuFor = null; moveApp = app }
       AppsMenuRow("App info") { menuFor = null; launchApprovedIntent(context, Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${app.component.packageName}"))) }
@@ -368,13 +388,13 @@ private fun ApprovedAppsContent(
   moveApp?.let { app ->
     AppsDialog("Move ${app.label}", { moveApp = null }) {
       AppsMenuRow("Remove from folder") {
-        assignments = assignments + (app.component.packageName to "")
-        UserLayout.save(context, assignments); moveApp = null
+        saveAssignments(assignments + (app.component.packageName to ""))
+        moveApp = null
       }
       (listOf("Settings") + folderNames).distinct().forEach { target ->
         AppsMenuRow("Move to “$target”") {
-          assignments = assignments + (app.component.packageName to target)
-          UserLayout.save(context, assignments); moveApp = null
+          saveAssignments(assignments + (app.component.packageName to target))
+          moveApp = null
         }
       }
     }
@@ -390,7 +410,9 @@ private fun ApprovedAppsContent(
         AppsSelectionRow(app.label, id in chosen) { chosen = if (id in chosen) chosen - id else if (chosen.size < availableSlots) chosen + id else chosen }
       }
       ApprovedAppsButton("Done", primary = true, enabled = chosen.size == minOf(availableSlots, ordered.size), modifier = Modifier.padding(top = 24.dp)) {
-        order = shortcutFavorites + chosen + (installedIds + order).distinct().filterNot { it in chosen || it in shortcutFavorites }; UserLayout.saveOrder(context, order); editFavorites = false
+        saveAppOrder(shortcutFavorites + chosen +
+            (installedIds + order).distinct().filterNot { it in chosen || it in shortcutFavorites })
+        editFavorites = false
       }
     }
   }
@@ -413,8 +435,8 @@ private fun ApprovedAppsContent(
           val name = newFolderName.trim()
           if (name != current) {
             val members = installed.filter { folderOf(it) == current }.map { it.component.packageName }
-            assignments = UserLayout.renamedFolderAssignments(assignments, current, name, members, folderNames)
-            UserLayout.save(context, assignments)
+            if (!saveAssignments(UserLayout.renamedFolderAssignments(
+                    assignments, current, name, members, folderNames))) return@ApprovedAppsButton
           }
           folder = name; renameFolder = false
         }
@@ -423,7 +445,8 @@ private fun ApprovedAppsContent(
   }
   if (editFolder && folder != null) AppsDialog("Edit folder contents", { editFolder = false }) {
     ordered.forEach { app -> AppsMenuRow(app.label + if (folderOf(app) == folder) "    ✓" else "") {
-      assignments = assignments + (app.component.packageName to if (folderOf(app) == folder) "" else folder!!); UserLayout.save(context, assignments)
+      saveAssignments(assignments +
+          (app.component.packageName to if (folderOf(app) == folder) "" else folder!!))
     } }
     ApprovedAppsButton("Done", primary = true, modifier = Modifier.padding(top = 24.dp)) { editFolder = false }
   }

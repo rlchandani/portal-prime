@@ -1,0 +1,1519 @@
+{
+  "schemaVersion": 1,
+  "taskId": "user-layout-save-conflicts",
+  "recordedAt": "2026-11-03T12:59:51.182352+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-03T12:41:33Z",
+    "deadline": "2026-11-03T13:11:33Z",
+    "originalIndependentAuditClockRetained": true
+  },
+  "verdict": "DELIVERED_WITH_SCOPED_ACCEPTANCE",
+  "broaderGoalActive": true,
+  "problem": {
+    "trigger": "A native Home/Apps folder or favorite action retains a complete field while a newer remote replacement is acknowledged.",
+    "witness": {
+      "oldAssignments": {
+        "com.alpha": "Alpha"
+      },
+      "newerAssignments": {
+        "com.alpha": "Alpha",
+        "com.remote": "Remote"
+      },
+      "laterNativeIntent": "Move com.native to Native from the retained map",
+      "beforeSavedAssignments": {
+        "com.alpha": "Alpha",
+        "com.native": "Native"
+      },
+      "acceptedBehavior": "Reject the stale complete-map save without writing; reload current assignments and ask for retry."
+    },
+    "otherFrozenWitnesses": "Removed assignment resurrection, newer folder rename replacement, newer favorite order replacement and empty newer favorite order."
+  },
+  "implementation": {
+    "assignmentBoundary": "Compare current logical assignments with expected map and save only on equality, under RemoteCompanionStore.mutationLock.",
+    "homeOrderBoundary": "Same compare/save policy for current canonical home_order; unrelated assignment changes do not conflict with current order.",
+    "genericSetters": "All four generic UserLayout setters use the same lock and retain unconditional whole-field replacement semantics.",
+    "nativeCallSites": {
+      "Home": [
+        "favorite action",
+        "move to folder"
+      ],
+      "Apps": [
+        "favorite menu",
+        "remove from folder",
+        "move to named folder",
+        "favorite picker Done",
+        "rename Save",
+        "edit folder contents"
+      ],
+      "count": 8,
+      "acceptance": "Source-reviewed only; canonical reload/toast and failed-rename navigation qualification."
+    },
+    "retainedContracts": [
+      "keys and codecs",
+      "blank overrides",
+      "offline membership",
+      "exact-case folder names",
+      "component/shortcut identity",
+      "duplicate order normalization",
+      "generic remote replacement",
+      "existing widget policy"
+    ],
+    "sourceBindings": {
+      "app/src/main/java/com/immortal/launcher/UserLayout.kt": {
+        "sha256": "a4aa50d80f339be22762e960b0aa17424187eae2d4392bd44221ba2651031359",
+        "bytes": 8304
+      },
+      "app/src/main/java/com/immortal/launcher/HomeActivity.kt": {
+        "sha256": "c1cdfac9b2662a021c722926b96221060990518e138ebdaed21f09650093df2b",
+        "bytes": 229896
+      },
+      "app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt": {
+        "sha256": "323f748bd12f91532c3ff14f7be0318dca39f7ff366f7d03a52cd51206c67162",
+        "bytes": 33028
+      },
+      "app/src/test/java/com/immortal/launcher/UserLayoutMutationTest.kt": {
+        "sha256": "14083fa259555c561985ec0098bbb949c598b2c27d02f2ffe157f23dac3e05fa",
+        "bytes": 6215
+      },
+      "app/build.gradle.kts": {
+        "sha256": "0bc5e3168a65cd291a34a99700c686eaa0c494625dac9f3e91e79863c76b5849",
+        "bytes": 11816
+      },
+      "app/src/main/java/com/immortal/launcher/RemoteLayoutPolicy.kt": {
+        "sha256": "06020d525fd046cec6e4ab8bba77806d406e4a674f7e063ee5bc4384f07e7384",
+        "bytes": 6414
+      },
+      "app/src/main/java/com/immortal/launcher/RemoteCompanionRoutes.kt": {
+        "sha256": "f037eb4e2ce6bddc77c468198572ca9b2f1a504c5c73e6ed95da2fb4fee51c84",
+        "bytes": 13663
+      },
+      "app/src/main/java/com/immortal/launcher/RemoteCompanionStore.kt": {
+        "sha256": "d3d571ec3528445c37b0036e3fd2562a32a7ca8aeb5ce3955a9187d62b9467aa",
+        "bytes": 12466
+      },
+      "app/src/main/java/com/immortal/launcher/ParsedLayoutSnapshot.kt": {
+        "sha256": "ddd659a11231712d80b2ffcabef275051bf39c11c95643eb991fad9933cf68be",
+        "bytes": 1113
+      }
+    },
+    "focusedReview": {
+      "verdict": "PASS",
+      "passedChecks": 23,
+      "blockers": []
+    }
+  },
+  "baselineQualification": {
+    "extraction": "PASS_STORAGE_TRANSFORM_EQUIVALENCE_WITH_LOCAL_STATE_QUALIFICATIONS",
+    "qualifications": [
+      "This is storage-transform equivalence on normal saves, not full observational Activity/Compose equivalence.",
+      "New wrappers reload canonical decoded state after saving; home-order duplicates are deduplicated by the unchanged serializer/decoder instead of retaining a possibly duplicate local list until a later reload.",
+      "Old callbacks assigned local state before storage save; extracted callbacks assign local state after save and reload. Exception ordering is therefore different and has not been executed.",
+      "No actual baseline test, compiler, native run, UI, network, device, or real remote call was executed by this reviewer.",
+      "Frozen tests exercise generated storage and actual extracted boundary/RemoteLayoutStore, not actual Compose callbacks or phone remote UI."
+    ],
+    "nativeBaseline": "Separately assembled storage-transform equivalent adapter baseline; not untouched original APK or physical UI.",
+    "acceptedArtifact": {
+      "sha256": "b28330774809a2c1e1230797c796c9098471c1fe7203b222dbc83cdd7b976015",
+      "bytes": 51335205,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "package": "com.immortal.launcher.debug",
+      "versionName": "1.121",
+      "versionCode": 115
+    },
+    "untouchedDebugArtifact": {
+      "sha256": "288c54e8229ae423c6cf1f58fc8617825645c9813a36b559a7217157f46ba0ef",
+      "bytes": 46703529,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "versionName": "1.121",
+      "versionCode": 115,
+      "versionMetadataScope": "Coordinator retained rollback metadata; independent full bytes and actual certificate checked here."
+    },
+    "excludedInitialStalePackaging": {
+      "reason": "Combined Gradle baseline-red failed its unit test task before packageDebug/assembleDebug completed. Initially copied on-diskAPK was byteidentical to untouched prior debug; excluded from native admission, not product failure. Separate assembleDebug will create extractedbaseline.",
+      "actualRedTestsRemainValid": true,
+      "notProductRedOrNativeExecution": true
+    }
+  },
+  "jvm": {
+    "actualRed": {
+      "tests": 10,
+      "failures": 5,
+      "errors": 0,
+      "skips": 0,
+      "failedMethods": [
+        "remoteEmptyOrderRejectsRetainedFavoriteDialog",
+        "remoteRenameRejectsStaleRenameOfSameFolder",
+        "remoteAdditionRejectsStaleFolderMoveWithoutWriting",
+        "remoteOrderRejectsStaleFavoriteEditWithoutWriting",
+        "remoteRemovalCannotBeResurrectedByFolderEditor"
+      ],
+      "frozenTestSha256": "14083fa259555c561985ec0098bbb949c598b2c27d02f2ffe157f23dac3e05fa",
+      "actualTerminalExit": 1,
+      "qualifiedBaseline": "Storage-transform equivalent extracted API, independent review qualifies canonical local reload and exception ordering; not untouched original APK nor actual Compose UI"
+    },
+    "actualFinalGate": {
+      "suites": 447,
+      "tests": 4313,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "actualUserLayoutMutationFocusedTests": 10,
+      "allFocusedUnchangedFromRed": true,
+      "qualityGateTerminalExit": 0,
+      "duration": "1m 48s",
+      "debugPerformanceR8AndVitalLint": true
+    },
+    "frozenTestPlan": {
+      "methods": [
+        "remoteAdditionRejectsStaleFolderMoveWithoutWriting",
+        "remoteRemovalCannotBeResurrectedByFolderEditor",
+        "remoteRenameRejectsStaleRenameOfSameFolder",
+        "remoteOrderRejectsStaleFavoriteEditWithoutWriting",
+        "remoteEmptyOrderRejectsRetainedFavoriteDialog",
+        "refreshedFolderRetryKeepsRemoteAndOfflineAssignments",
+        "currentRenameRetainsExistingMembershipRules",
+        "currentOrderPreservesComponentAndShortcutIdentity",
+        "assignmentsChangedAloneDoNotRejectCurrentOrder",
+        "genericRemoteReplacementCanRemoveSavedEntries"
+      ],
+      "frozenTestSha256": "14083fa259555c561985ec0098bbb949c598b2c27d02f2ffe157f23dac3e05fa",
+      "expectedBaselineFailures": [
+        "remoteAdditionRejectsStaleFolderMoveWithoutWriting",
+        "remoteRemovalCannotBeResurrectedByFolderEditor",
+        "remoteRenameRejectsStaleRenameOfSameFolder",
+        "remoteOrderRejectsStaleFavoriteEditWithoutWriting",
+        "remoteEmptyOrderRejectsRetainedFavoriteDialog"
+      ],
+      "expectedControls": [
+        "refreshedFolderRetryKeepsRemoteAndOfflineAssignments",
+        "currentRenameRetainsExistingMembershipRules",
+        "currentOrderPreservesComponentAndShortcutIdentity",
+        "assignmentsChangedAloneDoNotRejectCurrentOrder",
+        "genericRemoteReplacementCanRemoveSavedEntries"
+      ],
+      "nativeUI": "source-only; no physical menu, Android callback delivery or actual HTTP route acknowledgment acceptance"
+    }
+  },
+  "artifacts": {
+    "sha256": "349b301559026e35fabf0e82edb11d218947da5b8dc0edb609591305a1a9adf7",
+    "bytes": 25879086,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.122",
+    "versionCode": 116,
+    "variants": {
+      "performance": {
+        "sha256": "349b301559026e35fabf0e82edb11d218947da5b8dc0edb609591305a1a9adf7",
+        "bytes": 25879086,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.122",
+        "versionCode": 116
+      },
+      "debug": {
+        "sha256": "648bf7075d9a1cde486435dafed1f25e22823042a06a3cb01a84ecbfd9aba2e0",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.122",
+        "versionCode": 116
+      },
+      "rollback": {
+        "sha256": "dd13ab0ca23169f620ab800d8ee32ad4c17661778e269da71f932ca9102499c7",
+        "bytes": 25879086,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.121",
+        "versionCode": 115
+      },
+      "extractedEquivalentDebugBaseline": {
+        "sha256": "b28330774809a2c1e1230797c796c9098471c1fe7203b222dbc83cdd7b976015",
+        "bytes": 51335205,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.121",
+        "versionCode": 115
+      }
+    },
+    "debugSha256": "648bf7075d9a1cde486435dafed1f25e22823042a06a3cb01a84ecbfd9aba2e0",
+    "rollbackSha256": "dd13ab0ca23169f620ab800d8ee32ad4c17661778e269da71f932ca9102499c7",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "1m 48s"
+  },
+  "native": {
+    "scope": "Exact debug APK production storage/policy APIs with strict generated Context/preferences and bounded generic-setter monitor workers.",
+    "baseline": {
+      "status": "FAIL",
+      "passed": 7,
+      "total": 14,
+      "checks": {
+        "remoteAdditionRejectsStaleFolderMoveWithoutWriting": false,
+        "remoteRemovalCannotBeResurrectedByFolderEditor": false,
+        "remoteRenameRejectsStaleRenameOfSameFolder": false,
+        "remoteOrderRejectsStaleFavoriteEditWithoutWriting": false,
+        "remoteEmptyOrderRejectsRetainedFavoriteDialog": false,
+        "refreshedFolderRetryKeepsRemoteAndOfflineAssignments": true,
+        "currentRenameRetainsExistingMembershipRules": true,
+        "currentOrderPreservesComponentAndShortcutIdentity": true,
+        "assignmentsChangedAloneDoNotRejectCurrentOrder": true,
+        "genericRemoteReplacementCanRemoveSavedEntries": true,
+        "genericAssignmentsWaitForCompanionMutationLock": false,
+        "genericOrderWaitForCompanionMutationLock": false,
+        "actualAPKClassLoaderAndExactSignatures": true,
+        "strictGeneratedStoresAndRetiredWorkers": true
+      },
+      "observations": {
+        "remoteAdditionRejectsStaleFolderMoveWithoutWriting": {
+          "returned": true,
+          "expectedReturn": false,
+          "actualAssignments": {
+            "com.alpha": "Alpha",
+            "com.native": "Native"
+          },
+          "expectedAssignments": {
+            "com.alpha": "Alpha",
+            "com.remote": "Remote"
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 1,
+          "matches": false
+        },
+        "remoteRemovalCannotBeResurrectedByFolderEditor": {
+          "returned": true,
+          "expectedReturn": false,
+          "actualAssignments": {
+            "com.offline": "Old",
+            "com.native": ""
+          },
+          "expectedAssignments": {
+            "com.native": "Alpha"
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 1,
+          "matches": false
+        },
+        "remoteRenameRejectsStaleRenameOfSameFolder": {
+          "returned": true,
+          "expectedReturn": false,
+          "actualAssignments": {
+            "com.native": "Local",
+            "com.offline": "Local"
+          },
+          "expectedAssignments": {
+            "com.native": "Remote",
+            "com.offline": "Remote"
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 1,
+          "matches": false
+        },
+        "remoteOrderRejectsStaleFavoriteEditWithoutWriting": {
+          "returned": true,
+          "expectedReturn": false,
+          "actualAssignments": {},
+          "expectedAssignments": {},
+          "actualOrder": [
+            "com.beta/.Main",
+            "com.alpha/.Main"
+          ],
+          "expectedOrder": [
+            "com.remote/.Main",
+            "com.beta/.Main",
+            "com.alpha/.Main"
+          ],
+          "nativeWriteDelta": 1,
+          "matches": false
+        },
+        "remoteEmptyOrderRejectsRetainedFavoriteDialog": {
+          "returned": true,
+          "expectedReturn": false,
+          "actualAssignments": {},
+          "expectedAssignments": {},
+          "actualOrder": [
+            "com.beta/.Main"
+          ],
+          "expectedOrder": [],
+          "nativeWriteDelta": 1,
+          "matches": false
+        },
+        "refreshedFolderRetryKeepsRemoteAndOfflineAssignments": {
+          "returned": true,
+          "expectedReturn": true,
+          "actualAssignments": {
+            "com.remote": "Remote",
+            "com.offline": "Offline",
+            "com.native": ""
+          },
+          "expectedAssignments": {
+            "com.remote": "Remote",
+            "com.offline": "Offline",
+            "com.native": ""
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 1,
+          "matches": true
+        },
+        "currentRenameRetainsExistingMembershipRules": {
+          "returned": true,
+          "expectedReturn": true,
+          "actualAssignments": {
+            "com.native": "Local",
+            "com.offline": "Local",
+            "com.other": "Beta",
+            "com.curated": "Local"
+          },
+          "expectedAssignments": {
+            "com.native": "Local",
+            "com.offline": "Local",
+            "com.other": "Beta",
+            "com.curated": "Local"
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 1,
+          "matches": true
+        },
+        "currentOrderPreservesComponentAndShortcutIdentity": {
+          "returned": true,
+          "expectedReturn": true,
+          "actualAssignments": {},
+          "expectedAssignments": {},
+          "actualOrder": [
+            "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+            "com.alpha/.Other",
+            "com.alpha/.Main"
+          ],
+          "expectedOrder": [
+            "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+            "com.alpha/.Other",
+            "com.alpha/.Main"
+          ],
+          "nativeWriteDelta": 1,
+          "matches": true
+        },
+        "assignmentsChangedAloneDoNotRejectCurrentOrder": {
+          "returned": true,
+          "expectedReturn": true,
+          "actualAssignments": {
+            "com.remote": "Remote"
+          },
+          "expectedAssignments": {
+            "com.remote": "Remote"
+          },
+          "actualOrder": [
+            "com.beta/.Main"
+          ],
+          "expectedOrder": [
+            "com.beta/.Main"
+          ],
+          "nativeWriteDelta": 1,
+          "matches": true
+        },
+        "genericRemoteReplacementCanRemoveSavedEntries": {
+          "actualAssignments": {},
+          "actualOrder": [],
+          "matches": true
+        },
+        "genericAssignmentsWaitForCompanionMutationLock": {
+          "workerName": "generated-user-layout-genericAssignmentsWaitForCompanionMutationLock",
+          "stateWhileLockHeld": "TERMINATED",
+          "generatedContextCallsWhileHeld": 1,
+          "generatedWritesWhileHeld": 1,
+          "generatedWritesAfterRelease": 1,
+          "workerRetired": true,
+          "matches": false
+        },
+        "genericOrderWaitForCompanionMutationLock": {
+          "workerName": "generated-user-layout-genericOrderWaitForCompanionMutationLock",
+          "stateWhileLockHeld": "TERMINATED",
+          "generatedContextCallsWhileHeld": 1,
+          "generatedWritesWhileHeld": 1,
+          "generatedWritesAfterRelease": 1,
+          "workerRetired": true,
+          "matches": false
+        }
+      },
+      "apkSha256": "b28330774809a2c1e1230797c796c9098471c1fe7203b222dbc83cdd7b976015",
+      "actualAPKClassLoader": true,
+      "buildVariant": "debug",
+      "debugOnly": true,
+      "optimizedStorageBoundaryVerified": false,
+      "actualAssignmentsSnapshotInvocations": 5,
+      "actualOrderSnapshotInvocations": 4,
+      "actualRemoteLayoutReadInvocations": 17,
+      "actualRemoteLayoutApplyInvocations": 17,
+      "actualRemoteLayoutValidationInvocations": 17,
+      "actualRenameInvocations": 2,
+      "directUserLayoutLoadInvocations": 31,
+      "actualGenericSetterInvocations": 2,
+      "generatedContexts": 12,
+      "generatedContextPreferenceCalls": 212,
+      "generatedPreferenceReads": 116,
+      "generatedPreferenceEdits": 96,
+      "generatedPreferenceWrites": 96,
+      "generatedWorkers": 2,
+      "generatedWorkersRetired": 2,
+      "proxyFaults": [],
+      "actualRenameMethod": "renamedFolderAssignments$app",
+      "baselineQualification": "Behavior-preserving extracted snapshot adapters; not original untouched APK or UI acceptance",
+      "ownerPreferenceOperations": 0,
+      "originalProviderOperations": 0,
+      "serviceOrUIOperations": 0,
+      "realNetworkOperations": 0,
+      "companionMetadataOperations": 0,
+      "processDefaultsMutated": false
+    },
+    "candidate": {
+      "status": "PASS",
+      "passed": 14,
+      "total": 14,
+      "checks": {
+        "remoteAdditionRejectsStaleFolderMoveWithoutWriting": true,
+        "remoteRemovalCannotBeResurrectedByFolderEditor": true,
+        "remoteRenameRejectsStaleRenameOfSameFolder": true,
+        "remoteOrderRejectsStaleFavoriteEditWithoutWriting": true,
+        "remoteEmptyOrderRejectsRetainedFavoriteDialog": true,
+        "refreshedFolderRetryKeepsRemoteAndOfflineAssignments": true,
+        "currentRenameRetainsExistingMembershipRules": true,
+        "currentOrderPreservesComponentAndShortcutIdentity": true,
+        "assignmentsChangedAloneDoNotRejectCurrentOrder": true,
+        "genericRemoteReplacementCanRemoveSavedEntries": true,
+        "genericAssignmentsWaitForCompanionMutationLock": true,
+        "genericOrderWaitForCompanionMutationLock": true,
+        "actualAPKClassLoaderAndExactSignatures": true,
+        "strictGeneratedStoresAndRetiredWorkers": true
+      },
+      "observations": {
+        "remoteAdditionRejectsStaleFolderMoveWithoutWriting": {
+          "returned": false,
+          "expectedReturn": false,
+          "actualAssignments": {
+            "com.alpha": "Alpha",
+            "com.remote": "Remote"
+          },
+          "expectedAssignments": {
+            "com.alpha": "Alpha",
+            "com.remote": "Remote"
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 0,
+          "matches": true
+        },
+        "remoteRemovalCannotBeResurrectedByFolderEditor": {
+          "returned": false,
+          "expectedReturn": false,
+          "actualAssignments": {
+            "com.native": "Alpha"
+          },
+          "expectedAssignments": {
+            "com.native": "Alpha"
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 0,
+          "matches": true
+        },
+        "remoteRenameRejectsStaleRenameOfSameFolder": {
+          "returned": false,
+          "expectedReturn": false,
+          "actualAssignments": {
+            "com.native": "Remote",
+            "com.offline": "Remote"
+          },
+          "expectedAssignments": {
+            "com.native": "Remote",
+            "com.offline": "Remote"
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 0,
+          "matches": true
+        },
+        "remoteOrderRejectsStaleFavoriteEditWithoutWriting": {
+          "returned": false,
+          "expectedReturn": false,
+          "actualAssignments": {},
+          "expectedAssignments": {},
+          "actualOrder": [
+            "com.remote/.Main",
+            "com.beta/.Main",
+            "com.alpha/.Main"
+          ],
+          "expectedOrder": [
+            "com.remote/.Main",
+            "com.beta/.Main",
+            "com.alpha/.Main"
+          ],
+          "nativeWriteDelta": 0,
+          "matches": true
+        },
+        "remoteEmptyOrderRejectsRetainedFavoriteDialog": {
+          "returned": false,
+          "expectedReturn": false,
+          "actualAssignments": {},
+          "expectedAssignments": {},
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 0,
+          "matches": true
+        },
+        "refreshedFolderRetryKeepsRemoteAndOfflineAssignments": {
+          "returned": true,
+          "expectedReturn": true,
+          "actualAssignments": {
+            "com.remote": "Remote",
+            "com.offline": "Offline",
+            "com.native": ""
+          },
+          "expectedAssignments": {
+            "com.remote": "Remote",
+            "com.offline": "Offline",
+            "com.native": ""
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 1,
+          "matches": true
+        },
+        "currentRenameRetainsExistingMembershipRules": {
+          "returned": true,
+          "expectedReturn": true,
+          "actualAssignments": {
+            "com.native": "Local",
+            "com.offline": "Local",
+            "com.other": "Beta",
+            "com.curated": "Local"
+          },
+          "expectedAssignments": {
+            "com.native": "Local",
+            "com.offline": "Local",
+            "com.other": "Beta",
+            "com.curated": "Local"
+          },
+          "actualOrder": [],
+          "expectedOrder": [],
+          "nativeWriteDelta": 1,
+          "matches": true
+        },
+        "currentOrderPreservesComponentAndShortcutIdentity": {
+          "returned": true,
+          "expectedReturn": true,
+          "actualAssignments": {},
+          "expectedAssignments": {},
+          "actualOrder": [
+            "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+            "com.alpha/.Other",
+            "com.alpha/.Main"
+          ],
+          "expectedOrder": [
+            "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+            "com.alpha/.Other",
+            "com.alpha/.Main"
+          ],
+          "nativeWriteDelta": 1,
+          "matches": true
+        },
+        "assignmentsChangedAloneDoNotRejectCurrentOrder": {
+          "returned": true,
+          "expectedReturn": true,
+          "actualAssignments": {
+            "com.remote": "Remote"
+          },
+          "expectedAssignments": {
+            "com.remote": "Remote"
+          },
+          "actualOrder": [
+            "com.beta/.Main"
+          ],
+          "expectedOrder": [
+            "com.beta/.Main"
+          ],
+          "nativeWriteDelta": 1,
+          "matches": true
+        },
+        "genericRemoteReplacementCanRemoveSavedEntries": {
+          "actualAssignments": {},
+          "actualOrder": [],
+          "matches": true
+        },
+        "genericAssignmentsWaitForCompanionMutationLock": {
+          "workerName": "generated-user-layout-genericAssignmentsWaitForCompanionMutationLock",
+          "stateWhileLockHeld": "BLOCKED",
+          "generatedContextCallsWhileHeld": 0,
+          "generatedWritesWhileHeld": 0,
+          "generatedWritesAfterRelease": 1,
+          "workerRetired": true,
+          "matches": true
+        },
+        "genericOrderWaitForCompanionMutationLock": {
+          "workerName": "generated-user-layout-genericOrderWaitForCompanionMutationLock",
+          "stateWhileLockHeld": "BLOCKED",
+          "generatedContextCallsWhileHeld": 0,
+          "generatedWritesWhileHeld": 0,
+          "generatedWritesAfterRelease": 1,
+          "workerRetired": true,
+          "matches": true
+        }
+      },
+      "apkSha256": "648bf7075d9a1cde486435dafed1f25e22823042a06a3cb01a84ecbfd9aba2e0",
+      "actualAPKClassLoader": true,
+      "buildVariant": "debug",
+      "debugOnly": true,
+      "optimizedStorageBoundaryVerified": false,
+      "actualAssignmentsSnapshotInvocations": 5,
+      "actualOrderSnapshotInvocations": 4,
+      "actualRemoteLayoutReadInvocations": 17,
+      "actualRemoteLayoutApplyInvocations": 17,
+      "actualRemoteLayoutValidationInvocations": 17,
+      "actualRenameInvocations": 2,
+      "directUserLayoutLoadInvocations": 31,
+      "actualGenericSetterInvocations": 2,
+      "generatedContexts": 12,
+      "generatedContextPreferenceCalls": 216,
+      "generatedPreferenceReads": 125,
+      "generatedPreferenceEdits": 91,
+      "generatedPreferenceWrites": 91,
+      "generatedWorkers": 2,
+      "generatedWorkersRetired": 2,
+      "proxyFaults": [],
+      "actualRenameMethod": "renamedFolderAssignments$app",
+      "baselineQualification": "Behavior-preserving extracted snapshot adapters; not original untouched APK or UI acceptance",
+      "ownerPreferenceOperations": 0,
+      "originalProviderOperations": 0,
+      "serviceOrUIOperations": 0,
+      "realNetworkOperations": 0,
+      "companionMetadataOperations": 0,
+      "processDefaultsMutated": false
+    },
+    "processes": {
+      "baseline": {
+        "terminalExit": 1,
+        "stdoutSha256": "042edfc546b9f0fee0509c57913afbab66416174aceace0447ff209c28a43ac4",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutBytes": 5360,
+        "stderrBytes": 0
+      },
+      "candidate": {
+        "terminalExit": 0,
+        "stdoutSha256": "3f2657b8996ebb92cb0771921aa85ee806feb40cb10b66ed03d79f0c83ca452e",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutBytes": 5336,
+        "stderrBytes": 0
+      }
+    },
+    "correctedChecks": [
+      "remoteAdditionRejectsStaleFolderMoveWithoutWriting",
+      "remoteRemovalCannotBeResurrectedByFolderEditor",
+      "remoteRenameRejectsStaleRenameOfSameFolder",
+      "remoteOrderRejectsStaleFavoriteEditWithoutWriting",
+      "remoteEmptyOrderRejectsRetainedFavoriteDialog",
+      "genericAssignmentsWaitForCompanionMutationLock",
+      "genericOrderWaitForCompanionMutationLock"
+    ],
+    "retainedChecks": [
+      "refreshedFolderRetryKeepsRemoteAndOfflineAssignments",
+      "currentRenameRetainsExistingMembershipRules",
+      "currentOrderPreservesComponentAndShortcutIdentity",
+      "assignmentsChangedAloneDoNotRejectCurrentOrder",
+      "genericRemoteReplacementCanRemoveSavedEntries",
+      "actualAPKClassLoaderAndExactSignatures",
+      "strictGeneratedStoresAndRetiredWorkers"
+    ],
+    "actualParents": {
+      "baseline": {
+        "startedAt": "2026-11-03T12:50:42.064991+00:00",
+        "endedAt": "2026-11-03T12:50:48.905039+00:00",
+        "durationSeconds": 6.840048,
+        "actualExit": 0
+      },
+      "candidate": {
+        "startedAt": "2026-11-03T12:51:01.636185+00:00",
+        "endedAt": "2026-11-03T12:51:06.936411+00:00",
+        "durationSeconds": 5.300226,
+        "actualExit": 0
+      }
+    },
+    "actualCompiler": {
+      "startedAt": "2026-11-03T12:50:33.961678+00:00",
+      "endedAt": "2026-11-03T12:50:34.918259+00:00",
+      "durationSeconds": 0.956581,
+      "actualExit": 0
+    },
+    "compilerOutputQualification": "First successful compiler output contains three Java8 obsolescence warnings and unchecked-operation notes.",
+    "normalCleanup": {
+      "baseline": {
+        "parentsRetired": {
+          "baseline": true
+        },
+        "ownedScratchRemoved": true,
+        "faults": [],
+        "ownerPreferenceOperations": 0,
+        "realNetworkOperations": 0,
+        "originalProviderOperations": 0,
+        "buildVariant": "debug",
+        "optimizedStorageBoundaryVerified": false,
+        "serviceOrUIOperations": 0,
+        "companionMetadataOperations": 0,
+        "externalTimeoutFailureCleanupFaultInjected": false
+      },
+      "candidate": {
+        "parentsRetired": {
+          "candidate": true
+        },
+        "ownedScratchRemoved": true,
+        "faults": [],
+        "ownerPreferenceOperations": 0,
+        "realNetworkOperations": 0,
+        "originalProviderOperations": 0,
+        "buildVariant": "debug",
+        "optimizedStorageBoundaryVerified": false,
+        "serviceOrUIOperations": 0,
+        "companionMetadataOperations": 0,
+        "externalTimeoutFailureCleanupFaultInjected": false
+      }
+    },
+    "generatedBindingsWithoutPrivateSerial": {
+      "baseline": {
+        "fixtureSourceSha256": "84d2adc67dad2efdb07051d5dd85a4d650aa9b5b720104bac7e789c109b649ee",
+        "fixtureJarSha256": "0728b7bcc4367f3dcff3d27117176209378e43eec2fb481541887910b5fbbcc1",
+        "compilerSha256": "f4dc6ae5545c62be9fa665285af0f905dee06ee461008a7db6489a9db0d18d44",
+        "runnerSha256": "36a9373f70a337f97ad8ee9e13cb78c8e65d9dbd588551af90818668e23b966f",
+        "phases": [
+          "baseline"
+        ],
+        "apkSha256": {
+          "baseline": "b28330774809a2c1e1230797c796c9098471c1fe7203b222dbc83cdd7b976015"
+        },
+        "buildVariant": "debug",
+        "optimizedStorageBoundaryVerified": false,
+        "scope": "Actual extracted debug snapshot adapters and generic setters over generated Context/preferences, actual RemoteLayoutStore/policy/companion monitor; behavior-preserving extracted baseline, not original untouched APK or native UI/HTTP acceptance"
+      },
+      "candidate": {
+        "fixtureSourceSha256": "84d2adc67dad2efdb07051d5dd85a4d650aa9b5b720104bac7e789c109b649ee",
+        "fixtureJarSha256": "0728b7bcc4367f3dcff3d27117176209378e43eec2fb481541887910b5fbbcc1",
+        "compilerSha256": "f4dc6ae5545c62be9fa665285af0f905dee06ee461008a7db6489a9db0d18d44",
+        "runnerSha256": "36a9373f70a337f97ad8ee9e13cb78c8e65d9dbd588551af90818668e23b966f",
+        "phases": [
+          "candidate"
+        ],
+        "apkSha256": {
+          "candidate": "648bf7075d9a1cde486435dafed1f25e22823042a06a3cb01a84ecbfd9aba2e0"
+        },
+        "buildVariant": "debug",
+        "optimizedStorageBoundaryVerified": false,
+        "scope": "Actual extracted debug snapshot adapters and generic setters over generated Context/preferences, actual RemoteLayoutStore/policy/companion monitor; behavior-preserving extracted baseline, not original untouched APK or native UI/HTTP acceptance"
+      }
+    },
+    "structuralAdmission": {
+      "verdict": "PASS",
+      "blockers": [],
+      "summary": "Both debug APKs admit exact INSTANCE/public signatures. Candidate optimized UserLayout retains static renamed assignments g(Context,Map,Map):Boolean and order i(Context,List,ArrayList):Boolean; INSTANCE is removed. Optimized RemoteLayoutStore and RemoteCompanionStore declarations are absent; RemoteCompanionValidation.getValid is absent. The exact frozen fixture cannot admit optimized APKs and was not run against them.",
+      "actualOptimizedBoundaryCalls": 0,
+      "keepRulesChanged": false,
+      "fullReport": {
+        "sha256": "60a7bb11b3fd7e0b56e399eba0cf6c4d7b669b1d2d26d2b6e89857e0985cce1a",
+        "bytes": 45414
+      }
+    },
+    "independentGateReview": {
+      "verdict": "PASS",
+      "passedChecks": 46,
+      "totalChecks": 46,
+      "blockers": [],
+      "binding": {
+        "sha256": "136e195f68633e9cb0fae7338c573a1fdae5afb2422cb7231590a11ea52cd789",
+        "bytes": 19295
+      },
+      "artifactSupplementBinding": {
+        "sha256": "e7aaa4181280272bbdf30619c33bcf7f8f76b76de57428a2fdd3d95384f7885e",
+        "bytes": 2709
+      }
+    }
+  },
+  "delivery": {
+    "versionName": "1.122",
+    "versionCode": 116,
+    "fullApkSha256": "349b301559026e35fabf0e82edb11d218947da5b8dc0edb609591305a1a9adf7",
+    "rooms": {
+      "family": {
+        "helperExit": 0,
+        "installedFullSha256Verified": true,
+        "screensaverRequested": true
+      },
+      "living": {
+        "helperExit": 0,
+        "installedFullSha256Verified": true,
+        "screensaverRequested": true
+      }
+    },
+    "actualObservationTerminals": {
+      "preflight": {
+        "startedAt": "2026-11-03T12:46:05.978694+00:00",
+        "endedAt": "2026-11-03T12:46:07.101775+00:00",
+        "durationSeconds": 1.123081,
+        "actualExit": 0
+      },
+      "deploy": {
+        "startedAt": "2026-11-03T12:54:49.657256+00:00",
+        "endedAt": "2026-11-03T12:55:03.239222+00:00",
+        "durationSeconds": 13.581966,
+        "actualExit": 0
+      },
+      "postflight": {
+        "startedAt": "2026-11-03T12:55:07.835536+00:00",
+        "endedAt": "2026-11-03T12:55:08.956866+00:00",
+        "durationSeconds": 1.12133,
+        "actualExit": 0
+      },
+      "health": {
+        "startedAt": "2026-11-03T12:55:07.844832+00:00",
+        "endedAt": "2026-11-03T12:55:08.570153+00:00",
+        "durationSeconds": 0.725321,
+        "actualExit": 0
+      },
+      "screenshot": {
+        "startedAt": "2026-11-03T12:55:15.995960+00:00",
+        "endedAt": "2026-11-03T12:55:18.860120+00:00",
+        "durationSeconds": 2.86416,
+        "actualExit": 0
+      },
+      "credentialCleanup": {
+        "startedAt": "2026-11-03T12:56:04.467149+00:00",
+        "endedAt": "2026-11-03T12:56:04.542423+00:00",
+        "durationSeconds": 0.075274,
+        "actualExit": 0
+      },
+      "versionGuard": {
+        "startedAt": "2026-11-03T12:52:09.988030+00:00",
+        "endedAt": "2026-11-03T12:52:10.025946+00:00",
+        "durationSeconds": 0.037916,
+        "actualExit": 1
+      },
+      "layoutBefore": {
+        "startedAt": "2026-11-03T12:51:51.571134+00:00",
+        "endedAt": "2026-11-03T12:51:51.719877+00:00",
+        "durationSeconds": 0.148743,
+        "actualExit": 0
+      },
+      "layoutAfter": {
+        "startedAt": "2026-11-03T12:55:07.835619+00:00",
+        "endedAt": "2026-11-03T12:55:07.926487+00:00",
+        "durationSeconds": 0.090868,
+        "actualExit": 0
+      }
+    }
+  },
+  "preservation": {
+    "completeMapsAndFamilyState": {
+      "family": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true,
+        "fontUnchanged": true,
+        "accessibilityUnchanged": true,
+        "originalChromeTaskRetained": true,
+        "photoFrameResumed": true,
+        "displayOn": true,
+        "installedFullSha256Matches": true
+      },
+      "living": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true
+      }
+    },
+    "preferenceStateCounts": {
+      "family": {
+        "states": 12,
+        "presentByteIdentical": 11,
+        "unchangedAbsent": 1
+      },
+      "living": {
+        "states": 12,
+        "presentByteIdentical": 8,
+        "unchangedAbsent": 4
+      }
+    },
+    "additionalTouchedLayout": {
+      "before": {
+        "rooms": {
+          "family": {
+            "present": true
+          },
+          "living": {
+            "present": true
+          }
+        },
+        "scope": "Additional touched UserLayout preference file; read-only captures before deployment and after; existing eleven preference states unchanged."
+      },
+      "after": {
+        "rooms": {
+          "family": {
+            "present": true,
+            "byteIdentical": true
+          },
+          "living": {
+            "present": true,
+            "byteIdentical": true
+          }
+        },
+        "scope": "Additional touched UserLayout preference file; read-only captures before deployment and after; existing eleven preference states unchanged."
+      }
+    },
+    "rawCaptureBindings": {
+      "family-before-private.json": {
+        "sha256": "ffc5e1e5bce8ea1178d19ac5f6118a5a16f6439160546b86ddddf7d803fe7ca3",
+        "bytes": 62666
+      },
+      "family-prefs-before-private.json": {
+        "sha256": "66de9133c87de6d7f0d2996fa2e8ad0a3b39adc145d0521271326b47478901f1",
+        "bytes": 12670
+      },
+      "family-layout-prefs-before-private.json": {
+        "sha256": "70daf309dc8fdd53d923ec5daf60cd723662ee739bce874331b13e92d5182035",
+        "bytes": 2686
+      },
+      "family-after-private.json": {
+        "sha256": "236fce90f08eb0691678af477ba2dae59b4b5abea161c7c66fb8d6f6d4c55ac1",
+        "bytes": 62667
+      },
+      "family-prefs-after-private.json": {
+        "sha256": "66de9133c87de6d7f0d2996fa2e8ad0a3b39adc145d0521271326b47478901f1",
+        "bytes": 12670
+      },
+      "family-layout-prefs-after-private.json": {
+        "sha256": "70daf309dc8fdd53d923ec5daf60cd723662ee739bce874331b13e92d5182035",
+        "bytes": 2686
+      },
+      "living-before-private.json": {
+        "sha256": "e0dff71ca97b2470b3709b3696b8170efb9df6eeb49785f8de98828dd1089f6d",
+        "bytes": 62554
+      },
+      "living-prefs-before-private.json": {
+        "sha256": "27e2fa090caf1e2375f27a344e0064b68730c0b8f969b0d9477f8037371980a5",
+        "bytes": 11370
+      },
+      "living-layout-prefs-before-private.json": {
+        "sha256": "70daf309dc8fdd53d923ec5daf60cd723662ee739bce874331b13e92d5182035",
+        "bytes": 2686
+      },
+      "living-after-private.json": {
+        "sha256": "811feff21e5d68e5f87604322ea034e7a073f60e0b3974b018921c60bd3b9353",
+        "bytes": 62554
+      },
+      "living-prefs-after-private.json": {
+        "sha256": "27e2fa090caf1e2375f27a344e0064b68730c0b8f969b0d9477f8037371980a5",
+        "bytes": 11370
+      },
+      "living-layout-prefs-after-private.json": {
+        "sha256": "70daf309dc8fdd53d923ec5daf60cd723662ee739bce874331b13e92d5182035",
+        "bytes": 2686
+      }
+    },
+    "independentReviewBinding": {
+      "sha256": "3092f8d6a8162c809e337314daae04abc260ad0b1a9c44149e7d9c75e6fc0550",
+      "bytes": 4278
+    },
+    "familyCurrentFrameObservation": {
+      "reviewedByCoordinator": true,
+      "familyCurrentFrameVisible": true,
+      "description": "Current photo frame with white 4:55 clock, Tue Nov3 date, Weather overlay and debug badge; screenshot retained privately.",
+      "captureSha256": "35e3fec634dcdd99a1e238e3c9b1976198872aec93e7ddb90f9b751f5b940c84",
+      "captureBytes": 3375969,
+      "userLayoutEditorAcceptance": false,
+      "livingVisualAcceptance": false,
+      "scope": "Current Family frame only; no physical launcher folder/favorite editor, original foreground page-state or natural Dream recovery acceptance."
+    },
+    "ownerImagePublished": false,
+    "limitedHealth": {
+      "rooms": {
+        "family": {
+          "diagHttp200": true,
+          "diagIsObject": true,
+          "logcatHttp200": true,
+          "recentLogLines": 1645,
+          "fatalOrAnrMarkers": 0
+        },
+        "living": {
+          "diagHttp200": true,
+          "diagIsObject": true,
+          "logcatHttp200": true,
+          "recentLogLines": 2023,
+          "fatalOrAnrMarkers": 0
+        }
+      },
+      "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+    },
+    "credentials": {
+      "originalRegistryHashesUnchanged": true,
+      "ownedCopiedRegistryRemoved": true,
+      "originalRegistryEdited": false
+    },
+    "publicManifestAndNativeCli": {
+      "publicManifestVersion": {
+        "versionCode": 77,
+        "versionName": "1.83"
+      },
+      "version.json": {
+        "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+        "bytes": 310
+      },
+      "provisioning/fleetctl": {
+        "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+        "bytes": 694352
+      }
+    },
+    "expectedVersionGuardExit": 1
+  },
+  "backlog": {
+    "tasks": 98,
+    "counts": {
+      "delivered": 63,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "priorTaskObjects": 97,
+    "allPriorObjectsIdentical": true,
+    "priorRawTaskSuffixByteIdentical": true,
+    "priorRawTaskSuffixBytes": 316660,
+    "priorRawTaskSuffixSha256": "4b3e84623b25b2850f2a4b0f2f537f90960687ec67dd02646a95b0a39159566c",
+    "defaultTask": "weather-native-layout",
+    "defaultUnchanged": true,
+    "onlyBoundaryChange": "Current room version1.121/code115 to1.122/code116",
+    "otherTopLevelKeysUnchanged": true,
+    "originalClock": {
+      "startedAt": "2026-11-03T12:41:33Z",
+      "deadline": "2026-11-03T13:11:33Z",
+      "originalIndependentAuditClockRetained": true
+    }
+  },
+  "documents": {
+    "bindings": {
+      "docs/portal-user-layout-save-conflicts-2026-11-03.md": {
+        "sha256": "d7729bba77fac9baf77790874c4eb693ec8ca2ff64c0493f190d71d32485b2a2",
+        "bytes": 6573
+      },
+      "docs/portal-product-operating-state.md": {
+        "sha256": "f00959783fdee48aff216e083b660637677c80cbfa0f57489a8f34215a58ce0a",
+        "bytes": 146725
+      },
+      "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+        "sha256": "1b7974769a23115d723e58b6a9d2375681a042ef83f30f1a8c158b0f1f26f98a",
+        "bytes": 322986
+      },
+      "mocks/portal-widget-gallery-20261102/roadmap/index.html": {
+        "sha256": "18045c74106342204b3ae13fd8a4462d88beb7aa909bba231872eafc8aaf2913",
+        "bytes": 24426
+      }
+    },
+    "futureClosingQa": "Actual documentation/browser closing review and commit are bound separately; no future QA claim in this proof."
+  },
+  "limits": [
+    "Actual red uses storage-transform equivalent extracted snapshot boundaries, not the untouched prior APK or physical native menus. Canonical local reload and exception ordering are qualified.",
+    "Eight native menu actions and conflict reload/toast/navigation are source-reviewed only. Physical Home/Apps edits, real remote HTTP acknowledgment, phone workflow and API28 acceptance remain unverified.",
+    "Optimized snapshot methods survive as renamed static methods; this exact debug fixture requires unavailable singleton, store declarations and validation getter. Zero optimized boundary calls and no keep changes.",
+    "Generated preference and Context operations are real fixture-local operations. No owner preferences, original provider, service/UI, real network or companion metadata operation occurs in the accepted native fixture.",
+    "Shared monitor controls cover two generated generic setter workers. Raw preference writers, multiprocess races, natural notification delivery, disk durability and universal concurrency remain outside the claim.",
+    "Two accepted native parents and scratch retire normally; external timeout and fault cleanup remain unverified.",
+    "Living visual acceptance remains open. Limited diagnostics do not establish complete runtime health.",
+    "Existing widgets, parsed layout cache, folder naming, Chime and every older held or exhausted issue retain their original clocks."
+  ],
+  "privateEvidenceBindings": {
+    "full-gate-terminal.json": {
+      "sha256": "2112448d654d21214e6a538393aa59945d1b238acac16438e87f9250dacadc60",
+      "bytes": 327
+    },
+    "full-gate.log": {
+      "sha256": "143fbd132141bea646375000cc2f84c097295f75062e1aa3bffb6314882b12a5",
+      "bytes": 14042
+    },
+    "jvm.json": {
+      "sha256": "ed89556a1ce86601af5a551d30e88c07efa134d773c163b418203a36ddafaad8",
+      "bytes": 265
+    },
+    "artifact.json": {
+      "sha256": "22d0fa4f897a6a7d0037adc601714cd15121d481e34c77d1e5a411ba20d2dfc2",
+      "bytes": 1870
+    },
+    "package-proof.py": {
+      "sha256": "21e3f5628698017d35e1bb5811b7c8c62ebdd0f5a2f64f768b65a6a6922b9f12",
+      "bytes": 3906
+    },
+    "source-hashes.json": {
+      "sha256": "786709af3836408acbf65092e3c5a6be8eab08a4b2a0a04d22b0ad4bdb3a82c7",
+      "bytes": 628
+    },
+    "baseline-freeze.json": {
+      "sha256": "61e6060757f4e8d116adecefea0dba6ad979d5197df2cab96b192345fda821dc",
+      "bytes": 1283
+    },
+    "baseline-red.xml": {
+      "sha256": "b6f803b8089f0fdf7e6ed70471c61f46518fae22d198e846f63fbb9ff6be17b9",
+      "bytes": 23171
+    },
+    "baseline-red.json": {
+      "sha256": "498bfb9927c689d420d5a1f803acb5f680724125e256e7ee1c5aee16966e5958",
+      "bytes": 673
+    },
+    "baseline-red-terminal.json": {
+      "sha256": "9539d2843834ac5e708ab1dc57a6c3684ef2b51983743da89b566d108e07a571",
+      "bytes": 329
+    },
+    "baseline-assembly-terminal.json": {
+      "sha256": "2ea2da768fe659f02ea5b142db125b906ad8e02ddc108204110d2f651146d186",
+      "bytes": 231
+    },
+    "baseline-extracted-artifact.json": {
+      "sha256": "6d5447e707c8223a5d1ab3fb745badddae6b5cd8aeffae06965440763a6b5746",
+      "bytes": 419
+    },
+    "baseline-packaging-admission-correction.json": {
+      "sha256": "0714903b599ba5b573d58947fc0eb084dbbf9b848891477990ec6807a87a74fa",
+      "bytes": 419
+    },
+    "baseline-extraction-review.json": {
+      "sha256": "8ba16ac5c07da57d04ddf615110f8a10a2674e951ea0ec67ac5c64e3fa0ee861",
+      "bytes": 4357
+    },
+    "baseline-boundary-review.json": {
+      "sha256": "8a0a1e008d7c86cd3148092d433afc3de1ae2e9f70d801fdb48ebd4abbd9d1b4",
+      "bytes": 2684
+    },
+    "focused-source-review.json": {
+      "sha256": "8c718205c568e2cba6be0158f44f298592034a6768d5474705aa99d54c7ae8df",
+      "bytes": 5580
+    },
+    "native-author-initial.json": {
+      "sha256": "9ff876be10ec33d79b0ab7777fd62b05576e24b7628245e026aea10a38934451",
+      "bytes": 1356
+    },
+    "native-author-freeze.json": {
+      "sha256": "1ea1e8d32597ec4c96403397b6d0031906dd4b0b02df15ee49ffae353be0f5e5",
+      "bytes": 2065
+    },
+    "NativeUserLayoutSnapshots.java": {
+      "sha256": "84d2adc67dad2efdb07051d5dd85a4d650aa9b5b720104bac7e789c109b649ee",
+      "bytes": 21002
+    },
+    "build-layout-native.py": {
+      "sha256": "f4dc6ae5545c62be9fa665285af0f905dee06ee461008a7db6489a9db0d18d44",
+      "bytes": 2762
+    },
+    "run-layout-native.py": {
+      "sha256": "36a9373f70a337f97ad8ee9e13cb78c8e65d9dbd588551af90818668e23b966f",
+      "bytes": 11671
+    },
+    "native-compile-terminal.json": {
+      "sha256": "73858e7aa631843c39c25c4fed9e8ad4608a76d2eed46ce2e001f05b074d1d57",
+      "bytes": 510
+    },
+    "native-compile.log": {
+      "sha256": "6029bbc3d8b6173d9394fce9e712cd2ee1a1e8c17401c214af9f6d855683ec1c",
+      "bytes": 1007
+    },
+    "native-layout-compiled/fixture.jar": {
+      "sha256": "0728b7bcc4367f3dcff3d27117176209378e43eec2fb481541887910b5fbbcc1",
+      "bytes": 12213
+    },
+    "native-layout-compiled/compile-binding.json": {
+      "sha256": "c2314d0e6ba51700ec2db49e6f5199efa4ea9f64f5d600b142f27375e39d56d0",
+      "bytes": 584
+    },
+    "native-layout-compiled/OWNER": {
+      "sha256": "3c2e5f5894541427542970e3ac1b8ee7b54f11d4944fc6f1a918e1b13e2de15d",
+      "bytes": 38
+    },
+    "independent-layout-native-admission.json": {
+      "sha256": "60a7bb11b3fd7e0b56e399eba0cf6c4d7b669b1d2d26d2b6e89857e0985cce1a",
+      "bytes": 45414
+    },
+    "independent-full-jvm-manifest.json": {
+      "sha256": "4e15a29543f464c6b08166aa85abdf2fc42492b3492501a9c140c812651c0f33",
+      "bytes": 177180
+    },
+    "cohort.json": {
+      "sha256": "675043edd47df39d7923e62171d37b4b5cf88a99518efd093f8525d9e645fae4",
+      "bytes": 439
+    },
+    "baseline-layout-native-result.json": {
+      "sha256": "205d54cc023a3a5dc5daa3126431e26bf9eaedfd07c7d86297c20d94da1a41fc",
+      "bytes": 6946
+    },
+    "baseline-layout-native-process.json": {
+      "sha256": "f45fe65f6a8ae75fbd4c60e6d9df937c1dbb177f3873bdced548909d43698377",
+      "bytes": 239
+    },
+    "baseline-layout-native-stdout-private.txt": {
+      "sha256": "042edfc546b9f0fee0509c57913afbab66416174aceace0447ff209c28a43ac4",
+      "bytes": 5360
+    },
+    "baseline-layout-native-stderr-private.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "layout-native-binding-baseline.json": {
+      "sha256": "3897a6ee85e84b35db4f4788be827402218c675504eae562a0c8c781d5ceb6f1",
+      "bytes": 862
+    },
+    "layout-native-cleanup-baseline.json": {
+      "sha256": "911a318768e2696bf9da5bba34835dc492281daf6d479d661d7e8f27b4eb2da9",
+      "bytes": 390
+    },
+    "native-baseline-terminal.json": {
+      "sha256": "81b81900b962e065544f2bfb0fcc1f0c8be0a376aaa6ce1270c561cb86e4b90f",
+      "bytes": 334
+    },
+    "candidate-layout-native-result.json": {
+      "sha256": "668b030865917be1fdd886b8e2265f05c7f36e16ac6e45b1c0a72151109bc5ca",
+      "bytes": 6905
+    },
+    "candidate-layout-native-process.json": {
+      "sha256": "bef0843b73a306fc8762283ea67a3e07fd60011b60bf279e10ad35a6dcf30254",
+      "bytes": 239
+    },
+    "candidate-layout-native-stdout-private.txt": {
+      "sha256": "3f2657b8996ebb92cb0771921aa85ee806feb40cb10b66ed03d79f0c83ca452e",
+      "bytes": 5336
+    },
+    "candidate-layout-native-stderr-private.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "layout-native-binding-candidate.json": {
+      "sha256": "a0d222ca16362b543e9b89921dc560098aa42c64f78131329be1cca764943229",
+      "bytes": 864
+    },
+    "layout-native-cleanup-candidate.json": {
+      "sha256": "737d0f473f12ef039c1b5e7fcbbb0247ff683adb4808e5383d96c71c3739fb22",
+      "bytes": 391
+    },
+    "native-candidate-terminal.json": {
+      "sha256": "8915af156f4aa1f60c75b26fb9d0c7876206d0fba0fdb1a4419734c460679a44",
+      "bytes": 433
+    },
+    "gate-native-review.json": {
+      "sha256": "136e195f68633e9cb0fae7338c573a1fdae5afb2422cb7231590a11ea52cd789",
+      "bytes": 19295
+    },
+    "excluded-stale-before-baseline-assembly-baseline-extracted-artifact.json": {
+      "sha256": "715a5093059284729d059c363226a8963c39bfe5b82acb18d2c1a72ca1068d98",
+      "bytes": 282
+    },
+    "excluded-stale-before-baseline-assembly-baseline-extracted-debug-1.121.apk": {
+      "sha256": "288c54e8229ae423c6cf1f58fc8617825645c9813a36b559a7217157f46ba0ef",
+      "bytes": 46703529
+    },
+    "baseline-extracted-debug-1.121.apk": {
+      "sha256": "b28330774809a2c1e1230797c796c9098471c1fe7203b222dbc83cdd7b976015",
+      "bytes": 51335205
+    },
+    "user-layout-audit.json": {
+      "sha256": "4a77f7221ca2a931602d60d383b2f54c5ed95208bd2d91c4c82bb6185d81d00c",
+      "bytes": 10965
+    },
+    "chime-scheduling-config-audit.json": {
+      "sha256": "b794db8e6150c324b9a1fe82a770983ac687db61ad92f6957e8c84795e607608",
+      "bytes": 6115
+    },
+    "frozen-test-plan.json": {
+      "sha256": "c66f8ab0b6536d0318f37ec10f020e1979c085d65f59a3fde409f3b7e986e9d0",
+      "bytes": 1391
+    },
+    "baseline-red.log": {
+      "sha256": "98c20969e665877558bcf59bed913bbb9e47ea6097e0033f2419309a3b91c651",
+      "bytes": 5198
+    },
+    "baseline-assembly.log": {
+      "sha256": "887480c9523881f18f5bb0fd1e6b9bbcdaa9e70f80dc3954cb44fa7ca570916d",
+      "bytes": 2434
+    },
+    "gate-native-review-artifact-supplement.json": {
+      "sha256": "e7aaa4181280272bbdf30619c33bcf7f8f76b76de57428a2fdd3d95384f7885e",
+      "bytes": 2709
+    },
+    "independent-layout-native-admission-full-details.json": {
+      "sha256": "5c569777a92b1791272986656361598ec4cd77f65efd13611d8256fc51f5254d",
+      "bytes": 108538
+    },
+    "independent-room-preservation-review.json": {
+      "sha256": "3092f8d6a8162c809e337314daae04abc260ad0b1a9c44149e7d9c75e6fc0550",
+      "bytes": 4278
+    },
+    "deploy-results.json": {
+      "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31",
+      "bytes": 231
+    },
+    "deployment-terminal.json": {
+      "sha256": "145904decad9459e88556e3bc5c3e235c828940d272772cabe2d4aff992d5d6b",
+      "bytes": 252
+    },
+    "deployment.log": {
+      "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31",
+      "bytes": 231
+    },
+    "preflight-terminal.json": {
+      "sha256": "90f4a3d61db188ee8923aa0e6d3f34e5a798279cf34be934bc5ee992421e128e",
+      "bytes": 264
+    },
+    "preservation.json": {
+      "sha256": "2de61275dfa1480b50994ef53e781f275c02efce4e91569504dfda44473a7ed6",
+      "bytes": 718
+    },
+    "postflight-terminal.json": {
+      "sha256": "9382281d265ad593720495d2fa622064f3492d698df7f8889a503c7971c704d0",
+      "bytes": 262
+    },
+    "health.json": {
+      "sha256": "6fa009293a3b4750ddd2d0d7967663790a0ca4c8db68230a43c04ccc8c0e1ed0",
+      "bytes": 579
+    },
+    "observation-terminal.json": {
+      "sha256": "2c9e70a56316873298e83b8b6259d24b35d688de5e9ba6319f34ad415014bd3e",
+      "bytes": 252
+    },
+    "visual-review.json": {
+      "sha256": "2e46532314cfeaa6aaa3e0998eb635747c5d0eb1eda8be581bc08023b552cb60",
+      "bytes": 558
+    },
+    "family-capture-terminal.json": {
+      "sha256": "7f7b4741199df9a5014bfe432e14a1b160901af6017e48adcbd05aede51e3a63",
+      "bytes": 258
+    },
+    "family-after.png": {
+      "sha256": "35e3fec634dcdd99a1e238e3c9b1976198872aec93e7ddb90f9b751f5b940c84",
+      "bytes": 3375969
+    },
+    "credential-cleanup.json": {
+      "sha256": "584d00c535583d9f5c6f035e521ab6f64eefddfd75629ef4a3518d05d6a25d76",
+      "bytes": 119
+    },
+    "credential-cleanup-terminal.json": {
+      "sha256": "c2f85daec99cf8b17b939af4671b99b37ebcd4cc27cd2b5b03f9ad99aee0dca2",
+      "bytes": 264
+    },
+    "registry-digests-private.json": {
+      "sha256": "f6a7c39e541fbd6746646de8b96240a4f41c743077eb3a898f9bfbe30ab6aa6c",
+      "bytes": 189
+    },
+    "version-guard-terminal.json": {
+      "sha256": "5cff53f48d4a1938fd30505740346b06ebf2d5aaf923eecda9eebd6b69fab319",
+      "bytes": 218
+    },
+    "layout-preference-before.json": {
+      "sha256": "1842471266777b05c2918ba6da62d9561d6fc1d8a3d3089a12c76ba5ae64be68",
+      "bytes": 264
+    },
+    "layout-preference-after.json": {
+      "sha256": "bb6c6c64d415a7ef2c64cd8a4ab95c24bf3096576c2b67be117205c362e4bf3d",
+      "bytes": 322
+    },
+    "layout-preference-before-terminal.json": {
+      "sha256": "35d81fa479812f6c13c6c006051441dfa633f9026d91182863ec2a1fb7e1a659",
+      "bytes": 289
+    },
+    "layout-preference-after-terminal.json": {
+      "sha256": "1cdf0690084cc6ede48184075f7a9b7f6c43d1eb5a98b3f9cc7f7d0e2d0dcaa0",
+      "bytes": 288
+    },
+    "layout-preference-preservation.py": {
+      "sha256": "0b62a37e265161bd2992dc58cdc640b34d34de05b622ea424822fae6a064b1f7",
+      "bytes": 913
+    },
+    "documentation-before.json": {
+      "sha256": "d6de7409b22687cca0c5015d569631b354edb6d127cf920e585573b6377ba12a",
+      "bytes": 837
+    },
+    "documentation-boundary-baseline.json": {
+      "sha256": "51d809b008a50bfb1cb14b5709fd923cc608e4c9fd994c45c96784a5e73ebeb4",
+      "bytes": 346
+    },
+    "backlog-preservation.json": {
+      "sha256": "d9bd2755a05bc7a6a17f244120f1e405bc1e0754570741257fe4f48bedee69ae",
+      "bytes": 712
+    },
+    "documentation-written.json": {
+      "sha256": "455faa63b952ff03d0bb1c26ac884b69bcdbb3b742ddbc2c373e1a18de9851ea",
+      "bytes": 863
+    },
+    "write-docs.py": {
+      "sha256": "e56dd83e7ae4f24a9a96447d1d8e2221b51c16a880a0bbf90922a427e4e96c41",
+      "bytes": 32769
+    },
+    "write-proof.py": {
+      "sha256": "88eeb1aa006a88e9ea50337e0a15528c9a1ccaf52f887bb467941e3f068589e8",
+      "bytes": 14783
+    },
+    "family-before-private.json": {
+      "sha256": "ffc5e1e5bce8ea1178d19ac5f6118a5a16f6439160546b86ddddf7d803fe7ca3",
+      "bytes": 62666
+    },
+    "family-prefs-before-private.json": {
+      "sha256": "66de9133c87de6d7f0d2996fa2e8ad0a3b39adc145d0521271326b47478901f1",
+      "bytes": 12670
+    },
+    "family-layout-prefs-before-private.json": {
+      "sha256": "70daf309dc8fdd53d923ec5daf60cd723662ee739bce874331b13e92d5182035",
+      "bytes": 2686
+    },
+    "family-after-private.json": {
+      "sha256": "236fce90f08eb0691678af477ba2dae59b4b5abea161c7c66fb8d6f6d4c55ac1",
+      "bytes": 62667
+    },
+    "family-prefs-after-private.json": {
+      "sha256": "66de9133c87de6d7f0d2996fa2e8ad0a3b39adc145d0521271326b47478901f1",
+      "bytes": 12670
+    },
+    "family-layout-prefs-after-private.json": {
+      "sha256": "70daf309dc8fdd53d923ec5daf60cd723662ee739bce874331b13e92d5182035",
+      "bytes": 2686
+    },
+    "living-before-private.json": {
+      "sha256": "e0dff71ca97b2470b3709b3696b8170efb9df6eeb49785f8de98828dd1089f6d",
+      "bytes": 62554
+    },
+    "living-prefs-before-private.json": {
+      "sha256": "27e2fa090caf1e2375f27a344e0064b68730c0b8f969b0d9477f8037371980a5",
+      "bytes": 11370
+    },
+    "living-layout-prefs-before-private.json": {
+      "sha256": "70daf309dc8fdd53d923ec5daf60cd723662ee739bce874331b13e92d5182035",
+      "bytes": 2686
+    },
+    "living-after-private.json": {
+      "sha256": "811feff21e5d68e5f87604322ea034e7a073f60e0b3974b018921c60bd3b9353",
+      "bytes": 62554
+    },
+    "living-prefs-after-private.json": {
+      "sha256": "27e2fa090caf1e2375f27a344e0064b68730c0b8f969b0d9477f8037371980a5",
+      "bytes": 11370
+    },
+    "living-layout-prefs-after-private.json": {
+      "sha256": "70daf309dc8fdd53d923ec5daf60cd723662ee739bce874331b13e92d5182035",
+      "bytes": 2686
+    }
+  },
+  "privacy": {
+    "rawOwnerMapsOrPreferenceValuesIncluded": false,
+    "registryOrCredentialValuesIncluded": false,
+    "nativeSerialIncluded": false,
+    "terminalArgumentsIncluded": false,
+    "ownerScreenshotPublished": false
+  }
+}

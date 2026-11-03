@@ -1129,6 +1129,20 @@ private fun LauncherScreen(
   val room = remember(appsRefreshKey) { FleetConfig.name(context) }
   var assignments by remember { mutableStateOf(UserLayout.load(context)) }
   var order by remember { mutableStateOf(UserLayout.loadOrder(context)) }
+  fun saveAssignments(updated: Map<String, String>): Boolean {
+    val saved = UserLayout.saveAssignmentsFromSnapshot(context, assignments, updated)
+    assignments = UserLayout.load(context)
+    if (!saved) Toast.makeText(context,
+        "Folders changed on another screen. Review the layout and try again.", Toast.LENGTH_LONG).show()
+    return saved
+  }
+  fun saveAppOrder(updated: List<String>): Boolean {
+    val saved = UserLayout.saveOrderFromSnapshot(context, order, updated)
+    order = UserLayout.loadOrder(context)
+    if (!saved) Toast.makeText(context,
+        "Favorites changed on another screen. Review the layout and try again.", Toast.LENGTH_LONG).show()
+    return saved
+  }
   LaunchedEffect(selectedTab) {
     showSearch = false
     showSleep = false
@@ -1452,11 +1466,11 @@ private fun LauncherScreen(
             onFavorite = {
               val id = app.component.flattenToString()
               val all = orderedApps.map { it.component.flattenToString() }.filterNot { it == id }
-              order = if (favorites.any { it.component == app.component }) all + id else listOf(id) + all
-              UserLayout.saveOrder(context, order); appMenu = null
+              saveAppOrder(if (favorites.any { it.component == app.component }) all + id else listOf(id) + all)
+              appMenu = null
             }, onFolder = { target ->
-              assignments = assignments + (app.component.packageName to target)
-              UserLayout.save(context, assignments); appMenu = null
+              saveAssignments(assignments + (app.component.packageName to target))
+              appMenu = null
             }, onUninstall = { appMenu = null; onUninstall(app.component.packageName) },
             onDismiss = { appMenu = null })
       }

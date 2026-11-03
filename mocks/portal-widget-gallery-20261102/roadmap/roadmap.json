@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T12:32:39.895555+00:00",
+  "updatedAt": "2026-11-03T12:59:48.017599+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,65 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.121/code115. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.122/code116. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "user-layout-save-conflicts",
+      "title": "Folders and favorites: reject stale native saves",
+      "summary": "Delivered 1.122: older native folder and favorite edits preserve acknowledged newer layout changes.",
+      "description": "Compare retained assignments/order with current storage under the companion mutation lock; refresh and retry conflicting native edits.",
+      "status": "delivered",
+      "verification": "10 frozen tests: 5 red to pass; 4,313 JVM; debug native 7/14 to 14/14",
+      "kind": "Native layout save conflicts",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Launcher storage / independent source and native review",
+      "deployment": "Exact optimized 1.122/code116 installed and fully hashed in Family Area and Living Area.",
+      "state": "Four complete maps and twelve preference states per room match. Family frame/font/accessibility/Chrome retained. Original registry unchanged; copied credentials removed.",
+      "acceptance": [
+        "Freeze independent literal cases on extracted-equivalent production boundaries before correction.",
+        "Reject stale folder additions/removals/renames and favorite order without replacement writes.",
+        "Retain refreshed retries, offline membership, blank overrides, component/shortcut identity and generic whole replacements.",
+        "Use the existing companion mutation lock for guarded saves and all generic UserLayout setters.",
+        "Distinguish generated storage/runtime checks from source-reviewed eight native menu actions and unverified physical editor/HTTP acceptance.",
+        "Deliver exact signed optimized bytes and preserve complete maps plus twelve preference states."
+      ],
+      "evidence": [
+        {
+          "text": "Extracted baseline, frozen literal red/green, shared-lock correction, exact delivery and limits.",
+          "source": "docs/portal-user-layout-save-conflicts-2026-11-03.md"
+        },
+        {
+          "text": "Bound source, artifacts, generated storage/monitor checks, preservation and normal cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/user-layout-save-conflict-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual red uses storage-transform equivalent extracted snapshot boundaries, not the untouched prior APK or physical native menus. Canonical local reload and exception ordering are qualified.",
+        "Eight native menu actions and conflict reload/toast/navigation are source-reviewed only. Physical Home/Apps edits, real remote HTTP acknowledgment, phone workflow and API28 acceptance remain unverified.",
+        "Optimized snapshot methods survive as renamed static methods; this exact debug fixture requires unavailable singleton, store declarations and validation getter. Zero optimized boundary calls and no keep changes.",
+        "Generated preference and Context operations are real fixture-local operations. No owner preferences, original provider, service/UI, real network or companion metadata operation occurs in the accepted native fixture.",
+        "Shared monitor controls cover two generated generic setter workers. Raw preference writers, multiprocess races, natural notification delivery, disk durability and universal concurrency remain outside the claim.",
+        "Two accepted native parents and scratch retire normally; external timeout and fault cleanup remain unverified.",
+        "Living visual acceptance remains open. Limited diagnostics do not establish complete runtime health.",
+        "Existing widgets, parsed layout cache, folder naming, Chime and every older held or exhausted issue retain their original clocks.",
+        "Actual debug Family storage checks improve 7/14 to 14/14: five stale-save corrections and two generic-setter monitor corrections, with five product controls and two harness controls retained. Each variant invokes assignment snapshots 5 times, order snapshots 4 times, remote read/validate/apply 17 times each, folder rename 2 times, direct layout loads 31 times and generic setters 2 times across 12 generated Contexts. Both 2 generated workers retire. Generated preference writes are 96/91, Context preference calls 212/216 and preference reads 116/125 for baseline/candidate.",
+        "Twelve preference states per room match: Family eleven byte-identical files and one unchanged absence; Living eight byte-identical files and four unchanged absences. The original eleven captures stay unchanged; the touched UserLayout file has an additional before/after byte comparison.",
+        "Limited lines=1500 requests produce 1645 Family and 2023 Living actual lines, with HTTP200 and zero fatal or ANR markers.",
+        "Initial stale extracted-APK packaging is excluded from native admission; genuine JVM red remains valid.",
+        "Public manifest remains1.83/code77. Phone control, HA and publication restrictions remain."
+      ],
+      "next": "Retain exact two-room delivery and regressions. Physical native menus, optimized boundary calls, HTTP/phone workflow, API28 and Living visual remain open; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T12:41:33Z",
+        "deadline": "2026-11-03T13:11:33Z",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "apk-incoming-snapshot",
       "title": "APK opens: retain each prompt's copied file",

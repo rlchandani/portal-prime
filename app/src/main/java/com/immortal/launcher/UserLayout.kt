@@ -42,12 +42,22 @@ object UserLayout {
     return assignmentSnapshot.read(raw)
   }
 
-  fun save(context: Context, assignments: Map<String, String>) {
+  fun save(context: Context, assignments: Map<String, String>) =
+      synchronized(RemoteCompanionStore.mutationLock) {
     context
         .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit()
         .putString(KEY, serialize(assignments))
         .apply()
+  }
+
+  /** Reject stale whole-map edits without replacing an acknowledged change on another screen. */
+  fun saveAssignmentsFromSnapshot(
+      context: Context, expected: Map<String, String>, updated: Map<String, String>,
+  ): Boolean = synchronized(RemoteCompanionStore.mutationLock) {
+    if (load(context) != expected) return@synchronized false
+    save(context, updated)
+    true
   }
 
   /** User-defined order of ungrouped home-screen app package IDs. */
@@ -57,12 +67,21 @@ object UserLayout {
     return homeOrderSnapshot.read(raw)
   }
 
-  fun saveOrder(context: Context, order: List<String>) {
+  fun saveOrder(context: Context, order: List<String>) =
+      synchronized(RemoteCompanionStore.mutationLock) {
     context
         .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit()
         .putString(KEY_ORDER, serializeOrder(order))
         .apply()
+  }
+
+  fun saveOrderFromSnapshot(
+      context: Context, expected: List<String>, updated: List<String>,
+  ): Boolean = synchronized(RemoteCompanionStore.mutationLock) {
+    if (loadOrder(context) != expected) return@synchronized false
+    saveOrder(context, updated)
+    true
   }
 
   /**
@@ -76,7 +95,8 @@ object UserLayout {
     return gridOrderSnapshot.read(raw)
   }
 
-  fun saveGridOrder(context: Context, order: List<String>) {
+  fun saveGridOrder(context: Context, order: List<String>) =
+      synchronized(RemoteCompanionStore.mutationLock) {
     context
         .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit()
@@ -94,7 +114,8 @@ object UserLayout {
     return gridSlotsSnapshot.read(raw)
   }
 
-  fun saveGridSlots(context: Context, slots: List<String?>) {
+  fun saveGridSlots(context: Context, slots: List<String?>) =
+      synchronized(RemoteCompanionStore.mutationLock) {
     context
         .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         .edit()
