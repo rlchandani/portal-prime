@@ -6,7 +6,7 @@ on:
       - "catalog.json"
       - "app/src/main/assets/catalog.json"
       - "scripts/validate_catalog.py"
-      - "scripts/test_portal_catalog_parity.py"
+      - "scripts/test_portal_catalog_*.py"
       - ".github/workflows/catalog.yml"
   push:
     branches: [main]
@@ -14,7 +14,7 @@ on:
       - "catalog.json"
       - "app/src/main/assets/catalog.json"
       - "scripts/validate_catalog.py"
-      - "scripts/test_portal_catalog_parity.py"
+      - "scripts/test_portal_catalog_*.py"
       - ".github/workflows/catalog.yml"
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Test bundled catalog validation
-        run: python3 -m unittest discover -s scripts -p 'test_portal_catalog_parity.py'
+      - name: Test catalog validation
+        run: python3 -m unittest discover -s scripts -p 'test_portal_catalog_*.py'
       - name: Validate catalog (schema + network checks)
         run: python3 scripts/validate_catalog.py --network

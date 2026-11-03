@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T15:05:23.568898+00:00",
+  "updatedAt": "2026-11-03T15:27:30.095636+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -13,6 +13,50 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "catalog-version-types",
+      "title": "Catalog guard: reject Boolean version codes",
+      "summary": "Locally verified: identical Boolean copies cannot bypass the existing integer schema.",
+      "description": "Locally verified catalog guard: JSON true/false version codes are rejected as non-integers even when both copies agree. Existing integer, optional-field and canonical-parity rules remain. Eight frozen cases improved from 2 assertion failures and 6 controls to 8 passing; all 18 catalog and 234 Python tests pass. Secure certificate-verified network retry validates 26 current apps with 1 existing warning; initial 52 SSL errors are retained.",
+      "status": "verified",
+      "verification": "8 frozen whole CLI cases; 18 catalog cases; 234 Python cases: zero failures/errors/skips. Initial SSL failure retained; secure CA retry 26 apps/1 warning. Hosted CI unobserved.",
+      "kind": "Catalog scalar schema and CI regression guard",
+      "platforms": [
+        "tooling"
+      ],
+      "owner": "Catalog tooling / independent schema and pipeline review",
+      "deployment": "Local host verification only; no APK, room or public release deployment.",
+      "state": "Both catalogs, public manifest, current app source and native CLI bytes unchanged; prior room 1.126/code120 delivery retained without device recheck.",
+      "acceptance": [
+        "Reject Boolean versionCode through the real whole offline CLI with identical copies.",
+        "Retain six literal existing scalar controls and all 10 parity cases.",
+        "Wire both catalog test modules into the existing catalog CI wildcard and preserve secure network validation."
+      ],
+      "evidence": [
+        {
+          "text": "Actual baseline, local gates, secure CA retry and limits.",
+          "source": "docs/portal-catalog-version-types-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized current and historical evidence hashes.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/catalog-version-types-verification.json"
+        }
+      ],
+      "limits": [
+        "Whole copied production validator CLI and ordinary identical JSON copies; no parser model, core-check mock or network fixture. Two Boolean assertions and six retained controls.",
+        "Zero, negative, missing and null version codes keep their existing acceptance; string integers remain rejected. No new positivity, required-field, Android null compatibility or broader schema policy.",
+        "Initial real network validation failed with 52 SSL trust errors. A secure system-CA retry passed with certificate verification enabled; the original failure is retained. No universal provider, third-party APK or hosted CI acceptance.",
+        "Initial independent source review compared live corrected source with a baseline predicate and failed its binding checks. The retained correction resolves historical baseline versus current source; no product or test rerun for that reviewer error.",
+        "Host verification only. No APK build/deployment, device recheck, phone, real EXIF/caption test, speech/audio, HA, release or publication action in this unit. Room 1.126/code120 is the prior delivery snapshot; public 1.83/code77 and protected source bytes remain unchanged.",
+        "Voice and MQTT/usage discovery share the original clock without implementation. Older held scopes and the broader active goal remain; future docs/browser QA and commit are separate closure records."
+      ],
+      "next": "Retain host guard. Hosted CI, third-party compatibility and Android parser/device acceptance remain separate; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T15:07:14.567394Z",
+        "deadline": "2026-11-03T15:37:14.567394Z",
+        "reset": false
+      }
+    },
     {
       "id": "photo-caption-timezone",
       "title": "Photo captions: follow the current timezone on new reads",

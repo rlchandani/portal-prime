@@ -1,0 +1,384 @@
+{
+  "schemaVersion": 1,
+  "taskId": "catalog-version-types",
+  "status": "LOCALLY_VERIFIED_HOST_ONLY",
+  "recordedAt": "2026-11-03T15:27:30.095636+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T15:07:14.567394Z",
+    "deadline": "2026-11-03T15:37:14.567394Z",
+    "reset": false
+  },
+  "baseline": {
+    "tests": 8,
+    "assertionFailures": 2,
+    "controls": 6,
+    "errors": 0,
+    "skipped": 0,
+    "actualExit": 1,
+    "frozenFixtureSha256": "9699590e7de2240a99683d0297239ac86933b3c66802892960e54ad8f2506d8f",
+    "validatorBaselineSha256": "2f61a13bf89a85d66ebcd8914744f33b0f786d58790712744cc202201822e816"
+  },
+  "candidateLocalGates": {
+    "catalog-ci": {
+      "actualCases": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "terminal": {
+        "actualExit": 0,
+        "startedAt": "2026-11-03T15:18:10.196062+00:00",
+        "endedAt": "2026-11-03T15:18:10.930257+00:00",
+        "durationSeconds": 0.734195
+      }
+    },
+    "python-ci": {
+      "actualCases": 234,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "terminal": {
+        "actualExit": 0,
+        "startedAt": "2026-11-03T15:18:10.216920+00:00",
+        "endedAt": "2026-11-03T15:18:35.814000+00:00",
+        "durationSeconds": 25.59708
+      }
+    }
+  },
+  "network": {
+    "initial": {
+      "actualExit": 1,
+      "startedAt": "2026-11-03T15:18:10.451677+00:00",
+      "endedAt": "2026-11-03T15:18:19.707996+00:00",
+      "durationSeconds": 9.256319
+    },
+    "initialSslFailures": 52,
+    "trustedRetry": {
+      "actualExit": 0,
+      "startedAt": "2026-11-03T15:20:35.283714+00:00",
+      "endedAt": "2026-11-03T15:20:57.289404+00:00",
+      "durationSeconds": 22.00569
+    },
+    "certificateVerificationEnabled": true,
+    "trustedSystemCaBundle": {
+      "sha256": "9dae8d76e55cb08991f2b672d58999ea15560d910759c16b544f843bdffbb994",
+      "bytes": 333483,
+      "loadedCertificateAuthorities": 128
+    },
+    "retryScope": "Per-command system CA bundle; certificate checking enabled, original default-trust failure retained.",
+    "validatedApps": 26,
+    "warnings": 1,
+    "hostedCiObserved": false
+  },
+  "sourceBindings": {
+    "scripts/validate_catalog.py": {
+      "sha256": "fbb7c969c08464b26fb9ead0c1d7d542ee6522d8e99a8c642a3ce42ab1484b7f",
+      "bytes": 6576
+    },
+    "scripts/test_portal_catalog_version_types.py": {
+      "sha256": "9699590e7de2240a99683d0297239ac86933b3c66802892960e54ad8f2506d8f",
+      "bytes": 3161
+    },
+    ".github/workflows/catalog.yml": {
+      "sha256": "3ab719337cdf015c5be6b3423637677acdbfce88fd8815f113f2a89ced273cdd",
+      "bytes": 884
+    }
+  },
+  "protectedBindings": {
+    "catalog.json": {
+      "bytes": 24043,
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+    },
+    "app/src/main/assets/catalog.json": {
+      "bytes": 24043,
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+    },
+    "version.json": {
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    },
+    "provisioning/fleetctl": {
+      "bytes": 694352,
+      "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae"
+    },
+    "app/build.gradle.kts": {
+      "bytes": 11816,
+      "sha256": "3751e1c0d41e0e8ac567a763caad6f5431722c45c6205ae35aa52355a056845c"
+    },
+    "app/src/main/java/com/immortal/launcher/PhotoCaption.kt": {
+      "bytes": 7123,
+      "sha256": "cd9428ff9be0d067db4a263b72fe5e4215a95fea38f2914765f600f2a37f81b9"
+    },
+    "app/src/test/java/com/immortal/launcher/PhotoCaptionTimeZoneTest.kt": {
+      "bytes": 4011,
+      "sha256": "8e5e60cb5d7a30e0bdefc33523f29a0b58165ccd94e0537ef6a2f9030c613d5b"
+    },
+    "scripts/test_portal_catalog_parity.py": {
+      "bytes": 4370,
+      "sha256": "846632bea2d5955f12b47791bef78d2aa583fb99c9fcfdd1a15e4941469b838c"
+    },
+    ".github/workflows/tests.yml": {
+      "bytes": 1975,
+      "sha256": "c8d796a2e2f9330ba9399cdc84606bbbfe0a43327ec4a37c2466c9fc9ce45497"
+    },
+    "scripts/check-version-sync.sh": {
+      "bytes": 2080,
+      "sha256": "67724ed76ed380afce2008ec8592e5c3bbe31a98eb2f2535ed3677db1d7a5e65"
+    },
+    "scripts/cut-release.sh": {
+      "bytes": 9763,
+      "sha256": "d4cddb07f857eaa9b7b7d1155dcf91a6de33eb4fdec359961213581c98f92598"
+    },
+    "scripts/portal_release_readiness.py": {
+      "bytes": 17648,
+      "sha256": "6769d97fcfbb4ece0e2d41bd14bf1db782be49cffda3c676e38f04fc392587d6"
+    },
+    "app/proguard-rules.pro": {
+      "bytes": 915,
+      "sha256": "28e78cb4c9a43082dba4ffb1eecf27b7a167d4333fe0b467641e3ca97ef6d6a8"
+    },
+    "app/portal-r8-rules.pro": {
+      "bytes": 830,
+      "sha256": "641288488c5cb2c71d007c61d37c9dd8a975b36b1d0ee017647bf71fa6ee36ae"
+    },
+    "app/benchmark-r8-native-rules.pro": {
+      "bytes": 4210,
+      "sha256": "221e966b90d9a21a63694dbd299b027550689457bfb34e884b05d1e84316ac66"
+    },
+    ".github/workflows/release-guard.yml": {
+      "bytes": 738,
+      "sha256": "e69e6dd3f13d0595fb3360bc8e1e02ec7ddd575c760dc20b9aa94372a35e653b"
+    }
+  },
+  "independentReviews": {
+    "catalog-versioncode-schema-admission-review.json": {
+      "status": "PASS_SOURCE_SCHEMA_FROZEN_BASELINE_AND_CATALOG_CI",
+      "counts": {
+        "checks": 25,
+        "passed": 25,
+        "bindings": 23,
+        "baselineTests": 8,
+        "baselineAssertionFailures": 2,
+        "baselineControlsPassed": 6,
+        "baselineErrors": 0,
+        "baselineSkipped": 0,
+        "candidateCatalogTests": 18,
+        "candidateFocusedTests": 8,
+        "candidatePriorParityTests": 10,
+        "candidateFailures": 0,
+        "candidateErrors": 0,
+        "candidateSkipped": 0
+      },
+      "blockers": []
+    },
+    "catalog-pipeline-closing-review.json": {
+      "status": "PASS_SCOPED_HOST_CHANGE_NO_BLOCKERS",
+      "counts": {},
+      "blockers": []
+    }
+  },
+  "backlog": {
+    "before": 103,
+    "after": 104,
+    "all103ObjectsIdentical": true,
+    "exactPriorRawSuffix": {
+      "sha256": "073015c0fc743f0e26d46774cf7397c52ef421531a428e7456c8e7308a5c882e",
+      "bytes": 344015
+    },
+    "defaultTask": "weather-native-layout",
+    "headerChangeOnly": "updatedAt"
+  },
+  "limits": [
+    "Whole copied production validator CLI and ordinary identical JSON copies; no parser model, core-check mock or network fixture. Two Boolean assertions and six retained controls.",
+    "Zero, negative, missing and null version codes keep their existing acceptance; string integers remain rejected. No new positivity, required-field, Android null compatibility or broader schema policy.",
+    "Initial real network validation failed with 52 SSL trust errors. A secure system-CA retry passed with certificate verification enabled; the original failure is retained. No universal provider, third-party APK or hosted CI acceptance.",
+    "Initial independent source review compared live corrected source with a baseline predicate and failed its binding checks. The retained correction resolves historical baseline versus current source; no product or test rerun for that reviewer error.",
+    "Host verification only. No APK build/deployment, device recheck, phone, real EXIF/caption test, speech/audio, HA, release or publication action in this unit. Room 1.126/code120 is the prior delivery snapshot; public 1.83/code77 and protected source bytes remain unchanged.",
+    "Voice and MQTT/usage discovery share the original clock without implementation. Older held scopes and the broader active goal remain; future docs/browser QA and commit are separate closure records."
+  ],
+  "privateEvidenceBindings": {
+    "scope.json": {
+      "sha256": "25cb00f173d80266e39bc5ef5c90d20683be1d4d86a3184394edd5c62a39b6b6",
+      "bytes": 1056
+    },
+    "root-discovery-state.json": {
+      "sha256": "2970e7df483d62108992dcc57439cb6335731a4c2559d7b54cb4c068a28f61f6",
+      "bytes": 6391
+    },
+    "voice-helper-audit.json": {
+      "sha256": "a7cd5124a0d8f20457a5f161ff19d1a1bfcca8e956de9ad10778031f4afd82ca",
+      "bytes": 12401
+    },
+    "mqtt-notify-payload-audit.json": {
+      "sha256": "e89d8b2667d3764f55e28f2567187b1520d459be9d15302462d6d81443fd5911",
+      "bytes": 7650
+    },
+    "usage-window-audit.json": {
+      "sha256": "ebac23cbc43da2ea912fc37276ff07b5b894760281aefcbfbd535fe352b1c86f",
+      "bytes": 16424
+    },
+    "catalog-version-type-test-plan.json": {
+      "sha256": "76a63e90dd38b6b0edabc26534b5ce526c1a21650c254b67a8959758c0f9b5fd",
+      "bytes": 5575
+    },
+    "catalog-version-type-audit.json": {
+      "sha256": "df5b1654b29e246e6b707a6a37734f9eb8b4bb55cb7d4bd78e6fbba9bdad91f9",
+      "bytes": 7371
+    },
+    "test_portal_catalog_version_types.py": {
+      "sha256": "9699590e7de2240a99683d0297239ac86933b3c66802892960e54ad8f2506d8f",
+      "bytes": 3161
+    },
+    "frozen-catalog-type-plan.json": {
+      "sha256": "975d90e093a50c0e2aae1eafa0840a5e54f5168b91a4b3e55bcd67aed91d9dce",
+      "bytes": 1317
+    },
+    "catalog-validator-baseline.py": {
+      "sha256": "2f61a13bf89a85d66ebcd8914744f33b0f786d58790712744cc202201822e816",
+      "bytes": 6550
+    },
+    "catalog-workflow-baseline.yml": {
+      "sha256": "6f31177403426574fcedbfe846788e9e97e2830af929f8a0c63fc407a6df3ed4",
+      "bytes": 907
+    },
+    "catalog-protected-bindings.json": {
+      "sha256": "26ccc90b9fd522eeaafd1524e4c66a7b1feba0ab8d90b3f9d34bef3650532d19",
+      "bytes": 2295
+    },
+    "catalog-types-baseline.json": {
+      "sha256": "45ad25ab2a2a61c1ed06d8e1b1bc6cdd640ce5bfedf142f6adba6b0a13a7840e",
+      "bytes": 1653
+    },
+    "baseline-catalog-types.log": {
+      "sha256": "1b23ac5c0746f51aca96be1c637030181b88a6af27caaedcf1b36de531913581",
+      "bytes": 3118
+    },
+    "baseline-catalog-types-terminal.json": {
+      "sha256": "0deb479e72effaadeeb2e881e1de96f0c8e82f71e9c06c46cae29ca5ec90a61c",
+      "bytes": 325
+    },
+    "catalog-ci.log": {
+      "sha256": "fd6422abd05db6bc721387d5110c4909ef35eb0a14e3f0e516dc38a7a65826d4",
+      "bytes": 2577
+    },
+    "catalog-ci-terminal.json": {
+      "sha256": "77d24bc4613cd916a06531e14af721fe1975c27785e4c3aeb4de373be7f99380",
+      "bytes": 313
+    },
+    "python-ci.log": {
+      "sha256": "02f65873e8e7a833daaa33fbb180c3fb45e564802ab733a504caebc960d439eb",
+      "bytes": 38074
+    },
+    "python-ci-terminal.json": {
+      "sha256": "019ea0d246e75ff77b21e6a26197e23c4882029df8c3858080a66c221eb9a17b",
+      "bytes": 305
+    },
+    "catalog-network.log": {
+      "sha256": "996beafebaedb0346b128ee811f25b3468e365638ba6849e20fa3af0d85aa5aa",
+      "bytes": 13950
+    },
+    "catalog-network-terminal.json": {
+      "sha256": "d871a5da2953c66290f5f36b677735e59b6483f3f42fb0612a67555782fa2b35",
+      "bytes": 246
+    },
+    "catalog-network-trusted-ca.log": {
+      "sha256": "bef084f9dfa86b2f582ccd162028d6d1e4aba8f51b85ef22f06355521967c760",
+      "bytes": 350
+    },
+    "catalog-network-trusted-ca-terminal.json": {
+      "sha256": "26e3eb97d4d5ba6dbde9c1f711e88f0c5c446677b38d030a21352a55dbb4c7fe",
+      "bytes": 246
+    },
+    "catalog-root-gates.json": {
+      "sha256": "9b0c24a1e5104c7a372349ea839bf25ae72d46808540fb9fa3d1d94061a52ae5",
+      "bytes": 44185
+    },
+    "catalog-versioncode-schema-admission-review.json": {
+      "sha256": "e0e5d8e77ad6a9438f8f241777409123e990e9f271133eb8358dcd0fcda5b1ca",
+      "bytes": 17591
+    },
+    "catalog-versioncode-schema-admission-review-initial.json": {
+      "sha256": "9436ca35cf8250679d89e4496c80c197edbdad1969104e133c22e46cdfdd74cb",
+      "bytes": 10652
+    },
+    "catalog-versioncode-schema-admission-correction.json": {
+      "sha256": "1368f16abc191e028c130f889ff01598f380bf44f47a40c5ed6b5ff3ee54007d",
+      "bytes": 2777
+    },
+    "catalog-pipeline-admission-review.json": {
+      "sha256": "96e32a583c09d4971755dbfe0af88e5ae533ce32ab909dcca9e73292cb199de9",
+      "bytes": 14434
+    },
+    "catalog-pipeline-closing-review.json": {
+      "sha256": "2c75c3d2fb26ea20158bc9a9e070f09fd4f7812e060a3997ed8de15c83e8c6b0",
+      "bytes": 13241
+    },
+    "workflow-parse.json": {
+      "sha256": "0473da8cd4e4b565ebfac03171efaa21fa5b44ad5634fd7a0d787835dafda9b0",
+      "bytes": 454
+    },
+    "root-catalog-bindings.json": {
+      "sha256": "298561057f5919bef5f77bad0c560863df7259eb1567f68d285d431725fdad53",
+      "bytes": 13777
+    },
+    "catalog-documentation-before.json": {
+      "sha256": "0f3841a7b1ab71e0316b81b4503d6058fcf6df0a00298d3933bbf18ecbf6d203",
+      "bytes": 635
+    },
+    "catalog-docs-before-operating": {
+      "sha256": "796827cc8d91668435638804b14703d46deafcd522bfd7a2cca04bc65a48fb5a",
+      "bytes": 154086
+    },
+    "catalog-docs-before-roadmap": {
+      "sha256": "35be41d08ec6fc6e15f12a17e6db41afde9578bf152ecb392979bb036afb6f77",
+      "bytes": 345013
+    },
+    "catalog-docs-before-index": {
+      "sha256": "d03a00288ee4989899a7ffd77de061b3eda74cef532ac055648f32df25bb5eba",
+      "bytes": 31727
+    },
+    "write-catalog-delivery-initial.py": {
+      "sha256": "ed6479f9c36748980d981b4469ea24426ebfd79246ff127d735c8044e4e8956b",
+      "bytes": 14306
+    },
+    "write-catalog-delivery-spacing-draft-excluded.py": {
+      "sha256": "31fa6fee3bf51e3efec6b2ebe90e1f620aeb9b010d10e3d9ad0b978ad7d84b17",
+      "bytes": 14341
+    },
+    "catalog-writer-final-delta.json": {
+      "sha256": "0f71d9224e2454ce8744436aa1d7033104af0e09e3755178ec78a46124baa16d",
+      "bytes": 4423
+    },
+    "catalog-writer-root-read.json": {
+      "sha256": "e9cc0cfb71eb8b5e6db7c0b98c52faf631ad5dd83abeac8895715c36e82bf888",
+      "bytes": 1598
+    },
+    "catalog-writer-freeze.json": {
+      "sha256": "c2495a478ef6408a8c18ecd63aadc442cda7c91a9023affdc8b5c67e3544ef8c",
+      "bytes": 6033
+    },
+    "write-catalog-delivery.py": {
+      "sha256": "8eb41f49d1d59c50ff1d499ddc1aa5c7d7bdc3cf9c0ce6e97629971193919935",
+      "bytes": 14340
+    }
+  },
+  "documentBindings": {
+    "docs/portal-catalog-version-types-2026-11-03.md": {
+      "sha256": "94dc0f532cb72a92397d141f843e93a1178cd256260e6dc5ef4b2e9b8bd219ac",
+      "bytes": 2457
+    },
+    "docs/portal-product-operating-state.md": {
+      "sha256": "32da297d6ee7b3f4c50cd6db76a64c155648025104337d1772f9db714025bbb3",
+      "bytes": 154906
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+      "sha256": "2a3c194636641053a5c07f25c785bdbec2294b0035ad76c9bb29788b8cb3e0ad",
+      "bytes": 348841
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/index.html": {
+      "sha256": "79578e3d3374466e1f65dac311f4974ce47a17b2d9d4a6c3ebd94346ffa3333b",
+      "bytes": 32561
+    }
+  },
+  "sanitization": "Only relative repository paths, private basenames, hashes, counters and scoped public status; no owner credentials/serial/IP/private absolute paths/rawXML.",
+  "closure": "Future docs/browser QA and commit belong to private closure; broader goal active."
+}

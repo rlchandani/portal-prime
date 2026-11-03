@@ -113,7 +113,7 @@ def main():
                  f"(Portals are API 28/29) — listing it will just show as incompatible")
 
         vc = a.get("versionCode")
-        if vc is not None and not isinstance(vc, int):
+        if vc is not None and (isinstance(vc, bool) or not isinstance(vc, int)):
             err(f"{ctx} versionCode must be an integer, found {vc!r}")
         # A direct-URL app needs a live version source, else the store can't tell
         # when it's out of date and will never show an Update. Either a declared
