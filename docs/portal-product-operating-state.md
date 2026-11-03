@@ -13,6 +13,14 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Pixel control prohibited:** user explicitly asked on 3 November to stop
+  controlling the Google phone. No Pixel UI, ADB commands, installations or
+  deployment until explicit reauthorization. The physical browse check opened
+  the companion and selected Family Area, then stopped before Photos; no
+  acceptance claim. Its temporary XML cleanup and foreground restoration are
+  deferred because they would require another phone command. Companion source
+  and isolated QA remain available.
+
 - **Current room APK / latest local-folder delivery:** both rooms contain exact
   optimized **1.90/code84**. Canonical directory visits and a20,000-entry search
   budget prevent repeated alias/parent traversal; the media loop now stops at its
