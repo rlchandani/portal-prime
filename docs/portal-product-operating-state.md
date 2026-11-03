@@ -13,7 +13,27 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / slim slideshow frame:** exact optimized **1.97/code91**
+- **Current room APK / bundled catalog parity:** exact optimized **1.98/code92**
+  is installed and fully hashed in both rooms. The first-load/offline catalog
+  now matches the repository's26 apps rather than22, including current
+  Kasa/Jarvis release metadata. Canonical JSON validation and CI triggers protect
+  both copies; review's Boolean/integer equality gap was reproduced and fixed.
+  **10 focused / 206 Python / 4,066 JVM423 suites**, debug, optimized/R8/vital
+  lint and network validation pass. Actual optimized Family parser/asset checks
+  improved0/10→10/10; both initial room catalog APIs returned26. Complete saved
+  maps and Family font/accessibility/original Chrome task/frame are preserved.
+  Owned fixtures/registry removed; Pixel untouched. Third-party installs,
+  offline installation and full store navigation remain outside acceptance.
+  Original **03:50:19–04:20:19UTC** clock retained.
+  [Receipt](portal-catalog-fallback-parity-2026-11-03.md).
+
+- **Next independent unit / strict documentation gate:** baseline and current
+  site builds fail on the same433 warnings, mostly repository files linked
+  outside the docs tree. The new catalog receipt warning was corrected. Resolve
+  actual links without weakening strict validation or publishing. Original
+  **03:59:26.692799–04:29:26.692799UTC** clock includes diagnosis already used.
+
+- **Previous room APK / slim slideshow frame:** exact optimized **1.97/code91**
   is installed and fully hashed in both rooms. Framed Print uses a 4-pixel mat
   and 2-pixel edge; the existing zoom is confined to the photo opening.
   Baseline narrow-frame checks failed8/8; final16/16 rendered still/animated

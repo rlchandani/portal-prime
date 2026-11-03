@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "status": "delivered",
+  "checkedAtUtc": "2026-11-03T03:58:32.379062+00:00",
+  "scope": "Bundled first-load/offline catalog parity",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.98",
+    "versionCode": 92,
+    "sha256": "9051906e3c9a2a7ee6abaa348fb4fd9e2f9eade59601577dc7cd00fe0439e638",
+    "bytes": 25862706,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "bundledCatalogSha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+    "catalogApps": 26
+  },
+  "verification": {
+    "initialRegressions": {
+      "tests": 8,
+      "failures": 6
+    },
+    "booleanIntegerRegressionFailedBeforeFix": true,
+    "finalFocusedTests": 10,
+    "pythonTests": 206,
+    "jvm": {
+      "tests": 4066,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 423
+    },
+    "androidBuildSeconds": 110,
+    "debugBuild": true,
+    "performanceBuild": true,
+    "r8": true,
+    "vitalLint": true,
+    "networkCatalogApps": 26,
+    "networkWarnings": 1,
+    "tlsCertificateVerificationEnabled": true,
+    "systemCaBundleUsedForLocalPython": true,
+    "canonicalCatalogParity": true,
+    "exactPackagedCatalogBytesMatch": true,
+    "slideshowSourceHashPreserved": "a0e3994ba80885e51a8c0087d002aeee1a4b9d177502c06973e87eb4c9ce1177",
+    "independentReview": "Boolean/integer comparison finding reproduced and fixed; final scoped review found no actionable risks",
+    "strictDocsBuild": {
+      "passed": false,
+      "baselineWarnings": 433,
+      "finalWarnings": 433,
+      "warningSetsIdentical": true,
+      "newReceiptWarningCorrected": true,
+      "scope": "Inherited documentation link failures; separately queued under original03:59:26.692799UTC discovery clock."
+    }
+  },
+  "native": {
+    "scope": "Family shell app_process; own APK asset and actual optimized production parser; no installation for fixture execution",
+    "old197": {
+      "parsedCount": 22,
+      "checks": {
+        "actualParserCount26": false,
+        "exactCatalogBytes": false,
+        "contains:de.badaix.snapcast": false,
+        "contains:com.portal.isstracker": false,
+        "contains:com.portal.overlays": false,
+        "contains:com.portal.tts": false,
+        "latestApk:com.portal.kasa": false,
+        "liveVersion:com.portal.kasa": false,
+        "latestApk:com.portal.assistant": false,
+        "liveVersion:com.portal.assistant": false
+      },
+      "actualOptimizedParser": true,
+      "networkRequests": 0
+    },
+    "new198": {
+      "parsedCount": 26,
+      "checks": {
+        "actualParserCount26": true,
+        "exactCatalogBytes": true,
+        "contains:de.badaix.snapcast": true,
+        "contains:com.portal.isstracker": true,
+        "contains:com.portal.overlays": true,
+        "contains:com.portal.tts": true,
+        "latestApk:com.portal.kasa": true,
+        "liveVersion:com.portal.kasa": true,
+        "latestApk:com.portal.assistant": true,
+        "liveVersion:com.portal.assistant": true
+      },
+      "actualOptimizedParser": true,
+      "networkRequests": 0
+    },
+    "initialPostInstallCatalogs": {
+      "family": {
+        "ok": true,
+        "catalogApps": 26,
+        "version": {
+          "versionCode": 92,
+          "versionName": "1.98"
+        }
+      },
+      "living": {
+        "ok": true,
+        "catalogApps": 26,
+        "version": {
+          "versionCode": 92,
+          "versionName": "1.98"
+        }
+      }
+    },
+    "thirdPartyAppsInstalled": 0
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "manualPhotoFrameForeground": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true
+    }
+  },
+  "deployment": {
+    "familyFullInstalledApkHashVerified": true,
+    "livingFullInstalledApkHashVerified": true,
+    "familyNormalPhotoFrameVisuallyReviewed": true,
+    "livingNativeAppearanceInspected": false
+  },
+  "cleanup": {
+    "ownedRegistryRemoved": true,
+    "primaryRegistryBytesUnchanged": true,
+    "ownedNativeRootRemoved": true,
+    "nativeProcessesEnded": true,
+    "phoneCommands": 0
+  },
+  "sourceHashes": {
+    "catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+    "app/src/main/assets/catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+    "scripts/validate_catalog.py": "2f61a13bf89a85d66ebcd8914744f33b0f786d58790712744cc202201822e816",
+    "scripts/test_portal_catalog_parity.py": "846632bea2d5955f12b47791bef78d2aa583fb99c9fcfdd1a15e4941469b838c",
+    ".github/workflows/catalog.yml": "6f31177403426574fcedbfe846788e9e97e2830af929f8a0c63fc407a6df3ed4",
+    "app/src/main/java/com/immortal/launcher/StoreCatalog.kt": "53a808972554720a42c8cf3c52947ddb200adebf833c6c7b77b7c1fc69ac6c6d",
+    "app/src/main/assets/screensaver/styles.css": "a0e3994ba80885e51a8c0087d002aeee1a4b9d177502c06973e87eb4c9ce1177"
+  },
+  "issueClock": {
+    "startedAtUtc": "2026-11-03T03:50:19Z",
+    "deadlineUtc": "2026-11-03T04:20:19Z",
+    "includesDiagnosisImplementationReviewBuildsDeploymentCleanup": true
+  },
+  "limits": [
+    "Repository catalog has26 entries; public hosted refresh may contain newer upstream additions.",
+    "No third-party APK compatibility, offline installation or full native store-navigation acceptance.",
+    "No phone control, Home Assistant change, GitHub publication or parked issue reopening.",
+    "Private owner screenshots and credentials excluded."
+  ]
+}

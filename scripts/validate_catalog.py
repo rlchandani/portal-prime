@@ -4,7 +4,8 @@
 Run by CI on every PR that touches the catalog, and runnable locally:
     python3 scripts/validate_catalog.py [--network]
 
-Checks (offline): JSON validity, schema fields, duplicate packages, sane values.
+Checks (offline): JSON validity, schema fields, duplicate packages, sane values,
+and parity with the app's bundled first-load/offline catalog.
 With --network: download URLs resolve, F-Droid ids exist, icon URLs serve images.
 """
 
@@ -54,6 +55,16 @@ def main():
     except Exception as e:
         print(f"FAIL: catalog.json is not valid JSON: {e}")
         return 1
+
+    bundled_path = "app/src/main/assets/catalog.json"
+    try:
+        with open(bundled_path, encoding="utf-8") as f:
+            bundled = json.load(f)
+        # Python object equality treats True == 1; Android's typed getters do not.
+        if json.dumps(bundled, sort_keys=True) != json.dumps(cat, sort_keys=True):
+            err(f"{bundled_path} differs from catalog.json; sync the bundled copy")
+    except Exception as e:
+        err(f"{bundled_path} cannot be read as valid JSON: {e}")
 
     if cat.get("schemaVersion") != 2:
         err(f"schemaVersion must be 2, found {cat.get('schemaVersion')!r}")

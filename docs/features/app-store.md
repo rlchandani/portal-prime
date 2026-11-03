@@ -15,6 +15,10 @@ apps.
 - **Your own apps** use a direct `apkUrl`.
 - A **bundled copy** of the catalog ships in the app as an offline fallback.
 
+When editing `catalog.json`, copy it to `app/src/main/assets/catalog.json` too.
+The catalog validator rejects differences between their parsed JSON so new
+entries and release metadata also reach the store's first visible list.
+
 ## Installing apps
 
 Installs go through Android's standard `PackageInstaller`. On the

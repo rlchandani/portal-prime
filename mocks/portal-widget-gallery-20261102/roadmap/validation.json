@@ -1168,5 +1168,58 @@
     "evidenceHttpStatus": 200,
     "listingAndSortingLimitVisibleInAccessibilitySnapshot": true,
     "limits": "Saved metadata rendering and proof availability only; actual Android scanner and full-suite acceptance have separate scoped receipts."
+  },
+  "catalogFallbackParityScopedReview": {
+    "checkedAtUtc": "2026-11-03T04:01:38.493Z",
+    "taskCount": 70,
+    "cases": [
+      {
+        "width": 390,
+        "height": 844,
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "currentVersionVisible": true,
+        "focusedAndFullGatesVisible": true,
+        "scopeLimitVisible": true,
+        "phoneBoundaryVisible": true,
+        "taskCountVisible": true,
+        "evidenceHttpStatus": 200
+      },
+      {
+        "width": 390,
+        "task": "strict-docs-links",
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "warningCountVisible": true,
+        "strictValidationPreserved": true,
+        "deadlineVisible": true
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "currentVersionVisible": true,
+        "focusedAndFullGatesVisible": true,
+        "scopeLimitVisible": true,
+        "phoneBoundaryVisible": true,
+        "taskCountVisible": true,
+        "evidenceHttpStatus": 200
+      },
+      {
+        "width": 1600,
+        "task": "strict-docs-links",
+        "horizontalOverflow": false,
+        "detailOverflow": false,
+        "warningCountVisible": true,
+        "strictValidationPreserved": true,
+        "deadlineVisible": true
+      }
+    ],
+    "pageErrors": 0,
+    "externalRequests": 0,
+    "ownedContextsClosed": true,
+    "scope": "Selected catalog and queued documentation details, current version/boundaries and proof availability only; no all70workflow or native UI claim.",
+    "snapshotSha256": "f157d2a8beb778505b690b098fe022cab5b72c40cfb44ba05b64e9b2dafa6a93"
   }
 }

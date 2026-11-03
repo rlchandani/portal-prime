@@ -1,18 +1,99 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T03:42:48.428540+00:00",
-  "updatedLabel": "2 November 2026 Pacific \u00b7 1.97 slim slideshow frame delivered to both rooms",
+  "updatedAt": "2026-11-03T03:58:32.383303+00:00",
+  "updatedLabel": "2 November 2026 Pacific \u00b7 1.98 bundled store catalog delivered to both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.97/code91. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.98/code92. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "catalog-fallback-parity",
+      "title": "App store: keep the bundled catalog current",
+      "summary": "Delivered1.98 to both rooms. First-load/offline entries now match the repository catalog, with a CI consistency guard.",
+      "description": "The bundled asset lacked four catalog apps and retained old Kasa/Jarvis release pins. Both copies now contain26 apps; canonical JSON validation preserves types and display order.",
+      "status": "delivered",
+      "verification": "10 focused \u00b7206 Python \u00b74,066 JVM \u00b710/10 optimized native asset/parser checks",
+      "kind": "Catalog integrity and CI maintenance",
+      "platforms": [
+        "portal",
+        "tooling"
+      ],
+      "owner": "Portal engineering and release QA",
+      "deployment": "Exact optimized1.98/code92 fully hashed in Family Area and Living Area; complete saved maps unchanged.",
+      "state": "Actual Family APK asset/parser improved22\u219226 entries. Both initial room catalog APIs returned26; Family normal photo frame and original Chrome/font/services retained.",
+      "acceptance": [
+        "Synchronize bundled entries and release metadata to the repository catalog.",
+        "Reject missing, malformed or divergent bundled JSON without rejecting formatting/key-order differences.",
+        "Distinguish JSON Boolean and integer values and preserve app/category order.",
+        "Run relevant Python/JVM/network/build gates and inspect the exact packaged asset.",
+        "Verify full installed APK hashes and preserve both complete room configurations."
+      ],
+      "evidence": [
+        {
+          "text": "Problem, verification, rollout and scoped limits.",
+          "source": "docs/portal-catalog-fallback-parity-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized source/artifact hashes, native parser and room preservation proof.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/catalog-fallback-parity-verification.json"
+        }
+      ],
+      "limits": [
+        "No third-party compatibility, offline installation or full native store-navigation claim.",
+        "Hosted refresh may contain newer upstream entries; this copy matches the repository catalog.",
+        "Living native appearance uninspected; private photos and credentials excluded."
+      ],
+      "next": "Retain this scoped delivery. Existing UI approvals, human sign-in, phone prohibition and parked issue clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-03T03:50:19Z",
+        "deadline": "2026-11-03T04:20:19Z",
+        "originalClockRetained": true
+      }
+    },
+    {
+      "id": "strict-docs-links",
+      "title": "Documentation: repair the strict site build",
+      "summary": "Queued from a reproduced baseline failure:433 inherited warnings, with no new warning from the catalog delivery.",
+      "description": "Repository file links outside the docs tree fail the strict MkDocs build. Preserve strict validation and distinguish valid repository references from truly missing targets.",
+      "status": "queued",
+      "verification": "Current/baseline433 warning sets identical",
+      "kind": "Documentation and CI integrity",
+      "platforms": [
+        "tooling"
+      ],
+      "owner": "Documentation and release QA",
+      "deployment": "Local source/checks only; publication remains prohibited.",
+      "state": "Initial434 warnings included one new receipt link; that was corrected, leaving the identical433 inherited baseline warnings.",
+      "acceptance": [
+        "Resolve valid repository references into usable links.",
+        "Keep strict missing-target validation enabled.",
+        "Correct or explicitly describe truly unavailable references.",
+        "Pass focused regressions and strict site build without publishing."
+      ],
+      "evidence": [
+        {
+          "text": "Baseline/current warning comparison and catalog scope.",
+          "source": "docs/portal-catalog-fallback-parity-2026-11-03.md"
+        }
+      ],
+      "limits": [
+        "No hosted CI run or publication authorized.",
+        "The original discovery clock includes diagnosis performed during catalog closure."
+      ],
+      "next": "Inspect warning targets and correct links with strict verification. Original03:59:26.692799\u201304:29:26.692799UTC includes diagnosis already used.",
+      "issueClock": {
+        "startedAt": "2026-11-03T03:59:26.692799Z",
+        "deadline": "2026-11-03T04:29:26.692799Z",
+        "originalClockRetained": true
+      }
+    },
     {
       "id": "slideshow-slim-frame",
       "title": "Slideshow: a slim frame for every photo shape",

@@ -285,3 +285,21 @@ Fleet deployment verified the full installed hash. That missed confirmation now
 has a separate cause-first queued readiness item, with no assumed root cause.
 
 The confirmation-readiness checkpoint keeps32 tasks:14 delivered/implemented,12 scoped verified,2 approval,3 parked and1 queued account-dependent playback. Family's exact existing1.77 recovery and valid Fleet fixture confirmation passed.19 focused/180 Python tests protect linked device identity, actual completed binding, full hashes and timeout honesty. Original app/test/settings remain preserved; no new release or Living operation. Weather-only design scope is now approved for the next native unit; broader gallery approval stays pending.
+
+
+The69-task catalog-parity snapshot records exact **1.98/code92** in both rooms,
+10 focused /206 Python /4,066 JVM tests, matching packaged26-entry catalog,
+and actual optimized Family asset/parser improvement0/10→10/10. Complete saved
+maps are unchanged; Family frame/font/services/original Chrome remain. Source,
+network and review evidence has its separate scoped receipt. No third-party
+installs or offline-installation acceptance is implied.
+
+Fresh390×844 and1600×1000 checks cover the selected catalog detail, current
+version, phone boundary and HTTP200 proof with matching disk bytes. Neither
+page nor detail overflows; page errors/external requests are zero and owned
+contexts are closed. This does not reaccept all69 workflows or native UI.
+
+The final70-task snapshot adds the independently queued strict-docs repair with
+its original03:59:26.692799–04:29:26.692799UTC clock. Both selected details and
+the matching proof pass the same390/1600 checks; the queued clock is visible.
+No page errors or external requests; all owned contexts closed.
