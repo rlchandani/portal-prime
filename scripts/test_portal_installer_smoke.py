@@ -102,6 +102,55 @@ class InstallerSmokeTest(unittest.TestCase):
         ]
         self.runner = Runner()
 
+    def test_utf8_bom_unicode_name_registry_admission_preserves_bytes(self):
+        path = self.registry / "family.json"
+        data = {"name": "Café 東京", "serial": "usb-serial", "token": PRIVATE}
+        raw = b"\xef\xbb\xbf" + (json.dumps(data, ensure_ascii=False, indent=2)
+                                .replace("\n", "\r\n") + "\r\n").encode("utf-8")
+        path.write_bytes(raw)
+        try:
+            serial = smoke.registered_serial(self.registry, data["name"])
+        except smoke.SmokeError as error:
+            self.fail("Valid Windows UTF-8 registry rejected: " + str(error))
+        self.assertEqual(serial, "usb-serial")
+        self.assertEqual(path.read_bytes(), raw)
+        self.assertEqual(self.runner.calls, [])
+
+    def test_utf8_bom_serial_registry_admission_preserves_bytes(self):
+        path = self.registry / "family.json"
+        raw = b"\xef\xbb\xbf" + path.read_bytes()
+        path.write_bytes(raw)
+        try:
+            serial = smoke.registered_serial(self.registry, "usb-serial")
+        except smoke.SmokeError as error:
+            self.fail("Valid Windows UTF-8 registry rejected: " + str(error))
+        self.assertEqual(serial, "usb-serial")
+        self.assertEqual(path.read_bytes(), raw)
+        self.assertEqual(self.runner.calls, [])
+
+    def test_misplaced_or_double_registry_bom_keeps_admission_rejected(self):
+        path = self.registry / "family.json"
+        plain = path.read_bytes()
+        for raw in (b"\xef\xbb\xbf\xef\xbb\xbf" + plain,
+                    b" \r\n\xef\xbb\xbf" + plain,
+                    b"\xef\xbb\xbf" + plain.replace(b"CurrentFamily", b"Current\xff")):
+            with self.subTest(prefix=raw[:6]):
+                path.write_bytes(raw)
+                with self.assertRaises(smoke.SmokeError) as caught:
+                    smoke.registered_serial(self.registry, "usb-serial")
+                self.assertEqual(str(caught.exception), "invalid_registry_target")
+                self.assertEqual(path.read_bytes(), raw)
+        self.assertEqual(self.runner.calls, [])
+
+    def test_embedded_bom_name_remains_exact_identity_data(self):
+        path = self.registry / "family.json"
+        data = {"name": "Room\ufeffName", "serial": "usb-serial", "token": PRIVATE}
+        raw = json.dumps(data, ensure_ascii=False).encode("utf-8")
+        path.write_bytes(raw)
+        self.assertEqual(smoke.registered_serial(self.registry, data["name"]), "usb-serial")
+        self.assertEqual(path.read_bytes(), raw)
+        self.assertEqual(self.runner.calls, [])
+
     def invoke(self):
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):

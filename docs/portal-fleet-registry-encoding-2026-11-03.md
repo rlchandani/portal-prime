@@ -1,8 +1,9 @@
 # Fleet registry encoding — 3 November 2026
 
 The locally installed macOS arm64 Fleet CLI and the room helper now read UTF-8
-registry files written by Windows PowerShell 5.1. Both accept one leading UTF-8
-byte-order mark, preserve Unicode fields and leave files unchanged. The exact
+registry files written by Windows PowerShell 5.1. Read-only admission accepts one
+leading UTF-8 byte-order mark and preserves Unicode fields and file bytes. Endpoint
+refresh uses the same decoder before its existing private atomic write. The exact
 tested executable replaces the ignored local `provisioning/fleetctl`; its original
 bytes remain privately available for rollback. The previous **1.113/code107** room
 delivery is retained. No owner registry or device was accessed for this unit.
@@ -28,7 +29,7 @@ marker-only files, invalid UTF-8 and UTF-16 remain rejected. Existing malformed-
 CLI warning/skip and strict room-helper failure policies remain; reading does not
 rewrite registry bytes or change port, schema or selector rules.
 
-## Frozen reproduction and host acceptance
+## Initial delivery: frozen reproduction and host acceptance
 
 Ten actual-reader methods were frozen before production changes, SHA256
 `c5a47c9b83659c6c44e35c02114b0fc94bc54224339c3091e1290b9fcb8a85af`. The freshly compiled unchanged CLI and unchanged helper
@@ -88,6 +89,68 @@ original are 694,352-byte Mach-O arm64 executables. Raw
 logs, rollback binary and review records remain under private
 `/private/tmp/portal-product-audit-20261103-085150`.
 
+## Same-clock workflow follow-through
+
+The continued audit found two additional file reads using plain UTF-8:
+`room-fleet.py::atomic_update` after successful load/authentication, and
+`scripts/portal_installer_smoke.py::registered_serial` during registry admission.
+Both now use `utf-8-sig`. This continues the same **08:51:50–09:21:50 UTC** encoding
+clock, including the earlier delivery and all follow-through; no clock restarts.
+The follow-through baseline is commit `be51159fc9148f7e281da6c64e36b8747231a7c5`.
+
+Eight frozen refresh methods reproduce **three assertion failures**, then pass
+unchanged. An owned HTTP peer verifies actual GET, Host and bearer headers and
+returns the exact registered Unicode name; only service lookup is patched. The
+existing IPv4 resolution, HTTP identity/authentication, full snapshot comparison
+and private atomic replacement run. Before correction, the authenticated room
+reported down because its file reread rejected the marker. Endpoint-only changes,
+all remaining fields,0600 mode, replacement inode, unchanged authenticated
+snapshot, changed token/data rejection and symlink replacement checks pass.
+Injected replacement failure is actually reached and retires its private temporary
+file while preserving original BOM bytes. Double/displaced markers and invalid
+UTF-8 are rejected before writer creation; embedded U+FEFF data remains.
+
+Four installer admission cases extend the existing smoke suite from19 to23 methods.
+The two valid BOM cases reproduce **two assertion failures**, then pass unchanged;
+all19 prior method bodies remain unchanged. Generated Unicode name and serial
+lookup return only the safe identity and preserve file bytes. Malformed markers
+and embedded U+FEFF controls retain existing policy; no fixture Runner command
+is issued by those four cases. This proves the helper, not a live installer run.
+
+Current gates pass **200 Fleet tests +23 smoke tests +38 Bash access checks**, all
+terminal0/zero errors or skips. Eight Fleet suites, smoke/access and shell checks
+are joined in 18.017 seconds. The previously installed CLI is
+unchanged and passes the original frozen10 methods again. Rust source and its
+existing compiled25-test artifact are unchanged; no CLI reinstall or Android
+build/install is needed. New refresh tests are added to both provisioning triggers
+and its Linux room step; the smoke suite is already selected by existing CI.
+Hosted execution remains unobserved.
+
+`fleet-backup-data.py` already passes bytes into `json.loads`, which detects the
+leading marker; no backup/restore source change was needed. Existing backup/restore
+suites pass, but explicit BOM end-to-end backup/restore acceptance remains open.
+Actual mDNS, owner registry refresh, device/Windows execution and a live installer
+smoke run are unverified. Normal completion and replacement-failure cleanup are
+checked; crash/external-runner cleanup and universal filesystem race resistance
+are unverified. No owner configuration or phone operation occurred.
+
+The candidate selector-fanout investigation was stopped without source/test edits
+when an older receipt established the same defect under the exhausted November2
+23:15:37–23:45:37 clock. It receives no new slot.
+
+| Follow-through artifact | SHA256 |
+| --- | --- |
+| Baseline room helper | `0d56c1c4c4b0dc9cf026ba9938a7d16180980571ba619f9186ea96ec88fb8d82` |
+| Candidate room helper | `7d0ca1b4cef2ab27e7b0a4e09de3e49cdac2a220e2fbea98596fb42f7ee79a80` |
+| Frozen refresh tests | `7f7ec593a3c52bbcea5c0752e7852e39cf0810a5dfdaed8ea9cf42540a57d1f8` |
+| Baseline smoke source | `2791cf42daa639da13da933ac4a0cccbae66f4e8a05668d1fffa0bcd6c90e547` |
+| Candidate smoke source | `7e0b6e99b1c8129c004429a76f1d39ca2ac4455d3a8b038f1a5ce3a544e310f0` |
+| Frozen expanded smoke tests | `117ff911b4c2cfaa86d2ff2252602bc8a50bd8451b2f99dc8fbd4179e65b5eec` |
+
+Follow-through raw logs/reviews are private under
+`/private/tmp/portal-fleet-registry-refresh-20261103`. The first delivery's original
+binary, source/test hashes and counts above remain historical evidence.
+
 ## Documentation and backlog acceptance
 
 Strict MkDocs passes with zero warnings/errors. Browser checks at390×844 and
@@ -99,6 +162,6 @@ close and the existing deliverable preview server is preserved. Final proof byte
 are checked again after recording this metadata.
 
 The roadmap records **89 tasks:54 delivered,25 locally verified,3 approval,6 parked,
-1 queued**. All 88 prior task objects and their raw serialization, default Weather
-selection and all permission/delivery boundaries remain unchanged. The broader
+1 queued**. The existing encoding task is updated; all 88 older task objects and their raw
+serialization, default Weather selection and all permission/delivery boundaries remain unchanged. The broader
 autonomous goal stays active. Native Windows acceptance remains open.

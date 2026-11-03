@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T09:01:21.787959+00:00",
+  "updatedAt": "2026-11-03T09:14:58.981845+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -16,22 +16,23 @@
     {
       "id": "fleet-registry-encoding",
       "title": "Fleet: read Windows-provisioned UTF-8 registries",
-      "summary": "Locally verified and installed: a single leading UTF-8 BOM no longer hides Windows-provisioned devices.",
-      "description": "Accept the PowerShell5.1 file marker at both registry readers; preserve Unicode fields, original bytes and existing validation. Generic network JSON parsing remains unchanged.",
+      "summary": "Locally verified: Windows-generated files now load, refresh authenticated endpoints and pass installer registry admission.",
+      "description": "Accept the single file marker consistently at CLI and Python registry load/refresh/admission boundaries. Preserve Unicode fields, guarded atomic endpoint writes and existing validation; network JSON remains unchanged.",
       "status": "verified",
-      "verification": "10 frozen methods:6 red failures\u2192pass \u00b7 192 Fleet host tests +38 Bash checks \u00b7 installed copy10/10",
+      "verification": "10 read +8 refresh methods +4 smoke additions \u00b7200 Fleet +23 smoke +38 Bash checks",
       "kind": "Host Fleet registry compatibility",
       "platforms": [
         "portal"
       ],
       "owner": "Fleet tooling / independent regression and artifact review",
       "deployment": "Exact tested macOS arm64 CLI atomically installed locally; previous Portal1.113/code107 delivery retained.",
-      "state": "Original ignored executable preserved privately. Generated registries and owned loopback fixtures only; no owner registry or device operation.",
+      "state": "Exact installed CLI unchanged; original privately preserved. Actual owned HTTP refresh and private atomic filesystem fixtures pass; installer identity helper uses generated files only. No owner registry/device operation.",
       "acceptance": [
         "Reproduce CLI omitted inventory/fanout and strict helper rejection using frozen actual-reader methods.",
         "Accept exactly one leading UTF-8 file marker while preserving Unicode, BOM-free files, embedded U+FEFF and malformed-input policies.",
         "Run fresh native CLI/full host gates and exact installed executable acceptance.",
-        "Preserve original file bytes, prior task objects, room delivery, permissions and original issue clocks."
+        "Preserve original file bytes, prior task objects, room delivery, permissions and original issue clocks.",
+        "Complete authenticated endpoint refresh and installer registry admission using the same decoder; preserve all existing writer and identity guards."
       ],
       "evidence": [
         {
@@ -48,9 +49,13 @@
         "Normal listener/thread/subprocess/temporary registry cleanup is exercised. External runner failure and timeout cleanup were not independently fault-injected.",
         "Existing JSON schema, duplicate-key and selector-collision behavior, malformed-row CLI skip versus strict helper failure, port validation, token handling and general command deadlines remain.",
         "One existing as_i64 dead_code compiler warning; no compiler errors.",
-        "No owner registry or token copy, real-device/phone/provider/HA operation, GitHub authentication, push or publication. Existing permissions, approvals and original parked clocks remain."
+        "No owner registry or token copy, real-device/phone/provider/HA operation, GitHub authentication, push or publication. Existing permissions, approvals and original parked clocks remain.",
+        "Actual owned loopback HTTP and generated files only; service lookup is patched. Actual mDNS, Portal and Windows execution, helper deployment and live installer smoke remain unverified.",
+        "Normal fixture completion and injected replacement failure check temporary-file cleanup. Process crashes, external runner failures and full filesystem race resistance remain unverified.",
+        "Actual smoke registered_serial helper and mocked subprocess suite only; no live ADB or Fleet command.",
+        "Original token, data, symlink, size and unique safe-serial guards remain. CLI ambiguity is an older exhausted issue and stays unchanged."
       ],
-      "next": "Retain local host delivery; actual Windows writer/native CLI and hosted cross-platform CI remain open. Continue distinct authorized work without reopening parked clocks.",
+      "next": "Retain same-clock encoding delivery; actual Windows/mDNS/device and live installer acceptance remain open. Older selector fanout clock stays exhausted.",
       "issueClock": {
         "startedAt": "2026-11-03T08:51:50+00:00",
         "deadline": "2026-11-03T09:21:50+00:00",

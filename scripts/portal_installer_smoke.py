@@ -69,7 +69,7 @@ def registered_serial(registry, device):
         for path in root.glob("*.json"):
             if path.is_symlink() or path.stat().st_size > 1024 * 1024:
                 raise SmokeError("invalid_registry_target")
-            data = json.loads(path.read_text())
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
             if not isinstance(data, dict):
                 raise SmokeError("invalid_registry_target")
             if device in (data.get("name"), data.get("serial")):

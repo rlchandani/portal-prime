@@ -134,6 +134,7 @@ gitignored.)
 Both `fleetctl` and `room-fleet.py` accept UTF-8 registry files with or without
 the leading byte-order mark written by Windows PowerShell 5.1. Unicode device
 names and credentials are preserved, and reading a registry never rewrites it.
+Endpoint refresh reads the same format before its existing private atomic update.
 
 ```bash
 ./provision.sh --fleet          # macOS/Linux: name + enable the agent, record the device

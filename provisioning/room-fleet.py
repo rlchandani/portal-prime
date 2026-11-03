@@ -212,7 +212,7 @@ def atomic_update(room, ip, port):
     try:
         if room.path.is_symlink():
             raise FleetError("registry entry changed; refresh again")
-        current = json.loads(room.path.read_text(encoding="utf-8"))
+        current = json.loads(room.path.read_text(encoding="utf-8-sig"))
         if current != room.data:
             raise FleetError("registry entry changed; refresh again")
         updated = dict(current, ip=ip, agentPort=port)

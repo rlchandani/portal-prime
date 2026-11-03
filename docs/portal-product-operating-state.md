@@ -14,11 +14,15 @@ The updated whole-product objective is
 ## Current delivery and boundaries
 
 - **Current host CLI / Windows registry compatibility:** native macOS Fleet CLI
-  and room helper accept one leading UTF-8 BOM emitted by PowerShell5.1. Unicode
-  fields, BOM-free files and existing malformed-input policies remain; registry
-  bytes and network JSON parsing are unchanged. Ten frozen methods reproduce six
-  assertion failures then pass; **192 Fleet host tests +38 Bash access checks**,
-  zero skips. Exact tested CLI is atomically installed locally and separately
+  and Python registry load/refresh/installer admission accept one leading UTF-8
+  BOM emitted by PowerShell5.1. Unicode fields and existing guards remain;
+  read-only bytes and network JSON parsing are unchanged. Authenticated endpoint
+  refresh retains the original0600 guarded atomic writer. First10 read methods
+  reproduce6 failures; same-clock8 refresh methods reproduce3, expanded23 smoke
+  methods reproduce2; all pass unchanged. **200 Fleet +23 smoke +38 Bash tests**,
+  zero skips. Actual refresh HTTP/filesystem use generated fixtures, only lookup
+  patched; real mDNS/device/live installer remain open. Older selector fanout was
+  already known under exhaustedNov2 23:15:37–23:45:37; no source/test edit or new slot. Exact tested CLI is atomically installed locally and separately
   passes10/10. Original bytes are privately preserved. Actual Windows writer/native
   executable and hosted CI remain unobserved; Linux and Windows CI are wired.
   No owner registry or device operation; prior **1.113/code107** room delivery

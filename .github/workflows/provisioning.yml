@@ -24,6 +24,7 @@ on:
       - "provisioning/fleet.rs"
       - "provisioning/room-fleet.py"
       - "provisioning/test_room_fleet.py"
+      - "provisioning/test_room_registry_encoding.py"
       - "provisioning/test_fleet_http.py"
       - "provisioning/test_fleet_ports.py"
       - "provisioning/test_fleet_registry_encoding.py"
@@ -44,6 +45,7 @@ on:
       - "provisioning/fleet.rs"
       - "provisioning/room-fleet.py"
       - "provisioning/test_room_fleet.py"
+      - "provisioning/test_room_registry_encoding.py"
       - "provisioning/test_fleet_http.py"
       - "provisioning/test_fleet_ports.py"
       - "provisioning/test_fleet_registry_encoding.py"
@@ -89,7 +91,9 @@ jobs:
           python provisioning/test_fleet_registry_encoding.py -v
 
       - name: Run room fleet tests
-        run: python provisioning/test_room_fleet.py -v
+        run: |
+          python provisioning/test_room_fleet.py -v
+          python provisioning/test_room_registry_encoding.py -v
 
       - name: Run private backup integrity tests
         run: |
