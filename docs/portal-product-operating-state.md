@@ -13,6 +13,23 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Current room APK / Sunrise one-shot consumption:** exact optimized
+  **1.103/code97** is installed and fully hashed in both rooms. An enabled alarm
+  with no selected weekdays now consumes only its enabled flag after presentation;
+  the existing scheduler cancels instead of arming tomorrow. Time/ramp/chime and
+  repeating weekdays are retained. Seven regressions reproduce four failures then
+  pass; **4,108 JVM/428 suites**, debug/optimized/R8/vital lint pass in2m10s.
+  Actual optimized Family Android10 receiver/scheduler improves **7/11→11/11**
+  with process-local service doubles; real alarm/UI/light/audio/boot/API28 and
+  concurrent-settings acceptance remain open. Complete maps and Home/timer/Sunrise
+  preference bytes match. Family normal frame/font/services/original Chrome are
+  retained; owned native processes/scratch/registry copy removed. Earlier native
+  fixture gaps remain labeled separately. Public1.83 guard rejects local1.103;
+  no phone/HA/auth/publication.
+  **77 tasks:44 delivered,23 locally verified,3 approval,6 parked,1 queued.**
+  Original **05:53:46–06:23:46 UTC** retained; broader goal stays active.
+  [Receipt](portal-sunrise-one-shot-2026-11-03.md).
+
 - **Fleet soft restore XML / locally verified:** `--config` parses the saved map
   once, rejects invalid selected XML/types before earlier restore actions and
   freezes both literal endpoint plans. Private replies require process success
@@ -23,14 +40,15 @@ The updated whole-product objective is
   compile, owner restore or per-field applied-state readback. Registry collision,
   modes and normal scratch/server cleanup are verified. Endpoint subset/source
   precedence and partial-state limits remain; raw prefs/cross-package/atomic
-  restoration are separate. Room APK remains last verified **1.102/code96**.
+  restoration are separate. At that unit's verification, the room APK remained
+  **1.102/code96**.
   No owner registry/device/phone/build/install/HA/auth/publication operation.
   **76 tasks:43 delivered,23 locally verified,3 approval,6 parked,1 queued.**
   Original **05:39:37–06:09:37 UTC** retained; broader goal stays active.
   [Receipt](portal-fleet-config-xml-2026-11-03.md).
 
-- **Current room APK / cancelled calendar status:** exact optimized
-  **1.102/code96** is installed and fully hashed in both rooms. Event preparation
+- **Previous room APK / cancelled calendar status:** exact optimized
+  **1.102/code96** was installed and fully hashed in both rooms. Event preparation
   omits `STATUS:CANCELLED` before caching/recurrence; active statuses retain their
   behavior. Eight methods reproduce seven failures then pass, including
   active→cancelled-only success→failed-refresh recovery. **4,101 JVM/427 suites**,

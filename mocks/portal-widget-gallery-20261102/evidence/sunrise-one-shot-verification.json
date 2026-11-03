@@ -1,0 +1,348 @@
+{
+  "recordedAt": "2026-11-03T06:06:28.921698+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T05:53:46Z",
+    "deadline": "2026-11-03T06:23:46Z",
+    "originalDiscoveryClockRetained": true
+  },
+  "scope": "Consume enabled Sunrise one-shots after presentation; preserve saved fields and repeating weekday scheduling. Direct production receiver/scheduler calls with framework wrappers and process-local service doubles; no real alarm/UI acceptance.",
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/SunriseReceiver.kt": "a19ca5ab5baad1ec67fb88ad31a6bb329f44df8af8197988bd4501be65574f2c",
+    "app/src/test/java/com/immortal/launcher/SunriseReceiverDeliveryTest.kt": "561a79b76b14e73f0e6f0fc4ced977b3b883011f957f5848d110c65a261642c9",
+    "app/build.gradle.kts": "93ea2f469ac2a6d7ab8cebcda686917b30c8024396f5ded131fcd796335d82af"
+  },
+  "red": {
+    "tests": 7,
+    "failures": 4,
+    "errors": 0,
+    "failed": [
+      "containedPresentationFailuresStillConsumeOneShot",
+      "oneShotFiresOnceDisablesOnlyEnabledAndArmsNoNextOccurrence",
+      "duplicateOneShotDeliveryDoesNotWakeOrWriteAgain",
+      "laterAppOrBootRescheduleCannotRearmFiredOneShot"
+    ]
+  },
+  "green": {
+    "suites": 428,
+    "tests": 4108,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "newReceiverMethods": 7,
+    "debugAndOptimizedBuildExit": 0,
+    "r8AndVitalLintExit": 0,
+    "combinedDuration": "2m 10s"
+  },
+  "native": {
+    "platform": "Family Android 10/API29, explicitly scoped WiFi ADB",
+    "results": [
+      {
+        "optimizedApkSha256": "429017496a4e5908d0ad53cf1080694e7ddc3aeeb0d5f959b9f3a364b609bfcf",
+        "checks": {
+          "actualApkReceiverLoaded": true,
+          "oneWakeWithRetainedRampAndChime": true,
+          "oneFullScreenNotificationCaptured": true,
+          "onlyEnabledChangedForOneShot": false,
+          "oneShotHasNoRearmedAlarm": false,
+          "duplicateDeliverySilentAndPreservesConsumedState": false,
+          "explicitStartupRescheduleRemainsUnarmed": false,
+          "repeatingAlarmPreservesAllSavedFields": true,
+          "repeatingAlarmWakesAndArmsMatchingDay": true,
+          "disabledDeliveryAndRescheduleStaySilent": true,
+          "unrelatedMissingAndNullActionsAreInert": true
+        },
+        "actualProductionReceiver": "com.immortal.launcher.SunriseReceiver",
+        "explicitSchedulerMethod": "com.immortal.launcher.TodoStore.o",
+        "appPreferencesWritten": 0,
+        "realAlarmsRegistered": 0,
+        "realNotificationsPosted": 0,
+        "realPendingIntentsRegistered": 0,
+        "realActivitiesLaunched": 0,
+        "scope": "Actual optimized APK receiver/config/scheduler; framework wrappers and process-local service doubles",
+        "cleanup": {
+          "processLocalServicesRestored": true,
+          "inMemoryHandlesRetired": true
+        },
+        "interceptedServiceCalls": [
+          "ActivityManager.getIntentSender",
+          "NotificationManager.createNotificationChannels",
+          "NotificationManager.enqueueNotificationWithTag",
+          "ActivityManager.getIntentSender",
+          "ActivityManager.getIntentSender",
+          "AlarmManager.set",
+          "ActivityManager.getIntentSender",
+          "NotificationManager.createNotificationChannels",
+          "NotificationManager.enqueueNotificationWithTag",
+          "ActivityManager.getIntentSender",
+          "AlarmManager.remove",
+          "ActivityManager.cancelIntentSender",
+          "ActivityManager.getIntentSender",
+          "AlarmManager.set",
+          "ActivityManager.getIntentSender",
+          "AlarmManager.remove",
+          "ActivityManager.cancelIntentSender",
+          "ActivityManager.getIntentSender",
+          "AlarmManager.set",
+          "ActivityManager.getIntentSender",
+          "NotificationManager.createNotificationChannels",
+          "NotificationManager.enqueueNotificationWithTag",
+          "ActivityManager.getIntentSender",
+          "ActivityManager.getIntentSender",
+          "AlarmManager.set",
+          "ActivityManager.getIntentSender",
+          "ActivityManager.getIntentSender"
+        ],
+        "unsupportedInterceptedServiceCalls": [],
+        "passed": 7,
+        "total": 11,
+        "status": "FAIL"
+      },
+      {
+        "optimizedApkSha256": "e12a1370c901635084d1798dd7f759036e5116ecfc2b0489e254ae6b726eee2f",
+        "checks": {
+          "actualApkReceiverLoaded": true,
+          "oneWakeWithRetainedRampAndChime": true,
+          "oneFullScreenNotificationCaptured": true,
+          "onlyEnabledChangedForOneShot": true,
+          "oneShotHasNoRearmedAlarm": true,
+          "duplicateDeliverySilentAndPreservesConsumedState": true,
+          "explicitStartupRescheduleRemainsUnarmed": true,
+          "repeatingAlarmPreservesAllSavedFields": true,
+          "repeatingAlarmWakesAndArmsMatchingDay": true,
+          "disabledDeliveryAndRescheduleStaySilent": true,
+          "unrelatedMissingAndNullActionsAreInert": true
+        },
+        "actualProductionReceiver": "com.immortal.launcher.SunriseReceiver",
+        "explicitSchedulerMethod": "com.immortal.launcher.TodoStore.o",
+        "appPreferencesWritten": 0,
+        "realAlarmsRegistered": 0,
+        "realNotificationsPosted": 0,
+        "realPendingIntentsRegistered": 0,
+        "realActivitiesLaunched": 0,
+        "scope": "Actual optimized APK receiver/config/scheduler; framework wrappers and process-local service doubles",
+        "cleanup": {
+          "processLocalServicesRestored": true,
+          "inMemoryHandlesRetired": true
+        },
+        "interceptedServiceCalls": [
+          "ActivityManager.getIntentSender",
+          "NotificationManager.createNotificationChannels",
+          "NotificationManager.enqueueNotificationWithTag",
+          "ActivityManager.getIntentSender",
+          "ActivityManager.getIntentSender",
+          "ActivityManager.getIntentSender",
+          "ActivityManager.getIntentSender",
+          "NotificationManager.createNotificationChannels",
+          "NotificationManager.enqueueNotificationWithTag",
+          "ActivityManager.getIntentSender",
+          "ActivityManager.getIntentSender",
+          "AlarmManager.set",
+          "ActivityManager.getIntentSender",
+          "ActivityManager.getIntentSender"
+        ],
+        "unsupportedInterceptedServiceCalls": [],
+        "passed": 11,
+        "total": 11,
+        "status": "PASS"
+      }
+    ],
+    "cleanup": [
+      {
+        "ownedProcessRetired": true,
+        "ownedDeviceScratchRemoved": true,
+        "appPreferencesWritten": 0,
+        "installerInvoked": false,
+        "networkRequests": 0
+      },
+      {
+        "ownedProcessRetired": true,
+        "ownedDeviceScratchRemoved": true,
+        "appPreferencesWritten": 0,
+        "installerInvoked": false,
+        "networkRequests": 0
+      }
+    ],
+    "fixtureSha256": {
+      "java": "a650c253c24674881d6eaf0bbbfe8ccccb197fb4e53b03baf08c4299d8a64191",
+      "jar": "dde79c26356ce8fe3ead099ee10f8da3a35ec27eba3ab35cd561c760283a0bcc",
+      "runner": "2a3a3d075b6bff588c86f12a47869dea162177ed29437d74ff794982cd6a5a0f"
+    },
+    "earlierAttempts": "Two earlier 5/11 baseline attempts are retained privately as notification-preparation fixture gaps. Final activity-service double restores the controls; production and eleven assertions were unchanged."
+  },
+  "artifact": {
+    "sha256": "e12a1370c901635084d1798dd7f759036e5116ecfc2b0489e254ae6b726eee2f",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionCode": 97,
+    "versionName": "1.103",
+    "variants": {
+      "performance": {
+        "sha256": "e12a1370c901635084d1798dd7f759036e5116ecfc2b0489e254ae6b726eee2f",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 97,
+        "versionName": "1.103"
+      },
+      "debug": {
+        "sha256": "de27e80f46b7f02f24ec9dfc6694e4efa05df68327b6b2a20fda6f09a423c1c3",
+        "bytes": 46703533,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 97,
+        "versionName": "1.103"
+      },
+      "rollback": {
+        "sha256": "429017496a4e5908d0ad53cf1080694e7ddc3aeeb0d5f959b9f3a364b609bfcf",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 96,
+        "versionName": "1.102"
+      }
+    },
+    "debugSha256": "de27e80f46b7f02f24ec9dfc6694e4efa05df68327b6b2a20fda6f09a423c1c3",
+    "rollbackSha256": "429017496a4e5908d0ad53cf1080694e7ddc3aeeb0d5f959b9f3a364b609bfcf",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 10s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "originalRegistryByteHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "ownedNativeProcessesAndDeviceScratchRemoved": true,
+    "normalFamilyFrameVisuallyInspected": true,
+    "familyChromeTaskRetained": true,
+    "googlePhoneCommands": 0
+  },
+  "review": {
+    "blockingFindings": 0,
+    "reviewedSourceHashesMatch": true,
+    "reviewedNativeAndApkHashesMatch": true,
+    "normalCleanupVerified": true,
+    "scope": "Direct production receiver/scheduler and framework wrappers/service doubles; fault-injected timeout cleanup unverified.",
+    "receiptAndRoadmapReviewed": true,
+    "previousVersionWordingCorrected": true
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestUnchanged": true,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false
+  },
+  "limits": [
+    "Actual AlarmManager delivery, real PendingIntent registration/identity and full-screen notification promotion are unverified.",
+    "WakeLight UI, brightness, chime audio, app-start/boot lifecycle and reboot were not exercised.",
+    "API28, Living visual acceptance and concurrent setting changes remain unverified.",
+    "Native normal cleanup passes; fault-injected timeout cleanup is not claimed.",
+    "Existing channel/notification construction failures outside contained calls retain earlier behavior.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+  ],
+  "documentation": {
+    "strictMkdocsExit": 0,
+    "strictWarnings": 0,
+    "seconds": 2.38,
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 77,
+          "checks": [
+            {
+              "id": "sunrise-one-shot",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "fleet-config-xml",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 77,
+          "checks": [
+            {
+              "id": "sunrise-one-shot",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "fleet-config-xml",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingServerPreserved": true
+    },
+    "detailCapturesVisuallyInspected": true,
+    "earlier76TaskRecordsDefaultAndOtherBoundariesPreserved": true,
+    "scope": "Two selected details at two widths; no full-product accessibility or visual acceptance.",
+    "finalStrictMkdocsExit": 0,
+    "finalStrictWarnings": 0,
+    "finalSeconds": 2.05
+  }
+}

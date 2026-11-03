@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T05:51:46.666962+00:00",
+  "updatedAt": "2026-11-03T06:06:28.925779+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,56 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.102/code96. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.103/code97. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "sunrise-one-shot",
+      "title": "Sunrise: consume one-shot wake alarms",
+      "summary": "Delivered to both rooms: alarms with no selected weekdays disable after firing and stay unarmed until manually enabled.",
+      "description": "Consume only the enabled flag after presenting the saved ramp/chime configuration. Reuse the existing scheduler cancellation path; retain next matching weekday behavior for repeating alarms.",
+      "status": "delivered",
+      "verification": "7 regressions / 4,108 JVM \u00b7 optimized Android 7/11\u219211/11",
+      "kind": "Sunrise alarm scheduling correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Ambient engineering / independent receiver and Android fixture review",
+      "deployment": "Exact signed optimized 1.103/code97 installed and full APK hash verified in Family Area and Living Area.",
+      "state": "Complete maps and Home/timer/Sunrise preference bytes match. Family frame/font/services/original Chrome retained. Owned native processes/scratch/registry copy removed.",
+      "acceptance": [
+        "Reproduce a documented one-shot rearming tomorrow and sequential duplicate delivery.",
+        "Disable only the consumed one-shot; preserve saved fields, presentation and repeating weekday scheduling.",
+        "Verify later direct rescheduling stays unarmed; keep disabled/unrelated-action controls.",
+        "Run full gates and actual optimized production code on Android; deliver exact signed artifacts while preserving owner state."
+      ],
+      "evidence": [
+        {
+          "text": "Root cause, receiver policy, regression and optimized Android results, room delivery and limits.",
+          "source": "docs/portal-sunrise-one-shot-2026-11-03.md"
+        },
+        {
+          "text": "Reviewed hashes, seven regressions, native comparison, cleanup, exact APK and preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/sunrise-one-shot-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual AlarmManager delivery, real PendingIntent registration/identity and full-screen notification promotion are unverified.",
+        "WakeLight UI, brightness, chime audio, app-start/boot lifecycle and reboot were not exercised.",
+        "API28, Living visual acceptance and concurrent setting changes remain unverified.",
+        "Native normal cleanup passes; fault-injected timeout cleanup is not claimed.",
+        "Existing channel/notification construction failures outside contained calls retain earlier behavior.",
+        "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+      ],
+      "next": "Retain this delivered one-shot correction. Pending design approvals, human sign-in dependency and original parked clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-03T05:53:46Z",
+        "deadline": "2026-11-03T06:23:46Z",
+        "originalDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "fleet-config-xml",
       "title": "Fleet: decode and freeze soft restore config",

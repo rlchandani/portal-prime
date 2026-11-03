@@ -16,14 +16,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 
-/** Fires at the sunrise-alarm time: launches the full-screen wake light, then arms the
- *  next occurrence. */
+/** Fires at the sunrise-alarm time: launches the full-screen wake light, consumes a
+ *  one-shot or arms the next repeating occurrence. */
 class SunriseReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
     if (intent?.action != SunriseScheduler.ACTION_FIRE) return
     val cfg = SunriseConfig.load(context)
-    if (cfg.enabled) showWakeLight(context, cfg)
-    // Arm the next day (or next matching weekday).
+    if (cfg.enabled) {
+      showWakeLight(context, cfg)
+      // Empty repeat days mean one-shot: retain its settings but stop tomorrow's rearm.
+      if (cfg.days.isEmpty()) SunriseConfig.setEnabled(context, false)
+    }
+    // Cancel a consumed one-shot or arm the next matching weekday.
     SunriseScheduler.reschedule(context)
   }
 
