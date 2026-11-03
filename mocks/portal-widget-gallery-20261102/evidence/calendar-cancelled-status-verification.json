@@ -1,0 +1,278 @@
+{
+  "schemaVersion": 1,
+  "title": "Calendar feeds omit explicitly cancelled event blocks",
+  "status": "delivered",
+  "checkedAtUtc": "2026-11-03T05:37:24.022573+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T05:29:15Z",
+    "deadline": "2026-11-03T05:59:15Z",
+    "originalDiscoveryClockRetained": true
+  },
+  "artifact": {
+    "sha256": "429017496a4e5908d0ad53cf1080694e7ddc3aeeb0d5f959b9f3a364b609bfcf",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.102",
+    "versionCode": 96,
+    "debugSha256": "2f7f5dad56141b5bad01b14558dc1478425c5fdbc94e373946ec96968f8df713",
+    "rollbackSha256": "7bc1ee8b70f873e23bb35c88983bda6f0843a7bab4c77d2d91134a6f0f931045",
+    "variants": {
+      "performance": {
+        "sha256": "429017496a4e5908d0ad53cf1080694e7ddc3aeeb0d5f959b9f3a364b609bfcf",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.102",
+        "versionCode": 96
+      },
+      "debug": {
+        "sha256": "2f7f5dad56141b5bad01b14558dc1478425c5fdbc94e373946ec96968f8df713",
+        "bytes": 46703533,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.102",
+        "versionCode": 96
+      },
+      "rollback": {
+        "sha256": "7bc1ee8b70f873e23bb35c88983bda6f0843a7bab4c77d2d91134a6f0f931045",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.101",
+        "versionCode": 95
+      }
+    },
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "1m 59s"
+  },
+  "reviewedHashes": {
+    "app/src/main/java/com/immortal/launcher/CalendarFeed.kt": "99bbbd5886c02e27ca80f91d597664cb91e71ea050d47a6944c957293831d9bb",
+    "app/src/test/java/com/immortal/launcher/CalendarCancelledStatusTest.kt": "9d984a683b24e9ffc1ffdbf92a1b4019b0979902ad196b2796af848781e83b43",
+    "app/build.gradle.kts": "5fbf5040fefca63ce95cdcab08fb5cabc029543d89c5ad89884947d743903987"
+  },
+  "independentReview": {
+    "status": "clear",
+    "scope": "Read-only production/tests/optimized mapping/fixture ownership and source hash review",
+    "runtimeExecution": false,
+    "nativeExdateQualification": "Count/title control only; exact dates have existing JVM coverage"
+  },
+  "tests": {
+    "redMethods": 8,
+    "redFailures": 7,
+    "finalRegressionMethods": 8,
+    "suites": 427,
+    "tests": 4101,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "debugAssembly": true,
+    "optimizedAssembly": true,
+    "r8": true,
+    "vitalLint": true,
+    "androidGateSeconds": 119
+  },
+  "androidParser": {
+    "platform": {
+      "sdk": 29,
+      "release": "10",
+      "familyOnlyScopedAdb": true
+    },
+    "scope": "Actual optimized APK parser invoked in isolated Android shell process using generated feeds",
+    "baseline": {
+      "status": "FAIL",
+      "checks": {
+        "actualApkClassLoader": true,
+        "cancelledTimedExcluded": false,
+        "cancelledAllDayExcluded": false,
+        "cancelledSeriesExcluded": false,
+        "caseParametersFoldAndPosition": false,
+        "activeStatusesAndTextRetained": true,
+        "cancelledCannotConsumeCap": false,
+        "changedStatusAndWarmReads": false,
+        "existingExdateControl": true,
+        "retainedFields": true
+      },
+      "passed": 4,
+      "total": 10,
+      "optimizedApkSha256": "7bc1ee8b70f873e23bb35c88983bda6f0843a7bab4c77d2d91134a6f0f931045"
+    },
+    "candidate": {
+      "status": "PASS",
+      "checks": {
+        "actualApkClassLoader": true,
+        "cancelledTimedExcluded": true,
+        "cancelledAllDayExcluded": true,
+        "cancelledSeriesExcluded": true,
+        "caseParametersFoldAndPosition": true,
+        "activeStatusesAndTextRetained": true,
+        "cancelledCannotConsumeCap": true,
+        "changedStatusAndWarmReads": true,
+        "existingExdateControl": true,
+        "retainedFields": true
+      },
+      "passed": 10,
+      "total": 10,
+      "optimizedApkSha256": "429017496a4e5908d0ad53cf1080694e7ddc3aeeb0d5f959b9f3a364b609bfcf"
+    },
+    "checks": 10,
+    "baselinePassed": 4,
+    "candidatePassed": 10,
+    "productionBehaviorChecks": 9,
+    "classLoaderOwnershipChecks": 1,
+    "readerRecoveryNativeProof": false,
+    "calendarUiAcceptance": false
+  },
+  "fixtureHashes": {
+    "javaSha256": "7d5b03a8daadd238a94fa40b40469f08c753268d57978d262fa9e1ee66c7f6bb",
+    "runnerSha256": "e33c32f20d8f6f75c4b73515afe632740f8eb47dc5b17b90066fb770337aa924",
+    "dexJarSha256": "01952535e4a404bd7bd5dbd6e67cf097785eb800b40acd993bfafb2cea4ffe66"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "primaryRegistryUnchanged": true,
+    "copiedRegistryRemoved": true,
+    "nativeFixtureCleanupVerified": true,
+    "phoneOperations": 0,
+    "publication": false,
+    "nativeFixture": {
+      "ownedProcessRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "appPreferencesWritten": 0,
+      "installerInvoked": false,
+      "networkRequests": 0,
+      "ownedDeviceScratchRemoved": true,
+      "cleanupFaults": []
+    },
+    "familyPhotoFrameVisuallyObserved": true
+  },
+  "storageRecovery": {
+    "sourceSha256": "b49544237b74e3dcdf838adfa305fe1f9ffb7e7fb5a39950638e5aa22d276cf0",
+    "originalBytes": 83152174,
+    "archiveBytes": 5983687,
+    "roundTripByteIdentical": true,
+    "protectedCurrentAndRollbackApks": true
+  },
+  "publication": {
+    "publicManifestUnchanged": true,
+    "publicVersionName": "1.83",
+    "publicVersionCode": 77,
+    "versionGuardExit": 1,
+    "intentionalMismatchRejected": true,
+    "githubAuthentication": false,
+    "publication": false
+  },
+  "limits": [
+    "Native acceptance is optimized production parsing in a separate shell process; calendar UI, asynchronous refresh and hosted owner feeds are unverified.",
+    "Active\u2192cancelled\u2192failed-refresh reader recovery has JVM coverage; native EXDATE control checks count/title, not exact dates.",
+    "Detached RECURRENCE-ID cancellations are not reconciled with active same-UID masters; METHOD:CANCEL scheduling and broader RFC interpretation remain unsupported.",
+    "Cancellation never successfully refreshed cannot be inferred from prior cached active data.",
+    "No API28, Living calendar visual, latency/FPS, general performance or whole-product acceptance claim.",
+    "No phone operation, Home Assistant change, GitHub authentication or publication."
+  ],
+  "documentationAndRoadmap": {
+    "strictDocumentationBuild": {
+      "exit": 0,
+      "seconds": 2.0,
+      "warnings": 0,
+      "informationalWorkstationAndAnchorNoticesRemain": true
+    },
+    "previousTaskRecordsPreserved": 74,
+    "totalTasks": 75,
+    "defaultTaskPreserved": true,
+    "newTaskPlatformLabel": "Portal",
+    "browserChecks": [
+      {
+        "width": 390,
+        "height": 844,
+        "defaultTaskPreserved": true,
+        "tasks": 75,
+        "checks": [
+          {
+            "id": "calendar-cancelled-status",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          },
+          {
+            "id": "self-update-manifest-budget",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          }
+        ],
+        "pageErrors": 0,
+        "externalRequests": 0,
+        "proofHttp200AndByteIdentical": true
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "defaultTaskPreserved": true,
+        "tasks": 75,
+        "checks": [
+          {
+            "id": "calendar-cancelled-status",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          },
+          {
+            "id": "self-update-manifest-budget",
+            "selected": true,
+            "overflow": false,
+            "artifactTextPresent": true
+          }
+        ],
+        "pageErrors": 0,
+        "externalRequests": 0,
+        "proofHttp200AndByteIdentical": true
+      }
+    ],
+    "ownedBrowserAndContextsClosed": true,
+    "existingServerPreserved": true,
+    "selectedDetailCapturesVisuallyReviewed": true,
+    "wholePageAndAccessibilityAcceptance": false
+  }
+}

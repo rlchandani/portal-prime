@@ -13,7 +13,24 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / self-update manifest budget:** exact optimized
+- **Current room APK / cancelled calendar status:** exact optimized
+  **1.102/code96** is installed and fully hashed in both rooms. Event preparation
+  omits `STATUS:CANCELLED` before caching/recurrence; active statuses retain their
+  behavior. Eight methods reproduce seven failures then pass, including
+  active→cancelled-only success→failed-refresh recovery. **4,101 JVM/427 suites**,
+  debug/optimized/R8/vital lint pass in119sec. Actual optimized Family Android10
+  parser improves **4/10→10/10** without fixture app writes/network/install.
+  Complete maps/Home/timer bytes and Family frame/font/services/original Chrome
+  match; owned processes/scratch/registry copy removed. UI/asynchronous refresh/
+  hosted-feed/API28 acceptance, detached UID reconciliation and METHOD:CANCEL
+  scheduling remain outside scope. One completed mapping was archived with exact
+  round-trip verification after a transient review disk error. Public1.83 guard
+  rejects local1.102; no phone/HA/auth/publication.
+  **75 tasks:43 delivered,22 locally verified,3 approval,6 parked,1 queued.**
+  Original **05:29:15–05:59:15 UTC** retained; broader goal stays active.
+  [Receipt](portal-calendar-cancelled-status-2026-11-03.md).
+
+- **Previous room APK / self-update manifest budget:** exact optimized
   **1.101/code95** is installed and fully hashed in both rooms. The independent
   updater now reuses the existing 4 MiB actual-byte reader and disconnects in
   `finally`, preserving request/parse/version/dev-mode/install policies. Nine

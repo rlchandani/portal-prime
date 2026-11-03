@@ -30,7 +30,8 @@ import java.util.TimeZone
  * common `DTSTART`/`DTEND` forms (UTC `Z`, `TZID=`, floating, and all-day `VALUE=DATE`),
  * `SUMMARY`/`LOCATION` with text escapes, and the recurrence rules people actually
  * use (`RRULE` with `FREQ`/`INTERVAL`/`COUNT`/`UNTIL`, weekly `BYDAY`, plus `EXDATE`
- * exclusions). Anything it can't make sense of is skipped rather than crashing, and a
+ * exclusions). Events explicitly marked `STATUS:CANCELLED` are omitted. Anything it
+ * can't make sense of is skipped rather than crashing, and a
  * malformed recurrence falls back to showing the event once — the frame degrades
  * gracefully, like the rest of the screensaver.
  *
@@ -189,6 +190,7 @@ object CalendarFeed {
     for (raw in body) {
       val p = parseLine(raw) ?: continue
       when (p.name.uppercase(Locale.US)) {
+        "STATUS" -> if (p.value.equals("CANCELLED", ignoreCase = true)) return null
         "DTSTART" -> parseDt(p, zone, locale)?.let { (m, allDay) -> start = m; startAllDay = allDay }
         "DTEND" -> parseDt(p, zone, locale)?.let { (m, _) -> end = m }
         "SUMMARY" -> title = unescapeText(p.value)
