@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T10:49:51.432235+00:00",
+  "updatedAt": "2026-11-03T11:13:05.432024+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,60 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.117/code111. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.118/code112. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "sky-short-day",
+      "title": "Sky background: keep short-day phases in order",
+      "summary": "Delivered 1.118: short winter days reach the existing noon and twilight palettes smoothly.",
+      "description": "Scale interior phase distances for ordered daylight shorter than eight hours. Keep existing palettes, exterior twilight and long-day behavior.",
+      "status": "delivered",
+      "verification": "9 frozen methods: 5 red failures to pass; 4,273 JVM; debug native 7/12 to 12/12",
+      "kind": "Home Sky palette calculation",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Wallpaper reliability / independent palette and artifact review",
+      "deployment": "Exact optimized 1.118/code112 installed and fully hashed in Family Area and Living Area.",
+      "state": "Complete captured maps and ten preference states per room match. Family ten files and Living seven files are byte identical; three Living absences remain. Family frame, font, accessibility and Chrome retained. Two native parents and scratch retired; copied credentials removed.",
+      "acceptance": [
+        "Freeze literal noon and twilight regressions and independent adjacent-minute continuity before production changes.",
+        "Retain eight-hour and fourteen-hour literal palettes, exterior NIGHT and finite opaque sRGB output.",
+        "Bind unchanged full gates and actual debug gradient observations separately from physical Sky rendering.",
+        "Deliver the exact signed optimized artifact and verify complete room maps and preference states."
+      ],
+      "evidence": [
+        {
+          "text": "Short-day correction, frozen red and green checks, debug differential and exact two-room delivery.",
+          "source": "docs/portal-sky-short-day-2026-11-03.md"
+        },
+        {
+          "text": "Bound source, tests, artifacts, generated native colors, room preservation and normal cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/sky-short-day-verification.json"
+        }
+      ],
+      "limits": [
+        "Native debug pure gradient only:5788 gradient calls, 11,576 Color unboxes, 5,760 whole-day samples and 28 anchors per variant. Five corrected checks and seven retained checks comprise six product controls and one classloader harness control.",
+        "The optimized gradient remains as public static c(III):ec2, but singleton INSTANCE, Pair getters and Color unbox methods required by this exact debug fixture are unavailable. Zero optimized gradient calls and no added keep rules. API 28 and physical Sky UI remain unverified.",
+        "Generated ordered non-wrapping one-hour and three-hour days have bounded adjacent-minute changes; eight-hour and fourteen-hour literal anchors remain. No universal continuity bound for every solar schedule.",
+        "Seven named palettes and exterior twilight distances remain. Positive daylight shorter than eight hours alone changes; existing long-day integer midpoint and equal or reversed minute behavior remain.",
+        "Polar or midnight-wrapping schedules, invalid provider chronology and live solar-provider results remain open. No native Context, preferences, provider, service, network or process-default mutation.",
+        "One initial private compiler failure and corrected retry are retained. Successful compilation has three Java 8 obsolescence warnings. Two accepted parents retire and scratch is removed; zero excluded native executions. External timeout cleanup is unverified.",
+        "Ten preference states per room match: Family ten files, Living seven files and three unchanged absences. No exception or household preference edit or restore.",
+        "Family current night-clock appearance is viewed; Sky rendering and Living visual remain open. Normal diagnostic and logcat lines=1500 requests produce 1,642 and 1,715 actual lines; limited health scope.",
+        "Public manifest remains 1.83/code77. No phone, HA, authentication, push or publication; design approvals and parked clocks remain.",
+        "Unselected Back, Sleep, wallpaper reload, star-field and polar hypotheses share this clock without implementation. Older source-only or exhausted findings retain their original clocks."
+      ],
+      "next": "Retain exact two-room delivery. Optimized native gradient, API 28, live providers, physical Sky rendering, polar or wrapping schedules and Living visual acceptance remain open; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T10:55:48+00:00",
+        "deadline": "2026-11-03T11:25:48+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "ma-player-identity",
       "title": "Music metadata: keep the exact Portal player identity",

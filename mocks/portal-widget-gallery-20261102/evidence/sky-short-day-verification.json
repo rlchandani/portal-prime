@@ -1,0 +1,1655 @@
+{
+  "recordedAt": "2026-11-03T11:13:05.265365+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T10:55:48+00:00",
+    "deadline": "2026-11-03T11:25:48+00:00",
+    "base": "96740d24aa1186f29cf52ee2ebc4a7684fae6e8e",
+    "backlogTasks": 93,
+    "scope": "Fresh distinct accessibility/back gesture, wallpaper and boot/lifecycle reliability audit. All new findings retain this discovery clock through reproduction, change, verification, delivery, docs, cleanup and commit.",
+    "existingRoomVersion": "1.117/code111",
+    "excludedOlderFindings": [
+      "All prior clocks remain. SMB/DAV ownership/work-cap and album/duration dedupe keep10:30:21–11:00:21, no reset.",
+      "Presence/MQTT10:07:54–10:37:54, Aurora wording09:46:04–10:16:04, ISS/Aurora07:36–08:06, TimerAlarmAudioTrack08:51–09:21 and earlier bedtime/audio/widget/performance hypotheses remain held/exhausted or previously audited."
+    ],
+    "boundaries": [
+      "No phone/Pixel, HA/MQTT experiment, provider login/network discovery, GitHub auth, push or publication.",
+      "Family-only ADB192.168.0.70:5555 and scoped two-room Fleet delivery only after a verified candidate. Preserve household maps/prefs, active frame and original Chrome.",
+      "No approved-design scope expansion, settings registry bypass or duplicate navigation model.",
+      "Preserve preexisting scripts/__pycache__/ and ignored native fleetctl."
+    ]
+  },
+  "finding": {
+    "trigger": "Fixed forty-minute dawn/dusk and two-hour morning/evening offsets cross solar noon on short valid winter days.",
+    "actualWitness": "Generated one-hour and three-hour schedules miss literal noon palettes and jump at minute720 by0.7764706 and0.49411765 RGB channel range; one-hour twilight also misses its palette.",
+    "duplicateAuditBinding": {
+      "sha256": "ef9e5a6cda291f343555b7f938d97a3f58782acb056031de3a2201f76d1fa161",
+      "bytes": 13827
+    },
+    "selectedScope": "Actual shared SkyColors.gradientFor called by ApprovedHomeSky; generated ordered non-wrapping solar minutes."
+  },
+  "correction": {
+    "scope": "For positive daylight below480minutes, scale both interior40/120minute offsets proportionally and use fractional solar noon; keep fixed exterior dawn/twilight windows.",
+    "retained": "Seven existing palette pairs, Compose color interpolation, public signature, >=480minute timing and floor midpoint, nonpositive daylight branch policy, Weather producer, callers, settings and UI geometry."
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/SkyColors.kt": "00ea559b3db9d93620e71b73c8a74f2c9744f22a5da73b97d2a9b6349b2958fa",
+    "app/src/test/java/com/immortal/launcher/SkyColorsShortDayTest.kt": "739299e811eadcd812637cb79b1fa50bbb419dcc69a953478e6019b0ade58602",
+    "app/build.gradle.kts": "a9dd34416da7c5148c165e346a4f92c5a4157d2170b7e6ab5230409ab97bc1da"
+  },
+  "red": {
+    "terminalExit": 1,
+    "tests": 9,
+    "failures": 5,
+    "passingControls": 4,
+    "errors": 0,
+    "skips": 0,
+    "failedMethods": [
+      {
+        "name": "threeHourDayHasTheExistingMiddayPaletteAtSolarNoon",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Top palette at 690 with 600/780 expected:<Color(0.16078432, 0.5019608, 0.7254902, 1.0, sRGB IEC61966-2.1)> but was:<Color(0.20784314, 0.38431373, 0.6745098, 1.0, sRGB IEC61966-2.1)>"
+      },
+      {
+        "name": "threeHourDayDoesNotJumpBetweenAdjacentMinutes",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Largest channel jump 0.49411765 at minute 720 with 600/780"
+      },
+      {
+        "name": "oneHourDayHasTheExistingMiddayPaletteAtSolarNoon",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Top palette at 630 with 600/660 expected:<Color(0.16078432, 0.5019608, 0.7254902, 1.0, sRGB IEC61966-2.1)> but was:<Color(0.14901961, 0.20392157, 0.38431373, 1.0, sRGB IEC61966-2.1)>"
+      },
+      {
+        "name": "shortDaysReachTheExistingTwilightPaletteAfterSunset",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Top palette at 700 with 600/660 expected:<Color(0.101960786, 0.12156863, 0.23921569, 1.0, sRGB IEC61966-2.1)> but was:<Color(0.21568628, 0.41568628, 0.7254902, 1.0, sRGB IEC61966-2.1)>"
+      },
+      {
+        "name": "oneHourDayDoesNotJumpBetweenAdjacentMinutes",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Largest channel jump 0.7764706 at minute 720 with 600/660"
+      }
+    ],
+    "frozenTestSha256": "739299e811eadcd812637cb79b1fa50bbb419dcc69a953478e6019b0ade58602",
+    "baselineSourceSha256": "7866a1a41eaa93ac0fa780765cb98c26a8de96c61eb1f31c9c7b453a903e314b",
+    "bindings": {
+      "baseline-jvm.log": {
+        "sha256": "dc766e47d0c10707911b8392598f1b664c934f2aec513d407a55d8224f42ee21",
+        "bytes": 2859
+      },
+      "baseline-jvm.xml": {
+        "sha256": "14eb837538538365e9a114c67c8b337c6a5396c67614df8574575f593a3b5dd8",
+        "bytes": 24036
+      },
+      "baseline-red.json": {
+        "sha256": "61e7cc6c98416eaa7f2969b748269be2dd1022653ffd91b4c6df92d22271eb1e",
+        "bytes": 2339
+      },
+      "frozen-test-plan.json": {
+        "sha256": "721ea9332a5a6528cce528e6e7e1feaa893cd290bf167d80bb4626280df4595e",
+        "bytes": 2391
+      }
+    },
+    "scope": "Literal noon/twilight/night/8h/14h anchors; full1440minute one-hour/three-hour continuity and opaque finite SRGB. No compression formula in tests."
+  },
+  "green": {
+    "suites": 443,
+    "tests": 4273,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualSkyShortDayFocusedTests": 9,
+    "allNineUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 14s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "buildBindings": {
+    "log": {
+      "sha256": "c6243adb2153e7877f87335ecaf167b2b4ee7036e382aa980d417db52b6f7de8",
+      "bytes": 13732
+    },
+    "packageProofLog": {
+      "sha256": "ab8a8b173cb0ed75a4b3b4449677827f4e8cebe46979ba8c49e937ce400e6432",
+      "bytes": 600
+    },
+    "fullXmlFiles": 443,
+    "independentlyRecountedTotals": {
+      "tests": 4273,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "fullXmlAggregateSha256": "f121c7b3c73c193cd36a381ecb123f1a899aecc1a834fa6e0070cca2c7ada461"
+  },
+  "native": {
+    "runs": {
+      "baseline": {
+        "result": {
+          "status": "FAIL",
+          "checks": {
+            "actualDebugAPKClassLoader": true,
+            "threeHourNoonLiteralMidday": false,
+            "oneHourNoonLiteralMidday": false,
+            "oneHourPostSunsetLiteralTwilight": false,
+            "threeHourPostSunsetLiteralTwilight": true,
+            "fourteenHourLiteralPhaseAnchors": true,
+            "eightHourLiteralPhaseAnchors": true,
+            "oneHourLiteralNightAnchors": true,
+            "threeHourLiteralNightAnchors": true,
+            "oneHourAdjacentMinuteContinuity": false,
+            "threeHourAdjacentMinuteContinuity": false,
+            "allDaysOpaqueFiniteSrgb": true
+          },
+          "observations": {
+            "threeHourNoonLiteralMidday": {
+              "minute": 690,
+              "sunrise": 600,
+              "sunset": 780,
+              "expectedTopArgb": "FF2980B9",
+              "expectedBottomArgb": "FF6DD5FA",
+              "actualTopArgb": "FF3562AC",
+              "actualBottomArgb": "FFBCC1C4",
+              "actualTopPacked": "FF3562AC00000000",
+              "actualBottomPacked": "FFBCC1C400000000",
+              "matches": false
+            },
+            "oneHourNoonLiteralMidday": {
+              "minute": 630,
+              "sunrise": 600,
+              "sunset": 660,
+              "expectedTopArgb": "FF2980B9",
+              "expectedBottomArgb": "FF6DD5FA",
+              "actualTopArgb": "FF263462",
+              "actualBottomArgb": "FFCD855F",
+              "actualTopPacked": "FF26346200000000",
+              "actualBottomPacked": "FFCD855F00000000",
+              "matches": false
+            },
+            "oneHourPostSunsetLiteralTwilight": {
+              "minute": 700,
+              "sunrise": 600,
+              "sunset": 660,
+              "expectedTopArgb": "FF1A1F3D",
+              "expectedBottomArgb": "FF3A2A4D",
+              "actualTopArgb": "FF376AB9",
+              "actualBottomArgb": "FFAFC7D4",
+              "actualTopPacked": "FF376AB900000000",
+              "actualBottomPacked": "FFAFC7D400000000",
+              "matches": false
+            },
+            "threeHourPostSunsetLiteralTwilight": {
+              "minute": 820,
+              "sunrise": 600,
+              "sunset": 780,
+              "expectedTopArgb": "FF1A1F3D",
+              "expectedBottomArgb": "FF3A2A4D",
+              "actualTopArgb": "FF1A1F3D",
+              "actualBottomArgb": "FF3A2A4D",
+              "actualTopPacked": "FF1A1F3D00000000",
+              "actualBottomPacked": "FF3A2A4D00000000",
+              "matches": true
+            },
+            "fourteenHourLiteralPhaseAnchors": [
+              {
+                "minute": 320,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 400,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF2A3A6B",
+                "expectedBottomArgb": "FFEF9A6B",
+                "actualTopArgb": "FF2A3A6B",
+                "actualBottomArgb": "FFEF9A6B",
+                "actualTopPacked": "FF2A3A6B00000000",
+                "actualBottomPacked": "FFEF9A6B00000000",
+                "matches": true
+              },
+              {
+                "minute": 480,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF3A7BD5",
+                "expectedBottomArgb": "FF8FD3F4",
+                "actualTopArgb": "FF3A7BD5",
+                "actualBottomArgb": "FF8FD3F4",
+                "actualTopPacked": "FF3A7BD500000000",
+                "actualBottomPacked": "FF8FD3F400000000",
+                "matches": true
+              },
+              {
+                "minute": 780,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF2980B9",
+                "expectedBottomArgb": "FF6DD5FA",
+                "actualTopArgb": "FF2980B9",
+                "actualBottomArgb": "FF6DD5FA",
+                "actualTopPacked": "FF2980B900000000",
+                "actualBottomPacked": "FF6DD5FA00000000",
+                "matches": true
+              },
+              {
+                "minute": 1080,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF3A7BD5",
+                "expectedBottomArgb": "FF8FD3F4",
+                "actualTopArgb": "FF3A7BD5",
+                "actualBottomArgb": "FF8FD3F4",
+                "actualTopPacked": "FF3A7BD500000000",
+                "actualBottomPacked": "FF8FD3F400000000",
+                "matches": true
+              },
+              {
+                "minute": 1160,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF2C3E66",
+                "expectedBottomArgb": "FFE96443",
+                "actualTopArgb": "FF2C3E66",
+                "actualBottomArgb": "FFE96443",
+                "actualTopPacked": "FF2C3E6600000000",
+                "actualBottomPacked": "FFE9644300000000",
+                "matches": true
+              },
+              {
+                "minute": 1240,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF1A1F3D",
+                "expectedBottomArgb": "FF3A2A4D",
+                "actualTopArgb": "FF1A1F3D",
+                "actualBottomArgb": "FF3A2A4D",
+                "actualTopPacked": "FF1A1F3D00000000",
+                "actualBottomPacked": "FF3A2A4D00000000",
+                "matches": true
+              },
+              {
+                "minute": 1280,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              }
+            ],
+            "eightHourLiteralPhaseAnchors": [
+              {
+                "minute": 440,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 520,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF2A3A6B",
+                "expectedBottomArgb": "FFEF9A6B",
+                "actualTopArgb": "FF2A3A6B",
+                "actualBottomArgb": "FFEF9A6B",
+                "actualTopPacked": "FF2A3A6B00000000",
+                "actualBottomPacked": "FFEF9A6B00000000",
+                "matches": true
+              },
+              {
+                "minute": 600,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF3A7BD5",
+                "expectedBottomArgb": "FF8FD3F4",
+                "actualTopArgb": "FF3A7BD5",
+                "actualBottomArgb": "FF8FD3F4",
+                "actualTopPacked": "FF3A7BD500000000",
+                "actualBottomPacked": "FF8FD3F400000000",
+                "matches": true
+              },
+              {
+                "minute": 720,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF2980B9",
+                "expectedBottomArgb": "FF6DD5FA",
+                "actualTopArgb": "FF2980B9",
+                "actualBottomArgb": "FF6DD5FA",
+                "actualTopPacked": "FF2980B900000000",
+                "actualBottomPacked": "FF6DD5FA00000000",
+                "matches": true
+              },
+              {
+                "minute": 840,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF3A7BD5",
+                "expectedBottomArgb": "FF8FD3F4",
+                "actualTopArgb": "FF3A7BD5",
+                "actualBottomArgb": "FF8FD3F4",
+                "actualTopPacked": "FF3A7BD500000000",
+                "actualBottomPacked": "FF8FD3F400000000",
+                "matches": true
+              },
+              {
+                "minute": 920,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF2C3E66",
+                "expectedBottomArgb": "FFE96443",
+                "actualTopArgb": "FF2C3E66",
+                "actualBottomArgb": "FFE96443",
+                "actualTopPacked": "FF2C3E6600000000",
+                "actualBottomPacked": "FFE9644300000000",
+                "matches": true
+              },
+              {
+                "minute": 1000,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF1A1F3D",
+                "expectedBottomArgb": "FF3A2A4D",
+                "actualTopArgb": "FF1A1F3D",
+                "actualBottomArgb": "FF3A2A4D",
+                "actualTopPacked": "FF1A1F3D00000000",
+                "actualBottomPacked": "FF3A2A4D00000000",
+                "matches": true
+              },
+              {
+                "minute": 1040,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              }
+            ],
+            "oneHourLiteralNightAnchors": [
+              {
+                "minute": 0,
+                "sunrise": 600,
+                "sunset": 660,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 559,
+                "sunrise": 600,
+                "sunset": 660,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 740,
+                "sunrise": 600,
+                "sunset": 660,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 1439,
+                "sunrise": 600,
+                "sunset": 660,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              }
+            ],
+            "threeHourLiteralNightAnchors": [
+              {
+                "minute": 0,
+                "sunrise": 600,
+                "sunset": 780,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 559,
+                "sunrise": 600,
+                "sunset": 780,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 860,
+                "sunrise": 600,
+                "sunset": 780,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 1439,
+                "sunrise": 600,
+                "sunset": 780,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              }
+            ],
+            "oneHourDayScan": {
+              "sunrise": 600,
+              "sunset": 660,
+              "samples": 1440,
+              "largestChannelJump": 0.7764706015586853,
+              "largestJumpMinute": 720,
+              "channelIndex": 5,
+              "previousChannels": [
+                0.22745098173618317,
+                0.47843137383461,
+                0.8274509906768799,
+                0.5686274766921997,
+                0.8235294222831726,
+                0.9490196108818054
+              ],
+              "nextChannels": [
+                0.07058823853731155,
+                0.09019608050584793,
+                0.1921568661928177,
+                0.11372549086809158,
+                0.09019608050584793,
+                0.1725490242242813
+              ],
+              "threshold": 0.10000000149011612,
+              "includesMidnight": true,
+              "opaqueFiniteSrgbAccumulatorBefore": true,
+              "opaqueFiniteSrgbAccumulatorAfter": true
+            },
+            "threeHourDayScan": {
+              "sunrise": 600,
+              "sunset": 780,
+              "samples": 1440,
+              "largestChannelJump": 0.4941176474094391,
+              "largestJumpMinute": 720,
+              "channelIndex": 5,
+              "previousChannels": [
+                0.22745098173618317,
+                0.47843137383461,
+                0.8274509906768799,
+                0.5686274766921997,
+                0.8235294222831726,
+                0.9490196108818054
+              ],
+              "nextChannels": [
+                0.1882352977991104,
+                0.3019607961177826,
+                0.501960813999176,
+                0.8627451062202454,
+                0.5254902243614197,
+                0.45490196347236633
+              ],
+              "threshold": 0.10000000149011612,
+              "includesMidnight": true,
+              "opaqueFiniteSrgbAccumulatorBefore": true,
+              "opaqueFiniteSrgbAccumulatorAfter": true
+            },
+            "eightHourDayScan": {
+              "sunrise": 480,
+              "sunset": 960,
+              "samples": 1440,
+              "largestChannelJump": 0.01568630337715149,
+              "largestJumpMinute": 486,
+              "channelIndex": 3,
+              "previousChannels": [
+                0.10980392247438431,
+                0.15294118225574493,
+                0.29411765933036804,
+                0.48627451062202454,
+                0.32549020648002625,
+                0.25882354378700256
+              ],
+              "nextChannels": [
+                0.10980392247438431,
+                0.15294118225574493,
+                0.2980392277240753,
+                0.501960813999176,
+                0.3333333432674408,
+                0.26274511218070984
+              ],
+              "threshold": 0.10000000149011612,
+              "includesMidnight": true,
+              "opaqueFiniteSrgbAccumulatorBefore": true,
+              "opaqueFiniteSrgbAccumulatorAfter": true
+            },
+            "fourteenHourDayScan": {
+              "sunrise": 360,
+              "sunset": 1200,
+              "samples": 1440,
+              "largestChannelJump": 0.01568630337715149,
+              "largestJumpMinute": 366,
+              "channelIndex": 3,
+              "previousChannels": [
+                0.10980392247438431,
+                0.15294118225574493,
+                0.29411765933036804,
+                0.48627451062202454,
+                0.32549020648002625,
+                0.25882354378700256
+              ],
+              "nextChannels": [
+                0.10980392247438431,
+                0.15294118225574493,
+                0.2980392277240753,
+                0.501960813999176,
+                0.3333333432674408,
+                0.26274511218070984
+              ],
+              "threshold": 0.10000000149011612,
+              "includesMidnight": true,
+              "opaqueFiniteSrgbAccumulatorBefore": true,
+              "opaqueFiniteSrgbAccumulatorAfter": true
+            }
+          },
+          "passed": 7,
+          "total": 12,
+          "actualGradientForInvocations": 5788,
+          "actualColorUnboxInvocations": 11576,
+          "wholeDaySamples": 5760,
+          "apkSha256": "c5172c22f4155b2ae84d482bf0c79079983f2c476319b8a65b3020d9826e5550",
+          "actualAPKClassLoader": true,
+          "buildVariant": "debug",
+          "optimizedGradientVerified": false,
+          "contextOperations": 0,
+          "ownerPreferencesWritten": 0,
+          "realNetworkOperations": 0,
+          "providerOrServiceStarted": false,
+          "processTimezoneOrLocaleMutations": 0,
+          "scope": "Actual debug pure SkyColors.gradientFor with generated minutes, exact literal ARGB anchors and actual Compose getters; no Context, provider, weather, UI, process-default or owner-state operation."
+        },
+        "process": {
+          "terminalExit": 1,
+          "stdoutSha256": "061f02492544ff4ade8179f2124ff5c7fa99f2e8b30e74d4fd876f72bf928584",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutBytes": 10663,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "220a9d89c9670719606775bacf19aee8b6d1b0b580c52d58376b6742307bd449",
+          "bytes": 14874
+        },
+        "processBinding": {
+          "sha256": "a12ac8dc7a0d0debbe14703feaa18197e78755a41671c7566fcb6699e94ff992",
+          "bytes": 240
+        },
+        "stdoutBinding": {
+          "sha256": "061f02492544ff4ade8179f2124ff5c7fa99f2e8b30e74d4fd876f72bf928584",
+          "bytes": 10663
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "candidate": {
+        "result": {
+          "status": "PASS",
+          "checks": {
+            "actualDebugAPKClassLoader": true,
+            "threeHourNoonLiteralMidday": true,
+            "oneHourNoonLiteralMidday": true,
+            "oneHourPostSunsetLiteralTwilight": true,
+            "threeHourPostSunsetLiteralTwilight": true,
+            "fourteenHourLiteralPhaseAnchors": true,
+            "eightHourLiteralPhaseAnchors": true,
+            "oneHourLiteralNightAnchors": true,
+            "threeHourLiteralNightAnchors": true,
+            "oneHourAdjacentMinuteContinuity": true,
+            "threeHourAdjacentMinuteContinuity": true,
+            "allDaysOpaqueFiniteSrgb": true
+          },
+          "observations": {
+            "threeHourNoonLiteralMidday": {
+              "minute": 690,
+              "sunrise": 600,
+              "sunset": 780,
+              "expectedTopArgb": "FF2980B9",
+              "expectedBottomArgb": "FF6DD5FA",
+              "actualTopArgb": "FF2980B9",
+              "actualBottomArgb": "FF6DD5FA",
+              "actualTopPacked": "FF2980B900000000",
+              "actualBottomPacked": "FF6DD5FA00000000",
+              "matches": true
+            },
+            "oneHourNoonLiteralMidday": {
+              "minute": 630,
+              "sunrise": 600,
+              "sunset": 660,
+              "expectedTopArgb": "FF2980B9",
+              "expectedBottomArgb": "FF6DD5FA",
+              "actualTopArgb": "FF2980B9",
+              "actualBottomArgb": "FF6DD5FA",
+              "actualTopPacked": "FF2980B900000000",
+              "actualBottomPacked": "FF6DD5FA00000000",
+              "matches": true
+            },
+            "oneHourPostSunsetLiteralTwilight": {
+              "minute": 700,
+              "sunrise": 600,
+              "sunset": 660,
+              "expectedTopArgb": "FF1A1F3D",
+              "expectedBottomArgb": "FF3A2A4D",
+              "actualTopArgb": "FF1A1F3D",
+              "actualBottomArgb": "FF3A2A4D",
+              "actualTopPacked": "FF1A1F3D00000000",
+              "actualBottomPacked": "FF3A2A4D00000000",
+              "matches": true
+            },
+            "threeHourPostSunsetLiteralTwilight": {
+              "minute": 820,
+              "sunrise": 600,
+              "sunset": 780,
+              "expectedTopArgb": "FF1A1F3D",
+              "expectedBottomArgb": "FF3A2A4D",
+              "actualTopArgb": "FF1A1F3D",
+              "actualBottomArgb": "FF3A2A4D",
+              "actualTopPacked": "FF1A1F3D00000000",
+              "actualBottomPacked": "FF3A2A4D00000000",
+              "matches": true
+            },
+            "fourteenHourLiteralPhaseAnchors": [
+              {
+                "minute": 320,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 400,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF2A3A6B",
+                "expectedBottomArgb": "FFEF9A6B",
+                "actualTopArgb": "FF2A3A6B",
+                "actualBottomArgb": "FFEF9A6B",
+                "actualTopPacked": "FF2A3A6B00000000",
+                "actualBottomPacked": "FFEF9A6B00000000",
+                "matches": true
+              },
+              {
+                "minute": 480,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF3A7BD5",
+                "expectedBottomArgb": "FF8FD3F4",
+                "actualTopArgb": "FF3A7BD5",
+                "actualBottomArgb": "FF8FD3F4",
+                "actualTopPacked": "FF3A7BD500000000",
+                "actualBottomPacked": "FF8FD3F400000000",
+                "matches": true
+              },
+              {
+                "minute": 780,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF2980B9",
+                "expectedBottomArgb": "FF6DD5FA",
+                "actualTopArgb": "FF2980B9",
+                "actualBottomArgb": "FF6DD5FA",
+                "actualTopPacked": "FF2980B900000000",
+                "actualBottomPacked": "FF6DD5FA00000000",
+                "matches": true
+              },
+              {
+                "minute": 1080,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF3A7BD5",
+                "expectedBottomArgb": "FF8FD3F4",
+                "actualTopArgb": "FF3A7BD5",
+                "actualBottomArgb": "FF8FD3F4",
+                "actualTopPacked": "FF3A7BD500000000",
+                "actualBottomPacked": "FF8FD3F400000000",
+                "matches": true
+              },
+              {
+                "minute": 1160,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF2C3E66",
+                "expectedBottomArgb": "FFE96443",
+                "actualTopArgb": "FF2C3E66",
+                "actualBottomArgb": "FFE96443",
+                "actualTopPacked": "FF2C3E6600000000",
+                "actualBottomPacked": "FFE9644300000000",
+                "matches": true
+              },
+              {
+                "minute": 1240,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF1A1F3D",
+                "expectedBottomArgb": "FF3A2A4D",
+                "actualTopArgb": "FF1A1F3D",
+                "actualBottomArgb": "FF3A2A4D",
+                "actualTopPacked": "FF1A1F3D00000000",
+                "actualBottomPacked": "FF3A2A4D00000000",
+                "matches": true
+              },
+              {
+                "minute": 1280,
+                "sunrise": 360,
+                "sunset": 1200,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              }
+            ],
+            "eightHourLiteralPhaseAnchors": [
+              {
+                "minute": 440,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 520,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF2A3A6B",
+                "expectedBottomArgb": "FFEF9A6B",
+                "actualTopArgb": "FF2A3A6B",
+                "actualBottomArgb": "FFEF9A6B",
+                "actualTopPacked": "FF2A3A6B00000000",
+                "actualBottomPacked": "FFEF9A6B00000000",
+                "matches": true
+              },
+              {
+                "minute": 600,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF3A7BD5",
+                "expectedBottomArgb": "FF8FD3F4",
+                "actualTopArgb": "FF3A7BD5",
+                "actualBottomArgb": "FF8FD3F4",
+                "actualTopPacked": "FF3A7BD500000000",
+                "actualBottomPacked": "FF8FD3F400000000",
+                "matches": true
+              },
+              {
+                "minute": 720,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF2980B9",
+                "expectedBottomArgb": "FF6DD5FA",
+                "actualTopArgb": "FF2980B9",
+                "actualBottomArgb": "FF6DD5FA",
+                "actualTopPacked": "FF2980B900000000",
+                "actualBottomPacked": "FF6DD5FA00000000",
+                "matches": true
+              },
+              {
+                "minute": 840,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF3A7BD5",
+                "expectedBottomArgb": "FF8FD3F4",
+                "actualTopArgb": "FF3A7BD5",
+                "actualBottomArgb": "FF8FD3F4",
+                "actualTopPacked": "FF3A7BD500000000",
+                "actualBottomPacked": "FF8FD3F400000000",
+                "matches": true
+              },
+              {
+                "minute": 920,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF2C3E66",
+                "expectedBottomArgb": "FFE96443",
+                "actualTopArgb": "FF2C3E66",
+                "actualBottomArgb": "FFE96443",
+                "actualTopPacked": "FF2C3E6600000000",
+                "actualBottomPacked": "FFE9644300000000",
+                "matches": true
+              },
+              {
+                "minute": 1000,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF1A1F3D",
+                "expectedBottomArgb": "FF3A2A4D",
+                "actualTopArgb": "FF1A1F3D",
+                "actualBottomArgb": "FF3A2A4D",
+                "actualTopPacked": "FF1A1F3D00000000",
+                "actualBottomPacked": "FF3A2A4D00000000",
+                "matches": true
+              },
+              {
+                "minute": 1040,
+                "sunrise": 480,
+                "sunset": 960,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              }
+            ],
+            "oneHourLiteralNightAnchors": [
+              {
+                "minute": 0,
+                "sunrise": 600,
+                "sunset": 660,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 559,
+                "sunrise": 600,
+                "sunset": 660,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 740,
+                "sunrise": 600,
+                "sunset": 660,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 1439,
+                "sunrise": 600,
+                "sunset": 660,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              }
+            ],
+            "threeHourLiteralNightAnchors": [
+              {
+                "minute": 0,
+                "sunrise": 600,
+                "sunset": 780,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 559,
+                "sunrise": 600,
+                "sunset": 780,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 860,
+                "sunrise": 600,
+                "sunset": 780,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              },
+              {
+                "minute": 1439,
+                "sunrise": 600,
+                "sunset": 780,
+                "expectedTopArgb": "FF0B1026",
+                "expectedBottomArgb": "FF05060E",
+                "actualTopArgb": "FF0B1026",
+                "actualBottomArgb": "FF05060E",
+                "actualTopPacked": "FF0B102600000000",
+                "actualBottomPacked": "FF05060E00000000",
+                "matches": true
+              }
+            ],
+            "oneHourDayScan": {
+              "sunrise": 600,
+              "sunset": 660,
+              "samples": 1440,
+              "largestChannelJump": 0.08235293626785278,
+              "largestJumpMinute": 655,
+              "channelIndex": 5,
+              "previousChannels": [
+                0.18039216101169586,
+                0.2666666805744171,
+                0.43921568989753723,
+                0.8941176533699036,
+                0.45098039507865906,
+                0.3450980484485626
+              ],
+              "nextChannels": [
+                0.1725490242242813,
+                0.24313725531101227,
+                0.4000000059604645,
+                0.9137254953384399,
+                0.3921568691730499,
+                0.26274511218070984
+              ],
+              "threshold": 0.10000000149011612,
+              "includesMidnight": true,
+              "opaqueFiniteSrgbAccumulatorBefore": true,
+              "opaqueFiniteSrgbAccumulatorAfter": true
+            },
+            "threeHourDayScan": {
+              "sunrise": 600,
+              "sunset": 780,
+              "samples": 1440,
+              "largestChannelJump": 0.0313725471496582,
+              "largestJumpMinute": 765,
+              "channelIndex": 5,
+              "previousChannels": [
+                0.1764705926179886,
+                0.250980406999588,
+                0.4117647111415863,
+                0.9098039269447327,
+                0.4117647111415863,
+                0.29411765933036804
+              ],
+              "nextChannels": [
+                0.1725490242242813,
+                0.24313725531101227,
+                0.4000000059604645,
+                0.9137254953384399,
+                0.3921568691730499,
+                0.26274511218070984
+              ],
+              "threshold": 0.10000000149011612,
+              "includesMidnight": true,
+              "opaqueFiniteSrgbAccumulatorBefore": true,
+              "opaqueFiniteSrgbAccumulatorAfter": true
+            },
+            "eightHourDayScan": {
+              "sunrise": 480,
+              "sunset": 960,
+              "samples": 1440,
+              "largestChannelJump": 0.01568630337715149,
+              "largestJumpMinute": 486,
+              "channelIndex": 3,
+              "previousChannels": [
+                0.10980392247438431,
+                0.15294118225574493,
+                0.29411765933036804,
+                0.48627451062202454,
+                0.32549020648002625,
+                0.25882354378700256
+              ],
+              "nextChannels": [
+                0.10980392247438431,
+                0.15294118225574493,
+                0.2980392277240753,
+                0.501960813999176,
+                0.3333333432674408,
+                0.26274511218070984
+              ],
+              "threshold": 0.10000000149011612,
+              "includesMidnight": true,
+              "opaqueFiniteSrgbAccumulatorBefore": true,
+              "opaqueFiniteSrgbAccumulatorAfter": true
+            },
+            "fourteenHourDayScan": {
+              "sunrise": 360,
+              "sunset": 1200,
+              "samples": 1440,
+              "largestChannelJump": 0.01568630337715149,
+              "largestJumpMinute": 366,
+              "channelIndex": 3,
+              "previousChannels": [
+                0.10980392247438431,
+                0.15294118225574493,
+                0.29411765933036804,
+                0.48627451062202454,
+                0.32549020648002625,
+                0.25882354378700256
+              ],
+              "nextChannels": [
+                0.10980392247438431,
+                0.15294118225574493,
+                0.2980392277240753,
+                0.501960813999176,
+                0.3333333432674408,
+                0.26274511218070984
+              ],
+              "threshold": 0.10000000149011612,
+              "includesMidnight": true,
+              "opaqueFiniteSrgbAccumulatorBefore": true,
+              "opaqueFiniteSrgbAccumulatorAfter": true
+            }
+          },
+          "passed": 12,
+          "total": 12,
+          "actualGradientForInvocations": 5788,
+          "actualColorUnboxInvocations": 11576,
+          "wholeDaySamples": 5760,
+          "apkSha256": "5e8b0d80d614114e166f0c660d7acee8aed182af35fff236f17bd13fc5628a98",
+          "actualAPKClassLoader": true,
+          "buildVariant": "debug",
+          "optimizedGradientVerified": false,
+          "contextOperations": 0,
+          "ownerPreferencesWritten": 0,
+          "realNetworkOperations": 0,
+          "providerOrServiceStarted": false,
+          "processTimezoneOrLocaleMutations": 0,
+          "scope": "Actual debug pure SkyColors.gradientFor with generated minutes, exact literal ARGB anchors and actual Compose getters; no Context, provider, weather, UI, process-default or owner-state operation."
+        },
+        "process": {
+          "terminalExit": 0,
+          "stdoutSha256": "6e4587a9c9be73189b502741a99d9129f7682172dd83f482273137c75c9509e1",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutBytes": 10662,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "9ff55f4f825f0d860b856f01eae2a83b2b00dc0bf37ae19741e2377ac6c06415",
+          "bytes": 14873
+        },
+        "processBinding": {
+          "sha256": "f36576ab8ffa7b5744c593bfc3a0563c55cce93e608f8944fbb047d48bc3bf3f",
+          "bytes": 240
+        },
+        "stdoutBinding": {
+          "sha256": "6e4587a9c9be73189b502741a99d9129f7682172dd83f482273137c75c9509e1",
+          "bytes": 10662
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    },
+    "binding": {
+      "fixtureSourceSha256": "67a9e9b88215ce65853dd221f61db2150e16f16fcf9ae44e38b60de5331cc970",
+      "fixtureJarSha256": "02a0f829670e1e1082c3a7700c6f8878df9b096bd61f343778ede42e710bf09c",
+      "compilerSha256": "fcd6cd8ae2a7862e553b0530c857031a66b784663863cf6fc7a5d37e04eed06e",
+      "runnerSha256": "6626994bdaf12812d9181ea92e00c68f002f0e06cefd44505b6a77fcbd4fd443",
+      "phases": [
+        "baseline",
+        "candidate"
+      ],
+      "apkSha256": {
+        "baseline": "c5172c22f4155b2ae84d482bf0c79079983f2c476319b8a65b3020d9826e5550",
+        "candidate": "5e8b0d80d614114e166f0c660d7acee8aed182af35fff236f17bd13fc5628a98"
+      },
+      "buildVariant": "debug",
+      "optimizedGradientVerified": false,
+      "scope": "Actual debug pure SkyColors.gradientFor over fixed generated minutes; exact literal palette anchors and Compose getters; no Context, provider, UI, owner-state or real network"
+    },
+    "cleanup": {
+      "parentsRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "ownedScratchRemoved": true,
+      "faults": [],
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "buildVariant": "debug",
+      "optimizedGradientVerified": false,
+      "externalTimeoutFailureCleanupFaultInjected": false
+    },
+    "acceptedParents": 2,
+    "executedExcludedAttempts": 0,
+    "actualGradientForInvocations": 11576,
+    "actualColorUnboxInvocations": 23152,
+    "wholeDaySamples": 11520,
+    "correctedChecks": [
+      "threeHourNoonLiteralMidday",
+      "oneHourNoonLiteralMidday",
+      "oneHourPostSunsetLiteralTwilight",
+      "oneHourAdjacentMinuteContinuity",
+      "threeHourAdjacentMinuteContinuity"
+    ],
+    "retainedProductChecks": 6,
+    "retainedHarnessChecks": 1,
+    "runtimeEnvironment": {
+      "sdk": "29",
+      "release": "10",
+      "abi": "arm64-v8a",
+      "scope": "Actual Family-only read-only Android version properties; API28 unverified",
+      "terminalExit": 0
+    },
+    "compiler": {
+      "initialTerminalExit": 1,
+      "correctedTerminalExit": 0,
+      "successfulWarnings": 3,
+      "history": {
+        "initialCompilerTerminalExit": 1,
+        "failure": "Android JSONArray.put(double) declares checked JSONException; private floats helper omitted throws. javac had1error3obsolescencewarnings.",
+        "correction": "Only private generated fixture floats() adds throws JSONException; scan() already throws Exception. Expectations/counts/productsource/tests/APKs unchanged.",
+        "initialSourceSha256": "c3576f3a30cc1ee9ad89ea66f70053186665a85cabf51279f45477b19ef28aa7",
+        "correctedSourceSha256": "67a9e9b88215ce65853dd221f61db2150e16f16fcf9ae44e38b60de5331cc970",
+        "initialLogSha256": "5d1d989daaaee74e662f978b4a4b1f746ee1f08dc5423f94b6fd94ec03f98990",
+        "compilerAttemptsBeforeCorrection": 1,
+        "nativeExecutionsBeforeCorrection": 0,
+        "deviceOperationsByCompiler": 0,
+        "emptyOwnedFailedCompilerDirectoryRemoved": true,
+        "productionChanges": 0,
+        "testOrBuildReruns": 0
+      },
+      "bindings": {
+        "native-compile-initial-failed.log": {
+          "sha256": "5d1d989daaaee74e662f978b4a4b1f746ee1f08dc5423f94b6fd94ec03f98990",
+          "bytes": 1720
+        },
+        "native-compile.log": {
+          "sha256": "eb05a8e5104a1738182a7d91be7952d225ae77aa5a0acfa19d7705680743a903",
+          "bytes": 822
+        },
+        "native-compile-correction.json": {
+          "sha256": "720fa47cafcd07c1492c80c5535a484a4a95ff2dddfb732660b6dd91fb52a61d",
+          "bytes": 867
+        }
+      }
+    },
+    "preExecutionAuthorHistoryBinding": {
+      "sha256": "0d5abeb441a69b5db8da797b2118f230a67e03880302f62a69327f5a8718df60",
+      "bytes": 5489
+    },
+    "rootInputReviewBinding": {
+      "sha256": "5c0fb01c6e9e1942b4670eaef6fc9ba6141d064739768625baf04e45847997a1",
+      "bytes": 2262
+    },
+    "runnerLogBinding": {
+      "sha256": "e9a1e53b8bb192090777840667781996a4eb75503660c6a89c5d9ef32dd6ce4b",
+      "bytes": 357
+    },
+    "limits": "Actual debug function only. Optimized function remains static but Pair getters and Color unbox admission are removed; zero optimized invocations and no keep rules. No live solar/provider, Sky UI, Context, owner state, API28, polar/wrapping or external timeout/crash cleanup acceptance."
+  },
+  "artifact": {
+    "sha256": "1aa81f61457721a3efafef0a1e3848a8d117636492ebc605f1c9869718cd6236",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.118",
+    "versionCode": 112,
+    "variants": {
+      "performance": {
+        "sha256": "1aa81f61457721a3efafef0a1e3848a8d117636492ebc605f1c9869718cd6236",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.118",
+        "versionCode": 112
+      },
+      "debug": {
+        "sha256": "5e8b0d80d614114e166f0c660d7acee8aed182af35fff236f17bd13fc5628a98",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.118",
+        "versionCode": 112
+      },
+      "rollback": {
+        "sha256": "c8eafff85be1f47211d5e09089c0807bdbeacf9c212830a592bd3892de234ce1",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.117",
+        "versionCode": 111
+      }
+    },
+    "debugSha256": "5e8b0d80d614114e166f0c660d7acee8aed182af35fff236f17bd13fc5628a98",
+    "rollbackSha256": "c8eafff85be1f47211d5e09089c0807bdbeacf9c212830a592bd3892de234ce1",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 14s"
+  },
+  "artifactBindings": {
+    "baseline-1.117.apk": {
+      "sha256": "c8eafff85be1f47211d5e09089c0807bdbeacf9c212830a592bd3892de234ce1",
+      "bytes": 25862702
+    },
+    "baseline-debug-1.117.apk": {
+      "sha256": "c5172c22f4155b2ae84d482bf0c79079983f2c476319b8a65b3020d9826e5550",
+      "bytes": 46703529
+    },
+    "candidate-1.118.apk": {
+      "sha256": "1aa81f61457721a3efafef0a1e3848a8d117636492ebc605f1c9869718cd6236",
+      "bytes": 25862702
+    },
+    "candidate-debug-1.118.apk": {
+      "sha256": "5e8b0d80d614114e166f0c660d7acee8aed182af35fff236f17bd13fc5628a98",
+      "bytes": 46703529
+    },
+    "baseline-mapping.txt": {
+      "sha256": "06a8f018b4fece0160b4b8e37f494e0e9cb4809548544d274e6dbd2207eb8083",
+      "bytes": 83198249
+    },
+    "candidate-mapping.txt": {
+      "sha256": "19043eb6f07fa1226db5db3ba3d5ea0a7962413fc330b9bc716baa26fc91ea09",
+      "bytes": 83198337
+    },
+    "baseline-SkyColors.kt": {
+      "sha256": "7866a1a41eaa93ac0fa780765cb98c26a8de96c61eb1f31c9c7b453a903e314b",
+      "bytes": 2642
+    },
+    "baseline-version.json": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "NativeSkyShortDay.java": {
+      "sha256": "67a9e9b88215ce65853dd221f61db2150e16f16fcf9ae44e38b60de5331cc970",
+      "bytes": 13174
+    },
+    "build-sky-native.py": {
+      "sha256": "fcd6cd8ae2a7862e553b0530c857031a66b784663863cf6fc7a5d37e04eed06e",
+      "bytes": 2711
+    },
+    "run-sky-native.py": {
+      "sha256": "6626994bdaf12812d9181ea92e00c68f002f0e06cefd44505b6a77fcbd4fd443",
+      "bytes": 10590
+    },
+    "native-sky-compiled/fixture.jar": {
+      "sha256": "02a0f829670e1e1082c3a7700c6f8878df9b096bd61f343778ede42e710bf09c",
+      "bytes": 7430
+    }
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "terminalExit": 0,
+    "checks": {
+      "family": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true,
+        "fontUnchanged": true,
+        "accessibilityUnchanged": true,
+        "originalChromeTaskRetained": true,
+        "photoFrameResumed": true,
+        "displayOn": true,
+        "installedFullSha256Matches": true
+      },
+      "living": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true
+      }
+    },
+    "preferenceStates": {
+      "family": {
+        "states": 10,
+        "existingFilesByteIdentical": 10,
+        "absencesUnchanged": 0
+      },
+      "living": {
+        "states": 10,
+        "existingFilesByteIdentical": 7,
+        "absencesUnchanged": 3
+      }
+    },
+    "preferenceNames": [
+      "immortal_countdown",
+      "immortal_home_widgets",
+      "immortal_timers",
+      "immortal_timer",
+      "immortal_sunrise",
+      "immortal_chime",
+      "immortal_weather",
+      "immortal_packs",
+      "immortal_cameras",
+      "immortal_screensaver"
+    ],
+    "ownerPreferenceEditsOrRestores": 0,
+    "exceptions": [],
+    "familyScreenshotBinding": {
+      "sha256": "7e74960b2a40afcc0499f1deb2231e1f1311ae3c30e2a7e89eec30c47ea9f3ce",
+      "bytes": 63694
+    },
+    "familyScreenshotRootVisuallyInspected": true,
+    "familyScreenshotObservation": "Large tan3:09 digital night clock and Tuesday November3 date on black; accessibility button visible. Resumed frame and awake display verified separately. No Sky palette, provider, weather or photos visual acceptance inferred.",
+    "livingVisualAcceptance": "Unverified"
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1642,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1715,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "cleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "observationTerminals": {
+    "health": {
+      "terminalExit": 0
+    },
+    "credentials": {
+      "terminalExit": 0
+    },
+    "guard": {
+      "terminalExit": 1
+    },
+    "screenshot": {
+      "terminalExit": 0
+    }
+  },
+  "publicRelease": {
+    "guardTerminalExit": 1,
+    "publicManifestByteUnchanged": true,
+    "publicVersionName": "1.83",
+    "publicVersionCode": 77,
+    "localVersionName": "1.118",
+    "localVersionCode": 112,
+    "githubAuthenticationPushOrPublication": false,
+    "guardLogBinding": {
+      "sha256": "106058440941a269c2c3068b32e25614514b8d0a1dbbf5d8f13bacc365bc621f",
+      "bytes": 223
+    }
+  },
+  "nativeFleetCli": {
+    "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "bytes": 694352,
+    "unchanged": true,
+    "rebuiltOrReinstalled": false
+  },
+  "review": {
+    "source": {
+      "sha256": "d24a8927921ea472f2b126ad311938ed10d1b192f2a0fb848b92b08b70ec883b",
+      "bytes": 6650
+    },
+    "gateNative": {
+      "sha256": "c8a19f40bb17a3f1f23d61ef00bb7d10eeb4cbdb3a35506079b5b68286578a9c",
+      "bytes": 185031
+    },
+    "finalEightPathReview": "Separate coordinator-reviewed receipt binds final artifact bytes after documentation QA.",
+    "gateNativeInitialInspectionHistory": {
+      "binding": {
+        "sha256": "bf08eaba3b94c9bcfbe079c7249d788352e24b22bce590717cd81b5810260c27",
+        "bytes": 172681
+      },
+      "scope": "Initial read-only mapping parser stopped at unindented R8 comments and reported false blockers; corrected mapping and actual DEX inspection pass. No source, test, compiler, native, device or network execution by review."
+    },
+    "rootDocumentationGeneratorReviewBinding": {
+      "sha256": "bcc99141db23934a5730b959fea0a93e954b05d62f1ae04d4909ef6876aaa810",
+      "bytes": 2443
+    },
+    "newProseReadabilityCorrectionBinding": {
+      "sha256": "bcfe83c94fd2d40c311f743e10fbd03974fb7895d16173de84847beab0cd8625",
+      "bytes": 1667
+    }
+  },
+  "documentation": {
+    "initialVerification": {
+      "mkdocs": {
+        "terminalExit": 0,
+        "elapsedSeconds": 2.329
+      },
+      "roadmap": {
+        "terminalExit": 0,
+        "elapsedSeconds": 5.231
+      }
+    },
+    "initialProofByteBinding": {
+      "sha256": "1a9ce83c72132403881e7ebfc8a3c50139214c00ad94fe129c38c9ba54eefc64",
+      "bytes": 59515
+    },
+    "roadmapInitial": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 94,
+          "checks": [
+            {
+              "id": "sky-short-day",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 94,
+          "checks": [
+            {
+              "id": "sky-short-day",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "rootVisuallyInspectedScreenshots": true,
+    "rootObservation": "390px selected Sky article has contained wrapped Portal facts, evidence and limits.1600px selected detail has contained facts and acceptance; existing desktop pane scroll behavior retained. NoCSSchanges.",
+    "screenshots": {
+      "390": {
+        "sha256": "bb6d1db2d08c5fbbaace5b3e02fe25742ce5c918e79057564d906b22685e55c8",
+        "bytes": 264676
+      },
+      "1600": {
+        "sha256": "4fa2b3b62c9b37f3aef8865ccbd7677bcd16e0e5b937526b1011e3a5a02382e2",
+        "bytes": 119117
+      }
+    },
+    "initialBindings": {
+      "mkdocs-qa.log": {
+        "sha256": "62cbed913b593e941aec87fc58594974bb9db24cd81eae667595b49de29b006f",
+        "bytes": 31633
+      },
+      "roadmap-qa.log": {
+        "sha256": "eda24c682d18c81e748f71ca1e4447336b56cfc3b341b68a3524c9422fb604f5",
+        "bytes": 1445
+      },
+      "roadmap-qa.json": {
+        "sha256": "bb2aec1a28f3c456a79a0651e6dfacb79f0e406a1908f01e2dfbdea4db48c385",
+        "bytes": 1498
+      },
+      "documentation-qa-terminals.json": {
+        "sha256": "569930305340b221bbdbd9d4a50b8cd3e616b2a4c697a561fc047ce3e0fc1350",
+        "bytes": 144
+      }
+    },
+    "closingVerification": "Separate closing receipt verifies final documentation and exact served proof bytes before commit."
+  },
+  "backlog": {
+    "tasks": 94,
+    "counts": {
+      "delivered": 59,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "priorTaskObjects": 93,
+    "allPriorObjectsIdentical": true,
+    "priorRawTaskSuffixBytes": 297909,
+    "priorRawTaskSuffixSha256": "f5c3700f3cf5f182fca8023d2bf12784a47de45b0171a2869018edd76836011f",
+    "priorRawTaskSuffixByteIdentical": true,
+    "defaultTask": "weather-native-layout",
+    "defaultUnchanged": true,
+    "onlyBoundaryChange": "Current room version1.117/code111 to1.118/code112",
+    "otherTopLevelKeysUnchanged": true,
+    "originalIndependentAuditClock": {
+      "startedAt": "2026-11-03T10:55:48+00:00",
+      "deadline": "2026-11-03T11:25:48+00:00",
+      "retained": true
+    }
+  },
+  "deferredHypotheses": {
+    "selectionBinding": {
+      "sha256": "46726b6c4389f8084b5faa1d3767f73ae402791c407374243c542449c02d638e",
+      "bytes": 3399
+    },
+    "backInputBinding": {
+      "sha256": "6516724f6ab5a96fa61504941ea38d7d25cc9fa14cd34efbcdf4c31d87104715",
+      "bytes": 13120
+    },
+    "policy": "Unselected back reachability, queued overnight start, StarField accuracy and polar/wrapping solar hypotheses retain the original10:55:48–11:25:48clock. All older issue clocks remain; no reopened slot."
+  },
+  "limits": [
+    "Generated ordered1h/3h and control8h/14h schedules only; arbitrary schedules and live visual/provider behavior remain open.",
+    "Fractional ordering across other short valid schedules and long/invalid input preservation have source review; no broader native fixture claim.",
+    "Both rooms have exact optimized installation readback; native palette execution uses separate actual debug APK.",
+    "Family current frame/clock is viewed; Living visual, API28 and external cleanup faults remain unverified.",
+    "Public1.83/code77 unchanged; local1.118/code112 is not publication eligible.",
+    "No phone/Pixel, HA/MQTT experiment, provider login, GitHub auth, push or publication.",
+    "Existing approvals and parked scopes remain; whole-product goal stays active."
+  ]
+}

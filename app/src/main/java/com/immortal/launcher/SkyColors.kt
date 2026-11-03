@@ -29,14 +29,19 @@ object SkyColors {
   /** Gradient (top, bottom) for [nowMin] given today's [sunriseMin]/[sunsetMin]
    * (all minutes-of-day, 0..1439). Blends smoothly between phase anchors. */
   fun gradientFor(nowMin: Int, sunriseMin: Int, sunsetMin: Int): Pair<Color, Color> {
-    val dawnStart = sunriseMin - 40
-    val dawnEnd = sunriseMin + 40
-    val morningEnd = sunriseMin + 120
-    val midday = (sunriseMin + sunsetMin) / 2
-    val eveningStart = sunsetMin - 120
-    val duskStart = sunsetMin - 40
-    val duskEnd = sunsetMin + 40
-    val twilightEnd = sunsetMin + 80
+    val daylight = sunsetMin - sunriseMin
+    val shortDay = daylight in 1 until 480
+    // Keep all daytime anchors in order even when winter daylight is brief.
+    val phaseScale = if (shortDay) daylight / 480f else 1f
+    val dawnStart = (sunriseMin - 40).toFloat()
+    val dawnEnd = sunriseMin + 40 * phaseScale
+    val morningEnd = sunriseMin + 120 * phaseScale
+    val midday = if (shortDay) (sunriseMin + sunsetMin) / 2f
+        else ((sunriseMin + sunsetMin) / 2).toFloat()
+    val eveningStart = sunsetMin - 120 * phaseScale
+    val duskStart = sunsetMin - 40 * phaseScale
+    val duskEnd = (sunsetMin + 40).toFloat()
+    val twilightEnd = (sunsetMin + 80).toFloat()
 
     return when {
       nowMin < dawnStart -> NIGHT
@@ -51,8 +56,8 @@ object SkyColors {
     }
   }
 
-  private fun frac(now: Int, start: Int, end: Int): Float =
-      if (end <= start) 1f else ((now - start).toFloat() / (end - start)).coerceIn(0f, 1f)
+  private fun frac(now: Int, start: Float, end: Float): Float =
+      if (end <= start) 1f else ((now - start) / (end - start)).coerceIn(0f, 1f)
 
   private fun blend(a: Pair<Color, Color>, b: Pair<Color, Color>, t: Float): Pair<Color, Color> =
       lerp(a.first, b.first, t) to lerp(a.second, b.second, t)

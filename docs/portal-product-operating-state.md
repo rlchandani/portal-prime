@@ -13,8 +13,40 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / Music Assistant player identity:** exact optimized
-  **1.117/code111** is installed and fully hashed in both rooms. An exact client
+- **Current room APK / Sky palette on short days:** exact optimized
+  **1.118/code112** is installed and fully hashed in both rooms. Ordered short
+  days reach the existing noon and twilight palettes without overlapping
+  daytime phases. Interior distances shrink only below eight hours; seven
+  named palettes, exterior twilight distances and existing long-day midpoint
+  remain. Nine frozen methods reproduce five failures then pass;
+  **4,273 JVM / 443 suites**, debug, optimized, R8 and vital lint
+  pass in 2m 14s. Actual debug Family gradient improves **7/12 to 12/12**:
+  five corrections, six retained product checks and one harness control.
+  Each variant makes 5,788 gradient calls, 11,576 Color unboxes, 5,760 whole-day
+  samples and 28 literal anchors. Two accepted parents and scratch retire normally;
+  zero excluded native executions. One initial private compiler failure is
+  corrected; successful retry has three Java 8 obsolescence warnings.
+  The optimized static gradient remains, but required singleton and Pair/Color
+  getter admission is unavailable to this debug fixture; zero optimized calls,
+  no keep rules. API 28, polar or
+  wrapping schedules, live solar providers, physical Sky UI and external timeout
+  cleanup remain open. Complete captured maps and ten preference states per room
+  match: Family ten existing files, Living seven files and three unchanged
+  absences. No exception, edit or restore. Family current night clock was viewed;
+  font, accessibility, original Chrome, resumed frame and awake display remain.
+  Living visual remains open. Normal diagnostics and logcat lines=1500 requests
+  produce 1,642 Family and 1,715 Living actual lines without fatal or
+  ANR markers; limited scope. Original registry unchanged, copied credentials
+  removed. Public manifest remains 1.83; no phone, HA, auth or publication.
+  **94 tasks: 59 delivered, 25 locally verified, 3 approval, 6 parked, 1 queued.**
+  Original **10:55:48–11:25:48 UTC** audit clock retained. New unselected Back,
+  Sleep, wallpaper, star-field and polar hypotheses share this clock; older held
+  or exhausted scopes remain. Broader goal stays active.
+  [Receipt](portal-sky-short-day-2026-11-03.md).
+
+- **Previous room APK / Music Assistant player identity:** exact optimized
+  **1.117/code111** was installed and fully hashed in both rooms at that
+  delivery's closure; the current Sky build supersedes it. An exact client
   ID now wins over display-name fallback for legacy metadata and private command
   targeting. Missing-ID name fallback, current metadata, group precedence,
   authentication and transport remain. Sixteen frozen methods reproduce eight
@@ -45,7 +77,7 @@ The updated whole-product objective is
 
 - **Previous room APK / Orthodox feast civil dates:** exact optimized
   **1.116/code110** was installed and fully hashed in both rooms at that
-  delivery's closure; the current MA identity build supersedes it. Gregorian civil
+  delivery's closure; the MA identity build superseded it. Gregorian civil
   offsets keep the existing feast labels on their mapped dates across clock
   changes and differing input/default zones. Labels, precedence, fixed fallback
   and the documented 1900–2099 Easter algorithm remain. Ten frozen methods
