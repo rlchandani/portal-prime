@@ -108,17 +108,33 @@ object NewsFeed {
 
   /**
    * Pull the article link from an entry block: RSS `<link>URL</link>` (inner text), or an Atom
-   * `<link href="URL" …/>` attribute. Prefer a non-empty inner-text link, then an href.
+   * `<link href="URL" …/>` attribute. Prefer non-empty RSS text, then the first Atom alternate
+   * link. An omitted Atom relation defaults to alternate; self and enclosure links are not articles.
    */
   private fun extractLink(block: String): String? {
     firstTag(block, "link")?.let { inner ->
       val text = clean(inner)
       if (text.startsWith("http")) return text
     }
-    // Atom: <link href="..."/> — grab the first href on a <link ...> tag.
-    val linkTag = Regex("<link\\b[^>]*>", RegexOption.IGNORE_CASE).find(block)?.value ?: return null
-    val href = Regex("href\\s*=\\s*\"([^\"]+)\"", RegexOption.IGNORE_CASE).find(linkTag)?.groupValues?.get(1)
-    return href?.let { clean(it) }.takeUnless { it.isNullOrBlank() }
+    val linkTags = Regex("<link\\b[^>]*>", RegexOption.IGNORE_CASE).findAll(block)
+    // Read complete quoted attributes so data-href or text inside another value cannot become href.
+    val attributes = Regex("""\s+([A-Za-z_:][A-Za-z0-9_.:-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')""")
+    for (linkTag in linkTags) {
+      var href: String? = null
+      var relation: String? = null
+      for (attribute in attributes.findAll(linkTag.value)) {
+        val name = attribute.groupValues[1]
+        val value = attribute.groups[2]?.value ?: attribute.groupValues[3]
+        when {
+          name.equals("href", ignoreCase = true) -> href = value
+          name.equals("rel", ignoreCase = true) -> relation = value
+        }
+      }
+      if (relation != null && relation != "alternate") continue
+      val link = href?.let { clean(it) }?.takeIf { it.isNotBlank() } ?: continue
+      return link
+    }
+    return null
   }
 
   /** Strip CDATA wrappers, decode the common entities, collapse whitespace, trim. */

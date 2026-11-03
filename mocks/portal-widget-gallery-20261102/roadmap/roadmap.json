@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T11:13:05.432024+00:00",
+  "updatedAt": "2026-11-03T11:36:39.695299+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,60 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.118/code112. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.119/code113. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "news-atom-article-link",
+      "title": "News: open the Atom article link",
+      "summary": "Delivered 1.119: Atom headlines keep article links instead of earlier self or enclosure targets.",
+      "description": "Select the first nonblank alternate or omitted-relation Atom href. Keep optional headlines and existing RSS text priority.",
+      "status": "delivered",
+      "verification": "10 frozen methods: 8 red failures to pass; 4,283 JVM; debug native 6/16 to 16/16",
+      "kind": "News article target selection",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Content reliability / independent parser and artifact review",
+      "deployment": "Exact optimized 1.119/code113 installed and fully hashed in Family Area and Living Area.",
+      "state": "Complete captured maps and eleven preference states per room match. Family ten files and one absence, Living seven files and four absences remain. Family frame, font, accessibility and Chrome retained. Two native parents and scratch retired; copied credentials removed.",
+      "acceptance": [
+        "Freeze literal headline and article URL expectations before production changes.",
+        "Keep RSS text priority, title/entity cleanup, cap/order and multiple-alternate controls.",
+        "Bind unchanged full gates and actual debug parse/getter results separately from HTTP, provider or browser acceptance.",
+        "Deliver the exact signed optimized artifact and verify complete captured maps and eleven preference states."
+      ],
+      "evidence": [
+        {
+          "text": "Article selection correction, frozen red and green checks, debug differential and exact delivery.",
+          "source": "docs/portal-news-atom-article-link-2026-11-03.md"
+        },
+        {
+          "text": "Bound source, tests, artifacts, generated XML results, room preservation and normal cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/news-atom-article-link-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual debug Family parsing improves 6/16 to 16/16: 10 corrected checks and 6 retained checks, comprising 5 product controls and one classloader harness control. Each variant makes 17 actual parse$app calls and observes 24 headlines through 24 title getters and 24 link getters.",
+        "Native debug pure parser and actual Headline getters only. Optimized isolated parser/getter admission remains unavailable; zero optimized parse calls and no keep rules. API28 unverified.",
+        "No native Context, household preferences, HTTP, provider, service, article-open or process-default mutation. Physical news display, live feeds/cache and browser acceptance remain open.",
+        "First nonblank alternate or omitted-relation href is the article target; no eligible target keeps the headline with null. Existing RSS text priority and cleaning remain.",
+        "No MIME preference, namespace, xml:base, relative-URI or general XML-parser redesign. Broader malformed-document handling remains.",
+        "Two accepted native parents retire and scratch is removed without faults. Pre-execution author/admission inspection history remains separate. External timeout cleanup is unverified.",
+        "Eleven named preference states per room match: Family has ten byte-identical files and one unchanged absence; Living has seven byte-identical files and four unchanged absences, including the news preference file in both rooms. No exception or household preference edit or restore.",
+        "Family current frame appearance is viewed; News UI and Living visual remain open. Diagnostic and logcat lines=1500 requests produce 1642 and 1707 actual lines; limited health scope.",
+        "Public manifest remains 1.83/code77. No phone, HA, authentication, push or publication; design approvals and parked clocks remain.",
+        "Current unselected Alpaca, Converter and Todo/Notes source-only hypotheses share this clock without implementation. Earlier held or exhausted findings retain their original clocks."
+      ],
+      "next": "Retain exact two-room delivery. Optimized isolated parser, API28, real feeds/cache, physical News UI, browser opening and Living visual acceptance remain open; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T11:21:15+00:00",
+        "deadline": "2026-11-03T11:51:15+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "sky-short-day",
       "title": "Sky background: keep short-day phases in order",

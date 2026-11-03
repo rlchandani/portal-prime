@@ -1,0 +1,1474 @@
+{
+  "recordedAt": "2026-11-03T11:37:00.208257+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T11:21:15Z",
+    "deadline": "2026-11-03T11:51:15Z",
+    "originalRetained": true,
+    "includes": "Discovery, frozen reproduction, correction, gates, native checks, two-room delivery, documentation, cleanup and local commit"
+  },
+  "finding": {
+    "activeConsumer": "HomeActivity ImmortalNewsWidget fetches headlines and passes Headline.link to ACTION_VIEW",
+    "witness": "Valid Atom self or enclosure link before alternate chooses a non-article href on baseline",
+    "baselineSourceSha256": "1adf87e83d280d3312f0a209eedc47cb5c7e4a94521926cd47ba6bea352bf461"
+  },
+  "correction": {
+    "scope": "NewsFeed.extractLink only plus documentation and local version",
+    "atom": "First nonblank href with absent rel or exact alternate; no eligible link retains title with null link",
+    "quotedAttributeBoundary": "Complete single/double quoted attributes prevent data-href and href-like text in another value",
+    "retained": "RSS nonempty HTTP link text priority, entity/title cleanup, entry order, eight headline cap; existing six tests and active consumer/config unchanged"
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/NewsFeed.kt": "b18a3de6f5aa0d9e4b151fe37ac95644e252cbbedd2609910f8dd972bc7b3853",
+    "app/src/test/java/com/immortal/launcher/NewsAtomLinkTest.kt": "8c6b0f2730e41a32c78ea36cd443e3b0d70d5e513df3a0692e6fcf43c6fba430",
+    "app/build.gradle.kts": "7ab44e5485242717214dc47941e86d4a9f9f22d694dae7624ef89f519fbac4f1"
+  },
+  "red": {
+    "terminalExit": 1,
+    "tests": 10,
+    "assertionFailures": 8,
+    "errors": 0,
+    "skips": 0,
+    "failedMethods": [
+      "singleQuotedXmlAttributesKeepTheArticleTarget",
+      "omittedRelationIsAnArticleLinkAfterSelf",
+      "nonArticleRelationsRetainTheHeadlineWithoutAFalseTarget",
+      "attributeOrderDoesNotMakeSelfAnArticleTarget",
+      "blankEligibleHrefDoesNotHideTheLaterArticle",
+      "selfLinkBeforeAlternateKeepsTheArticleTarget",
+      "separateEntriesKeepTheirOwnTitleOrderAndArticleChoice",
+      "enclosureBeforeAlternateKeepsTheArticleTarget"
+    ],
+    "passingControls": [
+      "rssTextLinkKeepsPriorityAndExistingEntityDecoding",
+      "firstAlternateRemainsTheTargetWhenSeveralArePresent"
+    ],
+    "frozenTestSha256": "8c6b0f2730e41a32c78ea36cd443e3b0d70d5e513df3a0692e6fcf43c6fba430",
+    "baselineSourceSha256": "1adf87e83d280d3312f0a209eedc47cb5c7e4a94521926cd47ba6bea352bf461",
+    "failureType": "java.lang.AssertionError",
+    "actualProductAssertionsNotCompileErrors": true,
+    "bindings": {
+      "baseline-jvm.xml": {
+        "sha256": "2748dca7e7b6992c8520d1e4faef97debd6c4b1b24dd8853db74c5cec080fa2d",
+        "bytes": 38764
+      },
+      "baseline-jvm.log": {
+        "sha256": "a39d29e722d879bd8916651cc88182078a55d6faaf1f151c6ae22247e83a0cec",
+        "bytes": 3189
+      },
+      "baseline-terminal.json": {
+        "sha256": "bca9590284d84aa46968f65332553aeead21cbe6639e9e0c2b6b93caa8e495c3",
+        "bytes": 226
+      },
+      "acceptance-freeze.json": {
+        "sha256": "2b36e3006a8c9b1e871f94866450752789474b6587058c329e0691f9703c6f0f",
+        "bytes": 1698
+      }
+    }
+  },
+  "green": {
+    "suites": 444,
+    "tests": 4283,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualNewsAtomLinkFocusedTests": 10,
+    "allFocusedUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "1m 55s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "buildBindings": {
+    "full-gate.log": {
+      "sha256": "a9b080c8bf0db2ec5dfeebe2893450019a4c57e51bf14fab259e7eda19923616",
+      "bytes": 13732
+    },
+    "gate-terminal.json": {
+      "sha256": "c0fc7db4142de286c95f6f5731d93d7200e76d8a5042236f995b4a925d629279",
+      "bytes": 256
+    },
+    "package-proof.log": {
+      "sha256": "259f5603a4db6f02badcd4b98b98ad0664916889f3d3da760f9bcd3232ca2b37",
+      "bytes": 605
+    },
+    "package-terminal.json": {
+      "sha256": "95e850c27aab69ded358b519763913bc3804d3657427173193999c40460fea7c",
+      "bytes": 278
+    },
+    "independent-full-jvm-xml-manifest.json": {
+      "sha256": "bde67511c47c7241126cf50c3a6bf6d0c9a31c77fed2c7a922bd0b52f61b3364",
+      "bytes": 84379
+    }
+  },
+  "native": {
+    "baseline": {
+      "status": "FAIL",
+      "checks": {
+        "actualDebugAPKClassLoader": true,
+        "selfBeforeAlternate": false,
+        "enclosureBeforeAlternate": false,
+        "omittedRelationAfterSelf": false,
+        "nonArticleRelationsKeepHeadline": false,
+        "singleQuotedAttributes": false,
+        "blankEligibleFallsThrough": false,
+        "attributeOrderKeepsArticle": false,
+        "separateEntriesKeepOwnChoice": false,
+        "firstAlternateWins": true,
+        "rssTextAndCleanupPriority": true,
+        "simpleOmittedRelation": true,
+        "rssLiteralEightCapOrder": true,
+        "missingTitleAndGarbage": true,
+        "dataHrefIsNotHref": false,
+        "quotedAttributeTextIsNotHref": false
+      },
+      "observations": {
+        "selfBeforeAlternate": {
+          "generatedInputSha256": "51a3746a0a925eafb4c5ea3efc3c4c1eeb9ed60db07bd700bd63e9706826e37f",
+          "generatedInputBytes": 217,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Article one",
+              "link": "https://example.test/articles/one"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Article one",
+              "link": "https://example.test/entries/one.atom"
+            }
+          ],
+          "matches": false
+        },
+        "enclosureBeforeAlternate": {
+          "generatedInputSha256": "d7461a0f2b5bdfc1d314b595d93a11350bd2ea1db152fc5ae94295e0c0963217",
+          "generatedInputBytes": 232,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Article with audio",
+              "link": "https://example.test/articles/audio"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Article with audio",
+              "link": "https://example.test/audio/episode.mp3"
+            }
+          ],
+          "matches": false
+        },
+        "omittedRelationAfterSelf": {
+          "generatedInputSha256": "a3b31f0fc97872d31a1b492c44ad4265d2eb60d45e93779e80b359cef7f68ad2",
+          "generatedInputBytes": 222,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Default article relation",
+              "link": "https://example.test/articles/default"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Default article relation",
+              "link": "https://example.test/entries/default.atom"
+            }
+          ],
+          "matches": false
+        },
+        "nonArticleRelationsKeepHeadline": {
+          "generatedInputSha256": "7724456656965f737f3771b7dfe5515033f051e406195e01d9f0792b7e461bc4",
+          "generatedInputBytes": 253,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Headline without an article link",
+              "link": null
+            }
+          ],
+          "actual": [
+            {
+              "title": "Headline without an article link",
+              "link": "https://example.test/entries/no-article.atom"
+            }
+          ],
+          "matches": false
+        },
+        "singleQuotedAttributes": {
+          "generatedInputSha256": "7f39c107591308191fb20aed5768d293cc79cabb862cf406b13521115f551bbf",
+          "generatedInputBytes": 247,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Single quote attributes",
+              "link": "https://example.test/articles/single?x=1&y=2"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Single quote attributes",
+              "link": null
+            }
+          ],
+          "matches": false
+        },
+        "blankEligibleFallsThrough": {
+          "generatedInputSha256": "6ffa9b0efa91a9fd3ef5f6d9eba675343f920a1cf5b6ed18670279df48851026",
+          "generatedInputBytes": 225,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Article after a blank target",
+              "link": "https://example.test/articles/nonblank"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Article after a blank target",
+              "link": null
+            }
+          ],
+          "matches": false
+        },
+        "attributeOrderKeepsArticle": {
+          "generatedInputSha256": "b672e269c1100d014cf094e743db7c26d9512e5be2084821caa669f06428f41a",
+          "generatedInputBytes": 275,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Reordered attributes",
+              "link": "https://example.test/articles/order"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Reordered attributes",
+              "link": "https://example.test/entries/order.atom"
+            }
+          ],
+          "matches": false
+        },
+        "separateEntriesKeepOwnChoice": {
+          "generatedInputSha256": "a0e7bc99916792b2f2f154f16b5ed0b1074503b0a9be9a8b2984e90d9e3cf8cb",
+          "generatedInputBytes": 409,
+          "actualListClass": "java.util.ArrayList",
+          "expected": [
+            {
+              "title": "First & current",
+              "link": "https://example.test/articles/first"
+            },
+            {
+              "title": "Second without an article",
+              "link": null
+            },
+            {
+              "title": "Third article",
+              "link": "https://example.test/articles/third"
+            }
+          ],
+          "actual": [
+            {
+              "title": "First & current",
+              "link": "https://example.test/entries/first.atom"
+            },
+            {
+              "title": "Second without an article",
+              "link": "https://example.test/media/second.mp4"
+            },
+            {
+              "title": "Third article",
+              "link": "https://example.test/articles/third"
+            }
+          ],
+          "matches": false
+        },
+        "firstAlternateWins": {
+          "generatedInputSha256": "5575d48e0d35f2fe725cd97723be2522456ad7a5f7fff372499b9e12f7a73185",
+          "generatedInputBytes": 302,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Two article representations",
+              "link": "https://example.test/articles/first"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Two article representations",
+              "link": "https://example.test/articles/first"
+            }
+          ],
+          "matches": true
+        },
+        "rssTextAndCleanupPriority": {
+          "generatedInputSha256": "e3aaa91ec39ea172b98a272f309f2b1b6a6a61b4aa330c0cd746b5066bef5343",
+          "generatedInputBytes": 215,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "First & foremost",
+              "link": "https://example.test/rss/article?x=1&y=2"
+            }
+          ],
+          "actual": [
+            {
+              "title": "First & foremost",
+              "link": "https://example.test/rss/article?x=1&y=2"
+            }
+          ],
+          "matches": true
+        },
+        "simpleOmittedRelation": {
+          "generatedInputSha256": "27a0786d29eb79fe2db72cded2c4bf9a7a9a84b8d97dbaf0a79c91d468fe3f8c",
+          "generatedInputBytes": 146,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Default control",
+              "link": "https://example.test/articles/control"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Default control",
+              "link": "https://example.test/articles/control"
+            }
+          ],
+          "matches": true
+        },
+        "rssLiteralEightCapOrder": {
+          "generatedInputSha256": "192ce14f05573731a26f23295d2a546530e4022dae8ff5e569a85e0d2d72c477",
+          "generatedInputBytes": 1432,
+          "actualListClass": "java.util.ArrayList",
+          "expected": [
+            {
+              "title": "H1",
+              "link": "https://example.test/rss/1"
+            },
+            {
+              "title": "H2",
+              "link": "https://example.test/rss/2"
+            },
+            {
+              "title": "H3",
+              "link": "https://example.test/rss/3"
+            },
+            {
+              "title": "H4",
+              "link": "https://example.test/rss/4"
+            },
+            {
+              "title": "H5",
+              "link": "https://example.test/rss/5"
+            },
+            {
+              "title": "H6",
+              "link": "https://example.test/rss/6"
+            },
+            {
+              "title": "H7",
+              "link": "https://example.test/rss/7"
+            },
+            {
+              "title": "H8",
+              "link": "https://example.test/rss/8"
+            }
+          ],
+          "actual": [
+            {
+              "title": "H1",
+              "link": "https://example.test/rss/1"
+            },
+            {
+              "title": "H2",
+              "link": "https://example.test/rss/2"
+            },
+            {
+              "title": "H3",
+              "link": "https://example.test/rss/3"
+            },
+            {
+              "title": "H4",
+              "link": "https://example.test/rss/4"
+            },
+            {
+              "title": "H5",
+              "link": "https://example.test/rss/5"
+            },
+            {
+              "title": "H6",
+              "link": "https://example.test/rss/6"
+            },
+            {
+              "title": "H7",
+              "link": "https://example.test/rss/7"
+            },
+            {
+              "title": "H8",
+              "link": "https://example.test/rss/8"
+            }
+          ],
+          "matches": true
+        },
+        "missingTitleAndGarbage": [
+          {
+            "generatedInputSha256": "c59361c9571f3950c903a02550220412a35bdeb16c6b0eac0ce2df536ada226e",
+            "generatedInputBytes": 109,
+            "actualListClass": "java.util.Collections$SingletonList",
+            "expected": [
+              {
+                "title": "Present",
+                "link": null
+              }
+            ],
+            "actual": [
+              {
+                "title": "Present",
+                "link": null
+              }
+            ],
+            "matches": true
+          },
+          {
+            "generatedInputSha256": "a2e6ba245a3a5c6ab4c68282170e27c4ba683220ca3891fe489d4a7cc464bad2",
+            "generatedInputBytes": 14,
+            "actualListClass": "kotlin.collections.EmptyList",
+            "expected": [],
+            "actual": [],
+            "matches": true
+          },
+          {
+            "generatedInputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "generatedInputBytes": 0,
+            "actualListClass": "kotlin.collections.EmptyList",
+            "expected": [],
+            "actual": [],
+            "matches": true
+          }
+        ],
+        "dataHrefIsNotHref": {
+          "generatedInputSha256": "bb5f6d2e94459563c321ae254e58cd2cd0425bb73f242d52644a61aa1773944f",
+          "generatedInputBytes": 198,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Data href is not href",
+              "link": "https://example.test/articles/data"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Data href is not href",
+              "link": "https://example.test/not-the-article"
+            }
+          ],
+          "matches": false
+        },
+        "quotedAttributeTextIsNotHref": {
+          "generatedInputSha256": "fa35c2f0885051b3d30de6cc68e6643b79a4d4bfc4bc579f05fe3ecdad433240",
+          "generatedInputBytes": 207,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Quoted attribute text is not href",
+              "link": "https://example.test/articles/quoted"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Quoted attribute text is not href",
+              "link": "https://example.test/spoofed"
+            }
+          ],
+          "matches": false
+        }
+      },
+      "passed": 6,
+      "total": 16,
+      "actualParseInvocations": 17,
+      "actualTitleGetterInvocations": 24,
+      "actualLinkGetterInvocations": 24,
+      "actualHeadlineObservations": 24,
+      "generatedXmlInputs": 17,
+      "apkSha256": "5e8b0d80d614114e166f0c660d7acee8aed182af35fff236f17bd13fc5628a98",
+      "actualAPKClassLoader": true,
+      "admittedParser": "parse$app(java.lang.String):java.util.List",
+      "buildVariant": "debug",
+      "optimizedParseVerified": false,
+      "contextOperations": 0,
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "articleOpenOperations": 0,
+      "processTimezoneOrLocaleMutations": 0,
+      "scope": "Actual debug NewsFeed parser and Headline getters over generated XML and literal rows; no fetch, Context, preferences, provider, network, URL open, UI or process-default edit."
+    },
+    "candidate": {
+      "status": "PASS",
+      "checks": {
+        "actualDebugAPKClassLoader": true,
+        "selfBeforeAlternate": true,
+        "enclosureBeforeAlternate": true,
+        "omittedRelationAfterSelf": true,
+        "nonArticleRelationsKeepHeadline": true,
+        "singleQuotedAttributes": true,
+        "blankEligibleFallsThrough": true,
+        "attributeOrderKeepsArticle": true,
+        "separateEntriesKeepOwnChoice": true,
+        "firstAlternateWins": true,
+        "rssTextAndCleanupPriority": true,
+        "simpleOmittedRelation": true,
+        "rssLiteralEightCapOrder": true,
+        "missingTitleAndGarbage": true,
+        "dataHrefIsNotHref": true,
+        "quotedAttributeTextIsNotHref": true
+      },
+      "observations": {
+        "selfBeforeAlternate": {
+          "generatedInputSha256": "51a3746a0a925eafb4c5ea3efc3c4c1eeb9ed60db07bd700bd63e9706826e37f",
+          "generatedInputBytes": 217,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Article one",
+              "link": "https://example.test/articles/one"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Article one",
+              "link": "https://example.test/articles/one"
+            }
+          ],
+          "matches": true
+        },
+        "enclosureBeforeAlternate": {
+          "generatedInputSha256": "d7461a0f2b5bdfc1d314b595d93a11350bd2ea1db152fc5ae94295e0c0963217",
+          "generatedInputBytes": 232,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Article with audio",
+              "link": "https://example.test/articles/audio"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Article with audio",
+              "link": "https://example.test/articles/audio"
+            }
+          ],
+          "matches": true
+        },
+        "omittedRelationAfterSelf": {
+          "generatedInputSha256": "a3b31f0fc97872d31a1b492c44ad4265d2eb60d45e93779e80b359cef7f68ad2",
+          "generatedInputBytes": 222,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Default article relation",
+              "link": "https://example.test/articles/default"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Default article relation",
+              "link": "https://example.test/articles/default"
+            }
+          ],
+          "matches": true
+        },
+        "nonArticleRelationsKeepHeadline": {
+          "generatedInputSha256": "7724456656965f737f3771b7dfe5515033f051e406195e01d9f0792b7e461bc4",
+          "generatedInputBytes": 253,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Headline without an article link",
+              "link": null
+            }
+          ],
+          "actual": [
+            {
+              "title": "Headline without an article link",
+              "link": null
+            }
+          ],
+          "matches": true
+        },
+        "singleQuotedAttributes": {
+          "generatedInputSha256": "7f39c107591308191fb20aed5768d293cc79cabb862cf406b13521115f551bbf",
+          "generatedInputBytes": 247,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Single quote attributes",
+              "link": "https://example.test/articles/single?x=1&y=2"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Single quote attributes",
+              "link": "https://example.test/articles/single?x=1&y=2"
+            }
+          ],
+          "matches": true
+        },
+        "blankEligibleFallsThrough": {
+          "generatedInputSha256": "6ffa9b0efa91a9fd3ef5f6d9eba675343f920a1cf5b6ed18670279df48851026",
+          "generatedInputBytes": 225,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Article after a blank target",
+              "link": "https://example.test/articles/nonblank"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Article after a blank target",
+              "link": "https://example.test/articles/nonblank"
+            }
+          ],
+          "matches": true
+        },
+        "attributeOrderKeepsArticle": {
+          "generatedInputSha256": "b672e269c1100d014cf094e743db7c26d9512e5be2084821caa669f06428f41a",
+          "generatedInputBytes": 275,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Reordered attributes",
+              "link": "https://example.test/articles/order"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Reordered attributes",
+              "link": "https://example.test/articles/order"
+            }
+          ],
+          "matches": true
+        },
+        "separateEntriesKeepOwnChoice": {
+          "generatedInputSha256": "a0e7bc99916792b2f2f154f16b5ed0b1074503b0a9be9a8b2984e90d9e3cf8cb",
+          "generatedInputBytes": 409,
+          "actualListClass": "java.util.ArrayList",
+          "expected": [
+            {
+              "title": "First & current",
+              "link": "https://example.test/articles/first"
+            },
+            {
+              "title": "Second without an article",
+              "link": null
+            },
+            {
+              "title": "Third article",
+              "link": "https://example.test/articles/third"
+            }
+          ],
+          "actual": [
+            {
+              "title": "First & current",
+              "link": "https://example.test/articles/first"
+            },
+            {
+              "title": "Second without an article",
+              "link": null
+            },
+            {
+              "title": "Third article",
+              "link": "https://example.test/articles/third"
+            }
+          ],
+          "matches": true
+        },
+        "firstAlternateWins": {
+          "generatedInputSha256": "5575d48e0d35f2fe725cd97723be2522456ad7a5f7fff372499b9e12f7a73185",
+          "generatedInputBytes": 302,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Two article representations",
+              "link": "https://example.test/articles/first"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Two article representations",
+              "link": "https://example.test/articles/first"
+            }
+          ],
+          "matches": true
+        },
+        "rssTextAndCleanupPriority": {
+          "generatedInputSha256": "e3aaa91ec39ea172b98a272f309f2b1b6a6a61b4aa330c0cd746b5066bef5343",
+          "generatedInputBytes": 215,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "First & foremost",
+              "link": "https://example.test/rss/article?x=1&y=2"
+            }
+          ],
+          "actual": [
+            {
+              "title": "First & foremost",
+              "link": "https://example.test/rss/article?x=1&y=2"
+            }
+          ],
+          "matches": true
+        },
+        "simpleOmittedRelation": {
+          "generatedInputSha256": "27a0786d29eb79fe2db72cded2c4bf9a7a9a84b8d97dbaf0a79c91d468fe3f8c",
+          "generatedInputBytes": 146,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Default control",
+              "link": "https://example.test/articles/control"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Default control",
+              "link": "https://example.test/articles/control"
+            }
+          ],
+          "matches": true
+        },
+        "rssLiteralEightCapOrder": {
+          "generatedInputSha256": "192ce14f05573731a26f23295d2a546530e4022dae8ff5e569a85e0d2d72c477",
+          "generatedInputBytes": 1432,
+          "actualListClass": "java.util.ArrayList",
+          "expected": [
+            {
+              "title": "H1",
+              "link": "https://example.test/rss/1"
+            },
+            {
+              "title": "H2",
+              "link": "https://example.test/rss/2"
+            },
+            {
+              "title": "H3",
+              "link": "https://example.test/rss/3"
+            },
+            {
+              "title": "H4",
+              "link": "https://example.test/rss/4"
+            },
+            {
+              "title": "H5",
+              "link": "https://example.test/rss/5"
+            },
+            {
+              "title": "H6",
+              "link": "https://example.test/rss/6"
+            },
+            {
+              "title": "H7",
+              "link": "https://example.test/rss/7"
+            },
+            {
+              "title": "H8",
+              "link": "https://example.test/rss/8"
+            }
+          ],
+          "actual": [
+            {
+              "title": "H1",
+              "link": "https://example.test/rss/1"
+            },
+            {
+              "title": "H2",
+              "link": "https://example.test/rss/2"
+            },
+            {
+              "title": "H3",
+              "link": "https://example.test/rss/3"
+            },
+            {
+              "title": "H4",
+              "link": "https://example.test/rss/4"
+            },
+            {
+              "title": "H5",
+              "link": "https://example.test/rss/5"
+            },
+            {
+              "title": "H6",
+              "link": "https://example.test/rss/6"
+            },
+            {
+              "title": "H7",
+              "link": "https://example.test/rss/7"
+            },
+            {
+              "title": "H8",
+              "link": "https://example.test/rss/8"
+            }
+          ],
+          "matches": true
+        },
+        "missingTitleAndGarbage": [
+          {
+            "generatedInputSha256": "c59361c9571f3950c903a02550220412a35bdeb16c6b0eac0ce2df536ada226e",
+            "generatedInputBytes": 109,
+            "actualListClass": "java.util.Collections$SingletonList",
+            "expected": [
+              {
+                "title": "Present",
+                "link": null
+              }
+            ],
+            "actual": [
+              {
+                "title": "Present",
+                "link": null
+              }
+            ],
+            "matches": true
+          },
+          {
+            "generatedInputSha256": "a2e6ba245a3a5c6ab4c68282170e27c4ba683220ca3891fe489d4a7cc464bad2",
+            "generatedInputBytes": 14,
+            "actualListClass": "kotlin.collections.EmptyList",
+            "expected": [],
+            "actual": [],
+            "matches": true
+          },
+          {
+            "generatedInputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "generatedInputBytes": 0,
+            "actualListClass": "kotlin.collections.EmptyList",
+            "expected": [],
+            "actual": [],
+            "matches": true
+          }
+        ],
+        "dataHrefIsNotHref": {
+          "generatedInputSha256": "bb5f6d2e94459563c321ae254e58cd2cd0425bb73f242d52644a61aa1773944f",
+          "generatedInputBytes": 198,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Data href is not href",
+              "link": "https://example.test/articles/data"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Data href is not href",
+              "link": "https://example.test/articles/data"
+            }
+          ],
+          "matches": true
+        },
+        "quotedAttributeTextIsNotHref": {
+          "generatedInputSha256": "fa35c2f0885051b3d30de6cc68e6643b79a4d4bfc4bc579f05fe3ecdad433240",
+          "generatedInputBytes": 207,
+          "actualListClass": "java.util.Collections$SingletonList",
+          "expected": [
+            {
+              "title": "Quoted attribute text is not href",
+              "link": "https://example.test/articles/quoted"
+            }
+          ],
+          "actual": [
+            {
+              "title": "Quoted attribute text is not href",
+              "link": "https://example.test/articles/quoted"
+            }
+          ],
+          "matches": true
+        }
+      },
+      "passed": 16,
+      "total": 16,
+      "actualParseInvocations": 17,
+      "actualTitleGetterInvocations": 24,
+      "actualLinkGetterInvocations": 24,
+      "actualHeadlineObservations": 24,
+      "generatedXmlInputs": 17,
+      "apkSha256": "9a711913a6a90be2286a0490e806b5e9a18260ce5ec46374c0cfe56f5b2a7736",
+      "actualAPKClassLoader": true,
+      "admittedParser": "parse$app(java.lang.String):java.util.List",
+      "buildVariant": "debug",
+      "optimizedParseVerified": false,
+      "contextOperations": 0,
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "articleOpenOperations": 0,
+      "processTimezoneOrLocaleMutations": 0,
+      "scope": "Actual debug NewsFeed parser and Headline getters over generated XML and literal rows; no fetch, Context, preferences, provider, network, URL open, UI or process-default edit."
+    },
+    "binding": {
+      "fixtureSourceSha256": "f02cbaefd7ecaf7cf57d01817e60b3c580e3359045d0aee02f47aea7346336fd",
+      "fixtureJarSha256": "9f6bf729e158bbcebceacbf9c14af2443afd3b3156e3c51267c957a743545393",
+      "compilerSha256": "bda4f4f6368d3c451b00f3a6954a1fdf1df7a44a5411f709b1f60aa0ad79e9f2",
+      "runnerSha256": "63c9b21e0c06c8b070c3a735ffa3f95d3afdcfb542148961245a9b15eaf7965f",
+      "phases": [
+        "baseline",
+        "candidate"
+      ],
+      "apkSha256": {
+        "baseline": "5e8b0d80d614114e166f0c660d7acee8aed182af35fff236f17bd13fc5628a98",
+        "candidate": "9a711913a6a90be2286a0490e806b5e9a18260ce5ec46374c0cfe56f5b2a7736"
+      },
+      "buildVariant": "debug",
+      "optimizedParseVerified": false,
+      "scope": "Actual debug NewsFeed parse$app and Headline getters over generated XML and literal rows; no fetch, Context, provider, UI, owner-state, URL open or real network"
+    },
+    "process": {
+      "baseline": {
+        "terminalExit": 1,
+        "stdoutSha256": "52c6588242977b116e2a7cd380eb1f63eafcd0a6338c64d1c6d84b11bcbcd887",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutBytes": 8649,
+        "stderrBytes": 0
+      },
+      "candidate": {
+        "terminalExit": 0,
+        "stdoutSha256": "a029d0130689f9a355e25a7711d69843aee633005c7a00ace11c57f7b238b4c1",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutBytes": 8620,
+        "stderrBytes": 0
+      }
+    },
+    "rawOutputBindings": {
+      "baseline-news-native-stdout-private.txt": {
+        "sha256": "52c6588242977b116e2a7cd380eb1f63eafcd0a6338c64d1c6d84b11bcbcd887",
+        "bytes": 8649
+      },
+      "candidate-news-native-stdout-private.txt": {
+        "sha256": "a029d0130689f9a355e25a7711d69843aee633005c7a00ace11c57f7b238b4c1",
+        "bytes": 8620
+      },
+      "baseline-news-native-stderr-private.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "candidate-news-native-stderr-private.txt": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "classAdmission": {
+      "verdict": "PASS",
+      "checks": 12,
+      "debugEntry": "NewsFeed.INSTANCE parse$app(String):List and actual Headline.getTitle/getLink",
+      "bothOptimized": "Original NewsFeed declaration and getter entries absent; parser mapped inline into Home widget coroutine",
+      "reviewBinding": {
+        "sha256": "c2caf43be34a24b9622e3c03cac64cf4a5f3b3f4f5500e7cf9a8520232b80ded",
+        "bytes": 34809
+      },
+      "optimizedIsolatedParserCalls": 0,
+      "keepRulesAdded": false
+    },
+    "environment": {
+      "device": "Family Area",
+      "android": "10",
+      "api": 29,
+      "architecture": "arm64",
+      "api28Verified": false
+    },
+    "compiler": {
+      "firstActualAttemptExit": 0,
+      "java8ObsolescenceWarnings": 3,
+      "deprecationNote": false,
+      "binding": {
+        "sha256": "941c5b4fd38e72475a2d5ac2595d827c462abd324571b4192da7802641a8e470",
+        "bytes": 820
+      }
+    },
+    "executionHistoryBindings": {
+      "news-native-author-draft-history.json": {
+        "sha256": "1cb345fa7b05c3900b6feb49848cf693ef13d6068400adc79d500f980bd62a81",
+        "bytes": 804
+      },
+      "news-native-pre-execution-history.json": {
+        "sha256": "59742f51bb8812ab96a8fbeff6a3f310053af0d840256560837541dc5956cb6a",
+        "bytes": 3765
+      },
+      "root-native-admission-inspection-correction.json": {
+        "sha256": "204cfab77048ef4d9bf8e78970f919776cc2bdee7455a4e6841fcf77445d8ff3",
+        "bytes": 581
+      },
+      "root-native-admission.json": {
+        "sha256": "6f2c0fac4919d3fd504f093322c33b76faf71f64bef4b7f0c98f5e8a0761daa0",
+        "bytes": 1043
+      },
+      "native-compile-terminal.json": {
+        "sha256": "1f33ce7fee0bede4f80b1a089ff2e6639a865916d101ce169fdd40bc075278d0",
+        "bytes": 519
+      },
+      "native-run-terminal.json": {
+        "sha256": "d5ff55ec938fe13eba08d7930da31723384edf525f38b1b61043fb846207beae",
+        "bytes": 208
+      },
+      "independent-gate-review-inspection-history.json": {
+        "sha256": "fe7917f6b0599a5ecfe1ffcaa129ac0f92278f70a6768544ea644612ddee57dc",
+        "bytes": 560
+      }
+    },
+    "cleanup": {
+      "parentsRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "ownedScratchRemoved": true,
+      "faults": [],
+      "ownerPreferencesWritten": 0,
+      "realNetworkOperations": 0,
+      "providerOrServiceStarted": false,
+      "buildVariant": "debug",
+      "optimizedParseVerified": false,
+      "externalTimeoutFailureCleanupFaultInjected": false
+    }
+  },
+  "artifact": {
+    "sha256": "a2062892d83bd4bf774629ca51ce2f885505ec6865a8fc18481c1e142da7e29a",
+    "bytes": 25879086,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.119",
+    "versionCode": 113,
+    "variants": {
+      "performance": {
+        "sha256": "a2062892d83bd4bf774629ca51ce2f885505ec6865a8fc18481c1e142da7e29a",
+        "bytes": 25879086,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.119",
+        "versionCode": 113
+      },
+      "debug": {
+        "sha256": "9a711913a6a90be2286a0490e806b5e9a18260ce5ec46374c0cfe56f5b2a7736",
+        "bytes": 46703533,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.119",
+        "versionCode": 113
+      },
+      "rollback": {
+        "sha256": "1aa81f61457721a3efafef0a1e3848a8d117636492ebc605f1c9869718cd6236",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.118",
+        "versionCode": 112
+      }
+    },
+    "debugSha256": "9a711913a6a90be2286a0490e806b5e9a18260ce5ec46374c0cfe56f5b2a7736",
+    "rollbackSha256": "1aa81f61457721a3efafef0a1e3848a8d117636492ebc605f1c9869718cd6236",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "1m 55s"
+  },
+  "artifactBindings": {
+    "candidate-1.119.apk": {
+      "sha256": "a2062892d83bd4bf774629ca51ce2f885505ec6865a8fc18481c1e142da7e29a",
+      "bytes": 25879086
+    },
+    "candidate-debug-1.119.apk": {
+      "sha256": "9a711913a6a90be2286a0490e806b5e9a18260ce5ec46374c0cfe56f5b2a7736",
+      "bytes": 46703533
+    },
+    "baseline-1.118.apk": {
+      "sha256": "1aa81f61457721a3efafef0a1e3848a8d117636492ebc605f1c9869718cd6236",
+      "bytes": 25862702
+    },
+    "baseline-debug-1.118.apk": {
+      "sha256": "5e8b0d80d614114e166f0c660d7acee8aed182af35fff236f17bd13fc5628a98",
+      "bytes": 46703529
+    },
+    "candidate-mapping.txt": {
+      "sha256": "4bd8e7cc5f146423bb84606fe90a4731d9584bb013870634a03e47157963462c",
+      "bytes": 83203630
+    },
+    "baseline-mapping.txt": {
+      "sha256": "19043eb6f07fa1226db5db3ba3d5ea0a7962413fc330b9bc716baa26fc91ea09",
+      "bytes": 83198337
+    }
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "preferenceStates": {
+    "family": {
+      "states": 11,
+      "existingFilesByteIdentical": 10,
+      "absencesUnchanged": 1
+    },
+    "living": {
+      "states": 11,
+      "existingFilesByteIdentical": 7,
+      "absencesUnchanged": 4
+    }
+  },
+  "familyDisplayObservation": {
+    "rootVisuallyInspected": true,
+    "viewedAtUtc": "2026-11-03T11:36:36.551404+00:00",
+    "observation": "Black screensaver with large tan 3:33 clock and Tuesday, November 3 date; small bug icon at bottom right. Only the current clock frame is visible.",
+    "binding": {
+      "sha256": "68c6836d58e99ed0afcea394c0876d846e9a103c3c2cf4ca532f2e4e39d275fe",
+      "bytes": 43948
+    },
+    "newsVisualVerified": false,
+    "livingVisualVerified": false
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1642,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1707,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "cleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "observationTerminals": {
+    "postflight": 0,
+    "health": 0,
+    "screenshot": 0,
+    "versionGuardExpectedLocalPublicMismatch": 1,
+    "credentials": 0
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestBinding": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "unchanged": true,
+    "expectedGuardExit": 1,
+    "published": false
+  },
+  "nativeFleetCli": {
+    "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "bytes": 694352,
+    "rebuilt": false
+  },
+  "review": {
+    "focused-source-review.json": {
+      "passedChecks": 22,
+      "totalChecks": 22,
+      "blockers": [],
+      "binding": {
+        "sha256": "4c626690a5ef2bebb6f4e50948d7460922ea7337a09c48523569cac225a1e38d",
+        "bytes": 7168
+      }
+    },
+    "gate-native-review.json": {
+      "passedChecks": 48,
+      "totalChecks": 48,
+      "blockers": [],
+      "binding": {
+        "sha256": "ae4f07681e933d52523343a3dd9bf2eecf0b149b3c804e9e1b3d3df3ca57b22a",
+        "bytes": 12172
+      }
+    }
+  },
+  "documentation": {
+    "generatorBinding": {
+      "sha256": "b697add0291ac95c5686036ce6df1cb96732264b442eb93983f1cac224d59288",
+      "bytes": 28718
+    },
+    "rootAdmissionBinding": {
+      "sha256": "99683df9de52055ad8c01314ad1f7a9cffdd3cbecd0bf39afe0c93451fae5f98",
+      "bytes": 439
+    },
+    "generatedActualInputBindings": {
+      "status": "Four public documentation paths generated from actual accepted inputs; root owns docs/browser QA",
+      "writtenAtUtc": "2026-11-03T11:36:39.695299+00:00",
+      "files": {
+        "docs/portal-news-atom-article-link-2026-11-03.md": {
+          "sha256": "5a15a7c84dc8e5b0339998f49d0006cd0c5cf615662a97360dffd30b61334286",
+          "bytes": 5994
+        },
+        "docs/portal-product-operating-state.md": {
+          "sha256": "250cc9ef13d79de80471cc79dd3f97b7d4b9182beb5b9d6012de7e3fc1d35ce9",
+          "bytes": 139155
+        },
+        "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+          "sha256": "27e47e3e20f5f706c48e06fb93f975d4189be12a06586f1b7362acc33d9f0754",
+          "bytes": 308044
+        },
+        "mocks/portal-widget-gallery-20261102/roadmap/index.html": {
+          "sha256": "ad819ec44d03a2593b31115fc9fdd15f99413abcf3621d5be4a06240f88366b6",
+          "bytes": 18919
+        }
+      },
+      "inputBindings": {
+        "jvm.json": {
+          "sha256": "f3cb03c544ffcbd91670458d332a410b82ef20b92263b1ce8f885c0dacb08895",
+          "bytes": 259
+        },
+        "artifact.json": {
+          "sha256": "e29a264ee3736160f53bd198685987cd6896c975dddb4ec76c20b7fba84b35f2",
+          "bytes": 1519
+        },
+        "baseline-red.json": {
+          "sha256": "5b544b8f66dcf4d63619787207f93713b61101cd3b406dcc07e59c96875d3350",
+          "bytes": 1554
+        },
+        "source-hashes.json": {
+          "sha256": "662dec125b929e8d7afd99276fa2fc3cafca48072acf09a5f3e5fc2ee7294b4d",
+          "bytes": 355
+        },
+        "focused-source-review.json": {
+          "sha256": "4c626690a5ef2bebb6f4e50948d7460922ea7337a09c48523569cac225a1e38d",
+          "bytes": 7168
+        },
+        "gate-native-review.json": {
+          "sha256": "ae4f07681e933d52523343a3dd9bf2eecf0b149b3c804e9e1b3d3df3ca57b22a",
+          "bytes": 12172
+        },
+        "baseline-news-native-result.json": {
+          "sha256": "43b5678edde80594a9459763746fefabc4fe175ca150563cc4986d8ea0fd5993",
+          "bytes": 11979
+        },
+        "candidate-news-native-result.json": {
+          "sha256": "8efe3da8b862ad5c7d63b4285b09e0131325a0fbf1079525eb2367818c459a0c",
+          "bytes": 11948
+        },
+        "baseline-news-native-process.json": {
+          "sha256": "2fff99c4461cae14c44e5717e419cc52a48ab6e07919fc2ea9c3f18c990137ee",
+          "bytes": 239
+        },
+        "candidate-news-native-process.json": {
+          "sha256": "e48a4b6067014ca1c16b9330f24b0880d51dfd896deb36e927cd089191c5cb3e",
+          "bytes": 239
+        },
+        "news-native-binding-all.json": {
+          "sha256": "06928f64b9565e800460aab18835f1b61725e8c6930598419617cb91ad94833d",
+          "bytes": 871
+        },
+        "news-native-cleanup-all.json": {
+          "sha256": "e9f0f818ad40a26797ecafdde704859e8fb06e9e3e498405b04edd056321153e",
+          "bytes": 337
+        },
+        "native-compile.log": {
+          "sha256": "941c5b4fd38e72475a2d5ac2595d827c462abd324571b4192da7802641a8e470",
+          "bytes": 820
+        },
+        "deploy-results.json": {
+          "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31",
+          "bytes": 231
+        },
+        "preservation.json": {
+          "sha256": "2de61275dfa1480b50994ef53e781f275c02efce4e91569504dfda44473a7ed6",
+          "bytes": 718
+        },
+        "health.json": {
+          "sha256": "d36437da0a16903ef371be0db42f5e54c01577cafa76e8b41ccce6161fa115a7",
+          "bytes": 579
+        },
+        "screenshot-observation.json": {
+          "sha256": "ccd26c1f433f90168fb3b2f685afe292d5a0628a1332046023111e44ca367fe4",
+          "bytes": 441
+        },
+        "credential-cleanup.json": {
+          "sha256": "584d00c535583d9f5c6f035e521ab6f64eefddfd75629ef4a3518d05d6a25d76",
+          "bytes": 119
+        }
+      },
+      "sourceTestBuildOrCssWrites": 0,
+      "publicProofShaEmbedded": false
+    },
+    "rootOwnsRenderingAcceptance": true,
+    "strictMkDocs": {
+      "terminalExit": 0,
+      "buildSeconds": 2.13,
+      "binding": {
+        "sha256": "b66acd7325e5b78901dc3201aa4fb3c0c13e68433a21502797343c7090269c80",
+        "bytes": 31684
+      },
+      "existingInfoMessagesRetained": true
+    },
+    "initialActualChrome": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 95,
+          "checks": [
+            {
+              "id": "news-atom-article-link",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 95,
+          "checks": [
+            {
+              "id": "news-atom-article-link",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "initialRenderingBinding": {
+      "sha256": "33515fed8dfc2297bc80f1202f056f778d48347a5607e0b57f221f46f5805a68",
+      "bytes": 1516
+    },
+    "visualObservation": {
+      "rootActuallyViewedBoth": true,
+      "viewedAtUtc": "2026-11-03T11:37:53.480883+00:00",
+      "mobile": "Article title, two-column facts, acceptance, evidence and limits wrap within the narrow card; no overlap visible.",
+      "desktop": "Article heading and facts, acceptance and evidence align in the card; beginning of limits visible. Remaining clipping/full-content acceptance comes from actual layout assertions.",
+      "bindings": {
+        "initial-roadmap-390.png": {
+          "sha256": "db27b0d49d464ed11e599204f791472bc363e5a20a4ef9a59c8fb0b4ab9b6573",
+          "bytes": 248873
+        },
+        "initial-roadmap-1600.png": {
+          "sha256": "a7eea44e398af6b913c26034744c849b422cefe22ff850ccdc47e24e19047b33",
+          "bytes": 117758
+        }
+      }
+    },
+    "closingPlan": "Final frozen proof and eight paths checked again with strict MkDocs and actual Chrome at390 and1600; final receipts retained privately to avoid self-hashing."
+  },
+  "backlog": {
+    "tasks": 95,
+    "counts": {
+      "delivered": 60,
+      "verified": 25,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "priorTaskObjects": 94,
+    "allPriorObjectsIdentical": true,
+    "priorRawTaskSuffixByteIdentical": true,
+    "priorRawTaskSuffixBytes": 302579,
+    "priorRawTaskSuffixSha256": "06a8d048c314727b21b3cb1c395e55de1c73eeec71914ec99d08b7b2980d42f6",
+    "defaultTask": "weather-native-layout",
+    "defaultUnchanged": true,
+    "onlyBoundaryChange": "Current room version1.118/code112 to1.119/code113",
+    "otherTopLevelKeysUnchanged": true,
+    "originalClock": {
+      "startedAt": "2026-11-03T11:21:15+00:00",
+      "deadline": "2026-11-03T11:51:15+00:00",
+      "retained": true
+    },
+    "rootIndependentInspectionBinding": {
+      "sha256": "2c3b11dd8d80686f3fd07e10de8585fd0e3ab774b821237c52f15d4ccd8b7c47",
+      "bytes": 441
+    }
+  },
+  "deferredHypotheses": {
+    "sameClockUnselected": [
+      "Alpaca latestTrade fallback",
+      "Converter future cache timestamp",
+      "Todo/Notes competing writer hypotheses"
+    ],
+    "implementation": false,
+    "originalClockReset": false,
+    "olderScopes": "Aurora, ISS, SMB, Sleep, Back, Sky and other held or exhausted findings keep their original clocks"
+  },
+  "limits": [
+    "Native generated-XML parser/getter acceptance is debug only; no isolated optimized parser execution",
+    "API28 unverified",
+    "Actual HTTP/provider feed fetch, cache and browser/article opening unverified",
+    "No configured news preference file in either room; physical News widget acceptance unverified",
+    "Living visual acceptance open; Family screenshot only current tan clock frame",
+    "No MIME ranking, namespace, xml:base, relative URI or general XML redesign",
+    "Limited normal diagnostics only; no full runtime or negative authentication claim",
+    "Normal owned cleanup observed; forced external timeout/failure cleanup unverified",
+    "Rollback retained with same signer; not executed",
+    "No phone, HA/MQTT, discovery/login, GitHub auth/push/publication; broader goal active"
+  ]
+}

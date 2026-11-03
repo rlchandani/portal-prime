@@ -13,8 +13,35 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / Sky palette on short days:** exact optimized
-  **1.118/code112** is installed and fully hashed in both rooms. Ordered short
+- **Current room APK / Atom news article links:** exact optimized
+  **1.119/code113** is installed and fully hashed in both rooms. Atom headlines
+  prefer the first nonblank alternate or omitted-relation link; self and
+  enclosure targets do not become articles. Standard quoted attributes,
+  existing RSS text priority, title cleanup, order and cap remain.
+  Ten frozen methods reproduce eight failures then pass; **4,283 JVM /
+  444 suites**, debug, optimized, R8 and vital lint pass in 1m 55s.
+  Actual debug Family parsing improves 6/16 to 16/16: 10 corrected checks and 6 retained checks, comprising 5 product controls and one classloader harness control. Each variant makes 17 actual parse$app calls and observes 24 headlines through 24 title getters and 24 link getters.
+  Native pure parser and getter calls are debug only; zero HTTP, provider,
+  article-open or owner-state operations. Optimized isolated parser/getter
+  admission is unavailable; no keep rules. Two accepted parents and scratch
+  retire normally; compiler has 3 Java 8 obsolescence warnings. API28, actual feeds/cache,
+  physical browser/News UI and external timeout cleanup remain open.
+  Eleven named preference states per room match: Family has ten byte-identical files and one unchanged absence; Living has seven byte-identical files and four unchanged absences, including the news preference file in both rooms.
+  Four complete captured maps, room name and Dev Mode match; no exception,
+  edit or restore. Family current frame was viewed; font, accessibility,
+  original Chrome, resumed frame and awake display remain. Living visual open.
+  Limited diagnostics and logcat lines=1500 requests produce 1642 Family
+  and 1707 Living actual lines without fatal or ANR markers. Original
+  registry unchanged, copied credentials removed. Public manifest remains 1.83;
+  no phone, HA, auth or publication. **95 tasks: 60 delivered, 25 locally verified,
+  3 approval, 6 parked, 1 queued.** Original **11:21:15–11:51:15 UTC** clock retained.
+  Current unselected hypotheses share this clock; older held or exhausted
+  scopes remain. Broader goal active.
+  [Receipt](portal-news-atom-article-link-2026-11-03.md).
+
+- **Previous room APK / Sky palette on short days:** exact optimized
+  **1.118/code112** was installed and fully hashed in both rooms at that
+  delivery's closure; the current News build supersedes it. Ordered short
   days reach the existing noon and twilight palettes without overlapping
   daytime phases. Interior distances shrink only below eight hours; seven
   named palettes, exterior twilight distances and existing long-day midpoint
@@ -46,7 +73,7 @@ The updated whole-product objective is
 
 - **Previous room APK / Music Assistant player identity:** exact optimized
   **1.117/code111** was installed and fully hashed in both rooms at that
-  delivery's closure; the current Sky build supersedes it. An exact client
+  delivery's closure; the Sky build superseded it. An exact client
   ID now wins over display-name fallback for legacy metadata and private command
   targeting. Missing-ID name fallback, current metadata, group precedence,
   authentication and transport remain. Sixteen frozen methods reproduce eight
