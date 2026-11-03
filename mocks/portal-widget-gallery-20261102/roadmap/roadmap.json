@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T15:56:50.935386+00:00",
+  "updatedAt": "2026-11-03T16:17:31.278556+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,52 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.127/code121. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.128/code 122. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "image-cache-write-ownership",
+      "title": "Image cache: own staged writes and clean up failed writes",
+      "summary": "Delivered 1.128: overlapping image writes own their staging; failed writes reclaim it.",
+      "description": "Exact optimized 1.128/code 122 is installed and fully hashed in both rooms. Image-cache writes own unique staging files and reclaim only their own staging in finally, including write/close failure; overlapping successful writers publish their own complete bytes. The unchanged eight-case baseline has 5 product assertion failures and 3 controls; the same cases pass after correction. All 4,358 JVM tests / 453 suites pass with zero failures/errors/skips; debug, optimized, R8 and vital lint pass. Saved room state is preserved; limited HTTP200 diagnostics contain 1616/2015 lines with zero fatal/ANR markers; owned credentials are cleaned.",
+      "status": "delivered",
+      "verification": "Eight frozen production-path cases RED 5 / controls 3 → GREEN 8; 4,358 JVM tests / 453 suites, zero failures/errors/skips; debug/optimized/R8/vital lint pass.",
+      "kind": "Image-cache write ownership",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "MediaCache / independent source and frozen test review",
+      "deployment": "Exact optimized 1.128/code 122 installed and fully hashed in both rooms.",
+      "state": "Captured complete room maps and raw preference states match; owned copied credentials removed.",
+      "acceptance": [
+        "Failed write/close reclaims only its owned staging and preserves the prior target.",
+        "Overlapping same-image writers publish their own complete bytes without deleting another pending writer staging.",
+        "Deliver exact signed APK and preserve captured room state."
+      ],
+      "evidence": [
+        {
+          "text": "Actual failure, correction, gates, delivery and limits.",
+          "source": "docs/portal-image-cache-write-ownership-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized actual evidence bindings.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/image-cache-write-ownership-verification.json"
+        }
+      ],
+      "limits": [
+        "Eight unchanged JVM cases execute production MediaCache.putImage/imageFile/getIfPresent with real generated NIO files. Six cases scope Mockito FileOutputStream construction/write/close; two controls use the real stream. Latches control writer ordering; no provider fetch, copied publication model or physical photo input.",
+        "No native Android flash, real ENOSPC/disk-full, fsync, power-loss/process-death, cross-process atomicity, concurrent cache-construction/init-sweep, image decoding, VideoExportOwnership lifecycle or optimized-method execution acceptance. This evidence proves the controlled host staging/cleanup/publication contract.",
+        "Room delivery verifies installed artifact/state and limited diagnostics. It does not exercise physical image-write faults or establish UI, provider, phone, audio, disk durability or performance acceptance. All prior clocks/holds remain; public manifest/catalog/fleet binary and prior presence receipt/proof stay unchanged. No GitHub/public release/publication; broader goal active."
+      ],
+      "next": "Retain scoped delivery; native fault/durability and cross-process acceptance remain separate. Continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T16:01:55.000000Z",
+        "deadline": "2026-11-03T16:31:55.000000Z",
+        "reset": false
+      }
+    },
     {
       "id": "meta-presence-idle-expiry",
       "title": "Presence reader: evaluate idle expiry during silence",

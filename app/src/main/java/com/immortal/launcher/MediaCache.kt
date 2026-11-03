@@ -83,7 +83,7 @@ class MediaCache internal constructor(private val dir: File, private val budgetB
   /** A temp path beside a target file, for a transcoder/downloader to write before committing. */
   fun tempFor(target: File): File = File(dir, ".${target.name}.tmp")
 
-  /** A retiring video worker can never delete a replacement controller's source/output. */
+  /** Each writer owns its staging path, including retiring video workers and image writes. */
   fun uniqueTempFor(target: File): File =
       File(dir, ".${target.name}.${java.util.UUID.randomUUID()}.tmp")
 
@@ -97,11 +97,12 @@ class MediaCache internal constructor(private val dir: File, private val budgetB
           .getOrDefault(false)
 
   private fun writeAtomic(f: File, bytes: ByteArray) {
-    val tmp = tempFor(f)
-    tmp.outputStream().use { it.write(bytes) }
-    if (!tmp.renameTo(f)) {
+    val tmp = uniqueTempFor(f)
+    try {
+      tmp.outputStream().use { it.write(bytes) }
+      if (!tmp.renameTo(f)) error("rename failed for ${f.name}")
+    } finally {
       tmp.delete()
-      error("rename failed for ${f.name}")
     }
   }
 

@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-03T16:17:31.278556+00:00",
+  "status": "delivered-with-scoped-acceptance",
+  "issueClock": {
+    "startedAt": "2026-11-03T16:01:55.000000Z",
+    "deadline": "2026-11-03T16:31:55.000000Z",
+    "reset": false
+  },
+  "goalStatus": "active",
+  "baseline": {
+    "status": "ACTUAL_UNCHANGED_PRODUCTION_RED",
+    "tests": 8,
+    "failures": 5,
+    "errors": 0,
+    "skipped": 0,
+    "controlsPassed": 3,
+    "cases": [
+      {
+        "name": "failedWriteReclaimsItsTempAndPreservesThePreviousImage",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: a failed write must reclaim its own staging file only expected:<[<generated-root>/cache/.foreign-owner.tmp]> but was:<[<generated-root>/cache/.foreign-owner.tmp, <generated-root>/cache/.e7db6637dd82efb5c433e9570a6a648a482d1c3b.jpg.tmp]>"
+      },
+      {
+        "name": "failedFirstWriteLeavesNoHiddenPartialFile",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: partial image is excluded from resident accounting and must be reclaimed"
+      },
+      {
+        "name": "failedCloseReclaimsItsTempAndPreservesThePreviousImage",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: a failed write must reclaim its own staging file only expected:<[<generated-root>/cache/.foreign-owner.tmp]> but was:<[<generated-root>/cache/.foreign-owner.tmp, <generated-root>/cache/.e7db6637dd82efb5c433e9570a6a648a482d1c3b.jpg.tmp]>"
+      },
+      {
+        "name": "overlappingSuccessfulWritesPublishTheirOwnCompleteBytes",
+        "passed": false,
+        "failureType": "org.junit.internal.ArrayComparisonFailure",
+        "message": "org.junit.internal.ArrayComparisonFailure: second writer is still pending; first publication must contain its own bytes: array lengths differed, expected.length=3 actual.length=4; arrays first differed at element [0]; expected:<31> but was:<41>"
+      },
+      {
+        "name": "ordinaryReplacementUsesTheRealStreamAndPublishesCompleteBytes",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "emptyInputRetainsItsExistingAcceptance",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "aFailedWriterDoesNotRemoveAnotherPendingWritersFile",
+        "passed": true,
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "failedFirstCloseLeavesNoHiddenPartialFile",
+        "passed": false,
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: closed failed image must not remain outside the resident budget"
+      }
+    ],
+    "terminal": {
+      "args": [
+        "./gradlew",
+        ":app:testDebugUnitTest",
+        "--tests",
+        "com.immortal.launcher.MediaCacheWriteFailureTest",
+        "--no-daemon"
+      ],
+      "startedAt": "2026-11-03T16:12:55.218582+00:00",
+      "endedAt": "2026-11-03T16:13:05.280086+00:00",
+      "durationSeconds": 10.061504,
+      "actualExit": 1
+    }
+  },
+  "green": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "testNames": [
+    "failedWriteReclaimsItsTempAndPreservesThePreviousImage",
+    "failedCloseReclaimsItsTempAndPreservesThePreviousImage",
+    "failedFirstWriteLeavesNoHiddenPartialFile",
+    "failedFirstCloseLeavesNoHiddenPartialFile",
+    "overlappingSuccessfulWritesPublishTheirOwnCompleteBytes",
+    "aFailedWriterDoesNotRemoveAnotherPendingWritersFile",
+    "ordinaryReplacementUsesTheRealStreamAndPublishesCompleteBytes",
+    "emptyInputRetainsItsExistingAcceptance"
+  ],
+  "testBytesUnchangedFromBaseline": true,
+  "fullGates": {
+    "args": [
+      "./gradlew",
+      ":app:testDebugUnitTest",
+      ":app:assembleDebug",
+      ":app:assemblePerformance",
+      ":app:lintVitalPerformance",
+      "--no-daemon"
+    ],
+    "startedAt": "2026-11-03T16:13:35.268306+00:00",
+    "endedAt": "2026-11-03T16:15:30.845938+00:00",
+    "durationSeconds": 115.577632,
+    "actualExit": 0
+  },
+  "jvm": {
+    "tests": 4358,
+    "suites": 453,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "newClass": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "testNames": [
+      "failedWriteReclaimsItsTempAndPreservesThePreviousImage",
+      "failedCloseReclaimsItsTempAndPreservesThePreviousImage",
+      "failedFirstWriteLeavesNoHiddenPartialFile",
+      "failedFirstCloseLeavesNoHiddenPartialFile",
+      "overlappingSuccessfulWritesPublishTheirOwnCompleteBytes",
+      "aFailedWriterDoesNotRemoveAnotherPendingWritersFile",
+      "ordinaryReplacementUsesTheRealStreamAndPublishesCompleteBytes",
+      "emptyInputRetainsItsExistingAcceptance"
+    ]
+  },
+  "xmlBindingCount": 453,
+  "artifacts": {
+    "performance": {
+      "bytes": 25879086,
+      "sha256": "7f6211a1e7cd08e2364223e87fcb1bb8316b4cbed7fe5f11cb7fe3abf0aa38ec",
+      "package": "com.immortal.launcher.debug",
+      "versionName": "1.128",
+      "versionCode": 122,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "debug": {
+      "bytes": 46719917,
+      "sha256": "d36ac2d8856a606f23a28dacf98ca1c61eab48490c72da038fd7de87e1e07e06",
+      "package": "com.immortal.launcher.debug",
+      "versionName": "1.128",
+      "versionCode": 122,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "rollback": {
+      "bytes": 25879086,
+      "sha256": "176f6b36abb9dbccdaa354d874e267e5a7669dc774663dbdaca075e725dcad9e",
+      "package": "com.immortal.launcher.debug",
+      "versionName": "1.127",
+      "versionCode": 121,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "packageProof": {
+    "checks": {
+      "performance": {
+        "hashAndBytesMatch": true,
+        "packageAndVersionMatch": true,
+        "signatureVerified": true,
+        "signerMatches": true
+      },
+      "debug": {
+        "hashAndBytesMatch": true,
+        "packageAndVersionMatch": true,
+        "signatureVerified": true,
+        "signerMatches": true
+      },
+      "rollback": {
+        "hashAndBytesMatch": true,
+        "packageAndVersionMatch": true,
+        "signatureVerified": true,
+        "signerMatches": true
+      }
+    },
+    "tools": [
+      "aapt2 dump badging",
+      "apksigner verify --print-certs"
+    ]
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1616,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 2015,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Normal /diag and /logcat?lines=1500 requests; actual output line counts recorded. Limited installed observations, not complete runtime health, live provider, negative authentication or physical editor acceptance."
+  },
+  "credentialCleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "fixtureBoundary": "Mockito FileOutputStream construction/write/close; actual generated NIO files and production rename/delete; no native ENOSPC/Android fault claim",
+  "roadmap": {
+    "tasks": 106,
+    "counts": {
+      "delivered": 69,
+      "verified": 27,
+      "approval": 3,
+      "parked": 6,
+      "queued": 1
+    },
+    "old105ObjectsPreserved": true,
+    "oldSuffixBytes": 351653,
+    "oldSuffixSha256": "695cd69dc515e8807aa86305fcd0b751ab9bbb48173e7571467855631ef89636",
+    "defaultTask": "weather-native-layout"
+  },
+  "evidenceBindings": {
+    "baseline-result.json": {
+      "bytes": 3021,
+      "sha256": "be35b93af48c64879290a49c95d56c3ba871d2eeaaba2c71c0361ba86473ed49"
+    },
+    "green-result.json": {
+      "bytes": 587,
+      "sha256": "d3b91f4cd0076ef2d1185049fa4ada4573732f57fdd1a5566fec3dcf08ff4a73"
+    },
+    "full-gates-terminal.json": {
+      "bytes": 328,
+      "sha256": "5c01e09b5d640e7cd25349448e001c911910f4e7b11e8f2a2c05687574460e4d"
+    },
+    "junit-summary.json": {
+      "bytes": 135485,
+      "sha256": "4c877b3bb19781ff8e6d87aad7624e01a626be8e20efd60cf04a967a1e3adf27"
+    },
+    "final-source-freeze.json": {
+      "bytes": 1062,
+      "sha256": "9455d8744b87df27502bdbdbdc4c8339e344d1fbbec3193d043afebe33f1e186"
+    },
+    "artifact.json": {
+      "bytes": 1632,
+      "sha256": "bdb11ce52097050198a0937237a874d26800651c1fd4bbd9348ca633b0d059da"
+    },
+    "package-proof.json": {
+      "bytes": 573,
+      "sha256": "c75acf488a0d5159b0bd17b5e0d9dccda34dd684a1c768fe2cc9e185f3f7e418"
+    },
+    "deploy-results.json": {
+      "bytes": 231,
+      "sha256": "5fac34df851eafd58de1a2ef8d4122a3c06f508a98d67113bac1756a65093e31"
+    },
+    "preservation.json": {
+      "bytes": 718,
+      "sha256": "2de61275dfa1480b50994ef53e781f275c02efce4e91569504dfda44473a7ed6"
+    },
+    "health.json": {
+      "bytes": 579,
+      "sha256": "06679ce6d5021b5998a03002585ee29c192069cc3000519bced4f4ccf55c0364"
+    },
+    "credential-cleanup.json": {
+      "bytes": 119,
+      "sha256": "584d00c535583d9f5c6f035e521ab6f64eefddfd75629ef4a3518d05d6a25d76"
+    },
+    "MediaCacheWriteFailureTest.kt": {
+      "bytes": 7825,
+      "sha256": "59eb86b4551c351631f3c416b25cf14b7a503d0fade2db208d8d4ecfdb708524"
+    },
+    "image-cache-fixture-review.json": {
+      "bytes": 7375,
+      "sha256": "b787bb3cc228ea1b58658c93b58a60b1d25d8ed9653c39bdeeadd834bc4f4ff4"
+    },
+    "image-cache-doc-plan.json": {
+      "bytes": 5873,
+      "sha256": "88f374b9e6a3d8e0c2222fe283b779e501c6702851b348a056579c83c9e24fa3"
+    }
+  },
+  "limits": [
+    "Eight unchanged JVM cases execute production MediaCache.putImage/imageFile/getIfPresent with real generated NIO files. Six cases scope Mockito FileOutputStream construction/write/close; two controls use the real stream. Latches control writer ordering; no provider fetch, copied publication model or physical photo input.",
+    "No native Android flash, real ENOSPC/disk-full, fsync, power-loss/process-death, cross-process atomicity, concurrent cache-construction/init-sweep, image decoding, VideoExportOwnership lifecycle or optimized-method execution acceptance. This evidence proves the controlled host staging/cleanup/publication contract.",
+    "Room delivery verifies installed artifact/state and limited diagnostics. It does not exercise physical image-write faults or establish UI, provider, phone, audio, disk durability or performance acceptance. All prior clocks/holds remain; public manifest/catalog/fleet binary and prior presence receipt/proof stay unchanged. No GitHub/public release/publication; broader goal active."
+  ],
+  "closure": "Documentation/browser QA and commit are subsequent actual observations; not preclaimed."
+}
