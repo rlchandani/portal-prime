@@ -1,0 +1,967 @@
+{
+  "recordedAt": "2026-11-03T09:40:45.226468+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T09:19:42+00:00",
+    "deadline": "2026-11-03T09:49:42+00:00",
+    "baseCommit": "ee8248360ada1ee85e61b64d9f7cae373dadb4b8",
+    "scope": "Original discovery clock includes implementation, all verification, permitted room delivery, documentation, cleanup and commit. Existing exhausted clocks and approvals remain."
+  },
+  "finding": {
+    "backlogRecordsReviewed": 89,
+    "duplicateAgeCutoffTaskFound": false,
+    "trigger": "Calendar recurrence expansion exhausted its366-period budget at DTSTART before filtering expired occurrences. Daily series disappear after one year; weekly, monthly and yearly series have corresponding age cutoffs.",
+    "status": "Frozen real-parser reproduction corrected and exact optimized local APK delivery verified in both rooms."
+  },
+  "correction": {
+    "overlapWindow": "Seek near the earliest potentially overlapping start; retain two prior periods and use actual event-end filtering.",
+    "generationOrdinal": "Count historical generated occurrences before EXDATE, including the first partial WEEKLY/BYDAY week; preserve COUNT and inclusive UNTIL.",
+    "boundedExpansion": "Retain366 prospective periods/weeks and hard370 attempts; old series do not require replay of their entire age.",
+    "compatibility": "Replay the original first366 periods before farther seeking. MONTHLY/YEARLY seek additionally preserves existing sequential day clamping using reachable minima or a bounded Gregorian phase."
+  },
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/CalendarFeed.kt": "018526a9f5b57fc1f63afcd3ff3932ca8903731935ab3f17a9c6c3bac631d834",
+    "app/src/test/java/com/immortal/launcher/CalendarRecurringWindowTest.kt": "5f74564cc9763a212bac481d5a8e807f50e3c477c94909ca925529047052e641",
+    "app/build.gradle.kts": "b3ba5557312fc73510b18b1e788a8835bf9f025d2d00147a8bc1a80a0246fab6"
+  },
+  "red": {
+    "terminalExit": 1,
+    "tests": 16,
+    "failures": 12,
+    "errors": 0,
+    "skips": 0,
+    "failedMethods": [
+      "dailySeriesStartedDecadesAgoStillShowsCurrentDates",
+      "oldWeeklyByDaySeriesKeepsSortedCurrentWeekdays",
+      "oldDailyFiniteCountIncludesExpiredAndExcludedOccurrences",
+      "oldMonthlyAndYearlySeriesRetainEarlierDayClamping",
+      "oldIntervalSeriesIncludesExactHorizonAndNoLaterStart",
+      "oldWeeklyByDayCountPreservesHistoricalGenerationOrdinal",
+      "yearlySeriesOlderThanFourCenturiesStillShowsCurrentDates",
+      "dailySeriesOlderThanOneYearStillShowsCurrentDates",
+      "monthlySeriesOlderThanThirtyYearsStillShowsCurrentDates",
+      "oldSeriesUntilIncludesItsExactLastStartWithoutExtendingIt",
+      "weeklySeriesOlderThanTwentyYearsStillShowsCurrentMondays",
+      "oldOverlappingMultiDayEventsRetainStartsBeforeNow"
+    ],
+    "frozenTestSha256": "5f74564cc9763a212bac481d5a8e807f50e3c477c94909ca925529047052e641",
+    "baselineSourceSha256": "7de84c5cf50852c01f0ad9401c1f750bf4a1fd8e6f450e7a39ee812e54afaf2d",
+    "logBinding": {
+      "sha256": "6bebc5effff7450d10762b18bad8d597f4acd43dd98d2eb797807c6249fe7e39",
+      "bytes": 4048
+    },
+    "xmlBinding": {
+      "sha256": "1c4a4a5e5c8d710dedf3ad3f9a96cfa36910dd7c7166821774322c04903b7800",
+      "bytes": 59081
+    },
+    "scope": "Actual CalendarFeed.parse under generated dates and UTC/LocaleUS; test finally restores process defaults.",
+    "excludedInitialAttempt": "Invalid guessed JAVA_HOME failed before Gradle started; raw baseline-jvm.log retained. Actual baseline rerun uses existing /Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home."
+  },
+  "green": {
+    "suites": 439,
+    "tests": 4231,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualRecurringWindowFocusedTests": 16,
+    "allSixteenUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 8s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "buildBindings": {
+    "log": {
+      "sha256": "ad53db73da29bc97449ef251276369b2f916822c5d1fd4bbd8a4a10938b25be5",
+      "bytes": 13731
+    },
+    "packageProofLog": {
+      "sha256": "606a47496b449d5f41fb99806df190b654b7745a8aa2aabf2a71828b518e26b1",
+      "bytes": 608
+    },
+    "fullXmlAggregateSha256": "70c43595e4faf1908cf731c88bf5327161db3e3b534d275353e86800baaabf32",
+    "fullXmlFiles": 439
+  },
+  "native": {
+    "runs": {
+      "baseline": {
+        "result": {
+          "status": "FAIL",
+          "checks": {
+            "actualOptimizedAPKClassLoader": true,
+            "oldDailyKeepsCurrentWindow": false,
+            "decadesOldDailyKeepsCurrentWindow": false,
+            "oldWeeklyKeepsCurrentWindow": false,
+            "oldWeeklyByDayKeepsCurrentWindow": false,
+            "oldMonthlyKeepsCurrentWindow": false,
+            "oldYearlyKeepsCurrentWindow": false,
+            "expiredCountStaysExpired": true,
+            "liveCountExDatePreservesGeneratedCount": false,
+            "oldUntilBoundaryIsInclusive": false,
+            "nonRecurringEventUnchanged": true,
+            "oldMonthlyRetainsSequentialClamping": false,
+            "oldYearlyRetainsSequentialLeapClamping": false,
+            "recentDailyPreservesExistingDstGapNormalization": true,
+            "processDefaultTimezoneRestored": true
+          },
+          "observations": {
+            "oldDailyKeepsCurrentWindow": {
+              "actual": [],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1767690000000,
+                  1767693600000
+                ]
+              ]
+            },
+            "decadesOldDailyKeepsCurrentWindow": {
+              "actual": [],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1767690000000,
+                  1767693600000
+                ]
+              ]
+            },
+            "oldWeeklyKeepsCurrentWindow": {
+              "actual": [],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1768208400000,
+                  1768212000000
+                ]
+              ]
+            },
+            "oldWeeklyByDayKeepsCurrentWindow": {
+              "actual": [],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1767776400000,
+                  1767780000000
+                ],
+                [
+                  1768208400000,
+                  1768212000000
+                ]
+              ]
+            },
+            "oldMonthlyKeepsCurrentWindow": {
+              "actual": [],
+              "expected": [
+                [
+                  1768467600000,
+                  1768471200000
+                ]
+              ]
+            },
+            "oldYearlyKeepsCurrentWindow": {
+              "actual": [],
+              "expected": [
+                [
+                  1768467600000,
+                  1768471200000
+                ]
+              ]
+            },
+            "expiredCountStaysExpired": {
+              "actual": [],
+              "expected": []
+            },
+            "liveCountExDatePreservesGeneratedCount": {
+              "actual": [],
+              "expected": [
+                [
+                  1767690000000,
+                  1767693600000
+                ]
+              ]
+            },
+            "oldUntilBoundaryIsInclusive": {
+              "actual": [],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ]
+              ]
+            },
+            "nonRecurringEventUnchanged": {
+              "actual": [
+                [
+                  1767603600000,
+                  1767607200000
+                ]
+              ],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ]
+              ]
+            },
+            "oldMonthlyRetainsSequentialClamping": {
+              "actual": [],
+              "expected": [
+                [
+                  1769590800000,
+                  1769594400000
+                ],
+                [
+                  1772269200000,
+                  1772272800000
+                ]
+              ]
+            },
+            "oldYearlyRetainsSequentialLeapClamping": {
+              "actual": [],
+              "expected": [
+                [
+                  1772269200000,
+                  1772272800000
+                ]
+              ]
+            },
+            "recentDailyPreservesExistingDstGapNormalization": {
+              "actual": [
+                [
+                  1761982200000,
+                  1761985800000
+                ]
+              ],
+              "expected": [
+                [
+                  1761982200000,
+                  1761985800000
+                ]
+              ]
+            }
+          },
+          "passed": 5,
+          "total": 15,
+          "actualParserInvocations": 13,
+          "actualParameterOrder": "String,int,long",
+          "apkSha256": "34706507bc80bf69b88511444df6d02d575975728e5cba63906e8da2c7cda5ca",
+          "actualAPKClassLoader": true,
+          "ownerPreferencesWritten": 0,
+          "networkOperations": 0,
+          "providerOrServiceStarted": false,
+          "scope": "Generated UTC feed parser only; exact start/end arrays; no UI, provider, network or owner state"
+        },
+        "process": {
+          "terminalExit": 1,
+          "stdoutBytes": 2429,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "f273e341600d679e2a62da542001e0d04c09ef4001f93d97b77eb89f36a36d23",
+          "bytes": 3826
+        },
+        "processBinding": {
+          "sha256": "10062c7cff02070332cd9122d2c727b3e2eb4c49d30ddedb2983df6aed4cc978",
+          "bytes": 67
+        },
+        "stdoutBinding": {
+          "sha256": "129f7c2705ba353a6e2e2f6ee20dd4209e44d78709209f641f9fa62360cb1c5e",
+          "bytes": 2429
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "candidate": {
+        "result": {
+          "status": "PASS",
+          "checks": {
+            "actualOptimizedAPKClassLoader": true,
+            "oldDailyKeepsCurrentWindow": true,
+            "decadesOldDailyKeepsCurrentWindow": true,
+            "oldWeeklyKeepsCurrentWindow": true,
+            "oldWeeklyByDayKeepsCurrentWindow": true,
+            "oldMonthlyKeepsCurrentWindow": true,
+            "oldYearlyKeepsCurrentWindow": true,
+            "expiredCountStaysExpired": true,
+            "liveCountExDatePreservesGeneratedCount": true,
+            "oldUntilBoundaryIsInclusive": true,
+            "nonRecurringEventUnchanged": true,
+            "oldMonthlyRetainsSequentialClamping": true,
+            "oldYearlyRetainsSequentialLeapClamping": true,
+            "recentDailyPreservesExistingDstGapNormalization": true,
+            "processDefaultTimezoneRestored": true
+          },
+          "observations": {
+            "oldDailyKeepsCurrentWindow": {
+              "actual": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1767690000000,
+                  1767693600000
+                ]
+              ],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1767690000000,
+                  1767693600000
+                ]
+              ]
+            },
+            "decadesOldDailyKeepsCurrentWindow": {
+              "actual": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1767690000000,
+                  1767693600000
+                ]
+              ],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1767690000000,
+                  1767693600000
+                ]
+              ]
+            },
+            "oldWeeklyKeepsCurrentWindow": {
+              "actual": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1768208400000,
+                  1768212000000
+                ]
+              ],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1768208400000,
+                  1768212000000
+                ]
+              ]
+            },
+            "oldWeeklyByDayKeepsCurrentWindow": {
+              "actual": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1767776400000,
+                  1767780000000
+                ],
+                [
+                  1768208400000,
+                  1768212000000
+                ]
+              ],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ],
+                [
+                  1767776400000,
+                  1767780000000
+                ],
+                [
+                  1768208400000,
+                  1768212000000
+                ]
+              ]
+            },
+            "oldMonthlyKeepsCurrentWindow": {
+              "actual": [
+                [
+                  1768467600000,
+                  1768471200000
+                ]
+              ],
+              "expected": [
+                [
+                  1768467600000,
+                  1768471200000
+                ]
+              ]
+            },
+            "oldYearlyKeepsCurrentWindow": {
+              "actual": [
+                [
+                  1768467600000,
+                  1768471200000
+                ]
+              ],
+              "expected": [
+                [
+                  1768467600000,
+                  1768471200000
+                ]
+              ]
+            },
+            "expiredCountStaysExpired": {
+              "actual": [],
+              "expected": []
+            },
+            "liveCountExDatePreservesGeneratedCount": {
+              "actual": [
+                [
+                  1767690000000,
+                  1767693600000
+                ]
+              ],
+              "expected": [
+                [
+                  1767690000000,
+                  1767693600000
+                ]
+              ]
+            },
+            "oldUntilBoundaryIsInclusive": {
+              "actual": [
+                [
+                  1767603600000,
+                  1767607200000
+                ]
+              ],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ]
+              ]
+            },
+            "nonRecurringEventUnchanged": {
+              "actual": [
+                [
+                  1767603600000,
+                  1767607200000
+                ]
+              ],
+              "expected": [
+                [
+                  1767603600000,
+                  1767607200000
+                ]
+              ]
+            },
+            "oldMonthlyRetainsSequentialClamping": {
+              "actual": [
+                [
+                  1769590800000,
+                  1769594400000
+                ],
+                [
+                  1772269200000,
+                  1772272800000
+                ]
+              ],
+              "expected": [
+                [
+                  1769590800000,
+                  1769594400000
+                ],
+                [
+                  1772269200000,
+                  1772272800000
+                ]
+              ]
+            },
+            "oldYearlyRetainsSequentialLeapClamping": {
+              "actual": [
+                [
+                  1772269200000,
+                  1772272800000
+                ]
+              ],
+              "expected": [
+                [
+                  1772269200000,
+                  1772272800000
+                ]
+              ]
+            },
+            "recentDailyPreservesExistingDstGapNormalization": {
+              "actual": [
+                [
+                  1761982200000,
+                  1761985800000
+                ]
+              ],
+              "expected": [
+                [
+                  1761982200000,
+                  1761985800000
+                ]
+              ]
+            }
+          },
+          "passed": 15,
+          "total": 15,
+          "actualParserInvocations": 13,
+          "actualParameterOrder": "String,int,long",
+          "apkSha256": "28509be865cc279d5d002a3021034ffacb6fcffa9d89970c65820cacb0849df9",
+          "actualAPKClassLoader": true,
+          "ownerPreferencesWritten": 0,
+          "networkOperations": 0,
+          "providerOrServiceStarted": false,
+          "scope": "Generated UTC feed parser only; exact start/end arrays; no UI, provider, network or owner state"
+        },
+        "process": {
+          "terminalExit": 0,
+          "stdoutBytes": 2890,
+          "stderrBytes": 0
+        },
+        "resultBinding": {
+          "sha256": "82277a5fc3c8a3d7c01f8d4da3758170cebec38f12fcdf7a2c02a9fdf86e18b5",
+          "bytes": 4997
+        },
+        "processBinding": {
+          "sha256": "074a8e9e015b0952e8c93e70d34d044841dbd572f717c4fb640f2ceaac1d07a4",
+          "bytes": 67
+        },
+        "stdoutBinding": {
+          "sha256": "3b26f9e2573dccf388c31fec47cf046d41ceac07f4e49eb199651a4047fbbf3e",
+          "bytes": 2890
+        },
+        "stderrBinding": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    },
+    "binding": {
+      "fixtureSourceSha256": "8311995591e4b3aad0efa10e3dcfe3d978098b40bc4f2bb264edd935c2e59198",
+      "fixtureJarSha256": "3cb422d81565fd85a8fb8df60702b9bcec538fdcffcf42fb234648eb292014c8",
+      "compilerSha256": "ff2300011043f54a63ad009e6758dd0c2526e93e454057300778e08bcddda98c",
+      "runnerSha256": "dd1ef3a6ee12c840e749391d843dcb56faf5339a55e39d7707dda8d6ee239276",
+      "phases": [
+        "baseline",
+        "candidate"
+      ],
+      "mappedBindings": {
+        "baseline": [
+          "com.immortal.launcher.CalendarFeed",
+          "g",
+          "a",
+          "b"
+        ],
+        "candidate": [
+          "com.immortal.launcher.CalendarFeed",
+          "j",
+          "a",
+          "b"
+        ]
+      },
+      "scope": "Actual optimized APK parser; generated UTC feed dates only; exact start/end arrays; no app state, calendar provider, UI or network"
+    },
+    "cleanup": {
+      "parentsRetired": {
+        "baseline": true,
+        "candidate": true
+      },
+      "ownerPreferencesWritten": 0,
+      "providerOrServiceStarted": false,
+      "networkOperations": 0,
+      "externalTimeoutFailureCleanupFaultInjected": false,
+      "ownedScratchRemoved": true,
+      "faults": []
+    },
+    "compilerLog": {
+      "sha256": "d208f3066ff7a3dfa4ab94c9f2479657f46f1d308f709c096f32fc201296882c",
+      "bytes": 668
+    },
+    "runnerLog": {
+      "sha256": "9480eeec9a644e79594ac07237cfe8f359554bc551e0e2b9da98bdc3589f73b3",
+      "bytes": 321
+    },
+    "acceptedParserInvocations": 26,
+    "acceptedParents": 2,
+    "correctedChecks": 10,
+    "retainedControls": 5,
+    "retainedGapControl": "Actual unchanged Android baseline07:30–08:30Z on2025-11-01. This is Android legacy normalization retention, not the host-JDK05:30–06:30Z oracle.",
+    "excludedAttempts": [
+      {
+        "stage": "Pre-execution fixture correction",
+        "record": {
+          "initialFixtureJarSha256": "498d549e782affb88e520d22cb97d6a6c47bb7161f2251b9d3e15cabafcdc299",
+          "fixtureExecutions": 0,
+          "deviceOperations": 0,
+          "reason": "Pre-execution root review corrected BYDAY age from2020 to2010. Independent review tightened exact OWNER/APK path/byte guards. Actual JDK gap observation added one recent NY preservation control. Initial compilation retained without acceptance claim.",
+          "finalExpectedInvocations": 13,
+          "finalExpectedChecks": 15,
+          "baselineExpectedPassed": 5
+        },
+        "recordBinding": {
+          "sha256": "b1136d022e529b61e9641f4ade8c7d6d207264f1c2cc3765387bf422ba85ff0a",
+          "bytes": 510
+        },
+        "fixtureExecutions": 0,
+        "deviceOperations": 0
+      },
+      {
+        "stage": "Executed baseline with host-JDK gap-hour expectation",
+        "record": {
+          "recordedAt": "2026-11-03T09:33:49.712977+00:00",
+          "terminalParentExit": 1,
+          "actualParserExit": 1,
+          "actualParserInvocations": 13,
+          "observedPassed": 4,
+          "observedChecks": 15,
+          "productAgeDifferences": 10,
+          "fixtureExpectationErrors": 1,
+          "acceptedProductRedRun": false,
+          "reason": "Host JDK Calendar gap normalization was assumed for Android compatibility control; actual baseline Android parser07:30Z differs fromJDK05:30Z. Preserve entireattempt; corrected exactAndroid legacycontrolwillbefrozenandbothphasesrunagain underoriginalclock.",
+          "rawBindings": {
+            "NativeCalendarRecurringWindow.java": "80e32541763bf3d89bbcc23f9e991ab3cab1d8645f704e8d81deeeed586ed195",
+            "run-native.py": "dd1ef3a6ee12c840e749391d843dcb56faf5339a55e39d7707dda8d6ee239276",
+            "build-native.py": "ff2300011043f54a63ad009e6758dd0c2526e93e454057300778e08bcddda98c",
+            "baseline-native-result.json": "b0252cd02d51cc643f05c13ec887acd53b987a5adf1b9f4c9649847505806e84",
+            "baseline-native-process.json": "6ffd0fe185f6f769d7d2eb3a94cb07d0716afce46bdda915ac1e6834036fbb57",
+            "baseline-native-stdout-private.txt": "0e37ee8e0328450fade23a2d8f0b5934c7496471e77ff30595fccd18078acba0",
+            "baseline-native-stderr-private.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native-cleanup.json": "80fc1e8692d5dc39a6370bcc2d9b6a9aa9b55e58cd42cf0127b9e1c41419a76c",
+            "native-final-compile.log": "447fd9940a0c82fcc3a51b7fe17e2fd7ac9193f542f27232ceaf3fc770695ae7",
+            "fixture.jar": "224b1fbb9df703b0103d7d4eac244e2d0e95d96fb9f08466c09f2891ee6abcd7"
+          },
+          "cleanup": {
+            "parentsRetired": {
+              "baseline": true
+            },
+            "ownerPreferencesWritten": 0,
+            "providerOrServiceStarted": false,
+            "networkOperations": 0,
+            "externalTimeoutFailureCleanupFaultInjected": false,
+            "ownedScratchRemoved": true,
+            "faults": []
+          }
+        },
+        "recordBinding": {
+          "sha256": "cefc3ed37c0378911ad039f6d65aa35c3903b9ce3c910bcb9cbf8ddfc55f3732",
+          "bytes": 1861
+        },
+        "scope": "One excluded baseline parent/13 parser invocations, observed4/15. Ten product age failures plus one fixture oracle error; original raw output and normal cleanup retained. It is not an eleventh product failure."
+      }
+    ],
+    "totalObservedParserInvocationsIncludingExcluded": 39,
+    "totalObservedParentsIncludingExcluded": 3,
+    "limits": "Generated feed dates and actual optimized APK parser only. No calendar provider, app settings or UI mutation. API28, live feed/provider rendering, exhaustive historical timezone rules and external timeout/failure cleanup fault injection are unverified."
+  },
+  "artifact": {
+    "sha256": "28509be865cc279d5d002a3021034ffacb6fcffa9d89970c65820cacb0849df9",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.114",
+    "versionCode": 108,
+    "variants": {
+      "performance": {
+        "sha256": "28509be865cc279d5d002a3021034ffacb6fcffa9d89970c65820cacb0849df9",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.114",
+        "versionCode": 108
+      },
+      "debug": {
+        "sha256": "c7e8926101261a9005ef245a8ae110d4581c687f463f03e933ce80be33511279",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.114",
+        "versionCode": 108
+      },
+      "rollback": {
+        "sha256": "34706507bc80bf69b88511444df6d02d575975728e5cba63906e8da2c7cda5ca",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.113",
+        "versionCode": 107
+      }
+    },
+    "debugSha256": "c7e8926101261a9005ef245a8ae110d4581c687f463f03e933ce80be33511279",
+    "rollbackSha256": "34706507bc80bf69b88511444df6d02d575975728e5cba63906e8da2c7cda5ca",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 8s"
+  },
+  "artifactBindings": {
+    "baselineMapping": {
+      "sha256": "28c0af3912881d2acf99523f1e36d71b0706b9639d17b44349fdff7bdba8dbe4",
+      "bytes": 83180969
+    },
+    "candidateMapping": {
+      "sha256": "1579aa4523c92a1ee3045181d46f5e3adc16cbec63e928d438989c4e33bde2cb",
+      "bytes": 83197348
+    },
+    "baselineSource": {
+      "sha256": "7de84c5cf50852c01f0ad9401c1f750bf4a1fd8e6f450e7a39ee812e54afaf2d",
+      "bytes": 20513
+    },
+    "baselineVersion": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "nativeSource": {
+      "sha256": "8311995591e4b3aad0efa10e3dcfe3d978098b40bc4f2bb264edd935c2e59198",
+      "bytes": 8029
+    },
+    "nativeCompiler": {
+      "sha256": "ff2300011043f54a63ad009e6758dd0c2526e93e454057300778e08bcddda98c",
+      "bytes": 2033
+    },
+    "nativeRunner": {
+      "sha256": "dd1ef3a6ee12c840e749391d843dcb56faf5339a55e39d7707dda8d6ee239276",
+      "bytes": 8133
+    },
+    "nativeJar": {
+      "sha256": "3cb422d81565fd85a8fb8df60702b9bcec538fdcffcf42fb234648eb292014c8",
+      "bytes": 5703
+    }
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "terminalExit": 0,
+    "checks": {
+      "family": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true,
+        "fontUnchanged": true,
+        "accessibilityUnchanged": true,
+        "originalChromeTaskRetained": true,
+        "photoFrameResumed": true,
+        "displayOn": true,
+        "installedFullSha256Matches": true
+      },
+      "living": {
+        "/screensaver": true,
+        "/remote/settings/profile": true,
+        "/remote/layout": true,
+        "/remote/sources": true,
+        "nameUnchanged": true,
+        "devModeUnchanged": true,
+        "version": true,
+        "preferenceFilesByteIdentical": true
+      }
+    },
+    "preferenceStates": {
+      "family": {
+        "states": 9,
+        "existingFilesByteIdentical": 9,
+        "absencesUnchanged": 0
+      },
+      "living": {
+        "states": 9,
+        "existingFilesByteIdentical": 6,
+        "absencesUnchanged": 3
+      }
+    },
+    "exceptions": [],
+    "ownerPreferenceEditsOrRestores": 0,
+    "scope": "Complete captured screensaver/profile/layout/source maps and all nine named preference states per room. Original identity/dev mode retained. Family font/services/original Chrome/frame/awake/full APK hash checked; Living Fleet only, visual acceptance open.",
+    "familyFrameScreenshotBinding": {
+      "sha256": "f016a98734dd9a7acdecb007cec2c02ca9b16939c3d88bd86642d349ed38cfba",
+      "bytes": 4987693
+    },
+    "familyFrameVisuallyInspected": true
+  },
+  "health": {
+    "rooms": {
+      "family": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 1644,
+        "fatalOrAnrMarkers": 0
+      },
+      "living": {
+        "diagHttp200": true,
+        "diagIsObject": true,
+        "logcatHttp200": true,
+        "recentLogLines": 2021,
+        "fatalOrAnrMarkers": 0
+      }
+    },
+    "scope": "Positive installed normal diagnostics and /logcat?lines=1500 requests only; actual output line counts are1644/2021 as recorded. No complete runtime health, live provider, negative authentication or calendar UI acceptance."
+  },
+  "cleanup": {
+    "originalRegistryHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "originalRegistryEdited": false
+  },
+  "publicRelease": {
+    "exit": 1,
+    "expectedLocalOnlyMismatch": true,
+    "localVersion": "1.114/108",
+    "publicManifest": "1.83/77",
+    "publicManifestUnchanged": true,
+    "publicPublicationEligible": false
+  },
+  "review": {
+    "blockingFindings": [],
+    "sourceReviewBinding": {
+      "sha256": "b739bf090ef262232c64e7f19aff29edc19a46cc8d24fa61e96c2bd8cc8301cc",
+      "bytes": 4941
+    },
+    "independentGateNativeReviewBinding": {
+      "sha256": "916ea43e9e321f7f2f64e45f668d9344801cf320c439343df288ee2e41d871be",
+      "bytes": 6477
+    }
+  },
+  "documentation": {
+    "recordedAt": "2026-11-03T09:41:28.063889+00:00",
+    "strictDocs": {
+      "terminalExit": 0,
+      "seconds": 2.587,
+      "logSha256": "e8662411e1a1e1f545dd4a264e4818a371d8448afbef3c35d5980aaff835648a"
+    },
+    "browser": {
+      "terminalExit": 0,
+      "seconds": 4.713,
+      "logSha256": "c6bf2296f3103ffa540f901f75be24e95ad8ee3fad25552e1985700fc47ae515"
+    },
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 90,
+          "checks": [
+            {
+              "id": "calendar-recurring-window",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 90,
+          "checks": [
+            {
+              "id": "calendar-recurring-window",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": true,
+              "detailListsNoOverflow": true
+            },
+            {
+              "id": "fleet-registry-encoding",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true,
+              "factsNoOverflow": null,
+              "detailListsNoOverflow": null
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingDeliverablePreviewServerPreserved": true
+    },
+    "browserFixtureSha256": "c63e690e43071fadfa33b29dd6b1ea30ecd2ee105ce1461c7be23b703d345996",
+    "factsRectanglesWithinGrid": true,
+    "allDetailListItemsFit": true,
+    "bothScreenshotsVisuallyInspected": true,
+    "screenshotSha256": {
+      "390": "45ed18d93b9ab5e9840af4cdf1e687fcf27d9c02d2de44cd7b7636ec6293e465",
+      "1600": "737f4af91cc46c60ff3e07c68d04d4004275d9d94ae397817675c9506e7dae5e"
+    },
+    "documentationReviewSha256": "264fbb9b3f1faefc273fb39a020e2413e464bc589abf49d27c7accc3f545aab0",
+    "excludedFirstBrowserAttempt": {
+      "recordSha256": "ae8efaa12ef56359fc5a763716792f5109c30ea62320edf9c6d44fc3be709ce2",
+      "firstBrowserTerminalExit": 0,
+      "acceptedVisualQA": false,
+      "reason": "Root visual inspection caught intrinsic fact-column clipping missed by the old dd internal width test. New task wording uses spaces; closing check also constrains each fact rectangle within the grid. No stylesheet change."
+    },
+    "closingVerificationPending": false,
+    "finalMetadataBytesServedComparisonRequired": true
+  },
+  "backlog": {
+    "tasks": 90,
+    "delivered": 55,
+    "verified": 25,
+    "approval": 3,
+    "parked": 6,
+    "queued": 1,
+    "priorTaskObjects": 89,
+    "priorTaskObjectsAndRawSerializationUnchanged": true,
+    "defaultTaskPreserved": "weather-native-layout",
+    "boundaryChange": "Only current room version1.113/code107→1.114/code108; all other boundary text remains."
+  },
+  "limits": [
+    "Existing DTSTART timezone policy is held under its prior clock and is not redesigned. Invalid-date RFC policy remains the existing Calendar.add clamping behavior.",
+    "The recent DST-gap control preserves observed Android baseline behavior; it does not claim host-JDK equality or correctness of nonexistent local wall times.",
+    "First366 periods retain original stepping. Full Gregorian phase behavior is bounded; arbitrary historical political timezone changes and ancient calendar cutovers are not established.",
+    "No phone/Pixel access, Home Assistant change, provider login, GitHub authentication, push or publication.",
+    "Public manifest remains1.83/code77; local1.114/code108 is not publication eligible.",
+    "Normal cleanup is observed for all three executed owned parents and scratch. External timeout or process-crash cleanup was not independently fault-injected."
+  ]
+}

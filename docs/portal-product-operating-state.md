@@ -13,6 +13,28 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
+- **Current room APK / old recurring calendar series:** exact optimized
+  **1.114/code108** is installed and fully hashed in both rooms. Seek near the
+  overlap window while preserving generated COUNT before EXDATE, BYDAY order,
+  UNTIL, horizon and legacy monthly/yearly clamping. Original366 prospective
+  periods and bounded pre-window attempts remain; first366 legacy steps replay.
+  Sixteen frozen parser methods reproduce12 failures then pass; **4,231 JVM/439
+  suites**, debug/optimized/R8/vital lint pass in2m8s. Actual optimized Family
+  parser improves **5/15→15/15**, ten corrections/five controls,13 calls per variant.
+  Recent New York timing retains the old Android result; excluded host-JDK oracle
+  attempt and its normal cleanup remain separate. Complete maps and **nine named
+  preference states per room** match: Family9 files, Living6 files plus3 absences.
+  No exception/edit/restore. Family frame/clock/Weather appearance was viewed;
+  font/accessibility/original Chrome/resumed frame/awake display remain. Living
+  visual open. Two final native parents/scratch retire; timeout cleanup untested.
+  Live feeds/UI/API28, DTSTART-zone redesign and broader historical timezone or
+  Gregorian-reform behavior remain open. Limited normal diagnostics/recent samples
+  pass; original registry unchanged, copied credentials removed. Public1.83 guard
+  rejects local1.114; no phone/HA/auth/publication. **90 tasks:55 delivered,25 locally
+  verified,3 approval,6 parked,1 queued.** Original **09:19:42–09:49:42 UTC** audit
+  clock retained; broader goal stays active.
+  [Receipt](portal-calendar-recurring-window-2026-11-03.md).
+
 - **Current host CLI / Windows registry compatibility:** native macOS Fleet CLI
   and Python registry load/refresh/installer admission accept one leading UTF-8
   BOM emitted by PowerShell5.1. Unicode fields and existing guards remain;
@@ -30,8 +52,8 @@ The updated whole-product objective is
   Original **08:51:50–09:21:50 UTC** audit clock retained; broader goal stays active.
   [Receipt](portal-fleet-registry-encoding-2026-11-03.md).
 
-- **Current room APK / shared HTTP rejection diagnostics:** exact optimized
-  **1.113/code107** is installed and fully hashed in both rooms. Decode only the
+- **Previous room APK / shared HTTP rejection diagnostics:** exact optimized
+  **1.113/code107** was installed and fully hashed in both rooms. Decode only the
   existing300UTF16 log prefix and close its reader; status/empty/null/failure
   wording and connection ownership remain. Ten frozen methods reproduce five
   assertion failures then pass; **4,215 JVM/438 suites**, debug/optimized/R8/vital

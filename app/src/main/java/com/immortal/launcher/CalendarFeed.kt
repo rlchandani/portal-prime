@@ -225,8 +225,11 @@ object CalendarFeed {
     val horizonEnd = nowMillis + horizonDays * 24L * 60 * 60 * 1000
     val out = CalendarOccurrenceSelection<Event>(500)
     for (event in document.events) {
+      val span = event.allDayDays?.toLong()?.times(24L * 60 * 60 * 1000)
+          ?: event.duration.coerceAtLeast(0L)
+      val earliestStart = runCatching { Math.subtractExact(nowMillis, span) }.getOrDefault(Long.MIN_VALUE)
       val starts = if (event.rrule.isNullOrBlank()) listOf(event.start)
-          else expandRecurrence(event.start, event.rrule, event.exdates, horizonEnd)
+          else expandRecurrence(event.start, event.rrule, event.exdates, horizonEnd, earliestStart)
       for (start in starts) {
         val end = if (event.allDayDays != null) {
           Calendar.getInstance(document.zone, document.locale).apply {
@@ -355,6 +358,7 @@ object CalendarFeed {
       rrule: String,
       exdates: List<Long>,
       horizonEnd: Long,
+      notBefore: Long? = null,
   ): List<Long> =
       runCatching {
             val rules =
@@ -382,7 +386,7 @@ object CalendarFeed {
             cal.timeInMillis = start
             // RFC 5545: COUNT counts generated occurrences; EXDATE then removes some
             // from that set. So we track generation separately from what we keep.
-            var generated = 0
+            var generated = 0L
 
             // Emit one occurrence (subject to EXDATE). Returns false once we've run
             // past UNTIL / the horizon, so the caller can stop generating.
@@ -407,8 +411,19 @@ object CalendarFeed {
               weekStart.set(Calendar.SECOND, sec)
               weekStart.set(Calendar.MILLISECOND, 0)
               weekStart.add(Calendar.DAY_OF_MONTH, -(weekStart.get(Calendar.DAY_OF_WEEK) - 1))
+              val skipped = recurrencePeriodsBefore(weekStart, notBefore, "WEEKLY", interval)
+              if (skipped > 0) {
+                val firstWeek = byDay.count { dow ->
+                  (weekStart.clone() as Calendar).apply {
+                    add(Calendar.DAY_OF_MONTH, dow - 1)
+                  }.timeInMillis >= start
+                }
+                generated = firstWeek.toLong() + (skipped - 1) * byDay.size
+                advanceRecurrence(weekStart, "WEEKLY", interval, skipped)
+              }
               var weeks = 0
-              while (weeks < cap) {
+              var attemptedWeeks = 0
+              while (weeks < cap && attemptedWeeks++ < cap + 4) {
                 var anyInHorizon = false
                 for (dow in byDay.sorted()) {
                   val occ = weekStart.clone() as Calendar
@@ -416,20 +431,25 @@ object CalendarFeed {
                   val t = occ.timeInMillis
                   if (t < start) continue // skip days before the series actually begins
                   anyInHorizon = anyInHorizon || t <= horizonEnd
-                  if (count != null && generated >= count) return@runCatching out
+                  if (count != null && generated >= count.toLong()) return@runCatching out
                   generated++
                   if (!emit(t) && until != null) return@runCatching out
                 }
                 if (!anyInHorizon && weekStart.timeInMillis > horizonEnd) break
-                weekStart.add(Calendar.DAY_OF_MONTH, 7 * interval)
-                weeks++
+                if (notBefore == null || weekStart.timeInMillis >= notBefore) weeks++
+                advanceCalendar(weekStart, Calendar.DAY_OF_MONTH, 7L * interval)
               }
               return@runCatching out
             }
 
+            val skipped = recurrencePeriodsBefore(cal, notBefore, freq, interval)
+            generated = skipped
+            if (count != null && generated >= count.toLong()) return@runCatching out
+            advanceRecurrence(cal, freq, interval, skipped)
             var iterations = 0
-            while (iterations < cap) {
-              if (count != null && generated >= count) break
+            var attemptedPeriods = 0
+            while (iterations < cap && attemptedPeriods++ < cap + 4) {
+              if (count != null && generated >= count.toLong()) break
               val t = cal.timeInMillis
               generated++
               if (!emit(t)) {
@@ -437,16 +457,91 @@ object CalendarFeed {
               }
               when (freq) {
                 "DAILY" -> cal.add(Calendar.DAY_OF_MONTH, interval)
-                "WEEKLY" -> cal.add(Calendar.DAY_OF_MONTH, 7 * interval)
+                "WEEKLY" -> advanceCalendar(cal, Calendar.DAY_OF_MONTH, 7L * interval)
                 "MONTHLY" -> cal.add(Calendar.MONTH, interval)
                 "YEARLY" -> cal.add(Calendar.YEAR, interval)
                 else -> return@runCatching listOf(start)
               }
-              iterations++
+              if (notBefore == null || t >= notBefore) iterations++
             }
             out
           }
           .getOrDefault(listOf(start))
+
+  /** Leave two periods before the overlap boundary for offset changes and partial weeks. */
+  private fun recurrencePeriodsBefore(
+      start: Calendar, notBefore: Long?, freq: String, interval: Int,
+  ): Long {
+    if (notBefore == null || notBefore <= start.timeInMillis) return 0L
+    val target = (start.clone() as Calendar).apply { timeInMillis = notBefore }
+    val distance = when (freq) {
+      "DAILY", "WEEKLY" ->
+          Math.floorDiv(notBefore, 86_400_000L) - Math.floorDiv(start.timeInMillis, 86_400_000L)
+      "MONTHLY" ->
+          (target.get(Calendar.YEAR).toLong() - start.get(Calendar.YEAR)) * 12 +
+              target.get(Calendar.MONTH) - start.get(Calendar.MONTH)
+      "YEARLY" -> target.get(Calendar.YEAR).toLong() - start.get(Calendar.YEAR)
+      else -> return 0L
+    }
+    val step = interval.toLong() * if (freq == "WEEKLY") 7 else 1
+    return (distance / step - 2).coerceAtLeast(0L)
+  }
+
+  /** Calendar.add takes an Int; split a large seek without overflowing that argument. */
+  private fun advanceCalendar(calendar: Calendar, field: Int, amount: Long) {
+    var remaining = amount
+    while (remaining > 0) {
+      val step = remaining.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+      calendar.add(field, step)
+      remaining -= step
+    }
+  }
+
+  private fun advanceRecurrence(calendar: Calendar, freq: String, interval: Int, periods: Long) {
+    if (periods == 0L) return
+    val field = when (freq) {
+      "DAILY", "WEEKLY" -> Calendar.DAY_OF_MONTH
+      "MONTHLY" -> Calendar.MONTH
+      else -> Calendar.YEAR
+    }
+    val step = interval.toLong() * if (freq == "WEEKLY") 7 else 1
+    // Retain normalization across every period the original expansion could visit,
+    // including local times inside a daylight-saving gap, before seeking farther.
+    val prefix = periods.coerceAtMost(366L).toInt()
+    repeat(prefix) { advanceCalendar(calendar, field, step) }
+    var remaining = periods - prefix
+    if (remaining == 0L) return
+    if (freq == "DAILY" || freq == "WEEKLY") {
+      advanceCalendar(calendar, Calendar.DAY_OF_MONTH, remaining * step)
+      return
+    }
+    fun gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
+    val cycle = if (freq == "MONTHLY") 4800 else 400
+    val phaseLength = cycle / gcd(interval, cycle)
+    val minimumDay = if (freq == "YEARLY") {
+      if (calendar.get(Calendar.MONTH) == Calendar.FEBRUARY) 28 else 31
+    } else {
+      val month = calendar.get(Calendar.MONTH)
+      val monthStride = interval % 12
+      (0 until 12 / gcd(monthStride, 12)).minOf { offset ->
+        when ((month + offset * monthStride) % 12) {
+          Calendar.FEBRUARY -> 28
+          Calendar.APRIL, Calendar.JUNE, Calendar.SEPTEMBER, Calendar.NOVEMBER -> 30
+          else -> 31
+        }
+      }
+    }
+    // Preserve sequential Calendar.add's existing day clamping before jumping.
+    // Once the reachable minimum or a full Gregorian phase is visited, it cannot clamp further.
+    var examined = 0
+    while (remaining > 0 && examined < phaseLength &&
+        calendar.get(Calendar.DAY_OF_MONTH) > minimumDay) {
+      calendar.add(field, interval)
+      remaining--
+      examined++
+    }
+    advanceCalendar(calendar, field, remaining * interval)
+  }
 
   /** RRULE UNTIL is a date or UTC date-time; resolve to millis. */
   private fun parseUntil(v: String): Long? =

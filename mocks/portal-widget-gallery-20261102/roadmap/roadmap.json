@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T09:14:58.981845+00:00",
+  "updatedAt": "2026-11-03T09:38:31.996647+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,58 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.113/code107. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.114/code108. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "calendar-recurring-window",
+      "title": "Calendar: keep current events from old recurring feeds",
+      "summary": "Delivered 1.114: historical series age no longer consumes the current event window.",
+      "description": "Seek near overlapping current dates before bounded recurrence expansion. Preserve historical COUNT before EXDATE, BYDAY order, UNTIL and legacy calendar clamping.",
+      "status": "delivered",
+      "verification": "16 frozen methods:12 red failures \u2192 pass \u00b74,231 JVM \u00b7optimized native5/15 \u219215/15",
+      "kind": "Recurring calendar window admission",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal reliability / independent parser and artifact review",
+      "deployment": "Exact optimized1.114/code108 installed and fully hashed in Family Area and Living Area.",
+      "state": "Complete captured maps and nine preference states per room match. Family9 files and Living6 files are byte-identical; three Living absences remain. Family frame, font, accessibility and Chrome retained. Two final native parents and scratch retired; copied credentials removed.",
+      "acceptance": [
+        "Reproduce disappearing current events from old DAILY, WEEKLY, BYDAY, MONTHLY and YEARLY series with actual parser inputs.",
+        "Retain historical COUNT before EXDATE, UNTIL, overlap, interval and exact-horizon behavior.",
+        "Preserve bounded expansion and existing monthly/yearly day clamping; replay previously supported legacy steps before seeking farther.",
+        "Run frozen full gates and exact optimized APK parser differential; deliver and verify scoped two-room preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Old series admission, frozen parser regressions and exact two-room delivery.",
+          "source": "docs/portal-calendar-recurring-window-2026-11-03.md"
+        },
+        {
+          "text": "Bound artifacts, optimized native arrays, preservation and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/calendar-recurring-window-verification.json"
+        }
+      ],
+      "limits": [
+        "Actual optimized parser on Family Android10 with generated feeds only. Native debug, API28, live providers, network and calendar UI remain unverified.",
+        "Twelve UTC cases and one recent New York compatibility case retain the old Android result. Host-JDK gap normalization differs; that probe is source evidence only.",
+        "One unused initial compilation and one executed baseline with a host-JDK-specific oracle remain archived and excluded. Final comparison uses the corrected Android retention oracle.",
+        "Normal final and excluded-attempt parent/scratch cleanup is observed. External runner failure and timeout cleanup are untested.",
+        "DTSTART-zone redesign, broader RFC invalid-date policy and DURATION remain outside scope. Ancient Gregorian reform and arbitrary historical timezone transitions are unverified.",
+        "Nine preference states per room match: Family9 existing files, Living6 existing files and3 unchanged absences. No exception or owner edit/restore.",
+        "Family frame/clock/Weather appearance is viewed; Living visual remains open. Normal diagnostics and recent samples are limited observations, not full health or live feed acceptance.",
+        "Public manifest stays1.83/code77; its guard rejects local1.114/code108. No phone/HA/auth/push/publication; approvals and parked clocks remain."
+      ],
+      "next": "Retain the two-room delivery. Live calendar UI/provider, API28, Living visual and broader timezone acceptance remain open; continue distinct authorized work.",
+      "issueClock": {
+        "startedAt": "2026-11-03T09:19:42+00:00",
+        "deadline": "2026-11-03T09:49:42+00:00",
+        "originalIndependentAuditClockRetained": true
+      }
+    },
     {
       "id": "fleet-registry-encoding",
       "title": "Fleet: read Windows-provisioned UTF-8 registries",
