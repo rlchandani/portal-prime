@@ -139,9 +139,12 @@ class Immich:
             if not nxt:
                 break
             try:
-                page = int(nxt)
+                next_page = int(nxt)
             except (TypeError, ValueError):
                 break
+            if next_page <= page:
+                raise ValueError("Immich nextPage must advance")
+            page = next_page
         return out
 
     def asset_meta(self, asset_id):
@@ -245,7 +248,10 @@ def main():
         scope = f"album {album_name!r}"
 
     print(f"Enumerating {scope} ...", file=sys.stderr)
-    assets = client.enumerate_assets(album_id)
+    try:
+        assets = client.enumerate_assets(album_id)
+    except ValueError as e:
+        die(f"cannot enumerate Immich: {e}")
     photos = [aid for (aid, t) in assets if t == "IMAGE"]
     videos = [aid for (aid, t) in assets if t == "VIDEO"]
     print(
