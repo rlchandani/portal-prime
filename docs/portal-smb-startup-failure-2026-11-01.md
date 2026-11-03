@@ -60,7 +60,7 @@ configuration. The original Dream is active, Android's system process stayed
 unchanged, and a fresh health check found zero active performance listeners
 and no active instrumentation. Living Area was not changed.
 
-See the [sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-smb-startup-failure/verification.json).
+See the [sanitized verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-smb-startup-failure/verification.json).
 Credentials, original profiles and rollback APKs remain outside Git.
 
 ## Acceptance limits

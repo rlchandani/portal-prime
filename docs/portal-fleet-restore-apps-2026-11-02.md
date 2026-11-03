@@ -58,4 +58,4 @@ Owned metadata and synthetic fixture kits are removed during closure; owner
 contents and tokens are excluded from public evidence.
 
 Original clock: **2026-11-02 23:15:37–23:45:37 UTC**, including cleanup.
-[Sanitized structured receipt](../mocks/portal-widget-gallery-20261102/evidence/fleet-restore-apps-verification.json).
+[Sanitized structured receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/fleet-restore-apps-verification.json).

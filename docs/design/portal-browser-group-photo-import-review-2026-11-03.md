@@ -137,7 +137,7 @@ read, persistence, outside-origin request, page error, device command or live
 upload occurred. The context was closed and the process exited0. These are mock
 interaction/geometry checks, not native/physical performance or transfer proof.
 
-[Structured receipt](../../mocks/portal-widget-gallery-20261102/evidence/group-photo-import-review-verification.json).
+[Structured receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/group-photo-import-review-verification.json).
 
 The complete re-run at **2026-11-03T03:22:08.830Z** additionally verifies recipients
 following the viewed Portal until an explicit choice, unresolved-ledger import
@@ -147,7 +147,7 @@ visually inspected. The destination-sheet capture follows explicit dismissal of
 the failed ledger. One earlier setup attempt stopped on an ambiguous dialog
 selector; its log is retained separately. The corrected whole run completed once.
 
-[Terminal receipt](../../mocks/portal-widget-gallery-20261102/evidence/group-photo-import-review-qa.log)
+[Terminal receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/group-photo-import-review-qa.log)
 records **80 passed, 24 geometry cases, 4 local GETs, no errors**, with the owned
 context closed.
 

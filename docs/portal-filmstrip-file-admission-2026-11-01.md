@@ -82,7 +82,7 @@ sources, pin state and accessibility are preserved; the original screensaver
 is running. A fresh installed-hash check passed, with **zero performance
 listeners** and no active instrumentation.
 
-See the [sanitized receipt](../mocks/portal-premium-player-20261030/evidence/family-filmstrip-file-admission/verification.json).
+See the [sanitized receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-filmstrip-file-admission/verification.json).
 Private profiles, credentials and rollback APKs remain outside Git.
 
 ## Remaining limits

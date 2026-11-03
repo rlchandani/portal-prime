@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T03:58:32.383303+00:00",
-  "updatedLabel": "2 November 2026 Pacific \u00b7 1.98 bundled store catalog delivered to both rooms",
+  "updatedAt": "2026-11-03T04:07:36.795948+00:00",
+  "updatedLabel": "2 November 2026 Pacific \u00b7 1.98 in both rooms; strict docs build locally verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -60,34 +60,39 @@
     {
       "id": "strict-docs-links",
       "title": "Documentation: repair the strict site build",
-      "summary": "Queued from a reproduced baseline failure:433 inherited warnings, with no new warning from the catalog delivery.",
-      "description": "Repository file links outside the docs tree fail the strict MkDocs build. Preserve strict validation and distinguish valid repository references from truly missing targets.",
-      "status": "queued",
-      "verification": "Current/baseline433 warning sets identical",
+      "summary": "Locally verified:433 strict-build warnings become zero after425 repository-reference corrections. Publication and live URLs remain unverified.",
+      "description": "Every warning target existed and was tracked.83 docs now use blob URLs for sources, raw URLs for images and a normalized internal guide link; strict validation remains enabled.",
+      "status": "verified",
+      "verification": "Strict MkDocs0 warnings \u00b783 documents \u00b7425 destinations \u00b7120 fragments preserved",
       "kind": "Documentation and CI integrity",
       "platforms": [
         "tooling"
       ],
       "owner": "Documentation and release QA",
-      "deployment": "Local source/checks only; publication remains prohibited.",
-      "state": "Initial434 warnings included one new receipt link; that was corrected, leaving the identical433 inherited baseline warnings.",
+      "deployment": "Local source/build only. No site publication; Portal1.98/code92 is unchanged.",
+      "state": "Independent reversal recovers original docs; referenced bytes are unchanged and every destination appears in generated HTML. Remote availability remains unverified.",
       "acceptance": [
-        "Resolve valid repository references into usable links.",
-        "Keep strict missing-target validation enabled.",
-        "Correct or explicitly describe truly unavailable references.",
-        "Pass focused regressions and strict site build without publishing."
+        "Resolve existing repository references into publication URLs.",
+        "Keep strict validation, configuration and workflow unchanged.",
+        "Retain fragments, document content and referenced source/evidence bytes.",
+        "Verify actual generated HTML and strict build without publishing."
       ],
       "evidence": [
         {
-          "text": "Baseline/current warning comparison and catalog scope.",
-          "source": "docs/portal-catalog-fallback-parity-2026-11-03.md"
+          "text": "Source correction, build proof and publication limits.",
+          "source": "docs/portal-docs-repository-links-2026-11-03.md"
+        },
+        {
+          "text": "Sanitized source hashes, independent review and local verification.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/docs-repository-links-verification.json"
         }
       ],
       "limits": [
-        "No hosted CI run or publication authorized.",
-        "The original discovery clock includes diagnosis performed during catalog closure."
+        "290 of316 external targets are absent from the cached local origin/main; live availability was not checked.",
+        "Informational workstation/anchor/directory notices remain outside the433-warning correction.",
+        "No hosted CI, site publication or device behavior acceptance."
       ],
-      "next": "Inspect warning targets and correct links with strict verification. Original03:59:26.692799\u201304:29:26.692799UTC includes diagnosis already used.",
+      "next": "Retain local verification. Publication remains prohibited; remote acceptance needs a published repository/site. Original03:59:26.692799\u201304:29:26.692799UTC clock includes all diagnosis and closure.",
       "issueClock": {
         "startedAt": "2026-11-03T03:59:26.692799Z",
         "deadline": "2026-11-03T04:29:26.692799Z",

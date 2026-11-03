@@ -59,7 +59,7 @@ comparison failed on transient foreground diagnostics. The original receipt
 is preserved; the subsequent check confirms unchanged persistent pin fields
 and exact restored Dream state. No second installation was needed.
 
-See the [sanitized receipt](../mocks/portal-premium-player-20261030/evidence/family-music-photo-pause/verification.json).
+See the [sanitized receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-photo-pause/verification.json).
 Raw photographs, recordings, credentials, profiles and APK backups stay
 outside Git. No Living Area deployment occurred.
 

@@ -61,7 +61,7 @@ hardware workflow then verified the original unpinned state and all
 restoration checks. This was an assertion-scope correction, not another
 installation.
 
-See the [sanitized receipt](../mocks/portal-premium-player-20261030/evidence/family-clock-reveal/verification.json).
+See the [sanitized receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-clock-reveal/verification.json).
 Household photographs, recordings, credentials, APK backups and full device
 profiles remain outside Git.
 

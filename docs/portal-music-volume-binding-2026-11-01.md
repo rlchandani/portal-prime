@@ -73,10 +73,10 @@ The physical natural-light fade/comfort check remains pending. Previously
 parked work remains parked, provider/audio wiring remains deferred, and the
 overall platform goal remains incomplete.
 
-[Baseline checks](../mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/baseline-checks.json) ·
-[Corrected checks](../mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/checks.json) ·
-[Pixel proof](../mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/pixel-proof.json) ·
-[Unit gate](../mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/unit-gate.json) ·
-[Restoration](../mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/verification.json).
+[Baseline checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/baseline-checks.json) ·
+[Corrected checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/checks.json) ·
+[Pixel proof](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/pixel-proof.json) ·
+[Unit gate](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/unit-gate.json) ·
+[Restoration](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/verification.json).
 
-![Generated native volume comparison](../mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/comparison.png)
+![Generated native volume comparison](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-music-volume-binding/comparison.png)

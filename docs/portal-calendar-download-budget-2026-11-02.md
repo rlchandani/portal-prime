@@ -68,9 +68,9 @@ resent: full installed APK readback established the outcome.
 - SHA-256: `772681507fdf9695810319770db96033ac8225dabed70d5443da0976c3c72371`.
 - Signing certificate SHA-256:
   `4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6`.
-- Structured [verification receipt](../mocks/portal-widget-gallery-20261102/evidence/calendar-download-budget-verification.json).
-- Actual native [saved-event recovery crop](../mocks/portal-widget-gallery-20261102/evidence/calendar-saved-event.png).
-- Actual native [valid retry crop](../mocks/portal-widget-gallery-20261102/evidence/calendar-recovered.png).
+- Structured [verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/calendar-download-budget-verification.json).
+- Actual native [saved-event recovery crop](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/calendar-saved-event.png).
+- Actual native [valid retry crop](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/calendar-recovered.png).
 
 The new 8 MiB limit is a compatibility boundary: larger feeds use saved events
 when available, otherwise the existing unavailable state. The limit is a

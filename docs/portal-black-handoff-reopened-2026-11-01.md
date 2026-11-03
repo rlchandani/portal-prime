@@ -38,7 +38,7 @@ same central ROI and thresholds as the preceding
 
 ## Prepared change and build failure
 
-The [archived candidate](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/unverified-candidate.patch)
+The [archived candidate](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/unverified-candidate.patch)
 would call `overridePendingTransition(0, 0)` immediately after
 `PhotoFramePreviewActivity.finish()`. The existing Dream suppresses its own window
 animation, while the recovered Activity still inherits Android's default close
@@ -64,7 +64,7 @@ After the user interruption, the next continuation was observed at
 **00:50:20 UTC**. Restoration completed at **00:51:25 UTC**.
 This is after the deadline; it is cleanup, not an extension of the fix attempt.
 
-The [restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/restoration.json)
+The [restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/restoration.json)
 verifies all **97 settings**, photo sources, both face caches, persistent pin,
 accessibility configuration, system process, original APK and test APK.
 The original photo-preview Activity is restored and generated device fixtures
@@ -80,10 +80,10 @@ the separate legacy night-motion gap or the overall platform goal.
 
 ## Evidence
 
-- [Baseline visual classification](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/baseline-visual.json)
-- [Every decoded frame](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/baseline-encoded-frames.json)
-- [Lifecycle check](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/baseline-lifecycle.json)
-- [Independent activity check](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/independent-baseline.json)
-- [Failed build](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/build-failure.json)
-- [Bounded outcome](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/outcome.json)
-- [Evidence hashes](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/sha256.json)
+- [Baseline visual classification](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/baseline-visual.json)
+- [Every decoded frame](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/baseline-encoded-frames.json)
+- [Lifecycle check](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/baseline-lifecycle.json)
+- [Independent activity check](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/independent-baseline.json)
+- [Failed build](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/build-failure.json)
+- [Bounded outcome](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/outcome.json)
+- [Evidence hashes](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-reopened/sha256.json)

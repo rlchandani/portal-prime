@@ -22,9 +22,9 @@ absent: the existing forms prefill saved values and mask them.
 
 Only form crops containing generated drafts or placeholders are public:
 
-![WebDAV generated password is masked](../mocks/portal-widget-gallery-20261102/evidence/native-source-dav-masked.png)
+![WebDAV generated password is masked](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-source-dav-masked.png)
 
-![Immich generated API key is masked](../mocks/portal-widget-gallery-20261102/evidence/native-source-immich-masked.png)
+![Immich generated API key is masked](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-source-immich-masked.png)
 
 ## Reproduced keyboard defect and withdrawn candidate
 
@@ -46,7 +46,7 @@ acceptance. It was withdrawn, all three source/version changes were reverted,
 and Family was restored to the original exact 1.80 APK. Living received no
 candidate installation. No keyboard fix or performance improvement is claimed.**
 
-![The failed candidate still clips Home and covers actions](../mocks/portal-widget-gallery-20261102/evidence/native-source-smb-keyboard-defect.png)
+![The failed candidate still clips Home and covers actions](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-source-smb-keyboard-defect.png)
 
 The private candidate remains available for traceability, with optimized SHA-256
 `6d2986b872cfed0eaf39e3138596a65978af59ff4b26e7435c6274cea75d5ba7`.

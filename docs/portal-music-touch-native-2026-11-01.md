@@ -62,7 +62,7 @@ rollback from the test APKs, took **119.725 seconds**.
 Four larger-text Queue/Players captures were visually reviewed in both palettes;
 no overlap was observed in those samples. All 36 were not individually reviewed.
 
-![Actual light-theme larger-text Players capture using synthetic data](../mocks/portal-premium-player-20261030/evidence/family-music-touch-native/light-font-1_8-volume-75-after-edge.png)
+![Actual light-theme larger-text Players capture using synthetic data](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-music-touch-native/light-font-1_8-volume-75-after-edge.png)
 
 ## Build, delivery and preservation
 
@@ -101,6 +101,6 @@ check is pending; no repeat request was made.
 The broader optimization/screensaver/music goal remains incomplete. Parked
 performance investigations were not reopened.
 
-[Sanitized receipts and reviewed captures](../mocks/portal-premium-player-20261030/evidence/family-music-touch-native/verification.json).
+[Sanitized receipts and reviewed captures](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-touch-native/verification.json).
 Credentials, raw device snapshots, configuration backups and rollback APKs
 remain private outside Git.

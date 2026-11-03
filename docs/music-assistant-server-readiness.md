@@ -4,7 +4,7 @@
 
 Readiness and execution record, updated 2026-10-18 Pacific. The native adapter targets MA 2.10.7 / schema 65. The existing signed-in Home Assistant installation was confirmed as **HAOS 18.3 / Core 2026.10.2 / Supervisor 2026.10.2**, running on the user's Synology. **Stable Music Assistant 2.10.7 has been installed and reports Running.** YouTube Music Premium is confirmed. Provider authentication, actual Portal playback is still pending. Snapcast server and Family client connectivity are verified. No Google login cookies have been obtained or copied into Immortal.
 
-The existing path is **Music Assistant → Snapserver → stock Snapcast Android player (`de.badaix.snapcast`) → Portal audio**, with Immortal reading Snapcast metadata/topology and forwarding transport to MA. Native Immortal controls can use this path without introducing native Sendspin. Local references: [setup guide](../docs/guides/multi-room-audio-setup.md), [control client](../app/src/main/java/com/immortal/launcher/SnapcastControlClient.kt), [MA transport](../app/src/main/java/com/immortal/launcher/MaControl.kt).
+The existing path is **Music Assistant → Snapserver → stock Snapcast Android player (`de.badaix.snapcast`) → Portal audio**, with Immortal reading Snapcast metadata/topology and forwarding transport to MA. Native Immortal controls can use this path without introducing native Sendspin. Local references: [setup guide](guides/multi-room-audio-setup.md), [control client](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/SnapcastControlClient.kt), [MA transport](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/MaControl.kt).
 
 ## Conditional installation plan
 
@@ -44,8 +44,8 @@ Check relevant LAN reachability and port conflicts during setup; this is not an 
 
 Existing-code constraints to verify during subsequent implementation/setup:
 
-- [MaWebSocket](../app/src/main/java/com/immortal/launcher/MaWebSocket.kt) uses raw `ws` at `/ws`, not TLS `wss`. A reverse-proxy HTTPS URL is not interchangeable with the current direct LAN connection.
-- [MaControl](../app/src/main/java/com/immortal/launcher/MaControl.kt) uses the same configured host as Snapcast; separate MA/Snapserver hosts are not represented by that baseline setup.
+- [MaWebSocket](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/MaWebSocket.kt) uses raw `ws` at `/ws`, not TLS `wss`. A reverse-proxy HTTPS URL is not interchangeable with the current direct LAN connection.
+- [MaControl](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/MaControl.kt) uses the same configured host as Snapcast; separate MA/Snapserver hosts are not represented by that baseline setup.
 - The current legacy and persistent MA adapters require an explicit API token and a correlated `authenticated:true` reply. Socket reachability alone is insufficient. Username/password token minting is deliberately unsupported until its deployed response contract is verified. Installed server `/api-docs` is the version-specific reference. [Official API](https://www.music-assistant.io/api/).
 
 ## Required evidence before queue/group claims

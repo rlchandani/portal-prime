@@ -51,7 +51,7 @@ recovery, other framed styles or whole-product acceptance is implied.
 
 ## Evidence and boundaries
 
-The [sanitized verification receipt](../mocks/portal-widget-gallery-20261102/evidence/slideshow-slim-frame-verification.json)
+The [sanitized verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/slideshow-slim-frame-verification.json)
 contains the artifact hashes, generated geometry/pixel checks and preservation
 results. Generated portrait and landscape screenshots sit beside it. Owner
 photos, credentials and the actual native comparison remain private.

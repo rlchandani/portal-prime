@@ -43,7 +43,7 @@ Dream was resumed, optimized APK `199aa8a1…` stayed installed, and the perform
 collector has zero active listeners. No APK installation, instrumentation,
 force-stop, accessibility change or firmware change occurred.
 
-See the [sanitized receipt](../mocks/portal-premium-player-20261030/evidence/family-night-autoplay/verification.json).
+See the [sanitized receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-autoplay/verification.json).
 Household photo captures, source credentials, profiles and recordings stay
 outside Git.
 

@@ -70,7 +70,7 @@ physical touch routing, rotation/resize continuity, face inference, other
 renderers, or panel timing. The physical room-light check remains pending
 because the user cannot do it now. The overall goal remains incomplete.
 
-[Native checks](../mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/checks.json),
-[restoration](../mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/verification.json),
-[unit results](../mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/unit-results.json),
-[source/evidence hashes](../mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/sha256.json).
+[Native checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/checks.json),
+[restoration](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/verification.json),
+[unit results](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/unit-results.json),
+[source/evidence hashes](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-photo-motion/sha256.json).

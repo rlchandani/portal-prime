@@ -73,7 +73,7 @@ already parked background-WebView-startup experiment was not reopened.
 Cold Shuffle startup remains incomplete; warmed Filmstrip and renderer-ready
 callbacks do not close it.
 
-The [sanitized receipt](../mocks/portal-premium-player-20261030/evidence/family-cold-start/verification.json)
+The [sanitized receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-cold-start/verification.json)
 contains the scalar observations and failed-attempt qualifications. Recordings,
 screenshots of household photographs, complete settings and credentials stay
 outside Git. The broader performance/night/player goal remains incomplete.

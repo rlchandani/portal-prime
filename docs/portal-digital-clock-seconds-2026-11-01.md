@@ -47,7 +47,7 @@ Negative gaps indicate that the ring begins before the time's right edge.
 The normal fixture also recovers the text pixels previously covered by the
 indicator: its classified white glyph count changes from **7,047 to 7,208**.
 
-![Generated native clock pixels before and after](../mocks/portal-premium-player-20261030/evidence/native-clock-seconds/before-after.png)
+![Generated native clock pixels before and after](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/native-clock-seconds/before-after.png)
 
 These are **detached native Canvas renders**, not live screensaver screenshots
 or a browser mock. The montage adds labels and a dark matte; generated clock
@@ -90,6 +90,6 @@ choices. The clock font, night sensor thresholds and brightness fade are
 unchanged. Physical fade comfort remains pending because the user cannot test
 it now. The broader goal remains incomplete.
 
-[Before checks](../mocks/portal-premium-player-20261030/evidence/native-clock-seconds/before-checks.json),
-[after checks](../mocks/portal-premium-player-20261030/evidence/native-clock-seconds/after-checks.json),
-and [sanitized deployment receipt](../mocks/portal-premium-player-20261030/evidence/native-clock-seconds/verification.json).
+[Before checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-clock-seconds/before-checks.json),
+[after checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-clock-seconds/after-checks.json),
+and [sanitized deployment receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-clock-seconds/verification.json).

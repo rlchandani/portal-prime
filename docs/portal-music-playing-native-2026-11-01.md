@@ -46,7 +46,7 @@ These are observations of UI state, not provider acknowledgements or audible
 playback. Observer intervals include substantial test overhead and are not user
 input latency, panel FPS or an optical-smoothness measurement.
 
-![Actual larger-text playing volume screen, generated sample content](../mocks/portal-premium-player-20261030/evidence/family-music-playing-native/playing-volume-late.png)
+![Actual larger-text playing volume screen, generated sample content](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-music-playing-native/playing-volume-late.png)
 
 ## Failed attempts remain failed
 
@@ -101,6 +101,6 @@ production Home chrome or whole-platform performance.
 Physical brightness comfort remains pending because the user cannot test now.
 Provider/server wiring remains outside scope. The broader goal is incomplete.
 
-[Sanitized evidence and original attempt summaries](../mocks/portal-premium-player-20261030/evidence/family-music-playing-native/summary.json).
+[Sanitized evidence and original attempt summaries](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-playing-native/summary.json).
 Credentials, configuration snapshots, raw native trees, rollback APKs and the
 guarded recovery scripts remain private outside Git.

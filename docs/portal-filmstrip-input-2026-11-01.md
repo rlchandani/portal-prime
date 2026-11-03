@@ -76,7 +76,7 @@ restoring the non-debuggable APK. An independent Fleet file listing and
 **13 fresh restoration checks** confirmed that the original optimized app,
 test APK, settings, sources, face cache, services, pin and Dream were restored
 and all owned evidence removed. Both failures remain in the
-[first-attempt receipt](../mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/first-attempt.json).
+[first-attempt receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/first-attempt.json).
 Only one corrected physical rerun was made.
 
 The final optimized APK is **ac3b46b796c57e57f1552bebc541abde03f5321d3df38587f4eb558b2ccc0e5c**.
@@ -92,9 +92,9 @@ inactive, and generated files are removed. Living Area was not touched.
 Credentials, household configuration, rollback APKs and raw logs stay
 outside Git.
 
-See the [final receipt](../mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/verification.json),
-[native assertions](../mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/checks.json)
-and [pixel check](../mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/geometry.json).
+See the [final receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/verification.json),
+[native assertions](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/checks.json)
+and [pixel check](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-filmstrip-input/geometry.json).
 
 A separate audit reproduced interrupted Previous/Next history duplication.
 It was not changed in this delivery; the subsequent

@@ -27,11 +27,17 @@ The updated whole-product objective is
   Original **03:50:19–04:20:19UTC** clock retained.
   [Receipt](portal-catalog-fallback-parity-2026-11-03.md).
 
-- **Next independent unit / strict documentation gate:** baseline and current
-  site builds fail on the same433 warnings, mostly repository files linked
-  outside the docs tree. The new catalog receipt warning was corrected. Resolve
-  actual links without weakening strict validation or publishing. Original
-  **03:59:26.692799–04:29:26.692799UTC** clock includes diagnosis already used.
+- **Strict documentation gate / locally verified:** baseline433 warnings became
+  zero after425 repository-reference corrections across83 docs. Every target
+  exists and is tracked; all120 fragments and target hashes are preserved.
+  Independent reversal recovers original docs byte-for-byte; generated HTML
+  retains every corrected destination. Strict MkDocs/Material builds in1.88sec,
+  with configuration/workflow/severity unchanged. The site is unpublished:
+  290 of316 external targets are absent from the cached local `origin/main`;
+  remote availability and hosted execution remain unverified. Informational
+  workstation/anchor/directory notices are outside this scoped correction.
+  Original **03:59:26.692799–04:29:26.692799UTC** includes earlier diagnosis.
+  [Receipt](portal-docs-repository-links-2026-11-03.md).
 
 - **Previous room APK / slim slideshow frame:** exact optimized **1.97/code91**
   is installed and fully hashed in both rooms. Framed Print uses a 4-pixel mat
@@ -372,7 +378,7 @@ checkpoints below; do not reuse an initial “unverified” finding as a new iss
 
 | Component | Purpose, dependencies and inspected evidence | Verification/release procedure and current limits |
 | --- | --- | --- |
-| **Portal Android** | Single Kotlin/Compose `:app`, `com.immortal.launcher`; minSdk 24, targetSdk 36; Portal API 28/29, no Google services/root. Home/apps/widgets, photo and clock Dreams, tools, store/updater, MQTT/HA, music, accessibility, boot/sleep. Inspected [README](../README.md), build configuration, Home and settings source, current review and existing audits. | `./gradlew :app:testDebugUnitTest --no-daemon`, `:app:assembleDebug`; optimized variant and native acceptance are separate. Debug has `.debug` suffix. Preserve signing identity and configuration for in-place updates. Current 1.70 optimized gates and Family browser-branding acceptance passed; both rooms have the exact artifact. Earlier 1.69 browser-status proof remains separately scoped. Earlier 1.68 Slideshow acceptance remains separate. Earlier timer acceptance remains separately scoped. Earlier World Clock acceptance remains recorded separately. Whole-product hardware acceptance remains incomplete. |
+| **Portal Android** | Single Kotlin/Compose `:app`, `com.immortal.launcher`; minSdk 24, targetSdk 36; Portal API 28/29, no Google services/root. Home/apps/widgets, photo and clock Dreams, tools, store/updater, MQTT/HA, music, accessibility, boot/sleep. Inspected [README](https://github.com/starbrightlab/immortal/blob/main/README.md), build configuration, Home and settings source, current review and existing audits. | `./gradlew :app:testDebugUnitTest --no-daemon`, `:app:assembleDebug`; optimized variant and native acceptance are separate. Debug has `.debug` suffix. Preserve signing identity and configuration for in-place updates. Current 1.70 optimized gates and Family browser-branding acceptance passed; both rooms have the exact artifact. Earlier 1.69 browser-status proof remains separately scoped. Earlier 1.68 Slideshow acceptance remains separate. Earlier timer acceptance remains separately scoped. Earlier World Clock acceptance remains recorded separately. Whole-product hardware acceptance remains incomplete. |
 | **Native Android phone companion** | Paired management uses Portal protocol version 1: revision-guarded layout/scenes, settings/sources, photos, operations and Jarvis; music client supports capability fallback. Recovered source `422286e…` now has committed maintenance `610899f…` on isolated `codex/companion-compat-20261102`, still 1.7.0-music-preview/code 12. See [provenance](portal-companion-provenance-2026-11-02.md). | Earlier 555 JVM tests/73 suites and debug/test APKs passed. Latest group-preflight correction passed 564 tests/74 suites and debug assembly. Neither phone candidate was installed/run. Current phone identity, rendered UI, live networking/playback and parity remain unverified; historical Pixel receipts are separate. Primary/frozen/stale checkouts preserved. No shipped native iOS app identified. |
 | **Related Portal Toolkit checkout** | **Accessible and inspected:** `/Volumes/xHome/Github/portal-toolkit`. Compose/Dadb phone utility for USB/Wi-Fi ADB, APKs, photos, backups, files, logs, capture/mirror and OTA controls; Google Photos auth belongs on the phone. Build declares `com.portalinstaller`, minSdk 26/targetSdk 35, **1.4.0 / code 5**; README says release 1.1.0 and only Portal Mini tested. | Gradle `:app:testDebugUnitTest`, `:app:assembleDebug`; 34 JVM test source files found, none executed. No `.github` directory present; release signing/publication process not established. This checkout is not proof of the paired companion branch above. August audit checkboxes are stale: synchronous connection guards, error handling, shell quoting and capture cleanup already exist in inspected source. Revalidate before creating defects. |
 | **Browser remote / PWA** | APK-bundled `RemoteHtml` plus `remote/{core.mjs,control-center.js,control-center.css}`, served by Fleet on LAN. PIN/session pairing, room roster, input/media, photos, apps, registry settings, layout/scenes/snapshots, Jarvis. Inspected [control-center contract](features/browser-control-center.md), [remote docs](features/remote.md), routes and offline JS fixtures. Paired management requires session auth; do not equate it with unrestricted Fleet auth. | No separate web build/deploy: assets ship with the Portal APK. Offline Node tests cover controller behavior; rendered browser/mobile and live Portal checks are additional gates. Existing receipts establish selected cases only. Current browser/device sessions, PWA installation and native companion parity were not inspected. |

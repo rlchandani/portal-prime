@@ -49,7 +49,7 @@ focused Chrome/model runs passed. The older source-fixture checker stays **12/14
 matching the isolated baseline's two preexisting failures. These passes do not negate
 the native failure.
 
-[Evidence](../mocks/portal-premium-player-20261030/evidence/family-night-legacy-reopened/attempts.json)
+[Evidence](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-legacy-reopened/attempts.json)
 contains all three anonymous generated-photo reports, strict motion proof, exact tested
 input hashes, restoration receipt, scoped human acceptance, rejected source/test
 prototypes and a SHA-256 manifest. Household media, credentials and raw backups remain

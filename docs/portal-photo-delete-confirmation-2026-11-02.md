@@ -69,11 +69,11 @@ The original still matched its 77-byte fixture after unconfirmed outcomes:
 
 `d25cf32a53ab2f14f71e7f17d0f2890d476352ec9d56882db13502e9224b4195`
 
-![Original false success](../mocks/portal-widget-gallery-20261102/evidence/photo-delete-old.png)
+![Original false success](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/photo-delete-old.png)
 
-![Correct review warning](../mocks/portal-widget-gallery-20261102/evidence/photo-delete-new.png)
+![Correct review warning](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/photo-delete-new.png)
 
-![Success after a real confirmed deletion](../mocks/portal-widget-gallery-20261102/evidence/photo-delete-confirmed.png)
+![Success after a real confirmed deletion](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/photo-delete-confirmed.png)
 
 Only notice crops are public. Private snapshots, build logs and helper receipts
 remain under `/private/tmp/portal-photo-delete-confirmation-20261102/`.

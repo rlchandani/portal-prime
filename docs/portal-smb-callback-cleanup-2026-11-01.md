@@ -57,7 +57,7 @@ The paused-view observer capture, natural room-light comfort, cold startup,
 animated-image residency and Home/Apps timing outliers remain open.
 The full platform/screensaver/night-clock/music goal is incomplete.
 
-See the [sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-smb-callback-cleanup/verification.json).
+See the [sanitized verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-smb-callback-cleanup/verification.json).
 Private configuration snapshots, credentials and rollback APKs remain outside Git.
 
 **Subsequent startup fix:** the

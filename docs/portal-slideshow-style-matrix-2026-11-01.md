@@ -28,7 +28,7 @@ had encoded the stopped crop and were corrected to verify actual contained
 geometry, cell retention and face positions including letterbox offsets.
 Other animation and lifecycle protections remain.
 
-![Actual Portal Mosaic portrait before and after, using a generated image](../mocks/portal-premium-player-20261030/evidence/family-slideshow-style-matrix/before-after.png)
+![Actual Portal Mosaic portrait before and after, using a generated image](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-slideshow-style-matrix/before-after.png)
 
 ## Native coverage, with qualifications retained
 
@@ -59,7 +59,7 @@ portrait. That does not prove every remaining marker-area failure harmless.
 The survey is static coverage, not motion, visual-quality or frame-rate
 acceptance for every style.
 
-![All 31 generated-image native survey captures](../mocks/portal-premium-player-20261030/evidence/family-slideshow-style-matrix/native-static-matrix.png)
+![All 31 generated-image native survey captures](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-slideshow-style-matrix/native-static-matrix.png)
 
 ## Delivered Mosaic geometry
 

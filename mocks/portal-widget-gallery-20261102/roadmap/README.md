@@ -303,3 +303,16 @@ The final70-task snapshot adds the independently queued strict-docs repair with
 its original03:59:26.692799–04:29:26.692799UTC clock. Both selected details and
 the matching proof pass the same390/1600 checks; the queued clock is visible.
 No page errors or external requests; all owned contexts closed.
+
+
+The70-task docs snapshot moves the original queued docs unit to locally verified:
+433 strict-build warnings became0 after425 mapped destination corrections in83
+documents. All120 fragments and referenced bytes remain; independent review
+recovered the original docs. Current Portal1.98/code92 is unchanged. The site
+is unpublished and remote URL/image availability is not accepted.
+
+Fresh390×844 and1600×1000 checks verify the selected catalog/docs details,
+current version/phone boundary/original docs clock, no page/detail overflow,
+and both HTTP200 proof responses with identical disk bytes. Publication limits
+remain visible; page errors and external requests are0, and owned contexts are
+closed. This does not reaccept all70 workflows or native UI.

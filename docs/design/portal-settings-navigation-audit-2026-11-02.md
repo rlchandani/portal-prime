@@ -115,7 +115,7 @@ Refer to [the widget ownership map](portal-widget-settings-map-2026-11-02.md) fo
 
 ## Evidence and limits
 
-Machine-readable structure: [`settings-navigation-audit.json`](../../mocks/portal-widget-gallery-20261102/evidence/settings-navigation-audit.json).
+Machine-readable structure: [`settings-navigation-audit.json`](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/settings-navigation-audit.json).
 
 Source: `ApprovedSettingsNavigation.kt` (`ApprovedSettingsCategories`, `ApprovedSettingsPages`, `approvedSettingsIntent`); `ImmortalSettingsActivity.kt` (`ApprovedSettingsRouteContent`, `ApprovedNativeSettingsPage`, `permittedHistoryRoute`); `ApprovedSettingsSearch.kt` (`approvedPageForSpec`, `approvedSettingsPrerequisite`); `SettingsPresentation.kt` (`advancedPages`, `advancedControls`); `ScreensaverSourcesActivity.kt` (`sourcePage`, ordinary/Advanced source handling); `HaSettingsActivity.kt` (entity-only direct entry).
 

@@ -60,7 +60,7 @@ driver/precondition issues, not additional production fixes or passing attempts.
   `/private/tmp/portal-timer-editor-20261102`; tokens and full photo captures are
   not committed. The public image is cropped to the dialog only.
 
-![Installed Home timer editor](../mocks/portal-widget-gallery-20261102/roadmap/images/timer-editor-native.png)
+![Installed Home timer editor](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/roadmap/images/timer-editor-native.png)
 
 Limits: no physical audible-sound judgement, background/screen-off alarm test,
 screensaver timer rendering test, enlarged-text/remote-focus matrix, optical

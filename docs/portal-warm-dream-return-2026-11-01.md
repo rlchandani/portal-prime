@@ -56,10 +56,10 @@ Dream. The corrected component is
 The default HOME preference was not changed. That initial attempt does not
 establish a Home-return defect.
 
-The new [pure parser](../scripts/portal_warm_dream_contract.py) accepts only
+The new [pure parser](https://github.com/starbrightlab/immortal/blob/main/scripts/portal_warm_dream_contract.py) accepts only
 current `mResumedActivity` and live `Hist` rows. It excludes historical
 references and compares complete package/class identities.
-[Ten synthetic tests](../scripts/test_portal_warm_dream_contract.py) pass.
+[Ten synthetic tests](https://github.com/starbrightlab/immortal/blob/main/scripts/test_portal_warm_dream_contract.py) pass.
 No Android source changed, so the preceding fresh **3,764-test / 395-suite**
 gate is retained, not represented as a new run.
 
@@ -83,15 +83,15 @@ recordings, raw dumps and rollback APKs remain outside Git.
 
 ## Evidence and disposition
 
-- [Paused-viewer receipt](../mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/paused-checks.json)
-- [Continuation receipt](../mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/continuation-checks.json)
-- [Independent parser receipt](../mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/independent-activity-checks.json)
-- [Failed visual gate and recording limits](../mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/video-checks.json)
-- [Restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/verification.json)
-- [Twelve independent checks after restoration](../mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/health.json)
-- [Attempt history](../mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/analysis-attempts.json)
-- [Bounded issue outcome](../mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/outcome.json)
-- [Evidence hashes](../mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/hashes.json)
+- [Paused-viewer receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/paused-checks.json)
+- [Continuation receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/continuation-checks.json)
+- [Independent parser receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/independent-activity-checks.json)
+- [Failed visual gate and recording limits](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/video-checks.json)
+- [Restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/verification.json)
+- [Twelve independent checks after restoration](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/health.json)
+- [Attempt history](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/analysis-attempts.json)
+- [Bounded issue outcome](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/outcome.json)
+- [Evidence hashes](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-warm-dream-return/hashes.json)
 
 The warm API 29 software-input lifecycle gap is now checked. The black handoff
 remains unresolved within this bounded issue slot; no further capture or

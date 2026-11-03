@@ -82,13 +82,13 @@ API 24–27 fallback behavior is present in source, not accepted by this API 29 
 
 ## Evidence and installation
 
-[Native assertions](../mocks/portal-premium-player-20261030/evidence/family-clock-fonts/checks.json),
-[retained baseline failures](../mocks/portal-premium-player-20261030/evidence/family-clock-fonts/baseline-checks.json),
-[independent PNG pixel checks](../mocks/portal-premium-player-20261030/evidence/family-clock-fonts/pixels.json)
-and [restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-clock-fonts/verification.json)
+[Native assertions](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-clock-fonts/checks.json),
+[retained baseline failures](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-clock-fonts/baseline-checks.json),
+[independent PNG pixel checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-clock-fonts/pixels.json)
+and [restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-clock-fonts/verification.json)
 support this scoped acceptance. The native process is terminal.
 
-The [native comparison gallery](../mocks/portal-premium-player-20261030/family-clock-fonts-review.html)
+The [native comparison gallery](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/family-clock-fonts-review.html)
 shows the generated drawings; it does not recreate the clock using browser fonts.
 It retains 18 exact before/after pairs and explicitly labels the two added
 light-preset cases as having no exact baseline capture.

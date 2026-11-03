@@ -61,4 +61,4 @@ simultaneous storage transactions, general FPS and whole-product acceptance are
 not claimed. Reload an existing control-center tab for the current controller.
 
 Structured receipt:
-[`browser-profile-delete-conflicts-verification.json`](../mocks/portal-widget-gallery-20261102/evidence/browser-profile-delete-conflicts-verification.json).
+[`browser-profile-delete-conflicts-verification.json`](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/browser-profile-delete-conflicts-verification.json).

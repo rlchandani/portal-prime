@@ -81,7 +81,7 @@ Debug build, instrumentation build and **3,765 JVM tests in 395 suites pass**,
 with zero test failures, errors or skips. The final build took 1 minute 22 seconds.
 The on-device matrix itself fails and is recorded as such.
 
-[Evidence](../mocks/portal-premium-player-20261030/evidence/family-night-legacy/checks.json)
+[Evidence](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-legacy/checks.json)
 includes compressed complete samples, stricter motion proof, rejected-fixture
 receipts, restoration guards, unit totals, production hashes and a SHA-256 manifest.
 Natural room-light/physical fade acceptance remains pending because the user

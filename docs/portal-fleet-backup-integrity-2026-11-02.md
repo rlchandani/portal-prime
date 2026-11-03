@@ -61,4 +61,4 @@ this unit. No general speedup or whole-product completion is claimed.
 
 Original issue clock: **2026-11-02 22:56:14–23:26:14 UTC**, including cleanup.
 Final regression counts, source identity, review and cleanup are recorded in the
-[sanitized structured receipt](../mocks/portal-widget-gallery-20261102/evidence/fleet-backup-integrity-verification.json).
+[sanitized structured receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/fleet-backup-integrity-verification.json).

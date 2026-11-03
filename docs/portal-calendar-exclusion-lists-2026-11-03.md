@@ -31,9 +31,9 @@ The nine new cases cover UTC lists including the initial occurrence, all-day dat
 fixed `TZID`, floating dates, repeated properties, folded lines, malformed tokens
 between valid values, and no/single-exclusion controls.
 
-![Original: cancelled second occurrence still appears](../mocks/portal-widget-gallery-20261102/evidence/calendar-exdate-before.png)
+![Original: cancelled second occurrence still appears](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/calendar-exdate-before.png)
 
-![Fixed: only the remaining third occurrence appears](../mocks/portal-widget-gallery-20261102/evidence/calendar-exdate-after.png)
+![Fixed: only the remaining third occurrence appears](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/calendar-exdate-after.png)
 
 ## Artifact and boundaries
 

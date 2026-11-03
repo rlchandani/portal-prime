@@ -32,11 +32,11 @@ Compose tests.
 | Valid35-second interval → Save, reopen | Device API and reopened dialog show35. Exactly one registry scalar changes: `screensaver.intervalSec`. |
 | Restore30 seconds through native Save | Complete saved profile matches its baseline again. |
 
-![Actual blank-name validation](../mocks/portal-widget-gallery-20261102/evidence/native-name-validation.png)
+![Actual blank-name validation](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-name-validation.png)
 
-![Actual interval validation](../mocks/portal-widget-gallery-20261102/evidence/native-interval-validation.png)
+![Actual interval validation](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-interval-validation.png)
 
-![Actual reopened saved interval before restoration](../mocks/portal-widget-gallery-20261102/evidence/native-interval-saved.png)
+![Actual reopened saved interval before restoration](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-interval-saved.png)
 
 These are crops of actual Portal captures. Full captures and private profiles
 remain under `/private/tmp/portal-settings-native-editors-20261102/`;

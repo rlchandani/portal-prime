@@ -30,7 +30,7 @@ panel restores brightness rather than retaining a night override.
   Includes six transition and 15 brightness tests.
 - Debug and optimized performance builds pass; final combined build took
   **88 seconds**.
-- [Native API 34 checks](../mocks/portal-premium-player-20261030/evidence/native-night-crossfade/checks.json):
+- [Native API 34 checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-night-crossfade/checks.json):
   **430 passed / zero failed**, **83.349 seconds**. Real registry updates,
   emulated light-sensor input, native rendered video, actual window attributes,
   same process/activity/window, unchanged photo ROI and retained user pause.
@@ -41,7 +41,7 @@ panel restores brightness rather than retaining a night override.
   12 fps; the 10–90% intermediate range spans **1.75 seconds** in each direction.
   No intermediate bright/black flash in the tested probe. An independent
   endpoint-trim recheck confirms the same result before later Home navigation.
-- [Family delivery](../mocks/portal-premium-player-20261030/evidence/family-night-crossfade/verification.json):
+- [Family delivery](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-crossfade/verification.json):
   optimized APK `f602ba024021eb0a8c5c36d1b3478c07a02fd0aacb765328bca1e1574bcbc517`,
   **25,842,558 bytes**, independently read back after installation; signing key
   unchanged, all **97 settings** and photo-source/screensaver configuration
@@ -55,12 +55,12 @@ panel restores brightness rather than retaining a night override.
 The same debug artifact subsequently passed two production accessibility-overlay
 checks on the owned API 34 emulator:
 
-- [Full night/bright cycle](../mocks/portal-premium-player-20261030/evidence/native-night-pinned-overlay/checks.json):
+- [Full night/bright cycle](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-night-pinned-overlay/checks.json):
   **374 assertions**, zero failures, **43.453 seconds**. Observed down/up
   progression **2.983 / 2.988 seconds**, with **28 / 37** distinct intermediate
   brightness values. The clock renders black and warm ink; returning photos
   match the baseline exactly. One tap reveals the same Files Activity/process.
-- [Tap while showing the night clock](../mocks/portal-premium-player-20261030/evidence/native-night-pinned-tap/checks.json):
+- [Tap while showing the night clock](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-night-pinned-tap/checks.json):
   **228 assertions**, zero failures. One tap removes the clock cover and reveals
   that same Files Activity/process with its valid pin retained.
 

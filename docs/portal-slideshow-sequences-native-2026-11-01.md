@@ -83,9 +83,9 @@ Filmstrip contacts contain generated portrait and panoramic cards. These
 representative contacts support composition review at their displayed
 timestamps; the automated region gate does not prove every tile's framing.
 
-![Actual dense Mosaic presentation states](../mocks/portal-premium-player-20261030/evidence/family-slideshow-motion-native/contacts/mosaic-dense.png)
+![Actual dense Mosaic presentation states](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-slideshow-motion-native/contacts/mosaic-dense.png)
 
-![Actual dense Filmstrip presentation states](../mocks/portal-premium-player-20261030/evidence/family-slideshow-motion-native/contacts/filmstrip-dense.png)
+![Actual dense Filmstrip presentation states](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-slideshow-motion-native/contacts/filmstrip-dense.png)
 
 ## Tests, review and device restoration
 

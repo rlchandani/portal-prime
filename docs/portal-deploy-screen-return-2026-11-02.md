@@ -84,4 +84,4 @@ approved scope remains distinct from its parked native geometry acceptance.
 The original **22:26:30.941464–22:56:30.941464 UTC** clock is retained, including
 cleanup. The whole-product goal remains active.
 
-[Sanitized structured receipt](../mocks/portal-widget-gallery-20261102/evidence/deploy-screen-return-verification.json).
+[Sanitized structured receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/deploy-screen-return-verification.json).

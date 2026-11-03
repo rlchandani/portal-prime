@@ -51,7 +51,7 @@ autoplay pause.
 
 The native capture shows time, weekday and date without observed clipping:
 
-![Actual Family Area night clock, cropped from a native capture](../mocks/portal-premium-player-20261030/evidence/family-pinned-brightness-delivery/night-clock.png)
+![Actual Family Area night clock, cropped from a native capture](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-pinned-brightness-delivery/night-clock.png)
 
 The capture establishes rendered pixels, not backlight comfort. Accessibility
 time/date semantics and a new content-fade video were not tested.
@@ -100,6 +100,6 @@ cannot perform it now. Other styles, complete GPU residency, browser retention,
 cold startup and parked platform timing gaps retain their existing limits.
 The broader goal remains incomplete; music provider/audio wiring stays deferred.
 
-[Sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-pinned-brightness-delivery/verification.json).
+[Sanitized verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-pinned-brightness-delivery/verification.json).
 Raw captures, native dumps, configuration/source snapshots and credentials remain
 private outside Git.

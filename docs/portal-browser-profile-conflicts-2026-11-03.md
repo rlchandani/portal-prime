@@ -70,4 +70,4 @@ is source-only and keeps this same issue clock; it does not authorize a fresh
 slot. No general responsiveness, FPS or whole-product completion claim is made.
 
 Structured evidence:
-[`browser-profile-conflicts-verification.json`](../mocks/portal-widget-gallery-20261102/evidence/browser-profile-conflicts-verification.json).
+[`browser-profile-conflicts-verification.json`](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/browser-profile-conflicts-verification.json).

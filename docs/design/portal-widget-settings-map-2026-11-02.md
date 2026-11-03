@@ -108,31 +108,31 @@ precedence, and shared changes across duplicate widgets. These are proposed chec
 
 ## Source anchors
 
-- [HomeActivity.kt](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt):
+- [HomeActivity.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt):
   `ApprovedWidgetCell`, `ImmortalWidgetContent`, `ImmortalWidgetShell`, `QuickControlsWidget`,
   `TodayStripWidget`, `ImmortalTimersWidget`, `ImmortalHaWidget` and remaining `Immortal*Widget` handlers.
-- [HomeWidgetStore.kt](../../app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt):
+- [HomeWidgetStore.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt):
   `KIND_*`, `HomeWidget`, `serialize`; placement ownership and all fourteen kinds.
-- [ApprovedSettingsNavigation.kt](../../app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt):
+- [ApprovedSettingsNavigation.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt):
   `ApprovedSettingsCategories`, `ApprovedSettingsPages`, `approvedSettingsIntent`.
-  [ApprovedHomeNavigation.kt](../../app/src/main/java/com/immortal/launcher/ApprovedHomeNavigation.kt):
+  [ApprovedHomeNavigation.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomeNavigation.kt):
   `openApprovedHomeSettings`, `openApprovedHomeApps`, `ApprovedHomeTimersPage`.
-- [ImmortalSettingsActivity.kt](../../app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt):
+- [ImmortalSettingsActivity.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt):
   detail `when (page)`, `DisplaySection`, `QuickButtonsSection`, `WorldClockContent`.
-- [SettingsDomains.kt](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt):
+- [SettingsDomains.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt):
   `all`, `calendar`, `screensaver`, `immortal`, `quickbar`, `homeDashboard`.
-  [SettingsPresentation.kt](../../app/src/main/java/com/immortal/launcher/settings/SettingsPresentation.kt):
+  [SettingsPresentation.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsPresentation.kt):
   `advancedPages`, `advancedControls`.
-  [SettingsDomainTest.kt](../../app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt):
+  [SettingsDomainTest.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt):
   `exemptCollectionsOrContent`; the tripwire classifies persisted `*Config` files, not every store.
-- [ApprovedHomePhoto.kt](../../app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt):
+- [ApprovedHomePhoto.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt):
   `ApprovedHomePhoto`, `loadApprovedHomePhoto`.
-  [ScreensaverSourcesActivity.kt](../../app/src/main/java/com/immortal/launcher/ScreensaverSourcesActivity.kt):
+  [ScreensaverSourcesActivity.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ScreensaverSourcesActivity.kt):
   `ScreensaverSourcesContent`, `sourcePage`.
-  [HaSettingsActivity.kt](../../app/src/main/java/com/immortal/launcher/HaSettingsActivity.kt):
+  [HaSettingsActivity.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HaSettingsActivity.kt):
   `ApprovedEditorsHaContent`, `HomeDashboardSettings`.
-- [HomeToolOverlays.kt](../../app/src/main/java/com/immortal/launcher/HomeToolOverlays.kt):
+- [HomeToolOverlays.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeToolOverlays.kt):
   `TimersOverlay` → `TimerConfig`.
-  [AlarmSettingsEditor.kt](../../app/src/main/java/com/immortal/launcher/AlarmSettingsEditor.kt):
+  [AlarmSettingsEditor.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/AlarmSettingsEditor.kt):
   `alarmSettingsEditor`, `AlarmSettingsEditor`.
   Other editor bodies were inspected in their named `*SettingsActivity.kt` source files.

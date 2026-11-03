@@ -34,9 +34,9 @@ rendered content, not optical luminance or delivered panel FPS.
 The time, weekday and date were visually reviewed on the native clock capture,
 with no observed clipping. Accessibility time/date semantics were not tested.
 
-The [browser review](../mocks/portal-premium-player-20261030/family-night-review.html)
+The [browser review](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/family-night-review.html)
 contains an approximately 15.7-second cover-only recording excerpt and clock crop.
-The [receipt](../mocks/portal-premium-player-20261030/evidence/family-pinned-night/verification.json)
+The [receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-pinned-night/verification.json)
 records command ramps, content analysis, limits and restoration. Raw full video,
 app windows, source fields and settings remain private.
 

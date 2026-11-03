@@ -4,7 +4,7 @@ Source baseline: `codex/widget-gallery-20261102`, `61b870cd`. Scope: refinement 
 
 ## Rendering and sizing contract
 
-[`HomeWidgetStore`](../app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt) declares **14 custom kinds** and the separate `appwidget` category. The active custom dispatcher is `ImmortalWidgetContent` in [`HomeActivity.kt`](../app/src/main/java/com/immortal/launcher/HomeActivity.kt). It selects `ApprovedHomeWeather`, `ApprovedHomeCalendar`, and `ApprovedHomePhoto`; the older `ImmortalWeatherWidget` and `PhotoMemoryStrip` are not those dispatch targets.
+[`HomeWidgetStore`](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt) declares **14 custom kinds** and the separate `appwidget` category. The active custom dispatcher is `ImmortalWidgetContent` in [`HomeActivity.kt`](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt). It selects `ApprovedHomeWeather`, `ApprovedHomeCalendar`, and `ApprovedHomePhoto`; the older `ImmortalWeatherWidget` and `PhotoMemoryStrip` are not those dispatch targets.
 
 The table's size notation is **saved default → resolved display span**, in columns × rows:
 
@@ -13,13 +13,13 @@ The table's size notation is **saved default → resolved display span**, in col
 - Photo Memory: **2×1 → 2×4**.
 - Explicit sizes, Android providers, or saved sizes differing from the kind's default use their saved spans. `HomeWidgetStore.custom` itself defaults to 2×2; `ApprovedWidgetLibrary`'s add handler supplies height 1 for Today, Quick Controls and Photo Memory. `migrateDashboardCards` also seeds those three at 2×1.
 
-[`HomePresentation.spans`](../app/src/main/java/com/immortal/launcher/HomePresentation.kt) resolves these defaults. [`ApprovedPackedWidgetGrid`](../app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt) uses four columns and a 24 dp gap; each unit's width/height is `(available dimension − 3 × gap) / 4`. [`ApprovedWidgetPacking.pack`](../app/src/main/java/com/immortal/launcher/ApprovedWidgetPacking.kt) packs input-ordered rectangles into scrollable rows, clamping widths to the column count and heights to 1–4. `ApprovedWidgetCell`'s Size action cycles `nextWidgetSpan`: **1×1 → 2×1 → 2×2 → 1×1**; drag resizing supports spans up to 4 and commits `explicitSize=true`.
+[`HomePresentation.spans`](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomePresentation.kt) resolves these defaults. [`ApprovedPackedWidgetGrid`](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt) uses four columns and a 24 dp gap; each unit's width/height is `(available dimension − 3 × gap) / 4`. [`ApprovedWidgetPacking.pack`](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedWidgetPacking.kt) packs input-ordered rectangles into scrollable rows, clamping widths to the column count and heights to 1–4. `ApprovedWidgetCell`'s Size action cycles `nextWidgetSpan`: **1×1 → 2×1 → 2×2 → 1×1**; drag resizing supports spans up to 4 and commits `explicitSize=true`.
 
 Most custom content uses `ImmortalWidgetShell`: 30 dp padding, heading, 22 dp spacing, and a vertically scrollable body. Resizing generally changes the container, not the information hierarchy. List widgets receive `listRows(widget.spanY) = (saved height × 3).coerceIn(2,12)`; HA receives saved height clamped to 1–4 for its tile-row limit. These limits use saved height, not the resolved presentation height. There is no shared small/medium/large content-variant contract.
 
 ## All custom kinds and hosted Android providers
 
-`openApprovedHomeSettings(page)` means the exact extension in [`ApprovedHomeNavigation.kt`](../app/src/main/java/com/immortal/launcher/ApprovedHomeNavigation.kt), which uses `approvedSettingsIntent`; route definitions live in [`ApprovedSettingsNavigation.kt`](../app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt). “No dedicated error/loading state” below describes rendered UI, not an absence of background work.
+`openApprovedHomeSettings(page)` means the exact extension in [`ApprovedHomeNavigation.kt`](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomeNavigation.kt), which uses `approvedSettingsIntent`; route definitions live in [`ApprovedSettingsNavigation.kt`](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt). “No dedicated error/loading state” below describes rendered UI, not an absence of background work.
 
 | Kind / active renderer | Data and source | Settings / action symbols | States currently rendered | Default span / adaptation | Source-supported gaps |
 |---|---|---|---|---|---|
@@ -41,15 +41,15 @@ Most custom content uses `ImmortalWidgetShell`: 30 dp padding, heading, 22 dp sp
 
 ## Gallery and settings boundaries
 
-[`ApprovedHomeWidgetLibraryScreen`](../app/src/main/java/com/immortal/launcher/ApprovedHomeWidgetLibrary.kt) is a retained-Home Compose dialog with **three fixed columns**, 244 dp minimum-height cards and 24 dp gaps. Cards have an icon/image, title and metadata; they are not live content/size previews. `ApprovedWidgetLibrary` supplies all 14 custom choices plus Android providers, with Options gated by advanced settings. “On your home” is a label; selecting an existing custom kind still invokes `onAdd`, so duplicates can be created. The reviewed gallery has no per-widget size/state preview selector.
+[`ApprovedHomeWidgetLibraryScreen`](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomeWidgetLibrary.kt) is a retained-Home Compose dialog with **three fixed columns**, 244 dp minimum-height cards and 24 dp gaps. Cards have an icon/image, title and metadata; they are not live content/size previews. `ApprovedWidgetLibrary` supplies all 14 custom choices plus Android providers, with Options gated by advanced settings. “On your home” is a label; selecting an existing custom kind still invokes `onAdd`, so duplicates can be created. The reviewed gallery has no per-widget size/state preview selector.
 
-[`SettingsRegistry`](../app/src/main/java/com/immortal/launcher/settings/SettingsDomain.kt) is declared in `SettingsDomain.kt`; its registered domains are `screensaver`, `calendar`, `immortal`, `mqtt`, `quickbar`, `fleet`, `chime`, `digitalclock`, `welcome`, `sunrise`, `home_dashboard`, and `calendarpacks`. Do not infer a domain merely from a widget's kind or settings page name.
+[`SettingsRegistry`](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomain.kt) is declared in `SettingsDomain.kt`; its registered domains are `screensaver`, `calendar`, `immortal`, `mqtt`, `quickbar`, `fleet`, `chime`, `digitalclock`, `welcome`, `sunrise`, `home_dashboard`, and `calendarpacks`. Do not infer a domain merely from a widget's kind or settings page name.
 
 Weather's scalar preferences and Calendar's feed/screensaver options use `SettingsDomains` specs and `apply`; calendar `widgetOn` explicitly controls the screensaver, not Home visibility. Rich world-clock, alarm, crypto, task, news, stock, options and HA editors are dispatched as `*Content` pages by `ImmortalSettingsActivity` and use their existing stores/configuration mechanisms. For example, `WorldClockContent` directly calls `ImmortalSettings.setWorldClockZones`, and the alarm widget directly sets enabled state and reschedules. These existing paths should be evaluated when planning registry coverage; this inventory does not assert that every custom widget setting already has a `SettingSpec`. Photo-source connection forms are separate source editors, not provider configuration.
 
 ## The “iOS” mock is an Android Compose showcase
 
-[`IosWidgetsMockActivity`](../app/src/debug/java/com/immortal/launcher/mock/IosWidgetsMockActivity.kt) is a debug Android `ComponentActivity` calling Compose `WidgetsShowcaseScreen`. It is **not a Swift/iOS application or WidgetKit implementation**. The family labels and shapes are useful design references, but the displayed values are hard-coded:
+[`IosWidgetsMockActivity`](https://github.com/starbrightlab/immortal/blob/main/app/src/debug/java/com/immortal/launcher/mock/IosWidgetsMockActivity.kt) is a debug Android `ComponentActivity` calling Compose `WidgetsShowcaseScreen`. It is **not a Swift/iOS application or WidgetKit implementation**. The family labels and shapes are useful design references, but the displayed values are hard-coded:
 
 | Showcase family | Exact component symbols | Implemented showcase sizes/content |
 |---|---|---|
@@ -62,7 +62,7 @@ No loading, disconnected, permission, or error states are implemented in these s
 
 ## Browser gallery fixture contract
 
-[`catalog.json`](../mocks/portal-widget-gallery-20261102/catalog.json) is an array of the 14 custom kinds plus the hosted `appwidget` category. IDs exactly match `HomeWidgetStore` wire values. Every entry contains `id`, `name`, `description`, repository-relative `source`, exact renderer `sourceSymbol`, `local`, `sizes`, `sizeRationale`, and `states`. Each state contains `id`, `label`, `headline`, `value`, `detail`, `action`, and boolean `implemented`.
+[`catalog.json`](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/catalog.json) is an array of the 14 custom kinds plus the hosted `appwidget` category. IDs exactly match `HomeWidgetStore` wire values. Every entry contains `id`, `name`, `description`, repository-relative `source`, exact renderer `sourceSymbol`, `local`, `sizes`, `sizeRationale`, and `states`. Each state contains `id`, `label`, `headline`, `value`, `detail`, `action`, and boolean `implemented`.
 
 **All catalog content is anonymous, generated fixture data, never live app, household, account, photo or device data.** Source paths identify public code; they are not data endpoints. Action strings are labels for gallery demonstrations, not instructions to execute real operations. Photo fixtures request generated artwork and contain no image URL or household image. Example market values and provider identities are synthetic.
 

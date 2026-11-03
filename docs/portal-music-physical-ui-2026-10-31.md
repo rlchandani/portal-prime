@@ -35,8 +35,8 @@ Eight representative scenarios were visually reviewed: dark and light full
 player, selected queue, playlists, larger text, compact, Players and offline.
 No visible overlap was observed in those samples; all 59 captures were not
 individually reviewed. Ten sanitized captures are available in the
-[physical review](../mocks/portal-premium-player-20261030/family-music-review.html).
-The [receipt](../mocks/portal-premium-player-20261030/evidence/family-music-native/checks.json)
+[physical review](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/family-music-review.html).
+The [receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-native/checks.json)
 records the scope, assertions and restoration.
 
 ## Implementation and restoration

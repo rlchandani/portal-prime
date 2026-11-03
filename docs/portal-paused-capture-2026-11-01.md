@@ -86,7 +86,7 @@ and the performance collector ended inactive with zero listeners.
 Living Area was not touched.
 
 Household images, credentials, profiles, rollback APKs and raw traces remain
-outside Git. See the [sanitized receipt](../mocks/portal-premium-player-20261030/evidence/family-paused-capture/verification.json).
+outside Git. See the [sanitized receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-paused-capture/verification.json).
 The natural room-light comfort check remains pending because the user cannot
 test it now. Cold startup, animated-image residency, parked timing outliers
 and the full goal remain incomplete; provider/audio wiring stays deferred.

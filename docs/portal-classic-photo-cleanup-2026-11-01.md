@@ -62,7 +62,7 @@ brightness policy/value and both face caches match the baseline. The original
 test APK and Immortal Dream are restored; no instrumentation or performance
 collector remains. The system-server PID is unchanged. Living Area is untouched.
 
-[Before/after evidence](../mocks/portal-premium-player-20261030/evidence/family-classic-cleanup/comparison.json)
+[Before/after evidence](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-classic-cleanup/comparison.json)
 includes full baseline/final checks, configuration guards, unit totals, source
 hashes and a SHA-256 manifest. The separate seven-style legacy night-motion gap
 remains parked, and the user's natural room-light fade check remains pending.

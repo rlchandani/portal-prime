@@ -16,7 +16,7 @@ conditional lists themselves. Removing a pane for another tab or layout
 discarded those states; returning recreated a list at its default position.
 
 The production patch is confined to
-[MusicPlayerUi.kt](../app/src/main/java/com/immortal/launcher/MusicPlayerUi.kt).
+[MusicPlayerUi.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/MusicPlayerUi.kt).
 Two states now live beside the retained tab state, before the layout branch.
 Workspace and side-panel functions pass the appropriate state to each lazy list.
 
@@ -114,16 +114,16 @@ incomplete.
 
 ## Evidence
 
-[Before/after native gallery](../mocks/portal-premium-player-20261030/family-viewport-review.html),
-[original failures](../mocks/portal-premium-player-20261030/evidence/family-music-viewport/baseline-checks.json),
-[corrected assertions](../mocks/portal-premium-player-20261030/evidence/family-music-viewport/checks.json),
-[fresh unit gate](../mocks/portal-premium-player-20261030/evidence/family-music-viewport/unit-gate.json),
-[restoration](../mocks/portal-premium-player-20261030/evidence/family-music-viewport/verification.json)
-and [delivery time](../mocks/portal-premium-player-20261030/evidence/family-music-viewport/delivery-time.json)
+[Before/after native gallery](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/family-viewport-review.html),
+[original failures](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-viewport/baseline-checks.json),
+[corrected assertions](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-viewport/checks.json),
+[fresh unit gate](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-viewport/unit-gate.json),
+[restoration](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-viewport/verification.json)
+and [delivery time](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-viewport/delivery-time.json)
 support this scoped fix.
 
-[Seven independent checks after installation](../mocks/portal-premium-player-20261030/evidence/family-music-viewport/health.json)
+[Seven independent checks after installation](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-viewport/health.json)
 confirm Family identity, optimized artifact/flags, unchanged system process,
 inactive instrumentation/collector and restored Dream. The comparison gallery's
-[four theme/list combinations](../mocks/portal-premium-player-20261030/evidence/family-music-viewport/gallery-checks.json)
+[four theme/list combinations](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-viewport/gallery-checks.json)
 load their native before/after images in the browser.

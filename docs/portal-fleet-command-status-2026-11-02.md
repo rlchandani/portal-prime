@@ -49,4 +49,4 @@ performance, whole-product acceptance or rollback guarantee is claimed.
 
 Original observation clock: **2026-11-02 23:15:37–23:45:37 UTC**, including cleanup.
 It is inherited from the first observation during the earlier restore unit.
-[Sanitized structured evidence](../mocks/portal-widget-gallery-20261102/evidence/fleet-command-status-verification.json).
+[Sanitized structured evidence](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/fleet-command-status-verification.json).

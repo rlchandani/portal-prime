@@ -91,5 +91,5 @@ window/GPU/FPS behavior and physical night brightness comfort remain unaccepted.
 Living Area was not changed. Music provider/audio wiring remains deferred.
 The broader goal remains incomplete.
 
-[Sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-http-source-discovery/verification.json).
+[Sanitized verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-http-source-discovery/verification.json).
 Private credentials, snapshots and rollback artifacts remain outside Git.

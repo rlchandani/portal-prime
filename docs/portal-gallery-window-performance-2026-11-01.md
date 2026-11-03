@@ -80,7 +80,7 @@ it is not rerun for this evidence-only pass. The player sidecar finds no new
 unaddressed UI requirement within its source-review scope. Provider/audio wiring
 remains deferred.
 
-[Sanitized evidence](../mocks/portal-premium-player-20261030/evidence/family-gallery-warm/summary.json)
+[Sanitized evidence](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-gallery-warm/summary.json)
 includes the original targets, full Window histograms, scalar scene/work
 records, preservation guards, source hashes and a SHA-256 manifest.
 Credentials, source/configuration snapshots and rollback APKs remain private.

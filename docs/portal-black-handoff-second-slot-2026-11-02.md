@@ -84,7 +84,7 @@ candidate fails acceptance first.
 
 ## Restoration
 
-The [restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/restoration.json)
+The [restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/restoration.json)
 verifies all **97 settings**, sources, both face caches, persistent pin,
 accessibility configuration, test APK and unchanged system process. Brightness
 policy and raw brightness match the snapshot. Generated device fixtures are removed,
@@ -103,11 +103,11 @@ legacy night-motion issue and previously parked performance work remain incomple
 
 ## Evidence
 
-- [Baseline visual check](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/baseline-visual.json)
-- [Animation-only visual check](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/animation-only-visual.json)
-- [Final caller-gate visual check](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/caller-gate-visual.json)
-- [Final lifecycle observations](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/caller-gate-lifecycle.json)
-- [Fresh build and test receipt](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/unit-results.json)
-- [Rejected caller-gate implementation](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/rejected-caller-frame.patch)
-- [Bounded outcome](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/outcome.json)
-- [Evidence hashes](../mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/sha256.json)
+- [Baseline visual check](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/baseline-visual.json)
+- [Animation-only visual check](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/animation-only-visual.json)
+- [Final caller-gate visual check](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/caller-gate-visual.json)
+- [Final lifecycle observations](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/caller-gate-lifecycle.json)
+- [Fresh build and test receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/unit-results.json)
+- [Rejected caller-gate implementation](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/rejected-caller-frame.patch)
+- [Bounded outcome](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/outcome.json)
+- [Evidence hashes](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-black-handoff-second-slot/sha256.json)

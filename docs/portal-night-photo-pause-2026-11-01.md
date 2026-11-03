@@ -69,8 +69,8 @@ accepts controlled Smart Frame pan/zoom and an interrupted dissolve with
 **357/357 observations/assertions**. Its fixed-size, synthetic-metadata scope
 does not replace the physical room-light check or establish other renderers.
 
-[Native checks](../mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/checks.json),
-[restoration](../mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/verification.json),
-[unit results](../mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/unit-results.json),
-[discarded first checks](../mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/discarded-fixture-checks.json),
-[source/evidence hashes](../mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/sha256.json).
+[Native checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/checks.json),
+[restoration](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/verification.json),
+[unit results](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/unit-results.json),
+[discarded first checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/discarded-fixture-checks.json),
+[source/evidence hashes](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-photo-pause/sha256.json).

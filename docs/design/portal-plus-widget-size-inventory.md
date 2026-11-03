@@ -20,16 +20,16 @@ Line numbers describe the source read for this audit and can move during main's 
 
 | Reference | Source responsibility |
 |---|---|
-| [Store:22–63](../../app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L22), [Store:70–172](../../app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L70) | Kinds, identity, default spans, migration, size cycle, normalization and persistence |
-| [H:1155–1179](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1155), [H:907–944](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L907) | Home viewport and the same paged widgets for both modes |
-| [Presentation:26–79](../../app/src/main/java/com/immortal/launcher/HomePresentation.kt#L26) | Four ordinary widgets per page, shared first-photo hero, saved-order projection, effective spans and move |
-| [H:703–836](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L703) | Grid/cell entry, retained pages, move dialog and removal |
-| [Packing:29–65](../../app/src/main/java/com/immortal/launcher/ApprovedWidgetPacking.kt#L29), [Grid:47–195](../../app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L47) | First-fit packing, fixed measurements, scroll viewport, held move draft and release |
-| [H:579–699](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L579) | Shared surface, body, Customize overlay/footer, resize draft and commit |
-| [H:2733–2792](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2733) | Actual built-in dispatcher and shared scrolling shell |
-| [H:840–878](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L840) | Actual Android provider host and dimension options |
-| [H:1047–1099](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1047), [H:1204–1223](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1204) | Store owner, built-in add, provider bind/configure results, library and Customize transitions |
-| [H:4938–5000](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4938), [Library:66–173](../../app/src/main/java/com/immortal/launcher/ApprovedHomeWidgetLibrary.kt#L66) | All 14 built-in choices plus Android provider selection; Options choice is Advanced-only |
+| [Store:22–63](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L22), [Store:70–172](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L70) | Kinds, identity, default spans, migration, size cycle, normalization and persistence |
+| [H:1155–1179](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1155), [H:907–944](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L907) | Home viewport and the same paged widgets for both modes |
+| [Presentation:26–79](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomePresentation.kt#L26) | Four ordinary widgets per page, shared first-photo hero, saved-order projection, effective spans and move |
+| [H:703–836](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L703) | Grid/cell entry, retained pages, move dialog and removal |
+| [Packing:29–65](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedWidgetPacking.kt#L29), [Grid:47–195](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L47) | First-fit packing, fixed measurements, scroll viewport, held move draft and release |
+| [H:579–699](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L579) | Shared surface, body, Customize overlay/footer, resize draft and commit |
+| [H:2733–2792](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2733) | Actual built-in dispatcher and shared scrolling shell |
+| [H:840–878](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L840) | Actual Android provider host and dimension options |
+| [H:1047–1099](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1047), [H:1204–1223](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1204) | Store owner, built-in add, provider bind/configure results, library and Customize transitions |
+| [H:4938–5000](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4938), [Library:66–173](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomeWidgetLibrary.kt#L66) | All 14 built-in choices plus Android provider selection; Options choice is Advanced-only |
 
 The active chain is `HomeActivity.onCreate → LauncherScreen → HOME →
 ApprovedHomePagedWidgets → ApprovedWidgetArea → ApprovedWidgetPage →
@@ -42,7 +42,7 @@ Do not substitute nearby legacy bodies for this chain. `ImmortalWeatherWidget`,
 `updateWidgetSizeOptions` remain in `HomeActivity.kt`, but approved Home calls
 `ApprovedHomeWeather`, `ApprovedHomePhoto` and `ApprovedHostedWidget`.
 In particular, the old provider helper's 16/20 dp gutter math
-([H:4779](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4779))
+([H:4779](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4779))
 does not describe the approved 24 dp grid.
 
 ## Span contract, defaults and actual measurements
@@ -53,8 +53,8 @@ There are **14 built-in kinds + 1 Android provider kind** in
 `quick_controls`, `photo_memory`; `appwidget`).
 Unknown custom kind strings can deserialize with a nonblank `customId`; their
 fallback is `UnknownImmortalWidget`, not a fifteenth built-in
-([Store:150–166](../../app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L150),
-[H:4139](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4139)).
+([Store:150–166](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L150),
+[H:4139](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4139)).
 
 Every kind has the same host-supported range: `spanX = 1..4`, `spanY = 1..4`.
 Persistence clamps each axis, packing clamps width to four and height to four,
@@ -70,8 +70,8 @@ does not remove already saved Options widgets from the dispatcher.
 | Android provider | Each axis estimated from provider `minWidth/minHeight` using 128 dp units, clamped then raised to at least 2: `2..4` on each axis | Exact saved dimensions; providers bypass legacy remapping | Host allows every `1..4` pair |
 
 These are presentation mappings, not store rewrites
-([Presentation:53–66](../../app/src/main/java/com/immortal/launcher/HomePresentation.kt#L53),
-[H:1205–1208](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1205)).
+([Presentation:53–66](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomePresentation.kt#L53),
+[H:1205–1208](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1205)).
 `HomeWidgetStore.custom()` alone defaults to `2×2` for every custom kind; library
 add and one-time dashboard migration supply `spanY=1` for the three former
 dashboard cards. Any saved nondefault pair is already honored even without
@@ -80,8 +80,8 @@ dashboard cards. Any saved nondefault pair is already honored even without
 Provider estimates use `appWidgetMinDp`: nonpositive becomes zero, values below
 1000 are treated as plain dp, larger values are decoded as Android complex
 dimensions. `estimateWidgetSpan` then applies integer-like ceiling math with
-128 dp units ([H:1638](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1638),
-[H:4748–4808](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4748)).
+128 dp units ([H:1638](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1638),
+[H:4748–4808](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4748)).
 This estimate is not calculated from the measured Home cell width/height.
 Approved resizing does not consult `resizeMode`, `minResizeWidth` or
 `minResizeHeight`; provider compatibility requires actual provider evidence.
@@ -100,9 +100,9 @@ cellHeight(Y) = Y*row    + (Y-1)*gap
 Actual cell measurements use the corresponding pixel step, rounded and floored
 at one pixel. `Layout` supplies `Constraints.fixed(width,height)` to every cell.
 The scrollable grid has at least four rows and grows to the last packed rectangle
-([Grid:66–86](../../app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L66),
-[Grid:119–123](../../app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L119),
-[Grid:181–193](../../app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L181)).
+([Grid:66–86](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L66),
+[Grid:119–123](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L119),
+[Grid:181–193](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L181)).
 Thus four **span rows** describe one viewport's height, but a page can pack beyond
 that height and scroll. Pages are divided by item count, not by rectangle area:
 up to four ordinary widgets plus the shared first photo.
@@ -122,8 +122,8 @@ Column. Under ordinary bounds this leaves approximately `cellHeight−114 dp`
 for the body viewport. It provides scrolling, not compact font/layout
 breakpoints. The heading has a 27 dp icon, two 12 dp gaps, an expanding title
 at 24 sp/32 sp line height and a fixed `68×32 dp` Open box
-([H:2786–2791](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2786),
-[UI:116–128](../../app/src/main/java/com/immortal/launcher/ApprovedHomeUi.kt#L116)).
+([H:2786–2791](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2786),
+[UI:116–128](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomeUi.kt#L116)).
 That costs 119 dp before any title width, plus the 60 dp shell padding.
 Exact semantics/touch expansion needs measurement; the source explicitly
 measures the Open box at 32 dp high.
@@ -136,27 +136,27 @@ This is the precise extent of current content responsiveness.
 
 | Kind / actual body call chain | Width/height adaptation proved by source | Fixed content/minimums and estimated 1×1 risk |
 |---|---|---|
-| `weather` → `ApprovedHomeWeather` ([Weather:25–84](../../app/src/main/java/com/immortal/launcher/ApprovedHomeWeather.kt#L25)) | Same 30 dp/32 dp/22 dp shell anatomy; body vertically scrolls. Temperature gets Row weight; forecast takes five equal-weight columns with 8 dp gaps. Off omits forecast strip; Hourly/Daily changes content. No size-driven count or type scale. | 94 sp temperature, 100 sp line height beside a 72 dp icon or 60 sp emoji; city 26/34 sp, forecast 18–24 sp. Narrow width can severely constrain temperature/forecast columns; short height may show little beyond heading. Test unavailable, negative/three-digit temperature, long city and five forecasts. |
-| `world_clock` → `ImmortalWorldClockWidget` → S ([H:3271–3304](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3271)) | First four selected zones only, at every span; stacked clocks scroll. No width adaptation or height-based clock count. | Time 48 sp with **100 sp** line height; city/weekday 22/30 sp, 12 dp top gap and 22 dp between clocks. Long 12-hour time/city can wrap; even one clock consumes substantial scroll content. AnalogClock is not called by this body. |
-| `timers` → `ImmortalTimersWidget` → S → `TimerChip` ([H:3367–3441](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3367), [H:4121](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4121)) | Scroll body; FlowRow wraps controls with 8 dp gaps. Ready/running/paused/ringing states choose different chips. | 48/100 sp readout; 22/30 sp secondary line; chips min 52 dp high, 16 dp horizontal/11 dp vertical padding. Wrapping is real responsiveness, but short cards may require scrolling to start/pause/stop. |
-| `calendar` → `ApprovedHomeCalendar` ([Calendar:31–82](../../app/src/main/java/com/immortal/launcher/ApprovedHomeCalendar.kt#L31)) | 30 dp shell, fixed heading/gap, weighted `LazyColumn`, keyed event rows. Does **not** use `listRows`; content preparation supplies rows independently of span. | Kicker 18/24 sp, 10 dp gap, event rule `4×67 dp`, 18 dp horizontal gap, title 24/32 sp max two lines; 23 dp inter-item gaps. Setup copy and Add calendar use the same small viewport. |
-| `alarm` → `ImmortalAlarmWidget` → S ([H:3450–3520](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3450)) | Scroll body; 12/24-hour conditionally adds AM/PM. No span-specific typography. | 48/100 sp time plus 22/30 sp suffix; status max two lines at 22/30 sp; 20 dp gap; toggle `64×38 dp` with 30 dp thumb. Readout and toggle reachability need separate small-size checks. |
-| `crypto` → `ImmortalCryptoWidget` → S → `CryptoRow` → `Sparkline`/`ChangePill` ([H:3530–3599](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3530)) | Height cap `3,6,9,12` quotes for saved Y `1,2,3,4`; scroll body. Symbol has weight; price does not. 16 dp row gaps. | Symbol/price 26/35 sp; 64×22 dp sparkline beside 18/24 sp change pill with min 56 dp width after padding. Large price can dominate the available width; no compact price/spark variant. |
-| `todo` → `ImmortalTodoWidget` → S → `TodoRow` ([H:3640–3701](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3640)) | Height cap `3,6,9,12`; unfinished first; scroll body. Text has weight and one-line ellipsis. | Rows min 52 dp with 8 dp vertical padding, 26/35 sp glyph/text, 12 dp gap; 8 dp between rows; footer 22/30 sp after 16 dp. Three rows at Y=1 is a cap, not a promise that three are visible together. |
-| `news` → `ImmortalNewsWidget` → S ([H:3710–3762](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3710)) | Height cap `3,6,9,12`; interleaved feeds; scroll body; full-width clickable headlines. | 26/35 sp headlines, max two lines/ellipsis, 16 dp between them. Long/unbroken titles and small viewport need article-action reachability checks. |
-| `stocks` → `ImmortalStocksWidget` → S → `StockRow`/`ChangePill` ([H:3781–3825](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3781)) | Height cap `3,6,9,12`; scroll body; weighted symbol and unweighted price, 16 dp row gaps. | 26/35 sp price and symbol; pill below with 8 dp gap. Large formatted price and long symbol have no width breakpoint. Test disconnected/empty/loading/no-quotes as well as populated. |
-| `options` → `ImmortalOptionsWidget` → S → `OptionRow` ([H:3835–3897](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3835)) | Height cap `3,6,9,12`; scroll body; two-line contract label. Library add/editor require Advanced; existing body still renders. | Always adds 18/24 sp delta band with 12 dp bottom gap; label 26/35 sp max two lines, delta/mid price 18/24 and 22/30 sp in one Row. Tall row content and large strikes/premiums need checks. |
-| `ha` → `ImmortalHaWidget` → S → `HaTile`/`HaSensorTile` ([H:3916–3995](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3916), [H:4004–4060](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4004)) | Takes `Y` rows of two entities, i.e. at most `2,4,6,8`; scroll body. Always two columns, 14 dp gaps, spare half-width for odd last row. | Tiles min 150 dp high, 20 dp padding; control icon 32 dp, name 23/30 sp, state 20/27 sp; sensor value 26/35 sp, name 22/30 sp max two lines. A single entity still occupies half body width. No one-column compact layout. |
-| `today` → `TodayStripWidget` → S → `TodayRow` ([H:2911–3044](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2911)) | Scroll body; optional event, alarm, open-to-do count, countdown; weather/sun/moon copy. No span-driven row count. | Event title 24/32 sp max two lines and 67 dp rule; weather 22/32 sp; secondary rows 26/35 sp with 30 dp glyph, trailing 22/30 sp max 160 dp. Source hides absent optional data, not data based on size. |
-| `quick_controls` → `QuickControlsWidget` → S ([H:2851–2900](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2851)) | Installed-app-dependent zero to five tiles; always chunked in twos, vertically scrolls; odd last tile remains half-width. | Tiles min 150 dp, 20 dp padding, 32 dp icon, 23/30 sp label (one-line ellipsis), 20/27 sp description without maxLines. Narrow half-tile descriptions can grow vertically. Header Open goes to Display, while Customize Settings goes to Quick buttons. |
-| `photo_memory` → `ApprovedHomePhoto` ([Photo:75–129](../../app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt#L75)) | Image fills cell with `ContentScale.Crop`; gradient fills cell. Caption bottom-aligned, no content scroll or size breakpoint. First photo is shared across pages; additional photos ordinary paged widgets. | Caption inset 36 dp horizontal/34 dp vertical, title 36/46 sp, subtitle 22/30 sp with 12 dp gap, neither has maxLines. One-line nominal caption needs about 156 dp total vertical budget; wrapping/font scale increases it. Cropping the image is intentional source behavior, not evidence that caption is clipped. |
-| `appwidget` → `ApprovedHostedWidget` ([H:840–878](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L840)) | Actual `BoxWithConstraints` width/height rounded to dp, equal MIN/MAX options sent on dimension change; `AndroidView` fills cell with zero padding. Provider owns its body. Editing adds a scrim and disables host/descendant focus. | No launcher compact typography or provider minimum validation. Missing-info branch has 30 dp padding, 26/35 sp unavailable text and package 22/30 sp max two lines. Need live provider-specific content and minimum-size certification; class/category coverage alone is insufficient. |
+| `weather` → `ApprovedHomeWeather` ([Weather:25–84](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomeWeather.kt#L25)) | Same 30 dp/32 dp/22 dp shell anatomy; body vertically scrolls. Temperature gets Row weight; forecast takes five equal-weight columns with 8 dp gaps. Off omits forecast strip; Hourly/Daily changes content. No size-driven count or type scale. | 94 sp temperature, 100 sp line height beside a 72 dp icon or 60 sp emoji; city 26/34 sp, forecast 18–24 sp. Narrow width can severely constrain temperature/forecast columns; short height may show little beyond heading. Test unavailable, negative/three-digit temperature, long city and five forecasts. |
+| `world_clock` → `ImmortalWorldClockWidget` → S ([H:3271–3304](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3271)) | First four selected zones only, at every span; stacked clocks scroll. No width adaptation or height-based clock count. | Time 48 sp with **100 sp** line height; city/weekday 22/30 sp, 12 dp top gap and 22 dp between clocks. Long 12-hour time/city can wrap; even one clock consumes substantial scroll content. AnalogClock is not called by this body. |
+| `timers` → `ImmortalTimersWidget` → S → `TimerChip` ([H:3367–3441](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3367), [H:4121](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4121)) | Scroll body; FlowRow wraps controls with 8 dp gaps. Ready/running/paused/ringing states choose different chips. | 48/100 sp readout; 22/30 sp secondary line; chips min 52 dp high, 16 dp horizontal/11 dp vertical padding. Wrapping is real responsiveness, but short cards may require scrolling to start/pause/stop. |
+| `calendar` → `ApprovedHomeCalendar` ([Calendar:31–82](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomeCalendar.kt#L31)) | 30 dp shell, fixed heading/gap, weighted `LazyColumn`, keyed event rows. Does **not** use `listRows`; content preparation supplies rows independently of span. | Kicker 18/24 sp, 10 dp gap, event rule `4×67 dp`, 18 dp horizontal gap, title 24/32 sp max two lines; 23 dp inter-item gaps. Setup copy and Add calendar use the same small viewport. |
+| `alarm` → `ImmortalAlarmWidget` → S ([H:3450–3520](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3450)) | Scroll body; 12/24-hour conditionally adds AM/PM. No span-specific typography. | 48/100 sp time plus 22/30 sp suffix; status max two lines at 22/30 sp; 20 dp gap; toggle `64×38 dp` with 30 dp thumb. Readout and toggle reachability need separate small-size checks. |
+| `crypto` → `ImmortalCryptoWidget` → S → `CryptoRow` → `Sparkline`/`ChangePill` ([H:3530–3599](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3530)) | Height cap `3,6,9,12` quotes for saved Y `1,2,3,4`; scroll body. Symbol has weight; price does not. 16 dp row gaps. | Symbol/price 26/35 sp; 64×22 dp sparkline beside 18/24 sp change pill with min 56 dp width after padding. Large price can dominate the available width; no compact price/spark variant. |
+| `todo` → `ImmortalTodoWidget` → S → `TodoRow` ([H:3640–3701](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3640)) | Height cap `3,6,9,12`; unfinished first; scroll body. Text has weight and one-line ellipsis. | Rows min 52 dp with 8 dp vertical padding, 26/35 sp glyph/text, 12 dp gap; 8 dp between rows; footer 22/30 sp after 16 dp. Three rows at Y=1 is a cap, not a promise that three are visible together. |
+| `news` → `ImmortalNewsWidget` → S ([H:3710–3762](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3710)) | Height cap `3,6,9,12`; interleaved feeds; scroll body; full-width clickable headlines. | 26/35 sp headlines, max two lines/ellipsis, 16 dp between them. Long/unbroken titles and small viewport need article-action reachability checks. |
+| `stocks` → `ImmortalStocksWidget` → S → `StockRow`/`ChangePill` ([H:3781–3825](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3781)) | Height cap `3,6,9,12`; scroll body; weighted symbol and unweighted price, 16 dp row gaps. | 26/35 sp price and symbol; pill below with 8 dp gap. Large formatted price and long symbol have no width breakpoint. Test disconnected/empty/loading/no-quotes as well as populated. |
+| `options` → `ImmortalOptionsWidget` → S → `OptionRow` ([H:3835–3897](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3835)) | Height cap `3,6,9,12`; scroll body; two-line contract label. Library add/editor require Advanced; existing body still renders. | Always adds 18/24 sp delta band with 12 dp bottom gap; label 26/35 sp max two lines, delta/mid price 18/24 and 22/30 sp in one Row. Tall row content and large strikes/premiums need checks. |
+| `ha` → `ImmortalHaWidget` → S → `HaTile`/`HaSensorTile` ([H:3916–3995](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3916), [H:4004–4060](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4004)) | Takes `Y` rows of two entities, i.e. at most `2,4,6,8`; scroll body. Always two columns, 14 dp gaps, spare half-width for odd last row. | Tiles min 150 dp high, 20 dp padding; control icon 32 dp, name 23/30 sp, state 20/27 sp; sensor value 26/35 sp, name 22/30 sp max two lines. A single entity still occupies half body width. No one-column compact layout. |
+| `today` → `TodayStripWidget` → S → `TodayRow` ([H:2911–3044](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2911)) | Scroll body; optional event, alarm, open-to-do count, countdown; weather/sun/moon copy. No span-driven row count. | Event title 24/32 sp max two lines and 67 dp rule; weather 22/32 sp; secondary rows 26/35 sp with 30 dp glyph, trailing 22/30 sp max 160 dp. Source hides absent optional data, not data based on size. |
+| `quick_controls` → `QuickControlsWidget` → S ([H:2851–2900](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2851)) | Installed-app-dependent zero to five tiles; always chunked in twos, vertically scrolls; odd last tile remains half-width. | Tiles min 150 dp, 20 dp padding, 32 dp icon, 23/30 sp label (one-line ellipsis), 20/27 sp description without maxLines. Narrow half-tile descriptions can grow vertically. Header Open goes to Display, while Customize Settings goes to Quick buttons. |
+| `photo_memory` → `ApprovedHomePhoto` ([Photo:75–129](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt#L75)) | Image fills cell with `ContentScale.Crop`; gradient fills cell. Caption bottom-aligned, no content scroll or size breakpoint. First photo is shared across pages; additional photos ordinary paged widgets. | Caption inset 36 dp horizontal/34 dp vertical, title 36/46 sp, subtitle 22/30 sp with 12 dp gap, neither has maxLines. One-line nominal caption needs about 156 dp total vertical budget; wrapping/font scale increases it. Cropping the image is intentional source behavior, not evidence that caption is clipped. |
+| `appwidget` → `ApprovedHostedWidget` ([H:840–878](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L840)) | Actual `BoxWithConstraints` width/height rounded to dp, equal MIN/MAX options sent on dimension change; `AndroidView` fills cell with zero padding. Provider owns its body. Editing adds a scrim and disables host/descendant focus. | No launcher compact typography or provider minimum validation. Missing-info branch has 30 dp padding, 26/35 sp unavailable text and package 22/30 sp max two lines. Need live provider-specific content and minimum-size certification; class/category coverage alone is insufficient. |
 
 `listRows(Y) = (Y*3).coerceIn(2,12)` actually produces **3**, not two, at Y=1
-([H:2759–2764](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2759)).
+([H:2759–2764](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L2759)).
 All row caps are applied before rendering (`take`), so scrolling cannot reveal
 items beyond the selected cap. HA still fetches states for all pinned IDs
-([H:3927–3934](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3927)).
+([H:3927–3934](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3927)).
 Resizing therefore changes rendered quantity, not necessarily fetch quantity.
 
 ## Source-proven findings versus unmeasured risks
@@ -164,11 +164,11 @@ Resizing therefore changes rendered quantity, not necessarily fetch quantity.
 | ID | Source-proven fact / gap | What is NOT established |
 |---|---|---|
 | S1 | Normal and Customize use the same page projection, packing, exact cell constraints and body dispatcher. Customize adds an input overlay, footer, resize handle, semantics clearing and provider scrim. Its footer does not reserve space inside the body. | Identical visible pixels/content or unobscured controls in Customize. Geometry parity is distinct from the editing overlay intentionally covering body area. |
-| S2 | All 16 span pairs are accepted, but Size cycles only `1×1 → 2×1 → 2×2 → 1×1`; any other effective pair jumps to `1×1`. There is no full-range non-drag size picker in this path ([Store:84–89](../../app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L84), [H:630–633](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L630)). | A failure of drag sizing. The source gap is that the named Size alternative reaches only 3 of 16 pairs; the other 13 require drag or an external layout write. |
+| S2 | All 16 span pairs are accepted, but Size cycles only `1×1 → 2×1 → 2×2 → 1×1`; any other effective pair jumps to `1×1`. There is no full-range non-drag size picker in this path ([Store:84–89](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L84), [H:630–633](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L630)). | A failure of drag sizing. The source gap is that the named Size alternative reaches only 3 of 16 pairs; the other 13 require drag or an external layout write. |
 | S3 | Built-in bodies do not switch typography/layout by measured size; list/HA caps use saved Y, not the effective span argument passed to the cell. Scroll/crop/weight/FlowRow are the actual adaptation mechanisms. | A guarantee that any given small widget is unusable or clipped. Measuring actual 1×1 bounds and scrolling/actions is required. |
-| S4 | Every cell's resize release builds a **whole replacement list** with `widgets.map`, then `saveWidgets` assigns and saves it. There is no key-based mutation applied against current owner state, revision check or global resize-owner gate ([H:667–686](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L667), [H:1052–1055](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1052)). `ResizeBadge` uses latest callbacks, but still receives composition snapshots ([H:4440–4465](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4440)). | That two independent cells actually recognize simultaneous drags, or that updates were lost on hardware. If two release callbacks consume the same pre-recomposition list, the second replacement can restore the first widget's old span. Test both release orders within a frame and with recomposition between them. |
+| S4 | Every cell's resize release builds a **whole replacement list** with `widgets.map`, then `saveWidgets` assigns and saves it. There is no key-based mutation applied against current owner state, revision check or global resize-owner gate ([H:667–686](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L667), [H:1052–1055](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1052)). `ResizeBadge` uses latest callbacks, but still receives composition snapshots ([H:4440–4465](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4440)). | That two independent cells actually recognize simultaneous drags, or that updates were lost on hardware. If two release callbacks consume the same pre-recomposition list, the second replacement can restore the first widget's old span. Test both release orders within a frame and with recomposition between them. |
 | S5 | The shared heading Open box is explicitly `68×32 dp`; the inline alarm toggle is `64×38 dp`; footer actions have min 52 dp height but weighted widths. Their measured dimensions alone do not provide a 48×48 dp guarantee. | Actual hit rectangles, overlapping expanded targets, physical misses or focus behavior. Compose minimum touch expansion and the main-owned TvFocus candidate must be measured. The current TvFocus source adds click/focus treatment, not a size-specific widget layout. |
-| S6 | Timers inline controls and inline Custom timer use `TimerStore` (`immortal_timer`), but heading Open and Customize Settings host `ApprovedHomeTimersPage → TimersOverlay`, which uses `TimerConfig` (`immortal_timers`). These are separate persisted stores and alarm paths ([Navigation:65–89](../../app/src/main/java/com/immortal/launcher/ApprovedHomeNavigation.kt#L65), [Overlay:288–368](../../app/src/main/java/com/immortal/launcher/HomeToolOverlays.kt#L288), [TimerStore:29–35](../../app/src/main/java/com/immortal/launcher/TimerStore.kt#L29), [TimerConfig:20–23](../../app/src/main/java/com/immortal/launcher/TimerConfig.kt#L20)). | A native failure or a mandated unification patch. The concrete integration discrepancy is that the page reached as this widget's editor does not read/write the widget countdown. Main should verify expected user behavior before deciding scope. |
+| S6 | Timers inline controls and inline Custom timer use `TimerStore` (`immortal_timer`), but heading Open and Customize Settings host `ApprovedHomeTimersPage → TimersOverlay`, which uses `TimerConfig` (`immortal_timers`). These are separate persisted stores and alarm paths ([Navigation:65–89](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomeNavigation.kt#L65), [Overlay:288–368](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeToolOverlays.kt#L288), [TimerStore:29–35](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/TimerStore.kt#L29), [TimerConfig:20–23](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/TimerConfig.kt#L20)). | A native failure or a mandated unification patch. The concrete integration discrepancy is that the page reached as this widget's editor does not read/write the widget countdown. Main should verify expected user behavior before deciding scope. |
 | S7 | Quick controls heading Open navigates to `display`; its Customize Settings maps to `quickbar`. Tiles launch installed apps and do not consume QuickBarConfig. | That either route crashes or user expectations require a particular new setting. Main should verify the two handoffs explicitly. |
 | S8 | Provider dimensions are advertised from the actual cell, but host resizing ignores provider resize permissions/minimums. `remember(appWidgetId)` caches info; missing provider metadata uses a fallback and is not automatically pruned by the approved path. | Any specific provider rendering/input failure, or timely recovery after uninstall/reinstall. The legacy `filterLiveWidgets` helper is not called by this approved chain. |
 
@@ -180,8 +180,8 @@ These are screening estimates; **none is an observed clipping or runtime failure
   padding for the 48 dp handle. It has four equal-weight actions, each with
   6 dp horizontal padding and 18 sp text/26 sp line height, `maxLines=1`, no
   width breakpoint and no explicit ellipsis
-  ([H:624–658](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L624),
-  [H:694–699](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L694)).
+  ([H:624–658](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L624),
+  [H:694–699](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L694)).
   For a cell width `C`, each action's nominal text budget is
   `(C−64)/4−12 dp`. At font scale 1.3, 18 sp is nominally 23.4 dp and
   26 sp line height is 33.8 dp; widths do not expand. Measure **Settings** and
@@ -210,49 +210,49 @@ provider's allocated widget ID only on confirmation.
 
 | Entry / source | Draft, confirmation and persistence boundary |
 |---|---|
-| Customize / Done / Back ([H:1112](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1112), [H:1133](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1133)) | Changes mode. Done is not a global transaction save and Back does not undo already committed layout edits. |
-| Resize ([H:667–686](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L667), [H:4433–4465](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4433)) | Start captures effective display span and measured grid units. Drag changes local accumulator/draft outline only; snap step is `sign(delta)*floor(abs(delta/unit)+.35)`, threshold about .65 unit. RTL negates horizontal delta. Release saves once only if final pair differs from start, marking explicit. Cancel clears draft; detector disposal cancels an active gesture. Body does not resize live during draft. |
+| Customize / Done / Back ([H:1112](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1112), [H:1133](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1133)) | Changes mode. Done is not a global transaction save and Back does not undo already committed layout edits. |
+| Resize ([H:667–686](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L667), [H:4433–4465](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4433)) | Start captures effective display span and measured grid units. Drag changes local accumulator/draft outline only; snap step is `sign(delta)*floor(abs(delta/unit)+.35)`, threshold about .65 unit. RTL negates horizontal delta. Release saves once only if final pair differs from start, marking explicit. Cancel clears draft; detector disposal cancels an active gesture. Body does not resize live during draft. |
 | Size button | Immediate whole-list save on each click; no modal draft/Cancel. Three-state cycle uses effective display span. |
-| Held move / numbered Move ([Grid:91–168](../../app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L91), [H:721–727](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L721)) | Grid move uses an ownership token and ghost; finish returns destination once, then owner callback saves reorder. Cancel/invalidation resets. Move dialog commits on destination selection; Close/Back/outside dismissal does not reorder. Numbered dialog reaches positions on other pages; held drag targets current page bounds with vertical edge scrolling. |
-| Remove ([H:824–833](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L824)) | Cancel/dismiss leaves store and provider ID. Confirm deletes provider ID when applicable and saves `without(key)`. |
+| Held move / numbered Move ([Grid:91–168](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedPackedWidgetGrid.kt#L91), [H:721–727](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L721)) | Grid move uses an ownership token and ghost; finish returns destination once, then owner callback saves reorder. Cancel/invalidation resets. Move dialog commits on destination selection; Close/Back/outside dismissal does not reorder. Numbered dialog reaches positions on other pages; held drag targets current page bounds with vertical edge scrolling. |
+| Remove ([H:824–833](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L824)) | Cancel/dismiss leaves store and provider ID. Confirm deletes provider ID when applicable and saves `without(key)`. |
 | Library built-in/provider add | Built-in selection immediately appends a fresh `customId`, saves and closes; choosing an existing family can add another instance. Provider allocates ID, binds, optionally configures; only successful completion appends/saves. Bind/configure cancellation/launch failure deletes pending ID. Configuration metadata and installed-provider set are external. |
-| Common Home dialogs ([H:882–902](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L882)) | Render only when Home and widget-page input are active; full-width fraction .8, max 880 dp width/1096 dp height, 36 dp padding, vertically scrolling content. Dismiss callback decides draft cancellation. Runtime focus restoration/scrim behavior is unverified. |
-| Weather / Calendar / Today ([Settings:328–335](../../app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt#L328), [Calendar URL:23–41](../../app/src/main/java/com/immortal/launcher/CalendarUrlEntryActivity.kt#L23)) | Weather and calendar scalar rows apply registry domains immediately. Today Settings maps to Calendar. Add calendar opens URL Activity: Use this calendar validates then registry-applies; Cancel/Back discards draft; Remove connection confirms before applying empty URL ([URL:58–120](../../app/src/main/java/com/immortal/launcher/UrlEntryScreen.kt#L58)). |
-| World clock ([Settings:1237–1293](../../app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt#L1237)) | Selected-city click immediately saves list; no whole-editor Save/rollback. First four shown; re-picking changes order. |
-| Timers inline ([H:3412–3441](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3412), [H:4065–4085](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4065)) | Preset/Start/Pause/Reset/Stop act immediately on TimerStore. Inline Custom timer drafts minutes 0..180 and seconds in five-second steps with wrapping; Start calls TimerStore only for positive duration; Cancel/Close discard. |
+| Common Home dialogs ([H:882–902](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L882)) | Render only when Home and widget-page input are active; full-width fraction .8, max 880 dp width/1096 dp height, 36 dp padding, vertically scrolling content. Dismiss callback decides draft cancellation. Runtime focus restoration/scrim behavior is unverified. |
+| Weather / Calendar / Today ([Settings:328–335](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt#L328), [Calendar URL:23–41](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/CalendarUrlEntryActivity.kt#L23)) | Weather and calendar scalar rows apply registry domains immediately. Today Settings maps to Calendar. Add calendar opens URL Activity: Use this calendar validates then registry-applies; Cancel/Back discards draft; Remove connection confirms before applying empty URL ([URL:58–120](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/UrlEntryScreen.kt#L58)). |
+| World clock ([Settings:1237–1293](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt#L1237)) | Selected-city click immediately saves list; no whole-editor Save/rollback. First four shown; re-picking changes order. |
+| Timers inline ([H:3412–3441](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L3412), [H:4065–4085](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L4065)) | Preset/Start/Pause/Reset/Stop act immediately on TimerStore. Inline Custom timer drafts minutes 0..180 and seconds in five-second steps with wrapping; Start calls TimerStore only for positive duration; Cancel/Close discard. |
 | Timers Open/Settings → tool page | Separate TimerConfig model (S6). Presets immediately add/schedule a named timer. Tool Custom dialog drafts hours/minutes/seconds; valid Start adds/schedules. Running timer Cancel asks Keep timer/Cancel timer; confirmation removes it. System Back from hosted page dismisses to Home; explicit Tools action selects Tools. |
-| Alarm ([Alarm editor:71–138](../../app/src/main/java/com/immortal/launcher/AlarmSettingsActivity.kt#L71)) | Editor Enabled, hour/minute steppers and weekdays save/reschedule immediately; no Cancel undo. Inline widget toggle separately calls setEnabled/reschedule immediately. |
-| Crypto ([Crypto editor:51–96](../../app/src/main/java/com/immortal/launcher/CryptoSettingsActivity.kt#L51)) | Manual fields draft; Add validates nonblank ID then persists; popular choices immediately add. Remove dialog confirms collection deletion. Cancel clears unsaved fields and returns, leaving prior adds/removes. |
-| To-do ([Todo editor:35–77](../../app/src/main/java/com/immortal/launcher/TodoSettingsActivity.kt#L35)) | Add drafts then persists nonblank item; Complete/Undo and widget row toggle immediately persist. Remove/Clear completed confirm. Editor Cancel does not roll back prior toggles/adds. |
-| News ([News editor:47–90](../../app/src/main/java/com/immortal/launcher/NewsSettingsActivity.kt#L47)) | Manual name/URL draft; valid HTTP(S) Add persists. Popular choices immediately add; removal confirms. Widget headline opens article link, blank link opens editor. Cancel discards unsaved fields only. |
-| Stocks / Alpaca ([Stocks editor:50–107](../../app/src/main/java/com/immortal/launcher/StocksSettingsActivity.kt#L50), [Alpaca:16–48](../../app/src/main/java/com/immortal/launcher/ApprovedEditorsAlpaca.kt#L16)) | Manual Add/popular symbols persist; remove confirms. Advanced gates Alpaca navigation. Credential form Save validates effective key+secret then writes pair atomically; blank means keep saved; Cancel discards draft, not previous saves. |
-| Options ([Options editor:38–127](../../app/src/main/java/com/immortal/launcher/OptionsSettingsActivity.kt#L38)) | Advanced-only editor; type picker/number dialogs edit outer draft. Number dialog Save does not persist scan config. Save scan settings or Add writes validated band/type/expiry (Add also ticker). Remove ticker confirms. Cancel restores unsaved outer draft and returns. Shared remove/number mechanics: [Editors UI:177–227](../../app/src/main/java/com/immortal/launcher/ApprovedEditorsUi.kt#L177). |
-| HA ([HA editor:52–129](../../app/src/main/java/com/immortal/launcher/HaSettingsActivity.kt#L52), [HA editor:151–258](../../app/src/main/java/com/immortal/launcher/HaSettingsActivity.kt#L151)) | URL/token draft; Save & connect persists atomic connection only after successful discovery and current-request check; Cancel/stop cancels request. Entity selection immediately pins; removal confirms. Widget controls call HA REST with local optimistic override; scenes activate; read-only sensors open dashboard. Resizing cannot be judged by state text alone—verify no service call through editing overlay. |
-| Quick controls / Photo memory | Customize Settings maps to Quickbar/Screensaver. Quickbar scalar rows immediately registry-apply ([Settings:959–970](../../app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt#L959)); photo source selection/credential forms remain their existing Settings/Activities, with source-specific commit semantics. Photo tap launches preview; no photo-specific resize editor. Source-form census is main's control audit scope. |
-| Provider Settings ([H:638–646](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L638)) | Opens provider configure Activity with widget ID, otherwise app details; failure shows toast. Existing-provider configure edits have no launcher rollback/result transaction. Provider owns its configuration's Save/Cancel semantics. |
+| Alarm ([Alarm editor:71–138](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/AlarmSettingsActivity.kt#L71)) | Editor Enabled, hour/minute steppers and weekdays save/reschedule immediately; no Cancel undo. Inline widget toggle separately calls setEnabled/reschedule immediately. |
+| Crypto ([Crypto editor:51–96](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/CryptoSettingsActivity.kt#L51)) | Manual fields draft; Add validates nonblank ID then persists; popular choices immediately add. Remove dialog confirms collection deletion. Cancel clears unsaved fields and returns, leaving prior adds/removes. |
+| To-do ([Todo editor:35–77](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/TodoSettingsActivity.kt#L35)) | Add drafts then persists nonblank item; Complete/Undo and widget row toggle immediately persist. Remove/Clear completed confirm. Editor Cancel does not roll back prior toggles/adds. |
+| News ([News editor:47–90](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/NewsSettingsActivity.kt#L47)) | Manual name/URL draft; valid HTTP(S) Add persists. Popular choices immediately add; removal confirms. Widget headline opens article link, blank link opens editor. Cancel discards unsaved fields only. |
+| Stocks / Alpaca ([Stocks editor:50–107](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/StocksSettingsActivity.kt#L50), [Alpaca:16–48](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedEditorsAlpaca.kt#L16)) | Manual Add/popular symbols persist; remove confirms. Advanced gates Alpaca navigation. Credential form Save validates effective key+secret then writes pair atomically; blank means keep saved; Cancel discards draft, not previous saves. |
+| Options ([Options editor:38–127](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/OptionsSettingsActivity.kt#L38)) | Advanced-only editor; type picker/number dialogs edit outer draft. Number dialog Save does not persist scan config. Save scan settings or Add writes validated band/type/expiry (Add also ticker). Remove ticker confirms. Cancel restores unsaved outer draft and returns. Shared remove/number mechanics: [Editors UI:177–227](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedEditorsUi.kt#L177). |
+| HA ([HA editor:52–129](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HaSettingsActivity.kt#L52), [HA editor:151–258](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HaSettingsActivity.kt#L151)) | URL/token draft; Save & connect persists atomic connection only after successful discovery and current-request check; Cancel/stop cancels request. Entity selection immediately pins; removal confirms. Widget controls call HA REST with local optimistic override; scenes activate; read-only sensors open dashboard. Resizing cannot be judged by state text alone—verify no service call through editing overlay. |
+| Quick controls / Photo memory | Customize Settings maps to Quickbar/Screensaver. Quickbar scalar rows immediately registry-apply ([Settings:959–970](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt#L959)); photo source selection/credential forms remain their existing Settings/Activities, with source-specific commit semantics. Photo tap launches preview; no photo-specific resize editor. Source-form census is main's control audit scope. |
+| Provider Settings ([H:638–646](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L638)) | Opens provider configure Activity with widget ID, otherwise app details; failure shows toast. Existing-provider configure edits have no launcher rollback/result transaction. Provider owns its configuration's Save/Cancel semantics. |
 
 ### Empty-list behavior: intentional remove-all versus initial migration
 
 `load()` returns empty for an absent stored list; JSON `[]` deserializes as empty.
 Malformed JSON also returns empty, so absence, intentional empty and corruption
 are not distinguished by this loader. `save(emptyList())` serializes `[]`
-([Store:91–104](../../app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L91),
-[Store:124–171](../../app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L124)).
+([Store:91–104](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L91),
+[Store:124–171](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L124)).
 
 With `dashboard_cards_migrated=true`, migration returns before loading or seeding.
 Removing the last widget therefore stays empty on resume/recreation; there is
 no approved Home `if empty then reseed` branch. With the flag absent/false,
 first composition seeds Today + Quick controls + Photo memory around the current
 list, even if that current list is `[]`
-([Store:70–81](../../app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L70),
-[H:1047–1051](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1047)).
+([Store:70–81](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeWidgetStore.kt#L70),
+[H:1047–1051](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L1047)).
 
 An empty layout gets one page, no hero, no cells, and an empty grid with minimum
 four-row height. Customize remains in the header; Customize exposes Add widget,
 and Settings' widgets route opens the library
-([Presentation:26–32](../../app/src/main/java/com/immortal/launcher/HomePresentation.kt#L26),
-[H:932](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L932),
-[Navigation:133](../../app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt#L133)).
+([Presentation:26–32](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomePresentation.kt#L26),
+[H:932](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L932),
+[Navigation:133](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt#L133)).
 This is source-proven state behavior, not a report of a remove-all bug. Test both
 migration flag values without clearing real user preferences.
 
@@ -338,29 +338,29 @@ this audit supplies no new runtime acceptance.
 Main can run the following existing JVM classes with the repository unit-test
 gate; they were only **read**, not executed here:
 
-* [ApprovedWidgetPackingTest](../../app/src/test/java/com/immortal/launcher/ApprovedWidgetPackingTest.kt):
+* [ApprovedWidgetPackingTest](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/ApprovedWidgetPackingTest.kt):
   `mixedSpans_haveNoCollisionsAndAlwaysChooseFirstAvailablePosition`,
   `repeatedCalls_areStableAndDoNotRetainPriorOccupancy`,
   `invalidSpans_areNormalizedWithoutChangingInput`.
-* [ApprovedWidgetPageGeometryTest](../../app/src/test/java/com/immortal/launcher/ApprovedWidgetPageGeometryTest.kt):
+* [ApprovedWidgetPageGeometryTest](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/ApprovedWidgetPageGeometryTest.kt):
   `defaultDashboard_preservesHeroAndTwoColumnsWithoutRewritingSavedSizes`,
   `explicitSizeMatchingLegacyDefault_isHonoredWithoutResizingNeighbors`,
   `resizingOtherPage_doesNotChangeCurrentPageGeometry`,
   `sharedPhoto_preservesSavedRelativeOrderOnEveryPage`.
-* [ApprovedHomePresentationPagingTest](../../app/src/test/java/com/immortal/launcher/ApprovedHomePresentationPagingTest.kt):
+* [ApprovedHomePresentationPagingTest](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/ApprovedHomePresentationPagingTest.kt):
   `multiplePhotoWidgetsAndAppWidgets_allRemainReachable`,
   `removalFromLastPage_clampsWithoutLosingWidgets`,
   `reorderingAcrossPages_retainsEveryIdAndSavedSize`.
-* [ApprovedWidgetDragStateTest](../../app/src/test/java/com/immortal/launcher/ApprovedWidgetDragStateTest.kt):
+* [ApprovedWidgetDragStateTest](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/ApprovedWidgetDragStateTest.kt):
   `secondOwnerCannotStartMoveCancelOrFinishTheFirstDrag`,
   `invalidationPreventsStaleReleaseFromFinishingANewerDrag`,
   `releaseReturnsDestinationOnlyOnce_andEmptySpaceDoesNotMove`,
   `rtlPhysicalCoordinates_findTheCardToTheLeftWithoutInvertingTheFinger`.
   This pure **move** ownership state is not a global ResizeBadge owner.
-* [HomeWidgetStoreTest](../../app/src/test/java/com/immortal/launcher/HomeWidgetStoreTest.kt):
+* [HomeWidgetStoreTest](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/HomeWidgetStoreTest.kt):
   `serialize_deserialize_roundTripsWidgets` and
   `deserialize_ignoresInvalidEntriesAndDuplicates`;
-  [ApprovedHomePagerNavigationTest](../../app/src/test/java/com/immortal/launcher/ApprovedHomePagerNavigationTest.kt):
+  [ApprovedHomePagerNavigationTest](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/ApprovedHomePagerNavigationTest.kt):
   `parentClampingSuppressesOldPagerEventsUntilTheClampedTargetArrives`.
 
 Existing tests do not render every widget at every span, assert native text
@@ -368,16 +368,16 @@ fit/hit regions, verify two-cell resize commits or prove remove-all migration
 behavior. Main should add/extend meaningful coverage for those boundaries as
 needed; this sidecar writes no tests.
 
-The existing [PortalUxInstrumentation observer](../../app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt#L303)
+The existing [PortalUxInstrumentation observer](https://github.com/starbrightlab/immortal/blob/main/app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt#L303)
 supports `widgetGesture` with `source`, `resize`, `dx/dy` or `target`, `holdMs`,
 `moveMs`, `edgeHoldMs`, `cancel`, `handoff`, and phase reporting
-([instrumentation:374–448](../../app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt#L374)).
+([instrumentation:374–448](https://github.com/starbrightlab/immortal/blob/main/app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt#L374)).
 Its handoff adds a second pointer near the **same source gesture**, not two
 independently targeted ResizeBadge drags. T4 needs distinct-target input coverage.
 Its generic `observe` window snapshots and screenshots can support T1/T2/T8;
 semantic-label presence is not a glyph-fit/visible-content assertion.
 Its `touchPaging` benchmark exposes `paging`, `noop`, `tabs`, `settings`
-([instrumentation:113–125](../../app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt#L113));
+([instrumentation:113–125](https://github.com/starbrightlab/immortal/blob/main/app/src/androidTest/java/com/immortal/launcher/PortalUxInstrumentation.kt#L113));
 it has no existing all-widget-span/resize performance scenario.
 
 ### Performance ownership proved by source; measurements outstanding
@@ -390,11 +390,11 @@ to at most five cells per page.
 
 `produceHomeState` pauses by `LocalApprovedLauncherPageActive`, retains its value
 and refresh deadline, and serializes re-entry through a per-producer Mutex
-([Tabs:65–94](../../app/src/main/java/com/immortal/launcher/ApprovedLauncherTabs.kt#L65)).
+([Tabs:65–94](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedLauncherTabs.kt#L65)).
 It does **not** read `LocalApprovedWidgetPageInput`. Touch Home retains previous,
 current and next pages; their input eligibility differs, but they share active
 Home-tab producer eligibility
-([H:770–797](../../app/src/main/java/com/immortal/launcher/HomeActivity.kt#L770)).
+([H:770–797](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/HomeActivity.kt#L770)).
 Timers' inline tick likewise reads Home-tab active, not widget-page input.
 Do not claim offscreen widget-page requests/ticks are stopped merely because
 inactive input/focus/semantics are disabled.
@@ -410,10 +410,10 @@ intervals are not observed request rates or network performance.
 Photo uses page lifecycle `RESUMED`, a process cache keyed by source settings,
 30-minute TTL, failure backoff 1/2/5/30 minutes, cancellation-aware source work,
 sampled decoding bounded to 1200 on each dimension and a 16 MiB transfer cap
-([Photo:44–106](../../app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt#L44),
-[Photo:169–227](../../app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt#L169)).
+([Photo:44–106](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt#L44),
+[Photo:169–227](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt#L169)).
 The per-launcher-tab lifecycle wrapper pauses hidden tabs, not each retained
-widget page ([Tabs:173–195](../../app/src/main/java/com/immortal/launcher/ApprovedLauncherTabs.kt#L173)).
+widget page ([Tabs:173–195](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/ApprovedLauncherTabs.kt#L173)).
 Shared cache avoids many repeated loads; separate hero instances can still enter
 the cache-miss path, and method-level synchronization is not proof of one
 cross-instance in-flight load. Count real fetch/decode starts.

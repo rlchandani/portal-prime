@@ -113,5 +113,5 @@ It was not an active performance outlier; no camera code was changed.
 The broader optimization/screensaver/music goal remains incomplete. Music
 provider/audio wiring remains deferred.
 
-[Sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-night-brightness-delivery/verification.json).
+[Sanitized verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-night-brightness-delivery/verification.json).
 Credentials, configuration snapshots and rollback APKs remain private outside Git.

@@ -32,13 +32,13 @@ All seven files matching `scripts/test_portal_*.py` were included:
 
 | File | Cases | Regression guard |
 | --- | ---: | --- |
-| [`test_portal_home_preflight.py`](../scripts/test_portal_home_preflight.py) | 16 | Owned, idle Home preparation; one dispatch; deadlines and destination proof |
-| [`test_portal_install_observation.py`](../scripts/test_portal_install_observation.py) | 23 | One install attempt; uncertain ACK observation; exact artifact/readiness checks; deadlines |
-| [`test_portal_native_geometry.py`](../scripts/test_portal_native_geometry.py) | 21 | Visible, unambiguous action targets; observed dock/rail geometry; malformed bounds |
-| [`test_portal_navigation_observation.py`](../scripts/test_portal_navigation_observation.py) | 26 | Window ownership, transition gaps, destination stability and deadline enforcement |
-| [`test_portal_profile_equivalence.py`](../scripts/test_portal_profile_equivalence.py) | 28 | Canonical ART inventories, DEX checksums, flags and counts; malformed proof rejection |
-| [`test_portal_profile_validation.py`](../scripts/test_portal_profile_validation.py) | 16 | Workspace/evidence boundaries, input hashes, profile format and subprocess cleanup |
-| [`test_portal_warm_dream_contract.py`](../scripts/test_portal_warm_dream_contract.py) | 10 | Synthetic activity-dump parsing; exact package identity and live Home/preview counts |
+| [`test_portal_home_preflight.py`](https://github.com/starbrightlab/immortal/blob/main/scripts/test_portal_home_preflight.py) | 16 | Owned, idle Home preparation; one dispatch; deadlines and destination proof |
+| [`test_portal_install_observation.py`](https://github.com/starbrightlab/immortal/blob/main/scripts/test_portal_install_observation.py) | 23 | One install attempt; uncertain ACK observation; exact artifact/readiness checks; deadlines |
+| [`test_portal_native_geometry.py`](https://github.com/starbrightlab/immortal/blob/main/scripts/test_portal_native_geometry.py) | 21 | Visible, unambiguous action targets; observed dock/rail geometry; malformed bounds |
+| [`test_portal_navigation_observation.py`](https://github.com/starbrightlab/immortal/blob/main/scripts/test_portal_navigation_observation.py) | 26 | Window ownership, transition gaps, destination stability and deadline enforcement |
+| [`test_portal_profile_equivalence.py`](https://github.com/starbrightlab/immortal/blob/main/scripts/test_portal_profile_equivalence.py) | 28 | Canonical ART inventories, DEX checksums, flags and counts; malformed proof rejection |
+| [`test_portal_profile_validation.py`](https://github.com/starbrightlab/immortal/blob/main/scripts/test_portal_profile_validation.py) | 16 | Workspace/evidence boundaries, input hashes, profile format and subprocess cleanup |
+| [`test_portal_warm_dream_contract.py`](https://github.com/starbrightlab/immortal/blob/main/scripts/test_portal_warm_dream_contract.py) | 10 | Synthetic activity-dump parsing; exact package identity and live Home/preview counts |
 | **Total** | **140** | |
 
 ## Application JavaScript gate and local evidence
@@ -56,7 +56,7 @@ suite was not rerun during this CI edit.
 
 The modules cover offline remote-control, photo, navigation, settings, music and
 screensaver duplicate-avoidance contracts. The shared
-[`remote-browser-harness.mjs`](../app/src/test/js/remote-browser-harness.mjs) loads
+[`remote-browser-harness.mjs`](https://github.com/starbrightlab/immortal/blob/main/app/src/test/js/remote-browser-harness.mjs) loads
 the shipped controller into a synthetic DOM using `node:vm`, supplies fixture
 responses through a replacement fetch function, and controls browser timers.
 Imports across the modules and harness are limited to repository code and built-in
@@ -97,7 +97,7 @@ inspection do not establish execution on hosted Node 22; that run is pending.
 The workflow runs on `ubuntu-latest`. Fifteen of the sixteen
 `ProfileValidationTest` cases call
 `tempfile.TemporaryDirectory(dir="/private/tmp")`.
-[`reserve_workspace`](../scripts/portal_profile_validation.py) also deliberately
+[`reserve_workspace`](https://github.com/starbrightlab/immortal/blob/main/scripts/portal_profile_validation.py) also deliberately
 requires the tool directory to be a child of `/private/tmp`. Setting `TMPDIR`
 alone would not fix these explicit paths.
 

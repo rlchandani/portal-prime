@@ -47,13 +47,13 @@ cues stayed off; no sound preview or alarm was enabled.
 Save, Cancel and Close remain visible in the observed dialogs, including
 Meta's numeric keyboard and the error states.
 
-![Actual native maximum stepper draft](../mocks/portal-widget-gallery-20261102/evidence/native-stepper-volume-max.png)
+![Actual native maximum stepper draft](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-stepper-volume-max.png)
 
-![Actual native invalid-hour validation](../mocks/portal-widget-gallery-20261102/evidence/native-clock-hour-validation.png)
+![Actual native invalid-hour validation](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-clock-hour-validation.png)
 
-![Actual reopened saved 23:59](../mocks/portal-widget-gallery-20261102/evidence/native-clock-saved-time.png)
+![Actual reopened saved 23:59](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-clock-saved-time.png)
 
-![Actual reopened saved midnight](../mocks/portal-widget-gallery-20261102/evidence/native-clock-midnight-time.png)
+![Actual reopened saved midnight](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/native-clock-midnight-time.png)
 
 Only dialog crops are committed. Full captures, private profiles and command logs
 remain under `/private/tmp/portal-settings-native-steppers-20261102/`.

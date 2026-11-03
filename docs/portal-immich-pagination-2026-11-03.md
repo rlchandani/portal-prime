@@ -105,4 +105,4 @@ verification, delivery, cleanup and commit. The whole-product goal remains
 active; exhausted issue clocks and outstanding design approvals remain intact.
 
 Machine-readable public evidence:
-[`immich-pagination-verification.json`](../mocks/portal-widget-gallery-20261102/evidence/immich-pagination-verification.json).
+[`immich-pagination-verification.json`](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/immich-pagination-verification.json).

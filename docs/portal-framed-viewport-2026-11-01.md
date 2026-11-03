@@ -81,13 +81,13 @@ Dream are preserved. The original test APK is restored. The system process
 is unchanged; instrumentation and the collector are inactive. Owned generated
 files and reports are removed. Living Area was not touched.
 
-[Native assertions and observations](../mocks/portal-premium-player-20261030/evidence/family-framed-viewport/checks.json),
-[independent pixel check](../mocks/portal-premium-player-20261030/evidence/family-framed-viewport/geometry.json)
-and [restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-framed-viewport/verification.json)
+[Native assertions and observations](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-framed-viewport/checks.json),
+[independent pixel check](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-framed-viewport/geometry.json)
+and [restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-framed-viewport/verification.json)
 are public generated evidence, with
-[initial](../mocks/portal-premium-player-20261030/evidence/family-framed-viewport/before.png),
-[narrow](../mocks/portal-premium-player-20261030/evidence/family-framed-viewport/narrow.png)
-and [expanded](../mocks/portal-premium-player-20261030/evidence/family-framed-viewport/after.png)
+[initial](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-framed-viewport/before.png),
+[narrow](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-framed-viewport/narrow.png)
+and [expanded](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-framed-viewport/after.png)
 Window captures. Credentials, household configuration and rollback APKs
 remain outside Git.
 

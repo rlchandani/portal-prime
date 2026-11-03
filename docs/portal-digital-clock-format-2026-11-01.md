@@ -50,7 +50,7 @@ These are **detached native Canvas renders**, not screenshots of the
 screensaver or measurements of the display panel. The montage adds a dark
 matte and labels around the original, unscaled generated bitmaps.
 
-![Generated native Canvas clock renders](../mocks/portal-premium-player-20261030/evidence/native-clock-format/canvas-renders.png)
+![Generated native Canvas clock renders](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/native-clock-format/canvas-renders.png)
 
 The first full build attempt failed because the Mac ran out of disk space.
 That attempt is retained privately and is not counted as a passing gate.
@@ -81,5 +81,5 @@ arc styling, sensor thresholds or brightness transition. Physical fade
 smoothness and optical comfort remain pending because the user is unavailable
 to test them. No repeat physical check was requested.
 
-[Native checks](../mocks/portal-premium-player-20261030/evidence/native-clock-format/checks.json)
-and [sanitized deployment receipt](../mocks/portal-premium-player-20261030/evidence/native-clock-format/verification.json).
+[Native checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-clock-format/checks.json)
+and [sanitized deployment receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-clock-format/verification.json).

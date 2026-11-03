@@ -75,7 +75,7 @@ Portal. It does not reproduce an old-version device crash, accept every
 intermediate frame, test provider/group commands, or establish panel FPS.
 The pre-fix evidence is the source contract and failing key regression.
 
-![Generated native music lists at their top and bottom](../mocks/portal-premium-player-20261030/evidence/native-music-repeated-items/native-lists.png)
+![Generated native music lists at their top and bottom](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/native-music-repeated-items/native-lists.png)
 
 The contact sheet reduces the original window captures. All content is generated;
 the supplied blank artwork URIs intentionally exercise the existing fallback
@@ -104,8 +104,8 @@ The original issue slot began **13:29:01 UTC** on November 1 and expires
 Physical brightness comfort remains pending, and the broader goal remains
 incomplete. Music provider/audio wiring remains deliberately deferred.
 
-[Native checks](../mocks/portal-premium-player-20261030/evidence/native-music-repeated-items/checks.json)
-and [sanitized deployment receipt](../mocks/portal-premium-player-20261030/evidence/native-music-repeated-items/verification.json).
+[Native checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-music-repeated-items/checks.json)
+and [sanitized deployment receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/native-music-repeated-items/verification.json).
 
 ## Official references
 

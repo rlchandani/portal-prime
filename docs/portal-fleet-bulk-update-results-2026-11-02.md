@@ -73,4 +73,4 @@ are excluded from public evidence. Living received final delivery/readback only.
 
 Original observation clock: **23:38 UTC 2 November–00:08 UTC 3 November 2026**,
 including cleanup; no reset.
-[Sanitized structured evidence](../mocks/portal-widget-gallery-20261102/evidence/fleet-bulk-update-verification.json).
+[Sanitized structured evidence](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/fleet-bulk-update-verification.json).

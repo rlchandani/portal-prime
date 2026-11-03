@@ -74,9 +74,9 @@ preserved. The test APK is restored. The system process is unchanged,
 instrumentation and the collector are inactive, and owned generated files and
 reports are removed. Living Area was not touched.
 
-[Native assertions](../mocks/portal-premium-player-20261030/evidence/family-slideshow-history/checks.json),
-[independent pixel check](../mocks/portal-premium-player-20261030/evidence/family-slideshow-history/geometry.json)
-and [restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-slideshow-history/verification.json)
+[Native assertions](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-slideshow-history/checks.json),
+[independent pixel check](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-slideshow-history/geometry.json)
+and [restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-slideshow-history/verification.json)
 are public generated evidence. Credentials, household configuration and
 rollback APKs remain outside Git.
 

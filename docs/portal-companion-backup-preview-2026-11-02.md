@@ -14,7 +14,7 @@ emulator and Family transports are retained and owned resources removed.
 
 The phone repository contains the detailed receipt in
 `docs/companion-backup-preview-validation-2026-11-02.md`.
-[Structured evidence](../mocks/portal-widget-gallery-20261102/evidence/companion-backup-preview-verification.json)
+[Structured evidence](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/companion-backup-preview-verification.json)
 records actual artifacts and limits. Public pixels cover the generated isolated
 BackupCard, not the whole app or a physical phone. Physical installation, owner
 archives, real ADB backup/restore, FPS and universal provider cancellation remain

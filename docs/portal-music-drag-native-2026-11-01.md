@@ -56,7 +56,7 @@ they are not UI response latency or panel frame timing.
 Four larger-text Queue/Players captures were visually reviewed in both palettes;
 no overlap was observed in those samples. All 36 were not individually reviewed.
 
-![Actual dark larger-text Players after reverse drag, synthetic data](../mocks/portal-premium-player-20261030/evidence/family-music-drag-native/dark-font-1_8-volume-reverse-released.png)
+![Actual dark larger-text Players after reverse drag, synthetic data](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-music-drag-native/dark-font-1_8-volume-reverse-released.png)
 
 ## First timeout and bounded correction
 
@@ -109,6 +109,6 @@ Music provider/server wiring remains outside scope. The broader
 optimization/screensaver/music goal is incomplete; parked performance
 investigations were not reopened.
 
-[Sanitized verification and phase/action summaries](../mocks/portal-premium-player-20261030/evidence/family-music-drag-native/verification.json).
+[Sanitized verification and phase/action summaries](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-drag-native/verification.json).
 Credentials, raw device snapshots, configuration backups and rollback APKs
 remain private outside Git.

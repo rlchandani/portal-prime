@@ -72,7 +72,7 @@ Photo identity is checked against the original deck URL. An opaque loading
 endpoint may become a ready derivative file on the next preparation; that
 expected resource change is not classified as a source change or a reload.
 
-![Native photo-region crops before, during the hold, and on the next presentation](../mocks/portal-premium-player-20261030/evidence/family-live-face-metadata/native-sequence.png)
+![Native photo-region crops before, during the hold, and on the next presentation](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-live-face-metadata/native-sequence.png)
 
 Published PNGs crop rows 0–1099 of the original Window captures to keep the
 evidence focused on the generated photo. Measurements use the full original
@@ -101,6 +101,6 @@ Physical night-clock fade comfort remains pending because the user cannot
 test now. Whole-platform performance and complete slideshow acceptance remain
 open. Music provider/audio wiring remains deferred.
 
-[Native checks](../mocks/portal-premium-player-20261030/evidence/family-live-face-metadata/checks.json),
-[marker geometry](../mocks/portal-premium-player-20261030/evidence/family-live-face-metadata/geometry.json)
-and [deployment/restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-live-face-metadata/verification.json).
+[Native checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-live-face-metadata/checks.json),
+[marker geometry](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-live-face-metadata/geometry.json)
+and [deployment/restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-live-face-metadata/verification.json).

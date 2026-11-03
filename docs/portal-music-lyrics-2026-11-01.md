@@ -83,7 +83,7 @@ non-deactivated state through its layout ancestors. All **88 original assertions
 remain. The production implementation is unchanged between these two checks;
 the reader correction does not disable or relax overlap acceptance.
 Both failed reports and the
-[first restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-music-lyrics/first-attempt-verification.json)
+[first restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-lyrics/first-attempt-verification.json)
 are retained.
 
 ## Installation and restoration
@@ -107,12 +107,12 @@ These are debug-host component checks. The optimized APK is installed and its
 identity verified, but its player was not itself instrumented. Credentials,
 household configuration and rollback APKs remain outside Git.
 
-[Native assertions](../mocks/portal-premium-player-20261030/evidence/family-music-lyrics/checks.json),
-[independent pixel checks](../mocks/portal-premium-player-20261030/evidence/family-music-lyrics/geometry.json),
-[baseline failures](../mocks/portal-premium-player-20261030/evidence/family-music-lyrics/baseline-checks.json),
-[first attempt](../mocks/portal-premium-player-20261030/evidence/family-music-lyrics/first-attempt-checks.json)
-and [restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-music-lyrics/verification.json)
-support the delivery. [The native comparison gallery](../mocks/portal-premium-player-20261030/family-lyrics-review.html)
+[Native assertions](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-lyrics/checks.json),
+[independent pixel checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-lyrics/geometry.json),
+[baseline failures](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-lyrics/baseline-checks.json),
+[first attempt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-lyrics/first-attempt-checks.json)
+and [restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-lyrics/verification.json)
+support the delivery. [The native comparison gallery](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/family-lyrics-review.html)
 shows before/after, both palettes and manual browsing.
 
 Implementation references:

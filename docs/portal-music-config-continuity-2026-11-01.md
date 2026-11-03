@@ -62,7 +62,7 @@ separate evidence. The pending SMB startup ownership finding, natural
 room-light comfort, cold startup, animated-image residency and Home/Apps
 timing outliers remain open. The full goal is incomplete.
 
-See the [sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-music-config-continuity/verification.json).
+See the [sanitized verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-music-config-continuity/verification.json).
 Household photographs, credentials, original profiles and rollback APKs
 remain outside Git.
 

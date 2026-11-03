@@ -1,0 +1,508 @@
+{
+  "schemaVersion": 1,
+  "status": "locally-verified",
+  "checkedAtUtc": "2026-11-03T04:09:41.235309+00:00",
+  "scope": "433 baseline strict documentation warnings from existing repository references",
+  "baselineCommit": "7d6d5399",
+  "baselineWarnings": 433,
+  "strictBuild": {
+    "passed": true,
+    "warnings": 0,
+    "command": "mkdocs build --strict",
+    "seconds": 1.88,
+    "mkdocsVersion": "1.6.1",
+    "materialVersion": "9.5.39",
+    "pythonVersion": "3.13.7",
+    "configurationUnchanged": true,
+    "workflowUnchanged": true,
+    "validationSeverityUnchanged": true,
+    "warningSuppression": false
+  },
+  "rewrite": {
+    "baselineWarningOccurrences": 433,
+    "uniqueDestinations": 425,
+    "sourceDocuments": 83,
+    "kindCounts": {
+      "internal-doc": 1,
+      "repository-file": 377,
+      "repository-image": 47
+    },
+    "allTargetsTrackedAndPresent": true,
+    "rewriteOnlyExistingWarningTargets": true
+  },
+  "verification": {
+    "verifiedDocuments": 83,
+    "verifiedUniqueDestinations": 425,
+    "sourceChangesOnlyMappedDestinations": true,
+    "targetBytesUnchanged": true,
+    "generatedHtmlUrlsPresent": true,
+    "strictBuildPassed": true,
+    "strictWarnings": 0,
+    "baselineWarnings": 433,
+    "sitePublished": false,
+    "stage": "Mapped URL rewrite before operating-state delivery bookkeeping"
+  },
+  "independentReview": {
+    "reverseRewritesRecoverEveryOriginalDocument": true,
+    "all120FragmentsPreserved": true,
+    "targetFileHashesUnchanged": true,
+    "newBlobAndRawUrlsMatchTrackedPaths": true
+  },
+  "sourceDocumentHashes": [
+    {
+      "source": "docs/music-assistant-server-readiness.md",
+      "beforeSha256": "1144ce4c5a919c7f2db5b4e27c6e049fde111e8357b98894fe2d35a40c16d253",
+      "afterSha256": "cdd69f9164f45803d4896f9a7490f778ec6e7dcda338ba64668860827e24b0f5"
+    },
+    {
+      "source": "docs/portal-black-handoff-reopened-2026-11-01.md",
+      "beforeSha256": "ec1026f39a4a1047857248629e50979c2ce0c552395c9c89c28745dd1f5ac3e8",
+      "afterSha256": "474c022e8894987f4377c69c571387678efd7c7ad77d969a4a5d21f1585045ce"
+    },
+    {
+      "source": "docs/portal-black-handoff-second-slot-2026-11-02.md",
+      "beforeSha256": "e84b72eb5e406a102a9a0388e40d1b2e0a1b42134a134df1e7dc7d1c8694ef6b",
+      "afterSha256": "09abfe3514ca5d55da1657cd0a950e1b58c4216f27c8bad790e7dae8c34cae61"
+    },
+    {
+      "source": "docs/portal-browser-profile-conflicts-2026-11-03.md",
+      "beforeSha256": "0209b629059dc20ec2138df8d9bedd61c01caf6460947a2b97bfa52b3b60a5a6",
+      "afterSha256": "146775da8a3f19975632f5b7dd2496e2a8d78e2f6fc28fdd4fd40baea3993129"
+    },
+    {
+      "source": "docs/portal-browser-profile-delete-conflicts-2026-11-03.md",
+      "beforeSha256": "20926d8b9e6271dad44f362be62d696b13f37604859d8d307d80eafd5d88e38c",
+      "afterSha256": "447f90245495f2a6039bab4b6cd21441c58ead3192aa3c3c64bcd69100840e33"
+    },
+    {
+      "source": "docs/portal-calendar-download-budget-2026-11-02.md",
+      "beforeSha256": "8b118fa3b54f2bf6c1a0a75c8ee11532832dea17318bdf1b80aa8e5ce69136fb",
+      "afterSha256": "75400b737109e03794f4ca68b7fcbd65a24efc51f307112e6c1c664e089a6c60"
+    },
+    {
+      "source": "docs/portal-calendar-exclusion-lists-2026-11-03.md",
+      "beforeSha256": "094be05682197ff303c641df1abd509cd02eb6df7a5f1e57875b79f964abaa74",
+      "afterSha256": "54e8047f2e3a69eb3f1c2c1e5cc5249e566088b4c54e3f654a018ece6af1f76e"
+    },
+    {
+      "source": "docs/portal-classic-photo-backlog-2026-11-01.md",
+      "beforeSha256": "4018a6ce773985ecc06125161b25a70f8bd195e61145790bf67922a272dc3cdf",
+      "afterSha256": "812b36cb4a4e5cfdb3458b51eedb0e3a8ee6c0e3ef12517bff3edac5d04ac45d"
+    },
+    {
+      "source": "docs/portal-classic-photo-cleanup-2026-11-01.md",
+      "beforeSha256": "830cd8da1fd096be9c5b314a8ebd3aac240e5b248d9aae0139a47c765744efa7",
+      "afterSha256": "184f2c93729e353893133eb5ab2e38e96b6820c42ba67d23abef0f550dac0322"
+    },
+    {
+      "source": "docs/portal-clock-reveal-physical-2026-11-01.md",
+      "beforeSha256": "e0436437a728b83f378c0190c37cb49e1f2b76278086bdcf79f91ac31fd91270",
+      "afterSha256": "2c9bc8a4ff647bb1ef3f341091406c2554a49fd935e02cad6993b323374ba1bc"
+    },
+    {
+      "source": "docs/portal-cold-start-physical-2026-11-01.md",
+      "beforeSha256": "e4a838a45bc71dbe0f01aa3227034f2b4f4c4bf6cdb759be80792d2d0eb95b88",
+      "afterSha256": "167eed649e17380cda60c3a8f1144f956190d2f065a5fc9eac0b7f454d32190e"
+    },
+    {
+      "source": "docs/portal-companion-backup-preview-2026-11-02.md",
+      "beforeSha256": "8c0935757cfb6e8697df430e33f29bcb4b549dc00dc3dc7bcc8d3fc52dc895ff",
+      "afterSha256": "61eb43e5252144fb8a7413cae7f5729162419153e46ef277c3af6c3baa2c3140"
+    },
+    {
+      "source": "docs/portal-companion-display-images-2026-11-02.md",
+      "beforeSha256": "d8fb28ea42531f8f300f9288845fb36ba81cf29e4f4bd9cb5bfe5a661aadb43c",
+      "afterSha256": "a329c68a744ed89c8233da58528b14bc1da678b43d236700253cdc4e47af17f5"
+    },
+    {
+      "source": "docs/portal-companion-text-confirmation-2026-11-02.md",
+      "beforeSha256": "54874fbd35ff1747c542e0f4d88027662ded2e2780921bfddf0d28b8d82410c3",
+      "afterSha256": "f88468c6fea470240b8a7c6f3133799e404bad235387df090425eeafe81fdef6"
+    },
+    {
+      "source": "docs/portal-deploy-screen-return-2026-11-02.md",
+      "beforeSha256": "86056da9eb1e346702b2c2066701cd08e9a8e777e11758b9b0ea959daee3c7fd",
+      "afterSha256": "d01d849376196eb62c3bfee17f9109d3a1bc76a308dea9ef4fe0752403d054e7"
+    },
+    {
+      "source": "docs/portal-digital-clock-fonts-2026-11-01.md",
+      "beforeSha256": "802adca91eab73c7432881179dcaac0d526e72af12030abee1ac6587f3d17d13",
+      "afterSha256": "ce00c45482da4d4a051f27f85f030ebf8799059d8e899ab1445087f26ead4313"
+    },
+    {
+      "source": "docs/portal-digital-clock-format-2026-11-01.md",
+      "beforeSha256": "6a832a252accd310eb47b71a2caa6970cd34d906e46fd7d3897733a515b02a8a",
+      "afterSha256": "e25a03c43412da2fd3f129a260be79bd065d1fdf8b6960e1fa983a62ba099866"
+    },
+    {
+      "source": "docs/portal-digital-clock-seconds-2026-11-01.md",
+      "beforeSha256": "d027929349222579e9e06ed496a10f9b5806414342138c1d3cad317d12d77143",
+      "afterSha256": "f22daf8028e833ac30ab6b3c483ac4aef660b08b5924d435cfd6604085072ced"
+    },
+    {
+      "source": "docs/portal-face-region-framing-2026-11-01.md",
+      "beforeSha256": "c62aa971b3ad667526b7c2d43dbce2328ff84fa68074ddab1dfb3544846a89b5",
+      "afterSha256": "c2d25874ec5fc78d8a6c07f0f734f52d45e87f0fe57a41f7e4d658f014c06da0"
+    },
+    {
+      "source": "docs/portal-face-weather-admission-2026-11-01.md",
+      "beforeSha256": "d319e8d0219ef6ff85a3c802e809b951a51f4b41179c7b60225b11dbf4c4b515",
+      "afterSha256": "280d097f2e8e396fffd0415b2a92fa7b64f1f4b29956dccba552c57cea8e3597"
+    },
+    {
+      "source": "docs/portal-filmstrip-file-admission-2026-11-01.md",
+      "beforeSha256": "3a407452375bbe27b2d7378e31058b0849788d30499bec9a024f16d47e7e655b",
+      "afterSha256": "ce01ee6f57a4bfa1b15356e68e5fe2c536902c8005d6a6d41914dc270cbcf83c"
+    },
+    {
+      "source": "docs/portal-filmstrip-input-2026-11-01.md",
+      "beforeSha256": "495174b944a0d9cf99f20905befe6685b3934f54f53eef030af81528d73f5e88",
+      "afterSha256": "f7811d833b0eef6a3990e282295f4211c356de94c356e417ef6c9b9b516aab71"
+    },
+    {
+      "source": "docs/portal-fleet-backup-integrity-2026-11-02.md",
+      "beforeSha256": "54e43306db5dc8a4872578145822823d8eb79bf244d9f08c6ab45d2f4fce044e",
+      "afterSha256": "b5b340a950a33d26527cd7d9ab620e79cd6957c022d84ac817b0531536ef3d50"
+    },
+    {
+      "source": "docs/portal-fleet-bulk-update-results-2026-11-02.md",
+      "beforeSha256": "e66c51b46bc2ac1819765c141c08410353d55654bd3794e54d2c75e8b1679d95",
+      "afterSha256": "70b4ff1fd04da49e8d255100c9e8a3b4de7d251f50c9bd23107bf53a9ac8158d"
+    },
+    {
+      "source": "docs/portal-fleet-command-status-2026-11-02.md",
+      "beforeSha256": "410a6a34970cfcd49f21d194605f4ab2f6cfa3f3717e9bd041dcff8bf9bac6d6",
+      "afterSha256": "c1a4641e9d8107477aa27f00a6ec7bb4d0c9f35c5eb548715d79c98aa1aa5b73"
+    },
+    {
+      "source": "docs/portal-fleet-restore-apps-2026-11-02.md",
+      "beforeSha256": "7ae8f694f5766664cd8e7590d3d3719d3ddfb25ecc15bece556b1253b9ab6115",
+      "afterSha256": "df6d2badbd2ffd46840b96dd0d29273c0745eb358a1b6433aa7abb646c6c741b"
+    },
+    {
+      "source": "docs/portal-framed-print-native-2026-11-01.md",
+      "beforeSha256": "aa842ced4c7fb5b9538d996be4ef23c2e9d8a5fbbe29e460283101120a3bfc7b",
+      "afterSha256": "4c8dfdd9c0aa665ce9a035dbcd04e51cf5092cdf1a2c5e86650b436a6608cac1"
+    },
+    {
+      "source": "docs/portal-framed-viewport-2026-11-01.md",
+      "beforeSha256": "06e274c331b24b3c22ce7f86b2130becd63a95db34f95bdd3852640a92e28335",
+      "afterSha256": "6b0640f7bb634a3d587aca611d645762388f126b5735450699f230fbdb259ba1"
+    },
+    {
+      "source": "docs/portal-gallery-native-2026-11-01.md",
+      "beforeSha256": "f3c60466a714c6b347bd25c76e97268455f0018bd8ef060eed30e40431cfd80b",
+      "afterSha256": "94faf05a8db515029a06643c4a2fa235cb40234592cfb917b0d71e7c0221e0e2"
+    },
+    {
+      "source": "docs/portal-gallery-window-performance-2026-11-01.md",
+      "beforeSha256": "f4d374b1ad0ca33c3e32684747431a2f986dd8a5c0419ec5e72fe96c1f22b24b",
+      "afterSha256": "99700f6d7d8336e5b943bfcf7979baba9e75692c3a3f4d6e4c24672d9457cb3c"
+    },
+    {
+      "source": "docs/portal-hardware-budget-2026-10-30.md",
+      "beforeSha256": "687e43229ccaec83cacdbaf69bf882b7f6f2c0edb834220dc0d9262ab5b36f7f",
+      "afterSha256": "1d7f1f5ef853e5eeea5f845be55eb145430c4b9fec685fb04fbf7f05a01f46b4"
+    },
+    {
+      "source": "docs/portal-home-timer-delivery-2026-11-02.md",
+      "beforeSha256": "49516cd8353b2a2cd18422d1d2b643e497763a9e3543999d7da39c3bb23d27b1",
+      "afterSha256": "a5abdb47107b0754a7fb2063241b3eb0b5cde1e102cefd23eed1aebd026d86f5"
+    },
+    {
+      "source": "docs/portal-http-source-discovery-2026-11-01.md",
+      "beforeSha256": "36393a3c11c7e1926de35b9072b690f96215ba6acfe53b63b5569a015f3fdc75",
+      "afterSha256": "bc85cde14bca76d47f2a0932cdee34ae371b4c52bdeebed30c4f55853fee1add"
+    },
+    {
+      "source": "docs/portal-immich-pagination-2026-11-03.md",
+      "beforeSha256": "f0b24e74538b7f9d603f1567f609218be55c63856b64548bc2f9b8d59600f191",
+      "afterSha256": "771774255510560ac85686faf0a97e508607a2aba4b382feb4956cc6979aba74"
+    },
+    {
+      "source": "docs/portal-live-face-metadata-2026-11-01.md",
+      "beforeSha256": "f9aaa939a14cee25fba991384ccd67e975f0679e0599e6fc1ef064eccaf3b9d6",
+      "afterSha256": "81c895fa960dd53a0598b15849de46d32552c6473712651d327da4099834ea37"
+    },
+    {
+      "source": "docs/portal-music-config-continuity-2026-11-01.md",
+      "beforeSha256": "473ee822178460c54d0d17927ec4fbc5ff771b58de1432141ad00dd8b393a492",
+      "afterSha256": "de5014b23b359fd2b425508dd3552f14e6afdc40b0451fc1b2fb8b68f4d42b62"
+    },
+    {
+      "source": "docs/portal-music-drag-native-2026-11-01.md",
+      "beforeSha256": "3b5ad45e7c061920931b24b180cdd7d8825697115b18d2f6a0aa136870f80afa",
+      "afterSha256": "7a2fc2c8bca2a31cb469d1f557ced4fc811f310143ade47e44122376c283e133"
+    },
+    {
+      "source": "docs/portal-music-lyrics-2026-11-01.md",
+      "beforeSha256": "8d5b268cffa0bb5b645bff59348326f77ece882ffc5530e40acdfa3913391d7f",
+      "afterSha256": "4474b1bc6549d05258310bf014028946dde9a2feb961d77e66822e461bf95754"
+    },
+    {
+      "source": "docs/portal-music-photo-pause-2026-11-01.md",
+      "beforeSha256": "57e378fc78e0563893741945cdd538d30cdb0685064b6f7111f3d4afb11b973a",
+      "afterSha256": "4cd0c27105533eb24d56913ffceea8b4ebb580eca9a27034a2527864e7fd5a81"
+    },
+    {
+      "source": "docs/portal-music-physical-ui-2026-10-31.md",
+      "beforeSha256": "c5297680b98f7fc72681a9032a6c254275df36f0979b72c55596e6afeb17e6e7",
+      "afterSha256": "e1c70e8a22f327e7cdcdd8e9232630874dcd51f6413f37176cda163c8c733b1b"
+    },
+    {
+      "source": "docs/portal-music-playing-native-2026-11-01.md",
+      "beforeSha256": "7b66b5acb3e3578dbc6eadb3afc0f9805311c183a24abbf19d3b8b60f436c4b0",
+      "afterSha256": "7befa9c195523323fb598e47065a249c4ebe111d4753384c429e4641296b8435"
+    },
+    {
+      "source": "docs/portal-music-repeated-items-2026-11-01.md",
+      "beforeSha256": "dc31aa865430c66525fda233eae59aa332ac12ddf86ef22e25e0a2aa53d26bfb",
+      "afterSha256": "cf5831d05bf9790d66adf2c948b0636598202d935a3bec4c19d550f8beb39a87"
+    },
+    {
+      "source": "docs/portal-music-seek-binding-2026-11-01.md",
+      "beforeSha256": "74464a81f7cfcd6cf57a4a68a454af647d99ac525b5e1d014d5a8d7f2473c8c3",
+      "afterSha256": "02e01d386a268c49557228106a279e66fa379c4208f6d2b0f716ce8a3b382ac8"
+    },
+    {
+      "source": "docs/portal-music-touch-native-2026-11-01.md",
+      "beforeSha256": "91bc81cabc284e6fdc88e8b98fed79abe5038ca8fd55dc675c9e8bfedbbcc72e",
+      "afterSha256": "3c12ed3e25980b4527c049811b9bba41ac83e67c6afed7f7970a3e165fbf737a"
+    },
+    {
+      "source": "docs/portal-music-viewport-2026-11-01.md",
+      "beforeSha256": "c308f23c7e691b9c910fd87797e745a209b1c8a7f54fad5cf2fb147832d147b8",
+      "afterSha256": "d10431d69a89140ba15b326f07a2fc002d34c638c6749e3d45d6a83ccacaa6c3"
+    },
+    {
+      "source": "docs/portal-music-volume-binding-2026-11-01.md",
+      "beforeSha256": "2a6beffc5b18fb5d793ce9b593b00a0d99d443c469eb155068dd292a86363b46",
+      "afterSha256": "ceb21b40601dda93d3a83cd1dfe26ed5a6d1ea14c756046a59efa78f2ea2b763"
+    },
+    {
+      "source": "docs/portal-night-autoplay-physical-2026-11-01.md",
+      "beforeSha256": "554b584c1c6d1d5042834211aa76191124598ed1abf6afa76fd3051ab2f81d86",
+      "afterSha256": "deb02f02a1079a606903f949ce1b05e3e3ccdb96645161ae0d8f9fccf2e2af97"
+    },
+    {
+      "source": "docs/portal-night-brightness-delivery-2026-11-01.md",
+      "beforeSha256": "2c7f53fa7d5733d12f4b9224c43b6da657a399db59beac56e9816c462c8a796a",
+      "afterSha256": "bd53d782c68b3fd9e1cda16b30a4cdbaa2c4f8f96c02e18b1a89c74a14956ffc"
+    },
+    {
+      "source": "docs/portal-night-crossfade-2026-10-31.md",
+      "beforeSha256": "1b1b5f3646867e410673a38b64447afd395de5c4562b3d8d67ea474ba0688213",
+      "afterSha256": "2a3bb22cffe3c331da4ef2ab06d62d20cc1986f66fda18779fadead66fc71c68"
+    },
+    {
+      "source": "docs/portal-night-legacy-2026-11-01.md",
+      "beforeSha256": "2cece8709e7327ef39086f4546efcb778231099bd45b28156c090060fa131582",
+      "afterSha256": "9c92ac0cbe7e86a053cb6291d144ffdb33e21826b85f4e6f560d414d842ce396"
+    },
+    {
+      "source": "docs/portal-night-legacy-reopened-2026-11-01.md",
+      "beforeSha256": "c35725a28fa0e066f76ebf2119e7b0583cde1fe2aa45c23b1650c7fb494d52a8",
+      "afterSha256": "4f95f390c5ac149227c5e4e62ed6758e3c56e6e70822347205dd0b662380f5d1"
+    },
+    {
+      "source": "docs/portal-night-photo-motion-2026-11-01.md",
+      "beforeSha256": "78a4397154cbb589c6dede3c5078685bd88b9311c43746ce384c083ff38365ac",
+      "afterSha256": "26ad33cde88831e015b10f8995456b397986dfe031ea0a47300526b15e3d8766"
+    },
+    {
+      "source": "docs/portal-night-photo-pause-2026-11-01.md",
+      "beforeSha256": "151882aa8a7ce8dc8d49fcb6490c398e3c3b7f45ed8a5c1882dd078c7196b578",
+      "afterSha256": "bdb5592da982e0aeb19411aa68a7f228aaebe6b9329582037f818af375c4e4f4"
+    },
+    {
+      "source": "docs/portal-night-player-completion-audit-2026-10-31.md",
+      "beforeSha256": "acc0a91e789a09514a68e6a418a58f216f5479c424a8311e0b602d93d751b201",
+      "afterSha256": "45faed23387248cc96b7d704176ddb1595b4bc7e745e67a2c183ba18a0416d50"
+    },
+    {
+      "source": "docs/portal-paused-capture-2026-11-01.md",
+      "beforeSha256": "32ceff94717760f6ec1dd85cda8cf5ebaf49dd2268ab57123349735645eec9a6",
+      "afterSha256": "5b53d4da9ce0cb51da13195e4379ec206dd663dd25f327fec95fa0de670e3500"
+    },
+    {
+      "source": "docs/portal-photo-delete-confirmation-2026-11-02.md",
+      "beforeSha256": "f8e590c5431fca9cc8f759f3cfb84376c21657d75fc4d94fd07c267dde144a91",
+      "afterSha256": "873c0b41cb706c077fc1a7b5595f255fde5551dca3e3b5a9a2a4ee729647c740"
+    },
+    {
+      "source": "docs/portal-photo-upload-acknowledgment-2026-11-02.md",
+      "beforeSha256": "68167656744b788681a78658cae71a12e693e3da5d5ec44e8f1bb8ed7aab53c4",
+      "afterSha256": "8e93c3e03e303ab35f3a21e4cce8d1b2127c2185842ddb417c1ac643380709e7"
+    },
+    {
+      "source": "docs/portal-pinned-brightness-delivery-2026-11-01.md",
+      "beforeSha256": "e9f2d97132667bdbb3f380a81a55a3bc9ad467e9063fbcfefc830caf42bd91ee",
+      "afterSha256": "7cff0aa8419c25a30430339f95954dfccb468a1509c462a459768b937aadadcf"
+    },
+    {
+      "source": "docs/portal-pinned-night-physical-2026-10-31.md",
+      "beforeSha256": "46ffb0cd146f6e83e9c450660a26fc3c4c89bd7cc27ad7bfc9a2169282920fa0",
+      "afterSha256": "bf4eddab76767c010e428a8d7b4c31a6d03a227fecbf0d8e2d345dae0563284a"
+    },
+    {
+      "source": "docs/portal-product-operating-state.md",
+      "beforeSha256": "a57d6aebfd34c0d8daf789e46c022c4264c94b355cfda1c4275c5fe2c8c115e2",
+      "afterSha256": "03e543c40c8bac71a5cb05558948cbeba3d05faa982d570d111214f4379a5af0",
+      "mappedRewriteSha256": "88a84a01e58c4ebcf580a2f9612123bcf56cc5623c001aafe40bc4993520230c",
+      "additionalDeliveryBookkeeping": true
+    },
+    {
+      "source": "docs/portal-python-ci-gate-2026-11-02.md",
+      "beforeSha256": "8276bb731e010f81d2c267768ecd5712d8a49e75e47aba1f72006b088cd0be5f",
+      "afterSha256": "e3ae223b37311dadf94c1ea6844e151f9e9f407f85d6bece91c49a49629fc93e"
+    },
+    {
+      "source": "docs/portal-settings-native-editors-2026-11-02.md",
+      "beforeSha256": "e708a845e8a5dae33ce6255f122ce491295394d1d341a0dbbc1f885899527518",
+      "afterSha256": "60fb259b6e4d03e36ed127790d1f9601319da9160a67c74219ab88a92d5f1ace"
+    },
+    {
+      "source": "docs/portal-settings-native-source-drafts-2026-11-02.md",
+      "beforeSha256": "00748ec58db4e0fe454035abfc3a983c5ce97a076b69a983426c7f400dc85bf4",
+      "afterSha256": "a956673cc1de2bd9060be300b233529538efd570ac6807891d2d4c9a9b94d371"
+    },
+    {
+      "source": "docs/portal-settings-native-steppers-2026-11-02.md",
+      "beforeSha256": "36ffd09b1f7987657d5afc368fa6efec38c774f05231d791d5f0e530428a9ecd",
+      "afterSha256": "a49003807c55ec0547574a1a1a6bd86cd2b1c57b08b00b10d466e12d3433e332"
+    },
+    {
+      "source": "docs/portal-slideshow-commit-2026-11-01.md",
+      "beforeSha256": "1469deee276b274b566a21e00eb29f6061d77aa7294a194ffb53761fcd04b12f",
+      "afterSha256": "c0c2c0237da672ad3627ed10b72461ef948685ac4fceb38fe6c8a91df4667025"
+    },
+    {
+      "source": "docs/portal-slideshow-drag-2026-11-01.md",
+      "beforeSha256": "4c25cb7b9363c5344e7d3fe2887388341413199e008e0409664eb35e93628dd8",
+      "afterSha256": "aad3436547dbcbdb90d046f8b9c3e82173cb6e084f0166df5b500556f2c422f4"
+    },
+    {
+      "source": "docs/portal-slideshow-history-2026-11-01.md",
+      "beforeSha256": "2b589352a97afed2fbcc4e454da35dbde6978797903720ffc56ad49039326e7b",
+      "afterSha256": "c30c2bff1032f3127721907b63f3edf37a3a2a50f68e898ead54000c5d60f85c"
+    },
+    {
+      "source": "docs/portal-slideshow-sequences-native-2026-11-01.md",
+      "beforeSha256": "e43328bb3d4e18039813fe2afc14879879c685f21219d17955cfdf40ad092e0b",
+      "afterSha256": "f8018a2125a51f2de2bd10f1de7d077381b53025269972112ce7abd2aca54559"
+    },
+    {
+      "source": "docs/portal-slideshow-slim-frame-2026-11-02.md",
+      "beforeSha256": "34477ce35731127bd5da7fa3bb2fb2ef54cadea0191415556142cf54bf370bb0",
+      "afterSha256": "09a48e530ce6ab8cc7ee58dfa867841f5ddbe572304212bb0f3aa5080ef64ab7"
+    },
+    {
+      "source": "docs/portal-slideshow-style-matrix-2026-11-01.md",
+      "beforeSha256": "59caeaea04a7eb91c095f91d92435ec8311fa05e94fd24dd61e27c8b9ab59a30",
+      "afterSha256": "45dbc7f5ed967b0ad88c773c8968d97d1f57c711b135761292271ecd6c18518e"
+    },
+    {
+      "source": "docs/portal-smb-callback-cleanup-2026-11-01.md",
+      "beforeSha256": "4b6d505af76ae4adc7b4888514e181a1233edc0e7a8185969b171ae87c5b20f2",
+      "afterSha256": "9a63e6788c65cb362b28199b172ecad122101339c76a88ca02717a6c75092d6c"
+    },
+    {
+      "source": "docs/portal-smb-startup-failure-2026-11-01.md",
+      "beforeSha256": "33174fd6641c349ed6eb8a86d4f833bb85a24cbd54fe8db7cefb193fd88d8864",
+      "afterSha256": "fde2caa48c34f0fb7167564af34125f0bed1f103721a4a37a466db4c403d23ca"
+    },
+    {
+      "source": "docs/portal-video-night-retention-2026-11-01.md",
+      "beforeSha256": "b3adbd9326a30df18a7682ce916e12dbd2dc3c68ee5bad0cfca8111e9ae69c88",
+      "afterSha256": "ba0dfe487c6fa3f4cde7ec9b77648905d170333090d54c67618edbdc7b40878c"
+    },
+    {
+      "source": "docs/portal-warm-dream-return-2026-11-01.md",
+      "beforeSha256": "a9e664a1b7cb8f8bd5e3ac417591d58c10baa5abd19d5fe4b059f88e2d2b8e1a",
+      "afterSha256": "1de62564296257691531726f2b268812d621ed730343b63967e07ce88f9a4cb0"
+    },
+    {
+      "source": "docs/portal-widget-inventory-2026-11-02.md",
+      "beforeSha256": "67eeecb792d7c7704c7ad4fc57b9a1a3ac46e11435605e784b44feb3da639760",
+      "afterSha256": "1069c64c1803b97e0dc841df53d4ce92dffb6b4a7ea1aa3501613ac858b1e4a2"
+    },
+    {
+      "source": "docs/design/portal-browser-group-photo-import-review-2026-11-03.md",
+      "beforeSha256": "8b53df5cc1e5a7f6384e63f9897da976c4e804a8678ad8a9a4b78980e465eb84",
+      "afterSha256": "26881709bf9c72df39e0a7ec12c84f6ffe73d8ce35f86dc935390bd3838653a4"
+    },
+    {
+      "source": "docs/design/portal-performance-repeat-validation.md",
+      "beforeSha256": "78f12d87022d8358fc3bc457a7dda93ed4263db7de5e19bc3b43210efcb43d25",
+      "afterSha256": "569cc1e3ddaf52cae6aa5add7c118f236204d60ea42a8fcdd44016b3eb319ce3"
+    },
+    {
+      "source": "docs/design/portal-plus-widget-size-inventory.md",
+      "beforeSha256": "8f90e7ffec195593832a2afa3247ed832cc799da2055f4a8dab6c6926f22fb16",
+      "afterSha256": "0a38ed7ae60167e0dabebc1f045e545267be93a47fc7eba4c75e6757e6268608"
+    },
+    {
+      "source": "docs/design/portal-quick-controls-setup-review-2026-11-02.md",
+      "beforeSha256": "bebd0741e93067cf33d09aac1edc32c2e419fe9f774acab26ea47dfbfe5b4d20",
+      "afterSha256": "685d83d6c2df4b181c66d8aa5c7d08d7df555cc0757275b6d2c23be78ea64c2b"
+    },
+    {
+      "source": "docs/design/portal-settings-navigation-audit-2026-11-02.md",
+      "beforeSha256": "9f54019ca78e5a0a833ce56ac4c83bb3177971886517b3c4de4408463f65bc7f",
+      "afterSha256": "c5cb25076641457635c660ff573999b2dd98d88ad386c93ffa9f9f4599d7aa30"
+    },
+    {
+      "source": "docs/design/portal-settings-registry-audit-2026-11-02.md",
+      "beforeSha256": "f13322e53b8cd818be2d253c383123f7ee71e56cc12948655492c436f39cc265",
+      "afterSha256": "f0eacffcb37e49172f31976da2f2e0b98fc9f19812d9afe262ae9b2791bbb2f0"
+    },
+    {
+      "source": "docs/design/portal-slideshow-style-attribution.md",
+      "beforeSha256": "b78f63403b4dd537def0669093af8b406a8f36fdf63c695e1fbcc4122f02c8c5",
+      "afterSha256": "4371bb72011de344249e03e1024949a24bf50e3d6d9f057abef0507ca49391e1"
+    },
+    {
+      "source": "docs/design/portal-widget-settings-map-2026-11-02.md",
+      "beforeSha256": "2c09950fb3af4f07931e697c26abcdfbdb8af0164210230967bf0d0476282f90",
+      "afterSha256": "a8703278755853707e648d324cfc427ce93b7f554c17f88d6c28bf5774038ea2"
+    },
+    {
+      "source": "docs/portal-docs-repository-links-2026-11-03.md",
+      "afterSha256": "61f0b921d76434f507500cc31a76c89e1d59ce1b57927bb1a8c3df3bd323a4b2",
+      "deliveryReceipt": true
+    }
+  ],
+  "publication": {
+    "published": false,
+    "remoteAvailabilityVerified": false,
+    "localOriginMain": "e30f44056fa851ad9f856c1670ae1b139a2fdab7",
+    "uniqueExternalTargets": 316,
+    "targetsAbsentFromLocalOriginMain": 290,
+    "cachedRefIsNotLiveGitHubEvidence": true
+  },
+  "runtime": {
+    "currentRoomApk": "1.98/code92",
+    "androidCodeChanged": false,
+    "deviceCommands": 0,
+    "phoneCommands": 0,
+    "homeAssistantChanges": 0
+  },
+  "issueClock": {
+    "startedAtUtc": "2026-11-03T03:59:26.692799Z",
+    "deadlineUtc": "2026-11-03T04:29:26.692799Z",
+    "includesEarlierCatalogDiagnosis": true
+  },
+  "limits": [
+    "Publication and remote URL/image availability remain unverified.",
+    "Existing INFO notices about workstation paths, two heading anchors and a directory reference remain outside acceptance.",
+    "No hosted CI or complete link audit."
+  ],
+  "finalVerification": {
+    "unchangedMappedDocumentHashes": 82,
+    "additionalBookkeepingDocument": "docs/portal-product-operating-state.md",
+    "allTargetHashesUnchanged": true,
+    "strictBuildPassed": true,
+    "strictWarnings": 0,
+    "strictBuildSeconds": 2.04
+  }
+}

@@ -14,10 +14,10 @@ This is JVM contract evidence, not native device or remote-renderer verification
 
 ## Exact declaration counts
 
-[SettingsDomains.all](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L1338)
+[SettingsDomains.all](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L1338)
 registers **12 domains, 108 spec instances**. Counting constructor occurrences alone gives
 106: `calendarPacks` expands one `BoolSpec` constructor over the three
-[CalendarPacks.AVAILABLE](../../app/src/main/java/com/immortal/launcher/CalendarPacks.kt#L32)
+[CalendarPacks.AVAILABLE](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/CalendarPacks.kt#L32)
 entries (`romanian`, `irish`, `prayer`). These are source-derived instance counts, not a
 measurement of controls currently visible on a Portal.
 
@@ -37,7 +37,7 @@ measurement of controls currently visible on a Portal.
 | `calendarpacks` | 3 | 0 | 0 | 0 | 0 | 0 | 3 |
 | **Total** | **44** | **21** | **20** | **12** | **8** | **3** | **108** |
 
-[SettingSpec.kt](../../app/src/main/java/com/immortal/launcher/settings/SettingSpec.kt)
+[SettingSpec.kt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingSpec.kt)
 defines these six concrete types; there is no `FloatSpec` or `GroupSpec`.
 The first four types account for **97 writable scalars**. All eight current derived specs are
 flat-payload-only (`render = false`): screensaver `source`, `folderPath`, `albumUrl`; calendar
@@ -54,21 +54,21 @@ exclude the eight non-rendering derived fields, and do not count the separate Ad
 
 | Group | Actual predicate / affected keys | Source |
 | --- | --- | --- |
-| Calendar link and enablement | `hasCalendarLink` → `widgetOn`; `usesCalendar` → `range`, `size`, `side`. `url` remains available. | [calendar](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L80) |
-| Screensaver master and style | `enabled` → `mode`, `intervalSec`, `clockFace`, `photoSource`, `dismissTarget`; motion also requires `supportsPhotoMotion(mode)`; people framing requires Smart/Portraits; `fit` additionally requires Classic. | [screensaver styles](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L207) |
-| Photo-source capability | `usesImmich || usesDav` → `cacheEnabled`; no additional `enabled` predicate on this spec. | [cache](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L318) |
-| Overnight, darkness, sleep | `overnightEnabled` → start/end/night-clock; `darkRoomClock` → lux threshold; darkness OR enabled overnight night-clock → brightness/tone; `sleepTimerEnabled` → duration/pause-audio/close-app. | [night/sleep](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L396) |
-| Ambient audio | `soundscape != SOUND_OFF` → volume. | [soundscape](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L493) |
-| Multi-room connection | `multiRoomEnabled` → `snapcastHost`, `maPort`, `maApiToken`, `maPlayerId`. Username/password are always hidden instead. | [immortal audio](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L652) |
-| MQTT connection | `MqttConfig.isEnabled(c)` → host/port/username/password/TLS. These are live Context reads, not immutable snapshot predicates. | [mqtt](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L746) |
-| Quick buttons | `enabled` → `alwaysShow`. | [quickbar](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L833) |
-| Chime | `goldenHourOn` → sunrise variant; `quietHoursOn` → quiet start/end. Volume has no predicate, despite the nearby conditional-visibility comment. | [chime](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L920) |
-| Sunrise | `enabled` → hour/minute/ramp/chime. | [sunrise](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L1017) |
-| Digital clock | `enabled` → face/size/layout/background/date/seconds. | [digitalclock](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L1113) |
-| Hardware | `DreamPolicy.hasBattery(c)` → screensaver `batterySaver`. `darkRoomClock` only describes its light-sensor requirement; it has no capability predicate. `DarkRoomObserver` declines activation without a sensor. | [battery](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L345), [dark clock](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L432), [observer](../../app/src/main/java/com/immortal/launcher/DarkRoomObserver.kt#L27) |
+| Calendar link and enablement | `hasCalendarLink` → `widgetOn`; `usesCalendar` → `range`, `size`, `side`. `url` remains available. | [calendar](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L80) |
+| Screensaver master and style | `enabled` → `mode`, `intervalSec`, `clockFace`, `photoSource`, `dismissTarget`; motion also requires `supportsPhotoMotion(mode)`; people framing requires Smart/Portraits; `fit` additionally requires Classic. | [screensaver styles](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L207) |
+| Photo-source capability | `usesImmich || usesDav` → `cacheEnabled`; no additional `enabled` predicate on this spec. | [cache](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L318) |
+| Overnight, darkness, sleep | `overnightEnabled` → start/end/night-clock; `darkRoomClock` → lux threshold; darkness OR enabled overnight night-clock → brightness/tone; `sleepTimerEnabled` → duration/pause-audio/close-app. | [night/sleep](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L396) |
+| Ambient audio | `soundscape != SOUND_OFF` → volume. | [soundscape](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L493) |
+| Multi-room connection | `multiRoomEnabled` → `snapcastHost`, `maPort`, `maApiToken`, `maPlayerId`. Username/password are always hidden instead. | [immortal audio](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L652) |
+| MQTT connection | `MqttConfig.isEnabled(c)` → host/port/username/password/TLS. These are live Context reads, not immutable snapshot predicates. | [mqtt](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L746) |
+| Quick buttons | `enabled` → `alwaysShow`. | [quickbar](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L833) |
+| Chime | `goldenHourOn` → sunrise variant; `quietHoursOn` → quiet start/end. Volume has no predicate, despite the nearby conditional-visibility comment. | [chime](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L920) |
+| Sunrise | `enabled` → hour/minute/ramp/chime. | [sunrise](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L1017) |
+| Digital clock | `enabled` → face/size/layout/background/date/seconds. | [digitalclock](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L1113) |
+| Hardware | `DreamPolicy.hasBattery(c)` → screensaver `batterySaver`. `darkRoomClock` only describes its light-sensor requirement; it has no capability predicate. `DarkRoomObserver` declines activation without a sensor. | [battery](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L345), [dark clock](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt#L432), [observer](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/DarkRoomObserver.kt#L27) |
 
 **Advanced is a separate presentation layer.**
-[SettingsPresentation](../../app/src/main/java/com/immortal/launcher/settings/SettingsPresentation.kt#L13)
+[SettingsPresentation](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsPresentation.kt#L13)
 declares 64 control identifiers; **34 match registered specs**. The other identifiers address
 bespoke forms/pages and should not all be treated as orphan registry keys. The registered groups are:
 
@@ -83,9 +83,9 @@ bespoke forms/pages and should not all be treated as orphan registry keys. The r
 
 The server tags these controls/options with `tier`; it does not remove them on the basis of the
 Advanced flag. Native
-[prepareSettingsVisibility](../../app/src/main/java/com/immortal/launcher/SettingsVisibilityPreparation.kt#L24)
+[prepareSettingsVisibility](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/SettingsVisibilityPreparation.kt#L24)
 and remote
-[visibleControls](../../app/src/main/assets/remote/core.mjs#L594)
+[visibleControls](https://github.com/starbrightlab/immortal/blob/main/app/src/main/assets/remote/core.mjs#L594)
 apply their own Advanced filtering. Both preserve a selected legacy slideshow style when Advanced
 is off: native `visibleEnumOptions` and remote `renderSetting` use that exception.
 
@@ -98,7 +98,7 @@ schema while native child rows disappear. The slideshow parity test covers four 
 not this complete domain difference. This is source-proven behavior, not a reproduced UI defect.
 
 Visibility does not restrict writes:
-[SettingsDomain.applyValues](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomain.kt#L105)
+[SettingsDomain.applyValues](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomain.kt#L105)
 iterates all specs regardless of visibility or tier. Hidden values remain writable through
 validated API requests. This permits retaining/configuring dormant settings; presentation and
 apply eligibility must not be conflated in a corrective change.
@@ -114,17 +114,17 @@ chime domain's writer. Comments saying that the phone remote “can still tune�
 do not establish generic UI reachability: normal GET omits them. Explicit
 `includeInactive=1` schema requests expose their metadata for validation; the route requires
 a domain for that mode. See
-[schemaJson](../../app/src/main/java/com/immortal/launcher/settings/SettingsDomain.kt#L49) and
-[RemoteRoutes.settings](../../app/src/main/java/com/immortal/launcher/RemoteRoutes.kt#L466).
+[schemaJson](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/settings/SettingsDomain.kt#L49) and
+[RemoteRoutes.settings](https://github.com/starbrightlab/immortal/blob/main/app/src/main/java/com/immortal/launcher/RemoteRoutes.kt#L466).
 
 **Snapshot field exclusions in `SettingsDomainTest` (37 fields):**
 
 | Test owner | Exact `managedElsewhere` entries | Source |
 | --- | --- | --- |
-| Screensaver (23) | `immichUrl`, `immichKey`, `immichAlbumId`, `immichAlbumName`; `smbHost`, `smbShare`, `smbPath`, `smbUser`, `smbPass`; `davUrl`, `davUser`, `davPass`, `webUrl`; `facesEnabled`, `faceId`, `faceSizeIndex`; `dismissAppComponent`, `dismissHaDashboard`; `calendarUrl`, `calendarEnabled`, `calendarRange`, `calendarSize`, `calendarSide`. | [screensaver tripwire](../../app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L328) |
-| Immortal (1) | `constrainPageWidth`: retained dead storage field. | [immortal tripwire](../../app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L359) |
-| Welcome (12) | `greetingNight`, `greetingMorning`, `greetingAfternoon`, `greetingEvening`, `userName`, `greetingColor`, `clockColor`, `dateColor`, `backgroundOpacity`, `textScale`, `greetingLetterSpacing`, `ttsVoice`. | [welcome tripwire](../../app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L439) |
-| Sunrise (1) | `days`: bespoke Set-of-days picker. | [sunrise tripwire](../../app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L480) |
+| Screensaver (23) | `immichUrl`, `immichKey`, `immichAlbumId`, `immichAlbumName`; `smbHost`, `smbShare`, `smbPath`, `smbUser`, `smbPass`; `davUrl`, `davUser`, `davPass`, `webUrl`; `facesEnabled`, `faceId`, `faceSizeIndex`; `dismissAppComponent`, `dismissHaDashboard`; `calendarUrl`, `calendarEnabled`, `calendarRange`, `calendarSize`, `calendarSide`. | [screensaver tripwire](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L328) |
+| Immortal (1) | `constrainPageWidth`: retained dead storage field. | [immortal tripwire](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L359) |
+| Welcome (12) | `greetingNight`, `greetingMorning`, `greetingAfternoon`, `greetingEvening`, `userName`, `greetingColor`, `clockColor`, `dateColor`, `backgroundOpacity`, `textScale`, `greetingLetterSpacing`, `ttsVoice`. | [welcome tripwire](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L439) |
+| Sunrise (1) | `days`: bespoke Set-of-days picker. | [sunrise tripwire](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L480) |
 
 Screensaver wire keys `photo_motion` / `keep_people_in_frame` are mapped to snapshot fields;
 calendar's differently named fields are excluded rather than checked via a binding map.
@@ -138,7 +138,7 @@ This is a hand-maintained test list, not a discovery of all native consumers.
 **Whole-config exceptions (11):** `CameraConfig`, `TimerConfig`, `CountdownConfig`, `NotesConfig`,
 `AlarmConfig`, `CryptoConfig`, `NewsConfig`, `StocksConfig`, `AlpacaConfig`, `OptionsScanConfig`,
 `HaConfig`. The global
-[config tripwire](../../app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L535)
+[config tripwire](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt#L535)
 classifies 20 direct `*Config.kt` files: nine registered + eleven excepted. It does not inspect
 arbitrary preference setters, stores or subdirectories. For example,
 `ImmortalSettings.setWorldClockZones` writes a preference outside its reflected `Settings`
@@ -149,14 +149,14 @@ Thus “all persisted settings are covered” is stronger than these tests estab
 
 | Inspected tests | What their assertions cover | What they do not establish |
 | --- | --- | --- |
-| [`SettingsDomainTest`](../../app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt) (26 methods) | Generic partial apply, aliases, strict types/ranges, wrapping exception, enum coerce/skip, string guard, secret masking/blank preservation, hook once per batch; schema sections/defaults; real slideshow setters/styles; field/config tripwires. | Execution in this audit; actual Android effects, every real domain's hook, complete render parity, editor reachability. Most generic cases use recording setters. |
+| [`SettingsDomainTest`](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt) (26 methods) | Generic partial apply, aliases, strict types/ranges, wrapping exception, enum coerce/skip, string guard, secret masking/blank preservation, hook once per batch; schema sections/defaults; real slideshow setters/styles; field/config tripwires. | Execution in this audit; actual Android effects, every real domain's hook, complete render parity, editor reachability. Most generic cases use recording setters. |
 | `slideshowControls_gateIdenticallyForDeviceAndRemote_withoutClearingStoredChoices` | Remote schema vs direct `visibleWhen` for selected motion/framing/fit controls across styles. | It does not invoke native `prepareSettingsVisibility`, compose the screen or compare the full screensaver domain. |
 | `onDeviceRenderedDomains_haveNoUnrenderableInlineStrings` | Seven hardcoded domain/exclusion lists contain no remaining inline strings. | Its premise is stale: current `SettingControl` sends inline strings to `ApprovedStringSetting`. It omits fleet/home-dashboard/quickbar/calendarpacks and does not validate the actual consumer lists. |
-| [`SettingsVisibilityPreparationTest`](../../app/src/test/java/com/immortal/launcher/SettingsVisibilityPreparationTest.kt) | Native projection rules, Advanced hints, exclusions, disabled screensaver handling and predicate call counts using fixtures. | Comparison with actual registered domains' remote schemas. Existing tests deliberately lock the native master gate. |
+| [`SettingsVisibilityPreparationTest`](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/SettingsVisibilityPreparationTest.kt) | Native projection rules, Advanced hints, exclusions, disabled screensaver handling and predicate call counts using fixtures. | Comparison with actual registered domains' remote schemas. Existing tests deliberately lock the native master gate. |
 | `SettingsPresentationTest`, `SlideshowSettingsPresentationTest`, `ClockTimeDomainsTest`, `NightClockSettingsTest` | Tier/legacy selection, time metadata and selected conditional controls. | Capability availability and complete parent combinations across all twelve domains. |
-| [`SettingsSchemaRequestTest`](../../app/src/test/java/com/immortal/launcher/settings/SettingsSchemaRequestTest.kt), [`InactiveSettingsSchemaTest`](../../app/src/test/java/com/immortal/launcher/settings/InactiveSettingsSchemaTest.kt) | Request-scoped shared snapshots, fresh reads, hidden validation metadata, masking, readonly/default/section handling. | MQTT's live Context getters becoming a coherent immutable snapshot; real HTTP/Compose end-to-end behavior. |
-| [`HomeDashboardDomainTest`](../../app/src/test/java/com/immortal/launcher/settings/HomeDashboardDomainTest.kt), [`CalendarPackDomainTest`](../../app/src/test/java/com/immortal/launcher/settings/CalendarPackDomainTest.kt), [`FleetSettingsTest`](../../app/src/test/java/com/immortal/launcher/settings/FleetSettingsTest.kt) | New-domain membership, fields, validation and bindings; pack expansion/tiers. | Native presentation reachability or a single generic parity contract. These suites were inspected, not included in the attempted focused run. |
-| JS [`remote-settings-search-context.test.mjs`](../../app/src/test/js/remote-settings-search-context.test.mjs) and time-of-day tests | Remote filtering/time contracts against fixtures. | They are separate from Kotlin registry declarations; they do not compare a real schema with native projection. Not run here. |
+| [`SettingsSchemaRequestTest`](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/SettingsSchemaRequestTest.kt), [`InactiveSettingsSchemaTest`](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/InactiveSettingsSchemaTest.kt) | Request-scoped shared snapshots, fresh reads, hidden validation metadata, masking, readonly/default/section handling. | MQTT's live Context getters becoming a coherent immutable snapshot; real HTTP/Compose end-to-end behavior. |
+| [`HomeDashboardDomainTest`](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/HomeDashboardDomainTest.kt), [`CalendarPackDomainTest`](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/CalendarPackDomainTest.kt), [`FleetSettingsTest`](https://github.com/starbrightlab/immortal/blob/main/app/src/test/java/com/immortal/launcher/settings/FleetSettingsTest.kt) | New-domain membership, fields, validation and bindings; pack expansion/tiers. | Native presentation reachability or a single generic parity contract. These suites were inspected, not included in the attempted focused run. |
+| JS [`remote-settings-search-context.test.mjs`](https://github.com/starbrightlab/immortal/blob/main/app/src/test/js/remote-settings-search-context.test.mjs) and time-of-day tests | Remote filtering/time contracts against fixtures. | They are separate from Kotlin registry declarations; they do not compare a real schema with native projection. Not run here. |
 
 ## Bounded architecture corrections
 
@@ -199,5 +199,5 @@ Thus “all persisted settings are covered” is stronger than these tests estab
    Update those comments in a separately authorized code change.
 
 Evidence with source hashes, expanded counts, hidden/Advanced keys and both the initial failed attempt and passing JVM rerun:
-[settings-registry-audit.json](../../mocks/portal-widget-gallery-20261102/evidence/settings-registry-audit.json).
+[settings-registry-audit.json](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/settings-registry-audit.json).
 No production, test or build configuration files were edited by this audit.

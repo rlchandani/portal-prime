@@ -76,15 +76,15 @@ Living Area was not targeted.
 
 ## Evidence and limits
 
-[Native assertions](../mocks/portal-premium-player-20261030/evidence/family-face-weather/checks.json),
-[baseline failures](../mocks/portal-premium-player-20261030/evidence/family-face-weather/baseline-checks.json),
-[count comparison](../mocks/portal-premium-player-20261030/evidence/family-face-weather/compare.json),
-[fresh unit receipt](../mocks/portal-premium-player-20261030/evidence/family-face-weather/unit-gate.json)
-and [restoration receipt](../mocks/portal-premium-player-20261030/evidence/family-face-weather/verification.json)
+[Native assertions](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-face-weather/checks.json),
+[baseline failures](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-face-weather/baseline-checks.json),
+[count comparison](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-face-weather/compare.json),
+[fresh unit receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-face-weather/unit-gate.json)
+and [restoration receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-face-weather/verification.json)
 support this scoped delivery.
-[The original JVM failure](../mocks/portal-premium-player-20261030/evidence/family-face-weather/unit-baseline.json)
+[The original JVM failure](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-face-weather/unit-baseline.json)
 is retained, and
-[six independent post-install health checks](../mocks/portal-premium-player-20261030/evidence/family-face-weather/health.json)
+[six independent post-install health checks](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-face-weather/health.json)
 confirm the installed artifact, optimized flags, Family identity, unchanged
 system process and inactive instrumentation/collector over wireless ADB.
 

@@ -29,7 +29,7 @@ Generated corner markers on the actual Portal exposed the loss:
 
 All eight sampled corner colors now match their generated source exactly.
 
-![Native portrait frame before and after, using a generated test image](../mocks/portal-premium-player-20261030/evidence/family-framed-native/before-after.png)
+![Native portrait frame before and after, using a generated test image](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-framed-native/before-after.png)
 
 ## Safe, bounded correction
 

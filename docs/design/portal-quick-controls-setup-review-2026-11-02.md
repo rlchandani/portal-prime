@@ -90,9 +90,9 @@ Fresh bounded source review found no remaining significant regression.
 
 Actual browser captures were visually reviewed:
 
-![Browser mock at the simulated Portal viewport](../../mocks/portal-widget-gallery-20261102/evidence/quick-controls-portal-review.png)
+![Browser mock at the simulated Portal viewport](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/quick-controls-portal-review.png)
 
-![Mobile browser review at150% text](../../mocks/portal-widget-gallery-20261102/evidence/quick-controls-mobile-review.png)
+![Mobile browser review at150% text](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/quick-controls-mobile-review.png)
 
 ## Native acceptance after design approval
 

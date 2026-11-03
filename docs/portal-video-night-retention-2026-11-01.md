@@ -98,7 +98,7 @@ The parent waits for application startup and uses verified own-service
 detachment when explicitly ending diagnostics. Every prior attempt was terminal
 before a corrected run began; no observation timeout alone triggered a restart.
 
-See the [sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-video-night-retention/verification.json).
+See the [sanitized verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-video-night-retention/verification.json).
 Private profiles, credentials and rollback artifacts stay outside Git.
 
 This accepts synthetic local-video continuity on the actual Android 10 Portal.

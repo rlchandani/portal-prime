@@ -65,11 +65,11 @@ exactly, SHA-256
 All owned images and their empty directory were then removed. No mobile
 horizontal overflow was observed.
 
-![Original wrong Failed outcome](../mocks/portal-widget-gallery-20261102/evidence/photo-upload-ack-old.png)
+![Original wrong Failed outcome](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/photo-upload-ack-old.png)
 
-![Correct unconfirmed outcomes](../mocks/portal-widget-gallery-20261102/evidence/photo-upload-ack-new.png)
+![Correct unconfirmed outcomes](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/photo-upload-ack-new.png)
 
-![Explicit rejection and independently confirmed file](../mocks/portal-widget-gallery-20261102/evidence/photo-upload-ack-explicit.png)
+![Explicit rejection and independently confirmed file](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/photo-upload-ack-explicit.png)
 
 Only generated-name transfer-panel crops are public. Full private snapshots and
 logs remain under `/private/tmp/portal-photo-upload-acknowledgment-20261102/`.

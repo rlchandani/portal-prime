@@ -67,7 +67,7 @@ two-pixel raster tolerance. The expected rendered source width is
 **2292.994 pixels**; blindly containing the entire photo would produce a
 smaller scale and fail the scale assertion.
 
-![Actual Portal before and after, with generated face-region markers](../mocks/portal-premium-player-20261030/evidence/family-face-region-framing/before-after.png)
+![Actual Portal before and after, with generated face-region markers](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-face-region-framing/before-after.png)
 
 ## Failed integration attempt and regression coverage
 
@@ -107,4 +107,4 @@ second physical Portal test. The
 user's natural-light clock/brightness check remains pending; no repeat
 physical test was requested.
 
-[Sanitized verification receipt](../mocks/portal-premium-player-20261030/evidence/family-face-region-framing/verification.json).
+[Sanitized verification receipt](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-face-region-framing/verification.json).

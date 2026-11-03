@@ -28,8 +28,8 @@ fingerprints/metadata are unchanged, cloned resources are removed, and Family's
 original transports plus the unrelated emulator remain. No phone was found
 over ADB or mDNS; physical installation and acceptance remain open.
 
-- [Structured verification](../mocks/portal-widget-gallery-20261102/evidence/companion-text-confirmation-verification.json).
-- [Actual native unconfirmed state](../mocks/portal-widget-gallery-20261102/evidence/companion-text-unconfirmed-100.png).
+- [Structured verification](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-widget-gallery-20261102/evidence/companion-text-confirmation-verification.json).
+- [Actual native unconfirmed state](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-widget-gallery-20261102/evidence/companion-text-unconfirmed-100.png).
 
 This is a phone client correction. No Portal API, UI, APK, configuration or
 input changed; both rooms retain the Calendar release 1.83. No GitHub or Home

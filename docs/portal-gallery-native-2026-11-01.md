@@ -31,7 +31,7 @@ view and gradient drawable. Decoding, bitmap budgets, face analysis, timers and
 slideshow dissolves are unchanged. Removing that drawing work is an implementation
 reduction, **not a measured CPU/GPU/FPS improvement**.
 
-![Cropped native before/after captures using a generated test image](../mocks/portal-premium-player-20261030/evidence/family-gallery-native/before-after.png)
+![Cropped native before/after captures using a generated test image](https://raw.githubusercontent.com/starbrightlab/immortal/main/mocks/portal-premium-player-20261030/evidence/family-gallery-native/before-after.png)
 
 ## Actual Portal checks
 
@@ -104,6 +104,6 @@ The broader optimization/screensaver/music goal remains incomplete. Parked
 Home/cold-start/renderer investigations were not reopened. Music provider/server
 wiring remains outside scope.
 
-[Sanitized receipt and native captures](../mocks/portal-premium-player-20261030/evidence/family-gallery-native/verification.json).
+[Sanitized receipt and native captures](https://github.com/starbrightlab/immortal/blob/main/mocks/portal-premium-player-20261030/evidence/family-gallery-native/verification.json).
 Credentials, source/configuration snapshots, raw device dumps and rollback APKs
 remain private outside Git.
