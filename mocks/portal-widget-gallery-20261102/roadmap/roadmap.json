@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T06:25:58.336963+00:00",
+  "updatedAt": "2026-11-03T06:40:18.540091+00:00",
   "updatedLabel": "3 Nov 2026 (UTC)",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,56 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.105/code99. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.106/code100. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-file-read",
+      "title": "Fleet downloads: retain the selected file",
+      "summary": "Delivered to both rooms: file length and body share one open descriptor; atomic replacement cannot switch a selected download.",
+      "description": "Capture the descriptor before creating the response, bound ordinary files to its measured length and close on writer/response retirement. Preserve procfs diagnostic content with close-delimited streaming.",
+      "status": "delivered",
+      "verification": "12 regressions / 4,138 JVM \u00b7 actual debug Android 6/14\u219214/14",
+      "kind": "File-download content and lifecycle correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Fleet engineering / independent route and native file review",
+      "deployment": "Exact signed optimized 1.106/code100 installed and full APK hash verified in Family Area and Living Area.",
+      "state": "Complete maps and Home/timer/Sunrise preference bytes match. Family current night frame/font/services/original Chrome retained. Owned process/scratch/registry copy removed.",
+      "acceptance": [
+        "Reproduce actual fsRead selecting replacement bytes or the wrong length after atomic publication.",
+        "Bind ordinary response size and body to one descriptor; retain selected files through replace/unlink and bound append/empty append.",
+        "Fail on shortening and retire descriptors on close/output failure while retaining path guards and procfs diagnostic content.",
+        "Run full gates, actual debug route comparison and exact signed room delivery; verify installed procfs HTTP smoke without owner changes."
+      ],
+      "evidence": [
+        {
+          "text": "Descriptor correction, actual route regressions, native comparison, live procfs smoke and limits.",
+          "source": "docs/portal-fleet-file-read-2026-11-03.md"
+        },
+        {
+          "text": "Reviewed hashes, twelve unchanged route tests, exact native differential and preserved room state.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/fleet-file-read-verification.json"
+        }
+      ],
+      "limits": [
+        "Open descriptor and captured length do not freeze same-inode overwrites; no atomic whole-backup or changing-state snapshot claim.",
+        "Native comparison calls the actual debug APK private route and response callbacks; socket transport and authenticated admission are outside that fixture.",
+        "The separate installed optimized HTTP smoke covers positive authenticated own-process procfs reads only; optimized concurrent replacement and full protocol/authorization acceptance remain unverified.",
+        "Descriptor retirement is checked by rejecting closed/failed writer reuse, not a direct descriptor census. Normal cleanup passed; timeout cleanup was not fault-injected.",
+        "Broader virtual filesystems, API28 and Living visual acceptance remain unverified. Existing fleetctl rejects size-mismatched bodies; size-change silent corruption is not claimed for that CLI.",
+        "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+      ],
+      "next": "Retain this delivered file-selection correction. Whole-backup consistency and optimized concurrent replacement remain open; existing approvals and parked clocks are retained.",
+      "issueClock": {
+        "startedAt": "2026-11-03T06:27:46Z",
+        "deadline": "2026-11-03T06:57:46Z",
+        "originalParallelDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "lan-audio-pcm",
       "title": "LAN intercom: retain complete PCM samples",

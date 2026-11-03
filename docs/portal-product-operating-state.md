@@ -13,8 +13,26 @@ The updated whole-product objective is
 
 ## Current delivery and boundaries
 
-- **Current room APK / LAN intercom PCM framing:** exact optimized
-  **1.105/code99** is installed and fully hashed in both rooms. The receiver now
+- **Current room APK / Fleet file-read descriptor ownership:** exact optimized
+  **1.106/code100** is installed and fully hashed in both rooms. Generic file
+  responses bind length/body to one open descriptor; replacement/unlink retain
+  the selected inode, appends remain bounded and truncation fails. Response and
+  writer cleanup retire the descriptor; procfs remains close-delimited. Twelve
+  actual-route regressions reproduce eight failures then pass; **4,138 JVM/
+  431 suites**, debug/optimized/R8/vital lint pass in2m2s. Actual debug-APK Family
+  Android10 route improves **6/14→14/14**, preserving own-process proc content.
+  Both installed optimized authenticated HTTP endpoints pass a procfs smoke
+  with no `Content-Length` and nonempty bodies. Native optimized replacement,
+  full protocol/authorization, immutable in-place bytes and whole-backup
+  consistency remain open. Complete maps/Home/timer/Sunrise bytes match;
+  Family current night frame/font/services/original Chrome retained. Owned
+  process/scratch/registry copy removed. Public1.83 guard rejects local1.106;
+  no phone/HA/auth/publication. **80 tasks:47 delivered,23 locally verified,
+  3 approval,6 parked,1 queued.** Original **06:27:46–06:57:46 UTC** retained;
+  broader goal stays active. [Receipt](portal-fleet-file-read-2026-11-03.md).
+
+- **Previous room APK / LAN intercom PCM framing:** exact optimized
+  **1.105/code99** was installed and fully hashed in both rooms. The receiver now
   carries incomplete samples and drains short writes; invalid or non-progressing
   writes stop through existing cleanup. Nine actual-playback regressions reproduce
   six failures then pass; **4,126 JVM/430 suites**, debug/optimized/R8/vital lint

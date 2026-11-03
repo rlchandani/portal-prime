@@ -1,0 +1,552 @@
+{
+  "recordedAt": "2026-11-03T06:40:18.540091+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-03T06:27:46Z",
+    "deadline": "2026-11-03T06:57:46Z",
+    "baseCommit": "81f7256560cd3b15d8d3e8965b619af9063b08f5",
+    "scope": "Fleet genericfile-read selectedinode/bodylength integrity across atomicreplacement; captured-descriptorcleanup and procfsdiagnostic preservation. Parallel discoveryclock retained. Header syntax/wholebackup/atomicchanginginodecontent/ownerwrites excluded.",
+    "originalParallelDiscoveryClockRetained": true
+  },
+  "scope": "Generic Fleet file-read selected-inode/body-length ownership, response descriptor cleanup and procfs diagnostic preservation.",
+  "sourceSha256": {
+    "app/src/main/java/com/immortal/launcher/FleetRoutes.kt": "35aad6e808d64709d5a0682310e8975e061e2fbb62c6581382bb84c6435b8ad7",
+    "app/src/main/java/com/immortal/launcher/FleetFileRead.kt": "70e022b368e4717712b27b0e5041bebfdb4da4a1a18ccabec48b267e4dbdd95c",
+    "app/src/main/java/com/immortal/launcher/FleetHttpServer.kt": "db51f51829218210c00db95652df8ca6f0d50ebe92df9787408fc1bfd4511932",
+    "app/src/main/java/com/immortal/launcher/FleetUploadWriter.kt": "31ba8dcbba56675b3fdccadbd6c31fb76a2c75eba2884ef74101f18835d8e5f8",
+    "app/src/test/java/com/immortal/launcher/FleetFileReadSnapshotTest.kt": "bf879060d2ab30084b6910e57c5a9e2bfb9be41322c0c2d8239d274528265319",
+    "app/build.gradle.kts": "a66b3447a0f01543a45cd730e1a5195503900d8e9b269f64ec17f97729bc6d5f"
+  },
+  "red": {
+    "issueClock": {
+      "startedAt": "2026-11-03T06:27:46Z",
+      "deadline": "2026-11-03T06:57:46Z",
+      "originalDiscoveryClockRetained": true
+    },
+    "tests": 12,
+    "failures": 8,
+    "errors": 0,
+    "skipped": 0,
+    "terminalExit": 1,
+    "assertionFailures": 7,
+    "expectedProductionFileNotFoundFailure": 1,
+    "fixtureErrors": 0,
+    "failed": [
+      {
+        "name": "emptyOrdinaryFileDoesNotAdmitBytesAppendedAfterSelection",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<[]> but was:<[TAIL]>"
+      },
+      {
+        "name": "longerAtomicReplacementCannotChangeAnAlreadySelectedDownload",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<[OLD4]> but was:<[NEW-NEW8]>"
+      },
+      {
+        "name": "abandonedResponseCloseRetiresTheCapturedDescriptor",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected java.io.IOException to be thrown, but nothing was thrown"
+      },
+      {
+        "name": "shortenedSameInodeFailsRatherThanCompletingAnUndersizedResponse",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected java.io.EOFException to be thrown, but nothing was thrown"
+      },
+      {
+        "name": "sameSizeAtomicReplacementCannotSilentlyChangeSelectedBytes",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<[OLD]4> but was:<[NEW]4>"
+      },
+      {
+        "name": "unlinkAfterResponseCreationStillServesTheOpenedFile",
+        "type": "java.io.FileNotFoundException",
+        "message": "java.io.FileNotFoundException: /var/folders/xf/__wqn7vx59zdcbj_hk73xfjw0000gp/T/fleet-read-snapshot-11695341075250003152/data.bin (No such file or directory)"
+      },
+      {
+        "name": "failedOutputRetiresTheDescriptorBeforeResponseClose",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected java.io.IOException to be thrown, but nothing was thrown"
+      },
+      {
+        "name": "appendingToTheSameInodeCannotExceedTheAdvertisedLength",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<OLD4[]> but was:<OLD4[TAIL]>"
+      }
+    ],
+    "passed": [
+      "directoriesAndMissingFilesKeepTheExistingReadableFileGuard",
+      "ordinaryFileKeepsItsDeclaredLengthAndBytes",
+      "unchangedEmptyOrdinaryFileHasAnEmptyFixedLengthResponse",
+      "missingPathIsRejectedBeforeOpeningAnyFile"
+    ],
+    "sourceSha256": {
+      "app/src/main/java/com/immortal/launcher/FleetRoutes.kt": "43a4a7ba98a9a2c191f985fb512b7db5ca3c535fecffab87889d4115bb71b36f",
+      "app/src/main/java/com/immortal/launcher/FleetHttpServer.kt": "db51f51829218210c00db95652df8ca6f0d50ebe92df9787408fc1bfd4511932",
+      "app/src/test/java/com/immortal/launcher/FleetFileReadSnapshotTest.kt": "bf879060d2ab30084b6910e57c5a9e2bfb9be41322c0c2d8239d274528265319"
+    },
+    "xmlSha256": "0996fd377b6828184b655ccf3371ec60bb194e932da24e32077131b09266395e",
+    "scope": "Actual private fsRead via normal FleetRoutes constructor and inert Context; temporary generated files and actual atomic FleetUploadWriter publication, no socket/network/auth/device operations. Unlink failure is production opening the removed path, not a fixture error. Host procfs unavailable; native procfs control pending."
+  },
+  "green": {
+    "suites": 431,
+    "tests": 4138,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actualRouteFocusedTests": 12,
+    "allTwelveUnchangedFromRed": true,
+    "qualityGateTerminalExit": 0,
+    "duration": "2m 2s",
+    "debugPerformanceR8AndVitalLint": true
+  },
+  "native": {
+    "comparison": {
+      "baseline": {
+        "passed": 6,
+        "total": 14
+      },
+      "candidate": {
+        "passed": 14,
+        "total": 14
+      },
+      "exactlyEightChecksDiffer": true,
+      "differingChecks": [
+        "longerReplacementKeepsSelectedInode",
+        "sameSizeReplacementKeepsSelectedBytes",
+        "unlinkKeepsCapturedDescriptor",
+        "appendCannotExceedCapturedLength",
+        "truncateFailsWithEof",
+        "emptyFileDoesNotAdmitLaterAppend",
+        "abandonedResponseDescriptorRetired",
+        "outputFailureRetiresDescriptor"
+      ],
+      "allSixOriginalControlsRetained": true,
+      "ownProcNominalZeroContentRetained": true
+    },
+    "runs": [
+      {
+        "status": "FAIL",
+        "checks": {
+          "actualDebugApkPrivateRouteLoaded": true,
+          "ordinaryDeclaredLengthAndBytes": true,
+          "longerReplacementKeepsSelectedInode": false,
+          "sameSizeReplacementKeepsSelectedBytes": false,
+          "unlinkKeepsCapturedDescriptor": false,
+          "appendCannotExceedCapturedLength": false,
+          "truncateFailsWithEof": false,
+          "emptyFileDoesNotAdmitLaterAppend": false,
+          "ordinaryEmptyFilePreserved": true,
+          "missingPathGuard": true,
+          "directoryAndMissingFileGuards": true,
+          "abandonedResponseDescriptorRetired": false,
+          "outputFailureRetiresDescriptor": false,
+          "ownProcStatusContentRetained": true
+        },
+        "observations": {
+          "ordinaryDeclaredLengthAndBytes": {
+            "declaredLength": 4,
+            "bodyBytes": 4,
+            "bodySha256": "d2593c0bb5dbdc23a17890d65c3f5321eb000a8c6a4f3f717dd0fe2fa61498dc"
+          },
+          "longerReplacementKeepsSelectedInode": {
+            "declaredLength": 4,
+            "bodyBytes": 8,
+            "bodySha256": "560b0a416ef98d832d0b0a2c6666b52f15f8d3359ca2c902586f89b219535288"
+          },
+          "sameSizeReplacementKeepsSelectedBytes": {
+            "declaredLength": 4,
+            "bodyBytes": 4,
+            "bodySha256": "501ebeeebd632316953cf973efc8824044fe75f8f537c21a926e9380d6f79f0a"
+          },
+          "unlinkKeepsCapturedDescriptor": {
+            "declaredLength": 4,
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "exception": "java.io.FileNotFoundException"
+          },
+          "appendCannotExceedCapturedLength": {
+            "declaredLength": 4,
+            "bodyBytes": 8,
+            "bodySha256": "b015217fbe4bb2b701af6fd2d326ff5e9d415ea2aa341cd5cc286cffe25ecb9a"
+          },
+          "truncateFailsWithEof": {
+            "declaredLength": 4,
+            "bodyBytes": 2,
+            "bodySha256": "9ce28c43c1ca7e5a98e8a15952d42076b2f35772b229a4becd8eca6196ddfaae",
+            "exception": null
+          },
+          "emptyFileDoesNotAdmitLaterAppend": {
+            "declaredLength": 0,
+            "bodyBytes": 4,
+            "bodySha256": "6a6964c54ae66986779e855641d8ad3179f7cd433de8705fec85e7b3f46bcaf4"
+          },
+          "ordinaryEmptyFilePreserved": {
+            "declaredLength": 0,
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "abandonedResponseDescriptorRetired": {
+            "exception": null
+          },
+          "outputFailureRetiresDescriptor": {
+            "firstException": "java.io.IOException",
+            "retryException": null
+          },
+          "ownProcStatusContentRetained": {
+            "declaredLength": 0,
+            "bodyBytes": 996,
+            "ownProcessOnly": true,
+            "rawBodyPublished": false
+          }
+        },
+        "passed": 6,
+        "total": 14,
+        "debugApkSha256": "6f6007315678f1e9c20e9798d1dabce36e495c7ff55be9183835de2f0227debf",
+        "scope": "Actual debug APK private fsRead route, owned files, response streams and own proc status",
+        "actualAuthGateVerified": false,
+        "actualHttpServerVerified": false,
+        "optimizedRouteVerified": false,
+        "appPreferencesWritten": 0,
+        "networkRequests": 0,
+        "frameworkServicesTouched": 0,
+        "forbiddenContextCalls": [],
+        "cleanup": {
+          "fixtureResponsesClosed": true
+        }
+      },
+      {
+        "status": "PASS",
+        "checks": {
+          "actualDebugApkPrivateRouteLoaded": true,
+          "ordinaryDeclaredLengthAndBytes": true,
+          "longerReplacementKeepsSelectedInode": true,
+          "sameSizeReplacementKeepsSelectedBytes": true,
+          "unlinkKeepsCapturedDescriptor": true,
+          "appendCannotExceedCapturedLength": true,
+          "truncateFailsWithEof": true,
+          "emptyFileDoesNotAdmitLaterAppend": true,
+          "ordinaryEmptyFilePreserved": true,
+          "missingPathGuard": true,
+          "directoryAndMissingFileGuards": true,
+          "abandonedResponseDescriptorRetired": true,
+          "outputFailureRetiresDescriptor": true,
+          "ownProcStatusContentRetained": true
+        },
+        "observations": {
+          "ordinaryDeclaredLengthAndBytes": {
+            "declaredLength": 4,
+            "bodyBytes": 4,
+            "bodySha256": "d2593c0bb5dbdc23a17890d65c3f5321eb000a8c6a4f3f717dd0fe2fa61498dc"
+          },
+          "longerReplacementKeepsSelectedInode": {
+            "declaredLength": 4,
+            "bodyBytes": 4,
+            "bodySha256": "d2593c0bb5dbdc23a17890d65c3f5321eb000a8c6a4f3f717dd0fe2fa61498dc"
+          },
+          "sameSizeReplacementKeepsSelectedBytes": {
+            "declaredLength": 4,
+            "bodyBytes": 4,
+            "bodySha256": "d2593c0bb5dbdc23a17890d65c3f5321eb000a8c6a4f3f717dd0fe2fa61498dc"
+          },
+          "unlinkKeepsCapturedDescriptor": {
+            "declaredLength": 4,
+            "bodyBytes": 4,
+            "bodySha256": "d2593c0bb5dbdc23a17890d65c3f5321eb000a8c6a4f3f717dd0fe2fa61498dc",
+            "exception": null
+          },
+          "appendCannotExceedCapturedLength": {
+            "declaredLength": 4,
+            "bodyBytes": 4,
+            "bodySha256": "d2593c0bb5dbdc23a17890d65c3f5321eb000a8c6a4f3f717dd0fe2fa61498dc"
+          },
+          "truncateFailsWithEof": {
+            "declaredLength": 4,
+            "bodyBytes": 2,
+            "bodySha256": "9ce28c43c1ca7e5a98e8a15952d42076b2f35772b229a4becd8eca6196ddfaae",
+            "exception": "java.io.EOFException"
+          },
+          "emptyFileDoesNotAdmitLaterAppend": {
+            "declaredLength": 0,
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "ordinaryEmptyFilePreserved": {
+            "declaredLength": 0,
+            "bodyBytes": 0,
+            "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "abandonedResponseDescriptorRetired": {
+            "exception": "java.io.IOException"
+          },
+          "outputFailureRetiresDescriptor": {
+            "firstException": "java.io.IOException",
+            "retryException": "java.io.IOException"
+          },
+          "ownProcStatusContentRetained": {
+            "declaredLength": -1,
+            "bodyBytes": 997,
+            "ownProcessOnly": true,
+            "rawBodyPublished": false
+          }
+        },
+        "passed": 14,
+        "total": 14,
+        "debugApkSha256": "03dccb2c126fde819ecc8dcb5e05d58ca772d221e46a009f29ed1c09c0e75986",
+        "scope": "Actual debug APK private fsRead route, owned files, response streams and own proc status",
+        "actualAuthGateVerified": false,
+        "actualHttpServerVerified": false,
+        "optimizedRouteVerified": false,
+        "appPreferencesWritten": 0,
+        "networkRequests": 0,
+        "frameworkServicesTouched": 0,
+        "forbiddenContextCalls": [],
+        "cleanup": {
+          "fixtureResponsesClosed": true
+        }
+      }
+    ],
+    "process": [
+      {
+        "terminalExit": 1,
+        "stdoutBytes": 2533,
+        "stderrBytes": 0,
+        "debugApkSha256": "6f6007315678f1e9c20e9798d1dabce36e495c7ff55be9183835de2f0227debf"
+      },
+      {
+        "terminalExit": 0,
+        "stdoutBytes": 2552,
+        "stderrBytes": 0,
+        "debugApkSha256": "03dccb2c126fde819ecc8dcb5e05d58ca772d221e46a009f29ed1c09c0e75986"
+      }
+    ],
+    "cleanup": [
+      {
+        "ownedProcessRetired": true,
+        "ownedDeviceScratchRemoved": true,
+        "appPreferencesWritten": 0,
+        "installerInvoked": false,
+        "networkRequests": 0,
+        "faults": []
+      },
+      {
+        "ownedProcessRetired": true,
+        "ownedDeviceScratchRemoved": true,
+        "appPreferencesWritten": 0,
+        "installerInvoked": false,
+        "networkRequests": 0,
+        "faults": []
+      }
+    ],
+    "fixtureSha256": {
+      "java": "95715b5caf45a496108b14780440e327bbdc810360ebfbf0d9f2154cf0a6dcc8",
+      "jar": "5a230a73bccc85829f10b731b633dea1601e3d6234120c040e15adfcd435a651",
+      "compiler": "e12c664ed52df3b2eed43d8c31737372e89854d4f466c8ba24ed5a89ba0acc08",
+      "runner": "625f84cf20442786d7343a514967eb8ef4eb409c93e0928289a32d96265c2858"
+    },
+    "scope": "Actual debug APK private fsRead/Response callbacks, generated owned files and read-only own-process proc status; no auth gate or HTTP server invoked.",
+    "directDescriptorCensusVerified": false,
+    "optimizedConcurrentReplacementVerified": false
+  },
+  "liveOptimizedProcfsSmoke": {
+    "results": {
+      "family": {
+        "httpStatus": 200,
+        "contentLengthOmitted": true,
+        "connectionClose": true,
+        "bodyBytes": 989,
+        "processStatusContentRetained": true,
+        "rawBodyPublished": false
+      },
+      "living": {
+        "httpStatus": 200,
+        "contentLengthOmitted": true,
+        "connectionClose": true,
+        "bodyBytes": 986,
+        "processStatusContentRetained": true,
+        "rawBodyPublished": false
+      }
+    },
+    "optimizedInstalledArtifacts": true,
+    "scope": "Read-only current authenticated /fs/read of each running app process status; no replacement race, negative auth, broader diagnostics or full protocol acceptance."
+  },
+  "artifact": {
+    "sha256": "b4b49a9c2c39b3bc59ec7ff5575217cd5e726c3da0a0178374b51f7e9b5027e6",
+    "bytes": 25862702,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.106",
+    "versionCode": 100,
+    "variants": {
+      "performance": {
+        "sha256": "b4b49a9c2c39b3bc59ec7ff5575217cd5e726c3da0a0178374b51f7e9b5027e6",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.106",
+        "versionCode": 100
+      },
+      "debug": {
+        "sha256": "03dccb2c126fde819ecc8dcb5e05d58ca772d221e46a009f29ed1c09c0e75986",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.106",
+        "versionCode": 100
+      },
+      "rollback": {
+        "sha256": "f762f6ea741292c22c3d3f70d0e349ae9e21560433bbfa29779a832b6a4b081f",
+        "bytes": 25862702,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.105",
+        "versionCode": 99
+      },
+      "baselineDebug": {
+        "sha256": "6f6007315678f1e9c20e9798d1dabce36e495c7ff55be9183835de2f0227debf",
+        "bytes": 46703529,
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "package": "com.immortal.launcher.debug",
+        "versionName": "1.105",
+        "versionCode": 99
+      }
+    },
+    "debugSha256": "03dccb2c126fde819ecc8dcb5e05d58ca772d221e46a009f29ed1c09c0e75986",
+    "rollbackSha256": "f762f6ea741292c22c3d3f70d0e349ae9e21560433bbfa29779a832b6a4b081f",
+    "combinedBuildTerminalExit": 0,
+    "buildDuration": "2m 2s"
+  },
+  "deployment": {
+    "family": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    },
+    "living": {
+      "helperExit": 0,
+      "installedFullSha256Verified": true,
+      "screensaverRequested": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "photoFrameResumed": true,
+      "displayOn": true,
+      "installedFullSha256Matches": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "preferenceFilesByteIdentical": true
+    }
+  },
+  "cleanup": {
+    "originalRegistryByteHashesUnchanged": true,
+    "ownedCopiedRegistryRemoved": true,
+    "ownedNativeProcessesAndDeviceScratchRemoved": true,
+    "privateDirectoriesMode": "0700",
+    "privateFilesMode": "0600",
+    "googlePhoneCommands": 0,
+    "normalFamilyFrameVisuallyInspected": true,
+    "familyChromeTaskRetained": true,
+    "currentNightClockFrameVisuallyInspected": true
+  },
+  "review": {
+    "blockingFindings": 0,
+    "reviewedSourceFixtureAndApkHashesMatch": true,
+    "jvmAggregateIndependentlyVerified": true,
+    "allSevenNativeBodyHashesIndependentlyVerified": true,
+    "normalCleanupVerified": true,
+    "scope": "Actual debug private-route comparison; positive installed optimized procfs HTTP smoke remains separate."
+  },
+  "publicRelease": {
+    "versionName": "1.83",
+    "versionCode": 77,
+    "manifestUnchanged": true,
+    "versionSyncGuardExit": 1,
+    "localMismatchRejected": true,
+    "published": false
+  },
+  "limits": [
+    "Open descriptor and captured length do not freeze same-inode overwrites; no atomic whole-backup or changing-state snapshot claim.",
+    "Native comparison calls the actual debug APK private route and response callbacks; socket transport and authenticated admission are outside that fixture.",
+    "The separate installed optimized HTTP smoke covers positive authenticated own-process procfs reads only; optimized concurrent replacement and full protocol/authorization acceptance remain unverified.",
+    "Descriptor retirement is checked by rejecting closed/failed writer reuse, not a direct descriptor census. Normal cleanup passed; timeout cleanup was not fault-injected.",
+    "Broader virtual filesystems, API28 and Living visual acceptance remain unverified. Existing fleetctl rejects size-mismatched bodies; size-change silent corruption is not claimed for that CLI.",
+    "No Google phone operation, Home Assistant change, GitHub authentication, push or publication."
+  ],
+  "documentation": {
+    "strictMkdocsExit": 0,
+    "strictWarnings": 0,
+    "seconds": 2.03,
+    "roadmap": {
+      "results": [
+        {
+          "width": 390,
+          "height": 844,
+          "defaultTaskPreserved": true,
+          "tasks": 80,
+          "checks": [
+            {
+              "id": "fleet-file-read",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "lan-audio-pcm",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        },
+        {
+          "width": 1600,
+          "height": 1000,
+          "defaultTaskPreserved": true,
+          "tasks": 80,
+          "checks": [
+            {
+              "id": "fleet-file-read",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            },
+            {
+              "id": "lan-audio-pcm",
+              "selected": true,
+              "overflow": false,
+              "artifactTextPresent": true
+            }
+          ],
+          "pageErrors": 0,
+          "externalRequests": 0,
+          "proofHttp200AndByteIdentical": true
+        }
+      ],
+      "ownedBrowserAndContextsClosed": true,
+      "existingServerPreserved": true
+    },
+    "detailCapturesVisuallyInspected": true,
+    "earlier79TaskRecordsDefaultAndOtherBoundariesPreserved": true,
+    "scope": "Two selected details at two widths; no full-product accessibility or visual acceptance."
+  }
+}
