@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "issue": "Companion slideshow collection activation after failed listing",
+  "clock": {
+    "start": "2026-11-03T00:58:23Z",
+    "deadline": "2026-11-03T01:28:23Z",
+    "issue": "Phone slideshow activation remains enabled after failed photo listing",
+    "limits": [
+      "No Portal configuration/photo mutation",
+      "Physical Pixel UI workflow acceptance not exercised",
+      "No reopening parked work"
+    ],
+    "deliveryAdjustment": "Pixel rediscovered as Wi-Fi reachable during this unit; after gates/signature/baseline capture, same-key update installed without app launch. Exact APK/saved3files/foreground verified."
+  },
+  "scope": "Existing phone photo-library action only; Portal/browser behavior unchanged",
+  "reproduction": {
+    "baselineVersion": "1.7.7/code19",
+    "methods": 8,
+    "newRegressionFailures": 3,
+    "capturedRepeatFailures": 1,
+    "device": "Owned API34 Android emulator"
+  },
+  "verification": {
+    "jvm": {
+      "tests": 651,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 81
+    },
+    "nativeMethods": 8,
+    "nativeExecutions": 16,
+    "fontScales": [
+      1.0,
+      1.3
+    ],
+    "renderedActivityFontAsserted": true,
+    "nativeRunnerSeconds": {
+      "normal": 7.612,
+      "large": 7.233
+    },
+    "builds": [
+      "debug",
+      "debugAndroidTest"
+    ],
+    "review": "No actionable blocker; full caller/repository/source-write workflow not executed"
+  },
+  "artifact": {
+    "package": "com.portalinstaller",
+    "versionName": "1.7.8-music-preview",
+    "versionCode": 20,
+    "bytes": 14738977,
+    "sha256": "9e6d1fdab7468963b9a6d4f53526452ba78aa41f3629128a9eb4ab9d6421702c",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "pixelInstalledExact": true,
+    "emulatorInstalledExact": true,
+    "savedFilesUnchanged": 3,
+    "foregroundUnchanged": true,
+    "installAndReadbackSeconds": 6.961,
+    "physicalWorkflowAcceptance": false
+  },
+  "cleanup": {
+    "sourceUnchanged": true,
+    "ownedResourcesRemoved": true
+  },
+  "limits": [
+    "Generated cached metadata and null thumbnails in the real PhotoLibraryPanel, not full-app visual acceptance.",
+    "Source-state error production and caller wiring independently reviewed; no real-network listing failure injected.",
+    "Pixel installation and exact readback accepted; physical phone UI/source-write workflow not run.",
+    "Three saved companion files preserved byte-for-byte; no Portal photo or configuration operation.",
+    "No FPS, latency improvement, broad accessibility or whole-product completion claim.",
+    "Weather geometry, cold reconnect and all other exhausted issues remain parked."
+  ],
+  "roadmapBrowserValidation": {
+    "snapshot": "companion-photo-activation",
+    "widths": [
+      1600,
+      390
+    ],
+    "scrollAndClientWidths": [
+      1585,
+      375
+    ],
+    "horizontalOverflow": false,
+    "proofHttpStatus": 200,
+    "currentPhoneLabel": "1.7.8",
+    "explicitPhysicalWorkflowLimitVisible": true
+  },
+  "companionCommit": "d5b1a4de1069ceb02d172bfb10832a60c232bf53",
+  "recordedAt": "2026-11-03T01:08:20.374261+00:00"
+}

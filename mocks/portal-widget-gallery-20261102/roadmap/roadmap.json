@@ -1,18 +1,67 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T00:52:16.864665+00:00",
-  "updatedLabel": "Local photo scans guarded in both rooms; native7/7 and4,014JVM passed",
+  "updatedAt": "2026-11-03T01:07:21.911549+00:00",
+  "updatedLabel": "Phone photo activation guarded;16 native checks passed;1.7.8 installed on Pixel",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.90/code84. Companion1.7.7/code19 is verified only in an isolated Android emulator; historical receipts retain their versions. Physical-phone installation remains open.",
+    "Both rooms retain exact optimized Portal1.90/code84. Companion1.7.8/code20 is installed on Pixel with exact APK proof and unchanged saved settings; its new photo action has isolated native acceptance. Historical receipts retain their versions. Physical full-app and real-network acceptance remain open.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "companion-photo-activation",
+      "title": "Phone photos: authorize slideshow activation from a confirmed listing",
+      "summary": "Delivered on Pixel. Failed or unfinished listings cannot change the slideshow collection; a successful complete refresh restores the action.",
+      "description": "Cached nonempty metadata previously kept Use for slideshow enabled after a failed photo-list refresh. Preserve browsing while requiring a loaded, error-free, complete listing for source activation.",
+      "status": "delivered",
+      "verification": "3 original native failures \u2192 8/8 at100% and130% \u00b7651JVM \u00b7exact Pixel APK",
+      "kind": "Phone photo-library action correctness",
+      "platforms": [
+        "companion"
+      ],
+      "owner": "Companion engineering / independent review / isolated native QA",
+      "deployment": "Companion1.7.8/code20 installed on physical Pixel via Wi-Fi, full APK SHA matches; all3 saved files and original foreground retained. Portal1.90 unchanged in both rooms.",
+      "state": "Actual API34 component fixtures at360\u00d7800dp, validated rendered Activity fonts1.0/1.3; disposable emulator removed and original AVD unchanged.",
+      "acceptance": [
+        "Reproduce enabled slideshow action after failed cached-list refresh.",
+        "Block activation until metadata is loaded, error-free, nonempty, idle and untruncated.",
+        "Retain cached browsing and existing Refresh recovery.",
+        "Verify both folder and All photos states, then one explicit recovered activation callback.",
+        "Use same signing key, exact installed readback and saved-file preservation on Pixel."
+      ],
+      "evidence": [
+        {
+          "text": "Reproduction, scope, installed Pixel artifact and boundaries.",
+          "source": "docs/portal-companion-photo-activation-2026-11-03.md"
+        },
+        {
+          "text": "Native16 executions,651JVM, artifact and QA cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/companion-photo-activation-verification.json"
+        },
+        {
+          "text": "Generated error state at actual130% text; native component only.",
+          "source": "mocks/portal-widget-gallery-20261102/roadmap/images/photo-activation-error-large.png"
+        }
+      ],
+      "limits": [
+        "Generated metadata and null-thumbnail placeholders; full caller/repository/source-write flow not exercised.",
+        "Pixel installation verified; no physical phone UI or real-network source activation tested.",
+        "No Portal photo/configuration changes, latency/FPS or whole-app quality claim.",
+        "Weather,cold reconnect and other exhausted issues retain their parked boundaries."
+      ],
+      "next": "Continue independent whole-product work; do not treat installed Pixel artifact as comprehensive physical-phone acceptance.",
+      "issueClock": {
+        "startedAt": "2026-11-03T00:58:23Z",
+        "deadline": "2026-11-03T01:28:23Z",
+        "firstSourceAuditClockRetained": true,
+        "scope": "Phone slideshow source activation from stale/error metadata"
+      }
+    },
     {
       "id": "local-folder-traversal",
       "title": "Local photos: stop repeated folder visits and bound the search",

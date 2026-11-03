@@ -1,8 +1,8 @@
 # Portal product operating state
 
-- Phone settings confirmation: native1.7.4/code16 candidate verified by602JVM/77suites,12focusedtests and3renderedcases at100%/130% text. Exact owned-emulator APK matched; source AVD retained and cleanup passed. Physical-phone installation remains open. Original19:08–19:38UTC clock retained; Portal1.82 unchanged. See `portal-companion-settings-confirmation-2026-11-02.md`.
+- Latest phone delivery: **1.7.8/code20 installed on Pixel**, exact APK readback and all3 saved companion files unchanged. Photo slideshow activation now requires a loaded, error-free complete list;651JVM and16 native component executions passed. Physical full-app/source-write acceptance remains open. See `portal-companion-photo-activation-2026-11-03.md`.
 
-Snapshot: **2026-11-02 UTC**. Original inventory inspected
+Snapshot: **2026-11-03 UTC**. Original inventory inspected
 `codex/portal-hi-widget-fixes-20261102` at base
 `137608262e39d72498a9de57b6d7bdc3ff7fffe2`; subsequent deliveries and maintenance
 are recorded below, with the native editor unit committed at `2682e3a9`.
@@ -960,3 +960,25 @@ Desktop/mobile metadata rendering and proof availability passed. Weather
 approval, held geometry acceptance, physical companion and human music sign-in
 keep their existing boundaries. No general FPS/latency or whole-product claim;
 original **00:37:12–01:07:12 UTC** clock includes cleanup and commit.
+
+
+## Companion photo collection activation delivery — 2026-11-03
+
+Phone **1.7.8/code20** is installed on the now-reachable Pixel through Wi-Fi.
+Three original rendered regression methods failed on1.7.7; the corrected gate
+passed all8 methods at actual100%/130% text,16 executions, plus651JVM/81suites
+and signed debug/instrumentation builds. Cached browsing remains; loaded and
+error-free metadata now participates in existing busy/nonempty/truncation admission.
+Successful refresh clears the error and one explicit activation callback is accepted.
+Independent source review found no blocker. Generated component screenshots
+are public; owner photos/credentials remain private.
+
+Full installed APK hashes match on Pixel and the owned emulator. Pixel's3 saved
+configuration files equal their baseline and its original foreground Activity
+remains. No physical phone app was launched or instrumented; live-network/full
+caller/source-write acceptance remains open. Source AVD preserved and owned
+emulator removed; workers closed. Both Portals retain1.90/code84 unchanged.
+Roadmap: **59tasks:31delivered,20scoped verified,5parked,2approval,1queued**.
+Weather, cold reconnect, human music sign-in and other exhausted boundaries
+remain. Original **00:58:23–01:28:23UTC** discovery clock includes cleanup and
+commit; complete-product goal remains active. See the scoped delivery receipt.
