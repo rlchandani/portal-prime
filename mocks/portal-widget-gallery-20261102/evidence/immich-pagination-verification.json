@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-03T01:45:35.680423+00:00",
+  "scope": "Immich repeated/backward pagination and duplicate playable asset selection",
+  "sourceBranch": "codex/immich-pagination-20261103",
+  "artifact": {
+    "package": "com.immortal.launcher.debug",
+    "versionName": "1.92",
+    "versionCode": 86,
+    "bytes": 25861122,
+    "sha256": "4ddddddef3feeafaba29f16a245b77cf9cce24620098ef5b8b7754a7b8c294d1",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "tests": {
+    "initialRegressionMethods": 12,
+    "initialFailures": 9,
+    "initialErrors": 0,
+    "finalRegressionMethods": 12,
+    "finalRegressionFailures": 0,
+    "fullJvm": {
+      "suites": 421,
+      "tests": 4038,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "builds": [
+      "debug",
+      "performance",
+      "R8",
+      "vital-lint"
+    ],
+    "combinedBuildSeconds": 152,
+    "independentStaticReview": "No actionable blocker within pagination scope"
+  },
+  "native": {
+    "device": "Family Area",
+    "apiLevel": 29,
+    "baseline": "Exact optimized1.91 APK in separate shell DexClassLoader",
+    "candidate": "Byte-identical optimized1.92 candidate tested before installation",
+    "beforeCombinedPasses": 3,
+    "afterCombinedPasses": 9,
+    "beforeMediaOnlyPasses": 4,
+    "afterMediaOnlyPasses": 9,
+    "cases": 9,
+    "invocationErrors": 0,
+    "baselineCases": [
+      {
+        "case": "normal-two-pages",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 2,
+        "uniqueMediaCount": 2,
+        "actualPostCount": 2,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "repeat-first-page",
+        "combinedPass": false,
+        "mediaPass": false,
+        "actualMediaCount": 4,
+        "uniqueMediaCount": 1,
+        "actualPostCount": 4,
+        "exactRequestPlanPass": false
+      },
+      {
+        "case": "repeat-second-page",
+        "combinedPass": false,
+        "mediaPass": false,
+        "actualMediaCount": 4,
+        "uniqueMediaCount": 1,
+        "actualPostCount": 4,
+        "exactRequestPlanPass": false
+      },
+      {
+        "case": "backward",
+        "combinedPass": false,
+        "mediaPass": false,
+        "actualMediaCount": 4,
+        "uniqueMediaCount": 2,
+        "actualPostCount": 4,
+        "exactRequestPlanPass": false
+      },
+      {
+        "case": "duplicate-in-page",
+        "combinedPass": false,
+        "mediaPass": false,
+        "actualMediaCount": 2,
+        "uniqueMediaCount": 1,
+        "actualPostCount": 1,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "overlapping-pages",
+        "combinedPass": false,
+        "mediaPass": false,
+        "actualMediaCount": 4,
+        "uniqueMediaCount": 3,
+        "actualPostCount": 2,
+        "exactRequestPlanPass": false
+      },
+      {
+        "case": "video-filter-off",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 1,
+        "uniqueMediaCount": 1,
+        "actualPostCount": 1,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "video-filter-on",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 2,
+        "uniqueMediaCount": 2,
+        "actualPostCount": 1,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "unsupported-page-budget",
+        "combinedPass": false,
+        "mediaPass": true,
+        "actualMediaCount": 0,
+        "uniqueMediaCount": 0,
+        "actualPostCount": 101,
+        "exactRequestPlanPass": false
+      }
+    ],
+    "candidateCases": [
+      {
+        "case": "normal-two-pages",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 2,
+        "uniqueMediaCount": 2,
+        "actualPostCount": 2,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "repeat-first-page",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 1,
+        "uniqueMediaCount": 1,
+        "actualPostCount": 1,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "repeat-second-page",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 1,
+        "uniqueMediaCount": 1,
+        "actualPostCount": 2,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "backward",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 2,
+        "uniqueMediaCount": 2,
+        "actualPostCount": 2,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "duplicate-in-page",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 2,
+        "uniqueMediaCount": 2,
+        "actualPostCount": 1,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "overlapping-pages",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 4,
+        "uniqueMediaCount": 4,
+        "actualPostCount": 3,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "video-filter-off",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 1,
+        "uniqueMediaCount": 1,
+        "actualPostCount": 1,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "video-filter-on",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 2,
+        "uniqueMediaCount": 2,
+        "actualPostCount": 1,
+        "exactRequestPlanPass": true
+      },
+      {
+        "case": "unsupported-page-budget",
+        "combinedPass": true,
+        "mediaPass": true,
+        "actualMediaCount": 0,
+        "uniqueMediaCount": 0,
+        "actualPostCount": 100,
+        "exactRequestPlanPass": true
+      }
+    ],
+    "baselinePostCount": 120,
+    "candidatePostCount": 113,
+    "methodDescriptor": "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)Ljava/util/List;",
+    "bindings": "Mapping and actual APK disassembly: static cap,baseUrl,apiKey,albumId,includeVideo; actual returned Media URL and video flag",
+    "classLoaderProvenanceVerified": true,
+    "candidateServerAuditPass": true,
+    "installedBaselineUnchangedDuringBothFixtures": true,
+    "baselineUnsupportedFixtureTerminatesAtEmptyPage101": true,
+    "actualNasBugObserved": false
+  },
+  "deployment": {
+    "Family Area": "Full installed APK SHA matches candidate;1.92/code86; normal manual frame verified",
+    "Living Area": "Final deploy success log and separate fresh full installed APK SHA/version readback verify installation; original process session handle unavailable; no duplicate deployment"
+  },
+  "preservationAndCleanup": {
+    "family": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true,
+      "fontUnchanged": true,
+      "accessibilityUnchanged": true,
+      "originalChromeTaskRetained": true,
+      "manualPhotoFrameForeground": true
+    },
+    "living": {
+      "/screensaver": true,
+      "/remote/settings/profile": true,
+      "/remote/layout": true,
+      "/remote/sources": true,
+      "nameUnchanged": true,
+      "devModeUnchanged": true,
+      "version": true
+    },
+    "cleanup": {
+      "ownedDeviceScratchRemoved": 2,
+      "absenceChecks": 2,
+      "ownedServerTerminalShutdownConfirmed": true,
+      "ownedServerPortAbsent": true,
+      "ownedRegistryRemoved": true,
+      "workersClosed": true,
+      "pixelCommandsAfterProhibition": 0,
+      "phoneCheckCleanupDeferred": true
+    }
+  },
+  "issueClock": {
+    "startedAtUtc": "2026-11-03T01:27:16Z",
+    "deadlineUtc": "2026-11-03T01:57:16Z",
+    "includesDiscoveryCleanupAndCommit": true
+  },
+  "limits": [
+    "Generated metadata and authentication only; no real NAS/source changes, image downloads or app-UID networking acceptance.",
+    "A100-request limit is not a total wall-time or response-memory budget and may omit media beyond that limit.",
+    "Existing legacy page/nextPage API retained; no cursor migration claim.",
+    "Living visual presentation not inspected; full installed APK and complete saved configurations verified.",
+    "No ordinary NAS speedup, FPS, photo-decoding, cold slideshow or whole-product performance claim; publication metadata unchanged.",
+    "Pixel control and inspection prohibited until explicit authorization; phone cleanup remains deferred.",
+    "Exhausted issue clocks and outstanding design approvals remain unchanged."
+  ],
+  "roadmapBrowser": {
+    "viewports": [
+      {
+        "width": 390,
+        "clientWidth": 375,
+        "scrollWidth": 375
+      },
+      {
+        "width": 1600,
+        "clientWidth": 1585,
+        "scrollWidth": 1585
+      }
+    ],
+    "currentVersionVisible": true,
+    "pixelControlBoundaryVisible": true,
+    "trackedTasks": 61,
+    "newTaskEvidenceLinksResolve": true
+  }
+}

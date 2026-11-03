@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T01:23:36.466162+00:00",
-  "updatedLabel": "WebDAV photo links corrected; Family8/8; exact1.91 deployed to both rooms",
+  "updatedAt": "2026-11-03T01:45:35.680423+00:00",
+  "updatedLabel": "Immich discovery guarded; Family9/9; exact1.92 deployed to both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,54 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "immich-pagination",
+      "title": "Immich photos: stop repeated pages and keep unique photos",
+      "summary": "Delivered to both rooms. Unexpected continuations stop safely; overlapping pages no longer duplicate photos or consume unique-media slots.",
+      "description": "The original reader trusted repeated/backward nextPage values and counted duplicate rows toward its cap. Require forward progress, deduplicate playable IDs and bound requests separately. No current home NAS failure was observed.",
+      "status": "delivered",
+      "verification": "9 original HTTP failures \u219212/12 \u00b74,038 JVM \u00b7Family3/9\u21929/9 combined \u00b7exact both-room APKs",
+      "kind": "Photo-source reliability and bounded discovery",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent review / Family native QA",
+      "deployment": "Optimized1.92/code86 installed and completely hashed in Family Area and Living Area; whole saved configurations unchanged.",
+      "state": "Family Android10 actual optimized APK, nine generated metadata/request cases; media-only4/9\u21929/9. No real NAS accounts or asset GETs. Normal manual frame retained.",
+      "acceptance": [
+        "Stop repeated/backward/nonpositive continuations while retaining collected media.",
+        "Count unique playable assets toward the cap in first-occurrence order.",
+        "Retain normal forward pagination, album filters, authentication and video selection.",
+        "Bound unsupported-only advancing responses to100 POST attempts.",
+        "Verify actual optimized Android reader, identical installed APKs and complete saved-state preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, upstream research, before/after and delivery limits.",
+          "source": "docs/portal-immich-pagination-2026-11-03.md"
+        },
+        {
+          "text": "Twelve HTTP methods, full suite, actual Android request counts and cleanup.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/immich-pagination-verification.json"
+        }
+      ],
+      "limits": [
+        "Generated metadata and authentication only; no real NAS/source changes, image downloads or app-UID networking acceptance.",
+        "A100-request limit is not a total wall-time or response-memory budget and may omit media beyond that limit.",
+        "Existing legacy page/nextPage API retained; no cursor migration claim.",
+        "Living visual presentation not inspected; full installed APK and complete saved configurations verified.",
+        "No ordinary NAS speedup, FPS, photo-decoding, cold slideshow or whole-product performance claim; publication metadata unchanged.",
+        "Pixel control and inspection prohibited until explicit authorization; phone cleanup remains deferred.",
+        "Exhausted issue clocks and outstanding design approvals remain unchanged."
+      ],
+      "next": "Continue independent whole-product work; real NAS/image decoding and cursor migration remain separate acceptance. Do not reopen exhausted issues or control Pixel.",
+      "issueClock": {
+        "startedAt": "2026-11-03T01:27:16Z",
+        "deadline": "2026-11-03T01:57:16Z",
+        "firstSourceAuditClockRetained": true,
+        "scope": "Immich repeated/backward pagination and duplicate playable assets"
+      }
+    },
     {
       "id": "webdav-href-resolution",
       "title": "WebDAV photos: resolve server links and escaped filenames correctly",

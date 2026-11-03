@@ -21,7 +21,22 @@ The updated whole-product objective is
   deferred because they would require another phone command. Companion source
   and isolated QA remain available.
 
-- **Current room APK / latest WebDAV delivery:** both rooms contain exact
+- **Current room APK / latest Immich delivery:** both rooms contain exact
+  optimized **1.92/code86**. Strictly advancing page continuations and a separate
+  100-request budget prevent repeated/backward/unbounded discovery; playable
+  asset IDs are unique across pages and the cap counts those uniques.
+  Original12 HTTP methods reproduced9 failures; final12 and **4,038 JVM/421
+  suites**, debug/optimized/R8/vital-lint gates passed. Family's actual optimized
+  reader improved **3/9→9/9 combined output/request checks**; media-only4/9→9/9.
+  The generated repeated-first-page cap4 case changed4POSTs/4duplicates to
+  1POST/1photo; this is not an ordinary NAS performance claim. Both installed
+  full APK hashes and complete saved configurations match; Family frame/font/
+  services/original Chrome retained. Owned scratch/server/token registry removed,
+  workers closed. No real NAS credentials, source writes or image GETs; Pixel
+  remains prohibited. Original **01:27:16–01:57:16 UTC** includes cleanup and
+  commit. [Scoped receipt](portal-immich-pagination-2026-11-03.md).
+
+- **Previous WebDAV delivery:** both rooms received exact
   optimized **1.91/code85**. The reader resolves absolute paths and same-origin
   absolute URLs, decodes XML entities once, preserves percent escapes and
   classifies download-query photos by path. Other-origin/malformed hrefs are

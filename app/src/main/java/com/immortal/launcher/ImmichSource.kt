@@ -36,6 +36,7 @@ import org.json.JSONObject
  */
 object ImmichSource {
   private const val TAG = "ImmortalImmich"
+  private const val MAX_SEARCH_PAGES = 100
 
   /** A library album, for the connection picker. */
   data class Album(val id: String, val name: String, val count: Int)
@@ -123,20 +124,25 @@ object ImmichSource {
       includeVideo: Boolean,
   ): List<Pair<String, Boolean>> {
     val out = ArrayList<Pair<String, Boolean>>()
+    val seen = HashSet<String>()
     var page = 1
-    while (out.size < cap) {
+    var pagesFetched = 0
+    while (out.size < cap && pagesFetched < MAX_SEARCH_PAGES) {
       PhotoSourceWork.checkpoint()
       val req = JSONObject().put("size", 1000).put("page", page)
       if (!includeVideo) req.put("type", "IMAGE")
       if (albumId != null) req.put("albumIds", JSONArray().put(albumId))
+      pagesFetched++
       val body = httpPostJson("$base/api/search/metadata", headers, req.toString()) ?: break
       val assets = JSONObject(body).optJSONObject("assets") ?: break
       val items = assets.optJSONArray("items") ?: break
       if (items.length() == 0) break
-      out.addAll(assetsFrom(items, cap - out.size, includeVideo))
+      out.addAll(assetsFrom(items, cap - out.size, includeVideo, seen))
       val next = assets.opt("nextPage")
       if (next == null || next == JSONObject.NULL) break
-      page = (next as? String)?.toIntOrNull() ?: (next as? Int) ?: break
+      val nextPage = (next as? String)?.toIntOrNull() ?: (next as? Int) ?: break
+      if (nextPage <= page) break
+      page = nextPage
     }
     return out
   }
@@ -145,16 +151,19 @@ object ImmichSource {
       assets: JSONArray,
       limit: Int,
       includeVideo: Boolean,
+      seen: MutableSet<String>,
   ): List<Pair<String, Boolean>> {
     val out = ArrayList<Pair<String, Boolean>>()
     var i = 0
     while (i < assets.length() && out.size < limit) {
-      val o = assets.getJSONObject(i)
-      when (o.optString("type")) {
-        "IMAGE" -> out.add(o.getString("id") to false)
-        "VIDEO" -> if (includeVideo) out.add(o.getString("id") to true)
+      val o = assets.getJSONObject(i++)
+      val isVideo = when (o.optString("type")) {
+        "IMAGE" -> false
+        "VIDEO" -> if (includeVideo) true else continue
+        else -> continue
       }
-      i++
+      val id = o.getString("id")
+      if (seen.add(id)) out.add(id to isVideo)
     }
     return out
   }
