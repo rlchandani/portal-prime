@@ -1,18 +1,59 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T08:43:54.558160+00:00",
-  "updatedLabel": "Cinema matte/frame delivered; room1.140 and other scopes retained",
+  "updatedAt": "2026-11-04T08:58:34.215942+00:00",
+  "updatedLabel": "Polaroid doodles delivered; room1.141 and earlier scopes retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.140/code 134. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.141/code 135. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "polaroid-matte-doodles",
+      "title": "Polaroid: quiet doodles behind paper prints",
+      "summary": "Sparse dark doodles soften empty margins behind the existing full-photo paper prints.",
+      "status": "delivered",
+      "verification": "4,414 JVM · 1,106 JS · three native scenes · exact both-room installs",
+      "kind": "Screensaver visual polish",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent review",
+      "deployment": "Optimized1.141/code135 fully hashed in both rooms; one install per room; Living uncertain ACK reconciled read-only.",
+      "acceptance": [
+        "Static doodles behind full fitted photos and paper borders.",
+        "Existing gradient, rotation, captions, preparation, swaps, motion and timers retained.",
+        "All32 rotated photo corners and eight paper-border points pass in three generated native scenes."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped delivery, fixture corrections and remaining acceptance.",
+          "source": "docs/portal-polaroid-doodles-2026-11-04.md"
+        },
+        {
+          "text": "Artifacts, native pixels, independent review and installed state.",
+          "source": "mocks/portal-polaroid-doodles-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated direct Family/API29 scenes; native clock, scheduler, resize, swaps, API28, Living visuals and hardware performance remain separate.",
+        "Simulated browser clock overlap observed08:48:03UTC remains a separate placement issue; no placement fix claimed.",
+        "No phone, live media/provider/account, push or publication."
+      ],
+      "next": "Continue a distinct bounded visible fix; all earlier parked scopes and original clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-04T08:45:50Z",
+        "target": "2026-11-04T09:00:50Z",
+        "deadline": "2026-11-04T09:15:50Z",
+        "scope": "Polaroid quiet doodles behind existing fitted paper prints; existing gradient/layout/rotation/captions/motion/timers retained. Generated native pixels, both-room delivery and closure.",
+        "sourceBase": "c86acc66eec0da42d7b086e86b64c31017fdc249"
+      }
+    },
     {
       "id": "cinema-matte-frame",
       "title": "Cinema Letterbox: quiet margins and a slim frame",

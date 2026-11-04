@@ -1,0 +1,1815 @@
+{
+  "scope": {
+    "startedAt": "2026-11-04T08:45:50Z",
+    "target": "2026-11-04T09:00:50Z",
+    "deadline": "2026-11-04T09:15:50Z",
+    "scope": "Polaroid quiet doodles behind existing fitted paper prints; existing gradient/layout/rotation/captions/motion/timers retained. Generated native pixels, both-room delivery and closure.",
+    "sourceBase": "c86acc66eec0da42d7b086e86b64c31017fdc249",
+    "version": "1.141/code135",
+    "boundaries": [
+      "No phone",
+      "No live source-media/provider/account/GitHub publication",
+      "Previous parked scopes and clocks retained",
+      "Saved shuffle/fit and complete room configuration retained"
+    ]
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-polaroid-doodles-20261104-084550/candidate-debug-1.141.apk",
+      "bytes": 46728366,
+      "sha256": "0da7606def92a517c52adb9643e3de8e4c513fc1b8f2ae826d241f3de7615125",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='135' versionName='1.141' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 66451,
+          "sha256": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15267,
+          "sha256": "5b227662f9a5f1d66d499db5cb0da3b0c23103fc0e91ff40534c3eb8491aeb1d"
+        }
+      ]
+    },
+    "performance": {
+      "path": "/private/tmp/portal-polaroid-doodles-20261104-084550/candidate-performance-1.141.apk",
+      "bytes": 25886307,
+      "sha256": "38c2b5ad41b2bfd61c16dd48cab87324bd71ac215123d17cd281269a0cd21cec",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='135' versionName='1.141' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 66451,
+          "sha256": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15267,
+          "sha256": "5b227662f9a5f1d66d499db5cb0da3b0c23103fc0e91ff40534c3eb8491aeb1d"
+        }
+      ]
+    },
+    "jvm": {
+      "tests": 4414,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 461
+    },
+    "gradleExit": 0
+  },
+  "sourceReview": {
+    "status": "accepted_bounded_source_no_blocker",
+    "reviewedAtUtc": "2026-11-04T08:47:57.363Z",
+    "sliceClock": {
+      "start": "2026-11-04T08:45:50Z",
+      "target": "2026-11-04T09:00:50Z",
+      "hardDeadline": "2026-11-04T09:15:50Z"
+    },
+    "scope": {
+      "cssAddedLines": 2,
+      "removeExactInsertionReproducesFrozenBaseline": true,
+      "modeJSBytesUnchanged": true,
+      "version": "1.141",
+      "versionCode": 135,
+      "stacking": "Table background gradient is preserved. Absolute inset-zero ::before is generated before the later positioned/rotated paper cards with no z-index; it adds no parent/card geometry and pointer-events is none.",
+      "preview": "Only Polaroid choice and existing mixed-library mode lists extended; predetermined local sample URLs, seeded random and inert host bridge preserved; serve.py unchanged."
+    },
+    "pairedTraceReplay": {
+      "helperSha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+      "method": "Existing actual helper evaluated in-memory twice with frozen/current CSS; actual unchanged production modes.js/mode-impls.js executed; seven established virtual checkpoints. No shared source writes.",
+      "traces": [
+        {
+          "photoMotion": "undefined",
+          "before": {
+            "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+            "randomDraws": 44,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              30000
+            ],
+            "cursor": 11
+          },
+          "candidate": {
+            "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+            "randomDraws": 44,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              30000
+            ],
+            "cursor": 11
+          },
+          "exact": true
+        },
+        {
+          "photoMotion": true,
+          "before": {
+            "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+            "randomDraws": 44,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              30000
+            ],
+            "cursor": 11
+          },
+          "candidate": {
+            "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+            "randomDraws": 44,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              30000
+            ],
+            "cursor": 11
+          },
+          "exact": true
+        },
+        {
+          "photoMotion": false,
+          "before": {
+            "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+            "randomDraws": 44,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              30000
+            ],
+            "cursor": 11
+          },
+          "candidate": {
+            "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+            "randomDraws": 44,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              30000
+            ],
+            "cursor": 11
+          },
+          "exact": true
+        }
+      ],
+      "expectedHash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007"
+    },
+    "hashes": {
+      "styles": "5b227662f9a5f1d66d499db5cb0da3b0c23103fc0e91ff40534c3eb8491aeb1d",
+      "baselineStyles": "d9ce1c193f35d6c683e212c05e8e655c6452e5c8b53138e05448def6e49a296d",
+      "modeJS": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0",
+      "baselineModeJS": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0",
+      "svg": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "previewFixture": "214f31b0e4cca671a68993ae499d88b5f60d34c8acfca7d86a35caccc67a4c61",
+      "previewHTML": "d40a6fce02ea86e9ffe458d6e41c8d32684442c51648fd31c548871b0ad5b2e8",
+      "previewServer": "02cd1288844c592f1574f374f595c0dffd479a9abc8004a1034005ca5264fe9e"
+    },
+    "limits": [
+      "DOM fixture does not rasterize or model pseudo-element pixels; matching traces alone cannot prove decorative paint behind paper. Native generated-scene pixels remain coordinator/native-agent work.",
+      "Generated host trace covers existing geometry/resources/timers/random draws; no native clock, full animation trajectory, compositor or hardware-performance claim.",
+      "No signed APK binding, room-install outcome or installed launcher claim in this source review.",
+      "No device, owner-registry, household, provider, account, browser or network calls."
+    ],
+    "blockers": []
+  },
+  "native": {
+    "ok": true,
+    "error": null,
+    "observations": [
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "shape": "landscape-single",
+        "gradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+        "expectedGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+        "pseudo": {
+          "content": "\"\"",
+          "background": "url(\"https://polaroid.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "pointerEvents": "none",
+          "zIndex": "auto",
+          "insets": [
+            "0px",
+            "0px",
+            "0px",
+            "0px"
+          ]
+        },
+        "cards": [
+          {
+            "known": true,
+            "id": 0,
+            "pw": 800,
+            "ph": 600,
+            "rect": {
+              "x": 824.5447387695312,
+              "y": 669.0325317382812,
+              "w": 684.2439575195312,
+              "h": 577.0182495117188
+            },
+            "imageWidth": 600,
+            "imageHeight": 450,
+            "corners": [
+              {
+                "x": 907.6515434999999,
+                "y": 716.9699287499999
+              },
+              {
+                "x": 1460.8588935,
+                "y": 761.54281125
+              },
+              {
+                "x": 875.1253859999998,
+                "y": 1120.66177875
+              },
+              {
+                "x": 1428.332736,
+                "y": 1165.23466125
+              }
+            ],
+            "paperPoint": {
+              "x": 857.9966697499998,
+              "y": 916.1254185
+            },
+            "paperColor": "rgb(251, 250, 246)",
+            "opacity": "1",
+            "visibility": "visible",
+            "transform": "matrix(0.99677, 0.0803115, -0.0803115, 0.99677, 0, 0)",
+            "willChange": "auto",
+            "imageOpacity": "1",
+            "imageVisibility": "visible",
+            "backgroundImage": "url(\"https://polaroid.fixture/photo/0.png\")",
+            "size": "contain",
+            "position": "50% 50%",
+            "animation": "none",
+            "captionCount": 0,
+            "topElementAtPaper": true,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "nativePaperBorderPassed": true
+          }
+        ],
+        "ownerOpacity": "1",
+        "ownerVisibility": "visible",
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "svgRequests": 1,
+        "photoRequests": 1,
+        "computedChecksPassed": true,
+        "compositorFenceRequested": true,
+        "compositorFenceCompleted": true,
+        "screenshot": "polaroid-landscape-single.png",
+        "pixelCopy": true,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "matteSamplesAwayFromPaperAndShadows": 585275,
+        "quietDoodleLocalContrastSamples": 6741
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "shape": "portrait-single",
+        "gradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+        "expectedGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+        "pseudo": {
+          "content": "\"\"",
+          "background": "url(\"https://polaroid.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "pointerEvents": "none",
+          "zIndex": "auto",
+          "insets": [
+            "0px",
+            "0px",
+            "0px",
+            "0px"
+          ]
+        },
+        "cards": [
+          {
+            "known": true,
+            "id": 1,
+            "pw": 480,
+            "ph": 800,
+            "rect": {
+              "x": 886.3241577148438,
+              "y": 332.91650390625,
+              "w": 592.7405395507812,
+              "h": 916.2504272460938
+            },
+            "imageWidth": 480,
+            "imageHeight": 800,
+            "corners": [
+              {
+                "x": 1004.41469475,
+                "y": 388.93197999999995
+              },
+              {
+                "x": 1423.0580947499998,
+                "y": 422.6628099999999
+              },
+              {
+                "x": 944.9841847499999,
+                "y": 1126.54178
+              },
+              {
+                "x": 1363.6275847499999,
+                "y": 1160.27261
+              }
+            ],
+            "paperPoint": {
+              "x": 933.8318697499998,
+              "y": 754.4441085
+            },
+            "paperColor": "rgb(251, 250, 246)",
+            "opacity": "1",
+            "visibility": "visible",
+            "transform": "matrix(0.99677, 0.0803115, -0.0803115, 0.99677, 0, 0)",
+            "willChange": "auto",
+            "imageOpacity": "1",
+            "imageVisibility": "visible",
+            "backgroundImage": "url(\"https://polaroid.fixture/photo/1.png\")",
+            "size": "contain",
+            "position": "50% 50%",
+            "animation": "none",
+            "captionCount": 0,
+            "topElementAtPaper": true,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "nativePaperBorderPassed": true
+          }
+        ],
+        "ownerOpacity": "1",
+        "ownerVisibility": "visible",
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "svgRequests": 2,
+        "photoRequests": 2,
+        "computedChecksPassed": true,
+        "compositorFenceRequested": true,
+        "compositorFenceCompleted": true,
+        "screenshot": "polaroid-portrait-single.png",
+        "pixelCopy": true,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "matteSamplesAwayFromPaperAndShadows": 525400,
+        "quietDoodleLocalContrastSamples": 6087
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "shape": "mixed-six",
+        "gradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+        "expectedGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+        "pseudo": {
+          "content": "\"\"",
+          "background": "url(\"https://polaroid.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "pointerEvents": "none",
+          "zIndex": "auto",
+          "insets": [
+            "0px",
+            "0px",
+            "0px",
+            "0px"
+          ]
+        },
+        "cards": [
+          {
+            "known": true,
+            "id": 0,
+            "pw": 800,
+            "ph": 600,
+            "rect": {
+              "x": 667.9891357421875,
+              "y": 102.61233520507812,
+              "w": 583.9939575195312,
+              "h": 508.9836120605469
+            },
+            "imageWidth": 484.167,
+            "imageHeight": 363.125,
+            "corners": [
+              {
+                "x": 713.3275489199751,
+                "y": 209.9267482558625
+              },
+              {
+                "x": 1156.872768161525,
+                "y": 147.94771960613753
+              },
+              {
+                "x": 758.5554576074751,
+                "y": 533.5946583808625
+              },
+              {
+                "x": 1202.1006768490251,
+                "y": 471.6156297311375
+              }
+            ],
+            "paperPoint": {
+              "x": 707.0657823215,
+              "y": 375.795667642
+            },
+            "paperColor": "rgb(251, 250, 246)",
+            "opacity": "1",
+            "visibility": "visible",
+            "transform": "matrix(0.990378, -0.138391, 0.138391, 0.990378, 0, 0)",
+            "willChange": "auto",
+            "imageOpacity": "1",
+            "imageVisibility": "visible",
+            "backgroundImage": "url(\"https://polaroid.fixture/photo/0.png\")",
+            "size": "contain",
+            "position": "50% 50%",
+            "animation": "none",
+            "captionCount": 0,
+            "topElementAtPaper": true,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "nativePaperBorderPassed": true
+          },
+          {
+            "known": true,
+            "id": 1,
+            "pw": 480,
+            "ph": 800,
+            "rect": {
+              "x": 1463.0623779296875,
+              "y": 27.993213653564453,
+              "w": 353.111328125,
+              "h": 583.9996948242188
+            },
+            "imageWidth": 301.486,
+            "imageHeight": 502.486,
+            "corners": [
+              {
+                "x": 1504.446185163305,
+                "y": 72.864185451775
+              },
+              {
+                "x": 1768.223484541555,
+                "y": 69.37917310907503
+              },
+              {
+                "x": 1510.5865590584451,
+                "y": 537.623297890925
+              },
+              {
+                "x": 1774.3638584366952,
+                "y": 534.138285548225
+              }
+            ],
+            "paperPoint": {
+              "x": 1477.676093441,
+              "y": 305.6379899244
+            },
+            "paperColor": "rgb(251, 250, 246)",
+            "opacity": "1",
+            "visibility": "visible",
+            "transform": "matrix(0.999913, -0.0132108, 0.0132108, 0.999913, 0, 0)",
+            "willChange": "auto",
+            "imageOpacity": "1",
+            "imageVisibility": "visible",
+            "backgroundImage": "url(\"https://polaroid.fixture/photo/1.png\")",
+            "size": "contain",
+            "position": "50% 50%",
+            "animation": "none",
+            "captionCount": 0,
+            "topElementAtPaper": true,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "nativePaperBorderPassed": true
+          },
+          {
+            "known": true,
+            "id": 2,
+            "pw": 600,
+            "ph": 600,
+            "rect": {
+              "x": 53.00676345825195,
+              "y": 667.9962158203125,
+              "w": 552.055908203125,
+              "h": 583.9937133789062
+            },
+            "imageWidth": 490.347,
+            "imageHeight": 490.347,
+            "corners": [
+              {
+                "x": 100.982250310735,
+                "y": 729.951151315865
+              },
+              {
+                "x": 542.0730115361349,
+                "y": 715.967685646835
+              },
+              {
+                "x": 114.965715979765,
+                "y": 1171.041912541265
+              },
+              {
+                "x": 556.0564772051649,
+                "y": 1157.058446872235
+              }
+            ],
+            "paperPoint": {
+              "x": 72.47446285495002,
+              "y": 951.6219382323999
+            },
+            "paperColor": "rgb(251, 250, 246)",
+            "opacity": "1",
+            "visibility": "visible",
+            "transform": "matrix(0.999498, -0.0316861, 0.0316861, 0.999498, 0, 0)",
+            "willChange": "auto",
+            "imageOpacity": "1",
+            "imageVisibility": "visible",
+            "backgroundImage": "url(\"https://polaroid.fixture/photo/2.png\")",
+            "size": "contain",
+            "position": "50% 50%",
+            "animation": "none",
+            "captionCount": 0,
+            "topElementAtPaper": true,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "nativePaperBorderPassed": true
+          },
+          {
+            "known": true,
+            "id": 3,
+            "pw": 2400,
+            "ph": 600,
+            "rect": {
+              "x": 27.99320411682129,
+              "y": 80.60508728027344,
+              "w": 583.9857788085938,
+              "h": 266.2342834472656
+            },
+            "imageWidth": 521.139,
+            "imageHeight": 130.278,
+            "corners": [
+              {
+                "x": 75.37411752711249,
+                "y": 111.99694224365001
+              },
+              {
+                "x": 580.6000990766876,
+                "y": 166.06193454575
+              },
+              {
+                "x": 62.89822724631249,
+                "y": 228.58151285825
+              },
+              {
+                "x": 568.1242087958875,
+                "y": 282.64650516035
+              }
+            ],
+            "paperPoint": {
+              "x": 51.721363213,
+              "y": 168.425642624
+            },
+            "paperColor": "rgb(251, 250, 246)",
+            "opacity": "1",
+            "visibility": "visible",
+            "transform": "matrix(0.994323, 0.106404, -0.106404, 0.994323, 0, 0)",
+            "willChange": "auto",
+            "imageOpacity": "1",
+            "imageVisibility": "visible",
+            "backgroundImage": "url(\"https://polaroid.fixture/photo/3.png\")",
+            "size": "contain",
+            "position": "50% 50%",
+            "animation": "none",
+            "captionCount": 0,
+            "topElementAtPaper": true,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "nativePaperBorderPassed": true
+          },
+          {
+            "known": true,
+            "id": 4,
+            "pw": 800,
+            "ph": 600,
+            "rect": {
+              "x": 1307.9931640625,
+              "y": 694.6087036132812,
+              "w": 583.9996948242188,
+              "h": 493.9632873535156
+            },
+            "imageWidth": 514.542,
+            "imageHeight": 385.903,
+            "corners": [
+              {
+                "x": 1373.2419239884448,
+                "y": 738.1968207797902
+              },
+              {
+                "x": 1848.420804947395,
+                "y": 765.3047251093101
+              },
+              {
+                "x": 1353.460659697405,
+                "y": 1084.94583226769
+              },
+              {
+                "x": 1828.6395406563552,
+                "y": 1112.05373659721
+              }
+            ],
+            "paperPoint": {
+              "x": 1333.1051361554,
+              "y": 909.8458502293001
+            },
+            "paperColor": "rgb(251, 250, 246)",
+            "opacity": "1",
+            "visibility": "visible",
+            "transform": "matrix(0.998377, 0.0569552, -0.0569552, 0.998377, 0, 0)",
+            "willChange": "auto",
+            "imageOpacity": "1",
+            "imageVisibility": "visible",
+            "backgroundImage": "url(\"https://polaroid.fixture/photo/4.png\")",
+            "size": "contain",
+            "position": "50% 50%",
+            "animation": "none",
+            "captionCount": 0,
+            "topElementAtPaper": true,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "nativePaperBorderPassed": true
+          },
+          {
+            "known": true,
+            "id": 5,
+            "pw": 480,
+            "ph": 800,
+            "rect": {
+              "x": 780.5197143554688,
+              "y": 667.9916381835938,
+              "w": 349.47454833984375,
+              "h": 583.9889526367188
+            },
+            "imageWidth": 303.486,
+            "imageHeight": 505.806,
+            "corners": [
+              {
+                "x": 821.6403675691007,
+                "y": 710.0146905128088
+              },
+              {
+                "x": 1087.1890242676009,
+                "y": 709.1077647104912
+              },
+              {
+                "x": 823.2382718223992,
+                "y": 1177.8824332895088
+              },
+              {
+                "x": 1088.7869285208992,
+                "y": 1176.9755074871912
+              }
+            ],
+            "paperPoint": {
+              "x": 792.471624503,
+              "y": 944.05091028561
+            },
+            "paperColor": "rgb(251, 250, 246)",
+            "opacity": "1",
+            "visibility": "visible",
+            "transform": "matrix(0.999994, -0.00341527, 0.00341527, 0.999994, 0, 0)",
+            "willChange": "auto",
+            "imageOpacity": "1",
+            "imageVisibility": "visible",
+            "backgroundImage": "url(\"https://polaroid.fixture/photo/5.png\")",
+            "size": "contain",
+            "position": "50% 50%",
+            "animation": "none",
+            "captionCount": 0,
+            "topElementAtPaper": true,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "nativePaperBorderPassed": true
+          }
+        ],
+        "ownerOpacity": "1",
+        "ownerVisibility": "visible",
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "svgRequests": 3,
+        "photoRequests": 8,
+        "computedChecksPassed": true,
+        "compositorFenceRequested": true,
+        "compositorFenceCompleted": true,
+        "screenshot": "polaroid-mixed-six.png",
+        "pixelCopy": true,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "matteSamplesAwayFromPaperAndShadows": 54705,
+        "quietDoodleLocalContrastSamples": 393
+      }
+    ],
+    "svgRequests": 3,
+    "photoRequests": 8,
+    "lastComputedState": {
+      "ready": true,
+      "svgDecoded": true,
+      "shape": "mixed-six",
+      "gradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+      "expectedGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+      "pseudo": {
+        "content": "\"\"",
+        "background": "url(\"https://polaroid.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "pointerEvents": "none",
+        "zIndex": "auto",
+        "insets": [
+          "0px",
+          "0px",
+          "0px",
+          "0px"
+        ]
+      },
+      "cards": [
+        {
+          "known": true,
+          "id": 0,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 667.9891357421875,
+            "y": 102.61233520507812,
+            "w": 583.9939575195312,
+            "h": 508.9836120605469
+          },
+          "imageWidth": 484.167,
+          "imageHeight": 363.125,
+          "corners": [
+            {
+              "x": 713.3275489199751,
+              "y": 209.9267482558625
+            },
+            {
+              "x": 1156.872768161525,
+              "y": 147.94771960613753
+            },
+            {
+              "x": 758.5554576074751,
+              "y": 533.5946583808625
+            },
+            {
+              "x": 1202.1006768490251,
+              "y": 471.6156297311375
+            }
+          ],
+          "paperPoint": {
+            "x": 707.0657823215,
+            "y": 375.795667642
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.990378, -0.138391, 0.138391, 0.990378, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid.fixture/photo/0.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 1,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 1463.0623779296875,
+            "y": 27.993213653564453,
+            "w": 353.111328125,
+            "h": 583.9996948242188
+          },
+          "imageWidth": 301.486,
+          "imageHeight": 502.486,
+          "corners": [
+            {
+              "x": 1504.446185163305,
+              "y": 72.864185451775
+            },
+            {
+              "x": 1768.223484541555,
+              "y": 69.37917310907503
+            },
+            {
+              "x": 1510.5865590584451,
+              "y": 537.623297890925
+            },
+            {
+              "x": 1774.3638584366952,
+              "y": 534.138285548225
+            }
+          ],
+          "paperPoint": {
+            "x": 1477.676093441,
+            "y": 305.6379899244
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.999913, -0.0132108, 0.0132108, 0.999913, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid.fixture/photo/1.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 2,
+          "pw": 600,
+          "ph": 600,
+          "rect": {
+            "x": 53.00676345825195,
+            "y": 667.9962158203125,
+            "w": 552.055908203125,
+            "h": 583.9937133789062
+          },
+          "imageWidth": 490.347,
+          "imageHeight": 490.347,
+          "corners": [
+            {
+              "x": 100.982250310735,
+              "y": 729.951151315865
+            },
+            {
+              "x": 542.0730115361349,
+              "y": 715.967685646835
+            },
+            {
+              "x": 114.965715979765,
+              "y": 1171.041912541265
+            },
+            {
+              "x": 556.0564772051649,
+              "y": 1157.058446872235
+            }
+          ],
+          "paperPoint": {
+            "x": 72.47446285495002,
+            "y": 951.6219382323999
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.999498, -0.0316861, 0.0316861, 0.999498, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid.fixture/photo/2.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 3,
+          "pw": 2400,
+          "ph": 600,
+          "rect": {
+            "x": 27.99320411682129,
+            "y": 80.60508728027344,
+            "w": 583.9857788085938,
+            "h": 266.2342834472656
+          },
+          "imageWidth": 521.139,
+          "imageHeight": 130.278,
+          "corners": [
+            {
+              "x": 75.37411752711249,
+              "y": 111.99694224365001
+            },
+            {
+              "x": 580.6000990766876,
+              "y": 166.06193454575
+            },
+            {
+              "x": 62.89822724631249,
+              "y": 228.58151285825
+            },
+            {
+              "x": 568.1242087958875,
+              "y": 282.64650516035
+            }
+          ],
+          "paperPoint": {
+            "x": 51.721363213,
+            "y": 168.425642624
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.994323, 0.106404, -0.106404, 0.994323, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid.fixture/photo/3.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 4,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 1307.9931640625,
+            "y": 694.6087036132812,
+            "w": 583.9996948242188,
+            "h": 493.9632873535156
+          },
+          "imageWidth": 514.542,
+          "imageHeight": 385.903,
+          "corners": [
+            {
+              "x": 1373.2419239884448,
+              "y": 738.1968207797902
+            },
+            {
+              "x": 1848.420804947395,
+              "y": 765.3047251093101
+            },
+            {
+              "x": 1353.460659697405,
+              "y": 1084.94583226769
+            },
+            {
+              "x": 1828.6395406563552,
+              "y": 1112.05373659721
+            }
+          ],
+          "paperPoint": {
+            "x": 1333.1051361554,
+            "y": 909.8458502293001
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.998377, 0.0569552, -0.0569552, 0.998377, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid.fixture/photo/4.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 5,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 780.5197143554688,
+            "y": 667.9916381835938,
+            "w": 349.47454833984375,
+            "h": 583.9889526367188
+          },
+          "imageWidth": 303.486,
+          "imageHeight": 505.806,
+          "corners": [
+            {
+              "x": 821.6403675691007,
+              "y": 710.0146905128088
+            },
+            {
+              "x": 1087.1890242676009,
+              "y": 709.1077647104912
+            },
+            {
+              "x": 823.2382718223992,
+              "y": 1177.8824332895088
+            },
+            {
+              "x": 1088.7869285208992,
+              "y": 1176.9755074871912
+            }
+          ],
+          "paperPoint": {
+            "x": 792.471624503,
+            "y": 944.05091028561
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.999994, -0.00341527, 0.00341527, 0.999994, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid.fixture/photo/5.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        }
+      ],
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 3,
+      "photoRequests": 8,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "polaroid-mixed-six.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "matteSamplesAwayFromPaperAndShadows": 54705,
+      "quietDoodleLocalContrastSamples": 393
+    },
+    "sceneCount": 3,
+    "scope": "Generated Polaroid pseudo matte, preserved gradient and rotated whole-photo paper only; no native FaceRenderer, clock, resize, swapping, scheduler or performance claim",
+    "unknownRequests": 0,
+    "deniedRequestDiagnostics": [],
+    "deniedRequestDiagnosticLimit": 16,
+    "webViewDestroyed": true,
+    "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+  },
+  "nativeArtifact": {
+    "apkSha256": "e32eae2f6721e74d8c53b152a5bb70b864fa1a1614ed92407344703736765682",
+    "apkBytes": 16835050,
+    "javaSha256": "8d6a23bdc5322642978410830db91d05373e40958957384db3a77adf3a1db982",
+    "embeddedSourceSha256": "38c2b5ad41b2bfd61c16dd48cab87324bd71ac215123d17cd281269a0cd21cec",
+    "permissions": [],
+    "signatureVerified": true,
+    "pixelAndComputedGatesUnchanged": true,
+    "actualShuffledBootstrapHelper": "203bytes byte-identical to current photos.js"
+  },
+  "nativeRetirement": {
+    "packageAbsent": true,
+    "processAbsent": true,
+    "webViewDestroyed": true
+  },
+  "independentNativeReview": {
+    "status": "accepted_no_blocker",
+    "reviewedAtUtc": "2026-11-04T08:54:42.223061+00:00",
+    "fixedClock": {
+      "start": "2026-11-04T08:45:50Z",
+      "target": "2026-11-04T09:00:50Z",
+      "hardDeadline": "2026-11-04T09:15:50Z"
+    },
+    "candidateSha256": "38c2b5ad41b2bfd61c16dd48cab87324bd71ac215123d17cd281269a0cd21cec",
+    "fixtureSha256": "e32eae2f6721e74d8c53b152a5bb70b864fa1a1614ed92407344703736765682",
+    "javaSha256": "8d6a23bdc5322642978410830db91d05373e40958957384db3a77adf3a1db982",
+    "firstAttemptJavaSha256": "88676004f47a97d3213807f4c8d9c803bda54a7de448dc0af7888a275957589f",
+    "nativeReportSha256": "6a7640d39ad428d4302bc73c03d474c5c48d96762ac7546dec5263dba8001a70",
+    "binding": {
+      "embeddedCandidateExactHash": true,
+      "allTenCandidateAssetsEqualCurrentSource": true,
+      "computedGateBlockByteIdenticalToFirstAttempt": true,
+      "pixelHelpersAndCaptureBlockByteIdenticalToFirstAttempt": true,
+      "actualPhotosShuffledHelperBytes": 203,
+      "actualPhotosShuffledHelperExact": true,
+      "helperSha256": "ef85a14f22621d6fd34ce8e22939748bbeaae645b3a3a71ccf820a46804e3741",
+      "bootstrapSeparatorCorrection": "Only supplies missing existing shuffled helper/separator and pre-readiness diagnostic state; first preparation/semicolon attempts excluded from acceptance."
+    },
+    "independentPNGReplay": {
+      "rotationAwareCornerSamples": 32,
+      "paperSamples": 8,
+      "all40SamplesPassUnchanged18RGBDistanceThreshold": true,
+      "fullWindowPNGDimensionsEqualWebViewDimensions": true,
+      "results": [
+        {
+          "shape": "landscape-single",
+          "pngSha256": "c09a775761c4bf5676318b90203bb425cec36364064624cf7be234cac614531d",
+          "matteSamplesExact": 585275,
+          "localContrastMarksExact": 6741,
+          "paperAndCorners": [
+            {
+              "id": 0,
+              "matrix": "matrix(0.99677, 0.0803115, -0.0803115, 0.99677, 0, 0)",
+              "corners": [
+                {
+                  "rgb": [
+                    0,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                }
+              ],
+              "paperRGB": [
+                251,
+                250,
+                246
+              ],
+              "paperDistance": 0
+            }
+          ]
+        },
+        {
+          "shape": "portrait-single",
+          "pngSha256": "415d85c8051fc6d6db9ee312f10663b95fc20572f5fe26899f221a9dbc014371",
+          "matteSamplesExact": 525400,
+          "localContrastMarksExact": 6087,
+          "paperAndCorners": [
+            {
+              "id": 1,
+              "matrix": "matrix(0.99677, 0.0803115, -0.0803115, 0.99677, 0, 0)",
+              "corners": [
+                {
+                  "rgb": [
+                    0,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                }
+              ],
+              "paperRGB": [
+                251,
+                250,
+                246
+              ],
+              "paperDistance": 0
+            }
+          ]
+        },
+        {
+          "shape": "mixed-six",
+          "pngSha256": "f42ecb75e9f775c3359b9fa9d6b4cdf0db2de8fa5828ac108e55971fdd2819c7",
+          "matteSamplesExact": 54705,
+          "localContrastMarksExact": 393,
+          "paperAndCorners": [
+            {
+              "id": 0,
+              "matrix": "matrix(0.990378, -0.138391, 0.138391, 0.990378, 0, 0)",
+              "corners": [
+                {
+                  "rgb": [
+                    0,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                }
+              ],
+              "paperRGB": [
+                251,
+                250,
+                246
+              ],
+              "paperDistance": 0
+            },
+            {
+              "id": 1,
+              "matrix": "matrix(0.999913, -0.0132108, 0.0132108, 0.999913, 0, 0)",
+              "corners": [
+                {
+                  "rgb": [
+                    0,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                }
+              ],
+              "paperRGB": [
+                251,
+                250,
+                246
+              ],
+              "paperDistance": 0
+            },
+            {
+              "id": 2,
+              "matrix": "matrix(0.999498, -0.0316861, 0.0316861, 0.999498, 0, 0)",
+              "corners": [
+                {
+                  "rgb": [
+                    0,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                }
+              ],
+              "paperRGB": [
+                251,
+                250,
+                246
+              ],
+              "paperDistance": 0
+            },
+            {
+              "id": 3,
+              "matrix": "matrix(0.994323, 0.106404, -0.106404, 0.994323, 0, 0)",
+              "corners": [
+                {
+                  "rgb": [
+                    0,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                }
+              ],
+              "paperRGB": [
+                251,
+                250,
+                246
+              ],
+              "paperDistance": 0
+            },
+            {
+              "id": 4,
+              "matrix": "matrix(0.998377, 0.0569552, -0.0569552, 0.998377, 0, 0)",
+              "corners": [
+                {
+                  "rgb": [
+                    0,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                }
+              ],
+              "paperRGB": [
+                251,
+                250,
+                246
+              ],
+              "paperDistance": 0
+            },
+            {
+              "id": 5,
+              "matrix": "matrix(0.999994, -0.00341527, 0.00341527, 0.999994, 0, 0)",
+              "corners": [
+                {
+                  "rgb": [
+                    0,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "distance": 0
+                },
+                {
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "distance": 0
+                }
+              ],
+              "paperRGB": [
+                251,
+                250,
+                246
+              ],
+              "paperDistance": 0
+            }
+          ]
+        }
+      ]
+    },
+    "cleanup": {
+      "nativeReportWebViewDestroyed": true,
+      "deviceAbsenceAndUninstallCoordinatorOwned": true
+    },
+    "limits": [
+      "Native scene evidence covers generated landscape single, portrait single and six mixed original photos; whole-photo corner and paper points use reported actual CSS rotation matrices and center markers.",
+      "All PNG dimensions equal full WebView dimensions; replay assumes zero window offset, consistent with fullscreen fill fixture.",
+      "DOM/PNG evidence proves local decoration stays behind sampled paper/photo points and marks appear away from existing shadows; no full-time motion trajectory, swaps, resize, native clock, scheduler or performance claim.",
+      "No installed launcher, household input, owner registry, device, account, provider or network actions by this reviewer.",
+      "Family/Living promotion and runtime retirement are coordinator evidence and remain outside this host audit."
+    ],
+    "blockers": []
+  },
+  "preview": {
+    "surface": "Owned isolated desktop Chromium; actual production entry point at localhost8892",
+    "mode": "polaroid",
+    "photoControlDisabled": true,
+    "activePrints": 6,
+    "photosAllContain": true,
+    "paperColor": "rgb(251, 250, 246)",
+    "tableGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+    "pseudo": {
+      "image": "photo-doodles-dark.svg",
+      "size": "480px 360px",
+      "content": "empty",
+      "position": "absolute",
+      "allInsets": "0px",
+      "pointerEvents": "none"
+    },
+    "svgResponse": 200,
+    "screenshotDisplayedAndViewed": true,
+    "toolScreenshot": ".playwright-mcp/page-2026-11-04T08-48-03-881Z.png",
+    "ownedIsolatedTabClosed": true,
+    "userIabTabsUnchanged": true,
+    "limits": [
+      "Desktop sample/library and simulated clock only; native clock and production scheduler remain separate. Existing Polaroid placement can overlap the simulated clock; no layout change or clock-placement acceptance claimed."
+    ]
+  },
+  "javascriptGates": {
+    "slideshow": {
+      "exitCode": 0,
+      "tests": 363
+    },
+    "application": {
+      "exitCode": 0,
+      "tests": 743
+    }
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25886307,
+      "sha256": "38c2b5ad41b2bfd61c16dd48cab87324bd71ac215123d17cd281269a0cd21cec",
+      "app": {
+        "versionCode": 135,
+        "versionName": "1.141"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886307,
+        "sha256": "38c2b5ad41b2bfd61c16dd48cab87324bd71ac215123d17cd281269a0cd21cec",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 135,
+          "versionName": "1.141"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1529,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1517,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "cacheGateQualification": {
+    "initialGateFailed": "Allowed only empty WebView cached flag sets",
+    "qualifiedGate": "Only the exact two framework-owned string sets may be removed; all remaining typed values and all four complete configuration maps must match",
+    "source": "https://chromium.googlesource.com/chromium/src/+/25a5bc7242a972e00204085eca1bc300b9861102/android_webview/java/src/org/chromium/android_webview/common/WebViewCachedFlags.java",
+    "frameworkBehavior": "Reads and deletes the disk cache during startup",
+    "initialFailureRetained": true,
+    "firstReadRemovedStringCounts": {
+      "CachedFlagsEnabled": 1,
+      "CachedFlagsDisabled": 2
+    },
+    "subsequentRead": "43 Family files byte-identical; WebView recreated its caches; 30 Living files byte-identical",
+    "firstFailureRetained": true
+  },
+  "registry": {
+    "family": {
+      "originalAndCopyMatchBaseline": true
+    },
+    "living": {
+      "originalAndCopyMatchBaseline": true
+    }
+  },
+  "queue": {
+    "oldTaskObjectsPreserved": 132,
+    "rawSuffixBytesPreserved": 436335,
+    "newTotal": 133,
+    "counts": {
+      "delivered": 83,
+      "verified": 40,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "defaultTaskPreserved": true
+  },
+  "excludedAttempts": {
+    "missingProductionShuffledHelper": true,
+    "hostBootstrapSeparatorRepair": true,
+    "firstEmptyCacheOnlyGateFailureRetained": true
+  },
+  "unchangedPublicInputs": {
+    "version.json": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+    "catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+    "provisioning/fleetctl": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "provisioning/room-fleet.py": "723356471a6594a19c6e94ce34d64b6bdda34eeb3650c2603b18877923d28fce"
+  },
+  "limits": [
+    "Generated direct Family/API29 scenes; native clock, scheduler, resize, swaps, API28, Living visuals and hardware performance remain separate.",
+    "Simulated browser clock overlap observed08:48:03UTC remains a separate placement issue; no placement fix claimed.",
+    "No phone, live media/provider/account, push or publication."
+  ],
+  "wholeProductGoal": "active",
+  "closedAt": "2026-11-04T08:58:53.523217+00:00",
+  "elapsedMinutes": 13.06,
+  "strictDocsExit": 0,
+  "focusedSyntaxAndDiffChecks": true,
+  "cleanup": {
+    "copiedRegistryAbsent": true,
+    "ownedDocsEnvironmentAndSiteAbsent": true,
+    "nativeFixtureRetired": true,
+    "ownedBrowserTabClosed": true,
+    "existingUserPreviewServerRetained": true,
+    "preexistingUntrackedPycacheUntouched": true
+  }
+}

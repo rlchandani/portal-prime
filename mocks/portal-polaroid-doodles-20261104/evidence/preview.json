@@ -1,0 +1,25 @@
+{
+  "surface": "Owned isolated desktop Chromium; actual production entry point at localhost8892",
+  "mode": "polaroid",
+  "photoControlDisabled": true,
+  "activePrints": 6,
+  "photosAllContain": true,
+  "paperColor": "rgb(251, 250, 246)",
+  "tableGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+  "pseudo": {
+    "image": "photo-doodles-dark.svg",
+    "size": "480px 360px",
+    "content": "empty",
+    "position": "absolute",
+    "allInsets": "0px",
+    "pointerEvents": "none"
+  },
+  "svgResponse": 200,
+  "screenshotDisplayedAndViewed": true,
+  "toolScreenshot": ".playwright-mcp/page-2026-11-04T08-48-03-881Z.png",
+  "ownedIsolatedTabClosed": true,
+  "userIabTabsUnchanged": true,
+  "limits": [
+    "Desktop sample/library and simulated clock only; native clock and production scheduler remain separate. Existing Polaroid placement can overlap the simulated clock; no layout change or clock-placement acceptance claimed."
+  ]
+}

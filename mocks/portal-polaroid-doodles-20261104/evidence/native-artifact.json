@@ -1,0 +1,10 @@
+{
+  "apkSha256": "e32eae2f6721e74d8c53b152a5bb70b864fa1a1614ed92407344703736765682",
+  "apkBytes": 16835050,
+  "javaSha256": "8d6a23bdc5322642978410830db91d05373e40958957384db3a77adf3a1db982",
+  "embeddedSourceSha256": "38c2b5ad41b2bfd61c16dd48cab87324bd71ac215123d17cd281269a0cd21cec",
+  "permissions": [],
+  "signatureVerified": true,
+  "pixelAndComputedGatesUnchanged": true,
+  "actualShuffledBootstrapHelper": "203bytes byte-identical to current photos.js"
+}

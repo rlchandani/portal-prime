@@ -1,0 +1,420 @@
+{
+  "status": "accepted_no_blocker",
+  "reviewedAtUtc": "2026-11-04T08:54:42.223061+00:00",
+  "fixedClock": {
+    "start": "2026-11-04T08:45:50Z",
+    "target": "2026-11-04T09:00:50Z",
+    "hardDeadline": "2026-11-04T09:15:50Z"
+  },
+  "candidateSha256": "38c2b5ad41b2bfd61c16dd48cab87324bd71ac215123d17cd281269a0cd21cec",
+  "fixtureSha256": "e32eae2f6721e74d8c53b152a5bb70b864fa1a1614ed92407344703736765682",
+  "javaSha256": "8d6a23bdc5322642978410830db91d05373e40958957384db3a77adf3a1db982",
+  "firstAttemptJavaSha256": "88676004f47a97d3213807f4c8d9c803bda54a7de448dc0af7888a275957589f",
+  "nativeReportSha256": "6a7640d39ad428d4302bc73c03d474c5c48d96762ac7546dec5263dba8001a70",
+  "binding": {
+    "embeddedCandidateExactHash": true,
+    "allTenCandidateAssetsEqualCurrentSource": true,
+    "computedGateBlockByteIdenticalToFirstAttempt": true,
+    "pixelHelpersAndCaptureBlockByteIdenticalToFirstAttempt": true,
+    "actualPhotosShuffledHelperBytes": 203,
+    "actualPhotosShuffledHelperExact": true,
+    "helperSha256": "ef85a14f22621d6fd34ce8e22939748bbeaae645b3a3a71ccf820a46804e3741",
+    "bootstrapSeparatorCorrection": "Only supplies missing existing shuffled helper/separator and pre-readiness diagnostic state; first preparation/semicolon attempts excluded from acceptance."
+  },
+  "independentPNGReplay": {
+    "rotationAwareCornerSamples": 32,
+    "paperSamples": 8,
+    "all40SamplesPassUnchanged18RGBDistanceThreshold": true,
+    "fullWindowPNGDimensionsEqualWebViewDimensions": true,
+    "results": [
+      {
+        "shape": "landscape-single",
+        "pngSha256": "c09a775761c4bf5676318b90203bb425cec36364064624cf7be234cac614531d",
+        "matteSamplesExact": 585275,
+        "localContrastMarksExact": 6741,
+        "paperAndCorners": [
+          {
+            "id": 0,
+            "matrix": "matrix(0.99677, 0.0803115, -0.0803115, 0.99677, 0, 0)",
+            "corners": [
+              {
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0
+              }
+            ],
+            "paperRGB": [
+              251,
+              250,
+              246
+            ],
+            "paperDistance": 0
+          }
+        ]
+      },
+      {
+        "shape": "portrait-single",
+        "pngSha256": "415d85c8051fc6d6db9ee312f10663b95fc20572f5fe26899f221a9dbc014371",
+        "matteSamplesExact": 525400,
+        "localContrastMarksExact": 6087,
+        "paperAndCorners": [
+          {
+            "id": 1,
+            "matrix": "matrix(0.99677, 0.0803115, -0.0803115, 0.99677, 0, 0)",
+            "corners": [
+              {
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0
+              }
+            ],
+            "paperRGB": [
+              251,
+              250,
+              246
+            ],
+            "paperDistance": 0
+          }
+        ]
+      },
+      {
+        "shape": "mixed-six",
+        "pngSha256": "f42ecb75e9f775c3359b9fa9d6b4cdf0db2de8fa5828ac108e55971fdd2819c7",
+        "matteSamplesExact": 54705,
+        "localContrastMarksExact": 393,
+        "paperAndCorners": [
+          {
+            "id": 0,
+            "matrix": "matrix(0.990378, -0.138391, 0.138391, 0.990378, 0, 0)",
+            "corners": [
+              {
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0
+              }
+            ],
+            "paperRGB": [
+              251,
+              250,
+              246
+            ],
+            "paperDistance": 0
+          },
+          {
+            "id": 1,
+            "matrix": "matrix(0.999913, -0.0132108, 0.0132108, 0.999913, 0, 0)",
+            "corners": [
+              {
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0
+              }
+            ],
+            "paperRGB": [
+              251,
+              250,
+              246
+            ],
+            "paperDistance": 0
+          },
+          {
+            "id": 2,
+            "matrix": "matrix(0.999498, -0.0316861, 0.0316861, 0.999498, 0, 0)",
+            "corners": [
+              {
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0
+              }
+            ],
+            "paperRGB": [
+              251,
+              250,
+              246
+            ],
+            "paperDistance": 0
+          },
+          {
+            "id": 3,
+            "matrix": "matrix(0.994323, 0.106404, -0.106404, 0.994323, 0, 0)",
+            "corners": [
+              {
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0
+              }
+            ],
+            "paperRGB": [
+              251,
+              250,
+              246
+            ],
+            "paperDistance": 0
+          },
+          {
+            "id": 4,
+            "matrix": "matrix(0.998377, 0.0569552, -0.0569552, 0.998377, 0, 0)",
+            "corners": [
+              {
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0
+              }
+            ],
+            "paperRGB": [
+              251,
+              250,
+              246
+            ],
+            "paperDistance": 0
+          },
+          {
+            "id": 5,
+            "matrix": "matrix(0.999994, -0.00341527, 0.00341527, 0.999994, 0, 0)",
+            "corners": [
+              {
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0
+              },
+              {
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0
+              }
+            ],
+            "paperRGB": [
+              251,
+              250,
+              246
+            ],
+            "paperDistance": 0
+          }
+        ]
+      }
+    ]
+  },
+  "cleanup": {
+    "nativeReportWebViewDestroyed": true,
+    "deviceAbsenceAndUninstallCoordinatorOwned": true
+  },
+  "limits": [
+    "Native scene evidence covers generated landscape single, portrait single and six mixed original photos; whole-photo corner and paper points use reported actual CSS rotation matrices and center markers.",
+    "All PNG dimensions equal full WebView dimensions; replay assumes zero window offset, consistent with fullscreen fill fixture.",
+    "DOM/PNG evidence proves local decoration stays behind sampled paper/photo points and marks appear away from existing shadows; no full-time motion trajectory, swaps, resize, native clock, scheduler or performance claim.",
+    "No installed launcher, household input, owner registry, device, account, provider or network actions by this reviewer.",
+    "Family/Living promotion and runtime retirement are coordinator evidence and remain outside this host audit."
+  ],
+  "blockers": []
+}

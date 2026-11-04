@@ -1,0 +1,114 @@
+{
+  "status": "accepted_bounded_source_no_blocker",
+  "reviewedAtUtc": "2026-11-04T08:47:57.363Z",
+  "sliceClock": {
+    "start": "2026-11-04T08:45:50Z",
+    "target": "2026-11-04T09:00:50Z",
+    "hardDeadline": "2026-11-04T09:15:50Z"
+  },
+  "scope": {
+    "cssAddedLines": 2,
+    "removeExactInsertionReproducesFrozenBaseline": true,
+    "modeJSBytesUnchanged": true,
+    "version": "1.141",
+    "versionCode": 135,
+    "stacking": "Table background gradient is preserved. Absolute inset-zero ::before is generated before the later positioned/rotated paper cards with no z-index; it adds no parent/card geometry and pointer-events is none.",
+    "preview": "Only Polaroid choice and existing mixed-library mode lists extended; predetermined local sample URLs, seeded random and inert host bridge preserved; serve.py unchanged."
+  },
+  "pairedTraceReplay": {
+    "helperSha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+    "method": "Existing actual helper evaluated in-memory twice with frozen/current CSS; actual unchanged production modes.js/mode-impls.js executed; seven established virtual checkpoints. No shared source writes.",
+    "traces": [
+      {
+        "photoMotion": "undefined",
+        "before": {
+          "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+          "randomDraws": 44,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            30000
+          ],
+          "cursor": 11
+        },
+        "candidate": {
+          "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+          "randomDraws": 44,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            30000
+          ],
+          "cursor": 11
+        },
+        "exact": true
+      },
+      {
+        "photoMotion": true,
+        "before": {
+          "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+          "randomDraws": 44,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            30000
+          ],
+          "cursor": 11
+        },
+        "candidate": {
+          "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+          "randomDraws": 44,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            30000
+          ],
+          "cursor": 11
+        },
+        "exact": true
+      },
+      {
+        "photoMotion": false,
+        "before": {
+          "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+          "randomDraws": 44,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            30000
+          ],
+          "cursor": 11
+        },
+        "candidate": {
+          "hash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+          "randomDraws": 44,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            30000
+          ],
+          "cursor": 11
+        },
+        "exact": true
+      }
+    ],
+    "expectedHash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007"
+  },
+  "hashes": {
+    "styles": "5b227662f9a5f1d66d499db5cb0da3b0c23103fc0e91ff40534c3eb8491aeb1d",
+    "baselineStyles": "d9ce1c193f35d6c683e212c05e8e655c6452e5c8b53138e05448def6e49a296d",
+    "modeJS": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0",
+    "baselineModeJS": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0",
+    "svg": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+    "previewFixture": "214f31b0e4cca671a68993ae499d88b5f60d34c8acfca7d86a35caccc67a4c61",
+    "previewHTML": "d40a6fce02ea86e9ffe458d6e41c8d32684442c51648fd31c548871b0ad5b2e8",
+    "previewServer": "02cd1288844c592f1574f374f595c0dffd479a9abc8004a1034005ca5264fe9e"
+  },
+  "limits": [
+    "DOM fixture does not rasterize or model pseudo-element pixels; matching traces alone cannot prove decorative paint behind paper. Native generated-scene pixels remain coordinator/native-agent work.",
+    "Generated host trace covers existing geometry/resources/timers/random draws; no native clock, full animation trajectory, compositor or hardware-performance claim.",
+    "No signed APK binding, room-install outcome or installed launcher claim in this source review.",
+    "No device, owner-registry, household, provider, account, browser or network calls."
+  ],
+  "blockers": []
+}
