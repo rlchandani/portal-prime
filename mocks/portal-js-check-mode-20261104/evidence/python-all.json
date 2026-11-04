@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "scripts",
+    "-p",
+    "test_portal_*.py",
+    "-v"
+  ],
+  "exitCode": 0,
+  "seconds": 37.467083792005724
+}

@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "scope": "local-javascript-checks",
+  "status": "checked",
+  "published": false,
+  "deployed": false,
+  "checks": [
+    {
+      "name": "git-root",
+      "argv": [
+        "git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "--no-optional-locks",
+        "rev-parse",
+        "--show-toplevel"
+      ],
+      "log": "01-git-root.log",
+      "exitCode": 0,
+      "durationMs": 12
+    },
+    {
+      "name": "git-head",
+      "argv": [
+        "git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "log": "02-git-head.log",
+      "exitCode": 0,
+      "durationMs": 12
+    },
+    {
+      "name": "source-files",
+      "argv": [
+        "git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "--no-optional-locks",
+        "ls-files",
+        "--cached",
+        "--others",
+        "--exclude-standard",
+        "-z"
+      ],
+      "log": "03-source-files.log",
+      "exitCode": 0,
+      "durationMs": 82
+    },
+    {
+      "name": "node-version",
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "log": "04-node-version.log",
+      "exitCode": 0,
+      "durationMs": 46
+    },
+    {
+      "name": "slideshow-js",
+      "argv": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "scripts/test_slideshow_sources.mjs",
+        "scripts/test_slideshow_labels.mjs",
+        "scripts/tests/slideshow_cinema_lifecycle.test.mjs",
+        "scripts/tests/slideshow_face_region_crop.test.mjs",
+        "scripts/tests/slideshow_filmstrip_input.test.mjs",
+        "scripts/tests/slideshow_filmstrip_visible_preparation.test.mjs",
+        "scripts/tests/slideshow_fixed_startup.test.mjs",
+        "scripts/tests/slideshow_framed_lifecycle.test.mjs",
+        "scripts/tests/slideshow_framed_viewport.test.mjs",
+        "scripts/tests/slideshow_gallery_reservations.test.mjs",
+        "scripts/tests/slideshow_gallery_retirement.test.mjs",
+        "scripts/tests/slideshow_hero_sidebar.test.mjs",
+        "scripts/tests/slideshow_history_navigation.test.mjs",
+        "scripts/tests/slideshow_live_face_metadata.test.mjs",
+        "scripts/tests/slideshow_measurement_lifecycle.test.mjs",
+        "scripts/tests/slideshow_memories.test.mjs",
+        "scripts/tests/slideshow_memories_viewport.test.mjs",
+        "scripts/tests/slideshow_mosaic_lifecycle.test.mjs",
+        "scripts/tests/slideshow_native_filmstrip.test.cjs",
+        "scripts/tests/slideshow_panorama.test.mjs",
+        "scripts/tests/slideshow_panorama_viewport.test.mjs",
+        "scripts/tests/slideshow_photo_layout.test.mjs",
+        "scripts/tests/slideshow_photo_motion.test.mjs",
+        "scripts/tests/slideshow_polaroid_lifecycle.test.mjs",
+        "scripts/tests/slideshow_polaroid_reservations.test.mjs",
+        "scripts/tests/slideshow_resolved_resources.test.mjs",
+        "scripts/tests/slideshow_style_reporting.test.mjs"
+      ],
+      "log": "05-slideshow-js.log",
+      "exitCode": 0,
+      "durationMs": 4378
+    },
+    {
+      "name": "remote-js",
+      "argv": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "app/src/test/js/remote-app-card-search-reuse.test.mjs",
+        "app/src/test/js/remote-app-icon-search-reuse.test.mjs",
+        "app/src/test/js/remote-app-poll-performance.test.mjs",
+        "app/src/test/js/remote-browser-workflows.test.mjs",
+        "app/src/test/js/remote-companion-storage-recovery.test.mjs",
+        "app/src/test/js/remote-control-center.test.mjs",
+        "app/src/test/js/remote-control-command-delivery.test.mjs",
+        "app/src/test/js/remote-control-command-queue.test.mjs",
+        "app/src/test/js/remote-image-pool-reuse.test.mjs",
+        "app/src/test/js/remote-initial-status-ownership.test.mjs",
+        "app/src/test/js/remote-media-poll-performance.test.mjs",
+        "app/src/test/js/remote-music-player.test.mjs",
+        "app/src/test/js/remote-navigation-retention.test.mjs",
+        "app/src/test/js/remote-operation-progress.test.mjs",
+        "app/src/test/js/remote-photo-group-browser.test.mjs",
+        "app/src/test/js/remote-photo-group-controller.test.mjs",
+        "app/src/test/js/remote-photo-mutation-readback.test.mjs",
+        "app/src/test/js/remote-photo-preview-recovery.test.mjs",
+        "app/src/test/js/remote-photo-thumbnail-reuse.test.mjs",
+        "app/src/test/js/remote-photo-viewport-admission.test.mjs",
+        "app/src/test/js/remote-poll-cancellation.test.mjs",
+        "app/src/test/js/remote-preset-keyboard-editor.test.mjs",
+        "app/src/test/js/remote-preset-storage-feedback.test.mjs",
+        "app/src/test/js/remote-preset-tracked-run.test.mjs",
+        "app/src/test/js/remote-search-composition.test.mjs",
+        "app/src/test/js/remote-search-whitespace.test.mjs",
+        "app/src/test/js/remote-settings-disabled-parent.test.mjs",
+        "app/src/test/js/remote-settings-reset-scope.test.mjs",
+        "app/src/test/js/remote-settings-row-retention.test.mjs",
+        "app/src/test/js/remote-settings-search-context.test.mjs",
+        "app/src/test/js/remote-settings-time-of-day.test.mjs",
+        "app/src/test/js/remote-source-error-feedback.test.mjs",
+        "app/src/test/js/remote-text-confirmation.test.mjs",
+        "app/src/test/js/remote-touchpad-recovery.test.mjs",
+        "app/src/test/js/screensaver-dedup.test.mjs"
+      ],
+      "log": "06-remote-js.log",
+      "exitCode": 0,
+      "durationMs": 14146
+    },
+    {
+      "name": "source-files",
+      "argv": [
+        "git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "--no-optional-locks",
+        "ls-files",
+        "--cached",
+        "--others",
+        "--exclude-standard",
+        "-z"
+      ],
+      "log": "07-source-files.log",
+      "exitCode": 0,
+      "durationMs": 75
+    }
+  ],
+  "startedAt": "2026-11-04T18:57:53.658002+00:00",
+  "source": {
+    "sha256": "d311a8c2b7f7e30ffb8e32195a3666f33815048c9e730d331a8e04f8f4e01590",
+    "fileCount": 1473,
+    "head": "87722cd969be8a0f49a7855be01c412d1c22224f"
+  },
+  "tools": {
+    "python": "3.13.7",
+    "node": "v24.13.0"
+  },
+  "javascript": {
+    "slideshow-js": 398,
+    "remote-js": 753
+  },
+  "durationMs": 19177,
+  "finishedAt": "2026-11-04T18:58:12.834655+00:00"
+}

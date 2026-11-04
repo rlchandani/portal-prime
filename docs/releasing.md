@@ -51,6 +51,27 @@ hardware acceptance. After output creation, a failed check writes
 No source bump, authentication, Git fetch, tag, push, publication or device install
 is performed. The publishing workflow below remains a separate explicit operation.
 
+### Check JavaScript changes independently
+
+For frontend changes, reuse the same slideshow and bundled-remote gates without
+waiting for Android setup:
+
+```sh
+python3 scripts/portal_release_readiness.py \
+  --javascript-only \
+  --output app/build/javascript-checks/my-change
+```
+
+This mode needs Python 3.12+, Node 22+ and macOS/Linux, with a new output directory.
+It runs both existing JavaScript selections using TAP, preserves their exit
+statuses and logs, and checks that source inputs stayed unchanged during the run.
+The same whole-command timeout and process cleanup apply. No SDK, baseline APK
+or synchronized release manifest is required.
+
+A successful receipt says `scope: "local-javascript-checks"` and
+`status: "checked"`, with no APK or JVM result. Run the full readiness command
+before promoting an APK; this check establishes only the JavaScript gate results.
+
 ## Check provisioning scripts locally
 
 Run `scripts/check-provisioning.sh` before packaging the provisioning kit. It

@@ -1,0 +1,21 @@
+{
+  "status": "locally-verified",
+  "hostOnly": true,
+  "newApk": false,
+  "deviceOperation": false,
+  "published": false,
+  "startedAt": "2026-11-04T18:53:00Z",
+  "closedAt": "2026-11-04T19:07:03.796207+00:00",
+  "minutes": 14.063270116666667,
+  "targetMet": true,
+  "hardStopMet": true,
+  "originalClockRetained": true,
+  "priorDeliverySnapshot": "1.173/code167",
+  "checks": {
+    "javascript": 1151,
+    "python": 288,
+    "focused": 6,
+    "strictDocsExit": 0
+  },
+  "wholeGoal": "active"
+}

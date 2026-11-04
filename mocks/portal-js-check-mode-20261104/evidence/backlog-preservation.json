@@ -1,0 +1,16 @@
+{
+  "oldTasks": 171,
+  "newTasks": 172,
+  "oldObjectsExact": true,
+  "oldRawSuffixExact": true,
+  "suffixBytes": 545957,
+  "suffixSha256": "39d43fc6aa4c4fdb735ede8a002335810bac8a1eb8c80aa7a388b9692fe8adf8",
+  "defaultTask": "weather-native-layout",
+  "statusCounts": {
+    "verified": 45,
+    "delivered": 117,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  }
+}

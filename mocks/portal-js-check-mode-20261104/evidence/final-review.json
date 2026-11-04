@@ -1,0 +1,283 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "scope": "Host-only --javascript-only mode in the existing local readiness checker",
+  "clock": {
+    "startedAt": "2026-11-04T18:53:00Z",
+    "targetAt": "2026-11-04T19:08:00Z",
+    "hardStopAt": "2026-11-04T19:23:00Z",
+    "originalClockRetained": true
+  },
+  "reviewedAt": "2026-11-04T19:05:34.383Z",
+  "findings": [
+    "All existing helpers remain byte-identical. Both established JavaScript selections, explicit TAP runner and test-count parser are an exact extraction into javascript_checks; the entire APK execute path differs only by calling that extracted helper. The CLI main reconstructs through the six expected mode/argument/status replacements.",
+    "JavaScript-only reuses Checks deadline, process-group cleanup, Node version requirement, repository-root verification and start/end source capture. It does not invoke SDK/APK identity, version synchronization, Python/JVM or Android build gates. Success is checked/local-javascript-checks with no artifact or JVM fields and published/deployed false. Default APK mode retains its mandatory baseline and ready status.",
+    "Frozen six actual-CLI tests remain exact: four baseline AssertionErrors and two controls become six passes. Cases cover no Android/manifest inputs, failed Node exit stopping the next suite, missing required module, source mutation, existing receipt preservation and default baseline admission. External Node/build/SDK processes in these regressions are inert fixtures.",
+    "The real command uses both exact current selections:27 slideshow inputs including source/label and MJS/CJS modules, and35 remote files. Every recorded command exits0; TAP totals independently recount398/398 and753/753, with0fail/cancel/skip/todo. No candidate APK exists in the real output.",
+    "Complete Portal Python log contains288 passing case lines and an OK terminal. This includes twelve existing APK CLI fixture cases retaining stale artifact/report, signer, source mutation, module selection, SDK and output guards.",
+    "The actual before/after source-list logs are byte-identical. Independently hashing all1473 selected current source files reproduces the real-run digest. Output isolation/nonoverwrite creation and atomic receipt writing are unchanged.",
+    "Releasing and operating state each contain exactly one new insertion; all prior bytes remain exact. The queue adds one verified tooling task; all171 prior objects and their545957-byte raw suffix are exact, and all other metadata except updatedAt/updatedLabel remains unchanged. Default Weather and original clocks are preserved.",
+    "Strict docs terminal exits0 with a bound log. The initial two external evidence links caused a retained docs failure; final plain repository paths correct those warnings. App metadata remains the prior reviewed1.173/code167; public manifest remains1.83/code77."
+  ],
+  "limits": [
+    "This admits host tooling/source/check results only. No new APK, Android/JVM runtime, SDK build, native rendering, room/device/phone action, provider/account/media operation or publication is reviewed or claimed.",
+    "Existing APK pipeline guards are supported by exact source reconstruction and passing inert CLI fixtures, not a new actual APK readiness run.",
+    "The actual selected-source digest follows the existing source_inputs policy; it does not assert a clean Git tree or whole-repository stability. Docs/queue updates are separately bound.",
+    "Historical task content is preserved by byte/object equality; older acceptance scopes and clocks are not reopened or revalidated. No reviewer tests, build, SDK, Git, browser, device or network execution occurred."
+  ],
+  "results": {
+    "baseline": {
+      "exitCode": 1,
+      "tests": 6,
+      "assertionFailures": 4,
+      "controls": 2
+    },
+    "focused": {
+      "exitCode": 0,
+      "tests": 6,
+      "pass": 6,
+      "frozenTestSha256": "5777d633aacd058879034fb9f74925ef6ebb65c9fa3f6ca6570d837264de4ae4"
+    },
+    "python": {
+      "exitCode": 0,
+      "tests": 288,
+      "passLines": 288,
+      "existingApkFixtureCases": 12,
+      "wallSeconds": 37.467083792005724
+    },
+    "actual": {
+      "exitCode": 0,
+      "wallSeconds": 19.212701249998645,
+      "status": "checked",
+      "scope": "local-javascript-checks",
+      "slideshow": {
+        "tests": 398,
+        "pass": 398,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "remote": {
+        "tests": 753,
+        "pass": 753,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    "strictDocs": {
+      "exitCode": 0,
+      "initialFailureExcluded": true
+    }
+  },
+  "sourceCapture": {
+    "fileCount": 1473,
+    "sha256": "d311a8c2b7f7e30ffb8e32195a3666f33815048c9e730d331a8e04f8f4e01590",
+    "head": "87722cd969be8a0f49a7855be01c412d1c22224f",
+    "initialAndFinalListsExact": true,
+    "currentInputsMatchActualRun": true,
+    "replay": "Use the bound source-files log names and the unchanged source_inputs selection/hash algorithm."
+  },
+  "backlog": {
+    "oldTasks": 171,
+    "newTasks": 172,
+    "priorObjectsExact": true,
+    "priorRawSuffixExact": true,
+    "suffixBytes": 545957,
+    "suffixSha256": "39d43fc6aa4c4fdb735ede8a002335810bac8a1eb8c80aa7a388b9692fe8adf8",
+    "defaultTask": "weather-native-layout",
+    "statusCounts": {
+      "verified": 45,
+      "delivered": 117,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    }
+  },
+  "publicEvidence": {
+    "directory": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-js-check-mode-20261104/evidence",
+    "fileCount": 9,
+    "aggregateSha256": "5a315c01da9b7e0a60d0f7746830cd5206b3f09d9e6646a7fbd63fb2011d7be8",
+    "definition": "Sorted filenames, each filename + NUL + SHA256(file bytes) + NUL + decimal bytes + newline; SHA256 of concatenated UTF-8 rows.",
+    "privateReceiptParityVerified": true
+  },
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 21492,
+      "sha256": "6146ae475002e0033c1f26683b7098de4e4ea9f2096b2e69c9a5caa507ce855f"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/portal_release_readiness.py.before",
+      "bytes": 19404,
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_javascript_checks.py",
+      "bytes": 4635,
+      "sha256": "5777d633aacd058879034fb9f74925ef6ebb65c9fa3f6ca6570d837264de4ae4"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/tests.frozen.py",
+      "bytes": 4635,
+      "sha256": "5777d633aacd058879034fb9f74925ef6ebb65c9fa3f6ca6570d837264de4ae4"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_readiness.py",
+      "bytes": 13277,
+      "sha256": "fd936c47f5e6f80055c83e215f2ea9a75cd894430d384c566334b550db986156"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/scope.json",
+      "bytes": 657,
+      "sha256": "b3f3280dbd41bb448c61c1ab9afc82822b75dec3cb93bab54d6d8b4c9d75ce47"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/baseline.json",
+      "bytes": 223,
+      "sha256": "5fa8e4eed254bf2207b0caba1bbd91c12174b35993c473b35db094c696656116"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/baseline.log",
+      "bytes": 6001,
+      "sha256": "881ba927eb2196ed5b97331aec01783ea31d5b26e06d879d50ab3e206d1e2064"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/focused.json",
+      "bytes": 223,
+      "sha256": "a52cdea9d14f0be85bb8d92f5cec9811ae532bddf2ea5c034dd3de967a76abc5"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/focused.log",
+      "bytes": 1138,
+      "sha256": "cc4d10a7cdf928b1580949a08f70819788a97c319440deb2fa7d0a5bda35df14"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/python-all.json",
+      "bytes": 205,
+      "sha256": "cf083b9eb85b5977cc1ac1193c1dd425cd1b98d3a47650e009f67fbab4b028a3"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/python-all.log",
+      "bytes": 47047,
+      "sha256": "37bd3f0f35b079a8e1798e9feba4870962fae2e2c440a9d7e68cd594c8728c8b"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js-mode.json",
+      "bytes": 281,
+      "sha256": "3a1df3fe1758098dfd54429ec3950ea2ccdda5fef3edf1fdb4ae6a3997b71b9d"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js-mode.log",
+      "bytes": 288,
+      "sha256": "6a90a40a46662e556224d8f8df307967e37ea71a9a1fdc3d229a8472da419282"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js/receipt.json",
+      "bytes": 6299,
+      "sha256": "074494ab7d6d8048ef98e613f9b6cc56b00bf09c919225c177778141fc3991bd"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js/01-git-root.log",
+      "bytes": 63,
+      "sha256": "42d0242c5a67e76b740ff7eaddc06709d90e5f4471ecc802008c68b0a4962d78"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js/02-git-head.log",
+      "bytes": 41,
+      "sha256": "e6d30f214e376b5772b4f34f2327318851db1f7751fa41822ed5f1380eab1c20"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js/03-source-files.log",
+      "bytes": 320629,
+      "sha256": "2ae74bd2e06804ecfd20633d10d6d7d8f0a3feb3b3aa95665cdcee3abf9a5b98"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js/04-node-version.log",
+      "bytes": 9,
+      "sha256": "3ebea09fcbed81499165f8bb4d650d8307e4a759136e5411b9a726504b8fc2ac"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js/05-slideshow-js.log",
+      "bytes": 90518,
+      "sha256": "25338bf78ddaff919634e34aa6d605a447d4ebad8bee0c8392cba25529f5ecd4"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js/06-remote-js.log",
+      "bytes": 176609,
+      "sha256": "5ca3f7990d38936c1ec35ab7c11d42723fee708f27f3cfbbe1765b7f96f10043"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/actual-js/07-source-files.log",
+      "bytes": 320629,
+      "sha256": "2ae74bd2e06804ecfd20633d10d6d7d8f0a3feb3b3aa95665cdcee3abf9a5b98"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-javascript-check-mode-2026-11-04.md",
+      "bytes": 3076,
+      "sha256": "72912f50c078d4f50edba0654389c05013361ac39dbdd2e8e2f95c95231c6921"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/releasing.md",
+      "bytes": 9232,
+      "sha256": "9ecde6ad118c9245650c6679f217cbb3a10d718b353dad811d3e0ca752b58444"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/releasing.md.before",
+      "bytes": 8356,
+      "sha256": "78f8d328eb45230bc2da5122a810237eab39369c0a0f2a059fd14bc4d2619238"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-product-operating-state.md",
+      "bytes": 240556,
+      "sha256": "152e6dd2f107855ac5de065fbf676327a3ac0e4e88239027bc7aaa0d3d953ec2"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/portal-product-operating-state.md.before",
+      "bytes": 239709,
+      "sha256": "f89f8388f5ac51c0af5be5bd38f02d763e2e8a0f5cbcfd17b6e2b1d931b41631"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-widget-gallery-20261102/roadmap/roadmap.json",
+      "bytes": 548823,
+      "sha256": "3af86969347989af8a04cbcfbdbad78ae12bcec41e6b40e55748e729df648c51"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/roadmap.json.before",
+      "bytes": 547066,
+      "sha256": "bf2171643aabc6b33c33a8cc861da6fbbe365f195dc818d48599ee1bde132c75"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/docs.json",
+      "bytes": 244,
+      "sha256": "79a3b399c8378221a837478170b417355c260968ce3992fcc5b9e50e8992ac72"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/docs.log",
+      "bytes": 35562,
+      "sha256": "503e52783fec80cebf9f0b8919cabb4c5827266b37611124767d0f54d675d507"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/docs-initial.json",
+      "bytes": 156,
+      "sha256": "cab3b040e6f3b0fd942fed752957cd025644a141c923fd1ecd26019f40586604"
+    },
+    {
+      "path": "/private/tmp/portal-js-check-mode-20261104-185300/docs-initial.log",
+      "bytes": 35979,
+      "sha256": "fec6a8bf29d5b223e530acf32d10c373f696550154f10a7c2c05a48ad11964fc"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "f77e4932a7bd67594a73dd630098a215ebe6a92e9e8ba7aac821404b867dd83c"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/version.json",
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    }
+  ]
+}

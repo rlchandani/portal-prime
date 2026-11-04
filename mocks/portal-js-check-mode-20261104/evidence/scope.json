@@ -1,0 +1,14 @@
+{
+  "scope": "JavaScript-only reuse of existing local readiness checks",
+  "startedAt": "2026-11-04T18:53:00Z",
+  "targetAt": "2026-11-04T19:08:00Z",
+  "hardStopAt": "2026-11-04T19:23:00Z",
+  "base": "87722cd969be8a0f49a7855be01c412d1c22224f",
+  "acceptance": [
+    "run both existing JavaScript selections using existing TAP runner",
+    "new private receipt/log output without Android SDK or baseline APK",
+    "no ready-APK claim, deployment or publication",
+    "retain full APK readiness defaults, source stability and deadline gates"
+  ],
+  "priorScopes": "All original clocks and holds retained; no native/browser/screensaver acceptance reopened."
+}

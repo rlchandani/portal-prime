@@ -1,0 +1,7 @@
+{
+  "exitCode": 0,
+  "seconds": 2.386181417001353,
+  "logBytes": 35562,
+  "logSha256": "503e52783fec80cebf9f0b8919cabb4c5827266b37611124767d0f54d675d507",
+  "initialFailure": "Two evidence links outside docs; replaced with repository paths."
+}

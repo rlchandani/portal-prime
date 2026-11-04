@@ -231,6 +231,46 @@ def test_count(output, name, pattern):
     return int(match[1])
 
 
+def javascript_checks(root, checks, receipt):
+    slideshow_sources = ["scripts/test_slideshow_sources.mjs", "scripts/test_slideshow_labels.mjs"]
+    slideshow = slideshow_sources + sorted(
+        str(path.relative_to(root))
+        for pattern in ("slideshow_*.test.mjs", "slideshow_*.test.cjs")
+        for path in (root / "scripts/tests").glob(pattern)
+        if path.is_file()
+    )
+    required_slideshow = slideshow_sources + ["scripts/tests/slideshow_native_filmstrip.test.cjs"]
+    remote = sorted(str(p.relative_to(root)) for p in (root / "app/src/test/js").glob("*.test.mjs"))
+    if not remote or not all((root / p).is_file() for p in required_slideshow):
+        raise CheckFailed("Required JavaScript test files are missing.")
+    receipt["javascript"] = {}
+    for label, paths in (("slideshow-js", slideshow), ("remote-js", remote)):
+        output = checks.run(label, ["node", "--test", "--test-reporter=tap", *paths], capture=True)
+        receipt["javascript"][label] = test_count(output, label, r"^# tests (\d+)\s*$")
+
+
+def execute_javascript(args, receipt):
+    root = args.repo_root.resolve()
+    checks = Checks(root, args.output, args.timeout_seconds, receipt, dict(os.environ))
+    if sys.version_info < (3, 12) or os.name != "posix":
+        raise CheckFailed("JavaScript checks require Python 3.12+ and macOS/Linux process cleanup.")
+    top = checks.run("git-root", GIT + ["rev-parse", "--show-toplevel"], capture=True).strip()
+    if Path(top).resolve() != root:
+        raise CheckFailed("--repo-root must be the repository root.")
+    head = checks.run("git-head", GIT + ["rev-parse", "HEAD"], capture=True).strip()
+    start_source = source_inputs(checks)
+    receipt["source"] = dict(start_source, head=head)
+    node_version = checks.run("node-version", ["node", "--version"], capture=True).strip()
+    if not re.fullmatch(r"v(?:2[2-9]|[3-9]\d|\d{3,})\.\d+\.\d+", node_version):
+        raise CheckFailed("Node.js 22 or newer is required.")
+    receipt["tools"] = {"python": sys.version.split()[0], "node": node_version}
+    javascript_checks(root, checks, receipt)
+    if source_inputs(checks) != start_source:
+        raise CheckFailed("Source/build inputs changed during checks; rerun against a stable tree.")
+    if time.monotonic() >= checks.deadline:
+        raise CheckFailed("The local check deadline expired before JavaScript checks finished.")
+
+
 def execute(args, receipt):
     root = args.repo_root.resolve()
     environment = dict(os.environ, ANDROID_HOME=str(args.sdk), ANDROID_SDK_ROOT=str(args.sdk))
@@ -266,21 +306,7 @@ def execute(args, receipt):
         raise CheckFailed("Baseline package differs from the selected variant.")
     receipt["baseline"] = baseline
 
-    slideshow_sources = ["scripts/test_slideshow_sources.mjs", "scripts/test_slideshow_labels.mjs"]
-    slideshow = slideshow_sources + sorted(
-        str(path.relative_to(root))
-        for pattern in ("slideshow_*.test.mjs", "slideshow_*.test.cjs")
-        for path in (root / "scripts/tests").glob(pattern)
-        if path.is_file()
-    )
-    required_slideshow = slideshow_sources + ["scripts/tests/slideshow_native_filmstrip.test.cjs"]
-    remote = sorted(str(p.relative_to(root)) for p in (root / "app/src/test/js").glob("*.test.mjs"))
-    if not remote or not all((root / p).is_file() for p in required_slideshow):
-        raise CheckFailed("Required JavaScript test files are missing.")
-    receipt["javascript"] = {}
-    for label, paths in (("slideshow-js", slideshow), ("remote-js", remote)):
-        output = checks.run(label, ["node", "--test", "--test-reporter=tap", *paths], capture=True)
-        receipt["javascript"][label] = test_count(output, label, r"^# tests (\d+)\s*$")
+    javascript_checks(root, checks, receipt)
     output = checks.run("python-tests", [sys.executable, "-m", "unittest", "discover",
                                        "-s", "scripts", "-p", "test_portal_*.py"], capture=True)
     receipt["pythonTests"] = test_count(output, "Python tests", r"^Ran (\d+) tests? in ")
@@ -327,7 +353,10 @@ def execute(args, receipt):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parent.parent)
-    parser.add_argument("--baseline-apk", type=Path, required=True)
+    parser.add_argument("--baseline-apk", type=Path)
+    parser.add_argument("--javascript-only", action="store_true",
+                        help="Run both JavaScript gates with a private receipt; no Android build, "
+                             "SDK or baseline APK is needed. Success means checked, not APK ready.")
     parser.add_argument("--output", type=Path, required=True,
                         help="New directory for private logs, candidate and receipt; never overwritten.")
     parser.add_argument("--variant", choices=PACKAGES, default="release")
@@ -338,10 +367,13 @@ def main():
                         or os.environ.get("ANDROID_SDK_ROOT") or str(Path.home() / "Library/Android/sdk")))
     parser.add_argument("--timeout-seconds", type=float, default=900)
     args = parser.parse_args()
+    if not args.javascript_only and args.baseline_apk is None:
+        parser.error("--baseline-apk is required for APK readiness.")
     if not 0 < args.timeout_seconds <= 1800:
         parser.error("--timeout-seconds must be greater than zero and at most 1800.")
-    args.output, args.baseline_apk, args.sdk = (p.resolve() for p in
-                                              (args.output, args.baseline_apk, args.sdk))
+    args.output, args.sdk = args.output.resolve(), args.sdk.resolve()
+    if args.baseline_apk is not None:
+        args.baseline_apk = args.baseline_apk.resolve()
     root = args.repo_root.resolve()
     if args.output.is_relative_to(root) and not args.output.is_relative_to(root / "app/build"):
         print("Place output outside the repository or under app/build; source directories are not modified.",
@@ -353,12 +385,17 @@ def main():
         print("Choose a new writable output directory; existing evidence was not overwritten.", file=sys.stderr)
         return 2
     started = time.monotonic()
-    receipt = {"schemaVersion": 1, "scope": "local-artifact-readiness", "status": "failed",
+    receipt = {"schemaVersion": 1, "scope": ("local-javascript-checks" if args.javascript_only
+                                          else "local-artifact-readiness"), "status": "failed",
                "published": False, "deployed": False, "checks": [],
                "startedAt": datetime.now(timezone.utc).isoformat()}
     try:
-        execute(args, receipt)
-        receipt["status"] = "ready"
+        if args.javascript_only:
+            execute_javascript(args, receipt)
+            receipt["status"] = "checked"
+        else:
+            execute(args, receipt)
+            receipt["status"] = "ready"
     except (CheckFailed, OSError, ValueError, KeyboardInterrupt) as error:
         receipt["error"] = str(error) or "The local check was interrupted."
     finally:
@@ -370,7 +407,7 @@ def main():
         temporary.replace(args.output / "receipt.json")
     print(json.dumps({"status": receipt["status"], "receipt": str(args.output / "receipt.json"),
                       "error": receipt.get("error")}))
-    return 0 if receipt["status"] == "ready" else 1
+    return 0 if receipt["status"] in ("ready", "checked") else 1
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T18:38:42.028587+00:00",
-  "updatedLabel": "Exact1.173 delivered: browser key acknowledgments; saved settings retained",
+  "updatedAt": "2026-11-04T19:00:17.333611+00:00",
+  "updatedLabel": "Local frontend checks verified; exact1.173 room delivery retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,40 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "javascript-check-mode",
+      "title": "Frontend checks: reuse the release runner independently",
+      "summary": "Both JavaScript gates can produce a checked receipt without Android setup.",
+      "status": "verified",
+      "kind": "Small local release automation",
+      "platforms": [
+        "host-tooling"
+      ],
+      "owner": "Root implementation/checks / independent media review",
+      "verification": "Frozen6CLI checks:4AssertionErrors/2controls\u21926pass;398slideshow/753remote pass in19.21s;288Python pass in37.47s.",
+      "deployment": "Local tooling only. Current room1.173/code167 retained as prior delivery snapshot; no new device or publication action.",
+      "acceptance": [
+        "Reuse existing TAP test selections and Checks timeout/process cleanup.",
+        "Require new output, source stability and real exit success; record checked rather than ready.",
+        "Keep full APK readiness baseline/SDK/build/signing/asset gates."
+      ],
+      "evidence": [
+        {
+          "text": "Source, actual CLI regression and real JavaScript/Python runs.",
+          "source": "docs/portal-javascript-check-mode-2026-11-04.md"
+        }
+      ],
+      "limits": [
+        "Node gate reports host test counts; it does not establish native rendering, APK readiness or deployment. Full APK pipeline reconstruction was source-reviewed and existing CLI fixtures passed; no new Android build."
+      ],
+      "next": "Use this mode for subsequent frontend-only verification; keep APK promotion gates separate.",
+      "issueClock": {
+        "startedAt": "2026-11-04T18:53:00Z",
+        "target": "2026-11-04T19:08:00Z",
+        "deadline": "2026-11-04T19:23:00Z",
+        "firstDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "browser-key-acknowledgment",
       "title": "Remote: require confirmed command acknowledgment",

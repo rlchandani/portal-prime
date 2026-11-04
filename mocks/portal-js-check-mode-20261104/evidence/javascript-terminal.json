@@ -1,0 +1,22 @@
+{
+  "slideshow-js": {
+    "tests": 398,
+    "pass": 398,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "logSha256": "25338bf78ddaff919634e34aa6d605a447d4ebad8bee0c8392cba25529f5ecd4",
+    "logBytes": 90518
+  },
+  "remote-js": {
+    "tests": 753,
+    "pass": 753,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "logSha256": "5ca3f7990d38936c1ec35ab7c11d42723fee708f27f3cfbbe1765b7f96f10043",
+    "logBytes": 176609
+  }
+}
