@@ -43,6 +43,13 @@ the user's per-issue time limit. Parallel workers need disjoint write scopes; th
 owns shared-file integration and device operations. A matching signed APK and an install
 acknowledgment do not replace post-install identity and functional checks.
 
+Prioritize the user's reported screensaver and visible UX problems. Target 10–15 minute
+deliverable slices within the existing 30-minute hard issue limit; retain the original
+clock across continuations. Ship a checked small slice, then move on. Break larger work
+into separately useful releases and park a stalled slice rather than expanding it.
+Keep reporting concise. Distinguish installed renderer support from the style currently
+displayed, especially when Shuffle rotates through several styles.
+
 The user prohibited Google phone/Pixel inspection, control and installation on
 3 November 2026. Do not use that phone until the user explicitly reauthorizes it.
 Portal ADB commands must target the authorized Portal explicitly; do not use

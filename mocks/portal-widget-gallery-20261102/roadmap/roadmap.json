@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T07:07:04.723937Z",
-  "updatedLabel": "Home playback freshness: locally verified; room 1.133 retained",
+  "updatedAt": "2026-11-04T07:19:36.333849+00:00",
+  "updatedLabel": "Home playback freshness delivered 1.134; screensaver visuals prioritized",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.133/code 127. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.134/code 128. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -18,15 +18,15 @@
       "title": "Home mini-player: keep the latest playback state",
       "summary": "Delayed replay and worker callbacks no longer restore an old track after replacement, pause or clearing.",
       "description": "Read the shared current playback snapshot when queued Home UI work executes, following the existing screensaver pattern.",
-      "status": "verified",
-      "verification": "4,402 JVM · 10 replay cases · both builds",
+      "status": "delivered",
+      "verification": "4,402 JVM · 6 native cases · both rooms verified",
       "kind": "Playback presentation reliability",
       "platforms": [
         "portal"
       ],
       "owner": "Portal engineering / independent callback replay",
-      "deployment": "Local source and signed debug/optimized artifacts only. Existing room 1.133/code127 remains; candidate uses unchanged version metadata and is not a promoted release.",
-      "state": "No device, phone, provider, media-session, credential, account, push or publication action. Hub, transport, settings and slideshow assets remain exact.",
+      "deployment": "Exact optimized 1.134/code128 installed and fully hashed in Family and Living. Living acknowledgment uncertain; six read-only observations reconcile one install without retry.",
+      "state": "Same-clock versioned promotion. All43 Family/30 Living preference files and four maps per room remain exact; Family frame, font, services and original Chromium activity retained.",
       "acceptance": [
         "Late initial replay cannot restore a cleared or replaced track.",
         "Late worker publication cannot overwrite the newer state.",
@@ -42,16 +42,21 @@
         {
           "text": "Frozen baseline, independent replay and byte preservation.",
           "source": "mocks/portal-widget-gallery-20261102/evidence/home-playback-freshness-verification.json"
+        },
+        {
+          "text": "Versioned artifacts, native Handler cases, both installed hashes and complete configuration preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/home-playback-freshness-promotion.json"
         }
       ],
       "limits": [
-        "Generated tracks and controlled JVM queues; physical Home pixels and Android Handler scheduling remain open.",
-        "Baseline is an equivalent extracted callback, not original Compose execution.",
-        "Pending work after disposal, Handler refusal, real session and transport acceptance remain open.",
-        "No device installation, native/optimized execution, runtime performance, hosted CI or publication claim.",
-        "Earlier metadata, startup, playback, phone and other issue clocks remain."
+        "Native generated Android10/API29 HandlerThread and actual isolated debug factory/hub only; Home composition, live sessions/audio/transport, API28 and optimized callbacks remain open.",
+        "Captured equivalent baseline callback, not original Compose execution.",
+        "Pending work after disposal, Handler refusal, runtime performance and hosted CI remain open.",
+        "Living physical visual acceptance remains open.",
+        "Paper is installed, but other Shuffle stages can still have dark margins; all screensaver complaints are not claimed fixed.",
+        "No phone, household source-photo read/import/transfer, provider/account, push or publication; earlier clocks retained."
       ],
-      "next": "Retain the local verified correction; native acceptance and versioned room promotion remain separate.",
+      "next": "Prioritize user-reported screensaver visuals in10–15 minute independently useful slices; retain hard30-minute clocks and avoid another unrelated cleanup.",
       "issueClock": {
         "startedAt": "2026-11-04T06:55:22Z",
         "deadline": "2026-11-04T07:25:22Z",

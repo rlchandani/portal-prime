@@ -1,0 +1,420 @@
+{
+  "recordedAt": "2026-11-04T07:18:54.319755+00:00",
+  "status": "delivered",
+  "version": "1.134/code128",
+  "scope": "Same active Home callback UI-dispatch freshness; versioned local Portal room delivery",
+  "issueClock": {
+    "startedAt": "2026-11-04T06:55:22Z",
+    "deadline": "2026-11-04T07:25:22Z",
+    "reset": false
+  },
+  "apks": {
+    "debug": {
+      "bytes": 46726883,
+      "sha256": "3714906ae77d686712fd1299797a423850622fc957fe50779fb19ae28b139635",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='128' versionName='1.134' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 65010,
+          "sha256": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 14106,
+          "sha256": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994"
+        }
+      ],
+      "retained": "/private/tmp/portal-product-discovery-20261104-065522/candidate-debug-1.134.apk"
+    },
+    "performance": {
+      "bytes": 25884988,
+      "sha256": "2aca4c50dbfce037997d718c0a555725511c235d6570da3c4ea8795f855530d0",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='128' versionName='1.134' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 65010,
+          "sha256": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 14106,
+          "sha256": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994"
+        }
+      ],
+      "retained": "/private/tmp/portal-product-discovery-20261104-065522/candidate-performance-1.134.apk"
+    }
+  },
+  "jvm": {
+    "tests": 4402,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 460
+  },
+  "gradle": {
+    "terminalExit": 0,
+    "seconds": 102,
+    "debugOptimizedR8VitalLint": true
+  },
+  "native": {
+    "ok": true,
+    "apkClassloaderIdentity": true,
+    "candidatePass": 6,
+    "candidateCases": 6,
+    "equivalentBaselineFailures": 4,
+    "baselineControls": 2,
+    "uiThreadRetired": true,
+    "cases": [
+      {
+        "mode": "equivalentCapturedBaseline",
+        "case": "queued-clear",
+        "pass": false,
+        "renderCount": 2,
+        "expectedCount": 2,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "equivalentCapturedBaseline",
+        "case": "queued-replacement",
+        "pass": false,
+        "renderCount": 2,
+        "expectedCount": 2,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "equivalentCapturedBaseline",
+        "case": "queued-paused",
+        "pass": false,
+        "renderCount": 2,
+        "expectedCount": 2,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "equivalentCapturedBaseline",
+        "case": "late-obsolete-callback",
+        "pass": false,
+        "renderCount": 3,
+        "expectedCount": 3,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "equivalentCapturedBaseline",
+        "case": "ordinary-deferred-replay",
+        "pass": true,
+        "renderCount": 1,
+        "expectedCount": 1,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "equivalentCapturedBaseline",
+        "case": "worker-publication-control",
+        "pass": true,
+        "renderCount": 1,
+        "expectedCount": 1,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "actualCandidateFactory",
+        "case": "queued-clear",
+        "pass": true,
+        "renderCount": 2,
+        "expectedCount": 2,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "actualCandidateFactory",
+        "case": "queued-replacement",
+        "pass": true,
+        "renderCount": 2,
+        "expectedCount": 2,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "actualCandidateFactory",
+        "case": "queued-paused",
+        "pass": true,
+        "renderCount": 2,
+        "expectedCount": 2,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "actualCandidateFactory",
+        "case": "late-obsolete-callback",
+        "pass": true,
+        "renderCount": 3,
+        "expectedCount": 3,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "actualCandidateFactory",
+        "case": "ordinary-deferred-replay",
+        "pass": true,
+        "renderCount": 1,
+        "expectedCount": 1,
+        "callbackClassLoaderIsApk": true
+      },
+      {
+        "mode": "actualCandidateFactory",
+        "case": "worker-publication-control",
+        "pass": true,
+        "renderCount": 1,
+        "expectedCount": 1,
+        "callbackClassLoaderIsApk": true
+      }
+    ],
+    "sourceApkSha256": "3714906ae77d686712fd1299797a423850622fc957fe50779fb19ae28b139635",
+    "sourceApkBytes": 46726883,
+    "javaSha256": "3d84e9f9098abc9ef89e6ba9ab36f7c206d1fbbefc9220b2f87707a20843bf73",
+    "dexSha256": "e520900b8e942638d2eb9a8aab64d47ea523b3d294f353cdc8ec37e8d07ece8b",
+    "nativeExit": 0,
+    "sdk": 29,
+    "phoneCommands": 0,
+    "networkCalls": 0,
+    "installedHubChanges": 0,
+    "optimizedCalls": 0
+  },
+  "nativeCleanup": {
+    "remoteScratchAbsent": true,
+    "probeProcessAbsent": true,
+    "fixturePackageInstalled": false
+  },
+  "nativeReview": {
+    "blockers": 0,
+    "sourceAndDexBindingsValidated": true,
+    "reportSha256": "c42f0d2b81285141f4e824e6dcd4a406621b0d8866dfea4e5ef2437104292876"
+  },
+  "installed": {
+    "family": {
+      "bytes": 25884988,
+      "sha256": "2aca4c50dbfce037997d718c0a555725511c235d6570da3c4ea8795f855530d0",
+      "app": {
+        "versionCode": 128,
+        "versionName": "1.134"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25884988,
+        "sha256": "2aca4c50dbfce037997d718c0a555725511c235d6570da3c4ea8795f855530d0",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 128,
+          "versionName": "1.134"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1635,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1976,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "familyScreen": {
+    "frameVisuallyInspected": true,
+    "privateCaptureNotCommitted": true,
+    "observedCurrentStage": "Plain fitted photo with dark margins",
+    "savedMode": "shuffle",
+    "paperIsInstalledButNotEveryShuffleStageUsesIt": true
+  },
+  "renderedPreview": {
+    "url": "http://127.0.0.1:8892/renderer.html",
+    "localSamplePhotos": true,
+    "mosaicThinFramesLightDoodlesAndClockVisible": true,
+    "settingsChanged": false
+  },
+  "originalRegistryHashesPreserved": true,
+  "publicationManifestPreserved": "1.83/code77",
+  "archives": [
+    {
+      "path": "mocks/portal-home-playback-20261104/evidence/promotion-promotion-gates.log.gz",
+      "sha256": "77c601b8d5cbc0346cc4b00b858f52fea14b67cd7e50bd96c4476d5d2c2d5f97",
+      "uncompressedSha256": "98eeedec792c5f8a5b1994eb7c12b32a4f2d492ed3ab62abcba9d71bac535fc5",
+      "uncompressedBytes": 13734
+    },
+    {
+      "path": "mocks/portal-home-playback-20261104/evidence/promotion-promotion-artifacts.json.gz",
+      "sha256": "2eaa1a4e8ffb9ecce6c686bfe881c0eb25078ce308018043be842a8809c22161",
+      "uncompressedSha256": "a0ba764021811e38fd0b077849a73a89d017135915e11860b756ef982a0e3048",
+      "uncompressedBytes": 4751
+    },
+    {
+      "path": "mocks/portal-home-playback-20261104/evidence/promotion-build-report.json.gz",
+      "sha256": "22fe18744c03fe6e771609169a6adf40e2a4eb8d351c99a30a339d30781764c4",
+      "uncompressedSha256": "ba721559ebaece9a3a0d41bf7b77b243dd3215ddf59623209b42ba25a172acd5",
+      "uncompressedBytes": 4506
+    },
+    {
+      "path": "mocks/portal-home-playback-20261104/evidence/promotion-device-stdout.log.gz",
+      "sha256": "0f265bfffe1d802fdfb7f369aa5964f0ef03e7b1b074b450037505aa4519082a",
+      "uncompressedSha256": "bd9009dec508172393283a84ac592faf080584bd739207c0064f673c1655313c",
+      "uncompressedBytes": 1886
+    },
+    {
+      "path": "mocks/portal-home-playback-20261104/evidence/promotion-device-stderr.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "uncompressedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressedBytes": 0
+    },
+    {
+      "path": "mocks/portal-home-playback-20261104/evidence/promotion-independent-native-review.json.gz",
+      "sha256": "0a17a6c74da7658c4af5ff5be361d7f382076fe24bd8867fcc2622918f16f0e3",
+      "uncompressedSha256": "c42f0d2b81285141f4e824e6dcd4a406621b0d8866dfea4e5ef2437104292876",
+      "uncompressedBytes": 8061
+    }
+  ],
+  "setupCorrections": [
+    "Initial capture setup looked for registry in worktree; missing path produced zero device actions, then original ignored registry copied privately.",
+    "System Python lacks MkDocs; owned pinned documentation environment used.",
+    "Headerless private Java predecessor excluded; final header-bearing source/dex hashes validated before native execution."
+  ],
+  "limits": [
+    "Equivalent captured-callback native baseline, not execution of original Home Compose.",
+    "Real owned HandlerThread/Looper and actual isolated debug APK factory/hub; no Home composition, live media/session/transport/audio, API28 or optimized callback execution.",
+    "Shell process has shell permissions; zero generated fixture network or installed hub calls, not a no-INTERNET-permission claim.",
+    "Living full installed APK and preserved configurations are verified; physical Living visual acceptance remains open.",
+    "Paper assets are installed, but Shuffle contains other styles with dark margins; all reported screensaver issues are not declared fixed.",
+    "No phone, household source photo-file import/read/transfer, provider/account action, GitHub push or publication.",
+    "User steered priority to visible screensaver improvements and short modular releases; all older issue clocks remain."
+  ],
+  "cleanup": {
+    "copiedRegistryRemoved": true,
+    "originalRegistryHashesPreserved": true,
+    "nativeScratchAndProcessAbsent": true,
+    "privateRollbackAndSnapshotsRetained": true,
+    "preexistingPythonCacheUntouched": true,
+    "ownedDocumentationEnvironmentAndSiteRemoved": true
+  },
+  "roadmap": {
+    "tasks": 125,
+    "counts": {
+      "delivered": 76,
+      "verified": 39,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "all124PriorObjectsAndRawSuffixPreserved": true,
+    "rawSuffixBytes": 418405,
+    "rawSuffixSha256": "ae863bcb24c45856c82c903e714e20c69ac3d0647379e2eebb60de40bcc8cb61",
+    "weatherDefaultPreserved": true
+  },
+  "documentation": {
+    "strictMkDocsTerminalExit": 0,
+    "warningCount": 0,
+    "existingInfoMessagesRetained": true
+  },
+  "wholeProductGoalComplete": false
+}
