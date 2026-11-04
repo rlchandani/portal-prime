@@ -1,18 +1,64 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T10:27:55.302231+00:00",
-  "updatedLabel": "Native photo doodles delivered; both rooms1.147 and earlier scopes retained",
+  "updatedAt": "2026-11-04T10:39:06.820432+00:00",
+  "updatedLabel": "Native photo edges delivered; both rooms1.148 and earlier scopes retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.147/code 141. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.148/code 142. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "native-photo-border",
+      "title": "Native photo styles: thin photo edges",
+      "summary": "A quiet warm edge follows whole unadjusted native photos without changing fitting.",
+      "status": "delivered",
+      "verification": "4,434 JVM \u00b7 seven native captures \u00b728 corners \u00b7 exact both-room installs",
+      "kind": "Screensaver visual polish",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent source, artifact and pixel review",
+      "deployment": "Exact optimized1.148/code142 fully hashed in both rooms; one install per room.",
+      "acceptance": [
+        "Whole unadjusted photos gain a thin inside edge; tiny/manual/editor/cropped-fill cases stay unframed.",
+        "Same frozen actual debug nativeStage/Canvas:5 missing-border captures plus2controls\u21927pass; geometry/bitmap/budget/opacity/matte and28corners retained.",
+        "Saved settings and all web assets retained."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery, checks and limits",
+          "source": "docs/portal-native-photo-border-2026-11-04.md"
+        },
+        {
+          "text": "Frozen fixture, PNG replay and room preservation",
+          "source": "mocks/portal-native-photo-border-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated actual debug Family/API29 software Canvas only; compositor, live motion/dissolve, native clock/host, optimized runtime/API28/Living visuals/performance remain separate.",
+        "Saved Shuffle/fit retained; native style support does not prove current selection.",
+        "No phone/provider/media/account/push/publication."
+      ],
+      "next": "Switch to another distinct bounded product slice; prior scopes and clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-04T10:29:09Z",
+        "target": "2026-11-04T10:44:09Z",
+        "deadline": "2026-11-04T10:59:09Z",
+        "sourceBase": "235b2b165dc6ea41f1041fe2a88f725106108dca",
+        "scope": "Thin photo-sized native edge only for whole unadjusted pictures; no image resizing/crops/motion/settings changes",
+        "priorClocksRetained": true,
+        "boundaries": [
+          "Root device operations only",
+          "No phone/provider/media/account/push/publication"
+        ]
+      }
+    },
     {
       "id": "native-photo-matte",
       "title": "Native photo styles: quiet doodle margins",

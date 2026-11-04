@@ -318,7 +318,7 @@ internal class SlideshowStage(
         addView(holder, LayoutParams(area.width(), area.height()).apply {
           leftMargin = area.left; topMargin = area.top
         })
-        val image = ImageView(context).apply {
+        val image = NativePhotoView(context).apply {
           scaleType = ImageView.ScaleType.FIT_XY
           setImageBitmap(photo.bitmap)
           pivotX = 0f; pivotY = 0f
@@ -333,6 +333,8 @@ internal class SlideshowStage(
         if (manual == null) paths[index] = path
         image.scaleX = start.scale; image.scaleY = start.scale
         image.translationX = start.x; image.translationY = start.y
+        image.showBorder = path.whole && !p.editing &&
+            (photo.adjustment == null || p.gallerySpread)
         if (manual == null && path.start != path.end &&
             animationsAllowed()) {
           val end = path.end

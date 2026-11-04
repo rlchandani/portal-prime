@@ -1,0 +1,12 @@
+{
+  "family": {
+    "ok": true,
+    "result": "legacy_frame_requested",
+    "action": "screensaver"
+  },
+  "living": {
+    "ok": true,
+    "result": "legacy_frame_requested",
+    "action": "screensaver"
+  }
+}

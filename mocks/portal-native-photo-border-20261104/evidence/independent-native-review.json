@@ -1,0 +1,535 @@
+{
+  "reviewedAtUtc": "2026-11-04T10:38:09.528071+00:00",
+  "originalClock": {
+    "start": "2026-11-04T10:29:09Z",
+    "target": "2026-11-04T10:44:09Z",
+    "hardDeadline": "2026-11-04T10:59:09Z"
+  },
+  "ok": true,
+  "blockers": [],
+  "verdict": "Accepted bounded native whole-photo border evidence. Baseline five border failures/two unchanged controls becomes seven candidate passes.",
+  "checks": {
+    "sourceAndGatesFrozenExact": true,
+    "allFourteenPngPredicatesExact": true,
+    "caseNamesExact": true,
+    "baselineFiveBorderFailuresTwoControls": true,
+    "candidateSevenPass": true,
+    "allNonBorderFieldsExact": true,
+    "negativeControlsByteAndPixelExact": true,
+    "28Corners30VisibleEdgesEachRun": true,
+    "actualScopeAndStop": true,
+    "zeroFixturePermissions": true,
+    "beforeExactDexAndSource": true,
+    "afterExactDexAndSource": true,
+    "exactBaselineAndCandidateArtifact": true,
+    "bothRetired": true
+  },
+  "pixelReplay": {
+    "before": [
+      {
+        "name": "portrait-whole-fit",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 0,
+        "transparentPixels": 0,
+        "mattePixels": 261000,
+        "basePixels": 257091,
+        "quietMarks": 3909,
+        "badMatte": 0
+      },
+      {
+        "name": "portrait-whole-fit-retained-resize",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 0,
+        "transparentPixels": 0,
+        "mattePixels": 340740,
+        "basePixels": 336056,
+        "quietMarks": 4684,
+        "badMatte": 0
+      },
+      {
+        "name": "panorama-whole-fit",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 0,
+        "transparentPixels": 0,
+        "mattePixels": 316000,
+        "basePixels": 311172,
+        "quietMarks": 4828,
+        "badMatte": 0
+      },
+      {
+        "name": "gallery-print",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 0,
+        "transparentPixels": 0,
+        "mattePixels": 67263,
+        "basePixels": 66752,
+        "quietMarks": 511,
+        "badMatte": 0
+      },
+      {
+        "name": "gallery-spread",
+        "cornersPassed": 8,
+        "visibleEdges": 8,
+        "edgesPassed": 0,
+        "transparentPixels": 0,
+        "mattePixels": 174348,
+        "basePixels": 171774,
+        "quietMarks": 2574,
+        "badMatte": 0
+      },
+      {
+        "name": "tiny-whole-negative",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 0,
+        "basePixels": 0,
+        "quietMarks": 0,
+        "badMatte": 0
+      },
+      {
+        "name": "manual-crop-negative",
+        "cornersPassed": 0,
+        "visibleEdges": 2,
+        "edgesPassed": 2,
+        "transparentPixels": 0,
+        "mattePixels": 45000,
+        "basePixels": 44757,
+        "quietMarks": 243,
+        "badMatte": 0
+      }
+    ],
+    "after": [
+      {
+        "name": "portrait-whole-fit",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 261000,
+        "basePixels": 257091,
+        "quietMarks": 3909,
+        "badMatte": 0
+      },
+      {
+        "name": "portrait-whole-fit-retained-resize",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 340740,
+        "basePixels": 336056,
+        "quietMarks": 4684,
+        "badMatte": 0
+      },
+      {
+        "name": "panorama-whole-fit",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 316000,
+        "basePixels": 311172,
+        "quietMarks": 4828,
+        "badMatte": 0
+      },
+      {
+        "name": "gallery-print",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 67263,
+        "basePixels": 66752,
+        "quietMarks": 511,
+        "badMatte": 0
+      },
+      {
+        "name": "gallery-spread",
+        "cornersPassed": 8,
+        "visibleEdges": 8,
+        "edgesPassed": 8,
+        "transparentPixels": 0,
+        "mattePixels": 174348,
+        "basePixels": 171774,
+        "quietMarks": 2574,
+        "badMatte": 0
+      },
+      {
+        "name": "tiny-whole-negative",
+        "cornersPassed": 4,
+        "visibleEdges": 4,
+        "edgesPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 0,
+        "basePixels": 0,
+        "quietMarks": 0,
+        "badMatte": 0
+      },
+      {
+        "name": "manual-crop-negative",
+        "cornersPassed": 0,
+        "visibleEdges": 2,
+        "edgesPassed": 2,
+        "transparentPixels": 0,
+        "mattePixels": 45000,
+        "basePixels": 44757,
+        "quietMarks": 243,
+        "badMatte": 0
+      }
+    ]
+  },
+  "edgeObservations": {
+    "before": [
+      {
+        "name": "portrait-whole-fit",
+        "bestDistances": [
+          33,
+          33,
+          33,
+          33
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "portrait-whole-fit-retained-resize",
+        "bestDistances": [
+          33,
+          33,
+          33,
+          33
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "panorama-whole-fit",
+        "bestDistances": [
+          33,
+          33,
+          33,
+          33
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "gallery-print",
+        "bestDistances": [
+          33,
+          33,
+          33,
+          33
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "gallery-spread",
+        "bestDistances": [
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33,
+          33
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "tiny-whole-negative",
+        "bestDistances": [
+          33,
+          33,
+          33,
+          33
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "manual-crop-negative",
+        "bestDistances": [
+          33,
+          33
+        ],
+        "deepPlain": true
+      }
+    ],
+    "after": [
+      {
+        "name": "portrait-whole-fit",
+        "bestDistances": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "portrait-whole-fit-retained-resize",
+        "bestDistances": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "panorama-whole-fit",
+        "bestDistances": [
+          0,
+          1,
+          0,
+          0
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "gallery-print",
+        "bestDistances": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "gallery-spread",
+        "bestDistances": [
+          3,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "tiny-whole-negative",
+        "bestDistances": [
+          33,
+          33,
+          33,
+          33
+        ],
+        "deepPlain": true
+      },
+      {
+        "name": "manual-crop-negative",
+        "bestDistances": [
+          33,
+          33
+        ],
+        "deepPlain": true
+      }
+    ]
+  },
+  "negativeControlEquality": {
+    "tiny-whole-negative": {
+      "pixelIdentical": true,
+      "pngByteIdentical": true
+    },
+    "manual-crop-negative": {
+      "pixelIdentical": true,
+      "pngByteIdentical": true
+    }
+  },
+  "literalBlendRecomputed": {
+    "alpha": 96,
+    "bodyRgb": [
+      135,
+      150,
+      168
+    ],
+    "inkRgb": [
+      222,
+      216,
+      203
+    ],
+    "expectedRgb": [
+      168,
+      175,
+      181
+    ]
+  },
+  "pixelMethod": "PIL/NumPy replayed all14 PNGs: float32 corner/edge coordinates, literal RGBA, 3-pixel inward edge blend and 4-pixel inset body, photo envelope plus2 mask, whole-canvas alpha and matte thresholds. All counts and edge records match the reports. Only borderPass/edges and overall pass/error fields are excluded from exact baseline/candidate case comparison.",
+  "fixtures": {
+    "before": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native/baseline-fixture.apk",
+      "sha256": "2eff383313a442486854ff69fca6c6bb4ee29daa73ea5ab3f52e1522616a7c2c",
+      "bytes": 37503466,
+      "dexSha256": "ee2326786ff280a28d3a99493e3967c35fae285509de8bc5cdf1774739df2a78",
+      "embeddedSourceSha256": "a48c88f0e81a0ba52ae8642419487bff553ab8ae89a6c7d11d258ce3bad1cbdb",
+      "embeddedSourceBytes": 46745298
+    },
+    "after": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native/native-border-fixture.apk",
+      "sha256": "3ca0bfbd6d11591c9605b3f85bbdf7f9a0011de94f3d12a44e9e7c80159c2183",
+      "bytes": 37507562,
+      "dexSha256": "ee2326786ff280a28d3a99493e3967c35fae285509de8bc5cdf1774739df2a78",
+      "embeddedSourceSha256": "d15ee02d934b92b74658a4af6c09060232345d9fa78c3323666cc920450d8c45",
+      "embeddedSourceBytes": 46745298
+    }
+  },
+  "bindings": {
+    "java": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native/NativeBorderActivity.java",
+      "sha256": "6a88b2458abb573cca4c2faba014dbaa4ecc90c5bbaefa17bb95db1be46443ad",
+      "bytes": 15594
+    },
+    "dex": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native/frozen-dex/classes.dex",
+      "sha256": "ee2326786ff280a28d3a99493e3967c35fae285509de8bc5cdf1774739df2a78",
+      "bytes": 20164
+    },
+    "manifest": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native/AndroidManifest.xml",
+      "sha256": "a74d79aa9f463b69d44efb7ab81060c5af9d3dbf0a624b9d628827cfdaf2f15c",
+      "bytes": 442
+    },
+    "preparation": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native/preparation-verification.json",
+      "sha256": "8c35adce3ffc0f12dc2c789ddf3b373dd05a8b64467b038129e8acba928b7ea0",
+      "bytes": 4256
+    },
+    "candidatePreparation": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native-candidate-preparation.json",
+      "sha256": "2dcb9bf6952b236354136b9be434b9ff4092fd1ee47757b2369657690786693c",
+      "bytes": 366
+    },
+    "beforeReport": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native-before-report.json",
+      "sha256": "3f7e2352bc545b52be151b7e559e09deebd7b78c163c39f018913c7da08567a5",
+      "bytes": 35561
+    },
+    "afterReport": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native-after-report.json",
+      "sha256": "f9013a697e237f5d963f7c4ee7eec036a75925cd8113d0d68621c4ebc86b594a",
+      "bytes": 35242
+    },
+    "beforeRetirement": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native-before-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "afterRetirement": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/native-after-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "promotionArtifacts": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/promotion-artifacts.json",
+      "sha256": "f42fd6c041de2a79a7813d31c68a9c36f0dc464e7f65ef2543c1e7d695db141c",
+      "bytes": 4789
+    },
+    "sourceReview": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/independent-source-review.json",
+      "sha256": "5f5f4cf9a3eab91710de3e0bd66c5b40a38de8272c420a03f067b3f0757a686b",
+      "bytes": 5947
+    }
+  },
+  "pngBindings": {
+    "before": [
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-before-images/portrait-whole-fit.png",
+        "sha256": "a25aea4117f797142fa15514ca29294827116fe5738c4b0e1017d99dc27eb81f",
+        "bytes": 12588
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-before-images/portrait-whole-fit-retained-resize.png",
+        "sha256": "f7e02698b48133e21b11f4a24b08ad13c34c156cd46cf5584384f2aeb82f6f55",
+        "bytes": 15622
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-before-images/panorama-whole-fit.png",
+        "sha256": "aa712471af3bd8a3c64020151ff405a03a828d9902e4efbedb1f29faf21c1832",
+        "bytes": 15793
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-before-images/gallery-print.png",
+        "sha256": "2670b5cb8c18974919ea6d7db569df3db5e214805f2b8efb9bbc35df63712a26",
+        "bytes": 5502
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-before-images/gallery-spread.png",
+        "sha256": "0dd4df48156ffa1dc795fffac307ada4c4527a07370beb6e9ac8a50de84a7cd0",
+        "bytes": 13323
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-before-images/tiny-whole-negative.png",
+        "sha256": "a2aadce4198a04e2b5841fdb28cf2888b2af08c0e730453e5987d8f5fdcb6ffe",
+        "bytes": 163
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-before-images/manual-crop-negative.png",
+        "sha256": "df707ed10bff5671b1dd8197190c57f55e818ca7359d7fad200ac1b37f0ea7f5",
+        "bytes": 4644
+      }
+    ],
+    "after": [
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-after-images/portrait-whole-fit.png",
+        "sha256": "9a3bf712e203bd724b37ee6f120aa79af710ce89b1f41269a8340899d30c949b",
+        "bytes": 12753
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-after-images/portrait-whole-fit-retained-resize.png",
+        "sha256": "6e41ead742ef9d681598fe1c5887d6a42ae2a52bc0f3766a2cd3b5f0c651e9de",
+        "bytes": 15784
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-after-images/panorama-whole-fit.png",
+        "sha256": "f1d4b8831b45531e5878f4ab0580342202569760dacdb512e36a3c6e0b7e3a0e",
+        "bytes": 15955
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-after-images/gallery-print.png",
+        "sha256": "55d776e4fddf80cb0da81ce88456f8a17cfadab3d3821821c9602dd9af2f4615",
+        "bytes": 5705
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-after-images/gallery-spread.png",
+        "sha256": "952ef7e6fc6c917bd0d2d3584fbdde0f58d3a47941348661c482757ffd33ba10",
+        "bytes": 13660
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-after-images/tiny-whole-negative.png",
+        "sha256": "a2aadce4198a04e2b5841fdb28cf2888b2af08c0e730453e5987d8f5fdcb6ffe",
+        "bytes": 163
+      },
+      {
+        "path": "/private/tmp/portal-native-border-20261104-102909/native-after-images/manual-crop-negative.png",
+        "sha256": "df707ed10bff5671b1dd8197190c57f55e818ca7359d7fad200ac1b37f0ea7f5",
+        "bytes": 4644
+      }
+    ]
+  },
+  "retirement": {
+    "before": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    },
+    "after": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    }
+  },
+  "limits": [
+    "Actual embedded debug Stage/software Canvas rendering on SDK29/density1.125 with generated retained bitmaps. No compositor/PixelCopy/GPU or performance proof.",
+    "Primary resize retains stage/bitmap; existing resize may recreate image children. No retained-child refresh runtime proof.",
+    "28 literal corners include tiny control; manual crop intentionally has no whole/corner assertion and checks only2 visible original side edges.",
+    "No live motion/dissolve, FaceRenderer/complete controller host integration, owner data, optimized/API28 or other-density runtime claim. No device/build/repack/source/network/Git actions by this reviewer."
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "ok": true,
+  "blockers": [],
+  "originalClockUtc": "2026-11-04T10:29:09Z",
+  "targetUtc": "2026-11-04T10:44:09Z",
+  "hardDeadlineUtc": "2026-11-04T10:59:09Z",
+  "package": "com.immortal.nativeborderfixture",
+  "activity": ".NativeBorderActivity",
+  "reportPath": "external-files/report.json",
+  "sources": {
+    "NativeBorderActivity.java": {
+      "sha256": "6a88b2458abb573cca4c2faba014dbaa4ecc90c5bbaefa17bb95db1be46443ad",
+      "bytes": 15594
+    },
+    "AndroidManifest.xml": {
+      "sha256": "a74d79aa9f463b69d44efb7ab81060c5af9d3dbf0a624b9d628827cfdaf2f15c",
+      "bytes": 442
+    },
+    "build.sh": {
+      "sha256": "ac7934d6a530abed7d71d5d8b69e59ed76d7f7fb15f86d0ea31c2671efa6f419",
+      "bytes": 794
+    },
+    "repack.sh": {
+      "sha256": "02cf46e697071bfcc7b061cb38cd4ddd6cc30d982e3c8de7b054735a575072cd",
+      "bytes": 780
+    }
+  },
+  "fixtureDex": {
+    "sha256": "ee2326786ff280a28d3a99493e3967c35fae285509de8bc5cdf1774739df2a78",
+    "bytes": 20164
+  },
+  "fixture": {
+    "sha256": "2eff383313a442486854ff69fca6c6bb4ee29daa73ea5ab3f52e1522616a7c2c",
+    "bytes": 37503466
+  },
+  "baselineFixture": {
+    "sha256": "2eff383313a442486854ff69fca6c6bb4ee29daa73ea5ab3f52e1522616a7c2c",
+    "bytes": 37503466
+  },
+  "embeddedSource": {
+    "sha256": "a48c88f0e81a0ba52ae8642419487bff553ab8ae89a6c7d11d258ce3bad1cbdb",
+    "bytes": 46745298
+  },
+  "caseNames": [
+    "portrait-whole-fit",
+    "portrait-whole-fit-retained-resize",
+    "panorama-whole-fit",
+    "gallery-print",
+    "gallery-spread",
+    "tiny-whole-negative",
+    "manual-crop-negative"
+  ],
+  "expectedBaselineFailures": 5,
+  "expectedBaselineControls": [
+    "tiny-whole-negative",
+    "manual-crop-negative"
+  ],
+  "gates": {
+    "retainedPriorNativeMatteGeometryIdentityAdmissionOpacityCornerGates": true,
+    "literalGeneratedBodyArgb": "ff8796a8",
+    "literalExpectedWarmBlendArgb": "ffa8afb5",
+    "blendDefinition": "96/255 warm222,216,203 over generated body135,150,168; rounded expected168,175,181",
+    "expectedBlendMaxChannelDifference": 17,
+    "positiveEdgeRedMinimum": 147,
+    "blendToleranceReason": "Native antialias coverage at fractional fitted-image edge; full blend compared over three-pixel inward strip. Baseline plain body differs by33 in red and cannot pass. Frozen before baseline run.",
+    "fourMidpointEdgesPerWholePhoto": true,
+    "edgeStripPixels": 3,
+    "fourPixelsInwardMustRemainLiteralBody": true,
+    "negativeControlMaxChannelDifferenceFromLiteralBody": 2,
+    "expectedPrimaryPositiveEdgeCount": 24,
+    "expectedTinyNegativeEdgeCount": 4,
+    "expectedManualNegativeEdgeCount": 2,
+    "tinyViewport": {
+      "width": 20,
+      "height": 20,
+      "bitmapWidth": 100,
+      "bitmapHeight": 100
+    },
+    "manualCrop": {
+      "zoom": 2,
+      "focusX": 0.5,
+      "focusY": 0.5,
+      "viewportWidth": 800,
+      "viewportHeight": 600,
+      "bitmapWidth": 480,
+      "bitmapHeight": 800,
+      "visibleOriginalEdges": "left and right only; no full-corner/whole-fit assertion for deliberate crop"
+    },
+    "expectedLiteralCornerCountPerStage": 28,
+    "initiallyTransparentCanvasMustDrawEveryPixelOpaque": true,
+    "exactBitmapIdentityRetained": true,
+    "exactAdmissionBytesEqualSourceBitmapAllocation": true,
+    "stopMustReleaseAdmissionToZeroAndNotRecycleInput": true
+  },
+  "zeroDeclaredPermissions": true,
+  "frozenSourcesAndGatesByteIdentical": true,
+  "strictEmbeddedBaselineExact": true,
+  "watchdogMs": 30000,
+  "candidateRepackOwnership": "ROOT EXCLUSIVELY; author built baseline only and will not run repack for candidate",
+  "candidateCommandForRoot": "bash native/repack.sh candidate-debug-1.148.apk; swaps source.apk and signs original frozen DEX only",
+  "limits": [
+    "Actual embedded debug SlideshowStage/native software Canvas with generated bitmaps only",
+    "No owner photos, preferences, account/provider/network/device operations by author",
+    "Primary resize retains stage and bitmap; existing resize may recreate image child, no retained-child refresh claim",
+    "Manual crop control checks only its two visible original side edges; no full-corner/whole-fit claim",
+    "No compositor/GPU, live motion/dissolve, FaceRenderer/host, optimized/API28 or synthetic-clock acceptance"
+  ]
+}

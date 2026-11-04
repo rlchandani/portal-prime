@@ -1,0 +1,98 @@
+{
+  "reviewedAtUtc": "2026-11-04T10:32:29.649393+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-04T10:29:09Z",
+    "target": "2026-11-04T10:44:09Z",
+    "deadline": "2026-11-04T10:59:09Z",
+    "sourceBase": "235b2b165dc6ea41f1041fe2a88f725106108dca",
+    "scope": "Thin photo-sized native edge only for whole unadjusted pictures; no image resizing/crops/motion/settings changes",
+    "priorClocksRetained": true,
+    "boundaries": [
+      "Root device operations only",
+      "No phone/provider/media/account/push/publication"
+    ]
+  },
+  "ok": true,
+  "blockers": [],
+  "verdict": "Accepted bounded native whole-photo border source change; rendered pixel gates remain separate.",
+  "checks": {
+    "stageNormalizesExactlyToCapturedOriginal": true,
+    "versionOnlyBuildChange": true
+  },
+  "bindings": {
+    "candidateStage": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowStage.kt",
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "capturedStage": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/SlideshowStage.kt",
+      "sha256": "74104f7e62ef589e40b436eb0d8eff0ce71eabe0f29b13fb4c7534e4b689bd82",
+      "bytes": 25789
+    },
+    "nativePhotoView": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoView.kt",
+      "sha256": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "bytes": 1621
+    },
+    "candidateBuild": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "sha256": "45cb2fd054e80a4ca220aa803354770127b3bdc6bf60a2b66c9cec705b0c2a07",
+      "bytes": 11824
+    },
+    "capturedBuild": {
+      "path": "/private/tmp/portal-native-border-20261104-102909/build.gradle.kts",
+      "sha256": "8bac1e80ebf64a803e3b3baea3b5535e42b37da43f7214945846e2cda7af2258",
+      "bytes": 11824
+    },
+    "geometry": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowGeometry.kt",
+      "sha256": "285b5a8f4a03776bdfb69322bd6a40f72ca82256428c47c04f4b01c26db80cea",
+      "bytes": 5159
+    },
+    "presentationPolicy": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowPresentationPolicy.kt",
+      "sha256": "907e9a2c78652465bb27620bdb5990f3d9ad5fb9f571497f5b0326c6de59774b",
+      "bytes": 8380
+    },
+    "unchangedNativeMatte": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoMatte.kt",
+      "sha256": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "bytes": 3372
+    }
+  },
+  "findings": [
+    {
+      "lines": "NativePhotoView.kt:16-39;SlideshowStage.kt:321-337",
+      "finding": "ImageView subclass draws the original image first, then an inset stroke entirely inside its source-sized view. It retains FIT_XY, bitmap, pivots, scale and translations; no extra child, padding, layout area or crop is added. Border ink is ARGB(96,222,216,203), fixed inverse-scaled one-dp width."
+    },
+    {
+      "lines": "NativePhotoView.kt:17-25,33-45",
+      "finding": "Visibility changes and scaleX updates while enabled invalidate the view. Density is finite/positive, capped at4 or falls back1; invalid/nonpositive scale and either displayed dimension below24dp skip drawing. Existing stage assignments set equal X/Y scales, so inverseScale keeps the edge width stable. Retained Gallery reflow and snapshot/resize transform updates repaint at their latest scale."
+    },
+    {
+      "lines": "SlideshowStage.kt:336-337;SlideshowGeometry.kt:40-95;SlideshowStage.kt:355-378",
+      "finding": "Admission uses actual path.whole, excludes editing and manually adjusted photos, with the intentional normal Gallery Spread exception because that mode ignores saved crops and retains whole-photo plans. Fill paths admitted as cropped have whole=false. A manual adjustment is excluded even when zoom1/whole."
+    },
+    {
+      "lines": "SlideshowStage.kt:173-223,382-404,426-435,460-527",
+      "finding": "Entering editing rebuilds a border-disabled view before in-place manual updates. Finish/save/cancel rebuilds the correct normal scene and restores retained transforms. ImageView superclass casts/bitmap identity checks still accept the subclass. Cleanup removes the view/bitmap references as before; new view owns only one small Paint and no timers or external resources."
+    },
+    {
+      "lines": "SlideshowStage.kt complete captured-byte normalization",
+      "finding": "Replacing only the subclass constructor and removing the two admission lines restores the complete captured stage. All geometry, matte, bitmap budget, child ownership/count, crop/edit mechanics, pause/seek, resize, dissolve/timers and stop methods remain byte-identical."
+    }
+  ],
+  "reviewedConditions": {
+    "wholeUnadjusted": "enabled when not editing; actual draw also requires at least24dp in each displayed dimension",
+    "manualAdjustment": "disabled",
+    "editing": "disabled",
+    "croppedFillPath": "disabled",
+    "gallerySpreadSavedAdjustment": "enabled outside editing because normal spread ignores that saved crop"
+  },
+  "limits": [
+    "Source inspection/normalization only; reviewer performed no source/test writes, builds, device/network/Git actions.",
+    "Native seven-capture fixture must separately prove visible literal border blend, retained corners/geometry/matte/admission/opacity and tiny/manual negative controls.",
+    "No native compositor/GPU performance, live motion/dissolve, FaceRenderer or complete controller integration, owner photos, optimized/API28 or malformed/nonuniform external view-transform behavior is claimed."
+  ]
+}
