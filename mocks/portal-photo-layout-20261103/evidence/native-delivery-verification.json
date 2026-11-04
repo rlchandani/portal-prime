@@ -116,7 +116,8 @@
     "r8": true,
     "vitalLint": true,
     "androidTestAssembly": true,
-    "strictMkDocs": true
+    "strictMkDocs": true,
+    "publishedBuildLogsTrailingWhitespaceTrimmed": true
   },
   "excludedHarnessFailure": "Kotlin AndroidTest runner cannot load R8-renamed kotlin.jvm.internal.Intrinsics; crash_guard bytes and original test APK restored; launcher process restarted",
   "livingInstall": {
