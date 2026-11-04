@@ -1,0 +1,83 @@
+{
+  "recordedAtUtc": "2026-11-04T09:48:36.816434+00:00",
+  "ok": true,
+  "blockers": [],
+  "clock": {
+    "start": "2026-11-04T09:39:57Z",
+    "target": "2026-11-04T09:54:57Z",
+    "hardDeadline": "2026-11-04T10:09:57Z",
+    "hostPreparationDeadline": "2026-11-04T09:48:00Z",
+    "reset": false
+  },
+  "candidateFixture": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/news-identity-fixture.apk",
+    "bytes": 37495274,
+    "sha256": "3bfcc3bdd9e2c64b88e1cd06a1506a76345026ef53f2c029114937c514951a37"
+  },
+  "baselineFixture": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/baseline-fixture.apk",
+    "bytes": 37495274,
+    "sha256": "3b1655a86edbf91685f580020d0930dc4a815d9ec44bb94895a955f5ba8f6aa0"
+  },
+  "embeddedCandidate": {
+    "bytes": 46728910,
+    "sha256": "e0b5f4839783f570b034e258f2f4f3fe6345e06a655bce351b474466014acb9b"
+  },
+  "candidateDebugSource": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/candidate-debug-1.145.apk",
+    "bytes": 46728910,
+    "sha256": "e0b5f4839783f570b034e258f2f4f3fe6345e06a655bce351b474466014acb9b"
+  },
+  "candidatePackage": {
+    "id": "com.immortal.launcher.debug",
+    "versionName": "1.145",
+    "versionCode": 139
+  },
+  "frozenSources": {
+    "NewsIdentityActivity.java": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/NewsIdentityActivity.java",
+      "bytes": 12591,
+      "sha256": "e28e27589efdd5977461bb0d5f0e2104605e5e2aa61e180bf829e847a581bcb9"
+    },
+    "build.sh": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/build.sh",
+      "bytes": 1119,
+      "sha256": "7537f4a08614a7346add59206ba00f4c5d4500a082120d1b11abd81e96ff79ba"
+    },
+    "AndroidManifest.xml": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/AndroidManifest.xml",
+      "bytes": 436,
+      "sha256": "c990f6ac3caa520c1836bd1a80d04f69e96511085d56c957abd3b3d10eaa0012"
+    }
+  },
+  "logicalGateBindings": {
+    "actualClassAdmissionAndCases": {
+      "bytes": 6809,
+      "sha256": "9cc935b12d7c3eb8908e2b685207abe4329c71d44a975a0c9ac28ac279761508"
+    },
+    "preferenceIsolationAndAssertions": {
+      "bytes": 3092,
+      "sha256": "bed54e87d87d650ec30b1e39cf52167ed564728a77ed80f32f22be58565fb560"
+    },
+    "retirementAndReport": {
+      "bytes": 1256,
+      "sha256": "51f0d6f7ecefeaa5e3ef32714bc87a3c4dd5d6f7c0ebcb413ae92fd091d942b2"
+    }
+  },
+  "frozenSourcesAndGatesByteIdentical": true,
+  "baselineAndCandidateFixtureDexByteIdentical": true,
+  "fixtureDex": {
+    "bytes": 23400,
+    "sha256": "6a75a5c219531a19696b62b6dfe0afcecf05b11951347658c53ef5cb7248c1a8"
+  },
+  "embeddedCandidateExact": true,
+  "fixturePackage": "com.immortal.newsidentityfixture",
+  "zeroFixturePermissions": true,
+  "caseCount": 16,
+  "apkSignatureVerified": true,
+  "nativeExecutionByReviewer": false,
+  "limits": [
+    "Host build/admission only; candidate native run pending parent.",
+    "Actual debug APK NewsConfig only; no nativeUI, optimized, API28, livefeed, concurrency or millisecond-collision claim."
+  ]
+}

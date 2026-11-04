@@ -1,0 +1,247 @@
+{
+  "ok": true,
+  "review": "Independent source and frozen-test review; no additional build/test/device execution",
+  "issueClock": {
+    "startedAt": "2026-11-04T09:39:57Z",
+    "target": "2026-11-04T09:54:57Z",
+    "deadline": "2026-11-04T10:09:57Z",
+    "reset": false,
+    "baselineCommit": "da4c7729f47e10ffa793c7ab8cf931899a6fe9e9"
+  },
+  "sourceBindings": [
+    {
+      "role": "candidate-news-config",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NewsConfig.kt",
+      "sha256": "b5fc8ebc5c7c6b61d85dec5f0f63aa10a6942de1b4d18daa309520b46c602f6e"
+    },
+    {
+      "role": "baseline-news-config",
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/NewsConfig.kt.before",
+      "sha256": "5fdfb08df65b0eee86ece099e03a08004fd4c9549507751d0b23aa75a0bbd935"
+    },
+    {
+      "role": "frozen-regression",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/NewsConfigIdentityTest.kt",
+      "sha256": "48d9928ea28f318a1bff2ca92f1c93536f7fe1f33142529b641fddd1870bcb83"
+    },
+    {
+      "role": "camera-reference",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CameraConfig.kt",
+      "sha256": "550dd059d2a378f860f31052f80dafde4fb30e6dc155563dbd32fdcedfd106fc"
+    },
+    {
+      "role": "camera-reference-tests",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/CameraConfigLegacyIdentityTest.kt",
+      "sha256": "3220eb371e703997e04bbca0183d620512d0205693ffec33ed2522805149b81e"
+    },
+    {
+      "role": "news-editor",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NewsSettingsActivity.kt",
+      "sha256": "7a90fd663161d5ec0ed70c8ff0ce1aead6a282520cd8684fdc80d0273a1a1b2d"
+    },
+    {
+      "role": "collection-ui",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedEditorsUi.kt",
+      "sha256": "9167b9894eb74313ea4e2461b7c4c3ad4d592c42a92aaf7cb564a0dff091444d"
+    },
+    {
+      "role": "home-caller",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f"
+    },
+    {
+      "role": "baseline-result",
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/regression-before.log",
+      "sha256": "8ad804ab85886fc18d79bed4e7f6e8531637cd883fe064885641a1e379df1c32"
+    },
+    {
+      "role": "build-config",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "sha256": "3364dfabc60b963fa5f0e5c1b2d2ec3e5416e2f3822b890957bf78750a7f1128"
+    },
+    {
+      "role": "scope-plan",
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/plan.json",
+      "sha256": "892246ae27af1a4a93feb57579180f76ebb500694d833691d9dcb6ba0c735830"
+    }
+  ],
+  "protectedFiles": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/version.json",
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/catalog.json",
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/catalog.json",
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/provisioning/fleetctl",
+      "sha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/provisioning/room-fleet.py",
+      "sha256": "723356471a6594a19c6e94ce34d64b6bdda34eeb3650c2603b18877923d28fce",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NewsFeed.kt",
+      "sha256": "28ddb313ebf58060a594f210e6e5c98c3beb6b9c81564059e96e8b7727d49598",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NewsSettingsActivity.kt",
+      "sha256": "7a90fd663161d5ec0ed70c8ff0ce1aead6a282520cd8684fdc80d0273a1a1b2d",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CameraConfig.kt",
+      "sha256": "550dd059d2a378f860f31052f80dafde4fb30e6dc155563dbd32fdcedfd106fc",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html",
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js",
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css",
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png",
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js",
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg",
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js",
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js",
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg",
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "unchanged": true
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js",
+      "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+      "unchanged": true
+    }
+  ],
+  "sourceWitness": {
+    "missingId": "Baseline load synthesizes a fresh nanoTime ID on each read; remove reloads and cannot match the previously selected UI ID.",
+    "duplicateId": "Baseline load retains duplicates; LazyColumn key and removal share feed.id, so duplicate rows are not independently addressable.",
+    "activeCallers": [
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NewsSettingsActivity.kt",
+        "lines": [
+          50,
+          56,
+          58,
+          67,
+          81,
+          89
+        ],
+        "role": "Load, actual list key, custom/preset Add, and confirmed Remove."
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedEditorsUi.kt",
+        "lines": [
+          138,
+          148
+        ],
+        "role": "LazyColumn delegates item key directly."
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+        "lines": [
+          3982,
+          3985,
+          3990
+        ],
+        "role": "Home reloads same Feed list on resume; feed fetch remains unchanged."
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt",
+        "lines": [
+          451
+        ],
+        "role": "Embedded News settings uses same production content."
+      }
+    ]
+  },
+  "candidateReview": {
+    "accepted": true,
+    "blockers": [],
+    "readOnlyLoad": true,
+    "deterministicIds": true,
+    "laterValidIdsReserved": true,
+    "firstValidIdsAndLongBoundariesRetained": true,
+    "numericStringCompatibilityRetained": true,
+    "sameStoredIdAlgorithmAsCamera": true,
+    "blankUrlFilterAndFieldTrimSemanticsRetained": true,
+    "singleFeedRemovalPersistsRemainingAssignedIds": true,
+    "loadAddRemoveShareSynchronizedObjectMonitor": "source-reviewed; reentrant load under accepted add/remove",
+    "newAddsSkipAllLoadedIds": "source-reviewed; current time ID checked against normalized loaded set",
+    "mutationPersistence": "Existing one apply transaction stores normalized remaining/current list; no eager migration writes during load."
+  },
+  "frozenEvidence": {
+    "tests": 12,
+    "sha256": "48d9928ea28f318a1bff2ca92f1c93536f7fe1f33142529b641fddd1870bcb83",
+    "baselineTests": 12,
+    "baselineAssertionFailures": 9,
+    "baselineControls": 3,
+    "baselineErrorsOrSkipped": "Not asserted from console alone; coordinator owns XML/full result",
+    "caseCoverage": [
+      "Missing/null/unconvertible IDs stay stable without edits",
+      "Chosen missing-ID and either duplicate removal preserves other rows",
+      "Later valid IDs, zero, negative and both Long boundaries reserved",
+      "Multiple duplicate groups and identical rows retained",
+      "Add/remove persists assigned IDs with order and fields",
+      "Blank URLs/no-op adds and numeric-string compatibility retained"
+    ],
+    "fixtureBoundary": "Real NewsConfig parsing/mutations; mocked Context/SharedPreferences accept only generated immortal_news/feeds get/edit/putString/apply; unexpected operations are assertion failures."
+  },
+  "scope": {
+    "productionNewsConfigOnlyPlusVersion": "Coordinator-declared change scope; selected source, UI, parser, Camera, CLI and assets independently bound",
+    "uiParserHttpCacheCameraAndAllTenScreensaverAssetsUnchangedByHashes": true,
+    "roadmapContracts": "Existing delivered numeric decoding and Atom article-link tasks are parser-only; their explicit live/cache/UI limits and older Todo/Notes/provider/parked clocks remain. Subscription identity is distinct.",
+    "version": "1.145/code139; replacing only version literals exactly restores frozen build config"
+  },
+  "limits": [
+    "Candidate runtime outcomes/full gates/native acceptance are coordinator-owned and pending this source review; no candidate test pass is inferred here.",
+    "Frozen12 cases do not force new-add millisecond collision or concurrent transactions; synchronized modifiers and skip loop are source-reviewed only.",
+    "No mounted Compose/LazyColumn deletion UI, actual feed HTTP/cache/article, optimized/API28/Living functional or disk durability claim.",
+    "Other raw preference writers/external races and stale snapshot conflict handling are not redesigned.",
+    "Read-only host source/test/log inspection and this exclusive private report only; no Gradle, build, Git, device/phone/provider/media/account/network operations."
+  ]
+}

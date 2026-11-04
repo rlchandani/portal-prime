@@ -1,0 +1,48 @@
+{
+  "recordedAtUtc": "2026-11-04T09:51:14.337175+00:00",
+  "classification": "Host reviewer assertion error, excluded from product evidence",
+  "failedAssertion": "set(case for preferenceRequests)==all16caseNames",
+  "observedError": "AssertionError: all cases invoked actual preferences",
+  "actualMissingCase": "blankAddIsReadOnly",
+  "reason": "Both baseline and candidate NewsConfig.add return for a trimmed blank URL before calling preferences. Requiring preference access in this no-op control is unsound.",
+  "correctedAssertion": "All15 other cases request exactly immortal_news/mode0; blankAddIsReadOnly requests zero.",
+  "actualPerCaseRequestCounts": {
+    "baseline": {
+      "missingIdsStableAcrossReadOnlyReload": 2,
+      "invalidIdsStableAcrossReadOnlyReload": 2,
+      "duplicateIdsAreDistinctAndStable": 2,
+      "removeMissingRowLeavesOnlyOtherRow": 4,
+      "removeInvalidRowLeavesOnlyOtherRow": 4,
+      "removeFirstDuplicateLeavesSecond": 4,
+      "removeSecondDuplicateLeavesFirst": 4,
+      "laterReservedUniqueIdsRemainExact": 1,
+      "longBoundsAndSignedIdsRemainExact": 1,
+      "trimmedNamesUrlsOrderAndBlankFiltering": 1,
+      "loadNeverWritesLegacyBytesOrSentinels": 2,
+      "addPersistsNormalizedIdsAndOneNewRow": 4,
+      "missingPreferenceReturnsEmptyReadOnly": 1,
+      "invalidArrayReturnsEmptyReadOnly": 1,
+      "removeUnmatchedIdRetainsBothRows": 4
+    },
+    "candidate": {
+      "missingIdsStableAcrossReadOnlyReload": 2,
+      "invalidIdsStableAcrossReadOnlyReload": 2,
+      "duplicateIdsAreDistinctAndStable": 2,
+      "removeMissingRowLeavesOnlyOtherRow": 4,
+      "removeInvalidRowLeavesOnlyOtherRow": 4,
+      "removeFirstDuplicateLeavesSecond": 4,
+      "removeSecondDuplicateLeavesFirst": 4,
+      "laterReservedUniqueIdsRemainExact": 1,
+      "longBoundsAndSignedIdsRemainExact": 1,
+      "trimmedNamesUrlsOrderAndBlankFiltering": 1,
+      "loadNeverWritesLegacyBytesOrSentinels": 2,
+      "addPersistsNormalizedIdsAndOneNewRow": 5,
+      "missingPreferenceReturnsEmptyReadOnly": 1,
+      "invalidArrayReturnsEmptyReadOnly": 1,
+      "removeUnmatchedIdRetainsBothRows": 4
+    }
+  },
+  "fixtureSourceAssertionsAndDexChanged": false,
+  "nativeRerun": false,
+  "retainedTranscriptErrorNotProductRed": true
+}

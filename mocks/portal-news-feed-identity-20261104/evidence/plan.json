@@ -1,0 +1,20 @@
+{
+  "issue": "News subscription identity across native list reload and removal",
+  "startedAt": "2026-11-04T09:39:57Z",
+  "target": "2026-11-04T09:54:57Z",
+  "deadline": "2026-11-04T10:09:57Z",
+  "reset": false,
+  "scope": "Stable unique existing feed IDs and collision-safe serialized add/remove; no UI, HTTP, cache or settings schema changes",
+  "acceptance": [
+    "Missing/invalid-ID rows are stable without load writes",
+    "Removing either duplicate removes only chosen feed",
+    "Preserve later valid IDs, names, URLs, order and unrelated preference bytes",
+    "Frozen host regressions fail baseline then pass unchanged",
+    "Same frozen native generated preference fixture calls actual baseline/candidate APK code",
+    "Required builds/tests and exact both-room install/readback if admitted"
+  ],
+  "baselineCommit": "da4c7729f47e10ffa793c7ab8cf931899a6fe9e9",
+  "candidateVersion": "1.145",
+  "candidateCode": 139,
+  "wholeGoal": "active"
+}

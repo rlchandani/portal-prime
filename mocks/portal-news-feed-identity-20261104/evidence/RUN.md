@@ -1,0 +1,9 @@
+# Owned generated NewsConfig identity probe
+
+Build with `./build.sh /absolute/path/to/exact-original-debug.apk`. Parent owns install/run/report collection and package/process retirement. Fixture package `com.immortal.newsidentityfixture`; Activity `.NewsIdentityActivity`. The manifest declares zero permissions, including no INTERNET.
+
+The APK embeds the exact original debug APK as an asset without installing or launching it. Its owned cache copy is loaded through DexClassLoader with a platform parent, and NewsConfig class-loader identity plus public load/add/remove method signatures are admitted before cases run. Every NewsConfig Context preference request must be exactly immortal_news/mode0 and is redirected to a separate fixture-local generated store. getApplicationContext returns the same wrapped Context. No launcher package Context/data, account, provider or network is accessed.
+
+Sixteen frozen cases cover missing/invalid ID reload stability, duplicate uniqueness/stability, stale loaded-ID removal of missing and invalid rows, independent removal of either duplicate, later reserved explicit IDs, Long.MIN/MAX and negative IDs, trim/order/blank URL filtering, exact read-only load bytes, normalized ID add persistence and one new row, blank-add no-op, absent/malformed store controls and unmatched removal. Assertions do not prescribe generated ID values. Each case catches and reports its failure, then checks both untouched store sentinels, so one product failure does not prevent remaining controls.
+
+A single30-second watchdog owns the run. Report appears at fixture external-files/report.json and Activity finishes. Parent must retire fixture package/process after collection. Runtime admission is actual unoptimized debug NewsConfig on API29 only; no optimized, API28, launcher UI or room configuration claim. Frozen assertions and DEX must be unchanged between baseline and candidate.

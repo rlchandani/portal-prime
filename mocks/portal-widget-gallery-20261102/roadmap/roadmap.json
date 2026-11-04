@@ -1,18 +1,75 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T09:38:00.859346+00:00",
-  "updatedLabel": "Gallery clock reservation delivered; room1.144 and earlier scopes retained",
+  "updatedAt": "2026-11-04T09:52:49.789263+00:00",
+  "updatedLabel": "News subscription identity delivered; both rooms1.145 and earlier scopes retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.144/code 138. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.145/code 139. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "news-feed-identity",
+      "title": "News: remove only the selected subscription",
+      "summary": "Saved feeds retain stable distinct identities across reloads, so Remove keeps the other rows.",
+      "status": "delivered",
+      "verification": "12 frozen cases \u00b7 4,426 JVM \u00b7 native8fail/8controls\u219216pass \u00b7 exact both-room installs",
+      "kind": "Saved subscription correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent review",
+      "deployment": "Exact optimized1.145/code139 fully hashed in both rooms; one install per room.",
+      "acceptance": [
+        "Missing/unconvertible and duplicate saved IDs normalize deterministically without read-time writes.",
+        "First valid and later reserved IDs, Long bounds, trimmed names/URLs/order/blank filtering remain.",
+        "Remove persists only remaining rows; Add persists normalized identities and one distinct new row.",
+        "Host and same frozen generated native cases verify the actual public NewsConfig methods; sentinel preferences stay exact."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped delivery and remaining acceptance.",
+          "source": "docs/portal-news-feed-identity-2026-11-04.md"
+        },
+        {
+          "text": "Frozen regressions, native/source/artifact review and room preservation.",
+          "source": "mocks/portal-news-feed-identity-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated JVM and Family/API29 native NewsConfig public load/add/remove only; no rendered News list, live feeds, cache or article-opening acceptance.",
+        "Collision skipping and serialized mutations are source-reviewed; these cases do not force a same-millisecond collision or concurrent writers.",
+        "Native fixture loads exact original debug APK; optimized NewsConfig behavior, API28 and Living functional execution remain unverified.",
+        "Both installed optimized artifacts are fully hashed; saved Shuffle/fit remains and all screensaver assets stay exact.",
+        "No phone, source-media/provider/account operation, push or publication."
+      ],
+      "next": "Continue another bounded product slice; all earlier parked scopes/clocks remain.",
+      "issueClock": {
+        "issue": "News subscription identity across native list reload and removal",
+        "startedAt": "2026-11-04T09:39:57Z",
+        "target": "2026-11-04T09:54:57Z",
+        "deadline": "2026-11-04T10:09:57Z",
+        "reset": false,
+        "scope": "Stable unique existing feed IDs and collision-safe serialized add/remove; no UI, HTTP, cache or settings schema changes",
+        "acceptance": [
+          "Missing/invalid-ID rows are stable without load writes",
+          "Removing either duplicate removes only chosen feed",
+          "Preserve later valid IDs, names, URLs, order and unrelated preference bytes",
+          "Frozen host regressions fail baseline then pass unchanged",
+          "Same frozen native generated preference fixture calls actual baseline/candidate APK code",
+          "Required builds/tests and exact both-room install/readback if admitted"
+        ],
+        "baselineCommit": "da4c7729f47e10ffa793c7ab8cf931899a6fe9e9",
+        "candidateVersion": "1.145",
+        "candidateCode": 139,
+        "wholeGoal": "active"
+      }
+    },
     {
       "id": "gallery-clock-space",
       "title": "Gallery Wall: keep complete tiles clear of the clock",

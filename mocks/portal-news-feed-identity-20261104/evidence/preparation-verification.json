@@ -1,0 +1,110 @@
+{
+  "recordedAtUtc": "2026-11-04T09:45:16.147086+00:00",
+  "clock": {
+    "start": "2026-11-04T09:39:57Z",
+    "target": "2026-11-04T09:54:57Z",
+    "hardDeadline": "2026-11-04T10:09:57Z",
+    "hostPreparationDeadline": "2026-11-04T09:48:00Z",
+    "reset": false
+  },
+  "sources": {
+    "NewsIdentityActivity.java": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/NewsIdentityActivity.java",
+      "bytes": 12591,
+      "sha256": "e28e27589efdd5977461bb0d5f0e2104605e5e2aa61e180bf829e847a581bcb9"
+    },
+    "build.sh": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/build.sh",
+      "bytes": 1119,
+      "sha256": "7537f4a08614a7346add59206ba00f4c5d4500a082120d1b11abd81e96ff79ba"
+    },
+    "AndroidManifest.xml": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/AndroidManifest.xml",
+      "bytes": 436,
+      "sha256": "c990f6ac3caa520c1836bd1a80d04f69e96511085d56c957abd3b3d10eaa0012"
+    },
+    "RUN.md": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/RUN.md",
+      "bytes": 1911,
+      "sha256": "9d4791756d4cf4aeb137f8f43ec865019a645cccd98f7024d3db08e6e4935744"
+    }
+  },
+  "logicalGateBindings": {
+    "actualClassAdmissionAndCases": {
+      "bytes": 6809,
+      "sha256": "9cc935b12d7c3eb8908e2b685207abe4329c71d44a975a0c9ac28ac279761508"
+    },
+    "preferenceIsolationAndAssertions": {
+      "bytes": 3092,
+      "sha256": "bed54e87d87d650ec30b1e39cf52167ed564728a77ed80f32f22be58565fb560"
+    },
+    "retirementAndReport": {
+      "bytes": 1256,
+      "sha256": "51f0d6f7ecefeaa5e3ef32714bc87a3c4dd5d6f7c0ebcb413ae92fd091d942b2"
+    }
+  },
+  "frozenSourceCopies": true,
+  "fixture": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/news-identity-fixture.apk",
+    "bytes": 37495274,
+    "sha256": "3b1655a86edbf91685f580020d0930dc4a815d9ec44bb94895a955f5ba8f6aa0"
+  },
+  "fixtureDex": {
+    "bytes": 23400,
+    "sha256": "6a75a5c219531a19696b62b6dfe0afcecf05b11951347658c53ef5cb7248c1a8"
+  },
+  "embeddedBaseline": {
+    "bytes": 46728910,
+    "sha256": "52b1a05f418cbda5875df0818f9849433f14d7d9cd24c33ad994b18bbf14a51d",
+    "retainedDebugByteExact": true
+  },
+  "fixturePackage": "com.immortal.newsidentityfixture",
+  "zeroPermissions": true,
+  "caseCount": 16,
+  "caseNames": [
+    "missingIdsStableAcrossReadOnlyReload",
+    "invalidIdsStableAcrossReadOnlyReload",
+    "duplicateIdsAreDistinctAndStable",
+    "removeMissingRowLeavesOnlyOtherRow",
+    "removeInvalidRowLeavesOnlyOtherRow",
+    "removeFirstDuplicateLeavesSecond",
+    "removeSecondDuplicateLeavesFirst",
+    "laterReservedUniqueIdsRemainExact",
+    "longBoundsAndSignedIdsRemainExact",
+    "trimmedNamesUrlsOrderAndBlankFiltering",
+    "loadNeverWritesLegacyBytesOrSentinels",
+    "addPersistsNormalizedIdsAndOneNewRow",
+    "blankAddIsReadOnly",
+    "missingPreferenceReturnsEmptyReadOnly",
+    "invalidArrayReturnsEmptyReadOnly",
+    "removeUnmatchedIdRetainsBothRows"
+  ],
+  "publicMethods": [
+    "NewsConfig.load(Context)",
+    "NewsConfig.add(Context,String,String)",
+    "NewsConfig.remove(Context,long)"
+  ],
+  "preferenceAdmission": {
+    "requiredName": "immortal_news",
+    "requiredMode": 0,
+    "scope": "per-case generated fixture-only SharedPreferences",
+    "sentinels": [
+      "sentinel fixture-only-unchanged",
+      "sentinelNumber314159"
+    ],
+    "otherOwnerPackageDataAccessed": false
+  },
+  "hostChecks": {
+    "javaBuild": true,
+    "manifestZeroPermissions": true,
+    "apkSignatureVerifiedByBuild": true,
+    "embeddedApkExact": true
+  },
+  "sourceOrDeviceOperationsByReviewer": false,
+  "limits": [
+    "No native execution by reviewer.",
+    "No API28 or optimized NewsConfig claim.",
+    "Parent owns native runner and package/process retirement.",
+    "Expected baseline product failures must be read from actual report; no run-result claim yet."
+  ]
+}

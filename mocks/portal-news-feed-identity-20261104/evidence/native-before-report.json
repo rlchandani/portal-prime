@@ -1,0 +1,316 @@
+{
+  "ok": false,
+  "error": null,
+  "tests": 16,
+  "failures": 8,
+  "cases": [
+    {
+      "name": "missingIdsStableAcrossReadOnlyReload",
+      "passed": false,
+      "error": "java.lang.AssertionError:Stable missing-row identity",
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-missingIdsStableAcrossReadOnlyReload"
+    },
+    {
+      "name": "invalidIdsStableAcrossReadOnlyReload",
+      "passed": false,
+      "error": "java.lang.AssertionError:Stable invalid-row identity",
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-invalidIdsStableAcrossReadOnlyReload"
+    },
+    {
+      "name": "duplicateIdsAreDistinctAndStable",
+      "passed": false,
+      "error": "java.lang.AssertionError:Distinct duplicate-row identities",
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-duplicateIdsAreDistinctAndStable"
+    },
+    {
+      "name": "removeMissingRowLeavesOnlyOtherRow",
+      "passed": false,
+      "error": "java.lang.AssertionError:Expected row count",
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeMissingRowLeavesOnlyOtherRow"
+    },
+    {
+      "name": "removeInvalidRowLeavesOnlyOtherRow",
+      "passed": false,
+      "error": "java.lang.AssertionError:Expected row count",
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeInvalidRowLeavesOnlyOtherRow"
+    },
+    {
+      "name": "removeFirstDuplicateLeavesSecond",
+      "passed": false,
+      "error": "java.lang.AssertionError:Expected row count",
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeFirstDuplicateLeavesSecond"
+    },
+    {
+      "name": "removeSecondDuplicateLeavesFirst",
+      "passed": false,
+      "error": "java.lang.AssertionError:Expected row count",
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeSecondDuplicateLeavesFirst"
+    },
+    {
+      "name": "laterReservedUniqueIdsRemainExact",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-laterReservedUniqueIdsRemainExact"
+    },
+    {
+      "name": "longBoundsAndSignedIdsRemainExact",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-longBoundsAndSignedIdsRemainExact"
+    },
+    {
+      "name": "trimmedNamesUrlsOrderAndBlankFiltering",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-trimmedNamesUrlsOrderAndBlankFiltering"
+    },
+    {
+      "name": "loadNeverWritesLegacyBytesOrSentinels",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-loadNeverWritesLegacyBytesOrSentinels"
+    },
+    {
+      "name": "addPersistsNormalizedIdsAndOneNewRow",
+      "passed": false,
+      "error": "java.lang.AssertionError:Previously loaded normalized identities persisted",
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-addPersistsNormalizedIdsAndOneNewRow"
+    },
+    {
+      "name": "blankAddIsReadOnly",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-blankAddIsReadOnly"
+    },
+    {
+      "name": "missingPreferenceReturnsEmptyReadOnly",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-missingPreferenceReturnsEmptyReadOnly"
+    },
+    {
+      "name": "invalidArrayReturnsEmptyReadOnly",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-invalidArrayReturnsEmptyReadOnly"
+    },
+    {
+      "name": "removeUnmatchedIdRetainsBothRows",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeUnmatchedIdRetainsBothRows"
+    }
+  ],
+  "preferenceRequests": [
+    {
+      "case": "missingIdsStableAcrossReadOnlyReload",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "missingIdsStableAcrossReadOnlyReload",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "invalidIdsStableAcrossReadOnlyReload",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "invalidIdsStableAcrossReadOnlyReload",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "duplicateIdsAreDistinctAndStable",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "duplicateIdsAreDistinctAndStable",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeMissingRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeMissingRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeMissingRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeMissingRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeInvalidRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeInvalidRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeInvalidRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeInvalidRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeFirstDuplicateLeavesSecond",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeFirstDuplicateLeavesSecond",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeFirstDuplicateLeavesSecond",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeFirstDuplicateLeavesSecond",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeSecondDuplicateLeavesFirst",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeSecondDuplicateLeavesFirst",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeSecondDuplicateLeavesFirst",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeSecondDuplicateLeavesFirst",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "laterReservedUniqueIdsRemainExact",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "longBoundsAndSignedIdsRemainExact",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "trimmedNamesUrlsOrderAndBlankFiltering",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "loadNeverWritesLegacyBytesOrSentinels",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "loadNeverWritesLegacyBytesOrSentinels",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "addPersistsNormalizedIdsAndOneNewRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "addPersistsNormalizedIdsAndOneNewRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "addPersistsNormalizedIdsAndOneNewRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "addPersistsNormalizedIdsAndOneNewRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "missingPreferenceReturnsEmptyReadOnly",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "invalidArrayReturnsEmptyReadOnly",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeUnmatchedIdRetainsBothRows",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeUnmatchedIdRetainsBothRows",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeUnmatchedIdRetainsBothRows",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeUnmatchedIdRetainsBothRows",
+      "name": "immortal_news",
+      "mode": 0
+    }
+  ],
+  "unexpectedPreferenceCalls": 0,
+  "sourceSha256": "52b1a05f418cbda5875df0818f9849433f14d7d9cd24c33ad994b18bbf14a51d",
+  "sourceBytes": 46728910,
+  "sdk": 29,
+  "actualEmbeddedApkClassLoader": true,
+  "actualPublicNewsConfigLoadAddRemove": true,
+  "fixturePackage": "com.immortal.newsidentityfixture",
+  "internetPermission": false,
+  "scope": "Generated fixture-local SharedPreferences and actual embedded debug APK NewsConfig public methods only; no launcher owner data, providers, network, UI or optimized/API28 claim"
+}

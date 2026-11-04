@@ -1,0 +1,306 @@
+{
+  "recordedAtUtc": "2026-11-04T09:51:14.337692+00:00",
+  "ok": true,
+  "blockers": [],
+  "clock": {
+    "start": "2026-11-04T09:39:57Z",
+    "target": "2026-11-04T09:54:57Z",
+    "hardDeadline": "2026-11-04T10:09:57Z",
+    "hostPreparationDeadline": "2026-11-04T09:48:00Z",
+    "reset": false
+  },
+  "frozenSourcesAndGatesByteIdentical": true,
+  "baselineAndCandidateFixtureDexByteIdentical": true,
+  "embeddedCandidateExact": true,
+  "logicalGateBindings": {
+    "actualClassAdmissionAndCases": {
+      "bytes": 6809,
+      "sha256": "9cc935b12d7c3eb8908e2b685207abe4329c71d44a975a0c9ac28ac279761508"
+    },
+    "preferenceIsolationAndAssertions": {
+      "bytes": 3092,
+      "sha256": "bed54e87d87d650ec30b1e39cf52167ed564728a77ed80f32f22be58565fb560"
+    },
+    "retirementAndReport": {
+      "bytes": 1256,
+      "sha256": "51f0d6f7ecefeaa5e3ef32714bc87a3c4dd5d6f7c0ebcb413ae92fd091d942b2"
+    }
+  },
+  "fixtureSources": {
+    "NewsIdentityActivity.java": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/NewsIdentityActivity.java",
+      "bytes": 12591,
+      "sha256": "e28e27589efdd5977461bb0d5f0e2104605e5e2aa61e180bf829e847a581bcb9"
+    },
+    "build.sh": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/build.sh",
+      "bytes": 1119,
+      "sha256": "7537f4a08614a7346add59206ba00f4c5d4500a082120d1b11abd81e96ff79ba"
+    },
+    "AndroidManifest.xml": {
+      "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/AndroidManifest.xml",
+      "bytes": 436,
+      "sha256": "c990f6ac3caa520c1836bd1a80d04f69e96511085d56c957abd3b3d10eaa0012"
+    }
+  },
+  "fixtureDex": {
+    "bytes": 23400,
+    "sha256": "6a75a5c219531a19696b62b6dfe0afcecf05b11951347658c53ef5cb7248c1a8"
+  },
+  "candidateAdmission": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/candidate-admission.json",
+    "bytes": 3113,
+    "sha256": "f07dbcada61d9d34d79c39ec1efca636735d71e136320ce01c3683aeccdbb298"
+  },
+  "candidateFixture": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/news-identity-fixture.apk",
+    "bytes": 37495274,
+    "sha256": "3bfcc3bdd9e2c64b88e1cd06a1506a76345026ef53f2c029114937c514951a37"
+  },
+  "baselineFixture": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/baseline-fixture.apk",
+    "bytes": 37495274,
+    "sha256": "3b1655a86edbf91685f580020d0930dc4a815d9ec44bb94895a955f5ba8f6aa0"
+  },
+  "candidateOriginalDebugApk": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/candidate-debug-1.145.apk",
+    "bytes": 46728910,
+    "sha256": "e0b5f4839783f570b034e258f2f4f3fe6345e06a655bce351b474466014acb9b"
+  },
+  "baselineOriginalDebugApk": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/baseline-debug-1.144.apk",
+    "bytes": 46728910,
+    "sha256": "52b1a05f418cbda5875df0818f9849433f14d7d9cd24c33ad994b18bbf14a51d"
+  },
+  "baselineNativeReport": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native-before-report.json",
+    "bytes": 8675,
+    "sha256": "ad6facaa427073dc3bb8ca438b84079ca7b9a4eb41532680c7f9933f9dd63b46"
+  },
+  "candidateNativeReport": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native-after-report.json",
+    "bytes": 8388,
+    "sha256": "636804147672d782a9590f73fdbadcc85ffda85e3b41775a1ca72f3f84de487e"
+  },
+  "baselineRetirement": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native-before-retirement.json",
+    "bytes": 88,
+    "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b"
+  },
+  "candidateRetirement": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native-after-retirement.json",
+    "bytes": 88,
+    "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b"
+  },
+  "baseline": {
+    "tests": 16,
+    "failures": 8,
+    "controls": 8,
+    "failedCaseNames": [
+      "missingIdsStableAcrossReadOnlyReload",
+      "invalidIdsStableAcrossReadOnlyReload",
+      "duplicateIdsAreDistinctAndStable",
+      "removeMissingRowLeavesOnlyOtherRow",
+      "removeInvalidRowLeavesOnlyOtherRow",
+      "removeFirstDuplicateLeavesSecond",
+      "removeSecondDuplicateLeavesFirst",
+      "addPersistsNormalizedIdsAndOneNewRow"
+    ],
+    "allSentinelsUnchanged": true,
+    "unexpectedPreferenceCalls": 0,
+    "preferenceRequestCount": 37,
+    "allRequestsExactlyImmortalNewsMode0": true,
+    "actualEmbeddedApkClassLoader": true
+  },
+  "candidate": {
+    "tests": 16,
+    "failures": 0,
+    "passes": 16,
+    "allSentinelsUnchanged": true,
+    "unexpectedPreferenceCalls": 0,
+    "preferenceRequestCount": 38,
+    "allRequestsExactlyImmortalNewsMode0": true,
+    "actualEmbeddedApkClassLoader": true
+  },
+  "perCasePreferenceRequests": {
+    "baseline": {
+      "missingIdsStableAcrossReadOnlyReload": 2,
+      "invalidIdsStableAcrossReadOnlyReload": 2,
+      "duplicateIdsAreDistinctAndStable": 2,
+      "removeMissingRowLeavesOnlyOtherRow": 4,
+      "removeInvalidRowLeavesOnlyOtherRow": 4,
+      "removeFirstDuplicateLeavesSecond": 4,
+      "removeSecondDuplicateLeavesFirst": 4,
+      "laterReservedUniqueIdsRemainExact": 1,
+      "longBoundsAndSignedIdsRemainExact": 1,
+      "trimmedNamesUrlsOrderAndBlankFiltering": 1,
+      "loadNeverWritesLegacyBytesOrSentinels": 2,
+      "addPersistsNormalizedIdsAndOneNewRow": 4,
+      "missingPreferenceReturnsEmptyReadOnly": 1,
+      "invalidArrayReturnsEmptyReadOnly": 1,
+      "removeUnmatchedIdRetainsBothRows": 4
+    },
+    "candidate": {
+      "missingIdsStableAcrossReadOnlyReload": 2,
+      "invalidIdsStableAcrossReadOnlyReload": 2,
+      "duplicateIdsAreDistinctAndStable": 2,
+      "removeMissingRowLeavesOnlyOtherRow": 4,
+      "removeInvalidRowLeavesOnlyOtherRow": 4,
+      "removeFirstDuplicateLeavesSecond": 4,
+      "removeSecondDuplicateLeavesFirst": 4,
+      "laterReservedUniqueIdsRemainExact": 1,
+      "longBoundsAndSignedIdsRemainExact": 1,
+      "trimmedNamesUrlsOrderAndBlankFiltering": 1,
+      "loadNeverWritesLegacyBytesOrSentinels": 2,
+      "addPersistsNormalizedIdsAndOneNewRow": 5,
+      "missingPreferenceReturnsEmptyReadOnly": 1,
+      "invalidArrayReturnsEmptyReadOnly": 1,
+      "removeUnmatchedIdRetainsBothRows": 4
+    },
+    "blankAddZeroInBoth": true,
+    "all15OtherCasesRequestPrefs": true
+  },
+  "caseResults": [
+    {
+      "name": "missingIdsStableAcrossReadOnlyReload",
+      "baselinePass": false,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "invalidIdsStableAcrossReadOnlyReload",
+      "baselinePass": false,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "duplicateIdsAreDistinctAndStable",
+      "baselinePass": false,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "removeMissingRowLeavesOnlyOtherRow",
+      "baselinePass": false,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "removeInvalidRowLeavesOnlyOtherRow",
+      "baselinePass": false,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "removeFirstDuplicateLeavesSecond",
+      "baselinePass": false,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "removeSecondDuplicateLeavesFirst",
+      "baselinePass": false,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "laterReservedUniqueIdsRemainExact",
+      "baselinePass": true,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "longBoundsAndSignedIdsRemainExact",
+      "baselinePass": true,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "trimmedNamesUrlsOrderAndBlankFiltering",
+      "baselinePass": true,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "loadNeverWritesLegacyBytesOrSentinels",
+      "baselinePass": true,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "addPersistsNormalizedIdsAndOneNewRow",
+      "baselinePass": false,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "blankAddIsReadOnly",
+      "baselinePass": true,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "missingPreferenceReturnsEmptyReadOnly",
+      "baselinePass": true,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "invalidArrayReturnsEmptyReadOnly",
+      "baselinePass": true,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    },
+    {
+      "name": "removeUnmatchedIdRetainsBothRows",
+      "baselinePass": true,
+      "candidatePass": true,
+      "baselineSentinelUnchanged": true,
+      "candidateSentinelUnchanged": true
+    }
+  ],
+  "retirement": {
+    "baselinePackageProcessExternalDirectoryAbsent": true,
+    "candidatePackageProcessExternalDirectoryAbsent": true,
+    "observedThroughParentRetainedReports": true
+  },
+  "zeroFixtureManifestPermissions": true,
+  "actualPlatform": "Family API29 root-collected execution; Android JSON/SharedPreferences via exact original debug APK NewsConfig public methods",
+  "sourceReview": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NewsConfig.kt",
+    "sha256": "b5fc8ebc5c7c6b61d85dec5f0f63aa10a6942de1b4d18daa309520b46c602f6e",
+    "finding": "Deterministic normalization reserves later stored IDs, retains first valid occurrences and Long bounds, leaves load read-only, and persists normalized identities on existing mutations. Native probe makes no concurrent-call or millisecond add-collision claim."
+  },
+  "hostReviewAssertionCorrection": {
+    "path": "/private/tmp/portal-news-feed-identity-20261104-093957/native/host-review-assertion-correction.json",
+    "bytes": 2257,
+    "sha256": "9827620a0faefccc56a0b80f2199d145ec2a9b6dd1f3707ee292748d59ae1c19"
+  },
+  "hostReviewAssertionCorrectionExcludedFromProductEvidence": true,
+  "nativeRerunsByReviewer": 0,
+  "deviceOperationsByReviewer": 0,
+  "sourceOrAssertionEditsAfterBaseline": false,
+  "limits": [
+    "Actual unoptimized debug APK NewsConfig on API29 and generated fixture-local preference stores only.",
+    "No native UI, optimized runtime, API28, live feed/provider, concurrency or millisecond-collision acceptance claim.",
+    "Sentinel assertions cover two known fixture-owned keys; no launcher package data is accessed.",
+    "Root owns native execution and retirement; reviewer reads retained artifacts and verifies frozen source/DEX/APK bindings.",
+    "Root initial runner absent-package pm-path preflight error occurred before install and is excluded from product RED; root retains that diagnostic separately.",
+    "This review neither delivers nor claims production/device update completed."
+  ]
+}

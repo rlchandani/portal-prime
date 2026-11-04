@@ -1,0 +1,321 @@
+{
+  "ok": true,
+  "error": null,
+  "tests": 16,
+  "failures": 0,
+  "cases": [
+    {
+      "name": "missingIdsStableAcrossReadOnlyReload",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-missingIdsStableAcrossReadOnlyReload"
+    },
+    {
+      "name": "invalidIdsStableAcrossReadOnlyReload",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-invalidIdsStableAcrossReadOnlyReload"
+    },
+    {
+      "name": "duplicateIdsAreDistinctAndStable",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-duplicateIdsAreDistinctAndStable"
+    },
+    {
+      "name": "removeMissingRowLeavesOnlyOtherRow",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeMissingRowLeavesOnlyOtherRow"
+    },
+    {
+      "name": "removeInvalidRowLeavesOnlyOtherRow",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeInvalidRowLeavesOnlyOtherRow"
+    },
+    {
+      "name": "removeFirstDuplicateLeavesSecond",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeFirstDuplicateLeavesSecond"
+    },
+    {
+      "name": "removeSecondDuplicateLeavesFirst",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeSecondDuplicateLeavesFirst"
+    },
+    {
+      "name": "laterReservedUniqueIdsRemainExact",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-laterReservedUniqueIdsRemainExact"
+    },
+    {
+      "name": "longBoundsAndSignedIdsRemainExact",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-longBoundsAndSignedIdsRemainExact"
+    },
+    {
+      "name": "trimmedNamesUrlsOrderAndBlankFiltering",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-trimmedNamesUrlsOrderAndBlankFiltering"
+    },
+    {
+      "name": "loadNeverWritesLegacyBytesOrSentinels",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-loadNeverWritesLegacyBytesOrSentinels"
+    },
+    {
+      "name": "addPersistsNormalizedIdsAndOneNewRow",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-addPersistsNormalizedIdsAndOneNewRow"
+    },
+    {
+      "name": "blankAddIsReadOnly",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-blankAddIsReadOnly"
+    },
+    {
+      "name": "missingPreferenceReturnsEmptyReadOnly",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-missingPreferenceReturnsEmptyReadOnly"
+    },
+    {
+      "name": "invalidArrayReturnsEmptyReadOnly",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-invalidArrayReturnsEmptyReadOnly"
+    },
+    {
+      "name": "removeUnmatchedIdRetainsBothRows",
+      "passed": true,
+      "error": null,
+      "sentinelUnchanged": true,
+      "fixturePreferenceStore": "generated-removeUnmatchedIdRetainsBothRows"
+    }
+  ],
+  "preferenceRequests": [
+    {
+      "case": "missingIdsStableAcrossReadOnlyReload",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "missingIdsStableAcrossReadOnlyReload",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "invalidIdsStableAcrossReadOnlyReload",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "invalidIdsStableAcrossReadOnlyReload",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "duplicateIdsAreDistinctAndStable",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "duplicateIdsAreDistinctAndStable",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeMissingRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeMissingRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeMissingRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeMissingRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeInvalidRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeInvalidRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeInvalidRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeInvalidRowLeavesOnlyOtherRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeFirstDuplicateLeavesSecond",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeFirstDuplicateLeavesSecond",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeFirstDuplicateLeavesSecond",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeFirstDuplicateLeavesSecond",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeSecondDuplicateLeavesFirst",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeSecondDuplicateLeavesFirst",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeSecondDuplicateLeavesFirst",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeSecondDuplicateLeavesFirst",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "laterReservedUniqueIdsRemainExact",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "longBoundsAndSignedIdsRemainExact",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "trimmedNamesUrlsOrderAndBlankFiltering",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "loadNeverWritesLegacyBytesOrSentinels",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "loadNeverWritesLegacyBytesOrSentinels",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "addPersistsNormalizedIdsAndOneNewRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "addPersistsNormalizedIdsAndOneNewRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "addPersistsNormalizedIdsAndOneNewRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "addPersistsNormalizedIdsAndOneNewRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "addPersistsNormalizedIdsAndOneNewRow",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "missingPreferenceReturnsEmptyReadOnly",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "invalidArrayReturnsEmptyReadOnly",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeUnmatchedIdRetainsBothRows",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeUnmatchedIdRetainsBothRows",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeUnmatchedIdRetainsBothRows",
+      "name": "immortal_news",
+      "mode": 0
+    },
+    {
+      "case": "removeUnmatchedIdRetainsBothRows",
+      "name": "immortal_news",
+      "mode": 0
+    }
+  ],
+  "unexpectedPreferenceCalls": 0,
+  "sourceSha256": "e0b5f4839783f570b034e258f2f4f3fe6345e06a655bce351b474466014acb9b",
+  "sourceBytes": 46728910,
+  "sdk": 29,
+  "actualEmbeddedApkClassLoader": true,
+  "actualPublicNewsConfigLoadAddRemove": true,
+  "fixturePackage": "com.immortal.newsidentityfixture",
+  "internetPermission": false,
+  "scope": "Generated fixture-local SharedPreferences and actual embedded debug APK NewsConfig public methods only; no launcher owner data, providers, network, UI or optimized/API28 claim"
+}
