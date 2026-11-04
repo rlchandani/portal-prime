@@ -1,0 +1,105 @@
+{
+  "sourceAuthoringOnly": true,
+  "frozenAtUtc": "2026-11-04T14:11:46.632821+00:00",
+  "originalDiscoveryUtc": "2026-11-04T14:07:59Z",
+  "targetUtc": "2026-11-04T14:22:59Z",
+  "hardUtc": "2026-11-04T14:37:59Z",
+  "package": "com.immortal.dissolvepixelfixture",
+  "activity": ".DissolvePixelActivity",
+  "sources": {
+    "DissolvePixelActivity.java": {
+      "sha256": "3477c214240e20f448236a51d37e043b5de0a84b15c0c258ebc38b910a03871f",
+      "bytes": 18723
+    },
+    "AndroidManifest.xml": {
+      "sha256": "580b4158a211c4164e269189bf655ae9c913dc87eccaa41a2db741bc00dcd03e",
+      "bytes": 465
+    },
+    "build.sh": {
+      "sha256": "200024f32d0f58c1ec98f45ba83b7c5d703ea31cfc81609fd986229dea164274",
+      "bytes": 832
+    },
+    "repack.sh": {
+      "sha256": "8e5c8f39a092cc5a81c42873989b87b8ccee27999f7325a22fde02e1dbeb4e23",
+      "bytes": 785
+    },
+    "freeze.py": {
+      "sha256": "cc72a216fe6942593a5c88ec84cebb836f951614923e5f5b2f0c3c48936be14d",
+      "bytes": 1467
+    },
+    "RUN.md": {
+      "sha256": "ed3a984ad7c1418c7c268ddefc010782452988d4a39a690874a4beb217168dde",
+      "bytes": 3041
+    },
+    "source-admission.json": {
+      "sha256": "7c19f8c490ca7c57cb436f30cb4a39de7480b98efa1055e5c9cd1429d4ccf114",
+      "bytes": 1880
+    }
+  },
+  "fractions": [
+    0.25,
+    0.5,
+    0.75
+  ],
+  "expectedCases": 3,
+  "permissions": [],
+  "currentOnlyNoRedOrProductChange": true,
+  "sourceApk": {
+    "sha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+    "bytes": 46745646
+  },
+  "requiresRootFullReadBeforeSdk": true,
+  "foundation": {
+    "path": "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/AttachedPhotoActivity.java",
+    "sha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+    "generatedContextExactExceptClassAndPackage": true,
+    "frameFenceByteIdentical": true
+  },
+  "literalPixelOracle": {
+    "points": [
+      [
+        285,
+        48
+      ],
+      [
+        515,
+        48
+      ],
+      [
+        285,
+        432
+      ],
+      [
+        515,
+        432
+      ],
+      [
+        400,
+        240
+      ]
+    ],
+    "centerRgb": [
+      "606c74",
+      "807868",
+      "a0845c"
+    ],
+    "maxChannelTolerance": 3,
+    "allExpectedPixelsFrozenInJava": true,
+    "opaqueAlpha": 255
+  },
+  "operationsByAuthor": "Source reads and owned source/docs/metadata writes only, no SDK/build/tests/device/Git/network/runtime/media/provider operations.",
+  "ok": true,
+  "preparedAtUtc": "2026-11-04T14:13:24.333219+00:00",
+  "rootFullyReadBeforeCompilation": true,
+  "fixtureDex": {
+    "sha256": "fa64afba66f17ff4957ce9a948ca9fe8810825c26d97bed309afa7b9590a0d7b",
+    "bytes": 28992
+  },
+  "sourceApkExact": true,
+  "fixtureApk": {
+    "sha256": "1d7050d07ef11f5b622fb9396327423a913b4d849dab19d410ab65cca3e3efc8",
+    "bytes": 37511658
+  },
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.dissolvepixelfixture\n"
+}

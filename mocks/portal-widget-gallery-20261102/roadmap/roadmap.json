@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T14:06:59.611647+00:00",
-  "updatedLabel": "Lamp numeric step delivered to both rooms; original clocks retained",
+  "updatedAt": "2026-11-04T14:17:50.693313+00:00",
+  "updatedLabel": "Controlled hardware dissolve pixels verified; existing1.162 and original clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,51 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "native-dissolve-hardware-pixels",
+      "title": "Screensaver: verify hardware dissolve pixels",
+      "summary": "Existing Stage passes controlled25/50/75percent hardware/software blend checks; acceptance only.",
+      "description": "Actual paused fade, generated portraits and committed Window PixelCopy paired with same-Stage Canvas; no production change.",
+      "status": "verified",
+      "verification": "3native fractions \u00b76PNGs \u00b730literal RGB samples \u00b7all2,304,000pixels opaque \u00b7independent and root replay",
+      "kind": "Native screensaver hardware acceptance",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root execution / photo fixture / independent media review",
+      "deployment": "No room installation; both rooms retain fully hashed optimized1.162/code156.",
+      "state": "43/30preferences, four complete maps and Familyruntime unchanged; savedShuffle/fit retained.",
+      "acceptance": [
+        "Actual embedded debug1.162Stage and generated distinct-palette same-size whole photos; outgoingopaque/incomingactual pausedAnimator fraction, bitmap identity and budget exact",
+        "Hardware PixelCopy after2committed frames and softwareCanvas each pass independently fixed literal compositing, whole-geometry, opaque-output and matte predicates",
+        "Each normalstop,budget0,still-ownedinputs,detachment and hostcommittedframe fences recycling; finalpackage/process/externaldir absent",
+        "Exact current1.162 optimizedAPK fullreadbacks bothrooms,43/30preferences/fourmaps and Familyruntime preserved; one combined independent source/pixel/artifact review fullyread and rehashed"
+      ],
+      "evidence": [
+        {
+          "text": "Controlled compositor acceptance, preservation and limits.",
+          "source": "docs/portal-native-dissolve-pixels-2026-11-04.md"
+        },
+        {
+          "text": "Frozen source, combined review, pixel replay and receipt.",
+          "source": "mocks/portal-native-dissolve-pixels-20261104/evidence/root-verification.json"
+        }
+      ],
+      "limits": [
+        "Controlled fraction compositing; no natural transition progression/pause-resume/resize/motion/FPS verdict",
+        "No Dream/controller/FaceRenderer/clock/source/startup/householdmedia/provider/account/phone/publication operations",
+        "No optimized runtime/API28/Livingvisual/currentroomselection acceptance; previousparked clocks and positiveNativeStatechecks retained",
+        "No freshAndroidtest/build/productionchange; previous4525JVM/1.162build evidence belongs previousdelivery"
+      ],
+      "next": "Continue a distinct small product slice; do not repeat accepted state checks or reset parked clocks.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T14:07:59Z",
+        "selectedAt": "2026-11-04T14:11:59.822163+00:00",
+        "target": "2026-11-04T14:22:59Z",
+        "hardDeadline": "2026-11-04T14:37:59Z",
+        "clockNotReset": true
+      }
+    },
     {
       "id": "lamp-numeric-step-overflow",
       "title": "Lamp: clamp extreme numeric drafts without overflow",

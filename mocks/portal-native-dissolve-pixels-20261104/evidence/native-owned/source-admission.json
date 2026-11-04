@@ -1,0 +1,72 @@
+{
+  "sourceAuthoringOnly": true,
+  "frozenAtUtc": "2026-11-04T14:11:46.632821+00:00",
+  "originalDiscoveryUtc": "2026-11-04T14:07:59Z",
+  "targetUtc": "2026-11-04T14:22:59Z",
+  "hardUtc": "2026-11-04T14:37:59Z",
+  "package": "com.immortal.dissolvepixelfixture",
+  "activity": ".DissolvePixelActivity",
+  "sources": {
+    "DissolvePixelActivity.java": {
+      "sha256": "3477c214240e20f448236a51d37e043b5de0a84b15c0c258ebc38b910a03871f",
+      "bytes": 18723
+    },
+    "AndroidManifest.xml": {
+      "sha256": "580b4158a211c4164e269189bf655ae9c913dc87eccaa41a2db741bc00dcd03e",
+      "bytes": 465
+    },
+    "RUN.md": {
+      "sha256": "ed3a984ad7c1418c7c268ddefc010782452988d4a39a690874a4beb217168dde",
+      "bytes": 3041
+    }
+  },
+  "fractions": [
+    0.25,
+    0.5,
+    0.75
+  ],
+  "expectedCases": 3,
+  "permissions": [],
+  "currentOnlyNoRedOrProductChange": true,
+  "sourceApk": "Exact existing1.162 debug supplied/bound by root",
+  "requiresRootFullReadBeforeSdk": true,
+  "foundation": {
+    "path": "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/AttachedPhotoActivity.java",
+    "sha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+    "generatedContextExactExceptClassAndPackage": true,
+    "frameFenceByteIdentical": true
+  },
+  "literalPixelOracle": {
+    "points": [
+      [
+        285,
+        48
+      ],
+      [
+        515,
+        48
+      ],
+      [
+        285,
+        432
+      ],
+      [
+        515,
+        432
+      ],
+      [
+        400,
+        240
+      ]
+    ],
+    "centerRgb": [
+      "606c74",
+      "807868",
+      "a0845c"
+    ],
+    "maxChannelTolerance": 3,
+    "allExpectedPixelsFrozenInJava": true,
+    "opaqueAlpha": 255
+  },
+  "operationsByAuthor": "Source reads and owned source/docs/metadata writes only, no SDK/build/tests/device/Git/network/runtime/media/provider operations."
+}

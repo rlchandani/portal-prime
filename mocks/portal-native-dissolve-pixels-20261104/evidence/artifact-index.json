@@ -1,0 +1,122 @@
+{
+  "evidence/current-room-readback.json": {
+    "sha256": "bd7595697ee808fea43651eeda2f4e5932a6c86c0b9ab57ec102ebb2235b8af3",
+    "bytes": 497
+  },
+  "evidence/discovery-clock.json": {
+    "sha256": "ef31dec50b577b717a4444ec9d7cd56270129176130418bebb7d6bacc5be5649",
+    "bytes": 335
+  },
+  "evidence/docs-build-terminal.json": {
+    "sha256": "d317dc3d7845ab34f1e0130646166b129bda3be5c43ad26d4f6c3ef3a428c447",
+    "bytes": 65
+  },
+  "evidence/frame-return.json": {
+    "sha256": "13af4180504132cf8953756aea7700fafd6ec4273fa1907e4d74107e6c0fbb4f",
+    "bytes": 209
+  },
+  "evidence/independent-review.json": {
+    "sha256": "50247350cf1b334933b99b1f2ade70af44ea9c697fa76edd10fda8de1da28264",
+    "bytes": 27942
+  },
+  "evidence/native-execution-terminal.json": {
+    "sha256": "7098c83cf3c3c1c634ef4e51490f88fa025b3391005de670c806bc952765b150",
+    "bytes": 47
+  },
+  "evidence/native-owned/AndroidManifest.xml": {
+    "sha256": "580b4158a211c4164e269189bf655ae9c913dc87eccaa41a2db741bc00dcd03e",
+    "bytes": 465
+  },
+  "evidence/native-owned/DissolvePixelActivity.java": {
+    "sha256": "3477c214240e20f448236a51d37e043b5de0a84b15c0c258ebc38b910a03871f",
+    "bytes": 18723
+  },
+  "evidence/native-owned/RUN.md": {
+    "sha256": "ed3a984ad7c1418c7c268ddefc010782452988d4a39a690874a4beb217168dde",
+    "bytes": 3041
+  },
+  "evidence/native-owned/build.sh": {
+    "sha256": "200024f32d0f58c1ec98f45ba83b7c5d703ea31cfc81609fd986229dea164274",
+    "bytes": 832
+  },
+  "evidence/native-owned/freeze.py": {
+    "sha256": "cc72a216fe6942593a5c88ec84cebb836f951614923e5f5b2f0c3c48936be14d",
+    "bytes": 1467
+  },
+  "evidence/native-owned/preparation-verification.json": {
+    "sha256": "15e190ba750b319f23e95ee80a8907873684e940e7d04e4c08774141039fd2c7",
+    "bytes": 2960
+  },
+  "evidence/native-owned/repack.sh": {
+    "sha256": "8e5c8f39a092cc5a81c42873989b87b8ccee27999f7325a22fde02e1dbeb4e23",
+    "bytes": 785
+  },
+  "evidence/native-owned/source-admission.json": {
+    "sha256": "7c19f8c490ca7c57cb436f30cb4a39de7480b98efa1055e5c9cd1429d4ccf114",
+    "bytes": 1880
+  },
+  "evidence/native-report.json": {
+    "sha256": "d48ee12c6bc885e34e15d898ee9bb4c32d37751782e5401243aed55d773a8936",
+    "bytes": 17741
+  },
+  "evidence/native-retirement.json": {
+    "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+    "bytes": 88
+  },
+  "evidence/native-run.py": {
+    "sha256": "1bf9800d3e7281f1ef7e47f10aba9b57a4046ce591388c9d663f92a5f126fbd9",
+    "bytes": 5942
+  },
+  "evidence/photo-motion-source-discovery.json": {
+    "sha256": "2baa65052ae1005fe2907495040ac7474290216ee9585e881b0fe1b30317b4bf",
+    "bytes": 7358
+  },
+  "evidence/preservation.json": {
+    "sha256": "7e7bd1e9f83144f3f261688be7e0f2447a8621525e13bc2e80cfadb34db48848",
+    "bytes": 976
+  },
+  "evidence/queue-preservation.json": {
+    "sha256": "929b6f1fd42e08156ab1b4e78151bab1583100e6428d85a43aa6f91e3cf592b7",
+    "bytes": 281
+  },
+  "evidence/root-driver-freeze.json": {
+    "sha256": "55e4a88cbb3eb9d3fd1f0bc5457fc863cd81cd56f7b649c1ece2da3bdf594765",
+    "bytes": 262
+  },
+  "evidence/root-pixel-replay.json": {
+    "sha256": "277f2b49e39ada3020aa0402a94025675b30a8b6f95de2fbd45be47211470c4b",
+    "bytes": 2637
+  },
+  "evidence/root-verification.json": {
+    "sha256": "5ac47f6da5e2c6d1f0f6adf78afdceef2208badb6c87cfa98d65a0feba289788",
+    "bytes": 9653
+  },
+  "evidence/selected-plan.json": {
+    "sha256": "6900b9a8672058757114c96e1c9b6fcc0d238adb91d88102446f25bf37a3e0e3",
+    "bytes": 2286
+  },
+  "images/fraction-0-hardware.png": {
+    "sha256": "74ac6278135ee61cb2fb3bc200f431c2c66151182633d027e22d59ac89f08e35",
+    "bytes": 11530
+  },
+  "images/fraction-0-software.png": {
+    "sha256": "2ad4c3b06f65ee7d36309784063069c1cc799f1029eab3e412970f9242c799f4",
+    "bytes": 11666
+  },
+  "images/fraction-1-hardware.png": {
+    "sha256": "1516dd5d8734c702d603ad70570084492dcfae82ddbcd8e54b537285fc534aed",
+    "bytes": 11970
+  },
+  "images/fraction-1-software.png": {
+    "sha256": "ee407753acbcd827f2d4afac77f834ba283dfb560bef1f4ef0d322785203f4a2",
+    "bytes": 11667
+  },
+  "images/fraction-2-hardware.png": {
+    "sha256": "8fe5afdb9f999fe14a14cd1b633038427c706d1bcd8d73444a58681656ba1a2e",
+    "bytes": 11982
+  },
+  "images/fraction-2-software.png": {
+    "sha256": "921444610a5b128a50f9a846ba0605b29ab7283b46ff020a24c373969d7f8b74",
+    "bytes": 11672
+  }
+}

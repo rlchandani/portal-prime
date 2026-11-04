@@ -1,0 +1,22 @@
+{
+  "family": {
+    "app": {
+      "versionCode": 156,
+      "versionName": "1.162"
+    },
+    "sha256": "2c43d9e7a2fa0f76a82a4796317fbe2279747d62467ee0b64b2982c131d283c3",
+    "bytes": 25886923,
+    "serviceReady": true,
+    "noInstall": true
+  },
+  "living": {
+    "app": {
+      "versionCode": 156,
+      "versionName": "1.162"
+    },
+    "sha256": "2c43d9e7a2fa0f76a82a4796317fbe2279747d62467ee0b64b2982c131d283c3",
+    "bytes": 25886923,
+    "serviceReady": true,
+    "noInstall": true
+  }
+}

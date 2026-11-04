@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "previousTasksExact": 157,
+  "rawPriorTaskSuffixExact": true,
+  "defaultAndBoundariesExact": true,
+  "queue": 158,
+  "counts": {
+    "verified": 43,
+    "delivered": 105,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "originalClocksRetained": true
+}

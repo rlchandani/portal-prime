@@ -1,0 +1,144 @@
+{
+  "status": "qualified-bounded-negative",
+  "recordedAtUtc": "2026-11-04T14:09:29.910723+00:00",
+  "originalDiscoveryUtc": "2026-11-04T14:07:59Z",
+  "targetUtc": "2026-11-04T14:22:59Z",
+  "hardUtc": "2026-11-04T14:37:59Z",
+  "clockNotReset": true,
+  "authoritativeWorktree": "~/.codex/worktrees/portal-music-player/portal-prime",
+  "baseHeadFromCoordinator": "4acf37bd",
+  "result": "No fresh concrete lifecycle/motion defect established in the two allowed current production files. No production/test/fixture change selected.",
+  "sourceReadScope": {
+    "SlideshowStage.kt": "Full current file; show/pending/present, dissolve callbacks and revision guards, pause/host lifecycle, edit completion, stop, all retained composition motion capture/restore/resize paths.",
+    "SlideshowDissolvePause.kt": "Full current file; manual-vs-automatic exemption, explicit new Pause, covered host and ended transitions.",
+    "tests": "Full eight SlideshowDissolvePause tests; SlideshowPhotoPause source and relevant host/disposal tests inspected, no test execution.",
+    "roadmap": "All157 task IDs/status/title, relevant task objects and limits. Initial broad print was truncated and followed by compact complete157-ID inventory plus focused receipts; not claiming complete output visibility of every unrelated object."
+  },
+  "currentSourceEvidence": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/SlideshowStage.kt",
+      "lines": [
+        105,
+        159
+      ],
+      "observation": "present increments revision, ends prior policy, removes stale end listeners before cancellation, keeps outgoing opaque and guards new completion by ticket."
+    },
+    {
+      "path": "app/src/main/java/com/immortal/launcher/SlideshowStage.kt",
+      "lines": [
+        161,
+        175
+      ],
+      "observation": "User pause and host cover separately suspend both finite dissolve and continuous compositions; returning host does not undo user pause."
+    },
+    {
+      "path": "app/src/main/java/com/immortal/launcher/SlideshowStage.kt",
+      "lines": [
+        411,
+        510
+      ],
+      "observation": "Resize preserves motion time by photo index, remeasures replacement children, restores completed endpoints and explicitly applies paused geometry for API26-28."
+    },
+    {
+      "path": "app/src/main/java/com/immortal/launcher/SlideshowDissolvePause.kt",
+      "lines": [
+        17,
+        41
+      ],
+      "observation": "Paused manual navigation may finish its finite blend; host cover still freezes it; a new explicit Pause after Resume clears that exemption."
+    }
+  ],
+  "priorPositiveScopes": [
+    {
+      "source": "docs/portal-night-photo-motion-2026-11-01.md",
+      "qualifiedEvidence": "Prior controlled native Smart Frame motion plus in-flight dissolve357 assertions; covers freeze through host/night, user pause/return and subsequent resumed progression. No physical room-light, optical comfort, full renderer or FPS claim."
+    },
+    {
+      "source": "docs/portal-slideshow-resize-2026-11-01.md",
+      "qualifiedEvidence": "Delivered native six-case/24-resize matrix172 assertions including paused pair, paused single, interrupted dissolve, completed motion, manual/moving companion and cancel-after-resize. API28 source compatibility only; not physical rotation/input or performance."
+    },
+    {
+      "source": "docs/portal-slideshow-commit-2026-11-01.md",
+      "qualifiedEvidence": "Moving-pair Save independently retains companion3200ms and resumes3235ms; no repeat discovery of editor/motion-time indexing."
+    },
+    {
+      "source": "docs/portal-native-photo-hardware-2026-11-04.md",
+      "qualifiedEvidence": "New current hardware receipt is static only; its limits do not erase earlier controlled native motion/resize acceptance or turn the missing latest motion run into a defect."
+    }
+  ],
+  "duplicateAndHoldReview": {
+    "taskCount": 157,
+    "parkedIds": [
+      "toolkit-apk-read",
+      "platform-video-redirects",
+      "weather-native-layout",
+      "black-handoff",
+      "legacy-night",
+      "performance-experiments",
+      "settings-native-source-drafts"
+    ],
+    "excluded": "Black-handoff, seven legacy Night styles, cold-start/Shuffle and full performance scopes remain parked with original clocks; native static matte/frame/caption/geometry are already delivered.",
+    "acceptanceCandidate": "A current-only exact1.162 component recheck could be explicitly scoped later, but ordinary pause/cover/dissolve/resize predicates duplicate prior accepted native component evidence; no genuinely distinct small acceptance gate identified in this audit."
+  },
+  "notClaimed": [
+    "No native acceptance or newly passing tests",
+    "No absence of all bugs",
+    "No whole-screen/Night/sensor/motion/performance/optimized/API28/Living acceptance",
+    "No operational state or current style selection verified"
+  ],
+  "operations": "Source reads and this one private metadata write only; no source/test edits, SDK, builds, tests, Git commands, devices, network, phones, accounts, providers or household media.",
+  "sources": {
+    "app/src/main/java/com/immortal/launcher/SlideshowStage.kt": {
+      "bytes": 25908,
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0"
+    },
+    "app/src/main/java/com/immortal/launcher/SlideshowDissolvePause.kt": {
+      "bytes": 1176,
+      "sha256": "a8170628ed91345828580e16c690f3889dece518a1474261d675979b4d7c499e"
+    },
+    "app/src/test/java/com/immortal/launcher/SlideshowDissolvePauseTest.kt": {
+      "bytes": 3694,
+      "sha256": "7c3f9016ff9b97cf3f926ad2160cefb2df7de1cc3eec1f125c24b94782a1a616"
+    },
+    "app/src/test/java/com/immortal/launcher/SlideshowPhotoPauseTest.kt": {
+      "bytes": 10592,
+      "sha256": "d14e68d19c16a1c1f406f68bfb7c211b76f939c3e3859dff77bcc8c0ef973ef0"
+    },
+    "docs/portal-night-photo-motion-2026-11-01.md": {
+      "bytes": 5818,
+      "sha256": "26ad33cde88831e015b10f8995456b397986dfe031ea0a47300526b15e3d8766"
+    },
+    "docs/portal-slideshow-resize-2026-11-01.md": {
+      "bytes": 5083,
+      "sha256": "45fdc0388e317fa8a00a62c3338daa6b7b6cef8757828580e5816e7c81f31c42"
+    },
+    "docs/portal-night-photo-pause-2026-11-01.md": {
+      "bytes": 5326,
+      "sha256": "bdb5592da982e0aeb19411aa68a7f228aaebe6b9329582037f818af375c4e4f4"
+    },
+    "docs/portal-music-photo-pause-2026-11-01.md": {
+      "bytes": 4853,
+      "sha256": "4cd0c27105533eb24d56913ffceea8b4ebb580eca9a27034a2527864e7fd5a81"
+    },
+    "docs/portal-slideshow-commit-2026-11-01.md": {
+      "bytes": 6584,
+      "sha256": "c0c2c0237da672ad3627ed10b72461ef948685ac4fceb38fe6c8a91df4667025"
+    },
+    "docs/portal-slideshow-drag-2026-11-01.md": {
+      "bytes": 5352,
+      "sha256": "aad3436547dbcbdb90d046f8b9c3e82173cb6e084f0166df5b500556f2c422f4"
+    },
+    "docs/portal-native-photo-hardware-2026-11-04.md": {
+      "bytes": 3103,
+      "sha256": "9e6c58fae801d2f0c3d4565aac654f266031edf789f93fa90a96b1b442e9baef"
+    },
+    "docs/portal-slideshow-sequences-native-2026-11-01.md": {
+      "bytes": 6627,
+      "sha256": "f8018a2125a51f2de2bd10f1de7d077381b53025269972112ce7abd2aca54559"
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+      "bytes": 508294,
+      "sha256": "4571242b58d1eb56795c041ee1e302e954d5ec058eb390ed78516edf8424c1ea"
+    }
+  }
+}

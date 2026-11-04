@@ -1,0 +1,625 @@
+{
+  "ok": true,
+  "error": null,
+  "tests": 3,
+  "failures": 0,
+  "cases": [
+    {
+      "name": "fraction-0.25",
+      "passed": true,
+      "fraction": 0.25,
+      "incomingAlpha": 0.25,
+      "outgoingAlpha": 1,
+      "actualFadePaused": true,
+      "sameActualFade": true,
+      "stageAttached": true,
+      "stageHardwareAccelerated": true,
+      "committedFramesBeforePixelCopy": 2,
+      "pixelCopyResult": 0,
+      "windowCrop": [
+        680,
+        480,
+        1480,
+        960
+      ],
+      "geometry": {
+        "passed": true,
+        "layers": [
+          {
+            "photo": 0,
+            "passed": true,
+            "sameBitmap": true,
+            "left": 256,
+            "top": 1.430511474609375e-05,
+            "right": 544,
+            "bottom": 479.9999694824219,
+            "scaleX": 0.5999999642372131,
+            "scaleY": 0.5999999642372131
+          },
+          {
+            "photo": 1,
+            "passed": true,
+            "sameBitmap": true,
+            "left": 256,
+            "top": 1.430511474609375e-05,
+            "right": 544,
+            "bottom": 479.9999694824219,
+            "scaleX": 0.5999999642372131,
+            "scaleY": 0.5999999642372131
+          }
+        ],
+        "budgetUsed": 3072000,
+        "expectedAdmittedBytes": 3072000,
+        "literalExpectedAdmittedBytes": 3072000
+      },
+      "software": {
+        "passed": true,
+        "png": "fraction-0-software.png",
+        "width": 800,
+        "height": 480,
+        "fraction": 0.25,
+        "samples": [
+          {
+            "marker": 0,
+            "x": 285,
+            "y": 48,
+            "old": -52412,
+            "incoming": -2280483,
+            "expected": -576662,
+            "actual": -642198,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 1,
+            "x": 515,
+            "y": 48,
+            "old": -13378202,
+            "incoming": -13378083,
+            "expected": -13378172,
+            "actual": -13378173,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 2,
+            "x": 285,
+            "y": 432,
+            "old": -13412882,
+            "incoming": -1144781,
+            "expected": -10329409,
+            "actual": -10395201,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 3,
+            "x": 515,
+            "y": 432,
+            "old": -8909,
+            "incoming": -7846691,
+            "expected": -1984674,
+            "actual": -1984931,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 4,
+            "x": 400,
+            "y": 240,
+            "old": -12558208,
+            "incoming": -4157360,
+            "expected": -10457996,
+            "actual": -10457996,
+            "maxChannelTolerance": 3,
+            "passed": true
+          }
+        ],
+        "samplePassCount": 5,
+        "opaque": true,
+        "transparentPixels": 0,
+        "mattePass": true,
+        "mattePixels": 242400,
+        "baseColor": -15460837,
+        "basePixels": 238471,
+        "quietMarks": 3929,
+        "badMatte": 0,
+        "noDarkDip": true,
+        "oracle": "Frozen literal rounded opaque source-over RGB: (1-f)*old + f*incoming; channel tolerance3 permits predeclared 8-bit alpha/pixel quantization, not gamma-derived posthoc adjustment."
+      },
+      "hardware": {
+        "passed": true,
+        "png": "fraction-0-hardware.png",
+        "width": 800,
+        "height": 480,
+        "fraction": 0.25,
+        "samples": [
+          {
+            "marker": 0,
+            "x": 285,
+            "y": 48,
+            "old": -52412,
+            "incoming": -2280483,
+            "expected": -576662,
+            "actual": -576662,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 1,
+            "x": 515,
+            "y": 48,
+            "old": -13378202,
+            "incoming": -13378083,
+            "expected": -13378172,
+            "actual": -13378172,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 2,
+            "x": 285,
+            "y": 432,
+            "old": -13412882,
+            "incoming": -1144781,
+            "expected": -10329409,
+            "actual": -10394944,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 3,
+            "x": 515,
+            "y": 432,
+            "old": -8909,
+            "incoming": -7846691,
+            "expected": -1984674,
+            "actual": -1919139,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 4,
+            "x": 400,
+            "y": 240,
+            "old": -12558208,
+            "incoming": -4157360,
+            "expected": -10457996,
+            "actual": -10523532,
+            "maxChannelTolerance": 3,
+            "passed": true
+          }
+        ],
+        "samplePassCount": 5,
+        "opaque": true,
+        "transparentPixels": 0,
+        "mattePass": true,
+        "mattePixels": 242400,
+        "baseColor": -15460837,
+        "basePixels": 238111,
+        "quietMarks": 4289,
+        "badMatte": 0,
+        "noDarkDip": true,
+        "oracle": "Frozen literal rounded opaque source-over RGB: (1-f)*old + f*incoming; channel tolerance3 permits predeclared 8-bit alpha/pixel quantization, not gamma-derived posthoc adjustment."
+      }
+    },
+    {
+      "name": "fraction-0.5",
+      "passed": true,
+      "fraction": 0.5,
+      "incomingAlpha": 0.5,
+      "outgoingAlpha": 1,
+      "actualFadePaused": true,
+      "sameActualFade": true,
+      "stageAttached": true,
+      "stageHardwareAccelerated": true,
+      "committedFramesBeforePixelCopy": 2,
+      "pixelCopyResult": 0,
+      "windowCrop": [
+        680,
+        480,
+        1480,
+        960
+      ],
+      "geometry": {
+        "passed": true,
+        "layers": [
+          {
+            "photo": 0,
+            "passed": true,
+            "sameBitmap": true,
+            "left": 256,
+            "top": 1.430511474609375e-05,
+            "right": 544,
+            "bottom": 479.9999694824219,
+            "scaleX": 0.5999999642372131,
+            "scaleY": 0.5999999642372131
+          },
+          {
+            "photo": 1,
+            "passed": true,
+            "sameBitmap": true,
+            "left": 256,
+            "top": 1.430511474609375e-05,
+            "right": 544,
+            "bottom": 479.9999694824219,
+            "scaleX": 0.5999999642372131,
+            "scaleY": 0.5999999642372131
+          }
+        ],
+        "budgetUsed": 3072000,
+        "expectedAdmittedBytes": 3072000,
+        "literalExpectedAdmittedBytes": 3072000
+      },
+      "software": {
+        "passed": true,
+        "png": "fraction-1-software.png",
+        "width": 800,
+        "height": 480,
+        "fraction": 0.5,
+        "samples": [
+          {
+            "marker": 0,
+            "x": 285,
+            "y": 48,
+            "old": -52412,
+            "incoming": -2280483,
+            "expected": -1166447,
+            "actual": -1166448,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 1,
+            "x": 515,
+            "y": 48,
+            "old": -13378202,
+            "incoming": -13378083,
+            "expected": -13378142,
+            "actual": -13378143,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 2,
+            "x": 285,
+            "y": 432,
+            "old": -13412882,
+            "incoming": -1144781,
+            "expected": -7245935,
+            "actual": -7311728,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 3,
+            "x": 515,
+            "y": 432,
+            "old": -8909,
+            "incoming": -7846691,
+            "expected": -3894904,
+            "actual": -3960696,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 4,
+            "x": 400,
+            "y": 240,
+            "old": -12558208,
+            "incoming": -4157360,
+            "expected": -8357784,
+            "actual": -8357784,
+            "maxChannelTolerance": 3,
+            "passed": true
+          }
+        ],
+        "samplePassCount": 5,
+        "opaque": true,
+        "transparentPixels": 0,
+        "mattePass": true,
+        "mattePixels": 242400,
+        "baseColor": -15460837,
+        "basePixels": 238471,
+        "quietMarks": 3929,
+        "badMatte": 0,
+        "noDarkDip": true,
+        "oracle": "Frozen literal rounded opaque source-over RGB: (1-f)*old + f*incoming; channel tolerance3 permits predeclared 8-bit alpha/pixel quantization, not gamma-derived posthoc adjustment."
+      },
+      "hardware": {
+        "passed": true,
+        "png": "fraction-1-hardware.png",
+        "width": 800,
+        "height": 480,
+        "fraction": 0.5,
+        "samples": [
+          {
+            "marker": 0,
+            "x": 285,
+            "y": 48,
+            "old": -52412,
+            "incoming": -2280483,
+            "expected": -1166447,
+            "actual": -1166448,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 1,
+            "x": 515,
+            "y": 48,
+            "old": -13378202,
+            "incoming": -13378083,
+            "expected": -13378142,
+            "actual": -13378143,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 2,
+            "x": 285,
+            "y": 432,
+            "old": -13412882,
+            "incoming": -1144781,
+            "expected": -7245935,
+            "actual": -7311472,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 3,
+            "x": 515,
+            "y": 432,
+            "old": -8909,
+            "incoming": -7846691,
+            "expected": -3894904,
+            "actual": -3894904,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 4,
+            "x": 400,
+            "y": 240,
+            "old": -12558208,
+            "incoming": -4157360,
+            "expected": -8357784,
+            "actual": -8357784,
+            "maxChannelTolerance": 3,
+            "passed": true
+          }
+        ],
+        "samplePassCount": 5,
+        "opaque": true,
+        "transparentPixels": 0,
+        "mattePass": true,
+        "mattePixels": 242400,
+        "baseColor": -15460837,
+        "basePixels": 238111,
+        "quietMarks": 4289,
+        "badMatte": 0,
+        "noDarkDip": true,
+        "oracle": "Frozen literal rounded opaque source-over RGB: (1-f)*old + f*incoming; channel tolerance3 permits predeclared 8-bit alpha/pixel quantization, not gamma-derived posthoc adjustment."
+      }
+    },
+    {
+      "name": "fraction-0.75",
+      "passed": true,
+      "fraction": 0.75,
+      "incomingAlpha": 0.75,
+      "outgoingAlpha": 1,
+      "actualFadePaused": true,
+      "sameActualFade": true,
+      "stageAttached": true,
+      "stageHardwareAccelerated": true,
+      "committedFramesBeforePixelCopy": 2,
+      "pixelCopyResult": 0,
+      "windowCrop": [
+        680,
+        480,
+        1480,
+        960
+      ],
+      "geometry": {
+        "passed": true,
+        "layers": [
+          {
+            "photo": 0,
+            "passed": true,
+            "sameBitmap": true,
+            "left": 256,
+            "top": 1.430511474609375e-05,
+            "right": 544,
+            "bottom": 479.9999694824219,
+            "scaleX": 0.5999999642372131,
+            "scaleY": 0.5999999642372131
+          },
+          {
+            "photo": 1,
+            "passed": true,
+            "sameBitmap": true,
+            "left": 256,
+            "top": 1.430511474609375e-05,
+            "right": 544,
+            "bottom": 479.9999694824219,
+            "scaleX": 0.5999999642372131,
+            "scaleY": 0.5999999642372131
+          }
+        ],
+        "budgetUsed": 3072000,
+        "expectedAdmittedBytes": 3072000,
+        "literalExpectedAdmittedBytes": 3072000
+      },
+      "software": {
+        "passed": true,
+        "png": "fraction-2-software.png",
+        "width": 800,
+        "height": 480,
+        "fraction": 0.75,
+        "samples": [
+          {
+            "marker": 0,
+            "x": 285,
+            "y": 48,
+            "old": -52412,
+            "incoming": -2280483,
+            "expected": -1690697,
+            "actual": -1756234,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 1,
+            "x": 515,
+            "y": 48,
+            "old": -13378202,
+            "incoming": -13378083,
+            "expected": -13378113,
+            "actual": -13378113,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 2,
+            "x": 285,
+            "y": 432,
+            "old": -13412882,
+            "incoming": -1144781,
+            "expected": -4228254,
+            "actual": -4228255,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 3,
+            "x": 515,
+            "y": 432,
+            "old": -8909,
+            "incoming": -7846691,
+            "expected": -5870925,
+            "actual": -5936462,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 4,
+            "x": 400,
+            "y": 240,
+            "old": -12558208,
+            "incoming": -4157360,
+            "expected": -6257572,
+            "actual": -6257572,
+            "maxChannelTolerance": 3,
+            "passed": true
+          }
+        ],
+        "samplePassCount": 5,
+        "opaque": true,
+        "transparentPixels": 0,
+        "mattePass": true,
+        "mattePixels": 242400,
+        "baseColor": -15460837,
+        "basePixels": 238471,
+        "quietMarks": 3929,
+        "badMatte": 0,
+        "noDarkDip": true,
+        "oracle": "Frozen literal rounded opaque source-over RGB: (1-f)*old + f*incoming; channel tolerance3 permits predeclared 8-bit alpha/pixel quantization, not gamma-derived posthoc adjustment."
+      },
+      "hardware": {
+        "passed": true,
+        "png": "fraction-2-hardware.png",
+        "width": 800,
+        "height": 480,
+        "fraction": 0.75,
+        "samples": [
+          {
+            "marker": 0,
+            "x": 285,
+            "y": 48,
+            "old": -52412,
+            "incoming": -2280483,
+            "expected": -1690697,
+            "actual": -1756234,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 1,
+            "x": 515,
+            "y": 48,
+            "old": -13378202,
+            "incoming": -13378083,
+            "expected": -13378113,
+            "actual": -13378369,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 2,
+            "x": 285,
+            "y": 432,
+            "old": -13412882,
+            "incoming": -1144781,
+            "expected": -4228254,
+            "actual": -4228254,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 3,
+            "x": 515,
+            "y": 432,
+            "old": -8909,
+            "incoming": -7846691,
+            "expected": -5870925,
+            "actual": -5870926,
+            "maxChannelTolerance": 3,
+            "passed": true
+          },
+          {
+            "marker": 4,
+            "x": 400,
+            "y": 240,
+            "old": -12558208,
+            "incoming": -4157360,
+            "expected": -6257572,
+            "actual": -6257572,
+            "maxChannelTolerance": 3,
+            "passed": true
+          }
+        ],
+        "samplePassCount": 5,
+        "opaque": true,
+        "transparentPixels": 0,
+        "mattePass": true,
+        "mattePixels": 242400,
+        "baseColor": -15460837,
+        "basePixels": 238111,
+        "quietMarks": 4289,
+        "badMatte": 0,
+        "noDarkDip": true,
+        "oracle": "Frozen literal rounded opaque source-over RGB: (1-f)*old + f*incoming; channel tolerance3 permits predeclared 8-bit alpha/pixel quantization, not gamma-derived posthoc adjustment."
+      }
+    }
+  ],
+  "sourceSha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+  "sourceBytes": 46745646,
+  "fixturePackage": "com.immortal.dissolvepixelfixture",
+  "sdk": 29,
+  "density": 1.125,
+  "internetPermission": false,
+  "actualEmbeddedStageOrigin": true,
+  "unexpectedPreferenceRequests": 0,
+  "unexpectedResolverRequests": 0,
+  "unexpectedServiceRequests": 0,
+  "inputMethodNullAdmissions": 7,
+  "realInputMethodServiceAccesses": 0,
+  "retiredScenes": 1,
+  "retirementFrameCommitted": true,
+  "inputsRecycledAfterCommittedDetach": true,
+  "cleanup": true,
+  "ownerHandlerRetired": true,
+  "currentOnlyAcceptance": true,
+  "noRedOrSourceChangeClaim": true,
+  "scope": "Controlled25/50/75percent actual finite SlideshowStage dissolve fractions on owned hardware Activity Window, paired PixelCopy/software Canvas literal source-over pixels, inactive continuous photo motion and opaque matte. No natural progression/pause/cover/resize/time/FPS verdict; no mounted Dream/controller/clock/source/legacy/optimized/API28/Living/current-room style or performance acceptance."
+}

@@ -1,0 +1,249 @@
+{
+  "ok": true,
+  "acceptanceOnly": true,
+  "productionChanges": false,
+  "newAppBuildOrVersion": false,
+  "roomAppInstalls": 0,
+  "reviewFullReadTools": [
+    "589d22",
+    "1b00f3"
+  ],
+  "independentReviewSha256": "50247350cf1b334933b99b1f2ade70af44ea9c697fa76edd10fda8de1da28264",
+  "reviewBindingsRehashed": 34,
+  "reviewBindings": [
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/discovery-clock.json",
+      "sha256": "ef31dec50b577b717a4444ec9d7cd56270129176130418bebb7d6bacc5be5649",
+      "bytes": 335
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/selected-plan.json",
+      "sha256": "6900b9a8672058757114c96e1c9b6fcc0d238adb91d88102446f25bf37a3e0e3",
+      "bytes": 2286
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/photo-motion-source-discovery.json",
+      "sha256": "2baa65052ae1005fe2907495040ac7474290216ee9585e881b0fe1b30317b4bf",
+      "bytes": 7358
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/source-debug-1.162.apk",
+      "sha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+      "bytes": 46745646
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowStage.kt",
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowDissolvePause.kt",
+      "sha256": "a8170628ed91345828580e16c690f3889dece518a1474261d675979b4d7c499e",
+      "bytes": 1176
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowPixelBudget.kt",
+      "sha256": "a94dc10786b0b371acbfd499197feefdf502173c1737992c33dbff869572ea93",
+      "bytes": 2349
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoMatte.kt",
+      "sha256": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "bytes": 3372
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoView.kt",
+      "sha256": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "bytes": 1621
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "sha256": "54b45afe92a77c65996390344004ae44c61d52df1b83cfd52e013ed3105386fa",
+      "bytes": 11824
+    },
+    {
+      "path": "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/AttachedPhotoActivity.java",
+      "sha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+      "bytes": 19968
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/DissolvePixelActivity.java",
+      "sha256": "3477c214240e20f448236a51d37e043b5de0a84b15c0c258ebc38b910a03871f",
+      "bytes": 18723
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/AndroidManifest.xml",
+      "sha256": "580b4158a211c4164e269189bf655ae9c913dc87eccaa41a2db741bc00dcd03e",
+      "bytes": 465
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/RUN.md",
+      "sha256": "ed3a984ad7c1418c7c268ddefc010782452988d4a39a690874a4beb217168dde",
+      "bytes": 3041
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/source-admission.json",
+      "sha256": "7c19f8c490ca7c57cb436f30cb4a39de7480b98efa1055e5c9cd1429d4ccf114",
+      "bytes": 1880
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/build.sh",
+      "sha256": "200024f32d0f58c1ec98f45ba83b7c5d703ea31cfc81609fd986229dea164274",
+      "bytes": 832
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/repack.sh",
+      "sha256": "8e5c8f39a092cc5a81c42873989b87b8ccee27999f7325a22fde02e1dbeb4e23",
+      "bytes": 785
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/freeze.py",
+      "sha256": "cc72a216fe6942593a5c88ec84cebb836f951614923e5f5b2f0c3c48936be14d",
+      "bytes": 1467
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/preparation-verification.json",
+      "sha256": "15e190ba750b319f23e95ee80a8907873684e940e7d04e4c08774141039fd2c7",
+      "bytes": 2960
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/frozen-dex/classes.dex",
+      "sha256": "fa64afba66f17ff4957ce9a948ca9fe8810825c26d97bed309afa7b9590a0d7b",
+      "bytes": 28992
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/dissolve-pixel-fixture.apk",
+      "sha256": "1d7050d07ef11f5b622fb9396327423a913b4d849dab19d410ab65cca3e3efc8",
+      "bytes": 37511658
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-run.py",
+      "sha256": "1bf9800d3e7281f1ef7e47f10aba9b57a4046ce591388c9d663f92a5f126fbd9",
+      "bytes": 5942
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/root-driver-freeze.json",
+      "sha256": "55e4a88cbb3eb9d3fd1f0bc5457fc863cd81cd56f7b649c1ece2da3bdf594765",
+      "bytes": 262
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-current.claim",
+      "sha256": "25712475d9bce9faf058eb253e51a810b57f38ad02a2b749c4be38a11e525485",
+      "bytes": 50
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-report.json",
+      "sha256": "d48ee12c6bc885e34e15d898ee9bb4c32d37751782e5401243aed55d773a8936",
+      "bytes": 17741
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-execution-terminal.json",
+      "sha256": "7098c83cf3c3c1c634ef4e51490f88fa025b3391005de670c806bc952765b150",
+      "bytes": 47
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/native-execution.log",
+      "sha256": "0eaa5941a62ba7900b15e3257c7918eefff9f4f449c668583f615e10dca25328",
+      "bytes": 176
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-0-hardware.png",
+      "sha256": "74ac6278135ee61cb2fb3bc200f431c2c66151182633d027e22d59ac89f08e35",
+      "bytes": 11530
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-0-software.png",
+      "sha256": "2ad4c3b06f65ee7d36309784063069c1cc799f1029eab3e412970f9242c799f4",
+      "bytes": 11666
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-1-hardware.png",
+      "sha256": "1516dd5d8734c702d603ad70570084492dcfae82ddbcd8e54b537285fc534aed",
+      "bytes": 11970
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-1-software.png",
+      "sha256": "ee407753acbcd827f2d4afac77f834ba283dfb560bef1f4ef0d322785203f4a2",
+      "bytes": 11667
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-2-hardware.png",
+      "sha256": "8fe5afdb9f999fe14a14cd1b633038427c706d1bcd8d73444a58681656ba1a2e",
+      "bytes": 11982
+    },
+    {
+      "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-2-software.png",
+      "sha256": "921444610a5b128a50f9a846ba0605b29ab7283b46ff020a24c373969d7f8b74",
+      "bytes": 11672
+    }
+  ],
+  "rootPixelReplayTerminal": "031650",
+  "visualInspection": "fraction-1-hardware.png: generated full portrait and subtle surrounding matte inspected",
+  "devicePreservationTerminal": "24e408",
+  "fixtureRetirement": {
+    "packageAbsent": true,
+    "processAbsent": true,
+    "externalDirectoryAbsent": true
+  },
+  "nativeTerminal": {
+    "exitCode": 0,
+    "elapsedSeconds": 10.56
+  },
+  "currentRooms": {
+    "family": {
+      "app": {
+        "versionCode": 156,
+        "versionName": "1.162"
+      },
+      "sha256": "2c43d9e7a2fa0f76a82a4796317fbe2279747d62467ee0b64b2982c131d283c3",
+      "bytes": 25886923,
+      "serviceReady": true,
+      "noInstall": true
+    },
+    "living": {
+      "app": {
+        "versionCode": 156,
+        "versionName": "1.162"
+      },
+      "sha256": "2c43d9e7a2fa0f76a82a4796317fbe2279747d62467ee0b64b2982c131d283c3",
+      "bytes": 25886923,
+      "serviceReady": true,
+      "noInstall": true
+    }
+  },
+  "originalClock": "2026-11-04T14:07:59Z",
+  "hardDeadline": "2026-11-04T14:37:59Z",
+  "noFreshMotionOrPerformanceClaim": true,
+  "wholeGoal": "active",
+  "docsStrictBuild": {
+    "exitCode": 0,
+    "elapsedSeconds": 2.194,
+    "strict": true
+  },
+  "safeCopiesByteExact": true,
+  "generatedImages": 6,
+  "privateCredentialsAbsent": true,
+  "allProductionTrackedFilesUnchanged": true,
+  "queuePreservation": {
+    "ok": true,
+    "previousTasksExact": 157,
+    "rawPriorTaskSuffixExact": true,
+    "defaultAndBoundariesExact": true,
+    "queue": 158,
+    "counts": {
+      "verified": 43,
+      "delivered": 105,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "originalClocksRetained": true
+  },
+  "completedAt": "2026-11-04T14:18:23.734384+00:00",
+  "elapsedMinutesOriginal": 10.41224
+}

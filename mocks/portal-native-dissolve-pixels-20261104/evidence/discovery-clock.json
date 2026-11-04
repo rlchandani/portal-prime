@@ -1,0 +1,8 @@
+{
+  "originalDiscoveryAt": "2026-11-04T14:07:59Z",
+  "target": "2026-11-04T14:22:59Z",
+  "hardDeadline": "2026-11-04T14:37:59Z",
+  "clockNotReset": true,
+  "baseCommit": "4acf37bdfa564f788aee9b983f418cb15062700b",
+  "previousGoalTurn": "progress: Lamp numeric controls commit4acf37bd bothrooms1.162 exact,13.015min includingcleanup"
+}

@@ -1,0 +1,897 @@
+{
+  "ok": true,
+  "blockers": [],
+  "reviewer": "/root/media_source_review",
+  "scope": "One independent source/artifact/retained-native and PNG pixel replay review of current-only controlled finite Stage hardware compositing; no production fix or RED claim.",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T14:07:59Z",
+    "target": "2026-11-04T14:22:59Z",
+    "hardDeadline": "2026-11-04T14:37:59Z",
+    "clockNotReset": true
+  },
+  "source": {
+    "stageUnchangedSha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+    "debugSourceSha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+    "debugSourceBytes": 46745646,
+    "version": "Existing 1.162/code156; no application source/version/build/install change for this acceptance slice.",
+    "mechanism": "Actual Stage present keeps outgoing composition alpha1 and uses a linear 900ms incoming ObjectAnimator. Fixture presents generated first photo, commits frames, presents second, calls real Stage.pause, reads the actual fade and controls only setCurrentFraction(.25/.5/.75). It never directly sets product geometry or layer alpha.",
+    "foundation": "GeneratedContext differs from prior admitted AttachedPhotoActivity only in class/package names; frame fence method is byte-identical. Null base with own resource/theme/display delegation; preferences/resolver/services reject; exact InputMethodManager typed-name request returns null.",
+    "oracle": "Independently derived every one of 15 frozen opaque source-over rounded RGB literals from (1-f)*old+f*incoming. Five fixed sample points lie inside colored corners/center away from the border. Predeclared maximum channel tolerance3 remains unchanged.",
+    "gateDelta": "Prior foundation accepted three first-presentation static scenes. This fixture adds one retained two-photo dissolve at three controlled paused fractions, five fixed blend markers per path and exact two-composition geometry/budget. Prior ordinary pause/cover/resize state verdicts are not repeated."
+  },
+  "compiledArtifact": {
+    "fixtureDex": {
+      "sha256": "fa64afba66f17ff4957ce9a948ca9fe8810825c26d97bed309afa7b9590a0d7b",
+      "bytes": 28992
+    },
+    "fixtureApk": {
+      "sha256": "1d7050d07ef11f5b622fb9396327423a913b4d849dab19d410ab65cca3e3efc8",
+      "bytes": 37511658
+    },
+    "sourceApk": {
+      "sha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+      "bytes": 46745646
+    },
+    "verification": "Independently hashed all frozen preparation sources, compiled DEX and wrapper; ZIP entry names unique; wrapper classes.dex equals frozen DEX and assets/source.apk equals fixed current debug APK byte-for-byte. Driver SHA/bytes match final root freeze.",
+    "manifest": "Source manifest: no permissions, hardware accelerated own Activity, min24/target29. Root preparation permissions dump reports no uses-permission. Runtime SDK29 and INTERNET absent.",
+    "sdkTerminal": "Root driver freeze records SDK terminal d68ef6 exit0. No SDK/signature/build command rerun by reviewer."
+  },
+  "native": {
+    "tests": 3,
+    "failures": 0,
+    "fractions": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "incomingAlpha": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "outgoingAlpha": [
+      1,
+      1,
+      1
+    ],
+    "samePausedActualFade": true,
+    "stageAttachedAndHardwareAccelerated": true,
+    "committedFramesPerCapture": 2,
+    "pixelCopyResultEach": 0,
+    "windowCropEach": [
+      680,
+      480,
+      1480,
+      960
+    ],
+    "geometry": "Both generated 480x800 portraits retain bitmap identity and bounds256,0→544,480, scale0.6 in both axes at every controlled fraction. Two compositions remain visible.",
+    "budgetUsedEach": 3072000,
+    "expectedBudgetArithmetic": "2 * 480 * 800 * 4 = 3072000",
+    "origin": "Actual isolated embedded Stage/photo/budget class loader admitted; runtime source hash/bytes match wrapper embedded APK.",
+    "targetContextCounters": {
+      "unexpectedPreferenceRequests": 0,
+      "unexpectedResolverRequests": 0,
+      "unexpectedServiceRequests": 0,
+      "inputMethodNullAdmissions": 7
+    },
+    "containmentQualification": "GeneratedContext request counters cover the target context methods. realInputMethodServiceAccesses0 is a source-containment constant, not global OS service instrumentation. Fixture Activity uses its own Window/resources for capture.",
+    "retirement": "One actual Stage.stop verifies budget0 and inputs still owned; removes Stage and commits detach frame before recycling inputs; owned handler callbacks removed. Report cleanup true. External package/process/directory retirement all true.",
+    "terminal": {
+      "exitCode": 0,
+      "elapsedSeconds": 10.56
+    }
+  },
+  "pixelReplay": {
+    "method": "Independent Node PNG chunk/inflate and scanline-filter decoding of all six actual files; direct RGB/alpha examination. No author evaluator invoked, no runtime rerun.",
+    "images": 6,
+    "totalPixelsReplayed": 2304000,
+    "literalSamples": 30,
+    "literalPasses": 30,
+    "maxObservedChannelError": 1,
+    "frozenChannelTolerance": 3,
+    "fullOpacity": "All 384000 pixels in each PNG have alpha255.",
+    "matteGate": "Outside inclusive image/margin envelope x253..547: 242400 pixels each; base(20,22,27) channels±1; quiet marks require nonnegative channel deltas with max2..64; marks>=50 and<30%, base>65%, bad0.",
+    "reportComparison": "Every decoded sample actual RGB/alpha, all sample metadata and all transparent/matte/base/quiet/bad counts match the retained report exactly. Hardware and software rasterization differ within their frozen gates; byte/pixel identity between paths is not required.",
+    "captures": [
+      {
+        "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-0-hardware.png",
+        "fraction": 0.25,
+        "mode": "hardware",
+        "sha256": "74ac6278135ee61cb2fb3bc200f431c2c66151182633d027e22d59ac89f08e35",
+        "bytes": 11530,
+        "width": 800,
+        "height": 480,
+        "pixelsReplayed": 384000,
+        "samplePassCount": 5,
+        "maxChannelError": 1,
+        "transparentPixels": 0,
+        "mattePixels": 242400,
+        "basePixels": 238111,
+        "quietMarks": 4289,
+        "badMatte": 0,
+        "samples": [
+          {
+            "point": [
+              285,
+              48
+            ],
+            "expectedRgb": [
+              247,
+              51,
+              106
+            ],
+            "actualRgba": [
+              247,
+              51,
+              106,
+              255
+            ],
+            "maxChannelError": 0
+          },
+          {
+            "point": [
+              515,
+              48
+            ],
+            "expectedRgb": [
+              51,
+              221,
+              132
+            ],
+            "actualRgba": [
+              51,
+              221,
+              132,
+              255
+            ],
+            "maxChannelError": 0
+          },
+          {
+            "point": [
+              285,
+              432
+            ],
+            "expectedRgb": [
+              98,
+              98,
+              191
+            ],
+            "actualRgba": [
+              97,
+              98,
+              192,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              432
+            ],
+            "expectedRgb": [
+              225,
+              183,
+              94
+            ],
+            "actualRgba": [
+              226,
+              183,
+              93,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              400,
+              240
+            ],
+            "expectedRgb": [
+              96,
+              108,
+              116
+            ],
+            "actualRgba": [
+              95,
+              108,
+              116,
+              255
+            ],
+            "maxChannelError": 1
+          }
+        ]
+      },
+      {
+        "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-0-software.png",
+        "fraction": 0.25,
+        "mode": "software",
+        "sha256": "2ad4c3b06f65ee7d36309784063069c1cc799f1029eab3e412970f9242c799f4",
+        "bytes": 11666,
+        "width": 800,
+        "height": 480,
+        "pixelsReplayed": 384000,
+        "samplePassCount": 5,
+        "maxChannelError": 1,
+        "transparentPixels": 0,
+        "mattePixels": 242400,
+        "basePixels": 238471,
+        "quietMarks": 3929,
+        "badMatte": 0,
+        "samples": [
+          {
+            "point": [
+              285,
+              48
+            ],
+            "expectedRgb": [
+              247,
+              51,
+              106
+            ],
+            "actualRgba": [
+              246,
+              51,
+              106,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              48
+            ],
+            "expectedRgb": [
+              51,
+              221,
+              132
+            ],
+            "actualRgba": [
+              51,
+              221,
+              131,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              285,
+              432
+            ],
+            "expectedRgb": [
+              98,
+              98,
+              191
+            ],
+            "actualRgba": [
+              97,
+              97,
+              191,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              432
+            ],
+            "expectedRgb": [
+              225,
+              183,
+              94
+            ],
+            "actualRgba": [
+              225,
+              182,
+              93,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              400,
+              240
+            ],
+            "expectedRgb": [
+              96,
+              108,
+              116
+            ],
+            "actualRgba": [
+              96,
+              108,
+              116,
+              255
+            ],
+            "maxChannelError": 0
+          }
+        ]
+      },
+      {
+        "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-1-hardware.png",
+        "fraction": 0.5,
+        "mode": "hardware",
+        "sha256": "1516dd5d8734c702d603ad70570084492dcfae82ddbcd8e54b537285fc534aed",
+        "bytes": 11970,
+        "width": 800,
+        "height": 480,
+        "pixelsReplayed": 384000,
+        "samplePassCount": 5,
+        "maxChannelError": 1,
+        "transparentPixels": 0,
+        "mattePixels": 242400,
+        "basePixels": 238111,
+        "quietMarks": 4289,
+        "badMatte": 0,
+        "samples": [
+          {
+            "point": [
+              285,
+              48
+            ],
+            "expectedRgb": [
+              238,
+              51,
+              145
+            ],
+            "actualRgba": [
+              238,
+              51,
+              144,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              48
+            ],
+            "expectedRgb": [
+              51,
+              221,
+              162
+            ],
+            "actualRgba": [
+              51,
+              221,
+              161,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              285,
+              432
+            ],
+            "expectedRgb": [
+              145,
+              111,
+              145
+            ],
+            "actualRgba": [
+              144,
+              111,
+              144,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              432
+            ],
+            "expectedRgb": [
+              196,
+              145,
+              136
+            ],
+            "actualRgba": [
+              196,
+              145,
+              136,
+              255
+            ],
+            "maxChannelError": 0
+          },
+          {
+            "point": [
+              400,
+              240
+            ],
+            "expectedRgb": [
+              128,
+              120,
+              104
+            ],
+            "actualRgba": [
+              128,
+              120,
+              104,
+              255
+            ],
+            "maxChannelError": 0
+          }
+        ]
+      },
+      {
+        "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-1-software.png",
+        "fraction": 0.5,
+        "mode": "software",
+        "sha256": "ee407753acbcd827f2d4afac77f834ba283dfb560bef1f4ef0d322785203f4a2",
+        "bytes": 11667,
+        "width": 800,
+        "height": 480,
+        "pixelsReplayed": 384000,
+        "samplePassCount": 5,
+        "maxChannelError": 1,
+        "transparentPixels": 0,
+        "mattePixels": 242400,
+        "basePixels": 238471,
+        "quietMarks": 3929,
+        "badMatte": 0,
+        "samples": [
+          {
+            "point": [
+              285,
+              48
+            ],
+            "expectedRgb": [
+              238,
+              51,
+              145
+            ],
+            "actualRgba": [
+              238,
+              51,
+              144,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              48
+            ],
+            "expectedRgb": [
+              51,
+              221,
+              162
+            ],
+            "actualRgba": [
+              51,
+              221,
+              161,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              285,
+              432
+            ],
+            "expectedRgb": [
+              145,
+              111,
+              145
+            ],
+            "actualRgba": [
+              144,
+              110,
+              144,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              432
+            ],
+            "expectedRgb": [
+              196,
+              145,
+              136
+            ],
+            "actualRgba": [
+              195,
+              144,
+              136,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              400,
+              240
+            ],
+            "expectedRgb": [
+              128,
+              120,
+              104
+            ],
+            "actualRgba": [
+              128,
+              120,
+              104,
+              255
+            ],
+            "maxChannelError": 0
+          }
+        ]
+      },
+      {
+        "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-2-hardware.png",
+        "fraction": 0.75,
+        "mode": "hardware",
+        "sha256": "8fe5afdb9f999fe14a14cd1b633038427c706d1bcd8d73444a58681656ba1a2e",
+        "bytes": 11982,
+        "width": 800,
+        "height": 480,
+        "pixelsReplayed": 384000,
+        "samplePassCount": 5,
+        "maxChannelError": 1,
+        "transparentPixels": 0,
+        "mattePixels": 242400,
+        "basePixels": 238111,
+        "quietMarks": 4289,
+        "badMatte": 0,
+        "samples": [
+          {
+            "point": [
+              285,
+              48
+            ],
+            "expectedRgb": [
+              230,
+              51,
+              183
+            ],
+            "actualRgba": [
+              229,
+              51,
+              182,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              48
+            ],
+            "expectedRgb": [
+              51,
+              221,
+              191
+            ],
+            "actualRgba": [
+              51,
+              220,
+              191,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              285,
+              432
+            ],
+            "expectedRgb": [
+              191,
+              123,
+              98
+            ],
+            "actualRgba": [
+              191,
+              123,
+              98,
+              255
+            ],
+            "maxChannelError": 0
+          },
+          {
+            "point": [
+              515,
+              432
+            ],
+            "expectedRgb": [
+              166,
+              106,
+              179
+            ],
+            "actualRgba": [
+              166,
+              106,
+              178,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              400,
+              240
+            ],
+            "expectedRgb": [
+              160,
+              132,
+              92
+            ],
+            "actualRgba": [
+              160,
+              132,
+              92,
+              255
+            ],
+            "maxChannelError": 0
+          }
+        ]
+      },
+      {
+        "path": "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-2-software.png",
+        "fraction": 0.75,
+        "mode": "software",
+        "sha256": "921444610a5b128a50f9a846ba0605b29ab7283b46ff020a24c373969d7f8b74",
+        "bytes": 11672,
+        "width": 800,
+        "height": 480,
+        "pixelsReplayed": 384000,
+        "samplePassCount": 5,
+        "maxChannelError": 1,
+        "transparentPixels": 0,
+        "mattePixels": 242400,
+        "basePixels": 238471,
+        "quietMarks": 3929,
+        "badMatte": 0,
+        "samples": [
+          {
+            "point": [
+              285,
+              48
+            ],
+            "expectedRgb": [
+              230,
+              51,
+              183
+            ],
+            "actualRgba": [
+              229,
+              51,
+              182,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              48
+            ],
+            "expectedRgb": [
+              51,
+              221,
+              191
+            ],
+            "actualRgba": [
+              51,
+              221,
+              191,
+              255
+            ],
+            "maxChannelError": 0
+          },
+          {
+            "point": [
+              285,
+              432
+            ],
+            "expectedRgb": [
+              191,
+              123,
+              98
+            ],
+            "actualRgba": [
+              191,
+              123,
+              97,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              515,
+              432
+            ],
+            "expectedRgb": [
+              166,
+              106,
+              179
+            ],
+            "actualRgba": [
+              165,
+              106,
+              178,
+              255
+            ],
+            "maxChannelError": 1
+          },
+          {
+            "point": [
+              400,
+              240
+            ],
+            "expectedRgb": [
+              160,
+              132,
+              92
+            ],
+            "actualRgba": [
+              160,
+              132,
+              92,
+              255
+            ],
+            "maxChannelError": 0
+          }
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "Controlled fractions on an owned attached current-debug/API29 hardware Window plus same-Stage software Canvas; three fractions and 30 literal sample pixels establish the bounded compositing acceptance. Whole-image checks establish opacity and retained matte, not an exhaustive per-photo color oracle.",
+    "No natural animator progression, frame timing/FPS, pause/resume/cover/resize behavior, continuous photo motion, optical comfort or performance verdict. Prior357Night/172resize evidence remains separately qualified.",
+    "No mounted Dream/controller/FaceRenderer/clock/photo-source/startup/legacy acceptance; no owner photos, preferences, provider/account/phone/network actions by reviewer.",
+    "No optimized runtime, API28, Living/current room style or physical room preservation acceptance. Root room readbacks/preservation are outside this review.",
+    "No new full JVM/app build test claim; existing 1.162 build evidence belongs the prior delivered Lamp slice. Reviewer performed host source/evidence reads and this one receipt write only."
+  ],
+  "bindings": {
+    "/private/tmp/portal-screensaver-next-20261104-140759/discovery-clock.json": {
+      "sha256": "ef31dec50b577b717a4444ec9d7cd56270129176130418bebb7d6bacc5be5649",
+      "bytes": 335
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/selected-plan.json": {
+      "sha256": "6900b9a8672058757114c96e1c9b6fcc0d238adb91d88102446f25bf37a3e0e3",
+      "bytes": 2286
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/photo-motion-source-discovery.json": {
+      "sha256": "2baa65052ae1005fe2907495040ac7474290216ee9585e881b0fe1b30317b4bf",
+      "bytes": 7358
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/source-debug-1.162.apk": {
+      "sha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+      "bytes": 46745646
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowStage.kt": {
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowDissolvePause.kt": {
+      "sha256": "a8170628ed91345828580e16c690f3889dece518a1474261d675979b4d7c499e",
+      "bytes": 1176
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowPixelBudget.kt": {
+      "sha256": "a94dc10786b0b371acbfd499197feefdf502173c1737992c33dbff869572ea93",
+      "bytes": 2349
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoMatte.kt": {
+      "sha256": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "bytes": 3372
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoView.kt": {
+      "sha256": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "bytes": 1621
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "54b45afe92a77c65996390344004ae44c61d52df1b83cfd52e013ed3105386fa",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/AttachedPhotoActivity.java": {
+      "sha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+      "bytes": 19968
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/DissolvePixelActivity.java": {
+      "sha256": "3477c214240e20f448236a51d37e043b5de0a84b15c0c258ebc38b910a03871f",
+      "bytes": 18723
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/AndroidManifest.xml": {
+      "sha256": "580b4158a211c4164e269189bf655ae9c913dc87eccaa41a2db741bc00dcd03e",
+      "bytes": 465
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/RUN.md": {
+      "sha256": "ed3a984ad7c1418c7c268ddefc010782452988d4a39a690874a4beb217168dde",
+      "bytes": 3041
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/source-admission.json": {
+      "sha256": "7c19f8c490ca7c57cb436f30cb4a39de7480b98efa1055e5c9cd1429d4ccf114",
+      "bytes": 1880
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/build.sh": {
+      "sha256": "200024f32d0f58c1ec98f45ba83b7c5d703ea31cfc81609fd986229dea164274",
+      "bytes": 832
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/repack.sh": {
+      "sha256": "8e5c8f39a092cc5a81c42873989b87b8ccee27999f7325a22fde02e1dbeb4e23",
+      "bytes": 785
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/freeze.py": {
+      "sha256": "cc72a216fe6942593a5c88ec84cebb836f951614923e5f5b2f0c3c48936be14d",
+      "bytes": 1467
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/preparation-verification.json": {
+      "sha256": "15e190ba750b319f23e95ee80a8907873684e940e7d04e4c08774141039fd2c7",
+      "bytes": 2960
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/frozen-dex/classes.dex": {
+      "sha256": "fa64afba66f17ff4957ce9a948ca9fe8810825c26d97bed309afa7b9590a0d7b",
+      "bytes": 28992
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-owned/dissolve-pixel-fixture.apk": {
+      "sha256": "1d7050d07ef11f5b622fb9396327423a913b4d849dab19d410ab65cca3e3efc8",
+      "bytes": 37511658
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-run.py": {
+      "sha256": "1bf9800d3e7281f1ef7e47f10aba9b57a4046ce591388c9d663f92a5f126fbd9",
+      "bytes": 5942
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/root-driver-freeze.json": {
+      "sha256": "55e4a88cbb3eb9d3fd1f0bc5457fc863cd81cd56f7b649c1ece2da3bdf594765",
+      "bytes": 262
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-current.claim": {
+      "sha256": "25712475d9bce9faf058eb253e51a810b57f38ad02a2b749c4be38a11e525485",
+      "bytes": 50
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-report.json": {
+      "sha256": "d48ee12c6bc885e34e15d898ee9bb4c32d37751782e5401243aed55d773a8936",
+      "bytes": 17741
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-execution-terminal.json": {
+      "sha256": "7098c83cf3c3c1c634ef4e51490f88fa025b3391005de670c806bc952765b150",
+      "bytes": 47
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/native-execution.log": {
+      "sha256": "0eaa5941a62ba7900b15e3257c7918eefff9f4f449c668583f615e10dca25328",
+      "bytes": 176
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-0-hardware.png": {
+      "sha256": "74ac6278135ee61cb2fb3bc200f431c2c66151182633d027e22d59ac89f08e35",
+      "bytes": 11530
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-0-software.png": {
+      "sha256": "2ad4c3b06f65ee7d36309784063069c1cc799f1029eab3e412970f9242c799f4",
+      "bytes": 11666
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-1-hardware.png": {
+      "sha256": "1516dd5d8734c702d603ad70570084492dcfae82ddbcd8e54b537285fc534aed",
+      "bytes": 11970
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-1-software.png": {
+      "sha256": "ee407753acbcd827f2d4afac77f834ba283dfb560bef1f4ef0d322785203f4a2",
+      "bytes": 11667
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-2-hardware.png": {
+      "sha256": "8fe5afdb9f999fe14a14cd1b633038427c706d1bcd8d73444a58681656ba1a2e",
+      "bytes": 11982
+    },
+    "/private/tmp/portal-screensaver-next-20261104-140759/images/fraction-2-software.png": {
+      "sha256": "921444610a5b128a50f9a846ba0605b29ab7283b46ff020a24c373969d7f8b74",
+      "bytes": 11672
+    }
+  }
+}
