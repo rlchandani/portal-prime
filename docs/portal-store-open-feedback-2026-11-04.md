@@ -35,3 +35,19 @@ or publication; public1.83/code77 remains.
 Original clock **16:53:39UTC**, target **17:08:39UTC**, hard **17:23:39UTC**,
 including discovery and closure; no reset. Evidence:
 `mocks/portal-store-open-feedback-20261104/evidence/`.
+
+The native acceptance follow-up retained this original clock. It packaged two
+generated wrappers around the exact debug 1.169 and 1.170 APKs, with identical
+10,116-byte fixture DEX. Independent review verified the actual callback's
+name/signature, generated destination, intercepted launches, and denied
+preference/provider access. The runner stopped at its exact-package absence
+preflight because it treated `adb shell pm path`'s empty exit-1 result as an
+execution error. No fixture installation or callback execution occurred.
+There are no native result reports or screenshots.
+
+The cutoff was first checked after this failed runner at 17:23:46UTC, seven
+seconds late. The native check was closed without another attempt or deadline
+reset. This follow-up missed the hard limit; the earlier delivery remains
+verified, and visible native Toast acceptance remains outstanding. Paired
+package verification and the bounded negative outcome are retained in
+`evidence/native-acceptance-attempt.json`.
