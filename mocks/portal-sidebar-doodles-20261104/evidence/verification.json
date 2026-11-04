@@ -1,0 +1,775 @@
+{
+  "version": "1.137/code131",
+  "sourceBase": "76b32b5d46a7a17a47b62889140a0e6aaf223d0f",
+  "recordedAt": "2026-11-04T07:56:34.019473+00:00",
+  "issueClock": {
+    "scope": "Hero + Sidebar: quiet doodles in outer and per-photo dark margins, CSS only",
+    "startedAt": "2026-11-04T07:50:41Z",
+    "target": "2026-11-04T08:05:41Z",
+    "deadline": "2026-11-04T08:20:41Z",
+    "sourceBase": "76b32b5d46a7a17a47b62889140a0e6aaf223d0f",
+    "version": "1.137/code131",
+    "previousScopesAndClocksRetained": true
+  },
+  "elapsedMinutesAtReceipt": 5.88,
+  "artifacts": {
+    "apks": {
+      "debug": {
+        "bytes": 46728250,
+        "sha256": "9f9f4df2550cef08226119733eb01d30ef2f3513d941b5c7dacd438436f9271b",
+        "manifest": "package: name='com.immortal.launcher.debug' versionCode='131' versionName='1.137' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "screensaverAssets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "bytes": 66451,
+            "sha256": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0"
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "bytes": 14580,
+            "sha256": "465920d771336e4f53ba6005bd5a5d00ba7f5cecdbefd6011aba4c384c23f326"
+          }
+        ]
+      },
+      "performance": {
+        "bytes": 25886223,
+        "sha256": "68767f69b04936221267b7dc1224a559179e51417022c7d83bb13e3019a728eb",
+        "manifest": "package: name='com.immortal.launcher.debug' versionCode='131' versionName='1.137' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "screensaverAssets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "bytes": 66451,
+            "sha256": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0"
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "bytes": 14580,
+            "sha256": "465920d771336e4f53ba6005bd5a5d00ba7f5cecdbefd6011aba4c384c23f326"
+          }
+        ]
+      }
+    },
+    "jvm": {
+      "tests": 4402,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 460
+    },
+    "fullGradleExit": 0,
+    "clockReset": false,
+    "sourceHead": "76b32b5d46a7a17a47b62889140a0e6aaf223d0f"
+  },
+  "appearanceOnlyTrace": [
+    {
+      "mode": "heroSidebar",
+      "photoMotion": "undefined",
+      "previousHash": "a2af06e42ebaffa3b7c5b71ec510db4365eb4613782ad3986374eb373ed5a96f",
+      "normalizedCandidateHash": "a2af06e42ebaffa3b7c5b71ec510db4365eb4613782ad3986374eb373ed5a96f",
+      "candidateHash": "a68aba7d77b716bdafc6e05b798aca2ec4c7664807cc5b8d76ab667fc5b5a09c",
+      "randomDraws": 0,
+      "onlyDifference": [
+        "background-image and background-size on outer sidebar matte and photo panes"
+      ]
+    },
+    {
+      "mode": "heroSidebar",
+      "photoMotion": true,
+      "previousHash": "a2af06e42ebaffa3b7c5b71ec510db4365eb4613782ad3986374eb373ed5a96f",
+      "normalizedCandidateHash": "a2af06e42ebaffa3b7c5b71ec510db4365eb4613782ad3986374eb373ed5a96f",
+      "candidateHash": "a68aba7d77b716bdafc6e05b798aca2ec4c7664807cc5b8d76ab667fc5b5a09c",
+      "randomDraws": 0,
+      "onlyDifference": [
+        "background-image and background-size on outer sidebar matte and photo panes"
+      ]
+    }
+  ],
+  "native": {
+    "ok": true,
+    "error": null,
+    "observations": [
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "sceneToken": "library-1",
+        "root": {
+          "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(28, 27, 25)"
+        },
+        "panes": [
+          {
+            "id": 0,
+            "pw": 800,
+            "ph": 500,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/0.png\")",
+            "rect": {
+              "x": 20,
+              "y": 20,
+              "w": 1880,
+              "h": 1240
+            },
+            "matte": {
+              "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+              "size": "480px 360px",
+              "repeat": "repeat",
+              "color": "rgb(28, 27, 25)"
+            },
+            "fit": {
+              "x": 20,
+              "y": 52.5,
+              "w": 1880,
+              "h": 1175
+            },
+            "letterbox": {
+              "samples": 30537,
+              "brightDoodleSamples": 124,
+              "available": true
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "libraryCount": 1,
+        "narrow": false,
+        "sameSceneAfterResize": false,
+        "svgRequests": 1,
+        "screenshot": "heroSidebar-library-1.png",
+        "pixelCopy": true,
+        "webWindowX": 0,
+        "webWindowY": 0,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "outerRootMargin": {
+          "samples": 30175,
+          "brightDoodleSamples": 57
+        }
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "sceneToken": "library-2",
+        "root": {
+          "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(28, 27, 25)"
+        },
+        "panes": [
+          {
+            "id": 0,
+            "pw": 800,
+            "ph": 500,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/0.png\")",
+            "rect": {
+              "x": 20,
+              "y": 20,
+              "w": 1221.236083984375,
+              "h": 1240
+            },
+            "matte": {
+              "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+              "size": "480px 360px",
+              "repeat": "repeat",
+              "color": "rgb(28, 27, 25)"
+            },
+            "fit": {
+              "x": 20,
+              "y": 258.3637237548828,
+              "w": 1221.236083984375,
+              "h": 763.2725524902344
+            },
+            "letterbox": {
+              "samples": 178263,
+              "brightDoodleSamples": 2332,
+              "available": true
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": 1,
+            "pw": 480,
+            "ph": 800,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/1.png\")",
+            "rect": {
+              "x": 1257.236083984375,
+              "y": 20,
+              "w": 642.763916015625,
+              "h": 1240
+            },
+            "matte": {
+              "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+              "size": "480px 360px",
+              "repeat": "repeat",
+              "color": "rgb(28, 27, 25)"
+            },
+            "fit": {
+              "x": 1257.236083984375,
+              "y": 104.3634033203125,
+              "w": 642.763916015625,
+              "h": 1071.273193359375
+            },
+            "letterbox": {
+              "samples": 31862,
+              "brightDoodleSamples": 421,
+              "available": true
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "libraryCount": 2,
+        "narrow": false,
+        "sameSceneAfterResize": false,
+        "svgRequests": 2,
+        "screenshot": "heroSidebar-library-2.png",
+        "pixelCopy": true,
+        "webWindowX": 0,
+        "webWindowY": 0,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "outerRootMargin": {
+          "samples": 35068,
+          "brightDoodleSamples": 135
+        }
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "sceneToken": "library-3",
+        "root": {
+          "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(28, 27, 25)"
+        },
+        "panes": [
+          {
+            "id": 0,
+            "pw": 800,
+            "ph": 500,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/0.png\")",
+            "rect": {
+              "x": 20,
+              "y": 20,
+              "w": 1221.236083984375,
+              "h": 1240
+            },
+            "matte": {
+              "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+              "size": "480px 360px",
+              "repeat": "repeat",
+              "color": "rgb(28, 27, 25)"
+            },
+            "fit": {
+              "x": 20,
+              "y": 258.3637237548828,
+              "w": 1221.236083984375,
+              "h": 763.2725524902344
+            },
+            "letterbox": {
+              "samples": 178263,
+              "brightDoodleSamples": 2332,
+              "available": true
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": 1,
+            "pw": 480,
+            "ph": 800,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/1.png\")",
+            "rect": {
+              "x": 1257.236083984375,
+              "y": 20,
+              "w": 642.763916015625,
+              "h": 612
+            },
+            "matte": {
+              "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+              "size": "480px 360px",
+              "repeat": "repeat",
+              "color": "rgb(28, 27, 25)"
+            },
+            "fit": {
+              "x": 1395.0180419921876,
+              "y": 20,
+              "w": 367.2,
+              "h": 612
+            },
+            "letterbox": {
+              "samples": 50660,
+              "brightDoodleSamples": 651,
+              "available": true
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": 2,
+            "pw": 600,
+            "ph": 600,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/2.png\")",
+            "rect": {
+              "x": 1257.236083984375,
+              "y": 648,
+              "w": 642.763916015625,
+              "h": 612
+            },
+            "matte": {
+              "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+              "size": "480px 360px",
+              "repeat": "repeat",
+              "color": "rgb(28, 27, 25)"
+            },
+            "fit": {
+              "x": 1272.6180419921875,
+              "y": 648,
+              "w": 612,
+              "h": 612
+            },
+            "letterbox": {
+              "samples": 3740,
+              "brightDoodleSamples": 26,
+              "available": true
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "libraryCount": 3,
+        "narrow": false,
+        "sameSceneAfterResize": false,
+        "svgRequests": 3,
+        "screenshot": "heroSidebar-library-3.png",
+        "pixelCopy": true,
+        "webWindowX": 0,
+        "webWindowY": 0,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "outerRootMargin": {
+          "samples": 37609,
+          "brightDoodleSamples": 181
+        }
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "sceneToken": "library-3",
+        "root": {
+          "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(28, 27, 25)"
+        },
+        "panes": [
+          {
+            "id": 0,
+            "pw": 800,
+            "ph": 500,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/0.png\")",
+            "rect": {
+              "x": 20,
+              "y": 20,
+              "w": 592.2777709960938,
+              "h": 1240
+            },
+            "matte": {
+              "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+              "size": "480px 360px",
+              "repeat": "repeat",
+              "color": "rgb(28, 27, 25)"
+            },
+            "fit": {
+              "x": 20,
+              "y": 454.9131965637207,
+              "w": 592.2777709960938,
+              "h": 370.1736068725586
+            },
+            "letterbox": {
+              "samples": 158907,
+              "brightDoodleSamples": 2175,
+              "available": true
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": 1,
+            "pw": 480,
+            "ph": 800,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/1.png\")",
+            "rect": {
+              "x": 628.2777709960938,
+              "y": 20,
+              "w": 311.72222900390625,
+              "h": 612
+            },
+            "matte": {
+              "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+              "size": "480px 360px",
+              "repeat": "repeat",
+              "color": "rgb(28, 27, 25)"
+            },
+            "fit": {
+              "x": 628.2777709960938,
+              "y": 66.23147583007812,
+              "w": 311.72222900390625,
+              "h": 519.5370483398438
+            },
+            "letterbox": {
+              "samples": 7695,
+              "brightDoodleSamples": 25,
+              "available": true
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": 2,
+            "pw": 600,
+            "ph": 600,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/2.png\")",
+            "rect": {
+              "x": 628.2777709960938,
+              "y": 648,
+              "w": 311.72222900390625,
+              "h": 612
+            },
+            "matte": {
+              "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+              "size": "480px 360px",
+              "repeat": "repeat",
+              "color": "rgb(28, 27, 25)"
+            },
+            "fit": {
+              "x": 628.2777709960938,
+              "y": 798.1388854980469,
+              "w": 311.72222900390625,
+              "h": 311.72222900390625
+            },
+            "letterbox": {
+              "samples": 27873,
+              "brightDoodleSamples": 231,
+              "available": true
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 960,
+        "height": 1280,
+        "libraryCount": 3,
+        "narrow": true,
+        "sameSceneAfterResize": true,
+        "svgRequests": 3,
+        "screenshot": "heroSidebar-library-3-narrow.png",
+        "pixelCopy": true,
+        "webWindowX": 540,
+        "webWindowY": 0,
+        "webPixelWidth": 1080,
+        "webPixelHeight": 1440,
+        "outerRootMargin": {
+          "samples": 27127,
+          "brightDoodleSamples": 106
+        }
+      }
+    ],
+    "svgRequests": 3,
+    "unknownRequests": 0,
+    "deniedRequestDiagnostics": [],
+    "deniedRequestDiagnosticLimit": 16,
+    "webViewDestroyed": true,
+    "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+  },
+  "nativeRetirement": {
+    "packageAbsent": true,
+    "processAbsent": true,
+    "webViewDestroyed": true,
+    "embeddedPerformanceSha256": "68767f69b04936221267b7dc1224a559179e51417022c7d83bb13e3019a728eb"
+  },
+  "nativeSourceSha256": "23155eb06ad4b69dc3a6831b6edaad6176855522c02d5086c7bae15496a2ac0b",
+  "fixtureApkSha256": "35e94087dd78fa6d26a0b8af5dfccf06761f47fb7ff23cae16a5a3a354243064",
+  "gates": {
+    "jvmTests": 4402,
+    "jvmSuites": 460,
+    "slideshow": 363,
+    "applicationJs": 743,
+    "failures": 0,
+    "debugOptimizedR8VitalLint": true,
+    "strictDocsExit": 0
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886223,
+      "sha256": "68767f69b04936221267b7dc1224a559179e51417022c7d83bb13e3019a728eb",
+      "app": {
+        "versionCode": 131,
+        "versionName": "1.137"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 5
+      },
+      "installed": {
+        "bytes": 25886223,
+        "sha256": "68767f69b04936221267b7dc1224a559179e51417022c7d83bb13e3019a728eb",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 131,
+          "versionName": "1.137"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1623,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 2025,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "preview": {
+    "surface": "Isolated desktop Chromium with actual localhost production entry point and owned sample media",
+    "newThreePhotoChoice": {
+      "cells": 3,
+      "whole": true,
+      "outerDoodle": true,
+      "paneDoodles": true
+    },
+    "singlePhotoControlRestored": true,
+    "isolatedContextClosed": true,
+    "existingUserTabsUnchanged": true
+  },
+  "registryHashesPreserved": true,
+  "independentReview": "Scoped CSS and exact normalized trace plus generated native pixel/corner replay accepted.",
+  "visualReview": {
+    "fourGeneratedImagesViewed": true,
+    "all36PhotoCornersPreserved": true,
+    "sameThreePhotoSceneResized": true,
+    "privateFamilyFrameViewed": true,
+    "currentFamilyStyle": {
+      "configuredFrameResumed": true,
+      "householdImageViewedPrivately": true,
+      "clockDateReadable": true,
+      "currentlySelectedStyleNotVerified": "Snapshot shows one large photo with dark margins; saved Shuffle remains. Do not infer HeroSidebar is currently selected from installed support.",
+      "householdCaptureCommitted": false
+    }
+  },
+  "limits": [
+    "Hero + Sidebar only; other Shuffle styles retain their previous scoped implementations.",
+    "Four generated direct static WebView scenes on Family API29; production scheduler/native clock, API28, Living physical visuals and hardware performance remain open.",
+    "No phone, source-media transfer, provider/account, GitHub push or publication."
+  ],
+  "publicManifestUnchanged": "1.83/code77"
+}
