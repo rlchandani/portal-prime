@@ -1,0 +1,15 @@
+{
+  "olderObjects": 179,
+  "newObjects": 180,
+  "allOlderObjectsExact": true,
+  "rawSuffixExact": true,
+  "defaultAndBoundariesExact": true,
+  "allOlderClocksExact": true,
+  "counts": {
+    "delivered": 125,
+    "verified": 45,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  }
+}

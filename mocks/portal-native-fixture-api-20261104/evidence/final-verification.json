@@ -1,0 +1,19 @@
+{
+  "verifiedAt": "2026-11-04T21:41:43.842751+00:00",
+  "originalStart": "2026-11-04T21:29:45+00:00",
+  "target": "2026-11-04T21:44:45+00:00",
+  "hardStop": "2026-11-04T21:59:45+00:00",
+  "minutesToVerification": 11.980712516666667,
+  "targetMet": true,
+  "hardStopMet": true,
+  "reviewFullyRead": true,
+  "reviewSha256": "d75c670081556c05a299b34d29c67c712259f321e517fd602d749f8be59e261d",
+  "all25ReviewBindingsRootRehashed": true,
+  "docsStrictExit": 0,
+  "sourceAndFrozenTestsFinalExact": true,
+  "appVersion": "1.179",
+  "versionCode": 173,
+  "newInstallOrRuntimeAcceptance": false,
+  "wholeGoalActive": true,
+  "preexistingScriptsCacheUnstaged": true
+}

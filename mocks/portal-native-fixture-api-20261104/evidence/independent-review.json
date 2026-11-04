@@ -1,0 +1,250 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "reviewStartedAt": "2026-11-04T21:39:06Z",
+  "reviewedAt": "2026-11-04T21:40:58.422312+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-04T21:29:45Z",
+    "target": "2026-11-04T21:44:45Z",
+    "hardStop": "2026-11-04T21:59:45Z",
+    "firstSourceClockRetained": true,
+    "base": "c76384c7101f21a15fd37d92076ce25bca04d4dc",
+    "scope": "Optional min_api/--min-api in existing offline unsigned native fixture packager; default29 retained; supported integer range24..36; receipt includesselectedAPI",
+    "benefit": "Prepare native fixtures for Android9 API28 without editing the packager or duplicating D8 pipeline",
+    "findingType": "Bounded capability extension, not an observed device defect",
+    "acceptance": [
+      "Public build and CLI select requestedAPI28/24 and retain default29",
+      "Invalid API types/range fail beforetools and output",
+      "All existingfreeze/cleanup/publication guards retained",
+      "ActualofflineAPI28/29 fixtures built withSDKtools; matching manifest/source payload/DEX receipt inspected"
+    ],
+    "heldScopesReopened": false,
+    "appOrDeviceOrProviderOrPublicationChanges": false
+  },
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_native_fixture.py",
+      "bytes": 7284,
+      "sha256": "8709d28d473c47f2ce6b2d7cf47016c6b8e27d6404cb33cf1318044f54beb49a"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_native_fixture_api.py",
+      "bytes": 5433,
+      "sha256": "bdaf81e033f656f521de2619fbea9dea64a1f969ca5c34b8c839f1c41a78b3e3"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_native_fixture.py",
+      "bytes": 14946,
+      "sha256": "80860c3f76c9df8fda46ae2976fbcad7db292919852b1574763568196b902531"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-debug-1.179.apk",
+      "bytes": 46745710,
+      "sha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/scope.json",
+      "bytes": 990,
+      "sha256": "80ca260b1903c681064e21f5fa64b9464984e0682ad36236a24da33e6c625250"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/test-preparation.json",
+      "bytes": 2324,
+      "sha256": "505c915a66a329d22a9047a2b8563073f724c6e865564c11d9cdde478aebd1b8"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/portal_native_fixture.py.before",
+      "bytes": 7048,
+      "sha256": "83ca485d51fc2622ed31942ce68db6b286fae17d66b44d85c80c161eb3d48001"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/test_portal_native_fixture.py.before",
+      "bytes": 14946,
+      "sha256": "80860c3f76c9df8fda46ae2976fbcad7db292919852b1574763568196b902531"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/test_portal_native_fixture_api.frozen.py",
+      "bytes": 5433,
+      "sha256": "bdaf81e033f656f521de2619fbea9dea64a1f969ca5c34b8c839f1c41a78b3e3"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/baseline.json",
+      "bytes": 12436,
+      "sha256": "f80777acceda0bda5cd9b21417a3d5924ffc2fb1c7c8597541193751a4cda531"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/baseline.log",
+      "bytes": 14762,
+      "sha256": "5cc748ff3efb86918456d83149c90f01535420dab540753b40ff103b541c4005"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/frozen.json",
+      "bytes": 226,
+      "sha256": "6ff93585b35449b23fd63440f76b8fa7ccc9ef6bfe74ba81dacb572faf72228d"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/frozen.log",
+      "bytes": 1476,
+      "sha256": "b4dc3896a16619d9fbda324f5f47176a7771526db854a990f43973c2177da300"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/all-python.json",
+      "bytes": 231,
+      "sha256": "bea487b9de3beee76df2f32b383441d3ccf179f291259cdea7e9eda5c20bcb1a"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/all-python.log",
+      "bytes": 49791,
+      "sha256": "2bb23c7f0961276ba05cd483635e4f2b8b4d25826cfe8978da13505c4cf5fb73"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk.json",
+      "bytes": 2534,
+      "sha256": "0e8b24fe819576862688719b0341f99d44507d83a4dbe820d5f008791df1675f"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/AndroidManifest-28.xml",
+      "bytes": 236,
+      "sha256": "7978428ee403de1f95df8ad12b828261085978bf82a9dfa7c6225dc217826c52"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/AndroidManifest-29.xml",
+      "bytes": 236,
+      "sha256": "a33802baa90d3594ce4ec73b3058c35aa61de26a333734e4da5595dacd7d4d8a"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/ApiProbe.java",
+      "bytes": 120,
+      "sha256": "3241faa7294e071220bce869e9de5cf507e7b60c5c19de9a6887ce34fed57d03"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api28.apk",
+      "bytes": 37491919,
+      "sha256": "f944657383ec585c8b3076d96fcbe0bff269ac06727f1230f3a62304d2a4d447"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api28.badging.txt",
+      "bytes": 526,
+      "sha256": "d71e283d41be1eb4325646c53be1f7a3d523459a674335d1e32832a6b55fe78c"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api28.receipt.json",
+      "bytes": 1067,
+      "sha256": "5e2d41578deeaa617b16af07d9445ac29f98dae8415b1759fe86b6f4f613e992"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api29.apk",
+      "bytes": 37491919,
+      "sha256": "65bb6eae603aa438813e4d6f871d510b45656a1360fdf3a242132507684b031b"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api29.badging.txt",
+      "bytes": 526,
+      "sha256": "753f379a1e7d51ad12ff6398bafd25be4c6d2e7f84984de90aa47cc61d535a6d"
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api29.receipt.json",
+      "bytes": 1068,
+      "sha256": "12f88b7484fca42ae68d996cb4d4a443c88f9d536a19bd823acb7e4ebad19efc"
+    }
+  ],
+  "sourceReview": {
+    "exactOptionalMinApiDelta": true,
+    "default29Retained": true,
+    "integerTypeExcludesBoolAndFloat": true,
+    "range24Through36Inclusive": true,
+    "apiValidationBeforePathsStagingAndTools": true,
+    "D8SelectedApiSerializedByExistingRun": true,
+    "CLITypeIntAndReceiptMinApi": true,
+    "existingGuardsAndPipelineOtherBytesUnchanged": true,
+    "existingTestHelpersByteIdentical": true,
+    "publicAPICLIExercisedByFrozenTests": true,
+    "noCopiedSelectionPredicate": true
+  },
+  "regressions": {
+    "baselineMethods": 8,
+    "regressingMethods": 5,
+    "assertionEntries": 8,
+    "controls": 3,
+    "baselineErrors": 0,
+    "baselineSkips": 0,
+    "candidateMethods": 8,
+    "candidatePass": 8,
+    "fullPythonTests": 304,
+    "fullPythonFailures": 0,
+    "liveTestIdenticalToFrozen": true
+  },
+  "sdkArchives": [
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api28.apk",
+      "minApi": 28,
+      "binaryManifest": {
+        "manifest": {
+          "compileSdkVersion": 36,
+          "compileSdkVersionCodename": "16",
+          "package": "com.immortal.fixture.api28",
+          "platformBuildVersionCode": 36,
+          "platformBuildVersionName": 16
+        },
+        "uses-sdk": {
+          "minSdkVersion": 28,
+          "targetSdkVersion": 36
+        },
+        "application": {
+          "label": "Offline API fixture"
+        }
+      },
+      "dexSha256": "bf946b6aaef9af5b45ba2e69fc268d9b15402d13b531f3c0a5e7a80035a6abec",
+      "embeddedSourceSha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28",
+      "zipEntries": 4,
+      "uniqueZipEntries": true,
+      "unsignedArchiveVerified": true,
+      "dexHeaderChecksVerified": true,
+      "deviceRun": false
+    },
+    {
+      "path": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api29.apk",
+      "minApi": 29,
+      "binaryManifest": {
+        "manifest": {
+          "compileSdkVersion": 36,
+          "compileSdkVersionCodename": "16",
+          "package": "com.immortal.fixture.api29",
+          "platformBuildVersionCode": 36,
+          "platformBuildVersionName": 16
+        },
+        "uses-sdk": {
+          "minSdkVersion": 29,
+          "targetSdkVersion": 36
+        },
+        "application": {
+          "label": "Offline API fixture"
+        }
+      },
+      "dexSha256": "7a2240f83f4d61c594784478d10bd1877b5dfe84f0b61e2b31d62ef1d2689333",
+      "embeddedSourceSha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28",
+      "zipEntries": 4,
+      "uniqueZipEntries": true,
+      "unsignedArchiveVerified": true,
+      "dexHeaderChecksVerified": true,
+      "deviceRun": false
+    }
+  ],
+  "findings": [
+    {
+      "severity": "informational",
+      "finding": "No blocker. min_api chooses the D8 API and records it; callers continue to supply a matching manifest. The helper does not rewrite or validate manifest minSdk. Both admitted real SDK fixtures independently have matching API28/API29 manifests."
+    },
+    {
+      "severity": "informational",
+      "finding": "Baseline contains five regressing test methods with eight AssertionError entries because the invalid-API method has four subtests; it is not eight separately failing methods."
+    }
+  ],
+  "limits": [
+    "Offline unsigned packaging/API selection acceptance only; no signing, installation, app version/source change, Android execution/device/API28 runtime/provider/network claim.",
+    "API28 and defaultAPI29 SDK archive/manifest/DEX/source payloads independently parsed and hashed; SDK tools were not reexecuted by reviewer.",
+    "Supported24..36 boundary is source-reviewed; inert tests select24/28/default29 and reject23/37/bool/float. Real SDK evidence covers28/29 only.",
+    "Original publication/capture/timeout/output/sentinel/cleanup guards remain unchanged; no new concurrency/runtime guarantee.",
+    "No edits/tests/build/SDK/device/network/Git operations by reviewer. independent-review.json is the sole written review artifact."
+  ]
+}

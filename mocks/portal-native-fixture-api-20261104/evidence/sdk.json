@@ -1,0 +1,79 @@
+{
+  "fixtures": [
+    {
+      "output": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api28.apk",
+      "sourceApkSha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28",
+      "apkSha256": "f944657383ec585c8b3076d96fcbe0bff269ac06727f1230f3a62304d2a4d447",
+      "bytes": 37491919,
+      "minApi": 28,
+      "checks": [
+        {
+          "name": "javac",
+          "exitCode": 0
+        },
+        {
+          "name": "d8",
+          "exitCode": 0
+        },
+        {
+          "name": "aapt2",
+          "exitCode": 0
+        },
+        {
+          "name": "zipalign",
+          "exitCode": 0
+        }
+      ],
+      "explicitOption": true,
+      "manifestMinApi": 28,
+      "dexMagic": "6465780a30333900",
+      "dexSha256": "bf946b6aaef9af5b45ba2e69fc268d9b15402d13b531f3c0a5e7a80035a6abec",
+      "uniqueZipEntries": true,
+      "unsigned": true,
+      "seconds": 2.4778116670058807,
+      "javaSha256": "3241faa7294e071220bce869e9de5cf507e7b60c5c19de9a6887ce34fed57d03",
+      "manifestSha256": "7978428ee403de1f95df8ad12b828261085978bf82a9dfa7c6225dc217826c52",
+      "badgingSha256": "d71e283d41be1eb4325646c53be1f7a3d523459a674335d1e32832a6b55fe78c",
+      "deviceRun": false
+    },
+    {
+      "output": "/private/tmp/portal-native-fixture-api-20261104-212945/sdk/api29.apk",
+      "sourceApkSha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28",
+      "apkSha256": "65bb6eae603aa438813e4d6f871d510b45656a1360fdf3a242132507684b031b",
+      "bytes": 37491919,
+      "minApi": 29,
+      "checks": [
+        {
+          "name": "javac",
+          "exitCode": 0
+        },
+        {
+          "name": "d8",
+          "exitCode": 0
+        },
+        {
+          "name": "aapt2",
+          "exitCode": 0
+        },
+        {
+          "name": "zipalign",
+          "exitCode": 0
+        }
+      ],
+      "explicitOption": false,
+      "manifestMinApi": 29,
+      "dexMagic": "6465780a30333900",
+      "dexSha256": "7a2240f83f4d61c594784478d10bd1877b5dfe84f0b61e2b31d62ef1d2689333",
+      "uniqueZipEntries": true,
+      "unsigned": true,
+      "seconds": 2.2303719999981695,
+      "javaSha256": "3241faa7294e071220bce869e9de5cf507e7b60c5c19de9a6887ce34fed57d03",
+      "manifestSha256": "a33802baa90d3594ce4ec73b3058c35aa61de26a333734e4da5595dacd7d4d8a",
+      "badgingSha256": "753f379a1e7d51ad12ff6398bafd25be4c6d2e7f84984de90aa47cc61d535a6d",
+      "deviceRun": false
+    }
+  ],
+  "stagingRetired": true,
+  "sourceApkUnchanged": true,
+  "noInstallOrSigning": true
+}

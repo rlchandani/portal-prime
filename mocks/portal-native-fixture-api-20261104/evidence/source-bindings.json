@@ -1,0 +1,16 @@
+{
+  "base": "c76384c7101f21a15fd37d92076ce25bca04d4dc",
+  "sha256": {
+    "scripts/portal_native_fixture.py": "8709d28d473c47f2ce6b2d7cf47016c6b8e27d6404cb33cf1318044f54beb49a",
+    "scripts/test_portal_native_fixture_api.py": "bdaf81e033f656f521de2619fbea9dea64a1f969ca5c34b8c839f1c41a78b3e3",
+    "scripts/test_portal_native_fixture.py": "80860c3f76c9df8fda46ae2976fbcad7db292919852b1574763568196b902531",
+    ".github/workflows/tests.yml": "624c9988f3f38dd92019136b9540e9e50d044f15ba159364f18ab5d98ae2092f"
+  },
+  "oldSourceSha256": "83ca485d51fc2622ed31942ce68db6b286fae17d66b44d85c80c161eb3d48001",
+  "existingTestsUnchanged": true,
+  "frozenTestsUnchanged": true,
+  "existingCiDiscoveryIncludesNewTests": true,
+  "appChanges": false,
+  "deviceOperations": false,
+  "publication": false
+}

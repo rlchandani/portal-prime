@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T21:28:18.509723+00:00",
-  "updatedLabel": "Photo caption place-name fix delivered; exact1.179 both rooms",
+  "updatedAt": "2026-11-04T21:40:16.212124+00:00",
+  "updatedLabel": "Native fixture API option locally delivered; rooms retain1.179",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,42 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "native-fixture-min-api",
+      "title": "Native checks: select Android 9 compatibility",
+      "summary": "The existing unsigned local fixture packager accepts an explicit D8 minimum API while retaining its API29 default.",
+      "status": "delivered",
+      "kind": "Bounded local tooling capability",
+      "platforms": [
+        "portal",
+        "local-ci"
+      ],
+      "owner": "Root implementation/checks; independent review",
+      "verification": "Eight frozen public API/CLI methods: five regressing methods/eight assertion entries and three controls before; all eight pass after. Full304 Python tests pass in36.04s. Real SDK pipelines package explicitAPI28 and defaultAPI29 fixtures with matching manifest, DEX, unique archives and exact embedded source.",
+      "deployment": "Local tooling only; both rooms retain1.179/code173. No new APK install.",
+      "acceptance": [
+        "Public build_fixture min_api and CLI --min-api select D8 compatibility.",
+        "Default29 retained; integer24..36 validated before external commands/output.",
+        "Receipt includes minApi; existing capture/deadline/cleanup/atomic publication guards retained."
+      ],
+      "evidence": [
+        {
+          "text": "Local API contract, SDK checks and runtime limits",
+          "source": "docs/portal-native-fixture-api-2026-11-04.md"
+        }
+      ],
+      "limits": [
+        "Caller owns manifest; setting D8 does not rewrite its minimum SDK.",
+        "Generated command fixtures and real local unsigned APK packaging; no API28 runtime/device acceptance."
+      ],
+      "next": "Use the existing packager for future Android9 checks; continue small product priorities.",
+      "issueClock": {
+        "startedAt": "2026-11-04T21:29:45Z",
+        "target": "2026-11-04T21:44:45Z",
+        "deadline": "2026-11-04T21:59:45Z",
+        "firstDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "photo-caption-place-null",
       "title": "Photo captions: keep absent place names out of the label",

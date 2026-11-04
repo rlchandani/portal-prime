@@ -21,7 +21,9 @@ def digest(path):
 
 
 def build_fixture(*, sources, manifest, assets, source_apk, android_jar,
-                  build_tools, javac, output, seconds=120):
+                  build_tools, javac, output, seconds=120, min_api=29):
+    if type(min_api) is not int or not 24 <= min_api <= 36:
+        raise ValueError("The minimum API must be an integer from 24 through 36.")
     if Path(output).is_symlink():
         raise ValueError("The output must not be an existing symbolic link.")
     sources = [Path(p).resolve() for p in sources]
@@ -83,7 +85,7 @@ def build_fixture(*, sources, manifest, assets, source_apk, android_jar,
             compiled = sorted(classes.rglob("*.class"))
             if not compiled:
                 raise RuntimeError("javac produced no fixture classes.")
-            run("d8", [build_tools / "d8", "--lib", android_jar, "--min-api", "29",
+            run("d8", [build_tools / "d8", "--lib", android_jar, "--min-api", min_api,
                        "--output", dex, *compiled], stage)
             dex_file = dex / "classes.dex"
             if not dex_file.is_file():
@@ -111,7 +113,7 @@ def build_fixture(*, sources, manifest, assets, source_apk, android_jar,
                 raise RuntimeError("The fixture build deadline expired.")
             receipt = {"output": str(output), "sourceApkSha256": source_hash,
                        "apkSha256": digest(aligned), "bytes": aligned.stat().st_size,
-                       "checks": checks}
+                       "minApi": min_api, "checks": checks}
             # A hard link publishes complete bytes atomically and refuses a competing output.
             os.link(aligned, output)
             return receipt
@@ -126,6 +128,7 @@ def main():
                  "build-tools", "javac", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--seconds", type=float, default=120)
+    parser.add_argument("--min-api", type=int, default=29)
     args = vars(parser.parse_args())
     try:
         print(json.dumps(build_fixture(**args), indent=2))

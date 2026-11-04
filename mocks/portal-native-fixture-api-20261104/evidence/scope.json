@@ -1,0 +1,18 @@
+{
+  "startedAt": "2026-11-04T21:29:45Z",
+  "target": "2026-11-04T21:44:45Z",
+  "hardStop": "2026-11-04T21:59:45Z",
+  "firstSourceClockRetained": true,
+  "base": "c76384c7101f21a15fd37d92076ce25bca04d4dc",
+  "scope": "Optional min_api/--min-api in existing offline unsigned native fixture packager; default29 retained; supported integer range24..36; receipt includesselectedAPI",
+  "benefit": "Prepare native fixtures for Android9 API28 without editing the packager or duplicating D8 pipeline",
+  "findingType": "Bounded capability extension, not an observed device defect",
+  "acceptance": [
+    "Public build and CLI select requestedAPI28/24 and retain default29",
+    "Invalid API types/range fail beforetools and output",
+    "All existingfreeze/cleanup/publication guards retained",
+    "ActualofflineAPI28/29 fixtures built withSDKtools; matching manifest/source payload/DEX receipt inspected"
+  ],
+  "heldScopesReopened": false,
+  "appOrDeviceOrProviderOrPublicationChanges": false
+}

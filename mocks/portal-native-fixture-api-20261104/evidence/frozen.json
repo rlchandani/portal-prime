@@ -1,0 +1,10 @@
+{
+  "label": "frozen",
+  "testsRun": 8,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "successful": true,
+  "seconds": 0.06181358300091233,
+  "logSha256": "b4dc3896a16619d9fbda324f5f47176a7771526db854a990f43973c2177da300"
+}
