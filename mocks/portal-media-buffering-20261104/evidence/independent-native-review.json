@@ -1,0 +1,189 @@
+{
+  "ok": true,
+  "reviewedAt": "2026-11-04T11:02:10.476691+00:00",
+  "blockers": [],
+  "clock": {
+    "startedAt": "2026-11-04T10:40:15Z",
+    "firstWitness": "2026-11-04T10:41:30Z",
+    "selectedAt": "2026-11-04T10:56:18.929293+00:00",
+    "target": "2026-11-04T10:55:15Z",
+    "deadline": "2026-11-04T11:10:15Z",
+    "sourceBase": "fa7daf0e06eb90874a4816ffb11a1d1506123695",
+    "scope": "Retain previously playing native media session while buffering and pause it on existing card tap; preserve selection priority and never-played-session exclusion",
+    "priorClocksRetained": true,
+    "boundaries": [
+      "Root device operations only",
+      "No phone/provider/media/account/push/publication"
+    ]
+  },
+  "originalSourceReviewUntouched": true,
+  "nativeReview": {
+    "frozenJavaAndDEXBytesMatchPreparation": true,
+    "sameDEXInBothActualWrapperZIPs": true,
+    "exactEmbeddedSourceAPKsMatchRuntimeReportsAndArtifacts": true,
+    "actualSignatures": "Unique selectSession(List,String,MediaSession.Token), snapshotFrom(SelectedSession), public playPause; actual isolated APK classloader checked before invocation.",
+    "baseline": {
+      "tests": 10,
+      "assertionFailures": 4,
+      "controls": 6,
+      "failureNames": [
+        "previousPlayingBufferRetainedWithSnapshot",
+        "previousBufferSurvivesUnrelatedPausedSession",
+        "capturedBufferSnapshotRetainsSelectedState",
+        "bufferingPlayPauseDispatchesPause"
+      ]
+    },
+    "candidate": {
+      "tests": 10,
+      "failures": 0
+    },
+    "controlsExactAcrossReports": true,
+    "perCaseDormantReaderAndPreferenceZero": true,
+    "ownedSessionsPerRun": 13,
+    "allSessionsReleasedPerRun": 13,
+    "callbackThreadRetired": true,
+    "activeControllerRestored": true,
+    "historyTokenUnchanged": true,
+    "bothRetirementsAllThreeAbsenceFieldsTrue": true
+  },
+  "assertionReview": [
+    "Prior token is obtained by first invoking actual selection on an owned rawPLAYING session, then using that same token with rawBUFFERING. Never-played and mismatching tokens are rejected; genuinely PLAYING wins. Previous PAUSED and STOPPED controls are retained.",
+    "Snapshot gates assert literal title Generated track, artist Fixture only, mediaID generated-track-id, duration120000, position1234, sessiontoken and canSeek; captured selection remains PLAYING after actual controller changes to PAUSED9876.",
+    "Actual public playPause is temporarily bound to fixture-owned real MediaController. BUFFERING requires owned onPause once and no onPlay; PAUSED requires owned onPlay once and no onPause. Each callback waits at most3s, then another bounded3s barrier drains owned callback queue; active is restored in finally.",
+    "Generated MediaSession construction counts1+2+1+2+2+1+1+1+1+1=13 per complete run. Sessions receive only generated metadata/state/callbacks, never setActive/audio-player setup; zero notification-listener initialization or preference requests.",
+    "Same frozen Java/DEX/case assertions execute before/after; candidate repack changes embedded source APK only. No success-gate relaxation or fixture source change."
+  ],
+  "jvmIndependentXMLRead": {
+    "tests": 4454,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 465,
+    "frozenFocusedTests": 10
+  },
+  "artifacts": {
+    "debugSha256": "c76ae0a992a9c93e135a4e1b838f474533d88615bd53e788ed3f6225b98744ba",
+    "performanceSha256": "4d9498fbae1b0cc2d3b9fcd7196ac89740998a5eb4f17880387a82ae2c6a3a9f",
+    "versionName": "1.150",
+    "versionCode": 144,
+    "signerSha256Recorded": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "limits": [
+    "Read-only host/source/report expectation checks and artifact/ZIP byte hashing; root performed both native executions and recorded device retirement. No independent device actions.",
+    "Native acceptance is actual isolated debugAPK/API29 helper selection/captured snapshot and transport into silent fixture-owned real MediaSession callbacks; no mounted Home/FaceRenderer, notification-listener/session-manager integration, audible playback, owner preferences/media, providers/accounts/network, optimized/API28 runtime proof.",
+    "Native fixture sessions all belong to one fixture package. Real external-vs-relay package precedence is covered by existing/frozen JVM cases and exact source normalization, not cross-package native sessions.",
+    "Native JSON emits per-case assertion success/failure and guard fields, not every snapshot getter or callback count. Literal predicate interpretation is independently checked in frozen Java and bound to paired reports; no independent re-execution claim.",
+    "Bounded transport waits/barrier and cleanup are functional evidence, not latency, audio continuity, progress-clock or performance acceptance.",
+    "Room promotion/household preservation is coordinator-owned and not independently inspected. Prior music/browser/provider/audio/performance holds and all original clocks retained."
+  ],
+  "bindings": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/MediaSessionReader.kt": {
+      "sha256": "8a2171618a963b76d9e6ab98ffc267fddf930bfb65dc0b71cf0da708bf4380b9",
+      "bytes": 14891
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/MediaSessionBufferingTest.kt": {
+      "sha256": "332d192f9991a15556dcf4edbcf143a244a2f31e002640cb198f7043cf4ec011",
+      "bytes": 6082
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/independent-source-review.json": {
+      "sha256": "c24b9f4a36d26e1258885e2793058405e55b540162b89fb507af7598c0958d6f",
+      "bytes": 11990
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/plan.json": {
+      "sha256": "00d1c2196cea4af14e457ad60847a76109ab10cf65327c97e039ebaf37485874",
+      "bytes": 589
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/MediaSessionReader.kt": {
+      "sha256": "814a07601af15e8b16be253252cf052effe58558b0c33d4e4f37e06d31573aa7",
+      "bytes": 14724
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/MediaSessionBufferingTest.kt": {
+      "sha256": "332d192f9991a15556dcf4edbcf143a244a2f31e002640cb198f7043cf4ec011",
+      "bytes": 6082
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/baseline-verification.json": {
+      "sha256": "91482af8c39398791809132e46e7c7bdc2b45a1126aff9f67bddd97494d3fde4",
+      "bytes": 1340
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/baseline-tests.xml": {
+      "sha256": "c2714fef73c8293017ad76b520a4cc9de135e77915757e9b8a7edb06a8dd1d5c",
+      "bytes": 19941
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native/MediaBufferActivity.java": {
+      "sha256": "166356d7fd550a2a7027f2d5cc37969211fac82fc81d863504d6167b17c1620d",
+      "bytes": 14193
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native/AndroidManifest.xml": {
+      "sha256": "1c44e9b49418de84b33597b116bcdd5d5bc1b4d8de316fc06f61aae833b73d56",
+      "bytes": 436
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native/build.sh": {
+      "sha256": "9f93c856f3479c9ef87957178088405e8c413db7942e73b87a8ad9c31239fbbf",
+      "bytes": 781
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native/repack.sh": {
+      "sha256": "e600bd2ef5c3ccff3f42b81013e6140932b6fc609879a1a13a638f2dc8c7e5af",
+      "bytes": 778
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native/RUN.md": {
+      "sha256": "390583bb22beb52c147feb1ebd287336473c69b68d22e98c8331831f3bc1141c",
+      "bytes": 1306
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native/frozen-dex/classes.dex": {
+      "sha256": "30c28c62dbe6731e049be66a765ad467657d6774caaa70198bcab1be65efb4e6",
+      "bytes": 22716
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native/preparation-verification.json": {
+      "sha256": "0c69226cffb4855745587574198e4d5d8875f95b799fde66d6cba5570d703db2",
+      "bytes": 3977
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native-candidate-preparation.json": {
+      "sha256": "af943adf8615488e6389e8eeeb1f9c4e04b73c134584ef1d1d3fc0f064bc2f8c",
+      "bytes": 303
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native/baseline-fixture.apk": {
+      "sha256": "bb45a71767a1dd71cbf38f21e4799ef4c1a7adb681f62d89e1a681a22914a0be",
+      "bytes": 37503466
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native/media-buffer-fixture.apk": {
+      "sha256": "1c99a2105259923985528fbae3026b84334e6e5b2c3a6f9c400191c24d14a796",
+      "bytes": 37503466
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/baseline-debug-1.149.apk": {
+      "sha256": "616785092aefa22b5fb2ae0784baae0da7da567c83324d26cb3b49ce04bfc228",
+      "bytes": 46745298
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/candidate-debug-1.150.apk": {
+      "sha256": "c76ae0a992a9c93e135a4e1b838f474533d88615bd53e788ed3f6225b98744ba",
+      "bytes": 46745298
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/candidate-performance-1.150.apk": {
+      "sha256": "4d9498fbae1b0cc2d3b9fcd7196ac89740998a5eb4f17880387a82ae2c6a3a9f",
+      "bytes": 25886647
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native-before-report.json": {
+      "sha256": "4b3c304e035501611fba39d3e2540562494c333ca066f2c545218fbf59729a06",
+      "bytes": 3016
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native-after-report.json": {
+      "sha256": "00a2ff3cf2ddf59a15931394655fe887860e31d46c4f851c59d477bcc4e435ab",
+      "bytes": 2742
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/promotion-artifacts.json": {
+      "sha256": "bed46615fb4f2a1bbdf38e9d9521831ddb0e796c7273e72986414a3f4fd63f6a",
+      "bytes": 4793
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.MediaSessionBufferingTest.xml": {
+      "sha256": "f723d2ca90e573b24ffbb6e539847a3f5f2467a7665ad931697e9f9e485b6736",
+      "bytes": 2262
+    }
+  }
+}

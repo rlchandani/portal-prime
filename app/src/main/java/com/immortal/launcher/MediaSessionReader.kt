@@ -44,7 +44,7 @@ object MediaSessionReader {
   // Mutated only on the handler thread; read from the UI thread for transport.
   @Volatile private var active: MediaController? = null
 
-  // The session we last saw actually PLAYING. We keep showing it once it's paused (so
+  // The session we last saw actually PLAYING. We keep showing it while paused or buffering (so
   // "you paused your music, the card stays" works), but we do NOT resurrect a stale
   // paused session we never saw playing — e.g. an old Spotify pause surfacing when the
   // multi-room group stops. Cleared implicitly: a paused session not matching this is
@@ -101,7 +101,8 @@ object MediaSessionReader {
 
   fun playPause() {
     val c = active ?: return
-    if (c.playbackState?.state == MediaPlaybackState.STATE_PLAYING) c.transportControls.pause()
+    val state = c.playbackState?.state
+    if (state == MediaPlaybackState.STATE_PLAYING || state == MediaPlaybackState.STATE_BUFFERING) c.transportControls.pause()
     else c.transportControls.play()
   }
 
@@ -205,7 +206,7 @@ object MediaSessionReader {
   }
 
   /**
-   * Pick the active session (playing, else paused) and publish it. When several sessions
+   * Pick the active session (playing, else previously playing paused/buffering) and publish it. When several sessions
    * are in the same state, prefer one that ISN'T our own [MultiRoomService] relay: on the
    * Portal driving playback, the Music Assistant app and our relay both publish the same
    * track, but the MA app's session has working transport — our relay is the fallback
@@ -216,13 +217,13 @@ object MediaSessionReader {
       val playbackState: MediaPlaybackState?,
   )
 
-  /** Select the real player before our relay; only resume a previously playing paused session. */
+  /** Select the real player before our relay; retain a previously playing paused or buffering session. */
   internal fun selectSession(
       controllers: List<MediaController>, ownPackage: String, previousToken: MediaSession.Token?,
   ): SelectedSession? {
     var firstPlaying: SelectedSession? = null
     var firstExternalPlaying: SelectedSession? = null
-    var previousPaused: SelectedSession? = null
+    var previousRetained: SelectedSession? = null
     for (controller in controllers) {
       // MediaController reads can cross Binder. Keep one fresh value for this refresh.
       val playback = controller.playbackState
@@ -233,13 +234,14 @@ object MediaSessionReader {
             firstExternalPlaying = if (firstPlaying.controller === controller) firstPlaying
                 else SelectedSession(controller, playback)
         }
-        MediaPlaybackState.STATE_PAUSED -> {
-          if (previousPaused == null && previousToken != null && controller.sessionToken == previousToken)
-            previousPaused = SelectedSession(controller, playback)
+        MediaPlaybackState.STATE_PAUSED,
+        MediaPlaybackState.STATE_BUFFERING -> {
+          if (previousRetained == null && previousToken != null && controller.sessionToken == previousToken)
+            previousRetained = SelectedSession(controller, playback)
         }
       }
     }
-    return firstExternalPlaying ?: firstPlaying ?: previousPaused
+    return firstExternalPlaying ?: firstPlaying ?: previousRetained
   }
 
   private fun reselect(controllers: List<MediaController>) {

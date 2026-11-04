@@ -1,0 +1,92 @@
+{
+  "startedAtUtc": "2026-11-04T11:00:32.773108+00:00",
+  "finishedAtUtc": "2026-11-04T11:00:33.692564+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-04T10:40:15Z",
+    "firstWitness": "2026-11-04T10:41:30Z",
+    "selectedAt": "2026-11-04T10:56:18.929293+00:00",
+    "target": "2026-11-04T10:55:15Z",
+    "deadline": "2026-11-04T11:10:15Z"
+  },
+  "completedBeforeRetainedDeadline": true,
+  "gradleLogSha256": "1ed32186c3671df92308b6adc8a0bc43fcdb9339625f9a596a3cf99f29021052",
+  "gradleTerminal": "BUILD SUCCESSFUL in 2m 4s",
+  "gradleExitEvidence": "Root confirmed exec32134 terminal0; completed build-terminal.json byte-bound",
+  "buildTerminalReceiptSha256": "5bc232b82de377a5655a39a2af9d7ae0fc868de5b9df957e18905cb914606c88",
+  "requiredBuildTasksPresent": true,
+  "r8TaskPresent": true,
+  "checks": [
+    {
+      "variant": "debug",
+      "aaptExit": 0,
+      "apksignerExit": 0,
+      "assetCount": 10,
+      "matchesSourceAndRollback": true,
+      "duplicateZipEntries": false,
+      "builtSnapshotExact": true,
+      "apkMode": "0400",
+      "apkMtimeUtc": "2026-11-04T10:58:58.041221+00:00"
+    },
+    {
+      "variant": "performance",
+      "aaptExit": 0,
+      "apksignerExit": 0,
+      "assetCount": 10,
+      "matchesSourceAndRollback": true,
+      "duplicateZipEntries": false,
+      "builtSnapshotExact": true,
+      "apkMode": "0400",
+      "apkMtimeUtc": "2026-11-04T10:59:57.490075+00:00"
+    }
+  ],
+  "baselineDebugSha256": "616785092aefa22b5fb2ae0784baae0da7da567c83324d26cb3b49ce04bfc228",
+  "rollbackSha256": "082d56ebd559fa97ee44235fca84a2252a965ec541a559ec1ef1df9ccd437e83",
+  "sourceScope": {
+    "baselineReaderSha256": "814a07601af15e8b16be253252cf052effe58558b0c33d4e4f37e06d31573aa7",
+    "candidateReaderSha256": "8a2171618a963b76d9e6ab98ffc267fddf930bfb65dc0b71cf0da708bf4380b9",
+    "readerExactApprovedChanges": true,
+    "selectionPriorityAndSingleReadPreserved": true,
+    "lastPlayingTokenRulePreserved": true,
+    "protectedSha256": {
+      "CountdownConfig.kt": "7de6805d2c5d79b0dc034ec612a63725e119977f769de598ca89c094b4259afa",
+      "CountdownDates.kt": "ff6d3d80175531496c45a21d4e30bfa8dae4c15506218ac494c45cc2fcf00289",
+      "NativePhotoMatte.kt": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "NativePhotoView.kt": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "SlideshowStage.kt": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "CountdownSettingsActivity.kt": "19c4be5323f9c9072f96f78701945b93c5a79350fe2d6c36140cefa8213c23d2",
+      "ApprovedToolsEverydayValidation.kt": "95180ca2a063e5a9170d230ee64104b1787a6b53efc33da16753975fc11b4167"
+    },
+    "protectedHashesExact": true
+  },
+  "frozenHostTest": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/MediaSessionBufferingTest.kt",
+    "sha256": "332d192f9991a15556dcf4edbcf143a244a2f31e002640cb198f7043cf4ec011",
+    "matchesFrozenCopy": true,
+    "methods": 10,
+    "result": {
+      "file": "TEST-com.immortal.launcher.MediaSessionBufferingTest.xml",
+      "sha256": "f723d2ca90e573b24ffbb6e539847a3f5f2467a7665ad931697e9f9e485b6736",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "debugChangedDex": {
+    "classes6.dex": {
+      "candidateSha256": "265f94864eb3caa0caf34f8e65eb26923e883e27f109341c26c2c62ef25e4d11",
+      "baselineSha256": "4f964ddbe26f111cf9652ebd02711c6ae188893808b3426887d2d110cd7e25b6"
+    }
+  },
+  "freshXml": {
+    "tests": 4454,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 465,
+    "minimumTimestampUtc": "2026-11-04T10:58:21.617000+00:00",
+    "maximumTimestampUtc": "2026-11-04T10:58:56.905000+00:00",
+    "sortedReportInventorySha256": "337341cca49c3e53fa33ca04d30539c672c0d068b71cfe7ab8252eec9916f75d"
+  },
+  "limits": "Host artifact/source verification only; native media-session/transport acceptance and room promotion owned by root. Original target elapsed before selection; deadline retained without reset. No Git, build, device or network invoked by reviewer."
+}

@@ -1,0 +1,6 @@
+{
+  "fixtureSha256": "1c99a2105259923985528fbae3026b84334e6e5b2c3a6f9c400191c24d14a796",
+  "frozenDexSha256": "30c28c62dbe6731e049be66a765ad467657d6774caaa70198bcab1be65efb4e6",
+  "embeddedDebugApkSha256": "c76ae0a992a9c93e135a4e1b838f474533d88615bd53e788ed3f6225b98744ba",
+  "singleRootRepack": true
+}

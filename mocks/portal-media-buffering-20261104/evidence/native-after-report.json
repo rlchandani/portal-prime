@@ -1,0 +1,94 @@
+{
+  "ok": true,
+  "error": null,
+  "tests": 10,
+  "failures": 0,
+  "cases": [
+    {
+      "name": "previousPlayingBufferRetainedWithSnapshot",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "previousBufferSurvivesUnrelatedPausedSession",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "neverPlayedBufferIgnored",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "differentPreviousTokenCannotAdmitBuffer",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "actualPlayingWinsOverPreviousBuffer",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "previousPausedStillRetained",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "previousStoppedRemainsIgnored",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "capturedBufferSnapshotRetainsSelectedState",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "bufferingPlayPauseDispatchesPause",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "pausedPlayPauseDispatchesPlay",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    }
+  ],
+  "sourceSha256": "c76ae0a992a9c93e135a4e1b838f474533d88615bd53e788ed3f6225b98744ba",
+  "sourceBytes": 46745298,
+  "sdk": 29,
+  "actualEmbeddedApkClassLoader": true,
+  "actualSelectSessionCapturedSnapshotAndPlayPause": true,
+  "selectMethod": "selectSession$app",
+  "snapshotMethod": "snapshotFrom$app",
+  "fixturePackage": "com.immortal.mediabufferfixture",
+  "internetPermission": false,
+  "unexpectedPreferenceRequests": 0,
+  "ownedSessionsCreated": 13,
+  "ownedSessionsReleased": 13,
+  "callbackThreadRetired": true,
+  "activeControllerRestored": true,
+  "historyTokenUnchanged": true,
+  "scope": "Actual debug APK helper selection/captured snapshot/transport through fixture-owned real MediaSession/MediaController; generated metadata, no audio playback, notification listener, owner preferences, provider, network, UI, optimized/API28 or cross-package relay-priority acceptance"
+}

@@ -1,0 +1,200 @@
+{
+  "ok": true,
+  "reviewedAt": "2026-11-04T10:58:36.638845+00:00",
+  "verdict": "accepted bounded source correction; candidate execution pending",
+  "blockers": [],
+  "clock": {
+    "startedAt": "2026-11-04T10:40:15Z",
+    "firstWitness": "2026-11-04T10:41:30Z",
+    "selectedAt": "2026-11-04T10:56:18.929293+00:00",
+    "target": "2026-11-04T10:55:15Z",
+    "deadline": "2026-11-04T11:10:15Z",
+    "sourceBase": "fa7daf0e06eb90874a4816ffb11a1d1506123695",
+    "scope": "Retain previously playing native media session while buffering and pause it on existing card tap; preserve selection priority and never-played-session exclusion",
+    "priorClocksRetained": true,
+    "boundaries": [
+      "Root device operations only",
+      "No phone/provider/media/account/push/publication"
+    ]
+  },
+  "normalization": {
+    "exactReaderRestoredByOnlyPlayPauseConditionBufferingCaseRetentionNameAndThreeComments": true,
+    "buildExactByReversingOnly144_1_150To143_1_149": true,
+    "frozenTenTestsByteExact": true
+  },
+  "behavior": [
+    "Selection priority remains first external rawPLAYING, then first rawPLAYING including relay, then previous-token PAUSED orBUFFERING. Same ordering and original controller playback read once per refresh.",
+    "Only a nonnull previous token identical to the current controller token can retain buffering. Production reselect still updates lastPlayingToken solely for genuine rawPLAYING; initial or unrelated BUFFERING cannot establish that token.",
+    "Existing BUFFERING\u2192PlaybackState.PLAYING snapshot mapping, fresh metadata/art/action/position decoding and immutable selected playback snapshot are byte-identical. Titled retained buffering state remains active in NowPlayingHub.",
+    "Public card toggle reads fresh rawstate once and now pauses BUFFERING as well as PLAYING; all other rawstates retain old play dispatch. executeMusicCommand source/action/track/token validation is byte-identical.",
+    "No new listener, context read, media session, artwork request, timer, worker, cache, geometry, pause lifecycle or handler ownership. Requery/register/remove/disconnect/lifetime policies remain exact."
+  ],
+  "activeCallers": [
+    {
+      "file": "ImmortalApp.kt",
+      "line": 52,
+      "call": "MediaSessionReader.init(this)"
+    },
+    {
+      "file": "MediaNotificationListenerService.kt",
+      "line": 44,
+      "call": "onListenerConnected (disconnect at98)"
+    },
+    {
+      "file": "MediaSessionReader.kt",
+      "line": 60,
+      "call": "generic playback/metadata callback\u2192refresh\u2192onSessions\u2192reselect\u2192NowPlayingHub.publish"
+    },
+    {
+      "file": "HomeActivity.kt",
+      "line": 1286,
+      "call": "ApprovedHomeHeaderPlayer2092\u2192current-state listener2097\u2192active MiniPlayer2101; art tap2133\u2192NowPlayingHub.playPause"
+    },
+    {
+      "file": "PhotoFrameController.kt",
+      "line": 475,
+      "call": "Active non-photos-only frame starts FaceRenderer; FaceRenderer258\u2013266 reads current hub; updateNowPlaying607\u2013617 hides null/inactive, shows title/artist for active state."
+    }
+  ],
+  "scopeQualification": [
+    "Home callback freshness receipt positively states metadata selection and playback transport were unchanged by its prior scope; current upstream raw-state selection/toggle defect is distinct from queued-current-state rendering.",
+    "Prior MA exact-player identity and Snapcast socket exchange ownership concern different source/protocol boundaries. No provider credentials, account/browser authorization, audio/native UI continuity, performance, parked receiver/playback or artwork-cache contract is reopened.",
+    "Original10:40:15 discovery and10:41:30 witness retained; original10:55:15 target already passed, hard11:10:15 remains unchanged. No new acceptance clock."
+  ],
+  "frozenRegression": {
+    "actualProductionMethods": "selectSession/snapshotFrom and public playPause, not copied policy",
+    "tests": 10,
+    "baseline": {
+      "failures": 4,
+      "controls": 6,
+      "errors": 0,
+      "skipped": 0,
+      "details": [
+        {
+          "case": "previouslyPlayingRelayRetainsBufferingFallback",
+          "type": "java.lang.AssertionError",
+          "message": "java.lang.AssertionError: expected same:<Mock for MediaController, hashCode: 1132379993> was not:<null>"
+        },
+        {
+          "case": "bufferingRefreshUsesOnePlaybackReadAndFreshMetadata",
+          "type": "java.lang.AssertionError",
+          "message": "java.lang.AssertionError"
+        },
+        {
+          "case": "previouslyPlayingPlayerRetainsTrackThroughBufferingAndPauseThenStops",
+          "type": "java.lang.AssertionError",
+          "message": "java.lang.AssertionError"
+        },
+        {
+          "case": "bufferingCardTapPausesInsteadOfRestarting",
+          "type": "org.mockito.exceptions.verification.WantedButNotInvoked",
+          "message": "org.mockito.exceptions.verification.WantedButNotInvoked: \nWanted but not invoked:\ntransportControls.pause();\n-> at android.media.session.MediaController$TransportControls.pause(MediaController.java)\n\nHowever, there was exactly 1 interaction with this mock:\ntransportControls.play();\n-> at com.immortal.launcher.MediaSessionReader.playPause(MediaSessionReader.kt:105)\n\n"
+        }
+      ]
+    },
+    "coverage": [
+      "Previously actually playing external and relay token retained during buffering; titled active snapshot; PAUSED retained and STOPPED excluded.",
+      "Unseen/unrelated buffering cannot borrow prior token; external rawPLAYING wins over relay+buffering; rawPLAYING relay wins over prior buffering.",
+      "One controller playback read including selected snapshot, current metadata fresh after selection; snapshot captured rawbuffering persists even if controller later stops.",
+      "BUFFERING tap pause not play; genuinePLAYING pause andPAUSED play controls; reflected private active field restored in finally."
+    ]
+  },
+  "limits": [
+    "Source normalization and actual baseline host XML reviewed independently; candidate full build, GREEN XML, native fixture/runtime/artifacts are coordinator-owned and pending at this source receipt.",
+    "Generated/mock controller selection and control calls do not prove actual MediaSessionManager subscription, physical Home/screensaver rendering, audible playback, provider/account behavior or optimized/API28 native execution.",
+    "Existing PLAYING representation and downstream progress/action policies remain unchanged; no buffering-specific progress-clock or transport action-mask redesign is claimed.",
+    "Existing lastPlayingToken lifetime including stop/disconnect behavior is preserved; this scope does not redesign prior-session retirement.",
+    "Only captured Reader/build files are exact-normalized; other caller/protected source hashes bind reviewed bytes without independent whole-repository non-target diff.",
+    "No production/test edits, builds/Gradle, device/browser/network/provider/phone/account/Git actions."
+  ],
+  "bindings": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/MediaSessionReader.kt": {
+      "sha256": "8a2171618a963b76d9e6ab98ffc267fddf930bfb65dc0b71cf0da708bf4380b9",
+      "bytes": 14891
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/MediaSessionReader.kt": {
+      "sha256": "814a07601af15e8b16be253252cf052effe58558b0c33d4e4f37e06d31573aa7",
+      "bytes": 14724
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "daccace06a86349b642848035f53014e3ab3ce0187e147ead2f10ef0812e284e",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/build.gradle.kts": {
+      "sha256": "8b2f6c53e36aaa2dad357711ee55d8bb5f5775ba987ff35549d8b969fb65348f",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/MediaSessionBufferingTest.kt": {
+      "sha256": "332d192f9991a15556dcf4edbcf143a244a2f31e002640cb198f7043cf4ec011",
+      "bytes": 6082
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/MediaSessionBufferingTest.kt": {
+      "sha256": "332d192f9991a15556dcf4edbcf143a244a2f31e002640cb198f7043cf4ec011",
+      "bytes": 6082
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/plan.json": {
+      "sha256": "00d1c2196cea4af14e457ad60847a76109ab10cf65327c97e039ebaf37485874",
+      "bytes": 589
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/baseline-verification.json": {
+      "sha256": "91482af8c39398791809132e46e7c7bdc2b45a1126aff9f67bddd97494d3fde4",
+      "bytes": 1340
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/baseline-tests.xml": {
+      "sha256": "c2714fef73c8293017ad76b520a4cc9de135e77915757e9b8a7edb06a8dd1d5c",
+      "bytes": 19941
+    },
+    "/private/tmp/portal-media-buffering-20261104-104015/baseline-tests.log": {
+      "sha256": "8f7b001879b28712e4ceed1a17644ed23561a8b5299240fe1aceb02b41d0260b",
+      "bytes": 2927
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NowPlayingHub.kt": {
+      "sha256": "1dc20635fad282aa641539d4b1f3cd7632849a7d48020e26c15938e9707b6058",
+      "bytes": 2140
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NowPlaying.kt": {
+      "sha256": "0d26e29a4f13d3b1e2e552d1b5d3484b82405f0fe7aae238dc5f35e73830830d",
+      "bytes": 1961
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeNowPlayingListener.kt": {
+      "sha256": "dad91c746a8a9960a41597720e26d560cfcb36bf7472baff3bc88d0e686d650f",
+      "bytes": 589
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt": {
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+      "bytes": 229887
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FaceRenderer.kt": {
+      "sha256": "9f62b1b197bbd9afce67158bb77c8e6b27eaebd8d9140530280227f6fe1b8183",
+      "bytes": 39413
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "7f4d83b48102476a8e032961a157e8b3f7150dd28f74200e55c4aed9ca0054d9",
+      "bytes": 164474
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ImmortalApp.kt": {
+      "sha256": "4e7ea5b8fc0e8947ca6a32c3bd9a1dc0428d6837421a81f93d81bd28789bf1c6",
+      "bytes": 4880
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/MediaNotificationListenerService.kt": {
+      "sha256": "8a97ddbd46b4c46a6f8bd76826e77fc7f5320c3288d2b140064e7f8049a884d9",
+      "bytes": 5173
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/MusicSessionPolicy.kt": {
+      "sha256": "a2fe4f97dd2292662fc187196aaa8c0ff081fe603afa8cc014ef9b5960651f20",
+      "bytes": 2098
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/MediaSessionReaderTest.kt": {
+      "sha256": "2b2b8ebe16335e6b05436439ca2974a03d4cfbd34d6cb30e0f44335c2b94056f",
+      "bytes": 8928
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-home-playback-freshness-2026-11-04.md": {
+      "sha256": "599fa6d2a8a25efb7580d57181b7e305a419fba97f8ca03be7c7ae9adad49041",
+      "bytes": 6985
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/docs/music-standalone-readiness-2026-11-02.md": {
+      "sha256": "de6d89c454bd72a16b2c4d8b5febc5b78b8f6bc2ce4301b328a5d28229612ebf",
+      "bytes": 7491
+    }
+  }
+}

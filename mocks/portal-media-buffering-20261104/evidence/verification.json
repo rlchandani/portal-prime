@@ -1,0 +1,121 @@
+{
+  "version": "1.150/code144",
+  "verifiedAt": "2026-11-04T11:02:49.370147+00:00",
+  "goalStatus": "active",
+  "originalClock": {
+    "startedAt": "2026-11-04T10:40:15Z",
+    "firstWitness": "2026-11-04T10:41:30Z",
+    "selectedAt": "2026-11-04T10:56:18.929293+00:00",
+    "target": "2026-11-04T10:55:15Z",
+    "deadline": "2026-11-04T11:10:15Z",
+    "sourceBase": "fa7daf0e06eb90874a4816ffb11a1d1506123695",
+    "scope": "Retain previously playing native media session while buffering and pause it on existing card tap; preserve selection priority and never-played-session exclusion",
+    "priorClocksRetained": true,
+    "boundaries": [
+      "Root device operations only",
+      "No phone/provider/media/account/push/publication"
+    ]
+  },
+  "jvm": {
+    "tests": 4454,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 465
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46745298,
+      "sha256": "c76ae0a992a9c93e135a4e1b838f474533d88615bd53e788ed3f6225b98744ba",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='144' versionName='1.150' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "bytes": 25886647,
+      "sha256": "4d9498fbae1b0cc2d3b9fcd7196ac89740998a5eb4f17880387a82ae2c6a3a9f",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='144' versionName='1.150' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "native": {
+    "tests": 10,
+    "baselineProductFailures": 4,
+    "controls": 6,
+    "candidatePassed": 10,
+    "sameFrozenDex": true,
+    "ownedSessionsReleasedEachRun": 13,
+    "callbackThreadsRetired": true,
+    "isolatedActiveRestoredHistoryUnchanged": true,
+    "unexpectedPreferenceRequests": 0,
+    "fixtureRunsRetired": true
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886647,
+      "sha256": "4d9498fbae1b0cc2d3b9fcd7196ac89740998a5eb4f17880387a82ae2c6a3a9f",
+      "app": {
+        "versionCode": 144,
+        "versionName": "1.150"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "bytes": 25886647,
+      "sha256": "4d9498fbae1b0cc2d3b9fcd7196ac89740998a5eb4f17880387a82ae2c6a3a9f",
+      "serviceReady": true,
+      "app": {
+        "versionCode": 144,
+        "versionName": "1.150"
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1684,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 2004,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "ownerRegistryHashesRetained": true,
+  "independentSourceNativeAndArtifactReviewsAccepted": true,
+  "unchangedScreensaverAssets": 10,
+  "limits": [
+    "Generated actual debug/API29 selection, captured snapshot and transport helpers with fixture-owned sessions only; session-manager callbacks, notification listener, rendered Home/screensaver, actual audio/provider and optimized/API28 runtime remain separate.",
+    "Cross-package external/relay selection priority is JVM/source reviewed; native fixture sessions all belong to its own package.",
+    "No phone/household media/provider/account/push/publication; public1.83/code77 unchanged."
+  ]
+}

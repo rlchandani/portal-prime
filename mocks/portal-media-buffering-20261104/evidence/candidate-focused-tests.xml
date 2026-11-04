@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.immortal.launcher.MediaSessionBufferingTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-04T10:58:21.617Z" hostname="iRedlofs-Mac-mini-3.local" time="0.534">
+  <properties/>
+  <testcase name="previouslyPlayingRelayRetainsBufferingFallback" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.481"/>
+  <testcase name="bufferingRefreshUsesOnePlaybackReadAndFreshMetadata" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.02"/>
+  <testcase name="playingRelayWinsOverPreviousBufferingPlayer" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.007"/>
+  <testcase name="previouslyPlayingPlayerRetainsTrackThroughBufferingAndPauseThenStops" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.003"/>
+  <testcase name="neverPlayedBufferingSessionCannotBeSelected" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.0"/>
+  <testcase name="unrelatedBufferingSessionCannotBorrowPreviousToken" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.002"/>
+  <testcase name="playingCardTapStillPauses" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.015"/>
+  <testcase name="bufferingCardTapPausesInsteadOfRestarting" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.001"/>
+  <testcase name="externalPlayingSessionWinsOverPreviousBufferingAndRelay" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.001"/>
+  <testcase name="pausedCardTapStillPlays" classname="com.immortal.launcher.MediaSessionBufferingTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (~/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.12/be4984cb6fd1ef1d11f218a648889dfda44b8a15/byte-buddy-agent-1.14.12.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

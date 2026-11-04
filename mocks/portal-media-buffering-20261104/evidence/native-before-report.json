@@ -1,0 +1,94 @@
+{
+  "ok": false,
+  "error": null,
+  "tests": 10,
+  "failures": 4,
+  "cases": [
+    {
+      "name": "previousPlayingBufferRetainedWithSnapshot",
+      "passed": false,
+      "error": "java.lang.AssertionError:Previous actually-playing buffer retained",
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "previousBufferSurvivesUnrelatedPausedSession",
+      "passed": false,
+      "error": "java.lang.AssertionError:Previous buffer survives never-playing paused competitor",
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "neverPlayedBufferIgnored",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "differentPreviousTokenCannotAdmitBuffer",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "actualPlayingWinsOverPreviousBuffer",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "previousPausedStillRetained",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "previousStoppedRemainsIgnored",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "capturedBufferSnapshotRetainsSelectedState",
+      "passed": false,
+      "error": "java.lang.AssertionError:Captured buffer selection exists",
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "bufferingPlayPauseDispatchesPause",
+      "passed": false,
+      "error": "java.lang.AssertionError:Expected play=0 pause=1; observed play=1 pause=0",
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    },
+    {
+      "name": "pausedPlayPauseDispatchesPlay",
+      "passed": true,
+      "error": null,
+      "readerDormant": true,
+      "unexpectedPreferenceRequests": 0
+    }
+  ],
+  "sourceSha256": "616785092aefa22b5fb2ae0784baae0da7da567c83324d26cb3b49ce04bfc228",
+  "sourceBytes": 46745298,
+  "sdk": 29,
+  "actualEmbeddedApkClassLoader": true,
+  "actualSelectSessionCapturedSnapshotAndPlayPause": true,
+  "selectMethod": "selectSession$app",
+  "snapshotMethod": "snapshotFrom$app",
+  "fixturePackage": "com.immortal.mediabufferfixture",
+  "internetPermission": false,
+  "unexpectedPreferenceRequests": 0,
+  "ownedSessionsCreated": 13,
+  "ownedSessionsReleased": 13,
+  "callbackThreadRetired": true,
+  "activeControllerRestored": true,
+  "historyTokenUnchanged": true,
+  "scope": "Actual debug APK helper selection/captured snapshot/transport through fixture-owned real MediaSession/MediaController; generated metadata, no audio playback, notification listener, owner preferences, provider, network, UI, optimized/API28 or cross-package relay-priority acceptance"
+}

@@ -1,0 +1,95 @@
+{
+  "ok": true,
+  "preparedAtUtc": "2026-11-04T10:57:49.938137+00:00",
+  "originalClock": "2026-11-04T10:40:15Z to 2026-11-04T11:10:15Z",
+  "sources": {
+    "MediaBufferActivity.java": {
+      "sha256": "166356d7fd550a2a7027f2d5cc37969211fac82fc81d863504d6167b17c1620d",
+      "bytes": 14193
+    },
+    "AndroidManifest.xml": {
+      "sha256": "1c44e9b49418de84b33597b116bcdd5d5bc1b4d8de316fc06f61aae833b73d56",
+      "bytes": 436
+    },
+    "build.sh": {
+      "sha256": "9f93c856f3479c9ef87957178088405e8c413db7942e73b87a8ad9c31239fbbf",
+      "bytes": 781
+    },
+    "repack.sh": {
+      "sha256": "e600bd2ef5c3ccff3f42b81013e6140932b6fc609879a1a13a638f2dc8c7e5af",
+      "bytes": 778
+    },
+    "RUN.md": {
+      "sha256": "390583bb22beb52c147feb1ebd287336473c69b68d22e98c8331831f3bc1141c",
+      "bytes": 1306
+    }
+  },
+  "fixtureDex": {
+    "sha256": "30c28c62dbe6731e049be66a765ad467657d6774caaa70198bcab1be65efb4e6",
+    "bytes": 22716
+  },
+  "baselineFixture": {
+    "sha256": "bb45a71767a1dd71cbf38f21e4799ef4c1a7adb681f62d89e1a681a22914a0be",
+    "bytes": 37503466
+  },
+  "embeddedBaseline": {
+    "sha256": "616785092aefa22b5fb2ae0784baae0da7da567c83324d26cb3b49ce04bfc228",
+    "bytes": 46745298
+  },
+  "embeddedBaselineExact": true,
+  "baselineAndFrozenFixtureDexByteIdentical": true,
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.mediabufferfixture\n",
+  "package": "com.immortal.mediabufferfixture",
+  "activity": ".MediaBufferActivity",
+  "report": "external-files/report.json",
+  "caseNames": [
+    "previousPlayingBufferRetainedWithSnapshot",
+    "previousBufferSurvivesUnrelatedPausedSession",
+    "neverPlayedBufferIgnored",
+    "differentPreviousTokenCannotAdmitBuffer",
+    "actualPlayingWinsOverPreviousBuffer",
+    "previousPausedStillRetained",
+    "previousStoppedRemainsIgnored",
+    "capturedBufferSnapshotRetainsSelectedState",
+    "bufferingPlayPauseDispatchesPause",
+    "pausedPlayPauseDispatchesPlay"
+  ],
+  "expectedBaselineFailNames": [
+    "previousPlayingBufferRetainedWithSnapshot",
+    "previousBufferSurvivesUnrelatedPausedSession",
+    "capturedBufferSnapshotRetainsSelectedState",
+    "bufferingPlayPauseDispatchesPause"
+  ],
+  "expectedBaselineControlNames": [
+    "neverPlayedBufferIgnored",
+    "differentPreviousTokenCannotAdmitBuffer",
+    "actualPlayingWinsOverPreviousBuffer",
+    "previousPausedStillRetained",
+    "previousStoppedRemainsIgnored",
+    "pausedPlayPauseDispatchesPlay"
+  ],
+  "expectedCandidatePassNames": [
+    "previousPlayingBufferRetainedWithSnapshot",
+    "previousBufferSurvivesUnrelatedPausedSession",
+    "neverPlayedBufferIgnored",
+    "differentPreviousTokenCannotAdmitBuffer",
+    "actualPlayingWinsOverPreviousBuffer",
+    "previousPausedStillRetained",
+    "previousStoppedRemainsIgnored",
+    "capturedBufferSnapshotRetainsSelectedState",
+    "bufferingPlayPauseDispatchesPause",
+    "pausedPlayPauseDispatchesPlay"
+  ],
+  "expectedOwnedSessions": 13,
+  "gates": {
+    "selection": "only prior actually PLAYING token admits BUFFERING; unrelated/no token rejected; actual PLAYING priority retained; previous PAUSED retained and STOPPED ignored",
+    "snapshot": "state/title/artist/mediaId/duration/position/token/seek exact; captured BUFFERING snapshot not replaced by subsequent PAUSED state",
+    "transport": "actual playPause with private owned active controller dispatches exactly one expected owned callback; bounded callback queue barrier",
+    "retirement": "13 owned sessions released; callback thread quit/joined; reader dormant/history unchanged and active restored",
+    "noPreferenceRequests": true,
+    "watchdogMillis": 30000,
+    "callbackWaitMillis": 3000
+  },
+  "scope": "Actual embedded debug APK helpers and owned Android media sessions; no actual audio, provider/network, notification listener, owner preferences/media, mounted UI, optimized/API28 or cross-package relay priority proof. Root exclusively candidate repack/device execution."
+}

@@ -1,0 +1,30 @@
+{
+  "tests": 10,
+  "failures": 4,
+  "errors": 0,
+  "skipped": 0,
+  "terminalExit": 1,
+  "frozenTestSha256": "332d192f9991a15556dcf4edbcf143a244a2f31e002640cb198f7043cf4ec011",
+  "failuresDetail": [
+    {
+      "name": "previouslyPlayingRelayRetainsBufferingFallback",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected same:<Mock for MediaController, hashCode: 1132379993> was not:<null>"
+    },
+    {
+      "name": "bufferingRefreshUsesOnePlaybackReadAndFreshMetadata",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError"
+    },
+    {
+      "name": "previouslyPlayingPlayerRetainsTrackThroughBufferingAndPauseThenStops",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError"
+    },
+    {
+      "name": "bufferingCardTapPausesInsteadOfRestarting",
+      "type": "org.mockito.exceptions.verification.WantedButNotInvoked",
+      "message": "org.mockito.exceptions.verification.WantedButNotInvoked: \nWanted but not invoked:\ntransportControls.pause();\n-> at android.media.session.MediaController$TransportControls.pause(MediaController.java)\n\nHowever, there was exactly 1 interaction with this mock:\ntransportControls.play();\n-> at com.immortal.launcher.MediaSessionReader.playPause(MediaSessionReader.kt:105)\n\n"
+    }
+  ]
+}
