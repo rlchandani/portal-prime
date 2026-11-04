@@ -675,12 +675,13 @@
   MODES.memories = { name: "Memories", run(ctx, deck) {
     const t = makeTimers(ctx), scenes = [0, 1].map(() => el("ss-memory-scene retired", ctx.root));
     const resources = new Map(scenes.map(scene => [scene, []]));
+    const collages = new Map();
     const dissolve = makeSceneDissolve(ctx, t, scenes, 2000, scene => {
       resources.get(scene).forEach(image => {
         image.style.backgroundImage = "none"; image.style.animation = "none";
         image.style.willChange = "auto";
       });
-      resources.set(scene, []); scene.innerHTML = "";
+      resources.set(scene, []); collages.delete(scene); scene.innerHTML = "";
       scene.style.opacity = ""; scene.style.transition = "";
     });
     let beat = 0;
@@ -693,22 +694,38 @@
       }
       return image;
     }
-    function renderCollage(scene, ps, urls) {
-      const title = el("ss-memory-caption", scene); title.textContent = "Photo memories";
+    function layoutCollage(ps, images) {
+      const W = ctx.root.clientWidth || ctx.W, H = ctx.root.clientHeight || ctx.H;
       const slots = ps.length === 1 ? [[.16, .14, .68, .72]] :
         ps.length === 2 ? [[.07, .14, .40, .72], [.53, .14, .40, .72]] :
         [[.08, .16, .42, .5], [.53, .1, .36, .42], [.5, .56, .4, .3]];
-      return ps.map((p, i) => {
-        const [x, y, sw, sh] = slots[i], boxW = ctx.W * sw, boxH = ctx.H * sh;
+      ps.forEach((p, i) => {
+        const [x, y, sw, sh] = slots[i], boxW = W * sw, boxH = H * sh;
         const imageH = Math.max(1, Math.min(boxH - 24, (boxW - 24) / aspect(p)));
         const width = imageH * aspect(p) + 24, height = imageH + 24;
-        const tile = el("ss-memory-card", scene);
-        tile.style.left = (ctx.W * x + (boxW - width) / 2) + "px";
-        tile.style.top = (ctx.H * y + (boxH - height) / 2) + "px";
+        const tile = images[i].parentNode;
+        tile.style.left = (W * x + (boxW - width) / 2) + "px";
+        tile.style.top = (H * y + (boxH - height) / 2) + "px";
         tile.style.width = width + "px"; tile.style.height = height + "px";
-        return photo(tile, p, urls[i], false);
       });
     }
+    function renderCollage(scene, ps, urls) {
+      const title = el("ss-memory-caption", scene); title.textContent = "Photo memories";
+      const images = ps.map((p, i) => photo(el("ss-memory-card", scene), p, urls[i], false));
+      layoutCollage(ps, images); collages.set(scene, { ps, images });
+      return images;
+    }
+    let resizePending = false;
+    function onResize() {
+      if (resizePending || !dissolve.active()) return;
+      resizePending = true;
+      t.frame(() => {
+        resizePending = false;
+        if (!dissolve.active()) return;
+        collages.forEach(({ ps, images }) => layoutCollage(ps, images));
+      });
+    }
+    if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     async function step() {
       if (!dissolve.active()) return false;
       const nextBeat = beat + 1, collage = nextBeat % 6 === 0;
@@ -723,7 +740,13 @@
       });
     }
     t.start(step); t.every(step, ctx.photoMs);
-    return dissolve.cleanup;
+    const cleanup = () => {
+      if (typeof window.removeEventListener === "function") window.removeEventListener("resize", onResize);
+      dissolve.cleanup();
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => dissolve.cleanup.ready });
+    cleanup.pause = dissolve.cleanup.pause; cleanup.resume = dissolve.cleanup.resume;
+    return cleanup;
   }};
 
   // ---- 07 Panorama drift -----------------------------------------------------

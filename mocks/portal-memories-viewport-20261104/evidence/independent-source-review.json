@@ -1,0 +1,249 @@
+{
+  "ok": true,
+  "reviewedAt": "2026-11-04T12:54:40.010007+00:00",
+  "scope": "Independent read-only source and retained host-result review; no tests, builds, SDK, Git, device or network operations.",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T12:44:17Z",
+    "target": "2026-11-04T12:59:17Z",
+    "hardDeadline": "2026-11-04T13:14:17Z",
+    "selectedAt": "2026-11-04T12:48:29.025344+00:00"
+  },
+  "bindings": {
+    "/private/tmp/portal-memories-viewport-20261104-124417/selected-plan.json": {
+      "sha256": "f226b0266f5a9348381a476ac4ae0004961730e9ae5f893ee2874944e4dac7a3",
+      "bytes": 1315
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/source-witness.json": {
+      "sha256": "7320b97f983bbddb629712bcced2516b5a2cc1ff3acaef5b83993c13809004cd",
+      "bytes": 1116
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/mode-impls.js": {
+      "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+      "bytes": 68261
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/slideshow_scene_fixture.mjs": {
+      "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+      "bytes": 9921
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/slideshow_memories_viewport.frozen.test.mjs": {
+      "sha256": "af1e2c9a3cf3a2c749b4ce8c176aa6dd2c29bdfff092b285159515283e6096d3",
+      "bytes": 5097
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/baseline-host-terminal.json": {
+      "sha256": "9099f17e12ede2170ad4f816b38018928c11bf565ed2128ee9da99363f181315",
+      "bytes": 295
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/baseline-host-final.log": {
+      "sha256": "637281eef26dd57cbdb1c7cc64b62c142d4472aab08a3db4f56f8f18c2c889ed",
+      "bytes": 3156
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/excluded-operational-failures.json": {
+      "sha256": "02f935c4e1908dc99ba80a07b4b115e3744212cbdbfb30048871fe61ad734e61",
+      "bytes": 378
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/candidate-host-focused.log": {
+      "sha256": "0db677c4b6726d06a1d961717cc3f306f802c5c8d0e61a1d39c493e92ef3ed44",
+      "bytes": 653
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/before-debug-1.156.apk": {
+      "sha256": "7143f6abcb66f1b6844cabfc342504b886d680f717d70564cbf4df276a23f899",
+      "bytes": 46745298
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js": {
+      "sha256": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960",
+      "bytes": 69311
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "814e31f9c7ae13d0e679110a110606cdf3ee29e5ad30d884749578aec27c3ae1",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/slideshow_memories_viewport.test.mjs": {
+      "sha256": "af1e2c9a3cf3a2c749b4ce8c176aa6dd2c29bdfff092b285159515283e6096d3",
+      "bytes": 5097
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/helpers/slideshow_scene_fixture.mjs": {
+      "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+      "bytes": 9921
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+      "bytes": 164859
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/slideshow_fixed_startup.test.mjs": {
+      "sha256": "ec98cdb6182e343cb9ba7612cc7b0d02574eca8a6190e7cdec0690f3047c827a",
+      "bytes": 13981
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/slideshow_fixed_startup.before.test.mjs": {
+      "sha256": "af1564790cb4ca8d839ef46dd7efb92579b9c01588d85b60eec597803af5e8cc",
+      "bytes": 13936
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/all-slideshow-host.log": {
+      "sha256": "2a0680e982fe7481bf20e082556bfb1dc596c64fdca4fe0b4397efec86ae449f",
+      "bytes": 38286
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/all-slideshow-host-final.log": {
+      "sha256": "b88deba644ed2e9b61e2a70cb65fa5890c0be7c0f47d91fa65eee481f20da19c",
+      "bytes": 33748
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/all-slideshow-host-complete.log": {
+      "sha256": "7177068b4d03d8f5a08e3c5b1e65021250c28ef43658bbb16e0d585c94a6cef3",
+      "bytes": 36825
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/all-slideshow-ci-final.log": {
+      "sha256": "2db56f77e53baf7052c835999162b9209afd1c5f72a812d0c55676090b820a11",
+      "bytes": 37482
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/host-terminal.json": {
+      "sha256": "850c50a499558f59f731466d241acafc879bf35fe293d4cb269c406bdc984a0e",
+      "bytes": 810
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_slideshow_sources.mjs": {
+      "sha256": "90774e252a4966dc4230da59423c9a641a5f17cca677663c61f8ca1c5af8f8e5",
+      "bytes": 2589
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_slideshow_labels.mjs": {
+      "sha256": "937a22671323384bc14aadb5db1d2f11296b9a97f2a6374e74cd531bfcf7d87a",
+      "bytes": 4248
+    }
+  },
+  "protectedScreensaverAssets": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png": {
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "bytes": 12657
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html": {
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "bytes": 7785
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js": {
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "bytes": 5582
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg": {
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "bytes": 1247
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg": {
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "bytes": 1246
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js": {
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "bytes": 8528
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css": {
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "bytes": 15397
+    }
+  },
+  "sourceFindings": {
+    "outsideMemoriesBlockByteIdentical": true,
+    "allNineOtherBundledWebAssetsMatchBaselineApk": true,
+    "frozenTestAndSharedFixtureUnchanged": true,
+    "measuredDimensions": "Only collage positions and sizes use root.clientWidth/clientHeight, with original ctx.W/H fallback for zero/unmeasured bounds.",
+    "initialGeometry": "Slot fractions, 24px paper allowance, aspect math and complete-photo contain background remain unchanged. At original 1600x1000 single collage, literal box remains left266 top140 width1068 height720.",
+    "ownership": "Per-scene map retains existing photo arrays and Image/card nodes only until existing dissolve release; release deletes map record before clearing scene. Resize changes four card style fields only, without URLs, decode, cursor, beat, randomness, photo-motion or dissolve changes.",
+    "pause": "Existing makeTimers.frame defers callback through its owned zero-delay task while paused; coalesced callback reads latest dimensions after resume. A subsequent pause also withholds the scheduled task.",
+    "cleanup": "Resize listener removed before idempotent dissolve cleanup; timer owner cancels frames/tasks, aborts work and active predicate blocks captured callbacks. Scene records deleted through original release path.",
+    "deferredAndFade": "Collage render reads current bounds after decode/publication, while resize callback reflows all still-owned incoming/outgoing collage nodes. Retired nodes are removed from map.",
+    "publicCleanupContract": "ready getter and pause/resume delegates retained; single-photo path unchanged.",
+    "startupFixtureCompatibility": {
+      "exactDelta": "One standard DOM getter: get parentNode() { return this.parent; }",
+      "entireFileUnchangedAfterRemovingGetter": true,
+      "allBusinessAssertionsUnchanged": true,
+      "cause": "The existing fake Element maintained only child.parent. Actual DOM exposes parentNode; candidate uses it to reach the retained card. Undefined parentNode caused a caught style-access exception and left geometry unset in the fake DOM only. The unchanged aspect predicate detected this.",
+      "scope": "No production fallback or predicate weakening; captured HEAD source provided by root, without any reviewer Git operation."
+    }
+  },
+  "retainedHostEvidence": {
+    "baseline": {
+      "tests": 6,
+      "viewportAssertionFailures": 3,
+      "controls": 3,
+      "exitCode": 1,
+      "literalFailure": "Card right 800 exceeds viewport 640"
+    },
+    "candidateFocusedLog": {
+      "tests": 6,
+      "pass": 6,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "independentReplay": false,
+    "testScope": "Real mode evaluated by existing VM/DOM fixture; measured root and timer/transition adapters are generated. Tests check retained/new/resumed collages, identity/URL/resolution/cursor preservation, unchanged initial literal geometry, single-photo and stale-callback cleanup controls. No browser rasterization or actual scheduler/native WebView resize demonstrated by this host result.",
+    "excludedFirstHostAttempt": "One cleanup-control expectation was corrected to retain two empty roots owned by scheduler; all three viewport failure predicates unchanged. Retained excluded record explicitly records this boundary.",
+    "fullSlideshowCi": {
+      "tests": 391,
+      "pass": 391,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "terminal": {
+        "sessionId": 65134,
+        "toolChunk": "09f978",
+        "exitCode": 0,
+        "tests": 391,
+        "pass": 391,
+        "fail": 0,
+        "log": "all-slideshow-ci-final.log",
+        "command": "node --test scripts/test_slideshow_sources.mjs scripts/test_slideshow_labels.mjs scripts/tests/slideshow_*.test.mjs scripts/tests/slideshow_*.test.cjs"
+      },
+      "independentlyExecutedByReviewer": false
+    },
+    "qualification": {
+      "firstFullCandidate": {
+        "tests": 391,
+        "pass": 390,
+        "fail": 1,
+        "reason": "Excluded fixture adapter failure at unchanged Memories aspect predicate; retained log."
+      },
+      "correctedMjsSubset": {
+        "tests": 351,
+        "pass": 351,
+        "fail": 0
+      },
+      "correctedMjsCjsSubset": {
+        "tests": 384,
+        "pass": 384,
+        "fail": 0
+      },
+      "finalCiAddsSevenSourceLabelTests": true,
+      "originalSixViewportAssertionsUnchanged": true
+    }
+  },
+  "distinctness": {
+    "activeCaller": "PhotoFrameController existing root OnLayoutChangeListener resizes retained WebView and overlays without reload; scheduler context captures viewport once and healthy initial viewport bypasses degenerate-boot recovery.",
+    "priorScope": "Grouped matte delivery was CSS-only initial single Memories and explicitly left collage/resize unverified. Earlier Paper, Gallery and Polaroid geometry scopes are separate. No earlier Memories resize defect clock found in named roadmap records."
+  },
+  "versionSource": {
+    "versionCode": 151,
+    "versionName": "1.157",
+    "artifactManifestNotYetIndependentlyReviewed": true
+  },
+  "blockers": [],
+  "limits": [
+    "This receipt accepts source and retained six-case host evidence only; final build/APK/native fixture/promotion evidence remains root-owned and requires its later gate.",
+    "No hardware rendering, actual Android WebView resize, native overlays/clock, live source, motion, scheduler transitions, API28, optimized runtime or Living visual claim.",
+    "Existing minimum 24px paper geometry and original zero-size fallback retained; extremely tiny or fully occluded areas are outside the frozen 640x400 regression.",
+    "No whole-product performance, old black-handoff, coldShuffle, legacy night, provider/source ownership or other parked scope closure."
+  ]
+}

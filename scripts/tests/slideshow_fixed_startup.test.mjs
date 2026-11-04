@@ -45,6 +45,7 @@ function fixture({ mode = 'framed', paused = false, known = false, random = .5,
       this.children.forEach(child => { child.parent = null; }); this.children = [];
     }
     get offsetWidth() { return 2160; }
+    get parentNode() { return this.parent; }
     getAnimations() { return []; }
   }
   class Image {

@@ -32,8 +32,8 @@ android {
     applicationId = "com.immortal.launcher"
     minSdk = 24
     targetSdk = 36
-        versionCode = 150
-        versionName = "1.156"
+        versionCode = 151
+        versionName = "1.157"
     // AGP rewrites the test manifest's instrumentation name from this setting.
     // The opt-in runner uses framework APIs against optimized targets; app builds are unchanged.
     testInstrumentationRunner =

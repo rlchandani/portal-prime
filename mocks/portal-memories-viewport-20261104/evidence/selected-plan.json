@@ -1,0 +1,29 @@
+{
+  "originalDiscoveryAt": "2026-11-04T12:44:17Z",
+  "target": "2026-11-04T12:59:17Z",
+  "hardDeadline": "2026-11-04T13:14:17Z",
+  "baseCommit": "a08a08bbdc53f68953fdce55dab5e2ea9a6e92a6",
+  "state": "selected",
+  "clockNotReset": true,
+  "candidate": "Actual Memories collage retains pixel geometry from ctx startup W/H despite ordinary measured viewport shrink; scheduler only recovers degenerate boot.",
+  "sourceBindings": {
+    "app/src/main/assets/screensaver/mode-impls.js": {
+      "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+      "bytes": 68261
+    },
+    "app/src/main/assets/screensaver/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "app/src/main/assets/screensaver/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "scripts/tests/helpers/slideshow_scene_fixture.mjs": {
+      "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+      "bytes": 9921
+    }
+  },
+  "selectedAt": "2026-11-04T12:48:29.025344+00:00",
+  "scope": "Memories collage reflow uses current measured root size, retains current photo/card nodes and decode ownership, timer/beat/collage styling preserved."
+}

@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "rootFullyReadSourceAndArtifactReviews": true,
+  "nativeArtifactReviewFullReadToolChunk": "adcc2b",
+  "sourceFullReadToolChunk": "684143",
+  "sourceBindings": 35,
+  "nativeArtifactBindings": 56,
+  "allBindingsExactBeforePromotion": true,
+  "sourceReviewSha256": "d8c13a3a22eb40a626ffb5ca94cea66de3f2b8a4cba7f5d9e44f47f961d47cc9",
+  "artifactReviewSha256": "5ce9db49eb3dc839bf8b23b7e0ac44b72c41de9a9c7bb59be72a69838cb86c74"
+}

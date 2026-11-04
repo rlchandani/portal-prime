@@ -1,0 +1,30 @@
+<!doctype html><html><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="styles.css"><style>#stage{position:absolute;left:0;top:0;right:auto;bottom:auto;width:800px;height:480px}</style><body><div id="stage"><div id="owned" class="ss-beat on first-scene"></div></div>
+<script>
+var sourceResolutions=0, loadAdmissions=0, observations=[], complete=false, error=null, cleanup=null;
+function aspect(p){return p.w/p.h}
+var PHOTOS=[{id:0,seed:'owned-0',w:1200,h:800},{id:1,seed:'owned-1',w:600,h:1000},{id:2,seed:'owned-2',w:1200,h:800}];
+PHOTOS.forEach(function(p){var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+p.w+'" height="'+p.h+'"><rect width="100%" height="100%" fill="#5c7d8f"/><rect width="100" height="100" fill="#00ff00"/><rect x="'+(p.w-100)+'" width="100" height="100" fill="#0000ff"/><rect y="'+(p.h-100)+'" width="100" height="100" fill="#ffff00"/><rect x="'+(p.w-100)+'" y="'+(p.h-100)+'" width="100" height="100" fill="#ff00ff"/></svg>';p.url='data:image/svg+xml,'+encodeURIComponent(svg)});
+Math.random=function(){return .5};
+// Fixture-owned virtual mode time; browser decode, real layout and RAF remain real.
+var virtualNow=0,timerId=0,tasks=new Map(),realDateNow=Date.now;
+window.setTimeout=function(fn,ms){var id=++timerId;tasks.set(id,{id:id,fn:fn,due:virtualNow+Math.max(0,Number(ms)||0)});return id};
+window.clearTimeout=function(id){tasks.delete(id)};Date.now=function(){return virtualNow};
+async function advance(target){var n=0;while(true){var list=Array.from(tasks.values()).filter(function(t){return t.due<=target}).sort(function(a,b){return a.due-b.due||a.id-b.id});if(!list.length)break;if(++n>200)throw Error('owned timer bound');var t=list[0];tasks.delete(t.id);virtualNow=t.due;await t.fn();await Promise.resolve();await Promise.resolve()}virtualNow=target}
+function frame(){return new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r)})})}
+</script><script src="lib-engine.js"></script><script src="modes.js"></script><script src="mode-impls.js"></script><script>
+var originalPreload=preloadDecoded;preloadDecoded=function(url,signal){loadAdmissions++;return originalPreload(url,signal)};
+function size(w,h){var s=document.getElementById('stage');s.style.width=w+'px';s.style.height=h+'px';window.dispatchEvent(new Event('resize'))}
+function current(){var nodes=Array.from(document.querySelectorAll('.ss-memory-scene.on')).filter(function(n){return !n.classList.contains('retired')});return nodes[nodes.length-1]}
+function snapshot(){var scene=current(),root=document.getElementById('owned'),r=root.getBoundingClientRect(),cards=Array.from(scene.querySelectorAll('.ss-memory-card')),images=cards.map(function(c){return c.querySelector('.memory-photo')});return {scene:scene,cards:cards,images:images,urls:images.map(function(i){return i.style.backgroundImage}),boxes:cards.map(function(c){var b=c.getBoundingClientRect();return {x:b.left-r.left,y:b.top-r.top,w:b.width,h:b.height}}),root:{w:r.width,h:r.height},resolutions:sourceResolutions,loads:loadAdmissions,cursor:ctx.cursor.i}}
+var ctx;
+async function boot(){var root=document.getElementById('owned');ctx={root:root,deck:PHOTOS,cursor:{i:0},W:800,H:480,photoMotion:false,photoMs:5000,microMs:5000,motionMs:5000,url:function(p){sourceResolutions++;return p.url}};cleanup=SS.MODES.memories.run(ctx,PHOTOS);if(await cleanup.ready!==true)throw Error('actual mode not ready')}
+function fit(s){return s.cards.length===3&&s.boxes.every(function(b){return b.w>24&&b.h>24&&b.x>=-.04&&b.y>=-.04&&b.x+b.w<=s.root.w+.04&&b.y+b.h<=s.root.h+.04})}
+function serial(name,s,checks){return {name:name,ok:Object.keys(checks).every(function(k){return checks[k]}),checks:checks,boxes:s.boxes,root:s.root,photoCount:s.images.length,sourceResolutions:s.resolutions,loadAdmissions:s.loads,cursor:s.cursor,actualMode:'SS.MODES.memories.run',softwareRasterOnly:true}}
+async function run(){try{
+ await boot();await advance(27100);await frame();var before=snapshot();size(400,240);await frame();var after=snapshot();observations.push(serial('retainedCollageShrink',after,{contained:fit(after),sameCards:after.cards.every(function(v,i){return v===before.cards[i]}),sameImages:after.images.every(function(v,i){return v===before.images[i]}),sameUrls:JSON.stringify(after.urls)===JSON.stringify(before.urls),noResolutions:after.resolutions===before.resolutions,noLoads:after.loads===before.loads,sameCursor:after.cursor===before.cursor}));cleanup();
+ document.getElementById('owned').innerHTML='';tasks.clear();virtualNow=0;size(800,480);await boot();size(400,240);await frame();await advance(27100);await frame();var early=snapshot();observations.push(serial('nextCollageAfterEarlyShrink',early,{contained:fit(early),currentMeasured:early.root.w===400&&early.root.h===240}));cleanup();
+ document.getElementById('owned').innerHTML='';tasks.clear();virtualNow=0;size(800,480);await boot();await advance(27100);await frame();var full=snapshot(),literal=[[64,80.8,336,232],[424,48.8,288,200],[512,268.8,96,144]];observations.push(serial('originalFullsizeGeometry',full,{contained:fit(full),literalGeometry:full.boxes.every(function(b,i){return [b.x,b.y,b.w,b.h].every(function(v,j){return Math.abs(v-literal[i][j])<.04})})}));
+ }catch(e){error=String(e)}finally{complete=true}}
+function state(){return {complete:complete,error:error,observations:observations,caseCount:observations.length,virtualMillis:virtualNow,sourceResolutions:sourceResolutions,loadAdmissions:loadAdmissions,dpr:devicePixelRatio}}
+requestAnimationFrame(run);
+</script></body></html>

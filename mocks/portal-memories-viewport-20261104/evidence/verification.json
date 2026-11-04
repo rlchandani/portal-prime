@@ -1,0 +1,332 @@
+{
+  "ok": true,
+  "scope": "Memories collage reflow uses current measured root size, retains current photo/card nodes and decode ownership, timer/beat/collage styling preserved.",
+  "jvm": {
+    "tests": 4513,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 471
+  },
+  "host": {
+    "initialFull": {
+      "sessionId": 24377,
+      "slideshowExit": 1,
+      "log": "all-slideshow-host.log",
+      "tests": 391,
+      "pass": 390,
+      "fail": 1
+    },
+    "mjsSubset": {
+      "sessionId": 76245,
+      "toolChunk": "349bc5",
+      "exitCode": 0,
+      "tests": 351
+    },
+    "modulesOnly": {
+      "sessionId": 34721,
+      "toolChunk": "15d01f",
+      "exitCode": 0,
+      "tests": 384
+    },
+    "allAppJs": {
+      "sessionId": 24377,
+      "exitCode": 0,
+      "tests": 743
+    },
+    "ciFull": {
+      "sessionId": 65134,
+      "toolChunk": "09f978",
+      "exitCode": 0,
+      "tests": 391,
+      "pass": 391,
+      "fail": 0,
+      "log": "all-slideshow-ci-final.log",
+      "command": "node --test scripts/test_slideshow_sources.mjs scripts/test_slideshow_labels.mjs scripts/tests/slideshow_*.test.mjs scripts/tests/slideshow_*.test.cjs"
+    }
+  },
+  "native": {
+    "before": {
+      "sessionId": 44414,
+      "toolChunk": "b6f1b1",
+      "exitCode": 0
+    },
+    "after": {
+      "sessionId": 86796,
+      "toolChunk": "13f115",
+      "exitCode": 0
+    },
+    "cases": 3,
+    "beforeFailures": 2,
+    "afterFailures": 0
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/candidate-debug-1.157.apk",
+      "bytes": 46745522,
+      "sha256": "bea8a85790f829d86fa401e93afe09e9aae6f9dc5f5520f6820033ed137443b2",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='151' versionName='1.157' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 69311,
+          "sha256": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "performance": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/candidate-performance-1.157.apk",
+      "bytes": 25886783,
+      "sha256": "65e581f9897113f584462e7b217e751318f98e2ddfcaa037ceac7e15534f8e27",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='151' versionName='1.157' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 69311,
+          "sha256": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "jvm": {
+      "tests": 4513,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 471
+    },
+    "gradleExit": 0
+  },
+  "installed": {
+    "family": {
+      "bytes": 25886783,
+      "sha256": "65e581f9897113f584462e7b217e751318f98e2ddfcaa037ceac7e15534f8e27",
+      "app": {
+        "versionCode": 151,
+        "versionName": "1.157"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 5
+      },
+      "installed": {
+        "bytes": 25886783,
+        "sha256": "65e581f9897113f584462e7b217e751318f98e2ddfcaa037ceac7e15534f8e27",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 151,
+          "versionName": "1.157"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 42,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": {
+        "file": "WebViewChromiumPrefs.xml",
+        "removedCachedFlagSets": {
+          "CachedFlagsDisabled": 2,
+          "CachedFlagsEnabled": 1
+        },
+        "frameworkOwnershipSource": "https://chromium.googlesource.com/chromium/src/+/25a5bc7242a972e00204085eca1bc300b9861102/android_webview/java/src/org/chromium/android_webview/common/WebViewCachedFlags.java",
+        "allRemainingTypedValuesIdentical": true,
+        "userFacingConfigurationChanged": false
+      },
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1616,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1997,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "rootReview": {
+    "ok": true,
+    "rootFullyReadSourceAndArtifactReviews": true,
+    "nativeArtifactReviewFullReadToolChunk": "adcc2b",
+    "sourceFullReadToolChunk": "684143",
+    "sourceBindings": 35,
+    "nativeArtifactBindings": 56,
+    "allBindingsExactBeforePromotion": true,
+    "sourceReviewSha256": "d8c13a3a22eb40a626ffb5ca94cea66de3f2b8a4cba7f5d9e44f47f961d47cc9",
+    "artifactReviewSha256": "5ce9db49eb3dc839bf8b23b7e0ac44b72c41de9a9c7bb59be72a69838cb86c74"
+  },
+  "queue": {
+    "tasks": 151,
+    "counts": {
+      "delivered": 99,
+      "verified": 42,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "all150OldObjectsPreserved": true,
+    "oldRawSuffixByteExact": true,
+    "rawSuffixBytes": 486678,
+    "rawSuffixSha256": "f9524975b02a2fc303e7a565d8fe9edab8bc160272e44042397a2c4dddacd2dc",
+    "defaultTaskPreserved": true
+  },
+  "originalIssueClock": {
+    "originalDiscoveryAt": "2026-11-04T12:44:17Z",
+    "target": "2026-11-04T12:59:17Z",
+    "hardDeadline": "2026-11-04T13:14:17Z",
+    "baseCommit": "a08a08bbdc53f68953fdce55dab5e2ea9a6e92a6",
+    "state": "selected",
+    "clockNotReset": true,
+    "candidate": "Actual Memories collage retains pixel geometry from ctx startup W/H despite ordinary measured viewport shrink; scheduler only recovers degenerate boot.",
+    "sourceBindings": {
+      "app/src/main/assets/screensaver/mode-impls.js": {
+        "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+        "bytes": 68261
+      },
+      "app/src/main/assets/screensaver/modes.js": {
+        "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+        "bytes": 13499
+      },
+      "app/src/main/assets/screensaver/scheduler.js": {
+        "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+        "bytes": 14433
+      },
+      "scripts/tests/helpers/slideshow_scene_fixture.mjs": {
+        "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+        "bytes": 9921
+      }
+    },
+    "selectedAt": "2026-11-04T12:48:29.025344+00:00",
+    "scope": "Memories collage reflow uses current measured root size, retains current photo/card nodes and decode ownership, timer/beat/collage styling preserved."
+  },
+  "collectedAt": "2026-11-04T12:59:09.465445+00:00",
+  "wholeProductGoal": "active",
+  "turnOutcome": "progress",
+  "limits": [
+    "Actual packaged debug Memories mode.run on Family API29 with generated SVGs, virtual beat timers and real DOM layout/RAF; optional software Canvas only. No hardware raster, production scheduler/controller resize integration, mounted Dream/native clock/live-source/optimized/API28/Living/current-selection acceptance.",
+    "Frozen host cases use generated VM/DOM/timer adapters. Extremely tiny or zero-size root areas retain existing fallback and are outside the admitted regression.",
+    "Saved Shuffle/fit remains. Prior parked issues and original clocks are retained. Public release1.83/code77 unchanged; no phone, household media/provider/account, GitHub push or publication."
+  ]
+}

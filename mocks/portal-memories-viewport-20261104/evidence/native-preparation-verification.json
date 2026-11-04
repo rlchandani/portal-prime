@@ -1,0 +1,146 @@
+{
+  "sourceReady": true,
+  "authoredAtUtc": "2026-11-04T12:50:18.935837+00:00",
+  "originalClock": "2026-11-04T12:44:17Z target12:59:17Z hard13:14:17Z",
+  "package": "com.immortal.memoriesviewportfixture",
+  "activity": ".MemoriesViewportActivity",
+  "report": "external-files/report.json",
+  "sources": {
+    "MemoriesViewportActivity.java": {
+      "sha256": "e17e376ad6f5ee9c6a756c69e909276158e4f37c4448c5c55759524d8e1a5830",
+      "bytes": 6417
+    },
+    "fixture.html": {
+      "sha256": "01147d2ae7c1a5700eb402d9dcd818d648424686d340c1ffb5b254a3d7266b59",
+      "bytes": 5588
+    },
+    "AndroidManifest.xml": {
+      "sha256": "6c86e4f3740d5b25a3b87323abfc82b359301386c26322a7bb53065dcf7f03e0",
+      "bytes": 439
+    },
+    "RUN.md": {
+      "sha256": "f8a9c15837701eba34ddce898e86fcf4c40b87da9ed593a266edf1ff2dd19dce",
+      "bytes": 1876
+    },
+    "source-admission.json": {
+      "sha256": "6b5550509bff5b78bc74a1f1f25eae5be33927391acd6cdb5791050bbf50705f",
+      "bytes": 3463
+    },
+    "build.sh": {
+      "sha256": "d98de7e975741f016243722517bd060352ed18d099be2178c3e698908436f54a",
+      "bytes": 838
+    },
+    "repack.sh": {
+      "sha256": "a65ed4383e9baedeb3cc01db1aecf0e5b590587d9256de0955a3ff42511c918e",
+      "bytes": 846
+    },
+    "freeze.py": {
+      "sha256": "cabb227e38fa108f350a2c5f50de053087e44a1ae7787a406a32ab234d8f20c7",
+      "bytes": 1625
+    }
+  },
+  "caseNames": [
+    "retainedCollageShrink",
+    "nextCollageAfterEarlyShrink",
+    "originalFullsizeGeometry"
+  ],
+  "expectedBaselineFailNames": [
+    "retainedCollageShrink",
+    "nextCollageAfterEarlyShrink"
+  ],
+  "expectedBaselineControlNames": [
+    "originalFullsizeGeometry"
+  ],
+  "expectedCandidatePassNames": [
+    "retainedCollageShrink",
+    "nextCollageAfterEarlyShrink",
+    "originalFullsizeGeometry"
+  ],
+  "baselineApk": {
+    "path": "/private/tmp/portal-memories-viewport-20261104-124417/before-debug-1.156.apk",
+    "bytes": 46745298,
+    "sha256": "7143f6abcb66f1b6844cabfc342504b886d680f717d70564cbf4df276a23f899"
+  },
+  "assetAllowlist": [
+    "styles.css",
+    "lib-engine.js",
+    "modes.js",
+    "mode-impls.js",
+    "photo-doodles-dark.svg"
+  ],
+  "gates": {
+    "actualPackagedModeRun": true,
+    "caseCount": 3,
+    "generatedPhotos": 3,
+    "rootBefore": [
+      800,
+      480
+    ],
+    "rootAfter": [
+      400,
+      240
+    ],
+    "quantizationToleranceCssPx": 0.04,
+    "retainedCardImageUrlCursorIdentityAndNoResolutionPreloads": true,
+    "originalLiteralBoxes": [
+      [
+        64,
+        80.8,
+        336,
+        232
+      ],
+      [
+        424,
+        48.8,
+        288,
+        200
+      ],
+      [
+        512,
+        268.8,
+        96,
+        144
+      ]
+    ],
+    "unknownRequests": 0,
+    "webViewDestroyed": true,
+    "watchdogMillis": 45000
+  },
+  "declarations": {
+    "permissions": [],
+    "constructor": "Only fixture-owned Activity/WebView; no production class loaded",
+    "timers": "Fixture virtual mode setTimeout/Date.now; production CSS/layout/RAF/decode real",
+    "raster": "One optional originalFullsizeGeometry WebView.draw software Canvas PNG; no hardware/pixel gate"
+  },
+  "sourceAuthoringOnly": true,
+  "buildSdkAdbGitTestsDevices": 0,
+  "fixtureDexPendingRootCompilation": true,
+  "limits": [
+    "Direct actual mode.run, no production scheduler/controller/source/prefs/provider",
+    "No mounted Dream/native-overlay/clock/live-motion/integration acceptance",
+    "No optimized/API28/Living/current selection or hardware raster acceptance"
+  ],
+  "baselineAssetHashes": {
+    "styles.css": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+    "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+    "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+    "mode-impls.js": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+    "photo-doodles-dark.svg": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+  },
+  "ok": true,
+  "rootFullyReadBeforeCompilation": true,
+  "fixtureDex": {
+    "sha256": "f3517a56eb336177d042ac2ba85854d04b8463ac795bdeb1bf0ace85259237b8",
+    "bytes": 12772
+  },
+  "baselineFixture": {
+    "sha256": "81d0fff6f1a79a57aa2a1cd1fb6f88a5c82aafd653c5a249bdf6df5b7bd66917",
+    "bytes": 37507627
+  },
+  "sourceApk": {
+    "sha256": "7143f6abcb66f1b6844cabfc342504b886d680f717d70564cbf4df276a23f899",
+    "bytes": 46745298
+  },
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.memoriesviewportfixture\n"
+}

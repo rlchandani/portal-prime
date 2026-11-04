@@ -1,0 +1,10 @@
+{
+  "sessionId": 24377,
+  "overallShellExit": 0,
+  "initialSlideshowTests": 391,
+  "initialSlideshowFailures": 1,
+  "separateSlideshowExitNotCaptured": true,
+  "hostTerminalInitialSlideshowExit1IsInferredFromNodeFailureSummary": true,
+  "finalCiExitDirectlyObserved": 0,
+  "finalCiSession": 65134
+}

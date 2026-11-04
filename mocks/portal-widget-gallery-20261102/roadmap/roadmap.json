@@ -1,18 +1,81 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T12:42:41.499858+00:00",
-  "updatedLabel": "Calendar Tomorrow label delivered to both rooms; prior clocks retained",
+  "updatedAt": "2026-11-04T12:59:09.465445+00:00",
+  "updatedLabel": "Memories resize delivered to both rooms; original clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.156/code 150. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.157/code 151. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "memories-collage-viewport",
+      "title": "Memories photos fit after viewport resize",
+      "summary": "Reflow retained Memories collage cards and prepare later collages using current measured photo bounds.",
+      "status": "delivered",
+      "verification": "4,513 JVM \u00b7391 slideshow \u00b7743 app JS \u00b73 native cases \u00b7exact both-room installs",
+      "kind": "Screensaver photo layout",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent source and artifact review",
+      "deployment": "Exact optimized1.157/code151 fully hashed in both rooms; one install each.",
+      "acceptance": [
+        "Frozen6host:3 literal clipping failures/3controls to6passes.",
+        "Same frozen native actual-debug/API29 mode:2 clipping failures/1fullsize control to3passes; retained nodes/images/URLs/cursor and no new preload or source resolutions.",
+        "Only Memories production block changes; original slots, paper margin, cadence, motion and single-photo behavior retained."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery and limits",
+          "source": "docs/portal-memories-viewport-2026-11-04.md"
+        },
+        {
+          "text": "Verification",
+          "source": "mocks/portal-memories-viewport-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Actual packaged debug Memories mode.run on Family API29 with generated SVGs, virtual beat timers and real DOM layout/RAF; optional software Canvas only. No hardware raster, production scheduler/controller resize integration, mounted Dream/native clock/live-source/optimized/API28/Living/current-selection acceptance.",
+        "Frozen host cases use generated VM/DOM/timer adapters. Extremely tiny or zero-size root areas retain existing fallback and are outside the admitted regression.",
+        "Saved Shuffle/fit remains. Prior parked issues and original clocks are retained. Public release1.83/code77 unchanged; no phone, household media/provider/account, GitHub push or publication."
+      ],
+      "next": "Continue small visible improvements; broader motion remains separately scoped.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T12:44:17Z",
+        "target": "2026-11-04T12:59:17Z",
+        "hardDeadline": "2026-11-04T13:14:17Z",
+        "baseCommit": "a08a08bbdc53f68953fdce55dab5e2ea9a6e92a6",
+        "state": "selected",
+        "clockNotReset": true,
+        "candidate": "Actual Memories collage retains pixel geometry from ctx startup W/H despite ordinary measured viewport shrink; scheduler only recovers degenerate boot.",
+        "sourceBindings": {
+          "app/src/main/assets/screensaver/mode-impls.js": {
+            "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+            "bytes": 68261
+          },
+          "app/src/main/assets/screensaver/modes.js": {
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+            "bytes": 13499
+          },
+          "app/src/main/assets/screensaver/scheduler.js": {
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+            "bytes": 14433
+          },
+          "scripts/tests/helpers/slideshow_scene_fixture.mjs": {
+            "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+            "bytes": 9921
+          }
+        },
+        "selectedAt": "2026-11-04T12:48:29.025344+00:00",
+        "scope": "Memories collage reflow uses current measured root size, retains current photo/card nodes and decode ownership, timer/beat/collage styling preserved."
+      }
+    },
     {
       "id": "calendar-day-header-dst",
       "title": "Tomorrow label across daylight saving",

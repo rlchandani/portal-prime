@@ -1,0 +1,37 @@
+{
+  "initialFull": {
+    "sessionId": 24377,
+    "slideshowExit": 1,
+    "log": "all-slideshow-host.log",
+    "tests": 391,
+    "pass": 390,
+    "fail": 1
+  },
+  "mjsSubset": {
+    "sessionId": 76245,
+    "toolChunk": "349bc5",
+    "exitCode": 0,
+    "tests": 351
+  },
+  "modulesOnly": {
+    "sessionId": 34721,
+    "toolChunk": "15d01f",
+    "exitCode": 0,
+    "tests": 384
+  },
+  "allAppJs": {
+    "sessionId": 24377,
+    "exitCode": 0,
+    "tests": 743
+  },
+  "ciFull": {
+    "sessionId": 65134,
+    "toolChunk": "09f978",
+    "exitCode": 0,
+    "tests": 391,
+    "pass": 391,
+    "fail": 0,
+    "log": "all-slideshow-ci-final.log",
+    "command": "node --test scripts/test_slideshow_sources.mjs scripts/test_slideshow_labels.mjs scripts/tests/slideshow_*.test.mjs scripts/tests/slideshow_*.test.cjs"
+  }
+}

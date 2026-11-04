@@ -1,0 +1,272 @@
+{
+  "ok": false,
+  "error": null,
+  "tests": [
+    {
+      "name": "retainedCollageShrink",
+      "ok": false,
+      "checks": {
+        "contained": false,
+        "sameCards": true,
+        "sameImages": true,
+        "sameUrls": true,
+        "noResolutions": true,
+        "noLoads": true,
+        "sameCursor": true
+      },
+      "boxes": [
+        {
+          "x": 64,
+          "y": 80.79166412353516,
+          "w": 336,
+          "h": 232
+        },
+        {
+          "x": 424,
+          "y": 48.79166793823242,
+          "w": 288,
+          "h": 200
+        },
+        {
+          "x": 512,
+          "y": 268.7916564941406,
+          "w": 96,
+          "h": 144
+        }
+      ],
+      "root": {
+        "w": 400,
+        "h": 240
+      },
+      "photoCount": 3,
+      "sourceResolutions": 8,
+      "loadAdmissions": 7,
+      "cursor": 8,
+      "actualMode": "SS.MODES.memories.run",
+      "softwareRasterOnly": true
+    },
+    {
+      "name": "nextCollageAfterEarlyShrink",
+      "ok": false,
+      "checks": {
+        "contained": false,
+        "currentMeasured": true
+      },
+      "boxes": [
+        {
+          "x": 64,
+          "y": 80.79166412353516,
+          "w": 336,
+          "h": 232
+        },
+        {
+          "x": 424,
+          "y": 48.79166793823242,
+          "w": 288,
+          "h": 200
+        },
+        {
+          "x": 512,
+          "y": 268.7916564941406,
+          "w": 96,
+          "h": 144
+        }
+      ],
+      "root": {
+        "w": 400,
+        "h": 240
+      },
+      "photoCount": 3,
+      "sourceResolutions": 16,
+      "loadAdmissions": 14,
+      "cursor": 8,
+      "actualMode": "SS.MODES.memories.run",
+      "softwareRasterOnly": true
+    },
+    {
+      "name": "originalFullsizeGeometry",
+      "ok": true,
+      "checks": {
+        "contained": true,
+        "literalGeometry": true
+      },
+      "boxes": [
+        {
+          "x": 64,
+          "y": 80.79166412353516,
+          "w": 336,
+          "h": 232
+        },
+        {
+          "x": 424,
+          "y": 48.79166793823242,
+          "w": 288,
+          "h": 200
+        },
+        {
+          "x": 512,
+          "y": 268.7916564941406,
+          "w": 96,
+          "h": 144
+        }
+      ],
+      "root": {
+        "w": 800,
+        "h": 480
+      },
+      "photoCount": 3,
+      "sourceResolutions": 24,
+      "loadAdmissions": 21,
+      "cursor": 8,
+      "actualMode": "SS.MODES.memories.run",
+      "softwareRasterOnly": true
+    }
+  ],
+  "failures": 2,
+  "state": {
+    "complete": true,
+    "error": null,
+    "observations": [
+      {
+        "name": "retainedCollageShrink",
+        "ok": false,
+        "checks": {
+          "contained": false,
+          "sameCards": true,
+          "sameImages": true,
+          "sameUrls": true,
+          "noResolutions": true,
+          "noLoads": true,
+          "sameCursor": true
+        },
+        "boxes": [
+          {
+            "x": 64,
+            "y": 80.79166412353516,
+            "w": 336,
+            "h": 232
+          },
+          {
+            "x": 424,
+            "y": 48.79166793823242,
+            "w": 288,
+            "h": 200
+          },
+          {
+            "x": 512,
+            "y": 268.7916564941406,
+            "w": 96,
+            "h": 144
+          }
+        ],
+        "root": {
+          "w": 400,
+          "h": 240
+        },
+        "photoCount": 3,
+        "sourceResolutions": 8,
+        "loadAdmissions": 7,
+        "cursor": 8,
+        "actualMode": "SS.MODES.memories.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "nextCollageAfterEarlyShrink",
+        "ok": false,
+        "checks": {
+          "contained": false,
+          "currentMeasured": true
+        },
+        "boxes": [
+          {
+            "x": 64,
+            "y": 80.79166412353516,
+            "w": 336,
+            "h": 232
+          },
+          {
+            "x": 424,
+            "y": 48.79166793823242,
+            "w": 288,
+            "h": 200
+          },
+          {
+            "x": 512,
+            "y": 268.7916564941406,
+            "w": 96,
+            "h": 144
+          }
+        ],
+        "root": {
+          "w": 400,
+          "h": 240
+        },
+        "photoCount": 3,
+        "sourceResolutions": 16,
+        "loadAdmissions": 14,
+        "cursor": 8,
+        "actualMode": "SS.MODES.memories.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "originalFullsizeGeometry",
+        "ok": true,
+        "checks": {
+          "contained": true,
+          "literalGeometry": true
+        },
+        "boxes": [
+          {
+            "x": 64,
+            "y": 80.79166412353516,
+            "w": 336,
+            "h": 232
+          },
+          {
+            "x": 424,
+            "y": 48.79166793823242,
+            "w": 288,
+            "h": 200
+          },
+          {
+            "x": 512,
+            "y": 268.7916564941406,
+            "w": 96,
+            "h": 144
+          }
+        ],
+        "root": {
+          "w": 800,
+          "h": 480
+        },
+        "photoCount": 3,
+        "sourceResolutions": 24,
+        "loadAdmissions": 21,
+        "cursor": 8,
+        "actualMode": "SS.MODES.memories.run",
+        "softwareRasterOnly": true
+      }
+    ],
+    "caseCount": 3,
+    "virtualMillis": 27100,
+    "sourceResolutions": 24,
+    "loadAdmissions": 21,
+    "dpr": 1.125,
+    "screenshot": "fullsize-software.png",
+    "raster": "software WebView.draw Canvas; no PixelCopy/hardware acceptance"
+  },
+  "unknownRequests": 0,
+  "webViewDestroyed": true,
+  "assetHashes": {
+    "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+    "mode-impls.js": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+    "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+    "photo-doodles-dark.svg": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+    "styles.css": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+  },
+  "sourceApkSha256": "7143f6abcb66f1b6844cabfc342504b886d680f717d70564cbf4df276a23f899",
+  "sourceApkBytes": 46745298,
+  "sdk": 29,
+  "caseCount": 3,
+  "scope": "Actual packaged Memories mode.run; generated data SVGs; virtual beat timer; real DOM layout/RAF; optional software Canvas only"
+}

@@ -1,0 +1,9 @@
+{
+  "hostControlV1": {
+    "tests": 6,
+    "realViewportAssertionFailures": 3,
+    "excludedControlAssertions": 1,
+    "reason": "Cleanup control incorrectly expected removal of two empty scene roots. Mode clears resources; scheduler owns parent scene removal.",
+    "repair": "Keep three empty DOM nodes and assert zero photo/card owners; no viewport predicate changes."
+  }
+}

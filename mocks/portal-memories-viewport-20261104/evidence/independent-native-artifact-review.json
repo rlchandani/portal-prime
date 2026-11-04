@@ -1,0 +1,562 @@
+{
+  "ok": true,
+  "blockers": [],
+  "reviewedAtUtc": "2026-11-04T12:57:53.364540+00:00",
+  "reviewer": "/root/toolkit_source_review",
+  "originalDiscoveryAt": "2026-11-04T12:44:17Z",
+  "target": "2026-11-04T12:59:17Z",
+  "hardDeadline": "2026-11-04T13:14:17Z",
+  "clockNotReset": true,
+  "bindings": {
+    "selected-plan.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/selected-plan.json",
+      "sha256": "f226b0266f5a9348381a476ac4ae0004961730e9ae5f893ee2874944e4dac7a3",
+      "bytes": 1315
+    },
+    "source-witness.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/source-witness.json",
+      "sha256": "7320b97f983bbddb629712bcced2516b5a2cc1ff3acaef5b83993c13809004cd",
+      "bytes": 1116
+    },
+    "independent-source-review.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/independent-source-review.json",
+      "sha256": "d8c13a3a22eb40a626ffb5ca94cea66de3f2b8a4cba7f5d9e44f47f961d47cc9",
+      "bytes": 13751
+    },
+    "root-source-verification.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/root-source-verification.json",
+      "sha256": "2d3355ebe33c74165ff34565e4a43784bcecad5f99ed514088f539e538296081",
+      "bytes": 210
+    },
+    "initial-host-terminal-qualification.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/initial-host-terminal-qualification.json",
+      "sha256": "7c5dcfaa0c39eca0dea22a4df238560ca92db20ec2d8568b68d382bed00ee167",
+      "bytes": 299
+    },
+    "promotion-artifacts.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/promotion-artifacts.json",
+      "sha256": "9782536b7ad117c0673ce6fad28ecf948c51627e5982575623c36f42d2660e50",
+      "bytes": 4797
+    },
+    "verify-artifacts.py": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/verify-artifacts.py",
+      "sha256": "cb02e2c4e6dec69585e8f06f1be46d073e0392cc7c2eb90d360e4e346d53767e",
+      "bytes": 2513
+    },
+    "native-run.py": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-run.py",
+      "sha256": "9831ee6287d669a6b99c983dacb59a97c30304e75923b7abc737e4ab9968b47c",
+      "bytes": 4739
+    },
+    "native-before-report.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-before-report.json",
+      "sha256": "0871f45bf49ec8c560b6f7a16a946f42d5856e90e9330073ed6c21c47333f587",
+      "bytes": 6295
+    },
+    "native-after-report.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-after-report.json",
+      "sha256": "24fa6ecb737641f3c67d52b0db57529a7ad4a994418c7cfd8e2b977651a6f721",
+      "bytes": 6526
+    },
+    "native-before-retirement.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-before-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "native-after-retirement.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-after-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "native-before-terminal.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-before-terminal.json",
+      "sha256": "cdeafb41cc4b35788aaff6b96eee5487a9359feb5e489d0b129b0bc17f55d5da",
+      "bytes": 67
+    },
+    "native-after-terminal.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-after-terminal.json",
+      "sha256": "538f638c8effe1015989f6ae0ed56f0e5eca8500574c6b34aaf1d0ecddf23bed",
+      "bytes": 67
+    },
+    "native-before-terminal.log": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-before-terminal.log",
+      "sha256": "671cef6d826773c0342f083637a0180fd8c37eed38ac170be3d306ea31bf944a",
+      "bytes": 150
+    },
+    "native-after-terminal.log": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-after-terminal.log",
+      "sha256": "b8716b63661a7e35bc2eca3d46191964206b317297bb516ef20fbf0a9657b6bc",
+      "bytes": 149
+    },
+    "native-build.log": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-build.log",
+      "sha256": "251563bac0ddf01fd974d179934ff3eda3d4e02d23bd6a66ad597937c530a231",
+      "bytes": 834
+    },
+    "native-repack.log": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-repack.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "build-terminal.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/build-terminal.json",
+      "sha256": "a5ada10920c6931319c4d365c02433735024e13107188c5cf78685de7db04f43",
+      "bytes": 96
+    },
+    "build-gradle.log": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/build-gradle.log",
+      "sha256": "e86899cbb6995af0e9c5fcf54315efd1e69d063585c115051eba9c26c5916c71",
+      "bytes": 13690
+    },
+    "host-terminal.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/host-terminal.json",
+      "sha256": "850c50a499558f59f731466d241acafc879bf35fe293d4cb269c406bdc984a0e",
+      "bytes": 810
+    },
+    "all-slideshow-ci-final.log": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/all-slideshow-ci-final.log",
+      "sha256": "2db56f77e53baf7052c835999162b9209afd1c5f72a812d0c55676090b820a11",
+      "bytes": 37482
+    },
+    "all-app-js.log": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/all-app-js.log",
+      "sha256": "66fc8ce372ec5dd50ee9d96428bab833759db87f7bb91e6965550705a52d39bf",
+      "bytes": 74898
+    },
+    "baseline-host-terminal.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/baseline-host-terminal.json",
+      "sha256": "9099f17e12ede2170ad4f816b38018928c11bf565ed2128ee9da99363f181315",
+      "bytes": 295
+    },
+    "baseline-host-final.log": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/baseline-host-final.log",
+      "sha256": "637281eef26dd57cbdb1c7cc64b62c142d4472aab08a3db4f56f8f18c2c889ed",
+      "bytes": 3156
+    },
+    "excluded-operational-failures.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/excluded-operational-failures.json",
+      "sha256": "02f935c4e1908dc99ba80a07b4b115e3744212cbdbfb30048871fe61ad734e61",
+      "bytes": 378
+    },
+    "slideshow_memories_viewport.frozen.test.mjs": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/slideshow_memories_viewport.frozen.test.mjs",
+      "sha256": "af1e2c9a3cf3a2c749b4ce8c176aa6dd2c29bdfff092b285159515283e6096d3",
+      "bytes": 5097
+    },
+    "candidate-host-focused.log": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/candidate-host-focused.log",
+      "sha256": "0db677c4b6726d06a1d961717cc3f306f802c5c8d0e61a1d39c493e92ef3ed44",
+      "bytes": 653
+    },
+    "before-debug-1.156.apk": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/before-debug-1.156.apk",
+      "sha256": "7143f6abcb66f1b6844cabfc342504b886d680f717d70564cbf4df276a23f899",
+      "bytes": 46745298
+    },
+    "candidate-debug-1.157.apk": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/candidate-debug-1.157.apk",
+      "sha256": "bea8a85790f829d86fa401e93afe09e9aae6f9dc5f5520f6820033ed137443b2",
+      "bytes": 46745522
+    },
+    "candidate-performance-1.157.apk": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/candidate-performance-1.157.apk",
+      "sha256": "65e581f9897113f584462e7b217e751318f98e2ddfcaa037ceac7e15534f8e27",
+      "bytes": 25886783
+    },
+    "rollback-1.156.apk": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/rollback-1.156.apk",
+      "sha256": "a4d0441e943627c1209ecac7dc2473990b54807243b28824318359ff2ebb1cc4",
+      "bytes": 25886647
+    },
+    "native-before-fullsize-software.png": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-before-fullsize-software.png",
+      "sha256": "a0894e2fcce9289c8403c9a85fd91047a7db654a0d1434d459c035572e29e61e",
+      "bytes": 46624
+    },
+    "native-after-fullsize-software.png": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-after-fullsize-software.png",
+      "sha256": "a0894e2fcce9289c8403c9a85fd91047a7db654a0d1434d459c035572e29e61e",
+      "bytes": 46624
+    },
+    "native-owned/MemoriesViewportActivity.java": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/MemoriesViewportActivity.java",
+      "sha256": "e17e376ad6f5ee9c6a756c69e909276158e4f37c4448c5c55759524d8e1a5830",
+      "bytes": 6417
+    },
+    "native-owned/fixture.html": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/fixture.html",
+      "sha256": "01147d2ae7c1a5700eb402d9dcd818d648424686d340c1ffb5b254a3d7266b59",
+      "bytes": 5588
+    },
+    "native-owned/AndroidManifest.xml": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/AndroidManifest.xml",
+      "sha256": "6c86e4f3740d5b25a3b87323abfc82b359301386c26322a7bb53065dcf7f03e0",
+      "bytes": 439
+    },
+    "native-owned/RUN.md": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/RUN.md",
+      "sha256": "f8a9c15837701eba34ddce898e86fcf4c40b87da9ed593a266edf1ff2dd19dce",
+      "bytes": 1876
+    },
+    "native-owned/source-admission.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/source-admission.json",
+      "sha256": "6b5550509bff5b78bc74a1f1f25eae5be33927391acd6cdb5791050bbf50705f",
+      "bytes": 3463
+    },
+    "native-owned/preparation-verification.json": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/preparation-verification.json",
+      "sha256": "452e2a9532d275d2072917601c3e874028a1e913a4cde881194e808fdc3cea33",
+      "bytes": 4537
+    },
+    "native-owned/build.sh": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/build.sh",
+      "sha256": "d98de7e975741f016243722517bd060352ed18d099be2178c3e698908436f54a",
+      "bytes": 838
+    },
+    "native-owned/repack.sh": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/repack.sh",
+      "sha256": "a65ed4383e9baedeb3cc01db1aecf0e5b590587d9256de0955a3ff42511c918e",
+      "bytes": 846
+    },
+    "native-owned/freeze.py": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/freeze.py",
+      "sha256": "cabb227e38fa108f350a2c5f50de053087e44a1ae7787a406a32ab234d8f20c7",
+      "bytes": 1625
+    },
+    "native-owned/frozen-dex/classes.dex": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/frozen-dex/classes.dex",
+      "sha256": "f3517a56eb336177d042ac2ba85854d04b8463ac795bdeb1bf0ace85259237b8",
+      "bytes": 12772
+    },
+    "native-owned/baseline-fixture.apk": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/baseline-fixture.apk",
+      "sha256": "81d0fff6f1a79a57aa2a1cd1fb6f88a5c82aafd653c5a249bdf6df5b7bd66917",
+      "bytes": 37507627
+    },
+    "native-owned/memories-viewport-fixture.apk": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/memories-viewport-fixture.apk",
+      "sha256": "4de59c1c037ab925e36908ea3c01b601284fda97dfbf7afc68dda088c3ce5d52",
+      "bytes": 37507627
+    },
+    "source/screensaver/cinema-grain.png": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png",
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "bytes": 12657
+    },
+    "source/screensaver/index.html": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html",
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "bytes": 7785
+    },
+    "source/screensaver/lib-engine.js": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js",
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "bytes": 5582
+    },
+    "source/screensaver/mode-impls.js": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js",
+      "sha256": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960",
+      "bytes": 69311
+    },
+    "source/screensaver/modes.js": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js",
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "source/screensaver/photo-doodles-dark.svg": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg",
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "bytes": 1247
+    },
+    "source/screensaver/photo-doodles.svg": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg",
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "bytes": 1246
+    },
+    "source/screensaver/photos.js": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js",
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "bytes": 8528
+    },
+    "source/screensaver/scheduler.js": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js",
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "source/screensaver/styles.css": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css",
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "bytes": 15397
+    }
+  },
+  "frozenFixtureReview": {
+    "sourcesMatchAuthorAdmissionAndRootPreparation": true,
+    "sameDexHtmlManifestAllNonSignatureEntries": true,
+    "zipEntriesChanged": [
+      "assets/source.apk",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/MANIFEST.MF"
+    ],
+    "onlySourceApkAndSigningMetadataChanged": true,
+    "baselineEmbeddedSource": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/before-debug-1.156.apk",
+      "sha256": "7143f6abcb66f1b6844cabfc342504b886d680f717d70564cbf4df276a23f899",
+      "bytes": 46745298
+    },
+    "candidateEmbeddedSource": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/candidate-debug-1.157.apk",
+      "sha256": "bea8a85790f829d86fa401e93afe09e9aae6f9dc5f5520f6820033ed137443b2",
+      "bytes": 46745522
+    },
+    "fixtureDex": {
+      "path": "/private/tmp/portal-memories-viewport-20261104-124417/native-owned/frozen-dex/classes.dex",
+      "sha256": "f3517a56eb336177d042ac2ba85854d04b8463ac795bdeb1bf0ace85259237b8",
+      "bytes": 12772
+    },
+    "bothFixtureZipNamesUnique": true,
+    "manifestDeclaredPermissions": [],
+    "actualAssetHashAllowlistExactBothReports": true,
+    "requestBoundary": "Only exact fixed APK asset paths served; generated data SVGs handled internally; owned favicon explicitly404; all other requests returned empty and counted. No Internet permission; source zip hashes recomputed.",
+    "assertionBoundary": "Direct SS.MODES.memories.run; generated three-SVG deck; virtual setTimeout/Date.now beat time at27100ms; real browser decode/DOM layout/real two-RAF frames. Same frozen HTML/assertions/0.04CSSpx tolerance across before and after. DOM bounding boxes are authoritative; optional fullsize WebView.draw software PNG has no pixel acceptance gate.",
+    "lifecycleBoundary": "Reported WebView.destroy called and APK ZipFile closed before report; outer root driver additionally verifies package/process/external directory absent. This is owned fixture retirement, not production controller/source lifecycle acceptance.",
+    "preparationProvenance": "Inherited sourceAuthoringOnly/fixtureDexPendingRootCompilation fields retain author-stage provenance. Root preparation ok/rootFullyReadBeforeCompilation and frozen DEX/baseline fixture bindings are authoritative current compilation records."
+  },
+  "nativeReportReview": {
+    "before": {
+      "tests": 3,
+      "failures": 2,
+      "failedNames": [
+        "retainedCollageShrink",
+        "nextCollageAfterEarlyShrink"
+      ],
+      "onlyFailedCheck": "contained",
+      "fullsizeControl": true,
+      "sdk": 29,
+      "unknownRequests": 0,
+      "webViewDestroyed": true,
+      "retirement": {
+        "packageAbsent": true,
+        "processAbsent": true,
+        "externalDirectoryAbsent": true
+      },
+      "terminal": {
+        "sessionId": 44414,
+        "toolChunk": "b6f1b1",
+        "exitCode": 0
+      }
+    },
+    "after": {
+      "tests": 3,
+      "failures": 0,
+      "allChecksPass": true,
+      "sdk": 29,
+      "unknownRequests": 0,
+      "webViewDestroyed": true,
+      "retirement": {
+        "packageAbsent": true,
+        "processAbsent": true,
+        "externalDirectoryAbsent": true
+      },
+      "terminal": {
+        "sessionId": 86796,
+        "toolChunk": "13f115",
+        "exitCode": 0
+      }
+    },
+    "literalGeometryRecomputedFromFullReports": true,
+    "retainedCardImageUrlCursorAndNoNewResolutionLoadChecksPassBoth": true,
+    "sameFullsizeGeometryBoth": true,
+    "noClaimOfHardwareOrNativeExceptionAssertionType": "Failures are literal false DOM contained assertions, not harness errors or Java AssertionError reports."
+  },
+  "artifactReview": {
+    "variants": {
+      "debug": {
+        "allTenSourceExact": true,
+        "changedSinceBaseline": [
+          "assets/screensaver/mode-impls.js"
+        ],
+        "assets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+            "bytes": 12657
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+            "bytes": 7785
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+            "bytes": 5582
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "sha256": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960",
+            "bytes": 69311
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+            "bytes": 13499
+          },
+          {
+            "path": "assets/screensaver/photo-doodles-dark.svg",
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+            "bytes": 1247
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+            "bytes": 1246
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+            "bytes": 8528
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+            "bytes": 14433
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+            "bytes": 15397
+          }
+        ],
+        "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+      },
+      "performance": {
+        "allTenSourceExact": true,
+        "changedSinceBaseline": [
+          "assets/screensaver/mode-impls.js"
+        ],
+        "assets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+            "bytes": 12657
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+            "bytes": 7785
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+            "bytes": 5582
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "sha256": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960",
+            "bytes": 69311
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+            "bytes": 13499
+          },
+          {
+            "path": "assets/screensaver/photo-doodles-dark.svg",
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+            "bytes": 1247
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+            "bytes": 1246
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+            "bytes": 8528
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+            "bytes": 14433
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+            "bytes": 15397
+          }
+        ],
+        "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+      }
+    },
+    "binaryManifestIndependentlyParsedEarlierInReview": {
+      "debug": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 151,
+        "versionName": "1.157",
+        "compileSdkVersion": 36
+      },
+      "performance": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 151,
+        "versionName": "1.157",
+        "compileSdkVersion": 36
+      }
+    },
+    "certificateIdentityIndependentlyExtractedFromApkV2SigningBlock": true,
+    "signatureVerificationLimit": "Reviewer extracts exact signer certificate identity without SDK or independent cryptographic signature validation; root verify-artifacts.py binds successful apksigner verification to these same exact APK hashes.",
+    "apkSnapshotsMode0400": true,
+    "jvm": {
+      "tests": 4513,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 471
+    },
+    "jvmXmlCollection": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+      "files": 471,
+      "canonicalNameSha256BytesRecordsSha256": "e2913592c3e0efcbc12bcf10d0e1cddd922b0864385cbb4e76765baa1136243f",
+      "earliestTimestamp": "2026-11-04T12:49:59.571Z",
+      "latestTimestamp": "2026-11-04T12:50:35.043Z"
+    },
+    "buildTerminalExit0": true,
+    "buildSuccessfulR8VitalTasksRecorded": true,
+    "finalSlideshowCi": {
+      "tests": 391,
+      "pass": 391,
+      "fail": 0,
+      "directTerminal": {
+        "sessionId": 65134,
+        "toolChunk": "09f978",
+        "exitCode": 0,
+        "tests": 391,
+        "pass": 391,
+        "fail": 0,
+        "log": "all-slideshow-ci-final.log",
+        "command": "node --test scripts/test_slideshow_sources.mjs scripts/test_slideshow_labels.mjs scripts/tests/slideshow_*.test.mjs scripts/tests/slideshow_*.test.cjs"
+      }
+    },
+    "allAppJs": {
+      "tests": 743,
+      "pass": 743,
+      "fail": 0
+    },
+    "initialHostTerminalQualification": "Initial slideshow exit1 inferred from391 tests/1failure; no separate child exit captured. Containing shell overall0 ended with successful appJS. FinalCI65134/09f978 actual exit0 is authoritative."
+  },
+  "sourceReviewParentFinalGate": {
+    "ok": true,
+    "rootFullyReadInitialAndUpdatedReview": true,
+    "allExactBindings": 35,
+    "reviewSha256": "d8c13a3a22eb40a626ffb5ca94cea66de3f2b8a4cba7f5d9e44f47f961d47cc9",
+    "fullReadToolChunk": "684143"
+  },
+  "limits": [
+    "Direct debug APK/API29 mode.run only; no production scheduler/controller/mountedDream/native-overlay/clock/source-startup acceptance.",
+    "Generated DOM dimensions and virtual timer scope; optional softwareCanvas only, no hardware PixelCopy, raster fidelity or performance claim.",
+    "No live provider/account/owner media/preferences/registry/phone/network access.",
+    "No optimized APK behavioral acceptance, API28, Living room or current selected room style acceptance.",
+    "No reviewer tests/builds/SDK/devices/Git/network execution; read-only local artifact/report review plus this private receipt."
+  ]
+}
