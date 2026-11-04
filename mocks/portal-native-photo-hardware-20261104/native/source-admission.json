@@ -1,0 +1,89 @@
+{
+  "sourceReady": true,
+  "authoredAtUtc": "2026-11-04T12:19:41.100341+00:00",
+  "originalClock": "2026-11-04T12:15:12Z target12:30:12Z hard12:45:12Z",
+  "package": "com.immortal.attachedphotofixture",
+  "activity": ".AttachedPhotoActivity",
+  "report": "external-files/report.json",
+  "sources": {
+    "AttachedPhotoActivity.java": {
+      "sha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+      "bytes": 19968
+    },
+    "AndroidManifest.xml": {
+      "sha256": "c572681aa75930d2f29e97be9e4fe07e395eb117663a443ffea7e3f3ab891c1f",
+      "bytes": 463
+    },
+    "RUN.md": {
+      "sha256": "c6b7e9e4382df4be89f83287075b51e6f33526b799f1177f02ecb8e6709cb340",
+      "bytes": 2117
+    }
+  },
+  "caseNames": [
+    "portrait-whole-fit",
+    "panorama-whole-fit",
+    "gallery-spread"
+  ],
+  "currentOnlyAcceptance": true,
+  "noRedOrSourceChangeClaim": true,
+  "reusedPredicateSource": {
+    "sha256": "6a88b2458abb573cca4c2faba014dbaa4ecc90c5bbaefa17bb95db1be46443ad",
+    "bytes": 15594
+  },
+  "borderPredicateByteIdentical": true,
+  "sourceBindings": {
+    "SlideshowStage.kt": {
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "NativePhotoView.kt": {
+      "sha256": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "bytes": 1621
+    },
+    "NativePhotoMatte.kt": {
+      "sha256": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "bytes": 3372
+    }
+  },
+  "gates": {
+    "pixelCopyOwnWindowAfterTwoCommittedFrames": true,
+    "softwareHardwareIndependentFrozenPixelPredicates": true,
+    "literalCornerTolerance": 12,
+    "edgeBlendTolerance": 17,
+    "edgePlainTolerance": 2,
+    "matteQuietMarksMin": 50,
+    "matteBaseMinFraction": 0.65,
+    "matteQuietMaxFraction": 0.3,
+    "zeroBadMatteAndTransparentPixels": true,
+    "wholeGeometryIdentityAdmission": true,
+    "noPrefsResolverServices": true,
+    "stageStopBudgetZero": true,
+    "detachCommitBeforeRecycle": true,
+    "watchdogMillis": 45000
+  },
+  "declaredManifestPermissions": [],
+  "hardwareAcceleratedManifest": true,
+  "fixtureDexPendingRootCompilation": true,
+  "sourceAuthoringOnly": true,
+  "buildSdkAdbGitTestsDevices": 0,
+  "rootRequired": [
+    "compile/sign",
+    "verify exact current source APK and compiled zero permissions",
+    "freeze DEX and sources before execution"
+  ],
+  "limits": [
+    "No production controller/FaceRenderer/source startup or room style selection",
+    "No owner data/provider/network/account",
+    "No clock/resize/dissolve/live motion",
+    "No optimized/API28/Living/performance"
+  ],
+  "adapterVersion": 2,
+  "nullInputMethodTypeAdmission": "Only observed InputMethodManager.class getSystemServiceName request returns null; no service lookup/delegation, all other types fail/count.",
+  "excludedV1": {
+    "tests": 1,
+    "retiredScenes": 0,
+    "cleanup": false,
+    "reason": "Owned View retirement required typed InputMethodManager name; strict Context threw before normal retirement. Portrait partial reports not accepted; PNGs not collected.",
+    "packageProcessExternalDirectoryAbsent": true
+  }
+}

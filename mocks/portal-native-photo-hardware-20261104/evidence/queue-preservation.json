@@ -1,0 +1,14 @@
+{
+  "all148OldObjectsExact": true,
+  "defaultUnchanged": true,
+  "oldRawSuffixBytes": 480693,
+  "oldRawSuffixSha256": "9143bc40762b3d86080d61015b6dea0a883a3afe63f09c7a6f84931d1521292e",
+  "counts": {
+    "verified": 42,
+    "delivered": 97,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "tasks": 149
+}

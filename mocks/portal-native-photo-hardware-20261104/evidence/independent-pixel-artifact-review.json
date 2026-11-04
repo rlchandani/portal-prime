@@ -1,0 +1,493 @@
+{
+  "ok": true,
+  "status": "PASS_CURRENT_BOUNDED_ATTACHED_HARDWARE_ACCEPTANCE",
+  "reviewedAtUtc": "2026-11-04T12:26:58.884343+00:00",
+  "clock": {
+    "original": "2026-11-04T12:15:12Z",
+    "target": "2026-11-04T12:30:12Z",
+    "hard": "2026-11-04T12:45:12Z",
+    "notReset": true
+  },
+  "blockers": [],
+  "checks": {
+    "threeActualEmbeddedStageScenes": true,
+    "sameStageSoftwareCanvasAndOwnedWindowPixelCopy": true,
+    "twoCommittedFramesBeforeEachPixelCopy": true,
+    "currentAttachedHardwareStageApi29Density1_125": true,
+    "allSixRealPngsIndependentlyReplayed": true,
+    "literalFloat32CornerCoordinatesArgbAndTwelveChannelTolerance": true,
+    "literalThreePixelEdgeStripsSeventeenToleranceAndDepthFourPlainBody": true,
+    "sixteenCornersAndSixteenEdgesPerPath": true,
+    "matteCountsAndEveryAlphaMatchReport": true,
+    "geometryWholeSourceAspectAndBudgetSumsChecked": true,
+    "sameGeometryIdentityAndBudgetReportedAcrossBothPaths": true,
+    "zeroUnexpectedGeneratedContextPreferenceResolverServiceRequests": true,
+    "threeStagesStoppedBudgetZeroDetachedBeforeInputRecycling": true,
+    "bothExcludedAndAcceptedPackageProcessExternalDirectoryAbsent": true,
+    "v2OnlyObservedNullTypedInputMethodAdmissionAndReportFields": true,
+    "sameCasePixelFrameCleanupBodiesAndRootDriverAcrossAdapterVersions": true,
+    "edgeAndColorMethodsByteIdenticalToPriorFrozenBorderFixture": true,
+    "exactCurrentDebugApkEmbeddedAndFrozenV2Dex": true,
+    "manifestNoPermissionsHardwareEnabled": true,
+    "tenBundledScreensaverAssetsExactCurrentSource": true,
+    "nativeTerminalExitZeroBound": true
+  },
+  "pixelReplay": [
+    {
+      "case": "portrait-whole-fit",
+      "path": "hardware",
+      "cornersPassed": 4,
+      "edgesPassed": 4,
+      "maxBestEdgeDistance": 0,
+      "admittedBytes": 1536000,
+      "mattePixels": 243360,
+      "basePixels": 239058,
+      "quietMarks": 4302,
+      "badMatte": 0,
+      "transparentPixels": 0
+    },
+    {
+      "case": "portrait-whole-fit",
+      "path": "software",
+      "cornersPassed": 4,
+      "edgesPassed": 4,
+      "maxBestEdgeDistance": 0,
+      "admittedBytes": 1536000,
+      "mattePixels": 243360,
+      "basePixels": 239419,
+      "quietMarks": 3941,
+      "badMatte": 0,
+      "transparentPixels": 0
+    },
+    {
+      "case": "panorama-whole-fit",
+      "path": "hardware",
+      "cornersPassed": 4,
+      "edgesPassed": 4,
+      "maxBestEdgeDistance": 0,
+      "admittedBytes": 5760000,
+      "mattePixels": 220000,
+      "basePixels": 215982,
+      "quietMarks": 4018,
+      "badMatte": 0,
+      "transparentPixels": 0
+    },
+    {
+      "case": "panorama-whole-fit",
+      "path": "software",
+      "cornersPassed": 4,
+      "edgesPassed": 4,
+      "maxBestEdgeDistance": 1,
+      "admittedBytes": 5760000,
+      "mattePixels": 220000,
+      "basePixels": 216324,
+      "quietMarks": 3676,
+      "badMatte": 0,
+      "transparentPixels": 0
+    },
+    {
+      "case": "gallery-spread",
+      "path": "hardware",
+      "cornersPassed": 8,
+      "edgesPassed": 8,
+      "maxBestEdgeDistance": 4,
+      "admittedBytes": 3456000,
+      "mattePixels": 144628,
+      "basePixels": 141185,
+      "quietMarks": 3443,
+      "badMatte": 0,
+      "transparentPixels": 0
+    },
+    {
+      "case": "gallery-spread",
+      "path": "software",
+      "cornersPassed": 8,
+      "edgesPassed": 8,
+      "maxBestEdgeDistance": 4,
+      "admittedBytes": 3456000,
+      "mattePixels": 144628,
+      "basePixels": 141506,
+      "quietMarks": 3122,
+      "badMatte": 0,
+      "transparentPixels": 0
+    }
+  ],
+  "pixelMethod": "Bundled PIL/NumPy independently decoded six actual800x480 PNGs. Float32 geometry-derived corner/edge coordinates and literal ARGBs, all edge strips/depth4 samples and max distances, photo envelopes expanded2px, per-pixel alpha/base/quiet/off-range matte counts reproduced exact native report. Hardware/software geometry and admitted bytes exact; raster images need not be byte-identical.",
+  "geometryAndAdmission": [
+    {
+      "case": "portrait-whole-fit",
+      "geometry": [
+        {
+          "left": 256,
+          "top": 1.430511474609375e-05,
+          "right": 544,
+          "bottom": 479.9999694824219,
+          "sourceWidth": 480,
+          "sourceHeight": 800,
+          "holderLeft": 0,
+          "holderTop": 0,
+          "holderRight": 800,
+          "holderBottom": 480,
+          "scaleX": 0.5999999642372131,
+          "scaleY": 0.5999999642372131
+        }
+      ],
+      "admittedBytes": 1536000,
+      "windowCrop": [
+        680,
+        480,
+        1480,
+        960
+      ],
+      "frames": 2,
+      "pixelCopyResult": 0
+    },
+    {
+      "case": "panorama-whole-fit",
+      "geometry": [
+        {
+          "left": 2.384185791015625e-05,
+          "top": 140,
+          "right": 799.9999389648438,
+          "bottom": 340,
+          "sourceWidth": 2400,
+          "sourceHeight": 600,
+          "holderLeft": 0,
+          "holderTop": 0,
+          "holderRight": 800,
+          "holderBottom": 480,
+          "scaleX": 0.3333333134651184,
+          "scaleY": 0.3333333134651184
+        }
+      ],
+      "admittedBytes": 5760000,
+      "windowCrop": [
+        680,
+        480,
+        1480,
+        960
+      ],
+      "frames": 2,
+      "pixelCopyResult": 0
+    },
+    {
+      "case": "gallery-spread",
+      "geometry": [
+        {
+          "left": 68.9000015258789,
+          "top": 14.000000953674316,
+          "right": 340.1000061035156,
+          "bottom": 466,
+          "sourceWidth": 480,
+          "sourceHeight": 800,
+          "holderLeft": 14,
+          "holderTop": 14,
+          "holderRight": 395,
+          "holderBottom": 466,
+          "scaleX": 0.5649999976158142,
+          "scaleY": 0.5649999976158142
+        },
+        {
+          "left": 404,
+          "top": 97.125,
+          "right": 785,
+          "bottom": 382.875,
+          "sourceWidth": 800,
+          "sourceHeight": 600,
+          "holderLeft": 404,
+          "holderTop": 14,
+          "holderRight": 785,
+          "holderBottom": 466,
+          "scaleX": 0.4762499928474426,
+          "scaleY": 0.4762499928474426
+        }
+      ],
+      "admittedBytes": 3456000,
+      "windowCrop": [
+        680,
+        480,
+        1480,
+        960
+      ],
+      "frames": 2,
+      "pixelCopyResult": 0
+    }
+  ],
+  "sourceApk": {
+    "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+    "bytes": 46745294
+  },
+  "fixtureDex": {
+    "sha256": "ecd457faedde0d8d8bf75c348fa424bcb72768c9c1a8587d8ae91c0982b990e9",
+    "bytes": 28896
+  },
+  "fixtureApk": {
+    "sha256": "4767263e3e5c9a034696fa00458aee2eb7b6e1029f3bf546e6c65753f0cac7e2",
+    "bytes": 37511658
+  },
+  "currentApkMetadata": {
+    "versionName": "1.155",
+    "versionCode": 149,
+    "signerSha256FromPriorRootSdkArtifactGate": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "noNewRelease": true
+  },
+  "excludedAttempt": {
+    "adapterVersion": 1,
+    "executedScenes": 1,
+    "portraitReportPixelChecksPassed": true,
+    "independentPixelAcceptance": false,
+    "error": "capture:java.lang.IllegalStateException:No typed service admitted: class android.view.inputmethod.InputMethodManager",
+    "retiredScenes": 0,
+    "cleanup": false,
+    "partialPngsNotCollected": "Excluded from acceptance; full source/APK/report/driver/retirement preserved. This is fixture framework-context admission failure, not a product RED/source fix."
+  },
+  "contextQualification": {
+    "observedInputMethodNullAdmissions": 17,
+    "unexpectedPreferenceRequests": 0,
+    "unexpectedResolverRequests": 0,
+    "unexpectedServiceRequests": 0,
+    "realInputMethodServiceAccesses": "Constant zero source containment: exact getSystemServiceName(InputMethodManager.class) returns null, without acquiring or delegating a service. Not a global instrumented loader/OS-service counter.",
+    "explicitFixtureResources": "Generated Stage Context has null base; only owned fixture Resources/Theme/Assets/ApplicationInfo/classloader/display are admitted for Android View construction. These resource bridges are source containment, not resource-call counts. Owner Activity handles its own Window and PixelCopy."
+  },
+  "retirement": {
+    "packageAbsent": true,
+    "processAbsent": true,
+    "externalDirectoryAbsent": true
+  },
+  "terminal": {
+    "sessionId": 22382,
+    "terminalExitCode": 0,
+    "rootObservedAt": "2026-11-04T12:24:36Z",
+    "output": {
+      "currentOnly": true,
+      "nativeCases": 3,
+      "hardwareWindows": 3,
+      "softwareCaptures": 3,
+      "cornersPerPath": 16,
+      "edgesPerPath": 16,
+      "framesPerCase": 2,
+      "noAppSourceOrVersionChange": true
+    }
+  },
+  "pngDecodedRgbaSha256": {
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/portrait-whole-fit-hardware.png": "c595bc7b4b3949dd74cc97d08ac23d6f7b6e64850fa688b8f6375aecc7872370",
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/portrait-whole-fit-software.png": "8cfffb245a809e8d23c20609adeb9fbde817aa1737e842baff3fdd9ff53baeb9",
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/panorama-whole-fit-hardware.png": "d4f56b5ed96a4d595049da7f562e21ecd9fba56b281c8e1ac5ea236b30b577ab",
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/panorama-whole-fit-software.png": "f2d7fefb4897f0eccf1ddc631a04b8ff3c20b1207ced32c13d315f6e95e521ef",
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/gallery-spread-hardware.png": "e34d9d6905be98e9fb8559eabdfd46fcec795c74c1b4aacadeff5edb5773382b",
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/gallery-spread-software.png": "f85ca1da6b2585449e4acf28a6896cea1bab0d765efa4f9945492fc1a21229c7"
+  },
+  "limits": [
+    "Three selected static first presentations on the current actual debug APK/API29/density1.125 using generated four-corner bitmaps and owned attached Activity Window. A prior hardware/Dream proof is not denied and no first-ever hardware claim is made.",
+    "Stage host is inactive and motion false. No actual photo-source scan/decode/cache/startup, production controller/Dream/FaceRenderer, clock reservations/timing, resize, swaps/dissolve/live motion or broader handoff acceptance.",
+    "No current room style selection, owner media/preferences/providers/accounts, phone/network, optimized/APK runtime, API28, Living hardware, performance/visual scheduler or exhausted scope claim.",
+    "Source class origin and identity/admission fields are verified through frozen fixture source and retained native report; host pixel analysis independently proves the sampled photograph/edge/matte output. No device/SDK/build/Git/test or source/fixture edit by this reviewer.",
+    "Signature/manifest APK metadata are retained prior root SDK verification for identical1.155debug bytes, not an independently rerun SDK/certificate check. No production source change or new release accompanies this acceptance."
+  ],
+  "bindings": {
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/AttachedPhotoActivity.java": {
+      "sha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+      "bytes": 19968
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/AndroidManifest.xml": {
+      "sha256": "c572681aa75930d2f29e97be9e4fe07e395eb117663a443ffea7e3f3ab891c1f",
+      "bytes": 463
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/build.sh": {
+      "sha256": "323e0b129a6dd3126d65b9ec851c55d1e4256c5588aced08617f4304318bf7a4",
+      "bytes": 832
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/repack.sh": {
+      "sha256": "57e46c2ab383f78a53b6d2c717c3a943832bb52b5f0333afd2ea6ca3f2200d6c",
+      "bytes": 785
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/freeze.py": {
+      "sha256": "624eba2c3f89f8d49494f7d0fe12cf42dfc984f4b2d9dfabd9bde8bfe873b144",
+      "bytes": 1467
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/RUN.md": {
+      "sha256": "f694b2a1382ffd7f4c90a132b42b437d9efdc8b322191f7d920db5e08ccb7be2",
+      "bytes": 2572
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/source-admission.json": {
+      "sha256": "57571e8fe41cf6790f9dd29e7859eb360e0bbca797d20efaaf2bc85370381499",
+      "bytes": 3158
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowStage.kt": {
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoView.kt": {
+      "sha256": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "bytes": 1621
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoMatte.kt": {
+      "sha256": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "bytes": 3372
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/source-debug-1.155.apk": {
+      "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+      "bytes": 46745294
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/attached-photo-fixture.apk": {
+      "sha256": "4767263e3e5c9a034696fa00458aee2eb7b6e1029f3bf546e6c65753f0cac7e2",
+      "bytes": 37511658
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/frozen-dex/classes.dex": {
+      "sha256": "ecd457faedde0d8d8bf75c348fa424bcb72768c9c1a8587d8ae91c0982b990e9",
+      "bytes": 28896
+    },
+    "/private/tmp/portal-native-border-20261104-102909/native/NativeBorderActivity.java": {
+      "sha256": "6a88b2458abb573cca4c2faba014dbaa4ecc90c5bbaefa17bb95db1be46443ad",
+      "bytes": 15594
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/portrait-whole-fit-hardware.png": {
+      "sha256": "942a013154a09281be053f2000928a5363191e59b4737ba344238c925aa4557c",
+      "bytes": 11559
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/portrait-whole-fit-software.png": {
+      "sha256": "284b11fca7624728a968e62a02e1a0aec8bc7d3ede86c6d129ff18fa9a72488f",
+      "bytes": 11698
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/panorama-whole-fit-hardware.png": {
+      "sha256": "6d86c8693b6cb703f0c5a908641eedc723391291bd3988af5c970f04e6f16f0d",
+      "bytes": 11953
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/panorama-whole-fit-software.png": {
+      "sha256": "13c90f498528d6081f457ac804c1faa996f4d6fbc674578a37db91ad8a22fa07",
+      "bytes": 12038
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/gallery-spread-hardware.png": {
+      "sha256": "9925ab77b8989d6999459c8758d6e97f86155e8dca0f0d97b25c374ad29c5f5e",
+      "bytes": 12688
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/images/gallery-spread-software.png": {
+      "sha256": "b8783bb4f9c4cf805e22062070521ee4e24656860f722c2035e030bdde52cd3f",
+      "bytes": 12511
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png": {
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "bytes": 12657
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html": {
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "bytes": 7785
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js": {
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "bytes": 5582
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js": {
+      "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+      "bytes": 68261
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg": {
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "bytes": 1247
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg": {
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "bytes": 1246
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js": {
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "bytes": 8528
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css": {
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "bytes": 15397
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-owned/preparation-verification.json": {
+      "sha256": "5cf142c1fb807e70a58c1ec62fcb484d92ccea160513ab247d5a96cbf5e1a906",
+      "bytes": 4305
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-run.py": {
+      "sha256": "e260c37317156ede70028cf93bb73e3d6f88bd9651e331747a215312c9e94545",
+      "bytes": 4234
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-report.json": {
+      "sha256": "357460e220733e279b44352625844d83c0acdd7d3e0d2015e616abbcd1334836",
+      "bytes": 41613
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-execution-terminal.json": {
+      "sha256": "8a2ef1de3a662d08b1c4ea1991e241b6091ddc3ff719f0f6505820526a332e4c",
+      "bytes": 326
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-current.claim": {
+      "sha256": "ac32010a5cef231a212d249ce84274d5f9ab37c430d9252653df248c063826fd",
+      "bytes": 56
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-install.log": {
+      "sha256": "5525c6bd2379e7d234b58ff2cd4c6e7d7ebbc0dd304859b1ccb821bb2ebc3228",
+      "bytes": 115
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-uninstall.log": {
+      "sha256": "7fc0023a6402c7bd7abd98bb3e580968de4833eed07d88d1cc8d70819d69c7a0",
+      "bytes": 8
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/native-build-v2.log": {
+      "sha256": "eb60d2439d4821f0b4a2dc2355acce83d7270c346336dce648b18153e02ad442",
+      "bytes": 890
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/discovery-clock.json": {
+      "sha256": "82a4102505e6411ac3666ed766e08823307edd56f948fdfad2e1b7c3ab70aefc",
+      "bytes": 383
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/selected-plan.json": {
+      "sha256": "525783531c72e5e91e8dd2e369ac598d876b5cfaa2890dae8df8bc00b2c80080",
+      "bytes": 977
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/independent-source-review.json": {
+      "sha256": "ab7f0db27759cab12209fee8b0028d3a72f09f32dacf01cc27f7ce2302c3d05b",
+      "bytes": 15428
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/excluded-operational-failures.json": {
+      "sha256": "b2c902c9354ed0ab010c6b7f45e5794a8f7da56456046a55faa46b512529e09b",
+      "bytes": 657
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/excluded-context-adapter-v1/native-owned/AttachedPhotoActivity.java": {
+      "sha256": "90a744dcd09a2d6690a5bb3afbc2e671580d50f046f71678e12d6ca3fff26040",
+      "bytes": 19745
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/excluded-context-adapter-v1/native-owned/preparation-verification.json": {
+      "sha256": "a70d101590d57abe91ef3d193a47ca3bb4b482642d560454a81ae1ad28db366e",
+      "bytes": 3785
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/excluded-context-adapter-v1/native-owned/attached-photo-fixture.apk": {
+      "sha256": "49395c30439e1172621e10c35f86c694ee2bf11ef39420b7a98ee0a634c7ce99",
+      "bytes": 37511658
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/excluded-context-adapter-v1/native-owned/frozen-dex/classes.dex": {
+      "sha256": "9b73416df1df43d306b6d16771333764c42409588caa5a76e85be80eae5e712e",
+      "bytes": 28648
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/excluded-context-adapter-v1/native-report.json": {
+      "sha256": "588406c9a11b9922b27d350715e2b630604c9b5fe1f794b3979469372b48b618",
+      "bytes": 11737
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/excluded-context-adapter-v1/native-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-photo-presentation-audit-20261104-121512/excluded-context-adapter-v1/native-run.py": {
+      "sha256": "e260c37317156ede70028cf93bb73e3d6f88bd9651e331747a215312c9e94545",
+      "bytes": 4234
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/promotion-artifacts.json": {
+      "sha256": "afa6a6ac6960028ba704c91a97d3ec2d5a49de3b93049c4b11dc8297b0cb8f06",
+      "bytes": 4803
+    }
+  }
+}

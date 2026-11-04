@@ -1,0 +1,129 @@
+{
+  "scope": "Safe generated source, results and PNGs only; raw room maps/preferences/credentials and APK/DEX remain private.",
+  "files": {
+    "README.md": {
+      "sha256": "b098dda7a7b1ca9d968193ec8733b4ee01994cf636c9f022010626d4f5f245f9",
+      "bytes": 1044
+    },
+    "evidence/current-room-readback.json": {
+      "sha256": "a01076826734ca45913e094dcea399fc6145175e8a5b27d62c8d5ee8f1369283",
+      "bytes": 497
+    },
+    "evidence/discovery-clock.json": {
+      "sha256": "82a4102505e6411ac3666ed766e08823307edd56f948fdfad2e1b7c3ab70aefc",
+      "bytes": 383
+    },
+    "evidence/excluded-operational-failures.json": {
+      "sha256": "b2c902c9354ed0ab010c6b7f45e5794a8f7da56456046a55faa46b512529e09b",
+      "bytes": 657
+    },
+    "evidence/excluded-v1-native-report.json": {
+      "sha256": "588406c9a11b9922b27d350715e2b630604c9b5fe1f794b3979469372b48b618",
+      "bytes": 11737
+    },
+    "evidence/excluded-v1-native-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "evidence/independent-pixel-artifact-review.json": {
+      "sha256": "dc39af84347d26a69370310a9777ba2476a803c3f9abfc7ee098bf5653396f33",
+      "bytes": 22195
+    },
+    "evidence/independent-source-review.json": {
+      "sha256": "ab7f0db27759cab12209fee8b0028d3a72f09f32dacf01cc27f7ce2302c3d05b",
+      "bytes": 15428
+    },
+    "evidence/native-execution-terminal.json": {
+      "sha256": "8a2ef1de3a662d08b1c4ea1991e241b6091ddc3ff719f0f6505820526a332e4c",
+      "bytes": 326
+    },
+    "evidence/native-report.json": {
+      "sha256": "357460e220733e279b44352625844d83c0acdd7d3e0d2015e616abbcd1334836",
+      "bytes": 41613
+    },
+    "evidence/native-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "evidence/preservation.json": {
+      "sha256": "7e7bd1e9f83144f3f261688be7e0f2447a8621525e13bc2e80cfadb34db48848",
+      "bytes": 976
+    },
+    "evidence/queue-preservation.json": {
+      "sha256": "c70b0e8924257d19102d9c5674f5b82c3a71d53772c592dc9b52ed52d52c848f",
+      "bytes": 315
+    },
+    "evidence/root-verification.json": {
+      "sha256": "dcd139cfc8c6b259b98e88e95c15b8ad831a036916ae0d18d0f8f7db4a0669bc",
+      "bytes": 789
+    },
+    "evidence/selected-plan.json": {
+      "sha256": "525783531c72e5e91e8dd2e369ac598d876b5cfaa2890dae8df8bc00b2c80080",
+      "bytes": 977
+    },
+    "images/gallery-spread-hardware.png": {
+      "sha256": "9925ab77b8989d6999459c8758d6e97f86155e8dca0f0d97b25c374ad29c5f5e",
+      "bytes": 12688
+    },
+    "images/gallery-spread-software.png": {
+      "sha256": "b8783bb4f9c4cf805e22062070521ee4e24656860f722c2035e030bdde52cd3f",
+      "bytes": 12511
+    },
+    "images/panorama-whole-fit-hardware.png": {
+      "sha256": "6d86c8693b6cb703f0c5a908641eedc723391291bd3988af5c970f04e6f16f0d",
+      "bytes": 11953
+    },
+    "images/panorama-whole-fit-software.png": {
+      "sha256": "13c90f498528d6081f457ac804c1faa996f4d6fbc674578a37db91ad8a22fa07",
+      "bytes": 12038
+    },
+    "images/portrait-whole-fit-hardware.png": {
+      "sha256": "942a013154a09281be053f2000928a5363191e59b4737ba344238c925aa4557c",
+      "bytes": 11559
+    },
+    "images/portrait-whole-fit-software.png": {
+      "sha256": "284b11fca7624728a968e62a02e1a0aec8bc7d3ede86c6d129ff18fa9a72488f",
+      "bytes": 11698
+    },
+    "native/AndroidManifest.xml": {
+      "sha256": "c572681aa75930d2f29e97be9e4fe07e395eb117663a443ffea7e3f3ab891c1f",
+      "bytes": 463
+    },
+    "native/AttachedPhotoActivity.java": {
+      "sha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+      "bytes": 19968
+    },
+    "native/RUN.md": {
+      "sha256": "f694b2a1382ffd7f4c90a132b42b437d9efdc8b322191f7d920db5e08ccb7be2",
+      "bytes": 2572
+    },
+    "native/build.sh": {
+      "sha256": "323e0b129a6dd3126d65b9ec851c55d1e4256c5588aced08617f4304318bf7a4",
+      "bytes": 832
+    },
+    "native/excluded-v1-AttachedPhotoActivity.java": {
+      "sha256": "90a744dcd09a2d6690a5bb3afbc2e671580d50f046f71678e12d6ca3fff26040",
+      "bytes": 19745
+    },
+    "native/freeze.py": {
+      "sha256": "624eba2c3f89f8d49494f7d0fe12cf42dfc984f4b2d9dfabd9bde8bfe873b144",
+      "bytes": 1467
+    },
+    "native/native-run.py": {
+      "sha256": "e260c37317156ede70028cf93bb73e3d6f88bd9651e331747a215312c9e94545",
+      "bytes": 4234
+    },
+    "native/preparation-verification.json": {
+      "sha256": "5cf142c1fb807e70a58c1ec62fcb484d92ccea160513ab247d5a96cbf5e1a906",
+      "bytes": 4305
+    },
+    "native/repack.sh": {
+      "sha256": "57e46c2ab383f78a53b6d2c717c3a943832bb52b5f0333afd2ea6ca3f2200d6c",
+      "bytes": 785
+    },
+    "native/source-admission.json": {
+      "sha256": "57571e8fe41cf6790f9dd29e7859eb360e0bbca797d20efaaf2bc85370381499",
+      "bytes": 3158
+    }
+  }
+}

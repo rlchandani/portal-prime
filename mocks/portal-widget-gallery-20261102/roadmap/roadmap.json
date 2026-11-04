@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T12:13:52.253987+00:00",
-  "updatedLabel": "Apps favorite removal delivered to both rooms; prior clocks retained",
+  "updatedAt": "2026-11-04T12:26:30.631297+00:00",
+  "updatedLabel": "Static native photo hardware acceptance verified; room1.155 and prior clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,50 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "native-photo-static-hardware-acceptance",
+      "title": "Native photo backgrounds and edges on hardware",
+      "summary": "Verify quiet doodles, warm photo edges and whole-photo fit in three stable attached hardware scenes.",
+      "status": "verified",
+      "verification": "3 hardware Window captures \u00b73 software captures \u00b716 corners and edges per path \u00b76 independent PNG checks",
+      "kind": "Screensaver acceptance",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent source and pixel artifact review",
+      "deployment": "No app installation or release; exact existing optimized1.155/code149 fully hashed in both rooms.",
+      "acceptance": [
+        "Actual current debug Stage/API29 owned Window; portrait, panorama and Gallery Spread each pass frozen pixel and geometry predicates.",
+        "Two committed frames before PixelCopy; hardware/software independently pass; geometry and memory admission agree.",
+        "All3 normal retirements and package/process/external-directory absences; all43/30 preferences and four maps retained."
+      ],
+      "evidence": [
+        {
+          "text": "Acceptance and limits",
+          "source": "docs/portal-native-photo-hardware-2026-11-04.md"
+        },
+        {
+          "text": "Frozen native results",
+          "source": "mocks/portal-native-photo-hardware-20261104/evidence/native-report.json"
+        }
+      ],
+      "limits": [
+        "Current-only generated 800\u00d7480 actual debug/API29 static scene; no production source/version change or RED\u2192GREEN claim.",
+        "No production Dream/controller/source/clock, motion/dissolve/resize, optimized/API28/Living visual/performance/current-selection acceptance.",
+        "Initial Context adapter partial result excluded; exact typed null-name amendment changes no predicates or fences; source containment is not global instrumentation.",
+        "No phone/household media/provider/account/push/publication operation; prior clocks and holds retained."
+      ],
+      "next": "Continue distinct small visible fixes; preserve separate full screensaver acceptance.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T12:15:12Z",
+        "selectedAt": "2026-11-04T12:17:30Z",
+        "target": "2026-11-04T12:30:12Z",
+        "hardDeadline": "2026-11-04T12:45:12Z",
+        "baseCommit": "d1156b820e82ee8f34ca37e01a017e1c01ce3388",
+        "scope": "Static attached actual Stage hardware PixelCopy compared to actual software Canvas with three generated whole-photo scenes; acceptance only, no production edit or app version/install.",
+        "notReset": true
+      }
+    },
     {
       "id": "apps-favorite-removal-replacements",
       "title": "Remove an app from favorites",

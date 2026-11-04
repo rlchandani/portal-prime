@@ -1,0 +1,15 @@
+{
+  "sessionId": 22382,
+  "terminalExitCode": 0,
+  "rootObservedAt": "2026-11-04T12:24:36Z",
+  "output": {
+    "currentOnly": true,
+    "nativeCases": 3,
+    "hardwareWindows": 3,
+    "softwareCaptures": 3,
+    "cornersPerPath": 16,
+    "edgesPerPath": 16,
+    "framesPerCase": 2,
+    "noAppSourceOrVersionChange": true
+  }
+}

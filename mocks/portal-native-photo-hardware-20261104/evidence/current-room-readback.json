@@ -1,0 +1,18 @@
+{
+  "family": {
+    "versionName": "1.155",
+    "versionCode": 149,
+    "sha256": "8c6942ca339f920fb3b6034f21fa9a919942af2e2fa15aa82d53130c976770d6",
+    "bytes": 25886647,
+    "exactExistingInstalledArtifact": true,
+    "installsThisSlice": 0
+  },
+  "living": {
+    "versionName": "1.155",
+    "versionCode": 149,
+    "sha256": "8c6942ca339f920fb3b6034f21fa9a919942af2e2fa15aa82d53130c976770d6",
+    "bytes": 25886647,
+    "exactExistingInstalledArtifact": true,
+    "installsThisSlice": 0
+  }
+}

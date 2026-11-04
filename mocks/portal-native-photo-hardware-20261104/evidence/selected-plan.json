@@ -1,0 +1,21 @@
+{
+  "originalDiscoveryAt": "2026-11-04T12:15:12Z",
+  "target": "2026-11-04T12:30:12Z",
+  "hardDeadline": "2026-11-04T12:45:12Z",
+  "selectedAt": "2026-11-04T12:17:30Z",
+  "baseCommit": "d1156b820e82ee8f34ca37e01a017e1c01ce3388",
+  "scope": "Static attached actual Stage hardware PixelCopy compared to actual software Canvas with three generated whole-photo scenes; acceptance only, no production edit or app version/install.",
+  "limits": [
+    "No clock/FaceRenderer/controller/source startup, motion/dissolve/resize/geometry redesign or former exhausted scope.",
+    "No owner media/provider/account/preferences, phone, optimized/API28/Living visual/hardware performance acceptance."
+  ],
+  "sourceDebug": {
+    "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+    "bytes": 46745294
+  },
+  "roomPerformance": {
+    "sha256": "8c6942ca339f920fb3b6034f21fa9a919942af2e2fa15aa82d53130c976770d6",
+    "bytes": 25886647
+  },
+  "clockNotReset": true
+}

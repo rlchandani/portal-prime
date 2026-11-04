@@ -1,0 +1,13 @@
+{
+  "contextAdapterV1": {
+    "tests": 1,
+    "retiredScenes": 0,
+    "cleanup": false,
+    "reason": "Owned View retirement required typed InputMethodManager name; strict Context threw before normal retirement. Portrait partial reports not accepted; PNGs not collected.",
+    "packageProcessExternalDirectoryAbsent": true
+  },
+  "retainedPath": "/private/tmp/portal-photo-presentation-audit-20261104-121512/excluded-context-adapter-v1",
+  "repair": "Only observed InputMethodManager.class getSystemServiceName request returns null; no service lookup/delegation, all other types fail/count.",
+  "assertionsUnchanged": true,
+  "noOriginalClockReset": true
+}

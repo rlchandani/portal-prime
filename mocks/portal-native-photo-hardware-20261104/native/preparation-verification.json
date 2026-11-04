@@ -1,0 +1,123 @@
+{
+  "sourceReady": true,
+  "authoredAtUtc": "2026-11-04T12:19:41.100341+00:00",
+  "originalClock": "2026-11-04T12:15:12Z target12:30:12Z hard12:45:12Z",
+  "package": "com.immortal.attachedphotofixture",
+  "activity": ".AttachedPhotoActivity",
+  "report": "external-files/report.json",
+  "sources": {
+    "AttachedPhotoActivity.java": {
+      "sha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+      "bytes": 19968
+    },
+    "AndroidManifest.xml": {
+      "sha256": "c572681aa75930d2f29e97be9e4fe07e395eb117663a443ffea7e3f3ab891c1f",
+      "bytes": 463
+    },
+    "build.sh": {
+      "sha256": "323e0b129a6dd3126d65b9ec851c55d1e4256c5588aced08617f4304318bf7a4",
+      "bytes": 832
+    },
+    "repack.sh": {
+      "sha256": "57e46c2ab383f78a53b6d2c717c3a943832bb52b5f0333afd2ea6ca3f2200d6c",
+      "bytes": 785
+    },
+    "freeze.py": {
+      "sha256": "624eba2c3f89f8d49494f7d0fe12cf42dfc984f4b2d9dfabd9bde8bfe873b144",
+      "bytes": 1467
+    },
+    "RUN.md": {
+      "sha256": "f694b2a1382ffd7f4c90a132b42b437d9efdc8b322191f7d920db5e08ccb7be2",
+      "bytes": 2572
+    },
+    "source-admission.json": {
+      "sha256": "57571e8fe41cf6790f9dd29e7859eb360e0bbca797d20efaaf2bc85370381499",
+      "bytes": 3158
+    }
+  },
+  "caseNames": [
+    "portrait-whole-fit",
+    "panorama-whole-fit",
+    "gallery-spread"
+  ],
+  "currentOnlyAcceptance": true,
+  "noRedOrSourceChangeClaim": true,
+  "reusedPredicateSource": {
+    "sha256": "6a88b2458abb573cca4c2faba014dbaa4ecc90c5bbaefa17bb95db1be46443ad",
+    "bytes": 15594
+  },
+  "borderPredicateByteIdentical": true,
+  "sourceBindings": {
+    "SlideshowStage.kt": {
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "NativePhotoView.kt": {
+      "sha256": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "bytes": 1621
+    },
+    "NativePhotoMatte.kt": {
+      "sha256": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "bytes": 3372
+    }
+  },
+  "gates": {
+    "pixelCopyOwnWindowAfterTwoCommittedFrames": true,
+    "softwareHardwareIndependentFrozenPixelPredicates": true,
+    "literalCornerTolerance": 12,
+    "edgeBlendTolerance": 17,
+    "edgePlainTolerance": 2,
+    "matteQuietMarksMin": 50,
+    "matteBaseMinFraction": 0.65,
+    "matteQuietMaxFraction": 0.3,
+    "zeroBadMatteAndTransparentPixels": true,
+    "wholeGeometryIdentityAdmission": true,
+    "noPrefsResolverServices": true,
+    "stageStopBudgetZero": true,
+    "detachCommitBeforeRecycle": true,
+    "watchdogMillis": 45000
+  },
+  "declaredManifestPermissions": [],
+  "hardwareAcceleratedManifest": true,
+  "fixtureDexPendingRootCompilation": true,
+  "sourceAuthoringOnly": true,
+  "buildSdkAdbGitTestsDevices": 0,
+  "rootRequired": [
+    "compile/sign",
+    "verify exact current source APK and compiled zero permissions",
+    "freeze DEX and sources before execution"
+  ],
+  "limits": [
+    "No production controller/FaceRenderer/source startup or room style selection",
+    "No owner data/provider/network/account",
+    "No clock/resize/dissolve/live motion",
+    "No optimized/API28/Living/performance"
+  ],
+  "adapterVersion": 2,
+  "nullInputMethodTypeAdmission": "Only observed InputMethodManager.class getSystemServiceName request returns null; no service lookup/delegation, all other types fail/count.",
+  "excludedV1": {
+    "tests": 1,
+    "retiredScenes": 0,
+    "cleanup": false,
+    "reason": "Owned View retirement required typed InputMethodManager name; strict Context threw before normal retirement. Portrait partial reports not accepted; PNGs not collected.",
+    "packageProcessExternalDirectoryAbsent": true
+  },
+  "ok": true,
+  "preparedAtUtc": "2026-11-04T12:22:27.331208+00:00",
+  "rootFullyReadBeforeCompilation": true,
+  "fixtureDex": {
+    "sha256": "ecd457faedde0d8d8bf75c348fa424bcb72768c9c1a8587d8ae91c0982b990e9",
+    "bytes": 28896
+  },
+  "sourceApk": {
+    "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+    "bytes": 46745294
+  },
+  "sourceApkExact": true,
+  "fixtureApk": {
+    "sha256": "4767263e3e5c9a034696fa00458aee2eb7b6e1029f3bf546e6c65753f0cac7e2",
+    "bytes": 37511658
+  },
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.attachedphotofixture\n"
+}

@@ -1,0 +1,446 @@
+{
+  "ok": false,
+  "error": "capture:java.lang.IllegalStateException:No typed service admitted: class android.view.inputmethod.InputMethodManager",
+  "tests": 1,
+  "failures": 0,
+  "cases": [
+    {
+      "name": "portrait-whole-fit",
+      "passed": true,
+      "width": 800,
+      "height": 480,
+      "stageAttached": true,
+      "stageHardwareAccelerated": true,
+      "committedFramesBeforePixelCopy": 2,
+      "windowCrop": [
+        680,
+        480,
+        1480,
+        960
+      ],
+      "pixelCopyResult": 0,
+      "software": {
+        "name": "portrait-whole-fit-software",
+        "passed": true,
+        "error": null,
+        "width": 800,
+        "height": 480,
+        "gallery": false,
+        "geometry": [
+          {
+            "left": 256,
+            "top": 1.430511474609375e-05,
+            "right": 544,
+            "bottom": 479.9999694824219,
+            "sourceWidth": 480,
+            "sourceHeight": 800,
+            "holderLeft": 0,
+            "holderTop": 0,
+            "holderRight": 800,
+            "holderBottom": 480,
+            "scaleX": 0.5999999642372131,
+            "scaleY": 0.5999999642372131
+          }
+        ],
+        "geometryPass": true,
+        "sameBitmapIdentity": true,
+        "wholePhotos": true,
+        "budgetUsed": 1536000,
+        "expectedAdmittedBytes": 1536000,
+        "corners": [
+          {
+            "photo": 0,
+            "corner": 0,
+            "x": 279,
+            "y": 38,
+            "expected": -52412,
+            "actual": -52412,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "corner": 1,
+            "x": 521,
+            "y": 38,
+            "expected": -13378202,
+            "actual": -13378202,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "corner": 2,
+            "x": 279,
+            "y": 442,
+            "expected": -13412882,
+            "actual": -13412882,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "corner": 3,
+            "x": 521,
+            "y": 442,
+            "expected": -8909,
+            "actual": -8909,
+            "passed": true
+          }
+        ],
+        "cornerPassCount": 4,
+        "photoPass": true,
+        "opaque": true,
+        "transparentPixels": 0,
+        "baseColor": -15460837,
+        "mattePixels": 243360,
+        "basePixels": 239419,
+        "quietMarks": 3941,
+        "badMatte": 0,
+        "mattePass": true,
+        "negativeBorderControl": false,
+        "manualCropControl": false,
+        "borderPass": true,
+        "edges": [
+          {
+            "photo": 0,
+            "edge": 0,
+            "negative": false,
+            "expectedBlend": -5722187,
+            "maxChannelTolerance": 17,
+            "bestDistance": 0,
+            "samples": [
+              {
+                "x": 256,
+                "y": 240,
+                "actual": -5722187
+              },
+              {
+                "x": 257,
+                "y": 240,
+                "actual": -7694167
+              },
+              {
+                "x": 258,
+                "y": 240,
+                "actual": -7891288
+              }
+            ],
+            "deepX": 260,
+            "deepY": 240,
+            "deepActual": -7891288,
+            "deepPlain": true,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "edge": 1,
+            "negative": false,
+            "expectedBlend": -5722187,
+            "maxChannelTolerance": 17,
+            "bestDistance": 0,
+            "samples": [
+              {
+                "x": 543,
+                "y": 240,
+                "actual": -5722187
+              },
+              {
+                "x": 542,
+                "y": 240,
+                "actual": -7694167
+              },
+              {
+                "x": 541,
+                "y": 240,
+                "actual": -7891288
+              }
+            ],
+            "deepX": 539,
+            "deepY": 240,
+            "deepActual": -7891288,
+            "deepPlain": true,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "edge": 2,
+            "negative": false,
+            "expectedBlend": -5722187,
+            "maxChannelTolerance": 17,
+            "bestDistance": 0,
+            "samples": [
+              {
+                "x": 400,
+                "y": 0,
+                "actual": -5722187
+              },
+              {
+                "x": 400,
+                "y": 1,
+                "actual": -7628375
+              },
+              {
+                "x": 400,
+                "y": 2,
+                "actual": -7891288
+              }
+            ],
+            "deepX": 400,
+            "deepY": 5,
+            "deepActual": -7891288,
+            "deepPlain": true,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "edge": 3,
+            "negative": false,
+            "expectedBlend": -5722187,
+            "maxChannelTolerance": 17,
+            "bestDistance": 0,
+            "samples": [
+              {
+                "x": 400,
+                "y": 479,
+                "actual": -5722187
+              },
+              {
+                "x": 400,
+                "y": 478,
+                "actual": -7628375
+              },
+              {
+                "x": 400,
+                "y": 477,
+                "actual": -7891288
+              }
+            ],
+            "deepX": 400,
+            "deepY": 474,
+            "deepActual": -7891288,
+            "deepPlain": true,
+            "passed": true
+          }
+        ]
+      },
+      "hardware": {
+        "name": "portrait-whole-fit-hardware",
+        "passed": true,
+        "error": null,
+        "width": 800,
+        "height": 480,
+        "gallery": false,
+        "geometry": [
+          {
+            "left": 256,
+            "top": 1.430511474609375e-05,
+            "right": 544,
+            "bottom": 479.9999694824219,
+            "sourceWidth": 480,
+            "sourceHeight": 800,
+            "holderLeft": 0,
+            "holderTop": 0,
+            "holderRight": 800,
+            "holderBottom": 480,
+            "scaleX": 0.5999999642372131,
+            "scaleY": 0.5999999642372131
+          }
+        ],
+        "geometryPass": true,
+        "sameBitmapIdentity": true,
+        "wholePhotos": true,
+        "budgetUsed": 1536000,
+        "expectedAdmittedBytes": 1536000,
+        "corners": [
+          {
+            "photo": 0,
+            "corner": 0,
+            "x": 279,
+            "y": 38,
+            "expected": -52412,
+            "actual": -52412,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "corner": 1,
+            "x": 521,
+            "y": 38,
+            "expected": -13378202,
+            "actual": -13378202,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "corner": 2,
+            "x": 279,
+            "y": 442,
+            "expected": -13412882,
+            "actual": -13412882,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "corner": 3,
+            "x": 521,
+            "y": 442,
+            "expected": -8909,
+            "actual": -8909,
+            "passed": true
+          }
+        ],
+        "cornerPassCount": 4,
+        "photoPass": true,
+        "opaque": true,
+        "transparentPixels": 0,
+        "baseColor": -15460837,
+        "mattePixels": 243360,
+        "basePixels": 239058,
+        "quietMarks": 4302,
+        "badMatte": 0,
+        "mattePass": true,
+        "negativeBorderControl": false,
+        "manualCropControl": false,
+        "borderPass": true,
+        "edges": [
+          {
+            "photo": 0,
+            "edge": 0,
+            "negative": false,
+            "expectedBlend": -5722187,
+            "maxChannelTolerance": 17,
+            "bestDistance": 0,
+            "samples": [
+              {
+                "x": 256,
+                "y": 240,
+                "actual": -5722187
+              },
+              {
+                "x": 257,
+                "y": 240,
+                "actual": -7628375
+              },
+              {
+                "x": 258,
+                "y": 240,
+                "actual": -7891288
+              }
+            ],
+            "deepX": 260,
+            "deepY": 240,
+            "deepActual": -7891288,
+            "deepPlain": true,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "edge": 1,
+            "negative": false,
+            "expectedBlend": -5722187,
+            "maxChannelTolerance": 17,
+            "bestDistance": 0,
+            "samples": [
+              {
+                "x": 543,
+                "y": 240,
+                "actual": -5722187
+              },
+              {
+                "x": 542,
+                "y": 240,
+                "actual": -7628375
+              },
+              {
+                "x": 541,
+                "y": 240,
+                "actual": -7891288
+              }
+            ],
+            "deepX": 539,
+            "deepY": 240,
+            "deepActual": -7891288,
+            "deepPlain": true,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "edge": 2,
+            "negative": false,
+            "expectedBlend": -5722187,
+            "maxChannelTolerance": 17,
+            "bestDistance": 0,
+            "samples": [
+              {
+                "x": 400,
+                "y": 0,
+                "actual": -5722187
+              },
+              {
+                "x": 400,
+                "y": 1,
+                "actual": -7628375
+              },
+              {
+                "x": 400,
+                "y": 2,
+                "actual": -7891288
+              }
+            ],
+            "deepX": 400,
+            "deepY": 5,
+            "deepActual": -7891288,
+            "deepPlain": true,
+            "passed": true
+          },
+          {
+            "photo": 0,
+            "edge": 3,
+            "negative": false,
+            "expectedBlend": -5722187,
+            "maxChannelTolerance": 17,
+            "bestDistance": 0,
+            "samples": [
+              {
+                "x": 400,
+                "y": 479,
+                "actual": -5722187
+              },
+              {
+                "x": 400,
+                "y": 478,
+                "actual": -7628375
+              },
+              {
+                "x": 400,
+                "y": 477,
+                "actual": -7891288
+              }
+            ],
+            "deepX": 400,
+            "deepY": 474,
+            "deepActual": -7891288,
+            "deepPlain": true,
+            "passed": true
+          }
+        ]
+      },
+      "noMotion": true,
+      "inactiveHost": true,
+      "firstPresentationOnly": true
+    }
+  ],
+  "sourceSha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+  "sourceBytes": 46745294,
+  "fixturePackage": "com.immortal.attachedphotofixture",
+  "sdk": 29,
+  "density": 1.125,
+  "internetPermission": false,
+  "actualEmbeddedStageOrigin": true,
+  "unexpectedPreferenceRequests": 0,
+  "unexpectedResolverRequests": 0,
+  "unexpectedServiceRequests": 2,
+  "retiredScenes": 0,
+  "cleanup": false,
+  "currentOnlyAcceptance": true,
+  "noRedOrSourceChangeClaim": true,
+  "scope": "Three generated stable actual debug SlideshowStage scenes attached to owned hardware Activity Window, paired PixelCopy and software Canvas with existing frozen corner/edge/matte/opacity predicates. No owner media/prefs, controller/FaceRenderer/source startup, clock/resize/dissolve/live motion, optimized/API28/Living/current-room selection or performance claim."
+}

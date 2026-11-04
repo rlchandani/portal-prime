@@ -1,0 +1,19 @@
+{
+  "sourceReviewFullRead": true,
+  "sourceReviewAllBindingsExact": true,
+  "sourceReviewBindings": 31,
+  "all3RootReportGatesPass": true,
+  "strictDocsSession": 88722,
+  "strictDocsTerminalExit": 0,
+  "all73PreferencesExact": true,
+  "exactExistingBothRoomApks": true,
+  "noAndroidBuildOrTestRerun": true,
+  "pixelReviewFullRootRead": true,
+  "pixelReviewAllBindingsExact": true,
+  "pixelReviewBindingCount": 51,
+  "generatedPanoramaAndGalleryHardwareVisuallyInspected": true,
+  "currentOnlyNoSourceVersionOrReleaseChange": true,
+  "originalClockNotReset": true,
+  "scope": "Three generated static actual-debug/API29 attached Stage scenes, not production Dream/source/clock/motion/optimized/API28/Living/performance/current-selection acceptance.",
+  "ownerRegistryBytesUnchanged": true
+}
