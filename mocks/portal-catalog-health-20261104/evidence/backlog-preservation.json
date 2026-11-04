@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-11-04T20:29:10.248553+00:00",
+  "tasks": 176,
+  "counts": {
+    "delivered": 121,
+    "verified": 45,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "allOriginalTaskObjectsPreserved": true,
+  "originalRawTaskSuffixPreserved": true,
+  "defaultTaskPreserved": true,
+  "allOriginalClocksAndBoundariesPreserved": true,
+  "newTaskAdded": false,
+  "pendingHumanSelection": true,
+  "appVersion": "1.176/code170"
+}

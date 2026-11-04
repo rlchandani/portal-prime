@@ -1,0 +1,7 @@
+{
+  "command": "mkdocs build --strict",
+  "exitCode": 0,
+  "durationSeconds": 2.1890525829949183,
+  "completedAt": "2026-11-04T20:29:12.438396+00:00",
+  "scope": "Documentation validation only"
+}

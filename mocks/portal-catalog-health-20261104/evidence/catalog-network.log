@@ -1,0 +1,2 @@
+WARN: [Media & Entertainment / portalfin (Jellyfin for Portal)] source 'url' without versionCode or versionUrl won't get update detection — add a versionCode (bumped per release) or a versionUrl (a JSON manifest with a versionCode field, read live) so the store can offer updates without a delete-and-reinstall
+OK: 26 apps validated, 1 warning(s).

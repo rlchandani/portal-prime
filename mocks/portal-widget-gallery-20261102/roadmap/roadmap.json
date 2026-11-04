@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T20:13:52.379599+00:00",
-  "updatedLabel": "Release check verifies individual JVM results; rooms remain1.176",
+  "updatedAt": "2026-11-04T20:29:10.246552+00:00",
+  "updatedLabel": "26 catalog checks passed; fresh bounded priority choice pending; rooms remain 1.176",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",

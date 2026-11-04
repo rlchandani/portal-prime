@@ -1,0 +1,70 @@
+{
+  "scope": "Bounded source review and public catalog health checks; no implementation defect admitted",
+  "clock": {
+    "startedAt": "2026-11-04T20:14:00Z",
+    "target": "2026-11-04T20:29:00Z",
+    "hardStop": "2026-11-04T20:44:00Z",
+    "originalClockRetained": true
+  },
+  "base": "d006c4dc655f9ca81c2a72af51ce3dbd80f96d2f",
+  "catalog": {
+    "apps": 26,
+    "networkExit": 0,
+    "warnings": 1,
+    "durationSeconds": 23.000862417000462,
+    "limits": "HEAD/schema/parity checks only; no APK download/signature/version/install/compatibility or image-content verification"
+  },
+  "portalfin": {
+    "releaseSource": "https://api.github.com/repos/luke-hurd/portalfin/releases/latest",
+    "releaseUrl": "https://github.com/luke-hurd/portalfin/releases/tag/v2.3.3",
+    "tag": "v2.3.3",
+    "publishedAt": "2026-06-23T05:35:39Z",
+    "upstreamReportedCapability": "Versions2.3.1+ can update from inside the app.",
+    "actualRuntimeAcceptance": false,
+    "storeUpdateMetadataMissing": true,
+    "versionPinAdded": false
+  },
+  "sourceReviews": {
+    "lampIntercom": "No fresh ordinary defect supported; existing clamps/preview-result/foreground generation/status poll present. Source-only review.",
+    "camera": "No fresh ordinary URL/state/error defect supported; identity and foreground/retry/release boundaries already delivered or held. Source-only review."
+  },
+  "pending": "Human selection of one fresh30-minute slot: Weather daily geometry, SMB keyboard reachability, or screensaver black handoff. No selection inferred.",
+  "appVersionDevicePublicationChanges": false,
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/catalog.json",
+      "bytes": 24043,
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/catalog.json",
+      "bytes": 24043,
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/validate_catalog.py",
+      "bytes": 6576,
+      "sha256": "fbb7c969c08464b26fb9ead0c1d7d542ee6522d8e99a8c642a3ce42ab1484b7f"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/LampActivity.kt",
+      "bytes": 18486,
+      "sha256": "9862955c13e3d95fb7ca6b586e2a79cef865e6844c5e25c4883fb5242ea85a78"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsAudio.kt",
+      "bytes": 34362,
+      "sha256": "e1cffe986e1a479fa900cda6768e0d4191a0855f5f8eefcf23218ee573014fb6"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CameraConfig.kt",
+      "bytes": 3546,
+      "sha256": "550dd059d2a378f860f31052f80dafde4fb30e6dc155563dbd32fdcedfd106fc"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CameraViewerActivity.kt",
+      "bytes": 11892,
+      "sha256": "e5dfed37260d9148d4a709ab38080644d9ecf2e24f627d5781e707c8c1046ad5"
+    }
+  ]
+}

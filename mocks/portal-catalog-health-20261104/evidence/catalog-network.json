@@ -1,0 +1,14 @@
+{
+  "command": [
+    "python3",
+    "-B",
+    "scripts/validate_catalog.py",
+    "--network"
+  ],
+  "exitCode": 0,
+  "timedOut": false,
+  "durationSeconds": 23.000862417000462,
+  "completedAt": "2026-11-04T20:17:58.741500+00:00",
+  "sourceChanged": false,
+  "scope": "Public catalog URL/schema read checks only; no app install/account/household endpoint"
+}

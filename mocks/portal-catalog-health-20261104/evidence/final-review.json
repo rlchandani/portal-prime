@@ -1,0 +1,61 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "reviewedAt": "2026-11-04T20:25:07.901Z",
+  "scope": "Claims review of bounded source discovery and public catalog health evidence",
+  "clock": {
+    "startedAt": "2026-11-04T20:14:00Z",
+    "target": "2026-11-04T20:29:00Z",
+    "hardStop": "2026-11-04T20:44:00Z",
+    "originalClockRetained": true
+  },
+  "findings": [
+    "The bound root command receipt reports python3 -B scripts/validate_catalog.py --network, exit 0, no timeout, 23.000862417s. Bound log states 26 validated apps and one warning; static catalog independently has 26 apps and matches bundled catalog bytes.",
+    "Current script performs schema/parity checks and public HEAD requests. Documentation accurately excludes APK download/identity/signature/version/install/compatibility/image-content/runtime acceptance. This reviewer did not rerun the network command.",
+    "Portalfin direct URL entry has neither versionCode nor versionUrl, matching the single Store update-detection warning. The note attributes app self-update to upstream release notes, explicitly disclaims observed runtime behavior and makes no local version pin or Store update fix claim. Public GET metadata was supplied by root; no independent GET was performed.",
+    "Camera bounded negative agrees with the earlier source review; Lamp/Intercom negative is root-authored assessment evidence, not additional independent execution or fresh implementation. No code fix is admitted by this note.",
+    "Fresh selection among prior held Weather/SMB/screensaver scopes explicitly requires a human response. Silence/time is not authorization; original and earlier issue clocks remain retained."
+  ],
+  "limits": [
+    "This receipt reviews documentary claims and exact bound material only; no source edit, tests, build, SDK, Git, network, credentials, device, provider, media or runtime operations were performed.",
+    "Current app/version/rooms and no-change statements are recorded scope boundaries; no new independent APK/device verification is claimed.",
+    "No pending scope was selected or reopened."
+  ],
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-catalog-discovery-20261104-201400/assessment.json",
+      "bytes": 3302,
+      "sha256": "ef692adf4a804fbe9bc0dc9c71484fed58c6ed74b1eeb233cbac357998c3ac4f"
+    },
+    {
+      "path": "/private/tmp/portal-catalog-discovery-20261104-201400/catalog-network.json",
+      "bytes": 357,
+      "sha256": "234f1141c7fe7d93ebb51ba979050fb7000fcbaff863c4ca0f9eddfe35dc1487"
+    },
+    {
+      "path": "/private/tmp/portal-catalog-discovery-20261104-201400/catalog-network.log",
+      "bytes": 350,
+      "sha256": "bef084f9dfa86b2f582ccd162028d6d1e4aba8f51b85ef22f06355521967c760"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-catalog-health-2026-11-04.md",
+      "bytes": 1900,
+      "sha256": "1abe2b44286cdb950109f538016f75c30f7b29b248a8058b64632b4399b44df0"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/catalog.json",
+      "bytes": 24043,
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/validate_catalog.py",
+      "bytes": 6576,
+      "sha256": "fbb7c969c08464b26fb9ead0c1d7d542ee6522d8e99a8c642a3ce42ab1484b7f"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/catalog.json",
+      "bytes": 24043,
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+    }
+  ]
+}
