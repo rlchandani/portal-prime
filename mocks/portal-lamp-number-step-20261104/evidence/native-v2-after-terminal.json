@@ -1,0 +1,14 @@
+{
+  "phase": "after",
+  "sessionId": 10316,
+  "exitCode": 0,
+  "observedTerminalTool": "2d79dd",
+  "stdoutSummary": {
+    "tests": 12,
+    "literalFailures": 0,
+    "controls": 8,
+    "actualCallbacks": true,
+    "ownerHandlerRetired": true
+  },
+  "source": "Root observed completed unified exec session; native-run-v2.py printed only after assertions and retirement."
+}

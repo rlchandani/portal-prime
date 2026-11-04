@@ -1,0 +1,85 @@
+{
+  "sourceAuthoringOnly": true,
+  "frozenAtUtc": "2026-11-04T13:59:28.563600+00:00",
+  "originalDiscoveryUtc": "2026-11-04T13:54:32Z",
+  "targetUtc": "2026-11-04T14:09:32Z",
+  "hardUtc": "2026-11-04T14:24:32Z",
+  "package": "com.immortal.lampstepfixture",
+  "activity": ".LampStepActivity",
+  "sources": {
+    "LampStepActivity.java": {
+      "sha256": "742ea93eb3fce0d72bb114895cee1cbd5b832c9beb499cfb66336be7ba6f07fd",
+      "bytes": 8779
+    },
+    "AndroidManifest.xml": {
+      "sha256": "68f320b151c2042c13ab9dc620f36ee82217f2e9c11422cac64e3b9698bf2a9f",
+      "bytes": 417
+    },
+    "RUN.md": {
+      "sha256": "3240c8ce440b9b6d4b7a539cdd77f8cc7a0cad588dd0cd08de4a7c8c8add46f3",
+      "bytes": 2747
+    }
+  },
+  "caseNames": [
+    "brightnessMaxIntPlus",
+    "brightnessMinIntMinus",
+    "brightness90Plus",
+    "brightnessMinMinus",
+    "brightness100Plus",
+    "brightnessBlankPlus",
+    "warmthMaxIntPlus",
+    "warmthMinIntMinus",
+    "warmth90Plus",
+    "warmthMinMinus",
+    "warmth100Plus",
+    "warmthBlankPlus"
+  ],
+  "expectedBaseline": {
+    "tests": 12,
+    "failures": 4,
+    "controls": 8,
+    "setupFailures": 0
+  },
+  "expectedCandidate": {
+    "tests": 12,
+    "failures": 0,
+    "setupFailures": 0
+  },
+  "permissions": [],
+  "sourceApkBinding": "Root binds exact original before/candidate debug APK; not compiled by author",
+  "fixtureDexStatus": "Root must freeze one compiled DEX and reuse byte-identically",
+  "requiresRootFullReadBeforeSdk": true,
+  "sourceBinding": {
+    "LampActivity.ktSha256": "60b014bd9457da49e3eac635a61b0f118683a82682a81c8fd545f87948cea689",
+    "sourceWitnessSha256": "99081deb8cda9fca0f94d4d0662bb884f2e37f1a4813676ee17fdd0e70e1788d"
+  },
+  "authorOperations": "Source read and owned private source/doc/metadata writes only; no SDK/build/tests/runtime/device/Git/network/account/media/provider actions.",
+  "adapterVersion": 2,
+  "priorExcludedSourceDirectory": "/private/tmp/portal-next-20261104-135432/native-owned",
+  "priorSources": {
+    "LampStepActivity.java": {
+      "sha256": "967dd7067973acfdc106d3de0193eebd32398f5c7be986e7031fa205f06db5a4",
+      "bytes": 8802
+    },
+    "AndroidManifest.xml": {
+      "sha256": "68f320b151c2042c13ab9dc620f36ee82217f2e9c11422cac64e3b9698bf2a9f",
+      "bytes": 417
+    },
+    "RUN.md": {
+      "sha256": "eec44a512f5fa9329c9435eee6eaedf6ba8ffb0cb1f2e94cd156ea9f30babf7c",
+      "bytes": 2034
+    }
+  },
+  "adapterOnlyDelta": {
+    "exactOriginalExpression": "Modifier.isPrivate(m.getModifiers())&&Modifier.isStatic(m.getModifiers())",
+    "exactFinalExpression": "m.getModifiers()==(Modifier.STATIC|Modifier.FINAL)",
+    "productionOrBehavioralAssertionsChanged": false,
+    "javaSingleReplacementProven": true,
+    "manifestByteIdentical": true,
+    "reason": "Actual before D8 callbacks strict access0x18 STATIC FINAL, not JVM private; prior run excluded setup with zero cases",
+    "evidencePath": "/private/tmp/portal-next-20261104-135432/lamp-dex-class-before.txt",
+    "evidenceSha256": "cd72d7881aea100d88e0b047f406b8a7c71c7a01b6dba1dc010b72e6bbcb1ee0",
+    "evidenceBytes": 167237
+  },
+  "nativeExecutionStatus": "None performed by author; root must execute fresh paired v2 before/candidate with one frozen v2 DEX"
+}

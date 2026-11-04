@@ -1,0 +1,381 @@
+{
+  "ok": true,
+  "blockers": [],
+  "reviewer": "/root/media_source_review",
+  "reviewType": "One independent source, retained JVM/native results and artifact review; read-only host inspection, no execution",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T13:54:32Z",
+    "target": "2026-11-04T14:09:32Z",
+    "hardDeadline": "2026-11-04T14:24:32Z",
+    "clockNotReset": true
+  },
+  "source": {
+    "exactDelta": "Only two LampControlDialog callback expressions replace Int +/- before clamp with existing stepSettingNumber(parsedOrMin, +/-1, control.min, 100, wrap=false); app metadata 155/1.161 to 156/1.162.",
+    "activeCaller": "Approved settings navigation launches LampActivity; non-preview LampControlsContent -> LampSettings -> editable LampControlDialog. Numeric keyboard does not impose Int range on draft text.",
+    "defect": "Baseline Int.MAX_VALUE plus wraps to minimum; Int.MIN_VALUE minus wraps to 100. Existing helper adds in Long before clamping, preserving eight ordinary, boundary and blank-draft controls.",
+    "unchanged": "Save validation, draft/error assignment semantics, enum minima, layout, preview path and setting policy are unchanged. Exact full-file reconstruction from captured baseline passed."
+  },
+  "adapter": {
+    "excludedV1": "Zero cases, one setup failure from source-private method access check. JVM marks methods private static final; actual baseline D8 marks both callbacks package-visible STATIC FINAL (0x18). Excluded report and successful retirement preserved; this is not behavioral baseline.",
+    "v2": "Java differs only in strict observed 0x18 access guard; exact method names, three parameter types, Unit return, all 12 literal cases and state assertions unchanged. Manifest identical. Driver differs only in owned directory and phase receipt prefixes; all gates identical.",
+    "fixtureDexSha256": "c6727bd55e0f1fcbae85cbc1c7526ba9e56ffe8bc109f21715ce63fe187fb2ff",
+    "fixtureDexBytes": 13608,
+    "zeroPermissions": "Source manifest has no uses-permission; root compiled preparation permissions dump attests zero. Runtime report says INTERNET absent."
+  },
+  "jvm": {
+    "baseline": {
+      "tests": 12,
+      "failures": 4,
+      "errors": 0,
+      "skipped": 0,
+      "classification": "Exactly four extreme-value org.junit.ComparisonFailure literals; eight controls pass."
+    },
+    "candidate": {
+      "focusedTests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "full": {
+      "tests": 4525,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 472
+    },
+    "fullXmlSnapshot": {
+      "directory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+      "files": 472,
+      "sha256": "82c22141b4104253ad01afbc0bdaffad5a4c1c7aab7278b9348f2db9a1521932",
+      "definition": "Sorted filename NUL fileSHA NUL byteLength newline"
+    },
+    "testFreezeSha256": "7283b7b222d84a3e52ae9c51b95fb3109dc72db986d0619b644102a281870391",
+    "verification": "Independently read actual callback reflection test and retained XML. Current test bytes equal frozen baseline test; independently counted all 472 current XML suites. Build log contains BUILD SUCCESSFUL and debug/performance/R8/lintVital completion; root terminal is 0."
+  },
+  "native": {
+    "before": {
+      "tests": 12,
+      "literalFailures": 4,
+      "controls": 8,
+      "setupFailures": 0
+    },
+    "after": {
+      "tests": 12,
+      "literalFailures": 0,
+      "setupFailures": 0
+    },
+    "literalExpected": [
+      "100",
+      "5",
+      "91",
+      "5",
+      "100",
+      "6",
+      "100",
+      "0",
+      "91",
+      "0",
+      "100",
+      "1"
+    ],
+    "beforeActual": [
+      "5",
+      "100",
+      "91",
+      "5",
+      "100",
+      "6",
+      "0",
+      "100",
+      "91",
+      "0",
+      "100",
+      "1"
+    ],
+    "afterActual": [
+      "100",
+      "5",
+      "91",
+      "5",
+      "100",
+      "6",
+      "100",
+      "0",
+      "91",
+      "0",
+      "100",
+      "1"
+    ],
+    "state": "Every case: draft reads1/writes1; error reads0/writes1 and null after; actual Unit returned; invocationError null; unexpectedStateFunctions0. Independently checked exact names/input/operation expectations, all actual values and mandatory errors.",
+    "origin": "Isolated DexClassLoader loads actual embedded debug LampActivityKt, enum, MutableState and Unit; each admitted class loader is checked. No target Context is passed. Runtime report source SHA/bytes independently match embedded APK bytes.",
+    "retirement": "Both accepted runs and excluded v1 report package/process/external-directory absent. Fixture removes owned handler callbacks before report. Root after terminal session10316 exit0 is bound.",
+    "wrapper": {
+      "entrySetsIdentical": true,
+      "changedEntries": [
+        "META-INF/ANDROIDD.RSA",
+        "META-INF/ANDROIDD.SF",
+        "META-INF/MANIFEST.MF",
+        "assets/source.apk"
+      ],
+      "classesDexIdentical": true,
+      "baselineEmbeddedSourceExact": true,
+      "candidateEmbeddedSourceExact": true
+    }
+  },
+  "artifacts": {
+    "versionName": "1.162",
+    "versionCode": 156,
+    "debug": {
+      "sha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+      "bytes": 46745646
+    },
+    "performance": {
+      "sha256": "2c43d9e7a2fa0f76a82a4796317fbe2279747d62467ee0b64b2982c131d283c3",
+      "bytes": 25886923
+    },
+    "sourceAssets": "Independently read all 23 source asset files and compared their exact bytes to each candidate and corresponding baseline APK ZIP entry. All match; duplicate ZIP entry names rejected.",
+    "packagedAssetChanges": {
+      "debug": [],
+      "performance": [
+        "assets/dexopt/baseline.prof"
+      ]
+    },
+    "manifestAndSigner": "Root verify-artifacts.py invokes SDK manifest/signature verification and records com.immortal.launcher.debug 156/1.162, unchanged signer 4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6. This review independently hashes bytes and ZIP payloads; it does not rerun SDK signature verification."
+  },
+  "limits": [
+    "Actual isolated debug callback acceptance on API29 with generated String/nullable MutableState proxies; no mounted Compose UI, touch, Save, window brightness or visual acceptance.",
+    "Target Context/Compose/Lamp/Save false fields establish source containment, not instrumented global service/provider/network/preference counters.",
+    "No optimized runtime, API28, Living or physical room behavior acceptance. DexClassLoader has no close; owned Activity/package/process retirement is the relevant cleanup evidence.",
+    "No production/tests/fixture edits or SDK/build/test/Git/device/network execution performed by reviewer. Root room promotion and preservation are outside this review."
+  ],
+  "bindings": {
+    "/private/tmp/portal-next-20261104-135432/plan.json": {
+      "sha256": "97491539b2d5e503fab2ee08484cd258d2608488d4b22d5c7b35f5b6ff4e8a95",
+      "bytes": 1520
+    },
+    "/private/tmp/portal-next-20261104-135432/source-witness.json": {
+      "sha256": "99081deb8cda9fca0f94d4d0662bb884f2e37f1a4813676ee17fdd0e70e1788d",
+      "bytes": 5731
+    },
+    "/private/tmp/portal-next-20261104-135432/LampActivity.before.kt": {
+      "sha256": "60b014bd9457da49e3eac635a61b0f118683a82682a81c8fd545f87948cea689",
+      "bytes": 18447
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/LampActivity.kt": {
+      "sha256": "9862955c13e3d95fb7ca6b586e2a79cef865e6844c5e25c4883fb5242ea85a78",
+      "bytes": 18486
+    },
+    "/private/tmp/portal-next-20261104-135432/app-build.before.kts": {
+      "sha256": "2c7b7511cdbe2ac5ea12c4af11c0113e750394104561d486d7701b6a68385b48",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "54b45afe92a77c65996390344004ae44c61d52df1b83cfd52e013ed3105386fa",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SettingsNumberStep.kt": {
+      "sha256": "9add1717cdf58622a049bec3bef0a8381fa4b41ac3078b8612a8f3d06b41fdae",
+      "bytes": 633
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsHome.kt": {
+      "sha256": "780526cd65080f43e798ce5fbc819dcf7fe00a7b90ba97e1f9b4328b9a97de1d",
+      "bytes": 22167
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt": {
+      "sha256": "7736ce47a18ecb8d3ee8d3d4c429096dce02a310080626e9c1c33832ff670896",
+      "bytes": 13372
+    },
+    "/private/tmp/portal-next-20261104-135432/LampNumberStepTest.frozen.kt": {
+      "sha256": "7283b7b222d84a3e52ae9c51b95fb3109dc72db986d0619b644102a281870391",
+      "bytes": 3768
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/LampNumberStepTest.kt": {
+      "sha256": "7283b7b222d84a3e52ae9c51b95fb3109dc72db986d0619b644102a281870391",
+      "bytes": 3768
+    },
+    "/private/tmp/portal-next-20261104-135432/lamp-bytecode-before.txt": {
+      "sha256": "ac3883d0c6a7dd35c416b7aca85abd89c203c53d7e852fb3fa9060b88e9a48ab",
+      "bytes": 426591
+    },
+    "/private/tmp/portal-next-20261104-135432/lamp-dex-class-before.txt": {
+      "sha256": "cd72d7881aea100d88e0b047f406b8a7c71c7a01b6dba1dc010b72e6bbcb1ee0",
+      "bytes": 167237
+    },
+    "/private/tmp/portal-next-20261104-135432/lamp-source-before.dex": {
+      "sha256": "8acfcba39034e24843866a547a9be71eee36ea2acd710b2788f041682952d9d0",
+      "bytes": 11375632
+    },
+    "/private/tmp/portal-next-20261104-135432/jvm-before.xml": {
+      "sha256": "dcef3259c2a10e633e8397b47dad45efe09891bfb0eae864e560b2c62fecb879",
+      "bytes": 18660
+    },
+    "/private/tmp/portal-next-20261104-135432/jvm-before-summary.json": {
+      "sha256": "00c6383989cdc0badbf6d813e6fc55ad241b459c4ea3ffe4c429c373fd033c16",
+      "bytes": 1227
+    },
+    "/private/tmp/portal-next-20261104-135432/jvm-before.log": {
+      "sha256": "687846a53aff9342165b9fff78f27cdcae2a043412beeef21c6b51f730372691",
+      "bytes": 2641
+    },
+    "/private/tmp/portal-next-20261104-135432/jvm-before-terminal.json": {
+      "sha256": "9840780e4ed7cf4c8b212e2e489329624b3e0d3801a10540fce55fc37127eb16",
+      "bytes": 47
+    },
+    "/private/tmp/portal-next-20261104-135432/jvm-after.xml": {
+      "sha256": "99218426a894480a246fb867b302dfe9d47bac3caf04547d7acd5a210cd8c6de",
+      "bytes": 1692
+    },
+    "/private/tmp/portal-next-20261104-135432/jvm-after-summary.json": {
+      "sha256": "2a1e0b230a9fc2d24475544bf8b577a23bc955d84b0481701c32c6209840b82e",
+      "bytes": 495
+    },
+    "/private/tmp/portal-next-20261104-135432/gradle.log": {
+      "sha256": "0b6535e9e557831db9992a2edb1f9ceb324924564ace42546b471faf1a3ffe1d",
+      "bytes": 13723
+    },
+    "/private/tmp/portal-next-20261104-135432/build-terminal.json": {
+      "sha256": "bf6b8185895d92b2ee8a571d0a60e5f4e84535b98ead886b07837d83c5e86b22",
+      "bytes": 49
+    },
+    "/private/tmp/portal-next-20261104-135432/promotion-artifacts.json": {
+      "sha256": "cde4ac43329a5bf1480ab19c75bb1d1d34cfbc5ffd767a115deb60f696b309d2",
+      "bytes": 9828
+    },
+    "/private/tmp/portal-next-20261104-135432/verify-artifacts.py": {
+      "sha256": "866a577d95e1da20ff2c21fae22d226e2c4b4cf07a761ec8bd9f464e3f89b91b",
+      "bytes": 3368
+    },
+    "/private/tmp/portal-next-20261104-135432/before-debug-1.161.apk": {
+      "sha256": "23bbd0067f919ef221ba67d40b18f4d3e69e02834cd77fce8640c3b2e2e4057a",
+      "bytes": 46745646
+    },
+    "/private/tmp/portal-next-20261104-135432/rollback-1.161.apk": {
+      "sha256": "14a9a8e80670f9d8873844435955b7cbd9a785c31e3a9f9d5f8dac860332fd96",
+      "bytes": 25886923
+    },
+    "/private/tmp/portal-next-20261104-135432/candidate-debug-1.162.apk": {
+      "sha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+      "bytes": 46745646
+    },
+    "/private/tmp/portal-next-20261104-135432/candidate-performance-1.162.apk": {
+      "sha256": "2c43d9e7a2fa0f76a82a4796317fbe2279747d62467ee0b64b2982c131d283c3",
+      "bytes": 25886923
+    },
+    "/private/tmp/portal-next-20261104-135432/native-owned/LampStepActivity.java": {
+      "sha256": "967dd7067973acfdc106d3de0193eebd32398f5c7be986e7031fa205f06db5a4",
+      "bytes": 8802
+    },
+    "/private/tmp/portal-next-20261104-135432/native-owned/AndroidManifest.xml": {
+      "sha256": "68f320b151c2042c13ab9dc620f36ee82217f2e9c11422cac64e3b9698bf2a9f",
+      "bytes": 417
+    },
+    "/private/tmp/portal-next-20261104-135432/native-owned/source-admission.json": {
+      "sha256": "bc7bbb63e7e3d80724a3eaf982993769227688f4e0c073b9134296b575cf6136",
+      "bytes": 1864
+    },
+    "/private/tmp/portal-next-20261104-135432/native-owned/preparation-verification.json": {
+      "sha256": "6128cea43c002aa56b09c86d192e89a8ed08359d6083faa385c15901d22f38ef",
+      "bytes": 2600
+    },
+    "/private/tmp/portal-next-20261104-135432/native-owned/baseline-fixture.apk": {
+      "sha256": "2c9209ca51b4dcca2541e51e294647b2b094807790926d9f5438a7e55e9bfe47",
+      "bytes": 37503466
+    },
+    "/private/tmp/portal-next-20261104-135432/native-before-report.json": {
+      "sha256": "8920c2eaab3ed6527759505d4167a57de08b0e5d4181ec84e2a2c93288f98dd5",
+      "bytes": 1345
+    },
+    "/private/tmp/portal-next-20261104-135432/native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-next-20261104-135432/baseline-terminal.json": {
+      "sha256": "ffefa94ba51699916bb0aefa62f889a862e3ae057c3f4cdeb99ba5eb7626f165",
+      "bytes": 62
+    },
+    "/private/tmp/portal-next-20261104-135432/native-run.py": {
+      "sha256": "af64e12c02d34ee6d6d624c634ebb1ed133a567081b2d503ac4e7e70ba643b01",
+      "bytes": 5442
+    },
+    "/private/tmp/portal-next-20261104-135432/root-scaffolding-frozen.json": {
+      "sha256": "2802fd2712971b094a6a3c848b537b7bc58d1a92e4e09d91433915590eee859a",
+      "bytes": 531
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/LampStepActivity.java": {
+      "sha256": "742ea93eb3fce0d72bb114895cee1cbd5b832c9beb499cfb66336be7ba6f07fd",
+      "bytes": 8779
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/AndroidManifest.xml": {
+      "sha256": "68f320b151c2042c13ab9dc620f36ee82217f2e9c11422cac64e3b9698bf2a9f",
+      "bytes": 417
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/RUN.md": {
+      "sha256": "3240c8ce440b9b6d4b7a539cdd77f8cc7a0cad588dd0cd08de4a7c8c8add46f3",
+      "bytes": 2747
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/source-admission.json": {
+      "sha256": "66e653bc7f0407872a0c09443596df2149cbe79b461f9f844a2238b741e14c27",
+      "bytes": 3231
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/preparation-verification.json": {
+      "sha256": "2e17a1c05fc1edf743f06d3510acea4478ec38c3fe0dd57a1c06147a524c5a29",
+      "bytes": 3967
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/build.sh": {
+      "sha256": "d2247de8d21441d71ef35e108985eab3a6263f92b830d52d0c8c175b6e4da95f",
+      "bytes": 822
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/repack.sh": {
+      "sha256": "edc772a26b6461df334f357c069ce06f2825ecb6af8eabdf727c2ebec8e58138",
+      "bytes": 775
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/freeze.py": {
+      "sha256": "5f982f106c00075c940c66289b33c1232e4113217035045fff91eeafd2d4b605",
+      "bytes": 1468
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/frozen-dex/classes.dex": {
+      "sha256": "c6727bd55e0f1fcbae85cbc1c7526ba9e56ffe8bc109f21715ce63fe187fb2ff",
+      "bytes": 13608
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/baseline-fixture.apk": {
+      "sha256": "e564746bba8911d309da257bc3d52bf16ef45bf50b0b3c40b2e950b8f2758c87",
+      "bytes": 37503466
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2/lamp-step-fixture.apk": {
+      "sha256": "e869dcf13cb4bcb5ddbbb18b0ac398e200d5359b906ae11554c849377a927466",
+      "bytes": 37503466
+    },
+    "/private/tmp/portal-next-20261104-135432/native-run-v2.py": {
+      "sha256": "2c017fe90c0cfa22095f53f81111fc8f61b3c7815e4ebf189259612f44689b7a",
+      "bytes": 5442
+    },
+    "/private/tmp/portal-next-20261104-135432/root-scaffolding-frozen-v2.json": {
+      "sha256": "6d7494b57835d98ec15032fd26bea72ac86c00ea3079b795f045d405023e8886",
+      "bytes": 525
+    },
+    "/private/tmp/portal-next-20261104-135432/baseline-v2-terminal.json": {
+      "sha256": "667d87cd7121b622a5dd71ba3cd2079ec1a0c03b32e850eab59744667bb24a6e",
+      "bytes": 52
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2-before-report.json": {
+      "sha256": "d4ac18e714780eb4e5db33535ff5f75662f6b46f522a9c07e54f728840acbcae",
+      "bytes": 7790
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2-after-report.json": {
+      "sha256": "4eb4fe42aeb2daf58734a17835960770840019f914a59fede26c51bce10e8bfa",
+      "bytes": 7573
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-next-20261104-135432/native-v2-after-terminal.json": {
+      "sha256": "9a7a0834aaccc199b3a7d3e54edd6260c06a7f2e740c21aab49a33e8faae3cc2",
+      "bytes": 371
+    }
+  }
+}

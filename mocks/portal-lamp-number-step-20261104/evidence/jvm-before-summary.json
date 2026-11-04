@@ -1,0 +1,40 @@
+{
+  "tests": 12,
+  "failures": 4,
+  "errors": 0,
+  "skipped": 0,
+  "cases": {
+    "warmth100PlusRetains100": [],
+    "warmthMinimumIntMinusChooses0": [
+      {
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: Actual callback draft expected:<[]0> but was:<[10]0>"
+      }
+    ],
+    "brightness90PlusChooses91": [],
+    "warmth0MinusRetains0": [],
+    "brightnessBlankPlusChooses6": [],
+    "brightnessMaximumIntPlusChooses100": [
+      {
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: Actual callback draft expected:<[100]> but was:<[5]>"
+      }
+    ],
+    "warmth90PlusChooses91": [],
+    "brightness100PlusRetains100": [],
+    "warmthMaximumIntPlusChooses100": [
+      {
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: Actual callback draft expected:<[10]0> but was:<[]0>"
+      }
+    ],
+    "brightness5MinusRetains5": [],
+    "brightnessMinimumIntMinusChooses5": [
+      {
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: Actual callback draft expected:<[5]> but was:<[100]>"
+      }
+    ],
+    "warmthBlankPlusChooses1": []
+  }
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.immortal.launcher.LampNumberStepTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-04T14:00:53.416Z" hostname="iRedlofs-Mac-mini-3.local" time="0.025">
+  <properties/>
+  <testcase name="warmth100PlusRetains100" classname="com.immortal.launcher.LampNumberStepTest" time="0.022"/>
+  <testcase name="warmthMinimumIntMinusChooses0" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="brightness90PlusChooses91" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="warmth0MinusRetains0" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="brightnessBlankPlusChooses6" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="brightnessMaximumIntPlusChooses100" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="warmth90PlusChooses91" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="brightness100PlusRetains100" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="warmthMaximumIntPlusChooses100" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="brightness5MinusRetains5" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="brightnessMinimumIntMinusChooses5" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <testcase name="warmthBlankPlusChooses1" classname="com.immortal.launcher.LampNumberStepTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

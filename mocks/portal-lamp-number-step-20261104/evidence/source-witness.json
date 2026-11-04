@@ -1,0 +1,111 @@
+{
+  "status": "source-witness",
+  "originalDiscoveryAt": "2026-11-04T13:54:32Z",
+  "recordedAtUtc": "2026-11-04T13:55:56.347871+00:00",
+  "target": "2026-11-04T14:09:32Z",
+  "hardDeadline": "2026-11-04T14:24:32Z",
+  "clockNotReset": true,
+  "baseFromCoordinator": "f6f06b81ffcc05afff43713cbf0121cb12a4549c",
+  "finding": "Lamp percent-dialog steppers do Int arithmetic before clamp and can wrap to the opposite endpoint.",
+  "activeCaller": [
+    "ApprovedSettingsNavigation.kt:161 Sound settings registers LampActivity",
+    "LampActivity.onCreate non-preview \u2192 LampControlsContent \u2192 LampSettings \u2192 LampControlDialog",
+    "LampSliderRow onEdit opens private dialog; BasicTextField retains editable numeric draft.",
+    "Actual plus/minus callbacks LampActivity.kt:335/338 use toIntOrNull then \u00b11 before coerceIn."
+  ],
+  "literalWitnesses": [
+    {
+      "control": "Brightness",
+      "draft": "2147483647",
+      "action": "+",
+      "current": "5",
+      "expected": "100",
+      "impact": "Save accepts5% instead of the upper endpoint."
+    },
+    {
+      "control": "Warmth",
+      "draft": "2147483647",
+      "action": "+",
+      "current": "0",
+      "expected": "100"
+    },
+    {
+      "control": "Brightness",
+      "draft": "-2147483648",
+      "action": "\u2212",
+      "current": "100",
+      "expected": "5"
+    }
+  ],
+  "reproStatus": "Read-only source arithmetic witness; no test/build/native/UI execution.",
+  "smallestRepair": "Replace two callback expressions with existing stepSettingNumber(draft.toIntOrNull() ?: control.min, \u00b11, control.min, 100, wrap = false). Shared helper adds in Long before clamp.",
+  "acceptance": [
+    "Actual dialog draft and callback binding: Int.MAX_VALUE plus and Int.MIN_VALUE minus produce literal min/max endpoint drafts and Save percentages.",
+    "Controls: valid5/100 or0/100 endpoints,90\u00b11, blank/nonnumeric fallback,101 minus\u2192100 and\u22121 plus\u2192min.",
+    "Do not infer actual dialog binding from copied arithmetic tests alone; preserve existing validation/Save/Cancel/brightness ownership."
+  ],
+  "queueReview": {
+    "taskCount": 156,
+    "updatedAt": "2026-11-04T13:53:29.532663+00:00",
+    "positiveEarlierScope": {
+      "id": "settings-native-steppers",
+      "status": "verified",
+      "description": "Existing Volume and both quiet-hour clock dialogs passed endpoint, draft/Cancel, validation, keyboard/dial, persistence and reopen checks. No defect or speculative app change.",
+      "acceptance": [
+        "Inspect actual reachable time-of-day and bounded integer controls and their declarative constraints.",
+        "Check rendered value, plus/minus admission and applicable wrap/clamp behavior through the real native UI.",
+        "Verify acknowledged persistence only for safe reversible values and restore the full original configuration.",
+        "Timebox the complete unit, including cleanup, to 30 minutes."
+      ],
+      "limits": [
+        "Coordinator-observed native cases are not automated Compose tests.",
+        "No D-pad, alternate theme/font, wire-wrap, concurrent native draft or whole 54-page acceptance.",
+        "Secret/source-form editors remain separate; Weather and all exhausted slots retain their boundaries.",
+        "Final host is the baseline manual preview, not new natural Dream acceptance."
+      ]
+    },
+    "distinct": "Earlier verified settings-native-steppers unit explicitly covered Volume and quiet-hour dialogs without production fix. Lamp private dialog is distinct; Tools/preview ToolsLampNumberSheet has no steppers."
+  },
+  "limits": [
+    "Lamp controls ephemeral; no setting/registry/persistence addition or UI redesign.",
+    "No devices/owner preferences/media/accounts/provider/builds/tests/SDK/Git/network operations.",
+    "Excluded Converter/cache/Todo/Notes/Countdown/Aurora/Toolkit APK and parked settings/source-draft/performance scopes remain."
+  ],
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/LampActivity.kt",
+      "sha256": "60b014bd9457da49e3eac635a61b0f118683a82682a81c8fd545f87948cea689",
+      "bytes": 18447
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsHome.kt",
+      "sha256": "780526cd65080f43e798ce5fbc819dcf7fe00a7b90ba97e1f9b4328b9a97de1d",
+      "bytes": 22167
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt",
+      "sha256": "7736ce47a18ecb8d3ee8d3d4c429096dce02a310080626e9c1c33832ff670896",
+      "bytes": 13372
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SettingsNumberStep.kt",
+      "sha256": "9add1717cdf58622a049bec3bef0a8381fa4b41ac3078b8612a8f3d06b41fdae",
+      "bytes": 633
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-product-operating-state.md",
+      "sha256": "3f4d33bcb532bbf2f5489a233fc465fe6a887bb0e4a304a17dfe5686ef631e82",
+      "bytes": 223576
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-settings-native-steppers-2026-11-02.md",
+      "sha256": "a49003807c55ec0547574a1a1a6bd86cd2b1c57b08b00b10d466e12d3433e332",
+      "bytes": 6488
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-widget-gallery-20261102/roadmap/roadmap.json",
+      "sha256": "e3d4c180a41dc247eba38196107dcc6bd2d604e9327f3144f4c44d56aad63fa3",
+      "bytes": 505283
+    }
+  ]
+}

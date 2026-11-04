@@ -1,0 +1,20 @@
+{
+  "tests": 12,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    "warmth100PlusRetains100",
+    "warmthMinimumIntMinusChooses0",
+    "brightness90PlusChooses91",
+    "warmth0MinusRetains0",
+    "brightnessBlankPlusChooses6",
+    "brightnessMaximumIntPlusChooses100",
+    "warmth90PlusChooses91",
+    "brightness100PlusRetains100",
+    "warmthMaximumIntPlusChooses100",
+    "brightness5MinusRetains5",
+    "brightnessMinimumIntMinusChooses5",
+    "warmthBlankPlusChooses1"
+  ]
+}

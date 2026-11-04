@@ -1,0 +1,18 @@
+{
+  "native-run-v2.py": {
+    "sha256": "2c017fe90c0cfa22095f53f81111fc8f61b3c7815e4ebf189259612f44689b7a",
+    "bytes": 5442
+  },
+  "native-v2/build.sh": {
+    "sha256": "d2247de8d21441d71ef35e108985eab3a6263f92b830d52d0c8c175b6e4da95f",
+    "bytes": 822
+  },
+  "native-v2/repack.sh": {
+    "sha256": "edc772a26b6461df334f357c069ce06f2825ecb6af8eabdf727c2ebec8e58138",
+    "bytes": 775
+  },
+  "native-v2/freeze.py": {
+    "sha256": "5f982f106c00075c940c66289b33c1232e4113217035045fff91eeafd2d4b605",
+    "bytes": 1468
+  }
+}

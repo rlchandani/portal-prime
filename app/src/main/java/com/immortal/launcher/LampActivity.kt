@@ -332,10 +332,10 @@ private fun LampControlDialog(
                 }
                 Row(Modifier.padding(top = 26.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     ApprovedEditorsButton("−") {
-                        draft = ((draft.toIntOrNull() ?: control.min) - 1).coerceIn(control.min, 100).toString(); error = null
+                        draft = stepSettingNumber(draft.toIntOrNull() ?: control.min, -1, control.min, 100, wrap = false).toString(); error = null
                     }
                     ApprovedEditorsButton("+") {
-                        draft = ((draft.toIntOrNull() ?: control.min) + 1).coerceIn(control.min, 100).toString(); error = null
+                        draft = stepSettingNumber(draft.toIntOrNull() ?: control.min, 1, control.min, 100, wrap = false).toString(); error = null
                     }
                 }
                 Text(error.orEmpty(), color = palette.error, fontSize = 23.sp, lineHeight = 34.sp,

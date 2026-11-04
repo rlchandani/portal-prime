@@ -1,0 +1,57 @@
+{
+  "sourceAuthoringOnly": true,
+  "frozenAtUtc": "2026-11-04T13:57:40.852909+00:00",
+  "originalDiscoveryUtc": "2026-11-04T13:54:32Z",
+  "targetUtc": "2026-11-04T14:09:32Z",
+  "hardUtc": "2026-11-04T14:24:32Z",
+  "package": "com.immortal.lampstepfixture",
+  "activity": ".LampStepActivity",
+  "sources": {
+    "AndroidManifest.xml": {
+      "sha256": "68f320b151c2042c13ab9dc620f36ee82217f2e9c11422cac64e3b9698bf2a9f",
+      "bytes": 417
+    },
+    "LampStepActivity.java": {
+      "sha256": "967dd7067973acfdc106d3de0193eebd32398f5c7be986e7031fa205f06db5a4",
+      "bytes": 8802
+    },
+    "RUN.md": {
+      "sha256": "eec44a512f5fa9329c9435eee6eaedf6ba8ffb0cb1f2e94cd156ea9f30babf7c",
+      "bytes": 2034
+    }
+  },
+  "caseNames": [
+    "brightnessMaxIntPlus",
+    "brightnessMinIntMinus",
+    "brightness90Plus",
+    "brightnessMinMinus",
+    "brightness100Plus",
+    "brightnessBlankPlus",
+    "warmthMaxIntPlus",
+    "warmthMinIntMinus",
+    "warmth90Plus",
+    "warmthMinMinus",
+    "warmth100Plus",
+    "warmthBlankPlus"
+  ],
+  "expectedBaseline": {
+    "tests": 12,
+    "failures": 4,
+    "controls": 8,
+    "setupFailures": 0
+  },
+  "expectedCandidate": {
+    "tests": 12,
+    "failures": 0,
+    "setupFailures": 0
+  },
+  "permissions": [],
+  "sourceApkBinding": "Root binds exact original before/candidate debug APK; not compiled by author",
+  "fixtureDexStatus": "Root must freeze one compiled DEX and reuse byte-identically",
+  "requiresRootFullReadBeforeSdk": true,
+  "sourceBinding": {
+    "LampActivity.ktSha256": "60b014bd9457da49e3eac635a61b0f118683a82682a81c8fd545f87948cea689",
+    "sourceWitnessSha256": "99081deb8cda9fca0f94d4d0662bb884f2e37f1a4813676ee17fdd0e70e1788d"
+  },
+  "authorOperations": "Source read and owned private source/doc/metadata writes only; no SDK/build/tests/runtime/device/Git/network/account/media/provider actions."
+}

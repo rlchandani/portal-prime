@@ -1,0 +1,31 @@
+{
+  "v1": {
+    "status": "excluded-setup-only",
+    "cases": 0,
+    "setupFailures": 1,
+    "allBehavioralAssertionsPreservedInV2": true
+  },
+  "v2": {
+    "sourceSha256": "742ea93eb3fce0d72bb114895cee1cbd5b832c9beb499cfb66336be7ba6f07fd",
+    "frozenDexSha256": "c6727bd55e0f1fcbae85cbc1c7526ba9e56ffe8bc109f21715ce63fe187fb2ff",
+    "driverSha256": "2c017fe90c0cfa22095f53f81111fc8f61b3c7815e4ebf189259612f44689b7a",
+    "beforeWrapperSha256": "e564746bba8911d309da257bc3d52bf16ef45bf50b0b3c40b2e950b8f2758c87",
+    "afterWrapperSha256": "e869dcf13cb4bcb5ddbbb18b0ac398e200d5359b906ae11554c849377a927466",
+    "exactSameFrozenDexInBothWrappers": true,
+    "allEntryNamesIdentical": true,
+    "payloadChangesOnlyEmbeddedSourceAPK": true,
+    "changedZIPEntries": [
+      "assets/source.apk",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/MANIFEST.MF"
+    ]
+  },
+  "actualD8AccessInspection": {
+    "path": "/private/tmp/portal-next-20261104-135432/lamp-dex-class-before.txt",
+    "bytes": 167237,
+    "sha256": "cd72d7881aea100d88e0b047f406b8a7c71c7a01b6dba1dc010b72e6bbcb1ee0",
+    "bothHandlersFlags": "0x0018 STATIC FINAL",
+    "scope": "Root reviewed actual minus/plus method headers in full actual packaged DEX class dump; no claim to have read all unrelated methods."
+  }
+}

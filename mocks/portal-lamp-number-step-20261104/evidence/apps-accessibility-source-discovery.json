@@ -1,0 +1,146 @@
+{
+  "status": "BOUNDED_NEGATIVE_NO_ADMITTED_NEW_WITNESS",
+  "frozenAtUtc": "2026-11-04T13:56:15.865947+00:00",
+  "clock": {
+    "originalStartedAt": "2026-11-04T13:54:32Z",
+    "target": "2026-11-04T14:09:32Z",
+    "hardDeadline": "2026-11-04T14:24:32Z",
+    "reset": false,
+    "discoveryIncluded": true
+  },
+  "rootSuppliedBase": "f6f06b81ffcc05afff43713cbf0121cb12a4549c",
+  "focus": "Current retained Apps page route/loading/menu/launch labels; no full Home or hardware accessibility acceptance.",
+  "narrowFindings": [
+    "Selected installed/recent load effects check page/resume ownership and cancellation; they retain separate display/retry status. No distinct ordinary failure witnessed from these source regions.",
+    "Launch helper gives existing failed-open feedback and calls the completion only after accepted launch; no new handoff/performance policy or runtime proof.",
+    "Selected folder/order writes use existing optimistic snapshot guards and canonical reload. Favorite-removal/replacement fix is explicitly excluded; no stale-layout or generation variant reopened.",
+    "Header round actions pass their label into glyph description; ordinary buttons render their text. No new accessible-name fixture or redesign is inferred from selected source."
+  ],
+  "priorScopesRetained": [
+    {
+      "id": "apps-favorite-removal-replacements",
+      "status": "delivered",
+      "clock": {
+        "originalDiscoveryAt": "2026-11-04T11:49:44+00:00",
+        "selectedAt": "2026-11-04T12:04:26.640970+00:00",
+        "target": "2026-11-04T12:04:44+00:00",
+        "hardDeadline": "2026-11-04T12:19:44+00:00",
+        "baseCommit": "7b60d999",
+        "scope": "Apps Remove from favorites must move selected installed app after known built-in replacements; include builtinIds only on removal, preserving Add order, duplicates/stale records, optimistic snapshot guard and Home/Apps existing first-six projections",
+        "notReset": true
+      },
+      "qualification": "Retained exact roadmap scope; a null clock is unresolved here and not reset."
+    },
+    {
+      "id": "apk-browser-selection",
+      "status": "delivered",
+      "clock": {
+        "startedAt": "2026-11-04T09:54:27Z",
+        "target": "2026-11-04T10:09:27Z",
+        "deadline": "2026-11-04T10:24:27Z",
+        "baselineCommit": "f678dfc2757c33f06e5a3d0e4ba3fe67a91bae97",
+        "candidateVersion": "1.146",
+        "candidateCode": 140,
+        "reset": false,
+        "wholeGoal": "active"
+      },
+      "qualification": "Retained exact roadmap scope; a null clock is unresolved here and not reset."
+    },
+    {
+      "id": "user-layout-save-conflicts",
+      "status": "delivered",
+      "clock": {
+        "startedAt": "2026-11-03T12:41:33Z",
+        "deadline": "2026-11-03T13:11:33Z",
+        "originalIndependentAuditClockRetained": true
+      },
+      "qualification": "Retained exact roadmap scope; a null clock is unresolved here and not reset."
+    },
+    {
+      "id": "accessibility-reconnect-services",
+      "status": "delivered",
+      "clock": {
+        "startedAt": "2026-11-03T11:43:07+00:00",
+        "deadline": "2026-11-03T12:13:07+00:00",
+        "originalIndependentAuditClockRetained": true
+      },
+      "qualification": "Retained exact roadmap scope; a null clock is unresolved here and not reset."
+    },
+    {
+      "id": "black-handoff",
+      "status": "parked",
+      "clock": null,
+      "qualification": "Retained exact roadmap scope; a null clock is unresolved here and not reset."
+    },
+    {
+      "id": "settings-native-source-drafts",
+      "status": "parked",
+      "clock": null,
+      "qualification": "Retained exact roadmap scope; a null clock is unresolved here and not reset."
+    }
+  ],
+  "explicitExclusions": [
+    "favorite removal/replacements",
+    "already fixed selection/profile/generation ownership",
+    "parked keyboard/action reachability",
+    "black handoff",
+    "performance/exhausted scopes"
+  ],
+  "actions": {
+    "productOrTestEdits": false,
+    "fixtureCreated": false,
+    "runtimeTestsBuildsSdkGit": false,
+    "devicePhoneBrowserMediaProviderAccountActions": false,
+    "privateMetadataOnly": true
+  },
+  "limits": [
+    "Bounded static negative, not whole-feature acceptance or exhaustive absence proof. No brand-new candidate follows merely from missing backlog keywords.",
+    "Combined source/receipt/title inventories exceeded tool output budgets; only listed displayed semantic portions credited. No truncated body is claimed fully read.",
+    "Prior clocks remain exact where recorded. Unresolved older parked clocks remain unresolved; no reset.",
+    "No source/test/import/run, provider/owner state/token output or physical/native accessibility acceptance. Root owns all integration and device work."
+  ],
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt",
+      "bytes": 33074,
+      "sha256": "f2f82d2ce372c6d42acfc83b29b83104662ad5152a643b509afc1198d818815b",
+      "readScope": "Selected 1\u2013355,355\u2013450 and455\u2013570; source output after first180 included a truncated combined segment, so 330\u2013355/455\u2013500 are not asserted fully read. Actual captured menus, guards, search/folder routing and launch helpers reviewed. Not full639-line file."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedAppsChrome.kt",
+      "bytes": 13079,
+      "sha256": "dabb1ec543763bdf95f13129b8ba11d5ac727aa05d4f5ba9f6d32bea8a169318",
+      "readScope": "Full-file request was truncated; credited selected96\u2013111,137\u2013183 and exact function/description reference inventory only."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-app-favorite-removal-2026-11-04.md",
+      "bytes": 4072,
+      "sha256": "5baeab2e461496651c0489ef7cfbf35193c515cef570e55cb1bb98a1f65255da",
+      "readScope": "Selected current problem/change, native-limit/clock paragraphs displayed in combined output; not full report."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-user-layout-save-conflicts-2026-11-03.md",
+      "bytes": 6573,
+      "sha256": "d7729bba77fac9baf77790874c4eb693ec8ca2ff64c0493f190d71d32485b2a2",
+      "readScope": "Selected1\u201354 displayed in earlier combined output, existing snapshot/folder conflict contract and native limitations; not full report."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-black-handoff-second-slot-2026-11-02.md",
+      "bytes": 7880,
+      "sha256": "09abfe3514ca5d55da1657cd0a950e1b58c4216f27c8bad790e7dae8c34cae61",
+      "readScope": "Bounded exact exhausted/clock/mutation/rejection matching lines only."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-settings-native-source-drafts-2026-11-02.md",
+      "bytes": 4605,
+      "sha256": "a956673cc1de2bd9060be300b233529538efd570ac6807891d2d4c9a9b94d371",
+      "readScope": "Bounded keyboard/withdrawal/original-state/parked matching lines only."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-widget-gallery-20261102/roadmap/roadmap.json",
+      "bytes": 505283,
+      "sha256": "e3d4c180a41dc247eba38196107dcc6bd2d604e9327f3144f4c44d56aad63fa3",
+      "readScope": "All156task objects parsed; only selected Apps/favorite/layout/accessibility and explicit parked entries semantically reviewed. Broad title matches included truncated output; no all-task semantic claim."
+    }
+  ]
+}
