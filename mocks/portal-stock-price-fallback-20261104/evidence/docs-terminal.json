@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/private/tmp/portal-docs-runtime-20261104/bin/mkdocs",
+    "build",
+    "--strict",
+    "--site-dir",
+    "/private/tmp/portal-stock-price-fallback-20261104-194200/docs-site"
+  ],
+  "exitCode": 0,
+  "durationSeconds": 3.4949801249968004,
+  "checkedAt": "2026-11-04T19:59:44.965027+00:00"
+}

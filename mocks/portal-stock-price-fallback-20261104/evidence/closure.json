@@ -1,0 +1,14 @@
+{
+  "startedAt": "2026-11-04T19:42:00+00:00",
+  "deliveryPreservationCleanupAt": "2026-11-04T19:59:41.450560+00:00",
+  "elapsedMinutes": 17.690842666666665,
+  "targetMet": false,
+  "hardLimitMetAtClosure": true,
+  "copiedRegistryRemoved": true,
+  "ownerRegistryHashesUnchanged": true,
+  "originalIssueClockRetained": true,
+  "published": false,
+  "physicalPhoneOperations": false,
+  "wholeGoalComplete": false,
+  "preexistingScriptsCachePreserved": true
+}

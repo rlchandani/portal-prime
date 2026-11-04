@@ -1,0 +1,14 @@
+{
+  "command": [
+    "./gradlew",
+    ":app:testDebugUnitTest",
+    ":app:assembleDebug",
+    ":app:assemblePerformance",
+    ":app:lintVitalPerformance",
+    "--no-daemon",
+    "--console=plain"
+  ],
+  "exitCode": 0,
+  "durationSeconds": 110.47801620799873,
+  "completedAt": "2026-11-04T19:55:17.558568+00:00"
+}

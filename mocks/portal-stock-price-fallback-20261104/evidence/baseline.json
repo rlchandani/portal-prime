@@ -1,0 +1,35 @@
+{
+  "command": [
+    "./gradlew",
+    ":app:testDebugUnitTest",
+    "--tests",
+    "com.immortal.launcher.AlpacaStockFallbackTest",
+    "--no-daemon",
+    "--console=plain"
+  ],
+  "exitCode": 1,
+  "durationSeconds": 9.46238041700417,
+  "tests": 8,
+  "failures": 4,
+  "errors": 0,
+  "skipped": 0,
+  "failed": [
+    {
+      "name": "missingLatestPriceUsesDailyClose",
+      "type": "java.lang.AssertionError"
+    },
+    {
+      "name": "nullLatestPriceUsesDailyClose",
+      "type": "java.lang.AssertionError"
+    },
+    {
+      "name": "nonnumericLatestPriceUsesDailyClose",
+      "type": "java.lang.AssertionError"
+    },
+    {
+      "name": "nanLatestPriceUsesDailyClose",
+      "type": "java.lang.AssertionError"
+    }
+  ],
+  "sourceSha256": "15652aa0df13548e844233a421cc834b63c17d40e3eb4b52546a403e881ac8f8"
+}

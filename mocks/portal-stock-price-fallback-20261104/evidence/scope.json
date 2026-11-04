@@ -1,0 +1,21 @@
+{
+  "scope": "Stock quote latest-trade NaN falls back to existing valid daily-bar price",
+  "startedAt": "2026-11-04T19:42:00Z",
+  "targetAt": "2026-11-04T19:57:00Z",
+  "hardStopAt": "2026-11-04T20:12:00Z",
+  "base": "05c1cf941fdfe8870322cb4a443f981705493ed1",
+  "newVersion": {
+    "versionName": "1.176",
+    "versionCode": 170
+  },
+  "acceptance": [
+    "Generated actual-parser regressions for missing/null/non-numeric/NaN latest prices with valid daily close.",
+    "Keep valid latest trade precedence, zero, absent latest trade and absent both prices.",
+    "Exact one expression change, required checks/independent review/both-room delivery and saved state."
+  ],
+  "boundaries": [
+    "No live Alpaca/provider/account/phone/media operations.",
+    "Earlier Stocks HTTP-failure-to-empty feedback witness remains separate and unimplemented.",
+    "UI/real provider/optimized runtime/native parser acceptance qualified separately."
+  ]
+}

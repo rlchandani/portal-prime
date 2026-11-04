@@ -69,7 +69,7 @@ object AlpacaClient {
               val sym = raw.trim().uppercase()
               val snap = json.optJSONObject(sym) ?: return@mapNotNull null
               val last =
-                  snap.optJSONObject("latestTrade")?.optDouble("p")
+                  snap.optJSONObject("latestTrade")?.optDouble("p")?.takeUnless { it.isNaN() }
                       ?: snap.optJSONObject("dailyBar")?.optDouble("c")
                       ?: return@mapNotNull null
               if (last.isNaN()) return@mapNotNull null

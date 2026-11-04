@@ -1,0 +1,61 @@
+{
+  "status": "frozen-source-only-not-executed",
+  "issueClock": {
+    "originalStart": "2026-11-04T19:42:00Z",
+    "target": "2026-11-04T19:57:00Z",
+    "hardDeadline": "2026-11-04T20:12:00Z",
+    "clockNotReset": true
+  },
+  "scope": "Actual parseStockQuotes NaN latestTrade price must allow existing dailyBar close fallback. Four regression cases and four controls; transport and provider behavior excluded.",
+  "test": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/AlpacaStockFallbackTest.kt",
+    "frozenPath": "/private/tmp/portal-stock-price-fallback-20261104-194200/AlpacaStockFallbackTest.frozen.kt",
+    "bytes": 2892,
+    "sha256": "64a0d36775d836dcaf23d3ec69961003df599e45ca57801afb2721feb5b06eeb",
+    "methods": 8
+  },
+  "beforeSource": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AlpacaClient.kt",
+    "bytes": 7014,
+    "sha256": "15652aa0df13548e844233a421cc834b63c17d40e3eb4b52546a403e881ac8f8"
+  },
+  "unchangedExistingTests": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/AlpacaClientTest.kt",
+    "bytes": 3433,
+    "sha256": "a8908ee70bb6a08e75bcb2f1ffe05de5dafc8ef3226cd0ce1d49179082b2cdaa"
+  },
+  "expectations": {
+    "regressions": [
+      "missingLatestPriceUsesDailyClose",
+      "nullLatestPriceUsesDailyClose",
+      "nonnumericLatestPriceUsesDailyClose",
+      "nanLatestPriceUsesDailyClose"
+    ],
+    "controls": [
+      "validLatestPriceWinsOverDailyClose",
+      "zeroLatestPriceRemainsUsableAndWinsOverDailyClose",
+      "absentLatestTradeRetainsDailyCloseFallback",
+      "unusableLatestAndDailyPricesOmitQuote"
+    ],
+    "dailyClose": {
+      "last": 191,
+      "change": 3,
+      "changePct": 1.5957446808510638
+    },
+    "validLatest": {
+      "last": 190.5,
+      "change": 2.5,
+      "changePct": 1.3297872340425532
+    },
+    "zeroLatest": {
+      "last": 0,
+      "change": -188,
+      "changePct": -100
+    }
+  },
+  "limits": [
+    "No test/build/SDK/Git/device/HTTP/network/Context or household operation by author.",
+    "No HTTP-null/error-state change, infinity/range/price-policy redesign or optimized/native/UI claim.",
+    "Root owns actual unchanged baseline and candidate execution; no executed RED/PASS claim."
+  ]
+}

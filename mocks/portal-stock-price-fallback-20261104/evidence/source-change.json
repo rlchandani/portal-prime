@@ -1,0 +1,11 @@
+{
+  "status": "single-expression-candidate",
+  "beforeSha256": "15652aa0df13548e844233a421cc834b63c17d40e3eb4b52546a403e881ac8f8",
+  "afterSha256": "0a28663a7145348658e01e3654397ea6ff30ac2e79f8f165e7014c76df11c5f2",
+  "afterBytes": 7041,
+  "testSha256": "64a0d36775d836dcaf23d3ec69961003df599e45ca57801afb2721feb5b06eeb",
+  "exactSingleExpressionChange": true,
+  "optionsAndTransportBytesUnchanged": true,
+  "scope": "NaN latest stock price permits existing daily close fallback; final NaN omission remains",
+  "baseline": "8 tests, 4 intended AssertionErrors, 4 passing controls, zero errors/skips"
+}
