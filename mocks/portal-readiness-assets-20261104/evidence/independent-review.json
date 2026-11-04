@@ -1,0 +1,274 @@
+{
+  "ok": true,
+  "blockers": [],
+  "reviewedAtUtc": "2026-11-04T13:40:35.446Z",
+  "scope": "One independent source/evidence review of existing host release-readiness tool. Files and retained results read only; no commands, test/build/SDK/Git/network/device execution or source edits.",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T13:35:25Z",
+    "firstSourceWitnessAt": "2026-11-04T13:35:46Z",
+    "selectedAt": "2026-11-04T13:36:22.027488+00:00",
+    "target": "2026-11-04T13:50:25Z",
+    "hardDeadline": "2026-11-04T14:05:25Z",
+    "clockNotReset": true,
+    "scope": "Extend existing local release checker with source asset byte equality before candidate promotion. Host-only; current device/public versions unchanged.",
+    "acceptance": [
+      "Changed, missing, duplicate, unreadable packaged source assets fail actual CLI and remove pending APK",
+      "Nested and binary assets pass with exact source/hash evidence",
+      "Current 23 assets in exact 1.160 APK pass",
+      "Existing readiness and full Portal Python regression gates pass",
+      "Independent source/evidence review before local commit"
+    ],
+    "exclusions": [
+      "No new checker CLI, device operations, Java/Kotlin/JS changes, publication, CI dispatch or fresh Android acceptance"
+    ]
+  },
+  "source": {
+    "exactDelta": "Only zipfile/zlib imports, source_assets helper and sourceAssets receipt call before existing deadline check/candidate rename. Removing those additions reproduces the original checker byte-for-byte.",
+    "correctness": [
+      "Each sorted nested main-source asset must match exactly one corresponding ZipInfo; size and streamed SHA256 compare source bytes, including empty/binary/compressed entries.",
+      "Missing/duplicate/size/hash/read/CRC/DEFLATE failures remain failed readiness and pending APK is removed by existing main finally cleanup; zlib.error is explicitly contained.",
+      "Existing package/version/signer/baseline/source-stability checks and promotion ordering remain intact; no added external command. Empty main-asset inventory returns explicit fileCount 0."
+    ],
+    "documentationParagraph": "Before promoting `candidate.apk`, the checker also compares every file under\n`app/src/main/assets` with its packaged `assets/` entry. Missing or duplicate\nentries, different sizes or bytes, and unreadable contents fail readiness.\n`sourceAssets` in the receipt records each relative path, size and SHA256.\nThis covers the main source assets; extra library or generated assets and\nAndroid resources remain outside this comparison."
+  },
+  "tests": {
+    "frozenInitialFiveSha256": "256980765725a291b3288561c0b787d9b627cf24f077d6205a75e435990ff260",
+    "initialFiveAssertionsPreserved": true,
+    "finalSourceBinding": {
+      "sha256": "debeae6e1a03324ab00b37de2cc30cb7902d40681ffa90f84e0705dbb8f8ac37",
+      "bytes": 6144
+    },
+    "caseNames": [
+      "test_duplicate_matching_asset_blocks_ambiguous_lookup",
+      "test_invalid_compressed_asset_writes_failed_receipt",
+      "test_missing_asset_blocks_candidate_promotion",
+      "test_nested_compressed_binary_and_empty_assets_record_exact_evidence",
+      "test_stale_same_size_asset_blocks_candidate_promotion",
+      "test_truncated_binary_asset_blocks_candidate_promotion",
+      "test_unreadable_asset_crc_writes_failed_receipt_and_retires_pending_apk"
+    ],
+    "baseline": {
+      "tests": 7,
+      "assertionFailures": 7,
+      "errors": 0,
+      "interpretation": "Six invalid asset archives incorrectly reached ready; exact positive archive lacked sourceAssets evidence."
+    },
+    "candidate": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0
+    },
+    "fullPortalPython": {
+      "tests": 271,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 26.387
+    },
+    "terminal": {
+      "baselineFinalExit": 1,
+      "candidateFinalExit": 0,
+      "fullPythonExit": 0,
+      "sourceBindings": [
+        {
+          "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+          "bytes": 19404,
+          "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+        },
+        {
+          "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_assets.py",
+          "bytes": 6144,
+          "sha256": "debeae6e1a03324ab00b37de2cc30cb7902d40681ffa90f84e0705dbb8f8ac37"
+        }
+      ],
+      "assetCount": 23,
+      "environment": {
+        "PYTHONDONTWRITEBYTECODE": "1"
+      }
+    },
+    "limits": "Actual CLI with real generated ZIP mutations; only external SDK/build processes are fixtures. Initial five/six results are preserved intermediate evidence subordinate to final seven."
+  },
+  "realApk": {
+    "path": "/private/tmp/portal-flip-timezone-20261104-132030/candidate-performance-1.160.apk",
+    "sha256": "9a7fa0177937241d1709115479a4aa65b605f0a41021cb29e0f80b5175b75af9",
+    "zipEntries": 756,
+    "sourceAssetCount": 23,
+    "independentReplay": "Read APK central/local entries directly in Node, required exactly one matching entry, decompressed stored/DEFLATE payloads, and compared all 23 source byte buffers and receipt size/SHA256 values. Actual root source_assets helper receipt bound below.",
+    "fullReadinessRun": false
+  },
+  "limitations": [
+    "Checks only files under app/src/main/assets; extra library/generated assets and Android resources are outside this comparison.",
+    "No full readiness CLI against real APK, Android build/runtime, hardware/phone, publication, deployment or new app release acceptance. Real APK remains existing 1.160; device/public versions remain unchanged.",
+    "No hostile/concurrent filesystem mutation, arbitrary symlink policy or ZIP resource-budget redesign claimed."
+  ],
+  "bindings": {
+    "/private/tmp/portal-readiness-assets-20261104-133525/plan.json": {
+      "sha256": "ed04e39dc158beaebab5332078e5c64ff2acf746bf9699d79a2bb4531746505b",
+      "bytes": 949
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/portal_release_readiness.before.py": {
+      "sha256": "6769d97fcfbb4ece0e2d41bd14bf1db782be49cffda3c676e38f04fc392587d6",
+      "bytes": 17648
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/tests-frozen.json": {
+      "sha256": "3576bb9f555c193eb9dfe760b60483ea6544e3d3950d146425f3f72d2e75f06d",
+      "bytes": 100
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/baseline-tests.log": {
+      "sha256": "0b50e93c9a7464bc388c2197fc102af2cd092dd5f2e267c300e4757efbafce07",
+      "bytes": 7616
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/baseline-six-tests.log": {
+      "sha256": "5119362547fdf9e3df38e77248ec4a05e0b228b7d26c2510c1b84ab8dedb8aec",
+      "bytes": 9112
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/candidate-six-tests.log": {
+      "sha256": "930fe94d96d1054c18bc3af3fe2bed49e7226233aba48407ed7224182a34f1a1",
+      "bytes": 1122
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/baseline-final-seven-tests.log": {
+      "sha256": "ae391bca58ab4a119ab4fce77e3c9da8e2fca3712adf296b49c6d8f3cbb2dfb9",
+      "bytes": 10508
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/candidate-final-seven-tests.log": {
+      "sha256": "0a531f188a8b230307b59fda7ad988c0bcddaf307f273e8ca623168b28d3aaa0",
+      "bytes": 1280
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/python-final-regressions.log": {
+      "sha256": "d0259228a9e10e8349225dd7c13d77cfe67c4e704224f8589ef44cac95a0e119",
+      "bytes": 44123
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/final-checks-terminal.json": {
+      "sha256": "d0db845e8a071b55de6b952dad57cdf0c3595e5de38f69d2e8ab2ccef1c7915e",
+      "bytes": 653
+    },
+    "/private/tmp/portal-readiness-assets-20261104-133525/real-final-1.160-assets.json": {
+      "sha256": "4083637a7f1bcf7bf5e794577a7b2d097350b905fac508da547677d889c1abfd",
+      "bytes": 3805
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py": {
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740",
+      "bytes": 19404
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_assets.py": {
+      "sha256": "debeae6e1a03324ab00b37de2cc30cb7902d40681ffa90f84e0705dbb8f8ac37",
+      "bytes": 6144
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_readiness.py": {
+      "sha256": "fd936c47f5e6f80055c83e215f2ea9a75cd894430d384c566334b550db986156",
+      "bytes": 13277
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_readiness_edges.py": {
+      "sha256": "aca812da0917c3599247ffac222d6e0d87005b6b69988f9d0e365eb4dc185c48",
+      "bytes": 8642
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/docs/releasing.md": {
+      "sha256": "78f8d328eb45230bc2da5122a810237eab39369c0a0f2a059fd14bc4d2619238",
+      "bytes": 8356
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "42c4ef0815c1c9de7eaa1ffb037c1685ff3803e1a8f8f456d4a2f53ae845a9af",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/version.json": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/candidate-performance-1.160.apk": {
+      "sha256": "9a7fa0177937241d1709115479a4aa65b605f0a41021cb29e0f80b5175b75af9",
+      "bytes": 25886923
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/catalog.json": {
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+      "bytes": 24043
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/diagnostics/source-preview-4k.mp4": {
+      "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a",
+      "bytes": 25847
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/faces/Flip-Regular.otf": {
+      "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee",
+      "bytes": 3184
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/faces/flip.html": {
+      "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4",
+      "bytes": 29379
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/fonts/BebasNeue.ttf": {
+      "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73",
+      "bytes": 61400
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/fonts/OFL.txt": {
+      "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8",
+      "bytes": 1186
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/photoframe_fallback/01_wilderness.jpg": {
+      "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6",
+      "bytes": 261090
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/photoframe_fallback/02_denali.jpg": {
+      "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c",
+      "bytes": 277842
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/photoframe_fallback/03_yosemite.jpg": {
+      "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e",
+      "bytes": 443801
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.css": {
+      "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841",
+      "bytes": 24082
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js": {
+      "sha256": "eac6fc27ced31c9ec5614c8ed27eea62049223a29d0b4754b0ae3ef1283e14f5",
+      "bytes": 269969
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/core.mjs": {
+      "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6",
+      "bytes": 28623
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png": {
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "bytes": 12657
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html": {
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "bytes": 7785
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js": {
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "bytes": 5582
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js": {
+      "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007",
+      "bytes": 70273
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg": {
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "bytes": 1247
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg": {
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "bytes": 1246
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js": {
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "bytes": 8528
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css": {
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "bytes": 15397
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/webapp-retention-probe.html": {
+      "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c",
+      "bytes": 504
+    }
+  }
+}

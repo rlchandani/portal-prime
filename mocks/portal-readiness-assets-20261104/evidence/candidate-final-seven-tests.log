@@ -1,0 +1,12 @@
+test_duplicate_matching_asset_blocks_ambiguous_lookup (test_portal_release_assets.ReleaseAssetsTest.test_duplicate_matching_asset_blocks_ambiguous_lookup) ... ok
+test_invalid_compressed_asset_writes_failed_receipt (test_portal_release_assets.ReleaseAssetsTest.test_invalid_compressed_asset_writes_failed_receipt) ... ok
+test_missing_asset_blocks_candidate_promotion (test_portal_release_assets.ReleaseAssetsTest.test_missing_asset_blocks_candidate_promotion) ... ok
+test_nested_compressed_binary_and_empty_assets_record_exact_evidence (test_portal_release_assets.ReleaseAssetsTest.test_nested_compressed_binary_and_empty_assets_record_exact_evidence) ... ok
+test_stale_same_size_asset_blocks_candidate_promotion (test_portal_release_assets.ReleaseAssetsTest.test_stale_same_size_asset_blocks_candidate_promotion) ... ok
+test_truncated_binary_asset_blocks_candidate_promotion (test_portal_release_assets.ReleaseAssetsTest.test_truncated_binary_asset_blocks_candidate_promotion) ... ok
+test_unreadable_asset_crc_writes_failed_receipt_and_retires_pending_apk (test_portal_release_assets.ReleaseAssetsTest.test_unreadable_asset_crc_writes_failed_receipt_and_retires_pending_apk) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 3.491s
+
+OK

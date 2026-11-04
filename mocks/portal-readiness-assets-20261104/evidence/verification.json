@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "scope": "host-local-release-readiness-source-assets",
+  "status": "delivered-local-host-tooling",
+  "plan": {
+    "originalDiscoveryAt": "2026-11-04T13:35:25Z",
+    "firstSourceWitnessAt": "2026-11-04T13:35:46Z",
+    "selectedAt": "2026-11-04T13:36:22.027488+00:00",
+    "target": "2026-11-04T13:50:25Z",
+    "hardDeadline": "2026-11-04T14:05:25Z",
+    "clockNotReset": true,
+    "scope": "Extend existing local release checker with source asset byte equality before candidate promotion. Host-only; current device/public versions unchanged.",
+    "acceptance": [
+      "Changed, missing, duplicate, unreadable packaged source assets fail actual CLI and remove pending APK",
+      "Nested and binary assets pass with exact source/hash evidence",
+      "Current 23 assets in exact 1.160 APK pass",
+      "Existing readiness and full Portal Python regression gates pass",
+      "Independent source/evidence review before local commit"
+    ],
+    "exclusions": [
+      "No new checker CLI, device operations, Java/Kotlin/JS changes, publication, CI dispatch or fresh Android acceptance"
+    ]
+  },
+  "checks": {
+    "baseline": {
+      "tests": 7,
+      "failures": 7,
+      "errors": 0,
+      "exitCode": 1,
+      "sdkAndBuildProcesses": "fixtures; actual CLI and ZIP assets"
+    },
+    "candidate": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "exitCode": 0
+    },
+    "portalPython": {
+      "tests": 271,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "realApkAssets": {
+      "count": 23,
+      "apkSha256": "9a7fa0177937241d1709115479a4aa65b605f0a41021cb29e0f80b5175b75af9",
+      "source": "actual source_assets helper against existing optimized1.160; no new build"
+    }
+  },
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 19404,
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_assets.py",
+      "bytes": 6144,
+      "sha256": "debeae6e1a03324ab00b37de2cc30cb7902d40681ffa90f84e0705dbb8f8ac37"
+    },
+    {
+      "path": "/private/tmp/portal-readiness-assets-20261104-133525/portal_release_readiness.before.py",
+      "bytes": 17648,
+      "sha256": "6769d97fcfbb4ece0e2d41bd14bf1db782be49cffda3c676e38f04fc392587d6"
+    },
+    {
+      "path": "/private/tmp/portal-readiness-assets-20261104-133525/baseline-final-seven-tests.log",
+      "bytes": 10508,
+      "sha256": "ae391bca58ab4a119ab4fce77e3c9da8e2fca3712adf296b49c6d8f3cbb2dfb9"
+    },
+    {
+      "path": "/private/tmp/portal-readiness-assets-20261104-133525/candidate-final-seven-tests.log",
+      "bytes": 1280,
+      "sha256": "0a531f188a8b230307b59fda7ad988c0bcddaf307f273e8ca623168b28d3aaa0"
+    },
+    {
+      "path": "/private/tmp/portal-readiness-assets-20261104-133525/python-final-regressions.log",
+      "bytes": 44123,
+      "sha256": "d0259228a9e10e8349225dd7c13d77cfe67c4e704224f8589ef44cac95a0e119"
+    },
+    {
+      "path": "/private/tmp/portal-readiness-assets-20261104-133525/final-checks-terminal.json",
+      "bytes": 653,
+      "sha256": "d0db845e8a071b55de6b952dad57cdf0c3595e5de38f69d2e8ab2ccef1c7915e"
+    },
+    {
+      "path": "/private/tmp/portal-readiness-assets-20261104-133525/real-final-1.160-assets.json",
+      "bytes": 3805,
+      "sha256": "4083637a7f1bcf7bf5e794577a7b2d097350b905fac508da547677d889c1abfd"
+    }
+  ],
+  "limits": [
+    "Main source assets only; extra library/generated assets and Android resources excluded.",
+    "External SDK/build processes are fixtures in CLI regression cases; real1.160 ZIP is separately checked.",
+    "No fresh full readiness orchestration, Gradle/build/vital/Android UI/device/hosted CI/publication acceptance.",
+    "Rooms stay1.160/code154; public stays1.83/code77."
+  ],
+  "independentReview": {
+    "fullyReadTool": "c8a237",
+    "reviewSha256": "d8ae82eaea503e757d5dae4d4537c1879a29c50598f5a20173ffe3af531bc2fe",
+    "bindingsVerified": 42,
+    "verifiedAt": "2026-11-04T13:41:09.151495+00:00",
+    "allBindingsExact": true
+  },
+  "closure": {
+    "originalDiscoveryAt": "2026-11-04T13:35:25Z",
+    "firstSourceWitnessAt": "2026-11-04T13:35:46Z",
+    "selectedAt": "2026-11-04T13:36:22.027488+00:00",
+    "target": "2026-11-04T13:50:25Z",
+    "hardDeadline": "2026-11-04T14:05:25Z",
+    "clockNotReset": true,
+    "closedAt": "2026-11-04T13:41:49.325588+00:00",
+    "minutesFromOriginal": 6.4054264666666665,
+    "minutesFromSelection": 5.4549683333333325,
+    "targetMet": true,
+    "hardLimitMet": true,
+    "status": "delivered-local-host-tooling",
+    "wholeProductGoal": "active"
+  },
+  "strictDocsExit": 0
+}

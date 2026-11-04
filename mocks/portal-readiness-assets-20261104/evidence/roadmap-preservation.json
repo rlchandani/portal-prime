@@ -1,0 +1,15 @@
+{
+  "previousTaskCount": 154,
+  "taskCount": 155,
+  "allPreviousTaskObjectsExact": true,
+  "rawSuffixBytes": 499178,
+  "rawSuffixSha256": "e9307fcbf65e6f99aa00f4e530121b99b34bfeac2d7d233af6076a4b64d1471d",
+  "defaultAndBoundariesExact": true,
+  "counts": {
+    "delivered": 103,
+    "verified": 42,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  }
+}

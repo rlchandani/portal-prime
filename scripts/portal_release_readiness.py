@@ -15,6 +15,8 @@ import subprocess
 import sys
 import time
 import xml.etree.ElementTree as ET
+import zipfile
+import zlib
 
 GIT = ["git", "-c", "core.hooksPath=/dev/null", "--no-optional-locks"]
 PACKAGES = {"release": "com.immortal.launcher",
@@ -190,6 +192,38 @@ def jvm_result(root, not_before_ns):
     return dict(totals, suites=len(files))
 
 
+def source_assets(root, apk):
+    assets = root / "app/src/main/assets"
+    files = sorted(path for path in assets.rglob("*") if path.is_file())
+    evidence = []
+    if not files:
+        return {"fileCount": 0, "files": evidence}
+    try:
+        with zipfile.ZipFile(apk) as archive:
+            entries = {}
+            for entry in archive.infolist():
+                entries.setdefault(entry.filename, []).append(entry)
+            for path in files:
+                relative = path.relative_to(assets).as_posix()
+                matches = entries.get("assets/" + relative, [])
+                if len(matches) != 1:
+                    raise CheckFailed(f"Source asset must occur exactly once in APK: {relative}.")
+                size, source_hash = path.stat().st_size, digest(path)
+                if matches[0].file_size != size:
+                    raise CheckFailed(f"Packaged source asset size differs: {relative}.")
+                packaged = hashlib.sha256()
+                with archive.open(matches[0]) as stream:
+                    for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                        packaged.update(chunk)
+                if packaged.hexdigest() != source_hash:
+                    raise CheckFailed(f"Packaged source asset bytes differ: {relative}.")
+                evidence.append({"path": relative, "bytes": size, "sha256": source_hash})
+    except (OSError, zipfile.BadZipFile, zlib.error, RuntimeError,
+            EOFError, NotImplementedError) as error:
+        raise CheckFailed("Packaged source asset evidence is unreadable or invalid.") from error
+    return {"fileCount": len(evidence), "files": evidence}
+
+
 def test_count(output, name, pattern):
     match = re.search(pattern, output, re.M)
     if not match or int(match[1]) < 1:
@@ -283,6 +317,7 @@ def execute(args, receipt):
         raise CheckFailed("The built APK changed during inspection.")
     if source_inputs(checks) != start_source:
         raise CheckFailed("Source/build inputs changed during checks; rerun against a stable tree.")
+    receipt["sourceAssets"] = source_assets(root, pending)
     if time.monotonic() >= checks.deadline:
         raise CheckFailed("The local check deadline expired before readiness was established.")
     pending.rename(args.output / "candidate.apk")

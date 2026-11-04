@@ -27,6 +27,13 @@ APK hashes, and copies the inspected APK to `candidate.apk`. Different before/af
 source-input snapshots, or changed baseline/artifact bytes, invalidate readiness.
 It explicitly requests TAP output rather than depending on Node's default reporter.
 
+Before promoting `candidate.apk`, the checker also compares every file under
+`app/src/main/assets` with its packaged `assets/` entry. Missing or duplicate
+entries, different sizes or bytes, and unreadable contents fail readiness.
+`sourceAssets` in the receipt records each relative path, size and SHA256.
+This covers the main source assets; extra library or generated assets and
+Android resources remain outside this comparison.
+
 Python 3.12+, Node 22+, the Android SDK's `aapt`/`apksigner` and cached Gradle
 dependencies are required. The checker currently runs on macOS/Linux; Windows
 provisioning checks remain separate. The selected SDK is passed to the build.

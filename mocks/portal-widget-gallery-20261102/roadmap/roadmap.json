@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T13:33:35.043029+00:00",
-  "updatedLabel": "Retained Flip timezone delivered; original clocks retained",
+  "updatedAt": "2026-11-04T13:41:09.154361+00:00",
+  "updatedLabel": "Reusable source-asset check delivered; original clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,49 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "release-readiness-source-assets",
+      "title": "Reusable packaged source-asset release check",
+      "summary": "Existing local checker rejects missing, stale, duplicate and unreadable assets before candidate promotion.",
+      "status": "delivered",
+      "verification": "7 actual CLI cases /271 Portal Python tests /23 current real APK assets /independent review",
+      "kind": "Release automation",
+      "platforms": [
+        "host-tooling"
+      ],
+      "owner": "Release engineering / independent source and evidence review",
+      "deployment": "Local host tooling only; rooms1.160/code154 and public1.83/code77 remain.",
+      "acceptance": [
+        "Exactly one matching packaged entry with identical size and SHA256 for every main source asset.",
+        "Invalid asset contents write failed receipt and retire pending candidate; existing identity/signing/source gates retained.",
+        "Record sorted sourceAssets evidence; reuse existing CLI and CI discovery."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery and limits",
+          "source": "docs/portal-readiness-assets-2026-11-04.md"
+        },
+        {
+          "text": "Verification",
+          "source": "mocks/portal-readiness-assets-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Main source assets only; extra library/generated assets and Android resources excluded.",
+        "External SDK/build processes are fixtures in CLI regression cases; real1.160 ZIP is separately checked.",
+        "No fresh full readiness orchestration, Gradle/build/vital/Android UI/device/hosted CI/publication acceptance.",
+        "Rooms stay1.160/code154; public stays1.83/code77."
+      ],
+      "next": "Return to the next small visible product improvement; do not reopen parked clocks.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T13:35:25Z",
+        "firstSourceWitnessAt": "2026-11-04T13:35:46Z",
+        "selectedAt": "2026-11-04T13:36:22.027488+00:00",
+        "target": "2026-11-04T13:50:25Z",
+        "hardDeadline": "2026-11-04T14:05:25Z",
+        "clockNotReset": true
+      }
+    },
     {
       "id": "flip-clock-retained-timezone",
       "title": "Retained Flip clock follows timezone changes",
