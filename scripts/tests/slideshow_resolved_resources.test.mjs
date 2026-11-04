@@ -36,7 +36,11 @@ function fixture({ mode = 'galleryWall', count = 12, changing = true, random = .
         get: () => background,
         set: value => {
           background = value;
-          const url = /^url\("(.*)"\)$/.exec(value)?.[1];
+          const match = /^url\("([^"]*)"\)(.*)$/.exec(value);
+          if (match) assert.ok(match[2] === '' || (
+            this.classList.contains('gallery-photo') && match[2] === ', url("photo-doodles-dark.svg")'
+          ), 'Only Gallery Wall may add the fixed bundled doodle below its prepared photo');
+          const url = match?.[1];
           if (url) writes.push({ node: this, url, prepared: decoded.has(url) });
         },
       });

@@ -13,7 +13,7 @@
 </style>
 <header>
   <strong>Paper photos</strong>
-  <label>Layout <select id="mode"><option value="mosaic">Photo wall</option><option value="framed">Single print</option><option value="kenBurns">Cinematic photo</option><option value="push">Cinematic push</option><option value="heroSidebar">Three-photo layout</option><option value="diptych">Photo pair</option><option value="memories">Memories</option><option value="panorama">Panorama</option><option value="cinema">Cinema letterbox</option><option value="polaroid">Polaroid prints</option></select></label>
+  <label>Layout <select id="mode"><option value="mosaic">Photo wall</option><option value="framed">Single print</option><option value="kenBurns">Cinematic photo</option><option value="push">Cinematic push</option><option value="heroSidebar">Three-photo layout</option><option value="diptych">Photo pair</option><option value="memories">Memories</option><option value="panorama">Panorama</option><option value="cinema">Cinema letterbox</option><option value="polaroid">Polaroid prints</option><option value="galleryWall">Gallery Wall</option></select></label>
   <label>Photo <select id="photo"><option value="0">Landscape</option><option value="1">Portrait</option><option value="2">Square</option><option value="3">Panorama</option></select></label>
   <label><input id="motion" type="checkbox"> Gentle motion</label>
   <a href="/">Design comparison</a>
@@ -24,7 +24,7 @@
   const mode = document.querySelector("#mode"), photo = document.querySelector("#photo");
   const motion = document.querySelector("#motion"), scene = document.querySelector("#scene");
   function render() {
-    photo.disabled = ["mosaic", "heroSidebar", "diptych", "polaroid"].includes(mode.value);
+    photo.disabled = ["mosaic", "heroSidebar", "diptych", "polaroid", "galleryWall"].includes(mode.value);
     scene.src = `/production/index.html?mode=${mode.value}&photo=${photo.value}&motion=${motion.checked ? 1 : 0}`;
   }
   [mode, photo, motion].forEach(control => control.addEventListener("change", render));

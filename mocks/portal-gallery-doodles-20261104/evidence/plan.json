@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-11-04T09:14:51Z",
+  "target": "2026-11-04T09:29:51Z",
+  "deadline": "2026-11-04T09:44:51Z",
+  "sourceBase": "d0b5e03871b7e854a86d5d3a611ba5b0cea351a0",
+  "version": "1.143/code137",
+  "scope": "Gallery Wall quiet doodles in outer and photo letterbox margins; opaque incoming backing and full-photo contain preserved; no geometry, selection, timing or motion changes",
+  "priorClocksRetained": true,
+  "boundaries": [
+    "No phone/provider/account/media/push/publication",
+    "Generated native Gallery WebView acceptance only; actual native GalleryStage, clock, API28 and Living visual remain separate"
+  ]
+}

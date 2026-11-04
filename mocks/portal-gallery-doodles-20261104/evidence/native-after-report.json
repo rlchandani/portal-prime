@@ -1,0 +1,1835 @@
+{
+  "ok": true,
+  "error": null,
+  "observations": [
+    {
+      "ready": true,
+      "stable": true,
+      "replacementReady": true,
+      "svgDecoded": true,
+      "shape": "single-landscape",
+      "errors": [],
+      "cards": [
+        {
+          "known": true,
+          "id": 0,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 618.5,
+            "y": 384,
+            "w": 683,
+            "h": 512
+          },
+          "fit": {
+            "x": 618.6666666666666,
+            "y": 384,
+            "w": 682.6666666666667,
+            "h": 512
+          },
+          "corners": [
+            {
+              "x": 644.2666666666667,
+              "y": 409.6
+            },
+            {
+              "x": 1275.7333333333333,
+              "y": 409.6
+            },
+            {
+              "x": 644.2666666666667,
+              "y": 870.4000000000001
+            },
+            {
+              "x": 1275.7333333333333,
+              "y": 870.4000000000001
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/0.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/0.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ],
+      "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+      "wallColor": "rgb(28, 27, 25)",
+      "wallSize": "480px 360px",
+      "wallRepeat": "repeat",
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 1,
+      "photoRequests": 1,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "gallery-single-landscape.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "outerMatteSamples": 634029,
+      "outerDoodleSamples": 7466,
+      "letterboxMatteSamples": 0,
+      "letterboxDoodleSamples": 0,
+      "letterboxOutgoingColorPixels": 0,
+      "noOutgoingPhotoBleed": true
+    },
+    {
+      "ready": true,
+      "stable": true,
+      "replacementReady": true,
+      "svgDecoded": true,
+      "shape": "single-portrait",
+      "errors": [],
+      "cards": [
+        {
+          "known": true,
+          "id": 1,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 806.5,
+            "y": 384,
+            "w": 307,
+            "h": 512
+          },
+          "fit": {
+            "x": 806.5,
+            "y": 384.1666666666667,
+            "w": 307,
+            "h": 511.66666666666663
+          },
+          "corners": [
+            {
+              "x": 825.6875,
+              "y": 403.3541666666667
+            },
+            {
+              "x": 1094.3125,
+              "y": 403.3541666666667
+            },
+            {
+              "x": 825.6875,
+              "y": 876.6458333333333
+            },
+            {
+              "x": 1094.3125,
+              "y": 876.6458333333333
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/1.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/1.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ],
+      "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+      "wallColor": "rgb(28, 27, 25)",
+      "wallSize": "480px 360px",
+      "wallRepeat": "repeat",
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 2,
+      "photoRequests": 2,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "gallery-single-portrait.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "outerMatteSamples": 702293,
+      "outerDoodleSamples": 8149,
+      "letterboxMatteSamples": 0,
+      "letterboxDoodleSamples": 0,
+      "letterboxOutgoingColorPixels": 0,
+      "noOutgoingPhotoBleed": true
+    },
+    {
+      "ready": true,
+      "stable": true,
+      "replacementReady": true,
+      "svgDecoded": true,
+      "shape": "mixed-six",
+      "errors": [],
+      "cards": [
+        {
+          "known": true,
+          "id": 0,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 16,
+            "y": 244.43055725097656,
+            "w": 356,
+            "h": 267
+          },
+          "fit": {
+            "x": 16,
+            "y": 244.43055725097656,
+            "w": 356,
+            "h": 267
+          },
+          "corners": [
+            {
+              "x": 29.35,
+              "y": 257.7805572509766
+            },
+            {
+              "x": 358.65,
+              "y": 257.7805572509766
+            },
+            {
+              "x": 29.35,
+              "y": 498.08055725097654
+            },
+            {
+              "x": 358.65,
+              "y": 498.08055725097654
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/0.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/0.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 1,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 384,
+            "y": 244.43055725097656,
+            "w": 160,
+            "h": 267
+          },
+          "fit": {
+            "x": 384,
+            "y": 244.59722391764325,
+            "w": 160,
+            "h": 266.66666666666663
+          },
+          "corners": [
+            {
+              "x": 394,
+              "y": 254.59722391764325
+            },
+            {
+              "x": 534,
+              "y": 254.59722391764325
+            },
+            {
+              "x": 394,
+              "y": 501.2638905843099
+            },
+            {
+              "x": 534,
+              "y": 501.2638905843099
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/1.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/1.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 2,
+          "pw": 600,
+          "ph": 600,
+          "rect": {
+            "x": 556,
+            "y": 244.43055725097656,
+            "w": 267,
+            "h": 267
+          },
+          "fit": {
+            "x": 556,
+            "y": 244.43055725097656,
+            "w": 267,
+            "h": 267
+          },
+          "corners": [
+            {
+              "x": 569.35,
+              "y": 257.7805572509766
+            },
+            {
+              "x": 809.65,
+              "y": 257.7805572509766
+            },
+            {
+              "x": 569.35,
+              "y": 498.08055725097654
+            },
+            {
+              "x": 809.65,
+              "y": 498.08055725097654
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/2.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/2.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 3,
+          "pw": 2400,
+          "ph": 600,
+          "rect": {
+            "x": 836,
+            "y": 244.43055725097656,
+            "w": 1068,
+            "h": 267
+          },
+          "fit": {
+            "x": 836,
+            "y": 244.43055725097656,
+            "w": 1068,
+            "h": 267
+          },
+          "corners": [
+            {
+              "x": 849.35,
+              "y": 257.7805572509766
+            },
+            {
+              "x": 1890.65,
+              "y": 257.7805572509766
+            },
+            {
+              "x": 849.35,
+              "y": 498.08055725097654
+            },
+            {
+              "x": 1890.65,
+              "y": 498.08055725097654
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/3.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/3.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 4,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 459,
+            "y": 523.4305419921875,
+            "w": 683,
+            "h": 512
+          },
+          "fit": {
+            "x": 459.16666666666663,
+            "y": 523.4305419921875,
+            "w": 682.6666666666667,
+            "h": 512
+          },
+          "corners": [
+            {
+              "x": 484.76666666666665,
+              "y": 549.0305419921875
+            },
+            {
+              "x": 1116.2333333333333,
+              "y": 549.0305419921875
+            },
+            {
+              "x": 484.76666666666665,
+              "y": 1009.8305419921876
+            },
+            {
+              "x": 1116.2333333333333,
+              "y": 1009.8305419921876
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/4.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/4.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 5,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 1154,
+            "y": 523.4305419921875,
+            "w": 307,
+            "h": 512
+          },
+          "fit": {
+            "x": 1154,
+            "y": 523.5972086588542,
+            "w": 307,
+            "h": 511.66666666666663
+          },
+          "corners": [
+            {
+              "x": 1173.1875,
+              "y": 542.7847086588542
+            },
+            {
+              "x": 1441.8125,
+              "y": 542.7847086588542
+            },
+            {
+              "x": 1173.1875,
+              "y": 1016.0763753255209
+            },
+            {
+              "x": 1441.8125,
+              "y": 1016.0763753255209
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/5.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/5.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ],
+      "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+      "wallColor": "rgb(28, 27, 25)",
+      "wallSize": "480px 360px",
+      "wallRepeat": "repeat",
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 3,
+      "photoRequests": 8,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "gallery-mixed-six.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "outerMatteSamples": 395013,
+      "outerDoodleSamples": 4579,
+      "letterboxMatteSamples": 0,
+      "letterboxDoodleSamples": 0,
+      "letterboxOutgoingColorPixels": 0,
+      "noOutgoingPhotoBleed": true
+    },
+    {
+      "ready": true,
+      "stable": true,
+      "replacementReady": true,
+      "svgDecoded": true,
+      "shape": "replacement-letterbox",
+      "errors": [],
+      "cards": [
+        {
+          "known": true,
+          "id": 6,
+          "pw": 1080,
+          "ph": 600,
+          "rect": {
+            "x": 216.0277862548828,
+            "y": 16,
+            "w": 489.40277099609375,
+            "h": 271.8888854980469
+          },
+          "fit": {
+            "x": 216.0291748046875,
+            "y": 16,
+            "w": 489.3999938964844,
+            "h": 271.8888854980469
+          },
+          "corners": [
+            {
+              "x": 229.62361907958984,
+              "y": 29.594444274902344
+            },
+            {
+              "x": 691.8347244262695,
+              "y": 29.594444274902344
+            },
+            {
+              "x": 229.62361907958984,
+              "y": 274.29444122314453
+            },
+            {
+              "x": 691.8347244262695,
+              "y": 274.29444122314453
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/6.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/6.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 16,
+          "pw": 810,
+          "ph": 600,
+          "rect": {
+            "x": 714.888916015625,
+            "y": 16,
+            "w": 489.40277099609375,
+            "h": 271.8888854980469
+          },
+          "fit": {
+            "x": 776.0653038024902,
+            "y": 16,
+            "w": 367.0499954223633,
+            "h": 271.8888854980469
+          },
+          "corners": [
+            {
+              "x": 789.6597480773926,
+              "y": 29.594444274902344
+            },
+            {
+              "x": 1129.5208549499512,
+              "y": 29.594444274902344
+            },
+            {
+              "x": 789.6597480773926,
+              "y": 274.29444122314453
+            },
+            {
+              "x": 1129.5208549499512,
+              "y": 274.29444122314453
+            }
+          ],
+          "letterboxMargins": [
+            {
+              "x": 719.888916015625,
+              "y": 21,
+              "w": 51.176387786865234,
+              "h": 261.8888854980469
+            },
+            {
+              "x": 1148.1152992248535,
+              "y": 21,
+              "w": 51.176387786865234,
+              "h": 261.8888854980469
+            }
+          ],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/16.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/16.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 8,
+          "pw": 1080,
+          "ph": 600,
+          "rect": {
+            "x": 1214.5555419921875,
+            "y": 16,
+            "w": 489.40277099609375,
+            "h": 271.8888854980469
+          },
+          "fit": {
+            "x": 1214.5569305419922,
+            "y": 16,
+            "w": 489.3999938964844,
+            "h": 271.8888854980469
+          },
+          "corners": [
+            {
+              "x": 1228.1513748168945,
+              "y": 29.594444274902344
+            },
+            {
+              "x": 1690.3624801635742,
+              "y": 29.594444274902344
+            },
+            {
+              "x": 1228.1513748168945,
+              "y": 274.29444122314453
+            },
+            {
+              "x": 1690.3624801635742,
+              "y": 274.29444122314453
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/8.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/8.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 9,
+          "pw": 1080,
+          "ph": 600,
+          "rect": {
+            "x": 216.0277862548828,
+            "y": 297.34722900390625,
+            "w": 489.40277099609375,
+            "h": 271.8888854980469
+          },
+          "fit": {
+            "x": 216.0291748046875,
+            "y": 297.34722900390625,
+            "w": 489.3999938964844,
+            "h": 271.8888854980469
+          },
+          "corners": [
+            {
+              "x": 229.62361907958984,
+              "y": 310.9416732788086
+            },
+            {
+              "x": 691.8347244262695,
+              "y": 310.9416732788086
+            },
+            {
+              "x": 229.62361907958984,
+              "y": 555.6416702270508
+            },
+            {
+              "x": 691.8347244262695,
+              "y": 555.6416702270508
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/9.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/9.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 10,
+          "pw": 1080,
+          "ph": 600,
+          "rect": {
+            "x": 714.888916015625,
+            "y": 297.34722900390625,
+            "w": 489.40277099609375,
+            "h": 271.8888854980469
+          },
+          "fit": {
+            "x": 714.8903045654297,
+            "y": 297.34722900390625,
+            "w": 489.3999938964844,
+            "h": 271.8888854980469
+          },
+          "corners": [
+            {
+              "x": 728.484748840332,
+              "y": 310.9416732788086
+            },
+            {
+              "x": 1190.6958541870117,
+              "y": 310.9416732788086
+            },
+            {
+              "x": 728.484748840332,
+              "y": 555.6416702270508
+            },
+            {
+              "x": 1190.6958541870117,
+              "y": 555.6416702270508
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/10.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/10.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 11,
+          "pw": 1080,
+          "ph": 600,
+          "rect": {
+            "x": 1214.5555419921875,
+            "y": 297.34722900390625,
+            "w": 489.40277099609375,
+            "h": 271.8888854980469
+          },
+          "fit": {
+            "x": 1214.5569305419922,
+            "y": 297.34722900390625,
+            "w": 489.3999938964844,
+            "h": 271.8888854980469
+          },
+          "corners": [
+            {
+              "x": 1228.1513748168945,
+              "y": 310.9416732788086
+            },
+            {
+              "x": 1690.3624801635742,
+              "y": 310.9416732788086
+            },
+            {
+              "x": 1228.1513748168945,
+              "y": 555.6416702270508
+            },
+            {
+              "x": 1690.3624801635742,
+              "y": 555.6416702270508
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/11.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/11.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 12,
+          "pw": 1080,
+          "ph": 600,
+          "rect": {
+            "x": 216.0277862548828,
+            "y": 578.6944580078125,
+            "w": 489.40277099609375,
+            "h": 271.8888854980469
+          },
+          "fit": {
+            "x": 216.0291748046875,
+            "y": 578.6944580078125,
+            "w": 489.3999938964844,
+            "h": 271.8888854980469
+          },
+          "corners": [
+            {
+              "x": 229.62361907958984,
+              "y": 592.2889022827148
+            },
+            {
+              "x": 691.8347244262695,
+              "y": 592.2889022827148
+            },
+            {
+              "x": 229.62361907958984,
+              "y": 836.988899230957
+            },
+            {
+              "x": 691.8347244262695,
+              "y": 836.988899230957
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/12.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/12.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 13,
+          "pw": 1080,
+          "ph": 600,
+          "rect": {
+            "x": 714.888916015625,
+            "y": 578.6944580078125,
+            "w": 489.40277099609375,
+            "h": 271.8888854980469
+          },
+          "fit": {
+            "x": 714.8903045654297,
+            "y": 578.6944580078125,
+            "w": 489.3999938964844,
+            "h": 271.8888854980469
+          },
+          "corners": [
+            {
+              "x": 728.484748840332,
+              "y": 592.2889022827148
+            },
+            {
+              "x": 1190.6958541870117,
+              "y": 592.2889022827148
+            },
+            {
+              "x": 728.484748840332,
+              "y": 836.988899230957
+            },
+            {
+              "x": 1190.6958541870117,
+              "y": 836.988899230957
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/13.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/13.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 14,
+          "pw": 1080,
+          "ph": 600,
+          "rect": {
+            "x": 1214.5555419921875,
+            "y": 578.6944580078125,
+            "w": 489.40277099609375,
+            "h": 271.8888854980469
+          },
+          "fit": {
+            "x": 1214.5569305419922,
+            "y": 578.6944580078125,
+            "w": 489.3999938964844,
+            "h": 271.8888854980469
+          },
+          "corners": [
+            {
+              "x": 1228.1513748168945,
+              "y": 592.2889022827148
+            },
+            {
+              "x": 1690.3624801635742,
+              "y": 592.2889022827148
+            },
+            {
+              "x": 1228.1513748168945,
+              "y": 836.988899230957
+            },
+            {
+              "x": 1690.3624801635742,
+              "y": 836.988899230957
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/14.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/14.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 15,
+          "pw": 1080,
+          "ph": 600,
+          "rect": {
+            "x": 596.6805419921875,
+            "y": 860.8333129882812,
+            "w": 726.625,
+            "h": 403.5
+          },
+          "fit": {
+            "x": 596.8430419921875,
+            "y": 860.8333129882812,
+            "w": 726.3,
+            "h": 403.5
+          },
+          "corners": [
+            {
+              "x": 617.0180419921875,
+              "y": 881.0083129882812
+            },
+            {
+              "x": 1302.9680419921874,
+              "y": 881.0083129882812
+            },
+            {
+              "x": 617.0180419921875,
+              "y": 1244.1583129882813
+            },
+            {
+              "x": 1302.9680419921874,
+              "y": 1244.1583129882813
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/15.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/15.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ],
+      "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+      "wallColor": "rgb(28, 27, 25)",
+      "wallSize": "480px 360px",
+      "wallRepeat": "repeat",
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 4,
+      "photoRequests": 19,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "gallery-replacement-letterbox.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "outerMatteSamples": 241591,
+      "outerDoodleSamples": 3039,
+      "letterboxMatteSamples": 7150,
+      "letterboxDoodleSamples": 69,
+      "letterboxOutgoingColorPixels": 0,
+      "noOutgoingPhotoBleed": true
+    }
+  ],
+  "svgRequests": 4,
+  "photoRequests": 19,
+  "lastComputedState": {
+    "ready": true,
+    "stable": true,
+    "replacementReady": true,
+    "svgDecoded": true,
+    "shape": "replacement-letterbox",
+    "errors": [],
+    "cards": [
+      {
+        "known": true,
+        "id": 6,
+        "pw": 1080,
+        "ph": 600,
+        "rect": {
+          "x": 216.0277862548828,
+          "y": 16,
+          "w": 489.40277099609375,
+          "h": 271.8888854980469
+        },
+        "fit": {
+          "x": 216.0291748046875,
+          "y": 16,
+          "w": 489.3999938964844,
+          "h": 271.8888854980469
+        },
+        "corners": [
+          {
+            "x": 229.62361907958984,
+            "y": 29.594444274902344
+          },
+          {
+            "x": 691.8347244262695,
+            "y": 29.594444274902344
+          },
+          {
+            "x": 229.62361907958984,
+            "y": 274.29444122314453
+          },
+          {
+            "x": 691.8347244262695,
+            "y": 274.29444122314453
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/6.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/6.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 16,
+        "pw": 810,
+        "ph": 600,
+        "rect": {
+          "x": 714.888916015625,
+          "y": 16,
+          "w": 489.40277099609375,
+          "h": 271.8888854980469
+        },
+        "fit": {
+          "x": 776.0653038024902,
+          "y": 16,
+          "w": 367.0499954223633,
+          "h": 271.8888854980469
+        },
+        "corners": [
+          {
+            "x": 789.6597480773926,
+            "y": 29.594444274902344
+          },
+          {
+            "x": 1129.5208549499512,
+            "y": 29.594444274902344
+          },
+          {
+            "x": 789.6597480773926,
+            "y": 274.29444122314453
+          },
+          {
+            "x": 1129.5208549499512,
+            "y": 274.29444122314453
+          }
+        ],
+        "letterboxMargins": [
+          {
+            "x": 719.888916015625,
+            "y": 21,
+            "w": 51.176387786865234,
+            "h": 261.8888854980469
+          },
+          {
+            "x": 1148.1152992248535,
+            "y": 21,
+            "w": 51.176387786865234,
+            "h": 261.8888854980469
+          }
+        ],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/16.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/16.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 8,
+        "pw": 1080,
+        "ph": 600,
+        "rect": {
+          "x": 1214.5555419921875,
+          "y": 16,
+          "w": 489.40277099609375,
+          "h": 271.8888854980469
+        },
+        "fit": {
+          "x": 1214.5569305419922,
+          "y": 16,
+          "w": 489.3999938964844,
+          "h": 271.8888854980469
+        },
+        "corners": [
+          {
+            "x": 1228.1513748168945,
+            "y": 29.594444274902344
+          },
+          {
+            "x": 1690.3624801635742,
+            "y": 29.594444274902344
+          },
+          {
+            "x": 1228.1513748168945,
+            "y": 274.29444122314453
+          },
+          {
+            "x": 1690.3624801635742,
+            "y": 274.29444122314453
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/8.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/8.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 9,
+        "pw": 1080,
+        "ph": 600,
+        "rect": {
+          "x": 216.0277862548828,
+          "y": 297.34722900390625,
+          "w": 489.40277099609375,
+          "h": 271.8888854980469
+        },
+        "fit": {
+          "x": 216.0291748046875,
+          "y": 297.34722900390625,
+          "w": 489.3999938964844,
+          "h": 271.8888854980469
+        },
+        "corners": [
+          {
+            "x": 229.62361907958984,
+            "y": 310.9416732788086
+          },
+          {
+            "x": 691.8347244262695,
+            "y": 310.9416732788086
+          },
+          {
+            "x": 229.62361907958984,
+            "y": 555.6416702270508
+          },
+          {
+            "x": 691.8347244262695,
+            "y": 555.6416702270508
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/9.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/9.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 10,
+        "pw": 1080,
+        "ph": 600,
+        "rect": {
+          "x": 714.888916015625,
+          "y": 297.34722900390625,
+          "w": 489.40277099609375,
+          "h": 271.8888854980469
+        },
+        "fit": {
+          "x": 714.8903045654297,
+          "y": 297.34722900390625,
+          "w": 489.3999938964844,
+          "h": 271.8888854980469
+        },
+        "corners": [
+          {
+            "x": 728.484748840332,
+            "y": 310.9416732788086
+          },
+          {
+            "x": 1190.6958541870117,
+            "y": 310.9416732788086
+          },
+          {
+            "x": 728.484748840332,
+            "y": 555.6416702270508
+          },
+          {
+            "x": 1190.6958541870117,
+            "y": 555.6416702270508
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/10.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/10.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 11,
+        "pw": 1080,
+        "ph": 600,
+        "rect": {
+          "x": 1214.5555419921875,
+          "y": 297.34722900390625,
+          "w": 489.40277099609375,
+          "h": 271.8888854980469
+        },
+        "fit": {
+          "x": 1214.5569305419922,
+          "y": 297.34722900390625,
+          "w": 489.3999938964844,
+          "h": 271.8888854980469
+        },
+        "corners": [
+          {
+            "x": 1228.1513748168945,
+            "y": 310.9416732788086
+          },
+          {
+            "x": 1690.3624801635742,
+            "y": 310.9416732788086
+          },
+          {
+            "x": 1228.1513748168945,
+            "y": 555.6416702270508
+          },
+          {
+            "x": 1690.3624801635742,
+            "y": 555.6416702270508
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/11.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/11.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 12,
+        "pw": 1080,
+        "ph": 600,
+        "rect": {
+          "x": 216.0277862548828,
+          "y": 578.6944580078125,
+          "w": 489.40277099609375,
+          "h": 271.8888854980469
+        },
+        "fit": {
+          "x": 216.0291748046875,
+          "y": 578.6944580078125,
+          "w": 489.3999938964844,
+          "h": 271.8888854980469
+        },
+        "corners": [
+          {
+            "x": 229.62361907958984,
+            "y": 592.2889022827148
+          },
+          {
+            "x": 691.8347244262695,
+            "y": 592.2889022827148
+          },
+          {
+            "x": 229.62361907958984,
+            "y": 836.988899230957
+          },
+          {
+            "x": 691.8347244262695,
+            "y": 836.988899230957
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/12.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/12.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 13,
+        "pw": 1080,
+        "ph": 600,
+        "rect": {
+          "x": 714.888916015625,
+          "y": 578.6944580078125,
+          "w": 489.40277099609375,
+          "h": 271.8888854980469
+        },
+        "fit": {
+          "x": 714.8903045654297,
+          "y": 578.6944580078125,
+          "w": 489.3999938964844,
+          "h": 271.8888854980469
+        },
+        "corners": [
+          {
+            "x": 728.484748840332,
+            "y": 592.2889022827148
+          },
+          {
+            "x": 1190.6958541870117,
+            "y": 592.2889022827148
+          },
+          {
+            "x": 728.484748840332,
+            "y": 836.988899230957
+          },
+          {
+            "x": 1190.6958541870117,
+            "y": 836.988899230957
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/13.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/13.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 14,
+        "pw": 1080,
+        "ph": 600,
+        "rect": {
+          "x": 1214.5555419921875,
+          "y": 578.6944580078125,
+          "w": 489.40277099609375,
+          "h": 271.8888854980469
+        },
+        "fit": {
+          "x": 1214.5569305419922,
+          "y": 578.6944580078125,
+          "w": 489.3999938964844,
+          "h": 271.8888854980469
+        },
+        "corners": [
+          {
+            "x": 1228.1513748168945,
+            "y": 592.2889022827148
+          },
+          {
+            "x": 1690.3624801635742,
+            "y": 592.2889022827148
+          },
+          {
+            "x": 1228.1513748168945,
+            "y": 836.988899230957
+          },
+          {
+            "x": 1690.3624801635742,
+            "y": 836.988899230957
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/14.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/14.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 15,
+        "pw": 1080,
+        "ph": 600,
+        "rect": {
+          "x": 596.6805419921875,
+          "y": 860.8333129882812,
+          "w": 726.625,
+          "h": 403.5
+        },
+        "fit": {
+          "x": 596.8430419921875,
+          "y": 860.8333129882812,
+          "w": 726.3,
+          "h": 403.5
+        },
+        "corners": [
+          {
+            "x": 617.0180419921875,
+            "y": 881.0083129882812
+          },
+          {
+            "x": 1302.9680419921874,
+            "y": 881.0083129882812
+          },
+          {
+            "x": 617.0180419921875,
+            "y": 1244.1583129882813
+          },
+          {
+            "x": 1302.9680419921874,
+            "y": 1244.1583129882813
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/15.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/15.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    ],
+    "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+    "wallColor": "rgb(28, 27, 25)",
+    "wallSize": "480px 360px",
+    "wallRepeat": "repeat",
+    "ownerOpacity": "1",
+    "ownerVisibility": "visible",
+    "dpr": 1.125,
+    "width": 1920,
+    "height": 1280,
+    "svgRequests": 4,
+    "photoRequests": 19,
+    "computedChecksPassed": true,
+    "compositorFenceRequested": true,
+    "compositorFenceCompleted": true,
+    "screenshot": "gallery-replacement-letterbox.png",
+    "pixelCopy": true,
+    "webPixelWidth": 2160,
+    "webPixelHeight": 1440,
+    "outerMatteSamples": 241591,
+    "outerDoodleSamples": 3039,
+    "letterboxMatteSamples": 7150,
+    "letterboxDoodleSamples": 69,
+    "letterboxOutgoingColorPixels": 0,
+    "noOutgoingPhotoBleed": true
+  },
+  "sceneCount": 4,
+  "scope": "Generated legacy Gallery Wall appearance, whole-photo geometry and same-bucket replacement letterbox; no native SlideshowStage, FaceRenderer, clock, scheduler, resize or performance claim",
+  "unknownRequests": 0,
+  "deniedRequestDiagnostics": [],
+  "deniedRequestDiagnosticLimit": 16,
+  "webViewDestroyed": true,
+  "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+}

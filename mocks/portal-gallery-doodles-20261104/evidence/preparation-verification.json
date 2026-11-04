@@ -1,0 +1,115 @@
+{
+  "recordedAtUtc": "2026-11-04T09:19:32.635654+00:00",
+  "clock": {
+    "start": "2026-11-04T09:14:51Z",
+    "target": "2026-11-04T09:29:51Z",
+    "hardDeadline": "2026-11-04T09:44:51Z",
+    "reset": false
+  },
+  "fixturePackage": "com.immortal.galleryfixture",
+  "zeroPermissions": true,
+  "sources": {
+    "GalleryActivity.java": {
+      "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/GalleryActivity.java",
+      "bytes": 18039,
+      "sha256": "8fb0225cc7928ea5b7f57f89f81e8b338ee82e4942003940bcd5be077e05e8fd"
+    },
+    "build.sh": {
+      "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/build.sh",
+      "bytes": 1094,
+      "sha256": "d68a61d51a7fab26765da8c1db26d063a0e1f644f92efe990334fe216c8c8369"
+    },
+    "AndroidManifest.xml": {
+      "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/AndroidManifest.xml",
+      "bytes": 489,
+      "sha256": "f5719b3f452849ecdfd1d30ef18fe7d0e8dc8484df6569968e988a31cd2f1db0"
+    },
+    "RUN.md": {
+      "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/RUN.md",
+      "bytes": 1687,
+      "sha256": "b1a86b0897cb6294724b747e039fa9bd2b622e6d919ad3072f7e931149aaa94a"
+    }
+  },
+  "logicalGateBindings": {
+    "bootstrapAndComputedState": {
+      "bytes": 3975,
+      "sha256": "0ea826fb8b0daae242065a210f8db6549da814a3aca2b8b7727fc9180ec35f42"
+    },
+    "computedGates": {
+      "bytes": 2834,
+      "sha256": "076ecaec6324c14a6959787ef7723d1620c4d07a827fee5c84bc9b4ef16a05a4"
+    },
+    "nativePixelGates": {
+      "bytes": 3820,
+      "sha256": "df34ba9c5b36d82ff8f3ec93d9c6e4e599200cd12d32159cf210156bb0bd345c"
+    },
+    "retirementAndReport": {
+      "bytes": 1253,
+      "sha256": "d966baaa5706d4945589b539ecf6094900f866e8ec4fc5877b85a383841b7da9"
+    }
+  },
+  "frozenSourceCopies": true,
+  "productionAspectHelper": {
+    "literal": "window.aspect = function (p) { return (p.w || 1600) / (p.h || 1067); };",
+    "bytes": 71,
+    "sha256": "b057501d2bae2da07c821f9c97e45c338d59eb3b5febedae974b547546cacaad",
+    "literalPresentInActualSource": true
+  },
+  "generatedUrlFacade": "photoUrl returns fixture-generated owned PNG URL; no source/provider/derivative access",
+  "modeAndLayout": "Actual packaged SS.MODES.galleryWall and window.justifiedLayout; no copied or substituted Gallery layout",
+  "scenes": [
+    {
+      "shape": "single-landscape",
+      "expectedPhotos": 1
+    },
+    {
+      "shape": "single-portrait",
+      "expectedPhotos": 1
+    },
+    {
+      "shape": "mixed-six",
+      "expectedPhotos": 6
+    },
+    {
+      "shape": "replacement-letterbox",
+      "expectedPhotos": 10,
+      "generatedIncomingId": 16,
+      "sameBucket": "landscape",
+      "initialAspect": 1.8,
+      "incomingAspect": 1.35
+    }
+  ],
+  "expectedNativePhotoCorners": 72,
+  "gates": {
+    "cornerRgbDistanceMax": 18,
+    "outerDoodleBrightnessDeltaMin": 25,
+    "outerDoodleMarksMin": 20,
+    "letterboxDoodleMarksMin": 3,
+    "letterboxSamplesMin": 100,
+    "unknownRequests": 0,
+    "ownerWatchdogMs": 45000,
+    "compositorFence": true,
+    "sourceFilesMutated": false,
+    "deviceCommands": 0,
+    "photoBacking": "opaque rgb(28, 27, 25)",
+    "photoComposition": "photo URL first, dark SVG second; contain/480px 360px; centered/left top; no-repeat/repeat",
+    "replacementNoOutgoingPhotoBleed": "Every sampled interior letterbox pixel has all RGB channels <80; generated outgoing background is RGB92,125,143 and any generated corner has channel255. Threshold distinguishes dark matte and 13% doodle strokes from outgoing photo.",
+    "letterboxOutgoingColorPixelsExpected": 0
+  },
+  "limits": [
+    "No device execution by reviewer.",
+    "Exact candidate build/asset embedding remains pending.",
+    "Legacy Gallery Wall only; native Gallery Print/Spread unaffected by CSS."
+  ],
+  "adaptationBeforeCandidate": "Parent corrected publication requirement: incoming photo remains opaque #1c1b19 and composes owned photo URL over dark doodle SVG. Prior transparent fixture source/preparation preserved, excluded from acceptance.",
+  "firstPreparation": {
+    "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/preparation-verification-first.json",
+    "bytes": 3335,
+    "sha256": "d748a45ff99e87758b15ffa4a17fe998d1a98511553270330580192c436ef9ae"
+  },
+  "firstJavaSource": {
+    "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/first-GalleryActivity.java.txt",
+    "bytes": 17501,
+    "sha256": "22a4b4d21485adf5cfafa29f2885e6dc49993208af02a65f282e066edef7d00c"
+  }
+}

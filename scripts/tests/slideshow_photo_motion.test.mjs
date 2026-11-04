@@ -43,6 +43,45 @@ function snapshot(r) {
   };
 }
 
+function galleryGoldenSnapshot(r) {
+  const state = snapshot(r);
+  for (const node of state.nodes) {
+    const classes = node.classes.split(/\s+/);
+    if (classes.includes('gallery-wall') || classes.includes('ss-gcell')) {
+      assert.equal(node.computed.background, '#1c1b19', 'Gallery matte must remain opaque');
+      assert.equal(node.computed['background-image'], 'url("photo-doodles-dark.svg")');
+      assert.equal(node.computed['background-size'], '480px 360px');
+      delete node.computed['background-image'];
+      delete node.computed['background-size'];
+    }
+    if (!classes.includes('gallery-photo')) continue;
+    assert.equal(node.computed['background-color'], '#1c1b19',
+      'The incoming matte must cover outgoing-photo margins before retirement');
+    if (node.style.backgroundSize === undefined) {
+      assert.equal(node.style.backgroundImage, 'none', 'Only unused slots lack composed backgrounds');
+      continue;
+    }
+    assert.equal(node.style.backgroundSize, 'contain, 480px 360px');
+    assert.equal(node.style.backgroundPosition, 'center, left top');
+    assert.equal(node.style.backgroundRepeat, 'no-repeat, repeat');
+    assert.equal(node.computed['background-image'], node.style.backgroundImage);
+    assert.equal(node.computed['background-size'], node.style.backgroundSize);
+    assert.equal(node.computed['background-position'], node.style.backgroundPosition);
+    assert.equal(node.computed['background-repeat'], node.style.backgroundRepeat);
+    if (node.style.backgroundImage !== 'none') {
+      const composed = /^url\("([^"]+)"\), url\("photo-doodles-dark\.svg"\)$/.exec(node.style.backgroundImage);
+      assert.ok(composed, 'The prepared photo must be first and the fixed doodle SVG second');
+      assert.ok(state.resources.some(resource => resource.url === composed[1]));
+      node.style.backgroundImage = `url("${composed[1]}")`;
+      node.computed['background-image'] = node.style.backgroundImage;
+    }
+    node.style.backgroundSize = node.computed['background-size'] = 'contain';
+    node.style.backgroundPosition = node.computed['background-position'] = 'center';
+    node.style.backgroundRepeat = node.computed['background-repeat'] = 'no-repeat';
+  }
+  return state;
+}
+
 // Captured by executing the current source before adding the preference gates.
 // Pin geometry, publication order, CSS inputs and timers; matching two new paths alone
 // would miss a common regression in both. Coercions count the existing random selections.
@@ -53,6 +92,7 @@ function snapshot(r) {
 // Diptych/Memories/Panorama reuse those matte fields; their normalized traces also remain pinned.
 // Cinema matte fields preserve the previous normalized trace; its pseudo-frame needs native visual checks.
 // Polaroid now fits the existing reserved photo area; rotation, random draws, resources and timers stay pinned.
+// Gallery validates its exact composed backgrounds before removing only the added decorative fields.
 const legacyOutput = [
   ['kenBurns', 30, '3005c1e70712a249dbedd01585276ccadca7bfa140b86375ba5963d57c15ad63'],
   ['diptych', 12, 'fa7c72dbfe5deacf62899a1ae17aa0c6eeaf21e1d95901012bc702c23247beef'],
@@ -76,7 +116,8 @@ for (const [mode, selections, output] of legacyOutput) {
         await r.cleanup.ready;
         const hash = createHash('sha256');
         for (const time of [0, 3500, 5000, 7500, 10000, 15000, 27500]) {
-          await r.advanceTo(time); hash.update(JSON.stringify(snapshot(r)));
+          await r.advanceTo(time);
+          hash.update(JSON.stringify(mode === 'galleryWall' ? galleryGoldenSnapshot(r) : snapshot(r)));
         }
         assert.equal(draws, selections, 'Motion must not change random selection order');
         if (photoMotion !== false) assert.equal(hash.digest('hex'), output);

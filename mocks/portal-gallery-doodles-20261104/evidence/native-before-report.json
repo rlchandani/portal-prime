@@ -1,0 +1,163 @@
+{
+  "ok": false,
+  "error": "scene_assertion_failed",
+  "observations": [
+    {
+      "ready": true,
+      "stable": true,
+      "replacementReady": true,
+      "svgDecoded": true,
+      "shape": "single-landscape",
+      "errors": [],
+      "cards": [
+        {
+          "known": true,
+          "id": 0,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 618.5,
+            "y": 384,
+            "w": 683,
+            "h": 512
+          },
+          "fit": {
+            "x": 618.6666666666666,
+            "y": 384,
+            "w": 682.6666666666667,
+            "h": 512
+          },
+          "corners": [
+            {
+              "x": 644.2666666666667,
+              "y": 409.6
+            },
+            {
+              "x": 1275.7333333333333,
+              "y": 409.6
+            },
+            {
+              "x": 644.2666666666667,
+              "y": 870.4000000000001
+            },
+            {
+              "x": 1275.7333333333333,
+              "y": 870.4000000000001
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "none",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "auto",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery.fixture/photo/0.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "repeat": "no-repeat",
+          "inlineBackground": "url(\"https://gallery.fixture/photo/0.png\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0
+        }
+      ],
+      "wallBackground": "none",
+      "wallColor": "rgb(28, 27, 25)",
+      "wallSize": "auto",
+      "wallRepeat": "repeat",
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 1,
+      "photoRequests": 1,
+      "computedChecksPassed": false
+    }
+  ],
+  "svgRequests": 1,
+  "photoRequests": 1,
+  "lastComputedState": {
+    "ready": true,
+    "stable": true,
+    "replacementReady": true,
+    "svgDecoded": true,
+    "shape": "single-landscape",
+    "errors": [],
+    "cards": [
+      {
+        "known": true,
+        "id": 0,
+        "pw": 800,
+        "ph": 600,
+        "rect": {
+          "x": 618.5,
+          "y": 384,
+          "w": 683,
+          "h": 512
+        },
+        "fit": {
+          "x": 618.6666666666666,
+          "y": 384,
+          "w": 682.6666666666667,
+          "h": 512
+        },
+        "corners": [
+          {
+            "x": 644.2666666666667,
+            "y": 409.6
+          },
+          {
+            "x": 1275.7333333333333,
+            "y": 409.6
+          },
+          {
+            "x": 644.2666666666667,
+            "y": 870.4000000000001
+          },
+          {
+            "x": 1275.7333333333333,
+            "y": 870.4000000000001
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "none",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "auto",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery.fixture/photo/0.png\")",
+        "size": "contain",
+        "position": "50% 50%",
+        "repeat": "no-repeat",
+        "inlineBackground": "url(\"https://gallery.fixture/photo/0.png\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0
+      }
+    ],
+    "wallBackground": "none",
+    "wallColor": "rgb(28, 27, 25)",
+    "wallSize": "auto",
+    "wallRepeat": "repeat",
+    "ownerOpacity": "1",
+    "ownerVisibility": "visible",
+    "dpr": 1.125,
+    "width": 1920,
+    "height": 1280,
+    "svgRequests": 1,
+    "photoRequests": 1,
+    "computedChecksPassed": false
+  },
+  "sceneCount": 4,
+  "scope": "Generated legacy Gallery Wall appearance, whole-photo geometry and same-bucket replacement letterbox; no native SlideshowStage, FaceRenderer, clock, scheduler, resize or performance claim",
+  "unknownRequests": 0,
+  "deniedRequestDiagnostics": [],
+  "deniedRequestDiagnosticLimit": 16,
+  "webViewDestroyed": true,
+  "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+}

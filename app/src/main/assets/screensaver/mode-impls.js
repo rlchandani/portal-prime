@@ -537,6 +537,11 @@
       if (disposed || !cell.dissolve.active()) return;
       const img = cell.dissolve.next();
       bg(img, url, "contain"); img.style.animation = "none"; img.style.willChange = "auto";
+      // The opaque photo owner also covers outgoing pixels in its letterbox.
+      img.style.backgroundImage += ', url("photo-doodles-dark.svg")';
+      img.style.backgroundSize = "contain, 480px 360px";
+      img.style.backgroundPosition = "center, left top";
+      img.style.backgroundRepeat = "no-repeat, repeat";
       cell.photo = photo; cell.dissolve.present(img);
     }
     function layout(preparedPhotos) {

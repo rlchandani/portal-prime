@@ -1,0 +1,20 @@
+{
+  "actualProductionEntryPoint": true,
+  "selectedObservedLayoutControl": "galleryWall",
+  "preparedLocalSamples": 9,
+  "viewport": [
+    2560,
+    1099
+  ],
+  "allComposedPhotoOwnersOpaque": true,
+  "photoSize": "contain, 480px 360px",
+  "rootDarkDoodleLoaded": true,
+  "screenshotDisplayedAndViewed": "desktop-gallery-wall.png",
+  "browserConsoleErrors": 0,
+  "ownedIsolatedTabClosed": true,
+  "userIabTabsUnchanged": true,
+  "limits": [
+    "Bundled local samples and simulated clock only",
+    "Observed simulated bottom clock overlaps one Gallery tile; separate placement follow-up first observed2026-11-04T09:21:05Z, deadline09:51:05Z; no placement correction in appearance slice"
+  ]
+}

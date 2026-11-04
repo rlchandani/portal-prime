@@ -1,0 +1,4059 @@
+{
+  "scope": {
+    "startedAt": "2026-11-04T09:14:51Z",
+    "target": "2026-11-04T09:29:51Z",
+    "deadline": "2026-11-04T09:44:51Z",
+    "sourceBase": "d0b5e03871b7e854a86d5d3a611ba5b0cea351a0",
+    "version": "1.143/code137",
+    "scope": "Gallery Wall quiet doodles in outer and photo letterbox margins; opaque incoming backing and full-photo contain preserved; no geometry, selection, timing or motion changes",
+    "priorClocksRetained": true,
+    "boundaries": [
+      "No phone/provider/account/media/push/publication",
+      "Generated native Gallery WebView acceptance only; actual native GalleryStage, clock, API28 and Living visual remain separate"
+    ]
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-gallery-doodles-20261104-091451/candidate-debug-1.143.apk",
+      "bytes": 46728742,
+      "sha256": "ace9eeaf9b988263aeea5084339a108dae776c34334d523f1a2ddbdadf57ea05",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='137' versionName='1.143' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+          "bytes": 12657
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+          "bytes": 7785
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+          "bytes": 5582
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "sha256": "e0473ddbeeb20561fcaf1f85aa4192fd69e5273081140064e48e29a7f815ed22",
+          "bytes": 67552
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+          "bytes": 13499
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+          "bytes": 1247
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+          "bytes": 1246
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+          "bytes": 8528
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+          "bytes": 14433
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+          "bytes": 15397
+        }
+      ]
+    },
+    "performance": {
+      "path": "/private/tmp/portal-gallery-doodles-20261104-091451/candidate-performance-1.143.apk",
+      "bytes": 25886547,
+      "sha256": "0eeaf66d9b68682d440d4db15cc88d92ed4446cfae83b909d707a53a7aa87a11",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='137' versionName='1.143' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+          "bytes": 12657
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+          "bytes": 7785
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+          "bytes": 5582
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "sha256": "e0473ddbeeb20561fcaf1f85aa4192fd69e5273081140064e48e29a7f815ed22",
+          "bytes": 67552
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+          "bytes": 13499
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+          "bytes": 1247
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+          "bytes": 1246
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+          "bytes": 8528
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+          "bytes": 14433
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+          "bytes": 15397
+        }
+      ]
+    },
+    "jvm": {
+      "tests": 4414,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 461
+    },
+    "gradleExit": 0
+  },
+  "sourceReview": {
+    "ok": true,
+    "clock": {
+      "start": "2026-11-04T09:14:51Z",
+      "hardDeadline": "2026-11-04T09:44:51Z",
+      "reset": false
+    },
+    "scope": "Gallery appearance only; opaque photo-owned matte retained",
+    "sourceBindings": [
+      {
+        "role": "baseline-css",
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/styles.css.before",
+        "sha256": "5b227662f9a5f1d66d499db5cb0da3b0c23103fc0e91ff40534c3eb8491aeb1d"
+      },
+      {
+        "role": "baseline-mode",
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/mode-impls.js.before",
+        "sha256": "6cfa1ba98a8169f8d2f58615454c7d4381c834c9fc1513895accd87895b1fad0"
+      },
+      {
+        "role": "candidate-css",
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css",
+        "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+      },
+      {
+        "role": "candidate-mode",
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js",
+        "sha256": "e0473ddbeeb20561fcaf1f85aa4192fd69e5273081140064e48e29a7f815ed22"
+      },
+      {
+        "role": "motion-test",
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/slideshow_photo_motion.test.mjs",
+        "sha256": "0e85c1c927aa8a1b831719ce988265abff8a47123780a210671e9f7ac44bc00d"
+      },
+      {
+        "role": "fixture-helper",
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/helpers/slideshow_scene_fixture.mjs",
+        "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0"
+      },
+      {
+        "role": "frozen-motion-test",
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/slideshow_photo_motion.test.mjs.before",
+        "sha256": "7c2c2d823bb36f6948bdb1bf315d0d5fd9cab7f0d40edb500228c90183f78580"
+      }
+    ],
+    "productionNormalization": {
+      "cssAddedLines": 1,
+      "modeAddedLines": 5,
+      "allOtherCssAndModeBytesEqual": true
+    },
+    "testNormalization": {
+      "helperSha256": "a207adf662fc90ecb19dfc622f5773d8780e746ce29b6d260ddb0c70487eff4e",
+      "galleryGoldenUnchanged": true,
+      "allOtherGoldenEntriesUnchanged": true,
+      "normalizedFields": [
+        "root/cell computed background-image and background-size",
+        "photo inline/computed backgroundImage/Size/Position/Repeat only"
+      ],
+      "validatedBeforeNormalization": [
+        "exact local SVG second layer with photo first",
+        "480px 360px",
+        "contain centered nonrepeating photo",
+        "opaque #1c1b19 root/cell/photo matte",
+        "computed background fields equal inline values",
+        "prepared photo URL exists in source resource trace"
+      ],
+      "allGoldenEntriesByteIdentical": true,
+      "allOtherTestBytesRestoredExactly": true
+    },
+    "verification": {
+      "command": "node --test scripts/tests/slideshow_photo_motion.test.mjs",
+      "terminalExit": 0,
+      "tests": 54,
+      "pass": 54,
+      "fail": 0,
+      "skips": 0
+    },
+    "pairedTraces": [
+      {
+        "photoMotion": "legacy-undefined",
+        "beforeHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+        "candidateRawHash": "2f9f4da25c1e48ab9e97f801e3c4e67fd605415017e21da477b3d6995c67d796",
+        "candidateNormalizedHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+        "beforeRandomDraws": 5,
+        "candidateRandomDraws": 5,
+        "checkpoints": [
+          {
+            "timeMs": 0,
+            "nodeCount": 32,
+            "cursor": 10,
+            "resources": 10,
+            "loads": 10,
+            "timers": [
+              5000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 3500,
+            "nodeCount": 32,
+            "cursor": 10,
+            "resources": 10,
+            "loads": 10,
+            "timers": [
+              5000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 5000,
+            "nodeCount": 32,
+            "cursor": 12,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              6200,
+              10000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 7500,
+            "nodeCount": 32,
+            "cursor": 12,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              10000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 10000,
+            "nodeCount": 32,
+            "cursor": 15,
+            "resources": 12,
+            "loads": 12,
+            "timers": [
+              11200,
+              15000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 15000,
+            "nodeCount": 32,
+            "cursor": 22,
+            "resources": 13,
+            "loads": 13,
+            "timers": [
+              16200,
+              20000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 27500,
+            "nodeCount": 32,
+            "cursor": 31,
+            "resources": 15,
+            "loads": 15,
+            "timers": [
+              30000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          }
+        ]
+      },
+      {
+        "photoMotion": true,
+        "beforeHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+        "candidateRawHash": "2f9f4da25c1e48ab9e97f801e3c4e67fd605415017e21da477b3d6995c67d796",
+        "candidateNormalizedHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+        "beforeRandomDraws": 5,
+        "candidateRandomDraws": 5,
+        "checkpoints": [
+          {
+            "timeMs": 0,
+            "nodeCount": 32,
+            "cursor": 10,
+            "resources": 10,
+            "loads": 10,
+            "timers": [
+              5000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 3500,
+            "nodeCount": 32,
+            "cursor": 10,
+            "resources": 10,
+            "loads": 10,
+            "timers": [
+              5000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 5000,
+            "nodeCount": 32,
+            "cursor": 12,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              6200,
+              10000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 7500,
+            "nodeCount": 32,
+            "cursor": 12,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              10000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 10000,
+            "nodeCount": 32,
+            "cursor": 15,
+            "resources": 12,
+            "loads": 12,
+            "timers": [
+              11200,
+              15000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 15000,
+            "nodeCount": 32,
+            "cursor": 22,
+            "resources": 13,
+            "loads": 13,
+            "timers": [
+              16200,
+              20000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 27500,
+            "nodeCount": 32,
+            "cursor": 31,
+            "resources": 15,
+            "loads": 15,
+            "timers": [
+              30000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          }
+        ]
+      },
+      {
+        "photoMotion": false,
+        "beforeHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+        "candidateRawHash": "2f9f4da25c1e48ab9e97f801e3c4e67fd605415017e21da477b3d6995c67d796",
+        "candidateNormalizedHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+        "beforeRandomDraws": 5,
+        "candidateRandomDraws": 5,
+        "checkpoints": [
+          {
+            "timeMs": 0,
+            "nodeCount": 32,
+            "cursor": 10,
+            "resources": 10,
+            "loads": 10,
+            "timers": [
+              5000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 3500,
+            "nodeCount": 32,
+            "cursor": 10,
+            "resources": 10,
+            "loads": 10,
+            "timers": [
+              5000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 5000,
+            "nodeCount": 32,
+            "cursor": 12,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              6200,
+              10000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 7500,
+            "nodeCount": 32,
+            "cursor": 12,
+            "resources": 11,
+            "loads": 11,
+            "timers": [
+              10000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 10000,
+            "nodeCount": 32,
+            "cursor": 15,
+            "resources": 12,
+            "loads": 12,
+            "timers": [
+              11200,
+              15000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 15000,
+            "nodeCount": 32,
+            "cursor": 22,
+            "resources": 13,
+            "loads": 13,
+            "timers": [
+              16200,
+              20000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          },
+          {
+            "timeMs": 27500,
+            "nodeCount": 32,
+            "cursor": 31,
+            "resources": 15,
+            "loads": 15,
+            "timers": [
+              30000
+            ],
+            "opacityExact": true,
+            "geometryExact": true,
+            "resourcesExact": true
+          }
+        ]
+      }
+    ],
+    "limits": [
+      "Host fixture checks DOM/CSS inputs and simulated lifecycle, not native rasterization.",
+      "Static SVG visibility and old/new photo pixel ownership require the separately owned native fixture.",
+      "No device, provider, registry, media/account or network calls.",
+      "No motion, geometry, timers, scheduling or performance claims beyond the exact host traces."
+    ]
+  },
+  "native": {
+    "baseline": {
+      "ok": false,
+      "error": "scene_assertion_failed",
+      "observations": [
+        {
+          "ready": true,
+          "stable": true,
+          "replacementReady": true,
+          "svgDecoded": true,
+          "shape": "single-landscape",
+          "errors": [],
+          "cards": [
+            {
+              "known": true,
+              "id": 0,
+              "pw": 800,
+              "ph": 600,
+              "rect": {
+                "x": 618.5,
+                "y": 384,
+                "w": 683,
+                "h": 512
+              },
+              "fit": {
+                "x": 618.6666666666666,
+                "y": 384,
+                "w": 682.6666666666667,
+                "h": 512
+              },
+              "corners": [
+                {
+                  "x": 644.2666666666667,
+                  "y": 409.6
+                },
+                {
+                  "x": 1275.7333333333333,
+                  "y": 409.6
+                },
+                {
+                  "x": 644.2666666666667,
+                  "y": 870.4000000000001
+                },
+                {
+                  "x": 1275.7333333333333,
+                  "y": 870.4000000000001
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "none",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "auto",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/0.png\")",
+              "size": "contain",
+              "position": "50% 50%",
+              "repeat": "no-repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/0.png\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0
+            }
+          ],
+          "wallBackground": "none",
+          "wallColor": "rgb(28, 27, 25)",
+          "wallSize": "auto",
+          "wallRepeat": "repeat",
+          "ownerOpacity": "1",
+          "ownerVisibility": "visible",
+          "dpr": 1.125,
+          "width": 1920,
+          "height": 1280,
+          "svgRequests": 1,
+          "photoRequests": 1,
+          "computedChecksPassed": false
+        }
+      ],
+      "svgRequests": 1,
+      "photoRequests": 1,
+      "lastComputedState": {
+        "ready": true,
+        "stable": true,
+        "replacementReady": true,
+        "svgDecoded": true,
+        "shape": "single-landscape",
+        "errors": [],
+        "cards": [
+          {
+            "known": true,
+            "id": 0,
+            "pw": 800,
+            "ph": 600,
+            "rect": {
+              "x": 618.5,
+              "y": 384,
+              "w": 683,
+              "h": 512
+            },
+            "fit": {
+              "x": 618.6666666666666,
+              "y": 384,
+              "w": 682.6666666666667,
+              "h": 512
+            },
+            "corners": [
+              {
+                "x": 644.2666666666667,
+                "y": 409.6
+              },
+              {
+                "x": 1275.7333333333333,
+                "y": 409.6
+              },
+              {
+                "x": 644.2666666666667,
+                "y": 870.4000000000001
+              },
+              {
+                "x": 1275.7333333333333,
+                "y": 870.4000000000001
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "none",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "auto",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/0.png\")",
+            "size": "contain",
+            "position": "50% 50%",
+            "repeat": "no-repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/0.png\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0
+          }
+        ],
+        "wallBackground": "none",
+        "wallColor": "rgb(28, 27, 25)",
+        "wallSize": "auto",
+        "wallRepeat": "repeat",
+        "ownerOpacity": "1",
+        "ownerVisibility": "visible",
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "svgRequests": 1,
+        "photoRequests": 1,
+        "computedChecksPassed": false
+      },
+      "sceneCount": 4,
+      "scope": "Generated legacy Gallery Wall appearance, whole-photo geometry and same-bucket replacement letterbox; no native SlideshowStage, FaceRenderer, clock, scheduler, resize or performance claim",
+      "unknownRequests": 0,
+      "deniedRequestDiagnostics": [],
+      "deniedRequestDiagnosticLimit": 16,
+      "webViewDestroyed": true,
+      "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+    },
+    "candidate": {
+      "ok": true,
+      "error": null,
+      "observations": [
+        {
+          "ready": true,
+          "stable": true,
+          "replacementReady": true,
+          "svgDecoded": true,
+          "shape": "single-landscape",
+          "errors": [],
+          "cards": [
+            {
+              "known": true,
+              "id": 0,
+              "pw": 800,
+              "ph": 600,
+              "rect": {
+                "x": 618.5,
+                "y": 384,
+                "w": 683,
+                "h": 512
+              },
+              "fit": {
+                "x": 618.6666666666666,
+                "y": 384,
+                "w": 682.6666666666667,
+                "h": 512
+              },
+              "corners": [
+                {
+                  "x": 644.2666666666667,
+                  "y": 409.6
+                },
+                {
+                  "x": 1275.7333333333333,
+                  "y": 409.6
+                },
+                {
+                  "x": 644.2666666666667,
+                  "y": 870.4000000000001
+                },
+                {
+                  "x": 1275.7333333333333,
+                  "y": 870.4000000000001
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/0.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/0.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          ],
+          "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "wallColor": "rgb(28, 27, 25)",
+          "wallSize": "480px 360px",
+          "wallRepeat": "repeat",
+          "ownerOpacity": "1",
+          "ownerVisibility": "visible",
+          "dpr": 1.125,
+          "width": 1920,
+          "height": 1280,
+          "svgRequests": 1,
+          "photoRequests": 1,
+          "computedChecksPassed": true,
+          "compositorFenceRequested": true,
+          "compositorFenceCompleted": true,
+          "screenshot": "gallery-single-landscape.png",
+          "pixelCopy": true,
+          "webPixelWidth": 2160,
+          "webPixelHeight": 1440,
+          "outerMatteSamples": 634029,
+          "outerDoodleSamples": 7466,
+          "letterboxMatteSamples": 0,
+          "letterboxDoodleSamples": 0,
+          "letterboxOutgoingColorPixels": 0,
+          "noOutgoingPhotoBleed": true
+        },
+        {
+          "ready": true,
+          "stable": true,
+          "replacementReady": true,
+          "svgDecoded": true,
+          "shape": "single-portrait",
+          "errors": [],
+          "cards": [
+            {
+              "known": true,
+              "id": 1,
+              "pw": 480,
+              "ph": 800,
+              "rect": {
+                "x": 806.5,
+                "y": 384,
+                "w": 307,
+                "h": 512
+              },
+              "fit": {
+                "x": 806.5,
+                "y": 384.1666666666667,
+                "w": 307,
+                "h": 511.66666666666663
+              },
+              "corners": [
+                {
+                  "x": 825.6875,
+                  "y": 403.3541666666667
+                },
+                {
+                  "x": 1094.3125,
+                  "y": 403.3541666666667
+                },
+                {
+                  "x": 825.6875,
+                  "y": 876.6458333333333
+                },
+                {
+                  "x": 1094.3125,
+                  "y": 876.6458333333333
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/1.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/1.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          ],
+          "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "wallColor": "rgb(28, 27, 25)",
+          "wallSize": "480px 360px",
+          "wallRepeat": "repeat",
+          "ownerOpacity": "1",
+          "ownerVisibility": "visible",
+          "dpr": 1.125,
+          "width": 1920,
+          "height": 1280,
+          "svgRequests": 2,
+          "photoRequests": 2,
+          "computedChecksPassed": true,
+          "compositorFenceRequested": true,
+          "compositorFenceCompleted": true,
+          "screenshot": "gallery-single-portrait.png",
+          "pixelCopy": true,
+          "webPixelWidth": 2160,
+          "webPixelHeight": 1440,
+          "outerMatteSamples": 702293,
+          "outerDoodleSamples": 8149,
+          "letterboxMatteSamples": 0,
+          "letterboxDoodleSamples": 0,
+          "letterboxOutgoingColorPixels": 0,
+          "noOutgoingPhotoBleed": true
+        },
+        {
+          "ready": true,
+          "stable": true,
+          "replacementReady": true,
+          "svgDecoded": true,
+          "shape": "mixed-six",
+          "errors": [],
+          "cards": [
+            {
+              "known": true,
+              "id": 0,
+              "pw": 800,
+              "ph": 600,
+              "rect": {
+                "x": 16,
+                "y": 244.43055725097656,
+                "w": 356,
+                "h": 267
+              },
+              "fit": {
+                "x": 16,
+                "y": 244.43055725097656,
+                "w": 356,
+                "h": 267
+              },
+              "corners": [
+                {
+                  "x": 29.35,
+                  "y": 257.7805572509766
+                },
+                {
+                  "x": 358.65,
+                  "y": 257.7805572509766
+                },
+                {
+                  "x": 29.35,
+                  "y": 498.08055725097654
+                },
+                {
+                  "x": 358.65,
+                  "y": 498.08055725097654
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/0.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/0.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 1,
+              "pw": 480,
+              "ph": 800,
+              "rect": {
+                "x": 384,
+                "y": 244.43055725097656,
+                "w": 160,
+                "h": 267
+              },
+              "fit": {
+                "x": 384,
+                "y": 244.59722391764325,
+                "w": 160,
+                "h": 266.66666666666663
+              },
+              "corners": [
+                {
+                  "x": 394,
+                  "y": 254.59722391764325
+                },
+                {
+                  "x": 534,
+                  "y": 254.59722391764325
+                },
+                {
+                  "x": 394,
+                  "y": 501.2638905843099
+                },
+                {
+                  "x": 534,
+                  "y": 501.2638905843099
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/1.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/1.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 2,
+              "pw": 600,
+              "ph": 600,
+              "rect": {
+                "x": 556,
+                "y": 244.43055725097656,
+                "w": 267,
+                "h": 267
+              },
+              "fit": {
+                "x": 556,
+                "y": 244.43055725097656,
+                "w": 267,
+                "h": 267
+              },
+              "corners": [
+                {
+                  "x": 569.35,
+                  "y": 257.7805572509766
+                },
+                {
+                  "x": 809.65,
+                  "y": 257.7805572509766
+                },
+                {
+                  "x": 569.35,
+                  "y": 498.08055725097654
+                },
+                {
+                  "x": 809.65,
+                  "y": 498.08055725097654
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/2.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/2.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 3,
+              "pw": 2400,
+              "ph": 600,
+              "rect": {
+                "x": 836,
+                "y": 244.43055725097656,
+                "w": 1068,
+                "h": 267
+              },
+              "fit": {
+                "x": 836,
+                "y": 244.43055725097656,
+                "w": 1068,
+                "h": 267
+              },
+              "corners": [
+                {
+                  "x": 849.35,
+                  "y": 257.7805572509766
+                },
+                {
+                  "x": 1890.65,
+                  "y": 257.7805572509766
+                },
+                {
+                  "x": 849.35,
+                  "y": 498.08055725097654
+                },
+                {
+                  "x": 1890.65,
+                  "y": 498.08055725097654
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/3.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/3.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 4,
+              "pw": 800,
+              "ph": 600,
+              "rect": {
+                "x": 459,
+                "y": 523.4305419921875,
+                "w": 683,
+                "h": 512
+              },
+              "fit": {
+                "x": 459.16666666666663,
+                "y": 523.4305419921875,
+                "w": 682.6666666666667,
+                "h": 512
+              },
+              "corners": [
+                {
+                  "x": 484.76666666666665,
+                  "y": 549.0305419921875
+                },
+                {
+                  "x": 1116.2333333333333,
+                  "y": 549.0305419921875
+                },
+                {
+                  "x": 484.76666666666665,
+                  "y": 1009.8305419921876
+                },
+                {
+                  "x": 1116.2333333333333,
+                  "y": 1009.8305419921876
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/4.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/4.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 5,
+              "pw": 480,
+              "ph": 800,
+              "rect": {
+                "x": 1154,
+                "y": 523.4305419921875,
+                "w": 307,
+                "h": 512
+              },
+              "fit": {
+                "x": 1154,
+                "y": 523.5972086588542,
+                "w": 307,
+                "h": 511.66666666666663
+              },
+              "corners": [
+                {
+                  "x": 1173.1875,
+                  "y": 542.7847086588542
+                },
+                {
+                  "x": 1441.8125,
+                  "y": 542.7847086588542
+                },
+                {
+                  "x": 1173.1875,
+                  "y": 1016.0763753255209
+                },
+                {
+                  "x": 1441.8125,
+                  "y": 1016.0763753255209
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/5.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/5.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          ],
+          "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "wallColor": "rgb(28, 27, 25)",
+          "wallSize": "480px 360px",
+          "wallRepeat": "repeat",
+          "ownerOpacity": "1",
+          "ownerVisibility": "visible",
+          "dpr": 1.125,
+          "width": 1920,
+          "height": 1280,
+          "svgRequests": 3,
+          "photoRequests": 8,
+          "computedChecksPassed": true,
+          "compositorFenceRequested": true,
+          "compositorFenceCompleted": true,
+          "screenshot": "gallery-mixed-six.png",
+          "pixelCopy": true,
+          "webPixelWidth": 2160,
+          "webPixelHeight": 1440,
+          "outerMatteSamples": 395013,
+          "outerDoodleSamples": 4579,
+          "letterboxMatteSamples": 0,
+          "letterboxDoodleSamples": 0,
+          "letterboxOutgoingColorPixels": 0,
+          "noOutgoingPhotoBleed": true
+        },
+        {
+          "ready": true,
+          "stable": true,
+          "replacementReady": true,
+          "svgDecoded": true,
+          "shape": "replacement-letterbox",
+          "errors": [],
+          "cards": [
+            {
+              "known": true,
+              "id": 6,
+              "pw": 1080,
+              "ph": 600,
+              "rect": {
+                "x": 216.0277862548828,
+                "y": 16,
+                "w": 489.40277099609375,
+                "h": 271.8888854980469
+              },
+              "fit": {
+                "x": 216.0291748046875,
+                "y": 16,
+                "w": 489.3999938964844,
+                "h": 271.8888854980469
+              },
+              "corners": [
+                {
+                  "x": 229.62361907958984,
+                  "y": 29.594444274902344
+                },
+                {
+                  "x": 691.8347244262695,
+                  "y": 29.594444274902344
+                },
+                {
+                  "x": 229.62361907958984,
+                  "y": 274.29444122314453
+                },
+                {
+                  "x": 691.8347244262695,
+                  "y": 274.29444122314453
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/6.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/6.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 16,
+              "pw": 810,
+              "ph": 600,
+              "rect": {
+                "x": 714.888916015625,
+                "y": 16,
+                "w": 489.40277099609375,
+                "h": 271.8888854980469
+              },
+              "fit": {
+                "x": 776.0653038024902,
+                "y": 16,
+                "w": 367.0499954223633,
+                "h": 271.8888854980469
+              },
+              "corners": [
+                {
+                  "x": 789.6597480773926,
+                  "y": 29.594444274902344
+                },
+                {
+                  "x": 1129.5208549499512,
+                  "y": 29.594444274902344
+                },
+                {
+                  "x": 789.6597480773926,
+                  "y": 274.29444122314453
+                },
+                {
+                  "x": 1129.5208549499512,
+                  "y": 274.29444122314453
+                }
+              ],
+              "letterboxMargins": [
+                {
+                  "x": 719.888916015625,
+                  "y": 21,
+                  "w": 51.176387786865234,
+                  "h": 261.8888854980469
+                },
+                {
+                  "x": 1148.1152992248535,
+                  "y": 21,
+                  "w": 51.176387786865234,
+                  "h": 261.8888854980469
+                }
+              ],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/16.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/16.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 8,
+              "pw": 1080,
+              "ph": 600,
+              "rect": {
+                "x": 1214.5555419921875,
+                "y": 16,
+                "w": 489.40277099609375,
+                "h": 271.8888854980469
+              },
+              "fit": {
+                "x": 1214.5569305419922,
+                "y": 16,
+                "w": 489.3999938964844,
+                "h": 271.8888854980469
+              },
+              "corners": [
+                {
+                  "x": 1228.1513748168945,
+                  "y": 29.594444274902344
+                },
+                {
+                  "x": 1690.3624801635742,
+                  "y": 29.594444274902344
+                },
+                {
+                  "x": 1228.1513748168945,
+                  "y": 274.29444122314453
+                },
+                {
+                  "x": 1690.3624801635742,
+                  "y": 274.29444122314453
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/8.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/8.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 9,
+              "pw": 1080,
+              "ph": 600,
+              "rect": {
+                "x": 216.0277862548828,
+                "y": 297.34722900390625,
+                "w": 489.40277099609375,
+                "h": 271.8888854980469
+              },
+              "fit": {
+                "x": 216.0291748046875,
+                "y": 297.34722900390625,
+                "w": 489.3999938964844,
+                "h": 271.8888854980469
+              },
+              "corners": [
+                {
+                  "x": 229.62361907958984,
+                  "y": 310.9416732788086
+                },
+                {
+                  "x": 691.8347244262695,
+                  "y": 310.9416732788086
+                },
+                {
+                  "x": 229.62361907958984,
+                  "y": 555.6416702270508
+                },
+                {
+                  "x": 691.8347244262695,
+                  "y": 555.6416702270508
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/9.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/9.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 10,
+              "pw": 1080,
+              "ph": 600,
+              "rect": {
+                "x": 714.888916015625,
+                "y": 297.34722900390625,
+                "w": 489.40277099609375,
+                "h": 271.8888854980469
+              },
+              "fit": {
+                "x": 714.8903045654297,
+                "y": 297.34722900390625,
+                "w": 489.3999938964844,
+                "h": 271.8888854980469
+              },
+              "corners": [
+                {
+                  "x": 728.484748840332,
+                  "y": 310.9416732788086
+                },
+                {
+                  "x": 1190.6958541870117,
+                  "y": 310.9416732788086
+                },
+                {
+                  "x": 728.484748840332,
+                  "y": 555.6416702270508
+                },
+                {
+                  "x": 1190.6958541870117,
+                  "y": 555.6416702270508
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/10.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/10.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 11,
+              "pw": 1080,
+              "ph": 600,
+              "rect": {
+                "x": 1214.5555419921875,
+                "y": 297.34722900390625,
+                "w": 489.40277099609375,
+                "h": 271.8888854980469
+              },
+              "fit": {
+                "x": 1214.5569305419922,
+                "y": 297.34722900390625,
+                "w": 489.3999938964844,
+                "h": 271.8888854980469
+              },
+              "corners": [
+                {
+                  "x": 1228.1513748168945,
+                  "y": 310.9416732788086
+                },
+                {
+                  "x": 1690.3624801635742,
+                  "y": 310.9416732788086
+                },
+                {
+                  "x": 1228.1513748168945,
+                  "y": 555.6416702270508
+                },
+                {
+                  "x": 1690.3624801635742,
+                  "y": 555.6416702270508
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/11.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/11.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 12,
+              "pw": 1080,
+              "ph": 600,
+              "rect": {
+                "x": 216.0277862548828,
+                "y": 578.6944580078125,
+                "w": 489.40277099609375,
+                "h": 271.8888854980469
+              },
+              "fit": {
+                "x": 216.0291748046875,
+                "y": 578.6944580078125,
+                "w": 489.3999938964844,
+                "h": 271.8888854980469
+              },
+              "corners": [
+                {
+                  "x": 229.62361907958984,
+                  "y": 592.2889022827148
+                },
+                {
+                  "x": 691.8347244262695,
+                  "y": 592.2889022827148
+                },
+                {
+                  "x": 229.62361907958984,
+                  "y": 836.988899230957
+                },
+                {
+                  "x": 691.8347244262695,
+                  "y": 836.988899230957
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/12.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/12.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 13,
+              "pw": 1080,
+              "ph": 600,
+              "rect": {
+                "x": 714.888916015625,
+                "y": 578.6944580078125,
+                "w": 489.40277099609375,
+                "h": 271.8888854980469
+              },
+              "fit": {
+                "x": 714.8903045654297,
+                "y": 578.6944580078125,
+                "w": 489.3999938964844,
+                "h": 271.8888854980469
+              },
+              "corners": [
+                {
+                  "x": 728.484748840332,
+                  "y": 592.2889022827148
+                },
+                {
+                  "x": 1190.6958541870117,
+                  "y": 592.2889022827148
+                },
+                {
+                  "x": 728.484748840332,
+                  "y": 836.988899230957
+                },
+                {
+                  "x": 1190.6958541870117,
+                  "y": 836.988899230957
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/13.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/13.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 14,
+              "pw": 1080,
+              "ph": 600,
+              "rect": {
+                "x": 1214.5555419921875,
+                "y": 578.6944580078125,
+                "w": 489.40277099609375,
+                "h": 271.8888854980469
+              },
+              "fit": {
+                "x": 1214.5569305419922,
+                "y": 578.6944580078125,
+                "w": 489.3999938964844,
+                "h": 271.8888854980469
+              },
+              "corners": [
+                {
+                  "x": 1228.1513748168945,
+                  "y": 592.2889022827148
+                },
+                {
+                  "x": 1690.3624801635742,
+                  "y": 592.2889022827148
+                },
+                {
+                  "x": 1228.1513748168945,
+                  "y": 836.988899230957
+                },
+                {
+                  "x": 1690.3624801635742,
+                  "y": 836.988899230957
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/14.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/14.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "known": true,
+              "id": 15,
+              "pw": 1080,
+              "ph": 600,
+              "rect": {
+                "x": 596.6805419921875,
+                "y": 860.8333129882812,
+                "w": 726.625,
+                "h": 403.5
+              },
+              "fit": {
+                "x": 596.8430419921875,
+                "y": 860.8333129882812,
+                "w": 726.3,
+                "h": 403.5
+              },
+              "corners": [
+                {
+                  "x": 617.0180419921875,
+                  "y": 881.0083129882812
+                },
+                {
+                  "x": 1302.9680419921874,
+                  "y": 881.0083129882812
+                },
+                {
+                  "x": 617.0180419921875,
+                  "y": 1244.1583129882813
+                },
+                {
+                  "x": 1302.9680419921874,
+                  "y": 1244.1583129882813
+                }
+              ],
+              "letterboxMargins": [],
+              "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "cellColor": "rgb(28, 27, 25)",
+              "cellSize": "480px 360px",
+              "cellRepeat": "repeat",
+              "opacity": "1",
+              "visibility": "visible",
+              "photoColor": "rgb(28, 27, 25)",
+              "backgroundImage": "url(\"https://gallery.fixture/photo/15.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+              "size": "contain, 480px 360px",
+              "position": "50% 50%, 0% 0%",
+              "repeat": "no-repeat, repeat",
+              "inlineBackground": "url(\"https://gallery.fixture/photo/15.png\"), url(\"photo-doodles-dark.svg\")",
+              "animation": "none",
+              "willChange": "auto",
+              "captionCount": 0,
+              "wholePhotoCorners": [
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          ],
+          "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+          "wallColor": "rgb(28, 27, 25)",
+          "wallSize": "480px 360px",
+          "wallRepeat": "repeat",
+          "ownerOpacity": "1",
+          "ownerVisibility": "visible",
+          "dpr": 1.125,
+          "width": 1920,
+          "height": 1280,
+          "svgRequests": 4,
+          "photoRequests": 19,
+          "computedChecksPassed": true,
+          "compositorFenceRequested": true,
+          "compositorFenceCompleted": true,
+          "screenshot": "gallery-replacement-letterbox.png",
+          "pixelCopy": true,
+          "webPixelWidth": 2160,
+          "webPixelHeight": 1440,
+          "outerMatteSamples": 241591,
+          "outerDoodleSamples": 3039,
+          "letterboxMatteSamples": 7150,
+          "letterboxDoodleSamples": 69,
+          "letterboxOutgoingColorPixels": 0,
+          "noOutgoingPhotoBleed": true
+        }
+      ],
+      "svgRequests": 4,
+      "photoRequests": 19,
+      "lastComputedState": {
+        "ready": true,
+        "stable": true,
+        "replacementReady": true,
+        "svgDecoded": true,
+        "shape": "replacement-letterbox",
+        "errors": [],
+        "cards": [
+          {
+            "known": true,
+            "id": 6,
+            "pw": 1080,
+            "ph": 600,
+            "rect": {
+              "x": 216.0277862548828,
+              "y": 16,
+              "w": 489.40277099609375,
+              "h": 271.8888854980469
+            },
+            "fit": {
+              "x": 216.0291748046875,
+              "y": 16,
+              "w": 489.3999938964844,
+              "h": 271.8888854980469
+            },
+            "corners": [
+              {
+                "x": 229.62361907958984,
+                "y": 29.594444274902344
+              },
+              {
+                "x": 691.8347244262695,
+                "y": 29.594444274902344
+              },
+              {
+                "x": 229.62361907958984,
+                "y": 274.29444122314453
+              },
+              {
+                "x": 691.8347244262695,
+                "y": 274.29444122314453
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/6.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/6.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "known": true,
+            "id": 16,
+            "pw": 810,
+            "ph": 600,
+            "rect": {
+              "x": 714.888916015625,
+              "y": 16,
+              "w": 489.40277099609375,
+              "h": 271.8888854980469
+            },
+            "fit": {
+              "x": 776.0653038024902,
+              "y": 16,
+              "w": 367.0499954223633,
+              "h": 271.8888854980469
+            },
+            "corners": [
+              {
+                "x": 789.6597480773926,
+                "y": 29.594444274902344
+              },
+              {
+                "x": 1129.5208549499512,
+                "y": 29.594444274902344
+              },
+              {
+                "x": 789.6597480773926,
+                "y": 274.29444122314453
+              },
+              {
+                "x": 1129.5208549499512,
+                "y": 274.29444122314453
+              }
+            ],
+            "letterboxMargins": [
+              {
+                "x": 719.888916015625,
+                "y": 21,
+                "w": 51.176387786865234,
+                "h": 261.8888854980469
+              },
+              {
+                "x": 1148.1152992248535,
+                "y": 21,
+                "w": 51.176387786865234,
+                "h": 261.8888854980469
+              }
+            ],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/16.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/16.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "known": true,
+            "id": 8,
+            "pw": 1080,
+            "ph": 600,
+            "rect": {
+              "x": 1214.5555419921875,
+              "y": 16,
+              "w": 489.40277099609375,
+              "h": 271.8888854980469
+            },
+            "fit": {
+              "x": 1214.5569305419922,
+              "y": 16,
+              "w": 489.3999938964844,
+              "h": 271.8888854980469
+            },
+            "corners": [
+              {
+                "x": 1228.1513748168945,
+                "y": 29.594444274902344
+              },
+              {
+                "x": 1690.3624801635742,
+                "y": 29.594444274902344
+              },
+              {
+                "x": 1228.1513748168945,
+                "y": 274.29444122314453
+              },
+              {
+                "x": 1690.3624801635742,
+                "y": 274.29444122314453
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/8.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/8.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "known": true,
+            "id": 9,
+            "pw": 1080,
+            "ph": 600,
+            "rect": {
+              "x": 216.0277862548828,
+              "y": 297.34722900390625,
+              "w": 489.40277099609375,
+              "h": 271.8888854980469
+            },
+            "fit": {
+              "x": 216.0291748046875,
+              "y": 297.34722900390625,
+              "w": 489.3999938964844,
+              "h": 271.8888854980469
+            },
+            "corners": [
+              {
+                "x": 229.62361907958984,
+                "y": 310.9416732788086
+              },
+              {
+                "x": 691.8347244262695,
+                "y": 310.9416732788086
+              },
+              {
+                "x": 229.62361907958984,
+                "y": 555.6416702270508
+              },
+              {
+                "x": 691.8347244262695,
+                "y": 555.6416702270508
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/9.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/9.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "known": true,
+            "id": 10,
+            "pw": 1080,
+            "ph": 600,
+            "rect": {
+              "x": 714.888916015625,
+              "y": 297.34722900390625,
+              "w": 489.40277099609375,
+              "h": 271.8888854980469
+            },
+            "fit": {
+              "x": 714.8903045654297,
+              "y": 297.34722900390625,
+              "w": 489.3999938964844,
+              "h": 271.8888854980469
+            },
+            "corners": [
+              {
+                "x": 728.484748840332,
+                "y": 310.9416732788086
+              },
+              {
+                "x": 1190.6958541870117,
+                "y": 310.9416732788086
+              },
+              {
+                "x": 728.484748840332,
+                "y": 555.6416702270508
+              },
+              {
+                "x": 1190.6958541870117,
+                "y": 555.6416702270508
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/10.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/10.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "known": true,
+            "id": 11,
+            "pw": 1080,
+            "ph": 600,
+            "rect": {
+              "x": 1214.5555419921875,
+              "y": 297.34722900390625,
+              "w": 489.40277099609375,
+              "h": 271.8888854980469
+            },
+            "fit": {
+              "x": 1214.5569305419922,
+              "y": 297.34722900390625,
+              "w": 489.3999938964844,
+              "h": 271.8888854980469
+            },
+            "corners": [
+              {
+                "x": 1228.1513748168945,
+                "y": 310.9416732788086
+              },
+              {
+                "x": 1690.3624801635742,
+                "y": 310.9416732788086
+              },
+              {
+                "x": 1228.1513748168945,
+                "y": 555.6416702270508
+              },
+              {
+                "x": 1690.3624801635742,
+                "y": 555.6416702270508
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/11.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/11.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "known": true,
+            "id": 12,
+            "pw": 1080,
+            "ph": 600,
+            "rect": {
+              "x": 216.0277862548828,
+              "y": 578.6944580078125,
+              "w": 489.40277099609375,
+              "h": 271.8888854980469
+            },
+            "fit": {
+              "x": 216.0291748046875,
+              "y": 578.6944580078125,
+              "w": 489.3999938964844,
+              "h": 271.8888854980469
+            },
+            "corners": [
+              {
+                "x": 229.62361907958984,
+                "y": 592.2889022827148
+              },
+              {
+                "x": 691.8347244262695,
+                "y": 592.2889022827148
+              },
+              {
+                "x": 229.62361907958984,
+                "y": 836.988899230957
+              },
+              {
+                "x": 691.8347244262695,
+                "y": 836.988899230957
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/12.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/12.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "known": true,
+            "id": 13,
+            "pw": 1080,
+            "ph": 600,
+            "rect": {
+              "x": 714.888916015625,
+              "y": 578.6944580078125,
+              "w": 489.40277099609375,
+              "h": 271.8888854980469
+            },
+            "fit": {
+              "x": 714.8903045654297,
+              "y": 578.6944580078125,
+              "w": 489.3999938964844,
+              "h": 271.8888854980469
+            },
+            "corners": [
+              {
+                "x": 728.484748840332,
+                "y": 592.2889022827148
+              },
+              {
+                "x": 1190.6958541870117,
+                "y": 592.2889022827148
+              },
+              {
+                "x": 728.484748840332,
+                "y": 836.988899230957
+              },
+              {
+                "x": 1190.6958541870117,
+                "y": 836.988899230957
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/13.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/13.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "known": true,
+            "id": 14,
+            "pw": 1080,
+            "ph": 600,
+            "rect": {
+              "x": 1214.5555419921875,
+              "y": 578.6944580078125,
+              "w": 489.40277099609375,
+              "h": 271.8888854980469
+            },
+            "fit": {
+              "x": 1214.5569305419922,
+              "y": 578.6944580078125,
+              "w": 489.3999938964844,
+              "h": 271.8888854980469
+            },
+            "corners": [
+              {
+                "x": 1228.1513748168945,
+                "y": 592.2889022827148
+              },
+              {
+                "x": 1690.3624801635742,
+                "y": 592.2889022827148
+              },
+              {
+                "x": 1228.1513748168945,
+                "y": 836.988899230957
+              },
+              {
+                "x": 1690.3624801635742,
+                "y": 836.988899230957
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/14.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/14.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "known": true,
+            "id": 15,
+            "pw": 1080,
+            "ph": 600,
+            "rect": {
+              "x": 596.6805419921875,
+              "y": 860.8333129882812,
+              "w": 726.625,
+              "h": 403.5
+            },
+            "fit": {
+              "x": 596.8430419921875,
+              "y": 860.8333129882812,
+              "w": 726.3,
+              "h": 403.5
+            },
+            "corners": [
+              {
+                "x": 617.0180419921875,
+                "y": 881.0083129882812
+              },
+              {
+                "x": 1302.9680419921874,
+                "y": 881.0083129882812
+              },
+              {
+                "x": 617.0180419921875,
+                "y": 1244.1583129882813
+              },
+              {
+                "x": 1302.9680419921874,
+                "y": 1244.1583129882813
+              }
+            ],
+            "letterboxMargins": [],
+            "cellBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "cellColor": "rgb(28, 27, 25)",
+            "cellSize": "480px 360px",
+            "cellRepeat": "repeat",
+            "opacity": "1",
+            "visibility": "visible",
+            "photoColor": "rgb(28, 27, 25)",
+            "backgroundImage": "url(\"https://gallery.fixture/photo/15.png\"), url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+            "size": "contain, 480px 360px",
+            "position": "50% 50%, 0% 0%",
+            "repeat": "no-repeat, repeat",
+            "inlineBackground": "url(\"https://gallery.fixture/photo/15.png\"), url(\"photo-doodles-dark.svg\")",
+            "animation": "none",
+            "willChange": "auto",
+            "captionCount": 0,
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "wallBackground": "url(\"https://gallery.fixture/photo-doodles-dark.svg\")",
+        "wallColor": "rgb(28, 27, 25)",
+        "wallSize": "480px 360px",
+        "wallRepeat": "repeat",
+        "ownerOpacity": "1",
+        "ownerVisibility": "visible",
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "svgRequests": 4,
+        "photoRequests": 19,
+        "computedChecksPassed": true,
+        "compositorFenceRequested": true,
+        "compositorFenceCompleted": true,
+        "screenshot": "gallery-replacement-letterbox.png",
+        "pixelCopy": true,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "outerMatteSamples": 241591,
+        "outerDoodleSamples": 3039,
+        "letterboxMatteSamples": 7150,
+        "letterboxDoodleSamples": 69,
+        "letterboxOutgoingColorPixels": 0,
+        "noOutgoingPhotoBleed": true
+      },
+      "sceneCount": 4,
+      "scope": "Generated legacy Gallery Wall appearance, whole-photo geometry and same-bucket replacement letterbox; no native SlideshowStage, FaceRenderer, clock, scheduler, resize or performance claim",
+      "unknownRequests": 0,
+      "deniedRequestDiagnostics": [],
+      "deniedRequestDiagnosticLimit": 16,
+      "webViewDestroyed": true,
+      "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+    },
+    "independentReplay": {
+      "recordedAtUtc": "2026-11-04T09:24:54.364958+00:00",
+      "clock": {
+        "start": "2026-11-04T09:14:51Z",
+        "target": "2026-11-04T09:29:51Z",
+        "hardDeadline": "2026-11-04T09:44:51Z",
+        "reset": false
+      },
+      "blockers": [],
+      "admittedForBoundedGeneratedAcceptance": true,
+      "fixtureSources": {
+        "java": {
+          "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/GalleryActivity.java",
+          "bytes": 18039,
+          "sha256": "8fb0225cc7928ea5b7f57f89f81e8b338ee82e4942003940bcd5be077e05e8fd"
+        },
+        "build": {
+          "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/build.sh",
+          "bytes": 1094,
+          "sha256": "d68a61d51a7fab26765da8c1db26d063a0e1f644f92efe990334fe216c8c8369"
+        },
+        "manifest": {
+          "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/AndroidManifest.xml",
+          "bytes": 489,
+          "sha256": "f5719b3f452849ecdfd1d30ef18fe7d0e8dc8484df6569968e988a31cd2f1db0"
+        }
+      },
+      "preparation": {
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/preparation-verification.json",
+        "bytes": 4540,
+        "sha256": "d2a9c53cb5bfed32832f3afdd9c0d2dcf60dbf8dda3ec118bd94fa811f610592"
+      },
+      "logicalGateBindings": {
+        "bootstrapAndComputedState": {
+          "bytes": 3975,
+          "sha256": "0ea826fb8b0daae242065a210f8db6549da814a3aca2b8b7727fc9180ec35f42"
+        },
+        "computedGates": {
+          "bytes": 2834,
+          "sha256": "076ecaec6324c14a6959787ef7723d1620c4d07a827fee5c84bc9b4ef16a05a4"
+        },
+        "nativePixelGates": {
+          "bytes": 3820,
+          "sha256": "df34ba9c5b36d82ff8f3ec93d9c6e4e599200cd12d32159cf210156bb0bd345c"
+        },
+        "retirementAndReport": {
+          "bytes": 1253,
+          "sha256": "d966baaa5706d4945589b539ecf6094900f866e8ec4fc5877b85a383841b7da9"
+        }
+      },
+      "frozenSourcesAndGatesByteIdentical": true,
+      "baselineAndCandidateFixtureDexByteIdentical": true,
+      "fixtureDex": {
+        "bytes": 26192,
+        "sha256": "db328668bb23ebe9e41b2ff39ab168fedf92760da5d1d535bb76e2f675817bfd"
+      },
+      "candidateFixture": {
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native/gallery-fixture.apk",
+        "bytes": 16835050,
+        "sha256": "c61052e93635de13b5d988ab89833cc64144110d35ae8a99487386c4c9f6570b"
+      },
+      "candidateEmbeddedSource": {
+        "bytes": 25886547,
+        "sha256": "0eeaf66d9b68682d440d4db15cc88d92ed4446cfae83b909d707a53a7aa87a11",
+        "retainedApkByteExact": true
+      },
+      "candidate": {
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/candidate-performance-1.143.apk",
+        "bytes": 25886547,
+        "sha256": "0eeaf66d9b68682d440d4db15cc88d92ed4446cfae83b909d707a53a7aa87a11"
+      },
+      "candidatePackage": {
+        "id": "com.immortal.launcher.debug",
+        "versionName": "1.143",
+        "versionCode": 137,
+        "signatureVerified": true,
+        "signatureOutput": "Signer #1 certificate DN: C=US, O=Android, CN=Android Debug\nSigner #1 certificate SHA-256 digest: 4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6\nSigner #1 certificate SHA-1 digest: e65320f666fe95bab747629a6bf61ff20a7f7198\nSigner #1 certificate MD5 digest: af3c51722615cf125d6d32c063ac9876"
+      },
+      "zeroFixturePermissions": true,
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": true
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": true
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": true
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "sha256": "e0473ddbeeb20561fcaf1f85aa4192fd69e5273081140064e48e29a7f815ed22",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": false
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": true
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": true
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": true
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": true
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": true
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+          "sourceByteExact": true,
+          "unchangedFromBaseline": false
+        }
+      ],
+      "baselineNativeReport": {
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native-before-report.json",
+        "bytes": 4321,
+        "sha256": "d332b1b6ce54b0cebf75e496b892d391559c3806a5fbbc8b0a1c2ed61012e663"
+      },
+      "baselineObservation": "Expected computed rejection in first scene: missing Gallery/cell SVG and missing opaque composed photo pattern. Ready generated photo and SVG decode, unknown requests zero, WebView destroyed. No baseline native pixel or per-scene RED claim.",
+      "candidateNativeReport": {
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native-after-report.json",
+        "bytes": 55150,
+        "sha256": "dad2bcafda2c83890c72bfb82596d7edd45aa4d0e2f6ee5ab58a9f756dd43b17"
+      },
+      "rootAdmission": {
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native-admission.json",
+        "bytes": 196,
+        "sha256": "c4cc7588ea604d66a3ed3a4cdda603e701e2ed8d91d38f3c73eb6815df359444"
+      },
+      "rootRetirement": {
+        "path": "/private/tmp/portal-gallery-doodles-20261104-091451/native-after-retirement.json",
+        "bytes": 81,
+        "sha256": "3d1c0a8c70d54d7caab181facc3d99873dd3ab1e58ed88f7b8510e891fd8771d"
+      },
+      "independentReplay": {
+        "photoCornersPass": 72,
+        "outerDoodleSamples": [
+          7466,
+          8149,
+          4579,
+          3039
+        ],
+        "replacementLetterboxDoodleSamples": 69,
+        "replacementOutgoingPhotoPixels": 0,
+        "allNativePixelCountsMatch": true,
+        "cornerRgbDistanceMaxUnchanged": 18,
+        "brightnessDeltaMinUnchanged": 25,
+        "scenes": [
+          {
+            "shape": "single-landscape",
+            "screenshot": {
+              "path": "/private/tmp/portal-gallery-doodles-20261104-091451/gallery-single-landscape.png",
+              "bytes": 78992,
+              "sha256": "62734251cf757a2df26e51869680ad3ef56e0e42ff0f02b656460260615c4866"
+            },
+            "photoCornerCount": 4,
+            "replayedCorners": [
+              {
+                "photoId": 0,
+                "corner": 0,
+                "point": [
+                  725,
+                  461
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 0,
+                "corner": 1,
+                "point": [
+                  1435,
+                  461
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 0,
+                "corner": 2,
+                "point": [
+                  725,
+                  979
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 0,
+                "corner": 3,
+                "point": [
+                  1435,
+                  979
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              }
+            ],
+            "independentPixelScan": {
+              "outerMatteSamples": 634029,
+              "outerDoodleSamples": 7466,
+              "letterboxMatteSamples": 0,
+              "letterboxDoodleSamples": 0,
+              "letterboxOutgoingColorPixels": 0
+            },
+            "nativeScanCountsMatchExactly": true
+          },
+          {
+            "shape": "single-portrait",
+            "screenshot": {
+              "path": "/private/tmp/portal-gallery-doodles-20261104-091451/gallery-single-portrait.png",
+              "bytes": 80732,
+              "sha256": "85b958678c42241f9d92b9cfc4df4cf2aff2e04edf96ecb11b48b3ef2bac83b7"
+            },
+            "photoCornerCount": 4,
+            "replayedCorners": [
+              {
+                "photoId": 1,
+                "corner": 0,
+                "point": [
+                  929,
+                  454
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 1,
+                "corner": 1,
+                "point": [
+                  1231,
+                  454
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 1,
+                "corner": 2,
+                "point": [
+                  929,
+                  986
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 1,
+                "corner": 3,
+                "point": [
+                  1231,
+                  986
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              }
+            ],
+            "independentPixelScan": {
+              "outerMatteSamples": 702293,
+              "outerDoodleSamples": 8149,
+              "letterboxMatteSamples": 0,
+              "letterboxDoodleSamples": 0,
+              "letterboxOutgoingColorPixels": 0
+            },
+            "nativeScanCountsMatchExactly": true
+          },
+          {
+            "shape": "mixed-six",
+            "screenshot": {
+              "path": "/private/tmp/portal-gallery-doodles-20261104-091451/gallery-mixed-six.png",
+              "bytes": 76789,
+              "sha256": "45795598a5c7d64bcff85a462ef2f03c0345144e5416644a1015950c088a00f3"
+            },
+            "photoCornerCount": 24,
+            "replayedCorners": [
+              {
+                "photoId": 0,
+                "corner": 0,
+                "point": [
+                  33,
+                  290
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 0,
+                "corner": 1,
+                "point": [
+                  403,
+                  290
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 0,
+                "corner": 2,
+                "point": [
+                  33,
+                  560
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 0,
+                "corner": 3,
+                "point": [
+                  403,
+                  560
+                ],
+                "rgb": [
+                  254,
+                  0,
+                  254
+                ],
+                "distance": 2,
+                "pass": true
+              },
+              {
+                "photoId": 1,
+                "corner": 0,
+                "point": [
+                  443,
+                  286
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 1,
+                "corner": 1,
+                "point": [
+                  601,
+                  286
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 1,
+                "corner": 2,
+                "point": [
+                  443,
+                  564
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 1,
+                "corner": 3,
+                "point": [
+                  601,
+                  564
+                ],
+                "rgb": [
+                  254,
+                  0,
+                  254
+                ],
+                "distance": 2,
+                "pass": true
+              },
+              {
+                "photoId": 2,
+                "corner": 0,
+                "point": [
+                  641,
+                  290
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 2,
+                "corner": 1,
+                "point": [
+                  911,
+                  290
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 2,
+                "corner": 2,
+                "point": [
+                  641,
+                  560
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 2,
+                "corner": 3,
+                "point": [
+                  911,
+                  560
+                ],
+                "rgb": [
+                  254,
+                  0,
+                  254
+                ],
+                "distance": 2,
+                "pass": true
+              },
+              {
+                "photoId": 3,
+                "corner": 0,
+                "point": [
+                  956,
+                  290
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 3,
+                "corner": 1,
+                "point": [
+                  2127,
+                  290
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 3,
+                "corner": 2,
+                "point": [
+                  956,
+                  560
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 3,
+                "corner": 3,
+                "point": [
+                  2127,
+                  560
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 4,
+                "corner": 0,
+                "point": [
+                  545,
+                  618
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 4,
+                "corner": 1,
+                "point": [
+                  1256,
+                  618
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 4,
+                "corner": 2,
+                "point": [
+                  545,
+                  1136
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 4,
+                "corner": 3,
+                "point": [
+                  1256,
+                  1136
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 5,
+                "corner": 0,
+                "point": [
+                  1320,
+                  611
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 5,
+                "corner": 1,
+                "point": [
+                  1622,
+                  611
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 5,
+                "corner": 2,
+                "point": [
+                  1320,
+                  1143
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 5,
+                "corner": 3,
+                "point": [
+                  1622,
+                  1143
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              }
+            ],
+            "independentPixelScan": {
+              "outerMatteSamples": 395013,
+              "outerDoodleSamples": 4579,
+              "letterboxMatteSamples": 0,
+              "letterboxDoodleSamples": 0,
+              "letterboxOutgoingColorPixels": 0
+            },
+            "nativeScanCountsMatchExactly": true
+          },
+          {
+            "shape": "replacement-letterbox",
+            "screenshot": {
+              "path": "/private/tmp/portal-gallery-doodles-20261104-091451/gallery-replacement-letterbox.png",
+              "bytes": 88141,
+              "sha256": "d5bef65106ae1e7a06cc717d0dc66685934cc8bedf7168cb35a687d14b042fb8"
+            },
+            "photoCornerCount": 40,
+            "replayedCorners": [
+              {
+                "photoId": 6,
+                "corner": 0,
+                "point": [
+                  258,
+                  33
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 6,
+                "corner": 1,
+                "point": [
+                  778,
+                  33
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  254
+                ],
+                "distance": 1,
+                "pass": true
+              },
+              {
+                "photoId": 6,
+                "corner": 2,
+                "point": [
+                  258,
+                  309
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 6,
+                "corner": 3,
+                "point": [
+                  778,
+                  309
+                ],
+                "rgb": [
+                  253,
+                  0,
+                  253
+                ],
+                "distance": 4,
+                "pass": true
+              },
+              {
+                "photoId": 16,
+                "corner": 0,
+                "point": [
+                  888,
+                  33
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 16,
+                "corner": 1,
+                "point": [
+                  1271,
+                  33
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 16,
+                "corner": 2,
+                "point": [
+                  888,
+                  309
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 16,
+                "corner": 3,
+                "point": [
+                  1271,
+                  309
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 8,
+                "corner": 0,
+                "point": [
+                  1382,
+                  33
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 8,
+                "corner": 1,
+                "point": [
+                  1902,
+                  33
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 8,
+                "corner": 2,
+                "point": [
+                  1382,
+                  309
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 8,
+                "corner": 3,
+                "point": [
+                  1902,
+                  309
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 9,
+                "corner": 0,
+                "point": [
+                  258,
+                  350
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 9,
+                "corner": 1,
+                "point": [
+                  778,
+                  350
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  254
+                ],
+                "distance": 1,
+                "pass": true
+              },
+              {
+                "photoId": 9,
+                "corner": 2,
+                "point": [
+                  258,
+                  625
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 9,
+                "corner": 3,
+                "point": [
+                  778,
+                  625
+                ],
+                "rgb": [
+                  253,
+                  0,
+                  253
+                ],
+                "distance": 4,
+                "pass": true
+              },
+              {
+                "photoId": 10,
+                "corner": 0,
+                "point": [
+                  820,
+                  350
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 10,
+                "corner": 1,
+                "point": [
+                  1340,
+                  350
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  254
+                ],
+                "distance": 1,
+                "pass": true
+              },
+              {
+                "photoId": 10,
+                "corner": 2,
+                "point": [
+                  820,
+                  625
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 10,
+                "corner": 3,
+                "point": [
+                  1340,
+                  625
+                ],
+                "rgb": [
+                  253,
+                  0,
+                  253
+                ],
+                "distance": 4,
+                "pass": true
+              },
+              {
+                "photoId": 11,
+                "corner": 0,
+                "point": [
+                  1382,
+                  350
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 11,
+                "corner": 1,
+                "point": [
+                  1902,
+                  350
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 11,
+                "corner": 2,
+                "point": [
+                  1382,
+                  625
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 11,
+                "corner": 3,
+                "point": [
+                  1902,
+                  625
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 12,
+                "corner": 0,
+                "point": [
+                  258,
+                  666
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 12,
+                "corner": 1,
+                "point": [
+                  778,
+                  666
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  254
+                ],
+                "distance": 1,
+                "pass": true
+              },
+              {
+                "photoId": 12,
+                "corner": 2,
+                "point": [
+                  258,
+                  942
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 12,
+                "corner": 3,
+                "point": [
+                  778,
+                  942
+                ],
+                "rgb": [
+                  253,
+                  0,
+                  253
+                ],
+                "distance": 4,
+                "pass": true
+              },
+              {
+                "photoId": 13,
+                "corner": 0,
+                "point": [
+                  820,
+                  666
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 13,
+                "corner": 1,
+                "point": [
+                  1340,
+                  666
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  254
+                ],
+                "distance": 1,
+                "pass": true
+              },
+              {
+                "photoId": 13,
+                "corner": 2,
+                "point": [
+                  820,
+                  942
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 13,
+                "corner": 3,
+                "point": [
+                  1340,
+                  942
+                ],
+                "rgb": [
+                  253,
+                  0,
+                  253
+                ],
+                "distance": 4,
+                "pass": true
+              },
+              {
+                "photoId": 14,
+                "corner": 0,
+                "point": [
+                  1382,
+                  666
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 14,
+                "corner": 1,
+                "point": [
+                  1902,
+                  666
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 14,
+                "corner": 2,
+                "point": [
+                  1382,
+                  942
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 14,
+                "corner": 3,
+                "point": [
+                  1902,
+                  942
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 15,
+                "corner": 0,
+                "point": [
+                  694,
+                  991
+                ],
+                "rgb": [
+                  0,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 15,
+                "corner": 1,
+                "point": [
+                  1466,
+                  991
+                ],
+                "rgb": [
+                  0,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 15,
+                "corner": 2,
+                "point": [
+                  694,
+                  1400
+                ],
+                "rgb": [
+                  255,
+                  255,
+                  0
+                ],
+                "distance": 0,
+                "pass": true
+              },
+              {
+                "photoId": 15,
+                "corner": 3,
+                "point": [
+                  1466,
+                  1400
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  255
+                ],
+                "distance": 0,
+                "pass": true
+              }
+            ],
+            "independentPixelScan": {
+              "outerMatteSamples": 241591,
+              "outerDoodleSamples": 3039,
+              "letterboxMatteSamples": 7150,
+              "letterboxDoodleSamples": 69,
+              "letterboxOutgoingColorPixels": 0
+            },
+            "nativeScanCountsMatchExactly": true
+          }
+        ]
+      },
+      "sourceAssessment": "Gallery replacement appends the dark SVG behind its admitted photo URL while preserving the opaque matte. Root and cell patterns use existing dark SVG. Layout, timers, decode, dissolve and photo fit are retained. No source blocker demonstrated.",
+      "deviceOperationsByReviewer": 0,
+      "productionOrFixtureGateEditsDuringAcceptance": false,
+      "limits": [
+        "Generated legacy WebView Gallery Wall scenes only. Native SlideshowStage Gallery Print/Spread unaffected and untested.",
+        "No actual FaceRenderer/native clock, native resize, scheduler, motion, performance or household photo claim.",
+        "Same-bucket replacement is exercised through actual Gallery swap; capture waits for stable incoming opacity1 and outgoing retirement, so no intermediate-fade opacity acceptance claim.",
+        "Retirement and native execution admitted from root retained artifacts; no live device command by reviewer.",
+        "This report does not itself promote or claim device delivery."
+      ]
+    },
+    "admission": {
+      "phase": "after",
+      "fixtureSha256": "c61052e93635de13b5d988ab89833cc64144110d35ae8a99487386c4c9f6570b",
+      "sourceSha256": "0eeaf66d9b68682d440d4db15cc88d92ed4446cfae83b909d707a53a7aa87a11"
+    },
+    "baselineRetirement": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "webViewDestroyed": true
+    },
+    "candidateRetirement": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "webViewDestroyed": true
+    }
+  },
+  "preview": {
+    "actualProductionEntryPoint": true,
+    "selectedObservedLayoutControl": "galleryWall",
+    "preparedLocalSamples": 9,
+    "viewport": [
+      2560,
+      1099
+    ],
+    "allComposedPhotoOwnersOpaque": true,
+    "photoSize": "contain, 480px 360px",
+    "rootDarkDoodleLoaded": true,
+    "screenshotDisplayedAndViewed": "desktop-gallery-wall.png",
+    "browserConsoleErrors": 0,
+    "ownedIsolatedTabClosed": true,
+    "userIabTabsUnchanged": true,
+    "limits": [
+      "Bundled local samples and simulated clock only",
+      "Observed simulated bottom clock overlaps one Gallery tile; separate placement follow-up first observed2026-11-04T09:21:05Z, deadline09:51:05Z; no placement correction in appearance slice"
+    ]
+  },
+  "gates": {
+    "gradleExit": 0,
+    "jvm": {
+      "tests": 4414,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 461
+    },
+    "slideshow": {
+      "tests": 372,
+      "pass": 372,
+      "exit": 0
+    },
+    "applicationJavaScript": {
+      "tests": 743,
+      "pass": 743,
+      "exit": 0
+    },
+    "strictFinalDocsExit": 0
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25886547,
+      "sha256": "0eeaf66d9b68682d440d4db15cc88d92ed4446cfae83b909d707a53a7aa87a11",
+      "app": {
+        "versionCode": 137,
+        "versionName": "1.143"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886547,
+        "sha256": "0eeaf66d9b68682d440d4db15cc88d92ed4446cfae83b909d707a53a7aa87a11",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 137,
+          "versionName": "1.143"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1610,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1989,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "queue": {
+    "oldTaskObjectsPreserved": 134,
+    "rawSuffixBytesPreserved": 441206,
+    "newTotal": 135,
+    "counts": {
+      "delivered": 85,
+      "verified": 40,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "defaultTaskPreserved": true
+  },
+  "protectedInputs": {
+    "version.json": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+    "catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+    "app/src/main/assets/catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+    "provisioning/fleetctl": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "provisioning/room-fleet.py": "723356471a6594a19c6e94ce34d64b6bdda34eeb3650c2603b18877923d28fce"
+  },
+  "limits": [
+    "Generated legacy Gallery Wall/API29 scenes only; native Gallery Print/Spread, actual clock/scheduler/resize/motion/performance/API28/Living visuals remain separate.",
+    "Saved Shuffle/fit stays; installed support does not establish the current Shuffle scene.",
+    "Desktop simulated Gallery clock overlap first observed09:21:05UTC, original hard09:51:05UTC retained as a separate placement follow-up.",
+    "No phone, live source media/provider/account, push or publication."
+  ],
+  "wholeProductGoal": "active",
+  "closedAt": "2026-11-04T09:26:40.214357+00:00",
+  "elapsedMinutes": 11.82,
+  "target15MinutesMet": true,
+  "originalHardDeadlineMet": true,
+  "registry": {
+    "family": {
+      "originalAndCopyMatchBaseline": true
+    },
+    "living": {
+      "originalAndCopyMatchBaseline": true
+    }
+  },
+  "cleanup": {
+    "copiedFleetRegistryAbsent": true,
+    "ownedDocsEnvironmentAndSiteAbsent": true,
+    "nativeFixtureRetired": true,
+    "ownedIsolatedBrowserTabClosed": true,
+    "userIabTabsUnchanged": true,
+    "existingPreviewServerRetained": true,
+    "preexistingPycacheNotStagedOrRemoved": true
+  }
+}

@@ -76,6 +76,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-gcell .ss-img, .ss-mcell .ss-img { transition: opacity 1.1s ease; }
 .ss-wall.gallery-wall { background: #1c1b19; }
 .gallery-wall .ss-gcell { background: #1c1b19; }
+.ss-wall.gallery-wall, .gallery-wall .ss-gcell { background-image: url("photo-doodles-dark.svg"); background-size: 480px 360px; }
 .ss-gcell .gallery-photo { opacity: 0; background-color: #1c1b19; animation: none; will-change: auto; }
 .ss-gcell .gallery-photo.on { opacity: 1; }
 .ss-gcell .gallery-photo.retired { opacity: 0; visibility: hidden; transition: none; }

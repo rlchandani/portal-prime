@@ -1,0 +1,398 @@
+{
+  "ok": true,
+  "clock": {
+    "start": "2026-11-04T09:14:51Z",
+    "hardDeadline": "2026-11-04T09:44:51Z",
+    "reset": false
+  },
+  "scope": "Gallery appearance only; opaque photo-owned matte retained",
+  "sourceBindings": [
+    {
+      "role": "baseline-css",
+      "path": "/private/tmp/portal-gallery-doodles-20261104-091451/styles.css.before",
+      "sha256": "5b227662f9a5f1d66d499db5cb0da3b0c23103fc0e91ff40534c3eb8491aeb1d"
+    },
+    {
+      "role": "baseline-mode",
+      "path": "/private/tmp/portal-gallery-doodles-20261104-091451/mode-impls.js.before",
+      "sha256": "6cfa1ba98a8169f8d2f58615454c7d4381c834c9fc1513895accd87895b1fad0"
+    },
+    {
+      "role": "candidate-css",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css",
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+    },
+    {
+      "role": "candidate-mode",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js",
+      "sha256": "e0473ddbeeb20561fcaf1f85aa4192fd69e5273081140064e48e29a7f815ed22"
+    },
+    {
+      "role": "motion-test",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/slideshow_photo_motion.test.mjs",
+      "sha256": "0e85c1c927aa8a1b831719ce988265abff8a47123780a210671e9f7ac44bc00d"
+    },
+    {
+      "role": "fixture-helper",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/helpers/slideshow_scene_fixture.mjs",
+      "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0"
+    },
+    {
+      "role": "frozen-motion-test",
+      "path": "/private/tmp/portal-gallery-doodles-20261104-091451/slideshow_photo_motion.test.mjs.before",
+      "sha256": "7c2c2d823bb36f6948bdb1bf315d0d5fd9cab7f0d40edb500228c90183f78580"
+    }
+  ],
+  "productionNormalization": {
+    "cssAddedLines": 1,
+    "modeAddedLines": 5,
+    "allOtherCssAndModeBytesEqual": true
+  },
+  "testNormalization": {
+    "helperSha256": "a207adf662fc90ecb19dfc622f5773d8780e746ce29b6d260ddb0c70487eff4e",
+    "galleryGoldenUnchanged": true,
+    "allOtherGoldenEntriesUnchanged": true,
+    "normalizedFields": [
+      "root/cell computed background-image and background-size",
+      "photo inline/computed backgroundImage/Size/Position/Repeat only"
+    ],
+    "validatedBeforeNormalization": [
+      "exact local SVG second layer with photo first",
+      "480px 360px",
+      "contain centered nonrepeating photo",
+      "opaque #1c1b19 root/cell/photo matte",
+      "computed background fields equal inline values",
+      "prepared photo URL exists in source resource trace"
+    ],
+    "allGoldenEntriesByteIdentical": true,
+    "allOtherTestBytesRestoredExactly": true
+  },
+  "verification": {
+    "command": "node --test scripts/tests/slideshow_photo_motion.test.mjs",
+    "terminalExit": 0,
+    "tests": 54,
+    "pass": 54,
+    "fail": 0,
+    "skips": 0
+  },
+  "pairedTraces": [
+    {
+      "photoMotion": "legacy-undefined",
+      "beforeHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+      "candidateRawHash": "2f9f4da25c1e48ab9e97f801e3c4e67fd605415017e21da477b3d6995c67d796",
+      "candidateNormalizedHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+      "beforeRandomDraws": 5,
+      "candidateRandomDraws": 5,
+      "checkpoints": [
+        {
+          "timeMs": 0,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 3500,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 5000,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            6200,
+            10000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 7500,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            10000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 10000,
+          "nodeCount": 32,
+          "cursor": 15,
+          "resources": 12,
+          "loads": 12,
+          "timers": [
+            11200,
+            15000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 15000,
+          "nodeCount": 32,
+          "cursor": 22,
+          "resources": 13,
+          "loads": 13,
+          "timers": [
+            16200,
+            20000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 27500,
+          "nodeCount": 32,
+          "cursor": 31,
+          "resources": 15,
+          "loads": 15,
+          "timers": [
+            30000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        }
+      ]
+    },
+    {
+      "photoMotion": true,
+      "beforeHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+      "candidateRawHash": "2f9f4da25c1e48ab9e97f801e3c4e67fd605415017e21da477b3d6995c67d796",
+      "candidateNormalizedHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+      "beforeRandomDraws": 5,
+      "candidateRandomDraws": 5,
+      "checkpoints": [
+        {
+          "timeMs": 0,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 3500,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 5000,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            6200,
+            10000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 7500,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            10000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 10000,
+          "nodeCount": 32,
+          "cursor": 15,
+          "resources": 12,
+          "loads": 12,
+          "timers": [
+            11200,
+            15000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 15000,
+          "nodeCount": 32,
+          "cursor": 22,
+          "resources": 13,
+          "loads": 13,
+          "timers": [
+            16200,
+            20000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 27500,
+          "nodeCount": 32,
+          "cursor": 31,
+          "resources": 15,
+          "loads": 15,
+          "timers": [
+            30000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        }
+      ]
+    },
+    {
+      "photoMotion": false,
+      "beforeHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+      "candidateRawHash": "2f9f4da25c1e48ab9e97f801e3c4e67fd605415017e21da477b3d6995c67d796",
+      "candidateNormalizedHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+      "beforeRandomDraws": 5,
+      "candidateRandomDraws": 5,
+      "checkpoints": [
+        {
+          "timeMs": 0,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 3500,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 5000,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            6200,
+            10000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 7500,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            10000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 10000,
+          "nodeCount": 32,
+          "cursor": 15,
+          "resources": 12,
+          "loads": 12,
+          "timers": [
+            11200,
+            15000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 15000,
+          "nodeCount": 32,
+          "cursor": 22,
+          "resources": 13,
+          "loads": 13,
+          "timers": [
+            16200,
+            20000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        },
+        {
+          "timeMs": 27500,
+          "nodeCount": 32,
+          "cursor": 31,
+          "resources": 15,
+          "loads": 15,
+          "timers": [
+            30000
+          ],
+          "opacityExact": true,
+          "geometryExact": true,
+          "resourcesExact": true
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Host fixture checks DOM/CSS inputs and simulated lifecycle, not native rasterization.",
+    "Static SVG visibility and old/new photo pixel ownership require the separately owned native fixture.",
+    "No device, provider, registry, media/account or network calls.",
+    "No motion, geometry, timers, scheduling or performance claims beyond the exact host traces."
+  ]
+}

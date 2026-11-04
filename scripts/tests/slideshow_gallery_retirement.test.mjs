@@ -43,7 +43,10 @@ test('Gallery Wall shows static whole photos with every tile inside the viewport
     for (const image of photos(r)) {
       assert.equal(r.state(image).animation, 'none', 'A wall tile must not animate continuously');
       assert.equal(r.state(image).promotion, 'auto');
-      assert.equal(r.computed(image)['background-size'], 'contain');
+      assert.equal(r.computed(image)['background-size'], 'contain, 480px 360px');
+      assert.match(image.style.backgroundImage, /^url\("[^"]+"\), url\("photo-doodles-dark\.svg"\)$/);
+      assert.equal(r.computed(image)['background-position'], 'center, left top');
+      assert.equal(r.computed(image)['background-repeat'], 'no-repeat, repeat');
       assert.equal(r.computed(image)['background-color'], '#1c1b19',
         'The incoming matte must cover outgoing-photo margins before retirement');
       assert.equal(r.state(image).opacity, 1);
@@ -203,7 +206,7 @@ test('recovered dimensions recalculate the same admitted photos before wall publ
     r.finishLoad(); assert.equal(await r.cleanup.ready, true);
     inside(r);
     const admitted = new Set(r.resolutions.map(n => `url("${n.url}")`));
-    assert.ok(photos(r).every(n => admitted.has(n.style.backgroundImage)));
+    assert.ok(photos(r).every(n => admitted.has(/^url\("[^"]+"\)/.exec(n.style.backgroundImage)?.[0])));
     assert.equal(new Set(photos(r).map(n => n.style.backgroundImage)).size, photos(r).length);
   } finally { r.cleanup(); }
 });
