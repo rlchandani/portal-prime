@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T08:15:12.137352+00:00",
-  "updatedLabel": "News numeric references delivered1.139; other scopes retained",
+  "updatedAt": "2026-11-04T08:25:00.379118+00:00",
+  "updatedLabel": "Local deploy APK snapshot verified; room1.139 and other scopes retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,47 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "deploy-apk-snapshot",
+      "title": "Fleet deploy: keep one selected APK for every room",
+      "summary": "A private APK copy binds hashing and every installer handoff despite original-path changes.",
+      "status": "verified",
+      "verification": "10 frozen cases · existing real CLI loopback · host-only",
+      "kind": "Local fleet deployment input integrity",
+      "platforms": [
+        "host"
+      ],
+      "owner": "Fleet engineering / independent review",
+      "deployment": "Local helper implementation only; room 1.139/code133 and public 1.83/code77 unchanged.",
+      "acceptance": [
+        "Copy and hash once before room preflight; hand each selected room the same private file.",
+        "Preserve installed-byte verification, acknowledgment handling and optional screen return.",
+        "Retire the owned copy on completion, failures and interruption; retain unrelated files."
+      ],
+      "evidence": [
+        {
+          "text": "Focused change, generated proof and limits.",
+          "source": "docs/portal-deploy-apk-snapshot-2026-11-04.md"
+        },
+        {
+          "text": "Frozen regression, real CLI loopback, gates and review.",
+          "source": "mocks/portal-deploy-snapshot-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Host generated-file tests and actual existing CLI with synthetic loopback install acknowledgment; no Android installer or real device acceptance.",
+        "No new Rust compilation; existing CLI unchanged. Input streaming is not an atomic filesystem snapshot against concurrent writes during the copy.",
+        "No phone, owner registry, live media/provider/account, GitHub push or publication."
+      ],
+      "next": "Return to distinct visible screensaver slices; earlier parked scopes and clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-04T08:16:54Z",
+        "target": "2026-11-04T08:31:54Z",
+        "deadline": "2026-11-04T08:46:54Z",
+        "scope": "Local deploy APK input snapshot; host regression, existing CLI loopback and closure.",
+        "sourceBase": "694ea2b7821557c38d46a8a2caf160ec59e3cae0"
+      }
+    },
     {
       "id": "news-numeric-entities",
       "title": "News: readable numeric character references",

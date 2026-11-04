@@ -548,9 +548,10 @@ class RoomFleetTest(unittest.TestCase):
         def run(command, **kwargs):
             name = command[-1]
             case.assertEqual(command, [
-                "/fake/fleetctl", "dev", "update", str(apk), "--package", package,
+                "/fake/fleetctl", "dev", "update", command[3], "--package", package,
                 "--device", name,
             ])
+            case.assertEqual(Path(command[3]).read_bytes(), payload)
             case.assertEqual(kwargs["env"]["IMMORTAL_FLEET_DIR"], str(self.registry))
             observed["commands"].append(name)
             observed["events"].append("install")

@@ -504,16 +504,29 @@ def deploy(cli, registry, rooms, apk, package, after_install="leave"):
         raise FleetError("invalid package name")
     if after_install not in {"leave", "home", "screensaver"}:
         raise FleetError("invalid after-install screen")
-    digest, size = hashlib.sha256(), 0
     try:
-        with Path(apk).open("rb") as stream:
-            for chunk in iter(lambda: stream.read(65536), b""):
-                size += len(chunk)
-                digest.update(chunk)
+        directory = tempfile.TemporaryDirectory(prefix="immortal-deploy-")
     except OSError:
-        raise FleetError("cannot read local APK") from None
-    if not size:
-        raise FleetError("local APK is empty")
+        raise FleetError("cannot prepare local APK") from None
+    with directory as temporary:
+        snapshot = Path(temporary) / "snapshot.apk"
+        digest, size = hashlib.sha256(), 0
+        try:
+            with Path(apk).open("rb") as stream, snapshot.open("xb") as frozen:
+                for chunk in iter(lambda: stream.read(65536), b""):
+                    frozen.write(chunk)
+                    size += len(chunk)
+                    digest.update(chunk)
+            snapshot.chmod(0o600)
+        except OSError:
+            raise FleetError("cannot prepare local APK") from None
+        if not size:
+            raise FleetError("local APK is empty")
+        return _deploy_snapshot(cli, registry, rooms, snapshot, package,
+                                digest.hexdigest(), size, after_install)
+
+
+def _deploy_snapshot(cli, registry, rooms, apk, package, digest, size, after_install):
     failed = False
     for room in rooms:
         try:
@@ -556,7 +569,7 @@ def deploy(cli, registry, rooms, apk, package, after_install="leave"):
                             raise Retryable("installed APK path and mtime are unchanged")
                         actual = deploy_get(room, "/fs/read?" + urlencode({"path": current[0]}),
                                             size + 1, 30, deadline, hashing=True)
-                        if actual != (size, digest.hexdigest()):
+                        if actual != (size, digest):
                             raise FleetError("installed APK SHA-256 mismatch")
                         break
                     except Retryable:

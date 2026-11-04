@@ -228,6 +228,11 @@ python3 room-fleet.py deploy /path/to/signed.apk --device "Living Room" \
   --package com.immortal.launcher.debug --after-install screensaver
 ```
 
+`deploy` first copies and hashes the local APK into a private temporary directory.
+Every selected room receives that same copy, even if the original file changes or
+is deleted while deployment is running. The copy is removed when the group attempt
+ends, including failures and interruptions. Allow disk space for one extra APK.
+
 `--after-install home` opens Immortal Home; the default `leave` sends no navigation
 request. These options apply only when replacing the running agent's own package.
 They reuse the existing fleet token and do not select Android's default Home app.

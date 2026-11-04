@@ -1,0 +1,570 @@
+{
+  "schemaVersion": 1,
+  "status": "host verified; local tooling only",
+  "issueClock": {
+    "startedAt": "2026-11-04T08:16:54Z",
+    "target": "2026-11-04T08:31:54Z",
+    "deadline": "2026-11-04T08:46:54Z",
+    "reset": false
+  },
+  "sourceBase": "694ea2b7821557c38d46a8a2caf160ec59e3cae0",
+  "bindings": {
+    "provisioning/room-fleet.py": {
+      "bytes": 29758,
+      "sha256": "723356471a6594a19c6e94ce34d64b6bdda34eeb3650c2603b18877923d28fce"
+    },
+    "provisioning/test_deploy_snapshot.py": {
+      "bytes": 11410,
+      "sha256": "039f712cb138c4ca2c5bdaffb5caec4c7a2e350141f9a5426588538e0bb67b94"
+    },
+    "provisioning/test_room_fleet.py": {
+      "bytes": 60185,
+      "sha256": "75383af1c9bfbb3d677c5779d649bb9c40c3f59545ac5d1e11ba5684db135931"
+    },
+    ".github/workflows/provisioning.yml": {
+      "bytes": 7569,
+      "sha256": "a991e425893376f095ddee726528b801e15a4bb11ec38463bc0e2e1d86347544"
+    },
+    "mocks/portal-deploy-snapshot-20261104/loopback_handoff.py": {
+      "bytes": 5540,
+      "sha256": "3a6a394b209fdb8445abdeb90581bc6e5f528087762ddcb3062d315f01294e6b"
+    }
+  },
+  "regressionAdapter": {
+    "frozenSha256": "5806102d4af05760d4e6d947cabf7aefeb2e27fc7167cde9029ecdeb7b3ee94c",
+    "portableSha256": "039f712cb138c4ca2c5bdaffb5caec4c7a2e350141f9a5426588538e0bb67b94",
+    "testClassBodyUnchanged": true,
+    "adapter": "only repository-relative source default"
+  },
+  "acceptedBaseline": {
+    "schemaVersion": 1,
+    "status": "accepted_unchanged_source_regression",
+    "startedAtUtc": "2026-11-04T08:21:33.162025+00:00",
+    "finishedAtUtc": "2026-11-04T08:21:33.172555+00:00",
+    "source": {
+      "path": "/private/tmp/portal-deploy-snapshot-20261104-081654/review-baseline-room-fleet.py",
+      "gitCommit": "694ea2b7821557c38d46a8a2caf160ec59e3cae0",
+      "bytes": 29135,
+      "sha256": "7d0ca1b4cef2ab27e7b0a4e09de3e49cdac2a220e2fbea98596fb42f7ee79a80"
+    },
+    "fixture": {
+      "path": "/private/tmp/portal-deploy-snapshot-20261104-081654/test_deploy_snapshot.py",
+      "bytes": 11455,
+      "sha256": "5806102d4af05760d4e6d947cabf7aefeb2e27fc7167cde9029ecdeb7b3ee94c",
+      "frozen": true
+    },
+    "methodsRun": 10,
+    "assertionFailures": 11,
+    "errors": 0,
+    "skips": 0,
+    "rows": [
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_cli_exception_retires_snapshot_and_preserves_original (failure='OSError')",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "PosixPath('/private/var/folders/xf/__wqn7vx59zdcbj_hk73xfjw0000gp/T/snapshot-case-zzcokp_x/selected.apk') == PosixPath('/private/var/folders/xf/__wqn7vx59zdcbj_hk73xfjw0000gp/T/snapshot-case-zzcokp_x/selected.apk') : CLI still receives the caller's mutable pathname"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_cli_exception_retires_snapshot_and_preserves_original (failure='RuntimeError')",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "PosixPath('/private/var/folders/xf/__wqn7vx59zdcbj_hk73xfjw0000gp/T/snapshot-case-zzcokp_x/selected.apk') == PosixPath('/private/var/folders/xf/__wqn7vx59zdcbj_hk73xfjw0000gp/T/snapshot-case-zzcokp_x/selected.apk') : CLI still receives the caller's mutable pathname"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_empty_and_missing_inputs_never_reach_cli_or_device_preflight (missing=False)",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_empty_and_missing_inputs_never_reach_cli_or_device_preflight (missing=True)",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_empty_and_missing_inputs_never_reach_cli_or_device_preflight",
+        "outcome": "passed"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_first_room_rejection_continues_and_cleans_group_snapshot",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "PosixPath('/private/var/folders/xf/__wqn7vx59zdcbj_hk73xfjw0000gp/T/snapshot-case-uqzt6x3k/selected.apk') == PosixPath('/private/var/folders/xf/__wqn7vx59zdcbj_hk73xfjw0000gp/T/snapshot-case-uqzt6x3k/selected.apk') : CLI still receives the caller's mutable pathname"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_group_input_changes_between_rooms_cannot_change_second_handoff (mutation='overwrite')",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "1 != 0"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_group_input_changes_between_rooms_cannot_change_second_handoff (mutation='delete')",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "1 != 0"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_group_uses_one_private_snapshot_path_and_retires_it",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "Lists differ: [36, 36] != [0, 0]\n\nFirst differing element 0:\n36\n0\n\n- [36, 36]\n+ [0, 0]"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_keyboard_interrupt_retires_snapshot_and_remains_interrupt",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "PosixPath('/private/var/folders/xf/__wqn7vx59zdcbj_hk73xfjw0000gp/T/snapshot-case-fpsr6hpg/selected.apk') == PosixPath('/private/var/folders/xf/__wqn7vx59zdcbj_hk73xfjw0000gp/T/snapshot-case-fpsr6hpg/selected.apk') : CLI still receives the caller's mutable pathname"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_original_deleted_after_hash_does_not_abort_selected_deployment (self_update=False)",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "1 != 0"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_original_deleted_after_hash_does_not_abort_selected_deployment (self_update=True)",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "1 != 0"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_original_overwrite_after_hash_cannot_change_cli_bytes (self_update=False)",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "Lists differ: [b'generated replacement APK B'] != [b'generated selected APK A']\n\nFirst differing element 0:\nb'generated replacement APK B'\nb'generated selected APK A'\n\n- [b'generated replacement APK B']\n?              ^ - ^  ^^^^     ^\n\n+ [b'generated selected APK A']\n?              ^  ^ + ^     ^\n"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_original_overwrite_after_hash_cannot_change_cli_bytes (self_update=True)",
+        "outcome": "failure",
+        "exception": "AssertionError",
+        "message": "Lists differ: [b'generated replacement APK B'] != [b'generated selected APK A']\n\nFirst differing element 0:\nb'generated replacement APK B'\nb'generated selected APK A'\n\n- [b'generated replacement APK B']\n?              ^ - ^  ^^^^     ^\n\n+ [b'generated selected APK A']\n?              ^  ^ + ^     ^\n"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_stable_nonself_update_preserves_native_acknowledgment",
+        "outcome": "passed"
+      },
+      {
+        "name": "frozen_deploy_regression.DeploySnapshotTest.test_stable_self_update_reads_selected_bytes_and_verifies_actual_hash",
+        "outcome": "passed"
+      }
+    ],
+    "excludedInitialRun": "Unresolved /var alias in fake CLI registry assertion; corrected setup only. All first-run failures are excluded. Initial source/log/record retained.",
+    "scope": "Actual fleet.deploy orchestration; generated files and inert HTTP/CLI boundaries. Remote hash computes actual CLI-read bytes; no expected-byte substitution. No network/device/source writes. Temporary case roots auto-retired."
+  },
+  "candidate": {
+    "methodsRun": 10,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "rows": [
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_cli_exception_retires_snapshot_and_preserves_original (failure='OSError')",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_cli_exception_retires_snapshot_and_preserves_original (failure='RuntimeError')",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_cli_exception_retires_snapshot_and_preserves_original",
+        "outcome": "passed"
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_empty_and_missing_inputs_never_reach_cli_or_device_preflight (missing=False)",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_empty_and_missing_inputs_never_reach_cli_or_device_preflight (missing=True)",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_empty_and_missing_inputs_never_reach_cli_or_device_preflight",
+        "outcome": "passed"
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_first_room_rejection_continues_and_cleans_group_snapshot",
+        "outcome": "passed"
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_group_input_changes_between_rooms_cannot_change_second_handoff (mutation='overwrite')",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_group_input_changes_between_rooms_cannot_change_second_handoff (mutation='delete')",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_group_input_changes_between_rooms_cannot_change_second_handoff",
+        "outcome": "passed"
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_group_uses_one_private_snapshot_path_and_retires_it",
+        "outcome": "passed"
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_keyboard_interrupt_retires_snapshot_and_remains_interrupt",
+        "outcome": "passed"
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_original_deleted_after_hash_does_not_abort_selected_deployment (self_update=False)",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_original_deleted_after_hash_does_not_abort_selected_deployment (self_update=True)",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_original_deleted_after_hash_does_not_abort_selected_deployment",
+        "outcome": "passed"
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_original_overwrite_after_hash_cannot_change_cli_bytes (self_update=False)",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_original_overwrite_after_hash_cannot_change_cli_bytes (self_update=True)",
+        "outcome": "passed-subcase",
+        "exception": null,
+        "message": null
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_original_overwrite_after_hash_cannot_change_cli_bytes",
+        "outcome": "passed"
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_stable_nonself_update_preserves_native_acknowledgment",
+        "outcome": "passed"
+      },
+      {
+        "name": "independent_frozen_deploy_regression.DeploySnapshotTest.test_stable_self_update_reads_selected_bytes_and_verifies_actual_hash",
+        "outcome": "passed"
+      }
+    ],
+    "baselineMethodsRun": 10,
+    "baselineAssertionFailures": 11,
+    "baselinePassingMethods": 3,
+    "baselineErrors": 0,
+    "excludedInitialRun": "The initial13 failures had a /var alias fixture assertion error; retained and excluded. Accepted baseline/candidate fixture SHA is identical."
+  },
+  "actualExistingCliLoopback": {
+    "cases": [
+      {
+        "mutateOriginalAtInfoAfterHash": false,
+        "result": 0,
+        "uploadCount": 1,
+        "installRequestCount": 1,
+        "uploadSha256": [
+          "012c10836ca38b969da9bcb3505a8ffde98b902ed3ca14d289c59652c5cb23db"
+        ],
+        "uploadedSelectedBytes": true,
+        "selectedSha256": "012c10836ca38b969da9bcb3505a8ffde98b902ed3ca14d289c59652c5cb23db",
+        "requests": [
+          [
+            "GET",
+            "/info"
+          ],
+          [
+            "GET",
+            "/fs/read?path=%2Fproc%2Fself%2Fmaps"
+          ],
+          [
+            "POST",
+            "/dev"
+          ],
+          [
+            "POST",
+            "/fs/write?path=%2Fsdcard%2FAndroid%2Fdata%2Fcom.immortal.launcher.debug%2Ffiles%2Fdev%2Fimmortal-dev.apk"
+          ],
+          [
+            "POST",
+            "/install"
+          ]
+        ],
+        "output": "Generated Room: deployed com.immortal.launcher.debug (native result: installed)\n",
+        "scope": "Actual existing native CLI byte read/upload/install request; synthetic loopback ACK only, no Android installer."
+      },
+      {
+        "mutateOriginalAtInfoAfterHash": true,
+        "result": 0,
+        "uploadCount": 1,
+        "installRequestCount": 1,
+        "uploadSha256": [
+          "012c10836ca38b969da9bcb3505a8ffde98b902ed3ca14d289c59652c5cb23db"
+        ],
+        "uploadedSelectedBytes": true,
+        "selectedSha256": "012c10836ca38b969da9bcb3505a8ffde98b902ed3ca14d289c59652c5cb23db",
+        "requests": [
+          [
+            "GET",
+            "/info"
+          ],
+          [
+            "GET",
+            "/fs/read?path=%2Fproc%2Fself%2Fmaps"
+          ],
+          [
+            "POST",
+            "/dev"
+          ],
+          [
+            "POST",
+            "/fs/write?path=%2Fsdcard%2FAndroid%2Fdata%2Fcom.immortal.launcher.debug%2Ffiles%2Fdev%2Fimmortal-dev.apk"
+          ],
+          [
+            "POST",
+            "/install"
+          ]
+        ],
+        "output": "Generated Room: deployed com.immortal.launcher.debug (native result: installed)\n",
+        "scope": "Actual existing native CLI byte read/upload/install request; synthetic loopback ACK only, no Android installer."
+      }
+    ],
+    "ownedCleanup": true,
+    "candidateBothCasesConsumeSelectedA": true,
+    "oneUploadAndOneInstallRequestPerCase": true,
+    "baselineMutationUploadedBAndReportedSuccess": true
+  },
+  "independentReview": {
+    "recordedAt": "2026-11-04T08:24:52.649401+00:00",
+    "status": "accepted",
+    "blockers": [],
+    "clock": {
+      "start": "2026-11-04T08:16:54Z",
+      "target": "2026-11-04T08:31:54Z",
+      "deadline": "2026-11-04T08:46:54Z",
+      "reset": false
+    },
+    "bindings": [
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/provisioning/room-fleet.py",
+        "sha256": "723356471a6594a19c6e94ce34d64b6bdda34eeb3650c2603b18877923d28fce",
+        "bytes": 29758
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/provisioning/test_room_fleet.py",
+        "sha256": "75383af1c9bfbb3d677c5779d649bb9c40c3f59545ac5d1e11ba5684db135931",
+        "bytes": 60185
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/provisioning/test_deploy_snapshot.py",
+        "sha256": "039f712cb138c4ca2c5bdaffb5caec4c7a2e350141f9a5426588538e0bb67b94",
+        "bytes": 11410
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/.github/workflows/provisioning.yml",
+        "sha256": "a991e425893376f095ddee726528b801e15a4bb11ec38463bc0e2e1d86347544",
+        "bytes": 7569
+      },
+      {
+        "path": "/private/tmp/portal-deploy-snapshot-20261104-081654/review-baseline-room-fleet.py",
+        "sha256": "7d0ca1b4cef2ab27e7b0a4e09de3e49cdac2a220e2fbea98596fb42f7ee79a80",
+        "bytes": 29135
+      },
+      {
+        "path": "/private/tmp/portal-deploy-snapshot-20261104-081654/test_deploy_snapshot.py",
+        "sha256": "5806102d4af05760d4e6d947cabf7aefeb2e27fc7167cde9029ecdeb7b3ee94c",
+        "bytes": 11455
+      },
+      {
+        "path": "/private/tmp/portal-deploy-snapshot-20261104-081654/snapshot-baseline.json",
+        "sha256": "7fbee6ca03ccc2341d010f30f69db3165274193f3a4a396b1c4ceb5ee4c7c7fd",
+        "bytes": 6575
+      },
+      {
+        "path": "/private/tmp/portal-deploy-snapshot-20261104-081654/regression-adapter.json",
+        "sha256": "d619c4b92a1f54c3a3ae31ac47e02c69279f4cad9375278fda1af4e14ad2103f",
+        "bytes": 267
+      }
+    ],
+    "independentFrozenReplays": {
+      "baseline": {
+        "methods": 10,
+        "assertionFailures": 11,
+        "errors": 0,
+        "terminalExit": 1,
+        "controlMethods": 3
+      },
+      "candidate": {
+        "methods": 10,
+        "assertionFailures": 0,
+        "errors": 0,
+        "terminalExit": 0
+      }
+    },
+    "excludedInitialBaselineRetained": "Unresolved /var alias in fake CLI registry assertion; corrected setup only. All first-run failures are excluded. Initial source/log/record retained.",
+    "testClassBodyUnchanged": true,
+    "portableAdapterOnly": "repository-relative default source path",
+    "sharedDeployCases": {
+      "methods": 22,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "validationAndSafeErrorChecks": [
+      "invalid package name",
+      "invalid after-install screen",
+      "cannot prepare local APK"
+    ],
+    "sourceReview": [
+      "Package and after-install values validated before temporary-directory/file I/O; empty/missing APK stops before room preflight/CLI.",
+      "Snapshot created exclusively within owned private TemporaryDirectory; checksum/size derive from chunks written to that same file; filechmod0600 before handoff; one snapshot path for all selected rooms.",
+      "Context owns copy through complete group handoff/verification/screen return, removes it on normal completion, caught room errors, unexpected failure, and KeyboardInterrupt.",
+      "Per-room install result parsing, ambiguous ACK reconciliation, installed size/hash verification, screen return behavior and status handlers remain intact; only deploy receives frozen pathname and string digest.",
+      "New CI fixture included in push/pull_request filters and test invocation; shared fixture now verifies consumed bytes rather than original pathname."
+    ],
+    "limitations": [
+      "Host-generated files and inert CLI/HTTP mocks only; no actual device/phone/provider/owner registry access, no owner APK installation or signing/publication proof.",
+      "Snapshot bytes are captured during the initial copy; no claim of atomic consistency if an unrelated writer modifies the source in place during copying.",
+      "Unexpected OS cleanup failures and forcible process termination are not covered by frozen ordinary-failure/KeyboardInterrupt tests."
+    ]
+  },
+  "hostGates": {
+    "totalMethods": 199,
+    "methodCounts": {
+      "test_deploy_snapshot": 10,
+      "test_fleet_backup": 23,
+      "test_fleet_http": 28,
+      "test_fleet_ports": 12,
+      "test_fleet_registry_encoding": 10,
+      "test_fleet_restore": 48,
+      "test_room_fleet": 60,
+      "test_room_registry_encoding": 8
+    },
+    "commands": {
+      "test_deploy_snapshot": [
+        "python3",
+        "-B",
+        "provisioning/test_deploy_snapshot.py",
+        "-v"
+      ],
+      "test_fleet_backup": [
+        "python3",
+        "-B",
+        "provisioning/test_fleet_backup.py",
+        "-v"
+      ],
+      "test_fleet_http": [
+        "python3",
+        "-B",
+        "provisioning/test_fleet_http.py",
+        "-v"
+      ],
+      "test_fleet_ports": [
+        "python3",
+        "-B",
+        "provisioning/test_fleet_ports.py",
+        "-v"
+      ],
+      "test_fleet_registry_encoding": [
+        "python3",
+        "-B",
+        "provisioning/test_fleet_registry_encoding.py",
+        "-v"
+      ],
+      "test_fleet_restore": [
+        "python3",
+        "-B",
+        "provisioning/test_fleet_restore.py",
+        "-v"
+      ],
+      "test_room_fleet": [
+        "python3",
+        "-B",
+        "provisioning/test_room_fleet.py",
+        "-v"
+      ],
+      "test_room_registry_encoding": [
+        "python3",
+        "-B",
+        "provisioning/test_room_registry_encoding.py",
+        "-v"
+      ],
+      "bash-syntax": [
+        "bash",
+        "-n",
+        "provisioning/provision.sh",
+        "provisioning/fleet-backup.sh",
+        "provisioning/fleet-restore.sh"
+      ]
+    },
+    "allExitZero": true,
+    "setupCorrection": {
+      "excludedInitialRuns": [
+        "test_fleet_http",
+        "test_fleet_ports",
+        "test_fleet_registry_encoding"
+      ],
+      "reason": "Initial env pointed to absent build/fleet/fleetctl; corrected to existing unchanged provisioning/fleetctl. No product failure or fresh Rust compilation."
+    },
+    "freshRustCompilation": false
+  },
+  "unchangedFileBindings": {
+    "app/build.gradle.kts": "8f2bc681536f6ca9e07097e81505976fae774a23a01c24615512c8eaeb34ffe0",
+    "version.json": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+    "catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+    "provisioning/fleetctl": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "app/src/main/java/com/immortal/launcher/NewsFeed.kt": "28ddb313ebf58060a594f210e6e5c98c3beb6b9c81564059e96e8b7727d49598"
+  },
+  "roadmapPreservation": {
+    "previousTasks": 130,
+    "allPreviousObjectsExact": true,
+    "priorRawTaskSuffixBytes": 431899,
+    "rawTaskSuffixExact": true,
+    "defaultTaskUnchanged": true
+  },
+  "bounds": [
+    "Generated file/host regressions plus actual unchanged native CLI against synthetic loopback installation acknowledgments.",
+    "No real Android installation, device, phone, owner registry, media/provider/account or publication operations.",
+    "Private owned snapshot retirement on ordinary Python unwinding; no abrupt process death guarantee.",
+    "Streaming copy/hash does not atomically snapshot concurrent filesystem writes during copying.",
+    "Earlier issue clocks and holds remain; whole-product goal active."
+  ],
+  "finalGates": {
+    "docs": {
+      "exitCode": 0
+    },
+    "portable-loopback": {
+      "exitCode": 0
+    },
+    "diff-check": {
+      "exitCode": 0
+    },
+    "python-syntax": {
+      "exitCode": 0
+    }
+  },
+  "portableLoopbackReplay": {
+    "sha256": "1fa0b7edefee75e529892ae1a7db5b4586bef79ea5a0eced6e6c3e104fe2c13b",
+    "bothCasesUploadSelectedOnce": true,
+    "ownedCleanup": true
+  },
+  "closure": {
+    "finishedAt": "2026-11-04T08:26:19.542037+00:00",
+    "elapsedMinutes": 9.43,
+    "targetMet": true,
+    "hardLimitMet": true,
+    "ownedDocsEnvironmentAndSiteRetired": true,
+    "priorTaskObjectsExact": true,
+    "noDeviceOperations": true,
+    "wholeProductGoal": "active"
+  }
+}
