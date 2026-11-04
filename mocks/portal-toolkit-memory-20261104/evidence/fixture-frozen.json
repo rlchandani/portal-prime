@@ -1,0 +1,28 @@
+{
+  "clock": {
+    "startedAt": "2026-11-04T06:36:36Z",
+    "deadline": "2026-11-04T07:06:36Z",
+    "scope": "New distinct supported-source discovery, possible fixture/implementation/checks/delivery/documentation/cleanup/commit; earlier scopes do not reset",
+    "base": "c058f71edfea1df747121859c08687461d98c374"
+  },
+  "baselineCommit": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+  "frozenAtUtc": "2026-11-04T06:43:26.873351+00:00",
+  "scope": "First numeric value token and kB-to-byte representability; keep fallback, zero, available-over-total clamping and existing UI",
+  "files": [
+    {
+      "path": "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+      "bytes": 1443,
+      "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+    },
+    {
+      "path": "app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+      "bytes": 1474,
+      "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+    },
+    {
+      "path": "app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt",
+      "bytes": 2719,
+      "sha256": "dbd319ca21c32a8b1ec46909b78cf61bff570102e1027470b749e517076e0441"
+    }
+  ]
+}

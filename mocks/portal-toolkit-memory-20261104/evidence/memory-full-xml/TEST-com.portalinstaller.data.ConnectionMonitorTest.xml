@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.ConnectionMonitorTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.504Z" hostname="iRedlofs-Mac-mini-3.local" time="0.031">
+  <properties/>
+  <testcase name="stop during third suspended ping preserves disconnected event" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.004"/>
+  <testcase name="tolerates isolated ping blips below the failure threshold" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <testcase name="stopped ping returning false after catching cancellation stays silent" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <testcase name="explicit ping cancellation ends active run without Lost" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.001"/>
+  <testcase name="stopped reconnect returning true after catching cancellation stays silent" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <testcase name="stopped reconnect returning false after catching cancellation stays silent" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <testcase name="stop during suspended reconnect emits no later transition" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.001"/>
+  <testcase name="ordinary reconnect exception still retries and recovers" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.001"/>
+  <testcase name="caps the event log at MAX_EVENTS" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.0"/>
+  <testcase name="stays quiet while pings succeed" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <testcase name="stopped ping returning true after catching cancellation stays silent" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <testcase name="new run excludes canceled old reconnect success" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <testcase name="new run excludes canceled old third ping transitions" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <testcase name="explicit reconnect cancellation ends active run without retry" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.001"/>
+  <testcase name="declares Lost only after threshold consecutive failures" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.001"/>
+  <testcase name="ordinary ping exception still reaches Lost and recovers" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <testcase name="emits Lost then reconnects after backoff" classname="com.portalinstaller.data.ConnectionMonitorTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.tools.ShellCommandClassifierTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.748Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="benign read commands are safe" classname="com.portalinstaller.data.tools.ShellCommandClassifierTest" time="0.0"/>
+  <testcase name="power and package mutations are destructive" classname="com.portalinstaller.data.tools.ShellCommandClassifierTest" time="0.0"/>
+  <testcase name="rm and recursive deletes are destructive" classname="com.portalinstaller.data.tools.ShellCommandClassifierTest" time="0.0"/>
+  <testcase name="settings put mutates state" classname="com.portalinstaller.data.tools.ShellCommandClassifierTest" time="0.0"/>
+  <testcase name="classification ignores leading whitespace and case of keyword" classname="com.portalinstaller.data.tools.ShellCommandClassifierTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

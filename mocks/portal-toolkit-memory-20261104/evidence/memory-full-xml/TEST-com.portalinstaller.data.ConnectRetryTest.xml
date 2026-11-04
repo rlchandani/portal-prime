@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.ConnectRetryTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.477Z" hostname="iRedlofs-Mac-mini-3.local" time="0.026">
+  <properties/>
+  <testcase name="stops after maxAttempts and returns the last failure" classname="com.portalinstaller.data.ConnectRetryTest" time="0.021"/>
+  <testcase name="returns immediately on first success without delaying" classname="com.portalinstaller.data.ConnectRetryTest" time="0.002"/>
+  <testcase name="does not retry a non-retryable failure" classname="com.portalinstaller.data.ConnectRetryTest" time="0.001"/>
+  <testcase name="retries a retryable failure then succeeds" classname="com.portalinstaller.data.ConnectRetryTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

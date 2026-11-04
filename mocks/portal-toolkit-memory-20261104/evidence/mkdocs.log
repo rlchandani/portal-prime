@@ -1,0 +1,464 @@
+INFO    -  Cleaning site directory
+INFO    -  Building documentation to directory: /private/tmp/portal-product-discovery-20261104-063636/docs-site
+INFO    -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - companion-app-launch-validation-2026-10-08.md
+  - music-assistant-server-readiness.md
+  - music-interruption-readiness.md
+  - music-player-goal.md
+  - music-receiver-focus-plan.md
+  - music-receiver-preview-validation.md
+  - music-standalone-readiness-2026-11-02.md
+  - music-without-home-assistant-2026-10-19.md
+  - portal-accessibility-reconnect-services-2026-11-03.md
+  - portal-apk-download-publication-2026-11-02.md
+  - portal-apk-incoming-snapshot-2026-11-03.md
+  - portal-black-handoff-reopened-2026-11-01.md
+  - portal-black-handoff-second-slot-2026-11-02.md
+  - portal-browser-group-photo-import-2026-11-03.md
+  - portal-browser-pairing-keyboard-2026-11-03.md
+  - portal-browser-profile-conflicts-2026-11-03.md
+  - portal-browser-profile-delete-conflicts-2026-11-03.md
+  - portal-browser-text-confirmation-2026-11-02.md
+  - portal-calendar-all-day-dst-2026-11-03.md
+  - portal-calendar-cancelled-status-2026-11-03.md
+  - portal-calendar-download-budget-2026-11-02.md
+  - portal-calendar-exclusion-lists-2026-11-03.md
+  - portal-calendar-recurring-window-2026-11-03.md
+  - portal-camera-legacy-identity-2026-11-03.md
+  - portal-catalog-fallback-parity-2026-11-03.md
+  - portal-catalog-version-types-2026-11-03.md
+  - portal-chime-player-cleanup-2026-11-03.md
+  - portal-ci-sdk-install-2026-11-03.md
+  - portal-classic-photo-backlog-2026-11-01.md
+  - portal-classic-photo-cleanup-2026-11-01.md
+  - portal-clock-reveal-physical-2026-11-01.md
+  - portal-cloudkit-pagination-2026-11-04.md
+  - portal-cold-start-physical-2026-11-01.md
+  - portal-companion-backup-preview-2026-11-02.md
+  - portal-companion-display-images-2026-11-02.md
+  - portal-companion-emulator-qa-plan-2026-11-02.md
+  - portal-companion-live-contract-review-2026-11-02.md
+  - portal-companion-live-settings-acceptance-2026-11-02.md
+  - portal-companion-numeric-acceptance-2026-11-02.md
+  - portal-companion-photo-activation-2026-11-03.md
+  - portal-companion-photo-delete-2026-11-02.md
+  - portal-companion-photo-upload-2026-11-02.md
+  - portal-companion-provenance-2026-11-02.md
+  - portal-companion-qa-isolation-2026-11-02.md
+  - portal-companion-rendered-settings-delivery-2026-11-02.md
+  - portal-companion-settings-confirmation-2026-11-02.md
+  - portal-companion-settings-confirmation-audit-2026-11-02.md
+  - portal-companion-text-confirmation-2026-11-02.md
+  - portal-compositor-timing-2026-11-01.md
+  - portal-countdown-mutations-2026-11-03.md
+  - portal-crash-guard-clock-reset-2026-11-03.md
+  - portal-crypto-cache-publication-2026-11-04.md
+  - portal-deploy-ack-recovery-delivery-2026-11-02.md
+  - portal-deploy-screen-return-2026-11-02.md
+  - portal-digital-clock-fonts-2026-11-01.md
+  - portal-digital-clock-format-2026-11-01.md
+  - portal-digital-clock-seconds-2026-11-01.md
+  - portal-docs-repository-links-2026-11-03.md
+  - portal-dream-brightness-2026-10-31.md
+  - portal-face-region-framing-2026-11-01.md
+  - portal-face-weather-admission-2026-11-01.md
+  - portal-feast-civil-dates-2026-11-03.md
+  - portal-file-download-headers-2026-11-03.md
+  - portal-filmstrip-file-admission-2026-11-01.md
+  - portal-filmstrip-input-2026-11-01.md
+  - portal-fleet-backup-integrity-2026-11-02.md
+  - portal-fleet-bulk-update-results-2026-11-02.md
+  - portal-fleet-command-status-2026-11-02.md
+  - portal-fleet-config-xml-2026-11-03.md
+  - portal-fleet-diag-process-2026-11-03.md
+  - portal-fleet-error-response-2026-11-02.md
+  - portal-fleet-file-read-2026-11-03.md
+  - portal-fleet-port-admission-2026-11-03.md
+  - portal-fleet-preference-plan-2026-11-04.md
+  - portal-fleet-registry-encoding-2026-11-03.md
+  - portal-fleet-response-integrity-delivery-2026-11-02.md
+  - portal-fleet-response-timing-2026-11-02.md
+  - portal-fleet-restore-apps-2026-11-02.md
+  - portal-fleet-upload-integrity-delivery-2026-11-02.md
+  - portal-framed-print-native-2026-11-01.md
+  - portal-framed-viewport-2026-11-01.md
+  - portal-gallery-native-2026-11-01.md
+  - portal-gallery-print-2026-10-30.md
+  - portal-gallery-window-performance-2026-11-01.md
+  - portal-hardware-budget-2026-10-30.md
+  - portal-hi-first-units-review-2026-11-02.md
+  - portal-home-photo-exif-diagonals-2026-11-03.md
+  - portal-home-timer-delivery-2026-11-02.md
+  - portal-home-timer-review-2026-11-02.md
+  - portal-home-widget-save-conflicts-2026-11-03.md
+  - portal-http-error-body-2026-11-03.md
+  - portal-http-source-discovery-2026-11-01.md
+  - portal-image-cache-write-ownership-2026-11-03.md
+  - portal-immich-audit-pagination-2026-11-03.md
+  - portal-immich-pagination-2026-11-03.md
+  - portal-installer-confirm-ownership-2026-11-02.md
+  - portal-installer-confirm-readiness-2026-11-02.md
+  - portal-installer-session-cleanup-2026-11-02.md
+  - portal-json-body-integrity-delivery-2026-11-02.md
+  - portal-kitchen-timer-identity-2026-11-03.md
+  - portal-lan-audio-pcm-2026-11-03.md
+  - portal-live-face-metadata-2026-11-01.md
+  - portal-local-folder-traversal-2026-11-03.md
+  - portal-local-preview-readiness-2026-11-02.md
+  - portal-local-readiness-delivery-2026-11-02.md
+  - portal-local-readiness-review-2026-11-02.md
+  - portal-ma-player-identity-2026-11-03.md
+  - portal-meta-presence-idle-expiry-2026-11-03.md
+  - portal-music-config-continuity-2026-11-01.md
+  - portal-music-drag-native-2026-11-01.md
+  - portal-music-lyrics-2026-11-01.md
+  - portal-music-photo-pause-2026-11-01.md
+  - portal-music-physical-ui-2026-10-31.md
+  - portal-music-playing-native-2026-11-01.md
+  - portal-music-repeated-items-2026-11-01.md
+  - portal-music-seek-binding-2026-11-01.md
+  - portal-music-touch-native-2026-11-01.md
+  - portal-music-viewport-2026-11-01.md
+  - portal-music-volume-binding-2026-11-01.md
+  - portal-news-atom-article-link-2026-11-03.md
+  - portal-night-autoplay-physical-2026-11-01.md
+  - portal-night-brightness-delivery-2026-11-01.md
+  - portal-night-crossfade-2026-10-31.md
+  - portal-night-legacy-2026-11-01.md
+  - portal-night-legacy-reopened-2026-11-01.md
+  - portal-night-photo-motion-2026-11-01.md
+  - portal-night-photo-pause-2026-11-01.md
+  - portal-night-player-completion-audit-2026-10-31.md
+  - portal-night-player-progress-2026-10-30.md
+  - portal-optimized-platform-qa-2026-11-02.md
+  - portal-paper-clock-contrast-2026-11-03.md
+  - portal-paused-capture-2026-11-01.md
+  - portal-photo-caption-timezone-2026-11-03.md
+  - portal-photo-delete-confirmation-2026-11-02.md
+  - portal-photo-import-room-selection-2026-11-02.md
+  - portal-photo-layout-paper-2026-11-03.md
+  - portal-photo-layout-review-2026-11-03.md
+  - portal-photo-paper-native-2026-11-03.md
+  - portal-photo-preview-recovery-2026-11-02.md
+  - portal-photo-redirects-2026-11-03.md
+  - portal-photo-source-response-budget-2026-11-02.md
+  - portal-photo-upload-acknowledgment-2026-11-02.md
+  - portal-pinned-brightness-delivery-2026-11-01.md
+  - portal-pinned-night-physical-2026-10-31.md
+  - portal-platform-video-redirect-research-2026-11-03.md
+  - portal-prayer-tomorrow-2026-11-03.md
+  - portal-product-operating-state.md
+  - portal-provisioning-ascii-preflight-2026-11-03.md
+  - portal-pwa-connection-status-delivery-2026-11-02.md
+  - portal-pwa-tab-branding-delivery-2026-11-02.md
+  - portal-python-ci-gate-2026-11-02.md
+  - portal-release-signing-baseline-2026-11-03.md
+  - portal-remote-discovery-callbacks-2026-11-03.md
+  - portal-remote-pairing-browser-ci-2026-11-03.md
+  - portal-self-update-manifest-budget-2026-11-03.md
+  - portal-settings-editor-contract-2026-11-02.md
+  - portal-settings-editor-review-2026-11-02.md
+  - portal-settings-native-editors-2026-11-02.md
+  - portal-settings-native-source-drafts-2026-11-02.md
+  - portal-settings-native-steppers-2026-11-02.md
+  - portal-settings-visibility-delivery-2026-11-02.md
+  - portal-settings-visibility-web-review-2026-11-02.md
+  - portal-sky-short-day-2026-11-03.md
+  - portal-sleep-timer-dispatch-2026-11-03.md
+  - portal-slideshow-commit-2026-11-01.md
+  - portal-slideshow-drag-2026-11-01.md
+  - portal-slideshow-history-2026-11-01.md
+  - portal-slideshow-regression-gates-2026-11-02.md
+  - portal-slideshow-resize-2026-11-01.md
+  - portal-slideshow-sequences-native-2026-11-01.md
+  - portal-slideshow-slim-frame-2026-11-02.md
+  - portal-slideshow-style-matrix-2026-11-01.md
+  - portal-smb-callback-cleanup-2026-11-01.md
+  - portal-smb-startup-failure-2026-11-01.md
+  - portal-snapcast-connection-2026-11-03.md
+  - portal-soundscape-ownership-2026-11-03.md
+  - portal-source-discovery-2026-11-03.md
+  - portal-store-metadata-budget-2026-11-02.md
+  - portal-sunrise-one-shot-2026-11-03.md
+  - portal-toolkit-apk-read-2026-11-03.md
+  - portal-toolkit-backup-completeness-2026-11-03.md
+  - portal-toolkit-input-pixels-2026-11-03.md
+  - portal-toolkit-memory-validity-2026-11-04.md
+  - portal-toolkit-monitor-ci-2026-11-03.md
+  - portal-toolkit-path-guard-2026-11-03.md
+  - portal-toolkit-shell-exit-2026-11-03.md
+  - portal-toolkit-uptime-validity-2026-11-03.md
+  - portal-user-layout-save-conflicts-2026-11-03.md
+  - portal-version-sync-comments-2026-11-03.md
+  - portal-video-night-retention-2026-11-01.md
+  - portal-voice-memo-replacement-2026-11-03.md
+  - portal-warm-dream-return-2026-11-01.md
+  - portal-weather-clock-format-2026-11-02.md
+  - portal-weather-hour-correction-2026-11-02.md
+  - portal-weather-native-refinement-2026-11-02.md
+  - portal-weather-settings-return-2026-11-03.md
+  - portal-webdav-href-resolution-2026-11-03.md
+  - portal-widget-fixes-release-2026-11-02.md
+  - portal-widget-gallery-checkpoint-2026-11-02.md
+  - portal-widget-goal-coverage-2026-11-02.md
+  - portal-widget-inventory-2026-11-02.md
+  - portal-world-clock-delivery-2026-11-02.md
+  - portal-world-clock-review-2026-11-02.md
+  - design/browser-control-center-mobile-validation.md
+  - design/feature-integration.md
+  - design/home-layout-snapshot-reuse-validation-2026-10-12.md
+  - design/mqtt-notifications.md
+  - design/portal-apps-badge-activation-validation.md
+  - design/portal-apps-preparation-family-performance.md
+  - design/portal-browser-group-photo-import-contract-2026-11-03.md
+  - design/portal-browser-group-photo-import-review-2026-11-03.md
+  - design/portal-browser-search-composition-validation.md
+  - design/portal-browser-settings-row-retention-validation.md
+  - design/portal-calendar-feed-sharing-validation.md
+  - design/portal-calendar-occurrence-selection-validation.md
+  - design/portal-calendar-preparation-cache-validation.md
+  - design/portal-dashboard-direct-launch-validation.md
+  - design/portal-family-outlier-attribution.md
+  - design/portal-family-stability-2026-10-11.md
+  - design/portal-filmstrip-family-performance.md
+  - design/portal-filmstrip-native-layer-family.md
+  - design/portal-filmstrip-preparation-validation.md
+  - design/portal-filmstrip-render-cost-family.md
+  - design/portal-fleet-poll-performance-validation.md
+  - design/portal-foreground-window-performance-validation.md
+  - design/portal-framed-print-performance-validation.md
+  - design/portal-home-apps-performance-validation.md
+  - design/portal-home-icon-filtering-validation.md
+  - design/portal-home-photo-warm-cache-validation.md
+  - design/portal-home-widget-placement-snapshot-validation-2026-10-12.md
+  - design/portal-http-request-buffering-validation.md
+  - design/portal-image-tier-probe.md
+  - design/portal-isolated-navigation-performance-validation.md
+  - design/portal-jarvis-bridge-write-validation.md
+  - design/portal-native-home-preflight-validation-2026-10-12.md
+  - design/portal-native-target-geometry-validation.md
+  - design/portal-performance-family-2026-10-10.md
+  - design/portal-performance-repeat-validation.md
+  - design/portal-photo-thumbnail-concurrency-validation.md
+  - design/portal-photo-upload-concurrency-validation.md
+  - design/portal-plus-app-icon-quality.md
+  - design/portal-plus-apps-tools-feedback.md
+  - design/portal-plus-calls-handoff.md
+  - design/portal-plus-compositor-investigation.md
+  - design/portal-plus-contrast-audit.md
+  - design/portal-plus-control-inventory.md
+  - design/portal-plus-custom-home-dashboard.md
+  - design/portal-plus-jarvis-handoff.md
+  - design/portal-plus-meta-colors.md
+  - design/portal-plus-native-validation.md
+  - design/portal-plus-navigation-resource-validation.md
+  - design/portal-plus-owned-screensaver-recovery.md
+  - design/portal-plus-photo-library-discovery.md
+  - design/portal-plus-pinned-session-validation.md
+  - design/portal-plus-quality-gates.md
+  - design/portal-plus-r8-investigation.md
+  - design/portal-plus-size-aware-image-validation.md
+  - design/portal-plus-slideshow-face-research.md
+  - design/portal-plus-slideshow-native-validation.md
+  - design/portal-plus-slideshow-pipeline-research.md
+  - design/portal-plus-slideshow-research.md
+  - design/portal-plus-slideshow-webview-recovery.md
+  - design/portal-plus-tab-activation.md
+  - design/portal-plus-tab-frame-placement.md
+  - design/portal-plus-tools-native-validation.md
+  - design/portal-plus-tools-overhaul-inventory.md
+  - design/portal-plus-truthful-photo-labels.md
+  - design/portal-plus-whatsapp-widget-feasibility.md
+  - design/portal-plus-widget-listener.md
+  - design/portal-plus-widget-paging.md
+  - design/portal-plus-widget-size-inventory.md
+  - design/portal-plus-wifi-frame-validation.md
+  - design/portal-profile-verification.md
+  - design/portal-quick-controls-setup-review-2026-11-02.md
+  - design/portal-quiescent-release-performance-validation.md
+  - design/portal-remote-app-card-reuse-validation.md
+  - design/portal-remote-app-icon-search-reuse-validation.md
+  - design/portal-remote-icon-png-cache-validation.md
+  - design/portal-remote-media-polling-validation.md
+  - design/portal-remote-native-idle-validation.md
+  - design/portal-remote-navigation-retention-validation.md
+  - design/portal-remote-photo-thumbnail-reuse-validation.md
+  - design/portal-retained-preview-performance-validation.md
+  - design/portal-settings-baseline-profile.md
+  - design/portal-settings-bounded-sidebar-validation.md
+  - design/portal-settings-chime-writes-validation.md
+  - design/portal-settings-current-opening-baseline.md
+  - design/portal-settings-device-health-validation.md
+  - design/portal-settings-dismiss-inline-validation.md
+  - design/portal-settings-display-writes-validation.md
+  - design/portal-settings-focus-cost-rejection.md
+  - design/portal-settings-footer-scope-validation.md
+  - design/portal-settings-functional-probe-validation.md
+  - design/portal-settings-hardware-and-appearance-candidate.md
+  - design/portal-settings-history-two-pane-validation.md
+  - design/portal-settings-install-profile-validation.md
+  - design/portal-settings-instant-detail-validation.md
+  - design/portal-settings-layout-tracing-validation.md
+  - design/portal-settings-native-navigation-coverage.md
+  - design/portal-settings-native-r8-candidate.md
+  - design/portal-settings-navigation-audit-2026-11-02.md
+  - design/portal-settings-navigation-value-validation.md
+  - design/portal-settings-owned-back-validation.md
+  - design/portal-settings-pane-attribution-probe.md
+  - design/portal-settings-profile-verifier-diagnosis.md
+  - design/portal-settings-registry-audit-2026-11-02.md
+  - design/portal-settings-search-state-validation.md
+  - design/portal-settings-shared-app-inventory-validation.md
+  - design/portal-settings-sidebar-draw-layer.md
+  - design/portal-settings-sidebar-icon-cache-validation.md
+  - design/portal-settings-slideshow-writes-validation.md
+  - design/portal-settings-snapshot-scope-rejection.md
+  - design/portal-settings-startup-measurement-validation.md
+  - design/portal-settings-sunrise-writes-validation.md
+  - design/portal-settings-touch-sounds-validation.md
+  - design/portal-settings-wallpaper-previews-validation.md
+  - design/portal-settings-window-matched-validation.md
+  - design/portal-slideshow-gallery-tier-validation.md
+  - design/portal-slideshow-ken-burns-validation.md
+  - design/portal-slideshow-metadata-admission-validation.md
+  - design/portal-slideshow-observer-validation.md
+  - design/portal-slideshow-resource-readiness-validation.md
+  - design/portal-slideshow-style-attribution.md
+  - design/portal-source-cache-fastpath-validation.md
+  - design/portal-source-photo-preview-validation.md
+  - design/portal-source-video-preview-validation.md
+  - design/portal-weather-current-sharing-validation.md
+  - design/portal-webapp-retention-validation.md
+  - design/portal-webview-background-startup-experiment.md
+  - design/portal-widget-settings-map-2026-11-02.md
+  - design/retained-home-navigation-candidate.md
+  - design/settings-snapshot-lazy-validation-2026-10-12.md
+  - features/browser-control-center.md
+  - features/room-fleet.md
+  - research/snapcast-focus-candidate/README.md
+  - research/snapcast-focus-candidate/preview.2/README.md
+  - research/snapcast-focus-candidate/preview.2/RECEIPT.md
+  - research/snapcast-focus-candidate/preview.3/README.md
+  - superpowers/plans/2026-07-23-portal-prime-premium-redesign.md
+  - superpowers/plans/2026-07-24-home-edit-and-calendar-widget.md
+  - superpowers/plans/2026-07-24-icon-pack-support.md
+  - superpowers/plans/2026-07-25-settings-full-audit.md
+  - superpowers/plans/2026-07-25-settings-polish-revamp.md
+  - superpowers/plans/2026-07-25-settings-reimagining-audit.md
+  - superpowers/plans/2026-07-25-unified-drag-overlay.md
+  - superpowers/plans/2026-07-26-os-evaluation-roadmap.md
+  - superpowers/plans/2026-07-26-premium-dashboard.md
+  - superpowers/plans/2026-07-30-advanced-widgets-feasibility.md
+  - superpowers/plans/2026-10-04-portal-plus-approved-ux.md
+  - superpowers/plans/2026-10-06-tools-overhaul.md
+  - superpowers/plans/2026-10-07-slideshow-overhaul.md
+  - superpowers/plans/2026-10-09-fleet-poll-performance.md
+  - superpowers/plans/2026-10-09-framed-slot-animation-lifecycle.md
+  - superpowers/plans/2026-10-09-pinned-app-screensaver.md
+  - superpowers/plans/2026-10-09-rendering-navigation.md
+  - superpowers/plans/2026-10-09-tab-activation.md
+  - superpowers/plans/2026-10-09-tab-frame-placement.md
+  - superpowers/plans/2026-10-09-widget-listener.md
+  - superpowers/plans/2026-10-09-wifi-performance.md
+  - superpowers/plans/2026-10-10-family-performance-six-hour.md
+  - superpowers/plans/2026-10-10-foreground-window-work.md
+  - superpowers/plans/2026-10-10-quiescent-release-work.md
+  - superpowers/plans/2026-10-10-remote-native-idle-work.md
+  - superpowers/plans/2026-10-10-retained-preview-host-suspension.md
+  - superpowers/plans/2026-10-10-settings-bounded-sidebar.md
+  - superpowers/plans/2026-10-10-settings-footer-scope.md
+  - superpowers/plans/2026-10-10-settings-layout-tracing.md
+  - superpowers/plans/2026-10-10-settings-startup-measurement.md
+  - superpowers/plans/2026-10-10-settings-visibility-work.md
+  - superpowers/plans/2026-10-10-slideshow-metadata-admission.md
+  - superpowers/plans/2026-10-10-startup-frame-attribution.md
+  - superpowers/plans/2026-10-11-settings-app-profile.md
+  - superpowers/plans/2026-10-11-settings-entry-timeline.md
+  - superpowers/plans/2026-10-11-settings-retained-pane-attribution.md
+  - superpowers/plans/2026-10-18-music-player.md
+  - superpowers/plans/2026-11-02-apk-download-publication.md
+  - superpowers/plans/2026-11-02-companion-live-settings.md
+  - superpowers/plans/2026-11-02-companion-rendered-settings.md
+  - superpowers/plans/2026-11-02-deploy-screen-return.md
+  - superpowers/plans/2026-11-02-fleet-backup-integrity.md
+  - superpowers/plans/2026-11-02-fleet-bulk-update-results.md
+  - superpowers/plans/2026-11-02-fleet-json-body-integrity.md
+  - superpowers/plans/2026-11-02-fleet-response-integrity.md
+  - superpowers/plans/2026-11-02-fleet-restore-apps.md
+  - superpowers/plans/2026-11-02-fleet-upload-integrity.md
+  - superpowers/plans/2026-11-02-home-timer-editor.md
+  - superpowers/plans/2026-11-02-local-preview-readiness.md
+  - superpowers/plans/2026-11-02-local-release-readiness.md
+  - superpowers/plans/2026-11-02-portal-hi-first-units.md
+  - superpowers/plans/2026-11-02-pwa-connection-status.md
+  - superpowers/plans/2026-11-02-pwa-tab-branding.md
+  - superpowers/plans/2026-11-02-settings-editor-contract.md
+  - superpowers/plans/2026-11-02-settings-visibility.md
+  - superpowers/plans/2026-11-02-store-metadata-budget.md
+  - superpowers/plans/2026-11-02-weather-native-refinement.md
+  - superpowers/plans/2026-11-02-world-clock-fit.md
+  - superpowers/plans/2026-11-03-browser-group-photo-import.md
+  - superpowers/plans/2026-11-03-photo-layout-paper.md
+  - superpowers/plans/portal-plus-performance-audit.md
+  - superpowers/specs/2026-07-23-settings-light-unification-design.md
+  - superpowers/specs/2026-09-19-screensaver-polish-diagnosis.md
+  - superpowers/specs/2026-10-09-pinned-app-screensaver.md
+  - superpowers/specs/2026-10-09-rendering-navigation.md
+  - superpowers/specs/2026-10-09-wifi-performance.md
+  - superpowers/specs/2026-10-18-music-player-design.md
+  - superpowers/specs/2026-11-02-deploy-screen-return-design.md
+  - superpowers/specs/2026-11-02-fleet-backup-integrity-design.md
+  - superpowers/specs/2026-11-02-fleet-bulk-update-results-design.md
+  - superpowers/specs/2026-11-02-fleet-restore-apps-design.md
+  - superpowers/specs/2026-11-02-portal-widget-gallery-design.md
+INFO    -  Doc file 'music-receiver-focus-plan.md' contains an unrecognized relative link 'research/snapcast-focus-candidate/', it was left as is. Did you mean 'research/snapcast-focus-candidate/README.md'?
+INFO    -  Doc file 'music-receiver-focus-plan.md' contains an absolute link '/private/tmp/portal-music-receiver-focus', it was left as is.
+INFO    -  Doc file 'music-receiver-focus-plan.md' contains an absolute link '/private/tmp/portal-music-receiver-focus/receiver-focus.patch', it was left as is.
+INFO    -  Doc file 'music-receiver-focus-plan.md' contains an absolute link '/private/tmp/portal-music-receiver-focus/host-tests/run.py', it was left as is.
+INFO    -  Doc file 'music-receiver-focus-plan.md' contains an absolute link '/private/tmp/portal-music-receiver-focus/host-tests/ReceiverFocusTest.java', it was left as is.
+INFO    -  Doc file 'music-receiver-focus-plan.md' contains an absolute link '/private/tmp/portal-music-receiver-focus/native-binary-build.patch', it was left as is.
+INFO    -  Doc file 'music-receiver-focus-plan.md' contains an absolute link '/private/tmp/portal-music-receiver-focus/verification.txt', it was left as is.
+INFO    -  Doc file 'music-receiver-focus-plan.md' contains an absolute link '/private/tmp/portal-music-receiver-focus/api35-check.txt', it was left as is.
+INFO    -  Doc file 'music-receiver-focus-plan.md' contains an absolute link '/private/tmp/portal-music-receiver-focus/native-inventory.json', it was left as is.
+INFO    -  Doc file 'music-receiver-preview-validation.md' contains an unrecognized relative link 'research/snapcast-focus-candidate/preview.3/', it was left as is.
+INFO    -  Doc file 'music-receiver-preview-validation.md' contains an unrecognized relative link 'research/snapcast-focus-candidate/preview.2/', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt:126', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionGroup.kt:231', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionRepository.kt:402', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/ui/controlcenter/RegistrySettingsPanel.kt:69', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/androidTest/java/com/portalinstaller/ui/controlcenter/CompanionInactiveSettingsUiTest.kt:362', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/RemoteRoutes.kt:466', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/settings/SettingsDomain.kt:60', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/settings/SettingSpec.kt', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt:298', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/settings/SettingsPresentation.kt', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SettingsGuard.kt:99', it was left as is.
+INFO    -  Doc file 'portal-companion-live-contract-review-2026-11-02.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-companion-rendered-settings-delivery-2026-11-02.md', it was left as is.
+INFO    -  Doc file 'portal-framed-print-native-2026-11-01.md' contains an unrecognized relative link '../mocks/portal-premium-player-20261030/evidence/family-framed-native/', it was left as is.
+INFO    -  Doc file 'portal-slideshow-resize-2026-11-01.md' contains an unrecognized relative link '../mocks/portal-premium-player-20261030/evidence/family-slideshow-resize/', it was left as is.
+INFO    -  Doc file 'portal-slideshow-sequences-native-2026-11-01.md' contains an unrecognized relative link '../mocks/portal-premium-player-20261030/evidence/family-slideshow-motion-native/', it was left as is.
+INFO    -  Doc file 'portal-slideshow-style-matrix-2026-11-01.md' contains an unrecognized relative link '../mocks/portal-premium-player-20261030/evidence/family-slideshow-style-matrix/', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js:3978', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js:4016', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js:681', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/core.mjs:36', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js:3559', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionGroup.kt:22', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionRepository.kt:60', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionPhotos.kt:27', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt:210', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/ui/controlcenter/ControlCenterScreen.kt:168', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/ui/controlcenter/CompactPortalHeader.kt:140', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/ui/controlcenter/ManagePortalsPanel.kt:49', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/RemoteCompanionPhotos.kt:23', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/RemoteCompanionRoutes.kt:30', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FleetHttpServer.kt:155', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/viewmodel/ControlCenterViewModel.kt:100', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionRepository.kt:729', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/test/java/com/portalinstaller/data/companion/CompanionGroupTest.kt:182', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt:48', it was left as is.
+INFO    -  Doc file 'design/portal-browser-group-photo-import-contract-2026-11-03.md' contains an absolute link '~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt:188', it was left as is.
+INFO    -  Doc file 'research/snapcast-focus-candidate/preview.3/README.md' contains an unrecognized relative link '../preview.2/', it was left as is.
+INFO    -  Doc file 'music-receiver-preview-validation.md' contains a link 'music-player-goal.md#integrated-control-safety-and-preview-rollout--october-19-1108-utc', but the doc 'music-player-goal.md' does not contain an anchor '#integrated-control-safety-and-preview-rollout--october-19-1108-utc'.
+INFO    -  Doc file 'portal-hardware-budget-2026-10-30.md' contains a link 'portal-night-player-progress-2026-10-30.md#native-filmstrip-steady-motion-observation--2102-utc-batch', but the doc 'portal-night-player-progress-2026-10-30.md' does not contain an anchor '#native-filmstrip-steady-motion-observation--2102-utc-batch'.
+INFO    -  Documentation built in 1.81 seconds

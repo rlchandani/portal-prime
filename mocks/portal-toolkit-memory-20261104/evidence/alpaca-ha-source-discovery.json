@@ -1,0 +1,233 @@
+{
+  "status": "BOUNDED_NEGATIVE_NO_ADMITTED_FIXTURE_OR_IMPLEMENTATION",
+  "frozenAtUtc": "2026-11-04T06:40:46.441701+00:00",
+  "clock": {
+    "startedAt": "2026-11-04T06:36:36Z",
+    "deadline": "2026-11-04T07:06:36Z",
+    "scope": "New distinct supported-source discovery, possible fixture/implementation/checks/delivery/documentation/cleanup/commit; earlier scopes do not reset",
+    "base": "c058f71edfea1df747121859c08687461d98c374"
+  },
+  "scope": "Current Alpaca client/configuration and HA REST/dashboard data/model, exact selected active callers and existing tests. Source/contract discovery only.",
+  "priorBoundaries": [
+    {
+      "reference": "docs/portal-news-atom-article-link-2026-11-03.md:72\u201386",
+      "clock": "2026-11-03 11:21:15\u201311:51:15 UTC",
+      "positiveEvidence": "Explicitly preserves unselected Alpaca latestTrade fallback with Converter/Todo hypotheses. Current fallback is excluded, no reset."
+    },
+    {
+      "reference": "docs/portal-widget-inventory-2026-11-02.md:34\u201336",
+      "positiveEvidence": "Already records stock/options empty/failure ambiguity and HA optimistic actions without result/error feedback. These are existing review/design observations, not fresh defects admitted here."
+    },
+    {
+      "reference": "docs/portal-product-operating-state.md:874\u2013890,1218\u20131230",
+      "positiveEvidence": "Whole goal does not grant every proposed feature. No HA music deployment, credential extraction, server deployment or reopening exhausted music/performance scopes."
+    },
+    {
+      "reference": "docs/portal-product-operating-state.md:1356\u20131373,1555\u20131567",
+      "positiveEvidence": "Prior native Weather and tooling checkpoints explicitly state no Home Assistant service/account setup or owner credential/device action. Their native/tooling scope does not accept the HA REST/dashboard path."
+    },
+    {
+      "reference": "docs/superpowers/plans/2026-07-30-advanced-widgets-feasibility.md:1\u201324 and126\u2013138; registry audit126\u2013145",
+      "positiveEvidence": "Read-only market-data integration and plain SharedPreferences were deliberate approved choices; AlpacaConfig and HaConfig are explicit whole-config exceptions. No new storage/registry policy is inferred."
+    }
+  ],
+  "boundedOutcomes": [
+    {
+      "component": "Alpaca stock fallback",
+      "result": "STOP_PRIOR_UNSELECTED_CLOCK",
+      "sourceEffect": "Present latestTrade object with missing p can yield NaN and drop the symbol instead of reaching dailyBar fallback. This is the positively retained old fallback hypothesis, not a new slot or fixture."
+    },
+    {
+      "component": "Alpaca options/stock status",
+      "result": "NO_NEW_SUPPORTED_CONTRACT",
+      "sourceFacts": "Finite maxPages=5, shared configured header boundary, cancellation checkpoints and pure parsers. No new provider-token/input policy, account action or financial control is admitted."
+    },
+    {
+      "component": "HA optimistic/error state",
+      "result": "EXISTING_SOURCE_DESIGN_OBSERVATION",
+      "sourceFacts": "Active Home/dashboard callbacks ignore action Booleans and retain optimism until polling; already recorded in Nov 2 inventory. No new UI/error policy or service execution admitted."
+    },
+    {
+      "component": "HA lock/cover representation",
+      "result": "NO_NEW_SERVICE_POLICY",
+      "sourceFacts": "Model and existing test explicitly map lock/cover to toggle tiles. Source alone does not establish replacement service semantics or approved changed label behavior."
+    },
+    {
+      "component": "HA history hours parameter",
+      "result": "NO_ACTIVE_WITNESS",
+      "sourceFacts": "Selected dashboard caller uses default history duration; no supported nondefault active call witnessed."
+    }
+  ],
+  "unselectedCurrentObservation": {
+    "name": "HA declared per-room cap",
+    "sourceContract": "HaDashboardApi comments/constant declare MAX_ENTITIES_PER_ROOM=12 with DOMAIN_PRIORITY. Neither is used; active dashboard gives all area entity IDs to fetchDetails, which fetches each ID.",
+    "potentialWitness": "A normal 13-entity room contradicts the comment-only budget, but enforcing it hides currently visible entities and chooses a selection policy.",
+    "rootPositiveHistoryQualification": {
+      "providedBy": "Coordinator read-only Git/history review, not independently executed by this reviewer",
+      "constantsIntroduced": "276f71d5",
+      "fetchDetailsPriorSource": "4711cf91",
+      "finding": "Unused RENDERABLE_DOMAINS/DOMAIN_PRIORITY/MAX=12 were added alongside server template filtering while fetchDetails remained untouched."
+    },
+    "decision": "UNSELECTED; comment alone does not authorize a cap or priority-selection fix. No fixture or product change.",
+    "retainedClock": "2026-11-04 06:36:36\u201307:06:36 UTC, discovery included; no future reset implied."
+  },
+  "activeCallers": [
+    "HomeActivity stock widget \u2192 AlpacaClient.fetchStockQuotes; OptionsScanner.scan \u2192 fetchOptionChain with existing cancellation callback.",
+    "HomeActivity HA widget \u2192 fetchStates, activate/toggle; selected dashboard \u2192 fetchAreas/fetchDetails, sensor history, optimistic toggle/brightness/temperature callbacks.",
+    "HaDashboardModel \u2192 typed tile selection/lit counts with existing static tests; no native UI action performed."
+  ],
+  "limits": [
+    "No edits, fixtures, imports, tests, builds, Git, browser, provider/network, device/phone, owner preferences/account/financial action, audio, secrets or credentials by this reviewer.",
+    "No whole-feature acceptance, native HA service compatibility, market-data correctness, live account/provider behavior, layout/physics, performance or hosted CI claim.",
+    "Earlier Nov 3 private audit directories are unavailable now; absence and missing indexed hits are not novelty evidence. Positive public retained boundaries and coordinator-qualified history govern exclusions.",
+    "Combined outputs truncated broader unrelated roadmap/docs/caller material; only enumerated displayed full/selected semantic scopes count as read.",
+    "One broad filename-filtered /private/tmp search returned a permission error for an unrelated devio path; its result is excluded from absence/freshness claims and no matched private body was opened.",
+    "No new selection/design policy or count-driven test was created. All earlier held/unselected clocks and the whole goal remain intact."
+  ],
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AlpacaClient.kt",
+      "bytes": 7014,
+      "sha256": "15652aa0df13548e844233a421cc834b63c17d40e3eb4b52546a403e881ac8f8",
+      "readScope": "FULL body static read, stocks fetch/parser and option fetch/parser."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AlpacaConfig.kt",
+      "bytes": 2586,
+      "sha256": "aa5c11ce35593e52a2642b3d6d2690e4e4a705f23ed641015155e6c4e7ecefd7",
+      "readScope": "FULL body static read; no owner preferences or key material read."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HaClient.kt",
+      "bytes": 7175,
+      "sha256": "4d895460bc66fd0bf0b38a91b34e97d6acfad59dd4bfb01e40b105b68fe620f5",
+      "readScope": "FULL body static read, state/discovery and service/ping paths."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HaDashboardApi.kt",
+      "bytes": 8455,
+      "sha256": "50a80e038db57dbeaa8c00f22332a1f15404064fa5e91dae5fd909ff1d72dada",
+      "readScope": "FULL body static read, area template/details/history/control/parser paths."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HaDashboardModel.kt",
+      "bytes": 2473,
+      "sha256": "db98880e276b06b0de52650b618ae2de6e9dc46bf26e3bfcbd677b982f208b72",
+      "readScope": "FULL body static read."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/AlpacaClientTest.kt",
+      "bytes": 3433,
+      "sha256": "a8908ee70bb6a08e75bcb2f1ffe05de5dafc8ef3226cd0ce1d49179082b2cdaa",
+      "readScope": "FULL six test methods static read; no execution."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/HaClientTest.kt",
+      "bytes": 2971,
+      "sha256": "b0ef2b89cc2bea1142237292ed0d7b04413cc4e514c4bb948211d1bf48420ac1",
+      "readScope": "FULL nine test methods static read; no execution."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/HaDashboardApiTest.kt",
+      "bytes": 3397,
+      "sha256": "65fdcf8b256261dd544df9f9064f82799f2e7ae733eea15f876da0b544defa1a",
+      "readScope": "FULL eight test methods displayed before unrelated combined output truncation; no execution."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/HaDashboardModelTest.kt",
+      "bytes": 3218,
+      "sha256": "bb641d7c67df62c5b5120134ac78456abe7d681693edbe1c7f966eb6ac2b839a",
+      "readScope": "FULL seven test methods static read; no execution."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HaDashboardActivity.kt",
+      "bytes": 36130,
+      "sha256": "97ebbacf21a77eab6de57a2aee3ea9a30687740fe6977667d0827f2d7c00d266",
+      "readScope": "Selected 70\u2013205 actual room polling and command callbacks; selected 667\u2013711 media body. No full Activity/native-layout review."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+      "bytes": 229896,
+      "sha256": "c1cdfac9b2662a021c722926b96221060990518e138ebdaed21f09650093df2b",
+      "readScope": "Selected 4040\u20134088 stock widget, 4210\u20134276 HA widget polling/actions; bounded exact client reference search. No full Home review."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/OptionsScanner.kt",
+      "bytes": 5614,
+      "sha256": "226bdc540b7c7b161ad8dc768fe575af86d68b073edce7b93c06d2bf3245daae",
+      "readScope": "Selected 45\u201378 scanner/fetchOptionChain caller and cancellation checkpoints; reference inventory. No full scanner review."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-news-atom-article-link-2026-11-03.md",
+      "bytes": 5994,
+      "sha256": "5a15a7c84dc8e5b0339998f49d0006cd0c5cf615662a97360dffd30b61334286",
+      "readScope": "Selected 72\u201394 full original clock/unselected Alpaca boundary."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-widget-inventory-2026-11-02.md",
+      "bytes": 23736,
+      "sha256": "1069c64c1803b97e0dc841df53d4ce92dffb6b4a7ea1aa3501613ac858b1e4a2",
+      "readScope": "Selected complete rows 34\u201336, earlier explicitly recorded stock/options empty-failure and HA optimism/error omissions. Broader combined output truncation excluded from full-document claims."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-product-operating-state.md",
+      "bytes": 184179,
+      "sha256": "8f3a9e407201ccbe9c5eec54cd8c871c266835f7283d47643cfc62321ff11ffe",
+      "readScope": "Bounded exact HA/Alpaca/native-audit matches; selected 874\u2013890,1356\u20131373,1555\u20131567,1218\u20131230. Explicit constraints/native/tooling limits read; no full-state review."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/superpowers/plans/2026-07-30-advanced-widgets-feasibility.md",
+      "bytes": 10637,
+      "sha256": "3e3589c9d2feeea93904fb8604146f093aa5b63278d578cd8e7061749a84e315",
+      "readScope": "Selected 1\u201324 approved/shipped widgets and 126\u2013138 approved plain-preference decision; bounded Alpaca/HA matches. No runtime acceptance inference."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/design/portal-settings-registry-audit-2026-11-02.md",
+      "bytes": 20350,
+      "sha256": "f0eacffcb37e49172f31976da2f2e0b98fc9f19812d9afe262ae9b2791bbb2f0",
+      "readScope": "Selected 126\u2013145 explicit whole-config exceptions including AlpacaConfig/HaConfig; no direct-UI anti-pattern claim."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/design/portal-settings-navigation-audit-2026-11-02.md",
+      "bytes": 12561,
+      "sha256": "c5cb25076641457635c660ff573999b2dd98d88ad386c93ffa9f9f4599d7aa30",
+      "readScope": "Selected connection/editor mapping matching lines 25,34,92,100\u2013102 by rg only."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/superpowers/plans/2026-07-26-premium-dashboard.md",
+      "bytes": 4409,
+      "sha256": "4599302a9f81ddcc38e03132734208b8fa4103a663323e32accb302f8bef9ed0",
+      "readScope": "Bounded matching Home Assistant tile/source contract statements by rg only."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/guides/home-assistant.md",
+      "bytes": 3274,
+      "sha256": "4dfffbd1ae3209ba420db14bc8f6a1bd92debe247193e61a639b1d6a7ceaae6f",
+      "readScope": "Selected MQTT discovery/setup matching lines by rg; not REST dashboard or runtime acceptance."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/features/smart-home.md",
+      "bytes": 13511,
+      "sha256": "9716b67ce075876c0801b104e6e990e106f0f48ee3cb4bf6b2906ab19cfe4b68",
+      "readScope": "Selected MQTT/HA matching statements by rg only; not a whole feature read."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-widget-gallery-20261102/evidence/news-atom-article-link-verification.json",
+      "bytes": 52004,
+      "sha256": "c8a6d6c398a77b46ac75a56fbbf1722bb1e922885c36f680c306f78b71380622",
+      "readScope": "Selected clock/scope/unselected-source matching lines only; no full native proof inventory."
+    },
+    {
+      "path": "/private/tmp/portal-product-discovery-20261104-063636/clock.json",
+      "bytes": 294,
+      "sha256": "287e78658d2fa01f0a873b43e6d77fb1b11587dcfec0b116a4bc24df6500381b",
+      "readScope": "FULL root unit clock/base metadata; no own Git operation."
+    },
+    {
+      "path": "/private/tmp/portal-product-discovery-20261104-063636/roadmap-before.json",
+      "bytes": 416607,
+      "sha256": "a6d8539ad8e5c85999f20de93c3153deab467cc111bf6075467782941678c683",
+      "readScope": "All 123 objects parsed; selected music-without-ha evidence/limits read. Broad initial Home Assistant matching output was truncated and excluded from other task semantic claims."
+    }
+  ]
+}

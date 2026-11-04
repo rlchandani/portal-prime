@@ -1,0 +1,96 @@
+{
+  "summary": {
+    "tests": 17,
+    "failures": 9,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 2
+  },
+  "cases": [
+    {
+      "class": "com.portalinstaller.data.MemInfoParserTest",
+      "name": "returns null when MemTotal is missing",
+      "failure": null
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoParserTest",
+      "name": "falls back to MemFree when MemAvailable is absent",
+      "failure": null
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoParserTest",
+      "name": "returns null on blank input",
+      "failure": null
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoParserTest",
+      "name": "parses total and available in bytes",
+      "failure": null
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoParserTest",
+      "name": "used fraction is total minus available over total",
+      "failure": null
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "overflowingFreeFallbackDoesNotWrapBytes",
+      "failure": "java.lang.AssertionError"
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "whitespaceAndUnitlessCompatibilityRemain",
+      "failure": null
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "overflowingTotalDoesNotWrapBytes",
+      "failure": "java.lang.AssertionError"
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "overflowingAvailableStillUsesValidFreeFallback",
+      "failure": "java.lang.AssertionError"
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "invalidAvailableStillUsesValidFreeFallback",
+      "failure": "java.lang.AssertionError"
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "zeroAndExistingClampingRemainCompatible",
+      "failure": null
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "largestRepresentableByteValueRemainsExact",
+      "failure": null
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "digitsInsideAnErrorAreNotAValue",
+      "failure": "java.lang.AssertionError"
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "negativeAvailableWithoutFallbackIsUnavailable",
+      "failure": "java.lang.AssertionError"
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "negativeFreeFallbackIsUnavailable",
+      "failure": "java.lang.AssertionError"
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "negativeTotalDoesNotBecomePositiveMemory",
+      "failure": "java.lang.AssertionError"
+    },
+    {
+      "class": "com.portalinstaller.data.MemInfoValidityTest",
+      "name": "overflowingAvailableDoesNotWrapBytes",
+      "failure": "java.lang.AssertionError"
+    }
+  ]
+}

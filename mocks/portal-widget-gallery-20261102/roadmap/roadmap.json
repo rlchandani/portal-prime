@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T06:30:01.831613Z",
-  "updatedLabel": "CloudKit album progress and identity: 1.133 verified in both rooms",
+  "updatedAt": "2026-11-04T06:47:27.679795Z",
+  "updatedLabel": "Toolkit RAM parser: locally verified; room 1.133 retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,52 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "toolkit-memory-validity",
+      "title": "Toolkit RAM: reject negative and overflowing values",
+      "summary": "Invalid RAM tokens no longer become positive or wrapped byte readings. The existing unavailable and Free fallback paths remain.",
+      "description": "Read the first numeric value token with its sign and bound kilobytes by Long byte capacity before conversion. Preserve existing valid-value and fallback behavior.",
+      "status": "verified",
+      "verification": "239 JVM · 17 replay cases · debug build",
+      "kind": "RAM data reliability",
+      "platforms": [
+        "companion",
+        "tooling"
+      ],
+      "owner": "Toolkit engineering / independent parser replay",
+      "deployment": "Local Toolkit commit 205f2e56, continuing d15912d0. Debug 1.4.0/code5 built; no installation, version change or publication. Portal 1.133 remains.",
+      "state": "Original Toolkit and the companion checkout remain exact, including all four preexisting photo transport paths. No device state was read or changed.",
+      "acceptance": [
+        "Reject negative and nonnumeric first value tokens before byte conversion.",
+        "Reject kB values whose multiplication by 1,024 would overflow Long.",
+        "Keep zero, the largest representable value, whitespace and unitless compatibility.",
+        "Retain Available to Free fallback and existing above-total clamping.",
+        "Pass unchanged actual-parser cases against original and candidate classes independently."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, host gates and scoped release matrix.",
+          "source": "docs/portal-toolkit-memory-validity-2026-11-04.md"
+        },
+        {
+          "text": "Frozen RED/GREEN, independent replay and preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/toolkit-memory-validity-verification.json"
+        }
+      ],
+      "limits": [
+        "Generated proc values only; live kernel, native dashboard and device acceptance remain open.",
+        "Separate Toolkit source branch; no current companion UI or protocol rewrite.",
+        "No new total-positive, available-at-most-total, unit grammar or device-memory cap policy.",
+        "Debug artifact and actual manifest only; installation, production signing and hosted CI remain open.",
+        "Phone, provider, account, push and publication holds remain. Earlier issue clocks do not reset."
+      ],
+      "next": "Retain the local verified correction and native acceptance limits; continue independent supported product work.",
+      "issueClock": {
+        "startedAt": "2026-11-04T06:36:36Z",
+        "deadline": "2026-11-04T07:06:36Z",
+        "scope": "Discovery, setup, fixture, implementation, gates, review, documentation, cleanup and commit; no reset."
+      }
+    },
     {
       "id": "cloudkit-album-progress-identity",
       "title": "iCloud public albums: stop cursor cycles and preserve photo identity",

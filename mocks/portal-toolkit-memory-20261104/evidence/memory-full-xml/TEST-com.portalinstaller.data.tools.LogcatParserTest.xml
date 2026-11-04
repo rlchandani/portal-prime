@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.tools.LogcatParserTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.746Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="parses brief format line" classname="com.portalinstaller.data.tools.LogcatParserTest" time="0.001"/>
+  <testcase name="blank line is tolerated" classname="com.portalinstaller.data.tools.LogcatParserTest" time="0.0"/>
+  <testcase name="non-matching continuation line falls back to raw message" classname="com.portalinstaller.data.tools.LogcatParserTest" time="0.0"/>
+  <testcase name="parses info line with spaces in message" classname="com.portalinstaller.data.tools.LogcatParserTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

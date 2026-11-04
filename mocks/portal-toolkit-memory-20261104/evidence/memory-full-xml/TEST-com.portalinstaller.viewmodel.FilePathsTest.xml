@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.viewmodel.FilePathsTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.750Z" hostname="iRedlofs-Mac-mini-3.local" time="0.0">
+  <properties/>
+  <testcase name="parent of sdcard stays at sdcard" classname="com.portalinstaller.viewmodel.FilePathsTest" time="0.0"/>
+  <testcase name="parent of nested path" classname="com.portalinstaller.viewmodel.FilePathsTest" time="0.0"/>
+  <testcase name="parent of top-level dir is root" classname="com.portalinstaller.viewmodel.FilePathsTest" time="0.0"/>
+  <testcase name="trailing slash tolerated" classname="com.portalinstaller.viewmodel.FilePathsTest" time="0.0"/>
+  <testcase name="parent of root stays at root" classname="com.portalinstaller.viewmodel.FilePathsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

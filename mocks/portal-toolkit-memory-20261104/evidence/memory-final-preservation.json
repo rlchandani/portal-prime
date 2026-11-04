@@ -1,0 +1,47 @@
+{
+  "primary": {
+    "root": "/Volumes/xHome/Github/portal-toolkit",
+    "head": "4e1dadb8ec2ec018b6fdc250486e0c476467a7c4",
+    "headAndStatusExact": true,
+    "preexistingDirtyFileHashesExact": {},
+    "sourceWrites": 0
+  },
+  "companion": {
+    "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+    "head": "d5b1a4de1069ceb02d172bfb10832a60c232bf53",
+    "headAndStatusExact": true,
+    "preexistingDirtyFileHashesExact": {
+      "app/build.gradle.kts": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+      "app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+      "app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+      "docs/companion-photo-transport-exceptions-2026-11-03.md": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb"
+    },
+    "sourceWrites": 0
+  },
+  "roadmap": {
+    "counts": {
+      "verified": 39,
+      "delivered": 75,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "priorObjectsExact": 123,
+    "suffixBytes": 415562,
+    "suffixSha256": "738d3a19b734c2ff0381408f17841f245fae823fb923cf75b06f1b13a86eaad7",
+    "weatherDefaultExact": true,
+    "boundariesExact": true
+  },
+  "portal": {
+    "head": "c058f71edfea1df747121859c08687461d98c374",
+    "trackedPaths": [
+      "docs/portal-product-operating-state.md",
+      "mocks/portal-widget-gallery-20261102/roadmap/index.html",
+      "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json"
+    ],
+    "noTrackedAppTestVersionCatalogOrFleetDelta": true,
+    "preexistingPycachePathRetained": true,
+    "freshDeviceReads": 0
+  },
+  "recordedAtUtc": "2026-11-04T06:53:11.608713+00:00"
+}

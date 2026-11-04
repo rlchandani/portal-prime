@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.files.PathSafetyTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.552Z" hostname="iRedlofs-Mac-mini-3.local" time="0.002">
+  <properties/>
+  <testcase name="requireAllowed throws outside sdcard without advanced mode" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.001"/>
+  <testcase name="requireAllowed rejects nested parent traversal" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="requireAllowed permits dot and repeated slash segments within sdcard" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="system paths are outside" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="requireAllowed permits inside sdcard without advanced mode" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="requireAllowed permits outside sdcard in advanced mode" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="requireAllowed rejects raw move parent destination" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="sdcard paths are within" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="requireAllowed permits literal dotted and hidden filenames" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="requireAllowed rejects parent segment at sdcard root" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="requireAllowed rejects leave and return path" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <testcase name="requireAllowed rejects composed rename parent destination" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.001"/>
+  <testcase name="requireAllowed permits parent traversal and outside paths in advanced mode" classname="com.portalinstaller.data.files.PathSafetyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

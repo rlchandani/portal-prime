@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "runs": [
+    {
+      "label": "baseline",
+      "startedAtUtc": "2026-11-04T06:45:43.184780+00:00",
+      "completedAtUtc": "2026-11-04T06:45:43.285330+00:00",
+      "command": [
+        "java",
+        "-cp",
+        "/private/tmp/portal-product-discovery-20261104-063636/baseline-classes:~/.gradle/caches/modules-2/files-2.1/junit/junit/4.13.2/8ac9e16d933b6fb43bc7f576336b8f4d7eb5ba12/junit-4.13.2.jar:~/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar:~/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.21/618b539767b4899b4660a83006e052b63f1db551/kotlin-stdlib-2.0.21.jar",
+        "org.junit.runner.JUnitCore",
+        "com.portalinstaller.data.MemInfoParserTest",
+        "com.portalinstaller.data.MemInfoValidityTest"
+      ],
+      "classpath": [
+        "/private/tmp/portal-product-discovery-20261104-063636/baseline-classes",
+        "~/.gradle/caches/modules-2/files-2.1/junit/junit/4.13.2/8ac9e16d933b6fb43bc7f576336b8f4d7eb5ba12/junit-4.13.2.jar",
+        "~/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar",
+        "~/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.21/618b539767b4899b4660a83006e052b63f1db551/kotlin-stdlib-2.0.21.jar"
+      ],
+      "exitCode": 1,
+      "tests": 17,
+      "failures": 9,
+      "failureCases": [
+        {
+          "method": "overflowingFreeFallbackDoesNotWrapBytes",
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=-9223372036854775808)>"
+        },
+        {
+          "method": "overflowingTotalDoesNotWrapBytes",
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=-9223372036854775808, availableBytes=20480)>"
+        },
+        {
+          "method": "overflowingAvailableStillUsesValidFreeFallback",
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "type": "java.lang.AssertionError: expected:<MemInfo(totalBytes=102400, availableBytes=30720)> but was:<MemInfo(totalBytes=102400, availableBytes=-9223372036854775808)>"
+        },
+        {
+          "method": "invalidAvailableStillUsesValidFreeFallback",
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "type": "java.lang.AssertionError: expected:<MemInfo(totalBytes=102400, availableBytes=30720)> but was:<MemInfo(totalBytes=102400, availableBytes=20480)>"
+        },
+        {
+          "method": "digitsInsideAnErrorAreNotAValue",
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=12288, availableBytes=20480)>"
+        },
+        {
+          "method": "negativeAvailableWithoutFallbackIsUnavailable",
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=20480)>"
+        },
+        {
+          "method": "negativeFreeFallbackIsUnavailable",
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=20480)>"
+        },
+        {
+          "method": "negativeTotalDoesNotBecomePositiveMemory",
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=20480)>"
+        },
+        {
+          "method": "overflowingAvailableDoesNotWrapBytes",
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=-9223372036854775808)>"
+        }
+      ],
+      "expectedResultMatched": true,
+      "output": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-baseline.log",
+        "bytes": 4726,
+        "sha256": "c69168da0466f7832f916f10fda6b4f4169f57771ed8e733f7f5e1188f8276b7"
+      }
+    },
+    {
+      "label": "candidate",
+      "startedAtUtc": "2026-11-04T06:45:43.186275+00:00",
+      "completedAtUtc": "2026-11-04T06:45:43.297364+00:00",
+      "command": [
+        "java",
+        "-cp",
+        "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debug:/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debugUnitTest:~/.gradle/caches/modules-2/files-2.1/junit/junit/4.13.2/8ac9e16d933b6fb43bc7f576336b8f4d7eb5ba12/junit-4.13.2.jar:~/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar:~/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.21/618b539767b4899b4660a83006e052b63f1db551/kotlin-stdlib-2.0.21.jar",
+        "org.junit.runner.JUnitCore",
+        "com.portalinstaller.data.MemInfoParserTest",
+        "com.portalinstaller.data.MemInfoValidityTest"
+      ],
+      "classpath": [
+        "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debug",
+        "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debugUnitTest",
+        "~/.gradle/caches/modules-2/files-2.1/junit/junit/4.13.2/8ac9e16d933b6fb43bc7f576336b8f4d7eb5ba12/junit-4.13.2.jar",
+        "~/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar",
+        "~/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.21/618b539767b4899b4660a83006e052b63f1db551/kotlin-stdlib-2.0.21.jar"
+      ],
+      "exitCode": 0,
+      "tests": 17,
+      "failures": 0,
+      "failureCases": [],
+      "expectedResultMatched": true,
+      "output": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-candidate.log",
+        "bytes": 66,
+        "sha256": "a794cf5913510784cbcfa1a5ca21764fb1377ac3cd458e81baa61a5615770793"
+      }
+    }
+  ]
+}

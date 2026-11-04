@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.files.LsParserTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.550Z" hostname="iRedlofs-Mac-mini-3.local" time="0.002">
+  <properties/>
+  <testcase name="line with too few columns is skipped" classname="com.portalinstaller.data.files.LsParserTest" time="0.001"/>
+  <testcase name="non-numeric size falls back to zero" classname="com.portalinstaller.data.files.LsParserTest" time="0.0"/>
+  <testcase name="garbage line among valid lines does not break parse" classname="com.portalinstaller.data.files.LsParserTest" time="0.0"/>
+  <testcase name="trailing slash on parent path does not double up" classname="com.portalinstaller.data.files.LsParserTest" time="0.0"/>
+  <testcase name="blank and total lines ignored" classname="com.portalinstaller.data.files.LsParserTest" time="0.0"/>
+  <testcase name="parses dirs files and symlinks skipping dot entries" classname="com.portalinstaller.data.files.LsParserTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

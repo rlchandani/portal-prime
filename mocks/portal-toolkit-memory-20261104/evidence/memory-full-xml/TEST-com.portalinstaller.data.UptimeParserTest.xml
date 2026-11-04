@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.UptimeParserTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.546Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="returns null for blank or malformed input" classname="com.portalinstaller.data.UptimeParserTest" time="0.0"/>
+  <testcase name="formats days and hours" classname="com.portalinstaller.data.UptimeParserTest" time="0.0"/>
+  <testcase name="formats seconds below a minute" classname="com.portalinstaller.data.UptimeParserTest" time="0.001"/>
+  <testcase name="formats minutes below an hour" classname="com.portalinstaller.data.UptimeParserTest" time="0.0"/>
+  <testcase name="parses the first float of proc uptime as whole seconds" classname="com.portalinstaller.data.UptimeParserTest" time="0.0"/>
+  <testcase name="handles a single value without idle time" classname="com.portalinstaller.data.UptimeParserTest" time="0.0"/>
+  <testcase name="formats hours and minutes below a day" classname="com.portalinstaller.data.UptimeParserTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

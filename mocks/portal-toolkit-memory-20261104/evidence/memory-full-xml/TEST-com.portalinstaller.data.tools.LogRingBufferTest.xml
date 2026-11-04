@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.tools.LogRingBufferTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.745Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="append returns a new instance leaving the original unchanged" classname="com.portalinstaller.data.tools.LogRingBufferTest" time="0.001"/>
+  <testcase name="append evicts oldest beyond capacity" classname="com.portalinstaller.data.tools.LogRingBufferTest" time="0.0"/>
+  <testcase name="append accumulates below capacity" classname="com.portalinstaller.data.tools.LogRingBufferTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

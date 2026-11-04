@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.transfer.TransferProgressTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.750Z" hostname="iRedlofs-Mac-mini-3.local" time="0.0">
+  <properties/>
+  <testcase name="fraction is zero when total unknown" classname="com.portalinstaller.data.transfer.TransferProgressTest" time="0.0"/>
+  <testcase name="fraction is half at midpoint" classname="com.portalinstaller.data.transfer.TransferProgressTest" time="0.0"/>
+  <testcase name="fraction is zero when total negative" classname="com.portalinstaller.data.transfer.TransferProgressTest" time="0.0"/>
+  <testcase name="fraction clamps below zero" classname="com.portalinstaller.data.transfer.TransferProgressTest" time="0.0"/>
+  <testcase name="determinate only when total positive" classname="com.portalinstaller.data.transfer.TransferProgressTest" time="0.0"/>
+  <testcase name="fraction clamps above one" classname="com.portalinstaller.data.transfer.TransferProgressTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

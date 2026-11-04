@@ -1,0 +1,10 @@
+{
+  "head": "205f2e56a173273fbde4afd9b03dd6ff4ae7b048",
+  "parent": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+  "branch": "codex/toolkit-memory-validity-20261104",
+  "paths": [
+    "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+    "app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt"
+  ],
+  "clean": true
+}

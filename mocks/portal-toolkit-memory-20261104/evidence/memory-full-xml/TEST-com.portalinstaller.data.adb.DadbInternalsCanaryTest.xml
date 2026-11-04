@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.adb.DadbInternalsCanaryTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.548Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="public TCP connect(Socket, AdbKeyPair) still exists and is public" classname="com.portalinstaller.data.adb.DadbInternalsCanaryTest" time="0.0"/>
+  <testcase name="internal streams connect default still resolves" classname="com.portalinstaller.data.adb.DadbInternalsCanaryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

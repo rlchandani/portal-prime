@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.BackupDeclaredFilesTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:41.925Z" hostname="iRedlofs-Mac-mini-3.local" time="0.551">
+  <properties/>
+  <testcase name="missing declared base fails the app without installing the split" classname="com.portalinstaller.data.BackupDeclaredFilesTest" time="0.516"/>
+  <testcase name="empty declared base fails the app without installing the split" classname="com.portalinstaller.data.BackupDeclaredFilesTest" time="0.004"/>
+  <testcase name="missing declared split fails the app without installing the base" classname="com.portalinstaller.data.BackupDeclaredFilesTest" time="0.003"/>
+  <testcase name="complete archive with mismatched package retains failure before transport" classname="com.portalinstaller.data.BackupDeclaredFilesTest" time="0.005"/>
+  <testcase name="incomplete app fails independently while the following complete app installs" classname="com.portalinstaller.data.BackupDeclaredFilesTest" time="0.007"/>
+  <testcase name="all declared files absent retains a failed package and owned cleanup" classname="com.portalinstaller.data.BackupDeclaredFilesTest" time="0.003"/>
+  <testcase name="complete split restore retains declared order and actual bytes" classname="com.portalinstaller.data.BackupDeclaredFilesTest" time="0.006"/>
+  <testcase name="empty declared split fails the app without installing the base" classname="com.portalinstaller.data.BackupDeclaredFilesTest" time="0.003"/>
+  <testcase name="complete single APK retains push install and remote cleanup" classname="com.portalinstaller.data.BackupDeclaredFilesTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (~/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.12/be4984cb6fd1ef1d11f218a648889dfda44b8a15/byte-buddy-agent-1.14.12.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

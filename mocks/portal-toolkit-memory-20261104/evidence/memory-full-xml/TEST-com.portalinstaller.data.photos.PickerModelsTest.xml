@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.photos.PickerModelsTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.566Z" hostname="iRedlofs-Mac-mini-3.local" time="0.0">
+  <properties/>
+  <testcase name="session without polling config falls back to defaults" classname="com.portalinstaller.data.photos.PickerModelsTest" time="0.0"/>
+  <testcase name="duration parsing handles fractional, blank and garbage" classname="com.portalinstaller.data.photos.PickerModelsTest" time="0.0"/>
+  <testcase name="media item without filename falls back to id-based name" classname="com.portalinstaller.data.photos.PickerModelsTest" time="0.0"/>
+  <testcase name="session parses fields and polling durations" classname="com.portalinstaller.data.photos.PickerModelsTest" time="0.0"/>
+  <testcase name="download url appends full-resolution suffix" classname="com.portalinstaller.data.photos.PickerModelsTest" time="0.0"/>
+  <testcase name="media items page parses items and next page token" classname="com.portalinstaller.data.photos.PickerModelsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

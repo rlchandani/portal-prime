@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.InstallPolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.535Z" hostname="iRedlofs-Mac-mini-3.local" time="0.0">
+  <properties/>
+  <testcase name="minSdk above the portal ceiling is incompatible" classname="com.portalinstaller.data.InstallPolicyTest" time="0.0"/>
+  <testcase name="minSdk equal to the portal ceiling is compatible" classname="com.portalinstaller.data.InstallPolicyTest" time="0.0"/>
+  <testcase name="null minSdk is treated as compatible" classname="com.portalinstaller.data.InstallPolicyTest" time="0.0"/>
+  <testcase name="minSdk below the portal ceiling is compatible" classname="com.portalinstaller.data.InstallPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

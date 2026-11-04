@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.store.HistoryStoreTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.622Z" hostname="iRedlofs-Mac-mini-3.local" time="0.046">
+  <properties/>
+  <testcase name="parse tolerates malformed json" classname="com.portalinstaller.data.store.HistoryStoreTest" time="0.001"/>
+  <testcase name="add prepends newest entry first" classname="com.portalinstaller.data.store.HistoryStoreTest" time="0.003"/>
+  <testcase name="history caps at 50 entries keeping the newest" classname="com.portalinstaller.data.store.HistoryStoreTest" time="0.039"/>
+  <testcase name="replaceAll overwrites and still caps at 50" classname="com.portalinstaller.data.store.HistoryStoreTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

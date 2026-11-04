@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-04T06:44:15.081353+00:00",
+  "reviewer": "photo_layout_review",
+  "classification": "SUPPORTED_SOURCE_QUALIFICATION_ONLY",
+  "clock": {
+    "startedAt": "2026-11-04T06:36:36Z",
+    "deadline": "2026-11-04T07:06:36Z",
+    "reset": false
+  },
+  "sourceCheckout": {
+    "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+    "head": "d5b1a4de1069ceb02d172bfb10832a60c232bf53",
+    "clean": false,
+    "status": [
+      " M app/build.gradle.kts",
+      " M app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt",
+      " M app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt",
+      "?? docs/companion-photo-transport-exceptions-2026-11-03.md"
+    ],
+    "noAncestorAgENTsOrClaudeGuideFound": true
+  },
+  "continuation": {
+    "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit",
+    "base": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+    "branch": "codex/toolkit-memory-validity-20261104",
+    "rootOwnsAllSourceAndTests": true
+  },
+  "finding": {
+    "symbol": "MemInfoParser.parse/readKb",
+    "firstValueDigitExtraction": "Regex \\d+ finds 1 in -1; the sign is discarded.",
+    "byteConversion": "Unbounded nonnegative Long kB is multiplied by 1024 with normal Long overflow.",
+    "sourcePredictionsNotExecutedByReviewer": [
+      {
+        "input": "MemTotal: -1 kB; MemAvailable: 0 kB",
+        "predictedTotalBytes": 1024
+      },
+      {
+        "input": "MemTotal: 9007199254740992 kB; MemAvailable: 0 kB",
+        "predictedTotalBytes": -9223372036854775808
+      }
+    ],
+    "representableMaximumKb": 9007199254740991,
+    "observedKernelFailure": false
+  },
+  "activeCallerEvidence": [
+    {
+      "path": "app/src/main/java/com/portalinstaller/data/PortalConnectionManager.kt",
+      "currentLines": [
+        383,
+        386,
+        391,
+        392
+      ],
+      "baseLines": [
+        340,
+        343,
+        348,
+        349
+      ],
+      "effect": "getDeviceStatus invokes real parser on cat /proc/meminfo output and maps null to nullable RAM fields."
+    },
+    {
+      "path": "app/src/main/java/com/portalinstaller/ui/devices/DashboardCard.kt",
+      "currentLines": [
+        112,
+        113,
+        124,
+        127,
+        131,
+        134
+      ],
+      "effect": "Null RAM fields render existing unavailable center and empty subtitle; nonnull fields render percentage and used/total."
+    },
+    {
+      "path": "app/src/main/java/com/portalinstaller/ui/common/Format.kt",
+      "currentLines": [
+        52,
+        54,
+        60
+      ],
+      "effect": "formatRam has an existing null/unavailable branch."
+    },
+    {
+      "path": "app/src/main/java/com/portalinstaller/viewmodel/ConnectionViewModel.kt",
+      "currentLines": [
+        299,
+        305,
+        307,
+        309
+      ],
+      "effect": "Dashboard refresh publishes device status after session ownership check."
+    }
+  ],
+  "historyQualification": {
+    "parserAndOriginalTestsOnlyHistoryCommit": "50638385564ce8d07da571e8f9bd64361190e44c",
+    "historicalPositiveScope": "Aug 1 RAM gauge fix replaces a hardcoded full gauge with total/available bytes, prefers MemAvailable and falls back to MemFree; no sign or multiplication-bound guard.",
+    "originalTests": 5,
+    "originalCoverage": [
+      "ordinary Portal sample byte values",
+      "used fraction",
+      "MemFree fallback when MemAvailable absent",
+      "missing MemTotal",
+      "blank input"
+    ],
+    "parserAndOriginalTestsIdenticalAtRetainedBase": true,
+    "uptimeReceipt": "docs/portal-toolkit-uptime-validity-2026-11-03.md",
+    "uptimeStructuredReceipt": "mocks/portal-widget-gallery-20261102/evidence/toolkit-uptime-validity-verification.json",
+    "uptimeClock": {
+      "startedAt": "2026-11-03T20:18:18Z",
+      "deadline": "2026-11-03T20:48:18Z"
+    },
+    "uptimePositiveScope": "UptimeParser nonfinite/negative elapsed values before conversion, parser/formatter fixture only; source bindings contain no MemInfo file.",
+    "uptimeOtherDiscovery": "Profile application bounded negative; duplicate store/editor and scanner observations retain earlier clocks.",
+    "noMemInfoSpecificPriorFixOrHeldHypothesisFoundInReviewedHistoryReceiptsLedger": true,
+    "fileBrowserQualification": "Earlier file-browser ordering observations stay under Nov 3 18:18:11–18:48:11. Current rename-directory target semantics was source triage only, not admitted, reproduced or corrected; no reset."
+  },
+  "admittedPolicy": {
+    "scope": "First numeric value token toLongOrNull with 0..Long.MAX_VALUE/1024 before multiplication.",
+    "preserved": [
+      "zero",
+      "available greater than total and existing clamping",
+      "unitless compatibility",
+      "MemAvailable to MemFree fallback including unparsable Available",
+      "existing null/unavailable UI and persistence"
+    ],
+    "excluded": [
+      "total-positive policy",
+      "available<=total policy",
+      "unit-format redesign",
+      "UI change",
+      "device-memory cap"
+    ]
+  },
+  "sourceBindings": [
+    {
+      "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+      "path": "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+      "bytes": 1443,
+      "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+    },
+    {
+      "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+      "path": "app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+      "bytes": 1474,
+      "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+    },
+    {
+      "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+      "path": "app/src/main/java/com/portalinstaller/data/PortalConnectionManager.kt",
+      "bytes": 29180,
+      "sha256": "a6b422ed89a42769e8a28a4e564796dee695cae8527b8f21f88ae5212aaf8bea"
+    },
+    {
+      "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+      "path": "app/src/main/java/com/portalinstaller/ui/devices/DashboardCard.kt",
+      "bytes": 13035,
+      "sha256": "e5f8e25a700464263b2005d4af95d1b962b25333572bb915aacce5113e6c84bd"
+    },
+    {
+      "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+      "path": "app/src/main/java/com/portalinstaller/ui/common/Format.kt",
+      "bytes": 2116,
+      "sha256": "dae2cc2b473c5bc0a51ca8e2f1fc54406de3239991134562ee44b64c55f603b9"
+    },
+    {
+      "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+      "path": "app/src/main/java/com/portalinstaller/viewmodel/ConnectionViewModel.kt",
+      "bytes": 23194,
+      "sha256": "d59f8b026b5e5190cd853b38a8451a12fece1e37a1e6cd79216d35f685a1bb1f"
+    }
+  ],
+  "retainedBaseBindings": [
+    {
+      "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+      "path": "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+      "bytes": 1443,
+      "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+    },
+    {
+      "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+      "path": "app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+      "bytes": 1474,
+      "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+    },
+    {
+      "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+      "path": "app/src/main/java/com/portalinstaller/data/PortalConnectionManager.kt",
+      "bytes": 26812,
+      "sha256": "57d828aa56a0bf3877d0cb0e5d86e58592a252bb0c2444a07ee5af131050717a"
+    },
+    {
+      "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+      "path": "app/src/main/java/com/portalinstaller/ui/devices/DashboardCard.kt",
+      "bytes": 12528,
+      "sha256": "a461be9dd203ecb6e663ddf351e3346fb2aac85ffeba952df8dc58a79e61c101"
+    },
+    {
+      "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+      "path": "app/src/main/java/com/portalinstaller/ui/common/Format.kt",
+      "bytes": 2116,
+      "sha256": "dae2cc2b473c5bc0a51ca8e2f1fc54406de3239991134562ee44b64c55f603b9"
+    },
+    {
+      "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+      "path": "app/src/main/java/com/portalinstaller/viewmodel/ConnectionViewModel.kt",
+      "bytes": 19927,
+      "sha256": "d0ec6e06697830e8a8246a2f86b75297cd8592ab249611fbb932be7c7776378e"
+    }
+  ],
+  "preservation": {
+    "preexistingPhotoTransportFiles": [
+      {
+        "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+        "path": "app/build.gradle.kts",
+        "bytes": 3526,
+        "sha256": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+        "expectedSha256": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+        "unchanged": true
+      },
+      {
+        "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+        "path": "app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt",
+        "bytes": 17376,
+        "sha256": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+        "expectedSha256": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+        "unchanged": true
+      },
+      {
+        "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+        "path": "app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt",
+        "bytes": 24190,
+        "sha256": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+        "expectedSha256": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+        "unchanged": true
+      },
+      {
+        "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+        "path": "docs/companion-photo-transport-exceptions-2026-11-03.md",
+        "bytes": 1427,
+        "sha256": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb",
+        "expectedSha256": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb",
+        "unchanged": true
+      }
+    ],
+    "allFourExact": true,
+    "originalCompanionStatusRetained": true
+  },
+  "reviewerActions": {
+    "testsExecuted": 0,
+    "fixturesCreated": 0,
+    "sourceWrites": 0,
+    "devicePhoneNativeCommands": 0,
+    "providerAccountAuthActions": 0,
+    "networkActions": 0,
+    "reportOnlyWrite": "/private/tmp/portal-product-discovery-20261104-063636/memory-source-discovery.json"
+  },
+  "limits": [
+    "Source qualification and historical scope audit only; runtime assertions belong to root RED/GREEN review.",
+    "Generated numeric inputs are not observed real kernel or native dashboard output.",
+    "Physical phone/Portal, live proc/ADB, provider/account/auth, hosted CI, installation and publication remain prohibited/unaccepted.",
+    "All prior scopes and clocks remain intact."
+  ]
+}

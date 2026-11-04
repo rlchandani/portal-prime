@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.store.SavedPortalStoreTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.669Z" hostname="iRedlofs-Mac-mini-3.local" time="0.014">
+  <properties/>
+  <testcase name="upsert round-trips and sorts newest connected first" classname="com.portalinstaller.data.store.SavedPortalStoreTest" time="0.003"/>
+  <testcase name="setScreensaverFolder persists and round-trips" classname="com.portalinstaller.data.store.SavedPortalStoreTest" time="0.003"/>
+  <testcase name="upsert replaces an entry with the same id" classname="com.portalinstaller.data.store.SavedPortalStoreTest" time="0.002"/>
+  <testcase name="parse reuses the legacy json shape" classname="com.portalinstaller.data.store.SavedPortalStoreTest" time="0.0"/>
+  <testcase name="screensaverFolder survives serialize parse" classname="com.portalinstaller.data.store.SavedPortalStoreTest" time="0.001"/>
+  <testcase name="remove deletes by id" classname="com.portalinstaller.data.store.SavedPortalStoreTest" time="0.002"/>
+  <testcase name="rename changes only the matching portal" classname="com.portalinstaller.data.store.SavedPortalStoreTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

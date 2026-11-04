@@ -1,0 +1,45 @@
+{
+  "recordedAtUtc": "2026-11-04T06:52:14.801Z",
+  "url": "http://127.0.0.1:18914/roadmap/#task=toolkit-memory-validity",
+  "desktop": {
+    "detailWidth": 598.5625,
+    "detailX": 897.9375,
+    "detailY": 206.1953125,
+    "hasLimits": true,
+    "hasSourceCommit": true,
+    "height": 1000,
+    "platforms": "Android companion, Fleet & delivery tooling",
+    "rowCount": 124,
+    "scrollWidth": 1585,
+    "title": "Toolkit RAM: reject negative and overflowing values",
+    "width": 1600
+  },
+  "mobile": {
+    "detailWidth": 343,
+    "detailX": 16,
+    "detailY": 307.71875,
+    "hasLimits": true,
+    "hasSourceCommit": true,
+    "height": 844,
+    "platforms": "Android companion, Fleet & delivery tooling",
+    "rowCount": 124,
+    "scrollWidth": 391,
+    "title": "Toolkit RAM: reject negative and overflowing values",
+    "width": 390
+  },
+  "consoleWarningsErrors": [],
+  "scope": "New Toolkit RAM detail content/width and visible queue counts only. Mobile detail was explicitly scrolled into view by its heading; task-button scroll behavior and all historical details are not accepted. Document measures 391px at a 390px viewport; no whole-page overflow acceptance is claimed.",
+  "setupCorrections": [
+    "Initial preview root could not serve sibling evidence paths; corrected to gallery parent before final checks.",
+    "Native AX scroll target unavailable; no action occurred; documented DOM locator used."
+  ],
+  "screenshots": [
+    "mocks/portal-toolkit-memory-20261104/evidence/roadmap-desktop.png",
+    "mocks/portal-toolkit-memory-20261104/evidence/roadmap-mobile.png"
+  ],
+  "cleanup": {
+    "ownedTabClosed": true,
+    "viewportReset": true,
+    "userTabsClosed": 0
+  }
+}

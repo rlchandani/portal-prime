@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.tools.InputPixelBoundsTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.745Z" hostname="iRedlofs-Mac-mini-3.local" time="0.0">
+  <properties/>
+  <testcase name="rightLetterboxTapTargetsLastColumn" classname="com.portalinstaller.data.tools.InputPixelBoundsTest" time="0.0"/>
+  <testcase name="negativePointsStillClampToOrigin" classname="com.portalinstaller.data.tools.InputPixelBoundsTest" time="0.0"/>
+  <testcase name="lastPixelInsideContentIsUnchanged" classname="com.portalinstaller.data.tools.InputPixelBoundsTest" time="0.0"/>
+  <testcase name="invalidDimensionsKeepExistingOriginFallback" classname="com.portalinstaller.data.tools.InputPixelBoundsTest" time="0.0"/>
+  <testcase name="bottomLetterboxLongPressTargetsLastRow" classname="com.portalinstaller.data.tools.InputPixelBoundsTest" time="0.0"/>
+  <testcase name="dragBeyondViewTargetsValidPixelsAtBothEnds" classname="com.portalinstaller.data.tools.InputPixelBoundsTest" time="0.0"/>
+  <testcase name="interiorTapKeepsProportionalMapping" classname="com.portalinstaller.data.tools.InputPixelBoundsTest" time="0.0"/>
+  <testcase name="onePixelDisplayHasOnlyTheOrigin" classname="com.portalinstaller.data.tools.InputPixelBoundsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

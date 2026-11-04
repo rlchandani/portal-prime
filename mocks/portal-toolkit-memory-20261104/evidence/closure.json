@@ -1,0 +1,130 @@
+{
+  "recordedAtUtc": "2026-11-04T06:54:04.000770+00:00",
+  "clockDeadline": "2026-11-04T07:06:36Z",
+  "docs": {
+    "strictExitCode": 0,
+    "warnings": [],
+    "buildMarkerPresent": true,
+    "unrecognizedHistoricalLinksRemainInfoOnly": true
+  },
+  "browser": {
+    "recordedAtUtc": "2026-11-04T06:52:14.801Z",
+    "url": "http://127.0.0.1:18914/roadmap/#task=toolkit-memory-validity",
+    "desktop": {
+      "detailWidth": 598.5625,
+      "detailX": 897.9375,
+      "detailY": 206.1953125,
+      "hasLimits": true,
+      "hasSourceCommit": true,
+      "height": 1000,
+      "platforms": "Android companion, Fleet & delivery tooling",
+      "rowCount": 124,
+      "scrollWidth": 1585,
+      "title": "Toolkit RAM: reject negative and overflowing values",
+      "width": 1600
+    },
+    "mobile": {
+      "detailWidth": 343,
+      "detailX": 16,
+      "detailY": 307.71875,
+      "hasLimits": true,
+      "hasSourceCommit": true,
+      "height": 844,
+      "platforms": "Android companion, Fleet & delivery tooling",
+      "rowCount": 124,
+      "scrollWidth": 391,
+      "title": "Toolkit RAM: reject negative and overflowing values",
+      "width": 390
+    },
+    "consoleWarningsErrors": [],
+    "scope": "New Toolkit RAM detail content/width and visible queue counts only. Mobile detail was explicitly scrolled into view by its heading; task-button scroll behavior and all historical details are not accepted. Document measures 391px at a 390px viewport; no whole-page overflow acceptance is claimed.",
+    "setupCorrections": [
+      "Initial preview root could not serve sibling evidence paths; corrected to gallery parent before final checks.",
+      "Native AX scroll target unavailable; no action occurred; documented DOM locator used."
+    ],
+    "screenshots": [
+      "mocks/portal-toolkit-memory-20261104/evidence/roadmap-desktop.png",
+      "mocks/portal-toolkit-memory-20261104/evidence/roadmap-mobile.png"
+    ],
+    "cleanup": {
+      "ownedTabClosed": true,
+      "viewportReset": true,
+      "userTabsClosed": 0
+    }
+  },
+  "cleanup": {
+    "ownedPreviewServerSessionsRetired": [
+      35954,
+      1180
+    ],
+    "ownedBrowserTabClosed": true,
+    "browserViewportReset": true,
+    "userTabsClosed": 0,
+    "docsEnvironmentRemoved": true,
+    "generatedDocsSiteRemoved": true,
+    "toolkitCommittedWorktreeRetained": true,
+    "evidenceRetained": true,
+    "credentialsCopied": false
+  },
+  "preservation": {
+    "primary": {
+      "root": "/Volumes/xHome/Github/portal-toolkit",
+      "head": "4e1dadb8ec2ec018b6fdc250486e0c476467a7c4",
+      "headAndStatusExact": true,
+      "preexistingDirtyFileHashesExact": {},
+      "sourceWrites": 0
+    },
+    "companion": {
+      "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+      "head": "d5b1a4de1069ceb02d172bfb10832a60c232bf53",
+      "headAndStatusExact": true,
+      "preexistingDirtyFileHashesExact": {
+        "app/build.gradle.kts": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+        "app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+        "app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+        "docs/companion-photo-transport-exceptions-2026-11-03.md": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb"
+      },
+      "sourceWrites": 0
+    },
+    "roadmap": {
+      "counts": {
+        "verified": 39,
+        "delivered": 75,
+        "parked": 7,
+        "approval": 2,
+        "queued": 1
+      },
+      "priorObjectsExact": 123,
+      "suffixBytes": 415562,
+      "suffixSha256": "738d3a19b734c2ff0381408f17841f245fae823fb923cf75b06f1b13a86eaad7",
+      "weatherDefaultExact": true,
+      "boundariesExact": true
+    },
+    "portal": {
+      "head": "c058f71edfea1df747121859c08687461d98c374",
+      "trackedPaths": [
+        "docs/portal-product-operating-state.md",
+        "mocks/portal-widget-gallery-20261102/roadmap/index.html",
+        "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json"
+      ],
+      "noTrackedAppTestVersionCatalogOrFleetDelta": true,
+      "preexistingPycachePathRetained": true,
+      "freshDeviceReads": 0
+    },
+    "recordedAtUtc": "2026-11-04T06:53:11.608713+00:00"
+  },
+  "indexOnlyNewNoteInserted": true,
+  "setupCorrectionsExcludedFromProductRed": [
+    "Missing SDK configuration before clean baseline.",
+    "Queue-note uniqueness assertion before index write.",
+    "File binding checker needed root/revision resolution; final 133 bindings match.",
+    "Initial preview root served roadmap only; corrected parent used for final checks.",
+    "Unavailable native AX scroll performed no action; supported DOM locator used."
+  ],
+  "wholeProductGoalComplete": false,
+  "evidencePackaging": {
+    "sixRawLogsArchivedAsGzip": true,
+    "decompressedCapturedBytesExact": true,
+    "reason": "Gradle trailing spaces and JUnit final blank lines are retained without source whitespace changes."
+  }
+}

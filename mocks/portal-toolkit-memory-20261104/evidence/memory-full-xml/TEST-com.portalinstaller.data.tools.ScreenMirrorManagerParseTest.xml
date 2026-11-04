@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.tools.ScreenMirrorManagerParseTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.747Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="parses physical size line" classname="com.portalinstaller.data.tools.ScreenMirrorManagerParseTest" time="0.0"/>
+  <testcase name="returns null for malformed output" classname="com.portalinstaller.data.tools.ScreenMirrorManagerParseTest" time="0.0"/>
+  <testcase name="returns null for empty output" classname="com.portalinstaller.data.tools.ScreenMirrorManagerParseTest" time="0.0"/>
+  <testcase name="tolerates surrounding whitespace and carriage returns" classname="com.portalinstaller.data.tools.ScreenMirrorManagerParseTest" time="0.0"/>
+  <testcase name="override size wins over physical size" classname="com.portalinstaller.data.tools.ScreenMirrorManagerParseTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

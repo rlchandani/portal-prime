@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.transfer.CountingStreamsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.749Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="counting source reports cumulative bytes and fraction" classname="com.portalinstaller.data.transfer.CountingStreamsTest" time="0.0"/>
+  <testcase name="counting sink reports bytes written" classname="com.portalinstaller.data.transfer.CountingStreamsTest" time="0.0"/>
+  <testcase name="zero total is not determinate and never divides by zero" classname="com.portalinstaller.data.transfer.CountingStreamsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

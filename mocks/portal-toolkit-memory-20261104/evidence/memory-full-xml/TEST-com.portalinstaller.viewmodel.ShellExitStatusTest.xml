@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.viewmodel.ShellExitStatusTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.752Z" hostname="iRedlofs-Mac-mini-3.local" time="0.071">
+  <properties/>
+  <testcase name="exit zero retains stdout trimming and successful history" classname="com.portalinstaller.viewmodel.ShellExitStatusTest" time="0.056"/>
+  <testcase name="blank command has no transcript transport or history effect" classname="com.portalinstaller.viewmodel.ShellExitStatusTest" time="0.001"/>
+  <testcase name="negative returned exit remains an error" classname="com.portalinstaller.viewmodel.ShellExitStatusTest" time="0.003"/>
+  <testcase name="returned exit one reports stderr as an error without saving history" classname="com.portalinstaller.viewmodel.ShellExitStatusTest" time="0.002"/>
+  <testcase name="thrown transport failure retains existing error behavior" classname="com.portalinstaller.viewmodel.ShellExitStatusTest" time="0.003"/>
+  <testcase name="exit zero with stderr remains successful" classname="com.portalinstaller.viewmodel.ShellExitStatusTest" time="0.003"/>
+  <testcase name="disconnected command keeps the existing localized error" classname="com.portalinstaller.viewmodel.ShellExitStatusTest" time="0.001"/>
+  <testcase name="returned exit 127 is an error even with no output" classname="com.portalinstaller.viewmodel.ShellExitStatusTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

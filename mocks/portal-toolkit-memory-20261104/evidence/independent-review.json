@@ -1,0 +1,1241 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-04T06:47:27.131581+00:00",
+  "reviewer": "photo_layout_review",
+  "classification": "INDEPENDENT_SOURCE_AND_JVM_VERIFICATION",
+  "clock": {
+    "startedAt": "2026-11-04T06:36:36Z",
+    "deadline": "2026-11-04T07:06:36Z",
+    "reset": false,
+    "completedWithinOriginalDeadline": true
+  },
+  "readiness": {
+    "blockers": [],
+    "noSourceOrFixtureBlocker": true,
+    "scopeReady": true,
+    "meaning": "Narrow first-token validity and safe kB-to-byte conversion have verified source and frozen actual-parser JVM regression evidence. Recorded full JVM/debug gate artifacts agree. Device/native dashboard behavior, installation and publication are not accepted by this report."
+  },
+  "checkout": {
+    "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit",
+    "head": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+    "retainedBase": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+    "status": [
+      " M app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+      "?? app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt"
+    ],
+    "diffCheckExitCode": 0
+  },
+  "sourceReview": {
+    "diff": "diff --git a/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt b/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt\nindex 1e71aa8..572fc09 100644\n--- a/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt\n+++ b/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt\n@@ -39,6 +39,8 @@ object MemInfoParser {\n     private fun readKb(output: String, key: String): Long? {\n         val line = output.lineSequence().firstOrNull { it.trimStart().startsWith(\"$key:\") }\n             ?: return null\n-        return Regex(\"\"\"\\d+\"\"\").find(line)?.value?.toLongOrNull()\n+        val value = line.substringAfter(':').trimStart().takeWhile { !it.isWhitespace() }\n+        // Preserve the sign and reject values whose byte conversion would overflow.\n+        return value.toLongOrNull()?.takeIf { it in 0..Long.MAX_VALUE / 1024 }\n     }\n }\n",
+    "scope": "Only readKb first value token extraction and representability guard; parse preference/fallback, multiplication and MemInfo fraction stay unchanged.",
+    "maxKb": 9007199254740991,
+    "testCount": {
+      "original": 5,
+      "new": 12
+    },
+    "controlsPreserved": [
+      "ordinary Portal sample and used fraction",
+      "missing Total and blank input",
+      "Available absent to Free fallback",
+      "unparsable or overflowing Available to valid Free fallback",
+      "zero values",
+      "available greater than total with existing fraction clamping",
+      "maximum representable byte value",
+      "whitespace and unitless values"
+    ],
+    "testAdequacy": "Tests invoke actual public parser with generated inputs and expected nullable/byte values; 9 original-parser failures are all assertion failures. Baseline and candidate compiled tests and MemInfo data class are byte-identical. No fake parser, mocked transport or runtime replacement is used.",
+    "newTestHeader": "2026 Starbright Lab MIT header present.",
+    "bindings": [
+      {
+        "path": "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+        "frozen": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/frozen/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+          "bytes": 1443,
+          "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+          "bytes": 1631,
+          "sha256": "a1fec88773aa83601a592b2e4131dc5aa1a28ddcb8606d191c21568029fe5e7f"
+        },
+        "byteIdentical": false,
+        "retainedBase": {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "bytes": 1443,
+          "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+        },
+        "frozenMatchesRetainedBase": true
+      },
+      {
+        "path": "app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+        "frozen": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/frozen/app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+          "bytes": 1474,
+          "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+          "bytes": 1474,
+          "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+        },
+        "byteIdentical": true,
+        "retainedBase": {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "bytes": 1474,
+          "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+        },
+        "frozenMatchesRetainedBase": true
+      },
+      {
+        "path": "app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt",
+        "frozen": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/frozen/app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt",
+          "bytes": 2719,
+          "sha256": "dbd319ca21c32a8b1ec46909b78cf61bff570102e1027470b749e517076e0441"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt",
+          "bytes": 2719,
+          "sha256": "dbd319ca21c32a8b1ec46909b78cf61bff570102e1027470b749e517076e0441"
+        },
+        "byteIdentical": true
+      }
+    ]
+  },
+  "independentRuntime": {
+    "javaVersion": "openjdk version \"21.0.11\" 2026-04-21\nOpenJDK Runtime Environment JBR-21.0.11+10-1163.125-nomod (build 21.0.11+10-b1163.125)\nOpenJDK 64-Bit Server VM JBR-21.0.11+10-1163.125-nomod (build 21.0.11+10-b1163.125, mixed mode, sharing)\n",
+    "framework": "JUnitCore 4.13.2; Hamcrest 1.3; Kotlin stdlib 2.0.21 resolved from local Gradle cache.",
+    "runs": [
+      {
+        "label": "baseline",
+        "startedAtUtc": "2026-11-04T06:45:43.184780+00:00",
+        "completedAtUtc": "2026-11-04T06:45:43.285330+00:00",
+        "command": [
+          "java",
+          "-cp",
+          "/private/tmp/portal-product-discovery-20261104-063636/baseline-classes:~/.gradle/caches/modules-2/files-2.1/junit/junit/4.13.2/8ac9e16d933b6fb43bc7f576336b8f4d7eb5ba12/junit-4.13.2.jar:~/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar:~/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.21/618b539767b4899b4660a83006e052b63f1db551/kotlin-stdlib-2.0.21.jar",
+          "org.junit.runner.JUnitCore",
+          "com.portalinstaller.data.MemInfoParserTest",
+          "com.portalinstaller.data.MemInfoValidityTest"
+        ],
+        "classpath": [
+          "/private/tmp/portal-product-discovery-20261104-063636/baseline-classes",
+          "~/.gradle/caches/modules-2/files-2.1/junit/junit/4.13.2/8ac9e16d933b6fb43bc7f576336b8f4d7eb5ba12/junit-4.13.2.jar",
+          "~/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar",
+          "~/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.21/618b539767b4899b4660a83006e052b63f1db551/kotlin-stdlib-2.0.21.jar"
+        ],
+        "exitCode": 1,
+        "tests": 17,
+        "failures": 9,
+        "failureCases": [
+          {
+            "method": "overflowingFreeFallbackDoesNotWrapBytes",
+            "class": "com.portalinstaller.data.MemInfoValidityTest",
+            "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=-9223372036854775808)>"
+          },
+          {
+            "method": "overflowingTotalDoesNotWrapBytes",
+            "class": "com.portalinstaller.data.MemInfoValidityTest",
+            "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=-9223372036854775808, availableBytes=20480)>"
+          },
+          {
+            "method": "overflowingAvailableStillUsesValidFreeFallback",
+            "class": "com.portalinstaller.data.MemInfoValidityTest",
+            "type": "java.lang.AssertionError: expected:<MemInfo(totalBytes=102400, availableBytes=30720)> but was:<MemInfo(totalBytes=102400, availableBytes=-9223372036854775808)>"
+          },
+          {
+            "method": "invalidAvailableStillUsesValidFreeFallback",
+            "class": "com.portalinstaller.data.MemInfoValidityTest",
+            "type": "java.lang.AssertionError: expected:<MemInfo(totalBytes=102400, availableBytes=30720)> but was:<MemInfo(totalBytes=102400, availableBytes=20480)>"
+          },
+          {
+            "method": "digitsInsideAnErrorAreNotAValue",
+            "class": "com.portalinstaller.data.MemInfoValidityTest",
+            "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=12288, availableBytes=20480)>"
+          },
+          {
+            "method": "negativeAvailableWithoutFallbackIsUnavailable",
+            "class": "com.portalinstaller.data.MemInfoValidityTest",
+            "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=20480)>"
+          },
+          {
+            "method": "negativeFreeFallbackIsUnavailable",
+            "class": "com.portalinstaller.data.MemInfoValidityTest",
+            "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=20480)>"
+          },
+          {
+            "method": "negativeTotalDoesNotBecomePositiveMemory",
+            "class": "com.portalinstaller.data.MemInfoValidityTest",
+            "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=20480)>"
+          },
+          {
+            "method": "overflowingAvailableDoesNotWrapBytes",
+            "class": "com.portalinstaller.data.MemInfoValidityTest",
+            "type": "java.lang.AssertionError: expected null, but was:<MemInfo(totalBytes=102400, availableBytes=-9223372036854775808)>"
+          }
+        ],
+        "expectedResultMatched": true,
+        "output": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-baseline.log",
+          "bytes": 4726,
+          "sha256": "c69168da0466f7832f916f10fda6b4f4169f57771ed8e733f7f5e1188f8276b7"
+        }
+      },
+      {
+        "label": "candidate",
+        "startedAtUtc": "2026-11-04T06:45:43.186275+00:00",
+        "completedAtUtc": "2026-11-04T06:45:43.297364+00:00",
+        "command": [
+          "java",
+          "-cp",
+          "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debug:/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debugUnitTest:~/.gradle/caches/modules-2/files-2.1/junit/junit/4.13.2/8ac9e16d933b6fb43bc7f576336b8f4d7eb5ba12/junit-4.13.2.jar:~/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar:~/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.21/618b539767b4899b4660a83006e052b63f1db551/kotlin-stdlib-2.0.21.jar",
+          "org.junit.runner.JUnitCore",
+          "com.portalinstaller.data.MemInfoParserTest",
+          "com.portalinstaller.data.MemInfoValidityTest"
+        ],
+        "classpath": [
+          "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debug",
+          "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debugUnitTest",
+          "~/.gradle/caches/modules-2/files-2.1/junit/junit/4.13.2/8ac9e16d933b6fb43bc7f576336b8f4d7eb5ba12/junit-4.13.2.jar",
+          "~/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar",
+          "~/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.21/618b539767b4899b4660a83006e052b63f1db551/kotlin-stdlib-2.0.21.jar"
+        ],
+        "exitCode": 0,
+        "tests": 17,
+        "failures": 0,
+        "failureCases": [],
+        "expectedResultMatched": true,
+        "output": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-candidate.log",
+          "bytes": 66,
+          "sha256": "a794cf5913510784cbcfa1a5ca21764fb1377ac3cd458e81baa61a5615770793"
+        }
+      }
+    ],
+    "runSummary": {
+      "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-runs.json",
+      "bytes": 6491,
+      "sha256": "51c78f00b4a02c583c538662a8c3605167318e90c207f7f3da781b503d5e3990"
+    },
+    "classBindings": [
+      {
+        "class": "MemInfo.class",
+        "baseline": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/baseline-classes/com/portalinstaller/data/MemInfo.class",
+          "bytes": 2841,
+          "sha256": "702a2fcf1f86ffd3fb1255db35b1deed9ad69bd5e070aa6b5af4a2a301b559cc"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debug/com/portalinstaller/data/MemInfo.class",
+          "bytes": 2841,
+          "sha256": "702a2fcf1f86ffd3fb1255db35b1deed9ad69bd5e070aa6b5af4a2a301b559cc"
+        },
+        "byteIdentical": true
+      },
+      {
+        "class": "MemInfoParser.class",
+        "baseline": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/baseline-classes/com/portalinstaller/data/MemInfoParser.class",
+          "bytes": 4144,
+          "sha256": "afb121bb29f3c237dfd5848e50765fa4f866a6dc545c9b9ec3b8cc1e9cac3ae0"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debug/com/portalinstaller/data/MemInfoParser.class",
+          "bytes": 5047,
+          "sha256": "b43439b5259afc1d7096d8ef463184d47bd4bfebcfdca0912e3bc5f933d1699d"
+        },
+        "byteIdentical": false
+      },
+      {
+        "class": "MemInfoParserTest.class",
+        "baseline": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/baseline-classes/com/portalinstaller/data/MemInfoParserTest.class",
+          "bytes": 2883,
+          "sha256": "20b4cdea7516e2604336f181f0b092911b8400423328f0675c1e1344ae82a4da"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debugUnitTest/com/portalinstaller/data/MemInfoParserTest.class",
+          "bytes": 2883,
+          "sha256": "20b4cdea7516e2604336f181f0b092911b8400423328f0675c1e1344ae82a4da"
+        },
+        "byteIdentical": true
+      },
+      {
+        "class": "MemInfoValidityTest.class",
+        "baseline": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/baseline-classes/com/portalinstaller/data/MemInfoValidityTest.class",
+          "bytes": 4246,
+          "sha256": "b799206d535b9370379a92af37a1614ffe8030166685ca7f2d35376eb608a095"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debugUnitTest/com/portalinstaller/data/MemInfoValidityTest.class",
+          "bytes": 4246,
+          "sha256": "b799206d535b9370379a92af37a1614ffe8030166685ca7f2d35376eb608a095"
+        },
+        "byteIdentical": true
+      }
+    ],
+    "runtimeJarBindings": [
+      {
+        "path": "~/.gradle/caches/modules-2/files-2.1/junit/junit/4.13.2/8ac9e16d933b6fb43bc7f576336b8f4d7eb5ba12/junit-4.13.2.jar",
+        "bytes": 384581,
+        "sha256": "8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3"
+      },
+      {
+        "path": "~/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar",
+        "bytes": 45024,
+        "sha256": "66fdef91e9739348df7a096aa384a5685f4e875584cce89386a7a47251c4d8e9"
+      },
+      {
+        "path": "~/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.0.21/618b539767b4899b4660a83006e052b63f1db551/kotlin-stdlib-2.0.21.jar",
+        "bytes": 1747660,
+        "sha256": "f31cc53f105a7e48c093683bbd5437561d1233920513774b470805641bedbc09"
+      }
+    ],
+    "bytecodeBindings": [
+      {
+        "label": "baseline",
+        "command": [
+          "javap",
+          "-p",
+          "-c",
+          "-classpath",
+          "/private/tmp/portal-product-discovery-20261104-063636/baseline-classes",
+          "com.portalinstaller.data.MemInfoParser"
+        ],
+        "exitCode": 0,
+        "output": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-baseline-bytecode.txt",
+          "bytes": 5672,
+          "sha256": "acf0b19c67a501b971cd51c54397adf2fa6ad7c5efcc2a88b17210bf5c6b9020"
+        },
+        "inspection": "Original regex digit search and unchecked 1024 multiplication match retained base source."
+      },
+      {
+        "label": "candidate",
+        "command": [
+          "javap",
+          "-p",
+          "-c",
+          "-classpath",
+          "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/tmp/kotlin-classes/debug",
+          "com.portalinstaller.data.MemInfoParser"
+        ],
+        "exitCode": 0,
+        "output": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-candidate-bytecode.txt",
+          "bytes": 7728,
+          "sha256": "abb2c78215e25b3bb4d8b42f341b56457d8516987d103a692f99c1f31d625c52"
+        },
+        "inspection": "Whole first token toLongOrNull plus signed lower-bound 0 and exclusive upper-bound 9007199254740992 precede unchanged 1024 multiplication."
+      }
+    ],
+    "baselineEqualsRetainedBase": "Frozen original source equals d15912d0 byte-for-byte; preserved compiled baseline bytecode has original regex extraction and unchecked multiplication. No fresh baseline compile was performed by reviewer."
+  },
+  "recordedRootGatesIndependentlyParsed": {
+    "xml": [
+      {
+        "directory": "/private/tmp/portal-product-discovery-20261104-063636/memory-red-xml",
+        "counts": {
+          "tests": 17,
+          "failures": 9,
+          "errors": 0,
+          "skipped": 0,
+          "suites": 2
+        },
+        "uniqueCaseIds": 17,
+        "duplicateCaseIds": 0,
+        "failureTypes": [
+          "java.lang.AssertionError",
+          "java.lang.AssertionError",
+          "java.lang.AssertionError",
+          "java.lang.AssertionError",
+          "java.lang.AssertionError",
+          "java.lang.AssertionError",
+          "java.lang.AssertionError",
+          "java.lang.AssertionError",
+          "java.lang.AssertionError"
+        ],
+        "files": [
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-red-xml/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+            "bytes": 985,
+            "sha256": "d47f7d359896e8bdbf46c937a71c23d42cc077635b27869eb82d9438b0401b2b"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-red-xml/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+            "bytes": 39488,
+            "sha256": "1a7628e0fab855691af3207f1bab9f7cc6fd10edbc973091bc8b382f9de9ce6e"
+          }
+        ]
+      },
+      {
+        "directory": "/private/tmp/portal-product-discovery-20261104-063636/memory-green-xml",
+        "counts": {
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": 2
+        },
+        "uniqueCaseIds": 17,
+        "duplicateCaseIds": 0,
+        "failureTypes": [],
+        "files": [
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-green-xml/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+            "bytes": 982,
+            "sha256": "6eb5cd1bafdb98d6ba2861d490a826b642f54282e0f9fd8bcf4c75db3c9fb74c"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-green-xml/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+            "bytes": 1896,
+            "sha256": "49112cb0e3ae5028715cd52cf6f5bdd08828b6e0786491e654d2096f3be0481a"
+          }
+        ]
+      },
+      {
+        "directory": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml",
+        "counts": {
+          "tests": 239,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "suites": 39
+        },
+        "uniqueCaseIds": 239,
+        "duplicateCaseIds": 0,
+        "failureTypes": [],
+        "files": [
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.AdbErrorsTest.xml",
+            "bytes": 2090,
+            "sha256": "48ee82fe4767d944786e087ebfe72e7aee2eb9ae9798e7ab1d6d276f3743e17f"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.BackupDeclaredFilesTest.xml",
+            "bytes": 2324,
+            "sha256": "b01f8bd0766632af9bcfbcda1443bc0d7f8910649067a41ed81e56efdb61ccd8"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.ConnectRetryTest.xml",
+            "bytes": 882,
+            "sha256": "0e804ef3e2fa8d7103b7e243a600f9cd6b48afcfb3aafe657069c6515df216b6"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.ConnectionMonitorTest.xml",
+            "bytes": 2886,
+            "sha256": "3037c6fb529f1714ff1b4112a558a3a7eec8e7786d1352dd09f9a328d1a3c50a"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.InstallPolicyTest.xml",
+            "bytes": 869,
+            "sha256": "2a3da06b10e33504f24fb6fa084077a20343d18fc419d137152b65abce5ddca3"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+            "bytes": 982,
+            "sha256": "fbb7abe80265a86121af848d7d8ee870ab0e1ad4c363e97ffb3b0a2d8e9fab90"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+            "bytes": 1894,
+            "sha256": "026890ed5db396cf4ed9ed3a1eac5bf9d56ca392db0e0c71b12ce68bc5873c18"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.PortalBackupManagerTest.xml",
+            "bytes": 1082,
+            "sha256": "c1dd825419194f20b5ecc84544e0bf4696654e7108f9987f435ce337fead4aa1"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.ReconnectBackoffTest.xml",
+            "bytes": 852,
+            "sha256": "3697fd555f9e6a3f72a53a653e0e4530858c976f7d8b5f299ae0809cd850cfe2"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.UptimeParserTest.xml",
+            "bytes": 1206,
+            "sha256": "93cd809b80c749f048fbddcd87b8375fd94d88c33d19a4a39fb2577797d372cf"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.UptimeValidityTest.xml",
+            "bytes": 1278,
+            "sha256": "6101701625454189b5016862eee3b26daded93c0769e6c2917a30d2b8cfa6499"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.adb.DadbInternalsCanaryTest.xml",
+            "bytes": 663,
+            "sha256": "fc78d0d2df1dc373175bd7d4f9fb74ab7c29aedbe25c265628602322e7d4149c"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.apps.AppMetadataCacheTest.xml",
+            "bytes": 620,
+            "sha256": "bae3b21941f4cfe249794d827f676e4eb30ec8f540e87cde50882d592feb262d"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.files.LsParserTest.xml",
+            "bytes": 1130,
+            "sha256": "af6d33ed688113663aea5635c3a7d58ffdc014e3a5fcd856157856a2f22fb6dd"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.files.PathSafetyTest.xml",
+            "bytes": 2200,
+            "sha256": "75826a6ff07d786cc697fb5ba98869da89fc2d54e9dc1e8ed9602cbb7d844653"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.files.RemotePathsTest.xml",
+            "bytes": 1635,
+            "sha256": "8042cb0a2136f86088ea36df724ec174f8c708c92d8d892d94ad0ba31a8d9459"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.photos.PhotosPickerClientTest.xml",
+            "bytes": 1316,
+            "sha256": "cfe96136619cf21bc7083b314e6d75462a6cc1a817b5a7f81ad1ba9aad801a3d"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.photos.PickerModelsTest.xml",
+            "bytes": 1208,
+            "sha256": "01b8920eba16715cb5b06fde654c60ee2770827d5b229630b80703295fa1c0b8"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.screensaver.ImageFolderScannerTest.xml",
+            "bytes": 1110,
+            "sha256": "7a103fdff5b762b36f3bee34d2e19068184f407fd56d8ce6ed62effa794eac18"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.screensaver.ScreensaverHintTest.xml",
+            "bytes": 1045,
+            "sha256": "4ce35a2ceb5b1a12b50b618668c4839f54dce4a605bc0000fc0aabd422b78edc"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.screensaver.ThumbnailCacheKeyTest.xml",
+            "bytes": 633,
+            "sha256": "87595eb9529d7a8260580407160b64851df5494913dc40cf62eb7a29dd7bff5a"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.AppProfileStoreTest.xml",
+            "bytes": 896,
+            "sha256": "87076069f320ca68e6691f241799577ce042ae7412d148135aec555ae972859b"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.HistoryStoreTest.xml",
+            "bytes": 876,
+            "sha256": "f1bc417daf6fba17309f353d3acdee7abf6daa5586ca9f1d0edc4e20ea66b32c"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.SavedPortalStoreTest.xml",
+            "bytes": 1315,
+            "sha256": "39b8fa76ba42fe9c20fd4da023a95f0b480a6a65db0629268018334b51fbe154"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.SettingsStoreTest.xml",
+            "bytes": 867,
+            "sha256": "f9989c9171101be66ebf88f828ef688e0c1479442a95292cd71dca11e07e7aaf"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.ShellHistoryStoreTest.xml",
+            "bytes": 872,
+            "sha256": "c83897e422a852d7b3a81e54dc9eef7bd34371f7fd15c9d28f58e26e5839d517"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.AnnexBSplitterTest.xml",
+            "bytes": 1327,
+            "sha256": "01368843b062cc2cbb943169093a7dbdfa88c994b47f9bc7f55920845fc6527e"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.InputInjectorTest.xml",
+            "bytes": 2046,
+            "sha256": "9f917c53f0e05b6f2243bb7aa92f53caac1be0d5fc39b08de60a86b6558a27f2"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.InputPixelBoundsTest.xml",
+            "bytes": 1414,
+            "sha256": "88c93bf55ca6c2edb250a4fce81f3ea05a5b64fc647ac8e48d29b9bdf794f225"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.LogRingBufferTest.xml",
+            "bytes": 762,
+            "sha256": "a7c209d18e26468c17e4beedfe42eea9a645b94d8d7ea005a4661be8ea578596"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.LogcatParserTest.xml",
+            "bytes": 864,
+            "sha256": "143eb16ea535ed349850dc846c9e808bac4992afea42cb24e894d3330aaf4293"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.ScreenMirrorManagerParseTest.xml",
+            "bytes": 1062,
+            "sha256": "84aa90b7463f648dfed3fb0347b159dec0ab9335919e02257e3ec6c5f8118705"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.ShellCommandClassifierTest.xml",
+            "bytes": 1072,
+            "sha256": "c398bf626492ba7dae54162e6b25b91c28608346aaabe5ebb050e0f592d474b8"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.transfer.CountingStreamsTest.xml",
+            "bytes": 796,
+            "sha256": "cb13f64e6507e28a38d1634f98062c9c6531299103a66754ff4f0fa68b243f38"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.transfer.TransferProgressTest.xml",
+            "bytes": 1139,
+            "sha256": "7b964bf9eda943c9d9b745cb4c537fd5bb7b544ff917a70be9764b626fdc3579"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.viewmodel.FilePathsTest.xml",
+            "bytes": 923,
+            "sha256": "feee3b8aad07dc5d63c9f988a9fd3ce3bb33b8e2e6a514ce0ab9cc970f47e630"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.viewmodel.ProfileApplyStateTest.xml",
+            "bytes": 621,
+            "sha256": "78a0a3e5f270526f756f969954159f28de4bf3f428e065e3738376562eec9049"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.viewmodel.ScreensaverUploadPlanTest.xml",
+            "bytes": 642,
+            "sha256": "509b80104cc0da82d5e4066d4cc3fb887bdb5aaef64c2183139272654ce02007"
+          },
+          {
+            "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.viewmodel.ShellExitStatusTest.xml",
+            "bytes": 1547,
+            "sha256": "c201f23d04f470e492f60ce0dd98cea9b9f254624758d575f6ee329d9a21e981"
+          }
+        ]
+      }
+    ],
+    "currentBuildXml": {
+      "directory": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest",
+      "counts": {
+        "tests": 239,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": 39
+      },
+      "uniqueCaseIds": 239,
+      "duplicateCaseIds": 0,
+      "failureTypes": [],
+      "files": [
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.AdbErrorsTest.xml",
+          "bytes": 2090,
+          "sha256": "48ee82fe4767d944786e087ebfe72e7aee2eb9ae9798e7ab1d6d276f3743e17f"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.BackupDeclaredFilesTest.xml",
+          "bytes": 2324,
+          "sha256": "b01f8bd0766632af9bcfbcda1443bc0d7f8910649067a41ed81e56efdb61ccd8"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.ConnectRetryTest.xml",
+          "bytes": 882,
+          "sha256": "0e804ef3e2fa8d7103b7e243a600f9cd6b48afcfb3aafe657069c6515df216b6"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.ConnectionMonitorTest.xml",
+          "bytes": 2886,
+          "sha256": "3037c6fb529f1714ff1b4112a558a3a7eec8e7786d1352dd09f9a328d1a3c50a"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.InstallPolicyTest.xml",
+          "bytes": 869,
+          "sha256": "2a3da06b10e33504f24fb6fa084077a20343d18fc419d137152b65abce5ddca3"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+          "bytes": 982,
+          "sha256": "fbb7abe80265a86121af848d7d8ee870ab0e1ad4c363e97ffb3b0a2d8e9fab90"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+          "bytes": 1894,
+          "sha256": "026890ed5db396cf4ed9ed3a1eac5bf9d56ca392db0e0c71b12ce68bc5873c18"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.PortalBackupManagerTest.xml",
+          "bytes": 1082,
+          "sha256": "c1dd825419194f20b5ecc84544e0bf4696654e7108f9987f435ce337fead4aa1"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.ReconnectBackoffTest.xml",
+          "bytes": 852,
+          "sha256": "3697fd555f9e6a3f72a53a653e0e4530858c976f7d8b5f299ae0809cd850cfe2"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.UptimeParserTest.xml",
+          "bytes": 1206,
+          "sha256": "93cd809b80c749f048fbddcd87b8375fd94d88c33d19a4a39fb2577797d372cf"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.UptimeValidityTest.xml",
+          "bytes": 1278,
+          "sha256": "6101701625454189b5016862eee3b26daded93c0769e6c2917a30d2b8cfa6499"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.adb.DadbInternalsCanaryTest.xml",
+          "bytes": 663,
+          "sha256": "fc78d0d2df1dc373175bd7d4f9fb74ab7c29aedbe25c265628602322e7d4149c"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.apps.AppMetadataCacheTest.xml",
+          "bytes": 620,
+          "sha256": "bae3b21941f4cfe249794d827f676e4eb30ec8f540e87cde50882d592feb262d"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.files.LsParserTest.xml",
+          "bytes": 1130,
+          "sha256": "af6d33ed688113663aea5635c3a7d58ffdc014e3a5fcd856157856a2f22fb6dd"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.files.PathSafetyTest.xml",
+          "bytes": 2200,
+          "sha256": "75826a6ff07d786cc697fb5ba98869da89fc2d54e9dc1e8ed9602cbb7d844653"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.files.RemotePathsTest.xml",
+          "bytes": 1635,
+          "sha256": "8042cb0a2136f86088ea36df724ec174f8c708c92d8d892d94ad0ba31a8d9459"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.photos.PhotosPickerClientTest.xml",
+          "bytes": 1316,
+          "sha256": "cfe96136619cf21bc7083b314e6d75462a6cc1a817b5a7f81ad1ba9aad801a3d"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.photos.PickerModelsTest.xml",
+          "bytes": 1208,
+          "sha256": "01b8920eba16715cb5b06fde654c60ee2770827d5b229630b80703295fa1c0b8"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.screensaver.ImageFolderScannerTest.xml",
+          "bytes": 1110,
+          "sha256": "7a103fdff5b762b36f3bee34d2e19068184f407fd56d8ce6ed62effa794eac18"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.screensaver.ScreensaverHintTest.xml",
+          "bytes": 1045,
+          "sha256": "4ce35a2ceb5b1a12b50b618668c4839f54dce4a605bc0000fc0aabd422b78edc"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.screensaver.ThumbnailCacheKeyTest.xml",
+          "bytes": 633,
+          "sha256": "87595eb9529d7a8260580407160b64851df5494913dc40cf62eb7a29dd7bff5a"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.store.AppProfileStoreTest.xml",
+          "bytes": 896,
+          "sha256": "87076069f320ca68e6691f241799577ce042ae7412d148135aec555ae972859b"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.store.HistoryStoreTest.xml",
+          "bytes": 876,
+          "sha256": "f1bc417daf6fba17309f353d3acdee7abf6daa5586ca9f1d0edc4e20ea66b32c"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.store.SavedPortalStoreTest.xml",
+          "bytes": 1315,
+          "sha256": "39b8fa76ba42fe9c20fd4da023a95f0b480a6a65db0629268018334b51fbe154"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.store.SettingsStoreTest.xml",
+          "bytes": 867,
+          "sha256": "f9989c9171101be66ebf88f828ef688e0c1479442a95292cd71dca11e07e7aaf"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.store.ShellHistoryStoreTest.xml",
+          "bytes": 872,
+          "sha256": "c83897e422a852d7b3a81e54dc9eef7bd34371f7fd15c9d28f58e26e5839d517"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.tools.AnnexBSplitterTest.xml",
+          "bytes": 1327,
+          "sha256": "01368843b062cc2cbb943169093a7dbdfa88c994b47f9bc7f55920845fc6527e"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.tools.InputInjectorTest.xml",
+          "bytes": 2046,
+          "sha256": "9f917c53f0e05b6f2243bb7aa92f53caac1be0d5fc39b08de60a86b6558a27f2"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.tools.InputPixelBoundsTest.xml",
+          "bytes": 1414,
+          "sha256": "88c93bf55ca6c2edb250a4fce81f3ea05a5b64fc647ac8e48d29b9bdf794f225"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.tools.LogRingBufferTest.xml",
+          "bytes": 762,
+          "sha256": "a7c209d18e26468c17e4beedfe42eea9a645b94d8d7ea005a4661be8ea578596"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.tools.LogcatParserTest.xml",
+          "bytes": 864,
+          "sha256": "143eb16ea535ed349850dc846c9e808bac4992afea42cb24e894d3330aaf4293"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.tools.ScreenMirrorManagerParseTest.xml",
+          "bytes": 1062,
+          "sha256": "84aa90b7463f648dfed3fb0347b159dec0ab9335919e02257e3ec6c5f8118705"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.tools.ShellCommandClassifierTest.xml",
+          "bytes": 1072,
+          "sha256": "c398bf626492ba7dae54162e6b25b91c28608346aaabe5ebb050e0f592d474b8"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.transfer.CountingStreamsTest.xml",
+          "bytes": 796,
+          "sha256": "cb13f64e6507e28a38d1634f98062c9c6531299103a66754ff4f0fa68b243f38"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.data.transfer.TransferProgressTest.xml",
+          "bytes": 1139,
+          "sha256": "7b964bf9eda943c9d9b745cb4c537fd5bb7b544ff917a70be9764b626fdc3579"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.viewmodel.FilePathsTest.xml",
+          "bytes": 923,
+          "sha256": "feee3b8aad07dc5d63c9f988a9fd3ce3bb33b8e2e6a514ce0ab9cc970f47e630"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.viewmodel.ProfileApplyStateTest.xml",
+          "bytes": 621,
+          "sha256": "78a0a3e5f270526f756f969954159f28de4bf3f428e065e3738376562eec9049"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.viewmodel.ScreensaverUploadPlanTest.xml",
+          "bytes": 642,
+          "sha256": "509b80104cc0da82d5e4066d4cc3fb887bdb5aaef64c2183139272654ce02007"
+        },
+        {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/test-results/testDebugUnitTest/TEST-com.portalinstaller.viewmodel.ShellExitStatusTest.xml",
+          "bytes": 1547,
+          "sha256": "c201f23d04f470e492f60ce0dd98cea9b9f254624758d575f6ee329d9a21e981"
+        }
+      ]
+    },
+    "preFixtureBaseline": {
+      "summary": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/baseline-summary.json",
+        "bytes": 83,
+        "sha256": "cbeb901506ab3afe2b9658270ce4758a805e144f22851b0b4a1b04b4ec73044e"
+      },
+      "counts": {
+        "tests": 227,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": 38
+      },
+      "execution": "Root run only; reviewer did not repeat the full baseline."
+    },
+    "fullDebugBuild": {
+      "log": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full.log",
+        "bytes": 2892,
+        "sha256": "b82575b4c2faecfbe31b4628dfdcf3c0958507506f639b2d89ae08203d7a762e"
+      },
+      "successfulBuildMarkerPresent": true,
+      "assembleDebugTaskPresent": true,
+      "apk": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/outputs/apk/debug/app-debug.apk",
+        "bytes": 13901710,
+        "sha256": "a76042cddcff791bac8cc45ed319192d780c22c2dfa0166a0cb55e3991af7c1d"
+      },
+      "manifest": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-apk-manifest.txt",
+        "bytes": 5391,
+        "sha256": "cc1a194787370990d9d6e83976a79d76478e662506eb8688ae570a87b9bec413"
+      },
+      "recordedPackage": "com.portalinstaller",
+      "recordedVersionName": "1.4.0",
+      "recordedVersionCode": 5,
+      "reviewerInstalled": false
+    }
+  },
+  "callerContracts": [
+    {
+      "path": "app/src/main/java/com/portalinstaller/data/PortalConnectionManager.kt",
+      "lineStart": 340,
+      "lineEnd": 349,
+      "meaning": "Actual reader feeds cat /proc/meminfo output into parser and copies nullable result into nullable RAM status fields.",
+      "candidate": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/main/java/com/portalinstaller/data/PortalConnectionManager.kt",
+        "bytes": 26812,
+        "sha256": "57d828aa56a0bf3877d0cb0e5d86e58592a252bb0c2444a07ee5af131050717a"
+      },
+      "unchangedFromRetainedBase": true,
+      "acceptance": "source only"
+    },
+    {
+      "path": "app/src/main/java/com/portalinstaller/ui/devices/DashboardCard.kt",
+      "lineStart": 109,
+      "lineEnd": 128,
+      "meaning": "Existing nullable status branch renders unavailable center/empty subtitle; available-over-total clamping remains unchanged.",
+      "candidate": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/main/java/com/portalinstaller/ui/devices/DashboardCard.kt",
+        "bytes": 12528,
+        "sha256": "a461be9dd203ecb6e663ddf351e3346fb2aac85ffeba952df8dc58a79e61c101"
+      },
+      "unchangedFromRetainedBase": true,
+      "acceptance": "source only"
+    },
+    {
+      "path": "app/src/main/java/com/portalinstaller/ui/common/Format.kt",
+      "lineStart": 52,
+      "lineEnd": 60,
+      "meaning": "Existing formatRam null branch remains unavailable.",
+      "candidate": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/main/java/com/portalinstaller/ui/common/Format.kt",
+        "bytes": 2116,
+        "sha256": "dae2cc2b473c5bc0a51ca8e2f1fc54406de3239991134562ee44b64c55f603b9"
+      },
+      "unchangedFromRetainedBase": true,
+      "acceptance": "source only"
+    },
+    {
+      "path": "app/src/main/java/com/portalinstaller/viewmodel/ConnectionViewModel.kt",
+      "lineStart": 253,
+      "lineEnd": 264,
+      "meaning": "Retained-base dashboard refresh calls getDeviceStatus and publishes DeviceStatus; no new reader/UI transport test was run.",
+      "candidate": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/main/java/com/portalinstaller/viewmodel/ConnectionViewModel.kt",
+        "bytes": 19927,
+        "sha256": "d0ec6e06697830e8a8246a2f86b75297cd8592ab249611fbb932be7c7776378e"
+      },
+      "unchangedFromRetainedBase": true,
+      "acceptance": "source only"
+    }
+  ],
+  "qualification": {
+    "file": {
+      "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-source-discovery.json",
+      "bytes": 11041,
+      "sha256": "11ee31fc5f6e466e2722c69eb5bbe1f110fbb46e60359f056700b9d29f2a0cde"
+    },
+    "report": {
+      "schemaVersion": 1,
+      "recordedAtUtc": "2026-11-04T06:44:15.081353+00:00",
+      "reviewer": "photo_layout_review",
+      "classification": "SUPPORTED_SOURCE_QUALIFICATION_ONLY",
+      "clock": {
+        "startedAt": "2026-11-04T06:36:36Z",
+        "deadline": "2026-11-04T07:06:36Z",
+        "reset": false
+      },
+      "sourceCheckout": {
+        "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+        "head": "d5b1a4de1069ceb02d172bfb10832a60c232bf53",
+        "clean": false,
+        "status": [
+          " M app/build.gradle.kts",
+          " M app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt",
+          " M app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt",
+          "?? docs/companion-photo-transport-exceptions-2026-11-03.md"
+        ],
+        "noAncestorAgENTsOrClaudeGuideFound": true
+      },
+      "continuation": {
+        "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit",
+        "base": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+        "branch": "codex/toolkit-memory-validity-20261104",
+        "rootOwnsAllSourceAndTests": true
+      },
+      "finding": {
+        "symbol": "MemInfoParser.parse/readKb",
+        "firstValueDigitExtraction": "Regex \\d+ finds 1 in -1; the sign is discarded.",
+        "byteConversion": "Unbounded nonnegative Long kB is multiplied by 1024 with normal Long overflow.",
+        "sourcePredictionsNotExecutedByReviewer": [
+          {
+            "input": "MemTotal: -1 kB; MemAvailable: 0 kB",
+            "predictedTotalBytes": 1024
+          },
+          {
+            "input": "MemTotal: 9007199254740992 kB; MemAvailable: 0 kB",
+            "predictedTotalBytes": -9223372036854775808
+          }
+        ],
+        "representableMaximumKb": 9007199254740991,
+        "observedKernelFailure": false
+      },
+      "activeCallerEvidence": [
+        {
+          "path": "app/src/main/java/com/portalinstaller/data/PortalConnectionManager.kt",
+          "currentLines": [
+            383,
+            386,
+            391,
+            392
+          ],
+          "baseLines": [
+            340,
+            343,
+            348,
+            349
+          ],
+          "effect": "getDeviceStatus invokes real parser on cat /proc/meminfo output and maps null to nullable RAM fields."
+        },
+        {
+          "path": "app/src/main/java/com/portalinstaller/ui/devices/DashboardCard.kt",
+          "currentLines": [
+            112,
+            113,
+            124,
+            127,
+            131,
+            134
+          ],
+          "effect": "Null RAM fields render existing unavailable center and empty subtitle; nonnull fields render percentage and used/total."
+        },
+        {
+          "path": "app/src/main/java/com/portalinstaller/ui/common/Format.kt",
+          "currentLines": [
+            52,
+            54,
+            60
+          ],
+          "effect": "formatRam has an existing null/unavailable branch."
+        },
+        {
+          "path": "app/src/main/java/com/portalinstaller/viewmodel/ConnectionViewModel.kt",
+          "currentLines": [
+            299,
+            305,
+            307,
+            309
+          ],
+          "effect": "Dashboard refresh publishes device status after session ownership check."
+        }
+      ],
+      "historyQualification": {
+        "parserAndOriginalTestsOnlyHistoryCommit": "50638385564ce8d07da571e8f9bd64361190e44c",
+        "historicalPositiveScope": "Aug 1 RAM gauge fix replaces a hardcoded full gauge with total/available bytes, prefers MemAvailable and falls back to MemFree; no sign or multiplication-bound guard.",
+        "originalTests": 5,
+        "originalCoverage": [
+          "ordinary Portal sample byte values",
+          "used fraction",
+          "MemFree fallback when MemAvailable absent",
+          "missing MemTotal",
+          "blank input"
+        ],
+        "parserAndOriginalTestsIdenticalAtRetainedBase": true,
+        "uptimeReceipt": "docs/portal-toolkit-uptime-validity-2026-11-03.md",
+        "uptimeStructuredReceipt": "mocks/portal-widget-gallery-20261102/evidence/toolkit-uptime-validity-verification.json",
+        "uptimeClock": {
+          "startedAt": "2026-11-03T20:18:18Z",
+          "deadline": "2026-11-03T20:48:18Z"
+        },
+        "uptimePositiveScope": "UptimeParser nonfinite/negative elapsed values before conversion, parser/formatter fixture only; source bindings contain no MemInfo file.",
+        "uptimeOtherDiscovery": "Profile application bounded negative; duplicate store/editor and scanner observations retain earlier clocks.",
+        "noMemInfoSpecificPriorFixOrHeldHypothesisFoundInReviewedHistoryReceiptsLedger": true,
+        "fileBrowserQualification": "Earlier file-browser ordering observations stay under Nov 3 18:18:11–18:48:11. Current rename-directory target semantics was source triage only, not admitted, reproduced or corrected; no reset."
+      },
+      "admittedPolicy": {
+        "scope": "First numeric value token toLongOrNull with 0..Long.MAX_VALUE/1024 before multiplication.",
+        "preserved": [
+          "zero",
+          "available greater than total and existing clamping",
+          "unitless compatibility",
+          "MemAvailable to MemFree fallback including unparsable Available",
+          "existing null/unavailable UI and persistence"
+        ],
+        "excluded": [
+          "total-positive policy",
+          "available<=total policy",
+          "unit-format redesign",
+          "UI change",
+          "device-memory cap"
+        ]
+      },
+      "sourceBindings": [
+        {
+          "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+          "path": "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+          "bytes": 1443,
+          "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+        },
+        {
+          "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+          "path": "app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+          "bytes": 1474,
+          "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+        },
+        {
+          "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+          "path": "app/src/main/java/com/portalinstaller/data/PortalConnectionManager.kt",
+          "bytes": 29180,
+          "sha256": "a6b422ed89a42769e8a28a4e564796dee695cae8527b8f21f88ae5212aaf8bea"
+        },
+        {
+          "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+          "path": "app/src/main/java/com/portalinstaller/ui/devices/DashboardCard.kt",
+          "bytes": 13035,
+          "sha256": "e5f8e25a700464263b2005d4af95d1b962b25333572bb915aacce5113e6c84bd"
+        },
+        {
+          "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+          "path": "app/src/main/java/com/portalinstaller/ui/common/Format.kt",
+          "bytes": 2116,
+          "sha256": "dae2cc2b473c5bc0a51ca8e2f1fc54406de3239991134562ee44b64c55f603b9"
+        },
+        {
+          "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+          "path": "app/src/main/java/com/portalinstaller/viewmodel/ConnectionViewModel.kt",
+          "bytes": 23194,
+          "sha256": "d59f8b026b5e5190cd853b38a8451a12fece1e37a1e6cd79216d35f685a1bb1f"
+        }
+      ],
+      "retainedBaseBindings": [
+        {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "path": "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+          "bytes": 1443,
+          "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+        },
+        {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "path": "app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+          "bytes": 1474,
+          "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+        },
+        {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "path": "app/src/main/java/com/portalinstaller/data/PortalConnectionManager.kt",
+          "bytes": 26812,
+          "sha256": "57d828aa56a0bf3877d0cb0e5d86e58592a252bb0c2444a07ee5af131050717a"
+        },
+        {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "path": "app/src/main/java/com/portalinstaller/ui/devices/DashboardCard.kt",
+          "bytes": 12528,
+          "sha256": "a461be9dd203ecb6e663ddf351e3346fb2aac85ffeba952df8dc58a79e61c101"
+        },
+        {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "path": "app/src/main/java/com/portalinstaller/ui/common/Format.kt",
+          "bytes": 2116,
+          "sha256": "dae2cc2b473c5bc0a51ca8e2f1fc54406de3239991134562ee44b64c55f603b9"
+        },
+        {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "path": "app/src/main/java/com/portalinstaller/viewmodel/ConnectionViewModel.kt",
+          "bytes": 19927,
+          "sha256": "d0ec6e06697830e8a8246a2f86b75297cd8592ab249611fbb932be7c7776378e"
+        }
+      ],
+      "preservation": {
+        "preexistingPhotoTransportFiles": [
+          {
+            "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+            "path": "app/build.gradle.kts",
+            "bytes": 3526,
+            "sha256": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+            "expectedSha256": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+            "unchanged": true
+          },
+          {
+            "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+            "path": "app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt",
+            "bytes": 17376,
+            "sha256": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+            "expectedSha256": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+            "unchanged": true
+          },
+          {
+            "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+            "path": "app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt",
+            "bytes": 24190,
+            "sha256": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+            "expectedSha256": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+            "unchanged": true
+          },
+          {
+            "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+            "path": "docs/companion-photo-transport-exceptions-2026-11-03.md",
+            "bytes": 1427,
+            "sha256": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb",
+            "expectedSha256": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb",
+            "unchanged": true
+          }
+        ],
+        "allFourExact": true,
+        "originalCompanionStatusRetained": true
+      },
+      "reviewerActions": {
+        "testsExecuted": 0,
+        "fixturesCreated": 0,
+        "sourceWrites": 0,
+        "devicePhoneNativeCommands": 0,
+        "providerAccountAuthActions": 0,
+        "networkActions": 0,
+        "reportOnlyWrite": "/private/tmp/portal-product-discovery-20261104-063636/memory-source-discovery.json"
+      },
+      "limits": [
+        "Source qualification and historical scope audit only; runtime assertions belong to root RED/GREEN review.",
+        "Generated numeric inputs are not observed real kernel or native dashboard output.",
+        "Physical phone/Portal, live proc/ADB, provider/account/auth, hosted CI, installation and publication remain prohibited/unaccepted.",
+        "All prior scopes and clocks remain intact."
+      ]
+    }
+  },
+  "preservation": {
+    "companionCheckout": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+    "status": [
+      " M app/build.gradle.kts",
+      " M app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt",
+      " M app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt",
+      "?? docs/companion-photo-transport-exceptions-2026-11-03.md"
+    ],
+    "statusExact": true,
+    "fourPreexistingPaths": [
+      {
+        "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/build.gradle.kts",
+        "bytes": 3526,
+        "sha256": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+        "expectedSha256": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+        "unchanged": true
+      },
+      {
+        "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt",
+        "bytes": 17376,
+        "sha256": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+        "expectedSha256": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+        "unchanged": true
+      },
+      {
+        "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt",
+        "bytes": 24190,
+        "sha256": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+        "expectedSha256": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+        "unchanged": true
+      },
+      {
+        "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/docs/companion-photo-transport-exceptions-2026-11-03.md",
+        "bytes": 1427,
+        "sha256": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb",
+        "expectedSha256": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb",
+        "unchanged": true
+      }
+    ],
+    "allFourExact": true,
+    "sourceWritesByReviewer": 0,
+    "allPriorClocksPreserved": true
+  },
+  "actions": {
+    "directJUnitCoreExecutions": 2,
+    "gradleExecutions": 0,
+    "devicePhoneAdbNativeCommands": 0,
+    "networkProviderAccountAuthActions": 0,
+    "sourceWrites": 0,
+    "generatedDeviceFixtures": 0,
+    "writes": "Only owned scratch logs, bytecode output and JSON verification reports."
+  },
+  "limits": [
+    "Generated JVM memory strings do not prove real kernel/device output or native dashboard acceptance.",
+    "Caller/UI contracts were inspected in source and remain unchanged from retained Toolkit base; no native/UI/transport execution was performed.",
+    "Retained Toolkit base d15912d0 is intentional; dirty companion d5b1a4de is preserved rather than incorporated.",
+    "No signed release, installed phone/Portal application, hosted CI, provider/account action, publication or device acceptance claim.",
+    "Initial root SDK setup failure is diagnostic only and excluded from product RED; the 9 counted RED failures are genuine AssertionErrors against the preserved compiled original parser."
+  ]
+}

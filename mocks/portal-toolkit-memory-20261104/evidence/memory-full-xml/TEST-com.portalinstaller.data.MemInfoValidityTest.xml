@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.MemInfoValidityTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.539Z" hostname="iRedlofs-Mac-mini-3.local" time="0.003">
+  <properties/>
+  <testcase name="overflowingFreeFallbackDoesNotWrapBytes" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.001"/>
+  <testcase name="whitespaceAndUnitlessCompatibilityRemain" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <testcase name="overflowingTotalDoesNotWrapBytes" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <testcase name="overflowingAvailableStillUsesValidFreeFallback" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <testcase name="invalidAvailableStillUsesValidFreeFallback" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <testcase name="zeroAndExistingClampingRemainCompatible" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <testcase name="largestRepresentableByteValueRemainsExact" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.001"/>
+  <testcase name="digitsInsideAnErrorAreNotAValue" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <testcase name="negativeAvailableWithoutFallbackIsUnavailable" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <testcase name="negativeFreeFallbackIsUnavailable" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <testcase name="negativeTotalDoesNotBecomePositiveMemory" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <testcase name="overflowingAvailableDoesNotWrapBytes" classname="com.portalinstaller.data.MemInfoValidityTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

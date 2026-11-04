@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.tools.AnnexBSplitterTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.742Z" hostname="iRedlofs-Mac-mini-3.local" time="0.0">
+  <properties/>
+  <testcase name="completes a start code split across the feed boundary" classname="com.portalinstaller.data.tools.AnnexBSplitterTest" time="0.0"/>
+  <testcase name="nalType reads the header byte after the start code" classname="com.portalinstaller.data.tools.AnnexBSplitterTest" time="0.0"/>
+  <testcase name="empty feed returns nothing" classname="com.portalinstaller.data.tools.AnnexBSplitterTest" time="0.0"/>
+  <testcase name="completes a NAL split across two feeds" classname="com.portalinstaller.data.tools.AnnexBSplitterTest" time="0.0"/>
+  <testcase name="discards leading garbage before the first start code" classname="com.portalinstaller.data.tools.AnnexBSplitterTest" time="0.0"/>
+  <testcase name="emits complete NALs and retains the last incomplete one" classname="com.portalinstaller.data.tools.AnnexBSplitterTest" time="0.0"/>
+  <testcase name="isConfigNal is true only for SPS and PPS" classname="com.portalinstaller.data.tools.AnnexBSplitterTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

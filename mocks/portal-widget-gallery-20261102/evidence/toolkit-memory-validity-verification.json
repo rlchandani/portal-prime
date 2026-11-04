@@ -1,0 +1,1071 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUtc": "2026-11-04T06:54:04.000770+00:00",
+  "classification": "LOCAL_TOOLKIT_PARSER_VERIFIED_NO_INSTALL",
+  "issueClock": {
+    "startedAt": "2026-11-04T06:36:36Z",
+    "deadline": "2026-11-04T07:06:36Z",
+    "reset": false
+  },
+  "sourceCommit": {
+    "head": "205f2e56a173273fbde4afd9b03dd6ff4ae7b048",
+    "parent": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+    "branch": "codex/toolkit-memory-validity-20261104",
+    "paths": [
+      "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+      "app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt"
+    ],
+    "clean": true
+  },
+  "sourceBindings": [
+    {
+      "checkout": "/private/tmp/portal-product-discovery-20261104-063636/toolkit",
+      "path": "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+      "bytes": 1631,
+      "sha256": "a1fec88773aa83601a592b2e4131dc5aa1a28ddcb8606d191c21568029fe5e7f"
+    },
+    {
+      "checkout": "/private/tmp/portal-product-discovery-20261104-063636/toolkit",
+      "path": "app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt",
+      "bytes": 2719,
+      "sha256": "dbd319ca21c32a8b1ec46909b78cf61bff570102e1027470b749e517076e0441"
+    },
+    {
+      "checkout": "/private/tmp/portal-product-discovery-20261104-063636/toolkit",
+      "path": "app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+      "bytes": 1474,
+      "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+    }
+  ],
+  "baseline": {
+    "counts": {
+      "tests": 227,
+      "suites": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "setupOnlyFailureExcluded": true
+  },
+  "rootGates": [
+    {
+      "directory": "mocks/portal-toolkit-memory-20261104/evidence/memory-red-xml",
+      "counts": {
+        "tests": 17,
+        "failures": 9,
+        "errors": 0,
+        "skipped": 0,
+        "suites": 2
+      },
+      "uniqueCaseIds": 17,
+      "failureTypes": [
+        "java.lang.AssertionError",
+        "java.lang.AssertionError",
+        "java.lang.AssertionError",
+        "java.lang.AssertionError",
+        "java.lang.AssertionError",
+        "java.lang.AssertionError",
+        "java.lang.AssertionError",
+        "java.lang.AssertionError",
+        "java.lang.AssertionError"
+      ],
+      "focusedCases": [
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "returns null when MemTotal is missing",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "falls back to MemFree when MemAvailable is absent",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "returns null on blank input",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "parses total and available in bytes",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "used fraction is total minus available over total",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "overflowingFreeFallbackDoesNotWrapBytes",
+          "outcome": "failure",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "whitespaceAndUnitlessCompatibilityRemain",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "overflowingTotalDoesNotWrapBytes",
+          "outcome": "failure",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "overflowingAvailableStillUsesValidFreeFallback",
+          "outcome": "failure",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "invalidAvailableStillUsesValidFreeFallback",
+          "outcome": "failure",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "zeroAndExistingClampingRemainCompatible",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "largestRepresentableByteValueRemainsExact",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "digitsInsideAnErrorAreNotAValue",
+          "outcome": "failure",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "negativeAvailableWithoutFallbackIsUnavailable",
+          "outcome": "failure",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "negativeFreeFallbackIsUnavailable",
+          "outcome": "failure",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "negativeTotalDoesNotBecomePositiveMemory",
+          "outcome": "failure",
+          "failureType": "java.lang.AssertionError"
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "overflowingAvailableDoesNotWrapBytes",
+          "outcome": "failure",
+          "failureType": "java.lang.AssertionError"
+        }
+      ]
+    },
+    {
+      "directory": "mocks/portal-toolkit-memory-20261104/evidence/memory-green-xml",
+      "counts": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": 2
+      },
+      "uniqueCaseIds": 17,
+      "failureTypes": [],
+      "focusedCases": [
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "returns null when MemTotal is missing",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "falls back to MemFree when MemAvailable is absent",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "returns null on blank input",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "parses total and available in bytes",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoParserTest",
+          "name": "used fraction is total minus available over total",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "overflowingFreeFallbackDoesNotWrapBytes",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "whitespaceAndUnitlessCompatibilityRemain",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "overflowingTotalDoesNotWrapBytes",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "overflowingAvailableStillUsesValidFreeFallback",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "invalidAvailableStillUsesValidFreeFallback",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "zeroAndExistingClampingRemainCompatible",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "largestRepresentableByteValueRemainsExact",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "digitsInsideAnErrorAreNotAValue",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "negativeAvailableWithoutFallbackIsUnavailable",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "negativeFreeFallbackIsUnavailable",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "negativeTotalDoesNotBecomePositiveMemory",
+          "outcome": "pass",
+          "failureType": null
+        },
+        {
+          "class": "com.portalinstaller.data.MemInfoValidityTest",
+          "name": "overflowingAvailableDoesNotWrapBytes",
+          "outcome": "pass",
+          "failureType": null
+        }
+      ]
+    },
+    {
+      "directory": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml",
+      "counts": {
+        "tests": 239,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": 39
+      },
+      "uniqueCaseIds": 239,
+      "failureTypes": [],
+      "focusedCases": []
+    }
+  ],
+  "independentReplay": {
+    "baseline": {
+      "tests": 17,
+      "failures": 9,
+      "controls": 8,
+      "exitCode": 1
+    },
+    "candidate": {
+      "tests": 17,
+      "failures": 0,
+      "exitCode": 0
+    },
+    "directActualCompiledClasses": true,
+    "sameCompiledTests": true,
+    "freshFullGradleRunByReviewer": false,
+    "reportBindingsCheckedByRoot": 133,
+    "qualificationReportEqual": true,
+    "blockers": []
+  },
+  "debugArtifact": {
+    "log": {
+      "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-full.log",
+      "bytes": 2892,
+      "sha256": "b82575b4c2faecfbe31b4628dfdcf3c0958507506f639b2d89ae08203d7a762e"
+    },
+    "successfulBuildMarkerPresent": true,
+    "assembleDebugTaskPresent": true,
+    "apk": {
+      "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 13901710,
+      "sha256": "a76042cddcff791bac8cc45ed319192d780c22c2dfa0166a0cb55e3991af7c1d"
+    },
+    "manifest": {
+      "path": "/private/tmp/portal-product-discovery-20261104-063636/memory-apk-manifest.txt",
+      "bytes": 5391,
+      "sha256": "cc1a194787370990d9d6e83976a79d76478e662506eb8688ae570a87b9bec413"
+    },
+    "recordedPackage": "com.portalinstaller",
+    "recordedVersionName": "1.4.0",
+    "recordedVersionCode": 5,
+    "reviewerInstalled": false
+  },
+  "policy": {
+    "diff": "diff --git a/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt b/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt\nindex 1e71aa8..572fc09 100644\n--- a/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt\n+++ b/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt\n@@ -39,6 +39,8 @@ object MemInfoParser {\n     private fun readKb(output: String, key: String): Long? {\n         val line = output.lineSequence().firstOrNull { it.trimStart().startsWith(\"$key:\") }\n             ?: return null\n-        return Regex(\"\"\"\\d+\"\"\").find(line)?.value?.toLongOrNull()\n+        val value = line.substringAfter(':').trimStart().takeWhile { !it.isWhitespace() }\n+        // Preserve the sign and reject values whose byte conversion would overflow.\n+        return value.toLongOrNull()?.takeIf { it in 0..Long.MAX_VALUE / 1024 }\n     }\n }\n",
+    "scope": "Only readKb first value token extraction and representability guard; parse preference/fallback, multiplication and MemInfo fraction stay unchanged.",
+    "maxKb": 9007199254740991,
+    "testCount": {
+      "original": 5,
+      "new": 12
+    },
+    "controlsPreserved": [
+      "ordinary Portal sample and used fraction",
+      "missing Total and blank input",
+      "Available absent to Free fallback",
+      "unparsable or overflowing Available to valid Free fallback",
+      "zero values",
+      "available greater than total with existing fraction clamping",
+      "maximum representable byte value",
+      "whitespace and unitless values"
+    ],
+    "testAdequacy": "Tests invoke actual public parser with generated inputs and expected nullable/byte values; 9 original-parser failures are all assertion failures. Baseline and candidate compiled tests and MemInfo data class are byte-identical. No fake parser, mocked transport or runtime replacement is used.",
+    "newTestHeader": "2026 Starbright Lab MIT header present.",
+    "bindings": [
+      {
+        "path": "app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+        "frozen": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/frozen/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+          "bytes": 1443,
+          "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+          "bytes": 1631,
+          "sha256": "a1fec88773aa83601a592b2e4131dc5aa1a28ddcb8606d191c21568029fe5e7f"
+        },
+        "byteIdentical": false,
+        "retainedBase": {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "bytes": 1443,
+          "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+        },
+        "frozenMatchesRetainedBase": true
+      },
+      {
+        "path": "app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+        "frozen": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/frozen/app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+          "bytes": 1474,
+          "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+          "bytes": 1474,
+          "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+        },
+        "byteIdentical": true,
+        "retainedBase": {
+          "revision": "d15912d09b90345f728735d9e5a5b0dbec9fd17f",
+          "bytes": 1474,
+          "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+        },
+        "frozenMatchesRetainedBase": true
+      },
+      {
+        "path": "app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt",
+        "frozen": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/frozen/app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt",
+          "bytes": 2719,
+          "sha256": "dbd319ca21c32a8b1ec46909b78cf61bff570102e1027470b749e517076e0441"
+        },
+        "candidate": {
+          "path": "/private/tmp/portal-product-discovery-20261104-063636/toolkit/app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt",
+          "bytes": 2719,
+          "sha256": "dbd319ca21c32a8b1ec46909b78cf61bff570102e1027470b749e517076e0441"
+        },
+        "byteIdentical": true
+      }
+    ]
+  },
+  "preservation": {
+    "companionCheckout": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+    "status": [
+      " M app/build.gradle.kts",
+      " M app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt",
+      " M app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt",
+      "?? docs/companion-photo-transport-exceptions-2026-11-03.md"
+    ],
+    "statusExact": true,
+    "fourPreexistingPaths": [
+      {
+        "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/build.gradle.kts",
+        "bytes": 3526,
+        "sha256": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+        "expectedSha256": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+        "unchanged": true
+      },
+      {
+        "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt",
+        "bytes": 17376,
+        "sha256": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+        "expectedSha256": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+        "unchanged": true
+      },
+      {
+        "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt",
+        "bytes": 24190,
+        "sha256": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+        "expectedSha256": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+        "unchanged": true
+      },
+      {
+        "path": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit/docs/companion-photo-transport-exceptions-2026-11-03.md",
+        "bytes": 1427,
+        "sha256": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb",
+        "expectedSha256": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb",
+        "unchanged": true
+      }
+    ],
+    "allFourExact": true,
+    "sourceWritesByReviewer": 0,
+    "allPriorClocksPreserved": true
+  },
+  "queue": {
+    "tasks": 124,
+    "delivered": 75,
+    "verified": 39,
+    "approval": 2,
+    "parked": 7,
+    "queued": 1,
+    "priorTaskObjectsExact": 123,
+    "priorRawSuffixBytes": 415562,
+    "priorRawSuffixSha256": "738d3a19b734c2ff0381408f17841f245fae823fb923cf75b06f1b13a86eaad7",
+    "weatherDefaultRetained": true
+  },
+  "roomDeliveryRetained": {
+    "versionName": "1.133",
+    "versionCode": 127,
+    "publicVersionName": "1.83",
+    "publicVersionCode": 77,
+    "freshDeviceObservation": false
+  },
+  "limits": [
+    "Generated JVM memory strings do not prove real kernel/device output or native dashboard acceptance.",
+    "Caller/UI contracts were inspected in source and remain unchanged from retained Toolkit base; no native/UI/transport execution was performed.",
+    "Retained Toolkit base d15912d0 is intentional; dirty companion d5b1a4de is preserved rather than incorporated.",
+    "No signed release, installed phone/Portal application, hosted CI, provider/account action, publication or device acceptance claim.",
+    "Initial root SDK setup failure is diagnostic only and excluded from product RED; the 9 counted RED failures are genuine AssertionErrors against the preserved compiled original parser."
+  ],
+  "actions": {
+    "devicePhoneAdb": 0,
+    "providerAccountAuth": 0,
+    "install": 0,
+    "pushPublication": 0
+  },
+  "archivedArtifacts": [
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-source-discovery.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-source-discovery.json",
+      "bytes": 11041,
+      "sha256": "11ee31fc5f6e466e2722c69eb5bbe1f110fbb46e60359f056700b9d29f2a0cde"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/independent-review.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/independent-review.json",
+      "bytes": 64872,
+      "sha256": "7ae47105e913b45addacaa85f5bf15e501a96ad1d49b365d1e3e344d2ab677c8"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-runs.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-independent-runs.json",
+      "bytes": 6491,
+      "sha256": "51c78f00b4a02c583c538662a8c3605167318e90c207f7f3da781b503d5e3990"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-baseline.log",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-independent-baseline.log.gz",
+      "bytes": 598,
+      "sha256": "f6ccf9f8ee1a55ff26eaf7143cb4d6ed26990abfd0fb2fbb5e48bbbf9d722e29",
+      "decompressedBytes": 4726,
+      "decompressedSha256": "c69168da0466f7832f916f10fda6b4f4169f57771ed8e733f7f5e1188f8276b7",
+      "encoding": "gzip; exact captured stdout bytes after decompression"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-independent-candidate.log",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-independent-candidate.log.gz",
+      "bytes": 71,
+      "sha256": "2247f9522def12892cc67f5829859b3861d040578b92847786a350aa51b04c17",
+      "decompressedBytes": 66,
+      "decompressedSha256": "a794cf5913510784cbcfa1a5ca21764fb1377ac3cd458e81baa61a5615770793",
+      "encoding": "gzip; exact captured stdout bytes after decompression"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/toolkit-baseline.log",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/toolkit-baseline.log.gz",
+      "bytes": 651,
+      "sha256": "82c50303733b9d2c71fe72bb54b5132d370dbef8ad5d132b38436e2d7709021f",
+      "decompressedBytes": 1641,
+      "decompressedSha256": "5d3decb10c6311f9616e53b8ad2b471f128b3ba7ac3277a0a78813c72aa610a4",
+      "encoding": "gzip; exact captured stdout bytes after decompression"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/baseline-summary.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/baseline-summary.json",
+      "bytes": 83,
+      "sha256": "cbeb901506ab3afe2b9658270ce4758a805e144f22851b0b4a1b04b4ec73044e"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-red.log",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-red.log.gz",
+      "bytes": 995,
+      "sha256": "9d492240a824dbbe8d6d55204efb56c832a39eeb76b489f6219c6592d9bb9ed4",
+      "decompressedBytes": 3276,
+      "decompressedSha256": "8f2a25a6e1f066fed6b21c7967fb7aa68b08023a237a8b37cd2065b03172aa96",
+      "encoding": "gzip; exact captured stdout bytes after decompression"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-red-summary.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-red-summary.json",
+      "bytes": 2948,
+      "sha256": "ac6b5abc261edfa27922c6a6a5be22f39cabc73ba0d1104e41608a95243124bc"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-green.log",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-green.log.gz",
+      "bytes": 578,
+      "sha256": "0e0076275a34bc3c6ac559c367ee39db7acabbc7580953ab71ec67834085c957",
+      "decompressedBytes": 1733,
+      "decompressedSha256": "5814008643e00e83a09ec4c5040c8ca6dacbaa4d059c1f461350f1e90ce3b949",
+      "encoding": "gzip; exact captured stdout bytes after decompression"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-green-summary.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-green-summary.json",
+      "bytes": 81,
+      "sha256": "55f6f281b3233133d1c67d02c5ef9e425159ab1f8459d285e60c7349a508a90e"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full.log",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full.log.gz",
+      "bytes": 983,
+      "sha256": "4c37f6ba8adc42a80d5a62e659ed0fc93e0cc62ccf1d10944193be727b3cdfee",
+      "decompressedBytes": 2892,
+      "decompressedSha256": "b82575b4c2faecfbe31b4628dfdcf3c0958507506f639b2d89ae08203d7a762e",
+      "encoding": "gzip; exact captured stdout bytes after decompression"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-summary.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-summary.json",
+      "bytes": 358,
+      "sha256": "e04a0c6528f6f9c1033fefce792c156a65ffbe24d393f190b969bb2ccd284a11"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-apk-manifest.txt",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-apk-manifest.txt",
+      "bytes": 5391,
+      "sha256": "cc1a194787370990d9d6e83976a79d76478e662506eb8688ae570a87b9bec413"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/fixture-frozen.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/fixture-frozen.json",
+      "bytes": 1186,
+      "sha256": "297717ee08b6d0fb0138c7c88baebe0a2003153434ccbf3b6490e4a13f5f45bb"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-source-commit.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-source-commit.json",
+      "bytes": 341,
+      "sha256": "7ae3fdc73632cfc3ded53e4cfff96615e94b160d033eea44ce3a039ec8d3a6c9"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/roadmap-preservation.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/roadmap-preservation.json",
+      "bytes": 509,
+      "sha256": "e44265f182fda5c2c9fa50ab44f1285265e20fc2ebb8e97bce7096552584680c"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/alpaca-ha-source-discovery.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/alpaca-ha-source-discovery.json",
+      "bytes": 15297,
+      "sha256": "8a8dc2f52904a1a8713f2108eff380e45edf2db9e68ce7249f1db62a583f9822"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-red-xml/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-red-xml/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+      "bytes": 985,
+      "sha256": "d47f7d359896e8bdbf46c937a71c23d42cc077635b27869eb82d9438b0401b2b"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-red-xml/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-red-xml/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+      "bytes": 39488,
+      "sha256": "1a7628e0fab855691af3207f1bab9f7cc6fd10edbc973091bc8b382f9de9ce6e"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-green-xml/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-green-xml/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+      "bytes": 982,
+      "sha256": "6eb5cd1bafdb98d6ba2861d490a826b642f54282e0f9fd8bcf4c75db3c9fb74c"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-green-xml/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-green-xml/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+      "bytes": 1896,
+      "sha256": "49112cb0e3ae5028715cd52cf6f5bdd08828b6e0786491e654d2096f3be0481a"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.AdbErrorsTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.AdbErrorsTest.xml",
+      "bytes": 2090,
+      "sha256": "48ee82fe4767d944786e087ebfe72e7aee2eb9ae9798e7ab1d6d276f3743e17f"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.BackupDeclaredFilesTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.BackupDeclaredFilesTest.xml",
+      "bytes": 2324,
+      "sha256": "b01f8bd0766632af9bcfbcda1443bc0d7f8910649067a41ed81e56efdb61ccd8"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.ConnectRetryTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.ConnectRetryTest.xml",
+      "bytes": 882,
+      "sha256": "0e804ef3e2fa8d7103b7e243a600f9cd6b48afcfb3aafe657069c6515df216b6"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.ConnectionMonitorTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.ConnectionMonitorTest.xml",
+      "bytes": 2886,
+      "sha256": "3037c6fb529f1714ff1b4112a558a3a7eec8e7786d1352dd09f9a328d1a3c50a"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.InstallPolicyTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.InstallPolicyTest.xml",
+      "bytes": 869,
+      "sha256": "2a3da06b10e33504f24fb6fa084077a20343d18fc419d137152b65abce5ddca3"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.MemInfoParserTest.xml",
+      "bytes": 982,
+      "sha256": "fbb7abe80265a86121af848d7d8ee870ab0e1ad4c363e97ffb3b0a2d8e9fab90"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.MemInfoValidityTest.xml",
+      "bytes": 1894,
+      "sha256": "026890ed5db396cf4ed9ed3a1eac5bf9d56ca392db0e0c71b12ce68bc5873c18"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.PortalBackupManagerTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.PortalBackupManagerTest.xml",
+      "bytes": 1082,
+      "sha256": "c1dd825419194f20b5ecc84544e0bf4696654e7108f9987f435ce337fead4aa1"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.ReconnectBackoffTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.ReconnectBackoffTest.xml",
+      "bytes": 852,
+      "sha256": "3697fd555f9e6a3f72a53a653e0e4530858c976f7d8b5f299ae0809cd850cfe2"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.UptimeParserTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.UptimeParserTest.xml",
+      "bytes": 1206,
+      "sha256": "93cd809b80c749f048fbddcd87b8375fd94d88c33d19a4a39fb2577797d372cf"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.UptimeValidityTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.UptimeValidityTest.xml",
+      "bytes": 1278,
+      "sha256": "6101701625454189b5016862eee3b26daded93c0769e6c2917a30d2b8cfa6499"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.adb.DadbInternalsCanaryTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.adb.DadbInternalsCanaryTest.xml",
+      "bytes": 663,
+      "sha256": "fc78d0d2df1dc373175bd7d4f9fb74ab7c29aedbe25c265628602322e7d4149c"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.apps.AppMetadataCacheTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.apps.AppMetadataCacheTest.xml",
+      "bytes": 620,
+      "sha256": "bae3b21941f4cfe249794d827f676e4eb30ec8f540e87cde50882d592feb262d"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.files.LsParserTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.files.LsParserTest.xml",
+      "bytes": 1130,
+      "sha256": "af6d33ed688113663aea5635c3a7d58ffdc014e3a5fcd856157856a2f22fb6dd"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.files.PathSafetyTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.files.PathSafetyTest.xml",
+      "bytes": 2200,
+      "sha256": "75826a6ff07d786cc697fb5ba98869da89fc2d54e9dc1e8ed9602cbb7d844653"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.files.RemotePathsTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.files.RemotePathsTest.xml",
+      "bytes": 1635,
+      "sha256": "8042cb0a2136f86088ea36df724ec174f8c708c92d8d892d94ad0ba31a8d9459"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.photos.PhotosPickerClientTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.photos.PhotosPickerClientTest.xml",
+      "bytes": 1316,
+      "sha256": "cfe96136619cf21bc7083b314e6d75462a6cc1a817b5a7f81ad1ba9aad801a3d"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.photos.PickerModelsTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.photos.PickerModelsTest.xml",
+      "bytes": 1208,
+      "sha256": "01b8920eba16715cb5b06fde654c60ee2770827d5b229630b80703295fa1c0b8"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.screensaver.ImageFolderScannerTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.screensaver.ImageFolderScannerTest.xml",
+      "bytes": 1110,
+      "sha256": "7a103fdff5b762b36f3bee34d2e19068184f407fd56d8ce6ed62effa794eac18"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.screensaver.ScreensaverHintTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.screensaver.ScreensaverHintTest.xml",
+      "bytes": 1045,
+      "sha256": "4ce35a2ceb5b1a12b50b618668c4839f54dce4a605bc0000fc0aabd422b78edc"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.screensaver.ThumbnailCacheKeyTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.screensaver.ThumbnailCacheKeyTest.xml",
+      "bytes": 633,
+      "sha256": "87595eb9529d7a8260580407160b64851df5494913dc40cf62eb7a29dd7bff5a"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.AppProfileStoreTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.store.AppProfileStoreTest.xml",
+      "bytes": 896,
+      "sha256": "87076069f320ca68e6691f241799577ce042ae7412d148135aec555ae972859b"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.HistoryStoreTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.store.HistoryStoreTest.xml",
+      "bytes": 876,
+      "sha256": "f1bc417daf6fba17309f353d3acdee7abf6daa5586ca9f1d0edc4e20ea66b32c"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.SavedPortalStoreTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.store.SavedPortalStoreTest.xml",
+      "bytes": 1315,
+      "sha256": "39b8fa76ba42fe9c20fd4da023a95f0b480a6a65db0629268018334b51fbe154"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.SettingsStoreTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.store.SettingsStoreTest.xml",
+      "bytes": 867,
+      "sha256": "f9989c9171101be66ebf88f828ef688e0c1479442a95292cd71dca11e07e7aaf"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.store.ShellHistoryStoreTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.store.ShellHistoryStoreTest.xml",
+      "bytes": 872,
+      "sha256": "c83897e422a852d7b3a81e54dc9eef7bd34371f7fd15c9d28f58e26e5839d517"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.AnnexBSplitterTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.tools.AnnexBSplitterTest.xml",
+      "bytes": 1327,
+      "sha256": "01368843b062cc2cbb943169093a7dbdfa88c994b47f9bc7f55920845fc6527e"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.InputInjectorTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.tools.InputInjectorTest.xml",
+      "bytes": 2046,
+      "sha256": "9f917c53f0e05b6f2243bb7aa92f53caac1be0d5fc39b08de60a86b6558a27f2"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.InputPixelBoundsTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.tools.InputPixelBoundsTest.xml",
+      "bytes": 1414,
+      "sha256": "88c93bf55ca6c2edb250a4fce81f3ea05a5b64fc647ac8e48d29b9bdf794f225"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.LogRingBufferTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.tools.LogRingBufferTest.xml",
+      "bytes": 762,
+      "sha256": "a7c209d18e26468c17e4beedfe42eea9a645b94d8d7ea005a4661be8ea578596"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.LogcatParserTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.tools.LogcatParserTest.xml",
+      "bytes": 864,
+      "sha256": "143eb16ea535ed349850dc846c9e808bac4992afea42cb24e894d3330aaf4293"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.ScreenMirrorManagerParseTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.tools.ScreenMirrorManagerParseTest.xml",
+      "bytes": 1062,
+      "sha256": "84aa90b7463f648dfed3fb0347b159dec0ab9335919e02257e3ec6c5f8118705"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.tools.ShellCommandClassifierTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.tools.ShellCommandClassifierTest.xml",
+      "bytes": 1072,
+      "sha256": "c398bf626492ba7dae54162e6b25b91c28608346aaabe5ebb050e0f592d474b8"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.transfer.CountingStreamsTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.transfer.CountingStreamsTest.xml",
+      "bytes": 796,
+      "sha256": "cb13f64e6507e28a38d1634f98062c9c6531299103a66754ff4f0fa68b243f38"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.data.transfer.TransferProgressTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.data.transfer.TransferProgressTest.xml",
+      "bytes": 1139,
+      "sha256": "7b964bf9eda943c9d9b745cb4c537fd5bb7b544ff917a70be9764b626fdc3579"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.viewmodel.FilePathsTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.viewmodel.FilePathsTest.xml",
+      "bytes": 923,
+      "sha256": "feee3b8aad07dc5d63c9f988a9fd3ce3bb33b8e2e6a514ce0ab9cc970f47e630"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.viewmodel.ProfileApplyStateTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.viewmodel.ProfileApplyStateTest.xml",
+      "bytes": 621,
+      "sha256": "78a0a3e5f270526f756f969954159f28de4bf3f428e065e3738376562eec9049"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.viewmodel.ScreensaverUploadPlanTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.viewmodel.ScreensaverUploadPlanTest.xml",
+      "bytes": 642,
+      "sha256": "509b80104cc0da82d5e4066d4cc3fb887bdb5aaef64c2183139272654ce02007"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-full-xml/TEST-com.portalinstaller.viewmodel.ShellExitStatusTest.xml",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-full-xml/TEST-com.portalinstaller.viewmodel.ShellExitStatusTest.xml",
+      "bytes": 1547,
+      "sha256": "c201f23d04f470e492f60ce0dd98cea9b9f254624758d575f6ee329d9a21e981"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/frozen/app/src/main/java/com/portalinstaller/data/MemInfoParser.kt",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/frozen/MemInfoParser.kt.txt",
+      "bytes": 1443,
+      "sha256": "2c200b265130869ac7b26a5264e1f606da0db74012bbb49fa4dfd516831ff5d8"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/frozen/app/src/test/java/com/portalinstaller/data/MemInfoParserTest.kt",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/frozen/MemInfoParserTest.kt.txt",
+      "bytes": 1474,
+      "sha256": "e091e37589a825668c24c42e424f2369b3c18379b5d1e61dd07069ab4aab43a2"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/frozen/app/src/test/java/com/portalinstaller/data/MemInfoValidityTest.kt",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/frozen/MemInfoValidityTest.kt.txt",
+      "bytes": 2719,
+      "sha256": "dbd319ca21c32a8b1ec46909b78cf61bff570102e1027470b749e517076e0441"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-browser-proof.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-browser-proof.json",
+      "bytes": 1692,
+      "sha256": "b2efdfea90aac4df9c6ee58248d843b79e0280ded21eb1697b486daaa2db496f"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/mkdocs.log",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/mkdocs.log",
+      "bytes": 33482,
+      "sha256": "22b8217893a75f482e42f5c48c94711795ab6d4307f68bf2f54400bcc910d4f4"
+    },
+    {
+      "source": "/private/tmp/portal-product-discovery-20261104-063636/memory-final-preservation.json",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/memory-final-preservation.json",
+      "bytes": 1868,
+      "sha256": "5fca710818aabff2939f45d1c905ce1bba39d4b68d4c69ab19c713b1eef6eaec"
+    },
+    {
+      "source": "Owned CUA screenshot",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/roadmap-desktop.png",
+      "bytes": 153254,
+      "sha256": "fed83bbca7fbde98edc2d657d31bc26e7f0f522defd5ebd043707fa8bbe80f20"
+    },
+    {
+      "source": "Owned CUA screenshot",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/roadmap-mobile.png",
+      "bytes": 60477,
+      "sha256": "03be196906d57a4e5cde4cb6161661667b1f83c3cb63d09e85fde93b0bf83fe8"
+    },
+    {
+      "source": "Final local closure",
+      "path": "mocks/portal-toolkit-memory-20261104/evidence/closure.json",
+      "bytes": 5117,
+      "sha256": "a1b35a53dfca158f0c7ebf58e81e591a697b2dfcac8a320ad6b6678e47e7e39a"
+    }
+  ],
+  "docsBrowserClosure": {
+    "recordedAtUtc": "2026-11-04T06:54:04.000770+00:00",
+    "clockDeadline": "2026-11-04T07:06:36Z",
+    "docs": {
+      "strictExitCode": 0,
+      "warnings": [],
+      "buildMarkerPresent": true,
+      "unrecognizedHistoricalLinksRemainInfoOnly": true
+    },
+    "browser": {
+      "recordedAtUtc": "2026-11-04T06:52:14.801Z",
+      "url": "http://127.0.0.1:18914/roadmap/#task=toolkit-memory-validity",
+      "desktop": {
+        "detailWidth": 598.5625,
+        "detailX": 897.9375,
+        "detailY": 206.1953125,
+        "hasLimits": true,
+        "hasSourceCommit": true,
+        "height": 1000,
+        "platforms": "Android companion, Fleet & delivery tooling",
+        "rowCount": 124,
+        "scrollWidth": 1585,
+        "title": "Toolkit RAM: reject negative and overflowing values",
+        "width": 1600
+      },
+      "mobile": {
+        "detailWidth": 343,
+        "detailX": 16,
+        "detailY": 307.71875,
+        "hasLimits": true,
+        "hasSourceCommit": true,
+        "height": 844,
+        "platforms": "Android companion, Fleet & delivery tooling",
+        "rowCount": 124,
+        "scrollWidth": 391,
+        "title": "Toolkit RAM: reject negative and overflowing values",
+        "width": 390
+      },
+      "consoleWarningsErrors": [],
+      "scope": "New Toolkit RAM detail content/width and visible queue counts only. Mobile detail was explicitly scrolled into view by its heading; task-button scroll behavior and all historical details are not accepted. Document measures 391px at a 390px viewport; no whole-page overflow acceptance is claimed.",
+      "setupCorrections": [
+        "Initial preview root could not serve sibling evidence paths; corrected to gallery parent before final checks.",
+        "Native AX scroll target unavailable; no action occurred; documented DOM locator used."
+      ],
+      "screenshots": [
+        "mocks/portal-toolkit-memory-20261104/evidence/roadmap-desktop.png",
+        "mocks/portal-toolkit-memory-20261104/evidence/roadmap-mobile.png"
+      ],
+      "cleanup": {
+        "ownedTabClosed": true,
+        "viewportReset": true,
+        "userTabsClosed": 0
+      }
+    },
+    "cleanup": {
+      "ownedPreviewServerSessionsRetired": [
+        35954,
+        1180
+      ],
+      "ownedBrowserTabClosed": true,
+      "browserViewportReset": true,
+      "userTabsClosed": 0,
+      "docsEnvironmentRemoved": true,
+      "generatedDocsSiteRemoved": true,
+      "toolkitCommittedWorktreeRetained": true,
+      "evidenceRetained": true,
+      "credentialsCopied": false
+    },
+    "preservation": {
+      "primary": {
+        "root": "/Volumes/xHome/Github/portal-toolkit",
+        "head": "4e1dadb8ec2ec018b6fdc250486e0c476467a7c4",
+        "headAndStatusExact": true,
+        "preexistingDirtyFileHashesExact": {},
+        "sourceWrites": 0
+      },
+      "companion": {
+        "root": "~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit",
+        "head": "d5b1a4de1069ceb02d172bfb10832a60c232bf53",
+        "headAndStatusExact": true,
+        "preexistingDirtyFileHashesExact": {
+          "app/build.gradle.kts": "aaf23251ee5014ec48f068f6400cd3c3db5099a0cb3b01da6e1206ca37473032",
+          "app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt": "e125672416b4602f0c3b650d831ab3032913c14823595d49538db5f872ded5d3",
+          "app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt": "41a8be3171b0570abd34ce81c269d5ce9dff4d396a030934a3273505d83fcbbb",
+          "docs/companion-photo-transport-exceptions-2026-11-03.md": "0720a1592c5277149b7489a34a068989eaa068ad6f64055ad2c21e3ed2a3b1eb"
+        },
+        "sourceWrites": 0
+      },
+      "roadmap": {
+        "counts": {
+          "verified": 39,
+          "delivered": 75,
+          "parked": 7,
+          "approval": 2,
+          "queued": 1
+        },
+        "priorObjectsExact": 123,
+        "suffixBytes": 415562,
+        "suffixSha256": "738d3a19b734c2ff0381408f17841f245fae823fb923cf75b06f1b13a86eaad7",
+        "weatherDefaultExact": true,
+        "boundariesExact": true
+      },
+      "portal": {
+        "head": "c058f71edfea1df747121859c08687461d98c374",
+        "trackedPaths": [
+          "docs/portal-product-operating-state.md",
+          "mocks/portal-widget-gallery-20261102/roadmap/index.html",
+          "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json"
+        ],
+        "noTrackedAppTestVersionCatalogOrFleetDelta": true,
+        "preexistingPycachePathRetained": true,
+        "freshDeviceReads": 0
+      },
+      "recordedAtUtc": "2026-11-04T06:53:11.608713+00:00"
+    },
+    "indexOnlyNewNoteInserted": true,
+    "setupCorrectionsExcludedFromProductRed": [
+      "Missing SDK configuration before clean baseline.",
+      "Queue-note uniqueness assertion before index write.",
+      "File binding checker needed root/revision resolution; final 133 bindings match.",
+      "Initial preview root served roadmap only; corrected parent used for final checks.",
+      "Unavailable native AX scroll performed no action; supported DOM locator used."
+    ],
+    "wholeProductGoalComplete": false,
+    "evidencePackaging": {
+      "sixRawLogsArchivedAsGzip": true,
+      "decompressedCapturedBytesExact": true,
+      "reason": "Gradle trailing spaces and JUnit final blank lines are retained without source whitespace changes."
+    }
+  }
+}

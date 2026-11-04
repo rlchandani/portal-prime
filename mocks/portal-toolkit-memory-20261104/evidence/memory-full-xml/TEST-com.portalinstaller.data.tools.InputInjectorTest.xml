@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.tools.InputInjectorTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.743Z" hostname="iRedlofs-Mac-mini-3.local" time="0.002">
+  <properties/>
+  <testcase name="mapPoint maps proportionally when aspect matches" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="mapPoint maps exact bottom-right corner of content" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="textCommand escapes embedded single quotes via shellQuote" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="textCommand replaces spaces with percent-s and quotes the argument" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="mapPoint accounts for vertical letterbox" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="tapCommand formats x and y" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.001"/>
+  <testcase name="swipeCommand formats coordinates and duration" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="mapPoint clamps points inside letterbox bars" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="textCommand tolerates empty string" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="mapPoint accounts for horizontal letterbox" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="longPressCommand is a same-point swipe with default duration" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.0"/>
+  <testcase name="keyeventCommand emits correct keycodes for every key" classname="com.portalinstaller.data.tools.InputInjectorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

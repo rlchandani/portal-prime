@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.files.RemotePathsTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.554Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="parentOf top-level path yields empty root" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <testcase name="moveDest tolerates trailing slash on dest" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <testcase name="parentOf nested path drops last segment" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <testcase name="renameDest keeps parent directory" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <testcase name="join adds exactly one slash" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <testcase name="join collapses trailing slash on dir" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <testcase name="renameDest of bare name has no leading slash" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <testcase name="moveDest places file under destination dir" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <testcase name="parentOf tolerates trailing slash" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <testcase name="parentOf bare name yields empty" classname="com.portalinstaller.data.files.RemotePathsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

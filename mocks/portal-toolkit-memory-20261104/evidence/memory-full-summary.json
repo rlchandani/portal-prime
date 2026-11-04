@@ -1,0 +1,17 @@
+{
+  "summary": {
+    "tests": 239,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 39
+  },
+  "apk": {
+    "bytes": 13901710,
+    "sha256": "a76042cddcff791bac8cc45ed319192d780c22c2dfa0166a0cb55e3991af7c1d",
+    "package": "com.portalinstaller",
+    "versionName": "1.4.0",
+    "versionCode": 5,
+    "installStatus": "not_installed"
+  }
+}

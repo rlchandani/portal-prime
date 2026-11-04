@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.store.ShellHistoryStoreTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.691Z" hostname="iRedlofs-Mac-mini-3.local" time="0.05">
+  <properties/>
+  <testcase name="history caps at MAX keeping newest" classname="com.portalinstaller.data.store.ShellHistoryStoreTest" time="0.045"/>
+  <testcase name="blank commands are ignored" classname="com.portalinstaller.data.store.ShellHistoryStoreTest" time="0.002"/>
+  <testcase name="consecutive duplicate is not re-added" classname="com.portalinstaller.data.store.ShellHistoryStoreTest" time="0.001"/>
+  <testcase name="newest command is first" classname="com.portalinstaller.data.store.ShellHistoryStoreTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

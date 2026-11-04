@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.ReconnectBackoffTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.545Z" hostname="iRedlofs-Mac-mini-3.local" time="0.0">
+  <properties/>
+  <testcase name="honours custom base and cap" classname="com.portalinstaller.data.ReconnectBackoffTest" time="0.0"/>
+  <testcase name="treats non-positive attempts as the first attempt" classname="com.portalinstaller.data.ReconnectBackoffTest" time="0.0"/>
+  <testcase name="doubles from base up to the cap" classname="com.portalinstaller.data.ReconnectBackoffTest" time="0.0"/>
+  <testcase name="caps at maxMs for high attempt counts" classname="com.portalinstaller.data.ReconnectBackoffTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

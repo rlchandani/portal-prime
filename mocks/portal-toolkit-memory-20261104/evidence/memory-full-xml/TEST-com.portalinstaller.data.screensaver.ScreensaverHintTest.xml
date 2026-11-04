@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.screensaver.ScreensaverHintTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.568Z" hostname="iRedlofs-Mac-mini-3.local" time="0.0">
+  <properties/>
+  <testcase name="one photo suggests adding the remainder" classname="com.portalinstaller.data.screensaver.ScreensaverHintTest" time="0.0"/>
+  <testcase name="just below threshold suggests adding one" classname="com.portalinstaller.data.screensaver.ScreensaverHintTest" time="0.0"/>
+  <testcase name="above threshold is ok" classname="com.portalinstaller.data.screensaver.ScreensaverHintTest" time="0.0"/>
+  <testcase name="exactly at threshold is ok" classname="com.portalinstaller.data.screensaver.ScreensaverHintTest" time="0.0"/>
+  <testcase name="zero photos shows no hint (empty-state text covers it)" classname="com.portalinstaller.data.screensaver.ScreensaverHintTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

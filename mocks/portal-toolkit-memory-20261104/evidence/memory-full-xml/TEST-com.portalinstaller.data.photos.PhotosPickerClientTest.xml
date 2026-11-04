@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.portalinstaller.data.photos.PhotosPickerClientTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-04T06:44:42.555Z" hostname="iRedlofs-Mac-mini-3.local" time="0.01">
+  <properties/>
+  <testcase name="deleteSession swallows failures so the flow is never blocked" classname="com.portalinstaller.data.photos.PhotosPickerClientTest" time="0.004"/>
+  <testcase name="getSession hits session endpoint and reports mediaItemsSet" classname="com.portalinstaller.data.photos.PhotosPickerClientTest" time="0.001"/>
+  <testcase name="listAllPhotos follows pageToken across pages and drops videos" classname="com.portalinstaller.data.photos.PhotosPickerClientTest" time="0.002"/>
+  <testcase name="non-2xx response raises PickerException carrying the http code" classname="com.portalinstaller.data.photos.PhotosPickerClientTest" time="0.001"/>
+  <testcase name="createSession posts to sessions with bearer token and parses body" classname="com.portalinstaller.data.photos.PhotosPickerClientTest" time="0.0"/>
+  <testcase name="downloadPhoto requests the full-resolution url" classname="com.portalinstaller.data.photos.PhotosPickerClientTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
