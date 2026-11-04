@@ -1,0 +1,11 @@
+{
+  "issue": "Welcome settings snapshot stays stale when retained host resumes after external changes",
+  "startedAt": "2026-11-04T17:51:18Z",
+  "target": "2026-11-04T18:06:18Z",
+  "deadline": "2026-11-04T18:21:18Z",
+  "base": "7b23c8d11dd29c0e525c144ded740e9ca6000c68",
+  "acceptance": "Shared Welcome body reloads WelcomeConfig on lifecycle resume; required tests/builds/signing review; both device deliveries and state preservation",
+  "excluded": "Mounted lifecycle/native UI acceptance, live remote changes, media/audio/source/account changes, shared OnResume changes, publication, phone",
+  "version": "1.172",
+  "versionCode": 166
+}

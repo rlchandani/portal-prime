@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.SettingsDomains
+import com.immortal.launcher.ui.components.OnResume
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import org.json.JSONObject
 import kotlin.math.roundToInt
@@ -73,6 +74,7 @@ internal fun WelcomeSettingsContent() {
   val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
   val pageActive by rememberUpdatedState(LocalApprovedLauncherPageActive.current)
   var settings by remember { mutableStateOf(WelcomeConfig.load(context)) }
+  OnResume { settings = WelcomeConfig.load(context) }
 
   val firstFocus = remember { FocusRequester() }
   LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }

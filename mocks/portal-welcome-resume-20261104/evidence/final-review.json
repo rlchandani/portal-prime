@@ -1,0 +1,248 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "scope": "Shared Welcome settings snapshot reload on owner resume; source, existing JVM gates and final signed APK identities/assets only.",
+  "clock": {
+    "originalStart": "2026-11-04T17:51:18Z",
+    "target": "2026-11-04T18:06:18Z",
+    "hardDeadline": "2026-11-04T18:21:18Z",
+    "notReset": true
+  },
+  "findings": [
+    "Exact whole-source reconstruction verifies only import ui.components.OnResume and OnResume { settings = WelcomeConfig.load(context) } after the remembered snapshot. Exact Gradle reconstruction verifies only 165/1.171 to 166/1.172.",
+    "The callback captures the remembered MutableState holder through the delegated var and assigns a freshly loaded immutable Settings snapshot. It does not capture a Settings value to increment or overwrite from a stale snapshot. Existing OnResume keys registration to LocalLifecycleOwner and removes its observer on disposal. Initial remember load remains; no generic change to OnResume is made.",
+    "Standalone WelcomeSettingsScreen and ImmortalSettingsActivity welcome detail reach the same body. Retained settings panes supply ApprovedLauncherPageLifecycle: hidden panes stay at CREATED and visible panes follow host foreground. The added callback therefore follows the supplied owner resume events. This is source reasoning, not mounted lifecycle acceptance.",
+    "WelcomeConfig.load remains read-only and the registry, existing apply/write handlers, duration adapter, active guard, text dialogs, preview action and TTS lifecycle remain unchanged by the exact insertion. No setting, persistence schema, broad live-refresh mechanism or external action is added.",
+    "Retained Gradle terminal exit 0 in 111.535094667 seconds and successful build log cover unit tests/debug/performance/R8/vital. All 475 XML files independently hashed and recounted: 4565 tests/testcase entries, failures/errors/skipped 0. Existing WelcomeDurationAdapter tests and SettingsDomain tests pass; their coverage does not establish actual resume delivery.",
+    "Both static binary manifests are com.immortal.launcher.debug 166/1.172. Independently decoded APK v2 certificate identity is unchanged and matches 1.171. All 23 source assets equal local source and 1.171 payloads. Asset entry sets are unchanged; debug payloads are all unchanged, optimized only generated baseline.prof changes with its valid pro/010 header. Public manifest remains 1.83/code77."
+  ],
+  "qualifications": [
+    "Source-only freshness witness; no new regression/RED-GREEN fixture and no mounted standalone/two-panel Compose lifecycle or live remote update acceptance.",
+    "No native Welcome rendering, TTS/audio audition, household preferences, provider/media/account/phone, optimized-runtime/API28/Living functional or device-delivery acceptance by this reviewer. Root owns subsequent delivery/preservation.",
+    "Certificate identity was independently decoded; cryptographic apksigner verification is retained root-helper evidence, not an independent reviewer SDK execution. Reviewer ran no tests/build/SDK/Git/device/network operations.",
+    "Resume-only reload does not claim continuous updates while the host remains resumed, generic OnResume callback freshness, changed draft policy, or concurrency guarantees. Existing source guards and clocks remain."
+  ],
+  "build": {
+    "exitCode": 0,
+    "elapsedSeconds": 111.53509466700052,
+    "tasks": [
+      ":app:testDebugUnitTest",
+      ":app:assembleDebug",
+      ":app:assemblePerformance",
+      ":app:lintVitalPerformance"
+    ]
+  },
+  "jvm": {
+    "tests": 4565,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 475,
+    "testcaseCount": 4565,
+    "focused": [
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.WelcomeDurationAdapterTest.xml",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.settings.SettingsDomainTest.xml",
+        "tests": 25,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "xmlDirectory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "aggregateSha256": "5cb82d7415f0e4281cbdd5781d9752418b9bb8d24c59a1689b9b2188520ed018",
+    "aggregateDefinition": "Lexicographically sort TEST-*.xml filenames; concatenate UTF-8 filename + NUL + lowercase SHA256(file bytes) + NUL + decimal byte length + newline; SHA256 the concatenation. All 475 files read independently."
+  },
+  "artifacts": [
+    {
+      "variant": "debug",
+      "manifest": {
+        "versionCode": 166,
+        "versionName": "1.172",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssets": 23,
+      "sourceAndBaselineExact": true,
+      "generatedProfileChanges": []
+    },
+    {
+      "variant": "performance",
+      "manifest": {
+        "versionCode": 166,
+        "versionName": "1.172",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssets": 23,
+      "sourceAndBaselineExact": true,
+      "generatedProfileChanges": [
+        {
+          "path": "assets/dexopt/baseline.prof",
+          "beforeBytes": 11142,
+          "beforeSha256": "47dff5832749a4ee03774b8b1acfecb2bcfbc9109e4391267fc7fe218b94a224",
+          "bytes": 11143,
+          "sha256": "1380d31b291030a0952982eb67d54a1853fb29e9b85e7bbcce7a5eebcc64d113",
+          "headerHex": "70726f0030313000"
+        }
+      ]
+    }
+  ],
+  "sourceAssets": {
+    "root": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets",
+    "fileCount": 23,
+    "aggregateSha256": "5522cf7017cf8477c55e611c10b2acce748eb59fc5b63a187066128e5a2e0376",
+    "aggregateDefinition": "Recursively list all regular source assets, sort relative paths, concatenate path + NUL + SHA256 + NUL + byte length + newline; SHA256. Individual names/hashes are also bound by promotion-artifacts.json; each payload independently checked against both candidate and baseline ZIPs."
+  },
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/WelcomeSettingsActivity.kt",
+      "bytes": 15819,
+      "sha256": "eb6d3a07574a21100e7803b6fe565f45b580f5d3c4e28fb035c814d87bfc0824"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/WelcomeConfig.kt",
+      "bytes": 7524,
+      "sha256": "78a0d8bfca608c85a4e0d160ee3aa30fd8f1a1c725014af1ed13ae3cce42839a"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt",
+      "bytes": 69058,
+      "sha256": "4d110cd39ae80e5cc92180283edf5e5e19c62c3235f2a1ed4daccf619b40a045"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ui/components/Reuse.kt",
+      "bytes": 2511,
+      "sha256": "7ebf705fbd271e68501561ff4f78525653850fb8b43990bf992c22762065140f"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt",
+      "bytes": 96368,
+      "sha256": "5728f60db74716c210635771b6e93465df2f0c81b5bccc63db7dffe91d05ec8b"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedSettingsShell.kt",
+      "bytes": 31749,
+      "sha256": "4eeea19233021283fff20123aa0ca16148bcbe235d7f2dc4d627c57d5c58a400"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedLauncherTabs.kt",
+      "bytes": 10540,
+      "sha256": "3325d14bcb665da4c80f3bfe085871a1f98372ae382961d3d927ad574dfa5976"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/WelcomeDurationAdapter.kt",
+      "bytes": 1208,
+      "sha256": "f3253c7c9338f05c22816bda40f0fa194a1b17a1a170ceb9298a4c6e667d7b36"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/WelcomeDurationAdapterTest.kt",
+      "bytes": 4345,
+      "sha256": "ada9f5285d0fc2211e21b1e12266b9a4d6b78c004a721ceb97377790a639725e"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt",
+      "bytes": 28891,
+      "sha256": "8c7a2870cb922017808b4cb26f5ba099f318ef55f49614dc3d52c9b9f98dcc04"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "1f83964ae154e7803229ee42ce08ac48a468a7ef6b4a207f0b63b0e1e03c8fb8"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/version.json",
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 19404,
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/scope.json",
+      "bytes": 639,
+      "sha256": "b019e7d61daac959200d730cb45582af7ea4fa984ebc4f63230420d8f278c75f"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/source-author-receipt.json",
+      "bytes": 615,
+      "sha256": "1cbcc88c099667aa0048eef8a2c240354dff933cdebc4ddfe3f67aa970e99b0d"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/WelcomeSettingsActivity.before.kt",
+      "bytes": 15713,
+      "sha256": "8199f57fd2961d2d3f7726080da2c496d744721ffa87fb52206a106f70c49dfe"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/build.gradle.before.kts",
+      "bytes": 11824,
+      "sha256": "f920d93600e5469ab79775fd711c14e8231aee0b9ce75b74772e20d8967bd0bf"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/verify-artifacts.py",
+      "bytes": 3680,
+      "sha256": "49509e2a27aad1c0586123c277090821e4a6c43eddb2bf4d6a94916bef1612d5"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/build-terminal.json",
+      "bytes": 197,
+      "sha256": "a79af4e381c6c7f010566365e340b057c97ebf2784219fdd5e26ddc6b5a900bc"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/build.log",
+      "bytes": 13723,
+      "sha256": "59bfec5c93c86e6bf2e7b23c0d2ce028416647635c90806e49e2985b318b656c"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/promotion-artifacts.json",
+      "bytes": 9848,
+      "sha256": "2ef31d84ea7f161421e9dc7362707c3197743618a5b506efc9ad8691bfd565b2"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.WelcomeDurationAdapterTest.xml",
+      "bytes": 1075,
+      "sha256": "6b9dc19549c1e0b8a3d55b6ef5926263e9ef2065be6349c9320a9b757c31ca79"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.settings.SettingsDomainTest.xml",
+      "bytes": 4029,
+      "sha256": "56e0549526030c474a2e7b7a3949057b5ea3aa6c96fc6320da32170ee941df80"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/candidate-debug-1.172.apk",
+      "bytes": 46745650,
+      "sha256": "7561a40d5ae5ccc0712811fce21d486a69b8812580a2083df68b09b836ff04a0"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/candidate-debug-1.171.apk",
+      "bytes": 46745646,
+      "sha256": "f651a3b4248dd5f8adebaebcd0252b79f02a57be4ab7d65b4c047d32e55c2e3e"
+    },
+    {
+      "path": "/private/tmp/portal-welcome-resume-20261104-175118/candidate-performance-1.172.apk",
+      "bytes": 25886923,
+      "sha256": "1b0aa75b1bd86d37719713021923a4576aeedb9697e9d2f2cc1ed68d2d8188f2"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/candidate-performance-1.171.apk",
+      "bytes": 25886927,
+      "sha256": "58ffc6e7e3b8c14b9623d4e94c37a04e1c0955b7cc0999a0ce8b0fbebeaf69a7"
+    }
+  ]
+}

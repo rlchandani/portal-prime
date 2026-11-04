@@ -1,0 +1,10 @@
+{
+  "exitCode": 0,
+  "elapsedSeconds": 111.53509466700052,
+  "tasks": [
+    ":app:testDebugUnitTest",
+    ":app:assembleDebug",
+    ":app:assemblePerformance",
+    ":app:lintVitalPerformance"
+  ]
+}

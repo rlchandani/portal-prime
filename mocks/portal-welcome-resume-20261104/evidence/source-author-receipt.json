@@ -1,0 +1,9 @@
+{
+  "file": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/WelcomeSettingsActivity.kt",
+  "beforeSha256": "8199f57fd2961d2d3f7726080da2c496d744721ffa87fb52206a106f70c49dfe",
+  "afterSha256": "eb6d3a07574a21100e7803b6fe565f45b580f5d3c4e28fb035c814d87bfc0824",
+  "changedLines": 2,
+  "implementation": "Import existing OnResume and reload WelcomeConfig into remembered settings on resume",
+  "testsAdded": false,
+  "reason": "Reversible narrow UI lifecycle refresh; existing full JVM/build checks and independent source review; native acceptance not claimed"
+}

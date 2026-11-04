@@ -1,18 +1,52 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T17:49:08.379108+00:00",
-  "updatedLabel": "Exact1.171 delivered: Notes saved-memo summary; saved settings retained",
+  "updatedAt": "2026-11-04T18:08:39.799853+00:00",
+  "updatedLabel": "Exact1.172 delivered: Welcome settings refresh on resume; saved settings retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.171/code165, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.172/code166, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "welcome-settings-resume",
+      "title": "Welcome: refresh settings when the screen resumes",
+      "summary": "Retained Welcome screens reload the configuration snapshot after host resume.",
+      "status": "delivered",
+      "kind": "Small lifecycle settings refresh",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root implementation/delivery / independent media source review",
+      "verification": "4565JVM/475suites, debug/optimized/R8/vital pass; root fully read combined review and rehashed27bindings/23assets/all475XML.",
+      "deployment": "Exact optimized1.172/code166 fully hashed both rooms, one install each; Living ACK reconciled by6read-only observations.",
+      "acceptance": [
+        "Use existing OnResume in the Welcome body shared by both hosts.",
+        "Reload current configuration into remembered state without changing persistence or handlers.",
+        "Required checks, independent artifact review and exact both-room delivery with state preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Source scope, checked delivery and explicit acceptance limits.",
+          "source": "docs/portal-welcome-resume-2026-11-04.md"
+        }
+      ],
+      "limits": [
+        "Resume freshness is source-reviewed. Existing JVM tests do not mount the lifecycle; retained standalone/pane native interaction, remote edits, optimized functional behavior, API28 and Living visuals remain unverified."
+      ],
+      "next": "Keep the small refresh; mounted lifecycle acceptance is separate.",
+      "issueClock": {
+        "startedAt": "2026-11-04T17:51:18Z",
+        "target": "2026-11-04T18:06:18Z",
+        "deadline": "2026-11-04T18:21:18Z",
+        "firstDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "notes-saved-memo-summary",
       "title": "Notes: show a waiting voice memo",
