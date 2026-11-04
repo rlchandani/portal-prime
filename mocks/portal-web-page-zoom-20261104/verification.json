@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "status": "Zoom candidate withdrawn; baseline behavior recovered in1.183",
+  "issueClock": {
+    "startedAt": "2026-11-04T23:09:07Z",
+    "target": "2026-11-04T23:24:07Z",
+    "deadline": "2026-11-04T23:39:07Z",
+    "firstDiscoveryClockRetained": true,
+    "featureWorkStoppedAt": "2026-11-04T23:35:53Z",
+    "recoveryAndClosureExceededDeadline": true,
+    "closedAt": "2026-11-04T23:45:28.941546+00:00"
+  },
+  "candidate": {
+    "version": "1.182/code176",
+    "testCount": 4622,
+    "suiteCount": 482,
+    "focusedFrozenTests": 6,
+    "baselineMissingCapabilityFailures": 6,
+    "fixtureCompileSetupFailureRepairedBeforeBaseline": true,
+    "sourceReviewOnlyAccepted": true,
+    "nativeRenderingAccepted": false,
+    "promotionOccurredBeforeDecisiveNativeCheck": true,
+    "debugApkSha256": "b238193b198e508c1274530b6114ad7ff5cf245bc5aaaa1a6cd5731028988c99",
+    "optimizedApkSha256": "d1d08c7325c2c077f4695845c70a0c4e9eeafa5f9dc81b6f20486d630b531890",
+    "oneRoomInstallEach": true
+  },
+  "native": {
+    "accepted": false,
+    "reason": "Requested zoom did not change actual native scale or page viewport",
+    "cases": [
+      {
+        "requestedZoom": 0,
+        "scale": 1.8000000715255737,
+        "viewport": [
+          2160,
+          1440
+        ],
+        "page": {
+          "ready": "complete",
+          "innerWidth": 1200,
+          "innerHeight": 800,
+          "dpr": 1.125,
+          "documentWidth": 1200,
+          "probeWidth": 200,
+          "probeHeight": 200
+        },
+        "controllerStopReturned": true,
+        "pngSha256": "a8b81645255a9bf3e861e1e2e1e25f63433a3481d29a99c6907fa1c698c3b9a8"
+      },
+      {
+        "requestedZoom": 75,
+        "scale": 1.8000000715255737,
+        "viewport": [
+          2160,
+          1440
+        ],
+        "page": {
+          "ready": "complete",
+          "innerWidth": 1200,
+          "innerHeight": 800,
+          "dpr": 1.125,
+          "documentWidth": 1200,
+          "probeWidth": 200,
+          "probeHeight": 200
+        },
+        "controllerStopReturned": true,
+        "pngSha256": "f8f5587c1ea5563edc29d39b24e200a86af135c8ea42b0b9ea2ca66d4dd54cef"
+      },
+      {
+        "requestedZoom": 125,
+        "scale": 1.8000000715255737,
+        "viewport": [
+          2160,
+          1440
+        ],
+        "page": {
+          "ready": "complete",
+          "innerWidth": 1200,
+          "innerHeight": 800,
+          "dpr": 1.125,
+          "documentWidth": 1200,
+          "probeWidth": 200,
+          "probeHeight": 200
+        },
+        "controllerStopReturned": true,
+        "pngSha256": "c78b0e585a7d7dc3ce8bf6ec0da1a30e30865df10b6f9cd180af92d786364b46"
+      }
+    ],
+    "visuallyInspectedGeneratedPng": "zoom-75.png",
+    "firstFixtureFailure": "Owned application-context recursion; one fixture-only correction before the three captures"
+  },
+  "recovery": {
+    "version": "1.183/code177",
+    "jvm": {
+      "tests": 4616,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 481
+    },
+    "debugSha256": "6c9cabe05e850a1dbf64a4e9838228c81cf5e114ed642424466a0459920900ae",
+    "optimizedSha256": "9c17deca38b440193379095866c9313ce968b98f3fd88f2dc309fe4cfd5178d0",
+    "optimizedBytes": 25886951,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "all23SourceAssetsUnchanged": true,
+    "productionSourcesExactlyRestored": {
+      "app/src/main/java/com/immortal/launcher/ScreensaverConfig.kt": "6738cb1378b5f160c0361608734c66d18bfbfde2a6a69ff6973ed4b0f7c96796",
+      "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+      "app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt": "8d688e0ce12d6811b320380b20f95ded7b7d52852291d96c7bd69835d677a182",
+      "app/src/main/java/com/immortal/launcher/settings/SettingsPresentation.kt": "60915e2c59dce6b0a50d8f653d3fc096e6081ab1723964d7bafdf1df2d1c03ae",
+      "app/src/test/java/com/immortal/launcher/HomeGridTest.kt": "5b75a929cb51a691af9670e875fec4b2c6def6a1c1d5c5c949fe270632a15543"
+    },
+    "family": {
+      "bytes": 25886951,
+      "sha256": "9c17deca38b440193379095866c9313ce968b98f3fd88f2dc309fe4cfd5178d0",
+      "app": {
+        "versionCode": 177,
+        "versionName": "1.183"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25886951,
+        "sha256": "9c17deca38b440193379095866c9313ce968b98f3fd88f2dc309fe4cfd5178d0",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 177,
+          "versionName": "1.183"
+        }
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "fourMapsExactlyIdentical": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1535,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "fourMapsExactlyIdentical": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1517,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRetired": true,
+    "ownerRegistriesUnchanged": true,
+    "fixturesRetired": [
+      {
+        "fixtureUninstalled": true,
+        "packageAbsent": true
+      },
+      {
+        "fixtureUninstalled": true,
+        "packageAbsent": true
+      }
+    ]
+  },
+  "limits": [
+    "Actual candidate debug classes and generated HTML at private web entry with explicit real Config.load injection; no normal frame startup/provider/dashboard test.",
+    "Only Family API29 execution; no API28, Living native or browser-control rendering proof.",
+    "One owned fixture StackOverflowError due application-context recursion; fixed once. Final diagnostics contain zero captured fatal/ANR markers.",
+    "Inactive issue252 helper candidate withdrawn; original source/tests retained.",
+    "Original deadline not reset; zoom remains parked, no automatic retries.",
+    "No phone/provider/account/authentication/push/publication; public release metadata stays1.83."
+  ]
+}
