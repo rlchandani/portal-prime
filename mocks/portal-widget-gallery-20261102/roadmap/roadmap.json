@@ -1,18 +1,77 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T16:37:37.134172+00:00",
-  "updatedLabel": "Offline native fixture packaging verified; room delivery1.168 unchanged",
+  "updatedAt": "2026-11-04T16:51:51.312153+00:00",
+  "updatedLabel": "Exact1.169 delivered: truthful unavailable Home Assistant exit label; saved settings retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.168/code162, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.169/code163, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "ha-dismiss-fallback-label",
+      "title": "Screensaver exit: show the available destination",
+      "summary": "An unavailable saved Home Assistant target now shows Immortal launcher in the picker row.",
+      "description": "Use the current successfully loaded HA package result to match the existing fallback explanation. Keep the saved choice and launch behavior.",
+      "status": "delivered",
+      "verification": "Five existing inventory cases and all4565JVM/475suites/debug/optimized/R8/vital pass. Exact two-line source conditional reviewed;17bindings and all475XML rehashed. No new rendered picker or uninstall/reinstall acceptance.",
+      "kind": "Small native screensaver settings text correction",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root implementation/delivery / bounded photo discovery / independent media review",
+      "deployment": "Exact optimized1.169/code163 fully hashed in both rooms, one install each; Living uncertain ACK reconciled by seven read-only observations.",
+      "state": "All43/30 preference files and four complete maps exact; Family runtime, saved Shuffle/fit, name and DevMode preserved.",
+      "acceptance": [
+        "Confirmed absent selected HA displays the existing launcher fallback text (source verified).",
+        "Loading, failed inventory and pending revision do not assert absence.",
+        "Exact signed artifact installed and saved state verified in both rooms."
+      ],
+      "evidence": [
+        {
+          "text": "Change, delivery, checks and limits.",
+          "source": "docs/portal-dismiss-fallback-label-2026-11-04.md"
+        },
+        {
+          "text": "Combined final review.",
+          "source": "mocks/portal-dismiss-fallback-20261104/evidence/final-review.json"
+        }
+      ],
+      "limits": [
+        "No rendered/mounted picker, actual uninstall/reinstall, HA dashboard, fallback-launch, API28 or Living visual acceptance.",
+        "Plain-app label fallback remains; curated inventory absence is not exact component proof.",
+        "No new mirrored or product behavioral RED claim for reversible text correction.",
+        "All prior scopes/clocks and public1.83 remain."
+      ],
+      "next": "Select another distinct small visible product correction; keep older stalled scopes parked.",
+      "issueClock": {
+        "originalStart": "2026-11-04T16:39:11Z",
+        "target": "2026-11-04T16:54:11Z",
+        "hardDeadline": "2026-11-04T17:09:11Z",
+        "selectedAt": "2026-11-04T16:44:04.673680+00:00",
+        "clockNotReset": true,
+        "scope": "Only unavailable selected Home Assistant destination row text; use already confirmed choicesReady and haPackage. Retain existing footer, launcher/app paths, loading/failure, saved setting, resolver and launch behavior. No new mirrored tests for reversible text correction; retain actual inventory and full app regression gates.",
+        "before": {
+          "bytes": 16049,
+          "sha256": "80d9b0c0d38ce5322a44aa817e80e9c5345730dde1e22404aca5debe4d9a6216"
+        },
+        "roomBaseline": "preceding exact1.168/code162; fresh preservation required before delivery",
+        "exclusions": [
+          "plain-app stale label requires exact component resolver; not admitted",
+          "all previous parked/exhausted scopes retain clocks",
+          "no phone/household media/provider/account/push/publication"
+        ],
+        "expectedVersion": {
+          "versionName": "1.169",
+          "versionCode": 163
+        }
+      }
+    },
     {
       "id": "offline-native-fixture-packaging",
       "title": "Automate native test fixture packaging",

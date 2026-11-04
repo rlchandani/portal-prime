@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "originalStart": "2026-11-04T16:39:11+00:00",
+  "closedAt": "2026-11-04T16:53:21.011483+00:00",
+  "elapsedMinutes": 14.16685805,
+  "target": "2026-11-04T16:54:11+00:00",
+  "targetMet": true,
+  "hardDeadline": "2026-11-04T17:09:11+00:00",
+  "hardMet": true,
+  "clockNotReset": true,
+  "bothExact1169Delivered": true,
+  "all73PreferencesFourMapsAndFamilyRuntimePreserved": true,
+  "full4565JVM475SuitesAndBuildsPass": true,
+  "strictDocsPass": true,
+  "independentReviewFullyReadAndRehashed": true,
+  "privacyAndCleanupPass": true,
+  "wholeGoalActive": true,
+  "limits": "Rendered picker, real uninstall/reinstall, HA/fallback launch and all earlier excluded scopes remain outside acceptance."
+}

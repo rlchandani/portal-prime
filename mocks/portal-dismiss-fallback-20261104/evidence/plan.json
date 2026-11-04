@@ -1,0 +1,22 @@
+{
+  "originalStart": "2026-11-04T16:39:11Z",
+  "target": "2026-11-04T16:54:11Z",
+  "hardDeadline": "2026-11-04T17:09:11Z",
+  "selectedAt": "2026-11-04T16:44:04.673680+00:00",
+  "clockNotReset": true,
+  "scope": "Only unavailable selected Home Assistant destination row text; use already confirmed choicesReady and haPackage. Retain existing footer, launcher/app paths, loading/failure, saved setting, resolver and launch behavior. No new mirrored tests for reversible text correction; retain actual inventory and full app regression gates.",
+  "before": {
+    "bytes": 16049,
+    "sha256": "80d9b0c0d38ce5322a44aa817e80e9c5345730dde1e22404aca5debe4d9a6216"
+  },
+  "roomBaseline": "preceding exact1.168/code162; fresh preservation required before delivery",
+  "exclusions": [
+    "plain-app stale label requires exact component resolver; not admitted",
+    "all previous parked/exhausted scopes retain clocks",
+    "no phone/household media/provider/account/push/publication"
+  ],
+  "expectedVersion": {
+    "versionName": "1.169",
+    "versionCode": 163
+  }
+}

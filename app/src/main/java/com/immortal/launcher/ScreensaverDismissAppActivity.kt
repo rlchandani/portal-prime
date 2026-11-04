@@ -248,7 +248,8 @@ internal fun ScreensaverDismissContent() {
     SectionLabel("Options")
     Card {
       NavRow("Open when you tap to exit", value = when {
-        settings.dismissHaDashboard != null -> "Home Assistant dashboard"
+        settings.dismissHaDashboard != null -> if (choicesReady && haPkg == null)
+          "Immortal launcher" else "Home Assistant dashboard"
         settings.dismissAppComponent != null -> apps?.firstOrNull {
           it.component.flattenToString() == settings.dismissAppComponent
         }?.label ?: "Chosen app"

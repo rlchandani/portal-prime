@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "bothExactOptimized1169": true,
+  "sha256": "56a31c43d56bf6bd3ad3cf70f3189afccfddbbafd422376ec8cf3a8ca2370087",
+  "singleInstallEach": true,
+  "livingUncertainAckReadOnlyReconciled": 7,
+  "all43and30PreferencesExact": true,
+  "fourCompleteMapsExactBoth": true,
+  "familyRuntimePreserved": true,
+  "frameRequestsSuccessful": true,
+  "capturedFatalAnrMarkersZero": true,
+  "reviewBindingsRehashed": 17,
+  "mountedPickerUninstallReinstallNotTested": true
+}

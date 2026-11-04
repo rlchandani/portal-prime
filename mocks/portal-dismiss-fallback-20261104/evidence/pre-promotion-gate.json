@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "checkedAt": "2026-11-04T16:48:11.744282+00:00",
+  "fullReviewRead": true,
+  "reviewSha256": "9614436270f979645dcde799008e2c14f026b43d0c9e719b063962d76f9a52d3",
+  "bindingsRehashed": 17,
+  "xmlFilesRehashed": 475,
+  "xmlAggregateSha256": "4708943a288e3ed5a7fb389693e820b3b64cc898fb90d44ad21f6a17d98f0709",
+  "jvm": {
+    "tests": 4565,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 475
+  },
+  "privateFreshBaselineBoth1168": true
+}

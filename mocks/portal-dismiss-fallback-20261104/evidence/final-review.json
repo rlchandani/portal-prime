@@ -1,0 +1,181 @@
+{
+  "accepted": true,
+  "ok": true,
+  "findings": [],
+  "blockers": [],
+  "originalStart": "2026-11-04T16:39:11Z",
+  "target": "2026-11-04T16:54:11Z",
+  "hardDeadline": "2026-11-04T17:09:11Z",
+  "clockNotReset": true,
+  "base": "f608807e",
+  "source": {
+    "wholeFileExactConditionalInsertion": true,
+    "delta": "Selected HA row says Immortal launcher only when choicesReady && haPkg==null; existing dashboard label otherwise.",
+    "branches": {
+      "selectedUnavailableHA": "Completed current inventory, absent HA: Immortal launcher.",
+      "selectedInstalledHA": "Completed current inventory with HA: Home Assistant dashboard.",
+      "loadingOrRevisionPending": "choicesReady false; selected HA label remains Home Assistant dashboard.",
+      "loadFailure": "Existing loadFailed/error/retry and choicesReady boundary unchanged; unconfirmed inventory does not display fallback.",
+      "default": "Existing Immortal launcher label unchanged.",
+      "plainApp": "Existing exact component lookup and Chosen app fallback unchanged."
+    },
+    "footerResolverLaunchPathsSettingsAndActionsBytesUnchanged": true,
+    "inventoryReader": "Installed-app load must succeed before HA lookup; same prepared apps/HA snapshot and revision guard used.",
+    "noMountedUiAcceptance": true
+  },
+  "build": {
+    "terminalExit": 0,
+    "elapsedSeconds": 111.12898095799756,
+    "log": "BUILD SUCCESSFUL in 1m 50s",
+    "fullXmlRecountedAndHashed": {
+      "tests": 4565,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 475
+    },
+    "existingInventoryTests": 5
+  },
+  "xmlAggregate": {
+    "directory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "glob": "TEST-*.xml",
+    "sort": "ascending filename",
+    "definition": "UTF8 filename NUL lowercase SHA256 NUL decimal byte count newline for every sorted matched file, SHA256 of concatenation.",
+    "sha256": "4708943a288e3ed5a7fb389693e820b3b64cc898fb90d44ad21f6a17d98f0709",
+    "files": 475
+  },
+  "artifacts": {
+    "debug": {
+      "candidate": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 163,
+        "versionName": "1.169"
+      },
+      "baseline": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 162,
+        "versionName": "1.168"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsExactSourceAndBaseline": true,
+      "changedAssets": []
+    },
+    "performance": {
+      "candidate": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 163,
+        "versionName": "1.169"
+      },
+      "baseline": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 162,
+        "versionName": "1.168"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsExactSourceAndBaseline": true,
+      "changedAssets": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "publicManifest": {
+    "versionCode": 77,
+    "versionName": "1.83"
+  },
+  "limits": [
+    "Reversible label/source correction plus existing JVM/full build/artifact verification. No mirrored test or product behavioral RED claim.",
+    "No native/rendered/mounted UI, actual app uninstall/reinstall, HA dashboard, fallback launch, provider, phone, account or household acceptance.",
+    "Five inventory tests establish existing loader contracts, not rendered NavRow text. Loading/failure/plain-app branch behavior is source reviewed.",
+    "Only read-only host evidence/hash/ZIP inspection performed; no SDK/tests/build/device/Git/runtime actions.",
+    "APK manifests/certificate identities independently decoded; cryptographic signature verification remains retained root helper apksigner evidence.",
+    "Debug asset payloads unchanged; performance only generated baseline.prof changes. All23 source asset bytes match source/baseline; no profile performance claim.",
+    "XML aggregate covers all475 actual files; hash definition allows root to independently reproduce the complete set before delivery."
+  ],
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/plan.json",
+      "bytes": 1060,
+      "sha256": "b258a503d38f5e278d56d031a58b1ff3f219f86891b7ffe3cfeebeac3b1c5882"
+    },
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/ScreensaverDismissAppActivity-before.kt",
+      "bytes": 16049,
+      "sha256": "80d9b0c0d38ce5322a44aa817e80e9c5345730dde1e22404aca5debe4d9a6216"
+    },
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/build-terminal.json",
+      "bytes": 178,
+      "sha256": "c899d96e7e03fefaeb0108b68e4df25130b7cc26ea47debc79c65752d12a2c9f"
+    },
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/build.log",
+      "bytes": 13723,
+      "sha256": "328c4027315889d1f780d8fe823ef51369106412a2735352a8586cc481dbc293"
+    },
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/promotion-artifacts.json",
+      "bytes": 9852,
+      "sha256": "96c89105d94a7da4de314316aae5ae8a1b78816aade341168e57cecc3fad0ed5"
+    },
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/verify-artifacts.py",
+      "bytes": 3678,
+      "sha256": "cda9c79e6a06687f69caf8d712677a1a2c7b7781467851e4cf5b71c34ff29ac1"
+    },
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/candidate-debug-1.169.apk",
+      "bytes": 46745646,
+      "sha256": "f874d9ec0d34acb3627971666c3870fa0e7e9ea35b7b9a56cf8f28d3039ed0fe"
+    },
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/candidate-performance-1.169.apk",
+      "bytes": 25886927,
+      "sha256": "56a31c43d56bf6bd3ad3cf70f3189afccfddbbafd422376ec8cf3a8ca2370087"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ScreensaverDismissAppActivity.kt",
+      "bytes": 16119,
+      "sha256": "4131b878e245ec709a9dc53ff07397bebdd1924edcc171563d451c72919682d5"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ScreensaverAppInventory.kt",
+      "bytes": 1087,
+      "sha256": "58c5ed18a0c05ed9d3b8af2b656f26f2cc0c4c6ff2dae64350017b88dd687191"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/ScreensaverAppInventoryTest.kt",
+      "bytes": 3509,
+      "sha256": "178cf159c876946eccc484ac9af10c0cdb7957a974c6c17a684b1218cc043fdb"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "88e928b9da9d41d1a27f680c4398e9da077a53f7296d63c3b81c49c7a93aaa08"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/version.json",
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 19404,
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+    },
+    {
+      "path": "/private/tmp/portal-wallpaper-exif-20261104-154418/candidate-debug-1.168.apk",
+      "bytes": 46745650,
+      "sha256": "465a3f6189593a064010fca6e73597457306ad39860fcf48ae71add1df043877"
+    },
+    {
+      "path": "/private/tmp/portal-wallpaper-exif-20261104-154418/candidate-performance-1.168.apk",
+      "bytes": 25886927,
+      "sha256": "7b3f9e0008c801461efb0467b57c991223ca7481d708b110e456e294d33cd2ab"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.ScreensaverAppInventoryTest.xml",
+      "bytes": 1123,
+      "sha256": "3bb13f5299fa486c450704028680fb9fd08f060a3c8bbe57049fd06eeb0d99a4"
+    }
+  ]
+}
