@@ -1,0 +1,33 @@
+{
+  "output": "/private/tmp/portal-fixture-packaging-20261104-161341/offline-fixture.apk",
+  "sourceApkSha256": "465a3f6189593a064010fca6e73597457306ad39860fcf48ae71add1df043877",
+  "apkSha256": "77ec44e97912d82f8ed08ce6305ce255e312c4aaec0820474f2f60a40c097e6b",
+  "bytes": 37533747,
+  "checks": [
+    {
+      "name": "javac",
+      "exitCode": 0
+    },
+    {
+      "name": "d8",
+      "exitCode": 0
+    },
+    {
+      "name": "aapt2",
+      "exitCode": 0
+    },
+    {
+      "name": "zipalign",
+      "exitCode": 0
+    }
+  ],
+  "actualSdkElapsedSeconds": 2.6978539590054424,
+  "samePreviouslyAcceptedFixtureDex": true,
+  "dexSha256": "12da485d43c30b36aaa041d098d012329a3669613725d8f5f2fbb692c34cfd86",
+  "allEightGeneratedJpegsExact": true,
+  "sourceApkBytesExact": true,
+  "zeroManifestPermissions": true,
+  "unsignedOnly": true,
+  "stagingRetired": true,
+  "noDeviceSigningInstallationExecution": true
+}

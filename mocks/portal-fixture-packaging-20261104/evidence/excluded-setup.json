@@ -1,0 +1,7 @@
+{
+  "initialNewModuleAbsent": "Tests cannot import new helper before implementation; no behavioral RED claim.",
+  "macPathComparison": "First implementation test run tool7fc570:9pass1fail because /var and /private/var names denote same file. Four assertions changed to resolved-file identity; every other byte retained at that stage. Root then added one separate dangling-link ownership case.",
+  "originalTestsSha256": "bfd19e149c0a4f440fe99b2429bbf7dd7908b1648ba07d1f6e2942a2ba622ffc",
+  "adaptedTestsSha256": "a96d947ac136da36fbeb6b6e27c1eceab41e67fea27a24019ce5a312fc78df6c",
+  "testAssertionsNotWeakened": true
+}

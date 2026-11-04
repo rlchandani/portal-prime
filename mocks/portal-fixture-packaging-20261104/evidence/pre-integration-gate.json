@@ -1,0 +1,132 @@
+{
+  "ok": true,
+  "reviewSha256": "c0db60ce1f1b117a6fda9d8c80cb2dae95cf7443fcd28781632635c1d2ab5eda",
+  "bindingsRehashed": 25,
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/plan.json",
+      "bytes": 666,
+      "sha256": "3781e97a638716b308bf3812cc31d1e9a2026d78e7bfb08c7a878a5039d5ebd3"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/sdk-verification.json",
+      "bytes": 906,
+      "sha256": "691deca66ddbe10a625c70a0d3e87b39d0a24945345a6a41d13cbf218489db2e"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/sdk-build.log",
+      "bytes": 527,
+      "sha256": "723a9444d3d28556783dbf0c4dbcf468fb4d6b45050058c4fdcb2691f9ac4cec"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/tests-terminal.json",
+      "bytes": 69,
+      "sha256": "39afa120df2cd27152b9687d904ed91382ec81a1508d99c0b8b4a159de600da5"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/tests.log",
+      "bytes": 1983,
+      "sha256": "9c782867b81e5644fd6c80a41618f450371ed34c9919301d2a9f10a28a9427c7"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/python-terminal.json",
+      "bytes": 60,
+      "sha256": "90049ff7ec9cd041fff0d80226b47039041478e809908ac0552c39bc39dff1df"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/python-regressions.log",
+      "bytes": 383,
+      "sha256": "667226b7fc66993ff72eda4ec658df654a4d7313da8295479a18ef8530f8050d"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/initial-test.log",
+      "bytes": 1032,
+      "sha256": "e4663c203b59370ba2cd5fa132d869ebde5106804fcbe28d351f9ae3475bd7ce"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/offline-fixture.apk",
+      "bytes": 37533747,
+      "sha256": "77ec44e97912d82f8ed08ce6305ce255e312c4aaec0820474f2f60a40c097e6b"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_native_fixture.py",
+      "bytes": 7048,
+      "sha256": "83ca485d51fc2622ed31942ce68db6b286fae17d66b44d85c80c161eb3d48001"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_native_fixture.py",
+      "bytes": 14946,
+      "sha256": "80860c3f76c9df8fda46ae2976fbcad7db292919852b1574763568196b902531"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-native-fixture-packaging-2026-11-04.md",
+      "bytes": 2287,
+      "sha256": "15c85be4aa9658ce8678e2d0bdc7cb43521fc01c1abd14e80a69db3a28ac0ef3"
+    },
+    {
+      "path": "/private/tmp/portal-wallpaper-exif-20261104-154418/native/WallpaperExifActivity.java",
+      "bytes": 11812,
+      "sha256": "120e309ba3c27479bcdb07994e63f646afa5fe1e0fd8aa85cb9fb36f4eb77873"
+    },
+    {
+      "path": "/private/tmp/portal-wallpaper-exif-20261104-154418/native/AndroidManifest.xml",
+      "bytes": 423,
+      "sha256": "c99f8ab72a599e74cdb427167a8887db76260cdd00e5be209465daf01a6f1e33"
+    },
+    {
+      "path": "/private/tmp/portal-wallpaper-exif-20261104-154418/native/source-admission.json",
+      "bytes": 1628,
+      "sha256": "833d428ab3a215eee88fc24534e966e218ac592c1481dca66a0d78eeed66911e"
+    },
+    {
+      "path": "/private/tmp/portal-wallpaper-exif-20261104-154418/native/fixture-before.apk",
+      "bytes": 37540856,
+      "sha256": "e0af54b388f1085e112190b2969d1a2b9919742d09def3d8bc5d91462b767abc"
+    },
+    {
+      "path": "/private/tmp/portal-wallpaper-exif-20261104-154418/candidate-debug-1.168.apk",
+      "bytes": 46745650,
+      "sha256": "465a3f6189593a064010fca6e73597457306ad39860fcf48ae71add1df043877"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/input-assets/generated/o1.jpg",
+      "bytes": 3412,
+      "sha256": "46ceb7906f293220eb63a0c7dc1d7a5de8d356b72f0204be51a0958d60e8dabc"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/input-assets/generated/o2.jpg",
+      "bytes": 3412,
+      "sha256": "6fd6cf6ccd06c58f09c997f763e4792a7ca587f99e4c2ba3ae9c32f3ceefa673"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/input-assets/generated/o3.jpg",
+      "bytes": 3412,
+      "sha256": "ddcad9ec6a0b4582f8a1cb32cce893c5f804c51d1ef571188ca629b77a4fc5db"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/input-assets/generated/o4.jpg",
+      "bytes": 3412,
+      "sha256": "e802eb4d8ae9a5203872cf34a7e1e76c87100aa6931b78e74b86fc3a4d8fc80c"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/input-assets/generated/o5.jpg",
+      "bytes": 3412,
+      "sha256": "0a59886887570c7241ea75dc395da1b8bce08cc74ec3fe66f28a7fca21e3edf0"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/input-assets/generated/o6.jpg",
+      "bytes": 3412,
+      "sha256": "3a62f361f26fddf29fff15a16bcbac62bdae795d2fccceb25d9129b561cf6b32"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/input-assets/generated/o7.jpg",
+      "bytes": 3412,
+      "sha256": "f12b9e02649bf0c0b61a274de95d63adc76a79d067b30dde705bf1ffd91a2315"
+    },
+    {
+      "path": "/private/tmp/portal-fixture-packaging-20261104-161341/input-assets/generated/o8.jpg",
+      "bytes": 3412,
+      "sha256": "cfd59487f9848bb733c658ef67904a4613eaf4d131c6850f559a39cfbfb4b8f7"
+    }
+  ]
+}

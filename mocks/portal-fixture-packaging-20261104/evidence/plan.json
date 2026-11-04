@@ -1,0 +1,9 @@
+{
+  "originalStart": "2026-11-04T16:13:41Z",
+  "target": "2026-11-04T16:28:41Z",
+  "hardDeadline": "2026-11-04T16:43:41Z",
+  "selectedAt": "2026-11-04T16:21:26.461962+00:00",
+  "scope": "One offline native fixture APK packager: correct javac classpath, immutable inputs, fail-fast stages, atomic unsigned output. No signing, device invocation or app change.",
+  "baselineQualification": "New helper is absent: test import fails before behavioral cases. Actual compiler bootclasspath failure is preserved in preceding wallpaper EXIF excluded setup receipt; no product RED claim.",
+  "testsSha256": "bfd19e149c0a4f440fe99b2429bbf7dd7908b1648ba07d1f6e2942a2ba622ffc"
+}

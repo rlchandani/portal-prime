@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "originalStart": "2026-11-04T16:13:41+00:00",
+  "closedAt": "2026-11-04T16:38:50.108504+00:00",
+  "elapsedMinutes": 25.1518084,
+  "targetMinutes": 15,
+  "targetMet": false,
+  "hardDeadline": "2026-11-04T16:43:41Z",
+  "hardDeadlineMet": true,
+  "clockNotReset": true,
+  "combinedReviewAccepted": true,
+  "reviewBindingsRehashed": 25,
+  "fullPythonCases": 282,
+  "focusedCases": 11,
+  "strictDocsExit": 0,
+  "sourceAndAppVersionsUnchanged": true,
+  "noDeviceOrCredentialsReadOrWrite": true,
+  "noSigningInstallExecutionPublication": true,
+  "prior165BacklogTasksExact": true,
+  "pycacheUntouched": true,
+  "wholeGoalActive": true,
+  "scope": "Offline native packaging helper only; small standalone single-DEX/API29 fixture APK; no whole-release-speed or new native runtime acceptance."
+}

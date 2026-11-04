@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T16:07:10.321210+00:00",
-  "updatedLabel": "Exact1.168 delivered: local photo wallpaper orientation; settings and original clocks retained",
+  "updatedAt": "2026-11-04T16:37:37.134172+00:00",
+  "updatedLabel": "Offline native fixture packaging verified; room delivery1.168 unchanged",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,52 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "offline-native-fixture-packaging",
+      "title": "Automate native test fixture packaging",
+      "summary": "Package small generated native probes through one checked offline command.",
+      "description": "Capture generated inputs, run javac/D8/aapt2/zipalign with one deadline, and publish a complete unsigned fixture without replacing existing outputs.",
+      "status": "verified",
+      "verification": "11 focused cases and all282 Python CI cases pass. Actual local SDK package2.70s; DEX, compiled manifest, eight generated JPEGs and embedded debug1.168 match accepted prior inputs. Independent review25bindings root rehashed.",
+      "kind": "Test and delivery setup automation",
+      "platforms": [
+        "developer-tooling"
+      ],
+      "owner": "Root implementation/integration / toolkit focused cases / independent media review",
+      "deployment": "Local helper available in repository; no app build, signing, device operation or new room delivery.",
+      "state": "Current room delivery remains preceding verified1.168/code162; this task has no credentials or device reads.",
+      "acceptance": [
+        "Nonzero stages, missing products, timeouts and output races fail before publishing.",
+        "Private staging retires and caller inputs are copied before commands.",
+        "Actual SDK output payloads match prior accepted generated fixture."
+      ],
+      "evidence": [
+        {
+          "text": "Usage, checks and limits.",
+          "source": "docs/portal-native-fixture-packaging-2026-11-04.md"
+        },
+        {
+          "text": "Combined independent review.",
+          "source": "mocks/portal-fixture-packaging-20261104/evidence/final-review.json"
+        }
+      ],
+      "limits": [
+        "Small standalone single-DEX API29 wrappers; general app/resources/multidex unsupported.",
+        "No signing/install/native execution or new hardware acceptance;2.70s is one packaging run, not whole-release lead time.",
+        "Concurrent cross-file input copies are not an atomic snapshot.",
+        "Initial absent module and macOS path alias assertion are excluded setup/test issues.",
+        "Original15-minute target elapsed;30-minute hard cutoff retains original start."
+      ],
+      "next": "Select another distinct small visible product fix; use helper for generated native probes and retain parked scope clocks.",
+      "issueClock": {
+        "originalStart": "2026-11-04T16:13:41Z",
+        "target": "2026-11-04T16:28:41Z",
+        "hardDeadline": "2026-11-04T16:43:41Z",
+        "selectedAt": "2026-11-04T16:21:26.461962+00:00",
+        "clockNotReset": true,
+        "scope": "Offline fixture packaging only; no signing, device operations or app/version changes."
+      }
+    },
     {
       "id": "local-wallpaper-exif",
       "title": "Keep local photo wallpapers upright",
