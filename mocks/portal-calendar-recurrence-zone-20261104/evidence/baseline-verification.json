@@ -1,0 +1,107 @@
+{
+  "exitCode": 1,
+  "tests": 15,
+  "assertionFailures": 13,
+  "controlsPassed": 2,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "newYorkDailyUsesItsOwnDstOnTokyoPortal",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "utcExdateRemovesItsExactOccurrenceWithoutExtendingCount",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "dateUntilUsesTheUtcSeriesDateRatherThanTokyoDate",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "floatingUntilForTzidEventUsesThatSourceZone",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "utcWeeklyBydayKeepsUtcHoursAcrossPortalDst",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "localFloatingDailyRetainsPortalWallTimeAcrossDst",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "seekingAnOldUtcSeriesPreservesItsHoursAcrossPortalDst",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "utcDailyKeepsUtcHoursAcrossPortalFallDst",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "fixedKolkataDailyDoesNotFollowPortalDst",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "utcWeeklyBydayUsesSourceMondayRatherThanPortalSunday",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "berlinDailyUsesBerlinSpringDstOnUtcPortal",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "utcDailyKeepsUtcHoursAcrossPortalSpringDst",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "utcUntilIncludesTheExactLastUtcOccurrenceAcrossDst",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "mixedEventsRetainTheirOwnZonesWithinOnePreparedDocument",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "allDayDailyRetainsLocalExclusiveMidnightsAcrossDst",
+      "passed": true,
+      "failureType": null
+    }
+  ],
+  "frozenTestSha256": "dfc4f978202b75959da9bada98def5bba33286b468c6cb6060bd717a78ff10c4",
+  "expectedControls": [
+    "localFloatingDailyRetainsPortalWallTimeAcrossDst",
+    "allDayDailyRetainsLocalExclusiveMidnightsAcrossDst"
+  ],
+  "expectedFailures": [
+    "utcDailyKeepsUtcHoursAcrossPortalSpringDst",
+    "utcDailyKeepsUtcHoursAcrossPortalFallDst",
+    "berlinDailyUsesBerlinSpringDstOnUtcPortal",
+    "newYorkDailyUsesItsOwnDstOnTokyoPortal",
+    "fixedKolkataDailyDoesNotFollowPortalDst",
+    "utcWeeklyBydayKeepsUtcHoursAcrossPortalDst",
+    "utcWeeklyBydayUsesSourceMondayRatherThanPortalSunday",
+    "utcExdateRemovesItsExactOccurrenceWithoutExtendingCount",
+    "utcUntilIncludesTheExactLastUtcOccurrenceAcrossDst",
+    "floatingUntilForTzidEventUsesThatSourceZone",
+    "dateUntilUsesTheUtcSeriesDateRatherThanTokyoDate",
+    "seekingAnOldUtcSeriesPreservesItsHoursAcrossPortalDst",
+    "mixedEventsRetainTheirOwnZonesWithinOnePreparedDocument"
+  ],
+  "baselineSourceSha256": "018526a9f5b57fc1f63afcd3ff3932ca8903731935ab3f17a9c6c3bac631d834",
+  "baselineLogSha256": "14064c21b3d48958b3e3c39290c28c5c6dce4e035b326ba72d1ce815c75399a5"
+}

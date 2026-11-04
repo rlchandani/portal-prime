@@ -1,0 +1,216 @@
+{
+  "ok": true,
+  "reviewedAtUtc": "2026-11-04T11:46:45.181664+00:00",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+    "firstSourceWitnessAt": "2026-11-04T11:26:04Z",
+    "target": "2026-11-04T11:39:52Z",
+    "hardDeadline": "2026-11-04T11:54:52Z",
+    "notReset": true
+  },
+  "blockers": [],
+  "independence": "Reviewed the separately authored native fixture and retained root executions/artifacts. Own authored JVM suite was not rerun or represented as independent review. No SDK/build/test/Git/network/device/owner-data commands. Only this private report was written.",
+  "sourceReview": {
+    "isolatedFeedAndEventClassLoaderIdentity": true,
+    "uniqueNonstaticExactParseSignature": "String,long,int",
+    "actualMethod": "parse$app",
+    "literalUtcDatesIndependentlyChecked": 36,
+    "literalMethod": "Independent manual occurrence date lists converted with standard-library datetime/zoneinfo; no production recurrence helper used.",
+    "defaultsRestoredPerCaseAndGlobally": true,
+    "watchdogMillis": 30000,
+    "declaredPermissions": [],
+    "compiledPermissionEvidence": "Frozen preparation permissions dump + identical wrapper manifest + both runtime internetPermission=false, reviewed without an SDK rerun.",
+    "containmentQualification": "contextArguments/fetchReadProviderPreferenceCalls/contextsServicesProvidersPassed zero fields describe fixture SOURCE containment. They are constants, not instrumented loader or provider counters. Fixture invokes loaded code only with generated String, long and int; reader constructors do not call load/fetch."
+  },
+  "pairedResults": {
+    "before": {
+      "tests": 6,
+      "failures": 4,
+      "failedNames": [
+        "utcDailyAcrossNewYorkSpringDst",
+        "berlinDailyAcrossBerlinSpringDstDefaultUtc",
+        "utcMondayLateWeeklyDefaultTokyo",
+        "indiaDailyFixedZoneAcrossNewYorkDst"
+      ],
+      "passingNames": [
+        "floatingNewYorkDailyDstControl",
+        "allDayNewYorkCalendarDurationDstControl"
+      ],
+      "actualParserMethod": "parse$app",
+      "sdk": 29,
+      "allDefaultsRestored": true
+    },
+    "after": {
+      "tests": 6,
+      "failures": 0,
+      "failedNames": [],
+      "passingNames": [
+        "utcDailyAcrossNewYorkSpringDst",
+        "berlinDailyAcrossBerlinSpringDstDefaultUtc",
+        "utcMondayLateWeeklyDefaultTokyo",
+        "floatingNewYorkDailyDstControl",
+        "allDayNewYorkCalendarDurationDstControl",
+        "indiaDailyFixedZoneAcrossNewYorkDst"
+      ],
+      "actualParserMethod": "parse$app",
+      "sdk": 29,
+      "allDefaultsRestored": true
+    }
+  },
+  "controlActualArraysByteForByteJsonEqual": true,
+  "sameLiteralInputsAndGates": true,
+  "retirement": {
+    "before": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    },
+    "after": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    }
+  },
+  "wrapperZip": {
+    "entrySetsIdentical": true,
+    "changedEntries": [
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/MANIFEST.MF",
+      "assets/source.apk"
+    ],
+    "frozenDexIdentical": true,
+    "sourceApkEachExact": true,
+    "javaManifestBuildRepackFreezeRunSourcesMatchFrozenPreparation": true,
+    "driverHashUnchangedSincePreRunAdmission": true
+  },
+  "setupCorrection": "The initially read root driver was an unexecuted idle-sleep template. Root corrected it before either claim/execution; final driver was reviewed before baseline and remains byte-identical. Native Java/DEX/literals/acceptance gates were unchanged.",
+  "artifacts": {
+    "versionName": "1.153",
+    "versionCode": 147,
+    "debug": {
+      "sha256": "ad661c0643368342e1ea6c28a05d4003ac4566442bd7fe79d9aaf47046594938",
+      "bytes": 46745298,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "sha256": "a4f0ee785625d6b5aaa508544382980659db3698a891290336f4397edb6a5808",
+      "bytes": 25886647,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "sameSigner": "Matches retained root manifest/apksigner gate; no independent SDK/signature-verifier invocation.",
+    "allTenScreensaverAssetsExactToCurrentSourceAndPriorApk": true,
+    "retainedRootBuildExit": 0,
+    "retainedRootJvmAggregate": {
+      "tests": 4491,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 468
+    }
+  },
+  "limits": [
+    "Native result covers only six selected generated recurrence cases using actual debug parser on API29.",
+    "No mounted calendar UI, feed freshness/fetch/cache policy, owner calendar/provider/account/preferences, real device timezone setting, API28, or optimized-runtime acceptance.",
+    "Native controls preserve floating wall time and all-day calendar duration; EXDATE/UNTIL/old-series/mixed-zone coverage belongs to the separate root-run JVM gate.",
+    "Room promotion remains coordinator-owned and is not claimed by this review."
+  ],
+  "bindings": {
+    "native/CalendarZoneActivity.java": {
+      "sha256": "314d7ceb301438bdfe6ee2a07afead7c397743c4073b5b2c650c627d840c8c9f",
+      "bytes": 10384
+    },
+    "native/AndroidManifest.xml": {
+      "sha256": "87b8392113003649e40e7a58a4ddbd82a9c216de4e8b1ce6205f42afb2d11cc3",
+      "bytes": 431
+    },
+    "native/build.sh": {
+      "sha256": "2f1510c51d71b15c388e41110cc2fd400c83188564f2bb9a709acae9cf749b27",
+      "bytes": 830
+    },
+    "native/repack.sh": {
+      "sha256": "8f4db7ddd721f17f00057f715a597bb917806d890f109d10f073fcef149b6b28",
+      "bytes": 783
+    },
+    "native/freeze.py": {
+      "sha256": "3366f7b2e7fb25f2e33740d4346079cbc11eb2956dc872e9b25f0cd3d08c184e",
+      "bytes": 1782
+    },
+    "native/RUN.md": {
+      "sha256": "7e9b8e60527b97aecc26750011b0d14c7ae7d93fe72c500523ca8328bea45123",
+      "bytes": 1655
+    },
+    "native/source-admission.json": {
+      "sha256": "a3b9077555495b8024cd7a2a2e42448d2ffc96aaf2be37b4a7af2eab1fb1cb62",
+      "bytes": 2820
+    },
+    "native/preparation-verification.json": {
+      "sha256": "a0fba1aecb4d87a033731c2411bab029982c799d9ea515bd70541fe424dc4fbb",
+      "bytes": 3995
+    },
+    "native/frozen-dex/classes.dex": {
+      "sha256": "4f26b2615d97e75264b3fd69567a94539ffa46dc2efc33cc0944c08f48b84733",
+      "bytes": 15032
+    },
+    "native-run.py": {
+      "sha256": "1a7a014f4dbd5db10bdda21abf5d7a17cd5cc9c9c04cd0ab634ab38058a7e990",
+      "bytes": 5233
+    },
+    "native/baseline-fixture.apk": {
+      "sha256": "99978cb8c8b88bd1f3ac2b69cff132099b6e3272e689bca583de351b3fa5bf60",
+      "bytes": 37503466
+    },
+    "native/calendar-zone-fixture.apk": {
+      "sha256": "7a896e2d729be78b30451068eddb834b1429f9e3f307666d8b885fb7b0fc1d92",
+      "bytes": 37503466
+    },
+    "baseline-debug-1.152.apk": {
+      "sha256": "a2b5ffefebe6a20c6d24c9b7415dc25a8316b536ecefc61da7909603a645d2c0",
+      "bytes": 46745294
+    },
+    "candidate-debug-1.153.apk": {
+      "sha256": "ad661c0643368342e1ea6c28a05d4003ac4566442bd7fe79d9aaf47046594938",
+      "bytes": 46745298
+    },
+    "candidate-performance-1.153.apk": {
+      "sha256": "a4f0ee785625d6b5aaa508544382980659db3698a891290336f4397edb6a5808",
+      "bytes": 25886647
+    },
+    "native-before-report.json": {
+      "sha256": "ce3d16d0558ec0386ca8e2ff8e4396af0a36e9a4295b885203725698c5108f30",
+      "bytes": 9932
+    },
+    "native-after-report.json": {
+      "sha256": "bec9c7bc3d7299ba2c6d9002418300e5f1fa3596ce1fbb7b0a361cb716427020",
+      "bytes": 9103
+    },
+    "native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "promotion-artifacts.json": {
+      "sha256": "ec2a68af8b7c95d524babc3ce319c8dc14d00a0e90b5bcbb226e6e8fdf11b2a7",
+      "bytes": 4811
+    },
+    "build-terminal.json": {
+      "sha256": "12346eaeebf25b508141e6fce6c41ca5e60eb7dd290a3f97c29d921373fa41c9",
+      "bytes": 335
+    },
+    "CalendarFeed.kt": {
+      "sha256": "018526a9f5b57fc1f63afcd3ff3932ca8903731935ab3f17a9c6c3bac631d834",
+      "bytes": 25083
+    },
+    "current CalendarFeed.kt": {
+      "sha256": "9fed044ca49a8dbf9ab9ac4ac748dd04fcca9d5267e8558e8f1ad508157a0106",
+      "bytes": 25435
+    },
+    "current CalendarPreparedFeed.kt": {
+      "sha256": "83b383cf24d9006e128f9bc8959623b9b7b25d1ea64173ed3422f49e38e904be",
+      "bytes": 1498
+    }
+  }
+}

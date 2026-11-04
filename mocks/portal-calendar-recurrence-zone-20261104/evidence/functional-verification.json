@@ -1,0 +1,46 @@
+{
+  "jvm": {
+    "tests": 4491,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 468
+  },
+  "focusedTests": 15,
+  "focusedPassed": 15,
+  "native": {
+    "beforeTests": 6,
+    "beforeFailures": 4,
+    "beforeControls": 2,
+    "afterTests": 6,
+    "afterPassed": 6,
+    "afterFailures": 0,
+    "sameJavaDexDriverGatesAndLiteralCases": true,
+    "wrapperChangedFiles": [
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/MANIFEST.MF",
+      "assets/source.apk"
+    ],
+    "actualEmbeddedParserOrigin": true,
+    "allTimezoneAndLocaleDefaultsRestored": true,
+    "bothRunsRetired": true,
+    "externalCalls": "Fixture source invokes only parser with generated String/long/int; zero external fields are source containment, not loader instrumentation."
+  },
+  "artifacts": {
+    "debug": {
+      "sha256": "ad661c0643368342e1ea6c28a05d4003ac4566442bd7fe79d9aaf47046594938",
+      "bytes": 46745298,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='147' versionName='1.153' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "sha256": "a4f0ee785625d6b5aaa508544382980659db3698a891290336f4397edb6a5808",
+      "bytes": 25886647,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='147' versionName='1.153' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "gradleExit": 0,
+  "scope": "Generated actual parse and direct actual-debug/API29 parser; calendar UI, live feeds/providers/cache-network, optimized/API28 and device timezone-setting acceptance remain separate."
+}

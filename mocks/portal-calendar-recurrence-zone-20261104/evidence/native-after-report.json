@@ -1,0 +1,284 @@
+{
+  "ok": true,
+  "error": null,
+  "tests": 6,
+  "failures": 0,
+  "cases": [
+    {
+      "name": "utcDailyAcrossNewYorkSpringDst",
+      "passed": true,
+      "errors": [],
+      "defaultZone": "America/New_York",
+      "nowMillis": 1772755200000,
+      "horizonDays": 6,
+      "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:utcDailyAcrossNewYorkSpringDst@generated.invalid\r\nSUMMARY:UTC daily\r\nDTSTART:20260307T150000Z\r\nDTEND:20260307T160000Z\r\nRRULE:FREQ=DAILY;COUNT=3\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+      "expectedStarts": [
+        1772895600000,
+        1772982000000,
+        1773068400000
+      ],
+      "expectedEnds": [
+        1772899200000,
+        1772985600000,
+        1773072000000
+      ],
+      "expectedTitle": "UTC daily",
+      "expectedAllDay": false,
+      "actual": [
+        {
+          "startMillis": 1772895600000,
+          "endMillis": 1772899200000,
+          "title": "UTC daily",
+          "allDay": false
+        },
+        {
+          "startMillis": 1772982000000,
+          "endMillis": 1772985600000,
+          "title": "UTC daily",
+          "allDay": false
+        },
+        {
+          "startMillis": 1773068400000,
+          "endMillis": 1773072000000,
+          "title": "UTC daily",
+          "allDay": false
+        }
+      ],
+      "defaultsRestored": true,
+      "contextArguments": 0,
+      "fetchReadProviderPreferenceCalls": 0
+    },
+    {
+      "name": "berlinDailyAcrossBerlinSpringDstDefaultUtc",
+      "passed": true,
+      "errors": [],
+      "defaultZone": "UTC",
+      "nowMillis": 1774569600000,
+      "horizonDays": 6,
+      "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:berlinDailyAcrossBerlinSpringDstDefaultUtc@generated.invalid\r\nSUMMARY:Berlin daily\r\nDTSTART;TZID=Europe/Berlin:20260328T100000\r\nDTEND;TZID=Europe/Berlin:20260328T110000\r\nRRULE:FREQ=DAILY;COUNT=3\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+      "expectedStarts": [
+        1774688400000,
+        1774771200000,
+        1774857600000
+      ],
+      "expectedEnds": [
+        1774692000000,
+        1774774800000,
+        1774861200000
+      ],
+      "expectedTitle": "Berlin daily",
+      "expectedAllDay": false,
+      "actual": [
+        {
+          "startMillis": 1774688400000,
+          "endMillis": 1774692000000,
+          "title": "Berlin daily",
+          "allDay": false
+        },
+        {
+          "startMillis": 1774771200000,
+          "endMillis": 1774774800000,
+          "title": "Berlin daily",
+          "allDay": false
+        },
+        {
+          "startMillis": 1774857600000,
+          "endMillis": 1774861200000,
+          "title": "Berlin daily",
+          "allDay": false
+        }
+      ],
+      "defaultsRestored": true,
+      "contextArguments": 0,
+      "fetchReadProviderPreferenceCalls": 0
+    },
+    {
+      "name": "utcMondayLateWeeklyDefaultTokyo",
+      "passed": true,
+      "errors": [],
+      "defaultZone": "Asia/Tokyo",
+      "nowMillis": 1772323200000,
+      "horizonDays": 25,
+      "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:utcMondayLateWeeklyDefaultTokyo@generated.invalid\r\nSUMMARY:UTC weekly\r\nDTSTART:20260302T233000Z\r\nDTEND:20260303T003000Z\r\nRRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=3\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+      "expectedStarts": [
+        1772494200000,
+        1773099000000,
+        1773703800000
+      ],
+      "expectedEnds": [
+        1772497800000,
+        1773102600000,
+        1773707400000
+      ],
+      "expectedTitle": "UTC weekly",
+      "expectedAllDay": false,
+      "actual": [
+        {
+          "startMillis": 1772494200000,
+          "endMillis": 1772497800000,
+          "title": "UTC weekly",
+          "allDay": false
+        },
+        {
+          "startMillis": 1773099000000,
+          "endMillis": 1773102600000,
+          "title": "UTC weekly",
+          "allDay": false
+        },
+        {
+          "startMillis": 1773703800000,
+          "endMillis": 1773707400000,
+          "title": "UTC weekly",
+          "allDay": false
+        }
+      ],
+      "defaultsRestored": true,
+      "contextArguments": 0,
+      "fetchReadProviderPreferenceCalls": 0
+    },
+    {
+      "name": "floatingNewYorkDailyDstControl",
+      "passed": true,
+      "errors": [],
+      "defaultZone": "America/New_York",
+      "nowMillis": 1772755200000,
+      "horizonDays": 6,
+      "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:floatingNewYorkDailyDstControl@generated.invalid\r\nSUMMARY:Floating daily\r\nDTSTART:20260307T100000\r\nDTEND:20260307T110000\r\nRRULE:FREQ=DAILY;COUNT=3\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+      "expectedStarts": [
+        1772895600000,
+        1772978400000,
+        1773064800000
+      ],
+      "expectedEnds": [
+        1772899200000,
+        1772982000000,
+        1773068400000
+      ],
+      "expectedTitle": "Floating daily",
+      "expectedAllDay": false,
+      "actual": [
+        {
+          "startMillis": 1772895600000,
+          "endMillis": 1772899200000,
+          "title": "Floating daily",
+          "allDay": false
+        },
+        {
+          "startMillis": 1772978400000,
+          "endMillis": 1772982000000,
+          "title": "Floating daily",
+          "allDay": false
+        },
+        {
+          "startMillis": 1773064800000,
+          "endMillis": 1773068400000,
+          "title": "Floating daily",
+          "allDay": false
+        }
+      ],
+      "defaultsRestored": true,
+      "contextArguments": 0,
+      "fetchReadProviderPreferenceCalls": 0
+    },
+    {
+      "name": "allDayNewYorkCalendarDurationDstControl",
+      "passed": true,
+      "errors": [],
+      "defaultZone": "America/New_York",
+      "nowMillis": 1772755200000,
+      "horizonDays": 6,
+      "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:allDayNewYorkCalendarDurationDstControl@generated.invalid\r\nSUMMARY:All-day daily\r\nDTSTART;VALUE=DATE:20260307\r\nDTEND;VALUE=DATE:20260308\r\nRRULE:FREQ=DAILY;COUNT=3\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+      "expectedStarts": [
+        1772859600000,
+        1772946000000,
+        1773028800000
+      ],
+      "expectedEnds": [
+        1772946000000,
+        1773028800000,
+        1773115200000
+      ],
+      "expectedTitle": "All-day daily",
+      "expectedAllDay": true,
+      "actual": [
+        {
+          "startMillis": 1772859600000,
+          "endMillis": 1772946000000,
+          "title": "All-day daily",
+          "allDay": true
+        },
+        {
+          "startMillis": 1772946000000,
+          "endMillis": 1773028800000,
+          "title": "All-day daily",
+          "allDay": true
+        },
+        {
+          "startMillis": 1773028800000,
+          "endMillis": 1773115200000,
+          "title": "All-day daily",
+          "allDay": true
+        }
+      ],
+      "defaultsRestored": true,
+      "contextArguments": 0,
+      "fetchReadProviderPreferenceCalls": 0
+    },
+    {
+      "name": "indiaDailyFixedZoneAcrossNewYorkDst",
+      "passed": true,
+      "errors": [],
+      "defaultZone": "America/New_York",
+      "nowMillis": 1772755200000,
+      "horizonDays": 6,
+      "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:indiaDailyFixedZoneAcrossNewYorkDst@generated.invalid\r\nSUMMARY:India daily\r\nDTSTART;TZID=Asia/Kolkata:20260307T100000\r\nDTEND;TZID=Asia/Kolkata:20260307T110000\r\nRRULE:FREQ=DAILY;COUNT=3\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+      "expectedStarts": [
+        1772857800000,
+        1772944200000,
+        1773030600000
+      ],
+      "expectedEnds": [
+        1772861400000,
+        1772947800000,
+        1773034200000
+      ],
+      "expectedTitle": "India daily",
+      "expectedAllDay": false,
+      "actual": [
+        {
+          "startMillis": 1772857800000,
+          "endMillis": 1772861400000,
+          "title": "India daily",
+          "allDay": false
+        },
+        {
+          "startMillis": 1772944200000,
+          "endMillis": 1772947800000,
+          "title": "India daily",
+          "allDay": false
+        },
+        {
+          "startMillis": 1773030600000,
+          "endMillis": 1773034200000,
+          "title": "India daily",
+          "allDay": false
+        }
+      ],
+      "defaultsRestored": true,
+      "contextArguments": 0,
+      "fetchReadProviderPreferenceCalls": 0
+    }
+  ],
+  "sourceSha256": "ad661c0643368342e1ea6c28a05d4003ac4566442bd7fe79d9aaf47046594938",
+  "sourceBytes": 46745298,
+  "fixturePackage": "com.immortal.calendarzonefixture",
+  "sdk": 29,
+  "internetPermission": false,
+  "actualEmbeddedClassOrigin": true,
+  "actualParserMethod": "parse$app",
+  "parserSignature": "String,long,int",
+  "allDefaultsRestored": true,
+  "contextsServicesProvidersPassed": 0,
+  "containment": "Only generated ICS String, literal long and int arguments passed to actual parser. No Context, fetch/read, URL, provider, preference, HTTP or account calls are made by the fixture.",
+  "scope": "Direct actual debug parser with generated recurrence data and restored process-local TimeZone/Locale defaults; no calendar UI, cache/network refresh, owner calendars, optimized APK, API28 or real timezone setting acceptance."
+}

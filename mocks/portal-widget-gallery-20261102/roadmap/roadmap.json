@@ -1,18 +1,64 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T11:38:54.540281+00:00",
-  "updatedLabel": "Idle Off callback guard delivered to both rooms; prior clocks retained",
+  "updatedAt": "2026-11-04T11:48:44.825776+00:00",
+  "updatedLabel": "Recurring source timezone delivered to both rooms; prior clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.152/code 146. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.153/code 147. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "calendar-recurrence-source-zone",
+      "title": "Recurring calendar: retain the source timezone",
+      "summary": "Keep UTC/TZID recurrence times and weekdays correct when the Portal uses another timezone.",
+      "status": "delivered",
+      "verification": "4,491 JVM \u00b715 literal parser regressions \u00b76 native parser cases \u00b7exact both-room installs",
+      "kind": "Calendar reliability",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent source and native-artifact review",
+      "deployment": "Exact optimized1.153/code147 fully hashed in both rooms; one install each; Living uncertain ACK reconciled read-only.",
+      "acceptance": [
+        "Accepted DTSTART timezone retained per event; main/weekly calendars and non-UTC/date UNTIL use it.",
+        "UTC spring/fall, named DST/fixed zones, weekly day boundaries, COUNT/EXDATE/UNTIL, seeking and mixed-zone generated ICS pass literal start/end gates.",
+        "Same frozen15JVM:13 AssertionErrors/2controls\u219215pass; native actual-debug/API29 sixcases:4fail/2controls\u21926pass with all process defaults restored."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery and limits",
+          "source": "docs/portal-calendar-recurrence-zone-2026-11-04.md"
+        },
+        {
+          "text": "Frozen parser and room evidence",
+          "source": "mocks/portal-calendar-recurrence-zone-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated actual parser and direct actual debug/API29 parser only; zero external fields are fixture source containment, not loader counters.",
+        "Mounted calendar UI, live feeds/provider/cache-network, optimized/API28, Living functional acceptance and device timezone-setting changes remain separate.",
+        "Existing unknown-ID/invalid/gap/ambiguous-time/VTIMEZONE and legacy monthly clamping behavior remains.",
+        "No phone/household calendar/media/provider/account, push or publication; public1.83/code77 retained."
+      ],
+      "next": "Continue distinct bounded discovery; keep original scopes and clocks.",
+      "issueClock": {
+        "issue": "Preserve DTSTART timezone during recurring event expansion",
+        "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+        "firstSourceWitnessAt": "2026-11-04T11:26:04Z",
+        "selectedAt": "2026-11-04T11:39:59.651142+00:00",
+        "target": "2026-11-04T11:39:52Z",
+        "hardDeadline": "2026-11-04T11:54:52Z",
+        "baseCommit": "7d7492172008ff2920bbbf65e2f8afd8f69db621",
+        "scope": "Carry parsed DTSTART timezone into recurring calendars and non-UTC UNTIL; keep per-event UTC/TZID/floating distinction, all-day device-local behavior, duration, COUNT/EXDATE/horizon/seek/caps and supported frequencies. No setting, provider/network/cache policy or UI change; VTIMEZONE parsing, invalid-time/unknown-ID policy and monthly clamping unchanged.",
+        "authorization": "Autonomous local verification and room delivery; root owns devices. No phone, household provider/media/account, GitHub push/publication."
+      }
+    },
     {
       "id": "idle-sleep-current-disabled",
       "title": "Idle screen-off: respect Off at alarm delivery",

@@ -1,0 +1,11 @@
+{
+  "issue": "Preserve DTSTART timezone during recurring event expansion",
+  "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+  "firstSourceWitnessAt": "2026-11-04T11:26:04Z",
+  "selectedAt": "2026-11-04T11:39:59.651142+00:00",
+  "target": "2026-11-04T11:39:52Z",
+  "hardDeadline": "2026-11-04T11:54:52Z",
+  "baseCommit": "7d7492172008ff2920bbbf65e2f8afd8f69db621",
+  "scope": "Carry parsed DTSTART timezone into recurring calendars and non-UTC UNTIL; keep per-event UTC/TZID/floating distinction, all-day device-local behavior, duration, COUNT/EXDATE/horizon/seek/caps and supported frequencies. No setting, provider/network/cache policy or UI change; VTIMEZONE parsing, invalid-time/unknown-ID policy and monthly clamping unchanged.",
+  "authorization": "Autonomous local verification and room delivery; root owns devices. No phone, household provider/media/account, GitHub push/publication."
+}

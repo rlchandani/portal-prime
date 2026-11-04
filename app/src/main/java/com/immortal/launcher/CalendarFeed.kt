@@ -155,6 +155,7 @@ object CalendarFeed {
 
   private data class PreparedEvent(
       val start: Long,
+      val zone: TimeZone,
       val duration: Long,
       val allDayDays: Int?,
       val title: String,
@@ -186,6 +187,7 @@ object CalendarFeed {
 
   private fun prepareEvent(body: List<String>, zone: TimeZone, locale: Locale): PreparedEvent? {
     var start: Long? = null
+    var startZone = zone
     var startAllDay = false
     var end: Long? = null
     var endAllDay = false
@@ -197,7 +199,9 @@ object CalendarFeed {
       val p = parseLine(raw) ?: continue
       when (p.name.uppercase(Locale.US)) {
         "STATUS" -> if (p.value.equals("CANCELLED", ignoreCase = true)) return null
-        "DTSTART" -> parseDt(p, zone, locale)?.let { (m, allDay) -> start = m; startAllDay = allDay }
+        "DTSTART" -> parseDt(p, zone, locale)?.let { (m, allDay, parsedZone) ->
+          start = m; startAllDay = allDay; startZone = parsedZone
+        }
         "DTEND" -> parseDt(p, zone, locale)?.let { (m, allDay) -> end = m; endAllDay = allDay }
         "SUMMARY" -> title = unescapeText(p.value)
         "LOCATION" -> location = unescapeText(p.value).ifBlank { null }
@@ -218,7 +222,7 @@ object CalendarFeed {
           ((e + zone.getOffset(e).toLong() - s - zone.getOffset(s).toLong()) /
               (24L * 60 * 60 * 1000)).toInt()
     } else null
-    return PreparedEvent(s, duration, allDayDays, title, startAllDay, location, rrule, exdates.toList())
+    return PreparedEvent(s, startZone, duration, allDayDays, title, startAllDay, location, rrule, exdates.toList())
   }
 
   private fun evaluateDocument(document: PreparedDocument, nowMillis: Long, horizonDays: Int): List<Event> {
@@ -229,7 +233,7 @@ object CalendarFeed {
           ?: event.duration.coerceAtLeast(0L)
       val earliestStart = runCatching { Math.subtractExact(nowMillis, span) }.getOrDefault(Long.MIN_VALUE)
       val starts = if (event.rrule.isNullOrBlank()) listOf(event.start)
-          else expandRecurrence(event.start, event.rrule, event.exdates, horizonEnd, earliestStart)
+          else expandRecurrence(event.start, event.rrule, event.exdates, horizonEnd, earliestStart, event.zone)
       for (start in starts) {
         val end = if (event.allDayDays != null) {
           Calendar.getInstance(document.zone, document.locale).apply {
@@ -285,7 +289,7 @@ object CalendarFeed {
 
   /**
    * Parse a date/date-time property to absolute millis. Returns the instant and
-   * whether it's an all-day (date-only) value. Handles:
+   * whether it's an all-day (date-only) value and its recurrence timezone. Handles:
    *  - `VALUE=DATE` or bare `yyyyMMdd` → local midnight, all-day
    *  - `yyyyMMdd'T'HHmmss'Z'` → UTC
    *  - `;TZID=Zone:yyyyMMdd'T'HHmmss` → that zone
@@ -293,7 +297,9 @@ object CalendarFeed {
    *
    * EXDATE lists are split by the caller so every value retains the property's parameters.
    */
-  private fun parseDt(p: Prop, defaultZone: TimeZone, locale: Locale): Pair<Long, Boolean>? {
+  private data class ParsedDateTime(val millis: Long, val allDay: Boolean, val zone: TimeZone)
+
+  private fun parseDt(p: Prop, defaultZone: TimeZone, locale: Locale): ParsedDateTime? {
     val v = p.value.substringBefore(',').trim()
     if (v.isEmpty()) return null
     val dateOnly = p.params["VALUE"].equals("DATE", true) || (v.length == 8 && !v.contains('T'))
@@ -308,7 +314,7 @@ object CalendarFeed {
                 0,
                 0,
                 0)
-            cal.timeInMillis to true
+            ParsedDateTime(cal.timeInMillis, true, defaultZone)
           } else {
             val utc = v.endsWith("Z")
             val basic = v.removeSuffix("Z")
@@ -320,7 +326,7 @@ object CalendarFeed {
                 }
             val fmt = SimpleDateFormat("yyyyMMdd'T'HHmmss", Locale.US)
             fmt.timeZone = zone
-            (fmt.parse(basic)?.time ?: return null) to false
+            ParsedDateTime(fmt.parse(basic)?.time ?: return null, false, zone)
           }
         }
         .getOrNull()
@@ -359,6 +365,7 @@ object CalendarFeed {
       exdates: List<Long>,
       horizonEnd: Long,
       notBefore: Long? = null,
+      zone: TimeZone = TimeZone.getDefault(),
   ): List<Long> =
       runCatching {
             val rules =
@@ -373,7 +380,7 @@ object CalendarFeed {
             val freq = rules["FREQ"]?.uppercase(Locale.US) ?: return@runCatching listOf(start)
             val interval = rules["INTERVAL"]?.toIntOrNull()?.coerceAtLeast(1) ?: 1
             val count = rules["COUNT"]?.toIntOrNull()
-            val until = rules["UNTIL"]?.let { parseUntil(it) }
+            val until = rules["UNTIL"]?.let { parseUntil(it, zone) }
             val byDay =
                 rules["BYDAY"]?.split(',')?.mapNotNull { weekdayOf(it.trim()) }?.takeIf {
                   it.isNotEmpty()
@@ -382,7 +389,7 @@ object CalendarFeed {
             val cap = 366
             val out = ArrayList<Long>()
             val exSet = exdates.toHashSet()
-            val cal = Calendar.getInstance()
+            val cal = Calendar.getInstance(zone)
             cal.timeInMillis = start
             // RFC 5545: COUNT counts generated occurrences; EXDATE then removes some
             // from that set. So we track generation separately from what we keep.
@@ -404,7 +411,7 @@ object CalendarFeed {
               val min = cal.get(Calendar.MINUTE)
               val sec = cal.get(Calendar.SECOND)
               // Move to the Sunday that starts this event's week.
-              val weekStart = Calendar.getInstance()
+              val weekStart = Calendar.getInstance(zone)
               weekStart.timeInMillis = start
               weekStart.set(Calendar.HOUR_OF_DAY, hour)
               weekStart.set(Calendar.MINUTE, min)
@@ -544,17 +551,17 @@ object CalendarFeed {
   }
 
   /** RRULE UNTIL is a date or UTC date-time; resolve to millis. */
-  private fun parseUntil(v: String): Long? =
+  private fun parseUntil(v: String, zone: TimeZone): Long? =
       runCatching {
             val s = v.trim()
             if (s.length == 8 && !s.contains('T')) {
-              val cal = Calendar.getInstance()
+              val cal = Calendar.getInstance(zone)
               cal.clear()
               cal.set(s.substring(0, 4).toInt(), s.substring(4, 6).toInt() - 1, s.substring(6, 8).toInt(), 23, 59, 59)
               cal.timeInMillis
             } else {
               val fmt = SimpleDateFormat("yyyyMMdd'T'HHmmss", Locale.US)
-              fmt.timeZone = TimeZone.getTimeZone(if (s.endsWith("Z")) "UTC" else TimeZone.getDefault().id)
+              fmt.timeZone = if (s.endsWith("Z")) TimeZone.getTimeZone("UTC") else zone
               fmt.parse(s.removeSuffix("Z"))?.time
             }
           }

@@ -1,0 +1,12 @@
+[
+  {
+    "operation": "Independent-review binding read",
+    "reason": "A descriptive current CalendarFeed.kt binding key was initially treated as a scratch-relative filename.",
+    "correction": "Mapped the two explicit current-source keys to their actual worktree paths, then verified every same binding/hash. No fixture, assertion, product or execution changed."
+  },
+  {
+    "operation": "Native driver preparation",
+    "reason": "Owned unexecuted template initially retained idle receiver package/gates.",
+    "correction": "Adapted to calendar package/parser six-case gates before either claim; independent reviewer verified final driver before baseline and after. No failed native execution."
+  }
+]
