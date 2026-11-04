@@ -1,0 +1,15 @@
+{
+  "all158PriorTaskObjectsUnchanged": true,
+  "priorTaskRawSuffixExact": true,
+  "defaultAndOtherTopLevelFieldsExact": true,
+  "onlyCurrentRoomBoundaryUpdated": true,
+  "counts": {
+    "delivered": 106,
+    "queued": 2,
+    "verified": 43,
+    "parked": 7,
+    "approval": 2
+  },
+  "allOldIssueClocksRetained": true,
+  "unselectedHomeClockNotReset": true
+}

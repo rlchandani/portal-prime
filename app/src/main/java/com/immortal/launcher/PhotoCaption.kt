@@ -59,7 +59,8 @@ object PhotoCaption {
 
   // EXIF stores capture time as "yyyy:MM:dd HH:mm:ss". SimpleDateFormat isn't thread-safe,
   // so callers synchronize on it and refresh the current zone before parsing a new photo.
-  private val EXIF_DATE = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.US)
+  private val EXIF_DATE =
+      SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.US).apply { isLenient = false }
 
   /** Friendly capture date, e.g. "June 22, 2026" in the device locale. Null when absent. */
   fun formatDate(millis: Long?): String? =

@@ -1,0 +1,393 @@
+{
+  "ok": true,
+  "blockers": [],
+  "reviewer": "/root/media_source_review",
+  "scope": "One independent source, retained JVM/native and artifact review. Source/evidence host reads only; no SDK/test/build/device/Git/network execution.",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T14:19:02Z",
+    "target": "2026-11-04T14:34:02Z",
+    "hardDeadline": "2026-11-04T14:49:02Z",
+    "clockNotReset": true
+  },
+  "source": {
+    "beforeSha256": "cd9428ff9be0d067db4a263b72fe5e4215a95fea38f2914765f600f2a37f81b9",
+    "afterSha256": "a945b302e4339e1cb1cc572bd0b533ff178ed9b280ad1a4af95ace9f54875540",
+    "exactDelta": "Existing shared EXIF_DATE initializer adds .apply { isLenient = false }; otherwise captured PhotoCaption source is byte-exact. app build metadata changes156/1.162→157/1.163 only.",
+    "activeCaller": "PhotoFrameController.kt1566 local ExifInterface(path) and1577 SMB opened stream invoke PhotoCaption.read; publishCaption1583..1593 consumes Meta/formatDate/memoryYears. This review inspected source bindings, not household source/controller execution.",
+    "behavior": "Impossible numeric calendar date/time yields null capture date through existing runCatching boundary instead of normalizing into a different date. GPS extraction remains independent. ORIGINAL tag precedence, DATETIME fallback only when ORIGINAL is absent, synchronization/current timezone refresh, format/memory helper bodies and geocoding remain unchanged.",
+    "materialLimit": "Strict parsing also rejects nonexistent local DST wall times. The selected plan explicitly accepts this intrinsic consequence; this review does not claim DST-gap normalization, EXIF offset interpretation, full lexical consumption or parser redesign."
+  },
+  "jvm": {
+    "testFreezeSha256": "83b5710ceef4d848c31a8c928f7a5522b5ad62947bedd7050d263ba456f996a7",
+    "freeze": "Actual current regression test equals frozen16-case baseline bytes. Calls actual PhotoCaption.read/formatDate/memoryYears with mock Exif metadata; unavoidable Android Log static setup is scoped. Process zone and all locale categories restore in finally.",
+    "before": {
+      "tests": 16,
+      "failures": 9,
+      "errors": 0,
+      "skipped": 0,
+      "classification": "Nine java.lang.AssertionError date literals; seven controls. No adapter/setup errors."
+    },
+    "after": {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "full": {
+      "tests": 4541,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 473
+    },
+    "fullXmlSnapshot": {
+      "directory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+      "files": 473,
+      "sha256": "48e22bdd4afa066867e7b2d8d9bb15c2948e12cccb244d44a60fa96c27b8de60",
+      "definition": "Sorted filename NUL fileSHA NUL byteLength newline"
+    },
+    "build": "Retained full Gradle terminal0/112.953s; log BUILD SUCCESSFUL and debug/performance/R8/vital tasks. Full473 XML suites independently counted."
+  },
+  "native": {
+    "before": {
+      "tests": 16,
+      "literalFailures": 9,
+      "controls": 7,
+      "setupFailures": 0
+    },
+    "after": {
+      "tests": 16,
+      "literalFailures": 0,
+      "controls": 7,
+      "setupFailures": 0
+    },
+    "actualBoundary": "Actual isolated embedded PhotoCaption, ExifInterface and Meta admitted by class-loader identity; generated16x16 JPEG841bytes, actual InputStream EXIF constructors/setAttribute/setLatLong/read/Meta/formatDate/memoryYears; raw date tags strictly admitted before read and checked unchanged after read.",
+    "names": [
+      "invalidFebruary30",
+      "invalidNonLeapFebruary29",
+      "invalid1900February29",
+      "invalidApril31",
+      "invalidMonth13",
+      "invalidDayZero",
+      "invalidHour24",
+      "invalidOriginalRetainsPrecedenceOverValidFallback",
+      "invalidFebruary30RetainsGps",
+      "valid2024LeapFebruary29",
+      "valid2000LeapFebruary29",
+      "valid2023February28",
+      "missingOriginalUsesValidFallback",
+      "absentDates",
+      "gpsWithValidDate",
+      "losAngelesWallTimeStillUsesCurrentZone"
+    ],
+    "beforeDateMillis": [
+      1677758400000,
+      1677672000000,
+      -2203848000000,
+      1682942400000,
+      1704110400000,
+      1672488000000,
+      1672617600000,
+      1677758400000,
+      1677758400000,
+      1709208000000,
+      951825600000,
+      1677585600000,
+      1677585600000,
+      null,
+      1677585600000,
+      1577867400000
+    ],
+    "afterDateMillis": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1709208000000,
+      951825600000,
+      1677585600000,
+      1677585600000,
+      null,
+      1677585600000,
+      1577867400000
+    ],
+    "afterFormatted": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "February 29, 2024",
+      "February 29, 2000",
+      "February 28, 2023",
+      "February 28, 2023",
+      null,
+      "February 28, 2023",
+      "January 1, 2020"
+    ],
+    "fixedEpochVerification": "Independent host UTC datetime arithmetic verified1709208000000,951825600000,1677585600000,1577867400000 (LA2020Jan1at00:30 is08:30UTC) and memoryNow1898683200000. These are literal fixture expectations, not observed-value adjustments.",
+    "oracleFreeze": "Each native before/after case retains exact name/raw ORIGINAL/fallback/zone/GPS/nullable epoch/friendly date/memoryNow/tolerance. Frozen Java/driver/DEX remain exact. All expected nullable dates, formatting, memories, GPS/hasLocation/isEmpty and mandatory baseline literal errors independently inspected.",
+    "suiteDifferences": "JVM day0 uses2023:03:00 while native uses2023:01:00; JVM hour24 uses2023:02:28 while native uses2023:01:01; valid GPS date is JVM2024leap/native2023Feb28. These are analogous categories, not identical cross-suite vectors; each own paired oracle is unchanged.",
+    "GPS": "Invalid date retains48.8566/2.3522 within actual-EXIF tolerance1e-5 and hasLocation true/isEmpty false; valid GPS control also remains intact.",
+    "cleanup": "Both phases recycle generated Bitmap, close16/16 owned streams, restore global timezone/Locale/FORMAT/DISPLAY in finally, retire owned handler; both package/process/external-directory absent. Both native terminals0 with setupFailures0.",
+    "containment": "targetContextPassed/saveAttributes/placeLookup false fields are source containment from absent calls/arguments, not classloader-wide IO counters. Actual EXIF mutation stays in memory; no target Context is supplied."
+  },
+  "artifacts": {
+    "debug": {
+      "sha256": "25d2ed46666dfde89cd8c4f66a964b002ebff08e05066bb74c855f326b8421cc",
+      "bytes": 46745646,
+      "identity": {
+        "manifest": {
+          "package": "com.immortal.launcher.debug",
+          "versionCode": 157,
+          "versionName": "1.163"
+        },
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+      }
+    },
+    "performance": {
+      "sha256": "bbad63813775731b6cd71adfd33ace163d2e20bfacab3fc67dafdf5ccd2e9713",
+      "bytes": 25886923,
+      "identity": {
+        "manifest": {
+          "package": "com.immortal.launcher.debug",
+          "versionCode": 157,
+          "versionName": "1.163"
+        },
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+      }
+    },
+    "verification": "Independently hashed both candidate APKs; decoded binary AndroidManifest package/versionCode/versionName and APK v2 signing-block certificate DER fingerprint. Both are com.immortal.launcher.debug157/1.163 and signer4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6, matching baseline. Root verify-artifacts.py supplies SDK cryptographic signature verification; reviewer decoded certificate identity without rerunning SDK/signature cryptography.",
+    "sourceAssets": "All23 actual source files independently compared byte-for-byte and SHA/size against both candidate APK ZIP entries and corresponding1.162 baseline. Packaged asset name sets exact; debug changesnone, performance onlygenerated assets/dexopt/baseline.prof.",
+    "fixtureDex": {
+      "sha256": "5f21376c41cf16db1bac0e4a1feb12b7f3601066963cc1ed4ca360cebdff70b7",
+      "bytes": 17148
+    },
+    "wrapper": "Independent ZIP comparison: entry sets exact; classes.dex equals same frozen17148-byte DEX and compiled manifest unchanged. Only assets/source.apk plus META-INF/ANDROIDD.RSA,ANDROIDD.SF,MANIFEST.MF differ; embedded before/candidate APKs exact. Container/signature bytes are not asserted identical.",
+    "wrapperChangedEntries": [
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/MANIFEST.MF",
+      "assets/source.apk"
+    ],
+    "driverSha256": "e9b1b73364cd797676821d561519caf5796bee6e694e07f1114a2322c90631cc"
+  },
+  "limits": [
+    "Generated metadata helper acceptance on actual debug/API29; no mounted caption rendering, controller/source workers, household images/files, geocode, provider, owner preferences or persistence acceptance.",
+    "No EXIF offset/tag repair, trailing text/full-consumption, retained Meta timezone remapping, locale redesign, concurrent-default/formatter behavior or physical device timezone transition verdict.",
+    "No native optimized runtime, API28, Living/current room visual acceptance. Root room delivery/preservation is outside this review.",
+    "Home zero-start discovery remains source-only and unselected under its existing clock; no expansion or relabeling.",
+    "DexClassLoader has no close claim; owned stream/handler/default/package/process/external-directory retirement is the cleanup evidence."
+  ],
+  "bindings": {
+    "/private/tmp/portal-ux-next-20261104-141902/selected-plan.json": {
+      "sha256": "85f5ccb5c759334acb687c9fc21db05cbd966be7db5bc4a1e312f8914616676f",
+      "bytes": 1706
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/source-witness.json": {
+      "sha256": "a2243604e4b075a1b331ec70e77d94a215c3f4559748c3da4b345645a0e69bd9",
+      "bytes": 3068
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/PhotoCaption.before.kt": {
+      "sha256": "cd9428ff9be0d067db4a263b72fe5e4215a95fea38f2914765f600f2a37f81b9",
+      "bytes": 7123
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoCaption.kt": {
+      "sha256": "a945b302e4339e1cb1cc572bd0b533ff178ed9b280ad1a4af95ace9f54875540",
+      "bytes": 7157
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/app-build.before.kts": {
+      "sha256": "54b45afe92a77c65996390344004ae44c61d52df1b83cfd52e013ed3105386fa",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "153e800842a30f597054e1965c537481c07f09872402f716210c43ad92528ec2",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+      "bytes": 164859
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/frozen-regression/PhotoCaptionDateValidityTest.kt": {
+      "sha256": "83b5710ceef4d848c31a8c928f7a5522b5ad62947bedd7050d263ba456f996a7",
+      "bytes": 5371
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/PhotoCaptionDateValidityTest.kt": {
+      "sha256": "83b5710ceef4d848c31a8c928f7a5522b5ad62947bedd7050d263ba456f996a7",
+      "bytes": 5371
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/jvm-before.xml": {
+      "sha256": "3b8672922d08df8ecaa3781cc8eeeb8a2d5ddd6851a7768fec1ca9e7fe64a454",
+      "bytes": 43010
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/jvm-before-summary.json": {
+      "sha256": "fa8ed32719f5af4cd823a524d63a584b9dad67a1bfe108719557811c619035db",
+      "bytes": 2288
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/jvm-before.log": {
+      "sha256": "9f237e66ea5b8f604d2274a00d8d0242a66d5c4b72d09b9c07198fc53a030831",
+      "bytes": 3511
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/jvm-before-terminal.json": {
+      "sha256": "ff65b71e6356de7d588267ce11579c705e9fff8b795f9ade777bbc51d38627ea",
+      "bytes": 48
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/jvm-after.xml": {
+      "sha256": "c8aa0ddd629309416a6bd31afede40ba734f098361c70deab2b55ed6c31321b5",
+      "bytes": 2953
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/jvm-after-summary.json": {
+      "sha256": "26facf623dd209abb245656dcf2bc38853d5d5835ecb70466690a4ac992ab99d",
+      "bytes": 66
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/gradle.log": {
+      "sha256": "2b09b7a1c94d9ea67272d958df2aedec680df18d64719fe48d1e195c8153b056",
+      "bytes": 13723
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/build-terminal.json": {
+      "sha256": "8dfca72851ae96be7bf5fda2716527e05fd7fe110de565b2d09197c200dae8f4",
+      "bytes": 49
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/promotion-artifacts.json": {
+      "sha256": "745718aa472bfaf20eddb8010d149e48cf27b296150dbe2f79052ef4aaf881d2",
+      "bytes": 9834
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/verify-artifacts.py": {
+      "sha256": "4036164d9f744db273ff00d467533c121de19ee44b4572c52855be3a1a4b6866",
+      "bytes": 3386
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/before-debug-1.162.apk": {
+      "sha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+      "bytes": 46745646
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/rollback-1.162.apk": {
+      "sha256": "2c43d9e7a2fa0f76a82a4796317fbe2279747d62467ee0b64b2982c131d283c3",
+      "bytes": 25886923
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/candidate-debug-1.163.apk": {
+      "sha256": "25d2ed46666dfde89cd8c4f66a964b002ebff08e05066bb74c855f326b8421cc",
+      "bytes": 46745646
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/candidate-performance-1.163.apk": {
+      "sha256": "bbad63813775731b6cd71adfd33ace163d2e20bfacab3fc67dafdf5ccd2e9713",
+      "bytes": 25886923
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/PhotoCaptionDateActivity.java": {
+      "sha256": "e4a18d200a8415c787625ed15600094247fb3954f4f8f3a0601e57092d63bd5e",
+      "bytes": 12677
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/AndroidManifest.xml": {
+      "sha256": "9f5360cc9482689cebe18ff56247e72dae5886549f089f3f2224e78a1d7bd586",
+      "bytes": 424
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/RUN.md": {
+      "sha256": "96342184823c9625663bbb594995954544153d06d5e8803673f6fdc3bb23b1b9",
+      "bytes": 2826
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/source-admission.json": {
+      "sha256": "ce1e85cc84e50bbacf25867273554c291baa31448a449845d52d17e92a93bb66",
+      "bytes": 2003
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/preparation-verification.json": {
+      "sha256": "2099232ebdf758545f583800aa39d8a1a4b71863e53fb3d736f361da3678c253",
+      "bytes": 3148
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/build.sh": {
+      "sha256": "a65746ace1ca974c5a7b8ba97c21a56cbc7c6338277623ae039bc8ccd1c079ff",
+      "bytes": 833
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/repack.sh": {
+      "sha256": "73becfd9f845c278ab8a9b79d27bc9aa49d05eb64379b89d449ef9dc94044448",
+      "bytes": 781
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/freeze.py": {
+      "sha256": "08f8e064eb25b1f12e9253f9f7333ab7439948710738e535452eb5b01ebaec07",
+      "bytes": 1468
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/frozen-dex/classes.dex": {
+      "sha256": "5f21376c41cf16db1bac0e4a1feb12b7f3601066963cc1ed4ca360cebdff70b7",
+      "bytes": 17148
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/caption-date-fixture.before.apk": {
+      "sha256": "311ff6b303fc4c8126936d7ae3842eb7637a0451430916b7d93e809e149a6cfe",
+      "bytes": 37507562
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-owned/caption-date-fixture.apk": {
+      "sha256": "64d7ca93033897baf2e41802046d1a775e207cfb06ffdcabf2a0c7b18d5b0512",
+      "bytes": 37507562
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-run.py": {
+      "sha256": "e9b1b73364cd797676821d561519caf5796bee6e694e07f1114a2322c90631cc",
+      "bytes": 4994
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/root-driver-freeze.json": {
+      "sha256": "bd14863982a5ee28a21a9e20e00aa6eac3a47fc98bb6e5390a17753eedc3e9e9",
+      "bytes": 264
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/root-scaffolding-frozen.json": {
+      "sha256": "14b2af027c06adf7b0c7f1746f5686fa39e2cfaccbc66fb57e3e16f8b0586c73",
+      "bytes": 1130
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/paired-fixture-binding.json": {
+      "sha256": "288e57c08968fdfabef94dd181e240a117d0ea4bbec64870bf83bceab6e6d520",
+      "bytes": 821
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/wrapper-entry-comparison.json": {
+      "sha256": "c38c49e05e616c35e574fef92063e67ed59a7e5cba808621bcd356cec6451f2d",
+      "bytes": 413
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-build-terminal.json": {
+      "sha256": "85fb93c60fc5abbd481ba3f575c92e9d9e5a1d1a8ce65a81ad5f4a196e6aa8fe",
+      "bytes": 46
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-build.log": {
+      "sha256": "087aedf6cf293efac58a9881e4351f6a903987527670b7899e726f5d6e1d48a3",
+      "bytes": 694
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/repack-terminal.json": {
+      "sha256": "e276af206d5b2dac9b9428ff1b0951b9478b9f5ca8559b77575f16d2ca1aa13d",
+      "bytes": 47
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-before-report.json": {
+      "sha256": "6229dfb71b92ce99624df4c76eb33aacf43b162ef9ed6490dd1cfba9fdee8f92",
+      "bytes": 14519
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-after-report.json": {
+      "sha256": "eb1070035de772fedb3633786ea77ed2acf1b13bc4da977fab15281848e05607",
+      "bytes": 12353
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-before-terminal.json": {
+      "sha256": "0dc904c96d40c5cf2f42d407bc61cb08a52a9a305533eb4eb12003fe44201894",
+      "bytes": 47
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-after-terminal.json": {
+      "sha256": "fda267afc676005c48de2e74f8a0a3de5bd27f66ffa2db1bd7d4df22d08ec320",
+      "bytes": 47
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-before.log": {
+      "sha256": "0ef010978ecbd8befd0ac6dc1349c542ff2db90cea9680d54e9d7940e58ddb57",
+      "bytes": 275
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/native-after.log": {
+      "sha256": "4accce53b33c0f1261c9f0dba5261a90bd0337b5b4d7e681d5a0e73cb54471bd",
+      "bytes": 274
+    }
+  }
+}

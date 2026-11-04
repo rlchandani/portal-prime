@@ -1,0 +1,9 @@
+{
+  "originalDiscoveryAt": "2026-11-04T14:19:02Z",
+  "target": "2026-11-04T14:34:02Z",
+  "hardDeadline": "2026-11-04T14:49:02Z",
+  "clockNotReset": true,
+  "baseCommit": "f741ec7ec96e62c5b8dbbfcd91c2cc853fc10a81",
+  "previousGoalTurn": "progress: controlled hardware dissolve pixel acceptance committed f741ec7e,10.629min includingcleanup, bothrooms retained1.162",
+  "scope": "Bounded new visibleUX/source discovery; no candidate selected yet; do not reopen earlier scopes."
+}

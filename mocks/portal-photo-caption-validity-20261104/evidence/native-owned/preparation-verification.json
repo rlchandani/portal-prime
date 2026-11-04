@@ -1,0 +1,89 @@
+{
+  "sourceAuthoringOnly": true,
+  "frozenAtUtc": "2026-11-04T14:23:17.586418+00:00",
+  "originalDiscoveryUtc": "2026-11-04T14:19:02Z",
+  "targetUtc": "2026-11-04T14:34:02Z",
+  "hardUtc": "2026-11-04T14:49:02Z",
+  "package": "com.immortal.captiondatefixture",
+  "activity": ".PhotoCaptionDateActivity",
+  "sources": {
+    "PhotoCaptionDateActivity.java": {
+      "sha256": "e4a18d200a8415c787625ed15600094247fb3954f4f8f3a0601e57092d63bd5e",
+      "bytes": 12677
+    },
+    "AndroidManifest.xml": {
+      "sha256": "9f5360cc9482689cebe18ff56247e72dae5886549f089f3f2224e78a1d7bd586",
+      "bytes": 424
+    },
+    "build.sh": {
+      "sha256": "a65746ace1ca974c5a7b8ba97c21a56cbc7c6338277623ae039bc8ccd1c079ff",
+      "bytes": 833
+    },
+    "repack.sh": {
+      "sha256": "73becfd9f845c278ab8a9b79d27bc9aa49d05eb64379b89d449ef9dc94044448",
+      "bytes": 781
+    },
+    "freeze.py": {
+      "sha256": "08f8e064eb25b1f12e9253f9f7333ab7439948710738e535452eb5b01ebaec07",
+      "bytes": 1468
+    },
+    "RUN.md": {
+      "sha256": "96342184823c9625663bbb594995954544153d06d5e8803673f6fdc3bb23b1b9",
+      "bytes": 2826
+    },
+    "source-admission.json": {
+      "sha256": "ce1e85cc84e50bbacf25867273554c291baa31448a449845d52d17e92a93bb66",
+      "bytes": 2003
+    }
+  },
+  "expectedBaseline": {
+    "tests": 16,
+    "failures": 9,
+    "controls": 7,
+    "setupFailures": 0
+  },
+  "expectedCandidate": {
+    "tests": 16,
+    "failures": 0,
+    "setupFailures": 0
+  },
+  "permissions": [],
+  "fixtureDexStatus": "Not compiled by author; root freezes one DEX before both executions",
+  "sourceApkBinding": "Exact retained before/candidate debug APK supplied and bound by root",
+  "requiresRootFullReadBeforeSdk": true,
+  "sourceBinding": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoCaption.kt",
+    "sha256": "cd9428ff9be0d067db4a263b72fe5e4215a95fea38f2914765f600f2a37f81b9"
+  },
+  "fixedEpochOracle": {
+    "2024February29NoonUtc": 1709208000000,
+    "2000February29NoonUtc": 951825600000,
+    "2023February28NoonUtc": 1677585600000,
+    "losAngeles2020January1At0030": 1577867400000,
+    "memoryNow2030March2NoonUtc": 1898683200000
+  },
+  "GPS": {
+    "latitude": 48.8566,
+    "longitude": 2.3522,
+    "absoluteTolerance": 1e-05
+  },
+  "authorOperations": "Source reads and private source/docs/metadata writes only; independent fixed epoch generation via host datetime. No app tests, SDK/build/runtime/device/Git/network/account/media/provider actions.",
+  "ok": true,
+  "preparedAtUtc": "2026-11-04T14:24:46.046801+00:00",
+  "rootFullyReadBeforeCompilation": true,
+  "fixtureDex": {
+    "sha256": "5f21376c41cf16db1bac0e4a1feb12b7f3601066963cc1ed4ca360cebdff70b7",
+    "bytes": 17148
+  },
+  "sourceApk": {
+    "sha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+    "bytes": 46745646
+  },
+  "sourceApkExact": true,
+  "fixtureApk": {
+    "sha256": "311ff6b303fc4c8126936d7ae3842eb7637a0451430916b7d93e809e149a6cfe",
+    "bytes": 37507562
+  },
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.captiondatefixture\n"
+}

@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "sameFrozenFixtureDexSha256": "5f21376c41cf16db1bac0e4a1feb12b7f3601066963cc1ed4ca360cebdff70b7",
+  "sameDexBytes": 17148,
+  "sameDriverSha256": "e9b1b73364cd797676821d561519caf5796bee6e694e07f1114a2322c90631cc",
+  "beforeWrapper": {
+    "sha256": "311ff6b303fc4c8126936d7ae3842eb7637a0451430916b7d93e809e149a6cfe",
+    "bytes": 37507562
+  },
+  "afterWrapper": {
+    "sha256": "64d7ca93033897baf2e41802046d1a775e207cfb06ffdcabf2a0c7b18d5b0512",
+    "bytes": 37507562
+  },
+  "beforeSource": {
+    "sha256": "2a1e7dae0ca82795d424a3b4811481d0609da3c811dea46c5014795c1e3acb39",
+    "bytes": 46745646
+  },
+  "afterSource": {
+    "sha256": "25d2ed46666dfde89cd8c4f66a964b002ebff08e05066bb74c855f326b8421cc",
+    "bytes": 46745646
+  },
+  "manifestZeroPermissions": true,
+  "sourceOnlyChangedInWrapper": true
+}

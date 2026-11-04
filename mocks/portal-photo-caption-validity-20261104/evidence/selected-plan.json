@@ -1,0 +1,23 @@
+{
+  "originalDiscoveryAt": "2026-11-04T14:19:02Z",
+  "target": "2026-11-04T14:34:02Z",
+  "hardDeadline": "2026-11-04T14:49:02Z",
+  "clockNotReset": true,
+  "baseCommit": "f741ec7ec96e62c5b8dbbfcd91c2cc853fc10a81",
+  "previousGoalTurn": "progress: controlled hardware dissolve pixel acceptance committed f741ec7e,10.629min includingcleanup, bothrooms retained1.162",
+  "scope": "Reject impossible EXIF calendar date/time at existing shared parser with strictleniency; preservevalid/fallback/tagprecedence/timezone/GPS/formatting/network/UI/storagepolicy.",
+  "selectedAt": "2026-11-04T14:22:29.731932+00:00",
+  "acceptance": [
+    "Frozen16 actual JVM metadata cases9literal failures7controls before,16pass after",
+    "Same frozen actualdebug/API29 generatedJPEG/actualExif fixture16cases baseline/candidate",
+    "FullJVM/debug/performance/R8/vital,signer/version1571.163/all23sourceassets exact and one combined independent source/native/artifact review beforepromotion",
+    "One optimizedinstall each room,fullreadback,43/30preferences/fourmaps/Familyruntime preserved"
+  ],
+  "limits": [
+    "No household EXIF/photo/provider/files/network/devicezone settings or phone/account/publication operations",
+    "No EXIFoffsettag/trailingtext/locale/concurrency/retainedMeta/parserredesign",
+    "Strictcalendar intrinsically rejects impossible local DST times; no offset repair or DSTgap normalization guarantee",
+    "Mountedcaption/Dream/localSMB/network/optimized/API28/Livingvisual acceptance remains separate"
+  ],
+  "previousPositiveScope": "Photo-caption-timezone only testednew-readtimezone/malformedstring. Captionownership only bindsvisibility; neither accepts calendar numeric normalization."
+}

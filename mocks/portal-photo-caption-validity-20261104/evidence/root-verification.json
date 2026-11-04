@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "independentReviewFullyReadTool": "75a97c",
+  "reviewBindingsRehashedBeforePromotion": 50,
+  "frozenFullXmlSnapshotReplayed": true,
+  "jvm": {
+    "tests": 4541,
+    "suites": 473,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native": {
+    "before": {
+      "tests": 16,
+      "failures": 9,
+      "controls": 7
+    },
+    "after": {
+      "tests": 16,
+      "failures": 0
+    },
+    "bothRetired": true,
+    "generatedMetadataOnly": true
+  },
+  "installed": {
+    "family": {
+      "bytes": 25886923,
+      "sha256": "bbad63813775731b6cd71adfd33ace163d2e20bfacab3fc67dafdf5ccd2e9713",
+      "app": {
+        "versionCode": 157,
+        "versionName": "1.163"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 8
+      },
+      "installed": {
+        "bytes": 25886923,
+        "sha256": "bbad63813775731b6cd71adfd33ace163d2e20bfacab3fc67dafdf5ccd2e9713",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 157,
+          "versionName": "1.163"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1622,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1970,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "issueClock": {
+    "originalDiscoveryAt": "2026-11-04T14:19:02Z",
+    "selectedAt": "2026-11-04T14:22:29.731932Z",
+    "target": "2026-11-04T14:34:02Z",
+    "hardDeadline": "2026-11-04T14:49:02Z",
+    "clockNotReset": true
+  },
+  "writtenAtUtc": "2026-11-04T14:33:49.552424+00:00",
+  "targetMet": false,
+  "hardDeadlineMet": true,
+  "remainingGate": "Local commit and owned transient cleanup.",
+  "strictDocs": {
+    "exitCode": 0,
+    "elapsedSeconds": 2.4617048329964746
+  },
+  "privacy": {
+    "plannedFilesChecked": 55,
+    "ownedRegistrySecretsAbsent": true,
+    "noBinaryHouseholdOrRegistryFilesInBundle": true
+  },
+  "allReviewBindingsStillExact": true,
+  "closedAtUtc": "2026-11-04T14:34:33.444693+00:00",
+  "elapsedOriginalMinutes": 15.524078216666668
+}

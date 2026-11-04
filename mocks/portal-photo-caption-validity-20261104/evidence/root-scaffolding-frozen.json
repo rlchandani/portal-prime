@@ -1,0 +1,36 @@
+{
+  "sourceFullyReadTool": "8e8969",
+  "jvmFullyReadTool": "cf8a6f",
+  "baselineTerminal": "691fce",
+  "rootFrozenBeforeSdkAt": "2026-11-04T14:24:06.376340+00:00",
+  "sources": {
+    "PhotoCaptionDateActivity.java": {
+      "sha256": "e4a18d200a8415c787625ed15600094247fb3954f4f8f3a0601e57092d63bd5e",
+      "bytes": 12677
+    },
+    "AndroidManifest.xml": {
+      "sha256": "9f5360cc9482689cebe18ff56247e72dae5886549f089f3f2224e78a1d7bd586",
+      "bytes": 424
+    },
+    "RUN.md": {
+      "sha256": "96342184823c9625663bbb594995954544153d06d5e8803673f6fdc3bb23b1b9",
+      "bytes": 2826
+    },
+    "source-admission.json": {
+      "sha256": "ce1e85cc84e50bbacf25867273554c291baa31448a449845d52d17e92a93bb66",
+      "bytes": 2003
+    },
+    "build.sh": {
+      "sha256": "a65746ace1ca974c5a7b8ba97c21a56cbc7c6338277623ae039bc8ccd1c079ff",
+      "bytes": 833
+    },
+    "repack.sh": {
+      "sha256": "73becfd9f845c278ab8a9b79d27bc9aa49d05eb64379b89d449ef9dc94044448",
+      "bytes": 781
+    },
+    "freeze.py": {
+      "sha256": "08f8e064eb25b1f12e9253f9f7333ab7439948710738e535452eb5b01ebaec07",
+      "bytes": 1468
+    }
+  }
+}

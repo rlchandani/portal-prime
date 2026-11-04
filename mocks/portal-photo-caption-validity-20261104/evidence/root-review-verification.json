@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "rootFullReadTool": "75a97c",
+  "independentReviewSha256": "ff1ebb162b99a0172d01ba830ce288125f55c90a759be4bcc062d0dd6a6cce53",
+  "bindingsRehashed": 50,
+  "allJvmXmlReplayed": {
+    "tests": 4541,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 473
+  },
+  "beforePromotionAt": "2026-11-04T14:31:12.440916+00:00"
+}

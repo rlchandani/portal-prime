@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "sameFrozenSourceAndGate": true,
+  "sameDex": true,
+  "sameCompiledManifest": true,
+  "changedArchiveEntries": [
+    "assets/source.apk",
+    "META-INF/ANDROIDD.SF",
+    "META-INF/ANDROIDD.RSA",
+    "META-INF/MANIFEST.MF"
+  ],
+  "qualification": "Embedded app asset and signing records change; fixture code/gates/manifest remain exact. APKcontainer/signature bytes are not claimed identical."
+}

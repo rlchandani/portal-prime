@@ -1,0 +1,202 @@
+{
+  "PhotoCaption.before.kt": {
+    "bytes": 7123,
+    "sha256": "cd9428ff9be0d067db4a263b72fe5e4215a95fea38f2914765f600f2a37f81b9"
+  },
+  "app-build.before.kts": {
+    "bytes": 11824,
+    "sha256": "54b45afe92a77c65996390344004ae44c61d52df1b83cfd52e013ed3105386fa"
+  },
+  "build-terminal.json": {
+    "bytes": 49,
+    "sha256": "8dfca72851ae96be7bf5fda2716527e05fd7fe110de565b2d09197c200dae8f4"
+  },
+  "clock-source-discovery.json": {
+    "bytes": 1547,
+    "sha256": "1145efe4f8403fab3cca5bd12412734494623a33e4648ffcea2c23d617ba16df"
+  },
+  "discovery-clock.json": {
+    "bytes": 478,
+    "sha256": "65078da93ad4036d6d98707428fd99fb9df1e3428c8fe252bc55a61397a45e57"
+  },
+  "docs-terminal.json": {
+    "bytes": 60,
+    "sha256": "54bd2a5b48c7d067919e9f2274507325c592a7e6c5f3f15c2e790b65f4b7920c"
+  },
+  "family-installed.json": {
+    "bytes": 227,
+    "sha256": "9bcf84e29d9c41d2ca89abcb49c852bce684f5f8ac8ac9627459e5eb661cbfd7"
+  },
+  "frame-return.json": {
+    "bytes": 209,
+    "sha256": "13af4180504132cf8953756aea7700fafd6ec4273fa1907e4d74107e6c0fbb4f"
+  },
+  "independent-review.json": {
+    "bytes": 19427,
+    "sha256": "ff1ebb162b99a0172d01ba830ce288125f55c90a759be4bcc062d0dd6a6cce53"
+  },
+  "jvm-after-summary.json": {
+    "bytes": 66,
+    "sha256": "26facf623dd209abb245656dcf2bc38853d5d5835ecb70466690a4ac992ab99d"
+  },
+  "jvm-after.xml": {
+    "bytes": 2953,
+    "sha256": "c8aa0ddd629309416a6bd31afede40ba734f098361c70deab2b55ed6c31321b5"
+  },
+  "jvm-before-summary.json": {
+    "bytes": 2288,
+    "sha256": "fa8ed32719f5af4cd823a524d63a584b9dad67a1bfe108719557811c619035db"
+  },
+  "jvm-before-terminal.json": {
+    "bytes": 48,
+    "sha256": "ff65b71e6356de7d588267ce11579c705e9fff8b795f9ade777bbc51d38627ea"
+  },
+  "jvm-before.xml": {
+    "bytes": 43010,
+    "sha256": "3b8672922d08df8ecaa3781cc8eeeb8a2d5ddd6851a7768fec1ca9e7fe64a454"
+  },
+  "living-install-observation.json": {
+    "bytes": 348,
+    "sha256": "fe8f8003aaffedd0dcf5e9a6d38b1cc6f15c8ac8a39c8af25508a4b0e346c8d3"
+  },
+  "native-after-report.json": {
+    "bytes": 12353,
+    "sha256": "eb1070035de772fedb3633786ea77ed2acf1b13bc4da977fab15281848e05607"
+  },
+  "native-after-retirement.json": {
+    "bytes": 88,
+    "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b"
+  },
+  "native-after-terminal.json": {
+    "bytes": 47,
+    "sha256": "fda267afc676005c48de2e74f8a0a3de5bd27f66ffa2db1bd7d4df22d08ec320"
+  },
+  "native-before-report.json": {
+    "bytes": 14519,
+    "sha256": "6229dfb71b92ce99624df4c76eb33aacf43b162ef9ed6490dd1cfba9fdee8f92"
+  },
+  "native-before-retirement.json": {
+    "bytes": 88,
+    "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b"
+  },
+  "native-before-terminal.json": {
+    "bytes": 47,
+    "sha256": "0dc904c96d40c5cf2f42d407bc61cb08a52a9a305533eb4eb12003fe44201894"
+  },
+  "native-build-terminal.json": {
+    "bytes": 46,
+    "sha256": "85fb93c60fc5abbd481ba3f575c92e9d9e5a1d1a8ce65a81ad5f4a196e6aa8fe"
+  },
+  "native-owned/AndroidManifest.xml": {
+    "bytes": 424,
+    "sha256": "9f5360cc9482689cebe18ff56247e72dae5886549f089f3f2224e78a1d7bd586"
+  },
+  "native-owned/PhotoCaptionDateActivity.java": {
+    "bytes": 12677,
+    "sha256": "e4a18d200a8415c787625ed15600094247fb3954f4f8f3a0601e57092d63bd5e"
+  },
+  "native-owned/RUN.md": {
+    "bytes": 2826,
+    "sha256": "96342184823c9625663bbb594995954544153d06d5e8803673f6fdc3bb23b1b9"
+  },
+  "native-owned/build.sh": {
+    "bytes": 833,
+    "sha256": "a65746ace1ca974c5a7b8ba97c21a56cbc7c6338277623ae039bc8ccd1c079ff"
+  },
+  "native-owned/freeze.py": {
+    "bytes": 1468,
+    "sha256": "08f8e064eb25b1f12e9253f9f7333ab7439948710738e535452eb5b01ebaec07"
+  },
+  "native-owned/preparation-verification.json": {
+    "bytes": 3148,
+    "sha256": "2099232ebdf758545f583800aa39d8a1a4b71863e53fb3d736f361da3678c253"
+  },
+  "native-owned/repack.sh": {
+    "bytes": 781,
+    "sha256": "73becfd9f845c278ab8a9b79d27bc9aa49d05eb64379b89d449ef9dc94044448"
+  },
+  "native-owned/source-admission.json": {
+    "bytes": 2003,
+    "sha256": "ce1e85cc84e50bbacf25867273554c291baa31448a449845d52d17e92a93bb66"
+  },
+  "native-run.py": {
+    "bytes": 4994,
+    "sha256": "e9b1b73364cd797676821d561519caf5796bee6e694e07f1114a2322c90631cc"
+  },
+  "paired-fixture-binding.json": {
+    "bytes": 821,
+    "sha256": "288e57c08968fdfabef94dd181e240a117d0ea4bbec64870bf83bceab6e6d520"
+  },
+  "preservation.json": {
+    "bytes": 976,
+    "sha256": "1682ae3c468cdb476da2c8dacd936587b317d599abd619edf039d6766a028b26"
+  },
+  "preserve.terminal.json": {
+    "bytes": 60,
+    "sha256": "7831aefe65af346fe402e77d48368270afae4854ad0538f71fec079d9e36a875"
+  },
+  "promote-family.terminal.json": {
+    "bytes": 59,
+    "sha256": "41383686511ee9e44e37ac39bcfba188c06f4a476a01f85d6133dd1a95edc2b8"
+  },
+  "promote-living.terminal.json": {
+    "bytes": 59,
+    "sha256": "4899d0c7bf37b7b75e9a206258339149b34401d5700eb0d9c9c778fe33b882fb"
+  },
+  "promotion-artifacts.json": {
+    "bytes": 9834,
+    "sha256": "745718aa472bfaf20eddb8010d149e48cf27b296150dbe2f79052ef4aaf881d2"
+  },
+  "repack-terminal.json": {
+    "bytes": 47,
+    "sha256": "e276af206d5b2dac9b9428ff1b0951b9478b9f5ca8559b77575f16d2ca1aa13d"
+  },
+  "return-frame.terminal.json": {
+    "bytes": 61,
+    "sha256": "5cbf6efa5c305f83bcc29feb0d684c38553e0978eea977c198470bdd0e6c7e9e"
+  },
+  "roadmap-preservation.json": {
+    "bytes": 358,
+    "sha256": "c96740c107c36a32e2be88d4f9716a83cd47a5ea3210519dbef4313d4b2900ca"
+  },
+  "root-driver-freeze.json": {
+    "bytes": 264,
+    "sha256": "bd14863982a5ee28a21a9e20e00aa6eac3a47fc98bb6e5390a17753eedc3e9e9"
+  },
+  "root-review-verification.json": {
+    "bytes": 352,
+    "sha256": "5ab4dacc4e5e97b566a9a9ee433f530cd8ce0db031686833b628c97c290ecd63"
+  },
+  "root-scaffolding-frozen.json": {
+    "bytes": 1130,
+    "sha256": "14b2af027c06adf7b0c7f1746f5686fa39e2cfaccbc66fb57e3e16f8b0586c73"
+  },
+  "root-verification.json": {
+    "bytes": 3046,
+    "sha256": "7c56e42f5673b66e7a5f1c87d557982986681c90d8216479ce64719bf3edfd84"
+  },
+  "selected-plan.json": {
+    "bytes": 1706,
+    "sha256": "85f5ccb5c759334acb687c9fc21db05cbd966be7db5bc4a1e312f8914616676f"
+  },
+  "source-admission.json": {
+    "bytes": 3887,
+    "sha256": "bf2a7d0dc8d9b475c15dfda65e12c8f3b90b165c0d9d1a05f719d437c083d81f"
+  },
+  "source-witness.json": {
+    "bytes": 3068,
+    "sha256": "a2243604e4b075a1b331ec70e77d94a215c3f4559748c3da4b345645a0e69bd9"
+  },
+  "unselected-home-zero-duration.json": {
+    "bytes": 3665,
+    "sha256": "4974d81f44c6a517059411f6a932b66b723baf7c057fee6234817445b2955ab0"
+  },
+  "verify-artifacts.py": {
+    "bytes": 3386,
+    "sha256": "4036164d9f744db273ff00d467533c121de19ee44b4572c52855be3a1a4b6866"
+  },
+  "wrapper-entry-comparison.json": {
+    "bytes": 413,
+    "sha256": "c38c49e05e616c35e574fef92063e67ed59a7e5cba808621bcd356cec6451f2d"
+  }
+}

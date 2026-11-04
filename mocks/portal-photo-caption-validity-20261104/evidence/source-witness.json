@@ -1,0 +1,78 @@
+{
+  "ok": true,
+  "beforeSha256": "cd9428ff9be0d067db4a263b72fe5e4215a95fea38f2914765f600f2a37f81b9",
+  "afterSha256": "a945b302e4339e1cb1cc572bd0b533ff178ed9b280ad1a4af95ace9f54875540",
+  "solePolicyDelta": "EXIF sharedformatter strictcalendar leniency; allother production PhotoCaption bytes exact",
+  "jvmBaseline": {
+    "exitCode": 1,
+    "elapsedSeconds": 10.027,
+    "tests": 16,
+    "failures": 9,
+    "errors": 0,
+    "skipped": 0,
+    "failureDetails": [
+      {
+        "name": "impossibleOriginalDoesNotSubstituteValidFallback",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected null, but was:<1677758400000>"
+      },
+      {
+        "name": "day0HasNoDate",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Meta(dateMillis=null, lat=null, lng=null)> but was:<Meta(dateMillis=1677585600000, lat=null, lng=null)>"
+      },
+      {
+        "name": "nonLeapCentury1900February29HasNoDate",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Meta(dateMillis=null, lat=null, lng=null)> but was:<Meta(dateMillis=-2203848000000, lat=null, lng=null)>"
+      },
+      {
+        "name": "february30CannotManufactureACaptionOrMemoryBadge",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Impossible capture date expected null, but was:<1677758400000>"
+      },
+      {
+        "name": "month13HasNoDate",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Meta(dateMillis=null, lat=null, lng=null)> but was:<Meta(dateMillis=1704110400000, lat=null, lng=null)>"
+      },
+      {
+        "name": "invalidFebruary30RetainsExactGpsWithoutADate",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected null, but was:<1677758400000>"
+      },
+      {
+        "name": "hour24HasNoDate",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Meta(dateMillis=null, lat=null, lng=null)> but was:<Meta(dateMillis=1677628800000, lat=null, lng=null)>"
+      },
+      {
+        "name": "nonLeapFebruary29HasNoDate",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Meta(dateMillis=null, lat=null, lng=null)> but was:<Meta(dateMillis=1677672000000, lat=null, lng=null)>"
+      },
+      {
+        "name": "april31HasNoDate",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Meta(dateMillis=null, lat=null, lng=null)> but was:<Meta(dateMillis=1682942400000, lat=null, lng=null)>"
+      }
+    ]
+  },
+  "nativeBaseline": {
+    "tests": 16,
+    "failures": 9,
+    "controls": 7,
+    "setupFailures": 0,
+    "terminal": {
+      "exitCode": 0,
+      "elapsedSeconds": 7.297
+    }
+  },
+  "sourceReadTools": [
+    "3af7fc",
+    "8c1d71"
+  ],
+  "nativeSourceReadTool": "8e8969",
+  "allFrozenTestsUnchanged": true,
+  "at": "2026-11-04T14:25:28.371054+00:00"
+}

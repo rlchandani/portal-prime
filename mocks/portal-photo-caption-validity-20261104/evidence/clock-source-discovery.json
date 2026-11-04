@@ -1,0 +1,38 @@
+{
+  "state": "bounded-negative-source-discovery",
+  "originalClock": "2026-11-04T14:19:02Z",
+  "scope": "Currentclockformat/zone consumers reuse existing accepted fixes; no new concrete defect selected, no repeatfixture/execution/sourcechange",
+  "readTools": [
+    "b21924",
+    "d798eb",
+    "af30a0",
+    "f68159"
+  ],
+  "files": {
+    "app/src/main/java/com/immortal/launcher/FlipWebClockFaceView.kt": {
+      "sha256": "8935c49445ff126234883c83e4f416bfbc56c1864a9dc67bda14d01f01a0398a",
+      "bytes": 5783
+    },
+    "app/src/main/java/com/immortal/launcher/ui/clock/PrimeDigitalClock.kt": {
+      "sha256": "5b963521f5a4f8950d317775835f15254cad6f39f76065f4567bf98b9ce126d3",
+      "bytes": 8430
+    },
+    "app/src/main/java/com/immortal/launcher/DigitalClockView.kt": {
+      "sha256": "bf8c20c0bd2c8351aaf495940b836a1ee0959f0b41c7263f016d7ee65ba5287e",
+      "bytes": 19649
+    },
+    "app/src/main/java/com/immortal/launcher/QuietNightClockView.kt": {
+      "sha256": "e6c16c4685b53aabf6c1ac2951cfb8b6148adefa227d12da4762581673667bc1",
+      "bytes": 4955
+    },
+    "app/src/main/java/com/immortal/launcher/DateFormatter.kt": {
+      "sha256": "029c1ee3e8028b09180aa2070015237074b29f7818a5049a3b473cd80dd11100",
+      "bytes": 2681
+    },
+    "app/src/main/java/com/immortal/launcher/ClockCadence.kt": {
+      "sha256": "394074d724705a62d4957c57bc088a5172696b223f8013df6a55a7f193591c22",
+      "bytes": 1183
+    }
+  },
+  "next": "Distinct EXIFcalendar parser candidate selected; Homezero-input candidate remains unselected sameclock"
+}

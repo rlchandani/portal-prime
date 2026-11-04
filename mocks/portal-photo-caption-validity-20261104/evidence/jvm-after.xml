@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.immortal.launcher.PhotoCaptionDateValidityTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-11-04T14:25:34.459Z" hostname="iRedlofs-Mac-mini-3.local" time="0.478">
+  <properties/>
+  <testcase name="impossibleOriginalDoesNotSubstituteValidFallback" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.467"/>
+  <testcase name="day0HasNoDate" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.001"/>
+  <testcase name="valid2024LeapFebruary29NoonUtcHasLiteralEpoch" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.0"/>
+  <testcase name="nonLeapCentury1900February29HasNoDate" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.001"/>
+  <testcase name="february30CannotManufactureACaptionOrMemoryBadge" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.0"/>
+  <testcase name="valid2023February28NoonUtcHasLiteralEpoch" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.001"/>
+  <testcase name="month13HasNoDate" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.0"/>
+  <testcase name="missingOriginalUsesValidFallback" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.001"/>
+  <testcase name="absentDateAndGpsRemainEmpty" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.001"/>
+  <testcase name="invalidFebruary30RetainsExactGpsWithoutADate" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.0"/>
+  <testcase name="valid2020January1LosAngelesUsesCurrentZone" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.001"/>
+  <testcase name="hour24HasNoDate" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.0"/>
+  <testcase name="nonLeapFebruary29HasNoDate" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.001"/>
+  <testcase name="april31HasNoDate" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.0"/>
+  <testcase name="validDateRetainsExactGps" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.001"/>
+  <testcase name="valid2000LeapCenturyFebruary29NoonUtcHasLiteralEpoch" classname="com.immortal.launcher.PhotoCaptionDateValidityTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (~/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.12/be4984cb6fd1ef1d11f218a648889dfda44b8a15/byte-buddy-agent-1.14.12.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

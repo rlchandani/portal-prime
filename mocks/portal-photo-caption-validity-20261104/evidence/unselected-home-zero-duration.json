@@ -1,0 +1,61 @@
+{
+  "state": "unselected-source-only",
+  "originalDiscoveryAt": "2026-11-04T14:19:02Z",
+  "target": "2026-11-04T14:34:02Z",
+  "hardDeadline": "2026-11-04T14:49:02Z",
+  "clockNotReset": true,
+  "recordedAtUtc": "2026-11-04T14:22:46.968808+00:00",
+  "finding": "Home custom timer Start0:00 stays enabled, calls onStart(0), and parent closes the picker while declining TimerStore.start.",
+  "activePath": [
+    "ApprovedHomeNavigation.kt:76\u2192ApprovedHomeTimerEditor\u2192CustomTimerDialog",
+    "HomeActivity.kt:4369\u20134371 Start callback passes0",
+    "HomeActivity.kt:3636\u20133642 positive guard skips start but closes picker"
+  ],
+  "literalInput": "Default5:00, five minute-minus taps\u21920:00, tap Start0:00",
+  "current": "Editor closes, no timer starts",
+  "reasonableExpected": "Start disabled at zero duration; editor retained until positive duration or explicit Cancel",
+  "proposedSmallCorrection": "Optional enabled TimerChip input wired to existing tvFocusable disabled semantics; custom Start uses minutes>0||seconds>0; preserve positive durations/other callers.",
+  "execution": "No fixture/test/build/native/render/device execution. Source-only unselected finding.",
+  "positivePriorScope": {
+    "id": "timer-ownership",
+    "description": "On Family 1.66, starting 5m in the Home editor created a kitchen timer while the widget stayed Ready. The Home editor now uses the existing shared countdown. Tools keeps its kitchen-timer collection.",
+    "acceptance": [
+      "Reproduce the widget/editor behavior on the existing owner path before labeling it a runtime defect.",
+      "Record the intended widget/editor semantics and show that the selected editor changes the displayed timer.",
+      "Preserve existing timers, pause/resume/ringing, cancel and Back behavior; any migration needs a separate decision."
+    ],
+    "limits": [
+      "Tools kitchen timers, existing stores and alarm receivers were preserved; no migration or schema change.",
+      "No audible judgement, background/screen-off or screensaver rendering test, enlarged-text/focus matrix or repeated Living interaction run.",
+      "No FPS or latency improvement is claimed."
+    ]
+  },
+  "distinct": "Prior owner unit accepted shared TimerStore and custom0:10; this zero-input admission is not that earlier ownership defect. No restart/widening of timer-ownership or parked scope.",
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+      "bytes": 229887
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedHomeNavigation.kt",
+      "sha256": "cdba2e8a505449ba7b1fe9d9feadce8ab67f68c0b225227af096ffc9662f4644",
+      "bytes": 3197
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/TvFocus.kt",
+      "sha256": "c178b73f2f262b880031bdecba954cedbb44b2b9e1b3dff7eabe647d93df5117",
+      "bytes": 7018
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-home-timer-delivery-2026-11-02.md",
+      "sha256": "a5abdb47107b0754a7fb2063241b3eb0b5cde1e102cefd23eed1aebd026d86f5",
+      "bytes": 4699
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-widget-gallery-20261102/roadmap/roadmap.json",
+      "sha256": "6df509ec32bda66681020d4bfa339cff8f5bd26d03d9f2de52952255e22ec1d1",
+      "bytes": 511314
+    }
+  ]
+}

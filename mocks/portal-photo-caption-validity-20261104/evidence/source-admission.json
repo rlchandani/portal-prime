@@ -1,0 +1,82 @@
+{
+  "sourceReady": true,
+  "authoringOnly": true,
+  "executedTestsBuildSdkGitDevicesNetwork": false,
+  "originalDiscoveryAt": "2026-11-04T14:19:02Z",
+  "target": "2026-11-04T14:34:02Z",
+  "hardDeadline": "2026-11-04T14:49:02Z",
+  "clockNotReset": true,
+  "authoredAtUtc": "2026-11-04T14:22:46.966751+00:00",
+  "test": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/PhotoCaptionDateValidityTest.kt",
+    "sha256": "83b5710ceef4d848c31a8c928f7a5522b5ad62947bedd7050d263ba456f996a7",
+    "bytes": 5371
+  },
+  "frozenCopy": {
+    "path": "/private/tmp/portal-ux-next-20261104-141902/frozen-regression/PhotoCaptionDateValidityTest.kt",
+    "sha256": "83b5710ceef4d848c31a8c928f7a5522b5ad62947bedd7050d263ba456f996a7",
+    "bytes": 5371
+  },
+  "productionRead": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoCaption.kt",
+    "sha256": "cd9428ff9be0d067db4a263b72fe5e4215a95fea38f2914765f600f2a37f81b9",
+    "bytes": 7123
+  },
+  "existingTestsUnchangedBindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/PhotoCaptionTest.kt",
+      "sha256": "5abbd9800ad1739029538d2cd4b890a0d0c85b5b13c8b62a8841b53528ef451d",
+      "bytes": 1171
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/PhotoCaptionTimeZoneTest.kt",
+      "sha256": "8e5e60cb5d7a30e0bdefc33523f29a0b58165ccd94e0537ef6a2f9030c613d5b",
+      "bytes": 4011
+    }
+  ],
+  "cases": [
+    "february30CannotManufactureACaptionOrMemoryBadge",
+    "nonLeapFebruary29HasNoDate",
+    "nonLeapCentury1900February29HasNoDate",
+    "april31HasNoDate",
+    "month13HasNoDate",
+    "day0HasNoDate",
+    "hour24HasNoDate",
+    "impossibleOriginalDoesNotSubstituteValidFallback",
+    "invalidFebruary30RetainsExactGpsWithoutADate",
+    "valid2024LeapFebruary29NoonUtcHasLiteralEpoch",
+    "valid2000LeapCenturyFebruary29NoonUtcHasLiteralEpoch",
+    "valid2023February28NoonUtcHasLiteralEpoch",
+    "missingOriginalUsesValidFallback",
+    "absentDateAndGpsRemainEmpty",
+    "validDateRetainsExactGps",
+    "valid2020January1LosAngelesUsesCurrentZone"
+  ],
+  "expectedUnchangedBaseline": {
+    "tests": 16,
+    "productAssertionFailures": 9,
+    "controls": 7,
+    "setupErrors": 0,
+    "notYetObserved": true
+  },
+  "literalEpochs": {
+    "valid2024Feb29NoonUTC": 1709208000000,
+    "valid2000Feb29NoonUTC": 951825600000,
+    "valid2023Feb28NoonUTC": 1677585600000,
+    "valid2020Jan1_0030LosAngeles": 1577867400000,
+    "memoryNow2030March2NoonUTC": 1898683200000
+  },
+  "epochDerivation": "Independent Python datetime UTC and zoneinfo America/Los_Angeles timestamps; literals embedded in authored test, no production parser oracle.",
+  "scope": [
+    "Actual PhotoCaption.read with mocked EXIF original/fallback getters and unchanged getLatLong array values.",
+    "Nine impossible date/time cases including invalid-original precedence and GPS retention; seven valid/missing/tag/timezone controls.",
+    "First invalid case requires null date, null formatDate and null memoryYears at literal2030March2 noon UTC.",
+    "Each case restores TimeZone and global/FORMAT/DISPLAY Locale in finally."
+  ],
+  "limits": [
+    "No actual ExifInterface file parsing/image/provider/owner media/account/context or rendered caption/controller acceptance.",
+    "No EXIF offset, total string consumption, locale or concurrency redesign; these tests do not claim complete EXIF grammar.",
+    "Strict calendar parsing inherently rejects local DST gaps; this is a parser consequence, not separately asserted/tested gap policy.",
+    "Existing tag precedence/timezone tests preserved; root must fully read source and freeze before baseline execution."
+  ]
+}
