@@ -27,7 +27,7 @@ internal object ApprovedToolsSummaries {
             "countdowns" to summary { "${CountdownConfig.load(context).size} saved" },
             "camera" to summary { "${CameraConfig.load(context).size} saved" },
             "notes" to summary {
-                if (NotesConfig.loadText(context).isBlank()) "Leave a message" else "A note is waiting"
+                if (NotesConfig.loadText(context).isBlank() && !NotesConfig.hasAudioNote(context)) "Leave a message" else "A note is waiting"
             },
         )
 

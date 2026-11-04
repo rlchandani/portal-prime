@@ -1,0 +1,35 @@
+{
+  "status": "authored-source-only",
+  "originalClock": {
+    "start": "2026-11-04T17:27:49Z",
+    "target": "2026-11-04T17:42:49Z",
+    "hardDeadline": "2026-11-04T17:57:49Z",
+    "clockNotReset": true
+  },
+  "scope": "Only Notes library empty-summary condition: blank text and no existing nonempty saved memo. Existing waiting copy, active memo controls, persistence and audio unchanged.",
+  "before": {
+    "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/ApprovedToolsSummaries.before.kt",
+    "bytes": 1783,
+    "sha256": "ca1d447410246fe0922efe12d85e7552ff2625ce0a25e615a1224bc8219cf0c5"
+  },
+  "after": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsSummaries.kt",
+    "bytes": 1821,
+    "sha256": "519af8c0d7c1c267bb540e046e24efa0c837563cbe5a847ca3ca91da3fe013df"
+  },
+  "exactDiff": {
+    "removed": "if (NotesConfig.loadText(context).isBlank()) \"Leave a message\" else \"A note is waiting\"",
+    "added": "if (NotesConfig.loadText(context).isBlank() && !NotesConfig.hasAudioNote(context)) \"Leave a message\" else \"A note is waiting\""
+  },
+  "verification": {
+    "entireOtherSourceBytesUnchanged": true,
+    "testsRun": false,
+    "buildsRun": false,
+    "rootOwnsExistingTestsBuildsAndFunctionalVerification": true
+  },
+  "limits": [
+    "Source authoring only; no rendered UI, audio playback or saved household memo access.",
+    "No new tests, SDK, device, Git, settings/configuration or version changes.",
+    "Earlier Notes/refresh/recording hypotheses retain their original scopes and clocks."
+  ]
+}

@@ -1,0 +1,348 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "scope": "One saved-memo condition in Tools Notes library summary; source, existing JVM results and signed APK identity/assets only.",
+  "clock": {
+    "originalStart": "2026-11-04T17:27:49Z",
+    "target": "2026-11-04T17:42:49Z",
+    "hardDeadline": "2026-11-04T17:57:49Z",
+    "notReset": true
+  },
+  "findings": [
+    "Whole ApprovedToolsSummaries.kt exactly reconstructs from the before-copy by inserting ` && !NotesConfig.hasAudioNote(context)` once; all other bytes in that source remain identical. build.gradle.kts reconstructs with only 164/1.170 to 165/1.171 metadata replacements.",
+    "NotesConfig admits an existing nonempty leave_note.m4a using exists && length > 0. Existing active Notes controls use this predicate; inventory declares blank note/no memo as the empty state. Blank/whitespace text with a saved nonempty memo now yields the existing A note is waiting copy; absent/zero-length memo retains Leave a message. Nonblank text short-circuits unchanged.",
+    "Reachable ToolsLibrary loads the map on its existing Dispatchers.IO active/resume lane and passes notes summary into ToolsLibraryEntry Text. Notes storage, recording/playback, refresh ownership, cancellation/error isolation and other summary expressions are unchanged by the exact insertion.",
+    "Actual retained Gradle terminal exit 0 in 114.603142125 seconds; log ends BUILD SUCCESSFUL in 1m 54s. All 475 XML files independently read, root attributes and 4565 testcase entries recounted, failures/errors/skipped zero. Existing ApprovedToolsSummariesTest has ten passing tests.",
+    "Static binary manifest decoding confirms com.immortal.launcher.debug 165/1.171 in both APKs; APK v2 certificate bytes independently hash to unchanged 4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6. Candidate bytes/hash agree with the retained successful root verifier receipt.",
+    "Unique ZIP entry sets for assets match the corresponding 1.170 APK. Every one of 23 source assets equals local source and baseline payloads; debug assets all unchanged. Performance changes only assets/dexopt/baseline.prof with pro\\0/010 header. Public update manifest remains 1.83/code77."
+  ],
+  "qualifications": [
+    "Existing tests cover text/blank/null/empty preference states, feature read failures and cancellation; they do not directly exercise a nonempty saved memo file. Saved-memo-specific branch acceptance is source review, not a new behavioral regression or RED/GREEN claim.",
+    "No rendered native Tools UI, household memo inspection, recording/playback/audio, device/runtime, optimized runtime, API28 or Living functional acceptance. Reviewer ran no SDK, builds, tests, device, Git or network operations.",
+    "Signer certificate identity is independently decoded; Android cryptographic signature verification is the root-owned retained apksigner helper evidence, not a reviewer SDK rerun.",
+    "Initial library loading/default text and existing refresh cadence remain. Prior Notes/audio/refresh, Today midnight source-only witness and exhausted Store native scopes/clocks are not reopened."
+  ],
+  "jvm": {
+    "tests": 4565,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 475,
+    "testcaseCount": 4565,
+    "xmlDirectory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "aggregateSha256": "f35dc4931a8d1b2367f4324b4911c736e3bd28f2349681e62f5c48706170ea62",
+    "aggregateDefinition": "Sort TEST-*.xml filenames lexicographically; concatenate UTF-8 filename + NUL + lowercase SHA256(file bytes) + NUL + decimal byte length + newline; SHA256 of concatenation. All 475 entries independently read.",
+    "focused": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.ApprovedToolsSummariesTest.xml",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "artifacts": [
+    {
+      "variant": "debug",
+      "manifest": {
+        "versionCode": 165,
+        "versionName": "1.171",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetCount": 23,
+      "sourceAndBaselineExact": true,
+      "generatedProfileChanges": []
+    },
+    {
+      "variant": "performance",
+      "manifest": {
+        "versionCode": 165,
+        "versionName": "1.171",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetCount": 23,
+      "sourceAndBaselineExact": true,
+      "generatedProfileChanges": [
+        {
+          "path": "assets/dexopt/baseline.prof",
+          "beforeBytes": 11143,
+          "beforeSha256": "a72a118fe4c837f0fa6d49aec213491941c9e53a7ff93fc067eea2b77c44f7f6",
+          "bytes": 11142,
+          "sha256": "47dff5832749a4ee03774b8b1acfecb2bcfbc9109e4391267fc7fe218b94a224",
+          "headerHex": "70726f0030313000"
+        }
+      ]
+    }
+  ],
+  "sourceAssets": {
+    "fileCount": 23,
+    "aggregateSha256": "5522cf7017cf8477c55e611c10b2acce748eb59fc5b63a187066128e5a2e0376",
+    "aggregateDefinition": "Sorted asset relative path + NUL + SHA256 + NUL + byte length + newline.",
+    "files": [
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/catalog.json",
+        "relative": "catalog.json",
+        "bytes": 24043,
+        "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/diagnostics/source-preview-4k.mp4",
+        "relative": "diagnostics/source-preview-4k.mp4",
+        "bytes": 25847,
+        "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/faces/Flip-Regular.otf",
+        "relative": "faces/Flip-Regular.otf",
+        "bytes": 3184,
+        "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/faces/flip.html",
+        "relative": "faces/flip.html",
+        "bytes": 29379,
+        "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/fonts/BebasNeue.ttf",
+        "relative": "fonts/BebasNeue.ttf",
+        "bytes": 61400,
+        "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/fonts/OFL.txt",
+        "relative": "fonts/OFL.txt",
+        "bytes": 1186,
+        "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/photoframe_fallback/01_wilderness.jpg",
+        "relative": "photoframe_fallback/01_wilderness.jpg",
+        "bytes": 261090,
+        "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/photoframe_fallback/02_denali.jpg",
+        "relative": "photoframe_fallback/02_denali.jpg",
+        "bytes": 277842,
+        "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/photoframe_fallback/03_yosemite.jpg",
+        "relative": "photoframe_fallback/03_yosemite.jpg",
+        "bytes": 443801,
+        "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.css",
+        "relative": "remote/control-center.css",
+        "bytes": 24082,
+        "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js",
+        "relative": "remote/control-center.js",
+        "bytes": 269969,
+        "sha256": "eac6fc27ced31c9ec5614c8ed27eea62049223a29d0b4754b0ae3ef1283e14f5"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/core.mjs",
+        "relative": "remote/core.mjs",
+        "bytes": 28623,
+        "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png",
+        "relative": "screensaver/cinema-grain.png",
+        "bytes": 12657,
+        "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html",
+        "relative": "screensaver/index.html",
+        "bytes": 7785,
+        "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js",
+        "relative": "screensaver/lib-engine.js",
+        "bytes": 5582,
+        "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js",
+        "relative": "screensaver/mode-impls.js",
+        "bytes": 70273,
+        "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js",
+        "relative": "screensaver/modes.js",
+        "bytes": 13499,
+        "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg",
+        "relative": "screensaver/photo-doodles-dark.svg",
+        "bytes": 1247,
+        "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg",
+        "relative": "screensaver/photo-doodles.svg",
+        "bytes": 1246,
+        "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js",
+        "relative": "screensaver/photos.js",
+        "bytes": 8528,
+        "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js",
+        "relative": "screensaver/scheduler.js",
+        "bytes": 14433,
+        "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css",
+        "relative": "screensaver/styles.css",
+        "bytes": 15397,
+        "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/webapp-retention-probe.html",
+        "relative": "webapp-retention-probe.html",
+        "bytes": 504,
+        "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+      }
+    ]
+  },
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsSummaries.kt",
+      "bytes": 1821,
+      "sha256": "519af8c0d7c1c267bb540e046e24efa0c837563cbe5a847ca3ca91da3fe013df"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NotesConfig.kt",
+      "bytes": 1308,
+      "sha256": "e5743a962944056fbb9327b10e13ee0cbd07caa2ccbd7166007a7e6b02eac33c"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsHost.kt",
+      "bytes": 15830,
+      "sha256": "c81eb51548eb2e8f43cc3aa295822f389bfd2104c10a1d4b435d6f8db06069d0"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsAudio.kt",
+      "bytes": 34362,
+      "sha256": "e1cffe986e1a479fa900cda6768e0d4191a0855f5f8eefcf23218ee573014fb6"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsCatalog.kt",
+      "bytes": 2892,
+      "sha256": "94f75d7462b3c1fe5391277ff343c703d381251b9f81ec5a7dc9f74be8a6b37f"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/ApprovedToolsSummariesTest.kt",
+      "bytes": 11418,
+      "sha256": "fb145818a16bde79d913443e603b89eb54d390ec09e8ef91df50f5abc2fdeccd"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "f920d93600e5469ab79775fd711c14e8231aee0b9ce75b74772e20d8967bd0bf"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/version.json",
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 19404,
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/plan.json",
+      "bytes": 1077,
+      "sha256": "89c97c945572e373a515a192ba9303c6671075bbea46dd25b44aea64981b1cfc"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/source-author-receipt.json",
+      "bytes": 1621,
+      "sha256": "d72b2178ec089e18e2665dca0491695a8f3eafd5dd09196b5bdce2cdd4e6b6be"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/ApprovedToolsSummaries.before.kt",
+      "bytes": 1783,
+      "sha256": "ca1d447410246fe0922efe12d85e7552ff2625ce0a25e615a1224bc8219cf0c5"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/build.gradle.before.kts",
+      "bytes": 11824,
+      "sha256": "da13f13c5111e50f95624609f124e53b4e3cc0d7eac103b54355800ed350169a"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/verify-artifacts.py",
+      "bytes": 3685,
+      "sha256": "016644d4a3650d72f332c156d4ed8df758dbfb3aa2bddc88598c1188394db43a"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/build-terminal.json",
+      "bytes": 178,
+      "sha256": "93b9f97e85a3ecc8e8f5205c1305d02388f9834d81d1b4f2446670ff2f5d2d94"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/build.log",
+      "bytes": 13723,
+      "sha256": "b2b80cc1f12c0315d75a0a92f34146cfa058eeb4628a4d41097f8ac9f601d1c7"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/promotion-artifacts.json",
+      "bytes": 9856,
+      "sha256": "aa004c56a7685899e0579a545046b751520931b717896419f91cee59a0387345"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/design/portal-plus-tools-overhaul-inventory.md",
+      "bytes": 29019,
+      "sha256": "5e9c44958bdfa0498c9254f805cd4c7f026649da7e10fd87645853f17ff92825"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.ApprovedToolsSummariesTest.xml",
+      "bytes": 1828,
+      "sha256": "34f2ecf2936c4d9b8788d1683731928b08521dc724e180bb341b4c75efff781c"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/candidate-debug-1.171.apk",
+      "bytes": 46745646,
+      "sha256": "f651a3b4248dd5f8adebaebcd0252b79f02a57be4ab7d65b4c047d32e55c2e3e"
+    },
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/candidate-debug-1.170.apk",
+      "bytes": 46745646,
+      "sha256": "f903eb59e440372eeaa80dc652c2eaed52bbae2f51bb0d74a4c984af268d176b"
+    },
+    {
+      "path": "/private/tmp/portal-notes-memo-summary-20261104-172749/candidate-performance-1.171.apk",
+      "bytes": 25886927,
+      "sha256": "58ffc6e7e3b8c14b9623d4e94c37a04e1c0955b7cc0999a0ce8b0fbebeaf69a7"
+    },
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/candidate-performance-1.170.apk",
+      "bytes": 25886927,
+      "sha256": "2fe4afcabd146cdef1867b41d5ad157321dfe7258b9752c5d766673603bc3e8a"
+    }
+  ]
+}
