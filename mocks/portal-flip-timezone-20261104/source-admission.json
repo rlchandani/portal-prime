@@ -1,0 +1,99 @@
+{
+  "sourceReady": true,
+  "state": "unselected-source-only-native-timezone-probe",
+  "authoredAtUtc": "2026-11-04T13:23:34.368289+00:00",
+  "originalDiscoveryAt": "2026-11-04T13:20:30Z",
+  "target": "2026-11-04T13:35:30Z",
+  "hardDeadline": "2026-11-04T13:50:30Z",
+  "clockNotReset": true,
+  "package": "com.immortal.fliptimezonefixture",
+  "activity": ".FlipTimezoneActivity",
+  "report": "external-files/report.json",
+  "sources": {
+    "FlipTimezoneActivity.java": {
+      "sha256": "86a0b37ff4c64c6cdd283e230a48d22b62e5646d45572f8ded73295557c34b9f",
+      "bytes": 13434
+    },
+    "AndroidManifest.xml": {
+      "sha256": "992256a3d1a22ac5603ee175ec5d3a404bcf06287ff43ea4e0be97e9bde8990f",
+      "bytes": 392
+    },
+    "RUN.md": {
+      "sha256": "98fa351446b6f7d85ee067300502a018e31493043c9016c41e126843f8cdd213",
+      "bytes": 2279
+    },
+    "build.sh": {
+      "sha256": "ee077244885b1bd200b69a0b381eddacc6779abdc7de28b0a84dd8c230ab6f5b",
+      "bytes": 830
+    },
+    "repack.sh": {
+      "sha256": "af1276092c16b112b82a732b67f0fbece8a936a5f8e61382f260284185d632dc",
+      "bytes": 783
+    },
+    "freeze.py": {
+      "sha256": "979f73fe632574e8b7db9bf8bafcdc91f076aa9fa1fa8293a16fa02c285c6556",
+      "bytes": 1405
+    }
+  },
+  "baselineApk": {
+    "path": "/private/tmp/portal-flip-format-20261104-130107/candidate-debug-1.159.apk",
+    "binding": {
+      "sha256": "c9b76e5a376b97af298feb84b26256217b10663e8e914e29ae4be9b645c509a2",
+      "bytes": 46745650
+    }
+  },
+  "productionBindings": {
+    "app/src/main/java/com/immortal/launcher/ui/clock/SplitFlapClock.kt": "8e60061f434494dff05c149de255e9e753fd2036871cb0065474f7bf7f782de5",
+    "app/src/main/java/com/immortal/launcher/ScreensaverFace.kt": "9d2fbd1589ed1558336a1e3ca2ff0d5c38ba0d8159c76bb03c4fc9a5142ac71b"
+  },
+  "admittedWrapperOrigin": {
+    "path": "/private/tmp/portal-flip-format-20261104-130107/native-owned/FlipFormatActivity.java",
+    "sha256": "f7aab4cf670cf6447ddf9ba7099bdb048806355feb1c5be0b897125dcb59f615",
+    "OwnedContextCopiedExact": true
+  },
+  "caseNames": [
+    "forward12h",
+    "forward24h",
+    "reverse12h",
+    "reverse24h",
+    "sameUtc12hControl",
+    "sameUtc24hControl",
+    "inactiveOrdinaryTickControl",
+    "disposedConsumersControl"
+  ],
+  "expectedBaselineFailNames": [
+    "forward12h",
+    "forward24h",
+    "reverse12h",
+    "reverse24h"
+  ],
+  "gates": {
+    "actualConstructor": true,
+    "eachChangedConsumerIndependentlySeesZoneTransition": true,
+    "readOnlyFormatterNoInjection": true,
+    "literalExpectedForward": [
+      "0635",
+      "1835"
+    ],
+    "literalExpectedReverse": [
+      "0105",
+      "1305"
+    ],
+    "setupFailures": 0,
+    "constructedDisposed": 8,
+    "unexpectedContextOperations": 0,
+    "allDefaultsRestored": true,
+    "permissions": [],
+    "watchdogMillis": 30000
+  },
+  "rootFullReadRequiredBeforeSdk": true,
+  "sourceAuthoringOnly": true,
+  "fixtureDexPendingRootCompilation": true,
+  "baselineExecutionPending": true,
+  "authorTestsBuildSdkGitDeviceNetwork": 0,
+  "limits": [
+    "Actual detached constructor/first resumed update/inactive reveal only",
+    "No locale/night/motion/UI/attachment/draw/device timezone setting claim",
+    "No provider/prefs/accounts/media/optimized/API28/Living/concurrency claim"
+  ]
+}

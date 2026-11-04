@@ -1,0 +1,25 @@
+{
+  "excluded": true,
+  "terminal": {
+    "exitCode": 1,
+    "session": 63937,
+    "tool": "b76521"
+  },
+  "reason": "Four existing lifecycle fixtures seed UTC formatter but leave process timezone at host default; intended refresh exposes fixture precondition mismatch. No native baseline or production gate changed.",
+  "preserved": [
+    "gradle.log",
+    "SplitFlapClockRevealTest.before.kt",
+    "test-results/"
+  ],
+  "repair": "Set process defaultUTC and restore in finally around existing fixture. Every expected literal/assertion and source-native Java/DEX/driver stays unchanged.",
+  "bindings": {
+    "/private/tmp/portal-flip-timezone-20261104-132030/excluded-jvm-fixture-default/gradle.log": {
+      "sha256": "ee81deeeca6959c70667ab80728f447dad80168fd7b84ce0859112ed048e0430",
+      "bytes": 14366
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/excluded-jvm-fixture-default/SplitFlapClockRevealTest.before.kt": {
+      "sha256": "60595be33323b57c706760c764da4c5cb8e27f589f0bf7a6f270c8790d291b9d",
+      "bytes": 4762
+    }
+  }
+}

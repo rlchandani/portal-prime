@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "rootFullyReadIndependentReview": true,
+  "rootFullReadTool": "baa7a9",
+  "combinedBindingsExact": 44,
+  "independentReviewSha256": "031dcab2f340d737d3c7a42f3bcb67c69a9c162769785146dfb00bc275e51648",
+  "jvmAggregateExact": true,
+  "allTenSourceAssetsExact": true,
+  "beforePromotion": true,
+  "verifiedAt": "2026-11-04T13:32:44.077947+00:00"
+}

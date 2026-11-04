@@ -1,0 +1,11 @@
+# Retained Flip timezone constructor probe
+
+SOURCE ONLY until root fully reads Java/manifest/build/repack/freeze/admission and runs unchanged baseline. Original13:20:30,target13:35:30,hard13:50:30 retained. No author SDK/build/test/device/Git/network operation. Current delivered1.159 and prior13:01:07 formatter clock remain separate.
+
+Package com.immortal.fliptimezonefixture/.FlipTimezoneActivity; report external-files/report.json. Root runs bash build.sh exact-before-debug.apk to compile API36,D8min29 and freeze DEX; candidate uses bash repack.sh exact-candidate-debug.apk only. scripts are authored, never executed by author. Embed exact APK as assets/source.apk; zero manifest permissions.
+
+Eight actual Android detached constructor cases: UTC-to-GMT+05:30 12h/24h, reverse12h/24h, sameUTC12h/24h, inactive tick control, disposed consumers control. Fixed generated input2030-01-01 13:05UTC; current-zone literals0635/1835 forward,0105/1305 reverse; return-zone literals0105/1305 forward,0635/1835 reverse. Each changed case first resumes and calls actual update after default-zone change, then changes default back before actual inactive refreshForReveal. This independently requires both consumers to refresh timezone; reading formatter only after consumers does not assume it updates by itself. SameUTC and lifecycle controls retain prior behavior. Expected baseline4changed-case failures/4controls; candidate8pass, setupFailures0,8constructor/dispose,defaults restored,unexpected context0.
+
+Actual ClockSpec.Companion.fromJson and SplitFlap constructor; admitted resource-only wrapper copied exactly from FlipFormat fixture, no field seeding/formatter mutation/helper. Only fixture process TimeZone default changes; all timezone/global/FORMAT/DISPLAY locale defaults restore finally. Owned fixture Activity resources only; preferences/resolver/services/activity launches denied/count. Native constructor setup errors excluded from product RED.
+
+No clock attachment/drawing/animation phase/night motion/locale redesign/real timezone setting/provider/prefs/network/owner media/account/optimized/API28/Living/concurrent default guarantee. Root verifies wrapper package/process/external-directory retirement. Wrapper source counters do not establish loader-wide zero IO.

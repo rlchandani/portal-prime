@@ -26,6 +26,7 @@ import com.immortal.launcher.ui.theme.ClockSecondary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 /**
  * Native split-flap clock — replaces the Fliqlo WebView.
@@ -164,6 +165,8 @@ class SplitFlapClockFaceView(
 
     override fun update(now: Date, blinkOn: Boolean) {
         if (!hostActive || disposed) return
+        val zone = TimeZone.getDefault()
+        if (timeFmt.timeZone != zone) timeFmt.timeZone = zone
         val digits = timeFmt.format(now).toCharArray()
         if (refreshImmediately) {
             // Hidden time is not an animation backlog: show the current minute on the first tick.
@@ -190,6 +193,8 @@ class SplitFlapClockFaceView(
     override fun refreshForReveal(now: Date, blinkOn: Boolean) {
         if (disposed) return
         cancelFlips()
+        val zone = TimeZone.getDefault()
+        if (timeFmt.timeZone != zone) timeFmt.timeZone = zone
         val digits = timeFmt.format(now).toCharArray()
         digits.copyInto(displayedDigits)
         digits.copyInto(pendingDigits)

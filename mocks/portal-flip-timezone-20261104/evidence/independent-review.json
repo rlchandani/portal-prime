@@ -1,0 +1,362 @@
+{
+  "ok": true,
+  "blockers": [],
+  "review": "One combined independent source/native/artifact review; host reads and literal replay only. No test/build/SDK/Git/network/device execution or production edits.",
+  "reviewedAtUtc": "2026-11-04T13:32:09.930799+00:00",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T13:20:30Z",
+    "firstSourceWitnessAt": "2026-11-04T13:21:04Z",
+    "selectedAt": "2026-11-04T13:26:18.209624+00:00",
+    "target": "2026-11-04T13:35:30Z",
+    "hardDeadline": "2026-11-04T13:50:30Z",
+    "clockNotReset": true
+  },
+  "source": {
+    "exactDelta": "TimeZone import and the same two-line conditional default-zone refresh after existing update/reveal guards; app metadata 153/1.159 to 154/1.160. Format initializer, locale, four cards, animation/reveal sequencing, guards and caller code unchanged.",
+    "activeCallers": [
+      "ClockFaces.kt:53 native FLIP constructor",
+      "FaceRenderer.kt:248 returning-host refreshForReveal",
+      "FaceRenderer.kt:751 active periodic update"
+    ],
+    "reference": "Same conditional timezone refresh as existing PrimeDigitalClock.kt:172-174.",
+    "distinctness": "Prior native Flip format probe fixed defaults before construction; this probe changes the default after construction. Source witness and original 13:20:30 clock retained."
+  },
+  "fixtureRepair": {
+    "accepted": true,
+    "excludedInitialBuild": {
+      "session": 63937,
+      "tool": "b76521",
+      "exitCode": 1,
+      "focusedTests": 5,
+      "fixtureFailures": 4,
+      "errors": 0
+    },
+    "delta": "Only fixture wrapper supplies process UTC and restores the original default in finally; all five test bodies/literals/assertions/seeding/animator gate byte-identical. Original failures excluded from product RED.",
+    "finalFocusedTests": 5,
+    "finalFailures": 0
+  },
+  "native": {
+    "before": {
+      "tests": 8,
+      "literalUpdateFailures": 4,
+      "controls": 4,
+      "setupFailures": 0,
+      "session": 63040,
+      "tool": "9ef459",
+      "exitCode": 0
+    },
+    "after": {
+      "tests": 8,
+      "failures": 0,
+      "setupFailures": 0,
+      "session": 13213,
+      "tool": "71f757",
+      "exitCode": 0
+    },
+    "literalReplay": [
+      {
+        "name": "forward12h",
+        "initial": "0105",
+        "currentExpected": "0635",
+        "beforeTick": "0105",
+        "afterTick": "0635",
+        "afterReveal": "0105"
+      },
+      {
+        "name": "forward24h",
+        "initial": "1305",
+        "currentExpected": "1835",
+        "beforeTick": "1305",
+        "afterTick": "1835",
+        "afterReveal": "1305"
+      },
+      {
+        "name": "reverse12h",
+        "initial": "0635",
+        "currentExpected": "0105",
+        "beforeTick": "0635",
+        "afterTick": "0105",
+        "afterReveal": "0635"
+      },
+      {
+        "name": "reverse24h",
+        "initial": "1835",
+        "currentExpected": "1305",
+        "beforeTick": "1835",
+        "afterTick": "1305",
+        "afterReveal": "1835"
+      },
+      {
+        "name": "sameUtc12hControl",
+        "initial": "0105",
+        "currentExpected": "0105",
+        "beforeTick": "0105",
+        "afterTick": "0105",
+        "afterReveal": "0105"
+      },
+      {
+        "name": "sameUtc24hControl",
+        "initial": "1305",
+        "currentExpected": "1305",
+        "beforeTick": "1305",
+        "afterTick": "1305",
+        "afterReveal": "1305"
+      },
+      {
+        "name": "inactiveOrdinaryTickControl",
+        "initial": "0105",
+        "currentExpected": "0105",
+        "beforeTick": "0105",
+        "afterTick": "0105",
+        "afterReveal": null
+      },
+      {
+        "name": "disposedConsumersControl",
+        "initial": "0105",
+        "currentExpected": "0105",
+        "beforeTick": "0105",
+        "afterTick": "0105",
+        "afterReveal": null
+      }
+    ],
+    "methodEvidence": "Actual embedded ClockSpec.fromJson and Android SplitFlap constructor; read-only formatter/digit observations, real resumed update and inactive return-zone reveal. No Unsafe/mock/formatter seeding. Baseline fails only changed-zone update; candidate return-zone reveal independently requires reveal refresh after update changed the formatter.",
+    "defaultsAndRetirement": "Both phases construct/dispose 8, restore timezone/global/FORMAT/DISPLAY locale, and report all three package/process/external-directory absence checks true.",
+    "containment": "Zero manifest permissions. Prior admitted OwnedContext copied byte-identically: generated Activity resources/theme allowed; prefs/resolver/services/startActivity denied and counted. unexpectedContextOperations=0 is scoped wrapper observation, not loader-wide or system-wide zero IO. realClockSettingsChanged=false is source containment; only process defaults changed.",
+    "sameFixtureDex": {
+      "sha256": "6a9869475ef80f7f674efe53d4a0f9c7f97d22c3263acae4428c9e23f306ad96",
+      "bytes": 18596
+    },
+    "zipDifferences": [
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/MANIFEST.MF",
+      "assets/source.apk"
+    ],
+    "driver": "Current fixed eight-case driver bound below; root attests unchanged across both single runs. Independently replayed every report literal/guard/error/origin/default/retirement field."
+  },
+  "artifacts": {
+    "debug": {
+      "sha256": "8406ae2c6608584c5d03c572c76067df8c4d7f791962ba621e57cc3f53a8c43b",
+      "bytes": 46745646,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='154' versionName='1.160' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "sha256": "9a7fa0177937241d1709115479a4aa65b605f0a41021cb29e0f80b5175b75af9",
+      "bytes": 25886923,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='154' versionName='1.160' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "manifestAndSignerEvidence": "Root SDK verifier source/metadata bound; independent SHA/size/ZIP/embedded APK checks performed without SDK commands.",
+    "assets": [
+      {
+        "variant": "debug",
+        "exactAssets": 10,
+        "sourceAndBaselineIdentical": true
+      },
+      {
+        "variant": "performance",
+        "exactAssets": 10,
+        "sourceAndBaselineIdentical": true
+      }
+    ],
+    "buildTerminal": {
+      "exitCode": 0,
+      "session": 5492,
+      "tool": "798d23",
+      "command": ":app:testDebugUnitTest :app:assembleDebug :app:assemblePerformance :app:lintVitalPerformance --no-daemon"
+    },
+    "jvmRecount": {
+      "tests": 4513,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 471
+    },
+    "jvmXmlAggregateSha256": "c8a5d03c6ac5572efc29ce88fbe644f51b1b92bf6c06be059d9ea77b604f0854",
+    "jvmXmlAggregateDefinition": "Sorted XML filename + NUL + SHA256 + NUL + byte length + newline"
+  },
+  "limits": [
+    "Detached actual debug/API29 consumers with generated dates and process-local UTC/GMT+05:30 transitions only.",
+    "No attached UI/pixels, flip motion/night/performance, optimized runtime/API28/Living, real device timezone settings, concurrent global-default, provider/account/owner-data acceptance.",
+    "Inherited sourceAuthoringOnly/unselected/baselineExecutionPending fields describe original preparation phase; selected plan, final terminals and actual reports establish later phases."
+  ],
+  "bindings": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ui/clock/SplitFlapClock.kt": {
+      "sha256": "06d45a9194bfbef9884867f3144efbeaaacb051bda6adad786d1720569d7c2ac",
+      "bytes": 7781
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "42c4ef0815c1c9de7eaa1ffb037c1685ff3803e1a8f8f456d4a2f53ae845a9af",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/SplitFlapClockRevealTest.kt": {
+      "sha256": "226ae3727ae7c8b55eb305d46370e71c9b8ca2b719019aed825018fa166bcf83",
+      "bytes": 5034
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/excluded-jvm-fixture-default/SplitFlapClockRevealTest.before.kt": {
+      "sha256": "60595be33323b57c706760c764da4c5cb8e27f589f0bf7a6f270c8790d291b9d",
+      "bytes": 4762
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/SplitFlapClock.before.kt": {
+      "sha256": "8e60061f434494dff05c149de255e9e753fd2036871cb0065474f7bf7f782de5",
+      "bytes": 7549
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/app-build.before.kts": {
+      "sha256": "337ab1050de41e0fed45cc61eaa2cd2ca63016215c88fda3d787f230294b4156",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/source-witness.json": {
+      "sha256": "33d3a399d773d403170fdb273c450e8adc78441633e4ce4e3b721da55d1e11d6",
+      "bytes": 4452
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/selected-plan.json": {
+      "sha256": "a9c52fb7105169f38d0d80accaea4736901c1a997aedb24f4bfaae1a48dbb341",
+      "bytes": 4944
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/roadmap.before.json": {
+      "sha256": "8c9b65c2ffc86616ccac4b4ac5071ccc0f5b6ed34d05f65232e7ce73286f8579",
+      "bytes": 497751
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/excluded-operational-failures.json": {
+      "sha256": "458f941029a35c901c071cac8d3165bdcf9d9d798882049160dc7832c2859546",
+      "bytes": 1057
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/excluded-jvm-fixture-default/gradle.log": {
+      "sha256": "ee81deeeca6959c70667ab80728f447dad80168fd7b84ce0859112ed048e0430",
+      "bytes": 14366
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/excluded-jvm-fixture-default/test-results/TEST-com.immortal.launcher.SplitFlapClockRevealTest.xml": {
+      "sha256": "8d5fb4fec9ea22964da9979c008f0a6928c722245d44368c985da41e9d302221",
+      "bytes": 22341
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.SplitFlapClockRevealTest.xml": {
+      "sha256": "27546b974f9fbf34831418043d108a882a2a58a9ed1be8875f1c1995af323306",
+      "bytes": 1600
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/promotion-artifacts.json": {
+      "sha256": "b91a9b7d5e8f7f7475ebd28472b0ed05cd0b7712e203e26b435c827dc7e1361b",
+      "bytes": 4789
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/build-terminal.json": {
+      "sha256": "3f32e56f6c88cb93482a332ca3008a38da20cc1a6f3f473731e1d234612156c3",
+      "bytes": 180
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/gradle.log": {
+      "sha256": "ebfbc67dd4737dd5abfea7b60be3de21db26c5a7f747588954525b6233a1f29f",
+      "bytes": 5566
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/verify-artifacts.py": {
+      "sha256": "bed88b08ba840e71488853a8d0055ff8834ecbce9098e58193e572adf29e5cbb",
+      "bytes": 2469
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-run.py": {
+      "sha256": "5d75b2f51fa1c85527892c7e3ec92e84703aafbfbae286abf26a703fa06c4b4c",
+      "bytes": 5225
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-build.log": {
+      "sha256": "7e993474999a377f62d620ebbb76f9fb8c2989e94ba02d10d2f304c13c1ced80",
+      "bytes": 642
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/preparation-verification.json": {
+      "sha256": "aeaf8e5e6b43d664ee232f04a1690286880ef938df022dfa370a2ca3c2e900fa",
+      "bytes": 3913
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/frozen-dex/classes.dex": {
+      "sha256": "6a9869475ef80f7f674efe53d4a0f9c7f97d22c3263acae4428c9e23f306ad96",
+      "bytes": 18596
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/baseline-fixture.apk": {
+      "sha256": "f6cf290be8fbaa3057fd372c16538d3987c6ee4db78a06bee8950e6a7b28399d",
+      "bytes": 37507562
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/flip-timezone-fixture.apk": {
+      "sha256": "9687a9d5cf914169b67b9a135a3c50bf999b56c1bb0c1b4678db91cd186c5440",
+      "bytes": 37507562
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/before-debug-1.159.apk": {
+      "sha256": "c9b76e5a376b97af298feb84b26256217b10663e8e914e29ae4be9b645c509a2",
+      "bytes": 46745650
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/candidate-debug-1.160.apk": {
+      "sha256": "8406ae2c6608584c5d03c572c76067df8c4d7f791962ba621e57cc3f53a8c43b",
+      "bytes": 46745646
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/candidate-performance-1.160.apk": {
+      "sha256": "9a7fa0177937241d1709115479a4aa65b605f0a41021cb29e0f80b5175b75af9",
+      "bytes": 25886923
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/rollback-1.159.apk": {
+      "sha256": "a89371afe53bd0c0bd848f2bf626ec5bf784d2dd9d84a0d23e6375a29289805b",
+      "bytes": 25886927
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/FlipFormatActivity.java": {
+      "sha256": "f7aab4cf670cf6447ddf9ba7099bdb048806355feb1c5be0b897125dcb59f615",
+      "bytes": 10481
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ui/clock/PrimeDigitalClock.kt": {
+      "sha256": "5b963521f5a4f8950d317775835f15254cad6f39f76065f4567bf98b9ce126d3",
+      "bytes": 8430
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ClockFaces.kt": {
+      "sha256": "0bb2cffd08674e6bca3b5367eac747d14ac2f61225519418c76508f249308433",
+      "bytes": 7031
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FaceRenderer.kt": {
+      "sha256": "9f62b1b197bbd9afce67158bb77c8e6b27eaebd8d9140530280227f6fe1b8183",
+      "bytes": 39413
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/FlipTimezoneActivity.java": {
+      "sha256": "86a0b37ff4c64c6cdd283e230a48d22b62e5646d45572f8ded73295557c34b9f",
+      "bytes": 13434
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/AndroidManifest.xml": {
+      "sha256": "992256a3d1a22ac5603ee175ec5d3a404bcf06287ff43ea4e0be97e9bde8990f",
+      "bytes": 392
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/RUN.md": {
+      "sha256": "98fa351446b6f7d85ee067300502a018e31493043c9016c41e126843f8cdd213",
+      "bytes": 2279
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/build.sh": {
+      "sha256": "ee077244885b1bd200b69a0b381eddacc6779abdc7de28b0a84dd8c230ab6f5b",
+      "bytes": 830
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/repack.sh": {
+      "sha256": "af1276092c16b112b82a732b67f0fbece8a936a5f8e61382f260284185d632dc",
+      "bytes": 783
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/freeze.py": {
+      "sha256": "979f73fe632574e8b7db9bf8bafcdc91f076aa9fa1fa8293a16fa02c285c6556",
+      "bytes": 1405
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-owned/source-admission.json": {
+      "sha256": "8e4e52917c7b46ac4a0fc4c0bbb2e0eadd3cc154f595045571e171e161122d3e",
+      "bytes": 3276
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-before-report.json": {
+      "sha256": "aa4c00380a636c65f0686c762871b541e816f6c1d1911557931235850fd3ae00",
+      "bytes": 7340
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-before-terminal.json": {
+      "sha256": "96985f1fdd1128a36fea6fd70f4b47fa4452ef7c54a3ddd21de54aedfc265e24",
+      "bytes": 128
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-after-report.json": {
+      "sha256": "4913066e3670966a90f86d761845ad68ae0a65192f2d2ace268af5d341ecd3ea",
+      "bytes": 7043
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-after-terminal.json": {
+      "sha256": "ab466ed42a76848a3f452fe5404e792a3dea60874bd11dd2a2a03d633ad6aacd",
+      "bytes": 128
+    },
+    "/private/tmp/portal-flip-timezone-20261104-132030/native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    }
+  }
+}

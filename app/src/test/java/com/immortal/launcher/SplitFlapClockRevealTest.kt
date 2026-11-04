@@ -124,12 +124,19 @@ class SplitFlapClockRevealTest {
   private fun time(iso: String): Date = Date.from(Instant.parse(iso))
 
   private fun fixture(block: (Fixture) -> Unit) {
-    // Fail at the factory boundary if a reveal or first resumed tick tries to animate.
-    Mockito.mockStatic(ValueAnimator::class.java, org.mockito.stubbing.Answer<Any?> {
-      throw AssertionError("Reveal/resume must not call ValueAnimator.${it.method.name}")
-    }).use { animators ->
-      block(Fixture())
-      animators.verifyNoInteractions()
+    val originalZone = TimeZone.getDefault()
+    try {
+      // The fixed UTC literals and retained formatter use the same process timezone.
+      TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+      // Fail at the factory boundary if a reveal or first resumed tick tries to animate.
+      Mockito.mockStatic(ValueAnimator::class.java, org.mockito.stubbing.Answer<Any?> {
+        throw AssertionError("Reveal/resume must not call ValueAnimator.${it.method.name}")
+      }).use { animators ->
+        block(Fixture())
+        animators.verifyNoInteractions()
+      }
+    } finally {
+      TimeZone.setDefault(originalZone)
     }
   }
 }

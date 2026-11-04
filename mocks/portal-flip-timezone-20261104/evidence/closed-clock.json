@@ -1,0 +1,15 @@
+{
+  "originalDiscoveryAt": "2026-11-04T13:20:30Z",
+  "firstSourceWitnessAt": "2026-11-04T13:21:04Z",
+  "selectedAt": "2026-11-04T13:26:18.209624+00:00",
+  "target": "2026-11-04T13:35:30Z",
+  "hardDeadline": "2026-11-04T13:50:30Z",
+  "clockNotReset": true,
+  "closedAt": "2026-11-04T13:34:08.634213+00:00",
+  "minutesFromOriginal": 13.643903550000001,
+  "minutesFromSelection": 7.840409816666667,
+  "targetMet": true,
+  "hardLimitMet": true,
+  "status": "delivered",
+  "wholeProductGoal": "active"
+}

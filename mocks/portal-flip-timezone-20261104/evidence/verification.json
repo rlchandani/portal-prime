@@ -1,0 +1,319 @@
+{
+  "ok": true,
+  "scope": "Refresh native Flip cached timezone before active update and non-disposed reveal, following current process default. Preserve pattern/locale/four cards/animation/lifecycle/guards/settings and all web assets.",
+  "jvm": {
+    "tests": 4513,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 471
+  },
+  "native": {
+    "before": {
+      "exitCode": 0,
+      "session": 63040,
+      "tool": "9ef459",
+      "tests": 8,
+      "failures": 4,
+      "controls": 4,
+      "accepted": true
+    },
+    "after": {
+      "exitCode": 0,
+      "session": 13213,
+      "tool": "71f757",
+      "tests": 8,
+      "failures": 0,
+      "controls": 4,
+      "accepted": true
+    },
+    "cases": 8,
+    "beforeFailures": 4,
+    "afterFailures": 0
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-flip-timezone-20261104-132030/candidate-debug-1.160.apk",
+      "bytes": 46745646,
+      "sha256": "8406ae2c6608584c5d03c572c76067df8c4d7f791962ba621e57cc3f53a8c43b",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='154' versionName='1.160' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 70273,
+          "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "performance": {
+      "path": "/private/tmp/portal-flip-timezone-20261104-132030/candidate-performance-1.160.apk",
+      "bytes": 25886923,
+      "sha256": "9a7fa0177937241d1709115479a4aa65b605f0a41021cb29e0f80b5175b75af9",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='154' versionName='1.160' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 70273,
+          "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "jvm": {
+      "tests": 4513,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 471
+    },
+    "gradleExit": 0
+  },
+  "installed": {
+    "family": {
+      "bytes": 25886923,
+      "sha256": "9a7fa0177937241d1709115479a4aa65b605f0a41021cb29e0f80b5175b75af9",
+      "app": {
+        "versionCode": 154,
+        "versionName": "1.160"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886923,
+        "sha256": "9a7fa0177937241d1709115479a4aa65b605f0a41021cb29e0f80b5175b75af9",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 154,
+          "versionName": "1.160"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1622,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1981,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "rootReview": {
+    "ok": true,
+    "rootFullyReadIndependentReview": true,
+    "rootFullReadTool": "baa7a9",
+    "combinedBindingsExact": 44,
+    "independentReviewSha256": "031dcab2f340d737d3c7a42f3bcb67c69a9c162769785146dfb00bc275e51648",
+    "jvmAggregateExact": true,
+    "allTenSourceAssetsExact": true,
+    "beforePromotion": true,
+    "verifiedAt": "2026-11-04T13:32:44.077947+00:00"
+  },
+  "excludedJvmFixturePrecondition": {
+    "excluded": true,
+    "terminal": {
+      "exitCode": 1,
+      "session": 63937,
+      "tool": "b76521"
+    },
+    "reason": "Four existing lifecycle fixtures seed UTC formatter but leave process timezone at host default; intended refresh exposes fixture precondition mismatch. No native baseline or production gate changed.",
+    "preserved": [
+      "gradle.log",
+      "SplitFlapClockRevealTest.before.kt",
+      "test-results/"
+    ],
+    "repair": "Set process defaultUTC and restore in finally around existing fixture. Every expected literal/assertion and source-native Java/DEX/driver stays unchanged.",
+    "bindings": {
+      "/private/tmp/portal-flip-timezone-20261104-132030/excluded-jvm-fixture-default/gradle.log": {
+        "sha256": "ee81deeeca6959c70667ab80728f447dad80168fd7b84ce0859112ed048e0430",
+        "bytes": 14366
+      },
+      "/private/tmp/portal-flip-timezone-20261104-132030/excluded-jvm-fixture-default/SplitFlapClockRevealTest.before.kt": {
+        "sha256": "60595be33323b57c706760c764da4c5cb8e27f589f0bf7a6f270c8790d291b9d",
+        "bytes": 4762
+      }
+    }
+  },
+  "queue": {
+    "tasks": 154,
+    "counts": {
+      "delivered": 102,
+      "verified": 42,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "all153OldObjectsPreserved": true,
+    "oldRawSuffixByteExact": true,
+    "rawSuffixBytes": 496710,
+    "rawSuffixSha256": "8ad21a0923bb51365b752e8c7b650268744a55aaf269b3c3fbb24761392eb704",
+    "defaultTaskPreserved": true
+  },
+  "originalIssueClock": {
+    "originalDiscoveryAt": "2026-11-04T13:20:30Z",
+    "firstSourceWitnessAt": "2026-11-04T13:21:04Z",
+    "selectedAt": "2026-11-04T13:26:18.209624+00:00",
+    "target": "2026-11-04T13:35:30Z",
+    "hardDeadline": "2026-11-04T13:50:30Z",
+    "clockNotReset": true
+  },
+  "collectedAt": "2026-11-04T13:33:35.043029+00:00",
+  "wholeProductGoal": "active",
+  "limits": [
+    "Actual detached debug constructor, active first resumed update and inactive reveal on Family API29 with supplied fixed dates and process-local timezone transitions. Inactive/disposed guards remain.",
+    "No attached drawing, animation phase, hardware performance, optimized runtime, API28, Living visual, system timezone-setting or concurrent-default acceptance. Broader motion and parked Night scopes remain open.",
+    "All ten screensaver web assets match source and installed1.159 byte-for-byte. No new JavaScript-run claim.",
+    "Saved Shuffle/fit and household preferences remain. Public1.83/code77 unchanged; no phone, household media/provider/account operations, GitHub push or publication."
+  ],
+  "closedClock": {
+    "originalDiscoveryAt": "2026-11-04T13:20:30Z",
+    "firstSourceWitnessAt": "2026-11-04T13:21:04Z",
+    "selectedAt": "2026-11-04T13:26:18.209624+00:00",
+    "target": "2026-11-04T13:35:30Z",
+    "hardDeadline": "2026-11-04T13:50:30Z",
+    "clockNotReset": true,
+    "closedAt": "2026-11-04T13:34:08.634213+00:00",
+    "minutesFromOriginal": 13.643903550000001,
+    "minutesFromSelection": 7.840409816666667,
+    "targetMet": true,
+    "hardLimitMet": true,
+    "status": "delivered",
+    "wholeProductGoal": "active"
+  },
+  "docs": {
+    "exitCode": 0,
+    "session": 70522,
+    "tool": "a7d26d",
+    "strict": true
+  }
+}
