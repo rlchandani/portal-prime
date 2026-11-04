@@ -1,0 +1,624 @@
+{
+  "recordedAt": "2026-11-04T07:07:28.561976+00:00",
+  "base": "bfe8a96151daea869f1e8f4a8e4d5eea43552f34",
+  "scope": "Active Home playback subscription and queued UI dispatch freshness only",
+  "issueClock": {
+    "startedAt": "2026-11-04T06:55:22Z",
+    "deadline": "2026-11-04T07:25:22Z",
+    "reset": false
+  },
+  "baseline": {
+    "qualification": "Primary RED is retained actual Gradle red.xml/log. Coordinator attempted baseline compiled-class freeze at pre-AGP path and produced an empty directory; excluded as setup correction. This independent RED compiles ONLY frozen baseline equivalent production factory against actual current Gradle runtime and current unchanged hub/state. It does not execute original Home Compose or claim pre-GREEN archived class bytes.",
+    "tests": 10,
+    "assertionFailures": 5,
+    "controls": 5,
+    "errors": 0,
+    "skipped": 0,
+    "gradleExit": 1
+  },
+  "candidate": {
+    "focusedTests": 10,
+    "focusedFailures": 0,
+    "focusedGradleExit": 0,
+    "unchangedTestsSha256": "52a6989e056d0058c8914e266429d020e6d6777b5cdb2943e59a3ce4d3a7436c",
+    "recordedAt": "2026-11-04T07:06:22.509509+00:00",
+    "apks": [
+      {
+        "variant": "debug",
+        "bytes": 51373681,
+        "sha256": "8a44e52f9eb0a6ac5fe64c2cfe7ea3f75c74e0f68cdfdf2d1ebeec21ae467a96",
+        "manifest": "package: name='com.immortal.launcher.debug' versionCode='127' versionName='1.133' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "screensaverAssets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "bytes": 65010,
+            "sha256": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "bytes": 14106,
+            "sha256": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994"
+          }
+        ],
+        "installed": false,
+        "retainedPrivateArtifact": "/private/tmp/portal-product-discovery-20261104-065522/candidate-debug-local-unpromoted.apk"
+      },
+      {
+        "variant": "performance",
+        "bytes": 25884988,
+        "sha256": "e362a7b57cd7a259324c6546d09c5847d98117ba00d75b6de0eb10dba02e7b3e",
+        "manifest": "package: name='com.immortal.launcher.debug' versionCode='127' versionName='1.133' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "screensaverAssets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "bytes": 65010,
+            "sha256": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "bytes": 14106,
+            "sha256": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994"
+          }
+        ],
+        "installed": false,
+        "retainedPrivateArtifact": "/private/tmp/portal-product-discovery-20261104-065522/candidate-performance-local-unpromoted.apk"
+      }
+    ],
+    "jvm": {
+      "tests": 4402,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 460
+    },
+    "fullGradleExit": 0,
+    "buildSeconds": 108,
+    "builds": [
+      "debug",
+      "performance/R8",
+      "vital lint"
+    ],
+    "versionBumped": false,
+    "deviceActions": 0
+  },
+  "independentReview": {
+    "report": "mocks/portal-home-playback-20261104/evidence/media-listener-review.json.gz",
+    "sourceBlockers": [],
+    "candidatePasses": 10,
+    "baselineFailures": 5,
+    "baselineControls": 5,
+    "baselineRecompiledFrozenEquivalentFactory": true,
+    "candidateEffectiveRuntimeJar": true,
+    "nativeComposeExecuted": false
+  },
+  "archives": [
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/start.json.gz",
+        "bytes": 237,
+        "sha256": "0f0b11266288daced8e813f45ceabb093c44ecb9c518e5c31696f0adae3e902c"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/start.json",
+        "bytes": 303,
+        "sha256": "889e7ce76b7e0ff0af01c719001c756def437007ff114817d2a7725b740ea716"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/plan.json.gz",
+        "bytes": 1058,
+        "sha256": "7de40b324b11e258c528f8a4edeee838cf97ce78df8ca27c5bd0abbb8c7dd60a"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/plan.json",
+        "bytes": 2036,
+        "sha256": "4d6936ebc0bd39c7292c247d3e46dbdff0040b130d736c909f49d9729cac7e28"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/baseline-bindings.json.gz",
+        "bytes": 300,
+        "sha256": "3b04c2f29809bff9b3c652cd1d1b2ca68fc45e4fdb920470d7000dedc73d0e61"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/baseline-bindings.json",
+        "bytes": 567,
+        "sha256": "7607c9b83c35ed62a67331383b899777a85f77f748aa00621a61ce1bbf3de37f"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/red.log.gz",
+        "bytes": 1258,
+        "sha256": "6cfd3cebc9248866a49c2343b43651f3168f56dcb7b70d2f818455908bee006a"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/red.log",
+        "bytes": 4108,
+        "sha256": "4640cb1a793f55cf2d8982c39f278c2e91ef55c44e44e40b71142cddaf85708c"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/green.log.gz",
+        "bytes": 691,
+        "sha256": "e84802ba8819552204ade8e595eaa66ffa8f299e6324e100f35c0db3bc92bf5e"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/green.log",
+        "bytes": 1991,
+        "sha256": "b2838b25d7e219c11ea1b9c5257747f7c8adacf80e888094d04fc83d7e10c53f"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/full-gates.log.gz",
+        "bytes": 1481,
+        "sha256": "25df05eea65eba548f79b7e0b62f434936dd8fc10ebf4242f16be1ccb984aef6"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/full-gates.log",
+        "bytes": 6663,
+        "sha256": "b4a3aebaf867ddd86bf2b8f368b5b3b2aa0c383f721e7de81428b81f85abcf8e"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/red.xml.gz",
+        "bytes": 2160,
+        "sha256": "967a71ad1f2c8b804b00521b1e368217fbeab87708784eb966e94968c2c788d9"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/red.xml",
+        "bytes": 30662,
+        "sha256": "6a4a16188a8548a2813740f9957b2387417be0b45408a7d2fd8a0371d4c06b7c"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/green.xml.gz",
+        "bytes": 825,
+        "sha256": "769d35ad69d1df5613b774f4beea361c139ad71ff5f82bee505f64a5f85037bc"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/green.xml",
+        "bytes": 2236,
+        "sha256": "a051f501fd1da4dba4472d75e99b5ee8813e2c9ed1bab92a3451eddec57b766e"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/host-gates.json.gz",
+        "bytes": 1109,
+        "sha256": "6921547bab24648d178fc2d8f92d3bfdf135ced9e3ea66fc7fdb7a80466e117c"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/host-gates.json",
+        "bytes": 4740,
+        "sha256": "9bab27a3dfe6f36c89fa3064eb7210efe51621a08463fedb89570e9466da2028"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/roadmap-preservation.json.gz",
+        "bytes": 239,
+        "sha256": "f2cfd14ddef7cadda4d50dfa15994cc879d6c52b701294fe73a250b310568c58"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/roadmap-preservation.json",
+        "bytes": 335,
+        "sha256": "27195830836d4c0b1555562d9d947c60ce34a95453e1ef1c743bde9b10041bce"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/media-source-discovery.json.gz",
+        "bytes": 4935,
+        "sha256": "0f530141fe7a2b8ddbb2911cf803ead80e0a173fee373623d947c55ed8246b98"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/media-source-discovery.json",
+        "bytes": 14348,
+        "sha256": "c4e2d6331103748c78ae9fe7dc7d407337d99de41f2a03645e8ee2af57739ad5"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/startup-source-discovery.json.gz",
+        "bytes": 4698,
+        "sha256": "c5d8d9fca937f766fa10faf379b293e060dc166bf8c2f7c728cd26c05311e279"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/startup-source-discovery.json",
+        "bytes": 12593,
+        "sha256": "efe9f2bca6be28b82d3a26c49eaea53cb0ef3b6c38129602c3bdcba93a287ad4"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/toolkit-source-discovery.json.gz",
+        "bytes": 5921,
+        "sha256": "78c91a59d5cbf17e8fc7ac45f525055a5107b49fd55e7fcc6f6d2643732cb34d"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/toolkit-source-discovery.json",
+        "bytes": 21740,
+        "sha256": "9e167fe78dec5b518ad48d0a899335106e7c0233dd7342b2f126103334b83775"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/media-listener-review.json.gz",
+        "bytes": 33868,
+        "sha256": "af4d985696efc4fd9ccb5052a9fbc6fdac9b1acc9e1845faf569326609ff0067"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/media-listener-review.json",
+        "bytes": 248927,
+        "sha256": "61be9892fa447ae06d296f84fee13f6f8e24de257ff3f3ed62fa29f5725a9db7"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/full-suite-summary.json.gz",
+        "bytes": 28760,
+        "sha256": "898264dcf3fc4be74e34d406a7181478a4209b17d6b794dae830d603acc9943a"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/full-suite-summary.json",
+        "bytes": 173938,
+        "sha256": "8f5f64d51409eed6cb0b9cd3e9dc12dae7d6de7b4f58d756317586716494cfbc"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/original-HomeActivity.kt.gz",
+        "bytes": 56431,
+        "sha256": "503992e66c744911e1792f74efa2c7a049db1fe620686c00a538a948dae3c082"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/original/HomeActivity.kt",
+        "bytes": 229896,
+        "sha256": "c1cdfac9b2662a021c722926b96221060990518e138ebdaed21f09650093df2b"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/original-NowPlayingHub.kt.gz",
+        "bytes": 1020,
+        "sha256": "68ed9d8def819fbc10668ca31f1aab79217cee630a402d1969f842e3f563c90a"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/original/NowPlayingHub.kt",
+        "bytes": 2140,
+        "sha256": "1dc20635fad282aa641539d4b1f3cd7632849a7d48020e26c15938e9707b6058"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/original-NowPlaying.kt.gz",
+        "bytes": 942,
+        "sha256": "a255cf1d63459a61250c03214918dc16847cfc53e0d1440608d2676c5a7b8b02"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/original/NowPlaying.kt",
+        "bytes": 1961,
+        "sha256": "0d26e29a4f13d3b1e2e552d1b5d3484b82405f0fe7aae238dc5f35e73830830d"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/baseline-HomeNowPlayingListener.kt.gz",
+        "bytes": 324,
+        "sha256": "f6aa4dde4ef9dcaa8025a9674955d21540ef0f7fa86484c9aa438952944b5894"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/baseline/HomeNowPlayingListener.kt",
+        "bytes": 499,
+        "sha256": "dfba92b43f9e4ec1e5b8bda422235828c8df66c8e42e86e5d8cf9712dd23fcea"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/baseline-HomeNowPlayingListenerTest.kt.gz",
+        "bytes": 1625,
+        "sha256": "e8b4a1a9623185ccfed601fc241e1e59e78f198604503b7ec3465789f575c2d3"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/baseline/HomeNowPlayingListenerTest.kt",
+        "bytes": 5242,
+        "sha256": "52a6989e056d0058c8914e266429d020e6d6777b5cdb2943e59a3ce4d3a7436c"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/docs-build.log.gz",
+        "bytes": 5059,
+        "sha256": "7118084b60c525782f99b536f48bf85c3fa51dd44077c95efbf3e9f8b35ef783"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/docs-build.log",
+        "bytes": 33526,
+        "sha256": "46d09e39dbf2b242401f7361e82959399aaa54f957096fcc7324b199d11c61af"
+      },
+      "encoding": "gzip, original bytes exact"
+    },
+    {
+      "archive": {
+        "path": "mocks/portal-home-playback-20261104/evidence/browser-check.json.gz",
+        "bytes": 202,
+        "sha256": "4801c22de2ab1598f7fc0137be3c38f150f512dc778f5435e5a01e0acd728e67"
+      },
+      "original": {
+        "path": "/private/tmp/portal-product-discovery-20261104-065522/browser-check.json",
+        "bytes": 278,
+        "sha256": "11fdf87a1023c855d20cced842b94dbd3c218185293d9e85f1bb5c890e1c4b37"
+      },
+      "encoding": "gzip, original bytes exact"
+    }
+  ],
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+      "bytes": 229887,
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f"
+    },
+    {
+      "path": "app/src/main/java/com/immortal/launcher/HomeNowPlayingListener.kt",
+      "bytes": 589,
+      "sha256": "dad91c746a8a9960a41597720e26d560cfcb36bf7472baff3bc88d0e686d650f"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/HomeNowPlayingListenerTest.kt",
+      "bytes": 5242,
+      "sha256": "52a6989e056d0058c8914e266429d020e6d6777b5cdb2943e59a3ce4d3a7436c"
+    },
+    {
+      "path": "app/src/main/java/com/immortal/launcher/NowPlayingHub.kt",
+      "bytes": 2140,
+      "sha256": "1dc20635fad282aa641539d4b1f3cd7632849a7d48020e26c15938e9707b6058"
+    },
+    {
+      "path": "app/src/main/java/com/immortal/launcher/NowPlaying.kt",
+      "bytes": 1961,
+      "sha256": "0d26e29a4f13d3b1e2e552d1b5d3484b82405f0fe7aae238dc5f35e73830830d"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 14377,
+      "sha256": "b30f6e5fa78c6b4b6f4688a2ff68133edcf39fb96b730a78b1b65e80e2db6969"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "8fd31b1855a4c7920f55c5e9cc96b58f559be35c352de0c5acda2a15f110ee42"
+    },
+    {
+      "path": "version.json",
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    }
+  ],
+  "roadmap": {
+    "oldTasksExact": 124,
+    "oldRawSuffixBytes": 418403,
+    "oldRawSuffixSha256": "9cce820ba498bdafb590084d21a7e8bd9b24c562133b861bba7ae890104c5d63",
+    "defaultTaskPreserved": "weather-native-layout",
+    "counts": {
+      "verified": 40,
+      "delivered": 75,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "newTaskCount": 125
+  },
+  "documentation": {
+    "strictMkDocsExit": 0,
+    "warningCount": 0,
+    "receipt": {
+      "path": "docs/portal-home-playback-freshness-2026-11-04.md",
+      "bytes": 4245,
+      "sha256": "38a813af40baedd3a07444839ae262fcd94c560542af88d5a9e167c702f6280e"
+    }
+  },
+  "browser": {
+    "mobile": {
+      "documentWidth": 391,
+      "height": 1799.3984375,
+      "viewportWidth": 390,
+      "width": 343,
+      "x": 16,
+      "y": 20.015625
+    },
+    "logs": [],
+    "scope": "New task detail and latest note only; full document overflow and all historical tasks not accepted",
+    "desktopViewport": {
+      "width": 1600,
+      "height": 1000
+    },
+    "mobileViewport": {
+      "width": 390,
+      "height": 844
+    },
+    "desktopImage": {
+      "path": "mocks/portal-widget-gallery-20261102/evidence/home-playback-freshness-desktop.png",
+      "bytes": 142033,
+      "sha256": "6d099dfdc1230e22457c934405b1bc472be19dbd5d2ff1e6f3c2242536595b20"
+    },
+    "mobileImage": {
+      "path": "mocks/portal-widget-gallery-20261102/evidence/home-playback-freshness-mobile.png",
+      "bytes": 44251,
+      "sha256": "489ae0e4ffab5bc1300df671d51825702748f43522910718d7ed5f436b814f96"
+    },
+    "imagesInspected": true,
+    "latestNoteVerified": true,
+    "mobileDocumentOnePixelWider": true
+  },
+  "cleanup": {
+    "ownedPreviewTabClosed": true,
+    "viewportReset": true,
+    "ownedServerRetired": true,
+    "ownedDocsEnvironmentRemoved": true,
+    "ownedGeneratedSiteRemoved": true,
+    "retainedPrivateCandidateArtifacts": true,
+    "preexistingPycache": "untouched; not staged",
+    "deviceOrCredentialScratchCreated": false
+  },
+  "release": {
+    "versionBumped": false,
+    "installed": false,
+    "published": false,
+    "roomDeliveryRetained": "1.133/code127",
+    "publicManifestRetained": "1.83/code77",
+    "candidateUsesUnchangedVersionMetadata": true
+  },
+  "unselectedDiscovery": {
+    "startup": "No distinct admitted repair; prior startup/chooser clocks retained",
+    "toolkitStorage": "Source-only representability observation; no test/fix/native proof and no fresh clock"
+  },
+  "limits": [
+    "Generated JVM values and controlled queue only. Original Compose function, rendered pixels and real Handler/Looper are not executed.",
+    "The independent baseline factory is recompiled frozen extraction, not a preserved original compiled Home function.",
+    "No full build task, shared Gradle invocation, source/test edits, device/browser/network/credential or publication actions by reviewer.",
+    "No optimized/native/audio/provider/performance or whole-product acceptance.",
+    "All original clocks, metadata dedupe and playback/auth/HA/phone holds remain.",
+    "Android Handler refusal and pending callback work after disposal remain unverified.",
+    "No native, live playback, runtime performance, optimized execution, device installation or whole-product completion claim."
+  ],
+  "protectedFilesExactToBase": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 14377,
+      "sha256": "b30f6e5fa78c6b4b6f4688a2ff68133edcf39fb96b730a78b1b65e80e2db6969"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "8fd31b1855a4c7920f55c5e9cc96b58f559be35c352de0c5acda2a15f110ee42"
+    },
+    {
+      "path": "version.json",
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    },
+    {
+      "path": "catalog.json",
+      "bytes": 24043,
+      "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+    },
+    {
+      "path": "app/src/main/java/com/immortal/launcher/NowPlayingHub.kt",
+      "bytes": 2140,
+      "sha256": "1dc20635fad282aa641539d4b1f3cd7632849a7d48020e26c15938e9707b6058"
+    },
+    {
+      "path": "app/src/main/java/com/immortal/launcher/NowPlaying.kt",
+      "bytes": 1961,
+      "sha256": "0d26e29a4f13d3b1e2e552d1b5d3484b82405f0fe7aae238dc5f35e73830830d"
+    },
+    {
+      "path": "app/src/main/java/com/immortal/launcher/FaceRenderer.kt",
+      "bytes": 39413,
+      "sha256": "9f62b1b197bbd9afce67158bb77c8e6b27eaebd8d9140530280227f6fe1b8183"
+    }
+  ],
+  "setupCorrectionsExcluded": [
+    "Original class archive used obsolete AGP directory and copied zero files; independent baseline recompiled frozen equivalent factory.",
+    "First proof writer attempted Git HEAD comparison for ignored provisioning/fleetctl; no proof written by failed writer. Binary excluded from tracked preservation assertion."
+  ]
+}

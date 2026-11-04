@@ -2094,7 +2094,7 @@ private fun ApprovedHomeHeaderPlayer(modifier: Modifier = Modifier, onOpenMusic:
   var state by remember { mutableStateOf(NowPlayingHub.current) }
   val mainHandler = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
   DisposableEffect(Unit) {
-    val listener = NowPlayingHub.Listener { update -> mainHandler.post { state = update } }
+    val listener = homeNowPlayingListener({ mainHandler.post(it) }) { state = it }
     NowPlayingHub.addListener(listener)
     onDispose { NowPlayingHub.removeListener(listener) }
   }

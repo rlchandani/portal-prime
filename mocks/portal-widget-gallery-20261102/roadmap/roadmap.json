@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T06:47:27.679795Z",
-  "updatedLabel": "Toolkit RAM parser: locally verified; room 1.133 retained",
+  "updatedAt": "2026-11-04T07:07:04.723937Z",
+  "updatedLabel": "Home playback freshness: locally verified; room 1.133 retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,51 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "home-playback-freshness",
+      "title": "Home mini-player: keep the latest playback state",
+      "summary": "Delayed replay and worker callbacks no longer restore an old track after replacement, pause or clearing.",
+      "description": "Read the shared current playback snapshot when queued Home UI work executes, following the existing screensaver pattern.",
+      "status": "verified",
+      "verification": "4,402 JVM · 10 replay cases · both builds",
+      "kind": "Playback presentation reliability",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent callback replay",
+      "deployment": "Local source and signed debug/optimized artifacts only. Existing room 1.133/code127 remains; candidate uses unchanged version metadata and is not a promoted release.",
+      "state": "No device, phone, provider, media-session, credential, account, push or publication action. Hub, transport, settings and slideshow assets remain exact.",
+      "acceptance": [
+        "Late initial replay cannot restore a cleared or replaced track.",
+        "Late worker publication cannot overwrite the newer state.",
+        "Queued work reads the latest playing or paused snapshot.",
+        "Keep deferred rendering, playing/paused replay, inactive/null clearing and unregister behavior.",
+        "Pass the same ten actual factory/hub cases against baseline and candidate."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, full host gates and acceptance limits.",
+          "source": "docs/portal-home-playback-freshness-2026-11-04.md"
+        },
+        {
+          "text": "Frozen baseline, independent replay and byte preservation.",
+          "source": "mocks/portal-widget-gallery-20261102/evidence/home-playback-freshness-verification.json"
+        }
+      ],
+      "limits": [
+        "Generated tracks and controlled JVM queues; physical Home pixels and Android Handler scheduling remain open.",
+        "Baseline is an equivalent extracted callback, not original Compose execution.",
+        "Pending work after disposal, Handler refusal, real session and transport acceptance remain open.",
+        "No device installation, native/optimized execution, runtime performance, hosted CI or publication claim.",
+        "Earlier metadata, startup, playback, phone and other issue clocks remain."
+      ],
+      "next": "Retain the local verified correction; native acceptance and versioned room promotion remain separate.",
+      "issueClock": {
+        "startedAt": "2026-11-04T06:55:22Z",
+        "deadline": "2026-11-04T07:25:22Z",
+        "scope": "Discovery, fixture, implementation, gates, review, documentation, cleanup and commit; no reset."
+      }
+    },
     {
       "id": "toolkit-memory-validity",
       "title": "Toolkit RAM: reject negative and overflowing values",
