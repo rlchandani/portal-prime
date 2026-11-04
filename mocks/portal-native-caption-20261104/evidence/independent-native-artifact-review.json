@@ -1,0 +1,346 @@
+{
+  "ok": true,
+  "reviewedAtUtc": "2026-11-04T11:59:40.335253+00:00",
+  "blockers": [],
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T11:49:44Z",
+    "selectedAt": "2026-11-04T11:52:51Z",
+    "target": "2026-11-04T12:04:44Z",
+    "hardDeadline": "2026-11-04T12:19:44Z",
+    "notReset": true
+  },
+  "independence": "Independent source review of PHOTO-authored native fixture and host replay of retained root native reports/ZIP/artifact files. Authored JVM tests are hash/output provenance only, not independently reviewed or rerun. No build/SDK/Git/device/network/owner registry/media/prefs command was run. Only this private receipt written.",
+  "sourceScope": {
+    "actualEmbeddedClassOriginChecks": [
+      "PhotoFrameController",
+      "FaceRenderer",
+      "SlideshowStage",
+      "SlideshowPhoto",
+      "SlideshowPixelBudget",
+      "SlideshowViewerControls"
+    ],
+    "actualPrivateMethod": "presentNative(List,boolean)",
+    "actualSetter": "FaceRenderer.setCaption(String,String,String)",
+    "controllerRendererConstructorFree": true,
+    "controllerContextNotInjected": true,
+    "realOwnedInactiveStageControls": true,
+    "realDetachedCaptionViewsObserved": true,
+    "generatedBitmap": "64x48 owned solid bitmap",
+    "captionObservedWhen": "Immediately after presentNative returns; synchronous hide by admission return. This native probe does not instrument ordering before stage.show.",
+    "freshControl": "Direct actual setter only; publishCaption and actual EXIF/geocode/Main delivery never invoked.",
+    "containment": "Preference/resolver/service counters instrument requests reaching the supplied fixture-owned resource ContextWrapper only. Constructor/worker/publication zeros are source containment constants, not independent class-loader instrumentation or global OS-operation counters.",
+    "hostResourceContext": "Generated owned Android views use fixture Activity resources through a denying wrapper; no installed launcher/owner Context passed.",
+    "retirement": "Actual Stage.stop, controls.stop and work.stop plus checked zero budget; generated bitmap recycled afterward. Partially initialized controller/renderer stop deliberately not invoked.",
+    "permissionEvidence": "Source no uses-permission; retained compiled zero-permission dump; unchanged wrapper manifest and both runtime internetPermission=false."
+  },
+  "nativeReplay": {
+    "before": {
+      "tests": 5,
+      "failures": 2,
+      "failedNames": [
+        "oldPlaceDateMemoryClearedImmediately",
+        "oldDateOnlyClearedForManualPresentation"
+      ],
+      "passNames": [
+        "photosOnlyDoesNotInitializeRenderer",
+        "stoppedPresentationLeavesCaptionAndStage",
+        "actualSetCaptionRepopulatesGeneratedDate"
+      ],
+      "immediateCaptionVisibilities": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "photoCounts": [
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "rendererLazyGets": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ],
+      "retiredSetups": 5,
+      "wrapperPreferenceResolverServiceRequests": [
+        0,
+        0,
+        0
+      ]
+    },
+    "after": {
+      "tests": 5,
+      "failures": 0,
+      "failedNames": [],
+      "passNames": [
+        "oldPlaceDateMemoryClearedImmediately",
+        "oldDateOnlyClearedForManualPresentation",
+        "photosOnlyDoesNotInitializeRenderer",
+        "stoppedPresentationLeavesCaptionAndStage",
+        "actualSetCaptionRepopulatesGeneratedDate"
+      ],
+      "immediateCaptionVisibilities": [
+        8,
+        8,
+        0,
+        0,
+        8
+      ],
+      "photoCounts": [
+        1,
+        1,
+        1,
+        0,
+        1
+      ],
+      "rendererLazyGets": [
+        2,
+        2,
+        0,
+        0,
+        2
+      ],
+      "retiredSetups": 5,
+      "wrapperPreferenceResolverServiceRequests": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "sameGatesInputsJavaDexDriver": true,
+  "stoppedAndPhotosOnlyCaseReportsExactBeforeAfter": true,
+  "retirement": {
+    "before": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    },
+    "after": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    }
+  },
+  "wrapperZip": {
+    "sameEntrySet": true,
+    "changedEntries": [
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/MANIFEST.MF",
+      "assets/source.apk"
+    ],
+    "frozenDexByteIdentical": true,
+    "eachEmbeddedApkByteExact": true,
+    "manifestByteIdentical": true
+  },
+  "productionBound": {
+    "singleAddedCaptionClearAfterStoppedGuardBeforeStage": true,
+    "otherFourSourceBindingsUnchanged": true
+  },
+  "artifacts": {
+    "versionName": "1.154",
+    "versionCode": 148,
+    "debug": {
+      "sha256": "4a2822189560e841daa9243af2ba8549d1df37d1a25541e7f78fbb338be2fb42",
+      "bytes": 46745294,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "sha256": "ff67a819bea0a13a1931191d8e8a89c92eafe5793930342d66df442cb6020473",
+      "bytes": 25886647,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "sameSigner": "Exact retained root apksigner/manifest gate; no SDK/signature-verifier rerun by reviewer.",
+    "allTenAssetsExactToPriorAndCurrentSource": true,
+    "retainedRootJvm": {
+      "tests": 4499,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 469
+    },
+    "retainedBuildExit": 0,
+    "authoredFocusedOutputProvenanceOnly": {
+      "baseline-focused-tests.xml": {
+        "tests": 8,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0
+      },
+      "candidate-focused-tests.xml": {
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "excludedSetupAttempts": "Root retained v1/v2 adapter failures and frozen files; final v3 is byte-identical to current authored JVM test. No excluded setup output is counted as product RED."
+  },
+  "limits": [
+    "Native proof is five selected generated cases on actual debug code/API29 with detached owned views and inactive Stage, not mounted Dream/Compose UI or visual pixel proof.",
+    "Native immediate visibility verifies hide by method return, not measured before-stage ordering.",
+    "No actual metadata queue/publication, EXIF/geocode, owner/media/provider/account/preferences, optimized runtime, API28, physical photo swap, room UI, clock/scheduler or performance claim.",
+    "Room promotion remains coordinator-owned; no room execution or promotion result is claimed here."
+  ],
+  "bindings": {
+    "native-owned/NativeCaptionActivity.java": {
+      "sha256": "a6c0270d0eb60831f016cf1ab2ab1deacf7aaebb6f927177df457e656d441a5a",
+      "bytes": 14875
+    },
+    "native-owned/AndroidManifest.xml": {
+      "sha256": "0d15a1b96ddb5a7be4395fb18594db8592717fb66cc3ee6b00d8cfb19cca40ad",
+      "bytes": 428
+    },
+    "native-owned/build.sh": {
+      "sha256": "fc4b89f1e26d505df4a4e2fadf0ae827c464d10f9a06ad4fd8271de81f1d5f1f",
+      "bytes": 832
+    },
+    "native-owned/repack.sh": {
+      "sha256": "f0e2c5c9ca3967e49f2a4f5af6fcbc4dd20d6f7eefc8b14d3fb8b53e2d6c8907",
+      "bytes": 785
+    },
+    "native-owned/RUN.md": {
+      "sha256": "48c5cc093aa9bc4ce4a6917def4c26748be38f9f97559b50fe0906f69888ac3c",
+      "bytes": 1961
+    },
+    "native-owned/freeze.py": {
+      "sha256": "2e2c26b42f460806cc7ca6ed58703711cb2224112d6e5b369951ef945810405a",
+      "bytes": 1785
+    },
+    "native-owned/source-admission.json": {
+      "sha256": "525bf4ae072e590a5269728a5fc78d4c60dcfac9dc7dc29db2c30cf0280e9207",
+      "bytes": 3224
+    },
+    "native-owned/preparation-verification.json": {
+      "sha256": "1c20f2f67b0947c4f52260c763746e657bac94f2d0bec59397038eff6ffebfd9",
+      "bytes": 4400
+    },
+    "native-owned/frozen-dex/classes.dex": {
+      "sha256": "39ab4c61d3a9944c7ab5feee08837c13076d80c6d905823cf9d48b0906520460",
+      "bytes": 24572
+    },
+    "native-owned/baseline-fixture.apk": {
+      "sha256": "6e3a2bd695faf5d145a82af3f011f972037d63fafa7f7efeda10f2df1de0d3d0",
+      "bytes": 37507562
+    },
+    "native-owned/native-caption-fixture.apk": {
+      "sha256": "bdc8cad076ff58eb60cf8bef5c603c0c684d0befaef63408cd5be8304044b909",
+      "bytes": 37507562
+    },
+    "native-run.py": {
+      "sha256": "43ddfc9947caef2e8866169dfce3f0234690f49bbce4964c244fa27fc5eac8ec",
+      "bytes": 5849
+    },
+    "native-before-report.json": {
+      "sha256": "42519ab3337271d04edd7eecc73a07a225d862f01475d9bd0c2fad28c5283d6c",
+      "bytes": 5035
+    },
+    "native-after-report.json": {
+      "sha256": "7b28c4bf421bc115418df4bfbde14fc12e29331a5dba637ba01d560fec040c77",
+      "bytes": 4878
+    },
+    "native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "native-before-terminal.json": {
+      "sha256": "982b9e9bfb10ffe83cad665807abcfd3fa97b37822db5ab7831157a499548a9e",
+      "bytes": 16
+    },
+    "native-after-terminal.json": {
+      "sha256": "982b9e9bfb10ffe83cad665807abcfd3fa97b37822db5ab7831157a499548a9e",
+      "bytes": 16
+    },
+    "native-build-terminal.json": {
+      "sha256": "982b9e9bfb10ffe83cad665807abcfd3fa97b37822db5ab7831157a499548a9e",
+      "bytes": 16
+    },
+    "baseline-debug-1.153.apk": {
+      "sha256": "ad661c0643368342e1ea6c28a05d4003ac4566442bd7fe79d9aaf47046594938",
+      "bytes": 46745298
+    },
+    "candidate-debug-1.154.apk": {
+      "sha256": "4a2822189560e841daa9243af2ba8549d1df37d1a25541e7f78fbb338be2fb42",
+      "bytes": 46745294
+    },
+    "candidate-performance-1.154.apk": {
+      "sha256": "ff67a819bea0a13a1931191d8e8a89c92eafe5793930342d66df442cb6020473",
+      "bytes": 25886647
+    },
+    "promotion-artifacts.json": {
+      "sha256": "d79cbd455045cf1597a41d8565835ceee9f4206120108d25bb48e7645874e01c",
+      "bytes": 4791
+    },
+    "build-terminal.json": {
+      "sha256": "110022edad8227a08e5f8a38fe511f31b349bc26f3a4ed7bc8929e8a216483d3",
+      "bytes": 66
+    },
+    "baseline-focused-tests.xml": {
+      "sha256": "b2055cdc59f8c64d1982dd83d22b799541b1d7f9e7b06239ea13a8cbed977d81",
+      "bytes": 27668
+    },
+    "candidate-focused-tests.xml": {
+      "sha256": "6753e9ed7b35be0263d561918de6977a842f5c40ef93e3bb58b63851e0e3df09",
+      "bytes": 2028
+    },
+    "NativeCaptionOwnershipTest.frozen.kt": {
+      "sha256": "68247686e6dee29d04c48b67bfde97dd18b7dfa5281b20a6c2883c12301dea2a",
+      "bytes": 8167
+    },
+    "NativeCaptionOwnershipTest.v2.frozen.kt": {
+      "sha256": "41a8afe3181ef8685880cdda0a5a147bc2b28dfcc4754a80011f34765ae34bc1",
+      "bytes": 8255
+    },
+    "NativeCaptionOwnershipTest.v3.frozen.kt": {
+      "sha256": "078e67b9c7c808fca0441b90c2c8b42bc0d405dc558ec80a4d78d750d21c75dd",
+      "bytes": 8339
+    },
+    "excluded-adapter-v1-baseline-focused-tests.xml": {
+      "sha256": "4018afb72986a912ef3e4d36da309016c6a91d6979a20b971d1681579c009c5f",
+      "bytes": 70345
+    },
+    "excluded-adapter-v2-baseline-focused-tests.xml": {
+      "sha256": "3216d6eeabb06d74a3b8a373382ea0b178238067ef5e721ee71d38b277289f61",
+      "bytes": 33222
+    },
+    "functional-verification.json": {
+      "sha256": "76a02cca88a3ebac9d72a866806cb7d56cef45a9a571e5c6ca1a3c3184c9db82",
+      "bytes": 8456
+    },
+    "current production/PhotoFrameController.kt": {
+      "sha256": "5c9a072bf1aece603216b0d8a6b42a0fe0d692148bf1f0ab2f265bc171c1057e",
+      "bytes": 164828
+    },
+    "current production/FaceRenderer.kt": {
+      "sha256": "9f62b1b197bbd9afce67158bb77c8e6b27eaebd8d9140530280227f6fe1b8183",
+      "bytes": 39413
+    },
+    "current production/SlideshowStage.kt": {
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "current production/SlideshowViewerControls.kt": {
+      "sha256": "a7caf5f2f36b324e317ed271e922d4fb8fc01dfc42c135b9a296fc543898a001",
+      "bytes": 9009
+    },
+    "current production/FaceRendererWorkState.kt": {
+      "sha256": "848c613250d99678ac9bbd8b3caea88f2f4c32368ef012618a6f200d4c3340e5",
+      "bytes": 1378
+    },
+    "current authored JVM test (provenance only)": {
+      "sha256": "078e67b9c7c808fca0441b90c2c8b42bc0d405dc558ec80a4d78d750d21c75dd",
+      "bytes": 8339
+    }
+  }
+}

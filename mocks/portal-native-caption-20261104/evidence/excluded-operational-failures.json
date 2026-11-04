@@ -1,0 +1,13 @@
+{
+  "jvmAdapterV1": {
+    "cause": "Mocked Stage class initialization calls unmocked Android Color.rgb",
+    "evidence": "excluded-adapter-v1-baseline-focused-tests.xml",
+    "scope": "Not product failure evidence; scoped Color static mock added around fixture construction; same 8 acceptance gates retained",
+    "v2TestSha256": "41a8afe3181ef8685880cdda0a5a147bc2b28dfcc4754a80011f34765ae34bc1"
+  },
+  "jvmAdapterV2": {
+    "cause": "Actual presentNative Log.i is Android-only and unmocked",
+    "scope": "Not product failure; scoped Log mock added; same 8 gates retained",
+    "finalTestSha256": "078e67b9c7c808fca0441b90c2c8b42bc0d405dc558ec80a4d78d750d21c75dd"
+  }
+}

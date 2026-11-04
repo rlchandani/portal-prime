@@ -1,0 +1,129 @@
+{
+  "sourceReady": true,
+  "authoredAtUtc": "2026-11-04T11:54:49.855275+00:00",
+  "originalClock": "2026-11-04T11:49:44Z target12:04:44Z hard12:19:44Z selected11:52:51Z",
+  "package": "com.immortal.nativecaptionfixture",
+  "activity": ".NativeCaptionActivity",
+  "report": "external-files/report.json",
+  "sources": {
+    "NativeCaptionActivity.java": {
+      "sha256": "a6c0270d0eb60831f016cf1ab2ab1deacf7aaebb6f927177df457e656d441a5a",
+      "bytes": 14875
+    },
+    "AndroidManifest.xml": {
+      "sha256": "0d15a1b96ddb5a7be4395fb18594db8592717fb66cc3ee6b00d8cfb19cca40ad",
+      "bytes": 428
+    },
+    "build.sh": {
+      "sha256": "fc4b89f1e26d505df4a4e2fadf0ae827c464d10f9a06ad4fd8271de81f1d5f1f",
+      "bytes": 832
+    },
+    "repack.sh": {
+      "sha256": "f0e2c5c9ca3967e49f2a4f5af6fcbc4dd20d6f7eefc8b14d3fb8b53e2d6c8907",
+      "bytes": 785
+    },
+    "RUN.md": {
+      "sha256": "48c5cc093aa9bc4ce4a6917def4c26748be38f9f97559b50fe0906f69888ac3c",
+      "bytes": 1961
+    },
+    "freeze.py": {
+      "sha256": "2e2c26b42f460806cc7ca6ed58703711cb2224112d6e5b369951ef945810405a",
+      "bytes": 1785
+    },
+    "source-admission.json": {
+      "sha256": "525bf4ae072e590a5269728a5fc78d4c60dcfac9dc7dc29db2c30cf0280e9207",
+      "bytes": 3224
+    }
+  },
+  "caseNames": [
+    "oldPlaceDateMemoryClearedImmediately",
+    "oldDateOnlyClearedForManualPresentation",
+    "photosOnlyDoesNotInitializeRenderer",
+    "stoppedPresentationLeavesCaptionAndStage",
+    "actualSetCaptionRepopulatesGeneratedDate"
+  ],
+  "expectedBaselineFailNames": [
+    "oldPlaceDateMemoryClearedImmediately",
+    "oldDateOnlyClearedForManualPresentation"
+  ],
+  "expectedBaselineControlNames": [
+    "photosOnlyDoesNotInitializeRenderer",
+    "stoppedPresentationLeavesCaptionAndStage",
+    "actualSetCaptionRepopulatesGeneratedDate"
+  ],
+  "expectedCandidatePassNames": [
+    "oldPlaceDateMemoryClearedImmediately",
+    "oldDateOnlyClearedForManualPresentation",
+    "photosOnlyDoesNotInitializeRenderer",
+    "stoppedPresentationLeavesCaptionAndStage",
+    "actualSetCaptionRepopulatesGeneratedDate"
+  ],
+  "sourceBindings": {
+    "PhotoFrameController.kt": {
+      "sha256": "62e911e50c9cc534d9808a30d0b61a9fd26532818dda64b96059c794d88c064d",
+      "bytes": 164771
+    },
+    "FaceRenderer.kt": {
+      "sha256": "9f62b1b197bbd9afce67158bb77c8e6b27eaebd8d9140530280227f6fe1b8183",
+      "bytes": 39413
+    },
+    "SlideshowStage.kt": {
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "SlideshowViewerControls.kt": {
+      "sha256": "a7caf5f2f36b324e317ed271e922d4fb8fc01dfc42c135b9a296fc543898a001",
+      "bytes": 9009
+    },
+    "FaceRendererWorkState.kt": {
+      "sha256": "848c613250d99678ac9bbd8b3caea88f2f4c32368ef012618a6f200d4c3340e5",
+      "bytes": 1378
+    }
+  },
+  "gates": {
+    "oldCaptionGoneImmediately": true,
+    "photosOnlyLazyNeverInitialized": true,
+    "stoppedCaptionAndStageUnchanged": true,
+    "actualFreshDirectDateSetter": true,
+    "actualStageControlsWorkRetired": true,
+    "zeroPreferenceResolverServiceRequests": true,
+    "constructorsSkipped": [
+      "PhotoFrameController",
+      "FaceRenderer"
+    ],
+    "watchdogMillis": 30000
+  },
+  "declaredManifestPermissions": [],
+  "fixtureDexPendingRootCompilation": true,
+  "sourceAuthoringOnly": true,
+  "buildSdkAdbGitTestsDevices": 0,
+  "rootRequired": [
+    "compile/sign and bind exact source APK",
+    "verify compiled zero permissions",
+    "freeze DEX and sources before paired execution"
+  ],
+  "limits": [
+    "No actual publishCaption/Main call",
+    "No mounted UI or real metadata work",
+    "No owner context/prefs/provider/network/media",
+    "No optimized/API28/current room visual acceptance"
+  ],
+  "ok": true,
+  "preparedAtUtc": "2026-11-04T11:55:36.970785+00:00",
+  "fixtureDex": {
+    "sha256": "39ab4c61d3a9944c7ab5feee08837c13076d80c6d905823cf9d48b0906520460",
+    "bytes": 24572
+  },
+  "baselineFixture": {
+    "sha256": "6e3a2bd695faf5d145a82af3f011f972037d63fafa7f7efeda10f2df1de0d3d0",
+    "bytes": 37507562
+  },
+  "embeddedBaseline": {
+    "sha256": "ad661c0643368342e1ea6c28a05d4003ac4566442bd7fe79d9aaf47046594938",
+    "bytes": 46745298
+  },
+  "embeddedBaselineExact": true,
+  "baselineAndFrozenFixtureDexByteIdentical": true,
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.nativecaptionfixture\n"
+}

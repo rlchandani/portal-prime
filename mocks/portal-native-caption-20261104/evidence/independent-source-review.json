@@ -1,0 +1,250 @@
+{
+  "status": "PASS_SOURCE_REVIEW_ONLY",
+  "reviewedAtUtc": "2026-11-04T11:57:22.078352+00:00",
+  "clock": {
+    "original_batch_start": "2026-11-04T11:49:44+00:00",
+    "target": "2026-11-04T12:04:44+00:00",
+    "hard_stop": "2026-11-04T12:19:44+00:00",
+    "selected_at": "2026-11-04T11:52:51.262767+00:00"
+  },
+  "plan": "/private/tmp/portal-native-caption-20261104-114944/plan.json",
+  "localAppMetadata": {
+    "versionName": "1.154",
+    "versionCode": 148,
+    "targetSdk": 36,
+    "minSdk": 24
+  },
+  "criteria": {
+    "exactSingleLineProductionDelta": true,
+    "clearAfterStoppedBeforeStageVisibilityPauseAndShow": true,
+    "photosOnlyAvoidsNewLazyRendererAccess": true,
+    "allOtherControllerBytesUnchanged": true,
+    "protectedRendererStageControlsWorkMatchPreChangeAdmission": true,
+    "sharedTestExactFrozenV3": true,
+    "allEightAssertionBodiesUnchangedFromExcludedV1": true,
+    "baselineFiveProductAssertionFailuresThreeControls": true
+  },
+  "productionPaths": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+      "lines": [
+        2293,
+        2316,
+        2321,
+        2322
+      ],
+      "contract": "advanceLocal increments gen; current/non-stopped loader callback admits through photoPause, presents, then schedules local EXIF caption. The central clear hides the previous caption while this metadata is pending."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+      "lines": [
+        2650,
+        2682,
+        2687,
+        2688
+      ],
+      "contract": "advanceRemote increments gen; current/non-stopped remote callback presents, then schedules SMB caption or retains existing non-SMB clear. No source or credential IO is added."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+      "lines": [
+        2841,
+        2862,
+        2865,
+        2883,
+        2886,
+        2896,
+        2903,
+        2909,
+        2913
+      ],
+      "contract": "Native feed and history converge on presentNative; history navigation cancels the old request (advances gen), and feed captures a fresh gen before admission."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+      "lines": [
+        1585,
+        1593,
+        2070,
+        2141
+      ],
+      "contract": "publishCaption posts to the actual PausableFrameCallbacks queue and evaluates g == gen at dispatch. New clear adds no gen mutation or callback cancellation."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowLoader.kt",
+      "lines": [
+        192,
+        201
+      ],
+      "contract": "Prepared bitmap callbacks are delivered through the shared controller main queue. SlideshowPhotoPause remains the admission boundary for held automatic scenes."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FaceRenderer.kt",
+      "lines": [
+        714
+      ],
+      "contract": "setCaption(null,null) uses default null memory, hides the complete caption panel, and is a no-op if the panel is absent or work is stopped."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/MusicPhotoHost.kt",
+      "lines": [
+        37
+      ],
+      "contract": "The active Music host constructs photosOnly=true; new clear skips its lazy caption renderer. This is a handoff claim only."
+    }
+  ],
+  "baseline": {
+    "tests": 8,
+    "failures": 5,
+    "errors": 0,
+    "skips": 0,
+    "failureCases": [
+      {
+        "name": "galleryPrintClearsOldCaptionBeforeStageShow",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+      },
+      {
+        "name": "automaticWholePhotoClearsOldCaptionBeforeStageShow",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+      },
+      {
+        "name": "currentGeneratedDateRepopulatesOnlyAfterMainDispatch",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+      },
+      {
+        "name": "pausedManualPhotoClearsOldCaptionBeforeStageShow",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+      },
+      {
+        "name": "gallerySpreadClearsOldCaptionBeforeTwoPhotoStageShow",
+        "type": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+      }
+    ],
+    "passingControls": [
+      "staleGeneratedCaptionIsDroppedAtActualMainDispatch",
+      "stoppedHandoffLeavesOldCaptionAndStageUntouched",
+      "photosOnlyHandoffNeverInitializesCaptionRenderer"
+    ]
+  },
+  "bindings": {
+    "/private/tmp/portal-native-caption-20261104-114944/PhotoFrameController.before.kt": {
+      "sha256": "62e911e50c9cc534d9808a30d0b61a9fd26532818dda64b96059c794d88c064d",
+      "bytes": 164771
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "5c9a072bf1aece603216b0d8a6b42a0fe0d692148bf1f0ab2f265bc171c1057e",
+      "bytes": 164828
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "ac8ede2630bbd3e86d3e91139995583bb0bf7f9742b2fd29ac2c91b625c5b8f5",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/NativeCaptionOwnershipTest.kt": {
+      "sha256": "078e67b9c7c808fca0441b90c2c8b42bc0d405dc558ec80a4d78d750d21c75dd",
+      "bytes": 8339
+    },
+    "/private/tmp/portal-native-caption-20261104-114944/NativeCaptionOwnershipTest.v3.frozen.kt": {
+      "sha256": "078e67b9c7c808fca0441b90c2c8b42bc0d405dc558ec80a4d78d750d21c75dd",
+      "bytes": 8339
+    },
+    "/private/tmp/portal-native-caption-20261104-114944/plan.json": {
+      "sha256": "7b405897b010f57b11b43f70ce529f0c82f3b482b5acddb72bcc53befc03d5f3",
+      "bytes": 883
+    },
+    "/private/tmp/portal-native-caption-20261104-114944/baseline-tests.json": {
+      "sha256": "b4ba2a1150704ac8faf965731c4825db014ff4253f3c5330f65c61b0840f3627",
+      "bytes": 1809
+    },
+    "/private/tmp/portal-native-caption-20261104-114944/baseline-focused-tests.xml": {
+      "sha256": "b2055cdc59f8c64d1982dd83d22b799541b1d7f9e7b06239ea13a8cbed977d81",
+      "bytes": 27668
+    },
+    "/private/tmp/portal-native-caption-20261104-114944/baseline-tests.log": {
+      "sha256": "48c49d9a699110ecba4f017dd66457e821b42b6c7bdbd9096b35b9f073d15bba",
+      "bytes": 3049
+    },
+    "/private/tmp/portal-native-caption-20261104-114944/excluded-operational-failures.json": {
+      "sha256": "9476da61a843dae20d6fdbaf21b774b1c95897a8cacfb82198acfafd98453ca8",
+      "bytes": 672
+    },
+    "/private/tmp/portal-native-caption-20261104-114944/native-owned/source-admission.json": {
+      "sha256": "525bf4ae072e590a5269728a5fc78d4c60dcfac9dc7dc29db2c30cf0280e9207",
+      "bytes": 3224
+    },
+    "/private/tmp/portal-native-caption-20261104-114944/excluded-adapter-v1-baseline-focused-tests.xml": {
+      "sha256": "4018afb72986a912ef3e4d36da309016c6a91d6979a20b971d1681579c009c5f",
+      "bytes": 70345
+    }
+  },
+  "protectedSourceBindings": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FaceRenderer.kt": {
+      "sha256": "9f62b1b197bbd9afce67158bb77c8e6b27eaebd8d9140530280227f6fe1b8183",
+      "bytes": 39413,
+      "baselineReference": "/private/tmp/portal-native-caption-20261104-114944/native-owned/source-admission.json",
+      "matchesPreChangeSourceAdmission": true
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowStage.kt": {
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908,
+      "baselineReference": "/private/tmp/portal-native-caption-20261104-114944/native-owned/source-admission.json",
+      "matchesPreChangeSourceAdmission": true
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowViewerControls.kt": {
+      "sha256": "a7caf5f2f36b324e317ed271e922d4fb8fc01dfc42c135b9a296fc543898a001",
+      "bytes": 9009,
+      "baselineReference": "/private/tmp/portal-native-caption-20261104-114944/native-owned/source-admission.json",
+      "matchesPreChangeSourceAdmission": true
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FaceRendererWorkState.kt": {
+      "sha256": "848c613250d99678ac9bbd8b3caea88f2f4c32368ef012618a6f200d4c3340e5",
+      "bytes": 1378,
+      "baselineReference": "/private/tmp/portal-native-caption-20261104-114944/native-owned/source-admission.json",
+      "matchesPreChangeSourceAdmission": true
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowLoader.kt": {
+      "sha256": "451aa014667a515eb4b3d2871af0867f447e210b69f5c9fd014ad939a8469455",
+      "bytes": 12624,
+      "bindingScope": "Inspected current source; unchanged controller call sites proven by exact single-line delta"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowPhotoPause.kt": {
+      "sha256": "268d85e2857e9b880d30996247a39c40d67112b8123de628d6baa9d1eb0f66f2",
+      "bytes": 2486,
+      "bindingScope": "Inspected current source; unchanged controller call sites proven by exact single-line delta"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowWork.kt": {
+      "sha256": "5cb974217dc5a1eec4dd74fbe33de834694454279e73d0bfa15669c227d8208c",
+      "bytes": 1480,
+      "bindingScope": "Inspected current source; unchanged controller call sites proven by exact single-line delta"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PausableFrameCallbacks.kt": {
+      "sha256": "f86cab61055191d7b557162c2b1ecb2b0659551e880a116641349fcdd3b8b1c7",
+      "bytes": 7520,
+      "bindingScope": "Inspected current source; unchanged controller call sites proven by exact single-line delta"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoView.kt": {
+      "sha256": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "bytes": 1621,
+      "bindingScope": "Inspected current source; unchanged controller call sites proven by exact single-line delta"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoMatte.kt": {
+      "sha256": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "bytes": 3372,
+      "bindingScope": "Inspected current source; unchanged controller call sites proven by exact single-line delta"
+    }
+  },
+  "limits": [
+    "Source review and independently parsed retained baseline XML only; reviewer ran no build, tests, SDK or devices.",
+    "Full candidate build/JVM, actual native fixture, APK/signature/assets and promotion are separate root-owned gates; no candidate runtime success is claimed here.",
+    "JVM fixture invokes actual private presentNative/publishCaption with generated metadata and an actual injected main callback queue, but mocks FaceRenderer, stage, controls, images and bitmap objects; no rendered caption pixel, EXIF decode, geocoding, SMB or provider acceptance.",
+    "Initial Color class-initialization and subsequent Log adapter failures are explicitly excluded; v3 preserves every original acceptance assertion body.",
+    "No broader photosOnly pipeline/lifecycle guarantee; pre-existing caption calls outside presentNative are unchanged.",
+    "Stage show arguments and bitmap ownership code are byte-identical; hiding caption also removes its visible footprint from subsequent measured occlusions, consistent with hidden-overlay state. No geometry/panel/motion performance claim.",
+    "No behavior change for invalid metadata, multi-photo caption selection, re-read EXIF timezone semantics, queued work policy, concurrent external state, API28 or optimized fixture runtime.",
+    "No owner settings/source registry/media/device state was read or written; no provider/network/phone/Git operation occurred."
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "oneLineGuardOnly": true,
+  "sourceBindings": {
+    "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "5c9a072bf1aece603216b0d8a6b42a0fe0d692148bf1f0ab2f265bc171c1057e",
+      "bytes": 164828
+    },
+    "app/src/test/java/com/immortal/launcher/NativeCaptionOwnershipTest.kt": {
+      "sha256": "078e67b9c7c808fca0441b90c2c8b42bc0d405dc558ec80a4d78d750d21c75dd",
+      "bytes": 8339
+    },
+    "app/build.gradle.kts": {
+      "sha256": "ac8ede2630bbd3e86d3e91139995583bb0bf7f9742b2fd29ac2c91b625c5b8f5",
+      "bytes": 11824
+    },
+    "app/src/main/java/com/immortal/launcher/FaceRenderer.kt": {
+      "sha256": "9f62b1b197bbd9afce67158bb77c8e6b27eaebd8d9140530280227f6fe1b8183",
+      "bytes": 39413
+    },
+    "app/src/main/java/com/immortal/launcher/SlideshowStage.kt": {
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "app/src/main/java/com/immortal/launcher/SlideshowViewerControls.kt": {
+      "sha256": "a7caf5f2f36b324e317ed271e922d4fb8fc01dfc42c135b9a296fc543898a001",
+      "bytes": 9009
+    },
+    "app/src/main/java/com/immortal/launcher/FaceRendererWorkState.kt": {
+      "sha256": "848c613250d99678ac9bbd8b3caea88f2f4c32368ef012618a6f200d4c3340e5",
+      "bytes": 1378
+    },
+    "version.json": {
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "bytes": 310
+    }
+  },
+  "testV3Exact": true,
+  "publicManifestUnchanged": true
+}

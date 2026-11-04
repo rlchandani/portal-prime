@@ -2140,6 +2140,7 @@ class PhotoFrameController(
 
   private fun presentNative(photos: List<SlideshowPhoto>, automatic: Boolean = true) {
     if (stopped) return
+    if (!photosOnly) faceRenderer.setCaption(null, null)
     nativeStage.visibility = View.VISIBLE
     photo.visibility = View.GONE
     photoBack.visibility = View.GONE

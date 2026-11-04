@@ -1,0 +1,19 @@
+{
+  "status": "unselected_source_witness_no_runtime_reproduction_or_fix",
+  "originalDiscoveryClock": "2026-11-04T11:49:44Z",
+  "reportedBySourceAuditAt": "2026-11-04T11:52:44Z",
+  "hardDeadline": "2026-11-04T12:19:44Z",
+  "notReset": true,
+  "issue": "Remove from favorites can retain selected app in the first six",
+  "generatedSourceAlgebra": "Six installed IDs A,B,C,D,E,F, empty saved order; removing A saves B,C,D,E,F,A and Apps/Home still select A in their first-six projections. Builtin replacement IDs are omitted by the current action.",
+  "sourceFiles": [
+    "app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt:272",
+    "app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt:373",
+    "app/src/main/java/com/immortal/launcher/HomeActivity.kt:1166"
+  ],
+  "limits": [
+    "Source-only active caller/algebra; no generated runtime test/UI reproduction/change/deployment",
+    "Replacement inventory and short lists need a coherent Home/Apps policy; no selected implementation",
+    "Do not reset original clock if selected; park on exhaustion rather than expand this caption slice"
+  ]
+}

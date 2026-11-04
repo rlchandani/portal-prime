@@ -1,0 +1,17 @@
+{
+  "original_batch_start": "2026-11-04T11:49:44+00:00",
+  "target": "2026-11-04T12:04:44+00:00",
+  "hard_stop": "2026-11-04T12:19:44+00:00",
+  "selected_at": "2026-11-04T11:52:51.262767+00:00",
+  "issue": "Native scene retains previous photo caption while new metadata is pending",
+  "scope": "Clear caption at accepted non-stopped native presentation, skipping photosOnly; retain current metadata generation, source IO, stage geometry/motion/bitmap ownership, saved settings and assets",
+  "baseline_sha256": "62e911e50c9cc534d9808a30d0b61a9fd26532818dda64b96059c794d88c064d",
+  "base_commit": "cb7f5cc3814b6b9506b3fb9beb091ffe60967e73",
+  "out_of_scope": [
+    "AppSwitcher favorites source witness, not selected",
+    "Provider/live source operations",
+    "Physical live caption/photo acceptance",
+    "API28 and optimized fixture runtime",
+    "Phone/GitHub/publication"
+  ]
+}

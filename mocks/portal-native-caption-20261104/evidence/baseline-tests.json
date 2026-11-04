@@ -1,0 +1,38 @@
+{
+  "exitCode": 1,
+  "name": "com.immortal.launcher.NativeCaptionOwnershipTest",
+  "tests": "8",
+  "skipped": "0",
+  "failures": "5",
+  "errors": "0",
+  "timestamp": "2026-11-04T11:55:33.614Z",
+  "hostname": "iRedlofs-Mac-mini-3.local",
+  "time": "0.76",
+  "failedCases": [
+    {
+      "name": "galleryPrintClearsOldCaptionBeforeStageShow",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+    },
+    {
+      "name": "automaticWholePhotoClearsOldCaptionBeforeStageShow",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+    },
+    {
+      "name": "currentGeneratedDateRepopulatesOnlyAfterMainDispatch",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+    },
+    {
+      "name": "pausedManualPhotoClearsOldCaptionBeforeStageShow",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+    },
+    {
+      "name": "gallerySpreadClearsOldCaptionBeforeTwoPhotoStageShow",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<Caption(place=null, date=null, memory=null)> but was:<Caption(place=Previous place, date=Previous date, memory=Previous memory)>"
+    }
+  ]
+}

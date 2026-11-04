@@ -1,18 +1,62 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T11:48:44.825776+00:00",
-  "updatedLabel": "Recurring source timezone delivered to both rooms; prior clocks retained",
+  "updatedAt": "2026-11-04T12:01:28.211158+00:00",
+  "updatedLabel": "Native caption ownership delivered to both rooms; prior clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.153/code 147. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.154/code 148. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "native-photo-caption-ownership",
+      "title": "Photo caption follows its native photo",
+      "summary": "Hide the old place/date/memory caption while the next native photo metadata is pending.",
+      "status": "delivered",
+      "verification": "4,499 JVM \u00b78 ownership regressions \u00b75 native cases \u00b7exact both-room installs",
+      "kind": "Screensaver correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent source and native-artifact review",
+      "deployment": "Exact optimized1.154/code148 fully hashed in both rooms, one install each; Living uncertain ACK with 6 read-only observations.",
+      "acceptance": [
+        "One guarded clear after stopped; photos-only lazy renderer, source work, stage arguments and bitmap ownership retained.",
+        "Frozen8JVM:5 AssertionErrors/3controls\u21928pass; same actual-debug/API29 native2fail/3controls\u21925pass.",
+        "Current/stale actual metadata Main dispatch JVM-covered; native direct setter can repopulate generated date; all fixture setups and packages retire."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery and limits",
+          "source": "docs/portal-native-caption-2026-11-04.md"
+        },
+        {
+          "text": "Frozen checks and room evidence",
+          "source": "mocks/portal-native-caption-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated direct actual debug/API29 method on owned native views; mounted dream/EXIF/geocode/SMB/live source behavior remains separate",
+        "Native fresh control uses direct setter; native publishCaption/Main not invoked",
+        "Optimized runtime/API28/Living functional caption/geometry-performance acceptance remains separate",
+        "No phone/household photo/source/provider/account/GitHub publication; saved Shuffle/fit unchanged; public1.83 retained"
+      ],
+      "next": "Continue distinct small visible slices; retain all original issue clocks and holds.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T11:49:44+00:00",
+        "selectedAt": "2026-11-04T11:52:51.262767+00:00",
+        "target": "2026-11-04T12:04:44+00:00",
+        "hardDeadline": "2026-11-04T12:19:44+00:00",
+        "baseCommit": "cb7f5cc3814b6b9506b3fb9beb091ffe60967e73",
+        "scope": "Clear caption at accepted non-stopped native presentation, skipping photosOnly; retain current metadata generation, source IO, stage geometry/motion/bitmap ownership, saved settings and assets",
+        "notReset": true
+      }
+    },
     {
       "id": "calendar-recurrence-source-zone",
       "title": "Recurring calendar: retain the source timezone",
