@@ -1,0 +1,257 @@
+{
+  "ok": true,
+  "acceptance": "Accepted bounded date-only parser validation, frozen JVM evidence and final APK identities/assets.",
+  "blockers": [],
+  "originalDiscoveryAt": "2026-11-04T14:45:30Z",
+  "target": "2026-11-04T15:00:30Z",
+  "hardDeadline": "2026-11-04T15:15:30Z",
+  "clockNotReset": true,
+  "base": "0cc849cf",
+  "source": {
+    "exactSixLineInsertionReconstructsEntireCandidate": true,
+    "currentSourceMatchesFrozenAfter": true,
+    "scope": "Eight ASCII digits and strict UTC civil-date validation only inside existing dateOnly branch; original local Calendar conversion follows unchanged.",
+    "timedParserRecurrenceUntilCacheAndSettingsBytesUnchanged": true,
+    "activeConsumers": "ApprovedHomeCalendar CalendarFeed.read and PhotoFrameController CalendarFeed.fetch; source caller evidence only.",
+    "reviewFinding": "Separate UTC validation rejects impossible dates without rejecting valid dates whose local midnight is skipped by DST."
+  },
+  "fixture": {
+    "actualGeneratedIcsCalendarFeedParse": true,
+    "frozenTestMatchesCurrent": true,
+    "defaults": "Fixture saves process timezone and locale and restores both in finally.",
+    "correction": "Initial excluded red.xml contained an incorrect Sao Paulo end expectation. Initial test differs only in 2018-11-05T02:00:00Z becoming 03:00:00Z; existing normalized local-day end behavior retained. Final red-final.xml is accepted baseline.",
+    "sameFourteenNamesBeforeAfter": [
+      "april31DoesNotBecomeMay1",
+      "bareDateRemainsSupported",
+      "dateSuffixDoesNotBecomeValidStart",
+      "dayZeroDoesNotBecomePreviousMonth",
+      "february30DoesNotBecomeMarch2",
+      "invalidEndUsesExistingOneDayFallback",
+      "invalidEventDoesNotHideFollowingValidEvent",
+      "invalidExdateDoesNotCancelMarch2Occurrence",
+      "leapYearFebruary30DoesNotBecomeMarch1",
+      "month13DoesNotBecomeNextJanuary",
+      "nonLeapFebruary29DoesNotBecomeMarch1",
+      "timedDstGapKeepsExistingInterpretation",
+      "validDateWithMidnightGapKeepsLocalConversion",
+      "validLeapDayRemainsAllDay"
+    ],
+    "baseline": {
+      "tests": 14,
+      "failures": 10,
+      "errors": 0,
+      "skipped": 0,
+      "failureType": "java.lang.AssertionError",
+      "controls": 4
+    },
+    "candidate": {
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "build": {
+    "retainedTerminalExit": 0,
+    "retainedLog": "BUILD SUCCESSFUL in 1m 50s",
+    "fullXmlIndependentlyRehashedAndRecounted": {
+      "tests": 4555,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 474
+    },
+    "xmlSnapshotAggregateSha256": "af5de7f66351ee7a090d8f5099025203c17c0fec526a1f8b229e26d423906b22"
+  },
+  "artifacts": {
+    "debug": {
+      "candidateIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 159,
+        "versionName": "1.165"
+      },
+      "baselineIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 158,
+        "versionName": "1.164"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetsExact": 23,
+      "assetEntrySetExact": true,
+      "changed": [],
+      "generatedProfiles": []
+    },
+    "performance": {
+      "candidateIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 159,
+        "versionName": "1.165"
+      },
+      "baselineIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 158,
+        "versionName": "1.164"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetsExact": 23,
+      "assetEntrySetExact": true,
+      "changed": [
+        "assets/dexopt/baseline.prof"
+      ],
+      "generatedProfiles": [
+        {
+          "path": "assets/dexopt/baseline.prof",
+          "before": {
+            "bytes": 11159,
+            "sha256": "95109fecedbc6217f20acb8df8fef77cf53f2e6b1e84d51656ff517340718c6a",
+            "header": "70726f0030313000"
+          },
+          "after": {
+            "bytes": 11159,
+            "sha256": "6845215c512bd5f9ee69c93df3dfad388344b8c960203cf73fd10776274cf7cc",
+            "header": "70726f0030313000"
+          }
+        }
+      ]
+    }
+  },
+  "qualifications": [
+    "No native runtime, mounted UI, live calendar, device timezone or optimized-runtime/API28/Living acceptance.",
+    "Review used retained root execution evidence and read-only host decoding; no tests, builds, SDK, Git, network or device operations were rerun.",
+    "APK signing certificate identity independently decoded; cryptographic signature verification is retained root apksigner evidence in promotion-artifacts.json/verify-artifacts.py.",
+    "Only compiler-generated performance assets/dexopt/baseline.prof changed; baseline.profm and all other asset payloads remain exact. Both 23-file source asset sets are exact source and baseline bytes. Profile header validation makes no performance claim.",
+    "Fourteen current tests establish the selected cases; no broader timed/UNTIL/recurrence parser behavior claim."
+  ],
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/review-request.txt",
+      "bytes": 905,
+      "sha256": "558a2cb96d586cbb4425bb6da6002126404fbc62e466603a702921563ee8e5fe"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/selected-scope.json",
+      "bytes": 724,
+      "sha256": "ffbdf468118ecc353e52574de4afcec273c909d3a1355ba0d2739b1df24bf96e"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/source-admission.json",
+      "bytes": 822,
+      "sha256": "b0fa9ad9f172af4e6bb17638bb1a425a4a20f068f7b48040a0b0d968244c4cee"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/fixture-correction.json",
+      "bytes": 442,
+      "sha256": "6bd2b2465b905d460a6e882d05c8891ab4b4c6f0b70c13e140e38e6d67694cc5"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/before-CalendarFeed.kt",
+      "bytes": 25435,
+      "sha256": "9fed044ca49a8dbf9ab9ac4ac748dd04fcca9d5267e8558e8f1ad508157a0106"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/after-CalendarFeed.kt",
+      "bytes": 25787,
+      "sha256": "f37b046489c6ffc9f9b022fb9fa3d8f3c4f9ccb3899fd1b19fc52c2363f1a60e"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/CalendarFeedDateValidityTest.kt",
+      "bytes": 4340,
+      "sha256": "9c11cec03c6934254cf2be91c1cce49bf819d512e987fb810e7f00c86ecbe84e"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/initial-CalendarFeedDateValidityTest.kt",
+      "bytes": 4340,
+      "sha256": "cbb2d9362814cdbe3accec96bdf09c26c03efaf2568c9aedba5cd3d16865c9b5"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/red.xml",
+      "bytes": 54012,
+      "sha256": "52fb92547150cb8a4ec0c060ee4db96b71665ef3748487be3a2f57b1a28bff1d"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/red-final.xml",
+      "bytes": 49446,
+      "sha256": "c19f32bde80e5cb196e9457c35e41638c7ca74d18c7323f8e10aaf098ada92dd"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/green.xml",
+      "bytes": 2188,
+      "sha256": "29ee9af3b9bc217d011f59ee9a637c2769508d2a881897d47cd7f8c537af7a76"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/build-terminal.json",
+      "bytes": 303,
+      "sha256": "d7dae3715d8fb64385eb70cc19c2a68a936382d54aaa26eea4dd9bb18a507153"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/build.log",
+      "bytes": 13723,
+      "sha256": "7e5b8151d28077d1cc08ca74b2d8a6f2a951ee571299759414007b9cc47bc47a"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/promotion-artifacts.json",
+      "bytes": 9844,
+      "sha256": "83e9fca7340441b49bb08c3bc28070f18fc7a933baa15425cbea643fd0d5299e"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/jvm-snapshot.json",
+      "bytes": 176619,
+      "sha256": "9ab502b7c141fdd600aec53a11f39bcd7ad278e27a69054b22d97770c6f5a794"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/verify-artifacts.py",
+      "bytes": 3659,
+      "sha256": "2b53c408bf4274185f968a60cf5ae54cba687e3657ee6c0a5ee4a5709968355d"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/candidate-debug-1.165.apk",
+      "bytes": 46745650,
+      "sha256": "9a5da9891c9a4c34f3be9e58c50ac16d2800ccb00c617445d52bd6667ec69b33"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/candidate-performance-1.165.apk",
+      "bytes": 25886927,
+      "sha256": "f9cfee038106e6e487b99f8904b54fe2235efd895d236fd575686746b53b5717"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/before-debug-1.164.apk",
+      "bytes": 46745646,
+      "sha256": "54b1dc42eb595daf50975f691bb020187a5c6fa451fbaf1d00196908fa7dcfac"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-144530/rollback-1.164.apk",
+      "bytes": 25886923,
+      "sha256": "abfd9edb686cb0ac2968024f03c14b54469b8c404c8efcd7195dabf9667cc309"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CalendarFeed.kt",
+      "bytes": 25787,
+      "sha256": "f37b046489c6ffc9f9b022fb9fa3d8f3c4f9ccb3899fd1b19fc52c2363f1a60e"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/CalendarFeedDateValidityTest.kt",
+      "bytes": 4340,
+      "sha256": "9c11cec03c6934254cf2be91c1cce49bf819d512e987fb810e7f00c86ecbe84e"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedHomeCalendar.kt",
+      "bytes": 5885,
+      "sha256": "1c67ec084f1b5531d2d7315b2eba63881a5ea5596b1bed663c57e1f38e128414"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+      "bytes": 164859,
+      "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "1932f9fab272a78422559aba8d12e8e95d6c3275d55cec79cd3a6bc34864919c"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 19404,
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+    }
+  ]
+}

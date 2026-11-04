@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-11-04T14:51:38.934813+00:00",
+  "endedAt": "2026-11-04T14:53:29.891990+00:00",
+  "elapsedSeconds": 110.95727550000447,
+  "exitCode": 0,
+  "command": [
+    "./gradlew",
+    ":app:testDebugUnitTest",
+    ":app:assembleDebug",
+    ":app:assemblePerformance",
+    "--no-daemon"
+  ]
+}

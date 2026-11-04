@@ -1,0 +1,6 @@
+{
+  "definition": "Sorted filename NUL fileSha256 NUL byteCount newline",
+  "sha256": "af5de7f66351ee7a090d8f5099025203c17c0fec526a1f8b229e26d423906b22",
+  "suites": 474,
+  "tests": 4555
+}

@@ -1,0 +1,19 @@
+{
+  "originalClock": "2026-11-04T14:45:30Z",
+  "priorRoomVersion": "1.164/code158",
+  "boundedNegatives": [
+    "Photo source audit found no distinct defect outside accepted or expired scopes.",
+    "Tools narration/numeric audit found no distinct defect.",
+    "Legacy ConverterOverlay has no callers; formatting observation was discarded.",
+    "DailyContent negative-epoch observation was not selected as low user impact."
+  ],
+  "selected": "calendar-all-day-date-validity",
+  "distinctFromAccepted": [
+    "Calendar all-day duration/DST and source-zone recurrence retained.",
+    "CountdownDates editor helper untouched.",
+    "PhotoCaption strict EXIF timestamp path untouched."
+  ],
+  "noClockReset": true,
+  "householdData": false,
+  "phoneOperations": false
+}

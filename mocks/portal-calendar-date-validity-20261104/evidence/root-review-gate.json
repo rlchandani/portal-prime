@@ -1,0 +1,16 @@
+{
+  "fullyReadAt": "2026-11-04T14:56:38.981900+00:00",
+  "reviewSha256": "7dc6fa8281667d4c05942eb2ca2e5345c92ac7cb4ca375f2758cc0532193cada",
+  "allBindingsRehashed": 26,
+  "all474XmlSnapshotReplayed": true,
+  "changedDexPaths": {
+    "debug": [
+      "classes6.dex"
+    ],
+    "performance": [
+      "classes.dex"
+    ]
+  },
+  "promotionAllowed": true,
+  "initialHostGateCorrection": "First helper expected accepted/status; final schema uses ok:true. No promotion occurred before this corrected gate."
+}

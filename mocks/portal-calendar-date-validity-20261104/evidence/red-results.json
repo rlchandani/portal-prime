@@ -1,0 +1,78 @@
+{
+  "tests": 14,
+  "failures": 10,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "invalidExdateDoesNotCancelMarch2Occurrence",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[1677628800000, 1677715200000, 1677801600000]> but was:<[1677628800000, 1677801600000]>"
+    },
+    {
+      "name": "leapYearFebruary30DoesNotBecomeMarch1",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[]> but was:<[Event(startMillis=1709251200000, endMillis=1709337600000, title=Fixture, allDay=true, location=null)]>"
+    },
+    {
+      "name": "validDateWithMidnightGapKeepsLocalConversion",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "month13DoesNotBecomeNextJanuary",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[]> but was:<[Event(startMillis=1704067200000, endMillis=1704153600000, title=Fixture, allDay=true, location=null)]>"
+    },
+    {
+      "name": "timedDstGapKeepsExistingInterpretation",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "invalidEndUsesExistingOneDayFallback",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<1677628800000> but was:<1677715200000>"
+    },
+    {
+      "name": "invalidEventDoesNotHideFollowingValidEvent",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[Valid]> but was:<[Invalid, Valid]>"
+    },
+    {
+      "name": "dateSuffixDoesNotBecomeValidStart",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[]> but was:<[Event(startMillis=1677628800000, endMillis=1677715200000, title=Fixture, allDay=true, location=null)]>"
+    },
+    {
+      "name": "february30DoesNotBecomeMarch2",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[]> but was:<[Event(startMillis=1677715200000, endMillis=1677801600000, title=Fixture, allDay=true, location=null)]>"
+    },
+    {
+      "name": "nonLeapFebruary29DoesNotBecomeMarch1",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[]> but was:<[Event(startMillis=1677628800000, endMillis=1677715200000, title=Fixture, allDay=true, location=null)]>"
+    },
+    {
+      "name": "validLeapDayRemainsAllDay",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "april31DoesNotBecomeMay1",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[]> but was:<[Event(startMillis=1682899200000, endMillis=1682985600000, title=Fixture, allDay=true, location=null)]>"
+    },
+    {
+      "name": "dayZeroDoesNotBecomePreviousMonth",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[]> but was:<[Event(startMillis=1677542400000, endMillis=1677628800000, title=Fixture, allDay=true, location=null)]>"
+    },
+    {
+      "name": "bareDateRemainsSupported",
+      "failureType": null,
+      "message": null
+    }
+  ]
+}

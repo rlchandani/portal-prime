@@ -1,0 +1,15 @@
+{
+  "onlyProductionParserDelta": "Six lines inside existing dateOnly branch",
+  "entireSourceReconstructionExact": true,
+  "frozenTestUnchangedAfterFinalRed": true,
+  "timedParserLocalCalendarRecurrenceCachesSettingsUntouched": true,
+  "beforeSha256": "9fed044ca49a8dbf9ab9ac4ac748dd04fcca9d5267e8558e8f1ad508157a0106",
+  "afterSha256": "f37b046489c6ffc9f9b022fb9fa3d8f3c4f9ccb3899fd1b19fc52c2363f1a60e",
+  "fixtureSha256": "9c11cec03c6934254cf2be91c1cce49bf819d512e987fb810e7f00c86ecbe84e",
+  "nativeRuntimeVerified": false,
+  "activeConsumers": [
+    "ApprovedHomeCalendar.kt:65 CalendarFeed.read",
+    "PhotoFrameController.kt:2235 CalendarFeed.fetch; group/header/all-day text use parsed event starts."
+  ],
+  "claimLimit": "Source callers reviewed; no mounted Home/PhotoFrame calendar UI or live source execution."
+}

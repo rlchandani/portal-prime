@@ -1,0 +1,17 @@
+{
+  "tasks": 161,
+  "counts": {
+    "delivered": 108,
+    "verified": 43,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "all160OldObjectsExact": true,
+  "oldTaskRawSuffixBytes": 515878,
+  "oldTaskRawSuffixSha256": "c5b53cc6bf737656cf9831ff2c4dae1d30659087d2b10a5cae826a663680a4ea",
+  "oldTaskRawSuffixExact": true,
+  "defaultTaskUnchanged": true,
+  "oldClocksUnchanged": true,
+  "onlyBoundaryDelta": "Current room APK1.164/code158 to1.165/code159"
+}

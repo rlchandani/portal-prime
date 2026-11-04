@@ -305,6 +305,12 @@ object CalendarFeed {
     val dateOnly = p.params["VALUE"].equals("DATE", true) || (v.length == 8 && !v.contains('T'))
     return runCatching {
           if (dateOnly) {
+            if (v.length != 8 || v.any { it !in '0'..'9' }) return null
+            // Validate the civil date separately from local midnight, which may have a DST gap.
+            SimpleDateFormat("yyyyMMdd", Locale.US).apply {
+              isLenient = false
+              timeZone = TimeZone.getTimeZone("UTC")
+            }.parse(v) ?: return null
             val cal = Calendar.getInstance(defaultZone, locale)
             cal.clear()
             cal.set(

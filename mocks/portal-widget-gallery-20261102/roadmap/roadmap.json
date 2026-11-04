@@ -1,18 +1,62 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T14:43:46.677658+00:00",
-  "updatedLabel": "Zero-duration Home Start guard delivered as1.164 both rooms; original clocks retained",
+  "updatedAt": "2026-11-04T14:58:32.066933+00:00",
+  "updatedLabel": "All-day calendar date validation delivered as1.165 both rooms; original clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.164/code 158. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.165/code 159. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "calendar-all-day-date-validity",
+      "title": "Calendar: reject impossible all-day dates",
+      "summary": "Malformed dates no longer invent events or hide valid appointments.",
+      "description": "Validate eight-digit civil dates in UTC before the existing local-midnight conversion. Shared start/end/exclusion parsing retains current timed and DST behavior.",
+      "status": "delivered",
+      "verification": "Frozen14 generated-feed JVM cases: ten AssertionErrors and four controls to fourteen passes. All4555JVM/474suites/debug/optimized/R8/vital pass; one combined independent review, all26bindings rehashed.",
+      "kind": "Calendar input correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root execution / independent media review",
+      "deployment": "Exact optimized1.165/code159 fully hashed in both rooms; one install each. Living uncertain ACK resolved by seven read-only observations.",
+      "state": "All43/30 preference files and four complete maps exact; Family runtime and saved Shuffle/fit retained.",
+      "acceptance": [
+        "Invalid all-day starts omitted, invalid exclusions ignored, invalid ends use existing one-day fallback.",
+        "Valid leap/bare dates, following valid event, midnight and timed DST controls retain existing results.",
+        "Both installed APK identities and complete SHA256 match reviewed signed artifact."
+      ],
+      "evidence": [
+        {
+          "text": "Fix, checks, delivery and limits.",
+          "source": "docs/portal-calendar-date-validity-2026-11-04.md"
+        },
+        {
+          "text": "Combined independent review.",
+          "source": "mocks/portal-calendar-date-validity-20261104/evidence/independent-review.json"
+        }
+      ],
+      "limits": [
+        "Generated JVM parse only; no live calendar/provider/source, mounted widget UI, native parser or optimized-runtime/API28 acceptance.",
+        "Initial wrong midnight-gap end expectation corrected to preserve existing next-day01:00 behavior; initial run excluded.",
+        "Timed and UNTIL parsing, skipped civil-date policy and locale calendars remain unchanged.",
+        "No phone, account, household-media or publication operations; public1.83 and all parked clocks retained."
+      ],
+      "next": "Continue with another distinct small product slice.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T14:45:30Z",
+        "selectedAt": "2026-11-04T14:50:39.478238Z",
+        "target": "2026-11-04T15:00:30Z",
+        "hardDeadline": "2026-11-04T15:15:30Z",
+        "clockNotReset": true
+      }
+    },
     {
       "id": "photo-caption-date-validity",
       "title": "Photo captions: reject impossible capture dates",

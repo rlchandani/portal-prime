@@ -1,0 +1,16 @@
+{
+  "originalDiscoveryAt": "2026-11-04T14:45:30Z",
+  "selectedAt": "2026-11-04T14:50:39.478238Z",
+  "target": "2026-11-04T15:00:30Z",
+  "hardDeadline": "2026-11-04T15:15:30Z",
+  "clockNotReset": true,
+  "base": "0cc849cf",
+  "scope": "Reject invalid all-day civil dates and non-eight-digit VALUE=DATE; retain existing local-midnight conversion and timed parsing. Generated feed text only. No live calendars or sources.",
+  "acceptance": [
+    "Frozen14 actual-parser tests red/green",
+    "Whole JVM/debug/performance/R8/vital",
+    "Combined independent review before one delivery per room",
+    "Exact artifact readbacks and saved room state preservation"
+  ],
+  "nativeRuntimeAcceptance": "Not included in this slice."
+}

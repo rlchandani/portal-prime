@@ -1,0 +1,6 @@
+{
+  "initialRedExcluded": true,
+  "reason": "Midnight-gap end expectation incorrectly assumed next local midnight; existing implementation adds one calendar day from normalized 01:00. Control corrected to existing next-day 01:00, preserving conversion rather than expanding this slice.",
+  "onlyDelta": "S\u00e3o Paulo end literal 02:00Z to 03:00Z",
+  "finalFrozenSha256": "9c11cec03c6934254cf2be91c1cce49bf819d512e987fb810e7f00c86ecbe84e"
+}

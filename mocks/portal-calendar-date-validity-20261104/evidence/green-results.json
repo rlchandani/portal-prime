@@ -1,0 +1,78 @@
+{
+  "tests": 14,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "invalidExdateDoesNotCancelMarch2Occurrence",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "leapYearFebruary30DoesNotBecomeMarch1",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "validDateWithMidnightGapKeepsLocalConversion",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "month13DoesNotBecomeNextJanuary",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "timedDstGapKeepsExistingInterpretation",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "invalidEndUsesExistingOneDayFallback",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "invalidEventDoesNotHideFollowingValidEvent",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "dateSuffixDoesNotBecomeValidStart",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "february30DoesNotBecomeMarch2",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "nonLeapFebruary29DoesNotBecomeMarch1",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "validLeapDayRemainsAllDay",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "april31DoesNotBecomeMay1",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "dayZeroDoesNotBecomePreviousMonth",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "bareDateRemainsSupported",
+      "failureType": null,
+      "message": null
+    }
+  ]
+}
