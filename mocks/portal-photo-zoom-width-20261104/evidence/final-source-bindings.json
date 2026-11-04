@@ -1,0 +1,21 @@
+{
+  "app/src/main/java/com/immortal/launcher/SlideshowViewerControls.kt": {
+    "bytes": 9427,
+    "sha256": "ef1fdf154a3631b7ada5a066b3c1685fdc1d16b54c2e7e98e9929fb5e02e8210"
+  },
+  "app/build.gradle.kts": {
+    "bytes": 11824,
+    "sha256": "2c7b7511cdbe2ac5ea12c4af11c0113e750394104561d486d7701b6a68385b48"
+  },
+  "version.json": {
+    "bytes": 310,
+    "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+  },
+  "assetComparisonSetupQualification": {
+    "initialFailure": "Performance all-assets equality assertion",
+    "debugAllAssetsUnchanged": true,
+    "performanceOnlyChangedGeneratedEntry": "assets/dexopt/baseline.prof",
+    "finalAll23SourceAssetsExact": true,
+    "noNativeGateChanged": true
+  }
+}

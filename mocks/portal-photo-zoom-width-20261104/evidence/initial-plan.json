@@ -1,0 +1,21 @@
+{
+  "originalDiscoveryAt": "2026-11-04T13:42:16Z",
+  "selectedAt": "2026-11-04T13:45:17.422095+00:00",
+  "target": "2026-11-04T13:57:16Z",
+  "hardDeadline": "2026-11-04T14:12:16Z",
+  "clockNotReset": true,
+  "baseCommit": "5506840fe6c996c41cdaf79601af3564954a1d49",
+  "scope": "Cap the existing photo zoom slider to measured padded viewport width while retaining620dp wide maximum. Native layout acceptance only; no new navigation/button/editor/save/photo/settings policy.",
+  "acceptance": [
+    "Same actual constructor/layout fixture shows narrow clipping before and contained slider after, preservingwide620dp and repeatedresize behavior",
+    "All4513JVM/debug/performance/R8/vital checks and exact signed artifacts",
+    "One independent combined source/native/artifact review fully read beforepromotion",
+    "One install each room, exactAPKreadback and all preferences/maps/Familyruntime preserved"
+  ],
+  "limits": [
+    "No real photo/edit/save/touch acceptance or broad toolbar/button layout guarantee",
+    "Generated resource-only fixture, debugAPI29 detached native layout",
+    "No phone/householdmedia/provider/account/push/publication"
+  ],
+  "sourceWitnessRecordedAt": "2026-11-04T13:44:58Z"
+}

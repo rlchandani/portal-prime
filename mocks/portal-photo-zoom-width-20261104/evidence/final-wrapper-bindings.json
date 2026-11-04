@@ -1,0 +1,14 @@
+{
+  "baseline-fixture.apk": {
+    "bytes": 37507562,
+    "sha256": "d92608cc57d738fed472d23f7cec0abbf60c4254ca596080f9ef35948054d885",
+    "fixtureDex": "7283f6bad4d26f007454cd1ea8882132576a01be0f8759b2cd90e73a191f0c1a",
+    "sourceApk": "8406ae2c6608584c5d03c572c76067df8c4d7f791962ba621e57cc3f53a8c43b"
+  },
+  "photo-zoom-width-fixture.apk": {
+    "bytes": 37507562,
+    "sha256": "e40049edeccf3aeb6c5b00a82095a337c82c85f9b6c8aef376c8afbccff4e62a",
+    "fixtureDex": "7283f6bad4d26f007454cd1ea8882132576a01be0f8759b2cd90e73a191f0c1a",
+    "sourceApk": "23bbd0067f919ef221ba67d40b18f4d3e69e02834cd77fce8640c3b2e2e4057a"
+  }
+}

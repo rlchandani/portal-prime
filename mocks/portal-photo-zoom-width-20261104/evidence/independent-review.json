@@ -1,0 +1,307 @@
+{
+  "ok": true,
+  "blockers": [],
+  "reviewedAtUtc": "2026-11-04T13:52:46.966Z",
+  "scope": "One combined independent source/native/artifact review using file reads, report arithmetic and ZIP byte inspection only; no SDK/build/test/runtime/Git/network/device actions or production edits.",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T13:42:16Z",
+    "selectedAt": "2026-11-04T13:45:17.422095+00:00",
+    "target": "2026-11-04T13:57:16Z",
+    "hardDeadline": "2026-11-04T14:12:16Z",
+    "clockNotReset": true
+  },
+  "source": {
+    "exactDelta": "SlideshowViewerControls is byte-identical to captured original after removing only the seven-line onMeasure override. App metadata only154/1.160 to155/1.161. No callback/editor/save/photo/stage/timer policy changes.",
+    "measurement": "Constrained width min(620dp, max(0, MeasureSpec size minus actual left/right padding)); UNSPECIFIED preserves620dp. Mutates existing SeekBar width before delegating original LinearLayout measurement.",
+    "activeCaller": "PhotoFrameController.kt:1539-1556 creates actual controls and attaches MATCH_PARENT width/WRAP_CONTENT height at bottom; caller hash remains exact.",
+    "scopeCorrection": "Initial plan retained and corrected to repeated same-width hide/reveal. Retained width-to-width resize, AT_MOST and UNSPECIFIED width are source-reviewed only."
+  },
+  "native": {
+    "caseNames": [
+      "narrow320",
+      "narrow480",
+      "wide800Preserves620"
+    ],
+    "before": {
+      "tests": 3,
+      "boundsFailures": 2,
+      "controls": 1,
+      "setupFailures": 0,
+      "nativeBeforeExit": 0
+    },
+    "after": {
+      "tests": 3,
+      "failures": 0,
+      "setupFailures": 0,
+      "terminal": {
+        "exitCode": 0,
+        "elapsedSeconds": 7.01
+      }
+    },
+    "independentMeasurements": [
+      {
+        "name": "narrow320",
+        "editorWidthPx": 288,
+        "beforeSeekWidthPx": 697,
+        "afterSeekWidthPx": 288,
+        "rootHeightPx": 552
+      },
+      {
+        "name": "narrow480",
+        "editorWidthPx": 468,
+        "beforeSeekWidthPx": 697,
+        "afterSeekWidthPx": 468,
+        "rootHeightPx": 292
+      },
+      {
+        "name": "wide800Preserves620",
+        "editorWidthPx": 828,
+        "beforeSeekWidthPx": 697,
+        "afterSeekWidthPx": 697,
+        "rootHeightPx": 234
+      }
+    ],
+    "density": 1.125,
+    "unchangedMeasurements": "Per-case root width/height, padding, editor bounds, expected width, seek left, wide control and zero callback/context fields remain exact before/after.",
+    "fixture": "Actual isolated embedded Stage, pixel-budget and SlideshowViewerControls constructors; real Android EXACT-width/UNSPEC-height measure/layout. Owned editor visibility only; no action invocation or formatter/state model.",
+    "guards": "Both phases retired3 actual Stage/controls with budget0/photoCount0 predicate, cleanuptrue, callbacks0, unexpectedContextOperations0, setup0 and actual embedded source SHA/byte equality. Both package/process/external-directory retirement records are all true.",
+    "containment": "Zero-permission manifest and generated resource/theme ContextWrapper with prefs/resolver/services/activity launch denied and counted. Zero wrapper calls is scoped evidence, not system-wide or loader-wide IO instrumentation.",
+    "frozenFixtureDex": {
+      "sha256": "7283f6bad4d26f007454cd1ea8882132576a01be0f8759b2cd90e73a191f0c1a",
+      "bytes": 19020
+    },
+    "sameFrozenJavaManifestDriverScaffolding": true,
+    "wrapperZipChangedEntries": [
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/MANIFEST.MF",
+      "assets/source.apk"
+    ],
+    "originQualification": "Source-authoring/Not compiled/unexecuted fields in original admission/preparation describe their original phases; actual frozen DEX and paired reports establish completed native phase."
+  },
+  "artifacts": {
+    "debug": {
+      "sha256": "23bbd0067f919ef221ba67d40b18f4d3e69e02834cd77fce8640c3b2e2e4057a",
+      "bytes": 46745646,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='155' versionName='1.161' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "sha256": "14a9a8e80670f9d8873844435955b7cbd9a785c31e3a9f9d5f8dac860332fd96",
+      "bytes": 25886923,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='155' versionName='1.161' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "assetChecks": [
+      {
+        "variant": "debug",
+        "sourceAssetsExact": 23,
+        "packagedAssets": 65,
+        "generatedChanges": []
+      },
+      {
+        "variant": "performance",
+        "sourceAssetsExact": 23,
+        "packagedAssets": 57,
+        "generatedChanges": [
+          "assets/dexopt/baseline.prof"
+        ]
+      }
+    ],
+    "metadataEvidence": "Root SDK verifier/metadata are bound. Independent SHA/size/ZIP/embedded APK and all23source asset byte comparisons performed without SDK execution.",
+    "generatedProfileQualification": "Initial generated-assets equality assertion was too broad. Independent final replay confirms performance differs only in generated assets/dexopt/baseline.prof; all23source assets remain exact to source/baseline, debug packaged assets all unchanged. No production/native gate relaxation.",
+    "jvmRecount": {
+      "tests": 4513,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 471
+    },
+    "jvmXmlAggregateSha256": "d8c4c21f874b2cce14e3e8fbd76f14b6a65a4d8c73017f47c82ca0ff733993db",
+    "jvmXmlAggregateDefinition": "Sorted filename + NUL + SHA256 + NUL + byte length + newline",
+    "buildTerminal": {
+      "exitCode": 0,
+      "elapsedSeconds": 104.385
+    }
+  },
+  "limits": [
+    "Detached debug/API29 native measurement at EXACT widths320/480/800dp, UNSPECIFIED height, density1.125, same-width hide/reveal only.",
+    "No mounted UI/pixel/hardware/touch/real photo/editor save/provider/account/controller-startup or broad button horizontal-fit acceptance.",
+    "AT_MOST, UNSPECIFIED root width, zero/tiny width and same-instance width-to-width resize remain source-reviewed only. No optimized runtime/API28/Living/room visual acceptance.",
+    "Rooms/publication/preservation are root-owned later phases; this receipt authorizes no independent device claim."
+  ],
+  "bindings": {
+    "/private/tmp/portal-visible-ux-20261104-134216/plan.json": {
+      "sha256": "7b90f65e25596e21841cdee8b2f7138987d68b4f0fc0ebb407bb484f5c5abf3b",
+      "bytes": 1399
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/initial-plan.json": {
+      "sha256": "ce8c3dd3a7c9a24ae846420f732d7189a183915c1c1da259873ed0109bd383a6",
+      "bytes": 1212
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/source-witness.json": {
+      "sha256": "d3efd9f31b0e35fd2b051e4c6544d9f55d1b755f76c90cb9c58855c96e6589a0",
+      "bytes": 2370
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/SlideshowViewerControls.before.kt": {
+      "sha256": "a7caf5f2f36b324e317ed271e922d4fb8fc01dfc42c135b9a296fc543898a001",
+      "bytes": 9009
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/app-build.before.kts": {
+      "sha256": "42c4ef0815c1c9de7eaa1ffb037c1685ff3803e1a8f8f456d4a2f53ae845a9af",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/baseline-terminal.json": {
+      "sha256": "6bf1da941f3c7295eec00b594bc26e326c59dbd6c68e8965fd43d156c07826e5",
+      "bytes": 73
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/build-terminal.json": {
+      "sha256": "50168047b0788ef8d9bad2faec48783f7b40607d8f3c05c58df4496917a8fc2c",
+      "bytes": 49
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/gradle.log": {
+      "sha256": "138079eb8d20ffe5c3487db0ac84eafa63f6de4e90951ca1f7e7c9af9a7cf5a9",
+      "bytes": 14181
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-build.log": {
+      "sha256": "758b64413a953093680e9cf6cd958217b647077df9f0021d3e78c5a04f8b9ec3",
+      "bytes": 642
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-before.log": {
+      "sha256": "2b3e14056f82e0b89c2841d9799d4cc82d16539d8c6ad671eb5898e684e0969c",
+      "bytes": 117
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-after-terminal.json": {
+      "sha256": "fffc616eb76b88142bc6c9ea03f6e34755c38381b23af381b38bfac6935ca9fa",
+      "bytes": 46
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-after-terminal.log": {
+      "sha256": "e6453f15b0f73cf74472f82062587ea72866242a564791260f693173cc6235d7",
+      "bytes": 116
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/repack-terminal.json": {
+      "sha256": "6a952e4d8cea1277e8ea5d591ee8b2b1e5c35b6f0eb76cef1ec8724c3ad88b27",
+      "bytes": 47
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/repack-terminal.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/root-scaffolding-frozen.json": {
+      "sha256": "1e16fd020f390f862641d051f05222b544168e4a91ff682f3736f8474a1b3bc3",
+      "bytes": 531
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/final-wrapper-bindings.json": {
+      "sha256": "310dc1ed3cf12f316f29b196ef775401d989bdb6da4c8cf81109cb35e86c38a4",
+      "bytes": 627
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-run.py": {
+      "sha256": "6f09fd481d821112345993dcecfed276ccf5632fe5531ac58e6080bf66cf5154",
+      "bytes": 5230
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/verify-artifacts.py": {
+      "sha256": "f527173971498111c53bf59ae0283412a73daffad5d98910eb66e1ce27a74ce4",
+      "bytes": 3374
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/promotion-artifacts.json": {
+      "sha256": "d6a0d33d5dd0a3e992edfc1baae8786772cd09ea99c94106cada0d4b171a7e8c",
+      "bytes": 9840
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/before-debug-1.160.apk": {
+      "sha256": "8406ae2c6608584c5d03c572c76067df8c4d7f791962ba621e57cc3f53a8c43b",
+      "bytes": 46745646
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/rollback-1.160.apk": {
+      "sha256": "9a7fa0177937241d1709115479a4aa65b605f0a41021cb29e0f80b5175b75af9",
+      "bytes": 25886923
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/candidate-debug-1.161.apk": {
+      "sha256": "23bbd0067f919ef221ba67d40b18f4d3e69e02834cd77fce8640c3b2e2e4057a",
+      "bytes": 46745646
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/candidate-performance-1.161.apk": {
+      "sha256": "14a9a8e80670f9d8873844435955b7cbd9a785c31e3a9f9d5f8dac860332fd96",
+      "bytes": 25886923
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/preparation-verification.json": {
+      "sha256": "7e0cbfaa72ed0ca49a832e7d28391c869ede98fd13e005a2d37b95dbf3ff7676",
+      "bytes": 2161
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/frozen-dex/classes.dex": {
+      "sha256": "7283f6bad4d26f007454cd1ea8882132576a01be0f8759b2cd90e73a191f0c1a",
+      "bytes": 19020
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/baseline-fixture.apk": {
+      "sha256": "d92608cc57d738fed472d23f7cec0abbf60c4254ca596080f9ef35948054d885",
+      "bytes": 37507562
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/photo-zoom-width-fixture.apk": {
+      "sha256": "e40049edeccf3aeb6c5b00a82095a337c82c85f9b6c8aef376c8afbccff4e62a",
+      "bytes": 37507562
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowViewerControls.kt": {
+      "sha256": "ef1fdf154a3631b7ada5a066b3c1685fdc1d16b54c2e7e98e9929fb5e02e8210",
+      "bytes": 9427
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+      "bytes": 164859
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowStage.kt": {
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "2c7b7511cdbe2ac5ea12c4af11c0113e750394104561d486d7701b6a68385b48",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py": {
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740",
+      "bytes": 19404
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/PhotoZoomWidthActivity.java": {
+      "sha256": "065ac8954c2a9a221333f4c0b12d211b23e8e2e0bbbfa8a16674ff24dd02059b",
+      "bytes": 11637
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/AndroidManifest.xml": {
+      "sha256": "79a60c118d1d62c954a6ecfecc75664c2f49a7487bd26073af65e243b90b0cc2",
+      "bytes": 433
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/RUN.md": {
+      "sha256": "ce3f21e96cd602f257022d62a166431d2476cfc83ac3153e50ce35cbbbc12399",
+      "bytes": 2144
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/source-admission.json": {
+      "sha256": "2bdf6fc001984bde6cfafd5c26109d82a1b522ca235ab4efa392067f1e402c32",
+      "bytes": 1419
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/build.sh": {
+      "sha256": "2abc035bd76f5264d41d848df3e419218f12c02b5186876cda6ec30c4d0ec89a",
+      "bytes": 834
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/repack.sh": {
+      "sha256": "979c12ea0b3e2bf89b6933468187864d2dccfe69639ce9b595643d9f5735e65c",
+      "bytes": 789
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-owned/freeze.py": {
+      "sha256": "cb19d271532b45b32c9f57211202eaf294b9cbfddaf31f5940d86ec063b27184",
+      "bytes": 1475
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-before-report.json": {
+      "sha256": "1473d0bdcb1fb45055d9283e031f6da708035bc4f89cb0dabe5c494a72fcbc8d",
+      "bytes": 3079
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-after-report.json": {
+      "sha256": "ca92d43f412a68dba7b845cc54886805439b25e4c24d30c562abd510e295a554",
+      "bytes": 2702
+    },
+    "/private/tmp/portal-visible-ux-20261104-134216/native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    }
+  }
+}

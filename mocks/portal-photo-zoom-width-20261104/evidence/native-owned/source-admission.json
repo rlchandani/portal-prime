@@ -1,0 +1,44 @@
+{
+  "sourceAuthoringOnly": true,
+  "frozenAtUtc": "2026-11-04T13:45:12.990227+00:00",
+  "originalDiscoveryUtc": "2026-11-04T13:42:16Z",
+  "targetUtc": "2026-11-04T13:57:16Z",
+  "hardUtc": "2026-11-04T14:12:16Z",
+  "package": "com.immortal.photozoomwidthfixture",
+  "activity": ".PhotoZoomWidthActivity",
+  "sources": {
+    "PhotoZoomWidthActivity.java": {
+      "sha256": "065ac8954c2a9a221333f4c0b12d211b23e8e2e0bbbfa8a16674ff24dd02059b",
+      "bytes": 11637
+    },
+    "AndroidManifest.xml": {
+      "sha256": "79a60c118d1d62c954a6ecfecc75664c2f49a7487bd26073af65e243b90b0cc2",
+      "bytes": 433
+    },
+    "RUN.md": {
+      "sha256": "ce3f21e96cd602f257022d62a166431d2476cfc83ac3153e50ce35cbbbc12399",
+      "bytes": 2144
+    }
+  },
+  "caseNames": [
+    "narrow320",
+    "narrow480",
+    "wide800Preserves620"
+  ],
+  "expectedBaseline": {
+    "tests": 3,
+    "failures": 2,
+    "controls": 1,
+    "setupFailures": 0
+  },
+  "expectedCandidate": {
+    "tests": 3,
+    "failures": 0,
+    "setupFailures": 0
+  },
+  "permissions": [],
+  "sourceApkBinding": "Root must bind exact retained before/candidate APK; no author APK execution",
+  "dexStatus": "Not compiled; root must freeze one DEX before both executions",
+  "rootMustReadAllSourcesBeforeSdk": true,
+  "operationsByAuthor": "Read source and write owned private Java/manifest/docs/metadata only; no tests/build/SDK/device/Git/network/media/provider actions."
+}

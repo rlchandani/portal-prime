@@ -1,0 +1,16 @@
+{
+  "previousTaskCount": 155,
+  "taskCount": 156,
+  "allPreviousTaskObjectsExact": true,
+  "rawSuffixBytes": 501334,
+  "rawSuffixSha256": "18932a08129d2781baedba4ec99acae2bb903319f9bfb2a8820cd17bc5c79db7",
+  "defaultExact": true,
+  "onlyBoundaryChange": "Current room APK1.160/code154\u21921.161/code155",
+  "counts": {
+    "delivered": 104,
+    "verified": 42,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  }
+}

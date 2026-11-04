@@ -103,6 +103,13 @@ internal class SlideshowViewerControls(
     addView(editor, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
   }
 
+  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    val available = if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.UNSPECIFIED) dp(620)
+        else (MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight).coerceAtLeast(0)
+    (editor.getChildAt(1) as SeekBar).layoutParams.width = minOf(dp(620), available)
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+  }
+
   fun toggle() {
     if (editing) return
     visibility = if (visibility == View.VISIBLE) View.GONE else View.VISIBLE

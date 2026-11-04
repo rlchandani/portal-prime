@@ -1,0 +1,67 @@
+{
+  "originalDiscoveryUtc": "2026-11-04T13:42:16Z",
+  "targetUtc": "2026-11-04T13:57:16Z",
+  "hardUtc": "2026-11-04T14:12:16Z",
+  "scope": "Source-only visible native slideshow editor sizing audit",
+  "finding": "Fixed 620 dp Photo zoom SeekBar clips inside narrower MATCH_PARENT editor",
+  "activeCaller": {
+    "path": "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+    "lines": [
+      1539,
+      1556
+    ]
+  },
+  "sourceEvidence": {
+    "path": "app/src/main/java/com/immortal/launcher/SlideshowViewerControls.kt",
+    "horizontalPaddingDp": 32,
+    "fixedSeekbarWidthDp": 620,
+    "lines": [
+      61,
+      91,
+      103,
+      141,
+      145
+    ],
+    "literalWitnesses": [
+      {
+        "rootWidthDp": 320,
+        "availableEditorWidthDp": 256,
+        "excessDp": 364
+      },
+      {
+        "rootWidthDp": 480,
+        "availableEditorWidthDp": 416,
+        "excessDp": 204
+      },
+      {
+        "rootWidthDp": 800,
+        "availableEditorWidthDp": 736,
+        "expectedPreservedSeekbarWidthDp": 620
+      }
+    ]
+  },
+  "distinctness": "No zoom/seekbar/editor-width issue found in current roadmap or prior slideshow drag/commit receipts. Those validate editing transaction/drag input; matte/frame/crop policies do not cap toolbar child width. This witness excludes buttons, motion and photo geometry.",
+  "sources": {
+    "app/src/main/java/com/immortal/launcher/SlideshowViewerControls.kt": {
+      "sha256": "a7caf5f2f36b324e317ed271e922d4fb8fc01dfc42c135b9a296fc543898a001",
+      "bytes": 9009
+    },
+    "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+      "bytes": 164859
+    },
+    "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+      "sha256": "1dc74303e13b5eff028536af271d094740bccb13b7ad205d8a2f573a3d1349f4",
+      "bytes": 502381
+    },
+    "docs/portal-slideshow-drag-2026-11-01.md": {
+      "sha256": "aad3436547dbcbdb90d046f8b9c3e82173cb6e084f0166df5b500556f2c422f4",
+      "bytes": 5352
+    },
+    "docs/portal-slideshow-commit-2026-11-01.md": {
+      "sha256": "c0c2c0237da672ad3627ed10b72461ef948685ac4fceb38fe6c8a91df4667025",
+      "bytes": 6584
+    }
+  },
+  "operations": "Source reads and this private metadata write only; no tests, SDK, builds, devices, Git, providers or media."
+}

@@ -1,0 +1,65 @@
+{
+  "sourceAuthoringOnly": true,
+  "frozenAtUtc": "2026-11-04T13:45:12.990227+00:00",
+  "originalDiscoveryUtc": "2026-11-04T13:42:16Z",
+  "targetUtc": "2026-11-04T13:57:16Z",
+  "hardUtc": "2026-11-04T14:12:16Z",
+  "package": "com.immortal.photozoomwidthfixture",
+  "activity": ".PhotoZoomWidthActivity",
+  "sources": {
+    "PhotoZoomWidthActivity.java": {
+      "sha256": "065ac8954c2a9a221333f4c0b12d211b23e8e2e0bbbfa8a16674ff24dd02059b",
+      "bytes": 11637
+    },
+    "AndroidManifest.xml": {
+      "sha256": "79a60c118d1d62c954a6ecfecc75664c2f49a7487bd26073af65e243b90b0cc2",
+      "bytes": 433
+    },
+    "RUN.md": {
+      "sha256": "ce3f21e96cd602f257022d62a166431d2476cfc83ac3153e50ce35cbbbc12399",
+      "bytes": 2144
+    },
+    "source-admission.json": {
+      "sha256": "2bdf6fc001984bde6cfafd5c26109d82a1b522ca235ab4efa392067f1e402c32",
+      "bytes": 1419
+    }
+  },
+  "caseNames": [
+    "narrow320",
+    "narrow480",
+    "wide800Preserves620"
+  ],
+  "expectedBaseline": {
+    "tests": 3,
+    "failures": 2,
+    "controls": 1,
+    "setupFailures": 0
+  },
+  "expectedCandidate": {
+    "tests": 3,
+    "failures": 0,
+    "setupFailures": 0
+  },
+  "permissions": [],
+  "sourceApkBinding": "Root must bind exact retained before/candidate APK; no author APK execution",
+  "dexStatus": "Not compiled; root must freeze one DEX before both executions",
+  "rootMustReadAllSourcesBeforeSdk": true,
+  "operationsByAuthor": "Read source and write owned private Java/manifest/docs/metadata only; no tests/build/SDK/device/Git/network/media/provider actions.",
+  "state": "root-compiled-baseline-ready-unexecuted",
+  "ok": true,
+  "fixtureDex": {
+    "sha256": "7283f6bad4d26f007454cd1ea8882132576a01be0f8759b2cd90e73a191f0c1a",
+    "bytes": 19020
+  },
+  "baselineFixture": {
+    "sha256": "d92608cc57d738fed472d23f7cec0abbf60c4254ca596080f9ef35948054d885",
+    "bytes": 37507562
+  },
+  "sourceApk": {
+    "sha256": "8406ae2c6608584c5d03c572c76067df8c4d7f791962ba621e57cc3f53a8c43b",
+    "bytes": 46745646
+  },
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.photozoomwidthfixture\n",
+  "fixtureDexPendingRootCompilation": false
+}
