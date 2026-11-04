@@ -1,18 +1,58 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T07:56:34.019473+00:00",
-  "updatedLabel": "Three-photo doodles delivered1.137; next independent small slice",
+  "updatedAt": "2026-11-04T08:05:29.419326+00:00",
+  "updatedLabel": "Three matte layouts delivered1.138; distinct backgrounds remain",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.137/code 131. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.138/code 132. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "grouped-matte-doodles",
+      "title": "Photo pair, Memories and Panorama: quiet margins",
+      "summary": "Three compatible charcoal layouts share the quiet doodle background.",
+      "status": "delivered",
+      "verification": "4,402 JVM \u00b7 1,106 JS \u00b7 six native scenes \u00b7 exact both-room installs",
+      "kind": "Screensaver visual polish",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering",
+      "deployment": "Optimized1.138/code132 fully hashed in both rooms from one install per room; Living ACK reconciled read-only.",
+      "acceptance": [
+        "Visible quiet doodles in all three scene mattes.",
+        "Preserve existing geometry, crops, fades, captions and timers.",
+        "Keep saved configuration and prior scopes."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped delivery and remaining work.",
+          "source": "docs/portal-matte-doodles-2026-11-04.md"
+        },
+        {
+          "text": "Artifacts, traces, native pixels, preview and installed state.",
+          "source": "mocks/portal-matte-doodles-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Diptych/Memories/Panorama matte changes only; Gallery Wall opaque photo layers, Cinema black bars/grain, Polaroid gradient and Filmstrip image background retain separate scopes.",
+        "Generated static initials on Family API29, initial single Memories only; native collage, resize, extreme panorama crops, production scheduler/native clock, API28, Living physical visuals and hardware performance remain open.",
+        "No phone, source-media transfer, provider/account, GitHub push or publication."
+      ],
+      "next": "Treat remaining distinct backgrounds as separate bounded work; whole product stays active.",
+      "issueClock": {
+        "startedAt": "2026-11-04T07:57:33Z",
+        "target": "2026-11-04T08:12:33Z",
+        "deadline": "2026-11-04T08:27:33Z",
+        "scope": "Discovery through delivery and closure; no reset."
+      }
+    },
     {
       "id": "sidebar-doodle-margins",
       "title": "Three-photo layout: quiet doodle margins",

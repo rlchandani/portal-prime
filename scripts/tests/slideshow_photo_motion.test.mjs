@@ -50,13 +50,14 @@ function snapshot(r) {
 // Cinematic doodles change only background-image/size; normalized traces retain the prior hashes.
 // Cinematic border children are decorative; removing them retains the previous scene trace.
 // Sidebar doodles change only matte background-image/size; normalized traces retain the prior hash.
+// Diptych/Memories/Panorama reuse those matte fields; their normalized traces also remain pinned.
 const legacyOutput = [
   ['kenBurns', 30, '3005c1e70712a249dbedd01585276ccadca7bfa140b86375ba5963d57c15ad63'],
-  ['diptych', 12, '1306f202be7a187821287abc97d0bd6ab6664f761f9052081b157fa85fd116b0'],
+  ['diptych', 12, 'fa7c72dbfe5deacf62899a1ae17aa0c6eeaf21e1d95901012bc702c23247beef'],
   ['framed', 6, '95a97824d4030098e30c1d421b25d87e7611aae3115062474e9b72d1c7190551'],
   ['push', 0, '70851e47d57b1f68d6db6a5c2643b91928bdca4e8c92817175dbb305d607714a'],
-  ['memories', 0, '6f642dfabcc126c561f90a9e0507820b53b5a9bcb6039c0e4facd602e388a1a3'],
-  ['panorama', 0, '03a82e8bf80c00c8a1aeef2c9135a050a2b91c7df7ec75cd9e5bbf22d348cb1f'],
+  ['memories', 0, '450157eda127ccfa5a7696531686ce1b0607ebc7edd19922bcd11fadee86c9ef'],
+  ['panorama', 0, '64d5d2036eb082a85bab62c7718b97da2bb9289836eda98220a05a1c3b9ec0cd'],
   ['mosaic', 5, '5bcac3423cd4bb7973e4727270c64e614f7b97aa91faddc197a07443e5b22434'],
   ['cinema', 0, '783c87acee8c1a3d2110c15410acd7ee9c178ded8627d5f2750051fee5f84700'],
   ['heroSidebar', 0, 'a68aba7d77b716bdafc6e05b798aca2ec4c7664807cc5b8d76ab667fc5b5a09c'],

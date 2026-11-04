@@ -1,0 +1,674 @@
+{
+  "version": "1.138/code132",
+  "sourceBase": "212dfe1c2886b0859e4bb597ebd697264ce19a04",
+  "recordedAt": "2026-11-04T08:05:29.419326+00:00",
+  "issueClock": {
+    "scope": "Diptych/Memories/Panorama quiet charcoal matte doodles, three CSS rules only",
+    "startedAt": "2026-11-04T07:57:33Z",
+    "target": "2026-11-04T08:12:33Z",
+    "deadline": "2026-11-04T08:27:33Z",
+    "sourceBase": "212dfe1c2886b0859e4bb597ebd697264ce19a04",
+    "version": "1.138/code132",
+    "previousScopesAndClocksRetained": true,
+    "nextSeparateStyles": [
+      "Gallery Wall opaque image layer",
+      "Cinema black bars/grain",
+      "Polaroid gradient and Filmstrip image background"
+    ]
+  },
+  "elapsedMinutesAtReceipt": 7.94,
+  "artifacts": {
+    "apks": {
+      "debug": {
+        "bytes": 46728278,
+        "sha256": "5af2a37e544b2a24ee41db09cc771ab4c4767a8f5c64b6036ae9c06c6b05a467",
+        "manifest": "package: name='com.immortal.launcher.debug' versionCode='132' versionName='1.138' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "screensaverAssets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "bytes": 66451,
+            "sha256": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0"
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "bytes": 14823,
+            "sha256": "23a8148c71d54508a28a7af68f153f5e9d43550737bf7cb9b46ad4e1ed1ea314"
+          }
+        ]
+      },
+      "performance": {
+        "bytes": 25886231,
+        "sha256": "7560cf4ec6b419186e46f374e55d8172aebcd8f6947c19b2d0158d55ca4f9f33",
+        "manifest": "package: name='com.immortal.launcher.debug' versionCode='132' versionName='1.138' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "screensaverAssets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "bytes": 66451,
+            "sha256": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0"
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "bytes": 14823,
+            "sha256": "23a8148c71d54508a28a7af68f153f5e9d43550737bf7cb9b46ad4e1ed1ea314"
+          }
+        ]
+      }
+    },
+    "jvm": {
+      "tests": 4402,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 460
+    },
+    "fullGradleExit": 0,
+    "clockReset": false,
+    "sourceHead": "212dfe1c2886b0859e4bb597ebd697264ce19a04"
+  },
+  "appearanceOnlyTrace": [
+    {
+      "mode": "diptych",
+      "photoMotion": "undefined",
+      "previousHash": "1306f202be7a187821287abc97d0bd6ab6664f761f9052081b157fa85fd116b0",
+      "normalizedCandidateHash": "1306f202be7a187821287abc97d0bd6ab6664f761f9052081b157fa85fd116b0",
+      "candidateHash": "fa7c72dbfe5deacf62899a1ae17aa0c6eeaf21e1d95901012bc702c23247beef",
+      "randomDraws": 12,
+      "onlyDifference": [
+        "background-image and background-size on the charcoal scene matte"
+      ]
+    },
+    {
+      "mode": "diptych",
+      "photoMotion": true,
+      "previousHash": "1306f202be7a187821287abc97d0bd6ab6664f761f9052081b157fa85fd116b0",
+      "normalizedCandidateHash": "1306f202be7a187821287abc97d0bd6ab6664f761f9052081b157fa85fd116b0",
+      "candidateHash": "fa7c72dbfe5deacf62899a1ae17aa0c6eeaf21e1d95901012bc702c23247beef",
+      "randomDraws": 12,
+      "onlyDifference": [
+        "background-image and background-size on the charcoal scene matte"
+      ]
+    },
+    {
+      "mode": "memories",
+      "photoMotion": "undefined",
+      "previousHash": "6f642dfabcc126c561f90a9e0507820b53b5a9bcb6039c0e4facd602e388a1a3",
+      "normalizedCandidateHash": "6f642dfabcc126c561f90a9e0507820b53b5a9bcb6039c0e4facd602e388a1a3",
+      "candidateHash": "450157eda127ccfa5a7696531686ce1b0607ebc7edd19922bcd11fadee86c9ef",
+      "randomDraws": 0,
+      "onlyDifference": [
+        "background-image and background-size on the charcoal scene matte"
+      ]
+    },
+    {
+      "mode": "memories",
+      "photoMotion": true,
+      "previousHash": "6f642dfabcc126c561f90a9e0507820b53b5a9bcb6039c0e4facd602e388a1a3",
+      "normalizedCandidateHash": "6f642dfabcc126c561f90a9e0507820b53b5a9bcb6039c0e4facd602e388a1a3",
+      "candidateHash": "450157eda127ccfa5a7696531686ce1b0607ebc7edd19922bcd11fadee86c9ef",
+      "randomDraws": 0,
+      "onlyDifference": [
+        "background-image and background-size on the charcoal scene matte"
+      ]
+    },
+    {
+      "mode": "panorama",
+      "photoMotion": "undefined",
+      "previousHash": "03a82e8bf80c00c8a1aeef2c9135a050a2b91c7df7ec75cd9e5bbf22d348cb1f",
+      "normalizedCandidateHash": "03a82e8bf80c00c8a1aeef2c9135a050a2b91c7df7ec75cd9e5bbf22d348cb1f",
+      "candidateHash": "64d5d2036eb082a85bab62c7718b97da2bb9289836eda98220a05a1c3b9ec0cd",
+      "randomDraws": 0,
+      "onlyDifference": [
+        "background-image and background-size on the charcoal scene matte"
+      ]
+    },
+    {
+      "mode": "panorama",
+      "photoMotion": true,
+      "previousHash": "03a82e8bf80c00c8a1aeef2c9135a050a2b91c7df7ec75cd9e5bbf22d348cb1f",
+      "normalizedCandidateHash": "03a82e8bf80c00c8a1aeef2c9135a050a2b91c7df7ec75cd9e5bbf22d348cb1f",
+      "candidateHash": "64d5d2036eb082a85bab62c7718b97da2bb9289836eda98220a05a1c3b9ec0cd",
+      "randomDraws": 0,
+      "onlyDifference": [
+        "background-image and background-size on the charcoal scene matte"
+      ]
+    }
+  ],
+  "native": {
+    "ok": true,
+    "error": null,
+    "observations": [
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "mode": "diptych",
+        "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(28, 27, 25)",
+        "photos": [
+          {
+            "id": 0,
+            "pw": 800,
+            "ph": 600,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/0.png\")",
+            "fit": {
+              "x": 157.8518409729004,
+              "y": 38.38888931274414,
+              "w": 1604.29638671875,
+              "h": 1203.2222900390625
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "orientation": "landscape",
+        "svgRequests": 1,
+        "screenshot": "diptych-landscape.png",
+        "pixelCopy": true,
+        "webWindowX": 0,
+        "webWindowY": 0,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "marginSamples": 155921,
+        "brightDoodleSamples": 2131
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "mode": "diptych",
+        "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(28, 27, 25)",
+        "photos": [
+          {
+            "id": 1,
+            "pw": 480,
+            "ph": 800,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/1.png\")",
+            "fit": {
+              "x": 131.83193130493163,
+              "y": 38.38888931274414,
+              "w": 721.9333740234375,
+              "h": 1203.2222900390625
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": 2,
+            "pw": 480,
+            "ph": 800,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/2.png\")",
+            "fit": {
+              "x": 1066.248583984375,
+              "y": 38.38888931274414,
+              "w": 721.9333740234375,
+              "h": 1203.2222900390625
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "orientation": "portrait",
+        "svgRequests": 2,
+        "screenshot": "diptych-portrait.png",
+        "pixelCopy": true,
+        "webWindowX": 0,
+        "webWindowY": 0,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "marginSamples": 216352,
+        "brightDoodleSamples": 3000
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "mode": "memories",
+        "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(28, 27, 25)",
+        "photos": [
+          {
+            "id": 0,
+            "pw": 800,
+            "ph": 600,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/0.png\")",
+            "fit": {
+              "x": 192,
+              "y": 64,
+              "w": 1536,
+              "h": 1152
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "orientation": "landscape",
+        "svgRequests": 3,
+        "screenshot": "memories-landscape.png",
+        "pixelCopy": true,
+        "webWindowX": 0,
+        "webWindowY": 0,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "marginSamples": 205999,
+        "brightDoodleSamples": 3370
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "mode": "memories",
+        "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(28, 27, 25)",
+        "photos": [
+          {
+            "id": 1,
+            "pw": 480,
+            "ph": 800,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/1.png\")",
+            "fit": {
+              "x": 614.4000000000001,
+              "y": 64,
+              "w": 691.1999999999999,
+              "h": 1152
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "orientation": "portrait",
+        "svgRequests": 4,
+        "screenshot": "memories-portrait.png",
+        "pixelCopy": true,
+        "webWindowX": 0,
+        "webWindowY": 0,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "marginSamples": 515875,
+        "brightDoodleSamples": 7185
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "mode": "panorama",
+        "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(28, 27, 25)",
+        "photos": [
+          {
+            "id": 0,
+            "pw": 800,
+            "ph": 600,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/0.png\")",
+            "fit": {
+              "x": 106.66666666666663,
+              "y": 0,
+              "w": 1706.6666666666667,
+              "h": 1280
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "orientation": "landscape",
+        "svgRequests": 5,
+        "screenshot": "panorama-landscape.png",
+        "pixelCopy": true,
+        "webWindowX": 0,
+        "webWindowY": 0,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "marginSamples": 80908,
+        "brightDoodleSamples": 1229
+      },
+      {
+        "ready": true,
+        "svgDecoded": true,
+        "mode": "panorama",
+        "background": "url(\"https://graphite.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(28, 27, 25)",
+        "photos": [
+          {
+            "id": 1,
+            "pw": 480,
+            "ph": 800,
+            "knownPhoto": true,
+            "contain": true,
+            "position": "50% 50%",
+            "animation": "none",
+            "photoBackground": "url(\"https://graphite.fixture/photo/1.png\")",
+            "fit": {
+              "x": 576,
+              "y": 0,
+              "w": 768,
+              "h": 1280
+            },
+            "wholePhotoCorners": [
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        ],
+        "fillCount": 0,
+        "dpr": 1.125,
+        "width": 1920,
+        "height": 1280,
+        "orientation": "portrait",
+        "svgRequests": 6,
+        "screenshot": "panorama-portrait.png",
+        "pixelCopy": true,
+        "webWindowX": 0,
+        "webWindowY": 0,
+        "webPixelWidth": 2160,
+        "webPixelHeight": 1440,
+        "marginSamples": 458956,
+        "brightDoodleSamples": 6301
+      }
+    ],
+    "svgRequests": 6,
+    "unknownRequests": 0,
+    "deniedRequestDiagnostics": [],
+    "deniedRequestDiagnosticLimit": 16,
+    "webViewDestroyed": true,
+    "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+  },
+  "nativeRetirement": {
+    "packageAbsent": true,
+    "processAbsent": true,
+    "webViewDestroyed": true,
+    "embeddedPerformanceSha256": "7560cf4ec6b419186e46f374e55d8172aebcd8f6947c19b2d0158d55ca4f9f33"
+  },
+  "nativeSourceSha256": "9a5f035e0040594c6a216970a1068548adacb78971f564909ad061353c9287fd",
+  "fixtureApkSha256": "3cbc9380eac4da5aa66892d44a1e33269eb3fbc9c70fd6fb7d496fa225690219",
+  "gates": {
+    "jvmTests": 4402,
+    "jvmSuites": 460,
+    "slideshow": 363,
+    "applicationJs": 743,
+    "failures": 0,
+    "debugOptimizedR8VitalLint": true,
+    "strictDocsExit": 0
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886231,
+      "sha256": "7560cf4ec6b419186e46f374e55d8172aebcd8f6947c19b2d0158d55ca4f9f33",
+      "app": {
+        "versionCode": 132,
+        "versionName": "1.138"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886231,
+        "sha256": "7560cf4ec6b419186e46f374e55d8172aebcd8f6947c19b2d0158d55ca4f9f33",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 132,
+          "versionName": "1.138"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1529,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1741,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "preview": {
+    "surface": "Isolated desktop Chromium with actual localhost production entry point and owned samples",
+    "results": [
+      {
+        "mode": "diptych",
+        "background": true,
+        "size": "480px 360px",
+        "decodedSvg": true,
+        "photos": 2,
+        "controlDisabled": true
+      },
+      {
+        "mode": "memories",
+        "background": true,
+        "size": "480px 360px",
+        "decodedSvg": true,
+        "photos": 1,
+        "controlDisabled": false
+      },
+      {
+        "mode": "panorama",
+        "background": true,
+        "size": "480px 360px",
+        "decodedSvg": true,
+        "photos": 1,
+        "controlDisabled": false
+      }
+    ],
+    "isolatedContextClosed": true,
+    "existingUserTabsUnchanged": true
+  },
+  "registryHashesPreserved": true,
+  "independentReview": "Three-rule CSS normalization, all six prior trace comparisons, exact embedded APK/assets and six native mark/corner recomputations accepted.",
+  "visualReview": {
+    "sixGeneratedImagesViewed": true,
+    "all28PhotoCornersPreserved": true,
+    "privateFamilyFrameViewed": true,
+    "currentFamilyStyle": {
+      "viewedAt": "2026-11-04T08:05:24.984257+00:00",
+      "frameAwake": true,
+      "clockReadable": true,
+      "observedAppearance": "One large portrait photograph centered on charcoal margins with visible quiet doodles.",
+      "selectedRenderer": "Not identified from the private static capture.",
+      "savedMode": "shuffle",
+      "savedFit": "fit",
+      "householdCapture": "Private scratch only; excluded from repository evidence."
+    }
+  },
+  "limits": [
+    "Diptych/Memories/Panorama matte changes only; Gallery Wall opaque photo layers, Cinema black bars/grain, Polaroid gradient and Filmstrip image background retain separate scopes.",
+    "Generated static initials on Family API29, initial single Memories only; native collage, resize, extreme panorama crops, production scheduler/native clock, API28, Living physical visuals and hardware performance remain open.",
+    "No phone, source-media transfer, provider/account, GitHub push or publication."
+  ],
+  "publicManifestUnchanged": "1.83/code77"
+}

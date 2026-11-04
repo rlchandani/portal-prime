@@ -13,9 +13,9 @@
     [720,720,"square-forest"],[960,640,"mountain"],[480,720,"portrait-forest"],
   ];
   const selectedMode = query.get("mode");
-  const mode = ["framed", "mosaic", "kenBurns", "push", "heroSidebar"].includes(selectedMode) ? selectedMode : "mosaic";
+  const mode = ["framed", "mosaic", "kenBurns", "push", "heroSidebar", "diptych", "memories", "panorama"].includes(selectedMode) ? selectedMode : "mosaic";
   let photos = shapes.map(([w,h,name]) => ({ w, h, url: `/samples/${name}.jpg` }));
-  if (!["mosaic", "heroSidebar"].includes(mode)) photos = [photos[Number(query.get("photo")) || 0]];
+  if (!["mosaic", "heroSidebar", "diptych"].includes(mode)) photos = [photos[Number(query.get("photo")) || 0]];
   let seed = 531;
   Math.random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
   window.Android = {
