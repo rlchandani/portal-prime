@@ -1,0 +1,12 @@
+{
+  "issue": "Browser key actions show success without positive response envelope",
+  "startedAt": "2026-11-04T18:12:54Z",
+  "target": "2026-11-04T18:27:54Z",
+  "deadline": "2026-11-04T18:42:54Z",
+  "base": "830ff3663e5d774427a2aaa1b8b748e4e48d331f",
+  "acceptance": "Actual controller key actions reject malformed/missing/negative acknowledgments; preserve valid key and apps success, room ownership and generictransport; full Node/JVM/build/artifact review and both-room exact delivery",
+  "excluded": "Generic response grammar, device/native command success, live pairing/media/source/provider/account/phone/publication",
+  "version": "1.173",
+  "versionCode": 167,
+  "unselectedRecentsCandidateClock": "2026-11-04T18:12:45Z -> 2026-11-04T18:42:45Z; source-only misleading today suffix, no implementation or reset"
+}

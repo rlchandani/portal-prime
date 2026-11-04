@@ -1,0 +1,46 @@
+{
+  "originalDiscoveryUtc": "2026-11-04T18:12:54Z",
+  "guardAppliedObservedUtc": "2026-11-04T18:21:17Z",
+  "targetUtc": "2026-11-04T18:27:54Z",
+  "hardUtc": "2026-11-04T18:42:54Z",
+  "sourceOnlyAuthor": true,
+  "controllerAfter": {
+    "bytes": 270185,
+    "sha256": "a856e71873066f7e1b4ec47028d313a1f38255b06b95e73fec7553117888b672"
+  },
+  "controllerBeforeSha256": "eac6fc27ced31c9ec5614c8ed27eea62049223a29d0b4754b0ae3ef1283e14f5",
+  "onlyDispatchKeyGuardChanged": true,
+  "testFrozenUnchanged": true,
+  "harnessUnchanged": true,
+  "coreTransportUnchanged": true,
+  "baselineEvidence": {
+    "rootTerminalConfirmed": true,
+    "expectedAssertionFailures": 5,
+    "passedControls": 11,
+    "total": 16,
+    "reportSha256": "ea4b0eec45120b3bddd51253992007314a02f17511a62bef6be0f77f3c927422",
+    "report": {
+      "exitCode": 1,
+      "elapsedSeconds": 0.13205495799775235,
+      "counts": {
+        "tests": 16,
+        "pass": 11,
+        "fail": 5,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "sourceSha256": "eac6fc27ced31c9ec5614c8ed27eea62049223a29d0b4754b0ae3ef1283e14f5",
+      "testSha256": "17e88705e4a0e2d34a7075db6bb0cc0a443234a87c5a4b2926445cbff126d9b0",
+      "actualPublicControllerActions": true,
+      "initialReceiptParserError": "Node default Spec reporter did not match TAP parser; raw initial16/11/5 retained; same source/test rerun with explicit TAP for terminal receipt."
+    }
+  },
+  "scope": "dispatchKey explicit object/non-array/ok===true response admission; generic mutate, transport, success copy, dispatched===false and room-ticket ordering unchanged",
+  "limits": [
+    "No author-run tests/runtime/build/SDK/device/browser/network/media/provider/phone/Git operations.",
+    "Generated Node controller/DOM protocol feedback only; server ordinarily emitting malformed replies, physical rendered browser and native outcomes are not established."
+  ],
+  "focusedCommand": "node --test app/src/test/js/remote-control-command-delivery.test.mjs",
+  "fullCommand": "node --test app/src/test/js/*.test.mjs"
+}

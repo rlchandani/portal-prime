@@ -1,0 +1,23 @@
+{
+  "status": "no_accepted_browser_execution",
+  "caseResults": 0,
+  "requestsToPortals": 0,
+  "attempts": [
+    {
+      "stage": "private filename",
+      "error": "outside Playwright allowed roots",
+      "executed": false
+    },
+    {
+      "stage": "owned allowed fixture filename",
+      "error": "ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING before route/browser cases",
+      "executedCases": 0
+    }
+  ],
+  "candidateAndNodeAcceptanceUnchanged": true,
+  "scopeNotExpanded": true,
+  "isolatedTabClosed": true,
+  "ownedFixtureRetired": true,
+  "finishedAt": "2026-11-04T18:33:01.852490+00:00",
+  "originalIssueClockRetained": true
+}

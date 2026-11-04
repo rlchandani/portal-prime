@@ -1,0 +1,17 @@
+{
+  "startedAt": "2026-11-04T18:12:54+00:00",
+  "preDocsAt": "2026-11-04T18:38:42.054166+00:00",
+  "elapsedMinutes": 25.800902766666663,
+  "targetMinutes": 15,
+  "targetMissed": true,
+  "hardMinutes": 30,
+  "hardDeadlineMet": true,
+  "version": "1.173",
+  "bothExactApks": true,
+  "statePreserved": true,
+  "copiedCredentialsRetired": true,
+  "ownedBrowserFixtureRetired": true,
+  "isolatedTabClosed": true,
+  "goalStillActive": true,
+  "closureIncludesCommit": false
+}

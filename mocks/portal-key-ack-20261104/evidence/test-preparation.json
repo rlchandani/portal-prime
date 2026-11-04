@@ -1,0 +1,37 @@
+{
+  "originalDiscoveryUtc": "2026-11-04T18:12:54Z",
+  "targetUtc": "2026-11-04T18:27:54Z",
+  "hardUtc": "2026-11-04T18:42:54Z",
+  "phase": "tests ready; production guard held for root baseline",
+  "sources": [
+    {
+      "name": "control-center.before.js",
+      "bytes": 269969,
+      "sha256": "eac6fc27ced31c9ec5614c8ed27eea62049223a29d0b4754b0ae3ef1283e14f5"
+    },
+    {
+      "name": "remote-control-command-delivery.before.test.mjs",
+      "bytes": 4662,
+      "sha256": "cb17dfe3cc7233f32b17ef69064bcb949e786e2f3bcff8b6fd1c02088d44781a"
+    },
+    {
+      "name": "remote-browser-harness.before.mjs",
+      "bytes": 11469,
+      "sha256": "af023a77c0c650e39389eb17983aaf089b04390bb90ae0990ccedc4d1875e13c"
+    },
+    {
+      "name": "remote-control-command-delivery.frozen.test.mjs",
+      "bytes": 8586,
+      "sha256": "17e88705e4a0e2d34a7075db6bb0cc0a443234a87c5a4b2926445cbff126d9b0"
+    }
+  ],
+  "baselineControllerUnchanged": true,
+  "harnessUnchanged": true,
+  "addedCases": 10,
+  "expectedBaselineNewFailures": 5,
+  "expectedBaselineNewControls": 5,
+  "existingCases": 6,
+  "focusedCommand": "node --test app/src/test/js/remote-control-command-delivery.test.mjs",
+  "fullCommand": "node --test app/src/test/js/*.test.mjs",
+  "scope": "Actual controller public buttons in generated Node DOM and inert HTTP responses; no physical browser/server/device acceptance."
+}

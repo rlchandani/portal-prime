@@ -1,0 +1,14 @@
+{
+  "exitCode": 0,
+  "elapsedSeconds": 14.043630292006128,
+  "counts": {
+    "tests": 753,
+    "pass": 753,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "fileCount": 35,
+  "sourceSha256": "a856e71873066f7e1b4ec47028d313a1f38255b06b95e73fec7553117888b672"
+}

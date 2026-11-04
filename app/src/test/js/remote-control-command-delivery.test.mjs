@@ -92,3 +92,110 @@ test('hide then show retires queued values even when the old response finishes a
     assert.deepEqual(calls().map(c => JSON.parse(c.opts.body).level), [5, 7]);
   } finally { h.hide(); }
 });
+
+const keyRooms = [
+  { base: 'http://127.0.0.1:8877', name: 'A', token: 'fixture-a' },
+  { base: 'http://127.0.0.1:8878', name: 'B', token: 'fixture-b' },
+];
+
+async function keyHarness(reply) {
+  return browserHarness({
+    saved: keyRooms,
+    routes: { '/remote/key': ({ response }) => response(reply) },
+  });
+}
+
+for (const [name, reply] of [
+  ['empty object', {}],
+  ['array', []],
+  ['false', false],
+  ['missing ok with dispatch fields', { action: 'home', dispatched: true }],
+  ['non-Boolean ok', { ok: 'true', action: 'home', dispatched: true }],
+]) {
+  test(`Show Home rejects a ${name} acknowledgment without reporting dispatch`, async () => {
+    const h = await keyHarness(reply);
+    try {
+      h.click('Show Home');
+      await h.settle();
+      const calls = h.calls.filter(c => c.path === '/remote/key');
+      assert.equal(calls.length, 1);
+      assert.deepEqual(JSON.parse(calls[0].opts.body), { action: 'home' });
+      const notice = h.document.getElementById('notice');
+      assert.equal(notice.hidden, false);
+      assert.equal(notice.dataset.error, 'true');
+      assert.match(notice.textContent, /unreadable response/i);
+      assert.doesNotMatch(notice.textContent, /command dispatched/i);
+    } finally { h.hide(); }
+  });
+}
+
+test('Show Home reports an explicit successful key acknowledgment', async () => {
+  const h = await keyHarness({ ok: true, action: 'home', dispatched: true });
+  try {
+    h.click('Show Home');
+    await h.settle();
+    const notice = h.document.getElementById('notice');
+    assert.equal(notice.dataset.error, 'false');
+    assert.match(notice.textContent, /command dispatched/i);
+    assert.equal(h.calls.filter(c => c.path === '/remote/key').length, 1);
+  } finally { h.hide(); }
+});
+
+test('Apps accepts its explicit ok acknowledgment without a dispatched field', async () => {
+  const h = await keyHarness({ ok: true, action: 'apps' });
+  try {
+    h.eval('go("remote")');
+    await h.settle();
+    h.click('Apps');
+    await h.settle();
+    const calls = h.calls.filter(c => c.path === '/remote/key');
+    assert.equal(calls.length, 1);
+    assert.deepEqual(JSON.parse(calls[0].opts.body), { action: 'apps' });
+    const notice = h.document.getElementById('notice');
+    assert.equal(notice.dataset.error, 'false');
+    assert.match(notice.textContent, /command dispatched/i);
+  } finally { h.hide(); }
+});
+
+for (const [name, reply] of [
+  ['explicit rejection', { ok: false, error: 'fixture_rejected' }],
+  ['failed dispatch', { ok: true, action: 'home', dispatched: false }],
+]) {
+  test(`Show Home retains error feedback for ${name}`, async () => {
+    const h = await keyHarness(reply);
+    try {
+      h.click('Show Home');
+      await h.settle();
+      const notice = h.document.getElementById('notice');
+      assert.equal(notice.dataset.error, 'true');
+      assert.doesNotMatch(notice.textContent, /command dispatched/i);
+      assert.equal(h.calls.filter(c => c.path === '/remote/key').length, 1);
+    } finally { h.hide(); }
+  });
+}
+
+test('An old key acknowledgment cannot replace feedback after choosing another Portal', async () => {
+  let release;
+  const h = await browserHarness({
+    saved: keyRooms,
+    routes: {
+      '/remote/key': ({ response }) => new Promise(resolve => {
+        release = () => resolve(response({ action: 'home', dispatched: true }));
+      }),
+    },
+  });
+  try {
+    h.click('Show Home');
+    await h.settle();
+    h.eval('selectRoom("http://127.0.0.1:8878");toast("Current room notice.")');
+    await h.settle();
+    release();
+    await h.settle();
+    const notice = h.document.getElementById('notice');
+    assert.equal(notice.textContent, 'Current room notice.');
+    assert.equal(notice.dataset.error, 'false');
+    const calls = h.calls.filter(c => c.path === '/remote/key');
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, 'http://127.0.0.1:8877/remote/key');
+  } finally { h.hide(); }
+});

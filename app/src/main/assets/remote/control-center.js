@@ -1240,7 +1240,13 @@ function dispatchKey(action) {
     `key:${action}`,
     '/remote/key',
     { action },
-    { success: 'Command dispatched. Check the Portal screen.' },
+    {
+      success: 'Command dispatched. Check the Portal screen.',
+      validateResponse: (response) => {
+        if (!response || typeof response !== 'object' || Array.isArray(response) || response.ok !== true)
+          throw new ApiError('invalid_response');
+      },
+    },
   );
 }
 function homePage() {

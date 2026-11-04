@@ -1,0 +1,16 @@
+{
+  "exitCode": 1,
+  "elapsedSeconds": 0.13205495799775235,
+  "counts": {
+    "tests": 16,
+    "pass": 11,
+    "fail": 5,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "sourceSha256": "eac6fc27ced31c9ec5614c8ed27eea62049223a29d0b4754b0ae3ef1283e14f5",
+  "testSha256": "17e88705e4a0e2d34a7075db6bb0cc0a443234a87c5a4b2926445cbff126d9b0",
+  "actualPublicControllerActions": true,
+  "initialReceiptParserError": "Node default Spec reporter did not match TAP parser; raw initial16/11/5 retained; same source/test rerun with explicit TAP for terminal receipt."
+}
