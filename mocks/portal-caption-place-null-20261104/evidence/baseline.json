@@ -1,0 +1,17 @@
+{
+  "exitCode": 0,
+  "durationSeconds": 8.465465791996394,
+  "completedAt": "2026-11-04T21:12:52.686271+00:00",
+  "counts": {
+    "name": "com.immortal.launcher.PhotoCaptionPlaceNullTest",
+    "tests": "8",
+    "skipped": "0",
+    "failures": "0",
+    "errors": "0",
+    "timestamp": "2026-11-04T21:12:51.890Z",
+    "hostname": "iRedlofs-Mac-mini-3.local",
+    "time": "0.009"
+  },
+  "failures": [],
+  "testFrozen": true
+}

@@ -1,0 +1,24 @@
+{
+  "output": "/private/tmp/portal-caption-place-null-20261104-210843/native-baseline.apk",
+  "sourceApkSha256": "6a048598649326257e4b26a0048f9ddcec7e42d9602ef7b6e9d8bf05a46380cf",
+  "apkSha256": "6123003981ec8af7a4a87681982b02107e4cbd49f9d8d746d6cf73bad3df6ceb",
+  "bytes": 37499479,
+  "checks": [
+    {
+      "name": "javac",
+      "exitCode": 0
+    },
+    {
+      "name": "d8",
+      "exitCode": 0
+    },
+    {
+      "name": "aapt2",
+      "exitCode": 0
+    },
+    {
+      "name": "zipalign",
+      "exitCode": 0
+    }
+  ]
+}

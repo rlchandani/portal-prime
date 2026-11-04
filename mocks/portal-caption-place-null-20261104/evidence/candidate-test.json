@@ -1,0 +1,11 @@
+{
+  "tests": 8,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "xmlSha256": "a3de9f8160ad7f1a192b662b3095ac9cdf693e457310726a510539c523e36185",
+  "testFrozen": true,
+  "actualFunction": "PhotoCaption.parsePlace",
+  "hostBaselineAlsoPassed": true,
+  "limits": "Host org.json behavior differs from Android; native frozen cases supply actual RED/GREEN proof."
+}

@@ -1,0 +1,11 @@
+{
+  "initialPackagingExit": 1,
+  "actualAndroidCases": 0,
+  "acceptedRed": false,
+  "cause": "Runner requested assets directory; prepared fixture directory is named emptyassets",
+  "repair": "Only packager directory argument changed to existing emptyassets",
+  "fixtureJavaAndEightInputsAssertionsUnchanged": true,
+  "deviceCallsBeforeRepair": 0,
+  "productionUnchanged": true,
+  "recordedAt": "2026-11-04T21:18:20.956239+00:00"
+}

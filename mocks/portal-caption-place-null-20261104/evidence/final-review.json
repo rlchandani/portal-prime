@@ -1,0 +1,378 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "reviewedAt": "2026-11-04T21:26:25.591Z",
+  "reviewStartedAt": "2026-11-04T21:23:31Z",
+  "originalClock": {
+    "startedAt": "2026-11-04T21:08:43Z",
+    "target": "2026-11-04T21:23:43Z",
+    "hardStop": "2026-11-04T21:38:43Z",
+    "reset": false
+  },
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/scope.json",
+      "bytes": 727,
+      "sha256": "9798585defa743867ab4edb8c03606dbb70d72688ed5c25289e9c93722689a5b"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/test-preparation.json",
+      "bytes": 1813,
+      "sha256": "86740e08785f0eb892b47cc6c6c88fc320163359c18e286d7d9827ed131b00c4"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/source-change.json",
+      "bytes": 700,
+      "sha256": "23f1fedae5d6869c0b8e7f28a13af18e4747f0b2f0f0ba591de190f9b1f5aae4"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/PhotoCaption.kt.before",
+      "bytes": 7157,
+      "sha256": "a945b302e4339e1cb1cc572bd0b533ff178ed9b280ad1a4af95ace9f54875540"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/PhotoCaptionPlaceNullTest.frozen.kt",
+      "bytes": 1967,
+      "sha256": "2bd5471bee2acc839a881f1394e9bb639da5278c4818d1adf4e4111f51cca8c7"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/build.gradle.kts.before",
+      "bytes": 11816,
+      "sha256": "2d104e986596b37365af3247a8938681773e44eb16c4c44470c7945a7d6b8d8f"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/baseline.xml",
+      "bytes": 1378,
+      "sha256": "6998e5932d6dc01a65331b7d70de29eceab053fbd788d1617a637fa1f076e219"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/baseline.json",
+      "bytes": 423,
+      "sha256": "722108c0b0ece37662a763cdbacfaba779c121e4fb55f23900cfee362a63e547"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/baseline.log",
+      "bytes": 1883,
+      "sha256": "4b6b9d9751e4cba3a0e604b95c3e0babc0609bf4b7185e7b2b257756cadb3525"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/baseline-native.json",
+      "bytes": 2208,
+      "sha256": "8cddec35d9ca4ffe79b143446d53116d6278f0b8b1daaad8b0c4ff0dbe313010"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/baseline-native.log",
+      "bytes": 1203,
+      "sha256": "ee9d6b83feab52beea03eddba135ce1a7ed2d7226e500adb62d494a88f2fbd51"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-native.json",
+      "bytes": 2198,
+      "sha256": "f6bae08fdb12f8acfc8405a173a19b0678ca4b7be1c6afdd1181a7f9f59e9b28"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-native.log",
+      "bytes": 1194,
+      "sha256": "c9759bc23ef8939ca2a40c4781f667a535b8636ff5a8938614a8a0ddfadd95bc"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/baseline-native-package.json",
+      "bytes": 528,
+      "sha256": "621af4ff1b3f842d14e07ef2ba602fd9dc42e7fbde7cdb26a7fa7cca88faa591"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/baseline-native-package.log",
+      "bytes": 528,
+      "sha256": "621af4ff1b3f842d14e07ef2ba602fd9dc42e7fbde7cdb26a7fa7cca88faa591"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-native-package.json",
+      "bytes": 529,
+      "sha256": "ad561ead1640be18f13d6c0d05886115c6ac92fdde60195a120cc8d396df520b"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-native-package.log",
+      "bytes": 529,
+      "sha256": "ad561ead1640be18f13d6c0d05886115c6ac92fdde60195a120cc8d396df520b"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/native-fixture-adapter.json",
+      "bytes": 431,
+      "sha256": "ab828f36864d1a49b256af1b26330d889ebf0eab138536ba8bd3ea4c382b3cca"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/initial-baseline-native-package.log",
+      "bytes": 59,
+      "sha256": "894ef114e9420b34aa0776fa424dbdb35cf61e6b719ea23a9648edd02c913016"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/initial-baseline-native.claim",
+      "bytes": 63,
+      "sha256": "1a3afd775f0ffb5fad8f0ca8e9e37888e4275afbe51e1fef55b5f2ea0d25c77d"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/native-fixture-source.json",
+      "bytes": 766,
+      "sha256": "2d1ad2eba77ad17cc213f11552e9446dad168e7a3b2d60296d7570e8bcace606"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/native-parity.json",
+      "bytes": 580,
+      "sha256": "9f795bc3d0ae3ea8661b9b1368211e84bc27433886bdd3b7ddfba3c442322fc4"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-test.json",
+      "bytes": 362,
+      "sha256": "227f249892bbc2441c52c0f67b277f6cef9ad554a85068d4b37547b6db5c99b2"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/build-terminal.json",
+      "bytes": 278,
+      "sha256": "328b52e74565e07b7eff298975beb68737981fe4d21f11e9f3cf3ab15a768164"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/build.log",
+      "bytes": 13719,
+      "sha256": "64b1205a1ca73745db1fd4d3617c4c05c9472b65300d5c43f008877d7ddaf381"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/promotion-artifacts.json",
+      "bytes": 9942,
+      "sha256": "bd5a5e2f59602bddf44d17e4faf2629a49d4716c58cb1ce8cbaa306935b25444"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/verify-artifacts.py",
+      "bytes": 3774,
+      "sha256": "121729de4f31f2bee06f3e000609956396058c6b7500c0dcb96644bcb6dbc9bc"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/review-gate.py",
+      "bytes": 2132,
+      "sha256": "745818590b36188e71b37290fd71b7a80f85f26e3623d4ef283c1accdc5a9e71"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/run-native.py",
+      "bytes": 3810,
+      "sha256": "140ac293e4ea99cfb996fb126de50427b0830acd791ccb284035bd31a81665dd"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/native/CaptionNullProbe.java",
+      "bytes": 7663,
+      "sha256": "b525a2b064f18c5507db1e09a726ce91af7694a1f8a14aa8d16b70f7b040feff"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/native/AndroidManifest.xml",
+      "bytes": 321,
+      "sha256": "77eb463e8a5a2226578a9478368bd88f82d17a413eacef9af4415fc2d3cd9233"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/native-baseline.apk",
+      "bytes": 37499479,
+      "sha256": "6123003981ec8af7a4a87681982b02107e4cbd49f9d8d746d6cf73bad3df6ceb"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/native-candidate.apk",
+      "bytes": 37499839,
+      "sha256": "1968e88128daf2d4f92cb7a020765b51883339e286ffd55a6d10e33b6cda9b03"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-debug-1.179.apk",
+      "bytes": 46745710,
+      "sha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-performance-1.179.apk",
+      "bytes": 25886951,
+      "sha256": "2de751d0dc880fccd389a3195bdc072a67b8b8234fad4c1961b40852117c6eb0"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/roadmap.json.before",
+      "bytes": 560633,
+      "sha256": "e3ef128f99ad9db614f5c49373fcbfc9f56e836f9bb236fb5d1dbc0ef9bfcc5c"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/portal-product-operating-state.md.before",
+      "bytes": 247715,
+      "sha256": "838c9cbd9ebc30091fbb47694fac1ca0863095db64edb2c0a0c7c2cadb051c4f"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoCaption.kt",
+      "bytes": 7197,
+      "sha256": "452a4b85367de95513775c21f19a85227c07f4a5d1e15250c43d7a5e12b6fadb"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/PhotoCaptionPlaceNullTest.kt",
+      "bytes": 1967,
+      "sha256": "2bd5471bee2acc839a881f1394e9bb639da5278c4818d1adf4e4111f51cca8c7"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "1a01c0c17c034c1683ff9b81da5ad9085e554cd86d3afcf0e339887009e0cbbe"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-caption-place-null-20261104/native/CaptionNullProbe.java",
+      "bytes": 7663,
+      "sha256": "b525a2b064f18c5507db1e09a726ce91af7694a1f8a14aa8d16b70f7b040feff"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-caption-place-null-20261104/native/AndroidManifest.xml",
+      "bytes": 321,
+      "sha256": "77eb463e8a5a2226578a9478368bd88f82d17a413eacef9af4415fc2d3cd9233"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.PhotoCaptionPlaceNullTest.xml",
+      "bytes": 1372,
+      "sha256": "a3de9f8160ad7f1a192b662b3095ac9cdf693e457310726a510539c523e36185"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 21967,
+      "sha256": "d3b44170b6e9494d990f87e3817cc931d83b34763d3260c95ed7260fea8ed558"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/candidate-debug-1.178.apk",
+      "bytes": 46745710,
+      "sha256": "6a048598649326257e4b26a0048f9ddcec7e42d9602ef7b6e9d8bf05a46380cf"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/candidate-performance-1.178.apk",
+      "bytes": 25886947,
+      "sha256": "2331559622debc6e111a66167c2ba25bf5515cfe919d1baf990daaa826925042"
+    }
+  ],
+  "sourceAssets": {
+    "root": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets",
+    "fileCount": 23,
+    "aggregateSha256": "884d3ef5dbd72dfda10c9ef4f770a2b42299c2ba341ebcfa7dc5b6b5d0fd8848"
+  },
+  "jvm": {
+    "xmlDirectory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "tests": 4601,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 479,
+    "testcaseChildren": 4601,
+    "failureChildren": 0,
+    "errorChildren": 0,
+    "skippedChildren": 0,
+    "aggregateSha256": "10b2da0d60ddc64b41e8542bb57da93a284daeef17023fbb429ea63ef2f94aa1",
+    "earliestReportTimestamp": "2026-11-04T21:20:25.734Z"
+  },
+  "variants": {
+    "debug": {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-debug-1.179.apk",
+      "bytes": 46745710,
+      "sha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28",
+      "package": {
+        "versionCode": 173,
+        "versionName": "1.179",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "usesSdk": {
+        "minSdkVersion": 24,
+        "targetSdkVersion": 36
+      },
+      "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetsExact": 23,
+      "allSourceAssetsIdenticalTo1178": true,
+      "changedGeneratedAssets": [],
+      "uniqueZipEntries": true,
+      "rootSdkSignatureVerificationBound": true,
+      "baseline": {
+        "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/candidate-debug-1.178.apk",
+        "bytes": 46745710,
+        "sha256": "6a048598649326257e4b26a0048f9ddcec7e42d9602ef7b6e9d8bf05a46380cf"
+      }
+    },
+    "performance": {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-performance-1.179.apk",
+      "bytes": 25886951,
+      "sha256": "2de751d0dc880fccd389a3195bdc072a67b8b8234fad4c1961b40852117c6eb0",
+      "package": {
+        "versionCode": 173,
+        "versionName": "1.179",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "usesSdk": {
+        "minSdkVersion": 24,
+        "targetSdkVersion": 36
+      },
+      "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetsExact": 23,
+      "allSourceAssetsIdenticalTo1178": true,
+      "changedGeneratedAssets": [
+        "assets/dexopt/baseline.prof"
+      ],
+      "uniqueZipEntries": true,
+      "rootSdkSignatureVerificationBound": true,
+      "baseline": {
+        "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/candidate-performance-1.178.apk",
+        "bytes": 25886947,
+        "sha256": "2331559622debc6e111a66167c2ba25bf5515cfe919d1baf990daaa826925042"
+      }
+    }
+  },
+  "sourceReview": {
+    "exactOptionalNameNullGuardOnly": true,
+    "allOtherPhotoCaptionBytesIdentical": true,
+    "appVersionOnly": true,
+    "missingAndJSONNullNamesAbsent": true,
+    "nonNullCoercionAndLiteralNullStringRetained": true,
+    "cityLocalityRegionCountryOrderUnchanged": true,
+    "nativeJavaHostEightLiteralRowsReviewedIdentical": true,
+    "sourceAssetsAll23ByteIdentical": true,
+    "versionLinesIndentationOnlyAlsoChanged": true
+  },
+  "regressions": {
+    "hostBaseline": {
+      "tests": 8,
+      "passed": 8,
+      "failures": 0,
+      "notRedEvidence": true
+    },
+    "hostCandidate": {
+      "tests": 8,
+      "passed": 8,
+      "failures": 0
+    },
+    "nativeBaseline": {
+      "tests": 8,
+      "literalMismatches": 4,
+      "controls": 4,
+      "setupFailures": 0
+    },
+    "nativeCandidate": {
+      "tests": 8,
+      "passed": 8,
+      "failures": 0,
+      "setupFailures": 0
+    },
+    "sameFixtureDexAndManifest": true,
+    "fixtureDexSha256": "22b7fcd6d0fb5bfcc138b0c8a2ec7729a32546092174c0c7a9ee9e7bbbde6ada",
+    "initialPackagerArgumentFailureExcluded": true,
+    "bothOwnedDirectoriesRetiredRootEvidence": true
+  },
+  "limits": [
+    "Generated actual Android debug APK parser acceptance only; no installed optimized helper, rendered native caption pixels, live provider/geocoder/cache/network, API28, Dream/controller, household photos/preferences or physical UI claim.",
+    "Host org.json baseline was all green; only the actual Android parser supplied four baseline literal mismatches.",
+    "Initial assets-versus-emptyassets packager argument failure executed zero Android cases and zero device operations, and is excluded from RED.",
+    "Independent APK binary manifest/v2 certificate identity and decoded ZIP assets checked; complete cryptographic signature verification remains root SDK evidence bound to promotion-artifacts.json.",
+    "No Gradle/SDK/device/provider/network/test execution by reviewer; final-review.json is the sole written artifact.",
+    "All prior178 queue objects and held scopes remain; expired News20:42:52 clock is not reopened. Original target passed during final review; hard stop not reset."
+  ],
+  "reviewHostAssertionCorrection": {
+    "reason": "Strict version replacement comparison did not account for indentation on the same two version lines; inspected both deltas, all other Gradle lines byte-identical.",
+    "retainedInitialBlocker": "Unexpected app build/version delta",
+    "resolved": true
+  }
+}

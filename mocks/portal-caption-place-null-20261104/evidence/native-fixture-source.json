@@ -1,0 +1,18 @@
+{
+  "files": {
+    "CaptionNullProbe.java": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-caption-place-null-20261104/native/CaptionNullProbe.java",
+      "bytes": 7663,
+      "sha256": "b525a2b064f18c5507db1e09a726ce91af7694a1f8a14aa8d16b70f7b040feff",
+      "matchesFrozenPrivate": true
+    },
+    "AndroidManifest.xml": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-caption-place-null-20261104/native/AndroidManifest.xml",
+      "bytes": 321,
+      "sha256": "77eb463e8a5a2226578a9478368bd88f82d17a413eacef9af4415fc2d3cd9233",
+      "matchesFrozenPrivate": true
+    }
+  },
+  "unchangedEightNativeAndHostRows": true,
+  "recordedAt": "2026-11-04T21:21:25.960068+00:00"
+}

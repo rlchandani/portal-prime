@@ -148,9 +148,10 @@ object PhotoCaption {
   /** Pull a "City, Country" label from a BigDataCloud reverse-geocode JSON body. Pure. */
   internal fun parsePlace(body: String): String? {
     val o = JSONObject(body)
-    val city = o.optString("city", "").ifBlank { o.optString("locality", "") }
-    val region = o.optString("principalSubdivision", "")
-    val country = o.optString("countryName", "")
+    fun name(key: String): String = if (o.isNull(key)) "" else o.optString(key, "")
+    val city = name("city").ifBlank { name("locality") }
+    val region = name("principalSubdivision")
+    val country = name("countryName")
     val primary = city.ifBlank { region }
     return when {
       primary.isNotBlank() && country.isNotBlank() -> "$primary, $country"

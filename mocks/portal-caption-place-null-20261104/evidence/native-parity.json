@@ -1,0 +1,15 @@
+{
+  "sameEightNamesAndExpectedResults": true,
+  "sameFrozenHostRowsSourceReviewAccepted": true,
+  "classesDexAndBinaryManifestIdentical": true,
+  "fixtureDexSha256": "22b7fcd6d0fb5bfcc138b0c8a2ec7729a32546092174c0c7a9ee9e7bbbde6ada",
+  "actualApkParserClassOrigin": true,
+  "baselineActualAndroidTests": 8,
+  "baselineExpectedMismatches": 4,
+  "baselineControlsPassed": 4,
+  "candidateActualAndroidTestsPassed": 8,
+  "setupFailures": 0,
+  "bothOwnedDeviceDirectoriesRemoved": true,
+  "noAPKInstallUIOrProviderOperations": true,
+  "checkedAt": "2026-11-04T21:23:02.819832+00:00"
+}

@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-11-04T21:08:43Z",
+  "target": "2026-11-04T21:23:43Z",
+  "hardStop": "2026-11-04T21:38:43Z",
+  "firstDiscoveryClockRetained": true,
+  "base": "d3c4d2279864fe30c6c498e90cdc03f8d5840495",
+  "scope": "Caption place-name parser treats JSON null as absent, preserving existing fallback order and all non-null value coercion",
+  "sourceWitness": "PhotoCaption.parsePlace uses JSONObject.optString which may coerce explicit NULL to literal null; generated regression baseline required",
+  "heldScopesReopened": false,
+  "liveProviderCalls": false,
+  "phoneProviderHouseholdMediaPublicationOperations": false,
+  "priorUnselectedNewsObservations": "Original20:42:52/hard21:12:52 retained; not admitted or reset"
+}

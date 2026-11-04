@@ -1,0 +1,79 @@
+{
+  "exitCode": 1,
+  "sourceApkSha256": "6a048598649326257e4b26a0048f9ddcec7e42d9602ef7b6e9d8bf05a46380cf",
+  "fixtureApkSha256": "6123003981ec8af7a4a87681982b02107e4cbd49f9d8d746d6cf73bad3df6ceb",
+  "durationSeconds": 10.941799624997657,
+  "completedAt": "2026-11-04T21:18:31.946687+00:00",
+  "result": {
+    "sourceSha256": "6a048598649326257e4b26a0048f9ddcec7e42d9602ef7b6e9d8bf05a46380cf",
+    "sourceBytes": 46745710,
+    "methodName": "parsePlace$app",
+    "actualParserClassOrigin": true,
+    "cases": [
+      {
+        "name": "explicitNullCityUsesLocality",
+        "expected": "Dublin, Ireland",
+        "actual": "null, Ireland",
+        "pass": false,
+        "fail": true
+      },
+      {
+        "name": "explicitNullCityAndLocalityUseRegion",
+        "expected": "Tuscany, Italy",
+        "actual": "null, Italy",
+        "pass": false,
+        "fail": true
+      },
+      {
+        "name": "explicitNullCountryDoesNotAppearAfterCity",
+        "expected": "Paris",
+        "actual": "Paris, null",
+        "pass": false,
+        "fail": true
+      },
+      {
+        "name": "allExplicitNullNamesHaveNoPlaceLabel",
+        "expected": null,
+        "actual": "null, null",
+        "pass": false,
+        "fail": true
+      },
+      {
+        "name": "ordinaryCityBeatsLocalityAndRegion",
+        "expected": "Paris, France",
+        "actual": "Paris, France",
+        "pass": true,
+        "fail": false
+      },
+      {
+        "name": "ordinaryLocalityIsUsedWithoutCity",
+        "expected": "Townsville, Australia",
+        "actual": "Townsville, Australia",
+        "pass": true,
+        "fail": false
+      },
+      {
+        "name": "absentCityLocalityAndRegionRetainCountry",
+        "expected": "France",
+        "actual": "France",
+        "pass": true,
+        "fail": false
+      },
+      {
+        "name": "literalNullStringRemainsAPlaceName",
+        "expected": "null, Ireland",
+        "actual": "null, Ireland",
+        "pass": true,
+        "fail": false
+      }
+    ],
+    "tests": 8,
+    "passed": 4,
+    "failures": 4,
+    "setupFailures": 0
+  },
+  "generatedParserOnly": true,
+  "APKInstalled": false,
+  "UIOrProviderCalls": false,
+  "ownedDeviceDirectoryRemoved": true
+}

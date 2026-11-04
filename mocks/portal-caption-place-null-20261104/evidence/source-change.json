@@ -1,0 +1,13 @@
+{
+  "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoCaption.kt",
+  "beforeSha256": "a945b302e4339e1cb1cc572bd0b533ff178ed9b280ad1a4af95ace9f54875540",
+  "candidateSha256": "452a4b85367de95513775c21f19a85227c07f4a5d1e15250c43d7a5e12b6fadb",
+  "explicitJSONNullOnly": true,
+  "allNonNullCoercionAndFallbackOrderPreserved": true,
+  "dateMetadataCacheGeocoderTransportAndLayoutUnchanged": true,
+  "hostBaselineAllEightPassed": true,
+  "nativeActualParserFourExpectedFailuresFourControls": true,
+  "sameEightInputsAssertionsFrozen": true,
+  "productChangedOnlyAfterNativeRed": true,
+  "recordedAt": "2026-11-04T21:20:00.125245+00:00"
+}

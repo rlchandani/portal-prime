@@ -1,0 +1,24 @@
+{
+  "output": "/private/tmp/portal-caption-place-null-20261104-210843/native-candidate.apk",
+  "sourceApkSha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28",
+  "apkSha256": "1968e88128daf2d4f92cb7a020765b51883339e286ffd55a6d10e33b6cda9b03",
+  "bytes": 37499839,
+  "checks": [
+    {
+      "name": "javac",
+      "exitCode": 0
+    },
+    {
+      "name": "d8",
+      "exitCode": 0
+    },
+    {
+      "name": "aapt2",
+      "exitCode": 0
+    },
+    {
+      "name": "zipalign",
+      "exitCode": 0
+    }
+  ]
+}

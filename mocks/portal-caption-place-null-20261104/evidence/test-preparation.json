@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "preparedAt": "2026-11-04T21:12:09.711Z",
+  "firstReadAt": "2026-11-04T21:12:09.710Z",
+  "originalIssueAt": "2026-11-04T21:08:43Z",
+  "targetAt": "2026-11-04T21:23:43Z",
+  "hardStopAt": "2026-11-04T21:38:43Z",
+  "source": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoCaption.kt",
+    "bytes": 7157,
+    "sha256": "a945b302e4339e1cb1cc572bd0b533ff178ed9b280ad1a4af95ace9f54875540"
+  },
+  "test": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/PhotoCaptionPlaceNullTest.kt",
+    "bytes": 1967,
+    "sha256": "2bd5471bee2acc839a881f1394e9bb639da5278c4818d1adf4e4111f51cca8c7",
+    "cases": 8
+  },
+  "frozenTest": {
+    "path": "/private/tmp/portal-caption-place-null-20261104-210843/PhotoCaptionPlaceNullTest.frozen.kt",
+    "bytes": 1967,
+    "sha256": "2bd5471bee2acc839a881f1394e9bb639da5278c4818d1adf4e4111f51cca8c7",
+    "mode": "0400"
+  },
+  "liveMatchesFrozen": true,
+  "productionUnchanged": true,
+  "expectedBaseline": {
+    "regressions": 4,
+    "controls": 4,
+    "executed": false
+  },
+  "caseNames": [
+    "explicitNullCityUsesLocality",
+    "explicitNullCityAndLocalityUseRegion",
+    "explicitNullCountryDoesNotAppearAfterCity",
+    "allExplicitNullNamesHaveNoPlaceLabel",
+    "ordinaryCityBeatsLocalityAndRegion",
+    "ordinaryLocalityIsUsedWithoutCity",
+    "absentCityLocalityAndRegionRetainCountry",
+    "literalNullStringRemainsAPlaceName"
+  ],
+  "scope": "Actual PhotoCaption.parsePlace with literal generated JSON. No mocks, extracted algorithm, transport, provider, metadata image read, native execution or rendered UI.",
+  "executionOwner": "Root; author executed no tests/build/SDK/Git/device/network operations."
+}
