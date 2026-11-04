@@ -1,0 +1,15 @@
+{
+  "oldTasks": 120,
+  "newTasks": 121,
+  "oldObjectsPreserved": true,
+  "oldRawSuffixBytes": 405436,
+  "oldRawSuffixSha256": "3ea0e0fb933150fbb46eaaf621e34518d008e239bc688f1a6c0e1f6476a71be0",
+  "defaultTaskPreserved": true,
+  "counts": {
+    "delivered": 74,
+    "verified": 37,
+    "approval": 2,
+    "parked": 7,
+    "queued": 1
+  }
+}

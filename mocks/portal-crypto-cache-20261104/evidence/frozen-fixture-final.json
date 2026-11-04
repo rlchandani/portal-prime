@@ -1,0 +1,7 @@
+{
+  "fixture": "app/src/test/java/com/immortal/launcher/CryptoCachePublicationTest.kt",
+  "sha256": "7313cc8a1097631cfe0e091e6f446a7ae3975dd206e526769ee3687b23816e31",
+  "nativeJavaSha256": "545e85127838a52d544b0ff9d70e11fc19dde10fac8df1c4122f3da5b781bd97",
+  "caseAssertionsUnchanged": true,
+  "wrapperTimeoutAndDiscoveryIsolationRepaired": true
+}

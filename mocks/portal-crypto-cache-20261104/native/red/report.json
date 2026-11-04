@@ -1,0 +1,100 @@
+{
+  "cases": [
+    {
+      "mode": "html",
+      "firstQuotesMatch": false,
+      "savedRawAndStampMatch": false,
+      "firstGeneratedTransport": true,
+      "laterOfflineQuotesMatch": false,
+      "laterTransportMatch": false,
+      "pass": false
+    },
+    {
+      "mode": "truncated",
+      "firstQuotesMatch": false,
+      "savedRawAndStampMatch": false,
+      "firstGeneratedTransport": true,
+      "laterOfflineQuotesMatch": false,
+      "laterTransportMatch": false,
+      "pass": false
+    },
+    {
+      "mode": "object",
+      "firstQuotesMatch": false,
+      "savedRawAndStampMatch": false,
+      "firstGeneratedTransport": true,
+      "laterOfflineQuotesMatch": false,
+      "laterTransportMatch": false,
+      "pass": false
+    },
+    {
+      "mode": "empty-body",
+      "firstQuotesMatch": false,
+      "savedRawAndStampMatch": false,
+      "firstGeneratedTransport": true,
+      "laterOfflineQuotesMatch": false,
+      "laterTransportMatch": false,
+      "pass": false
+    },
+    {
+      "mode": "first-invalid",
+      "firstQuotesMatch": true,
+      "savedRawAndStampMatch": false,
+      "firstGeneratedTransport": true,
+      "laterOfflineQuotesMatch": true,
+      "laterTransportMatch": false,
+      "pass": false
+    },
+    {
+      "mode": "valid-replacement",
+      "firstQuotesMatch": true,
+      "savedRawAndStampMatch": true,
+      "firstGeneratedTransport": true,
+      "laterOfflineQuotesMatch": true,
+      "laterTransportMatch": true,
+      "pass": true
+    },
+    {
+      "mode": "valid-empty",
+      "firstQuotesMatch": true,
+      "savedRawAndStampMatch": true,
+      "firstGeneratedTransport": true,
+      "laterOfflineQuotesMatch": true,
+      "laterTransportMatch": true,
+      "pass": true
+    },
+    {
+      "mode": "valid-omitted",
+      "firstQuotesMatch": true,
+      "savedRawAndStampMatch": true,
+      "firstGeneratedTransport": true,
+      "laterOfflineQuotesMatch": true,
+      "laterTransportMatch": true,
+      "pass": true
+    },
+    {
+      "mode": "offline",
+      "firstQuotesMatch": true,
+      "savedRawAndStampMatch": true,
+      "firstGeneratedTransport": true,
+      "laterOfflineQuotesMatch": true,
+      "laterTransportMatch": true,
+      "pass": true
+    },
+    {
+      "mode": "fresh",
+      "pass": true,
+      "requests": 0
+    }
+  ],
+  "pass": false,
+  "sdk": 29,
+  "sourceSha256": "ffab4191ef612b9cb5ba3033a9c33d34eff0805534ae7de1d13255c369923fdf",
+  "sourceBytes": 51372381,
+  "internetPermission": false,
+  "actualPublicFetch": true,
+  "actualHttp": true,
+  "androidJsonAndPreferences": true,
+  "generatedTransportOnly": true,
+  "backgroundThread": true
+}

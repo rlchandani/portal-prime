@@ -1,0 +1,14 @@
+{
+  "files": {
+    "version.json": true,
+    "catalog.json": true,
+    "provisioning/fleetctl": true,
+    "app/src/main/java/com/immortal/launcher/HttpCache.kt": true,
+    "app/src/main/java/com/immortal/launcher/NewsFeed.kt": true,
+    "app/src/main/java/com/immortal/launcher/Converter.kt": true
+  },
+  "originalSelectedRegistries": {
+    "family": true,
+    "living": true
+  }
+}

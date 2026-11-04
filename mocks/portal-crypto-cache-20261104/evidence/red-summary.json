@@ -1,0 +1,24 @@
+{
+  "baselineRuntimeSha256": "c4e3517b5da01408b284b5bf4a0c113811ee2cceb97ec9d0e3a0c3deca9cf384",
+  "frozenFixtureSha256": "7313cc8a1097631cfe0e091e6f446a7ae3975dd206e526769ee3687b23816e31",
+  "cases": {
+    "html200PreservesPriorPricesAndOfflineFallback": "FAIL",
+    "truncated200PreservesPriorPricesAndOfflineFallback": "FAIL",
+    "object200PreservesPriorPricesAndOfflineFallback": "FAIL",
+    "emptyBody200PreservesPriorPricesAndOfflineFallback": "FAIL",
+    "firstInvalidResponseDoesNotPublishValueOrTimestamp": "FAIL",
+    "validReplacementPublishesAndRetainsConfiguredLabels": "PASS",
+    "validEmptyArrayReplacesOldPrices": "PASS",
+    "validArrayOmittingConfiguredCoinReplacesOldPrices": "PASS",
+    "freshCacheSkipsTransportAndPublication": "PASS",
+    "ordinaryOfflineFetchPreservesExpiredCache": "PASS"
+  },
+  "generatedCases": 10,
+  "failures": 5,
+  "controls": 5,
+  "unchangedParserTests": 6,
+  "parentJunitTests": 7,
+  "parentFailures": 1,
+  "runtimeReplay": true,
+  "nativeBaselineSeparate": true
+}

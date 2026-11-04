@@ -46,21 +46,28 @@ object CryptoFeed {
 
   /**
    * Fetch quotes for [coins], preserving their order. Blocking — call from a background dispatcher.
-   * Returns an empty list only when there's no cached data AND the network fails; otherwise serves
-   * cached (possibly stale) prices. Coins the API doesn't return are dropped.
+   * Failed requests or malformed responses serve cached (possibly stale) prices when available.
+   * A valid empty markets array replaces old prices. Coins the API doesn't return are dropped.
    */
   fun fetch(context: Context, coins: List<CryptoConfig.Coin>): List<Quote> {
     if (coins.isEmpty()) return emptyList()
     val ids = coins.joinToString(",") { it.id }
     val url = "$BASE?vs_currency=usd&ids=$ids&sparkline=true&price_change_percentage=24h"
     val body =
-        HttpCache.getOrFetch(context, "$CACHE_KEY:$ids", TTL_MS) { Http.getString(url) }
+        HttpCache.getOrFetch(context, "$CACHE_KEY:$ids", TTL_MS) {
+          // Admit the response before publication so an error page cannot replace usable prices.
+          Http.getString(url)?.takeIf { decode(it, coins) != null }
+        }
             ?: return emptyList()
     return parse(body, coins)
   }
 
   /** Parse the markets array into [Quote]s ordered like [coins], skipping coins the API omitted. */
   internal fun parse(body: String, coins: List<CryptoConfig.Coin>): List<Quote> =
+      decode(body, coins).orEmpty()
+
+  /** Null distinguishes failed decoding from a valid response with no configured coins. */
+  private fun decode(body: String, coins: List<CryptoConfig.Coin>): List<Quote>? =
       runCatching {
             val arr = JSONArray(body)
             val byId = HashMap<String, Quote>(arr.length())
@@ -83,7 +90,7 @@ object CryptoFeed {
               byId[coin.id]?.copy(symbol = coin.symbol)
             }
           }
-          .getOrDefault(emptyList())
+          .getOrNull()
 
   /** Evenly downsample a JSON price array to [SPARK_POINTS] doubles (empty when absent/short). */
   private fun downsample(arr: JSONArray?): List<Double> {

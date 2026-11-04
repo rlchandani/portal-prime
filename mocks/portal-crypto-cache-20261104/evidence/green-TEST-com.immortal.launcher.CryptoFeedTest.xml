@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.immortal.launcher.CryptoFeedTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-04T05:56:50.184Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="coins absent from the response are dropped" classname="com.immortal.launcher.CryptoFeedTest" time="0.001"/>
+  <testcase name="sparkline points survive parsing, missing sparkline is empty" classname="com.immortal.launcher.CryptoFeedTest" time="0.0"/>
+  <testcase name="malformed json yields an empty list, never throws" classname="com.immortal.launcher.CryptoFeedTest" time="0.0"/>
+  <testcase name="configured symbol label wins over the API's" classname="com.immortal.launcher.CryptoFeedTest" time="0.0"/>
+  <testcase name="parses quotes in the coin list order, not API order" classname="com.immortal.launcher.CryptoFeedTest" time="0.0"/>
+  <testcase name="missing 24h change is null, not zero" classname="com.immortal.launcher.CryptoFeedTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

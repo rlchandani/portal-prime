@@ -1,0 +1,13 @@
+{
+  "nativeFixtureRemovedBothRuns": true,
+  "copiedRegistryRemoved": true,
+  "privateRollbackAndBeforeAfterSnapshotsRetained": true,
+  "originalRegistriesUnchanged": true,
+  "phoneOperations": 0,
+  "liveProviderRequests": 0,
+  "householdMediaReadsOrTransfers": 0,
+  "pushOrPublication": false,
+  "ownedDocumentationEnvironmentRemoved": true,
+  "ownedDocumentationSiteRemoved": true,
+  "strictDocumentationBuildPassed": true
+}

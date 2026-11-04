@@ -1,0 +1,29 @@
+{
+  "family": {
+    "bytes": 25884988,
+    "sha256": "41e7d2fe5069432a31e624b7578b2a09fc4e467728f8a8851247800bd688e838",
+    "app": {
+      "versionCode": 126,
+      "versionName": "1.132"
+    },
+    "serviceReady": true,
+    "installAck": true
+  },
+  "living": {
+    "result": {
+      "status": "ready",
+      "ack": "uncertain",
+      "install_attempted": true,
+      "observations": 7
+    },
+    "installed": {
+      "bytes": 25884988,
+      "sha256": "41e7d2fe5069432a31e624b7578b2a09fc4e467728f8a8851247800bd688e838",
+      "serviceReady": true,
+      "app": {
+        "versionCode": 126,
+        "versionName": "1.132"
+      }
+    }
+  }
+}

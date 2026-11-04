@@ -1,18 +1,64 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T05:44:09Z",
-  "updatedLabel": "Saved voice memo: exact 1.131 delivered in both rooms",
+  "updatedAt": "2026-11-04T06:00:16Z",
+  "updatedLabel": "Crypto cache: exact 1.132 delivered in both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.131/code 125. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.132/code 126. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "crypto-cache-response-publication",
+      "title": "Crypto: preserve cached prices when an HTTP 200 body cannot decode",
+      "summary": "Optimized 1.132 is installed in both rooms. Malformed responses preserve previous prices and the cache timestamp; valid empty markets still replace old quotes.",
+      "description": "Validate fresh responses with the existing decoder before returning raw bytes to HttpCache. Retain coin order, configured symbols, missing-field defaults, sparkline behavior and the valid-empty policy.",
+      "status": "delivered",
+      "verification": "4,391 JVM / 458 suites · 10 generated child cases · 6 existing parser cases · debug/optimized/R8/vital lint · 9 exact assets · API29 native baseline 5 failures/5 controls → 10 pass · full installed hashes",
+      "kind": "Supported cache data-integrity failure",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal widget reliability",
+      "deployment": "Exact optimized 1.132/code126 installed and fully hashed in Family Area and Living Area. Living ACK uncertain; seven read-only observations reconcile one invocation without retry.",
+      "state": "Fresh responses must decode before publication; decoding failure uses existing stale fallback without touching raw value or timestamp.",
+      "acceptance": [
+        "Keep prior prices, raw cache and timestamp after HTML, truncated JSON, object-shaped errors or empty HTTP 200 bodies.",
+        "Do not publish an invalid first response.",
+        "Allow valid empty arrays and responses omitting configured coins to replace old quotes.",
+        "Retain fresh-hit/no-network and ordinary offline fallback behavior."
+      ],
+      "evidence": [
+        {
+          "text": "Correction, exact room delivery and acceptance limits.",
+          "source": "docs/portal-crypto-cache-publication-2026-11-04.md"
+        },
+        {
+          "text": "Frozen baseline/candidate checks, artifact hashes, native reports and preservation.",
+          "source": "mocks/portal-crypto-cache-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated HTTP only; no live CoinGecko/provider request or mounted Home UI acceptance.",
+        "Native evidence is Family API29 debug, with same-process Android preferences; API28, optimized runtime, Living functional acceptance and durable restart remain open.",
+        "Syntactically admitted arrays retain prior quote-field defaults. Previously poisoned fresh entries and future timestamps are unchanged.",
+        "Normal HTTP disconnection is observed; owned Tools cancellation and forced child-timeout cleanup are not exercised.",
+        "All 43 Family/30 Living preferences and four maps match; names/Dev Mode and Family font/accessibility/Chromium/resumed frame/awake state remain.",
+        "No phone, household media, provider/account action, push or publication.",
+        "Earlier Converter-clock, News, legacy-night and all parked scopes retain their original clocks."
+      ],
+      "next": "Retain live-provider, UI, API28, optimized and durable-restart acceptance limits; continue independent supported product work.",
+      "issueClock": {
+        "startedAt": "2026-11-04T05:46:54Z",
+        "deadline": "2026-11-04T06:16:54Z",
+        "scope": "Discovery, fixture repair, implementation, tests, authorized room delivery, observation and closure; no reset."
+      }
+    },
     {
       "id": "voice-memo-safe-replacement",
       "title": "Voice memo: keep the saved recording when replacement fails",

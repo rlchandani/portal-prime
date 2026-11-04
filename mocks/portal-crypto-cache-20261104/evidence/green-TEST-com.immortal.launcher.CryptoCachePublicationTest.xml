@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.immortal.launcher.CryptoCachePublicationTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-11-04T05:56:39.933Z" hostname="iRedlofs-Mac-mini-3.local" time="0.764">
+  <properties/>
+  <testcase name="generatedResponsesPreserveCachePublicationContract" classname="com.immortal.launcher.CryptoCachePublicationTest" time="0.762"/>
+  <system-out><![CDATA[WARNING: A Java agent has been loaded dynamically (~/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.12/be4984cb6fd1ef1d11f218a648889dfda44b8a15/byte-buddy-agent-1.14.12.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+CRYPTO_CASE html200PreservesPriorPricesAndOfflineFallback PASS
+CRYPTO_CASE truncated200PreservesPriorPricesAndOfflineFallback PASS
+CRYPTO_CASE object200PreservesPriorPricesAndOfflineFallback PASS
+CRYPTO_CASE emptyBody200PreservesPriorPricesAndOfflineFallback PASS
+CRYPTO_CASE firstInvalidResponseDoesNotPublishValueOrTimestamp PASS
+CRYPTO_CASE validReplacementPublishesAndRetainsConfiguredLabels PASS
+CRYPTO_CASE validEmptyArrayReplacesOldPrices PASS
+CRYPTO_CASE validArrayOmittingConfiguredCoinReplacesOldPrices PASS
+CRYPTO_CASE freshCacheSkipsTransportAndPublication PASS
+CRYPTO_CASE ordinaryOfflineFetchPreservesExpiredCache PASS
+CRYPTO_CASES tests=10 failures=0
+
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

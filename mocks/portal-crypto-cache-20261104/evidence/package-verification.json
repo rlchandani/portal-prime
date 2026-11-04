@@ -1,0 +1,36 @@
+{
+  "debug": {
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "assets": {
+      "index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+      "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "photos.js": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+    },
+    "package": "com.immortal.launcher.debug",
+    "code": 126,
+    "version": "1.132"
+  },
+  "performance": {
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "assets": {
+      "index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+      "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "photos.js": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+    },
+    "package": "com.immortal.launcher.debug",
+    "code": 126,
+    "version": "1.132"
+  }
+}

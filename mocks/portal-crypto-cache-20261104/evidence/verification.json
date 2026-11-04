@@ -1,0 +1,199 @@
+{
+  "recordedAt": "2026-11-04T06:00:16Z",
+  "base": "3c422184a7c2f269d2cbdfba16c5c4baa6b04e37",
+  "scope": "Crypto fresh-response cache publication only",
+  "issueClock": {
+    "startedAt": "2026-11-04T05:46:54Z",
+    "deadline": "2026-11-04T06:16:54Z",
+    "scope": "Discovery, fixture repair, implementation, tests, authorized room delivery, observation and closure; no reset."
+  },
+  "artifacts": {
+    "versionName": "1.132",
+    "versionCode": 126,
+    "package": "com.immortal.launcher.debug",
+    "apks": {
+      "debug": {
+        "bytes": 46726887,
+        "sha256": "0a9b8df0bbbd8bb2d6ddc1d0284964129802407d590db29c81907d17bab51f88"
+      },
+      "performance": {
+        "bytes": 25884988,
+        "sha256": "41e7d2fe5069432a31e624b7578b2a09fc4e467728f8a8851247800bd688e838"
+      }
+    },
+    "jvm": {
+      "tests": 4391,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 458
+    }
+  },
+  "baseline": {
+    "baselineRuntimeSha256": "c4e3517b5da01408b284b5bf4a0c113811ee2cceb97ec9d0e3a0c3deca9cf384",
+    "frozenFixtureSha256": "7313cc8a1097631cfe0e091e6f446a7ae3975dd206e526769ee3687b23816e31",
+    "cases": {
+      "html200PreservesPriorPricesAndOfflineFallback": "FAIL",
+      "truncated200PreservesPriorPricesAndOfflineFallback": "FAIL",
+      "object200PreservesPriorPricesAndOfflineFallback": "FAIL",
+      "emptyBody200PreservesPriorPricesAndOfflineFallback": "FAIL",
+      "firstInvalidResponseDoesNotPublishValueOrTimestamp": "FAIL",
+      "validReplacementPublishesAndRetainsConfiguredLabels": "PASS",
+      "validEmptyArrayReplacesOldPrices": "PASS",
+      "validArrayOmittingConfiguredCoinReplacesOldPrices": "PASS",
+      "freshCacheSkipsTransportAndPublication": "PASS",
+      "ordinaryOfflineFetchPreservesExpiredCache": "PASS"
+    },
+    "generatedCases": 10,
+    "failures": 5,
+    "controls": 5,
+    "unchangedParserTests": 6,
+    "parentJunitTests": 7,
+    "parentFailures": 1,
+    "runtimeReplay": true,
+    "nativeBaselineSeparate": true
+  },
+  "greenGeneratedCases": {
+    "tests": 10,
+    "failures": 0,
+    "parentGradleMethods": 1,
+    "existingParserMethods": 6
+  },
+  "native": {
+    "sdk": 29,
+    "baselineCases": 10,
+    "baselineFailures": 5,
+    "baselineControls": 5,
+    "candidateCases": 10,
+    "candidateFailures": 0,
+    "actualDebugPublicFetchHttpCacheAndAndroidJson": true,
+    "sameFrozenJava": true,
+    "internetPermission": false,
+    "generatedTransportOnly": true,
+    "durableRestartProven": false,
+    "optimizedProbeCalls": 0
+  },
+  "initialUrlConstructorMockHarnessFailureExcluded": true,
+  "independentReview": "No blocker after independent source, fixture, XML, frozen baseline replay, native reports, APK hashes, signatures and exact assets review.",
+  "installed": {
+    "family": {
+      "bytes": 25884988,
+      "sha256": "41e7d2fe5069432a31e624b7578b2a09fc4e467728f8a8851247800bd688e838",
+      "app": {
+        "versionCode": 126,
+        "versionName": "1.132"
+      },
+      "serviceReady": true,
+      "installAck": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25884988,
+        "sha256": "41e7d2fe5069432a31e624b7578b2a09fc4e467728f8a8851247800bd688e838",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 126,
+          "versionName": "1.132"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1635,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1974,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "protected": {
+    "files": {
+      "version.json": true,
+      "catalog.json": true,
+      "provisioning/fleetctl": true,
+      "app/src/main/java/com/immortal/launcher/HttpCache.kt": true,
+      "app/src/main/java/com/immortal/launcher/NewsFeed.kt": true,
+      "app/src/main/java/com/immortal/launcher/Converter.kt": true
+    },
+    "originalSelectedRegistries": {
+      "family": true,
+      "living": true
+    }
+  },
+  "cleanup": {
+    "nativeFixtureRemovedBothRuns": true,
+    "copiedRegistryRemoved": true,
+    "privateRollbackAndBeforeAfterSnapshotsRetained": true,
+    "originalRegistriesUnchanged": true,
+    "phoneOperations": 0,
+    "liveProviderRequests": 0,
+    "householdMediaReadsOrTransfers": 0,
+    "pushOrPublication": false,
+    "ownedDocumentationEnvironmentRemoved": true,
+    "ownedDocumentationSiteRemoved": true,
+    "strictDocumentationBuildPassed": true
+  },
+  "roadmap": {
+    "oldTasks": 120,
+    "newTasks": 121,
+    "oldObjectsPreserved": true,
+    "oldRawSuffixBytes": 405436,
+    "oldRawSuffixSha256": "3ea0e0fb933150fbb46eaaf621e34518d008e239bc688f1a6c0e1f6476a71be0",
+    "defaultTaskPreserved": true,
+    "counts": {
+      "delivered": 74,
+      "verified": 37,
+      "approval": 2,
+      "parked": 7,
+      "queued": 1
+    }
+  },
+  "limits": [
+    "Generated HTTP only; no live CoinGecko/provider request or mounted Home UI acceptance.",
+    "Native evidence is Family API29 debug, with same-process Android preferences; API28, optimized runtime, Living functional acceptance and durable restart remain open.",
+    "Syntactically admitted arrays retain prior quote-field defaults. Previously poisoned fresh entries and future timestamps are unchanged.",
+    "Normal HTTP disconnection is observed; owned Tools cancellation and forced child-timeout cleanup are not exercised.",
+    "All 43 Family/30 Living preferences and four maps match; names/Dev Mode and Family font/accessibility/Chromium/resumed frame/awake state remain.",
+    "No phone, household media, provider/account action, push or publication.",
+    "Earlier Converter-clock, News, legacy-night and all parked scopes retain their original clocks."
+  ],
+  "documentation": {
+    "strictBuildPassed": true,
+    "ownedEnvironmentAndSiteRemoved": true
+  },
+  "closedAt": "2026-11-04T06:01:50Z"
+}
