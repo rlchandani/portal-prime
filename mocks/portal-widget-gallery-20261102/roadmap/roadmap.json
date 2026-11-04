@@ -1,18 +1,61 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T15:15:54.966471+00:00",
-  "updatedLabel": "Home greeting timezone candidate verified locally;1.166 delivery unverified after device transport failures; clocks retained",
+  "updatedAt": "2026-11-04T15:28:29.748848+00:00",
+  "updatedLabel": "Alarm PCM status candidate1.167 verified locally; device delivery remains unverified; clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Latest complete room readbacks were optimized Portal1.165/code159 before the1.166 attempt;1.166 device deployment is unverified after transport failures. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Latest complete room readbacks were optimized Portal1.165/code159 before the1.166 attempt; device deployment remains unverified after transport failures. Latest locally verified candidate is1.167/code161. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "alarm-pcm-startup-status",
+      "title": "Alarm chimes: reject incomplete PCM setup",
+      "summary": "Timer and alarm chimes return to the existing fallback when preload or loop setup returns failure.",
+      "description": "Require the full static PCM sample count and successful loop result before playback/publication; release newly rejected allocation. Successful startup, synthesis, timers and existing exception/stop paths remain.",
+      "status": "verified",
+      "verification": "Frozen10 actual-method JVM cases: eight AssertionErrors/two controls to ten passes. All4565JVM/475suites/debug/optimized/R8/vital pass. Combined independent review,26bindings and all475XML replayed.",
+      "kind": "Alarm startup status correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root execution / toolkit regressions / independent media review",
+      "deployment": "Signed local1.167/code161 verified; no device operation this slice. Room deployment remains unverified after prior connection failures.",
+      "state": "Last complete room readbacks/preservation were1.165/code159 before the prior1.166 attempt. No settings or device writes in this slice.",
+      "acceptance": [
+        "Both actual private methods reject short/zero/negative writes and failed loop status without playback/publication; release rejected track once.",
+        "Full-success controls preserve playback/publication and no early release.",
+        "Full required local tests/builds and signed artifact/source asset gates pass."
+      ],
+      "evidence": [
+        {
+          "text": "Fix, regression, artifacts and scope limits.",
+          "source": "docs/portal-alarm-pcm-status-2026-11-04.md"
+        },
+        {
+          "text": "Independent combined review.",
+          "source": "mocks/portal-alarm-pcm-status-20261104/evidence/independent-review.json"
+        }
+      ],
+      "limits": [
+        "Inert mocked Android sinks/constructors and actual private methods only; no public fallback, native/audible audio, UI, optimized runtime/API28/API29 or device acceptance.",
+        "Old TimerAlarm thrown-exception/stop cleanup remains excluded under exhausted2026-11-03T08:51:50\u201309:21:50Z; all those source bytes unchanged.",
+        "No device, phone, household media, provider, account or publication operations; public1.83 and old issue clocks retained."
+      ],
+      "next": "Reconcile known device state when connections return; move to distinct small product work without extending old clocks.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T15:00:49Z",
+        "selectedAt": "2026-11-04T15:19:32.316906+00:00",
+        "target": "2026-11-04T15:15:49Z",
+        "hardDeadline": "2026-11-04T15:30:49Z",
+        "clockNotReset": true
+      }
+    },
     {
       "id": "home-greeting-timezone",
       "title": "Home greeting: follow the current timezone",

@@ -1,0 +1,10 @@
+{
+  "counts": {
+    "tests": 4565,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 475
+  },
+  "aggregateSha256": "e9c62310e6f1e9cd23e1be011be221666bb7abc4500405ef1efd297f3c20307d"
+}

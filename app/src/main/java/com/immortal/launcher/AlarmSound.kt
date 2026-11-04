@@ -97,9 +97,12 @@ object AlarmSound {
                 AudioTrack.MODE_STATIC,
             )
 
-    t.write(samples, 0, samples.size)
-    // Loop the whole buffer (chime + trailing silence) indefinitely.
-    t.setLoopPoints(0, samples.size, -1)
+    // Only a complete buffer with an accepted loop can replace the fallback sound.
+    if (t.write(samples, 0, samples.size) != samples.size ||
+        t.setLoopPoints(0, samples.size, -1) != AudioTrack.SUCCESS) {
+      runCatching { t.release() }
+      return false
+    }
     t.play()
     track = t
     return true

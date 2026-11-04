@@ -1,0 +1,11 @@
+{
+  "originalDiscoveryAt": "2026-11-04T15:00:49Z",
+  "selectedAt": "2026-11-04T15:19:32.316906+00:00",
+  "target": "2026-11-04T15:15:49Z",
+  "hardDeadline": "2026-11-04T15:30:49Z",
+  "clockNotReset": true,
+  "base": "c5e82f76e6bd7f5bfcb2e21a2e242e9af1319cb8",
+  "scope": "Reject incomplete/zero/negative static PCM preload or failed loop result; release only newly rejected allocation and return false to existing fallback. Preserve synthesis, successful startup, existing exception paths, stop, wake lock, timers and settings.",
+  "excludedOldScope": "TimerAlarm thrown-exception and stop cleanup hypothesis retains exhausted2026-11-03T08:51:50\u201309:21:50Z. Not reopened.",
+  "acceptance": "Frozen actual-method JVM status-result failure/control regressions for both objects, full required builds/artifacts/independent review. Native/audio/device delivery separate and currently transport-blocked."
+}

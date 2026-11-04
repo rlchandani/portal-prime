@@ -1,0 +1,17 @@
+{
+  "tasks": 163,
+  "counts": {
+    "verified": 45,
+    "delivered": 108,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "all162OldObjectsExact": true,
+  "oldTaskRawSuffixBytes": 521144,
+  "oldTaskRawSuffixSha256": "aa6a33a09bd8124d8eae0dc583746e698e155164f4a58dfd8b1e046ab3130340",
+  "oldTaskRawSuffixExact": true,
+  "defaultTaskUnchanged": true,
+  "oldClocksUnchanged": true,
+  "onlyBoundaryDelta": "Latest locally verified1.167 candidate; room delivery remains unverified, last complete1.165 before prior attempt"
+}

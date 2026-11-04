@@ -1,0 +1,24 @@
+{
+  "files": {
+    "TimerAlarm.kt": {
+      "beforeSha256": "3a267f0a685ad2a875db1f01d92a3c109d167d0bf70da213c1d72a3040a5ddba",
+      "afterSha256": "bace8dbf24e8d0716f1f0a19180e04564927526bfabcb59e90dc07861e78ae71",
+      "wholeSourceExactReconstruction": true,
+      "allOtherBytesUnchanged": true
+    },
+    "AlarmSound.kt": {
+      "beforeSha256": "bd50e1a02410a1830af178425d280e74a60cdd2735b6c4549d5bebd62d8a456a",
+      "afterSha256": "2bc2b134aef8f734dea636b6431ce45e7da6396c695c2110d5d5cfa360b7de41",
+      "wholeSourceExactReconstruction": true,
+      "allOtherBytesUnchanged": true
+    }
+  },
+  "frozenTestSha256": "fd6e99fe1192f461eb8da3a7883a0b294c02a8e4a96007b02668e8b39ee4840c",
+  "red": {
+    "tests": 10,
+    "assertionFailures": 8,
+    "controls": 2
+  },
+  "olderCleanupScopeUntouched": true,
+  "noNativeAudioAcceptance": true
+}

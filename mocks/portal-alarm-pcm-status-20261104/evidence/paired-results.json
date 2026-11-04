@@ -1,0 +1,17 @@
+{
+  "frozenTestSha256": "fd6e99fe1192f461eb8da3a7883a0b294c02a8e4a96007b02668e8b39ee4840c",
+  "red": {
+    "tests": 10,
+    "assertionFailures": 8,
+    "controls": 2
+  },
+  "green": {
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sameCaseNamesAndFixture": true,
+  "mockedActualMethodsOnly": true,
+  "noContextPreferencesProvidersNativeAudioOrDevices": true
+}

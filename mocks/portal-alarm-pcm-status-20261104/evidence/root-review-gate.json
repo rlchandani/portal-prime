@@ -1,0 +1,18 @@
+{
+  "fullyReadAt": "2026-11-04T15:27:24.321625+00:00",
+  "reviewSha256": "ac52816c15277d9b448f7235f1b94e5f3330ecffd6cbdbc63c3372f2b1b50947",
+  "allBindingsRehashed": 26,
+  "all475XmlSnapshotReplayed": true,
+  "changedDexPaths": {
+    "debug": [
+      "classes6.dex"
+    ],
+    "performance": [
+      "classes.dex"
+    ]
+  },
+  "localCandidateCommitAllowed": true,
+  "deviceDeliveryVerified": false,
+  "noDeviceOperationsThisSlice": true,
+  "olderCleanupScopeExcludedAndUnchanged": true
+}

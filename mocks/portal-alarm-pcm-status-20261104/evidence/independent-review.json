@@ -1,0 +1,254 @@
+{
+  "ok": true,
+  "acceptance": "Accepted status-result-only PCM startup guards, frozen actual-private-method JVM evidence, full build and final artifact identities/assets.",
+  "blockers": [],
+  "originalDiscoveryAt": "2026-11-04T15:00:49Z",
+  "target": "2026-11-04T15:15:49Z",
+  "hardDeadline": "2026-11-04T15:30:49Z",
+  "clockNotReset": true,
+  "base": "c5e82f76e6bd7f5bfcb2e21a2e242e9af1319cb8",
+  "source": {
+    "wholeSourceExactReplacementBothObjects": true,
+    "liveSourcesMatchFrozenAfter": true,
+    "onlyDelta": "Require full ShortArray preload and AudioTrack.SUCCESS loop result; on rejected result attempt release of newly allocated local track and return false before play/publication.",
+    "shortCircuitSkipsLoopForRejectedWrite": true,
+    "successfulStartupBytesUnchanged": true,
+    "exceptionStopSynthesisWakeLockTimerFallbackPolicyAndSettingsBytesUnchanged": true,
+    "activeCallers": "Each existing public start calls startChime and uses returned false for existing fallback; source flow only."
+  },
+  "jvm": {
+    "sameFrozenTestAndTenCaseNames": [
+      "alarmFullStartupPublishesWithoutEarlyRelease",
+      "alarmIncompleteWriteDoesNotPublishOrPlay",
+      "alarmNegativeWriteDoesNotPublishOrPlay",
+      "alarmRejectedLoopDoesNotPublishOrPlay",
+      "alarmZeroWriteDoesNotPublishOrPlay",
+      "timerFullStartupPublishesWithoutEarlyRelease",
+      "timerIncompleteWriteDoesNotPublishOrPlay",
+      "timerNegativeWriteDoesNotPublishOrPlay",
+      "timerRejectedLoopDoesNotPublishOrPlay",
+      "timerZeroWriteDoesNotPublishOrPlay"
+    ],
+    "baseline": {
+      "tests": 10,
+      "assertionFailures": 8,
+      "controls": 2,
+      "errors": 0,
+      "skipped": 0,
+      "terminalExit": 1,
+      "failure": "All eight java.lang.AssertionError at actual Boolean result assertion: A rejected PCM startup cannot report success."
+    },
+    "candidate": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "acceptanceBoundary": "Reflection invokes each actual private startChime. Android constructors/sinks and handler are inert doubles; stub-selected acquisition branch is not native API-level proof.",
+    "checks": "Nonempty actual synthesized samples; short/zero/negative writes and rejected loop return false, do not publish/play, release once. Full success publishes/plays without early release. Test finally resets inert singleton track and reclaims only unreleased mock after assertions.",
+    "all475ImmutableXmlFilesRehashedAndRecounted": {
+      "tests": 4565,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 475
+    },
+    "snapshotAggregateSha256": "e9c62310e6f1e9cd23e1be011be221666bb7abc4500405ef1efd297f3c20307d"
+  },
+  "build": {
+    "retainedTerminalExit": 0,
+    "retainedLog": "BUILD SUCCESSFUL in 1m 39s"
+  },
+  "artifacts": {
+    "debug": {
+      "candidateIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 161,
+        "versionName": "1.167"
+      },
+      "baselineIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 160,
+        "versionName": "1.166"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsExactSourceAndBaseline": true,
+      "assetEntrySetExact": true,
+      "changedAssets": [],
+      "generatedProfiles": []
+    },
+    "performance": {
+      "candidateIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 161,
+        "versionName": "1.167"
+      },
+      "baselineIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 160,
+        "versionName": "1.166"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsExactSourceAndBaseline": true,
+      "assetEntrySetExact": true,
+      "changedAssets": [
+        "assets/dexopt/baseline.prof"
+      ],
+      "generatedProfiles": [
+        {
+          "path": "assets/dexopt/baseline.prof",
+          "before": {
+            "bytes": 11159,
+            "sha256": "51790f36279aad2df47e943907fd14f649518e7923735a1b91313ed0d4e46984",
+            "header": "70726f0030313000"
+          },
+          "after": {
+            "bytes": 11158,
+            "sha256": "982afd9b2f55e749b041261c736501b3d95fa1ae0f576928184fc0269132c9d8",
+            "header": "70726f0030313000"
+          }
+        }
+      ]
+    }
+  },
+  "qualifications": [
+    "Original exhausted TimerAlarm thrown-exception/stop cleanup scope 2026-11-03T08:51:50–09:21:50Z remains excluded and unchanged; release applies solely to newly rejected status-result allocation.",
+    "No actual public fallback invocation, native runtime, audible audio, mounted UI, device delivery, optimized runtime, API28 or Living acceptance.",
+    "No SDK, tests, builds, Git, device, account, source/provider or network actions were performed by reviewer.",
+    "Independent host decoding checks manifest/certificate identities and ZIP payloads. Cryptographic signature verification remains retained root apksigner evidence, not a reviewer SDK execution.",
+    "Debug assets unchanged; performance only generated assets/dexopt/baseline.prof changed. baseline.profm and all23 source assets exact source/baseline. Profile headers make no performance claim.",
+    "All475 individual immutable XML bindings are carried by bound jvm-snapshot.json and independently verified here; no rerun."
+  ],
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/selected-scope.json",
+      "bytes": 905,
+      "sha256": "4e902c3b21980173e1aa611c535af61cb8b58e1fe5011e28ffb2e78390b2043d"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/source-admission.json",
+      "bytes": 846,
+      "sha256": "95cceecf5a7e211911ab3949fe839f1143b25ac9b9db730421c2e611230e0703"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/frozen-AlarmPcmStartupTest.kt",
+      "bytes": 6489,
+      "sha256": "fd6e99fe1192f461eb8da3a7883a0b294c02a8e4a96007b02668e8b39ee4840c"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/before-TimerAlarm.kt",
+      "bytes": 5651,
+      "sha256": "3a267f0a685ad2a875db1f01d92a3c109d167d0bf70da213c1d72a3040a5ddba"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/after-TimerAlarm.kt",
+      "bytes": 5776,
+      "sha256": "bace8dbf24e8d0716f1f0a19180e04564927526bfabcb59e90dc07861e78ae71"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/before-AlarmSound.kt",
+      "bytes": 5599,
+      "sha256": "bd50e1a02410a1830af178425d280e74a60cdd2735b6c4549d5bebd62d8a456a"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/after-AlarmSound.kt",
+      "bytes": 5724,
+      "sha256": "2bc2b134aef8f734dea636b6431ce45e7da6396c695c2110d5d5cfa360b7de41"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/red.xml",
+      "bytes": 36462,
+      "sha256": "86fbac6bd22560cef5d7c5b2d0adcc9e03c0274a737abcac2247221dc8460226"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/green.xml",
+      "bytes": 2140,
+      "sha256": "7367fe8c1ee2ef53e4c210093ad2cf5f32c7a55699155899198b0a433533fda2"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/paired-results.json",
+      "bytes": 391,
+      "sha256": "3f17ddcb4d4daf8d3b58de8dd749c5861c7e370252016f1ca2c427754ff6b2f1"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/red-terminal.json",
+      "bytes": 159,
+      "sha256": "18824d8b63ff27a5de6b1e64443b4fb56be35e7d1953178478551b965d3a1d82"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/red.log",
+      "bytes": 3295,
+      "sha256": "795ce04dbaeb8e90ac487a9a18724854d635cdb641999c3691534b504d1fd59b"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/build-terminal.json",
+      "bytes": 302,
+      "sha256": "1c18b19b2687f96d8f569f7be651428323273d5b463318ca4836bf0e56cdd515"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/build.log",
+      "bytes": 13723,
+      "sha256": "e2f3963684d8b47f942c19a9dd386ee8f506d0d285aed4bde0489c4be38d5076"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/promotion-artifacts.json",
+      "bytes": 9878,
+      "sha256": "74573b3aed8f2d163a2dcafc04cab72e345b8f714b8994098da2184fa4102b32"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/verify-artifacts.py",
+      "bytes": 3641,
+      "sha256": "397d0c1b507cefbc8b175c1b5d3ba295b254cde66c66bdb8d2a0f967c116e9a8"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/jvm-snapshot.json",
+      "bytes": 160157,
+      "sha256": "5201e340cfbf482944c8bc7502a789b0cb574315dbb140564a3075673bc768c0"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/candidate-debug-1.167.apk",
+      "bytes": 46745646,
+      "sha256": "26cc888c993fbca3682fa77cf9b0ac5447180f81c6675be44336ae8a9d65592d"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/alarm-pcm-status/candidate-performance-1.167.apk",
+      "bytes": 25886923,
+      "sha256": "3280a35c2ea34ae298f58a5cf7337a103e8a656a8c460c8ed16b856abffad9f0"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/candidate-debug-1.166.apk",
+      "bytes": 46745646,
+      "sha256": "61b0030a309a39e7dc61ff655db228e2e68810d7cc179d740cc32d9bc5427eb3"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/candidate-performance-1.166.apk",
+      "bytes": 25886923,
+      "sha256": "b9a522c2d8b5ae44adbacd1a55b8ae5122720ecb5f73a4a16582c62892f6fdcf"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/TimerAlarm.kt",
+      "bytes": 5776,
+      "sha256": "bace8dbf24e8d0716f1f0a19180e04564927526bfabcb59e90dc07861e78ae71"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AlarmSound.kt",
+      "bytes": 5724,
+      "sha256": "2bc2b134aef8f734dea636b6431ce45e7da6396c695c2110d5d5cfa360b7de41"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/AlarmPcmStartupTest.kt",
+      "bytes": 6489,
+      "sha256": "fd6e99fe1192f461eb8da3a7883a0b294c02a8e4a96007b02668e8b39ee4840c"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "28b491133015b3f5e17d47c922d215e2f58c10df7cc73bc786ee22932f234328"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 19404,
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+    }
+  ]
+}
