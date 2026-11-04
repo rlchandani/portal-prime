@@ -1,0 +1,49 @@
+{
+  "status": "frozen-test-source-only-not-executed",
+  "clock": {
+    "conservativeOriginalStart": "2026-11-04T20:00:00Z",
+    "target": "2026-11-04T20:15:00Z",
+    "hardDeadline": "2026-11-04T20:30:00Z",
+    "clockNotReset": true
+  },
+  "test": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_jvm_report_evidence.py",
+    "bytes": 4843,
+    "sha256": "99f3fdd42c8dbf5647b558e92a44e1b44aa73fae0a331998648b531bac28110c",
+    "frozenPath": "/private/tmp/portal-jvm-report-evidence-20261104-200000/test_portal_jvm_report_evidence.frozen.py",
+    "methods": [
+      "test_nonzero_header_without_any_testcases_cannot_report_ready",
+      "test_three_test_header_with_only_one_passing_case_cannot_report_ready",
+      "test_one_test_header_with_three_passing_cases_cannot_report_ready",
+      "test_clean_header_cannot_hide_case_failure",
+      "test_clean_header_cannot_hide_case_error",
+      "test_clean_header_cannot_hide_skipped_case",
+      "test_complete_three_passing_cases_report_ready",
+      "test_complete_cases_allow_additional_zero_test_empty_suite"
+    ]
+  },
+  "atAuthoringBindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 21492,
+      "sha256": "6146ae475002e0033c1f26683b7098de4e4ea9f2096b2e69c9a5caa507ce855f"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_readiness.py",
+      "bytes": 13539,
+      "sha256": "34f8b6ad541503896e000d01fac4894fcbe072eaa2d9a6a30488fd8ce8fd2ea2"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_readiness_edges.py",
+      "bytes": 8620,
+      "sha256": "960bf52b21a9b090127de5564a27bd62d9e3f9ae2d6100a9fbda2bb636d2daef"
+    }
+  ],
+  "scope": "Actual readiness CLI must reject testcase-count/header mismatches and hidden failure/error/skipped children. Complete three-case reports, including an additional zero-case empty suite, remain ready.",
+  "dependencies": "Root adapts shared passing Gradle fixture to three literal testcase children and exports PASSING_JVM_REPORT; existing edge set_jvm_report must use that shared constant before baseline. Test inherits no external TestCase, aliases helper methods through module only.",
+  "limits": [
+    "No source implementation/checker duplicated; literal XML enters actual CLI via shared fixture.",
+    "No execution/tests/build/SDK/Git/network/device operations by author.",
+    "Root owns baseline/candidate execution and final source verification; no RED/PASS claim."
+  ]
+}

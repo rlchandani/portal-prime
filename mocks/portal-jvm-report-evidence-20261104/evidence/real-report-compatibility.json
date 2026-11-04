@@ -1,0 +1,16 @@
+{
+  "status": "existing-real-report-compatibility-passed",
+  "jvm": {
+    "tests": 4573,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 476
+  },
+  "testcases": 4573,
+  "xmlDirectory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+  "aggregateSha256": "8acf33e840d5d5e3ee1215dee85aadd83d9e24686486aa2cbb288697a85617b6",
+  "reportOrigin": "Actual prior 1.176 Gradle run completed 2026-11-04T19:55:17.558568+00:00",
+  "notBeforeNs": 0,
+  "freshBuildOrRuntimeClaim": false
+}

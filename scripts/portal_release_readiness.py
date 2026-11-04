@@ -180,11 +180,19 @@ def jvm_result(root, not_before_ns):
             report = ET.parse(file).getroot()
             if report.tag != "testsuite":
                 raise CheckFailed("Unexpected JVM test report structure.")
+            counts = {}
             for key in totals:
                 value = int(report.attrib[key])
                 if value < 0:
                     raise CheckFailed("Invalid negative JVM test count.")
+                counts[key] = value
                 totals[key] += value
+            cases = report.findall("testcase")
+            if len(cases) != counts["tests"]:
+                raise CheckFailed("JVM report test count differs from its testcase evidence.")
+            if any(case.find(outcome) is not None for case in cases
+                   for outcome in ("failure", "error", "skipped")):
+                raise CheckFailed("JVM testcases must have no failures, errors or skips.")
     except (OSError, ET.ParseError, ValueError, KeyError) as error:
         raise CheckFailed("JVM report evidence is incomplete or invalid.") from error
     if not files or totals["tests"] == 0 or any(totals[k] for k in ("failures", "errors", "skipped")):

@@ -1,0 +1,11 @@
+{
+  "tests": 296,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "durationSeconds": 34.503409334000025,
+  "failureCases": [],
+  "errorCases": [],
+  "pattern": "scripts/test_portal_*.py",
+  "newEightFrozenCasesIncluded": true
+}

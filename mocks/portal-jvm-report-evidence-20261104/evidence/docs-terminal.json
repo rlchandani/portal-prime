@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/private/tmp/portal-docs-runtime-20261104/bin/mkdocs",
+    "build",
+    "--strict",
+    "--site-dir",
+    "/private/tmp/portal-jvm-report-evidence-20261104-200000/docs-site"
+  ],
+  "exitCode": 0,
+  "durationSeconds": 2.894207125005778
+}

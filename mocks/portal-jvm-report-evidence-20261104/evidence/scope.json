@@ -1,0 +1,18 @@
+{
+  "scope": "Local readiness rejects incomplete or contradictory JVM testcase evidence",
+  "base": "60556b8aa03ba335c05cfb0161e946eeaae00492",
+  "startedAt": "2026-11-04T20:00:00Z",
+  "targetAt": "2026-11-04T20:15:00Z",
+  "hardStopAt": "2026-11-04T20:30:00Z",
+  "originalClockRetained": true,
+  "acceptance": [
+    "Actual CLI frozen regressions for missing/mismatched testcase counts and hidden failure/error/skipped children.",
+    "Complete passing reports and empty zero-test suite alongside passing suite remain accepted.",
+    "Full Python/tool tests and current real Gradle reports confirm compatibility; source-only app changes prohibited."
+  ],
+  "boundaries": [
+    "No app/version/Portal/settings/auth/provider/media/phone/publication changes.",
+    "Generated external build/SDK fixture is not live Gradle/APK verification.",
+    "Existing checker default/preview/source/artifact/timeout contracts retained; prior delivered and held clocks unchanged."
+  ]
+}

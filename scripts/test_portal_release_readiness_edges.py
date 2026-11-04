@@ -8,7 +8,7 @@ import signal
 import time
 import unittest
 
-from test_portal_release_readiness import ReadinessFixture
+from test_portal_release_readiness import PASSING_JVM_REPORT, ReadinessFixture
 
 
 class ReleaseReadinessEdgesTest(unittest.TestCase):
@@ -32,7 +32,7 @@ class ReleaseReadinessEdgesTest(unittest.TestCase):
         return (fixture.repo / "gradlew").read_text().split("\n", 1)[1]
 
     def set_jvm_report(self, fixture, report):
-        original = '<testsuite tests="3" failures="0" errors="0" skipped="0"/>'
+        original = PASSING_JVM_REPORT
         body = self.gradle_body(fixture)
         self.assertIn(original, body)
         fixture.executable(fixture.repo / "gradlew", body.replace(original, report))

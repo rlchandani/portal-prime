@@ -1,0 +1,18 @@
+{
+  "tests": 8,
+  "failures": 6,
+  "errors": 0,
+  "skipped": 0,
+  "failed": [
+    "test_portal_jvm_report_evidence.JvmReportEvidenceTest.test_clean_header_cannot_hide_case_error",
+    "test_portal_jvm_report_evidence.JvmReportEvidenceTest.test_clean_header_cannot_hide_case_failure",
+    "test_portal_jvm_report_evidence.JvmReportEvidenceTest.test_clean_header_cannot_hide_skipped_case",
+    "test_portal_jvm_report_evidence.JvmReportEvidenceTest.test_nonzero_header_without_any_testcases_cannot_report_ready",
+    "test_portal_jvm_report_evidence.JvmReportEvidenceTest.test_one_test_header_with_three_passing_cases_cannot_report_ready",
+    "test_portal_jvm_report_evidence.JvmReportEvidenceTest.test_three_test_header_with_only_one_passing_case_cannot_report_ready"
+  ],
+  "durationSeconds": 4.928849749994697,
+  "allFailureTracesContainAssertionError": true,
+  "sourceSha256": "6146ae475002e0033c1f26683b7098de4e4ea9f2096b2e69c9a5caa507ce855f",
+  "actualCLIWithGeneratedExternalProcessFixtures": true
+}

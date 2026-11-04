@@ -1,0 +1,10 @@
+{
+  "exactOneBlockChange": true,
+  "scope": "per-suite actual testcase count and outcome evidence",
+  "beforeSha256": "6146ae475002e0033c1f26683b7098de4e4ea9f2096b2e69c9a5caa507ce855f",
+  "afterSha256": "d3b44170b6e9494d990f87e3817cc931d83b34763d3260c95ed7260fea8ed558",
+  "afterBytes": 21967,
+  "frozenTestSha256": "99f3fdd42c8dbf5647b558e92a44e1b44aa73fae0a331998648b531bac28110c",
+  "appVersionAndAssetChanges": false,
+  "fixtureChange": "Shared passing external Gradle fixture has three literal testcase children; edge lookup imports that same report."
+}

@@ -1,0 +1,158 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "reviewedAt": "2026-11-04T20:11:08.515Z",
+  "scope": "Host readiness JVM testcase evidence validation",
+  "clock": {
+    "original": "2026-11-04T20:00:00Z",
+    "target": "2026-11-04T20:15:00Z",
+    "hard": "2026-11-04T20:30:00Z",
+    "originalClockRetained": true
+  },
+  "base": "60556b8aa03ba335c05cfb0161e946eeaae00492",
+  "findings": [
+    "Whole production source reconstructs exactly by replacing the sole jvm_result block. Each suite now requires direct testcase count equality and rejects direct failure/error/skipped testcase outcomes using is not None. All bytes outside that block remain identical.",
+    "The actual default readiness caller checks JVM evidence after its Gradle gate and before copying or renaming a candidate APK. Freshness, header nonnegative/count totals, positive aggregate tests, JavaScript-only/default/preview, source consistency, artifact and deadline guards remain unchanged.",
+    "Shared successful external Gradle fixture now emits three literal testcase children. The shared constant insertion, first successful fixture XML replacement and edge import/replacement adapter reconstruct entire fixture files exactly; existing test assertions and historical stale-report fixture remain unchanged.",
+    "The frozen eight actual CLI cases cover absent children, undercount, overcount and hidden failure/error/skipped outcomes, plus complete passing and additional empty-suite controls. Baseline had six genuine false-READY AssertionErrors and two passing controls, zero setup errors/skips; candidate full discovery logs all eight as ok.",
+    "Full Python log independently contains 296 successful named cases, Ran 296 and OK. Root receipt records zero failures/errors/skips. Log duration is 34.406s; enclosing measured receipt duration is 34.503409334s.",
+    "Independently read and hashed all 476 retained Gradle XML files: header tests and actual testcase elements both total 4573, no failure/error/skipped elements, exact aggregate matches the compatibility receipt. Root helper used cutoff 0; this establishes compatibility with existing reports."
+  ],
+  "sourceReconstruction": {
+    "productionOnlyFunction": "jvm_result",
+    "wholeFileExactReplacement": true,
+    "beforeSha256": "6146ae475002e0033c1f26683b7098de4e4ea9f2096b2e69c9a5caa507ce855f",
+    "afterSha256": "d3b44170b6e9494d990f87e3817cc931d83b34763d3260c95ed7260fea8ed558",
+    "oldBlockSha256": "a33a137b2f783e75f6e106f1f34026d4402de2982682e1701a7b13f2587ee531",
+    "newBlockSha256": "5873cfc2f288752db773c055a4f7563678f371129de9bdaa8966f4ba3620fae9",
+    "sharedFixtureExactReconstruction": true,
+    "edgeAdapterExactReconstruction": true,
+    "frozenTestExact": true
+  },
+  "checks": {
+    "baseline": {
+      "tests": 8,
+      "failures": 6,
+      "errors": 0,
+      "skipped": 0,
+      "passingControls": 2,
+      "failureKind": "AssertionError from false READY"
+    },
+    "candidateFrozenCases": {
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "includedInFullDiscovery": true
+    },
+    "python": {
+      "tests": 296,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "pattern": "scripts/test_portal_*.py",
+      "loggedSuccessfulCaseCount": 296
+    }
+  },
+  "jvm": {
+    "directory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "suites": 476,
+    "tests": 4573,
+    "testcases": 4573,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "aggregateSha256": "8acf33e840d5d5e3ee1215dee85aadd83d9e24686486aa2cbb288697a85617b6",
+    "aggregateDefinition": "SHA256 of UTF-8 concatenation, sorted by TEST-*.xml filename: filename + NUL + SHA256(file bytes) + NUL + decimal byte length + newline.",
+    "reportOrigin": "Actual prior 1.176 Gradle run completed 2026-11-04T19:55:17.558568+00:00",
+    "notBeforeNs": 0,
+    "freshBuildOrRuntimeClaim": false
+  },
+  "qualifications": [
+    "Acceptance is limited to the selected direct Gradle testsuite/testcase evidence contract; arbitrary nested suites, XML namespaces, duplicate testcase names and complete JUnit schema validation were not added or claimed.",
+    "Actual readiness CLI uses generated external process/SDK/APK fixtures in the eight regressions. This review did not execute tests, builds, SDK tools, Git, network, devices or production runtime.",
+    "Retained 1.176 XML compatibility is not a fresh JVM build, complete readiness run, APK release verification, hosted CI or hardware acceptance.",
+    "No app/version/assets/room changes are part of this source-only Python scope. Parent-owned later docs, queue and commit work is outside this receipt. Earlier delivered or held scopes and clocks remain unchanged."
+  ],
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 21967,
+      "sha256": "d3b44170b6e9494d990f87e3817cc931d83b34763d3260c95ed7260fea8ed558"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_jvm_report_evidence.py",
+      "bytes": 4843,
+      "sha256": "99f3fdd42c8dbf5647b558e92a44e1b44aa73fae0a331998648b531bac28110c"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_readiness.py",
+      "bytes": 13539,
+      "sha256": "34f8b6ad541503896e000d01fac4894fcbe072eaa2d9a6a30488fd8ce8fd2ea2"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_release_readiness_edges.py",
+      "bytes": 8620,
+      "sha256": "960bf52b21a9b090127de5564a27bd62d9e3f9ae2d6100a9fbda2bb636d2daef"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/scope.json",
+      "bytes": 971,
+      "sha256": "70279486e0fed06043e53a5cd6c7169ed8dd1828679a530932ddfbf27b5c4849"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/source-change.json",
+      "bytes": 559,
+      "sha256": "97a21c667192c9420fa2a3146d76fd3aa749d13e9fe0da3b0931557f8bc32413"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/test-preparation.json",
+      "bytes": 2661,
+      "sha256": "af25176ec60e2170ca9a5b81e8628f04872bf87b5098e9ba45ba5f1d9a9aaae3"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/portal_release_readiness.py.before",
+      "bytes": 21492,
+      "sha256": "6146ae475002e0033c1f26683b7098de4e4ea9f2096b2e69c9a5caa507ce855f"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/test_portal_release_readiness.py.before",
+      "bytes": 13277,
+      "sha256": "fd936c47f5e6f80055c83e215f2ea9a75cd894430d384c566334b550db986156"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/test_portal_release_readiness_edges.py.before",
+      "bytes": 8642,
+      "sha256": "aca812da0917c3599247ffac222d6e0d87005b6b69988f9d0e365eb4dc185c48"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/test_portal_jvm_report_evidence.frozen.py",
+      "bytes": 4843,
+      "sha256": "99f3fdd42c8dbf5647b558e92a44e1b44aa73fae0a331998648b531bac28110c"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/baseline.json",
+      "bytes": 1006,
+      "sha256": "b2b17011bef50aa4ae4bd4e4799528e0b9e420c9e31eba12af5b806443038549"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/baseline.log",
+      "bytes": 11036,
+      "sha256": "494d40ba5fcb1f27cd451b9cf8c0a6ac760a1de2c1954f785b281c501840da44"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/python-tests.json",
+      "bytes": 230,
+      "sha256": "2bbe392f1813c13c6405f820cd8ca1cc2333204b874c81f0b5c50f5dea2c4af9"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/python-tests.log",
+      "bytes": 48413,
+      "sha256": "12b8e59ad57af09419fe886c056f7eb33529720109a9a4e38b7a2b525521cca4"
+    },
+    {
+      "path": "/private/tmp/portal-jvm-report-evidence-20261104-200000/real-report-compatibility.json",
+      "bytes": 553,
+      "sha256": "9db3bb860d1eb17b9105fcf047eb7e54ed670daa9b031e708dd23958e0987d55"
+    }
+  ]
+}

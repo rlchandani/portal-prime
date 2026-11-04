@@ -12,6 +12,11 @@ import unittest
 
 SCRIPT = Path(__file__).with_name("portal_release_readiness.py")
 GIT = shutil.which("git")
+PASSING_JVM_REPORT = (
+    '<testsuite tests="3" failures="0" errors="0" skipped="0">'
+    '<testcase name="one"/><testcase name="two"/><testcase name="three"/>'
+    '</testsuite>'
+)
 
 
 class ReadinessFixture:
@@ -51,7 +56,7 @@ if (r/'sleep-gradle').exists():time.sleep(30)
 if (r/'fail-gradle').exists():sys.exit(7)
 p=r/'app/build/test-results/testDebugUnitTest';p.mkdir(parents=True,exist_ok=True)
 if not (r/'missing-tests').exists():
- (p/'TEST-fixture.xml').write_text('<testsuite tests="3" failures="0" errors="0" skipped="0"/>')
+ (p/'TEST-fixture.xml').write_text('<testsuite tests="3" failures="0" errors="0" skipped="0"><testcase name="one"/><testcase name="two"/><testcase name="three"/></testsuite>')
 variant=next(a.removeprefix(':app:assemble').lower() for a in sys.argv if a.startswith(':app:assemble'))
 p=r/f'app/build/outputs/apk/{variant}';p.mkdir(parents=True,exist_ok=True)
 (p/f'app-{variant}.apk').write_bytes((r/'candidate.json').read_bytes())
