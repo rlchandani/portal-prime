@@ -1,0 +1,36 @@
+{
+  "scopeStart": "2026-11-04T19:07:33Z",
+  "target": "2026-11-04T19:22:33Z",
+  "hard": "2026-11-04T19:37:33Z",
+  "baseline": {
+    "acceptedBy": "root",
+    "cases": 4,
+    "pass": 3,
+    "failures": 1,
+    "failureType": "ERR_ASSERTION",
+    "trigger": "Ordinary initial HTTP503 still showed Loading snapshot after the read settled",
+    "controllerSha256": "a856e71873066f7e1b4ec47028d313a1f38255b06b95e73fec7553117888b672",
+    "testSha256": "be9985fdd2fd72b080387b1d57e0d36f865b3240812e838ddc722c5fd34c1414"
+  },
+  "change": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js",
+    "line": 5196,
+    "before": ": text('Loading snapshot…'),",
+    "after": ": text(data.snapshotError ? 'Snapshot unavailable' : 'Loading snapshot…'),",
+    "exactSingleReplacement": true,
+    "beforeSha256": "a856e71873066f7e1b4ec47028d313a1f38255b06b95e73fec7553117888b672",
+    "afterSha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66",
+    "beforeBytes": 270185,
+    "afterBytes": 270231
+  },
+  "frozenChecks": {
+    "testByteIdentical": true,
+    "harnessByteIdentical": true
+  },
+  "runtimeExecutionByAuthor": false,
+  "limits": [
+    "Actual shipped controller and rendered public Home snapshot action through generated DOM harness",
+    "No mounted browser, native UI, download, restore, server or physical Portal acceptance",
+    "No test or runtime execution by fixture author"
+  ]
+}

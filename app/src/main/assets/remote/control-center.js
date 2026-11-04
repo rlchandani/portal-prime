@@ -5193,7 +5193,7 @@ function snapshotsPage() {
           ? text(
               `${Object.keys(current.domains || {}).length} settings categories · This Portal only`,
             )
-          : text('Loading snapshot…'),
+          : text(data.snapshotError ? 'Snapshot unavailable' : 'Loading snapshot…'),
         data.snapshotError ? text(message(data.snapshotError), 'error') : null,
         exporting || exportOwner?.error ? el('p', { role: 'status', 'aria-live': 'polite',
           class: exportOwner.error ? 'error' : 'detail',

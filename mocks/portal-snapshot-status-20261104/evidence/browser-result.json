@@ -1,0 +1,44 @@
+{
+  "scope": "isolated-generated-snapshot-browser",
+  "cases": [
+    {
+      "variant": "baseline",
+      "mode": "failed",
+      "reads": 1,
+      "accepted": true,
+      "controllerSha256": "a856e71873066f7e1b4ec47028d313a1f38255b06b95e73fec7553117888b672"
+    },
+    {
+      "variant": "candidate",
+      "mode": "failed",
+      "reads": 1,
+      "accepted": true,
+      "controllerSha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+    },
+    {
+      "variant": "candidate",
+      "mode": "pending",
+      "reads": 1,
+      "accepted": true,
+      "controllerSha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+    },
+    {
+      "variant": "candidate",
+      "mode": "empty",
+      "reads": 1,
+      "accepted": true,
+      "controllerSha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+    },
+    {
+      "variant": "candidate",
+      "mode": "retained",
+      "reads": 2,
+      "accepted": true,
+      "controllerSha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+    }
+  ],
+  "outside": [],
+  "posts": [],
+  "errors": [],
+  "accepted": true
+}

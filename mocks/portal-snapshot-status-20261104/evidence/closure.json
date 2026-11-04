@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-11-04T19:07:33+00:00",
+  "deliveryPreservationCleanupAt": "2026-11-04T19:25:58.067329+00:00",
+  "elapsedMinutes": 18.417788816666665,
+  "targetMet": false,
+  "hardLimitMetAtClosure": true,
+  "copiedRegistryRemoved": true,
+  "ownerRegistryHashesUnchanged": true,
+  "isolatedBrowserClosed": true,
+  "originalIssueClockRetained": true,
+  "published": false,
+  "physicalPhoneOperations": false,
+  "wholeGoalComplete": false,
+  "preexistingScriptsCachePreserved": true,
+  "docsStrictPassed": true,
+  "docsSiteRemoved": true,
+  "precommitCheckedAt": "2026-11-04T19:27:24.013637+00:00",
+  "precommitElapsedMinutes": 19.850227283333332,
+  "hardLimitMetBeforeCommit": true
+}

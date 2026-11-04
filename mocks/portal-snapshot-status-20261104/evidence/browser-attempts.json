@@ -1,0 +1,17 @@
+{
+  "scope": "isolated-generated-snapshot-browser",
+  "initialAttempts": [
+    {
+      "result": "Public Snapshots button disabled",
+      "cause": "Generated companion omitted snapshot:true",
+      "productionChange": false
+    },
+    {
+      "result": "Error text exact-match timed out",
+      "cause": "Actual rendered error includes punctuation; use substring witness",
+      "productionChange": false
+    }
+  ],
+  "final": "Five observations accepted in isolated desktop Chrome at402x874. No outside/POST/page errors. Not native Portal/WebView or live failure acceptance.",
+  "priorBrowserKeyScopeReopened": false
+}

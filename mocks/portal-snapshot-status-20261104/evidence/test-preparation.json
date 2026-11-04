@@ -1,0 +1,45 @@
+{
+  "scopeStart": "2026-11-04T19:07:33Z",
+  "target": "2026-11-04T19:22:33Z",
+  "hard": "2026-11-04T19:37:33Z",
+  "status": "baseline-ready-unexecuted",
+  "productionUnchanged": true,
+  "expectedBaseline": {
+    "cases": 4,
+    "assertionFailures": 1,
+    "controls": 3
+  },
+  "commands": {
+    "focused": "node --test --test-reporter=tap app/src/test/js/remote-snapshot-status.test.mjs",
+    "full": "node --test app/src/test/js/*.test.mjs"
+  },
+  "sources": {
+    "controller": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js",
+      "sha256": "a856e71873066f7e1b4ec47028d313a1f38255b06b95e73fec7553117888b672",
+      "bytes": 270185
+    },
+    "tests": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/js/remote-snapshot-status.test.mjs",
+      "sha256": "be9985fdd2fd72b080387b1d57e0d36f865b3240812e838ddc722c5fd34c1414",
+      "bytes": 3634
+    },
+    "harness": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/js/remote-browser-harness.mjs",
+      "sha256": "af023a77c0c650e39389eb17983aaf089b04390bb90ae0990ccedc4d1875e13c",
+      "bytes": 11469
+    }
+  },
+  "cases": [
+    "initial HTTP 503 settles unavailable",
+    "pending initial read stays Loading",
+    "confirmed empty snapshot shows zero categories",
+    "failed public Refresh retains three-category summary"
+  ],
+  "limits": [
+    "Actual shipped controller and rendered public Home snapshot action through generated DOM harness",
+    "No mounted browser, native UI, download, restore, server or physical Portal acceptance",
+    "No test or runtime execution by fixture author",
+    "Production label conditional held until root accepts baseline"
+  ]
+}

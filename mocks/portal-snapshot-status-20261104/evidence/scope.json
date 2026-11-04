@@ -1,0 +1,22 @@
+{
+  "scope": "Initial browser snapshot request: show settled failure instead of loading",
+  "startedAt": "2026-11-04T19:07:33Z",
+  "targetAt": "2026-11-04T19:22:33Z",
+  "hardStopAt": "2026-11-04T19:37:33Z",
+  "base": "9ff00bf421a8a51c4dc57be02542a790b11730f7",
+  "newVersion": {
+    "versionName": "1.174",
+    "versionCode": 168
+  },
+  "acceptance": [
+    "Actual controller failure503 shows unavailable with no loading",
+    "Pendingfirstfetch remains loading",
+    "Confirmedempty/saved snapshot status preserved",
+    "Relevant fullchecks and exactsameoptimizedAPK bothrooms with savedstatepreservation"
+  ],
+  "boundaries": [
+    "No real snapshot export/import or household account/source/media operations",
+    "No auth/push/publication/phoneoperations; public1.83 unchanged",
+    "Existing screensaver/browser/native acceptance clocks not reopened"
+  ]
+}

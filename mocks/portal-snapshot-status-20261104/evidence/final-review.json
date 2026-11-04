@@ -1,0 +1,498 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "scope": "Snapshot initial settled-failure status label; generated-controller and isolated desktop Chrome observations plus final static artifact/build verification",
+  "clock": {
+    "startedAt": "2026-11-04T19:07:33Z",
+    "targetAt": "2026-11-04T19:22:33Z",
+    "hardStopAt": "2026-11-04T19:37:33Z",
+    "originalClockRetained": true
+  },
+  "reviewedAt": "2026-11-04T19:22:50.807Z",
+  "findings": [
+    "Whole controller reconstructs from the frozen baseline with the one snapshotsPage fallback conditional. Existing read ownership/error assignment, summary priority, refresh, export and restore bytes remain exact. An absent confirmed snapshot shows unavailable when the existing snapshotError is present; pending initial reads keep Loading.",
+    "Four byte-frozen actual-controller/public Home action cases reproduce one literal ERR_ASSERTION and three controls before the fix; all four pass after. Pending-to-confirmed, confirmed empty and retained three-category summary after failed Refresh are covered with unchanged harness.",
+    "Corrected actual full JavaScript command exits0:398 slideshow and757 remote cases, all pass and zero fail/cancel/skip/TODO. Initial --receipt invocation omitted required --output and stopped at argparse before checking; it is retained as excluded operational setup, with no source/test change.",
+    "Five final mounted desktop Chrome observations use actual RemoteHtml/controller/core/CSS with generated GET-only backend data: baseline503 Loading, candidate503 unavailable, pending then confirmed, empty0 and retained3 categories after failed Refresh. Reports record no outside requests, POSTs or page errors. Two zero-case setup reports remain excluded; only snapshot capability admission and error-label substring locators changed, while all label/category/read-count assertions stayed exact.",
+    "Build exits0 in109.794s. All475 JUnit XML files independently recount4565 tests and testcase elements, zero failures/errors/skips. Both APKs decode package.debug1.174/code168 and the unchanged signer certificate.",
+    "All23 source payloads match the frozen APKs. Against each1.173 baseline, the sole changed asset entry is remote/control-center.js; other22 source assets and all generated profiles are byte-identical.",
+    "Gradle reconstructs with only its two version lines:167/1.173→168/1.174, plus eight-to-four-space indentation on those same lines. Public manifest remains1.83/code77."
+  ],
+  "qualifications": [
+    "Browser observations are isolated mounted desktop Chrome at402×874 with generated data, not Portal/WebView, real server/device/account behavior, snapshot download/restore, household sources or native acceptance. Reviewer performed no browser/runtime/test/build/SDK/Git/network/device operation.",
+    "No broader loading/retry/ownership/export/restore policy change or physical Portal acceptance is claimed. Docs/queue and later room delivery/preservation are outside this promotion-source review.",
+    "Manifest, certificate identity and ZIP bytes were independently decoded on the host. Cryptographic signature verification relies on the bound root SDK verifier/receipt; no reviewer SDK execution.",
+    "Initial JavaScript preflight and two browser setup failures are retained and excluded from behavioral baseline/acceptance. No production or frozen controller-test predicates were repaired."
+  ],
+  "checks": {
+    "baseline": {
+      "exitCode": 1,
+      "tests": 4,
+      "pass": 3,
+      "fail": 1,
+      "failureType": "ERR_ASSERTION"
+    },
+    "focused": {
+      "exitCode": 0,
+      "tests": 4,
+      "pass": 4,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "fullJavascript": {
+      "exitCode": 0,
+      "slideshow": {
+        "tests": 398,
+        "pass": 398,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "remote": {
+        "tests": 757,
+        "pass": 757,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "receiptStatus": "checked"
+    },
+    "browser": {
+      "accepted": true,
+      "cases": 5,
+      "outsideRequests": 0,
+      "posts": 0,
+      "pageErrors": 0,
+      "viewport": [
+        402,
+        874
+      ],
+      "fixtureOnly": true
+    }
+  },
+  "build": {
+    "command": [
+      "./gradlew",
+      ":app:testDebugUnitTest",
+      ":app:assembleDebug",
+      ":app:assemblePerformance",
+      ":app:lintVitalPerformance",
+      "--no-daemon",
+      "--console=plain"
+    ],
+    "start": "2026-11-04T19:17:22.254908+00:00",
+    "end": "2026-11-04T19:19:12.048423+00:00",
+    "durationSeconds": 109.79366508300154,
+    "exitCode": 0
+  },
+  "jvm": {
+    "tests": 4565,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 475,
+    "testcaseCount": 4565,
+    "xmlDirectory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "aggregateSha256": "988ffe6c4fde3500d26f5ccffbc10c734976c439bf7e4a70b7263983da70b437",
+    "aggregateDefinition": "Sorted TEST-*.xml filenames, each filename + NUL + SHA256(file bytes) + NUL + decimal bytes + newline; SHA256 of concatenated UTF-8 rows."
+  },
+  "sourceAssets": {
+    "root": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets",
+    "count": 23,
+    "aggregateSha256": "884d3ef5dbd72dfda10c9ef4f770a2b42299c2ba341ebcfa7dc5b6b5d0fd8848",
+    "aggregateDefinition": "Sorted relative asset paths, each path + NUL + SHA256(file bytes) + NUL + decimal bytes + newline; SHA256 of concatenated UTF-8 rows.",
+    "files": [
+      {
+        "path": "catalog.json",
+        "bytes": 24043,
+        "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+      },
+      {
+        "path": "diagnostics/source-preview-4k.mp4",
+        "bytes": 25847,
+        "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+      },
+      {
+        "path": "faces/Flip-Regular.otf",
+        "bytes": 3184,
+        "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+      },
+      {
+        "path": "faces/flip.html",
+        "bytes": 29379,
+        "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+      },
+      {
+        "path": "fonts/BebasNeue.ttf",
+        "bytes": 61400,
+        "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+      },
+      {
+        "path": "fonts/OFL.txt",
+        "bytes": 1186,
+        "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+      },
+      {
+        "path": "photoframe_fallback/01_wilderness.jpg",
+        "bytes": 261090,
+        "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+      },
+      {
+        "path": "photoframe_fallback/02_denali.jpg",
+        "bytes": 277842,
+        "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+      },
+      {
+        "path": "photoframe_fallback/03_yosemite.jpg",
+        "bytes": 443801,
+        "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+      },
+      {
+        "path": "remote/control-center.css",
+        "bytes": 24082,
+        "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+      },
+      {
+        "path": "remote/control-center.js",
+        "bytes": 270231,
+        "sha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+      },
+      {
+        "path": "remote/core.mjs",
+        "bytes": 28623,
+        "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+      },
+      {
+        "path": "screensaver/cinema-grain.png",
+        "bytes": 12657,
+        "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+      },
+      {
+        "path": "screensaver/index.html",
+        "bytes": 7785,
+        "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+      },
+      {
+        "path": "screensaver/lib-engine.js",
+        "bytes": 5582,
+        "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+      },
+      {
+        "path": "screensaver/mode-impls.js",
+        "bytes": 70273,
+        "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+      },
+      {
+        "path": "screensaver/modes.js",
+        "bytes": 13499,
+        "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+      },
+      {
+        "path": "screensaver/photo-doodles-dark.svg",
+        "bytes": 1247,
+        "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+      },
+      {
+        "path": "screensaver/photo-doodles.svg",
+        "bytes": 1246,
+        "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+      },
+      {
+        "path": "screensaver/photos.js",
+        "bytes": 8528,
+        "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+      },
+      {
+        "path": "screensaver/scheduler.js",
+        "bytes": 14433,
+        "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+      },
+      {
+        "path": "screensaver/styles.css",
+        "bytes": 15397,
+        "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+      },
+      {
+        "path": "webapp-retention-probe.html",
+        "bytes": 504,
+        "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+      }
+    ],
+    "intentionalChangedSourceAssets": [
+      "remote/control-center.js"
+    ],
+    "allOther22ExactBaseline": true
+  },
+  "artifacts": [
+    {
+      "variant": "debug",
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/candidate-debug-1.174.apk",
+      "bytes": 46745710,
+      "sha256": "24e03f885485b184b7ff73d5497129af9e03853c051f0b7fac25393a028b3ea8",
+      "manifest": {
+        "versionCode": 168,
+        "versionName": "1.174",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetsMatched": 23,
+      "allOther22UnchangedFromBaseline": true,
+      "changedAssetEntries": [
+        "assets/remote/control-center.js"
+      ],
+      "generatedProfileChanges": []
+    },
+    {
+      "variant": "performance",
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/candidate-performance-1.174.apk",
+      "bytes": 25886947,
+      "sha256": "ed778d6be88ee9c16c64fd2810c0801becbb39a2fc0ff298e1e31d98157ddf2d",
+      "manifest": {
+        "versionCode": 168,
+        "versionName": "1.174",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetsMatched": 23,
+      "allOther22UnchangedFromBaseline": true,
+      "changedAssetEntries": [
+        "assets/remote/control-center.js"
+      ],
+      "generatedProfileChanges": []
+    }
+  ],
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/scope.json",
+      "bytes": 863,
+      "sha256": "53da388e09d4829d497876a4c71c59335a38f478ee667995758056dd5c56dd27"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/author-receipt.json",
+      "bytes": 1479,
+      "sha256": "bf1a14998227aed243b49831de9f58dcb01ba9be1c0eb8588c979cf0d1cd1424"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/test-preparation.json",
+      "bytes": 1787,
+      "sha256": "dd5790b1f5a4d7933d04bdfcb77292022fcecd026dd6606ccc158e20f6dce390"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/control-center.before.js",
+      "bytes": 270185,
+      "sha256": "a856e71873066f7e1b4ec47028d313a1f38255b06b95e73fec7553117888b672"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/control-center.after.js",
+      "bytes": 270231,
+      "sha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/control-center.js.before",
+      "bytes": 270185,
+      "sha256": "a856e71873066f7e1b4ec47028d313a1f38255b06b95e73fec7553117888b672"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.js",
+      "bytes": 270231,
+      "sha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/core.mjs",
+      "bytes": 28623,
+      "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/remote/control-center.css",
+      "bytes": 24082,
+      "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/RemoteHtml.kt",
+      "bytes": 2442,
+      "sha256": "36542d7f0d83c7642528872dd5604c6b99cc05ae440ccb50c341cfc17b6e6ada"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/js/remote-snapshot-status.test.mjs",
+      "bytes": 3634,
+      "sha256": "be9985fdd2fd72b080387b1d57e0d36f865b3240812e838ddc722c5fd34c1414"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/remote-snapshot-status.test.frozen.mjs",
+      "bytes": 3634,
+      "sha256": "be9985fdd2fd72b080387b1d57e0d36f865b3240812e838ddc722c5fd34c1414"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/js/remote-browser-harness.mjs",
+      "bytes": 11469,
+      "sha256": "af023a77c0c650e39389eb17983aaf089b04390bb90ae0990ccedc4d1875e13c"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/remote-browser-harness.mjs.before",
+      "bytes": 11469,
+      "sha256": "af023a77c0c650e39389eb17983aaf089b04390bb90ae0990ccedc4d1875e13c"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/baseline.json",
+      "bytes": 340,
+      "sha256": "6dc61f918bb4a7db7015370bc4a50d8f76477181a7047fc993b89928face0042"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/baseline.log",
+      "bytes": 2834,
+      "sha256": "77923ace10b4ab707d0d45228f7450742b6fef3dedf998d191daedb7c7be8109"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/focused.log",
+      "bytes": 1049,
+      "sha256": "78dfeb5a94c1ed501a4d783b7d5b7cf7b1e58fa3923b6f88a67876bb27ad9c26"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/checks-terminal.json",
+      "bytes": 539,
+      "sha256": "af3b766a80a4d83466be5a6c18434050535efc3805805a1559776ccd2d5ce08c"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/javascript.log",
+      "bytes": 494,
+      "sha256": "65e23a63a97ea9ffbe6a9c31008045b821cce435e34992b8c2ce8cd1c68d8845"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/javascript-terminal.json",
+      "bytes": 266,
+      "sha256": "a191449284cc1a0ae6d50758f41f4c27341cd72398cfe13b4b25b60d09ee0e23"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/javascript-corrected.log",
+      "bytes": 298,
+      "sha256": "f85ad86b0f4f27a40c623f3bc1f99aebebba0f698d6cb39a2b9d9782b64ffb83"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/javascript-checks/receipt.json",
+      "bytes": 6358,
+      "sha256": "ac791a8acdc9d901cc6d24b219344ae58e2e233b4316cc1675253b65e0804458"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/javascript-checks/05-slideshow-js.log",
+      "bytes": 90517,
+      "sha256": "5aeede639ae171ad577db9cc55812904f25a04c680f42f523ce7632e84511a7e"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/javascript-checks/06-remote-js.log",
+      "bytes": 177544,
+      "sha256": "18d5b402e42d54f47e77a5e0ca6a9e5cbff3410b7e6defb5af929999dbc7f5c5"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/javascript-checks/03-source-files.log",
+      "bytes": 321477,
+      "sha256": "e6b4198e3f16f3fd2d5c0b1d541b41bba3f7039021f2477a08aa4d6da8c73d4a"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/javascript-checks/07-source-files.log",
+      "bytes": 321477,
+      "sha256": "e6b4198e3f16f3fd2d5c0b1d541b41bba3f7039021f2477a08aa4d6da8c73d4a"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 21492,
+      "sha256": "6146ae475002e0033c1f26683b7098de4e4ea9f2096b2e69c9a5caa507ce855f"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/build-terminal.json",
+      "bytes": 352,
+      "sha256": "f4faee4ac5bff54c61ee4a1d4094883d1d6c3d4927cd24f8c3b68014ea69444a"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/build.log",
+      "bytes": 13690,
+      "sha256": "a871b003ee22cf344772c0030976ce9d9058250646b520c2142ac9f352a27fda"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/promotion-artifacts.json",
+      "bytes": 9981,
+      "sha256": "cad62b112f96601406634917a0d0e544dda84b54e2282aa05a72ab09b77be992"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/verify-artifacts.py",
+      "bytes": 3960,
+      "sha256": "fd13f73f336ad26df046aef9474afab9967e848a521a6d9a9032a409ca315374"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/build.gradle.kts.before",
+      "bytes": 11824,
+      "sha256": "f77e4932a7bd67594a73dd630098a215ebe6a92e9e8ba7aac821404b867dd83c"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "aa288c32c4fef0675e5a1b86c7497bcb4b737bd9a5a8a3391695628959a163dd"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/version.json",
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/candidate-debug-1.174.apk",
+      "bytes": 46745710,
+      "sha256": "24e03f885485b184b7ff73d5497129af9e03853c051f0b7fac25393a028b3ea8"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/candidate-performance-1.174.apk",
+      "bytes": 25886947,
+      "sha256": "ed778d6be88ee9c16c64fd2810c0801becbb39a2fc0ff298e1e31d98157ddf2d"
+    },
+    {
+      "path": "/private/tmp/portal-key-ack-20261104-181254/candidate-debug-1.173.apk",
+      "bytes": 46745702,
+      "sha256": "b2a698cc6865b09a2e93227df36acff2ea722b5b3c1017e7b8bb87a096e4131f"
+    },
+    {
+      "path": "/private/tmp/portal-key-ack-20261104-181254/candidate-performance-1.173.apk",
+      "bytes": 25886947,
+      "sha256": "cd72016218d1424b122280f4b06a1dfe05f12e0b769f4a63232f99e36c708b9b"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/snapshot-browser.cjs",
+      "bytes": 5318,
+      "sha256": "e8cd8aea7d1b5ee4ab14a44f13c22144638d7d14fa285c2db3e30bf23982a929"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/browser-result.json",
+      "bytes": 1149,
+      "sha256": "af7c874576e44053ecb5f1f50541ecf77de588c18c891e1b589a8f888e70f33f"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/snapshot-browser.initial.cjs",
+      "bytes": 5303,
+      "sha256": "016990b03c0705d4e8b8573f4b1f649246a4b0107309505d5f0a64e247af7716"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/browser-result.initial.json",
+      "bytes": 116,
+      "sha256": "ff3a64203786bd68ae0dcfaced5d4459fd4e87f1f93ce9f992bd11a408c19c96"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/snapshot-browser.capability.cjs",
+      "bytes": 5316,
+      "sha256": "f736e6b631093b8b37531cb0c38f3acbf177434428d04540c4612606d6ca20e1"
+    },
+    {
+      "path": "/private/tmp/portal-snapshot-status-20261104-190733/browser-result.capability.json",
+      "bytes": 116,
+      "sha256": "ff3a64203786bd68ae0dcfaced5d4459fd4e87f1f93ce9f992bd11a408c19c96"
+    }
+  ]
+}

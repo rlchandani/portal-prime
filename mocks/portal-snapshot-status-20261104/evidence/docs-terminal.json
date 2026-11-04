@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/private/tmp/portal-docs-runtime-20261104/bin/mkdocs",
+    "build",
+    "--strict",
+    "--site-dir",
+    "/private/tmp/portal-snapshot-status-20261104-190733/docs-site"
+  ],
+  "exitCode": 0,
+  "durationSeconds": 2.1524342500051716,
+  "checkedAt": "2026-11-04T19:26:10.262579+00:00"
+}
