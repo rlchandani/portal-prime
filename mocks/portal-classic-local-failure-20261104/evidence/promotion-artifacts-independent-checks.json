@@ -1,0 +1,101 @@
+{
+  "ok": true,
+  "reviewedAtUtc": "2026-11-04T11:16:00.076234+00:00",
+  "plan": {
+    "issue": "Classic local-image whole failed-pass fallback",
+    "originalDiscoveryAt": "2026-11-04T11:04:11Z",
+    "firstSourceWitnessAt": "2026-11-04T11:06:09Z",
+    "selectedAt": "2026-11-04T11:07:58.368090+00:00",
+    "target": "2026-11-04T11:19:11Z",
+    "hardDeadline": "2026-11-04T11:34:11Z",
+    "baseCommit": "2c0893e15c89a0aba0dc13891948690b6943ba22",
+    "scope": "Bound accepted failed Classic local-image results to playlist.size; preserve successful holds and stale/stopped/discard fences. Reset after accepted photo display, new folder acceptance and rendered local video. No scanner, decoder, native/engine/remote or video failure-policy changes. Whole-pass guarantee is all-image decks; mixed-media/video-only settlement remains separate.",
+    "authorization": "Whole-product autonomous small verified local-room delivery; no phone, household media/provider/account or GitHub publication."
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/candidate-debug-1.151.apk",
+      "sha256": "bb6fa24adf36d1ffcc0b9504e0aceeaa14a16b6c4cfb29c5b15424de6945e8a7",
+      "bytes": 46745294,
+      "mode": "0o400",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='145' versionName='1.151' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "packagedAssetsExact": 10,
+      "uniqueZipEntryNames": true,
+      "currentBuildOutputExact": true
+    },
+    "performance": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/candidate-performance-1.151.apk",
+      "sha256": "94f836a24b20b47e7536ff8102aac42ee61b8d3343d2b3bef6dc566612770470",
+      "bytes": 25886647,
+      "mode": "0o400",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='145' versionName='1.151' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "packagedAssetsExact": 10,
+      "uniqueZipEntryNames": true,
+      "currentBuildOutputExact": true
+    }
+  },
+  "jvm": {
+    "tests": 4464,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 466
+  },
+  "freshJUnitInventorySha256": "baba9f89fedc20bf979d64213aecde103c1e8e623a187e4067e9d4344026fa5e",
+  "freshJUnitTimestampMin": "2026-11-04T11:12:00.153000+00:00",
+  "freshJUnitTimestampMax": "2026-11-04T11:12:35.165000+00:00",
+  "focused": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.ClassicLocalImageFailureTest.xml",
+    "sha256": "6e89861a665f8a66bb65213f892a037f5bc9a1dcaede7fe8316e16135a05868c",
+    "bytes": 2334,
+    "mode": "0o644"
+  },
+  "frozenTest": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/ClassicLocalImageFailureTest.kt",
+    "sha256": "976528a1ac6affb5a0685090fccf4614651e9977bf9302c62c5eadf578d66b92",
+    "bytes": 8827,
+    "mode": "0o644"
+  },
+  "sourceReview": {
+    "path": "/private/tmp/portal-classic-local-failure-20261104-110411/independent-source-review.json",
+    "sha256": "5d367e2b7a9284b877c40aff9b4f872967466c19b4514f59170fd4ea17fea910",
+    "bytes": 6183,
+    "mode": "0o600"
+  },
+  "buildTerminal": {
+    "path": "/private/tmp/portal-classic-local-failure-20261104-110411/build-terminal.json",
+    "sha256": "4587f77935ddaf35b20b663a14abd5bf3d5b09a04cc54bd12c6476bb7d61b75f",
+    "bytes": 72,
+    "mode": "0o644"
+  },
+  "buildLog": {
+    "path": "/private/tmp/portal-classic-local-failure-20261104-110411/candidate-build.log",
+    "sha256": "6eff08e5b936bbf88715b8d76bbf1d0e6ea843d974179713bf2a67ceee8523c0",
+    "bytes": 13723,
+    "mode": "0o644"
+  },
+  "promotionMetadata": {
+    "path": "/private/tmp/portal-classic-local-failure-20261104-110411/promotion-artifacts.json",
+    "sha256": "06b36ce2722e3e734336cfc1df0329d22c737bfdf5be84bd078833f4897fe157",
+    "bytes": 4805,
+    "mode": "0o644"
+  },
+  "baselineDebug": {
+    "path": "/private/tmp/portal-classic-local-failure-20261104-110411/baseline-debug-1.150.apk",
+    "sha256": "c76ae0a992a9c93e135a4e1b838f474533d88615bd53e788ed3f6225b98744ba",
+    "bytes": 46745298,
+    "mode": "0o644"
+  },
+  "rollback": {
+    "path": "/private/tmp/portal-classic-local-failure-20261104-110411/rollback-1.150.apk",
+    "sha256": "4d9498fbae1b0cc2d3b9fcd7196ac89740998a5eb4f17880387a82ae2c6a3a9f",
+    "bytes": 25886647,
+    "mode": "0o644"
+  },
+  "limits": [
+    "Independent host source/DEX/ZIP/SDK/report replay only; root exclusively ran tests/builds/native devices.",
+    "No mounted UI, actual folder discovery/new-folder reset, video reset, native styles, optimized/API28, live household/provider media, automatic-flag propagation or default-feed rendering proof."
+  ]
+}

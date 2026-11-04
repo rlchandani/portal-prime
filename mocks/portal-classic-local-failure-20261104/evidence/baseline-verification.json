@@ -1,0 +1,30 @@
+{
+  "tests": 10,
+  "productAssertionFailures": 4,
+  "controls": 6,
+  "sourceUnchanged": true,
+  "frozenTestSha256": "976528a1ac6affb5a0685090fccf4614651e9977bf9302c62c5eadf578d66b92",
+  "failures": [
+    [
+      "singleEmptyImageFallsBackAfterItsAcceptedFailure",
+      "java.lang.AssertionError",
+      "java.lang.AssertionError: An exhausted local pass must enter the existing feed fallback expected:<false> but was:<true>"
+    ],
+    [
+      "manualAdvanceAlsoSettlesOnTheExistingFallback",
+      "java.lang.AssertionError",
+      "java.lang.AssertionError: An exhausted local pass must enter the existing feed fallback expected:<false> but was:<true>"
+    ],
+    [
+      "pausedFailureIsCountedOnlyWhenItsOwnedCallbackResumes",
+      "java.lang.AssertionError",
+      "java.lang.AssertionError: An exhausted local pass must enter the existing feed fallback expected:<false> but was:<true>"
+    ],
+    [
+      "threeEmptyImagesFallBackOnlyAfterOneCompletePass",
+      "java.lang.AssertionError",
+      "java.lang.AssertionError: An exhausted local pass must enter the existing feed fallback expected:<false> but was:<true>"
+    ]
+  ],
+  "excludedInitialBindingSetupFailures": 10
+}

@@ -1,0 +1,57 @@
+{
+  "sourceAuthoringCompletedAtUtc": "2026-11-04T11:12:39.970222+00:00",
+  "originalClock": "2026-11-04T11:04:11Z target11:19:11Z hard11:34:11Z",
+  "package": "com.immortal.classiclocalfixture",
+  "activity": ".ClassicLocalActivity",
+  "report": "external-files/report.json",
+  "caseNames": [
+    "oneUnreadableImageFallsBackAfterOnePass",
+    "threeUnreadableImagesFallBackAfterOnePass",
+    "mixedGoodPhotoBreaksFailurePass",
+    "goodPhotoResetsNextFailurePass",
+    "explicitManualRequestCanReachFallback",
+    "staleBeforeIoDoesNoDecodeOrNavigation",
+    "stoppedBeforeIoDoesNoDecodeOrNavigation",
+    "staleBeforeMainDoesNoNavigation",
+    "stoppedBeforeMainDoesNoNavigation"
+  ],
+  "expectedBaselineFailNames": [
+    "oneUnreadableImageFallsBackAfterOnePass",
+    "threeUnreadableImagesFallBackAfterOnePass",
+    "goodPhotoResetsNextFailurePass",
+    "explicitManualRequestCanReachFallback"
+  ],
+  "expectedBaselineControlNames": [
+    "mixedGoodPhotoBreaksFailurePass",
+    "staleBeforeIoDoesNoDecodeOrNavigation",
+    "stoppedBeforeIoDoesNoDecodeOrNavigation",
+    "staleBeforeMainDoesNoNavigation",
+    "stoppedBeforeMainDoesNoNavigation"
+  ],
+  "expectedCandidatePassNames": [
+    "oneUnreadableImageFallsBackAfterOnePass",
+    "threeUnreadableImagesFallBackAfterOnePass",
+    "mixedGoodPhotoBreaksFailurePass",
+    "goodPhotoResetsNextFailurePass",
+    "explicitManualRequestCanReachFallback",
+    "staleBeforeIoDoesNoDecodeOrNavigation",
+    "stoppedBeforeIoDoesNoDecodeOrNavigation",
+    "staleBeforeMainDoesNoNavigation",
+    "stoppedBeforeMainDoesNoNavigation"
+  ],
+  "gates": {
+    "singleFailedPass": "Actual accepted null branch leaves localMode after1 decode; one fallback IO task queued and unexecuted",
+    "threeFailedPass": "No fallback after1/2 failed decodes; routes fallback exactlyafter3",
+    "mixedAndReset": "Actual generated96x64PNG success remains local; truncating it then requires a fresh complete2-failure pass beforefallback",
+    "staleStopped": "Before IO or Main callbacks remain inert without navigation/fallback; generatedfiles only",
+    "manual": "Explicit false argument reaches same fallback route; no claim of automatic flag propagation",
+    "privacy": "All preference requests redirected into fixture-owned stores; zero permissions/network/provider tasks run",
+    "retirement": "Owned animations/callbacks/bitmaps/executors closed explicitly, no blanket stop",
+    "watchdogMillis": 45000,
+    "mainDispatchMillis": 3000
+  },
+  "scope": "Actual dormant debug controller Classic local callback/fallback route, generated private files and explicit IO/Main queue; no feed rendering, actual folder reset/video reset, mounted UI, optimized/API28 or automatic propagation claim",
+  "sourceAuthorBuilds": 0,
+  "sourceAuthorDeviceOperations": 0,
+  "candidatePackagingOwnedBy": "root"
+}

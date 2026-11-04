@@ -1,0 +1,168 @@
+{
+  "ok": true,
+  "reviewedAtUtc": "2026-11-04T11:16:00.076234+00:00",
+  "plan": {
+    "issue": "Classic local-image whole failed-pass fallback",
+    "originalDiscoveryAt": "2026-11-04T11:04:11Z",
+    "firstSourceWitnessAt": "2026-11-04T11:06:09Z",
+    "selectedAt": "2026-11-04T11:07:58.368090+00:00",
+    "target": "2026-11-04T11:19:11Z",
+    "hardDeadline": "2026-11-04T11:34:11Z",
+    "baseCommit": "2c0893e15c89a0aba0dc13891948690b6943ba22",
+    "scope": "Bound accepted failed Classic local-image results to playlist.size; preserve successful holds and stale/stopped/discard fences. Reset after accepted photo display, new folder acceptance and rendered local video. No scanner, decoder, native/engine/remote or video failure-policy changes. Whole-pass guarantee is all-image decks; mixed-media/video-only settlement remains separate.",
+    "authorization": "Whole-product autonomous small verified local-room delivery; no phone, household media/provider/account or GitHub publication."
+  },
+  "baseline": {
+    "tests": 9,
+    "productAssertionFailures": 4,
+    "controls": 5,
+    "controllersRetired": 9
+  },
+  "candidate": {
+    "tests": 9,
+    "failures": 0,
+    "controllersRetired": 9
+  },
+  "caseNames": [
+    "oneUnreadableImageFallsBackAfterOnePass",
+    "threeUnreadableImagesFallBackAfterOnePass",
+    "mixedGoodPhotoBreaksFailurePass",
+    "goodPhotoResetsNextFailurePass",
+    "explicitManualRequestCanReachFallback",
+    "staleBeforeIoDoesNoDecodeOrNavigation",
+    "stoppedBeforeIoDoesNoDecodeOrNavigation",
+    "staleBeforeMainDoesNoNavigation",
+    "stoppedBeforeMainDoesNoNavigation"
+  ],
+  "preparedJavaManifestAndAllSourcesExact": true,
+  "identicalFrozenDexBeforeAfter": true,
+  "changedWrapperEntries": [
+    "assets/source.apk",
+    "META-INF/ANDROIDD.SF",
+    "META-INF/ANDROIDD.RSA",
+    "META-INF/MANIFEST.MF"
+  ],
+  "allNonSignatureNonEmbeddedSourceWrapperEntriesExact": true,
+  "embeddedApkExactBeforeAfter": true,
+  "actualEmbeddedControllerClassLoaderChecked": true,
+  "sdk": 29,
+  "preferenceRequests": 0,
+  "fallbackProviderIoExecuted": 0,
+  "wrappers": {
+    "baseline-fixture.apk": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native/baseline-fixture.apk",
+      "sha256": "6fa9980d6b9c5ebe49eba0db8b8b2ca0c94e3340794e92083ec905f2da505c1b",
+      "bytes": 37507562,
+      "mode": "0o400",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "zeroPermissions": true
+    },
+    "classic-local-fixture.apk": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native/classic-local-fixture.apk",
+      "sha256": "952555d123d6ad8fd0e18cdcb34d140ea1ebe5538d4e5c0dded4393a787477de",
+      "bytes": 37507562,
+      "mode": "0o644",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "zeroPermissions": true
+    }
+  },
+  "retirements": {
+    "before": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    },
+    "after": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    }
+  },
+  "bindings": {
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native/preparation-verification.json": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native/preparation-verification.json",
+      "sha256": "de740749956990ad91394a5550ca2575e2938f5e47fdee8040c05b855d53bf1e",
+      "bytes": 4435,
+      "mode": "0o600"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native/source-authoring.json": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native/source-authoring.json",
+      "sha256": "452e246fe2786a47a404f23302c280a9da6e1e4f62e7c502b4f22546fb0abec3",
+      "bytes": 2828,
+      "mode": "0o400"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native/ClassicLocalActivity.java": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native/ClassicLocalActivity.java",
+      "sha256": "6af1a7dc854139d523db05de731f77372347cb85a4241d7ef6cf87fcc81b0458",
+      "bytes": 17204,
+      "mode": "0o400"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native/AndroidManifest.xml": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native/AndroidManifest.xml",
+      "sha256": "b5853a52112e68a49ddb2682456575d6e9338098e4caead15309749476cc9515",
+      "bytes": 444,
+      "mode": "0o400"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native/frozen-dex/classes.dex": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native/frozen-dex/classes.dex",
+      "sha256": "8f3122ddab52a414c2a0741e6dead0c090b43942e7080bbe16191e0a8fb94820",
+      "bytes": 31964,
+      "mode": "0o400"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native-run.py": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native-run.py",
+      "sha256": "c3a2a87ce6e693f497a7a405a0ac9d1d67d6dcbd2c3dbe72a7e3898093cf0004",
+      "bytes": 3864,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native-before-report.json": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native-before-report.json",
+      "sha256": "391e7640a4e19ac7fdbff3d407aae2992548b51db89a471354d9a9f1d2b594a2",
+      "bytes": 4295,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native-after-report.json": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native-after-report.json",
+      "sha256": "b98dc76775c50937154acf2cabfb5ee2f04690377b4c506a41f904885a76bfad",
+      "bytes": 4042,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native-before-retirement.json": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native-before-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native-after-retirement.json": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native-after-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native-before.claim": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native-before.claim",
+      "sha256": "341cc2fa031bce70fec079f1b9eee88bbcb8be330a73bb238de849a9e8b03f48",
+      "bytes": 50,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/native-after.claim": {
+      "path": "/private/tmp/portal-classic-local-failure-20261104-110411/native-after.claim",
+      "sha256": "341cc2fa031bce70fec079f1b9eee88bbcb8be330a73bb238de849a9e8b03f48",
+      "bytes": 50,
+      "mode": "0o644"
+    }
+  },
+  "excludedReviewerExpectation": {
+    "observed": "Initial ZIP comparison expected only source.apk to differ; actual regenerated v1 signature metadata also differs.",
+    "resolution": "Only source.apk and exactly three signature metadata entries differ; both wrappers independently pass SDK signature verification and all other entries including DEX/manifest/resources are exact.",
+    "productOrFixtureGatesChanged": false,
+    "nativeReruns": 0
+  },
+  "scope": "Actual dormant debug controller Classic local-image/advance/fallback route with generated private zero-byte JPEG and PNG, injected owned IO/Main queue; fallback stops at localMode false and queued unexecuted IO. No feed/provider/network, mounted UI, actual folder binding, video reset, native styles, optimized/API28 or automatic-flag propagation acceptance",
+  "limits": [
+    "Independent host source/DEX/ZIP/SDK/report replay only; root exclusively ran tests/builds/native devices.",
+    "Native evidence covers actual dormant debug controller/API29 generated private zero-byte JPEG/PNG with injected IO/Main queues; fallback provider task remains queued and unexecuted.",
+    "No mounted UI, actual folder discovery/new-folder reset, video reset, native styles, optimized/API28, live household/provider media, automatic-flag propagation or default-feed rendering proof.",
+    "Package/process/external-directory retirement is reviewed from retained root observations, without a reviewer device recheck."
+  ]
+}

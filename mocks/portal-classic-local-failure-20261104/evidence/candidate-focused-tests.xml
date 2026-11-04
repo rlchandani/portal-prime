@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.immortal.launcher.ClassicLocalImageFailureTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-11-04T11:12:00.153Z" hostname="iRedlofs-Mac-mini-3.local" time="0.835">
+  <properties/>
+  <testcase name="discardedSuccessfulBitmapIsRecycledOnceWithoutPublication" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.806"/>
+  <testcase name="singleEmptyImageFallsBackAfterItsAcceptedFailure" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.004"/>
+  <testcase name="staleNullMainCallbackNeitherCountsNorAdvances" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.004"/>
+  <testcase name="stoppedNullMainCallbackNeitherCountsNorAdvances" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.002"/>
+  <testcase name="acceptedGoodImageResetsFailuresAcrossRepeatedMixedPasses" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.008"/>
+  <testcase name="manualAdvanceAlsoSettlesOnTheExistingFallback" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.002"/>
+  <testcase name="staleQueuedWorkerDoesNotPostOrAdvance" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.001"/>
+  <testcase name="discardedNullCallbackDoesNotAdvanceOrFallback" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.001"/>
+  <testcase name="pausedFailureIsCountedOnlyWhenItsOwnedCallbackResumes" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.002"/>
+  <testcase name="threeEmptyImagesFallBackOnlyAfterOneCompletePass" classname="com.immortal.launcher.ClassicLocalImageFailureTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (~/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.12/be4984cb6fd1ef1d11f218a648889dfda44b8a15/byte-buddy-agent-1.14.12.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

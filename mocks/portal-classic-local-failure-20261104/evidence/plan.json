@@ -1,0 +1,11 @@
+{
+  "issue": "Classic local-image whole failed-pass fallback",
+  "originalDiscoveryAt": "2026-11-04T11:04:11Z",
+  "firstSourceWitnessAt": "2026-11-04T11:06:09Z",
+  "selectedAt": "2026-11-04T11:07:58.368090+00:00",
+  "target": "2026-11-04T11:19:11Z",
+  "hardDeadline": "2026-11-04T11:34:11Z",
+  "baseCommit": "2c0893e15c89a0aba0dc13891948690b6943ba22",
+  "scope": "Bound accepted failed Classic local-image results to playlist.size; preserve successful holds and stale/stopped/discard fences. Reset after accepted photo display, new folder acceptance and rendered local video. No scanner, decoder, native/engine/remote or video failure-policy changes. Whole-pass guarantee is all-image decks; mixed-media/video-only settlement remains separate.",
+  "authorization": "Whole-product autonomous small verified local-room delivery; no phone, household media/provider/account or GitHub publication."
+}

@@ -1,0 +1,105 @@
+{
+  "sourceAuthoringCompletedAtUtc": "2026-11-04T11:12:39.970222+00:00",
+  "originalClock": "2026-11-04T11:04:11Z target11:19:11Z hard11:34:11Z",
+  "package": "com.immortal.classiclocalfixture",
+  "activity": ".ClassicLocalActivity",
+  "report": "external-files/report.json",
+  "caseNames": [
+    "oneUnreadableImageFallsBackAfterOnePass",
+    "threeUnreadableImagesFallBackAfterOnePass",
+    "mixedGoodPhotoBreaksFailurePass",
+    "goodPhotoResetsNextFailurePass",
+    "explicitManualRequestCanReachFallback",
+    "staleBeforeIoDoesNoDecodeOrNavigation",
+    "stoppedBeforeIoDoesNoDecodeOrNavigation",
+    "staleBeforeMainDoesNoNavigation",
+    "stoppedBeforeMainDoesNoNavigation"
+  ],
+  "expectedBaselineFailNames": [
+    "oneUnreadableImageFallsBackAfterOnePass",
+    "threeUnreadableImagesFallBackAfterOnePass",
+    "goodPhotoResetsNextFailurePass",
+    "explicitManualRequestCanReachFallback"
+  ],
+  "expectedBaselineControlNames": [
+    "mixedGoodPhotoBreaksFailurePass",
+    "staleBeforeIoDoesNoDecodeOrNavigation",
+    "stoppedBeforeIoDoesNoDecodeOrNavigation",
+    "staleBeforeMainDoesNoNavigation",
+    "stoppedBeforeMainDoesNoNavigation"
+  ],
+  "expectedCandidatePassNames": [
+    "oneUnreadableImageFallsBackAfterOnePass",
+    "threeUnreadableImagesFallBackAfterOnePass",
+    "mixedGoodPhotoBreaksFailurePass",
+    "goodPhotoResetsNextFailurePass",
+    "explicitManualRequestCanReachFallback",
+    "staleBeforeIoDoesNoDecodeOrNavigation",
+    "stoppedBeforeIoDoesNoDecodeOrNavigation",
+    "staleBeforeMainDoesNoNavigation",
+    "stoppedBeforeMainDoesNoNavigation"
+  ],
+  "gates": {
+    "singleFailedPass": "Actual accepted null branch leaves localMode after1 decode; one fallback IO task queued and unexecuted",
+    "threeFailedPass": "No fallback after1/2 failed decodes; routes fallback exactlyafter3",
+    "mixedAndReset": "Actual generated96x64PNG success remains local; truncating it then requires a fresh complete2-failure pass beforefallback",
+    "staleStopped": "Before IO or Main callbacks remain inert without navigation/fallback; generatedfiles only",
+    "manual": "Explicit false argument reaches same fallback route; no claim of automatic flag propagation",
+    "privacy": "All preference requests redirected into fixture-owned stores; zero permissions/network/provider tasks run",
+    "retirement": "Owned animations/callbacks/bitmaps/executors closed explicitly, no blanket stop",
+    "watchdogMillis": 45000,
+    "mainDispatchMillis": 3000
+  },
+  "scope": "Actual dormant debug controller Classic local callback/fallback route, generated private files and explicit IO/Main queue; no feed rendering, actual folder reset/video reset, mounted UI, optimized/API28 or automatic propagation claim",
+  "sourceAuthorBuilds": 0,
+  "sourceAuthorDeviceOperations": 0,
+  "candidatePackagingOwnedBy": "root",
+  "ok": true,
+  "preparedAtUtc": "2026-11-04T11:13:16.170106+00:00",
+  "sources": {
+    "ClassicLocalActivity.java": {
+      "sha256": "6af1a7dc854139d523db05de731f77372347cb85a4241d7ef6cf87fcc81b0458",
+      "bytes": 17204
+    },
+    "AndroidManifest.xml": {
+      "sha256": "b5853a52112e68a49ddb2682456575d6e9338098e4caead15309749476cc9515",
+      "bytes": 444
+    },
+    "build.sh": {
+      "sha256": "94c1d1cffdb15132e859e17bf64f855ac5bb7daf4d9b720ab8e81827862137ae",
+      "bytes": 830
+    },
+    "repack.sh": {
+      "sha256": "47f3d7550af1c6c5f2a36120b386842fff751a5d4bdd9c794a4be7f8b6656c8e",
+      "bytes": 780
+    },
+    "RUN.md": {
+      "sha256": "97a19be6085acd4034183bc14e7abdbb11ce2de4a3283058015436e26d5db6e3",
+      "bytes": 1751
+    },
+    "freeze.py": {
+      "sha256": "ee08ccf2dce1179b8e42d63b9bdd87bf526687e1954ac56efde4430caf638229",
+      "bytes": 1782
+    },
+    "source-authoring.json": {
+      "sha256": "452e246fe2786a47a404f23302c280a9da6e1e4f62e7c502b4f22546fb0abec3",
+      "bytes": 2828
+    }
+  },
+  "fixtureDex": {
+    "sha256": "8f3122ddab52a414c2a0741e6dead0c090b43942e7080bbe16191e0a8fb94820",
+    "bytes": 31964
+  },
+  "baselineFixture": {
+    "sha256": "6fa9980d6b9c5ebe49eba0db8b8b2ca0c94e3340794e92083ec905f2da505c1b",
+    "bytes": 37507562
+  },
+  "embeddedBaseline": {
+    "sha256": "c76ae0a992a9c93e135a4e1b838f474533d88615bd53e788ed3f6225b98744ba",
+    "bytes": 46745298
+  },
+  "embeddedBaselineExact": true,
+  "baselineAndFrozenFixtureDexByteIdentical": true,
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.classiclocalfixture\n"
+}

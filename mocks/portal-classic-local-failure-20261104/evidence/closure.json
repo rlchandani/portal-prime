@@ -1,0 +1,19 @@
+{
+  "verifiedAndDocumentedAt": "2026-11-04T11:17:49.746329+00:00",
+  "originalDiscoveryAt": "2026-11-04T11:04:11Z",
+  "selectedAt": "2026-11-04T11:07:58.368090+00:00",
+  "elapsedOriginalMinutes": 13.645772149999999,
+  "elapsedSelectedMinutes": 9.856303983333333,
+  "targetMet": true,
+  "hardDeadlineMet": true,
+  "originalClockRetained": true,
+  "goalStatus": "active",
+  "outcome": "progress",
+  "docsStrictExitCode": 0,
+  "excludedOperationalFailures": [
+    "Initial JVM callback adapter mismatched compiled callback type; corrected adapter and reran unchanged cases before production edit.",
+    "First closure-writer quoting attempt failed before any file writes; rewritten.",
+    "First strict docs run flagged out-of-docs proof link; changed receipt to repository path and reran strict build."
+  ],
+  "planScopeClarifiedAfterSourceReview": "Added exact existing video-rendered streak reset and image-only full-pass guarantee; all original times unchanged. Final independent artifact/native reviews include the clarified plan."
+}

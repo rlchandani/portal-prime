@@ -1,0 +1,114 @@
+{
+  "status": "source_review_pass",
+  "reviewedAtUtc": "2026-11-04T11:12:20.938181+00:00",
+  "plan": {
+    "issue": "Classic local-image whole failed-pass fallback",
+    "originalDiscoveryAt": "2026-11-04T11:04:11Z",
+    "firstSourceWitnessAt": "2026-11-04T11:06:09Z",
+    "selectedAt": "2026-11-04T11:07:58.368090+00:00",
+    "target": "2026-11-04T11:19:11Z",
+    "hardDeadline": "2026-11-04T11:34:11Z",
+    "baseCommit": "2c0893e15c89a0aba0dc13891948690b6943ba22",
+    "scope": "Bound failed Classic local-image pass; preserve successful holds and stale/stopped/discard fences. No scanner, decoder, native, engine, remote or video changes.",
+    "authorization": "Whole-product autonomous small verified local-room delivery; no phone, household media/provider/account or GitHub publication."
+  },
+  "criteria": {
+    "onlyAdmittedControllerAndVersionDeltas": true,
+    "acceptedCurrentNullDeliveryCountsInsideExistingGenerationAndStoppedFence": true,
+    "allImageDeckFallbackAfterPlaylistSizeConsecutiveAcceptedFailures": true,
+    "retryAndFallbackPreserveAutomaticArgument": true,
+    "successfulPhotoResetsAfterShowReturns": true,
+    "newAcceptedFolderResetsCounter": true,
+    "localVideoResetsOnlyOnActualRenderingStartViaExistingGuardedCallback": true,
+    "workerPredecodePostdecodeAndOwnedMainFencesExact": true,
+    "ownedMainOnDiscardRecyclingExact": true,
+    "advanceLocalNavigationAndLocalTickExact": true,
+    "nativeLoaderNativeFailureCounterNavigationAndPhotoPausePoliciesExact": true,
+    "remoteImageVideoRecoveryAndFeedFallbackImplementationsExact": true,
+    "videoPrepareErrorCompletionAndHoldBehaviorExact": true,
+    "frozenTenAssertionsUnchanged": true,
+    "baselineFourProductAssertionFailuresAndSixControls": true
+  },
+  "bindings": {
+    "/private/tmp/portal-classic-local-failure-20261104-110411/PhotoFrameController.kt": {
+      "sha256": "7f4d83b48102476a8e032961a157e8b3f7150dd28f74200e55c4aed9ca0054d9",
+      "bytes": 164474
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "62e911e50c9cc534d9808a30d0b61a9fd26532818dda64b96059c794d88c064d",
+      "bytes": 164771
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/build.gradle.kts": {
+      "sha256": "daccace06a86349b642848035f53014e3ab3ce0187e147ead2f10ef0812e284e",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "d30c70f482477efd72112e0b3d9fbf25b09a0cd6f66e072d976fcb12dc64de40",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/ClassicLocalImageFailureTest.kt": {
+      "sha256": "976528a1ac6affb5a0685090fccf4614651e9977bf9302c62c5eadf578d66b92",
+      "bytes": 8827
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/ClassicLocalImageFailureTest.kt": {
+      "sha256": "976528a1ac6affb5a0685090fccf4614651e9977bf9302c62c5eadf578d66b92",
+      "bytes": 8827
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/baseline-verification.json": {
+      "sha256": "38e983c78abdb74cc91798bbda4855479e19f03410f8eba31f4beb794003c07b",
+      "bytes": 1184
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/baseline-tests.xml": {
+      "sha256": "b31b017d47ec9d649f364dadb2466b6de86ff456b88f287eaeda1e1a1f4dfa28",
+      "bytes": 21706
+    },
+    "/private/tmp/portal-classic-local-failure-20261104-110411/plan.json": {
+      "sha256": "bc41b7313aad9c3f043c407d23d1309e13b6b2ff9886374239e977ecc3bb1938",
+      "bytes": 677
+    }
+  },
+  "protectedSourceBindings": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowLoader.kt": {
+      "sha256": "451aa014667a515eb4b3d2871af0867f447e210b69f5c9fd014ad939a8469455",
+      "bytes": 12624
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowRecoveryIntent.kt": {
+      "sha256": "81e24e9ca9da6e11b89665ce839be0a30a3f7c18f9517992a0b5d8bf883fadfe",
+      "bytes": 698
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ScreensaverConfig.kt": {
+      "sha256": "6738cb1378b5f160c0361608734c66d18bfbfde2a6a69ff6973ed4b0f7c96796",
+      "bytes": 29946
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PausableFrameCallbacks.kt": {
+      "sha256": "f86cab61055191d7b557162c2b1ecb2b0659551e880a116641349fcdd3b8b1c7",
+      "bytes": 7520
+    }
+  },
+  "baselineFailureCases": [
+    {
+      "case": "singleEmptyImageFallsBackAfterItsAcceptedFailure",
+      "type": "java.lang.AssertionError"
+    },
+    {
+      "case": "manualAdvanceAlsoSettlesOnTheExistingFallback",
+      "type": "java.lang.AssertionError"
+    },
+    {
+      "case": "pausedFailureIsCountedOnlyWhenItsOwnedCallbackResumes",
+      "type": "java.lang.AssertionError"
+    },
+    {
+      "case": "threeEmptyImagesFallBackOnlyAfterOneCompletePass",
+      "type": "java.lang.AssertionError"
+    }
+  ],
+  "excludedInitialBindingSetupFailures": 10,
+  "scope": "Classic nonnative local-image accepted-null streak only; existing local-video rendering callback resets this new streak.",
+  "limits": [
+    "Source comparison and existing frozen baseline evidence only; this reviewer ran no tests, Gradle, SDK, Git, device or network commands.",
+    "One complete failed-pass guarantee applies to all-image decks. Mixed decks settle only after playlist.size consecutive accepted image failures without a successful photo or rendered video; video-only/error/completion settlement is unchanged.",
+    "New-folder and rendered-video reset/manual automatic propagation are source-reviewed; the ten host tests do not execute folder enumeration or actual MediaPlayer rendering and do not observe the private fallback automatic flag.",
+    "No mounted UI, actual BitmapFactory valid image success, optimized/API28 runtime, household media/provider or device acceptance claimed."
+  ]
+}

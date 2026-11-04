@@ -293,6 +293,7 @@ class PhotoFrameController(
   private var playlist: List<MediaItem> = emptyList()
   private var localDeckKeys: List<String> = emptyList()
   private var localIndex = -1
+  private var localImageFailStreak = 0
   // Bumped on every advance so a slow image-decode or an old video's completion
   // callback can tell it's been superseded and bow out.
   @Volatile private var gen = 0
@@ -586,6 +587,7 @@ class PhotoFrameController(
               localDeckKeys = deckKeys
               localMode = true
               localIndex = -1
+              localImageFailStreak = 0
               advanceLocal(+1)
             } else {
               // Folder empty / unreachable → never leave the frame blank.
@@ -2340,11 +2342,14 @@ class PhotoFrameController(
       ui.postOwned(Runnable {
         if (g != gen || stopped) { bmp?.recycle(); return@Runnable }
         if (bmp == null) {
-          advanceLocal(+1) // skip an unreadable file
+          // A folder of unreadable images must settle on the existing fallback.
+          if (++localImageFailStreak >= playlist.size) startWeb(automatic)
+          else advanceLocal(+1, automatic)
           return@Runnable
         }
         photo.visibility = View.VISIBLE
         show(bmp)
+        localImageFailStreak = 0
         loadCaptionForLocal(path, g)
         ui.postDelayed(localTick, intervalMs())
       }, onDiscard = { bmp?.let { if (!it.isRecycled) it.recycle() } })
@@ -2431,7 +2436,10 @@ class PhotoFrameController(
   }
 
   private fun showVideo(path: String, g: Int, automatic: Boolean) {
-    beginVideo(g, localDeckKeys.getOrNull(localIndex) ?: localKey(path)) { nativeFailures = 0 }
+    beginVideo(g, localDeckKeys.getOrNull(localIndex) ?: localKey(path)) {
+      nativeFailures = 0
+      localImageFailStreak = 0
+    }
     fun failed() {
       if (g != gen || stopped) return
       restorePhotoAfterVideo()

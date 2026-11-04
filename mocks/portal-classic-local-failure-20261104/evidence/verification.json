@@ -1,0 +1,125 @@
+{
+  "version": "1.151/code145",
+  "verifiedAt": "2026-11-04T11:16:50.838335+00:00",
+  "goalStatus": "active",
+  "originalClock": {
+    "issue": "Classic local-image whole failed-pass fallback",
+    "originalDiscoveryAt": "2026-11-04T11:04:11Z",
+    "firstSourceWitnessAt": "2026-11-04T11:06:09Z",
+    "selectedAt": "2026-11-04T11:07:58.368090+00:00",
+    "target": "2026-11-04T11:19:11Z",
+    "hardDeadline": "2026-11-04T11:34:11Z",
+    "baseCommit": "2c0893e15c89a0aba0dc13891948690b6943ba22",
+    "scope": "Bound accepted failed Classic local-image results to playlist.size; preserve successful holds and stale/stopped/discard fences. Reset after accepted photo display, new folder acceptance and rendered local video. No scanner, decoder, native/engine/remote or video failure-policy changes. Whole-pass guarantee is all-image decks; mixed-media/video-only settlement remains separate.",
+    "authorization": "Whole-product autonomous small verified local-room delivery; no phone, household media/provider/account or GitHub publication."
+  },
+  "jvm": {
+    "tests": 4464,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 466
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46745294,
+      "sha256": "bb6fa24adf36d1ffcc0b9504e0aceeaa14a16b6c4cfb29c5b15424de6945e8a7",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='145' versionName='1.151' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "bytes": 25886647,
+      "sha256": "94f836a24b20b47e7536ff8102aac42ee61b8d3343d2b3bef6dc566612770470",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='145' versionName='1.151' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "native": {
+    "tests": 9,
+    "baselineProductFailures": 4,
+    "controls": 5,
+    "candidatePassed": 9,
+    "sameFrozenDex": true,
+    "controllersRetiredEachRun": 9,
+    "preferenceRequestsBefore": 0,
+    "preferenceRequestsAfter": 0,
+    "unexpectedPreferenceRequests": 0,
+    "fallbackProviderIoExecuted": 0,
+    "bothFixtureRunsRetired": true
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886647,
+      "sha256": "94f836a24b20b47e7536ff8102aac42ee61b8d3343d2b3bef6dc566612770470",
+      "app": {
+        "versionCode": 145,
+        "versionName": "1.151"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "bytes": 25886647,
+      "sha256": "94f836a24b20b47e7536ff8102aac42ee61b8d3343d2b3bef6dc566612770470",
+      "serviceReady": true,
+      "app": {
+        "versionCode": 145,
+        "versionName": "1.151"
+      }
+    }
+  },
+  "livingInstallObservation": {
+    "status": "ready",
+    "ack": "uncertain",
+    "install_attempted": true,
+    "observations": 6
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1610,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 2002,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "independentReviewsAccepted": true,
+  "unchangedScreensaverAssets": 10,
+  "ownerRegistriesRetained": true,
+  "limits": [
+    "Actual debug/API29 dormant controller and generated private files/queued callbacks only. Feed/provider IO never executes; mounted UI, optimized/API28 runtime and Living visual acceptance remain separate.",
+    "The complete failed-pass guarantee covers all-image decks. Mixed-media/video-only settlement remains separate; new-folder and useful-video resets and automatic propagation are source-reviewed.",
+    "No phone, household folder/media/provider/account operations or GitHub push/publication; public1.83/code77 unchanged."
+  ]
+}
