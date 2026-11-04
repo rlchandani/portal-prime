@@ -1,0 +1,42 @@
+{
+  "dex/classes.dex": {
+    "bytes": 15576,
+    "sha256": "12da485d43c30b36aaa041d098d012329a3669613725d8f5f2fbb692c34cfd86"
+  },
+  "assets/generated/o1.jpg": {
+    "bytes": 3412,
+    "sha256": "46ceb7906f293220eb63a0c7dc1d7a5de8d356b72f0204be51a0958d60e8dabc"
+  },
+  "assets/generated/o2.jpg": {
+    "bytes": 3412,
+    "sha256": "6fd6cf6ccd06c58f09c997f763e4792a7ca587f99e4c2ba3ae9c32f3ceefa673"
+  },
+  "assets/generated/o3.jpg": {
+    "bytes": 3412,
+    "sha256": "ddcad9ec6a0b4582f8a1cb32cce893c5f804c51d1ef571188ca629b77a4fc5db"
+  },
+  "assets/generated/o4.jpg": {
+    "bytes": 3412,
+    "sha256": "e802eb4d8ae9a5203872cf34a7e1e76c87100aa6931b78e74b86fc3a4d8fc80c"
+  },
+  "assets/generated/o5.jpg": {
+    "bytes": 3412,
+    "sha256": "0a59886887570c7241ea75dc395da1b8bce08cc74ec3fe66f28a7fca21e3edf0"
+  },
+  "assets/generated/o6.jpg": {
+    "bytes": 3412,
+    "sha256": "3a62f361f26fddf29fff15a16bcbac62bdae795d2fccceb25d9129b561cf6b32"
+  },
+  "assets/generated/o7.jpg": {
+    "bytes": 3412,
+    "sha256": "f12b9e02649bf0c0b61a274de95d63adc76a79d067b30dde705bf1ffd91a2315"
+  },
+  "assets/generated/o8.jpg": {
+    "bytes": 3412,
+    "sha256": "cfd59487f9848bb733c658ef67904a4613eaf4d131c6850f559a39cfbfb4b8f7"
+  },
+  "fixture-before.apk": {
+    "bytes": 37540856,
+    "sha256": "e0af54b388f1085e112190b2969d1a2b9919742d09def3d8bc5d91462b767abc"
+  }
+}

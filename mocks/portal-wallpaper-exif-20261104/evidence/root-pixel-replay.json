@@ -1,0 +1,150 @@
+{
+  "before": [
+    {
+      "orientation": 1,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": true,
+      "ok": true
+    },
+    {
+      "orientation": 2,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": false,
+      "ok": false
+    },
+    {
+      "orientation": 3,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": false,
+      "ok": false
+    },
+    {
+      "orientation": 4,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": false,
+      "ok": false
+    },
+    {
+      "orientation": 5,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": false,
+      "ok": false
+    },
+    {
+      "orientation": 6,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": false,
+      "ok": false
+    },
+    {
+      "orientation": 7,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": false,
+      "ok": false
+    },
+    {
+      "orientation": 8,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": false,
+      "ok": false
+    }
+  ],
+  "after": [
+    {
+      "orientation": 1,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": true,
+      "ok": true
+    },
+    {
+      "orientation": 2,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": true,
+      "ok": true
+    },
+    {
+      "orientation": 3,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": true,
+      "ok": true
+    },
+    {
+      "orientation": 4,
+      "dimensions": [
+        360,
+        240
+      ],
+      "cornersMatch": true,
+      "ok": true
+    },
+    {
+      "orientation": 5,
+      "dimensions": [
+        240,
+        360
+      ],
+      "cornersMatch": true,
+      "ok": true
+    },
+    {
+      "orientation": 6,
+      "dimensions": [
+        240,
+        360
+      ],
+      "cornersMatch": true,
+      "ok": true
+    },
+    {
+      "orientation": 7,
+      "dimensions": [
+        240,
+        360
+      ],
+      "cornersMatch": true,
+      "ok": true
+    },
+    {
+      "orientation": 8,
+      "dimensions": [
+        240,
+        360
+      ],
+      "cornersMatch": true,
+      "ok": true
+    }
+  ]
+}

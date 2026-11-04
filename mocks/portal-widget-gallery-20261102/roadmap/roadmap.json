@@ -1,18 +1,74 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T15:40:32.216771+00:00",
-  "updatedLabel": "Exact1.167 delivered to both rooms after connection recovery; saved state and original source clocks retained",
+  "updatedAt": "2026-11-04T16:07:10.321210+00:00",
+  "updatedLabel": "Exact1.168 delivered: local photo wallpaper orientation; settings and original clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.167/code161, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.168/code162, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "local-wallpaper-exif",
+      "title": "Keep local photo wallpapers upright",
+      "summary": "Local photo wallpaper now follows the image’s rotation and mirroring metadata.",
+      "description": "Reuse the existing upright slideshow decoder for the local Screensaver wallpaper photo; retain folder selection, final scale, blur and saved settings.",
+      "status": "delivered",
+      "verification": "Same frozen actual-debug/API29 generated EXIF1–8: seven failures/one control to eight passes. All16PNG/64corners replayed;4565JVM/475suites and debug/optimized/R8/vital pass. Combined review61bindings and475XML rehashed.",
+      "kind": "Local wallpaper orientation correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root execution / toolkit discovery / photo fixture / independent media review",
+      "deployment": "Exact optimized1.168/code162 fully hashed in both rooms, one install each. Living uncertain acknowledgment reconciled by seven read-only observations.",
+      "state": "All43/30 preference files and four complete maps exact; Family runtime and saved Shuffle/fit preserved.",
+      "acceptance": [
+        "Actual generated local-image reader returns upright pixels for all eight EXIF orientations.",
+        "Both fixture runs retire; frozen DEX/assertions/JPEGs retained.",
+        "Full installed APK identity and saved state verified in both rooms."
+      ],
+      "evidence": [
+        {
+          "text": "Change, native evidence, delivery and limits.",
+          "source": "docs/portal-wallpaper-exif-2026-11-04.md"
+        },
+        {
+          "text": "Combined final review.",
+          "source": "mocks/portal-wallpaper-exif-20261104/evidence/final-review.json"
+        }
+      ],
+      "limits": [
+        "No mounted Home, blur/fallback, arbitrary large-image quality, memory/performance, optimized function, API28 or Living pixel acceptance.",
+        "Shared decoder budgets and initial sampling apply; final wallpaper scale/blur code is unchanged.",
+        "Older wallpaper reload and previous scopes retain their clocks.",
+        "No phone, household-media/provider/source write, account or publication; public1.83 remains."
+      ],
+      "next": "Select another distinct small visible product fix; keep old exhausted scopes parked.",
+      "issueClock": {
+        "originalStart": "2026-11-04T15:44:18Z",
+        "target": "2026-11-04T15:59:18Z",
+        "hardDeadline": "2026-11-04T16:14:18Z",
+        "selectedAt": "2026-11-04T15:51:16.340065+00:00",
+        "scope": "Only local Screensaver Home wallpaper upright EXIF decode routing; reuse generic SlideshowDecoder.file. Existing folder choice, max80 enumeration, fallback, blur, final scale, settings and reload unchanged.",
+        "exclusions": [
+          "wallpaper reload original Nov3 10:55:48–11:25:48",
+          "Home Photo Memory EXIF signs",
+          "household photos/provider/source writes",
+          "allocation performance and bitmap lifetime changes",
+          "mounted UI/optimized/API28/Living pixels"
+        ],
+        "before": {
+          "bytes": 18521,
+          "sha256": "dc0e075876d10a8fe45298a0c235c97030314cdadf5d2c5f7ec2198da6f4a141"
+        },
+        "clockNotReset": true
+      }
+    },
     {
       "id": "room-delivery-1-167",
       "title": "Deliver verified1.167 after connections return",

@@ -1,0 +1,418 @@
+{
+  "sourceApkSha256": "465a3f6189593a064010fca6e73597457306ad39860fcf48ae71add1df043877",
+  "actualApkClassOrigins": [
+    "WallpaperConfig",
+    "ScreensaverConfig",
+    "LocalMedia",
+    "SlideshowDecoder"
+  ],
+  "defaultsRestored": true,
+  "generatedInputsRemoved": true,
+  "retiredBitmaps": 8,
+  "tests": [
+    {
+      "name": "exif-1",
+      "inputSha256": "46ceb7906f293220eb63a0c7dc1d7a5de8d356b72f0204be51a0958d60e8dabc",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 360,
+      "expectedHeight": 240,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        }
+      ],
+      "cornersOk": true,
+      "png": "exif-1.png",
+      "pngSha256": "b0367e9b8d51175328bd154303c08fe4a02104ffbfcb3e05e4c7fedbe64e90c9",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": true
+    },
+    {
+      "name": "exif-2",
+      "inputSha256": "6fd6cf6ccd06c58f09c997f763e4792a7ca587f99e4c2ba3ae9c32f3ceefa673",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 360,
+      "expectedHeight": 240,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        }
+      ],
+      "cornersOk": true,
+      "png": "exif-2.png",
+      "pngSha256": "c9e4925b618f1088f49196e4c5190cfb307e33c18c52f61fee10799c5be738d2",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": true
+    },
+    {
+      "name": "exif-3",
+      "inputSha256": "ddcad9ec6a0b4582f8a1cb32cce893c5f804c51d1ef571188ca629b77a4fc5db",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 360,
+      "expectedHeight": 240,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        }
+      ],
+      "cornersOk": true,
+      "png": "exif-3.png",
+      "pngSha256": "215bbf39f0685e31bf34659f623105a3ea6567ef091ce3ade3fd954c81f66762",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": true
+    },
+    {
+      "name": "exif-4",
+      "inputSha256": "e802eb4d8ae9a5203872cf34a7e1e76c87100aa6931b78e74b86fc3a4d8fc80c",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 360,
+      "expectedHeight": 240,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        }
+      ],
+      "cornersOk": true,
+      "png": "exif-4.png",
+      "pngSha256": "678530bcc09973ec59c8ed3581114274e7f5071c3a297fcbde687526978f65e5",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": true
+    },
+    {
+      "name": "exif-5",
+      "inputSha256": "0a59886887570c7241ea75dc395da1b8bce08cc74ec3fe66f28a7fca21e3edf0",
+      "width": 240,
+      "height": 360,
+      "expectedWidth": 240,
+      "expectedHeight": 360,
+      "pixels": [
+        {
+          "x": 20,
+          "y": 30,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        },
+        {
+          "x": 219,
+          "y": 30,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        },
+        {
+          "x": 20,
+          "y": 329,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        },
+        {
+          "x": 219,
+          "y": 329,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        }
+      ],
+      "cornersOk": true,
+      "png": "exif-5.png",
+      "pngSha256": "0308c1e69522b3ba4d4fe967fe71e596349aded6a1d27c4cd70c43fd687e7bb6",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": true
+    },
+    {
+      "name": "exif-6",
+      "inputSha256": "3a62f361f26fddf29fff15a16bcbac62bdae795d2fccceb25d9129b561cf6b32",
+      "width": 240,
+      "height": 360,
+      "expectedWidth": 240,
+      "expectedHeight": 360,
+      "pixels": [
+        {
+          "x": 20,
+          "y": 30,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        },
+        {
+          "x": 219,
+          "y": 30,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        },
+        {
+          "x": 20,
+          "y": 329,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        },
+        {
+          "x": 219,
+          "y": 329,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        }
+      ],
+      "cornersOk": true,
+      "png": "exif-6.png",
+      "pngSha256": "ecd9ef401b0d971e70af00e1863fae2573b6878cd31cc9f64f45f1b10fee8327",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": true
+    },
+    {
+      "name": "exif-7",
+      "inputSha256": "f12b9e02649bf0c0b61a274de95d63adc76a79d067b30dde705bf1ffd91a2315",
+      "width": 240,
+      "height": 360,
+      "expectedWidth": 240,
+      "expectedHeight": 360,
+      "pixels": [
+        {
+          "x": 20,
+          "y": 30,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        },
+        {
+          "x": 219,
+          "y": 30,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        },
+        {
+          "x": 20,
+          "y": 329,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        },
+        {
+          "x": 219,
+          "y": 329,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        }
+      ],
+      "cornersOk": true,
+      "png": "exif-7.png",
+      "pngSha256": "a6ed9a312e2f687e8cbc644c84a1d9b045ca3c199bbf82b917234baa43f952a1",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": true
+    },
+    {
+      "name": "exif-8",
+      "inputSha256": "cfd59487f9848bb733c658ef67904a4613eaf4d131c6850f559a39cfbfb4b8f7",
+      "width": 240,
+      "height": 360,
+      "expectedWidth": 240,
+      "expectedHeight": 360,
+      "pixels": [
+        {
+          "x": 20,
+          "y": 30,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        },
+        {
+          "x": 219,
+          "y": 30,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        },
+        {
+          "x": 20,
+          "y": 329,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        },
+        {
+          "x": 219,
+          "y": 329,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        }
+      ],
+      "cornersOk": true,
+      "png": "exif-8.png",
+      "pngSha256": "e1859e7e938b58cdc066ab640e3e594affbd5582c304c1d1d690837c2f508333",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": true
+    }
+  ],
+  "channelTolerance": 12,
+  "sdk": 29,
+  "ok": true,
+  "handlerRetired": true
+}

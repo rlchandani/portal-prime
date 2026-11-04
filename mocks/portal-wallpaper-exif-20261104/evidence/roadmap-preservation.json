@@ -1,0 +1,15 @@
+{
+  "taskCount": 165,
+  "counts": {
+    "delivered": 112,
+    "verified": 43,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "all164PriorTaskObjectsExact": true,
+  "rawPriorTaskSuffixBytes": 527422,
+  "rawPriorTaskSuffixSha256": "6c912e4870df11b573f85b618647a25db4a1cad501b978cf7f5a3b20b8bb8225",
+  "defaultPreserved": true,
+  "oldClocksPreserved": true
+}

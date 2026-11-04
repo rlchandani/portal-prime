@@ -1,0 +1,56 @@
+{
+  "authoredAt": "2026-11-04T15:53:51.868Z",
+  "sourceOnly": true,
+  "sources": {
+    "WallpaperExifActivity.java": {
+      "bytes": 11812,
+      "sha256": "120e309ba3c27479bcdb07994e63f646afa5fe1e0fd8aa85cb9fb36f4eb77873",
+      "mode": "0400"
+    },
+    "AndroidManifest.xml": {
+      "bytes": 423,
+      "sha256": "c99f8ab72a599e74cdb427167a8887db76260cdd00e5be209465daf01a6f1e33",
+      "mode": "0400"
+    },
+    "root-driver.py": {
+      "bytes": 4555,
+      "sha256": "1f7a902cf96ebe61745df06044ef7dadf4861948ed5a9b546fd434b8f4fcea3b",
+      "mode": "0400"
+    },
+    "RUN.md": {
+      "bytes": 3109,
+      "sha256": "6d43e45631f083d6c60b5f4c75db5fc59a3b6e03f9abc0b7ce71518d008bf11b",
+      "mode": "0400"
+    }
+  },
+  "package": "com.immortal.wallpaperexiffixture",
+  "caseNames": [
+    "exif-1",
+    "exif-2",
+    "exif-3",
+    "exif-4",
+    "exif-5",
+    "exif-6",
+    "exif-7",
+    "exif-8"
+  ],
+  "channelTolerance": 12,
+  "expectedBaselineFailures": 7,
+  "expectedControls": 1,
+  "expectedCandidatePasses": 8,
+  "binding": {
+    "target": "WallpaperConfig.screensaverPhoto(android.content.Context):android.graphics.Bitmap",
+    "prefs": "immortal_screensaver",
+    "source": "folder",
+    "folder_path": "only generated unique fixture directory",
+    "contextBase": null,
+    "realTargetContext": false
+  },
+  "limits": [
+    "No execution by source author",
+    "Actual debug/API29 private leaf and native decoder only, root must run",
+    "No mounted Home/UI/blur/live-source/provider/optimized/API28/performance acceptance"
+  ],
+  "originalClock": "2026-11-04T15:44:18Z",
+  "hardClock": "2026-11-04T16:14:18Z"
+}

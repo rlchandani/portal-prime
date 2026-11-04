@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.immortal.wallpaperexiffixture">
+  <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="29" />
+  <application android:label="Generated wallpaper EXIF fixture" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+    <activity android:name=".WallpaperExifActivity" android:exported="true" />
+  </application>
+</manifest>

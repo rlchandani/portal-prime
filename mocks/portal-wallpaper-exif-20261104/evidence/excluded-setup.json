@@ -1,0 +1,8 @@
+{
+  "setupFailures": [
+    "System Python lacks Pillow; generation failed before compilation/device use",
+    "Dependent run attempted absent fixture and stopped before device admission",
+    "Android bootclasspath lacks host LambdaMetafactory; fixture javac failed before device use. Fixed command to use Android classpath without overriding host boot classes."
+  ],
+  "noProductBehaviorObserved": true
+}

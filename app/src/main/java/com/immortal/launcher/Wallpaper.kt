@@ -162,7 +162,7 @@ object WallpaperConfig {
               .filterNot { it.isVideo }
               .randomOrNull()
       if (pick != null) {
-        runCatching { BitmapFactory.decodeFile(pick.path) }.getOrNull()?.let { return it }
+        runCatching { SlideshowDecoder.file(pick.path, maxEdge = 360) }.getOrNull()?.let { return it }
       }
     }
     return anyBundled(context)

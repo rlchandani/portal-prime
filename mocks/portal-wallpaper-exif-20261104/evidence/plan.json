@@ -1,0 +1,18 @@
+{
+  "originalStart": "2026-11-04T15:44:18Z",
+  "target": "2026-11-04T15:59:18Z",
+  "hardDeadline": "2026-11-04T16:14:18Z",
+  "selectedAt": "2026-11-04T15:51:16.340065+00:00",
+  "scope": "Only local Screensaver Home wallpaper upright EXIF decode routing; reuse generic SlideshowDecoder.file. Existing folder choice, max80 enumeration, fallback, blur, final scale, settings and reload unchanged.",
+  "exclusions": [
+    "wallpaper reload original Nov3 10:55:48\u201311:25:48",
+    "Home Photo Memory EXIF signs",
+    "household photos/provider/source writes",
+    "allocation performance and bitmap lifetime changes",
+    "mounted UI/optimized/API28/Living pixels"
+  ],
+  "before": {
+    "bytes": 18521,
+    "sha256": "dc0e075876d10a8fe45298a0c235c97030314cdadf5d2c5f7ec2198da6f4a141"
+  }
+}

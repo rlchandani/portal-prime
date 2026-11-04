@@ -1,0 +1,14 @@
+{
+  "reviewFullReadTool": "acd1a6",
+  "reviewSha256": "ac64c949f30e77740feafedff986234712fc764e5d98269c188ec5c1d41ec957",
+  "reviewBytes": 18641,
+  "allBindingsRehashed": 61,
+  "allXmlRehashed": 475,
+  "jvm": {
+    "tests": 4565,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "accepted": true
+}

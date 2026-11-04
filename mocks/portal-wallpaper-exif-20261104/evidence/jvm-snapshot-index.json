@@ -1,0 +1,4277 @@
+[
+  {
+    "name": "TEST-com.immortal.launcher.AlarmConfigObservationTest.xml",
+    "bytes": 1438,
+    "sha256": "7b3736be566907a8df78891d5810960c7fc16f1e82ef46dc53901b1df31a678b",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AlarmConfigTest.xml",
+    "bytes": 1165,
+    "sha256": "6c22bad23ac543d930086fa9fa61c960441b824d33d25307bcf87f1955a504fc",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AlarmDaylightSchedulingTest.xml",
+    "bytes": 1696,
+    "sha256": "9e6d7ff39e27b8aa3c7f4c2e96abf47b616e13323a724aa53147515357b4f5fc",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AlarmDeliveryPolicyTest.xml",
+    "bytes": 599,
+    "sha256": "0e51b4c60d55a2fd097e07f656f9edadfe8a9fe2f5d134c370065d6e6675372b",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AlarmPcmStartupTest.xml",
+    "bytes": 1619,
+    "sha256": "d632ff8c5787bf68716de42b33e927b64bc12fa4348da4027b9960180a7da0b0",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AlarmSettingsEditorTest.xml",
+    "bytes": 2671,
+    "sha256": "016fe8287984af754534f7e23461064721f0f2dde935889ccd44c2f6842fc7e3",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AlarmSnoozeTest.xml",
+    "bytes": 1127,
+    "sha256": "5a3375393bae93dac2838f99d6d434416d3acba89ae9212787086a602336aef9",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AlpacaClientTest.xml",
+    "bytes": 1142,
+    "sha256": "af6e41400ce6701ceef9bfa6a9903371837f5cd65473232ca08f226d541701c9",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AndroidSettingsNavigationTest.xml",
+    "bytes": 2108,
+    "sha256": "0f70c9ef80fa2699fa6b7d3968d60f01dea8fd5bdc90fff475791e931b44a084",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AntiBurnInTest.xml",
+    "bytes": 878,
+    "sha256": "8b19c5b7a4f12663954209891410d721f72ca9e678fc34c9b78e40f367b8c22f",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApkBrowserSelectionTest.xml",
+    "bytes": 1469,
+    "sha256": "b4048bfe64aa28fb821e9c86d0b350ea323025be8580a1048b48173dea5efb10",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApkDownloadHttpTest.xml",
+    "bytes": 2217,
+    "sha256": "b9c0343a2f2f5e607e5ce64984f68c89c5d290533d9f1f3ea0f9eb1a07c3839f",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApkDownloadTransportTest.xml",
+    "bytes": 2638,
+    "sha256": "e4d1184e51db8da767865da2e2fece0da81625458bffbe0e09517337dbdf3687",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AppShortcutPreparationTest.xml",
+    "bytes": 810,
+    "sha256": "77eff2b7f76a1d1c42bab2bef275cde114bd25b5225311b920b276906c526e53",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedAppBadgesTest.xml",
+    "bytes": 1162,
+    "sha256": "723e883605fc5180c332811dbdd4ad6c608dc493194307197c1a238310a9f354",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedClockSearchTest.xml",
+    "bytes": 1423,
+    "sha256": "fef2ce7845a14177e66df568e07ee399a4250fc3673a277fae4db5d05fdd3aa3",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedEditorsFlowPolicyTest.xml",
+    "bytes": 1213,
+    "sha256": "869e0527e4614647e9c73b0e57d81867a8dd438bc6ccd12405098ef8538c732e",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomeCalendarOngoingTest.xml",
+    "bytes": 1580,
+    "sha256": "a1fef20a194f1657335992b40140121c91f175dc8ce1c145b15d66b54b7443d3",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomeCalendarPreparationTest.xml",
+    "bytes": 1010,
+    "sha256": "1ba3ce63580b478a5296730ec0ed399871ecf11a02ecefddffe46334f10b1245",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomeInventorySnapshotTest.xml",
+    "bytes": 1002,
+    "sha256": "85b389a39fde904d27fe67b78686d07d7f06fdb8a2b861aab69cd929cf9ed2ef",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomeNavigationBoundaryTest.xml",
+    "bytes": 3545,
+    "sha256": "98513b1f3da4ad63f056341e879671af6fc1e8c78a5f7f922d12a06e92859a23",
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomeNavigationDispatcherTest.xml",
+    "bytes": 1906,
+    "sha256": "e4f107b91afd45cd5afe93e9e6c12ae11ac202528aed20412053ded8443cf96f",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomePagerNavigationTest.xml",
+    "bytes": 833,
+    "sha256": "487478929a7db83eaeee81498cb0004c624b11db88f152115af0ccd1a22927b5",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomePresentationPagingTest.xml",
+    "bytes": 1618,
+    "sha256": "a1cac21db04cafae93cda1c4bca656d0d0e44239345381a0326ad3a2e062900b",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomeTabAnimationTest.xml",
+    "bytes": 1134,
+    "sha256": "cc2eb251fc253ea0ce38c10be204a1ae305e5c4fda250e32063a8959f61618ae",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomeTabTransitionTest.xml",
+    "bytes": 1395,
+    "sha256": "5805728cd9763066f26dc109f75e5c3db414d2d7a0ee681560c7c91e1c357772",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedHomeWallpaperSelectionTest.xml",
+    "bytes": 1022,
+    "sha256": "de10736dcb606585af9ebc6b4cc25cf814557adfe05ee765095a4fdafa71255e",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedPhotoPreviewOwnershipTest.xml",
+    "bytes": 825,
+    "sha256": "7c2a2080f304c97d24e5e19d7c2085a87258609490c2e0abe326e8d3dd8e080b",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedPhotoPreviewPlanTest.xml",
+    "bytes": 1637,
+    "sha256": "8700e722e8a85a59420189862afa07e93b2709cf9669552031b4098fcb5d0722",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSettingsBackDispatcherTest.xml",
+    "bytes": 951,
+    "sha256": "3cdc6e407c342d549809a4325c1d7e9f04c85d93ba6eae70ca0d5ca8c187421f",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSettingsContinuityTest.xml",
+    "bytes": 955,
+    "sha256": "4af25d1c1b266a43e6a7da5c355ef729ece747712888a1b9605990bd6b8fae34",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSettingsHistoryTest.xml",
+    "bytes": 3113,
+    "sha256": "b1a791cd58462fb6af5d1532447e194c5e23540b8ec836cf4eea76e0f09f2bbc",
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSettingsLazyProjectionTest.xml",
+    "bytes": 1007,
+    "sha256": "9ecd3ddf317e66ad58493aa36760ef25e974fe9e3eadced701a9f54467d0f348",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSettingsSearchBreadcrumbTest.xml",
+    "bytes": 1574,
+    "sha256": "a3aba414a0f8f884b0fc7cf8cd7d6f383e741b8f3738362d0fc020fa3a369f9b",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSettingsSearchMatchingTest.xml",
+    "bytes": 3519,
+    "sha256": "ccfcf3a236c3a34127ba429c5a4ad99695e66abdb2bcc1d543a15d40e6ee1d5a",
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSettingsSearchRoutingTest.xml",
+    "bytes": 1243,
+    "sha256": "d9c25ebbd54c6b618c8ca6a281a0b16935b7567d2b7b32b464256a599cc25f9f",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSettingsViewportMemoryTest.xml",
+    "bytes": 973,
+    "sha256": "8159ebf2759b29990475dbb9522711fb3db1ac401001133bd4a6742d8e5baee4",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSourcesBoundedMediaScanTest.xml",
+    "bytes": 804,
+    "sha256": "5e9d3f1629f9d347627ef939645e8dacf3db07b4834958c9410792d1cbe3646b",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSourcesOperationCancellationTest.xml",
+    "bytes": 936,
+    "sha256": "e6f2a28ce7fc023aab0a6acc3171e3de87070789914363c112fcafdbd6c6d3a8",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedSourcesPreviewSlotsTest.xml",
+    "bytes": 1221,
+    "sha256": "1aa381d73e1ddb145a6b93479e9c6133cd7f4045f00dae02d5297ab8c26d6593",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedToolsAudioLifecycleTest.xml",
+    "bytes": 1259,
+    "sha256": "b18eb5e08e00252daae3224bc3ec85f9e0bc8f9695b28865caf776a7b6e02986",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedToolsCatalogTest.xml",
+    "bytes": 1465,
+    "sha256": "d49a47b954ffbb962c11068db5a81e7e108660508a4cf391e59663d9b558fc6d",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedToolsEverydayValidationTest.xml",
+    "bytes": 2054,
+    "sha256": "a7c55b0be476ba187586966417b286a44a2c82f251119e83aee1de9528ec567a",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedToolsSummariesTest.xml",
+    "bytes": 1826,
+    "sha256": "f0f0c7fcd766ea241aafe094870766f91b8deceb759c86b052d83ab17bdb037d",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedVideoPreviewTest.xml",
+    "bytes": 1191,
+    "sha256": "5db702f7e03c188936e46d4518f9226a900441add42466c892f1a48f103ec801",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedWidgetDragStateTest.xml",
+    "bytes": 1720,
+    "sha256": "01dcb35097ee52c2c821933294019a67f7c1ea1044f726207c05845a6a16f284",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedWidgetPackingTest.xml",
+    "bytes": 2379,
+    "sha256": "56a162de4ad0f9aba8a0f8f9da5adc82bcc3785466485e300061e95392865c82",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ApprovedWidgetPageGeometryTest.xml",
+    "bytes": 1592,
+    "sha256": "31e0424de2a69b84529ebfb8047ec70570353890c3a35334089b53b757a3f51e",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AppsFavoriteRemovalTest.xml",
+    "bytes": 1537,
+    "sha256": "0c4d7d5b24a6b0d051a94e62233878eec532c65a4daab32acd556ebd281e7ab8",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ArtworkDecodeAdmissionTest.xml",
+    "bytes": 895,
+    "sha256": "beb8ef26ec4b2f57859e209c8e8415b9fa59c00e17b39efd5a084d0231741962",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ArtworkLoadCoordinatorTest.xml",
+    "bytes": 1057,
+    "sha256": "b24065b8a9817a534fa4b63bb91b9eb5b693745c5abbc9012bcfa5ac848b5708",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AudioNoteRecordingFileTest.xml",
+    "bytes": 2312,
+    "sha256": "3f3b1a19ae4a8d8dbf8588b36416135e14daa69b6d7d77d607cb05c918a258d3",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AudioNoteWorkTest.xml",
+    "bytes": 1880,
+    "sha256": "5de4702ff2ad5513817213f834740892ac5c7a206b4be7333f4217b3f36530d7",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AuroraTest.xml",
+    "bytes": 1354,
+    "sha256": "7c4e2df617b3051d800f23824527f559d221d85418331cf9a938a276743e64bd",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.AutomaticTimeSpeechTest.xml",
+    "bytes": 1405,
+    "sha256": "706592b23415109c361a6a4372b0a1f7729cac08e739116f690501457e32afd8",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.BarWatchReconnectTest.xml",
+    "bytes": 1756,
+    "sha256": "3bea8eadb00a4871de31b60b780ceb23c233ff142480511ee653c9b9e57b1d6c",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.BarWatchServiceListTest.xml",
+    "bytes": 1862,
+    "sha256": "e2d29c29286c3f9f23f6ced094cffdec66abc91d9ef2b1ca1ef8588f7256314a",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.BarWatchServiceTest.xml",
+    "bytes": 998,
+    "sha256": "e88127e690575fe518c62e62f17734bb109e2245d8507b8fbbd2459a0543e006",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.BootLaunchTest.xml",
+    "bytes": 2467,
+    "sha256": "41fd48d634cc81a113cc08ec4582f2a0f39ff1a156b8ed1511f5e598b1cc1aaa",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarAllDayDurationTest.xml",
+    "bytes": 2126,
+    "sha256": "74c3d18fb9d4c05ef2abe1fcc74be86a6e426f938880d2c461b80eea5d4d0d79",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarCancelledStatusTest.xml",
+    "bytes": 1498,
+    "sha256": "db32d1f1d6d37bd5b5d25423701ca07940a4df9f716e1a0e6096b48e6184cb2b",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarDayHeaderTest.xml",
+    "bytes": 1114,
+    "sha256": "c727e5ea390e3a8752bbb4d049e544e00aa1c64449023d49e3e92892558834d0",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarDownloadRegressionTest.xml",
+    "bytes": 907,
+    "sha256": "04b09960e4b2b563a01a7b8f0cdc51fe0d4c601c96ecd7e2fe737e43957fdcd3",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarExclusionDatesTest.xml",
+    "bytes": 1615,
+    "sha256": "e4d64b5e3ddd1afb84c72bdf8a6b71323fb6448d956742c93f88f7b2acdcae38",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarFeedDateValidityTest.xml",
+    "bytes": 2172,
+    "sha256": "64d3e2b92479970dbf0ef54d62cf7a4dfa1627fd5f4aa01d0acddcaee70fd6ce",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarFeedHttpTest.xml",
+    "bytes": 2357,
+    "sha256": "ca8c4857d52b42ce48664cf29de84af3f7c3e1f8dfde0f45392fe5ac474455ef",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarFeedReaderTest.xml",
+    "bytes": 1685,
+    "sha256": "433e08ec92c50f57974c15a6c2991e1df5f0324bed4edfa2e8f6c40ebffd3452",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarFeedRecoveryTest.xml",
+    "bytes": 2942,
+    "sha256": "7aad21824484548b48316e670c588537d1d158b0af5435b0554ffaf140a74467",
+    "tests": 18,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarFeedTest.xml",
+    "bytes": 2097,
+    "sha256": "35bc4ab8ed3738e930ef747a703c8d34322a2fc391175d473166a8000d8e1c52",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarMinuteRefreshTest.xml",
+    "bytes": 1316,
+    "sha256": "fed67fa466ff22ed8d3018c944da1d641894a544754d8664ecd489eaafb3a4de",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarOccurrenceSelectionTest.xml",
+    "bytes": 2781,
+    "sha256": "b40a241d1125ed40cbab0bb758b1171574c2cc539e8a1e6f26c3609fdcb3dfea",
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarPreparedFeedTest.xml",
+    "bytes": 3022,
+    "sha256": "bc578dbc5e0221f3675f3d64214486d1c041c5bad55f8f527fdbacce2d34cf3c",
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarRecurrenceZoneTest.xml",
+    "bytes": 2462,
+    "sha256": "96c205bd4cb61b162f733ce301202689e7237b0d70cb19416da5ca0e1482fb23",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarRecurringWindowTest.xml",
+    "bytes": 2714,
+    "sha256": "eaf9fdaeb06ea64fb0eddfc392602e64da15bbf722a95ee457cd5ad5f4221fcd",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarUrlRegistryTest.xml",
+    "bytes": 1228,
+    "sha256": "1c51d17f1ebe48e82b9e43b21ec3bbdd0ced436455a476f2590cd19191d1b3c9",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarUrlValidationTest.xml",
+    "bytes": 2172,
+    "sha256": "563ff3ab0d542b8ebe14d8f25567736dea23babe9d354324e40248bd2f56b299",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CalendarWidgetTest.xml",
+    "bytes": 660,
+    "sha256": "19d0eea33d8ce5fef1ab7cf7ee59d798a591b7be125a2a03e7ce4b2209d89415",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CameraConfigLegacyIdentityTest.xml",
+    "bytes": 2218,
+    "sha256": "8ea930e181a65c35fb95cbde769206562fbd8431480c81796eeec314142ee7e3",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CameraConfigTest.xml",
+    "bytes": 768,
+    "sha256": "3f7103b7f24e056c04a5f42ac429fd327d07c33da5acbe0d8f5e0d50d2a54fc3",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CatalogSnapshotDeliveryTest.xml",
+    "bytes": 1402,
+    "sha256": "94433b172462fbf6fdf71e468ecb1d8e0c09406a974731f502f69af762af9944",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ChimeConfigTest.xml",
+    "bytes": 1277,
+    "sha256": "a3713869527fc301fb540e80d01525fb6d0e9d09c1bbfda1997b568be66fb64f",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ChimePlayerResourceTest.xml",
+    "bytes": 2019,
+    "sha256": "ebfcd25f5dd98cce6830280211ba4f1817ad2eebc36b60343ed3001e22b0c350",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ChimeSaveStateTest.xml",
+    "bytes": 977,
+    "sha256": "38e1ba9a304fd8153236a6ea840841473f16b62f9d21ab7458177c54f020170d",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ChimeSettingsWriteQueueTest.xml",
+    "bytes": 1244,
+    "sha256": "27ef22c6b1265e21ecb9e6aba6e57dfb54e5d700e3f2812ae9f75c47974c5fff",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ChimeVoiceSettingsTest.xml",
+    "bytes": 1229,
+    "sha256": "6e2a7ba2f5d0202193cdcf6ac3bacb713d8524905a2f8fe2fbdf376f10973edc",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ClassicLocalImageFailureTest.xml",
+    "bytes": 1805,
+    "sha256": "c4196aff26fb433e0f22d47ccee20c289bff349264f5aa6666644d6740a26dd8",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ClockCadenceTest.xml",
+    "bytes": 1530,
+    "sha256": "75262548ef973747d17c76ca4dc99cc7f771e79b229a15e6d7d07279704b7cbc",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ClockChangeAlarmsTest.xml",
+    "bytes": 1563,
+    "sha256": "09e825a544c2687fd8f0adb4395cc8097173ef436b757afdad69bc4a7ef9bf07",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ClockRevealRefreshTest.xml",
+    "bytes": 902,
+    "sha256": "685eb8ae31efae029222c2e66132383c0b6c5e78cda26ba921f7fefef9e171fc",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ClockTimeDraftTest.xml",
+    "bytes": 949,
+    "sha256": "6cd810035ec963c42474983c644eb268db08f20a8e7f1c4902dc489b663c96e5",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CloudKitPaginationTest.xml",
+    "bytes": 1333,
+    "sha256": "56802a649fa48884609929598523eeb200ee6fa6e433a7ccb940a1ccf3766674",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ConflatedVideoCommandsTest.xml",
+    "bytes": 812,
+    "sha256": "15d24300cc2c75a0573543b14f86d57682186cbc0cda9bbedf6ed5471d663f1f",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ConverterCurrencyWorkTest.xml",
+    "bytes": 1176,
+    "sha256": "05f1146140a250e83ce199a5026863ced6c7b5628f9e6e439741ba67ad4ce5d7",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ConverterNumberInputTest.xml",
+    "bytes": 2313,
+    "sha256": "38c55faaeae78f4bc6e6d9054976867d3b6b88c5e9b7d4bd2fdfb87001b58d4b",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ConverterRateMetadataTest.xml",
+    "bytes": 1314,
+    "sha256": "a631588795a76b0a8c43918fdb218053656c81f0902edadad806665d73a22f5f",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ConverterTest.xml",
+    "bytes": 1713,
+    "sha256": "054d15c91d52c4407e0a54e6d22999e6e56a31b523f1ffe9b414edcc7bc7dbee",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CountdownConfigMutationTest.xml",
+    "bytes": 1327,
+    "sha256": "5f0900b2423dd4017f8ad030bbbad1e52a1ad33924b8f4561f10ea17bade2fcd",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CountdownDatesTest.xml",
+    "bytes": 1432,
+    "sha256": "51fcb2e03745357e9dd764d7212c02a63f2f43dfec8ed8340960e46406745b4f",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CountdownEditorDateTest.xml",
+    "bytes": 1608,
+    "sha256": "21e69bfb64085b072b782f0b8bf202a18679175fa8cf7667948437488f53f207",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CountdownIdentityTest.xml",
+    "bytes": 2214,
+    "sha256": "0ca2180ed5287f7995eeb982c57b5388d9b01ea277522f56cbd856ffd286cd67",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CrashGuardClockTest.xml",
+    "bytes": 1147,
+    "sha256": "35ad61894405f5a4a9165f50f10d36a22090f2a937bde10049494f7dc38d827f",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CrashGuardTest.xml",
+    "bytes": 817,
+    "sha256": "fc6dd1a8192d47263078a7c45c18b0bacf94bf77214f9c0bd4049e17422f21bd",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CryptoCachePublicationTest.xml",
+    "bytes": 1813,
+    "sha256": "dd9946b3362632d7e904e6e861e990f16abd7c2eb085cb5a39eb3b454869d0f0",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CryptoFeedTest.xml",
+    "bytes": 1112,
+    "sha256": "741313b6276d31d4c85fd9ca52916f52e4e7aba7186f4582a6ea666e7b4f81e2",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CurationTest.xml",
+    "bytes": 605,
+    "sha256": "d5b5a1e64c754e33a04955679a29d9e79c5ad56f793bc45128457f4440c153b2",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CurrencyRateIntegrityTest.xml",
+    "bytes": 2359,
+    "sha256": "a94308f4ee04be65577652855681573518b51b578d9af77cdb94ca3b1830f2f6",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.CurrencyRateLoaderTest.xml",
+    "bytes": 968,
+    "sha256": "d2bd22939583f857565a77c95413eedb57e470e7753af1080fd6af875005cdee",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DarkRoomObserverTest.xml",
+    "bytes": 1611,
+    "sha256": "4e3cbadae1d66ecd9d4114079602ab9d409f0a29cc9529629933de52b9d4874b",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DarkRoomPolicyTest.xml",
+    "bytes": 1954,
+    "sha256": "aead6364d7c3af8a25d53121036303afc62f4e1c85b72fa30b4ccbae2d355107",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DateFormatterTest.xml",
+    "bytes": 1666,
+    "sha256": "083f217f91a9dafe70736867d089f4f1ec4b3423fd176f56a659d9df0829d48d",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DavHrefResolutionTest.xml",
+    "bytes": 2101,
+    "sha256": "48d76733c7ee575b7d872d31e7b3cc95aed237f3761d2301c07de3af6a53c9e7",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DavResponseBudgetTest.xml",
+    "bytes": 1020,
+    "sha256": "a163a783b3d7140d725a559cf7adf96ce7ed3de24dd291265476c3b68dd7fd11",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DavSourceFolderTest.xml",
+    "bytes": 741,
+    "sha256": "f87e4b46742e94dc06dd03af5c23830f925fa9d92a85d9d1be9a3ef1b38e951b",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DeferredSettingsSnapshotTest.xml",
+    "bytes": 1828,
+    "sha256": "b24da42e0a18e32f653224d3d7826858aaefbe8995e9702d846184fce846eabf",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DevModeTest.xml",
+    "bytes": 446,
+    "sha256": "7a9deda93d4d87fcaaeac559297784745eef44de53bbc2d4d1561defef30fe5f",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DeviceHealthControlsTest.xml",
+    "bytes": 1081,
+    "sha256": "857217ef551541c7679ddec6e7e45d54c1627a96fecdcfdd8c1e98ad036697d8",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DeviceHealthLoadTest.xml",
+    "bytes": 2388,
+    "sha256": "d7158300751117cc30912212cd1ac82557936cf8d3aac40570cc7668442cdbf3",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DigitalClockGeometryTest.xml",
+    "bytes": 1872,
+    "sha256": "6d57bad884322937f59f77053783a0d86c016013873babbb690f9126e43da21d",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DisplayWriteQueueTest.xml",
+    "bytes": 1294,
+    "sha256": "94c1c888301cf047ceec89dfb3d3081c6748a6d0eaa280591cbc728c78cc08b6",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DockStoreTest.xml",
+    "bytes": 738,
+    "sha256": "899278e47b0f66213b5aa44e8c8b9f0aff92b097c29eca88cdc19ff8fa2e0565",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DreamBridgeWriteQueueTest.xml",
+    "bytes": 1155,
+    "sha256": "56f46781cd79752140f68c51fd233dc7e74ae4f8cf1a4fe1369d7c6af2227096",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DreamPolicyTest.xml",
+    "bytes": 716,
+    "sha256": "d50a19b22901ff02259e298af1367584695630d8d9059cd41fe88d37fc2f12d2",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DreamRecoveryOwnershipTest.xml",
+    "bytes": 1394,
+    "sha256": "b5011c63112a60aca01375f6a0f79212172e418719c9541e5c200fa130954183",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.DreamTapContinuationTest.xml",
+    "bytes": 1220,
+    "sha256": "be304c2754918046bdc54a26e48199498fdaaabd7720786c4bfa0c8dbc7fee2a",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineDerivativeSizingTest.xml",
+    "bytes": 839,
+    "sha256": "144774fb9f476118b35827f1fd81a69bc96edb03ae170fa7f4ebb5bb26bb6df9",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineDerivativeWorkTest.xml",
+    "bytes": 959,
+    "sha256": "1ab58051852c2294a83fbe956150f8762ce529b16d99765051f5072c610d2856",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineImageRequestsTest.xml",
+    "bytes": 1353,
+    "sha256": "5552ae410cff62311a94b3e3e947ab191048d0bd5d847371940b5fb60055f419",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineImageResolutionCaptureTest.xml",
+    "bytes": 999,
+    "sha256": "b1e68cd7fb069a8bf1485ba7313a487a4859dbbd9ea0d99b899ddbd7cd4e4775",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineImageResolutionSamplesTest.xml",
+    "bytes": 1665,
+    "sha256": "4f505df2ba1e1d4c6c1e7e03de9b98121a8b34e6338144dc175790bb85bef881",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineLocalPhotoRequestsTest.xml",
+    "bytes": 945,
+    "sha256": "6bd775e0a9b8224cd8937a5a8e70258d8c0e7395b9cc2c6e376c2f9bd42ecd96",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EnginePhotoContentTypeTest.xml",
+    "bytes": 951,
+    "sha256": "33c5f4ca12da9380f6bab3029daa317cc47102ef94c6b359a6e9e0288a54bb45",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EnginePhotoTransferTest.xml",
+    "bytes": 1058,
+    "sha256": "bd74ab69777ba573ae63646f6abd920922e9460dee9cc63e4f39d6a041fe9ea7",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EnginePhotoTransportsTest.xml",
+    "bytes": 1241,
+    "sha256": "bedbb504499ec42ceabf4b8533b908905ea37a81c6ca3e7f0a2abbbf8335fbc2",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineRemoteImageCacheTest.xml",
+    "bytes": 1248,
+    "sha256": "9cafcda2327abf35da622980ca01866230b564266b47b48a9b65d9b3577bb9c7",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineRemotePhotoRequestsTest.xml",
+    "bytes": 790,
+    "sha256": "ffdec0bc157be6049cb6b4dee3fbc90db07f585903a2c98b26592f75a7021c39",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineScaledCacheResolutionTest.xml",
+    "bytes": 1787,
+    "sha256": "808959acd82e8bee8e6141b2da945641d6960ade36ced2c869cef9f269c909ed",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EngineScaledCacheTest.xml",
+    "bytes": 1444,
+    "sha256": "0c1b8aa506069b1cbb78477a5cddeef5ae68f4728af1ad65c622728002821df2",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EverydayLoadTest.xml",
+    "bytes": 1730,
+    "sha256": "41fb035a4499d951865420ce36bf4b9b1408f71fb44a87adc09ad58def16982d",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.EverydayNumberInputTest.xml",
+    "bytes": 2608,
+    "sha256": "452c5c95bc5e9d18ecdc1f7a7f0a9456dbe3b78e6ea5e3d122d303fba8d331dd",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceFocusCacheTest.xml",
+    "bytes": 1757,
+    "sha256": "b97aed6dbc5450e77836e485f73523be155fe2807d515bd41ddba4e9b2e951db",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceFocusStoreTest.xml",
+    "bytes": 1429,
+    "sha256": "383d33f89647edffff1aea620eeec5e760ffcba55d553f475f52d8eb1bf72202",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceFocusTest.xml",
+    "bytes": 2149,
+    "sha256": "efe8f60db43f11c7b9c7126fb063fa1823e11958762943b985718960cfc008ca",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceFocusWorkActivityTest.xml",
+    "bytes": 2607,
+    "sha256": "a52b0dd1679903ae5eeaabf702ea98f9bb582c1754d82fb6f2f9a68886c4faae",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceFocusWorkTest.xml",
+    "bytes": 1131,
+    "sha256": "4220d413998a6da9e9290d6adaae59cb7ba681b30e0954c3628d26d9fc5f2bf1",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceRendererArtworkCleanupTest.xml",
+    "bytes": 837,
+    "sha256": "c51b01e409bfd86ab4abe93affe4fa5dea81dcb79a9cb12cfc3b8c309738d427",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceRendererBatteryUpdatesTest.xml",
+    "bytes": 1388,
+    "sha256": "389ee96aceb47c3a547bbb82d0399a0655e6f14977ee067b7e11b8cdd4181631",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceRendererMetadataUpdatesTest.xml",
+    "bytes": 1163,
+    "sha256": "21feb6b984766d59f7f96a1c6ec549a67478f48e408c9de78598834e97aad763",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceRendererPaperBackingTest.xml",
+    "bytes": 814,
+    "sha256": "12f03e2b603903c7b3d1aa02fcba9fc22fb11c931f082a145e4c539949412738",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceRendererWeatherAdmissionTest.xml",
+    "bytes": 830,
+    "sha256": "517fbe212609b84e921bb8f24e33494193aeee226c4960648850ec1dcaf7c8e1",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FaceRendererWorkStateTest.xml",
+    "bytes": 1426,
+    "sha256": "10d0146702892a5a126416896592853038bebf95997d8d1f8eb91c69af2c2f65",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FeastDaysCivilOffsetTest.xml",
+    "bytes": 1739,
+    "sha256": "8ab5fe4135327ba2e78aea6b625c135103696fa3d5de3d240047c93459a91963",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FilmstripBackdropPlanTest.xml",
+    "bytes": 1335,
+    "sha256": "553c62f94abc090bc9e0e6a6c313918f78c17e7465744a282905a7bd40bce997",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FilmstripGeometryTest.xml",
+    "bytes": 3769,
+    "sha256": "71f16bd04f9fa4958b651f28ea3c9997724ebc09c0364a6fe180f93cf0be6f1f",
+    "tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetCalendarTest.xml",
+    "bytes": 1029,
+    "sha256": "4952a666d9d0144438b8b25c2a6af893c8b485da3b861707512dd5da1c5141ad",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetDiagProcessOwnershipTest.xml",
+    "bytes": 1995,
+    "sha256": "30cb1d27d03859654760e2d92654b804b40933ab876d1177bb8b1d5c30b33dca",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetDownloadHeaderTest.xml",
+    "bytes": 1915,
+    "sha256": "d02cd41f21ca3e82c5f3d72a18f61e10b4899c665b7798d9c3ad2a386c5fcc65",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetErrorResponseTest.xml",
+    "bytes": 924,
+    "sha256": "f7201d406beb9bac97558faf9a624d7ec94be756dcf4be2325c7db48626eec9f",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetFileReadSnapshotTest.xml",
+    "bytes": 2118,
+    "sha256": "8f43fd0c57459912621fb9c8d631ff4eb8b3ba240f8df342a618d0e4b4f6af5f",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetFsTest.xml",
+    "bytes": 437,
+    "sha256": "60ca231e4b7f0c72b3998fd0ab2b34a4bcf61bdedca38b0a2de3388de3c64cd4",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetHttpServerBufferedInputTest.xml",
+    "bytes": 2164,
+    "sha256": "b2b0d240838b4ab0576b52d1bb013e71603cde0fe4d5b3c03dd9b609e50f365e",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetHttpServerTest.xml",
+    "bytes": 863,
+    "sha256": "eec50344deb809ff5ca753ea4334b516b4a770744f56b465f51d449141edc877",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetJsonBodyRequestTest.xml",
+    "bytes": 1829,
+    "sha256": "7f14f7d385bfa1e8f38d23088bcdf8ce850a295b00adc66ff34bb04f91d1b655",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetJsonBodyServerTest.xml",
+    "bytes": 1598,
+    "sha256": "0e5f03c7a33d550e018be13805a96affe0eef8ec349487bb536aa0763011cd81",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetRoutesTest.xml",
+    "bytes": 986,
+    "sha256": "f45c2f53d1b72117f0bf7aad22d7ca4cc2703f8b9c3a2efa9a3b8fb0747c1a81",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetScreensaverTest.xml",
+    "bytes": 1651,
+    "sha256": "e91abc7301d9406f105594d5819bcb509e6b58995ddb9a1aa6c584860caf1258",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetUpdateResultsTest.xml",
+    "bytes": 1777,
+    "sha256": "c01032d6532d47ebd64fcc4abedde1ee1c585dd242a5da74e5f30678bd2eed02",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetUploadRequestTest.xml",
+    "bytes": 1451,
+    "sha256": "25527f7f5145965201a6549729fa06496238d35545a80881f6fedc27ca2da182",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FleetUploadWriterTest.xml",
+    "bytes": 2187,
+    "sha256": "e639bfa02bbb17e8eb65a7a7239e3884e34dbeeb377790041731829ecf885609",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FramePerformanceCommandGateTest.xml",
+    "bytes": 917,
+    "sha256": "4f96e88fdf16915e7cba0f98596cffad3328bbdf60244d48efca6c1168fca522",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FramePerformanceHistogramTest.xml",
+    "bytes": 2608,
+    "sha256": "dd758966ae6e15d103f3ac4158d6ac9558cb687b24ef4e71bb1e8bb19dfa8ecb",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FramePerformanceRequestTest.xml",
+    "bytes": 1909,
+    "sha256": "6536e95d62e058e375f6f9a06c137aa81171dd6b7bc63f21577768cdb2e62d2b",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FramePerformanceSamplingDetailTest.xml",
+    "bytes": 1298,
+    "sha256": "ed69765e2cdd251a92f3fb8bf15a7e56cff62651cd184df4ff1a3ebd0e3e8898",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FramePerformanceSlowFramesTest.xml",
+    "bytes": 1149,
+    "sha256": "fa388594aff0edc96b969513fe5a0f5a4b34f640e7b9da0f0da2a5d87f31edf2",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.FramePerformanceStateReadTest.xml",
+    "bytes": 2510,
+    "sha256": "1c672c90634652820cad45470a9142ddd8e8a8f2f536c41f72445fe607941a5b",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.GalleryOverlayLayoutObserverTest.xml",
+    "bytes": 1138,
+    "sha256": "441d5c2d8c26712288d48b700d6624ab86cdab6e401ebf9d143c7cd1f35f7885",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.GoldenHourSchedulerTest.xml",
+    "bytes": 1232,
+    "sha256": "1a024272e43ecf4f5e000c114e6e47a791d0820fcde500db5110afb3a4e25a36",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.GoldenHourWorkTest.xml",
+    "bytes": 1948,
+    "sha256": "56059b4dfb20cdf458395e68ed14f2d4a42dae22a1568e5dce1110eed535784e",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HaClientTest.xml",
+    "bytes": 1399,
+    "sha256": "a61a548452d2ac33b693961fe29b20e4c3d3b030b42e90cdfe457b9b41d43fa6",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HaDashboardApiTest.xml",
+    "bytes": 1337,
+    "sha256": "d5c640a77ba4c9947f46e54e47d89ddf466525ed2c0e09d4142d4e0bd3d8c7b2",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HaDashboardModelTest.xml",
+    "bytes": 1318,
+    "sha256": "dbe0b260700c00c6d3707411963f645fb38f40872b26b6043c6c046cde7f1dd7",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HeadlessInstallerCleanupTest.xml",
+    "bytes": 1787,
+    "sha256": "183e782c007477ae91470d84cbf8eef5831b6574faf1b59ce1bfd4558b7e36bd",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeAlarmWidgetTimingTest.xml",
+    "bytes": 2230,
+    "sha256": "ad0134cdcb8be8acea4e76bdff2011a6704492768466a2f1cd3f01d11fa1eba4",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeAppIconPreparationTest.xml",
+    "bytes": 1729,
+    "sha256": "2aeccdfd8294fc6d37e99881a41d1221fba4e678788d038fe77361e75aa3146a",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeDashboardConfigTest.xml",
+    "bytes": 2003,
+    "sha256": "de8945dee163cdfa63c1abfaa36b023f805257c1a4c074a923bd0c06a4f2de46",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeDashboardLaunchTest.xml",
+    "bytes": 1051,
+    "sha256": "6daa3aa860bfba989ad8e6cbf053084fd007af47960b24057812fab8be513445",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeDashboardNavigationTest.xml",
+    "bytes": 502,
+    "sha256": "3f066fa70f3c352110cff97ad96608131c1aa101a20477bc4fa7528c8ac143bd",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeGridTest.xml",
+    "bytes": 1374,
+    "sha256": "ed17da51ff99ee321a1a14a1fa6b2b2eba7a5da6a2c70e2fb053b20c9a5e2789",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeNowPlayingListenerTest.xml",
+    "bytes": 1711,
+    "sha256": "de6ec14c3f6631501f81c029379a9ae8450bb2c377c65c46d64bca556e647f23",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomePhotoWarmCacheTest.xml",
+    "bytes": 1355,
+    "sha256": "d2fc5346ce6381f86de8290f426cc255adca823d063d1eff0fa71fa3471e5b70",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeUiDiagnosticsTest.xml",
+    "bytes": 5489,
+    "sha256": "18c25f32de3fe289a4a8822ba94ab6d5a53108c32b7b732d93223a8c5c0cf579",
+    "tests": 34,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeWidgetListeningTest.xml",
+    "bytes": 1827,
+    "sha256": "b4025c2a103b32fca4fed30a7471dec5964dbd5a1ffccad5a16b23915c0eec64",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeWidgetMutationTest.xml",
+    "bytes": 1589,
+    "sha256": "86780e149581c2aedf04bf85969c8fdd4bf60f058d1e23b7e3f295705c546368",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeWidgetSnapshotTest.xml",
+    "bytes": 1473,
+    "sha256": "4d4b6300aef839142f13fd28f9914e790cfadcc81685b8671e76b36ed2690c3b",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeWidgetStoreTest.xml",
+    "bytes": 829,
+    "sha256": "39cb42e3cb9ede33e7d7298e2d072f351ca948eee07fbfb54a340cd21fae989d",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HomeWorldClockFitTest.xml",
+    "bytes": 1530,
+    "sha256": "72677b36a030191f834f4f5a7e961dbb8fad3cf0abf03166b78fc946aa8b0ece",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.HttpErrorBodyTest.xml",
+    "bytes": 1689,
+    "sha256": "77413571f8c5fd41c60c6bb804ef7b5e5bfe14e2c77717e1785f2165a9056de0",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ImmichAlbumLoadTest.xml",
+    "bytes": 1423,
+    "sha256": "4c142312b054d283e974deea2053b9ac0a1312180e2b2f89161026c6cd5c47bd",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ImmichLibraryRecoveryTest.xml",
+    "bytes": 1027,
+    "sha256": "715c0e02e674e45ec9713fe8802e467729a2dfd10f0cf8cda3bfeb78ffcfe939",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ImmichPaginationTest.xml",
+    "bytes": 1978,
+    "sha256": "21538b37bc1047bf641abfe21ec132f31ae72b441abf0d3760b22e0232636723",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ImmichResponseBudgetTest.xml",
+    "bytes": 1223,
+    "sha256": "e7521fb666263f9915102f261ab50212a3809f909e43d4cdae0325ecd2cd26b0",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ImmichSourceTest.xml",
+    "bytes": 828,
+    "sha256": "a9ec6a294011d0adff59e78110dcf740eb4cc991d406a1ddcc8a92ab1141ee37",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ImmortalDreamNavigationTest.xml",
+    "bytes": 1235,
+    "sha256": "0f890bf98c26f0f86c75e3f9cb78de399c034ad49e06956d2b4c657a95e31cea",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ImmortalSettingsTest.xml",
+    "bytes": 1848,
+    "sha256": "89d560921f712c0f66e8353a5a7a4616aee344eac5a3232703f41662a362fa42",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.IncomingApkSnapshotTest.xml",
+    "bytes": 1737,
+    "sha256": "779e49bdc19c4e1cf4721d19dd0f17cafe44df5aeaa17c0e0a65d91d480a3ee4",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.InstallAutoConfirmWindowTest.xml",
+    "bytes": 1724,
+    "sha256": "ba3f0c017183c0cba3553bf2522d4db4d8aac4a870ae0719e27241d3f23e9442",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.InstallDaemonTest.xml",
+    "bytes": 1695,
+    "sha256": "219d4d264e172f5a0e48e15659e31dffd7b1e3b1aafde323b8019be0d378ce0e",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.InstallLifecycleTest.xml",
+    "bytes": 723,
+    "sha256": "68edbee9521ddd68e3213779e55584595f16516c76d5ed78f6cecb74102495fc",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.InstalledPackageVersionsTest.xml",
+    "bytes": 4210,
+    "sha256": "e38d68e7741e670314933aa5689d32bc60380b00a121f7397fd977881d9986a1",
+    "tests": 26,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.InstalledVoiceChoicesTest.xml",
+    "bytes": 1490,
+    "sha256": "b022b1a18ca312c12e53fd4d09cb15d1253f0a517a679a615822ee616943a793",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.InstallerNavigationTest.xml",
+    "bytes": 987,
+    "sha256": "c44749bdf5d2fbbec811aa94d8d47b378a32411680a02f791c372216a8203bdb",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.IssPassesTest.xml",
+    "bytes": 835,
+    "sha256": "c14486f32679829da01cc6d52da9374097cabffb4448e44386190fc5ac19f13b",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.IssPredictionOutcomeTest.xml",
+    "bytes": 931,
+    "sha256": "4cfd6f972a0b6c6275d1a0b97c27c40fdef99aca60412390b52a9c4e7af74a48",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.JarvisForegroundWakeTest.xml",
+    "bytes": 891,
+    "sha256": "72d1ab1f513a263c24c7a793bb33c8a0761e94fb3e9871af4407f6c647e782b0",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.JarvisPreparedLaunchTest.xml",
+    "bytes": 1318,
+    "sha256": "67840f2813e9d0a589f48db899812adc8cf1f3b9becf7dabc10ac6fa0697fdc3",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.LampNumberStepTest.xml",
+    "bytes": 1692,
+    "sha256": "fb37c35c1f481d46f5c2a82332c1135c8d4bf5fc331fbd26b435814350178f55",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.LanAudioPcmWriteTest.xml",
+    "bytes": 1649,
+    "sha256": "9bb1509574cef51583c91bd3407c290c7b8943c05e983667995057a07949abae",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.LanAudioSessionsTest.xml",
+    "bytes": 1667,
+    "sha256": "f88f3f9b6cccb38b39821ed9b8ee1505863fbbb665985b7c9497169a2aefdc9a",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.LegacyPhotoFocusBridgeTest.xml",
+    "bytes": 1050,
+    "sha256": "c4c2840323f77508e358247303643f13d2c137f5483100b7069e9eb2f2f0d8d5",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.LegacySlideshowPreparationTest.xml",
+    "bytes": 4057,
+    "sha256": "0ac6e63dbf8b81528f18f92dac499a401f780edf525925d411517cdde17723a7",
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.LegacySlideshowWarmupGateTest.xml",
+    "bytes": 3654,
+    "sha256": "363900f7c60cb4e9d3aaba00b3edfc1dba476b6c2c7ebae98a2cad367b3a2a97",
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.LocalMediaTest.xml",
+    "bytes": 689,
+    "sha256": "e2ed226821b920c2511cd766becb66654b95a8903d1ca0e1f4334f668bd99374",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.LocalMediaTraversalTest.xml",
+    "bytes": 2353,
+    "sha256": "307140b938ce9702146c68f3eb24af7d7cd58c246c99e3a51ad7c37145cd0489",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MaControlPlayerSelectionTest.xml",
+    "bytes": 2645,
+    "sha256": "5136232d51c7a1bcae6ca5caecfec6e412cfa874120cf533e2c670d30872954c",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MaLegacyAuthTest.xml",
+    "bytes": 1488,
+    "sha256": "1e2cd521fdd90c7927e52c077e3f4bc5d74a7c34c392fb73abdc6766622226aa",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MaMusicClientTest.xml",
+    "bytes": 5733,
+    "sha256": "8677179da5adf81f3764efed5556788766ff1781ef665ff22d62b355b745d13b",
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MaMusicProtocolTest.xml",
+    "bytes": 5843,
+    "sha256": "d69735e2144aa4812606eccd3f2fb219cbf583c8de1141c8da2b83a9d15478c9",
+    "tests": 37,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MaWebSocketTest.xml",
+    "bytes": 1570,
+    "sha256": "868be21c1c64ab0a888c4f44546409dece4c6e71cfabeb6494c17bdba3bdfff7",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MainThreadSampleChronologyIntegrationTest.xml",
+    "bytes": 1209,
+    "sha256": "f222fdf95cbb5b91e1d892c4f6086663af1379067604f10980cdb8d7b3f7fbe6",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MainThreadSampleHistogramTest.xml",
+    "bytes": 6649,
+    "sha256": "8a07456c35d721c3c781712ed4cfb603d9f7da96cb929f41c3db7257f768fcc2",
+    "tests": 39,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MainThreadSampleTimelineTest.xml",
+    "bytes": 2151,
+    "sha256": "5567fcec9723242c55f3ff4cb1e353313746620f29e571062ea7a4bf570b1357",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MediaArtTest.xml",
+    "bytes": 1464,
+    "sha256": "51c1f023c2e4fae4461b48a9d866e82a13b38034171ae18999a4e539cc75fbb3",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MediaCacheTest.xml",
+    "bytes": 1498,
+    "sha256": "89a443ad31a3953517615dcd77d83c3fb7fdbecc923afdfe95f8fb64e929aa56",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MediaCacheWriteFailureTest.xml",
+    "bytes": 1508,
+    "sha256": "2a7b59a6efddd42fb531205d283b27db354e9a7be66b214d4d0fabb3d7c7013c",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MediaSessionBufferingTest.xml",
+    "bytes": 1732,
+    "sha256": "a6060d4694d39a630787909b16e0dedc04f7f19ef7e67d866675b589c24b9449",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MediaSessionReaderTest.xml",
+    "bytes": 2037,
+    "sha256": "667ea07c27f9bb228cea14ae161edf8a8e01c8ae109a4a5878064ceb0234534b",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MetaPresenceDeliveryTest.xml",
+    "bytes": 1266,
+    "sha256": "a0981c07f63c430fc4f4d4083d8a17515e22cb536a0d8d7e188dd7ae7df6799e",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MetaPresenceTest.xml",
+    "bytes": 1934,
+    "sha256": "0cb0e47e4a0758855e8934951b449abd41fb92c0a1b9ff41d19edde8acab4bff",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MqttClientTest.xml",
+    "bytes": 810,
+    "sha256": "e7a957cfb5643a9aaf77ba1dc159121b65e693412d9ff9464ca88225d0fe7286",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MqttConnectionEditsTest.xml",
+    "bytes": 2500,
+    "sha256": "3d20b6c2fc146e9297de4fa2ecb747e60a69a17b81c27fcfa18490d992ad324b",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MqttNotifyPayloadTest.xml",
+    "bytes": 2106,
+    "sha256": "7c11b88e9420634e9b2c745016411271134655eb2c784a957bf46480833d96ca",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MultiRoomConnectionEditsTest.xml",
+    "bytes": 2126,
+    "sha256": "0588f0eea77ed113f8539411e4d84f8f393457cc63708d415d2a688c60a5b784",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MultiRoomNowPlayingTest.xml",
+    "bytes": 890,
+    "sha256": "0b0ad3aaafc2a6d7b6d7a3274660c66a7c6cdb0d96fed5fc9ee3f2f4148eaa1b",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MultiRoomServiceArtworkTest.xml",
+    "bytes": 1104,
+    "sha256": "0b3e023b888cae30b16252a6818c23de014d19c5b1575e44ba6dfeec178bb963",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicArtworkCancellationTest.xml",
+    "bytes": 643,
+    "sha256": "3071ef478a2f0699ac45c5c8fd1e92115ff54b9d84f47a45986e080e13c92026",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicArtworkDeliveryTest.xml",
+    "bytes": 782,
+    "sha256": "de6ba1da5017660be9ce093176c01896b2cc58849f062d0ab05035a00ce43815",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicArtworkPolicyTest.xml",
+    "bytes": 5889,
+    "sha256": "1eae280ddbbb54b5dc7d23565a0dc67abc4d7a8a730da6396f5e14ed9266f4a7",
+    "tests": 39,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicBrowseSearchTest.xml",
+    "bytes": 1193,
+    "sha256": "2da40c66d3b63f09c1d1d31d3b61142c29e96c61c4296feedee40be99cbeb600",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicConnectionSettingsTest.xml",
+    "bytes": 2196,
+    "sha256": "0141910c9d8e7ed5340939a02d5fa2764330edcdd32e5d592d74d9aac451cfc5",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicItemKeysTest.xml",
+    "bytes": 1381,
+    "sha256": "6dd2928bce36d7fc54aa120a27d2ac5f5776da2817cf3eab6fd28c24f6c5601f",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicLayoutPolicyTest.xml",
+    "bytes": 1311,
+    "sha256": "b024216ac6dc393352645007562b18df2576e7fdd836e0cb1dcf5e62dce3b5af",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicLocalArtworkTest.xml",
+    "bytes": 2131,
+    "sha256": "bcf77cd0159253ee01d8a344711f734586f11ee6c6fbde1c9d15ef9848c98203",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicLocalSessionBindingTest.xml",
+    "bytes": 1339,
+    "sha256": "d346f616dccafeed95774b56b03153d4b6f7fbef81eb596a8aca35c55d354065",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicMaDispatchTest.xml",
+    "bytes": 1890,
+    "sha256": "6e3f09aaac850ee8a3e64a747ba3db935dd2473e2a9add03a3902c40d9a4f0aa",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicPhotoPolicyTest.xml",
+    "bytes": 1289,
+    "sha256": "88ead0962b814eb72c349f659dbcbd5a6531300560748259d712ccb0d233a881",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicPhotoRetentionTest.xml",
+    "bytes": 910,
+    "sha256": "5f665ecf16683a43f10e8509f39c1997821c282c512dc7fed0eadde9a8999b53",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicPlayerStateTest.xml",
+    "bytes": 2330,
+    "sha256": "5d52efa212f0945c5eaefa4bd5a2e25b3d2d64214ee3892efc212ec6e92c6e63",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicPlayerStoreTest.xml",
+    "bytes": 2157,
+    "sha256": "fa84fafe871bff9ebe79ddc6e8a1b2bdf184f444f86715aa58380f057abdaaa4",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicQueuePresentationTest.xml",
+    "bytes": 1692,
+    "sha256": "892116c8938457ca81ab37720c4373e0d4d827be1d59324378867df70d94a1b2",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicReceiverClientTest.xml",
+    "bytes": 4021,
+    "sha256": "6d3dac18a7f66e8c6f4b04851320ffd99739928190d9f76ab77734bf8d6acce6",
+    "tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicReceiverProtocolTest.xml",
+    "bytes": 4835,
+    "sha256": "f6b7ca837b93db670b5c2ac631c5dcf9e22de79c90f9cdc17e0758e1d5d353b4",
+    "tests": 29,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicRemoteProtocolTest.xml",
+    "bytes": 6111,
+    "sha256": "c0f536b05fab1731a14eab55785edfab6fa522a91458c6e96db49d29cb2ca73d",
+    "tests": 40,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicRenderedActionTest.xml",
+    "bytes": 2482,
+    "sha256": "3d0bab80743bc161636e0b98b8d92421ae2bd3745e251e3493309c6d2e6ba74f",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicRoomPolicyTest.xml",
+    "bytes": 1424,
+    "sha256": "f0282c33825132c1983a107b9b4235a6005c1bcb3ef60002eebb77f3da3efece",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicRoomPresentationTest.xml",
+    "bytes": 1943,
+    "sha256": "119f3032ecf1e305e911cd33bba910b636cd8bba389d967d23f1e0f951e14d19",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicSessionLeaseTest.xml",
+    "bytes": 1130,
+    "sha256": "16109efdd841f3afffaefb0674e6a650e25bfa23c6b162ea52b591622c804946",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicSessionPolicyTest.xml",
+    "bytes": 1471,
+    "sha256": "98b27eda3ec1bf70a9cada736ec7f6a3f08e339fc9f5efdfcf36b6444cf68b96",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.MusicSessionTransportTest.xml",
+    "bytes": 1614,
+    "sha256": "1704d5632be4b955dae7ef4182b74057b36a2cd4233d06b94b675de375f0031f",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NativeCaptionOwnershipTest.xml",
+    "bytes": 1503,
+    "sha256": "be55d7c6af6ecad4fe591242b5e410f260407ef446f0f9d9b417f77e994f9a81",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NativeFilmstripDecodeTest.xml",
+    "bytes": 795,
+    "sha256": "ed3bf939900450382c361ba1630b11775a77133485fe1e3d22af7f877bb7f4af",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NativeFilmstripFileFormatTest.xml",
+    "bytes": 1405,
+    "sha256": "f3e244e8dbdd7f540c7c1966ef6cb0899395db35440765776fc505c1f236c918",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NativeFilmstripFormatTest.xml",
+    "bytes": 3876,
+    "sha256": "44d55e507dbcd34351088d7cec56d7d44fcef52a25d876e2eb094ae4f4c69ebe",
+    "tests": 25,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NativeFilmstripSelectionTest.xml",
+    "bytes": 1098,
+    "sha256": "9e4070a547151f6615b1b7b0d29d21c964df8a388835a8604f4c12bcf0f6486a",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NativeSettingsEditorTest.xml",
+    "bytes": 1702,
+    "sha256": "2a0e89111c4a4e6cfc3801948f0f956eef018fe9b2bd9c10176261152167df78",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NewsAtomLinkTest.xml",
+    "bytes": 1650,
+    "sha256": "438f2de67e835f25b7d89be99d92fce04f79cb695ad243f63305b2ce95db5c80",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NewsConfigIdentityTest.xml",
+    "bytes": 2003,
+    "sha256": "584145b7090623fcd3c102958bf105aaa8a58a1fab3ec3bc9aec1f77760447c3",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NewsFeedNumericEntityTest.xml",
+    "bytes": 1922,
+    "sha256": "0953045693494990d54dd3b2881c83d76dd92b4600cb74dde4ab15963dcc9a24",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NewsFeedTest.xml",
+    "bytes": 1060,
+    "sha256": "8771bce6306813bcf0c9c7f7d4bd7fb4da42cf581c0fe4c2597cbedd74d3e037",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NightBrightnessDeliveryTest.xml",
+    "bytes": 3226,
+    "sha256": "960bdcd49c2426fe842bb2e9cf021ce912400b127cdd832e653d92d5c79501b0",
+    "tests": 18,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NightBrightnessFadeTest.xml",
+    "bytes": 2541,
+    "sha256": "adfe4005dccdfb1517f0404d7d5ed0e36a6bb14463e2628d06c528ab4295f445",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NightClockTransitionTest.xml",
+    "bytes": 1227,
+    "sha256": "46c93772d282d1e2c66b5753e90afdcba7e3466fdd0286550ecc7795544862c6",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NightSettingsChangesTest.xml",
+    "bytes": 624,
+    "sha256": "ee5e0c817a87610685c514f93e8ee8bb6964aee41ed0eef648ff37c187e40ed2",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.NotificationBadgeSnapshotTest.xml",
+    "bytes": 2615,
+    "sha256": "42fc259b3cc92b979364427b77e0e48114a9553b30ce5874693b4b707056b2a8",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.OneShotSpeechOwnerTest.xml",
+    "bytes": 2197,
+    "sha256": "6a9794f4b1aa6ae375fbcdfe4af895c504e4fe181ac09ddab74a47960cd4673f",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.OptionsScannerTest.xml",
+    "bytes": 1106,
+    "sha256": "51db6fe703cb9973ace601e505ba4a56d2ab8de007f6f89087c8bc55f8a8f8c7",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PaperWidgetContrastTest.xml",
+    "bytes": 1535,
+    "sha256": "b31fe2da3ec90e8a28ffce41cb6ddd0a21d6063cbee2eb1839bb0ca307a55c64",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ParsedLayoutSnapshotTest.xml",
+    "bytes": 2048,
+    "sha256": "620e56fec72947a1ac6fd774f60403ff0474c4d2a91bc9396f34afdcb028ccd7",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PausableFrameCallbacksTest.xml",
+    "bytes": 5739,
+    "sha256": "cba45d0557ac20bf265ad5b68aea88ce6f7265b418a8bcacbfd4ec11bbba7a53",
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoCaptionDateValidityTest.xml",
+    "bytes": 2418,
+    "sha256": "8f670a7d0450fae27fcc316be3b4c9a35a50c69b9c5afc64cb24e61e6d49c3e7",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoCaptionTest.xml",
+    "bytes": 803,
+    "sha256": "cc12dc0c640e1def9dc42dd6728a54925f439fa93e9080c338820bde6f237e64",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoCaptionTimeZoneTest.xml",
+    "bytes": 1169,
+    "sha256": "12a23b75eb91ffd2e4121a7afcfb1683e6fa09a3a507dfcaec720da4adc91b00",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoDreamLifecycleTest.xml",
+    "bytes": 809,
+    "sha256": "eaefa266b2a267769e8312e05ee395af071aa7d8b80ba78dc86c143b62277281",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoFolderCheckTest.xml",
+    "bytes": 976,
+    "sha256": "976438c1ff9f3b19829a88276f5c2ab9bd4083d9e5d5051e62153733d4b3154c",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoFrameControllerTest.xml",
+    "bytes": 1401,
+    "sha256": "01455f12b660c74669720fd7588aeb1a1891dbc24fdc17b8d914c66764a48861",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoFrameSourceTest.xml",
+    "bytes": 845,
+    "sha256": "c32b835f02bdaadcfc6d8243b3bc49dc4911c074dbf56c5fff15d2a683b81b03",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoSourceHttpTest.xml",
+    "bytes": 2935,
+    "sha256": "1ee021ab83117fc5ffe1abc5648877ca1379521145bc1b3ac35558040052788e",
+    "tests": 18,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoSourceRedirectTest.xml",
+    "bytes": 2616,
+    "sha256": "9e4d40dbe136716679754f29151233fe15fa01ede1afcc592461353da0af5fc9",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PhotoSourceWorkTest.xml",
+    "bytes": 781,
+    "sha256": "bee52712752b8898db8a952edde363bd7cefd688824c2562f4be7a14726dde63",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PinForegroundReaderTest.xml",
+    "bytes": 3439,
+    "sha256": "9a1d54fe8aebb310a2b407ae9214eeace01ad6540c1d13c8422e87da020bf0e9",
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PinWindowReaderTest.xml",
+    "bytes": 3016,
+    "sha256": "1842ff0d03346ee68960bb862eb208a22c0ccc7764a769dd43d3c3be1cc69052",
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PinnedAppScreensaverTest.xml",
+    "bytes": 1973,
+    "sha256": "dc03573b90093cf9d9f5518ea08dc7b4ef72be9a8263c5b8ae47c530bff6fc74",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PinnedCoverPolicyTest.xml",
+    "bytes": 2286,
+    "sha256": "17f909f8f9c553659da379cbef0d6b3800e4e34d4ba67c10b61739684e513ed6",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PinnedDreamExitTest.xml",
+    "bytes": 901,
+    "sha256": "7308604aa00f05061e23c3902954489364ec73f19856062ca2e0170febcee48f",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PinnedNavigationRoutesTest.xml",
+    "bytes": 3173,
+    "sha256": "6d3e67f57b1429ab37c4bb6f6dff53191a707f0969cde4eaa27c63a7bcfa9d03",
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PinnedQuiescentReleaseTest.xml",
+    "bytes": 3557,
+    "sha256": "ffd30f468938a4ccde997dc26631b1ba3c749a26526f0abfffe67a68218d3578",
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PinnedSessionStateTest.xml",
+    "bytes": 1709,
+    "sha256": "a840ee5e16b9f255f73e2d5bf6727c5651e18a2a4b5bb72583c307f55d13a4e6",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PinnedSurfaceRetirementTest.xml",
+    "bytes": 2321,
+    "sha256": "6921b615b78514b8e95375ab1fb8d7fb742f1f231ef181e92fe9328402bfc0d2",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PortalAmbientExitSessionTest.xml",
+    "bytes": 2690,
+    "sha256": "dca357c1328ddd68039b0360634c9136172f83ab57a21ff1664b692cc46e2ed6",
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PortalHomeAmbientGuardTest.xml",
+    "bytes": 2612,
+    "sha256": "1cc82ab1f124c597cbfcfcf0589b8b7bd5a5b6e3b200b0376989e99fe70a1c77",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PortalHomeBridgePersistenceTest.xml",
+    "bytes": 1870,
+    "sha256": "c34a49e9e41a2614c21fffe48601d58dafd8c9a45b329131f865f1b3c84e5e62",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PortalHomeBridgeTest.xml",
+    "bytes": 1066,
+    "sha256": "a8d5200d3dc418f24f322b487aa060ec9fbb085819f6fff1fc87e68434bffb69",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PortalHomeHandoffRecoveryTest.xml",
+    "bytes": 1114,
+    "sha256": "075f228f3a64706e791ae6e3267e205840fa7a53edff128f89c8fb3bf2a5e107",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PrayerTimesNextLineTest.xml",
+    "bytes": 1963,
+    "sha256": "a92084d21966592b4b45322dc518ab0d7e904a80092af776e9d6cb9c51e4c5b8",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PresenceScreenStatePolicyTest.xml",
+    "bytes": 1819,
+    "sha256": "af796a544897b847c4e83d173a9b0eb0f1940e0071013691452923c76e8f3aa7",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PresenceStateTest.xml",
+    "bytes": 1020,
+    "sha256": "99bd108784185eae4915a3e37973f41b1a014fb5cd510e42f5ab5321b97df247",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.PrimeDigitalClockUpdatesTest.xml",
+    "bytes": 2731,
+    "sha256": "6d2b5109046e671754cec50fd33838b89e47e10d5beabee15f240d73f2092b4c",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ProducerCancellationCheckpointTest.xml",
+    "bytes": 1539,
+    "sha256": "9ff66016c4425f6c60da4d0b0c0e66f701c439d8e89ef01fab900314445f3160",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.QuickBarConfigObservationTest.xml",
+    "bytes": 1450,
+    "sha256": "be39ca25bbe91571daf5ba86825675771266f053a327210b99d314d31d286254",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.QuickBarRefreshTest.xml",
+    "bytes": 1123,
+    "sha256": "ed0b6e69918b19c71601e3b9e5f42472f0faa6fe793938d8e62129d2e545d549",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.QuietNightClockViewTest.xml",
+    "bytes": 1844,
+    "sha256": "7a3ca6da23b42b1f1cf1b6e401b9cd0eea8b03d2ff4523db857cff6e413f6d23",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RecentAppLabelCacheTest.xml",
+    "bytes": 1597,
+    "sha256": "0e5283384a9a2445bf3a256827bb73156754e8b58284676e22f3238b3ea265aa",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RecentAppUsageAccessTest.xml",
+    "bytes": 1776,
+    "sha256": "65f78fcbab9ec6f544afae595735c90312d73a0ee3ed7d2bf930ccbdde8597f9",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteAlbumResponseBudgetTest.xml",
+    "bytes": 958,
+    "sha256": "eee365bdd05dc393cdb018c5320f4d2e742d18ea12af20b5a03c12b6e91513a6",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteAlbumTest.xml",
+    "bytes": 2471,
+    "sha256": "90b467870c2ca13408eb07adddf0cf35b1f963125d3717a44de960ca35c5daef",
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteAlbumUrlValidationTest.xml",
+    "bytes": 4121,
+    "sha256": "3c0056b423ec47c7cbd49f2b3236c7c0921eb690f666a6da725341921a568f64",
+    "tests": 27,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteAppIconCacheTest.xml",
+    "bytes": 2129,
+    "sha256": "5ab0e800ad0247dad233044135983334455af8ae9a7aa170cb450c5bf75f6b8e",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteAppListInventoryTest.xml",
+    "bytes": 2037,
+    "sha256": "46051b50257e19c0bbb269c38576658341b0873ac8e6c952d0949480c6862254",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteAppsLaunchTest.xml",
+    "bytes": 1564,
+    "sha256": "8e8126a675973bee6af4a2e9e6c9e17a12fb4752d4a4e2a01406a9c1249fb56d",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteArtTest.xml",
+    "bytes": 763,
+    "sha256": "a9ef2822932c9844441dcbb64fa28b2fa2fd136dd18899d998ab8e322104279d",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCompanionHistoryTest.xml",
+    "bytes": 1294,
+    "sha256": "4b23b3332aa89464e6a7b43cdd6e4bae0dd94f777e135b09838a12c7a1482959",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCompanionInstallPolicyTest.xml",
+    "bytes": 1677,
+    "sha256": "0b0740230090b7854edfae2549caedc950bed920188caf3f3742686317af8c5d",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCompanionPhotoIndexTest.xml",
+    "bytes": 3499,
+    "sha256": "eb6c5909fc4c1d9a3c9746b39e18cd7d0fbe0857f20b5252bbae286e366905ca",
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCompanionPhotoTest.xml",
+    "bytes": 2245,
+    "sha256": "f1337095dcf274137e6f4106ff182fd2e75b046ef73f0094c7f50b7ad354c2df",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCompanionPolicyTest.xml",
+    "bytes": 4154,
+    "sha256": "c96e1d780cd045a0169e7c028719ef93971826694e08ee609c72ff9ebdbd4624",
+    "tests": 26,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCompanionRoutesTest.xml",
+    "bytes": 908,
+    "sha256": "62c6b77621ebcc3cdf034564265743d59d36df03d033f60ee42d57aaeae6bbc5",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCompanionSourcesTest.xml",
+    "bytes": 915,
+    "sha256": "17cc57caee0188ae885897156563da61335912d68327d8dabad90bf927f78d31",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCompanionStorageTest.xml",
+    "bytes": 1764,
+    "sha256": "7a891838bcdad218cef2f7b9469fcf25c44c262979c9f8702e3258c122050083",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCompanionUploadConcurrencyTest.xml",
+    "bytes": 1593,
+    "sha256": "bbb9bf2805a30cf689f846d6230db6846ea4934354319529cfa8295cbe8b97d2",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCursorStateTest.xml",
+    "bytes": 1039,
+    "sha256": "c281f05bb5993fc9e86b48e97a684355cf78c71ccf9e06132af1f927ac699357",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteCursorTest.xml",
+    "bytes": 1104,
+    "sha256": "803bf05813c930822f08bd04ac5a6fca363da00d3fb2e8fc250aaf20b6031ae5",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteDiscoveryGenerationTest.xml",
+    "bytes": 1794,
+    "sha256": "cdb7c062f240a7ecf46a7b8578f3ea9963e429cb985d8868a2bdffdbb682ca07",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteGestureCapabilityTest.xml",
+    "bytes": 1877,
+    "sha256": "f1ca254800cdecf4dc1af4c327fd90f9733525c78469b3056548dec1f813d5ca",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteInputNodeLifecycleTest.xml",
+    "bytes": 5070,
+    "sha256": "885aec7b9c364236a44b806f9b26fa20068a53ab155078f02fa5bcf28fdde736",
+    "tests": 28,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteInputTest.xml",
+    "bytes": 2307,
+    "sha256": "b5c4c371842b115b3ba5b703cf02020ef8f57309bc19f1c61ad1d49a2184e694",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteMediaTest.xml",
+    "bytes": 1230,
+    "sha256": "f663c33bb8d598cfb98a950d11b8227579e3a1373e82c727c14f1b34338152a2",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteNavigationActivityTest.xml",
+    "bytes": 4508,
+    "sha256": "a3474e9d1091b0d882de21b288db3d028a8c6b411937f42045ff322ec15b95fc",
+    "tests": 26,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemotePairingDisplayTest.xml",
+    "bytes": 1513,
+    "sha256": "7b8653bf97fdda096047ec7f5331d26c55d3d8ff53a6449be57a96a6f628d408",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemotePairingTest.xml",
+    "bytes": 1258,
+    "sha256": "58e622b48777dfdfd6d0478f98ac3450229c92702d9370d9ca12d2149c538b3b",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemotePhotoThumbnailCacheTest.xml",
+    "bytes": 1476,
+    "sha256": "9533ae4f31752fd7a7f11322ff542a636576133525b28ee875e6eb24ffc8899a",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemotePresetExecutionTest.xml",
+    "bytes": 1865,
+    "sha256": "27175bcde836d8bd7e3c2424fc5e97c6cad56088a238bf0664a27d51b919c56b",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemotePresetRoutesTest.xml",
+    "bytes": 1089,
+    "sha256": "b3343287c51412e2c8bd1744f6c3bb5785573a99edf6519ec30c9bc925ee0357",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemotePresetTrackedRunTest.xml",
+    "bytes": 1321,
+    "sha256": "0a0a63fc4dc39dec1899213ca659a070f6fe6e65c0c9b6c9bcecd0507a135097",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemotePresetsTest.xml",
+    "bytes": 1968,
+    "sha256": "79b82d56095ed449d594768a0fcd6cb130e4995764011415075fc33f7e7fa4fc",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteRosterTest.xml",
+    "bytes": 979,
+    "sha256": "da98bfa1b3386c8f545b27d9bb89935b1333fdbd61c3ab010b1c9b2d5c0b337a",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteRoutesNavigationTest.xml",
+    "bytes": 1027,
+    "sha256": "955e6341384991392cb4df9027dc36818eeaf27373d0dd20b68bf9b36b89cbaf",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteRoutesTest.xml",
+    "bytes": 914,
+    "sha256": "3d8dbc8e57fb719388f34f61ba8fa155277041b83447230a0827182027de91a8",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteSceneRevisionRoutesTest.xml",
+    "bytes": 1246,
+    "sha256": "6665d86df8182ef1a9980d8588ace65153d9a0debf7268dfe08b12feb5c52ce6",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteStaticAssetsTest.xml",
+    "bytes": 917,
+    "sha256": "15e6a1ff7596cf1c120f465628b58579080345dc5a48e69c1026801c1586ad89",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.RemoteVolumeTest.xml",
+    "bytes": 1851,
+    "sha256": "bf0f2718f297d71fd44e34bf80d244c9dca163b3c94afb8406cb4520d56e64f0",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ScreensaverAppInventoryTest.xml",
+    "bytes": 1123,
+    "sha256": "d7f2f97f1feec35fe2c70d897bed754728603f3b4d4eff37ae07d1e6f0a5899f",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ScreensaverConfigTest.xml",
+    "bytes": 1678,
+    "sha256": "70d543ca901628e3cdaadac4938d0ee0417709954dab8e8d5969bc5633499f5a",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ScreensaverSettingsWriteQueueTest.xml",
+    "bytes": 1129,
+    "sha256": "133841f316321d7958a67be6ca37968f5b958d1c058474842cd0025d76506fcc",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ScreensaverTouchRecoveryTest.xml",
+    "bytes": 1084,
+    "sha256": "3a23019b6b2c2f81fe33567d5b72a08c84be22a774ff651840647613078a5dd3",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SelfInstallDexMetadataTest.xml",
+    "bytes": 5142,
+    "sha256": "bd937d3bed2c3ef8845b9293be1fa313e2fc2bdd972629e7c68cd0e901509357",
+    "tests": 34,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ServiceArtworkLifecycleTest.xml",
+    "bytes": 1755,
+    "sha256": "c0ef68fb3ca749620f6be707fe5a295103a1d47834f762cc5aebd0702a554cd2",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingNavigationValueTest.xml",
+    "bytes": 1039,
+    "sha256": "5e61695855ffc0f5618114ab2017e8f292d83db21726b40f56ca326502f847a8",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsEntryCaptureTest.xml",
+    "bytes": 1928,
+    "sha256": "83b8e709472ead7642f9f7db9bc0b388ef6c7306d77adab7a9270572c732db52",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsEntryFirstDrawObservationTest.xml",
+    "bytes": 1456,
+    "sha256": "f9aedd675be24fc8f8dcc7b4a51243bcd64d6a07f31b5c42ae7efa5b35456b05",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsEntryTimelineTest.xml",
+    "bytes": 3948,
+    "sha256": "65601a40d5d4a915aa4be2efc936b33689cc5f9ae7b53c19ce864645c051920f",
+    "tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsIconCacheTest.xml",
+    "bytes": 1419,
+    "sha256": "3edc2da4b87c99f05dcdd04749f5ced05da0f6947bfb6a33ec306b54684dc311",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsNumberStepTest.xml",
+    "bytes": 745,
+    "sha256": "55c0be7c1075f9dfc411d069a38976d16d76630e8ffa08251cbec5c0d5109f9e",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsPaneWorkProbeTest.xml",
+    "bytes": 2240,
+    "sha256": "137c151022f2edb83de4e9e28d68098c35961937fac3cd1fa2da6bfcd43c84a7",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsPaneWorkSamplesTest.xml",
+    "bytes": 1754,
+    "sha256": "12f8bd3d47deb4f04e373b76dd4d270d46d18e0858b44ff2ef17393ae946af05",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsSearchPreparationCaptureTest.xml",
+    "bytes": 1834,
+    "sha256": "bac89b67de1725a857de3a5bd0776e71fca5bc737d4a633cd40dcfa68bdec253",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsSearchPreparationProbeTest.xml",
+    "bytes": 2009,
+    "sha256": "e9ba8adf69dfc3113b73ffdcd720a2b7b1b09491dc5beb827dde658e264aa340",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsSearchPreparationSamplesTest.xml",
+    "bytes": 1807,
+    "sha256": "c7fca7f6485869a6fb3314a49251f536fc3c5d494b11b365866eda338119e8bd",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsSidebarResourceTest.xml",
+    "bytes": 654,
+    "sha256": "c4510e9df47886bc166c5283caacc4084a31325ad6f96091c1ceb59c4f0cdb7a",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsSnapshotObservationTest.xml",
+    "bytes": 1526,
+    "sha256": "9f745c4484e9ad869b090289b01956759b7e51f5d6d08e48d7f45403d9b72127",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsUiProbePolicyTest.xml",
+    "bytes": 2982,
+    "sha256": "afd96ea58d46fcea22435b517b830ef6969b1f685a72d68bdcb85fc81d6db1f3",
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsUiWorkCaptureTest.xml",
+    "bytes": 2031,
+    "sha256": "5e8d89990569508a0302fea173219e68e22a665fa525b10973def68584f6c54f",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsUiWorkProbeTest.xml",
+    "bytes": 1601,
+    "sha256": "b2e140178a3e88d3b8d52ddd4cdfc324e961e9c2a22e13b2f7e7e386326e250f",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsUiWorkSamplesTest.xml",
+    "bytes": 1829,
+    "sha256": "d67e511261ccbe372cc817665736665796ee197665b0d05233183946345bb816",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SettingsVisibilityPreparationTest.xml",
+    "bytes": 2597,
+    "sha256": "e27ffb0cfc5ac8af19273aa1c9292a8d792727cb44f3f3ff34d0351f97672494",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SingleFlightValueCacheTest.xml",
+    "bytes": 2385,
+    "sha256": "c77e94852d1cbdda21e0882159ab233c0fbc6d472d492bbea099cb87db9d3867",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SkyColorsShortDayTest.xml",
+    "bytes": 1565,
+    "sha256": "4e9ac03ae51b737a8b28f902d74c205c4c6a866462d58268bfdb10dc676fe623",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SleepElapsedTimingTest.xml",
+    "bytes": 1382,
+    "sha256": "479285189cabd31c35c9a4870a7bd25a38b0332f3837c6f1af640d00d2e6922c",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SleepIdleReceiverTest.xml",
+    "bytes": 2097,
+    "sha256": "4fb2d95e0fdc558c02cea3b4731278c6f76418716d582a03ff073252a18bd50e",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SleepSchedulerTest.xml",
+    "bytes": 2021,
+    "sha256": "0b9de08de39e292d6fdf364a1b4412a3135faae47986d2615766c026fb48703d",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SleepTimerReceiverTest.xml",
+    "bytes": 1566,
+    "sha256": "c887b6de8d3ef1c3ac13bb051a47bbff48bfa35cf29b9cede58ea57f69771a91",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowDecodeBudgetTest.xml",
+    "bytes": 2093,
+    "sha256": "281ce04b221823a0335e7fb5ce1bd6a11068cf802719b711bc023588e7a4e157",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowDecoderTest.xml",
+    "bytes": 2033,
+    "sha256": "6906899f686b1230dbf99bdbe2b15b81778c0549112e30db6ed934ad17e6da4e",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowDissolvePauseTest.xml",
+    "bytes": 1501,
+    "sha256": "2323a73b6e01827b954f5bad009eb95068136768928eaf0bb8fc929cf52d4a5f",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowFaceCacheTest.xml",
+    "bytes": 2241,
+    "sha256": "96c55192c9223aaa37971410dc43df98ac97a5a94621b7115453826c205eb3aa",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowFaceMetadataTest.xml",
+    "bytes": 1935,
+    "sha256": "3355f946f8ef6b6e93a97fa23cbdb837070f51fa6d44b38ea957f9d8b3b74ddd",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowFaceOwnershipTest.xml",
+    "bytes": 1023,
+    "sha256": "7bfac29ccb659609425a79668a146c59173323b543830465bae2861e86e82b47",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowFramingTest.xml",
+    "bytes": 941,
+    "sha256": "06ed64f9e2dd5d6afbf772cfddbd4d97923f6ecb8bc246790047733e3cf6e215",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowGeometryTest.xml",
+    "bytes": 2645,
+    "sha256": "49c7f7a64a71a05506be6ef7d4a9a05ad43209ab5f625c378a6dd51167dfd103",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowNavigationTest.xml",
+    "bytes": 878,
+    "sha256": "59f3f7bf486fa35f2b675ad52ade9d8a8c6367bd0df06ddf0293205667c6ab52",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowOwnedSocketTest.xml",
+    "bytes": 626,
+    "sha256": "6fb8878ed904863501ee813baceeb975fddef2ec3f96c9a8db002af705b3574a",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowPhotoPauseTest.xml",
+    "bytes": 2625,
+    "sha256": "e55b714c7844b9ce9f6121b8125712c6dbc0d71645faf7162bff856e56b533f2",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowPixelBudgetTest.xml",
+    "bytes": 790,
+    "sha256": "8974c62e282d74748f60e9f9a0cfa1b3f6f79ed391eb2049166cdb2ef6751201",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowPreparedDeliveryTest.xml",
+    "bytes": 1292,
+    "sha256": "446b696d341dc573cd66cce0b457b7885c75ad3fd534c8824f743984930d5972",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowPresentationPolicyTest.xml",
+    "bytes": 4330,
+    "sha256": "24f73c55530c67d7ce8f8c954735518cc3d21b0098a33b9a5bdb169e02f9892f",
+    "tests": 25,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowRecoveryIntentTest.xml",
+    "bytes": 931,
+    "sha256": "a5b5824f84153f4911539428ce2e1f46d9a2fffa24a0d19f643d31f86f4f4e39",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowSourceDiscoveryTest.xml",
+    "bytes": 1610,
+    "sha256": "4cface3fe8df1c9ec7865b237234d2317dfbd5a4a22cf8fe505525f628c9fe34",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowSourceStartupTest.xml",
+    "bytes": 1875,
+    "sha256": "42c61063812e90948a8929b473efba3dd767b88e61741a0d3c544d44700a0d1e",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowStyleCaptureTest.xml",
+    "bytes": 3573,
+    "sha256": "c85afa2e49b8e9f355cdf574579957058fe139f96074d622a3562e56d7977fad",
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowStyleReporterTest.xml",
+    "bytes": 1206,
+    "sha256": "078e5902ced35603ba81736e7b7bed86ead32593621688f7b33679e4e1aa7590",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowStyleSamplesTest.xml",
+    "bytes": 1380,
+    "sha256": "d06ee105765868fcc1233fb3a4e5e5fcf3dab1875154647db1fe3bc3df77a86c",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowViewerControlsTest.xml",
+    "bytes": 772,
+    "sha256": "52b2f242c440ffbd0f3d3e32c075de849965b0108217aefc3d2e527367b79a2f",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowWorkCaptureTest.xml",
+    "bytes": 1707,
+    "sha256": "d483ce648441078ce17bcae9457df39d293bf686eaa8963e6dde06c916cc74b7",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowWorkProbeTest.xml",
+    "bytes": 2041,
+    "sha256": "b740c5c93064fe057a14958ed62cec091e54e3a493a55026264464e979cfbfd6",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowWorkSamplesTest.xml",
+    "bytes": 1818,
+    "sha256": "f416c2e5b65310a239c1415673dfd4ec70e9a4428ba7eedd8511b865b929642b",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SlideshowWorkTest.xml",
+    "bytes": 607,
+    "sha256": "314a8cde6b0c744b118003231d35d16c7c41fb43ebc6156802363c45312b99ee",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SmbSourceListingTest.xml",
+    "bytes": 1043,
+    "sha256": "902b50c9a0a99046dab45addc585c62b62d533aaedd8d62e6cd27f189b2ffcc8",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SnapcastConnectionOwnershipTest.xml",
+    "bytes": 1582,
+    "sha256": "7d8efca49f2cd2aad7a724332506da0aec82351748cf04eb43e783e0271c5c09",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SoundPreviewSessionTest.xml",
+    "bytes": 3314,
+    "sha256": "c57d5553bc6e937e1ce27345e2f6eaa227969714773da08cf828658a29435986",
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SoundscapeOwnershipTest.xml",
+    "bytes": 1453,
+    "sha256": "66c0b55a7530b2a263c13006fab0802102b258515841ec63b8c5b8ff2bf1769b",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SpeedTestPresentationTest.xml",
+    "bytes": 3191,
+    "sha256": "64ac57d7695d4b3238f3ca3cbf38deeca46eb91648dbe31e1944ca75a53f35d3",
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SplitFlapClockRevealTest.xml",
+    "bytes": 1073,
+    "sha256": "d329afdf84b88407b60ebdf08ef191055c7611ccbd34fa8169ee045122040a1e",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.StoreCatalogTest.xml",
+    "bytes": 2268,
+    "sha256": "ab67519641b4a6de1e3c80c152ee46a122073184028b4453e9272f696c2280e5",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.StoreMetadataHttpTest.xml",
+    "bytes": 3787,
+    "sha256": "9612e4db0a554f9f47c5a7845d4ff40be444ccdb0611f76deab1f538b98d992b",
+    "tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.StoreMetadataTransportTest.xml",
+    "bytes": 1496,
+    "sha256": "23a9c733ff35c70dfa41037b18bf4206e00b31fcebfd9836794edc06fb477340",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.StorePrimaryActionTest.xml",
+    "bytes": 1995,
+    "sha256": "fd8d913769953be4e9a7905f90d501221b439f993f894273f9e4373c4c035bd2",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.StoreUpdateSnapshotTest.xml",
+    "bytes": 2091,
+    "sha256": "c3611ed85dcf5e7a1f899ce51c08c9f63b3b8f7805e2d205b4786efda14491f1",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SunriseDaylightSchedulingTest.xml",
+    "bytes": 1716,
+    "sha256": "96b41bfde2659ce5403c688aae83c1e96744f4e353172c29908fe18eb1eac994",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SunriseReceiverDeliveryTest.xml",
+    "bytes": 1373,
+    "sha256": "176e784397bd4efb2a2ebfdb0a843c088d866993e46b480e776e7581d80f6b07",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SunriseSettingsWriteQueueTest.xml",
+    "bytes": 2921,
+    "sha256": "3cbb2ac1a207af9de1503cf47a60b9ee6f430a07542431611810894e6de55ff9",
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.SystemTouchSoundsLoadTest.xml",
+    "bytes": 1162,
+    "sha256": "467c399ac07bc68ef506cede6fa3272992715cfe2eb5f26ab4de0c063866975e",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.TimerConfigMutationTest.xml",
+    "bytes": 1903,
+    "sha256": "3c20f818ad376312b99e5bb481fc05ac71681af57a4b53e8b9987e4e7f632a4d",
+    "tests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.TimerReceiverDeliveryTest.xml",
+    "bytes": 1517,
+    "sha256": "5faf1ec2ecba63cccfd588cb58cf8b9daa57383ef0f85a41cfc408784c538ff9",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.TimerSchedulerIdentityTest.xml",
+    "bytes": 1365,
+    "sha256": "f04ee1d4011082581a310ea008779747bd25e83ecf66dcdc1766ef554584533a",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.TimerStoreTest.xml",
+    "bytes": 680,
+    "sha256": "31e3fbf3722ecce3988981fc308e61c8be9027686e0938afaced66693f452a48",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.TodayCalendarStateTest.xml",
+    "bytes": 2660,
+    "sha256": "5f4944e5089ad3775d052ebbce657b3983a1d51d0d6a4cb3f0f18ebf4b4395fb",
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.TodoStoreTest.xml",
+    "bytes": 2792,
+    "sha256": "ba010da0202385d6bee977b21a33982f63668a7773d6eadb0a144cd2a60024b1",
+    "tests": 18,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ToolsMemoStopCallbackTest.xml",
+    "bytes": 882,
+    "sha256": "a4d77e91d9b69452e91928f949c290f1d0526d002fe8f71b026d74e81ecb98b0",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ToolsPaneRetentionTest.xml",
+    "bytes": 775,
+    "sha256": "9e937cac798dac365a47e46f1560a1ca8f03da14116ab571b348134d1f449b7a",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ToolsRefreshGateTest.xml",
+    "bytes": 1566,
+    "sha256": "e6becce1c2c2834983e06188a76d91737a20a21561a653158a440f97ddebdf03",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ToolsWorkTest.xml",
+    "bytes": 2125,
+    "sha256": "cada59e36d4d12ab511bd91c6297a4969284bd787d1b4e05839b18dc8d70fdac",
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.UpdateManagerTest.xml",
+    "bytes": 936,
+    "sha256": "f3db7c6382264791fa98af5b355384370615f5a326130b4d9d1de8273d259c7e",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.UpdateManifestTransportTest.xml",
+    "bytes": 1636,
+    "sha256": "49c19b332dc7ea8e363d474ffb4261b83611531a02b649c10f3511171670ec95",
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.UserLayoutMutationTest.xml",
+    "bytes": 1717,
+    "sha256": "14bccc1437a8dd327e86d34db824aaa06a99e41d513ba69b1748594bc0c02cfb",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.UserLayoutTest.xml",
+    "bytes": 2676,
+    "sha256": "35e948b682522b17b1ed6ecde056ed7103c95bd1b2b454eeb3e95a2c2a42429a",
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.VideoExportOwnershipTest.xml",
+    "bytes": 929,
+    "sha256": "202e92527832b90b1f3a293176ba4ae50eb329cc0e65b8e1f06124e15818f4e6",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.VideoPlaybackRetentionTest.xml",
+    "bytes": 1064,
+    "sha256": "d917287238b5a1a153582da780bf00dba738b03a1e859400c86eabfdcc157158",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.VideoPositionCacheTest.xml",
+    "bytes": 613,
+    "sha256": "884479accc3f828c8dcb82a124db30440b55ce7a15acd541de41fbf83fea118c",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.VideoTranscoderTest.xml",
+    "bytes": 1071,
+    "sha256": "e0444fb3e514d0fbc4b2aae59fcfca49cfb30642d9f550f4767f8b53b7c8bbe0",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WallpaperPreviewsTest.xml",
+    "bytes": 1754,
+    "sha256": "bfcaf3a36191d83a5203bf727f2d319d8df7d3caf602d256339a44c4aa30b0cc",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WeatherTest.xml",
+    "bytes": 3097,
+    "sha256": "ca8507e00bd9de52dd692a301d8d60102981002f29cba3a73662056d316e39c7",
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WebAppContentRevealGateTest.xml",
+    "bytes": 2795,
+    "sha256": "6ed4b73f01796056147f5e3fca1b3aa3459f4fb41acff74f5f93e8fc93e01f6b",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WebAppEntryStateTest.xml",
+    "bytes": 751,
+    "sha256": "67d8f437687c80fe6afd0704a730151de8036d66890dca9dc795dbfa727e4575",
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WebAppLoadErrorPolicyTest.xml",
+    "bytes": 929,
+    "sha256": "bbd67d5787a8e52aa1f559239a7c153422eee17f3a71d01096953b364c631340",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WebAppOpeningGateTest.xml",
+    "bytes": 1473,
+    "sha256": "916a9c725264437bf42f93638174a9f93d6fa0ed837e19316a780bd4b9093459",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WebAppProbeTest.xml",
+    "bytes": 577,
+    "sha256": "62f68bd69276f960f3ae30514279d40b76af6c340b4295cec70e01d122631e5e",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WebPageUrlValidationTest.xml",
+    "bytes": 2686,
+    "sha256": "ff954f01e1252a0f698975f3e97b363a3492137482c701afc80f9ffd36c21efa",
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WebViewStartupConfigTest.xml",
+    "bytes": 681,
+    "sha256": "d706893aaaf0b5d105fbb5ee9e5b47a38613daae1bff64ca35248dda4af71a24",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WebViewStartupPreparationTest.xml",
+    "bytes": 5821,
+    "sha256": "f7e24dab838bf83c961c40c950b990e6e6227ee6238210562a36a16406ac8994",
+    "tests": 33,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WebViewStartupRelevanceTest.xml",
+    "bytes": 1140,
+    "sha256": "1588ab746b02171a12cec32aec5d979e53dea3beebfd48701c854b6200f77a08",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WelcomeDurationAdapterTest.xml",
+    "bytes": 1075,
+    "sha256": "1e1d21a83a641dabdb209537e352498083f8d4681f1fc2ab91fa743a9d11aad1",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.WidgetGridTest.xml",
+    "bytes": 447,
+    "sha256": "ce66d084393c7e36e4993db1883ae67c883f306cdd7d3c51880288804161704c",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.CalendarPackDomainTest.xml",
+    "bytes": 1600,
+    "sha256": "48dbafbe2bc86ad97857dbb2dae6275f7f13b4a2ec4d248d21ed1d6e87844a67",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.ClockTimeDomainsTest.xml",
+    "bytes": 638,
+    "sha256": "9e2d5f031a5fa43cc95655c3ae6e20d0a737e031f5ab8343a005e915cc48156a",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.ClockTimeSpecTest.xml",
+    "bytes": 661,
+    "sha256": "b48fac34e44d7673201836a57134cb451a99c57c5426176b5c8afdfc166eea37",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.EnumSettingValidationTest.xml",
+    "bytes": 2154,
+    "sha256": "92d0ec05096ffca502342ce0169d3b16f843644779157f1ec856abbc313ee45c",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.ExactIntegerSpecTest.xml",
+    "bytes": 2793,
+    "sha256": "3e274513e23e3bb2047781291b50b43c18153a685dd2361d0584969113f0bddb",
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.FleetSettingsTest.xml",
+    "bytes": 1009,
+    "sha256": "86ef83310e58ee7485b2fdd20df7ce3e47c450af2e6de8e50a4042e47fa3dbbd",
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.HomeDashboardDomainTest.xml",
+    "bytes": 1558,
+    "sha256": "36f0220f1c85a98803f9721a0e3840aafec9a7c2fcf9ce03a17624342fc53754",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.InactiveSettingsSchemaTest.xml",
+    "bytes": 1632,
+    "sha256": "4f685f0a214b342169fb3adccacb0a8779b28021541a15d0d4c3dca84fe9ae21",
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.NightClockSettingsTest.xml",
+    "bytes": 960,
+    "sha256": "50205692308050d68b3ad9d3244f0d24539c7270e06ee81397dd035cce3ff559",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.ScreensaverVisibilityParityTest.xml",
+    "bytes": 1053,
+    "sha256": "1782e213be7ccf88e90f8d4ff5f2a44af80facbd6f66eb97ef16d2032f98b57e",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.SettingSpecTest.xml",
+    "bytes": 581,
+    "sha256": "b11e4c3de5e026ebfd68917d3a2a4a78fc2e29b7dbd5a4c64447cc8039e6032e",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.SettingsDomainTest.xml",
+    "bytes": 4027,
+    "sha256": "2ae3eda57af50021c4805c1aa229ccf0c8719d7674f75794564dec32bd6f690f",
+    "tests": 25,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.SettingsPresentationTest.xml",
+    "bytes": 952,
+    "sha256": "815ba9302c8abb4a914213453430c0daaec93f34c385be1bb8b1fada4cf60ca4",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.SettingsSchemaRequestTest.xml",
+    "bytes": 1900,
+    "sha256": "a45ec632aa2344f2086f568fcc0f3f3f3e1b9e6c204857a5da67293aaca89b10",
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.settings.SlideshowSettingsPresentationTest.xml",
+    "bytes": 998,
+    "sha256": "3136fe9c7f6315666500741a6ebff00419d1c8bd605d203a455f2a554c56c71a",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "name": "TEST-com.immortal.launcher.ui.theme.ApprovedColorSchemeReuseTest.xml",
+    "bytes": 1264,
+    "sha256": "4e1544265b1734c1ff328c9b2e34553912ad0876e83d2b2df38c5c7193107449",
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+]

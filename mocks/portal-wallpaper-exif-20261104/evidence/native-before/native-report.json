@@ -1,0 +1,425 @@
+{
+  "sourceApkSha256": "26cc888c993fbca3682fa77cf9b0ac5447180f81c6675be44336ae8a9d65592d",
+  "actualApkClassOrigins": [
+    "WallpaperConfig",
+    "ScreensaverConfig",
+    "LocalMedia",
+    "SlideshowDecoder"
+  ],
+  "defaultsRestored": true,
+  "generatedInputsRemoved": true,
+  "retiredBitmaps": 8,
+  "tests": [
+    {
+      "name": "exif-1",
+      "inputSha256": "46ceb7906f293220eb63a0c7dc1d7a5de8d356b72f0204be51a0958d60e8dabc",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 360,
+      "expectedHeight": 240,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        }
+      ],
+      "cornersOk": true,
+      "png": "exif-1.png",
+      "pngSha256": "b0367e9b8d51175328bd154303c08fe4a02104ffbfcb3e05e4c7fedbe64e90c9",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": true
+    },
+    {
+      "name": "exif-2",
+      "inputSha256": "6fd6cf6ccd06c58f09c997f763e4792a7ca587f99e4c2ba3ae9c32f3ceefa673",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 360,
+      "expectedHeight": 240,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -52412,
+          "expected": -13378202,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -52412,
+          "ok": false
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -8909,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -8909,
+          "expected": -13412882,
+          "ok": false
+        }
+      ],
+      "cornersOk": false,
+      "png": "exif-2.png",
+      "pngSha256": "b0367e9b8d51175328bd154303c08fe4a02104ffbfcb3e05e4c7fedbe64e90c9",
+      "failure": "orientation_or_containment_assertion",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": false
+    },
+    {
+      "name": "exif-3",
+      "inputSha256": "ddcad9ec6a0b4582f8a1cb32cce893c5f804c51d1ef571188ca629b77a4fc5db",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 360,
+      "expectedHeight": 240,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -52412,
+          "expected": -8909,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -13412882,
+          "ok": false
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -13378202,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -8909,
+          "expected": -52412,
+          "ok": false
+        }
+      ],
+      "cornersOk": false,
+      "png": "exif-3.png",
+      "pngSha256": "b0367e9b8d51175328bd154303c08fe4a02104ffbfcb3e05e4c7fedbe64e90c9",
+      "failure": "orientation_or_containment_assertion",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": false
+    },
+    {
+      "name": "exif-4",
+      "inputSha256": "e802eb4d8ae9a5203872cf34a7e1e76c87100aa6931b78e74b86fc3a4d8fc80c",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 360,
+      "expectedHeight": 240,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -52412,
+          "expected": -13412882,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -8909,
+          "ok": false
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -52412,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -8909,
+          "expected": -13378202,
+          "ok": false
+        }
+      ],
+      "cornersOk": false,
+      "png": "exif-4.png",
+      "pngSha256": "b0367e9b8d51175328bd154303c08fe4a02104ffbfcb3e05e4c7fedbe64e90c9",
+      "failure": "orientation_or_containment_assertion",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": false
+    },
+    {
+      "name": "exif-5",
+      "inputSha256": "0a59886887570c7241ea75dc395da1b8bce08cc74ec3fe66f28a7fca21e3edf0",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 240,
+      "expectedHeight": 360,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -52412,
+          "expected": -52412,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -13412882,
+          "ok": false
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -13378202,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -8909,
+          "expected": -8909,
+          "ok": true
+        }
+      ],
+      "cornersOk": false,
+      "png": "exif-5.png",
+      "pngSha256": "b0367e9b8d51175328bd154303c08fe4a02104ffbfcb3e05e4c7fedbe64e90c9",
+      "failure": "orientation_or_containment_assertion",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": false
+    },
+    {
+      "name": "exif-6",
+      "inputSha256": "3a62f361f26fddf29fff15a16bcbac62bdae795d2fccceb25d9129b561cf6b32",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 240,
+      "expectedHeight": 360,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -52412,
+          "expected": -13412882,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -52412,
+          "ok": false
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -8909,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -8909,
+          "expected": -13378202,
+          "ok": false
+        }
+      ],
+      "cornersOk": false,
+      "png": "exif-6.png",
+      "pngSha256": "b0367e9b8d51175328bd154303c08fe4a02104ffbfcb3e05e4c7fedbe64e90c9",
+      "failure": "orientation_or_containment_assertion",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": false
+    },
+    {
+      "name": "exif-7",
+      "inputSha256": "f12b9e02649bf0c0b61a274de95d63adc76a79d067b30dde705bf1ffd91a2315",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 240,
+      "expectedHeight": 360,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -52412,
+          "expected": -8909,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -13378202,
+          "ok": true
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -13412882,
+          "ok": true
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -8909,
+          "expected": -52412,
+          "ok": false
+        }
+      ],
+      "cornersOk": false,
+      "png": "exif-7.png",
+      "pngSha256": "b0367e9b8d51175328bd154303c08fe4a02104ffbfcb3e05e4c7fedbe64e90c9",
+      "failure": "orientation_or_containment_assertion",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": false
+    },
+    {
+      "name": "exif-8",
+      "inputSha256": "cfd59487f9848bb733c658ef67904a4613eaf4d131c6850f559a39cfbfb4b8f7",
+      "width": 360,
+      "height": 240,
+      "expectedWidth": 240,
+      "expectedHeight": 360,
+      "pixels": [
+        {
+          "x": 30,
+          "y": 20,
+          "actual": -52412,
+          "expected": -13378202,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 20,
+          "actual": -13312666,
+          "expected": -8909,
+          "ok": false
+        },
+        {
+          "x": 30,
+          "y": 219,
+          "actual": -13413139,
+          "expected": -52412,
+          "ok": false
+        },
+        {
+          "x": 329,
+          "y": 219,
+          "actual": -8909,
+          "expected": -13412882,
+          "ok": false
+        }
+      ],
+      "cornersOk": false,
+      "png": "exif-8.png",
+      "pngSha256": "b0367e9b8d51175328bd154303c08fe4a02104ffbfcb3e05e4c7fedbe64e90c9",
+      "failure": "orientation_or_containment_assertion",
+      "context": {
+        "preferenceRequests": 1,
+        "writes": 0,
+        "unexpectedOperations": 0,
+        "fallbackAssetAttempts": 0,
+        "sourceRead": true,
+        "generatedFolderRead": true
+      },
+      "ok": false
+    }
+  ],
+  "channelTolerance": 12,
+  "sdk": 29,
+  "ok": false,
+  "handlerRetired": true
+}
