@@ -50,18 +50,21 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-cell.contain .ss-img { background-size: contain; background-repeat: no-repeat; animation: none; }
 
 /* framed print */
-.ss-room, .ss-art { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% -10%, #23231f 0%, #141414 45%, #0b0b0c 100%); }
+.ss-room, .ss-art { position: absolute; inset: 0; background: #ede9df url("photo-doodles.svg") repeat; background-size: 480px 360px; }
 .ss-art { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   opacity: 0; transition: opacity 2.4s cubic-bezier(0.16,1,0.3,1); }
 .ss-art.on { opacity: 1; }
 .ss-art.retired { opacity: 0; visibility: hidden; transition: none; }
 /* A slim edge follows the photo's measured aspect without a heavy mat on narrow portraits. */
-.ss-frameEdge { padding: 2px; background: linear-gradient(145deg, #2a2622, #4a3f34 40%, #1c1916); border-radius: 3px; box-shadow: 0 50px 100px -24px rgba(0,0,0,0.85); }
+.ss-frameEdge { padding: 2px; background: linear-gradient(145deg, #c7b79c, #a4957d 40%, #d4c7b1); border-radius: 3px; box-shadow: 0 10px 26px -12px rgba(58,48,34,.32); }
 .ss-mat { background: #f4f1ea; padding: 4px; border-radius: 2px; }
 .ss-bevel { overflow: hidden; box-shadow: inset 0 2px 6px rgba(0,0,0,0.28); background: #ddd; }
-.ss-print { display: block; background-size: cover; background-position: center; will-change: transform; animation: breathe 22s linear infinite alternate; }
+.ss-print { display: block; background-size: contain; background-position: center; will-change: auto; animation: none; }
+/* A subtle contained translation preserves every image edge, including cached face hints. */
+@keyframes paperPrintLift { from { transform: translateY(0); } to { transform: translateY(var(--paper-lift,-2px)); } }
 /* Each incoming scene covers the room and frame before the outgoing print retires. */
 .ss-art.retired .ss-print { animation-play-state: paused; will-change: auto; }
+.ss-art.retired .ss-frameEdge { animation-play-state: paused; will-change: auto; }
 @keyframes breathe { from { transform: scale(1.0); } to { transform: scale(1.06); } }
 
 /* gallery wall + mosaic + hero */
@@ -84,14 +87,16 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-img.panh { inset: auto; top: 0; left: 0; height: 100%; background-size: cover;
   animation: panH var(--d,20s) ease-in-out infinite alternate; }
 @keyframes panH { from { transform: translateX(0); } to { transform: translateX(var(--travel,-50%)); } }
-.ss-mcell::after { content:""; position:absolute; inset:0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35); pointer-events:none; }
+.ss-mcell { overflow: visible; border-radius: 0; box-shadow: none; }
 /* mosaic choreography: roaming spotlight (tiles themselves never move) */
 /* Spotlight is TRANSFORM-ONLY (a subtle lift) — animating `filter` re-rasterized all 9 moving tiles
    every beat, a recurring whole-wall stall on the weak GPU. */
 .ss-wall.spotlit .ss-mcell { transition: transform 1.2s ease; }
-.ss-wall.spotlit .ss-mcell.spot { transform: scale(1.02); z-index: 2; }
-.ss-wall.mosaic-wall, .mosaic-cell { background: #1c1b19; }
-.ss-mosaic-pane { position: absolute; inset: 0; opacity: 0; background: #1c1b19;
+.ss-wall.spotlit .ss-mcell.spot { transform: translateY(var(--paper-lift,-2px)); z-index: 2; }
+.ss-wall.mosaic-wall { background: #ede9df url("photo-doodles.svg") repeat; background-size: 480px 360px; }
+.mosaic-cell { background: transparent; }
+.ss-mosaic-pane { position: absolute; inset: 0; opacity: 0; background: #f4f1ea; border-radius: 3px;
+  box-shadow: 0 0 0 1px #baab91, 0 10px 26px -12px rgba(58,48,34,.32);
   transition: opacity 1.1s ease; }
 .ss-mosaic-pane.on { opacity: 1; }
 .ss-mosaic-pane.retired { opacity: 0; visibility: hidden; transition: none; }
@@ -171,3 +176,6 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 #chrome-time { font-size: 82px; font-weight: 200; letter-spacing: -3px; line-height: 1; }
 #chrome-date { font-size: 21px; font-weight: 300; opacity: .84; margin-top: 5px; }
 #chrome-mode { position: fixed; top: 42px; right: 56px; color: rgba(255,255,255,0.55); font-size: 15px; letter-spacing: 1px; z-index: 5; text-shadow: 0 1px 8px rgba(0,0,0,.5); }
+.photo-paper #chrome-scrim, .photo-paper #chrome-vignette { display: none; }
+.photo-paper #chrome-clock { color: #343a30; text-shadow: none; }
+.photo-paper #chrome-clock { padding: 12px; background: rgba(237,233,223,.92); border-radius: 12px; }

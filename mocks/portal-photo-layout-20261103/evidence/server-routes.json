@@ -1,0 +1,93 @@
+{
+  "cases": 19,
+  "results": [
+    {
+      "path": "/production/index.html",
+      "status": 200,
+      "sourceMatch": true
+    },
+    {
+      "path": "/production/styles.css",
+      "status": 200,
+      "sourceMatch": true
+    },
+    {
+      "path": "/production/photos.js",
+      "status": 200,
+      "sourceMatch": true
+    },
+    {
+      "path": "/production/lib-engine.js",
+      "status": 200,
+      "sourceMatch": true
+    },
+    {
+      "path": "/production/modes.js",
+      "status": 200,
+      "sourceMatch": true
+    },
+    {
+      "path": "/production/mode-impls.js",
+      "status": 200,
+      "sourceMatch": true
+    },
+    {
+      "path": "/production/scheduler.js",
+      "status": 200,
+      "sourceMatch": true
+    },
+    {
+      "path": "/production/photo-doodles.svg",
+      "status": 200,
+      "sourceMatch": true
+    },
+    {
+      "path": "/baseline-engine/styles.css",
+      "status": 200,
+      "historicalSourceMatch": true
+    },
+    {
+      "path": "/baseline-engine/lib-engine.js",
+      "status": 200,
+      "historicalSourceMatch": true
+    },
+    {
+      "path": "/baseline-engine/modes.js",
+      "status": 200,
+      "historicalSourceMatch": true
+    },
+    {
+      "path": "/baseline-engine/mode-impls.js",
+      "status": 200,
+      "historicalSourceMatch": true
+    },
+    {
+      "path": "/renderer.html",
+      "status": 200
+    },
+    {
+      "path": "/renderer-fixture.js",
+      "status": 200
+    },
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/app/build.gradle.kts",
+      "status": 404
+    },
+    {
+      "path": "/.git/config",
+      "status": 404
+    },
+    {
+      "path": "/provisioning/fleet.rs",
+      "status": 404
+    },
+    {
+      "path": "/production/no-such-file.js",
+      "status": 404
+    }
+  ]
+}

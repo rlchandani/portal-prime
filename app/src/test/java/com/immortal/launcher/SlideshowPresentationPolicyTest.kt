@@ -11,6 +11,12 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SlideshowPresentationPolicyTest {
+  @Test fun paperReservationsConvertWindowClockAndLocalCalendarToOneRootOrigin() {
+    assertEquals(listOf(Bounds(20, 40, 200, 160), Bounds(600, 500, 900, 700)),
+        SlideshowPresentationPolicy.paperOcclusions(30, 100,
+            listOf(Bounds(50, 140, 230, 260)), listOf(Bounds(600, 500, 900, 700))))
+  }
+
   @Test fun galleryMatteKeepsWholePhotoColorsWithoutAFullWidthClockScrim() {
     assertFalse(SlideshowPresentationPolicy.needsPhotoScrim(ScreensaverConfig.MODE_GALLERY_PRINT))
     assertFalse(SlideshowPresentationPolicy.needsPhotoScrim(ScreensaverConfig.MODE_GALLERY_SPREAD))

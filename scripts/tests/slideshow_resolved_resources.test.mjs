@@ -227,7 +227,7 @@ test('Memories: the sixth beat carries the three decoded collage resources', asy
 });
 
 test('Mosaic: exchanging two occupied tiles carries each corresponding prepared resource', async () => {
-  const r = fixture({ mode: 'mosaic', count: 9 });
+  const r = fixture({ mode: 'mosaic', count: 6 });
   try {
     r.start(); await r.drain();
     const before = r.writes.length;

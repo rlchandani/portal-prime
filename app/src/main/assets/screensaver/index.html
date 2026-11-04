@@ -147,11 +147,13 @@
     intervalSec: intervalSec(),
     photoMotion: photoMotion(),
     onMode: (_, modeId) => {
+      if (modeId === "framed" || modeId === "mosaic") paperSurface(true);
       // Code-defined style only, once per decoded promotion; optional diagnostics never stop playback.
       try {
         if (window.Android && window.Android.reportPresentedStyle) window.Android.reportPresentedStyle(modeId);
       } catch (_) {}
     },
+    onSettled: modeId => paperSurface(modeId === "framed" || modeId === "mosaic"),
     onReady: () => {
       document.getElementById("loading").classList.add("hide");
       if (!readyLogged) {
@@ -163,6 +165,13 @@
     },
   });
   if (requestedPause) engine.pause();
+  function paperSurface(enabled) {
+    // Keep native/standalone contrast until outgoing Paper pixels have actually retired.
+    try { if (document.body) document.body.classList.toggle("photo-paper", enabled); } catch (_) {}
+    try {
+      if (window.Android && window.Android.paperSurfaceChanged) window.Android.paperSurfaceChanged(enabled);
+    } catch (_) {}
+  }
 })();
 </script>
 </body>

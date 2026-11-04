@@ -443,26 +443,35 @@
       const root = el("ss-art retired"); const edge = el("ss-frameEdge", root); const mat = el("ss-mat", edge);
       const bevel = el("ss-bevel", mat); const photo = el("ss-print", bevel);
       photo.style.animation = "none"; photo.style.willChange = "auto";
-      return { root, photo, source: null };
+      return { root, edge, mat, photo, source: null };
     }
     const dissolve = makeSceneDissolve(ctx, t, arts.map(a => a.root), 2400, root => {
       const art = arts.find(a => a.root === root), photo = art.photo;
       art.source = null;
+      art.edge.style.animation = "none"; art.edge.style.willChange = "auto";
       photo.style.backgroundImage = "none"; photo.style.animation = "none";
       photo.style.willChange = "auto";
     });
     function printLimits() {
-      return { maxW: (ctx.root.clientWidth || ctx.W) * 0.6,
-        maxH: (ctx.root.clientHeight || ctx.H) * 0.72 };
+      const area = SS.photoLayoutArea(ctx);
+      const decoration = Math.min(6, area.w * .08, area.h * .08);
+      return { area, decoration, maxW: area.w - decoration * 2, maxH: area.h - decoration * 2 };
     }
-    function resizePrint(art, { maxW, maxH } = printLimits()) {
+    function resizePrint(art, { area, decoration, maxW, maxH } = printLimits()) {
       if (!art.source) return;
       const ar = aspect(art.source);
       let w = maxW, h = w / ar;
       if (h > maxH) { h = maxH; w = h * ar; }
-      const width = Math.round(w) + "px", height = Math.round(h) + "px";
+      const width = w + "px", height = h + "px";
       if (art.photo.style.width !== width) art.photo.style.width = width;
       if (art.photo.style.height !== height) art.photo.style.height = height;
+      art.edge.style.padding = decoration / 3 + "px";
+      art.mat.style.padding = decoration * 2 / 3 + "px";
+      art.edge.style.position = "absolute";
+      art.edge.style.left = area.x + (area.w - w - decoration * 2) / 2 + "px";
+      const top = area.y + (area.h - h - decoration * 2) / 2;
+      art.edge.style.top = top + "px";
+      art.edge.style.setProperty("--paper-lift", -Math.min(2, top) + "px");
     }
     // Keep admitted photos/resources; coalesce viewport events into one pausable frame.
     let resizePending = false;
@@ -485,12 +494,13 @@
       A.source = p; resizePrint(A);
       // Frame geometry already follows the photo's aspect. Cached face hints keep
       // the complete print still; do not introduce a focal crop or another decode.
-      bg(A.photo, u, ctx.photoMotion === false || hasFace(p) ? "contain" : "cover");
+      bg(A.photo, u, "contain");
       A.photo.style.animation = "none"; A.photo.style.willChange = "auto";
-      A.photo.style.animationDelay = (-Math.random() * 10) + "s";
+      A.edge.style.animation = "none"; A.edge.style.willChange = "auto";
+      A.edge.style.animationDelay = (-Math.random() * 10) + "s";
       if (ctx.photoMotion !== false && !hasFace(p)) {
-        A.photo.style.willChange = "transform";
-        void A.photo.offsetWidth; A.photo.style.animation = "";
+        A.edge.style.willChange = "transform";
+        A.edge.style.animation = "paperPrintLift 22s ease-in-out infinite alternate";
       }
       dissolve.present(root);
     }
@@ -843,15 +853,14 @@
     return cleanup;
   }};
 
-  // ---- 09 Mosaic wall (BSP, choreographed) -----------------------------------
-  // Keep the fixed BSP layout and in-place exchanges. The spotlight guides photo
-  // motion, so the wall never runs nine independent animations simultaneously.
+  // ---- 09 Mosaic wall (proportional whole photos, choreographed) -------------
+  // Invisible layout slots own two photo-sized frames. Decode/publication/retirement
+  // stays with the existing owners; a replacement reflows from its decoded shape.
   MODES.mosaic = { name: "Mosaic Wall", run(ctx, deck) {
     const t = makeTimers(ctx), wall = el("ss-wall spotlit mosaic-wall", ctx.root);
     let cells = [], disposed = false, paused = false, spot = -1;
-    function bsp(rect, n) { if (n <= 1) return [rect]; const k = Math.max(1, Math.round(n * (0.42 + Math.random() * 0.16))); const horiz = rect.w >= rect.h; const ratio = k / n; if (horiz) { const w1 = Math.round(rect.w * ratio); return bsp({ x: rect.x, y: rect.y, w: w1, h: rect.h }, k).concat(bsp({ x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }, n - k)); } const h1 = Math.round(rect.h * ratio); return bsp({ x: rect.x, y: rect.y, w: rect.w, h: h1 }, k).concat(bsp({ x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }, n - k)); }
     function applySpot(cell) {
-      cell.c.classList.toggle("spot", ctx.photoMotion !== false && cell.spot);
+      cell.c.classList.toggle("spot", ctx.photoMotion !== false && cell.spot && !hasFace(cell.photo));
       cell.layers.forEach(layer => {
         const active = cell.spot && layer.moves && !paused;
         layer.image.style.animationPlayState = active ? "running" : "paused";
@@ -866,45 +875,58 @@
         const pane = el("ss-mosaic-pane retired", c), image = el("ss-img mosaic-photo", pane);
         image.style.backgroundImage = "none"; image.style.animation = "none";
         image.style.willChange = "auto"; image.style.animationPlayState = "paused";
-        return { pane, image, moves: false };
+        return { pane, image, photo: null, moves: false };
       });
       const dissolve = makeSceneDissolve({ ...ctx, root: c }, t, layers.map(layer => layer.pane), 1100, pane => {
         const layer = layers.find(layer => layer.pane === pane);
         layer.image.style.backgroundImage = "none"; layer.image.style.animation = "none";
         layer.image.style.willChange = "auto"; layer.image.style.transform = "none";
-        layer.image.style.animationPlayState = "paused"; layer.moves = false;
+        layer.image.style.animationPlayState = "paused"; layer.moves = false; layer.photo = null;
       });
       return { c, rect, layers, dissolve, photo: null, spot: false };
     }
     function setImg(cell, p, url) {
       const pane = cell.dissolve.next(), layer = cell.layers.find(layer => layer.pane === pane), image = layer.image;
-      const W = cell.rect.w, H = cell.rect.h, rawAspect = aspect(p);
-      const ratio = Number.isFinite(rawAspect) && rawAspect > 0 ? rawAspect : W / H;
-      const plan = SS.fitPlan(ratio, W / H);
-      const mayMove = ctx.photoMotion !== false && !hasFace(p);
-      let width = W * .92, height = H * .92, left = W * .04, top = H * .04, travel = 0;
-      let animation = "cinematicDrift", axis = null;
-      if (mayMove && plan.mode === "panV") {
-        height = Math.min(H * 2, Math.max(H, W / ratio)); width = Math.min(W, height * ratio);
-        left = (W - width) / 2; top = 0; travel = (H - height) / height * 100;
-        animation = "panV"; axis = "translateY";
-      } else if (mayMove && plan.mode === "panH") {
-        width = Math.min(W * 2, Math.max(W, H * ratio)); height = Math.min(H, width / ratio);
-        left = 0; top = (H - height) / 2; travel = (W - width) / width * 100;
-        animation = "panH"; axis = "translateX";
-      }
-      image.className = "ss-img mosaic-photo " + (axis ? (plan.mode === "panV" ? "panv" : "panh") : "kb");
-      image.style.width = width + "px"; image.style.height = height + "px";
-      image.style.left = left + "px"; image.style.top = top + "px";
-      image.style.right = "auto"; image.style.bottom = "auto";
-      image.style.setProperty("--travel", travel + "%");
-      // A stopped pan must contain the whole photo, not retain its oversized crop.
-      bg(image, url, "contain"); layer.moves = mayMove;
-      image.style.animation = layer.moves ?
-        `${animation} ${Math.max(12000, ctx.motionMs)}ms ease-in-out infinite alternate` : "none";
+      layer.photo = p;
+      image.className = "ss-img mosaic-photo";
+      bg(image, url, "contain"); layer.moves = false;
+      image.style.animation = "none";
       image.style.transform = "none";
       cell.photo = p; applySpot(cell); cell.dissolve.present(pane);
     }
+    function reflow() {
+      if (disposed || !cells.length) return;
+      const area = SS.photoLayoutArea(ctx);
+      const boxes = SS.photoLayoutRows(cells.map(cell => cell.photo || {}), area.w, area.h,
+        Math.min(area.w, area.h) * .018);
+      cells.forEach((cell, i) => {
+        const rect = boxes[i]; cell.rect = rect;
+        cell.c.style.left = area.x + rect.x + "px"; cell.c.style.top = area.y + rect.y + "px";
+        cell.c.style.width = rect.w + "px"; cell.c.style.height = rect.h + "px";
+        cell.c.style.setProperty("--paper-lift", -Math.min(2, area.y + rect.y) + "px");
+        cell.layers.forEach(layer => {
+          if (!layer.photo) return;
+          const raw = aspect(layer.photo), ratio = Number.isFinite(raw) && raw > 0 ? raw : 1;
+          const edge = Math.min(6, rect.w * .08, rect.h * .08);
+          let w = rect.w - edge * 2, h = w / ratio;
+          if (h > rect.h - edge * 2) { h = rect.h - edge * 2; w = h * ratio; }
+          layer.pane.style.left = (rect.w - w - edge * 2) / 2 + "px";
+          layer.pane.style.top = (rect.h - h - edge * 2) / 2 + "px";
+          layer.pane.style.right = "auto"; layer.pane.style.bottom = "auto";
+          layer.pane.style.width = w + edge * 2 + "px"; layer.pane.style.height = h + edge * 2 + "px";
+          layer.image.style.left = edge + "px"; layer.image.style.top = edge + "px";
+          layer.image.style.right = "auto"; layer.image.style.bottom = "auto";
+          layer.image.style.width = w + "px"; layer.image.style.height = h + "px";
+        });
+      });
+    }
+    let resizePending = false;
+    function onResize() {
+      if (resizePending || disposed) return;
+      resizePending = true;
+      t.frame(() => { resizePending = false; reflow(); });
+    }
+    if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     function wantFor(cellA) { return cellA < 0.85 ? "portrait" : cellA > 1.8 ? "pano" : "landscape"; }
     function onWall() { return cells.map(x => x.photo && x.photo.seed).filter(Boolean); }
     async function prepare(pairs) {
@@ -913,14 +935,12 @@
       return t.publish(() => {
         if (disposed) return false;
         pairs.forEach((pair, i) => setImg(pair.cell, pair.photo, urls[i]));
+        reflow();
       });
     }
     async function build() {
-      const selected = [];
-      const slots = bsp({ x: 0, y: 0, w: ctx.W, h: ctx.H }, SS.slots(deck, 9)).map(rect => {
-        const photo = SS.take(deck, ctx.cursor, [wantFor(rect.w / rect.h)], selected)[0];
-        selected.push(photo.seed); return { rect, photo };
-      });
+      const selected = SS.take(deck, ctx.cursor, new Array(SS.slots(deck, 6)).fill("any"));
+      const slots = selected.map(photo => ({ rect: { x: 0, y: 0, w: 1, h: 1 }, photo }));
       if (await t.publish(() => {
         if (disposed) return false;
         slots.forEach(slot => { slot.cell = createCell(slot.rect); cells.push(slot.cell); });
@@ -951,10 +971,11 @@
       cells[spot].spot = true; applySpot(cells[spot]);
     }
     t.start(build);
-    if (SS.slots(deck, 9) > 1) { t.every(spotlight, ctx.ambientMs); t.every(swap, ctx.microMs); }
+    if (SS.slots(deck, 6) > 1) { t.every(spotlight, ctx.ambientMs); t.every(swap, ctx.microMs); }
     const cleanup = () => {
       if (disposed) return;
       disposed = true; t.cleanup(); cells.forEach(cell => cell.dissolve.cleanup());
+      if (typeof window.removeEventListener === "function") window.removeEventListener("resize", onResize);
       cells = []; wall.remove();
     };
     Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });

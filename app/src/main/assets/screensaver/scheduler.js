@@ -41,6 +41,7 @@
     }
     function finishFade() {
       dispose(outgoing); outgoing = null;
+      if (current && opts.onSettled) opts.onSettled(current.modeId);
       if (queued && !stopped && !paused) {
         const direction = queued; queued = null; advance(direction);
       }
@@ -62,6 +63,7 @@
       if (opts.onMode) opts.onMode(SS.MODES[scene.modeId].name, scene.modeId);
       if (opts.onReady) opts.onReady();
       if (outgoing) arm("fade", finishFade, XFADE_MS + 100);
+      else if (opts.onSettled) opts.onSettled(scene.modeId);
       if (!opts.mode || opts.mode === "shuffle") {
         arm("beat", () => advance("auto"), Math.max(SS.BEAT[scene.modeId] || intervalMs, intervalMs));
       }

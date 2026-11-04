@@ -46,15 +46,15 @@ function snapshot(r) {
 // Captured by executing the current source before adding the preference gates.
 // Pin geometry, publication order, CSS inputs and timers; matching two new paths alone
 // would miss a common regression in both. Coercions count the existing random selections.
-// Framed Print's approved slim mat and clipped zoom update its CSS inputs only.
+// Paper Framed/Mosaic intentionally update geometry, motion and CSS inputs; unrelated snapshots stay pinned.
 const legacyOutput = [
   ['kenBurns', 30, '1ec9a0c298c708acbc653e8987006355af4bea462fbe0e7606cba08f9666b675'],
   ['diptych', 12, '1306f202be7a187821287abc97d0bd6ab6664f761f9052081b157fa85fd116b0'],
-  ['framed', 6, 'c0ea1c6dcd90ac4d71a8e10d864368a1db0a0b7ac90b48c294d2d3895283b7d3'],
+  ['framed', 6, '95a97824d4030098e30c1d421b25d87e7611aae3115062474e9b72d1c7190551'],
   ['push', 0, 'fb2b28a70e305ae83268e4e5b933276258f6811750ee8ce4beecd602efe35e8c'],
   ['memories', 0, '6f642dfabcc126c561f90a9e0507820b53b5a9bcb6039c0e4facd602e388a1a3'],
   ['panorama', 0, '03a82e8bf80c00c8a1aeef2c9135a050a2b91c7df7ec75cd9e5bbf22d348cb1f'],
-  ['mosaic', 13, 'c5e69de053beac0b2dca4e947fdbcabdf5821604b187fb0f583361bd5d8983c7'],
+  ['mosaic', 5, '5bcac3423cd4bb7973e4727270c64e614f7b97aa91faddc197a07443e5b22434'],
   ['cinema', 0, '783c87acee8c1a3d2110c15410acd7ee9c178ded8627d5f2750051fee5f84700'],
   ['heroSidebar', 0, 'a2af06e42ebaffa3b7c5b71ec510db4365eb4613782ad3986374eb373ed5a96f'],
   ['galleryWall', 5, '15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702'],
@@ -118,11 +118,9 @@ for (const mode of allModes) {
 // Independent legacy expectations prevent both sides of the default comparison becoming still.
 for (const [mode, animation] of [
   ['kenBurns', /^kb var\(--motion-duration, 32400ms\) linear forwards$/],
-  ['framed', /^breathe 22s linear infinite alternate$/],
   ['push', /^cinematicDrift 5400ms linear forwards$/],
   ['memories', /^cinematicDrift 5400ms linear forwards$/],
   ['panorama', /^dolly 5000ms linear forwards$/],
-  ['mosaic', /^(panH|panV|cinematicDrift) 12000ms ease-in-out infinite alternate$/],
   ['cinema', /^cinematicDrift 5400ms linear forwards$/],
 ]) {
   test(`${mode}: the legacy default retains its existing photo animation`, async () => {
@@ -162,25 +160,24 @@ test('still Panorama centers its bounded crop on matte and preserves cached face
   }
 });
 
-test('still Mosaic contains mismatched photos without changing BSP geometry', async () => {
+test('still Mosaic contains complete photos while replacement proportions reflow', async () => {
   const r = fixture('mosaic', { photoMotion: false });
   try {
     await r.cleanup.ready;
     const cells = r.nodes().filter(node => node.classList.contains('ss-mcell'));
-    assert.equal(cells.length, 9);
-    const geometry = cells.map(cell => JSON.stringify(cell.style));
+    assert.equal(cells.length, 6);
     for (const image of photos(r)) {
       const cell = image.parent.parent, W = parseFloat(cell.style.width), H = parseFloat(cell.style.height);
       const width = parseFloat(image.style.width), height = parseFloat(image.style.height);
       const left = parseFloat(image.style.left), top = parseFloat(image.style.top);
       assert.ok(left >= 0 && top >= 0 && left + width <= W && top + height <= H);
       assert.equal(image.style.backgroundSize, 'contain');
-      assert.equal(r.computed(cell).background, '#1c1b19');
+      assert.equal(r.computed(cell).background, 'transparent');
       assert.equal(image.style.transform, 'none');
       still(r, image);
     }
     await r.advanceTo(7500);
-    assert.deepEqual(cells.map(cell => JSON.stringify(cell.style)), geometry);
+    assert.ok(cells.every(cell => parseFloat(cell.style.width) > 0 && parseFloat(cell.style.height) > 0));
   } finally { r.cleanup(); }
 });
 
@@ -212,8 +209,8 @@ test('still Framed Print keeps the complete upright portrait centered inside its
   try {
     await r.cleanup.ready;
     const image = photos(r)[0];
-    assert.equal(image.style.width, '648px');
-    assert.equal(image.style.height, '1037px');
+    assert.ok(Math.abs(parseFloat(image.style.width) - 729.6) < .001);
+    assert.ok(Math.abs(parseFloat(image.style.height) - 1167.36) < .001);
     assert.equal(image.style.backgroundSize, 'contain');
     assert.equal(image.style.backgroundPosition, 'center');
     assert.equal(r.computed(image.parent.parent).padding, '4px');

@@ -155,6 +155,7 @@ class PhotoFrameController(
   private var photoBackIsFront = false
   private lateinit var nativeStage: SlideshowStage
   private var galleryOverlayObserver: GalleryOverlayLayoutObserver? = null
+  @Volatile private var legacyPhotoLayoutBounds = "{}"
   private val pixelBudget = SlideshowPixelBudget()
   private val photoPause = SlideshowPhotoPause<List<SlideshowPhoto>>(
       onHeldChanged = { photos ->
@@ -472,7 +473,7 @@ class PhotoFrameController(
     // Build + drive the overlay from the user's selected face ([FaceCatalog]); faceOverride lets
     // the debug preview harness (and the overnight night clock) render a specific face instead.
     if (!photosOnly) faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
-    if (!photosOnly && isGalleryStyle()) {
+    if (!photosOnly) {
       galleryOverlayObserver?.close()
       galleryOverlayObserver = GalleryOverlayLayoutObserver(root, ::refreshGalleryOverlays).also {
         it.setActive(hostActive)
@@ -1020,6 +1021,16 @@ class PhotoFrameController(
                     // hardcoded ~9s step, so the user's interval actually takes effect in engine modes.
                     @android.webkit.JavascriptInterface fun getIntervalSec(): Int = intervalSec
                     @android.webkit.JavascriptInterface fun getPhotoMotion(): Boolean = photoMotion
+                    @android.webkit.JavascriptInterface fun getPhotoLayoutBounds(): String = legacyPhotoLayoutBounds
+                    @android.webkit.JavascriptInterface fun paperSurfaceChanged(enabled: Boolean) {
+                      if (photosOnly) return
+                      ui.post {
+                        if (!stopped && owner == legacyEngineRevision && webView === wv) {
+                          faceRenderer.setPaperPhotoSurface(enabled)
+                          refreshGalleryOverlays()
+                        }
+                      }
+                    }
                     @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
                     // Ready copies or opaque bounded requests; bridge calls never decode or wait.
                     @android.webkit.JavascriptInterface
@@ -1058,10 +1069,12 @@ class PhotoFrameController(
                   if (root.width > 0 && root.height > 0) FrameLayout.LayoutParams(root.width, root.height)
                   else FrameLayout.LayoutParams(MATCH, MATCH)
               root.addView(wv, engineParams())
+              refreshGalleryOverlays()
               val resize = View.OnLayoutChangeListener { _, l, t, r, b, ol, ot, or2, ob ->
                 if (!stopped && webView === wv &&
                     ((r - l) != (or2 - ol) || (b - t) != (ob - ot))) {
                   if (root.width > 0 && root.height > 0) wv.layoutParams = engineParams()
+                  refreshGalleryOverlays()
                 }
               }
               engineLayoutRoot = root
@@ -1207,6 +1220,8 @@ class PhotoFrameController(
     engineLayoutListener = null
     val owned = webView
     webView = null
+    legacyPhotoLayoutBounds = "{}"
+    if (faceRendererDelegate.isInitialized()) faceRenderer.setPaperPhotoSurface(false)
     owned?.let { wv ->
       if (engineActive) FramePerformanceCapture.markSlideshowWork(SlideshowWorkStage.ENGINE_RETIRED)
       runCatching { wv.onPause() }
@@ -2087,7 +2102,35 @@ class PhotoFrameController(
   }
 
   private fun refreshGalleryOverlays() {
-    if (stopped || !hostActive || !isGalleryStyle() ||
+    if (stopped || !hostActive) return
+    if (!photosOnly && faceRendererDelegate.isInitialized()) faceRenderer.refreshPaperPhotoSurface()
+    webView?.let { wv ->
+      val root = view
+      if (root.width > 0 && root.height > 0) {
+        val origin = IntArray(2)
+        root.getLocationInWindow(origin)
+        val bounds = org.json.JSONArray()
+        val clocks = if (photosOnly) emptyList() else faceRenderer.photoOcclusions().map { area ->
+          SlideshowPresentationPolicy.Bounds(area.left, area.top, area.right, area.bottom)
+        }
+        val calendar = if (this::calendarPanel.isInitialized &&
+            calendarPanel.visibility == View.VISIBLE && calendarPanel.width > 0) {
+          listOf(SlideshowPresentationPolicy.Bounds(calendarPanel.left - dp(20), calendarPanel.top - dp(20),
+              calendarPanel.right + dp(20), calendarPanel.bottom + dp(20)))
+        } else emptyList()
+        SlideshowPresentationPolicy.paperOcclusions(origin[0], origin[1], clocks, calendar).forEach { area ->
+          bounds.put(JSONObject().put("left", area.left).put("top", area.top)
+              .put("right", area.right).put("bottom", area.bottom))
+        }
+        val snapshot = JSONObject().put("width", root.width).put("height", root.height)
+            .put("occupied", bounds).toString()
+        if (legacyPhotoLayoutBounds != snapshot) {
+          legacyPhotoLayoutBounds = snapshot
+          wv.evaluateJavascript("window.dispatchEvent(new Event('resize'))", null)
+        }
+      }
+    }
+    if (!isGalleryStyle() ||
         !this::nativeStage.isInitialized || nativeStage.visibility != View.VISIBLE ||
         (this::viewerControls.isInitialized && viewerControls.isEditing)) return
     nativeStage.refreshGalleryOverlays(measuredNativeOcclusions())

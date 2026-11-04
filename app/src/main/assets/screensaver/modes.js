@@ -56,6 +56,81 @@
   const MODE_IDS = Object.keys(APPETITE);
 
   window.SS = window.SS || {};
+  // Paper layouts use a bounded measured reservation search in CSS pixels. The bridge
+  // publishes immutable window-pixel snapshots; never read Android views on its thread.
+  window.SS.photoLayoutArea = function (ctx) {
+    const W = Math.max(1, ctx.root.clientWidth || ctx.W), H = Math.max(1, ctx.root.clientHeight || ctx.H);
+    let occupied = null;
+    try {
+      const host = window.Android;
+      const raw = host && host.getPhotoLayoutBounds && host.getPhotoLayoutBounds();
+      const data = typeof raw === "string" && raw.length <= 16384 ? JSON.parse(raw) : null;
+      if (data && Number.isFinite(data.width) && data.width > 0 &&
+          Number.isFinite(data.height) && data.height > 0 &&
+          Array.isArray(data.occupied) && data.occupied.length <= 32 &&
+          data.occupied.every(r => ["left", "top", "right", "bottom"].every(k => Number.isFinite(r[k])) &&
+            r.left < r.right && r.top < r.bottom)) {
+        occupied = data.occupied.map(r => ({
+          x: Math.max(0, r.left * W / data.width), y: Math.max(0, r.top * H / data.height),
+          right: Math.min(W, r.right * W / data.width), bottom: Math.min(H, r.bottom * H / data.height),
+        }));
+      }
+    } catch (_) {}
+    // Standalone clock / unknown initial native geometry: reserve a modest lower strip.
+    let candidates = [{ x: 0, y: 0, w: W, h: occupied === null ? H - Math.min(H * .22, 180) : H }];
+    for (const r of occupied || []) {
+      if (r.x >= r.right || r.y >= r.bottom) continue;
+      candidates = candidates.flatMap(a => {
+        const right = a.x + a.w, bottom = a.y + a.h;
+        if (a.x >= r.right || right <= r.x || a.y >= r.bottom || bottom <= r.y) return [a];
+        return [
+          { x: a.x, y: a.y, w: a.w, h: Math.min(bottom, r.y) - a.y },
+          { x: a.x, y: Math.max(a.y, r.bottom), w: a.w, h: bottom - Math.max(a.y, r.bottom) },
+          { x: a.x, y: a.y, w: Math.min(right, r.x) - a.x, h: a.h },
+          { x: Math.max(a.x, r.right), y: a.y, w: right - Math.max(a.x, r.right), h: a.h },
+        ].filter(a => a.w > 0 && a.h > 0);
+      }).sort((a, b) => b.w * b.h - a.w * a.h).slice(0, 16);
+    }
+    const area = candidates[0] || { x: 0, y: 0, w: W, h: H };
+    const pad = Math.min(Math.min(W, H) * .028, area.w * .1, area.h * .1);
+    return { x: area.x + pad, y: area.y + pad, w: area.w - pad * 2, h: area.h - pad * 2 };
+  };
+  window.SS.photoLayoutRows = function (photos, width, height, rawGap) {
+    const selected = photos.slice(0, 6);
+    if (!selected.length) return [];
+    const ratios = selected.map(p => {
+      const a = p.w / p.h;
+      return Number.isFinite(a) && a > 0 ? a : 1;
+    });
+    const gap = Math.min(rawGap, width / (selected.length * 2), height / 6);
+    let best = null;
+    // Six photos admit at most 32 partitions. Small libraries also allow single-photo rows.
+    for (let mask = 0; mask < 1 << (selected.length - 1); mask++) {
+      const rows = [[]];
+      selected.forEach((_, i) => { rows[rows.length - 1].push(i); if (mask & (1 << i)) rows.push([]); });
+      if (rows.length > 3) continue;
+      const heights = rows.map(row => (width - (row.length - 1) * gap) /
+        row.reduce((sum, i) => sum + ratios[i], 0));
+      const total = heights.reduce((sum, h) => sum + h, 0) + (rows.length - 1) * gap;
+      const scale = Math.min(1, height / total);
+      const area = heights.reduce((sum, h, i) => sum + (width - (rows[i].length - 1) * gap) * h, 0);
+      const score = area * scale * scale / (1 + .035 * (Math.max(...heights) / Math.min(...heights) - 1));
+      if (!best || score > best.score) best = { rows, heights, total, scale, score };
+    }
+    const boxes = [];
+    let y = (height - best.total * best.scale) / 2;
+    best.rows.forEach((row, index) => {
+      const h = best.heights[index] * best.scale;
+      let x = (width - width * best.scale) / 2;
+      row.forEach(i => {
+        const w = h * ratios[i];
+        boxes[i] = { x, y, w, h };
+        x += w + gap * best.scale;
+      });
+      y += h + gap * best.scale;
+    });
+    return boxes;
+  };
   window.SS.bucket = bucket;
   window.SS.counts = counts;
   window.SS.APPETITE = APPETITE;

@@ -24,17 +24,17 @@ function released(image) {
   assert.equal(image.style.willChange, 'auto');
 }
 
-test('Mosaic preserves nine unique BSP tiles, each owning two fixed slots with an opaque first photo', async () => {
+test('Mosaic preserves six proportional tiles, each owning two fixed slots with an opaque first photo', async () => {
   const r = fixture();
   try {
     assert.equal(await r.cleanup.ready, true);
-    assert.equal(cells(r).length, 9);
-    assert.equal(r.prints().length, 18);
-    assert.equal(images(r).length, 9);
-    assert.equal(new Set(current(r).map(image => image.style.backgroundImage)).size, 9);
+    assert.equal(cells(r).length, 6);
+    assert.equal(r.prints().length, 12);
+    assert.equal(images(r).length, 6);
+    assert.equal(new Set(current(r).map(image => image.style.backgroundImage)).size, 6);
     assert.ok(cells(r).every(cell => cell.children.length === 2));
     assert.ok(current(r).every(image => r.slot(image).opacity() === 1));
-    assert.equal(r.resolutions.length, 9);
+    assert.equal(r.resolutions.length, 6);
   } finally { r.cleanup(); }
 });
 
@@ -45,7 +45,7 @@ test('Mosaic initial decode admits at most two photos at once rather than the en
     assert.equal(r.loads.length, 2);
     assert.equal(r.resolutions.length, 2);
     r.finishLoad(); await r.flush(); await r.cleanup.ready;
-    assert.equal(images(r).length, 9);
+    assert.equal(images(r).length, 6);
   } finally { r.cleanup(); }
 });
 
@@ -93,13 +93,13 @@ test('Mosaic still photos fit inside their tiles instead of freezing a cropped p
   }
 });
 
-test('the spotlight guides one active photo and visits every tile without reshaping the wall', async () => {
-  const r = fixture();
+test('the spotlight guides one complete frame and visits every tile between replacements', async () => {
+  const r = fixture({ photoMs: 600000 });
   try {
     await r.cleanup.ready;
     const geometry = cells(r).map(cell => JSON.stringify(cell.style));
     const visited = new Set();
-    for (let beat = 0; beat < 9; beat++) {
+    for (let beat = 0; beat < 6; beat++) {
       if (beat) await r.advanceTo(beat * 3500);
       const selected = cells(r).filter(cell => cell.classList.contains('spot'));
       assert.equal(selected.length, 1); visited.add(selected[0]);
@@ -107,7 +107,7 @@ test('the spotlight guides one active photo and visits every tile without reshap
       assert.ok(images(r).filter(image => image.style.willChange === 'transform').length <= 2);
       assert.deepEqual(cells(r).map(cell => JSON.stringify(cell.style)), geometry);
     }
-    assert.equal(visited.size, 9);
+    assert.equal(visited.size, 6);
   } finally { r.cleanup(); }
 });
 
@@ -124,13 +124,13 @@ test('an in-place replacement holds outgoing pixels, then clears its URL and pro
     assert.equal(outgoing.opacity(), 1);
     assert.ok(r.slot(replacement).opacity() > 0 && r.slot(replacement).opacity() < 1);
     await r.advanceTo(6100); r.end(replacement); released(old);
-    assert.equal(images(r).length, 9);
-    assert.equal(r.prints().length, 18);
+    assert.equal(images(r).length, 6);
+    assert.equal(r.prints().length, 12);
   } finally { r.cleanup(); }
 });
 
 test('full-library swaps exchange two photos atomically while retaining all unique current tile photos', async () => {
-  const r = fixture({ photos: photographs(9), changingUrls: true });
+  const r = fixture({ photos: photographs(6), changingUrls: true });
   try {
     await r.cleanup.ready;
     const before = new Map(cells(r).map(cell => [cell, cell.children.at(-1).children[0].style.backgroundImage]));
@@ -140,10 +140,10 @@ test('full-library swaps exchange two photos atomically while retaining all uniq
     const seed = url => /mosaic-\d+/.exec(url)[0];
     assert.equal(seed(changed[0].children.at(-1).children[0].style.backgroundImage), seed(before.get(changed[1])));
     assert.equal(seed(changed[1].children.at(-1).children[0].style.backgroundImage), seed(before.get(changed[0])));
-    assert.equal(new Set(current(r).map(image => seed(image.style.backgroundImage))).size, 9);
+    assert.equal(new Set(current(r).map(image => seed(image.style.backgroundImage))).size, 6);
     await r.advanceTo(6200);
-    assert.equal(images(r).length, 9);
-    assert.equal(r.prints().length, 18);
+    assert.equal(images(r).length, 6);
+    assert.equal(r.prints().length, 12);
   } finally { r.cleanup(); }
 });
 
@@ -160,20 +160,20 @@ test('Mosaic pause retains live fades and photo motion without timer or derivati
     assert.ok(images(r).every(image => r.state(image).playState === 'paused'));
     r.cleanup.resume(); await r.advanceTo(50600);
     current(r).forEach(image => r.end(image));
-    assert.equal(images(r).length, 9);
+    assert.equal(images(r).length, 6);
   } finally { r.cleanup(); }
 });
 
-test('rapid Mosaic exchanges keep nine cells/eighteen slots and at most two simultaneously moving photos', async () => {
+test('rapid Mosaic exchanges keep six cells/twelve slots and at most two simultaneously moving photos', async () => {
   const r = fixture({ photoMs: 500, ambientMs: 350 });
   try {
     await r.cleanup.ready;
     for (let beat = 1; beat <= 40; beat++) {
       await r.advanceTo(beat * 500);
-      assert.equal(cells(r).length, 9);
-      assert.equal(r.prints().length, 18);
+      assert.equal(cells(r).length, 6);
+      assert.equal(r.prints().length, 12);
       assert.ok(moving(r).length <= 2);
-      assert.ok(images(r).length <= 11);
+      assert.ok(images(r).length <= 8);
     }
   } finally { r.cleanup(); }
 });
@@ -227,7 +227,7 @@ for (const initial of [true, false]) {
         assert.equal(r.writes.length, writes);
         assert.equal(r.resolutions.length, requests);
         r.cleanup.resume(); await r.cleanup.ready; await r.flush();
-        assert.equal(current(r).length, 9);
+        assert.equal(current(r).length, 6);
       } finally { r.cleanup(); }
     }
   });

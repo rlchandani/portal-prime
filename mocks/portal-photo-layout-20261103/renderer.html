@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Immortal · implemented Paper photos</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#ede9df;color:#343a30;font:15px system-ui}
+  header{padding:14px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #cbc5b8}
+  strong{font-size:18px}label{display:flex;gap:8px;align-items:center}
+  select{font:inherit;padding:6px;background:#f9f7f1;border:1px solid #b8b09f;border-radius:6px;color:inherit}
+  small{display:block;padding:8px 20px}a{color:inherit}
+  iframe{display:block;width:100%;height:calc(100dvh - 130px);min-height:320px;border:0}
+</style>
+<header>
+  <strong>Paper photos</strong>
+  <label>Layout <select id="mode"><option value="mosaic">Photo wall</option><option value="framed">Single print</option></select></label>
+  <label>Photo <select id="photo"><option value="0">Landscape</option><option value="1">Portrait</option><option value="2">Square</option><option value="3">Panorama</option></select></label>
+  <label><input id="motion" type="checkbox"> Gentle motion</label>
+  <a href="/">Design comparison</a>
+</header>
+<small>Implemented renderer with local sample photos and a simulated clock. Portal appearance and performance still need device checks.</small>
+<iframe title="Implemented photo renderer" id="scene"></iframe>
+<script>
+  const mode = document.querySelector("#mode"), photo = document.querySelector("#photo");
+  const motion = document.querySelector("#motion"), scene = document.querySelector("#scene");
+  function render() {
+    photo.disabled = mode.value !== "framed";
+    scene.src = `/production/index.html?mode=${mode.value}&photo=${photo.value}&motion=${motion.checked ? 1 : 0}`;
+  }
+  [mode, photo, motion].forEach(control => control.addEventListener("change", render));
+  render();
+</script>
+</html>

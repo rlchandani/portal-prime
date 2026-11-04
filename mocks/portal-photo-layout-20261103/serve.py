@@ -1,4 +1,4 @@
-"""Serve only the photo review and four unchanged renderer files on localhost."""
+"""Serve the photo review and allowlisted production renderer assets on localhost."""
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -7,13 +7,30 @@ import argparse
 MOCK = Path(__file__).resolve().parent
 REPOSITORY = MOCK.parent.parent
 ENGINE = REPOSITORY / "app/src/main/assets/screensaver"
-ENGINE_FILES = {"styles.css", "lib-engine.js", "modes.js", "mode-impls.js"}
+ENGINE_FILES = {
+    "index.html", "styles.css", "photos.js", "lib-engine.js",
+    "modes.js", "mode-impls.js", "scheduler.js", "photo-doodles.svg",
+}
 
 
 class ReviewHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if urlsplit(self.path).path == "/production/index.html":
+            # Execute the actual entry point with an inert local host bridge.
+            source = (ENGINE / "index.html").read_text()
+            source = source.replace("<head>", '<head><script src="/renderer-fixture.js"></script>', 1)
+            body = source.encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        super().do_GET()
+
     def translate_path(self, path):
         clean = unquote(urlsplit(path).path)
-        if clean.startswith("/baseline/") and clean.count("/") == 2:
+        if clean.startswith("/production/") and clean.count("/") == 2:
             name = clean.split("/")[-1]
             if name in ENGINE_FILES:
                 return str(ENGINE / name)

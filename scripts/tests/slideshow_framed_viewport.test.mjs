@@ -27,14 +27,14 @@ test('Framed Print reflows the same decoded photo into a narrower live viewport 
   try {
     assert.equal(await r.cleanup.ready, true);
     const photo = r.incoming(), url = photo.style.backgroundImage;
-    assert.equal(photo.style.width, '1296px');
+    assert.equal(photo.style.width, '1751.04px');
     r.resize(800, 1440); await r.advanceTo(16);
     assert.equal(r.incoming(), photo);
-    assert.equal(photo.style.width, '480px');
-    assert.equal(photo.style.height, '320px');
+    assert.equal(photo.style.width, '743.2px');
+    assert.equal(photo.style.height, '495.4666666666667px');
     r.resize(2160, 1440); await r.advanceTo(32);
-    assert.equal(photo.style.width, '1296px');
-    assert.equal(photo.style.height, '864px');
+    assert.equal(photo.style.width, '1751.04px');
+    assert.equal(photo.style.height, '1167.36px');
     assert.equal(photo.style.backgroundImage, url);
     assert.equal(r.loads.length, 1, 'Reflow must not decode again');
     assert.equal(r.cursor.i, 1, 'Reflow must not advance the photo deck');
@@ -51,10 +51,10 @@ test('Framed Print coalesces a resize burst and defers covered-scene writes unti
     for (let w = 900; w >= 800; w--) r.resize(w, 1440);
     assert.equal(r.pending.size, baseline + 1, 'A burst owns only one animation frame');
     await r.advanceTo(1000);
-    assert.equal(photo.style.width, '1296px', 'A paused scene keeps its pixels untouched');
+    assert.equal(photo.style.width, '1751.04px', 'A paused scene keeps its pixels untouched');
     r.resize(700, 1440);
     r.cleanup.resume(); await r.advanceTo(1016);
-    assert.equal(photo.style.width, '420px', 'Resume uses the latest viewport');
+    assert.equal(photo.style.width, '648.8px', 'Resume uses the latest viewport');
     assert.equal(r.loads.length, 1);
   } finally { r.cleanup(); }
 });
@@ -65,7 +65,7 @@ test('Framed Print admits a pending decode at the current size and retires its r
   r.resize(800, 1440); await r.advanceTo(16);
   r.finishLoad(); assert.equal(await r.cleanup.ready, true);
   const photo = r.incoming();
-  assert.equal(photo.style.width, '480px');
+  assert.equal(photo.style.width, '743.2px');
   r.resize(600, 1440);
   r.cleanup();
   const width = photo.style.width, writes = r.writes.length;
@@ -83,8 +83,8 @@ test('Framed Print reflows both admitted layers while a dissolve is in progress'
     const layers = r.prints().filter(photo => photo.style.backgroundImage !== 'none');
     assert.equal(layers.length, 2);
     r.resize(800, 1440); await r.advanceTo(5016);
-    assert.deepEqual(layers.map(photo => photo.style.width), ['480px', '480px']);
-    assert.deepEqual(layers.map(photo => photo.style.height), ['320px', '720px']);
+    assert.deepEqual(layers.map(photo => photo.style.width), ['743.2px', '743.2px']);
+    assert.deepEqual(layers.map(photo => photo.style.height), ['495.4666666666667px', '1114.8000000000002px']);
     assert.equal(r.loads.length, 2);
   } finally { r.cleanup(); }
 });

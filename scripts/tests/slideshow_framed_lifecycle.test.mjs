@@ -16,9 +16,11 @@ function retired(r, print) {
   assert.equal(print.style.backgroundImage, 'none', 'Retirement releases the decoded image URL');
 }
 function breathing(r, print) {
-  assert.match(r.state(print).animation, /^breathe 22s linear infinite alternate$/);
-  assert.equal(r.state(print).promotion, 'transform');
-  assert.equal(r.state(print).playState, 'running');
+  const edge = r.computed(print.parent.parent.parent);
+  assert.equal(r.state(print).animation, 'none');
+  assert.match(edge.animation, /^paperPrintLift 22s ease-in-out infinite alternate$/);
+  assert.equal(edge['will-change'], 'transform');
+  assert.equal(edge['animation-play-state'] || 'running', 'running');
 }
 
 test('Cinematic Push shows an opaque whole photo without duplicate blurred layers', async () => {
@@ -110,7 +112,7 @@ test('Framed Print admits an opaque first scene and fades only incoming scenes o
     breathing(r, first);
     assert.equal(r.state(first).opacity, 1, 'Ready must mean fully opaque initial content');
     assert.equal(r.computed(r.slot(first)).background,
-      'radial-gradient(120% 80% at 50% -10%, #23231f 0%, #141414 45%, #0b0b0c 100%)',
+      '#ede9df url("photo-doodles.svg") repeat',
       'Each full-viewport scene must cover differently sized outgoing frames with the same room');
     assert.equal(r.computed(r.slot(first)).inset, '0');
     for (let swap = 1; swap <= 8; swap++) {
@@ -379,7 +381,8 @@ test('cached face hints show a whole still upright print; reused no-hint slots b
   try {
     await r.cleanup.ready;
     const first = r.incoming();
-    assert.equal(first.style.width, '648px'); assert.equal(first.style.height, '1037px');
+    assert.ok(Math.abs(parseFloat(first.style.width) - 729.6) < .001);
+    assert.ok(Math.abs(parseFloat(first.style.height) - 1167.36) < .001);
     assert.equal(r.state(first).animation, 'none');
     assert.equal(r.state(first).promotion, 'auto');
     assert.equal(first.style.backgroundSize, 'contain');
@@ -388,7 +391,8 @@ test('cached face hints show a whole still upright print; reused no-hint slots b
     assert.equal(r.computed(first.parent.parent.parent).padding, '2px');
     await r.advanceTo(5000);
     const second = r.incoming();
-    assert.equal(second.style.width, '1296px'); assert.equal(second.style.height, '810px');
+    assert.ok(Math.abs(parseFloat(second.style.width) - 1867.776) < .001);
+    assert.ok(Math.abs(parseFloat(second.style.height) - 1167.36) < .001);
     breathing(r, second);
     await r.advanceTo(10000);
     assert.equal(r.incoming(), first);

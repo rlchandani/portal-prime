@@ -51,6 +51,17 @@ internal object SlideshowPresentationPolicy {
   }
   data class Plan(val area: Bounds, val path: SlideshowGeometry.Motion)
 
+  /** Clock buckets are measured in window pixels; calendar bounds already belong to the root. */
+  fun paperOcclusions(
+      rootWindowX: Int, rootWindowY: Int, windowAreas: List<Bounds>, localAreas: List<Bounds>,
+  ): List<Bounds> {
+    val window = windowAreas.take(MAX_OCCLUSIONS + 1).map { area ->
+      Bounds(area.left - rootWindowX, area.top - rootWindowY,
+          area.right - rootWindowX, area.bottom - rootWindowY)
+    }
+    return window + localAreas.take((MAX_OCCLUSIONS + 1 - window.size).coerceAtLeast(0))
+  }
+
   fun galleryPrint(
       imageWidth: Int, imageHeight: Int, viewportWidth: Int, viewportHeight: Int,
       density: Float = 1f, occupied: List<Bounds> = emptyList(),

@@ -1,0 +1,670 @@
+{
+  "scope": "Local Paper production photo layout; no device install or publication",
+  "base": "d7e18bcb83248406cae0f151db634e3b9b0d9a81",
+  "issueClock": {
+    "startedAt": "2026-11-04T04:23:10Z",
+    "deadline": "2026-11-04T04:53:10Z"
+  },
+  "authorization": "User continuation after concrete reviewed design; recommended Paper selected",
+  "checks": {
+    "slideshow": 359,
+    "applicationJS": 743,
+    "JVM": 4359,
+    "JVMSuites": 453,
+    "JVMFailures": 0,
+    "JVMErrors": 0,
+    "JVMSkips": 0,
+    "assemble": "passed",
+    "exactBundledAssets": {
+      "index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+      "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136",
+      "scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "photos.js": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+    },
+    "productionBrowser": {
+      "browser": "156.0.8078.80",
+      "cases": 11,
+      "errors": [],
+      "results": [
+        {
+          "mode": "mosaic",
+          "w": 2160,
+          "h": 1440,
+          "paper": true,
+          "frames": [
+            {
+              "x": 55.8125,
+              "y": 40.3125,
+              "w": 2048.359375,
+              "h": 775.625
+            },
+            {
+              "x": 45.8125,
+              "y": 836.875,
+              "w": 371.796875,
+              "h": 371.796875
+            },
+            {
+              "x": 441.546875,
+              "y": 836.875,
+              "w": 553.390625,
+              "h": 371.796875
+            },
+            {
+              "x": 1018.90625,
+              "y": 839.875,
+              "w": 247.859375,
+              "h": 365.796875
+            },
+            {
+              "x": 1290.6875,
+              "y": 836.875,
+              "w": 551.6875,
+              "h": 371.796875
+            },
+            {
+              "x": 1866.3125,
+              "y": 839.875,
+              "w": 247.859375,
+              "h": 365.796875
+            }
+          ],
+          "photos": [
+            {
+              "x": 61.8125,
+              "y": 46.3125,
+              "w": 2036.359375,
+              "h": 763.625,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 51.8125,
+              "y": 842.875,
+              "w": 359.796875,
+              "h": 359.796875,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 447.546875,
+              "y": 842.875,
+              "w": 541.390625,
+              "h": 359.796875,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 1024.90625,
+              "y": 845.875,
+              "w": 235.859375,
+              "h": 353.796875,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 1296.6875,
+              "y": 842.875,
+              "w": 539.6875,
+              "h": 359.796875,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 1872.3125,
+              "y": 845.875,
+              "w": 235.859375,
+              "h": 353.796875,
+              "contain": "contain",
+              "animation": "none"
+            }
+          ],
+          "clock": {
+            "x": 56,
+            "y": 1261,
+            "w": 227.890625,
+            "h": 137
+          }
+        },
+        {
+          "mode": "framed",
+          "w": 2160,
+          "h": 1440,
+          "paper": true,
+          "frames": [
+            {
+              "x": 204,
+              "y": 40.3125,
+              "w": 1751.96875,
+              "h": 1168.359375
+            }
+          ],
+          "photos": [
+            {
+              "x": 210,
+              "y": 46.3125,
+              "w": 1739.96875,
+              "h": 1156.359375,
+              "contain": "contain",
+              "animation": "none"
+            }
+          ],
+          "clock": {
+            "x": 56,
+            "y": 1261,
+            "w": 227.890625,
+            "h": 137
+          }
+        },
+        {
+          "mode": "mosaic",
+          "w": 1280,
+          "h": 800,
+          "paper": true,
+          "frames": [
+            {
+              "x": 328.28125,
+              "y": 102.609375,
+              "w": 390.421875,
+              "h": 153.90625
+            },
+            {
+              "x": 742.296875,
+              "y": 102.609375,
+              "w": 153.90625,
+              "h": 153.90625
+            },
+            {
+              "x": 912.8125,
+              "y": 102.609375,
+              "w": 225.53125,
+              "h": 153.90625
+            },
+            {
+              "x": 1154.984375,
+              "y": 105.609375,
+              "w": 102.59375,
+              "h": 147.90625
+            },
+            {
+              "x": 321.28125,
+              "y": 270.109375,
+              "w": 634.875,
+              "h": 427.25
+            },
+            {
+              "x": 972.75,
+              "y": 273.109375,
+              "w": 284.828125,
+              "h": 421.25
+            }
+          ],
+          "photos": [
+            {
+              "x": 334.28125,
+              "y": 108.609375,
+              "w": 378.421875,
+              "h": 141.90625,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 748.296875,
+              "y": 108.609375,
+              "w": 141.90625,
+              "h": 141.90625,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 918.8125,
+              "y": 108.609375,
+              "w": 213.53125,
+              "h": 141.90625,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 1160.984375,
+              "y": 111.609375,
+              "w": 90.59375,
+              "h": 135.90625,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 327.28125,
+              "y": 276.109375,
+              "w": 622.875,
+              "h": 415.25,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 978.75,
+              "y": 279.109375,
+              "w": 272.828125,
+              "h": 409.25,
+              "contain": "contain",
+              "animation": "none"
+            }
+          ],
+          "clock": {
+            "x": 56,
+            "y": 621,
+            "w": 227.890625,
+            "h": 137
+          }
+        },
+        {
+          "mode": "framed",
+          "w": 1280,
+          "h": 800,
+          "paper": true,
+          "frames": [
+            {
+              "x": 318.28125,
+              "y": 85.859375,
+              "w": 939.296875,
+              "h": 628.265625
+            }
+          ],
+          "photos": [
+            {
+              "x": 324.28125,
+              "y": 91.859375,
+              "w": 927.296875,
+              "h": 616.265625,
+              "contain": "contain",
+              "animation": "none"
+            }
+          ],
+          "clock": {
+            "x": 56,
+            "y": 621,
+            "w": 227.890625,
+            "h": 137
+          }
+        },
+        {
+          "mode": "mosaic",
+          "w": 800,
+          "h": 1280,
+          "paper": true,
+          "frames": [
+            {
+              "x": 32.390625,
+              "y": 50.34375,
+              "w": 519.34375,
+              "h": 202.25
+            },
+            {
+              "x": 575.328125,
+              "y": 50.34375,
+              "w": 202.25,
+              "h": 202.25
+            },
+            {
+              "x": 25.40625,
+              "y": 266.203125,
+              "w": 749.140625,
+              "h": 501.890625
+            },
+            {
+              "x": 22.390625,
+              "y": 784.6875,
+              "w": 171.296875,
+              "h": 250.9375
+            },
+            {
+              "x": 210.28125,
+              "y": 781.6875,
+              "w": 379.40625,
+              "h": 256.9375
+            },
+            {
+              "x": 606.296875,
+              "y": 784.6875,
+              "w": 171.296875,
+              "h": 250.9375
+            }
+          ],
+          "photos": [
+            {
+              "x": 38.390625,
+              "y": 56.34375,
+              "w": 507.34375,
+              "h": 190.25,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 581.328125,
+              "y": 56.34375,
+              "w": 190.25,
+              "h": 190.25,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 31.40625,
+              "y": 272.203125,
+              "w": 737.140625,
+              "h": 489.890625,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 28.390625,
+              "y": 790.6875,
+              "w": 159.296875,
+              "h": 238.9375,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 216.28125,
+              "y": 787.6875,
+              "w": 367.40625,
+              "h": 244.9375,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 612.296875,
+              "y": 790.6875,
+              "w": 159.296875,
+              "h": 238.9375,
+              "contain": "contain",
+              "animation": "none"
+            }
+          ],
+          "clock": {
+            "x": 56,
+            "y": 1101,
+            "w": 227.890625,
+            "h": 137
+          }
+        },
+        {
+          "mode": "framed",
+          "w": 800,
+          "h": 1280,
+          "paper": true,
+          "frames": [
+            {
+              "x": 22.390625,
+              "y": 291.53125,
+              "w": 755.1875,
+              "h": 505.90625
+            }
+          ],
+          "photos": [
+            {
+              "x": 28.390625,
+              "y": 297.53125,
+              "w": 743.1875,
+              "h": 493.90625,
+              "contain": "contain",
+              "animation": "none"
+            }
+          ],
+          "clock": {
+            "x": 56,
+            "y": 1101,
+            "w": 227.890625,
+            "h": 137
+          }
+        },
+        {
+          "mode": "mosaic",
+          "w": 320,
+          "h": 480,
+          "paper": true,
+          "frames": [
+            {
+              "x": 51.265625,
+              "y": 8.953125,
+              "w": 217.4375,
+              "h": 89.03125
+            },
+            {
+              "x": 41.265625,
+              "y": 101.828125,
+              "w": 93.265625,
+              "h": 93.265625
+            },
+            {
+              "x": 141.390625,
+              "y": 101.828125,
+              "w": 134.28125,
+              "h": 93.265625
+            },
+            {
+              "x": 41.265625,
+              "y": 201.09375,
+              "w": 54.0625,
+              "h": 76.765625
+            },
+            {
+              "x": 102.171875,
+              "y": 198.9375,
+              "w": 115.640625,
+              "h": 81.09375
+            },
+            {
+              "x": 224.65625,
+              "y": 201.09375,
+              "w": 54.0625,
+              "h": 76.765625
+            }
+          ],
+          "photos": [
+            {
+              "x": 57.265625,
+              "y": 14.953125,
+              "w": 205.4375,
+              "h": 77.03125,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 47.265625,
+              "y": 107.828125,
+              "w": 81.265625,
+              "h": 81.265625,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 147.390625,
+              "y": 107.828125,
+              "w": 122.28125,
+              "h": 81.265625,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 45.578125,
+              "y": 205.40625,
+              "w": 45.40625,
+              "h": 68.109375,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 108.171875,
+              "y": 204.9375,
+              "w": 103.640625,
+              "h": 69.09375,
+              "contain": "contain",
+              "animation": "none"
+            },
+            {
+              "x": 228.96875,
+              "y": 205.40625,
+              "w": 45.40625,
+              "h": 68.109375,
+              "contain": "contain",
+              "animation": "none"
+            }
+          ],
+          "clock": {
+            "x": 56,
+            "y": 301,
+            "w": 227.890625,
+            "h": 137
+          }
+        },
+        {
+          "mode": "framed",
+          "w": 320,
+          "h": 480,
+          "paper": true,
+          "frames": [
+            {
+              "x": 8.953125,
+              "y": 42.09375,
+              "w": 302.078125,
+              "h": 204.78125
+            }
+          ],
+          "photos": [
+            {
+              "x": 14.953125,
+              "y": 48.09375,
+              "w": 290.078125,
+              "h": 192.78125,
+              "contain": "contain",
+              "animation": "none"
+            }
+          ],
+          "clock": {
+            "x": 56,
+            "y": 301,
+            "w": 227.890625,
+            "h": 137
+          }
+        },
+        {
+          "mode": "framed",
+          "photo": 1,
+          "motion": {
+            "image": "none",
+            "edge": "paperPrintLift"
+          }
+        },
+        {
+          "mode": "framed",
+          "photo": 2,
+          "motion": {
+            "image": "none",
+            "edge": "paperPrintLift"
+          }
+        },
+        {
+          "mode": "framed",
+          "photo": 3,
+          "motion": {
+            "image": "none",
+            "edge": "paperPrintLift"
+          }
+        }
+      ]
+    },
+    "previewControls": {
+      "controlCases": 4,
+      "errors": []
+    },
+    "routes": 19,
+    "independentFocusedCases": 163,
+    "independentReview": "No remaining blocking finding",
+    "strictDocs": "passed",
+    "serverSyntax": "passed",
+    "fixtureSyntax": "passed",
+    "whitespace": "passed"
+  },
+  "apk": {
+    "bytes": 51358523,
+    "sha256": "c5a2249d503e0dcf1ec634292e5df260f44dd0d0ef624764c263a7a7482029ba"
+  },
+  "protectedBaseHashes": {
+    "version.json": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+    "catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+    "app/build.gradle.kts": "ade7cb9cff9a2210bcefd48dc4a49ca2ad5873759ac3b6c977936f40ea97c049",
+    "app/src/main/AndroidManifest.xml": "f5623647efe5d0bb8b1fcd4bf59a6fd7522c11902d6f1573497e0e6cb1d5904e",
+    "provisioning/fleet.rs": "d4f7664bade9149eba4679935f4e983d933fd0359bc98b3f8f9db074b6d66544",
+    "provisioning/provision.sh": "75fac8842c3e942e2cb8c401a1b0afd7ad726c538879a2101c1aceae54981b4f",
+    "provisioning/provision.ps1": "e7973d24466b480b50ae7a2cb0db1feb1a0382b6fb1a064a464a9535adb9a19f",
+    "app/src/main/assets/catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+  },
+  "trackedScopeCheck": "All tracked differences are in this unit allowlist; other tracked files unchanged from base",
+  "roadmap": {
+    "tasks": 119,
+    "statuses": {
+      "verified": 38,
+      "delivered": 71,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "other118ObjectsAndRawSuffixPreserved": true,
+    "defaultTask": "weather-native-layout"
+  },
+  "rulings": [
+    "Use recommended Paper from continuation; reversible direction before delivery.",
+    "Replace crop/zoom with bounded complete-frame lift; motion becomes subtler."
+  ],
+  "excludedAttempts": [
+    "Hidden-element visibility wait timed out; corrected attached/class readiness.",
+    "Browser snapshot used x/y/w/h instead of left/top/right/bottom; corrected inert fixture and backing refresh.",
+    "Missing new native helper initially failed compilation; no native-pixel RED claim.",
+    "Initial shell-owned Gradle process had no completed result; fresh retained run used instead."
+  ],
+  "limits": [
+    "No installed version change, Portal/phone operation, live media transfer, provider/account action or publication.",
+    "Android 9/10 WebView, custom dark/gradient native clock contrast, density, burn-in and Portal performance unverified.",
+    "Browser replacements and pause ownership covered by deterministic Node fixtures; raster cases cover settled geometry.",
+    "Historical design receipt remains separate; comparison baseline frozen at d7e18bcb."
+  ],
+  "sourceHashes": {
+    "app/src/main/assets/screensaver/index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+    "app/src/main/assets/screensaver/mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136",
+    "app/src/main/assets/screensaver/modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+    "app/src/main/assets/screensaver/scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+    "app/src/main/assets/screensaver/styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+    "app/src/main/java/com/immortal/launcher/FaceRenderer.kt": "954725132ae483f41378edabbdac3c50ff646a84338a3068204ee8240c6eff9d",
+    "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": "7f4d83b48102476a8e032961a157e8b3f7150dd28f74200e55c4aed9ca0054d9",
+    "app/src/main/java/com/immortal/launcher/SlideshowPresentationPolicy.kt": "907e9a2c78652465bb27620bdb5990f3d9ad5fb9f571497f5b0326c6de59774b",
+    "app/src/test/java/com/immortal/launcher/SlideshowPresentationPolicyTest.kt": "ae23a9d8c3b91e09cf3f10e1f4812964809b469d45ea3eae79638bb1176671e9",
+    "scripts/tests/slideshow_fixed_startup.test.mjs": "af1564790cb4ca8d839ef46dd7efb92579b9c01588d85b60eec597803af5e8cc",
+    "scripts/tests/slideshow_framed_lifecycle.test.mjs": "aab77de8c0fc32d11fd5b1230043cd423c1637fdf917b6459f4f3f0e0f955568",
+    "scripts/tests/slideshow_framed_viewport.test.mjs": "a258339b3324830c85e6a5c3941812b525845842922e72c90d71d26f3a5f50cc",
+    "scripts/tests/slideshow_mosaic_lifecycle.test.mjs": "7b49004230dd2708a200cc39fa958ee8cd4d16e3fb537f3f05e7415d438e6d1b",
+    "scripts/tests/slideshow_photo_motion.test.mjs": "5a7a530223e93cd750fb86cc9ec1723ff9836339b58727291e41593cd4d6ffec",
+    "scripts/tests/slideshow_resolved_resources.test.mjs": "53bb66ac4e7a289f57d1a7f59aaed4272793679cae21ee29a0da62cfa7e7401d",
+    "scripts/tests/slideshow_style_reporting.test.mjs": "fca4c5a2918620affd9c0a7f50de593d41359458d9430620359a836e5fcd4f12",
+    "app/src/main/assets/screensaver/photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+    "scripts/tests/slideshow_photo_layout.test.mjs": "2ef1500099fc7877f0266e9d3c3ed2ad40b4cfad6434dd33152ae772e72678f7"
+  },
+  "screenshots": {
+    "implemented-preview.png": {
+      "bytes": 824207,
+      "sha256": "97badf9f06f7df8561530d5d1522327b0ca252247b06fe7dd4813e3c96cbe58f"
+    },
+    "implemented-framed-paper.png": {
+      "bytes": 2016130,
+      "sha256": "cea5040a4afaa4b467feb08ed86113b2c5bc2c46cc3de8202778d1b81d89310b"
+    },
+    "implemented-mosaic-paper.png": {
+      "bytes": 2958818,
+      "sha256": "ad6538dbd6f29ed755f741dbebda5c0f54e193733aa77160f52c089fcca0d588"
+    }
+  },
+  "verifiedAt": "2026-11-04T04:44:16.454090+00:00",
+  "logSanitization": "Published Gradle logs strip trailing spaces; raw completed logs remain in private scratch."
+}

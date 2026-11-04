@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="/baseline/styles.css">
+  <link rel="stylesheet" href="baseline-engine/styles.css">
 </head>
 <body>
   <div id="stage"></div>
   <script>
     window.aspect = p => p.w / p.h;
     window.shuffled = values => values.slice();
-    // Stable comparison fixture; production files below remain unchanged.
+    // Stable comparison fixture; historical renderer files below are frozen at d7e18bcb.
     let fixtureSeed = 531;
     Math.random = () => ((fixtureSeed = (fixtureSeed * 1664525 + 1013904223) >>> 0) / 4294967296);
   </script>
-  <script src="/baseline/lib-engine.js"></script>
-  <script src="/baseline/modes.js"></script>
-  <script src="/baseline/mode-impls.js"></script>
+  <script src="baseline-engine/lib-engine.js"></script>
+  <script src="baseline-engine/modes.js"></script>
+  <script src="baseline-engine/mode-impls.js"></script>
   <script>
     const query = new URLSearchParams(location.search);
     const shapes = [

@@ -4,6 +4,10 @@ The user's renewed report on November 3, Pacific time, concerns small photos
 inside visible grid cells and excessive dark space around a single photo.
 **Those appearance issues were not fully resolved by the earlier deliveries.**
 
+Following the user's continuation, the recommended Paper direction is now
+[implemented and locally verified](portal-photo-layout-paper-2026-11-03.md).
+The remainder of this document preserves the earlier design-review evidence.
+
 The November 1 Mosaic correction preserved the whole image when motion stopped.
 It retained fixed rectangular tiles, a 92% inset image box, `contain`, rounded
 cell edges and an explicit one-pixel outline. These still make mismatched photos
@@ -22,7 +26,8 @@ A [functional local comparison](http://127.0.0.1:8892/) now offers:
 - Current/Proposed switching, wide/portrait display formats, four single-photo
   shapes, next sample photos, and frame/pattern controls.
 
-The Current view executes four **unchanged local renderer assets**, with
+The Current view executes four **historical renderer assets frozen at
+`d7e18bcb`**, with
 deterministic generated fixture selection, disabled motion and long dwell.
 The proposal is a browser design study. Nine scenic fixtures derive from three
 bundled fallback photographs; some are cropped to create different sample
@@ -44,7 +49,8 @@ claimed for this review-only change.
 Source, case results and generated screenshot hashes are in
 `mocks/portal-photo-layout-20261103/evidence/verification.json`.
 `mocks/portal-photo-layout-20261103/README.md` explains reproduction and limits.
-The server exposes only the review folder and four allowlisted renderer files.
+The review server now also offers the implemented entry point and eight
+allowlisted production assets; the historical comparison stays frozen.
 All 17 previously protected tracked files remain unchanged.
 
 Visual selection precedes production implementation. Native work must preserve

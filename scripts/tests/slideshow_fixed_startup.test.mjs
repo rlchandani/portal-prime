@@ -129,7 +129,7 @@ for (const mode of fixed) test(`${mode}: unknown metadata starts with display de
     assert.ok(f.context.PHOTOS.some(photo => photo.measured && photo.w / photo.h === 2 / 3));
     if (mode === 'framed') {
       const print = f.nodes().find(node => node.classList.contains('ss-print') && node.style.backgroundImage?.startsWith('url('));
-      assert.deepEqual([print.style.width, print.style.height, print.style.backgroundSize], ['691px', '1037px', 'contain']);
+      assert.deepEqual([print.style.width, print.style.height, print.style.backgroundSize], ['778.2399999999999px', '1167.36px', 'contain']);
     }
   } finally { f.close(); }
 });

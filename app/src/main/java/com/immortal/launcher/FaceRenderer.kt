@@ -89,6 +89,42 @@ class FaceRenderer(
 
   // Position buckets (a vertical stack per used grid cell), created on demand.
   private val buckets = HashMap<GridPosition, LinearLayout>()
+  private var paperPhotoSurface = false
+  private var photoScrim: View? = null
+  private val paperBackedBuckets = HashSet<LinearLayout>()
+
+  /** Keep configured native clock colors readable on the Paper photo margin in every position. */
+  fun setPaperPhotoSurface(enabled: Boolean) {
+    if (paperPhotoSurface == enabled) return
+    paperPhotoSurface = enabled
+    buckets.values.forEach(::applyPhotoBucketBacking)
+    if (enabled) {
+      detachFramedScrimListener()
+      photoScrim?.visibility = View.INVISIBLE
+    } else {
+      photoScrim?.visibility = View.VISIBLE
+      if (ScreensaverConfig.load(context).mode == "framed") photoScrim?.let(::watchFramedScrim)
+    }
+  }
+
+  private fun applyPhotoBucketBacking(bucket: LinearLayout) {
+    val backed = paperPhotoSurface && (0 until bucket.childCount).any {
+      bucket.getChildAt(it).visibility == View.VISIBLE
+    }
+    // Visibility can change on a retained timer/music/caption bucket. Change padding only
+    // when its state changes, so the layout observer settles instead of causing a loop.
+    if (backed == paperBackedBuckets.contains(bucket)) return
+    if (backed) paperBackedBuckets.add(bucket) else paperBackedBuckets.remove(bucket)
+    val inset = if (backed) dp(12) else 0
+    bucket.setPadding(inset, inset, inset, inset)
+    bucket.background = if (backed) GradientDrawable().apply {
+      setColor(0xE6293029.toInt()); cornerRadius = dp(12).toFloat()
+    } else null
+  }
+
+  fun refreshPaperPhotoSurface() {
+    if (paperPhotoSurface) buckets.values.forEach(::applyPhotoBucketBacking)
+  }
   private var framedScrimListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
   private fun detachFramedScrimListener() {
@@ -124,7 +160,9 @@ class FaceRenderer(
   fun photoOcclusions(): List<android.graphics.Rect> =
       if (view.visibility != View.VISIBLE) emptyList() else buckets.values.mapNotNull { bucket ->
     if (bucket.visibility != View.VISIBLE || bucket.width <= 0 || bucket.height <= 0 ||
-        bucket.childCount == 0) null
+        bucket.childCount == 0 || (paperPhotoSurface && (0 until bucket.childCount).none {
+          bucket.getChildAt(it).visibility == View.VISIBLE
+        })) null
     else {
       val position = IntArray(2)
       bucket.getLocationInWindow(position)
@@ -235,6 +273,7 @@ class FaceRenderer(
   fun stop() {
     if (!work.stop()) return
     detachFramedScrimListener()
+    photoScrim = null
     suspendHostWork()
     clockFace?.dispose()
     io.shutdownNow()
@@ -243,8 +282,10 @@ class FaceRenderer(
   // --- overlay assembly -------------------------------------------------------
   private fun buildOverlay() {
     detachFramedScrimListener()
+    photoScrim = null
     view.removeAllViews()
     buckets.clear()
+    paperBackedBuckets.clear()
     // Caption views are rebuilt below (or not, on a full-bleed face) — drop stale refs so a
     // late setCaption() can't poke a detached view from the previous face.
     captionPanel = null
@@ -281,7 +322,9 @@ class FaceRenderer(
                 ),
             )
         view.addView(premiumScrim, 0, FrameLayout.LayoutParams(MATCH, scrimHeight, Gravity.BOTTOM))
-        if (screensaver.mode == "framed") watchFramedScrim(premiumScrim)
+        photoScrim = premiumScrim
+        if (paperPhotoSurface) premiumScrim.visibility = View.INVISIBLE
+        else if (screensaver.mode == "framed") watchFramedScrim(premiumScrim)
       }
       buildStandaloneWidgets(face)
       // Photo caption is photo metadata, so (like the widgets) it's skipped on a full-bleed clock.
@@ -793,6 +836,7 @@ class FaceRenderer(
         col.gravity = horizontalGravity(pos)
         col.clipChildren = false // shadows on the clock / meta text may overflow this column
         col.clipToPadding = false
+        applyPhotoBucketBacking(col)
         val lp = FrameLayout.LayoutParams(WRAP, WRAP, gravityFor(pos))
         val bottomInset = when (pos) {
             GridPosition.BOTTOM_LEFT, GridPosition.BOTTOM_CENTER, GridPosition.BOTTOM_RIGHT -> dp(80)
