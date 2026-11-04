@@ -1,0 +1,159 @@
+{
+  "status": "accepted_no_blocker",
+  "reviewed_at_utc": "2026-11-04T08:42:10.641703+00:00",
+  "fixed_slice_clock": {
+    "start": "2026-11-04T08:26:59Z",
+    "target": "2026-11-04T08:41:59Z",
+    "hard_deadline": "2026-11-04T08:56:59Z"
+  },
+  "candidate_sha256": "75a78dda335343418cb45bcb40faf7e3fa0f178539bfd24196efed4df32af40a",
+  "fixture_sha256": "5a05158e70b65666ba947d18c5a7d50a30a81870aafdd4eeb0cf1d3b71cfc8da",
+  "embedded_candidate_bytes_exact": true,
+  "all_ten_assets_match_current_source": true,
+  "native_observations": [
+    {
+      "shape": "landscape",
+      "motion": false,
+      "png_sha256": "12e51b424c7cda096bf9d2f7dc589670bb395270c3abbd84aeda343191e12230",
+      "matte_counts_exact": [
+        1104,
+        1104,
+        180557,
+        2074
+      ],
+      "corner_samples": [
+        {
+          "rgb": [
+            4,
+            250,
+            4
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            4,
+            4,
+            250
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            250,
+            250,
+            4
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            251,
+            5,
+            251
+          ],
+          "passed": true
+        }
+      ],
+      "frame_delta_exact": 92
+    },
+    {
+      "shape": "portrait",
+      "motion": false,
+      "png_sha256": "052d8b62900e7b7a88e58fdf8e3fdcf094d4334b8000b022929bc98765c2242e",
+      "matte_counts_exact": [
+        1104,
+        1104,
+        410865,
+        5232
+      ],
+      "corner_samples": [
+        {
+          "rgb": [
+            4,
+            250,
+            4
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            5,
+            5,
+            251
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            250,
+            250,
+            4
+          ],
+          "passed": true
+        },
+        {
+          "rgb": [
+            251,
+            5,
+            251
+          ],
+          "passed": true
+        }
+      ],
+      "frame_delta_exact": 89
+    },
+    {
+      "shape": "panorama",
+      "motion": false,
+      "png_sha256": "be8399b7d94411054d3044606fdbb9a06a28654bde43ba0745f4bacfbeb5c9b8",
+      "matte_counts_exact": [
+        1104,
+        1104,
+        0,
+        0
+      ],
+      "corner_samples": [],
+      "frame_delta_exact": 95
+    },
+    {
+      "shape": "panorama",
+      "motion": true,
+      "png_sha256": "fc5fe69c3044f478f83858ea103a0d49f74ede5d3f09c6a103cd34f5aa518a75",
+      "matte_counts_exact": [
+        1104,
+        1104,
+        0,
+        0
+      ],
+      "corner_samples": [],
+      "frame_delta_exact": 91
+    }
+  ],
+  "native_report_sha256": "2153a0bedcb8127cf6a8db63ea37e4dcdbb7f981e83d8fd22f5ed335df0dbdd1",
+  "java_sha256": "46374e57a7c2e0cc66c78c607a253cc4b6f48488b03f6f13ffbc3edbcfab8cd9",
+  "host_build_report_sha256": "1e580568dda163b872e5f5557f8a695f3148ee8087d3bd3b11e6c0dc676ff331",
+  "fixture_adaptation": {
+    "before_java_matches_failed_v2_build": true,
+    "after_java_matches_final_build": true,
+    "pixel_gates_reviewed_unchanged_from_previously_inspected_source": [
+      "matte markRGB>=8,8,7,minimum20; unavailable sideband conditional unchanged",
+      "whole-photo corner RGB Manhattan distance<=45 at generated 30px marker centers",
+      "frame edge brightness delta>=15 relative to same flat generated photo interior"
+    ],
+    "added_only_visibility_URL_response_diagnostics_and_compositor_fence": true,
+    "all_four_fences_completed": true
+  },
+  "cleanup": {
+    "report_webview_destroyed": true,
+    "device_retirement_not_independently_observed": true
+  },
+  "limits": [
+    "Landscape/portrait eight whole-photo marker corners verified; panoramas retain existing cover crop and explicitly exclude whole-photo corner claim.",
+    "Panorama motion-on proves CSS animation admission and one native snapshot; no time trajectory, clock, scheduler, renderer performance or hardware performance claim.",
+    "Fixture isolates generated inputs and assets from uninstalled optimized APK; no installed launcher context, household data, owner registry or device calls in this independent review.",
+    "Production CSS/JS source scope approval retained; no claim that Family/Living promotion is completed by this review.",
+    "Before/after adaptation hashes bind coordinator records; original failed-v2 Java bytes were not retained here, so comparison of gates uses previously inspected Java plus current explicit predicates."
+  ],
+  "blockers": []
+}

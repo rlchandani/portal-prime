@@ -1,0 +1,661 @@
+{
+  "ok": true,
+  "error": null,
+  "observations": [
+    {
+      "ready": true,
+      "svgDecoded": true,
+      "grainDecoded": true,
+      "shape": "landscape",
+      "motion": false,
+      "surfaces": [
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 140.7916717529297,
+            "w": 1920,
+            "h": 998.4166870117188
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 140.7916717529297,
+            "w": 1920,
+            "h": 998.4166870117188
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1920,
+            "h": 140.7916717529297
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 1139.2083740234375,
+            "w": 1920,
+            "h": 140.7916717529297
+          }
+        }
+      ],
+      "activeLayer": {
+        "className": "ss-layer cinema-layer on",
+        "opacity": "1",
+        "visibility": "visible",
+        "ownerOpacity": "1",
+        "ownerVisibility": "visible"
+      },
+      "photo": {
+        "id": 0,
+        "pw": 800,
+        "ph": 600,
+        "rect": {
+          "x": 294.3888854980469,
+          "y": 140.7916717529297,
+          "w": 1331.1944580078125,
+          "h": 998.388916015625
+        },
+        "backgroundImage": "url(\"https://cinema.fixture/photo/0.png\")",
+        "inlineBackgroundImage": "url(\"https://cinema.fixture/photo/0.png\")",
+        "opacity": "1",
+        "visibility": "visible",
+        "fullImage": true,
+        "size": "contain",
+        "position": "50% 50%",
+        "animation": "none",
+        "animationPlayState": "running",
+        "willChange": "auto",
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "border": {
+        "content": "\"\"",
+        "width": "0.888889px",
+        "style": "solid",
+        "color": "rgba(239, 233, 219, 0.28)",
+        "pointerEvents": "none",
+        "zIndex": "3",
+        "insets": [
+          "0px",
+          "0px",
+          "0px",
+          "0px"
+        ]
+      },
+      "grain": {
+        "background": "url(\"https://cinema.fixture/cinema-grain.png\")",
+        "size": "128px 128px",
+        "opacity": "0.035",
+        "animation": "none"
+      },
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "computedChecksPassed": true,
+      "svgRequests": 1,
+      "grainRequests": 1,
+      "photoRequests": 1,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "cinema-landscape-motion-false.png",
+      "pixelCopy": true,
+      "webWindowX": 0,
+      "webWindowY": 0,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "topBarDoodleSamples": 1104,
+      "bottomBarDoodleSamples": 1104,
+      "availableMatteSamples": 180557,
+      "availableMatteDoodleSamples": 2074,
+      "nativeFrameEdgeBrightnessDelta": 92,
+      "nativeFrameEdgePassed": true
+    },
+    {
+      "ready": true,
+      "svgDecoded": true,
+      "grainDecoded": true,
+      "shape": "portrait",
+      "motion": false,
+      "surfaces": [
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 140.7916717529297,
+            "w": 1920,
+            "h": 998.4166870117188
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 140.7916717529297,
+            "w": 1920,
+            "h": 998.4166870117188
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1920,
+            "h": 140.7916717529297
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 1139.2083740234375,
+            "w": 1920,
+            "h": 140.7916717529297
+          }
+        }
+      ],
+      "activeLayer": {
+        "className": "ss-layer cinema-layer on",
+        "opacity": "1",
+        "visibility": "visible",
+        "ownerOpacity": "1",
+        "ownerVisibility": "visible"
+      },
+      "photo": {
+        "id": 1,
+        "pw": 480,
+        "ph": 800,
+        "rect": {
+          "x": 660.4722290039062,
+          "y": 140.7916717529297,
+          "w": 599.0277709960938,
+          "h": 998.388916015625
+        },
+        "backgroundImage": "url(\"https://cinema.fixture/photo/1.png\")",
+        "inlineBackgroundImage": "url(\"https://cinema.fixture/photo/1.png\")",
+        "opacity": "1",
+        "visibility": "visible",
+        "fullImage": true,
+        "size": "contain",
+        "position": "50% 50%",
+        "animation": "none",
+        "animationPlayState": "running",
+        "willChange": "auto",
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "border": {
+        "content": "\"\"",
+        "width": "0.888889px",
+        "style": "solid",
+        "color": "rgba(239, 233, 219, 0.28)",
+        "pointerEvents": "none",
+        "zIndex": "3",
+        "insets": [
+          "0px",
+          "0px",
+          "0px",
+          "0px"
+        ]
+      },
+      "grain": {
+        "background": "url(\"https://cinema.fixture/cinema-grain.png\")",
+        "size": "128px 128px",
+        "opacity": "0.035",
+        "animation": "none"
+      },
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "computedChecksPassed": true,
+      "svgRequests": 2,
+      "grainRequests": 2,
+      "photoRequests": 2,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "cinema-portrait-motion-false.png",
+      "pixelCopy": true,
+      "webWindowX": 0,
+      "webWindowY": 0,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "topBarDoodleSamples": 1104,
+      "bottomBarDoodleSamples": 1104,
+      "availableMatteSamples": 410865,
+      "availableMatteDoodleSamples": 5232,
+      "nativeFrameEdgeBrightnessDelta": 89,
+      "nativeFrameEdgePassed": true
+    },
+    {
+      "ready": true,
+      "svgDecoded": true,
+      "grainDecoded": true,
+      "shape": "panorama",
+      "motion": false,
+      "surfaces": [
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 140.7916717529297,
+            "w": 1920,
+            "h": 998.4166870117188
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 140.7916717529297,
+            "w": 1920,
+            "h": 998.4166870117188
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1920,
+            "h": 140.7916717529297
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 1139.2083740234375,
+            "w": 1920,
+            "h": 140.7916717529297
+          }
+        }
+      ],
+      "activeLayer": {
+        "className": "ss-layer cinema-layer on",
+        "opacity": "1",
+        "visibility": "visible",
+        "ownerOpacity": "1",
+        "ownerVisibility": "visible"
+      },
+      "photo": {
+        "id": 2,
+        "pw": 2400,
+        "ph": 600,
+        "rect": {
+          "x": 0,
+          "y": 140.7916717529297,
+          "w": 1920,
+          "h": 998.388916015625
+        },
+        "backgroundImage": "url(\"https://cinema.fixture/photo/2.png\")",
+        "inlineBackgroundImage": "url(\"https://cinema.fixture/photo/2.png\")",
+        "opacity": "1",
+        "visibility": "visible",
+        "fullImage": false,
+        "size": "cover",
+        "position": "50% 50%",
+        "animation": "none",
+        "animationPlayState": "running",
+        "willChange": "auto",
+        "wholePhotoCornersClaimed": false
+      },
+      "border": {
+        "content": "\"\"",
+        "width": "0.888889px",
+        "style": "solid",
+        "color": "rgba(239, 233, 219, 0.28)",
+        "pointerEvents": "none",
+        "zIndex": "3",
+        "insets": [
+          "0px",
+          "0px",
+          "0px",
+          "0px"
+        ]
+      },
+      "grain": {
+        "background": "url(\"https://cinema.fixture/cinema-grain.png\")",
+        "size": "128px 128px",
+        "opacity": "0.035",
+        "animation": "none"
+      },
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "computedChecksPassed": true,
+      "svgRequests": 3,
+      "grainRequests": 3,
+      "photoRequests": 3,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "cinema-panorama-motion-false.png",
+      "pixelCopy": true,
+      "webWindowX": 0,
+      "webWindowY": 0,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "topBarDoodleSamples": 1104,
+      "bottomBarDoodleSamples": 1104,
+      "availableMatteSamples": 0,
+      "availableMatteDoodleSamples": 0,
+      "nativeFrameEdgeBrightnessDelta": 95,
+      "nativeFrameEdgePassed": true
+    },
+    {
+      "ready": true,
+      "svgDecoded": true,
+      "grainDecoded": true,
+      "shape": "panorama",
+      "motion": true,
+      "surfaces": [
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 140.7916717529297,
+            "w": 1920,
+            "h": 998.4166870117188
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 140.7916717529297,
+            "w": 1920,
+            "h": 998.4166870117188
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1920,
+            "h": 140.7916717529297
+          }
+        },
+        {
+          "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+          "size": "480px 360px",
+          "repeat": "repeat",
+          "color": "rgb(0, 0, 0)",
+          "rect": {
+            "x": 0,
+            "y": 1139.2083740234375,
+            "w": 1920,
+            "h": 140.7916717529297
+          }
+        }
+      ],
+      "activeLayer": {
+        "className": "ss-layer cinema-layer on",
+        "opacity": "1",
+        "visibility": "visible",
+        "ownerOpacity": "1",
+        "ownerVisibility": "visible"
+      },
+      "photo": {
+        "id": 2,
+        "pw": 2400,
+        "ph": 600,
+        "rect": {
+          "x": -0.0480685755610466,
+          "y": 140.76666259765625,
+          "w": 1920.0963134765625,
+          "h": 998.4387817382812
+        },
+        "backgroundImage": "url(\"https://cinema.fixture/photo/2.png\")",
+        "inlineBackgroundImage": "url(\"https://cinema.fixture/photo/2.png\")",
+        "opacity": "1",
+        "visibility": "visible",
+        "fullImage": false,
+        "size": "cover",
+        "position": "50% 50%",
+        "animation": "cinematicDrift",
+        "animationPlayState": "running",
+        "willChange": "transform",
+        "wholePhotoCornersClaimed": false
+      },
+      "border": {
+        "content": "\"\"",
+        "width": "0.888889px",
+        "style": "solid",
+        "color": "rgba(239, 233, 219, 0.28)",
+        "pointerEvents": "none",
+        "zIndex": "3",
+        "insets": [
+          "0px",
+          "0px",
+          "0px",
+          "0px"
+        ]
+      },
+      "grain": {
+        "background": "url(\"https://cinema.fixture/cinema-grain.png\")",
+        "size": "128px 128px",
+        "opacity": "0.035",
+        "animation": "none"
+      },
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "computedChecksPassed": true,
+      "svgRequests": 4,
+      "grainRequests": 4,
+      "photoRequests": 4,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "cinema-panorama-motion-true.png",
+      "pixelCopy": true,
+      "webWindowX": 0,
+      "webWindowY": 0,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "topBarDoodleSamples": 1104,
+      "bottomBarDoodleSamples": 1104,
+      "availableMatteSamples": 0,
+      "availableMatteDoodleSamples": 0,
+      "nativeFrameEdgeBrightnessDelta": 91,
+      "nativeFrameEdgePassed": true
+    }
+  ],
+  "svgRequests": 4,
+  "grainRequests": 4,
+  "photoRequests": 4,
+  "lastComputedState": {
+    "ready": true,
+    "svgDecoded": true,
+    "grainDecoded": true,
+    "shape": "panorama",
+    "motion": true,
+    "surfaces": [
+      {
+        "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(0, 0, 0)",
+        "rect": {
+          "x": 0,
+          "y": 140.7916717529297,
+          "w": 1920,
+          "h": 998.4166870117188
+        }
+      },
+      {
+        "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(0, 0, 0)",
+        "rect": {
+          "x": 0,
+          "y": 140.7916717529297,
+          "w": 1920,
+          "h": 998.4166870117188
+        }
+      },
+      {
+        "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(0, 0, 0)",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "w": 1920,
+          "h": 140.7916717529297
+        }
+      },
+      {
+        "background": "url(\"https://cinema.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "color": "rgb(0, 0, 0)",
+        "rect": {
+          "x": 0,
+          "y": 1139.2083740234375,
+          "w": 1920,
+          "h": 140.7916717529297
+        }
+      }
+    ],
+    "activeLayer": {
+      "className": "ss-layer cinema-layer on",
+      "opacity": "1",
+      "visibility": "visible",
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible"
+    },
+    "photo": {
+      "id": 2,
+      "pw": 2400,
+      "ph": 600,
+      "rect": {
+        "x": -0.0480685755610466,
+        "y": 140.76666259765625,
+        "w": 1920.0963134765625,
+        "h": 998.4387817382812
+      },
+      "backgroundImage": "url(\"https://cinema.fixture/photo/2.png\")",
+      "inlineBackgroundImage": "url(\"https://cinema.fixture/photo/2.png\")",
+      "opacity": "1",
+      "visibility": "visible",
+      "fullImage": false,
+      "size": "cover",
+      "position": "50% 50%",
+      "animation": "cinematicDrift",
+      "animationPlayState": "running",
+      "willChange": "transform",
+      "wholePhotoCornersClaimed": false
+    },
+    "border": {
+      "content": "\"\"",
+      "width": "0.888889px",
+      "style": "solid",
+      "color": "rgba(239, 233, 219, 0.28)",
+      "pointerEvents": "none",
+      "zIndex": "3",
+      "insets": [
+        "0px",
+        "0px",
+        "0px",
+        "0px"
+      ]
+    },
+    "grain": {
+      "background": "url(\"https://cinema.fixture/cinema-grain.png\")",
+      "size": "128px 128px",
+      "opacity": "0.035",
+      "animation": "none"
+    },
+    "dpr": 1.125,
+    "width": 1920,
+    "height": 1280,
+    "computedChecksPassed": true,
+    "svgRequests": 4,
+    "grainRequests": 4,
+    "photoRequests": 4,
+    "compositorFenceRequested": true,
+    "compositorFenceCompleted": true,
+    "screenshot": "cinema-panorama-motion-true.png",
+    "pixelCopy": true,
+    "webWindowX": 0,
+    "webWindowY": 0,
+    "webPixelWidth": 2160,
+    "webPixelHeight": 1440,
+    "topBarDoodleSamples": 1104,
+    "bottomBarDoodleSamples": 1104,
+    "availableMatteSamples": 0,
+    "availableMatteDoodleSamples": 0,
+    "nativeFrameEdgeBrightnessDelta": 91,
+    "nativeFrameEdgePassed": true
+  },
+  "sceneCount": 4,
+  "scope": "Generated Cinema matte/frame and existing crop/motion only; no native FaceRenderer, clock, resize, scheduler or performance claim",
+  "unknownRequests": 0,
+  "deniedRequestDiagnostics": [],
+  "deniedRequestDiagnosticLimit": 16,
+  "webViewDestroyed": true,
+  "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+}

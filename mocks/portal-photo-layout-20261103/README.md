@@ -1,8 +1,9 @@
 # Portal photo layout review
 
 This follows the user's report of small photos inside visible grid cells and
-large dark margins. Paper is now implemented in the local production renderer;
-the installed screensaver has not changed.
+large dark margins. Paper and the later scoped matte/frame changes are installed
+in both rooms through1.140/code134. Saved Shuffle/fit remains; the installed
+renderer and currently displayed Shuffle style are separate observations.
 
 Run from any directory with Python 3.9 or newer:
 
@@ -12,7 +13,7 @@ python3 /path/to/portal-prime/mocks/portal-photo-layout-20261103/serve.py
 
 Open <http://127.0.0.1:8892/renderer.html> for the implemented renderer or
 <http://127.0.0.1:8892/> for the earlier design comparison. The dedicated server
-exposes only this review folder and eight allowlisted screensaver assets.
+exposes only this review folder and ten allowlisted screensaver assets.
 No device, account, household photo or remote image request is used.
 
 The comparison's **Current renderer** view executes frozen `styles.css`,

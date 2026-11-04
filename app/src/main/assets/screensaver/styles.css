@@ -158,6 +158,11 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-layer.cinema-layer.retired { opacity: 0; visibility: hidden; transition: none; }
 .ss-bar { position: absolute; left: 0; right: 0; height: 11%; background: #000; z-index: 3; }
 .ss-bar.top { top: 0; } .ss-bar.bot { bottom: 0; }
+.ss-scope, .ss-layer.cinema-layer, .ss-bar {
+  background-image: url("photo-doodles-dark.svg"); background-size: 480px 360px;
+}
+.ss-cinema-photo::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  border: 1px solid rgba(239,233,219,.28); z-index: 3; }
 .ss-grain { position: absolute; inset: 0; pointer-events: none; opacity: .035; mix-blend-mode: normal; z-index: 2;
   background-image: url("cinema-grain.png"); background-repeat: repeat; background-size: 128px 128px;
   animation: none; filter: none; will-change: auto; }

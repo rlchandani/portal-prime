@@ -1,0 +1,47 @@
+{
+  "surface": "Owned isolated desktop Chromium actual production entry point at localhost8892; existing user IAB tabs untouched",
+  "cases": [
+    {
+      "shape": "landscape",
+      "motion": false,
+      "fit": "contain",
+      "animation": "none"
+    },
+    {
+      "shape": "portrait",
+      "motion": false,
+      "fit": "contain",
+      "animation": "none"
+    },
+    {
+      "shape": "panorama",
+      "motion": false,
+      "fit": "cover",
+      "animation": "none"
+    },
+    {
+      "shape": "panorama",
+      "motion": true,
+      "fit": "cover",
+      "animation": "cinematicDrift"
+    }
+  ],
+  "eachCase": {
+    "matteSurfaces": 4,
+    "backgroundImage": "photo-doodles-dark.svg",
+    "backgroundSize": "480px 360px",
+    "borderWidth": "1px",
+    "borderColor": "rgba(239, 233, 219, 0.28)",
+    "borderInset": "0px",
+    "pointerEvents": "none",
+    "grain": "cinema-grain.png",
+    "grainOpacity": ".035"
+  },
+  "network": "All observed darkSVG/grain requests HTTP200",
+  "previewPortraitViewed": true,
+  "isolatedTabClosed": true,
+  "fileOutputAttempt": "browser_evaluate private filename rejected outside browser tool roots; no further file workaround; state is recorded from tool results",
+  "limits": [
+    "Desktop viewport and simulated clock only; actual Portal native clock, scheduler and performance remain separate"
+  ]
+}

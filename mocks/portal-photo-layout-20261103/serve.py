@@ -9,7 +9,7 @@ REPOSITORY = MOCK.parent.parent
 ENGINE = REPOSITORY / "app/src/main/assets/screensaver"
 ENGINE_FILES = {
     "index.html", "styles.css", "photos.js", "lib-engine.js",
-    "modes.js", "mode-impls.js", "scheduler.js", "photo-doodles.svg", "photo-doodles-dark.svg",
+    "modes.js", "mode-impls.js", "scheduler.js", "photo-doodles.svg", "photo-doodles-dark.svg", "cinema-grain.png",
 }
 
 

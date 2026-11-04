@@ -1,18 +1,59 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T08:25:00.379118+00:00",
-  "updatedLabel": "Local deploy APK snapshot verified; room1.139 and other scopes retained",
+  "updatedAt": "2026-11-04T08:43:54.558160+00:00",
+  "updatedLabel": "Cinema matte/frame delivered; room1.140 and other scopes retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.139/code 133. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.140/code 134. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "cinema-matte-frame",
+      "title": "Cinema Letterbox: quiet margins and a slim frame",
+      "summary": "Black bars and available side margins carry sparse dark doodles; a thin edge follows the photo.",
+      "status": "delivered",
+      "verification": "4,414 JVM · 1,106 JS · four native scenes · exact both-room installs",
+      "kind": "Screensaver visual polish",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent review",
+      "deployment": "Optimized1.140/code134 fully hashed in both rooms from one install per room; Living uncertain ACK reconciled read-only.",
+      "acceptance": [
+        "Quiet doodles on scope, active black matte and top/bottom bars.",
+        "Thin photo-sized edge with existing fit/crop, grain and optional motion retained.",
+        "Native generated pixels, exact installed APKs and complete configuration preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped delivery, fixture corrections and remaining acceptance.",
+          "source": "docs/portal-cinema-matte-2026-11-04.md"
+        },
+        {
+          "text": "Artifacts, traces, native pixels, independent review and installed state.",
+          "source": "mocks/portal-cinema-matte-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Four generated direct scenes on Family/API29; production scheduler/native clock, resize, API28, Living visuals and hardware performance remain separate.",
+        "Eligible fitted-photo corners verified; existing panorama cover crop retained. Motion-style admission is not trajectory acceptance.",
+        "No phone, source-media transfer, provider/account, GitHub push or publication."
+      ],
+      "next": "Continue another distinct small product slice; earlier parked clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-04T08:26:59Z",
+        "target": "2026-11-04T08:41:59Z",
+        "deadline": "2026-11-04T08:56:59Z",
+        "scope": "Cinema Letterbox quiet static matte doodles and photo-sized edge; existing crops/grain/motion retained; generated native scene gates; both-room small delivery.",
+        "sourceBase": "8b5538341262ab791bcc8a88180450b7cd2b73f1"
+      }
+    },
     {
       "id": "deploy-apk-snapshot",
       "title": "Fleet deploy: keep one selected APK for every room",

@@ -1,0 +1,64 @@
+{
+  "status": "accepted_source_scope_no_blocker",
+  "reviewed_at_utc": "2026-11-04T08:30:18.277915+00:00",
+  "slice_clock": {
+    "start": "2026-11-04T08:26:59Z",
+    "target": "2026-11-04T08:41:59Z",
+    "hard_deadline": "2026-11-04T08:56:59Z"
+  },
+  "source_proof": {
+    "css_added_lines": 5,
+    "css_remove_exact_insert_reproduces_before_bytes": true,
+    "mode_impls_equals_frozen_before_bytes": true,
+    "relevant_css_lines": [
+      154,
+      170
+    ],
+    "cinema_js_lines": [
+      1145,
+      1214
+    ],
+    "cascade": "Grouped image/size rule follows all three existing black background shorthands; no later Cinema background reset. Existing black colors and repeat defaults retained.",
+    "frame": "Absolute inset-zero 1px rgba(239,233,219,.28) pseudo element on existing ss-cinema-photo; pointer-events none; z-index3 above unchanged grain z-index2. Parent photo rectangles, fit/crop, grain opacity/filter/animation, dissolve and timers unchanged.",
+    "version": {
+      "name": "1.140",
+      "code": 134,
+      "source_only": true
+    },
+    "preserved_files": {
+      "version.json": true,
+      "catalog.json": true,
+      "provisioning/fleetctl": true,
+      "provisioning/room-fleet.py": true
+    }
+  },
+  "preview_proof": {
+    "mode_added_to_existing_allowlist": "cinema",
+    "fixed_asset_added_to_existing_allowlist": "cinema-grain.png",
+    "resource_bounds": "Only fixed /production/<allowlisted-name>; other local files remain constrained to resolved mock directory. Existing inert Android bridge and seeded generated/local samples unchanged.",
+    "node_syntax_exit": 0,
+    "serve_python_ast_parse": true
+  },
+  "hashes_sha256": {
+    "app/src/main/assets/screensaver/styles.css": "d9ce1c193f35d6c683e212c05e8e655c6452e5c8b53138e05448def6e49a296d",
+    "app/src/main/assets/screensaver/mode-impls.js": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0",
+    "app/src/main/assets/screensaver/photo-doodles-dark.svg": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+    "app/src/main/assets/screensaver/cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+    "app/build.gradle.kts": "28dcc0300cd955977308f3d39370c03d9499394dcce71e3e1d47e399748f8370",
+    "mocks/portal-photo-layout-20261103/renderer-fixture.js": "6a04eaf4b91b5024531f66cb057fcd3dbd7cc4f9089c297b7644e41867228824",
+    "mocks/portal-photo-layout-20261103/renderer.html": "b948e5e4900ab71197453ae0e3a513101ace876ab674880c713e7af2288b731a",
+    "mocks/portal-photo-layout-20261103/serve.py": "02cd1288844c592f1574f374f595c0dffd479a9abc8004a1034005ca5264fe9e"
+  },
+  "frozen_baseline_sha256": {
+    "styles.css.before": "23a8148c71d54508a28a7af68f153f5e9d43550737bf7cb9b46ad4e1ed1ea314",
+    "mode-impls.js.before": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0"
+  },
+  "blockers": [],
+  "limits": [
+    "No local Playwright module discovered; no Chromium geometry replay performed during bounded source review.",
+    "No native device, installed launcher, signed APK artifact or pixel evidence independently checked in this report.",
+    "Existing panoramic cover/crop and optional cinematicDrift remain unchanged; whole-photo and static claims are limited to eligible non-panorama/disabled-motion cases.",
+    "No renderer timing, hardware performance or native clock claim."
+  ],
+  "actions": "Host read-only source/hash checks; only this private report written. No Gradle, source mutation, device, registry, provider, browser or network actions."
+}

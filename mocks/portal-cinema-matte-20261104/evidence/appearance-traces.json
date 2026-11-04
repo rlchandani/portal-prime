@@ -1,0 +1,26 @@
+[
+  {
+    "photoMotion": "undefined",
+    "before": "783c87acee8c1a3d2110c15410acd7ee9c178ded8627d5f2750051fee5f84700",
+    "candidate": "05ab8f802f34a45f48a16ea90a0f485df8647abceb1f2226fc32abc62fa868d1",
+    "normalized": "783c87acee8c1a3d2110c15410acd7ee9c178ded8627d5f2750051fee5f84700",
+    "randomDraws": 0,
+    "onlyComputedDifference": "matte background-image and background-size; pseudo-border needs visual verification"
+  },
+  {
+    "photoMotion": true,
+    "before": "783c87acee8c1a3d2110c15410acd7ee9c178ded8627d5f2750051fee5f84700",
+    "candidate": "05ab8f802f34a45f48a16ea90a0f485df8647abceb1f2226fc32abc62fa868d1",
+    "normalized": "783c87acee8c1a3d2110c15410acd7ee9c178ded8627d5f2750051fee5f84700",
+    "randomDraws": 0,
+    "onlyComputedDifference": "matte background-image and background-size; pseudo-border needs visual verification"
+  },
+  {
+    "photoMotion": false,
+    "before": "7be9cbf16233418439745fc0c845ebe5b0e19535a8b42497102e5e6ed4a4ace2",
+    "candidate": "1b3de741113381fcc397aecb06a00b505c0fdc3f3476e97903fb83dc83a6257a",
+    "normalized": "7be9cbf16233418439745fc0c845ebe5b0e19535a8b42497102e5e6ed4a4ace2",
+    "randomDraws": 0,
+    "onlyComputedDifference": "matte background-image and background-size; pseudo-border needs visual verification"
+  }
+]
