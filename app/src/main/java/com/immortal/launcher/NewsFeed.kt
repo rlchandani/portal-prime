@@ -142,6 +142,14 @@ object NewsFeed {
     var s = raw.trim()
     // Unwrap one or more CDATA sections.
     s = s.replace(Regex("<!\\[CDATA\\[(.*?)]]>", setOf(RegexOption.DOT_MATCHES_ALL))) { it.groupValues[1] }
+    // Decode numeric references before &amp; so escaped references remain literal.
+    s = s.replace(Regex("&#(?:([0-9]+)|[xX]([0-9a-fA-F]+));")) { reference ->
+      val codePoint = reference.groups[1]?.value?.toIntOrNull()
+          ?: reference.groups[2]?.value?.toIntOrNull(16)
+      if (codePoint != null && codePoint in 1..0x10FFFF && codePoint !in 0xD800..0xDFFF)
+        String(Character.toChars(codePoint))
+      else reference.value
+    }
     s =
         s.replace("&amp;", "&")
             .replace("&lt;", "<")

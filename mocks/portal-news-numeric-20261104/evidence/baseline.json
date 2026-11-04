@@ -1,0 +1,70 @@
+{
+  "tests": 12,
+  "failures": 8,
+  "errors": 0,
+  "cases": [
+    {
+      "name": "validReferencesSurviveAdjacentInvalidReferences",
+      "passed": false,
+      "failureType": "org.junit.ComparisonFailure"
+    },
+    {
+      "name": "numericWhitespaceKeepsExistingCollapse",
+      "passed": false,
+      "failureType": "org.junit.ComparisonFailure"
+    },
+    {
+      "name": "escapedNumericReferenceIsNotDecodedRecursively",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "cdataAndPlainUnicodeRemain",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "parsedHeadlinesRetainOrderAndCap",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "numericReferencesAlsoDecodeInArticleLinks",
+      "passed": false,
+      "failureType": "org.junit.ComparisonFailure"
+    },
+    {
+      "name": "existingNamedEntitiesAndApostrophesRemain",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "malformedAndInvalidCodePointsRemainReadable",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "hexadecimalPunctuationInAtomTitle",
+      "passed": false,
+      "failureType": "org.junit.ComparisonFailure"
+    },
+    {
+      "name": "supplementaryCharactersUseCompleteCodePoints",
+      "passed": false,
+      "failureType": "org.junit.ComparisonFailure"
+    },
+    {
+      "name": "decimalPunctuationInRssTitle",
+      "passed": false,
+      "failureType": "org.junit.ComparisonFailure"
+    },
+    {
+      "name": "nonLatinTextAndLeadingZeroReferences",
+      "passed": false,
+      "failureType": "org.junit.ComparisonFailure"
+    }
+  ],
+  "frozenTestSha256": "450b146ac1c14f1f8775d505fa1e39405f33c5c99bc0aabb9793124067964ac2",
+  "baselineSourceSha256": "b18a3de6f5aa0d9e4b151fe37ac95644e252cbbedd2609910f8dd972bc7b3853",
+  "terminalExit": 1
+}

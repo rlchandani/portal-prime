@@ -1,18 +1,65 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T08:05:29.419326+00:00",
-  "updatedLabel": "Three matte layouts delivered1.138; distinct backgrounds remain",
+  "updatedAt": "2026-11-04T08:15:12.137352+00:00",
+  "updatedLabel": "News numeric references delivered1.139; other scopes retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.138/code 132. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.139/code 133. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "news-numeric-entities",
+      "title": "News: readable numeric character references",
+      "summary": "RSS and Atom punctuation, multilingual text and emoji decode from decimal/hexadecimal references.",
+      "status": "delivered",
+      "verification": "4,414 JVM \u00b7 native8fail\u219212pass \u00b7 exact both-room installs",
+      "kind": "News display correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent review",
+      "deployment": "Optimized1.139/code133 fully hashed in both rooms from one install per room.",
+      "acceptance": [
+        "Decode decimal/hexadecimal Unicode scalar references in shared cleanup.",
+        "Preserve invalid/escaped references, named cleanup, article selection, order and cap.",
+        "Pass frozen/generated native checks and preserve both-room configuration."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped fix and remaining acceptance.",
+          "source": "docs/portal-news-numeric-entities-2026-11-04.md"
+        },
+        {
+          "text": "Baseline, native calls, independent review and exact artifacts.",
+          "source": "mocks/portal-news-numeric-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated JVM and Family/API29 debug parser execution only; optimized runtime, API28, mounted Home News UI, live feed/cache/article and Living functional acceptance remain open.",
+        "Decimal/hexadecimal Unicode reference support; complete HTML/XML parsing and existing named cleanup semantics are separate.",
+        "No phone, source-media transfer, provider/account, GitHub push or publication."
+      ],
+      "next": "Continue distinct small product work; live News UI acceptance stays separate.",
+      "issueClock": {
+        "startedAt": "2026-11-04T08:06:47Z",
+        "target": "2026-11-04T08:21:47Z",
+        "deadline": "2026-11-04T08:36:47Z",
+        "scope": "News decimal and hexadecimal Unicode numeric character references; generated parser evidence, gates, both-room delivery and closure.",
+        "sourceBase": "19f3cdfdb55351e6c5c45cde08d02e0c1d4db6c8",
+        "boundaries": [
+          "No live provider/feed requests or account operations",
+          "No phone",
+          "Existing named decoding, link preference, ordering and cap remain",
+          "Prior parked issue clocks remain"
+        ]
+      }
+    },
     {
       "id": "grouped-matte-doodles",
       "title": "Photo pair, Memories and Panorama: quiet margins",

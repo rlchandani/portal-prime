@@ -1,0 +1,185 @@
+{
+  "recordedAt": "2026-11-04T08:12:09.082675+00:00",
+  "variants": {
+    "baseline": {
+      "tests": 12,
+      "failures": 8,
+      "cases": [
+        {
+          "name": "decimalPunctuationInRssTitle",
+          "actual": "Today&#8217;s news &#8212; more",
+          "expected": "Today\u2019s news \u2014 more",
+          "passed": false
+        },
+        {
+          "name": "hexadecimalPunctuationInAtomTitle",
+          "actual": "&#x201c;News&#X201D;",
+          "expected": "\u201cNews\u201d",
+          "passed": false
+        },
+        {
+          "name": "supplementaryCharactersUseCompleteCodePoints",
+          "actual": "&#128640; &#x1F600;",
+          "expected": "\ud83d\ude80 \ud83d\ude00",
+          "passed": false
+        },
+        {
+          "name": "nonLatinTextAndLeadingZeroReferences",
+          "actual": "&#26085;&#x672C; &#000233;",
+          "expected": "\u65e5\u672c \u00e9",
+          "passed": false
+        },
+        {
+          "name": "numericWhitespaceKeepsExistingCollapse",
+          "actual": "one&#10;&#x09;two&#13; three",
+          "expected": "one two three",
+          "passed": false
+        },
+        {
+          "name": "numericReferencesAlsoDecodeInArticleLinks",
+          "actual": "https://example.com/?a=1&#38;b=2",
+          "expected": "https://example.com/?a=1&b=2",
+          "passed": false
+        },
+        {
+          "name": "malformedAndInvalidCodePointsRemainReadable",
+          "actual": "&#; &#x; &#-1; &#xZZ; &#0; &#55296; &#xDFFF; &#1114112; &#99999999999999999999;",
+          "expected": "&#; &#x; &#-1; &#xZZ; &#0; &#55296; &#xDFFF; &#1114112; &#99999999999999999999;",
+          "passed": true
+        },
+        {
+          "name": "validReferencesSurviveAdjacentInvalidReferences",
+          "actual": "&#65;&#xD800;&#66;",
+          "expected": "A&#xD800;B",
+          "passed": false
+        },
+        {
+          "name": "existingNamedEntitiesAndApostrophesRemain",
+          "actual": "& < > \" ' ' '",
+          "expected": "& < > \" ' ' '",
+          "passed": true
+        },
+        {
+          "name": "cdataAndPlainUnicodeRemain",
+          "actual": "Already caf\u00e9 \u2014",
+          "expected": "Already caf\u00e9 \u2014",
+          "passed": true
+        },
+        {
+          "name": "escapedNumericReferenceIsNotDecodedRecursively",
+          "actual": "Literal &#8217;",
+          "expected": "Literal &#8217;",
+          "passed": true
+        },
+        {
+          "name": "parsedHeadlinesRetainOrderAndCap",
+          "actual": "[\"H1&#8217;s\",\"H2&#8217;s\",\"H3&#8217;s\",\"H4&#8217;s\",\"H5&#8217;s\",\"H6&#8217;s\",\"H7&#8217;s\",\"H8&#8217;s\"]",
+          "expected": "[\"H1\u2019s\",\"H2\u2019s\",\"H3\u2019s\",\"H4\u2019s\",\"H5\u2019s\",\"H6\u2019s\",\"H7\u2019s\",\"H8\u2019s\"]",
+          "passed": false
+        }
+      ],
+      "apkSha256": "5af2a37e544b2a24ee41db09cc771ab4c4767a8f5c64b6036ae9c06c6b05a467",
+      "actualApkClassLoader": true,
+      "parseMethod": "parse$app",
+      "cleanMethod": "clean$app",
+      "networkCalls": 0,
+      "preferenceCalls": 0
+    },
+    "candidate": {
+      "tests": 12,
+      "failures": 0,
+      "cases": [
+        {
+          "name": "decimalPunctuationInRssTitle",
+          "actual": "Today\u2019s news \u2014 more",
+          "expected": "Today\u2019s news \u2014 more",
+          "passed": true
+        },
+        {
+          "name": "hexadecimalPunctuationInAtomTitle",
+          "actual": "\u201cNews\u201d",
+          "expected": "\u201cNews\u201d",
+          "passed": true
+        },
+        {
+          "name": "supplementaryCharactersUseCompleteCodePoints",
+          "actual": "\ud83d\ude80 \ud83d\ude00",
+          "expected": "\ud83d\ude80 \ud83d\ude00",
+          "passed": true
+        },
+        {
+          "name": "nonLatinTextAndLeadingZeroReferences",
+          "actual": "\u65e5\u672c \u00e9",
+          "expected": "\u65e5\u672c \u00e9",
+          "passed": true
+        },
+        {
+          "name": "numericWhitespaceKeepsExistingCollapse",
+          "actual": "one two three",
+          "expected": "one two three",
+          "passed": true
+        },
+        {
+          "name": "numericReferencesAlsoDecodeInArticleLinks",
+          "actual": "https://example.com/?a=1&b=2",
+          "expected": "https://example.com/?a=1&b=2",
+          "passed": true
+        },
+        {
+          "name": "malformedAndInvalidCodePointsRemainReadable",
+          "actual": "&#; &#x; &#-1; &#xZZ; &#0; &#55296; &#xDFFF; &#1114112; &#99999999999999999999;",
+          "expected": "&#; &#x; &#-1; &#xZZ; &#0; &#55296; &#xDFFF; &#1114112; &#99999999999999999999;",
+          "passed": true
+        },
+        {
+          "name": "validReferencesSurviveAdjacentInvalidReferences",
+          "actual": "A&#xD800;B",
+          "expected": "A&#xD800;B",
+          "passed": true
+        },
+        {
+          "name": "existingNamedEntitiesAndApostrophesRemain",
+          "actual": "& < > \" ' ' '",
+          "expected": "& < > \" ' ' '",
+          "passed": true
+        },
+        {
+          "name": "cdataAndPlainUnicodeRemain",
+          "actual": "Already caf\u00e9 \u2014",
+          "expected": "Already caf\u00e9 \u2014",
+          "passed": true
+        },
+        {
+          "name": "escapedNumericReferenceIsNotDecodedRecursively",
+          "actual": "Literal &#8217;",
+          "expected": "Literal &#8217;",
+          "passed": true
+        },
+        {
+          "name": "parsedHeadlinesRetainOrderAndCap",
+          "actual": "[\"H1\u2019s\",\"H2\u2019s\",\"H3\u2019s\",\"H4\u2019s\",\"H5\u2019s\",\"H6\u2019s\",\"H7\u2019s\",\"H8\u2019s\"]",
+          "expected": "[\"H1\u2019s\",\"H2\u2019s\",\"H3\u2019s\",\"H4\u2019s\",\"H5\u2019s\",\"H6\u2019s\",\"H7\u2019s\",\"H8\u2019s\"]",
+          "passed": true
+        }
+      ],
+      "apkSha256": "87ca7eaa34be533e1aaaf02e0737c6c6946340601e020366b27aae287880b567",
+      "actualApkClassLoader": true,
+      "parseMethod": "parse$app",
+      "cleanMethod": "clean$app",
+      "networkCalls": 0,
+      "preferenceCalls": 0
+    }
+  },
+  "ownedRemoteDirectoryAbsent": true,
+  "processesTerminal": true,
+  "actualParserSubprocessExit": {
+    "baseline": 0,
+    "candidate": 0
+  },
+  "initialWrapperExit": 1,
+  "cleanupObservationError": "ADB sh -c argument quoting; remote deletion had succeeded. Corrected read-only direct-shell absence check exits0.",
+  "correctedRetirementVerificationExit": 0,
+  "api": 29,
+  "optimizedExecution": false,
+  "scope": "Generated literal parser calls from actual debug APKs; no fetch/context/network/preferences/UI operations. Zero counter fields are source constraints, not instrumentation."
+}

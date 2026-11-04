@@ -1,0 +1,637 @@
+{
+  "version": "1.139/code133",
+  "recordedAt": "2026-11-04T08:15:12.137352+00:00",
+  "sourceBase": "19f3cdfdb55351e6c5c45cde08d02e0c1d4db6c8",
+  "issueClock": {
+    "startedAt": "2026-11-04T08:06:47Z",
+    "target": "2026-11-04T08:21:47Z",
+    "deadline": "2026-11-04T08:36:47Z",
+    "scope": "News decimal and hexadecimal Unicode numeric character references; generated parser evidence, gates, both-room delivery and closure.",
+    "sourceBase": "19f3cdfdb55351e6c5c45cde08d02e0c1d4db6c8",
+    "boundaries": [
+      "No live provider/feed requests or account operations",
+      "No phone",
+      "Existing named decoding, link preference, ordering and cap remain",
+      "Prior parked issue clocks remain"
+    ]
+  },
+  "elapsedMinutesAtReceipt": 8.42,
+  "baseline": {
+    "tests": 12,
+    "failures": 8,
+    "errors": 0,
+    "cases": [
+      {
+        "name": "validReferencesSurviveAdjacentInvalidReferences",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "numericWhitespaceKeepsExistingCollapse",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "escapedNumericReferenceIsNotDecodedRecursively",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "cdataAndPlainUnicodeRemain",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "parsedHeadlinesRetainOrderAndCap",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "numericReferencesAlsoDecodeInArticleLinks",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "existingNamedEntitiesAndApostrophesRemain",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "malformedAndInvalidCodePointsRemainReadable",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "hexadecimalPunctuationInAtomTitle",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "supplementaryCharactersUseCompleteCodePoints",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "decimalPunctuationInRssTitle",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure"
+      },
+      {
+        "name": "nonLatinTextAndLeadingZeroReferences",
+        "passed": false,
+        "failureType": "org.junit.ComparisonFailure"
+      }
+    ],
+    "frozenTestSha256": "450b146ac1c14f1f8775d505fa1e39405f33c5c99bc0aabb9793124067964ac2",
+    "baselineSourceSha256": "b18a3de6f5aa0d9e4b151fe37ac95644e252cbbedd2609910f8dd972bc7b3853",
+    "terminalExit": 1
+  },
+  "artifacts": {
+    "apks": {
+      "debug": {
+        "bytes": 46728278,
+        "sha256": "87ca7eaa34be533e1aaaf02e0737c6c6946340601e020366b27aae287880b567",
+        "manifest": "package: name='com.immortal.launcher.debug' versionCode='133' versionName='1.139' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "screensaverAssets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "bytes": 66451,
+            "sha256": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0"
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "bytes": 14823,
+            "sha256": "23a8148c71d54508a28a7af68f153f5e9d43550737bf7cb9b46ad4e1ed1ea314"
+          }
+        ]
+      },
+      "performance": {
+        "bytes": 25886227,
+        "sha256": "17d36b46121c61c013d6b371c026ba6f767e6cb8697c22da51b166d2f6eb9524",
+        "manifest": "package: name='com.immortal.launcher.debug' versionCode='133' versionName='1.139' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+        "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+        "screensaverAssets": [
+          {
+            "path": "assets/screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "assets/screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "assets/screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "assets/screensaver/mode-impls.js",
+            "bytes": 66451,
+            "sha256": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0"
+          },
+          {
+            "path": "assets/screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "assets/screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "assets/screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "assets/screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "assets/screensaver/styles.css",
+            "bytes": 14823,
+            "sha256": "23a8148c71d54508a28a7af68f153f5e9d43550737bf7cb9b46ad4e1ed1ea314"
+          }
+        ]
+      }
+    },
+    "jvm": {
+      "tests": 4414,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 461
+    },
+    "fullGradleExit": 0,
+    "clockReset": false,
+    "sourceHead": "19f3cdfdb55351e6c5c45cde08d02e0c1d4db6c8"
+  },
+  "native": {
+    "recordedAt": "2026-11-04T08:12:09.082675+00:00",
+    "variants": {
+      "baseline": {
+        "tests": 12,
+        "failures": 8,
+        "cases": [
+          {
+            "name": "decimalPunctuationInRssTitle",
+            "actual": "Today&#8217;s news &#8212; more",
+            "expected": "Today\u2019s news \u2014 more",
+            "passed": false
+          },
+          {
+            "name": "hexadecimalPunctuationInAtomTitle",
+            "actual": "&#x201c;News&#X201D;",
+            "expected": "\u201cNews\u201d",
+            "passed": false
+          },
+          {
+            "name": "supplementaryCharactersUseCompleteCodePoints",
+            "actual": "&#128640; &#x1F600;",
+            "expected": "\ud83d\ude80 \ud83d\ude00",
+            "passed": false
+          },
+          {
+            "name": "nonLatinTextAndLeadingZeroReferences",
+            "actual": "&#26085;&#x672C; &#000233;",
+            "expected": "\u65e5\u672c \u00e9",
+            "passed": false
+          },
+          {
+            "name": "numericWhitespaceKeepsExistingCollapse",
+            "actual": "one&#10;&#x09;two&#13; three",
+            "expected": "one two three",
+            "passed": false
+          },
+          {
+            "name": "numericReferencesAlsoDecodeInArticleLinks",
+            "actual": "https://example.com/?a=1&#38;b=2",
+            "expected": "https://example.com/?a=1&b=2",
+            "passed": false
+          },
+          {
+            "name": "malformedAndInvalidCodePointsRemainReadable",
+            "actual": "&#; &#x; &#-1; &#xZZ; &#0; &#55296; &#xDFFF; &#1114112; &#99999999999999999999;",
+            "expected": "&#; &#x; &#-1; &#xZZ; &#0; &#55296; &#xDFFF; &#1114112; &#99999999999999999999;",
+            "passed": true
+          },
+          {
+            "name": "validReferencesSurviveAdjacentInvalidReferences",
+            "actual": "&#65;&#xD800;&#66;",
+            "expected": "A&#xD800;B",
+            "passed": false
+          },
+          {
+            "name": "existingNamedEntitiesAndApostrophesRemain",
+            "actual": "& < > \" ' ' '",
+            "expected": "& < > \" ' ' '",
+            "passed": true
+          },
+          {
+            "name": "cdataAndPlainUnicodeRemain",
+            "actual": "Already caf\u00e9 \u2014",
+            "expected": "Already caf\u00e9 \u2014",
+            "passed": true
+          },
+          {
+            "name": "escapedNumericReferenceIsNotDecodedRecursively",
+            "actual": "Literal &#8217;",
+            "expected": "Literal &#8217;",
+            "passed": true
+          },
+          {
+            "name": "parsedHeadlinesRetainOrderAndCap",
+            "actual": "[\"H1&#8217;s\",\"H2&#8217;s\",\"H3&#8217;s\",\"H4&#8217;s\",\"H5&#8217;s\",\"H6&#8217;s\",\"H7&#8217;s\",\"H8&#8217;s\"]",
+            "expected": "[\"H1\u2019s\",\"H2\u2019s\",\"H3\u2019s\",\"H4\u2019s\",\"H5\u2019s\",\"H6\u2019s\",\"H7\u2019s\",\"H8\u2019s\"]",
+            "passed": false
+          }
+        ],
+        "apkSha256": "5af2a37e544b2a24ee41db09cc771ab4c4767a8f5c64b6036ae9c06c6b05a467",
+        "actualApkClassLoader": true,
+        "parseMethod": "parse$app",
+        "cleanMethod": "clean$app",
+        "networkCalls": 0,
+        "preferenceCalls": 0
+      },
+      "candidate": {
+        "tests": 12,
+        "failures": 0,
+        "cases": [
+          {
+            "name": "decimalPunctuationInRssTitle",
+            "actual": "Today\u2019s news \u2014 more",
+            "expected": "Today\u2019s news \u2014 more",
+            "passed": true
+          },
+          {
+            "name": "hexadecimalPunctuationInAtomTitle",
+            "actual": "\u201cNews\u201d",
+            "expected": "\u201cNews\u201d",
+            "passed": true
+          },
+          {
+            "name": "supplementaryCharactersUseCompleteCodePoints",
+            "actual": "\ud83d\ude80 \ud83d\ude00",
+            "expected": "\ud83d\ude80 \ud83d\ude00",
+            "passed": true
+          },
+          {
+            "name": "nonLatinTextAndLeadingZeroReferences",
+            "actual": "\u65e5\u672c \u00e9",
+            "expected": "\u65e5\u672c \u00e9",
+            "passed": true
+          },
+          {
+            "name": "numericWhitespaceKeepsExistingCollapse",
+            "actual": "one two three",
+            "expected": "one two three",
+            "passed": true
+          },
+          {
+            "name": "numericReferencesAlsoDecodeInArticleLinks",
+            "actual": "https://example.com/?a=1&b=2",
+            "expected": "https://example.com/?a=1&b=2",
+            "passed": true
+          },
+          {
+            "name": "malformedAndInvalidCodePointsRemainReadable",
+            "actual": "&#; &#x; &#-1; &#xZZ; &#0; &#55296; &#xDFFF; &#1114112; &#99999999999999999999;",
+            "expected": "&#; &#x; &#-1; &#xZZ; &#0; &#55296; &#xDFFF; &#1114112; &#99999999999999999999;",
+            "passed": true
+          },
+          {
+            "name": "validReferencesSurviveAdjacentInvalidReferences",
+            "actual": "A&#xD800;B",
+            "expected": "A&#xD800;B",
+            "passed": true
+          },
+          {
+            "name": "existingNamedEntitiesAndApostrophesRemain",
+            "actual": "& < > \" ' ' '",
+            "expected": "& < > \" ' ' '",
+            "passed": true
+          },
+          {
+            "name": "cdataAndPlainUnicodeRemain",
+            "actual": "Already caf\u00e9 \u2014",
+            "expected": "Already caf\u00e9 \u2014",
+            "passed": true
+          },
+          {
+            "name": "escapedNumericReferenceIsNotDecodedRecursively",
+            "actual": "Literal &#8217;",
+            "expected": "Literal &#8217;",
+            "passed": true
+          },
+          {
+            "name": "parsedHeadlinesRetainOrderAndCap",
+            "actual": "[\"H1\u2019s\",\"H2\u2019s\",\"H3\u2019s\",\"H4\u2019s\",\"H5\u2019s\",\"H6\u2019s\",\"H7\u2019s\",\"H8\u2019s\"]",
+            "expected": "[\"H1\u2019s\",\"H2\u2019s\",\"H3\u2019s\",\"H4\u2019s\",\"H5\u2019s\",\"H6\u2019s\",\"H7\u2019s\",\"H8\u2019s\"]",
+            "passed": true
+          }
+        ],
+        "apkSha256": "87ca7eaa34be533e1aaaf02e0737c6c6946340601e020366b27aae287880b567",
+        "actualApkClassLoader": true,
+        "parseMethod": "parse$app",
+        "cleanMethod": "clean$app",
+        "networkCalls": 0,
+        "preferenceCalls": 0
+      }
+    },
+    "ownedRemoteDirectoryAbsent": true,
+    "processesTerminal": true,
+    "actualParserSubprocessExit": {
+      "baseline": 0,
+      "candidate": 0
+    },
+    "initialWrapperExit": 1,
+    "cleanupObservationError": "ADB sh -c argument quoting; remote deletion had succeeded. Corrected read-only direct-shell absence check exits0.",
+    "correctedRetirementVerificationExit": 0,
+    "api": 29,
+    "optimizedExecution": false,
+    "scope": "Generated literal parser calls from actual debug APKs; no fetch/context/network/preferences/UI operations. Zero counter fields are source constraints, not instrumentation."
+  },
+  "independentReview": {
+    "recordedAt": "2026-11-04T08:13:21.943491+00:00",
+    "status": "accepted",
+    "blockers": [],
+    "clock": {
+      "start": "2026-11-04T08:06:47Z",
+      "target": "2026-11-04T08:21:47Z",
+      "deadline": "2026-11-04T08:36:47Z",
+      "reset": false
+    },
+    "scope": "Only numeric decimal/hex Unicode scalar decoding before existing named cleanup; fetch/cache/Atom relation behavior unchanged.",
+    "bindings": [
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NewsFeed.kt",
+        "sha256": "28ddb313ebf58060a594f210e6e5c98c3beb6b9c81564059e96e8b7727d49598",
+        "bytes": 7125
+      },
+      {
+        "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/NewsFeedNumericEntityTest.kt",
+        "sha256": "450b146ac1c14f1f8775d505fa1e39405f33c5c99bc0aabb9793124067964ac2",
+        "bytes": 2396
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/NewsFeed.baseline.kt",
+        "sha256": "b18a3de6f5aa0d9e4b151fe37ac95644e252cbbedd2609910f8dd972bc7b3853",
+        "bytes": 6675
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/native/NewsNumericProbe.java",
+        "sha256": "c4db7ae2ad454c9ab4db198bd329ab1b981d37e59942ef6b87d50d31f06fb249",
+        "bytes": 4411
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/native-baseline.txt",
+        "sha256": "5c77ea74379fd6c71065fa3af50d40be45d7b14b0b951aecde526b3266cbb269",
+        "bytes": 2061
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/native-candidate.txt",
+        "sha256": "078947aa6ad8220651414d8319c91db9f98b7cef499ce93c7b82074c81158d72",
+        "bytes": 1949
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/native-report.json",
+        "sha256": "63db0a91a9a09a7da2cc96b6500ed1b2dcf59aa6e1cdc9d8de5aa452866668d4",
+        "bytes": 6665
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/native-build.log",
+        "sha256": "06379e2ae52eb01fa43f911cb1b8c6e73022716b5626b6ce32026167ead29658",
+        "bytes": 346
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/promotion-artifacts.json",
+        "sha256": "dcd98b9f80a18d1f1b6e2747e3e54ef2c8f1d0504f3421d7c23753a92400f2da",
+        "bytes": 5133
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/baseline-jvm.xml",
+        "sha256": "7d41565ce92689e6147292fcf9df96c88e949b316377f237f252b5545916e8c2",
+        "bytes": 36562
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/native/build.sh",
+        "sha256": "e9651727236877b621e00060b859abaa7d61cd025e375bdaeb47c042ee9dce5d",
+        "bytes": 490
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/native/probe.jar",
+        "sha256": "02c586167530cf5279365e5cf9571b0938a3bef765a7067fe1ab91a7746d9f50",
+        "bytes": 3789
+      },
+      {
+        "path": "/private/tmp/portal-news-numeric-20261104-080647/native/classes/com/immortal/newsnumericprobe/NewsNumericProbe.class",
+        "sha256": "075b87e0a64829205464e1ba4e0f473bf89afc3a9ef5c1e23cf61a8bea8856e6",
+        "bytes": 6369
+      }
+    ],
+    "independentExpectations": {
+      "baseline": {
+        "tests": 12,
+        "failures": 8,
+        "controls": 4,
+        "failedMethods": [
+          "decimalPunctuationInRssTitle",
+          "hexadecimalPunctuationInAtomTitle",
+          "supplementaryCharactersUseCompleteCodePoints",
+          "nonLatinTextAndLeadingZeroReferences",
+          "numericWhitespaceKeepsExistingCollapse",
+          "numericReferencesAlsoDecodeInArticleLinks",
+          "validReferencesSurviveAdjacentInvalidReferences",
+          "parsedHeadlinesRetainOrderAndCap"
+        ],
+        "apkSha256": "5af2a37e544b2a24ee41db09cc771ab4c4767a8f5c64b6036ae9c06c6b05a467"
+      },
+      "candidate": {
+        "tests": 12,
+        "failures": 0,
+        "controls": 12,
+        "failedMethods": [],
+        "apkSha256": "87ca7eaa34be533e1aaaf02e0737c6c6946340601e020366b27aae287880b567"
+      }
+    },
+    "baselineFailureSetMatchesActualJvmXml": true,
+    "baselineSourceMatchesGitBase": true,
+    "frozenTestBytesUnchanged": true,
+    "candidateActualHostJUnitReplay": {
+      "tests": 12,
+      "failures": 0,
+      "terminalExit": 0,
+      "NewsFeedClassSha256": "732b43eac15b05b7810361deca1593ecce3151af761b7f7844211f418b2e781a",
+      "evidence": "Independent direct JUnit invocation in this worker thread using actual Gradle runtime jar/test classes, no Gradle invocation."
+    },
+    "candidateSignaturesVerified": {
+      "debug": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "performance": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "fullGates": {
+      "tests": 4414,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 461
+    },
+    "rootFullGradleExit": 0,
+    "nativeExitDistinction": {
+      "parserSubprocess": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "initialWrapper": 1,
+      "initialError": "ADB sh -c argument quoting; remote deletion had succeeded. Corrected read-only direct-shell absence check exits0.",
+      "correctedReadOnlyRetirement": 0
+    },
+    "retirement": {
+      "ownedDirectoryAbsent": true,
+      "processesTerminal": true,
+      "workerFreshDeviceObservation": false
+    },
+    "limitations": [
+      "Native outputs were root-executed generated literal parser calls from isolated actual debug APK DexClassLoader on API29, independently audited by this worker.",
+      "networkCalls/preferenceCalls zero values are source constraints, not measured counters; probe calls only clean/parse/Headline getters and APK hashing.",
+      "No optimized parser execution, UI/feed fetch/cache/network/account/preferences or room-promotion validation by this worker.",
+      "Invalid-reference preservation and existing named cleanup are bounded by frozen cases; complete HTML/XML entity compliance is not claimed."
+    ],
+    "probeDexSha256": "1065565b9339dc13a38588eafdb4fcad5a9895312dbb639563e44c25934bdcda"
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1616,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1966,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886227,
+      "sha256": "17d36b46121c61c013d6b371c026ba6f767e6cb8697c22da51b166d2f6eb9524",
+      "app": {
+        "versionCode": 133,
+        "versionName": "1.139"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886227,
+        "sha256": "17d36b46121c61c013d6b371c026ba6f767e6cb8697c22da51b166d2f6eb9524",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 133,
+          "versionName": "1.139"
+        }
+      }
+    }
+  },
+  "privateFrame": {
+    "viewedAt": "2026-11-04T08:15:05.696550+00:00",
+    "frameViewed": true,
+    "clockAndDateReadable": true,
+    "observedAppearance": "Large fitted portrait with thin frame and quiet doodles in dark margins.",
+    "currentRenderer": "Not identified from static capture.",
+    "newsWidgetVisualAcceptance": false,
+    "householdCapturePrivateOnly": true
+  },
+  "originalRegistryUnchanged": true,
+  "publicManifestUnchanged": "1.83/code77",
+  "limits": [
+    "Generated JVM and Family/API29 debug parser execution only; optimized runtime, API28, mounted Home News UI, live feed/cache/article and Living functional acceptance remain open.",
+    "Decimal/hexadecimal Unicode reference support; complete HTML/XML parsing and existing named cleanup semantics are separate.",
+    "No phone, source-media transfer, provider/account, GitHub push or publication."
+  ],
+  "strictDocsExit": 0
+}

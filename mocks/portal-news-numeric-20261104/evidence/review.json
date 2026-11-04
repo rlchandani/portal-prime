@@ -1,0 +1,147 @@
+{
+  "recordedAt": "2026-11-04T08:13:21.943491+00:00",
+  "status": "accepted",
+  "blockers": [],
+  "clock": {
+    "start": "2026-11-04T08:06:47Z",
+    "target": "2026-11-04T08:21:47Z",
+    "deadline": "2026-11-04T08:36:47Z",
+    "reset": false
+  },
+  "scope": "Only numeric decimal/hex Unicode scalar decoding before existing named cleanup; fetch/cache/Atom relation behavior unchanged.",
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NewsFeed.kt",
+      "sha256": "28ddb313ebf58060a594f210e6e5c98c3beb6b9c81564059e96e8b7727d49598",
+      "bytes": 7125
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/NewsFeedNumericEntityTest.kt",
+      "sha256": "450b146ac1c14f1f8775d505fa1e39405f33c5c99bc0aabb9793124067964ac2",
+      "bytes": 2396
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/NewsFeed.baseline.kt",
+      "sha256": "b18a3de6f5aa0d9e4b151fe37ac95644e252cbbedd2609910f8dd972bc7b3853",
+      "bytes": 6675
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/native/NewsNumericProbe.java",
+      "sha256": "c4db7ae2ad454c9ab4db198bd329ab1b981d37e59942ef6b87d50d31f06fb249",
+      "bytes": 4411
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/native-baseline.txt",
+      "sha256": "5c77ea74379fd6c71065fa3af50d40be45d7b14b0b951aecde526b3266cbb269",
+      "bytes": 2061
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/native-candidate.txt",
+      "sha256": "078947aa6ad8220651414d8319c91db9f98b7cef499ce93c7b82074c81158d72",
+      "bytes": 1949
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/native-report.json",
+      "sha256": "63db0a91a9a09a7da2cc96b6500ed1b2dcf59aa6e1cdc9d8de5aa452866668d4",
+      "bytes": 6665
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/native-build.log",
+      "sha256": "06379e2ae52eb01fa43f911cb1b8c6e73022716b5626b6ce32026167ead29658",
+      "bytes": 346
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/promotion-artifacts.json",
+      "sha256": "dcd98b9f80a18d1f1b6e2747e3e54ef2c8f1d0504f3421d7c23753a92400f2da",
+      "bytes": 5133
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/baseline-jvm.xml",
+      "sha256": "7d41565ce92689e6147292fcf9df96c88e949b316377f237f252b5545916e8c2",
+      "bytes": 36562
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/native/build.sh",
+      "sha256": "e9651727236877b621e00060b859abaa7d61cd025e375bdaeb47c042ee9dce5d",
+      "bytes": 490
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/native/probe.jar",
+      "sha256": "02c586167530cf5279365e5cf9571b0938a3bef765a7067fe1ab91a7746d9f50",
+      "bytes": 3789
+    },
+    {
+      "path": "/private/tmp/portal-news-numeric-20261104-080647/native/classes/com/immortal/newsnumericprobe/NewsNumericProbe.class",
+      "sha256": "075b87e0a64829205464e1ba4e0f473bf89afc3a9ef5c1e23cf61a8bea8856e6",
+      "bytes": 6369
+    }
+  ],
+  "independentExpectations": {
+    "baseline": {
+      "tests": 12,
+      "failures": 8,
+      "controls": 4,
+      "failedMethods": [
+        "decimalPunctuationInRssTitle",
+        "hexadecimalPunctuationInAtomTitle",
+        "supplementaryCharactersUseCompleteCodePoints",
+        "nonLatinTextAndLeadingZeroReferences",
+        "numericWhitespaceKeepsExistingCollapse",
+        "numericReferencesAlsoDecodeInArticleLinks",
+        "validReferencesSurviveAdjacentInvalidReferences",
+        "parsedHeadlinesRetainOrderAndCap"
+      ],
+      "apkSha256": "5af2a37e544b2a24ee41db09cc771ab4c4767a8f5c64b6036ae9c06c6b05a467"
+    },
+    "candidate": {
+      "tests": 12,
+      "failures": 0,
+      "controls": 12,
+      "failedMethods": [],
+      "apkSha256": "87ca7eaa34be533e1aaaf02e0737c6c6946340601e020366b27aae287880b567"
+    }
+  },
+  "baselineFailureSetMatchesActualJvmXml": true,
+  "baselineSourceMatchesGitBase": true,
+  "frozenTestBytesUnchanged": true,
+  "candidateActualHostJUnitReplay": {
+    "tests": 12,
+    "failures": 0,
+    "terminalExit": 0,
+    "NewsFeedClassSha256": "732b43eac15b05b7810361deca1593ecce3151af761b7f7844211f418b2e781a",
+    "evidence": "Independent direct JUnit invocation in this worker thread using actual Gradle runtime jar/test classes, no Gradle invocation."
+  },
+  "candidateSignaturesVerified": {
+    "debug": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "performance": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "fullGates": {
+    "tests": 4414,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 461
+  },
+  "rootFullGradleExit": 0,
+  "nativeExitDistinction": {
+    "parserSubprocess": {
+      "baseline": 0,
+      "candidate": 0
+    },
+    "initialWrapper": 1,
+    "initialError": "ADB sh -c argument quoting; remote deletion had succeeded. Corrected read-only direct-shell absence check exits0.",
+    "correctedReadOnlyRetirement": 0
+  },
+  "retirement": {
+    "ownedDirectoryAbsent": true,
+    "processesTerminal": true,
+    "workerFreshDeviceObservation": false
+  },
+  "limitations": [
+    "Native outputs were root-executed generated literal parser calls from isolated actual debug APK DexClassLoader on API29, independently audited by this worker.",
+    "networkCalls/preferenceCalls zero values are source constraints, not measured counters; probe calls only clean/parse/Headline getters and APK hashing.",
+    "No optimized parser execution, UI/feed fetch/cache/network/account/preferences or room-promotion validation by this worker.",
+    "Invalid-reference preservation and existing named cleanup are bounded by frozen cases; complete HTML/XML entity compliance is not claimed."
+  ],
+  "probeDexSha256": "1065565b9339dc13a38588eafdb4fcad5a9895312dbb639563e44c25934bdcda"
+}
