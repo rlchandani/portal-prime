@@ -1,18 +1,62 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T13:12:50.859520+00:00",
-  "updatedLabel": "Panorama resize delivered to both rooms; original clocks retained",
+  "updatedAt": "2026-11-04T13:23:01.176899+00:00",
+  "updatedLabel": "Flip12h delivered to both rooms; original clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.158/code 152. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.159/code 153. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "flip-clock-hour-format",
+      "title": "Flip clock respects 12-hour format",
+      "summary": "Use the selected hour format for initial, reveal and resumed Flip clock digits.",
+      "status": "delivered",
+      "verification": "4,513 JVM /8 actual native cases /exact both-room installs",
+      "kind": "Screensaver clock",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent review",
+      "deployment": "Exact optimized1.159/code153 fully hashed in both rooms; one install each.",
+      "acceptance": [
+        "Same frozen actual-debug/API29 fixture: three literal failures and five controls become eight passes.",
+        "12h13:05 becomes0105; midnight00:05 becomes1205; late23:59 becomes1159. Noon and all24h controls remain.",
+        "Only cached formatter choice changes; four cards, drawing, reveal, update, animation, lifecycle and existing settings infrastructure remain."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery",
+          "source": "docs/portal-flip-format-2026-11-04.md"
+        },
+        {
+          "text": "Verification",
+          "source": "mocks/portal-flip-format-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Native acceptance observes the actual packaged debug constructor and formatter, refreshForReveal, and first resumed update on Family API29 using fixed generated UTC times. No formatter or digit seeding.",
+        "No attached drawing, raster, animation phase, hardware performance, optimized-class, API28, Living visual, whole-controller, or currently selected style acceptance. Broader motion and parked Night scopes remain open.",
+        "All ten screensaver web assets are byte-identical to installed1.158 and packaged source. No new JavaScript test-run claim; prior1.158 runs remain their recorded baseline.",
+        "Saved Shuffle/fit and household preferences remain. Public1.83/code77 unchanged; no phone, household media/provider/account operations, GitHub push or publication."
+      ],
+      "next": "Continue the next small verified improvement.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T13:01:07Z",
+        "firstSourceWitnessAt": "2026-11-04T13:02:37Z",
+        "selectedAt": "2026-11-04T13:16:36.452593+00:00",
+        "target": "2026-11-04T13:16:07Z",
+        "hardDeadline": "2026-11-04T13:31:07Z",
+        "clockNotReset": true,
+        "targetMissedBeforeSelection": true
+      }
+    },
     {
       "id": "panorama-strip-viewport",
       "title": "Panorama photos fit after viewport resize",

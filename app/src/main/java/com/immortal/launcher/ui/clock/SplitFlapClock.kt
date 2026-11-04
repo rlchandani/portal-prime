@@ -39,7 +39,7 @@ class SplitFlapClockFaceView(
 
     override val fullBleed: Boolean = true
 
-    private val timeFmt = SimpleDateFormat("HHmm", Locale.getDefault())
+    private val timeFmt = SimpleDateFormat(if (spec.is24h) "HHmm" else "hhmm", Locale.getDefault())
     private var displayedDigits = charArrayOf('0', '0', '0', '0')
     private var pendingDigits   = charArrayOf('0', '0', '0', '0')
     // flip progress per digit: 0f = idle, 0..1f = flipping

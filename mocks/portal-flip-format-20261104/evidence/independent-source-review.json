@@ -1,0 +1,364 @@
+{
+  "ok": true,
+  "reviewedAt": "2026-11-04T13:22:12.599149+00:00",
+  "scope": "Independent source, retained native-result and exact artifact binding review. Reviewer performed no SDK/build/test/Git/device/network operation or production edit.",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T13:01:07Z",
+    "firstSourceWitnessAt": "2026-11-04T13:02:37Z",
+    "selectedAt": "2026-11-04T13:16:36.452593+00:00",
+    "target": "2026-11-04T13:16:07Z",
+    "hardDeadline": "2026-11-04T13:31:07Z",
+    "clockNotReset": true
+  },
+  "bindings": {
+    "/private/tmp/portal-flip-format-20261104-130107/selected-plan.json": {
+      "sha256": "a4cb2b060e20f3f6a48c16400fedebe23ca6cccea1a6e0be77d2455407188a01",
+      "bytes": 4148
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/source-witness.json": {
+      "sha256": "5b28061efee1b9524e5f8b24278646d94b6be7a79118d7a1a1150071d1ed9fa9",
+      "bytes": 3653
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/SplitFlapClock.before.kt": {
+      "sha256": "9b5717a1f01e614752a8fb5ab2958831c25bc417ccfe4ecefa1b960c52238242",
+      "bytes": 7521
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/app-build.before.kts": {
+      "sha256": "402ad3e314388d1e1e3754fd414a5d54cb8fe27b83c8ed4770df77bd8d7fb884",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-run.py": {
+      "sha256": "9a487c9746c6bea9cc1d65c56b44296c475b615bdb2f6b9813b509f2985cafd6",
+      "bytes": 4389
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-before-report.json": {
+      "sha256": "06a3e56f7780169f7ff1256d5ca8e5f4917adb7e2f6edf27c62675aec1c77a3e",
+      "bytes": 5260
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-before-terminal.json": {
+      "sha256": "3e5a75ac248c0cd9ea33c62c43fed09e6d1a59068d14b0ba06ae0750c4d5fe92",
+      "bytes": 111
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-after-report.json": {
+      "sha256": "475892dfa734d87fa0c87170ffd09ee4d1bd06c5be2c6f7776c02bd7938b75d5",
+      "bytes": 4746
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-after-terminal.json": {
+      "sha256": "81b7f5c39a8779a2e683f40aafa15bcb25940a2ebdb08b89588cdc7135fd0c69",
+      "bytes": 128
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/build-terminal.json": {
+      "sha256": "4c2a18e49055976b64535c2198eec1c993384eed867063e6027666e6c4cf48ee",
+      "bytes": 181
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/promotion-artifacts.json": {
+      "sha256": "36bc84f49e488c371ee9e70b591a988b731181400cd3ff18ee5b4454feee8f1b",
+      "bytes": 4785
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/before-debug-1.158.apk": {
+      "sha256": "818cc9138cf6cbde0abeccf541fae7358651694f35a256ef0f78e593562e038e",
+      "bytes": 46767286
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/candidate-debug-1.159.apk": {
+      "sha256": "c9b76e5a376b97af298feb84b26256217b10663e8e914e29ae4be9b645c509a2",
+      "bytes": 46745650
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/candidate-performance-1.159.apk": {
+      "sha256": "a89371afe53bd0c0bd848f2bf626ec5bf784d2dd9d84a0d23e6375a29289805b",
+      "bytes": 25886927
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/FlipFormatActivity.java": {
+      "sha256": "f7aab4cf670cf6447ddf9ba7099bdb048806355feb1c5be0b897125dcb59f615",
+      "bytes": 10481
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/AndroidManifest.xml": {
+      "sha256": "da4e98e3bc42c08ac049d27e5b1d21ea9f8ac7a2acb4c18c17ce3dc8d174bde5",
+      "bytes": 386
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/RUN.md": {
+      "sha256": "3cb0f48ecf9bbceb4913ad2e0b9f5655b5bd95ae77b062ab2f363d040e5f2630",
+      "bytes": 2040
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/source-admission.json": {
+      "sha256": "e764bfaf3c1a6260cc2ee1576d8c8c51084fa98732c8629ec84f733646ac245b",
+      "bytes": 2607
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/build.sh": {
+      "sha256": "4cf58d1ea27d347e13a10c872008fc088575476d9caceb20efea97553e986e10",
+      "bytes": 826
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/repack.sh": {
+      "sha256": "4b70c8fe322f90a42d87b0dcba3a6596d89298d32b6404d55322bf08f89756af",
+      "bytes": 779
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/freeze.py": {
+      "sha256": "43c80be2e06b61472cf061e7de34e26801386ab93b2ac98a105ee9d137343773",
+      "bytes": 1562
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/preparation-verification.json": {
+      "sha256": "0864a040ebeca6e80c32426cf92f664278030110b8b3b960d38993472ff78739",
+      "bytes": 3675
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/frozen-dex/classes.dex": {
+      "sha256": "6692b3b317ee255ca6859421161677db231d025ce1ef1393968fdc805a526fb6",
+      "bytes": 15756
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/baseline-fixture.apk": {
+      "sha256": "a851e5542d60716fe20938f9ce2521cff9cc34468fb910abba524640911824fb",
+      "bytes": 37503466
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/flip-format-fixture.apk": {
+      "sha256": "0825b5df48b79aa3c877ff496eb17243372e2c56851d067a1723dbe6bb3362f2",
+      "bytes": 37507562
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/native-owned/assets/source.apk": {
+      "sha256": "c9b76e5a376b97af298feb84b26256217b10663e8e914e29ae4be9b645c509a2",
+      "bytes": 46745650
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ui/clock/SplitFlapClock.kt": {
+      "sha256": "8e60061f434494dff05c149de255e9e753fd2036871cb0065474f7bf7f782de5",
+      "bytes": 7549
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "337ab1050de41e0fed45cc61eaa2cd2ca63016215c88fda3d787f230294b4156",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ScreensaverFace.kt": {
+      "sha256": "9d2fbd1589ed1558336a1e3ca2ff0d5c38ba0d8159c76bb03c4fc9a5142ac71b",
+      "bytes": 12013
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FaceCatalog.kt": {
+      "sha256": "a435d5291ce599bea63d37c3d6f7727fcd2d9198bcbfdcc8af394faeb0ec4ef6",
+      "bytes": 5915
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ClockFaces.kt": {
+      "sha256": "0bb2cffd08674e6bca3b5367eac747d14ac2f61225519418c76508f249308433",
+      "bytes": 7031
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FaceRenderer.kt": {
+      "sha256": "9f62b1b197bbd9afce67158bb77c8e6b27eaebd8d9140530280227f6fe1b8183",
+      "bytes": 39413
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+      "bytes": 164859
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/SplitFlapClockRevealTest.kt": {
+      "sha256": "60595be33323b57c706760c764da4c5cb8e27f589f0bf7a6f270c8790d291b9d",
+      "bytes": 4762
+    },
+    "/private/tmp/portal-flip-format-20261104-130107/gradle.log": {
+      "sha256": "63efcd866b319494e475731da453ff24987f067a277687f5cdf4e390e887da04",
+      "bytes": 13723
+    }
+  },
+  "protectedWebAssets": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png": {
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "bytes": 12657
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html": {
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "bytes": 7785
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js": {
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "bytes": 5582
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js": {
+      "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007",
+      "bytes": 70273
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg": {
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "bytes": 1247
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg": {
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "bytes": 1246
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js": {
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "bytes": 8528
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css": {
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "bytes": 15397
+    }
+  },
+  "sourceAcceptance": {
+    "exactOneLineDelta": "SimpleDateFormat(\"HHmm\", Locale.getDefault()) \u2192 SimpleDateFormat(if (spec.is24h) \"HHmm\" else \"hhmm\", Locale.getDefault()). Entire remaining SplitFlap source byte-identical.",
+    "metadataOnlyDelta": "App build152/1.158 \u2192153/1.159; every other build-file byte identical.",
+    "protectedCallersAndExistingRevealTest": "Every selected-plan caller and seeded reveal-test hash unchanged. Active ordinary Flip receives format from existing ImmortalSettings policy via FaceCatalog/ClockSpec and factory. Four cards, draw, animation, reveal/update/lifecycle and locale/timezone capture unchanged.",
+    "regressionBoundary": "Existing host reveal tests seed a formatter and bypass constructor initialization. No JVM constructor regression claim; actual detached native constructor evidence is the regression gate.",
+    "priorScopes": "Ordinary Flip format is distinct from parked legacy Night motion. Shared Night class does not create a Night/performance/motion acceptance claim."
+  },
+  "nativeAcceptance": {
+    "before": {
+      "tests": 8,
+      "literalFailures": 3,
+      "controls": 5,
+      "setupFailures": 0,
+      "terminal": {
+        "exitCode": 0,
+        "tool": "3a8639",
+        "session": 41264,
+        "tests": 8,
+        "failures": 3,
+        "controls": 5,
+        "accepted": true
+      }
+    },
+    "after": {
+      "tests": 8,
+      "failures": 0,
+      "setupFailures": 0,
+      "terminal": {
+        "exitCode": 0,
+        "session": 22160,
+        "tool": "fa7bbd",
+        "tests": 8,
+        "failures": 0,
+        "controls": 5,
+        "accepted": true
+      }
+    },
+    "literalReplay": [
+      {
+        "name": "twelveHourAfternoon",
+        "input": "2030-01-01 13:05 UTC",
+        "expected": "0105",
+        "before": "1305",
+        "after": "0105"
+      },
+      {
+        "name": "twelveHourMidnight",
+        "input": "2030-01-01 00:05 UTC",
+        "expected": "1205",
+        "before": "0005",
+        "after": "1205"
+      },
+      {
+        "name": "twelveHourNoon",
+        "input": "2030-01-01 12:05 UTC",
+        "expected": "1205",
+        "before": "1205",
+        "after": "1205"
+      },
+      {
+        "name": "twelveHourLateEvening",
+        "input": "2030-01-01 23:59 UTC",
+        "expected": "1159",
+        "before": "2359",
+        "after": "1159"
+      },
+      {
+        "name": "twentyFourHourAfternoon",
+        "input": "2030-01-01 13:05 UTC",
+        "expected": "1305",
+        "before": "1305",
+        "after": "1305"
+      },
+      {
+        "name": "twentyFourHourMidnight",
+        "input": "2030-01-01 00:05 UTC",
+        "expected": "0005",
+        "before": "0005",
+        "after": "0005"
+      },
+      {
+        "name": "twentyFourHourNoon",
+        "input": "2030-01-01 12:05 UTC",
+        "expected": "1205",
+        "before": "1205",
+        "after": "1205"
+      },
+      {
+        "name": "twentyFourHourLateEvening",
+        "input": "2030-01-01 23:59 UTC",
+        "expected": "2359",
+        "before": "2359",
+        "after": "2359"
+      }
+    ],
+    "allFourObservedDigitFieldsRecomputed": true,
+    "exactBaselineFailedErrors": "Only12h afternoon/midnight/late-evening have three exact formatter/reveal/first-tick mismatch errors. All five baseline controls and all eight candidate cases have no errors.",
+    "realOriginAndLifecycle": "Both embedded ClockSpec and SplitFlap ClassLoaders verified actual isolated APK origin. Actual ClockSpec.fromJson and public Android constructor used; initialized formatter and retained fields only read, never seeded. Actual inactive reveal and first resumed tick consumers run. Both phases construct/dispose8, have0setup/0unexpectedContext, restore per-case/global timezone and default/FORMAT/DISPLAY locales, API29 and no INTERNET permission.",
+    "retirement": "Both retained records have packageAbsent/processAbsent/externalDirectoryAbsent=true.",
+    "contextLimits": "OwnedContext wraps only fixture Activity for resources/theme and rejects prefs/resolver/known services/startActivity. unexpectedContextOperations0 is scoped wrapper observation; realClockSettingsChanged=false is source containment, not loader-wide/global OS instrumentation.",
+    "fixtureIntegrity": {
+      "javaSha256": "f7aab4cf670cf6447ddf9ba7099bdb048806355feb1c5be0b897125dcb59f615",
+      "dex": {
+        "sha256": "6692b3b317ee255ca6859421161677db231d025ce1ef1393968fdc805a526fb6",
+        "bytes": 15756
+      },
+      "sameCompiledDexAndFrozenJavaGatesBothPhases": true,
+      "wrapperChangedEntries": [
+        "META-INF/ANDROIDD.RSA",
+        "META-INF/ANDROIDD.SF",
+        "META-INF/MANIFEST.MF",
+        "assets/source.apk"
+      ],
+      "onlyEmbeddedApkAndThreeV1SignatureEntriesDiffer": true,
+      "actualBeforeAfterEmbeddedApkBytesVerified": true,
+      "driver": "Current exact driver bound, fully reviewed before candidate and unchanged guards/literals retained. No SDK execution by reviewer.",
+      "historicalMetadata": "Preparation/admission unselected/source-authoring/dex-pending labels and selected-plan inherited limits are original witness/template metadata. SelectedAt, frozen compiled DEX and actual terminal/reports establish the accepted phases."
+    }
+  },
+  "artifactAcceptance": {
+    "debug": {
+      "path": "/private/tmp/portal-flip-format-20261104-130107/candidate-debug-1.159.apk",
+      "sha256": "c9b76e5a376b97af298feb84b26256217b10663e8e914e29ae4be9b645c509a2",
+      "bytes": 46745650,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='153' versionName='1.159' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "path": "/private/tmp/portal-flip-format-20261104-130107/candidate-performance-1.159.apk",
+      "sha256": "a89371afe53bd0c0bd848f2bf626ec5bf784d2dd9d84a0d23e6375a29289805b",
+      "bytes": 25886927,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='153' versionName='1.159' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "actualHashesAndZipBytesIndependentlyRecomputed": true,
+    "allTenAssetsEachApkEqualCurrentSourceAndBaselineApk": true,
+    "manifestAndSignerOrigin": "Root SDK verification retained in artifact metadata; exact153/1.159, expected package and unchanged signer metadata read, no reviewer SDK invocation.",
+    "fullJvmXmlIndependentlyRecounted": {
+      "tests": 4513,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 471
+    },
+    "xmlBindingSetSha256": "b5218daef8ebc4a171172542caa85fe315f6be23de192d14f8399f16a72e2dcd",
+    "xmlBindingSetDefinition": "Sorted TEST-*.xml filenames + NUL + sha256 + NUL + bytes + newline; actual current testDebugUnitTest results.",
+    "buildTerminal": {
+      "exitCode": 0,
+      "session": 47460,
+      "tool": "2ef336",
+      "command": ":app:testDebugUnitTest :app:assembleDebug :app:assemblePerformance :app:lintVitalPerformance --no-daemon"
+    }
+  },
+  "blockers": [],
+  "limits": [
+    "Detached actual debug constructor/formatter consumers on API29 with supplied UTC/US literals only; no attached Canvas/pixel, physical clock/flip animation, AM/PM redesign, live time changes or concurrent-default acceptance.",
+    "No optimized runtime, API28, Living visual, native Night, optical/performance or exhausted motion/black-handoff scope closure.",
+    "Room installation/preservation, durable documentation and Git operations remain root-owned; this review does not claim those pending actions."
+  ]
+}

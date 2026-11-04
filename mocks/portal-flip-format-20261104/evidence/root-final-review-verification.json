@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "rootFullyReadBothFinalReviews": true,
+  "rootFullReadTool": "3f05d0",
+  "sourceBindingsExact": 47,
+  "nativeArtifactBindingsExact": 38,
+  "sourceReviewSha256": "0db69e1dcedf22540fa41feb4cd1cb75e21fcad1a34843805c82f36e2619cdf8",
+  "nativeArtifactReviewSha256": "d69969e21797b106e86cc7c91b69413ab7381dc339ed3af80670feb926dadad4",
+  "beforePromotion": true,
+  "verifiedAt": "2026-11-04T13:22:34.332337+00:00"
+}

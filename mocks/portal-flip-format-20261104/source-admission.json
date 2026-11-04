@@ -1,0 +1,82 @@
+{
+  "sourceReady": true,
+  "state": "unselected-actual-native-constructor-alternative",
+  "authoredAtUtc": "2026-11-04T13:12:34.688143+00:00",
+  "originalDiscoveryAt": "2026-11-04T13:01:07Z",
+  "firstSourceWitnessAt": "2026-11-04T13:02:37Z",
+  "target": "2026-11-04T13:16:07Z",
+  "hardDeadline": "2026-11-04T13:31:07Z",
+  "clockNotReset": true,
+  "package": "com.immortal.flipformatfixture",
+  "activity": ".FlipFormatActivity",
+  "report": "external-files/report.json",
+  "sources": {
+    "FlipFormatActivity.java": {
+      "sha256": "f7aab4cf670cf6447ddf9ba7099bdb048806355feb1c5be0b897125dcb59f615",
+      "bytes": 10481
+    },
+    "AndroidManifest.xml": {
+      "sha256": "da4e98e3bc42c08ac049d27e5b1d21ea9f8ac7a2acb4c18c17ce3dc8d174bde5",
+      "bytes": 386
+    },
+    "RUN.md": {
+      "sha256": "3cb0f48ecf9bbceb4913ad2e0b9f5655b5bd95ae77b062ab2f363d040e5f2630",
+      "bytes": 2040
+    }
+  },
+  "baselineApk": {
+    "path": "/private/tmp/portal-panorama-viewport-20261104-130107/candidate-debug-1.158.apk",
+    "sha256": "818cc9138cf6cbde0abeccf541fae7358651694f35a256ef0f78e593562e038e",
+    "bytes": 46767286
+  },
+  "productionBindings": {
+    "app/src/main/java/com/immortal/launcher/ui/clock/SplitFlapClock.kt": "9b5717a1f01e614752a8fb5ab2958831c25bc417ccfe4ecefa1b960c52238242",
+    "app/src/main/java/com/immortal/launcher/ScreensaverFace.kt": "9d2fbd1589ed1558336a1e3ca2ff0d5c38ba0d8159c76bb03c4fc9a5142ac71b"
+  },
+  "caseNames": [
+    "twelveHourAfternoon",
+    "twelveHourMidnight",
+    "twelveHourNoon",
+    "twelveHourLateEvening",
+    "twentyFourHourAfternoon",
+    "twentyFourHourMidnight",
+    "twentyFourHourNoon",
+    "twentyFourHourLateEvening"
+  ],
+  "expectedBaselineFailNames": [
+    "twelveHourAfternoon",
+    "twelveHourMidnight",
+    "twelveHourLateEvening"
+  ],
+  "literalExpected12h": [
+    "0105",
+    "1205",
+    "1205",
+    "1159"
+  ],
+  "literalExpected24h": [
+    "1305",
+    "0005",
+    "1205",
+    "2359"
+  ],
+  "gates": {
+    "actualConstructor": true,
+    "formatterReadOnlyNoSeeding": true,
+    "actualRevealFirstResumedUpdateDigits": true,
+    "setupFailures": 0,
+    "constructedDisposed": 8,
+    "unexpectedContextOperations": 0,
+    "allDefaultsRestored": true,
+    "manifestPermissions": [],
+    "watchdogMillis": 30000
+  },
+  "sourceAuthoringOnly": true,
+  "buildSdkAdbGitTestsDevicesNetwork": 0,
+  "fixtureDexPendingRootCompilation": true,
+  "limits": [
+    "Detached actual Android constructor/formatter consumers only",
+    "No mounted drawing/clock motion/night/optimized/API28/Living",
+    "Wrapper source containment, not loader instrumentation"
+  ]
+}
