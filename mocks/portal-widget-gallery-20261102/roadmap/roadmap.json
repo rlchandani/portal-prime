@@ -1,18 +1,61 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T14:58:32.066933+00:00",
-  "updatedLabel": "All-day calendar date validation delivered as1.165 both rooms; original clocks retained",
+  "updatedAt": "2026-11-04T15:15:54.966471+00:00",
+  "updatedLabel": "Home greeting timezone candidate verified locally;1.166 delivery unverified after device transport failures; clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.165/code 159. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Latest complete room readbacks were optimized Portal1.165/code159 before the1.166 attempt;1.166 device deployment is unverified after transport failures. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "home-greeting-timezone",
+      "title": "Home greeting: follow the current timezone",
+      "summary": "Retained time, weekday and date formatters use the same timezone as the greeting hour.",
+      "description": "Refresh the three remembered formatter zones on each composition; preserve patterns, locale, minute cadence and layout.",
+      "status": "verified",
+      "verification": "Eight frozen source-captured leaf vectors: four literal mismatches/four controls to eight passes. All4555JVM/474suites/debug/optimized/R8/vital pass; combined independent review,32bindings rehashed.",
+      "kind": "Home clock correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root execution / photo diagnosis / independent media review",
+      "deployment": "Signed1.166/code160 candidate ready locally; deployment unverified because Family is unreachable and Living upload timed out. One Living upload attempt; no Family install and no retry.",
+      "state": "Last complete readbacks/preservation are1.165 before the attempt; post-attempt installed bytes/settings/health are unverified. Saved settings were not intentionally changed.",
+      "acceptance": [
+        "Same captured formatter/hour leaf and literal expectations before/after, with restored process defaults.",
+        "Full required local build/test and signed artifact/source-asset gates pass."
+      ],
+      "evidence": [
+        {
+          "text": "Fix, checks and deployment block.",
+          "source": "docs/portal-home-greeting-zone-2026-11-04.md"
+        },
+        {
+          "text": "Combined independent review.",
+          "source": "mocks/portal-home-greeting-zone-20261104/evidence/independent-review.json"
+        }
+      ],
+      "limits": [
+        "Source-captured construction-only remember adapter; no actual Composable, UI, retained lifecycle, native or optimized runtime acceptance.",
+        "No immediate timezone-broadcast or locale-change acceptance; minute cadence remains.",
+        "Both-room deployment and post-attempt preservation remain unverified; reconcile read-only before any new install.",
+        "No phone, account, household media or publication operations; public1.83 and old issue clocks retained."
+      ],
+      "next": "Reconcile device state when the known connections return; continue another independent small slice.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T15:00:49Z",
+        "selectedAt": "2026-11-04T15:04:43.181422+00:00",
+        "target": "2026-11-04T15:15:49Z",
+        "hardDeadline": "2026-11-04T15:30:49Z",
+        "clockNotReset": true
+      }
+    },
     {
       "id": "calendar-all-day-date-validity",
       "title": "Calendar: reject impossible all-day dates",

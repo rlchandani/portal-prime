@@ -1,0 +1,23 @@
+{
+  "source": "/private/tmp/portal-next-visible-20261104-150049/after-HomeActivity.kt",
+  "sourceSha256": "0c0d23fb70911760a08cded01817ad76483dcfed2948d3a3eba1fdff533b94f9",
+  "capture": {
+    "function": "private fun ApprovedHomeGreeting(",
+    "characterStartInclusive": 227560,
+    "characterEndExclusive": 228035,
+    "byteStartInclusive": 228439,
+    "byteEndExclusive": 228914,
+    "startLine": 5307,
+    "endLine": 5314,
+    "fieldsSha256": "4f83bc874b81f6522173d139d44331bb2dd221d84a08ced248ed722ebe0445a2",
+    "postFieldsSha256": "cc32ff5c3373f2428acf87ce49faa45d038d96475c0d20255cf20dfb55df9985",
+    "blockSha256": "597f4d7078cc6ff84f8d057e6b4e007888dc36ecd6fd367e9aed4da380780f9e",
+    "fieldsExact": "  val timeFmt = remember(use24) { SimpleDateFormat(if (use24) \"H:mm\" else \"h:mm\", Locale.getDefault()) }\n  val dayFmt = remember { SimpleDateFormat(\"EEEE\", Locale.getDefault()) }\n  val dateFmt = remember { SimpleDateFormat(\"MMMM d\", Locale.getDefault()) }\n",
+    "postFieldsExact": "  val zone = TimeZone.getDefault()\n  timeFmt.timeZone = zone\n  dayFmt.timeZone = zone\n  dateFmt.timeZone = zone\n  val hour = java.util.Calendar.getInstance(zone).apply { time = now }.get(java.util.Calendar.HOUR_OF_DAY)\n"
+  },
+  "wrapper": {
+    "path": "/private/tmp/portal-next-visible-20261104-150049/green-leaf/ActualGreetingLeaf.kt",
+    "sha256": "c9ee6304a665eb03e89d842f47163ac8a3813ac72af046c5515ff7eeaa6208c4"
+  },
+  "boundary": "Actual source-captured retained formatter/hour leaf; remember adapter runs only at construction. No actual Compose execution, UI, lifecycle, provider, preference or native acceptance."
+}

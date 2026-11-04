@@ -1,0 +1,10 @@
+{
+  "compileExit": 0,
+  "runExit": 1,
+  "cases": 8,
+  "failingLiteralVectors": 4,
+  "controls": 4,
+  "terminalFailure": "java.lang.AssertionError",
+  "defaultsRestored": true,
+  "fixtureSha256": "acd476f987fa37322aabe0c455ebad3688192bb599d6246882b4d777ff564b94"
+}

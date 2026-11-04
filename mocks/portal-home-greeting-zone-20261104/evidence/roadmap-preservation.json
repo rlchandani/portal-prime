@@ -1,0 +1,17 @@
+{
+  "tasks": 162,
+  "counts": {
+    "verified": 44,
+    "delivered": 108,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "all161OldObjectsExact": true,
+  "oldTaskRawSuffixBytes": 518502,
+  "oldTaskRawSuffixSha256": "387ac2e6071182112f5b09cd4a66f8df034a936aca9a47f7c3fd562b12c1a561",
+  "oldTaskRawSuffixExact": true,
+  "defaultTaskUnchanged": true,
+  "oldClocksUnchanged": true,
+  "onlyBoundaryDelta": "Latest confirmed1.165 before attempt;1.166 deployment unverified after transport failures"
+}

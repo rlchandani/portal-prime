@@ -1,0 +1,9 @@
+{
+  "result": {
+    "status": "timeout",
+    "ack": "uncertain",
+    "install_attempted": true,
+    "observations": 57
+  },
+  "installed": null
+}

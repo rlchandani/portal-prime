@@ -1,0 +1,11 @@
+{
+  "originalDiscoveryAt": "2026-11-04T15:00:49Z",
+  "selectedAt": "2026-11-04T15:04:43.181422+00:00",
+  "target": "2026-11-04T15:15:49Z",
+  "hardDeadline": "2026-11-04T15:30:49Z",
+  "clockNotReset": true,
+  "base": "15d701ef",
+  "scope": "Refresh three retained Home greeting formatter zones each composition and use the same zone for greeting hour; retain locale/patterns/cache/minute producer/layout/settings.",
+  "verification": "Captured exactformatter/hour leaf diagnostic plus fullJVM/build/artifactreview; no completeCompose/nativeUIacceptance.",
+  "otherDiscovery": "Camera boundednegative; TimerAlarm/AlarmSound PCM return/release observations remain unselected under this same clock."
+}

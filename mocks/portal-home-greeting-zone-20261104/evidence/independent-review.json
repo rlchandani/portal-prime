@@ -1,0 +1,306 @@
+{
+  "ok": true,
+  "acceptance": "Accepted exact Home greeting timezone delta, source-captured retained-leaf diagnostics, full JVM/build evidence and final APK identity/assets.",
+  "blockers": [],
+  "originalDiscoveryAt": "2026-11-04T15:00:49Z",
+  "target": "2026-11-04T15:15:49Z",
+  "hardDeadline": "2026-11-04T15:30:49Z",
+  "clockNotReset": true,
+  "base": "15d701ef",
+  "source": {
+    "entireSourceReconstructionExact": true,
+    "currentSourceMatchesFrozenAfter": true,
+    "onlyDelta": "Sample default timezone once, assign it to three remembered formatters, pass the same zone to existing hour Calendar.",
+    "patternsLocaleRememberKeysProducerCadenceSelectionLayoutSettingsBytesUnchanged": true,
+    "activeCaller": "HomeActivity.kt:1306 ApprovedHomeGreeting"
+  },
+  "capturedLeaf": {
+    "characterByteLineOffsetsAndExactTextReplayed": true,
+    "fieldPostFieldAndWrapperShaReplayed": true,
+    "constructionOnlyRememberAdapter": true,
+    "sameActualCompiledCheckClasses": true,
+    "fixtureDefaults": "TimeZone and general/FORMAT/DISPLAY Locale restored in finally and checked in retained run.",
+    "baseline": {
+      "cases": 8,
+      "literalMismatches": 4,
+      "controls": 4,
+      "compileExit": 0,
+      "runExit": 1,
+      "terminalFailure": "java.lang.AssertionError"
+    },
+    "candidate": {
+      "cases": 8,
+      "literalMismatches": 0,
+      "compileExit": 0,
+      "runExit": 0
+    },
+    "literalCases": [
+      {
+        "name": "forward-12h",
+        "expected": "GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=1)"
+      },
+      {
+        "name": "forward-24h",
+        "expected": "GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=1)"
+      },
+      {
+        "name": "reverse-12h",
+        "expected": "GreetingRendered(time=8:00, day=Wednesday, date=November 4, hour=20)"
+      },
+      {
+        "name": "reverse-24h",
+        "expected": "GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=20)"
+      },
+      {
+        "name": "same-utc-12h",
+        "expected": "GreetingRendered(time=8:00, day=Wednesday, date=November 4, hour=20)"
+      },
+      {
+        "name": "same-utc-24h",
+        "expected": "GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=20)"
+      },
+      {
+        "name": "return-utc-24h",
+        "expected": "GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=20)"
+      },
+      {
+        "name": "fresh-india-12h",
+        "expected": "GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=1)"
+      }
+    ],
+    "literalReason": "At 2026-11-04T20:00Z UTC is Wednesday November 4 20:00; GMT+05:30 is Thursday November 5 01:30. Both direction changes are verified in 12h and 24h formats."
+  },
+  "build": {
+    "retainedTerminalExit": 0,
+    "retainedBuildLog": "BUILD SUCCESSFUL in 1m 52s",
+    "fullXmlIndependentlyRehashedAndRecounted": {
+      "tests": 4555,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 474
+    },
+    "snapshotAggregateSha256": "dc0182a441395be14f5234c9cbcf11d9aa0817ef8fc64e6d912ac100b91d7a6b"
+  },
+  "artifacts": {
+    "debug": {
+      "candidateIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 160,
+        "versionName": "1.166"
+      },
+      "baselineIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 159,
+        "versionName": "1.165"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetsExactSourceAndBaseline": 23,
+      "assetEntrySetExact": true,
+      "changedAssets": [],
+      "generatedProfiles": []
+    },
+    "performance": {
+      "candidateIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 160,
+        "versionName": "1.166"
+      },
+      "baselineIdentity": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 159,
+        "versionName": "1.165"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetsExactSourceAndBaseline": 23,
+      "assetEntrySetExact": true,
+      "changedAssets": [
+        "assets/dexopt/baseline.prof"
+      ],
+      "generatedProfiles": [
+        {
+          "path": "assets/dexopt/baseline.prof",
+          "before": {
+            "bytes": 11159,
+            "sha256": "6845215c512bd5f9ee69c93df3dfad388344b8c960203cf73fd10776274cf7cc",
+            "header": "70726f0030313000"
+          },
+          "after": {
+            "bytes": 11159,
+            "sha256": "51790f36279aad2df47e943907fd14f649518e7923735a1b91313ed0d4e46984",
+            "header": "70726f0030313000"
+          }
+        }
+      ]
+    }
+  },
+  "qualifications": [
+    "Diagnostic invokes exact source-captured formatter/hour block with construction-only remember adapter; it does not execute the actual Composable function or prove Compose rekeying, mounted UI, lifecycle or immediate timezone broadcast behavior.",
+    "No native runtime, optimized-runtime, API28, Living visual or household source acceptance.",
+    "Retained root execution reviewed; no SDK, tests, builds, Git, device, provider, network or owner-data actions were executed by reviewer.",
+    "APK certificate identities independently decoded. Cryptographic signature verification is retained root apksigner evidence; no SDK verifier rerun.",
+    "Debug asset payloads unchanged; optimized artifact changes only generated assets/dexopt/baseline.prof. baseline.profm and all 23 source assets remain exact. Header checks make no performance claim."
+  ],
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/review-request.txt",
+      "bytes": 889,
+      "sha256": "3a86cd5b6125d7310ada49a0796246890af126169ba98b5cb0cdd52769c68492"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/selected-scope.json",
+      "bytes": 698,
+      "sha256": "9f2192e7a3a383d853292dfd8aa914049ac65a6fb00f0a1bf843fc4c9e649665"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/source-admission.json",
+      "bytes": 717,
+      "sha256": "44cce497d85e4ca397858cd65b1e50410f5028049eeb7c4103d9a882583c5304"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/before-HomeActivity.kt",
+      "bytes": 230028,
+      "sha256": "a0f9972d7755234c8be4f5f6886f77b0e7fa3925625583fb68059bbd26de0821"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/after-HomeActivity.kt",
+      "bytes": 230144,
+      "sha256": "0c0d23fb70911760a08cded01817ad76483dcfed2948d3a3eba1fdff533b94f9"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/prepare-greeting.py",
+      "bytes": 3051,
+      "sha256": "9a38f9255b5960e4ce61c689d8999e71273e635ee61b8096da521a8862660ee7"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/GreetChecks.kt",
+      "bytes": 3367,
+      "sha256": "acd476f987fa37322aabe0c455ebad3688192bb599d6246882b4d777ff564b94"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/kotlin-toolchain.json",
+      "bytes": 1427,
+      "sha256": "281cc14cd992476104fdd5c3087d674b15c96f8c4eb3d40c61df8391d546386c"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/build-terminal.json",
+      "bytes": 303,
+      "sha256": "5adc5d386021fe9fb2c5f9e8ec3f3b74008ea475548478cd720e19f57ca3377a"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/build.log",
+      "bytes": 13723,
+      "sha256": "fa8228cfa74500139bac35e2218f08819f88d06e504a3491408fa634be025bae"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/promotion-artifacts.json",
+      "bytes": 9844,
+      "sha256": "414cffc6a0931749c85ca21db4b3da663da8353a735bd667f9080125d77efa63"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/jvm-snapshot.json",
+      "bytes": 176617,
+      "sha256": "5065eb2952140f15cfe91fff089201e6770d4b43c8ab3530b1056d06cd2ac367"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/verify-artifacts.py",
+      "bytes": 3659,
+      "sha256": "4dfb7841c59263621578e5915f2e1c59d7742484e53c123ef2359197a74e5c52"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/candidate-debug-1.166.apk",
+      "bytes": 46745646,
+      "sha256": "61b0030a309a39e7dc61ff655db228e2e68810d7cc179d740cc32d9bc5427eb3"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/candidate-performance-1.166.apk",
+      "bytes": 25886923,
+      "sha256": "b9a522c2d8b5ae44adbacd1a55b8ae5122720ecb5f73a4a16582c62892f6fdcf"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/before-debug-1.165.apk",
+      "bytes": 46745650,
+      "sha256": "9a5da9891c9a4c34f3be9e58c50ac16d2800ccb00c617445d52bd6667ec69b33"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/rollback-1.165.apk",
+      "bytes": 25886927,
+      "sha256": "f9cfee038106e6e487b99f8904b54fe2235efd895d236fd575686746b53b5717"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/red-leaf/source-capture-admission.json",
+      "bytes": 1519,
+      "sha256": "92db0f59c2a84368a5636f6e2b9665b3f214735c22156d0fa51182a06c3a3d4b"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/red-leaf/ActualGreetingLeaf.kt",
+      "bytes": 822,
+      "sha256": "51981964ccd77b4405ab4d6211eb9db0ac47edfda7d1204a5a6ab5ce54bfb49c"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/red-leaf/compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/red-leaf/run.log",
+      "bytes": 2299,
+      "sha256": "367cf558f1d575cb2ebb4333b39741649ab169ff84c447a4b9da98243ccbf34e"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/red-leaf/terminal.json",
+      "bytes": 264,
+      "sha256": "bb72a30eabba7678306648304f20570e5e5359c6cd2984ca8fb1f99989ad721c"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/red-leaf/leaf.jar",
+      "bytes": 7588,
+      "sha256": "cd8874f11cbf6a605cff1a73cbdf1879618784e5af1b99aa3cacfe312ee65956"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/green-leaf/source-capture-admission.json",
+      "bytes": 1640,
+      "sha256": "c2e1921827d6c67b37d7d05348cf60ff46b8aee3e66a3618bcb95305f444122a"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/green-leaf/ActualGreetingLeaf.kt",
+      "bytes": 938,
+      "sha256": "c9ee6304a665eb03e89d842f47163ac8a3813ac72af046c5515ff7eeaa6208c4"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/green-leaf/compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/green-leaf/run.log",
+      "bytes": 1499,
+      "sha256": "1af54ffc80f8006551e0903a35928c6ac07775ca570b1b53950dbf9d0699ff5c"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/green-leaf/terminal.json",
+      "bytes": 398,
+      "sha256": "ce338d693b54b79aa29cce085ec72c4581ddbafd74eaf44b86f913f96dc1404f"
+    },
+    {
+      "path": "/private/tmp/portal-next-visible-20261104-150049/green-leaf/leaf.jar",
+      "bytes": 7686,
+      "sha256": "cd2884a7a7679e4362526b6dc1b45ee2baf93da97e058bb97ef87d4bd323471e"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+      "bytes": 230144,
+      "sha256": "0c0d23fb70911760a08cded01817ad76483dcfed2948d3a3eba1fdff533b94f9"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "b52a6eb34e46e1e4bfea147e556d8559c2dcf12ad54f6f14a8e23afa924a57db"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 19404,
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+    }
+  ]
+}

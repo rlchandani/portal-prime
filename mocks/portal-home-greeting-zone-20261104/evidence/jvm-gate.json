@@ -1,0 +1,12 @@
+{
+  "retainedTerminalExit": 0,
+  "retainedBuildLog": "BUILD SUCCESSFUL in 1m 52s",
+  "fullXmlIndependentlyRehashedAndRecounted": {
+    "tests": 4555,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 474
+  },
+  "snapshotAggregateSha256": "dc0182a441395be14f5234c9cbcf11d9aa0817ef8fc64e6d912ac100b91d7a6b"
+}

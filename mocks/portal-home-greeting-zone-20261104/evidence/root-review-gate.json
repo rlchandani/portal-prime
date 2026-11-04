@@ -1,0 +1,16 @@
+{
+  "fullyReadAt": "2026-11-04T15:11:10.624114+00:00",
+  "reviewSha256": "8b397a27e5b5f41729d7300867605437c819c91d5a1518d38a6d0779ff7e8ed0",
+  "allBindingsRehashed": 32,
+  "all474XmlSnapshotReplayed": true,
+  "bothSourceCaptureOffsetsReplayed": true,
+  "changedDexPaths": {
+    "debug": [
+      "classes6.dex"
+    ],
+    "performance": [
+      "classes.dex"
+    ]
+  },
+  "promotionAllowed": true
+}

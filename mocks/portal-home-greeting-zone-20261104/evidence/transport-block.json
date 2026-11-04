@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-11-04T15:15:54.962928+00:00",
+  "family": {
+    "serialReadFailedBeforeInstall": true,
+    "installClaimCreated": false,
+    "adb": "offline; explicit connection timed out",
+    "fleet": "host is down",
+    "installedAfterAttemptVerified": false
+  },
+  "living": {
+    "singleUploadClaimCreated": true,
+    "uploadAcknowledgment": "connect failed: connection timed out; could not confirm push; transport error",
+    "installedAfterAttemptVerified": false
+  },
+  "lastCompleteReadbacks": "1.165/code159 before candidate attempt",
+  "noRepeatInstallIssued": true,
+  "postAttemptPreservationAndHealthAcceptance": false
+}

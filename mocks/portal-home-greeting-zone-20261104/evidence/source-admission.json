@@ -1,0 +1,11 @@
+{
+  "entireHomeSourceExactReconstruction": true,
+  "onlyDelta": "Four inserted timezone assignments/sample lines and existing hour Calendar gets same zone.",
+  "beforeSha256": "a0f9972d7755234c8be4f5f6886f77b0e7fa3925625583fb68059bbd26de0821",
+  "afterSha256": "0c0d23fb70911760a08cded01817ad76483dcfed2948d3a3eba1fdff533b94f9",
+  "patternsLocaleRememberKeysProducerCadenceGreetingSelectionLayoutSettingsUntouched": true,
+  "activeCaller": "HomeActivity.kt:1306",
+  "rememberAdapterConstructionOnly": true,
+  "eightCapturedLeafVectors": "four baseline failing literals/four controls to eight passes; one terminal AssertionError baseline",
+  "actualComposeNativeLifecycleImmediateTimezoneBroadcastAcceptance": false
+}

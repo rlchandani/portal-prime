@@ -5307,7 +5307,11 @@ private fun ApprovedHomeGreeting(welcome: WelcomeConfig.Settings, use24: Boolean
   val timeFmt = remember(use24) { SimpleDateFormat(if (use24) "H:mm" else "h:mm", Locale.getDefault()) }
   val dayFmt = remember { SimpleDateFormat("EEEE", Locale.getDefault()) }
   val dateFmt = remember { SimpleDateFormat("MMMM d", Locale.getDefault()) }
-  val hour = java.util.Calendar.getInstance().apply { time = now }.get(java.util.Calendar.HOUR_OF_DAY)
+  val zone = TimeZone.getDefault()
+  timeFmt.timeZone = zone
+  dayFmt.timeZone = zone
+  dateFmt.timeZone = zone
+  val hour = java.util.Calendar.getInstance(zone).apply { time = now }.get(java.util.Calendar.HOUR_OF_DAY)
   val greeting = when (hour) {
     in 5..11 -> welcome.greetingMorning
     in 12..16 -> welcome.greetingAfternoon

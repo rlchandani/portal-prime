@@ -1,0 +1,21 @@
+{
+  "closedAt": "2026-11-04T15:16:42.385017+00:00",
+  "elapsedMinutesFromOriginal": 15.889750283333333,
+  "targetMet": false,
+  "hardDeadlineMet": true,
+  "clockNotReset": true,
+  "wholeGoalActive": true,
+  "candidateLocalVerified": true,
+  "bothRoomDeploymentVerified": false,
+  "familyInstallAttempted": false,
+  "livingSingleUploadObserverTerminal": "timeout/uncertain,57observations,no installed readback",
+  "noRepeatInstallIssued": true,
+  "docsStrictExit": 0,
+  "docsTerminal": "INFO    -  Documentation built in 1.84 seconds",
+  "all32ReviewBindingsStillExactBeforeCleanup": true,
+  "credentialsAndTransientDocsDirsRemoved": true,
+  "originalOwnerRegistriesUntouched": true,
+  "publicPlannedFilesSecretScanPass": true,
+  "privateSourceArtifactsReportsRetained": true,
+  "noPhoneProviderHouseholdMediaOrPublicationOperations": true
+}

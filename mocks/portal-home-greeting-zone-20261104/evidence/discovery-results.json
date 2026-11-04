@@ -1,0 +1,9 @@
+{
+  "clock": "2026-11-04T15:00:49Z",
+  "previousTurn": "progress:1.165bothrooms,13.9minutes",
+  "selected": "home-greeting-timezone",
+  "cameraAudit": "Boundednegative: missing-camera/retry/release paths source-reviewed, no new defect.",
+  "audioAlarmObservation": "TimerAlarm and AlarmSound ignore PCM write/loop results and assign track after play. Unselected source observation only, same clock; no failure reproduction, fix or hardware claim.",
+  "oldScopesRetained": true,
+  "noPhoneProviderHouseholdDataOperations": true
+}

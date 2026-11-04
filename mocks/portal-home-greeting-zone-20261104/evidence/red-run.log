@@ -1,0 +1,15 @@
+CASE	forward-12h	expected=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=1)	actual=GreetingRendered(time=8:00, day=Wednesday, date=November 4, hour=1)	pass=false
+CASE	forward-24h	expected=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=1)	actual=GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=1)	pass=false
+CASE	reverse-12h	expected=GreetingRendered(time=8:00, day=Wednesday, date=November 4, hour=20)	actual=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=20)	pass=false
+CASE	reverse-24h	expected=GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=20)	actual=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=20)	pass=false
+CASE	same-utc-12h	expected=GreetingRendered(time=8:00, day=Wednesday, date=November 4, hour=20)	actual=GreetingRendered(time=8:00, day=Wednesday, date=November 4, hour=20)	pass=true
+CASE	same-utc-24h	expected=GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=20)	actual=GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=20)	pass=true
+CASE	return-utc-24h	expected=GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=20)	actual=GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=20)	pass=true
+CASE	fresh-india-12h	expected=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=1)	actual=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=1)	pass=true
+RESULT	cases=8	failures=4	defaultsRestored=true
+Exception in thread "main" java.lang.AssertionError: forward-12h: expected=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=1) actual=GreetingRendered(time=8:00, day=Wednesday, date=November 4, hour=1)
+forward-24h: expected=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=1) actual=GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=1)
+reverse-12h: expected=GreetingRendered(time=8:00, day=Wednesday, date=November 4, hour=20) actual=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=20)
+reverse-24h: expected=GreetingRendered(time=20:00, day=Wednesday, date=November 4, hour=20) actual=GreetingRendered(time=1:30, day=Thursday, date=November 5, hour=20)
+	at GreetChecksKt.main(GreetChecks.kt:74)
+	at GreetChecksKt.main(GreetChecks.kt)
