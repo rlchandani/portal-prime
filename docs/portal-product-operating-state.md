@@ -2,7 +2,7 @@
 
 - Latest phone delivery: **1.7.8/code20 installed on Pixel**, exact APK readback and all3 saved companion files unchanged. Photo slideshow activation now requires a loaded, error-free complete list;651JVM and16 native component executions passed. Physical full-app/source-write acceptance remains open. See `portal-companion-photo-activation-2026-11-03.md`.
 
-Snapshot: **2026-11-03 UTC**. Original inventory inspected
+Snapshot: **2026-11-04 UTC**. Original inventory inspected
 `codex/portal-hi-widget-fixes-20261102` at base
 `137608262e39d72498a9de57b6d7bdc3ff7fffe2`; subsequent deliveries and maintenance
 are recorded below, with the native editor unit committed at `2682e3a9`.
@@ -12,6 +12,8 @@ The updated whole-product objective is
 `~/.codex/attachments/e1ac08b5-a8c8-4f3e-9d81-6508e323ce04/pasted-text-1.txt`.
 
 ## Current delivery and boundaries
+
+- **Current local browser group photo import:** Direct human design approval received. The shipped browser captures one/both Portal destinations with separate folders and per-file outcomes; viewing another Portal keeps the import targets. Failure-only retry excludes confirmed, unconfirmed and cancelled copies; explicit collision rename affects one failed copy. Five review findings are resolved with lifecycle/session regressions. All 743 JS cases, 4,358 fresh JVM / 453 suites, debug assembly and exact bundled asset checks pass. Isolated Chromium passes 16 leaves / 12 layouts; generated intercepted boundaries only, no device install/live transfer/phone/provider/publication acceptance. Existing task promoted from approval to local verified; queue remains 118: 71 delivered, 37 verified, 2 approval, 7 parked, 1 queued. Other 117 task objects/raw suffix and Weather default retained. Separate authorized implementation clock 00:42:19–01:12:19 UTC November 4; original mock clock and all earlier holds remain. [Receipt](portal-browser-group-photo-import-2026-11-03.md).
 
 - **Current local Home EXIF correction:** The active Photo Memory reader now uses the correct rotation signs for transpose 5/transverse 7 under the documented Matrix order. Only two signs change; all 4,358 fresh JVM cases / 453 suites and debug assembly pass. Local Immortal 60b1fc00 only, with independent source/execution evidence fully read before commit. The 12 existing shared controls do not execute Home/Matrix; no Home pixel RED/GREEN or new regression coverage. Native rendering/deployment remain open. MA framing/WebApp checks are bounded negatives; inactive thumbnail helpers are excluded. Queue 118: 71 delivered, 36 verified, 3 approval, 7 parked, 1 queued; all 117 old objects/raw suffix and Weather default retained. Original 21:08:44–21:38:44 clock and every earlier hold remain. [Receipt](portal-home-photo-exif-diagonals-2026-11-03.md).
 

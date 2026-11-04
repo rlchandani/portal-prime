@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "scope": "Approved local browser group-photo UI/controller; generated boundaries only",
+  "approval": "Direct human approval of one/both Portals, separate folders/results, failure-only retry on November 3, 2026.",
+  "implementationClock": {
+    "startedAt": "2026-11-04T00:42:19Z",
+    "deadline": "2026-11-04T01:12:19Z"
+  },
+  "retainedMockClock": {
+    "startedAt": "2026-11-03T03:02:13Z",
+    "deadline": "2026-11-03T03:32:13Z"
+  },
+  "checks": {
+    "javascript": {
+      "tests": 743,
+      "failures": 0,
+      "command": "node --test app/src/test/js/*.test.mjs"
+    },
+    "jvm": {
+      "tests": 4358,
+      "suites": 453,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "freshTaskExecution": true,
+      "command": "./gradlew :app:testDebugUnitTest --rerun --no-daemon --offline"
+    },
+    "debugAssembly": {
+      "passed": true,
+      "command": "./gradlew :app:assembleDebug --offline",
+      "apkSha256": "e212848fd5e9e608d719ff1ea4f10fe75abb2a26666c53716e13c25e50afe006",
+      "sourceAssetsMatch": {
+        "control-center.js": true,
+        "core.mjs": true,
+        "control-center.css": true
+      }
+    },
+    "chromium": {
+      "leafCases": 16,
+      "workflowCases": 4,
+      "geometryCases": 12,
+      "nodeTestsIncludingParent": 17,
+      "failures": 0,
+      "pageErrors": 0,
+      "outsideRequests": 0,
+      "undeclaredRequests": 0,
+      "webSockets": 0,
+      "widths": [
+        320,
+        390,
+        768
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "fontPercent": [
+        100,
+        130
+      ],
+      "contextsClosed": true,
+      "fixtureSha256": "bdab2496bb335faf82a2a34ecdfc8fcf2d20eaa23d58c4674111d8b537e5ee9a"
+    },
+    "independentReview": {
+      "remainingActionableFindings": 0,
+      "resolvedFindings": [
+        "Late initial preflight cannot replace an unresolved newer ledger",
+        "Start captures validated destination folders before awaits",
+        "Cancelled or retired pre-POST inspection errors remain cancelled and cannot retry",
+        "Pagehide closes pending sheet and aborts initial preflight",
+        "Roster changes and unauthorized pairing retire stale active lanes and pending initial preflight monotonically"
+      ],
+      "groupTests": 19
+    },
+    "docs": {
+      "strictBuildPassed": true,
+      "warnings": 0,
+      "initialBrokenRelativeEvidenceLinksCorrected": 3
+    },
+    "roadmap": {
+      "tasks": 118,
+      "unchangedOtherTasks": 117,
+      "counts": {
+        "delivered": 71,
+        "verified": 37,
+        "approval": 2,
+        "parked": 7,
+        "queued": 1
+      },
+      "originalMockClockPreserved": true,
+      "rawSuffixPreserved": true,
+      "weatherDefaultPreserved": true
+    },
+    "protectedFiles": {
+      "unchanged": 17
+    }
+  },
+  "sourceSha256": {
+    "app/src/main/assets/remote/control-center.js": "eac6fc27ced31c9ec5614c8ed27eea62049223a29d0b4754b0ae3ef1283e14f5",
+    "app/src/main/assets/remote/core.mjs": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6",
+    "app/src/test/js/remote-browser-harness.mjs": "af023a77c0c650e39389eb17983aaf089b04390bb90ae0990ccedc4d1875e13c",
+    "app/src/test/js/remote-browser-workflows.test.mjs": "f03dafc1cec0ef7ba2189766d6b687f78839132b04229936ca3b3e3b716f4000",
+    "app/src/test/js/remote-photo-mutation-readback.test.mjs": "eeeccbafc332ab93250a72b8ebefa4b16993d99434b9b4bdc93bbb07ab11bb8d",
+    "app/src/test/js/remote-photo-group-browser.test.mjs": "386fd3019233a5cd695b8a9410272a28a3331d8b0796d478457cc7d4bbcd2288",
+    "app/src/test/js/remote-photo-group-controller.test.mjs": "2b7be571b67bee25b093f17c7ee7a2b162741758ac658a5b6c498fb7a9972a09",
+    "scripts/tests/remote_photo_group_browser.test.mjs": "bdab2496bb335faf82a2a34ecdfc8fcf2d20eaa23d58c4674111d8b537e5ee9a"
+  },
+  "screenshots": [
+    {
+      "path": "mocks/portal-widget-gallery-20261102/evidence/group-photo-import-production-sheet.png",
+      "sha256": "41ddf9bb381ba4556d562c0fad31a5661aa06e0944a933204d48b3f439f6ebd9"
+    },
+    {
+      "path": "mocks/portal-widget-gallery-20261102/evidence/group-photo-import-production-sheet-small.png",
+      "sha256": "6acee52f1cb1bf8504a66baabc5bbaa058170abdd3847df1f6fcce0f327374a3"
+    }
+  ],
+  "redEvidence": [
+    "12 missing-controller assertion failures before implementation",
+    "Picker lacked destination controls",
+    "Late preflight replaced newer results; folder edits changed captured destination",
+    "Cancelled inspection failure became retryable",
+    "Pagehide allowed a pending preflight POST",
+    "Removed/replaced peer pairing failed to retire pending work",
+    "15 Chromium leaf count-label assertion failures; unchanged strengthened fixture passes final16 leaves"
+  ],
+  "limits": [
+    "No Portal installation or live photo transfer/API storage proof",
+    "No physical phone, provider, owner browser profile or account accessed",
+    "Generated text payloads labelled image/png; no image-decoding or native performance acceptance",
+    "No publication or hosted CI execution",
+    "Closing the page retires pending work; no background continuity promise"
+  ]
+}

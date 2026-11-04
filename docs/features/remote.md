@@ -69,6 +69,12 @@ installed app's storage isn't evicted the way a browser tab's is, so once instal
 the roster at all — the per-Portal backup is just the safety net. The remote also asks the browser
 for persistent storage on load (honoured on Chrome/Android), and a *Devices* tab tip points the way.
 
+## Importing photos
+
+In **Photos → Import photos**, choose files and one or both paired Portals. Each Portal has its own destination folder; changing the viewed Portal keeps the import destinations. JPEG, PNG, WebP and GIF files are supported up to 20 MiB each.
+
+Results distinguish confirmed, failed, unconfirmed and unsent copies. **Cancel remaining uploads** stops queued files while an in-flight upload settles. **Retry definite failures** never repeats confirmed or unconfirmed copies. A filename collision can be renamed and retried for that one Portal; existing files are preserved. Refresh the relevant Portal to check an unconfirmed arrival. Dismiss the results explicitly before starting another batch. Keep the page open while importing.
+
 ## Security
 
 - The remote is served by the fleet agent, which only accepts **LAN/loopback** peers.

@@ -1,7 +1,9 @@
 # Browser photos: import to multiple Portals
 
-This is an **unapproved functional design review**, not a delivered browser
-feature. At review creation both rooms contained exact Portal **1.96/code90**;
+The human approved this functional design for **local browser implementation**
+on November 3, 2026. The [verified local implementation](../portal-browser-group-photo-import-2026-11-03.md)
+is complete; live device transfer and publication acceptance remain separately gated.
+The mock and its evidence below retain their original scope. At review creation both rooms contained exact Portal **1.96/code90**;
 see the operating state for subsequent independent deliveries.
 No Portal, Google phone, Home Assistant or account is accessed by this unit.
 
@@ -105,7 +107,7 @@ not demonstrate a real authentication UI.
 
 ## Design and release gates
 
-The review needs design sign-off before production UI/controller implementation,
+Design sign-off was received before production UI/controller implementation,
 in line with the user's request to approve functional mocks first. Approval does
 not relax the 30-minute issue limit, publication restriction, existing parked
 work, phone prohibition or account boundaries.
@@ -115,9 +117,9 @@ The review unit retains the discovery clock **03:02:13–03:32:13 UTC on
 review, rendered interactions, responsive checks, documentation and commit.
 It does not restart Save/Delete, Weather, screensaver or prior performance work.
 
-After sign-off, production work should be decomposed into a browser group
-controller with regression tests, the approved sheet/result UI, and actual
-Family transfer/restore plus Living rollout verification. No design confidence
+The approved browser group controller, regression tests and sheet/result UI are
+implemented and locally verified. Actual Family transfer/restore plus Living
+rollout verification remain separate acceptance work. No design confidence
 or simulated performance result substitutes for that acceptance.
 
 ## Rendered review evidence

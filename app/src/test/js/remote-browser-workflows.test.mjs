@@ -683,38 +683,27 @@ test('photo imports continue in captured room across tab navigation and finish w
   assert.match(h.document.getElementById('upload-status').textContent, /2 of 2/);
 });
 
-test('room switching cancels queued imports and retains an honest in-flight ledger on return', async () => {
-  const h = await browserHarness({
-    saved,
-    routes: {
-      '/remote/photo-upload': ({ opts }) =>
-        new Promise((resolve, reject) => {
-          opts.signal.addEventListener('abort', () =>
-            reject(new DOMException('Aborted', 'AbortError')),
-          );
-        }),
+test('viewing another room keeps imports on their captured destination', async () => {
+  let release;
+  const h = await browserHarness({saved,routes:{
+    '/remote/photo-upload':({url,opts,response})=> {
+      const q = new URL(url).searchParams;
+      const finish = () => response({ok:true,path:`${q.get('path')}/${q.get('name')}`,bytes:opts.body.size});
+      if (q.get('name')==='first.png') return new Promise(resolve=>{release=()=>resolve(finish());});
+      return finish();
     },
-  });
-  h.eval('go("photos")');
-  await h.settle();
-  const capturedName = h.eval('room().name');
-  startTwoPhotos(h);
-  await h.settle();
-  h.eval(`selectRoom('${saved[1].base}')`);
-  await h.settle();
-  assert.equal(h.calls.filter((c) => c.path === '/remote/photo-upload').length, 1);
-  h.eval(`selectRoom('${saved[0].base}')`);
-  await h.settle();
-  assert.equal(h.eval('upload?.running'), false);
-  assert.equal(h.eval('upload?.cancelled'), true);
-  assert.equal(h.eval('upload?.completed'), 0);
-  assert.equal(h.eval('upload?.items[0].state'), 'unconfirmed');
-  assert.equal(h.eval('upload?.items[1].state'), 'cancelled');
-  assert.ok(h.document.getElementById('upload-status').textContent.includes(capturedName));
-  assert.match(
-    h.document.getElementById('upload-status').textContent,
-    /unconfirmed|check whether/i,
-  );
+  }});
+  h.eval('go("photos")'); await h.settle();
+  startTwoPhotos(h); await h.settle();
+  h.eval(`selectRoom('${saved[1].base}')`); await h.settle();
+  assert.equal(h.eval('upload.running'),true);
+  release(); await h.settle();
+  const posts = h.calls.filter(c=>c.path==='/remote/photo-upload');
+  assert.equal(posts.length,2);
+  assert.ok(posts.every(c=>new URL(c.url).port==='8877'));
+  assert.equal(h.eval('upload.completed'),2);
+  assert.deepEqual(Array.from(h.eval('upload.items.map(i=>i.state)')),['confirmed','confirmed']);
+  assert.match(h.document.getElementById('upload-status').textContent,/Stored and confirmed/);
 });
 
 test('completion after delayed gallery refresh cannot toast against a newly selected room', async () => {
@@ -962,7 +951,7 @@ test('a late confirmed in-flight upload counts honestly after cancellation witho
   await h.settle();
   startTwoPhotos(h);
   await h.settle();
-  h.eval(`selectRoom('${saved[1].base}')`);
+  h.click('Cancel remaining uploads');
   await h.settle();
   release();
   await h.settle();

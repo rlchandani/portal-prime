@@ -21,6 +21,7 @@ import {
   readSettings,
   operationView,
   photoFolder,
+  PhotoImportBatch,
   photoPage,
   photoListing,
   copy,
@@ -413,6 +414,11 @@ function message(error) {
     unsupported_model: 'That model is no longer reported by Jarvis. Refresh and choose an available model.',
     configuration_rejected: 'Jarvis rejected these settings. Your edits are kept; check Jarvis on the Portal.',
     ipc_failed: 'Jarvis did not respond. Your edits are kept; check Jarvis on the Portal before retrying.',
+    identity_unverified: 'This Portal did not provide a device identity. Refresh or update it before importing.',
+    identity_changed: 'This address now identifies a different Portal. Pair the intended Portal before retrying.',
+    pairing_changed: 'The Portal pairing changed. Pair it again before retrying failed copies.',
+    photos_unsupported: 'This Portal cannot currently receive photos. Choose another destination or check its storage.',
+    choose_photos_and_portals: 'Choose at least one photo and one Portal.',
     invalid_address: 'Enter a Portal address or its pairing link, without a username or password.',
   };
   return (
@@ -421,8 +427,7 @@ function message(error) {
   );
 }
 function persistRoster() {
-  for (const base of uploadTransfers.keys())
-    if (!roster.some((target) => target.base === base)) uploadTransfers.delete(base);
+  retireStaleUploads();
   storage.set(STORAGE.roster, JSON.stringify(roster));
   const index = roster.findIndex((r) => r.base === room()?.base);
   storage.set(STORAGE.active, String(Math.max(0, index)));
@@ -471,6 +476,7 @@ const api = createClient({
   fetch: (...args) => fetch(...args),
   onUnauthorized: (target) => {
     expired.set(target.base, target.token);
+    retireStaleUploads();
     if (room()?.base === target.base && room()?.token === target.token) {
       connected = false;
       connectionState = 'expired';
@@ -691,8 +697,7 @@ function selectRoom(base) {
   }
   abortReads();
   stopPolling();
-  if (upload?.running) cancelUpload(upload, 'room_changed');
-  upload = uploadTransfers.get(target?.base) || null;
+  retireStaleUploads();
   session.select(target);
   data = {};
   connected = false;
@@ -3976,186 +3981,224 @@ function photoPreview(file, ticket) {
   }
   load();
 }
+const uploadFolders = new Map();
+let uploadRecipients = null, uploadResultPage = 0, pendingPhotoImport = null;
+function currentUploadRoom(target) {
+  return roster.some((r) => r.base === target.base && r.token === target.token) &&
+    expired.get(target.base) !== target.token;
+}
+function retireStaleUploads() {
+  if (pendingPhotoImport?.rooms.some((target)=>!currentUploadRoom(target))) {
+    pendingPhotoImport.retired=true;
+    pendingPhotoImport.controller.abort();
+  }
+  if (upload?.running) {
+    for (const item of upload.items)
+      if (!currentUploadRoom(item.room)) upload.retire(item.room.base);
+  }
+}
 function chooseUpload() {
-  const ticket = session.capture();
-  let destination = photosAll && supported('photoLibrary')
-    ? '/sdcard/Pictures/Immortal'
-    : photoPath;
-  const input = el('input', {
-    type: 'file',
-    accept: '.jpg,.jpeg,.png,.webp,.gif',
-    multiple: true,
-    'aria-label': 'Choose photos',
+  if (upload) {
+    toast('Dismiss the existing import results before starting another import.', true);
+    return;
+  }
+  const targets = roster.map((r) => Object.freeze({ ...r }));
+  const chosen = new Set(uploadRecipients || [room()?.base]);
+  let filePage = 0, busy = false, closed = false;
+  const preflight = new AbortController();
+  const owner = {controller:preflight,rooms:[]};
+  const folders = new Map(targets.map((r) => [r.base, uploadFolders.get(r.base) ||
+    (r.base === room()?.base && !photosAll ? photoPath : '/sdcard/Pictures/Immortal')]));
+  const input = el('input', { type: 'file', accept: '.jpg,.jpeg,.png,.webp,.gif',
+    multiple: true, 'aria-label': 'Choose photos' });
+  const recipients = el('div'), folderFields = el('div'), preview = el('div');
+  const summary = text('Choose photos and destination Portals.');
+  const admission = text('');
+  const start = button('Start import', async () => {
+    if (busy) return;
+    try {
+      const files = Array.from(input.files || []);
+      const selected = targets.filter((r) => chosen.has(r.base));
+      const captured = selected.map((target)=>({room:target,path:photoFolder(folders.get(target.base))}));
+      if (!files.length || !selected.length) throw new ApiError('choose_photos_and_portals');
+      // Validate every destination and file before inspecting or sending anything.
+      new PhotoImportBatch(captured.map((destination)=>({...destination,deviceId:'preflight'})), files);
+      busy = true; start.disabled = true;
+      owner.rooms=selected;pendingPhotoImport=owner;
+      const destinations = await Promise.all(captured.map(async ({room:target,path}) => {
+        if (!currentUploadRoom(target)) throw new ApiError('pairing_changed');
+        const companion = await api(target, '/remote/companion', {signal:preflight.signal});
+        if (!currentUploadRoom(target)) throw new ApiError('pairing_changed');
+        if (typeof companion.deviceId !== 'string' || !companion.deviceId.trim())
+          throw new ApiError('identity_unverified');
+        if (companion.capabilities?.photos !== true) throw new ApiError('photos_unsupported');
+        return {room:target,path,deviceId:companion.deviceId};
+      }));
+      if (closed || preflight.signal.aborted || upload) return;
+      for (const destination of destinations) uploadFolders.set(destination.room.base,destination.path);
+      closeSheet();
+      await startUpload(files, destinations);
+    } catch (error) { if (!closed) toast(message(owner.retired ? {code:'pairing_changed'} : error), true); }
+    finally {
+      if (pendingPhotoImport===owner) pendingPhotoImport=null;
+      busy = false; if (!closed) validateSelection();
+    }
+  }, {kind:'primary'});
+  function validateSelection() {
+    const files=Array.from(input.files || []), selected=targets.filter((r)=>chosen.has(r.base));
+    start.textContent=`Import ${files.length} ${files.length===1?'photo':'photos'} to ${selected.length} ${selected.length===1?'Portal':'Portals'}`;
+    try {
+      new PhotoImportBatch(selected.map((r)=>({room:r,path:folders.get(r.base),deviceId:'preflight'})),files);
+      admission.textContent=owner.retired ? 'The pairing changed. Close this sheet and pair the intended Portal again.' : '';
+      start.disabled=busy || preflight.signal.aborted;
+    } catch(error) {
+      start.disabled=true;admission.textContent=files.length && selected.length ? message(error) : 'Choose at least one photo and one Portal.';
+    }
+  }
+  function update() {
+    recipients.replaceChildren(...targets.map((target) => checkbox(target.name, chosen.has(target.base), (checked) => {
+      if (busy) return;
+      checked ? chosen.add(target.base) : chosen.delete(target.base);
+      uploadRecipients = new Set(chosen); update();
+    })));
+    const selected = targets.filter((r) => chosen.has(r.base));
+    folderFields.replaceChildren(...selected.map((target) => field(
+      selected.length === 1 ? 'Destination folder' : `${target.name} destination folder`,
+      folders.get(target.base), (value) => {folders.set(target.base,value);validateSelection();},
+      {key:target.base === targets[0]?.base ? 'upload-folder' : `upload-folder-${targets.indexOf(target)}`},
+    )));
+    const files = Array.from(input.files || []);
+    const pages = Math.max(1,Math.ceil(files.length/8)); filePage = Math.min(filePage,pages-1);
+    summary.textContent = `${files.length} photos × ${selected.length} Portals = ${files.length*selected.length} copies`;
+    preview.replaceChildren(...files.slice(filePage*8,filePage*8+8).map((file) => text(`${file.name} · ${Math.ceil(file.size/1024)} KB`)),
+      ...(files.length > 8 ? [actions(
+        button('Previous files',()=>{filePage--;update();},{disabled:filePage===0}),
+        text(`Files page ${filePage+1} of ${pages}`),
+        button('Next files',()=>{filePage++;update();},{disabled:filePage===pages-1}),
+      )] : []));
+    validateSelection();
+  }
+  input.onchange = () => { filePage = 0; update(); };
+  update();
+  openSheet('Import photos',sections(
+    text('JPEG, PNG, WebP and GIF · Up to 20 MiB per file. Existing files are never replaced.'),
+    text('Send to'), recipients,
+    targets.length === 2 ? button('Select both Portals',()=>{
+      if (busy) return; targets.forEach((r)=>chosen.add(r.base)); uploadRecipients = new Set(chosen); update();
+    },{kind:'outline'}) : null,
+    folderFields,input,summary,preview,admission,el('div',{class:'dialog-actions'},start),
+  ),()=>{
+    closed=true;preflight.abort();
+    if (pendingPhotoImport===owner) pendingPhotoImport=null;
   });
-  openSheet(
-    'Import photos',
-    sections(
-      text('JPEG, PNG, WebP and GIF · Up to 20 MiB per file. Existing files are never replaced.'),
-      field('Destination folder', destination, (v) => (destination = v), { key: 'upload-folder' }),
-      input,
-      button(
-        'Start import',
-        () => {
-          try {
-            const path = photoFolder(destination);
-            if (!input.files.length) {
-              toast('Choose at least one photo.', true);
-              return;
-            }
-            const files = Array.from(input.files);
-            closeSheet();
-            startUpload(files, path, ticket);
-          } catch (error) {
-            toast(message(error), true);
-          }
-        },
-        { kind: 'primary' },
-      ),
-    ),
-  );
 }
 function cancelUpload(transfer = upload, reason = 'cancelled') {
   if (!transfer?.running) return;
-  transfer.cancelled = true;
-  transfer.cancelReason = reason;
-  for (const item of transfer.items) {
-    if (item.state === 'queued') item.state = 'cancelled';
-    else if (item.state === 'sending') item.state = 'unconfirmed';
-  }
-  transfer.current = '';
-  transfer.controller.abort();
+  transfer.stop(reason,{abort:reason !== 'cancelled'});
   if (upload === transfer) renderUpload();
 }
-async function startUpload(files, path, ticket) {
-  if (!session.current(ticket) || upload?.running) return;
-  const controller = new AbortController();
-  const transfer = {
-    controller,
-    target: ticket.room,
-    path,
-    total: files.length,
-    completed: 0,
-    bytes: 0,
-    failures: [],
-    running: true,
-    current: '',
-    cancelled: false,
-    items: files.map((file) => ({ name: file.name, state: 'queued' })),
+function uploadRuntime(transfer) {
+  let updatePending = false;
+  return {
+    current:currentUploadRoom,
+    inspect:(target,signal)=>api(target,'/remote/companion',{signal}),
+    send:(target,item,signal)=>api(target,
+      `/remote/photo-upload?path=${encodeURIComponent(item.path)}&name=${encodeURIComponent(item.name)}`,
+      {body:item.file,headers:{'Content-Type':/^image\/(jpeg|png|webp|gif)$/.test(item.file.type)
+        ? item.file.type : 'application/octet-stream'},signal,timeout:90000}),
+    changed:()=>{
+      if (updatePending) return; updatePending=true;
+      queueMicrotask(()=>{updatePending=false;if(upload===transfer) renderUpload();});
+    },
   };
-  upload = transfer;
-  uploadTransfers.set(ticket.room.base, transfer);
+}
+async function finishUpload(transfer) {
+  if (upload !== transfer) return;
+  renderUpload();
+  const target = room();
+  if (!target || !transfer.items.some((item)=>item.room.base===target.base && item.room.token===target.token) || !currentUploadRoom(target)) return;
+  if (tab==='photos' && !detail && !document.hidden) {
+    const ticket = session.capture();
+    if (transfer.items.some((item)=>item.state==='confirmed' && item.room.base===target.base))
+      await loadPhotos({force:true});
+    if (!session.current(ticket) || upload!==transfer) return;
+    render();
+    const unconfirmed = transfer.items.filter((item)=>item.state==='unconfirmed').length;
+    toast(`${transfer.completed} of ${transfer.total} photos stored. Review the per-file results.${unconfirmed ? ` ${unconfirmed} unconfirmed; refresh this Portal to check arrival.` : ''}`,
+      transfer.items.some((item)=>['failed','unconfirmed','cancelled'].includes(item.state)));
+  }
+}
+async function startUpload(files, destinations, ticket) {
+  if (upload) return;
+  // Keep the established single-Portal caller while giving all imports view-independent ownership.
+  if (typeof destinations === 'string') {
+    if (!session.current(ticket)) return;
+    destinations = [{room:ticket.room,path:destinations,deviceId:data.companion?.deviceId}];
+  }
+  const transfer = new PhotoImportBatch(destinations,files);
+  upload = transfer; uploadResultPage = 0;
+  for (const destination of destinations) uploadTransfers.set(destination.room.base,transfer);
   render();
-  for (let index = 0; index < files.length; index++) {
-    if (controller.signal.aborted || !session.current(ticket, { page: false })) {
-      cancelUpload(transfer, 'room_changed');
-      break;
-    }
-    const file = files[index],
-      item = transfer.items[index];
-    let posted = false;
-    try {
-      if (file.size < 1 || file.size > 20 * 1048576) throw new ApiError('upload_size_limit');
-      if (
-        !/^[^.][^/\\:\x00-\x1f]{0,127}\.(?:jpe?g|png|webp|gif)$/i.test(file.name) ||
-        file.name.length > 128
-      )
-        throw new ApiError('invalid_name');
-      transfer.current = file.name;
-      item.state = 'sending';
-      if (upload === transfer) renderUpload();
-      posted = true;
-      const response = await api(
-        ticket.room,
-        `/remote/photo-upload?path=${encodeURIComponent(path)}&name=${encodeURIComponent(file.name)}`,
-        {
-          body: file,
-          headers: {
-            'Content-Type': /^image\/(jpeg|png|webp|gif)$/.test(file.type)
-              ? file.type
-              : 'application/octet-stream',
-          },
-          signal: controller.signal,
-          timeout: 90000,
-        },
-      );
-      if (response?.ok !== true || response.path !== `${path}/${file.name}` || response.bytes !== file.size)
-        throw new ApiError('upload_unconfirmed');
-      item.state = 'confirmed';
-      transfer.completed++;
-      transfer.bytes += file.size;
-    } catch (error) {
-      const uncertain =
-        posted && (['aborted', 'timeout', 'unreachable', 'upload_unconfirmed'].includes(error.code) ||
-          (error.code === 'invalid_response' && !error.data));
-      item.state = uncertain ? 'unconfirmed' : 'failed';
-      item.error = uncertain ? 'incomplete_upload' : error.code;
-      transfer.failures.push({ name: file.name, error: item.error });
-      if (error.code === 'aborted' || error.status === 401) {
-        cancelUpload(transfer, error.status === 401 ? 'pairing_expired' : 'cancelled');
-        break;
-      }
-    }
-    transfer.current = '';
-    if (upload === transfer) renderUpload();
-  }
-  transfer.running = false;
-  transfer.current = '';
-  transfer.cancelled ||= controller.signal.aborted;
-  if (upload === transfer) renderUpload();
-  if (!session.current(ticket, { page: false }) || upload !== transfer) return;
-  if (transfer.completed && tab === 'photos' && !detail && !document.hidden) {
-    const refreshTicket = session.capture();
-    await loadPhotos({ force: true });
-    if (
-      !session.current(refreshTicket) ||
-      !session.current(ticket, { page: false }) ||
-      upload !== transfer
-    )
-      return;
-  }
-  if (tab === 'photos' && !detail) render();
-  const unconfirmed = transfer.items.filter((item) => item.state === 'unconfirmed').length;
-  toast(
-    `${transfer.completed} of ${transfer.total} photos stored on ${ticket.room.name}.${unconfirmed ? ` ${unconfirmed} unconfirmed; refresh this Portal before retrying.` : ''}${transfer.cancelled ? ' Remaining imports stopped.' : ''}`,
-    transfer.failures.length > 0 || transfer.cancelled,
-  );
+  await transfer.run(uploadRuntime(transfer));
+  await finishUpload(transfer);
+}
+async function retryUpload(transfer, item = null) {
+  if (transfer.running || upload!==transfer) return;
+  await transfer.retry(roster,uploadRuntime(transfer),item);
+  await finishUpload(transfer);
+}
+function renameUpload(transfer,item) {
+  let name = item.name;
+  openSheet('Rename failed copy',sections(
+    text(`${item.room.name} · ${item.path}. Existing files are never replaced.`),
+    field('New filename',name,(value)=>name=value),
+    el('div',{class:'dialog-actions'},button('Rename and retry this copy',async()=>{
+      try {transfer.rename(item,name);closeSheet();await retryUpload(transfer,item);}
+      catch(error){toast(message(error),true);}
+    },{kind:'primary'})),
+  ));
+}
+function dismissUpload(transfer) {
+  const dismiss = () => {
+    if (upload!==transfer || transfer.running) return;
+    upload = null; uploadTransfers.clear(); uploadResultPage = 0; render();
+  };
+  if (transfer.items.some((item)=>item.state!=='confirmed'))
+    confirmAction('Dismiss import results','Failed, unsent and unconfirmed copies will be removed from this results list. Check each Portal before importing an unconfirmed file again.',dismiss,'Dismiss results');
+  else dismiss();
 }
 function uploadPanel() {
   if (!upload) return null;
   const transfer = upload;
-  const labels = {
-    queued: 'Queued',
-    sending: 'Sending',
-    confirmed: 'Stored and confirmed',
-    failed: 'Failed',
-    cancelled: 'Not sent',
-    unconfirmed: 'Completion unconfirmed — refresh this Portal',
-  };
-  return el(
-    'div',
-    { class: 'upload-status', id: 'upload-status' },
-    text(
-      `${transfer.completed} of ${transfer.total} uploaded to ${transfer.target.name} · ${Math.ceil(transfer.bytes / 1024)} KB confirmed${transfer.current ? ` · Sending ${transfer.current}` : ''}`,
-    ),
-    el('progress', {
-      max: transfer.total,
-      value: transfer.completed,
-      'aria-label': 'Photos uploaded',
+  const labels = {queued:'Queued',sending:'Sending',confirmed:'Stored and confirmed',failed:'Failed',
+    cancelled:'Not sent',unconfirmed:'Completion unconfirmed — refresh this Portal'};
+  const pages = Math.max(1,Math.ceil(transfer.items.length/8));
+  uploadResultPage = Math.min(uploadResultPage,pages-1);
+  const rooms = [...new Map(transfer.items.map((item)=>[item.room.base,item.room])).values()];
+  return el('div',{class:'upload-status',id:'upload-status'},
+    text(`${transfer.completed} of ${transfer.total} uploaded · ${Math.ceil(transfer.bytes/1024)} KB confirmed${transfer.current ? ` · Sending ${transfer.current}` : ''}`),
+    ...rooms.map((target)=>{
+      const items = transfer.items.filter((item)=>item.room.base===target.base);
+      return text(`${target.name} · ${items[0].path} · ${items.filter((item)=>item.state==='confirmed').length} of ${items.length} confirmed`);
     }),
-    transfer.running && !transfer.cancelled
-      ? button('Cancel remaining uploads', () => cancelUpload(transfer), { kind: 'outline' })
-      : null,
-    transfer.cancelled
-      ? text(
-          'Transfer stopped. Already confirmed files remain. Refresh this Portal to check whether the in-flight file arrived.',
-        )
-      : null,
-    ...transfer.items.map((item) =>
-      text(
-        `${item.name}: ${labels[item.state]}${item.error && item.state === 'failed' ? ` · ${message({ code: item.error })}` : ''}`,
-        ['failed', 'unconfirmed'].includes(item.state) ? 'detail error' : 'detail',
-      ),
-    ),
+    el('progress',{max:transfer.total,value:transfer.completed,'aria-label':'Photos uploaded'}),
+    transfer.running && !transfer.cancelled ? button('Cancel remaining uploads',()=>cancelUpload(transfer),{kind:'outline'}) : null,
+    transfer.cancelled ? text('Transfer stopped. Already confirmed files remain. Refresh this Portal to check whether the in-flight file arrived.') : null,
+    ...transfer.items.slice(uploadResultPage*8,uploadResultPage*8+8).map((item)=>el('div',{'data-upload-result':'true'},
+      text(`${item.name}: ${labels[item.state]} · ${item.room.name}${item.error && item.state==='failed' ? ` · ${message({code:item.error})}` : ''}`,
+        ['failed','unconfirmed'].includes(item.state)?'detail error':'detail'),
+      !transfer.running && item.state==='failed' && item.error==='file_exists'
+        ? button(`Rename ${item.name} for ${item.room.name}`,()=>renameUpload(transfer,item),{kind:'outline'}) : null,
+    )),
+    transfer.items.length>8 ? actions(
+      button('Previous results',()=>{uploadResultPage--;renderUpload();},{disabled:uploadResultPage===0}),
+      text(`Results page ${uploadResultPage+1} of ${pages}`),
+      button('Next results',()=>{uploadResultPage++;renderUpload();},{disabled:uploadResultPage===pages-1}),
+    ) : null,
+    !transfer.running ? actions(
+      transfer.items.some((item)=>item.state==='failed') ? button('Retry definite failures',()=>retryUpload(transfer),{kind:'outline'}) : null,
+      button('Dismiss results',()=>dismissUpload(transfer),{kind:'outline'}),
+    ) : null,
   );
 }
 function renderUpload() {
@@ -6372,6 +6415,7 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 window.addEventListener('pagehide', () => {
+  closeSheet();
   playbackVisibilityGeneration++;
   cancelSearchComposition();  stopPolling();
   abortReads();
@@ -6387,6 +6431,7 @@ window.addEventListener('storage', (event) => {
   if (event.key === STORAGE.roster) {
     const fresh = sanitizeRoster(parse(event.newValue, []));
     roster = fresh;
+    retireStaleUploads();
     const existing = fresh.find((r) => r.base === room()?.base);
     if (!existing || existing.token !== room()?.token) selectRoom(existing?.base || fresh[0]?.base);
     else updateHeader();

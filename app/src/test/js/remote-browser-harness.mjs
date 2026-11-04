@@ -243,6 +243,7 @@ export async function browserHarness({ routes = {}, saved = [], active = '0' } =
     ]),
     calls = [],
     timeouts = new Map();
+  const windowEvents = {};
   let timerId = 0;
   const response = (body, status = 200) => new Response(JSON.stringify(body), { status });
   const fetcher = async (url, opts) => {
@@ -307,7 +308,7 @@ export async function browserHarness({ routes = {}, saved = [], active = '0' } =
       getItem: (key) => savedMap.get(key) ?? null,
       setItem: (key, value) => savedMap.set(key, value),
     },
-    window: { scrollTo() {}, addEventListener() {} },
+    window: { scrollTo() {}, addEventListener(name,fn) { windowEvents[name]=fn; } },
     setTimeout: (fn, delay) => {
       timeouts.set(++timerId, { fn, delay });
       return timerId;
@@ -328,6 +329,8 @@ export async function browserHarness({ routes = {}, saved = [], active = '0' } =
   return {
     document,
     calls,
+    pagehide:()=>windowEvents.pagehide?.(),
+    storage:event=>windowEvents.storage?.(event),
     tick: async (delay) => {
       const ready = [...timeouts].filter(([, timer]) => timer.delay === delay);
       for (const [id, timer] of ready) {

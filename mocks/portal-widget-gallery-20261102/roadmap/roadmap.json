@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-03T21:21:58.285585Z",
-  "updatedLabel": "3 November 2026 \u00b7 Home EXIF source correction",
+  "updatedAt": "2026-11-04T00:59:19.429084Z",
+  "updatedLabel": "3 November 2026 \u00b7 approved local group photo import",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -2365,10 +2365,10 @@
     {
       "id": "browser-group-photo-import",
       "title": "Browser photos: send to multiple Portals",
-      "summary": "Functional mobile-first review ready. Choose recipients independently from the viewed library; keep separate room/file results. Design sign-off is pending.",
-      "description": "The native companion has captured group photo targets; production browser imports still use one viewed session. The proposal adds explicit destinations, bounded room lanes, per-room folders, cancellation and failure-only retry while retaining uncertainty.",
-      "status": "approval",
-      "verification": "80 rendered checks \u00b724 responsive cases \u00b7 independent contract review",
+      "summary": "Approved local browser implementation verified: one/both Portals, separate folders/results and failure-only retry. Live transfer acceptance remains gated.",
+      "description": "The production browser captures group destinations independently of the viewed library. Two bounded room lanes retain device identity, pairing, per-room folders and exact acknowledgements; uncertain copies cannot retry.",
+      "status": "verified",
+      "verification": "743 JavaScript \u00b7 4,358 fresh JVM / 453 suites \u00b7 debug APK assets \u00b7 16 Chromium leaves / 12 layouts \u00b7 independent review",
       "kind": "Browser and companion photo workflow parity",
       "platforms": [
         "browser",
@@ -2376,15 +2376,15 @@
         "companion"
       ],
       "owner": "Browser UX / group contract review / QA",
-      "deployment": "Review artifact only. Portal production remains exact1.96/code90; no phone or Portal operation.",
-      "state": "Generated outcome examples cover success, offline, pairing expiry, missing confirmation, filename collision and independent room folders. Empty/invalid selection, view changes, cancellation, reset retirement and eight-row paging are checked.",
+      "deployment": "Local source and debug APK only; no Portal install, real transfer, phone control or publication.",
+      "state": "Human approved implementation on November 3. Captured recipients/folders survive view changes; eight-row lists and counted action are verified. Sheet/page/pairing retirement preserves cancelled and unconfirmed outcomes.",
       "acceptance": [
         "View a Portal independently of captured import recipients.",
         "Select files and one or both destination rooms, with per-room folders and truthful count.",
         "Preserve confirmed copies through mixed outcomes; retry only definite failed pairs.",
         "Keep missing acknowledgments unconfirmed even after a matching filename is listed.",
         "Keep sheet actions reachable on narrow and enlarged-text layouts; bound rendered rows.",
-        "Obtain design sign-off before production controller/UI and real Family/Living transfer acceptance."
+        "Design sign-off received before local controller/UI implementation; real Family/Living transfer acceptance remains separately gated."
       ],
       "evidence": [
         {
@@ -2402,19 +2402,38 @@
         {
           "text": "80 rendered checks, 24 geometry cases; receipt SHA-256 741480daed56989f6c7e47158c30bb4207fc3c84bd15b835bf4cbbc72e05183c; source, QA and both screenshot hashes recorded.",
           "source": "../evidence/group-photo-import-review-verification.json"
+        },
+        {
+          "text": "Verified local production UI/controller: 743 JS, 4,358 fresh JVM, debug asset equality and 16 real-browser cases; no live transfers.",
+          "source": "docs/portal-browser-group-photo-import-2026-11-03.md"
+        },
+        {
+          "text": "Final production asset/test/APK hashes, generated screenshots and scoped verification.",
+          "source": "../evidence/group-photo-import-production-verification.json"
         }
       ],
       "limits": [
-        "Generated in-memory room/file outcomes, not actual uploads or pairing renewal.",
-        "Desktop Chrome at320/390/768px and100%/130% root-font emulation; no physical phone/system-font/hardware acceptance.",
-        "Background/closed-page continuity, real server acknowledgment, live CORS/LAN permission, credential/session replacement and actual per-room photo refresh remain implementation gates.",
-        "Broader library browsing, bulk deletion and group slideshow activation are outside this import-flow design."
+        "Generated intercepted replies and text payloads labelled image/png; no native image decoding, server/storage or live transfer acceptance.",
+        "Desktop Chromium at 320/390/768px and 100%/130% root-font emulation; no physical phone/system-font/hardware acceptance.",
+        "Live LAN/CORS/authentication, actual Family/Living transfer and room-state preservation remain separate gates.",
+        "No page-close background continuity, persisted folder choices, broader merged browsing, bulk deletion or group slideshow activation."
       ],
-      "next": "Review the local mock. Implement approved import UI/controller only after design sign-off, then separately prove real transfers and per-room preservation. Phone control remains prohibited.",
+      "next": "Retain verified local implementation. Perform real Family/Living transfer and preservation acceptance only under the existing device gate; publication and phone controls remain separately held.",
       "issueClock": {
         "startedAt": "2026-11-03T03:02:13Z",
         "deadline": "2026-11-03T03:32:13Z",
         "originalDiscoveryClockRetained": true
+      },
+      "approval": {
+        "scope": "Local browser UI/controller implementation",
+        "received": "November 3, 2026",
+        "source": "Direct human answer: Approve implementation"
+      },
+      "implementationClock": {
+        "startedAt": "2026-11-04T00:42:19Z",
+        "deadline": "2026-11-04T01:12:19Z",
+        "separateAuthorizedImplementationUnit": true,
+        "priorMockClockRetained": true
       }
     },
     {

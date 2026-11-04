@@ -635,3 +635,131 @@ export const formatTime = (ms) => {
   const sec = Math.max(0, Math.floor((ms || 0) / 1000));
   return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 };
+
+function photoImportName(name) {
+  if (typeof name !== 'string' || name.length > 128 ||
+      !/^[^.][^/\\:\x00-\x1f]{0,127}\.(?:jpe?g|png|webp|gif)$/i.test(name))
+    throw new ApiError('invalid_name');
+  return name;
+}
+// A batch owns destinations and outcomes independently of the library being viewed.
+export class PhotoImportBatch {
+  constructor(destinations, files) {
+    const capturedFiles = Array.from(files, (file) => {
+      if (!Number.isInteger(file.size) || file.size < 1 || file.size > 20 * 1048576)
+        throw new ApiError('upload_size_limit');
+      return {file,name:photoImportName(file.name)};
+    });
+    const bases = new Set();
+    this.items = Array.from(destinations).flatMap((destination) => {
+      const room = Object.freeze({...destination.room}), path = photoFolder(destination.path);
+      if (!room.base || !room.token || bases.has(room.base)) throw new ApiError('invalid_destination');
+      bases.add(room.base);
+      return capturedFiles.map(({file,name}) => {
+        const item = {room,name,state:'queued',error:null};
+        Object.defineProperties(item, {
+          file:{value:file,enumerable:true}, path:{value:path,enumerable:true},
+          deviceId:{value:destination.deviceId,enumerable:true},
+        });
+        return item;
+      });
+    });
+    if (!this.items.length) throw new ApiError('choose_photos_and_portals');
+    this.running = false; this.cancelled = false; this.controller = new AbortController();
+    this.lanes = new Map(); this.retired = new Set();
+  }
+  get total() { return this.items.length; }
+  get completed() { return this.items.filter((item)=>item.state==='confirmed').length; }
+  get bytes() { return this.items.reduce((sum,item)=>sum+(item.state==='confirmed'?item.file.size:0),0); }
+  get current() { return this.items.filter((item)=>item.state==='sending').map((item)=>item.name).join(', '); }
+  get target() { return this.items[0]?.room; }
+  get path() { return this.items[0]?.path; }
+  get failures() { return this.items.filter((item)=>['failed','unconfirmed'].includes(item.state)); }
+  stop(reason = 'cancelled', {abort = false} = {}) {
+    this.cancelled = true; this.cancelReason = reason;
+    for (const item of this.items) if (item.state==='queued') item.state = 'cancelled';
+    if (abort) this.controller.abort();
+    this.runtime?.changed?.(this);
+  }
+  retire(base) {
+    this.retired.add(base);
+    for (const item of this.items)
+      if (item.room.base===base && item.state==='queued') item.state = 'cancelled';
+    this.lanes.get(base)?.abort();
+    this.runtime?.changed?.(this);
+  }
+  rename(item,name) {
+    if (this.running || !this.items.includes(item) || item.state!=='failed' || item.error!=='file_exists')
+      throw new ApiError('rename_unavailable');
+    item.name = photoImportName(name);
+    this.runtime?.changed?.(this);
+  }
+  async retry(rooms,runtime,only = null) {
+    if (this.running) return;
+    const sessions = new Map(Array.from(rooms,(room)=>[room.base,room]));
+    let count = 0;
+    for (const item of this.items) {
+      const room = sessions.get(item.room.base);
+      if (item.state!=='failed' || (only && item!==only) || !room?.token) continue;
+      item.room = Object.freeze({...room}); item.state = 'queued'; item.error = null; count++;
+    }
+    if (!count) return;
+    this.controller = new AbortController(); this.retired.clear(); this.cancelled = false;
+    await this.run(runtime);
+  }
+  async run(runtime) {
+    if (this.running) return this.pending;
+    this.runtime = runtime; this.running = true;
+    const groups = [...new Set(this.items.filter((item)=>item.state==='queued').map((item)=>item.room.base))];
+    let cursor = 0;
+    const changed = () => runtime.changed?.(this);
+    const lane = async (base) => {
+      const controller = new AbortController(); this.lanes.set(base,controller);
+      const abort = () => controller.abort();
+      this.controller.signal.addEventListener('abort',abort,{once:true});
+      if (this.controller.signal.aborted || this.retired.has(base)) abort();
+      try {
+        for (const item of this.items.filter((item)=>item.room.base===base)) {
+          if (item.state!=='queued') continue;
+          if (controller.signal.aborted) {item.state='cancelled';changed();continue;}
+          let posted = false;
+          try {
+            if (!runtime.current(item.room)) throw new ApiError('pairing_changed');
+            if (typeof item.deviceId !== 'string' || !item.deviceId.trim()) throw new ApiError('identity_unverified');
+            const info = await runtime.inspect(item.room,controller.signal);
+            if (item.state!=='queued' || controller.signal.aborted) {item.state='cancelled';continue;}
+            if (!runtime.current(item.room)) throw new ApiError('pairing_changed');
+            if (typeof info?.deviceId !== 'string' || !info.deviceId.trim()) throw new ApiError('identity_unverified');
+            if (info.deviceId!==item.deviceId) throw new ApiError('identity_changed');
+            if (info.capabilities?.photos!==true) throw new ApiError('photos_unsupported');
+            item.state = 'sending'; changed(); posted = true;
+            const result = await runtime.send(item.room,item,controller.signal);
+            if (result?.ok===false) throw new ApiError(result.error || 'upload_rejected',0,result);
+            if (result?.ok!==true || result.path!==`${item.path}/${item.name}` || result.bytes!==item.file.size)
+              throw new ApiError('upload_unconfirmed');
+            item.state = 'confirmed'; item.error = null;
+          } catch (error) {
+            if (!posted && (item.state==='cancelled' || controller.signal.aborted)) {
+              item.state='cancelled';item.error=null;changed();continue;
+            }
+            const uncertain = posted && error?.data?.ok!==false;
+            item.state = uncertain ? 'unconfirmed' : 'failed';
+            item.error = uncertain ? 'incomplete_upload' : error.code || 'preflight_failed';
+            if (controller.signal.aborted || error.status===401 || item.error==='pairing_changed') {
+              for (const queued of this.items)
+                if (queued.room.base===base && queued.state==='queued') queued.state='cancelled';
+            }
+          }
+          changed();
+        }
+      } finally {
+        this.controller.signal.removeEventListener('abort',abort); this.lanes.delete(base);
+      }
+    };
+    const worker = async () => { while (cursor<groups.length) await lane(groups[cursor++]); };
+    changed();
+    this.pending = Promise.all(Array.from({length:Math.min(2,groups.length)},worker));
+    try {await this.pending;}
+    finally {this.running=false;changed();}
+  }
+}

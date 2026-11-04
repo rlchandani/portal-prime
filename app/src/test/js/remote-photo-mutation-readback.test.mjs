@@ -158,7 +158,8 @@ async function fixture(t, { empty = false } = {}) {
       assert.ok(picker, 'The shipped import dialog must expose its file picker');
       picker.files = names.map(name => Object.assign(
         new Blob(['abc'], { type: 'image/png' }), { name }));
-      h.click('Start import');
+      picker.onchange?.({target:picker});
+      h.document.body.querySelectorAll('button').find(b=>/^Import \d+ photo/.test(b.textContent)).click();
       await h.settle();
     },
     async deleteOld() {
@@ -397,10 +398,11 @@ test('switching Portals during upload cannot refresh or publish that upload in t
   const before = f.reads.length;
   f.heldUploads[0].finish();
   await h.settle();
-  assert.equal(f.uploads.length, 1, 'Queued uploads remain cancelled');
+  assert.equal(f.uploads.length, 2, 'Queued uploads continue only to the captured Portal');
+  assert.ok(f.uploads.every(upload=>upload.base===saved[0].base));
   assert.equal(f.reads.length, before);
   assert.deepEqual(galleryNames(h), ['Preview peer.png']);
-  assert.equal(h.document.getElementById('upload-status'), undefined);
+  assert.ok(h.document.getElementById('upload-status'));
   assert.doesNotMatch(h.document.getElementById('notice').textContent, /photos stored/i);
 });
 
