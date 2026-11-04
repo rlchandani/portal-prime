@@ -103,7 +103,7 @@ const legacyOutput = [
   ['mosaic', 5, '5bcac3423cd4bb7973e4727270c64e614f7b97aa91faddc197a07443e5b22434'],
   ['cinema', 0, '05ab8f802f34a45f48a16ea90a0f485df8647abceb1f2226fc32abc62fa868d1'],
   ['heroSidebar', 0, 'a68aba7d77b716bdafc6e05b798aca2ec4c7664807cc5b8d76ab667fc5b5a09c'],
-  ['galleryWall', 5, '15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702'],
+  ['galleryWall', 5, '239aa48e016a8c83876cd308e2183b9002e89c4ff286519e57b6ec8fddc95ac9'],
   ['polaroid', 44, '9265a46eae766e341903322fedaf76800aa12e1a6c708499a338fd0489994598'],
   ['filmstrip', 0, 'e55bbd40fc31709d71052f73d61ea3de6333fa2b804527a014cb5d79bde5e677'],
 ];

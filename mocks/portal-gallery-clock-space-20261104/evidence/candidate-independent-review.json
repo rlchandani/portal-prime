@@ -1,0 +1,808 @@
+{
+  "recordedAtUtc": "2026-11-04T09:34:17.067063+00:00",
+  "clock": {
+    "firstObservation": "2026-11-04T09:21:05Z",
+    "selection": "2026-11-04T09:27:13Z",
+    "target": "2026-11-04T09:36:05Z",
+    "hardDeadline": "2026-11-04T09:51:05Z",
+    "reset": false
+  },
+  "blockers": [],
+  "admittedForBoundedGeneratedAcceptance": true,
+  "fixtureSources": {
+    "java": {
+      "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native/GalleryClockActivity.java",
+      "bytes": 19977,
+      "sha256": "56ddfeb6cc536e87aec7d9a8c0aeff75063e07fac9e29b7541e2a2ce7e12b092"
+    },
+    "build": {
+      "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native/build.sh",
+      "bytes": 1116,
+      "sha256": "ff09fad2049ce876d558ff704339b9bc84f8f260a2cd9bd71a2a123d3b2d44a0"
+    },
+    "manifest": {
+      "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native/AndroidManifest.xml",
+      "bytes": 504,
+      "sha256": "ca8b21b06dcdd247717fb13edc6c354ed180fe350e297f9404f252cf059c2557"
+    }
+  },
+  "preparation": {
+    "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native/preparation-verification.json",
+    "bytes": 3046,
+    "sha256": "ebc1e6bacf761bbb132956a9e2ac05af64994f937754246ea74df153343cc50d"
+  },
+  "logicalGateBindings": {
+    "bootstrapAndComputedState": {
+      "bytes": 4439,
+      "sha256": "b7e56357dda2da16b306965817e5388e3c5e18e805c68543cf170489818d9ac5"
+    },
+    "computedAndReservationGates": {
+      "bytes": 3682,
+      "sha256": "c638ab87288d869dce7eb29d330d0d198631c7d800b4ec9b6261536a4c488937"
+    },
+    "nativePixelGates": {
+      "bytes": 3732,
+      "sha256": "600f6803dc54e73b7ea7c70084dc7a473e182f829994d8e77cc02e7ac5b195de"
+    },
+    "retirementAndReport": {
+      "bytes": 1470,
+      "sha256": "956523cc30e1fe242e30000f751c6a83152e452b96e5172d728da968ad70b6dc"
+    }
+  },
+  "frozenSourcesAndGatesByteIdentical": true,
+  "baselineAndCandidateFixtureDexByteIdentical": true,
+  "fixtureDex": {
+    "bytes": 28340,
+    "sha256": "4c94858956ca8b2444868f96d2d98b8395e82402f636d917dcd79a8ce6571037"
+  },
+  "candidateFixture": {
+    "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native/gallery-clock-fixture.apk",
+    "bytes": 16835050,
+    "sha256": "b2b257bc18ff5440504b98602ca30066e0ef8a5a10265ac8cfc852ca2df8a11c"
+  },
+  "candidateEmbeddedSource": {
+    "bytes": 25886643,
+    "sha256": "a3a3373d0c69029a6649e899cb7f24f78a0e9066111a14ad8284f0b448a246a7",
+    "retainedApkByteExact": true
+  },
+  "candidate": {
+    "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/candidate-performance-1.144.apk",
+    "bytes": 25886643,
+    "sha256": "a3a3373d0c69029a6649e899cb7f24f78a0e9066111a14ad8284f0b448a246a7"
+  },
+  "candidatePackage": {
+    "id": "com.immortal.launcher.debug",
+    "versionName": "1.144",
+    "versionCode": 138,
+    "signatureVerified": true,
+    "signatureOutput": "Signer #1 certificate DN: C=US, O=Android, CN=Android Debug\nSigner #1 certificate SHA-256 digest: 4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6\nSigner #1 certificate SHA-1 digest: e65320f666fe95bab747629a6bf61ff20a7f7198\nSigner #1 certificate MD5 digest: af3c51722615cf125d6d32c063ac9876"
+  },
+  "zeroFixturePermissions": true,
+  "screensaverAssets": [
+    {
+      "path": "assets/screensaver/cinema-grain.png",
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": true
+    },
+    {
+      "path": "assets/screensaver/index.html",
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": true
+    },
+    {
+      "path": "assets/screensaver/lib-engine.js",
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": true
+    },
+    {
+      "path": "assets/screensaver/mode-impls.js",
+      "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": false
+    },
+    {
+      "path": "assets/screensaver/modes.js",
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": true
+    },
+    {
+      "path": "assets/screensaver/photo-doodles-dark.svg",
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": true
+    },
+    {
+      "path": "assets/screensaver/photo-doodles.svg",
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": true
+    },
+    {
+      "path": "assets/screensaver/photos.js",
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": true
+    },
+    {
+      "path": "assets/screensaver/scheduler.js",
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": true
+    },
+    {
+      "path": "assets/screensaver/styles.css",
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "sourceByteExact": true,
+      "unchangedFromBaseline": true
+    }
+  ],
+  "baselineNativeReport": {
+    "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native-before-report.json",
+    "bytes": 32990,
+    "sha256": "cccc86ee578b61990590a5b4a96fb5186e63b031b36f3843fd59a86acd3cd5aa"
+  },
+  "baselineObservation": "All three baseline scenes reach computed readiness with reported native photo/doodle controls; terminal clock_reservation_failed. Geometry independently replayed from measured rectangle pairs. Baseline PNGs are not present alongside candidate PNGs, so no independent baseline PNG replay claim.",
+  "candidateNativeReport": {
+    "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native-after-report.json",
+    "bytes": 32387,
+    "sha256": "f82c1968c00638ac30caf8fcbf75b75127c35f19727377f50e0095f233038408"
+  },
+  "rootAdmission": {
+    "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native-admission.json",
+    "bytes": 196,
+    "sha256": "5d45564243281a49ff54076896371845807130f93269cefc8eb50e1183b0e7c8"
+  },
+  "rootRetirement": {
+    "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native-after-retirement.json",
+    "bytes": 81,
+    "sha256": "3d1c0a8c70d54d7caab181facc3d99873dd3ab1e58ed88f7b8510e891fd8771d"
+  },
+  "independentReplay": {
+    "baselineGeometry": [
+      {
+        "shape": "bottom-clock-landscape",
+        "bridgeMappingExact": true,
+        "intersections": [
+          {
+            "photoId": 0,
+            "reservation": "bottom-clock",
+            "intersectionWidth": 683.0,
+            "intersectionHeight": 64
+          }
+        ],
+        "count": 1
+      },
+      {
+        "shape": "side-clock-portrait",
+        "bridgeMappingExact": true,
+        "intersections": [
+          {
+            "photoId": 1,
+            "reservation": "side-clock",
+            "intersectionWidth": 57.5,
+            "intersectionHeight": 512
+          }
+        ],
+        "count": 1
+      },
+      {
+        "shape": "clock-panel-mixed-six",
+        "bridgeMappingExact": true,
+        "intersections": [
+          {
+            "photoId": 3,
+            "reservation": "side-panel",
+            "intersectionWidth": 406.4027099609375,
+            "intersectionHeight": 267.0
+          },
+          {
+            "photoId": 4,
+            "reservation": "bottom-clock",
+            "intersectionWidth": 683,
+            "intersectionHeight": 75.4305419921875
+          },
+          {
+            "photoId": 5,
+            "reservation": "bottom-clock",
+            "intersectionWidth": 307,
+            "intersectionHeight": 75.4305419921875
+          }
+        ],
+        "count": 3
+      }
+    ],
+    "candidateGeometry": [
+      {
+        "shape": "bottom-clock-landscape",
+        "bridgeMappingExact": true,
+        "intersections": [],
+        "count": 0
+      },
+      {
+        "shape": "side-clock-portrait",
+        "bridgeMappingExact": true,
+        "intersections": [],
+        "count": 0
+      },
+      {
+        "shape": "clock-panel-mixed-six",
+        "bridgeMappingExact": true,
+        "intersections": [],
+        "count": 0
+      }
+    ],
+    "baselineIntersectionsPerScene": [
+      1,
+      1,
+      3
+    ],
+    "candidateIntersectionsPerScene": [
+      0,
+      0,
+      0
+    ],
+    "scaledBridgeRectanglesMatchMeasuredCss": true,
+    "photoCornersPass": 32,
+    "outerDoodleSamples": [
+      8355,
+      8247,
+      6381
+    ],
+    "allNativePixelCountsMatch": true,
+    "cornerRgbDistanceMaxUnchanged": 18,
+    "brightnessDeltaMinUnchanged": 25,
+    "scenes": [
+      {
+        "shape": "bottom-clock-landscape",
+        "screenshot": {
+          "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/gallery-bottom-clock-landscape.png",
+          "bytes": 79058,
+          "sha256": "e5f4aff94cf327b3a07cb9b8ec4ae85a4b86381f6db673a7f77b94fbba694521"
+        },
+        "photoCornerCount": 4,
+        "replayedCorners": [
+          {
+            "photoId": 0,
+            "corner": 0,
+            "point": [
+              869,
+              314
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 1,
+            "point": [
+              1291,
+              314
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 2,
+            "point": [
+              869,
+              622
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 3,
+            "point": [
+              1291,
+              622
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          }
+        ],
+        "independentPixelScan": {
+          "outerMatteSamples": 715177,
+          "outerDoodleSamples": 8355,
+          "letterboxMatteSamples": 0,
+          "letterboxDoodleSamples": 0,
+          "letterboxOutgoingColorPixels": 0
+        },
+        "nativeScanCountsMatchExactly": true
+      },
+      {
+        "shape": "side-clock-portrait",
+        "screenshot": {
+          "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/gallery-side-clock-portrait.png",
+          "bytes": 80372,
+          "sha256": "6cd1ca8940aee4e7ee95119b4e8bb575f1c225d6edf227dbda08ac836f690a18"
+        },
+        "photoCornerCount": 4,
+        "replayedCorners": [
+          {
+            "photoId": 1,
+            "corner": 0,
+            "point": [
+              451,
+              469
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 1,
+            "point": [
+              737,
+              469
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 2,
+            "point": [
+              451,
+              971
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 3,
+            "point": [
+              737,
+              971
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          }
+        ],
+        "independentPixelScan": {
+          "outerMatteSamples": 708649,
+          "outerDoodleSamples": 8247,
+          "letterboxMatteSamples": 0,
+          "letterboxDoodleSamples": 0,
+          "letterboxOutgoingColorPixels": 0
+        },
+        "nativeScanCountsMatchExactly": true
+      },
+      {
+        "shape": "clock-panel-mixed-six",
+        "screenshot": {
+          "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/gallery-clock-panel-mixed-six.png",
+          "bytes": 93801,
+          "sha256": "e23bcecb726c2ab315d38267524f583145b11a6e8d1ab1a7ce3bd2799adba755"
+        },
+        "photoCornerCount": 24,
+        "replayedCorners": [
+          {
+            "photoId": 0,
+            "corner": 0,
+            "point": [
+              69,
+              234
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 1,
+            "point": [
+              341,
+              234
+            ],
+            "rgb": [
+              0,
+              0,
+              254
+            ],
+            "distance": 1,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 2,
+            "point": [
+              69,
+              433
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 3,
+            "point": [
+              341,
+              433
+            ],
+            "rgb": [
+              253,
+              0,
+              253
+            ],
+            "distance": 4,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 0,
+            "point": [
+              374,
+              231
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 1,
+            "point": [
+              490,
+              231
+            ],
+            "rgb": [
+              0,
+              0,
+              254
+            ],
+            "distance": 1,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 2,
+            "point": [
+              374,
+              435
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 3,
+            "point": [
+              490,
+              435
+            ],
+            "rgb": [
+              252,
+              0,
+              252
+            ],
+            "distance": 6,
+            "pass": true
+          },
+          {
+            "photoId": 2,
+            "corner": 0,
+            "point": [
+              523,
+              234
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 2,
+            "corner": 1,
+            "point": [
+              721,
+              234
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 2,
+            "corner": 2,
+            "point": [
+              523,
+              433
+            ],
+            "rgb": [
+              254,
+              254,
+              0
+            ],
+            "distance": 2,
+            "pass": true
+          },
+          {
+            "photoId": 2,
+            "corner": 3,
+            "point": [
+              721,
+              433
+            ],
+            "rgb": [
+              253,
+              0,
+              253
+            ],
+            "distance": 4,
+            "pass": true
+          },
+          {
+            "photoId": 3,
+            "corner": 0,
+            "point": [
+              757,
+              234
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 3,
+            "corner": 1,
+            "point": [
+              1616,
+              234
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 3,
+            "corner": 2,
+            "point": [
+              757,
+              433
+            ],
+            "rgb": [
+              254,
+              254,
+              0
+            ],
+            "distance": 2,
+            "pass": true
+          },
+          {
+            "photoId": 3,
+            "corner": 3,
+            "point": [
+              1616,
+              433
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 4,
+            "corner": 0,
+            "point": [
+              470,
+              477
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 4,
+            "corner": 1,
+            "point": [
+              962,
+              477
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 4,
+            "corner": 2,
+            "point": [
+              470,
+              837
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 4,
+            "corner": 3,
+            "point": [
+              962,
+              837
+            ],
+            "rgb": [
+              254,
+              0,
+              254
+            ],
+            "distance": 2,
+            "pass": true
+          },
+          {
+            "photoId": 5,
+            "corner": 0,
+            "point": [
+              1011,
+              472
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 5,
+            "corner": 1,
+            "point": [
+              1221,
+              472
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 5,
+            "corner": 2,
+            "point": [
+              1011,
+              842
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "distance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 5,
+            "corner": 3,
+            "point": [
+              1221,
+              842
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "distance": 0,
+            "pass": true
+          }
+        ],
+        "independentPixelScan": {
+          "outerMatteSamples": 562871,
+          "outerDoodleSamples": 6381,
+          "letterboxMatteSamples": 0,
+          "letterboxDoodleSamples": 0,
+          "letterboxOutgoingColorPixels": 0
+        },
+        "nativeScanCountsMatchExactly": true
+      }
+    ]
+  },
+  "sourceAssessment": "Gallery layout now consumes actual SS.photoLayoutArea, offsets all cells into its available region, and repositions retained photo cells through an owned coalesced frame on resize. Cleanup removes its listener and retires timers; reflow uses retained photos without new selection or loads. Opaque composed photo backing and existing doodles remain. No source blocker demonstrated.",
+  "deviceOperationsByReviewer": 0,
+  "productionOrFixtureGateEditsDuringAcceptance": false,
+  "limits": [
+    "Generated legacy WebView Gallery Wall initial reservations only; large hidden stress rectangles are not either room saved clock dimensions.",
+    "No actual native FaceRenderer/clock rendering, SlideshowStage Gallery Print/Spread, native resize, API28, scheduler, motion, swapping or performance claim.",
+    "Native execution and retirement are admitted from root artifacts; reviewer ran host-only checks.",
+    "Baseline geometry independently replayed from report; only candidate PNGs independently sampled.",
+    "This report does not itself promote or claim device delivery."
+  ]
+}

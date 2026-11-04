@@ -545,7 +545,8 @@
       cell.photo = photo; cell.dissolve.present(img);
     }
     function layout(preparedPhotos) {
-      const W = ctx.W, H = ctx.H, pad = 16, gutter = 12;
+      const area = SS.photoLayoutArea(ctx), W = area.w, H = area.h;
+      const pad = Math.min(16, W * .1, H * .1), gutter = 12;
       const targetH = Math.max(240, H * .4);
       const pick = preparedPhotos || []; const seen = new Set(); let g = 0;
       if (!preparedPhotos) {
@@ -559,15 +560,29 @@
       const rowWidths = new Map();
       res.cells.forEach(c => rowWidths.set(c.top, Math.max(rowWidths.get(c.top) || 0, c.left + c.width)));
       return res.cells.map(c => ({
-        ...c, left: c.left * sy + (W - rowWidths.get(c.top) * sy) / 2,
-        top: c.top * sy + offY, width: c.width * sy, height: c.height * sy,
+        ...c, left: area.x + c.left * sy + (W - rowWidths.get(c.top) * sy) / 2,
+        top: area.y + c.top * sy + offY, width: c.width * sy, height: c.height * sy,
       }));
     }
+    function position(root, slot) {
+      root.style.left = slot.left + "px"; root.style.top = slot.top + "px";
+      root.style.width = slot.width + "px"; root.style.height = slot.height + "px";
+    }
+    let resizePending = false;
+    function onResize() {
+      if (disposed || resizePending) return;
+      resizePending = true;
+      t.frame(() => {
+        resizePending = false;
+        if (disposed || !cells.length) return;
+        layout(cells.map(cell => cell.photo)).forEach((slot, i) => position(cells[i].el, slot));
+      });
+    }
+    if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     function render(target) {
       target.forEach(slot => {
         const root = el("ss-gcell", wall);
-        root.style.left = slot.left + "px"; root.style.top = slot.top + "px";
-        root.style.width = slot.width + "px"; root.style.height = slot.height + "px";
+        position(root, slot);
         const layers = [0, 1].map(() => {
           const img = el("ss-img gallery-photo retired", root);
           img.style.backgroundImage = "none"; img.style.animation = "none";
@@ -608,6 +623,7 @@
     const cleanup = () => {
       if (disposed) return;
       disposed = true; t.cleanup(); cells.forEach(c => c.dissolve.cleanup());
+      if (typeof window.removeEventListener === "function") window.removeEventListener("resize", onResize);
     };
     Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });
     cleanup.pause = () => {

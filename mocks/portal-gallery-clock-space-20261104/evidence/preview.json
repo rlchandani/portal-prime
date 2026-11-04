@@ -1,0 +1,25 @@
+{
+  "actualProductionEntryPoint": true,
+  "mode": "galleryWall",
+  "simulatedClockOnly": true,
+  "initialViewport": [
+    2560,
+    1099
+  ],
+  "initialCells": 9,
+  "initialReservedClockIntersections": 0,
+  "resizedViewport": [
+    1200,
+    770
+  ],
+  "resizedCells": 9,
+  "resizedReservedClockIntersections": 0,
+  "allWholeTilesInside": true,
+  "screenshotDisplayedAndViewed": "desktop-gallery-clock-space.png",
+  "browserConsoleErrors": 0,
+  "ownedIsolatedTabClosed": true,
+  "existingUserIabTabsUnchanged": true,
+  "limits": [
+    "Bundled samples and desktop simulated clock only; no actual Android clock or device resize acceptance."
+  ]
+}

@@ -2,7 +2,7 @@
 
 This follows the user's report of small photos inside visible grid cells and
 large dark margins. Paper and the later scoped matte/frame changes are installed
-in both rooms through1.143/code137. Saved Shuffle/fit remains; the installed
+in both rooms through1.144/code138. Saved Shuffle/fit remains; the installed
 renderer and currently displayed Shuffle style are separate observations.
 
 Run from any directory with Python 3.9 or newer:

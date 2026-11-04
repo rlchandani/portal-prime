@@ -1,0 +1,417 @@
+{
+  "ok": true,
+  "clock": {
+    "start": "2026-11-04T09:21:05Z",
+    "selected": "2026-11-04T09:27:13Z",
+    "target": "2026-11-04T09:36:05Z",
+    "hardDeadline": "2026-11-04T09:51:05Z",
+    "reset": false
+  },
+  "sourceBindings": [
+    {
+      "role": "baseline-mode",
+      "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/mode-impls.js.before",
+      "sha256": "e0473ddbeeb20561fcaf1f85aa4192fd69e5273081140064e48e29a7f815ed22"
+    },
+    {
+      "role": "candidate-mode",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js",
+      "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb"
+    },
+    {
+      "role": "css",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css",
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+    },
+    {
+      "role": "motion-test-pre-golden",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/slideshow_photo_motion.test.mjs",
+      "sha256": "0e85c1c927aa8a1b831719ce988265abff8a47123780a210671e9f7ac44bc00d"
+    },
+    {
+      "role": "fixture-helper",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/helpers/slideshow_scene_fixture.mjs",
+      "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0"
+    },
+    {
+      "role": "frozen-regression",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/slideshow_gallery_reservations.test.mjs",
+      "sha256": "02f7e1003c1bd9ea88c64ca5fcbaf9f4b0885c11ec699988c472ae9ad8014d98"
+    },
+    {
+      "role": "modes-helper",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js",
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+    },
+    {
+      "role": "final-motion-test",
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/slideshow_photo_motion.test.mjs",
+      "sha256": "ca62d6895120c2b240808c9dd06c348fb2cec30e650e42efb7a2a98f96920d48"
+    },
+    {
+      "role": "frozen-motion-test",
+      "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/slideshow_photo_motion.test.mjs.before",
+      "sha256": "0e85c1c927aa8a1b831719ce988265abff8a47123780a210671e9f7ac44bc00d"
+    }
+  ],
+  "scope": {
+    "allProductionBytesOutsideGalleryEqual": true,
+    "geometryNormalization": [
+      "ss-gcell inline/computed left, top, width, height only"
+    ],
+    "existingDecorativeNormalizationRetained": true,
+    "selectionDissolvePreparationCleanupTimersUnchanged": true
+  },
+  "verification": {
+    "command": "node --test scripts/tests/slideshow_gallery_reservations.test.mjs scripts/tests/slideshow_gallery_retirement.test.mjs",
+    "terminalExit": 0,
+    "tests": 24,
+    "pass": 24,
+    "fail": 0
+  },
+  "pairedTraces": [
+    {
+      "photoMotion": "legacy-undefined",
+      "oldHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+      "newHash": "239aa48e016a8c83876cd308e2183b9002e89c4ff286519e57b6ec8fddc95ac9",
+      "oldNormalizedHash": "0ce07c03f2749c272a450abef19180018f0659796d8741e931861fa4d33bb7c8",
+      "newNormalizedHash": "0ce07c03f2749c272a450abef19180018f0659796d8741e931861fa4d33bb7c8",
+      "beforeRandomDraws": 5,
+      "candidateRandomDraws": 5,
+      "checkpoints": [
+        {
+          "timeMs": 0,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 3500,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 5000,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            6200,
+            10000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 7500,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            10000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 10000,
+          "nodeCount": 32,
+          "cursor": 15,
+          "resources": 12,
+          "loads": 12,
+          "timers": [
+            11200,
+            15000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 15000,
+          "nodeCount": 32,
+          "cursor": 22,
+          "resources": 13,
+          "loads": 13,
+          "timers": [
+            16200,
+            20000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 27500,
+          "nodeCount": 32,
+          "cursor": 31,
+          "resources": 15,
+          "loads": 15,
+          "timers": [
+            30000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        }
+      ]
+    },
+    {
+      "photoMotion": true,
+      "oldHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+      "newHash": "239aa48e016a8c83876cd308e2183b9002e89c4ff286519e57b6ec8fddc95ac9",
+      "oldNormalizedHash": "0ce07c03f2749c272a450abef19180018f0659796d8741e931861fa4d33bb7c8",
+      "newNormalizedHash": "0ce07c03f2749c272a450abef19180018f0659796d8741e931861fa4d33bb7c8",
+      "beforeRandomDraws": 5,
+      "candidateRandomDraws": 5,
+      "checkpoints": [
+        {
+          "timeMs": 0,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 3500,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 5000,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            6200,
+            10000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 7500,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            10000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 10000,
+          "nodeCount": 32,
+          "cursor": 15,
+          "resources": 12,
+          "loads": 12,
+          "timers": [
+            11200,
+            15000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 15000,
+          "nodeCount": 32,
+          "cursor": 22,
+          "resources": 13,
+          "loads": 13,
+          "timers": [
+            16200,
+            20000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 27500,
+          "nodeCount": 32,
+          "cursor": 31,
+          "resources": 15,
+          "loads": 15,
+          "timers": [
+            30000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        }
+      ]
+    },
+    {
+      "photoMotion": false,
+      "oldHash": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+      "newHash": "239aa48e016a8c83876cd308e2183b9002e89c4ff286519e57b6ec8fddc95ac9",
+      "oldNormalizedHash": "0ce07c03f2749c272a450abef19180018f0659796d8741e931861fa4d33bb7c8",
+      "newNormalizedHash": "0ce07c03f2749c272a450abef19180018f0659796d8741e931861fa4d33bb7c8",
+      "beforeRandomDraws": 5,
+      "candidateRandomDraws": 5,
+      "checkpoints": [
+        {
+          "timeMs": 0,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 3500,
+          "nodeCount": 32,
+          "cursor": 10,
+          "resources": 10,
+          "loads": 10,
+          "timers": [
+            5000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 5000,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            6200,
+            10000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 7500,
+          "nodeCount": 32,
+          "cursor": 12,
+          "resources": 11,
+          "loads": 11,
+          "timers": [
+            10000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 10000,
+          "nodeCount": 32,
+          "cursor": 15,
+          "resources": 12,
+          "loads": 12,
+          "timers": [
+            11200,
+            15000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 15000,
+          "nodeCount": 32,
+          "cursor": 22,
+          "resources": 13,
+          "loads": 13,
+          "timers": [
+            16200,
+            20000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        },
+        {
+          "timeMs": 27500,
+          "nodeCount": 32,
+          "cursor": 31,
+          "resources": 15,
+          "loads": 15,
+          "timers": [
+            30000
+          ],
+          "ownerOpacityExact": true,
+          "nonGeometryExact": true
+        }
+      ]
+    }
+  ],
+  "liveDissolveResize": {
+    "ok": true,
+    "resizeAtMs": 5350,
+    "frameAtMs": 5366,
+    "coalescedFrames": 1,
+    "ownersAndOpacityMatchBaselineAtFrameAndRetirement": true,
+    "noNewResourcesLoadsRandomOrDomOwners": true,
+    "clearsBottom900Reservation": true,
+    "staleWorkAndListenerCleanup": true
+  },
+  "review": {
+    "accepted": true,
+    "blockers": [],
+    "initialAdmission": "Second layout after t.load reads latest bridge/root dimensions.",
+    "retention": "Reflow passes retained cell.photo array and writes only existing cell geometry; no cursor/selection path.",
+    "pause": "Existing t.frame defers while paused and owner cleanup retires queued frame/timer work.",
+    "narrowArea": "Local padding now bounds available geometry for the frozen narrow-strip case."
+  },
+  "limits": [
+    "Host fixture proves source inputs, simulated ownership/lifecycle and exact paired traces, not native pixels or actual FaceRenderer clock.",
+    "Shared bounded-area helper retains existing fully-occupied/no-free-area fallback limits; no helper/bridge redesign claimed.",
+    "Native GalleryStage, actual Android resize/scheduler/performance/API28/Living visuals remain separately qualified.",
+    "No device, network, provider, registry, owner-media/account operations."
+  ],
+  "goldenChange": {
+    "onlyGalleryGoldenChanged": true,
+    "old": "15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702",
+    "current": "239aa48e016a8c83876cd308e2183b9002e89c4ff286519e57b6ec8fddc95ac9",
+    "allOtherElevenEntriesAndTestBytesExact": true
+  },
+  "motionVerification": {
+    "command": "node --test scripts/tests/slideshow_photo_motion.test.mjs",
+    "terminalExit": 0,
+    "tests": 54,
+    "pass": 54,
+    "fail": 0,
+    "skipped": 0
+  },
+  "frozenBaselineEvidence": {
+    "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/regression-before.log",
+    "sha256": "5d70387995195903b6cebe5552fdebc1fc6801709717ae592d76b9023ae1f158",
+    "summary": [
+      "ℹ tests 13",
+      "ℹ pass 3",
+      "ℹ fail 10",
+      "ℹ cancelled 0",
+      "ℹ skipped 0"
+    ]
+  }
+}

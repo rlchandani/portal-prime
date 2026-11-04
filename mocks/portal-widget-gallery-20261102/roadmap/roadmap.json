@@ -1,18 +1,68 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T09:25:51.921541+00:00",
-  "updatedLabel": "Gallery Wall doodles delivered; room1.143 and earlier scopes retained",
+  "updatedAt": "2026-11-04T09:38:00.859346+00:00",
+  "updatedLabel": "Gallery clock reservation delivered; room1.144 and earlier scopes retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.143/code 137. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.144/code 138. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "gallery-clock-space",
+      "title": "Gallery Wall: keep complete tiles clear of the clock",
+      "summary": "Measured clock/calendar reservations bound existing justified rows; resize retains prepared photo owners.",
+      "status": "delivered",
+      "verification": "13 frozen cases \u00b7 4,414 JVM \u00b7 1,128 JS \u00b7 native 5\u21920 overlaps \u00b7 exact both-room installs",
+      "kind": "Screensaver placement correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent review",
+      "deployment": "Exact optimized1.144/code138 fully hashed in both rooms; one install per room.",
+      "acceptance": [
+        "Existing photo-area helper bounds and offsets original justified rows; pad stays positive in narrow spaces.",
+        "Coalesced pausable resize updates retained cells without photo loads or random draws; cleanup removes its listener.",
+        "Generated native baseline1/1/3 intersections becomes0/0/0 with32 full-photo corner controls and quiet doodles retained."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped delivery, collector limitation and remaining acceptance.",
+          "source": "docs/portal-gallery-clock-space-2026-11-04.md"
+        },
+        {
+          "text": "Frozen regressions, exact native/artifact review and room preservation.",
+          "source": "mocks/portal-gallery-clock-space-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated initial Gallery/API29 reservations only; actual FaceRenderer/native clock/GalleryStage/Android resize/swaps/scheduler/motion/performance/API28/Living visuals remain separate.",
+        "Desktop simulated-clock resize and host live-fade/deferred/paused resize pass; native resize remains unverified.",
+        "Baseline geometry replay is report-based; candidate corner/doodle replay uses actual screenshots. Baseline screenshots were overwritten by identical collector output names.",
+        "Saved Shuffle/fit stays; installed support does not establish the current style.",
+        "No phone, live source media/provider/account, push or publication."
+      ],
+      "next": "Switch to a distinct bounded slice; all earlier parked scopes and clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-04T09:21:05Z",
+        "target": "2026-11-04T09:36:05Z",
+        "deadline": "2026-11-04T09:51:05Z",
+        "selectedAt": "2026-11-04T09:27:13Z",
+        "sourceBase": "1f54ac17be222f0c7cb402ffa4ffb5c2d148eba9",
+        "version": "1.144/code138",
+        "scope": "Gallery justified rows use existing measured photo area and owned coalesced resize; retain admitted photos, opaque doodles, selection, fades and timers",
+        "priorClocksRetained": true,
+        "boundaries": [
+          "No phone/provider/media/account/push/publication",
+          "Legacy Gallery initial generated bridge bounds only; native GalleryStage/FaceRenderer/clock/scheduler/performance/API28/Living visuals remain separate"
+        ]
+      }
+    },
     {
       "id": "gallery-wall-doodles",
       "title": "Gallery Wall: quiet doodles in empty photo margins",

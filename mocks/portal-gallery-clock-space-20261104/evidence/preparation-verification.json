@@ -1,0 +1,86 @@
+{
+  "recordedAtUtc": "2026-11-04T09:29:47.874978+00:00",
+  "clock": {
+    "firstObservation": "2026-11-04T09:21:05Z",
+    "selection": "2026-11-04T09:27:13Z",
+    "target": "2026-11-04T09:36:05Z",
+    "hardDeadline": "2026-11-04T09:51:05Z",
+    "reset": false
+  },
+  "fixturePackage": "com.immortal.galleryclockfixture",
+  "zeroPermissions": true,
+  "sources": {
+    "GalleryClockActivity.java": {
+      "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native/GalleryClockActivity.java",
+      "bytes": 19977,
+      "sha256": "56ddfeb6cc536e87aec7d9a8c0aeff75063e07fac9e29b7541e2a2ce7e12b092"
+    },
+    "build.sh": {
+      "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native/build.sh",
+      "bytes": 1116,
+      "sha256": "ff09fad2049ce876d558ff704339b9bc84f8f260a2cd9bd71a2a123d3b2d44a0"
+    },
+    "AndroidManifest.xml": {
+      "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native/AndroidManifest.xml",
+      "bytes": 504,
+      "sha256": "ca8b21b06dcdd247717fb13edc6c354ed180fe350e297f9404f252cf059c2557"
+    },
+    "RUN.md": {
+      "path": "/private/tmp/portal-gallery-clock-space-20261104-092105/native/RUN.md",
+      "bytes": 1395,
+      "sha256": "ef20d13dc41a74dab28e3f38655fb255bc045732ff66ffae124ecf38d6de4746"
+    }
+  },
+  "logicalGateBindings": {
+    "bootstrapAndComputedState": {
+      "bytes": 4439,
+      "sha256": "b7e56357dda2da16b306965817e5388e3c5e18e805c68543cf170489818d9ac5"
+    },
+    "computedAndReservationGates": {
+      "bytes": 3682,
+      "sha256": "c638ab87288d869dce7eb29d330d0d198631c7d800b4ec9b6261536a4c488937"
+    },
+    "nativePixelGates": {
+      "bytes": 3732,
+      "sha256": "600f6803dc54e73b7ea7c70084dc7a473e182f829994d8e77cc02e7ac5b195de"
+    },
+    "retirementAndReport": {
+      "bytes": 1470,
+      "sha256": "956523cc30e1fe242e30000f751c6a83152e452b96e5172d728da968ad70b6dc"
+    }
+  },
+  "frozenCopies": true,
+  "generatedReservations": [
+    {
+      "scene": "bottom-clock-landscape",
+      "bottomPercent": 35
+    },
+    {
+      "scene": "side-clock-portrait",
+      "rightPercent": 45
+    },
+    {
+      "scene": "clock-panel-mixed-six",
+      "bottomPercent": 25,
+      "rightPercent": 22
+    }
+  ],
+  "bridge": "Measured hidden DOM rectangles and viewport scaled to native window pixels through JavaScript getPhotoLayoutBounds facade; actual SS.photoLayoutArea consumes it.",
+  "expectedWholePhotoCorners": 32,
+  "collisionThresholdCssPixels": 0.01,
+  "expectedBaselineFinalError": "clock_reservation_failed",
+  "controlsRetained": [
+    "photo ownership and preparation",
+    "opaque photo URL over dark SVG composed backing",
+    "quiet outer/root doodles",
+    "whole-photo contain pixels",
+    "unknown requests zero",
+    "compositor fence",
+    "45s owned watchdog",
+    "destruction and report"
+  ],
+  "nativeResizeIncluded": false,
+  "scope": "Generated legacy Gallery Wall initial reservation geometry only; no actual native clock/FaceRenderer or room setting claim",
+  "sourceFilesWritten": false,
+  "deviceOperations": 0
+}

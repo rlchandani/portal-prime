@@ -1,0 +1,13 @@
+{
+  "oldTaskObjectsPreserved": 135,
+  "rawSuffixBytesPreserved": 443983,
+  "newTotal": 136,
+  "counts": {
+    "delivered": 86,
+    "verified": 40,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "defaultTaskPreserved": true
+}

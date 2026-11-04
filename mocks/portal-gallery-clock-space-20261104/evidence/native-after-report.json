@@ -1,0 +1,1107 @@
+{
+  "ok": true,
+  "error": null,
+  "observations": [
+    {
+      "ready": true,
+      "stable": true,
+      "reservations": [
+        {
+          "id": "bottom-clock",
+          "left": 0,
+          "top": 832,
+          "right": 1920,
+          "bottom": 1280
+        }
+      ],
+      "bridgeSnapshot": {
+        "width": 2160,
+        "height": 1440,
+        "occupied": [
+          {
+            "left": 0,
+            "top": 936,
+            "right": 2160,
+            "bottom": 1440
+          }
+        ]
+      },
+      "availablePhotoArea": {
+        "x": 35.84,
+        "y": 35.84,
+        "w": 1848.32,
+        "h": 760.3199999999999
+      },
+      "svgDecoded": true,
+      "shape": "bottom-clock-landscape",
+      "errors": [],
+      "cards": [
+        {
+          "known": true,
+          "id": 0,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 757,
+            "y": 263.9305725097656,
+            "w": 406,
+            "h": 304
+          },
+          "fit": {
+            "x": 757.3333333333333,
+            "y": 263.9305725097656,
+            "w": 405.33333333333337,
+            "h": 304
+          },
+          "corners": [
+            {
+              "x": 772.5333333333333,
+              "y": 279.1305725097656
+            },
+            {
+              "x": 1147.4666666666667,
+              "y": 279.1305725097656
+            },
+            {
+              "x": 772.5333333333333,
+              "y": 552.7305725097656
+            },
+            {
+              "x": 1147.4666666666667,
+              "y": 552.7305725097656
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery-clock.fixture/photo/0.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery-clock.fixture/photo/0.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ],
+      "wallBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+      "wallColor": "rgb(28, 27, 25)",
+      "wallSize": "480px 360px",
+      "wallRepeat": "repeat",
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 1,
+      "photoRequests": 1,
+      "galleryAvoidsOccupiedRectangles": true,
+      "galleryReservationIntersections": [],
+      "clockReservationChecks": 1,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "gallery-bottom-clock-landscape.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "outerMatteSamples": 715177,
+      "outerDoodleSamples": 8355,
+      "letterboxMatteSamples": 0,
+      "letterboxDoodleSamples": 0,
+      "letterboxOutgoingColorPixels": 0,
+      "noOutgoingPhotoBleed": true
+    },
+    {
+      "ready": true,
+      "stable": true,
+      "reservations": [
+        {
+          "id": "side-clock",
+          "left": 1056,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1280
+        }
+      ],
+      "bridgeSnapshot": {
+        "width": 2160,
+        "height": 1440,
+        "occupied": [
+          {
+            "left": 1188,
+            "top": 0,
+            "right": 2160,
+            "bottom": 1440
+          }
+        ]
+      },
+      "availablePhotoArea": {
+        "x": 35.84,
+        "y": 35.84,
+        "w": 984.3199999999999,
+        "h": 1208.32
+      },
+      "svgDecoded": true,
+      "shape": "side-clock-portrait",
+      "errors": [],
+      "cards": [
+        {
+          "known": true,
+          "id": 1,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 383,
+            "y": 398.3333435058594,
+            "w": 290,
+            "h": 483
+          },
+          "fit": {
+            "x": 383.1,
+            "y": 398.3333435058594,
+            "w": 289.8,
+            "h": 483
+          },
+          "corners": [
+            {
+              "x": 401.21250000000003,
+              "y": 416.4458435058594
+            },
+            {
+              "x": 654.7875,
+              "y": 416.4458435058594
+            },
+            {
+              "x": 401.21250000000003,
+              "y": 863.2208435058594
+            },
+            {
+              "x": 654.7875,
+              "y": 863.2208435058594
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery-clock.fixture/photo/1.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery-clock.fixture/photo/1.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ],
+      "wallBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+      "wallColor": "rgb(28, 27, 25)",
+      "wallSize": "480px 360px",
+      "wallRepeat": "repeat",
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 2,
+      "photoRequests": 2,
+      "galleryAvoidsOccupiedRectangles": true,
+      "galleryReservationIntersections": [],
+      "clockReservationChecks": 1,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "gallery-side-clock-portrait.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "outerMatteSamples": 708649,
+      "outerDoodleSamples": 8247,
+      "letterboxMatteSamples": 0,
+      "letterboxDoodleSamples": 0,
+      "letterboxOutgoingColorPixels": 0,
+      "noOutgoingPhotoBleed": true
+    },
+    {
+      "ready": true,
+      "stable": true,
+      "reservations": [
+        {
+          "id": "bottom-clock",
+          "left": 0,
+          "top": 960,
+          "right": 1920,
+          "bottom": 1280
+        },
+        {
+          "id": "side-panel",
+          "left": 1497.5972900390625,
+          "top": 0,
+          "right": 1919.9861755371094,
+          "bottom": 1280
+        }
+      ],
+      "bridgeSnapshot": {
+        "width": 2160,
+        "height": 1440,
+        "occupied": [
+          {
+            "left": 0,
+            "top": 1080,
+            "right": 2160,
+            "bottom": 1440
+          },
+          {
+            "left": 1684.7969512939453,
+            "top": 0,
+            "right": 2159.984447479248,
+            "bottom": 1440
+          }
+        ]
+      },
+      "availablePhotoArea": {
+        "x": 35.84,
+        "y": 35.84,
+        "w": 1425.9172900390624,
+        "h": 888.3199999999999
+      },
+      "svgDecoded": true,
+      "shape": "clock-panel-mixed-six",
+      "errors": [],
+      "cards": [
+        {
+          "known": true,
+          "id": 0,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 51.79166793823242,
+            "y": 198.4027862548828,
+            "w": 261,
+            "h": 196
+          },
+          "fit": {
+            "x": 51.79166793823242,
+            "y": 198.5277862548828,
+            "w": 261,
+            "h": 195.75
+          },
+          "corners": [
+            {
+              "x": 61.57916793823242,
+              "y": 208.3152862548828
+            },
+            {
+              "x": 303.0041679382324,
+              "y": 208.3152862548828
+            },
+            {
+              "x": 61.57916793823242,
+              "y": 384.4902862548828
+            },
+            {
+              "x": 303.0041679382324,
+              "y": 384.4902862548828
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery-clock.fixture/photo/0.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery-clock.fixture/photo/0.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 1,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 324.7916564941406,
+            "y": 198.4027862548828,
+            "w": 118,
+            "h": 196
+          },
+          "fit": {
+            "x": 324.9916564941406,
+            "y": 198.4027862548828,
+            "w": 117.6,
+            "h": 196
+          },
+          "corners": [
+            {
+              "x": 332.34165649414064,
+              "y": 205.7527862548828
+            },
+            {
+              "x": 435.2416564941406,
+              "y": 205.7527862548828
+            },
+            {
+              "x": 332.34165649414064,
+              "y": 387.0527862548828
+            },
+            {
+              "x": 435.2416564941406,
+              "y": 387.0527862548828
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery-clock.fixture/photo/1.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery-clock.fixture/photo/1.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 2,
+          "pw": 600,
+          "ph": 600,
+          "rect": {
+            "x": 454.7916564941406,
+            "y": 198.4027862548828,
+            "w": 196,
+            "h": 196
+          },
+          "fit": {
+            "x": 454.7916564941406,
+            "y": 198.4027862548828,
+            "w": 196,
+            "h": 196
+          },
+          "corners": [
+            {
+              "x": 464.59165649414064,
+              "y": 208.20278625488282
+            },
+            {
+              "x": 640.9916564941407,
+              "y": 208.20278625488282
+            },
+            {
+              "x": 464.59165649414064,
+              "y": 384.6027862548828
+            },
+            {
+              "x": 640.9916564941407,
+              "y": 384.6027862548828
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery-clock.fixture/photo/2.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery-clock.fixture/photo/2.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 3,
+          "pw": 2400,
+          "ph": 600,
+          "rect": {
+            "x": 662.7916870117188,
+            "y": 198.4027862548828,
+            "w": 783,
+            "h": 196
+          },
+          "fit": {
+            "x": 662.7916870117188,
+            "y": 198.5277862548828,
+            "w": 783,
+            "h": 195.75
+          },
+          "corners": [
+            {
+              "x": 672.5791870117188,
+              "y": 208.3152862548828
+            },
+            {
+              "x": 1436.0041870117188,
+              "y": 208.3152862548828
+            },
+            {
+              "x": 672.5791870117188,
+              "y": 384.4902862548828
+            },
+            {
+              "x": 1436.0041870117188,
+              "y": 384.4902862548828
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery-clock.fixture/photo/3.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery-clock.fixture/photo/3.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 4,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 399.2916564941406,
+            "y": 406.40277099609375,
+            "w": 474,
+            "h": 355
+          },
+          "fit": {
+            "x": 399.624989827474,
+            "y": 406.40277099609375,
+            "w": 473.3333333333333,
+            "h": 355
+          },
+          "corners": [
+            {
+              "x": 417.374989827474,
+              "y": 424.15277099609375
+            },
+            {
+              "x": 855.2083231608074,
+              "y": 424.15277099609375
+            },
+            {
+              "x": 417.374989827474,
+              "y": 743.6527709960938
+            },
+            {
+              "x": 855.2083231608074,
+              "y": 743.6527709960938
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery-clock.fixture/photo/4.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery-clock.fixture/photo/4.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "known": true,
+          "id": 5,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 885.2916870117188,
+            "y": 406.40277099609375,
+            "w": 213,
+            "h": 355
+          },
+          "fit": {
+            "x": 885.2916870117188,
+            "y": 406.40277099609375,
+            "w": 213,
+            "h": 355
+          },
+          "corners": [
+            {
+              "x": 898.6041870117188,
+              "y": 419.71527099609375
+            },
+            {
+              "x": 1084.9791870117188,
+              "y": 419.71527099609375
+            },
+            {
+              "x": 898.6041870117188,
+              "y": 748.0902709960938
+            },
+            {
+              "x": 1084.9791870117188,
+              "y": 748.0902709960938
+            }
+          ],
+          "letterboxMargins": [],
+          "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "cellColor": "rgb(28, 27, 25)",
+          "cellSize": "480px 360px",
+          "cellRepeat": "repeat",
+          "opacity": "1",
+          "visibility": "visible",
+          "photoColor": "rgb(28, 27, 25)",
+          "backgroundImage": "url(\"https://gallery-clock.fixture/photo/5.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+          "size": "contain, 480px 360px",
+          "position": "50% 50%, 0% 0%",
+          "repeat": "no-repeat, repeat",
+          "inlineBackground": "url(\"https://gallery-clock.fixture/photo/5.png\"), url(\"photo-doodles-dark.svg\")",
+          "animation": "none",
+          "willChange": "auto",
+          "captionCount": 0,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ]
+        }
+      ],
+      "wallBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+      "wallColor": "rgb(28, 27, 25)",
+      "wallSize": "480px 360px",
+      "wallRepeat": "repeat",
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 3,
+      "photoRequests": 8,
+      "galleryAvoidsOccupiedRectangles": true,
+      "galleryReservationIntersections": [],
+      "clockReservationChecks": 12,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "gallery-clock-panel-mixed-six.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "outerMatteSamples": 562871,
+      "outerDoodleSamples": 6381,
+      "letterboxMatteSamples": 0,
+      "letterboxDoodleSamples": 0,
+      "letterboxOutgoingColorPixels": 0,
+      "noOutgoingPhotoBleed": true
+    }
+  ],
+  "svgRequests": 3,
+  "photoRequests": 8,
+  "lastComputedState": {
+    "ready": true,
+    "stable": true,
+    "reservations": [
+      {
+        "id": "bottom-clock",
+        "left": 0,
+        "top": 960,
+        "right": 1920,
+        "bottom": 1280
+      },
+      {
+        "id": "side-panel",
+        "left": 1497.5972900390625,
+        "top": 0,
+        "right": 1919.9861755371094,
+        "bottom": 1280
+      }
+    ],
+    "bridgeSnapshot": {
+      "width": 2160,
+      "height": 1440,
+      "occupied": [
+        {
+          "left": 0,
+          "top": 1080,
+          "right": 2160,
+          "bottom": 1440
+        },
+        {
+          "left": 1684.7969512939453,
+          "top": 0,
+          "right": 2159.984447479248,
+          "bottom": 1440
+        }
+      ]
+    },
+    "availablePhotoArea": {
+      "x": 35.84,
+      "y": 35.84,
+      "w": 1425.9172900390624,
+      "h": 888.3199999999999
+    },
+    "svgDecoded": true,
+    "shape": "clock-panel-mixed-six",
+    "errors": [],
+    "cards": [
+      {
+        "known": true,
+        "id": 0,
+        "pw": 800,
+        "ph": 600,
+        "rect": {
+          "x": 51.79166793823242,
+          "y": 198.4027862548828,
+          "w": 261,
+          "h": 196
+        },
+        "fit": {
+          "x": 51.79166793823242,
+          "y": 198.5277862548828,
+          "w": 261,
+          "h": 195.75
+        },
+        "corners": [
+          {
+            "x": 61.57916793823242,
+            "y": 208.3152862548828
+          },
+          {
+            "x": 303.0041679382324,
+            "y": 208.3152862548828
+          },
+          {
+            "x": 61.57916793823242,
+            "y": 384.4902862548828
+          },
+          {
+            "x": 303.0041679382324,
+            "y": 384.4902862548828
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery-clock.fixture/photo/0.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery-clock.fixture/photo/0.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 1,
+        "pw": 480,
+        "ph": 800,
+        "rect": {
+          "x": 324.7916564941406,
+          "y": 198.4027862548828,
+          "w": 118,
+          "h": 196
+        },
+        "fit": {
+          "x": 324.9916564941406,
+          "y": 198.4027862548828,
+          "w": 117.6,
+          "h": 196
+        },
+        "corners": [
+          {
+            "x": 332.34165649414064,
+            "y": 205.7527862548828
+          },
+          {
+            "x": 435.2416564941406,
+            "y": 205.7527862548828
+          },
+          {
+            "x": 332.34165649414064,
+            "y": 387.0527862548828
+          },
+          {
+            "x": 435.2416564941406,
+            "y": 387.0527862548828
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery-clock.fixture/photo/1.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery-clock.fixture/photo/1.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 2,
+        "pw": 600,
+        "ph": 600,
+        "rect": {
+          "x": 454.7916564941406,
+          "y": 198.4027862548828,
+          "w": 196,
+          "h": 196
+        },
+        "fit": {
+          "x": 454.7916564941406,
+          "y": 198.4027862548828,
+          "w": 196,
+          "h": 196
+        },
+        "corners": [
+          {
+            "x": 464.59165649414064,
+            "y": 208.20278625488282
+          },
+          {
+            "x": 640.9916564941407,
+            "y": 208.20278625488282
+          },
+          {
+            "x": 464.59165649414064,
+            "y": 384.6027862548828
+          },
+          {
+            "x": 640.9916564941407,
+            "y": 384.6027862548828
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery-clock.fixture/photo/2.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery-clock.fixture/photo/2.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 3,
+        "pw": 2400,
+        "ph": 600,
+        "rect": {
+          "x": 662.7916870117188,
+          "y": 198.4027862548828,
+          "w": 783,
+          "h": 196
+        },
+        "fit": {
+          "x": 662.7916870117188,
+          "y": 198.5277862548828,
+          "w": 783,
+          "h": 195.75
+        },
+        "corners": [
+          {
+            "x": 672.5791870117188,
+            "y": 208.3152862548828
+          },
+          {
+            "x": 1436.0041870117188,
+            "y": 208.3152862548828
+          },
+          {
+            "x": 672.5791870117188,
+            "y": 384.4902862548828
+          },
+          {
+            "x": 1436.0041870117188,
+            "y": 384.4902862548828
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery-clock.fixture/photo/3.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery-clock.fixture/photo/3.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 4,
+        "pw": 800,
+        "ph": 600,
+        "rect": {
+          "x": 399.2916564941406,
+          "y": 406.40277099609375,
+          "w": 474,
+          "h": 355
+        },
+        "fit": {
+          "x": 399.624989827474,
+          "y": 406.40277099609375,
+          "w": 473.3333333333333,
+          "h": 355
+        },
+        "corners": [
+          {
+            "x": 417.374989827474,
+            "y": 424.15277099609375
+          },
+          {
+            "x": 855.2083231608074,
+            "y": 424.15277099609375
+          },
+          {
+            "x": 417.374989827474,
+            "y": 743.6527709960938
+          },
+          {
+            "x": 855.2083231608074,
+            "y": 743.6527709960938
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery-clock.fixture/photo/4.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery-clock.fixture/photo/4.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "known": true,
+        "id": 5,
+        "pw": 480,
+        "ph": 800,
+        "rect": {
+          "x": 885.2916870117188,
+          "y": 406.40277099609375,
+          "w": 213,
+          "h": 355
+        },
+        "fit": {
+          "x": 885.2916870117188,
+          "y": 406.40277099609375,
+          "w": 213,
+          "h": 355
+        },
+        "corners": [
+          {
+            "x": 898.6041870117188,
+            "y": 419.71527099609375
+          },
+          {
+            "x": 1084.9791870117188,
+            "y": 419.71527099609375
+          },
+          {
+            "x": 898.6041870117188,
+            "y": 748.0902709960938
+          },
+          {
+            "x": 1084.9791870117188,
+            "y": 748.0902709960938
+          }
+        ],
+        "letterboxMargins": [],
+        "cellBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "cellColor": "rgb(28, 27, 25)",
+        "cellSize": "480px 360px",
+        "cellRepeat": "repeat",
+        "opacity": "1",
+        "visibility": "visible",
+        "photoColor": "rgb(28, 27, 25)",
+        "backgroundImage": "url(\"https://gallery-clock.fixture/photo/5.png\"), url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+        "size": "contain, 480px 360px",
+        "position": "50% 50%, 0% 0%",
+        "repeat": "no-repeat, repeat",
+        "inlineBackground": "url(\"https://gallery-clock.fixture/photo/5.png\"), url(\"photo-doodles-dark.svg\")",
+        "animation": "none",
+        "willChange": "auto",
+        "captionCount": 0,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    ],
+    "wallBackground": "url(\"https://gallery-clock.fixture/photo-doodles-dark.svg\")",
+    "wallColor": "rgb(28, 27, 25)",
+    "wallSize": "480px 360px",
+    "wallRepeat": "repeat",
+    "ownerOpacity": "1",
+    "ownerVisibility": "visible",
+    "dpr": 1.125,
+    "width": 1920,
+    "height": 1280,
+    "svgRequests": 3,
+    "photoRequests": 8,
+    "galleryAvoidsOccupiedRectangles": true,
+    "galleryReservationIntersections": [],
+    "clockReservationChecks": 12,
+    "computedChecksPassed": true,
+    "compositorFenceRequested": true,
+    "compositorFenceCompleted": true,
+    "screenshot": "gallery-clock-panel-mixed-six.png",
+    "pixelCopy": true,
+    "webPixelWidth": 2160,
+    "webPixelHeight": 1440,
+    "outerMatteSamples": 562871,
+    "outerDoodleSamples": 6381,
+    "letterboxMatteSamples": 0,
+    "letterboxDoodleSamples": 0,
+    "letterboxOutgoingColorPixels": 0,
+    "noOutgoingPhotoBleed": true
+  },
+  "sceneCount": 3,
+  "reservationFailureScenes": 0,
+  "bridgeSource": "Measured hidden generated DOM rectangles published as window-pixel snapshots; no native FaceRenderer or clock",
+  "scope": "Generated legacy Gallery Wall occupied clock/panel reservation envelopes, retained doodles and whole-photo pixels only; no native SlideshowStage, FaceRenderer, clock rendering, scheduler, resize or performance claim",
+  "unknownRequests": 0,
+  "deniedRequestDiagnostics": [],
+  "deniedRequestDiagnosticLimit": 16,
+  "webViewDestroyed": true,
+  "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+}
