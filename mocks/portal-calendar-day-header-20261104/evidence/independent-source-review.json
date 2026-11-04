@@ -1,0 +1,241 @@
+{
+  "ok": true,
+  "status": "PASS_SOURCE_REVIEW_ONLY",
+  "reviewedAtUtc": "2026-11-04T12:34:30.932715+00:00",
+  "reviewer": "/root/toolkit_source_review",
+  "originalDiscoveryAt": "2026-11-04T12:15:12Z",
+  "firstSourceObservationAt": "2026-11-04T12:15:45Z",
+  "selectedAt": "2026-11-04T12:29:28.098554+00:00",
+  "target": "2026-11-04T12:30:12Z",
+  "targetMissed": true,
+  "hardDeadline": "2026-11-04T12:45:12Z",
+  "clockNotReset": true,
+  "scope": "Private PhotoFrameController.dayHeader civil-day labels. Exact minimal production calculation plus frozen generated JVM baseline reviewed; no production clock seam, live provider/calendar or mounted UI acceptance.",
+  "bindings": {
+    "plan": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/selected-plan.json",
+      "sha256": "69e6336f22796b5ac6c649ee073b8265f094de32c3ac14a305ec54099bc5ee52",
+      "bytes": 663
+    },
+    "sourceWitness": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/source-witness.json",
+      "sha256": "88a23f46c0d2bb03fd8bd812ffc5b7b6aea5935388c56c023deeff47d7b38287",
+      "bytes": 4623
+    },
+    "baselineSource": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/PhotoFrameController.before.kt",
+      "sha256": "5c9a072bf1aece603216b0d8a6b42a0fe0d692148bf1f0ab2f265bc171c1057e",
+      "bytes": 164828
+    },
+    "candidateSource": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+      "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+      "bytes": 164859
+    },
+    "frozenTest": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/CalendarDayHeaderTest.frozen.kt",
+      "sha256": "e182e87cc6f6e86aa157bfbd34b98ac55d1a8462ca3f9184c0bc197df4be85c9",
+      "bytes": 5368
+    },
+    "currentTest": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/CalendarDayHeaderTest.kt",
+      "sha256": "e182e87cc6f6e86aa157bfbd34b98ac55d1a8462ca3f9184c0bc197df4be85c9",
+      "bytes": 5368
+    },
+    "acceptedV2Test": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/CalendarDayHeaderTest.accepted-v2.kt",
+      "sha256": "4834006005c6e8b6945f449973ce4a0eb61b88f1ad1e5e4b3a1c642650b7f797",
+      "bytes": 4928
+    },
+    "finalBaselineXml": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/baseline-focused-tests.xml",
+      "sha256": "82352048b9d0e4257f32515c9788182b10f6df1416f7f0b440bc55e6c4030daf",
+      "bytes": 10477
+    },
+    "finalBaselineTerminal": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/baseline-terminal.json",
+      "sha256": "1adc9c9731fc5e9b76101a32e2fbb178a4ab5ec7a6ab7e29cbbd4d3ffcbea3bc",
+      "bytes": 370
+    },
+    "finalBaselineLog": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/baseline-final-gradle.log",
+      "sha256": "692a4d622b03e0b1a59add05fddf43e2806866852847b873423bd6c868a1179c",
+      "bytes": 2549
+    },
+    "acceptedV2BaselineXml": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/baseline-v2-focused-tests.xml",
+      "sha256": "3ce5702acfc8c612db24cd87929f5cde24377aad49e4db650361babc9d5db3f6",
+      "bytes": 10475
+    },
+    "acceptedV2BaselineTerminal": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/baseline-v2-terminal.json",
+      "sha256": "22e10edff2a878fca509733357d2348412ff899fbcc2153c69d0408b7bc1ca68",
+      "bytes": 270
+    },
+    "excludedV1Test": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/excluded-jvm-adapter-v1/CalendarDayHeaderTest.kt",
+      "sha256": "cec52fdc439cfeb55a6cb994225f5d266a4125cc3c99fe59eb5b9adff8b70caf",
+      "bytes": 4926
+    },
+    "excludedOperations": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/excluded-operational-failures.json",
+      "sha256": "ea8d358370bb504b87f4cd60a3de759c493977489bb6fbce1bd8b1144105f16f",
+      "bytes": 457
+    },
+    "currentAppBuild": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "sha256": "cd6d6032943949133c814b82ab797e14b44a126af70d0dd02adeccc4e217ae79",
+      "bytes": 11824
+    },
+    "baselineAppBuildEvidenceReceipt": {
+      "path": "/private/tmp/portal-photo-presentation-audit-20261104-121512/independent-source-review.json",
+      "sha256": "ab7f0db27759cab12209fee8b0028d3a72f09f32dacf01cc27f7ce2302c3d05b",
+      "bytes": 15428
+    },
+    "baselineDebugApk": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/before-debug-1.155.apk",
+      "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+      "bytes": 46745294
+    },
+    "DateFormatter.kt": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/DateFormatter.kt",
+      "sha256": "029c1ee3e8028b09180aa2070015237074b29f7818a5049a3b473cd80dd11100",
+      "bytes": 2681
+    },
+    "CalendarFeed.kt": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CalendarFeed.kt",
+      "sha256": "9fed044ca49a8dbf9ab9ac4ac748dd04fcca9d5267e8558e8f1ad508157a0106",
+      "bytes": 25435
+    },
+    "SlideshowStage.kt": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowStage.kt",
+      "sha256": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0",
+      "bytes": 25908
+    },
+    "NativePhotoView.kt": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoView.kt",
+      "sha256": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "bytes": 1621
+    },
+    "NativePhotoMatte.kt": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoMatte.kt",
+      "sha256": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "bytes": 3372
+    },
+    "portal-calendar-all-day-dst-2026-11-03.md": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-calendar-all-day-dst-2026-11-03.md",
+      "sha256": "1e26692bf8b4496c8ded8f005ef279c4cbdbb04141a50167ca5fb5f67af88db7",
+      "bytes": 2878
+    },
+    "portal-calendar-recurrence-zone-2026-11-04.md": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-calendar-recurrence-zone-2026-11-04.md",
+      "sha256": "fa28b89fddcb7e7f26d17198b51bf0b29cb526fb085b87a1b3d8d50f03259b67",
+      "bytes": 3072
+    },
+    "portal-prayer-tomorrow-2026-11-03.md": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-prayer-tomorrow-2026-11-03.md",
+      "sha256": "4cedfa0fb51e8fcffb55eea0658903eb3d5b415390ec974ff50be906ec19407b",
+      "bytes": 3647
+    }
+  },
+  "productionReview": {
+    "entireControllerOtherwiseByteIdenticalToCapturedBefore": true,
+    "replacementOld": "    val today = dayKey(System.currentTimeMillis())\n    val tomorrow = dayKey(System.currentTimeMillis() + 24L * 60 * 60 * 1000)\n",
+    "replacementNew": "    val day = Calendar.getInstance()\n    val today = dayKey(day.timeInMillis)\n    day.add(Calendar.DAY_OF_YEAR, 1)\n    val tomorrow = dayKey(day.timeInMillis)\n",
+    "singleSample": "Calendar.getInstance initializes one current instant; Today uses its timeInMillis and tomorrow advances that same Calendar by DAY_OF_YEAR. No second System.currentTimeMillis read.",
+    "civilDayArithmetic": "Calendar.add(DAY_OF_YEAR,1) follows local calendar date over DST while retaining local time where representable; date key depends on the resulting civil date rather than an elapsed 24-hour interval.",
+    "unchangedTodayPrecedenceAndFallback": true,
+    "unchangedDayKey": "SimpleDateFormat(yyyyDDD, Locale.US), default local timezone.",
+    "unchangedFallback": "DateFormatter.format(Date(millis), EEEMMMd); real formatter cache tracks timezone IDs and rules.",
+    "activeCaller": {
+      "source": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+      "renderCalendarLines": [
+        1655,
+        1658,
+        1660,
+        1661,
+        1664
+      ],
+      "trigger": "Day headers for actual multi-day/agenda shown-event groups; ordinary single-day range retains its existing suppression.",
+      "refreshPaths": "Existing start/refresh and calendar minute callbacks render cached calendar event data. Their code is otherwise byte-identical to before."
+    },
+    "noSettingsSourceOrOwnershipPolicyChange": true,
+    "versionDeltaOnly": {
+      "before": {
+        "versionCode": 149,
+        "versionName": "1.155",
+        "appBuildSha256": "1da9864964b9947942d22788c1b864a15898a76206af52bb29405d3e7ca02657"
+      },
+      "current": {
+        "versionCode": 150,
+        "versionName": "1.156"
+      },
+      "entireAppBuildNormalizedToBeforeHash": true
+    },
+    "protectedStageMatteBorderExactPriorBindings": true,
+    "timezoneChangeLimit": "No new atomic timezone-change, timer, generation, window or source refresh policy; current default timezone behavior is preserved."
+  },
+  "frozenTestSourceReview": {
+    "actualPrivateMethod": "Unsafe allocates actual PhotoFrameController without constructor/source setup. Reflection invokes its real private dayHeader(long); header/body/dayKey/Calendar/DateFormatter are not mocked.",
+    "mockedSeamOnly": "Only unavailable Android DateFormat.getBestDateTimePattern(Locale.US, EEEMMMd) returns EEE, MMM d. System/currentTimeMillis is untouched; fallback remains an actual nonrelative date label.",
+    "fallRule": "Reference instant shifted by rawOffset to local 00:30 with one-hour DST active; prior-day start and today 02:00 end rules produce a 25-hour civil day. Elapsed +24h lands on same-date 23:30; a separately built tomorrow-noon event must be Tomorrow.",
+    "springRule": "Reference shifted to local 23:30 standard time; tomorrow 02:00 start and later end rules produce a 23-hour day. Elapsed +24h skips tomorrow to 00:30 following day; tomorrow-noon event must be Tomorrow.",
+    "eventIndependence": "GregorianCalendar(zone, Locale.US), cleared then set by civil year/month/day + offset at noon. No +24h event construction and no production time seam.",
+    "margin": "Profiles assert sampled local hour/minute; post-invocation drift <120 seconds stays within the 30-minute margins at this accepted run. Fixture does not mutate the wall clock.",
+    "defaultRestoration": "Saved TimeZone/default Locale/DISPLAY/FORMAT defaults restored in finally. Pattern mock opens under original timezone before applying custom unknown-ID zone.",
+    "serialExecutionLimit": "TimeZone and Locale are process-global. This fixture assumes serial in-process JUnit execution; it is not safe to claim arbitrary concurrent default changes are covered.",
+    "v1Exclusion": "All initial six Mockito/ByteBuddy ZoneRulesException setup failures excluded; zero accepted product failures from v1. V2 moves only TimeZone.setDefault inside the already-open pattern mock.",
+    "v3Portability": "V3 only replaces literal Feb29 transition rule with last occurrence of its weekday in February. In the sampled leap year Feb29 is that last weekday; current Nov4 rule calculations are unchanged. All six assertions/event construction remain identical. Final unchanged-source baseline repeated after freeze.",
+    "portabilityLimit": "The February29 branch is source-reviewed but was inactive in Nov4 baseline; no separate leap-day execution or all-runtime/calendar-date portability claim."
+  },
+  "baselineEvidence": {
+    "sessionId": 88575,
+    "terminalExitCode": 1,
+    "tests": 6,
+    "productAssertionFailures": [
+      {
+        "name": "tomorrowSurvivesTheTwentyThreeHourDay",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<T[omorrow]> but was:<T[hu, Nov 5]>"
+      },
+      {
+        "name": "tomorrowSurvivesTheTwentyFiveHourDay",
+        "type": "org.junit.ComparisonFailure",
+        "message": "org.junit.ComparisonFailure: expected:<T[omorrow]> but was:<T[hu, Nov 5]>"
+      }
+    ],
+    "controls": [
+      "laterDaysRetainTheirDateLabel",
+      "todayRetainsPriorityBeforeTheFallTransition",
+      "todayRetainsPriorityBeforeTheSpringTransition",
+      "ordinaryTomorrowStillHasItsRelativeLabel"
+    ],
+    "errors": 0,
+    "skips": 0,
+    "unchangedProductionBeforeCandidate": true,
+    "caseExpectationsFrozenBeforeProduction": true,
+    "correctedBaselineRepeatedAfterFinalFixtureFreeze": true
+  },
+  "priorPositiveScopeDistinction": "Earlier all-day DST receipt covers date-only exclusive ends/parser/window, recurrence-zone covers feed expansion and leaves UI unchanged, prayer tomorrow covers a different CalendarPacks Fajr date helper. This actual PhotoFrameController event-day header defect is distinct.",
+  "candidateVerificationState": "Full candidate Gradle and native fixture gates are parent-owned and pending at source review. This receipt makes no candidate JVM/native/UI/optimized acceptance claim.",
+  "limits": [
+    "Generated JVM/private-method source review only; no reviewer test/build/SDK/device/Git/network execution.",
+    "No mounted calendar panel rendering, real feed/provider, owner settings/media/accounts/registry or phone acceptance.",
+    "No optimized APK, API28, Living room, timezone-update event or wider calendar lifecycle guarantee.",
+    "Locale.US literal Today/Tomorrow behavior and existing fallback preserved; no new localization policy.",
+    "No immediate timer, refresh, generation, source ownership or setting registry change."
+  ],
+  "reviewerOperations": {
+    "productionWrites": 0,
+    "testWrites": 0,
+    "tests": 0,
+    "builds": 0,
+    "sdk": 0,
+    "git": 0,
+    "devices": 0,
+    "network": 0,
+    "privateWrites": [
+      "independent-source-review.json"
+    ]
+  }
+}

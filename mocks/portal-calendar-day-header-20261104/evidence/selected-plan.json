@@ -1,0 +1,10 @@
+{
+  "originalDiscoveryAt": "2026-11-04T12:15:12Z",
+  "selectedAt": "2026-11-04T12:29:28.098554+00:00",
+  "target": "2026-11-04T12:30:12Z",
+  "hardDeadline": "2026-11-04T12:45:12Z",
+  "baseCommit": "abfcd677a769513d0da88d4f71156e48a774b969",
+  "scope": "Actual private dayHeader local civil Tomorrow labeling across DST, minimal calendar-day arithmetic; no production clock seam, calendar parser/feed/settings/UI layout changes.",
+  "baselineStrategy": "Own process synthetic SimpleTimeZone around unchanged real currentTimeMillis. Literal Today/Tomorrow expectations, calendar-local event timestamps; restore defaults and bound drift.",
+  "clockNotReset": true
+}

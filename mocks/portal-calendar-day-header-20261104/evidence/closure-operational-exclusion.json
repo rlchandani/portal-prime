@@ -1,0 +1,7 @@
+{
+  "acceptedProductFailures": 0,
+  "reason": "First docs invocation used private scratch cwd without mkdocs.yml.",
+  "actualExitCode": 1,
+  "repair": "Run identical strict mkdocs command from the source worktree; no source, APK or gate changes.",
+  "toolChunkId": "188b85"
+}

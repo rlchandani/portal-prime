@@ -1,0 +1,123 @@
+{
+  "sourceReady": true,
+  "authoredAtUtc": "2026-11-04T12:31:04.435254+00:00",
+  "originalClock": "2026-11-04T12:15:12Z target12:30:12Z hard12:45:12Z",
+  "package": "com.immortal.dayheaderfixture",
+  "activity": ".DayHeaderActivity",
+  "report": "external-files/report.json",
+  "sources": {
+    "DayHeaderActivity.java": {
+      "sha256": "a0c7531e74722113b60fd962ae298d824d741a4b67888a2164291fad693fd23b",
+      "bytes": 10718
+    },
+    "AndroidManifest.xml": {
+      "sha256": "e2d946b3801089249d943ce0d46c76bebef5b937723b39ed9d1c525544b53988",
+      "bytes": 416
+    },
+    "RUN.md": {
+      "sha256": "f31e4bfa6f9e6ce4f032119a2e762e6f948f4506332930bda8c8fe59e726d16a",
+      "bytes": 1936
+    },
+    "source-admission.json": {
+      "sha256": "9af3912bdbc2d6d13a103811e994d7c198959c6d5ca680a5541b8497a07360a1",
+      "bytes": 2701
+    },
+    "build.sh": {
+      "sha256": "16e5dd7aac677b5a115cdba12abfd40d3f37eb098d900deaed568d7029e2607d",
+      "bytes": 824
+    },
+    "repack.sh": {
+      "sha256": "cd5c772dc0a76cefb9e8227b9df7ec3c6d4b2a430f7ef1016e5231122ad46c60",
+      "bytes": 777
+    },
+    "freeze.py": {
+      "sha256": "5ff23f72734d0f6c4a8a450a014a8b84dbad8f1e28bea4192ecfcda124ce3657",
+      "bytes": 1490
+    }
+  },
+  "caseNames": [
+    "fallLocal0030Tomorrow",
+    "springLocal2330Tomorrow",
+    "fallTodayControl",
+    "springTodayControl",
+    "utcTomorrowControl",
+    "farDateFallbackControl"
+  ],
+  "expectedBaselineFailNames": [
+    "fallLocal0030Tomorrow",
+    "springLocal2330Tomorrow"
+  ],
+  "expectedBaselineControlNames": [
+    "fallTodayControl",
+    "springTodayControl",
+    "utcTomorrowControl",
+    "farDateFallbackControl"
+  ],
+  "expectedCandidatePassNames": [
+    "fallLocal0030Tomorrow",
+    "springLocal2330Tomorrow",
+    "fallTodayControl",
+    "springTodayControl",
+    "utcTomorrowControl",
+    "farDateFallbackControl"
+  ],
+  "sourceBindings": {
+    "PhotoFrameController.before.kt": {
+      "sha256": "5c9a072bf1aece603216b0d8a6b42a0fe0d692148bf1f0ab2f265bc171c1057e",
+      "bytes": 164828
+    },
+    "DateFormatter.kt": {
+      "sha256": "029c1ee3e8028b09180aa2070015237074b29f7818a5049a3b473cd80dd11100",
+      "bytes": 2681
+    }
+  },
+  "baselineApk": {
+    "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+    "bytes": 46745294
+  },
+  "gates": {
+    "actualUnchangedPrivateDayHeaderLong": true,
+    "constructorSkipped": true,
+    "literalHeaders": [
+      "Tomorrow",
+      "Tomorrow",
+      "Today",
+      "Today",
+      "Tomorrow"
+    ],
+    "farFallbackSourceDerived": true,
+    "exactDomRulesDayOfWeek": 0,
+    "profileOffsetDriftAndLocalDateAdmission": true,
+    "maxDriftMillis": 120000,
+    "allTimezoneLocaleDefaultsRestored": true,
+    "realClockChanged": false,
+    "contextsServicesProvidersPrefsPassed": 0,
+    "watchdogMillis": 30000
+  },
+  "declaredManifestPermissions": [],
+  "fixtureDexPendingRootCompilation": true,
+  "sourceAuthoringOnly": true,
+  "buildSdkAdbGitTestsDevices": 0,
+  "limits": [
+    "No mounted calendar UI/provider/network/feed/prefs",
+    "No real clock/timezone settings changes",
+    "No optimized/API28/Living/concurrent default-zone guarantee",
+    "Fallback control is not exact ICU string acceptance"
+  ],
+  "ok": true,
+  "rootFullyReadBeforeCompilation": true,
+  "fixtureDex": {
+    "sha256": "c371291f955584c1f7bb2bf939ecc96eee251fa6ca8899d0c533b71e19468ef5",
+    "bytes": 14816
+  },
+  "baselineFixture": {
+    "sha256": "7f4f3e9da8570ae29d125e0304451759d63181a1ff06acda1d7f74f13f4ccfd6",
+    "bytes": 37503466
+  },
+  "sourceApk": {
+    "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+    "bytes": 46745294
+  },
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.dayheaderfixture\n"
+}

@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "fullRootReadBothReviews": true,
+  "allBindingsExact": true,
+  "bindingCounts": {
+    "independent-source-review.json": 25,
+    "independent-native-artifact-review.json": 54
+  },
+  "reviewHashes": {
+    "independent-source-review.json": "e7912edf92ffcb49f6c731b535715fd75377346d19d61debad45ba6e35e6affa",
+    "independent-native-artifact-review.json": "ba73932c81319866ef284d4b42c03a26385e195b44efd85cb56fbea521e20873"
+  },
+  "beforePromotion": true,
+  "recordedAt": "2026-11-04T12:42:06.173354+00:00"
+}

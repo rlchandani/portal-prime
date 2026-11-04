@@ -1,0 +1,317 @@
+{
+  "ok": true,
+  "scope": "Actual private dayHeader local civil Tomorrow labeling across DST, minimal calendar-day arithmetic; no production clock seam, calendar parser/feed/settings/UI layout changes.",
+  "jvm": {
+    "tests": 4513,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 471
+  },
+  "focusedJvm": {
+    "before": {
+      "tests": 6,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0
+    },
+    "after": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "buildTerminal": {
+    "sessionId": 37949,
+    "exitCode": 0,
+    "recordedAt": "2026-11-04T12:37:51.354919+00:00"
+  },
+  "nativeTerminals": {
+    "before": {
+      "sessionId": 65868,
+      "terminalExitCode": 0,
+      "tests": 6,
+      "literalHeaderFailures": 2,
+      "controls": 4,
+      "actualPrivateHeader": true,
+      "allDefaultsRestored": true,
+      "realClockUnchanged": true
+    },
+    "after": {
+      "sessionId": 70362,
+      "exitCode": 0,
+      "recordedAt": "2026-11-04T12:38:09.134510+00:00",
+      "tests": 6,
+      "failures": 0
+    }
+  },
+  "nativeCases": {
+    "before": {
+      "tests": 6,
+      "failures": 2,
+      "controls": 4
+    },
+    "after": {
+      "tests": 6,
+      "failures": 0
+    }
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/candidate-debug-1.156.apk",
+      "bytes": 46745298,
+      "sha256": "7143f6abcb66f1b6844cabfc342504b886d680f717d70564cbf4df276a23f899",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='150' versionName='1.156' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 68261,
+          "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "performance": {
+      "path": "/private/tmp/portal-calendar-day-header-20261104-121512/candidate-performance-1.156.apk",
+      "bytes": 25886647,
+      "sha256": "a4d0441e943627c1209ecac7dc2473990b54807243b28824318359ff2ebb1cc4",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='150' versionName='1.156' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 68261,
+          "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "jvm": {
+      "tests": 4513,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 471
+    },
+    "gradleExit": 0
+  },
+  "installed": {
+    "family": {
+      "bytes": 25886647,
+      "sha256": "a4d0441e943627c1209ecac7dc2473990b54807243b28824318359ff2ebb1cc4",
+      "app": {
+        "versionCode": 150,
+        "versionName": "1.156"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886647,
+        "sha256": "a4d0441e943627c1209ecac7dc2473990b54807243b28824318359ff2ebb1cc4",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 150,
+          "versionName": "1.156"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1610,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 2010,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "rootReview": {
+    "ok": true,
+    "fullRootReadBothReviews": true,
+    "allBindingsExact": true,
+    "bindingCounts": {
+      "independent-source-review.json": 25,
+      "independent-native-artifact-review.json": 54
+    },
+    "reviewHashes": {
+      "independent-source-review.json": "e7912edf92ffcb49f6c731b535715fd75377346d19d61debad45ba6e35e6affa",
+      "independent-native-artifact-review.json": "ba73932c81319866ef284d4b42c03a26385e195b44efd85cb56fbea521e20873"
+    },
+    "beforePromotion": true,
+    "recordedAt": "2026-11-04T12:42:06.173354+00:00"
+  },
+  "queue": {
+    "tasks": 150,
+    "counts": {
+      "delivered": 98,
+      "verified": 42,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "all149OldObjectsPreserved": true,
+    "oldRawSuffixByteExact": true,
+    "rawSuffixBytes": 483387,
+    "rawSuffixSha256": "a1e908a726e1d92876a8dc2f90d48323b65a8f7497c2e80e269a142e70402b07",
+    "defaultTaskPreserved": true
+  },
+  "originalIssueClock": {
+    "originalDiscoveryAt": "2026-11-04T12:15:12Z",
+    "selectedAt": "2026-11-04T12:29:28.098554+00:00",
+    "target": "2026-11-04T12:30:12Z",
+    "hardDeadline": "2026-11-04T12:45:12Z",
+    "baseCommit": "abfcd677a769513d0da88d4f71156e48a774b969",
+    "scope": "Actual private dayHeader local civil Tomorrow labeling across DST, minimal calendar-day arithmetic; no production clock seam, calendar parser/feed/settings/UI layout changes.",
+    "baselineStrategy": "Own process synthetic SimpleTimeZone around unchanged real currentTimeMillis. Literal Today/Tomorrow expectations, calendar-local event timestamps; restore defaults and bound drift.",
+    "clockNotReset": true,
+    "notReset": true
+  },
+  "gatesCollectedAt": "2026-11-04T12:42:41.499858+00:00",
+  "wholeProductGoal": "active",
+  "turnOutcome": "progress",
+  "limits": [
+    "Actual private debug helper on Family API29, generated process-local zones and unchanged real clock; no mounted calendar UI, live feeds/providers, optimized/API28/Living functional or concurrent defaults acceptance.",
+    "Native constructor/context/service/provider/preference zero fields are source containment, not loader-wide instrumentation; private method signature remains unchanged while its candidate body intentionally changes.",
+    "Fallback control checks a nonrelative date label, not exact ICU formatting. JVM February29 adapter branch was inactive on November4 and is source-reviewed only.",
+    "Initial six Mockito/ByteBuddy timezone setup failures are retained and excluded; accepted final frozen baseline contains two literal Tomorrow assertions and four controls.",
+    "Saved Shuffle/fit remains; installed support does not establish current selected style. Earlier issue clocks and holds remain."
+  ],
+  "documentation": {
+    "sessionId": 97328,
+    "exitCode": 0,
+    "correctedCwdSessionId": 74092,
+    "correctedCwdExitCode": 0,
+    "finalLogSha256": "893015604d45ac605a90eeffd0eebce5ba3059c2b8fb43412377414c5ae74639",
+    "recordedAt": "2026-11-04T12:43:43.816939+00:00"
+  },
+  "closureOperationalExclusion": "closure-operational-exclusion.json"
+}

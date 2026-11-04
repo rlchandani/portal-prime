@@ -1,0 +1,447 @@
+{
+  "ok": true,
+  "status": "PASS_BOUNDED_NATIVE_ARTIFACT_REVIEW",
+  "reviewedAtUtc": "2026-11-04T12:41:54.069949+00:00",
+  "clock": {
+    "original": "2026-11-04T12:15:12Z",
+    "target": "2026-11-04T12:30:12Z",
+    "hard": "2026-11-04T12:45:12Z",
+    "notReset": true
+  },
+  "blockers": [],
+  "checks": {
+    "actualPrivateDayHeaderAndEmbeddedControllerOrigin": true,
+    "sameFrozenJavaDexAndLiteralGatesAcrossApkRepack": true,
+    "baselineTwoLiteralTomorrowMismatchesFourControlsCandidateSixPass": true,
+    "twelveProfilesIndependentRawOffsetDstRuleDateAndTimestampReplay": true,
+    "allDefaultsRestoredAndBothNativeTerminalsZero": true,
+    "bothPackageProcessExternalDirectoryRetirementsAbsent": true,
+    "exactCandidateBodyTwoElapsedTimeLinesToFourCalendarCivilDayLinesOnly": true,
+    "protectedDateFormatterExact": true,
+    "wrappersDifferOnlyEmbeddedApkAndThreeV1MetadataEntries": true,
+    "zeroDeclaredPermissions": true,
+    "exactApkHashesVersion150_1_156RootVerifiedSameSigner": true,
+    "tenAssetsEachExactSourceAndBaseline": true,
+    "sixFocusedCasesGreenAnd4513FullTests471SuitesZero": true
+  },
+  "profileReplay": [
+    {
+      "phase": "before",
+      "case": "fallLocal0030Tomorrow",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-05",
+      "plus24Date": "2026-11-04",
+      "civilDays": 1,
+      "rawOffsetMillis": -46983867,
+      "offsetDeltaMillis": -3600000,
+      "driftMillis": 126,
+      "actual": "Thu, Nov 5",
+      "passed": false,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "before",
+      "case": "springLocal2330Tomorrow",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-05",
+      "plus24Date": "2026-11-06",
+      "civilDays": 1,
+      "rawOffsetMillis": 39416006,
+      "offsetDeltaMillis": 3600000,
+      "driftMillis": 0,
+      "actual": "Thu, Nov 5",
+      "passed": false,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "before",
+      "case": "fallTodayControl",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-04",
+      "plus24Date": "2026-11-04",
+      "civilDays": 0,
+      "rawOffsetMillis": -46983994,
+      "offsetDeltaMillis": -3600000,
+      "driftMillis": 1,
+      "actual": "Today",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "before",
+      "case": "springTodayControl",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-04",
+      "plus24Date": "2026-11-06",
+      "civilDays": 0,
+      "rawOffsetMillis": 39416005,
+      "offsetDeltaMillis": 3600000,
+      "driftMillis": 0,
+      "actual": "Today",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "before",
+      "case": "utcTomorrowControl",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-05",
+      "plus24Date": "2026-11-05",
+      "civilDays": 1,
+      "rawOffsetMillis": 0,
+      "offsetDeltaMillis": 0,
+      "driftMillis": 0,
+      "actual": "Tomorrow",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "before",
+      "case": "farDateFallbackControl",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-12",
+      "plus24Date": "2026-11-05",
+      "civilDays": 8,
+      "rawOffsetMillis": 0,
+      "offsetDeltaMillis": 0,
+      "driftMillis": 1,
+      "actual": "Thu, Nov 12",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "after",
+      "case": "fallLocal0030Tomorrow",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-05",
+      "plus24Date": "2026-11-04",
+      "civilDays": 1,
+      "rawOffsetMillis": -47279279,
+      "offsetDeltaMillis": -3600000,
+      "driftMillis": 4,
+      "actual": "Tomorrow",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "after",
+      "case": "springLocal2330Tomorrow",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-05",
+      "plus24Date": "2026-11-06",
+      "civilDays": 1,
+      "rawOffsetMillis": 39120717,
+      "offsetDeltaMillis": 3600000,
+      "driftMillis": 1,
+      "actual": "Tomorrow",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "after",
+      "case": "fallTodayControl",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-04",
+      "plus24Date": "2026-11-04",
+      "civilDays": 0,
+      "rawOffsetMillis": -47279284,
+      "offsetDeltaMillis": -3600000,
+      "driftMillis": 0,
+      "actual": "Today",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "after",
+      "case": "springTodayControl",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-04",
+      "plus24Date": "2026-11-06",
+      "civilDays": 0,
+      "rawOffsetMillis": 39120716,
+      "offsetDeltaMillis": 3600000,
+      "driftMillis": 1,
+      "actual": "Today",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "after",
+      "case": "utcTomorrowControl",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-05",
+      "plus24Date": "2026-11-05",
+      "civilDays": 1,
+      "rawOffsetMillis": 0,
+      "offsetDeltaMillis": 0,
+      "driftMillis": 0,
+      "actual": "Tomorrow",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    },
+    {
+      "phase": "after",
+      "case": "farDateFallbackControl",
+      "localDate": "2026-11-04",
+      "eventDate": "2026-11-12",
+      "plus24Date": "2026-11-05",
+      "civilDays": 8,
+      "rawOffsetMillis": 0,
+      "offsetDeltaMillis": 0,
+      "driftMillis": 26,
+      "actual": "Thu, Nov 12",
+      "passed": true,
+      "ruleOffsetsAndDateStringsExact": true
+    }
+  ],
+  "fixtureDex": {
+    "sha256": "c371291f955584c1f7bb2bf939ecc96eee251fa6ca8899d0c533b71e19468ef5",
+    "bytes": 14816
+  },
+  "wrapperChangedEntries": [
+    "META-INF/ANDROIDD.RSA",
+    "META-INF/ANDROIDD.SF",
+    "META-INF/MANIFEST.MF",
+    "assets/source.apk"
+  ],
+  "metadata": {
+    "versionName": "1.156",
+    "versionCode": 150,
+    "debugSha256": "7143f6abcb66f1b6844cabfc342504b886d680f717d70564cbf4df276a23f899",
+    "performanceSha256": "a4d0441e943627c1209ecac7dc2473990b54807243b28824318359ff2ebb1cc4",
+    "signerSha256FromRootSdkGate": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "fullJvm": {
+      "tests": 4513,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 471
+    }
+  },
+  "bodyQualification": "Native report/fixture wording unchanged private dayHeader describes direct private(long):String signature/access and no clock seam. Candidate body intentionally changes two elapsed-time lines to four Calendar civil-day lines; candidate-body unchanged is not claimed.",
+  "containmentQualification": "constructorCalls=0, contextsServicesProvidersPrefsPassed=0 and realClockChanged=false are source-containment constants, not global instrumentation. Inspected fixture uses Unsafe.allocateInstance and calls only actual dayHeader(long), without passing Context/services/providers/prefs or invoking controller constructor/startup. Process-local TimeZone and all Locale defaults restore in finally; no system clock/timezone settings setter is called.",
+  "jvmProvenance": "Current5368-byte e182e87c frozen test matches actual accepted baseline-terminal/current source. Historical accepted-v2 4928-byte48340060 copy remains distinct. Initial ByteBuddy timezone setup failures are excluded. Baseline XML has exactly two org.junit.ComparisonFailure literal Tomorrow assertions (AssertionError subclass), zero errors, four controls; candidate six pass.",
+  "limits": [
+    "Actual debug helper/API29 with generated exact-DOM timezone profiles and unchanged real wall clock. No constructed production controller, mounted calendar UI, provider/feed/parser/network/owner data/prefs/phone or source startup acceptance.",
+    "Fall00:30 and spring23:30 admissions independently replayed; no IANA history/month/year/leap-transition native generalization, real clock/timezone/alarm setting or concurrent process-default guarantee. Far-date fallback is nonempty/neitherToday/norTomorrow control, not exact ICU formatting acceptance.",
+    "No optimized runtime/API28/Living, physical room UI, promotion or broader clock/photo/source/performance claim. Host read-only source/JSON/XML/ZIP verification; no SDK/build/tests/Git/device/network/source edits by reviewer. Signer/manifest are retained root SDK metadata; hashes and ZIP bytes independently recomputed."
+  ],
+  "bindings": {
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/DayHeaderActivity.java": {
+      "sha256": "a0c7531e74722113b60fd962ae298d824d741a4b67888a2164291fad693fd23b",
+      "bytes": 10718
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/AndroidManifest.xml": {
+      "sha256": "e2d946b3801089249d943ce0d46c76bebef5b937723b39ed9d1c525544b53988",
+      "bytes": 416
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/RUN.md": {
+      "sha256": "f31e4bfa6f9e6ce4f032119a2e762e6f948f4506332930bda8c8fe59e726d16a",
+      "bytes": 1936
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/source-admission.json": {
+      "sha256": "9af3912bdbc2d6d13a103811e994d7c198959c6d5ca680a5541b8497a07360a1",
+      "bytes": 2701
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/build.sh": {
+      "sha256": "16e5dd7aac677b5a115cdba12abfd40d3f37eb098d900deaed568d7029e2607d",
+      "bytes": 824
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/repack.sh": {
+      "sha256": "cd5c772dc0a76cefb9e8227b9df7ec3c6d4b2a430f7ef1016e5231122ad46c60",
+      "bytes": 777
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/freeze.py": {
+      "sha256": "5ff23f72734d0f6c4a8a450a014a8b84dbad8f1e28bea4192ecfcda124ce3657",
+      "bytes": 1490
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/frozen-dex/classes.dex": {
+      "sha256": "c371291f955584c1f7bb2bf939ecc96eee251fa6ca8899d0c533b71e19468ef5",
+      "bytes": 14816
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/baseline-fixture.apk": {
+      "sha256": "7f4f3e9da8570ae29d125e0304451759d63181a1ff06acda1d7f74f13f4ccfd6",
+      "bytes": 37503466
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/before-debug-1.155.apk": {
+      "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+      "bytes": 46745294
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/PhotoFrameController.before.kt": {
+      "sha256": "5c9a072bf1aece603216b0d8a6b42a0fe0d692148bf1f0ab2f265bc171c1057e",
+      "bytes": 164828
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/DateFormatter.kt": {
+      "sha256": "029c1ee3e8028b09180aa2070015237074b29f7818a5049a3b473cd80dd11100",
+      "bytes": 2681
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+      "bytes": 164859
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/candidate-debug-1.156.apk": {
+      "sha256": "7143f6abcb66f1b6844cabfc342504b886d680f717d70564cbf4df276a23f899",
+      "bytes": 46745298
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png": {
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "bytes": 12657
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html": {
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "bytes": 7785
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js": {
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "bytes": 5582
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js": {
+      "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+      "bytes": 68261
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg": {
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "bytes": 1247
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg": {
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "bytes": 1246
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js": {
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "bytes": 8528
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css": {
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "bytes": 15397
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/candidate-performance-1.156.apk": {
+      "sha256": "a4d0441e943627c1209ecac7dc2473990b54807243b28824318359ff2ebb1cc4",
+      "bytes": 25886647
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/day-header-fixture.apk": {
+      "sha256": "c2d8395e31406b1cc5429341bf8cdb9adddbb8e958cad769a84bdf5d3c3af724",
+      "bytes": 37503466
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/CalendarDayHeaderTest.kt": {
+      "sha256": "e182e87cc6f6e86aa157bfbd34b98ac55d1a8462ca3f9184c0bc197df4be85c9",
+      "bytes": 5368
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-run.py": {
+      "sha256": "d747eaa655b46d2bce3474f90547295c90413fc57a0fdbacd9b7fe026dd2e680",
+      "bytes": 4748
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-before-report.json": {
+      "sha256": "48e2bb7ad8aeccdfdd6b1ea646288b66fdaea6ba18745965b5bda90696082d2a",
+      "bytes": 6954
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-after-report.json": {
+      "sha256": "7fe1e6516bcd76ce7ad157024745753de02d443aabc225634760d08508f3b324",
+      "bytes": 6810
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-before-terminal.json": {
+      "sha256": "4af94c9aeebf493a588c2652a2f569feb2a2958146762aac2106bcd5bdf4b1df",
+      "bytes": 203
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-after-terminal.json": {
+      "sha256": "e8a3f093954564bd8e9494fb2b966fdfce41a99936c8ebfd14b4398fd1298664",
+      "bytes": 125
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-before.claim": {
+      "sha256": "c780d107042290a3bd7777dbee32226d0ded708913bbf04a4ba3a1ce4c607c20",
+      "bytes": 46
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-after.claim": {
+      "sha256": "c780d107042290a3bd7777dbee32226d0ded708913bbf04a4ba3a1ce4c607c20",
+      "bytes": 46
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-before-install.log": {
+      "sha256": "5525c6bd2379e7d234b58ff2cd4c6e7d7ebbc0dd304859b1ccb821bb2ebc3228",
+      "bytes": 115
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-after-install.log": {
+      "sha256": "5525c6bd2379e7d234b58ff2cd4c6e7d7ebbc0dd304859b1ccb821bb2ebc3228",
+      "bytes": 115
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-before-uninstall.log": {
+      "sha256": "7fc0023a6402c7bd7abd98bb3e580968de4833eed07d88d1cc8d70819d69c7a0",
+      "bytes": 8
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-after-uninstall.log": {
+      "sha256": "7fc0023a6402c7bd7abd98bb3e580968de4833eed07d88d1cc8d70819d69c7a0",
+      "bytes": 8
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-build.log": {
+      "sha256": "9d0774199aef654d07e8b3a6ffbd1c0542b4e1ef96e638501e53bf3d783f89d9",
+      "bytes": 642
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/promotion-artifacts.json": {
+      "sha256": "ebe49d3ca02af3c23448619acd407ff46ce67ebaae1e57eb38b6d1d459ea25d9",
+      "bytes": 4801
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/build-terminal.json": {
+      "sha256": "882527fd7127cba232b2c938b1a035e5457540798dc21752e5017755e633cece",
+      "bytes": 94
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/build-gradle.log": {
+      "sha256": "2eedabc2c629a43f17e9241e9f6ae576383c2f087921cfd44364ceb09afe4360",
+      "bytes": 13723
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/baseline-terminal.json": {
+      "sha256": "1adc9c9731fc5e9b76101a32e2fbb178a4ab5ec7a6ab7e29cbbd4d3ffcbea3bc",
+      "bytes": 370
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/baseline-v2-terminal.json": {
+      "sha256": "22e10edff2a878fca509733357d2348412ff899fbcc2153c69d0408b7bc1ca68",
+      "bytes": 270
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/baseline-focused-tests.xml": {
+      "sha256": "82352048b9d0e4257f32515c9788182b10f6df1416f7f0b440bc55e6c4030daf",
+      "bytes": 10477
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/candidate-focused-tests.xml": {
+      "sha256": "d575ab7c26555a45d7a06a0da49941c5f60b04cb72ebb7bf446f1fc68fe8c0c8",
+      "bytes": 1639
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/CalendarDayHeaderTest.frozen.kt": {
+      "sha256": "e182e87cc6f6e86aa157bfbd34b98ac55d1a8462ca3f9184c0bc197df4be85c9",
+      "bytes": 5368
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/CalendarDayHeaderTest.accepted-v2.kt": {
+      "sha256": "4834006005c6e8b6945f449973ce4a0eb61b88f1ad1e5e4b3a1c642650b7f797",
+      "bytes": 4928
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/excluded-operational-failures.json": {
+      "sha256": "ea8d358370bb504b87f4cd60a3de759c493977489bb6fbce1bd8b1144105f16f",
+      "bytes": 457
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/independent-source-review.json": {
+      "sha256": "e7912edf92ffcb49f6c731b535715fd75377346d19d61debad45ba6e35e6affa",
+      "bytes": 14187
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/selected-plan.json": {
+      "sha256": "69e6336f22796b5ac6c649ee073b8265f094de32c3ac14a305ec54099bc5ee52",
+      "bytes": 663
+    },
+    "/private/tmp/portal-calendar-day-header-20261104-121512/native-owned/preparation-verification.json": {
+      "sha256": "c5939fe9927ef110df890f48bced6dd659bea17d00c33817ef46e99f0bbf13c7",
+      "bytes": 3768
+    }
+  }
+}

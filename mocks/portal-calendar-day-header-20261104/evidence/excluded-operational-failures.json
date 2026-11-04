@@ -1,0 +1,9 @@
+{
+  "jvmAdapterV1": {
+    "tests": 6,
+    "acceptedRedAssertions": 0,
+    "reason": "Mockito ByteBuddy initializes a JAR before custom TimeZone ID can be represented by java.time.ZoneId. All failures are setup errors; no product RED.",
+    "repair": "Initialize Android pattern mock under original default timezone, then apply owned synthetic timezone inside its block. No production/test expectation or profile math change."
+  },
+  "clockNotReset": true
+}

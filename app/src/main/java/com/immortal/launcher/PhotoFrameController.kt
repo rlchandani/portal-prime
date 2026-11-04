@@ -1730,8 +1730,10 @@ class PhotoFrameController(
 
   /** "Today" / "Tomorrow" / "Sat, Jun 21" relative to now. */
   private fun dayHeader(millis: Long): String {
-    val today = dayKey(System.currentTimeMillis())
-    val tomorrow = dayKey(System.currentTimeMillis() + 24L * 60 * 60 * 1000)
+    val day = Calendar.getInstance()
+    val today = dayKey(day.timeInMillis)
+    day.add(Calendar.DAY_OF_YEAR, 1)
+    val tomorrow = dayKey(day.timeInMillis)
     return when (dayKey(millis)) {
       today -> "Today"
       tomorrow -> "Tomorrow"

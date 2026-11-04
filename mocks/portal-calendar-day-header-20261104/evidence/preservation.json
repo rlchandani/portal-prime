@@ -1,0 +1,40 @@
+{
+  "family": {
+    "preferenceFilesByteIdentical": 43,
+    "preferenceFileSetsIdentical": true,
+    "webViewCacheMaintenance": null,
+    "fourCompleteMapsIdentical": true,
+    "nameAndDevModePreserved": true,
+    "diagnostics": {
+      "/diag": {
+        "responseLines": 1,
+        "fatalAnrMarkers": 0
+      },
+      "/logcat?lines=1500": {
+        "responseLines": 1610,
+        "fatalAnrMarkers": 0
+      }
+    },
+    "fontAccessibilityPreserved": true,
+    "originalChromiumActivityRetained": true,
+    "frameResumed": true,
+    "awake": true
+  },
+  "living": {
+    "preferenceFilesByteIdentical": 30,
+    "preferenceFileSetsIdentical": true,
+    "webViewCacheMaintenance": null,
+    "fourCompleteMapsIdentical": true,
+    "nameAndDevModePreserved": true,
+    "diagnostics": {
+      "/diag": {
+        "responseLines": 1,
+        "fatalAnrMarkers": 0
+      },
+      "/logcat?lines=1500": {
+        "responseLines": 2010,
+        "fatalAnrMarkers": 0
+      }
+    }
+  }
+}

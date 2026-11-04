@@ -1,0 +1,30 @@
+{
+  "oneExactHeaderDelta": true,
+  "allOtherControllerBytesIdentical": true,
+  "noClockSeam": true,
+  "frozenJvmTestExact": true,
+  "sourceBefore": {
+    "sha256": "5c9a072bf1aece603216b0d8a6b42a0fe0d692148bf1f0ab2f265bc171c1057e",
+    "bytes": 164828
+  },
+  "sourceAfter": {
+    "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+    "bytes": 164859
+  },
+  "nativeBeforeTerminal": {
+    "session": 65868,
+    "exit": 0,
+    "failures": 2,
+    "controls": 4
+  },
+  "jvmBaselineTerminal": {
+    "session": 88575,
+    "exit": 1,
+    "assertionFailures": 2,
+    "controls": 4
+  },
+  "clockNotReset": true,
+  "independentSourceFullRootRead": true,
+  "independentSourceAllBindingsExact": true,
+  "sourceBindings": 25
+}

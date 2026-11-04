@@ -1,0 +1,9 @@
+# Direct native calendar day header
+
+Root compiles/signs and embeds exact before-debug-1.155.apk as assets/source.apk, then swaps only source.apk for candidate. Freeze same Java/DEX/manifest/assertions for both executions. Package com.immortal.dayheaderfixture/.DayHeaderActivity; external-files/report.json; 30-second watchdog. No SDK/build/test/Git/device operations by author.
+
+Actual embedded PhotoFrameController constructor is skipped with Unsafe; only private unchanged dayHeader(long) is invoked. No Context or services/prefs/provider/network or actual startup. Real wall clock remains unchanged. Synthetic process-local SimpleTimeZone uses exact-DOM rules (dayOfWeek0): fall starts yesterday02/ends today02, rawOffset=UTCtoday00:30-sampledRealNow-1h; spring starts tomorrow02/ends day+2 02, rawOffset=UTCtoday23:30-sampledRealNow. Offsets, local dates/times and under120second drift are gated.
+
+Expected labels are literal: fall next-local-date noon Tomorrow, spring next-local-date noon Tomorrow, Today for each, normal UTC tomorrow Tomorrow. Far-date fallback must be nonempty and neitherToday norTomorrow; this is source-derived contract, not exact ICU pattern acceptance. Independent event Calendar is cleared and set from date fields after a separate UTC date anchor add, not from elapsed24h arithmetic. Profile construction normalizes only fixture inputs; header source still uses its own unmodified clock. Baseline expected two literal-header mismatches/four controls; candidate six pass.
+
+Per-case and global finally restore timezone and every Locale default category. Report contains actual localNow/event/+24h, offsets and call-boundary timestamps so input admission can be independently checked. Native controls do not prove mounted calendar UI, actual feeds/providers, owner prefs, clock/timezone setting changes, optimized/API28/Living or concurrent timezone behavior. Zero external counts are source containment.
