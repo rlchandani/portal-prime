@@ -1,0 +1,7 @@
+{
+  "initialExitCode": 1,
+  "cause": "Private registry copy had not yet been created; FileNotFound before any device request.",
+  "corrected": "Copied only two exact owner records privately; captured43/30prefs and actual1.174rollback.",
+  "productionChange": false,
+  "originalClockRetained": true
+}

@@ -1,0 +1,17 @@
+{
+  "result": {
+    "status": "ready",
+    "ack": "uncertain",
+    "install_attempted": true,
+    "observations": 6
+  },
+  "installed": {
+    "bytes": 25886951,
+    "sha256": "f7f6d0f909344296ccb1aee5b74b7f20d1a485069abfba96533dbe3e68fe47f3",
+    "serviceReady": true,
+    "app": {
+      "versionCode": 169,
+      "versionName": "1.175"
+    }
+  }
+}

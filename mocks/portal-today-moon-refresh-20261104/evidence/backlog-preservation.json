@@ -1,0 +1,15 @@
+{
+  "tasks": 174,
+  "counts": {
+    "delivered": 119,
+    "verified": 45,
+    "approval": 2,
+    "parked": 7,
+    "queued": 1
+  },
+  "all173OriginalObjectsExact": true,
+  "allOriginalTaskBytesSuffixExact": true,
+  "originalSuffixBytes": 549752,
+  "defaultTaskPreserved": true,
+  "originalClocksPreserved": true
+}

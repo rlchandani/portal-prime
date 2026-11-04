@@ -1,0 +1,16 @@
+{
+  "exactSingleBlockReplacement": true,
+  "before": {
+    "bytes": 230144,
+    "sha256": "0c0d23fb70911760a08cded01817ad76483dcfed2948d3a3eba1fdff533b94f9"
+  },
+  "after": {
+    "bytes": 230286,
+    "sha256": "18ba024530f6c64881785fe18ec21a819b906459f907dc1557debd0b33cf14eb"
+  },
+  "phaseMathLabelsLayoutOtherTodayRowsUnchanged": true,
+  "sharedProducerUnchanged": true,
+  "refreshIntervalMilliseconds": 3600000,
+  "acceptanceScope": "Source/coroutine contract and successful compiled artifacts, not mounted scheduling or overnight UI proof",
+  "newMirroredTestsAdded": false
+}

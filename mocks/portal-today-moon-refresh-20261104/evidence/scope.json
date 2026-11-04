@@ -1,0 +1,21 @@
+{
+  "scope": "Today moon-phase freshness using existing paused Home producer",
+  "startedAt": "2026-11-04T19:28:09Z",
+  "targetAt": "2026-11-04T19:43:09Z",
+  "hardStopAt": "2026-11-04T19:58:09Z",
+  "base": "82f5a09f0ee2a84c63552e79739884bac8f5ec51",
+  "newVersion": {
+    "versionName": "1.175",
+    "versionCode": 169
+  },
+  "acceptance": [
+    "Re-evaluate existing moon phase hourly and when active Home producer restarts.",
+    "Preserve existing phase math/labels and Today layout.",
+    "Relevant checks/builds, independent review, exact both-room delivery and saved-state preservation."
+  ],
+  "boundaries": [
+    "No time/systemclock/config/account/provider/photo/phone writes; only authorized APK delivery and frame return.",
+    "No reopening exhausted Today countdown or other widget scopes.",
+    "Existing native runtime/UI acceptance qualified separately."
+  ]
+}

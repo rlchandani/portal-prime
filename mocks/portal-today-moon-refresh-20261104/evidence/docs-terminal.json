@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/private/tmp/portal-docs-runtime-20261104/bin/mkdocs",
+    "build",
+    "--strict",
+    "--site-dir",
+    "/private/tmp/portal-today-moon-refresh-20261104-192809/docs-site"
+  ],
+  "exitCode": 0,
+  "durationSeconds": 2.348233833996346,
+  "checkedAt": "2026-11-04T19:41:48.406631+00:00"
+}

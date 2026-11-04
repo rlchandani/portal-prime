@@ -3130,7 +3130,12 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
   OnResume { refreshTodayLines() }
 
   val today = forecast?.days?.firstOrNull()
-  val (_, moonName) = remember { moonPhase(System.currentTimeMillis()) }
+  val moonName by produceHomeState(initialValue = moonPhase(System.currentTimeMillis()).second) {
+    while (true) {
+      value = moonPhase(System.currentTimeMillis()).second
+      delay(60L * 60 * 1000)
+    }
+  }
   val sunPair = sun?.formatted(use24)
   ImmortalWidgetShell(title = "Today", openPage = "calendar", modifier = modifier) {
     TodayCalendarSection(currentCalendar.copy(refreshing = calendarBusy), onRetry = {
