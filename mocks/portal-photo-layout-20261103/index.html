@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Immortal — photo layout review</title>
+  <link rel="stylesheet" href="review.css">
+  <script src="review.js" defer></script>
+</head>
+<body>
+  <header class="intro">
+    <div>
+      <p class="eyebrow">IMMORTAL / PHOTO STUDY 02</p>
+      <h1>Let the photographs lead.</h1>
+      <p class="description">Larger photos. Quiet framing. A little life in the margins.</p>
+    </div>
+    <span class="review-tag">Design review · sample photos</span>
+  </header>
+  <main>
+    <div class="toolbar">
+      <fieldset class="segmented" aria-label="Layout">
+        <label><input type="radio" name="layout" value="wall" checked><span>Photo wall</span></label>
+        <label><input type="radio" name="layout" value="single"><span>Single photo</span></label>
+      </fieldset>
+      <fieldset class="segmented comparison" aria-label="Comparison">
+        <label><input type="radio" name="version" value="current"><span>Current renderer</span></label>
+        <label><input type="radio" name="version" value="proposed" checked><span>Proposed</span></label>
+      </fieldset>
+    </div>
+    <section id="preview" class="preview" data-theme="paper" aria-label="Photo layout preview">
+      <div class="doodles" aria-hidden="true"></div>
+      <div id="photographs"></div>
+      <div class="clock" aria-label="Sample clock">9:41<span>Tuesday, November 3</span></div>
+      <div class="scene-note">A few moments<br><span id="scene-caption">Whole photos · gentle edges</span></div>
+      <iframe id="baseline" title="Unchanged local screensaver renderer with sample photos" hidden></iframe>
+    </section>
+    <div class="options">
+      <fieldset class="themes" aria-label="Background">
+        <legend>Background</legend>
+        <label><input type="radio" name="theme" value="paper" checked><span class="swatch paper"></span>Paper</label>
+        <label><input type="radio" name="theme" value="graphite"><span class="swatch graphite"></span>Graphite</label>
+        <label><input type="radio" name="theme" value="sage"><span class="swatch sage"></span>Sage</label>
+      </fieldset>
+      <div class="switches">
+        <label><input id="pattern" type="checkbox" checked>Subtle doodles</label>
+        <label><input id="frame" type="checkbox" checked>Slim photo frame</label>
+      </div>
+      <label class="format">Display
+        <select id="format">
+          <option value="plus">Portal+ · landscape</option>
+          <option value="wide">Portal · wide</option>
+          <option value="portrait">Portrait display</option>
+        </select>
+      </label>
+      <label class="format" id="shape-option" hidden>Photo
+        <select id="photo">
+          <option value="3">Panorama</option>
+          <option value="1">Portrait</option>
+          <option value="0">Landscape</option>
+          <option value="2">Square</option>
+        </select>
+      </label>
+      <button id="next" type="button">Next photos <span aria-hidden="true">↗</span></button>
+    </div>
+    <p id="explanation" class="explanation" aria-live="polite"></p>
+    <div class="notes">
+      <p><strong>The grid fix.</strong> Six larger photos form rows around their own proportions. The frame follows each image; there are no empty outlined cells.</p>
+      <p><strong>The empty-space fix.</strong> A muted, static line drawing fills the margins. The photo keeps its full shape, with a narrow warm edge.</p>
+      <p><strong>Review scope.</strong> The current view runs the unchanged local WebView mode. The proposal is a browser study, pending your visual choice and native implementation.</p>
+    </div>
+  </main>
+  <footer>Scenic samples derive from Immortal’s bundled fallback photos. No household photos, device controls or external image requests.</footer>
+</body>
+</html>

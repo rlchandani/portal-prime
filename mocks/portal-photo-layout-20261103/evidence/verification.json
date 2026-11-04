@@ -1,0 +1,1440 @@
+{
+  "scope": "Functional local design comparison only; no production or device changes",
+  "geometryCases": 81,
+  "baselineScenes": 6,
+  "controlCases": 6,
+  "browserErrors": 0,
+  "serverRouteCases": 11,
+  "scriptSyntax": "passed",
+  "independentReview": "No blocking mock findings; disabled ineffective proposal controls in Current view",
+  "sourceParentCommit": "0af282e17992c1a8529563d8413aace6d0ccbfdc",
+  "protectedFilesUnchanged": 17,
+  "initialFixtureLimits": [
+    "A hidden-input click stalled an initial QA call; use visible label clicks.",
+    "An initial baseline collector read before iframe initialization; excluded, then readiness awaited."
+  ],
+  "checks": {
+    "geometry": [
+      {
+        "width": 320,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "plus",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "plus",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "plus",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "wide",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "wide",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "wide",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 320,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "plus",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "plus",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "plus",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "wide",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "wide",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "wide",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 390,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "plus",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "plus",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "plus",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "wide",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "wide",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "wide",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 768,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "wide",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "wide",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "wide",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "wide",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "portrait",
+        "layout": "wall",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "portrait",
+        "layout": "single",
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "photo": 0,
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "photo": 0,
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "photo": 0,
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "photo": 1,
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "photo": 1,
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "photo": 1,
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "photo": 2,
+        "theme": "paper",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "photo": 2,
+        "theme": "graphite",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "format": "plus",
+        "layout": "single",
+        "photo": 2,
+        "theme": "sage",
+        "checks": {
+          "decoded": true,
+          "wholePhotoAspect": true,
+          "insideScene": true,
+          "clearOfClock": true,
+          "noOverlap": true,
+          "noPageOverflow": true,
+          "photoCount": true
+        },
+        "pass": true
+      }
+    ],
+    "baseline": [
+      {
+        "format": "plus",
+        "layout": "wall",
+        "ready": true,
+        "tiles": 9,
+        "activeImages": 9,
+        "pass": true
+      },
+      {
+        "format": "plus",
+        "layout": "single",
+        "ready": true,
+        "tiles": 0,
+        "activeImages": 1,
+        "pass": true
+      },
+      {
+        "format": "wide",
+        "layout": "wall",
+        "ready": true,
+        "tiles": 9,
+        "activeImages": 9,
+        "pass": true
+      },
+      {
+        "format": "wide",
+        "layout": "single",
+        "ready": true,
+        "tiles": 0,
+        "activeImages": 1,
+        "pass": true
+      },
+      {
+        "format": "portrait",
+        "layout": "wall",
+        "ready": true,
+        "tiles": 9,
+        "activeImages": 9,
+        "pass": true
+      },
+      {
+        "format": "portrait",
+        "layout": "single",
+        "ready": true,
+        "tiles": 0,
+        "activeImages": 1,
+        "pass": true
+      }
+    ],
+    "controls": [
+      {
+        "name": "pattern off",
+        "pass": true
+      },
+      {
+        "name": "frame off",
+        "pass": true
+      },
+      {
+        "name": "next samples",
+        "pass": true
+      },
+      {
+        "name": "proposal controls disabled in current view",
+        "pass": true
+      },
+      {
+        "name": "retire baseline",
+        "pass": true
+      },
+      {
+        "name": "keyboard layout switch",
+        "pass": true
+      }
+    ],
+    "errors": []
+  },
+  "files": {
+    "mocks/portal-photo-layout-20261103/README.md": "213dc3ed632ea4558d5b17095c1955248b3c008a38486aa26682253331010add",
+    "mocks/portal-photo-layout-20261103/baseline.html": "aca7c4fc9cd9ae40eda72aacb1ca9dc234ff8f17fde531d21c71bb6d2e63c105",
+    "mocks/portal-photo-layout-20261103/doodles.svg": "58f4bfe3140f97539bfb969d38a0fc2ccadae9c9ac7c1de0f300196950dd3ef9",
+    "mocks/portal-photo-layout-20261103/evidence/current-wall.png": "922bab796cd8996ca1bac3a79a77d57542665b51c8e4531ccce47ccb299efa7f",
+    "mocks/portal-photo-layout-20261103/evidence/proposed-single-graphite.png": "61a31c9df20de869a1302162d1bf85e1ebd7b0f21b21510acb6d44fba74e62bf",
+    "mocks/portal-photo-layout-20261103/evidence/proposed-single-paper.png": "dfdb9d539c30fbd6208569b59e0cd7e606ce785cb5296e3d6ae599977df05fca",
+    "mocks/portal-photo-layout-20261103/evidence/proposed-wall-paper.png": "a34447df8c0bc5fd54ed61b63ae4b19b704682649110e0403eaadd5ded73fb03",
+    "mocks/portal-photo-layout-20261103/index.html": "3fa89f6f802c908fcb91c0d6acb64e2732bfe7ffca3f32f0db557d5c4220f4f7",
+    "mocks/portal-photo-layout-20261103/review.css": "0d0ff1439840990cfd8cb4b1064815e8eadd4f89f641d8c83418efb18b72978c",
+    "mocks/portal-photo-layout-20261103/review.js": "d192efd9b201b78b5a288d54c169c598533cc30f55177d0aec35e4884f792b08",
+    "mocks/portal-photo-layout-20261103/samples/landscape.jpg": "21b4ddf99897c1714273e7392dbcf81d340d339284d4f31a5706fed6ffe22583",
+    "mocks/portal-photo-layout-20261103/samples/mountain.jpg": "ac9c5afb93d7569dcccb257225cad66334d8ec2ac0c9b22725eed1bd1a4419c4",
+    "mocks/portal-photo-layout-20261103/samples/panorama.jpg": "232733a9259480aa90e076f798119b322cdfa1d273899ad07e8f827d1cbcaaaf",
+    "mocks/portal-photo-layout-20261103/samples/portrait-forest.jpg": "6ac1387fc2986075340145fc445298c21033eccdf719056a91dd511a0b9efd8c",
+    "mocks/portal-photo-layout-20261103/samples/portrait-mountain.jpg": "94f37b1e48f789a7d66ac74071d49eff3c0dc5e74e400fe4208ea6877c6d0600",
+    "mocks/portal-photo-layout-20261103/samples/portrait.jpg": "a1beb919f74eb5d67bc46691c4adfdd31d936007185d697da11cc4285ffee993",
+    "mocks/portal-photo-layout-20261103/samples/square-forest.jpg": "c0f17567872e3113a1d2ce8488f93c4cd77b1e2345db14e33b11afa120fbed6a",
+    "mocks/portal-photo-layout-20261103/samples/square.jpg": "c15a3ab01ffd348a0631a01aa5cb0ffe8a5a2a530a9b86e8bcdb318eb6b1c4e6",
+    "mocks/portal-photo-layout-20261103/samples/valley.jpg": "a4720e985506d540ca823c7621ca877f8173ddf0c2e12535ad8d8fa4fd249ed8",
+    "mocks/portal-photo-layout-20261103/serve.py": "6d788fe577fca1a8703ece9ca80511edbc264527dc31f3e8289492d0e213cb3f",
+    "app/src/main/assets/screensaver/lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+    "app/src/main/assets/screensaver/mode-impls.js": "6e675ea06f8035b12854b21d36676c7aa21896952c97b48359cdd55fb86dc9de",
+    "app/src/main/assets/screensaver/modes.js": "d3cc4d346051afa7a7d40d26fcd2ab7769fd851580c9c4bb4a945f3bb99bdf68",
+    "app/src/main/assets/screensaver/styles.css": "a0e3994ba80885e51a8c0087d002aeee1a4b9d177502c06973e87eb4c9ce1177",
+    "docs/portal-photo-layout-review-2026-11-03.md": "c57dbe29fef645bf112895b3fd1cf3dc6f25707422cbb405026389cda57ca473",
+    "docs/portal-product-operating-state.md": "a94e61419daafee0b6cec87bb30c31d3339b14bf159ccc8a59aa66210e833322",
+    "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": "24606d740497cd08cd3086b6e70011067dcb32d2e5181de6df114785239a60f1"
+  },
+  "issueClock": {
+    "startedAt": "2026-11-04T01:01:58.039Z",
+    "deadline": "2026-11-04T01:31:58.039Z",
+    "discoveryIncluded": true,
+    "priorClocksRetained": true
+  },
+  "verifiedAt": "2026-11-04T01:17:12.870895+00:00",
+  "documentationStrictBuild": "passed",
+  "whitespaceCheck": "passed"
+}

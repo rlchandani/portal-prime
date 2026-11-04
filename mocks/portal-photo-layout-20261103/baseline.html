@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="/baseline/styles.css">
+</head>
+<body>
+  <div id="stage"></div>
+  <script>
+    window.aspect = p => p.w / p.h;
+    window.shuffled = values => values.slice();
+    // Stable comparison fixture; production files below remain unchanged.
+    let fixtureSeed = 531;
+    Math.random = () => ((fixtureSeed = (fixtureSeed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  </script>
+  <script src="/baseline/lib-engine.js"></script>
+  <script src="/baseline/modes.js"></script>
+  <script src="/baseline/mode-impls.js"></script>
+  <script>
+    const query = new URLSearchParams(location.search);
+    const shapes = [
+      [960,638,"landscape"],[480,720,"portrait"],[720,720,"square"],
+      [1200,450,"panorama"],[480,720,"portrait-mountain"],[960,640,"valley"],
+      [720,720,"square-forest"],[960,640,"mountain"],[480,720,"portrait-forest"],
+    ];
+    const deck = shapes.map(([w,h,name],i) => ({ seed: i + 1, w, h, url: `samples/${name}.jpg` }));
+    const offset = Number(query.get("offset")) || 0;
+    const ordered = deck.slice(offset).concat(deck.slice(0,offset));
+    const single = deck[Number(query.get("photo")) || 0];
+    const root = document.querySelector("#stage");
+    const cleanup = SS.MODES[query.get("layout") === "single" ? "framed" : "mosaic"].run({
+      root, W: innerWidth, H: innerHeight, cursor: { i: 0 }, url: p => p.url,
+      photoMotion: false, photoMs: 3600000, microMs: 3600000, ambientMs: 3600000,
+      motionMs: 3600000,
+    }, query.get("layout") === "single" ? [single] : ordered);
+    window.baselineReady = cleanup.ready;
+    addEventListener("pagehide", () => cleanup(), { once: true });
+  </script>
+</body>
+</html>

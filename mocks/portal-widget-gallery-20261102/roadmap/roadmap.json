@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T00:59:19.429084Z",
-  "updatedLabel": "3 November 2026 \u00b7 approved local group photo import",
+  "updatedAt": "2026-11-04T01:17:12.870895+00:00",
+  "updatedLabel": "3 November 2026 · photo grid and doodle visual review",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,55 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "slideshow-photo-layout-review",
+      "title": "Slideshow: larger photos and quiet doodle margins",
+      "summary": "Renewed visual report remains open. Functional comparison replaces outlined fixed cells with six proportional photos and offers three static doodle backgrounds.",
+      "description": "Earlier crop and slim-mat deliveries did not fix Mosaic small-photo composition or Framed Print dark margins. Prepare and verify the concrete visual direction before native implementation.",
+      "status": "approval",
+      "verification": "81 browser geometry cases · 6 unchanged-renderer scenes · 6 controls · 11 routes · independent mock review",
+      "kind": "Reported screensaver appearance follow-up",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Photo-frame design / Portal engineering",
+      "deployment": "Local design study only; no product or installed-device change.",
+      "state": "Paper recommended; Graphite and Sage available. Thin photo-sized frames, whole photos and reserved sample clock space. Current executes unchanged local WebView assets.",
+      "acceptance": [
+        "Keep whole photos large without visible empty outlined grid cells.",
+        "Soften remaining margins with sparse static doodles and a thin photo-sized frame.",
+        "Approve a concrete visual direction before production implementation.",
+        "Preserve face/motion, decode residency, replacement and lifecycle behavior; verify actual native overlays and Android 9/10."
+      ],
+      "evidence": [
+        {
+          "text": "Functional local design comparison with scenic sample fixtures.",
+          "source": "http://127.0.0.1:8892/"
+        },
+        {
+          "text": "Earlier fix status, verified mock and native limits.",
+          "source": "docs/portal-photo-layout-review-2026-11-03.md"
+        },
+        {
+          "text": "Bound source, generated screenshots and actual browser checks.",
+          "source": "mocks/portal-photo-layout-20261103/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Browser study; no native appearance, installed version or Portal performance claim.",
+        "Current uses deterministic static local fixtures without native overlays or natural Shuffle/face metadata.",
+        "Nine cropped scenic fixtures come from three bundled photographs; no household media.",
+        "Six proposed photos versus nine current tiles is intentional and disclosed; Next is a local sample action.",
+        "Prior crop/slim-frame delivery and every parked issue retain their own clocks."
+      ],
+      "next": "Choose Paper, Graphite or a revision; then implement and verify the approved native appearance within a separately authorized bounded unit.",
+      "issueClock": {
+        "startedAt": "2026-11-04T01:01:58.039Z",
+        "deadline": "2026-11-04T01:31:58.039Z",
+        "discoveryIncluded": true,
+        "priorClocksRetained": true
+      }
+    },
     {
       "id": "home-photo-exif-diagonals",
       "title": "Home photos: correct diagonal EXIF reflections",
