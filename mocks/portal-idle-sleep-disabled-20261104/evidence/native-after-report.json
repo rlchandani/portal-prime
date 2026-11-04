@@ -1,0 +1,131 @@
+{
+  "ok": true,
+  "error": null,
+  "tests": 4,
+  "failures": 0,
+  "cases": [
+    {
+      "name": "idleDisabledAfterInertArm",
+      "passed": true,
+      "errors": [],
+      "currentEnabled": true,
+      "currentIdleSleepMin": 0,
+      "suppressionAttempts": 0,
+      "adminClassLookups": 0,
+      "adminNameLookups": 0,
+      "preferenceRequests": 1,
+      "requestedPreferences": [
+        {
+          "name": "immortal_screensaver",
+          "mode": 0
+        }
+      ],
+      "preferenceReads": 59,
+      "preferenceEdits": 0,
+      "preferencePuts": 0,
+      "preferenceApplies": 0,
+      "preferenceCommits": 0,
+      "entirePreferenceMapUnchanged": true,
+      "unexpectedContextOperations": 0,
+      "contextBaseIsNull": true,
+      "realResolversExposed": 0,
+      "realServicesExposed": 0,
+      "realAlarmScheduling": false
+    },
+    {
+      "name": "screensaverDisabledAfterInertArm",
+      "passed": true,
+      "errors": [],
+      "currentEnabled": false,
+      "currentIdleSleepMin": 15,
+      "suppressionAttempts": 0,
+      "adminClassLookups": 0,
+      "adminNameLookups": 0,
+      "preferenceRequests": 1,
+      "requestedPreferences": [
+        {
+          "name": "immortal_screensaver",
+          "mode": 0
+        }
+      ],
+      "preferenceReads": 59,
+      "preferenceEdits": 0,
+      "preferencePuts": 0,
+      "preferenceApplies": 0,
+      "preferenceCommits": 0,
+      "entirePreferenceMapUnchanged": true,
+      "unexpectedContextOperations": 0,
+      "contextBaseIsNull": true,
+      "realResolversExposed": 0,
+      "realServicesExposed": 0,
+      "realAlarmScheduling": false
+    },
+    {
+      "name": "bothCurrentSettingsDisabled",
+      "passed": true,
+      "errors": [],
+      "currentEnabled": false,
+      "currentIdleSleepMin": 0,
+      "suppressionAttempts": 0,
+      "adminClassLookups": 0,
+      "adminNameLookups": 0,
+      "preferenceRequests": 1,
+      "requestedPreferences": [
+        {
+          "name": "immortal_screensaver",
+          "mode": 0
+        }
+      ],
+      "preferenceReads": 59,
+      "preferenceEdits": 0,
+      "preferencePuts": 0,
+      "preferenceApplies": 0,
+      "preferenceCommits": 0,
+      "entirePreferenceMapUnchanged": true,
+      "unexpectedContextOperations": 0,
+      "contextBaseIsNull": true,
+      "realResolversExposed": 0,
+      "realServicesExposed": 0,
+      "realAlarmScheduling": false
+    },
+    {
+      "name": "currentEnabledIdlePreservesSuppressionAndAdminNoop",
+      "passed": true,
+      "errors": [],
+      "currentEnabled": true,
+      "currentIdleSleepMin": 15,
+      "suppressionAttempts": 1,
+      "adminClassLookups": 1,
+      "adminNameLookups": 1,
+      "preferenceRequests": 1,
+      "requestedPreferences": [
+        {
+          "name": "immortal_screensaver",
+          "mode": 0
+        }
+      ],
+      "preferenceReads": 59,
+      "preferenceEdits": 0,
+      "preferencePuts": 0,
+      "preferenceApplies": 0,
+      "preferenceCommits": 0,
+      "entirePreferenceMapUnchanged": true,
+      "unexpectedContextOperations": 0,
+      "contextBaseIsNull": true,
+      "realResolversExposed": 0,
+      "realServicesExposed": 0,
+      "realAlarmScheduling": false
+    }
+  ],
+  "sourceSha256": "a2b5ffefebe6a20c6d24c9b7415dc25a8316b536ecefc61da7909603a645d2c0",
+  "sourceBytes": 46745294,
+  "sdk": 29,
+  "fixturePackage": "com.immortal.idlesleepfixture",
+  "internetPermission": false,
+  "actualEmbeddedReceiverSchedulerOrigin": true,
+  "actualSleepReceiverOnReceive": true,
+  "action": "com.immortal.launcher.SLEEP_IDLE",
+  "allLoadedCodeContextsNullBase": true,
+  "realResolversServicesAlarmsExposed": 0,
+  "scope": "Actual debug APK ACTION_IDLE receiver dispatch with current generated in-memory prefs and null-base Context; suppression/admin attempted lookups intercepted as no-ops. No real alarm arm/delivery, settings provider/write, admin/lock/sleep, activity/service/audio, owner prefs, mounted UI, optimized/API28 or platform timing acceptance"
+}

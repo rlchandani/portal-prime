@@ -1,0 +1,324 @@
+{
+  "status": "passed",
+  "reviewKind": "independent_source_review",
+  "reviewedAt": "2026-11-04T11:31:17.451744+00:00",
+  "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+  "firstSourceWitnessAt": "2026-11-04T11:25:56Z",
+  "target": "2026-11-04T11:39:52Z",
+  "hardDeadline": "2026-11-04T11:54:52Z",
+  "baseCommitFromRootPlan": "d12914f00e837a349199640b307c253602f4e81b",
+  "commitIndependentlyResolved": false,
+  "change": {
+    "file": "SleepScheduler.kt",
+    "function": "onIdleElapsed",
+    "line": 167,
+    "insertedLines": [
+      "    val cfg = ScreensaverConfig.load(context)",
+      "    if (!cfg.enabled || !cfg.idleSleepOn) return"
+    ],
+    "exactTwoLineInsertion": true,
+    "allOtherSchedulerBytesRetained": true,
+    "SleepReceiverBytesRetained": true,
+    "ScreensaverConfigBytesRetained": true,
+    "buildOnlyVersionChanged": true,
+    "versionName": "1.152",
+    "versionCode": 146
+  },
+  "criteria": {
+    "readsOneCurrentReadOnlyConfigSnapshotBeforeEffects": true,
+    "currentScreensaverDisabledRejectsOldIdleAction": true,
+    "currentIdleOffRejectsOldIdleAction": true,
+    "enabledIdlePreservesDreamSuppressionThenSleep": true,
+    "noAudioPauseOrAppCloseAdded": true,
+    "noNewSettingOrUIOrRouteOrPreferenceWrite": true,
+    "armCancelTimingOvernightAndSleepTimerBytesRetained": true,
+    "existingDeviceAdminSleepNoopRetained": true,
+    "privateAndSharedTwelveMethodFrozenTestExact": true,
+    "baselineSixProductAssertionsSixPassingControlsVerifiedFromXml": true
+  },
+  "productionWitness": {
+    "arm": "PhotoDreamService.onDreamingStarted:116, normal PhotoFramePreviewActivity:149 and admitted DAY PinnedAppFrameHost:256 call onScreensaverStarted. Enabled positive idle timeout arms ACTION_IDLE as ELAPSED_REALTIME_WAKEUP.",
+    "apply": "Screensaver Settings applies the declarative domain. RemoteRoutes /remote/settings uses SettingsRegistry.apply. FleetRoutes:347-348 calls FleetScreensaver.apply then SettingsGuard.afterScreensaverApply; FleetScreensaver:126 uses domain.applyValues. Domain idleSleepMin=0 explicitly formats Off.",
+    "oldDelivery": "SettingsGuard.afterScreensaverApply:99-103 reaffirms Dream and handles overnight keys without cancelling idle. A previously queued ACTION_IDLE reaches unchanged SleepReceiver:21. Baseline onIdleElapsed performs suppression/sleep regardless of current enabled/idle flag.",
+    "newDelivery": "New early return samples current enabled and derived idleSleepOn before either operation. Active saved Off delivery is harmless at this callback boundary."
+  },
+  "settingsContract": {
+    "idleSleepOn": "ScreensaverConfig.Settings.idleSleepOn = idleSleepMin > 0",
+    "Off": "Registry idleSleepMin min0/max120 and format Off for <=0; setter clamps nonpositive to0. No validation or persistence changes.",
+    "domainHook": "SettingsDomains.screensaver onApplied -> SettingsGuard.afterScreensaverApply, no duplicated UI or route preference write introduced."
+  },
+  "baseline": {
+    "exitCodeFromRoot": 1,
+    "tests": 12,
+    "assertionFailures": 6,
+    "controlsPassed": 6,
+    "errors": 0,
+    "skipped": 0,
+    "cases": [
+      {
+        "name": "missingDeviceAdminRetainsDreamSuppressionAndTheExistingLockNoOp",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "disablingIdleAfterArmMakesTheCapturedDeliveryHarmless",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "disablingScreensaverAfterArmMakesTheCapturedDeliveryHarmless",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "currentEnabledIdleSuppressesDreamThenLocksWithoutChangingPreferences",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "idleDeliveryDoesNotBorrowSleepTimerPauseOrCloseOptions",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "initiallyDisabledScreensaverNeitherArmsNorAcceptsAnOldIdleAction",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "reenabledIdleUsesCurrentPolicyRatherThanAnEarlierDisabledSnapshot",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "missingAndUnrelatedActionsRemainInert",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "reenabledScreensaverUsesCurrentPolicyAtDelivery",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "initiallyOffIdleNeitherArmsNorAcceptsAnOldIdleAction",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "enabledSleepTimerDoesNotAuthorizeDisabledIdleDelivery",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "disabledIdleDoesNotSuppressDreamEvenWhenDeviceAdminIsMissing",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      }
+    ],
+    "frozenTestSha256": "42fc897c1083a8feaa0914d1debf21e5eb84ef16f76af2a861ac9f76f6c757b7"
+  },
+  "fixtureReview": {
+    "callsActualArmAndReceiver": true,
+    "capturedIdleIntentAndElapsedDeadlineControl": true,
+    "currentFlagChangesAfterArm": true,
+    "effectsAssertedOutsideProductionRunCatching": true,
+    "commonGeneratedPreferenceMapAndWritesUnchanged": true,
+    "commonZeroMediaKeysAndActivityLaunches": true,
+    "reenableTestsRetainCurrentPolicyOnOldHandle": true,
+    "candidateNotExecutedByReviewer": true
+  },
+  "priorScopes": [
+    {
+      "id": "sleep-timer-dispatch",
+      "distinction": "Delivered separate ACTION_SLEEP_TIMER routing and current sleepTimerEnabled/options contract. That dispatch and policy remain byte-identical; enabled SLEEP_TIMER cannot authorize disabled ACTION_IDLE."
+    },
+    {
+      "id": "black-handoff",
+      "distinction": "Parked complete-Home/zero-black-frame experiments are untouched. No black handoff or optical/compositor claim."
+    },
+    {
+      "id": "legacy-night",
+      "distinction": "Parked legacy motion and exhausted native/night scopes untouched; all overnight policy bytes retained."
+    },
+    {
+      "id": "native Android idle",
+      "distinction": "No native idle timer, Dream wake/re-light, pin ownership, generation, session or presence-policy changes. Guard concerns only app-owned old ACTION_IDLE callback."
+    }
+  ],
+  "limits": [
+    "No immediate cancel/rearm or PendingIntent retirement added. Existing handle can remain after Off until existing cancellation; an Off-to-On return before old delivery retains old-handle/deadline behavior.",
+    "No duration-change, stale generation/window/source/native Android idle guarantee.",
+    "Current flags are sampled once. A concurrent setting change after that read is not serialized with the callback; no atomic concurrent-disable guarantee.",
+    "Existing config-load exception policy unchanged; new read does not introduce a recovery policy.",
+    "Source and preserved root baseline evidence reviewed only. Candidate full tests/builds, native service effects, actual alarm delivery, physical screen-off, secure-settings provider, boot/API28 and mounted UI remain separate gates.",
+    "No SDK/build/test/Git/network/device/phone/provider/account/owner registry/media operations by reviewer; only this private receipt written."
+  ],
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-idle-sleep-disabled-20261104-112452/plan.json",
+      "bytes": 1195,
+      "sha256": "82303d096bbe4fc9c630ceb295cf968daaad691647b459dd3a113f67d3e3d376"
+    },
+    {
+      "path": "/private/tmp/portal-idle-sleep-disabled-20261104-112452/SleepScheduler.kt",
+      "bytes": 19801,
+      "sha256": "f3f124a9d3109d4ab5effe7bfab42288781b5135e44753c166a0b1c776b9e4c4"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SleepScheduler.kt",
+      "bytes": 19896,
+      "sha256": "d097b2dbd0cae7e006b44572ea0ab6f81ed2eb54bc8cab6d0d6eb9bdd83074f8"
+    },
+    {
+      "path": "/private/tmp/portal-idle-sleep-disabled-20261104-112452/ScreensaverConfig.kt",
+      "bytes": 29946,
+      "sha256": "6738cb1378b5f160c0361608734c66d18bfbfde2a6a69ff6973ed4b0f7c96796"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ScreensaverConfig.kt",
+      "bytes": 29946,
+      "sha256": "6738cb1378b5f160c0361608734c66d18bfbfde2a6a69ff6973ed4b0f7c96796"
+    },
+    {
+      "path": "/private/tmp/portal-idle-sleep-disabled-20261104-112452/SleepReceiver.kt",
+      "bytes": 986,
+      "sha256": "0e7e69a260123f9698bbf8ea9fc65ef8fe7873a401fd2d0203ee6262262ba86d"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SleepReceiver.kt",
+      "bytes": 986,
+      "sha256": "0e7e69a260123f9698bbf8ea9fc65ef8fe7873a401fd2d0203ee6262262ba86d"
+    },
+    {
+      "path": "/private/tmp/portal-idle-sleep-disabled-20261104-112452/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "d30c70f482477efd72112e0b3d9fbf25b09a0cd6f66e072d976fcb12dc64de40"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "5bd2904a2d4d5532a76da6598b55f10899b46666c9fe0b657e761689a82fc12f"
+    },
+    {
+      "path": "/private/tmp/portal-idle-sleep-disabled-20261104-112452/SleepIdleReceiverTest.kt",
+      "bytes": 9910,
+      "sha256": "42fc897c1083a8feaa0914d1debf21e5eb84ef16f76af2a861ac9f76f6c757b7"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/SleepIdleReceiverTest.kt",
+      "bytes": 9910,
+      "sha256": "42fc897c1083a8feaa0914d1debf21e5eb84ef16f76af2a861ac9f76f6c757b7"
+    },
+    {
+      "path": "/private/tmp/portal-idle-sleep-disabled-20261104-112452/baseline-verification.json",
+      "bytes": 2169,
+      "sha256": "f15dfeb42ccbe4a5657dd01a4dbd6fed2da38c68d8679dffc4b13590934d06da"
+    },
+    {
+      "path": "/private/tmp/portal-idle-sleep-disabled-20261104-112452/baseline-focused-tests.xml",
+      "bytes": 29481,
+      "sha256": "c7dda836bcb1f73125f7f6aa68df6e02b48037f6432c290e68a3e79c75c1406a"
+    },
+    {
+      "path": "/private/tmp/portal-idle-sleep-disabled-20261104-112452/baseline-tests.log",
+      "bytes": 3186,
+      "sha256": "aa0e988b0d57b09a08c8ca7bb912b3f8fe231e84884b1cb46b326ed79cafbcce"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SettingsGuard.kt",
+      "bytes": 14684,
+      "sha256": "7e3188da32e446204cacd63b9a60ec23406763d6496eccf454b0c5a667133e77"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ScreenControl.kt",
+      "bytes": 4286,
+      "sha256": "bb28eb09d6fba6d4eb2af52817da58a23f808e089b6c18ed6bc7ce74ab143b45"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SleepElapsedTiming.kt",
+      "bytes": 1075,
+      "sha256": "10b96d2b244013704716af5938aa1d8d901f77f87c404fbe622c478e5fbc4796"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoDreamService.kt",
+      "bytes": 8815,
+      "sha256": "a0506525fd4a761c575e3a3257f52624d1ece79b8aa62f0da77836f2cd6b66f6"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFramePreviewActivity.kt",
+      "bytes": 11078,
+      "sha256": "8ca9dbcf28d19aac29a4c39d373c45b644fcfc0c30d6dd61c2beec188e8c497a"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PinnedAppFrameHost.kt",
+      "bytes": 22556,
+      "sha256": "d9c66510319da26d2542eb1307bdcdf5f15d644592860c05463c2b368368c3c7"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/DigitalClockDreamService.kt",
+      "bytes": 4614,
+      "sha256": "8ae78532b099b707069505651819e599e0d17367b4ae9773a22552bced8554c1"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+      "bytes": 229887,
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FleetRoutes.kt",
+      "bytes": 27699,
+      "sha256": "35aad6e808d64709d5a0682310e8975e061e2fbb62c6581382bb84c6435b8ad7"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/FleetScreensaver.kt",
+      "bytes": 8566,
+      "sha256": "faf4471504363de3779c1dfddb167907e6e0c053dbe39f3dbef576c41357cba9"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/RemoteRoutes.kt",
+      "bytes": 34902,
+      "sha256": "912dcfc81b8c20f5f2d2e5c5730fbe9c70138c6dc4feca7256f16527ad2d1faa"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ScreensaverSettingsActivity.kt",
+      "bytes": 11939,
+      "sha256": "42a83209f5d2644d5f2513f1fc5a255086ca5bc22abb2219ddd5fbd008829875"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/settings/SettingsDomain.kt",
+      "bytes": 6081,
+      "sha256": "0893fa845f5849a71a3619f23b58cc1f5275777b36402cb737e0e71a41313fec"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt",
+      "bytes": 69058,
+      "sha256": "4d110cd39ae80e5cc92180283edf5e5e19c62c3235f2a1ed4daccf619b40a045"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/AndroidManifest.xml",
+      "bytes": 35052,
+      "sha256": "f5623647efe5d0bb8b1fcd4bf59a6fd7522c11902d6f1573497e0e6cb1d5904e"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/SleepTimerReceiverTest.kt",
+      "bytes": 8568,
+      "sha256": "6136f5dbf3ca162f3cc8abbbea4403977e15d104f643789788703487176c84d5"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-sleep-timer-dispatch-2026-11-03.md",
+      "bytes": 4598,
+      "sha256": "d72f6be89f32083da7a022f0fe07658a5545ae213c0324d4cfec445f031baa96"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-product-operating-state.md",
+      "bytes": 209280,
+      "sha256": "5cbccd920ab85f2f4d62e4e93d0a248f9e1bb95745e47dd20886b680c61c94c5"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-widget-gallery-20261102/roadmap/roadmap.json",
+      "bytes": 469425,
+      "sha256": "3524e242550ea9fac1a381098e08b3c02a6f17855b58e8d177971c2ece15cca4"
+    }
+  ]
+}

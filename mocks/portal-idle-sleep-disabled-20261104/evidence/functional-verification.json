@@ -1,0 +1,43 @@
+{
+  "jvm": {
+    "tests": 4476,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 467
+  },
+  "focusedTests": 12,
+  "focusedPassed": 12,
+  "debug": {
+    "sha256": "a2b5ffefebe6a20c6d24c9b7415dc25a8316b536ecefc61da7909603a645d2c0",
+    "bytes": 46745294,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "performance": {
+    "sha256": "ad0f4970b47e9717423867f6c64fc2b2074fbefaccc0e7231e01892b5fa3f9db",
+    "bytes": 25886647,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "native": {
+    "beforeTests": 4,
+    "beforeFailures": 3,
+    "beforeControls": 1,
+    "afterTests": 4,
+    "afterFailures": 0,
+    "afterPassed": 4,
+    "fixtureDexIdentical": true,
+    "wrapperChangedFiles": [
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/MANIFEST.MF",
+      "assets/source.apk"
+    ],
+    "preferenceRequestsBefore": 0,
+    "preferenceRequestsAfter": 4,
+    "preferenceWrites": 0,
+    "unexpectedContextOperations": 0,
+    "realResolversServicesAlarmsExposed": 0,
+    "bothRunsRetired": true
+  },
+  "scope": "Actual debug/API29 receiver dispatch against current generated preferences and null-base context. JVM captures actual arm delivery and OS-boundary effects. No native alarm delivery, secure provider/write, admin/physical sleep, UI, optimized/API28 or concurrent/generation acceptance."
+}

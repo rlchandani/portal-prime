@@ -1,0 +1,8 @@
+[
+  {
+    "operation": "First candidate wrapper repack",
+    "reason": "cp could not replace the readonly generated baseline assets/source.apk.",
+    "correction": "Removed only that owned generated source.apk input before the permitted candidate replacement; frozen Java/DEX/builders/driver/gates unchanged.",
+    "nativeAfterExecutionBeforeCorrection": false
+  }
+]

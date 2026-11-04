@@ -1,0 +1,18 @@
+{
+  "issue": "Disabled idle screen-off makes old ACTION_IDLE delivery harmless",
+  "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+  "firstSourceWitnessAt": "2026-11-04T11:25:56Z",
+  "selectedAt": "2026-11-04T11:27:49.377527+00:00",
+  "target": "2026-11-04T11:39:52Z",
+  "hardDeadline": "2026-11-04T11:54:52Z",
+  "baseCommit": "d12914f00e837a349199640b307c253602f4e81b",
+  "scope": "At idle expiry re-read enabled and idleSleepOn; reject when currently disabled. Preserve enabled idle suppression/sleep order, no-audio/no-close behavior, config, scheduling, cancellation, duration/overnight/native Android idle and other receivers. No immediate rearm/cancel policy.",
+  "authorization": "Autonomous local verified room delivery; root owns devices. No phone, household source/media/provider/account or GitHub authentication/push/publication.",
+  "candidateCalendarHold": {
+    "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+    "firstSourceWitnessAt": "2026-11-04T11:26:04Z",
+    "target": "2026-11-04T11:39:52Z",
+    "hardDeadline": "2026-11-04T11:54:52Z",
+    "status": "Unselected source witness: recurrence calendar uses device zone after DTSTART zone is resolved; no test or edit yet."
+  }
+}

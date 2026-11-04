@@ -165,6 +165,8 @@ object SleepScheduler {
 
   /** The daytime idle alarm fired: turn the system Dream off so it can't re-light, then blank. */
   fun onIdleElapsed(context: Context) {
+    val cfg = ScreensaverConfig.load(context)
+    if (!cfg.enabled || !cfg.idleSleepOn) return
     SettingsGuard.setSystemScreensaverEnabled(context, false)
     ScreenControl.sleep(context)
   }

@@ -1,18 +1,72 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T11:23:44.904059+00:00",
-  "updatedLabel": "Host release cleanliness gate verified; room1.151 and prior clocks retained",
+  "updatedAt": "2026-11-04T11:38:54.540281+00:00",
+  "updatedLabel": "Idle Off callback guard delivered to both rooms; prior clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.151/code 145. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.152/code 146. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "idle-sleep-current-disabled",
+      "title": "Idle screen-off: respect Off at alarm delivery",
+      "summary": "An already scheduled idle alarm becomes harmless when the current screensaver or idle screen-off setting is disabled.",
+      "status": "delivered",
+      "verification": "4,476 JVM \u00b712 receiver regressions \u00b74 native current-policy cases \u00b7exact both-room installs",
+      "kind": "Screensaver reliability",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent source and native-artifact review",
+      "deployment": "Exact optimized1.152/code146 fully hashed in both rooms; one install each; Living ACK uncertain and reconciled read-only.",
+      "acceptance": [
+        "Current enabled/idleSleepOn sampled before suppression or sleep; disabled callbacks have no effects.",
+        "Enabled suppression then sleep, no-audio/no-close behavior and other scheduler/receiver policy retained.",
+        "Same frozen12JVM:6 AssertionErrors/6controls\u219212pass; actual debug/API29 direct receiver:3fail/1control\u21924pass with zero generated preference writes."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery and limits",
+          "source": "docs/portal-idle-sleep-disabled-2026-11-04.md"
+        },
+        {
+          "text": "Frozen acceptance and room evidence",
+          "source": "mocks/portal-idle-sleep-disabled-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Native cases directly invoke actual debug receiver with generated current preferences and null-base contexts; names containing AfterInertArm do not prove native arming or real delivery.",
+        "Real AlarmManager delivery, secure-provider writes, physical sleep, mounted UI, optimized/API28 and Living functional acceptance remain separate.",
+        "No immediate cancellation/rearming, duration/generation or atomic concurrent-disable guarantee. Off-to-On preserves old-handle current-policy behavior.",
+        "No phone, household media/provider/account, push or publication; public1.83/code77 retained."
+      ],
+      "next": "Continue with a distinct bounded slice; preserve all earlier clocks and holds.",
+      "issueClock": {
+        "issue": "Disabled idle screen-off makes old ACTION_IDLE delivery harmless",
+        "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+        "firstSourceWitnessAt": "2026-11-04T11:25:56Z",
+        "selectedAt": "2026-11-04T11:27:49.377527+00:00",
+        "target": "2026-11-04T11:39:52Z",
+        "hardDeadline": "2026-11-04T11:54:52Z",
+        "baseCommit": "d12914f00e837a349199640b307c253602f4e81b",
+        "scope": "At idle expiry re-read enabled and idleSleepOn; reject when currently disabled. Preserve enabled idle suppression/sleep order, no-audio/no-close behavior, config, scheduling, cancellation, duration/overnight/native Android idle and other receivers. No immediate rearm/cancel policy.",
+        "authorization": "Autonomous local verified room delivery; root owns devices. No phone, household source/media/provider/account or GitHub authentication/push/publication.",
+        "candidateCalendarHold": {
+          "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+          "firstSourceWitnessAt": "2026-11-04T11:26:04Z",
+          "target": "2026-11-04T11:39:52Z",
+          "hardDeadline": "2026-11-04T11:54:52Z",
+          "status": "Unselected source witness: recurrence calendar uses device zone after DTSTART zone is resolved; no test or edit yet."
+        }
+      }
+    }
+    ,
     {
       "id": "release-clean-tree",
       "title": "Release preflight: reject untracked inputs",

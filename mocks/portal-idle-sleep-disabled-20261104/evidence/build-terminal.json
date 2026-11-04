@@ -1,0 +1,7 @@
+{
+  "exitCode": 0,
+  "terminalAt": "2026-11-04T11:33:08.646715+00:00",
+  "session": 25058,
+  "command": "./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assemblePerformance --no-daemon -Dorg.gradle.jvmargs='-Xmx4096m -Dfile.encoding=UTF-8'",
+  "logSha256": "ddeae01628fcefc75041b00ff936ee09f862741b04496286fbba536c14df314e"
+}

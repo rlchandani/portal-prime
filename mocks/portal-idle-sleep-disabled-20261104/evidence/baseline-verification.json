@@ -1,0 +1,73 @@
+{
+  "exitCode": 1,
+  "tests": 12,
+  "assertionFailures": 6,
+  "controlsPassed": 6,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "missingDeviceAdminRetainsDreamSuppressionAndTheExistingLockNoOp",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "disablingIdleAfterArmMakesTheCapturedDeliveryHarmless",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "disablingScreensaverAfterArmMakesTheCapturedDeliveryHarmless",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "currentEnabledIdleSuppressesDreamThenLocksWithoutChangingPreferences",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "idleDeliveryDoesNotBorrowSleepTimerPauseOrCloseOptions",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "initiallyDisabledScreensaverNeitherArmsNorAcceptsAnOldIdleAction",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "reenabledIdleUsesCurrentPolicyRatherThanAnEarlierDisabledSnapshot",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "missingAndUnrelatedActionsRemainInert",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "reenabledScreensaverUsesCurrentPolicyAtDelivery",
+      "passed": true,
+      "failureType": null
+    },
+    {
+      "name": "initiallyOffIdleNeitherArmsNorAcceptsAnOldIdleAction",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "enabledSleepTimerDoesNotAuthorizeDisabledIdleDelivery",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    },
+    {
+      "name": "disabledIdleDoesNotSuppressDreamEvenWhenDeviceAdminIsMissing",
+      "passed": false,
+      "failureType": "java.lang.AssertionError"
+    }
+  ],
+  "baselineSourceSha256": "f3f124a9d3109d4ab5effe7bfab42288781b5135e44753c166a0b1c776b9e4c4",
+  "frozenTestSha256": "42fc897c1083a8feaa0914d1debf21e5eb84ef16f76af2a861ac9f76f6c757b7",
+  "baselineLogSha256": "aa0e988b0d57b09a08c8ca7bb912b3f8fe231e84884b1cb46b326ed79cafbcce"
+}

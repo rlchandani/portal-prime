@@ -1,0 +1,229 @@
+{
+  "ok": true,
+  "blockers": [],
+  "scope": "Independent host review of another author frozen native receiver fixture and retained paired reports/artifacts. Authored JVM tests were not independently re-reviewed or rerun.",
+  "clock": {
+    "startedAt": "2026-11-04T11:24:52Z",
+    "firstWitnessAt": "2026-11-04T11:25:56Z",
+    "target": "2026-11-04T11:39:52Z",
+    "deadline": "2026-11-04T11:54:52Z",
+    "reset": false
+  },
+  "native": {
+    "before": {
+      "tests": 4,
+      "missingCurrentPolicyFailures": 3,
+      "controls": 1
+    },
+    "after": {
+      "tests": 4,
+      "failures": 0
+    },
+    "caseNames": [
+      "idleDisabledAfterInertArm",
+      "screensaverDisabledAfterInertArm",
+      "bothCurrentSettingsDisabled",
+      "currentEnabledIdlePreservesSuppressionAndAdminNoop"
+    ],
+    "literalPredicatesIndependentlyRecomputed": true,
+    "sameFrozenJavaDexDriverAndGates": true,
+    "prefRequestsBeforeAfter": [
+      0,
+      4
+    ],
+    "candidateReadCounts": [
+      59,
+      59,
+      59,
+      59
+    ],
+    "zeroGeneratedPreferenceWrites": true,
+    "completeGeneratedMapsRetained": true,
+    "nullBaseContexts": true,
+    "realResolversAdminServicesAlarmsExposed": 0,
+    "zeroPermissionManifestAndRuntimeInternetDenied": true,
+    "bothRetirementRecordsAllAbsent": true,
+    "fixtureZipDifferences": [
+      "assets/source.apk",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/MANIFEST.MF"
+    ],
+    "candidateWrapper": {
+      "sha256": "7322a7e464aa7555108f23e7f5e74a4733dfd4a36a62b80229b7c75424f8f7ce",
+      "bytes": 37503466
+    }
+  },
+  "artifacts": {
+    "debug": {
+      "sha256": "a2b5ffefebe6a20c6d24c9b7415dc25a8316b536ecefc61da7909603a645d2c0",
+      "bytes": 46745294,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='146' versionName='1.152' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "sha256": "ad0f4970b47e9717423867f6c64fc2b2074fbefaccc0e7231e01892b5fa3f9db",
+      "bytes": 25886647,
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='146' versionName='1.152' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "tenPackagedScreensaverAssetsEachByteExactToCurrentSource": true,
+  "retainedRootGateSummary": {
+    "tests": 4476,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 467
+  },
+  "retainedRootGradleExit": 0,
+  "excludedSetupCorrection": {
+    "files": [
+      {
+        "path": "excluded-native-repack-readonly.log",
+        "sha256": "b4d235fce36b3d2d046010f0841f61f5eb5afe656cacc4c84e567a479c4ba80a",
+        "bytes": 104
+      }
+    ],
+    "assessment": "Root reports first candidate repack failed replacing generated read-only source.apk before after claim/native execution. Final frozen builder/Java/DEX/driver hashes match; generated asset replacement is exact candidate. No assertion weakening or native repeat inferred."
+  },
+  "bindings": {
+    "native/IdleSleepActivity.java": {
+      "sha256": "ade1c38eff48036201eeb10e919135897eb736d82f48edc01c47661772fb578e",
+      "bytes": 11684
+    },
+    "native/AndroidManifest.xml": {
+      "sha256": "a024a600af45533515636fe47e50a63e76e6ec7cd268ca4e354d31902c1a77fa",
+      "bytes": 427
+    },
+    "native/build.sh": {
+      "sha256": "f7c1207dafa10310af4cb9f04d2cbc01b3a3be68606823c18fe32f156fb38a83",
+      "bytes": 824
+    },
+    "native/repack.sh": {
+      "sha256": "a6992ef0872089166f392530df91a749eba17b9436ed5aaaf441cef364fcac1d",
+      "bytes": 774
+    },
+    "native/RUN.md": {
+      "sha256": "7349cabfd2311ce80e8b22c3953eb441addff28b22aadc3ac2d98e1315c0837f",
+      "bytes": 1783
+    },
+    "native/freeze.py": {
+      "sha256": "fcae24d1c2390e83890e2484daf28f839117ba3b97da09fdc8cf28fd9b06ecd5",
+      "bytes": 1773
+    },
+    "native/source-admission.json": {
+      "sha256": "d322f1b0655ab50477797dc225deffdd27978068dff3de93f903885aca334f65",
+      "bytes": 3514
+    },
+    "native/preparation-verification.json": {
+      "sha256": "98ba1163fad857ec818f9084b905d65a522383f19b8620df7287619ce3f77687",
+      "bytes": 4686
+    },
+    "native/frozen-dex/classes.dex": {
+      "sha256": "61ecbbe5dcadc8ef1b874ee824c3342fc517d3aff4d82adeedff8da799899b33",
+      "bytes": 18140
+    },
+    "native/baseline-fixture.apk": {
+      "sha256": "5a0b2301cd37ce8debf2624d4967f21d314c657edbbcebcfb19a71e3aaaebad7",
+      "bytes": 37503466
+    },
+    "native/idle-sleep-fixture.apk": {
+      "sha256": "7322a7e464aa7555108f23e7f5e74a4733dfd4a36a62b80229b7c75424f8f7ce",
+      "bytes": 37503466
+    },
+    "native-run.py": {
+      "sha256": "c2b078a2c9475fa499c8e4ea307c8fe2c8a958fe30557f7cdf0e5666f01b7e0a",
+      "bytes": 5051
+    },
+    "native-build.log": {
+      "sha256": "197b522fcf2993564fbfe66e5b6d1f4938635ca626c29b13a0aff559276bd3f5",
+      "bytes": 980
+    },
+    "native-before-report.json": {
+      "sha256": "b879cfabae218ae24751ac9b47476043417a0b145d674039bc0548d981a3b546",
+      "bytes": 3973
+    },
+    "native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "native-after-report.json": {
+      "sha256": "aed37eb669aaebf710f4a124dd30c697bb43ca5327e34a69101d7f28e8b99f92",
+      "bytes": 3963
+    },
+    "native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "promotion-artifacts.json": {
+      "sha256": "6a78670ab563985e12fcd08310751cb6eedd185e071dba5646ab56f970ac5239",
+      "bytes": 4801
+    },
+    "SleepScheduler.kt": {
+      "sha256": "f3f124a9d3109d4ab5effe7bfab42288781b5135e44753c166a0b1c776b9e4c4",
+      "bytes": 19801
+    }
+  },
+  "productBindings": {
+    "SleepReceiver.kt": {
+      "beforeBinding": {
+        "sha256": "0e7e69a260123f9698bbf8ea9fc65ef8fe7873a401fd2d0203ee6262262ba86d",
+        "bytes": 986
+      },
+      "currentCandidateBinding": {
+        "sha256": "0e7e69a260123f9698bbf8ea9fc65ef8fe7873a401fd2d0203ee6262262ba86d",
+        "bytes": 986
+      }
+    },
+    "SleepScheduler.kt": {
+      "beforeBinding": {
+        "sha256": "f3f124a9d3109d4ab5effe7bfab42288781b5135e44753c166a0b1c776b9e4c4",
+        "bytes": 19801
+      },
+      "currentCandidateBinding": {
+        "sha256": "d097b2dbd0cae7e006b44572ea0ab6f81ed2eb54bc8cab6d0d6eb9bdd83074f8",
+        "bytes": 19896
+      }
+    },
+    "ScreenControl.kt": {
+      "beforeBinding": {
+        "sha256": "bb28eb09d6fba6d4eb2af52817da58a23f808e089b6c18ed6bc7ce74ab143b45",
+        "bytes": 4286
+      },
+      "currentCandidateBinding": {
+        "sha256": "bb28eb09d6fba6d4eb2af52817da58a23f808e089b6c18ed6bc7ce74ab143b45",
+        "bytes": 4286
+      }
+    },
+    "SettingsGuard.kt": {
+      "beforeBinding": {
+        "sha256": "7e3188da32e446204cacd63b9a60ec23406763d6496eccf454b0c5a667133e77",
+        "bytes": 14684
+      },
+      "currentCandidateBinding": {
+        "sha256": "7e3188da32e446204cacd63b9a60ec23406763d6496eccf454b0c5a667133e77",
+        "bytes": 14684
+      }
+    },
+    "ScreensaverConfig.kt": {
+      "beforeBinding": {
+        "sha256": "6738cb1378b5f160c0361608734c66d18bfbfde2a6a69ff6973ed4b0f7c96796",
+        "bytes": 29946
+      },
+      "currentCandidateBinding": {
+        "sha256": "6738cb1378b5f160c0361608734c66d18bfbfde2a6a69ff6973ed4b0f7c96796",
+        "bytes": 29946
+      }
+    }
+  },
+  "candidateTwoLineGuardInverseExactlyMatchesCapturedBaseline": true,
+  "limits": [
+    "Actual API29 debug direct SleepReceiver.onReceive with generated current in-memory preferences only; native AfterInertArm case names do not prove arming, earlier mutation or real AlarmManager delivery.",
+    "Suppression/admin effects are attempted null-returning context lookups. No real secure read/write, DevicePolicyManager object, lock or physical screen sleep is tested.",
+    "No mounted UI/Dream lifecycle, optimized runtime/API28, OS timing, audio/launch, provider/account/owner data or room promotion acceptance.",
+    "Signer/manifest/tool gate checks use retained coordinator metadata bound to actual APK hashes. This reviewer ran no SDK/signing/build/device/network/Git calls.",
+    "Root owns native execution and retirement collection. This reviewer independently recomputed retained JSON predicates and ZIP/hash bindings without rerunning native or authored JVM fixtures."
+  ],
+  "reviewedAtUtc": "2026-11-04T11:35:51.108490+00:00"
+}

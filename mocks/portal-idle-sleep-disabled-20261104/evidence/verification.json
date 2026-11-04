@@ -1,0 +1,234 @@
+{
+  "jvm": {
+    "tests": 4476,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 467
+  },
+  "focusedTests": 12,
+  "focusedPassed": 12,
+  "debug": {
+    "sha256": "a2b5ffefebe6a20c6d24c9b7415dc25a8316b536ecefc61da7909603a645d2c0",
+    "bytes": 46745294,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "performance": {
+    "sha256": "ad0f4970b47e9717423867f6c64fc2b2074fbefaccc0e7231e01892b5fa3f9db",
+    "bytes": 25886647,
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "native": {
+    "beforeTests": 4,
+    "beforeFailures": 3,
+    "beforeControls": 1,
+    "afterTests": 4,
+    "afterFailures": 0,
+    "afterPassed": 4,
+    "fixtureDexIdentical": true,
+    "wrapperChangedFiles": [
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/MANIFEST.MF",
+      "assets/source.apk"
+    ],
+    "preferenceRequestsBefore": 0,
+    "preferenceRequestsAfter": 4,
+    "preferenceWrites": 0,
+    "unexpectedContextOperations": 0,
+    "realResolversServicesAlarmsExposed": 0,
+    "bothRunsRetired": true
+  },
+  "scope": "Actual debug/API29 receiver dispatch against current generated preferences and null-base context. JVM captures actual arm delivery and OS-boundary effects. No native alarm delivery, secure provider/write, admin/physical sleep, UI, optimized/API28 or concurrent/generation acceptance.",
+  "baseline": {
+    "exitCode": 1,
+    "tests": 12,
+    "assertionFailures": 6,
+    "controlsPassed": 6,
+    "errors": 0,
+    "skipped": 0,
+    "cases": [
+      {
+        "name": "missingDeviceAdminRetainsDreamSuppressionAndTheExistingLockNoOp",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "disablingIdleAfterArmMakesTheCapturedDeliveryHarmless",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "disablingScreensaverAfterArmMakesTheCapturedDeliveryHarmless",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "currentEnabledIdleSuppressesDreamThenLocksWithoutChangingPreferences",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "idleDeliveryDoesNotBorrowSleepTimerPauseOrCloseOptions",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "initiallyDisabledScreensaverNeitherArmsNorAcceptsAnOldIdleAction",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "reenabledIdleUsesCurrentPolicyRatherThanAnEarlierDisabledSnapshot",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "missingAndUnrelatedActionsRemainInert",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "reenabledScreensaverUsesCurrentPolicyAtDelivery",
+        "passed": true,
+        "failureType": null
+      },
+      {
+        "name": "initiallyOffIdleNeitherArmsNorAcceptsAnOldIdleAction",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "enabledSleepTimerDoesNotAuthorizeDisabledIdleDelivery",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      },
+      {
+        "name": "disabledIdleDoesNotSuppressDreamEvenWhenDeviceAdminIsMissing",
+        "passed": false,
+        "failureType": "java.lang.AssertionError"
+      }
+    ],
+    "baselineSourceSha256": "f3f124a9d3109d4ab5effe7bfab42288781b5135e44753c166a0b1c776b9e4c4",
+    "frozenTestSha256": "42fc897c1083a8feaa0914d1debf21e5eb84ef16f76af2a861ac9f76f6c757b7",
+    "baselineLogSha256": "aa0e988b0d57b09a08c8ca7bb912b3f8fe231e84884b1cb46b326ed79cafbcce"
+  },
+  "installed": {
+    "family": {
+      "bytes": 25886647,
+      "sha256": "ad0f4970b47e9717423867f6c64fc2b2074fbefaccc0e7231e01892b5fa3f9db",
+      "app": {
+        "versionCode": 146,
+        "versionName": "1.152"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886647,
+        "sha256": "ad0f4970b47e9717423867f6c64fc2b2074fbefaccc0e7231e01892b5fa3f9db",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 146,
+          "versionName": "1.152"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1629,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 2028,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "reviews": {
+    "source": "passed",
+    "nativeArtifact": true
+  },
+  "queue": {
+    "tasks": 145,
+    "counts": {
+      "delivered": 94,
+      "verified": 41,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "all144OldObjectsPreserved": true,
+    "oldRawSuffixByteExact": true,
+    "rawSuffixBytes": 468366,
+    "rawSuffixSha256": "faed01f438797ef869455abc9336e01b917a85245016f4405d8173344266d6d2",
+    "defaultTaskPreserved": true
+  },
+  "originalIssueClock": {
+    "issue": "Disabled idle screen-off makes old ACTION_IDLE delivery harmless",
+    "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+    "firstSourceWitnessAt": "2026-11-04T11:25:56Z",
+    "selectedAt": "2026-11-04T11:27:49.377527+00:00",
+    "target": "2026-11-04T11:39:52Z",
+    "hardDeadline": "2026-11-04T11:54:52Z",
+    "baseCommit": "d12914f00e837a349199640b307c253602f4e81b",
+    "scope": "At idle expiry re-read enabled and idleSleepOn; reject when currently disabled. Preserve enabled idle suppression/sleep order, no-audio/no-close behavior, config, scheduling, cancellation, duration/overnight/native Android idle and other receivers. No immediate rearm/cancel policy.",
+    "authorization": "Autonomous local verified room delivery; root owns devices. No phone, household source/media/provider/account or GitHub authentication/push/publication.",
+    "candidateCalendarHold": {
+      "originalDiscoveryAt": "2026-11-04T11:24:52Z",
+      "firstSourceWitnessAt": "2026-11-04T11:26:04Z",
+      "target": "2026-11-04T11:39:52Z",
+      "hardDeadline": "2026-11-04T11:54:52Z",
+      "status": "Unselected source witness: recurrence calendar uses device zone after DTSTART zone is resolved; no test or edit yet."
+    }
+  },
+  "gatesCollectedAt": "2026-11-04T11:38:54.540281+00:00",
+  "wholeProductGoal": "active",
+  "turnOutcome": "progress",
+  "closedAt": "2026-11-04T11:39:14.727156+00:00",
+  "originalElapsedMinutes": 14.378785933333335,
+  "selectedElapsedMinutes": 11.422493816666668,
+  "targetMet": true,
+  "hardDeadlineMet": true,
+  "strictDocsBuildPassed": true,
+  "ownerRegistriesUnchanged": true,
+  "ownedRegistryAndDocsCopiesRemoved": true,
+  "publicVersionManifestByteExact": true
+}
