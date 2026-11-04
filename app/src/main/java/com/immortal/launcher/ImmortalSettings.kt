@@ -77,6 +77,7 @@ object ImmortalSettings {
       val maApiToken: String = "",
       // Canonical raw MA player_id, never a display name; blank leaves player selection unset.
       val maPlayerId: String = "",
+      val stayInStartupApp: Boolean = false,
   )
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -100,6 +101,7 @@ object ImmortalSettings {
         maPassword = p.getString("ma_password", "") ?: "",
         maApiToken = p.getString("ma_api_token", "") ?: "",
         maPlayerId = p.getString("ma_player_id", "") ?: "",
+        stayInStartupApp = p.getBoolean("stay_in_startup_app", false),
     )
   }
 
@@ -108,6 +110,9 @@ object ImmortalSettings {
 
   fun setSettingsTheme(c: Context, theme: String) =
       prefs(c).edit().putString("settings_theme", theme).apply()
+
+  fun setStayInStartupApp(c: Context, enabled: Boolean) =
+      prefs(c).edit().putBoolean("stay_in_startup_app", enabled).apply()
 
   fun settingsTheme(c: Context): String = prefs(c).getString("settings_theme", "light") ?: "light"
   fun advancedSettings(c: Context): Boolean = prefs(c).getBoolean("advanced_settings", false)
@@ -126,7 +131,7 @@ object ImmortalSettings {
   fun observeSnapshot(c: Context, changed: () -> Unit): () -> Unit =
       observeSettingsPreferenceChanges(prefs(c), setOf(
           "settings_theme", "weather_unit", "weather_widget", "tile_size",
-          "clock_format", "show_mini_player", "hide_status_bar",
+          "clock_format", "show_mini_player", "hide_status_bar", "stay_in_startup_app",
       ), changed)
 
   /** Connection subscription owned by config; dispose when the player controller stops observing.

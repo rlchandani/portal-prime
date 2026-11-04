@@ -1,18 +1,57 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T22:28:05.630449+00:00",
-  "updatedLabel": "Chime clock-event correction delivered1.180 to both rooms",
+  "updatedAt": "2026-11-04T22:54:18.016710+00:00",
+  "updatedLabel": "4 November2026 \u00b71.181 startup focus option delivered",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.180/code174, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.181/code175, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "startup-app-foreground",
+      "title": "Startup: keep a chosen app visible after boot",
+      "summary": "Optional default-off startup focus setting delivered in1.181 to both rooms.",
+      "status": "delivered",
+      "kind": "Bounded requested startup feature",
+      "platforms": [
+        "portal",
+        "browser"
+      ],
+      "owner": "Root implementation and delivery; independent source review",
+      "verification": "4,616 JVM/481 suites and both builds pass. Family native row inspected off; both live schemas false.",
+      "deployment": "Exact optimized1.181/code175 fully hashed both rooms, one install each.",
+      "acceptance": [
+        "Keep existing Home return by default.",
+        "Enabled plus successful dispatch skips final Home; missing/failed apps fall back.",
+        "Always finish pending receiver work.",
+        "Use one registry definition for native, browser and search."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, verification, delivery and limitations",
+          "source": "docs/portal-boot-foreground-2026-11-04.md"
+        }
+      ],
+      "limits": [
+        "Real reboot, Android background start admission, third-party app foreground retention and scheduler timing are unverified.",
+        "Family native control visually checked while off; no option toggle or real phone interaction. Living mounted UI not separately checked.",
+        "Baseline assertions establish the new feature was absent, not an existing bug reproduction. Initial fixture assumed string true rejection; repaired to numeric1 using existing BoolSpec contract.",
+        "Black screensaver handoff and other held issues retain their original clocks."
+      ],
+      "next": "Real reboot/third-party foreground acceptance remains separate; continue the actionable UX and reliability queue.",
+      "issueClock": {
+        "startedAt": "2026-11-04T22:28:54Z",
+        "target": "2026-11-04T22:43:54Z",
+        "deadline": "2026-11-04T22:58:54Z",
+        "firstDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "chime-clock-change-rearm",
       "title": "Ambient chimes: follow clock and timezone changes",

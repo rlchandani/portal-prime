@@ -36,22 +36,30 @@ class BootReceiver : BroadcastReceiver() {
       MqttService.sync(context)
       // (Re)launch apps that can't restart themselves (e.g. the MA/Sendspin player,
       // which has no boot receiver). Wait a few seconds first so WiFi is up for their
-      // first connect, then hand the screen back to our home so the Portal doesn't sit
-      // on a third-party app (the launched app keeps connecting in the background).
+      // first connect, then return Home unless the user chose to stay in a startup app.
       // Keep the receiver alive across the delays with goAsync().
       if (BootLaunch.packages(context).isNotEmpty()) {
         val pending = goAsync()
         val h = Handler(Looper.getMainLooper())
-        h.postDelayed({ runCatching { BootLaunch.launchAll(context) } }, BOOT_LAUNCH_DELAY_MS)
+        var launched = 0
+        h.postDelayed(
+            { launched = runCatching { BootLaunch.launchAll(context) }.getOrDefault(0) },
+            BOOT_LAUNCH_DELAY_MS)
         h.postDelayed(
             {
               runCatching {
-                context.startActivity(
-                    Intent(Intent.ACTION_MAIN)
-                        .addCategory(Intent.CATEGORY_HOME)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                BootLaunch.finishStartup(
+                    stayInApp = runCatching { ImmortalSettings.load(context).stayInStartupApp }
+                        .getOrDefault(false),
+                    launched = launched,
+                    returnHome = {
+                      context.startActivity(
+                          Intent(Intent.ACTION_MAIN)
+                              .addCategory(Intent.CATEGORY_HOME)
+                              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    },
+                    finish = { pending.finish() })
               }
-              pending.finish()
             },
             BOOT_HOME_DELAY_MS)
       }

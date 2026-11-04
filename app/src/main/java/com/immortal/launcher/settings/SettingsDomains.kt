@@ -663,7 +663,14 @@ object SettingsDomains {
                       set = ImmortalSettings::setHideStatusBar,
                       help =
                           "Hidden by default for a cleaner full-screen look. Swipe down from the top to reveal it briefly."),
-                  // NOTE: `constrainPageWidth` removed — no consumer ever read it. See audit.
+                   BoolSpec(
+                       "stayInStartupApp",
+                       "Stay in startup app",
+                       get = { it.stayInStartupApp },
+                       set = ImmortalSettings::setStayInStartupApp,
+                       help = "After reboot, keep the last app that launches on screen. " +
+                           "Off returns to Immortal. Takes effect at the next reboot."),
+                   // NOTE: `constrainPageWidth` removed — no consumer ever read it. See audit.
                   BoolSpec(
                       "multiRoomEnabled",
                       "Multi-room audio",
@@ -728,6 +735,7 @@ object SettingsDomains {
                   "showMiniPlayer" to "Home screen",
                   "hideStatusBar" to "Home screen",
                   "clockFormat" to "Clock",
+                   "stayInStartupApp" to "Startup",
                   "multiRoomEnabled" to "Audio",
                   "snapcastHost" to "Audio",
                   "maPort" to "Audio",

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "status": "delivered",
+  "scope": "Default-off stay in startup app option",
+  "issue": "https://github.com/starbrightlab/immortal/issues/267",
+  "version": {
+    "name": "1.181",
+    "code": 175
+  },
+  "artifacts": {
+    "debug": {
+      "sha256": "650a973b21969f6992613d406f55afa2cbeb6f81f26ef197f4af73a18ca511e5",
+      "bytes": 46745710,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "sha256": "e4770e5500f0a82ad94a5a95facecf5ed0620329f7dd53e0752c8754bcbf9e2c",
+      "bytes": 25886947,
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "jvm": {
+    "tests": 4616,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 481
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 46.59199975000229
+  },
+  "sourceReview": {
+    "accepted": true,
+    "blockers": [],
+    "bindingsRehashed": 9
+  },
+  "nativeUI": {
+    "exactInstalledVersion": "1.181",
+    "path": "Settings > Advanced > Start on boot",
+    "controlTextPresent": true,
+    "optionValueVerifiedFalseThroughSchema": true,
+    "settingToggled": false,
+    "screenshotPrivate": true
+  },
+  "deployment": {
+    "family": {
+      "bytes": 25886947,
+      "sha256": "e4770e5500f0a82ad94a5a95facecf5ed0620329f7dd53e0752c8754bcbf9e2c",
+      "app": {
+        "versionCode": 175,
+        "versionName": "1.181"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25886947,
+        "sha256": "e4770e5500f0a82ad94a5a95facecf5ed0620329f7dd53e0752c8754bcbf9e2c",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 175,
+          "versionName": "1.181"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "screensaverAndSourcesMapsIdentical": true,
+      "completeLayoutContentIdentical": true,
+      "settingsRevisionSingleDefaultAdditionVerified": true,
+      "profileExistingFieldsIdentical": true,
+      "newStartupControlDefaultFalse": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1502,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "screensaverAndSourcesMapsIdentical": true,
+      "completeLayoutContentIdentical": true,
+      "settingsRevisionSingleDefaultAdditionVerified": true,
+      "profileExistingFieldsIdentical": true,
+      "newStartupControlDefaultFalse": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1502,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRetired": true,
+    "ownerRegistriesUnchanged": true,
+    "ownedDeviceUiScratchRetired": true,
+    "phoneCommands": 0,
+    "deviceReboots": 0,
+    "thirdPartyAppLaunches": 0,
+    "settingToggles": 0
+  },
+  "issueClock": {
+    "startedAt": "2026-11-04T22:28:54Z",
+    "target": "2026-11-04T22:43:54Z",
+    "deadline": "2026-11-04T22:58:54Z",
+    "firstDiscoveryClockRetained": true
+  },
+  "limits": [
+    "Real reboot, Android background start admission, third-party app foreground retention and scheduler timing are unverified.",
+    "Family native control visually checked while off; no option toggle or real phone interaction. Living mounted UI not separately checked.",
+    "Baseline assertions establish the new feature was absent, not an existing bug reproduction. Initial fixture assumed string true rejection; repaired to numeric1 using existing BoolSpec contract.",
+    "Black screensaver handoff and other held issues retain their original clocks."
+  ]
+}

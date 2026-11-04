@@ -15,7 +15,7 @@ object SettingsPresentation {
       "alpaca", "options", "speed", "apk", "managed", "debug", "ha-entities")
   private val advancedControls = setOf(
       "calendarpacks.romanian", "calendarpacks.irish", "calendarpacks.prayer",
-      "immortal.hideStatusBar", "sources.albumRefresh", "screensaver.cacheEnabled",
+      "immortal.hideStatusBar", "immortal.stayInStartupApp", "sources.albumRefresh", "screensaver.cacheEnabled",
       "screensaver.batterySaver", "screensaver.presenceMode", "screensaver.idleSleepMin",
       "screensaver.closeAppOnSleep", "screensaver.ambientDashboard", "screensaver.gestureWave",
       "dismiss.haPath", "welcome.durationMs", "welcome.voice", "welcome.greetingNight",
@@ -32,6 +32,7 @@ object SettingsPresentation {
       "mqtt.validateCert", "digitalclock.style", "digitalclock.color", "digitalclock.font",
       "digitalclock.glow", "debug.enabled", "ha.url", "ha.token")
   private val shortHelp = mapOf(
+      "immortal.stayInStartupApp" to "Keep the last app that launches after reboot. Off returns to Immortal.",
       "immortal.maApiToken" to "API token preferred. Blank keeps the saved token; provider credentials stay on the server.",
       "immortal.maPlayerId" to "Raw Music Assistant player_id, up to 256 printable characters; blank leaves selection unset.",
       "calendarpacks.romanian" to "Today’s name-days and Orthodox feasts.",

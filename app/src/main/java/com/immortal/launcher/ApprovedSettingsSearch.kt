@@ -41,6 +41,7 @@ internal fun approvedPageForControl(domain: String, key: String): String? = when
         "advancedSettings" -> "advanced"
         "settingsTheme", "tileSize", "showMiniPlayer", "hideStatusBar", "clockFormat" -> "appearance"
         "weatherUnit", "weatherWidget" -> "weather"
+        "stayInStartupApp" -> "boot"
         "multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword",
         "maApiToken", "maPlayerId" -> "multiroom"
         else -> null

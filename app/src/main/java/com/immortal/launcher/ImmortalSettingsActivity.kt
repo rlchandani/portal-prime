@@ -1932,6 +1932,14 @@ internal fun BootAppsContent() {
   val context = LocalContext.current.applicationContext
   val owner = LocalLifecycleOwner.current
   val pageActive = LocalApprovedLauncherPageActive.current
+  var startupSettings by remember(context) { mutableStateOf(ImmortalSettings.load(context)) }
+  OnResume { startupSettings = ImmortalSettings.load(context) }
+  DisposableEffect(context, pageActive) {
+    val stop = if (pageActive) ImmortalSettings.observeSnapshot(context) {
+      startupSettings = ImmortalSettings.load(context)
+    } else null
+    onDispose { stop?.invoke() }
+  }
   var apps by remember(context) { mutableStateOf<List<BootAppOption>?>(null) }
   var selected by remember(context) { mutableStateOf<Set<String>>(emptySet()) }
   var loading by remember(context) { mutableStateOf(true) }
@@ -2001,6 +2009,12 @@ internal fun BootAppsContent() {
       else -> "Startup apps ready"
     }
   }) {
+    val domain = SettingsDomains.immortal
+    SettingsRows(domain, startupSettings,
+        exclude = domain.specs.map { it.key }.toSet() - "stayInStartupApp") { key, value ->
+      domain.apply(context, JSONObject().put(key, value))
+      startupSettings = ImmortalSettings.load(context)
+    }
     problem?.let { message ->
       FooterNote(message)
       if (apps != null) FooterNote("Last confirmed choices are shown.")

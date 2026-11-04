@@ -65,15 +65,32 @@ object BootLaunch {
    * needs an exemption on Android 10 (SYSTEM_ALERT_WINDOW, which provisioning grants);
    * Android 9 has no background-activity-start restriction, so it's unrestricted there.
    */
-  fun launchAll(context: Context) {
+  fun launchAll(context: Context): Int {
     val pm = context.packageManager
+    var launched = 0
     packages(context).forEach { pkg ->
       runCatching {
         pm.getLaunchIntentForPackage(pkg)?.let { intent ->
           intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
           context.startActivity(intent)
+          launched++
         }
       }
+    }
+    return launched
+  }
+
+  /** Keep the last dispatched app only on opt-in; always release the pending boot receiver. */
+  internal fun finishStartup(
+      stayInApp: Boolean,
+      launched: Int,
+      returnHome: () -> Unit,
+      finish: () -> Unit,
+  ) {
+    try {
+      if (!stayInApp || launched <= 0) returnHome()
+    } finally {
+      finish()
     }
   }
 }
