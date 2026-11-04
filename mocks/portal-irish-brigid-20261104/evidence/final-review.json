@@ -1,0 +1,338 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "reviewedAt": "2026-11-04T20:38:46.414Z",
+  "scope": "Irish St Brigid public-holiday date label in existing offline pack",
+  "clock": {
+    "original": "2026-11-04T20:29:13Z",
+    "target": "2026-11-04T20:44:13Z",
+    "hard": "2026-11-04T20:59:13Z",
+    "originalClockRetained": true
+  },
+  "findings": [
+    "Whole IrishHolidays source reconstructs exactly from its before copy through the two existing February branches plus the explanatory comment. February 1 receives the existing bank label on Monday or Friday only from 2023; first Monday excludes day 4 and pre-2023 years. All other holiday, Easter, Calendar input and label bytes remain unchanged.",
+    "The first Monday is February 4 exactly when February 1 is Friday. The fixed February 1 branch handles that Friday exception and Monday February 1 without the earlier saint-only return suppressing the bank label. Other February 1 observances retain the saint label.",
+    "The live 12-method test is byte-identical to the frozen test. Seventeen literal Gregorian dates also assert supplied Calendar immutability. Original baseline XML has 12 testcase children, four intended org.junit.ComparisonFailure outcomes and eight controls; candidate leaf has 12 actual cases and no negative outcomes.",
+    "Baseline admission corrects an initial wrapper classifier that required the exact AssertionError type: ComparisonFailure is an AssertionError subtype. The same original failed terminal/XML was admitted, with no baseline rerun or assertion change.",
+    "CalendarPacks.headerLines directly calls IrishHolidays.forToday(now) when the existing Irish pack is enabled, then prefixes the nonempty label. Current consumer inspected and bound; no settings or display change is required.",
+    "Build terminal reports exit 0 without timeout in 103.167858542s; build log includes JVM/debug/performance/R8/vital success. Independent full XML replay finds 4585 actual testcase children in 477 suites, matching headers, zero failure/error/skipped outcomes.",
+    "Whole build.gradle reconstructs from before bytes by only 170→171 and 1.176→1.177. Both candidate APK lengths and SHA256 independently match the retained artifact receipt. The bound root verifier records package com.immortal.launcher.debug and unchanged signer 4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6 for both exact APKs.",
+    "Independently decoded ZIP payloads for both candidates and retained 1.176 baselines. All 23 source assets match current source, receipt and baseline bytes; asset entry sets agree. Debug assets are exact; performance changes only assets/dexopt/baseline.prof with preserved pro-NUL header."
+  ],
+  "sourceReconstruction": {
+    "wholeProductionExactTwoBranchReplacement": true,
+    "sourceBeforeSha256": "cb97686be36863c4dabc89a32aeb42dd9229094eaa30055e2512e22318dda0ae",
+    "sourceAfterSha256": "16ace7361850906fd5c9dca235b5736103fe1834c30abc9eca8bf9f969d06700",
+    "versionOnlyExactReplacement": true,
+    "frozenTestExact": true
+  },
+  "tests": {
+    "baseline": {
+      "tests": 12,
+      "failures": 4,
+      "errors": 0,
+      "skipped": 0,
+      "controls": 8,
+      "failureType": "org.junit.ComparisonFailure"
+    },
+    "candidate": {
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "literalDateChecks": 17,
+    "calendarInputImmutabilityChecked": true
+  },
+  "jvm": {
+    "xmlDirectory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "tests": 4585,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 477,
+    "testcases": 4585,
+    "aggregateSha256": "c62469f98b1d8682f1f69c836d00e0dd3d87c7c8cd6392998b632862f084be4f",
+    "aggregateDefinition": "SHA256 of UTF-8 concatenation in sorted TEST-*.xml filename order: filename + NUL + SHA256(file bytes) + NUL + decimal byte length + newline."
+  },
+  "sourceAssets": {
+    "root": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets",
+    "fileCount": 23,
+    "files": [
+      {
+        "path": "catalog.json",
+        "bytes": 24043,
+        "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+      },
+      {
+        "path": "diagnostics/source-preview-4k.mp4",
+        "bytes": 25847,
+        "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+      },
+      {
+        "path": "faces/Flip-Regular.otf",
+        "bytes": 3184,
+        "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+      },
+      {
+        "path": "faces/flip.html",
+        "bytes": 29379,
+        "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+      },
+      {
+        "path": "fonts/BebasNeue.ttf",
+        "bytes": 61400,
+        "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+      },
+      {
+        "path": "fonts/OFL.txt",
+        "bytes": 1186,
+        "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+      },
+      {
+        "path": "photoframe_fallback/01_wilderness.jpg",
+        "bytes": 261090,
+        "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+      },
+      {
+        "path": "photoframe_fallback/02_denali.jpg",
+        "bytes": 277842,
+        "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+      },
+      {
+        "path": "photoframe_fallback/03_yosemite.jpg",
+        "bytes": 443801,
+        "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+      },
+      {
+        "path": "remote/control-center.css",
+        "bytes": 24082,
+        "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+      },
+      {
+        "path": "remote/control-center.js",
+        "bytes": 270231,
+        "sha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+      },
+      {
+        "path": "remote/core.mjs",
+        "bytes": 28623,
+        "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+      },
+      {
+        "path": "screensaver/cinema-grain.png",
+        "bytes": 12657,
+        "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+      },
+      {
+        "path": "screensaver/index.html",
+        "bytes": 7785,
+        "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+      },
+      {
+        "path": "screensaver/lib-engine.js",
+        "bytes": 5582,
+        "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+      },
+      {
+        "path": "screensaver/mode-impls.js",
+        "bytes": 70273,
+        "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+      },
+      {
+        "path": "screensaver/modes.js",
+        "bytes": 13499,
+        "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+      },
+      {
+        "path": "screensaver/photo-doodles-dark.svg",
+        "bytes": 1247,
+        "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+      },
+      {
+        "path": "screensaver/photo-doodles.svg",
+        "bytes": 1246,
+        "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+      },
+      {
+        "path": "screensaver/photos.js",
+        "bytes": 8528,
+        "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+      },
+      {
+        "path": "screensaver/scheduler.js",
+        "bytes": 14433,
+        "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+      },
+      {
+        "path": "screensaver/styles.css",
+        "bytes": 15397,
+        "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+      },
+      {
+        "path": "webapp-retention-probe.html",
+        "bytes": 504,
+        "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+      }
+    ],
+    "aggregateSha256": "884d3ef5dbd72dfda10c9ef4f770a2b42299c2ba341ebcfa7dc5b6b5d0fd8848",
+    "aggregateDefinition": "SHA256 of UTF-8 concatenation in sorted relative source-asset path order: path + NUL + SHA256(file bytes) + NUL + decimal byte length + newline."
+  },
+  "artifacts": {
+    "debug": "/private/tmp/portal-irish-brigid-20261104-202913/candidate-debug-1.177.apk",
+    "performance": "/private/tmp/portal-irish-brigid-20261104-202913/candidate-performance-1.177.apk",
+    "versionCode": 171,
+    "versionName": "1.177",
+    "packagedSourceAssetsIndependentlyVerified": true,
+    "baselineZipComparisons": [
+      {
+        "variant": "debug",
+        "sourceAssetsExact": 23,
+        "assetEntrySetExactToBaseline": true,
+        "changedGeneratedProfileEntries": []
+      },
+      {
+        "variant": "performance",
+        "sourceAssetsExact": 23,
+        "assetEntrySetExactToBaseline": true,
+        "changedGeneratedProfileEntries": [
+          "assets/dexopt/baseline.prof"
+        ]
+      }
+    ],
+    "manifestAndCryptographicSignatureValidation": "Root-owned retained verifier receipt bound to independently hashed APKs; reviewer did not invoke SDK/aapt/apksigner."
+  },
+  "qualifications": [
+    "Authority is the official government/WRC search text recorded by root: from 2023, first Monday in February except Friday February 1. Direct full-page opens failed 403/404; no fresh full-page read or independent network retrieval is claimed.",
+    "Acceptance covers actual public forToday JVM behavior on generated Gregorian/Dublin dates and static consumer integration. No mounted screensaver/UI/native/optimized runtime/API28/Living pixels, real device clock, household pack configuration, astronomy-wide calendar or performance acceptance.",
+    "Registry preflight metadata only was read and bound; no private owner records, tokens, preferences, devices or provider operations were inspected. Root owns later promotion and preservation.",
+    "Reviewer performed static source/XML/ZIP/hash checks only, with no tests, builds, SDK, Git, network, device, provider or phone execution. Only this private review JSON was written. Earlier expired/held issues and pending human priority choice remain separate."
+  ],
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/scope.json",
+      "bytes": 728,
+      "sha256": "914b3457a2ddb4c032cd21ee5cad438f3e4fcd1b86b306b6b6386eb74a436df8"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/test-preparation.json",
+      "bytes": 317,
+      "sha256": "c5b720ad2de978a7e9cd0fadbeeb92e250b9ed8c35443ba43970a4220056ae72"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/baseline.json",
+      "bytes": 1392,
+      "sha256": "d4db28d6bbd6b342b6b5a4c2a8efb5ea9c14fbfccfe06618b7c96ec15907717e"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/baseline-admission.json",
+      "bytes": 288,
+      "sha256": "2367a0078006190629c3e3816e25241c231fed4f948d204e7b4ab809ac7b5457"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/source-change.json",
+      "bytes": 387,
+      "sha256": "00746026a48748b50ab4e749514e4b7e150b57909fb9c9dabb8f653b85900bf2"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/build-terminal.json",
+      "bytes": 278,
+      "sha256": "ab47b5f844c354ef19838c0cdcd98feb8d9613d683098380585d9add1b4dc149"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/promotion-artifacts.json",
+      "bytes": 9930,
+      "sha256": "f7163c03f5377821e04408e5356d93febcc169b1d4a7c5a2bf17eb3bb231acb8"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/registry-preflight.json",
+      "bytes": 258,
+      "sha256": "7fe2740488dcb3a8f0df76c6a7588d2f29bab932a5d013240073b7e88db3c721"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/baseline.log",
+      "bytes": 2726,
+      "sha256": "3ccc4f427bb9b8eda642f735f1472c13a2d3b76b996166a3b1ee5f341b0e31b0"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/baseline.xml",
+      "bytes": 19164,
+      "sha256": "b304adc275e04bce39717208921cf2aafb12b48a1110494d4d749847617bae5e"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/build.log",
+      "bytes": 13723,
+      "sha256": "6d506efd4a3a1e97727747ce03374112b3292e467408d0eb3e502f81f8a57389"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/candidate-test.json",
+      "bytes": 314,
+      "sha256": "6eca8e28bd80b18a992ead680dcf01b53663e476c2b4200a416db07fa1a5b5ab"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/IrishHolidays.kt.before",
+      "bytes": 3011,
+      "sha256": "cb97686be36863c4dabc89a32aeb42dd9229094eaa30055e2512e22318dda0ae"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/IrishBrigidHolidayTest.frozen.kt",
+      "bytes": 2418,
+      "sha256": "b6be3eeca8b3fd2bc6f9581324b70db2fbd242a50b35e4c78ce815f9cf26241a"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/build.gradle.kts.before",
+      "bytes": 11816,
+      "sha256": "7d2639656bf79d1e9ddf546445248233dcaef69d8c862a5b4b10b640e00550c5"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/verify-artifacts.py",
+      "bytes": 3769,
+      "sha256": "8dea3ffefa0418e5307e62bbffc7c0f16c47939157bb2c4f0189d6e1972c8530"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/IrishHolidays.kt",
+      "bytes": 3240,
+      "sha256": "16ace7361850906fd5c9dca235b5736103fe1834c30abc9eca8bf9f969d06700"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/IrishBrigidHolidayTest.kt",
+      "bytes": 2418,
+      "sha256": "b6be3eeca8b3fd2bc6f9581324b70db2fbd242a50b35e4c78ce815f9cf26241a"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CalendarPacks.kt",
+      "bytes": 3282,
+      "sha256": "eb56f3b408c70bdd98006e4f8d311b3b178a7f2a201f2e5e5351b35a85a0701f"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "a7f0217151615d8cebaa7723d925ccaad05dc884ebb2730ab14e337756418940"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.IrishBrigidHolidayTest.xml",
+      "bytes": 1911,
+      "sha256": "928719f81fec5f7f8b3f43cfea111a51dff1fd333d67f523a68a79ab22714350"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/candidate-debug-1.177.apk",
+      "bytes": 46745710,
+      "sha256": "8365a999415977ccce2896f37d60d47c422defe6eeeb74af91ff0f2b33655d75"
+    },
+    {
+      "path": "/private/tmp/portal-stock-price-fallback-20261104-194200/candidate-debug-1.176.apk",
+      "bytes": 46745714,
+      "sha256": "a1ee7dbef224b949b34b6bc02baf8a355bea706642dd95063c313f02b6145feb"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/candidate-performance-1.177.apk",
+      "bytes": 25886951,
+      "sha256": "11e5fb73f19e6128af953c39910ae5941f9f58a64a5bcbee6d0d5fcea06d3a3e"
+    },
+    {
+      "path": "/private/tmp/portal-stock-price-fallback-20261104-194200/candidate-performance-1.176.apk",
+      "bytes": 25886951,
+      "sha256": "b57129ef929e39c430fd56ee6b667db7fef0c1b1961fc4c92afcf75ca016cb35"
+    }
+  ]
+}

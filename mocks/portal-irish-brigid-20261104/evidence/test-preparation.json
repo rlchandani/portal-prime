@@ -1,0 +1,8 @@
+{
+  "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/IrishBrigidHolidayTest.kt",
+  "bytes": 2418,
+  "sha256": "b6be3eeca8b3fd2bc6f9581324b70db2fbd242a50b35e4c78ce815f9cf26241a",
+  "cases": 12,
+  "expectedRegressionFailures": 4,
+  "expectedControls": 8
+}

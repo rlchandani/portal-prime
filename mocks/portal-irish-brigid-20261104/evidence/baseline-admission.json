@@ -1,0 +1,11 @@
+{
+  "accepted": true,
+  "failures": 4,
+  "controls": 8,
+  "errors": 0,
+  "skips": 0,
+  "actualFailureType": "org.junit.ComparisonFailure (AssertionError subtype)",
+  "initialWrapperClassifierRejectedExactType": true,
+  "sameOriginalTerminalEvidenceUsed": true,
+  "baselineRerun": false
+}

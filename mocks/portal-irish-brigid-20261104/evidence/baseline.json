@@ -1,0 +1,38 @@
+{
+  "exitCode": 1,
+  "durationSeconds": 8.248219582994352,
+  "completedAt": "2026-11-04T20:33:47.234638+00:00",
+  "counts": {
+    "name": "com.immortal.launcher.IrishBrigidHolidayTest",
+    "tests": "12",
+    "skipped": "0",
+    "failures": "4",
+    "errors": "0",
+    "timestamp": "2026-11-04T20:33:46.348Z",
+    "hostname": "iRedlofs-Mac-mini-3.local",
+    "time": "0.008"
+  },
+  "failures": [
+    {
+      "name": "mondayFebruaryFirstRetainsTheBankHolidayLabel",
+      "type": "org.junit.ComparisonFailure",
+      "message": "org.junit.ComparisonFailure: 2027-2-1 expected:<St Brigid's Day[ (bank holiday)]> but was:<St Brigid's Day[]>"
+    },
+    {
+      "name": "mondayAfterFridayFebruaryFirstIsNotAnotherBankHoliday",
+      "type": "org.junit.ComparisonFailure",
+      "message": "org.junit.ComparisonFailure: 2030-2-4 expected:<[]> but was:<[St Brigid's Day (bank holiday)]>"
+    },
+    {
+      "name": "fridayFebruaryFirstIsTheBankHoliday",
+      "type": "org.junit.ComparisonFailure",
+      "message": "org.junit.ComparisonFailure: 2030-2-1 expected:<St Brigid's Day[ (bank holiday)]> but was:<St Brigid's Day[]>"
+    },
+    {
+      "name": "firstMondayBeforeIntroductionIsNotABankHoliday",
+      "type": "org.junit.ComparisonFailure",
+      "message": "org.junit.ComparisonFailure: 2022-2-7 expected:<[]> but was:<[St Brigid's Day (bank holiday)]>"
+    }
+  ],
+  "testFrozen": true
+}

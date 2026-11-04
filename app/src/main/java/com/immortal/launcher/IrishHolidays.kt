@@ -28,7 +28,8 @@ object IrishHolidays {
     // Fixed-date holidays + saints.
     when (m to d) {
       1 to 1 -> return "New Year's Day"
-      2 to 1 -> return "St Brigid's Day"
+      2 to 1 -> return if (y >= 2023 && (dow == Calendar.MONDAY || dow == Calendar.FRIDAY))
+          "St Brigid's Day (bank holiday)" else "St Brigid's Day"
       3 to 17 -> return "St Patrick's Day"
       6 to 9 -> return "St Columba's Day"
       12 to 25 -> return "Christmas Day"
@@ -37,7 +38,9 @@ object IrishHolidays {
 
     // Movable bank holidays (first/last Monday of certain months).
     if (dow == Calendar.MONDAY) {
-      if (m == 2 && weekOfMonth == 1) return "St Brigid's Day (bank holiday)"
+      // February's first Monday is the 4th exactly when February 1 is Friday.
+      if (m == 2 && weekOfMonth == 1 && d != 4 && y >= 2023)
+          return "St Brigid's Day (bank holiday)"
       if (m == 5 && weekOfMonth == 1) return "May Bank Holiday"
       if (m == 6 && weekOfMonth == 1) return "June Bank Holiday"
       if (m == 8 && weekOfMonth == 1) return "August Bank Holiday"

@@ -1,0 +1,10 @@
+{
+  "tests": 12,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "xmlSha256": "928719f81fec5f7f8b3f43cfea111a51dff1fd333d67f523a68a79ab22714350",
+  "testFrozen": true,
+  "actualFunction": "IrishHolidays.forToday",
+  "limits": "Generated Gregorian date inputs; no rendered/native pack or changed device clock."
+}

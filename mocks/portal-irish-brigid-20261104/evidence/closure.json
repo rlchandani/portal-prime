@@ -1,0 +1,11 @@
+{
+  "startedAt": "2026-11-04T20:29:13+00:00",
+  "deliveryPreservationCleanupAt": "2026-11-04T20:42:49.029874+00:00",
+  "elapsedMinutes": 13.600497899999999,
+  "targetMetAtDeliveryCleanup": true,
+  "originalHardStop": "2026-11-04T20:59:13+00:00",
+  "copiedRegistryRemoved": true,
+  "ownerRegistryUnchanged": true,
+  "phoneProviderHouseholdMediaPublicationOperations": false,
+  "wholeGoalComplete": false
+}
