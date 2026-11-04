@@ -1,0 +1,291 @@
+{
+  "ok": true,
+  "error": null,
+  "tests": 10,
+  "failures": 0,
+  "cases": [
+    {
+      "name": "february31",
+      "passed": true,
+      "errors": [],
+      "shouldSave": false,
+      "sentinelUnchanged": true,
+      "edits": 0,
+      "applies": 0,
+      "commits": 0,
+      "callbackPreferenceRequests": 0,
+      "rawUnchanged": true,
+      "labelAfter": "Trip",
+      "errorAfter": "Choose a valid date for this month and year.",
+      "eventsReferenceUnchanged": true,
+      "otherDraftValuesUnchanged": true
+    },
+    {
+      "name": "april31",
+      "passed": true,
+      "errors": [],
+      "shouldSave": false,
+      "sentinelUnchanged": true,
+      "edits": 0,
+      "applies": 0,
+      "commits": 0,
+      "callbackPreferenceRequests": 0,
+      "rawUnchanged": true,
+      "labelAfter": "Trip",
+      "errorAfter": "Choose a valid date for this month and year.",
+      "eventsReferenceUnchanged": true,
+      "otherDraftValuesUnchanged": true
+    },
+    {
+      "name": "commonYearFebruary29",
+      "passed": true,
+      "errors": [],
+      "shouldSave": false,
+      "sentinelUnchanged": true,
+      "edits": 0,
+      "applies": 0,
+      "commits": 0,
+      "callbackPreferenceRequests": 0,
+      "rawUnchanged": true,
+      "labelAfter": "Trip",
+      "errorAfter": "Choose a valid date for this month and year.",
+      "eventsReferenceUnchanged": true,
+      "otherDraftValuesUnchanged": true
+    },
+    {
+      "name": "nonLeapCenturyFebruary29",
+      "passed": true,
+      "errors": [],
+      "shouldSave": false,
+      "sentinelUnchanged": true,
+      "edits": 0,
+      "applies": 0,
+      "commits": 0,
+      "callbackPreferenceRequests": 0,
+      "rawUnchanged": true,
+      "labelAfter": "Trip",
+      "errorAfter": "Choose a valid date for this month and year.",
+      "eventsReferenceUnchanged": true,
+      "otherDraftValuesUnchanged": true
+    },
+    {
+      "name": "yearlyFebruary30",
+      "passed": true,
+      "errors": [],
+      "shouldSave": false,
+      "sentinelUnchanged": true,
+      "edits": 0,
+      "applies": 0,
+      "commits": 0,
+      "callbackPreferenceRequests": 0,
+      "rawUnchanged": true,
+      "labelAfter": "Trip",
+      "errorAfter": "Choose a valid date for this month and year.",
+      "eventsReferenceUnchanged": true,
+      "otherDraftValuesUnchanged": true
+    },
+    {
+      "name": "blankName",
+      "passed": true,
+      "errors": [],
+      "shouldSave": false,
+      "sentinelUnchanged": true,
+      "edits": 0,
+      "applies": 0,
+      "commits": 0,
+      "callbackPreferenceRequests": 0,
+      "rawUnchanged": true,
+      "labelAfter": "   ",
+      "errorAfter": "Enter a name.",
+      "eventsReferenceUnchanged": true,
+      "otherDraftValuesUnchanged": true
+    },
+    {
+      "name": "validFebruary28",
+      "passed": true,
+      "errors": [],
+      "shouldSave": true,
+      "sentinelUnchanged": true,
+      "edits": 1,
+      "applies": 1,
+      "commits": 0,
+      "callbackPreferenceRequests": 3,
+      "rawUnchanged": false,
+      "labelAfter": "",
+      "errorAfter": null,
+      "eventsReferenceUnchanged": false,
+      "otherDraftValuesUnchanged": true
+    },
+    {
+      "name": "validLeapYearFebruary29",
+      "passed": true,
+      "errors": [],
+      "shouldSave": true,
+      "sentinelUnchanged": true,
+      "edits": 1,
+      "applies": 1,
+      "commits": 0,
+      "callbackPreferenceRequests": 3,
+      "rawUnchanged": false,
+      "labelAfter": "",
+      "errorAfter": null,
+      "eventsReferenceUnchanged": false,
+      "otherDraftValuesUnchanged": true
+    },
+    {
+      "name": "validYearlyFebruary29",
+      "passed": true,
+      "errors": [],
+      "shouldSave": true,
+      "sentinelUnchanged": true,
+      "edits": 1,
+      "applies": 1,
+      "commits": 0,
+      "callbackPreferenceRequests": 3,
+      "rawUnchanged": false,
+      "labelAfter": "",
+      "errorAfter": null,
+      "eventsReferenceUnchanged": false,
+      "otherDraftValuesUnchanged": true
+    },
+    {
+      "name": "validLongNameRetainsExistingPolicy",
+      "passed": true,
+      "errors": [],
+      "shouldSave": true,
+      "sentinelUnchanged": true,
+      "edits": 1,
+      "applies": 1,
+      "commits": 0,
+      "callbackPreferenceRequests": 3,
+      "rawUnchanged": false,
+      "labelAfter": "",
+      "errorAfter": null,
+      "eventsReferenceUnchanged": false,
+      "otherDraftValuesUnchanged": true
+    }
+  ],
+  "preferenceRequests": [
+    {
+      "case": "february31",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "april31",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "commonYearFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "nonLeapCenturyFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "yearlyFebruary30",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "blankName",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validFebruary28",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validFebruary28",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validFebruary28",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validFebruary28",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validLeapYearFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validLeapYearFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validLeapYearFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validLeapYearFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validYearlyFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validYearlyFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validYearlyFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validYearlyFebruary29",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validLongNameRetainsExistingPolicy",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validLongNameRetainsExistingPolicy",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validLongNameRetainsExistingPolicy",
+      "name": "immortal_countdown",
+      "mode": 0
+    },
+    {
+      "case": "validLongNameRetainsExistingPolicy",
+      "name": "immortal_countdown",
+      "mode": 0
+    }
+  ],
+  "unexpectedPreferenceCalls": 0,
+  "sourceSha256": "616785092aefa22b5fb2ae0784baae0da7da567c83324d26cb3b49ce04bfc228",
+  "sourceBytes": 46745298,
+  "sdk": 29,
+  "actualEmbeddedApkClassLoader": true,
+  "actualCompiledAddCallback": true,
+  "callbackName": "CountdownSettingsContent$lambda$55$lambda$41$lambda$40$lambda$39",
+  "captureBinding": "after-month-first",
+  "fixturePackage": "com.immortal.countdowndatefixture",
+  "internetPermission": false,
+  "scope": "Actual compiled standalone editor Add callback only with JavaProxy draft state and generated fixture-local preferences; no mounted Compose UI, physical clicks, owner data, provider, network, optimized/API28 acceptance"
+}

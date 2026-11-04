@@ -1,0 +1,183 @@
+{
+  "ok": true,
+  "reviewedAt": "2026-11-04T10:54:40.296356+00:00",
+  "blockers": [],
+  "clock": {
+    "startedAt": "2026-11-04T10:40:15Z",
+    "target": "2026-11-04T10:55:15Z",
+    "deadline": "2026-11-04T11:10:15Z",
+    "sourceBase": "489b187b3b85224a5cff868cb84e2a481570bcbb",
+    "scope": "Reject impossible dates at the existing native countdown editor Add callback; retain name policy/storage/legacy records",
+    "priorClocksRetained": true,
+    "boundaries": [
+      "Root device operations only",
+      "No phone/provider/media/account/push/publication"
+    ]
+  },
+  "originalSourceReviewUntouched": true,
+  "sourceAcceptance": "Original exact two-line date-guard correction remains accepted; current source hash unchanged.",
+  "adapterReview": {
+    "jvmOnlyTwoImportsAndExactTwoSignatureInvocationAdapterChanged": true,
+    "allJVMCaseDeclarationsAndBusinessAssertionsByteIdentical": true,
+    "nativeOnlyFiveBindingOrObservationLinesChanged": true,
+    "nativeCaseCallsAndEntireCaseAssertionReportChunkByteIdentical": true,
+    "signatureBefore": "Context,label,stateError,emoji,monthInt,dayInt,yearly,yearInt,events",
+    "signatureAfter": "Context,label,stateError,monthInt,dayInt,yearly,yearInt,emoji,events",
+    "unknownSignatureRejected": true,
+    "compiledCallbackNotCopiedLogic": true,
+    "retainedFailedJVMArtifact": "10 java.lang.IllegalArgumentException failures from old adapter before callback execution; excluded from product regression evidence."
+  },
+  "nativeIndependentRecalculation": {
+    "beforeTests": 10,
+    "beforeFailures": 5,
+    "controls": 5,
+    "afterTests": 10,
+    "afterFailures": 0,
+    "failureCaseNames": [
+      "february31",
+      "april31",
+      "commonYearFebruary29",
+      "nonLeapCenturyFebruary29",
+      "yearlyFebruary30"
+    ],
+    "unchangedControlsExact": true,
+    "allSentinelsAndOtherDraftFieldsRetained": true,
+    "rejectedAfterZeroPreferenceRequestsEditsAppliesCommits": true,
+    "rejectedAfterExactRawLegacyBytesAndEventsReferenceRetained": true,
+    "validAfterExactlyOneEditorApplyAndExistingErrorLabelPolicyRetained": true,
+    "preferenceRequestsBefore": 37,
+    "preferenceRequestsAfter": 22,
+    "unexpectedRequests": 0,
+    "runtimeClassLoaderAndActualCallback": true,
+    "sourceAPKZipHashBindingsExact": true,
+    "sameFrozenV2JavaAndDEXForPairedRuns": true,
+    "bothRetirementsAllThreeAbsenceFieldsTrue": true
+  },
+  "jvmIndependentRead": {
+    "tests": 4444,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 464,
+    "correctedBaselineTests": 10,
+    "correctedBaselineAssertionFailures": 5,
+    "correctedBaselineControls": 5
+  },
+  "artifactBinding": {
+    "debug": "616785092aefa22b5fb2ae0784baae0da7da567c83324d26cb3b49ce04bfc228",
+    "performance": "082d56ebd559fa97ee44235fca84a2252a965ec541a559ec1ef1df9ccd437e83",
+    "version": "1.149",
+    "versionCode": 143,
+    "signerRecordedByCoordinator": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "scope": "APK byte and embedded fixture ZIP bindings independently recomputed; package/version/signer validation record bound, no fresh install/build performed."
+  },
+  "limits": [
+    "Host-only review, JSON expectation recomputation and actual artifact byte/ZIP hashing. No independent native execution or device absence check.",
+    "Generated fixture-local preferences and JavaProxy states call actual debug/API29 private Add callback; no mounted Compose UI, physical taps, owner data, provider/network, optimized/API28 runtime acceptance.",
+    "Unchanged native success gates include actual saved legacy fields/order, exact new row and actual sorted event identity reload, but raw accepted stored row values are not all emitted in JSON; acceptance binds unchanged gate source to paired execution.",
+    "Room promotion/owner preservation remain coordinator-owned and are not inspected in this receipt.",
+    "No production/test/build/device/network/Git actions and no reset of selected or unselected issue clocks."
+  ],
+  "bindings": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/CountdownEditorDateTest.kt": {
+      "sha256": "39fb89db8c57288720c75665ed755c2b31730071cd42d0471157ec32fee40011",
+      "bytes": 5839
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CountdownSettingsActivity.kt": {
+      "sha256": "19c4be5323f9c9072f96f78701945b93c5a79350fe2d6c36140cefa8213c23d2",
+      "bytes": 4963
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "8b2f6c53e36aaa2dad357711ee55d8bb5f5775ba987ff35549d8b969fb65348f",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/CountdownEditorDateTest.kt": {
+      "sha256": "ff639cfcb99970ea17a18f8563a4799287bdd1553d4a0c6a2df93a1579829ed9",
+      "bytes": 5060
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/CountdownEditorDateTest-binding-corrected.kt": {
+      "sha256": "39fb89db8c57288720c75665ed755c2b31730071cd42d0471157ec32fee40011",
+      "bytes": 5839
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/CountdownDateActivity.java": {
+      "sha256": "001eff5adca961ebe65d0d0aa11f350b57ee0b80a29af14c46c737a9a6e8a1e9",
+      "bytes": 13493
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/native-binding-v1/CountdownDateActivity.java": {
+      "sha256": "b6e08944acaf53ef31939cf778fdec65ed50032f095c9ff147e17b164f0869c2",
+      "bytes": 12694
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/frozen-dex/classes.dex": {
+      "sha256": "d01f30696b53b76adab1d08d8a5d5e9b0ce7f2a7d00e4febe8ef0be8c7824cfb",
+      "bytes": 19728
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/AndroidManifest.xml": {
+      "sha256": "b0479c34278907ca0c5a229c22a6aea748dd44a1ba58db1e110dfd0595d020ea",
+      "bytes": 450
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/preparation-verification.json": {
+      "sha256": "d02ef2bbaed9698b9f7f68774a77c5667b865bcd8e23b51d702b250940a23769",
+      "bytes": 3618
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/adapter-only-delta.json": {
+      "sha256": "d0a4d71896ac154280a061eb781c103020678bec010b22585fbfdabb87fb8a77",
+      "bytes": 1001
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native-candidate-preparation.json": {
+      "sha256": "7af0a2cfb5bcbc165f8955a82eb617e967f68e2c0059f3c4093e015053787780",
+      "bytes": 303
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/countdown-date-fixture.apk": {
+      "sha256": "822d500ce2b7f235dffac175afbefbc1fb75eb6c4125454ef1d6f668eac4e304",
+      "bytes": 37503466
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/baseline-fixture-v2.apk": {
+      "sha256": "1f255677a4ccecb7e7a5e445b657ef6ca2f738b5e12507ff1aff3632df249c04",
+      "bytes": 37503466
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/baseline-debug-1.148.apk": {
+      "sha256": "d15ee02d934b92b74658a4af6c09060232345d9fa78c3323666cc920450d8c45",
+      "bytes": 46745298
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/candidate-debug-1.149.apk": {
+      "sha256": "616785092aefa22b5fb2ae0784baae0da7da567c83324d26cb3b49ce04bfc228",
+      "bytes": 46745298
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/candidate-performance-1.149.apk": {
+      "sha256": "082d56ebd559fa97ee44235fca84a2252a965ec541a559ec1ef1df9ccd437e83",
+      "bytes": 25886647
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native-v2-before-report.json": {
+      "sha256": "13511c2a693ab93f8bcd00009ce956d51962a5b94c1d811db053b4afd5f5dfb2",
+      "bytes": 9771
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native-v2-after-report.json": {
+      "sha256": "7837ca0a2e25f920ec4eeb039414b776437aab3c17e254740723d7375990c588",
+      "bytes": 7388
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native-v2-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native-v2-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/baseline-callback-adapter-corrected.xml": {
+      "sha256": "b669e0bee047f9278d6e446f121fe7ca1b63d3479cbae91e1b46ddb08babb144",
+      "bytes": 24412
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/candidate-binding-failure.xml": {
+      "sha256": "ffabca237e537ba55808a99a3e3b41cdc76e4cbf4e3f42dd0df27c20489235df",
+      "bytes": 47285
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/promotion-artifacts.json": {
+      "sha256": "ffec6abd3ac8b7a7639714b0aeb4c51e19737109d4dd8d61db2d18d3bfe777d2",
+      "bytes": 4805
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/independent-source-review.json": {
+      "sha256": "777a28c97a50289b84fbf22ca5d384ca8441c23be27d282eda5119459acf4d33",
+      "bytes": 9886
+    }
+  }
+}

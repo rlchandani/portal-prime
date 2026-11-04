@@ -1,0 +1,82 @@
+{
+  "startedAtUtc": "2026-11-04T10:51:09.917339+00:00",
+  "finishedAtUtc": "2026-11-04T10:51:11.419110+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-04T10:40:15Z",
+    "target": "2026-11-04T10:55:15Z",
+    "deadline": "2026-11-04T11:10:15Z"
+  },
+  "gradleLogSha256": "1956b3e1e6a7aa43b396f90ed8ca14853b6503e845c9b2ac7b5a09d879213eee",
+  "gradleTerminal": "BUILD SUCCESSFUL in 58s",
+  "gradleExitEvidence": "Root confirmed exec42020 terminal0 at10:50:31UTC; log success independently checked",
+  "requiredBuildTasksPresent": true,
+  "r8TaskPresent": true,
+  "checks": [
+    {
+      "variant": "debug",
+      "aaptExit": 0,
+      "apksignerExit": 0,
+      "assetCount": 10,
+      "matchesSourceAndRollback": true,
+      "duplicateZipEntries": false,
+      "builtSnapshotExact": true,
+      "apkMode": "0400",
+      "apkMtimeUtc": "2026-11-04T10:48:41.451962+00:00"
+    },
+    {
+      "variant": "performance",
+      "aaptExit": 0,
+      "apksignerExit": 0,
+      "assetCount": 10,
+      "matchesSourceAndRollback": true,
+      "duplicateZipEntries": false,
+      "builtSnapshotExact": true,
+      "apkMode": "0400",
+      "apkMtimeUtc": "2026-11-04T10:49:29.311284+00:00"
+    }
+  ],
+  "baselineDebugSha256": "d15ee02d934b92b74658a4af6c09060232345d9fa78c3323666cc920450d8c45",
+  "rollbackSha256": "6c87f550b83d37e448ae4d7dc074db8c85958b1d0722ee213fef98c69e510385",
+  "sourceScope": {
+    "baselineActivitySha256": "ba2d92ba48cb3cbd5ef18b521b162876f0cce01eb5571542f1b48b4a4de57615",
+    "activityExactCapturedCandidate": true,
+    "activityExactTwoLineGuardAddition": true,
+    "protectedSha256": {
+      "CountdownConfig.kt": "7de6805d2c5d79b0dc034ec612a63725e119977f769de598ca89c094b4259afa",
+      "CountdownDates.kt": "ff6d3d80175531496c45a21d4e30bfa8dae4c15506218ac494c45cc2fcf00289",
+      "NativePhotoMatte.kt": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "NativePhotoView.kt": "8b942960302ba9bd0997d0eb8e44a94aded8a86391e34e24346dca2f7778b7a8",
+      "SlideshowStage.kt": "cd1329856b4be13e27cd63d598bd4847eb5dc389f20953dc954767efcb777ac0"
+    },
+    "protectedHashesExact": true,
+    "sourceSha256": {
+      "CountdownSettingsActivity.kt": "19c4be5323f9c9072f96f78701945b93c5a79350fe2d6c36140cefa8213c23d2",
+      "ApprovedToolsEverydayValidation.kt": "95180ca2a063e5a9170d230ee64104b1787a6b53efc33da16753975fc11b4167"
+    }
+  },
+  "frozenHostTest": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/CountdownEditorDateTest.kt",
+    "sha256": "39fb89db8c57288720c75665ed755c2b31730071cd42d0471157ec32fee40011",
+    "matchesCorrectedFrozenCopy": true,
+    "methods": 10,
+    "result": {
+      "file": "TEST-com.immortal.launcher.CountdownEditorDateTest.xml",
+      "sha256": "01b358eb0886a79ca562653f93b52247424d7200bc4ddeba9ac394cb2433a8bb",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "freshXml": {
+    "tests": 4444,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 464,
+    "minimumTimestampUtc": "2026-11-04T10:48:42.023000+00:00",
+    "maximumTimestampUtc": "2026-11-04T10:49:22.503000+00:00",
+    "sortedReportInventorySha256": "9b4484a4728e7a4aff177172887c7d7033c019c9756700124331747173780c84"
+  },
+  "limits": "Host artifact/source verification only; prior callback-binding failures excluded. Native editor/fixture and room promotion owned by root. No Git, build, device or network invoked by reviewer."
+}

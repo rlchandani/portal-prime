@@ -66,6 +66,8 @@ internal fun CountdownSettingsContent() {
         ApprovedEditorsForm(actions = {
             ApprovedEditorsActions(error = error, onCancel = { reset(); onBack() }) {
                 if (label.isBlank()) error = "Enter a name."
+                else if (!ApprovedToolsEverydayValidation.isRealCountdownDate(month, day, if (yearly) 0 else year))
+                    error = "Choose a valid date for this month and year."
                 else {
                     CountdownConfig.add(context, label, emoji, month, day, if (yearly) 0 else year)
                     label = ""; error = null; events = CountdownConfig.loadSorted(context)

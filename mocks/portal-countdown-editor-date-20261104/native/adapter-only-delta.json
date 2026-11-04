@@ -1,0 +1,18 @@
+{
+  "ok": true,
+  "v1Archive": "/private/tmp/portal-countdown-editor-date-20261104-104015/native/native-binding-v1",
+  "byteSubstitutionReversalEqualsEntireV1": true,
+  "caseDeclarationsByteIdentical": true,
+  "entireProductAssertionAndReportCaseChunkByteIdentical": true,
+  "v1JavaSha256": "b6e08944acaf53ef31939cf778fdec65ed50032f095c9ff147e17b164f0869c2",
+  "v2JavaSha256": "001eff5adca961ebe65d0d0aa11f350b57ee0b80a29af14c46c737a9a6e8a1e9",
+  "changes": [
+    "Explicit before/after exact type arrays; select only known parameter3 signature",
+    "Create each semantic state with correct MutableState/MutableIntState interface",
+    "Invoke unchanged semantic draft state using exact known before/after capture order",
+    "Add captureBinding observation only"
+  ],
+  "productChanges": 0,
+  "caseGateChanges": 0,
+  "scope": "Host adapter repair; v1 baseline product failure remains retained, v1 candidate host ABI failure excluded. Root paired v2 baseline/candidate required before acceptance."
+}

@@ -1,0 +1,117 @@
+{
+  "version": "1.149/code143",
+  "verifiedAt": "2026-11-04T10:54:43.852231+00:00",
+  "goalStatus": "active",
+  "originalClock": {
+    "startedAt": "2026-11-04T10:40:15Z",
+    "target": "2026-11-04T10:55:15Z",
+    "deadline": "2026-11-04T11:10:15Z",
+    "sourceBase": "489b187b3b85224a5cff868cb84e2a481570bcbb",
+    "scope": "Reject impossible dates at the existing native countdown editor Add callback; retain name policy/storage/legacy records",
+    "priorClocksRetained": true,
+    "boundaries": [
+      "Root device operations only",
+      "No phone/provider/media/account/push/publication"
+    ]
+  },
+  "jvm": {
+    "tests": 4444,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 464
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46745298,
+      "sha256": "616785092aefa22b5fb2ae0784baae0da7da567c83324d26cb3b49ce04bfc228",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='143' versionName='1.149' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "bytes": 25886647,
+      "sha256": "082d56ebd559fa97ee44235fca84a2252a965ec541a559ec1ef1df9ccd437e83",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='143' versionName='1.149' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "native": {
+    "tests": 10,
+    "baselineProductFailures": 5,
+    "baselineControls": 5,
+    "candidatePassed": 10,
+    "sameFrozenV2Dex": true,
+    "rejectedDraftAndRawPreferencesRetained": true,
+    "bindingRepair": "Explicit observed capture orders only; cases and product assertions unchanged. Earlier ten host binding errors retained and excluded.",
+    "fixtureRunsRetired": true
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886647,
+      "sha256": "082d56ebd559fa97ee44235fca84a2252a965ec541a559ec1ef1df9ccd437e83",
+      "app": {
+        "versionCode": 143,
+        "versionName": "1.149"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "bytes": 25886647,
+      "sha256": "082d56ebd559fa97ee44235fca84a2252a965ec541a559ec1ef1df9ccd437e83",
+      "serviceReady": true,
+      "app": {
+        "versionCode": 143,
+        "versionName": "1.149"
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1684,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 2048,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "independentSourceBindingNativeAndArtifactReviewsAccepted": true,
+  "ownerRegistryHashesRetained": true,
+  "unchangedScreensaverAssets": 10,
+  "limits": [
+    "Generated actual debug Add callback on Family/API29 only; mounted Compose UI, physical taps, optimized runtime, API28 and disk durability remain separate.",
+    "Existing legacy invalid-date records remain readable; no household countdown or other setting changed.",
+    "No phone/provider/media/account/push/publication; public1.83/code77 unchanged."
+  ]
+}

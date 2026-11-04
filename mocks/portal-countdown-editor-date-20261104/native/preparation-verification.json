@@ -1,0 +1,99 @@
+{
+  "ok": true,
+  "preparedAtUtc": "2026-11-04T10:48:06.824172+00:00",
+  "originalClock": "2026-11-04T10:40:15Z to 2026-11-04T11:10:15Z",
+  "sources": {
+    "CountdownDateActivity.java": {
+      "sha256": "001eff5adca961ebe65d0d0aa11f350b57ee0b80a29af14c46c737a9a6e8a1e9",
+      "bytes": 13493
+    },
+    "AndroidManifest.xml": {
+      "sha256": "b0479c34278907ca0c5a229c22a6aea748dd44a1ba58db1e110dfd0595d020ea",
+      "bytes": 450
+    },
+    "build.sh": {
+      "sha256": "061bd18e62756b7f5ee2ee57ee10c3ba6691c965304054a9eee4a74ca756b5a3",
+      "bytes": 785
+    },
+    "repack.sh": {
+      "sha256": "8099e2703c1e1c27b8997c46e1976fa8b659e50e829972e37a44e51586874f73",
+      "bytes": 782
+    },
+    "RUN.md": {
+      "sha256": "26ba743e4ef3e78e33357e69f85233ba4cffdb139cd17b0ae52757c63a3d2986",
+      "bytes": 1391
+    }
+  },
+  "fixtureDex": {
+    "sha256": "d01f30696b53b76adab1d08d8a5d5e9b0ce7f2a7d00e4febe8ef0be8c7824cfb",
+    "bytes": 19728
+  },
+  "baselineFixture": {
+    "sha256": "1f255677a4ccecb7e7a5e445b657ef6ca2f738b5e12507ff1aff3632df249c04",
+    "bytes": 37503466
+  },
+  "embeddedBaseline": {
+    "sha256": "d15ee02d934b92b74658a4af6c09060232345d9fa78c3323666cc920450d8c45",
+    "bytes": 46745298
+  },
+  "embeddedBaselineExact": true,
+  "baselineAndFrozenFixtureDexByteIdentical": true,
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.countdowndatefixture\n",
+  "package": "com.immortal.countdowndatefixture",
+  "activity": ".CountdownDateActivity",
+  "report": "external-files/report.json",
+  "caseNames": [
+    "february31",
+    "april31",
+    "commonYearFebruary29",
+    "nonLeapCenturyFebruary29",
+    "yearlyFebruary30",
+    "blankName",
+    "validFebruary28",
+    "validLeapYearFebruary29",
+    "validYearlyFebruary29",
+    "validLongNameRetainsExistingPolicy"
+  ],
+  "expectedBaselineFailNames": [
+    "february31",
+    "april31",
+    "commonYearFebruary29",
+    "nonLeapCenturyFebruary29",
+    "yearlyFebruary30"
+  ],
+  "expectedBaselineControlNames": [
+    "blankName",
+    "validFebruary28",
+    "validLeapYearFebruary29",
+    "validYearlyFebruary29",
+    "validLongNameRetainsExistingPolicy"
+  ],
+  "expectedCandidatePassNames": [
+    "february31",
+    "april31",
+    "commonYearFebruary29",
+    "nonLeapCenturyFebruary29",
+    "yearlyFebruary30",
+    "blankName",
+    "validFebruary28",
+    "validLeapYearFebruary29",
+    "validYearlyFebruary29",
+    "validLongNameRetainsExistingPolicy"
+  ],
+  "gates": {
+    "invalidDraft": "zero edit/apply/commit; exact raw legacy bytes; retained label/events reference and other draft values; exact existing error",
+    "validSave": "one edit/apply, no commit; exact legacy fields/order and sentinel; one exact new row; label/error cleared; sorted three-row events reload retaining IDs",
+    "preferenceScope": "only immortal_countdown MODE_PRIVATE; redirected to fixture-local generated-* stores",
+    "watchdogMillis": 30000
+  },
+  "scope": "Actual embedded baseline/candidate debug APK compiled Add callback via unique static nine-parameter signature; JavaProxy MutableState/MutableIntState. No mounted Compose UI, physical click, owner prefs/media, provider/network, optimized/API28 claim. Root exclusively candidate repack and all device operations.",
+  "bindingVersion": 2,
+  "v1RetainedArchive": "/private/tmp/portal-countdown-editor-date-20261104-104015/native/native-binding-v1",
+  "adapterOnlyAudit": {
+    "sha256": "d0a4d71896ac154280a061eb781c103020678bec010b22585fbfdabb87fb8a77",
+    "bytes": 1001
+  },
+  "gateDeclarationsAndAssertionsByteIdenticalToV1": true,
+  "pairedV2BaselineCandidateRequired": true
+}

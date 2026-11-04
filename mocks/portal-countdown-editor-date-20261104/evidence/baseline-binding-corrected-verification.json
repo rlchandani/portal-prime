@@ -1,0 +1,9 @@
+{
+  "tests": 10,
+  "failures": 5,
+  "errors": 0,
+  "actualCompiledAddCallback": true,
+  "assertionsAndCasesUnchanged": true,
+  "bindingOnlyCorrected": true,
+  "frozenTestSha256": "39fb89db8c57288720c75665ed755c2b31730071cd42d0471157ec32fee40011"
+}

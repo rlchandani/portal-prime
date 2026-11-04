@@ -1,0 +1,180 @@
+{
+  "reviewedAt": "2026-11-04T10:45:49.750066+00:00",
+  "verdict": "accepted bounded source correction",
+  "blockers": [],
+  "clock": {
+    "startedAt": "2026-11-04T10:40:15Z",
+    "target": "2026-11-04T10:55:15Z",
+    "deadline": "2026-11-04T11:10:15Z",
+    "sourceBase": "489b187b3b85224a5cff868cb84e2a481570bcbb",
+    "scope": "Reject impossible dates at the existing native countdown editor Add callback; retain name policy/storage/legacy records",
+    "priorClocksRetained": true,
+    "boundaries": [
+      "Root device operations only",
+      "No phone/provider/media/account/push/publication"
+    ]
+  },
+  "sourceNormalization": {
+    "editorRemovingExactlyTwoGuardLinesEqualsCapturedOriginal": true,
+    "buildReversingOnly1_148To1_149And142To143EqualsCapturedOriginal": true,
+    "frozenTestBytesExact": true
+  },
+  "activeBinding": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt",
+      "line": 148,
+      "evidence": "Countowns standaloneActivity selects CountdownSettingsActivity."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CountdownSettingsActivity.kt",
+      "line": 26,
+      "evidence": "onCreate composes CountdownSettingsScreen, which composes CountdownSettingsContent at line35."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt",
+      "line": 448,
+      "evidence": "Settings countdown page also delegates to CountdownSettingsContent."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CountdownSettingsActivity.kt",
+      "line": 69,
+      "evidence": "Add retains existing blank-name guard; impossible date guard runs before Config.add and valid saved-state updates."
+    }
+  ],
+  "policyFindings": [
+    "Only date policy is reused; countdownError is deliberately not called, preserving standalone editor acceptance of 81-character labels.",
+    "Yearly drafts validate year0; leap-day annual dates remain valid via Gregorian leap year2000 in CountdownDates. Nonyearly drafts use current year, retaining existing2000..2100 editor range.",
+    "Rejected dates only set existing error state. Label/emoji/date/yearly/events are unchanged, no Config.add/loadSorted or preference write occurs.",
+    "Valid save branch, storage API, label whitespace and emoji handling remain byte-identical to captured editor. CountdownConfig existing legacy-invalid-date fallback and record compatibility policy are not routed through the new guard.",
+    "No new timers, background work, resources, lifecycle hooks, UI elements or geometry; date-helper computation is synchronous and already used by existing Tools validation."
+  ],
+  "testWitness": {
+    "actualCompiledProductionCallback": true,
+    "selection": "CountdownSettingsActivityKt declaredMethods.single parameterCount9 and first parameter Context",
+    "copiedValidationLogic": false,
+    "generatedStates": "Actual Compose mutableStateOf/mutableIntStateOf plus mocked Context/SharedPreferences; no mounted UI.",
+    "baseline": {
+      "tests": 10,
+      "assertionFailures": 5,
+      "controls": 5,
+      "errors": 0,
+      "skipped": 0,
+      "failures": [
+        {
+          "case": "commonYearFebruary29RetainsTheDraftWithoutSaving",
+          "type": "java.lang.AssertionError",
+          "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+        },
+        {
+          "case": "february31RetainsTheDraftWithoutSaving",
+          "type": "java.lang.AssertionError",
+          "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+        },
+        {
+          "case": "yearlyFebruary30RetainsTheDraftWithoutSaving",
+          "type": "java.lang.AssertionError",
+          "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+        },
+        {
+          "case": "april31RetainsTheDraftWithoutSaving",
+          "type": "java.lang.AssertionError",
+          "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+        },
+        {
+          "case": "nonLeapCenturyFebruary29RetainsTheDraftWithoutSaving",
+          "type": "java.lang.AssertionError",
+          "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+        }
+      ]
+    },
+    "guards": "Reject tests assert zero apply/write and never prefs.edit, exact stored JSON, same event reference, all draft fields and expected error. Accept controls assert exactly one write, prior records equality (including invalid legacy row), new exact fields, blanked label/cleared error, actual sorted reload."
+  },
+  "nativeFixtureSourceReview": {
+    "actualCompiledCallback": true,
+    "classLoaderAndCaptureInterfacesChecked": true,
+    "generatedPreferencesOnly": true,
+    "dateCasesEquivalentNotIdenticalToJVM": true,
+    "limits": "Source review only; native execution/result/retirement and artifact binding are coordinator-owned and not yet accepted in this report."
+  },
+  "unselectedDiscovery": {
+    "mediaSessionBufferingFirstObserved": "2026-11-04T10:41:30Z",
+    "clockRetained": "2026-11-04T10:40:15Z\u20132026-11-04T11:10:15Z",
+    "status": "unselected source-only witness; no reopened old playback/provider/credential scopes"
+  },
+  "verificationLimits": [
+    "No independent Gradle/build/device actions. Candidate suite/full builds are running under root ownership and not claimed passing here.",
+    "Actual private compiled callback unit boundary is proven by baseline XML, not physical Add taps or mounted Compose rendering.",
+    "No owner preferences, phone, providers, network, clock reset or Git actions.",
+    "Only editor and version inverse normalization compare captured pre-change bytes; other reviewed source hashes bind current compatibility/read path without asserting independent whole-repository non-target diff."
+  ],
+  "bindings": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CountdownSettingsActivity.kt": {
+      "sha256": "19c4be5323f9c9072f96f78701945b93c5a79350fe2d6c36140cefa8213c23d2",
+      "bytes": 4963
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CountdownConfig.kt": {
+      "sha256": "7de6805d2c5d79b0dc034ec612a63725e119977f769de598ca89c094b4259afa",
+      "bytes": 5032
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/CountdownDates.kt": {
+      "sha256": "ff6d3d80175531496c45a21d4e30bfa8dae4c15506218ac494c45cc2fcf00289",
+      "bytes": 2211
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsEverydayValidation.kt": {
+      "sha256": "95180ca2a063e5a9170d230ee64104b1787a6b53efc33da16753975fc11b4167",
+      "bytes": 3302
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedToolsEveryday.kt": {
+      "sha256": "fb1c8eda1d978018c36af1f56323007908e9840c42c010cf28d026d2bcd19dfb",
+      "bytes": 39176
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedSettingsNavigation.kt": {
+      "sha256": "7736ce47a18ecb8d3ee8d3d4c429096dce02a310080626e9c1c33832ff670896",
+      "bytes": 13372
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ImmortalSettingsActivity.kt": {
+      "sha256": "5728f60db74716c210635771b6e93465df2f0c81b5bccc63db7dffe91d05ec8b",
+      "bytes": 96368
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/CountdownEditorDateTest.kt": {
+      "sha256": "ff639cfcb99970ea17a18f8563a4799287bdd1553d4a0c6a2df93a1579829ed9",
+      "bytes": 5060
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "8b2f6c53e36aaa2dad357711ee55d8bb5f5775ba987ff35549d8b969fb65348f",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/CountdownSettingsActivity.kt": {
+      "sha256": "ba2d92ba48cb3cbd5ef18b521b162876f0cce01eb5571542f1b48b4a4de57615",
+      "bytes": 4772
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/build.gradle.kts": {
+      "sha256": "45cb2fd054e80a4ca220aa803354770127b3bdc6bf60a2b66c9cec705b0c2a07",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/CountdownEditorDateTest.kt": {
+      "sha256": "ff639cfcb99970ea17a18f8563a4799287bdd1553d4a0c6a2df93a1579829ed9",
+      "bytes": 5060
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/plan.json": {
+      "sha256": "1f41a4ffcef44af4bd827a652afc5e5008a2ff8a058407976a2c455f750b3bfb",
+      "bytes": 454
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/baseline-callback-tests.xml": {
+      "sha256": "9b5abd4b7dc32814f13e426bcc3d33a0572278ae452d57bef9cf0d619fc743d1",
+      "bytes": 24413
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/baseline-callback-verification.json": {
+      "sha256": "31e858d075999abfcc833510a4f5671dd8c9dbcf5b651b1e31e197650a825157",
+      "bytes": 1180
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/CountdownDateActivity.java": {
+      "sha256": "b6e08944acaf53ef31939cf778fdec65ed50032f095c9ff147e17b164f0869c2",
+      "bytes": 12694
+    },
+    "/private/tmp/portal-countdown-editor-date-20261104-104015/native/AndroidManifest.xml": {
+      "sha256": "b0479c34278907ca0c5a229c22a6aea748dd44a1ba58db1e110dfd0595d020ea",
+      "bytes": 450
+    }
+  }
+}

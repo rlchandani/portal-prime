@@ -1,0 +1,36 @@
+{
+  "tests": 10,
+  "failures": 5,
+  "errors": 0,
+  "skipped": 0,
+  "actualCompiledAddCallback": true,
+  "failureCases": [
+    {
+      "case": "commonYearFebruary29RetainsTheDraftWithoutSaving",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+    },
+    {
+      "case": "february31RetainsTheDraftWithoutSaving",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+    },
+    {
+      "case": "yearlyFebruary30RetainsTheDraftWithoutSaving",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+    },
+    {
+      "case": "april31RetainsTheDraftWithoutSaving",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+    },
+    {
+      "case": "nonLeapCenturyFebruary29RetainsTheDraftWithoutSaving",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<0> but was:<1>"
+    }
+  ],
+  "frozenTestSha256": "ff639cfcb99970ea17a18f8563a4799287bdd1553d4a0c6a2df93a1579829ed9",
+  "sourceStillBaseline": true
+}
