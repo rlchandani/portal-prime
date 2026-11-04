@@ -1,0 +1,7 @@
+{
+  "initialMobileDetailScrollWidth": 481,
+  "initialMobileDetailClientWidth": 341,
+  "cause": "Unbroken compact verification and saved-state tokens in the newly added task",
+  "repair": "Plain words and spaces in new task only; all 122 prior objects/raw suffix retained",
+  "cssChanged": false
+}

@@ -1,18 +1,63 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T06:14:42Z",
-  "updatedLabel": "Fleet raw preferences: private complete plan verified locally",
+  "updatedAt": "2026-11-04T06:30:01.831613Z",
+  "updatedLabel": "CloudKit album progress and identity: 1.133 verified in both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.132/code 126. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.133/code 127. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "cloudkit-album-progress-identity",
+      "title": "iCloud public albums: stop cursor cycles and preserve photo identity",
+      "summary": "Repeated CloudKit pages stop before revisiting cursors and no longer repeat usable photo masters.",
+      "description": "Track requested continuation markers and first usable master identities. Preserve distinct named photos sharing URLs, unnamed URL fallback, partial albums, ordinary progress and the existing page cap.",
+      "status": "delivered",
+      "verification": "4,392 JVM · 12 generated cases · Family API29 debug · exact room APKs",
+      "kind": "Public album reliability",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Photo-source engineering / independent execution review",
+      "deployment": "Exact optimized 1.133/code127 installed and read back in both rooms. Family accepted once; Living uncertain acknowledgment reconciled with seven read-only observations and no retry.",
+      "state": "All 43 Family and 30 Living preference files, file sets, four complete maps, names and Dev Mode preserved. Family font size, accessibility, original Chrome, resumed frame and awake state remain; nine assets exact.",
+      "acceptance": [
+        "Stop before requesting an already requested continuation marker.",
+        "Keep first usable master identity while retaining distinct named masters sharing URLs.",
+        "Use URL fallback for unnamed records without consuming identity for unusable images.",
+        "Retain title, partial earlier pages, forward empty pages, derivative/video rules and50-page cap.",
+        "Pass generated public fetch on JVM and FamilyAPI29, preserve room state and verify complete installed APK hashes."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, scoped acceptance and release receipt.",
+          "source": "docs/portal-cloudkit-pagination-2026-11-04.md"
+        },
+        {
+          "text": "Frozen fixture, native reports, artifact and preservation evidence.",
+          "source": "mocks/portal-cloudkit-pagination-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated responses only; live Apple albums, optimized functional execution, API28 and Living visual/functional acceptance remain open.",
+        "Native generated debug execution and normal connection disconnection are verified; arbitrary cancellation and forced child-timeout cleanup are untested.",
+        "Initial constant-mismatch JVM and Java compile-only attempts are excluded from product RED/native execution.",
+        "No phone, source photo-file read/import/transfer, provider/account, push or publication. Family screenshot stays private.",
+        "Earlier provider-response, Immich pagination, alarm and parked/approval scopes retain their original clocks."
+      ],
+      "next": "Retain live/provider/native limits and continue independent supported product work.",
+      "issueClock": {
+        "startedAt": "2026-11-04T06:16:40Z",
+        "deadline": "2026-11-04T06:46:40Z",
+        "scope": "Discovery, fixture corrections, implementation, checks, review, delivery, documentation, cleanup and commit; no reset."
+      }
+    },
     {
       "id": "fleet-raw-preference-plan",
       "title": "Fleet raw restore: validate and freeze every preference file before changes",

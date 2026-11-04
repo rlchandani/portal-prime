@@ -1,0 +1,239 @@
+{
+  "recordedAt": "2026-11-04T06:34:34.122568Z",
+  "base": "a4e24bb63f9458ae12c60347c49fb72f12c1958f",
+  "scope": "CloudKit public album cursor progress and usable master identity; generated transport acceptance and authorized local room delivery",
+  "issueClock": {
+    "startedAt": "2026-11-04T06:16:40Z",
+    "deadline": "2026-11-04T06:46:40Z",
+    "includesDiscoveryFixtureCorrectionsChecksDeliveryDocumentationCleanupAndCommit": true,
+    "reset": false
+  },
+  "artifacts": {
+    "versionName": "1.133",
+    "versionCode": 127,
+    "package": "com.immortal.launcher.debug",
+    "apks": {
+      "debug": {
+        "bytes": 46726883,
+        "sha256": "f91d8cc51d0f874c22d110cdf17bcefc2c8b8d1ecc829314f1971442c19bb3c0",
+        "signerMatches": true,
+        "exactScreensaverAssets": 9
+      },
+      "performance": {
+        "bytes": 25884988,
+        "sha256": "d06aba9bbfdef8dcfc14f0dc7ce6cd8606114952e6c5df846e796a6c622e58a9",
+        "signerMatches": true,
+        "exactScreensaverAssets": 9
+      }
+    },
+    "jvm": {
+      "tests": 4392,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 459
+    },
+    "buildSeconds": 113,
+    "debugOptimizedR8VitalLint": true
+  },
+  "baseline": {
+    "generatedCases": 12,
+    "caseFailures": 5,
+    "passingControls": 7,
+    "failureType": "AssertionError",
+    "correctedFixtureSha256": "6d6de4d5b10079c0547411752d6b0d5ee962ac29690f4a7b1023a507c1761c1d",
+    "junitWrapperMethods": 1,
+    "setupOnlyConstantsAttemptExcluded": true
+  },
+  "candidate": {
+    "generatedCases": 12,
+    "caseFailures": 0,
+    "existingAlbumControlMethods": 48,
+    "frozenFixtureUnchangedAfterBaseline": true
+  },
+  "native": {
+    "sdk": 29,
+    "baselineCases": 12,
+    "baselineCaseFailures": 5,
+    "baselinePassingControls": 7,
+    "candidateCases": 12,
+    "candidateCaseFailures": 0,
+    "sameFrozenJavaSha256": "ec11792e03e1f410095667fae0a7a80378d80a48d56806ed3b620e1a8c945fe4",
+    "baselineDebugSha256": "0a9b8df0bbbd8bb2d6ddc1d0284964129802407d590db29c81907d17bab51f88",
+    "candidateDebugSha256": "f91d8cc51d0f874c22d110cdf17bcefc2c8b8d1ecc829314f1971442c19bb3c0",
+    "repeatedMarkerQueryCount": {
+      "baseline": 50,
+      "candidate": 2
+    },
+    "cursorCycleQueryCount": {
+      "baseline": 50,
+      "candidate": 3
+    },
+    "ordinaryCapRetained": 50,
+    "actualPublicFetchAndPhotoSourceHttp": true,
+    "androidJson": true,
+    "internetPermission": false,
+    "generatedHttpsOnly": true,
+    "allConnectionsDisconnectedBothPhases": true,
+    "fixtureRemovedBothPhases": true,
+    "finalFixtureProcessAbsent": true,
+    "compileOnlyAttemptExcluded": true,
+    "successfulJava8OptionWarnings": 4,
+    "optimizedFunctionalCalls": 0
+  },
+  "independentReview": {
+    "scopedChecks": 18,
+    "passed": 18,
+    "ownDirectChildCasesPassed": 12,
+    "ownJUnitWrapperPassed": 1,
+    "fullXmlMethods": 4392,
+    "fullXmlSuites": 459,
+    "noBlocker": true,
+    "report": "cloudkit-independent-review.json"
+  },
+  "installed": {
+    "family": {
+      "bytes": 25884988,
+      "sha256": "d06aba9bbfdef8dcfc14f0dc7ce6cd8606114952e6c5df846e796a6c622e58a9",
+      "app": {
+        "versionCode": 127,
+        "versionName": "1.133"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25884988,
+        "sha256": "d06aba9bbfdef8dcfc14f0dc7ce6cd8606114952e6c5df846e796a6c622e58a9",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 127,
+          "versionName": "1.133"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1610,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1987,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "protected": {
+    "files": {
+      "version.json": true,
+      "catalog.json": true,
+      "provisioning/fleetctl": true,
+      "provisioning/fleet-backup.sh": true,
+      "provisioning/fleet-restore.sh": true,
+      "provisioning/fleet-backup-data.py": true,
+      "app/src/main/java/com/immortal/launcher/CryptoFeed.kt": true,
+      "app/src/main/java/com/immortal/launcher/LocalAlarmSchedule.kt": true,
+      "app/src/main/assets/remote/control-center.css": true,
+      "app/src/main/assets/remote/control-center.js": true,
+      "app/src/main/assets/remote/core.mjs": true,
+      "app/src/main/assets/screensaver/cinema-grain.png": true,
+      "app/src/main/assets/screensaver/index.html": true,
+      "app/src/main/assets/screensaver/lib-engine.js": true,
+      "app/src/main/assets/screensaver/mode-impls.js": true,
+      "app/src/main/assets/screensaver/modes.js": true,
+      "app/src/main/assets/screensaver/photo-doodles.svg": true,
+      "app/src/main/assets/screensaver/photos.js": true,
+      "app/src/main/assets/screensaver/scheduler.js": true,
+      "app/src/main/assets/screensaver/styles.css": true
+    },
+    "originalSelectedRegistries": {
+      "family": true,
+      "living": true
+    }
+  },
+  "roadmap": {
+    "oldTasks": 122,
+    "newTasks": 123,
+    "oldObjectsPreserved": true,
+    "oldRawSuffixBytes": 412349,
+    "oldRawSuffixSha256": "62576d456b7ee0acac33f70fe0530337dbf3bcb11ddf5c39f1e0c9e406f64836",
+    "defaultTaskPreserved": true,
+    "counts": {
+      "delivered": 75,
+      "verified": 38,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    }
+  },
+  "documentation": {
+    "strictBuildPassed": true,
+    "warningCount": 0,
+    "ownedEnvironmentAndSiteRemoved": true
+  },
+  "browser": {
+    "report": "roadmap-browser-repaired.json",
+    "scope": "New CloudKit detail at390x844/1600x1000,123row count/platform labels, footer and exact served JSON",
+    "newDetailOverflowPixels": 0,
+    "mobileDocumentExtraPixel": 1,
+    "consoleWarningsErrors": 0,
+    "initialNewCopyOverflowCorrected": true,
+    "oldDetailsNotReaccepted": true,
+    "temporaryViewportReset": true,
+    "ownedTabsClosed": true,
+    "initial8891PlaywrightAvailabilityAttemptDidNotEstablishUiAcceptance": true
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "originalRegistriesUnchanged": true,
+    "nativeFixtureRemovedBothRuns": true,
+    "privateSourceApksRollbackSnapshotsAndFamilyScreenRetained": true,
+    "familyScreenCommitted": false,
+    "phoneOperations": 0,
+    "sourcePhotoFilesReadOrImportedOrTransferred": 0,
+    "explicitLiveAppleRequests": 0,
+    "providerAccountActions": 0,
+    "pushOrPublication": false
+  },
+  "limits": [
+    "Native evidence is generated debug execution on FamilyAPI29. Live Apple albums, optimized functional execution, API28 and Living visual/functional album acceptance remain open.",
+    "Ordinary transport disconnection is verified; arbitrary cancellation, forced child-timeout and every photo-rendering path are untested.",
+    "Existing partial-album behavior, image/derivative/video selection and hard cap remain; this is not a photo-source security-policy redesign.",
+    "All older provider-response, Immich pagination, alarm, parked and approval scopes retain their original clocks.",
+    "Current Family frame was viewed with its screenshot kept private; no household source-photo file read, import or transfer.",
+    "New mobile detail fits exactly; the overall mobile document retains one extra scroll-width pixel. No claim that every old detail was revalidated."
+  ]
+}

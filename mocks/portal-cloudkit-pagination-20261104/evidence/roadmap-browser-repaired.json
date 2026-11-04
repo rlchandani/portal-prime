@@ -1,0 +1,30 @@
+{
+  "revisedMobile": {
+    "count": "123 of 123 tasks",
+    "footer": "Local review artifact · Current room APK: exact1.133 / code127",
+    "heading": "iCloud public albums: stop cursor cycles and preserve photo identity",
+    "missingPlatforms": 0,
+    "pageScrollWidth": 391,
+    "rowCount": 123,
+    "taskClientWidth": 341,
+    "taskScrollWidth": 341,
+    "viewport": [
+      390,
+      844
+    ]
+  },
+  "revisedDesktop": {
+    "count": "123 of 123 tasks",
+    "footer": "Local review artifact · Current room APK: exact1.133 / code127",
+    "heading": "iCloud public albums: stop cursor cycles and preserve photo identity",
+    "pageScrollWidth": 1585,
+    "taskClientWidth": 586,
+    "taskScrollWidth": 586,
+    "viewport": [
+      1600,
+      1000
+    ]
+  },
+  "revisedLogs": [],
+  "scope": "New CloudKit detail, row count/platform labels and footer only; no repeat acceptance of old details"
+}

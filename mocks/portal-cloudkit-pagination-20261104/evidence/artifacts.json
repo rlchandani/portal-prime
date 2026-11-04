@@ -1,0 +1,28 @@
+{
+  "versionName": "1.133",
+  "versionCode": 127,
+  "package": "com.immortal.launcher.debug",
+  "apks": {
+    "debug": {
+      "bytes": 46726883,
+      "sha256": "f91d8cc51d0f874c22d110cdf17bcefc2c8b8d1ecc829314f1971442c19bb3c0",
+      "signerMatches": true,
+      "exactScreensaverAssets": 9
+    },
+    "performance": {
+      "bytes": 25884988,
+      "sha256": "d06aba9bbfdef8dcfc14f0dc7ce6cd8606114952e6c5df846e796a6c622e58a9",
+      "signerMatches": true,
+      "exactScreensaverAssets": 9
+    }
+  },
+  "jvm": {
+    "tests": 4392,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 459
+  },
+  "buildSeconds": 113,
+  "debugOptimizedR8VitalLint": true
+}

@@ -1,0 +1,134 @@
+{
+  "cases": [
+    {
+      "name": "repeated-marker",
+      "urlsMatch": false,
+      "markersMatch": false,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 50,
+      "photoCount": 99,
+      "pass": false
+    },
+    {
+      "name": "cursor-cycle",
+      "urlsMatch": false,
+      "markersMatch": false,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 50,
+      "photoCount": 98,
+      "pass": false
+    },
+    {
+      "name": "forward-overlap",
+      "urlsMatch": false,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 3,
+      "pass": false
+    },
+    {
+      "name": "distinct-shared-url",
+      "urlsMatch": false,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 1,
+      "photoCount": 3,
+      "pass": false
+    },
+    {
+      "name": "unnamed-url",
+      "urlsMatch": false,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 4,
+      "pass": false
+    },
+    {
+      "name": "unusable-first",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 1,
+      "pass": true
+    },
+    {
+      "name": "forward-empty-and-pairs",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 3,
+      "photoCount": 2,
+      "pass": true
+    },
+    {
+      "name": "malformed-later",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 1,
+      "pass": true
+    },
+    {
+      "name": "transport-failure-later",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 1,
+      "pass": true
+    },
+    {
+      "name": "missing-records-later",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 1,
+      "pass": true
+    },
+    {
+      "name": "empty-terminal",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 1,
+      "photoCount": 0,
+      "pass": true
+    },
+    {
+      "name": "fifty-page-cap",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 50,
+      "photoCount": 50,
+      "pass": true
+    }
+  ],
+  "failures": 5,
+  "pass": false,
+  "sdk": 29,
+  "sourceSha256": "0a9b8df0bbbd8bb2d6ddc1d0284964129802407d590db29c81907d17bab51f88",
+  "sourceBytes": 46726887,
+  "internetPermission": false,
+  "actualPublicFetchAndMetadataReader": true,
+  "androidJson": true,
+  "generatedTransportOnly": true,
+  "backgroundThread": true
+}

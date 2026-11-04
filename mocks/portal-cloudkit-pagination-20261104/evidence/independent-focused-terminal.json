@@ -1,0 +1,115 @@
+{
+  "startedAtUtc": "2026-11-04T06:24:44.832316+00:00",
+  "finishedAtUtc": "2026-11-04T06:24:45.199862+00:00",
+  "runs": [
+    {
+      "label": "direct-child",
+      "mainArguments": [
+        "com.immortal.launcher.CloudKitPaginationProcess"
+      ],
+      "executable": "/usr/bin/java",
+      "classpathBinding": {
+        "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/test-classpath.txt",
+        "bytes": 31310,
+        "sha256": "7bd182aaf50dbe7ae2c1c601b7223e5f58cb363a811beef5304fe5e3d828d2cf"
+      },
+      "startedAtUtc": "2026-11-04T06:24:44.832316+00:00",
+      "finishedAtUtc": "2026-11-04T06:24:44.960894+00:00",
+      "actualExit": 0,
+      "log": {
+        "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/independent-direct-child.log",
+        "bytes": 841,
+        "sha256": "aa44f47775e3f74d00673438652b33bcbc5ca03705ce051adda5d759a13e4be7"
+      },
+      "pid": 8224,
+      "processReaped": true
+    },
+    {
+      "label": "junit-launcher",
+      "mainArguments": [
+        "org.junit.runner.JUnitCore",
+        "com.immortal.launcher.CloudKitPaginationTest"
+      ],
+      "executable": "/usr/bin/java",
+      "classpathBinding": {
+        "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/test-classpath.txt",
+        "bytes": 31310,
+        "sha256": "7bd182aaf50dbe7ae2c1c601b7223e5f58cb363a811beef5304fe5e3d828d2cf"
+      },
+      "startedAtUtc": "2026-11-04T06:24:44.961272+00:00",
+      "finishedAtUtc": "2026-11-04T06:24:45.199862+00:00",
+      "actualExit": 0,
+      "log": {
+        "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/independent-junit-launcher.log",
+        "bytes": 891,
+        "sha256": "e5901f1060ca1d7a7e9035fe0f990991c71a53d811e0885a639885ec72edfe7f"
+      },
+      "pid": 8225,
+      "processReaped": true
+    }
+  ],
+  "inputBindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/RemoteAlbum.kt",
+      "bytes": 32167,
+      "sha256": "49a2235c867988a3ed95fed298863bb3b66586c3ec0d8adcf22c5c301d594425"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/CloudKitPaginationTest.kt",
+      "bytes": 10452,
+      "sha256": "6d6de4d5b10079c0547411752d6b0d5ee962ac29690f4a7b1023a507c1761c1d"
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/frozen-CloudKitPaginationTest.kt",
+      "bytes": 10452,
+      "sha256": "6d6de4d5b10079c0547411752d6b0d5ee962ac29690f4a7b1023a507c1761c1d"
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/test-classpath.txt",
+      "bytes": 31310,
+      "sha256": "7bd182aaf50dbe7ae2c1c601b7223e5f58cb363a811beef5304fe5e3d828d2cf"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/intermediates/runtime_app_classes_jar/debug/bundleDebugClassesToRuntimeJar/classes.jar",
+      "bytes": 21389472,
+      "sha256": "6fde886e59c97540977e0a8f9aad15f04fefaba259760bc6b90c78502435f9c7"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/intermediates/built_in_kotlinc/debugUnitTest/compileDebugUnitTestKotlin/classes/com/immortal/launcher/CloudKitPaginationProcess$Connection.class",
+      "bytes": 6667,
+      "sha256": "85fb93772818952ce3c1104d1419d3a794b52af7b4c1ae3b9bd277de11c734d4"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/intermediates/built_in_kotlinc/debugUnitTest/compileDebugUnitTestKotlin/classes/com/immortal/launcher/CloudKitPaginationProcess$main$1$1.class",
+      "bytes": 1713,
+      "sha256": "d1ee74f95256fac9a736ac2aa8a2743f6d8319cb777d37825d66bf0502e22ad8"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/intermediates/built_in_kotlinc/debugUnitTest/compileDebugUnitTestKotlin/classes/com/immortal/launcher/CloudKitPaginationProcess.class",
+      "bytes": 7546,
+      "sha256": "7afd4409ce7ca5441eea9f6174c3ff090fcb5d49d003499aff248f3bd08dec71"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/intermediates/built_in_kotlinc/debugUnitTest/compileDebugUnitTestKotlin/classes/com/immortal/launcher/CloudKitPaginationTest$GeneratedCases.class",
+      "bytes": 12105,
+      "sha256": "2d27d508bb99765bfdbacddb13575224f8a10562c9782c288189fad99daf39d7"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/intermediates/built_in_kotlinc/debugUnitTest/compileDebugUnitTestKotlin/classes/com/immortal/launcher/CloudKitPaginationTest.class",
+      "bytes": 6057,
+      "sha256": "6afcdb1d9285e9cefd93b1477c927cefd786b5c3731d2a80482e62d6663864e6"
+    }
+  ],
+  "inputBytesUnchangedAcrossRuns": true,
+  "compiledRemoteAlbum": {
+    "jar": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/intermediates/runtime_app_classes_jar/debug/bundleDebugClassesToRuntimeJar/classes.jar",
+    "entry": "com/immortal/launcher/RemoteAlbum.class",
+    "bytes": 56856,
+    "sha256": "89a208ba0e771668448c8e65626b8fa8a6016d09603ca0c6e941ec6d96f6bb31"
+  },
+  "limitations": [
+    "Independent host JVM generated transport only; no Gradle, Android, device, provider or real network operation.",
+    "Classpath and compiled source were produced by root; this reviewer executed, rather than compiled, them.",
+    "No build/full-suite/runtime acceptance is implied."
+  ]
+}

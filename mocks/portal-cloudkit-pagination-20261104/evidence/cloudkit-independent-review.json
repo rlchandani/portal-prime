@@ -1,0 +1,481 @@
+{
+  "status": "SCOPED_PASS",
+  "frozenAtUtc": "2026-11-04T06:28:31.603963+00:00",
+  "clock": {
+    "startedAt": "2026-11-04T06:16:40Z",
+    "deadline": "2026-11-04T06:46:40Z",
+    "reset": false,
+    "discoveryIncluded": true
+  },
+  "checks": [
+    {
+      "name": "onlyNarrowProductionDelta",
+      "result": "PASS",
+      "evidence": "Inverse exactly two sets, one pre-request guard and identity block reconstructs entire original e467f5\u2026 source. All unrelated provider/helper bytes remain."
+    },
+    {
+      "name": "cursorGuardBeforeRequest",
+      "result": "PASS",
+      "evidence": "Null initial page allowed; seen nonblank continuation stops before repeat POST."
+    },
+    {
+      "name": "identityAfterUsable",
+      "result": "PASS",
+      "evidence": "Video/derivative filters precede record identity reservation; invalid first leaves later usable photo available."
+    },
+    {
+      "name": "separateNamespaces",
+      "result": "PASS",
+      "evidence": "record: and url: preserve distinct named masters sharing URL and anonymous URL fallback."
+    },
+    {
+      "name": "firstUsableOrder",
+      "result": "PASS",
+      "evidence": "List ordering remains first usable occurrence; set used solely for membership."
+    },
+    {
+      "name": "partialTitleAndFailure",
+      "result": "PASS",
+      "evidence": "Existing partial-page/transport/shape behavior, title and headers retained."
+    },
+    {
+      "name": "forwardEmptyAndCap",
+      "result": "PASS",
+      "evidence": "Forward empty pages and original 50-page cap retained."
+    },
+    {
+      "name": "derivativeVideoPreservation",
+      "result": "PASS",
+      "evidence": "Selector/video code unchanged via full inverse-patch match; controls pass."
+    },
+    {
+      "name": "correctedFrozenFixture",
+      "result": "PASS",
+      "evidence": "Only two setup constants changed; corrected/current frozen bytes equal across own runs and final read."
+    },
+    {
+      "name": "baselineCountsQualified",
+      "result": "PASS",
+      "evidence": "One failing wrapper contains five AssertionErrors/seven controls in 12 cases. Setup-only excluded."
+    },
+    {
+      "name": "independentDirectChild",
+      "result": "PASS",
+      "evidence": "Own actual exit 0, 12/12 generated cases."
+    },
+    {
+      "name": "independentJUnitLauncher",
+      "result": "PASS",
+      "evidence": "Own actual exit 0, one JUnit method with 12/12 generated child cases; progress dot accounted for when parsing."
+    },
+    {
+      "name": "transportChildOwnership",
+      "result": "PASS",
+      "evidence": "Owned child factory, fake HTTPS and byte streams; image URLs never opened. Finite existing cap/launcher timeout/finally reap."
+    },
+    {
+      "name": "executedInputsStable",
+      "result": "PASS",
+      "evidence": "Source/fixture/classpath/app jar/test classes unchanged across own runs; current RemoteAlbum.class still matches executed class."
+    },
+    {
+      "name": "nativeBaseline",
+      "result": "PASS",
+      "evidence": "Root-owned API29 generated public-fetch/Android JSON baseline: five failed boolean validations/seven controls; all closures and exact embedded source confirmed."
+    },
+    {
+      "name": "nativeCandidate",
+      "result": "PASS",
+      "evidence": "Root-owned same native Java API29 candidate: all 12 pass, repeated cursor 2/cycle3 vs baseline50 each; cap50; all closures and embedded source confirmed."
+    },
+    {
+      "name": "nativeOwnershipCleanup",
+      "result": "PASS",
+      "evidence": "No requested permission/INTERNET, separate fixture package and app-local scratch; root package removal/absence true for both. Compile-only failure excluded."
+    },
+    {
+      "name": "fullJvmCount",
+      "result": "PASS",
+      "evidence": "Independently parsed all 459 root-generated XMLs: 4,392 distinct methods; zero failures/errors/skips/duplicates."
+    }
+  ],
+  "checkCounts": {
+    "passed": 18,
+    "failed": 0
+  },
+  "blockers": [],
+  "caseCounts": {
+    "rootCorrectedBaselineGenerated": {
+      "tests": 12,
+      "assertionFailures": 5,
+      "controlsPassed": 7
+    },
+    "rootCorrectedBaselineJUnit": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "ownDirectGenerated": {
+      "tests": 12,
+      "failures": 0
+    },
+    "ownJUnitLauncher": {
+      "tests": 1,
+      "failures": 0,
+      "generatedChildCases": 12
+    },
+    "rootFullJvmIndependentParsing": {
+      "tests": 4392,
+      "suites": 459,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "cases": [
+    {
+      "name": "repeatedMarkerStopsBeforeAnotherRequestAndKeepsUniqueMasters",
+      "baseline": "FAIL",
+      "baselineFailureType": "java.lang.AssertionError",
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "markerCycleStopsBeforeRevisitingAndKeepsEarlierPhotos",
+      "baseline": "FAIL",
+      "baselineFailureType": "java.lang.AssertionError",
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "overlappingForwardPagesKeepFirstUsableMaster",
+      "baseline": "FAIL",
+      "baselineFailureType": "java.lang.AssertionError",
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "repeatedMasterWithinPageKeepsFirstButDistinctMastersMayShareUrl",
+      "baseline": "FAIL",
+      "baselineFailureType": "java.lang.AssertionError",
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "unnamedMastersUseUrlIdentityAcrossPages",
+      "baseline": "FAIL",
+      "baselineFailureType": "java.lang.AssertionError",
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "unusableFirstMasterDoesNotHideItsLaterValidAsset",
+      "baseline": "PASS",
+      "baselineFailureType": null,
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "forwardEmptyPagesAndAssetVideoPairsRemainSupported",
+      "baseline": "PASS",
+      "baselineFailureType": null,
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "malformedLaterPagePreservesEarlierAlbum",
+      "baseline": "PASS",
+      "baselineFailureType": null,
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "failedLaterTransportPreservesEarlierAlbum",
+      "baseline": "PASS",
+      "baselineFailureType": null,
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "missingLaterRecordsPreservesEarlierAlbum",
+      "baseline": "PASS",
+      "baselineFailureType": null,
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "ordinaryEmptyTerminalAlbumStillReturnsTitle",
+      "baseline": "PASS",
+      "baselineFailureType": null,
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    },
+    {
+      "name": "ordinaryForwardPagesRetainExistingFiftyPageCap",
+      "baseline": "PASS",
+      "baselineFailureType": null,
+      "independentDirectChild": "PASS",
+      "independentJUnitChild": "PASS"
+    }
+  ],
+  "native": {
+    "baseline": {
+      "rootOwnedExecution": true,
+      "caseCount": 12,
+      "failedValidations": 5,
+      "passedCases": 7,
+      "sdk": 29,
+      "sourceSha256": "0a9b8df0bbbd8bb2d6ddc1d0284964129802407d590db29c81907d17bab51f88",
+      "sourceBytes": 46726887,
+      "fixtureSha256": "9019c427458ac858dc64622c90ea190a6ea0515bc2768d0481457f90009a1421",
+      "javaSha256": "ec11792e03e1f410095667fae0a7a80378d80a48d56806ed3b620e1a8c945fe4",
+      "allConnectionsClosed": true,
+      "noRequestedPermissions": true,
+      "internetPermission": false,
+      "embeddedSourceHashMatches": true,
+      "rootCleanup": {
+        "fixtureUninstalled": true,
+        "packageAbsent": true
+      },
+      "queryCounts": {
+        "repeated-marker": 50,
+        "cursor-cycle": 50,
+        "forward-overlap": 2,
+        "distinct-shared-url": 1,
+        "unnamed-url": 2,
+        "unusable-first": 2,
+        "forward-empty-and-pairs": 3,
+        "malformed-later": 2,
+        "transport-failure-later": 2,
+        "missing-records-later": 2,
+        "empty-terminal": 1,
+        "fifty-page-cap": 50
+      }
+    },
+    "candidate": {
+      "rootOwnedExecution": true,
+      "caseCount": 12,
+      "failedValidations": 0,
+      "passedCases": 12,
+      "sdk": 29,
+      "sourceSha256": "f91d8cc51d0f874c22d110cdf17bcefc2c8b8d1ecc829314f1971442c19bb3c0",
+      "sourceBytes": 46726883,
+      "fixtureSha256": "2288a80171f92d02286ceb6b98a7cb06630cd928fd4649e8b2d7e33654a56274",
+      "javaSha256": "ec11792e03e1f410095667fae0a7a80378d80a48d56806ed3b620e1a8c945fe4",
+      "allConnectionsClosed": true,
+      "noRequestedPermissions": true,
+      "internetPermission": false,
+      "embeddedSourceHashMatches": true,
+      "rootCleanup": {
+        "fixtureUninstalled": true,
+        "packageAbsent": true
+      },
+      "queryCounts": {
+        "repeated-marker": 2,
+        "cursor-cycle": 3,
+        "forward-overlap": 2,
+        "distinct-shared-url": 1,
+        "unnamed-url": 2,
+        "unusable-first": 2,
+        "forward-empty-and-pairs": 3,
+        "malformed-later": 2,
+        "transport-failure-later": 2,
+        "missing-records-later": 2,
+        "empty-terminal": 1,
+        "fifty-page-cap": 50
+      }
+    }
+  },
+  "ownRunRecord": "/private/tmp/portal-cloudkit-audit-20261104-061640/independent-focused-terminal.json",
+  "compiledBindingQualification": {
+    "historicalRunInputs": "Compiled archive and classes in own terminal record bind actual execution time. Root subsequent full gates may rebuild the archive; these are not asserted as all current-file bindings.",
+    "currentRemoteAlbumClassStillMatchesExecuted": true,
+    "executedClass": {
+      "jar": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/intermediates/runtime_app_classes_jar/debug/bundleDebugClassesToRuntimeJar/classes.jar",
+      "entry": "com/immortal/launcher/RemoteAlbum.class",
+      "bytes": 56856,
+      "sha256": "89a208ba0e771668448c8e65626b8fa8a6016d09603ca0c6e941ec6d96f6bb31"
+    }
+  },
+  "priorScopeReport": "/private/tmp/portal-cloudkit-audit-20261104-061640/cloudkit-source-scope-review.json",
+  "limits": [
+    "Reviewer ran only explicitly admitted host generated child/JUnit launcher; no Gradle, native/device/browser/provider/network/auth/audio/Git or source/test/public edit.",
+    "Native baseline/candidate were root-owned executions; reviewer fully read reports/fixture and hashed actual APKs/embedded source. No independent device action.",
+    "Native acceptance uses debug APK, synthetic in-memory HTTPS and Android JSON; no real iCloud/TLS, image download/decode/slideshow pixels/app UID network or optimized-artifact native execution is inferred.",
+    "Root full JVM results independently parsed; build/cert/screensaver-assets summaries remain root-owned evidence. No signer/asset tool execution by reviewer.",
+    "No two-room delivery/preservation/cleanup or physical-phone/whole-product completion claim. Those are separate root gates.",
+    "Earlier response-budget/Android Immich/host Immich and preceding crypto-turn alarm clocks remain unchanged.",
+    "The first private report assembler attempt failed because the JUnit progress dot prefixed its first case; no product/test failure or rerun resulted, and the parser now accounts for that formatting."
+  ],
+  "bindings": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/RemoteAlbum.kt",
+      "bytes": 32167,
+      "sha256": "49a2235c867988a3ed95fed298863bb3b66586c3ec0d8adcf22c5c301d594425",
+      "readScope": "FULL current file, three consecutive reads 1\u2013270,271\u2013535,536\u2013EOF."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/CloudKitPaginationTest.kt",
+      "bytes": 10452,
+      "sha256": "6d6de4d5b10079c0547411752d6b0d5ee962ac29690f4a7b1023a507c1761c1d",
+      "readScope": "FULL body before setup correction plus exact setup-only diff; byte-equal to fully reread corrected frozen fixture."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/frozen-CloudKitPaginationTest.kt",
+      "bytes": 10452,
+      "sha256": "6d6de4d5b10079c0547411752d6b0d5ee962ac29690f4a7b1023a507c1761c1d",
+      "readScope": "FULL corrected frozen fixture."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/baseline.json",
+      "bytes": 2676,
+      "sha256": "890a8301529c25810da4d2549f77876b8e7666c468fe1c6d20df1bbe1e130245",
+      "readScope": "FULL unit clock/base/protected metadata."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/red-corrected.xml",
+      "bytes": 43238,
+      "sha256": "410e6c0d15f7d5ac06b162b465b1ccf05c4160921a4f093fed553f39707aa648",
+      "readScope": "Full XML parsed; all 12 child rows and failure types extracted. Long duplicated wrapper message display was truncated; no manually full-message read claim."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/excluded-setup/CloudKitPaginationTest.kt",
+      "bytes": 10393,
+      "sha256": "6487b7eebaea6e4b61b2f2d1aaf36080a7a2b2b20fd62848408ee15089df91ce",
+      "readScope": "Full-byte comparison and exact two-constant diff against frozen corrected fixture."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/excluded-setup/classification.json",
+      "bytes": 222,
+      "sha256": "f49c4b775021e6ec3a37b4c4e970cb74e59ac3077b7da7cc6b479752f8c8f44b",
+      "readScope": "FULL excluded setup classification."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/cloudkit-source-scope-review.json",
+      "bytes": 11113,
+      "sha256": "f374a2d990d6b44ac4497a023aa51f112b93e2db95607176fe75d94d444063da",
+      "readScope": "Earlier own scope report; its fixture blockers are historical and resolved before authoritative RED."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/independent-focused-terminal.json",
+      "bytes": 5531,
+      "sha256": "87b5adb67ae7d543336c8e971bb94817aa5f23a52caf2e34b69ae6c2308fee2e",
+      "readScope": "FULL own fresh run/input record."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-cloudkit-pagination-20261104/native/CloudKitActivity.java",
+      "bytes": 11366,
+      "sha256": "ec11792e03e1f410095667fae0a7a80378d80a48d56806ed3b620e1a8c945fe4",
+      "readScope": "FULL native Java static read."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-cloudkit-pagination-20261104/native/AndroidManifest.xml",
+      "bytes": 401,
+      "sha256": "2479168e5be08f15a256f8bce5ce0cb0edbb8902c62fc646a495156f3783cfd8",
+      "readScope": "FULL manifest; no permissions declared."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/native-fixture-frozen.json",
+      "bytes": 189,
+      "sha256": "2ba08c8b2793678b56c4b7fb1276d14fcfffbb4371d2887055e7bf407764130f",
+      "readScope": "FULL native Java/manifest frozen hashes."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/excluded-native-compile/classification.json",
+      "bytes": 143,
+      "sha256": "a71cef3e4c1d1e67a505e0009d69171201a752666d58ade55790222d44a1fa56",
+      "readScope": "FULL excluded compile-only attempt classification."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/artifacts.json",
+      "bytes": 672,
+      "sha256": "505a65458f11c49a74df8051fbaa5dd4531387f6e0a14fc4bf5422b2a0f24a90",
+      "readScope": "FULL root-owned artifact/build/cert/asset/JVM summary. Signer/asset assertions not separately executed by this reviewer."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/full-gates.log",
+      "bytes": 13723,
+      "sha256": "5c5b9fc94b1a3ace690cf9dd2d3b005a1cb380b9d3d6b5d783f148a18d86da50",
+      "readScope": "Selected final build/task output; full bytes bound, unrelated earlier compiler warnings not manually reviewed."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/native-baseline/report.json",
+      "bytes": 3207,
+      "sha256": "fbe1e0c125838ac550fe7a681230a89fb1d03951ba6498b05cd78dafced786ea",
+      "readScope": "FULL root-owned native report, all twelve rows."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/native-baseline/metadata.json",
+      "bytes": 320,
+      "sha256": "ec3c4daada36717dd50a71fcb81a788c675c6e3ed91ffdc421622df76061fb9f",
+      "readScope": "FULL source/fixture/native-Java metadata."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/native-baseline/cleanup.json",
+      "bytes": 57,
+      "sha256": "69fe261c02759d8e327bb95add2ec5b053fe29da595735f5d43e79c6e856f67d",
+      "readScope": "FULL root-owned cleanup/package-absence metadata."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/baseline-debug.apk",
+      "bytes": 46726887,
+      "sha256": "0a9b8df0bbbd8bb2d6ddc1d0284964129802407d590db29c81907d17bab51f88",
+      "readScope": "Byte/hash only; no reviewer install/device execution."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/native-baseline/fixture.apk",
+      "bytes": 46752210,
+      "sha256": "9019c427458ac858dc64622c90ea190a6ea0515bc2768d0481457f90009a1421",
+      "readScope": "Byte/hash and embedded source asset hash only; no reviewer install/device execution."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/native-candidate/report.json",
+      "bytes": 3190,
+      "sha256": "975f2057e51d3a61af695c76129f74ef3732f5aa7a806d45f7b8fe10f9b0d0db",
+      "readScope": "FULL root-owned native report, all twelve rows."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/native-candidate/metadata.json",
+      "bytes": 320,
+      "sha256": "4c19e76ed38ebf423c0f63c96b071ebaabb4fa0ffc0658f54cb1de6076030cde",
+      "readScope": "FULL source/fixture/native-Java metadata."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/native-candidate/cleanup.json",
+      "bytes": 57,
+      "sha256": "69fe261c02759d8e327bb95add2ec5b053fe29da595735f5d43e79c6e856f67d",
+      "readScope": "FULL root-owned cleanup/package-absence metadata."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/candidate-debug.apk",
+      "bytes": 46726883,
+      "sha256": "f91d8cc51d0f874c22d110cdf17bcefc2c8b8d1ecc829314f1971442c19bb3c0",
+      "readScope": "Byte/hash only; no reviewer install/device execution."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/native-candidate/fixture.apk",
+      "bytes": 46752210,
+      "sha256": "2288a80171f92d02286ceb6b98a7cb06630cd928fd4649e8b2d7e33654a56274",
+      "readScope": "Byte/hash and embedded source asset hash only; no reviewer install/device execution."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/independent-full-results.json",
+      "bytes": 620,
+      "sha256": "60e86fafc056064ffec79600cdc0e2727e6f3e393056012193338b75045bae74",
+      "readScope": "FULL own 459-XML independent aggregate/count record."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/independent-direct-child.log",
+      "bytes": 841,
+      "sha256": "aa44f47775e3f74d00673438652b33bcbc5ca03705ce051adda5d759a13e4be7",
+      "readScope": "FULL fresh own output read."
+    },
+    {
+      "path": "/private/tmp/portal-cloudkit-audit-20261104-061640/independent-junit-launcher.log",
+      "bytes": 891,
+      "sha256": "e5901f1060ca1d7a7e9035fe0f990991c71a53d811e0885a639885ec72edfe7f",
+      "readScope": "FULL fresh own output read."
+    }
+  ]
+}

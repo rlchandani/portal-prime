@@ -1,0 +1,16 @@
+{
+  "parsedAtUtc": "2026-11-04T06:28:31.600481+00:00",
+  "directory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+  "suites": 459,
+  "totals": {
+    "tests": 4392,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "uniqueMethods": 4392,
+  "duplicateMethods": 0,
+  "aggregateMethod": "SHA256 of sorted XML filename + NUL + full XML bytes concatenated",
+  "aggregateSha256": "568c1c0bf45da81ce0096e33d371cc807e4de8f00c2ec2d3f8134ed9bbf02c09",
+  "executionOwner": "Root Gradle run; independently parsed by reviewer, no duplicate Gradle execution."
+}

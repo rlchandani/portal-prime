@@ -336,10 +336,13 @@ object RemoteAlbum {
             "&publicAccessAuthToken=${URLEncoder.encode(authToken, "UTF-8")}"
 
     val out = ArrayList<String>()
+    val seenMasters = HashSet<String>()
+    val requestedMarkers = HashSet<String>()
     var marker: String? = null
     var pages = 0
     do {
       val m = marker // local for a stable smart-cast
+      if (m != null && !requestedMarkers.add(m)) break
       // A later page must never cost the photos already collected: records come as
       // CPLAsset+CPLMaster PAIRS, so one [CK_PAGE_SIZE] page is only ~100 photos and a
       // >100-photo album (issue #175) always crosses at least one page boundary. Any
@@ -374,7 +377,12 @@ object RemoteAlbum {
                   if (rec.optString("recordType") != "CPLMaster") continue
                   val fields = rec.optJSONObject("fields") ?: continue
                   if (!isCloudKitImage(fields)) continue
-                  pickBestCloudKitAsset(fields, screenW, screenH)?.let { pageUrls.add(it) }
+                  val photo = pickBestCloudKitAsset(fields, screenW, screenH) ?: continue
+                  // Record identity survives derivative URL changes; unnamed masters use
+                  // their usable URL without collapsing distinct named masters sharing it.
+                  val name = rec.optString("recordName", "").takeIf { it.isNotBlank() }
+                  val identity = if (name != null) "record:$name" else "url:$photo"
+                  if (seenMasters.add(identity)) pageUrls.add(photo)
                 }
                 pageUrls to obj.optString("continuationMarker", "").ifBlank { null }
               }

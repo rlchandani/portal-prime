@@ -1,0 +1,134 @@
+{
+  "cases": [
+    {
+      "name": "repeated-marker",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 2,
+      "pass": true
+    },
+    {
+      "name": "cursor-cycle",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 3,
+      "photoCount": 3,
+      "pass": true
+    },
+    {
+      "name": "forward-overlap",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 2,
+      "pass": true
+    },
+    {
+      "name": "distinct-shared-url",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 1,
+      "photoCount": 2,
+      "pass": true
+    },
+    {
+      "name": "unnamed-url",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 2,
+      "pass": true
+    },
+    {
+      "name": "unusable-first",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 1,
+      "pass": true
+    },
+    {
+      "name": "forward-empty-and-pairs",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 3,
+      "photoCount": 2,
+      "pass": true
+    },
+    {
+      "name": "malformed-later",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 1,
+      "pass": true
+    },
+    {
+      "name": "transport-failure-later",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 1,
+      "pass": true
+    },
+    {
+      "name": "missing-records-later",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 2,
+      "photoCount": 1,
+      "pass": true
+    },
+    {
+      "name": "empty-terminal",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 1,
+      "photoCount": 0,
+      "pass": true
+    },
+    {
+      "name": "fifty-page-cap",
+      "urlsMatch": true,
+      "markersMatch": true,
+      "titleAndHeadersMatch": true,
+      "connectionsClosed": true,
+      "queryRequests": 50,
+      "photoCount": 50,
+      "pass": true
+    }
+  ],
+  "failures": 0,
+  "pass": true,
+  "sdk": 29,
+  "sourceSha256": "f91d8cc51d0f874c22d110cdf17bcefc2c8b8d1ecc829314f1971442c19bb3c0",
+  "sourceBytes": 46726883,
+  "internetPermission": false,
+  "actualPublicFetchAndMetadataReader": true,
+  "androidJson": true,
+  "generatedTransportOnly": true,
+  "backgroundThread": true
+}
