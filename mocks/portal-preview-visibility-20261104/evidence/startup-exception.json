@@ -1,0 +1,190 @@
+{
+  "cursor": 96,
+  "events": [
+    {
+      "sequence": 69,
+      "source": {
+        "tabId": 3
+      },
+      "method": "Runtime.exceptionThrown",
+      "params": {
+        "exceptionDetails": {
+          "columnNumber": 6482,
+          "exceptionId": 2,
+          "executionContextId": 13,
+          "lineNumber": 195,
+          "scriptId": "30",
+          "stackTrace": {
+            "callFrames": [
+              {
+                "columnNumber": 6482,
+                "functionName": "",
+                "lineNumber": 195,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 2431,
+                "functionName": "r",
+                "lineNumber": 127,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 2316,
+                "functionName": "n",
+                "lineNumber": 127,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 2643,
+                "functionName": "ac",
+                "lineNumber": 127,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 6394,
+                "functionName": "Vb",
+                "lineNumber": 195,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 38733,
+                "functionName": "",
+                "lineNumber": 212,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 55741,
+                "functionName": "",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 38781,
+                "functionName": "",
+                "lineNumber": 212,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 91864,
+                "functionName": "Vc",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 107047,
+                "functionName": "Dl",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 106931,
+                "functionName": "El",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 107093,
+                "functionName": "Dl",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 119876,
+                "functionName": "Gu",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 119662,
+                "functionName": "Wu",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 123229,
+                "functionName": "fd",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 121807,
+                "functionName": "sd",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 119516,
+                "functionName": "Hu",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 117508,
+                "functionName": "zu",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 112654,
+                "functionName": "yu",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 112163,
+                "functionName": "vu",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 123126,
+                "functionName": "dd",
+                "lineNumber": 134,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 84351,
+                "functionName": "te",
+                "lineNumber": 127,
+                "scriptId": "30",
+                "url": ""
+              },
+              {
+                "columnNumber": 114131,
+                "functionName": "onMicrotask",
+                "lineNumber": 1,
+                "scriptId": "29",
+                "url": "node:electron/js2c/sandbox_bundle"
+              }
+            ]
+          },
+          "text": "Uncaught TypeError: Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'."
+        },
+        "timestamp": 1793828944367.945
+      }
+    }
+  ],
+  "hasMore": false,
+  "truncated": true
+}

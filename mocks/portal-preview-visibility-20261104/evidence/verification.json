@@ -1,0 +1,126 @@
+{
+  "verifiedAt": "2026-11-04T21:55:37.979175+00:00",
+  "start": "2026-11-04T21:43:08+00:00",
+  "target": "2026-11-04T21:58:08Z",
+  "hardStop": "2026-11-04T22:13:08Z",
+  "base": "e914bb886c59648925e8cf148be4f77bd80a19d4",
+  "browser": "Existing in-app browser tab3",
+  "url": "http://127.0.0.1:8892/renderer.html",
+  "action": "Reload stale existing tab once; expand/collapse existing layout control without changing selection",
+  "beforeEvidence": "Actual read-only DOM observation before reload; copied literally from tool result. Before screenshot displayed in transcript but not retained as a file.",
+  "before": {
+    "layouts": [
+      {
+        "text": "Photo wall",
+        "value": "mosaic"
+      },
+      {
+        "text": "Single print",
+        "value": "framed"
+      }
+    ],
+    "selectedMode": "mosaic",
+    "photo": "0",
+    "motion": false,
+    "renderer": "/production/index.html?mode=mosaic&photo=0&motion=0"
+  },
+  "after": {
+    "tabId": "3",
+    "state": {
+      "layouts": [
+        {
+          "text": "Photo wall",
+          "value": "mosaic"
+        },
+        {
+          "text": "Single print",
+          "value": "framed"
+        },
+        {
+          "text": "Cinematic photo",
+          "value": "kenBurns"
+        },
+        {
+          "text": "Cinematic push",
+          "value": "push"
+        },
+        {
+          "text": "Three-photo layout",
+          "value": "heroSidebar"
+        },
+        {
+          "text": "Photo pair",
+          "value": "diptych"
+        },
+        {
+          "text": "Memories",
+          "value": "memories"
+        },
+        {
+          "text": "Panorama",
+          "value": "panorama"
+        },
+        {
+          "text": "Cinema letterbox",
+          "value": "cinema"
+        },
+        {
+          "text": "Polaroid prints",
+          "value": "polaroid"
+        },
+        {
+          "text": "Gallery Wall",
+          "value": "galleryWall"
+        }
+      ],
+      "motion": false,
+      "photo": "0",
+      "renderer": "/production/index.html?mode=mosaic&photo=0&motion=0",
+      "selectedMode": "mosaic"
+    },
+    "errors": [
+      {
+        "level": "error",
+        "message": "Uncaught TypeError: Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'.",
+        "timestamp": "2026-11-04T21:49:04.368Z"
+      }
+    ]
+  },
+  "newLayoutCount": 11,
+  "oldLayoutCount": 2,
+  "selectionPreserved": true,
+  "visualObservation": "After reload: six balanced photo tiles, slim photo frames, pale doodle margins and separate clock space. Native Portal appearance/performance is not established by this browser observation.",
+  "imageSha256": "02b790864bf173a6e6a856097dd0775c50065d756cf3adff574a7b95f5b4a643",
+  "imageBytes": 145884,
+  "sourceBindings": {
+    "mocks/portal-photo-layout-20261103/renderer.html": "b9cf982711e62b53ec77ac9d110893955924f52651e3c58df8902811486b8fde",
+    "mocks/portal-photo-layout-20261103/serve.py": "02cd1288844c592f1574f374f595c0dffd479a9abc8004a1034005ca5264fe9e",
+    "mocks/portal-photo-layout-20261103/renderer-fixture.js": "8aab462d9512838a00c83588e1afc789458b110ca1344d3d7232446ff4924950",
+    "app/src/main/assets/screensaver/index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+    "app/src/main/assets/screensaver/styles.css": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+    "app/src/main/assets/screensaver/mode-impls.js": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+  },
+  "allInspectedSourceBytesUnchanged": true,
+  "otherTabsNotReloaded": true,
+  "appOrDeviceOrPublicationChanges": false,
+  "roomsRetain": "1.179/code173",
+  "heldScopesReopened": false,
+  "wholeGoalActive": true,
+  "minutesToVerification": 12.499652916666667,
+  "targetMet": true,
+  "startupErrorQualification": {
+    "capturedErrors": 1,
+    "attributedRepositoryDefect": false,
+    "message": "MutationObserver received non-Node",
+    "stackHasElectronSandbox": true,
+    "unnamedScript": true,
+    "noMutationObserverInInspectedRendererSources": true,
+    "cleanConsoleClaim": false,
+    "exactScriptOwnerUnproven": true,
+    "bufferTruncated": true
+  },
+  "excludedAttempts": [
+    "First metadata promotion rejected its zero-error assertion before any document/roadmap/source edit.",
+    "One read-only DOM inspection attempted an unavailable iframe document property and failed; no UI/source mutation or accepted case."
+  ]
+}

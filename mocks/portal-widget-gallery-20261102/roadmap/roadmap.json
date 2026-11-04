@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T21:40:16.212124+00:00",
-  "updatedLabel": "Native fixture API option locally delivered; rooms retain1.179",
+  "updatedAt": "2026-11-04T21:55:37.979175+00:00",
+  "updatedLabel": "Photo preview refreshed to11layouts; rooms retain1.179",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,43 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-preview-stale-tab",
+      "title": "Photo review: show the current implemented layouts",
+      "summary": "The already-open local review was refreshed from two available layouts to eleven, exposing the current balanced photo wall.",
+      "status": "verified",
+      "kind": "Observed local preview delivery visibility",
+      "platforms": [
+        "browser"
+      ],
+      "owner": "Root browser observation and refresh",
+      "verification": "Actual current DOM: two options before one reload, eleven after. Existing Photo wall/index0/motionfalse values preserved. After screenshot inspected; all bound source bytes unchanged. One unattributed startup error retained; no clean-console claim.",
+      "deployment": "Existing local browser tab3 refreshed. No app build, install, provider or publication action; rooms retain1.179/code173.",
+      "acceptance": [
+        "Expose all eleven current implemented photo styles in the review.",
+        "Retain the existing selection and leave other browser tabs untouched.",
+        "Inspect actual visible photo frame/doodle layout and record separate native limits."
+      ],
+      "evidence": [
+        {
+          "text": "Actual preview mismatch, refresh and scope",
+          "source": "docs/portal-preview-visibility-2026-11-04.md"
+        }
+      ],
+      "limits": [
+        "Existing loaded-page staleness; no cache-policy defect was established or changed.",
+        "Local generated samples and simulated clock; no new native/Portal, natural Shuffle or performance acceptance.",
+        "Before DOM retained from actual tool output; before screenshot is transcript-only.",
+        "One unattributed unnamed-script startup exception with Electron sandbox frame; exact owner unproven and no product patch. Captured buffer truncated."
+      ],
+      "next": "Use the refreshed review for current layouts; retain separate held native issues.",
+      "issueClock": {
+        "startedAt": "2026-11-04T21:43:08Z",
+        "target": "2026-11-04T21:58:08Z",
+        "deadline": "2026-11-04T22:13:08Z",
+        "firstDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "native-fixture-min-api",
       "title": "Native checks: select Android 9 compatibility",
