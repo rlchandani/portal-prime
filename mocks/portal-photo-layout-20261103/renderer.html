@@ -4,12 +4,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Immortal · implemented Paper photos</title>
 <style>
-  *{box-sizing:border-box}body{margin:0;background:#ede9df;color:#343a30;font:15px system-ui}
+  *{box-sizing:border-box}body{margin:0;background:#ede9df;color:#343a30;font:15px system-ui;height:100dvh;display:flex;flex-direction:column}
+  header,small{flex-shrink:0}
   header{padding:14px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #cbc5b8}
   strong{font-size:18px}label{display:flex;gap:8px;align-items:center}
   select{font:inherit;padding:6px;background:#f9f7f1;border:1px solid #b8b09f;border-radius:6px;color:inherit}
   small{display:block;padding:8px 20px}a{color:inherit}
-  iframe{display:block;width:100%;height:calc(100dvh - 130px);min-height:320px;border:0}
+  iframe{display:block;width:100%;flex:1 1 0;min-height:320px;border:0}
 </style>
 <header>
   <strong>Paper photos</strong>

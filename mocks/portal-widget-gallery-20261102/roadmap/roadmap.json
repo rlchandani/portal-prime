@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T21:55:37.979175+00:00",
-  "updatedLabel": "Photo preview refreshed to11layouts; rooms retain1.179",
+  "updatedAt": "2026-11-04T22:11:01.014893+00:00",
+  "updatedLabel": "Photo preview fits wrapped controls; rooms retain1.179",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,43 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-preview-wrapped-header-height",
+      "title": "Photo review: fit beneath wrapped controls",
+      "summary": "The local photo review fills the space below its actual header and note, removing artificial page overflow.",
+      "status": "delivered",
+      "kind": "Local preview wrapper CSS fix",
+      "platforms": [
+        "browser"
+      ],
+      "owner": "Root implementation and actual browser checks; independent review",
+      "verification": "Four actual viewport measurements before/after: excess11/112/162px removed at825x1313,390x844,320x900. At320x400, existing320px frame and212px reachable scrolling retained. All11options and selection exact.",
+      "deployment": "Current local browser preview; rooms retain1.179/code173.",
+      "acceptance": [
+        "Actual825x1313 and narrow/tall wrapped headers fit viewport without artificial scroll",
+        "All11layout options and existing local preview state remain",
+        "Short viewport retains320px iframe and reachable scroll rather than crop",
+        "Only local review wrapper CSS changes; Android sources/assets/version/devices unchanged"
+      ],
+      "evidence": [
+        {
+          "text": "Measured geometry, source scope and review",
+          "source": "docs/portal-preview-height-2026-11-04.md"
+        }
+      ],
+      "limits": [
+        "Local review wrapper only; no Android source/assets/version/device changes.",
+        "One prior unattributed startup exception remains separate; no clean-console claim.",
+        "No native black-handoff, performance or all-style acceptance."
+      ],
+      "next": "Keep native held issues separate.",
+      "issueClock": {
+        "startedAt": "2026-11-04T21:43:08Z",
+        "target": "2026-11-04T21:58:08Z",
+        "deadline": "2026-11-04T22:13:08Z",
+        "firstDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "photo-preview-stale-tab",
       "title": "Photo review: show the current implemented layouts",
