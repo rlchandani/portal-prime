@@ -1,0 +1,21 @@
+{
+  "nativeAdapterV1": {
+    "error": "setup:java.lang.AssertionError:Actual six/seven capture menu action",
+    "casesExecuted": 0,
+    "retired": true,
+    "reason": "D8 makes actual private JVM callback package-visible; old private modifier gate incorrectly rejected actual unchanged APK."
+  },
+  "unchangedAssertionBodies": true,
+  "originalIssueClockRetained": true,
+  "excludedReceiptPath": "/private/tmp/portal-app-favorite-removal-20261104-114944/excluded-native-adapter-v1",
+  "baselineDexAccessProof": {
+    "path": "/private/tmp/portal-app-favorite-removal-20261104-114944/baseline-apk-callback-dexdump.txt",
+    "sha256": "caab7e83413b8b20bce2dab26b01dac80b00a3390af29500c55cce32f31014b9"
+  },
+  "nativeV2PreInstallCopy": {
+    "error": "PermissionError replacing v1 read-only owned baseline-fixture.apk",
+    "casesExecuted": 0,
+    "installAttempted": false,
+    "repair": "Remove owned stale copy after retaining v1 receipt; unchanged v2 wrapper/DEX/gates/driver."
+  }
+}

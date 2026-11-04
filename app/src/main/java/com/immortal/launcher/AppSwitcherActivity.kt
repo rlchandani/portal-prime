@@ -372,7 +372,7 @@ private fun ApprovedAppsContent(
       AppsMenuRow("Open") { menuFor = null; launchApp(app) }
       AppsMenuRow(if (isFavorite) "Remove from favorites" else "Add to favorites") {
         val id = app.component.flattenToString()
-        val remaining = (ordered.map { it.component.flattenToString() } + order).distinct().filterNot { it == id }
+        val remaining = (ordered.map { it.component.flattenToString() } + order + if (isFavorite) builtinIds else emptyList()).distinct().filterNot { it == id }
         saveAppOrder(if (isFavorite) remaining + id else listOf(id) + remaining)
         menuFor = null
       }

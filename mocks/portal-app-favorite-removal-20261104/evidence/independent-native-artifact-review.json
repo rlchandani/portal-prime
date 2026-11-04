@@ -1,0 +1,377 @@
+{
+  "ok": true,
+  "status": "PASS_BOUNDED_NATIVE_ARTIFACT_REVIEW",
+  "reviewedAtUtc": "2026-11-04T12:12:45.746064+00:00",
+  "clock": {
+    "original": "2026-11-04T11:49:44Z",
+    "selected": "2026-11-04T12:04:26Z",
+    "target": "2026-11-04T12:04:44Z",
+    "hard": "2026-11-04T12:19:44Z",
+    "notReset": true
+  },
+  "blockers": [],
+  "checks": {
+    "javaV1ToV2ExactlyAccessGateOnly": true,
+    "fourCaseAndAssertionBodiesUnchanged": true,
+    "packagedBaselineCallbackPackageVisibleStaticFinalConfirmed": true,
+    "uniqueTypedSixSevenCaptureAdmission": true,
+    "realEmbeddedCallbackAppItemUserLayoutOrigin": true,
+    "sourceOneRemovalOnlyLineExact": true,
+    "protectedHomeLayoutDashboardSourcesExact": true,
+    "sameFrozenFixtureDexBothWrappers": true,
+    "sameWrapperEntriesOnlyEmbeddedApkAndThreeV1SignatureEntriesChange": true,
+    "exactEmbeddedBaselineAndCandidateApks": true,
+    "zeroManifestPermissions": true,
+    "baselineThreeLiteralFailuresOneControlCandidateFourPass": true,
+    "generatedPrefsOneEditPutApplyPerCaseNoCommit": true,
+    "menuAndOrderStateOneWritePerCase": true,
+    "nonOrderSentinelsAndNullBaseContextPreserved": true,
+    "observedGeneratedContextUnexpectedOperationsAndIconReadsZero": true,
+    "bothRetirementsAllThreeAbsent": true,
+    "tenScreensaverAssetsBothApksEqualSourceAndBaseline": true,
+    "artifactHashesRecomputed": true
+  },
+  "caseReplay": [
+    {
+      "phase": "before",
+      "case": "removeFromSixApps",
+      "literalSavedOrderExact": true,
+      "firstSixIndependentlyRecomputed": true,
+      "removedAbsent": false,
+      "pass": false
+    },
+    {
+      "phase": "before",
+      "case": "removeOnlyAppUsesKnownBuiltins",
+      "literalSavedOrderExact": true,
+      "firstSixIndependentlyRecomputed": true,
+      "removedAbsent": false,
+      "pass": false
+    },
+    {
+      "phase": "before",
+      "case": "removePreservesExistingShortcutOrder",
+      "literalSavedOrderExact": true,
+      "firstSixIndependentlyRecomputed": true,
+      "removedAbsent": false,
+      "pass": false
+    },
+    {
+      "phase": "before",
+      "case": "addRetainsExactPreviousOutput",
+      "literalSavedOrderExact": true,
+      "firstSixIndependentlyRecomputed": true,
+      "removedAbsent": null,
+      "pass": true
+    },
+    {
+      "phase": "after",
+      "case": "removeFromSixApps",
+      "literalSavedOrderExact": true,
+      "firstSixIndependentlyRecomputed": true,
+      "removedAbsent": true,
+      "pass": true
+    },
+    {
+      "phase": "after",
+      "case": "removeOnlyAppUsesKnownBuiltins",
+      "literalSavedOrderExact": true,
+      "firstSixIndependentlyRecomputed": true,
+      "removedAbsent": true,
+      "pass": true
+    },
+    {
+      "phase": "after",
+      "case": "removePreservesExistingShortcutOrder",
+      "literalSavedOrderExact": true,
+      "firstSixIndependentlyRecomputed": true,
+      "removedAbsent": true,
+      "pass": true
+    },
+    {
+      "phase": "after",
+      "case": "addRetainsExactPreviousOutput",
+      "literalSavedOrderExact": true,
+      "firstSixIndependentlyRecomputed": true,
+      "removedAbsent": null,
+      "pass": true
+    }
+  ],
+  "artifactMetadata": {
+    "versionName": "1.155",
+    "versionCode": 149,
+    "debugSha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+    "performanceSha256": "8c6942ca339f920fb3b6034f21fa9a919942af2e2fa15aa82d53130c976770d6",
+    "signerSha256FromRetainedRootSdkGate": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "fullJvm": {
+      "tests": 4507,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 470
+    },
+    "gradleExit": 0,
+    "nativeBeforeExit": 0,
+    "nativeAfterExit": 0,
+    "nativeTerminalEvidence": "Root reported retained sessions 85639 and 42001 terminal exit0; reviewer did not execute them."
+  },
+  "wrapperChangedEntries": [
+    "META-INF/ANDROIDD.RSA",
+    "META-INF/ANDROIDD.SF",
+    "META-INF/MANIFEST.MF",
+    "assets/source.apk"
+  ],
+  "fixtureDex": {
+    "sha256": "7b82fec40496fd43d2bedbea6afeb0530fe3827001953f4e8fd851996291bb49",
+    "bytes": 25448
+  },
+  "javaSha256": "83e9d6207c075113f74bf267fe53c50156a55151e817dc465320aa95ccefafd3",
+  "driverSha256": "c81ccfd91f4bd60b088d617798dc05aa503c69efe76493b0dc04da36bb33f766",
+  "excludedAttempts": {
+    "adapterV1": "Zero executed cases: private-JVM access assumption rejected actual D8 package-visible STATIC FINAL method. Excluded source/results and retirement retained; not product failure evidence.",
+    "v2PreInstallCopy": "PermissionError replacing retained read-only v1 baseline wrapper copy; zero cases and no install. Root retained receipt then removed stale owned copy; no gate change."
+  },
+  "metadataQualification": [
+    "Preparation adapterVersion2 and final RUN hash are authoritative. Earlier source-admission RUN binding is the initial documentation snapshot; final preparation binds current appended v2 RUN.",
+    "actualPrivateMenuCallback is a legacy admission key describing the JVM private source method. Actual packaged native method is package-visible STATIC FINAL, as witnessed by exact APK DEX access.",
+    "realContextsServicesProvidersPassed=0 is source containment, not instrumented global loader/provider counters. unexpectedOperations covers attempted operations through GeneratedContext; zero INTERNET also follows manifest/runtime fields."
+  ],
+  "scopeAndLimits": [
+    "API29 actual debug APK non-mounted generated callback, actual generated in-memory preference mutation/readback, and real UserLayout.applyOrder. Apps known-first-six is a source-derived projection; no mounted Compose menu/Home or screenshot proof.",
+    "Acceptance requires at least six genuinely available non-selected Home inventory items represented before the removed app. Sparse native case explicitly provides six Home shortcuts, including configured available Dashboard. One app plus only five available shortcuts, missing icons, unconfigured dashboard and Home/Apps inventory mismatch remain outside this correction.",
+    "Existing ordered-app prefix and explicit shortcut relative semantics are preserved; no claim original absolute shortcut positions are retained. Add branch has exact old saved output.",
+    "No real installed inventory, owner context/preferences, provider/account/network/phone/live media, concurrency/raw writers, persistence-to-disk durability, optimized/runtime/API28 or physical household UI acceptance.",
+    "Authored JVM suite is bound only for frozen provenance and retained XML counts, not independently reviewed by its author. Native fixture was authored separately and independently reviewed here.",
+    "Read-only host verification of retained source, JSON, XML and APK ZIP bytes only; no build/test/SDK/Git/ADB/device/network action. Signature and manifest SDK verification are root-retained metadata; independent SDK/certificate validation was not performed."
+  ],
+  "bindings": {
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/AppFavoriteActivity.java": {
+      "sha256": "83e9d6207c075113f74bf267fe53c50156a55151e817dc465320aa95ccefafd3",
+      "bytes": 16512
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/AndroidManifest.xml": {
+      "sha256": "f413b7b3fe0f5ed827ef852399cf85628f5141f5a326e99b6fb8c42ae6e1385b",
+      "bytes": 422
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/build.sh": {
+      "sha256": "78251bb3b7378bca812ef909378dd2716ae39045b87835f1b1597ae516cf42bc",
+      "bytes": 828
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/repack.sh": {
+      "sha256": "e1aee6e34e319fdaa10e1812a54854dcec53086bbae569e27f3fda47a889a554",
+      "bytes": 781
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/RUN.md": {
+      "sha256": "cc7581e938860406f6c985d9971afa32c58d71b8275808077d4835d8e7173ad9",
+      "bytes": 2139
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/freeze.py": {
+      "sha256": "6e1e5a5f8708877ab44cdc6f058d2138b00279f6c5265022b4e731fca321926a",
+      "bytes": 1779
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/source-admission.json": {
+      "sha256": "0311f15f8c7c80843ba6f87a9be28bbfa72ebb04606c3403c5d5046cf55bf1ee",
+      "bytes": 2954
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/frozen-dex/classes.dex": {
+      "sha256": "7b82fec40496fd43d2bedbea6afeb0530fe3827001953f4e8fd851996291bb49",
+      "bytes": 25448
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt": {
+      "sha256": "f2f82d2ce372c6d42acfc83b29b83104662ad5152a643b509afc1198d818815b",
+      "bytes": 33074
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/AppsFavoriteRemovalTest.kt": {
+      "sha256": "53c4a23bd2b0d5ab5a10afc84f9a3da928d187b11e1ae1564127a4d0e644811a",
+      "bytes": 8386
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/UserLayout.kt": {
+      "sha256": "a4aa50d80f339be22762e960b0aa17424187eae2d4392bd44221ba2651031359",
+      "bytes": 8304
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt": {
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+      "bytes": 229887
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "1da9864964b9947942d22788c1b864a15898a76206af52bb29405d3e7ca02657",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/AppSwitcherActivity.before.kt": {
+      "sha256": "323f748bd12f91532c3ff14f7be0318dca39f7ff366f7d03a52cd51206c67162",
+      "bytes": 33028
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeDashboardActivity.kt": {
+      "sha256": "e0f6e0a5b99ef2da3ab99c9c52491c257ecfa114fd5e9b6a085478c4a4a07e7b",
+      "bytes": 2181
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeDashboardConfig.kt": {
+      "sha256": "35108e4f39b92fafb726bc1d25a8fe1d6dfd4c70cbbe645c41bb6dc0d21e4d21",
+      "bytes": 1842
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomePresentation.kt": {
+      "sha256": "021a05b0168d9eb08e9844c5e64117940716a7bc23859c0161e96d6dcf11d56f",
+      "bytes": 3804
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/baseline-fixture.apk": {
+      "sha256": "9871af859c41a9799ca8532c660805429cced064ebf0bc8d8f5a0a81b44c3cae",
+      "bytes": 37507562
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/baseline-debug-1.154.apk": {
+      "sha256": "4a2822189560e841daa9243af2ba8549d1df37d1a25541e7f78fbb338be2fb42",
+      "bytes": 46745294
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/candidate-debug-1.155.apk": {
+      "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+      "bytes": 46745294
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png": {
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "bytes": 12657
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html": {
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "bytes": 7785
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js": {
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "bytes": 5582
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js": {
+      "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+      "bytes": 68261
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg": {
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "bytes": 1247
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg": {
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "bytes": 1246
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js": {
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "bytes": 8528
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css": {
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "bytes": 15397
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/candidate-performance-1.155.apk": {
+      "sha256": "8c6942ca339f920fb3b6034f21fa9a919942af2e2fa15aa82d53130c976770d6",
+      "bytes": 25886647
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/app-favorite-fixture.apk": {
+      "sha256": "a3f378e963ddd3991018e1f4cd61ffa5d17081819f65a4d5911fee5184b3fcb6",
+      "bytes": 37511658
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/excluded-native-adapter-v1/native-owned/AppFavoriteActivity.java": {
+      "sha256": "ddfbb9ae78fcfd9c19837143bd41556241aeb314cbed694ef05f74fb4a9148c9",
+      "bytes": 16437
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-run.py": {
+      "sha256": "c81ccfd91f4bd60b088d617798dc05aa503c69efe76493b0dc04da36bb33f766",
+      "bytes": 4221
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-before-report.json": {
+      "sha256": "c454af9c830ec2f080d77a2c447e93c63787f63a907f4e8d5f5a42f3472624cf",
+      "bytes": 14469
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-after-report.json": {
+      "sha256": "ea949f3795b6d4c24e36304b40ad81faf847e4782628aae344998e3912524501",
+      "bytes": 13138
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-before-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-after-retirement.json": {
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-before.claim": {
+      "sha256": "a743c86bafe16faefdf23056ee05eb1f7b0ddb6f619d4b20d713af9c0f9d6e00",
+      "bytes": 54
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-after.claim": {
+      "sha256": "a743c86bafe16faefdf23056ee05eb1f7b0ddb6f619d4b20d713af9c0f9d6e00",
+      "bytes": 54
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-before-install.log": {
+      "sha256": "5525c6bd2379e7d234b58ff2cd4c6e7d7ebbc0dd304859b1ccb821bb2ebc3228",
+      "bytes": 115
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-after-install.log": {
+      "sha256": "5525c6bd2379e7d234b58ff2cd4c6e7d7ebbc0dd304859b1ccb821bb2ebc3228",
+      "bytes": 115
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-before-uninstall.log": {
+      "sha256": "7fc0023a6402c7bd7abd98bb3e580968de4833eed07d88d1cc8d70819d69c7a0",
+      "bytes": 8
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-after-uninstall.log": {
+      "sha256": "7fc0023a6402c7bd7abd98bb3e580968de4833eed07d88d1cc8d70819d69c7a0",
+      "bytes": 8
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/promotion-artifacts.json": {
+      "sha256": "afa6a6ac6960028ba704c91a97d3ec2d5a49de3b93049c4b11dc8297b0cb8f06",
+      "bytes": 4803
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/build-terminal.json": {
+      "sha256": "5125cc87945f4a0eaa8be57489b564b0d467b201538a2a2176dbb86c576e08ae",
+      "bytes": 224
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/build.log": {
+      "sha256": "6a40031347cd5d9c3b5e5f3f1b7a8f29b75696904dec5c36248996ddb7a30737",
+      "bytes": 14343
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-build-v2.log": {
+      "sha256": "7916a5b6a00ffd0ac6062c4077b296f9d2b2617c2e29829a544969bead51b478",
+      "bytes": 980
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/baseline-focused-tests.xml": {
+      "sha256": "24ea10236a87c7e59f160d0fd02494b62e23fa03181511fabaed12017427b371",
+      "bytes": 20061
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/candidate-focused-tests.xml": {
+      "sha256": "eeaa601a189dd81b028ddd9dc62614837a708af5464d23e6995432b08d15e4fd",
+      "bytes": 2064
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/source-freeze.json": {
+      "sha256": "4201ad8d91ac458e4084a72fa591ebea59614c6651266a524ee84e239c41a59f",
+      "bytes": 947
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/pre-baseline-admission.json": {
+      "sha256": "8f8342394702fa8ea07320f09473e01ed23fa5c97bfec7d7e1b3f622498aaf55",
+      "bytes": 941
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/plan.json": {
+      "sha256": "0f8c0fbc8b81257337053d4707ceae9380708634e50f4a769e1097c0bc3773ed",
+      "bytes": 1008
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/independent-source-review.json": {
+      "sha256": "58c71070a0652d6e58e7130639f4443bb332e8666370586d5da883381f817336",
+      "bytes": 11848
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/excluded-operational-failures.json": {
+      "sha256": "59ad08af3ac11cfe4f7aafa863f63a61b13e1c2539aec483537d27ef1f62752b",
+      "bytes": 986
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/baseline-apk-callback-dexdump.txt": {
+      "sha256": "caab7e83413b8b20bce2dab26b01dac80b00a3390af29500c55cce32f31014b9",
+      "bytes": 349390
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/preparation-verification.json": {
+      "sha256": "b83f6a753e665e21b4b7057f3f840b8d4792bb618d0c9a7e2ab390e074a343d8",
+      "bytes": 4128
+    }
+  }
+}

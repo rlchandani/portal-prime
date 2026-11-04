@@ -1,18 +1,64 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T12:01:28.211158+00:00",
-  "updatedLabel": "Native caption ownership delivered to both rooms; prior clocks retained",
+  "updatedAt": "2026-11-04T12:13:52.253987+00:00",
+  "updatedLabel": "Apps favorite removal delivered to both rooms; prior clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.154/code 148. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.155/code 149. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "apps-favorite-removal-replacements",
+      "title": "Remove an app from favorites",
+      "summary": "Fill the six favorite slots with existing shortcut alternatives before moving the removed app last.",
+      "status": "delivered",
+      "verification": "4,507 JVM \u00b78 action regressions \u00b74 native cases \u00b7exact both-room installs",
+      "kind": "Apps correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent source and native artifact review",
+      "deployment": "Exact optimized1.155/code149 fully hashed in both rooms, one install each; Living uncertain ACK with 6 read-only observations.",
+      "acceptance": [
+        "One-line removal-only builtin suffix; Add exact old output and snapshot-save guard/reload/toast/menu unchanged.",
+        "Frozen8JVM:4 AssertionErrors/4controls\u21928pass; same actual-debug/API29 native3fail/1control\u21924pass.",
+        "Actual generated order persistence/applyOrder, literal output and non-order sentinels checked; all fixtures retire."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery and limits",
+          "source": "docs/portal-app-favorite-removal-2026-11-04.md"
+        },
+        {
+          "text": "Frozen checks and room evidence",
+          "source": "mocks/portal-app-favorite-removal-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Guarantee requires at least six distinct non-selected IDs genuinely available in Home inventory; generated one-app/six-shortcut case assumes configured dashboard and available icons.",
+        "One-app/five-Home-shortcut scarcity, missing icons, unconfigured dashboard and existing Home/Apps inventory mismatch require separate policy.",
+        "Actual non-mounted debug/API29 callback, generated in-memory prefs and actual UserLayout applyOrder; Apps first-six is source-derived.",
+        "No mounted menu/Home/physical input/real installed inventory/optimized/API28/Living visuals/concurrent edits/disk durability acceptance.",
+        "No phone, household media/provider/account/network auth/push/publication operation.",
+        "Wrapper counters and source containment are not loader-wide instrumentation; installed support is not current displayed style."
+      ],
+      "next": "Continue distinct small visible slices; scarce favorite inventory policy is separate; retain all prior clocks and holds.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T11:49:44+00:00",
+        "selectedAt": "2026-11-04T12:04:26.640970+00:00",
+        "target": "2026-11-04T12:04:44+00:00",
+        "hardDeadline": "2026-11-04T12:19:44+00:00",
+        "baseCommit": "7b60d999",
+        "scope": "Apps Remove from favorites must move selected installed app after known built-in replacements; include builtinIds only on removal, preserving Add order, duplicates/stale records, optimistic snapshot guard and Home/Apps existing first-six projections",
+        "notReset": true
+      }
+    },
     {
       "id": "native-photo-caption-ownership",
       "title": "Photo caption follows its native photo",

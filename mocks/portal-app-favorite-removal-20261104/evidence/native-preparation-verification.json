@@ -1,0 +1,120 @@
+{
+  "sourceReady": true,
+  "authoredAtUtc": "2026-11-04T12:06:33.549032+00:00",
+  "originalClock": "2026-11-04T11:49:44Z target12:04:44Z hard12:19:44Z selected12:04:26Z",
+  "package": "com.immortal.appfavoritefixture",
+  "activity": ".AppFavoriteActivity",
+  "report": "external-files/report.json",
+  "sources": {
+    "AppFavoriteActivity.java": {
+      "sha256": "83e9d6207c075113f74bf267fe53c50156a55151e817dc465320aa95ccefafd3",
+      "bytes": 16512
+    },
+    "AndroidManifest.xml": {
+      "sha256": "f413b7b3fe0f5ed827ef852399cf85628f5141f5a326e99b6fb8c42ae6e1385b",
+      "bytes": 422
+    },
+    "build.sh": {
+      "sha256": "78251bb3b7378bca812ef909378dd2716ae39045b87835f1b1597ae516cf42bc",
+      "bytes": 828
+    },
+    "repack.sh": {
+      "sha256": "e1aee6e34e319fdaa10e1812a54854dcec53086bbae569e27f3fda47a889a554",
+      "bytes": 781
+    },
+    "RUN.md": {
+      "sha256": "cc7581e938860406f6c985d9971afa32c58d71b8275808077d4835d8e7173ad9",
+      "bytes": 2139
+    },
+    "freeze.py": {
+      "sha256": "6e1e5a5f8708877ab44cdc6f058d2138b00279f6c5265022b4e731fca321926a",
+      "bytes": 1779
+    },
+    "source-admission.json": {
+      "sha256": "0311f15f8c7c80843ba6f87a9be28bbfa72ebb04606c3403c5d5046cf55bf1ee",
+      "bytes": 2954
+    }
+  },
+  "caseNames": [
+    "removeFromSixApps",
+    "removeOnlyAppUsesKnownBuiltins",
+    "removePreservesExistingShortcutOrder",
+    "addRetainsExactPreviousOutput"
+  ],
+  "expectedBaselineFailNames": [
+    "removeFromSixApps",
+    "removeOnlyAppUsesKnownBuiltins",
+    "removePreservesExistingShortcutOrder"
+  ],
+  "expectedBaselineControlNames": [
+    "addRetainsExactPreviousOutput"
+  ],
+  "expectedCandidatePassNames": [
+    "removeFromSixApps",
+    "removeOnlyAppUsesKnownBuiltins",
+    "removePreservesExistingShortcutOrder",
+    "addRetainsExactPreviousOutput"
+  ],
+  "sourceBindings": {
+    "AppSwitcherActivity.kt": {
+      "sha256": "323f748bd12f91532c3ff14f7be0318dca39f7ff366f7d03a52cd51206c67162",
+      "bytes": 33028
+    },
+    "UserLayout.kt": {
+      "sha256": "a4aa50d80f339be22762e960b0aa17424187eae2d4392bd44221ba2651031359",
+      "bytes": 8304
+    }
+  },
+  "baselineJavap": {
+    "sha256": "a6bcf7f88b356adf43b8b87a7bc5ca78ba16a283a63b93553b59ac66b57c3d59",
+    "bytes": 750101
+  },
+  "gates": {
+    "actualPrivateMenuCallback": true,
+    "literalSavedOrderAndFirstSix": true,
+    "actualUserLayoutApplyOrder": true,
+    "appsFirstSixSourceDerived": true,
+    "knownBuiltinCount": 6,
+    "oneEditPutApply": true,
+    "menuAndOrderStateOneWrite": true,
+    "nonOrderSentinelsExact": true,
+    "contextNullBase": true,
+    "zeroExternalOpsAndIconReads": true,
+    "watchdogMillis": 30000
+  },
+  "declaredManifestPermissions": [],
+  "fixtureDexPendingRootCompilation": true,
+  "sourceAuthoringOnly": true,
+  "buildSdkAdbGitTestsDevices": 0,
+  "limits": [
+    "No mounted menu/Home/composable",
+    "No real installed inventory/apps/provider/account/prefs/network",
+    "No optimized/API28/concurrency/disk durability"
+  ],
+  "adapterVersion": 2,
+  "dexAccessAdmission": "Exact baseline APK DEX package-visible STATIC FINAL six/seven capture Kotlin Unit menu callback; no private/public/protected access flag.",
+  "excludedAdapterV1": {
+    "error": "setup:java.lang.AssertionError:Actual six/seven capture menu action",
+    "casesExecuted": 0,
+    "retired": true,
+    "reason": "D8 makes actual private JVM callback package-visible; old private modifier gate incorrectly rejected actual unchanged APK."
+  },
+  "ok": true,
+  "preparedAtUtc": "2026-11-04T12:09:33.545704+00:00",
+  "fixtureDex": {
+    "sha256": "7b82fec40496fd43d2bedbea6afeb0530fe3827001953f4e8fd851996291bb49",
+    "bytes": 25448
+  },
+  "baselineFixture": {
+    "sha256": "9871af859c41a9799ca8532c660805429cced064ebf0bc8d8f5a0a81b44c3cae",
+    "bytes": 37507562
+  },
+  "embeddedBaseline": {
+    "sha256": "4a2822189560e841daa9243af2ba8549d1df37d1a25541e7f78fbb338be2fb42",
+    "bytes": 46745294
+  },
+  "embeddedBaselineExact": true,
+  "baselineAndFrozenFixtureDexByteIdentical": true,
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.appfavoritefixture\n"
+}

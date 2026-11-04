@@ -1,0 +1,5 @@
+{
+  "exitCode": 0,
+  "completedAtUtc": "2026-11-04T12:10:42.769561+00:00",
+  "command": ":app:testDebugUnitTest :app:assembleDebug :app:assemblePerformance --no-daemon -Dorg.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8"
+}

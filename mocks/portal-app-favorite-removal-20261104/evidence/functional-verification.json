@@ -1,0 +1,269 @@
+{
+  "ok": true,
+  "atUtc": "2026-11-04T12:11:58.961536+00:00",
+  "jvm": {
+    "tests": 4507,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 470
+  },
+  "focusedBaseline": {
+    "exitCode": 1,
+    "atUtc": "2026-11-04T12:08:22.509773+00:00",
+    "tests": 8,
+    "failures": 4,
+    "errors": 0,
+    "skipped": 0,
+    "cases": [
+      {
+        "name": "staleRemovalCannotOverwriteAnAcknowledgedFavoriteOrder",
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "staleAddCannotOverwriteAnAcknowledgedFavoriteOrder",
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "addingFavoriteRetainsItsExactExistingOrderPolicy",
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "removingFromTwoInstalledAppsKeepsTheOtherAppAheadOfShortcuts",
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Removed app must leave Home favorites"
+      },
+      {
+        "name": "sevenInstalledAppsAlreadyProvideEnoughRemovalReplacements",
+        "failureType": null,
+        "message": null
+      },
+      {
+        "name": "removingOneOfSixInstalledAppsLeavesBothFavoriteProjections",
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Removed app must leave Home favorites"
+      },
+      {
+        "name": "removingTheOnlyInstalledAppUsesAvailableShortcutsAsReplacements",
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Removed app must leave Home favorites"
+      },
+      {
+        "name": "removalRetainsExplicitShortcutOrderAndStaleIdsWithoutDuplicates",
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[generated.app1/.Main, generated.app2/.Main, generated.shortcut2/.Main, missing.app/.Main, generated.shortcut0/.Main, generated.shortcut1/.Main, generated.shortcut3/.Main, generated.shortcut4/.Main, generated.shortcut5/.Main, generated.app0/.Main]> but was:<[generated.app1/.Main, generated.app2/.Main, generated.shortcut2/.Main, missing.app/.Main, generated.app0/.Main]>"
+      }
+    ],
+    "xmlSha256": "24ea10236a87c7e59f160d0fd02494b62e23fa03181511fabaed12017427b371"
+  },
+  "candidateFocusedXml": {
+    "sha256": "eeaa601a189dd81b028ddd9dc62614837a708af5464d23e6995432b08d15e4fd",
+    "bytes": 2064
+  },
+  "baselineXml": {
+    "sha256": "24ea10236a87c7e59f160d0fd02494b62e23fa03181511fabaed12017427b371",
+    "bytes": 20061
+  },
+  "sourceFrozen": true,
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-app-favorite-removal-20261104-114944/candidate-debug-1.155.apk",
+      "bytes": 46745294,
+      "sha256": "f8cb43de6629dc1152b96c2b4c90f59fa180c16f9d45d6fc34818dfd0f4e590f",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='149' versionName='1.155' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 68261,
+          "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "performance": {
+      "path": "/private/tmp/portal-app-favorite-removal-20261104-114944/candidate-performance-1.155.apk",
+      "bytes": 25886647,
+      "sha256": "8c6942ca339f920fb3b6034f21fa9a919942af2e2fa15aa82d53130c976770d6",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='149' versionName='1.155' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 68261,
+          "sha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "jvm": {
+      "tests": 4507,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 470
+    },
+    "gradleExit": 0
+  },
+  "native": {
+    "tests": 4,
+    "beforeFailures": 3,
+    "afterFailures": 0,
+    "sameFixtureJavaDexManifestAssertionsRootDriver": true,
+    "wrapperChangedEntries": [
+      "assets/source.apk",
+      "META-INF/ANDROIDD.SF",
+      "META-INF/ANDROIDD.RSA",
+      "META-INF/MANIFEST.MF"
+    ],
+    "rootConfirmedExactActualCaptureBindings": true,
+    "before": {
+      "sha256": "c454af9c830ec2f080d77a2c447e93c63787f63a907f4e8d5f5a42f3472624cf",
+      "bytes": 14469
+    },
+    "after": {
+      "sha256": "ea949f3795b6d4c24e36304b40ad81faf847e4782628aae344998e3912524501",
+      "bytes": 13138
+    },
+    "fixtureDex": {
+      "sha256": "7b82fec40496fd43d2bedbea6afeb0530fe3827001953f4e8fd851996291bb49",
+      "bytes": 25448
+    },
+    "nativeJava": {
+      "sha256": "83e9d6207c075113f74bf267fe53c50156a55151e817dc465320aa95ccefafd3",
+      "bytes": 16512
+    },
+    "rootDriver": {
+      "sha256": "c81ccfd91f4bd60b088d617798dc05aa503c69efe76493b0dc04da36bb33f766",
+      "bytes": 4221
+    },
+    "allPackagesProcessesExternalDirsAbsent": true
+  },
+  "excludedSetups": {
+    "nativeAdapterV1": {
+      "error": "setup:java.lang.AssertionError:Actual six/seven capture menu action",
+      "casesExecuted": 0,
+      "retired": true,
+      "reason": "D8 makes actual private JVM callback package-visible; old private modifier gate incorrectly rejected actual unchanged APK."
+    },
+    "unchangedAssertionBodies": true,
+    "originalIssueClockRetained": true,
+    "excludedReceiptPath": "/private/tmp/portal-app-favorite-removal-20261104-114944/excluded-native-adapter-v1",
+    "baselineDexAccessProof": {
+      "path": "/private/tmp/portal-app-favorite-removal-20261104-114944/baseline-apk-callback-dexdump.txt",
+      "sha256": "caab7e83413b8b20bce2dab26b01dac80b00a3390af29500c55cce32f31014b9"
+    },
+    "nativeV2PreInstallCopy": {
+      "error": "PermissionError replacing v1 read-only owned baseline-fixture.apk",
+      "casesExecuted": 0,
+      "installAttempted": false,
+      "repair": "Remove owned stale copy after retaining v1 receipt; unchanged v2 wrapper/DEX/gates/driver."
+    }
+  },
+  "publicReleaseManifestUnchanged": true,
+  "limits": [
+    "Guarantee requires at least six distinct non-selected IDs genuinely available in Home inventory; generated one-app/six-shortcut case assumes configured dashboard and available icons.",
+    "One-app/five-Home-shortcut scarcity, missing icons, unconfigured dashboard and existing Home/Apps inventory mismatch require separate policy.",
+    "Actual non-mounted debug/API29 callback, generated in-memory prefs and actual UserLayout applyOrder; Apps first-six is source-derived.",
+    "No mounted menu/Home/physical input/real installed inventory/optimized/API28/Living visuals/concurrent edits/disk durability acceptance.",
+    "No phone, household media/provider/account/network auth/push/publication operation.",
+    "Wrapper counters and source containment are not loader-wide instrumentation; installed support is not current displayed style."
+  ],
+  "reviews": {
+    "source": "PASS_SOURCE_REVIEW_ONLY",
+    "nativeArtifact": "PASS_BOUNDED_NATIVE_ARTIFACT_REVIEW",
+    "rootFullReadAndEveryAbsoluteBindingExactBeforePromotion": true,
+    "atUtc": "2026-11-04T12:13:03.186184+00:00"
+  }
+}

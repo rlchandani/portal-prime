@@ -1,0 +1,214 @@
+{
+  "status": "PASS_SOURCE_REVIEW_ONLY",
+  "reviewedAtUtc": "2026-11-04T12:09:44.122404+00:00",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T11:49:44+00:00",
+    "target": "2026-11-04T12:04:44+00:00",
+    "hardDeadline": "2026-11-04T12:19:44+00:00",
+    "selectedAt": "2026-11-04T12:04:26.640970+00:00"
+  },
+  "targetNotReset": "Original target had elapsed before final review; original hard deadline retained.",
+  "plan": "/private/tmp/portal-app-favorite-removal-20261104-114944/plan.json",
+  "localAppMetadata": {
+    "versionName": "1.155",
+    "versionCode": 149
+  },
+  "criteria": {
+    "exactOneLineRemovalOnlySuffix": true,
+    "addBranchExactPreviousOutputPolicy": true,
+    "allOtherAppsSourceBytesUnchanged": true,
+    "homeUserLayoutAndDashboardSourcesUnchanged": true,
+    "appBuildOnlyTwoMetadataLinesChanged": true,
+    "snapshotCompareSaveCanonicalReloadToastAndMenuDismissUnchanged": true,
+    "existingPrefixDeduplicationStaleRecordAndShortcutIdentitySemanticsUnchanged": true,
+    "actualCompiledCallbackRegressionTestMatchesPreBaselineFrozenSHA": true,
+    "baselineFourExpectedAssertionFailuresFourControlsZeroErrorsSkips": true
+  },
+  "activeContracts": [
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt",
+      "lines": [
+        75,
+        264,
+        269,
+        273,
+        275,
+        373,
+        375,
+        376
+      ],
+      "contract": "Apps uses the shared Home inventory with own shortcuts excluded from installed items. Its menu derives isFavorite from six known first IDs and writes remaining+selected on removal through the existing snapshot save boundary."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+      "lines": [
+        276,
+        280,
+        1162,
+        1165,
+        1166,
+        1333,
+        4879,
+        4933,
+        4942,
+        4950,
+        4958,
+        4966,
+        4974
+      ],
+      "contract": "Home and embedded Apps share icon inventory. Home nonempty saved order applies known inventory and takes six. Home injects Music, Calls, Tools, Settings and Store only if their icons prepare; dashboard also requires configuration."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt",
+      "lines": [
+        158,
+        159,
+        160,
+        269
+      ],
+      "contract": "Save still compares the retained order and reloads canonical state; builtin component identities match the actual Home injected entries, including fixed Calls sentinel."
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/UserLayout.kt",
+      "lines": [
+        79,
+        82,
+        83,
+        156,
+        171,
+        174,
+        176
+      ],
+      "contract": "saveOrderFromSnapshot remains under the companion mutation lock and refuses stale logical order. Existing codec de-duplicates; applyOrder discards unknown IDs only from display and appends the remaining actual inventory."
+    }
+  ],
+  "witness": {
+    "generatedInput": "Six distinct installed app IDs A..F, saved order empty, actual available Store shortcut, selected A already in Apps first six.",
+    "before": "Old saved order B,C,D,E,F,A keeps A in the six Home/Apps favorites despite Remove.",
+    "after": "New order B,C,D,E,F,Store,other known builtins,A puts at least six actual available non-selected IDs before A; both projections exclude A.",
+    "minimumHomeGuarantee": "At least six distinct IDs other than the selected app are genuinely available in the Home inventory and represented ahead of the selected app after this save."
+  },
+  "baseline": {
+    "tests": 8,
+    "assertionFailures": 4,
+    "passingControls": 4,
+    "errors": 0,
+    "skips": 0,
+    "failureCases": [
+      {
+        "name": "removingFromTwoInstalledAppsKeepsTheOtherAppAheadOfShortcuts",
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Removed app must leave Home favorites"
+      },
+      {
+        "name": "removingOneOfSixInstalledAppsLeavesBothFavoriteProjections",
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Removed app must leave Home favorites"
+      },
+      {
+        "name": "removingTheOnlyInstalledAppUsesAvailableShortcutsAsReplacements",
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: Removed app must leave Home favorites"
+      },
+      {
+        "name": "removalRetainsExplicitShortcutOrderAndStaleIdsWithoutDuplicates",
+        "failureType": "java.lang.AssertionError",
+        "message": "java.lang.AssertionError: expected:<[generated.app1/.Main, generated.app2/.Main, generated.shortcut2/.Main, missing.app/.Main, generated.shortcut0/.Main, generated.shortcut1/.Main, generated.shortcut3/.Main, generated.shortcut4/.Main, generated.shortcut5/.Main, generated.app0/.Main]> but was:<[generated.app1/.Main, generated.app2/.Main, generated.shortcut2/.Main, missing.app/.Main, generated.app0/.Main]>"
+      }
+    ],
+    "controls": [
+      "staleRemovalCannotOverwriteAnAcknowledgedFavoriteOrder",
+      "staleAddCannotOverwriteAnAcknowledgedFavoriteOrder",
+      "addingFavoriteRetainsItsExactExistingOrderPolicy",
+      "sevenInstalledAppsAlreadyProvideEnoughRemovalReplacements"
+    ]
+  },
+  "bindings": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt": {
+      "sha256": "f2f82d2ce372c6d42acfc83b29b83104662ad5152a643b509afc1198d818815b",
+      "bytes": 33074
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/AppSwitcherActivity.before.kt": {
+      "sha256": "323f748bd12f91532c3ff14f7be0318dca39f7ff366f7d03a52cd51206c67162",
+      "bytes": 33028
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/AppsFavoriteRemovalTest.kt": {
+      "sha256": "53c4a23bd2b0d5ab5a10afc84f9a3da928d187b11e1ae1564127a4d0e644811a",
+      "bytes": 8386
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "1da9864964b9947942d22788c1b864a15898a76206af52bb29405d3e7ca02657",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/plan.json": {
+      "sha256": "0f8c0fbc8b81257337053d4707ceae9380708634e50f4a769e1097c0bc3773ed",
+      "bytes": 1008
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/pre-baseline-admission.json": {
+      "sha256": "8f8342394702fa8ea07320f09473e01ed23fa5c97bfec7d7e1b3f622498aaf55",
+      "bytes": 941
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/source-freeze.json": {
+      "sha256": "4201ad8d91ac458e4084a72fa591ebea59614c6651266a524ee84e239c41a59f",
+      "bytes": 947
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/baseline-focused-tests.xml": {
+      "sha256": "24ea10236a87c7e59f160d0fd02494b62e23fa03181511fabaed12017427b371",
+      "bytes": 20061
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/baseline-tests.json": {
+      "sha256": "a2b506474f2c59fdfc4c48e38658de5280135489b6e795bf4bc0bbbb33447b89",
+      "bytes": 1998
+    },
+    "/private/tmp/portal-app-favorite-removal-20261104-114944/native-owned/source-admission.json": {
+      "sha256": "0311f15f8c7c80843ba6f87a9be28bbfa72ebb04606c3403c5d5046cf55bf1ee",
+      "bytes": 2954
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/docs/portal-user-layout-save-conflicts-2026-11-03.md": {
+      "sha256": "d7729bba77fac9baf77790874c4eb693ec8ca2ff64c0493f190d71d32485b2a2",
+      "bytes": 6573
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/docs/design/portal-plus-apps-tools-feedback.md": {
+      "sha256": "07b36ff9628ebe475bc0852242c6e74012f30e47be89b4d04d7ee8c01891ce83",
+      "bytes": 6369
+    }
+  },
+  "unchangedSourceBindings": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt": {
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+      "bytes": 229887,
+      "matchesIndependentPreChangeReadAtUtc": "2026-11-04T12:06:00.043710+00:00"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/UserLayout.kt": {
+      "sha256": "a4aa50d80f339be22762e960b0aa17424187eae2d4392bd44221ba2651031359",
+      "bytes": 8304,
+      "matchesIndependentPreChangeReadAtUtc": "2026-11-04T12:06:00.043710+00:00"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeDashboardActivity.kt": {
+      "sha256": "e0f6e0a5b99ef2da3ab99c9c52491c257ecfa114fd5e9b6a085478c4a4a07e7b",
+      "bytes": 2181,
+      "matchesIndependentPreChangeReadAtUtc": "2026-11-04T12:06:00.043710+00:00"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeDashboardConfig.kt": {
+      "sha256": "35108e4f39b92fafb726bc1d25a8fe1d6dfd4c70cbbe645c41bb6dc0d21e4d21",
+      "bytes": 1842,
+      "matchesIndependentPreChangeReadAtUtc": "2026-11-04T12:06:00.043710+00:00"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomePresentation.kt": {
+      "sha256": "021a05b0168d9eb08e9844c5e64117940716a7bc23859c0161e96d6dcf11d56f",
+      "bytes": 3804,
+      "matchesIndependentPreChangeReadAtUtc": "2026-11-04T12:06:00.043710+00:00"
+    }
+  },
+  "priorScopeDistinction": "The positive UserLayout conflict receipt preserves old favorite-order semantics and verifies stale-save protection. This review addresses the installed-only removal candidate list while keeping that snapshot boundary and all persistence rules unchanged.",
+  "limits": [
+    "Independent host source review and parsing retained baseline XML only. Reviewer performed no tests, build, SDK, Git, device, registry, media, provider, network or account operation.",
+    "Current full build, candidate JVM outcome, native fixture, APK/signature/assets and room promotion remain separate root-owned gates; none is claimed passed here.",
+    "Frozen JVM fixture invokes the actual private compiled menu callback and actual UserLayout persistence through mocked generated Context/preferences and AppItems. Home/Apps first-six projections are source-derived; no mounted Compose menu, physical interaction or real PackageManager/icon inventory acceptance.",
+    "The one-installed-app/six-shortcut generated case assumes all six Home shortcuts exist, including configured dashboard. With only five actual Home shortcuts and one app, Remove cannot exclude that app from the existing six-slot policy; scarce or missing-icon alternatives are not solved.",
+    "Apps already admits an unconfigured dashboard as a known builtin key. That virtual membership, actual dashboard/icon availability and any Home/Apps inventory mismatch are unchanged and excluded from the guarantee.",
+    "Existing `(ordered IDs + order)` prefix already places installed IDs before saved shortcut records. The change preserves that prior semantic; it does not promise to preserve original shortcut positions or redesign favorites.",
+    "Stale unknown IDs remain persisted in their existing relative prefix position; duplicates remain normalized by existing distinct/codec rules. No new persistence/settings/UI design.",
+    "No broad concurrent-edit/raw-writer/disk-durability, optimized/API28 or live household acceptance claim."
+  ]
+}

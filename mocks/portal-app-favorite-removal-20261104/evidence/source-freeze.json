@@ -1,0 +1,25 @@
+{
+  "frozenAtUtc": "2026-11-04T12:08:55.742974+00:00",
+  "sourceBindings": {
+    "app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt": {
+      "sha256": "f2f82d2ce372c6d42acfc83b29b83104662ad5152a643b509afc1198d818815b",
+      "bytes": 33074
+    },
+    "app/src/test/java/com/immortal/launcher/AppsFavoriteRemovalTest.kt": {
+      "sha256": "53c4a23bd2b0d5ab5a10afc84f9a3da928d187b11e1ae1564127a4d0e644811a",
+      "bytes": 8386
+    },
+    "app/src/main/java/com/immortal/launcher/UserLayout.kt": {
+      "sha256": "a4aa50d80f339be22762e960b0aa17424187eae2d4392bd44221ba2651031359",
+      "bytes": 8304
+    },
+    "app/src/main/java/com/immortal/launcher/HomeActivity.kt": {
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+      "bytes": 229887
+    },
+    "app/build.gradle.kts": {
+      "sha256": "1da9864964b9947942d22788c1b864a15898a76206af52bb29405d3e7ca02657",
+      "bytes": 11824
+    }
+  }
+}

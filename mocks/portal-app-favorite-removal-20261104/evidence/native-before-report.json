@@ -1,0 +1,365 @@
+{
+  "ok": false,
+  "error": null,
+  "tests": 4,
+  "failures": 3,
+  "cases": [
+    {
+      "name": "removeFromSixApps",
+      "passed": false,
+      "errors": [
+        "Literal saved output expected=[owned.app.b/owned.app.b.Main, owned.app.c/owned.app.c.Main, owned.app.d/owned.app.d.Main, owned.app.e/owned.app.e.Main, owned.app.f/owned.app.f.Main, com.immortal.launcher/com.immortal.launcher.StoreActivity, com.immortal.launcher/com.immortal.launcher.ToolsActivity, com.immortal.launcher/com.immortal.launcher.WebAppActivity, com.immortal.launcher/com.immortal.launcher.ImmortalSettingsActivity, com.immortal.launcher/com.immortal.launcher.HomeDashboardActivity, com.immortal.launcher/__immortal_calls_bridge__, owned.app.a/owned.app.a.Main] actual=[owned.app.b/owned.app.b.Main, owned.app.c/owned.app.c.Main, owned.app.d/owned.app.d.Main, owned.app.e/owned.app.e.Main, owned.app.f/owned.app.f.Main, owned.app.a/owned.app.a.Main]",
+        "Order state reload equals literal output",
+        "Actual UserLayout Home first six literal check",
+        "Source-derived Apps known first six literal check",
+        "Removed app outside both first-six contracts"
+      ],
+      "installedIds": [
+        "owned.app.a/owned.app.a.Main",
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main",
+        "owned.app.f/owned.app.f.Main"
+      ],
+      "initialOrder": [],
+      "selectedId": "owned.app.a/owned.app.a.Main",
+      "isFavorite": true,
+      "expectedOrder": [
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main",
+        "owned.app.f/owned.app.f.Main",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+        "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+        "com.immortal.launcher/com.immortal.launcher.WebAppActivity",
+        "com.immortal.launcher/com.immortal.launcher.ImmortalSettingsActivity",
+        "com.immortal.launcher/com.immortal.launcher.HomeDashboardActivity",
+        "com.immortal.launcher/__immortal_calls_bridge__",
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "savedOrder": [
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main",
+        "owned.app.f/owned.app.f.Main",
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "homeFirstSix": [
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main",
+        "owned.app.f/owned.app.f.Main",
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "appsKnownFirstSixSourceDerived": [
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main",
+        "owned.app.f/owned.app.f.Main",
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "menuCleared": true,
+      "orderStateWrites": 1,
+      "menuStateWrites": 1,
+      "preferenceRequests": 4,
+      "requestedPreferences": [
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        }
+      ],
+      "edits": 1,
+      "puts": 1,
+      "applies": 1,
+      "commits": 0,
+      "nonOrderSentinelsExact": true,
+      "unexpectedOperations": 0,
+      "contextBaseIsNull": true
+    },
+    {
+      "name": "removeOnlyAppUsesKnownBuiltins",
+      "passed": false,
+      "errors": [
+        "Literal saved output expected=[com.immortal.launcher/com.immortal.launcher.StoreActivity, com.immortal.launcher/com.immortal.launcher.ToolsActivity, com.immortal.launcher/com.immortal.launcher.WebAppActivity, com.immortal.launcher/com.immortal.launcher.ImmortalSettingsActivity, com.immortal.launcher/com.immortal.launcher.HomeDashboardActivity, com.immortal.launcher/__immortal_calls_bridge__, owned.app.a/owned.app.a.Main] actual=[owned.app.a/owned.app.a.Main]",
+        "Order state reload equals literal output",
+        "Actual UserLayout Home first six literal check",
+        "Source-derived Apps known first six literal check",
+        "Removed app outside both first-six contracts"
+      ],
+      "installedIds": [
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "initialOrder": [],
+      "selectedId": "owned.app.a/owned.app.a.Main",
+      "isFavorite": true,
+      "expectedOrder": [
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+        "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+        "com.immortal.launcher/com.immortal.launcher.WebAppActivity",
+        "com.immortal.launcher/com.immortal.launcher.ImmortalSettingsActivity",
+        "com.immortal.launcher/com.immortal.launcher.HomeDashboardActivity",
+        "com.immortal.launcher/__immortal_calls_bridge__",
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "savedOrder": [
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "homeFirstSix": [
+        "owned.app.a/owned.app.a.Main",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+        "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+        "com.immortal.launcher/com.immortal.launcher.WebAppActivity",
+        "com.immortal.launcher/com.immortal.launcher.ImmortalSettingsActivity",
+        "com.immortal.launcher/com.immortal.launcher.HomeDashboardActivity"
+      ],
+      "appsKnownFirstSixSourceDerived": [
+        "owned.app.a/owned.app.a.Main",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+        "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+        "com.immortal.launcher/com.immortal.launcher.WebAppActivity",
+        "com.immortal.launcher/com.immortal.launcher.ImmortalSettingsActivity",
+        "com.immortal.launcher/com.immortal.launcher.HomeDashboardActivity"
+      ],
+      "menuCleared": true,
+      "orderStateWrites": 1,
+      "menuStateWrites": 1,
+      "preferenceRequests": 4,
+      "requestedPreferences": [
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        }
+      ],
+      "edits": 1,
+      "puts": 1,
+      "applies": 1,
+      "commits": 0,
+      "nonOrderSentinelsExact": true,
+      "unexpectedOperations": 0,
+      "contextBaseIsNull": true
+    },
+    {
+      "name": "removePreservesExistingShortcutOrder",
+      "passed": false,
+      "errors": [
+        "Literal saved output expected=[owned.app.c/owned.app.c.Main, owned.app.b/owned.app.b.Main, com.immortal.launcher/com.immortal.launcher.ToolsActivity, com.immortal.launcher/com.immortal.launcher.StoreActivity, com.immortal.launcher/com.immortal.launcher.WebAppActivity, com.immortal.launcher/com.immortal.launcher.ImmortalSettingsActivity, com.immortal.launcher/com.immortal.launcher.HomeDashboardActivity, com.immortal.launcher/__immortal_calls_bridge__, owned.app.a/owned.app.a.Main] actual=[owned.app.c/owned.app.c.Main, owned.app.b/owned.app.b.Main, com.immortal.launcher/com.immortal.launcher.ToolsActivity, com.immortal.launcher/com.immortal.launcher.StoreActivity, owned.app.a/owned.app.a.Main]",
+        "Order state reload equals literal output",
+        "Actual UserLayout Home first six literal check",
+        "Source-derived Apps known first six literal check",
+        "Removed app outside both first-six contracts"
+      ],
+      "installedIds": [
+        "owned.app.a/owned.app.a.Main",
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main"
+      ],
+      "initialOrder": [
+        "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+        "owned.app.c/owned.app.c.Main",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity"
+      ],
+      "selectedId": "owned.app.a/owned.app.a.Main",
+      "isFavorite": true,
+      "expectedOrder": [
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.b/owned.app.b.Main",
+        "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+        "com.immortal.launcher/com.immortal.launcher.WebAppActivity",
+        "com.immortal.launcher/com.immortal.launcher.ImmortalSettingsActivity",
+        "com.immortal.launcher/com.immortal.launcher.HomeDashboardActivity",
+        "com.immortal.launcher/__immortal_calls_bridge__",
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "savedOrder": [
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.b/owned.app.b.Main",
+        "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "homeFirstSix": [
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.b/owned.app.b.Main",
+        "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+        "owned.app.a/owned.app.a.Main",
+        "com.immortal.launcher/com.immortal.launcher.WebAppActivity"
+      ],
+      "appsKnownFirstSixSourceDerived": [
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.b/owned.app.b.Main",
+        "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+        "owned.app.a/owned.app.a.Main",
+        "com.immortal.launcher/com.immortal.launcher.WebAppActivity"
+      ],
+      "menuCleared": true,
+      "orderStateWrites": 1,
+      "menuStateWrites": 1,
+      "preferenceRequests": 4,
+      "requestedPreferences": [
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        }
+      ],
+      "edits": 1,
+      "puts": 1,
+      "applies": 1,
+      "commits": 0,
+      "nonOrderSentinelsExact": true,
+      "unexpectedOperations": 0,
+      "contextBaseIsNull": true
+    },
+    {
+      "name": "addRetainsExactPreviousOutput",
+      "passed": true,
+      "errors": [],
+      "installedIds": [
+        "owned.app.a/owned.app.a.Main",
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main",
+        "owned.app.f/owned.app.f.Main"
+      ],
+      "initialOrder": [
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+        "owned.app.a/owned.app.a.Main"
+      ],
+      "selectedId": "owned.app.f/owned.app.f.Main",
+      "isFavorite": false,
+      "expectedOrder": [
+        "owned.app.f/owned.app.f.Main",
+        "owned.app.a/owned.app.a.Main",
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity"
+      ],
+      "savedOrder": [
+        "owned.app.f/owned.app.f.Main",
+        "owned.app.a/owned.app.a.Main",
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main",
+        "com.immortal.launcher/com.immortal.launcher.StoreActivity"
+      ],
+      "homeFirstSix": [
+        "owned.app.f/owned.app.f.Main",
+        "owned.app.a/owned.app.a.Main",
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main"
+      ],
+      "appsKnownFirstSixSourceDerived": [
+        "owned.app.f/owned.app.f.Main",
+        "owned.app.a/owned.app.a.Main",
+        "owned.app.b/owned.app.b.Main",
+        "owned.app.c/owned.app.c.Main",
+        "owned.app.d/owned.app.d.Main",
+        "owned.app.e/owned.app.e.Main"
+      ],
+      "menuCleared": true,
+      "orderStateWrites": 1,
+      "menuStateWrites": 1,
+      "preferenceRequests": 4,
+      "requestedPreferences": [
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        },
+        {
+          "name": "immortal_layout",
+          "mode": 0
+        }
+      ],
+      "edits": 1,
+      "puts": 1,
+      "applies": 1,
+      "commits": 0,
+      "nonOrderSentinelsExact": true,
+      "unexpectedOperations": 0,
+      "contextBaseIsNull": true
+    }
+  ],
+  "sourceSha256": "4a2822189560e841daa9243af2ba8549d1df37d1a25541e7f78fbb338be2fb42",
+  "sourceBytes": 46745294,
+  "sdk": 29,
+  "fixturePackage": "com.immortal.appfavoritefixture",
+  "internetPermission": false,
+  "actualEmbeddedCallbackAppItemLayoutOrigin": true,
+  "actualMenuAction": "ApprovedAppsContent$lambda$163$lambda$162$lambda$152$lambda$151",
+  "captureSignature": [
+    "com.immortal.launcher.AppItem",
+    "java.util.List",
+    "boolean",
+    "androidx.compose.runtime.MutableState",
+    "android.content.Context",
+    "androidx.compose.runtime.MutableState"
+  ],
+  "knownBuiltinIds": [
+    "com.immortal.launcher/com.immortal.launcher.StoreActivity",
+    "com.immortal.launcher/com.immortal.launcher.ToolsActivity",
+    "com.immortal.launcher/com.immortal.launcher.WebAppActivity",
+    "com.immortal.launcher/com.immortal.launcher.ImmortalSettingsActivity",
+    "com.immortal.launcher/com.immortal.launcher.HomeDashboardActivity",
+    "com.immortal.launcher/__immortal_calls_bridge__"
+  ],
+  "iconReads": 0,
+  "realContextsServicesProvidersPassed": 0,
+  "scope": "Actual debug non-mounted Apps menu callback, actual generated preference order mutation/readback and UserLayout Home applyOrder; Apps known-first-six calculation is source-derived. No composed menu/Home UI, real installed inventory/apps, provider/account/owner prefs, network, optimized/API28, concurrent edits or disk durability acceptance."
+}

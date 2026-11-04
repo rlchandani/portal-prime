@@ -1,0 +1,17 @@
+{
+  "integrationGatesAtUtc": "2026-11-04T12:14:22.319881+00:00",
+  "originalDiscoveryAt": "2026-11-04T11:49:44+00:00",
+  "selectedAt": "2026-11-04T12:04:26.640970+00:00",
+  "target": "2026-11-04T12:04:44+00:00",
+  "hardDeadline": "2026-11-04T12:19:44+00:00",
+  "targetMet": false,
+  "hardDeadlineMetAtIntegrationGates": true,
+  "originalClockNotReset": true,
+  "strictDocsExit": 0,
+  "docsBuildLogSha256": "d05a863628d6e538f0a724d90544e008955ce89bd649eadb773b575b3fc294fb",
+  "gitDiffCheckExit": 0,
+  "sourceFreezeStillExact": true,
+  "wholeProductGoal": "active",
+  "turnOutcome": "progress",
+  "integrationParent": "7b60d999095b62c3300681949aa85a1b15105c6a"
+}

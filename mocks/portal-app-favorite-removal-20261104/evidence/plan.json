@@ -1,0 +1,15 @@
+{
+  "originalDiscoveryAt": "2026-11-04T11:49:44+00:00",
+  "target": "2026-11-04T12:04:44+00:00",
+  "hardDeadline": "2026-11-04T12:19:44+00:00",
+  "selectedAt": "2026-11-04T12:04:26.640970+00:00",
+  "baseCommit": "7b60d999",
+  "scope": "Apps Remove from favorites must move selected installed app after known built-in replacements; include builtinIds only on removal, preserving Add order, duplicates/stale records, optimistic snapshot guard and Home/Apps existing first-six projections",
+  "proposedChange": "Append if(isFavorite) builtinIds else emptyList() to remaining candidates before distinct/filter; one-line action change",
+  "sourceSha256": "323f748bd12f91532c3ff14f7be0318dca39f7ff366f7d03a52cd51206c67162",
+  "limits": [
+    "No new favorites persistence or UX redesign",
+    "Six-slot inventory availability remains preexisting; missing-icon/insufficient-replacement policy outside guarantee",
+    "Root owns build/tests/SDK and devices; no phone/live providers/account/GitHub/publication"
+  ]
+}

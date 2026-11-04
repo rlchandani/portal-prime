@@ -1,0 +1,51 @@
+{
+  "exitCode": 1,
+  "atUtc": "2026-11-04T12:08:22.509773+00:00",
+  "tests": 8,
+  "failures": 4,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "staleRemovalCannotOverwriteAnAcknowledgedFavoriteOrder",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "staleAddCannotOverwriteAnAcknowledgedFavoriteOrder",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "addingFavoriteRetainsItsExactExistingOrderPolicy",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "removingFromTwoInstalledAppsKeepsTheOtherAppAheadOfShortcuts",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: Removed app must leave Home favorites"
+    },
+    {
+      "name": "sevenInstalledAppsAlreadyProvideEnoughRemovalReplacements",
+      "failureType": null,
+      "message": null
+    },
+    {
+      "name": "removingOneOfSixInstalledAppsLeavesBothFavoriteProjections",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: Removed app must leave Home favorites"
+    },
+    {
+      "name": "removingTheOnlyInstalledAppUsesAvailableShortcutsAsReplacements",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: Removed app must leave Home favorites"
+    },
+    {
+      "name": "removalRetainsExplicitShortcutOrderAndStaleIdsWithoutDuplicates",
+      "failureType": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected:<[generated.app1/.Main, generated.app2/.Main, generated.shortcut2/.Main, missing.app/.Main, generated.shortcut0/.Main, generated.shortcut1/.Main, generated.shortcut3/.Main, generated.shortcut4/.Main, generated.shortcut5/.Main, generated.app0/.Main]> but was:<[generated.app1/.Main, generated.app2/.Main, generated.shortcut2/.Main, missing.app/.Main, generated.app0/.Main]>"
+    }
+  ],
+  "xmlSha256": "24ea10236a87c7e59f160d0fd02494b62e23fa03181511fabaed12017427b371"
+}

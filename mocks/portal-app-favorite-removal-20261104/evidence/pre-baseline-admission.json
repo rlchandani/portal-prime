@@ -1,0 +1,17 @@
+{
+  "frozenAtUtc": "2026-11-04T12:08:04.133137+00:00",
+  "rootFullyReadJvmNativeManifestAdmissionRunAndBaselineCompiledAbi": true,
+  "jvmSha256": "53c4a23bd2b0d5ab5a10afc84f9a3da928d187b11e1ae1564127a4d0e644811a",
+  "jvmCases": 8,
+  "expectedJvmAssertionFailures": 4,
+  "expectedJvmControls": 4,
+  "nativeCases": 4,
+  "expectedNativeFailures": 3,
+  "expectedNativeControls": 1,
+  "scope": "Generated Home inventory has at least six distinct available non-selected IDs. Six-shortcut sparse case assumes dashboard configured and all shortcut icons available. Existing action prefix semantics retained; Add exact old output.",
+  "limits": [
+    "One app plus only five genuinely available Home shortcuts cannot be removed under current first-six policy.",
+    "No mounted menu/Home, real inventory, dashboard/icon availability, optimized/API28, concurrent edits or disk durability acceptance."
+  ],
+  "sameLiteralAssertionsBeforeAfter": true
+}
