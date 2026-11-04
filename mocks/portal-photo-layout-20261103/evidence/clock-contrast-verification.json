@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "base": "4f9274d1089e4ce8e86ba25f09e1e729247d4098",
+  "clock": {
+    "startedAt": "2026-11-04T05:10:43Z",
+    "deadline": "2026-11-04T05:40:43Z",
+    "priorClocksRetained": true
+  },
+  "artifacts": {
+    "versionName": "1.130",
+    "versionCode": 124,
+    "package": "com.immortal.launcher.debug",
+    "apks": {
+      "debug": {
+        "bytes": 46726883,
+        "sha256": "6d4ba3b768b63fd5fc5df0d20c4f7a6e53c0ece60e4e1bb2b681edec25f03fc3"
+      },
+      "performance": {
+        "bytes": 25884988,
+        "sha256": "4647ba1d06e9aca7b0bc7a9b660ac9f39ced14f371dceb9950ad03ad4f6b02a6"
+      }
+    },
+    "jvm": {
+      "tests": 4371,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 455
+    }
+  },
+  "packageVerification": {
+    "debug": {
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "assets": {
+        "index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+        "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+        "styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+        "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+        "photos.js": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+        "scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+        "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+        "photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+        "mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+      },
+      "package": "com.immortal.launcher.debug",
+      "code": 124,
+      "version": "1.130"
+    },
+    "performance": {
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "assets": {
+        "index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+        "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+        "styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+        "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+        "photos.js": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+        "scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+        "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+        "photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+        "mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+      },
+      "package": "com.immortal.launcher.debug",
+      "code": 124,
+      "version": "1.130"
+    }
+  },
+  "installed": {
+    "family": {
+      "app": {
+        "versionCode": 124,
+        "versionName": "1.130"
+      },
+      "bytes": 25884988,
+      "sha256": "4647ba1d06e9aca7b0bc7a9b660ac9f39ced14f371dceb9950ad03ad4f6b02a6",
+      "serviceReady": true
+    },
+    "living": {
+      "app": {
+        "versionCode": 124,
+        "versionName": "1.130"
+      },
+      "bytes": 25884988,
+      "sha256": "4647ba1d06e9aca7b0bc7a9b660ac9f39ced14f371dceb9950ad03ad4f6b02a6",
+      "serviceReady": true
+    }
+  },
+  "livingInstallObservation": {
+    "status": "ready",
+    "ack": "uncertain",
+    "install_attempted": true,
+    "observations": 6
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1620,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1705,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "red": {
+    "scope": "extracted fixed-dark policy matching the prior renderer constant",
+    "tests": 6,
+    "assertionFailures": 4,
+    "controls": 2,
+    "notOldAndroidRendererExecution": true
+  },
+  "focusedGreen": {
+    "sameContrastMethods": 6,
+    "additionalBandMethods": 3,
+    "productionRetainedBucketBoundaryMethods": 3,
+    "passed": 12
+  },
+  "native": {
+    "variant": "exact debug APK classes in owned DexClassLoader",
+    "loadedApkSha256": "6d4ba3b768b63fd5fc5df0d20c4f7a6e53c0ece60e4e1bb2b681edec25f03fc3",
+    "report": {
+      "clockPixel": "fff6f2e8",
+      "captionPixel": "ff3b423a",
+      "lightClock": true,
+      "darkCaption": true,
+      "restored": true,
+      "readmitted": true,
+      "paperPadding": 13,
+      "bucketWidth": 309,
+      "bucketHeight": 257,
+      "generatedPreferenceReads": 3,
+      "inactiveWorkers": true,
+      "pass": true,
+      "retired": true
+    },
+    "image": "native-contrast/mixed.png",
+    "imageType": "native view drawn into software Canvas bitmap",
+    "imageSha256": "da207e8cb79f1eba4d7dcee3e9a8ecf3e0811e54deea68f5a75f397c5d2df170",
+    "interveningLayoutDuringToggle": false,
+    "optimizedProbeCalls": 0,
+    "householdPreferenceCalls": 0,
+    "householdPhotos": 0,
+    "networkWorkersInactive": true,
+    "cleanup": {
+      "ownedFixtureRemoved": true,
+      "ownedWindowRetired": true,
+      "debugProductNotInstalled": true
+    },
+    "independentReview": "No blocker to scoped source/debug native result; Canvas/state limits retained"
+  },
+  "sourceHashes": {
+    "app/src/main/java/com/immortal/launcher/FaceRenderer.kt": "9f62b1b197bbd9afce67158bb77c8e6b27eaebd8d9140530280227f6fe1b8183",
+    "app/src/main/java/com/immortal/launcher/PaperWidgetContrast.kt": "16be03c24f5e5602f8cc502fa60c2497f26b1d60ff435f202baac723e5f51e70",
+    "app/src/main/java/com/immortal/launcher/PaperWidgetBackground.kt": "02c77af548fde06717b7882942f9b5a17b2fe5ed48e70a577f0a20492284fda2",
+    "app/src/test/java/com/immortal/launcher/PaperWidgetContrastTest.kt": "9292caee52061601c0c2056859d8232b22cd44351f490176416b93eaaeb1651f",
+    "app/src/test/java/com/immortal/launcher/FaceRendererPaperBackingTest.kt": "7d61ba6db16b47f88fc4952ccc77a9bc6965f38c1b307dc59f19aa93c58f1e2b",
+    "app/build.gradle.kts": "b17e35401a95a6ce0c763ead6171394723345670c529254dc77f2f07cbc995d2",
+    "mocks/portal-photo-layout-20261103/native-contrast/ContrastActivity.java": "70ff5e81b17f180767b44e049d02fff32626a2faa781f6150af42308941a4c2a",
+    "mocks/portal-photo-layout-20261103/native-contrast/AndroidManifest.xml": "67a3bc28c34510941dafa4ddc3e020f5c83a9a1a54c12d3a4542701d6f02c89f"
+  },
+  "limits": [
+    "Very low opacity remains user-owned and can prevent readability.",
+    "Native music/dividers/hidden widgets/low opacity/gradients/API28/Living visual/optimized FaceRenderer and Shuffle coupling/hardware performance unverified.",
+    "No live photo transfer, phone, provider/account action, push or publication.",
+    "Earlier clocks and whole-product active objective retained."
+  ],
+  "protectedFiles": {
+    "originalRegistryUnchanged": true,
+    "publicManifestCatalogUnchanged": true,
+    "nativeFleetCliUnchanged": true,
+    "copiedRegistryRemoved": true
+  },
+  "roadmapPreservation": {
+    "taskCount": 119,
+    "otherTasksPreserved": 118,
+    "rawSuffixBytesPreserved": 396640,
+    "defaultTaskPreserved": "weather-native-layout",
+    "statuses": {
+      "delivered": 72,
+      "verified": 37,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    }
+  },
+  "strictDocsBuild": "passed"
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.immortal.launcher.PaperWidgetContrastTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-11-04T05:17:28.574Z" hostname="iRedlofs-Mac-mini-3.local" time="0.001">
+  <properties/>
+  <testcase name="selectedPlateNeverLosesAgainstTheOtherForColorAndAlphaSamples" classname="com.immortal.launcher.PaperWidgetContrastTest" time="0.001"/>
+  <testcase name="clockAndMetadataMergeWhileWhiteCaptionKeepsItsOwnBand" classname="com.immortal.launcher.PaperWidgetContrastTest" time="0.0"/>
+  <testcase name="whiteClockRetainsExistingDarkPlate" classname="com.immortal.launcher.PaperWidgetContrastTest" time="0.0"/>
+  <testcase name="transparentForegroundHasNoInventedContrast" classname="com.immortal.launcher.PaperWidgetContrastTest" time="0.0"/>
+  <testcase name="darkGreenClockUsesLightPlate" classname="com.immortal.launcher.PaperWidgetContrastTest" time="0.0"/>
+  <testcase name="emptyOrUnmeasuredBucketsPaintNothing" classname="com.immortal.launcher.PaperWidgetContrastTest" time="0.0"/>
+  <testcase name="whiteCaptionAndDarkClockChooseIndependently" classname="com.immortal.launcher.PaperWidgetContrastTest" time="0.0"/>
+  <testcase name="blackClockUsesLightPlate" classname="com.immortal.launcher.PaperWidgetContrastTest" time="0.0"/>
+  <testcase name="classicWhiteWidgetsRetainOneContinuousDarkPlate" classname="com.immortal.launcher.PaperWidgetContrastTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

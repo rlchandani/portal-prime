@@ -23,6 +23,7 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
@@ -92,12 +93,18 @@ class FaceRenderer(
   private var paperPhotoSurface = false
   private var photoScrim: View? = null
   private val paperBackedBuckets = HashSet<LinearLayout>()
+  private val paperForegrounds = HashMap<View, Int>()
 
   /** Keep configured native clock colors readable on the Paper photo margin in every position. */
   fun setPaperPhotoSurface(enabled: Boolean) {
     if (paperPhotoSurface == enabled) return
     paperPhotoSurface = enabled
     buckets.values.forEach(::applyPhotoBucketBacking)
+    val dividerColor = if (enabled &&
+        PaperWidgetContrast.backing(FaceStyle.colorWithOpacity(face.clock.color, face.clock.opacity)) ==
+            PaperWidgetContrast.LIGHT) 0x88343A30.toInt() else 0x88FFFFFF.toInt()
+    batteryDivider?.setTextColor(dividerColor)
+    weatherDivider?.setTextColor(dividerColor)
     if (enabled) {
       detachFramedScrimListener()
       photoScrim?.visibility = View.INVISIBLE
@@ -108,23 +115,30 @@ class FaceRenderer(
   }
 
   private fun applyPhotoBucketBacking(bucket: LinearLayout) {
-    val backed = paperPhotoSurface && (0 until bucket.childCount).any {
-      bucket.getChildAt(it).visibility == View.VISIBLE
-    }
+    val visible = (0 until bucket.childCount).map { bucket.getChildAt(it) }
+        .filter(::hasVisiblePaperContent)
+    val backed = paperPhotoSurface && visible.isNotEmpty()
     // Visibility can change on a retained timer/music/caption bucket. Change padding only
     // when its state changes, so the layout observer settles instead of causing a loop.
-    if (backed == paperBackedBuckets.contains(bucket)) return
-    if (backed) paperBackedBuckets.add(bucket) else paperBackedBuckets.remove(bucket)
-    val inset = if (backed) dp(12) else 0
-    bucket.setPadding(inset, inset, inset, inset)
-    bucket.background = if (backed) GradientDrawable().apply {
-      setColor(0xE6293029.toInt()); cornerRadius = dp(12).toFloat()
-    } else null
+    if (backed != paperBackedBuckets.contains(bucket)) {
+      if (backed) paperBackedBuckets.add(bucket) else paperBackedBuckets.remove(bucket)
+      val inset = if (backed) dp(12) else 0
+      bucket.setPadding(inset, inset, inset, inset)
+      bucket.background = if (backed) PaperWidgetBackground(dp(12).toFloat()) else null
+    }
+    if (backed) (bucket.background as? PaperWidgetBackground)?.update(visible.map { child ->
+      child to (paperForegrounds[child] ?: (child as? TextView)?.currentTextColor ?: Color.WHITE)
+    })
   }
 
   fun refreshPaperPhotoSurface() {
     if (paperPhotoSurface) buckets.values.forEach(::applyPhotoBucketBacking)
   }
+
+  /** A visible metadata wrapper can still be empty after battery/weather hide their children. */
+  private fun hasVisiblePaperContent(child: View): Boolean =
+      child.visibility == View.VISIBLE && (child !is ViewGroup ||
+          (0 until child.childCount).any { hasVisiblePaperContent(child.getChildAt(it)) })
   private var framedScrimListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
   private fun detachFramedScrimListener() {
@@ -161,7 +175,7 @@ class FaceRenderer(
       if (view.visibility != View.VISIBLE) emptyList() else buckets.values.mapNotNull { bucket ->
     if (bucket.visibility != View.VISIBLE || bucket.width <= 0 || bucket.height <= 0 ||
         bucket.childCount == 0 || (paperPhotoSurface && (0 until bucket.childCount).none {
-          bucket.getChildAt(it).visibility == View.VISIBLE
+          hasVisiblePaperContent(bucket.getChildAt(it))
         })) null
     else {
       val position = IntArray(2)
@@ -176,11 +190,11 @@ class FaceRenderer(
   private var clockFace: ClockFaceView? = null
   private var dateView: TextView? = null
   private var batteryView: TextView? = null
-  private var batteryDivider: View? = null
+  private var batteryDivider: TextView? = null
   private var batteryReceiver: BroadcastReceiver? = null
   private var batteryStatus: Pair<Int, Boolean> = -1 to false
   private var weatherView: TextView? = null
-  private var weatherDivider: View? = null
+  private var weatherDivider: TextView? = null
   private var weatherText: String = ""
   private var blinkOn = true
 
@@ -277,6 +291,7 @@ class FaceRenderer(
     suspendHostWork()
     clockFace?.dispose()
     io.shutdownNow()
+    paperForegrounds.clear()
   }
 
   // --- overlay assembly -------------------------------------------------------
@@ -286,6 +301,7 @@ class FaceRenderer(
     view.removeAllViews()
     buckets.clear()
     paperBackedBuckets.clear()
+    paperForegrounds.clear()
     // Caption views are rebuilt below (or not, on a full-bleed face) — drop stale refs so a
     // late setCaption() can't poke a detached view from the previous face.
     captionPanel = null
@@ -485,6 +501,7 @@ class FaceRenderer(
     }
 
     val col = bucket(clock.position)
+    paperForegrounds[made.view] = FaceStyle.colorWithOpacity(clock.color, clock.opacity)
     // Canvas clocks measure their chosen size within this grid bucket's available space.
     col.addView(
         made.view,
@@ -512,6 +529,7 @@ class FaceRenderer(
     if (row.childCount > 0) {
       val wrapper = LinearLayout(context)
       wrapper.gravity = Gravity.CENTER_HORIZONTAL
+      paperForegrounds[wrapper] = FaceStyle.colorWithOpacity(clock.color, clock.opacity)
       wrapper.addView(row, LinearLayout.LayoutParams(WRAP, LinearLayout.LayoutParams.WRAP_CONTENT))
       col.addView(wrapper, LinearLayout.LayoutParams(MATCH, LinearLayout.LayoutParams.WRAP_CONTENT))
     }
@@ -819,11 +837,14 @@ class FaceRenderer(
     return t
   }
 
-  private fun divider(): View {
+  private fun divider(): TextView {
     val v = TextView(context)
     v.text = "   •   "
     v.textSize = 22f
-    v.setTextColor(0x88FFFFFF.toInt())
+    val light = paperPhotoSurface &&
+        PaperWidgetContrast.backing(FaceStyle.colorWithOpacity(face.clock.color, face.clock.opacity)) ==
+            PaperWidgetContrast.LIGHT
+    v.setTextColor(if (light) 0x88343A30.toInt() else 0x88FFFFFF.toInt())
     return v
   }
 
