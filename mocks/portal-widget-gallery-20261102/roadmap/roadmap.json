@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T06:00:16Z",
-  "updatedLabel": "Crypto cache: exact 1.132 delivered in both rooms",
+  "updatedAt": "2026-11-04T06:14:42Z",
+  "updatedLabel": "Fleet raw preferences: private complete plan verified locally",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,53 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "fleet-raw-preference-plan",
+      "title": "Fleet raw restore: validate and freeze every preference file before changes",
+      "summary": "Complete raw XML preflight prevents invalid backups from starting a restore. Later pushes use private, byte-identical frozen files.",
+      "description": "Use pinned directory/file descriptors, map-root validation, manifest inventory/package checks and a NUL-separated private plan before any CLI mutation. Preserve legacy release snapshots and the fresh token.",
+      "status": "verified",
+      "verification": "48 restore methods · 189 provisioning / 266 script methods · actual CLI loopback baseline5fail/3controls →8pass · independent48pass · shell/source checks",
+      "kind": "Supported raw restore data-integrity failure",
+      "platforms": [
+        "tooling",
+        "portal"
+      ],
+      "owner": "Fleet engineering / independent source and generated execution review",
+      "deployment": "Local host helper only. Existing CI discovers expanded tests; no owner restore, Android build, device install or publication. Room1.132/code126 unchanged.",
+      "state": "Every selected XML file validates and is frozen before app installs or preference/config writes. Manifestless completeness and real Portal acceptance remain open.",
+      "acceptance": [
+        "Reject malformed/non-map XML, missing manifest members, package mismatches and unsafe or linked files before every CLI command, including dry-run.",
+        "Push exactly the bytes captured before earlier installs or pushes can replace the source.",
+        "Keep private directories0700/files0600 and remove owned scratch on exit.",
+        "Preserve release legacy/manual snapshots, top-level latest, literal Unicode/space names and fleet_agent.xml skipping.",
+        "Pass independent actual Bash and generated actualCLI checks without touching owner data."
+      ],
+      "evidence": [
+        {
+          "text": "Implementation, verification matrix and retained limits.",
+          "source": "docs/portal-fleet-preference-plan-2026-11-04.md"
+        },
+        {
+          "text": "Frozen baseline, candidate, actual CLI reports and preservation.",
+          "source": "mocks/portal-fleet-preferences-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "XML syntax/map-root validation does not validate every Android preference value or make filesystem capture atomic.",
+        "Manifestless snapshots cannot prove which externally expected files are missing; legacy missing package metadata retains release interpretation.",
+        "Later device writes remain separate, without rollback or automatic retry; reboot permission and native reload/readback are unobserved.",
+        "Generated localhost transport only; no owner registry, Portal, phone, media, provider/account, push or publication.",
+        "Host has no rustc; unchanged repository prebuiltCLI is used, with no freshRust or hostedLinux acceptance claim.",
+        "All earlier backup/app/soft-config scopes and parked clocks remain."
+      ],
+      "next": "Retain native restore/reload, Linux hostedCI and transactional limits; continue independent supported product work.",
+      "issueClock": {
+        "startedAt": "2026-11-04T06:02:41Z",
+        "deadline": "2026-11-04T06:32:41Z",
+        "scope": "Discovery, fixture corrections, implementation, checks, review, documentation, cleanup and commit; no reset."
+      }
+    },
     {
       "id": "crypto-cache-response-publication",
       "title": "Crypto: preserve cached prices when an HTTP 200 body cannot decode",

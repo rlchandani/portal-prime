@@ -1,0 +1,11 @@
+{
+  "reviewer": "photo_layout_review",
+  "restoreMethods": 48,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "elapsedSeconds": 17.088,
+  "blockingFindings": 0,
+  "resolvedFinding": "Unicode line separators in producer-valid filenames",
+  "testSha256": "6808bd579259acf97e13982e96543c8c01995cd91f85dee91af2fb3aa9b35550"
+}

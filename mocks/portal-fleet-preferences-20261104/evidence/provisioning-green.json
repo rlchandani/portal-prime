@@ -1,0 +1,10 @@
+{
+  "exit": 0,
+  "cli": "unchanged repository prebuilt fleetctl; rustc unavailable",
+  "summary": [
+    "----------------------------------------------------------------------",
+    "Ran 189 tests in 44.524s",
+    "",
+    "OK"
+  ]
+}

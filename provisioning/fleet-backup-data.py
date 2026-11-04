@@ -238,6 +238,97 @@ def validate_xml(path):
         raise ValueError("not a preference map")
 
 
+def restore_preference_name(name):
+    if (
+        not name.endswith(".xml") or "/" in name or "\\" in name
+        or any(ord(c) < 32 or ord(c) == 127 for c in name)
+    ):
+        raise ValueError("unsafe preference name")
+    return name
+
+
+def read_regular_file(directory, name, read=True):
+    # Nonblocking open also lets the type check reject a FIFO without waiting.
+    descriptor = os.open(
+        name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
+    with os.fdopen(descriptor, "rb") as stream:
+        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+            raise ValueError("not a regular snapshot file")
+        return stream.read() if read else None
+
+
+def restore_preference_inventory(directory):
+    try:
+        os.stat("MANIFEST.txt", dir_fd=directory, follow_symlinks=False)
+    except FileNotFoundError:
+        # Historical manually assembled release snapshots have no inventory.
+        return None
+    # The writer uses literal LF, not Unicode line separators within filenames.
+    lines = read_regular_file(directory, "MANIFEST.txt").decode("utf-8").split("\n")
+    if lines[-1] == "":
+        lines.pop()
+    lines = [line.rstrip("\r") for line in lines]
+    packages = [line[len("package:"):].strip() for line in lines if line.startswith("package:")]
+    if packages and packages != ["com.immortal.launcher"]:
+        raise ValueError("raw restore requires the release package")
+    markers = [index for index, line in enumerate(lines) if line == "shared_prefs:"]
+    if len(markers) != 1:
+        raise ValueError("invalid preference inventory")
+    names = []
+    for line in lines[markers[0] + 1:]:
+        if not line.startswith("  "):
+            raise ValueError("invalid preference inventory entry")
+        names.append(restore_preference_name(line[2:]))
+    if not names or len(set(names)) != len(names):
+        raise ValueError("empty or duplicate preference inventory")
+    # Legacy fleet-backup.sh manifests lack package metadata and used release.
+    return set(names) - {"fleet_agent.xml"}
+
+
+def restore_preferences(backup, destination, plan):
+    # Following the snapshot's top-level `latest` link is intentional. All
+    # subsequent reads are relative to pinned directory descriptors.
+    backup_descriptor = os.open(backup, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        preferences = os.open(
+            "shared_prefs", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+            dir_fd=backup_descriptor)
+        try:
+            names = sorted(
+                restore_preference_name(name)
+                for name in os.listdir(preferences) if name.endswith(".xml"))
+            if not names:
+                raise ValueError("no preferences available")
+            inventory = restore_preference_inventory(backup_descriptor)
+            if inventory is not None and inventory != set(names) - {"fleet_agent.xml"}:
+                raise ValueError("preference inventory does not match")
+            private_directory(destination)
+            for name in names:
+                if name == "fleet_agent.xml":
+                    # Check its file type, but never decode/copy the old token.
+                    read_regular_file(preferences, name, read=False)
+                    continue
+                data = read_regular_file(preferences, name)
+                if ET.fromstring(data).tag != "map":
+                    raise ValueError("not a preference map")
+                descriptor = os.open(
+                    Path(destination) / name,
+                    os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+                with os.fdopen(descriptor, "wb") as stream:
+                    stream.write(data)
+            # Publish the list only after every selected file validates. Keep
+            # original bytes and literal names, rather than serializing XML.
+            descriptor = os.open(
+                plan, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+            with os.fdopen(descriptor, "wb") as stream:
+                for name in names:
+                    stream.write(name.encode("utf-8") + b"\0")
+        finally:
+            os.close(preferences)
+    finally:
+        os.close(backup_descriptor)
+
+
 def manifest(stage, serial, stamp, package):
     info = validate_json("info", stage / "info.json")
     apps = validate_json("apps", stage / "apps.json")["apps"]
@@ -304,6 +395,8 @@ def main():
             validate_presence(*args)
         elif mode == "restore-config" and len(args) == 3:
             restore_config(*args)
+        elif mode == "restore-preferences" and len(args) == 3:
+            restore_preferences(*args)
         elif mode == "config-result" and len(args) == 1:
             validate_config_result(args[0])
         elif mode == "names" and len(args) == 2:

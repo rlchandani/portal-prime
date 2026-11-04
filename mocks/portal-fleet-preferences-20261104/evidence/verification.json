@@ -1,0 +1,123 @@
+{
+  "recordedAt": "2026-11-04T06:14:42Z",
+  "classification": "PROGRESS",
+  "base": "c0b903032fbeaf6a49d705c32629548a1e44df7f",
+  "clock": {
+    "startedAt": "2026-11-04T06:02:41Z",
+    "deadline": "2026-11-04T06:32:41Z"
+  },
+  "scope": "Raw preference validation and private complete byte plan; host-only change",
+  "frozenFixtureSha256": "6808bd579259acf97e13982e96543c8c01995cd91f85dee91af2fb3aa9b35550",
+  "baseline": {
+    "tests": 48,
+    "failureEntries": 19,
+    "errors": 0,
+    "skipped": 0,
+    "failingMethods": [
+      "test_prefs_all_bytes_are_frozen_before_first_push",
+      "test_prefs_bytes_are_frozen_before_install_and_kept_private",
+      "test_prefs_late_malformed_xml_prevents_earlier_install_and_push",
+      "test_prefs_manifest_invalid_inventory_and_package_prevent_all_operations",
+      "test_prefs_manifest_missing_or_unlisted_xml_prevents_all_operations",
+      "test_prefs_manifest_symlink_or_directory_is_not_absent_legacy",
+      "test_prefs_missing_empty_or_linked_directory_prevents_all_operations",
+      "test_prefs_non_map_prevents_all_operations_even_in_dry_run",
+      "test_prefs_token_only_has_no_push_or_reboot_but_token_links_fail",
+      "test_prefs_unsafe_xml_names_prevent_all_operations",
+      "test_prefs_xml_symlink_and_directory_prevent_all_operations"
+    ]
+  },
+  "candidate": {
+    "restoreMethods": 48,
+    "provisioningMethods": 189,
+    "scriptMethods": 266,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "loopback": {
+    "baseline": {
+      "methods": 8,
+      "failures": 5,
+      "errors": 0
+    },
+    "candidate": {
+      "methods": 8,
+      "failures": 0,
+      "errors": 0
+    },
+    "cliSha256": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "generatedOnly": true
+  },
+  "independent": {
+    "reviewer": "photo_layout_review",
+    "restoreMethods": 48,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsedSeconds": 17.088,
+    "blockingFindings": 0,
+    "resolvedFinding": "Unicode line separators in producer-valid filenames",
+    "testSha256": "6808bd579259acf97e13982e96543c8c01995cd91f85dee91af2fb3aa9b35550"
+  },
+  "fixtureCorrections": [
+    "Initial XML-kind test cleanup error corrected before final RED freeze.",
+    "Unsafe-name subcase cleanup fixed before final freeze.",
+    "Review found Unicode splitlines regression; three assertions witnessed then literal newline parser corrected.",
+    "Initial broad discovery omitted required CLI env; corrected. rustc absent, unchanged prebuilt used without freshRust claim."
+  ],
+  "sourceHashes": {
+    "provisioning/fleet-backup-data.py": "e7ec8e92c14422508b72c011ae1d867085d0f75ab2d359e6aa66b2780bc5ae8e",
+    "provisioning/fleet-restore.sh": "7ea9f7832ddbd340197be2a125c75dd5bb984fb727b4743bc559ed876ac47efa",
+    "provisioning/test_fleet_restore.py": "6808bd579259acf97e13982e96543c8c01995cd91f85dee91af2fb3aa9b35550",
+    "mocks/portal-fleet-preferences-20261104/fixture/loopback.py": "859314ee4526e2b09862ec43e75992b7a36835b56c46e89873229aa40e14616c"
+  },
+  "preservation": {
+    "previousTasks": 121,
+    "currentTasks": 122,
+    "allPreviousObjectsExact": true,
+    "rawPreviousSuffixBytes": 408872,
+    "rawPreviousSuffixSha256": "cfd4a945e40a4fae6f5337295d2ff892cc3da36979cbc6f0cd30c6a563eb5e72",
+    "defaultTaskRetained": "weather-native-layout",
+    "statuses": {
+      "verified": 38,
+      "delivered": 74,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "protectedHashes": {
+      "version.json": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+      "catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+      "provisioning/fleetctl": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+      "app/build.gradle.kts": "eb484b11573c52a1718d3ae45a4d42a3d10fff07ac3174295e6017b5e99bc46d",
+      "provisioning/fleet-backup.sh": "1d61ef3a655f9a02261a00dda7df64eb23bc49aefbe4a10e9fea8210b9c2a817",
+      "app/src/main/java/com/immortal/launcher/FleetFs.kt": "56aaae30896fe47188697cf7df22812045193b43e6e3d452a0af26f17dc1e57e"
+    }
+  },
+  "checks": {
+    "pythonSyntax": true,
+    "shellSyntax": true,
+    "scriptDiscovery": 266,
+    "provisioningDiscovery": 189,
+    "docsStrict": "passed",
+    "stagedWhitespace": "passed"
+  },
+  "cleanup": {
+    "allLoopbackServersRetired": true,
+    "syntheticKitDirectoriesRemoved": true,
+    "ownedRestoreScratchRemoved": true,
+    "docsEnvironmentRemoved": true,
+    "baselineSourceKitRemoved": true
+  },
+  "limits": [
+    "XML syntax/map-root validation does not validate every Android preference value or make filesystem capture atomic.",
+    "Manifestless snapshots cannot prove which externally expected files are missing; legacy missing package metadata retains release interpretation.",
+    "Later device writes remain separate, without rollback or automatic retry; reboot permission and native reload/readback are unobserved.",
+    "Generated localhost transport only; no owner registry, Portal, phone, media, provider/account, push or publication.",
+    "Host has no rustc; unchanged repository prebuiltCLI is used, with no freshRust or hostedLinux acceptance claim.",
+    "All earlier backup/app/soft-config scopes and parked clocks remain."
+  ],
+  "closureCheckedAt": "2026-11-04T06:15:55Z",
+  "finalRecordedAt": "2026-11-04T06:16:20Z"
+}

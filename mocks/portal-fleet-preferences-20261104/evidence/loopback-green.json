@@ -1,0 +1,8 @@
+{
+  "tests": 8,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "failedMethods": [],
+  "log": "test_all_bytes_are_frozen_before_first_http_write (__main__.PreferenceLoopbackTest.test_all_bytes_are_frozen_before_first_http_write) ... ok\ntest_debug_package_has_no_http_mutation (__main__.PreferenceLoopbackTest.test_debug_package_has_no_http_mutation) ... ok\ntest_failed_push_stops_without_reboot_or_retry (__main__.PreferenceLoopbackTest.test_failed_push_stops_without_reboot_or_retry) ... ok\ntest_invalid_dry_run_has_no_http_mutation (__main__.PreferenceLoopbackTest.test_invalid_dry_run_has_no_http_mutation) ... ok\ntest_late_invalid_map_has_no_http_mutation (__main__.PreferenceLoopbackTest.test_late_invalid_map_has_no_http_mutation) ... ok\ntest_legacy_manifest_keeps_release_restore (__main__.PreferenceLoopbackTest.test_legacy_manifest_keeps_release_restore) ... ok\ntest_missing_manifest_member_has_no_http_mutation (__main__.PreferenceLoopbackTest.test_missing_manifest_member_has_no_http_mutation) ... ok\ntest_unicode_name_exact_bytes_and_token_skip (__main__.PreferenceLoopbackTest.test_unicode_name_exact_bytes_and_token_skip) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 4.442s\n\nOK\n"
+}

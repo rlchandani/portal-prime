@@ -76,8 +76,14 @@ fi
 config_planned=0
 ss_args=()
 cal_args=()
-if [ $dry -eq 0 ] || { [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" ]; }; then
+if [ $dry -eq 0 ] || [ $do_prefs -eq 1 ] || { [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" ]; }; then
   scratch="$(mktemp -d "${TMPDIR:-/tmp}/immortal-restore-apps.XXXXXX")" || exit 1
+fi
+if [ $do_prefs -eq 1 ]; then
+  # Validate and freeze every raw file before installs, writes or config calls.
+  # Dry-run uses the same preflight without calling the device CLI.
+  "$PYTHON3" "$here/fleet-backup-data.py" restore-preferences \
+    "$backup" "$scratch/preferences" "$scratch/preferences.names" || exit 1
 fi
 if [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" ]; then
   # Decode and validate the complete subset before installs, prefs or reboot.
@@ -142,17 +148,15 @@ fi
 if [ $do_prefs -eq 1 ]; then
   echo "-- prefs (full restore) --"
   pushed=0
-  for x in "$backup"/shared_prefs/*.xml; do
-    [ -e "$x" ] || continue
-    n="$(basename "$x")"
+  while IFS= read -r -d '' n; do
     if [ "$n" = "fleet_agent.xml" ]; then
       echo "  skip $n (keep freshly-provisioned token)"
       continue
     fi
     echo "  push $n"
-    run "$FLEETCTL" push "$x" "$PREFS_DIR/$n" --device "$serial"
+    run "$FLEETCTL" push "$scratch/preferences/$n" "$PREFS_DIR/$n" --device "$serial"
     pushed=$((pushed + 1))
-  done
+  done < "$scratch/preferences.names"
   if [ $pushed -gt 0 ]; then
     echo "  rebooting so prefs reload from disk"
     run "$FLEETCTL" action reboot --device "$serial"

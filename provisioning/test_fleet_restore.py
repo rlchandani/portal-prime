@@ -50,6 +50,8 @@ if config.get("mutate_original_registry"):
 if args[0] == "install":
     if config.get("mutate_config_xml"):
         pathlib.Path(config["config_xml_path"]).write_text(config["mutate_config_xml"])
+    for path, value in config.get("replace_preferences", {}).items():
+        pathlib.Path(path).write_text(value)
     package = args[1]
     reply = config.get("install", {}).get(package, {})
     default = {"ok": True, "packageName": package, "result": "installed"}
@@ -60,7 +62,19 @@ elif args[0] == "apps":
         {"packageName": "org.beta", "installed": True},
         {"packageName": "org.gamma", "installed": True},
     ]}
-elif args[0] in ("push", "action", "screensaver", "calendar"):
+elif args[0] == "push":
+    source = pathlib.Path(args[1])
+    observation = {
+        "name": source.name, "bytes": source.read_bytes().hex(),
+        "source": str(source), "file_mode": source.stat().st_mode & 0o7777,
+        "directory_mode": source.parent.stat().st_mode & 0o7777,
+    }
+    with open(os.environ["FAKE_RESTORE_PUSH_OBSERVATIONS"], "a") as stream:
+        stream.write(json.dumps(observation) + "\n")
+    for path, value in config.get("replace_preferences_on_push", {}).items():
+        pathlib.Path(path).write_text(value)
+    reply, default = config.get(args[0], {}), {"ok": True}
+elif args[0] in ("action", "screensaver", "calendar"):
     reply, default = config.get(args[0], {}), {"ok": True}
 else:
     sys.exit(95)
@@ -97,6 +111,7 @@ class FleetRestoreTest(unittest.TestCase):
         self.config = self.root / "replies.json"
         self.calls = self.root / "calls.jsonl"
         self.registry_observations = self.root / "registry-observations.jsonl"
+        self.push_observations = self.root / "push-observations.jsonl"
         self.replies = {}
         self.scratch_parent = self.root / "scratch"
         self.scratch_parent.mkdir(mode=0o700)
@@ -123,7 +138,8 @@ class FleetRestoreTest(unittest.TestCase):
                "FLEETCTL": str(self.cli), "IMMORTAL_FLEET_DIR": str(self.registry),
                "FAKE_RESTORE_CONFIG": str(self.config), "FAKE_RESTORE_CALLS": str(self.calls),
                "FAKE_ORIGINAL_REGISTRY": str(self.registry),
-               "FAKE_RESTORE_REGISTRY_OBSERVATIONS": str(self.registry_observations)}
+               "FAKE_RESTORE_REGISTRY_OBSERVATIONS": str(self.registry_observations),
+               "FAKE_RESTORE_PUSH_OBSERVATIONS": str(self.push_observations)}
         env.pop("PYTHON3", None)
         if runtime is not None:
             env["PYTHON3"] = str(runtime)
@@ -146,6 +162,175 @@ class FleetRestoreTest(unittest.TestCase):
         self.assertNotEqual(code, 0, "invalid app plan must prevent all install/prefs operations")
         self.assertEqual(calls, [])
         self.assertNotIn("done.", output)
+
+    def write_manifest(self, names, package="com.immortal.launcher"):
+        lines = ["device:  " + SERIAL, "stamp:   public"]
+        if package is not None:
+            lines.append("package: " + package)
+        lines.extend(["installed apps:", "shared_prefs:", *("  " + name for name in names)])
+        (self.backup / "MANIFEST.txt").write_text("\n".join(lines) + "\n")
+
+    def assert_invalid_preferences(self, *modes):
+        code, output, calls = self.run_restore(*(modes or ("--apps", "--prefs")))
+        self.assertNotEqual(code, 0, "invalid preference plan must prevent all operations")
+        self.assertEqual(calls, [])
+        self.assertNotIn("done.", output)
+
+    def read_pushes(self):
+        return [json.loads(line) for line in self.push_observations.read_text().splitlines()]
+
+    def test_prefs_late_malformed_xml_prevents_earlier_install_and_push(self):
+        (self.backup / "shared_prefs" / "z-late.xml").write_text("<map>")
+        self.assert_invalid_preferences()
+
+    def test_prefs_non_map_prevents_all_operations_even_in_dry_run(self):
+        (self.backup / "shared_prefs" / "prefs.xml").write_text("<not-map/>")
+        self.assert_invalid_preferences("--apps", "--prefs", "--dry-run")
+
+    def test_prefs_manifest_missing_or_unlisted_xml_prevents_all_operations(self):
+        for names in (["prefs.xml", "missing.xml"], ["other.xml"]):
+            with self.subTest(names=names):
+                self.write_manifest(names)
+                self.assert_invalid_preferences()
+
+    def test_prefs_manifest_invalid_inventory_and_package_prevent_all_operations(self):
+        for text in (
+            "package: com.immortal.launcher.debug\nshared_prefs:\n  prefs.xml\n",
+            "package: com.immortal.launcher\npackage: com.immortal.launcher\nshared_prefs:\n  prefs.xml\n",
+            "shared_prefs:\n  prefs.xml\nshared_prefs:\n  prefs.xml\n",
+            "shared_prefs:\n  prefs.xml\n  prefs.xml\n",
+            "shared_prefs:\n  ../prefs.xml\n",
+            "device: public\n",
+        ):
+            with self.subTest(text=text):
+                (self.backup / "MANIFEST.txt").write_text(text)
+                self.assert_invalid_preferences()
+
+    def test_prefs_xml_symlink_and_directory_prevent_all_operations(self):
+        path = self.backup / "shared_prefs" / "z-late.xml"
+        for kind in ("symlink", "directory"):
+            with self.subTest(kind=kind):
+                if kind == "symlink":
+                    path.symlink_to(self.backup / "shared_prefs" / "prefs.xml")
+                else:
+                    path.mkdir()
+                try:
+                    self.assert_invalid_preferences()
+                finally:
+                    path.rmdir() if kind == "directory" else path.unlink()
+
+    def test_prefs_missing_empty_or_linked_directory_prevents_all_operations(self):
+        path = self.backup / "shared_prefs"
+        saved = self.root / "saved-prefs"
+        path.rename(saved)
+        self.assert_invalid_preferences()
+        path.mkdir()
+        self.assert_invalid_preferences()
+        path.rmdir()
+        path.symlink_to(saved, target_is_directory=True)
+        self.assert_invalid_preferences()
+
+    def test_prefs_manifest_symlink_or_directory_is_not_absent_legacy(self):
+        path = self.backup / "MANIFEST.txt"
+        path.symlink_to(self.root / "missing-manifest")
+        self.assert_invalid_preferences()
+        path.unlink()
+        path.mkdir()
+        self.assert_invalid_preferences()
+
+    def test_prefs_unsafe_xml_names_prevent_all_operations(self):
+        for name in ("bad\nname.xml", "bad\\name.xml"):
+            with self.subTest(name=name):
+                path = self.backup / "shared_prefs" / name
+                path.write_text("<map/>")
+                try:
+                    self.assert_invalid_preferences()
+                finally:
+                    path.unlink()
+
+    def test_prefs_bytes_are_frozen_before_install_and_kept_private(self):
+        path = self.backup / "shared_prefs" / "prefs.xml"
+        original = path.read_bytes()
+        self.replies["replace_preferences"] = {str(path): "<map/>"}
+        code, output, calls = self.run_restore("--apps", "--prefs")
+        self.assertEqual(code, 0, output)
+        self.assertEqual([call[0] for call in calls], ["install", "apps", "push", "action"])
+        pushed = self.read_pushes()[0]
+        self.assertEqual(bytes.fromhex(pushed["bytes"]), original)
+        self.assertEqual(pushed["file_mode"], 0o600)
+        self.assertEqual(pushed["directory_mode"], 0o700)
+        self.assertTrue(Path(pushed["source"]).is_relative_to(self.scratch_parent))
+
+    def test_prefs_all_bytes_are_frozen_before_first_push(self):
+        path = self.backup / "shared_prefs" / "z-late.xml"
+        path.write_bytes(b'<?xml version="1.0"?><map><!--public--><string name="x">A&amp;B</string></map>\n')
+        original = path.read_bytes()
+        self.replies["replace_preferences_on_push"] = {str(path): "<map/>"}
+        code, output, calls = self.run_restore("--prefs")
+        self.assertEqual(code, 0, output)
+        self.assertEqual([call[0] for call in calls], ["push", "push", "action"])
+        self.assertEqual(bytes.fromhex(self.read_pushes()[1]["bytes"]), original)
+
+    def test_prefs_manifestless_legacy_manifest_and_latest_link_keep_exact_bytes(self):
+        original = (self.backup / "shared_prefs" / "prefs.xml").read_bytes()
+        for kind in ("manual", "legacy", "current"):
+            with self.subTest(kind=kind):
+                if kind != "manual":
+                    self.write_manifest(["prefs.xml"], None if kind == "legacy" else "com.immortal.launcher")
+                if self.push_observations.exists():
+                    self.push_observations.unlink()
+                saved = self.backup
+                link = self.root / "latest"
+                link.symlink_to(saved, target_is_directory=True)
+                self.backup = link
+                code, output, calls = self.run_restore("--prefs")
+                self.backup = saved
+                link.unlink()
+                self.assertEqual(code, 0, output)
+                self.assertEqual([call[0] for call in calls], ["push", "action"])
+                self.assertEqual(bytes.fromhex(self.read_pushes()[0]["bytes"]), original)
+
+    def test_prefs_unicode_spaces_token_skip_and_dry_run_are_literal(self):
+        name = " public café 'photo'.xml"
+        (self.backup / "shared_prefs" / name).write_text("<map/>")
+        (self.backup / "shared_prefs" / "fleet_agent.xml").write_text("old-token-not-xml")
+        self.write_manifest([name, "prefs.xml", "fleet_agent.xml"])
+        code, output, calls = self.run_restore("--prefs", "--dry-run")
+        self.assertEqual(code, 0, output)
+        self.assertEqual(calls, [])
+        self.assertIn(name, output)
+        self.assertNotIn("old-token-not-xml", output)
+        code, output, calls = self.run_restore("--prefs")
+        self.assertEqual(code, 0, output)
+        pushes = [call for call in calls if call[0] == "push"]
+        self.assertEqual([Path(call[1]).name for call in pushes], [name, "prefs.xml"])
+        self.assertEqual(pushes[0][2], "/data/data/com.immortal.launcher/shared_prefs/" + name)
+
+    def test_prefs_token_only_has_no_push_or_reboot_but_token_links_fail(self):
+        path = self.backup / "shared_prefs" / "prefs.xml"
+        path.unlink()
+        token = self.backup / "shared_prefs" / "fleet_agent.xml"
+        token.write_text("old-token-not-xml")
+        code, output, calls = self.run_restore("--prefs")
+        self.assertEqual(code, 0, output)
+        self.assertEqual(calls, [])
+        token.unlink()
+        token.symlink_to(self.root / "missing-token")
+        self.assert_invalid_preferences()
+
+    def test_prefs_manifest_unicode_line_separators_remain_literal_filenames(self):
+        for separator in ("\u0085", "\u2028", "\u2029"):
+            with self.subTest(separator=separator):
+                path = self.backup / "shared_prefs" / ("public" + separator + "photo.xml")
+                path.write_text("<map/>")
+                self.write_manifest(["prefs.xml", path.name])
+                try:
+                    code, output, calls = self.run_restore("--prefs")
+                    self.assertEqual(code, 0, output)
+                    self.assertEqual([Path(call[1]).name for call in calls if call[0] == "push"],
+                                     ["prefs.xml", path.name])
+                finally:
+                    path.unlink()
 
     def test_arbitrary_field_order_and_pretty_or_minified_json_select_correct_app(self):
         for minified in (False, True):

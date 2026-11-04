@@ -1,0 +1,19 @@
+{
+  "tests": 48,
+  "failureEntries": 19,
+  "errors": 0,
+  "skipped": 0,
+  "failingMethods": [
+    "test_prefs_all_bytes_are_frozen_before_first_push",
+    "test_prefs_bytes_are_frozen_before_install_and_kept_private",
+    "test_prefs_late_malformed_xml_prevents_earlier_install_and_push",
+    "test_prefs_manifest_invalid_inventory_and_package_prevent_all_operations",
+    "test_prefs_manifest_missing_or_unlisted_xml_prevents_all_operations",
+    "test_prefs_manifest_symlink_or_directory_is_not_absent_legacy",
+    "test_prefs_missing_empty_or_linked_directory_prevents_all_operations",
+    "test_prefs_non_map_prevents_all_operations_even_in_dry_run",
+    "test_prefs_token_only_has_no_push_or_reboot_but_token_links_fail",
+    "test_prefs_unsafe_xml_names_prevent_all_operations",
+    "test_prefs_xml_symlink_and_directory_prevent_all_operations"
+  ]
+}

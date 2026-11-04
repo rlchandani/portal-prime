@@ -1,0 +1,3 @@
+INFO    -  Doc file 'music-receiver-preview-validation.md' contains a link 'music-player-goal.md#integrated-control-safety-and-preview-rollout--october-19-1108-utc', but the doc 'music-player-goal.md' does not contain an anchor '#integrated-control-safety-and-preview-rollout--october-19-1108-utc'.
+INFO    -  Doc file 'portal-hardware-budget-2026-10-30.md' contains a link 'portal-night-player-progress-2026-10-30.md#native-filmstrip-steady-motion-observation--2102-utc-batch', but the doc 'portal-night-player-progress-2026-10-30.md' does not contain an anchor '#native-filmstrip-steady-motion-observation--2102-utc-batch'.
+INFO    -  Documentation built in 1.96 seconds

@@ -1,0 +1,23 @@
+{
+  "previousTasks": 121,
+  "currentTasks": 122,
+  "allPreviousObjectsExact": true,
+  "rawPreviousSuffixBytes": 408872,
+  "rawPreviousSuffixSha256": "cfd4a945e40a4fae6f5337295d2ff892cc3da36979cbc6f0cd30c6a563eb5e72",
+  "defaultTaskRetained": "weather-native-layout",
+  "statuses": {
+    "verified": 38,
+    "delivered": 74,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "protectedHashes": {
+    "version.json": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903",
+    "catalog.json": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15",
+    "provisioning/fleetctl": "41a6e4f98bf11f497fec3b40a983ca62a40e4d9be9a63ad6ffad17fe43bb0fae",
+    "app/build.gradle.kts": "eb484b11573c52a1718d3ae45a4d42a3d10fff07ac3174295e6017b5e99bc46d",
+    "provisioning/fleet-backup.sh": "1d61ef3a655f9a02261a00dda7df64eb23bc49aefbe4a10e9fea8210b9c2a817",
+    "app/src/main/java/com/immortal/launcher/FleetFs.kt": "56aaae30896fe47188697cf7df22812045193b43e6e3d452a0af26f17dc1e57e"
+  }
+}
