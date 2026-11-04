@@ -1,0 +1,109 @@
+{
+  "ok": true,
+  "preparedAtUtc": "2026-11-04T10:04:00Z",
+  "originalClockUtc": "2026-11-04T09:54:27Z",
+  "targetUtc": "2026-11-04T10:09:27Z",
+  "hardDeadlineUtc": "2026-11-04T10:24:27Z",
+  "package": "com.immortal.apkbrowserfixture",
+  "activity": ".ApkBrowserActivityFixture",
+  "reportPath": "external-files/report.json",
+  "sources": {
+    "ApkBrowserActivityFixture.java": {
+      "sha256": "ee3098b5adca7a690f6088276326de6c392a7220e11411bab1eac2a415f2246e",
+      "bytes": 10778
+    },
+    "AndroidManifest.xml": {
+      "sha256": "a10b559dfc622ab3eafe1630eba3d4d92d73d8ebb268608c8e95b04a9271d090",
+      "bytes": 439
+    },
+    "build.sh": {
+      "sha256": "8c05b075c20d80df31e2ddc69d9c7181628924ff742bc2643192a7d4096238b8",
+      "bytes": 797
+    },
+    "repack.sh": {
+      "sha256": "5a714969ffc8439fd2fa832c17e8a210c18391fbcb92cb4b4d63406e2a92f981",
+      "bytes": 776
+    }
+  },
+  "fixtureDex": {
+    "sha256": "9abc7c4c90c76d2ac92fedb0d1ca823db85b14258d62641c4dbaa551304d3c4f",
+    "bytes": 21308
+  },
+  "fixture": {
+    "sha256": "7c43849373684fcb30dfd725ccf806b0d0c68585627afb04eb96a96ff975b24c",
+    "bytes": 37503466
+  },
+  "baselineFixture": {
+    "sha256": "7c43849373684fcb30dfd725ccf806b0d0c68585627afb04eb96a96ff975b24c",
+    "bytes": 37503466
+  },
+  "embeddedSource": {
+    "sha256": "e60623c019c6547b31cac26f709c6ae91596cc36a9be30a112a7f95e9624baf0",
+    "bytes": 51378217
+  },
+  "caseNames": [
+    "replacementAfterConfirmationRetainsConfirmedBytesAndMetadata",
+    "deletingDownloadAfterConfirmationRetainsInstallerInput",
+    "metadataReadsSamePrivateFileHandedToInstaller",
+    "closeRemovesOnlyOwnedCopyAndCanRepeat",
+    "successiveSelectionsKeepBothCompletedCopies",
+    "unreadableMetadataLeavesSourceAndForeignCache",
+    "metadataFailureCleansOwnedCopyPreservesOriginal",
+    "missingDownloadFailsWithoutCallingMetadata"
+  ],
+  "expectedBaselineFailures": [
+    "replacementAfterConfirmationRetainsConfirmedBytesAndMetadata",
+    "deletingDownloadAfterConfirmationRetainsInstallerInput",
+    "metadataReadsSamePrivateFileHandedToInstaller",
+    "closeRemovesOnlyOwnedCopyAndCanRepeat",
+    "successiveSelectionsKeepBothCompletedCopies",
+    "missingDownloadFailsWithoutCallingMetadata"
+  ],
+  "expectedBaselineControls": [
+    "unreadableMetadataLeavesSourceAndForeignCache",
+    "metadataFailureCleansOwnedCopyPreservesOriginal"
+  ],
+  "sourceGuards": "Every case checks separate owned source guard and foreign cache guard plus expected source state, including after expected deliberate source overwrite/delete. No owner data.",
+  "frozenSourcesByteIdentical": true,
+  "zeroDeclaredPermissions": true,
+  "strictEmbeddedBaselineExact": true,
+  "watchdogMs": 30000,
+  "generatedMetadata": "Literal byte[3] or generated string/null/unchecked exact exception; no APK metadata parser or installation",
+  "baselineQualification": "New equivalent extracted helper seam, not a claim that a historic APK contained ApkBrowserSelection",
+  "reportKeys": [
+    "ok",
+    "error",
+    "tests",
+    "failures",
+    "cases",
+    "sourceSha256",
+    "sourceBytes",
+    "sdk",
+    "actualEmbeddedApkClassLoader",
+    "actualPublicHelperMethods",
+    "fixturePackage",
+    "internetPermission",
+    "generatedFileOnly",
+    "scope"
+  ],
+  "caseReportKeys": [
+    "name",
+    "passed",
+    "error",
+    "sourceGuardUnchanged",
+    "cacheGuardUnchanged",
+    "sourceStateExpected",
+    "metadataCallbackCount"
+  ],
+  "commands": {
+    "baseline": "Use native/apk-browser-fixture.apk as built; baseline-fixture.apk is byte-identical preserved copy",
+    "candidate": "bash native/repack.sh candidate-debug-1.146.apk (frozen classes.dex, no javac/D8)"
+  },
+  "limits": [
+    "Actual embedded debug helper with Android generated file behavior only",
+    "No native Activity/UI/wiring acceptance",
+    "No optimized, API28, owner data, provider, media, network, concurrency or filename collision acceptance",
+    "No device commands executed by this agent"
+  ],
+  "blockers": []
+}

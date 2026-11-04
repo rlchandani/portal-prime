@@ -1,0 +1,8 @@
+{
+  "ownedWrapperPid": 86282,
+  "compilerPid": 86313,
+  "observedCompilerHeap": "~2GB; old generation99%, eden100%; active collection",
+  "action": "Stop own incomplete build; retire saturated compiler; rerun unchanged gates with temporary4GB Kotlin heap",
+  "sourceTestsGatesChanged": false,
+  "excludedRecoveryAttempt": "Initial substring filter selected its own collector shell; corrected executable/argument token filter before any compiler retirement. Failedcollector retained; no other process affected."
+}

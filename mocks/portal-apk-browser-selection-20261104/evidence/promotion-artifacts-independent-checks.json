@@ -1,0 +1,68 @@
+{
+  "startedAtUtc": "2026-11-04T10:09:00.589724+00:00",
+  "finishedAtUtc": "2026-11-04T10:09:00.985257+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-04T09:54:27Z",
+    "target": "2026-11-04T10:09:27Z",
+    "deadline": "2026-11-04T10:24:27Z"
+  },
+  "gradleLogSha256": "c579b0e001139e98226afe5958639ac46bebdbffc27b63b733113d3292a02c05",
+  "gradleTerminal": "BUILD SUCCESSFUL in 2m 6s; parent reports terminal exit 0",
+  "checks": [
+    {
+      "variant": "debug",
+      "aaptExit": 0,
+      "apksignerExit": 0,
+      "assetCount": 10,
+      "matchesSourceAndRollback": true,
+      "duplicateZipEntries": false,
+      "builtSnapshotExact": true,
+      "apkMode": "0400",
+      "apkMtimeUtc": "2026-11-04T10:07:40.310544+00:00"
+    },
+    {
+      "variant": "performance",
+      "aaptExit": 0,
+      "apksignerExit": 0,
+      "assetCount": 10,
+      "matchesSourceAndRollback": true,
+      "duplicateZipEntries": false,
+      "builtSnapshotExact": true,
+      "apkMode": "0400",
+      "apkMtimeUtc": "2026-11-04T10:08:24.580885+00:00"
+    }
+  ],
+  "rollbackSha256": "a78f11081e556e85b6348b2d0a80579d4e5bd63645075ce19713786100b1fe35",
+  "sources": {
+    "ApkBrowserActivity.kt": "3ef40afda7c301327962bfbf8ed8e1266e1493dc975be2a406215ad6353d98b9",
+    "ApkBrowserSelection.kt": "05600ff387b91f187fb3539e205775f9b56d907224e4916e642e96c329fff82d"
+  },
+  "protectedFileCount": 16,
+  "protectedHashesExact": true,
+  "protectedInventorySha256": "a57e052fba0460a1a039a0c41aafc083f9f4be2a608902e888d5d9c1108c0cb6",
+  "frozenTest": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/ApkBrowserSelectionTest.kt",
+    "sha256": "8e8d444b2e8bed12d45804ae734818bb56e9ffe749079bd80eaf2c968bc05d50",
+    "methods": 8,
+    "exactFrozenSha256": true,
+    "result": {
+      "file": "TEST-com.immortal.launcher.ApkBrowserSelectionTest.xml",
+      "sha256": "cc43b56fb327dd7313b05cd7e0ffac734107aee84c9357c7409ba97ce1526bc4",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "freshXml": {
+    "tests": 4434,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 463,
+    "minimumTimestampUtc": "2026-11-04T10:07:04.622000+00:00",
+    "maximumTimestampUtc": "2026-11-04T10:07:39.455000+00:00",
+    "sortedReportInventorySha256": "cb9f84d4b0d8cff1f37f3ce94a8b7e1c318fff69cc4f6c74bfd946e2c96fb87f"
+  },
+  "limits": "Host artifact verification only; native validation and device promotion owned by root. Prior failed/stalled runs excluded."
+}

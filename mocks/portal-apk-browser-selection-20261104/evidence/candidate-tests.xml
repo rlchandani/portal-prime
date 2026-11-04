@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.immortal.launcher.ApkBrowserSelectionTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-11-04T10:07:04.622Z" hostname="iRedlofs-Mac-mini-3.local" time="0.029">
+  <properties/>
+  <testcase name="missingDownloadFailsWithoutCallingMetadata" classname="com.immortal.launcher.ApkBrowserSelectionTest" time="0.007"/>
+  <testcase name="metadataReadsTheSamePrivateFileHandedToInstaller" classname="com.immortal.launcher.ApkBrowserSelectionTest" time="0.004"/>
+  <testcase name="unreadableMetadataLeavesSourceAndForeignCache" classname="com.immortal.launcher.ApkBrowserSelectionTest" time="0.008"/>
+  <testcase name="successiveSelectionsKeepBothCompletedCopies" classname="com.immortal.launcher.ApkBrowserSelectionTest" time="0.002"/>
+  <testcase name="deletingDownloadAfterConfirmationRetainsInstallerInput" classname="com.immortal.launcher.ApkBrowserSelectionTest" time="0.001"/>
+  <testcase name="replacementAfterConfirmationRetainsConfirmedBytesAndMetadata" classname="com.immortal.launcher.ApkBrowserSelectionTest" time="0.001"/>
+  <testcase name="closeRemovesOnlyOwnedCopyAndCanRepeat" classname="com.immortal.launcher.ApkBrowserSelectionTest" time="0.001"/>
+  <testcase name="metadataFailureCleansOwnedCopyAndPreservesOriginal" classname="com.immortal.launcher.ApkBrowserSelectionTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

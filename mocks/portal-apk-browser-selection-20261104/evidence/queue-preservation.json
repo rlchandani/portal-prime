@@ -1,0 +1,15 @@
+{
+  "oldCount": 137,
+  "newCount": 138,
+  "allOldObjectsExact": true,
+  "rawTaskSuffixBytes": 450440,
+  "rawTaskSuffixSha256": "73a776b89318d7707d59f1006fdf0b8324b57eaee81f9b69698c9fd9255f20d5",
+  "defaultTaskPreserved": true,
+  "states": {
+    "approval": 2,
+    "delivered": 88,
+    "parked": 7,
+    "queued": 1,
+    "verified": 40
+  }
+}

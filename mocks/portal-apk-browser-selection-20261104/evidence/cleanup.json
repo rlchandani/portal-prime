@@ -1,0 +1,15 @@
+{
+  "family": {
+    "originalRegistryUnchanged": true
+  },
+  "living": {
+    "originalRegistryUnchanged": true
+  },
+  "fleetRemoved": true,
+  "docs-envRemoved": true,
+  "docs-siteRemoved": true,
+  "nativeFixturePackageProcessExternalDirectoryRetired": true,
+  "compilerRecoveryRetired": true,
+  "privateLogsAndApksRetained": true,
+  "preexistingRepositoryPycacheNotStagedDeletedOrDirectlyEdited": true
+}

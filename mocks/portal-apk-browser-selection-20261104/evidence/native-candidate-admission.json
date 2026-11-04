@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "blockers": [],
+  "originalClockUtc": "2026-11-04T09:54:27Z",
+  "sources": {
+    "ApkBrowserActivityFixture.java": {
+      "sha256": "ee3098b5adca7a690f6088276326de6c392a7220e11411bab1eac2a415f2246e",
+      "bytes": 10778
+    },
+    "AndroidManifest.xml": {
+      "sha256": "a10b559dfc622ab3eafe1630eba3d4d92d73d8ebb268608c8e95b04a9271d090",
+      "bytes": 439
+    },
+    "build.sh": {
+      "sha256": "8c05b075c20d80df31e2ddc69d9c7181628924ff742bc2643192a7d4096238b8",
+      "bytes": 797
+    },
+    "repack.sh": {
+      "sha256": "5a714969ffc8439fd2fa832c17e8a210c18391fbcb92cb4b4d63406e2a92f981",
+      "bytes": 776
+    }
+  },
+  "fixtureDex": {
+    "sha256": "9abc7c4c90c76d2ac92fedb0d1ca823db85b14258d62641c4dbaa551304d3c4f",
+    "bytes": 21308
+  },
+  "fixture": {
+    "sha256": "4537fb812b64e0a17fefdbbd538a8d49e9334554e03759109a3fa98f932589b0",
+    "bytes": 37499370
+  },
+  "originalCandidate": {
+    "sha256": "bdd3964e0b51d36d94fe82f5bf515b9b60eb3a08168f3021e66eae9e84c3938e",
+    "bytes": 46745294
+  },
+  "baselineFixture": {
+    "sha256": "7c43849373684fcb30dfd725ccf806b0d0c68585627afb04eb96a96ff975b24c",
+    "bytes": 37503466
+  },
+  "caseNames": [
+    "replacementAfterConfirmationRetainsConfirmedBytesAndMetadata",
+    "deletingDownloadAfterConfirmationRetainsInstallerInput",
+    "metadataReadsSamePrivateFileHandedToInstaller",
+    "closeRemovesOnlyOwnedCopyAndCanRepeat",
+    "successiveSelectionsKeepBothCompletedCopies",
+    "unreadableMetadataLeavesSourceAndForeignCache",
+    "metadataFailureCleansOwnedCopyPreservesOriginal",
+    "missingDownloadFailsWithoutCallingMetadata"
+  ],
+  "frozenSourcesAndGatesByteIdentical": true,
+  "baselineAndCandidateFixtureDexByteIdentical": true,
+  "embeddedCandidateExact": true,
+  "zeroDeclaredPermissions": true,
+  "package": "com.immortal.apkbrowserfixture",
+  "activity": ".ApkBrowserActivityFixture",
+  "reportPath": "external-files/report.json",
+  "repackOnlyNoJavaOrDexRecompile": true,
+  "limits": [
+    "Actual embedded debug helper with Android generated file behavior only",
+    "No native Activity/UI/wiring acceptance",
+    "No optimized, API28, owner data, provider, media, network, concurrency or filename collision acceptance",
+    "No device commands executed by this agent"
+  ]
+}

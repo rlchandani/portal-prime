@@ -1,0 +1,251 @@
+{
+  "reviewedAt": "2026-11-04T10:01:44.406543+00:00",
+  "scope": "Independent host source and retained baseline-evidence review; no source/tests/build/device/network/Git actions.",
+  "originalClock": {
+    "startedAt": "2026-11-04T09:54:27Z",
+    "target": "2026-11-04T10:09:27Z",
+    "deadline": "2026-11-04T10:24:27Z"
+  },
+  "verdict": "accepted_bounded_source_no_blocker",
+  "bindings": {
+    "candidateActivity": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApkBrowserActivity.kt",
+      "sha256": "3ef40afda7c301327962bfbf8ed8e1266e1493dc975be2a406215ad6353d98b9"
+    },
+    "candidateHelper": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApkBrowserSelection.kt",
+      "sha256": "05600ff387b91f187fb3539e205775f9b56d907224e4916e642e96c329fff82d"
+    },
+    "frozenTests": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/ApkBrowserSelectionTest.kt",
+      "sha256": "8e8d444b2e8bed12d45804ae734818bb56e9ffe749079bd80eaf2c968bc05d50"
+    },
+    "capturedOriginalActivity": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/ApkBrowserActivity.kt",
+      "sha256": "16b2bd55ffaa5cd18dd4a73bf2f791836a59f2d3827d1dd1a0cb1b17fa0e93f3"
+    },
+    "extractedBaselineHelper": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/baseline-ApkBrowserSelection.kt",
+      "sha256": "84cf9d92df820e712f400e0902a95a2cae1886f4f60ac6140723324cb0f9f7b0"
+    },
+    "baselineXml": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/baseline-tests.xml",
+      "sha256": "6ec64c477efd099c8f939b34ea4bd53e4746ce7e1b7a60f38500a8c0009ebd26"
+    },
+    "baselineResult": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/baseline-result.json",
+      "sha256": "8b049def73ee07fcfd19dd994e92a182c4bc0fb8837c29e258d3739cbb188f2b"
+    },
+    "baselineEquivalentApk": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/baseline-equivalent-debug.apk",
+      "sha256": "e60623c019c6547b31cac26f709c6ae91596cc36a9be30a112a7f95e9624baf0"
+    },
+    "originalRollbackApk": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/rollback-1.145.apk",
+      "sha256": "a78f11081e556e85b6348b2d0a80579d4e5bd63645075ce19713786100b1fe35"
+    },
+    "plan": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/plan.json",
+      "sha256": "dfc5e151578ca7e194d721b42af256c50452faef3f944d142622db13012f7a07"
+    },
+    "frozenRegressionManifest": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/frozen-regression.json",
+      "sha256": "c4b8e2615f9768b263ff253c27c24d951d7549047050396e37a49bc72d336b58"
+    },
+    "candidateBuildConfig": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "sha256": "646b258a2c46e52449acffdfe0a6c2c08930898933dd388733627d183a2f262d"
+    },
+    "capturedBuildConfig": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/build.gradle.kts",
+      "sha256": "3364dfabc60b963fa5f0e5c1b2d2ec3e5416e2f3822b890957bf78750a7f1128"
+    }
+  },
+  "frozenTestsMatch": true,
+  "protectedFiles": {
+    "app/src/main/java/com/immortal/launcher/HeadlessInstaller.kt": {
+      "expectedSha256": "c7988798ef5398665b51cecfdc8e690bb5d40df3354f1d5929fde5b284799958",
+      "actualSha256": "c7988798ef5398665b51cecfdc8e690bb5d40df3354f1d5929fde5b284799958",
+      "matches": true
+    },
+    "app/src/main/java/com/immortal/launcher/InstallDaemon.kt": {
+      "expectedSha256": "d91e5ed93b97b112c7ae13a05ae5f738b67e4404b0e0ac90ea019092270287ef",
+      "actualSha256": "d91e5ed93b97b112c7ae13a05ae5f738b67e4404b0e0ac90ea019092270287ef",
+      "matches": true
+    },
+    "app/src/main/java/com/immortal/launcher/ApkInstallActivity.kt": {
+      "expectedSha256": "ad6bd02cd9b8d568f50feaedff911e7909b07b02e01a949c1b008706f991a736",
+      "actualSha256": "ad6bd02cd9b8d568f50feaedff911e7909b07b02e01a949c1b008706f991a736",
+      "matches": true
+    },
+    "app/src/main/java/com/immortal/launcher/IncomingApkSnapshot.kt": {
+      "expectedSha256": "dc902d27911d3d603ed4ce42ca59e59b347a3f3a9aa818980fd225fddb4eeb06",
+      "actualSha256": "dc902d27911d3d603ed4ce42ca59e59b347a3f3a9aa818980fd225fddb4eeb06",
+      "matches": true
+    },
+    "app/src/main/java/com/immortal/launcher/StoreActivity.kt": {
+      "expectedSha256": "b14f2008035393ee47a7e6b1be958dd506e12966a4f0f1fa29da8f6295f9b2a0",
+      "actualSha256": "b14f2008035393ee47a7e6b1be958dd506e12966a4f0f1fa29da8f6295f9b2a0",
+      "matches": true
+    },
+    "app/src/main/java/com/immortal/launcher/NewsConfig.kt": {
+      "expectedSha256": "b5fc8ebc5c7c6b61d85dec5f0f63aa10a6942de1b4d18daa309520b46c602f6e",
+      "actualSha256": "b5fc8ebc5c7c6b61d85dec5f0f63aa10a6942de1b4d18daa309520b46c602f6e",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/index.html": {
+      "expectedSha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "actualSha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/modes.js": {
+      "expectedSha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "actualSha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/styles.css": {
+      "expectedSha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "actualSha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/cinema-grain.png": {
+      "expectedSha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "actualSha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/photos.js": {
+      "expectedSha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "actualSha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/photo-doodles-dark.svg": {
+      "expectedSha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "actualSha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/scheduler.js": {
+      "expectedSha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "actualSha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/lib-engine.js": {
+      "expectedSha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "actualSha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/photo-doodles.svg": {
+      "expectedSha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "actualSha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "matches": true
+    },
+    "app/src/main/assets/screensaver/mode-impls.js": {
+      "expectedSha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+      "actualSha256": "b4d5f83d7da6465591d39ede0e27e2aea6377d25d89c0c3b4056c31d84be9deb",
+      "matches": true
+    }
+  },
+  "allProtectedFilesMatch": true,
+  "versionOnlyBuildConfigMatchesCapturedOriginal": true,
+  "baseline": {
+    "tests": 8,
+    "failures": 6,
+    "errors": 0,
+    "skips": 0,
+    "methods": [
+      {
+        "name": "missingDownloadFailsWithoutCallingMetadata",
+        "failureTypes": [
+          "java.lang.AssertionError"
+        ]
+      },
+      {
+        "name": "metadataReadsTheSamePrivateFileHandedToInstaller",
+        "failureTypes": [
+          "java.lang.AssertionError"
+        ]
+      },
+      {
+        "name": "unreadableMetadataLeavesSourceAndForeignCache",
+        "failureTypes": []
+      },
+      {
+        "name": "successiveSelectionsKeepBothCompletedCopies",
+        "failureTypes": [
+          "java.lang.AssertionError"
+        ]
+      },
+      {
+        "name": "deletingDownloadAfterConfirmationRetainsInstallerInput",
+        "failureTypes": [
+          "java.io.FileNotFoundException"
+        ]
+      },
+      {
+        "name": "replacementAfterConfirmationRetainsConfirmedBytesAndMetadata",
+        "failureTypes": [
+          "org.junit.internal.ArrayComparisonFailure"
+        ]
+      },
+      {
+        "name": "closeRemovesOnlyOwnedCopyAndCanRepeat",
+        "failureTypes": [
+          "java.lang.AssertionError"
+        ]
+      },
+      {
+        "name": "metadataFailureCleansOwnedCopyAndPreservesOriginal",
+        "failureTypes": []
+      }
+    ]
+  },
+  "baselineEquivalence": {
+    "qualified": "The extracted helper reads metadata from the public source and returns that same non-owned File, matching the original browser scan-to-confirm-to-installer address handoff. It is not the original Activity method or the original rollback APK execution.",
+    "originalWitness": "Captured original LocalApk retains public File plus scan-time metadata; selection retains that row, and confirm later passes apk.file to HeadlessInstaller.",
+    "testFailureWording": "Six XML failures and two controls. The deletion case is FileNotFoundException; replacement is ArrayComparisonFailure; remaining four are AssertionError. Zero XML errors/skips does not make all six assertion failures.",
+    "missingSourceLimit": "The missing-source test uses a fake metadata callback that can return metadata without reading bytes. Its baseline failure demonstrates the extracted helper boundary, not PackageManager behavior or original scan admission."
+  },
+  "reviewedOwnership": [
+    {
+      "lines": "ApkBrowserSelection.kt:19-29",
+      "finding": "Creates a unique IncomingApkSnapshot before metadata, reads metadata from that same copy, returns that owned File. Null metadata or thrown metadata callback removes only that copy in finally."
+    },
+    {
+      "lines": "IncomingApkSnapshot.kt:15-30",
+      "finding": "Existing byte-identical helper uses a unique cache file and removes its own incomplete output on source-open/copy/close failure."
+    },
+    {
+      "lines": "ApkBrowserActivity.kt:125-150",
+      "finding": "Preparation is serialized by preparing state, starts UNDISPATCHED, performs copy/parser work on IO, and assigns pending inside IO. A cancelled withContext delivery therefore retains pending for finally cleanup. No suspension occurs between successful return, selected transfer and pending=null."
+    },
+    {
+      "lines": "ApkBrowserActivity.kt:68-74,158-174",
+      "finding": "Selected is a remembered delegated mutable state. DisposableEffect reads its current value at disposal. Dismiss, explicit Cancel, replacement and paused confirmation each close the selected ownership."
+    },
+    {
+      "lines": "ApkBrowserActivity.kt:169-184;HeadlessInstaller.kt:100-125",
+      "finding": "Confirmation clears selected, then UNDISPATCHED launch enters try/finally before dispatching blocking installer IO. Disposal no longer owns the confirmed snapshot; cancellation waits for the structured IO child, then closes selection. The unchanged installer opens and stages selection.file synchronously before returning."
+    },
+    {
+      "lines": "ApkBrowserActivity.kt:132-143,180,220-240",
+      "finding": "Package archive metadata/label/icon read from snapshot contents; displayFile remains original path for filename/status. The exact prepared File is handed to HeadlessInstaller. Scan parser extraction preserves existing fallback fields and directory/filter/sort behavior."
+    },
+    {
+      "lines": "ApkBrowserActivity.kt:138-146,181-183",
+      "finding": "Preparation errors use fixed user-facing text. Existing installation status/error handling remains, with added owned-copy finally cleanup; installer, daemon, Store and incoming Activity are unchanged."
+    }
+  ],
+  "reviewedFrozenCoverage": [
+    "Source replacement and deletion after preparation retain confirmed bytes.",
+    "Metadata callback and installer File identity point to the same private copy.",
+    "Repeat close and successive selections affect only their owned copies; public source and foreign cache file survive.",
+    "Null/throwing metadata and missing input retire newly owned output."
+  ],
+  "runtimeLimits": [
+    "Eight frozen tests were read and matched; retained baseline XML/results were independently parsed. No additional Gradle/JVM execution was performed by this reviewer; candidate full gates remain coordinator-owned.",
+    "Caller cancellation, remembered-state disposal and confirmed handoff were source-reviewed; the eight helper tests do not exercise Compose or coroutine scheduling.",
+    "No native Activity/UI, Android PackageManager parser, valid APK installation, daemon/signature/permission flow, API28/29 or optimized artifact behavior is claimed by this source review.",
+    "Concurrent mutation during source copying is not an atomic file-version snapshot claim. The confirmed metadata and installer consume the same completed private copy.",
+    "File deletion remains best-effort as in the existing helper; process death or storage deletion failure is not proven cleanup."
+  ],
+  "blockers": []
+}

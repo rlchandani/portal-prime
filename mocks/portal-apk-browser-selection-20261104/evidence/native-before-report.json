@@ -1,0 +1,89 @@
+{
+  "ok": false,
+  "error": null,
+  "tests": 8,
+  "failures": 6,
+  "cases": [
+    {
+      "name": "replacementAfterConfirmationRetainsConfirmedBytesAndMetadata",
+      "passed": false,
+      "error": "java.lang.AssertionError:Confirmed bytes A remain",
+      "sourceGuardUnchanged": true,
+      "cacheGuardUnchanged": true,
+      "sourceStateExpected": true,
+      "metadataCallbackCount": 1
+    },
+    {
+      "name": "deletingDownloadAfterConfirmationRetainsInstallerInput",
+      "passed": false,
+      "error": "java.io.FileNotFoundException:/data/user/0/com.immortal.apkbrowserfixture/files/generated-deletingDownloadAfterConfirmationRetainsInstallerInput/download.apk: open failed: ENOENT (No such file or directory)",
+      "sourceGuardUnchanged": true,
+      "cacheGuardUnchanged": true,
+      "sourceStateExpected": true,
+      "metadataCallbackCount": 1
+    },
+    {
+      "name": "metadataReadsSamePrivateFileHandedToInstaller",
+      "passed": false,
+      "error": "java.lang.AssertionError:Private cache parent",
+      "sourceGuardUnchanged": true,
+      "cacheGuardUnchanged": true,
+      "sourceStateExpected": true,
+      "metadataCallbackCount": 1
+    },
+    {
+      "name": "closeRemovesOnlyOwnedCopyAndCanRepeat",
+      "passed": false,
+      "error": "java.lang.AssertionError:Owned copy removed",
+      "sourceGuardUnchanged": true,
+      "cacheGuardUnchanged": true,
+      "sourceStateExpected": true,
+      "metadataCallbackCount": 1
+    },
+    {
+      "name": "successiveSelectionsKeepBothCompletedCopies",
+      "passed": false,
+      "error": "java.lang.AssertionError:Distinct owned selection files",
+      "sourceGuardUnchanged": true,
+      "cacheGuardUnchanged": true,
+      "sourceStateExpected": true,
+      "metadataCallbackCount": 2
+    },
+    {
+      "name": "unreadableMetadataLeavesSourceAndForeignCache",
+      "passed": true,
+      "error": null,
+      "sourceGuardUnchanged": true,
+      "cacheGuardUnchanged": true,
+      "sourceStateExpected": true,
+      "metadataCallbackCount": 1
+    },
+    {
+      "name": "metadataFailureCleansOwnedCopyPreservesOriginal",
+      "passed": true,
+      "error": null,
+      "sourceGuardUnchanged": true,
+      "cacheGuardUnchanged": true,
+      "sourceStateExpected": true,
+      "metadataCallbackCount": 1
+    },
+    {
+      "name": "missingDownloadFailsWithoutCallingMetadata",
+      "passed": false,
+      "error": "java.lang.AssertionError:Missing source rejects",
+      "sourceGuardUnchanged": true,
+      "cacheGuardUnchanged": true,
+      "sourceStateExpected": true,
+      "metadataCallbackCount": 1
+    }
+  ],
+  "sourceSha256": "e60623c019c6547b31cac26f709c6ae91596cc36a9be30a112a7f95e9624baf0",
+  "sourceBytes": 51378217,
+  "sdk": 29,
+  "actualEmbeddedApkClassLoader": true,
+  "actualPublicHelperMethods": true,
+  "fixturePackage": "com.immortal.apkbrowserfixture",
+  "internetPermission": false,
+  "generatedFileOnly": true,
+  "scope": "Actual embedded debug APK selection helper with generated owned files only; no APK installation, launcher owner data, media, providers, network, UI, optimized/API28, concurrency or collision claim"
+}

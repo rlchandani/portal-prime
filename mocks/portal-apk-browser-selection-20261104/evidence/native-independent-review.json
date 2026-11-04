@@ -1,0 +1,146 @@
+{
+  "reviewedAtUtc": "2026-11-04T10:10:18.274438+00:00",
+  "originalClock": {
+    "start": "2026-11-04T09:54:27Z",
+    "target": "2026-11-04T10:09:27Z",
+    "hardDeadline": "2026-11-04T10:24:27Z"
+  },
+  "ok": true,
+  "blockers": [],
+  "verdict": "Accepted bounded native debug-helper comparison; extracted equivalent baseline six failures/two controls becomes candidate eight passes.",
+  "checks": {
+    "caseNamesExact": true,
+    "baselineFailuresExact": true,
+    "baselineControlsExact": true,
+    "baselineCounts": true,
+    "candidateCounts": true,
+    "all48Guards": true,
+    "callbackCounts": true,
+    "runtimeScope": true,
+    "zeroDeclaredPermissions": true,
+    "frozenSourcesExact": true,
+    "baselineEmbeddedExact": true,
+    "candidateEmbeddedExact": true,
+    "baselineSourceExact": true,
+    "candidateSourceExact": true,
+    "bothRetired": true
+  },
+  "caseNames": [
+    "replacementAfterConfirmationRetainsConfirmedBytesAndMetadata",
+    "deletingDownloadAfterConfirmationRetainsInstallerInput",
+    "metadataReadsSamePrivateFileHandedToInstaller",
+    "closeRemovesOnlyOwnedCopyAndCanRepeat",
+    "successiveSelectionsKeepBothCompletedCopies",
+    "unreadableMetadataLeavesSourceAndForeignCache",
+    "metadataFailureCleansOwnedCopyPreservesOriginal",
+    "missingDownloadFailsWithoutCallingMetadata"
+  ],
+  "baselineFailureTypes": {
+    "AssertionError": 5,
+    "FileNotFoundException": 1
+  },
+  "fixtures": {
+    "baseline": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native/baseline-fixture.apk",
+      "sha256": "7c43849373684fcb30dfd725ccf806b0d0c68585627afb04eb96a96ff975b24c",
+      "bytes": 37503466,
+      "embeddedDexSha256": "9abc7c4c90c76d2ac92fedb0d1ca823db85b14258d62641c4dbaa551304d3c4f",
+      "embeddedSourceSha256": "e60623c019c6547b31cac26f709c6ae91596cc36a9be30a112a7f95e9624baf0",
+      "embeddedSourceBytes": 51378217
+    },
+    "candidate": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native/apk-browser-fixture.apk",
+      "sha256": "4537fb812b64e0a17fefdbbd538a8d49e9334554e03759109a3fa98f932589b0",
+      "bytes": 37499370,
+      "embeddedDexSha256": "9abc7c4c90c76d2ac92fedb0d1ca823db85b14258d62641c4dbaa551304d3c4f",
+      "embeddedSourceSha256": "bdd3964e0b51d36d94fe82f5bf515b9b60eb3a08168f3021e66eae9e84c3938e",
+      "embeddedSourceBytes": 46745294
+    }
+  },
+  "frozenDex": {
+    "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native/frozen-dex/classes.dex",
+    "sha256": "9abc7c4c90c76d2ac92fedb0d1ca823db85b14258d62641c4dbaa551304d3c4f",
+    "bytes": 21308
+  },
+  "sources": {
+    "ApkBrowserActivityFixture.java": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native/ApkBrowserActivityFixture.java",
+      "sha256": "ee3098b5adca7a690f6088276326de6c392a7220e11411bab1eac2a415f2246e",
+      "bytes": 10778
+    },
+    "AndroidManifest.xml": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native/AndroidManifest.xml",
+      "sha256": "a10b559dfc622ab3eafe1630eba3d4d92d73d8ebb268608c8e95b04a9271d090",
+      "bytes": 439
+    },
+    "build.sh": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native/build.sh",
+      "sha256": "8c05b075c20d80df31e2ddc69d9c7181628924ff742bc2643192a7d4096238b8",
+      "bytes": 797
+    },
+    "repack.sh": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native/repack.sh",
+      "sha256": "5a714969ffc8439fd2fa832c17e8a210c18391fbcb92cb4b4d63406e2a92f981",
+      "bytes": 776
+    }
+  },
+  "evidence": {
+    "native-before-report.json": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native-before-report.json",
+      "sha256": "bc37a80c223ffccb5ebd873891fe883c2aff885e4a3b6d8a8ea55dff65df610f",
+      "bytes": 3127
+    },
+    "native-after-report.json": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native-after-report.json",
+      "sha256": "0878e81ebbbdb680f9d500b99354e9fbbe099a1d0583848995cb6bb8b392c3aa",
+      "bytes": 2687
+    },
+    "native-before-retirement.json": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native-before-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "native-after-retirement.json": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/native-after-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "promotion-artifacts.json": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/promotion-artifacts.json",
+      "sha256": "6480862ee8ed3c9156a85285802a00264d19782e11d3e3b3bebd10800705663f",
+      "bytes": 4805
+    },
+    "independent-source-review.json": {
+      "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/independent-source-review.json",
+      "sha256": "4f373a90c53aac0aae046fb449e88ba352871d1788c72a50a2d615aa8aaadae4",
+      "bytes": 13666
+    }
+  },
+  "candidateDebugSource": {
+    "path": "/private/tmp/portal-apk-browser-selection-20261104-095427/candidate-debug-1.146.apk",
+    "sha256": "bdd3964e0b51d36d94fe82f5bf515b9b60eb3a08168f3021e66eae9e84c3938e",
+    "bytes": 46745294
+  },
+  "candidatePerformanceArtifact": {
+    "sha256RecordedByCoordinator": "5e693e23c24d9cd16b2ece89a1cde69d4c8c25dc4d2d4965962a678fd231b0a0",
+    "nativeAcceptanceClaimed": false
+  },
+  "retirement": {
+    "before": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    },
+    "after": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    }
+  },
+  "assertionReview": "Unchanged Java/DEX uses isolated loader identity, generated byte callback, exact retained bytes/metadata/file identity, unique owned paths, close/repeat close, null/throw cleanup and missing-source rejection. Every case checks separate source/cache guards and expected public-source state; no gate was weakened.",
+  "limits": [
+    "Baseline is the newly extracted equivalent public-file handoff, not historic Activity execution.",
+    "Actual embedded debug helper ran on SDK29 using generated bytes and fake metadata. No Activity/Compose/parser/valid APK installation, optimized/API28, owner data, provider/network, concurrent writer, collision or process-death cleanup proof.",
+    "Retirement was verified from retained coordinator records; this reviewer made no device/build/network/source/Git calls."
+  ]
+}

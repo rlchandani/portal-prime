@@ -1,0 +1,10 @@
+{
+  "bytes": 25886647,
+  "sha256": "5e693e23c24d9cd16b2ece89a1cde69d4c8c25dc4d2d4965962a678fd231b0a0",
+  "app": {
+    "versionCode": 140,
+    "versionName": "1.146"
+  },
+  "serviceReady": true,
+  "singleInstallAccepted": true
+}

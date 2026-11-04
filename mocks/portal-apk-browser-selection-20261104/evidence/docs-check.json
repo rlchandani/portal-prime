@@ -1,0 +1,6 @@
+{
+  "command": "mkdocs build --strict --site-dir task-owned path",
+  "exit": 0,
+  "logSha256": "06b9eb49dfd436cb9cbe6f142c6b91d9f838ce6612a37f1426a1d4b01faa4c6e",
+  "siteRemovedAfterBuild": true
+}
