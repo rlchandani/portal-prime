@@ -1,0 +1,9 @@
+{
+  "base": "22c20fe11023cbab46116c44a5bf6765bece0def",
+  "startedAt": "2026-11-04T22:11:32Z",
+  "target": "2026-11-04T22:26:32Z",
+  "hardStop": "2026-11-04T22:41:32Z",
+  "scope": "New clock-change dispatch discovery; no old chime-player/golden-work/held-screensaver issue reopened",
+  "hypothesis": "ClockChangeReceiver rearms Alarm/Sunrise but omits existing ChimeScheduler on protected time/timezone changes",
+  "status": "discovery"
+}

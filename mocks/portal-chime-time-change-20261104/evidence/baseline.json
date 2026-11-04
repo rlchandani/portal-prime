@@ -1,0 +1,9 @@
+{
+  "tests": 6,
+  "failures": 5,
+  "errors": 0,
+  "controls": 1,
+  "frozenTestSha256": "97c9aff00423bb3562cea75d66c5b60852a6ad993800f3f35bca86abe9f9a020",
+  "path": "Actual ClockChangeReceiver through actual Alarm/Sunrise/Chime scheduler code; framework storage/alarm delivery doubled",
+  "wrongScheduling": "Zero hourly alarm side effects and no disabled-chime cancellation on clock events"
+}

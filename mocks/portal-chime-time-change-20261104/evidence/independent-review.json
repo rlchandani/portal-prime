@@ -1,0 +1,346 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "reviewStartedAt": "2026-11-04T22:20:13Z",
+  "reviewedAt": "2026-11-04T22:24:11.588240+00:00",
+  "originalClock": {
+    "base": "22c20fe11023cbab46116c44a5bf6765bece0def",
+    "startedAt": "2026-11-04T22:11:32Z",
+    "target": "2026-11-04T22:26:32Z",
+    "hardStop": "2026-11-04T22:41:32Z",
+    "scope": "New clock-change dispatch discovery; no old chime-player/golden-work/held-screensaver issue reopened",
+    "hypothesis": "ClockChangeReceiver rearms Alarm/Sunrise but omits existing ChimeScheduler on protected time/timezone changes",
+    "status": "discovery"
+  },
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/scope.json",
+      "bytes": 439,
+      "sha256": "0f57e3a7cd580b0030f6257f275786b7eeb0c84de007b30d2225ab0334fc94cf"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/ClockChangeAlarms.kt.before",
+      "bytes": 1449,
+      "sha256": "6d9d19610376ed2633385161bf84d0cc518519b09ba9b97a8c99f80e42481857"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/ClockChangeAlarmsTest.kt.before",
+      "bytes": 4012,
+      "sha256": "8afb6cf7db0fbfe7f98ae5450d2e1390887b070f386c7c5853479f9b3146b418"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/ClockChangeChimeTest.frozen.kt",
+      "bytes": 4618,
+      "sha256": "97c9aff00423bb3562cea75d66c5b60852a6ad993800f3f35bca86abe9f9a020"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/build.gradle.kts.before",
+      "bytes": 11824,
+      "sha256": "1a01c0c17c034c1683ff9b81da5ad9085e554cd86d3afcf0e339887009e0cbbe"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/ClockChangeAlarmsTest.baseline.xml",
+      "bytes": 1565,
+      "sha256": "10b5c88cb56ad41d75449b45a0864ea4cea730e54a08b6baace0bcbf5fc27f07"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/ClockChangeChimeTest.baseline.xml",
+      "bytes": 24291,
+      "sha256": "658f697879ab5572169445d55364d3dcfabe1d5f1ecefe0998e248b78265508b"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/baseline.json",
+      "bytes": 394,
+      "sha256": "f21c68eaf41c24a440ef266dfe5ea9129c2f46049d2542f06571bdaa3692c616"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/baseline.log",
+      "bytes": 2903,
+      "sha256": "3f3fa09b489c2f82d4a157b06cd42136ce2ec4f711311cd1548b3f15cd71af2a"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/build-terminal.json",
+      "bytes": 119,
+      "sha256": "8fe0e9abdb0da2ccb57019886636a1df63608e04f1689a6d645c84cd1a27845a"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/build.log",
+      "bytes": 13723,
+      "sha256": "d683c6825e8458203f17d13e14ea3bc3456951f3f2d6cf47e25299501e6a6a9d"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/promotion-artifacts.json",
+      "bytes": 9940,
+      "sha256": "481d8bb608cfba5afba4c43b1480963301b2c2b9f4650b3f01a91edb82872537"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/verify-artifacts.py",
+      "bytes": 3772,
+      "sha256": "fc075fa0afe25097dadb0a6cbfb59fe56ccedd05e37896be204934e1a1e5dc03"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/run-native.py",
+      "bytes": 3814,
+      "sha256": "b167d61d233dcdd6cdcad8f204f73f7b362f20981da25aa71a27dcfe0f2f593e"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/native/ClockRearmProbe.java",
+      "bytes": 10172,
+      "sha256": "b41e2d5b155477599692ad66542a2c837030a74b5b693fe88bdba1cfd4ed8419"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/native/AndroidManifest.xml",
+      "bytes": 322,
+      "sha256": "de39bac94de73c8f3a82e8a15b0fdaecc75b2442d2d35ce3ac94fe449a7d89fc"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/candidate-debug-1.180.apk",
+      "bytes": 46745714,
+      "sha256": "442679f1bd38cbeece4c385db0c086e58dcf027ee1c7fbc0aa8e1fab7c03dc91"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/candidate-performance-1.180.apk",
+      "bytes": 25886951,
+      "sha256": "880a1c408976aa1ade8be3b553b9482923113db98f21d84dbd1e257aad49a6ae"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/baseline-native.json",
+      "bytes": 2939,
+      "sha256": "e5e513ef54baf8875da47d975f039c9c3ba4302914555f5c7d97c683de9d03fd"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/baseline-native.log",
+      "bytes": 1446,
+      "sha256": "c9443941127c1ce2c1e8ebe17d73df9d7dbaffec039acad5842c395b37a5fdf7"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/baseline-native-package.json",
+      "bytes": 543,
+      "sha256": "11c7fda56bd123669ec0789a581289807f92328aeb2fe81bd330e72a89d3cbea"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/baseline-native-package.log",
+      "bytes": 543,
+      "sha256": "11c7fda56bd123669ec0789a581289807f92328aeb2fe81bd330e72a89d3cbea"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/native-baseline.apk",
+      "bytes": 37502163,
+      "sha256": "02ca72bde5f94baf599de7a46eb359d614ecb65075bdea486140ee76de583890"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/candidate-native.json",
+      "bytes": 3051,
+      "sha256": "e9e825dfb9510f331b2d68bdda26292e27029a7dd53856a2f6b48efb29795b10"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/candidate-native.log",
+      "bytes": 1494,
+      "sha256": "fc46979c33fbcc282c152883f1e4f45fdba54749771839f02e8a2bbb11a3d8db"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/candidate-native-package.json",
+      "bytes": 544,
+      "sha256": "4c206de443f5787686ceefcd3e8141bf1f3c887074e078d80eb31d9eccf964da"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/candidate-native-package.log",
+      "bytes": 544,
+      "sha256": "4c206de443f5787686ceefcd3e8141bf1f3c887074e078d80eb31d9eccf964da"
+    },
+    {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/native-candidate.apk",
+      "bytes": 37501955,
+      "sha256": "c1cddffb4709a5aeb24b307797c60a4e940b1e3fc169209ed1e9cc610bfa2d87"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ClockChangeAlarms.kt",
+      "bytes": 1565,
+      "sha256": "6acf79d8992a82be8afe66a144c274d4041681e166944e9c12faf3c25948a7f0"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ChimeScheduler.kt",
+      "bytes": 5343,
+      "sha256": "3cd0956c6932ba4cc89b98ddf3353343d080dccd9e65214cf1cd71460ea37727"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ChimeConfig.kt",
+      "bytes": 5137,
+      "sha256": "adf9612bf80da7016604028d5c3637539885fececc193545b03bf4b93c8951d3"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/AndroidManifest.xml",
+      "bytes": 35052,
+      "sha256": "f5623647efe5d0bb8b1fcd4bf59a6fd7522c11902d6f1573497e0e6cb1d5904e"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "de93788ed01b9394ac53f87869f87c62638c39c1c87cfd72687a22bd4910bf9a"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/ClockChangeChimeTest.kt",
+      "bytes": 4618,
+      "sha256": "97c9aff00423bb3562cea75d66c5b60852a6ad993800f3f35bca86abe9f9a020"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/ClockChangeAlarmsTest.kt",
+      "bytes": 4012,
+      "sha256": "8afb6cf7db0fbfe7f98ae5450d2e1390887b070f386c7c5853479f9b3146b418"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.ClockChangeChimeTest.xml",
+      "bytes": 1610,
+      "sha256": "83efc0a9e6e2e124564f0c12ede6675b8072058ec953cb68501306979a9d7ab4"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.ClockChangeAlarmsTest.xml",
+      "bytes": 1563,
+      "sha256": "6ffdb8edb1865af7fea08ff30a4643c3a17a223fbe4b1117be156ee2884e8908"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_native_fixture.py",
+      "bytes": 7284,
+      "sha256": "8709d28d473c47f2ce6b2d7cf47016c6b8e27d6404cb33cf1318044f54beb49a"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 21967,
+      "sha256": "d3b44170b6e9494d990f87e3817cc931d83b34763d3260c95ed7260fea8ed558"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-debug-1.179.apk",
+      "bytes": 46745710,
+      "sha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28"
+    },
+    {
+      "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-performance-1.179.apk",
+      "bytes": 25886951,
+      "sha256": "2de751d0dc880fccd389a3195bdc072a67b8b8234fad4c1961b40852117c6eb0"
+    }
+  ],
+  "sourceAssets": {
+    "root": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets",
+    "fileCount": 23,
+    "aggregateSha256": "884d3ef5dbd72dfda10c9ef4f770a2b42299c2ba341ebcfa7dc5b6b5d0fd8848"
+  },
+  "jvm": {
+    "xmlDirectory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "tests": 4607,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 480,
+    "testcaseChildren": 4607,
+    "failureChildren": 0,
+    "errorChildren": 0,
+    "skippedChildren": 0,
+    "aggregateSha256": "dadbed81ff7769b4552152915e0c57ace375745f1b1d6f61167bf711bb694db3",
+    "earliestReportTimestamp": "2026-11-04T22:18:00.629Z"
+  },
+  "variants": {
+    "debug": {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/candidate-debug-1.180.apk",
+      "bytes": 46745714,
+      "sha256": "442679f1bd38cbeece4c385db0c086e58dcf027ee1c7fbc0aa8e1fab7c03dc91",
+      "package": {
+        "versionCode": 174,
+        "versionName": "1.180",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "usesSdk": {
+        "minSdkVersion": 24,
+        "targetSdkVersion": 36
+      },
+      "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsIdentical": true,
+      "changedGeneratedAssets": [],
+      "rootSdkFullSignatureVerificationBound": true,
+      "baseline": {
+        "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-debug-1.179.apk",
+        "bytes": 46745710,
+        "sha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28"
+      }
+    },
+    "performance": {
+      "path": "/private/tmp/portal-chime-time-change-20261104-221132/candidate-performance-1.180.apk",
+      "bytes": 25886951,
+      "sha256": "880a1c408976aa1ade8be3b553b9482923113db98f21d84dbd1e257aad49a6ae",
+      "package": {
+        "versionCode": 174,
+        "versionName": "1.180",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "usesSdk": {
+        "minSdkVersion": 24,
+        "targetSdkVersion": 36
+      },
+      "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsIdentical": true,
+      "changedGeneratedAssets": [
+        "assets/dexopt/baseline.prof"
+      ],
+      "rootSdkFullSignatureVerificationBound": true,
+      "baseline": {
+        "path": "/private/tmp/portal-caption-place-null-20261104-210843/candidate-performance-1.179.apk",
+        "bytes": 25886951,
+        "sha256": "2de751d0dc880fccd389a3195bdc072a67b8b8234fad4c1961b40852117c6eb0"
+      }
+    }
+  },
+  "sourceReview": {
+    "exactDispatchChimeAdditionOnly": true,
+    "existingSnoozeFalseRetained": true,
+    "alarmWakeChimeIndependentRunCatching": true,
+    "chimeLastPreservesExistingOrder": true,
+    "unrelatedActionsReturnWithoutSchedulers": true,
+    "existingChimeSchedulerReused": true,
+    "oldRegressionSourceUnchanged": true,
+    "versionOnly": true
+  },
+  "regressions": {
+    "hostBefore": {
+      "tests": 6,
+      "assertionFailures": 5,
+      "controls": 1
+    },
+    "hostAfter": {
+      "tests": 6,
+      "passed": 6
+    },
+    "nativeBefore": {
+      "tests": 6,
+      "missingChimeFailures": 5,
+      "controls": 1,
+      "setupFailures": 0,
+      "parameterCount": 3
+    },
+    "nativeAfter": {
+      "tests": 6,
+      "passed": 6,
+      "setupFailures": 0,
+      "parameterCount": 4
+    },
+    "sameNativeFixtureDexAndManifest": true,
+    "fixtureDexSha256": "d6ac1ab378ab68b9b68c1b6e3a86dcd651477b437457c2df82fde57a04fec8a2",
+    "frozenHostSourceIdentical": true,
+    "nativeSameCaseNamesAndExpectedCalls": true,
+    "bothNativeOwnedDirectoriesRetiredRootEvidence": true
+  },
+  "limits": [
+    "JVM evidence exercises actual ClockChangeReceiver/config/schedulers with mocked Android storage/alarm/PendingIntent boundaries; actual OS alarm delivery, audio, protected broadcast reception, natural clock changes, golden-hour/provider behavior and mounted UI are not established.",
+    "Native evidence invokes actual debug APK ClockChangeAlarms dispatcher with generated callback proxies; it does not invoke the whole receiver or native AlarmManager/ChimeScheduler timing. Same frozen DEX/gates are retained across3/4parameter source bindings.",
+    "No installed optimized helper, API28/Living native execution, household preferences/provider/audio/device writes or physical UI acceptance by reviewer.",
+    "Both APK binary manifests/v2 certificate identity and decoded source assets independently checked; root SDK full signature verification is bound, not reexecuted.",
+    "Original22:11:32/target22:26:32/hard22:41:32 retained; previous held/expired styles/black-handoff/performance/provider/video/caption-place scopes not reopened.",
+    "Reviewer performed read/hash/archive/XML inspection only; independent-review.json is the sole written artifact."
+  ]
+}

@@ -18,13 +18,15 @@ internal object ClockChangeAlarms {
   var revision by mutableIntStateOf(0)
     private set
 
-  fun rearm(action: String?, alarm: (Boolean) -> Unit, wakeLight: () -> Unit) {
+  fun rearm(action: String?, alarm: (Boolean) -> Unit, wakeLight: () -> Unit,
+      chimes: () -> Unit = {}) {
     if (action != Intent.ACTION_TIME_CHANGED && action != Intent.ACTION_TIMEZONE_CHANGED) return
     revision++
     // Recompute regular occurrences without cancelling a user's existing snooze.
-    // Either scheduler may fail independently; still attempt the other and refresh labels.
+    // Each scheduler may fail independently; still attempt the others and refresh labels.
     runCatching { alarm(false) }
     runCatching { wakeLight() }
+    runCatching { chimes() }
   }
 }
 
@@ -33,6 +35,7 @@ class ClockChangeReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
     ClockChangeAlarms.rearm(intent.action,
         alarm = { cancelSnooze -> AlarmScheduler.reschedule(context, cancelSnooze) },
-        wakeLight = { SunriseScheduler.reschedule(context) })
+        wakeLight = { SunriseScheduler.reschedule(context) },
+        chimes = { ChimeScheduler.reschedule(context) })
   }
 }

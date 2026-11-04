@@ -1,0 +1,134 @@
+{
+  "status": "delivered",
+  "verifiedAt": "2026-11-04T22:28:05.630449+00:00",
+  "base": "22c20fe11023cbab46116c44a5bf6765bece0def",
+  "clock": {
+    "base": "22c20fe11023cbab46116c44a5bf6765bece0def",
+    "startedAt": "2026-11-04T22:11:32Z",
+    "target": "2026-11-04T22:26:32Z",
+    "hardStop": "2026-11-04T22:41:32Z",
+    "scope": "New clock-change dispatch discovery; no old chime-player/golden-work/held-screensaver issue reopened",
+    "hypothesis": "ClockChangeReceiver rearms Alarm/Sunrise but omits existing ChimeScheduler on protected time/timezone changes",
+    "status": "discovery"
+  },
+  "jvm": {
+    "tests": 4607,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 480
+  },
+  "hostRegression": {
+    "frozenCases": 6,
+    "beforeFailures": 5,
+    "beforeControls": 1,
+    "afterPassed": 6,
+    "errors": 0
+  },
+  "nativeRegression": {
+    "frozenCases": 6,
+    "beforeFailures": 5,
+    "beforeControls": 1,
+    "afterPassed": 6,
+    "setupErrors": 0,
+    "ownedDeviceDirectoriesRemoved": true
+  },
+  "builds": {
+    "debug": {
+      "bytes": 46745714,
+      "sha256": "442679f1bd38cbeece4c385db0c086e58dcf027ee1c7fbc0aa8e1fab7c03dc91",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true
+    },
+    "performance": {
+      "bytes": 25886951,
+      "sha256": "880a1c408976aa1ade8be3b553b9482923113db98f21d84dbd1e257aad49a6ae",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true
+    }
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886951,
+      "sha256": "880a1c408976aa1ade8be3b553b9482923113db98f21d84dbd1e257aad49a6ae",
+      "app": {
+        "versionCode": 174,
+        "versionName": "1.180"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886951,
+        "sha256": "880a1c408976aa1ade8be3b553b9482923113db98f21d84dbd1e257aad49a6ae",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 174,
+          "versionName": "1.180"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1610,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 2008,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "credentials": {
+    "ownerRegistriesUnchanged": true,
+    "ownedCopiesRetired": true
+  },
+  "reviewMaterialBindings": 41,
+  "sourceAssets": 23,
+  "limits": [
+    "JVM real receiver/config/scheduler with doubled Android storage/alarm/PendingIntent boundary.",
+    "Android10 debug APK dispatcher with generated callbacks; no real protected broadcast, native scheduler/alarm delivery, audible cues, golden-hour/provider or system clock change.",
+    "Installed optimized helper, API28/Living dispatcher execution and complete screensaver/performance acceptance remain separate."
+  ],
+  "published": false,
+  "publicVersionManifestChanged": false,
+  "targetMet": false,
+  "wholeProductGoal": "active"
+}

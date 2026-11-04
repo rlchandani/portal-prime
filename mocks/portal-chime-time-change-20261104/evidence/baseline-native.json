@@ -1,0 +1,125 @@
+{
+  "exitCode": 1,
+  "sourceApkSha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28",
+  "fixtureApkSha256": "02ca72bde5f94baf599de7a46eb359d614ecb65075bdea486140ee76de583890",
+  "durationSeconds": 10.783626791991992,
+  "completedAt": "2026-11-04T22:20:50.648079+00:00",
+  "result": {
+    "sourceSha256": "2bb30289696b5da706471eb7bf4e29d0350796f26b6fd8dc29ac291c7de33f28",
+    "sourceBytes": 46745710,
+    "methodName": "rearm",
+    "parameterCount": 3,
+    "actualDispatcherClassOrigin": true,
+    "cases": [
+      {
+        "name": "timeSetRearmsAllWithSnoozeRetained",
+        "expected": [
+          "alarm:false",
+          "wake",
+          "chime"
+        ],
+        "actual": [
+          "alarm:false",
+          "wake"
+        ],
+        "alarmCalls": 1,
+        "wakeCalls": 1,
+        "chimeCalls": 0,
+        "pass": false,
+        "fail": true
+      },
+      {
+        "name": "timezoneChangeRearmsAllWithSnoozeRetained",
+        "expected": [
+          "alarm:false",
+          "wake",
+          "chime"
+        ],
+        "actual": [
+          "alarm:false",
+          "wake"
+        ],
+        "alarmCalls": 1,
+        "wakeCalls": 1,
+        "chimeCalls": 0,
+        "pass": false,
+        "fail": true
+      },
+      {
+        "name": "timeTickDoesNotInvokeSchedulers",
+        "expected": [],
+        "actual": [],
+        "alarmCalls": 0,
+        "wakeCalls": 0,
+        "chimeCalls": 0,
+        "pass": true,
+        "fail": false
+      },
+      {
+        "name": "alarmFailureStillCallsWakeAndChime",
+        "expected": [
+          "alarm:false",
+          "wake",
+          "chime"
+        ],
+        "actual": [
+          "alarm:false",
+          "wake"
+        ],
+        "alarmCalls": 1,
+        "wakeCalls": 1,
+        "chimeCalls": 0,
+        "pass": false,
+        "fail": true
+      },
+      {
+        "name": "wakeFailureStillCallsChime",
+        "expected": [
+          "alarm:false",
+          "wake",
+          "chime"
+        ],
+        "actual": [
+          "alarm:false",
+          "wake"
+        ],
+        "alarmCalls": 1,
+        "wakeCalls": 1,
+        "chimeCalls": 0,
+        "pass": false,
+        "fail": true
+      },
+      {
+        "name": "chimeFailureContainedAndLaterEventWorks",
+        "expected": [
+          "alarm:false",
+          "wake",
+          "chime",
+          "alarm:false",
+          "wake",
+          "chime"
+        ],
+        "actual": [
+          "alarm:false",
+          "wake",
+          "alarm:false",
+          "wake"
+        ],
+        "alarmCalls": 2,
+        "wakeCalls": 2,
+        "chimeCalls": 0,
+        "pass": false,
+        "fail": true
+      }
+    ],
+    "tests": 6,
+    "passed": 1,
+    "failures": 5,
+    "setupFailures": 0,
+    "scope": "Actual dispatcher with generated callback proxies only"
+  },
+  "generatedDispatcherOnly": true,
+  "APKInstalled": false,
+  "UIOrProviderCalls": false,
+  "ownedDeviceDirectoryRemoved": true
+}

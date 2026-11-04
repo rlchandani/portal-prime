@@ -1,18 +1,54 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T22:11:01.014893+00:00",
-  "updatedLabel": "Photo preview fits wrapped controls; rooms retain1.179",
+  "updatedAt": "2026-11-04T22:28:05.630449+00:00",
+  "updatedLabel": "Chime clock-event correction delivered1.180 to both rooms",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.179/code173, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.180/code174, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "chime-clock-change-rearm",
+      "title": "Ambient chimes: follow clock and timezone changes",
+      "summary": "Enabled hourly and spoken cues rearm through the existing scheduler when the system clock or timezone changes.",
+      "status": "delivered",
+      "kind": "Bounded scheduling correctness fix",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root implementation/delivery; independent acceptance review",
+      "verification": "Six frozen real receiver/scheduler JVM cases:5 assertion failures/1control before,6pass after. Full4607/480/debug/optimized/R8/vital pass. Actual Android10 debug dispatcher6frozen cases:5missing-chime failures/1control before,6pass after; callback failures contained.",
+      "deployment": "Exact optimized1.180/code174 fully hashed in both rooms, one install each; Living uncertain acknowledgment resolved through six read-only observations, no replay.",
+      "acceptance": [
+        "Include existing ChimeScheduler on protected TIME_SET/TIMEZONE_CHANGED.",
+        "Preserve alarm snooze, scheduler independence and unrelated-event behavior.",
+        "Pass relevant gates and preserve saved room configuration on delivery."
+      ],
+      "evidence": [
+        {
+          "text": "Source fix, tests, native scope and delivery",
+          "source": "docs/portal-chime-clock-change-2026-11-04.md"
+        }
+      ],
+      "limits": [
+        "JVM real receiver/config/scheduler with doubled Android storage/alarm/PendingIntent boundary.",
+        "Android10 debug APK dispatcher with generated callbacks; no real protected broadcast, native scheduler/alarm delivery, audible cues, golden-hour/provider or system clock change.",
+        "Installed optimized helper, API28/Living dispatcher execution and complete screensaver/performance acceptance remain separate."
+      ],
+      "next": "Keep native alarm/audio/provider and held screensaver issues separate.",
+      "issueClock": {
+        "startedAt": "2026-11-04T22:11:32Z",
+        "target": "2026-11-04T22:26:32Z",
+        "deadline": "2026-11-04T22:41:32Z",
+        "firstDiscoveryClockRetained": true
+      }
+    },
     {
       "id": "photo-preview-wrapped-header-height",
       "title": "Photo review: fit beneath wrapped controls",

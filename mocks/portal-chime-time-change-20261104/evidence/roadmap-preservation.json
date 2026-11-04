@@ -1,0 +1,13 @@
+{
+  "all182ExistingTaskObjectsExact": true,
+  "oldRawTaskSuffixExact": true,
+  "defaultAndOldClocksExact": true,
+  "boundaryOnlyCurrentRoomVersionUpdated": true,
+  "counts": {
+    "delivered": 127,
+    "verified": 46,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  }
+}
