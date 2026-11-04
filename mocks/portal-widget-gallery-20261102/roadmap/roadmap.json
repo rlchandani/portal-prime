@@ -1,18 +1,59 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T07:19:36.333849+00:00",
-  "updatedLabel": "Home playback freshness delivered 1.134; screensaver visuals prioritized",
+  "updatedAt": "2026-11-04T07:35:54.724529+00:00",
+  "updatedLabel": "Cinematic doodles delivered1.135; next small photo-border slice",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.134/code 128. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.135/code 129. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "cinematic-doodle-margins",
+      "title": "Cinematic photos: quiet doodles in dark margins",
+      "summary": "Ken Burns and Push display subtle static doodles around complete photographs.",
+      "status": "delivered",
+      "verification": "4,402 JVM \u00b7 1,106 JS \u00b7 four native scenes \u00b7 both rooms installed",
+      "kind": "Screensaver visual polish",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering",
+      "deployment": "Exact optimized1.135/code129 installed in both rooms; Living ACK uncertain, six read-only observations from one install.",
+      "acceptance": [
+        "Visible quiet doodles in both orientations and styles.",
+        "Preserve photo geometry, selection, motion and timers.",
+        "Preserve saved configuration."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped delivery and remaining work.",
+          "source": "docs/portal-cinematic-doodles-2026-11-04.md"
+        },
+        {
+          "text": "Artifacts, traces, native pixels and installed state.",
+          "source": "mocks/portal-cinematic-doodles-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Two cinematic styles only; other Shuffle styles can still have plain margins.",
+        "Photo-sized cinematic borders are a separate slice.",
+        "Native clock/FaceRenderer/production scheduler, API28, Living visuals and hardware performance remain open.",
+        "No phone, household source-photo read/import/transfer, provider/account, GitHub push or publication."
+      ],
+      "next": "Slim photo-sized cinematic borders; other styles remain separate.",
+      "issueClock": {
+        "startedAt": "2026-11-04T07:17:39Z",
+        "target": "2026-11-04T07:32:39Z",
+        "deadline": "2026-11-04T07:47:39Z",
+        "scope": "Discovery through delivery and closure; no reset."
+      }
+    },
     {
       "id": "home-playback-freshness",
       "title": "Home mini-player: keep the latest playback state",

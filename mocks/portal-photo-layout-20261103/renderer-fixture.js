@@ -12,9 +12,10 @@
     [1200,450,"panorama"],[480,720,"portrait-mountain"],[960,640,"valley"],
     [720,720,"square-forest"],[960,640,"mountain"],[480,720,"portrait-forest"],
   ];
-  const mode = query.get("mode") === "framed" ? "framed" : "mosaic";
+  const selectedMode = query.get("mode");
+  const mode = ["framed", "mosaic", "kenBurns", "push"].includes(selectedMode) ? selectedMode : "mosaic";
   let photos = shapes.map(([w,h,name]) => ({ w, h, url: `/samples/${name}.jpg` }));
-  if (mode === "framed") photos = [photos[Number(query.get("photo")) || 0]];
+  if (mode !== "mosaic") photos = [photos[Number(query.get("photo")) || 0]];
   let seed = 531;
   Math.random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
   window.Android = {
