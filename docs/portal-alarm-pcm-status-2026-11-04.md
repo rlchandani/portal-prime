@@ -1,5 +1,9 @@
 # Alarm chimes: fall back after rejected PCM setup
 
+Subsequently delivered in exact optimized **1.167/code161** to both rooms.
+See the [separate delivery recovery receipt](portal-room-delivery-2026-11-04.md).
+The source iteration below performed no device operations.
+
 Signed **1.167/code161** is verified locally. All **4,565 JVM tests / 475 suites**,
 debug and optimized assembly, R8 and vital lint pass. All 23 source assets match
 source and the preceding local 1.166 candidate; only generated optimized
@@ -8,9 +12,10 @@ failures and two controls to ten passes.
 One combined independent review has no blockers; root fully read it, rehashed
 all 26 bindings and replayed the complete 475-file test snapshot.
 
-No device operation was performed in this slice. Both-room deployment remains
-unverified after the prior connection failures. The last complete room readbacks
-and preservation checks were 1.165/code159 before the prior attempt.
+No device operation was performed in this source iteration. At its closure,
+both-room deployment remained unverified after the prior connection failures.
+The last complete room readbacks and preservation checks then were 1.165/code159
+before the prior attempt.
 
 TimerAlarm and AlarmSound previously ignored the accepted sample count from
 their fixed-buffer PCM write and the return code from loop setup. A partial

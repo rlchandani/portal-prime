@@ -1,0 +1,19 @@
+{
+  "closedAt": "2026-11-04T15:40:35.334907+00:00",
+  "elapsedMinutesFromDeliveryRecovery": 10.155581783333334,
+  "targetMet": true,
+  "hardDeadlineMet": true,
+  "originalSourceIssueClocksUnchanged": true,
+  "wholeGoalActive": true,
+  "bothRoomDeliveryVerified": true,
+  "oneInstallEach": true,
+  "noRepeatInstallIssued": true,
+  "docsStrictExit": 0,
+  "docsTerminal": "INFO    -  Documentation built in 2.02 seconds",
+  "credentialsAndTransientDocsDirsRemoved": true,
+  "originalOwnerRegistriesUntouched": true,
+  "publicPlannedFilesSecretScanPass": true,
+  "privateBaselinesArtifactsReportsRetained": true,
+  "noNewAppSourceVersionSdkBuildOrTestRun": true,
+  "noPhoneHouseholdMediaProviderAccountOrPublicationOperations": true
+}

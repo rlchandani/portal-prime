@@ -1,32 +1,76 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T15:28:29.748848+00:00",
-  "updatedLabel": "Alarm PCM status candidate1.167 verified locally; device delivery remains unverified; clocks retained",
+  "updatedAt": "2026-11-04T15:40:32.216771+00:00",
+  "updatedLabel": "Exact1.167 delivered to both rooms after connection recovery; saved state and original source clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Latest complete room readbacks were optimized Portal1.165/code159 before the1.166 attempt; device deployment remains unverified after transport failures. Latest locally verified candidate is1.167/code161. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.167/code161, with complete readback and saved-state preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
     {
+      "id": "room-delivery-1-167",
+      "title": "Deliver verified1.167 after connections return",
+      "summary": "Both Portals now contain the reviewed Home timezone and alarm status fixes, with saved state preserved.",
+      "description": "Reconcile the prior uncertain upload against fresh complete1.165 baselines, then install the existing reviewed1.167 artifact once per room and verify complete installed bytes.",
+      "status": "delivered",
+      "verification": "Both complete installed APK hashes/length/version match reviewed optimized1.167/code161. All43/30 preferences and four maps exact; Family runtime preserved; captured fatal/ANR markers zero. Existing4565JVM/build gate retained, no rerun.",
+      "kind": "Bounded deployment recovery",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root delivery execution / existing independent candidate review",
+      "deployment": "Exact optimized1.167/code161 in both rooms, one install each. Living uncertain acknowledgment resolved by seven read-only observations.",
+      "state": "Saved Shuffle/fit, names/DevMode, four maps and all preference files retained; Family font/accessibility/original Chromium activity/resumed frame/awake preserved.",
+      "acceptance": [
+        "Fresh complete baselines prove prior1.166 upload did not install; no retry of that artifact.",
+        "Exact reviewed1.167 fully hashed after install in each room.",
+        "Frame requests, full saved-state preservation and limited captured diagnostics pass."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery, source provenance, preservation and limits.",
+          "source": "docs/portal-room-delivery-2026-11-04.md"
+        },
+        {
+          "text": "Bounded delivery evidence.",
+          "source": "mocks/portal-room-delivery-20261104/evidence/delivery-gate.json"
+        }
+      ],
+      "limits": [
+        "No new source/version/artifact/build/test change; existing candidate gate remains authoritative.",
+        "No actual composed greeting, immediate timezone broadcast, native/audible alarm or fallback, optimized-function/API28/Living-visual acceptance.",
+        "Source clocks and older parked scopes are unchanged. This delivery follows the observed network recovery; no old investigation reopened.",
+        "No phone, household-media, provider, account or publication operations; public1.83 remains."
+      ],
+      "next": "Continue with a distinct small product slice; keep broader runtime acceptance scoped.",
+      "issueClock": {
+        "deliveryRecoveryStartedAt": "2026-11-04T15:30:26Z",
+        "target": "2026-11-04T15:45:26Z",
+        "hardDeadline": "2026-11-04T16:00:26Z",
+        "sourceIssueClocksUnchanged": true,
+        "externalChangeRequiredAndObserved": true
+      }
+    },
+    {
       "id": "alarm-pcm-startup-status",
       "title": "Alarm chimes: reject incomplete PCM setup",
       "summary": "Timer and alarm chimes return to the existing fallback when preload or loop setup returns failure.",
       "description": "Require the full static PCM sample count and successful loop result before playback/publication; release newly rejected allocation. Successful startup, synthesis, timers and existing exception/stop paths remain.",
-      "status": "verified",
+      "status": "delivered",
       "verification": "Frozen10 actual-method JVM cases: eight AssertionErrors/two controls to ten passes. All4565JVM/475suites/debug/optimized/R8/vital pass. Combined independent review,26bindings and all475XML replayed.",
       "kind": "Alarm startup status correctness",
       "platforms": [
         "portal"
       ],
       "owner": "Root execution / toolkit regressions / independent media review",
-      "deployment": "Signed local1.167/code161 verified; no device operation this slice. Room deployment remains unverified after prior connection failures.",
-      "state": "Last complete room readbacks/preservation were1.165/code159 before the prior1.166 attempt. No settings or device writes in this slice.",
+      "deployment": "Subsequently delivered in exact optimized1.167/code161 to both rooms after connection recovery; full readbacks match reviewed artifact, one install each. Living uncertain ACK reconciled by seven read-only observations.",
+      "state": "All43 Family/30 Living preference files and four complete maps exact against fresh baseline; Family runtime and saved Shuffle/fit retained. Source-iteration and runtime acceptance limits remain separate.",
       "acceptance": [
         "Both actual private methods reject short/zero/negative writes and failed loop status without playback/publication; release rejected track once.",
         "Full-success controls preserve playback/publication and no early release.",
@@ -40,14 +84,18 @@
         {
           "text": "Independent combined review.",
           "source": "mocks/portal-alarm-pcm-status-20261104/evidence/independent-review.json"
+        },
+        {
+          "text": "Subsequent exact both-room delivery and preservation.",
+          "source": "docs/portal-room-delivery-2026-11-04.md"
         }
       ],
       "limits": [
         "Inert mocked Android sinks/constructors and actual private methods only; no public fallback, native/audible audio, UI, optimized runtime/API28/API29 or device acceptance.",
         "Old TimerAlarm thrown-exception/stop cleanup remains excluded under exhausted2026-11-03T08:51:50\u201309:21:50Z; all those source bytes unchanged.",
-        "No device, phone, household media, provider, account or publication operations; public1.83 and old issue clocks retained."
+        "The source iteration performed no device operations; subsequent1.167 delivery is separate. No phone, household media, provider, account or publication operations; public1.83 and old issue clocks retained."
       ],
-      "next": "Reconcile known device state when connections return; move to distinct small product work without extending old clocks.",
+      "next": "Continue distinct small product work; retain unverified native/runtime acceptance limits and original issue clocks.",
       "issueClock": {
         "originalDiscoveryAt": "2026-11-04T15:00:49Z",
         "selectedAt": "2026-11-04T15:19:32.316906+00:00",
@@ -61,15 +109,15 @@
       "title": "Home greeting: follow the current timezone",
       "summary": "Retained time, weekday and date formatters use the same timezone as the greeting hour.",
       "description": "Refresh the three remembered formatter zones on each composition; preserve patterns, locale, minute cadence and layout.",
-      "status": "verified",
+      "status": "delivered",
       "verification": "Eight frozen source-captured leaf vectors: four literal mismatches/four controls to eight passes. All4555JVM/474suites/debug/optimized/R8/vital pass; combined independent review,32bindings rehashed.",
       "kind": "Home clock correctness",
       "platforms": [
         "portal"
       ],
       "owner": "Root execution / photo diagnosis / independent media review",
-      "deployment": "Signed1.166/code160 candidate ready locally; deployment unverified because Family is unreachable and Living upload timed out. One Living upload attempt; no Family install and no retry.",
-      "state": "Last complete readbacks/preservation are1.165 before the attempt; post-attempt installed bytes/settings/health are unverified. Saved settings were not intentionally changed.",
+      "deployment": "Subsequently delivered in exact optimized1.167/code161 to both rooms after connection recovery; full readbacks match reviewed artifact, one install each. Living uncertain ACK reconciled by seven read-only observations.",
+      "state": "All43 Family/30 Living preference files and four complete maps exact against fresh baseline; Family runtime and saved Shuffle/fit retained. Source-iteration and runtime acceptance limits remain separate.",
       "acceptance": [
         "Same captured formatter/hour leaf and literal expectations before/after, with restored process defaults.",
         "Full required local build/test and signed artifact/source-asset gates pass."
@@ -82,15 +130,19 @@
         {
           "text": "Combined independent review.",
           "source": "mocks/portal-home-greeting-zone-20261104/evidence/independent-review.json"
+        },
+        {
+          "text": "Subsequent exact both-room delivery and preservation.",
+          "source": "docs/portal-room-delivery-2026-11-04.md"
         }
       ],
       "limits": [
         "Source-captured construction-only remember adapter; no actual Composable, UI, retained lifecycle, native or optimized runtime acceptance.",
         "No immediate timezone-broadcast or locale-change acceptance; minute cadence remains.",
-        "Both-room deployment and post-attempt preservation remain unverified; reconcile read-only before any new install.",
+        "Both-room artifact delivery and state preservation subsequently verified in1.167; composed/native/optimized function acceptance remains separate.",
         "No phone, account, household media or publication operations; public1.83 and old issue clocks retained."
       ],
-      "next": "Reconcile device state when the known connections return; continue another independent small slice.",
+      "next": "Continue distinct small product work; retain unverified native/runtime acceptance limits and original issue clocks.",
       "issueClock": {
         "originalDiscoveryAt": "2026-11-04T15:00:49Z",
         "selectedAt": "2026-11-04T15:04:43.181422+00:00",

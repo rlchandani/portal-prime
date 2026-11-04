@@ -1,0 +1,18 @@
+{
+  "tasks": 164,
+  "counts": {
+    "delivered": 111,
+    "verified": 43,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "all161OtherObjectsExact": true,
+  "twoExistingSourceTasksOnlyDeliveryStatusFieldsUpdated": true,
+  "allOldIssueClocksUnchanged": true,
+  "oldTailRawSuffixBytes": 518502,
+  "oldTailRawSuffixSha256": "387ac2e6071182112f5b09cd4a66f8df034a936aca9a47f7c3fd562b12c1a561",
+  "oldTailRawSuffixExact": true,
+  "defaultTaskUnchanged": true,
+  "onlyBoundaryDelta": "Fully verified installed1.167/code161 replaces last confirmed1.165/unverified delivery state"
+}

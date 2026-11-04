@@ -1,0 +1,11 @@
+{
+  "bothFullApkBaseline": "1.165/code159",
+  "sha256": "f9cfee038106e6e487b99f8904b54fe2235efd895d236fd575686746b53b5717",
+  "familySerialVerified": true,
+  "capturedPreferenceFiles": {
+    "family": 43,
+    "living": 30
+  },
+  "fourMapsCapturedPerRoom": true,
+  "prior1.166UploadReconciledWithoutRetry": true
+}

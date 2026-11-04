@@ -1,0 +1,18 @@
+{
+  "deliveryStartedAt": "2026-11-04T15:30:26Z",
+  "target": "2026-11-04T15:45:26Z",
+  "hardDeadline": "2026-11-04T16:00:26Z",
+  "externalChange": "Both exact known Fleet connections now reachable; both report1.165/code159, prior upload not installed.",
+  "sourceCandidate": "1.167/code161",
+  "sourceScopeClocksPreserved": true,
+  "newSourceFixOrIssueInvestigation": false,
+  "existingCombinedReviewRehash": {
+    "reviewSha256": "ac52816c15277d9b448f7235f1b94e5f3330ecffd6cbdbc63c3372f2b1b50947",
+    "bindings": 26,
+    "allExact": true
+  },
+  "singleInstallPerRoom": true,
+  "actualCurrentBaselinesRequired": true,
+  "sourceScopeClock": "15:00:49\u201315:30:49 retained; locally closed15:28:32",
+  "wholeGoalActive": true
+}

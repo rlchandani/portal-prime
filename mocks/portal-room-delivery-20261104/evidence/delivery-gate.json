@@ -1,0 +1,21 @@
+{
+  "existingCombinedReviewSha256": "ac52816c15277d9b448f7235f1b94e5f3330ecffd6cbdbc63c3372f2b1b50947",
+  "all26BindingsRehashedBeforePromotion": true,
+  "homeSourceStillExactAgainstReviewed1.166": true,
+  "homeSourceSha256": "0c0d23fb70911760a08cded01817ad76483dcfed2948d3a3eba1fdff533b94f9",
+  "artifact": {
+    "bytes": 25886923,
+    "sha256": "3280a35c2ea34ae298f58a5cf7337a103e8a656a8c460c8ed16b856abffad9f0",
+    "manifest": "package: name='com.immortal.launcher.debug' versionCode='161' versionName='1.167' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+  },
+  "previousFullGate": {
+    "jvmTests": 4565,
+    "suites": 475,
+    "zeroFailuresErrorsSkipped": true,
+    "debugOptimizedR8VitalPass": true
+  },
+  "noNewAppVersionSourceSdkBuildOrTestRun": true,
+  "originalSourceIssueClocksPreserved": true,
+  "functionalAcceptanceBoundary": "Installed exact artifacts, frame requests, saved state and limited health only; no fresh composed Home, native alarm/audio/fallback/optimized-function/API28/Living-visual acceptance"
+}

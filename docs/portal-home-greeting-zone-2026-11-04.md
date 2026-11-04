@@ -1,6 +1,11 @@
 # Home greeting: refresh retained clock timezones
 
-Signed **1.166/code160** is verified locally; device deployment is **unverified**.
+Subsequently delivered in exact optimized **1.167/code161** to both rooms.
+See the [separate delivery recovery receipt](portal-room-delivery-2026-11-04.md).
+The local checks and earlier failed attempt below retain their original scope.
+
+At local closure, signed **1.166/code160** was verified locally; device deployment
+was **unverified**.
 All **4,555 JVM tests / 474 suites**, debug and optimized assembly, R8 and vital
 lint pass. One combined independent review has no blockers; root fully read it
 and rehashed all 32 bindings before attempting delivery. All 23 source assets
