@@ -1,0 +1,90 @@
+{
+  "cases": [
+    {
+      "mode": "valid",
+      "result": true,
+      "savedBytesMatch": true,
+      "unrelatedStagePreserved": true,
+      "handlesDetached": true,
+      "ownStageAbsent": true,
+      "stopCalls": 1,
+      "releaseCalls": 1,
+      "pass": true
+    },
+    {
+      "mode": "first",
+      "result": true,
+      "savedBytesMatch": true,
+      "unrelatedStagePreserved": true,
+      "handlesDetached": true,
+      "ownStageAbsent": true,
+      "stopCalls": 1,
+      "releaseCalls": 1,
+      "pass": true
+    },
+    {
+      "mode": "short",
+      "result": false,
+      "savedBytesMatch": true,
+      "unrelatedStagePreserved": true,
+      "handlesDetached": true,
+      "ownStageAbsent": true,
+      "stopCalls": 1,
+      "releaseCalls": 1,
+      "pass": true
+    },
+    {
+      "mode": "stop",
+      "result": false,
+      "savedBytesMatch": true,
+      "unrelatedStagePreserved": true,
+      "handlesDetached": true,
+      "ownStageAbsent": true,
+      "stopCalls": 1,
+      "releaseCalls": 1,
+      "pass": true
+    },
+    {
+      "mode": "release",
+      "result": false,
+      "savedBytesMatch": true,
+      "unrelatedStagePreserved": true,
+      "handlesDetached": true,
+      "ownStageAbsent": true,
+      "stopCalls": 1,
+      "releaseCalls": 1,
+      "pass": true
+    },
+    {
+      "mode": "empty",
+      "result": false,
+      "savedBytesMatch": true,
+      "unrelatedStagePreserved": true,
+      "handlesDetached": true,
+      "ownStageAbsent": true,
+      "stopCalls": 1,
+      "releaseCalls": 1,
+      "pass": true
+    },
+    {
+      "mode": "rename",
+      "result": false,
+      "savedBytesMatch": true,
+      "unrelatedStagePreserved": true,
+      "handlesDetached": true,
+      "ownStageAbsent": false,
+      "stopCalls": 1,
+      "releaseCalls": 1,
+      "pass": true
+    }
+  ],
+  "pass": true,
+  "sdk": 29,
+  "sourceSha256": "ffab4191ef612b9cb5ba3033a9c33d34eff0805534ae7de1d13255c369923fdf",
+  "sourceBytes": 51372381,
+  "recordAudioPermission": false,
+  "prepareStartAudioSourceCalls": 0,
+  "actualPublicStopRecording": true,
+  "sharedWorker": true,
+  "generatedFilesOnly": true
+}

@@ -83,15 +83,18 @@ internal fun ToolsNotesContent() {
         // Keep an outstanding Android permission request until its result arrives.
         // Otherwise an old result could be mistaken for a new request after re-entry.
         val wasRecording = recording || recorderStarting || recorderStopping || audio.isRecording
+        // Repeated hide/stop events must keep the first finalization outcome.
+        if (recorderStopping) return
         recorderStopping = wasRecording
         if (wasRecording) message = "Saving voice memo…"
         else if (!memoDeleting) message = if (playing || playbackPreparing) "Playback stopped." else null
         audio.stopAsync { saved ->
             if (!memoDeleting) {
-                hasMemo = saved
+                hasMemo = NotesConfig.hasAudioNote(context)
                 recorderStopping = false
                 if (wasRecording) {
                     message = if (saved) "Voice memo saved."
+                        else if (hasMemo) "The new recording couldn't be saved. Your previous memo is still available."
                         else "The recording was too short or couldn't be saved. Try recording again."
                 }
             }
@@ -283,7 +286,7 @@ internal fun ToolsNotesContent() {
                     ToolsButton("Delete memo", destructive = true,
                         enabled = !recorderStopping && !memoDeleting && !memoLoading,
                         modifier = Modifier.fillMaxWidth()) { deleteMemo = true }
-                    ToolsText("Recording again replaces the saved memo.", secondary = true)
+                    ToolsText("Your previous memo stays until the new recording is saved.", secondary = true)
                 }
                 if (!micGranted) {
                     ToolsText("Allow microphone access before recording. Speak close to this Portal.",

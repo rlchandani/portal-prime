@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.immortal.memofixture">
+  <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="28" />
+  <application android:label="Owned memo fixture" android:theme="@android:style/Theme.Material.NoActionBar">
+    <activity android:name=".MemoActivity" android:exported="true" />
+  </application>
+</manifest>

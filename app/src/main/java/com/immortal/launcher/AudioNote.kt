@@ -16,6 +16,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
+import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -32,6 +33,7 @@ class AudioNote(private val context: Context) {
   private val main = Handler(Looper.getMainLooper())
   // Native handles are accessed only by the shared audio worker.
   private var recorder: MediaRecorder? = null
+  private var recordingFile: File? = null
   private var player: MediaPlayer? = null
   private var recordStarted = false
   private var recordStartMs = 0L
@@ -68,34 +70,36 @@ class AudioNote(private val context: Context) {
     stopPlayer()
     stopRecorder()
     if (!request.isCurrent()) return false
-    val file = NotesConfig.audioFile(context)
+    var file: File? = null
     var prepared: MediaRecorder? = null
     return runCatching {
+      val stage = File.createTempFile("voice-memo-", ".m4a.part", context.filesDir)
+      file = stage
       @Suppress("DEPRECATION")
       val rec = if (Build.VERSION.SDK_INT >= 31) MediaRecorder(context) else MediaRecorder()
       prepared = rec
-      file.delete() // Explicit re-record still replaces the single saved memo.
       rec.setAudioSource(MediaRecorder.AudioSource.MIC)
       rec.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
       rec.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
       rec.setAudioChannels(1)
       rec.setAudioSamplingRate(44100)
       rec.setAudioEncodingBitRate(128000)
-      rec.setOutputFile(file.absolutePath)
+      rec.setOutputFile(stage.absolutePath)
       rec.prepare()
       if (!request.isCurrent()) {
         runCatching { rec.release() }
-        file.delete()
+        runCatching { stage.delete() }
         false
       } else {
         recorder = rec
+        recordingFile = stage
         recordStarted = false
         true
       }
     }.getOrElse {
       Log.w(TAG, "prepare recording failed", it)
       runCatching { prepared?.release() }
-      runCatching { file.delete() }
+      runCatching { file?.delete() }
       false
     }
   }
@@ -138,20 +142,34 @@ class AudioNote(private val context: Context) {
 
   private fun stopRecorder(): Boolean {
     val r = recorder ?: return NotesConfig.hasAudioNote(context)
+    val file = recordingFile
     recorder = null
+    recordingFile = null
     recording = false
     val tooShort = !recordStarted || SystemClock.elapsedRealtime() - recordStartMs < 500
     val stopped = recordStarted && runCatching { r.stop() }.isSuccess
     recordStarted = false
-    runCatching { r.release() }
-    if (!stopped || tooShort) {
-      Log.w(TAG, "recording too short / stop failed — discarding")
-      runCatching { NotesConfig.audioFile(context).delete() }
+    val released = runCatching { r.release() }.isSuccess
+    try {
+      if (!stopped || !released || tooShort || file == null || !file.isFile || file.length() == 0L) {
+        Log.w(TAG, "recording incomplete — keeping the saved memo")
+        return false
+      }
+      // Same-directory rename replaces the saved memo only after native finalization.
+      // Never delete the destination or fall back to a partial copy.
+      val saved = NotesConfig.audioFile(context)
+      if (!file.renameTo(saved)) {
+        Log.w(TAG, "recording replacement failed — keeping the saved memo")
+        return false
+      }
+      Log.i(TAG, "recorded ${saved.length()} bytes to ${saved.absolutePath}")
+      return true
+    } catch (failure: Exception) {
+      Log.w(TAG, "recording replacement failed", failure)
       return false
+    } finally {
+      runCatching { file?.delete() }
     }
-    val f = NotesConfig.audioFile(context)
-    Log.i(TAG, "recorded ${f.length()} bytes to ${f.absolutePath}")
-    return f.exists() && f.length() > 0
   }
 
   /** Legacy completion callback continues to cover both completion and failure, on main. */

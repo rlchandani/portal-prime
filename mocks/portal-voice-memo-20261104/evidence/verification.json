@@ -1,0 +1,366 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-04T05:45:38.472349+00:00",
+  "base": "f4fffbc4354bfa33a3613787c2b3a5227693648f",
+  "issueClock": {
+    "startedAt": "2026-11-04T05:27:32Z",
+    "deadline": "2026-11-04T05:57:32Z",
+    "scope": "Discovery, implementation, checks, delivery and closure; earlier clocks retained."
+  },
+  "sources": {
+    "app/build.gradle.kts": "998a7318f1f5ab2dcf171ab87e25bb46ddcbd1e6a684f5b8a51f4f3e8a9770bd",
+    "app/src/main/java/com/immortal/launcher/AudioNote.kt": "76898fc1f53c2f16538b1554b6868cfcdecd8197ebfde1e3d2faea9be451e1a7",
+    "app/src/main/java/com/immortal/launcher/ApprovedToolsAudio.kt": "e1cffe986e1a479fa900cda6768e0d4191a0855f5f8eefcf23218ee573014fb6",
+    "app/src/test/java/com/immortal/launcher/AudioNoteRecordingFileTest.kt": "18464ee4f853d967f69db5b7e13b439ca859ed76645af161ffa78f6a59bbc76a",
+    "app/src/test/java/com/immortal/launcher/ToolsMemoStopCallbackTest.kt": "02af94215ecb10c402e071cef7fe36e52075a864dff5a0cee471c7bbb0a57081",
+    "mocks/portal-voice-memo-20261104/native/MemoActivity.java": "922b3699be62f8e6ed1534411de661bc7e1758cb38e352afb8a53d2e1ae9e8dd",
+    "mocks/portal-voice-memo-20261104/native/AndroidManifest.xml": "67b362db429cb525ba7186b62bbf6955eabb807c4d35c02b6f4131954b4c7598"
+  },
+  "fileBaseline": {
+    "tests": 15,
+    "failures": 14,
+    "errors": 0,
+    "fixtureSha256": "18464ee4f853d967f69db5b7e13b439ca859ed76645af161ffa78f6a59bbc76a",
+    "failedMethods": [
+      "firstValidMemoPublishesFinalizedBytes",
+      "emptyReplacementPreservesSavedMemo",
+      "savedMemoRemainsUnchangedWhileReplacementRecords",
+      "releaseFailurePreservesSavedMemo",
+      "releaseStillFinalizesValidRecording",
+      "cancellationDuringPreparePreservesSavedMemo",
+      "stopFailurePreservesSavedMemo",
+      "validReplacementPublishesFinalizedBytes",
+      "failedFirstMemoLeavesNoSavedFile",
+      "tooShortReplacementPreservesSavedMemo",
+      "startFailurePreservesSavedMemo",
+      "failedRenamePreservesSavedMemo",
+      "prepareFailurePreservesSavedMemo",
+      "explicitDeletionStillWinsAfterFinalization"
+    ],
+    "audioNoteSourceSha256": "b1c17fc3b82f4f1be4a66366491ac20fd3c98d2d0ec5f3711bace8f785886974",
+    "provenance": "Actual unmodified base AudioNote public methods, generated files, mocked native recorder calls. Fourteen failing methods include staging ownership checks; one idle-stop control."
+  },
+  "uiBaseline": {
+    "tests": 4,
+    "failures": 1,
+    "errors": 0,
+    "fixtureSha256": "02af94215ecb10c402e071cef7fe36e52075a864dff5a0cee471c7bbb0a57081",
+    "beforeCoalescingSourceSha256Reconstructed": "f022dffadcf2fa732c3479445a5a64f63871721009cd1ea46d6480a19fbb3aba",
+    "provenance": "After staged storage correction, before the two-line coalescing guard; one repeated-stop assertion failure, three controls. Source hash reconstructed by removing the final guard."
+  },
+  "focused": {
+    "suites": [
+      {
+        "suite": "AudioNoteRecordingFileTest",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "AudioNoteWorkTest",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "ApprovedToolsAudioLifecycleTest",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "ToolsMemoStopCallbackTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "frozenFixturesUnchanged": true
+  },
+  "artifacts": {
+    "versionName": "1.131",
+    "versionCode": 125,
+    "package": "com.immortal.launcher.debug",
+    "apks": {
+      "debug": {
+        "bytes": 51372381,
+        "sha256": "ffab4191ef612b9cb5ba3033a9c33d34eff0805534ae7de1d13255c369923fdf"
+      },
+      "performance": {
+        "bytes": 25884988,
+        "sha256": "e07423b2b153e774f43066b9d87e4c956e363da687d9968b1eac3c38e12bf389"
+      }
+    },
+    "jvm": {
+      "tests": 4390,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 457
+    }
+  },
+  "packageVerification": {
+    "debug": {
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "assets": {
+        "index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+        "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+        "styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+        "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+        "photos.js": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+        "scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+        "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+        "photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+        "mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+      },
+      "package": "com.immortal.launcher.debug",
+      "code": 125,
+      "version": "1.131"
+    },
+    "performance": {
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "assets": {
+        "index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+        "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+        "styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+        "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+        "photos.js": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+        "scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+        "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+        "photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+        "mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136"
+      },
+      "package": "com.immortal.launcher.debug",
+      "code": 125,
+      "version": "1.131"
+    }
+  },
+  "native": {
+    "scope": "Candidate exact debug APK public stopRecording/shared worker; generated files and fake recorder methods. No baseline differential. Native handle construction and super.release execute; no audio source/prepare/start calls.",
+    "report": {
+      "cases": [
+        {
+          "mode": "valid",
+          "result": true,
+          "savedBytesMatch": true,
+          "unrelatedStagePreserved": true,
+          "handlesDetached": true,
+          "ownStageAbsent": true,
+          "stopCalls": 1,
+          "releaseCalls": 1,
+          "pass": true
+        },
+        {
+          "mode": "first",
+          "result": true,
+          "savedBytesMatch": true,
+          "unrelatedStagePreserved": true,
+          "handlesDetached": true,
+          "ownStageAbsent": true,
+          "stopCalls": 1,
+          "releaseCalls": 1,
+          "pass": true
+        },
+        {
+          "mode": "short",
+          "result": false,
+          "savedBytesMatch": true,
+          "unrelatedStagePreserved": true,
+          "handlesDetached": true,
+          "ownStageAbsent": true,
+          "stopCalls": 1,
+          "releaseCalls": 1,
+          "pass": true
+        },
+        {
+          "mode": "stop",
+          "result": false,
+          "savedBytesMatch": true,
+          "unrelatedStagePreserved": true,
+          "handlesDetached": true,
+          "ownStageAbsent": true,
+          "stopCalls": 1,
+          "releaseCalls": 1,
+          "pass": true
+        },
+        {
+          "mode": "release",
+          "result": false,
+          "savedBytesMatch": true,
+          "unrelatedStagePreserved": true,
+          "handlesDetached": true,
+          "ownStageAbsent": true,
+          "stopCalls": 1,
+          "releaseCalls": 1,
+          "pass": true
+        },
+        {
+          "mode": "empty",
+          "result": false,
+          "savedBytesMatch": true,
+          "unrelatedStagePreserved": true,
+          "handlesDetached": true,
+          "ownStageAbsent": true,
+          "stopCalls": 1,
+          "releaseCalls": 1,
+          "pass": true
+        },
+        {
+          "mode": "rename",
+          "result": false,
+          "savedBytesMatch": true,
+          "unrelatedStagePreserved": true,
+          "handlesDetached": true,
+          "ownStageAbsent": false,
+          "stopCalls": 1,
+          "releaseCalls": 1,
+          "pass": true
+        }
+      ],
+      "pass": true,
+      "sdk": 29,
+      "sourceSha256": "ffab4191ef612b9cb5ba3033a9c33d34eff0805534ae7de1d13255c369923fdf",
+      "sourceBytes": 51372381,
+      "recordAudioPermission": false,
+      "prepareStartAudioSourceCalls": 0,
+      "actualPublicStopRecording": true,
+      "sharedWorker": true,
+      "generatedFilesOnly": true
+    },
+    "metadata": {
+      "sourceBytes": 51372381,
+      "sourceSha256": "ffab4191ef612b9cb5ba3033a9c33d34eff0805534ae7de1d13255c369923fdf",
+      "fixtureSha256": "bf3f2de4934683efacb0f78191d30b696204a9d7aafa19a9bce1a8f86acfbb07",
+      "noRequestedPermissions": true
+    },
+    "cleanup": {
+      "ownedFixtureRemoved": true
+    },
+    "optimizedProbeCalls": 0
+  },
+  "installed": {
+    "family": {
+      "app": {
+        "versionCode": 125,
+        "versionName": "1.131"
+      },
+      "bytes": 25884988,
+      "sha256": "e07423b2b153e774f43066b9d87e4c956e363da687d9968b1eac3c38e12bf389",
+      "serviceReady": true
+    },
+    "living": {
+      "bytes": 25884988,
+      "sha256": "e07423b2b153e774f43066b9d87e4c956e363da687d9968b1eac3c38e12bf389",
+      "serviceReady": true,
+      "app": {
+        "versionCode": 125,
+        "versionName": "1.131"
+      }
+    }
+  },
+  "livingInstallObservation": {
+    "status": "ready",
+    "ack": "uncertain",
+    "install_attempted": true,
+    "observations": 6
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1663,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1966,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "memoMetadataPreservation": {
+    "family": true,
+    "living": true,
+    "comparison": "existence/size/mtime directory metadata only",
+    "memoContentRead": false
+  },
+  "protectedPreservation": {
+    "files": {
+      "version.json": true,
+      "catalog.json": true,
+      "provisioning/fleetctl": true,
+      "app/src/main/java/com/immortal/launcher/HomeToolOverlays.kt": true
+    },
+    "originalSelectedRegistries": {
+      "family": true,
+      "living": true
+    }
+  },
+  "roadmap": {
+    "oldTasksPreserved": 119,
+    "oldRawSuffixBytes": 402307,
+    "oldRawSuffixSha256": "0de40ce9b37b142a853c3b8972957c42bb1798bbc091fd26612df6a67b24dd3d",
+    "defaultTaskPreserved": true,
+    "taskCount": 120,
+    "statuses": {
+      "delivered": 73,
+      "verified": 37,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    }
+  },
+  "review": {
+    "sourceBlockers": 0,
+    "independentXmlHashNativeReportReview": true,
+    "agent": "photo_layout_review"
+  },
+  "docs": {
+    "mkdocsStrict": true,
+    "ownedEnvironmentAndSiteRemoved": true
+  },
+  "cleanup": {
+    "copiedRegistryRemoved": true,
+    "nativeFixtureRemoved": true,
+    "preexistingPycacheRetained": true
+  },
+  "fixtureErrorsExcluded": [
+    "Initial callback Mockito any() nullability rejected before production function execution.",
+    "Initial guard changed compiled capture argument order; snapshot-first guard preserves original order. Frozen fixture bytes unchanged."
+  ],
+  "limits": [
+    "JVM recorder calls mocked and worker inline; unchanged concurrency/lifecycle tests run separately.",
+    "Compiled callback test executes state/callback logic without mounted Compose or real lifecycle events.",
+    "Native only candidate debug stop/publication; no native prepare/start/cancellation or baseline comparison.",
+    "No real microphone capture or AAC/M4A validity, API28 or optimized recording acceptance.",
+    "Staging cleanup best-effort during filesystem denial; process-death leftovers not reclaimed.",
+    "No phone, live media transfer, provider/account action, push or publication.",
+    "Whole-product goal active; every earlier issue clock and hold retained."
+  ]
+}
