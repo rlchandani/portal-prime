@@ -67,7 +67,9 @@ things that historically broke releases — forgetting the `version.json` bump, 
 the APK — can't happen:
 
 1. **Preflight** — `gh` authenticated; a clean tree on an up-to-date `main`; the signing key
-   present; Android build-tools found; the tag still free.
+   present; Android build-tools found; the tag still free. Tracked changes and nonignored
+   untracked files must be committed or removed before releasing; ignored signing keys and
+   build outputs remain allowed.
 2. **Bumps `versionCode` (auto, current + 1) / `versionName` / `notes` in both
    `app/build.gradle.kts` and `version.json` together**, then re-checks they agree.
 3. **Builds the signed APK and verifies it** — `aapt` confirms the APK's version matches what

@@ -1,0 +1,181 @@
+{
+  "ok": true,
+  "reviewedAtUtc": "2026-11-04T11:22:54.863423+00:00",
+  "plan": {
+    "issue": "Release preflight refuses nonignored untracked files",
+    "originalDiscoveryAt": "2026-11-04T11:04:11Z",
+    "firstSourceWitnessAt": "2026-11-04T11:06:01Z",
+    "selectedAt": "2026-11-04T11:19:11.508455+00:00",
+    "target": "2026-11-04T11:19:11Z",
+    "hardDeadline": "2026-11-04T11:34:11Z",
+    "baseCommit": "6deff28c9ed16e857e63c3b75191fcf7c9c8f682",
+    "scope": "Add nonignored-untracked refusal before fetch/version/build, preserving tracked/staged checks, ignored signing/build outputs and all publication/signing/version steps. Isolated cleanliness gate only; no full publishing flow, authentication, network, Android builds or devices.",
+    "authorization": "Autonomous local reliability implementation and verification; no GitHub publication."
+  },
+  "sourceDiff": "Exactly two lines inserted after original tracked/staged diff gate; all other publishing/auth/signature/version/build/archive/tag/upload behavior byte-identical.",
+  "documentationDiff": "Exactly three clean-tree policy lines replace one preflight line.",
+  "criteria": {
+    "trackedAndStagedChecksRetained": true,
+    "untrackedQueryStandaloneUnderSetErrexit": true,
+    "gitQueryNonzeroFailsClosed": true,
+    "beforeFetchVersionWritesBuildAndPublication": true,
+    "statusShowUntrackedFilesCannotHideQuery": true,
+    "quotedNonemptyCheckNoPathSplitting": true,
+    "genericDiagnosticDoesNotEchoUntrackedNames": true,
+    "standardAndNestedIgnoreRulesRetained": true,
+    "signingAndBuildOutputsIntentionallyAllowed": true,
+    "frozenTenMethodTestByteIdentical": true,
+    "priorClassicAppSourceAndVersionExact": true,
+    "existingCiWildcardDiscoversNewTest": true
+  },
+  "baseline": {
+    "loggedTests": 10,
+    "assertionFailures": 6,
+    "controlsPassed": 4,
+    "setupErrors": 0,
+    "cases": {
+      "test_clean_committed_tree_reaches_fetch_boundary": "ok",
+      "test_ignored_output_does_not_hide_an_untracked_asset": "FAIL",
+      "test_ignored_signing_and_build_outputs_remain_accepted": "ok",
+      "test_staged_tracked_change_still_blocks": "ok",
+      "test_unstaged_tracked_change_still_blocks": "ok",
+      "test_untracked_bundled_asset_blocks_before_fetch": "FAIL",
+      "test_untracked_git_query_failure_blocks_before_fetch": "FAIL",
+      "test_untracked_kotlin_source_blocks_before_fetch": "FAIL",
+      "test_untracked_source_blocks_even_when_status_hides_untracked_files": "FAIL",
+      "test_untracked_weird_filename_blocks_without_printing_its_path": "FAIL"
+    }
+  },
+  "candidate": {
+    "loggedFullCiTests": 264,
+    "loggedRuntimeSeconds": 24.692,
+    "fullCiTerminalExit": 0,
+    "fullCiTerminalEvidence": "Root exec session77233 exit0 notification plus final candidate-tests.log. Reviewer did not execute tests.",
+    "focusedCases": {
+      "test_clean_committed_tree_reaches_fetch_boundary": "ok",
+      "test_ignored_output_does_not_hide_an_untracked_asset": "ok",
+      "test_ignored_signing_and_build_outputs_remain_accepted": "ok",
+      "test_staged_tracked_change_still_blocks": "ok",
+      "test_unstaged_tracked_change_still_blocks": "ok",
+      "test_untracked_bundled_asset_blocks_before_fetch": "ok",
+      "test_untracked_git_query_failure_blocks_before_fetch": "ok",
+      "test_untracked_kotlin_source_blocks_before_fetch": "ok",
+      "test_untracked_source_blocks_even_when_status_hides_untracked_files": "ok",
+      "test_untracked_weird_filename_blocks_without_printing_its_path": "ok"
+    },
+    "bashSyntaxExit": 0,
+    "bashSyntaxEvidence": "Root terminal notification; reviewer did not execute syntax command."
+  },
+  "fixtureScope": "Actual production cleanliness block in generated ordinary Git repositories. Normal checks use real Git; only the ls-files error case is shimmed to exit73. Global/system Git config isolated. No full release script, branch/auth/fetch/version/build/signing/tag/push/publication execution.",
+  "bindings": {
+    "/private/tmp/portal-release-clean-tree-20261104-110411/cut-release.sh": {
+      "path": "/private/tmp/portal-release-clean-tree-20261104-110411/cut-release.sh",
+      "sha256": "d4cddb07f857eaa9b7b7d1155dcf91a6de33eb4fdec359961213581c98f92598",
+      "bytes": 9763,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/cut-release.sh": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/cut-release.sh",
+      "sha256": "972512803892deeed72dbb962711f4e001f60ae51e8c290bdd456b0d75d36922",
+      "bytes": 9936,
+      "mode": "0o755"
+    },
+    "/private/tmp/portal-release-clean-tree-20261104-110411/releasing.md": {
+      "path": "/private/tmp/portal-release-clean-tree-20261104-110411/releasing.md",
+      "sha256": "a7d86f3496f37af43c7c7ee413c8f88b14959a2ae52db017566b72918deac71a",
+      "bytes": 7771,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/docs/releasing.md": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/docs/releasing.md",
+      "sha256": "8c59775128feb7c6ba01558b22d8117211613db921b7a2be8e2985a20fdefb78",
+      "bytes": 7926,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-release-clean-tree-20261104-110411/test_portal_cut_release_clean_tree.py": {
+      "path": "/private/tmp/portal-release-clean-tree-20261104-110411/test_portal_cut_release_clean_tree.py",
+      "sha256": "da6dbab761acb06806afecf888709c1959808b901da5642516e364e304e96cfe",
+      "bytes": 5643,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_cut_release_clean_tree.py": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_cut_release_clean_tree.py",
+      "sha256": "da6dbab761acb06806afecf888709c1959808b901da5642516e364e304e96cfe",
+      "bytes": 5643,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-release-clean-tree-20261104-110411/baseline-tests.log": {
+      "path": "/private/tmp/portal-release-clean-tree-20261104-110411/baseline-tests.log",
+      "sha256": "c6e663aa1cc0a770e83acb5d9f8067b9608db381a34c1215c7e7a7933dc9642b",
+      "bytes": 7673,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-release-clean-tree-20261104-110411/candidate-tests.log": {
+      "path": "/private/tmp/portal-release-clean-tree-20261104-110411/candidate-tests.log",
+      "sha256": "b595ac5ccf512ea8c3e9d6066998dacd88bfdb8ef53813477921ee44ddb5c667",
+      "bytes": 42941,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-release-clean-tree-20261104-110411/baseline-verification.json": {
+      "path": "/private/tmp/portal-release-clean-tree-20261104-110411/baseline-verification.json",
+      "sha256": "ecd9e1fe553623f069b9c09c387eb250322f31eab33dfed8412da7eb0689e8b7",
+      "bytes": 1255,
+      "mode": "0o644"
+    },
+    "/private/tmp/portal-release-clean-tree-20261104-110411/plan.json": {
+      "path": "/private/tmp/portal-release-clean-tree-20261104-110411/plan.json",
+      "sha256": "1c71eddcfe84b72c4e25a6f2b434ff93ee02d0037941a539a013564a1c087def",
+      "bytes": 757,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/.gitignore": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/.gitignore",
+      "sha256": "18b60319dc5bf26ab57ccb77ea00ab0dd5340452e3b4eaf331479e96a62f2bd8",
+      "bytes": 1168,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/.gitignore": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/.gitignore",
+      "sha256": "5b46eb48d96e8571e8c93e4ef4f6ffbe6807b6d7350664a36a064e1167a32718",
+      "bytes": 7,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/provisioning/.gitignore": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/provisioning/.gitignore",
+      "sha256": "af33fb314700364f9e12d6b9702fc2e193002ba84ec133fac7626e8095aec51e",
+      "bytes": 584,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/.github/workflows/tests.yml": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/.github/workflows/tests.yml",
+      "sha256": "624c9988f3f38dd92019136b9540e9e50d044f15ba159364f18ab5d98ae2092f",
+      "bytes": 2178,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_cut_release_signing.py": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_portal_cut_release_signing.py",
+      "sha256": "119e14c206317099704177404b2f53352147db779aee955f241fa308dbb65b8e",
+      "bytes": 4388,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "sha256": "d30c70f482477efd72112e0b3d9fbf25b09a0cd6f66e072d976fcb12dc64de40",
+      "bytes": 11824,
+      "mode": "0o644"
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+      "sha256": "62e911e50c9cc534d9808a30d0b61a9fd26532818dda64b96059c794d88c064d",
+      "bytes": 164771,
+      "mode": "0o644"
+    }
+  },
+  "limits": [
+    "Independent read-only source and retained-log review only; reviewer ran no tests, Bash checker, Git, build, SDK, device, account or network commands.",
+    "Refusal covers nonignored untracked entries. Ignored build inputs, global excludes, nested Git/submodule contents, and mutation after preflight remain outside any complete release-reproducibility claim.",
+    "Generated ignore-rule controls establish intended signing/build-output admission; actual repository/nested ignore files were separately source-read and hash-bound.",
+    "Hosted CI, full release flow, external authentication/signature/download/push/publication and device acceptance were not exercised.",
+    "Original11:04:11 discovery/11:06:01 witness/11:19:11target/11:34:11deadline retained; target was already missed at selection and no clock reset occurs."
+  ]
+}

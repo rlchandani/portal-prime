@@ -1,0 +1,17 @@
+{
+  "priorTasks": 143,
+  "currentTasks": 144,
+  "counts": {
+    "verified": 41,
+    "delivered": 93,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "allPriorTaskObjectsPreserved": true,
+  "priorRawSuffixBytes": 465620,
+  "priorRawSuffixSha256": "65ec71c41dffb2debb87d15900c31ee6b75f203a3cd02acf9d76391dd33c6bfe",
+  "rawSuffixPreserved": true,
+  "defaultTaskRetained": "weather-native-layout",
+  "priorClocksRetained": true
+}

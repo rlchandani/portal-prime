@@ -1,0 +1,19 @@
+{
+  "verifiedAt": "2026-11-04T11:22:20.606947+00:00",
+  "fullPythonCiCommand": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_portal_*.py' -v",
+  "exitCode": 0,
+  "tests": 264,
+  "durationSeconds": 24.692,
+  "failures": 0,
+  "errors": 0,
+  "focusedTests": 10,
+  "focusedPassed": 10,
+  "bashSyntaxExitCode": 0,
+  "baselineSourceSha256": "d4cddb07f857eaa9b7b7d1155dcf91a6de33eb4fdec359961213581c98f92598",
+  "candidateSourceSha256": "972512803892deeed72dbb962711f4e001f60ae51e8c290bdd456b0d75d36922",
+  "frozenTestSha256": "da6dbab761acb06806afecf888709c1959808b901da5642516e364e304e96cfe",
+  "candidateLogSha256": "b595ac5ccf512ea8c3e9d6066998dacd88bfdb8ef53813477921ee44ddb5c667",
+  "documentationSha256": "8c59775128feb7c6ba01558b22d8117211613db921b7a2be8e2985a20fdefb78",
+  "scope": "Actual extracted production cleanliness block in generated Git repositories; fixture-generated ignores. Repository and nested ignores source-reviewed separately. No authentication/fetch/version/build/signing/tag/push/publication, devices, phone or household sources.",
+  "roomBoundary": "Prior installed Portal1.151/code145; no new device reads or installs. Public1.83/code77 unchanged."
+}

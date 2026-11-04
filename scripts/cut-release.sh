@@ -64,6 +64,8 @@ command -v gh >/dev/null || die "gh CLI not found"
 gh auth status >/dev/null 2>&1 || die "gh is not authenticated (run: gh auth login)"
 [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ] || die "not on main (on $(git rev-parse --abbrev-ref HEAD))"
 git diff --quiet && git diff --cached --quiet || die "working tree has uncommitted changes — commit or stash first"
+untracked_files="$(git ls-files --others --exclude-standard)"
+[ -z "$untracked_files" ] || die "working tree has untracked files — commit or remove them before releasing"
 git fetch --quiet origin main --tags
 [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] || die "local main is not in sync with origin/main — pull/push first"
 git rev-parse "$tag" >/dev/null 2>&1 && die "tag $tag already exists locally"

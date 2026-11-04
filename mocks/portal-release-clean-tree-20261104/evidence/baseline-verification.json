@@ -1,0 +1,25 @@
+{
+  "verifiedAt": "2026-11-04T11:21:28.858822+00:00",
+  "baselineExit": 1,
+  "tests": 10,
+  "assertionFailures": 6,
+  "controlsPassed": 4,
+  "setupErrors": 0,
+  "cases": {
+    "test_clean_committed_tree_reaches_fetch_boundary": "ok",
+    "test_ignored_output_does_not_hide_an_untracked_asset": "FAIL",
+    "test_ignored_signing_and_build_outputs_remain_accepted": "ok",
+    "test_staged_tracked_change_still_blocks": "ok",
+    "test_unstaged_tracked_change_still_blocks": "ok",
+    "test_untracked_bundled_asset_blocks_before_fetch": "FAIL",
+    "test_untracked_git_query_failure_blocks_before_fetch": "FAIL",
+    "test_untracked_kotlin_source_blocks_before_fetch": "FAIL",
+    "test_untracked_source_blocks_even_when_status_hides_untracked_files": "FAIL",
+    "test_untracked_weird_filename_blocks_without_printing_its_path": "FAIL"
+  },
+  "baselineSourceSha256": "d4cddb07f857eaa9b7b7d1155dcf91a6de33eb4fdec359961213581c98f92598",
+  "frozenTestSha256": "da6dbab761acb06806afecf888709c1959808b901da5642516e364e304e96cfe",
+  "candidateSourceSha256": "972512803892deeed72dbb962711f4e001f60ae51e8c290bdd456b0d75d36922",
+  "sourceDiffExactlyTwoLineInsertion": true,
+  "baselineLogSha256": "c6e663aa1cc0a770e83acb5d9f8067b9608db381a34c1215c7e7a7933dc9642b"
+}

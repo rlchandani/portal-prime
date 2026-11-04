@@ -1,0 +1,11 @@
+{
+  "issue": "Release preflight refuses nonignored untracked files",
+  "originalDiscoveryAt": "2026-11-04T11:04:11Z",
+  "firstSourceWitnessAt": "2026-11-04T11:06:01Z",
+  "selectedAt": "2026-11-04T11:19:11.508455+00:00",
+  "target": "2026-11-04T11:19:11Z",
+  "hardDeadline": "2026-11-04T11:34:11Z",
+  "baseCommit": "6deff28c9ed16e857e63c3b75191fcf7c9c8f682",
+  "scope": "Add nonignored-untracked refusal before fetch/version/build, preserving tracked/staged checks, ignored signing/build outputs and all publication/signing/version steps. Isolated cleanliness gate only; no full publishing flow, authentication, network, Android builds or devices.",
+  "authorization": "Autonomous local reliability implementation and verification; no GitHub publication."
+}
