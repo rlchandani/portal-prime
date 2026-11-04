@@ -22,6 +22,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000;
 .ss-fill { position: absolute; inset: -8%; background-size: cover; background-position: center;
   filter: blur(20px) saturate(1.15) brightness(0.75); transform: scale(1.12); }
 .ss-hero { position: absolute; inset: 0; background-repeat: no-repeat; background-position: center; will-change: transform; }
+.ss-photo-border { position: absolute; inset: 0; pointer-events: none; background-repeat: no-repeat; background-position: center; background-size: contain; }
 .ss-layer.on .ss-hero, .ss-layer .ss-hero.ss-motion { animation: kb var(--motion-duration, 32400ms) linear forwards; }
 @keyframes kb { from { transform: scale(var(--s0,1.04)) translate(var(--x0,0),var(--y0,0)); }
   to { transform: scale(var(--s1,1.15)) translate(var(--x1,0),var(--y1,0)); } }

@@ -48,11 +48,12 @@ function snapshot(r) {
 // would miss a common regression in both. Coercions count the existing random selections.
 // Paper Framed/Mosaic intentionally update geometry, motion and CSS inputs; unrelated snapshots stay pinned.
 // Cinematic doodles change only background-image/size; normalized traces retain the prior hashes.
+// Cinematic border children are decorative; removing them retains the previous scene trace.
 const legacyOutput = [
-  ['kenBurns', 30, 'bf5da229aac013eb9d127306bedfb0aa41253282c5abab040e53b1dbac4f9c65'],
+  ['kenBurns', 30, '3005c1e70712a249dbedd01585276ccadca7bfa140b86375ba5963d57c15ad63'],
   ['diptych', 12, '1306f202be7a187821287abc97d0bd6ab6664f761f9052081b157fa85fd116b0'],
   ['framed', 6, '95a97824d4030098e30c1d421b25d87e7611aae3115062474e9b72d1c7190551'],
-  ['push', 0, '79e628a34c6173f187c5987495424fe77fa24934cfb62dd0da33859dab3fa2b7'],
+  ['push', 0, '70851e47d57b1f68d6db6a5c2643b91928bdca4e8c92817175dbb305d607714a'],
   ['memories', 0, '6f642dfabcc126c561f90a9e0507820b53b5a9bcb6039c0e4facd602e388a1a3'],
   ['panorama', 0, '03a82e8bf80c00c8a1aeef2c9135a050a2b91c7df7ec75cd9e5bbf22d348cb1f'],
   ['mosaic', 5, '5bcac3423cd4bb7973e4727270c64e614f7b97aa91faddc197a07443e5b22434'],

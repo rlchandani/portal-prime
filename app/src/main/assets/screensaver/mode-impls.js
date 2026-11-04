@@ -15,6 +15,15 @@
   // Publish the exact URL admitted by t.load. Resolve again only for a new preparation
   // so derivative completion/eviction cannot silently substitute an unprepared resource.
   function bg(node, url, size) { node.style.backgroundImage = `url("${url}")`; node.style.backgroundSize = size || "cover"; node.style.backgroundPosition = "center"; node.style.backgroundRepeat = "no-repeat"; }
+  // The transparent outline uses the same contain fit and aspect as the decoded photo.
+  // As a hero child it follows resizing and the existing motion without another photo load.
+  function photoBorderUrl(photo) {
+    const ar = aspect(photo);
+    if (!Number.isFinite(ar) || ar <= 0) return null;
+    const w = Math.min(1000, 1000 * ar), h = w / ar;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="none" stroke="#c7b79c" stroke-opacity=".92" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+    return "data:image/svg+xml," + encodeURIComponent(svg);
+  }
   // Anchor a cover-crop on the detected face (fx/fy in 0..1) so heads aren't clipped. Falls back to
   // the CSS default (a top-biased center) when the photo has no focal point yet.
   function hasFace(p) { return p && Number.isFinite(p.fx) && Number.isFinite(p.fy) && p.fx >= 0 && p.fx <= 1 && p.fy >= 0 && p.fy <= 1; }
@@ -375,19 +384,25 @@
     const layers = [mk(), mk()]; layers.forEach(l => ctx.root.appendChild(l.root));
     function mk() {
       const root = el("ss-layer ken-burns retired"), hero = el("ss-hero", root);
+      const border = el("ss-photo-border", hero);
       hero.style.animation = "none"; hero.style.willChange = "auto";
-      return { root, hero };
+      return { root, hero, border };
     }
     const dissolve = makeSceneDissolve(ctx, t, layers.map(l => l.root), 2200, root => {
       const hero = layers.find(l => l.root === root).hero;
       hero.style.backgroundImage = "none"; hero.style.animation = "none";
       hero.style.willChange = "auto"; hero.classList.remove("ss-motion");
+      layers.find(l => l.root === root).border.style.backgroundImage = "none";
     });
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0];
       const u = ctx.url(p, 2200); if (!await t.load(u) || !dissolve.active()) return false;
+      const borderUrl = photoBorderUrl(p);
+      if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
       const root = dissolve.next(), L = layers.find(l => l.root === root);
       bg(L.hero, u, "contain");
+      if (borderUrl) bg(L.border, borderUrl, "contain");
+      else L.border.style.backgroundImage = "none";
       L.hero.style.animation = "none"; L.hero.style.willChange = "auto";
       if (hasFace(p)) {
         L.hero.style.willChange = "auto";
@@ -606,19 +621,25 @@
     const t = makeTimers(ctx); const layers = [mk(), mk()]; layers.forEach(l => ctx.root.appendChild(l.root));
     function mk() {
       const root = el("ss-layer cinematic-push retired"), hero = el("ss-hero", root);
+      const border = el("ss-photo-border", hero);
       hero.style.animation = "none"; hero.style.willChange = "auto";
-      return { root, hero };
+      return { root, hero, border };
     }
     const dissolve = makeSceneDissolve(ctx, t, layers.map(l => l.root), 2200, root => {
       const hero = layers.find(l => l.root === root).hero;
       hero.style.backgroundImage = "none"; hero.style.animation = "none";
       hero.style.willChange = "auto";
+      layers.find(l => l.root === root).border.style.backgroundImage = "none";
     });
     async function step() {
       const p = SS.take(deck, ctx.cursor, ["any"])[0], u = ctx.url(p, 2200);
       if (!await t.load(u) || !dissolve.active()) return false;
-      const root = dissolve.next(), hero = layers.find(l => l.root === root).hero;
+      const borderUrl = photoBorderUrl(p);
+      if (borderUrl && !await t.load(borderUrl) || !dissolve.active()) return false;
+      const root = dissolve.next(), layer = layers.find(l => l.root === root), hero = layer.hero;
       bg(hero, u, "contain"); hero.style.animation = "none"; hero.style.willChange = "auto";
+      if (borderUrl) bg(layer.border, borderUrl, "contain");
+      else layer.border.style.backgroundImage = "none";
       if (ctx.photoMotion !== false && !hasFace(p)) {
         hero.style.willChange = "transform"; void hero.offsetWidth;
         hero.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;

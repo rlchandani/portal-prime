@@ -1,18 +1,58 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T07:35:54.724529+00:00",
-  "updatedLabel": "Cinematic doodles delivered1.135; next small photo-border slice",
+  "updatedAt": "2026-11-04T07:49:44.315505+00:00",
+  "updatedLabel": "Cinematic frames delivered1.136; continue next small visible slice",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.135/code 129. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.136/code 130. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "cinematic-photo-borders",
+      "title": "Cinematic photos: slim photo-sized frames",
+      "summary": "Ken Burns and Push frame complete photographs over quiet doodle margins.",
+      "status": "delivered",
+      "verification": "4,402 JVM \u00b7 1,106 JS \u00b7 six native scenes \u00b7 exact both-room installs",
+      "kind": "Screensaver visual polish",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering",
+      "deployment": "Optimized1.136/code130 fully hashed in both rooms from one install invocation per room; Living uncertain ACK reconciled by six read-only observations.",
+      "acceptance": [
+        "Photo-sized thin frame for both orientations.",
+        "Frame follows the existing scene during resize.",
+        "Preserve saved settings and photo geometry/motion."
+      ],
+      "evidence": [
+        {
+          "text": "Scoped delivery and remaining acceptance.",
+          "source": "docs/portal-cinematic-frames-2026-11-04.md"
+        },
+        {
+          "text": "Artifacts, traces, native pixels and installed state.",
+          "source": "mocks/portal-cinematic-frames-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Ken Burns and Push only; other Shuffle styles remain separate.",
+        "Generated direct modes on Family API29 with motion off; production scheduler/native clock, API28, Living physical visuals and hardware performance remain open.",
+        "No phone, source-media import/transfer, provider/account, GitHub push or publication."
+      ],
+      "next": "Continue a separate small visible slice; retain all previous clocks.",
+      "issueClock": {
+        "startedAt": "2026-11-04T07:38:02Z",
+        "target": "2026-11-04T07:53:02Z",
+        "deadline": "2026-11-04T08:08:02Z",
+        "scope": "Discovery through delivery and closure; no reset."
+      }
+    },
     {
       "id": "cinematic-doodle-margins",
       "title": "Cinematic photos: quiet doodles in dark margins",
