@@ -1,0 +1,14 @@
+[
+  {
+    "dex": "classes.dex",
+    "class": "com.immortal.launcher.PhotoFrameController$startEngine$2$4",
+    "method": "getPhotoLayoutBounds",
+    "JavascriptInterface": true
+  },
+  {
+    "dex": "classes.dex",
+    "class": "com.immortal.launcher.PhotoFrameController$startEngine$2$4",
+    "method": "paperSurfaceChanged",
+    "JavascriptInterface": true
+  }
+]

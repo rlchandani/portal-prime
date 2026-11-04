@@ -67,6 +67,9 @@ internal object FilmstripInputDeviceChecks {
     private val reportFile = File(probe.targetContext.cacheDir, "$prefix.json")
     private val handler = Handler(Looper.getMainLooper())
     private val application = probe.targetContext.applicationContext as Application
+    // A standard, fresh Activity also exists in the optimized iteration package.
+    // Its initial settings screen only reads configuration; no button is invoked.
+    private val hostClass = if (framed) "com.immortal.launcher.CountdownSettingsActivity" else HOST
     private val created = CountDownLatch(1)
     private val activity = AtomicReference<Activity>()
     private val owned = mutableListOf<Activity>() // Main only.
@@ -86,7 +89,7 @@ internal object FilmstripInputDeviceChecks {
 
     private val lifecycle = object : Application.ActivityLifecycleCallbacks {
       override fun onActivityCreated(host: Activity, state: Bundle?) {
-        if (host.javaClass.name != HOST || host.intent.getStringExtra("owned_probe") != token) return
+        if (host.javaClass.name != hostClass || host.intent.getStringExtra("owned_probe") != token) return
         owned.add(host)
         activity.compareAndSet(null, host)
         if (closing) host.finish()
@@ -515,8 +518,15 @@ internal object FilmstripInputDeviceChecks {
       val edge = value.getJSONObject("frame")
       val width = root.getDouble("width")
       val height = root.getDouble("height")
-      val expectedWidth = kotlin.math.round(minOf(width * .6, height * .72 * 400 / 300))
-      val expectedHeight = kotlin.math.round(minOf(width * .6, height * .72 * 400 / 300) * 300 / 400)
+      // This bridge-free fixture reserves the standalone clock strip. The complete
+      // print, including its six-pixel decoration, expands into the remaining area.
+      val availableHeight = height - minOf(height * .22, 180.0)
+      val padding = minOf(minOf(width, height) * .028, width * .1, availableHeight * .1)
+      val areaWidth = width - padding * 2
+      val areaHeight = availableHeight - padding * 2
+      val decoration = minOf(6.0, areaWidth * .08, areaHeight * .08)
+      val expectedWidth = minOf(areaWidth - decoration * 2, (areaHeight - decoration * 2) * 400 / 300)
+      val expectedHeight = expectedWidth * 300 / 400
       observations.put(JSONObject().put("phase", label).put("state", value)
           .put("nativeViewport", native).put("expectedPrintWidth", expectedWidth)
           .put("expectedPrintHeight", expectedHeight).put("photoRequests", photoRequests.get()))
@@ -713,8 +723,8 @@ internal object FilmstripInputDeviceChecks {
         phase = "owned_window"
         main { application.registerActivityLifecycleCallbacks(lifecycle); registered = true }
         main {
-          // This existing debug host creates only a quiet generated clock, no player or sources.
-          probe.targetContext.startActivity(Intent().setClassName(probe.targetContext, HOST)
+          // The UUID admits only this fresh window, never a retained household frame.
+          probe.targetContext.startActivity(Intent().setClassName(probe.targetContext, hostClass)
               .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("screen", "night")
               .putExtra("owned_probe", token))
         }

@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T04:42:39.526905+00:00",
-  "updatedLabel": "3 November 2026 · implemented Paper photo layout",
+  "updatedAt": "2026-11-04T05:03:42.018167+00:00",
+  "updatedLabel": "3 November 2026 · Paper photo renderer installed",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.128/code 122. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.129/code 123. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -16,16 +16,16 @@
     {
       "id": "slideshow-photo-layout-review",
       "title": "Slideshow: larger photos and quiet doodle margins",
-      "summary": "Local Paper renderer implemented: six proportional whole photos, photo-sized thin frames and quiet doodles. Android and browser gates pass; device appearance remains open.",
+      "summary": "Paper renderer installed as optimized 1.129 in both rooms; six whole photos, slim frames and static doodles. Actual Android geometry passes; native overlay/custom-clock acceptance remains open.",
       "description": "Implement the reviewed Paper direction after the user continuation; preserve decode, pause and retirement ownership while correcting the fixed-cell composition and single-photo limits.",
-      "status": "verified",
-      "verification": "359 slideshow · 743 app JS · 4,359 JVM / 453 suites · debug APK · 11 raster/motion + 4 control cases · independent review",
+      "status": "delivered",
+      "verification": "4,359 JVM / 453 suites · debug/optimized/R8/vital lint · 8 exact assets · both installed full APK hashes · 43 generated Android geometry/pixel checks",
       "kind": "Reported screensaver appearance follow-up",
       "platforms": [
         "portal"
       ],
       "owner": "Photo-frame design / Portal engineering",
-      "deployment": "Local production implementation and debug artifact only; no Portal install.",
+      "deployment": "Exact optimized 1.129/code123 installed and fully read back in Family Area and Living Area; Living response disconnected, verified without retry.",
       "state": "Paper selected from the concrete reviewed recommendation and user continuation. Real native bounds bridge and localized backing implemented; historical comparison frozen at d7e18bcb.",
       "acceptance": [
         "Keep whole photos large without visible empty outlined grid cells.",
@@ -57,16 +57,24 @@
         {
           "text": "Bound source, browser results and debug APK evidence.",
           "source": "mocks/portal-photo-layout-20261103/evidence/implementation-verification.json"
+        },
+        {
+          "text": "Exact installed artifacts, generated native geometry/pixels and preserved state.",
+          "source": "docs/portal-photo-paper-native-2026-11-03.md"
+        },
+        {
+          "text": "Aggregate installed hashes and 43 native checks with explicit acceptance limits.",
+          "source": "mocks/portal-photo-layout-20261103/evidence/native-delivery-verification.json"
         }
       ],
       "limits": [
-        "Local implementation only; no installed-version, native appearance or Portal performance claim.",
-        "Browser fixtures use the actual entry point with inert bridge data and simulated standalone clock bounds.",
-        "Nine cropped scenic fixtures come from three bundled photographs; no household media.",
-        "Android 9/10 WebView, density, burn-in and dark/gradient customized native clock contrast remain unverified.",
-        "Prior crop/slim-frame deliveries, original review clock and all parked issues retain their clocks."
+        "Native fixture executes installed mode assets in a separate owned Android Activity with standalone clock-strip fallback; production FaceRenderer/scheduler coupling remains open.",
+        "43 Family and 30 Living captured preference files and four maps match; private original test APK and crash guard restored.",
+        "Dark/low-opacity clock contrast is known limited; gradients, API28, Living visual and hardware performance remain unverified.",
+        "No live photo transfer, phone operation, provider/account action, push or publication.",
+        "Original review, implementation and all parked clocks remain."
       ],
-      "next": "Verify physical Android 9/10 appearance, custom native clock contrast, density and performance before device acceptance.",
+      "next": "Exercise actual native measured overlays and Shuffle backing with owned light/dark clock fixtures; keep API28, Living visual and performance limits explicit.",
       "issueClock": {
         "startedAt": "2026-11-04T01:01:58.039Z",
         "deadline": "2026-11-04T01:31:58.039Z",
@@ -78,6 +86,12 @@
         "deadline": "2026-11-04T04:53:10Z",
         "discoveryIncluded": true,
         "originalReviewClockRetained": true,
+        "priorClocksRetained": true
+      },
+      "deploymentClock": {
+        "startedAt": "2026-11-04T04:45:43Z",
+        "deadline": "2026-11-04T05:15:43Z",
+        "discoveryIncluded": true,
         "priorClocksRetained": true
       }
     },

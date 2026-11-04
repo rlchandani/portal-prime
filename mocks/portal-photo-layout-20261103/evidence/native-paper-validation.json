@@ -1,0 +1,334 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "completed",
+      "passed": true
+    },
+    {
+      "name": "framed-0-image-count",
+      "passed": true
+    },
+    {
+      "name": "framed-0-native-css-size",
+      "passed": true
+    },
+    {
+      "name": "framed-0-whole-proportional-still",
+      "passed": true
+    },
+    {
+      "name": "framed-0-within-root",
+      "passed": true
+    },
+    {
+      "name": "framed-0-separated",
+      "passed": true
+    },
+    {
+      "name": "framed-1-image-count",
+      "passed": true
+    },
+    {
+      "name": "framed-1-native-css-size",
+      "passed": true
+    },
+    {
+      "name": "framed-1-whole-proportional-still",
+      "passed": true
+    },
+    {
+      "name": "framed-1-within-root",
+      "passed": true
+    },
+    {
+      "name": "framed-1-separated",
+      "passed": true
+    },
+    {
+      "name": "framed-2-image-count",
+      "passed": true
+    },
+    {
+      "name": "framed-2-native-css-size",
+      "passed": true
+    },
+    {
+      "name": "framed-2-whole-proportional-still",
+      "passed": true
+    },
+    {
+      "name": "framed-2-within-root",
+      "passed": true
+    },
+    {
+      "name": "framed-2-separated",
+      "passed": true
+    },
+    {
+      "name": "mosaic-0-image-count",
+      "passed": true
+    },
+    {
+      "name": "mosaic-0-native-css-size",
+      "passed": true
+    },
+    {
+      "name": "mosaic-0-whole-proportional-still",
+      "passed": true
+    },
+    {
+      "name": "mosaic-0-within-root",
+      "passed": true
+    },
+    {
+      "name": "mosaic-0-separated",
+      "passed": true
+    },
+    {
+      "name": "mosaic-0-no-cell-outline-background",
+      "passed": true
+    },
+    {
+      "name": "mosaic-1-image-count",
+      "passed": true
+    },
+    {
+      "name": "mosaic-1-native-css-size",
+      "passed": true
+    },
+    {
+      "name": "mosaic-1-whole-proportional-still",
+      "passed": true
+    },
+    {
+      "name": "mosaic-1-within-root",
+      "passed": true
+    },
+    {
+      "name": "mosaic-1-separated",
+      "passed": true
+    },
+    {
+      "name": "mosaic-1-no-cell-outline-background",
+      "passed": true
+    },
+    {
+      "name": "mosaic-2-image-count",
+      "passed": true
+    },
+    {
+      "name": "mosaic-2-native-css-size",
+      "passed": true
+    },
+    {
+      "name": "mosaic-2-whole-proportional-still",
+      "passed": true
+    },
+    {
+      "name": "mosaic-2-within-root",
+      "passed": true
+    },
+    {
+      "name": "mosaic-2-separated",
+      "passed": true
+    },
+    {
+      "name": "mosaic-2-no-cell-outline-background",
+      "passed": true
+    },
+    {
+      "name": "framed-resize-retained",
+      "passed": true
+    },
+    {
+      "name": "mosaic-resize-retained",
+      "passed": true
+    },
+    {
+      "name": "framed-photo-0-four-native-corners",
+      "passed": true,
+      "nativeRgb": [
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-photo-0-four-native-corners",
+      "passed": true,
+      "nativeRgb": [
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-photo-1-four-native-corners",
+      "passed": true,
+      "nativeRgb": [
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-photo-2-four-native-corners",
+      "passed": true,
+      "nativeRgb": [
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-photo-3-four-native-corners",
+      "passed": true,
+      "nativeRgb": [
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-photo-4-four-native-corners",
+      "passed": true,
+      "nativeRgb": [
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "name": "mosaic-photo-5-four-native-corners",
+      "passed": true,
+      "nativeRgb": [
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          255
+        ]
+      ]
+    }
+  ],
+  "scope": "Exact installed asset Android WebView; standalone clock-strip fallback, not PhotoFrameController/FaceRenderer coupling",
+  "unknownRequestsBlocked": 4,
+  "pixelChecks": "Independent standard-library PNG decode; four generated corner markers in each of seven visible photos"
+}

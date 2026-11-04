@@ -1,0 +1,173 @@
+{
+  "startedAt": "2026-11-04T04:45:43Z",
+  "deadline": "2026-11-04T05:15:43Z",
+  "base": "0246f283f89edb5b4bb0951019cd07968aac9f5d",
+  "versionCode": 123,
+  "versionName": "1.129",
+  "package": "com.immortal.launcher.debug",
+  "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "artifacts": {
+    "debug": {
+      "bytes": 46726887,
+      "sha256": "fc40b907881f3a075544874f2f9cf7fce9e3adb1ef2dfcebc893b7500eb17bcd",
+      "assets": {
+        "index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+        "styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+        "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+        "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+        "mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136",
+        "photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+        "photos.js": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+        "scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+      }
+    },
+    "performance": {
+      "bytes": 25884988,
+      "sha256": "65c3b65d5f2b6404f888278a0eee02f5f137524e987612b2e787ede98d597ddc",
+      "assets": {
+        "index.html": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+        "styles.css": "e8357f30e86da0195d7d75c4a6ff4edf6c64c1bcfeff4c2db8ebb05385d75994",
+        "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+        "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+        "mode-impls.js": "708656067fba468cabb8ed72b64f5710f7bbe8c3b7bab985954b15d1cd349136",
+        "photo-doodles.svg": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+        "photos.js": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+        "scheduler.js": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+      }
+    }
+  },
+  "installed": {
+    "family": {
+      "app": {
+        "versionCode": 123,
+        "versionName": "1.129"
+      },
+      "bytes": 25884988,
+      "sha256": "65c3b65d5f2b6404f888278a0eee02f5f137524e987612b2e787ede98d597ddc",
+      "serviceReady": true
+    },
+    "living": {
+      "app": {
+        "versionCode": 123,
+        "versionName": "1.129"
+      },
+      "bytes": 25884988,
+      "sha256": "65c3b65d5f2b6404f888278a0eee02f5f137524e987612b2e787ede98d597ddc",
+      "serviceReady": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferencesCaptured": 43,
+      "changedPreferences": [],
+      "addedPreferences": [],
+      "fourMapsEqual": true,
+      "nameAndDevModeEqual": true,
+      "fontEqual": true,
+      "accessibilityEqual": true,
+      "originalChromeTaskRetained": true,
+      "frameResumed": true,
+      "displayAwake": true
+    },
+    "living": {
+      "preferencesCaptured": 30,
+      "changedPreferences": [],
+      "addedPreferences": [],
+      "fourMapsEqual": true,
+      "nameAndDevModeEqual": true
+    }
+  },
+  "native": {
+    "checks": 43,
+    "passed": true,
+    "apiLevel": 29,
+    "devicePixelRatio": 1.125,
+    "nativeViewports": [
+      [
+        2160,
+        1440
+      ],
+      [
+        892,
+        1440
+      ],
+      [
+        2160,
+        1440
+      ]
+    ],
+    "modes": [
+      "framed",
+      "mosaic"
+    ],
+    "visibleCornerMarkers": 28,
+    "fixtureScope": "Separate owned framework Activity; installed assets; mode renderers and shared geometry, standalone clock-strip fallback; no production native overlay or scheduler execution",
+    "allUnknownRequestsBlocked": true,
+    "unknownRequestCount": 4
+  },
+  "checks": {
+    "jvm": 4359,
+    "suites": 453,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "debugAssembly": true,
+    "optimizedAssembly": true,
+    "r8": true,
+    "vitalLint": true,
+    "androidTestAssembly": true,
+    "strictMkDocs": true
+  },
+  "excludedHarnessFailure": "Kotlin AndroidTest runner cannot load R8-renamed kotlin.jvm.internal.Intrinsics; crash_guard bytes and original test APK restored; launcher process restarted",
+  "livingInstall": {
+    "invocations": 1,
+    "ack": "uncertain",
+    "fullReadbackVerified": true,
+    "transport": "incomplete HTTP headers after install; initial CLI exit-code adapter misclassified refusal, corrected by explicit transport inspection and read-only reconciliation"
+  },
+  "privateRollback": {
+    "versionCode": 122,
+    "versionName": "1.128",
+    "bytes": 25879086,
+    "sha256": "7f6211a1e7cd08e2364223e87fcb1bb8316b4cbed7fe5f11cb7fe3abf0aa38ec",
+    "source": "Full Family installed APK before promotion; ordinary Android downgrade support not asserted"
+  },
+  "limits": [
+    "Android 9/API28 and Living native appearance unverified",
+    "Native PhotoFrameController/FaceRenderer measured reservations, empty-child backing parity and Shuffle retirement are source/unit checked, not exercised by the standalone native fixture",
+    "Custom dark/low-opacity clock contrast is limited; fixed dark backing has poor contrast for dark foreground; gradient compatibility is pre-existing and unproven",
+    "No hardware performance/burn-in, household-media transfer, phone operation, provider/account action, push or publication acceptance"
+  ],
+  "fixtures": {
+    "activitySha256": "0d41b38bcc45aa37bb05f6cffe31626818e4039e6347b3e75100e9b92b3c74a3",
+    "manifestSha256": "7e9f3ff048e81819490ce26c062b154d9ba3d8b2b0baccb5a5a4780a5664f097",
+    "compiledActivitySourceSha256": "d86b30c8eff6aa5197636a52a747fd17998eef9924295c8c5a6b02f50b838a03",
+    "sourceNormalization": "Recorded source has the canonical copyright header and whitespace formatting; runtime code is unchanged.",
+    "fixtureApkSha256": "a1fdb7e2fef952206111283e6e880ef90500d4259413324104ec476b540da235",
+    "normalizedSourceCompilation": "Pass; four Java8 bootstrap/obsolete-option warnings and deprecated-API note",
+    "nativePixelScope": "Landscape only; narrow/restored use DOM geometry; Framed one4:3 photo; motion disabled"
+  },
+  "independentReview": "43 native checks and both images independently inspected; scoped geometry supports saved classic white faces; no production native-overlay or Shuffle claim",
+  "cleanup": {
+    "copiedRegistryRemoved": true,
+    "originalRegistryUnchanged": true,
+    "ownedFixtureUninstalled": true,
+    "originalTestApkFullHashRestored": "b318d39ff76ce0ee59fce2bff4164745da6da28e48d4ed5ffcfa6dcc2635c136",
+    "temporaryDocsRuntimeAndSiteRemoved": true,
+    "privateConfigurationAndRollbackRetained": true,
+    "previewServerRetained": true
+  },
+  "roadmap": {
+    "tasks": 119,
+    "counts": {
+      "delivered": 72,
+      "verified": 37,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "other118ObjectsUnchanged": true,
+    "defaultTaskUnchanged": true
+  },
+  "verifiedAt": "2026-11-04T05:07:49.413253+00:00"
+}
