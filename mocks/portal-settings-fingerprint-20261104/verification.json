@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "issueClock": {
+    "startedAt": "2026-11-04T22:57:22Z",
+    "target": "2026-11-04T23:12:22Z",
+    "deadline": "2026-11-04T23:27:22Z",
+    "firstDiscoveryClockRetained": true,
+    "fiveMinuteDiscoveryCapExceeded": true
+  },
+  "baseline": {
+    "newHelperAbsent": true,
+    "classification": "Missing new capability; import failure, not an existing app bug"
+  },
+  "verification": {
+    "pythonTests": 315,
+    "newTestMethods": 11,
+    "failures": 0,
+    "errors": 0,
+    "elapsedSeconds": 37.027,
+    "savedAndroidRevisionChecks": [
+      {
+        "room": "family",
+        "phase": "before",
+        "matches": true,
+        "revision": "e56fbd7de508ecdb694e07c7f5d5a0512f375b412449b8df83e915ac11d3f286"
+      },
+      {
+        "room": "family",
+        "phase": "after",
+        "matches": true,
+        "revision": "a5169f67d45520edf6ed720754b2b1d3660e948db4f1c4928329f5114d80dc5b"
+      },
+      {
+        "room": "living",
+        "phase": "before",
+        "matches": true,
+        "revision": "ed78e5fe0dc9af1c86dc903793a39f4de22989c89f761ed71c58ab127202e18e"
+      },
+      {
+        "room": "living",
+        "phase": "after",
+        "matches": true,
+        "revision": "455a54f1df368071e7cee9a0780c21f270f683f1037d23a93a38a9aa90656ee3"
+      }
+    ],
+    "savedFamilySnapshotCliMatched": true,
+    "independentReview": "Read-only source review accepted; no execution claimed",
+    "reviewedHashesRechecked": {
+      "scripts/portal_settings_fingerprint.py": "b8588d1e06ccd57ca5511fbb450a6363edb865483547714e1fa7c46d6e5f4ad5",
+      "scripts/test_portal_settings_fingerprint.py": "3a1022a5ff16f56a7115cae1c7c3423f3e139703ad7b4ed6c761731e74457d80",
+      "app/src/main/java/com/immortal/launcher/RemoteSnapshotPolicy.kt": "d8d219e0100cf73c094bb40dce0dc3078d8b45d089c739a05112052f0209002f",
+      "app/src/main/java/com/immortal/launcher/RemoteLayoutPolicy.kt": "06020d525fd046cec6e4ab8bba77806d406e4a674f7e063ee5bc4384f07e7384"
+    },
+    "strictMkDocsPassed": true
+  },
+  "boundaries": {
+    "deviceInteraction": false,
+    "network": false,
+    "appVersionChanged": false,
+    "roomVersion": "1.181/code175",
+    "publication": false,
+    "wholeProductComplete": false,
+    "heldIssueClocksChanged": false
+  },
+  "verificationCompletedAt": "2026-11-04T23:08:42.829833+00:00",
+  "elapsedMinutesAtVerification": 11.347163883333334
+}

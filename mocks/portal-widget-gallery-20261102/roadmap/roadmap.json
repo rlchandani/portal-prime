@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T22:54:18.016710+00:00",
-  "updatedLabel": "4 November2026 \u00b71.181 startup focus option delivered",
+  "updatedAt": "2026-11-04T23:07:48.418090+00:00",
+  "updatedLabel": "4 November2026 · offline settings fingerprint helper verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,44 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "settings-layout-fingerprint-helper",
+      "title": "Delivery: verify saved settings/layout fingerprints",
+      "summary": "Offline helper replaces ad hoc reconstruction of Android snapshot revisions.",
+      "status": "delivered",
+      "kind": "Bounded offline delivery tooling",
+      "platforms": [
+        "tooling"
+      ],
+      "owner": "Root implementation; independent source review",
+      "verification": "315 Python checks pass; four prior Android room revisions and saved Family snapshot match.",
+      "deployment": "Local tooling only; both rooms remain1.181/code175.",
+      "acceptance": [
+        "Match existing Android canonicalization for supported settings/layout types.",
+        "Report match, mismatch or invalid input without captured values.",
+        "Perform no network requests or device changes."
+      ],
+      "evidence": [
+        {
+          "text": "Guide, verification and limitations",
+          "source": "docs/portal-settings-fingerprint-2026-11-04.md"
+        }
+      ],
+      "limits": [
+        "Fingerprint verification alone does not prove complete snapshot validity, device identity or equality between two captures.",
+        "Floats and lone surrogates are unsupported; duplicate captured JSON keys are rejected.",
+        "Five-minute discovery cap was exceeded; original issue clock retained.",
+        "Held screensaver issues remain open with their existing clocks."
+      ],
+      "next": "Use on saved snapshots during later deliveries; continue the actionable product queue.",
+      "issueClock": {
+        "startedAt": "2026-11-04T22:57:22Z",
+        "target": "2026-11-04T23:12:22Z",
+        "deadline": "2026-11-04T23:27:22Z",
+        "firstDiscoveryClockRetained": true,
+        "fiveMinuteDiscoveryCapExceeded": true
+      }
+    },
     {
       "id": "startup-app-foreground",
       "title": "Startup: keep a chosen app visible after boot",
