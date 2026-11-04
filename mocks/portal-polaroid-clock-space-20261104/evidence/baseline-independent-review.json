@@ -1,0 +1,822 @@
+{
+  "recordedAtUtc": "2026-11-04T09:04:12.390635+00:00",
+  "clock": {
+    "observedAtUtc": "2026-11-04T08:48:03Z",
+    "hardDeadlineUtc": "2026-11-04T09:18:03Z",
+    "reset": false
+  },
+  "classification": "INDEPENDENT_REPLAY_OF_GENERATED_NATIVE_BASELINE_AND_FROZEN_FIXTURE",
+  "fixtureSources": [
+    {
+      "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/native/PolaroidClockActivity.java",
+      "bytes": 19633,
+      "sha256": "7cf385aba9af4e030ff6ed87eb49fa51e666b0fb54714f40a66bf82a7b3e65c3"
+    },
+    {
+      "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/native/build.sh",
+      "bytes": 1120,
+      "sha256": "36070028da53a7334b33c2b9241525273b534aea2d96df788823057c2b151458"
+    },
+    {
+      "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/native/AndroidManifest.xml",
+      "bytes": 506,
+      "sha256": "255c904b590acef33a6d651ca06597cb8df40076a6f0288973cd76f5808a4836"
+    },
+    {
+      "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/native/RUN.md",
+      "bytes": 1171,
+      "sha256": "4dd19d34a701fcfa2bece3da200d39a0afd6947a740d560bef9f2da435d8dc43"
+    }
+  ],
+  "logicalGateBindings": {
+    "bootstrapAndComputedState": {
+      "bytes": 4563,
+      "sha256": "22a847ad5e62d4ed370b8d914263ac9d598bdb4a57a3c486576c894b62581434"
+    },
+    "computedAndReservationGates": {
+      "bytes": 3624,
+      "sha256": "81e548a76925b28f9a60ffa13221e5831ef7ba529f104730f98c1abadd3515b2"
+    },
+    "nativePixelGates": {
+      "bytes": 3361,
+      "sha256": "48905e2b28cbffebd2ff51a357748fef7544388d916de731161ace3a2126d798"
+    },
+    "retirementAndReport": {
+      "bytes": 1440,
+      "sha256": "3d262dd0ce0e4443a67e9ea62e11523ac947c207a44e1b85cd3878aea178a8d1"
+    }
+  },
+  "frozenCopies": [
+    {
+      "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/native/frozen-PolaroidClockActivity.java.txt",
+      "bytes": 19633,
+      "sha256": "7cf385aba9af4e030ff6ed87eb49fa51e666b0fb54714f40a66bf82a7b3e65c3"
+    },
+    {
+      "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/native/frozen-build.sh.txt",
+      "bytes": 1120,
+      "sha256": "36070028da53a7334b33c2b9241525273b534aea2d96df788823057c2b151458"
+    }
+  ],
+  "baselineFixture": {
+    "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/baseline-fixture.apk",
+    "bytes": 16835050,
+    "sha256": "7ede52a7a1d4bcf213236ff66f04a24b511b6969568ffd79f93cd1299b563d9d"
+  },
+  "baselineEmbeddedSource": {
+    "bytes": 25886307,
+    "sha256": "38c2b5ad41b2bfd61c16dd48cab87324bd71ac215123d17cd281269a0cd21cec",
+    "exactRetainedRollbackBytes": true
+  },
+  "fixtureDex": {
+    "bytes": 28400,
+    "sha256": "3c399073e9aa26f56d72164e5f150be872e940ca0a067f2a0e877aa105b2c492"
+  },
+  "baselineReport": {
+    "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/native-before-report.json",
+    "bytes": 32860,
+    "sha256": "3b44691375843bb9b4fa423a9c7c8eacc0cf24dffbd6a50c07a4594c1ab0844a"
+  },
+  "retainedCollectorFailureLog": {
+    "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/native-before.log",
+    "bytes": 477,
+    "sha256": "f2c3185f07d30b5fd19ac48870a70aa185c17f310ae0e317d44f50aad95a5ad8"
+  },
+  "collectorAdmission": {
+    "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/baseline-report-admission.json",
+    "bytes": 285,
+    "sha256": "357868cd79a8bb237788c0b01e4f8e89a13b9381312d5cc8e22abba85818a559"
+  },
+  "rootRetirementRecord": {
+    "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/native-before-retirement.json",
+    "bytes": 81,
+    "sha256": "3d1c0a8c70d54d7caab181facc3d99873dd3ab1e58ed88f7b8510e891fd8771d"
+  },
+  "nativeReportAdmission": {
+    "actualError": "clock_reservation_failed",
+    "reservationFailureScenes": 3,
+    "computedControlsPassed": true,
+    "unknownRequests": 0,
+    "webViewDestroyed": true,
+    "collectorWrongLiteralIsHarnessOnly": true,
+    "noRerun": true
+  },
+  "independentReplay": {
+    "intersectionsPerScene": [
+      1,
+      1,
+      5
+    ],
+    "intersectionsTotal": 7,
+    "photoCornersPass": 32,
+    "paperBordersPass": 8,
+    "allGeometryAndDprMappingAgrees": true,
+    "pixelThresholdUnchanged": 18,
+    "pixelReplayOrigin": "Screenshot size equals full WebView and CSS dimensions*dpr, so full-window origin0; sample rounding uses Java positive Math.round equivalent.",
+    "scenes": [
+      {
+        "shape": "bottom-clock-landscape",
+        "recomputedIntersections": [
+          {
+            "photoId": 0,
+            "reservation": "bottom-clock",
+            "intersectionWidth": 684.2439575195312,
+            "intersectionHeight": 247.661865234375
+          }
+        ],
+        "intersectionCount": 1,
+        "geometryMatchesNativeReport": true,
+        "bridgeDprMappingRechecked": true,
+        "nativeScreenshot": {
+          "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/before-polaroid-bottom-clock-landscape.png",
+          "bytes": 556913,
+          "sha256": "c09a775761c4bf5676318b90203bb425cec36364064624cf7be234cac614531d"
+        },
+        "replayedPixels": [
+          {
+            "photoId": 0,
+            "corner": 0,
+            "position": [
+              1021,
+              807
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 1,
+            "position": [
+              1643,
+              857
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 2,
+            "position": [
+              985,
+              1261
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 3,
+            "position": [
+              1607,
+              1311
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "paperBorder": true,
+            "position": [
+              965,
+              1031
+            ],
+            "rgb": [
+              251,
+              250,
+              246
+            ],
+            "channelDistance": 0,
+            "pass": true
+          }
+        ],
+        "recordedDoodleContrastSamples": 6741,
+        "thresholdsUnchanged": "Photo/paper channel-distance limit18; doodle native local contrast threshold25 and minimum20 recorded in unchanged fixture."
+      },
+      {
+        "shape": "side-clock-portrait",
+        "recomputedIntersections": [
+          {
+            "photoId": 1,
+            "reservation": "side-clock",
+            "intersectionWidth": 135.064697265625,
+            "intersectionHeight": 916.2504272460938
+          }
+        ],
+        "intersectionCount": 1,
+        "geometryMatchesNativeReport": true,
+        "bridgeDprMappingRechecked": true,
+        "nativeScreenshot": {
+          "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/before-polaroid-side-clock-portrait.png",
+          "bytes": 627669,
+          "sha256": "415d85c8051fc6d6db9ee312f10663b95fc20572f5fe26899f221a9dbc014371"
+        },
+        "replayedPixels": [
+          {
+            "photoId": 1,
+            "corner": 0,
+            "position": [
+              1130,
+              438
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 1,
+            "position": [
+              1601,
+              475
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 2,
+            "position": [
+              1063,
+              1267
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 3,
+            "position": [
+              1534,
+              1305
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "paperBorder": true,
+            "position": [
+              1051,
+              849
+            ],
+            "rgb": [
+              251,
+              250,
+              246
+            ],
+            "channelDistance": 0,
+            "pass": true
+          }
+        ],
+        "recordedDoodleContrastSamples": 6087,
+        "thresholdsUnchanged": "Photo/paper channel-distance limit18; doodle native local contrast threshold25 and minimum20 recorded in unchanged fixture."
+      },
+      {
+        "shape": "clock-panel-mixed-six",
+        "recomputedIntersections": [
+          {
+            "photoId": 1,
+            "reservation": "side-panel",
+            "intersectionWidth": 318.576416015625,
+            "intersectionHeight": 583.9996948242188
+          },
+          {
+            "photoId": 2,
+            "reservation": "bottom-clock",
+            "intersectionWidth": 552.055908203125,
+            "intersectionHeight": 291.98992919921875
+          },
+          {
+            "photoId": 4,
+            "reservation": "bottom-clock",
+            "intersectionWidth": 583.9996948242188,
+            "intersectionHeight": 228.57199096679688
+          },
+          {
+            "photoId": 4,
+            "reservation": "side-panel",
+            "intersectionWidth": 394.39556884765625,
+            "intersectionHeight": 493.9632873535156
+          },
+          {
+            "photoId": 5,
+            "reservation": "bottom-clock",
+            "intersectionWidth": 349.47454833984375,
+            "intersectionHeight": 291.9805908203125
+          }
+        ],
+        "intersectionCount": 5,
+        "geometryMatchesNativeReport": true,
+        "bridgeDprMappingRechecked": true,
+        "nativeScreenshot": {
+          "path": "/private/tmp/portal-polaroid-clock-space-20261104-084803/before-polaroid-clock-panel-mixed-six.png",
+          "bytes": 622451,
+          "sha256": "f42ecb75e9f775c3359b9fa9d6b4cdf0db2de8fa5828ac108e55971fdd2819c7"
+        },
+        "replayedPixels": [
+          {
+            "photoId": 0,
+            "corner": 0,
+            "position": [
+              802,
+              236
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 1,
+            "position": [
+              1301,
+              166
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 2,
+            "position": [
+              853,
+              600
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "corner": 3,
+            "position": [
+              1352,
+              531
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 0,
+            "paperBorder": true,
+            "position": [
+              795,
+              423
+            ],
+            "rgb": [
+              251,
+              250,
+              246
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 0,
+            "position": [
+              1693,
+              82
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 1,
+            "position": [
+              1989,
+              78
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 2,
+            "position": [
+              1699,
+              605
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "corner": 3,
+            "position": [
+              1996,
+              601
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 1,
+            "paperBorder": true,
+            "position": [
+              1662,
+              344
+            ],
+            "rgb": [
+              251,
+              250,
+              246
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 2,
+            "corner": 0,
+            "position": [
+              114,
+              821
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 2,
+            "corner": 1,
+            "position": [
+              610,
+              805
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 2,
+            "corner": 2,
+            "position": [
+              129,
+              1317
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 2,
+            "corner": 3,
+            "position": [
+              626,
+              1302
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 2,
+            "paperBorder": true,
+            "position": [
+              82,
+              1071
+            ],
+            "rgb": [
+              251,
+              250,
+              246
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 3,
+            "corner": 0,
+            "position": [
+              85,
+              126
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 3,
+            "corner": 1,
+            "position": [
+              653,
+              187
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 3,
+            "corner": 2,
+            "position": [
+              71,
+              257
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 3,
+            "corner": 3,
+            "position": [
+              639,
+              318
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 3,
+            "paperBorder": true,
+            "position": [
+              58,
+              189
+            ],
+            "rgb": [
+              251,
+              250,
+              246
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 4,
+            "corner": 0,
+            "position": [
+              1545,
+              830
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 4,
+            "corner": 1,
+            "position": [
+              2079,
+              861
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 4,
+            "corner": 2,
+            "position": [
+              1523,
+              1221
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 4,
+            "corner": 3,
+            "position": [
+              2057,
+              1251
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 4,
+            "paperBorder": true,
+            "position": [
+              1500,
+              1024
+            ],
+            "rgb": [
+              251,
+              250,
+              246
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 5,
+            "corner": 0,
+            "position": [
+              924,
+              799
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 5,
+            "corner": 1,
+            "position": [
+              1223,
+              798
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 5,
+            "corner": 2,
+            "position": [
+              926,
+              1325
+            ],
+            "rgb": [
+              255,
+              255,
+              0
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 5,
+            "corner": 3,
+            "position": [
+              1225,
+              1324
+            ],
+            "rgb": [
+              255,
+              0,
+              255
+            ],
+            "channelDistance": 0,
+            "pass": true
+          },
+          {
+            "photoId": 5,
+            "paperBorder": true,
+            "position": [
+              892,
+              1062
+            ],
+            "rgb": [
+              251,
+              250,
+              246
+            ],
+            "channelDistance": 0,
+            "pass": true
+          }
+        ],
+        "recordedDoodleContrastSamples": 393,
+        "thresholdsUnchanged": "Photo/paper channel-distance limit18; doodle native local contrast threshold25 and minimum20 recorded in unchanged fixture."
+      }
+    ]
+  },
+  "sourceChangesByReviewer": 0,
+  "deviceCommandsByReviewer": 0,
+  "nativeRerunsByReviewer": 0,
+  "limits": [
+    "Generated occupied bridge rectangles and actual embedded source assets only; no real clock/FaceRenderer/native geometry acceptance.",
+    "No clock UI drawn; hidden generated DOM reservations measured for fixture wire snapshot.",
+    "Baseline independently replayed from retained report/PNGs; reviewer did not execute native fixture.",
+    "Doodle margin sample counts independently read from report; original threshold logic hash-frozen, not changed or fully rescanned here.",
+    "No candidate/fix acceptance until exact candidate report is independently reviewed."
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "status": "accepted_no_blocker",
+  "reviewedAtUtc": "2026-11-04T09:03:09.906Z",
+  "fixedClock": {
+    "start": "2026-11-04T08:48:03Z",
+    "hardDeadline": "2026-11-04T09:18:03Z"
+  },
+  "hashes": {
+    "beforeMode": "16db1979764b497ecb2d3bed3ed42835e43962ad8705d970729f0b66b8858ea0",
+    "candidateMode": "6cfa1ba98a8169f8d2f58615454c7d4381c834c9fc1513895accd87895b1fad0",
+    "helper": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+    "frozenRegression": "92fa6acebabbda02a3726e5643f2d22f548b4ff1b64a021181d02f10d8cda2b6",
+    "lifecycleTests": "f1951c96f3020d1b3fae8c65acd52b02a67ebbb335cb11fdedc4b0a5d2e7f589"
+  },
+  "nonTargetSourceBytesExact": true,
+  "independentTests": {
+    "command": "node --test scripts/tests/slideshow_polaroid_reservations.test.mjs scripts/tests/slideshow_polaroid_lifecycle.test.mjs",
+    "tests": 20,
+    "pass": 20,
+    "fail": 0,
+    "exit": 0
+  },
+  "pairedTraces": {
+    "method": "Actual existing helper in-memory using frozen/current mode bytes, current identical CSS; seven established checkpoints. Normalization removes only width,height,padding,left,top from paper-card/photo styles and computed values. Every other node value, opacity, transform/rotation, resource admission/order, load, cursor and timer compared exactly.",
+    "trace": [
+      {
+        "photoMotion": "undefined",
+        "before": {
+          "fullHash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+          "normalizedHash": "c87d29171b5d626b1ad28ddc3830a91ee972183e0c8922b29a0ae3e215782cf2",
+          "draws": 44,
+          "resources": 11,
+          "loads": 11,
+          "cursor": 11,
+          "timers": [
+            30000
+          ]
+        },
+        "candidate": {
+          "fullHash": "9265a46eae766e341903322fedaf76800aa12e1a6c708499a338fd0489994598",
+          "normalizedHash": "c87d29171b5d626b1ad28ddc3830a91ee972183e0c8922b29a0ae3e215782cf2",
+          "draws": 44,
+          "resources": 11,
+          "loads": 11,
+          "cursor": 11,
+          "timers": [
+            30000
+          ]
+        },
+        "normalizedExact": true
+      },
+      {
+        "photoMotion": true,
+        "before": {
+          "fullHash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+          "normalizedHash": "c87d29171b5d626b1ad28ddc3830a91ee972183e0c8922b29a0ae3e215782cf2",
+          "draws": 44,
+          "resources": 11,
+          "loads": 11,
+          "cursor": 11,
+          "timers": [
+            30000
+          ]
+        },
+        "candidate": {
+          "fullHash": "9265a46eae766e341903322fedaf76800aa12e1a6c708499a338fd0489994598",
+          "normalizedHash": "c87d29171b5d626b1ad28ddc3830a91ee972183e0c8922b29a0ae3e215782cf2",
+          "draws": 44,
+          "resources": 11,
+          "loads": 11,
+          "cursor": 11,
+          "timers": [
+            30000
+          ]
+        },
+        "normalizedExact": true
+      },
+      {
+        "photoMotion": false,
+        "before": {
+          "fullHash": "ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007",
+          "normalizedHash": "c87d29171b5d626b1ad28ddc3830a91ee972183e0c8922b29a0ae3e215782cf2",
+          "draws": 44,
+          "resources": 11,
+          "loads": 11,
+          "cursor": 11,
+          "timers": [
+            30000
+          ]
+        },
+        "candidate": {
+          "fullHash": "9265a46eae766e341903322fedaf76800aa12e1a6c708499a338fd0489994598",
+          "normalizedHash": "c87d29171b5d626b1ad28ddc3830a91ee972183e0c8922b29a0ae3e215782cf2",
+          "draws": 44,
+          "resources": 11,
+          "loads": 11,
+          "cursor": 11,
+          "timers": [
+            30000
+          ]
+        },
+        "normalizedExact": true
+      }
+    ]
+  },
+  "review": {
+    "reservation": "Existing SS.photoLayoutArea reused; original COLS/ROWS/freeCells and selection preserved; area offsets and bounded paper-fit sizes are deliberate geometry change.",
+    "scatter": "Rotation and numeric x/y biases sampled once per fresh photo; Number conversion preserves44 real fixture coercions and prevents redraw on reflow.",
+    "lifecycle": "Resize listener coalesces with resizePending; existing owner t.frame holds while paused and ignores cancelled work; cleanup removes listener and clears owner before releasing every print. No new decode, selection or timer owner.",
+    "nonTarget": "All bytes before Polaroid and after Mosaic header identical to frozen production baseline."
+  },
+  "limits": [
+    "Host generated reservation/lifecycle fixtures are bounded source evidence; native overlays, optimized runtime, clock appearance and device install outcomes remain coordinator-owned.",
+    "Fixed original grid count is retained across resize; no repacking/extra random selection claim.",
+    "Existing helper max32reservations/max16candidates and fallback behavior are unchanged; full-occluded/pathological tiny-area behavior is outside this correction.",
+    "No device, household, owner registry, provider/account, browser or network actions."
+  ],
+  "blockers": []
+}

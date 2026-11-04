@@ -756,9 +756,9 @@
   MODES.polaroid = { name: "Polaroid Scatter", run(ctx, deck) {
     const t = makeTimers(ctx), table = el("ss-table", ctx.root), MAX = SS.slots(deck, 6);
     let live = [], disposed = false, paused = false, fading = null;
+    let area = SS.photoLayoutArea(ctx), resizePending = false;
     const now = () => typeof performance !== "undefined" ? performance.now() : Date.now();
     const COLS = Math.min(MAX, Math.ceil(Math.sqrt(MAX * ctx.W / ctx.H))), ROWS = Math.ceil(MAX / COLS);
-    const cellW = ctx.W / COLS, cellH = ctx.H / ROWS;
     const freeCells = window.shuffled(Array.from({ length: COLS * ROWS }, (_, i) => i)).slice(0, MAX);
     // Six live prints and one reusable incoming owner. Resting paper never asks
     // for permanent promotion; no guessed date, event or place belongs on it.
@@ -776,11 +776,13 @@
       print.card.style.transform = "none"; print.card.style.willChange = "auto";
       print.image.style.backgroundImage = "none"; print.photo = null;
     }
-    function layout(print, photo, cell) {
+    function layout(print, photo, cell, retained = false) {
+      const cellW = area.w / COLS, cellH = area.h / ROWS;
       const raw = aspect(photo), ratio = Number.isFinite(raw) && raw > 0 ? raw : 1;
       const pad = Math.max(8, Math.min(28, Math.min(cellW, cellH) * .045));
       const edge = Math.max(4, Math.min(22, Math.min(cellW, cellH) * .035)), chin = edge * 2.5;
-      const rotation = (Math.random() * 2 - 1) * 8, angle = Math.abs(rotation) * Math.PI / 180;
+      const rotation = retained ? print.rotation : (Math.random() * 2 - 1) * 8;
+      const angle = Math.abs(rotation) * Math.PI / 180;
       const cos = Math.cos(angle), sin = Math.sin(angle), baseW = ratio >= 1 ? 600 : 480, baseH = baseW / ratio;
       // Fit the rotated PAPER envelope, not only its unrotated photograph.
       const scale = Math.max(Number.EPSILON, Math.min(1,
@@ -788,15 +790,27 @@
         (cellH - pad * 2 - sin * edge * 2 - cos * (edge + chin)) / (sin * baseW + cos * baseH)));
       const pw = baseW * scale, ph = baseH * scale, W = pw + edge * 2, H = ph + edge + chin;
       const boundW = cos * W + sin * H, boundH = sin * W + cos * H;
-      const cx = (cell % COLS) * cellW, cy = Math.floor(cell / COLS) * cellH;
-      const x = cx + pad + boundW / 2 + Math.random() * Math.max(0, cellW - pad * 2 - boundW);
-      const y = cy + pad + boundH / 2 + Math.random() * Math.max(0, cellH - pad * 2 - boundH);
+      const cx = area.x + (cell % COLS) * cellW, cy = area.y + Math.floor(cell / COLS) * cellH;
+      if (!retained) { print.biasX = Number(Math.random()); print.biasY = Number(Math.random()); }
+      const x = cx + pad + boundW / 2 + print.biasX * Math.max(0, cellW - pad * 2 - boundW);
+      const y = cy + pad + boundH / 2 + print.biasY * Math.max(0, cellH - pad * 2 - boundH);
       print.card.style.width = W + "px"; print.card.style.height = H + "px";
       print.card.style.padding = `${edge}px ${edge}px ${chin}px`;
       print.card.style.left = (x - W / 2) + "px"; print.card.style.top = (y - H / 2) + "px";
       print.image.style.width = pw + "px"; print.image.style.height = ph + "px";
       print.target = `rotate(${rotation}deg) scale(1)`; print.rotation = rotation;
     }
+    function onResize() {
+      if (disposed || resizePending) return;
+      resizePending = true;
+      t.frame(() => {
+        resizePending = false;
+        if (disposed) return;
+        area = SS.photoLayoutArea(ctx);
+        pool.forEach(print => { if (print.photo) layout(print, print.photo, print.cell, true); });
+      });
+    }
+    if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     function settle(request = fading) {
       if (disposed || paused || !request || fading !== request) return;
       const incoming = request.incoming.card;
@@ -846,6 +860,7 @@
     const cleanup = () => {
       if (disposed) return;
       disposed = true; t.cleanup(); fading = null;
+      if (typeof window.removeEventListener === "function") window.removeEventListener("resize", onResize);
       pool.forEach(release); live = []; table.remove();
     };
     Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });

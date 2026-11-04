@@ -1,0 +1,8 @@
+{
+  "fixtureSha256": "701c5273201fac72a0e5eee88a8faa801ecd27197c135646c314539bb1a6b3da",
+  "fixtureBytes": 16835050,
+  "javaSha256": "7cf385aba9af4e030ff6ed87eb49fa51e666b0fb54714f40a66bf82a7b3e65c3",
+  "embeddedApkSha256": "7af09cb1e3245b773c7b0940d8841615fadab643981720d42735a095d74a7b28",
+  "logicalGatesByteIdenticalToBaseline": true,
+  "zeroPermissions": true
+}

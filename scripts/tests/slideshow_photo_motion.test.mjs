@@ -52,6 +52,7 @@ function snapshot(r) {
 // Sidebar doodles change only matte background-image/size; normalized traces retain the prior hash.
 // Diptych/Memories/Panorama reuse those matte fields; their normalized traces also remain pinned.
 // Cinema matte fields preserve the previous normalized trace; its pseudo-frame needs native visual checks.
+// Polaroid now fits the existing reserved photo area; rotation, random draws, resources and timers stay pinned.
 const legacyOutput = [
   ['kenBurns', 30, '3005c1e70712a249dbedd01585276ccadca7bfa140b86375ba5963d57c15ad63'],
   ['diptych', 12, 'fa7c72dbfe5deacf62899a1ae17aa0c6eeaf21e1d95901012bc702c23247beef'],
@@ -63,7 +64,7 @@ const legacyOutput = [
   ['cinema', 0, '05ab8f802f34a45f48a16ea90a0f485df8647abceb1f2226fc32abc62fa868d1'],
   ['heroSidebar', 0, 'a68aba7d77b716bdafc6e05b798aca2ec4c7664807cc5b8d76ab667fc5b5a09c'],
   ['galleryWall', 5, '15c1332c17a3e9be02d7331220f21267d81578589fca920ac208a3d9a0ac8702'],
-  ['polaroid', 44, 'ab29d2674954ba5667b297904c3f63621a43ce5f9d5b6d7b716b503cda202007'],
+  ['polaroid', 44, '9265a46eae766e341903322fedaf76800aa12e1a6c708499a338fd0489994598'],
   ['filmstrip', 0, 'e55bbd40fc31709d71052f73d61ea3de6333fa2b804527a014cb5d79bde5e677'],
 ];
 for (const [mode, selections, output] of legacyOutput) {

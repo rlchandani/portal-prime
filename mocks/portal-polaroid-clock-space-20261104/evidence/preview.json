@@ -1,0 +1,25 @@
+{
+  "actualProductionEntryPoint": true,
+  "mode": "polaroid",
+  "simulatedClockOnly": true,
+  "initialViewport": [
+    2560,
+    1099
+  ],
+  "initialPrints": 6,
+  "initialReservedClockIntersections": 0,
+  "resizedViewport": [
+    1200,
+    770
+  ],
+  "resizedPrints": 6,
+  "resizedReservedClockIntersections": 0,
+  "allWholePhotosAndPaperEnvelopesInside": true,
+  "screenshotDisplayedAndViewed": ".playwright-mcp/page-2026-11-04T09-04-04-720Z.png",
+  "ownedIsolatedTabClosed": true,
+  "existingUserIabTabsUnchanged": true,
+  "limits": [
+    "Bundled samples and simulated desktop clock only; no actual Android FaceRenderer clock or device resize acceptance.",
+    "URL alone leaves default Mosaic control; observed Layout selection selected Polaroid before acceptance."
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "retainedCollectorFailure": "Expected wrong literal paper_intersects_reserved_space; actual frozen fixture emits clock_reservation_failed",
+  "actualFixtureReportAdmitted": true,
+  "clockFailureScenes": 3,
+  "computedAndNativePixelControlsPassed": true,
+  "rerunRequired": false
+}

@@ -1,0 +1,1103 @@
+{
+  "ok": true,
+  "error": null,
+  "observations": [
+    {
+      "ready": true,
+      "svgDecoded": true,
+      "shape": "bottom-clock-landscape",
+      "reservations": [
+        {
+          "id": "bottom-clock",
+          "left": 0,
+          "top": 998.388916015625,
+          "right": 1920,
+          "bottom": 1279.9861450195312
+        }
+      ],
+      "bridgeSnapshot": {
+        "width": 2160,
+        "height": 1440,
+        "occupied": [
+          {
+            "left": 0,
+            "top": 1123.1875305175781,
+            "right": 2160,
+            "bottom": 1439.9844131469727
+          }
+        ]
+      },
+      "availablePhotoArea": {
+        "x": 35.84,
+        "y": 35.84,
+        "w": 1848.32,
+        "h": 926.7089160156249
+      },
+      "gradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+      "expectedGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+      "pseudo": {
+        "content": "\"\"",
+        "background": "url(\"https://polaroid-clock.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "pointerEvents": "none",
+        "zIndex": "auto",
+        "insets": [
+          "0px",
+          "0px",
+          "0px",
+          "0px"
+        ]
+      },
+      "cards": [
+        {
+          "known": true,
+          "id": 0,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 811.9752807617188,
+            "y": 354.8241882324219,
+            "w": 684.2439575195312,
+            "h": 577.0182495117188
+          },
+          "imageWidth": 600,
+          "imageHeight": 450,
+          "corners": [
+            {
+              "x": 895.0945435000001,
+              "y": 402.76392875
+            },
+            {
+              "x": 1448.3018935000002,
+              "y": 447.3368112500001
+            },
+            {
+              "x": 862.568386,
+              "y": 806.45577875
+            },
+            {
+              "x": 1415.7757360000003,
+              "y": 851.0286612500001
+            }
+          ],
+          "paperPoint": {
+            "x": 845.43966975,
+            "y": 601.9194185000001
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.99677, 0.0803115, -0.0803115, 0.99677, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/0.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        }
+      ],
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 1,
+      "photoRequests": 1,
+      "paperAvoidsOccupiedRectangles": true,
+      "paperReservationIntersections": [],
+      "clockReservationChecks": 1,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "polaroid-bottom-clock-landscape.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "matteSamplesAwayFromPaperAndShadows": 571975,
+      "quietDoodleLocalContrastSamples": 6616
+    },
+    {
+      "ready": true,
+      "svgDecoded": true,
+      "shape": "side-clock-portrait",
+      "reservations": [
+        {
+          "id": "side-clock",
+          "left": 1344,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1280
+        }
+      ],
+      "bridgeSnapshot": {
+        "width": 2160,
+        "height": 1440,
+        "occupied": [
+          {
+            "left": 1512,
+            "top": 0,
+            "right": 2160,
+            "bottom": 1440
+          }
+        ]
+      },
+      "availablePhotoArea": {
+        "x": 35.84,
+        "y": 35.84,
+        "w": 1272.32,
+        "h": 1208.32
+      },
+      "gradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+      "expectedGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+      "pseudo": {
+        "content": "\"\"",
+        "background": "url(\"https://polaroid-clock.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "pointerEvents": "none",
+        "zIndex": "auto",
+        "insets": [
+          "0px",
+          "0px",
+          "0px",
+          "0px"
+        ]
+      },
+      "cards": [
+        {
+          "known": true,
+          "id": 1,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 484.8658447265625,
+            "y": 297.7359619140625,
+            "w": 592.7405395507812,
+            "h": 916.2504272460938
+          },
+          "imageWidth": 480,
+          "imageHeight": 800,
+          "corners": [
+            {
+              "x": 602.9556947499999,
+              "y": 353.74997999999994
+            },
+            {
+              "x": 1021.5990947500001,
+              "y": 387.4808099999999
+            },
+            {
+              "x": 543.5251847499999,
+              "y": 1091.35978
+            },
+            {
+              "x": 962.16858475,
+              "y": 1125.09061
+            }
+          ],
+          "paperPoint": {
+            "x": 532.37286975,
+            "y": 719.2621085
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.99677, 0.0803115, -0.0803115, 0.99677, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/1.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        }
+      ],
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 2,
+      "photoRequests": 2,
+      "paperAvoidsOccupiedRectangles": true,
+      "paperReservationIntersections": [],
+      "clockReservationChecks": 1,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "polaroid-side-clock-portrait.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "matteSamplesAwayFromPaperAndShadows": 516940,
+      "quietDoodleLocalContrastSamples": 6035
+    },
+    {
+      "ready": true,
+      "svgDecoded": true,
+      "shape": "clock-panel-mixed-six",
+      "reservations": [
+        {
+          "id": "bottom-clock",
+          "left": 0,
+          "top": 960,
+          "right": 1920,
+          "bottom": 1280
+        },
+        {
+          "id": "side-panel",
+          "left": 1497.5972900390625,
+          "top": 0,
+          "right": 1919.9861755371094,
+          "bottom": 1280
+        }
+      ],
+      "bridgeSnapshot": {
+        "width": 2160,
+        "height": 1440,
+        "occupied": [
+          {
+            "left": 0,
+            "top": 1080,
+            "right": 2160,
+            "bottom": 1440
+          },
+          {
+            "left": 1684.7969512939453,
+            "top": 0,
+            "right": 2159.984447479248,
+            "bottom": 1440
+          }
+        ]
+      },
+      "availablePhotoArea": {
+        "x": 35.84,
+        "y": 35.84,
+        "w": 1425.9172900390624,
+        "h": 888.3199999999999
+      },
+      "gradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+      "expectedGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+      "pseudo": {
+        "content": "\"\"",
+        "background": "url(\"https://polaroid-clock.fixture/photo-doodles-dark.svg\")",
+        "size": "480px 360px",
+        "repeat": "repeat",
+        "pointerEvents": "none",
+        "zIndex": "auto",
+        "insets": [
+          "0px",
+          "0px",
+          "0px",
+          "0px"
+        ]
+      },
+      "cards": [
+        {
+          "known": true,
+          "id": 0,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 531.1204223632812,
+            "y": 81.95157623291016,
+            "w": 435.32861328125,
+            "h": 377.9024353027344
+          },
+          "imageWidth": 362.833,
+          "imageHeight": 272.125,
+          "corners": [
+            {
+              "x": 564.039621198925,
+              "y": 161.31510847883746
+            },
+            {
+              "x": 896.430805507375,
+              "y": 114.86824840356249
+            },
+            {
+              "x": 597.933306986425,
+              "y": 403.8710604038375
+            },
+            {
+              "x": 930.324491294875,
+              "y": 357.4242003285625
+            }
+          ],
+          "paperPoint": {
+            "x": 559.8131356915,
+            "y": 285.55175082
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.990378, -0.138391, 0.138391, 0.990378, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/0.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 1,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 1134.6947021484375,
+            "y": 55.827239990234375,
+            "w": 244.34678649902344,
+            "h": 404.1788635253906
+          },
+          "imageWidth": 207.986,
+          "imageHeight": 346.639,
+          "corners": [
+            {
+              "x": 1163.6206023578002,
+              "y": 87.15047938403251
+            },
+            {
+              "x": 1345.5925194235501,
+              "y": 84.74627561633253
+            },
+            {
+              "x": 1167.8565274714101,
+              "y": 407.7636586105075
+            },
+            {
+              "x": 1349.82844453716,
+              "y": 405.3594548428075
+            }
+          ],
+          "paperPoint": {
+            "x": 1144.9684470720802,
+            "y": 247.73148274406
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.999913, -0.0132108, 0.0132108, 0.999913, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/1.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 2,
+          "pw": 600,
+          "ph": 600,
+          "rect": {
+            "x": 97.88558959960938,
+            "y": 499.9831237792969,
+            "w": 381.6038513183594,
+            "h": 404.1726379394531
+          },
+          "imageWidth": 338.264,
+          "imageHeight": 338.264,
+          "corners": [
+            {
+              "x": 131.36767774178,
+              "y": 543.10417089712
+            },
+            {
+              "x": 435.65245006658,
+              "y": 533.4577306597599
+            },
+            {
+              "x": 141.01411797914,
+              "y": 847.3889432219199
+            },
+            {
+              "x": 445.29889030393997,
+              "y": 837.7425029845599
+            }
+          ],
+          "paperPoint": {
+            "x": 111.51729023246,
+            "y": 696.02876012412
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.999498, -0.0316861, 0.0316861, 0.999498, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/2.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 3,
+          "pw": 2400,
+          "ph": 600,
+          "rect": {
+            "x": 55.81742477416992,
+            "y": 90.2823486328125,
+            "w": 435.3234558105469,
+            "h": 196.0047607421875
+          },
+          "imageWidth": 390.444,
+          "imageHeight": 97.6111,
+          "corners": [
+            {
+              "x": 90.13935130443002,
+              "y": 112.77723346996504
+            },
+            {
+              "x": 468.66111448113,
+              "y": 153.28341676156504
+            },
+            {
+              "x": 80.79176096847002,
+              "y": 200.128499076735
+            },
+            {
+              "x": 459.31352414517005,
+              "y": 240.634682368335
+            }
+          ],
+          "paperPoint": {
+            "x": 72.8840392044,
+            "y": 155.10649921995002
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.994323, 0.106404, -0.106404, 0.994323, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/3.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 4,
+          "pw": 800,
+          "ph": 600,
+          "rect": {
+            "x": 1006.4332885742188,
+            "y": 511.0999450683594,
+            "w": 435.3279113769531,
+            "h": 366.5779113769531
+          },
+          "imageWidth": 385.347,
+          "imageHeight": 289.014,
+          "corners": [
+            {
+              "x": 1054.2365913312526,
+              "y": 542.75840702136
+            },
+            {
+              "x": 1410.1040545138276,
+              "y": 563.0598588166799
+            },
+            {
+              "x": 1039.4218261757326,
+              "y": 802.4488442715599
+            },
+            {
+              "x": 1395.2892893583075,
+              "y": 822.7502960668799
+            }
+          ],
+          "paperPoint": {
+            "x": 1024.64196468968,
+            "y": 671.33789243836
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.998377, 0.0569552, -0.0569552, 0.998377, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/4.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        },
+        {
+          "known": true,
+          "id": 5,
+          "pw": 480,
+          "ph": 800,
+          "rect": {
+            "x": 623.9646606445312,
+            "y": 499.97943115234375,
+            "w": 241.83453369140625,
+            "h": 404.1800231933594
+          },
+          "imageWidth": 209.361,
+          "imageHeight": 348.944,
+          "corners": [
+            {
+              "x": 652.7051996165251,
+              "y": 529.3418713541137
+            },
+            {
+              "x": 835.8949754712751,
+              "y": 528.7162250544523
+            },
+            {
+              "x": 653.807557243289,
+              "y": 852.1131347149136
+            },
+            {
+              "x": 836.997333098039,
+              "y": 851.4874884152523
+            }
+          ],
+          "paperPoint": {
+            "x": 632.3986410770821,
+            "y": 690.798738266574
+          },
+          "paperColor": "rgb(251, 250, 246)",
+          "opacity": "1",
+          "visibility": "visible",
+          "transform": "matrix(0.999994, -0.00341527, 0.00341527, 0.999994, 0, 0)",
+          "willChange": "auto",
+          "imageOpacity": "1",
+          "imageVisibility": "visible",
+          "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/5.png\")",
+          "size": "contain",
+          "position": "50% 50%",
+          "animation": "none",
+          "captionCount": 0,
+          "topElementAtPaper": true,
+          "wholePhotoCorners": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "nativePaperBorderPassed": true
+        }
+      ],
+      "ownerOpacity": "1",
+      "ownerVisibility": "visible",
+      "dpr": 1.125,
+      "width": 1920,
+      "height": 1280,
+      "svgRequests": 3,
+      "photoRequests": 8,
+      "paperAvoidsOccupiedRectangles": true,
+      "paperReservationIntersections": [],
+      "clockReservationChecks": 12,
+      "computedChecksPassed": true,
+      "compositorFenceRequested": true,
+      "compositorFenceCompleted": true,
+      "screenshot": "polaroid-clock-panel-mixed-six.png",
+      "pixelCopy": true,
+      "webPixelWidth": 2160,
+      "webPixelHeight": 1440,
+      "matteSamplesAwayFromPaperAndShadows": 322549,
+      "quietDoodleLocalContrastSamples": 4036
+    }
+  ],
+  "svgRequests": 3,
+  "photoRequests": 8,
+  "lastComputedState": {
+    "ready": true,
+    "svgDecoded": true,
+    "shape": "clock-panel-mixed-six",
+    "reservations": [
+      {
+        "id": "bottom-clock",
+        "left": 0,
+        "top": 960,
+        "right": 1920,
+        "bottom": 1280
+      },
+      {
+        "id": "side-panel",
+        "left": 1497.5972900390625,
+        "top": 0,
+        "right": 1919.9861755371094,
+        "bottom": 1280
+      }
+    ],
+    "bridgeSnapshot": {
+      "width": 2160,
+      "height": 1440,
+      "occupied": [
+        {
+          "left": 0,
+          "top": 1080,
+          "right": 2160,
+          "bottom": 1440
+        },
+        {
+          "left": 1684.7969512939453,
+          "top": 0,
+          "right": 2159.984447479248,
+          "bottom": 1440
+        }
+      ]
+    },
+    "availablePhotoArea": {
+      "x": 35.84,
+      "y": 35.84,
+      "w": 1425.9172900390624,
+      "h": 888.3199999999999
+    },
+    "gradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+    "expectedGradient": "radial-gradient(130% 100% at 50% 0%, rgb(42, 39, 36) 0%, rgb(23, 21, 15) 60%, rgb(13, 11, 8) 100%)",
+    "pseudo": {
+      "content": "\"\"",
+      "background": "url(\"https://polaroid-clock.fixture/photo-doodles-dark.svg\")",
+      "size": "480px 360px",
+      "repeat": "repeat",
+      "pointerEvents": "none",
+      "zIndex": "auto",
+      "insets": [
+        "0px",
+        "0px",
+        "0px",
+        "0px"
+      ]
+    },
+    "cards": [
+      {
+        "known": true,
+        "id": 0,
+        "pw": 800,
+        "ph": 600,
+        "rect": {
+          "x": 531.1204223632812,
+          "y": 81.95157623291016,
+          "w": 435.32861328125,
+          "h": 377.9024353027344
+        },
+        "imageWidth": 362.833,
+        "imageHeight": 272.125,
+        "corners": [
+          {
+            "x": 564.039621198925,
+            "y": 161.31510847883746
+          },
+          {
+            "x": 896.430805507375,
+            "y": 114.86824840356249
+          },
+          {
+            "x": 597.933306986425,
+            "y": 403.8710604038375
+          },
+          {
+            "x": 930.324491294875,
+            "y": 357.4242003285625
+          }
+        ],
+        "paperPoint": {
+          "x": 559.8131356915,
+          "y": 285.55175082
+        },
+        "paperColor": "rgb(251, 250, 246)",
+        "opacity": "1",
+        "visibility": "visible",
+        "transform": "matrix(0.990378, -0.138391, 0.138391, 0.990378, 0, 0)",
+        "willChange": "auto",
+        "imageOpacity": "1",
+        "imageVisibility": "visible",
+        "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/0.png\")",
+        "size": "contain",
+        "position": "50% 50%",
+        "animation": "none",
+        "captionCount": 0,
+        "topElementAtPaper": true,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "nativePaperBorderPassed": true
+      },
+      {
+        "known": true,
+        "id": 1,
+        "pw": 480,
+        "ph": 800,
+        "rect": {
+          "x": 1134.6947021484375,
+          "y": 55.827239990234375,
+          "w": 244.34678649902344,
+          "h": 404.1788635253906
+        },
+        "imageWidth": 207.986,
+        "imageHeight": 346.639,
+        "corners": [
+          {
+            "x": 1163.6206023578002,
+            "y": 87.15047938403251
+          },
+          {
+            "x": 1345.5925194235501,
+            "y": 84.74627561633253
+          },
+          {
+            "x": 1167.8565274714101,
+            "y": 407.7636586105075
+          },
+          {
+            "x": 1349.82844453716,
+            "y": 405.3594548428075
+          }
+        ],
+        "paperPoint": {
+          "x": 1144.9684470720802,
+          "y": 247.73148274406
+        },
+        "paperColor": "rgb(251, 250, 246)",
+        "opacity": "1",
+        "visibility": "visible",
+        "transform": "matrix(0.999913, -0.0132108, 0.0132108, 0.999913, 0, 0)",
+        "willChange": "auto",
+        "imageOpacity": "1",
+        "imageVisibility": "visible",
+        "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/1.png\")",
+        "size": "contain",
+        "position": "50% 50%",
+        "animation": "none",
+        "captionCount": 0,
+        "topElementAtPaper": true,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "nativePaperBorderPassed": true
+      },
+      {
+        "known": true,
+        "id": 2,
+        "pw": 600,
+        "ph": 600,
+        "rect": {
+          "x": 97.88558959960938,
+          "y": 499.9831237792969,
+          "w": 381.6038513183594,
+          "h": 404.1726379394531
+        },
+        "imageWidth": 338.264,
+        "imageHeight": 338.264,
+        "corners": [
+          {
+            "x": 131.36767774178,
+            "y": 543.10417089712
+          },
+          {
+            "x": 435.65245006658,
+            "y": 533.4577306597599
+          },
+          {
+            "x": 141.01411797914,
+            "y": 847.3889432219199
+          },
+          {
+            "x": 445.29889030393997,
+            "y": 837.7425029845599
+          }
+        ],
+        "paperPoint": {
+          "x": 111.51729023246,
+          "y": 696.02876012412
+        },
+        "paperColor": "rgb(251, 250, 246)",
+        "opacity": "1",
+        "visibility": "visible",
+        "transform": "matrix(0.999498, -0.0316861, 0.0316861, 0.999498, 0, 0)",
+        "willChange": "auto",
+        "imageOpacity": "1",
+        "imageVisibility": "visible",
+        "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/2.png\")",
+        "size": "contain",
+        "position": "50% 50%",
+        "animation": "none",
+        "captionCount": 0,
+        "topElementAtPaper": true,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "nativePaperBorderPassed": true
+      },
+      {
+        "known": true,
+        "id": 3,
+        "pw": 2400,
+        "ph": 600,
+        "rect": {
+          "x": 55.81742477416992,
+          "y": 90.2823486328125,
+          "w": 435.3234558105469,
+          "h": 196.0047607421875
+        },
+        "imageWidth": 390.444,
+        "imageHeight": 97.6111,
+        "corners": [
+          {
+            "x": 90.13935130443002,
+            "y": 112.77723346996504
+          },
+          {
+            "x": 468.66111448113,
+            "y": 153.28341676156504
+          },
+          {
+            "x": 80.79176096847002,
+            "y": 200.128499076735
+          },
+          {
+            "x": 459.31352414517005,
+            "y": 240.634682368335
+          }
+        ],
+        "paperPoint": {
+          "x": 72.8840392044,
+          "y": 155.10649921995002
+        },
+        "paperColor": "rgb(251, 250, 246)",
+        "opacity": "1",
+        "visibility": "visible",
+        "transform": "matrix(0.994323, 0.106404, -0.106404, 0.994323, 0, 0)",
+        "willChange": "auto",
+        "imageOpacity": "1",
+        "imageVisibility": "visible",
+        "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/3.png\")",
+        "size": "contain",
+        "position": "50% 50%",
+        "animation": "none",
+        "captionCount": 0,
+        "topElementAtPaper": true,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "nativePaperBorderPassed": true
+      },
+      {
+        "known": true,
+        "id": 4,
+        "pw": 800,
+        "ph": 600,
+        "rect": {
+          "x": 1006.4332885742188,
+          "y": 511.0999450683594,
+          "w": 435.3279113769531,
+          "h": 366.5779113769531
+        },
+        "imageWidth": 385.347,
+        "imageHeight": 289.014,
+        "corners": [
+          {
+            "x": 1054.2365913312526,
+            "y": 542.75840702136
+          },
+          {
+            "x": 1410.1040545138276,
+            "y": 563.0598588166799
+          },
+          {
+            "x": 1039.4218261757326,
+            "y": 802.4488442715599
+          },
+          {
+            "x": 1395.2892893583075,
+            "y": 822.7502960668799
+          }
+        ],
+        "paperPoint": {
+          "x": 1024.64196468968,
+          "y": 671.33789243836
+        },
+        "paperColor": "rgb(251, 250, 246)",
+        "opacity": "1",
+        "visibility": "visible",
+        "transform": "matrix(0.998377, 0.0569552, -0.0569552, 0.998377, 0, 0)",
+        "willChange": "auto",
+        "imageOpacity": "1",
+        "imageVisibility": "visible",
+        "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/4.png\")",
+        "size": "contain",
+        "position": "50% 50%",
+        "animation": "none",
+        "captionCount": 0,
+        "topElementAtPaper": true,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "nativePaperBorderPassed": true
+      },
+      {
+        "known": true,
+        "id": 5,
+        "pw": 480,
+        "ph": 800,
+        "rect": {
+          "x": 623.9646606445312,
+          "y": 499.97943115234375,
+          "w": 241.83453369140625,
+          "h": 404.1800231933594
+        },
+        "imageWidth": 209.361,
+        "imageHeight": 348.944,
+        "corners": [
+          {
+            "x": 652.7051996165251,
+            "y": 529.3418713541137
+          },
+          {
+            "x": 835.8949754712751,
+            "y": 528.7162250544523
+          },
+          {
+            "x": 653.807557243289,
+            "y": 852.1131347149136
+          },
+          {
+            "x": 836.997333098039,
+            "y": 851.4874884152523
+          }
+        ],
+        "paperPoint": {
+          "x": 632.3986410770821,
+          "y": 690.798738266574
+        },
+        "paperColor": "rgb(251, 250, 246)",
+        "opacity": "1",
+        "visibility": "visible",
+        "transform": "matrix(0.999994, -0.00341527, 0.00341527, 0.999994, 0, 0)",
+        "willChange": "auto",
+        "imageOpacity": "1",
+        "imageVisibility": "visible",
+        "backgroundImage": "url(\"https://polaroid-clock.fixture/photo/5.png\")",
+        "size": "contain",
+        "position": "50% 50%",
+        "animation": "none",
+        "captionCount": 0,
+        "topElementAtPaper": true,
+        "wholePhotoCorners": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "nativePaperBorderPassed": true
+      }
+    ],
+    "ownerOpacity": "1",
+    "ownerVisibility": "visible",
+    "dpr": 1.125,
+    "width": 1920,
+    "height": 1280,
+    "svgRequests": 3,
+    "photoRequests": 8,
+    "paperAvoidsOccupiedRectangles": true,
+    "paperReservationIntersections": [],
+    "clockReservationChecks": 12,
+    "computedChecksPassed": true,
+    "compositorFenceRequested": true,
+    "compositorFenceCompleted": true,
+    "screenshot": "polaroid-clock-panel-mixed-six.png",
+    "pixelCopy": true,
+    "webPixelWidth": 2160,
+    "webPixelHeight": 1440,
+    "matteSamplesAwayFromPaperAndShadows": 322549,
+    "quietDoodleLocalContrastSamples": 4036
+  },
+  "sceneCount": 3,
+  "reservationFailureScenes": 0,
+  "bridgeSource": "Measured hidden generated DOM rectangles published as window-pixel snapshots; no native FaceRenderer or clock",
+  "scope": "Generated Polaroid clock/panel reservation envelopes, preserved matte and rotated whole-photo paper only; no native FaceRenderer, clock rendering, resize, swapping, scheduler or performance claim",
+  "unknownRequests": 0,
+  "deniedRequestDiagnostics": [],
+  "deniedRequestDiagnosticLimit": 16,
+  "webViewDestroyed": true,
+  "targetAssetSource": "fixture-embedded-uninstalled-source.apk"
+}
