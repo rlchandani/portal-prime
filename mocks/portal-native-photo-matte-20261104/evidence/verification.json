@@ -1,0 +1,134 @@
+{
+  "version": "1.147/code141",
+  "sourceBase": "5dfd13f027e416592cd246b62eda7fae959eaeea",
+  "scope": "Native slideshow static charcoal matte doodles only; opaque compositions, photo geometry, crops, motion, bitmap ownership and timers retained",
+  "originalClock": {
+    "startedAt": "2026-11-04T10:14:38Z",
+    "target": "2026-11-04T10:29:38Z",
+    "deadline": "2026-11-04T10:44:38Z",
+    "sourceBase": "5dfd13f027e416592cd246b62eda7fae959eaeea",
+    "scope": "Native slideshow static charcoal matte doodles only; opaque compositions, photo geometry, crops, motion, bitmap ownership and timers retained",
+    "boundaries": [
+      "No phone/provider/media/account/push/publication",
+      "Root owns devices",
+      "Prior original scopes/clocks retained"
+    ]
+  },
+  "verifiedAt": "2026-11-04T10:27:55.302231+00:00",
+  "goalStatus": "active",
+  "artifacts": {
+    "debug": {
+      "bytes": 46745298,
+      "sha256": "a48c88f0e81a0ba52ae8642419487bff553ab8ae89a6c7d11d258ce3bad1cbdb",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='141' versionName='1.147' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "bytes": 25886647,
+      "sha256": "79f25594cdebe4ac32a2bb3eae0876eb498b00ba7c40b8290d552f6ba8d97e92",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='141' versionName='1.147' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "jvm": {
+    "tests": 4434,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 463
+  },
+  "native": {
+    "captures": 5,
+    "baselineMissingDecoration": 5,
+    "candidatePassed": 5,
+    "photoCornersPerRun": 24,
+    "quietMarks": [
+      3909,
+      4684,
+      4828,
+      511,
+      2574
+    ],
+    "sameFrozenDex": true,
+    "exactNonMatteFieldsRetained": true
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886647,
+      "sha256": "79f25594cdebe4ac32a2bb3eae0876eb498b00ba7c40b8290d552f6ba8d97e92",
+      "app": {
+        "versionCode": 141,
+        "versionName": "1.147"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "status": "ready",
+      "readOnlyReconciliation": true,
+      "additionalInstalls": 0,
+      "bytes": 25886647,
+      "sha256": "79f25594cdebe4ac32a2bb3eae0876eb498b00ba7c40b8290d552f6ba8d97e92",
+      "serviceReady": true,
+      "app": {
+        "versionCode": 141,
+        "versionName": "1.147"
+      },
+      "excludedObserverResult": "Timeout caused by unchanged !=140 guard despite observed code141; retained without overwriting"
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1607,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1696,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "webScreensaverAssetsExact": 10,
+  "independentSourceAccepted": true,
+  "independentNativePixelsAccepted": true,
+  "operationalCorrections": {
+    "candidateHostRepack": "Root and author duplicated identical frozen-DEX candidate repack; no native rerun",
+    "docsDependencies": "Nonexistent docs/requirements.txt failed; requirements-docs.txt corrected, failed log retained",
+    "livingObserver": "Stale !=140 guard timed out after93 observations despite141; read-only full APK reconciliation succeeded, zero additional installs",
+    "receipt": "First aggregate attempted non-APK metadata key; explicit debug/performance iteration corrected before queue/state mutation"
+  },
+  "limits": [
+    "Generated actual debug Family/API29 software Canvas only; compositor, live motion/dissolve, native clock/host, optimized runtime/API28/Living visuals/performance remain separate.",
+    "Saved Shuffle/fit retained; native style support does not prove current selection.",
+    "No phone/provider/media/account/push/publication."
+  ]
+}

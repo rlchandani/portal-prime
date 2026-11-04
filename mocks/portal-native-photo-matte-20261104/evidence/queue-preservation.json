@@ -1,0 +1,17 @@
+{
+  "previousTasks": 138,
+  "currentTasks": 139,
+  "counts": {
+    "delivered": 89,
+    "verified": 40,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "allOldObjectsIdentical": true,
+  "rawPreviousTaskSuffixBytes": 453077,
+  "rawPreviousTaskSuffixSha256": "bd84fe91acbee61da5b2ffb7a95c66c4f90d735bd0507a12ee96f5b6a23cefd4",
+  "rawPreviousTaskSuffixExact": true,
+  "weatherDefaultRetained": true,
+  "originalClocksRetained": true
+}

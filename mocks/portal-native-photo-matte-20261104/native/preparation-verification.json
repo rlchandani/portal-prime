@@ -1,0 +1,120 @@
+{
+  "ok": true,
+  "blockers": [],
+  "originalClockUtc": "2026-11-04T10:14:38Z",
+  "targetUtc": "2026-11-04T10:29:38Z",
+  "hardDeadlineUtc": "2026-11-04T10:44:38Z",
+  "package": "com.immortal.nativemattefixture",
+  "activity": ".NativeMatteActivity",
+  "reportPath": "external-files/report.json",
+  "sources": {
+    "NativeMatteActivity.java": {
+      "sha256": "1107912fab076dceeac4be9fcc92125c0f39f883d1dddac9c2f05df0053d5fdd",
+      "bytes": 12442
+    },
+    "AndroidManifest.xml": {
+      "sha256": "550803aa3b1b19812e659d799ca32554b7334ac4b64c166624bc5b6ff524a4b3",
+      "bytes": 439
+    },
+    "build.sh": {
+      "sha256": "71ed0506bf1aa13abe71f1dd1ddbc7f6fbf9e5e5b1832f50d866fac38c114b21",
+      "bytes": 792
+    },
+    "repack.sh": {
+      "sha256": "9c703fe0153fa575dd0cb652456cae79ba3f4d9690b42fa38d0ef15bfb0f34a5",
+      "bytes": 778
+    }
+  },
+  "fixtureDex": {
+    "sha256": "daf4a0d0d528ff33a0b4fb714ab71896b918d9212a14114c4f71175c8212207b",
+    "bytes": 17880
+  },
+  "fixture": {
+    "sha256": "6fce0e7cb4a45e2dfbb342cc64259a84b0210772a2a2085167737ae46de27b31",
+    "bytes": 37499370
+  },
+  "baselineFixture": {
+    "sha256": "6fce0e7cb4a45e2dfbb342cc64259a84b0210772a2a2085167737ae46de27b31",
+    "bytes": 37499370
+  },
+  "embeddedSource": {
+    "sha256": "bdd3964e0b51d36d94fe82f5bf515b9b60eb3a08168f3021e66eae9e84c3938e",
+    "bytes": 46745294
+  },
+  "caseNames": [
+    "portrait-whole-fit",
+    "portrait-whole-fit-retained-resize",
+    "panorama-whole-fit",
+    "gallery-print",
+    "gallery-spread"
+  ],
+  "expectedBaselineFailures": 5,
+  "expectedBaselineControls": {
+    "photoCorners": 24,
+    "geometryPerCapture": 5,
+    "retainedBitmapIdentityPerCapture": 5,
+    "admissionPerCapture": 5,
+    "opacityPerCapture": 5,
+    "stopReleasePerScene": 4
+  },
+  "gates": {
+    "generatedPhotoCornerColors": [
+      [
+        4294914884,
+        4281589094,
+        4281554414,
+        4294958387
+      ],
+      [
+        4292686813,
+        4281589213,
+        4293822515,
+        4287120605
+      ]
+    ],
+    "cornerPositionsFractions": [
+      0.08,
+      0.92
+    ],
+    "cornerMaxChannelDifference": 12,
+    "wholePhotoBoundsTolerancePixels": 0.02,
+    "scaleEqualityTolerance": 0.0001,
+    "normalBaseArgb": "ff14161b",
+    "galleryBaseArgb": "ff1c1b19",
+    "bitmapIdentityExact": true,
+    "admittedBytesMustEqualActualInputAllocationSum": true,
+    "outputCanvasInitiallyTransparent": true,
+    "everyPixelAlphaMustBe255": true,
+    "matteMaskExcludesPhotoEnvelopePlus2Pixels": true,
+    "mattePixelsMinimumExclusive": 1000,
+    "quietMarksMinimum": 50,
+    "quietMarksFractionMaximumExclusive": 0.3,
+    "basePixelsFractionMinimumExclusive": 0.65,
+    "basePixelsMaxChannelDifference": 1,
+    "quietMarksMinPositiveChannelDifference": 2,
+    "quietMarksMaxPositiveChannelDifference": 64,
+    "negativeOrOtherMattePixelsAllowed": 0,
+    "stoppedAdmissionMustBe0": true,
+    "inputBitmapsMustNotBeRecycledByStage": true
+  },
+  "zeroDeclaredPermissions": true,
+  "frozenSourcesAndGatesByteIdentical": true,
+  "strictEmbeddedBaselineExact": true,
+  "watchdogMs": 30000,
+  "preFreezeCorrections": {
+    "description": "Before baseline execution/freezing, made opacity proof sound using initially transparent Canvas and admitted antialiased matte pixels at max delta2 (delta<=1 remains base). No device run or product result existed for first host-compiled preparation draft.",
+    "initialDraftSource": {
+      "sha256": "7f3d88c070bb5abca31339b100addbeaa7ef1aec0b5a3d525ec1c3f7822ef483",
+      "bytes": 12442
+    },
+    "excludedFromProductEvidence": true
+  },
+  "limits": [
+    "Actual embedded debug SlideshowStage public constructor/show/stop and native software Canvas draw only",
+    "Generated owned bitmaps; zero preference reads permitted",
+    "No owner photos or data, account/provider/network/device operations by author",
+    "No device compositor/GPU, live motion/dissolve, FaceRenderer or host integration acceptance",
+    "No optimized or API28 runtime claim"
+  ],
+  "candidateCommand": "bash native/repack.sh candidate-debug-1.147.apk; replaces only source.apk and signs same frozen DEX"
+}

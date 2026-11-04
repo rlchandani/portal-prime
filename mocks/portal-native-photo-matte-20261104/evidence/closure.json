@@ -1,0 +1,14 @@
+{
+  "closedAt": "2026-11-04T10:28:20.880755+00:00",
+  "elapsedMinutes": 13.71467925,
+  "target15MinutesMet": true,
+  "hard30MinutesMet": true,
+  "sourceUnchangedSinceBuild": true,
+  "originalRegistryHashesExact": true,
+  "ownedCredentialsDocsEnvironmentSiteRemoved": true,
+  "privateApksAndLogsRetained": true,
+  "preexistingRepoPycacheUnstagedAndNotDirectlyTouched": true,
+  "goalStatus": "active",
+  "result": "progress",
+  "docsStrictBuild": true
+}

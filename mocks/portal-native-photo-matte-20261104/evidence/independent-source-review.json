@@ -1,0 +1,121 @@
+{
+  "reviewedAtUtc": "2026-11-04T10:20:30.412253+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-04T10:14:38Z",
+    "target": "2026-11-04T10:29:38Z",
+    "deadline": "2026-11-04T10:44:38Z",
+    "sourceBase": "5dfd13f027e416592cd246b62eda7fae959eaeea",
+    "scope": "Native slideshow static charcoal matte doodles only; opaque compositions, photo geometry, crops, motion, bitmap ownership and timers retained",
+    "boundaries": [
+      "No phone/provider/media/account/push/publication",
+      "Root owns devices",
+      "Prior original scopes/clocks retained"
+    ]
+  },
+  "ok": true,
+  "blockers": [],
+  "verdict": "Accepted bounded appearance-only source change. Native rendering evidence remains separate.",
+  "checks": {
+    "stageNormalizesExactlyToCapturedOriginal": true,
+    "all15VectorPathsMatchSvgOrder": true,
+    "versionOnlyBuildChange": true,
+    "svgAttributesExact": true
+  },
+  "bindings": {
+    "candidateStage": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/SlideshowStage.kt",
+      "sha256": "74104f7e62ef589e40b436eb0d8eff0ce71eabe0f29b13fb4c7534e4b689bd82",
+      "bytes": 25789
+    },
+    "capturedStage": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/SlideshowStage.kt",
+      "sha256": "46c45dab9889650f9c990229bc19a01b045fca31e94bfda2dbc066e6f5c64b3c",
+      "bytes": 25629
+    },
+    "nativeDrawable": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/NativePhotoMatte.kt",
+      "sha256": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92",
+      "bytes": 3372
+    },
+    "svg": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg",
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "bytes": 1247
+    },
+    "candidateBuild": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "sha256": "8bac1e80ebf64a803e3b3baea3b5535e42b37da43f7214945846e2cda7af2258",
+      "bytes": 11824
+    },
+    "capturedBuild": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/build.gradle.kts",
+      "sha256": "646b258a2c46e52449acffdfe0a6c2c08930898933dd388733627d183a2f262d",
+      "bytes": 11824
+    },
+    "caller": {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt",
+      "sha256": "7f4d83b48102476a8e032961a157e8b3f7150dd28f74200e55c4aed9ca0054d9",
+      "bytes": 164474
+    }
+  },
+  "svgParity": {
+    "paths": 13,
+    "circles": [
+      {
+        "cx": 151,
+        "cy": 275,
+        "radius": 9,
+        "pairedArc": "M142 275a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"
+      },
+      {
+        "cx": 289,
+        "cy": 297,
+        "radius": 6,
+        "pairedArc": "M283 297a6 6 0 1 0 12 0a6 6 0 1 0 -12 0"
+      }
+    ],
+    "tileDp": [
+      480,
+      360
+    ],
+    "strokeColor": [
+      222,
+      216,
+      203
+    ],
+    "strokeWidthDp": 1.35,
+    "roundCapsAndJoins": true,
+    "svgOpacity": 0.13,
+    "androidAlpha": 33,
+    "androidOpacity": 0.12941176470588237,
+    "opacityNote": "33/255 is the nearest 8-bit alpha to .13; exact vector identity is not a claim of identical SVG/Android anti-aliasing pixels."
+  },
+  "findings": [
+    {
+      "lines": "SlideshowStage.kt:261-285,549-551",
+      "finding": "Two cached drawables per composition replace only its background initialization/selection. Existing opaque MATTE RGB(20,22,27) and PRINT_MATTE RGB(28,27,25) remain; root matte stays unchanged. Two compositions retain four small drawables; vector paths are cached once."
+    },
+    {
+      "lines": "NativePhotoMatte.kt:20-47",
+      "finding": "Finite density clamps to .5..4; nonfinite fallback is 1. Each draw paints the complete bounds with its existing base matte, clips and anchors repeated 480x360 dp vectors to those bounds. Canvas state is restored. Drawable bounds naturally track view layout; no scene or geometry callback is added."
+    },
+    {
+      "lines": "NativePhotoMatte.kt:50-64",
+      "finding": "Default base alpha255 and no filter preserve opaque coverage. Explicit drawable alpha also scales ink alpha; color filters apply to both paints. Opacity is conservatively translucent when alpha/filter could change coverage."
+    },
+    {
+      "lines": "SlideshowStage.kt:105-158,243-253,277-350,405-423,516-527",
+      "finding": "Exact normalization restores all original stage bytes, including photo transforms/crops, tile bounds, bitmap budget ownership, resize rebind, pause/seek, dissolve900ms and cleanup. Clear retains reusable decoration while removing photos/animators and releasing existing owners."
+    },
+    {
+      "lines": "PhotoFrameController.kt:1500-1520,2139-2151",
+      "finding": "The actual controller creates SlideshowStage and passes normal/gallery flags to show. That caller is unchanged by this slice. New drawable contains no bitmap decode, external resource I/O, timer, scheduler, network or context/data access."
+    }
+  ],
+  "limits": [
+    "Source review only; no additional builds/tests/device calls were performed by this reviewer.",
+    "Native Canvas/AndroidX parser loading, real-stage rendered margins and same-stage resizing require separately retained native fixture evidence.",
+    "SVG and Canvas anti-aliasing need not be pixel-identical; native static visibility/contrast and preserved full-photo pixels are separate gates.",
+    "No native clock/renderer hardware performance, dissolve timing measurement, owner photos/providers or optimized/API28 behavior is claimed."
+  ]
+}

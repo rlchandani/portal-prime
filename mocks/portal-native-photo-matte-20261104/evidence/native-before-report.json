@@ -1,0 +1,454 @@
+{
+  "ok": false,
+  "error": null,
+  "tests": 5,
+  "failures": 5,
+  "cases": [
+    {
+      "name": "portrait-whole-fit",
+      "passed": false,
+      "error": "quiet_matte_marks_missing_or_invalid",
+      "width": 800,
+      "height": 600,
+      "gallery": false,
+      "geometry": [
+        {
+          "left": 220,
+          "top": 0,
+          "right": 580,
+          "bottom": 600,
+          "sourceWidth": 480,
+          "sourceHeight": 800,
+          "holderLeft": 0,
+          "holderTop": 0,
+          "holderRight": 800,
+          "holderBottom": 600,
+          "scaleX": 0.75,
+          "scaleY": 0.75
+        }
+      ],
+      "geometryPass": true,
+      "sameBitmapIdentity": true,
+      "wholePhotos": true,
+      "budgetUsed": 1536000,
+      "expectedAdmittedBytes": 1536000,
+      "corners": [
+        {
+          "photo": 0,
+          "corner": 0,
+          "x": 249,
+          "y": 48,
+          "expected": -52412,
+          "actual": -52412,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 1,
+          "x": 551,
+          "y": 48,
+          "expected": -13378202,
+          "actual": -13378202,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 2,
+          "x": 249,
+          "y": 552,
+          "expected": -13412882,
+          "actual": -13412882,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 3,
+          "x": 551,
+          "y": 552,
+          "expected": -8909,
+          "actual": -8909,
+          "passed": true
+        }
+      ],
+      "cornerPassCount": 4,
+      "photoPass": true,
+      "opaque": true,
+      "transparentPixels": 0,
+      "baseColor": -15460837,
+      "mattePixels": 261000,
+      "basePixels": 261000,
+      "quietMarks": 0,
+      "badMatte": 0,
+      "mattePass": false
+    },
+    {
+      "name": "portrait-whole-fit-retained-resize",
+      "passed": false,
+      "error": "quiet_matte_marks_missing_or_invalid",
+      "width": 960,
+      "height": 540,
+      "gallery": false,
+      "geometry": [
+        {
+          "left": 318,
+          "top": 1.9073486328125e-05,
+          "right": 642,
+          "bottom": 539.9999389648438,
+          "sourceWidth": 480,
+          "sourceHeight": 800,
+          "holderLeft": 0,
+          "holderTop": 0,
+          "holderRight": 960,
+          "holderBottom": 540,
+          "scaleX": 0.6749999523162842,
+          "scaleY": 0.6749999523162842
+        }
+      ],
+      "geometryPass": true,
+      "sameBitmapIdentity": true,
+      "wholePhotos": true,
+      "budgetUsed": 1536000,
+      "expectedAdmittedBytes": 1536000,
+      "corners": [
+        {
+          "photo": 0,
+          "corner": 0,
+          "x": 344,
+          "y": 43,
+          "expected": -52412,
+          "actual": -52412,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 1,
+          "x": 616,
+          "y": 43,
+          "expected": -13378202,
+          "actual": -13378202,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 2,
+          "x": 344,
+          "y": 497,
+          "expected": -13412882,
+          "actual": -13412882,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 3,
+          "x": 616,
+          "y": 497,
+          "expected": -8909,
+          "actual": -8909,
+          "passed": true
+        }
+      ],
+      "cornerPassCount": 4,
+      "photoPass": true,
+      "opaque": true,
+      "transparentPixels": 0,
+      "baseColor": -15460837,
+      "mattePixels": 340740,
+      "basePixels": 340740,
+      "quietMarks": 0,
+      "badMatte": 0,
+      "mattePass": false
+    },
+    {
+      "name": "panorama-whole-fit",
+      "passed": false,
+      "error": "quiet_matte_marks_missing_or_invalid",
+      "width": 800,
+      "height": 600,
+      "gallery": false,
+      "geometry": [
+        {
+          "left": 2.384185791015625e-05,
+          "top": 200,
+          "right": 799.9999389648438,
+          "bottom": 400,
+          "sourceWidth": 2400,
+          "sourceHeight": 600,
+          "holderLeft": 0,
+          "holderTop": 0,
+          "holderRight": 800,
+          "holderBottom": 600,
+          "scaleX": 0.3333333134651184,
+          "scaleY": 0.3333333134651184
+        }
+      ],
+      "geometryPass": true,
+      "sameBitmapIdentity": true,
+      "wholePhotos": true,
+      "budgetUsed": 5760000,
+      "expectedAdmittedBytes": 5760000,
+      "corners": [
+        {
+          "photo": 0,
+          "corner": 0,
+          "x": 64,
+          "y": 216,
+          "expected": -52412,
+          "actual": -52412,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 1,
+          "x": 736,
+          "y": 216,
+          "expected": -13378202,
+          "actual": -13378202,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 2,
+          "x": 64,
+          "y": 384,
+          "expected": -13412882,
+          "actual": -13412882,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 3,
+          "x": 736,
+          "y": 384,
+          "expected": -8909,
+          "actual": -8909,
+          "passed": true
+        }
+      ],
+      "cornerPassCount": 4,
+      "photoPass": true,
+      "opaque": true,
+      "transparentPixels": 0,
+      "baseColor": -15460837,
+      "mattePixels": 316000,
+      "basePixels": 316000,
+      "quietMarks": 0,
+      "badMatte": 0,
+      "mattePass": false
+    },
+    {
+      "name": "gallery-print",
+      "passed": false,
+      "error": "quiet_matte_marks_missing_or_invalid",
+      "width": 800,
+      "height": 600,
+      "gallery": true,
+      "geometry": [
+        {
+          "left": 32.00001525878906,
+          "top": 24.00001335144043,
+          "right": 767.9999389648438,
+          "bottom": 576,
+          "sourceWidth": 800,
+          "sourceHeight": 600,
+          "holderLeft": 24,
+          "holderTop": 24,
+          "holderRight": 776,
+          "holderBottom": 576,
+          "scaleX": 0.9199999570846558,
+          "scaleY": 0.9199999570846558
+        }
+      ],
+      "geometryPass": true,
+      "sameBitmapIdentity": true,
+      "wholePhotos": true,
+      "budgetUsed": 1920000,
+      "expectedAdmittedBytes": 1920000,
+      "corners": [
+        {
+          "photo": 0,
+          "corner": 0,
+          "x": 91,
+          "y": 68,
+          "expected": -52412,
+          "actual": -52412,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 1,
+          "x": 709,
+          "y": 68,
+          "expected": -13378202,
+          "actual": -13378202,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 2,
+          "x": 91,
+          "y": 532,
+          "expected": -13412882,
+          "actual": -13412882,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 3,
+          "x": 709,
+          "y": 532,
+          "expected": -8909,
+          "actual": -8909,
+          "passed": true
+        }
+      ],
+      "cornerPassCount": 4,
+      "photoPass": true,
+      "opaque": true,
+      "transparentPixels": 0,
+      "baseColor": -14935271,
+      "mattePixels": 67263,
+      "basePixels": 67263,
+      "quietMarks": 0,
+      "badMatte": 0,
+      "mattePass": false
+    },
+    {
+      "name": "gallery-spread",
+      "passed": false,
+      "error": "quiet_matte_marks_missing_or_invalid",
+      "width": 800,
+      "height": 600,
+      "gallery": true,
+      "geometry": [
+        {
+          "left": 36.80000305175781,
+          "top": 18.00000762939453,
+          "right": 375.20001220703125,
+          "bottom": 582,
+          "sourceWidth": 480,
+          "sourceHeight": 800,
+          "holderLeft": 18,
+          "holderTop": 18,
+          "holderRight": 394,
+          "holderBottom": 582,
+          "scaleX": 0.7049999833106995,
+          "scaleY": 0.7049999833106995
+        },
+        {
+          "left": 406,
+          "top": 159,
+          "right": 782,
+          "bottom": 441,
+          "sourceWidth": 800,
+          "sourceHeight": 600,
+          "holderLeft": 406,
+          "holderTop": 18,
+          "holderRight": 782,
+          "holderBottom": 582,
+          "scaleX": 0.4699999988079071,
+          "scaleY": 0.4699999988079071
+        }
+      ],
+      "geometryPass": true,
+      "sameBitmapIdentity": true,
+      "wholePhotos": true,
+      "budgetUsed": 3456000,
+      "expectedAdmittedBytes": 3456000,
+      "corners": [
+        {
+          "photo": 0,
+          "corner": 0,
+          "x": 64,
+          "y": 63,
+          "expected": -52412,
+          "actual": -52412,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 1,
+          "x": 348,
+          "y": 63,
+          "expected": -13378202,
+          "actual": -13378202,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 2,
+          "x": 64,
+          "y": 537,
+          "expected": -13412882,
+          "actual": -13412882,
+          "passed": true
+        },
+        {
+          "photo": 0,
+          "corner": 3,
+          "x": 348,
+          "y": 537,
+          "expected": -8909,
+          "actual": -8909,
+          "passed": true
+        },
+        {
+          "photo": 1,
+          "corner": 0,
+          "x": 436,
+          "y": 182,
+          "expected": -2280483,
+          "actual": -2280483,
+          "passed": true
+        },
+        {
+          "photo": 1,
+          "corner": 1,
+          "x": 752,
+          "y": 182,
+          "expected": -13378083,
+          "actual": -13378083,
+          "passed": true
+        },
+        {
+          "photo": 1,
+          "corner": 2,
+          "x": 436,
+          "y": 418,
+          "expected": -1144781,
+          "actual": -1144781,
+          "passed": true
+        },
+        {
+          "photo": 1,
+          "corner": 3,
+          "x": 752,
+          "y": 418,
+          "expected": -7846691,
+          "actual": -7846691,
+          "passed": true
+        }
+      ],
+      "cornerPassCount": 8,
+      "photoPass": true,
+      "opaque": true,
+      "transparentPixels": 0,
+      "baseColor": -14935271,
+      "mattePixels": 174348,
+      "basePixels": 174348,
+      "quietMarks": 0,
+      "badMatte": 0,
+      "mattePass": false
+    }
+  ],
+  "sourceSha256": "bdd3964e0b51d36d94fe82f5bf515b9b60eb3a08168f3021e66eae9e84c3938e",
+  "sourceBytes": 46745294,
+  "sdk": 29,
+  "density": 1.125,
+  "actualEmbeddedStageClassLoader": true,
+  "actualPublicStageShowStop": true,
+  "unexpectedPreferenceRequests": 0,
+  "stopped": true,
+  "fixturePackage": "com.immortal.nativemattefixture",
+  "internetPermission": false,
+  "scope": "Actual SlideshowStage native View/Canvas software draw with generated retained bitmaps only; no owner media, preferences, device compositor, live motion/dissolve, host integration, optimized or API28 claim"
+}

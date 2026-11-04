@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-11-04T10:14:38Z",
+  "target": "2026-11-04T10:29:38Z",
+  "deadline": "2026-11-04T10:44:38Z",
+  "sourceBase": "5dfd13f027e416592cd246b62eda7fae959eaeea",
+  "scope": "Native slideshow static charcoal matte doodles only; opaque compositions, photo geometry, crops, motion, bitmap ownership and timers retained",
+  "boundaries": [
+    "No phone/provider/media/account/push/publication",
+    "Root owns devices",
+    "Prior original scopes/clocks retained"
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "startedAtUtc": "2026-11-04T10:21:50.963673+00:00",
+  "finishedAtUtc": "2026-11-04T10:21:51.530755+00:00",
+  "originalClock": {
+    "startedAt": "2026-11-04T10:14:38Z",
+    "target": "2026-11-04T10:29:38Z",
+    "deadline": "2026-11-04T10:44:38Z"
+  },
+  "gradleLogSha256": "158634f45ec2cabcfb8ecf549e54a61eec288388708402d3e9161d3e3589e51b",
+  "gradleTerminal": "BUILD SUCCESSFUL in 1m 55s",
+  "gradleExitEvidence": "Root confirmed actual exec session95817 terminal0; log success independently checked",
+  "requiredBuildTasksPresent": true,
+  "r8TaskPresent": true,
+  "checks": [
+    {
+      "variant": "debug",
+      "aaptExit": 0,
+      "apksignerExit": 0,
+      "assetCount": 10,
+      "matchesSourceAndRollback": true,
+      "duplicateZipEntries": false,
+      "builtSnapshotExact": true,
+      "apkMode": "0400",
+      "apkMtimeUtc": "2026-11-04T10:20:38.101032+00:00"
+    },
+    {
+      "variant": "performance",
+      "aaptExit": 0,
+      "apksignerExit": 0,
+      "assetCount": 10,
+      "matchesSourceAndRollback": true,
+      "duplicateZipEntries": false,
+      "builtSnapshotExact": true,
+      "apkMode": "0400",
+      "apkMtimeUtc": "2026-11-04T10:21:23.241496+00:00"
+    }
+  ],
+  "rollbackSha256": "5e693e23c24d9cd16b2ece89a1cde69d4c8c25dc4d2d4965962a678fd231b0a0",
+  "sourceScope": {
+    "base": "5dfd13f027e416592cd246b62eda7fae959eaeea",
+    "trackedAppDelta": [
+      "app/build.gradle.kts",
+      "app/src/main/java/com/immortal/launcher/SlideshowStage.kt"
+    ],
+    "newAppSource": [
+      "app/src/main/java/com/immortal/launcher/NativePhotoMatte.kt"
+    ],
+    "exactExistingSourceTransformation": true,
+    "priorPhotoConstraintsUnchanged": true,
+    "trackedDiffSha256": "1effdeca7f502c0a20b6fd2d0b26746f0b2831a92c0bcbb388b6e3b1ade8fbc8",
+    "sourceSha256": {
+      "app/src/main/java/com/immortal/launcher/SlideshowStage.kt": "74104f7e62ef589e40b436eb0d8eff0ce71eabe0f29b13fb4c7534e4b689bd82",
+      "app/build.gradle.kts": "8bac1e80ebf64a803e3b3baea3b5535e42b37da43f7214945846e2cda7af2258",
+      "app/src/main/java/com/immortal/launcher/NativePhotoMatte.kt": "037bf63f302d377c13acf763567aba6132f45663d4e81e9fb5ace79f6f671d92"
+    }
+  },
+  "freshXml": {
+    "tests": 4434,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 463,
+    "minimumTimestampUtc": "2026-11-04T10:20:00.355000+00:00",
+    "maximumTimestampUtc": "2026-11-04T10:20:37.067000+00:00",
+    "sortedReportInventorySha256": "ad33aeedd718a0a819d5c8a4cd7f0f9e441fd1f8c08053db61e307ad3eaec6d7"
+  },
+  "limits": "Host artifact/source verification only; actual matte rendering, native fixture and device promotion owned by root."
+}

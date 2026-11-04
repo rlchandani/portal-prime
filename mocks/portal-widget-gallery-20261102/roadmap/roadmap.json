@@ -1,18 +1,64 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T10:13:47.185291+00:00",
-  "updatedLabel": "Local APK confirmation delivered; both rooms1.146 and earlier scopes retained",
+  "updatedAt": "2026-11-04T10:27:55.302231+00:00",
+  "updatedLabel": "Native photo doodles delivered; both rooms1.147 and earlier scopes retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.145/code 139. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.147/code 141. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "native-photo-matte",
+      "title": "Native photo styles: quiet doodle margins",
+      "summary": "Existing charcoal native mattes gain sparse static doodles below whole photos.",
+      "status": "delivered",
+      "verification": "4,434 JVM · five native captures ·24 corners · exact both-room installs",
+      "kind": "Screensaver visual polish",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent source, artifact and pixel review",
+      "deployment": "Exact optimized1.147/code141 fully hashed in both rooms; one install per room. Living stale host check corrected read-only.",
+      "acceptance": [
+        "Static vectors match existing darkSVG; original opaque matte colors stay.",
+        "Same frozen actual debug nativeStage/Canvas:5 missing-decoration captures→5pass; geometry/bitmap/budget/opacity and24corners retained.",
+        "Saved settings and all web assets retained."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery, checks and limits",
+          "source": "docs/portal-native-photo-matte-2026-11-04.md"
+        },
+        {
+          "text": "Frozen fixture, PNG replay and room preservation",
+          "source": "mocks/portal-native-photo-matte-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated actual debug Family/API29 software Canvas only; compositor, live motion/dissolve, native clock/host, optimized runtime/API28/Living visuals/performance remain separate.",
+        "Saved Shuffle/fit retained; native style support does not prove current selection.",
+        "No phone/provider/media/account/push/publication."
+      ],
+      "next": "Switch to another distinct bounded product slice; prior scopes and clocks remain.",
+      "issueClock": {
+        "startedAt": "2026-11-04T10:14:38Z",
+        "target": "2026-11-04T10:29:38Z",
+        "deadline": "2026-11-04T10:44:38Z",
+        "sourceBase": "5dfd13f027e416592cd246b62eda7fae959eaeea",
+        "scope": "Native slideshow static charcoal matte doodles only; opaque compositions, photo geometry, crops, motion, bitmap ownership and timers retained",
+        "boundaries": [
+          "No phone/provider/media/account/push/publication",
+          "Root owns devices",
+          "Prior original scopes/clocks retained"
+        ]
+      }
+    },
     {
       "id": "apk-browser-selection",
       "title": "APK browser: install the confirmed copy",

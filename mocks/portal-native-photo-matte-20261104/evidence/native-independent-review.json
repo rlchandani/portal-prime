@@ -1,0 +1,283 @@
+{
+  "reviewedAtUtc": "2026-11-04T10:23:32.467421+00:00",
+  "originalClock": {
+    "start": "2026-11-04T10:14:38Z",
+    "target": "2026-11-04T10:29:38Z",
+    "hardDeadline": "2026-11-04T10:44:38Z"
+  },
+  "ok": true,
+  "blockers": [],
+  "verdict": "Accepted bounded actual debug SlideshowStage/software Canvas evidence; five missing-decoration baseline captures become five candidate passes. All 24 photo corners, retained resize geometry/bitmap identity/admission/opacity fields remain exact.",
+  "checks": {
+    "frozenSourceAndGatesExact": true,
+    "exactJavaAndDex": true,
+    "caseNamesExact": true,
+    "baselineOnlyMarksMissing": true,
+    "candidateFivePass": true,
+    "allNonMatteFieldsExact": true,
+    "nativeScopeAndStopExact": true,
+    "noFixturePermissions": true,
+    "beforeEmbeddedSourceAndDexExact": true,
+    "afterEmbeddedSourceAndDexExact": true,
+    "baselineSourceExact": true,
+    "candidateSourceAndArtifactExact": true,
+    "candidateFixtureMatchesAdmission": true,
+    "bothRetired": true
+  },
+  "pixelReplay": {
+    "before": [
+      {
+        "name": "portrait-whole-fit",
+        "cornersPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 261000,
+        "basePixels": 261000,
+        "quietMarks": 0,
+        "badMatte": 0,
+        "mattePass": false
+      },
+      {
+        "name": "portrait-whole-fit-retained-resize",
+        "cornersPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 340740,
+        "basePixels": 340740,
+        "quietMarks": 0,
+        "badMatte": 0,
+        "mattePass": false
+      },
+      {
+        "name": "panorama-whole-fit",
+        "cornersPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 316000,
+        "basePixels": 316000,
+        "quietMarks": 0,
+        "badMatte": 0,
+        "mattePass": false
+      },
+      {
+        "name": "gallery-print",
+        "cornersPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 67263,
+        "basePixels": 67263,
+        "quietMarks": 0,
+        "badMatte": 0,
+        "mattePass": false
+      },
+      {
+        "name": "gallery-spread",
+        "cornersPassed": 8,
+        "transparentPixels": 0,
+        "mattePixels": 174348,
+        "basePixels": 174348,
+        "quietMarks": 0,
+        "badMatte": 0,
+        "mattePass": false
+      }
+    ],
+    "after": [
+      {
+        "name": "portrait-whole-fit",
+        "cornersPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 261000,
+        "basePixels": 257091,
+        "quietMarks": 3909,
+        "badMatte": 0,
+        "mattePass": true
+      },
+      {
+        "name": "portrait-whole-fit-retained-resize",
+        "cornersPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 340740,
+        "basePixels": 336056,
+        "quietMarks": 4684,
+        "badMatte": 0,
+        "mattePass": true
+      },
+      {
+        "name": "panorama-whole-fit",
+        "cornersPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 316000,
+        "basePixels": 311172,
+        "quietMarks": 4828,
+        "badMatte": 0,
+        "mattePass": true
+      },
+      {
+        "name": "gallery-print",
+        "cornersPassed": 4,
+        "transparentPixels": 0,
+        "mattePixels": 67263,
+        "basePixels": 66752,
+        "quietMarks": 511,
+        "badMatte": 0,
+        "mattePass": true
+      },
+      {
+        "name": "gallery-spread",
+        "cornersPassed": 8,
+        "transparentPixels": 0,
+        "mattePixels": 174348,
+        "basePixels": 171774,
+        "quietMarks": 2574,
+        "badMatte": 0,
+        "mattePass": true
+      }
+    ]
+  },
+  "pixelMethod": "Independently decoded all ten PNGs with PIL/NumPy. Rebuilt photo envelope masks from retained geometry using floor/ceil plus2 pixels, replayed exact base/mark thresholds and whole-image alpha; recomputed float32 corner positions and RGBA values. Every recomputed counter equals its report.",
+  "fixtures": {
+    "before": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native/baseline-fixture.apk",
+      "sha256": "6fce0e7cb4a45e2dfbb342cc64259a84b0210772a2a2085167737ae46de27b31",
+      "bytes": 37499370,
+      "dexSha256": "daf4a0d0d528ff33a0b4fb714ab71896b918d9212a14114c4f71175c8212207b",
+      "embeddedSourceSha256": "bdd3964e0b51d36d94fe82f5bf515b9b60eb3a08168f3021e66eae9e84c3938e",
+      "embeddedSourceBytes": 46745294
+    },
+    "after": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native/native-matte-fixture.apk",
+      "sha256": "2488c0af0042e7413079d3a8c9656a035cf8386d2cfcdde2cc26b8889b5a4814",
+      "bytes": 37503466,
+      "dexSha256": "daf4a0d0d528ff33a0b4fb714ab71896b918d9212a14114c4f71175c8212207b",
+      "embeddedSourceSha256": "a48c88f0e81a0ba52ae8642419487bff553ab8ae89a6c7d11d258ce3bad1cbdb",
+      "embeddedSourceBytes": 46745298
+    }
+  },
+  "bindings": {
+    "java": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native/NativeMatteActivity.java",
+      "sha256": "1107912fab076dceeac4be9fcc92125c0f39f883d1dddac9c2f05df0053d5fdd",
+      "bytes": 12442
+    },
+    "dex": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native/frozen-dex/classes.dex",
+      "sha256": "daf4a0d0d528ff33a0b4fb714ab71896b918d9212a14114c4f71175c8212207b",
+      "bytes": 17880
+    },
+    "manifest": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native/AndroidManifest.xml",
+      "sha256": "550803aa3b1b19812e659d799ca32554b7334ac4b64c166624bc5b6ff524a4b3",
+      "bytes": 439
+    },
+    "preparation": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native/preparation-verification.json",
+      "sha256": "8b5bb951f9f315ff3abe2c01f1232a026fe8ff3e85097f50ec088b6bb2a80f9a",
+      "bytes": 4131
+    },
+    "candidateAdmission": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native/candidate-admission.json",
+      "sha256": "69c3ffc82e4ce354fb6069970f376105f85e0e922e316ef1b392a41bccdbd169",
+      "bytes": 10438
+    },
+    "beforeReport": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native-before-report.json",
+      "sha256": "c96f744b7536a8e33449bfd6aa656bf99952194bde87c56162274b3e4c5e516e",
+      "bytes": 10932
+    },
+    "afterReport": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native-after-report.json",
+      "sha256": "7bd24ff426163f784c1667e69803dc0562b1887987d5df16184c7cb44f4b3d1e",
+      "bytes": 10765
+    },
+    "beforeRetirement": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native-before-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "afterRetirement": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/native-after-retirement.json",
+      "sha256": "236f4a1b9d803fb26981f05b407d1bbd202d1e4ff11e259705eeda1527e0418b",
+      "bytes": 88
+    },
+    "promotionArtifacts": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/promotion-artifacts.json",
+      "sha256": "a7cc1b2391e1dabcce32b05be9f25bf75f30dcf5ea1d2522b65717a0fd792a87",
+      "bytes": 4787
+    },
+    "sourceReview": {
+      "path": "/private/tmp/portal-native-matte-20261104-101438/independent-source-review.json",
+      "sha256": "3548e8670277ff79eab9075d6ae68a6516d4124e87ddba879ab7eadd3ea4f734",
+      "bytes": 5750
+    }
+  },
+  "pngBindings": {
+    "before": [
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-before-images/portrait-whole-fit.png",
+        "sha256": "bfa9fd3ed687cd8b113d284274698e9a8e09ad42d684235ed48eb50e20944dcc",
+        "bytes": 3377
+      },
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-before-images/portrait-whole-fit-retained-resize.png",
+        "sha256": "981fddbca4afe5d085b8e5f84d6d72e19908a95dc2eea5947c4c9ecccf57f7e4",
+        "bytes": 3406
+      },
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-before-images/panorama-whole-fit.png",
+        "sha256": "62f1e1d353bd3dfa66457b3f442da3ecc7805b93ce0cc82a9a5473022d4eb1d3",
+        "bytes": 3342
+      },
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-before-images/gallery-print.png",
+        "sha256": "5f88f281f1209accb6d72820d07d26a0913c964f1c57ceae4189df9cc24f812d",
+        "bytes": 3455
+      },
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-before-images/gallery-spread.png",
+        "sha256": "d8b07fa0ba57aadc9c95ea3949d6198cd8c019d828adcb24dbc3cd6c9af68bb3",
+        "bytes": 3617
+      }
+    ],
+    "after": [
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-after-images/portrait-whole-fit.png",
+        "sha256": "a25aea4117f797142fa15514ca29294827116fe5738c4b0e1017d99dc27eb81f",
+        "bytes": 12588
+      },
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-after-images/portrait-whole-fit-retained-resize.png",
+        "sha256": "f7e02698b48133e21b11f4a24b08ad13c34c156cd46cf5584384f2aeb82f6f55",
+        "bytes": 15622
+      },
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-after-images/panorama-whole-fit.png",
+        "sha256": "aa712471af3bd8a3c64020151ff405a03a828d9902e4efbedb1f29faf21c1832",
+        "bytes": 15793
+      },
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-after-images/gallery-print.png",
+        "sha256": "2670b5cb8c18974919ea6d7db569df3db5e214805f2b8efb9bbc35df63712a26",
+        "bytes": 5502
+      },
+      {
+        "path": "/private/tmp/portal-native-matte-20261104-101438/native-after-images/gallery-spread.png",
+        "sha256": "0dd4df48156ffa1dc795fffac307ada4c4527a07370beb6e9ac8a50de84a7cd0",
+        "bytes": 13323
+      }
+    ]
+  },
+  "retirement": {
+    "before": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    },
+    "after": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    }
+  },
+  "coordinationNote": "Coordinator reports two identical host repacks before one candidate execution. Final fixture matches frozen Java/DEX, admission hash and exact runtime source hash; no gate/source change is admitted.",
+  "limits": [
+    "Native evidence is actual embedded debug Stage construction/show/stop and software Canvas draw of generated bitmaps at SDK29/density1.125. It is not PixelCopy/compositor/GPU performance evidence.",
+    "Same-stage portrait resize is covered; live motion/dissolve, FaceRenderer or complete launcher/controller integration, owner photos, optimized/API28 and other densities remain outside runtime proof.",
+    "Stop and input-nonrecycling checks are explicit fixture assertions; retirement was read from retained coordinator records. Reviewer executed no device/build/network/source/Git operations."
+  ]
+}

@@ -270,7 +270,9 @@ internal class SlideshowStage(
     private val rememberedTimes = HashMap<Int, Long>()
     private val paths = HashMap<Int, SlideshowGeometry.Motion>()
     private var displayed: Presentation? = null
-    init { setBackgroundColor(MATTE); clipChildren = true }
+    private val matte = NativePhotoMatte(MATTE, resources.displayMetrics.density)
+    private val printMatte = NativePhotoMatte(PRINT_MATTE, resources.displayMetrics.density)
+    init { background = matte; clipChildren = true }
 
     fun display(p: Presentation, width: Int, height: Int) {
       // Keep admission held across rebinding; a worker cannot reserve scratch
@@ -280,7 +282,7 @@ internal class SlideshowStage(
       budget.setOwner(owner, p.photos.map {
         SlideshowPixelBudget.Entry(it.bitmap, it.bitmap.allocationByteCount.toLong())
       })
-      setBackgroundColor(if (p.galleryStyle) PRINT_MATTE else MATTE)
+      background = if (p.galleryStyle) printMatte else matte
       visibility = View.VISIBLE
       val gallery = galleryPlans(p, width, height)
       val margin = if (p.photos.size == 2) (20 * resources.displayMetrics.density).toInt() else 0

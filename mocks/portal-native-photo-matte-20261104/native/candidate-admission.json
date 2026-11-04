@@ -1,0 +1,99 @@
+{
+  "ok": true,
+  "blockers": [],
+  "originalClockUtc": "2026-11-04T10:14:38Z",
+  "sources": {
+    "NativeMatteActivity.java": {
+      "sha256": "1107912fab076dceeac4be9fcc92125c0f39f883d1dddac9c2f05df0053d5fdd",
+      "bytes": 12442
+    },
+    "AndroidManifest.xml": {
+      "sha256": "550803aa3b1b19812e659d799ca32554b7334ac4b64c166624bc5b6ff524a4b3",
+      "bytes": 439
+    },
+    "build.sh": {
+      "sha256": "71ed0506bf1aa13abe71f1dd1ddbc7f6fbf9e5e5b1832f50d866fac38c114b21",
+      "bytes": 792
+    },
+    "repack.sh": {
+      "sha256": "9c703fe0153fa575dd0cb652456cae79ba3f4d9690b42fa38d0ef15bfb0f34a5",
+      "bytes": 778
+    }
+  },
+  "fixtureDex": {
+    "sha256": "daf4a0d0d528ff33a0b4fb714ab71896b918d9212a14114c4f71175c8212207b",
+    "bytes": 17880
+  },
+  "fixture": {
+    "sha256": "2488c0af0042e7413079d3a8c9656a035cf8386d2cfcdde2cc26b8889b5a4814",
+    "bytes": 37503466
+  },
+  "originalCandidate": {
+    "sha256": "a48c88f0e81a0ba52ae8642419487bff553ab8ae89a6c7d11d258ce3bad1cbdb",
+    "bytes": 46745298
+  },
+  "baselineFixture": {
+    "sha256": "6fce0e7cb4a45e2dfbb342cc64259a84b0210772a2a2085167737ae46de27b31",
+    "bytes": 37499370
+  },
+  "caseNames": [
+    "portrait-whole-fit",
+    "portrait-whole-fit-retained-resize",
+    "panorama-whole-fit",
+    "gallery-print",
+    "gallery-spread"
+  ],
+  "gates": {
+    "generatedPhotoCornerColors": [
+      [
+        4294914884,
+        4281589094,
+        4281554414,
+        4294958387
+      ],
+      [
+        4292686813,
+        4281589213,
+        4293822515,
+        4287120605
+      ]
+    ],
+    "cornerPositionsFractions": [
+      0.08,
+      0.92
+    ],
+    "cornerMaxChannelDifference": 12,
+    "wholePhotoBoundsTolerancePixels": 0.02,
+    "scaleEqualityTolerance": 0.0001,
+    "normalBaseArgb": "ff14161b",
+    "galleryBaseArgb": "ff1c1b19",
+    "bitmapIdentityExact": true,
+    "admittedBytesMustEqualActualInputAllocationSum": true,
+    "outputCanvasInitiallyTransparent": true,
+    "everyPixelAlphaMustBe255": true,
+    "matteMaskExcludesPhotoEnvelopePlus2Pixels": true,
+    "mattePixelsMinimumExclusive": 1000,
+    "quietMarksMinimum": 50,
+    "quietMarksFractionMaximumExclusive": 0.3,
+    "basePixelsFractionMinimumExclusive": 0.65,
+    "basePixelsMaxChannelDifference": 1,
+    "quietMarksMinPositiveChannelDifference": 2,
+    "quietMarksMaxPositiveChannelDifference": 64,
+    "negativeOrOtherMattePixelsAllowed": 0,
+    "stoppedAdmissionMustBe0": true,
+    "inputBitmapsMustNotBeRecycledByStage": true
+  },
+  "frozenSourcesAndGatesByteIdentical": true,
+  "baselineAndCandidateFixtureDexByteIdentical": true,
+  "embeddedCandidateExact": true,
+  "zeroDeclaredPermissions": true,
+  "repackOnlyNoJavaOrDexRecompile": true,
+  "candidateOriginalBadging": "package: name='com.immortal.launcher.debug' versionCode='141' versionName='1.147' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'\nminSdkVersion:'24'\ntargetSdkVersion:'36'\nuses-permission: name='android.permission.INTERNET'\nuses-permission: name='android.permission.REQUEST_INSTALL_PACKAGES'\nuses-permission: name='android.permission.REQUEST_DELETE_PACKAGES'\nuses-permission: name='android.permission.WRITE_SECURE_SETTINGS'\nuses-permission: name='android.permission.WRITE_SETTINGS'\nuses-permission: name='android.permission.RECEIVE_BOOT_COMPLETED'\nuses-permission: name='android.permission.CAMERA'\nuses-permission: name='android.permission.READ_CALENDAR'\nuses-permission: name='android.permission.ACCESS_WIFI_STATE'\nuses-permission: name='android.permission.CHANGE_WIFI_MULTICAST_STATE'\nuses-permission: name='android.permission.MODIFY_AUDIO_SETTINGS'\nuses-permission: name='android.permission.RECORD_AUDIO'\nuses-permission: name='android.permission.FOREGROUND_SERVICE'\nuses-permission: name='android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE'\nuses-permission: name='android.permission.WAKE_LOCK'\nuses-permission: name='android.permission.KILL_BACKGROUND_PROCESSES'\nuses-permission: name='android.permission.PACKAGE_USAGE_STATS'\nuses-permission: name='android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK'\nuses-permission: name='android.permission.SYSTEM_ALERT_WINDOW'\nuses-permission: name='android.permission.FOREGROUND_SERVICE_SPECIAL_USE'\nuses-permission: name='android.permission.READ_LOGS'\nuses-permission: name='android.permission.READ_EXTERNAL_STORAGE'\nuses-permission: name='android.permission.WRITE_EXTERNAL_STORAGE'\nuses-permission: name='android.permission.BIND_APPWIDGET'\nuses-permission: name='com.immortal.launcher.debug.permission.HEY_TRIGGER'\nuses-permission: name='android.permission.ACCESS_NETWORK_STATE'\nuses-permission: name='com.immortal.launcher.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'\napplication-label:'Immortal'\napplication-label-af:'Immortal'\napplication-label-am:'Immortal'\napplication-label-ar:'Immortal'\napplication-label-as:'Immortal'\napplication-label-az:'Immortal'\napplication-label-be:'Immortal'\napplication-label-bg:'Immortal'\napplication-label-bn:'Immortal'\napplication-label-bs:'Immortal'\napplication-label-ca:'Immortal'\napplication-label-cs:'Immortal'\napplication-label-da:'Immortal'\napplication-label-de:'Immortal'\napplication-label-el:'Immortal'\napplication-label-en-AU:'Immortal'\napplication-label-en-CA:'Immortal'\napplication-label-en-GB:'Immortal'\napplication-label-en-IN:'Immortal'\napplication-label-en-XC:'Immortal'\napplication-label-es:'Immortal'\napplication-label-es-US:'Immortal'\napplication-label-et:'Immortal'\napplication-label-eu:'Immortal'\napplication-label-fa:'Immortal'\napplication-label-fi:'Immortal'\napplication-label-fr:'Immortal'\napplication-label-fr-CA:'Immortal'\napplication-label-gl:'Immortal'\napplication-label-gu:'Immortal'\napplication-label-hi:'Immortal'\napplication-label-hr:'Immortal'\napplication-label-hu:'Immortal'\napplication-label-hy:'Immortal'\napplication-label-in:'Immortal'\napplication-label-is:'Immortal'\napplication-label-it:'Immortal'\napplication-label-iw:'Immortal'\napplication-label-ja:'Immortal'\napplication-label-ka:'Immortal'\napplication-label-kk:'Immortal'\napplication-label-km:'Immortal'\napplication-label-kn:'Immortal'\napplication-label-ko:'Immortal'\napplication-label-ky:'Immortal'\napplication-label-lo:'Immortal'\napplication-label-lt:'Immortal'\napplication-label-lv:'Immortal'\napplication-label-mk:'Immortal'\napplication-label-ml:'Immortal'\napplication-label-mn:'Immortal'\napplication-label-mr:'Immortal'\napplication-label-ms:'Immortal'\napplication-label-my:'Immortal'\napplication-label-nb:'Immortal'\napplication-label-ne:'Immortal'\napplication-label-nl:'Immortal'\napplication-label-or:'Immortal'\napplication-label-pa:'Immortal'\napplication-label-pl:'Immortal'\napplication-label-pt:'Immortal'\napplication-label-pt-BR:'Immortal'\napplication-label-pt-PT:'Immortal'\napplication-label-ro:'Immortal'\napplication-label-ru:'Immortal'\napplication-label-si:'Immortal'\napplication-label-sk:'Immortal'\napplication-label-sl:'Immortal'\napplication-label-sq:'Immortal'\napplication-label-sr:'Immortal'\napplication-label-sr-Latn:'Immortal'\napplication-label-sv:'Immortal'\napplication-label-sw:'Immortal'\napplication-label-ta:'Immortal'\napplication-label-te:'Immortal'\napplication-label-th:'Immortal'\napplication-label-tl:'Immortal'\napplication-label-tr:'Immortal'\napplication-label-uk:'Immortal'\napplication-label-ur:'Immortal'\napplication-label-uz:'Immortal'\napplication-label-vi:'Immortal'\napplication-label-zh-CN:'Immortal'\napplication-label-zh-HK:'Immortal'\napplication-label-zh-TW:'Immortal'\napplication-label-zu:'Immortal'\napplication-icon-160:'res/mipmap-mdpi-v4/ic_launcher.png'\napplication-icon-240:'res/mipmap-hdpi-v4/ic_launcher.png'\napplication-icon-320:'res/mipmap-xhdpi-v4/ic_launcher.png'\napplication-icon-480:'res/mipmap-xxhdpi-v4/ic_launcher.png'\napplication-icon-640:'res/mipmap-xxxhdpi-v4/ic_launcher.png'\napplication: label='Immortal' icon='res/mipmap-mdpi-v4/ic_launcher.png'\napplication-debuggable\nproperty: name='android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE' value='System-wide back-swipe gesture overlay' \nuses-library-not-required:'androidx.window.extensions'\nuses-library-not-required:'androidx.window.sidecar'\nfeature-group: label=''\n  uses-feature-not-required: name='android.hardware.camera'\n  uses-feature-not-required: name='android.hardware.camera.autofocus'\n  uses-feature-not-required: name='android.hardware.touchscreen'\n  uses-feature-not-required: name='android.software.leanback'\n  uses-feature: name='android.hardware.microphone'\n  uses-implied-feature: name='android.hardware.microphone' reason='requested android.permission.RECORD_AUDIO permission'\n  uses-feature: name='android.hardware.screen.landscape'\n  uses-implied-feature: name='android.hardware.screen.landscape' reason='one or more activities have specified a landscape orientation'\n  uses-feature: name='android.hardware.wifi'\n  uses-implied-feature: name='android.hardware.wifi' reason='requested android.permission.ACCESS_WIFI_STATE permission, and requested android.permission.CHANGE_WIFI_MULTICAST_STATE permission'\nprovides-component:'device-admin'\nprovides-component:'accessibility'\nprovides-component:'launcher'\nprovides-component:'notification-listener'\nprovides-component:'dream'\nmain\nother-activities\nother-receivers\nother-services\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--' 'af' 'am' 'ar' 'as' 'az' 'be' 'bg' 'bn' 'bs' 'ca' 'cs' 'da' 'de' 'el' 'en-AU' 'en-CA' 'en-GB' 'en-IN' 'en-XC' 'es' 'es-US' 'et' 'eu' 'fa' 'fi' 'fr' 'fr-CA' 'gl' 'gu' 'hi' 'hr' 'hu' 'hy' 'in' 'is' 'it' 'iw' 'ja' 'ka' 'kk' 'km' 'kn' 'ko' 'ky' 'lo' 'lt' 'lv' 'mk' 'ml' 'mn' 'mr' 'ms' 'my' 'nb' 'ne' 'nl' 'or' 'pa' 'pl' 'pt' 'pt-BR' 'pt-PT' 'ro' 'ru' 'si' 'sk' 'sl' 'sq' 'sr' 'sr-Latn' 'sv' 'sw' 'ta' 'te' 'th' 'tl' 'tr' 'uk' 'ur' 'uz' 'vi' 'zh-CN' 'zh-HK' 'zh-TW' 'zu'\ndensities: '160' '240' '320' '480' '640'\nnative-code: 'arm64-v8a' 'armeabi-v7a'\n",
+  "limits": [
+    "Actual embedded debug SlideshowStage public constructor/show/stop and native software Canvas draw only",
+    "Generated owned bitmaps; zero preference reads permitted",
+    "No owner photos or data, account/provider/network/device operations by author",
+    "No device compositor/GPU, live motion/dissolve, FaceRenderer or host integration acceptance",
+    "No optimized or API28 runtime claim"
+  ]
+}
