@@ -1,0 +1,94 @@
+{
+  "sourceReady": true,
+  "authoredAtUtc": "2026-11-04T13:04:31.508304+00:00",
+  "originalClock": "2026-11-04T13:01:07Z target13:16:07Z hard13:31:07Z",
+  "package": "com.immortal.panoramaviewportfixture",
+  "activity": ".PanoramaViewportActivity",
+  "report": "external-files/report.json",
+  "sources": {
+    "PanoramaViewportActivity.java": {
+      "sha256": "228f8a2a72d124fff26cbe4d6e6c0a3fecf3c462b4eb5923e4f0d826f15fe671",
+      "bytes": 6417
+    },
+    "fixture.html": {
+      "sha256": "837b84de848fa1fab2dd360f2425803db6fad02679c2b2ec75795ba9b98afce1",
+      "bytes": 7023
+    },
+    "AndroidManifest.xml": {
+      "sha256": "14d73b199b8638c801c0ea653fe558f9de6414fdea68e1b464bcaf5774e38d41",
+      "bytes": 439
+    },
+    "RUN.md": {
+      "sha256": "79ca77d65b73595e5d27e78aea92650420f2eb2eedcf46b589d65759926223a9",
+      "bytes": 2009
+    }
+  },
+  "caseNames": [
+    "retainedStillLandscapeShrink",
+    "nextStepAfterEarlyShrink",
+    "retainedMovingWideShrink",
+    "originalFullsizeLandscape"
+  ],
+  "expectedBaselineFailNames": [
+    "retainedStillLandscapeShrink",
+    "nextStepAfterEarlyShrink",
+    "retainedMovingWideShrink"
+  ],
+  "expectedBaselineControlNames": [
+    "originalFullsizeLandscape"
+  ],
+  "assetAllowlist": [
+    "styles.css",
+    "lib-engine.js",
+    "modes.js",
+    "mode-impls.js",
+    "photo-doodles-dark.svg"
+  ],
+  "gates": {
+    "caseCount": 4,
+    "currentViewport": [
+      400,
+      240
+    ],
+    "initialViewport": [
+      800,
+      480
+    ],
+    "cssTolerance": 0.04,
+    "actualModeRun": true,
+    "retainedResourceAndAnimationStringIdentity": true,
+    "boundsAndTravel": true,
+    "stillWholePhoto": true,
+    "movingNativePhaseClaim": false,
+    "literalFullsizeStrip": [
+      800,
+      480,
+      0
+    ],
+    "literalFullsizePhoto": [
+      40,
+      0,
+      720,
+      480
+    ],
+    "unknownRequests": 0,
+    "webViewDestroyed": true,
+    "watchdogMillis": 45000
+  },
+  "declaredPermissions": [],
+  "baselineApkPendingRootCopy": true,
+  "sourceAuthoringOnly": true,
+  "fixtureDexPendingRootCompilation": true,
+  "buildSdkAdbGitTestsDevices": 0,
+  "limits": [
+    "Actual direct mode.run; no controller/scheduler integration",
+    "Native DOM geometry/real RAF only; optional software Canvas",
+    "No native moving phase/trajectory/continuity claim",
+    "No mounted Dream/overlay/clock/live-source/optimized/API28/Living/current-selection claim"
+  ],
+  "rootFixtureCorrection": {
+    "reason": "WebView canonicalizes inline animation shorthand. Exact name,5000ms duration,linear timing,forwards fill longhands replace incorrect literal shorthand control. Retained string identity and all geometry predicates unchanged.",
+    "excludedInitialRun": "b3131d exit1 false motion/fullsize controls; retirement exact",
+    "originalJavaAndDexUnchanged": true
+  }
+}

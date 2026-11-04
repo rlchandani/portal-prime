@@ -1,0 +1,257 @@
+{
+  "ok": true,
+  "reviewedAt": "2026-11-04T13:08:38.491726+00:00",
+  "scope": "Independent source and retained host-result review only; reviewer ran no tests/build/SDK/Git/device/network operations.",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T13:01:07Z",
+    "target": "2026-11-04T13:16:07Z",
+    "hardDeadline": "2026-11-04T13:31:07Z",
+    "selectedAt": "2026-11-04T13:03:41.738274+00:00",
+    "clockNotReset": true
+  },
+  "bindings": {
+    "/private/tmp/portal-panorama-viewport-20261104-130107/selected-plan.json": {
+      "sha256": "e702d3d5b9f52917096764e5f113cd30f2260950b2e883c3b810235bda15c753",
+      "bytes": 1676
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/source-witness.json": {
+      "sha256": "20d73e7445e65a1e197fe4465ec3efb8e563667cd5f5441637b44fc2cd4dcee3",
+      "bytes": 1373
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/mode-impls.js": {
+      "sha256": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960",
+      "bytes": 69311
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/app-build.before.kts": {
+      "sha256": "814e31f9c7ae13d0e679110a110606cdf3ee29e5ad30d884749578aec27c3ae1",
+      "bytes": 11824
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/roadmap.before.json": {
+      "sha256": "d10683c43c8035894adbdfab0d6b1ebf54c41a461147e53dd7156d60afe9e215",
+      "bytes": 491421
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/slideshow_scene_fixture.mjs": {
+      "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+      "bytes": 9921
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/slideshow_panorama_viewport.frozen.test.mjs": {
+      "sha256": "362c77f622813e26864f298fc03b16be8816bb0a23d904039489973e27f3ee8e",
+      "bytes": 5443
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/baseline-host-terminal.json": {
+      "sha256": "d03b0bd1452a709fa2d9524ade6b91021413cbdd6d7d24e7a3ec395f53d3e16c",
+      "bytes": 201
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/baseline-host-v1.log": {
+      "sha256": "fc34759311876c5c7adc58ccba84834a978018d36d987fdca33e70d0c3fa7231",
+      "bytes": 4041
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/candidate-host.log": {
+      "sha256": "7aa3c3fee805b0c5c8c1aafdcfce5682fe3df6b110eb529b00ce59336cb6f85c",
+      "bytes": 745
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/alternate-flip-source-witness.json": {
+      "sha256": "5b28061efee1b9524e5f8b24278646d94b6be7a79118d7a1a1150071d1ed9fa9",
+      "bytes": 3653
+    },
+    "/private/tmp/portal-memories-viewport-20261104-124417/independent-source-review.json": {
+      "sha256": "d8c13a3a22eb40a626ffb5ca94cea66de3f2b8a4cba7f5d9e44f47f961d47cc9",
+      "bytes": 13751
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/mode-impls.js": {
+      "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007",
+      "bytes": 70273
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/slideshow_panorama_viewport.test.mjs": {
+      "sha256": "362c77f622813e26864f298fc03b16be8816bb0a23d904039489973e27f3ee8e",
+      "bytes": 5443
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/helpers/slideshow_scene_fixture.mjs": {
+      "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+      "bytes": 9921
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "sha256": "1f2fcfc3d01a93cb3a96c050b97230cfddfb80cbec53da205f4d008a79a0f971",
+      "bytes": 164859
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/candidate-host-final.log": {
+      "sha256": "da8430c2db5ad44398b762a8371e6c0a62875b215e78188e65f6bc5b2f15c287",
+      "bytes": 742
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/candidate-host-terminal.json": {
+      "sha256": "52714d5c60ce2cf8af783a943421e963bdd426a08e43fa4169b281b76874675a",
+      "bytes": 142
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/slideshow-ci.log": {
+      "sha256": "48dd784d27645627aac5b8dc7a896b3e193d6087975810af679417189dfa3822",
+      "bytes": 39092
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/slideshow-ci-final.log": {
+      "sha256": "fa071085d464fdaaa6b11da2802eeceae368471edd10ab6c71ae09c6fed568a2",
+      "bytes": 38099
+    },
+    "/private/tmp/portal-panorama-viewport-20261104-130107/before-debug-1.157.apk": {
+      "sha256": "bea8a85790f829d86fa401e93afe09e9aae6f9dc5f5520f6820033ed137443b2",
+      "bytes": 46745522
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/tests/slideshow_photo_motion.test.mjs": {
+      "sha256": "ca62d6895120c2b240808c9dd06c348fb2cec30e650e42efb7a2a98f96920d48",
+      "bytes": 17974
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_slideshow_sources.mjs": {
+      "sha256": "90774e252a4966dc4230da59423c9a641a5f17cca677663c61f8ca1c5af8f8e5",
+      "bytes": 2589
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/scripts/test_slideshow_labels.mjs": {
+      "sha256": "937a22671323384bc14aadb5db1d2f11296b9a97f2a6374e74cd531bfcf7d87a",
+      "bytes": 4248
+    }
+  },
+  "protectedScreensaverAssets": {
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/cinema-grain.png": {
+      "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "bytes": 12657
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/index.html": {
+      "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2",
+      "bytes": 7785
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/lib-engine.js": {
+      "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "bytes": 5582
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/modes.js": {
+      "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "bytes": 13499
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles-dark.svg": {
+      "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "bytes": 1247
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photo-doodles.svg": {
+      "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911",
+      "bytes": 1246
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/photos.js": {
+      "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293",
+      "bytes": 8528
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/scheduler.js": {
+      "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+      "bytes": 14433
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets/screensaver/styles.css": {
+      "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b",
+      "bytes": 15397
+    }
+  },
+  "sourceChecks": {
+    "onlyPanoramaBlockChanged": true,
+    "MemoriesAndAllOtherModesByteExact": true,
+    "sharedHelpersSchedulerAndFrozenTestsExact": true,
+    "otherNineAssetsMatchPriorAcceptedActualApkBindings": true,
+    "measuredViewport": "Geometry reads root.clientWidth/clientHeight with previous ctx.W/H fallback when unmeasured. New photo publishes after decode at current size.",
+    "retainedOwnership": "Exactly two original layer/strip nodes gain bounded photo references. Existing release clears photo before removing URL/animation/transform. Resize visits only retained admitted photos, mutates geometry/styles, and never calls ctx.url, load, take, cursor or beat logic.",
+    "pauseAndCleanup": "Coalesced requestAnimationFrame belongs to unchanged makeTimers; paused frame defers to owned zero-delay task. Callback reads latest size when resumed, and active checks plus timer cancellation prevent cleanup races. Listener removed before existing idempotent dissolve cleanup.",
+    "dissolve": "Unchanged incoming-only 1800ms dissolve owner remains; reflow covers all unreleased incoming/outgoing layers until retirement clears each photo.",
+    "geometryAndMotion": "Previous ratio fallback, min(W*2,max(W,H*ratio)) width cap, whole-height contain fit, centered top, travel, faceCrop/panStart focal math and motion eligibility preserved with measured W/H. Duration remains min(ctx.motionMs,ctx.photoMs). No new random draws. Reassigning the same animation string is checked by host assertions; native/browser timeline continuity is not established by this receipt.",
+    "cleanupContract": "ready getter and existing pause/resume delegates retained.",
+    "initialControl": "Original measured1600x1000 generated3:1 panorama remains width3000 height1000 top0 shift-46.666666666666664%, animation dolly5000ms linear forwards; focal-point control remains still and within viewport.",
+    "finalCssAssignmentOrder": {
+      "exactDeltaFromPreviouslyReviewedCandidateReconstructedAndHashed": true,
+      "sequence": "width/height \u2192 top \u2192 bg(url,contain) only when url is supplied \u2192 shift \u2192 animation/willChange \u2192 transform",
+      "resizeDoesNotAssignBackground": true,
+      "sourceChangeReason": "Restore prior initial DOM/CSS assignment order and preserve the existing reviewed default trace hash.",
+      "otherProductionBlocksByteIdentical": true
+    },
+    "otherNineAssetsMatchCurrentBaselineActualApk": true
+  },
+  "hostEvidence": {
+    "frozenTestSha256": "362c77f622813e26864f298fc03b16be8816bb0a23d904039489973e27f3ee8e",
+    "baseline": {
+      "tests": 7,
+      "literalBoundsAssertionFailures": 4,
+      "controls": 3,
+      "exitCode": 1,
+      "toolChunk": "394862",
+      "literal": "Strip width 3000 exceeds two viewports 1280"
+    },
+    "rootReportedTerminal": {
+      "focusedToolChunk": "f34391",
+      "focusedExitCode": 0,
+      "retainedLogToolChunk": "6db721",
+      "retainedLogExitCode": 0,
+      "origin": "Root message; no separate candidate terminal JSON available at review time."
+    },
+    "reviewerExecutedTests": false,
+    "coverage": "Actual production mode in existing generated DOM/time/load fixture; still and moving reflow, pending decode, paused resize burst, original geometry/duration, cached focal point, cleanup/stale callbacks. URL/node/resolution/cursor/animation string identity checked. No raster or actual native WebView capture claimed.",
+    "initialCandidateRetainedLog": {
+      "tests": 7,
+      "pass": 7,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "candidateFinalRetainedLog": {
+      "tests": 7,
+      "pass": 7,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "finalFullSlideshowCi": {
+      "tests": 398,
+      "pass": 398,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "rootReportedToolChunk": "84dd3a",
+      "rootReportedExitCode": 0,
+      "terminalOrigin": "Root message; reviewer bound actual retained complete log."
+    },
+    "finalFocusedTerminal": {
+      "rootReportedToolChunk": "8824a5",
+      "underlyingNodeExitCode": 0,
+      "qualification": "A preceding Python repair in that tool invocation failed on read-only write. Root reports the subsequent node test exited0 and no source change in the failed repair. Retained final seven-case log independently read and hashed; no reviewer execution."
+    },
+    "excludedInitialFullTraceFailure": {
+      "tests": 398,
+      "pass": 397,
+      "fail": 1,
+      "rootReportedToolChunk": "4243c2",
+      "exitCode": 1,
+      "onlyFailure": "Panorama default-output trace hash changed from reviewed64d5d203\u2026 to ae533277\u2026 because background styles were inserted before geometry.",
+      "finalReviewedPanoramaGolden": "64d5d2036eb082a85bab62c7718b97da2bb9289836eda98220a05a1c3b9ec0cd",
+      "correctiveScope": "Production assignment order restored; no golden hash or business assertion adjustment."
+    },
+    "allReviewedMotionGoldensPassed": true,
+    "testAndPredicateUnchangedQualification": "Frozen seven viewport tests and shared fixture byte-exact. Current Panorama golden equals the original failure log expected value; final CI passes all existing mode golden/resource/random checks. Root reports no tests or predicates were edited; no reviewer Git query."
+  },
+  "distinctness": {
+    "activeCaller": "Existing PhotoFrameController root layout listener updates retained WebView dimensions and overlays without reload. Scheduler ctx captures startup W/H and only recovers degenerate initial boot; no healthy-resize restart.",
+    "priorScopes": "Earlier grouped matte scope was CSS-only and expressly left Panorama resize/extreme crops unverified. Current completed Memories resize remains byte-identical. No prior named Panorama ordinary-resize defect task found; original discovery and hard deadline preserved."
+  },
+  "alternateUnselectedFlip": "Bound alternate-flip-source-witness.json retains first witness13:02:37 and original13:01:07\u201313:31:07 clock; no Flip/Night production or test change and no selection claim.",
+  "blockers": [],
+  "limits": [
+    "Accepts final source, unchanged frozen seven-case host evidence and retained398-case slideshowCI result. Full app/artifact/native before/after and promotion evidence remain root-owned later checks.",
+    "No claim about actual Android WebView resize, hardware pixels, native clock/overlays, optimized runtime, API28, Living visuals, live sources or whole-product performance.",
+    "Moving-host test proves unchanged animation string/duration, not optical motion continuity or cadence.",
+    "Original zero-size fallback and fit policy retained; no broad layout, timer, selection, source, motion, Night, black-handoff or exhausted-scope redesign."
+  ],
+  "supersededCandidateSource": {
+    "sha256": "7a330fbda2083082f022908c4bb08edacd8c5a9c89f61fa7b678fe96065e40d7",
+    "bytes": 70240
+  }
+}

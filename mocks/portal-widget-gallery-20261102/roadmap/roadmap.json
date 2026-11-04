@@ -1,18 +1,89 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T12:59:09.465445+00:00",
-  "updatedLabel": "Memories resize delivered to both rooms; original clocks retained",
+  "updatedAt": "2026-11-04T13:12:50.859520+00:00",
+  "updatedLabel": "Panorama resize delivered to both rooms; original clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.157/code 151. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.158/code 152. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "panorama-strip-viewport",
+      "title": "Panorama photos fit after viewport resize",
+      "summary": "Resize retained Panorama strips and prepare later photos using the current measured photo area.",
+      "status": "delivered",
+      "verification": "4,513 JVM /398 slideshow /743 app JS /4 native cases /exact both-room installs",
+      "kind": "Screensaver photo layout",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Portal engineering / independent review",
+      "deployment": "Exact optimized1.158/code152 fully hashed in both rooms; one install each.",
+      "acceptance": [
+        "Frozen7host:4 literal bounds failures/3controls to7passes.",
+        "Same frozen actual-debug/API29 native:3 geometric failures/1literal fullsize control to4passes; retained image/URL/cursor without extra loads.",
+        "Only Panorama production block changes; original fit/focal/duration/background assignment order and every mode golden remain."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery",
+          "source": "docs/portal-panorama-viewport-2026-11-04.md"
+        },
+        {
+          "text": "Verification",
+          "source": "mocks/portal-panorama-viewport-20261104/evidence/verification.json"
+        }
+      ],
+      "limits": [
+        "Native acceptance uses actual packaged debug Panorama mode.run, Family API29, generated SVGs, virtual beat timers and real DOM layout/RAF. Optional software Canvas; no hardware or motion-phase gate.",
+        "Production controller/scheduler resize integration, mounted Dream/clock/live source/optimized/API28/Living visuals and currently selected style remain separate. Saved Shuffle/fit remains.",
+        "Public1.83/code77 unchanged; no phone, household media/provider/account, push or publication."
+      ],
+      "next": "Continue the next small verified improvement. Broader motion remains separately scoped.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-04T13:01:07Z",
+        "target": "2026-11-04T13:16:07Z",
+        "hardDeadline": "2026-11-04T13:31:07Z",
+        "baseCommit": "e1765e9ae7d650453a11168828b80ee0d9ea5e4a",
+        "clockNotReset": true,
+        "state": "selected",
+        "candidate": "Panorama retains initial pixel bounds after ordinary measured viewport resize, including later steps.",
+        "sourceBindings": {
+          "app/src/main/assets/screensaver/mode-impls.js": {
+            "sha256": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960",
+            "bytes": 69311
+          },
+          "app/src/main/assets/screensaver/modes.js": {
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+            "bytes": 13499
+          },
+          "app/src/main/assets/screensaver/scheduler.js": {
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+            "bytes": 14433
+          },
+          "scripts/tests/helpers/slideshow_scene_fixture.mjs": {
+            "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+            "bytes": 9921
+          },
+          "app/build.gradle.kts": {
+            "sha256": "814e31f9c7ae13d0e679110a110606cdf3ee29e5ad30d884749578aec27c3ae1",
+            "bytes": 11824
+          },
+          "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+            "sha256": "d10683c43c8035894adbdfab0d6b1ebf54c41a461147e53dd7156d60afe9e215",
+            "bytes": 491421
+          }
+        },
+        "selectedAt": "2026-11-04T13:03:41.738274+00:00",
+        "scope": "Panorama strip geometry uses current measured bounds for retained and pending photos; existing whole-height fit, width cap, focal point and motion duration remain. Coalesced pausable reflow retains photo/image/URL/decode/cursor ownership."
+      }
+    },
     {
       "id": "memories-collage-viewport",
       "title": "Memories photos fit after viewport resize",

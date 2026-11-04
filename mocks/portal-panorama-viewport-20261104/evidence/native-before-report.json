@@ -1,0 +1,352 @@
+{
+  "ok": false,
+  "error": null,
+  "tests": [
+    {
+      "name": "retainedStillLandscapeShrink",
+      "ok": false,
+      "checks": {
+        "sameImage": true,
+        "sameUrl": true,
+        "noResolutions": true,
+        "noLoads": true,
+        "sameCursor": true,
+        "sameAnimation": true,
+        "contain": true,
+        "bounded": false,
+        "wholePhoto": false
+      },
+      "strip": {
+        "width": 800,
+        "height": 480,
+        "top": 0,
+        "travel": 0
+      },
+      "root": {
+        "w": 400,
+        "h": 240
+      },
+      "fullPhoto": {
+        "x": 40,
+        "y": 0,
+        "w": 720,
+        "h": 480
+      },
+      "animation": "auto ease 0s 1 normal none running none",
+      "animationName": "none",
+      "animationDuration": "auto",
+      "animationTimingFunction": "ease",
+      "animationFillMode": "none",
+      "backgroundSize": "contain",
+      "sourceResolutions": 1,
+      "loadAdmissions": 1,
+      "cursor": 1,
+      "actualMode": "SS.MODES.panorama.run",
+      "softwareRasterOnly": true
+    },
+    {
+      "name": "nextStepAfterEarlyShrink",
+      "ok": false,
+      "checks": {
+        "bounded": false,
+        "wholePhoto": false,
+        "currentMeasured": true,
+        "oneLiveImage": true
+      },
+      "strip": {
+        "width": 800,
+        "height": 480,
+        "top": 0,
+        "travel": 0
+      },
+      "root": {
+        "w": 400,
+        "h": 240
+      },
+      "fullPhoto": {
+        "x": 40,
+        "y": 0,
+        "w": 720,
+        "h": 480
+      },
+      "animation": "auto ease 0s 1 normal none running none",
+      "animationName": "none",
+      "animationDuration": "auto",
+      "animationTimingFunction": "ease",
+      "animationFillMode": "none",
+      "backgroundSize": "contain",
+      "sourceResolutions": 3,
+      "loadAdmissions": 3,
+      "cursor": 2,
+      "actualMode": "SS.MODES.panorama.run",
+      "softwareRasterOnly": true
+    },
+    {
+      "name": "retainedMovingWideShrink",
+      "ok": false,
+      "checks": {
+        "sameImage": true,
+        "sameUrl": true,
+        "noResolutions": true,
+        "noLoads": true,
+        "sameCursor": true,
+        "sameAnimation": true,
+        "contain": true,
+        "bounded": false,
+        "originalAnimation": true
+      },
+      "strip": {
+        "width": 1440,
+        "height": 480,
+        "top": 0,
+        "travel": -640
+      },
+      "root": {
+        "w": 400,
+        "h": 240
+      },
+      "fullPhoto": {
+        "x": -4.284031867980957,
+        "y": 0,
+        "w": 1440,
+        "h": 480
+      },
+      "animation": "5000ms linear 0s 1 normal forwards running dolly",
+      "animationName": "dolly",
+      "animationDuration": "5000ms",
+      "animationTimingFunction": "linear",
+      "animationFillMode": "forwards",
+      "backgroundSize": "contain",
+      "sourceResolutions": 4,
+      "loadAdmissions": 4,
+      "cursor": 1,
+      "actualMode": "SS.MODES.panorama.run",
+      "softwareRasterOnly": true
+    },
+    {
+      "name": "originalFullsizeLandscape",
+      "ok": true,
+      "checks": {
+        "bounded": true,
+        "wholePhoto": true,
+        "literalStrip": true,
+        "literalPhoto": true,
+        "staticAnimation": true
+      },
+      "strip": {
+        "width": 800,
+        "height": 480,
+        "top": 0,
+        "travel": 0
+      },
+      "root": {
+        "w": 800,
+        "h": 480
+      },
+      "fullPhoto": {
+        "x": 40,
+        "y": 0,
+        "w": 720,
+        "h": 480
+      },
+      "animation": "auto ease 0s 1 normal none running none",
+      "animationName": "none",
+      "animationDuration": "auto",
+      "animationTimingFunction": "ease",
+      "animationFillMode": "none",
+      "backgroundSize": "contain",
+      "sourceResolutions": 5,
+      "loadAdmissions": 5,
+      "cursor": 1,
+      "actualMode": "SS.MODES.panorama.run",
+      "softwareRasterOnly": true
+    }
+  ],
+  "failures": 3,
+  "state": {
+    "complete": true,
+    "error": null,
+    "observations": [
+      {
+        "name": "retainedStillLandscapeShrink",
+        "ok": false,
+        "checks": {
+          "sameImage": true,
+          "sameUrl": true,
+          "noResolutions": true,
+          "noLoads": true,
+          "sameCursor": true,
+          "sameAnimation": true,
+          "contain": true,
+          "bounded": false,
+          "wholePhoto": false
+        },
+        "strip": {
+          "width": 800,
+          "height": 480,
+          "top": 0,
+          "travel": 0
+        },
+        "root": {
+          "w": 400,
+          "h": 240
+        },
+        "fullPhoto": {
+          "x": 40,
+          "y": 0,
+          "w": 720,
+          "h": 480
+        },
+        "animation": "auto ease 0s 1 normal none running none",
+        "animationName": "none",
+        "animationDuration": "auto",
+        "animationTimingFunction": "ease",
+        "animationFillMode": "none",
+        "backgroundSize": "contain",
+        "sourceResolutions": 1,
+        "loadAdmissions": 1,
+        "cursor": 1,
+        "actualMode": "SS.MODES.panorama.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "nextStepAfterEarlyShrink",
+        "ok": false,
+        "checks": {
+          "bounded": false,
+          "wholePhoto": false,
+          "currentMeasured": true,
+          "oneLiveImage": true
+        },
+        "strip": {
+          "width": 800,
+          "height": 480,
+          "top": 0,
+          "travel": 0
+        },
+        "root": {
+          "w": 400,
+          "h": 240
+        },
+        "fullPhoto": {
+          "x": 40,
+          "y": 0,
+          "w": 720,
+          "h": 480
+        },
+        "animation": "auto ease 0s 1 normal none running none",
+        "animationName": "none",
+        "animationDuration": "auto",
+        "animationTimingFunction": "ease",
+        "animationFillMode": "none",
+        "backgroundSize": "contain",
+        "sourceResolutions": 3,
+        "loadAdmissions": 3,
+        "cursor": 2,
+        "actualMode": "SS.MODES.panorama.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "retainedMovingWideShrink",
+        "ok": false,
+        "checks": {
+          "sameImage": true,
+          "sameUrl": true,
+          "noResolutions": true,
+          "noLoads": true,
+          "sameCursor": true,
+          "sameAnimation": true,
+          "contain": true,
+          "bounded": false,
+          "originalAnimation": true
+        },
+        "strip": {
+          "width": 1440,
+          "height": 480,
+          "top": 0,
+          "travel": -640
+        },
+        "root": {
+          "w": 400,
+          "h": 240
+        },
+        "fullPhoto": {
+          "x": -4.284031867980957,
+          "y": 0,
+          "w": 1440,
+          "h": 480
+        },
+        "animation": "5000ms linear 0s 1 normal forwards running dolly",
+        "animationName": "dolly",
+        "animationDuration": "5000ms",
+        "animationTimingFunction": "linear",
+        "animationFillMode": "forwards",
+        "backgroundSize": "contain",
+        "sourceResolutions": 4,
+        "loadAdmissions": 4,
+        "cursor": 1,
+        "actualMode": "SS.MODES.panorama.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "originalFullsizeLandscape",
+        "ok": true,
+        "checks": {
+          "bounded": true,
+          "wholePhoto": true,
+          "literalStrip": true,
+          "literalPhoto": true,
+          "staticAnimation": true
+        },
+        "strip": {
+          "width": 800,
+          "height": 480,
+          "top": 0,
+          "travel": 0
+        },
+        "root": {
+          "w": 800,
+          "h": 480
+        },
+        "fullPhoto": {
+          "x": 40,
+          "y": 0,
+          "w": 720,
+          "h": 480
+        },
+        "animation": "auto ease 0s 1 normal none running none",
+        "animationName": "none",
+        "animationDuration": "auto",
+        "animationTimingFunction": "ease",
+        "animationFillMode": "none",
+        "backgroundSize": "contain",
+        "sourceResolutions": 5,
+        "loadAdmissions": 5,
+        "cursor": 1,
+        "actualMode": "SS.MODES.panorama.run",
+        "softwareRasterOnly": true
+      }
+    ],
+    "caseCount": 4,
+    "virtualMillis": 0,
+    "sourceResolutions": 5,
+    "loadAdmissions": 5,
+    "dpr": 1.125,
+    "screenshot": "fullsize-software.png",
+    "raster": "software WebView.draw Canvas; no PixelCopy/hardware acceptance"
+  },
+  "unknownRequests": 0,
+  "webViewDestroyed": true,
+  "assetHashes": {
+    "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+    "mode-impls.js": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960",
+    "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+    "photo-doodles-dark.svg": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+    "styles.css": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+  },
+  "sourceApkSha256": "bea8a85790f829d86fa401e93afe09e9aae6f9dc5f5520f6820033ed137443b2",
+  "sourceApkBytes": 46745522,
+  "sdk": 29,
+  "caseCount": 4,
+  "scope": "Actual packaged Panorama mode.run; generated data SVGs; virtual beat timer; real DOM layout/RAF; optional software Canvas only"
+}

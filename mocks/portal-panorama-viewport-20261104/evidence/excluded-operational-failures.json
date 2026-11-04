@@ -1,0 +1,28 @@
+{
+  "initialNativeCssom": {
+    "exitCode": 1,
+    "tool": "b3131d",
+    "reason": "CSSOM shorthand serialization differs from source shorthand",
+    "excluded": true,
+    "originalFourGeometryPredicatesUnchanged": true
+  },
+  "initialHostGolden": {
+    "exitCode": 1,
+    "tool": "4243c2",
+    "reason": "bg before layout changed JSON property order",
+    "productionOrderRestored": true,
+    "goldenHashesAndAssertionsUnchanged": true
+  },
+  "readPathAndFrozenWriteErrors": {
+    "sourceMutation": false,
+    "corrected": true,
+    "failedWriteBeforeChmod": true
+  },
+  "frozenBaselineCopy": {
+    "tool": "398aba",
+    "exitCode": 1,
+    "reason": "Existing excluded baseline copy is readonly",
+    "deviceExecution": false,
+    "resolved": "Moved owned old copy aside, same script/predicates"
+  }
+}

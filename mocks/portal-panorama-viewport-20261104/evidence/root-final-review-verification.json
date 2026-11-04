@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "rootFullyReadBothFinalReviews": true,
+  "nativeArtifactBindingsExact": 59,
+  "sourceBindingsExact": 35,
+  "sourceReviewSha256": "3e2b55121f6a686ca21a0e364584c14918916d1b4938034be0e60f078b591c9b",
+  "nativeArtifactReviewSha256": "a1ffb37d1b28e5a07ad150df9f0bedaeaf7010b1010a9e7b0e7b6e4540cc1d87",
+  "beforePromotion": true
+}

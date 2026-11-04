@@ -753,15 +753,51 @@
   MODES.panorama = { name: "Panorama Drift", run(ctx, deck) {
     const t = makeTimers(ctx), layers = [mk(), mk()];
     const dissolve = makeSceneDissolve(ctx, t, layers.map(layer => layer.root), 1800, root => {
-      const pan = layers.find(layer => layer.root === root).pan;
+      const layer = layers.find(layer => layer.root === root), pan = layer.pan;
+      layer.photo = null;
       pan.style.backgroundImage = "none"; pan.style.animation = "none";
       pan.style.willChange = "auto"; pan.style.transform = "none";
     });
     function mk() {
       const root = el("ss-layer panorama-drift retired", ctx.root), pan = el("ss-pan", root);
       pan.style.animation = "none"; pan.style.willChange = "auto";
-      return { root, pan };
+      return { root, pan, photo: null };
     }
+    function layout(layer, url) {
+      const p = layer.photo, pan = layer.pan;
+      const W = ctx.root.clientWidth || ctx.W, H = ctx.root.clientHeight || ctx.H;
+      const rawAspect = aspect(p), ratio = Number.isFinite(rawAspect) && rawAspect > 0 ? rawAspect : W / H;
+      // Bound the moving strip instead of making an extreme panorama many screens wide.
+      // Fit its full height on matte; transform motion still reaches both horizontal edges.
+      const baseWidth = Math.min(W * 2, Math.max(W, H * ratio));
+      const faceCrop = SS.faceCrop(p, baseWidth, W);
+      const width = faceCrop ? faceCrop.size : baseWidth;
+      const height = Math.min(H, width / ratio), travel = (W - width) / width * 100;
+      pan.style.width = width + "px"; pan.style.height = height + "px";
+      pan.style.top = (H - height) / 2 + "px";
+      if (url !== undefined) bg(pan, url, "contain");
+      pan.style.setProperty("--shift", travel + "%");
+      const moving = ctx.photoMotion !== false && width > W && !hasFace(p);
+      // Unlike zoom, the full panoramic sweep must finish before the next photo.
+      const duration = Math.min(ctx.motionMs, ctx.photoMs);
+      pan.style.animation = moving ? `dolly ${duration}ms linear forwards` : "none";
+      pan.style.willChange = moving ? "transform" : "auto";
+      // A still strip uses the cached face or the middle of the admitted crop.
+      pan.style.transform = faceCrop ? `translateX(${-faceCrop.offset / width * 100}%)` :
+        hasFace(p) || ctx.photoMotion === false ?
+        `translateX(${travel * SS.panStart(hasFace(p) ? p.fx : .5, width / W * 100)}%)` : "none";
+    }
+    let resizePending = false;
+    function onResize() {
+      if (resizePending || !dissolve.active()) return;
+      resizePending = true;
+      t.frame(() => {
+        resizePending = false;
+        if (!dissolve.active()) return;
+        layers.forEach(layer => { if (layer.photo) layout(layer); });
+      });
+    }
+    if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     async function step() {
       if (!dissolve.active()) return false;
       const p = SS.take(deck, ctx.cursor, [SS.counts(deck).pano ? "pano" : "landscape"])[0];
@@ -769,31 +805,19 @@
       if (url === false || !await t.load(url) || !dissolve.active()) return false;
       return t.publish(() => {
         if (!dissolve.active()) return false;
-        const root = dissolve.next(), pan = layers.find(layer => layer.root === root).pan;
-        const rawAspect = aspect(p), ratio = Number.isFinite(rawAspect) && rawAspect > 0 ? rawAspect : ctx.W / ctx.H;
-        // Bound the moving strip instead of making an extreme panorama many screens wide.
-        // Fit its full height on matte; transform motion still reaches both horizontal edges.
-        const baseWidth = Math.min(ctx.W * 2, Math.max(ctx.W, ctx.H * ratio));
-        const faceCrop = SS.faceCrop(p, baseWidth, ctx.W);
-        const width = faceCrop ? faceCrop.size : baseWidth;
-        const height = Math.min(ctx.H, width / ratio), travel = (ctx.W - width) / width * 100;
-        pan.style.width = width + "px"; pan.style.height = height + "px";
-        pan.style.top = (ctx.H - height) / 2 + "px";
-        bg(pan, url, "contain"); pan.style.setProperty("--shift", travel + "%");
-        const moving = ctx.photoMotion !== false && width > ctx.W && !hasFace(p);
-        // Unlike zoom, the full panoramic sweep must finish before the next photo.
-        const duration = Math.min(ctx.motionMs, ctx.photoMs);
-        pan.style.animation = moving ? `dolly ${duration}ms linear forwards` : "none";
-        pan.style.willChange = moving ? "transform" : "auto";
-        // A still strip uses the cached face or the middle of the admitted crop.
-        pan.style.transform = faceCrop ? `translateX(${-faceCrop.offset / width * 100}%)` :
-          hasFace(p) || ctx.photoMotion === false ?
-          `translateX(${travel * SS.panStart(hasFace(p) ? p.fx : .5, width / ctx.W * 100)}%)` : "none";
+        const root = dissolve.next(), layer = layers.find(layer => layer.root === root);
+        layer.photo = p; layout(layer, url);
         dissolve.present(root);
       });
     }
     t.start(step); t.every(step, ctx.photoMs);
-    return dissolve.cleanup;
+    const cleanup = () => {
+      if (typeof window.removeEventListener === "function") window.removeEventListener("resize", onResize);
+      dissolve.cleanup();
+    };
+    Object.defineProperty(cleanup, "ready", { get: () => dissolve.cleanup.ready });
+    cleanup.pause = dissolve.cleanup.pause; cleanup.resume = dissolve.cleanup.resume;
+    return cleanup;
   }};
 
   // ---- 08 Polaroid scatter ---------------------------------------------------

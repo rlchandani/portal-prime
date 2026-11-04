@@ -1,0 +1,328 @@
+{
+  "ok": true,
+  "scope": "Panorama strip geometry uses current measured bounds for retained and pending photos; existing whole-height fit, width cap, focal point and motion duration remain. Coalesced pausable reflow retains photo/image/URL/decode/cursor ownership.",
+  "jvm": {
+    "tests": 4513,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 471
+  },
+  "host": {
+    "initialFull": {
+      "exitCode": 1,
+      "tool": "4243c2",
+      "tests": 398,
+      "fail": 1,
+      "log": "slideshow-ci.log"
+    },
+    "ciFull": {
+      "exitCode": 0,
+      "tool": "84dd3a",
+      "tests": 398,
+      "fail": 0,
+      "log": "slideshow-ci-final.log"
+    },
+    "focusedFinal": {
+      "exitCode": 0,
+      "tool": "8824a5",
+      "tests": 7,
+      "fail": 0,
+      "precedingPythonPermissionErrorExcluded": true
+    },
+    "allAppJs": {
+      "exitCode": 0,
+      "tool": "5950e0",
+      "tests": 743,
+      "fail": 0
+    }
+  },
+  "native": {
+    "before": {
+      "exitCode": 0,
+      "tool": "de9941",
+      "session": 59796,
+      "tests": 4,
+      "failures": 3,
+      "controls": 1,
+      "accepted": true
+    },
+    "after": {
+      "exitCode": 0,
+      "tool": "755698",
+      "session": 46415,
+      "tests": 4,
+      "failures": 0,
+      "accepted": true,
+      "artifactVerificationExitCode": 0
+    },
+    "cases": 4,
+    "beforeFailures": 3,
+    "afterFailures": 0
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-panorama-viewport-20261104-130107/candidate-debug-1.158.apk",
+      "bytes": 46767286,
+      "sha256": "818cc9138cf6cbde0abeccf541fae7358651694f35a256ef0f78e593562e038e",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='152' versionName='1.158' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 70273,
+          "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "performance": {
+      "path": "/private/tmp/portal-panorama-viewport-20261104-130107/candidate-performance-1.158.apk",
+      "bytes": 25886927,
+      "sha256": "6d0783191dfd7c0319ce4613244a858b2d5bbc266cc14295a676347f0b667d6f",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='152' versionName='1.158' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "screensaverAssets": [
+        {
+          "path": "assets/screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "assets/screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "assets/screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "assets/screensaver/mode-impls.js",
+          "bytes": 70273,
+          "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+        },
+        {
+          "path": "assets/screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "assets/screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "assets/screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "assets/screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "assets/screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        }
+      ]
+    },
+    "jvm": {
+      "tests": 4513,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 471
+    },
+    "gradleExit": 0
+  },
+  "installed": {
+    "family": {
+      "bytes": 25886927,
+      "sha256": "6d0783191dfd7c0319ce4613244a858b2d5bbc266cc14295a676347f0b667d6f",
+      "app": {
+        "versionCode": 152,
+        "versionName": "1.158"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886927,
+        "sha256": "6d0783191dfd7c0319ce4613244a858b2d5bbc266cc14295a676347f0b667d6f",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 152,
+          "versionName": "1.158"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1622,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 2104,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "rootReview": {
+    "ok": true,
+    "rootFullyReadBothFinalReviews": true,
+    "nativeArtifactBindingsExact": 59,
+    "sourceBindingsExact": 35,
+    "sourceReviewSha256": "3e2b55121f6a686ca21a0e364584c14918916d1b4938034be0e60f078b591c9b",
+    "nativeArtifactReviewSha256": "a1ffb37d1b28e5a07ad150df9f0bedaeaf7010b1010a9e7b0e7b6e4540cc1d87",
+    "beforePromotion": true
+  },
+  "queue": {
+    "tasks": 152,
+    "counts": {
+      "delivered": 100,
+      "verified": 42,
+      "parked": 7,
+      "approval": 2,
+      "queued": 1
+    },
+    "all151OldObjectsPreserved": true,
+    "oldRawSuffixByteExact": true,
+    "rawSuffixBytes": 490372,
+    "rawSuffixSha256": "bae7774d228b4a5250f118ab6df0cbd2fcdf4f9b8510615f93be1e1ec3e78678",
+    "defaultTaskPreserved": true
+  },
+  "originalIssueClock": {
+    "originalDiscoveryAt": "2026-11-04T13:01:07Z",
+    "target": "2026-11-04T13:16:07Z",
+    "hardDeadline": "2026-11-04T13:31:07Z",
+    "baseCommit": "e1765e9ae7d650453a11168828b80ee0d9ea5e4a",
+    "clockNotReset": true,
+    "state": "selected",
+    "candidate": "Panorama retains initial pixel bounds after ordinary measured viewport resize, including later steps.",
+    "sourceBindings": {
+      "app/src/main/assets/screensaver/mode-impls.js": {
+        "sha256": "0d4838314995777463c1f22a4c04b3b7fa545f1416413259aaddf74eecad6960",
+        "bytes": 69311
+      },
+      "app/src/main/assets/screensaver/modes.js": {
+        "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+        "bytes": 13499
+      },
+      "app/src/main/assets/screensaver/scheduler.js": {
+        "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8",
+        "bytes": 14433
+      },
+      "scripts/tests/helpers/slideshow_scene_fixture.mjs": {
+        "sha256": "e1e0053545810d26e12b57fb0ed3d05e7ea48c0726c62166c75ef099223ac3d0",
+        "bytes": 9921
+      },
+      "app/build.gradle.kts": {
+        "sha256": "814e31f9c7ae13d0e679110a110606cdf3ee29e5ad30d884749578aec27c3ae1",
+        "bytes": 11824
+      },
+      "mocks/portal-widget-gallery-20261102/roadmap/roadmap.json": {
+        "sha256": "d10683c43c8035894adbdfab0d6b1ebf54c41a461147e53dd7156d60afe9e215",
+        "bytes": 491421
+      }
+    },
+    "selectedAt": "2026-11-04T13:03:41.738274+00:00",
+    "scope": "Panorama strip geometry uses current measured bounds for retained and pending photos; existing whole-height fit, width cap, focal point and motion duration remain. Coalesced pausable reflow retains photo/image/URL/decode/cursor ownership."
+  },
+  "collectedAt": "2026-11-04T13:12:50.859520+00:00",
+  "wholeProductGoal": "active",
+  "limits": [
+    "Native acceptance uses actual packaged debug Panorama mode.run, Family API29, generated SVGs, virtual beat timers and real DOM layout/RAF. Optional software Canvas; no hardware or motion-phase gate.",
+    "Production controller/scheduler resize integration, mounted Dream/clock/live source/optimized/API28/Living visuals and currently selected style remain separate. Saved Shuffle/fit remains.",
+    "Public1.83/code77 unchanged; no phone, household media/provider/account, push or publication."
+  ]
+}
