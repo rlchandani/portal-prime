@@ -1,0 +1,15 @@
+{
+  "tasks": 178,
+  "counts": {
+    "delivered": 123,
+    "verified": 45,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "all177OriginalObjectsExact": true,
+  "originalTaskRawSuffixExact": true,
+  "originalDefaultAndClocksPreserved": true,
+  "heldScopesReopened": false,
+  "pendingHumanChoicePreserved": true
+}

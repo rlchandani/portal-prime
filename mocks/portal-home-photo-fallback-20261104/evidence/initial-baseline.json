@@ -1,0 +1,33 @@
+{
+  "exitCode": 1,
+  "durationSeconds": 8.89932475000387,
+  "completedAt": "2026-11-04T20:51:48.086827+00:00",
+  "counts": {
+    "name": "com.immortal.launcher.HomePhotoLocalFallbackTest",
+    "tests": "8",
+    "skipped": "0",
+    "failures": "3",
+    "errors": "0",
+    "timestamp": "2026-11-04T20:51:46.679Z",
+    "hostname": "iRedlofs-Mac-mini-3.local",
+    "time": "0.545"
+  },
+  "failures": [
+    {
+      "name": "throwingDecoderFirstFallsThroughToValidSecond",
+      "type": "org.mockito.exceptions.base.MockitoException",
+      "message": "org.mockito.exceptions.base.MockitoException: Cannot instrument class androidx.exifinterface.media.ExifInterface because it or one of its supertypes could not be initialized"
+    },
+    {
+      "name": "corruptBoundsFirstFallsThroughToValidSecond",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected same:<Mock for Bitmap, hashCode: 1424188812> was not:<null>"
+    },
+    {
+      "name": "nullFullDecodeFirstFallsThroughToValidSecond",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected same:<Mock for Bitmap, hashCode: 1601800698> was not:<null>"
+    }
+  ],
+  "testFrozen": true
+}

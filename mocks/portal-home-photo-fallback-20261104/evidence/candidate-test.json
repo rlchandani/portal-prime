@@ -1,0 +1,10 @@
+{
+  "tests": 8,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "xmlSha256": "4ff700c05104a454284f02712cf954e6a288c65c0a80c21bfdca0d3bdd9a2a6e",
+  "testFrozen": true,
+  "actualFunction": "ApprovedHomePhotoKt.loadApprovedHomePhoto",
+  "limits": "Actual local selection generated filesystem; Android decoder/Options/Bitmap/normalEXIF/Matrix/Log mocked, no native pixels or UI."
+}

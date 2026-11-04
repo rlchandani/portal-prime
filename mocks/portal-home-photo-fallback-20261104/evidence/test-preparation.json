@@ -1,0 +1,11 @@
+{
+  "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/HomePhotoLocalFallbackTest.kt",
+  "bytes": 5967,
+  "sha256": "f6233d492d40fa7bddf64fb61e011238405bb64247b92b8cf5312318b87dd753",
+  "cases": 8,
+  "expectedRegressionFailures": 3,
+  "expectedControls": 5,
+  "initialFrozenFileRetained": true,
+  "adapterChange": "Only static android.util.Log wrapper before EXIF initialization and fixture indentation. All case inputs/assertions and marker decoder unchanged.",
+  "limits": "Actual private loader/real generated filesystem; Android decoder/Bitmap/Options/normalEXIF/Matrix/logging mocked, no native pixels."
+}

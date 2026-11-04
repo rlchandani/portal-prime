@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "checkedAt": "2026-11-04T21:07:54.750805+00:00",
+  "reviewFullyRead": true,
+  "reviewSha256": "667b61268089003bfa410435528886a77fba9631ab4572556045f42e6776a377",
+  "materialBindings": 32,
+  "sourceAssetBindings": 23,
+  "jvm": {
+    "tests": 4593,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 478
+  },
+  "xmlAggregateSha256": "9f741f39c92e0b4c0df8df44508bf707472cdb25e4495ca4d74bd5b1d8f46836",
+  "candidateEligible": true
+}

@@ -134,8 +134,11 @@ private fun loadApprovedHomePhoto(context: Context, settings: ScreensaverConfig.
       when {
         settings.usesFolder -> settings.folderPath?.let { folder ->
           if (!LocalMedia.isAccessible(folder)) null else
-            LocalMedia.enumerate(folder, includeVideo = false, max = 60).firstOrNull { !it.isVideo }?.let {
-              decodeHomePhoto { File(it.path).inputStream() }
+            LocalMedia.enumerate(folder, includeVideo = false, max = 60).firstNotNullOfOrNull {
+              PhotoSourceWork.checkpoint()
+              if (it.isVideo) null else try {
+                decodeHomePhoto { File(it.path).inputStream() }
+              } catch (_: Exception) { null }
             }
         }
         settings.usesSmb -> {

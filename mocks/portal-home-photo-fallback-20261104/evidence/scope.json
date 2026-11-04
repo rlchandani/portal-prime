@@ -1,0 +1,22 @@
+{
+  "startedAt": "2026-11-04T20:42:52Z",
+  "target": "2026-11-04T20:57:52Z",
+  "hardStop": "2026-11-04T21:12:52Z",
+  "originalClockRetained": true,
+  "base": "9deb4afd357bebd057a4acc080a1f7b36b3cc067",
+  "scope": "Home local-folder photo selects first successful decode within existing60cap",
+  "heldScopesReopened": false,
+  "unselectedObservations": [
+    {
+      "scope": "News HTTP scheme case",
+      "firstRead": "2026-11-04T20:44:28Z",
+      "wholeEarlierClockRetained": true
+    },
+    {
+      "scope": "News title-like tag prefix",
+      "firstReadConservative": "2026-11-04T20:42:52Z",
+      "implementationAdmitted": false
+    }
+  ],
+  "phoneProviderHouseholdMediaPublicationOperations": false
+}

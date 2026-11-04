@@ -1,0 +1,33 @@
+{
+  "exitCode": 1,
+  "durationSeconds": 8.728090750002593,
+  "completedAt": "2026-11-04T20:54:29.431587+00:00",
+  "counts": {
+    "name": "com.immortal.launcher.HomePhotoLocalFallbackTest",
+    "tests": "8",
+    "skipped": "0",
+    "failures": "3",
+    "errors": "0",
+    "timestamp": "2026-11-04T20:54:28.045Z",
+    "hostname": "iRedlofs-Mac-mini-3.local",
+    "time": "0.547"
+  },
+  "failures": [
+    {
+      "name": "throwingDecoderFirstFallsThroughToValidSecond",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected same:<Mock for Bitmap, hashCode: 1066949254> was not:<null>"
+    },
+    {
+      "name": "corruptBoundsFirstFallsThroughToValidSecond",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected same:<Mock for Bitmap, hashCode: 2113919627> was not:<null>"
+    },
+    {
+      "name": "nullFullDecodeFirstFallsThroughToValidSecond",
+      "type": "java.lang.AssertionError",
+      "message": "java.lang.AssertionError: expected same:<Mock for Bitmap, hashCode: 1720922681> was not:<null>"
+    }
+  ],
+  "testFrozen": true
+}

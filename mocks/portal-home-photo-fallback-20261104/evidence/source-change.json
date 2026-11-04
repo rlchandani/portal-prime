@@ -1,0 +1,9 @@
+{
+  "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt",
+  "beforeSha256": "a1cdfe35456b82f5a3253e42beced197add120f45ac6a7b115a2e41d55446e9d",
+  "candidateSha256": "e753a74269d8d6aa7c35967b1289dc015870659ce2e106e6f0f6f209daa65153",
+  "exactLocalFolderSelectionOnly": true,
+  "decoderEXIFCacheTTLLayoutOtherProvidersUnchanged": true,
+  "checkpointOutsidePerImageCatch": true,
+  "max60AndIncludeVideoFalsePreserved": true
+}

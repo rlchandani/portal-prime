@@ -1,0 +1,14 @@
+{
+  "initialOutcome": {
+    "tests": 8,
+    "intendedAssertionErrors": 2,
+    "fixtureSetupFailures": 1,
+    "controls": 5
+  },
+  "initialRedAccepted": false,
+  "cause": "ExifInterface static initializer calls android.util.Log.isLoggable on host Android stub",
+  "adapter": "Static Log mock scoped around fixture",
+  "allEightMethodInputsAndAssertionsUnchanged": true,
+  "productionUnchangedDuringRepair": true,
+  "initialTerminalAndXMLAndFrozenFileRetained": true
+}

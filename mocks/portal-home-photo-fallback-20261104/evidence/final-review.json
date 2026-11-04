@@ -1,0 +1,315 @@
+{
+  "accepted": true,
+  "blockers": [],
+  "reviewedAt": "2026-11-04T20:58:58.292Z",
+  "reviewStartedAt": "2026-11-04T20:55:59Z",
+  "originalClock": {
+    "startedAt": "2026-11-04T20:42:52Z",
+    "target": "2026-11-04T20:57:52Z",
+    "hardStop": "2026-11-04T21:12:52Z",
+    "reset": false
+  },
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/scope.json",
+      "bytes": 707,
+      "sha256": "8a48c2a929901de2fa2324a1a58c550ad54a9a86c052e05e0c2ef9dd09e98dcf"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/ApprovedHomePhoto.kt.before",
+      "bytes": 10461,
+      "sha256": "a1cdfe35456b82f5a3253e42beced197add120f45ac6a7b115a2e41d55446e9d"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/ApprovedHomePhoto.kt",
+      "bytes": 10586,
+      "sha256": "e753a74269d8d6aa7c35967b1289dc015870659ce2e106e6f0f6f209daa65153"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/source-change.json",
+      "bytes": 504,
+      "sha256": "56c5658a597f647cdc20e8259a400f1ee52ca4c1597e15c00d6d65abe2090f33"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/build.gradle.kts.before",
+      "bytes": 11816,
+      "sha256": "a7f0217151615d8cebaa7723d925ccaad05dc884ebb2730ab14e337756418940"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "2d104e986596b37365af3247a8938681773e44eb16c4c44470c7945a7d6b8d8f"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/initial-HomePhotoLocalFallbackTest.frozen.kt",
+      "bytes": 5832,
+      "sha256": "d1c26b277b036cd69b30008707ff831b06b57506882b5d5f8fa43c6193c4a511"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/HomePhotoLocalFallbackTest.frozen.kt",
+      "bytes": 5967,
+      "sha256": "f6233d492d40fa7bddf64fb61e011238405bb64247b92b8cf5312318b87dd753"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/HomePhotoLocalFallbackTest.kt",
+      "bytes": 5967,
+      "sha256": "f6233d492d40fa7bddf64fb61e011238405bb64247b92b8cf5312318b87dd753"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/initial-test-preparation.json",
+      "bytes": 477,
+      "sha256": "1b9cb954fd771edd9e606e8092cebaad1db79a0bfaefde68859cd1e72a24c2fb"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/test-preparation.json",
+      "bytes": 672,
+      "sha256": "c2c0627aabd7188d6d939d729d89ec6904aa7740d64a2f0a216cc8dba38f4a31"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/fixture-adapter.json",
+      "bytes": 467,
+      "sha256": "9369df7b6d7d893b6119b7429223c7866f217aa6658779caf3fd3c4eb1cc01fd"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/initial-baseline.xml",
+      "bytes": 17367,
+      "sha256": "21726135b3cc751d22bc6edc519b11b770ea441b34d58e43a902749374a838ff"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/initial-baseline.json",
+      "bytes": 1217,
+      "sha256": "a239fcc9853667d1b390268bb1f6312e75e16ddfadc5cfb0a4cff160bf54e11f"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/initial-baseline.log",
+      "bytes": 2829,
+      "sha256": "da5c873ed6e701c366bfe5fb594b6d194e20eb0730d552ad0a79963e36feabfb"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/baseline.xml",
+      "bytes": 15965,
+      "sha256": "1df22015bf8204d259d98c31344aefbddb78a6938bfb793817ada914d18f9760"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/baseline.json",
+      "bytes": 1119,
+      "sha256": "685d104c62d4d7555d2bb5ee607f5054f6dea2b8cb4d0b3e9e0bdfadf5bf43d2"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/baseline.log",
+      "bytes": 2725,
+      "sha256": "987cd061511fbe4c1cbaad7a2735142c02ef15616f8c25e8df9340005b295aff"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.HomePhotoLocalFallbackTest.xml",
+      "bytes": 1959,
+      "sha256": "4ff700c05104a454284f02712cf954e6a288c65c0a80c21bfdca0d3bdd9a2a6e"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/build-terminal.json",
+      "bytes": 278,
+      "sha256": "099f168f1470a02bf03d4321c85290417200b2e9a7ca6b7fff5444bde5148b41"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/build.log",
+      "bytes": 14337,
+      "sha256": "190d4d24917ba1006e389af9c68c1eb99487ea00bd27603f2b2d1e1bd0577558"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/verify-artifacts.py",
+      "bytes": 3768,
+      "sha256": "584077fb6a8ee3b6bbb4d6f6767b03cf0fa84f971b5b95c42542efb1a8d9c70a"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/review-gate.py",
+      "bytes": 2133,
+      "sha256": "3aed5154ae4f601e7a3e97c2468022dee847c58d409cfa8b4bb850d95ad4df89"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/LocalMedia.kt",
+      "bytes": 7361,
+      "sha256": "deb0e7d602367b972348e2b21921612da96351eb500f1b838d9ed90f440712d6"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/PhotoSourceWork.kt",
+      "bytes": 5881,
+      "sha256": "89b8d30c8c0eef05c3783f3bbf25ae8735e5aa574b60e0bd88d16b1bd43f847e"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+      "bytes": 230286,
+      "sha256": "18ba024530f6c64881785fe18ec21a819b906459f907dc1557debd0b33cf14eb"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/candidate-debug-1.177.apk",
+      "bytes": 46745710,
+      "sha256": "8365a999415977ccce2896f37d60d47c422defe6eeeb74af91ff0f2b33655d75"
+    },
+    {
+      "path": "/private/tmp/portal-irish-brigid-20261104-202913/candidate-performance-1.177.apk",
+      "bytes": 25886951,
+      "sha256": "11e5fb73f19e6128af953c39910ae5941f9f58a64a5bcbee6d0d5fcea06d3a3e"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/candidate-debug-1.178.apk",
+      "bytes": 46745710,
+      "sha256": "6a048598649326257e4b26a0048f9ddcec7e42d9602ef7b6e9d8bf05a46380cf"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/candidate-performance-1.178.apk",
+      "bytes": 25886947,
+      "sha256": "2331559622debc6e111a66167c2ba25bf5515cfe919d1baf990daaa826925042"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/promotion-artifacts.json",
+      "bytes": 9944,
+      "sha256": "6980ed3a618f170e93fe88a6125aab06aef72a8a0ed8bc7aab90532e18ee3ce3"
+    },
+    {
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/candidate-test.json",
+      "bytes": 380,
+      "sha256": "65d803e918be93ded5c74e8283c4bb124a921022ff31d8837039f12839f5d59b"
+    }
+  ],
+  "sourceAssets": {
+    "root": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/assets",
+    "fileCount": 23,
+    "aggregateSha256": "884d3ef5dbd72dfda10c9ef4f770a2b42299c2ba341ebcfa7dc5b6b5d0fd8848"
+  },
+  "jvm": {
+    "xmlDirectory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "tests": 4593,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 478,
+    "testcaseChildren": 4593,
+    "failureChildren": 0,
+    "errorChildren": 0,
+    "skippedChildren": 0,
+    "aggregateSha256": "9f741f39c92e0b4c0df8df44508bf707472cdb25e4495ca4d74bd5b1d8f46836",
+    "earliestReportTimestamp": "2026-11-04T20:55:30.599Z"
+  },
+  "variants": {
+    "debug": {
+      "livePath": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 46745710,
+      "sha256": "6a048598649326257e4b26a0048f9ddcec7e42d9602ef7b6e9d8bf05a46380cf",
+      "package": {
+        "versionCode": 172,
+        "versionName": "1.178",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "usesSdk": {
+        "minSdkVersion": 24,
+        "targetSdkVersion": 36
+      },
+      "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "zipEntries": 777,
+      "uniqueZipEntries": true,
+      "sourceAssetsExact": 23,
+      "baseline": {
+        "path": "/private/tmp/portal-irish-brigid-20261104-202913/candidate-debug-1.177.apk",
+        "bytes": 46745710,
+        "sha256": "8365a999415977ccce2896f37d60d47c422defe6eeeb74af91ff0f2b33655d75"
+      },
+      "changedGeneratedAssets": [],
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/candidate-debug-1.178.apk",
+      "artifactMode": "0400",
+      "rootSdkSignatureVerificationBound": true
+    },
+    "performance": {
+      "livePath": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/outputs/apk/performance/app-performance.apk",
+      "bytes": 25886947,
+      "sha256": "2331559622debc6e111a66167c2ba25bf5515cfe919d1baf990daaa826925042",
+      "package": {
+        "versionCode": 172,
+        "versionName": "1.178",
+        "compileSdkVersion": 36,
+        "compileSdkVersionCodename": "16",
+        "package": "com.immortal.launcher.debug",
+        "platformBuildVersionCode": 36,
+        "platformBuildVersionName": 16
+      },
+      "usesSdk": {
+        "minSdkVersion": 24,
+        "targetSdkVersion": 36
+      },
+      "certificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "zipEntries": 756,
+      "uniqueZipEntries": true,
+      "sourceAssetsExact": 23,
+      "baseline": {
+        "path": "/private/tmp/portal-irish-brigid-20261104-202913/candidate-performance-1.177.apk",
+        "bytes": 25886951,
+        "sha256": "11e5fb73f19e6128af953c39910ae5941f9f58a64a5bcbee6d0d5fcea06d3a3e"
+      },
+      "changedGeneratedAssets": [
+        "assets/dexopt/baseline.prof"
+      ],
+      "path": "/private/tmp/portal-home-photo-fallback-20261104-204252/candidate-performance-1.178.apk",
+      "artifactMode": "0400",
+      "rootSdkSignatureVerificationBound": true
+    }
+  },
+  "sourceReview": {
+    "exactLocalFolderBlockOnly": true,
+    "appVersionOnly": true,
+    "firstSuccessfulBitmapStops": true,
+    "nullAndOrdinaryExceptionAdvance": true,
+    "checkpointBeforeEachAttemptOutsideExceptionCatch": true,
+    "max60AndVideoExclusionRetained": true,
+    "outerThrowableFallbackUnchanged": true,
+    "decoderEXIFCacheTTLLayoutAndOtherProviderSourceBytesUnchanged": true,
+    "activeConsumer": "ApprovedHomePhoto → PhotoSourceWork.cachedOrLoad → loadApprovedHomePhoto",
+    "publicationAndWorkerCancellationFencesUnchanged": true
+  },
+  "regressions": {
+    "methods": [
+      "allBadFolderReturnsNull",
+      "corruptBoundsFirstFallsThroughToValidSecond",
+      "emptyFolderReturnsNullWithoutDecode",
+      "nonImagesAndVideoAreSkippedBeforeValidImage",
+      "nullFullDecodeFirstFallsThroughToValidSecond",
+      "throwingDecoderFirstFallsThroughToValidSecond",
+      "validFirstStopsBeforeReadingLaterImage",
+      "validImageBeyondExistingSixtyItemLimitIsNotDecoded"
+    ],
+    "initialBaseline": {
+      "tests": 8,
+      "intendedAssertionErrors": 2,
+      "fixtureSetupFailures": 1,
+      "controls": 5,
+      "accepted": false
+    },
+    "adapter": "Only scoped android.util.Log static mock and whitespace/one wrapper brace; methods, inputs, marker decoder and assertions unchanged",
+    "acceptedBaseline": {
+      "tests": 8,
+      "assertionErrors": 3,
+      "controls": 5,
+      "errors": 0,
+      "skipped": 0
+    },
+    "candidate": {
+      "tests": 8,
+      "testcaseChildren": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "liveEqualsFrozen": true
+  },
+  "limits": [
+    "Actual private Home loader and LocalMedia enumeration with generated temporary filesystem and mocked Android decoder/Bitmap/Options/normal EXIF/Matrix/Log; no native pixels or mounted Home hero acceptance.",
+    "Fallback applies only to existing first60 enumerated local images; later files, remote-provider fallback, bundled substitution and exceptional enumeration are unchanged.",
+    "Cancellation and Error boundaries are source-reviewed; no new runtime cancellation/fatal-Error, bitmap resource-failure, cache scheduling, EXIF orientation or performance acceptance is inferred from these eight cases.",
+    "APK binary manifests, v2 certificate identity, ZIP uniqueness and decoded source/baseline asset bytes independently checked; full cryptographic signature verification is root SDK evidence bound in promotion-artifacts.json, not reexecuted by reviewer.",
+    "No API28/API29/native/optimized runtime, real household photos/preferences/providers, browser/phone/device or external publication operations by reviewer.",
+    "Initial Mockito Log/EXIF initializer setup failure excluded; corrected baseline completed before the production edit.",
+    "Target20:57:52 elapsed before receipt completion; original hard stop and unselected News clock retained."
+  ]
+}
