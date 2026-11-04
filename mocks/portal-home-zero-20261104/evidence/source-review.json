@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "blockers": [],
+  "scope": "Bounded source-only Home custom zero-duration Start admission review; build/artifact gate is pending root evidence.",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T14:19:02Z",
+    "target": "2026-11-04T14:34:02Z",
+    "hardDeadline": "2026-11-04T14:49:02Z",
+    "clockNotReset": true
+  },
+  "base": "0cd54527",
+  "source": {
+    "beforeSha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+    "afterSha256": "a0f9972d7755234c8be4f5f6886f77b0e7fa3925625583fb68059bbd26de0821",
+    "exactDelta": "Start passes enabled=(minutes>0||seconds>0). TimerChip adds default enabled=true, passes it to tvFocusable and chooses Secondary text only when disabled; modifier line wrap only. Complete Home source reconstructs exactly from captured baseline with these changes. Metadata changes157/1.163→158/1.164 only.",
+    "activePaths": "ImmortalTimerWidget and ApprovedHomeTimerEditor both use CustomTimerDialog; callers previously ignored zero duration and dismissed the dialog. Disabled Start no longer invokes that callback at0:00; Cancel remains available. Positive durations retain original callback and timer persistence/alarm policy.",
+    "range": "Existing minutes0..180 clamp and seconds five-second wrap stay unchanged;0:00 is the only disabled state in reachable nonnegative values. Initial5:00,0:05 and positive-minute values remain enabled.",
+    "focus": "Full current TvFocus source examined. enabled=false returns merged disabled semantics before any focus/click modifier is created. TimerChip Surface/Text add no independent click handler. All other chip calls retain defaulttrue.",
+    "helperBaseComparison": {
+      "path": "app/src/main/java/com/immortal/launcher/TvFocus.kt",
+      "sha256": "c178b73f2f262b880031bdecba954cedbb44b2b9e1b3dff7eabe647d93df5117",
+      "bytes": 7018,
+      "method": "Authorized read-only git show0cd54527:path piped to shasum; observedtoolbc639e exit0 SHA exactly matches current helper. Prior unselected source witness is also bound."
+    }
+  },
+  "limits": [
+    "No mounted Compose/touch/D-pad/accessibility runtime or visual contrast acceptance; conclusions are source admission semantics.",
+    "No test or SDK/build/device/network action by reviewer. No new tests requested for this reversible small UI change; root existing full JVM/debug/performance gates remain required.",
+    "No timer duration, settings registry, storage/alarm/controller policy change. Other parked scopes and original issue clocks remain separate."
+  ],
+  "bindings": {
+    "/private/tmp/portal-home-zero-20261104-143508/plan.json": {
+      "sha256": "206c707bfac9dcf0a59c4268cbac0a5c7ad02c4e2938a5a57b609fc33f18a415",
+      "bytes": 413
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/HomeActivity.before.kt": {
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+      "bytes": 229887
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt": {
+      "sha256": "a0f9972d7755234c8be4f5f6886f77b0e7fa3925625583fb68059bbd26de0821",
+      "bytes": 230028
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/app-build.before.kts": {
+      "sha256": "153e800842a30f597054e1965c537481c07f09872402f716210c43ad92528ec2",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "564f51aabfa2c4f6c0c8edc00083345fe9ab139e6758853d829b3a63e51b9a06",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/TvFocus.kt": {
+      "sha256": "c178b73f2f262b880031bdecba954cedbb44b2b9e1b3dff7eabe647d93df5117",
+      "bytes": 7018
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/unselected-home-zero-duration.json": {
+      "sha256": "4974d81f44c6a517059411f6a932b66b723baf7c057fee6234817445b2955ab0",
+      "bytes": 3665
+    }
+  }
+}

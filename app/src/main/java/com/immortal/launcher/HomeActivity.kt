@@ -4366,7 +4366,7 @@ private fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
         Spacer(Modifier.size(28.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
           TimerChip("Cancel") { onDismiss() }
-          TimerChip("Start ${minutes}:%02d".format(seconds)) {
+          TimerChip("Start ${minutes}:%02d".format(seconds), enabled = minutes > 0 || seconds > 0) {
             onStart((minutes * 60 + seconds) * 1000L)
           }
         }
@@ -4406,15 +4406,16 @@ private fun StepButton(label: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun TimerChip(label: String, onClick: () -> Unit) {
+private fun TimerChip(label: String, enabled: Boolean = true, onClick: () -> Unit) {
   Surface(
       color = ApprovedHomePalette.Chrome,
       shape = RoundedCornerShape(16.dp),
-      modifier = Modifier.heightIn(min = 52.dp).tvFocusable(RoundedCornerShape(16.dp)) { onClick() },
+      modifier = Modifier.heightIn(min = 52.dp)
+          .tvFocusable(RoundedCornerShape(16.dp), enabled = enabled) { onClick() },
   ) {
     Text(
         label,
-        color = ApprovedHomePalette.Accent,
+        color = if (enabled) ApprovedHomePalette.Accent else ApprovedHomePalette.Secondary,
         fontSize = 22.sp,
         lineHeight = 30.sp,
         fontWeight = FontWeight.Medium,

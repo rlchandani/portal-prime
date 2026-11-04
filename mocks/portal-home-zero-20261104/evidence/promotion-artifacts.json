@@ -1,0 +1,271 @@
+{
+  "debug": {
+    "path": "/private/tmp/portal-home-zero-20261104-143508/candidate-debug-1.164.apk",
+    "bytes": 46745646,
+    "sha256": "54b1dc42eb595daf50975f691bb020187a5c6fa451fbaf1d00196908fa7dcfac",
+    "manifest": "package: name='com.immortal.launcher.debug' versionCode='158' versionName='1.164' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "sourceAssets": {
+      "fileCount": 23,
+      "files": [
+        {
+          "path": "catalog.json",
+          "bytes": 24043,
+          "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+        },
+        {
+          "path": "diagnostics/source-preview-4k.mp4",
+          "bytes": 25847,
+          "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+        },
+        {
+          "path": "faces/Flip-Regular.otf",
+          "bytes": 3184,
+          "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+        },
+        {
+          "path": "faces/flip.html",
+          "bytes": 29379,
+          "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+        },
+        {
+          "path": "fonts/BebasNeue.ttf",
+          "bytes": 61400,
+          "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+        },
+        {
+          "path": "fonts/OFL.txt",
+          "bytes": 1186,
+          "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+        },
+        {
+          "path": "photoframe_fallback/01_wilderness.jpg",
+          "bytes": 261090,
+          "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+        },
+        {
+          "path": "photoframe_fallback/02_denali.jpg",
+          "bytes": 277842,
+          "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+        },
+        {
+          "path": "photoframe_fallback/03_yosemite.jpg",
+          "bytes": 443801,
+          "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+        },
+        {
+          "path": "remote/control-center.css",
+          "bytes": 24082,
+          "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+        },
+        {
+          "path": "remote/control-center.js",
+          "bytes": 269969,
+          "sha256": "eac6fc27ced31c9ec5614c8ed27eea62049223a29d0b4754b0ae3ef1283e14f5"
+        },
+        {
+          "path": "remote/core.mjs",
+          "bytes": 28623,
+          "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+        },
+        {
+          "path": "screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "screensaver/mode-impls.js",
+          "bytes": 70273,
+          "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+        },
+        {
+          "path": "screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        },
+        {
+          "path": "webapp-retention-probe.html",
+          "bytes": 504,
+          "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+        }
+      ]
+    },
+    "allSourceAssetsUnchangedFromBaseline": true,
+    "generatedOptimizationProfileChanges": []
+  },
+  "performance": {
+    "path": "/private/tmp/portal-home-zero-20261104-143508/candidate-performance-1.164.apk",
+    "bytes": 25886923,
+    "sha256": "abfd9edb686cb0ac2968024f03c14b54469b8c404c8efcd7195dabf9667cc309",
+    "manifest": "package: name='com.immortal.launcher.debug' versionCode='158' versionName='1.164' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+    "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+    "sourceAssets": {
+      "fileCount": 23,
+      "files": [
+        {
+          "path": "catalog.json",
+          "bytes": 24043,
+          "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+        },
+        {
+          "path": "diagnostics/source-preview-4k.mp4",
+          "bytes": 25847,
+          "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+        },
+        {
+          "path": "faces/Flip-Regular.otf",
+          "bytes": 3184,
+          "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+        },
+        {
+          "path": "faces/flip.html",
+          "bytes": 29379,
+          "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+        },
+        {
+          "path": "fonts/BebasNeue.ttf",
+          "bytes": 61400,
+          "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+        },
+        {
+          "path": "fonts/OFL.txt",
+          "bytes": 1186,
+          "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+        },
+        {
+          "path": "photoframe_fallback/01_wilderness.jpg",
+          "bytes": 261090,
+          "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+        },
+        {
+          "path": "photoframe_fallback/02_denali.jpg",
+          "bytes": 277842,
+          "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+        },
+        {
+          "path": "photoframe_fallback/03_yosemite.jpg",
+          "bytes": 443801,
+          "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+        },
+        {
+          "path": "remote/control-center.css",
+          "bytes": 24082,
+          "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+        },
+        {
+          "path": "remote/control-center.js",
+          "bytes": 269969,
+          "sha256": "eac6fc27ced31c9ec5614c8ed27eea62049223a29d0b4754b0ae3ef1283e14f5"
+        },
+        {
+          "path": "remote/core.mjs",
+          "bytes": 28623,
+          "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+        },
+        {
+          "path": "screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "screensaver/mode-impls.js",
+          "bytes": 70273,
+          "sha256": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007"
+        },
+        {
+          "path": "screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        },
+        {
+          "path": "webapp-retention-probe.html",
+          "bytes": 504,
+          "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+        }
+      ]
+    },
+    "allSourceAssetsUnchangedFromBaseline": true,
+    "generatedOptimizationProfileChanges": [
+      "assets/dexopt/baseline.prof",
+      "assets/dexopt/baseline.profm"
+    ]
+  },
+  "jvm": {
+    "tests": 4541,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 473
+  },
+  "gradleExit": 0
+}

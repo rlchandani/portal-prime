@@ -1,0 +1,100 @@
+{
+  "ok": true,
+  "combinedReviewFullyReadTool": "60f8e2",
+  "reviewBindingsRehashedBeforePromotion": 21,
+  "reviewBindingsStillExact": true,
+  "jvm": {
+    "tests": 4541,
+    "suites": 473,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "installed": {
+    "family": {
+      "bytes": 25886923,
+      "sha256": "abfd9edb686cb0ac2968024f03c14b54469b8c404c8efcd7195dabf9667cc309",
+      "app": {
+        "versionCode": 158,
+        "versionName": "1.164"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25886923,
+        "sha256": "abfd9edb686cb0ac2968024f03c14b54469b8c404c8efcd7195dabf9667cc309",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 158,
+          "versionName": "1.164"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1616,
+          "fatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "preferenceFileSetsIdentical": true,
+      "webViewCacheMaintenance": null,
+      "fourCompleteMapsIdentical": true,
+      "nameAndDevModePreserved": true,
+      "diagnostics": {
+        "/diag": {
+          "responseLines": 1,
+          "fatalAnrMarkers": 0
+        },
+        "/logcat?lines=1500": {
+          "responseLines": 1991,
+          "fatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "acceptance": "Source-reviewed disabled action admission; actual composed timer interaction not run.",
+  "issueClock": {
+    "originalDiscoveryAt": "2026-11-04T14:19:02Z",
+    "selectedAt": "2026-11-04T14:35:57.650017+00:00",
+    "target": "2026-11-04T14:34:02Z",
+    "hardDeadline": "2026-11-04T14:49:02Z",
+    "clockNotReset": true,
+    "scope": "Only disable Home custom timer Start at zero duration through existing shared tvFocusable semantics; positive durations and other callers unchanged. No new setting, storage or timer mutation."
+  },
+  "strictDocs": {
+    "exitCode": 0,
+    "elapsedSeconds": 2.1890189170007943
+  },
+  "plannedFilePrivacyChecked": true,
+  "closedAtUtc": "2026-11-04T14:44:15.385206+00:00",
+  "elapsedOriginalMinutes": 25.223086766666665,
+  "targetMet": false,
+  "hardDeadlineMet": true
+}

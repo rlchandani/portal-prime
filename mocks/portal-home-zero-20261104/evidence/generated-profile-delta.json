@@ -1,0 +1,30 @@
+{
+  "debug": {
+    "changed": [],
+    "details": {}
+  },
+  "performance": {
+    "changed": [
+      "assets/dexopt/baseline.prof",
+      "assets/dexopt/baseline.profm"
+    ],
+    "details": {
+      "assets/dexopt/baseline.prof": {
+        "oldBytes": 11196,
+        "newBytes": 11159,
+        "oldSha256": "267d1c9e3a12c3fd9036ee9269a0ff0aca16ed539ae67f733cd22933360dec38",
+        "newSha256": "95109fecedbc6217f20acb8df8fef77cf53f2e6b1e84d51656ff517340718c6a",
+        "oldMagic": "70726f0030313000",
+        "newMagic": "70726f0030313000"
+      },
+      "assets/dexopt/baseline.profm": {
+        "oldBytes": 1456,
+        "newBytes": 1481,
+        "oldSha256": "0dc80d7135c44c598608d7839b8559f4376e80d7a4efb6c5d8a2c788e8cfa3e7",
+        "newSha256": "10762d256746963fa155e8f1aabcf8b7e8d714b75aaa9f266ac5079c6073b1e3",
+        "oldMagic": "70726d0030303200",
+        "newMagic": "70726d0030303200"
+      }
+    }
+  }
+}

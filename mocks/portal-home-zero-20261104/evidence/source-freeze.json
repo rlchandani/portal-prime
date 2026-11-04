@@ -1,0 +1,14 @@
+{
+  "app/src/main/java/com/immortal/launcher/HomeActivity.kt": {
+    "bytes": 230028,
+    "sha256": "a0f9972d7755234c8be4f5f6886f77b0e7fa3925625583fb68059bbd26de0821"
+  },
+  "app/src/main/java/com/immortal/launcher/TvFocus.kt": {
+    "bytes": 7018,
+    "sha256": "c178b73f2f262b880031bdecba954cedbb44b2b9e1b3dff7eabe647d93df5117"
+  },
+  "app/build.gradle.kts": {
+    "bytes": 11824,
+    "sha256": "564f51aabfa2c4f6c0c8edc00083345fe9ab139e6758853d829b3a63e51b9a06"
+  }
+}

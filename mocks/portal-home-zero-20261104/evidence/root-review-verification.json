@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "reviewSha256": "257690b8816d24d38fe177dd3dfff34895211d8573ee62f3bc273d66875c60b4",
+  "bindingsRehashedBeforePromotion": 21,
+  "fullXmlReplay": {
+    "tests": 4541,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 473
+  },
+  "fullXmlSha256": "cc61d9bf5d11246de80d38e7437613038a7e0e82b1ad1541db32fa11c78fa980",
+  "beforePromotionAtUtc": "2026-11-04T14:41:43.413100+00:00",
+  "nativeComposedTimerAcceptance": false,
+  "rootFullReadTool": "60f8e2"
+}

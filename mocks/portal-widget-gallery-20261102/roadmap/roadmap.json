@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-04T14:33:49.552424+00:00",
-  "updatedLabel": "Photo caption validity delivered as1.163 both rooms; zero-duration Home timer queued under original clock",
+  "updatedAt": "2026-11-04T14:43:46.677658+00:00",
+  "updatedLabel": "Zero-duration Home Start guard delivered as1.164 both rooms; original clocks retained",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal 1.163/code 157. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal 1.164/code 158. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
@@ -60,37 +60,46 @@
     {
       "id": "home-timer-zero-duration",
       "title": "Home timer: retain the editor at zero duration",
-      "summary": "Source finding: Start0:00 closes the editor without starting a timer.",
-      "description": "Default5:00 minus-minutes five times reaches0:00; enabled Start passes zero while parent declines TimerStore.start and closes picker.",
-      "status": "queued",
-      "verification": "Source-only finding; no runtime reproducer or fix yet.",
+      "summary": "Zero-duration Start uses the existing disabled state; other timer chips retain enabled defaults.",
+      "description": "Custom Start is disabled at0:00 with secondary text and no click/focus handler. Duration calculation, positive callbacks, Cancel, alarms and storage remain.",
+      "status": "delivered",
+      "verification": "Independent source admission review; all4,541JVM/473suites/debug/optimized/R8/vital pass. Mounted timer interaction untested.",
       "kind": "Home timer input admission",
       "platforms": [
         "portal"
       ],
       "owner": "Root implementation and verification",
-      "deployment": "Unselected; current rooms retain1.163/code157.",
+      "deployment": "Exact optimized1.164/code158 fully hashed in both rooms; one install each. Living uncertainACK resolved by six read-only observations.",
       "acceptance": [
-        "Reproduce zero-duration Start on the existing custom timer path.",
-        "Disable Start at zero duration and retain editor; preserve positive timers, cancellation and other TimerChip callers."
+        "Source trace establishes five minute-minus taps from5:00 reach0:00 and the previous enabled callback dismissed without starting a timer.",
+        "Start now exposes zero-duration disabled semantics without a clickable handler; positive durations, Cancel and other chip callers retain their existing code.",
+        "Existing complete tests/builds and combined source/artifact review pass before exact both-room installs; no timer or household layout writes during validation."
       ],
       "evidence": [
         {
-          "text": "Frozen source finding and distinction from prior timer ownership fix.",
-          "source": "mocks/portal-photo-caption-validity-20261104/evidence/unselected-home-zero-duration.json"
+          "text": "Focused implementation, delivery and limits.",
+          "source": "docs/portal-home-zero-2026-11-04.md"
+        },
+        {
+          "text": "Combined review and deployment evidence.",
+          "source": "mocks/portal-home-zero-20261104/evidence/independent-review.json"
         }
       ],
       "limits": [
-        "No runtime acceptance or source change; distinct from prior accepted timer ownership unit.",
-        "Original discovery clock and hard deadline remain; no restart under another label."
+        "Source-reviewed admission only; actual composed timer interaction, touch/D-pad/accessibility tree and contrast remain unverified.",
+        "No new native harness or mirrored test for this reversible UI change; complete existing tests/builds pass.",
+        "Only generated optimized baseline.prof and baseline.profm differ; all23source assets and debug packaged assets remain exact. Initial comparison failure retained privately.",
+        "Distinct from prior timer ownership; original14:19:02–14:49:02 clock remains."
       ],
-      "next": "Select only if the remaining original issue time supports a small verified delivery.",
+      "next": "Continue a distinct small product slice; native interaction acceptance remains open under its original clock.",
       "issueClock": {
         "originalDiscoveryAt": "2026-11-04T14:19:02Z",
         "target": "2026-11-04T14:34:02Z",
         "hardDeadline": "2026-11-04T14:49:02Z",
-        "clockNotReset": true
-      }
+        "clockNotReset": true,
+        "selectedAt": "2026-11-04T14:35:57.650017+00:00"
+      },
+      "state": "43/30preference files, four maps and Familyruntime unchanged; savedShuffle/fit retained."
     },
     {
       "id": "native-dissolve-hardware-pixels",

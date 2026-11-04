@@ -1,0 +1,13 @@
+{
+  "homeBaselineSha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+  "homeCurrentSha256": "a0f9972d7755234c8be4f5f6886f77b0e7fa3925625583fb68059bbd26de0821",
+  "onlyFourFocusedEdits": true,
+  "allOtherHomeSourceBytesExact": true,
+  "tvFocusExactToBase": true,
+  "tvFocusSha256": "c178b73f2f262b880031bdecba954cedbb44b2b9e1b3dff7eabe647d93df5117",
+  "zeroDurationSourceSemantics": "disabled merged node; existing early return adds no click/focus action",
+  "positiveAndOtherCallers": "enabled=true default; duration calculation and callbacks exact",
+  "nativeComposedTimerAcceptance": "not run; no safe existing isolated path without new routing/adapter",
+  "regressionStrategy": "Existing complete JVM suite and debug/optimized/R8/vital gates; no new mirrored test for this reversible low-impact change",
+  "atUtc": "2026-11-04T14:38:54.394900+00:00"
+}

@@ -1,0 +1,186 @@
+{
+  "ok": true,
+  "blockers": [],
+  "reviewer": "/root/media_source_review",
+  "scope": "One final combined source/build/artifact review before root promotion. Prior source-review.json retained. No mounted UI or physical preservation acceptance.",
+  "clock": {
+    "originalDiscoveryAt": "2026-11-04T14:19:02Z",
+    "target": "2026-11-04T14:34:02Z",
+    "hardDeadline": "2026-11-04T14:49:02Z",
+    "clockNotReset": true
+  },
+  "source": {
+    "beforeSha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+    "afterSha256": "a0f9972d7755234c8be4f5f6886f77b0e7fa3925625583fb68059bbd26de0821",
+    "exactDelta": "CustomTimerDialog Start passes enabled=(minutes>0||seconds>0). TimerChip defaultenabled=true, forwards to existing tvFocusable and uses Secondary text when disabled; modifier line wrap only. Complete Home source reconstruction from captured base passed. Build metadata only157/1.163→158/1.164.",
+    "behavior": "Zero duration previously reached parent callback, skipped TimerStore.start and dismissed the picker. Source now supplies disabled merged semantics without a click/focus node at0:00, so this callback is not exposed through the chip. Positive durations, initial5:00, Cancel and all other TimerChip callers retain original behavior/defaulttrue.",
+    "helper": "Full unchanged TvFocus early-return examined. Authorized read-only git show0cd54527:path SHA c178b73f2f262b880031bdecba954cedbb44b2b9e1b3dff7eabe647d93df5117 matches current7018 bytes; observed toolbc639e exit0. TimerChip Surface/Text adds no independent click action.",
+    "stableAfterBuild": "Current Home hash rechecked after final artifact verification; source unchanged."
+  },
+  "build": {
+    "terminal": {
+      "exitCode": 0,
+      "elapsedSeconds": 122.33533670900215
+    },
+    "log": "BUILD SUCCESSFUL in2m1s; debug/performance/R8/lintVital and full JVM gates complete.",
+    "jvm": {
+      "tests": 4541,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 473
+    },
+    "fullXmlSnapshot": {
+      "directory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+      "files": 473,
+      "sha256": "cc61d9bf5d11246de80d38e7437613038a7e0e82b1ad1541db32fa11c78fa980",
+      "definition": "Sorted filename NUL fileSHA NUL byteLength newline"
+    },
+    "regressionStrategy": "No new tests for this reversible UI admission change, as requested. Existing full4541/473 XML independently counted with failures/errors/skips0."
+  },
+  "artifacts": {
+    "debug": {
+      "sha256": "54b1dc42eb595daf50975f691bb020187a5c6fa451fbaf1d00196908fa7dcfac",
+      "bytes": 46745646,
+      "manifest": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 158,
+        "versionName": "1.164"
+      },
+      "signerCertificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "sha256": "abfd9edb686cb0ac2968024f03c14b54469b8c404c8efcd7195dabf9667cc309",
+      "bytes": 25886923,
+      "manifest": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 158,
+        "versionName": "1.164"
+      },
+      "signerCertificateSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "verification": "Independent ZIP uniqueness checks and raw APK SHA/size; binary AndroidManifest identity decoded; certificate DER SHA decoded from APK v2 signing block. Bothcom.immortal.launcher.debug158/1.164, signer4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6. Root verify-artifacts SDK cryptographic signature result is retained; reviewer did not rerun signature cryptography/SDK.",
+    "sourceAssets": "All23 actual source files read and compared byte-exact to candidate and corresponding1.163 baseline ZIP entries; source SHA/size metadata verified. Packaged asset entry-name sets exact.",
+    "debugAssetChanges": [],
+    "performanceAssetChanges": [
+      "assets/dexopt/baseline.prof",
+      "assets/dexopt/baseline.profm"
+    ],
+    "generatedProfileReplay": {
+      "assets/dexopt/baseline.prof": {
+        "oldBytes": 11196,
+        "newBytes": 11159,
+        "oldSha256": "267d1c9e3a12c3fd9036ee9269a0ff0aca16ed539ae67f733cd22933360dec38",
+        "newSha256": "95109fecedbc6217f20acb8df8fef77cf53f2e6b1e84d51656ff517340718c6a",
+        "oldHeader": "70726f0030313000",
+        "newHeader": "70726f0030313000"
+      },
+      "assets/dexopt/baseline.profm": {
+        "oldBytes": 1456,
+        "newBytes": 1481,
+        "oldSha256": "0dc80d7135c44c598608d7839b8559f4376e80d7a4efb6c5d8a2c788e8cfa3e7",
+        "newSha256": "10762d256746963fa155e8f1aabcf8b7e8d714b75aaa9f266ac5079c6073b1e3",
+        "oldHeader": "70726d0030303200",
+        "newHeader": "70726d0030303200"
+      }
+    }
+  },
+  "gateCorrection": {
+    "initial": "Preserved initial helper and failure log rejected the changed baseline.profm because only baseline.prof was allowed. This was an artifact-comparison assumption failure, not a failing app test.",
+    "final": "Independently compared helper initial/final: only the optimized generated-asset whitelist expands to two explicit profile paths and requires appropriate pro/prm magic in old/new payloads. All23 source asset comparisons and every other guard remain exact. Independent ZIP replay proves no third asset changed; actual8-byte headers remain pro/010 and prm/002.",
+    "qualification": "No rebuild/product/source change made for gate correction. Exact generated bytes/hashes/sizes are recorded. Header agreement is not a profile semantic/performance benchmark claim."
+  },
+  "limits": [
+    "Source disabled-click/focus/semantics reasoning; no mounted Compose, touch, D-pad, accessibility tree, visual contrast or native UI acceptance.",
+    "No timer setting/schema/store/alarm policy change; duration arithmetic and positive/other callbacks are unchanged.",
+    "No new native fixture, UI test, performance/FPS, optimized runtime/API28/Livingvisual verdict.",
+    "Reviewer performed source/evidence reads, one explicitly authorized read-only git show and review receipt writes. No tests/build/SDK/device/network/Git mutation or owner media/provider/account actions.",
+    "Root room installs, readback, complete preference/map/Familyruntime preservation and cleanup remain root-owned subsequent gates; their private payloads were not read or independently accepted here."
+  ],
+  "bindings": {
+    "/private/tmp/portal-home-zero-20261104-143508/plan.json": {
+      "sha256": "206c707bfac9dcf0a59c4268cbac0a5c7ad02c4e2938a5a57b609fc33f18a415",
+      "bytes": 413
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/source-review.json": {
+      "sha256": "2cbe92630d1683c2ecf491ff9f45272ef5b29e9d674ede1ee92e1470f6ce7362",
+      "bytes": 4007
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/source-witness.json": {
+      "sha256": "ce3f6539c9a87e11f6d27ccce3c4b9137db8d48d61f6f6bdacdba7ff1b9c14e4",
+      "bytes": 880
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/HomeActivity.before.kt": {
+      "sha256": "218925fdc351bb6bbb48498315ba6a91b188aeafdf0c8958bcc123ad938e093f",
+      "bytes": 229887
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/HomeActivity.kt": {
+      "sha256": "a0f9972d7755234c8be4f5f6886f77b0e7fa3925625583fb68059bbd26de0821",
+      "bytes": 230028
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/app-build.before.kts": {
+      "sha256": "153e800842a30f597054e1965c537481c07f09872402f716210c43ad92528ec2",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts": {
+      "sha256": "564f51aabfa2c4f6c0c8edc00083345fe9ab139e6758853d829b3a63e51b9a06",
+      "bytes": 11824
+    },
+    "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/TvFocus.kt": {
+      "sha256": "c178b73f2f262b880031bdecba954cedbb44b2b9e1b3dff7eabe647d93df5117",
+      "bytes": 7018
+    },
+    "/private/tmp/portal-ux-next-20261104-141902/unselected-home-zero-duration.json": {
+      "sha256": "4974d81f44c6a517059411f6a932b66b723baf7c057fee6234817445b2955ab0",
+      "bytes": 3665
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/build-terminal.json": {
+      "sha256": "32aac0698a00a20c2e4941df521a97e020c0f70c834a297ae0265da0a81d2d64",
+      "bytes": 60
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/build.log": {
+      "sha256": "332d5658e4ebc437446aaf8e9076e7413a2fa8df42c2f7166b15b220f1a3f370",
+      "bytes": 13722
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/promotion-artifacts.json": {
+      "sha256": "df53eaedaba87a94bbb2b1ea9e514e0ca6d89d9cdc56a759893db70f11542010",
+      "bytes": 9876
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/verify-artifacts.initial.py": {
+      "sha256": "748b538172f4c05c20fb2f79ac32b4bbf74ff5f7910d6bb6e2169065089e6ce5",
+      "bytes": 3388
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/verify-artifacts.py": {
+      "sha256": "c7409f1c9624834f9fb26988b51c14ae3012d2fbc6351730641499d3ac2d1982",
+      "bytes": 3656
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/artifact-verification.initial.log": {
+      "sha256": "1b4e1dc894344a41b910a895ca49ac5084135b5635ac1abc6b74854b0f43f4b5",
+      "bytes": 349
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/artifact-verification.log": {
+      "sha256": "835ae3f4867c5c970fefe8dc00176cee3072ebb5fe8441660148c604edaee3ae",
+      "bytes": 487
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/generated-profile-delta.json": {
+      "sha256": "5ff6f4b11c7549bb245c585a7a2c710b8883d4614430628df175784889d018c3",
+      "bytes": 919
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/before-debug-1.163.apk": {
+      "sha256": "25d2ed46666dfde89cd8c4f66a964b002ebff08e05066bb74c855f326b8421cc",
+      "bytes": 46745646
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/rollback-1.163.apk": {
+      "sha256": "bbad63813775731b6cd71adfd33ace163d2e20bfacab3fc67dafdf5ccd2e9713",
+      "bytes": 25886923
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/candidate-debug-1.164.apk": {
+      "sha256": "54b1dc42eb595daf50975f691bb020187a5c6fa451fbaf1d00196908fa7dcfac",
+      "bytes": 46745646
+    },
+    "/private/tmp/portal-home-zero-20261104-143508/candidate-performance-1.164.apk": {
+      "sha256": "abfd9edb686cb0ac2968024f03c14b54469b8c404c8efcd7195dabf9667cc309",
+      "bytes": 25886923
+    }
+  }
+}

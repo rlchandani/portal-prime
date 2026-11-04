@@ -1,0 +1,66 @@
+{
+  "build-terminal.json": {
+    "bytes": 60,
+    "sha256": "32aac0698a00a20c2e4941df521a97e020c0f70c834a297ae0265da0a81d2d64"
+  },
+  "docs-terminal.json": {
+    "bytes": 60,
+    "sha256": "52ae74873c93de7b98c29f5ac4b9070efde9e748f65571071cce1d9abdaad71a"
+  },
+  "family-installed.json": {
+    "bytes": 227,
+    "sha256": "2d4111656de7e42c99d129ebaec6a28bcc89fb7e7e3234cff2443a09dadaed9d"
+  },
+  "frame-return.json": {
+    "bytes": 209,
+    "sha256": "13af4180504132cf8953756aea7700fafd6ec4273fa1907e4d74107e6c0fbb4f"
+  },
+  "generated-profile-delta.json": {
+    "bytes": 919,
+    "sha256": "5ff6f4b11c7549bb245c585a7a2c710b8883d4614430628df175784889d018c3"
+  },
+  "independent-review.json": {
+    "bytes": 10553,
+    "sha256": "257690b8816d24d38fe177dd3dfff34895211d8573ee62f3bc273d66875c60b4"
+  },
+  "living-install-observation.json": {
+    "bytes": 348,
+    "sha256": "aba043d3e165b25452435c92eebd5333632a3f4cd39a49bfa0a7e3bba483025e"
+  },
+  "plan.json": {
+    "bytes": 413,
+    "sha256": "206c707bfac9dcf0a59c4268cbac0a5c7ad02c4e2938a5a57b609fc33f18a415"
+  },
+  "preservation.json": {
+    "bytes": 976,
+    "sha256": "97974197bc438d0d85ad11e071501d4e7b77b909613e4d73678725d55e610fbc"
+  },
+  "promotion-artifacts.json": {
+    "bytes": 9876,
+    "sha256": "df53eaedaba87a94bbb2b1ea9e514e0ca6d89d9cdc56a759893db70f11542010"
+  },
+  "roadmap-preservation.json": {
+    "bytes": 299,
+    "sha256": "bb17ce493baf1152247dcc3eb533b99c236b1ba09ce3df6762a64379a1f35ae1"
+  },
+  "root-review-verification.json": {
+    "bytes": 484,
+    "sha256": "451b8d324f31cc5d3fcf4871663f0e70719cdbf41b346f489cb949ddab583d45"
+  },
+  "root-verification.json": {
+    "bytes": 2870,
+    "sha256": "8dc5e0519ff90fb9e2dacf3f9d6b0967b68053b653992277100e972c2b3ff285"
+  },
+  "source-freeze.json": {
+    "bytes": 470,
+    "sha256": "54672c48d31854615b21b8a186df255cf6829805c21ce1304922d07c40324cff"
+  },
+  "source-review.json": {
+    "bytes": 4007,
+    "sha256": "2cbe92630d1683c2ecf491ff9f45272ef5b29e9d674ede1ee92e1470f6ce7362"
+  },
+  "source-witness.json": {
+    "bytes": 880,
+    "sha256": "ce3f6539c9a87e11f6d27ccce3c4b9137db8d48d61f6f6bdacdba7ff1b9c14e4"
+  }
+}
