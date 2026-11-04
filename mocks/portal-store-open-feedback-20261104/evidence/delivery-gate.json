@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "bothExactOptimized1170": true,
+  "sha256": "2fe4afcabd146cdef1867b41d5ad157321dfe7258b9752c5d766673603bc3e8a",
+  "singleInstallEach": true,
+  "livingUncertainAckReadOnlyObservations": 6,
+  "all43and30PreferencesExact": true,
+  "fourCompleteMapsAndFamilyRuntimePreserved": true,
+  "frameRequestsSuccessful": true,
+  "capturedFatalAnrMarkersZero": true,
+  "toastAndActualLaunchNotTested": true
+}

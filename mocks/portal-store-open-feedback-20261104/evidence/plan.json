@@ -1,0 +1,22 @@
+{
+  "originalStart": "2026-11-04T16:53:39Z",
+  "target": "2026-11-04T17:08:39Z",
+  "hardDeadline": "2026-11-04T17:23:39Z",
+  "selectedAt": "2026-11-04T17:01:07.877713+00:00",
+  "clockNotReset": true,
+  "scope": "Only existing App Store Open failure feedback; retain direct launch and installed app-details fallback. Use same standard launcher message. No new mirrored tests for reversible UI feedback; all existing app tests/builds and independent source/artifact review required.",
+  "sourceWitness": "StoreAction OPEN catches each startActivity failure and discards Result. App switcher already reports the same failure with Toast.",
+  "before": {
+    "bytes": 23177,
+    "sha256": "b14f2008035393ee47a7e6b1be958dd506e12966a4f0f1fa29da8f6295f9b2a0"
+  },
+  "expectedVersion": {
+    "versionName": "1.170",
+    "versionCode": 164
+  },
+  "exclusions": [
+    "AppSwitcher launch policy, Jarvis handoff, installer/download/confirmation ownership and prior expired scopes",
+    "Actual household app launches, catalog network/provider/account/phone operations",
+    "No push/publication; public1.83 remains"
+  ]
+}

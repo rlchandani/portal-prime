@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "originalStart": "2026-11-04T16:53:39+00:00",
+  "closedAt": "2026-11-04T17:09:31.266848+00:00",
+  "elapsedMinutes": 15.871114133333332,
+  "targetMet": false,
+  "hardMet": true,
+  "clockNotReset": true,
+  "bothExact1170Delivered": true,
+  "savedStateAndFamilyRuntimePreserved": true,
+  "fullTestsBuildsReviewAndStrictDocsPass": true,
+  "privacyCleanupPass": true,
+  "wholeGoalActive": true,
+  "limits": "Actual launch/app-details/visibleToast and older excluded scopes remain outside acceptance."
+}

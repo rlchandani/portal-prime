@@ -1,0 +1,115 @@
+{
+  "startedAt": "2026-11-04T16:53:39Z",
+  "deadline": "2026-11-04T17:23:39Z",
+  "base": "b1596d6c",
+  "rooms": {
+    "family": {
+      "prefs": {
+        "AwOriginVisitLoggerPrefs.xml": "0e14f14554561fce171ef4f14d9dd9eafabdd92249665764efe0be7d278e963d",
+        "com.google.mlkit.internal.xml": "5ed54e11a5c1ab9a7f323a2ef4be1bb1bc703ad5ecfa201a31144422cd37b158",
+        "crash_guard.xml": "cbc87566c9b44cca19a10938013564bb41ce45801ff76ea92d4eac38b70ca8fa",
+        "digital_clock_config.xml": "3e1aca8c879349f87ef460d3f0224abe26023da3cc34dacce81f8eb90476a7d6",
+        "dream_bridge.xml": "3325d2a819fdd8062c2cdc48a09b995c9b012915bcdf88b1cf9742a7f057c793",
+        "fleet_agent.xml": "eb3ae2fa89b3138b8a22fe9e281de63ee8a8c8e9b4b4a00b9c5c66fcd3c830cc",
+        "immortal_alarm.xml": "8cd870fdb57232e77a5ec169808a401ccb622b1f8d3e89efcc377fff2c4fc991",
+        "immortal_cameras.xml": "3e3d798d29a753bddcbe1f772f09cbb3a23db9bcac4be4a20117260a3e855de9",
+        "immortal_chime.xml": "21d1319a88aa7d54ae825391ce1301cb0e6e4b556556b0dc5312d3dcc4fcf1d9",
+        "immortal_converter.xml": "d2d8840b443bc595333af8c3b2a6bea8873bd2c95ca19e8bd6e724b39a4b28b1",
+        "immortal_countdown.xml": "3325d2a819fdd8062c2cdc48a09b995c9b012915bcdf88b1cf9742a7f057c793",
+        "immortal_crypto.xml": "5afc8f9ec50c2be0c280bcf2cfbbed8c0b7fc2ec0228272ea490ca206902a72b",
+        "immortal_debug.xml": "f9e4f9ef6184b3ca2b1f8eef66c917965d1ae1b0ded9fa7e61be875281b02cff",
+        "immortal_dev.xml": "096b065c97a4ef46c889cdc6d4ac3580305647ae6a41254c3fe002ffd462fe99",
+        "immortal_display.xml": "babc00281ffc64efd8645c679e6801eee6cd29711fd08c05d0d0d57a639473f3",
+        "immortal_ha.xml": "497ff09f2c8fdfdb73358dca0a3518ec41b1faa8d01e6d31bf41af7f59dad923",
+        "immortal_help.xml": "b277f546749b6110207d35662009adb420fc71fcde46341854531bc7c64d1775",
+        "immortal_home_dashboard.xml": "bc35707198bee09358f7a5c956015e7f2be35cdb659ba09bec1abf807ecf7823",
+        "immortal_home_widgets.xml": "76441a7d99113e28ae367bbd1298e32883d1e2988ace05dace3e847c1c147a75",
+        "immortal_http_cache.xml": "b5c2e91dcd36448368d90142f075a09f0e735caa12cf46832a8973079aab97a3",
+        "immortal_iss.xml": "1b3b21b935f5eb66670cda4cb893f01255a123ca1bc84075a159df4b416f806f",
+        "immortal_layout.xml": "fd828c959e351173b960ccda3af411cb9e9b8358ca47d097f41456d8e02431b1",
+        "immortal_notes.xml": "3325d2a819fdd8062c2cdc48a09b995c9b012915bcdf88b1cf9742a7f057c793",
+        "immortal_options.xml": "7424874eb00151e27bf4b6f4ae8bd54aeee8fe5f7ca17b4eeb15127dd4db769e",
+        "immortal_packs.xml": "8462aa250596721ad1d7ebf439cd1cec8b03b88f37a791b9e45b093149f0acd2",
+        "immortal_screensaver.xml": "d059b3617af84f92001e29effc414950eee2cb956a847fa9669ce163dc1eb9b4",
+        "immortal_settings.xml": "ba74730ca8670b24577c9b79d3475b906ff37337f8d5a25559de9a712410ced0",
+        "immortal_sleep_timer.xml": "5213ca41c4e9be52035cad6faad151871c011cd0ef2f91a0766b4511c23f3a06",
+        "immortal_stocks.xml": "152edc7354afe73c9c71c6080a6c03a724c33e4245e38701bbf70194afa30c21",
+        "immortal_sunrise.xml": "1e424bd83d0c508b0f35ce2447f6eaf18b9601c3c43ada6ea8946409287db981",
+        "immortal_timer.xml": "3e7ec24496aa601cf9171c11e82fc5cfa829d2149a7bf04ade9506f99a754bcf",
+        "immortal_timers.xml": "4112299350ee9fb9f08e0f9bb4a1ddbd0df6a6a8458ee92a1203cfeca16f71e9",
+        "immortal_todos.xml": "c33ac23526515516b0d7ed8565fdbccb7b3c20ad881e852a950fe3bdf94d5d56",
+        "immortal_wallpaper.xml": "cc39f9605819c1f215f6e75f3505e23c9337413bc82b9e7ecafe0dbf3a0bef75",
+        "immortal_weather.xml": "77a3f6236390f0104f542602aa1d0d9ba522934a4efe8949952f5442ca9016a4",
+        "immortal_welcome.xml": "796afd5d31f6e4ab37570127342fcc4c14b633e212f8ef4e0ebce6e706360e04",
+        "mqtt_publisher.xml": "c9a0d93785d40fa49b0f3c002fb228467c8f0b392289dbc5cec9b0b122982cee",
+        "night-photo-owned-42b4692f-d74f-4724-8aa2-46b8c86aac4b-immortal_screensaver.xml": "1d39423e637a85d62a7b1aceb5d92b190b89303a7ff1c01c01d79441838b6572",
+        "night-photo-owned-42b4692f-d74f-4724-8aa2-46b8c86aac4b-immortal_weather.xml": "e54868035c100940a9d718138a39e677cfd65a5f7e9c5245bfacce30e7c96508",
+        "quick_bar.xml": "41edafa36db2d20210dd3d9d17c25f9766eaa53be5991661b6ed3fbb652abc34",
+        "remote_pairing.xml": "d167cc83bf155f003395b05cdbb103982c326ed99d66181375cd674f922930fd",
+        "remote_roster.xml": "0c6045b7e67d905cef5be618533b4dca9f65dfd1ceaff4983d5cd24b1e714484",
+        "WebViewChromiumPrefs.xml": "2d0e50a519aee41003b0a9e84b2006c3915b15bc939f085f6b34c330a2bee03e"
+      },
+      "maps": {
+        "/info": "3e4d572e32585f98ef576bdfe9095c84d6ceb934784ddd58ff2968d0ed172531",
+        "/screensaver": "3b5d02d944ca399deaf9a9e9575ec5f79f9a5d94ee5cf20a50c3adbd2f170ce9",
+        "/remote/settings/profile": "cb562a7a98fca05076379c91e3e6802ba08126e23a685b2f10a7811187439356",
+        "/remote/sources": "a39e9aa21bcea86a61afda207c4b6ffb07cbd4ee2c34eecd53cd1de7e7ac9add",
+        "/remote/layout": "3c9408c7e4b2b3bee636a155b09f7564f42c2159199802c9111af3399c4a59db"
+      },
+      "app": {
+        "versionCode": 163,
+        "versionName": "1.169"
+      }
+    },
+    "living": {
+      "prefs": {
+        "com.google.mlkit.internal.xml": "9d2be87babbe3031f65e3b13edbfe291c7c2e8cd4aa940d43aefebadf37e26c2",
+        "digital_clock_config.xml": "3e1aca8c879349f87ef460d3f0224abe26023da3cc34dacce81f8eb90476a7d6",
+        "dream_bridge.xml": "3325d2a819fdd8062c2cdc48a09b995c9b012915bcdf88b1cf9742a7f057c793",
+        "fleet_agent.xml": "79766934625d47aea824d2ed0a3f0b62ab9bf0e18db9eed07d3522a1664baf52",
+        "immortal_alarm.xml": "8cd870fdb57232e77a5ec169808a401ccb622b1f8d3e89efcc377fff2c4fc991",
+        "immortal_cameras.xml": "3e3d798d29a753bddcbe1f772f09cbb3a23db9bcac4be4a20117260a3e855de9",
+        "immortal_chime.xml": "6db106e3a0b7f47987953250a2e8633e8f49eb10ceeffd147536d6e0747f78e2",
+        "immortal_countdown.xml": "3325d2a819fdd8062c2cdc48a09b995c9b012915bcdf88b1cf9742a7f057c793",
+        "immortal_crypto.xml": "5afc8f9ec50c2be0c280bcf2cfbbed8c0b7fc2ec0228272ea490ca206902a72b",
+        "immortal_dev.xml": "096b065c97a4ef46c889cdc6d4ac3580305647ae6a41254c3fe002ffd462fe99",
+        "immortal_display.xml": "1748d97418d8aa7d01bc2f7e30db9a861112a59e14455cdff0934b4e2c76a888",
+        "immortal_ha.xml": "497ff09f2c8fdfdb73358dca0a3518ec41b1faa8d01e6d31bf41af7f59dad923",
+        "immortal_help.xml": "b277f546749b6110207d35662009adb420fc71fcde46341854531bc7c64d1775",
+        "immortal_home_dashboard.xml": "bc35707198bee09358f7a5c956015e7f2be35cdb659ba09bec1abf807ecf7823",
+        "immortal_home_widgets.xml": "76441a7d99113e28ae367bbd1298e32883d1e2988ace05dace3e847c1c147a75",
+        "immortal_http_cache.xml": "8e4d21ad16f18de090fa9aae6332db7fc2116d061a6c9979964a7d4e93f028da",
+        "immortal_layout.xml": "fd828c959e351173b960ccda3af411cb9e9b8358ca47d097f41456d8e02431b1",
+        "immortal_notes.xml": "3325d2a819fdd8062c2cdc48a09b995c9b012915bcdf88b1cf9742a7f057c793",
+        "immortal_screensaver.xml": "968baa8152db73040cd74fbde85c9019316299ecdf1a2778a811d663137a5504",
+        "immortal_settings.xml": "73ad150dc20ad12eb2e67f6071e664264299de593f30e4304c369503015c9e87",
+        "immortal_sunrise.xml": "1e424bd83d0c508b0f35ce2447f6eaf18b9601c3c43ada6ea8946409287db981",
+        "immortal_todos.xml": "c33ac23526515516b0d7ed8565fdbccb7b3c20ad881e852a950fe3bdf94d5d56",
+        "immortal_wallpaper.xml": "cc39f9605819c1f215f6e75f3505e23c9337413bc82b9e7ecafe0dbf3a0bef75",
+        "immortal_weather.xml": "dcb9e41ebb084b7e492d777224f192db95e8de6bd0efd9710676ef3a6e2c0883",
+        "immortal_welcome.xml": "295e5b3003455256d8f493bfa115b90c66238fa045e6070bb4046735db579c16",
+        "mqtt_publisher.xml": "b70c5a8806d4aee0f48e66ac0336c53a3b07855c0b72d2a0d6953a903cdad468",
+        "quick_bar.xml": "41edafa36db2d20210dd3d9d17c25f9766eaa53be5991661b6ed3fbb652abc34",
+        "remote_pairing.xml": "749df2b0cd879e0cc509a04b70e699e64d0d4eb6deceb5fca432535e4d23366f",
+        "remote_roster.xml": "ce8fd8554e5360672d2e8d25c96fb78f69adbec7482743ee5ae45e86a0aa2f71",
+        "WebViewChromiumPrefs.xml": "086e75082f4c239ae4adcb9fd49367ba8a704bb1c571076e5393419a18ee8790"
+      },
+      "maps": {
+        "/info": "2e7a8bad032f8554b672334bd46d33abfcf8964f405aa7789aa2a24b3294dbc5",
+        "/screensaver": "cd2ebe3bb7fbd15ddebb40ebfe95b581175b7b41255bfc724275c7b41a0c0cd1",
+        "/remote/settings/profile": "fc2c49b9a8fa1e89462a736d0a1ee714ab6d39a8f7604dfbd40ca5ea4cde1312",
+        "/remote/sources": "a39e9aa21bcea86a61afda207c4b6ffb07cbd4ee2c34eecd53cd1de7e7ac9add",
+        "/remote/layout": "4916325b71b419b395c02ee305ef994c1c016fb53f00db95ff29b5cd8faf7541"
+      },
+      "app": {
+        "versionCode": 163,
+        "versionName": "1.169"
+      }
+    }
+  },
+  "rollbackSha256": "56a31c43d56bf6bd3ad3cf70f3189afccfddbbafd422376ec8cf3a8ca2370087",
+  "registryHashes": {
+    "family": "ea4f9c78c5c9360583b13eeef922b1eecb3d4056cabf55d8cbe2ef4f747d308b",
+    "living": "b186a49cba8b52f7595b1660405162998c61c6e1fae10522ab416c230cef29b4"
+  }
+}

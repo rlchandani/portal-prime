@@ -1,0 +1,181 @@
+{
+  "accepted": true,
+  "ok": true,
+  "findings": [],
+  "blockers": [],
+  "originalStart": "2026-11-04T16:53:39Z",
+  "target": "2026-11-04T17:08:39Z",
+  "hardDeadline": "2026-11-04T17:23:39Z",
+  "clockNotReset": true,
+  "base": "b1596d6c",
+  "source": {
+    "wholeStoreActivityExactOpenBlockReplacement": true,
+    "liveSourceFrozen": true,
+    "activeCaller": "StoreAppCard calls StoreAction; enabled tvFocusable OPEN branch invokes selected intent.",
+    "intentResolution": "PackageManager launch intent unchanged; when absent same application-details Intent and package URI used.",
+    "failureFeedback": "Resolution or startActivity failure reaches one onFailure; same standard launcher This app couldn’t be opened. LENGTH_LONG Toast.",
+    "successfulDirectAndAppDetailsDispatchUnchanged": true,
+    "getUpdateWaitCheckingIncompatibleEligibilityLabelsAndDispatchBytesUnchanged": true,
+    "installerCatalogOwnershipSettingsAndOtherSourceBytesUnchanged": true
+  },
+  "build": {
+    "retainedTerminalExit": 0,
+    "elapsedSeconds": 107.38069770899892,
+    "log": "BUILD SUCCESSFUL in 1m 46s",
+    "all475XmlRehashedAndRecounted": {
+      "tests": 4565,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 475
+    },
+    "existingStorePrimaryActionTests": 12
+  },
+  "xmlAggregate": {
+    "directory": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest",
+    "glob": "TEST-*.xml",
+    "sort": "ascending filename",
+    "definition": "SHA256 of concatenated UTF8 filename NUL lowercase SHA256 NUL decimal bytecount newline records.",
+    "sha256": "4c10ec1ebc8aa3fecbfb565e157850a49b51376373597abd362d948723197bcf",
+    "files": 475
+  },
+  "artifacts": {
+    "debug": {
+      "candidate": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 164,
+        "versionName": "1.170"
+      },
+      "baseline": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 163,
+        "versionName": "1.169"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsExactSourceAndBaseline": true,
+      "changedAssets": []
+    },
+    "performance": {
+      "candidate": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 164,
+        "versionName": "1.170"
+      },
+      "baseline": {
+        "package": "com.immortal.launcher.debug",
+        "versionCode": 163,
+        "versionName": "1.169"
+      },
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsExactSourceAndBaseline": true,
+      "changedAssets": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "publicManifest": {
+    "versionCode": 77,
+    "versionName": "1.83"
+  },
+  "limits": [
+    "Source and existing full test/build/artifact acceptance only. No mirrored test or behavioral RED claim for reversible UI feedback.",
+    "No visible Toast, actual household app launch/app-details display, rendered/native UI, installer/AppSwitcher/Jarvis handoff policy or device acceptance.",
+    "Twelve existing policy tests cover action selection/eligibility, not Toast visibility or Android launch execution.",
+    "Only read-only source/hash/XML/ZIP inspection performed; no SDK/tests/build/Git/device/browser/provider/account/network actions.",
+    "APK manifest and signing certificate identities independently decoded; cryptographic verification remains retained root helper apksigner evidence.",
+    "Debug assets exact; performance only generated baseline.prof changes. All23 source asset bytes exact source/baseline; no profile performance claim.",
+    "All475 XML bytes bound by reproducible aggregate; root can rehash complete file set before delivery. Prior held scopes/clocks retained."
+  ],
+  "bindings": [
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/plan.json",
+      "bytes": 1110,
+      "sha256": "58ff3af8eb83c56b9fe53d74451f0e29d1aa4290ed6a1b9ac37ff1dccc7b6cd8"
+    },
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/StoreActivity-before.kt",
+      "bytes": 23177,
+      "sha256": "b14f2008035393ee47a7e6b1be958dd506e12966a4f0f1fa29da8f6295f9b2a0"
+    },
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/build-terminal.json",
+      "bytes": 178,
+      "sha256": "fe01ab990824be6f87bac3ecd5465e8b1a6b87493918f650ed011b52edda9801"
+    },
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/build.log",
+      "bytes": 13723,
+      "sha256": "86d2983300e38a28113f766466af565dec7e5eb83fb5433de26054860f2d0362"
+    },
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/verify-artifacts.py",
+      "bytes": 3683,
+      "sha256": "af60cf8ed6f822694aa3ec71f3292e160599b28feba830f5712e25b31aa56b53"
+    },
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/promotion-artifacts.json",
+      "bytes": 9858,
+      "sha256": "7259fc15709cf4bfd88ea9f3e53a15f18a97058c0ce0860e053e09c1e1009400"
+    },
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/candidate-debug-1.170.apk",
+      "bytes": 46745646,
+      "sha256": "f903eb59e440372eeaa80dc652c2eaed52bbae2f51bb0d74a4c984af268d176b"
+    },
+    {
+      "path": "/private/tmp/portal-store-open-feedback-20261104-165339/candidate-performance-1.170.apk",
+      "bytes": 25886927,
+      "sha256": "2fe4afcabd146cdef1867b41d5ad157321dfe7258b9752c5d766673603bc3e8a"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/StoreActivity.kt",
+      "bytes": 23356,
+      "sha256": "6bb6a7ce16f94689c60c34bc53b5ed3eeff0eb6f85d1d350a96e2162aa6630ca"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/StorePrimaryAction.kt",
+      "bytes": 930,
+      "sha256": "e43b882d25b73b436967e3c14e19a4bae2333aac6e9627dfb4dd4fa34937a3d4"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/test/java/com/immortal/launcher/StorePrimaryActionTest.kt",
+      "bytes": 2418,
+      "sha256": "e9013ca8af9c6dbfbc3493e36dbe62deea4005374e17f42a327b6152fb324923"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/src/main/java/com/immortal/launcher/AppSwitcherActivity.kt",
+      "bytes": 33074,
+      "sha256": "f2f82d2ce372c6d42acfc83b29b83104662ad5152a643b509afc1198d818815b"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build.gradle.kts",
+      "bytes": 11824,
+      "sha256": "da13f13c5111e50f95624609f124e53b4e3cc0d7eac103b54355800ed350169a"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/version.json",
+      "bytes": 310,
+      "sha256": "172e62fa797a48960329c2f967c7d60547f89ba4a1ecd8f7f20894f2c4060903"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/scripts/portal_release_readiness.py",
+      "bytes": 19404,
+      "sha256": "1625abbd01fdf82c89a0d760d3e1125dd083069ae8f3aeab5e06768fba1bb740"
+    },
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/candidate-debug-1.169.apk",
+      "bytes": 46745646,
+      "sha256": "f874d9ec0d34acb3627971666c3870fa0e7e9ea35b7b9a56cf8f28d3039ed0fe"
+    },
+    {
+      "path": "/private/tmp/portal-dismiss-fallback-20261104-163911/candidate-performance-1.169.apk",
+      "bytes": 25886927,
+      "sha256": "56a31c43d56bf6bd3ad3cf70f3189afccfddbbafd422376ec8cf3a8ca2370087"
+    },
+    {
+      "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/test-results/testDebugUnitTest/TEST-com.immortal.launcher.StorePrimaryActionTest.xml",
+      "bytes": 1995,
+      "sha256": "4f491377987e6f9baa1e708035e58a845b7e617e0db3eec84b12b72b9fefdc51"
+    }
+  ]
+}

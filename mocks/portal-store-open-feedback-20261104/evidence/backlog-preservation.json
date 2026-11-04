@@ -1,0 +1,14 @@
+{
+  "oldTasks": 167,
+  "newTasks": 168,
+  "counts": {
+    "delivered": 114,
+    "verified": 44,
+    "parked": 7,
+    "approval": 2,
+    "queued": 1
+  },
+  "allPreviousObjectsClocksAndDefaultExact": true,
+  "oldRawSuffixBytes": 536987,
+  "oldRawSuffixSha256": "8ccd4678907177418b0ba09d217a117a71d46b42b4a1d5b98c614ec1d2338182"
+}

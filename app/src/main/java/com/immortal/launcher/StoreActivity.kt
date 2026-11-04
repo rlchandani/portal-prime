@@ -319,9 +319,15 @@ private fun StoreAction(app: CatalogApp, status: String?, updates: Map<String, L
         if (action.enabled) {
           when (action) {
             StorePrimaryAction.OPEN -> {
-              val launch = context.packageManager.getLaunchIntentForPackage(app.packageName)
-              if (launch != null) runCatching { context.startActivity(launch) }
-              else runCatching { context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${app.packageName}"))) }
+              runCatching {
+                val launch = context.packageManager.getLaunchIntentForPackage(app.packageName)
+                    ?: Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:${app.packageName}"))
+                context.startActivity(launch)
+              }.onFailure {
+                android.widget.Toast.makeText(context, "This app couldn’t be opened.",
+                    android.widget.Toast.LENGTH_LONG).show()
+              }
             }
             StorePrimaryAction.GET, StorePrimaryAction.UPDATE -> onInstall()
             else -> Unit
