@@ -4020,8 +4020,9 @@ function chooseUpload() {
   const input = el('input', { type: 'file', accept: '.jpg,.jpeg,.png,.webp,.gif',
     multiple: true, 'aria-label': 'Choose photos' });
   const recipients = el('div'), folderFields = el('div'), preview = el('div');
-  const summary = text('Choose photos and destination Portals.');
-  const admission = text('');
+  const summary = el('p', { class: 'detail', role: 'status', 'aria-live': 'polite',
+    text: 'Choose photos and destination Portals.' });
+  const admission = el('p', { class: 'detail', role: 'status', 'aria-live': 'polite', text: '' });
   const start = button('Start import', async () => {
     if (busy) return;
     try {

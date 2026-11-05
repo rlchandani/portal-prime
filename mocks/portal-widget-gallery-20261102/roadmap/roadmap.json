@@ -1,18 +1,67 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T04:30:35.208301+00:00",
-  "updatedLabel": "5 November2026 \u00b7 offline capture timing locally verified; room1.199 retained",
+  "updatedAt": "2026-11-05T04:44:29.172690+00:00",
+  "updatedLabel": "5 November2026 \u00b7 photo import status feedback delivered in1.200",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.199/code193, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.200/code194, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+        "id": "photo-import-polite-status",
+        "title": "Photo import: accessible live feedback",
+        "summary": "Expose existing copy-count and folder-validation feedback as polite status regions.",
+        "status": "delivered",
+        "kind": "Remote picker accessibility semantics",
+        "platforms": [
+            "portal",
+            "browser"
+        ],
+        "owner": "Remote UI / independent review / delivery verification",
+        "deployment": "Exact optimized1.200/code194 fully hashed both rooms, one install each.",
+        "verification": "4730JVM/492suites;772JS records pass;2DOM failures→2pass;18Chromium leaves pass",
+        "acceptance": [
+            "Keep existing text/node/style and transfer policies.",
+            "Expose both existing summary/admission paragraphs as status/polite.",
+            "Observe updates and invalid-to-valid correction without uploads.",
+            "Verify packaged sources/builds/review/delivery/preservation."
+        ],
+        "evidence": [
+            {
+                "text": "Scope and limits.",
+                "source": "docs/portal-photo-import-status-2026-11-05.md"
+            },
+            {
+                "text": "Machine receipt and clock.",
+                "source": "mocks/portal-photo-import-status-20261105/verification.json"
+            }
+        ],
+        "limits": [
+            "The two existing picker paragraphs expose status/polite semantics. Selection, validation, transfer, retry and destination policies are byte-equivalent outside those constructions.",
+            "Actual assistive-technology speech, announcement timing/order and native Portal WebView/phone/API28 visual acceptance are unverified.",
+            "Two frozen actual-controller DOM tests fail on missing roles before the change and pass afterward. The adapter does not render or speak.",
+            "Chromium loads actual RemoteHtml and packaged before/after controller bytes with identical core/CSS and frozen expectations. One new leaf fails before and passes afterward; all17 existing leaves pass in both. Node reports19 records including parent, not19 independent leaves.",
+            "Chromium uses generated payloads and intercepted routes only. The new status leaf never uploads; existing controls use intercepted generated POSTs. No actual media/provider/server transfer is exercised.",
+            "All23 candidate source assets match checkout. Only remote/control-center.js intentionally differs from1.199;22 source assets and certificate remain. Generated optimization profiles may differ.",
+            "Original04:32:32 start,04:37:32 discovery cap,04:47:32 target,05:02:32 hard limit retained. Final DOM baseline04:36:51 precedes cap. The initial reporter-inspection mismatch was corrected without changing tests or source.",
+            "No phone, household provider/account/media action, GitHub authentication/push or public publication. Public manifest1.83, prior held clocks and whole product goal remain."
+        ],
+        "next": "Continue independent product work; retain previous held clocks.",
+        "issueClock": {
+            "originalStartUtc": "2026-11-05T04:32:32Z",
+            "discoveryCapUtc": "2026-11-05T04:37:32Z",
+            "targetUtc": "2026-11-05T04:47:32Z",
+            "hardLimitUtc": "2026-11-05T05:02:32Z",
+            "baseHead": "1520211245888ec8e29002a35d89a8b758122c77",
+            "scope": "Import-picker accessibility: polite copy-count and validation status semantics; keep transfer/controller policy unchanged"
+        }
+    },
     {
         "id": "delivery-capture-timing",
         "title": "Delivery summaries: show original elapsed capture time",

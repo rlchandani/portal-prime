@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T04:44:29.172690+00:00",
+  "status": "delivered_and_read_back_in_both_rooms",
+  "version": {
+    "code": 194,
+    "name": "1.200"
+  },
+  "baseCommit": "1520211245888ec8e29002a35d89a8b758122c77",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T04:32:32Z",
+    "discoveryCapUtc": "2026-11-05T04:37:32Z",
+    "targetUtc": "2026-11-05T04:47:32Z",
+    "hardLimitUtc": "2026-11-05T05:02:32Z",
+    "baseHead": "1520211245888ec8e29002a35d89a8b758122c77",
+    "scope": "Import-picker accessibility: polite copy-count and validation status semantics; keep transfer/controller policy unchanged"
+  },
+  "scope": "Expose import copy-count and folder-validation feedback as polite status updates.",
+  "sourceBindings": [
+    {
+      "path": "app/src/main/assets/remote/control-center.js",
+      "bytes": 270517,
+      "sha256": "6f601820aee5fd530fd12c32e72a963e2395b6eeb5aaec891b4383ea25e2c25a"
+    },
+    {
+      "path": "app/src/test/js/remote-photo-import-status.test.mjs",
+      "bytes": 2720,
+      "sha256": "5a1bbea375d2e1f718b05cb8752baf1355d1eed92cc0c6aa73e0c236d6946d5a"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "3504c286b7b719f2838fc6b4da13d97e059a4ea2067ccdf7a01c44eedee67a49"
+    }
+  ],
+  "regression": {
+    "frozenDomMethods": 2,
+    "baselineMissingRoleFailures": 2,
+    "candidatePassed": 2,
+    "testSha256": "5a1bbea375d2e1f718b05cb8752baf1355d1eed92cc0c6aa73e0c236d6946d5a",
+    "fullJsReportedTests": 772,
+    "fullJsPass": 772,
+    "fullJsFailures": 0,
+    "fullJsSkipped": 0
+  },
+  "chromium": {
+    "leaves": 18,
+    "originalControls": 17,
+    "baselineNewLeafFailed": true,
+    "candidateLeavesPassed": 18,
+    "reportedNodeRecords": 19,
+    "baselinePass": 17,
+    "baselineFailIncludingParent": 2,
+    "candidatePass": 19,
+    "sameFrozenFixture": {
+      "scriptSha256": "73748d1403afd5cf91608b51e1c243b9f379e91bf50914b1367bedf98a3fb368",
+      "scriptBytes": 23647,
+      "beforeSha256": "735f94f4eca74f2cdf58ee34d51688cfe68fbc4740bce4030b9ec66f3a138aa4",
+      "afterSha256": "6f601820aee5fd530fd12c32e72a963e2395b6eeb5aaec891b4383ea25e2c25a"
+    },
+    "packagedSources": true,
+    "newLeafUploadPosts": 0,
+    "outsideUnexpectedWebsocketPageErrors": 0,
+    "speechVerified": false,
+    "browserBeforeSeconds": 10.839205625001341,
+    "browserAfterSeconds": 10.458010750007816
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 107.42172833399673
+  },
+  "jvm": {
+    "tests": 4730,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 492
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746026,
+      "sha256": "87b3e237b41508d4bf1d277bf2e4da73be9ae8d2451bd25fb051b83b7e1c35ec",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsMatchCurrentSource": true,
+      "unchangedSourceAssetsFromBaseline": 22,
+      "intentionalSourceAssetChanges": [
+        "remote/control-center.js"
+      ],
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25903491,
+      "sha256": "d959879aaf66470b96bc9685224af747402c8b716c12d4b705d697dcee29d6ed",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsMatchCurrentSource": true,
+      "unchangedSourceAssetsFromBaseline": 22,
+      "intentionalSourceAssetChanges": [
+        "remote/control-center.js"
+      ],
+      "generatedOptimizationProfileChanges": []
+    }
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "056ae3635aec940f5d55ddd0e7164121488555139b0d5d7e33fc2a76578748ca",
+    "bindingsRootRehashed": 26,
+    "exactSourceVersionReverse": true,
+    "scope": "Source and retained DOM evidence; root separately verifies browser/build/artifact/delivery evidence"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25903491,
+      "sha256": "d959879aaf66470b96bc9685224af747402c8b716c12d4b705d697dcee29d6ed",
+      "app": {
+        "versionCode": 194,
+        "versionName": "1.200"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25903491,
+        "sha256": "d959879aaf66470b96bc9685224af747402c8b716c12d4b705d697dcee29d6ed",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 194,
+          "versionName": "1.200"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1622,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 2005,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "ownerRegistryHashesPreserved": true,
+    "browserContextsAndProcessTerminal": true
+  },
+  "publicVersionManifestUnchanged": true,
+  "limits": [
+    "The two existing picker paragraphs expose status/polite semantics. Selection, validation, transfer, retry and destination policies are byte-equivalent outside those constructions.",
+    "Actual assistive-technology speech, announcement timing/order and native Portal WebView/phone/API28 visual acceptance are unverified.",
+    "Two frozen actual-controller DOM tests fail on missing roles before the change and pass afterward. The adapter does not render or speak.",
+    "Chromium loads actual RemoteHtml and packaged before/after controller bytes with identical core/CSS and frozen expectations. One new leaf fails before and passes afterward; all17 existing leaves pass in both. Node reports19 records including parent, not19 independent leaves.",
+    "Chromium uses generated payloads and intercepted routes only. The new status leaf never uploads; existing controls use intercepted generated POSTs. No actual media/provider/server transfer is exercised.",
+    "All23 candidate source assets match checkout. Only remote/control-center.js intentionally differs from1.199;22 source assets and certificate remain. Generated optimization profiles may differ.",
+    "Original04:32:32 start,04:37:32 discovery cap,04:47:32 target,05:02:32 hard limit retained. Final DOM baseline04:36:51 precedes cap. The initial reporter-inspection mismatch was corrected without changing tests or source.",
+    "No phone, household provider/account/media action, GitHub authentication/push or public publication. Public manifest1.83, prior held clocks and whole product goal remain."
+  ]
+}
