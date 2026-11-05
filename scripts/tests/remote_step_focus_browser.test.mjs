@@ -24,7 +24,7 @@ const assets = Object.fromEntries(['control-center.js', 'core.mjs', 'control-cen
 ]));
 
 for (const mode of ['scene', 'preset']) {
-  for (const variant of ['refresh', 'stable', 'replacement']) {
+  for (const variant of ['refresh', 'stable', 'replacement', 'save']) {
     test(`${mode} step dialog focus after ${variant}`, {
       skip: enabled ? false : 'Set IMMORTAL_REMOTE_CHROME=1 for isolated generated Chrome.',
       timeout: 30000,
@@ -135,7 +135,12 @@ for (const mode of ['scene', 'preset']) {
             queueMicrotask(() => queueMicrotask(resolve));
           }, { once: true }));
         }, variant === 'replacement');
-        await page.keyboard.press('Escape');
+        if (variant === 'save') {
+          await sheet.getByRole('spinbutton', { name: 'Wait in milliseconds', exact: true }).fill('300');
+          await sheet.getByRole('button', { name: 'Save step', exact: true }).click();
+        } else {
+          await page.keyboard.press('Escape');
+        }
         await page.evaluate(() => window.__fixtureClose);
         f.closeObserved = true;
         f.focused = await page.evaluate(() => ({
@@ -153,6 +158,15 @@ for (const mode of ['scene', 'preset']) {
           assert.equal(f.focused.sheetOpen, false);
           assert.equal(f.focused.name, 'Edit step 1',
             `${mode}/${variant}: closing returns focus to the current numbered opener`);
+          if (variant === 'save') {
+            await edit.click();
+            assert.equal(await sheet.getByRole('spinbutton', { name: 'Wait in milliseconds', exact: true })
+              .inputValue(), '300', 'Save step updates the generated local draft');
+            await page.keyboard.press('Escape');
+            await page.getByRole('button', { name: 'Edit step 2', exact: true }).click();
+            assert.equal(await sheet.getByRole('spinbutton', { name: 'Wait in milliseconds', exact: true })
+              .inputValue(), '200', 'Save step preserves the other draft entry');
+          }
         }
         assert.deepEqual(f.posts, []);
         assert.equal(f.outsideRequests, 0);

@@ -29,6 +29,11 @@ backend Save/Run and full screensaver acceptance remain separate.
 Original 06:08:51–06:38:51 UTC clock remains. Definitive browser baseline followed
 the discovery cap; setup/race attempts are retained and qualified.
 These are recorded results, not fresh checks from reading this file.
+The same-clock local Save step follow-up adds two generated Chrome cases:
+eight expanded cases pass on packaged 1.205; the two new focus checks fail on
+1.204. No app or device change. Its dated receipt retains the original six-case
+evidence and backend/phone acceptance boundaries. The focus issue is now closed;
+move to a distinct priority instead of extending it again.
 
 The public manifest remains **1.83**. Local delivery and public publication are
 separate. The roadmap has **211 tasks: 151 delivered, 49 scoped verified,

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "scope": "Local Save step acceptance for the already delivered focus fix; no new feature or issue clock",
+  "originalIssueStartUtc": "2026-11-05T06:08:51Z",
+  "originalHardLimitUtc": "2026-11-05T06:38:51Z",
+  "deliveryCommit": "bf2359108518c609219d6d2cdbc12f3aa443070c",
+  "appVersion": "1.205",
+  "originalSixCaseFixture": {
+    "bytes": 9316,
+    "sha256": "344b721dcddff4e02e4de48dc2c3a2bb2c8f3e5e9c6154789486819695dc17de",
+    "gitPath": "bf235910:scripts/tests/remote_step_focus_browser.test.mjs"
+  },
+  "expandedFixture": {
+    "path": "scripts/tests/remote_step_focus_browser.test.mjs",
+    "bytes": 10181,
+    "sha256": "305472164ea8727d7c816dd35934b38af1d95ff3c8e01b86aa6397ca0d09709e"
+  },
+  "freshGreen": {
+    "start": "2026-11-05T06:31:06.096514+00:00",
+    "end": "2026-11-05T06:31:12.787082+00:00",
+    "elapsedSeconds": 6.690606582997134,
+    "exitCode": 0,
+    "fixtureBytes": 10181,
+    "fixtureSha256": "305472164ea8727d7c816dd35934b38af1d95ff3c8e01b86aa6397ca0d09709e",
+    "controllerSha256": "eb8e4fc0618d7cdd19c8e53555bf44800732cc2bc3cba13fbd3ed2add1666833"
+  },
+  "freshBaseline": {
+    "start": "2026-11-05T06:31:35.784475+00:00",
+    "end": "2026-11-05T06:31:37.579352+00:00",
+    "elapsedSeconds": 1.7948969160061097,
+    "exitCode": 1,
+    "selectedCases": "scene/save and preset/save only",
+    "expectedFailure": true
+  },
+  "acceptance": {
+    "newSaveCases": 2,
+    "expandedCasesPassed": 8,
+    "baselineNewSaveFocusFailures": 2,
+    "editedWaitMs": 300,
+    "otherStepWaitMs": 200,
+    "posts": 0,
+    "outsidePageRequests": 0,
+    "pageErrors": 0
+  },
+  "inputs": [
+    {
+      "version": "1.204",
+      "path": "/private/tmp/portal-product-discovery-20261105-060851/browser-old-assets/control-center.js",
+      "bytes": 271610,
+      "sha256": "1280b15c30278212c00e8762757ed7e35df0c7cc1589c50fc04f58736c027ca8"
+    },
+    {
+      "version": "1.204",
+      "path": "/private/tmp/portal-product-discovery-20261105-060851/browser-old-assets/core.mjs",
+      "bytes": 28623,
+      "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+    },
+    {
+      "version": "1.204",
+      "path": "/private/tmp/portal-product-discovery-20261105-060851/browser-old-assets/control-center.css",
+      "bytes": 24082,
+      "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+    },
+    {
+      "version": "1.205",
+      "path": "/private/tmp/portal-product-discovery-20261105-060851/browser-new-assets/control-center.js",
+      "bytes": 272470,
+      "sha256": "eb8e4fc0618d7cdd19c8e53555bf44800732cc2bc3cba13fbd3ed2add1666833"
+    },
+    {
+      "version": "1.205",
+      "path": "/private/tmp/portal-product-discovery-20261105-060851/browser-new-assets/core.mjs",
+      "bytes": 28623,
+      "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+    },
+    {
+      "version": "1.205",
+      "path": "/private/tmp/portal-product-discovery-20261105-060851/browser-new-assets/control-center.css",
+      "bytes": 24082,
+      "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+    }
+  ],
+  "logs": [
+    {
+      "path": "/private/tmp/portal-product-discovery-20261105-060851/save-followup/browser.log",
+      "bytes": 5068,
+      "sha256": "b81e4722859019b55887ebc0987553593a4e0bb8cf7c83f244ce0d57bab0ca0f"
+    },
+    {
+      "path": "/private/tmp/portal-product-discovery-20261105-060851/save-followup/save-baseline.log",
+      "bytes": 2780,
+      "sha256": "fac7566f9b14a44fdfb5f7fa2a0800689ace4be6a69d6191a4976acda069555c"
+    }
+  ],
+  "limits": [
+    "Generated local drafts only",
+    "No backend scene/preset Save/Run",
+    "No physical phone or Android WebView",
+    "No new app build or device operation",
+    "Original six-case evidence, roadmap statuses and public manifest unchanged"
+  ]
+}
