@@ -37,7 +37,10 @@ command uses the full class name.
 ## Ongoing product delivery
 
 Resume from [`docs/portal-product-operating-state.md`](docs/portal-product-operating-state.md)
-before creating new backlog items. Keep source inspection, implementation, automated checks,
+before creating new backlog items. Read current state first, then the selected roadmap task
+and dated receipt; consult only relevant sections of the linked historical snapshot.
+Keep completed release detail in receipts/history rather than growing the current handoff.
+Keep source inspection, implementation, automated checks,
 device acceptance, deployment and publication statuses separate. Preserve parked issues and
 the user's per-issue time limit. Parallel workers need disjoint write scopes; the coordinator
 owns shared-file integration and device operations. A matching signed APK and an install
