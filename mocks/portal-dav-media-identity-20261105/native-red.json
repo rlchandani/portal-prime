@@ -1,0 +1,439 @@
+{
+  "phase": "red",
+  "sourceApkSha256": "38284206383a17465b98f64ee564f26d3c690a7e1eb877750b6e89101685ba01",
+  "fixture": {
+    "javaSha256": "fd841f57214365086dc8b815e9639a9f181f27571bc08f2549a04734128975bb",
+    "probeJarSha256": "6079c6059ec9f58046515ab4bd8d7a8531dd0daee4a3ea632fa1585d677b0d3a",
+    "driverSha256": "33a132cb5185c1e79517565ecbf9fdeea34619dd199e07dca75e5321ec89b6bd",
+    "compiledClassCount": 4,
+    "literalCases": 8,
+    "expectedBaselineFailures": 4,
+    "expectedBaselineControls": 4
+  },
+  "result": {
+    "caseCount": 8,
+    "passed": 4,
+    "sourceClassLoaderVerified": true,
+    "api": 29,
+    "actualNetworkRequests": 0,
+    "networkBoundary": "Process-only URL factory never delegates; finite generated root/child listings only",
+    "deniedUnexpected": 0,
+    "cases": [
+      {
+        "entrypoint": "DavSource.INSTANCE.listImageUrls(String,String,String,int)",
+        "includeVideo": false,
+        "cap": 2,
+        "expected": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/b.png",
+            false
+          ]
+        ],
+        "actual": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ]
+        ],
+        "failure": null,
+        "literalPassed": false,
+        "transportPassed": true,
+        "passed": false,
+        "deniedUnexpected": 0,
+        "requests": [
+          {
+            "url": "http://generated-dav.invalid/photos/",
+            "method": "PROPFIND",
+            "headers": {
+              "Depth": "1",
+              "User-Agent": "PortalPhotoFrame/1.0"
+            },
+            "status": 207,
+            "disconnects": 1,
+            "responseReads": 2,
+            "inputReads": 1,
+            "inputCloses": 1,
+            "connectCalls": 0,
+            "inMemoryOnly": true
+          }
+        ],
+        "name": "root-duplicate-before-later-unique"
+      },
+      {
+        "entrypoint": "DavSource.INSTANCE.listImageUrls(String,String,String,int)",
+        "includeVideo": false,
+        "cap": 2,
+        "expected": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/b.png",
+            false
+          ]
+        ],
+        "actual": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ]
+        ],
+        "failure": null,
+        "literalPassed": false,
+        "transportPassed": true,
+        "passed": false,
+        "deniedUnexpected": 0,
+        "requests": [
+          {
+            "url": "http://generated-dav.invalid/photos/",
+            "method": "PROPFIND",
+            "headers": {
+              "Depth": "1",
+              "User-Agent": "PortalPhotoFrame/1.0"
+            },
+            "status": 207,
+            "disconnects": 1,
+            "responseReads": 2,
+            "inputReads": 1,
+            "inputCloses": 1,
+            "connectCalls": 0,
+            "inMemoryOnly": true
+          }
+        ],
+        "name": "absolute-and-path-resolve-same-url"
+      },
+      {
+        "entrypoint": "DavSource.INSTANCE.listImageUrls(String,String,String,int)",
+        "includeVideo": false,
+        "cap": 2,
+        "expected": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/b.png",
+            false
+          ]
+        ],
+        "actual": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ]
+        ],
+        "failure": null,
+        "literalPassed": false,
+        "transportPassed": true,
+        "passed": false,
+        "deniedUnexpected": 0,
+        "requests": [
+          {
+            "url": "http://generated-dav.invalid/photos/",
+            "method": "PROPFIND",
+            "headers": {
+              "Depth": "1",
+              "User-Agent": "PortalPhotoFrame/1.0"
+            },
+            "status": 207,
+            "disconnects": 1,
+            "responseReads": 2,
+            "inputReads": 1,
+            "inputCloses": 1,
+            "connectCalls": 0,
+            "inMemoryOnly": true
+          },
+          {
+            "url": "http://generated-dav.invalid/photos/child/",
+            "method": "PROPFIND",
+            "headers": {
+              "Depth": "1",
+              "User-Agent": "PortalPhotoFrame/1.0"
+            },
+            "status": 207,
+            "disconnects": 1,
+            "responseReads": 2,
+            "inputReads": 1,
+            "inputCloses": 1,
+            "connectCalls": 0,
+            "inMemoryOnly": true
+          }
+        ],
+        "name": "root-child-repeat-before-later-unique"
+      },
+      {
+        "entrypoint": "DavSource.INSTANCE.listMedia(String,String,String,boolean,int)",
+        "includeVideo": true,
+        "cap": 2,
+        "expected": [
+          [
+            "http://generated-dav.invalid/photos/clip.mp4",
+            true
+          ],
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ]
+        ],
+        "actual": [
+          [
+            "http://generated-dav.invalid/photos/clip.mp4",
+            true
+          ],
+          [
+            "http://generated-dav.invalid/photos/clip.mp4",
+            true
+          ]
+        ],
+        "failure": null,
+        "literalPassed": false,
+        "transportPassed": true,
+        "passed": false,
+        "deniedUnexpected": 0,
+        "requests": [
+          {
+            "url": "http://generated-dav.invalid/photos/",
+            "method": "PROPFIND",
+            "headers": {
+              "Depth": "1",
+              "User-Agent": "PortalPhotoFrame/1.0"
+            },
+            "status": 207,
+            "disconnects": 1,
+            "responseReads": 2,
+            "inputReads": 1,
+            "inputCloses": 1,
+            "connectCalls": 0,
+            "inMemoryOnly": true
+          }
+        ],
+        "name": "included-video-duplicate"
+      },
+      {
+        "entrypoint": "DavSource.INSTANCE.listMedia(String,String,String,boolean,int)",
+        "includeVideo": false,
+        "cap": 2,
+        "expected": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/b.png",
+            false
+          ]
+        ],
+        "actual": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/b.png",
+            false
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "transportPassed": true,
+        "passed": true,
+        "deniedUnexpected": 0,
+        "requests": [
+          {
+            "url": "http://generated-dav.invalid/photos/",
+            "method": "PROPFIND",
+            "headers": {
+              "Depth": "1",
+              "User-Agent": "PortalPhotoFrame/1.0"
+            },
+            "status": 207,
+            "disconnects": 1,
+            "responseReads": 2,
+            "inputReads": 1,
+            "inputCloses": 1,
+            "connectCalls": 0,
+            "inMemoryOnly": true
+          }
+        ],
+        "name": "unique-order-control"
+      },
+      {
+        "entrypoint": "DavSource.INSTANCE.listImageUrls(String,String,String,int)",
+        "includeVideo": false,
+        "cap": 2,
+        "expected": [
+          [
+            "http://generated-dav.invalid/photos/one/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/two/a.jpg",
+            false
+          ]
+        ],
+        "actual": [
+          [
+            "http://generated-dav.invalid/photos/one/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/two/a.jpg",
+            false
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "transportPassed": true,
+        "passed": true,
+        "deniedUnexpected": 0,
+        "requests": [
+          {
+            "url": "http://generated-dav.invalid/photos/",
+            "method": "PROPFIND",
+            "headers": {
+              "Depth": "1",
+              "User-Agent": "PortalPhotoFrame/1.0"
+            },
+            "status": 207,
+            "disconnects": 1,
+            "responseReads": 2,
+            "inputReads": 1,
+            "inputCloses": 1,
+            "connectCalls": 0,
+            "inMemoryOnly": true
+          }
+        ],
+        "name": "same-basename-distinct-directories"
+      },
+      {
+        "entrypoint": "DavSource.INSTANCE.listMedia(String,String,String,boolean,int)",
+        "includeVideo": false,
+        "cap": 2,
+        "expected": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/b.png",
+            false
+          ]
+        ],
+        "actual": [
+          [
+            "http://generated-dav.invalid/photos/a.jpg",
+            false
+          ],
+          [
+            "http://generated-dav.invalid/photos/b.png",
+            false
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "transportPassed": true,
+        "passed": true,
+        "deniedUnexpected": 0,
+        "requests": [
+          {
+            "url": "http://generated-dav.invalid/photos/",
+            "method": "PROPFIND",
+            "headers": {
+              "Depth": "1",
+              "User-Agent": "PortalPhotoFrame/1.0"
+            },
+            "status": 207,
+            "disconnects": 1,
+            "responseReads": 2,
+            "inputReads": 1,
+            "inputCloses": 1,
+            "connectCalls": 0,
+            "inMemoryOnly": true
+          }
+        ],
+        "name": "excluded-videos-do-not-consume-cap"
+      },
+      {
+        "checks": [
+          {
+            "entrypoint": "DavSource.INSTANCE.listImageUrls(String,String,String,int)",
+            "includeVideo": false,
+            "cap": 2,
+            "expected": null,
+            "actual": null,
+            "failure": null,
+            "literalPassed": true,
+            "transportPassed": true,
+            "passed": true,
+            "deniedUnexpected": 0,
+            "requests": [
+              {
+                "url": "http://generated-dav.invalid/photos/",
+                "method": "PROPFIND",
+                "headers": {
+                  "Depth": "1",
+                  "User-Agent": "PortalPhotoFrame/1.0"
+                },
+                "status": 503,
+                "disconnects": 1,
+                "responseReads": 2,
+                "inputReads": 0,
+                "inputCloses": 0,
+                "connectCalls": 0,
+                "inMemoryOnly": true
+              }
+            ]
+          },
+          {
+            "entrypoint": "DavSource.INSTANCE.listImageUrls(String,String,String,int)",
+            "includeVideo": false,
+            "cap": 2,
+            "expected": [],
+            "actual": [],
+            "failure": null,
+            "literalPassed": true,
+            "transportPassed": true,
+            "passed": true,
+            "deniedUnexpected": 0,
+            "requests": [
+              {
+                "url": "http://generated-dav.invalid/photos/",
+                "method": "PROPFIND",
+                "headers": {
+                  "Depth": "1",
+                  "User-Agent": "PortalPhotoFrame/1.0"
+                },
+                "status": 207,
+                "disconnects": 1,
+                "responseReads": 2,
+                "inputReads": 1,
+                "inputCloses": 1,
+                "connectCalls": 0,
+                "inMemoryOnly": true
+              }
+            ]
+          }
+        ],
+        "passed": true,
+        "name": "failed-root-and-empty-root-controls"
+      }
+    ]
+  }
+}

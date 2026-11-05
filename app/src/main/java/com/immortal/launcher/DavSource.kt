@@ -86,6 +86,7 @@ object DavSource {
       runCatching {
             val headers = authHeaders(user, pass)
             val out = ArrayList<Media>()
+            val seenMedia = HashSet<String>()
             val stack = ArrayDeque<String>()
             val rootUrl = resolveHref(dir(baseUrl), dir(baseUrl)) ?: return null
             stack.addLast(rootUrl)
@@ -106,8 +107,8 @@ object DavSource {
                   stack.addLast(dir(full))
                 } else
                     when (LocalMedia.classify(resource.path)) {
-                      LocalMedia.Kind.IMAGE -> out.add(Media(full, false))
-                      LocalMedia.Kind.VIDEO -> if (includeVideo) out.add(Media(full, true))
+                      LocalMedia.Kind.IMAGE -> if (seenMedia.add(full)) out.add(Media(full, false))
+                      LocalMedia.Kind.VIDEO -> if (includeVideo && seenMedia.add(full)) out.add(Media(full, true))
                       else -> {}
                     }
               }

@@ -1,18 +1,61 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T01:39:27.341641+00:00",
-  "updatedLabel": "5 November 2026 \u00b7 Photo retry ownership delivered in 1.189",
+  "updatedAt": "2026-11-05T01:56:37.031843+00:00",
+  "updatedLabel": "5 November 2026 \u00b7 WebDAV media identity delivered in 1.190",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.189/code183, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.190/code184, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "dav-media-identity",
+      "title": "WebDAV photos: preserve distinct media before the limit",
+      "summary": "Duplicate resolved media URLs no longer consume slots or hide later distinct photos.",
+      "status": "delivered",
+      "kind": "Shared WebDAV admission correction",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Shared source / independent review / generated JVM and native verification",
+      "deployment": "Exact optimized1.190/code184 fully hashed both rooms, one install each.",
+      "verification": "4642 JVM/483 suites;8 HTTP and8 actual debug/API29 public-method cases",
+      "state": "Each frozen suite:4duplicate failures/4controls\u21928pass.",
+      "acceptance": [
+        "Deduplicate exact resolved media URLs before cap accounting.",
+        "Preserve first-seen order, video inclusion and distinct directory identities.",
+        "Retain href/XML/traversal/transport/cancellation behavior.",
+        "Verify frozen regressions, package identity, room delivery and saved state."
+      ],
+      "evidence": [
+        {
+          "text": "Scope, regressions, delivery and limits.",
+          "source": "docs/portal-dav-media-identity-2026-11-05.md"
+        },
+        {
+          "text": "Generated native before/after and machine evidence.",
+          "source": "mocks/portal-dav-media-identity-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated JVM HTTP fixtures and actual debug/API29 public listing methods with process-only in-memory responses; no household server, media operation or source selection.",
+        "Native fake connection directly permits PROPFIND; real Android method fallback, transport/auth, decoding, mounted UI, optimized helper/API28/Living native behavior remain separate.",
+        "SMB Home fallback is a separate source-only finding, unimplemented and not bundled. Earlier held clocks and public1.83 remain. No phone/account/auth/push/publication."
+      ],
+      "next": "Continue independent product work; retain held clocks.",
+      "issueClock": {
+        "originalStartUtc": "2026-11-05T01:43:42Z",
+        "discoveryCapUtc": "2026-11-05T01:48:42Z",
+        "targetUtc": "2026-11-05T01:58:42Z",
+        "hardLimitUtc": "2026-11-05T02:13:42Z",
+        "scope": "New ordinary photo-source metadata failure discovery; all earlier held/expired clocks retained"
+      }
+    },
     {
       "id": "photo-retry-active-retirement",
       "title": "Photo imports: keep a valid retry after pairing renewal",
