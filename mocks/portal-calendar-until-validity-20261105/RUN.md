@@ -1,0 +1,12 @@
+# Generated recurrence UNTIL fallback probe (source only)
+
+Baseline /private/tmp/portal-product-discovery-20261105-034503/candidate-debug-1.197.apk
+Bytes 46746006 SHA256 d28f4a7befe15fb062d92e053be745951a9128e0ad04eb2bbb3420d3961aa02d; supplied binding match: True.
+
+Root reuses established offline native app_process/DexClassLoader infrastructure. Compile CalendarUntilValidityProbe.java against Android jar javac -source8 -target8; D8 ALL generated classes --lib android.jar --min-api29 into owned probe.jar. Freeze source/JAR before baseline and retain identical source/JAR/driver/inputs/expectations for candidate, exact APK alone differs. Main: CalendarUntilValidityProbe EXACT_OWNED_DEBUG_APK OWNED_DEX_DIRECTORY. Root owns isolated process invocation, scratch-path creation/cleanup. Author performed no compiler/build/test/native/device runtime.
+
+Verify APK CalendarFeed.INSTANCE origin; uniquely discover actual expandRecurrence (optional internal suffix) with six arguments long,String,List,long,java.lang.Long,TimeZone and List return. Missing/ambiguous signatures, wrong origin or factory failure are setup failures, not semantic RED. Invoke real helper, empty generated exdates, notBefore null. Expected epochs use explicit valid Gregorian UTC instants: Jan1/2/3 2033 09Z, horizonJan11 09Z; local control Jan1/2/3 09 America/Los_Angeles means explicit Jan1/2/3 17Z (winter PST). UTC Calendar construction only converts valid literals; it does not implement recurrence/UNTIL parsing.
+
+Eight frozen vectors: malformed present UNTIL Feb30, hour24, trailing timeZjunk, shorttimeHHmm and unreadablebad each expect exactly original start; valid dateJan3 and UTC Jan3 09Z inclusive expect three starts; localJan3 09 with Los_Angeles zone expects three local09 starts. Empty exdates and null lower-bound are deliberately fixed. Root must report actual API29 baseline rather than assume predicted five mismatches/three controls. Process UTC/US changes restored finally; no Android/device TZ settings write. Fresh process URL factory denies all opens without delegation, expected0.
+
+Helper-level malformed recurrence-termination fallback only: no prior DTSTART/DTEND/EXDATE validation reset, no all-day/unknown-zone policy, recurrence architecture, provider/parser UI, live feed, cache, Context, preferences, network/socket or whole calendar/native rendering acceptance. Original2026-11-05T03:57:55Z target04:12:55Z hard04:27:55Z retained; preparation cap04:04:30.

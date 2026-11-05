@@ -394,7 +394,9 @@ object CalendarFeed {
             val freq = rules["FREQ"]?.uppercase(Locale.US) ?: return@runCatching listOf(start)
             val interval = rules["INTERVAL"]?.toIntOrNull()?.coerceAtLeast(1) ?: 1
             val count = rules["COUNT"]?.toIntOrNull()
-            val until = rules["UNTIL"]?.let { parseUntil(it, zone) }
+            val until = rules["UNTIL"]?.let {
+              parseUntil(it, zone) ?: return@runCatching listOf(start)
+            }
             val byDay =
                 rules["BYDAY"]?.split(',')?.mapNotNull { weekdayOf(it.trim()) }?.takeIf {
                   it.isNotEmpty()
@@ -568,6 +570,7 @@ object CalendarFeed {
   private fun parseUntil(v: String, zone: TimeZone): Long? =
       runCatching {
             val s = v.trim()
+            if (',' in s || parseDt(Prop("UNTIL", emptyMap(), s), zone, Locale.US) == null) return null
             if (s.length == 8 && !s.contains('T')) {
               val cal = Calendar.getInstance(zone)
               cal.clear()

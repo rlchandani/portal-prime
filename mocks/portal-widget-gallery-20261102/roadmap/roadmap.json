@@ -1,18 +1,66 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T03:56:12.759902+00:00",
-  "updatedLabel": "5 November2026 \u00b7 aurora reading validity fix delivered in1.197",
+  "updatedAt": "2026-11-05T04:10:30.694558+00:00",
+  "updatedLabel": "5 November2026 \u00b7 calendar recurrence limit fix delivered in1.198",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.197/code191, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.198/code192, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+        "id": "calendar-until-validity",
+        "title": "Calendar: respect malformed recurrence end limits",
+        "summary": "Malformed present UNTIL limits use the documented single-occurrence fallback instead of emitting extra future events.",
+        "status": "delivered",
+        "kind": "Android calendar recurrence admission correctness",
+        "platforms": [
+            "portal"
+        ],
+        "owner": "Calendar data / independent review / native and delivery verification",
+        "deployment": "Exact optimized1.198/code192 fully hashed both rooms, one install each.",
+        "verification": "4719JVM/491suites;11host8failures→11pass;8actual-debug/API29 helper vectors5mismatches→8pass",
+        "acceptance": [
+            "Validate present UNTIL before expansion; invalid uses existing single-start fallback.",
+            "Retain absent/valid limits and original inclusive/local conversion.",
+            "Use actual APK recurrence helper with frozen generated rules.",
+            "Verify builds/review/artifacts/delivery/preservation."
+        ],
+        "evidence": [
+            {
+                "text": "Scope and acceptance limits.",
+                "source": "docs/portal-calendar-until-validity-2026-11-05.md"
+            },
+            {
+                "text": "Machine proof and original clock.",
+                "source": "mocks/portal-calendar-until-validity-20261105/verification.json"
+            }
+        ],
+        "limits": [
+            "Acceptance executes actual recurrence expansion with generated rules; one host test also exercises actual full parse. Native helper does not execute full parse, HTTP, provider refresh, cache or rendered calendar.",
+            "Host eleven methods and native eight vectors differ. Host additionally covers minute60/second61, full generated ICS parse, existing DST-gap behavior and leap-second conversion.",
+            "Initial host11/9 result is excluded: its extra failure was an incorrect03:30 spring-gap oracle. The sole control was corrected to existing01:30 before final baseline and production edits; final11/8 failures/3controls are frozen.",
+            "Native uses actual debug APK on Family API29. Optimized helper execution, API28 and Living native are separate; optimized packaging/signing and exact delivery are verified. Explicit comma rejection is source-reviewed without a dedicated frozen vector.",
+            "Only malformed present UNTIL admission/fallback changes. Absent and valid limits retain original end-of-day/UTC/local conversion; existing malformed-rule fallback intentionally remains single original start. No COUNT/EXDATE/window/cache/provider redesign.",
+            "Final corrected baseline overran the five-minute discovery cap; initial reproduction preceded it. Original03:57:55 start/04:12:55 target/04:27:55 hard limit and earlier held scopes remain, without reset.",
+            "No phone, household provider/account/media operation, GitHub authentication/push or public publication. Public manifest1.83 and whole product goal remain."
+        ],
+        "next": "Continue independent product work; retain held clocks.",
+        "issueClock": {
+            "originalStartUtc": "2026-11-05T03:57:55Z",
+            "discoveryCapUtc": "2026-11-05T04:02:55Z",
+            "targetUtc": "2026-11-05T04:12:55Z",
+            "hardLimitUtc": "2026-11-05T04:27:55Z",
+            "baseHead": "217296d2be6adc4493a015360d2a39fc4de62cac",
+            "scope": "Malformed present recurrence UNTIL falls back to one original occurrence; prior temporal scopes and clocks retained",
+            "discoveryQualification": "Final frozen baseline completed after the five-minute cap; initial reproduction preceded it. Original clock retained."
+        }
+    },
     {
         "id": "aurora-kp-validity",
         "title": "Aurora: reject invalid Kp readings",

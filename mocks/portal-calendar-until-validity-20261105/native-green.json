@@ -1,0 +1,191 @@
+{
+  "phase": "green",
+  "sourceApkSha256": "30215504cdc18943040d30d0fc244a197bd275fbd8e9af54e11a318de2985683",
+  "fixture": {
+    "javaSha256": "b2f32d89f2fc684e90f434d6882411e1017746d78369b14d8777c3ad14f80373",
+    "probeJarSha256": "5ba4b49394b7eb638050f8d113675481fb86ce153194a67dd1cb46c6a5726875",
+    "driverSha256": "040601287ec000c44aa96de48e798ddd2716bcddcf34f2d900da51476591bcc4",
+    "compiledClassCount": 2,
+    "literalCases": 8,
+    "expectedBaselineFailures": 5,
+    "expectedBaselineControls": 3
+  },
+  "result": {
+    "caseCount": 8,
+    "passed": 8,
+    "sourceClassLoaderVerified": true,
+    "actualExpandMethod": "expandRecurrence$app",
+    "api": 29,
+    "deniedUrlOpens": 0,
+    "actualNetworkRequests": 0,
+    "scope": "Actual APK CalendarFeed.expandRecurrence; malformed present UNTIL single-start fallback only; finite generated rules and literal instants",
+    "cases": [
+      {
+        "name": "impossible-UNTIL-date-fallback",
+        "rrule": "FREQ=DAILY;UNTIL=20330230",
+        "startMillis": 1988182800000,
+        "horizonEndMillis": 1989046800000,
+        "zone": "UTC",
+        "exdates": [],
+        "notBefore": null,
+        "expected": [
+          1988182800000
+        ],
+        "actual": [
+          1988182800000
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "invalid-UNTIL-hour-fallback",
+        "rrule": "FREQ=DAILY;UNTIL=20330103T240000Z",
+        "startMillis": 1988182800000,
+        "horizonEndMillis": 1989046800000,
+        "zone": "UTC",
+        "exdates": [],
+        "notBefore": null,
+        "expected": [
+          1988182800000
+        ],
+        "actual": [
+          1988182800000
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "trailing-UNTIL-time-junk-fallback",
+        "rrule": "FREQ=DAILY;UNTIL=20330103T090000Zjunk",
+        "startMillis": 1988182800000,
+        "horizonEndMillis": 1989046800000,
+        "zone": "UTC",
+        "exdates": [],
+        "notBefore": null,
+        "expected": [
+          1988182800000
+        ],
+        "actual": [
+          1988182800000
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "short-UNTIL-time-fallback",
+        "rrule": "FREQ=DAILY;UNTIL=20330103T0900",
+        "startMillis": 1988182800000,
+        "horizonEndMillis": 1989046800000,
+        "zone": "UTC",
+        "exdates": [],
+        "notBefore": null,
+        "expected": [
+          1988182800000
+        ],
+        "actual": [
+          1988182800000
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "unreadable-UNTIL-fallback",
+        "rrule": "FREQ=DAILY;UNTIL=bad",
+        "startMillis": 1988182800000,
+        "horizonEndMillis": 1989046800000,
+        "zone": "UTC",
+        "exdates": [],
+        "notBefore": null,
+        "expected": [
+          1988182800000
+        ],
+        "actual": [
+          1988182800000
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "valid-date-inclusive-control",
+        "rrule": "FREQ=DAILY;UNTIL=20330103",
+        "startMillis": 1988182800000,
+        "horizonEndMillis": 1989046800000,
+        "zone": "UTC",
+        "exdates": [],
+        "notBefore": null,
+        "expected": [
+          1988182800000,
+          1988269200000,
+          1988355600000
+        ],
+        "actual": [
+          1988182800000,
+          1988269200000,
+          1988355600000
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "valid-UTC-time-inclusive-control",
+        "rrule": "FREQ=DAILY;UNTIL=20330103T090000Z",
+        "startMillis": 1988182800000,
+        "horizonEndMillis": 1989046800000,
+        "zone": "UTC",
+        "exdates": [],
+        "notBefore": null,
+        "expected": [
+          1988182800000,
+          1988269200000,
+          1988355600000
+        ],
+        "actual": [
+          1988182800000,
+          1988269200000,
+          1988355600000
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "valid-local-time-control",
+        "rrule": "FREQ=DAILY;UNTIL=20330103T090000",
+        "startMillis": 1988211600000,
+        "horizonEndMillis": 1989046800000,
+        "zone": "America/Los_Angeles",
+        "exdates": [],
+        "notBefore": null,
+        "expected": [
+          1988211600000,
+          1988298000000,
+          1988384400000
+        ],
+        "actual": [
+          1988211600000,
+          1988298000000,
+          1988384400000
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      }
+    ],
+    "processZoneRestored": true,
+    "processLocaleRestored": true
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T04:10:30.694558+00:00",
+  "status": "delivered_and_read_back_in_both_rooms",
+  "version": {
+    "code": 192,
+    "name": "1.198"
+  },
+  "baseCommit": "217296d2be6adc4493a015360d2a39fc4de62cac",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T03:57:55Z",
+    "discoveryCapUtc": "2026-11-05T04:02:55Z",
+    "targetUtc": "2026-11-05T04:12:55Z",
+    "hardLimitUtc": "2026-11-05T04:27:55Z",
+    "baseHead": "217296d2be6adc4493a015360d2a39fc4de62cac",
+    "scope": "Malformed present recurrence UNTIL falls back to one original occurrence; prior temporal scopes and clocks retained",
+    "discoveryQualification": "Final frozen baseline completed after the five-minute cap; initial reproduction preceded it. Original clock retained."
+  },
+  "scope": "Use the existing single-occurrence fallback when a present recurrence UNTIL is malformed, instead of ignoring or normalizing that end limit.",
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/CalendarFeed.kt",
+      "bytes": 26469,
+      "sha256": "3062d2fb470230f8818ce44d7bd335af270e5b267a4f2e8793a7bb02b17868d0"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/CalendarUntilValidityTest.kt",
+      "bytes": 3187,
+      "sha256": "c210afb3765e7e832a6592ac4b7a2eb010a7559452c5b8d71c8c3d0ae71ac6d5"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "eb8197d1b8f927b50442261f1584dcba1a8e904bbdf86533f687a4cca610e804"
+    }
+  ],
+  "regression": {
+    "actualRecurrenceEngine": true,
+    "hostFullParseCase": true,
+    "generatedRulesOnly": true,
+    "hostMethods": 11,
+    "hostBaselineFailures": 8,
+    "hostBaselineControlsPassed": 3,
+    "hostCandidatePassed": 11,
+    "initialOracleRunExcluded": true,
+    "frozenAssertionsUnchanged": true
+  },
+  "native": {
+    "api": 29,
+    "actualDebugRecurrenceHelper": true,
+    "generatedRulesAndLiteralInstantsOnly": true,
+    "cases": 8,
+    "baselineMismatches": 5,
+    "baselineControlsPassed": 3,
+    "candidatePassed": 8,
+    "classOriginsVerified": true,
+    "sameFrozenJavaJarDriver": true,
+    "fixture": {
+      "javaSha256": "b2f32d89f2fc684e90f434d6882411e1017746d78369b14d8777c3ad14f80373",
+      "probeJarSha256": "5ba4b49394b7eb638050f8d113675481fb86ce153194a67dd1cb46c6a5726875",
+      "driverSha256": "040601287ec000c44aa96de48e798ddd2716bcddcf34f2d900da51476591bcc4",
+      "compiledClassCount": 2,
+      "literalCases": 8,
+      "expectedBaselineFailures": 5,
+      "expectedBaselineControls": 3
+    },
+    "urlOpens": 0,
+    "bothOwnedPathsAbsent": true,
+    "bothProcessesTerminal": true
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 108.86666237498866
+  },
+  "jvm": {
+    "tests": 4719,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 491
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746006,
+      "sha256": "30215504cdc18943040d30d0fc244a197bd275fbd8e9af54e11a318de2985683",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25903483,
+      "sha256": "1418818aaabe410cc1e513f3a82c3d6a8cddc0d06121b2af8d1d0e48a47e4136",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "fd35dab8b901dd40d092376906c9a499bfe0dd2666dee7936ea32ce728eb26d1",
+    "bindingsRootRehashed": 25,
+    "twoGuardsAndVersionEditsReverseExactlyToBaseline": true,
+    "scope": "Source and frozen baseline review; root separately checked fresh candidate build/native and promotion evidence"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25903483,
+      "sha256": "1418818aaabe410cc1e513f3a82c3d6a8cddc0d06121b2af8d1d0e48a47e4136",
+      "app": {
+        "versionCode": 192,
+        "versionName": "1.198"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 8
+      },
+      "installed": {
+        "bytes": 25903483,
+        "sha256": "1418818aaabe410cc1e513f3a82c3d6a8cddc0d06121b2af8d1d0e48a47e4136",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 192,
+          "versionName": "1.198"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1616,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1746,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "ownerRegistryHashesPreserved": true,
+    "nativePathsRemoved": true
+  },
+  "publicVersionManifestUnchanged": true,
+  "limits": [
+    "Acceptance executes actual recurrence expansion with generated rules; one host test also exercises actual full parse. Native helper does not execute full parse, HTTP, provider refresh, cache or rendered calendar.",
+    "Host eleven methods and native eight vectors differ. Host additionally covers minute60/second61, full generated ICS parse, existing DST-gap behavior and leap-second conversion.",
+    "Initial host11/9 result is excluded: its extra failure was an incorrect03:30 spring-gap oracle. The sole control was corrected to existing01:30 before final baseline and production edits; final11/8 failures/3controls are frozen.",
+    "Native uses actual debug APK on Family API29. Optimized helper execution, API28 and Living native are separate; optimized packaging/signing and exact delivery are verified. Explicit comma rejection is source-reviewed without a dedicated frozen vector.",
+    "Only malformed present UNTIL admission/fallback changes. Absent and valid limits retain original end-of-day/UTC/local conversion; existing malformed-rule fallback intentionally remains single original start. No COUNT/EXDATE/window/cache/provider redesign.",
+    "Final corrected baseline overran the five-minute discovery cap; initial reproduction preceded it. Original03:57:55 start/04:12:55 target/04:27:55 hard limit and earlier held scopes remain, without reset.",
+    "No phone, household provider/account/media operation, GitHub authentication/push or public publication. Public manifest1.83 and whole product goal remain."
+  ]
+}
