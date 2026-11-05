@@ -54,6 +54,15 @@ No authentication, app/device change or new release occurred. Raw inventory,
 bindings and closure are private:
 `/private/tmp/portal-product-discovery-20261105-073547/`.
 
+Follow-up source qualification at **07:43:48 UTC** retained that original clock.
+Issue246's volume-heartbeat premise does not match this checkout: the MQTT
+publisher has neither a volume entity nor that heartbeat. Issue257's SMB cache
+bypass does match; encoded transport, qualified cache identity and startup
+behavior need coordinated work. No candidate was admitted or implemented.
+A human priority choice is pending between a new bounded optimized-photo
+controller-harness slot and SMB caching; this request grants neither scope.
+Prior photo fixture and all other held clocks remain unchanged.
+
 The [previous crypto receipt](portal-crypto-change-validity-2026-11-05.md)
 retains its four methods/eight vectors, 06:56:14–07:26:14 UTC clock and
 native/provider limits. Earlier options/input-policy discovery remains closed;
