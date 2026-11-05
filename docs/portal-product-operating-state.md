@@ -59,9 +59,12 @@ Issue246's volume-heartbeat premise does not match this checkout: the MQTT
 publisher has neither a volume entity nor that heartbeat. Issue257's SMB cache
 bypass does match; encoded transport, qualified cache identity and startup
 behavior need coordinated work. No candidate was admitted or implemented.
-A human priority choice is pending between a new bounded optimized-photo
-controller-harness slot and SMB caching; this request grants neither scope.
-Prior photo fixture and all other held clocks remain unchanged.
+The human subsequently authorized **both sequentially**: optimized-photo controller
+verification first, then SMB caching, each in a fresh bounded 30-minute slot.
+The [optimized controller receipt](portal-optimized-photo-controller-2026-11-05.md)
+records three scenes/six Family captures passing the frozen pixel, containment and
+normal-stop checks against exact1.207, with43/30prefs andfourmaps preserved.
+Its15:25:00–15:55:00clock remains. SMB work is next; prior holds remain unchanged.
 
 The [07:56 UTC current-frame observation](portal-current-frame-observation-2026-11-05.md)
 shows a clock on black, without photos, on Family. Living's targeted ADB read
@@ -79,7 +82,7 @@ its original six packaged Chrome cases, same-clock two-case Save follow-up,
 backend/phone limits and 06:08:51–06:38:51 UTC clock. That issue is closed.
 
 The public manifest remains **1.83**. Local delivery and public publication are
-separate. The roadmap has **214 tasks: 153 delivered, 49 scoped verified,
+separate. The roadmap has **215 tasks: 153 delivered, 50 scoped verified,
 9 parked, 2 awaiting approval, 1 queued**. Prior task statuses, acceptance and
 issue clocks remain.
 

@@ -1,0 +1,103 @@
+{
+  "status": "scoped-verified",
+  "completedUtc": "2026-11-05T15:35:16.191765+00:00",
+  "scope": {
+    "scope": "User authorized optimized photo verification first, then SMB caching",
+    "startUtc": "2026-11-05T15:25:00Z",
+    "discoveryCutoffUtc": "2026-11-05T15:30:00Z",
+    "targetUtc": "2026-11-05T15:40:00Z",
+    "hardStopUtc": "2026-11-05T15:55:00Z",
+    "baseCommit": "705bcf2228e866dc01e602a5b52f79d5b67dc9ed",
+    "priorClocksPreserved": true,
+    "selected": "Normally construct exact optimized controller; inject isolated actual Stage/viewer controls with exact retained callbacks; generated settings only; T presentation and x0 normal stop; locked f total budget checks; all frozen pixel/assertion functions unchanged",
+    "selectedUtc": "2026-11-05T15:29:45Z"
+  },
+  "preparation": {
+    "checks": {
+      "private void fence(": true,
+      "private static Picture picture(": true,
+      "private static boolean edgeCheck(": true,
+      "private static boolean colorClose(": true,
+      "capturePredicatesUnchangedExceptLockedBudgetReader": true,
+      "pixelCopyAssertionsUnchanged": true,
+      "strictContextAccessGuardsRetained": true
+    },
+    "sourceSha256": "21bc839af31a690a10521065116ebfaaea67e78b066e0fccf58fb734583d09d6",
+    "frozenSha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+    "embeddedApkSha256": "6dec140dcebe9ffc9bed73b60dca80a0b52e283a1513844f838b1e8798b95288",
+    "fixtureApkSha256": "877186e92774f76a687da6bbc78c3759b9d25ac399a72a9eb5d06755a38dcc47",
+    "fixtureDexSha256": "81359e11ac79ec5ff3a5117fa67bf095940ee23d9f13d2869e19a38ba115c121"
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1644,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1513,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "registryByteExact": true,
+  "copiedRegistryRemoved": true,
+  "nativeFixtureRetirement": {
+    "packageAbsent": true,
+    "processAbsent": true,
+    "externalDirectoryAbsent": true
+  },
+  "excludedAttempts": [
+    {
+      "attempt": 1,
+      "error": "Context.isRestricted null wrapper",
+      "scenes": 0
+    },
+    {
+      "attempt": 2,
+      "error": "Context.canLoadUnsafeResources null wrapper",
+      "scenes": 0
+    }
+  ],
+  "noAppSourceVersionBuildInstallChange": true,
+  "limits": [
+    "Isolated800x480 FamilyAPI29 staticgeneratedcontrollerpresentation andnormalstop only",
+    "No fullstart/Dream/motion/performance/API28/Livingvisualacceptance"
+  ]
+}

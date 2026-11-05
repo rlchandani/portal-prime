@@ -1,0 +1,16 @@
+{
+  "checks": {
+    "private void fence(": true,
+    "private static Picture picture(": true,
+    "private static boolean edgeCheck(": true,
+    "private static boolean colorClose(": true,
+    "capturePredicatesUnchangedExceptLockedBudgetReader": true,
+    "pixelCopyAssertionsUnchanged": true,
+    "strictContextAccessGuardsRetained": true
+  },
+  "sourceSha256": "21bc839af31a690a10521065116ebfaaea67e78b066e0fccf58fb734583d09d6",
+  "frozenSha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a",
+  "embeddedApkSha256": "6dec140dcebe9ffc9bed73b60dca80a0b52e283a1513844f838b1e8798b95288",
+  "fixtureApkSha256": "877186e92774f76a687da6bbc78c3759b9d25ac399a72a9eb5d06755a38dcc47",
+  "fixtureDexSha256": "81359e11ac79ec5ff3a5117fa67bf095940ee23d9f13d2869e19a38ba115c121"
+}
