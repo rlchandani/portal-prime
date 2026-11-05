@@ -1,18 +1,62 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T01:56:37.031843+00:00",
-  "updatedLabel": "5 November 2026 \u00b7 WebDAV media identity delivered in 1.190",
+  "updatedAt": "2026-11-05T02:07:49.842251+00:00",
+  "updatedLabel": "5 November 2026 \u00b7 Home SMB photo fallback delivered in 1.191",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.190/code184, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.191/code185, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "home-smb-photo-fallback",
+      "title": "Home photos: skip failed SMB image reads",
+      "summary": "A bad first SMB image no longer hides later decodable photos on Home.",
+      "status": "delivered",
+      "kind": "Home source-selection correction",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Home loader / independent review / generated JVM and delivery verification",
+      "deployment": "Exact optimized1.191/code185 fully hashed both rooms, one install each.",
+      "verification": "4652 JVM/484 suites;10 actual-loader generated fallback/control cases",
+      "state": "Frozen10cases:5AssertionErrors/5controls\u219210pass; stream/source closure verified.",
+      "acceptance": [
+        "Continue null/ordinary failed SMB reads in listing order.",
+        "Stop at first bitmap, request60 items and retain checkpoints/share closure.",
+        "Keep other sources, decoder, cache and UI unchanged.",
+        "Verify frozen regressions, package identity, room delivery and saved state."
+      ],
+      "evidence": [
+        {
+          "text": "Scope, regressions, delivery and limits.",
+          "source": "docs/portal-home-smb-fallback-2026-11-05.md"
+        },
+        {
+          "text": "Machine evidence and preserved original clock.",
+          "source": "mocks/portal-home-smb-fallback-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Actual private Home loader with generated JVM SMB construction/connect/list/open and Android decoder/EXIF/bitmap substitutes. No live NAS, household files, source selection or network.",
+        "Cap control verifies the loader requests60 and uses the capped adapter result; real SMB enumeration, worker lifecycle/cancellation, native pixels, Compose/cache/optimized behavior remain separate.",
+        "Original discovery01:43:42/target01:58:42/hard02:13:42 retained; resumed01:58:18 without reset. Earlier held clocks and public1.83 remain. No phone/account/auth/push/publication."
+      ],
+      "next": "Continue independent product work; retain held clocks.",
+      "issueClock": {
+        "originalStartUtc": "2026-11-05T01:43:42Z",
+        "implementationResumedUtc": "2026-11-05T01:58:18Z",
+        "discoveryCapUtc": "2026-11-05T01:48:42Z",
+        "targetUtc": "2026-11-05T01:58:42Z",
+        "hardLimitUtc": "2026-11-05T02:13:42Z",
+        "scope": "Separate SMB Home loader fallback found during the original source review; original clock is not reset."
+      }
+    },
     {
       "id": "dav-media-identity",
       "title": "WebDAV photos: preserve distinct media before the limit",

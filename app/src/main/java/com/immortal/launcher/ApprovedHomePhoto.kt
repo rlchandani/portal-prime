@@ -146,8 +146,11 @@ private fun loadApprovedHomePhoto(context: Context, settings: ScreensaverConfig.
               settings.smbPath.orEmpty(), settings.smbUser.orEmpty(), settings.smbPass.orEmpty())
           try {
             PhotoSourceWork.onClose { smb.close() }
-            if (!smb.connect()) null else smb.listImages(cap = 60).firstOrNull()?.let { path ->
-              decodeHomePhoto { smb.openStream(path) }
+            if (!smb.connect()) null else smb.listImages(cap = 60).firstNotNullOfOrNull { path ->
+              PhotoSourceWork.checkpoint()
+              try {
+                decodeHomePhoto { smb.openStream(path) }
+              } catch (_: Exception) { null }
             }
           } finally { smb.close() }
         }
