@@ -1,18 +1,61 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T05:06:29.778643+00:00",
-  "updatedLabel": "5 November2026 \u00b7 supplied APK inspection verified",
+  "updatedAt": "2026-11-05T05:22:30.324711+00:00",
+  "updatedLabel": "5 November2026 \u00b7 choice-label Settings search delivered1.202",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.201/code195, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.202/code196, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+{
+    "id": "settings-choice-label-search",
+    "title": "Settings search: find a choice by its visible name",
+    "summary": "Celsius, Fahrenheit,24-hour and Polaroid Scatter now reach their existing settings.",
+    "status": "delivered",
+    "kind": "Native Settings search usability",
+    "platforms": [
+        "portal"
+    ],
+    "owner": "Implementation / independent source review / native helper / delivery verification",
+    "deployment": "Exact optimized1.202/code196 fully hashed both rooms, one install each.",
+    "verification": "4739JVM/493suites;9frozen host methods7failures\u21929pass;native8vectors6mismatches\u21928pass;23assets retained",
+    "acceptance": [
+        "Index registry enum display labels through existing keywords.",
+        "Retain control routes, ranking rules, grouped time aliases and selections.",
+        "Verify actual APK helper, signed builds and both room delivery/preservation."
+    ],
+    "evidence": [
+        {
+            "text": "Scope, delivery and limits.",
+            "source": "docs/portal-settings-choice-search-2026-11-05.md"
+        },
+        {
+            "text": "Machine receipt.",
+            "source": "mocks/portal-settings-choice-search-20261105/verification.json"
+        }
+    ],
+    "limits": [
+        "Actual API29 debug-APK index/matcher acceptance; mounted Settings search/tap/keyboard/physical pixels, installed optimized helper and API28 acceptance remain separate.",
+        "No selected setting, schema, route, matcher, persistence or frontend asset change. Added labels can affect which aliases fill existing bounded buckets; no universal query-completeness or performance claim.",
+        "Native report actualNetworkRequests0 is literal; fixture declares no Internet permission and counted deniedUrlOpens0.",
+        "Initial fixture signing password-stream EOF and read-only staging copy failures happened before their respective device calls; retained separately, never counted as product RED. Same Java/manifest/DEX/assertions retained.",
+        "No phone, household provider/account/media/source-selection action, GitHub authentication/push/publication. Public manifest1.83 and all earlier held scopes/clocks remain."
+    ],
+    "next": "Continue distinct small product work; keep held visual and exhausted scopes under original clocks.",
+    "issueClock": {
+        "startedAt": "2026-11-05T05:07:55+00:00",
+        "discoveryCap": "2026-11-05T05:12:55+00:00",
+        "targetAt": "2026-11-05T05:22:55+00:00",
+        "deadline": "2026-11-05T05:37:55+00:00",
+        "scope": "Native enum choice-label search aliases; old grouped clock/editor/matcher/held visual scopes unchanged."
+    }
+},
 {
     "id": "supplied-apk-inspection",
     "title": "Inspect frozen APKs without another build",

@@ -1,0 +1,15 @@
+# Find settings by their choice labels
+
+Exact optimized **1.202/code196** is installed in both rooms, one install each, complete readback SHA256 `122ded61136f8896e945f3ed5eff32fbbb18e5bc2bbd151837b9749538c678c2` (25,887,119bytes). Living's uncertain acknowledgment settled through7 read-only observations, with no install replay.
+
+Native Settings search now includes the registry's declared enum display labels. Searching Celsius or Fahrenheit finds Temperature unit;24-hour finds the existing Clock control, and Polaroid Scatter reaches Screensaver style. Three added lines reuse existing aliases. Titles, routes, current selections, persistence, advanced consent, all-word matching, priority buckets and the12-result limit remain. Choice aliases may change which existing bounded results are returned; this is not universal search completeness.
+
+Nine frozen actual-index/matcher JVM tests show7 expected AssertionErrors and2controls before, then9pass. All4,739JVM tests/493suites and debug/optimized/R8/vital checks pass. Initial build126.59seconds; a30.23second verification after restoring version-line indentation yields byte-identical APKs. Only196/1.202 version values differ from prior Gradle; public manifest1.83 remains. All23 bundled source assets and signer are retained.
+
+The same generated native probe loads actual debug APKs1.201/1.202 on API29 and verifies classloader origin. Its8literal queries show6missing-choice mismatches/2controls before, then8passes. Index metadata only: no settings Activity, selected setting writes or Context supplied to helpers. This does not establish mounted Settings UI, physical keyboard/tap/pixels, installed optimized helper or API28 acceptance. The probe has no Internet permission and denies URL opens, with0counted attempts. Its actualNetworkRequests0 is a literal field, not a universal measured counter.
+
+Two fixture setup failures are retained separately: signing reused one password-file stream for two reads, and candidate packaging encountered a read-only owned staging APK. Both were repaired before their respective device calls without changing the frozen Java/manifest/DEX/vectors; neither is product RED. The temporary probe and generated signing files are retired. Independent source review passed; root fully read and rehashed17 bindings.
+
+All43Family/30Living preference files, file sets and four complete maps/revisions are byte-exact. Names/Dev Mode remain; Family font/accessibility/original Chromium activity/resumed frame/awake state remain. Both normal frame requests passed. Captured logcat samples1682/1650lines have0fatal/ANR markers; these are scoped samples. Copied fleet registries were removed and owner hashes match. No phone, household provider/account/media/source-selection action or GitHub authentication/push/publication occurred.
+
+Machine receipt: `mocks/portal-settings-choice-search-20261105/verification.json`. Original start **2026-11-05 05:07:55UTC**, discovery cap **05:12:55**, target **05:22:55**, hard limit **05:37:55**. Source witness05:11:42 and actual baseline capture05:12:29 precede cap. Earlier held scopes/clocks and whole-product goal remain.

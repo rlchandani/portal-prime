@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "scope": "Native settings search indexes declared enum choice labels",
+  "status": "delivered",
+  "capturedAt": "2026-11-05T05:22:30.324711+00:00",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T05:07:55+00:00",
+    "discoveryCapUtc": "2026-11-05T05:12:55+00:00",
+    "targetUtc": "2026-11-05T05:22:55+00:00",
+    "hardLimitUtc": "2026-11-05T05:37:55+00:00",
+    "baseHead": "6c86e7722e0a9ad5e850009a40be198b27723860",
+    "scope": "Distinct visible UI defect discovery; previous photo/count/status/held scopes excluded"
+  },
+  "version": {
+    "versionCode": 196,
+    "versionName": "1.202"
+  },
+  "sourceReview": {
+    "accepted": true,
+    "sha256": "4ceaa62caa86002981a81f2c46bc504bb1410bae6cd3af98056aa83057005bd6",
+    "rootRehashedBindings": 17,
+    "sourceReverseExact": true,
+    "onlyVersionValuesChanged": true
+  },
+  "tests": {
+    "frozenHostMethods": 9,
+    "hostBaselineAssertionFailures": 7,
+    "hostBaselineControls": 2,
+    "hostBaselineCapturedAt": "2026-11-05T05:12:29.197333+00:00",
+    "freshJvm": {
+      "tests": 4739,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 493
+    },
+    "initialBuildSeconds": 126.58953108399874,
+    "finalFormatVerificationSeconds": 30.232731875003083,
+    "formatVerificationApksByteIdentical": true,
+    "native": {
+      "cases": 8,
+      "beforeMissingChoices": 6,
+      "beforeControls": 2,
+      "afterPassed": 8,
+      "api": 29,
+      "sameFrozenJavaManifestDex": true,
+      "ownedFixtureRetired": true
+    }
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746050,
+      "sha256": "ff06c6650c8952fd4a29a870541872888946b5d3ba11643b0e542c9bc3401172",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "unchangedSourceAssetsFromBaseline": 23,
+      "intentionalSourceAssetChanges": [],
+      "generatedOptimizationProfileChanges": [],
+      "inspectionReceiptSha256": "d4408a79f01522e471a435a320bd13e8f7e5551b1759703ddb63e55b3cf97dde"
+    },
+    "performance": {
+      "bytes": 25887119,
+      "sha256": "122ded61136f8896e945f3ed5eff32fbbb18e5bc2bbd151837b9749538c678c2",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "unchangedSourceAssetsFromBaseline": 23,
+      "intentionalSourceAssetChanges": [],
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof",
+        "assets/dexopt/baseline.profm"
+      ],
+      "inspectionReceiptSha256": "6c5a3b1a627b82571303cf8b941109378656eaa2195d8136072dc3cbd47ab03c"
+    }
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25887119,
+      "sha256": "122ded61136f8896e945f3ed5eff32fbbb18e5bc2bbd151837b9749538c678c2",
+      "app": {
+        "versionCode": 196,
+        "versionName": "1.202"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25887119,
+        "sha256": "122ded61136f8896e945f3ed5eff32fbbb18e5bc2bbd151837b9749538c678c2",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 196,
+          "versionName": "1.202"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1682,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1650,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    },
+    "copiedFleetRetiredOwnerHashesStable": true,
+    "generatedSigningFilesRetired": true
+  },
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/ApprovedSettingsSearch.kt",
+      "bytes": 15355,
+      "sha256": "7a3971e655ab2521b12f7712c1f4ab1026db72bf80c527617200355f726450b4"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/ApprovedSettingsChoiceSearchTest.kt",
+      "bytes": 2001,
+      "sha256": "be316ebf68f057711b44ac650d095334972b763cef16330e635049a4884a0852"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "8354725fddae6bba9bb6b3b8c2d8bca041e5e884ce77e373ec3d8be5547cec27"
+    }
+  ],
+  "evidenceHashes": {
+    "baseline.xml": "d9e5b9e0cfcc8f3e9159e767d3e0d0093e61909277df1cecfc0266dce277e7db",
+    "jvm-red.json": "3f6ab09c2f1850ad3a9eb375e331eb2cdc55d6f333fa92c0324837284b687d37",
+    "native-before.json": "801ee03284f04c902bdb94049917e6b38fc219c23e01fc5423fd9af013b9991e",
+    "native-after.json": "d7c34e62918e7a5a8e4a6f52b6ca092932aef5b4af45c0481ddd92f09460e09a",
+    "native-before-proof.json": "ecf70ec00983b584fa2dc825d142014775501420ff976e85c940eb1fc0f08796",
+    "native-after-proof.json": "9e90b1771f377ca040ecd98301397c10d6ca4aae02025e22994f8906216063e4",
+    "native-prep/preparation.json": "0789200aa7daf11fce16f76d9341c9347a9258d5739ded2f5d2021428dbe535c",
+    "root-review-gate.json": "f921ea34c6f18da1a2dfac271130b1ef241674fbe3349f21081a10be862978ee",
+    "preservation.json": "f88f23a0067acdacb6c2f9dc65f76e3805c42b5d417149dd1fedebe20a645eac"
+  },
+  "limits": [
+    "Actual API29 debug-APK index/matcher acceptance; mounted Settings search/tap/keyboard/physical pixels, installed optimized helper and API28 acceptance remain separate.",
+    "No selected setting, schema, route, matcher, persistence or frontend asset change. Added labels can affect which aliases fill existing bounded buckets; no universal query-completeness or performance claim.",
+    "Native report actualNetworkRequests0 is literal; fixture declares no Internet permission and counted deniedUrlOpens0.",
+    "Initial fixture signing password-stream EOF and read-only staging copy failures happened before their respective device calls; retained separately, never counted as product RED. Same Java/manifest/DEX/assertions retained.",
+    "No phone, household provider/account/media/source-selection action, GitHub authentication/push/publication. Public manifest1.83 and all earlier held scopes/clocks remain."
+  ]
+}

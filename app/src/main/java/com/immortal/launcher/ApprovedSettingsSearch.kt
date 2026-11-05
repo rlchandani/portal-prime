@@ -105,7 +105,10 @@ internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> =
                 val wakeTime = domain.id == "sunrise" && spec.key == "hour"
                 entries += ApprovedSettingsSearchResult(if (wakeTime) "Wake time" else title, page,
                     domain.id, spec.key, help.orEmpty(), managed, domain.sections[spec.key].orEmpty(),
-                    keywords = if (wakeTime) "hour minute sunrise.minute" else "")
+                    keywords = listOfNotNull(
+                        if (wakeTime) "hour minute sunrise.minute" else null,
+                        (spec as? EnumSpec<*>)?.options?.joinToString(" ") { it.second },
+                    ).joinToString(" "))
             }
         }
         entries += ApprovedNativeSettingsFields
