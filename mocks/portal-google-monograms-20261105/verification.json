@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-05T00:30:13.907279+00:00",
+  "version": {
+    "name": "1.185",
+    "code": 179
+  },
+  "clock": {
+    "startedAt": "2026-11-05T00:17:20Z",
+    "discoveryCap": "2026-11-05T00:22:20Z",
+    "target": "2026-11-05T00:32:20Z",
+    "deadline": "2026-11-05T00:47:20Z",
+    "originalClockRetained": true,
+    "issue": 233
+  },
+  "jvmBaseline": {
+    "tests": 21,
+    "failures": [
+      {
+        "name": "isGoogleAvatarUrl_dropsContributorMonogramOutsideOwnerPath",
+        "type": "java.lang.AssertionError"
+      },
+      {
+        "name": "isGoogleAvatarUrl_dropsContributorMonogramWithFurtherModifiers",
+        "type": "java.lang.AssertionError"
+      }
+    ],
+    "existingAndNewControlsPass": 19
+  },
+  "jvmFinal": {
+    "tests": 4620,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 481
+  },
+  "sameFourNewTestsFrozenBeforeProductionChange": true,
+  "focusedFinal": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "nativeBaseline": {
+    "phase": "red",
+    "sourceApkSha256": "598bbbc02318fc73bf76a0b86400dcd9519c511e5c460e1af9c07021ab6bc8cd",
+    "fixture": {
+      "javaSha256": "2b9a80043f9cbd52ffc5f85e58c0231212f6f10678da865edb8a17c990c84c04",
+      "probeJarSha256": "c909a7f322fd3771faaa193e5151f34a27e034b1e817a1e11b48fbc2313a9284"
+    },
+    "result": {
+      "caseCount": 6,
+      "passed": 4,
+      "sourceClassLoaderVerified": true,
+      "api": 29,
+      "cases": [
+        {
+          "name": "contributor",
+          "url": "https://lh3.googleusercontent.com/GeneratedContributor=s40-c-mo",
+          "expected": true,
+          "actual": false,
+          "passed": false
+        },
+        {
+          "name": "contributor-extra-modifier",
+          "url": "https://lh3.googleusercontent.com/pw/GeneratedContributor=s512-c-mo-rw",
+          "expected": true,
+          "actual": false,
+          "passed": false
+        },
+        {
+          "name": "real-cropped-photo",
+          "url": "https://lh3.googleusercontent.com/GeneratedAlbumPhoto=s512-c",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "modifier-prefix-control",
+          "url": "https://lh3.googleusercontent.com/GeneratedAlbumPhoto=s512-c-more",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "owner-avatar",
+          "url": "https://lh3.googleusercontent.com/a/GeneratedOwner=s64-c-mo",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "real-album-photo",
+          "url": "https://lh3.googleusercontent.com/pw/GeneratedPhoto=w1920-h1080-no",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        }
+      ]
+    }
+  },
+  "nativeCandidate": {
+    "phase": "green",
+    "sourceApkSha256": "5a4c82c910950e15dcc02628d838b507589969999549ae472839789bb322c293",
+    "fixture": {
+      "javaSha256": "2b9a80043f9cbd52ffc5f85e58c0231212f6f10678da865edb8a17c990c84c04",
+      "probeJarSha256": "c909a7f322fd3771faaa193e5151f34a27e034b1e817a1e11b48fbc2313a9284"
+    },
+    "result": {
+      "caseCount": 6,
+      "passed": 6,
+      "sourceClassLoaderVerified": true,
+      "api": 29,
+      "cases": [
+        {
+          "name": "contributor",
+          "url": "https://lh3.googleusercontent.com/GeneratedContributor=s40-c-mo",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "contributor-extra-modifier",
+          "url": "https://lh3.googleusercontent.com/pw/GeneratedContributor=s512-c-mo-rw",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "real-cropped-photo",
+          "url": "https://lh3.googleusercontent.com/GeneratedAlbumPhoto=s512-c",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "modifier-prefix-control",
+          "url": "https://lh3.googleusercontent.com/GeneratedAlbumPhoto=s512-c-more",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "owner-avatar",
+          "url": "https://lh3.googleusercontent.com/a/GeneratedOwner=s64-c-mo",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "real-album-photo",
+          "url": "https://lh3.googleusercontent.com/pw/GeneratedPhoto=w1920-h1080-no",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        }
+      ]
+    }
+  },
+  "sourceReview": {
+    "verdict": "accepted",
+    "scope": "shared predicate and both scrape call sites; frozen JVM witness",
+    "bindings": {
+      "app/src/main/java/com/immortal/launcher/RemoteAlbum.kt": "d5d86fa9977316fe3aaec8820c4a0b069b4dabacf59bc9264e97b5926e8d2d7e",
+      "app/src/test/java/com/immortal/launcher/RemoteAlbumTest.kt": "1e93629c2c0fc9358316e9c02f7785f91e70b8ffccdc2c07b2ff344ea13da46f",
+      "app/build.gradle.kts": "fd539be08861f9823a0901a2e59c8d4ac85f419dbac706d844a75a2392468f1a"
+    }
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 99.69903025000531
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46745710,
+      "sha256": "5a4c82c910950e15dcc02628d838b507589969999549ae472839789bb322c293",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25886951,
+      "sha256": "25864fca8f16b2689a3abbbaf42d86a657063f4fb3fa57a5fad413da075d5775",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886951,
+      "sha256": "25864fca8f16b2689a3abbbaf42d86a657063f4fb3fa57a5fad413da075d5775",
+      "app": {
+        "versionCode": 179,
+        "versionName": "1.185"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25886951,
+        "sha256": "25864fca8f16b2689a3abbbaf42d86a657063f4fb3fa57a5fad413da075d5775",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 179,
+          "versionName": "1.185"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1595,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1684,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "ownerRegistryHashesUnchanged": true,
+    "copiedRegistriesRetired": true,
+    "redOwnedScratchAbsent": true,
+    "greenOwnedScratchAbsent": true
+  },
+  "limits": [
+    "Generated URL classification only; no live Google page, pagination response, album/media/image decoding or household provider operation",
+    "Android10/API29 debug APK via shell DexClassLoader; source origin checked; no optimized classifier/API28/Living native proof",
+    "No phone/account/authentication/push/publication; public release metadata remains1.83",
+    "All held scopes retain original clocks"
+  ]
+}

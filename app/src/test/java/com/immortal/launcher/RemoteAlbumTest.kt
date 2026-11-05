@@ -208,6 +208,34 @@ class RemoteAlbumTest {
   }
 
   @Test
+  fun isGoogleAvatarUrl_dropsContributorMonogramOutsideOwnerPath() {
+    assertTrue(
+        RemoteAlbum.isGoogleAvatarUrl(
+            "https://lh3.googleusercontent.com/GeneratedContributor=s40-c-mo"))
+  }
+
+  @Test
+  fun isGoogleAvatarUrl_dropsContributorMonogramWithFurtherModifiers() {
+    assertTrue(
+        RemoteAlbum.isGoogleAvatarUrl(
+            "https://lh3.googleusercontent.com/pw/GeneratedContributor=s512-c-mo-rw"))
+  }
+
+  @Test
+  fun isGoogleAvatarUrl_keepsCroppedAlbumPhotoWithoutMonogramModifier() {
+    assertFalse(
+        RemoteAlbum.isGoogleAvatarUrl(
+            "https://lh3.googleusercontent.com/GeneratedAlbumPhoto=s512-c"))
+  }
+
+  @Test
+  fun isGoogleAvatarUrl_doesNotTreatModifierPrefixAsMonogram() {
+    assertFalse(
+        RemoteAlbum.isGoogleAvatarUrl(
+            "https://lh3.googleusercontent.com/GeneratedAlbumPhoto=s512-c-more"))
+  }
+
+  @Test
   fun pickBestDerivative_skipsEntriesMissingChecksum() {
     val derivs =
         JSONObject(

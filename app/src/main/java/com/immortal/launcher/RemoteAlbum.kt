@@ -523,9 +523,13 @@ object RemoteAlbum {
     }
   }
 
+  // Contributor monograms can sit outside the owner's /a/ and /a-/ avatar paths.
+  private val GOOGLE_MONOGRAM_SUFFIX = Regex("""=s\d+-c-mo\b""")
+
   internal fun isGoogleAvatarUrl(url: String): Boolean {
     val path = url.removePrefix("https://lh3.googleusercontent.com")
-    return path.startsWith("/a/") || path.startsWith("/a-/")
+    return path.startsWith("/a/") || path.startsWith("/a-/") ||
+        GOOGLE_MONOGRAM_SUFFIX.containsMatchIn(url)
   }
 
   private fun extractGoogleTitle(html: String): String? {
