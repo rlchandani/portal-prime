@@ -7,7 +7,6 @@
 
 package com.immortal.launcher
 
-import java.util.concurrent.TimeUnit
 
 /**
  * Bundled "something every day" content for the home-screen daily tile: a quote, a
@@ -41,17 +40,17 @@ object DailyContent {
    * Portal doesn't travel). Used as the rotation index. */
   fun epochDay(nowMillis: Long = System.currentTimeMillis()): Long {
     val offset = java.util.TimeZone.getDefault().getOffset(nowMillis)
-    return TimeUnit.MILLISECONDS.toDays(nowMillis + offset)
+    return Math.floorDiv(nowMillis + offset, 24L * 60 * 60 * 1000)
   }
 
   fun quoteOfDay(nowMillis: Long = System.currentTimeMillis()): Quote =
-      QUOTES[(epochDay(nowMillis) % QUOTES.size).toInt()]
+      QUOTES[Math.floorMod(epochDay(nowMillis), QUOTES.size.toLong()).toInt()]
 
   fun wordOfDay(nowMillis: Long = System.currentTimeMillis()): Word =
-      WORDS[(epochDay(nowMillis) % WORDS.size).toInt()]
+      WORDS[Math.floorMod(epochDay(nowMillis), WORDS.size.toLong()).toInt()]
 
   fun triviaOfDay(nowMillis: Long = System.currentTimeMillis()): Trivia =
-      TRIVIA[(epochDay(nowMillis) % TRIVIA.size).toInt()]
+      TRIVIA[Math.floorMod(epochDay(nowMillis), TRIVIA.size.toLong()).toInt()]
 
   private val QUOTES = listOf(
       Quote("The best way to predict the future is to invent it.", "Alan Kay"),

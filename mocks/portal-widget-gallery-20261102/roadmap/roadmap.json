@@ -1,18 +1,65 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T04:10:30.694558+00:00",
-  "updatedLabel": "5 November2026 \u00b7 calendar recurrence limit fix delivered in1.198",
+  "updatedAt": "2026-11-05T04:24:21.779347+00:00",
+  "updatedLabel": "5 November2026 \u00b7 daily content date fix delivered in1.199",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.198/code192, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.199/code193, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+        "id": "daily-content-signed-day",
+        "title": "Daily content: keep negative local dates available",
+        "summary": "Daily quotes, words and trivia use floor day boundaries and bounded indices, preventing pre-epoch lookup crashes.",
+        "status": "delivered",
+        "kind": "Android daily content date/index correctness",
+        "platforms": [
+            "portal"
+        ],
+        "owner": "Content data / independent review / native and delivery verification",
+        "deployment": "Exact optimized1.199/code193 fully hashed both rooms, one install each.",
+        "verification": "4730JVM/492suites;11host7failures→11pass;8actual-debug/API29 vectors5mismatches→8pass",
+        "acceptance": [
+            "Select the correct negative local day at midnight.",
+            "Keep all three collection indices valid and retain positive rotation.",
+            "Use actual APK methods/getters with frozen timestamps and literal values.",
+            "Verify builds/review/artifacts/delivery/preservation."
+        ],
+        "evidence": [
+            {
+                "text": "Scope and acceptance limits.",
+                "source": "docs/portal-daily-content-signed-day-2026-11-05.md"
+            },
+            {
+                "text": "Machine proof and original clock.",
+                "source": "mocks/portal-daily-content-signed-day-20261105/verification.json"
+            }
+        ],
+        "limits": [
+            "Acceptance uses actual DailyContent methods with generated timestamps and process-local time zones; no Portal wall-clock change or actual household clock failure was observed.",
+            "The screensaver dashboard directly calls quoteOfDay. No direct wordOfDay/triviaOfDay callers were found in main source; their existing public helper contracts are covered.",
+            "Eleven host methods and eight native vectors differ. Host additionally covers western-zone pre-epoch/local-midnight edges, positive day boundaries, positive content wrap and negative whole-cycle controls.",
+            "Native uses actual debug APK on Family API29. Optimized helper execution, API28 and Living native remain separate; optimized packaging/signing and exact delivery are verified.",
+            "Only floor day conversion and three bounded list indices change. Bundled data, default timestamps, timezone offset choice, mode mapping and settings remain. Long-extreme offset-addition overflow is outside this near-epoch contract.",
+            "Host final baseline timestamp04:16:27 precedes discovery cap04:17:11. Original04:12:11 start/04:27:11 target/04:42:11 hard limit and earlier held scopes remain without reset.",
+            "No phone, household provider/account/media operation, GitHub authentication/push or public publication. Public manifest1.83 and whole product goal remain."
+        ],
+        "next": "Continue independent product work; retain held clocks.",
+        "issueClock": {
+            "originalStartUtc": "2026-11-05T04:12:11Z",
+            "discoveryCapUtc": "2026-11-05T04:17:11Z",
+            "targetUtc": "2026-11-05T04:27:11Z",
+            "hardLimitUtc": "2026-11-05T04:42:11Z",
+            "baseHead": "f550a710b9d4ea5efb8e6e651d303ab039a98575",
+            "scope": "DailyContent negative local days: floor day boundaries and bounded quote/word/trivia indexing"
+        }
+    },
     {
         "id": "calendar-until-validity",
         "title": "Calendar: respect malformed recurrence end limits",

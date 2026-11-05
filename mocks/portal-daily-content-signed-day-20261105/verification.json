@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T04:24:21.779347+00:00",
+  "status": "delivered_and_read_back_in_both_rooms",
+  "version": {
+    "code": 193,
+    "name": "1.199"
+  },
+  "baseCommit": "f550a710b9d4ea5efb8e6e651d303ab039a98575",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T04:12:11Z",
+    "discoveryCapUtc": "2026-11-05T04:17:11Z",
+    "targetUtc": "2026-11-05T04:27:11Z",
+    "hardLimitUtc": "2026-11-05T04:42:11Z",
+    "baseHead": "f550a710b9d4ea5efb8e6e651d303ab039a98575",
+    "scope": "DailyContent negative local days: floor day boundaries and bounded quote/word/trivia indexing"
+  },
+  "scope": "Keep daily content available for negative local days and rotate it at the correct local midnight.",
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/DailyContent.kt",
+      "bytes": 8937,
+      "sha256": "a6664e2777df43503fc08903942dd6cbf32ede6c6398cfda5c165070f2ca2f76"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/DailyContentSignedDayTest.kt",
+      "bytes": 3143,
+      "sha256": "1d04853ac671cdd9eae772ef1f79bdfb379d69aa2fcf9f420773ff3195250960"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "7c8ec697e3be839a7470aa713e98e6164f27dc99d30b8555e8b233135172b0cf"
+    }
+  ],
+  "regression": {
+    "actualDailyContentMethods": true,
+    "generatedTimestampsOnly": true,
+    "hostMethods": 11,
+    "hostBaselineFailures": 7,
+    "hostBaselineControlsPassed": 4,
+    "hostBaselineIndexExceptions": 3,
+    "hostCandidatePassed": 11,
+    "frozenAssertionsUnchanged": true
+  },
+  "native": {
+    "api": 29,
+    "actualDebugDailyContentMethodsAndGetters": true,
+    "generatedMillisAndProcessZonesOnly": true,
+    "cases": 8,
+    "baselineMismatches": 5,
+    "baselineControlsPassed": 3,
+    "baselineIndexExceptions": 3,
+    "candidatePassed": 8,
+    "classOriginsVerified": true,
+    "sameFrozenJavaJarDriver": true,
+    "fixture": {
+      "javaSha256": "dd779de941a7b063d91654328c96dad9745b931edd10aa0d6abf48e5b9f58d65",
+      "probeJarSha256": "c9386986913bc2e9a588d49e75fe1e96f542bd9c1939ca307f296f0dfa742660",
+      "driverSha256": "6ad2b3f53524ced37e2ce7c53e336fd6a3339650009a3064de2e66f89e960d40",
+      "compiledClassCount": 2,
+      "literalCases": 8,
+      "expectedBaselineFailures": 5,
+      "expectedBaselineControls": 3
+    },
+    "urlOpens": 0,
+    "bothOwnedPathsAbsent": true,
+    "bothProcessesTerminal": true
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 31.803448083999683
+  },
+  "initialFullBuild": {
+    "exitCode": 0,
+    "seconds": 126.59574829200574
+  },
+  "styleRebuild": {
+    "onlyIndentationChanged": true,
+    "bothApksByteIdenticalToNativeTestedCandidates": true
+  },
+  "jvm": {
+    "tests": 4730,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 492
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746006,
+      "sha256": "846b6244c3709535f77d4bb23743c5476228f07de0ab28f73322354887c10448",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25903487,
+      "sha256": "85630f4a95be91ed7ca2e62db3b044bceb8585a1b98a2f489a68e37fe31b6acb",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "459df5a71e1b9117eb435e21884066d959c698e89fb4741ee942120e20265a6a",
+    "bindingsRootRehashed": 22,
+    "fourArithmeticEditsImportAndVersionReverseExactlyToBaseline": true,
+    "scope": "Source and frozen baseline review; root separately checked fresh candidate build/native and promotion evidence"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25903487,
+      "sha256": "85630f4a95be91ed7ca2e62db3b044bceb8585a1b98a2f489a68e37fe31b6acb",
+      "app": {
+        "versionCode": 193,
+        "versionName": "1.199"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25903487,
+        "sha256": "85630f4a95be91ed7ca2e62db3b044bceb8585a1b98a2f489a68e37fe31b6acb",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 193,
+          "versionName": "1.199"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1610,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1971,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "ownerRegistryHashesPreserved": true,
+    "nativePathsRemoved": true
+  },
+  "publicVersionManifestUnchanged": true,
+  "limits": [
+    "Acceptance uses actual DailyContent methods with generated timestamps and process-local time zones; no Portal wall-clock change or actual household clock failure was observed.",
+    "The screensaver dashboard directly calls quoteOfDay. No direct wordOfDay/triviaOfDay callers were found in main source; their existing public helper contracts are covered.",
+    "Eleven host methods and eight native vectors differ. Host additionally covers western-zone pre-epoch/local-midnight edges, positive day boundaries, positive content wrap and negative whole-cycle controls.",
+    "Native uses actual debug APK on Family API29. Optimized helper execution, API28 and Living native remain separate; optimized packaging/signing and exact delivery are verified.",
+    "Only floor day conversion and three bounded list indices change. Bundled data, default timestamps, timezone offset choice, mode mapping and settings remain. Long-extreme offset-addition overflow is outside this near-epoch contract.",
+    "Host final baseline timestamp04:16:27 precedes discovery cap04:17:11. Original04:12:11 start/04:27:11 target/04:42:11 hard limit and earlier held scopes remain without reset.",
+    "No phone, household provider/account/media operation, GitHub authentication/push or public publication. Public manifest1.83 and whole product goal remain."
+  ]
+}
