@@ -68,7 +68,8 @@ object FaceFocus {
   fun peopleWeight(faces: List<Box>, w: Int, h: Int): Float {
     if (w <= 0 || h <= 0) return 0f
     val minSide = minOf(w, h) * MIN_FACE_FRACTION
-    val real = faces.filter { it.width >= minSide && it.height >= minSide }
+    val real = faces.filter { it.width >= minSide && it.height >= minSide &&
+        it.right > 0 && it.bottom > 0 && it.left < w && it.top < h }
     if (real.isEmpty()) return 0f
     val coverage = real.sumOf { it.area }.toFloat() / (w.toLong() * h.toLong())
     // Count and coverage both matter: a group of small faces ≈ one large portrait.
@@ -83,7 +84,8 @@ object FaceFocus {
   fun focalPoint(faces: List<Box>, w: Int, h: Int): Focus? {
     if (w <= 0 || h <= 0) return null
     val minSide = minOf(w, h) * MIN_FACE_FRACTION
-    val real = faces.filter { it.width >= minSide && it.height >= minSide }
+    val real = faces.filter { it.width >= minSide && it.height >= minSide &&
+        it.right > 0 && it.bottom > 0 && it.left < w && it.top < h }
     if (real.isEmpty()) return null
 
     val union = Box(

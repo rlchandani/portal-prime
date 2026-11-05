@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T02:27:51.756868+00:00",
+  "status": "delivered_and_read_back_in_both_rooms",
+  "version": {
+    "code": 186,
+    "name": "1.192"
+  },
+  "baseCommit": "a0d62ae3331680905a93986a76a5694eeeac1c22",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T02:17:52Z",
+    "discoveryCapUtc": "2026-11-05T02:22:52Z",
+    "targetUtc": "2026-11-05T02:32:52Z",
+    "hardLimitUtc": "2026-11-05T02:47:52Z",
+    "baseHead": "a0d62ae3331680905a93986a76a5694eeeac1c22",
+    "scope": "Exclude wholly off-image detector boxes from photo focal point and People weight; preserve partly visible boxes and existing math"
+  },
+  "scope": "Only admit detector boxes with positive intersection into focal-point and People-weight calculations; retain raw partly visible boxes and existing centroid/coverage math.",
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/FaceFocus.kt",
+      "bytes": 4964,
+      "sha256": "78abadc6b32c0035ad73160b13d9b24cfb400049a872d24282d7f7726cb2fb88"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/FaceFocusOutsideImageTest.kt",
+      "bytes": 2635,
+      "sha256": "699bd2c3181690c72535950c4f44b308cbe64660bf36a2817404d7022f340eea"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "902ba372fb4600c7394765154039085381aa97bf0f94535350c923ad81aa0476"
+    }
+  ],
+  "regression": {
+    "actualProductionMethods": true,
+    "generatedCoordinatesOnly": true,
+    "methods": 10,
+    "baselineAssertionFailures": 6,
+    "baselineControlsPassed": 4,
+    "candidatePassed": 10,
+    "errors": 0,
+    "skipped": 0,
+    "frozenAssertionsUnchanged": true,
+    "baselineCases": [
+      {
+        "name": "edgeContactWithoutVisibleAreaDoesNotSupplyAFocalPoint",
+        "failure": "java.lang.AssertionError"
+      },
+      {
+        "name": "visibleFaceKeepsItsExistingFocus",
+        "failure": null
+      },
+      {
+        "name": "outsideBoxesCannotMoveTheVisibleSubjectsFocus",
+        "failure": "java.lang.AssertionError"
+      },
+      {
+        "name": "outsideBoxesCannotInflateTheVisibleSubjectsWeight",
+        "failure": "java.lang.AssertionError"
+      },
+      {
+        "name": "partiallyVisibleFaceKeepsItsExistingPeopleWeight",
+        "failure": null
+      },
+      {
+        "name": "edgeContactWithoutVisibleAreaDoesNotSupplyAPeopleWeight",
+        "failure": "java.lang.AssertionError"
+      },
+      {
+        "name": "visibleFaceKeepsItsExistingPeopleWeight",
+        "failure": null
+      },
+      {
+        "name": "outsideBoxesDoNotSupplyAFocalPoint",
+        "failure": "java.lang.AssertionError"
+      },
+      {
+        "name": "partiallyVisibleFaceKeepsItsExistingClampedFocus",
+        "failure": null
+      },
+      {
+        "name": "outsideBoxesDoNotSupplyAPeopleWeight",
+        "failure": "java.lang.AssertionError"
+      }
+    ]
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 98.48869716699119
+  },
+  "jvm": {
+    "tests": 4662,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 485
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746006,
+      "sha256": "e2410667172d4d5f247eb0c77ad17f59cf5ffb3571fc36c338764f7c1e0d743b",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25903483,
+      "sha256": "97b1c55d38df61f545073969025777c91435550bf805290ea262fe4104b237fa",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "ffef188b39cf3ddda1c75e05e7302e941488afdfdf788d603907c944a33e2ed4",
+    "all18BindingsRehashedBeforePromotion": true,
+    "twoFiltersReverseExactlyToBaseline": true
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25903483,
+      "sha256": "97b1c55d38df61f545073969025777c91435550bf805290ea262fe4104b237fa",
+      "app": {
+        "versionCode": 186,
+        "versionName": "1.192"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25903483,
+        "sha256": "97b1c55d38df61f545073969025777c91435550bf805290ea262fe4104b237fa",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 186,
+          "versionName": "1.192"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1622,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1911,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "ownerRegistryHashesPreserved": true,
+    "noNativeFixturesCreated": true
+  },
+  "publicVersionManifestUnchanged": true,
+  "limits": [
+    "Generated JVM tests call actual pure FaceFocus methods; no live detector/provider/photo request, mounted UI or pixel acceptance.",
+    "Existing complete cached incorrect metadata is not repaired; only newly computed metadata benefits.",
+    "Partly visible raw-box centroid and area semantics intentionally remain unchanged.",
+    "No optimized function execution, API28, physical phone, account, GitHub authentication, push or publication claim.",
+    "Earlier parked scopes retain their original clocks; the whole product objective stays active."
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T02:07:49.842251+00:00",
+  "updatedAt": "2026-11-05T02:27:51.756868+00:00",
   "updatedLabel": "5 November 2026 \u00b7 Home SMB photo fallback delivered in 1.191",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,56 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.191/code185, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.192/code186, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-face-image-admission",
+      "title": "Photo framing: ignore detections outside the image",
+      "summary": "Off-image detector boxes no longer pull new focal points away from a visible subject or inflate People ranking.",
+      "status": "delivered",
+      "kind": "Photo metadata admission correction",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Pure photo math / independent source review / JVM and delivery verification",
+      "deployment": "Exact optimized1.192/code186 fully hashed both rooms, one install each.",
+      "verification": "4662 JVM/485 suites;10 actual-method generated-coordinate regressions/controls",
+      "state": "Frozen10methods:6AssertionErrors/4controls→10pass; partial-face raw semantics retained.",
+      "acceptance": [
+        "Exclude wholly outside and edge-touch-only detector boxes.",
+        "Preserve visible and partly visible focal points, People weights and all existing math.",
+        "Keep detector/cache/renderer/source assets unchanged.",
+        "Verify frozen regressions, signed artifacts, room delivery and saved state."
+      ],
+      "evidence": [
+        {
+          "text": "Scope, tests, delivery and limits.",
+          "source": "docs/portal-face-image-admission-2026-11-05.md"
+        },
+        {
+          "text": "Machine evidence and original clock.",
+          "source": "mocks/portal-face-image-admission-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated JVM tests call actual pure FaceFocus methods; no live detector/provider/photo request, mounted UI or pixel acceptance.",
+        "Existing complete cached incorrect metadata is not repaired; only newly computed metadata benefits.",
+        "Partly visible raw-box centroid and area semantics intentionally remain unchanged.",
+        "No optimized function execution, API28, physical phone, account, GitHub authentication, push or publication claim.",
+        "Earlier parked scopes retain their original clocks; the whole product objective stays active."
+      ],
+      "next": "Continue independent product work; retain held clocks.",
+      "issueClock": {
+        "originalStartUtc": "2026-11-05T02:17:52Z",
+        "discoveryCapUtc": "2026-11-05T02:22:52Z",
+        "targetUtc": "2026-11-05T02:32:52Z",
+        "hardLimitUtc": "2026-11-05T02:47:52Z",
+        "scope": "Exclude wholly off-image detector boxes from photo focal point and People weight; preserve partly visible boxes and existing math"
+      }
+    },
     {
       "id": "home-smb-photo-fallback",
       "title": "Home photos: skip failed SMB image reads",
