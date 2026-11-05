@@ -69,14 +69,19 @@ object ImmichSource {
           }
           .getOrDefault(false)
 
-  /** List the user's albums (for the picker). Null on any failure. */
+  /** List uniquely identified albums for the picker. Null on request or document failure. */
   fun listAlbums(base: String, apiKey: String): List<Album>? =
       runCatching {
             val body = httpGet("${normalizeBase(base)}/api/albums", authHeaders(apiKey)) ?: return null
             val arr = JSONArray(body)
-            (0 until arr.length()).map { i ->
-              val o = arr.getJSONObject(i)
-              Album(o.getString("id"), o.optString("albumName", "Album"), o.optInt("assetCount", 0))
+            buildList {
+              val seen = HashSet<String>()
+              for (i in 0 until arr.length()) {
+                val o = arr.optJSONObject(i) ?: continue
+                val id = o.opt("id") as? String ?: continue
+                if (id.isBlank() || !seen.add(id)) continue
+                add(Album(id, o.optString("albumName", "Album"), o.optInt("assetCount", 0)))
+              }
             }
           }
           .onFailure { Log.w(TAG, "album list failed", it) }

@@ -1,0 +1,1187 @@
+{
+  "recordedAt": "2026-11-05T01:20:33.797857+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-05T01:10:43Z",
+    "discoveryDeadline": "2026-11-05T01:15:43Z",
+    "target": "2026-11-05T01:25:43Z",
+    "deadline": "2026-11-05T01:40:43Z",
+    "scope": "Immich album identity admission retains valid neighbors and unique picker keys",
+    "reset": false
+  },
+  "plan": {
+    "problem": "Album map rejects entire list on malformed row and admits duplicate/blank IDs used as native stable keys.",
+    "scope": "Shared listAlbums only: skip nonobjects/non-string/blank IDs, keep first duplicate and original metadata/order.",
+    "acceptance": [
+      "Real HTTP public listAlbums tests before/after frozen",
+      "Native actual public listAlbums generated in-memory URL handler with same fixture",
+      "Full JVM/build/optimized/R8/vital gates and independent review",
+      "Exact optimized APK both rooms, no install replay; whole saved state retained"
+    ],
+    "limits": [
+      "No household credentials/providers or connection/write operations",
+      "No album name/count coercion, connection UI, media parser or URL-path rules changed"
+    ]
+  },
+  "sourceReview": {
+    "firstReadAt": "2026-11-05T01:14:50.982Z",
+    "completedAt": "2026-11-05T01:15:11.356Z",
+    "accepted": true,
+    "findings": [],
+    "scope": "Only listAlbums body/comment + version; first exact ID admission/stable metadata. Both native and browser consumers share parser. HTTP baseline8 childcases5AssertionErrors/3controls. Native generated probe source accepted; runtime outside verdict.",
+    "bindings": {
+      "app/src/main/java/com/immortal/launcher/ImmichSource.kt": "6fed2732def801f61d4a54b829d651d3f6ab7563ffa20c0c259bc371bc97ac8f",
+      "app/src/test/java/com/immortal/launcher/ImmichAlbumIdentityTest.kt": "08f9220003b06604b1b8f52e54476062ae9aa8c4ec2899d4255b97811d2dc83f",
+      "app/build.gradle.kts": "96b87877c66bd0730e39ccd18f0aab03bc15a5101c3f9f615e30e2bd30e16d08"
+    }
+  },
+  "promotionGate": {
+    "candidateEligible": true,
+    "versionCode": 182,
+    "versionName": "1.188",
+    "sourceReviewExact": true,
+    "unchangedAll23SourceAssetsAndControllerAndPublicManifest": true,
+    "jvmActualCases": 4634,
+    "nativeFrozen8Cases5Failures3ControlsTo8Pass": true,
+    "nativeOwnedScratchRetired": true,
+    "installedBehaviorNotYetClaimed": true
+  },
+  "host": {
+    "cases": 8,
+    "baselineAssertionFailures": 5,
+    "baselineControls": 3,
+    "candidatePassed": 8,
+    "frozenTestSha256": "08f9220003b06604b1b8f52e54476062ae9aa8c4ec2899d4255b97811d2dc83f",
+    "actualAllJvmChildCount": 4634
+  },
+  "nativeRed": {
+    "phase": "red",
+    "sourceApkSha256": "a89b72177b9e12c1e7eb96c5cc0b5f0dfc60a6801de6c84d4505944b66462e98",
+    "fixture": {
+      "javaSha256": "5d861e0457c133dd0b4f21ea70a2201f7a12e078a11853dc4cec36b44ceffd99",
+      "probeJarSha256": "06768df08677c7b7f84c04d58e9438fdc92cc9d0e4bec6341be6a3fc182e4b1d",
+      "driverSha256": "b87a48b5596f1157f98e2d53ce93d7c1c69592afaada4ce486b9cba3b616b038",
+      "compiledClassCount": 5,
+      "literalCases": 8,
+      "expectedBaselineFailures": 5,
+      "expectedBaselineControls": 3
+    },
+    "result": {
+      "caseCount": 8,
+      "passed": 3,
+      "sourceClassLoaderVerified": true,
+      "entrypoint": "ImmichSource.INSTANCE.listAlbums(String,String)",
+      "api": 29,
+      "actualNetworkRequests": 0,
+      "networkBoundary": "Process-only URL factory never delegates; exact generated endpoint only; in-memory HttpURLConnection",
+      "deniedUnexpected": 0,
+      "cases": [
+        {
+          "name": "nonobject-between-neighbors",
+          "body": "[{\"id\":\"a\",\"albumName\":\"First\",\"assetCount\":1},null,7,\"row\",{\"id\":\"b\",\"albumName\":\"Last\",\"assetCount\":2}]",
+          "expected": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "actual": null,
+          "failure": null,
+          "literalPassed": false,
+          "transportPassed": true,
+          "passed": false,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "missing-null-nonstring-ids",
+          "body": "[{\"id\":\"a\",\"albumName\":\"First\",\"assetCount\":1},{},{\"id\":null},{\"id\":7},{\"id\":true},{\"id\":[]},{\"id\":{}},{\"id\":\"b\",\"albumName\":\"Last\",\"assetCount\":2}]",
+          "expected": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "actual": null,
+          "failure": null,
+          "literalPassed": false,
+          "transportPassed": true,
+          "passed": false,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "blank-ids-between-neighbors",
+          "body": "[{\"id\":\"a\",\"albumName\":\"First\",\"assetCount\":1},{\"id\":\"\"},{\"id\":\" \\t\\n \"},{\"id\":\"b\",\"albumName\":\"Last\",\"assetCount\":2}]",
+          "expected": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "actual": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "",
+              "Album",
+              0
+            ],
+            [
+              " \t\n ",
+              "Album",
+              0
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "failure": null,
+          "literalPassed": false,
+          "transportPassed": true,
+          "passed": false,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "duplicate-first-details-stable-order",
+          "body": "[{\"id\":\"a\",\"albumName\":\"First\",\"assetCount\":1},{\"id\":\"a\",\"albumName\":\"Duplicate\",\"assetCount\":99},{\"id\":\"b\",\"albumName\":\"Last\",\"assetCount\":2},{\"id\":\"a\",\"albumName\":\"Again\",\"assetCount\":55}]",
+          "expected": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "actual": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "a",
+              "Duplicate",
+              99
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ],
+            [
+              "a",
+              "Again",
+              55
+            ]
+          ],
+          "failure": null,
+          "literalPassed": false,
+          "transportPassed": true,
+          "passed": false,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "all-invalid-empty",
+          "body": "[null,7,\"bad\",{}, {\"id\":null},{\"id\":9},{\"id\":\"\"},{\"id\":\"   \"}]",
+          "expected": [],
+          "actual": null,
+          "failure": null,
+          "literalPassed": false,
+          "transportPassed": true,
+          "passed": false,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "unicode-default-metadata",
+          "body": "[{\"id\":\"\u30a2\u30eb\u30d0\u30e0-\u00e9\",\"albumName\":\"N\u00f3in\u00edn \ud83c\udf3f\",\"assetCount\":4},{\"id\":\"b\"}]",
+          "expected": [
+            [
+              "\u30a2\u30eb\u30d0\u30e0-\u00e9",
+              "N\u00f3in\u00edn \ud83c\udf3f",
+              4
+            ],
+            [
+              "b",
+              "Album",
+              0
+            ]
+          ],
+          "actual": [
+            [
+              "\u30a2\u30eb\u30d0\u30e0-\u00e9",
+              "N\u00f3in\u00edn \ud83c\udf3f",
+              4
+            ],
+            [
+              "b",
+              "Album",
+              0
+            ]
+          ],
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "malformed-top-level-null",
+          "body": "{\"albums\":[]}",
+          "expected": null,
+          "actual": null,
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "http503-null",
+          "body": "[]",
+          "expected": null,
+          "actual": null,
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 503,
+              "disconnects": 1,
+              "responseReads": 3,
+              "inputReads": 0,
+              "inputCloses": 0,
+              "errorReads": 1,
+              "errorCloses": 1,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "nativeGreen": {
+    "phase": "green",
+    "sourceApkSha256": "593eb253751e1ceb2b8fd0b82852832b5bf04a26a09327e365229bb67e934138",
+    "fixture": {
+      "javaSha256": "5d861e0457c133dd0b4f21ea70a2201f7a12e078a11853dc4cec36b44ceffd99",
+      "probeJarSha256": "06768df08677c7b7f84c04d58e9438fdc92cc9d0e4bec6341be6a3fc182e4b1d",
+      "driverSha256": "b87a48b5596f1157f98e2d53ce93d7c1c69592afaada4ce486b9cba3b616b038",
+      "compiledClassCount": 5,
+      "literalCases": 8,
+      "expectedBaselineFailures": 5,
+      "expectedBaselineControls": 3
+    },
+    "result": {
+      "caseCount": 8,
+      "passed": 8,
+      "sourceClassLoaderVerified": true,
+      "entrypoint": "ImmichSource.INSTANCE.listAlbums(String,String)",
+      "api": 29,
+      "actualNetworkRequests": 0,
+      "networkBoundary": "Process-only URL factory never delegates; exact generated endpoint only; in-memory HttpURLConnection",
+      "deniedUnexpected": 0,
+      "cases": [
+        {
+          "name": "nonobject-between-neighbors",
+          "body": "[{\"id\":\"a\",\"albumName\":\"First\",\"assetCount\":1},null,7,\"row\",{\"id\":\"b\",\"albumName\":\"Last\",\"assetCount\":2}]",
+          "expected": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "actual": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "missing-null-nonstring-ids",
+          "body": "[{\"id\":\"a\",\"albumName\":\"First\",\"assetCount\":1},{},{\"id\":null},{\"id\":7},{\"id\":true},{\"id\":[]},{\"id\":{}},{\"id\":\"b\",\"albumName\":\"Last\",\"assetCount\":2}]",
+          "expected": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "actual": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "blank-ids-between-neighbors",
+          "body": "[{\"id\":\"a\",\"albumName\":\"First\",\"assetCount\":1},{\"id\":\"\"},{\"id\":\" \\t\\n \"},{\"id\":\"b\",\"albumName\":\"Last\",\"assetCount\":2}]",
+          "expected": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "actual": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "duplicate-first-details-stable-order",
+          "body": "[{\"id\":\"a\",\"albumName\":\"First\",\"assetCount\":1},{\"id\":\"a\",\"albumName\":\"Duplicate\",\"assetCount\":99},{\"id\":\"b\",\"albumName\":\"Last\",\"assetCount\":2},{\"id\":\"a\",\"albumName\":\"Again\",\"assetCount\":55}]",
+          "expected": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "actual": [
+            [
+              "a",
+              "First",
+              1
+            ],
+            [
+              "b",
+              "Last",
+              2
+            ]
+          ],
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "all-invalid-empty",
+          "body": "[null,7,\"bad\",{}, {\"id\":null},{\"id\":9},{\"id\":\"\"},{\"id\":\"   \"}]",
+          "expected": [],
+          "actual": [],
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "unicode-default-metadata",
+          "body": "[{\"id\":\"\u30a2\u30eb\u30d0\u30e0-\u00e9\",\"albumName\":\"N\u00f3in\u00edn \ud83c\udf3f\",\"assetCount\":4},{\"id\":\"b\"}]",
+          "expected": [
+            [
+              "\u30a2\u30eb\u30d0\u30e0-\u00e9",
+              "N\u00f3in\u00edn \ud83c\udf3f",
+              4
+            ],
+            [
+              "b",
+              "Album",
+              0
+            ]
+          ],
+          "actual": [
+            [
+              "\u30a2\u30eb\u30d0\u30e0-\u00e9",
+              "N\u00f3in\u00edn \ud83c\udf3f",
+              4
+            ],
+            [
+              "b",
+              "Album",
+              0
+            ]
+          ],
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "malformed-top-level-null",
+          "body": "{\"albums\":[]}",
+          "expected": null,
+          "actual": null,
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 200,
+              "disconnects": 1,
+              "responseReads": 2,
+              "inputReads": 1,
+              "inputCloses": 1,
+              "errorReads": 0,
+              "errorCloses": 0,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        },
+        {
+          "name": "http503-null",
+          "body": "[]",
+          "expected": null,
+          "actual": null,
+          "failure": null,
+          "literalPassed": true,
+          "transportPassed": true,
+          "passed": true,
+          "openCount": 1,
+          "deniedUnexpected": 0,
+          "requests": [
+            {
+              "url": "http://fixture.invalid/api/albums",
+              "method": "GET",
+              "headers": {
+                "x-api-key": "generated-album-key"
+              },
+              "status": 503,
+              "disconnects": 1,
+              "responseReads": 3,
+              "inputReads": 0,
+              "inputCloses": 0,
+              "errorReads": 1,
+              "errorCloses": 1,
+              "connectCalls": 0,
+              "inMemoryOnly": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-immich-album-identity-20261105-011043/candidate-debug-1.188.apk",
+      "bytes": 46745942,
+      "sha256": "593eb253751e1ceb2b8fd0b82852832b5bf04a26a09327e365229bb67e934138",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='182' versionName='1.188' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssets": {
+        "fileCount": 23,
+        "files": [
+          {
+            "path": "catalog.json",
+            "bytes": 24043,
+            "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+          },
+          {
+            "path": "diagnostics/source-preview-4k.mp4",
+            "bytes": 25847,
+            "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+          },
+          {
+            "path": "faces/Flip-Regular.otf",
+            "bytes": 3184,
+            "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+          },
+          {
+            "path": "faces/flip.html",
+            "bytes": 29379,
+            "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+          },
+          {
+            "path": "fonts/BebasNeue.ttf",
+            "bytes": 61400,
+            "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+          },
+          {
+            "path": "fonts/OFL.txt",
+            "bytes": 1186,
+            "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+          },
+          {
+            "path": "photoframe_fallback/01_wilderness.jpg",
+            "bytes": 261090,
+            "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+          },
+          {
+            "path": "photoframe_fallback/02_denali.jpg",
+            "bytes": 277842,
+            "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+          },
+          {
+            "path": "photoframe_fallback/03_yosemite.jpg",
+            "bytes": 443801,
+            "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+          },
+          {
+            "path": "remote/control-center.css",
+            "bytes": 24082,
+            "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+          },
+          {
+            "path": "remote/control-center.js",
+            "bytes": 270231,
+            "sha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+          },
+          {
+            "path": "remote/core.mjs",
+            "bytes": 28623,
+            "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+          },
+          {
+            "path": "screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "screensaver/mode-impls.js",
+            "bytes": 71114,
+            "sha256": "641d87ee5a015324aa4fce92a934e17ccebfd8e9b7febbfaddc56a1ea1874251"
+          },
+          {
+            "path": "screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "screensaver/styles.css",
+            "bytes": 15397,
+            "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+          },
+          {
+            "path": "webapp-retention-probe.html",
+            "bytes": 504,
+            "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+          }
+        ]
+      },
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "intentionalSourceAssetChanges": [],
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "path": "/private/tmp/portal-immich-album-identity-20261105-011043/candidate-performance-1.188.apk",
+      "bytes": 25887039,
+      "sha256": "5439645104073d0bc001416e17b1acb926c302c2d57ae51cea9644a37a732a12",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='182' versionName='1.188' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssets": {
+        "fileCount": 23,
+        "files": [
+          {
+            "path": "catalog.json",
+            "bytes": 24043,
+            "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+          },
+          {
+            "path": "diagnostics/source-preview-4k.mp4",
+            "bytes": 25847,
+            "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+          },
+          {
+            "path": "faces/Flip-Regular.otf",
+            "bytes": 3184,
+            "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+          },
+          {
+            "path": "faces/flip.html",
+            "bytes": 29379,
+            "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+          },
+          {
+            "path": "fonts/BebasNeue.ttf",
+            "bytes": 61400,
+            "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+          },
+          {
+            "path": "fonts/OFL.txt",
+            "bytes": 1186,
+            "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+          },
+          {
+            "path": "photoframe_fallback/01_wilderness.jpg",
+            "bytes": 261090,
+            "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+          },
+          {
+            "path": "photoframe_fallback/02_denali.jpg",
+            "bytes": 277842,
+            "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+          },
+          {
+            "path": "photoframe_fallback/03_yosemite.jpg",
+            "bytes": 443801,
+            "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+          },
+          {
+            "path": "remote/control-center.css",
+            "bytes": 24082,
+            "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+          },
+          {
+            "path": "remote/control-center.js",
+            "bytes": 270231,
+            "sha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+          },
+          {
+            "path": "remote/core.mjs",
+            "bytes": 28623,
+            "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+          },
+          {
+            "path": "screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "screensaver/mode-impls.js",
+            "bytes": 71114,
+            "sha256": "641d87ee5a015324aa4fce92a934e17ccebfd8e9b7febbfaddc56a1ea1874251"
+          },
+          {
+            "path": "screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "screensaver/styles.css",
+            "bytes": 15397,
+            "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+          },
+          {
+            "path": "webapp-retention-probe.html",
+            "bytes": 504,
+            "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+          }
+        ]
+      },
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "intentionalSourceAssetChanges": [],
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    },
+    "jvm": {
+      "tests": 4634,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 482
+    },
+    "gradleExit": 0
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 96.6819482909923
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25887039,
+      "sha256": "5439645104073d0bc001416e17b1acb926c302c2d57ae51cea9644a37a732a12",
+      "app": {
+        "versionCode": 182,
+        "versionName": "1.188"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25887039,
+        "sha256": "5439645104073d0bc001416e17b1acb926c302c2d57ae51cea9644a37a732a12",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 182,
+          "versionName": "1.188"
+        }
+      }
+    },
+    "frameReturn": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1614,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1712,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "ownerRegistriesUnchanged": true,
+    "copiedRegistriesRetired": true,
+    "nativeRed": {
+      "ownedPathAbsent": true,
+      "processTerminal": true
+    },
+    "nativeGreen": {
+      "ownedPathAbsent": true,
+      "processTerminal": true
+    }
+  },
+  "limits": [
+    "Generated JVM loopback responses exercise public listAlbums; no live Immich compatibility.",
+    "Actual debug APK/API29 public listAlbums with process-only in-memory URL interception. No Context, saved source, credential/provider operation, mounted picker, native HTTP transport, optimized parser, API28 or Living native behavior acceptance.",
+    "Album name/count coercion, surrounding ID whitespace, URL-path rules, connection UI and media parser remain unchanged. No new source selected.",
+    "No phone/account/authentication/push/publication. Public release remains1.83; held clocks remain."
+  ]
+}
