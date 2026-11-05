@@ -63,6 +63,12 @@ A human priority choice is pending between a new bounded optimized-photo
 controller-harness slot and SMB caching; this request grants neither scope.
 Prior photo fixture and all other held clocks remain unchanged.
 
+The [07:56 UTC current-frame observation](portal-current-frame-observation-2026-11-05.md)
+shows a clock on black, without photos, on Family. Living's targeted ADB read
+was unavailable, so no Living visual result exists. All43/30 preference files
+and saved maps remained exact. This read-only check provides no photo-layout,
+new fixture, complete APK or universal health acceptance.
+
 The [previous crypto receipt](portal-crypto-change-validity-2026-11-05.md)
 retains its four methods/eight vectors, 06:56:14–07:26:14 UTC clock and
 native/provider limits. Earlier options/input-policy discovery remains closed;
