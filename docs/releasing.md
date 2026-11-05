@@ -51,6 +51,37 @@ hardware acceptance. After output creation, a failed check writes
 No source bump, authentication, Git fetch, tag, push, publication or device install
 is performed. The publishing workflow below remains a separate explicit operation.
 
+### Inspect an already-built APK
+
+When the required test/build gates have already run, inspect their frozen APK
+without starting another build:
+
+```sh
+python3 -B scripts/portal_release_readiness.py \
+  --inspect-apk /path/to/frozen-candidate.apk \
+  --baseline-apk /path/to/previous-accepted.apk \
+  --variant performance \
+  --local-preview \
+  --sdk "$ANDROID_HOME" \
+  --output app/build/artifact-inspection/my-candidate
+```
+
+This mode reuses the package, version, signing-certificate and source-asset checks.
+Both APKs are hashed before the SDK tools run and again afterward; changed APKs
+or source inputs fail inspection. The supplied files are read in place, with
+their absolute path, size and SHA256 recorded. No APK copy is created.
+
+Python 3.12+, macOS/Linux and SDK `aapt`/`apksigner` are required. Node and Gradle
+are not invoked; tests and existing JVM reports are untouched. The same deadline
+and new-output-directory rules apply. `--local-preview` is only for debug or
+performance; omit it to require Gradle and `version.json` to agree. The baseline
+must still have the same package and signing certificates.
+
+Success is `scope: "local-artifact-inspection"` and `status: "checked"`.
+This establishes artifact identity and packaged source assets, without proving
+compiled-code provenance or fresh tests/build readiness. Keep the separate gate
+evidence before promotion. This mode and `--javascript-only` are mutually exclusive.
+
 ### Check JavaScript changes independently
 
 For frontend changes, reuse the same slideshow and bundled-remote gates without

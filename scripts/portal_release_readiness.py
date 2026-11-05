@@ -358,13 +358,68 @@ def execute(args, receipt):
     receipt["artifact"] = dict(candidate, file="candidate.apk", variant=args.variant)
 
 
+def execute_inspection(args, receipt):
+    root = args.repo_root.resolve()
+    environment = dict(os.environ, ANDROID_HOME=str(args.sdk), ANDROID_SDK_ROOT=str(args.sdk))
+    checks = Checks(root, args.output, args.timeout_seconds, receipt, environment)
+    if sys.version_info < (3, 12):
+        raise CheckFailed("Python 3.12 or newer is required.")
+    if os.name != "posix":
+        raise CheckFailed("This checker currently requires macOS/Linux for process-group cleanup.")
+    if not args.baseline_apk.is_file():
+        raise CheckFailed("The mandatory local baseline APK is missing.")
+    if not args.inspect_apk.is_file():
+        raise CheckFailed("The supplied candidate APK is missing.")
+    receipt["versionPolicy"] = "local-preview" if args.local_preview else "release-manifest"
+    if args.local_preview and args.variant == "release":
+        raise CheckFailed("Local preview requires debug or performance; release manifest checks remain mandatory.")
+    top = checks.run("git-root", GIT + ["rev-parse", "--show-toplevel"], capture=True).strip()
+    if Path(top).resolve() != root:
+        raise CheckFailed("--repo-root must be the repository root.")
+    head = checks.run("git-head", GIT + ["rev-parse", "HEAD"], capture=True).strip()
+    dirty = bool(checks.run("git-status", GIT + ["status", "--porcelain"], capture=True).strip())
+    start_source = source_inputs(checks)
+    receipt["source"] = dict(start_source, head=head, dirty=dirty)
+    receipt["version"], receipt["releaseManifestVersion"] = version_metadata(
+        root, local_preview=args.local_preview)
+    start_baseline, start_candidate = digest(args.baseline_apk), digest(args.inspect_apk)
+    tools = build_tools(args.sdk)
+    receipt["tools"] = {"python": sys.version.split()[0], "androidBuildTools": tools.name}
+    baseline = apk_identity(checks, tools, args.baseline_apk, "baseline")
+    if baseline["package"] != PACKAGES[args.variant]:
+        raise CheckFailed("Baseline package differs from the selected variant.")
+    receipt["baseline"] = baseline
+    candidate = apk_identity(checks, tools, args.inspect_apk, "candidate")
+    if candidate["package"] != PACKAGES[args.variant]:
+        raise CheckFailed("Candidate APK package differs from the selected variant.")
+    for key, value in receipt["version"].items():
+        if candidate[key] != value:
+            raise CheckFailed(f"Candidate APK {key} is stale or inconsistent.")
+    if candidate["signerSha256"] != baseline["signerSha256"]:
+        raise CheckFailed("Candidate signing certificates differ from the local baseline.")
+    receipt["sourceAssets"] = source_assets(root, args.inspect_apk)
+    if baseline["sha256"] != start_baseline or digest(args.baseline_apk) != start_baseline:
+        raise CheckFailed("The baseline APK changed during inspection.")
+    if candidate["sha256"] != start_candidate or digest(args.inspect_apk) != start_candidate:
+        raise CheckFailed("The candidate APK changed during inspection.")
+    if source_inputs(checks) != start_source:
+        raise CheckFailed("Source/build inputs changed during checks; rerun against a stable tree.")
+    if time.monotonic() >= checks.deadline:
+        raise CheckFailed("The local check deadline expired before inspection was established.")
+    receipt["artifact"] = dict(candidate, file=str(args.inspect_apk), variant=args.variant)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parent.parent)
     parser.add_argument("--baseline-apk", type=Path)
-    parser.add_argument("--javascript-only", action="store_true",
-                        help="Run both JavaScript gates with a private receipt; no Android build, "
-                             "SDK or baseline APK is needed. Success means checked, not APK ready.")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--javascript-only", action="store_true",
+                      help="Run both JavaScript gates with a private receipt; no Android build, "
+                           "SDK or baseline APK is needed. Success means checked, not APK ready.")
+    mode.add_argument("--inspect-apk", type=Path,
+                      help="Inspect a supplied APK's identity, signature and source assets without "
+                           "building or running tests. Success means checked, not APK ready.")
     parser.add_argument("--output", type=Path, required=True,
                         help="New directory for private logs, candidate and receipt; never overwritten.")
     parser.add_argument("--variant", choices=PACKAGES, default="release")
@@ -376,12 +431,14 @@ def main():
     parser.add_argument("--timeout-seconds", type=float, default=900)
     args = parser.parse_args()
     if not args.javascript_only and args.baseline_apk is None:
-        parser.error("--baseline-apk is required for APK readiness.")
+        parser.error("--baseline-apk is required for APK readiness or inspection.")
     if not 0 < args.timeout_seconds <= 1800:
         parser.error("--timeout-seconds must be greater than zero and at most 1800.")
     args.output, args.sdk = args.output.resolve(), args.sdk.resolve()
     if args.baseline_apk is not None:
         args.baseline_apk = args.baseline_apk.resolve()
+    if args.inspect_apk is not None:
+        args.inspect_apk = args.inspect_apk.resolve()
     root = args.repo_root.resolve()
     if args.output.is_relative_to(root) and not args.output.is_relative_to(root / "app/build"):
         print("Place output outside the repository or under app/build; source directories are not modified.",
@@ -394,12 +451,16 @@ def main():
         return 2
     started = time.monotonic()
     receipt = {"schemaVersion": 1, "scope": ("local-javascript-checks" if args.javascript_only
+                                          else "local-artifact-inspection" if args.inspect_apk
                                           else "local-artifact-readiness"), "status": "failed",
                "published": False, "deployed": False, "checks": [],
                "startedAt": datetime.now(timezone.utc).isoformat()}
     try:
         if args.javascript_only:
             execute_javascript(args, receipt)
+            receipt["status"] = "checked"
+        elif args.inspect_apk:
+            execute_inspection(args, receipt)
             receipt["status"] = "checked"
         else:
             execute(args, receipt)

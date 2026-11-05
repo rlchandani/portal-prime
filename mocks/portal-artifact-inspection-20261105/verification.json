@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "scope": "Host-only supplied-APK inspection CLI",
+  "status": "verified",
+  "capturedAt": "2026-11-05T05:06:29.778643+00:00",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T04:54:52Z",
+    "discoveryCapUtc": "2026-11-05T04:59:52Z",
+    "targetUtc": "2026-11-05T05:09:52Z",
+    "hardLimitUtc": "2026-11-05T05:24:52Z",
+    "baseHead": "8bf6e0acbbeea483742da5782c7f67728d74c4ff",
+    "scope": "Broader reliability and delivery-bottleneck discovery outside closed import and earlier held scopes"
+  },
+  "discovery": "Missing entry point confirmed04:56:53 before cap. Frozen CLI baseline05:02:31 after discovery cap; original clock retained. No vulnerability or performance regression inferred from absent flag.",
+  "tests": {
+    "frozenMethods": 14,
+    "baselineMissingModeFailures": 12,
+    "baselineParserControls": 2,
+    "initialOracleCorrection": "Expected canonical macOS /private/var path; rerun frozen final tests against byte-exact original CLI.",
+    "finalPythonTests": 345,
+    "finalPythonSeconds": 34.43499233300099,
+    "finalPythonExit": 0
+  },
+  "realSdk": {
+    "capturedAt": "2026-11-05T05:05:15.708197+00:00",
+    "results": [
+      {
+        "variant": "debug",
+        "exit": 0,
+        "seconds": 1.0993010419915663,
+        "receiptSha256": "cc8e6ed855fa67d8a8cda5320bf586b53c079e8fb311200573cc0a90154a714c",
+        "artifact": {
+          "package": "com.immortal.launcher.debug",
+          "versionCode": 195,
+          "versionName": "1.201",
+          "signerSha256": [
+            "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+          ],
+          "bytes": 46746050,
+          "sha256": "37727efb23eabac92cc00dd7243bf7f25b45b63eb0e1b38a109c561aaaf2c117",
+          "variant": "debug"
+        },
+        "sourceAssets": 23,
+        "checkNames": [
+          "git-root",
+          "git-head",
+          "git-status",
+          "source-files",
+          "baseline-metadata",
+          "baseline-signature",
+          "candidate-metadata",
+          "candidate-signature",
+          "source-files"
+        ]
+      },
+      {
+        "variant": "performance",
+        "exit": 0,
+        "seconds": 0.6692918750050012,
+        "receiptSha256": "7db004aed25e0f1f5e2bcfaacb953655ac9c925b23bc048fb188911b30e1832c",
+        "artifact": {
+          "package": "com.immortal.launcher.debug",
+          "versionCode": 195,
+          "versionName": "1.201",
+          "signerSha256": [
+            "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+          ],
+          "bytes": 25903503,
+          "sha256": "227a20917c4d26ad9439958661d6df8c044dd80845ee04d9c2793593166b8ba4",
+          "variant": "performance"
+        },
+        "sourceAssets": 23,
+        "checkNames": [
+          "git-root",
+          "git-head",
+          "git-status",
+          "source-files",
+          "baseline-metadata",
+          "baseline-signature",
+          "candidate-metadata",
+          "candidate-signature",
+          "source-files"
+        ]
+      }
+    ],
+    "watchedFiles": 497,
+    "jvmReports": 492,
+    "allWatchedBytesAndMtimesPreserved": true,
+    "helperSha256": "7b683b8e37108a522b091f23e48f700b660d9335d2946485cc4f34758d15b09c"
+  },
+  "sourceReview": {
+    "accepted": true,
+    "reviewSha256": "c4071e73729b728d6af38642b5907b17bad9961b64ea65342c0b34cb98aaed9f",
+    "rootRehashedBindings": 21,
+    "sharedAndDefaultFunctionsExact": true,
+    "limits": "Independent source review includes pre-ordering runtime logs. Root reran full Python and actual SDK checks against final ordering."
+  },
+  "sourceBindings": [
+    {
+      "path": "scripts/portal_release_readiness.py",
+      "bytes": 25936,
+      "sha256": "7b683b8e37108a522b091f23e48f700b660d9335d2946485cc4f34758d15b09c"
+    },
+    {
+      "path": "scripts/test_portal_artifact_inspection.py",
+      "bytes": 7052,
+      "sha256": "ad7a62eada6bcf2ea76687c1bc0c1231012688becc5b1ee0a3454cada5155a29"
+    },
+    {
+      "path": "docs/releasing.md",
+      "bytes": 10674,
+      "sha256": "01d849c2eb6033a57bfc2fba12a5dd0b6a45d87e458d0011a0811d27cc7a0c2d"
+    }
+  ],
+  "evidenceHashes": {
+    "final-baseline.log": "29a0e68cd63ecbbe1a55fae29d44404c353954eeca2aea2341619d3abd0b0e97",
+    "python-full-final.log": "011761fff5e476a5eece6153a3e9e7655c2c531ce4e49cade08dcfd275843ebd",
+    "real-inspection-final-proof.json": "fd176dae485461b25e170a8924215bc8790f707711657167d9c9091d96eaa8f3",
+    "final-test-freeze.json": "f8ee0439d4939bb278672af18c7b9d4b2461334640bca3b99fb2c5c926f3b43a"
+  },
+  "limits": [
+    "Success is checked/local-artifact-inspection, never readiness or fresh build/test evidence.",
+    "Inspection validates supplied signed APK identity and current packaged source assets, not compiled-code provenance.",
+    "No Android build, installation, device/provider/account/media/phone operation or GitHub authentication/push/publication. Rooms retain previously verified1.201/code195; no fresh room observation.",
+    "Supplied artifacts remain caller-owned; rehash before later use. Old held scopes and original clocks remain."
+  ]
+}

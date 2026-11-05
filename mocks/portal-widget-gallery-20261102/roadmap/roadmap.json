@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T04:54:07.617382+00:00",
-  "updatedLabel": "5 November2026 \u00b7 photo import count wording delivered in1.201",
+  "updatedAt": "2026-11-05T05:06:29.778643+00:00",
+  "updatedLabel": "5 November2026 \u00b7 supplied APK inspection verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,48 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+{
+    "id": "supplied-apk-inspection",
+    "title": "Inspect frozen APKs without another build",
+    "summary": "Reuse identity/signature/assets checks through an explicit supplied-artifact mode.",
+    "status": "verified",
+    "kind": "Local delivery tooling",
+    "platforms": [
+        "host"
+    ],
+    "owner": "Implementation / independent source review / root verification",
+    "deployment": "Local tool committed; no app or device change.",
+    "verification": "345Python pass;14frozen CLI methods;real SDK debug/optimized checks;497files preserved.",
+    "acceptance": [
+        "Inspect supplied APK with package/version/signature/assets and stability checks.",
+        "Keep checked separate from fresh build/test readiness.",
+        "Do not invoke Gradle/Node/tests, move existing JVM reports or rewrite either input."
+    ],
+    "evidence": [
+        {
+            "text": "Command and scope.",
+            "source": "docs/portal-artifact-inspection-2026-11-05.md"
+        },
+        {
+            "text": "Verified machine receipt.",
+            "source": "mocks/portal-artifact-inspection-20261105/verification.json"
+        }
+    ],
+    "limits": [
+        "Success is checked/local-artifact-inspection, never readiness or fresh build/test evidence.",
+        "Inspection validates supplied signed APK identity and current packaged source assets, not compiled-code provenance.",
+        "No Android build, installation, device/provider/account/media/phone operation or GitHub authentication/push/publication. Rooms retain previously verified1.201/code195; no fresh room observation.",
+        "Supplied artifacts remain caller-owned; rehash before later use. Old held scopes and original clocks remain."
+    ],
+    "next": "Continue distinct small product improvements; retain held clocks.",
+    "issueClock": {
+        "startedAt": "2026-11-05T04:54:52Z",
+        "targetAt": "2026-11-05T05:09:52Z",
+        "deadline": "2026-11-05T05:24:52Z",
+        "discoveryCap": "2026-11-05T04:59:52Z",
+        "scope": "Supplied artifact inspection entry point; default readiness and previous held scopes unchanged."
+    }
+},
     {
         "id": "photo-import-count-wording",
         "title": "Photo import: accurate singular and plural labels",
