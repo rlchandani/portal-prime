@@ -4078,7 +4078,8 @@ function chooseUpload() {
     )));
     const files = Array.from(input.files || []);
     const pages = Math.max(1,Math.ceil(files.length/8)); filePage = Math.min(filePage,pages-1);
-    summary.textContent = `${files.length} photos × ${selected.length} Portals = ${files.length*selected.length} copies`;
+    const copies = files.length * selected.length;
+    summary.textContent = `${files.length} ${files.length===1?'photo':'photos'} × ${selected.length} ${selected.length===1?'Portal':'Portals'} = ${copies} ${copies===1?'copy':'copies'}`;
     preview.replaceChildren(...files.slice(filePage*8,filePage*8+8).map((file) => text(`${file.name} · ${Math.ceil(file.size/1024)} KB`)),
       ...(files.length > 8 ? [actions(
         button('Previous files',()=>{filePage--;update();},{disabled:filePage===0}),

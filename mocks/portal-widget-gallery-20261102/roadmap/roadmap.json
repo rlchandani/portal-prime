@@ -1,18 +1,66 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T04:44:29.172690+00:00",
-  "updatedLabel": "5 November2026 \u00b7 photo import status feedback delivered in1.200",
+  "updatedAt": "2026-11-05T04:54:07.617382+00:00",
+  "updatedLabel": "5 November2026 \u00b7 photo import count wording delivered in1.201",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.200/code194, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.201/code195, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+        "id": "photo-import-count-wording",
+        "title": "Photo import: accurate singular and plural labels",
+        "summary": "One photo sent to one Portal is now labelled one copy; existing counts and transfer policy stay.",
+        "status": "delivered",
+        "kind": "Remote picker visible copy polish",
+        "platforms": [
+            "portal",
+            "browser"
+        ],
+        "owner": "Remote UI / source review / delivery verification",
+        "deployment": "Exact optimized1.201/code195 fully hashed both rooms, one install each.",
+        "verification": "4730JVM/492suites;775JS records pass;3wording assertions fail→pass;18Chromium leaves pass",
+        "acceptance": [
+            "Use singular photo/Portal/copy exactly for1.",
+            "Keep zero and multiple counts plural and existing multiplication.",
+            "Retain status/validation/transfer behavior.",
+            "Verify packaged-source browser/build/review/delivery/preservation."
+        ],
+        "evidence": [
+            {
+                "text": "Scope and limits.",
+                "source": "docs/portal-photo-import-count-wording-2026-11-05.md"
+            },
+            {
+                "text": "Machine receipt and clock.",
+                "source": "mocks/portal-photo-import-count-wording-20261105/verification.json"
+            }
+        ],
+        "limits": [
+            "Visible picker wording only: singular photo, Portal and copy exactly when each count is1; existing files-times-Portals calculation and selection/admission/transfer/retry/ARIA policies retained.",
+            "Three frozen actual-controller DOM methods fail on wrong visible wording before and pass after. Later multiple/empty states in the third method are candidate assertions, not extra baseline failures. Two existing status methods also pass with only selectors updated.",
+            "Chromium loads actual RemoteHtml and packaged debug controller1.200/1.201 with identical core/CSS and frozen expectations. Five literal selection strings on the same mounted paragraph pass after; the first wording assertion fails before. All17 original controls pass in both. Node reports19 records including parent for18leaves.",
+            "Generated/intercepted browser boundaries only. New wording leaf never sends an upload; original controls intentionally perform intercepted generated POSTs. Actual household media/provider/server transfer, speech, native WebView/phone/API28 visual acceptance remain unverified.",
+            "All23 candidate source assets match checkout. Only remote/control-center.js intentionally differs from1.200;22 source assets and certificate remain. Generated optimization profiles may differ.",
+            "Original04:44:53 start,04:49:53 discovery cap,04:59:53 target,05:14:53 hard limit retained. Frozen DOM baseline04:48:08 precedes cap. Prior ARIA and other closed/held scopes keep their original clocks.",
+            "No phone, household provider/account/media action, GitHub authentication/push or public publication. Public manifest1.83 and whole product goal remain."
+        ],
+        "next": "Continue distinct prioritized product work; retain held clocks.",
+        "issueClock": {
+            "originalStartUtc": "2026-11-05T04:44:53Z",
+            "discoveryCapUtc": "2026-11-05T04:49:53Z",
+            "targetUtc": "2026-11-05T04:59:53Z",
+            "hardLimitUtc": "2026-11-05T05:14:53Z",
+            "baseHead": "454445a81cb262572fc35fec41cddb260f75972b",
+            "scope": "Import-picker copy wording: singular photo, Portal and copy for existing counts; no count/transfer-policy change"
+        }
+    },
     {
         "id": "photo-import-polite-status",
         "title": "Photo import: accessible live feedback",

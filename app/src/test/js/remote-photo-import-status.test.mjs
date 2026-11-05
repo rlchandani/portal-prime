@@ -33,7 +33,7 @@ function chooseFiles(h, names) {
 test('import copy count exposes polite status feedback as selection changes', async () => {
   const h = await picker();
   const summary = h.document.getElementById('sheet-content').querySelectorAll('p')
-    .find(node => /photos × \d+ Portals = \d+ copies/.test(node.textContent));
+    .find(node => /photos? × \d+ Portals? = \d+ cop(?:y|ies)/.test(node.textContent));
   assert.ok(summary, 'The actual picker exposes its computed copy count');
   assert.equal(summary.getAttribute('role'), 'status');
   assert.equal(summary.getAttribute('aria-live'), 'polite');
@@ -49,7 +49,7 @@ test('import folder validation exposes polite feedback and clears when corrected
   await h.input('Destination folder', '/private/Photos');
   const content = h.document.getElementById('sheet-content');
   const hint = content.querySelectorAll('p')
-    .find(node => node.textContent && !/JPEG|Send to|photos ×|first\.png/.test(node.textContent));
+    .find(node => node.textContent === 'Choose a public folder under /sdcard. Private Android folders and hidden paths cannot be used.');
   const start = h.document.body.querySelectorAll('button')
     .find(node => /^Import \d+ photo/.test(node.textContent));
   assert.ok(hint, 'The actual validation message is visible');
