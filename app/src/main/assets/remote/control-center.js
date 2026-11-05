@@ -182,10 +182,10 @@ const text = (value, cls = 'detail') => el('p', { class: cls, text: value });
 const group = (...children) => el('section', { class: 'group' }, ...children);
 const sections = (...children) => el('div', { class: 'sections' }, ...children);
 const actions = (...children) => el('div', { class: 'actions' }, ...children);
-function button(label, onClick, { kind = '', disabled = false, icon = null, ariaLabel = null } = {}) {
+function button(label, onClick, { kind = '', disabled = false, icon = null, ariaLabel = null, focusKey = null } = {}) {
   return el(
     'button',
-    { class: `button ${kind}`, type: 'button', disabled, onClick, 'aria-label': ariaLabel },
+    { class: `button ${kind}`, type: 'button', disabled, onClick, 'aria-label': ariaLabel, 'data-focus': focusKey },
     icon ? glyph(icon) : null,
     label,
   );
@@ -5672,6 +5672,7 @@ function sceneEditor() {
                 }),
                 button('Edit', () => stepDialog(entry, 'scene'), {
                   kind: 'outline', ariaLabel: `Edit step ${index + 1}`,
+                  focusKey: `step-scene-${entry.id}`,
                 }),
                 button(
                   '×',
@@ -5882,6 +5883,8 @@ function stepDialog(existing, mode) {
   let type = existing?.step.type || 'key';
   const state = existing ? copy(existing.step) : { type: 'key', action: 'home' };
   const ticket = session.capture();
+  const draft = mode === 'scene' ? sceneDraft : presetDraft;
+  const focusKey = existing ? `step-${mode}-${existing.id}` : null;
   const editor = el('div');
   const err = text('');
   const types =
@@ -5920,6 +5923,15 @@ function stepDialog(existing, mode) {
       err,
       button('Save step', save, { kind: 'primary' }),
     ),
+    () => queueMicrotask(() => {
+      // Reads can rebuild the opener; return to the same surviving draft step.
+      if (!focusKey || sheet.open || !session.current(ticket) || document.hidden ||
+          connectionState === 'expired' || draft !== (mode === 'scene' ? sceneDraft : presetDraft) ||
+          detail !== (mode === 'scene' ? 'scenes' : 'presets') ||
+          !draft?.steps.some(entry => entry.id === existing.id)) return;
+      [...page.querySelectorAll('[data-focus]')]
+        .find(node => node.dataset.focus === focusKey)?.focus({ preventScroll: true });
+    }),
   );
   if (mode === 'preset' && presetDraft) sheet.dataset.presetEditor = presetDraft.id;
   if (mode === 'scene' && sceneDraft) sheet.dataset.sceneEditor = sceneDraft.id;
@@ -6311,6 +6323,7 @@ function presetsPage() {
               }),
               button('Edit', () => stepDialog(entry, 'preset'), {
                 kind: 'outline', ariaLabel: `Edit step ${index + 1}`,
+                focusKey: `step-preset-${entry.id}`,
               }),
               button(
                 '×',

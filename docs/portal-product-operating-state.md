@@ -14,23 +14,24 @@ This document is a handoff, not whole-product acceptance.
 
 ## Current delivery and boundaries
 
-Both rooms last verified at exact optimized **1.204/code198**, SHA256
-`09c938a52734e91134d17b189e040655ef345468c872af63514e68c3243da0b9`, 25,887,275 bytes.
-[Latest receipt](portal-photo-decode-feedback-2026-11-05.md): browser photo decode
-failures hide broken images and expose the existing retry. Four controller and two
-actual packaged-asset Chrome cases pass, with generated valid PNG recovery.
-All 4,739 JVM/493 suites, debug/optimized/R8/vital and JavaScript gates pass.
-Both rooms serve the exact controller. Final 43/43 Family and 30/30 Living
-preference files, four maps/revisions and scoped Family runtime are preserved.
-An initial WebView cache comparison was unsettled; fresh complete reads matched.
-Current backend thumbnails are validated JPEGs; no new backend corruption defect
-is claimed. Other browsers,
-phones/native screensaver and full visual acceptance remain separate.
-Original 05:48:09–06:18:09 UTC clock remains. These are recorded results,
-not fresh checks from reading this file.
+Both rooms last verified at exact optimized **1.205/code199**, SHA256
+`f9bbf8fb6eedf889c2a43bfa24848b0619c7adc2d25cef48d47a7b773f6b29a5`, 25,887,623 bytes.
+[Latest receipt](portal-step-focus-return-2026-11-05.md): closing an existing
+scene/preset step editor returns keyboard focus after a background page rebuild.
+Four host and six actual packaged-asset Chrome cases pass; stable, retired-page
+and replacement-dialog controls remain. All 4,739 JVM/493 suites,
+debug/optimized/R8/vital and JavaScript gates pass. Both rooms serve the exact
+controller. 43/43 Family and
+30/30 Living preference files remain byte-exact;
+four maps/revisions and scoped Family runtime are preserved. No WebView cache difference
+was observed in this final comparison. Other browsers/Android WebView, phones,
+backend Save/Run and full screensaver acceptance remain separate.
+Original 06:08:51–06:38:51 UTC clock remains. Definitive browser baseline followed
+the discovery cap; setup/race attempts are retained and qualified.
+These are recorded results, not fresh checks from reading this file.
 
 The public manifest remains **1.83**. Local delivery and public publication are
-separate. The roadmap has **210 tasks: 150 delivered, 49 scoped verified,
+separate. The roadmap has **211 tasks: 151 delivered, 49 scoped verified,
 8 parked, 2 awaiting approval, 1 queued**. Documentation maintenance changes no
 task statuses, historical acceptance or platform delivery.
 
@@ -67,7 +68,7 @@ across turns and aliases. Split larger work into independently useful changes.
 When a slice stalls, park it and continue unrelated safe work. Do not manufacture
 bugs or add features merely to increase the task count.
 
-Recent closed units include browser photo decode feedback, step-action naming, Settings choice-label indexing, import status/count
+Recent closed units include step-editor focus return, browser photo decode feedback, step-action naming, Settings choice-label indexing, import status/count
 wording, calendar date/recurrence parsing, photo-source identity/fallback,
 caption date/timezone parsing, and supplied-APK inspection. Historical bounded
 negative findings also remain closed: do not turn an unchanged hypothesis into a

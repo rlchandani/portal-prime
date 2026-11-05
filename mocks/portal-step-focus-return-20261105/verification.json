@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "status": "delivered_and_read_back_in_both_rooms",
+  "scope": "Return keyboard focus to an existing draft step after a remote page rebuild",
+  "recordedUtc": "2026-11-05T06:25:49.235909+00:00",
+  "version": {
+    "code": 199,
+    "name": "1.205"
+  },
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T06:08:51+00:00",
+    "discoveryCapUtc": "2026-11-05T06:13:51+00:00",
+    "targetUtc": "2026-11-05T06:23:51+00:00",
+    "hardLimitUtc": "2026-11-05T06:38:51+00:00"
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 96.84417995800322
+  },
+  "jvm": {
+    "tests": 4739,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 493
+  },
+  "javascript": {
+    "slideshow-js": 404,
+    "remote-js": 786
+  },
+  "regression": {
+    "hostFrozenCases": 4,
+    "hostBaselineFailures": 2,
+    "hostBaselineControls": 2,
+    "hostCandidatePass": 4,
+    "focusedWithPriorControlsPass": 21,
+    "chromeFrozenCases": 6,
+    "chromeBaselineFailures": 2,
+    "chromeBaselineControls": 4,
+    "chromeCandidatePass": 6,
+    "actualClickedOpenerRetirementAndCloseEventObserved": true,
+    "chromePostsOutsidePageErrors": 0,
+    "baselineFinishedUtc": "2026-11-05T06:20:24.023187+00:00",
+    "candidateFinishedUtc": "2026-11-05T06:21:13.703632+00:00",
+    "hostFixtureSha256": "5bae320a843da996dcdbe32403f084a64765ee63dfb96b519c9fc0d81216a85b",
+    "chromeFixtureSha256": "344b721dcddff4e02e4de48dc2c3a2bb2c8f3e5e9c6154789486819695dc17de"
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746646,
+      "sha256": "899ab7427987201cdffcb400d5682f0b9c381aa5d0161a19f0c26c48710d1d79",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetCount": 23,
+      "allAssetDifferences": [
+        "assets/remote/control-center.js"
+      ]
+    },
+    "performance": {
+      "bytes": 25887623,
+      "sha256": "f9bbf8fb6eedf889c2a43bfa24848b0619c7adc2d25cef48d47a7b773f6b29a5",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetCount": 23,
+      "allAssetDifferences": [
+        "assets/remote/control-center.js"
+      ]
+    }
+  },
+  "independentReview": {
+    "sourceAccepted": true,
+    "rootSourceBindings": 42,
+    "rootBrowserBindings": 18,
+    "sourceReviewSha256": "b5a9838af530afc83cd78ee37fcdf5cefe346e1c1efb28628f1e58ca59cb2957",
+    "browserReportSha256": "085da5789aca5c5618f4694a4ed9466495db12d5df3a13e8dab904426d846e0b"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25887623,
+      "sha256": "f9bbf8fb6eedf889c2a43bfa24848b0619c7adc2d25cef48d47a7b773f6b29a5",
+      "app": {
+        "versionCode": 199,
+        "versionName": "1.205"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25887623,
+        "sha256": "f9bbf8fb6eedf889c2a43bfa24848b0619c7adc2d25cef48d47a7b773f6b29a5",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 199,
+          "versionName": "1.205"
+        }
+      }
+    }
+  },
+  "servedController": {
+    "family": {
+      "bytes": 272470,
+      "sha256": "eb8e4fc0618d7cdd19c8e53555bf44800732cc2bc3cba13fbd3ed2add1666833",
+      "matchesPackagedController": true
+    },
+    "living": {
+      "bytes": 272470,
+      "sha256": "eb8e4fc0618d7cdd19c8e53555bf44800732cc2bc3cba13fbd3ed2add1666833",
+      "matchesPackagedController": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1616,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1832,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "registryRetirement": {
+    "copiedRegistryRemoved": true,
+    "ownerRecordsByteIdentical": true
+  },
+  "limits": [
+    "Six generated Chrome cases use exact packaged1.204/1.205 assets. No physical phone, Android WebView, other browser or assistive-technology acceptance.",
+    "Focus return for an existing scene/preset step only; no generic modal, Add-step, backend Save/Run or persistence guarantee.",
+    "Initial hidden-state observation was transient; accepted baseline captures the actual clicked opener and waits the real close event. Setup/race attempts and host cancellation are retained separately, excluded from definitive counts.",
+    "Definitive browser baseline completed after the five-minute discovery cap. Original06:08:51 start,06:23:51 target and06:38:51 hard limit remain unchanged.",
+    "No household provider/account/media/source-selection changes, phone, GitHub authentication/push/publication or earlier clock reset. Full screensaver acceptance remains open."
+  ],
+  "wholeProductGoalComplete": false
+}

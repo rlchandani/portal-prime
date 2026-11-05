@@ -1,18 +1,61 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T05:58:53.738361+00:00",
-  "updatedLabel": "5 November \u00b7 photo preview decode recovery delivered",
+  "updatedAt": "2026-11-05T06:25:49.235909+00:00",
+  "updatedLabel": "5 November \u00b7 step editor focus return delivered",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.204/code198, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.205/code199, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "step-editor-focus-return",
+      "title": "Step editors: return keyboard focus after a background refresh",
+      "summary": "Existing draft steps keep keyboard focus after their dialog closes; exact1.205 in both rooms.",
+      "status": "delivered",
+      "kind": "Browser keyboard usability",
+      "platforms": [
+        "portal",
+        "browser"
+      ],
+      "owner": "Root implementation/delivery; independent source and browser verification",
+      "verification": "4 host cases,6 packaged Chrome cases, required Android/JS gates, both-room APK/controller readbacks",
+      "deployment": "Exact optimized1.205/code199, one install per room.",
+      "acceptance": [
+        "A rebuilt existing scene/preset step regains focus after the real dialog close event.",
+        "Stable, retired-page and replacement-dialog controls preserve their own focus.",
+        "Required gates pass and complete saved configuration is preserved."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery and scope",
+          "source": "docs/portal-step-focus-return-2026-11-05.md"
+        },
+        {
+          "text": "Structured verification",
+          "source": "mocks/portal-step-focus-return-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Six generated Chrome cases use exact packaged1.204/1.205 assets. No physical phone, Android WebView, other browser or assistive-technology acceptance.",
+        "Focus return for an existing scene/preset step only; no generic modal, Add-step, backend Save/Run or persistence guarantee.",
+        "Initial hidden-state observation was transient; accepted baseline captures the actual clicked opener and waits the real close event. Setup/race attempts and host cancellation are retained separately, excluded from definitive counts.",
+        "Definitive browser baseline completed after the five-minute discovery cap. Original06:08:51 start,06:23:51 target and06:38:51 hard limit remain unchanged.",
+        "No household provider/account/media/source-selection changes, phone, GitHub authentication/push/publication or earlier clock reset. Full screensaver acceptance remains open."
+      ],
+      "issueClock": {
+        "originalStartUtc": "2026-11-05T06:08:51+00:00",
+        "discoveryCapUtc": "2026-11-05T06:13:51+00:00",
+        "targetUtc": "2026-11-05T06:23:51+00:00",
+        "hardLimitUtc": "2026-11-05T06:38:51+00:00"
+      },
+      "next": "Continue distinct reported visible work within existing boundaries; retain all earlier clocks."
+    },
     {
       "id": "photo-browser-decode-feedback",
       "title": "Photo previews: recover from browser decoding failures",
