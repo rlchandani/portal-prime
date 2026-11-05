@@ -3839,6 +3839,12 @@ function photoTile(file, ticket) {
       }),
     ),
   );
+  image.addEventListener('error', () => {
+    if (!session.current(ticket) || !tile.isConnected) return;
+    image.hidden = true;
+    hint.hidden = false;
+    hint.textContent = 'Preview unavailable · Tap to retry';
+  });
   const load = () => {
     const key = photoThumbnailKey(file, ticket);
     // Viewing retained metadata is safe while refresh is pending or failed; deletion
@@ -3950,6 +3956,14 @@ function photoPreview(file, ticket) {
   const current = () => photoPreviewState === owner && session.current(ticket) && sheet.open &&
     image.isConnected && tab === 'photos' && !detail && !document.hidden &&
     connectionState !== 'expired';
+  image.addEventListener('error', () => {
+    if (!current()) return;
+    owner.pending = false;
+    image.hidden = true;
+    status.textContent = 'Preview unavailable. Try again.';
+    status.className = 'error';
+    retry.hidden = false;
+  });
   async function load() {
     if (!current()) return;
     owner.pending = true;

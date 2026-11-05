@@ -1,18 +1,60 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T05:44:50.843258+00:00",
-  "updatedLabel": "5 November2026 \u00b7 choice-label Settings search delivered1.202",
+  "updatedAt": "2026-11-05T05:58:53.738361+00:00",
+  "updatedLabel": "5 November \u00b7 photo preview decode recovery delivered",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.203/code197, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.204/code198, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "photo-browser-decode-feedback",
+      "title": "Photo previews: recover from browser decoding failures",
+      "summary": "Hide broken images and expose existing preview retry; exact 1.204 in both rooms.",
+      "status": "delivered",
+      "verification": "4 controller cases; 2 packaged Chromium cases; required Android/JS gates; both-room APK and served-controller readbacks",
+      "kind": "Browser photo UX",
+      "platforms": [
+        "portal",
+        "browser"
+      ],
+      "owner": "Root implementation/delivery; independent source and browser verification",
+      "deployment": "Exact optimized 1.204/code198, one install per room.",
+      "acceptance": [
+        "Decode failure shows recovery feedback in the gallery and preview dialog.",
+        "Existing retry decodes a generated valid PNG; retired view events are ignored.",
+        "Required gates pass; saved configuration and runtime are preserved."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery and scope",
+          "source": "docs/portal-photo-decode-feedback-2026-11-05.md"
+        },
+        {
+          "text": "Structured verification",
+          "source": "mocks/portal-photo-decode-feedback-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Client decoding feedback tested with generated HTTP 200 image/png failures; the current backend already validates and encodes thumbnails. No new backend corruption defect is claimed.",
+        "Two unchanged Chrome cases use exact packaged assets at 402×874. Other browser engines, physical phones, native screensaver rendering and full visual acceptance remain separate.",
+        "Gallery retry opens the existing modal; clearing the retained gallery tile without rerender is not asserted. HTTP requests, caching, source selection and delete admission remain unchanged.",
+        "No household media/provider/account/source-selection, phone, GitHub authentication/push/publication or earlier clock reset."
+      ],
+      "next": "Continue a distinct useful small unit; full screensaver acceptance and all held clocks remain separate.",
+      "issueClock": {
+        "originalStartUtc": "2026-11-05T05:48:09Z",
+        "discoveryCapUtc": "2026-11-05T05:53:09Z",
+        "targetUtc": "2026-11-05T06:03:09Z",
+        "hardLimitUtc": "2026-11-05T06:18:09Z"
+      }
+    },
     {
       "id": "browser-step-action-labels",
       "title": "Scene and preset steps: identify every action",

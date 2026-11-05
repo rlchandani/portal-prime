@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "status": "delivered_and_read_back_in_both_rooms",
+  "scope": "Recover browser photo previews after an image decode failure",
+  "recordedUtc": "2026-11-05T05:58:53.738361+00:00",
+  "version": {
+    "code": 198,
+    "name": "1.204"
+  },
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T05:48:09Z",
+    "discoveryCapUtc": "2026-11-05T05:53:09Z",
+    "targetUtc": "2026-11-05T06:03:09Z",
+    "hardLimitUtc": "2026-11-05T06:18:09Z"
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 99.95759545901092
+  },
+  "jvm": {
+    "tests": 4739,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 493
+  },
+  "javascript": {
+    "slideshow-js": {
+      "tests": 404,
+      "pass": 404,
+      "fail": 0,
+      "skipped": 0
+    },
+    "remote-js": {
+      "tests": 782,
+      "pass": 782,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "regression": {
+    "hostFrozenCases": 4,
+    "hostBaselineFailures": 2,
+    "hostBaselineControls": 2,
+    "hostCandidatePass": 4,
+    "chromeFrozenCases": 2,
+    "chromeBaselineFailures": 2,
+    "chromeCandidatePass": 2,
+    "actualBadDecodeObserved": true,
+    "validRecoveryPngWidth": 2,
+    "chromePostOutsidePageErrors": 0,
+    "baselineFinishedUtc": "2026-11-05T05:52:23.840278+00:00",
+    "candidateFinishedUtc": "2026-11-05T05:54:16.675963+00:00",
+    "hostFixtureSha256": "814e5d7e626902c810c9fd7ecdc32b83ce7162c46d8a230e9b2ee35fd6951d57",
+    "chromeFixtureSha256": "191601e9cd9c288aa5047764deb713b76014b9e9d2d652631b55f149aadcf1cb"
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746254,
+      "sha256": "d050d039d09755fa1740900a5d34cf6172c345a3564bc9aeb211b61153e78cf2",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetCount": 23,
+      "allAssetDifferences": [
+        "assets/remote/control-center.js"
+      ]
+    },
+    "performance": {
+      "bytes": 25887275,
+      "sha256": "09c938a52734e91134d17b189e040655ef345468c872af63514e68c3243da0b9",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssetCount": 23,
+      "allAssetDifferences": [
+        "assets/remote/control-center.js"
+      ]
+    }
+  },
+  "independentReview": {
+    "sourceAccepted": true,
+    "rootSourceBindings": 17,
+    "rootBrowserBindings": 8,
+    "sourceReviewSha256": "c390c58b64e3cadae04fb63db28e30efc1bc4c4ef202966e3113ce8f1749a743",
+    "browserReportSha256": "0497a40139aecba32eada14f7dd49d10c56fffe6b6e4048b9dd22969aba5188a"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25887275,
+      "sha256": "09c938a52734e91134d17b189e040655ef345468c872af63514e68c3243da0b9",
+      "app": {
+        "versionCode": 198,
+        "versionName": "1.204"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25887275,
+        "sha256": "09c938a52734e91134d17b189e040655ef345468c872af63514e68c3243da0b9",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 198,
+          "versionName": "1.204"
+        }
+      }
+    }
+  },
+  "servedController": {
+    "family": {
+      "bytes": 271610,
+      "sha256": "1280b15c30278212c00e8762757ed7e35df0c7cc1589c50fc04f58736c027ca8",
+      "matchesPackagedController": true
+    },
+    "living": {
+      "bytes": 271610,
+      "sha256": "1280b15c30278212c00e8762757ed7e35df0c7cc1589c50fc04f58736c027ca8",
+      "matchesPackagedController": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1529,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1599,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "registryRetirement": {
+    "copiedRegistryRemoved": true,
+    "ownerRecordsByteIdentical": true
+  },
+  "limits": [
+    "Client decoding feedback tested with generated HTTP 200 image/png failures; the current backend already validates and encodes thumbnails. No new backend corruption defect is claimed.",
+    "Two unchanged Chrome cases use exact packaged assets at 402\u00d7874. Other browser engines, physical phones, native screensaver rendering and full visual acceptance remain separate.",
+    "Gallery retry opens the existing modal; clearing the retained gallery tile without rerender is not asserted. HTTP requests, caching, source selection and delete admission remain unchanged.",
+    "No household media/provider/account/source-selection, phone, GitHub authentication/push/publication or earlier clock reset."
+  ],
+  "wholeProductGoalComplete": false,
+  "postInstallObservation": {
+    "initialPreferenceComparison": "Rejected unsettled comparison: Family WebView cache flags/version bookkeeping changed.",
+    "freshFinalComparison": "43/43 Family and30/30 Living file hashes and sets match baseline; no cache difference remains.",
+    "initialXmlRetained": false,
+    "provenance": "Initial failure/investigation retained in tool output; final complete capture retained privately."
+  }
+}
