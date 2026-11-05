@@ -44,9 +44,9 @@ test('production group photo import browser workflow and sheet geometry', {
   const reports = [];
   if (output) mkdirSync(output, { recursive: true });
   async function fixture(run, { width = 390, theme = 'light', font = 100,
-    hold = false, failureModes = false, missingIdentity = false } = {}) {
+    hold = false, failureModes = false, missingIdentity = false, renewal = false } = {}) {
     const f = { posts: [], pending: [], outside: [], unexpected: [], errors: [], websockets: [],
-      reads: [], geometry: [], screenshots: [], selectedFileCount: 0 };
+      reads: [], geometry: [], screenshots: [], selectedFileCount: 0, renewed: false, pairings: [] };
     const libraries = new Map(targets.map((target, i) => [target.base, [
       { path: `/sdcard/Pictures/generated-${i}-existing.png`, name: `generated-${i}-existing.png`,
         size: 4, modified: 1 },
@@ -76,6 +76,15 @@ test('production group photo import browser workflow and sheet geometry', {
       if (url.pathname === '/remote/manifest.webmanifest')
         return route.fulfill({ contentType: 'application/manifest+json', body: '{}' });
       if (url.pathname === '/remote/app-icon') return route.fulfill({ status: 204 });
+      if (renewal && url.pathname === '/remote/devices' && request.method() === 'GET')
+        return fulfill({ok:true,devices:[]});
+      if (renewal && url.pathname === '/remote/pair' && request.method() === 'POST') {
+        assert.deepEqual(JSON.parse(request.postData()),{pin:'123456'});
+        f.renewed=true;f.pairings.push(target.base);
+        return fulfill({ok:true,token:'generated-renewed-session-a',name:target.name});
+      }
+      if (renewal && url.pathname === '/remote/roster' && request.method() === 'POST')
+        return fulfill({ok:true});
       if (url.pathname === '/remote/companion' && request.method() === 'GET')
         return fulfill({ ok: true, protocolVersion: 1,
           deviceId: missingIdentity ? undefined : `generated-device-${targets.indexOf(target)}`,
@@ -100,6 +109,8 @@ test('production group photo import browser workflow and sheet geometry', {
         const name = url.searchParams.get('name'), folder = url.searchParams.get('path');
         const path = `${folder}/${name}`, bytes = request.postDataBuffer()?.length ?? 0;
         f.posts.push({ base: target.base, name, folder, path, bytes });
+        if (renewal && name==='retry.png' && !f.renewed)
+          return fulfill({ok:false,error:'generated_rejection'},503);
         const finish = async () => {
           if (failureModes && target === targets[0] && name === 'collision.png')
             return fulfill({ ok: false, error: 'file_exists' }, 409);
@@ -109,7 +120,9 @@ test('production group photo import browser workflow and sheet geometry', {
               contentType: 'application/json', body: '{"ok":true,"path":' });
           return fulfill({ ok: true, path, bytes });
         };
-        if (hold && name === 'first.png') { f.pending.push(finish); return; }
+        if ((hold && name === 'first.png') || (renewal && name==='retry.png' && f.renewed)) {
+          f.pending.push(finish);return;
+        }
         return finish();
       }
       f.unexpected.push({ url: request.url(), method: request.method() });
@@ -167,7 +180,7 @@ test('production group photo import browser workflow and sheet geometry', {
     } finally {
       for (const finish of f.pending.splice(0)) await finish().catch(() => {});
       reports.push({ posts: f.posts, reads: f.reads, geometry: f.geometry,
-        screenshots: f.screenshots, errors: f.errors, outside: f.outside,
+        screenshots: f.screenshots, pairings:f.pairings, errors: f.errors, outside: f.outside,
         unexpected: f.unexpected, websockets: f.websockets });
       await context.close();
       assert.deepEqual(f.errors, [], 'production page script errors');
@@ -236,6 +249,32 @@ test('production group photo import browser workflow and sheet geometry', {
           bytes: generatedFile('collision.png').buffer.length });
         assert.match(await page.locator('#upload-status').innerText(), /Completion unconfirmed/);
       }, { failureModes: true });
+    });
+    await t.test('pairing renewal and view switch preserve the active retry beside confirmed history', async()=>{
+      await fixture(async({f,page,selectFiles,start,waitPosts,done})=>{
+        const sheet=await selectFiles(['confirmed.png','retry.png']);
+        await start(sheet);await waitPosts(2);await done();
+        assert.match(await page.locator('#upload-status').innerText(),/1 of 2/);
+        await page.locator('#room-button').click();
+        await page.getByRole('button',{name:'Add a Portal',exact:true}).click();
+        const pairing=page.getByRole('dialog',{name:'Pair a Portal',exact:true});
+        await pairing.getByLabel('Portal address or pairing link',{exact:true}).fill(shellOrigin);
+        await pairing.getByLabel('Six-digit PIN',{exact:true}).fill('123456');
+        await pairing.getByRole('button',{name:'Pair Portal',exact:true}).click();
+        await pairing.waitFor({state:'hidden'});
+        await page.getByRole('button',{name:'Retry definite failures',exact:true}).click();
+        await waitPosts(3);
+        await page.locator('#room-button').click();
+        await page.getByRole('button',{name:'Select',exact:true}).click();
+        await page.locator('button.photo-tile').filter({hasText:'generated-1-existing.png'}).waitFor();
+        for(const finish of f.pending.splice(0))await finish().catch(()=>{});
+        await done();
+        assert.deepEqual(f.pairings,[shellOrigin]);
+        assert.equal(f.posts.filter(post=>post.name==='confirmed.png').length,1);
+        assert.equal(f.posts.filter(post=>post.name==='retry.png').length,2);
+        assert.match(await page.locator('#upload-status').innerText(),/2 of 2/);
+        assert.doesNotMatch(await page.locator('#upload-status').innerText(),/unconfirmed|Not sent/i);
+      },{renewal:true});
     });
     for (const width of [320, 390, 768]) for (const theme of ['light', 'dark'])
       for (const font of [100, 130]) await t.test(

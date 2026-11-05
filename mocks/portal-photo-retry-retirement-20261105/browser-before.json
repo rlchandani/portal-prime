@@ -1,0 +1,2449 @@
+{
+  "startedAtUtc": "2026-11-05T01:28:49.799Z",
+  "endedAtUtc": "2026-11-05T01:28:59.758Z",
+  "scope": "Actual bundled UI; generated payloads and intercepted responses only; no server/device transfer.",
+  "sourceHashes": {
+    "/remote/assets/control-center.js": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66",
+    "/remote/assets/core.mjs": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6",
+    "/remote/assets/control-center.css": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+  },
+  "cases": 17,
+  "reports": [
+    {
+      "posts": [],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "first.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/first.png",
+          "bytes": 40
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "first.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/first.png",
+          "bytes": 40
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "second.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/second.png",
+          "bytes": 41
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "second.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/second.png",
+          "bytes": 41
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "path": "/sdcard",
+          "recursive": false
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "first.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/first.png",
+          "bytes": 40
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "first.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/first.png",
+          "bytes": 40
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "collision.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/collision.png",
+          "bytes": 44
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "collision.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/collision.png",
+          "bytes": 44
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "uncertain.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/uncertain.png",
+          "bytes": 44
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "uncertain.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/uncertain.png",
+          "bytes": 44
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "collision.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/collision.png",
+          "bytes": 44
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "renamed.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/renamed.png",
+          "bytes": 44
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "confirmed.png",
+          "folder": "/sdcard/Pictures/Immortal",
+          "path": "/sdcard/Pictures/Immortal/confirmed.png",
+          "bytes": 44
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "retry.png",
+          "folder": "/sdcard/Pictures/Immortal",
+          "path": "/sdcard/Pictures/Immortal/retry.png",
+          "bytes": 40
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "retry.png",
+          "folder": "/sdcard/Pictures/Immortal",
+          "path": "/sdcard/Pictures/Immortal/retry.png",
+          "bytes": 40
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": false
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "path": "/sdcard",
+          "recursive": false
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [],
+      "screenshots": [],
+      "pairings": [
+        "https://group-photo-fixture.invalid"
+      ],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 320,
+          "theme": "light",
+          "font": 100,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 12,
+            "bottom": 832,
+            "left": 19,
+            "right": 301,
+            "width": 282,
+            "height": 820
+          },
+          "actions": {
+            "top": 755,
+            "bottom": 832,
+            "left": 19,
+            "right": 301,
+            "width": 282,
+            "height": 77
+          },
+          "content": {
+            "top": 92,
+            "bottom": 755,
+            "left": 19,
+            "right": 301,
+            "width": 282,
+            "height": 663
+          }
+        }
+      ],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 320,
+          "theme": "light",
+          "font": 130,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 12,
+            "bottom": 832,
+            "left": 23.796875,
+            "right": 296.1875,
+            "width": 272.390625,
+            "height": 820
+          },
+          "actions": {
+            "top": 738,
+            "bottom": 832,
+            "left": 23.796875,
+            "right": 296.1875,
+            "width": 272.390625,
+            "height": 94
+          },
+          "content": {
+            "top": 92,
+            "bottom": 738,
+            "left": 23.796875,
+            "right": 296.1875,
+            "width": 272.390625,
+            "height": 646
+          }
+        }
+      ],
+      "screenshots": [
+        "/private/tmp/portal-photo-retry-retirement-20261105-012257/browser-before/group-photo-320-light-130.png"
+      ],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 320,
+          "theme": "dark",
+          "font": 100,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 12,
+            "bottom": 832,
+            "left": 19,
+            "right": 301,
+            "width": 282,
+            "height": 820
+          },
+          "actions": {
+            "top": 755,
+            "bottom": 832,
+            "left": 19,
+            "right": 301,
+            "width": 282,
+            "height": 77
+          },
+          "content": {
+            "top": 92,
+            "bottom": 755,
+            "left": 19,
+            "right": 301,
+            "width": 282,
+            "height": 663
+          }
+        }
+      ],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 320,
+          "theme": "dark",
+          "font": 130,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 12,
+            "bottom": 832,
+            "left": 23.796875,
+            "right": 296.1875,
+            "width": 272.390625,
+            "height": 820
+          },
+          "actions": {
+            "top": 738,
+            "bottom": 832,
+            "left": 23.796875,
+            "right": 296.1875,
+            "width": 272.390625,
+            "height": 94
+          },
+          "content": {
+            "top": 92,
+            "bottom": 738,
+            "left": 23.796875,
+            "right": 296.1875,
+            "width": 272.390625,
+            "height": 646
+          }
+        }
+      ],
+      "screenshots": [
+        "/private/tmp/portal-photo-retry-retirement-20261105-012257/browser-before/group-photo-320-dark-130.png"
+      ],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 390,
+          "theme": "light",
+          "font": 100,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 12,
+            "bottom": 832,
+            "left": 19,
+            "right": 371,
+            "width": 352,
+            "height": 820
+          },
+          "actions": {
+            "top": 755,
+            "bottom": 832,
+            "left": 19,
+            "right": 371,
+            "width": 352,
+            "height": 77
+          },
+          "content": {
+            "top": 92,
+            "bottom": 755,
+            "left": 19,
+            "right": 371,
+            "width": 352,
+            "height": 663
+          }
+        }
+      ],
+      "screenshots": [
+        "/private/tmp/portal-photo-retry-retirement-20261105-012257/browser-before/group-photo-390-light-100.png"
+      ],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 390,
+          "theme": "light",
+          "font": 130,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 12,
+            "bottom": 832,
+            "left": 23.796875,
+            "right": 366.1875,
+            "width": 342.390625,
+            "height": 820
+          },
+          "actions": {
+            "top": 755,
+            "bottom": 832,
+            "left": 23.796875,
+            "right": 366.1875,
+            "width": 342.390625,
+            "height": 77
+          },
+          "content": {
+            "top": 92,
+            "bottom": 755,
+            "left": 23.796875,
+            "right": 366.1875,
+            "width": 342.390625,
+            "height": 663
+          }
+        }
+      ],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 390,
+          "theme": "dark",
+          "font": 100,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 12,
+            "bottom": 832,
+            "left": 19,
+            "right": 371,
+            "width": 352,
+            "height": 820
+          },
+          "actions": {
+            "top": 755,
+            "bottom": 832,
+            "left": 19,
+            "right": 371,
+            "width": 352,
+            "height": 77
+          },
+          "content": {
+            "top": 92,
+            "bottom": 755,
+            "left": 19,
+            "right": 371,
+            "width": 352,
+            "height": 663
+          }
+        }
+      ],
+      "screenshots": [
+        "/private/tmp/portal-photo-retry-retirement-20261105-012257/browser-before/group-photo-390-dark-100.png"
+      ],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 390,
+          "theme": "dark",
+          "font": 130,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 12,
+            "bottom": 832,
+            "left": 23.796875,
+            "right": 366.1875,
+            "width": 342.390625,
+            "height": 820
+          },
+          "actions": {
+            "top": 755,
+            "bottom": 832,
+            "left": 23.796875,
+            "right": 366.1875,
+            "width": 342.390625,
+            "height": 77
+          },
+          "content": {
+            "top": 92,
+            "bottom": 755,
+            "left": 23.796875,
+            "right": 366.1875,
+            "width": 342.390625,
+            "height": 663
+          }
+        }
+      ],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 768,
+          "theme": "light",
+          "font": 100,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 16,
+            "bottom": 828,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 812
+          },
+          "actions": {
+            "top": 751,
+            "bottom": 828,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 77
+          },
+          "content": {
+            "top": 96,
+            "bottom": 751,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 655
+          }
+        }
+      ],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 768,
+          "theme": "light",
+          "font": 130,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 16,
+            "bottom": 828,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 812
+          },
+          "actions": {
+            "top": 751,
+            "bottom": 828,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 77
+          },
+          "content": {
+            "top": 96,
+            "bottom": 751,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 655
+          }
+        }
+      ],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 768,
+          "theme": "dark",
+          "font": 100,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 16,
+            "bottom": 828,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 812
+          },
+          "actions": {
+            "top": 751,
+            "bottom": 828,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 77
+          },
+          "content": {
+            "top": 96,
+            "bottom": 751,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 655
+          }
+        }
+      ],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    },
+    {
+      "posts": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-0.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-0.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-1.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-1.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-2.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-2.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-3.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-3.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-4.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-4.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-5.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-5.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-6.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-6.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/A",
+          "path": "/sdcard/Pictures/A/generated-file-8.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-7.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-7.png",
+          "bytes": 51
+        },
+        {
+          "base": "https://group-photo-peer.invalid",
+          "name": "generated-file-8.png",
+          "folder": "/sdcard/Pictures/B",
+          "path": "/sdcard/Pictures/B/generated-file-8.png",
+          "bytes": 51
+        }
+      ],
+      "reads": [
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        },
+        {
+          "base": "https://group-photo-fixture.invalid",
+          "path": "/sdcard",
+          "recursive": true
+        }
+      ],
+      "geometry": [
+        {
+          "width": 768,
+          "theme": "dark",
+          "font": 130,
+          "height": 844,
+          "overflow": false,
+          "dialog": {
+            "top": 16,
+            "bottom": 828,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 812
+          },
+          "actions": {
+            "top": 751,
+            "bottom": 828,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 77
+          },
+          "content": {
+            "top": 96,
+            "bottom": 751,
+            "left": 114,
+            "right": 654,
+            "width": 540,
+            "height": 655
+          }
+        }
+      ],
+      "screenshots": [],
+      "pairings": [],
+      "errors": [],
+      "outside": [],
+      "unexpected": [],
+      "websockets": []
+    }
+  ]
+}

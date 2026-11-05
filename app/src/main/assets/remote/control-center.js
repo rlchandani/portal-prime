@@ -4000,7 +4000,9 @@ function retireStaleUploads() {
   }
   if (upload?.running) {
     for (const item of upload.items)
-      if (!currentUploadRoom(item.room)) upload.retire(item.room.base);
+      // Terminal results retain historical sessions; only active attempts own retirement.
+      if (['queued','sending'].includes(item.state) && !currentUploadRoom(item.room))
+        upload.retire(item.room.base);
   }
 }
 function chooseUpload() {
