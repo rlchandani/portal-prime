@@ -81,7 +81,7 @@ object CryptoFeed {
                       id = id,
                       symbol = o.optString("symbol").uppercase(),
                       usd = o.optDouble("current_price", 0.0),
-                      change24h = change.takeUnless { it.isNaN() },
+                      change24h = change.takeIf { it.isFinite() },
                       spark = downsample(sparkArr),
                   )
             }

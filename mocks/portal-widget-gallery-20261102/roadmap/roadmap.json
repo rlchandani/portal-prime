@@ -1,18 +1,65 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T06:53:41.304650+00:00",
-  "updatedLabel": "5 November \u00b7 optimized photo harness gap parked",
+  "updatedAt": "2026-11-05T07:11:22.283395+00:00",
+  "updatedLabel": "5 November \u00b7 crypto percentage guard delivered",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.205/code199, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.206/code200, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "crypto-finite-change",
+      "title": "Crypto: hide unusable infinite percentage changes",
+      "summary": "Optional percentage overflow uses the existing unavailable path; exact optimized1.206 verified in both rooms.",
+      "status": "delivered",
+      "kind": "Bounded numeric display correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root implementation/delivery; independent source review",
+      "verification": "4 frozen tests/8 vectors:2 baseline AssertionErrors/2 controls \u21924 pass;4743 JVM/494 suites, debug/optimized/R8/vital and JS gates; full APK readbacks.",
+      "deployment": "Exact optimized1.206/code200 in both rooms; one install each. Living ACK uncertain, reconciled by6 read-only observations.",
+      "acceptance": [
+        "Reject positive/negative infinite optional percentages without discarding a valid quote.",
+        "Preserve finite values including zero, price, label, sparkline and cache publication.",
+        "Preserve43/30 preferences and all four maps/revisions; retain normal frame and existing runtime."
+      ],
+      "evidence": [
+        {
+          "text": "Correction, delivery and limits",
+          "source": "docs/portal-crypto-change-validity-2026-11-05.md"
+        },
+        {
+          "text": "Bound verification",
+          "source": "mocks/portal-crypto-change-validity-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated JVM JSON/parser responses; no live provider or mounted native Crypto widget acceptance",
+        "No optimized parser execution, API28 or Living UI acceptance",
+        "No price, sparkline, missing-price/default, cache-publication or request-cadence policy change",
+        "Captured log markers are scoped observations, not universal health proof",
+        "No phone, household provider/account/source selection, GitHub push or public publication",
+        "All earlier parked issue clocks and acceptance limits remain"
+      ],
+      "next": "Continue a distinct small priority; retain native/provider acceptance and all prior clocks.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-05T06:56:14Z",
+        "selectedAt": "2026-11-05T07:01:10.094259+00:00",
+        "discoveryCap": "2026-11-05T07:01:14Z",
+        "target": "2026-11-05T07:11:14Z",
+        "hardDeadline": "2026-11-05T07:26:14Z",
+        "baseCommit": "377c8b15acea6925e5148b03129b084b46a4e98e",
+        "scope": "Optional crypto percentage finiteness; generated actual-parser acceptance and exact two-room delivery",
+        "notReset": true
+      }
+    },
     {
       "id": "optimized-photo-fixture-abi",
       "title": "Optimized photo fixture compatibility gap",

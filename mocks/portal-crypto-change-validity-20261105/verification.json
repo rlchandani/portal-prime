@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "scope": "Optional crypto percentage finiteness; generated actual-parser acceptance and exact two-room delivery",
+  "version": {
+    "versionCode": 200,
+    "versionName": "1.206"
+  },
+  "baseCommit": "377c8b15acea6925e5148b03129b084b46a4e98e",
+  "issueClock": {
+    "originalClock": {
+      "originalStartUtc": "2026-11-05T06:56:14Z",
+      "discoveryCapUtc": "2026-11-05T07:01:14Z",
+      "targetUtc": "2026-11-05T07:11:14Z",
+      "hardLimitUtc": "2026-11-05T07:26:14Z",
+      "baseCommit": "377c8b15acea6925e5148b03129b084b46a4e98e",
+      "scope": "Select a distinct small reported visible or reliability defect; no reopened held scope"
+    },
+    "candidateSelectedAt": "2026-11-05T07:01:10.094259+00:00",
+    "baselineCompletedUtc": "2026-11-05T07:01:21.064540+00:00",
+    "baselineFollowedDiscoveryCapSeconds": 7.06454,
+    "sourceQualifiedBeforeCap": true,
+    "originalIssueClockRetained": true,
+    "baselineNewMethods": 4,
+    "baselineExpectedAssertionFailures": 2,
+    "baselineControlsPassed": 2
+  },
+  "implementation": "change24h = change.takeIf { it.isFinite() }",
+  "frozenTest": {
+    "path": "app/src/test/java/com/immortal/launcher/CryptoChangeValidityTest.kt",
+    "bytes": 1497,
+    "sha256": "843382aa4aa7eb22703d5a47c0003f738c405d991a1e00062bc36972257d2341",
+    "methods": 4,
+    "parserVectors": 8,
+    "baselineIntendedAssertionFailures": 2,
+    "baselineControlsPassed": 2,
+    "candidatePassed": 4
+  },
+  "independentReview": {
+    "reviewer": "catalog_fallback_review",
+    "scope": "Full CryptoFeed, new frozen4-case test, prior parser/cache fixture and prior receipt; selected Home3780\u20133863 only",
+    "result": "No blockers. Single-expression reversal exactly restores complete baseline.4 methods contain8 actual-parser vectors and preserve quote fields. No independent runtime/build/native acceptance.",
+    "rootRehashedBindings": [
+      {
+        "path": "app/src/main/java/com/immortal/launcher/CryptoFeed.kt",
+        "bytes": 4400,
+        "sha256": "dc6f38be6cd03db1b841792fd7c9208955f1e10cb3982234a54e97c59fb3b9dd"
+      },
+      {
+        "path": "app/src/test/java/com/immortal/launcher/CryptoChangeValidityTest.kt",
+        "bytes": 1497,
+        "sha256": "843382aa4aa7eb22703d5a47c0003f738c405d991a1e00062bc36972257d2341"
+      },
+      {
+        "path": "docs/portal-crypto-cache-publication-2026-11-04.md",
+        "bytes": 5812,
+        "sha256": "efa1a7564d7c5243ece297f711dc666252b74c5a1b3dbb311d6fe13864e03076"
+      },
+      {
+        "path": "mocks/portal-crypto-cache-20261104/evidence/verification.json",
+        "bytes": 6663,
+        "sha256": "b57530de13d597c8d2da087a99957faf904971f55b404f806ade40ad30e7c711"
+      },
+      {
+        "path": "app/src/test/java/com/immortal/launcher/CryptoFeedTest.kt",
+        "bytes": 2855,
+        "sha256": "5dc59391b911409f6e1cd310f28889b364b9889e7f463992d52ca7c6b2ec5732"
+      },
+      {
+        "path": "app/src/test/java/com/immortal/launcher/CryptoCachePublicationTest.kt",
+        "bytes": 9899,
+        "sha256": "7313cc8a1097631cfe0e091e6f446a7ae3975dd206e526769ee3687b23816e31"
+      },
+      {
+        "path": "app/src/main/java/com/immortal/launcher/HomeActivity.kt",
+        "bytes": 230286,
+        "sha256": "18ba024530f6c64881785fe18ec21a819b906459f907dc1557debd0b33cf14eb"
+      }
+    ]
+  },
+  "build": {
+    "startUtc": "2026-11-05T07:04:11.570083+00:00",
+    "endUtc": "2026-11-05T07:05:53.013850+00:00",
+    "elapsedSeconds": 101.44360208298895,
+    "exitCode": 0
+  },
+  "jvm": {
+    "suites": 494,
+    "tests": 4743,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "allReportsFresh": true,
+    "frozenNewTests": 4,
+    "generatedNewVectors": 8,
+    "existingParserTests": 6,
+    "existingCacheChildTests": 10
+  },
+  "javascript": {
+    "slideshow-js": 404,
+    "remote-js": 786
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-product-discovery-20261105-065614/candidate-debug-1.206.apk",
+      "bytes": 46746646,
+      "sha256": "a69391841d2ee55a4f7cca0f25aef691e0b40285c5993bd5e9752e35c740d9b2",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='200' versionName='1.206' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "path": "/private/tmp/portal-product-discovery-20261105-065614/candidate-performance-1.206.apk",
+      "bytes": 25887623,
+      "sha256": "f65239e425badf4bb2f4c42cc72aa954dac3ccbd616ac553491cf599f8ae7b5c",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='200' versionName='1.206' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "mainSourceAssetsUnchangedAgainstBaseline": 23,
+  "generatedAssetDifferences": [
+    "assets/dexopt/baseline.prof"
+  ],
+  "delivery": {
+    "family": {
+      "bytes": 25887623,
+      "sha256": "f65239e425badf4bb2f4c42cc72aa954dac3ccbd616ac553491cf599f8ae7b5c",
+      "app": {
+        "versionCode": 200,
+        "versionName": "1.206"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25887623,
+        "sha256": "f65239e425badf4bb2f4c42cc72aa954dac3ccbd616ac553491cf599f8ae7b5c",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 200,
+          "versionName": "1.206"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1610,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1916,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "frameReturn": {
+    "family": {
+      "ok": true,
+      "result": "legacy_frame_requested",
+      "action": "screensaver"
+    },
+    "living": {
+      "ok": true,
+      "result": "legacy_frame_requested",
+      "action": "screensaver"
+    }
+  },
+  "copiedRegistryRecordsRemoved": 2,
+  "ownerRegistryHashesPreserved": true,
+  "priorPreflightMappingRetention": {
+    "originalPath": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/outputs/mapping/performance/mapping.txt",
+    "retainedPath": "/private/tmp/portal-product-discovery-20261105-064425/retained-performance-1.205-mapping.txt",
+    "bytes": 83387754,
+    "sha256": "a7d2d624ee0623dd8e51b5700688012197c62141a4f41a8d4f54a8aa0c68ee13"
+  },
+  "limits": [
+    "Generated JVM JSON/parser responses; no live provider or mounted native Crypto widget acceptance",
+    "No optimized parser execution, API28 or Living UI acceptance",
+    "No price, sparkline, missing-price/default, cache-publication or request-cadence policy change",
+    "Captured log markers are scoped observations, not universal health proof",
+    "No phone, household provider/account/source selection, GitHub push or public publication",
+    "All earlier parked issue clocks and acceptance limits remain"
+  ]
+}

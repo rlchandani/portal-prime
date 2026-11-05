@@ -14,31 +14,29 @@ This document is a handoff, not whole-product acceptance.
 
 ## Current delivery and boundaries
 
-Both rooms last verified at exact optimized **1.205/code199**, SHA256
-`f9bbf8fb6eedf889c2a43bfa24848b0619c7adc2d25cef48d47a7b773f6b29a5`, 25,887,623 bytes.
-[Latest receipt](portal-step-focus-return-2026-11-05.md): closing an existing
-scene/preset step editor returns keyboard focus after a background page rebuild.
-Four host and six actual packaged-asset Chrome cases pass; stable, retired-page
-and replacement-dialog controls remain. All 4,739 JVM/493 suites,
-debug/optimized/R8/vital and JavaScript gates pass. Both rooms serve the exact
-controller. 43/43 Family and
-30/30 Living preference files remain byte-exact;
-four maps/revisions and scoped Family runtime are preserved. No WebView cache difference
-was observed in this final comparison. Other browsers/Android WebView, phones,
-backend Save/Run and full screensaver acceptance remain separate.
-Original 06:08:51–06:38:51 UTC clock remains. Definitive browser baseline followed
-the discovery cap; setup/race attempts are retained and qualified.
+Both rooms last verified at exact optimized **1.206/code200**, SHA256
+`f65239e425badf4bb2f4c42cc72aa954dac3ccbd616ac553491cf599f8ae7b5c`, 25,887,623 bytes.
+[Latest receipt](portal-crypto-change-validity-2026-11-05.md): optional crypto
+percentages admit finite values, so numeric overflow uses the existing unavailable
+path. Two baseline assertion failures/two controls become four passing frozen
+parser tests, covering eight vectors and preserving quote fields. All 4,743 JVM /
+494 suites, debug/optimized/R8/vital and JavaScript gates pass. Both complete
+installed APKs match. All 43 Family / 30 Living preference files and four saved
+maps/revisions remain byte-exact. Family font/accessibility, original Chromium,
+resumed frame and awake state remain; both normal frame requests pass.
+Generated JVM parser acceptance only; live provider/native Crypto UI, optimized
+parser and API28 acceptance remain separate. Original **06:56:14–07:26:14 UTC**
+clock remains; definitive baseline follows the discovery cap by 7.06 seconds.
 These are recorded results, not fresh checks from reading this file.
-The same-clock local Save step follow-up adds two generated Chrome cases:
-eight expanded cases pass on packaged 1.205; the two new focus checks fail on
-1.204. No app or device change. Its dated receipt retains the original six-case
-evidence and backend/phone acceptance boundaries. The focus issue is now closed;
-move to a distinct priority instead of extending it again.
+
+The [previous step-focus receipt](portal-step-focus-return-2026-11-05.md) retains
+its original six packaged Chrome cases, same-clock two-case Save follow-up,
+backend/phone limits and 06:08:51–06:38:51 UTC clock. That issue is closed.
 
 The public manifest remains **1.83**. Local delivery and public publication are
-separate. The roadmap has **212 tasks: 151 delivered, 49 scoped verified,
-9 parked, 2 awaiting approval, 1 queued**. The added parked item records the
-optimized fixture gap; prior task statuses, acceptance and delivery remain.
+separate. The roadmap has **213 tasks: 152 delivered, 49 scoped verified,
+9 parked, 2 awaiting approval, 1 queued**. Prior task statuses, acceptance and
+issue clocks remain.
 
 - Use `~/.codex/worktrees/portal-music-player/portal-prime`, branch
   `codex/product-audit-20261103-144114`, for this work. The user checkout at
@@ -73,7 +71,7 @@ across turns and aliases. Split larger work into independently useful changes.
 When a slice stalls, park it and continue unrelated safe work. Do not manufacture
 bugs or add features merely to increase the task count.
 
-Recent closed units include step-editor focus return, browser photo decode feedback, step-action naming, Settings choice-label indexing, import status/count
+Recent closed units include crypto percentage validity, step-editor focus return, browser photo decode feedback, step-action naming, Settings choice-label indexing, import status/count
 wording, calendar date/recurrence parsing, photo-source identity/fallback,
 caption date/timezone parsing, and supplied-APK inspection. Historical bounded
 negative findings also remain closed: do not turn an unchanged hypothesis into a
