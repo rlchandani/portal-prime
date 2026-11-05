@@ -232,6 +232,7 @@ object Aurora {
         is JSONArray -> row.optString(1).toDoubleOrNull()
         else -> null
       }
+          ?.takeIf { it.isFinite() && it in 0.0..9.0 }
 
   private fun timeOf(row: Any?): String =
       when (row) {

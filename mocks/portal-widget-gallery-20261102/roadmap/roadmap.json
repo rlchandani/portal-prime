@@ -1,18 +1,63 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T03:43:21.044942+00:00",
-  "updatedLabel": "5 November2026 \u00b7 disabled overnight-start fix delivered in1.196",
+  "updatedAt": "2026-11-05T03:56:12.759902+00:00",
+  "updatedLabel": "5 November2026 \u00b7 aurora reading validity fix delivered in1.197",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.196/code190, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.197/code191, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+        "id": "aurora-kp-validity",
+        "title": "Aurora: reject invalid Kp readings",
+        "summary": "Non-finite and out-of-scale feed values cannot become valid aurora readings.",
+        "status": "delivered",
+        "kind": "Android ambient data parsing correctness",
+        "platforms": [
+            "portal"
+        ],
+        "owner": "Ambient data / independent review / native and delivery verification",
+        "deployment": "Exact optimized1.197/code191 fully hashed both rooms, one install each.",
+        "verification": "4708JVM/490suites;13host7failures→13pass;8actual-debug/API29 getter vectors5mismatches→8pass",
+        "acceptance": [
+            "Reject non-finite and outside0..9 readings in the shared getter.",
+            "Retain valid fractions/endpoints/legacy strings and row field precedence.",
+            "Use actual APK getter with frozen generated framework JSON.",
+            "Verify builds/review/artifacts/delivery/preservation."
+        ],
+        "evidence": [
+            {
+                "text": "Scope and acceptance limits.",
+                "source": "docs/portal-aurora-kp-validity-2026-11-05.md"
+            },
+            {
+                "text": "Machine proof and original clock.",
+                "source": "mocks/portal-aurora-kp-validity-20261105/verification.json"
+            }
+        ],
+        "limits": [
+            "Acceptance executes the actual private Kp row getter with generated JSON. No HTTP, NOAA, current/forecast fetch, cache, location, classification, outlook or UI workflow acceptance.",
+            "Host thirteen methods and native eight literal vectors differ. Host JSON already rejects object Infinity strings; Android framework JSON admits the baseline object Infinity case. Do not equate their baseline counts.",
+            "Native uses the actual debug APK on Family API29. Optimized getter execution, API28 and Living native execution are separate; optimized artifact packaging/signing and exact delivery are verified.",
+            "Only final finite 0..9 admission changes. Getter field precedence/coercion, timestamps, forecast horizon, cached fallback, location and scientific classification remain byte-identical.",
+            "No phone, household provider/account/media operation, GitHub authentication/push or public publication. Public manifest1.83 remains; earlier held scopes/clocks and the whole product goal remain active."
+        ],
+        "next": "Continue independent product work; retain held clocks.",
+        "issueClock": {
+            "originalStartUtc": "2026-11-05T03:45:03Z",
+            "discoveryCapUtc": "2026-11-05T03:50:03Z",
+            "targetUtc": "2026-11-05T04:00:03Z",
+            "hardLimitUtc": "2026-11-05T04:15:03Z",
+            "baseHead": "d76ba1bbc737ca6412ca88e5555bba88386c6fa1",
+            "scope": "Fresh ambient-data or music-status correctness discovery; prior held scopes retained"
+        }
+    },
     {
         "id": "overnight-disabled-start",
         "title": "Sleep: ignore disabled overnight-start deliveries",

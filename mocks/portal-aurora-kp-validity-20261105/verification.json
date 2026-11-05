@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T03:56:12.759902+00:00",
+  "status": "delivered_and_read_back_in_both_rooms",
+  "version": {
+    "code": 191,
+    "name": "1.197"
+  },
+  "baseCommit": "d76ba1bbc737ca6412ca88e5555bba88386c6fa1",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T03:45:03Z",
+    "discoveryCapUtc": "2026-11-05T03:50:03Z",
+    "targetUtc": "2026-11-05T04:00:03Z",
+    "hardLimitUtc": "2026-11-05T04:15:03Z",
+    "baseHead": "d76ba1bbc737ca6412ca88e5555bba88386c6fa1",
+    "scope": "Fresh ambient-data or music-status correctness discovery; prior held scopes retained"
+  },
+  "scope": "Reject non-finite or out-of-range Kp feed readings at the shared row getter, retaining valid finite readings from 0 through 9.",
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/Aurora.kt",
+      "bytes": 9984,
+      "sha256": "bdf20ff9e5b394e07fed92af7f612ed19ff3e3e0995a3ea143070b625cdd4e36"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/AuroraKpValidityTest.kt",
+      "bytes": 2357,
+      "sha256": "0a9a44d4dc7e695122a633983feda28bffbb27ab1fc0a2a6fea45631c081d7dc"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "e7ea05e6853f9643437d09066845d96539dfea1a729a85d56114ca272272dc05"
+    }
+  ],
+  "regression": {
+    "actualPrivateGetter": true,
+    "generatedJsonOnly": true,
+    "hostMethods": 13,
+    "hostBaselineFailures": 7,
+    "hostBaselineControlsPassed": 6,
+    "hostCandidatePassed": 13,
+    "frozenAssertionsUnchanged": true
+  },
+  "native": {
+    "api": 29,
+    "actualDebugGetter": true,
+    "generatedFrameworkJsonOnly": true,
+    "cases": 8,
+    "baselineMismatches": 5,
+    "baselineControlsPassed": 3,
+    "candidatePassed": 8,
+    "classOriginsVerified": true,
+    "sameFrozenJavaJarDriver": true,
+    "fixture": {
+      "javaSha256": "18e48dcd480ccefefa2cef15c99a3fac6d6586764d37ecbced8ceed3f8237113",
+      "probeJarSha256": "23760c0fac4e04f9f636afd5e1bce1e81564688fbb1a32c31898394c2eaea82f",
+      "driverSha256": "724ef5604e7f1e54a47b6cd6dc6185f10de71e2ac986dbbcb1c7365f4c3b097b",
+      "compiledClassCount": 2,
+      "literalCases": 8,
+      "expectedBaselineFailures": 5,
+      "expectedBaselineControls": 3
+    },
+    "urlOpens": 0,
+    "bothOwnedPathsAbsent": true,
+    "bothProcessesTerminal": true
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 116.07820862499648
+  },
+  "jvm": {
+    "tests": 4708,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 490
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746006,
+      "sha256": "d28f4a7befe15fb062d92e053be745951a9128e0ad04eb2bbb3420d3961aa02d",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25903487,
+      "sha256": "cd0182d4ad964f7257ececf1eb3ff30e1e4bb01aa75553be63d6a493722cdb3e",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "2920f2aa24e19edee7a607e3f9bfe16234a21ad63a617eb52477422bbdbe2c0d",
+    "bindingsRootRehashed": 20,
+    "oneGuardAndVersionEditsReverseExactlyToBaseline": true,
+    "scope": "Source and frozen baseline review; root separately checked fresh candidate build/native and promotion evidence"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25903487,
+      "sha256": "cd0182d4ad964f7257ececf1eb3ff30e1e4bb01aa75553be63d6a493722cdb3e",
+      "app": {
+        "versionCode": 191,
+        "versionName": "1.197"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25903487,
+        "sha256": "cd0182d4ad964f7257ececf1eb3ff30e1e4bb01aa75553be63d6a493722cdb3e",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 191,
+          "versionName": "1.197"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1616,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1944,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "ownerRegistryHashesPreserved": true,
+    "nativePathsRemoved": true
+  },
+  "publicVersionManifestUnchanged": true,
+  "limits": [
+    "Acceptance executes the actual private Kp row getter with generated JSON. No HTTP, NOAA, current/forecast fetch, cache, location, classification, outlook or UI workflow acceptance.",
+    "Host thirteen methods and native eight literal vectors differ. Host JSON already rejects object Infinity strings; Android framework JSON admits the baseline object Infinity case. Do not equate their baseline counts.",
+    "Native uses the actual debug APK on Family API29. Optimized getter execution, API28 and Living native execution are separate; optimized artifact packaging/signing and exact delivery are verified.",
+    "Only final finite 0..9 admission changes. Getter field precedence/coercion, timestamps, forecast horizon, cached fallback, location and scientific classification remain byte-identical.",
+    "No phone, household provider/account/media operation, GitHub authentication/push or public publication. Public manifest1.83 remains; earlier held scopes/clocks and the whole product goal remain active."
+  ]
+}
