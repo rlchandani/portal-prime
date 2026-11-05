@@ -41,6 +41,19 @@ NotificationOverlay's earlier **3 November 13:09:28–13:39:28 UTC** held scope 
 be qualified before any retry; no new clock, app release or device acceptance is
 granted by this discovery. Do not repeat the unchanged caption lead.
 
+The **07:35:47–07:40:47 UTC public-issue discovery cap** also closed without an
+admitted app candidate. A live unauthenticated GitHub GET returned 24 open issues
+and 20 pull requests (excluded from the issue count); the cached issue page was
+not used as current evidence. Issue252's grid helper has no active production
+caller and its earlier candidate remains withdrawn. Issue264 describes a1.74
+shutdown race; the current controller guards stopped callbacks, without fresh
+Calls/Dream runtime acceptance. Issue182 describes a fixed-offset Recents button;
+the current centered Apps cluster already has its own visibility setting.
+These source findings do not close upstream issues or establish hardware health.
+No authentication, app/device change or new release occurred. Raw inventory,
+bindings and closure are private:
+`/private/tmp/portal-product-discovery-20261105-073547/`.
+
 The [previous crypto receipt](portal-crypto-change-validity-2026-11-05.md)
 retains its four methods/eight vectors, 06:56:14–07:26:14 UTC clock and
 native/provider limits. Earlier options/input-policy discovery remains closed;
