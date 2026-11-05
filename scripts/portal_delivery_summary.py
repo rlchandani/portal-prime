@@ -54,6 +54,9 @@ def summary(evidence):
     require(all(a <= b for a, b in zip(dates, dates[1:])))
     recorded = datetime.fromisoformat(evidence["recordedUtc"].replace("Z", "+00:00"))
     require(recorded.utcoffset() is not None and recorded >= dates[0])
+    elapsed_minutes = (recorded - dates[0]).total_seconds() / 60
+    target_state = "within" if recorded <= dates[2] else "past"
+    hard_state = "within" if recorded <= dates[3] else "past"
 
     build, jvm = evidence["build"], evidence["jvm"]
     require(type(build["exitCode"]) is int and build["exitCode"] == 0)
@@ -85,6 +88,8 @@ def summary(evidence):
         "Offline summary of supplied evidence; this is not a fresh device check.", "",
         scope, "",
         f"Recorded UTC: {text(evidence['recordedUtc'])}.", "",
+        f"Elapsed at evidence capture: {elapsed_minutes:.2f} minutes.",
+        f"Time limits at evidence capture: target {target_state}; hard limit {hard_state}.", "",
         f"Build exit 0 in {build['seconds']:.2f} seconds. "
         f"JVM: {jvm['tests']} tests across {jvm['suites']} suites; "
         "zero failures, errors or skips. Independent review recorded as accepted.", "",

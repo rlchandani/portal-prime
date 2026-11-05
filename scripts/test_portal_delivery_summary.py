@@ -169,6 +169,43 @@ class DeliverySummaryTests(unittest.TestCase):
             with self.subTest(field=field):
                 self.assert_rejected(evidence)
 
+    def captured_evidence(self):
+        return json.loads(
+            (ROOT / "mocks/portal-daily-content-signed-day-20261105/verification.json").read_text())
+
+    def assert_capture_timing(self, recorded, elapsed, target, hard):
+        evidence = self.captured_evidence()
+        evidence["recordedUtc"] = recorded
+        result, output = self.run_summary(evidence)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        text = output.decode()
+        self.assertIn(f"Elapsed at evidence capture: {elapsed} minutes.", text)
+        self.assertIn(
+            f"Time limits at evidence capture: target {target}; hard limit {hard}.", text)
+        self.assertIn("recorded time is not a completion timestamp", text)
+
+    def test_recorded_delivery_includes_original_elapsed_capture_time(self):
+        self.assert_capture_timing(
+            "2026-11-05T04:24:21.779347Z", "12.18", "within", "within")
+
+    def test_capture_exactly_at_target_remains_within_target(self):
+        self.assert_capture_timing("2026-11-05T04:27:11Z", "15.00", "within", "within")
+
+    def test_capture_past_target_is_not_hidden_by_display_rounding(self):
+        self.assert_capture_timing(
+            "2026-11-05T04:27:11.000001Z", "15.00", "past", "within")
+
+    def test_capture_exactly_at_hard_limit_remains_within_hard_limit(self):
+        self.assert_capture_timing("2026-11-05T04:42:11Z", "30.00", "past", "within")
+
+    def test_capture_past_hard_limit_is_reported_without_rewriting_delivery(self):
+        self.assert_capture_timing(
+            "2026-11-05T04:42:11.000001Z", "30.00", "past", "past")
+
+    def test_equivalent_offset_timestamp_retains_capture_elapsed_and_limits(self):
+        self.assert_capture_timing(
+            "2026-11-04T20:24:21.779347-08:00", "12.18", "within", "within")
+
 
 if __name__ == "__main__":
     unittest.main()

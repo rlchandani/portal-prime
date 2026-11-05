@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T04:30:35.208301+00:00",
+  "status": "locally_verified_host_tooling",
+  "baseCommit": "daa778886ad3b0d75fdd0ac44f100cf8fc6ac156",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T04:25:31Z",
+    "discoveryCapUtc": "2026-11-05T04:30:31Z",
+    "targetUtc": "2026-11-05T04:40:31Z",
+    "hardLimitUtc": "2026-11-05T04:55:31Z",
+    "baseHead": "daa778886ad3b0d75fdd0ac44f100cf8fc6ac156",
+    "scope": "Offline delivery summary: elapsed time and deadline position at evidence capture, without completion/device claims"
+  },
+  "scope": "Report original elapsed time and target/hard-limit position at saved evidence capture.",
+  "sourceBindings": [
+    {
+      "path": "scripts/portal_delivery_summary.py",
+      "bytes": 7036,
+      "sha256": "3dd7acf7573e1a9dcb29a7288987a549b22777d8332679174be15639c8362ddf"
+    },
+    {
+      "path": "scripts/test_portal_delivery_summary.py",
+      "bytes": 10193,
+      "sha256": "975aa92c5e0438a3aa4bbe01c99806581102559c3509aa0a168133304d499c98"
+    }
+  ],
+  "regression": {
+    "actualWholeCli": true,
+    "focusedMethods": 16,
+    "baselineAbsentFeatureFailures": 6,
+    "baselineUnchangedControlsPassed": 10,
+    "candidatePassed": 16,
+    "frozenTest": {
+      "bytes": 10193,
+      "sha256": "975aa92c5e0438a3aa4bbe01c99806581102559c3509aa0a168133304d499c98",
+      "sourceBeforeSha256": "a582410f3fc495c1590f7b6f461dec5b314331b42a75bcfd1f5584653ba2ae72"
+    },
+    "frozenAssertionsUnchanged": true
+  },
+  "python": {
+    "tests": 331,
+    "exitCode": 0,
+    "seconds": 37.29156816701288,
+    "discoveryPattern": "test_portal_*.py",
+    "hostedCiObserved": false
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "65f0e3d7a1c71f54cfe7002a0fff33f52627e6cde8909b536ef30668ea684291",
+    "bindingsRootRehashed": 14
+  },
+  "example": {
+    "sourceReceiptPath": "mocks/portal-daily-content-signed-day-20261105/verification.json",
+    "sourceReceiptBytes": 8058,
+    "sourceReceiptSha256": "b208fefa7ff5be926c854bd2019e4438f9fb4fd8c6bf606a83cdf355ae2aa6bd",
+    "examplePath": "mocks/portal-delivery-capture-timing-20261105/example-1.199.md",
+    "exampleBytes": 2330,
+    "exampleSha256": "7faa8b230454c70500e3c689a474d609e151b4fbbd06436ab74dcec87326db28",
+    "onlyTwoCaptureLinesAddedToOldSummary": true,
+    "elapsedAtEvidenceCaptureMinutes": "12.18",
+    "targetAtEvidenceCapture": "within",
+    "hardLimitAtEvidenceCapture": "within",
+    "completionTimestampInferred": false
+  },
+  "roomDeliveryContext": {
+    "versionCode": 193,
+    "versionName": "1.199",
+    "freshDeviceCheckPerformed": false
+  },
+  "appAndPublicReleaseMetadataUnchanged": true,
+  "limits": [
+    "Pure offline formatting of saved public schema-v1 evidence. Capture duration is not completion, commit, promotion or fresh device-health proof.",
+    "Target and hard-limit comparisons are inclusive and use exact aware timestamps before two-decimal elapsed formatting; a just-past timestamp may display15.00/30.00 while truthfully labelled past.",
+    "The existing validation, escaping, output publication, fixed-error behavior and delivery status remain. Historical summaries/receipts are retained byte-for-byte; example1.199 only adds two capture lines.",
+    "Actual whole CLI exercised by16 focused tests: six absent-feature baseline failures/ten unchanged controls, then16 passes. Full existing Python wildcard reports331 tests passing; hosted CI execution remains unobserved.",
+    "No app source/version/build/install or device/provider/account operation in this tooling unit. Rooms retain prior verified1.199/code193 without a fresh room check; public manifest1.83 and old holds/clocks remain.",
+    "Original04:25:31 start,04:30:31 discovery cap,04:40:31 target and04:55:31 hard limit remain. Whole product goal stays active."
+  ]
+}
