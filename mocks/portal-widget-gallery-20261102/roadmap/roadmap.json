@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T02:27:51.756868+00:00",
+  "updatedAt": "2026-11-05T02:44:56.611385+00:00",
   "updatedLabel": "5 November 2026 \u00b7 Home SMB photo fallback delivered in 1.191",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,55 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.192/code186, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.193/code187, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "catalog-optional-numeric-null",
+      "title": "App Store: accept optional numeric null catalog fields",
+      "summary": "Schema-permitted null values no longer reject usable apps.",
+      "status": "delivered",
+      "kind": "Catalog schema consumer compatibility",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Catalog parser / independent review / JVM-native and delivery verification",
+      "deployment": "Exact optimized1.193/code187 fully hashed both rooms, one install each.",
+      "verification": "4672JVM/486suites;10 frozen JVM and6 actual-debug/API29 parser cases",
+      "state": "JVM4AssertionErrors/6controls→10pass; native3null failures/3controls→6pass, same frozen Java/JAR.",
+      "acceptance": [
+        "Accept null optional numeric fields.",
+        "Preserve ordering/defaults/non-null getters/coercion/rejection.",
+        "Keep loader/install/update and catalog data unchanged.",
+        "Verify JVM/native/review/artifact/delivery/preservation."
+      ],
+      "evidence": [
+        {
+          "text": "Scope, acceptance and limits.",
+          "source": "docs/portal-catalog-null-numeric-2026-11-05.md"
+        },
+        {
+          "text": "Machine evidence and original clock.",
+          "source": "mocks/portal-catalog-null-numeric-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated JVM and actual-debug/API29 parser acceptance only; no mounted Store UI, asynchronous loader/cache/callback, live catalog transport or download/install function proof.",
+        "Native invalid text rejects versionCode first; separate minSdk rejection and numeric-string coercion are JVM controls. Native rows omit description and are not full validator inputs.",
+        "Current26-entry catalogs contain no numeric nulls; this corrects compatibility for already permitted future content.",
+        "No optimized parser/API28/phone/provider/account/GitHub authentication/push/publication claim; prior held clocks and whole active goal remain."
+      ],
+      "next": "Continue independent product work; retain held clocks.",
+      "issueClock": {
+        "originalStartUtc": "2026-11-05T02:29:50Z",
+        "discoveryCapUtc": "2026-11-05T02:34:50Z",
+        "targetUtc": "2026-11-05T02:44:50Z",
+        "hardLimitUtc": "2026-11-05T02:59:50Z",
+        "scope": "Accept explicit JSON null for schema-optional catalog minSdk/versionCode; preserve other getter/coercion/failure behavior"
+      }
+    },
     {
       "id": "photo-face-image-admission",
       "title": "Photo framing: ignore detections outside the image",

@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T02:44:56.611385+00:00",
+  "status": "delivered_and_read_back_in_both_rooms",
+  "version": {
+    "code": 187,
+    "name": "1.193"
+  },
+  "baseCommit": "5c883493284e1e28310ccdef9fe177335b600cd3",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T02:29:50Z",
+    "discoveryCapUtc": "2026-11-05T02:34:50Z",
+    "targetUtc": "2026-11-05T02:44:50Z",
+    "hardLimitUtc": "2026-11-05T02:59:50Z",
+    "baseHead": "5c883493284e1e28310ccdef9fe177335b600cd3",
+    "scope": "Accept explicit JSON null for schema-optional catalog minSdk/versionCode; preserve other getter/coercion/failure behavior"
+  },
+  "scope": "Explicit-null schema-optional minSdk/versionCode map to absent; other getter/coercion/failure behavior stays.",
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/StoreCatalog.kt",
+      "bytes": 13993,
+      "sha256": "1b34191e7d93d4c060f18770a66c5bffd65eabb67e708c402af3d7c94c9a32cb"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/StoreCatalogNullNumericTest.kt",
+      "bytes": 4300,
+      "sha256": "ad3ecb8642025ee0d91ce98257fe66d049b0eb7ea4451148fd09d03fdd5f1480"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "d49c48a90b1d6fb7a8f0164686dba81bffa8f1bdf3680ac8d6c469dc82dc476c"
+    }
+  ],
+  "regression": {
+    "actualProductionParser": true,
+    "generatedJsonOnly": true,
+    "methods": 10,
+    "baselineAssertionFailures": 4,
+    "baselineControlsPassed": 6,
+    "candidatePassed": 10,
+    "frozenAssertionsUnchanged": true,
+    "baselineCases": [
+      {
+        "name": "longVersionCodeKeepsItsPrecision",
+        "failure": null
+      },
+      {
+        "name": "invalidNonNullMinSdkStillRejectsTheCatalog",
+        "failure": null
+      },
+      {
+        "name": "explicitNullMinSdkIsAbsent",
+        "failure": "java.lang.AssertionError"
+      },
+      {
+        "name": "integerNumericFieldsKeepTheirValues",
+        "failure": null
+      },
+      {
+        "name": "numericNullInLaterCategoryKeepsEveryCategory",
+        "failure": "java.lang.AssertionError"
+      },
+      {
+        "name": "bothNullFieldsKeepSurroundingAppsInOrder",
+        "failure": "java.lang.AssertionError"
+      },
+      {
+        "name": "invalidNonNullVersionCodeStillRejectsTheCatalog",
+        "failure": null
+      },
+      {
+        "name": "existingNumericStringGetterCoercionIsPreserved",
+        "failure": null
+      },
+      {
+        "name": "absentNumericFieldsKeepTheirDefaults",
+        "failure": null
+      },
+      {
+        "name": "explicitNullVersionCodeIsAbsent",
+        "failure": "java.lang.AssertionError"
+      }
+    ]
+  },
+  "native": {
+    "api": 29,
+    "actualDebugParser": true,
+    "frameworkJson": true,
+    "cases": 6,
+    "baselineFailures": 3,
+    "baselineControlsPassed": 3,
+    "candidatePassed": 6,
+    "classOriginsVerified": true,
+    "sameFrozenJavaAndJar": true,
+    "fixture": {
+      "javaSha256": "92e2c495acbc402f781b260d41befc2c35f552a5c1354b28417247d03c32a577",
+      "probeJarSha256": "00ed52b33d5334b94ff1337d4c95c3d0805fddf7193d081fd1c96a0f395ff489",
+      "driverSha256": "8147cd5599170f396b1f8f8b08362307d1ad616cb9324e6022c87874f926e176",
+      "compiledClassCount": 2,
+      "literalCases": 6,
+      "expectedBaselineFailures": 3,
+      "expectedBaselineControls": 3
+    },
+    "urlOpens": 0,
+    "bothOwnedPathsAbsent": true,
+    "bothProcessesTerminal": true
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 101.66736933399807
+  },
+  "jvm": {
+    "tests": 4672,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 486
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746006,
+      "sha256": "c3a4e59385fb9729309c41c3b039d9324ce11538414fda2201e0903a328b8d13",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25903483,
+      "sha256": "6361d8a809de567b3fa71f94fa9ccc33c750c5236942eb2651f074261036a6ae",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "4934fc3d9210b89612d4201b20d53e1677e29b863ee5552e5090b81bf3f79100",
+    "all16BindingsRehashedBeforePromotion": true,
+    "twoGuardsAndVersionEditsReverseExactlyToBaseline": true
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25903483,
+      "sha256": "6361d8a809de567b3fa71f94fa9ccc33c750c5236942eb2651f074261036a6ae",
+      "app": {
+        "versionCode": 187,
+        "versionName": "1.193"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25903483,
+        "sha256": "6361d8a809de567b3fa71f94fa9ccc33c750c5236942eb2651f074261036a6ae",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 187,
+          "versionName": "1.193"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1616,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1517,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "catalog": {
+    "copiesUnchangedAndIdentical": true,
+    "entries": 26,
+    "currentNumericNullCount": 0
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "ownerRegistryHashesPreserved": true,
+    "bothNativePathsRemoved": true
+  },
+  "publicVersionManifestUnchanged": true,
+  "limits": [
+    "Generated JVM and actual-debug/API29 parser acceptance only; no mounted Store UI, asynchronous loader/cache/callback, live catalog transport or download/install function proof.",
+    "Native invalid text rejects versionCode first; separate minSdk rejection and numeric-string coercion are JVM controls. Native rows omit description and are not full validator inputs.",
+    "Current26-entry catalogs contain no numeric nulls; this corrects compatibility for already permitted future content.",
+    "No optimized parser/API28/phone/provider/account/GitHub authentication/push/publication claim; prior held clocks and whole active goal remain."
+  ]
+}

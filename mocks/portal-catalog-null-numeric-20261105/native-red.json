@@ -1,0 +1,152 @@
+{
+  "phase": "red",
+  "sourceApkSha256": "e2410667172d4d5f247eb0c77ad17f59cf5ffb3571fc36c338764f7c1e0d743b",
+  "fixture": {
+    "javaSha256": "92e2c495acbc402f781b260d41befc2c35f552a5c1354b28417247d03c32a577",
+    "probeJarSha256": "00ed52b33d5334b94ff1337d4c95c3d0805fddf7193d081fd1c96a0f395ff489",
+    "driverSha256": "8147cd5599170f396b1f8f8b08362307d1ad616cb9324e6022c87874f926e176",
+    "compiledClassCount": 2,
+    "literalCases": 6,
+    "expectedBaselineFailures": 3,
+    "expectedBaselineControls": 3
+  },
+  "result": {
+    "caseCount": 6,
+    "passed": 3,
+    "sourceClassLoaderVerified": true,
+    "actualParseMethod": "parse$app",
+    "api": 29,
+    "deniedUrlOpens": 0,
+    "actualNetworkRequests": 0,
+    "scope": "Actual packaged StoreCatalog.parse with generated strings only; no Context, assets, UI, download or install call",
+    "cases": [
+      {
+        "name": "explicit-null-minSdk",
+        "generatedJson": "{\"schemaVersion\":2,\"categories\":[{\"name\":\"Generated\",\"apps\":[{\"name\":\"NullMin\",\"packageName\":\"generated.nullmin\",\"minSdk\":null}]}]}",
+        "expectedRejected": false,
+        "expected": [
+          [
+            "NullMin",
+            "generated.nullmin",
+            null,
+            null
+          ]
+        ],
+        "actual": null,
+        "failure": "org.json.JSONException",
+        "literalPassed": false,
+        "urlOpens": 0,
+        "passed": false
+      },
+      {
+        "name": "explicit-null-versionCode",
+        "generatedJson": "{\"schemaVersion\":2,\"categories\":[{\"name\":\"Generated\",\"apps\":[{\"name\":\"NullVersion\",\"packageName\":\"generated.nullversion\",\"versionCode\":null}]}]}",
+        "expectedRejected": false,
+        "expected": [
+          [
+            "NullVersion",
+            "generated.nullversion",
+            null,
+            null
+          ]
+        ],
+        "actual": null,
+        "failure": "org.json.JSONException",
+        "literalPassed": false,
+        "urlOpens": 0,
+        "passed": false
+      },
+      {
+        "name": "both-null-valid-neighbors-order",
+        "generatedJson": "{\"schemaVersion\":2,\"categories\":[{\"name\":\"Generated\",\"apps\":[{\"name\":\"Before\",\"packageName\":\"generated.before\",\"minSdk\":24,\"versionCode\":5},{\"name\":\"BothNull\",\"packageName\":\"generated.both\",\"minSdk\":null,\"versionCode\":null},{\"name\":\"After\",\"packageName\":\"generated.after\",\"minSdk\":29,\"versionCode\":9}]}]}",
+        "expectedRejected": false,
+        "expected": [
+          [
+            "Before",
+            "generated.before",
+            24,
+            5
+          ],
+          [
+            "BothNull",
+            "generated.both",
+            null,
+            null
+          ],
+          [
+            "After",
+            "generated.after",
+            29,
+            9
+          ]
+        ],
+        "actual": null,
+        "failure": "org.json.JSONException",
+        "literalPassed": false,
+        "urlOpens": 0,
+        "passed": false
+      },
+      {
+        "name": "absent-numeric-fields",
+        "generatedJson": "{\"schemaVersion\":2,\"categories\":[{\"name\":\"Generated\",\"apps\":[{\"name\":\"Absent\",\"packageName\":\"generated.absent\"}]}]}",
+        "expectedRejected": false,
+        "expected": [
+          [
+            "Absent",
+            "generated.absent",
+            null,
+            null
+          ]
+        ],
+        "actual": [
+          [
+            "Absent",
+            "generated.absent",
+            null,
+            null
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "actual-integer-numeric-values",
+        "generatedJson": "{\"schemaVersion\":2,\"categories\":[{\"name\":\"Generated\",\"apps\":[{\"name\":\"Integer\",\"packageName\":\"generated.integer\",\"minSdk\":29,\"versionCode\":4294967297}]}]}",
+        "expectedRejected": false,
+        "expected": [
+          [
+            "Integer",
+            "generated.integer",
+            29,
+            4294967297
+          ]
+        ],
+        "actual": [
+          [
+            "Integer",
+            "generated.integer",
+            29,
+            4294967297
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "invalid-non-null-numeric-text-rejected",
+        "generatedJson": "{\"schemaVersion\":2,\"categories\":[{\"name\":\"Generated\",\"apps\":[{\"name\":\"InvalidText\",\"packageName\":\"generated.invalid\",\"minSdk\":\"twenty-nine\",\"versionCode\":\"latest\"}]}]}",
+        "expectedRejected": true,
+        "expected": null,
+        "actual": null,
+        "failure": "org.json.JSONException",
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      }
+    ]
+  }
+}
