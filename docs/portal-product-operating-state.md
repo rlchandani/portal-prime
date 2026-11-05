@@ -30,6 +30,17 @@ Android/optimized caller and API28 acceptance remain separate. Original
 cap, definitive baseline finished 70.15 seconds after it.
 These are recorded results, not fresh checks from reading this file.
 
+The **07:27:24–07:32:24 UTC discovery cap** closed without an admitted app
+candidate. Selected caption references/line limits yielded no distinct reachable
+defect; pixel bounds remain unverified. A notification-image cleanup hypothesis
+has no definitive baseline: its URL-constructor mock intercepted Gradle resource
+loading and the executor failed before assertions. The experimental test was
+removed and failed evidence retained privately in
+`/private/tmp/portal-product-discovery-20261105-072724/`.
+NotificationOverlay's earlier **3 November 13:09:28–13:39:28 UTC** held scope must
+be qualified before any retry; no new clock, app release or device acceptance is
+granted by this discovery. Do not repeat the unchanged caption lead.
+
 The [previous crypto receipt](portal-crypto-change-validity-2026-11-05.md)
 retains its four methods/eight vectors, 06:56:14–07:26:14 UTC clock and
 native/provider limits. Earlier options/input-policy discovery remains closed;
