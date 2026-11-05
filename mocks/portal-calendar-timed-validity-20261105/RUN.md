@@ -1,0 +1,12 @@
+# Generated CalendarFeed timed-date validation probe (source only)
+
+Existing baseline /private/tmp/portal-icloud-null-checksum-20261105-030214/candidate-debug-1.194.apk
+Bytes 46746002 SHA256 5cf2c0f2987de6b10fca678e618fdaf4f399b31fc8f844c9826c4d863f7630ab; supplied expected binding match: True.
+
+Root reuses established offline app_process/DexClassLoader native runner. Compile CalendarTimedValidityProbe.java against Android jar with javac -source8 -target8; D8 ALL generated classes --lib android.jar --min-api29 into owned probe.jar. Root freezes source/JAR before baseline; exact same source/JAR/inputs/literal expected epochs for candidate, APK alone differs. Main: CalendarTimedValidityProbe EXACT_OWNED_APK OWNED_DEX_DIRECTORY. Root owns isolated process invocation and exact scratch-path cleanup. No new runner, compiler/build/device/runtime execution by author.
+
+Verify actual APK CalendarFeed.INSTANCE and each returned Event class origin. Discover exactly one actual parse/parse$module method with String,long,int parameters and List return, invoke with generated ICS, hardcoded now and45-day horizon, read actual Event getStartMillis/getEndMillis. No copied date/recurrence helper. Epoch literals were converted during source preparation from named valid UTC dates, not derived by production parser. Fresh process sets TimeZone UTC and Locale.US only within try/finally and restores original process values, no Android/device settings write. Nondelegating URL factory denies all opens; expected0. Factory/signature/origin mismatch or unsupported setup is not product RED.
+
+Eight immutable cases: Feb30 timed start rejected; hour24 rejected; timed trailing junk rejected; malformed Feb30 EXDATE ignored so DAILY COUNT3 yields Mar01/02/03 09Z; malformed DTEND ignored so Feb28 09Z has equal start/end; valid UTC control; America/New_York spring DST-gap02:30 keeps existing07:30Z normalization; leap-second20161231T235960Z keeps existing20170101T000000Z normalization. All-day validation, RRULE UNTIL, unknown zones and architecture excluded. Predicted native five mismatches/three controls requires actual API29 evidence; host/framework differences must be reported rather than substituted.
+
+No Context/fetch, network/sockets/provider, preferences, owner calendars, Activity, Home widget, calendar UI, schedule/render performance, new native policy or whole recurrence acceptance. Generated finite strings and JSONObject output only. Original2026-11-05T03:17:44Z target03:32:44Z hard03:47:44Z retained; source preparation cap03:23:00.

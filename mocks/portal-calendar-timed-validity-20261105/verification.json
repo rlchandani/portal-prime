@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T03:29:56.910658+00:00",
+  "status": "delivered_and_read_back_in_both_rooms",
+  "version": {
+    "code": 189,
+    "name": "1.195"
+  },
+  "baseCommit": "2ddc5608ed848a65b04c1477cc1e37378b6f7de3",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T03:17:44Z",
+    "discoveryCapUtc": "2026-11-05T03:22:44Z",
+    "targetUtc": "2026-11-05T03:32:44Z",
+    "hardLimitUtc": "2026-11-05T03:47:44Z",
+    "baseHead": "2ddc5608ed848a65b04c1477cc1e37378b6f7de3",
+    "scope": "Timed DTSTART/DTEND/EXDATE civil fields and basic syntax; preserve timezone/DST-gap/leap-second conversion, recurrence and all-day/UNTIL behavior"
+  },
+  "scope": "Reject malformed timed calendar starts, ends and exclusions before existing timezone conversion.",
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/CalendarFeed.kt",
+      "bytes": 26303,
+      "sha256": "864332655cc41677f1b92c5d2504b9d0675612c6864f93c4370289e13ebf2aeb"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/CalendarFeedTimedValidityTest.kt",
+      "bytes": 3269,
+      "sha256": "2e754494459b9efa6b1d53ca31403291143e8b037100a50e31c2e3f4c11f2052"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "6b9bfaa0cc32462936f9c2a1d83fdfe43db7b18949b2e5c14d5e4e45e8c3b81f"
+    }
+  ],
+  "regression": {
+    "actualProductionParser": true,
+    "generatedIcsOnly": true,
+    "hostMethods": 11,
+    "hostBaselineMismatches": 7,
+    "hostBaselineControlsPassed": 4,
+    "hostCandidatePassed": 11,
+    "frozenAssertionsUnchanged": true
+  },
+  "native": {
+    "api": 29,
+    "actualDebugParser": true,
+    "frameworkDateParser": true,
+    "cases": 8,
+    "baselineMismatches": 5,
+    "baselineControlsPassed": 3,
+    "candidatePassed": 8,
+    "classOriginsVerified": true,
+    "sameFrozenJavaJarDriver": true,
+    "fixture": {
+      "javaSha256": "59488f4ff905d9a6d0211c62c6ca333d95b4492adf40496ce2a277942bbda84e",
+      "probeJarSha256": "c5b54308b9953cae0690394e222cb76eea22d962456a713db894557bbe5e4599",
+      "driverSha256": "13e5a68c214e580c36a5dbde221e3e4ef403e104300a686a7ac3fdfe9cd2bae3",
+      "compiledClassCount": 2,
+      "literalCases": 8,
+      "expectedBaselineFailures": 5,
+      "expectedBaselineControls": 3
+    },
+    "urlOpens": 0,
+    "bothOwnedPathsAbsent": true,
+    "bothProcessesTerminal": true,
+    "failedPreparationPathAbsent": true
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 100.16381683299551
+  },
+  "jvm": {
+    "tests": 4688,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 488
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746006,
+      "sha256": "f010194fb065211cc2f367d332d5b3a2ef1adf21f574c2b4e281e7acc8c12e39",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25903487,
+      "sha256": "7b6cedffef60368869fe8810e50c3f628b5805c9a66542bdf0fe0e8fd20c970a",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "2af6d4cbe40dad197e3635ad739a6970f426ebc2be62923b7d4efa1ab744c00d",
+    "bindingsRootRehashed": 21,
+    "oneGuardAndVersionEditsReverseExactlyToBaseline": true,
+    "scope": "Source and frozen baseline review; root independently checked fresh candidate build/native and promotion evidence"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25903487,
+      "sha256": "7b6cedffef60368869fe8810e50c3f628b5805c9a66542bdf0fe0e8fd20c970a",
+      "app": {
+        "versionCode": 189,
+        "versionName": "1.195"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25903487,
+        "sha256": "7b6cedffef60368869fe8810e50c3f628b5805c9a66542bdf0fe0e8fd20c970a",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 189,
+          "versionName": "1.195"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1610,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1879,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "ownerRegistryHashesPreserved": true,
+    "nativePathsRemoved": true
+  },
+  "publicVersionManifestUnchanged": true,
+  "limits": [
+    "Generated timed DTSTART/DTEND/EXDATE parser acceptance only; no household calendar/provider/network, live event ingestion, UI/pixel or full recurrence acceptance.",
+    "The native eight-case set is a subset of eleven host cases; host adds minute60, second61 and Asia/Kolkata controls.",
+    "Existing all-day, UNTIL, unknown-zone, recurrence, cache, local DST-gap and leap-second conversion behavior is retained; this does not validate every ICS feature.",
+    "Actual debug APK parser executed on Family API29; no optimized parser execution, API28, Living native, phone, account or public publication claim.",
+    "Discovery overran its five-minute cap; original03:17:44 start/03:32:44 target/03:47:44 hard limit retained. A wrong baseline filename stopped native preparation before probe execution; scratch removed, repaired fixture refrozen before actual RED/GREEN. Earlier held clocks and whole active goal remain."
+  ]
+}

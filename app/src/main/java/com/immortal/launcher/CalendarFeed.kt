@@ -324,6 +324,14 @@ object CalendarFeed {
           } else {
             val utc = v.endsWith("Z")
             val basic = v.removeSuffix("Z")
+            if (basic.length != 15 || basic[8] != 'T' ||
+                basic.indices.any { it != 8 && basic[it] !in '0'..'9' }) return null
+            if (basic.takeLast(2).toInt() > 60) return null
+            // Validate civil fields in UTC, preserving local DST gaps and leap-second conversion.
+            SimpleDateFormat("yyyyMMdd'T'HHmmss", Locale.US).apply {
+              isLenient = false
+              timeZone = TimeZone.getTimeZone("UTC")
+            }.parse(basic.dropLast(2) + "00") ?: return null
             val zone =
                 when {
                   utc -> TimeZone.getTimeZone("UTC")

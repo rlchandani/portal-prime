@@ -1,18 +1,63 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T03:15:09.265503+00:00",
-  "updatedLabel": "5 November 2026 \u00b7 iCloud derivative checksum fix delivered in1.194",
+  "updatedAt": "2026-11-05T03:29:56.910658+00:00",
+  "updatedLabel": "5 November2026 \u00b7 timed calendar validation delivered in1.195",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.194/code188, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.195/code189, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+        "id": "calendar-timed-date-validation",
+        "title": "Calendar: reject malformed timed dates",
+        "summary": "Malformed starts, ends and exclusions no longer roll into real appointment times.",
+        "status": "delivered",
+        "kind": "Android calendar parser correctness",
+        "platforms": [
+            "portal"
+        ],
+        "owner": "Calendar / independent review / native and delivery verification",
+        "deployment": "Exact optimized1.195/code189 fully hashed both rooms, one install each.",
+        "verification": "4688JVM/488suites;11host7failures→11pass;8actual-debug/API29 cases5mismatches→8pass",
+        "acceptance": [
+            "Reject malformed timed calendar civil fields and syntax.",
+            "Preserve valid timezone, DST-gap and leap-second conversion.",
+            "Use frozen actual Android class-origin fixture.",
+            "Verify builds/review/artifacts/delivery/preservation."
+        ],
+        "evidence": [
+            {
+                "text": "Scope and acceptance limits.",
+                "source": "docs/portal-calendar-timed-validity-2026-11-05.md"
+            },
+            {
+                "text": "Machine proof and original clock.",
+                "source": "mocks/portal-calendar-timed-validity-20261105/verification.json"
+            }
+        ],
+        "limits": [
+            "Generated timed DTSTART/DTEND/EXDATE parser acceptance only; no household calendar/provider/network, live event ingestion, UI/pixel or full recurrence acceptance.",
+            "The native eight-case set is a subset of eleven host cases; host adds minute60, second61 and Asia/Kolkata controls.",
+            "Existing all-day, UNTIL, unknown-zone, recurrence, cache, local DST-gap and leap-second conversion behavior is retained; this does not validate every ICS feature.",
+            "Actual debug APK parser executed on Family API29; no optimized parser execution, API28, Living native, phone, account or public publication claim.",
+            "Discovery overran its five-minute cap; original03:17:44 start/03:32:44 target/03:47:44 hard limit retained. A wrong baseline filename stopped native preparation before probe execution; scratch removed, repaired fixture refrozen before actual RED/GREEN. Earlier held clocks and whole active goal remain."
+        ],
+        "next": "Continue independent product work; retain held clocks.",
+        "issueClock": {
+            "originalStartUtc": "2026-11-05T03:17:44Z",
+            "discoveryCapUtc": "2026-11-05T03:22:44Z",
+            "targetUtc": "2026-11-05T03:32:44Z",
+            "hardLimitUtc": "2026-11-05T03:47:44Z",
+            "baseHead": "2ddc5608ed848a65b04c1477cc1e37378b6f7de3",
+            "scope": "Timed DTSTART/DTEND/EXDATE civil fields and basic syntax; preserve timezone/DST-gap/leap-second conversion, recurrence and all-day/UNTIL behavior"
+        }
+    },
     {
         "id": "icloud-null-derivative-checksum",
         "title": "iCloud photos: skip null derivative checksums",

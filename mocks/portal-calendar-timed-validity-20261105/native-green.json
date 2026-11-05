@@ -1,0 +1,200 @@
+{
+  "phase": "green",
+  "sourceApkSha256": "f010194fb065211cc2f367d332d5b3a2ef1adf21f574c2b4e281e7acc8c12e39",
+  "fixture": {
+    "javaSha256": "59488f4ff905d9a6d0211c62c6ca333d95b4492adf40496ce2a277942bbda84e",
+    "probeJarSha256": "c5b54308b9953cae0690394e222cb76eea22d962456a713db894557bbe5e4599",
+    "driverSha256": "13e5a68c214e580c36a5dbde221e3e4ef403e104300a686a7ac3fdfe9cd2bae3",
+    "compiledClassCount": 2,
+    "literalCases": 8,
+    "expectedBaselineFailures": 5,
+    "expectedBaselineControls": 3
+  },
+  "result": {
+    "caseCount": 8,
+    "passed": 8,
+    "sourceClassLoaderVerified": true,
+    "actualParseMethod": "parse$app",
+    "api": 29,
+    "fixtureZone": "UTC",
+    "fixtureLocale": "en_US",
+    "frameworkSDFClassLoader": "java.lang.BootClassLoader@76e0c9b",
+    "deniedUrlOpens": 0,
+    "actualNetworkRequests": 0,
+    "scope": "Actual packaged CalendarFeed.parse with generated ICS; framework timed parsing; no Context/fetch/provider/preferences",
+    "cases": [
+      {
+        "name": "invalid-start-Feb30",
+        "generatedICS": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:generated-timed-validation\r\nSUMMARY:Generated\r\nDTSTART:20260230T090000Z\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+        "nowMillis": 1769904000000,
+        "horizonDays": 45,
+        "expected": [],
+        "expectedCount": 0,
+        "actual": [],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "invalid-hour24",
+        "generatedICS": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:generated-timed-validation\r\nSUMMARY:Generated\r\nDTSTART:20260301T240000Z\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+        "nowMillis": 1772323200000,
+        "horizonDays": 45,
+        "expected": [],
+        "expectedCount": 0,
+        "actual": [],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "trailing-junk",
+        "generatedICS": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:generated-timed-validation\r\nSUMMARY:Generated\r\nDTSTART:20260301T090000junkZ\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+        "nowMillis": 1772323200000,
+        "horizonDays": 45,
+        "expected": [],
+        "expectedCount": 0,
+        "actual": [],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "malformed-EXDATE-retains-three",
+        "generatedICS": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:generated-timed-validation\r\nSUMMARY:Generated\r\nDTSTART:20260301T090000Z\r\nRRULE:FREQ=DAILY;COUNT=3\r\nEXDATE:20260230T090000Z\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+        "nowMillis": 1772323200000,
+        "horizonDays": 45,
+        "expected": [
+          [
+            1772355600000,
+            1772355600000
+          ],
+          [
+            1772442000000,
+            1772442000000
+          ],
+          [
+            1772528400000,
+            1772528400000
+          ]
+        ],
+        "expectedCount": 3,
+        "actual": [
+          [
+            1772355600000,
+            1772355600000
+          ],
+          [
+            1772442000000,
+            1772442000000
+          ],
+          [
+            1772528400000,
+            1772528400000
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "invalid-DTEND-defaults-to-start",
+        "generatedICS": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:generated-timed-validation\r\nSUMMARY:Generated\r\nDTSTART:20260228T090000Z\r\nDTEND:20260230T090000Z\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+        "nowMillis": 1769904000000,
+        "horizonDays": 45,
+        "expected": [
+          [
+            1772269200000,
+            1772269200000
+          ]
+        ],
+        "expectedCount": 1,
+        "actual": [
+          [
+            1772269200000,
+            1772269200000
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "valid-UTC-control",
+        "generatedICS": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:generated-timed-validation\r\nSUMMARY:Generated\r\nDTSTART:20260301T090000Z\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+        "nowMillis": 1772323200000,
+        "horizonDays": 45,
+        "expected": [
+          [
+            1772355600000,
+            1772355600000
+          ]
+        ],
+        "expectedCount": 1,
+        "actual": [
+          [
+            1772355600000,
+            1772355600000
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "DST-gap-leniency-control",
+        "generatedICS": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:generated-timed-validation\r\nSUMMARY:Generated\r\nDTSTART;TZID=America/New_York:20260308T023000\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+        "nowMillis": 1772323200000,
+        "horizonDays": 45,
+        "expected": [
+          [
+            1772955000000,
+            1772955000000
+          ]
+        ],
+        "expectedCount": 1,
+        "actual": [
+          [
+            1772955000000,
+            1772955000000
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "leap-second-leniency-control",
+        "generatedICS": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:generated-timed-validation\r\nSUMMARY:Generated\r\nDTSTART:20161231T235960Z\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+        "nowMillis": 1483142400000,
+        "horizonDays": 45,
+        "expected": [
+          [
+            1483228800000,
+            1483228800000
+          ]
+        ],
+        "expectedCount": 1,
+        "actual": [
+          [
+            1483228800000,
+            1483228800000
+          ]
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      }
+    ],
+    "processZoneRestored": true,
+    "processLocaleRestored": true
+  }
+}
