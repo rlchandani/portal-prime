@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T03:15:09.265503+00:00",
+  "status": "delivered_and_read_back_in_both_rooms",
+  "version": {
+    "code": 188,
+    "name": "1.194"
+  },
+  "baseCommit": "72facbd8851de7b91d5333531b76b12ce464bd0b",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T03:02:14Z",
+    "discoveryCapUtc": "2026-11-05T03:07:14Z",
+    "targetUtc": "2026-11-05T03:17:14Z",
+    "hardLimitUtc": "2026-11-05T03:32:14Z",
+    "baseHead": "72facbd8851de7b91d5333531b76b12ce464bd0b",
+    "scope": "iCloud derivative JSON-null checksum admission; retain literal strings and existing size selection"
+  },
+  "scope": "Skip JSON-null iCloud derivative checksums before existing getter and size selection; keep valid smaller photo fallback.",
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/RemoteAlbum.kt",
+      "bytes": 32411,
+      "sha256": "71c846b4883076574b163c724c4e8ba4fe7f0c713ee5847883ba430ca7f5fa7e"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/RemoteAlbumNullChecksumTest.kt",
+      "bytes": 1547,
+      "sha256": "ef94ebb2ff6454a405f2e25ab7fa6b3284dd469065453cb18ddb31ba66c8792e"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "aba23aa4837513b6e0a3dea48fd0693d61950f36c944d79bef68ad4b80812010"
+    }
+  ],
+  "regression": {
+    "actualProductionSelector": true,
+    "generatedJsonOnly": true,
+    "hostMethods": 5,
+    "hostBaselinePassed": 5,
+    "hostCandidatePassed": 5,
+    "hostBaselineIsRed": false,
+    "frozenAssertionsUnchanged": true
+  },
+  "native": {
+    "api": 29,
+    "actualDebugSelector": true,
+    "frameworkJson": true,
+    "cases": 5,
+    "baselineMismatches": 2,
+    "baselineControlsPassed": 3,
+    "candidatePassed": 5,
+    "classOriginsVerified": true,
+    "sameFrozenJavaJarDriver": true,
+    "fixture": {
+      "javaSha256": "74b5bca82f05fefa07f16c80a2eb8f163536fae3085dba33f03c342839302608",
+      "probeJarSha256": "4a1c187f705357b7b4df6d13675174019ac30e796858eb11e7ca517fe315b320",
+      "driverSha256": "589d45c73780782818be4d2f8ea8cb1fe872207c332745f660c6647a422e0f17",
+      "compiledClassCount": 2,
+      "literalCases": 5,
+      "expectedBaselineFailures": 2,
+      "expectedBaselineControls": 3
+    },
+    "urlOpens": 0,
+    "bothOwnedPathsAbsent": true,
+    "bothProcessesTerminal": true
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 105.03008929199132
+  },
+  "jvm": {
+    "tests": 4677,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 487
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746002,
+      "sha256": "5cf2c0f2987de6b10fca678e618fdaf4f399b31fc8f844c9826c4d863f7630ab",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25903483,
+      "sha256": "64d0fe98d7ca90c9d1410c708fe23459693a464fd2a8a69f7ab0a4bef95ed522",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "4f54e3df30a5c4246fe313b27e0115c698248a76eaba4c315de0c2615ddb5ce3",
+    "all19BindingsRootRehashed": true,
+    "oneGuardAndVersionEditsReverseExactlyToBaseline": true
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25903483,
+      "sha256": "64d0fe98d7ca90c9d1410c708fe23459693a464fd2a8a69f7ab0a4bef95ed522",
+      "app": {
+        "versionCode": 188,
+        "versionName": "1.194"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25903483,
+        "sha256": "64d0fe98d7ca90c9d1410c708fe23459693a464fd2a8a69f7ab0a4bef95ed522",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 188,
+          "versionName": "1.194"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1633,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1619,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "ownerRegistryHashesPreserved": true,
+    "bothNativePathsRemoved": true
+  },
+  "publicVersionManifestUnchanged": true,
+  "limits": [
+    "Actual-debug/API29 generated selector acceptance only; no complete album fetch, webasseturls, download, live iCloud, household photo, UI/crop/pixel or cache acceptance.",
+    "Host baseline already passes all5; host org.json differs from Android. Native literal-null vector has an extra smaller derivative, so five host/native inputs are not identical.",
+    "Literal checksum string null and other non-null getter coercion remain; no checksum-format policy introduced.",
+    "No optimized selector execution/API28/Living native/phone/provider/account/GitHub authentication/push/publication claim.",
+    "Discovery exceeded its cap by23seconds; original03:02:14 start/03:17:14 target/03:32:14 hard limit retained. Prior held clocks and whole active goal remain."
+  ]
+}

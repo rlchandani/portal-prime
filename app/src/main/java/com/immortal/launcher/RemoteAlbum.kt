@@ -263,6 +263,7 @@ object RemoteAlbum {
       val k = keys.next()
       val size = k.toIntOrNull() ?: continue
       val d = derivs.optJSONObject(k) ?: continue
+      if (d.isNull("checksum")) continue
       val checksum = d.optString("checksum", "")
       if (checksum.isEmpty()) continue
       if (size >= target && (bestSize < 0 || size < bestSize)) {

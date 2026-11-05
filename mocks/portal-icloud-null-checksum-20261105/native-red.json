@@ -1,0 +1,97 @@
+{
+  "phase": "red",
+  "sourceApkSha256": "c3a4e59385fb9729309c41c3b039d9324ce11538414fda2201e0903a328b8d13",
+  "fixture": {
+    "javaSha256": "74b5bca82f05fefa07f16c80a2eb8f163536fae3085dba33f03c342839302608",
+    "probeJarSha256": "4a1c187f705357b7b4df6d13675174019ac30e796858eb11e7ca517fe315b320",
+    "driverSha256": "589d45c73780782818be4d2f8ea8cb1fe872207c332745f660c6647a422e0f17",
+    "compiledClassCount": 2,
+    "literalCases": 5,
+    "expectedBaselineFailures": 2,
+    "expectedBaselineControls": 3
+  },
+  "result": {
+    "caseCount": 5,
+    "passed": 3,
+    "sourceClassLoaderVerified": true,
+    "actualSelectorMethod": "pickBestDerivative$app",
+    "frameworkJSONObjectClass": "org.json.JSONObject",
+    "frameworkJSONObjectClassLoader": "java.lang.BootClassLoader@a098994",
+    "api": 29,
+    "deniedUrlOpens": 0,
+    "actualNetworkRequests": 0,
+    "scope": "Actual packaged RemoteAlbum.pickBestDerivative; generated framework JSON; no fetch/provider/Context/preferences",
+    "cases": [
+      {
+        "name": "larger-null-checksum-smaller-good",
+        "generatedJson": "{\"1024\":{\"checksum\":\"good\"},\"2048\":{\"checksum\":null}}",
+        "screenW": 1920,
+        "screenH": 1080,
+        "expected": "good",
+        "expectedIsNull": false,
+        "actual": "null",
+        "actualIsNull": false,
+        "failure": null,
+        "literalPassed": false,
+        "urlOpens": 0,
+        "passed": false
+      },
+      {
+        "name": "all-null-checksums",
+        "generatedJson": "{\"1024\":{\"checksum\":null},\"2048\":{\"checksum\":null}}",
+        "screenW": 1920,
+        "screenH": 1080,
+        "expected": null,
+        "expectedIsNull": true,
+        "actual": "null",
+        "actualIsNull": false,
+        "failure": null,
+        "literalPassed": false,
+        "urlOpens": 0,
+        "passed": false
+      },
+      {
+        "name": "literal-null-string-accepted",
+        "generatedJson": "{\"1024\":{\"checksum\":\"small\"},\"2048\":{\"checksum\":\"null\"}}",
+        "screenW": 1920,
+        "screenH": 1080,
+        "expected": "null",
+        "expectedIsNull": false,
+        "actual": "null",
+        "actualIsNull": false,
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "absent-large-checksum-smaller-good",
+        "generatedJson": "{\"1024\":{\"checksum\":\"good\"},\"2048\":{}}",
+        "screenW": 1920,
+        "screenH": 1080,
+        "expected": "good",
+        "expectedIsNull": false,
+        "actual": "good",
+        "actualIsNull": false,
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      },
+      {
+        "name": "normal-covering-selection",
+        "generatedJson": "{\"1024\":{\"checksum\":\"small\"},\"2048\":{\"checksum\":\"large\"}}",
+        "screenW": 1920,
+        "screenH": 1080,
+        "expected": "large",
+        "expectedIsNull": false,
+        "actual": "large",
+        "actualIsNull": false,
+        "failure": null,
+        "literalPassed": true,
+        "urlOpens": 0,
+        "passed": true
+      }
+    ]
+  }
+}

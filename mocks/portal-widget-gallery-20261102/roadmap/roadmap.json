@@ -1,18 +1,63 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T03:00:59.450047+00:00",
-  "updatedLabel": "5 November 2026 \u00b7 Offline delivery summary automation verified",
+  "updatedAt": "2026-11-05T03:15:09.265503+00:00",
+  "updatedLabel": "5 November 2026 \u00b7 iCloud derivative checksum fix delivered in1.194",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.193/code187, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.194/code188, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+        "id": "icloud-null-derivative-checksum",
+        "title": "iCloud photos: skip null derivative checksums",
+        "summary": "A null larger checksum no longer displaces a usable smaller photo derivative.",
+        "status": "delivered",
+        "kind": "Android photo-source selector correctness",
+        "platforms": [
+            "portal"
+        ],
+        "owner": "Photo source / independent review / native and delivery verification",
+        "deployment": "Exact optimized1.194/code188 fully hashed both rooms, one install each.",
+        "verification": "4677JVM/487suites;5host controls;5actual-debug/API29 cases2mismatches→5pass",
+        "acceptance": [
+            "Skip JSON-null checksums.",
+            "Preserve literal strings, non-null getters and size selection.",
+            "Use frozen actual Android class-origin fixture.",
+            "Verify builds/review/artifacts/delivery/preservation."
+        ],
+        "evidence": [
+            {
+                "text": "Scope, acceptance and limits.",
+                "source": "docs/portal-icloud-null-checksum-2026-11-05.md"
+            },
+            {
+                "text": "Machine proof and original clock.",
+                "source": "mocks/portal-icloud-null-checksum-20261105/verification.json"
+            }
+        ],
+        "limits": [
+            "Actual-debug/API29 generated selector acceptance only; no complete album fetch, webasseturls, download, live iCloud, household photo, UI/crop/pixel or cache acceptance.",
+            "Host baseline already passes all5; host org.json differs from Android. Native literal-null vector has an extra smaller derivative, so five host/native inputs are not identical.",
+            "Literal checksum string null and other non-null getter coercion remain; no checksum-format policy introduced.",
+            "No optimized selector execution/API28/Living native/phone/provider/account/GitHub authentication/push/publication claim.",
+            "Discovery exceeded its cap by23seconds; original03:02:14 start/03:17:14 target/03:32:14 hard limit retained. Prior held clocks and whole active goal remain."
+        ],
+        "next": "Continue independent product work; retain held clocks.",
+        "issueClock": {
+            "originalStartUtc": "2026-11-05T03:02:14Z",
+            "discoveryCapUtc": "2026-11-05T03:07:14Z",
+            "targetUtc": "2026-11-05T03:17:14Z",
+            "hardLimitUtc": "2026-11-05T03:32:14Z",
+            "baseHead": "72facbd8851de7b91d5333531b76b12ce464bd0b",
+            "scope": "iCloud derivative JSON-null checksum admission; retain literal strings and existing size selection"
+        }
+    },
     {
         "id": "offline-delivery-summary",
         "title": "Release tooling: generate saved delivery summaries",
