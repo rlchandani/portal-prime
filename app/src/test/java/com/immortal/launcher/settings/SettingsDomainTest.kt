@@ -20,6 +20,26 @@ import org.mockito.Mockito.mock
  */
 class SettingsDomainTest {
 
+  @Test
+  fun smbCacheControlIsVisibleOnDeviceAndRemoteWithoutChangingSavedValues() {
+    val prefs = ScreensaverTestPrefs(mapOf(
+        "source" to ScreensaverConfig.SOURCE_SMB, "smb_host" to "nas",
+        "smb_share" to "photos", "cache_enabled" to false, "cache_budget_gb" to 2))
+    val before = prefs.all
+    val spec = SettingsDomains.screensaver.specs.single { it.key == "cacheEnabled" }
+    val snapshot = ScreensaverConfig.load(prefs.context)
+    assertTrue(spec.visibleWhen(prefs.context, snapshot))
+    val domain = SettingsDomain(
+        id = "screensaver", title = "Screensaver",
+        load = { ScreensaverConfig.load(prefs.context) }, specs = listOf(spec))
+    val controls = domain.schemaJson(prefs.context).getJSONArray("controls")
+    assertEquals(1, controls.length())
+    assertEquals("cacheEnabled", controls.getJSONObject(0).getString("key"))
+    assertFalse(controls.getJSONObject(0).getBoolean("value"))
+    assertEquals(before, prefs.all)
+    assertEquals(0, prefs.writeCount)
+  }
+
   private val slideshowKeys = setOf("mode", "photo_motion", "keep_people_in_frame", "fit")
 
   /** The real registered specs and defaults; omit unrelated hardware and app-picker metadata. */

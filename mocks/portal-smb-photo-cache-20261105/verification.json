@@ -1,0 +1,424 @@
+{
+  "completionUtc": "2026-11-05T15:43:57.911268+00:00",
+  "scope": {
+    "scope": "Human authorized SMB caching second after optimized-photoverification; firstusefulslice cachedencodedSMBphotos,qualifiedidentity,boundedreads,cancellationcleanup,settingspreserved",
+    "startUtc": "2026-11-05T15:35:26Z",
+    "discoveryCutoffUtc": "2026-11-05T15:40:26Z",
+    "targetUtc": "2026-11-05T15:50:26Z",
+    "hardStopUtc": "2026-11-05T16:05:26Z",
+    "baseCommit": "681de4f5",
+    "priorClocksPreserved": true,
+    "selectedUtc": "2026-11-05T15:39:06.847690+00:00",
+    "selected": "Warm encoded SMB photo caching through existing MediaCache and remoteFetch; qualifiedidentity; tracked boundedstreams; registrygate; generatedJVMtests; nooffline startup/reconnect"
+  },
+  "jvm": {
+    "suites": 496,
+    "tests": 4754,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-smb-photo-cache-20261105-073526/candidate-debug-1.208.apk",
+      "bytes": 46763030,
+      "sha256": "bde888711d5deb525c8af2210ec6cbd8b6756b16d56c9db57e9027c16750ad6b",
+      "signerSha256": [
+        "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+      ],
+      "manifest": "versionCode='202' versionName='1.208'"
+    },
+    "performance": {
+      "path": "/private/tmp/portal-smb-photo-cache-20261105-073526/candidate-performance-1.208.apk",
+      "bytes": 25904007,
+      "sha256": "cd12ddb0d874f24dc7c8903abe79a639a3d840308e5c4de3bf3556093f92a886",
+      "signerSha256": [
+        "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+      ],
+      "manifest": "versionCode='202' versionName='1.208'"
+    }
+  },
+  "family": {
+    "bytes": 25904007,
+    "sha256": "cd12ddb0d874f24dc7c8903abe79a639a3d840308e5c4de3bf3556093f92a886",
+    "app": {
+      "versionCode": 202,
+      "versionName": "1.208"
+    },
+    "serviceReady": true,
+    "singleInstallAccepted": true
+  },
+  "living": {
+    "result": {
+      "status": "ready",
+      "ack": "uncertain",
+      "install_attempted": true,
+      "observations": 9
+    },
+    "installed": {
+      "bytes": 25904007,
+      "sha256": "cd12ddb0d874f24dc7c8903abe79a639a3d840308e5c4de3bf3556093f92a886",
+      "serviceReady": true,
+      "app": {
+        "versionCode": 202,
+        "versionName": "1.208"
+      }
+    }
+  },
+  "frameReturn": {
+    "family": {
+      "ok": true,
+      "result": "legacy_frame_requested",
+      "action": "screensaver"
+    },
+    "living": {
+      "ok": true,
+      "result": "legacy_frame_requested",
+      "action": "screensaver"
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1610,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1749,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "registryByteExact": true,
+  "copiedRegistryRemoved": true,
+  "publicManifestUnchanged": "1.83/code77",
+  "scopeLimits": [
+    "Generated JVM helper and registry acceptance; no live NAS/native SMB playback or actual controller-stop race acceptance",
+    "SMB startup listing and caption metadata remain online; no offline NAS startup/reconnect",
+    "Previous optimized photo scene acceptance binds 1.207, not the 1.208 APK"
+  ],
+  "sourceReviewAccepted": true,
+  "sourceBindings": {
+    "app/src/main/java/com/immortal/launcher/SmbPhotoCache.kt": {
+      "bytes": 2762,
+      "sha256": "b878b3eecae4e8815a0817292d889cea07ef8ecd81d1e62e6576f3e9361dbd2c"
+    },
+    "app/src/main/java/com/immortal/launcher/SmbSource.kt": {
+      "bytes": 5282,
+      "sha256": "b0a09d072f326660eee98d9c7320c409278f4add0377a955a94c86842e93bb6e"
+    },
+    "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": {
+      "bytes": 166648,
+      "sha256": "f5f11f3de0ff420e065c9afecdbdc1a0201ea01038eea6e53c4d3d898aca9c49"
+    },
+    "app/src/main/java/com/immortal/launcher/settings/SettingsDomains.kt": {
+      "bytes": 69551,
+      "sha256": "76d495f652bfa5b67f93b882a4fb044b436a80afe808d4c93e13c0089cbc1d27"
+    },
+    "app/src/test/java/com/immortal/launcher/SmbPhotoCacheTest.kt": {
+      "bytes": 5440,
+      "sha256": "faa5aed3407e6fc6f87f2429ae304bc0132249c367573a7667dcf1ccd0b99b86"
+    },
+    "app/src/test/java/com/immortal/launcher/settings/SettingsDomainTest.kt": {
+      "bytes": 29902,
+      "sha256": "63fb4370fef2072e1e5ac8d51bf0e589734a17ec3952f67c53780427b56a9fb4"
+    },
+    "app/build.gradle.kts": {
+      "bytes": 11816,
+      "sha256": "058e3bfb11643ce1fdef38dd95f66034b87b0799cf4654749b5ec539c7a30b41"
+    }
+  },
+  "androidGates": {
+    "debugBuild": true,
+    "optimizedBuild": true,
+    "r8": true,
+    "vitalLint": true
+  },
+  "javascriptGates": {
+    "status": "checked",
+    "allChecksExitZero": true
+  },
+  "apkSourceAssetChecks": {
+    "debug": {
+      "fileCount": 23,
+      "files": [
+        {
+          "path": "catalog.json",
+          "bytes": 24043,
+          "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+        },
+        {
+          "path": "diagnostics/source-preview-4k.mp4",
+          "bytes": 25847,
+          "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+        },
+        {
+          "path": "faces/Flip-Regular.otf",
+          "bytes": 3184,
+          "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+        },
+        {
+          "path": "faces/flip.html",
+          "bytes": 29379,
+          "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+        },
+        {
+          "path": "fonts/BebasNeue.ttf",
+          "bytes": 61400,
+          "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+        },
+        {
+          "path": "fonts/OFL.txt",
+          "bytes": 1186,
+          "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+        },
+        {
+          "path": "photoframe_fallback/01_wilderness.jpg",
+          "bytes": 261090,
+          "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+        },
+        {
+          "path": "photoframe_fallback/02_denali.jpg",
+          "bytes": 277842,
+          "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+        },
+        {
+          "path": "photoframe_fallback/03_yosemite.jpg",
+          "bytes": 443801,
+          "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+        },
+        {
+          "path": "remote/control-center.css",
+          "bytes": 24082,
+          "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+        },
+        {
+          "path": "remote/control-center.js",
+          "bytes": 272470,
+          "sha256": "eb8e4fc0618d7cdd19c8e53555bf44800732cc2bc3cba13fbd3ed2add1666833"
+        },
+        {
+          "path": "remote/core.mjs",
+          "bytes": 28623,
+          "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+        },
+        {
+          "path": "screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "screensaver/mode-impls.js",
+          "bytes": 71114,
+          "sha256": "641d87ee5a015324aa4fce92a934e17ccebfd8e9b7febbfaddc56a1ea1874251"
+        },
+        {
+          "path": "screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        },
+        {
+          "path": "webapp-retention-probe.html",
+          "bytes": 504,
+          "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+        }
+      ]
+    },
+    "performance": {
+      "fileCount": 23,
+      "files": [
+        {
+          "path": "catalog.json",
+          "bytes": 24043,
+          "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+        },
+        {
+          "path": "diagnostics/source-preview-4k.mp4",
+          "bytes": 25847,
+          "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+        },
+        {
+          "path": "faces/Flip-Regular.otf",
+          "bytes": 3184,
+          "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+        },
+        {
+          "path": "faces/flip.html",
+          "bytes": 29379,
+          "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+        },
+        {
+          "path": "fonts/BebasNeue.ttf",
+          "bytes": 61400,
+          "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+        },
+        {
+          "path": "fonts/OFL.txt",
+          "bytes": 1186,
+          "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+        },
+        {
+          "path": "photoframe_fallback/01_wilderness.jpg",
+          "bytes": 261090,
+          "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+        },
+        {
+          "path": "photoframe_fallback/02_denali.jpg",
+          "bytes": 277842,
+          "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+        },
+        {
+          "path": "photoframe_fallback/03_yosemite.jpg",
+          "bytes": 443801,
+          "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+        },
+        {
+          "path": "remote/control-center.css",
+          "bytes": 24082,
+          "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+        },
+        {
+          "path": "remote/control-center.js",
+          "bytes": 272470,
+          "sha256": "eb8e4fc0618d7cdd19c8e53555bf44800732cc2bc3cba13fbd3ed2add1666833"
+        },
+        {
+          "path": "remote/core.mjs",
+          "bytes": 28623,
+          "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+        },
+        {
+          "path": "screensaver/cinema-grain.png",
+          "bytes": 12657,
+          "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+        },
+        {
+          "path": "screensaver/index.html",
+          "bytes": 7785,
+          "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+        },
+        {
+          "path": "screensaver/lib-engine.js",
+          "bytes": 5582,
+          "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+        },
+        {
+          "path": "screensaver/mode-impls.js",
+          "bytes": 71114,
+          "sha256": "641d87ee5a015324aa4fce92a934e17ccebfd8e9b7febbfaddc56a1ea1874251"
+        },
+        {
+          "path": "screensaver/modes.js",
+          "bytes": 13499,
+          "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+        },
+        {
+          "path": "screensaver/photo-doodles-dark.svg",
+          "bytes": 1247,
+          "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+        },
+        {
+          "path": "screensaver/photo-doodles.svg",
+          "bytes": 1246,
+          "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+        },
+        {
+          "path": "screensaver/photos.js",
+          "bytes": 8528,
+          "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+        },
+        {
+          "path": "screensaver/scheduler.js",
+          "bytes": 14433,
+          "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+        },
+        {
+          "path": "screensaver/styles.css",
+          "bytes": 15397,
+          "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+        },
+        {
+          "path": "webapp-retention-probe.html",
+          "bytes": 504,
+          "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+        }
+      ]
+    }
+  },
+  "newTests": {
+    "smbCacheHelperMethods": 9,
+    "registryVisibilityMethod": 1,
+    "claim": "Generated JVM helper and registry acceptance; no historical RED/native NAS claim"
+  }
+}

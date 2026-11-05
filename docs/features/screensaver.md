@@ -92,6 +92,12 @@ you don't type URLs and credentials on the Portal:
 | Web page | Pull images from any web page. |
 | Built-in feed | Keyless (Lorem Picsum; Unsplash-ready with a key). Requests photos at the device's actual resolution/orientation so they're sharp on every model. |
 
+For Immich, WebDAV and SMB, **Store media on this device** saves fetched photos
+within the existing storage limit and reuses them on later loops. SMB photo
+copies are kept separate for each server, share and account. SMB still connects
+to list the album at startup and may read caption metadata from the server;
+saved copies do not provide offline album discovery.
+
 ## Presence-aware behaviour
 
 The screensaver cooperates with the Portal's camera-based presence detection so it can run as a

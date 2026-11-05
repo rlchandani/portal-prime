@@ -1,0 +1,16 @@
+{
+  "accepted": true,
+  "reviewer": "catalog_fallback_review",
+  "findings": [
+    "Worker-only cache initialization; captured epoch checked under stream ownership lock",
+    "Bounded encoded reads close/unregister on failure and retirement",
+    "Cache failures/eviction retain downloaded in-memory decode fallback",
+    "Source/account/path-qualified identity excludes passwords",
+    "Non-null customfetch still rejects nativeFilmstrip; source selectionandsettingswrites untouched"
+  ],
+  "limits": [
+    "Generated JVMhelper andregistry acceptance; no liveNAS/nativeSMBplayback or actualcontrollerstop raceacceptance",
+    "SMBstartup listing andcaptionmetadata remainonline; noofflineNASstartup/reconnect",
+    "Previousoptimizedphoto sceneacceptance binds1.207, notthis1.208APK"
+  ]
+}

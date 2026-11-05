@@ -315,7 +315,7 @@ object SettingsDomains {
                       set = ScreensaverConfig::setIncludeVideo,
                       visible = { _, s -> s.enabled }),
                   // On-device cache: only meaningful for a network source that re-fetches the same
-                  // assets every loop (Immich / WebDAV). Hidden for a local folder or the built-in
+                  // assets every loop (Immich / WebDAV / SMB). Hidden for a local folder or the built-in
                   // feed, where there's nothing to save a round-trip on.
                   BoolSpec(
                       "cacheEnabled",
@@ -327,7 +327,7 @@ object SettingsDomains {
                               "this device on every loop instead of fetching it again. Videos are " +
                               "shrunk to fit the screen. The frame loads faster and your server does " +
                               "far less work; it uses some of this device's storage.",
-                      visible = { _, s -> s.enabled && (s.usesImmich || s.usesDav) }),
+                      visible = { _, s -> s.enabled && (s.usesImmich || s.usesDav || s.usesSmb) }),
                   IntSpec(
                       "cacheBudgetGb",
                       "Storage limit",

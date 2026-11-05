@@ -45,6 +45,9 @@ class SmbSource(
   @Volatile private var session: Session? = null
   @Volatile private var share: DiskShare? = null
 
+  internal fun photoCacheKey(path: String): String =
+      smbPhotoCacheKey(host, shareName, user, domain, path)
+
   /** Open the share. Returns true on success. */
   fun connect(): Boolean =
       runCatching {

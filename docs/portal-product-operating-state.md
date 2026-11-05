@@ -14,21 +14,36 @@ This document is a handoff, not whole-product acceptance.
 
 ## Current delivery and boundaries
 
-Both rooms last verified at exact optimized **1.207/code201**, SHA256
-`6dec140dcebe9ffc9bed73b60dca80a0b52e283a1513844f838b1e8798b95288`, 25,887,623 bytes.
-[Latest receipt](portal-options-page-token-2026-11-05.md): options continuation
-tokens are encoded without changing their decoded value or other query fields.
-Six generated actual-caller child cases, represented by one JUnit wrapper:
-four baseline AssertionErrors/two controls become six passes. All 4,744 JVM /
-495 suites, debug/optimized/R8/vital and JavaScript gates pass. Both complete
-installed APKs match. All 43 Family / 30 Living preference files and four saved
-maps/revisions remain byte-exact. Family font/accessibility, original Chromium,
-resumed frame and awake state remain; both normal frame requests pass.
-Generated JVM transport acceptance only; live provider/mounted scanner UI,
-Android/optimized caller and API28 acceptance remain separate. Original
-**07:13:50–07:43:50 UTC** clock remains; candidate selected before the discovery
-cap, definitive baseline finished 70.15 seconds after it.
-These are recorded results, not fresh checks from reading this file.
+Both rooms last verified at exact optimized **1.208/code202**, SHA256
+`cd12ddb0d874f24dc7c8903abe79a639a3d840308e5c4de3bf3556093f92a886`, 25,904,007 bytes.
+[Latest receipt](portal-smb-photo-cache-2026-11-05.md): opt-in SMB warm image caching
+uses existing bounded storage, qualified source/account/path identity and tracked
+stream cancellation. Nine helper methods plus one registry method; **4,754 JVM /
+496 suites**, debug/optimized/R8/vital/JS and APK inspection pass. Both complete
+installed APK hashes match after one install each; Living's uncertain ACK settled
+with nine read-only observations. All 43 Family / 30 Living preferences and four
+maps remain exact. Family font/accessibility, Chromium activity, resumed frame
+and awake state remain; both frame requests pass, captured fatal/ANR markers zero.
+These are generated helper/registry and delivery results. Live NAS/native SMB,
+decoder and actual controller-stop race acceptance remain separate. Startup
+listing and caption metadata remain online; offline album startup/reconnect are
+follow-up work. The **15:35:26–16:05:26 UTC** authorized clock remains.
+No saved source/account/cache choice or public manifest changed.
+
+The [optimized controller receipt](portal-optimized-photo-controller-2026-11-05.md)
+records three static generated scenes/six Family hardware/software captures
+passing all frozen geometry/corner/border/doodle/opacity/containment and normal
+stop checks against exact **1.207**, with 43/30 preferences and four maps preserved.
+Actual controller presentation and normal stop replace inlined Stage entrypoints.
+Two wrapper setup failures reached zero scenes and were excluded; only value-query
+overrides were added. Full startup, Dream, motion, performance, API28 and Living
+visuals remain separate. Its **15:25:00–15:55:00 UTC** authorized follow-up clock
+and the older preflight remain. These recorded results are not fresh checks from
+reading this file.
+
+The [previous options-token receipt](portal-options-page-token-2026-11-05.md)
+retains its 1.207 delivery, six generated actual-caller cases and
+**07:13:50–07:43:50 UTC** clock. Its provider/native/API28 limits remain.
 
 The **07:27:24–07:32:24 UTC discovery cap** closed without an admitted app
 candidate. Selected caption references/line limits yielded no distinct reachable
@@ -63,8 +78,8 @@ The human subsequently authorized **both sequentially**: optimized-photo control
 verification first, then SMB caching, each in a fresh bounded 30-minute slot.
 The [optimized controller receipt](portal-optimized-photo-controller-2026-11-05.md)
 records three scenes/six Family captures passing the frozen pixel, containment and
-normal-stop checks against exact1.207, with43/30prefs andfourmaps preserved.
-Its15:25:00–15:55:00clock remains. SMB work is next; prior holds remain unchanged.
+normal-stop checks against exact 1.207, with 43/30 preferences and four maps preserved.
+Both authorized slices are now recorded above; all earlier holds remain unchanged.
 
 The [07:56 UTC current-frame observation](portal-current-frame-observation-2026-11-05.md)
 shows a clock on black, without photos, on Family. Living's targeted ADB read
@@ -82,7 +97,7 @@ its original six packaged Chrome cases, same-clock two-case Save follow-up,
 backend/phone limits and 06:08:51–06:38:51 UTC clock. That issue is closed.
 
 The public manifest remains **1.83**. Local delivery and public publication are
-separate. The roadmap has **215 tasks: 153 delivered, 50 scoped verified,
+separate. The roadmap has **216 tasks: 154 delivered, 50 scoped verified,
 9 parked, 2 awaiting approval, 1 queued**. Prior task statuses, acceptance and
 issue clocks remain.
 

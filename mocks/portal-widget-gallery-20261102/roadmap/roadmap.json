@@ -9630,7 +9630,7 @@
       "id": "optimized-photo-controller-acceptance",
       "title": "Optimized static photo controller acceptance",
       "summary": "Exact1.207 controller presentation and normal stop pass frozen static geometry, borders and doodle matte in six Family captures.",
-      "status": "scoped-verified",
+      "status": "verified",
       "kind": "Screensaver acceptance",
       "platforms": [
         "portal"
@@ -9664,6 +9664,46 @@
         "selectedUtc": "2026-11-05T15:29:45Z"
       },
       "next": "Keep fullstartup Dream motion performance API28 andLivingvisualacceptance separate."
+    },
+    {
+      "id": "smb-photo-warm-cache",
+      "title": "SMB warm photo cache",
+      "summary": "Fetched SMB images reuse the existing bounded encoded cache; source/account/path keys and tracked cancellation keep sources separate.",
+      "status": "delivered",
+      "kind": "Photo source",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root implementation androomdelivery; independent source review",
+      "verification": "Nine generated helper methods and one registry visibility method; 4,754 JVM / 496 suites, debug/optimized/R8/vital/JS and exact APK inspection pass.",
+      "deployment": "Exact 1.208/code202 optimized installed once in both rooms; full hash/readiness confirmed; 43/30 preferences and four maps exact.",
+      "evidence": [
+        {
+          "text": "Delivery and acceptance limits",
+          "source": "docs/portal-smb-photo-cache-2026-11-05.md"
+        },
+        {
+          "text": "Artifact and source bindings",
+          "source": "mocks/portal-smb-photo-cache-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated JVM helper and registry acceptance; no live NAS/native SMB playback or actual controller-stop race acceptance",
+        "SMB startup listing and caption metadata remain online; no offline NAS startup/reconnect",
+        "Previous optimized photo scene acceptance binds 1.207, not the 1.208 APK"
+      ],
+      "issueClock": {
+        "scope": "Human authorized SMB caching second after optimized-photoverification; firstusefulslice cachedencodedSMBphotos,qualifiedidentity,boundedreads,cancellationcleanup,settingspreserved",
+        "startUtc": "2026-11-05T15:35:26Z",
+        "discoveryCutoffUtc": "2026-11-05T15:40:26Z",
+        "targetUtc": "2026-11-05T15:50:26Z",
+        "hardStopUtc": "2026-11-05T16:05:26Z",
+        "baseCommit": "681de4f5",
+        "priorClocksPreserved": true,
+        "selectedUtc": "2026-11-05T15:39:06.847690+00:00",
+        "selected": "Warm encoded SMB photo caching through existing MediaCache and remoteFetch; qualifiedidentity; tracked boundedstreams; registrygate; generatedJVMtests; nooffline startup/reconnect"
+      },
+      "next": "Keep live NAS/native SMB, offline album discovery and reconnect separate; cache remains opt-in."
     }
   ]
 }

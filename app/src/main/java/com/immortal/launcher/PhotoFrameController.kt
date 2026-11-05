@@ -718,7 +718,9 @@ class PhotoFrameController(
             prepareSlideshowSource(
                 source = src,
                 prepare = { connected ->
-                  if (connected.connect()) connected.listImages().takeIf { it.isNotEmpty() }
+                  if (connected.connect()) connected.listImages().takeIf { it.isNotEmpty() }?.also {
+                    enableMediaCache()
+                  }
                   else null
                 },
                 release = ::closeSmbSourceAsync,
@@ -730,7 +732,7 @@ class PhotoFrameController(
                     }
                     smbSource = connected
                     remoteUrls = if (source.shuffle) paths.shuffled() else paths
-                    remoteFetch = { p, edge -> connected.openStream(p)?.use { decodeBoundedStream(it, edge) } }
+                    remoteFetch = { p, edge -> fetchSmbImage(connected, p, edge) }
                     remoteMode = true
                     remoteIndex = -1
                     remoteFailStreak = 0
@@ -3240,6 +3242,27 @@ class PhotoFrameController(
 
   private fun photoRequestCurrent(generation: Long): Boolean =
       !stopped && generation == photoTransportGeneration.get() && !Thread.currentThread().isInterrupted
+
+  /** SMB retains its custom transport while sharing encoded storage and bounded decoding. */
+  private fun fetchSmbImage(source: SmbSource, path: String, maxEdge: Int): Bitmap? {
+    val generation = photoTransportGeneration.get()
+    val current = { photoRequestCurrent(generation) }
+    return fetchCachedSmbPhoto(mediaCache, source.photoCacheKey(path), current,
+        read = {
+          readSmbPhotoEncoded({ source.openStream(path) }, current,
+              register = { input ->
+                synchronized(photoTransportLock) {
+                  if (!current()) false else { photoStreams.add(input); true }
+                }
+              },
+              unregister = { input ->
+                synchronized(photoTransportLock) { photoStreams.remove(input) }
+              })
+        },
+        decodeFile = { decodeBoundedFile(it.path, maxEdge) },
+        decodeBytes = { decodeBoundedBytes(it, maxEdge) },
+        discard = { if (!it.isRecycled) it.recycle() })
+  }
 
   /** Epoch invalidation is synchronous; physical closes are serialized away from the UI. */
   private fun cancelPhotoTransports() {

@@ -1,0 +1,14 @@
+{
+  "reviewer": "calendar_native_fixture",
+  "sourceAccepted": true,
+  "sourceBytes": 22223,
+  "sourceSha256": "21bc839af31a690a10521065116ebfaaea67e78b066e0fccf58fb734583d09d6",
+  "artifactReplayAccepted": true,
+  "replayedPngs": 6,
+  "literalCornersBothPaths": 32,
+  "thinEdgesBothPaths": 32,
+  "pixelOpacityMatteCountsExactlyMatch": true,
+  "allFrozenThresholdsRetained": true,
+  "scope": "Offline retained-artifact/source review; optimizedstaticgeneratedAPI29controllerpresentation/normalstop only",
+  "completedUtc": "2026-11-05T15:35:28Z"
+}
