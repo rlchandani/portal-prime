@@ -14,27 +14,33 @@ This document is a handoff, not whole-product acceptance.
 
 ## Current delivery and boundaries
 
-Both rooms last verified at exact optimized **1.206/code200**, SHA256
-`f65239e425badf4bb2f4c42cc72aa954dac3ccbd616ac553491cf599f8ae7b5c`, 25,887,623 bytes.
-[Latest receipt](portal-crypto-change-validity-2026-11-05.md): optional crypto
-percentages admit finite values, so numeric overflow uses the existing unavailable
-path. Two baseline assertion failures/two controls become four passing frozen
-parser tests, covering eight vectors and preserving quote fields. All 4,743 JVM /
-494 suites, debug/optimized/R8/vital and JavaScript gates pass. Both complete
+Both rooms last verified at exact optimized **1.207/code201**, SHA256
+`6dec140dcebe9ffc9bed73b60dca80a0b52e283a1513844f838b1e8798b95288`, 25,887,623 bytes.
+[Latest receipt](portal-options-page-token-2026-11-05.md): options continuation
+tokens are encoded without changing their decoded value or other query fields.
+Six generated actual-caller child cases, represented by one JUnit wrapper:
+four baseline AssertionErrors/two controls become six passes. All 4,744 JVM /
+495 suites, debug/optimized/R8/vital and JavaScript gates pass. Both complete
 installed APKs match. All 43 Family / 30 Living preference files and four saved
 maps/revisions remain byte-exact. Family font/accessibility, original Chromium,
 resumed frame and awake state remain; both normal frame requests pass.
-Generated JVM parser acceptance only; live provider/native Crypto UI, optimized
-parser and API28 acceptance remain separate. Original **06:56:14–07:26:14 UTC**
-clock remains; definitive baseline follows the discovery cap by 7.06 seconds.
+Generated JVM transport acceptance only; live provider/mounted scanner UI,
+Android/optimized caller and API28 acceptance remain separate. Original
+**07:13:50–07:43:50 UTC** clock remains; candidate selected before the discovery
+cap, definitive baseline finished 70.15 seconds after it.
 These are recorded results, not fresh checks from reading this file.
+
+The [previous crypto receipt](portal-crypto-change-validity-2026-11-05.md)
+retains its four methods/eight vectors, 06:56:14–07:26:14 UTC clock and
+native/provider limits. Earlier options/input-policy discovery remains closed;
+this correction preserves an existing token's transport.
 
 The [previous step-focus receipt](portal-step-focus-return-2026-11-05.md) retains
 its original six packaged Chrome cases, same-clock two-case Save follow-up,
 backend/phone limits and 06:08:51–06:38:51 UTC clock. That issue is closed.
 
 The public manifest remains **1.83**. Local delivery and public publication are
-separate. The roadmap has **213 tasks: 152 delivered, 49 scoped verified,
+separate. The roadmap has **214 tasks: 153 delivered, 49 scoped verified,
 9 parked, 2 awaiting approval, 1 queued**. Prior task statuses, acceptance and
 issue clocks remain.
 
@@ -71,7 +77,7 @@ across turns and aliases. Split larger work into independently useful changes.
 When a slice stalls, park it and continue unrelated safe work. Do not manufacture
 bugs or add features merely to increase the task count.
 
-Recent closed units include crypto percentage validity, step-editor focus return, browser photo decode feedback, step-action naming, Settings choice-label indexing, import status/count
+Recent closed units include options token transport, crypto percentage validity, step-editor focus return, browser photo decode feedback, step-action naming, Settings choice-label indexing, import status/count
 wording, calendar date/recurrence parsing, photo-source identity/fallback,
 caption date/timezone parsing, and supplied-APK inspection. Historical bounded
 negative findings also remain closed: do not turn an unchanged hypothesis into a

@@ -8,6 +8,7 @@
 package com.immortal.launcher
 
 import android.content.Context
+import java.net.URLEncoder
 import org.json.JSONObject
 
 /**
@@ -117,7 +118,7 @@ object AlpacaClient {
         append("&expiration_date_gte=$expiryGte")
         append("&expiration_date_lte=$expiryLte")
         append("&limit=1000")
-        pageToken?.let { append("&page_token=$it") }
+        pageToken?.let { append("&page_token=${URLEncoder.encode(it, "UTF-8")}") }
       }
       val body = Http.getString(url, headers = headers)
       checkCancelled()

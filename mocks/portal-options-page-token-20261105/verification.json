@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "scope": "Options snapshot continuation: encode opaque page tokens in the query; retain cancellation, page limit, ordering, provider/account/configuration and all prior clocks.",
+  "version": {
+    "versionCode": 201,
+    "versionName": "1.207"
+  },
+  "baseCommit": "5179bbceb8743a23bad1fa1aa04efb1692875a7f",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T07:13:50Z",
+    "discoveryCapUtc": "2026-11-05T07:18:50Z",
+    "targetUtc": "2026-11-05T07:28:50Z",
+    "hardLimitUtc": "2026-11-05T07:43:50Z",
+    "baseCommit": "5179bbceb8743a23bad1fa1aa04efb1692875a7f",
+    "scope": "Distinct bounded visible or reliability correctness priority; retain prior exhausted and delivered scopes",
+    "selectedAt": "2026-11-05T07:18:28.195550+00:00",
+    "selectedScope": "Options snapshot continuation: encode opaque page tokens in the query; retain cancellation, page limit, ordering, provider/account/configuration and all prior clocks.",
+    "evidence": "Actual fetchOptionChain interpolates next_page_token directly; Http passes URL unchanged. Generated decoding shows plus changed to space and ampersand splits a second parameter. Live provider reproduction unestablished.",
+    "baselineAcceptance": "Actual caller generated regression complete: six child cases, four intended AssertionErrors, two controls; one failing JUnit wrapper.",
+    "baselineCompletedUtc": "2026-11-05T07:20:00.154990+00:00",
+    "baselineFollowedDiscoveryCapSeconds": 70.15499,
+    "notReset": true
+  },
+  "implementation": "Encode only opaque page_token using URLEncoder.encode(it, \"UTF-8\")",
+  "frozenTest": {
+    "path": "app/src/test/java/com/immortal/launcher/AlpacaPageTokenTest.kt",
+    "bytes": 6578,
+    "sha256": "4817351b2af13191612e9e80893515e636b29d50a4652f6c338e887ff5f877ae",
+    "jvmWrappers": 1,
+    "childCases": 6,
+    "baselineIntendedAssertionFailures": 4,
+    "baselineControlsPassed": 2,
+    "candidatePassed": 6
+  },
+  "independentReview": {
+    "reviewer": "catalog_fallback_review",
+    "result": "Accepted, no blockers; whole-source reversal exact",
+    "rootRehashedBindings": [
+      {
+        "path": "app/src/main/java/com/immortal/launcher/AlpacaClient.kt",
+        "bytes": 7098,
+        "sha256": "c65ccd5611624c557e8647c534a369e108bba11b2ede31b0a9beb9d3f5205f31"
+      },
+      {
+        "path": "app/src/test/java/com/immortal/launcher/AlpacaPageTokenTest.kt",
+        "bytes": 6578,
+        "sha256": "4817351b2af13191612e9e80893515e636b29d50a4652f6c338e887ff5f877ae"
+      },
+      {
+        "path": "app/build.gradle.kts",
+        "bytes": 11816,
+        "sha256": "bf1f07b4b507b03d466e04155b1c6b10756bfde14e39d218f1fb085567448569"
+      },
+      {
+        "path": "app/src/main/java/com/immortal/launcher/Http.kt",
+        "bytes": 6615,
+        "sha256": "442c3285682ae7467cde959417c40477d1373dd893e1e267bd355c4fd2322422"
+      }
+    ],
+    "baselineXmlSha256": "989293f46eaa544c826d5fc1249ae807bcc9364c03b7e30cc6e67a8dc6781a00",
+    "freshReviewerExecution": false,
+    "limitations": [
+      "No live provider/native/API28/optimized-caller execution",
+      "No literal encoded secondURL assertion",
+      "No new cancellation assertion; cancellation policy source-exact"
+    ],
+    "originalClockRetained": true
+  },
+  "build": {
+    "start": "2026-11-05T07:20:34.941843+00:00",
+    "finish": "2026-11-05T07:22:15.278769+00:00",
+    "exit": 0,
+    "seconds": 100.33631412500108
+  },
+  "jvm": {
+    "tests": 4744,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 495,
+    "allReportsFresh": true,
+    "newJUnitWrappers": 1,
+    "generatedChildCases": 6
+  },
+  "javascript": {
+    "slideshow-js": 404,
+    "remote-js": 786
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-product-discovery-20261105-071350/candidate-debug-1.207.apk",
+      "bytes": 46746646,
+      "sha256": "a6a6ae8200fc7f4363101bd7a5692954b0f8d9964ea1cdb59ca363427fbd3426",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='201' versionName='1.207' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    },
+    "performance": {
+      "path": "/private/tmp/portal-product-discovery-20261105-071350/candidate-performance-1.207.apk",
+      "bytes": 25887623,
+      "sha256": "6dec140dcebe9ffc9bed73b60dca80a0b52e283a1513844f838b1e8798b95288",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='201' versionName='1.207' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6"
+    }
+  },
+  "assets": {
+    "mainSourceAssetsByteExact": 23,
+    "generatedAssetDifferences": [
+      "assets/dexopt/baseline.prof"
+    ]
+  },
+  "artifactInspection": {
+    "final": {
+      "start": "2026-11-05T07:23:23.344233+00:00",
+      "finish": "2026-11-05T07:23:23.980657+00:00",
+      "exit": 0,
+      "seconds": 0.6364375830016797
+    },
+    "firstAttempt": {
+      "start": "2026-11-05T07:23:09.719647+00:00",
+      "finish": "2026-11-05T07:23:10.027170+00:00",
+      "exit": 1,
+      "seconds": 0.3075342500087572
+    },
+    "firstFailure": "SDK path missing; retained separately; corrected explicit SDK passed"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25887623,
+      "sha256": "6dec140dcebe9ffc9bed73b60dca80a0b52e283a1513844f838b1e8798b95288",
+      "app": {
+        "versionCode": 201,
+        "versionName": "1.207"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25887623,
+        "sha256": "6dec140dcebe9ffc9bed73b60dca80a0b52e283a1513844f838b1e8798b95288",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 201,
+          "versionName": "1.207"
+        }
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1622,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1939,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "frameReturn": {
+    "family": {
+      "ok": true,
+      "result": "legacy_frame_requested",
+      "action": "screensaver"
+    },
+    "living": {
+      "ok": true,
+      "result": "legacy_frame_requested",
+      "action": "screensaver"
+    }
+  },
+  "cleanup": {
+    "copiedRegistryRecordsRemoved": 2,
+    "ownerRegistryHashesPreserved": true,
+    "captureDirectoriesExclusive": true
+  },
+  "limits": [
+    "Generated isolated JVM transport; no live provider, mounted scanner UI, Android/optimized caller or API28 acceptance",
+    "One JUnit wrapper represents six child cases; no literal encoded secondURL or new cancellation assertion",
+    "No provider/account/input-validation policy change; prior negative options and stock fallback scopes retained",
+    "Captured log markers are scoped observations, not universal health proof",
+    "No phone, household provider/account/source selection, GitHub push or public publication",
+    "All prior held issue clocks and screensaver visual acceptance remain"
+  ]
+}

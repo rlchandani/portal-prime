@@ -1,18 +1,66 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T07:11:22.283395+00:00",
-  "updatedLabel": "5 November \u00b7 crypto percentage guard delivered",
+  "updatedAt": "2026-11-05T07:25:35.034501+00:00",
+  "updatedLabel": "5 November \u00b7 options token transport delivered",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.206/code200, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.207/code201, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "options-page-token-encoding",
+      "title": "Options scanner: preserve continuation tokens",
+      "summary": "Opaque page tokens retain their value across query encoding; exact optimized1.207 verified in both rooms.",
+      "status": "delivered",
+      "kind": "Bounded options request correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root implementation/delivery; independent source review",
+      "verification": "Six frozen generated child cases:4 baseline AssertionErrors/2 controls \u21926 pass; one JUnit wrapper.4744JVM/495suites, builds/R8/vital/JS; full APK readbacks.",
+      "deployment": "Exact optimized1.207/code201 both rooms; one install each. Living uncertainty reconciled by6 read-only observations.",
+      "acceptance": [
+        "Preserve plus, ampersand, percent and fragment token values and existing query parameters.",
+        "Preserve first-page URL, contracts, page cap, headers, connection retirement and preferences.",
+        "Keep cancellation/parser/filter/configuration source-exact; verify artifacts and both rooms."
+      ],
+      "evidence": [
+        {
+          "text": "Correction, delivery and limits",
+          "source": "docs/portal-options-page-token-2026-11-05.md"
+        },
+        {
+          "text": "Bound verification",
+          "source": "mocks/portal-options-page-token-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated isolated JVM transport; no live provider, mounted scanner UI, Android/optimized caller or API28 acceptance",
+        "One JUnit wrapper represents six child cases; no literal encoded secondURL or new cancellation assertion",
+        "No provider/account/input-validation policy change; prior negative options and stock fallback scopes retained",
+        "Captured log markers are scoped observations, not universal health proof",
+        "No phone, household provider/account/source selection, GitHub push or public publication",
+        "All prior held issue clocks and screensaver visual acceptance remain"
+      ],
+      "next": "Continue a distinct small priority; retain all prior issue clocks and provider/native limits.",
+      "issueClock": {
+        "originalStartUtc": "2026-11-05T07:13:50Z",
+        "discoveryCapUtc": "2026-11-05T07:18:50Z",
+        "targetUtc": "2026-11-05T07:28:50Z",
+        "hardLimitUtc": "2026-11-05T07:43:50Z",
+        "baseCommit": "5179bbceb8743a23bad1fa1aa04efb1692875a7f",
+        "selectedAt": "2026-11-05T07:18:28.195550+00:00",
+        "baselineCompletedUtc": "2026-11-05T07:20:00.154990+00:00",
+        "baselineFollowedDiscoveryCapSeconds": 70.15499,
+        "notReset": true
+      }
+    },
     {
       "id": "crypto-finite-change",
       "title": "Crypto: hide unusable infinite percentage changes",
