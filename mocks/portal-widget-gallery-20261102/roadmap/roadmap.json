@@ -1,18 +1,63 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T03:29:56.910658+00:00",
-  "updatedLabel": "5 November2026 \u00b7 timed calendar validation delivered in1.195",
+  "updatedAt": "2026-11-05T03:43:21.044942+00:00",
+  "updatedLabel": "5 November2026 \u00b7 disabled overnight-start fix delivered in1.196",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.195/code189, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.196/code190, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+        "id": "overnight-disabled-start",
+        "title": "Sleep: ignore disabled overnight-start deliveries",
+        "summary": "A queued overnight start cannot request rest after the user disables the feature.",
+        "status": "delivered",
+        "kind": "Android overnight alarm admission correctness",
+        "platforms": [
+            "portal"
+        ],
+        "owner": "Sleep policy / independent review / native and delivery verification",
+        "deployment": "Exact optimized1.196/code190 fully hashed both rooms, one install each.",
+        "verification": "4695JVM/489suites;7host5failures→7pass;4actual-debug/API29 boundary cases3mismatches→4pass",
+        "acceptance": [
+            "Check current overnightEnabled before entering rest.",
+            "Retain both disabled alarm cancellations and enabled rest behavior.",
+            "Use frozen actual Android receiver boundary fixture.",
+            "Verify builds/review/artifacts/delivery/preservation."
+        ],
+        "evidence": [
+            {
+                "text": "Scope and acceptance limits.",
+                "source": "docs/portal-overnight-disabled-2026-11-05.md"
+            },
+            {
+                "text": "Machine proof and original clock.",
+                "source": "mocks/portal-overnight-disabled-20261105/verification.json"
+            }
+        ],
+        "limits": [
+            "Actual generated receiver/policy acceptance for disabled overnight-start delivery only; no real overnight alarm, physical lock/wake or mounted night-clock acceptance.",
+            "Native API29 debug fixture captures denied rest-entry resolver/DPM attempts, then halts at scheduleOvernight config read before real settings/services/alarms/PendingIntents; no end-to-end secure/lock/cancellation acceptance.",
+            "Host seven and native four vectors differ. Host verifies generated captured alarm/cancellation, disabled night-clock PowerManager inactivity, enabled dark lock and no-admin controls.",
+            "Only current overnightEnabled admission changes; enabled-window timing, user sessions, recurrence, idle, sleep timer, audio and configuration behavior remain. No atomicity guarantee if settings change after the guard read.",
+            "No optimized receiver execution/API28/Living native/phone/provider/account/GitHub authentication/push/publication claim. Discovery overran its cap; original03:31:49 start/03:46:49 target/04:01:49 hard limit retained, as are earlier held clocks and the whole active goal."
+        ],
+        "next": "Continue independent product work; retain held clocks.",
+        "issueClock": {
+            "originalStartUtc": "2026-11-05T03:31:49Z",
+            "discoveryCapUtc": "2026-11-05T03:36:49Z",
+            "targetUtc": "2026-11-05T03:46:49Z",
+            "hardLimitUtc": "2026-11-05T04:01:49Z",
+            "baseHead": "ba0126ca6c187e289da23165b0cb2cf7b7115a90",
+            "scope": "Fresh screen/sleep/input reliability discovery; no reopening prior held units"
+        }
+    },
     {
         "id": "calendar-timed-date-validation",
         "title": "Calendar: reject malformed timed dates",

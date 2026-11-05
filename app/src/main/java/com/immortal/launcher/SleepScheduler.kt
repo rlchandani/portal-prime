@@ -348,7 +348,7 @@ object SleepScheduler {
   /** The window-start alarm fired: enter the rest state and arm tomorrow's alarms. */
   fun onWindowStart(context: Context) {
     Log.i(TAG, "overnight start")
-    enterOvernightRest(context)
+    if (ScreensaverConfig.load(context).overnightEnabled) enterOvernightRest(context)
     scheduleOvernight(context)
   }
 

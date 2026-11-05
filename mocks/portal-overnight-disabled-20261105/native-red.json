@@ -1,0 +1,157 @@
+{
+  "phase": "red",
+  "sourceApkSha256": "f010194fb065211cc2f367d332d5b3a2ef1adf21f574c2b4e281e7acc8c12e39",
+  "fixture": {
+    "javaSha256": "9df8a7dd0e13926eb66560d9f2af619a23a548fc596b96162d74c66f3270c666",
+    "probeJarSha256": "b3fee547036fb2ddf0b05004402def53970e47fa0c4e7a5a1030645d13929127",
+    "driverSha256": "eaf1fd33e48fa81dc4ed37f5ae21ac9f5bf80d3e254886191ebdd6e827219ace",
+    "compiledClassCount": 5,
+    "literalCases": 4,
+    "expectedBaselineFailures": 3,
+    "expectedBaselineControls": 1
+  },
+  "result": {
+    "caseCount": 4,
+    "passed": 1,
+    "sourceClassLoaderVerified": true,
+    "api": 29,
+    "action": "com.immortal.launcher.OVERNIGHT_START",
+    "entrypoint": "Actual APK SleepReceiver.onReceive(Context,Intent)",
+    "deniedUrlOpens": 0,
+    "actualNetworkRequests": 0,
+    "actualSecureReadsWrites": 0,
+    "actualServiceLookups": 0,
+    "actualAlarmsPendingIntents": 0,
+    "scope": "Rest-entry boundary attempts only; halted at actual scheduleOvernight config read before alarm/PI operations; no end-to-end lock/wake/nightclock acceptance",
+    "cases": [
+      {
+        "name": "disabled-default-settings",
+        "generatedPreferences": {
+          "overnight_night_clock": false,
+          "idle_sleep_min": 0,
+          "overnight_enabled": false,
+          "enabled": true,
+          "sleep_timer_enabled": false
+        },
+        "expectedResolverAttempts": 0,
+        "expectedDpmAttempts": 0,
+        "resolverAttempts": 1,
+        "dpmAttempts": 1,
+        "servicesDeniedBeforeLookup": [
+          "android.app.admin.DevicePolicyManager"
+        ],
+        "preferenceReads": 1,
+        "preferencesMutationAttempts": 0,
+        "unexpectedServiceAttempts": 0,
+        "scheduleHalts": 1,
+        "scheduleBoundaryStack": [
+          "com.immortal.launcher.ScreensaverConfig.prefs",
+          "com.immortal.launcher.ScreensaverConfig.load",
+          "com.immortal.launcher.SleepScheduler.scheduleOvernight",
+          "com.immortal.launcher.SleepScheduler.onWindowStart",
+          "com.immortal.launcher.SleepReceiver.onReceive"
+        ],
+        "failure": null,
+        "literalPassed": false,
+        "boundaryContained": true,
+        "passed": false
+      },
+      {
+        "name": "disabled-screensaver-off-idle-on",
+        "generatedPreferences": {
+          "overnight_night_clock": false,
+          "idle_sleep_min": 60,
+          "overnight_enabled": false,
+          "enabled": false,
+          "sleep_timer_enabled": false
+        },
+        "expectedResolverAttempts": 0,
+        "expectedDpmAttempts": 0,
+        "resolverAttempts": 1,
+        "dpmAttempts": 1,
+        "servicesDeniedBeforeLookup": [
+          "android.app.admin.DevicePolicyManager"
+        ],
+        "preferenceReads": 1,
+        "preferencesMutationAttempts": 0,
+        "unexpectedServiceAttempts": 0,
+        "scheduleHalts": 1,
+        "scheduleBoundaryStack": [
+          "com.immortal.launcher.ScreensaverConfig.prefs",
+          "com.immortal.launcher.ScreensaverConfig.load",
+          "com.immortal.launcher.SleepScheduler.scheduleOvernight",
+          "com.immortal.launcher.SleepScheduler.onWindowStart",
+          "com.immortal.launcher.SleepReceiver.onReceive"
+        ],
+        "failure": null,
+        "literalPassed": false,
+        "boundaryContained": true,
+        "passed": false
+      },
+      {
+        "name": "disabled-sleep-timer-on",
+        "generatedPreferences": {
+          "overnight_night_clock": false,
+          "idle_sleep_min": 10,
+          "overnight_enabled": false,
+          "enabled": true,
+          "sleep_timer_enabled": true
+        },
+        "expectedResolverAttempts": 0,
+        "expectedDpmAttempts": 0,
+        "resolverAttempts": 1,
+        "dpmAttempts": 1,
+        "servicesDeniedBeforeLookup": [
+          "android.app.admin.DevicePolicyManager"
+        ],
+        "preferenceReads": 1,
+        "preferencesMutationAttempts": 0,
+        "unexpectedServiceAttempts": 0,
+        "scheduleHalts": 1,
+        "scheduleBoundaryStack": [
+          "com.immortal.launcher.ScreensaverConfig.prefs",
+          "com.immortal.launcher.ScreensaverConfig.load",
+          "com.immortal.launcher.SleepScheduler.scheduleOvernight",
+          "com.immortal.launcher.SleepScheduler.onWindowStart",
+          "com.immortal.launcher.SleepReceiver.onReceive"
+        ],
+        "failure": null,
+        "literalPassed": false,
+        "boundaryContained": true,
+        "passed": false
+      },
+      {
+        "name": "enabled-dark-control",
+        "generatedPreferences": {
+          "overnight_night_clock": false,
+          "idle_sleep_min": 0,
+          "overnight_enabled": true,
+          "enabled": true,
+          "sleep_timer_enabled": false
+        },
+        "expectedResolverAttempts": 1,
+        "expectedDpmAttempts": 1,
+        "resolverAttempts": 1,
+        "dpmAttempts": 1,
+        "servicesDeniedBeforeLookup": [
+          "android.app.admin.DevicePolicyManager"
+        ],
+        "preferenceReads": 1,
+        "preferencesMutationAttempts": 0,
+        "unexpectedServiceAttempts": 0,
+        "scheduleHalts": 1,
+        "scheduleBoundaryStack": [
+          "com.immortal.launcher.ScreensaverConfig.prefs",
+          "com.immortal.launcher.ScreensaverConfig.load",
+          "com.immortal.launcher.SleepScheduler.scheduleOvernight",
+          "com.immortal.launcher.SleepScheduler.onWindowStart",
+          "com.immortal.launcher.SleepReceiver.onReceive"
+        ],
+        "failure": null,
+        "literalPassed": true,
+        "boundaryContained": true,
+        "passed": true
+      }
+    ]
+  }
+}

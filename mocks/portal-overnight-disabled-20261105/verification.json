@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T03:43:21.044942+00:00",
+  "status": "delivered_and_read_back_in_both_rooms",
+  "version": {
+    "code": 190,
+    "name": "1.196"
+  },
+  "baseCommit": "ba0126ca6c187e289da23165b0cb2cf7b7115a90",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T03:31:49Z",
+    "discoveryCapUtc": "2026-11-05T03:36:49Z",
+    "targetUtc": "2026-11-05T03:46:49Z",
+    "hardLimitUtc": "2026-11-05T04:01:49Z",
+    "baseHead": "ba0126ca6c187e289da23165b0cb2cf7b7115a90",
+    "scope": "Fresh screen/sleep/input reliability discovery; no reopening prior held units"
+  },
+  "scope": "Reject queued overnight-start rest entry when the overnight feature is currently disabled; retain cancellation of both alarms.",
+  "sourceBindings": [
+    {
+      "path": "app/src/main/java/com/immortal/launcher/SleepScheduler.kt",
+      "bytes": 19950,
+      "sha256": "89cf7ba210afa4ae60e22697ad62bbfc867b856042cb54d3c6d0af59699f342b"
+    },
+    {
+      "path": "app/src/test/java/com/immortal/launcher/SleepOvernightDisabledTest.kt",
+      "bytes": 5590,
+      "sha256": "ded5bd1f249f3c402c3846168f0acf12f54b1a432dd287cfaa587d4e448860ef"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 11816,
+      "sha256": "91a9fce10833614e6dcb7ca229eaf751fe21028b18f7f46f22de246099808896"
+    }
+  ],
+  "regression": {
+    "actualReceiverAndScheduler": true,
+    "generatedPreferencesAndCapturedAndroidEffectsOnly": true,
+    "hostMethods": 7,
+    "hostBaselineFailures": 5,
+    "hostBaselineControlsPassed": 2,
+    "hostCandidatePassed": 7,
+    "frozenAssertionsUnchanged": true
+  },
+  "native": {
+    "api": 29,
+    "actualDebugReceiver": true,
+    "boundaryAttemptsOnly": true,
+    "cases": 4,
+    "baselineMismatches": 3,
+    "baselineControlsPassed": 1,
+    "candidatePassed": 4,
+    "classOriginsVerified": true,
+    "sameFrozenJavaJarDriver": true,
+    "fixture": {
+      "javaSha256": "9df8a7dd0e13926eb66560d9f2af619a23a548fc596b96162d74c66f3270c666",
+      "probeJarSha256": "b3fee547036fb2ddf0b05004402def53970e47fa0c4e7a5a1030645d13929127",
+      "driverSha256": "eaf1fd33e48fa81dc4ed37f5ae21ac9f5bf80d3e254886191ebdd6e827219ace",
+      "compiledClassCount": 5,
+      "literalCases": 4,
+      "expectedBaselineFailures": 3,
+      "expectedBaselineControls": 1
+    },
+    "urlOpens": 0,
+    "realSettingsServicesAlarmsDenied": true,
+    "haltBeforeScheduling": true,
+    "bothOwnedPathsAbsent": true,
+    "bothProcessesTerminal": true
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 112.17260724998778
+  },
+  "jvm": {
+    "tests": 4695,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 489
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746006,
+      "sha256": "dcf74425ebb61379a153d0119a3fbc879019728fcbd54a485cfa3f7340de1f61",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25903487,
+      "sha256": "44a3b49678b5062cb79ceeb4dcb08522f2bd5fd1fc16294d9da9ceef21328016",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof"
+      ]
+    }
+  },
+  "independentReview": {
+    "accepted": true,
+    "reviewSha256": "4ef3fae72707088a6508a47119354e54ad708c071b1fd706ca4d68d074f124d9",
+    "bindingsRootRehashed": 22,
+    "oneGuardAndVersionEditsReverseExactlyToBaseline": true,
+    "scope": "Source and frozen baseline review; root independently checked fresh candidate build/native and promotion evidence"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25903487,
+      "sha256": "44a3b49678b5062cb79ceeb4dcb08522f2bd5fd1fc16294d9da9ceef21328016",
+      "app": {
+        "versionCode": 190,
+        "versionName": "1.196"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 9
+      },
+      "installed": {
+        "bytes": 25903487,
+        "sha256": "44a3b49678b5062cb79ceeb4dcb08522f2bd5fd1fc16294d9da9ceef21328016",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 190,
+          "versionName": "1.196"
+        }
+      }
+    },
+    "frameRequests": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    },
+    "preservation": {
+      "family": {
+        "preferenceFilesByteIdentical": 43,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1622,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        },
+        "fontAccessibilityPreserved": true,
+        "originalChromiumActivityRetained": true,
+        "frameResumed": true,
+        "awake": true
+      },
+      "living": {
+        "preferenceFilesByteIdentical": 30,
+        "observedInternalCacheDifferences": {},
+        "preferenceFileSetsIdentical": true,
+        "allFourMapsIdenticalIncludingRevision": true,
+        "nameDevModePreserved": true,
+        "diagnostics": {
+          "diag": {
+            "responseLines": 1,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          },
+          "logcat": {
+            "responseLines": 1872,
+            "capturedFatalAnrMarkers": 0,
+            "ownedFixtureFirstAttemptCrashMarkers": 0,
+            "otherCapturedFatalAnrMarkers": 0
+          }
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "copiedRegistriesRemoved": true,
+    "ownerRegistryHashesPreserved": true,
+    "nativePathsRemoved": true
+  },
+  "publicVersionManifestUnchanged": true,
+  "limits": [
+    "Actual generated receiver/policy acceptance for disabled overnight-start delivery only; no real overnight alarm, physical lock/wake or mounted night-clock acceptance.",
+    "Native API29 debug fixture captures denied rest-entry resolver/DPM attempts, then halts at scheduleOvernight config read before real settings/services/alarms/PendingIntents; no end-to-end secure/lock/cancellation acceptance.",
+    "Host seven and native four vectors differ. Host verifies generated captured alarm/cancellation, disabled night-clock PowerManager inactivity, enabled dark lock and no-admin controls.",
+    "Only current overnightEnabled admission changes; enabled-window timing, user sessions, recurrence, idle, sleep timer, audio and configuration behavior remain. No atomicity guarantee if settings change after the guard read.",
+    "No optimized receiver execution/API28/Living native/phone/provider/account/GitHub authentication/push/publication claim. Discovery overran its cap; original03:31:49 start/03:46:49 target/04:01:49 hard limit retained, as are earlier held clocks and the whole active goal."
+  ]
+}
