@@ -1226,20 +1226,71 @@
 
   // ---- 11 Cinema letterbox ---------------------------------------------------
   MODES.cinema = { name: "Cinema Letterbox", run(ctx, deck) {
-    const t = makeTimers(ctx), frame = el("ss-scope", ctx.root), scopeH = ctx.H * .78;
+    const t = makeTimers(ctx), frame = el("ss-scope", ctx.root);
     const bars = [el("ss-bar top", ctx.root), el("ss-bar bot", ctx.root)];
     let disposed = false;
     const layers = [0, 1].map(() => {
       const root = el("ss-layer cinema-layer retired", frame), img = el("ss-img ss-cinema-photo", root);
       const grain = el("ss-grain", img);
       img.style.backgroundImage = "none"; img.style.animation = "none"; img.style.willChange = "auto";
-      return { root, img, grain };
+      return { root, img, grain, photo: null };
     });
     const dissolve = makeSceneDissolve({ ...ctx, root: frame }, t, layers.map(layer => layer.root), 2200, root => {
-      const image = layers.find(layer => layer.root === root).img;
+      const layer = layers.find(layer => layer.root === root), image = layer.img;
+      layer.photo = null;
       image.style.backgroundImage = "none"; image.style.animation = "none";
       image.style.willChange = "auto"; image.style.transform = "none";
     });
+    function layoutImage(layer, u) {
+      const p = layer.photo; if (!p) return;
+      const image = layer.img, viewportW = ctx.root.clientWidth || ctx.W,
+        viewportH = ctx.root.clientHeight || ctx.H, scopeH = viewportH * .78;
+    const raw = aspect(p), ratio = Number.isFinite(raw) && raw > 0 ? raw : 1;
+    const wide = ratio > 2.2, W = wide ? viewportW : Math.min(viewportW, scopeH * ratio), H = wide ? scopeH : W / ratio;
+    image.style.width = W + "px"; image.style.height = H + "px";
+    image.style.left = ((viewportW - W) / 2) + "px"; image.style.top = ((scopeH - H) / 2) + "px";
+    image.style.right = "auto"; image.style.bottom = "auto";
+    if (u !== undefined) {
+      image.style.transform = "none"; image.style.animation = "none"; image.style.willChange = "auto";
+      bg(image, u, wide ? "cover" : "contain");
+    }
+    if (wide && hasFace(p)) {
+      // Keep the immersive crop, but center the cached focal point rather than
+      // confusing CSS edge alignment with the focal point's image coordinate.
+      const renderedW = Math.max(viewportW, scopeH * ratio), renderedH = renderedW / ratio;
+      // Compare the cover constraints directly; division roundoff can make
+      // a height fitted exactly to scopeH appear to overflow it.
+      const vertical = viewportW > scopeH * ratio;
+      const faceCrop = SS.faceCrop(p, vertical ? renderedH : renderedW,
+        vertical ? scopeH : viewportW, vertical);
+      if (faceCrop) {
+        const safeWidth = vertical ? faceCrop.size * ratio : viewportW;
+        const safeHeight = vertical ? scopeH : faceCrop.size / ratio;
+        image.style.width = safeWidth + "px";
+        image.style.height = safeHeight + "px";
+        image.style.left = (viewportW - safeWidth) / 2 + "px";
+        image.style.top = (scopeH - safeHeight) / 2 + "px";
+        image.style.backgroundPosition = vertical ? `50% ${faceCrop.position * 100}%` :
+          `${faceCrop.position * 100}% 50%`;
+      } else {
+        image.style.backgroundPosition =
+          `${SS.panStart(p.fx, renderedW / viewportW * 100) * 100}% ${SS.panStart(p.fy, renderedH / scopeH * 100) * 100}%`;
+      }
+    } else if (u !== undefined && wide && ctx.photoMotion !== false) {
+      image.style.willChange = "transform";
+      image.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
+    }
+    }
+    let resizePending = false;
+    function onResize() {
+      if (disposed || resizePending) return;
+      resizePending = true;
+      t.frame(() => {
+        resizePending = false;
+        if (!disposed && dissolve.active()) layers.forEach(layer => layoutImage(layer));
+      });
+    }
+    if (typeof window.addEventListener === "function") window.addEventListener("resize", onResize);
     async function step() {
       const c = SS.counts(deck), p = SS.take(deck, ctx.cursor, [c.pano ? "pano" : "landscape"])[0];
       const u = await t.publish(() => ctx.url(p, 2400));
@@ -1247,39 +1298,8 @@
       return t.publish(() => {
         if (disposed || !dissolve.active()) return false;
         const root = dissolve.next(), image = layers.find(layer => layer.root === root).img;
-        const raw = aspect(p), ratio = Number.isFinite(raw) && raw > 0 ? raw : 1;
-        const wide = ratio > 2.2, W = wide ? ctx.W : Math.min(ctx.W, scopeH * ratio), H = wide ? scopeH : W / ratio;
-        image.style.width = W + "px"; image.style.height = H + "px";
-        image.style.left = ((ctx.W - W) / 2) + "px"; image.style.top = ((scopeH - H) / 2) + "px";
-        image.style.right = "auto"; image.style.bottom = "auto"; image.style.transform = "none";
-        image.style.animation = "none"; image.style.willChange = "auto";
-        bg(image, u, wide ? "cover" : "contain");
-        if (wide && hasFace(p)) {
-          // Keep the immersive crop, but center the cached focal point rather than
-          // confusing CSS edge alignment with the focal point's image coordinate.
-          const renderedW = Math.max(ctx.W, scopeH * ratio), renderedH = renderedW / ratio;
-          // Compare the cover constraints directly; division roundoff can make
-          // a height fitted exactly to scopeH appear to overflow it.
-          const vertical = ctx.W > scopeH * ratio;
-          const faceCrop = SS.faceCrop(p, vertical ? renderedH : renderedW,
-            vertical ? scopeH : ctx.W, vertical);
-          if (faceCrop) {
-            const safeWidth = vertical ? faceCrop.size * ratio : ctx.W;
-            const safeHeight = vertical ? scopeH : faceCrop.size / ratio;
-            image.style.width = safeWidth + "px";
-            image.style.height = safeHeight + "px";
-            image.style.left = (ctx.W - safeWidth) / 2 + "px";
-            image.style.top = (scopeH - safeHeight) / 2 + "px";
-            image.style.backgroundPosition = vertical ? `50% ${faceCrop.position * 100}%` :
-              `${faceCrop.position * 100}% 50%`;
-          } else {
-            image.style.backgroundPosition =
-              `${SS.panStart(p.fx, renderedW / ctx.W * 100) * 100}% ${SS.panStart(p.fy, renderedH / scopeH * 100) * 100}%`;
-          }
-        } else if (wide && ctx.photoMotion !== false) {
-          image.style.willChange = "transform";
-          image.style.animation = `cinematicDrift ${ctx.motionMs}ms linear forwards`;
-        }
+        const layer = layers.find(layer => layer.root === root);
+        layer.photo = p; layoutImage(layer, u);
         dissolve.present(root);
       });
     }
@@ -1288,6 +1308,7 @@
       if (disposed) return;
       disposed = true; dissolve.cleanup();
       layers.forEach(layer => { layer.grain.style.backgroundImage = "none"; });
+      if (typeof window.removeEventListener === "function") window.removeEventListener("resize", onResize);
       frame.remove(); bars.forEach(bar => bar.remove());
     };
     Object.defineProperty(cleanup, "ready", { get: () => t.cleanup.ready });

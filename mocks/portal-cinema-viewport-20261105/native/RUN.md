@@ -1,0 +1,7 @@
+# Owned Cinema viewport fixture
+
+Root reviewed, compiled, signed and ran the accepted fixture against both embedded APKs. Package com.immortal.cinemaviewportfixture/.CinemaViewportActivity; owned external-files/report.json. No manifest permissions; all non-allowlisted requests denied. Actual Cinema mode and CSS come from immutable embedded APK assets, generated inline SVG photos only. No Android app controller/scheduler/providers/prefs/household media.
+
+Use build.sh with exact candidate-debug-1.186.apk once, freeze DEX, then repack.sh for candidate changing only embedded source.apk. Keep Java, HTML, manifest, driver and DEX exact between native runs. Virtual mode timeout/Date.now only; real WebView decode, layout and RAF. Five literal geometry cases: landscape full1600x1000 => image1170x780 at215,0; retained640x400 =>468x312 at86,0; retainedportrait800x1200 =>800x533.333333 at0,201.333333; future step at640x400 =>468x312 at86,0; originalwide control1600x1000 =>1600x780 at0,0. Tolerance0.05 CSS pixels. Retained stages never restart mode, resolve URL or decode a new image. Future actual mode timeout advances5000ms; new layer plus one resolution/decode required. Static motion only; no physical animation/performance/native app scheduler acceptance. Optional final software Canvas screenshot has no hardware-raster acceptance.
+
+Original issue00:46:14Z target01:01:14Z hard01:16:14Z Nov5 retained. No reopening Panorama/Memories prior units.

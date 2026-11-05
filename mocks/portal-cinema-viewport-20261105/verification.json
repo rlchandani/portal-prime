@@ -1,0 +1,1211 @@
+{
+  "recordedAt": "2026-11-05T01:08:08.722323+00:00",
+  "issueClock": {
+    "startedAt": "2026-11-05T00:46:14Z",
+    "discoveryDeadline": "2026-11-05T00:51:14Z",
+    "target": "2026-11-05T01:01:14Z",
+    "deadline": "2026-11-05T01:16:14Z",
+    "scope": "Retained and future Cinema geometry after viewport resize",
+    "reset": false
+  },
+  "sourceReview": {
+    "verdict": "accepted",
+    "reviewStarted": "2026-11-05T00:52:48.884Z",
+    "reviewCompleted": "2026-11-05T00:53:13.013Z",
+    "bindings": {
+      "app/src/main/assets/screensaver/mode-impls.js": "641d87ee5a015324aa4fce92a934e17ccebfd8e9b7febbfaddc56a1ea1874251",
+      "scripts/tests/slideshow_cinema_viewport.test.mjs": "3e06f44344873a9199a4f66cfcd52b62e922a0d15bdd6af47f7dc159fd1a6072",
+      "app/build.gradle.kts": "76bf19c9e1da6f34ba4c58b6466fcd49fb3f52e9c4955343b0ada350afbb7043"
+    },
+    "scope": "Only Cinema; original geometry/motion/face crop and lifetime ownership"
+  },
+  "promotionGate": {
+    "candidateEligible": true,
+    "sourceReviewRehashed": true,
+    "all4626JvmPass": true,
+    "all404Slideshow757RemoteChecksPass": true,
+    "frozenHostTestsIdentical": true,
+    "nativeFiveCasesPassBeforePromotion": true,
+    "sameFrozenNativeSourcesDexDriver": true,
+    "nativeFixturesRetired": true,
+    "all22OtherSourceAssetsExact": true,
+    "soleIntentionalSourceAsset": "screensaver/mode-impls.js",
+    "debugSha256": "a89b72177b9e12c1e7eb96c5cc0b5f0dfc60a6801de6c84d4505944b66462e98",
+    "performanceSha256": "ef18d83db2d07f48dead95239d9e22906946858a46e58111b0e760b650f5d776"
+  },
+  "jvm": {
+    "tests": 4626,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 481
+  },
+  "javascript": {
+    "schemaVersion": 1,
+    "scope": "local-javascript-checks",
+    "status": "checked",
+    "published": false,
+    "deployed": false,
+    "checks": [
+      {
+        "name": "git-root",
+        "argv": [
+          "git",
+          "-c",
+          "core.hooksPath=/dev/null",
+          "--no-optional-locks",
+          "rev-parse",
+          "--show-toplevel"
+        ],
+        "log": "01-git-root.log",
+        "exitCode": 0,
+        "durationMs": 12
+      },
+      {
+        "name": "git-head",
+        "argv": [
+          "git",
+          "-c",
+          "core.hooksPath=/dev/null",
+          "--no-optional-locks",
+          "rev-parse",
+          "HEAD"
+        ],
+        "log": "02-git-head.log",
+        "exitCode": 0,
+        "durationMs": 12
+      },
+      {
+        "name": "source-files",
+        "argv": [
+          "git",
+          "-c",
+          "core.hooksPath=/dev/null",
+          "--no-optional-locks",
+          "ls-files",
+          "--cached",
+          "--others",
+          "--exclude-standard",
+          "-z"
+        ],
+        "log": "03-source-files.log",
+        "exitCode": 0,
+        "durationMs": 24
+      },
+      {
+        "name": "node-version",
+        "argv": [
+          "node",
+          "--version"
+        ],
+        "log": "04-node-version.log",
+        "exitCode": 0,
+        "durationMs": 24
+      },
+      {
+        "name": "slideshow-js",
+        "argv": [
+          "node",
+          "--test",
+          "--test-reporter=tap",
+          "scripts/test_slideshow_sources.mjs",
+          "scripts/test_slideshow_labels.mjs",
+          "scripts/tests/slideshow_cinema_lifecycle.test.mjs",
+          "scripts/tests/slideshow_cinema_viewport.test.mjs",
+          "scripts/tests/slideshow_face_region_crop.test.mjs",
+          "scripts/tests/slideshow_filmstrip_input.test.mjs",
+          "scripts/tests/slideshow_filmstrip_visible_preparation.test.mjs",
+          "scripts/tests/slideshow_fixed_startup.test.mjs",
+          "scripts/tests/slideshow_framed_lifecycle.test.mjs",
+          "scripts/tests/slideshow_framed_viewport.test.mjs",
+          "scripts/tests/slideshow_gallery_reservations.test.mjs",
+          "scripts/tests/slideshow_gallery_retirement.test.mjs",
+          "scripts/tests/slideshow_hero_sidebar.test.mjs",
+          "scripts/tests/slideshow_history_navigation.test.mjs",
+          "scripts/tests/slideshow_live_face_metadata.test.mjs",
+          "scripts/tests/slideshow_measurement_lifecycle.test.mjs",
+          "scripts/tests/slideshow_memories.test.mjs",
+          "scripts/tests/slideshow_memories_viewport.test.mjs",
+          "scripts/tests/slideshow_mosaic_lifecycle.test.mjs",
+          "scripts/tests/slideshow_native_filmstrip.test.cjs",
+          "scripts/tests/slideshow_panorama.test.mjs",
+          "scripts/tests/slideshow_panorama_viewport.test.mjs",
+          "scripts/tests/slideshow_photo_layout.test.mjs",
+          "scripts/tests/slideshow_photo_motion.test.mjs",
+          "scripts/tests/slideshow_polaroid_lifecycle.test.mjs",
+          "scripts/tests/slideshow_polaroid_reservations.test.mjs",
+          "scripts/tests/slideshow_resolved_resources.test.mjs",
+          "scripts/tests/slideshow_style_reporting.test.mjs"
+        ],
+        "log": "05-slideshow-js.log",
+        "exitCode": 0,
+        "durationMs": 4369
+      },
+      {
+        "name": "remote-js",
+        "argv": [
+          "node",
+          "--test",
+          "--test-reporter=tap",
+          "app/src/test/js/remote-app-card-search-reuse.test.mjs",
+          "app/src/test/js/remote-app-icon-search-reuse.test.mjs",
+          "app/src/test/js/remote-app-poll-performance.test.mjs",
+          "app/src/test/js/remote-browser-workflows.test.mjs",
+          "app/src/test/js/remote-companion-storage-recovery.test.mjs",
+          "app/src/test/js/remote-control-center.test.mjs",
+          "app/src/test/js/remote-control-command-delivery.test.mjs",
+          "app/src/test/js/remote-control-command-queue.test.mjs",
+          "app/src/test/js/remote-image-pool-reuse.test.mjs",
+          "app/src/test/js/remote-initial-status-ownership.test.mjs",
+          "app/src/test/js/remote-media-poll-performance.test.mjs",
+          "app/src/test/js/remote-music-player.test.mjs",
+          "app/src/test/js/remote-navigation-retention.test.mjs",
+          "app/src/test/js/remote-operation-progress.test.mjs",
+          "app/src/test/js/remote-photo-group-browser.test.mjs",
+          "app/src/test/js/remote-photo-group-controller.test.mjs",
+          "app/src/test/js/remote-photo-mutation-readback.test.mjs",
+          "app/src/test/js/remote-photo-preview-recovery.test.mjs",
+          "app/src/test/js/remote-photo-thumbnail-reuse.test.mjs",
+          "app/src/test/js/remote-photo-viewport-admission.test.mjs",
+          "app/src/test/js/remote-poll-cancellation.test.mjs",
+          "app/src/test/js/remote-preset-keyboard-editor.test.mjs",
+          "app/src/test/js/remote-preset-storage-feedback.test.mjs",
+          "app/src/test/js/remote-preset-tracked-run.test.mjs",
+          "app/src/test/js/remote-search-composition.test.mjs",
+          "app/src/test/js/remote-search-whitespace.test.mjs",
+          "app/src/test/js/remote-settings-disabled-parent.test.mjs",
+          "app/src/test/js/remote-settings-reset-scope.test.mjs",
+          "app/src/test/js/remote-settings-row-retention.test.mjs",
+          "app/src/test/js/remote-settings-search-context.test.mjs",
+          "app/src/test/js/remote-settings-time-of-day.test.mjs",
+          "app/src/test/js/remote-snapshot-status.test.mjs",
+          "app/src/test/js/remote-source-error-feedback.test.mjs",
+          "app/src/test/js/remote-text-confirmation.test.mjs",
+          "app/src/test/js/remote-touchpad-recovery.test.mjs",
+          "app/src/test/js/screensaver-dedup.test.mjs"
+        ],
+        "log": "06-remote-js.log",
+        "exitCode": 0,
+        "durationMs": 14264
+      },
+      {
+        "name": "source-files",
+        "argv": [
+          "git",
+          "-c",
+          "core.hooksPath=/dev/null",
+          "--no-optional-locks",
+          "ls-files",
+          "--cached",
+          "--others",
+          "--exclude-standard",
+          "-z"
+        ],
+        "log": "07-source-files.log",
+        "exitCode": 0,
+        "durationMs": 42
+      }
+    ],
+    "startedAt": "2026-11-05T00:52:25.239313+00:00",
+    "source": {
+      "sha256": "0c246587e83f388f676ae0bd98b7018d5d65271cf4b460461273063704229ebb",
+      "fileCount": 1485,
+      "head": "b9bea8ab64705a94433911b56fdfdf16e6b0a271"
+    },
+    "tools": {
+      "python": "3.13.7",
+      "node": "v24.13.0"
+    },
+    "javascript": {
+      "slideshow-js": 404,
+      "remote-js": 757
+    },
+    "durationMs": 19072,
+    "finishedAt": "2026-11-05T00:52:44.310996+00:00"
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 93.4438033339975
+  },
+  "host": {
+    "cases": 6,
+    "baselineGeometryAssertionFailures": 5,
+    "baselineControls": 1,
+    "greenPassed": 6,
+    "frozenV2Sha256": "3e06f44344873a9199a4f66cfcd52b62e922a0d15bdd6af47f7dc159fd1a6072",
+    "excludedV1": "Wrong fixture r.now/resolveNext/deferDecode API; original output retained; assertions unchanged."
+  },
+  "nativeBefore": {
+    "ok": false,
+    "error": null,
+    "tests": [
+      {
+        "name": "originalFullsizeLandscape",
+        "ok": true,
+        "checks": {
+          "literalGeometry": true,
+          "withinScope": true,
+          "measuredRoot": true,
+          "contain": true,
+          "static": true
+        },
+        "expected": {
+          "x": 215,
+          "y": 0,
+          "w": 1170,
+          "h": 780,
+          "rootW": 1600,
+          "rootH": 1000
+        },
+        "actual": {
+          "x": 215,
+          "y": 0,
+          "w": 1170,
+          "h": 780
+        },
+        "root": {
+          "w": 1600,
+          "h": 1000
+        },
+        "scope": {
+          "w": 1600,
+          "h": 780
+        },
+        "backgroundSize": "contain",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 1,
+        "loadAdmissions": 1,
+        "cursor": 1,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "sameSceneLandscapeShrink",
+        "ok": false,
+        "checks": {
+          "literalGeometry": false,
+          "withinScope": false,
+          "measuredRoot": true,
+          "sameImage": true,
+          "sameScene": true,
+          "sameUrl": true,
+          "noResolutions": true,
+          "noLoads": true,
+          "sameCursor": true,
+          "sameAnimation": true
+        },
+        "expected": {
+          "x": 86,
+          "y": 0,
+          "w": 468,
+          "h": 312,
+          "rootW": 640,
+          "rootH": 400
+        },
+        "actual": {
+          "x": 215,
+          "y": 0,
+          "w": 1170,
+          "h": 780
+        },
+        "root": {
+          "w": 640,
+          "h": 400
+        },
+        "scope": {
+          "w": 640,
+          "h": 312
+        },
+        "backgroundSize": "contain",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 1,
+        "loadAdmissions": 1,
+        "cursor": 1,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "sameSceneLandscapePortrait",
+        "ok": false,
+        "checks": {
+          "literalGeometry": false,
+          "withinScope": false,
+          "measuredRoot": true,
+          "sameImage": true,
+          "sameScene": true,
+          "sameUrl": true,
+          "noResolutions": true,
+          "noLoads": true,
+          "sameCursor": true,
+          "sameAnimation": true
+        },
+        "expected": {
+          "x": 0,
+          "y": 201.333333333333,
+          "w": 800,
+          "h": 533.333333333333,
+          "rootW": 800,
+          "rootH": 1200
+        },
+        "actual": {
+          "x": 215,
+          "y": 0,
+          "w": 1170,
+          "h": 780
+        },
+        "root": {
+          "w": 800,
+          "h": 1200
+        },
+        "scope": {
+          "w": 800,
+          "h": 936
+        },
+        "backgroundSize": "contain",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 1,
+        "loadAdmissions": 1,
+        "cursor": 1,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "futurePhotoAtShrunkBounds",
+        "ok": false,
+        "checks": {
+          "literalGeometry": false,
+          "withinScope": false,
+          "measuredRoot": true,
+          "differentLayer": true,
+          "oneAdditionalResolution": true,
+          "oneAdditionalDecode": true,
+          "contain": true
+        },
+        "expected": {
+          "x": 86,
+          "y": 0,
+          "w": 468,
+          "h": 312,
+          "rootW": 640,
+          "rootH": 400
+        },
+        "actual": {
+          "x": 215,
+          "y": 0,
+          "w": 1170,
+          "h": 780
+        },
+        "root": {
+          "w": 640,
+          "h": 400
+        },
+        "scope": {
+          "w": 640,
+          "h": 312
+        },
+        "backgroundSize": "contain",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 2,
+        "loadAdmissions": 2,
+        "cursor": 2,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "originalFullsizeWideControl",
+        "ok": true,
+        "checks": {
+          "literalGeometry": true,
+          "withinScope": true,
+          "measuredRoot": true,
+          "cover": true,
+          "static": true
+        },
+        "expected": {
+          "x": 0,
+          "y": 0,
+          "w": 1600,
+          "h": 780,
+          "rootW": 1600,
+          "rootH": 1000
+        },
+        "actual": {
+          "x": 0,
+          "y": 0,
+          "w": 1600,
+          "h": 780
+        },
+        "root": {
+          "w": 1600,
+          "h": 1000
+        },
+        "scope": {
+          "w": 1600,
+          "h": 780
+        },
+        "backgroundSize": "cover",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 3,
+        "loadAdmissions": 3,
+        "cursor": 1,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      }
+    ],
+    "failures": 3,
+    "state": {
+      "complete": true,
+      "error": null,
+      "caseCount": 5,
+      "virtualMillis": 0,
+      "sourceResolutions": 3,
+      "loadAdmissions": 3,
+      "dpr": 1.125,
+      "screenshot": "fullsize-software.png",
+      "raster": "software WebView.draw Canvas; no PixelCopy/hardware acceptance"
+    },
+    "unknownRequests": 0,
+    "webViewDestroyed": true,
+    "assetHashes": {
+      "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "mode-impls.js": "0531768f36e32d175665652d1feef6a82d3cd9493feee0708840608a58679007",
+      "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "photo-doodles-dark.svg": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "styles.css": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+    },
+    "sourceApkSha256": "68774640e7adedec3c9186896afc2e02477cdc0e533d735f163d4623a45b1c06",
+    "sourceApkBytes": 46745714,
+    "sdk": 29,
+    "caseCount": 5,
+    "scope": "Actual packaged Cinema mode.run; generated data SVGs; virtual beat timer; real DOM layout/RAF; optional software Canvas only"
+  },
+  "nativeAfter": {
+    "ok": true,
+    "error": null,
+    "tests": [
+      {
+        "name": "originalFullsizeLandscape",
+        "ok": true,
+        "checks": {
+          "literalGeometry": true,
+          "withinScope": true,
+          "measuredRoot": true,
+          "contain": true,
+          "static": true
+        },
+        "expected": {
+          "x": 215,
+          "y": 0,
+          "w": 1170,
+          "h": 780,
+          "rootW": 1600,
+          "rootH": 1000
+        },
+        "actual": {
+          "x": 215,
+          "y": 0,
+          "w": 1170,
+          "h": 780
+        },
+        "root": {
+          "w": 1600,
+          "h": 1000
+        },
+        "scope": {
+          "w": 1600,
+          "h": 780
+        },
+        "backgroundSize": "contain",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 1,
+        "loadAdmissions": 1,
+        "cursor": 1,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "sameSceneLandscapeShrink",
+        "ok": true,
+        "checks": {
+          "literalGeometry": true,
+          "withinScope": true,
+          "measuredRoot": true,
+          "sameImage": true,
+          "sameScene": true,
+          "sameUrl": true,
+          "noResolutions": true,
+          "noLoads": true,
+          "sameCursor": true,
+          "sameAnimation": true
+        },
+        "expected": {
+          "x": 86,
+          "y": 0,
+          "w": 468,
+          "h": 312,
+          "rootW": 640,
+          "rootH": 400
+        },
+        "actual": {
+          "x": 86,
+          "y": 0,
+          "w": 468,
+          "h": 312
+        },
+        "root": {
+          "w": 640,
+          "h": 400
+        },
+        "scope": {
+          "w": 640,
+          "h": 312
+        },
+        "backgroundSize": "contain",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 1,
+        "loadAdmissions": 1,
+        "cursor": 1,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "sameSceneLandscapePortrait",
+        "ok": true,
+        "checks": {
+          "literalGeometry": true,
+          "withinScope": true,
+          "measuredRoot": true,
+          "sameImage": true,
+          "sameScene": true,
+          "sameUrl": true,
+          "noResolutions": true,
+          "noLoads": true,
+          "sameCursor": true,
+          "sameAnimation": true
+        },
+        "expected": {
+          "x": 0,
+          "y": 201.333333333333,
+          "w": 800,
+          "h": 533.333333333333,
+          "rootW": 800,
+          "rootH": 1200
+        },
+        "actual": {
+          "x": 0,
+          "y": 201.33334350585938,
+          "w": 800,
+          "h": 533.3333129882812
+        },
+        "root": {
+          "w": 800,
+          "h": 1200
+        },
+        "scope": {
+          "w": 800,
+          "h": 936
+        },
+        "backgroundSize": "contain",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 1,
+        "loadAdmissions": 1,
+        "cursor": 1,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "futurePhotoAtShrunkBounds",
+        "ok": true,
+        "checks": {
+          "literalGeometry": true,
+          "withinScope": true,
+          "measuredRoot": true,
+          "differentLayer": true,
+          "oneAdditionalResolution": true,
+          "oneAdditionalDecode": true,
+          "contain": true
+        },
+        "expected": {
+          "x": 86,
+          "y": 0,
+          "w": 468,
+          "h": 312,
+          "rootW": 640,
+          "rootH": 400
+        },
+        "actual": {
+          "x": 86,
+          "y": 0,
+          "w": 468,
+          "h": 312
+        },
+        "root": {
+          "w": 640,
+          "h": 400
+        },
+        "scope": {
+          "w": 640,
+          "h": 312
+        },
+        "backgroundSize": "contain",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 2,
+        "loadAdmissions": 2,
+        "cursor": 2,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      },
+      {
+        "name": "originalFullsizeWideControl",
+        "ok": true,
+        "checks": {
+          "literalGeometry": true,
+          "withinScope": true,
+          "measuredRoot": true,
+          "cover": true,
+          "static": true
+        },
+        "expected": {
+          "x": 0,
+          "y": 0,
+          "w": 1600,
+          "h": 780,
+          "rootW": 1600,
+          "rootH": 1000
+        },
+        "actual": {
+          "x": 0,
+          "y": 0,
+          "w": 1600,
+          "h": 780
+        },
+        "root": {
+          "w": 1600,
+          "h": 1000
+        },
+        "scope": {
+          "w": 1600,
+          "h": 780
+        },
+        "backgroundSize": "cover",
+        "animation": "auto ease 0s 1 normal none running none",
+        "sourceResolutions": 3,
+        "loadAdmissions": 3,
+        "cursor": 1,
+        "actualMode": "SS.MODES.cinema.run",
+        "softwareRasterOnly": true
+      }
+    ],
+    "failures": 0,
+    "state": {
+      "complete": true,
+      "error": null,
+      "caseCount": 5,
+      "virtualMillis": 0,
+      "sourceResolutions": 3,
+      "loadAdmissions": 3,
+      "dpr": 1.125,
+      "screenshot": "fullsize-software.png",
+      "raster": "software WebView.draw Canvas; no PixelCopy/hardware acceptance"
+    },
+    "unknownRequests": 0,
+    "webViewDestroyed": true,
+    "assetHashes": {
+      "cinema-grain.png": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330",
+      "lib-engine.js": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09",
+      "mode-impls.js": "641d87ee5a015324aa4fce92a934e17ccebfd8e9b7febbfaddc56a1ea1874251",
+      "modes.js": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b",
+      "photo-doodles-dark.svg": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6",
+      "styles.css": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+    },
+    "sourceApkSha256": "a89b72177b9e12c1e7eb96c5cc0b5f0dfc60a6801de6c84d4505944b66462e98",
+    "sourceApkBytes": 46745946,
+    "sdk": 29,
+    "caseCount": 5,
+    "scope": "Actual packaged Cinema mode.run; generated data SVGs; virtual beat timer; real DOM layout/RAF; optional software Canvas only"
+  },
+  "nativeFrozen": {
+    "status": "SOURCE_PREPARED_NOT_COMPILED_OR_EXECUTED",
+    "originalClock": {
+      "start": "2026-11-05T00:46:14Z",
+      "target": "2026-11-05T01:01:14Z",
+      "hard": "2026-11-05T01:16:14Z"
+    },
+    "caseCount": 5,
+    "sources": {
+      "CinemaViewportActivity.java": {
+        "sha256": "7fd65b70709ac39224e5c7cafce781b37e34f64334c43f41e746bc43d11dfa14",
+        "bytes": 6458
+      },
+      "fixture.html": {
+        "sha256": "824a3aba608e906f140622f38389aea0410bb5e6e935232ab30f3ae1f3be0d1f",
+        "bytes": 6388
+      },
+      "AndroidManifest.xml": {
+        "sha256": "2a61e72bab372373774b02445b1cb1112799290a510b349c0581db107e39f46e",
+        "bytes": 433
+      },
+      "RUN.md": {
+        "sha256": "c3194ba6bb44dfa2f89adb2f1756d37e74f6231cfa0f20fd29576cc03a6f125f",
+        "bytes": 1454
+      },
+      "source-admission.json": {
+        "sha256": "71d168957e8ae652dd68e43d86a6a6ad015180cd1dc0d33de71f527fc4ea7088",
+        "bytes": 2393
+      },
+      "build.sh": {
+        "sha256": "b272b2dc4ea3b864076174775e0364e50a40f0ac7acb35bc7d5fe8f32eaf7ecd",
+        "bytes": 834
+      },
+      "repack.sh": {
+        "sha256": "59696942a3cc535cb235c604306a85ce8a94bed27d850eadac038c1c3cf3cd71",
+        "bytes": 842
+      },
+      "freeze.py": {
+        "sha256": "ced9c4505e2937c39b68da86731e29e8c0d978839048ca4c2c87c7ae36307c3a",
+        "bytes": 1659
+      }
+    },
+    "sourceApk": {
+      "sha256": "68774640e7adedec3c9186896afc2e02477cdc0e533d735f163d4623a45b1c06",
+      "bytes": 46745714
+    },
+    "readScope": {
+      "priorFixture": "Full HTML, Java, build/repack/freeze, manifest, run guidance",
+      "production": "Selected mode-impls.js1191-1340 including full current Cinema1228-1296; selected CSS scope/layer/bar declarations via symbol search"
+    },
+    "limits": [
+      "Source-only adaptation; no Java/DEX compilation, HTML runtime or device witness by author",
+      "Root must freeze generated DEX and fixture APK before baseline, using preparation-verification.json",
+      "Actual embedded Cinema direct mode, not whole app/Dream/provider scheduler",
+      "Static generated landscape/wide without face metadata; no motion/clock/face-crop coverage",
+      "All five geometry expectations are explicit literals independent of production helpers"
+    ],
+    "rootAdapterCorrection": "v1 excluded: exact packaged cinema-grain.png added to finite allowlist; CSS animationName checks actual none rather than shorthand serialization. All geometry, ownership, zero-unknown and static-motion gates retained.",
+    "ok": true,
+    "rootFullyReadBeforeCompilation": true,
+    "fixtureDex": {
+      "sha256": "01ac6a7750edfab7dfe47223380e062935bf6c73c1cb9cc8bbadadc61531c079",
+      "bytes": 12820
+    },
+    "baselineFixture": {
+      "sha256": "00d187e7129f60ff5b1ec75ca719f256f4d38d35796e671968e85cf63d114f71",
+      "bytes": 37511723
+    },
+    "manifestZeroPermissions": true,
+    "permissionsDump": "package: com.immortal.cinemaviewportfixture\n"
+  },
+  "nativeDriver": {
+    "sha256": "2a89eb1d1716b23bc6f97415ab05fda4f324619f15b3f3ba325f0c4318d92ef5"
+  },
+  "excludedNativeV1": {
+    "reason": "v1 excluded: exact packaged cinema-grain.png added to finite allowlist; CSS animationName checks actual none rather than shorthand serialization. All geometry, ownership, zero-unknown and static-motion gates retained.",
+    "report": "native-v1-before-report.json",
+    "terminalExit": 1,
+    "retired": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    },
+    "thresholdsUnchanged": true
+  },
+  "artifacts": {
+    "debug": {
+      "path": "/private/tmp/portal-cinema-viewport-20261105-004614/candidate-debug-1.187.apk",
+      "bytes": 46745946,
+      "sha256": "a89b72177b9e12c1e7eb96c5cc0b5f0dfc60a6801de6c84d4505944b66462e98",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='181' versionName='1.187' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssets": {
+        "fileCount": 23,
+        "files": [
+          {
+            "path": "catalog.json",
+            "bytes": 24043,
+            "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+          },
+          {
+            "path": "diagnostics/source-preview-4k.mp4",
+            "bytes": 25847,
+            "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+          },
+          {
+            "path": "faces/Flip-Regular.otf",
+            "bytes": 3184,
+            "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+          },
+          {
+            "path": "faces/flip.html",
+            "bytes": 29379,
+            "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+          },
+          {
+            "path": "fonts/BebasNeue.ttf",
+            "bytes": 61400,
+            "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+          },
+          {
+            "path": "fonts/OFL.txt",
+            "bytes": 1186,
+            "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+          },
+          {
+            "path": "photoframe_fallback/01_wilderness.jpg",
+            "bytes": 261090,
+            "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+          },
+          {
+            "path": "photoframe_fallback/02_denali.jpg",
+            "bytes": 277842,
+            "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+          },
+          {
+            "path": "photoframe_fallback/03_yosemite.jpg",
+            "bytes": 443801,
+            "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+          },
+          {
+            "path": "remote/control-center.css",
+            "bytes": 24082,
+            "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+          },
+          {
+            "path": "remote/control-center.js",
+            "bytes": 270231,
+            "sha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+          },
+          {
+            "path": "remote/core.mjs",
+            "bytes": 28623,
+            "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+          },
+          {
+            "path": "screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "screensaver/mode-impls.js",
+            "bytes": 71114,
+            "sha256": "641d87ee5a015324aa4fce92a934e17ccebfd8e9b7febbfaddc56a1ea1874251"
+          },
+          {
+            "path": "screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "screensaver/styles.css",
+            "bytes": 15397,
+            "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+          },
+          {
+            "path": "webapp-retention-probe.html",
+            "bytes": 504,
+            "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+          }
+        ]
+      },
+      "all22OtherSourceAssetsUnchangedFromBaseline": true,
+      "intentionalSourceAssetChanges": [
+        "screensaver/mode-impls.js"
+      ],
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "path": "/private/tmp/portal-cinema-viewport-20261105-004614/candidate-performance-1.187.apk",
+      "bytes": 25887043,
+      "sha256": "ef18d83db2d07f48dead95239d9e22906946858a46e58111b0e760b650f5d776",
+      "manifest": "package: name='com.immortal.launcher.debug' versionCode='181' versionName='1.187' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "sourceAssets": {
+        "fileCount": 23,
+        "files": [
+          {
+            "path": "catalog.json",
+            "bytes": 24043,
+            "sha256": "6a766a7801c2bd785d11b1dab3796c1b1139329984c7378683951cbcba03bb15"
+          },
+          {
+            "path": "diagnostics/source-preview-4k.mp4",
+            "bytes": 25847,
+            "sha256": "34828d4fbaa4ac9a43d8aa13c4e9a114052934fd5bfd8509f701c5df7c6fc65a"
+          },
+          {
+            "path": "faces/Flip-Regular.otf",
+            "bytes": 3184,
+            "sha256": "3339a20af3f787c6aa640a83d4e4bc50cc4bd9f872aa088c2dfd211581e253ee"
+          },
+          {
+            "path": "faces/flip.html",
+            "bytes": 29379,
+            "sha256": "02919aede433fae3e27b3d6d6ce8f622bd3a88a639b479dcc91f6e691821a9f4"
+          },
+          {
+            "path": "fonts/BebasNeue.ttf",
+            "bytes": 61400,
+            "sha256": "08e4623805102d819f58601e46e345648846075e363b2ceb23313c2d1c83ec73"
+          },
+          {
+            "path": "fonts/OFL.txt",
+            "bytes": 1186,
+            "sha256": "3f2c017cf8a6c5cdb8e84fffa8a17df7206301614d3c1ad402c54522abefa8e8"
+          },
+          {
+            "path": "photoframe_fallback/01_wilderness.jpg",
+            "bytes": 261090,
+            "sha256": "5171691e59e68a7241b2a1532cf76b0da0aeaa4e02ba455bb8734bad75644aa6"
+          },
+          {
+            "path": "photoframe_fallback/02_denali.jpg",
+            "bytes": 277842,
+            "sha256": "fa0f4d93c489e6b165a16419d82235a501bf9468801aa47d976ff041e0622e3c"
+          },
+          {
+            "path": "photoframe_fallback/03_yosemite.jpg",
+            "bytes": 443801,
+            "sha256": "fc00d1ea0ddc926a7e959a2243927c74ab13e09905c3e70513c6a6911127b64e"
+          },
+          {
+            "path": "remote/control-center.css",
+            "bytes": 24082,
+            "sha256": "a3b814ae1807a3d9f9802128de517df3f60c7e5b3b32339c74d1497e1a0f8841"
+          },
+          {
+            "path": "remote/control-center.js",
+            "bytes": 270231,
+            "sha256": "000b1ebb52d3dd2dcaa40e31bf29dd27eab3129feafacdf3202b3a2ab4fb2f66"
+          },
+          {
+            "path": "remote/core.mjs",
+            "bytes": 28623,
+            "sha256": "ca78bd7642b28d7c268f97cb1542a6961d2562fa73fbbd94aaa928f512810dc6"
+          },
+          {
+            "path": "screensaver/cinema-grain.png",
+            "bytes": 12657,
+            "sha256": "58d94700ffff06ce418914705304fadd17ed1eb62035f9de4d2ad029eeb76330"
+          },
+          {
+            "path": "screensaver/index.html",
+            "bytes": 7785,
+            "sha256": "9e20219e362f137dc19e01a5016d1f94791bd3ff55e6fe11a9aaff2cc0a87ff2"
+          },
+          {
+            "path": "screensaver/lib-engine.js",
+            "bytes": 5582,
+            "sha256": "97e50ce71f9ea50ac02027cceffd7b2d21e6c59460c109cc4d8928c218c21c09"
+          },
+          {
+            "path": "screensaver/mode-impls.js",
+            "bytes": 71114,
+            "sha256": "641d87ee5a015324aa4fce92a934e17ccebfd8e9b7febbfaddc56a1ea1874251"
+          },
+          {
+            "path": "screensaver/modes.js",
+            "bytes": 13499,
+            "sha256": "23213725e49d21be39435148029527d26fb721b9004535f4af2a4af379697f6b"
+          },
+          {
+            "path": "screensaver/photo-doodles-dark.svg",
+            "bytes": 1247,
+            "sha256": "cbcf6f8c6e55e78c2b0203ab1f97a2a17cd35febabbbf9d7bf0d54bbc995afc6"
+          },
+          {
+            "path": "screensaver/photo-doodles.svg",
+            "bytes": 1246,
+            "sha256": "8cb7a7827e4289d19ba16153b0c24d4f70f087f3893fa9dbf631ac6f729dc911"
+          },
+          {
+            "path": "screensaver/photos.js",
+            "bytes": 8528,
+            "sha256": "e90710666a0843b3b76933c16f5ef514583c315ae6db930ed9839d778c8ee293"
+          },
+          {
+            "path": "screensaver/scheduler.js",
+            "bytes": 14433,
+            "sha256": "b95ba5f3e3dea1bcb5b772935848ce55f6cc042ffb1540b4c9774b8e18078ba8"
+          },
+          {
+            "path": "screensaver/styles.css",
+            "bytes": 15397,
+            "sha256": "1689eb64019e33e5d2045594f756ce785adf3a6dc4c22ca35f566cefde69e37b"
+          },
+          {
+            "path": "webapp-retention-probe.html",
+            "bytes": 504,
+            "sha256": "3cdc184f9b94c53af3459a78c98a5390b840ea7957a4f382ba62fc43d699537c"
+          }
+        ]
+      },
+      "all22OtherSourceAssetsUnchangedFromBaseline": true,
+      "intentionalSourceAssetChanges": [
+        "screensaver/mode-impls.js"
+      ],
+      "generatedOptimizationProfileChanges": []
+    },
+    "jvm": {
+      "tests": 4626,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 481
+    },
+    "gradleExit": 0
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25887043,
+      "sha256": "ef18d83db2d07f48dead95239d9e22906946858a46e58111b0e760b650f5d776",
+      "app": {
+        "versionCode": 181,
+        "versionName": "1.187"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25887043,
+        "sha256": "ef18d83db2d07f48dead95239d9e22906946858a46e58111b0e760b650f5d776",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 181,
+          "versionName": "1.187"
+        }
+      }
+    },
+    "frameReturn": {
+      "family": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      },
+      "living": {
+        "ok": true,
+        "result": "legacy_frame_requested",
+        "action": "screensaver"
+      }
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1502,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1502,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "cleanup": {
+    "ownerRegistriesUnchanged": true,
+    "copiedRegistriesRetired": true,
+    "nativeBeforeRetired": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    },
+    "nativeAfterRetired": {
+      "packageAbsent": true,
+      "processAbsent": true,
+      "externalDirectoryAbsent": true
+    }
+  },
+  "limits": [
+    "Actual embedded Cinema direct-mode generated DOM geometry on Family/API29 only; no production controller/scheduler/native clock/live photos, optimized execution, API28 or Living visual verdict.",
+    "Native cases use static landscape/wide images; no native face crop, physical animation trajectory or hardware performance proof. Host assertions cover pause/cleanup/pending decode, not those native paths.",
+    "Software control capture is not compositor/pixel acceptance. Saved Shuffle/fit remains; renderer support does not select Cinema.",
+    "No phone/provider/account/auth/push/publication. Public release remains1.83; held clocks stay."
+  ],
+  "preservationFirstCapture": {
+    "room": "family",
+    "changedFiles": [
+      "WebViewChromiumPrefs.xml"
+    ],
+    "originalCaptureRetained": "/private/tmp/portal-cinema-viewport-20261105-004614/family/after-first-mismatch",
+    "valuesNotPrinted": true,
+    "internalCacheRemovedKeys": [
+      "CachedFlagsDisabled",
+      "CachedFlagsEnabled"
+    ],
+    "internalCacheChangedKey": "lastVersionCodeUsed",
+    "subsequentAllFileBytesMatch": true,
+    "restorationWrites": false
+  }
+}

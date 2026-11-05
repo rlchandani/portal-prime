@@ -1,0 +1,34 @@
+<!doctype html><html><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cinema.fixture; style-src 'unsafe-inline' https://cinema.fixture; img-src data: https://cinema.fixture"><link rel="stylesheet" href="styles.css"><style>#stage{position:absolute;left:0;top:0;right:auto;bottom:auto;width:1600px;height:1000px}</style><body><div id="stage"><div id="owned" class="ss-beat on first-scene"></div></div>
+<script>
+var sourceResolutions=0,loadAdmissions=0,observations=[],complete=false,error=null,cleanup=null;
+function aspect(p){return p.w/p.h}
+var PHOTOS=[{id:0,seed:'owned-landscape',w:1200,h:800},{id:1,seed:'owned-wide',w:3000,h:1000}];
+PHOTOS.forEach(function(p){var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+p.w+'" height="'+p.h+'"><rect width="100%" height="100%" fill="#5c7d8f"/><rect width="100" height="100" fill="#00ff00"/><rect x="'+(p.w-100)+'" width="100" height="100" fill="#0000ff"/><rect y="'+(p.h-100)+'" width="100" height="100" fill="#ffff00"/><rect x="'+(p.w-100)+'" y="'+(p.h-100)+'" width="100" height="100" fill="#ff00ff"/></svg>';p.url='data:image/svg+xml,'+encodeURIComponent(svg)});
+Math.random=function(){return .5};
+// Only owned mode timeout/Date.now virtualized; real WebView decode/layout/RAF.
+var virtualNow=0,timerId=0,tasks=new Map();
+window.setTimeout=function(fn,ms){var id=++timerId;tasks.set(id,{id:id,fn:fn,due:virtualNow+Math.max(0,Number(ms)||0)});return id};window.clearTimeout=function(id){tasks.delete(id)};Date.now=function(){return virtualNow};
+async function advance(target){var n=0;while(true){var list=Array.from(tasks.values()).filter(function(t){return t.due<=target}).sort(function(a,b){return a.due-b.due||a.id-b.id});if(!list.length)break;if(++n>200)throw Error('owned timer bound');var t=list[0];tasks.delete(t.id);virtualNow=t.due;await t.fn();await Promise.resolve();await Promise.resolve()}virtualNow=target}
+function frame(){return new Promise(function(r){requestAnimationFrame(function(){requestAnimationFrame(r)})})}
+</script><script src="lib-engine.js"></script><script src="modes.js"></script><script src="mode-impls.js"></script><script>
+var GENERATED=PHOTOS.slice(),originalPreload=preloadDecoded;preloadDecoded=function(url,signal){loadAdmissions++;return originalPreload(url,signal)};
+function size(w,h){var s=document.getElementById('stage');s.style.width=w+'px';s.style.height=h+'px';window.dispatchEvent(new Event('resize'))}
+function current(){var nodes=Array.from(document.querySelectorAll('.cinema-layer.on')).filter(function(n){return !n.classList.contains('retired')});return nodes[nodes.length-1]}
+var ctx;
+async function boot(which){PHOTOS=[GENERATED[which]];ctx={root:document.getElementById('owned'),deck:PHOTOS,cursor:{i:0},W:1600,H:1000,photoMotion:false,photoMs:5000,microMs:5000,motionMs:5000,url:function(p){sourceResolutions++;return p.url}};cleanup=SS.MODES.cinema.run(ctx,PHOTOS);if(await cleanup.ready!==true)throw Error('actual Cinema not ready');await frame()}
+function snapshot(){var scene=current(),image=scene.querySelector('.ss-cinema-photo'),root=document.getElementById('owned'),r=root.getBoundingClientRect(),scope=document.querySelector('.ss-scope').getBoundingClientRect(),b=image.getBoundingClientRect();return {image:image,scene:scene,url:image.style.backgroundImage,animation:image.style.animation,animationName:image.style.animationName,backgroundSize:image.style.backgroundSize,rect:{x:b.left-scope.left,y:b.top-scope.top,w:b.width,h:b.height},root:{w:r.width,h:r.height},scope:{w:scope.width,h:scope.height},resolutions:sourceResolutions,loads:loadAdmissions,cursor:ctx.cursor.i}}
+function near(a,b){return Math.abs(a-b)<.05}
+function geometry(s,e){var b=s.rect;return {literalGeometry:near(b.x,e.x)&&near(b.y,e.y)&&near(b.w,e.w)&&near(b.h,e.h),withinScope:b.x>=-.05&&b.y>=-.05&&b.x+b.w<=s.scope.w+.05&&b.y+b.h<=s.scope.h+.05,measuredRoot:near(s.root.w,e.rootW)&&near(s.root.h,e.rootH)}}
+function retained(a,b){return {sameImage:a.image===b.image,sameScene:a.scene===b.scene,sameUrl:a.url===b.url,noResolutions:a.resolutions===b.resolutions,noLoads:a.loads===b.loads,sameCursor:a.cursor===b.cursor,sameAnimation:a.animation===b.animation}}
+function record(name,s,expected,extra){var checks=Object.assign(geometry(s,expected),extra||{});observations.push({name:name,ok:Object.keys(checks).every(function(k){return checks[k]}),checks:checks,expected:expected,actual:s.rect,root:s.root,scope:s.scope,backgroundSize:s.backgroundSize,animation:s.animation,sourceResolutions:s.resolutions,loadAdmissions:s.loads,cursor:s.cursor,actualMode:'SS.MODES.cinema.run',softwareRasterOnly:true})}
+function reset(){cleanup();document.getElementById('owned').innerHTML='';tasks.clear();virtualNow=0;size(1600,1000)}
+async function run(){try{
+ await boot(0);var original=snapshot();record('originalFullsizeLandscape',original,{x:215,y:0,w:1170,h:780,rootW:1600,rootH:1000},{contain:original.backgroundSize==='contain',static:original.animationName==='none'});
+ size(640,400);await frame();var shrunk=snapshot();record('sameSceneLandscapeShrink',shrunk,{x:86,y:0,w:468,h:312,rootW:640,rootH:400},retained(original,shrunk));
+ size(800,1200);await frame();var portrait=snapshot();record('sameSceneLandscapePortrait',portrait,{x:0,y:201.333333333333,w:800,h:533.333333333333,rootW:800,rootH:1200},retained(shrunk,portrait));
+ size(640,400);await frame();var beforeNext=snapshot();await advance(5000);await frame();var future=snapshot();record('futurePhotoAtShrunkBounds',future,{x:86,y:0,w:468,h:312,rootW:640,rootH:400},{differentLayer:beforeNext.image!==future.image,oneAdditionalResolution:future.resolutions===beforeNext.resolutions+1,oneAdditionalDecode:future.loads===beforeNext.loads+1,contain:future.backgroundSize==='contain'});
+ reset();await boot(1);var wide=snapshot();record('originalFullsizeWideControl',wide,{x:0,y:0,w:1600,h:780,rootW:1600,rootH:1000},{cover:wide.backgroundSize==='cover',static:wide.animationName==='none'});
+ }catch(e){error=String(e)}finally{complete=true}}
+function state(){return {complete:complete,error:error,observations:observations,caseCount:observations.length,virtualMillis:virtualNow,sourceResolutions:sourceResolutions,loadAdmissions:loadAdmissions,dpr:devicePixelRatio}}
+requestAnimationFrame(run);
+</script></body></html>

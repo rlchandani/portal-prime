@@ -1,0 +1,71 @@
+{
+  "status": "SOURCE_PREPARED_NOT_COMPILED_OR_EXECUTED",
+  "originalClock": {
+    "start": "2026-11-05T00:46:14Z",
+    "target": "2026-11-05T01:01:14Z",
+    "hard": "2026-11-05T01:16:14Z"
+  },
+  "caseCount": 5,
+  "sources": {
+    "CinemaViewportActivity.java": {
+      "sha256": "7fd65b70709ac39224e5c7cafce781b37e34f64334c43f41e746bc43d11dfa14",
+      "bytes": 6458
+    },
+    "fixture.html": {
+      "sha256": "824a3aba608e906f140622f38389aea0410bb5e6e935232ab30f3ae1f3be0d1f",
+      "bytes": 6388
+    },
+    "AndroidManifest.xml": {
+      "sha256": "2a61e72bab372373774b02445b1cb1112799290a510b349c0581db107e39f46e",
+      "bytes": 433
+    },
+    "RUN.md": {
+      "sha256": "c3194ba6bb44dfa2f89adb2f1756d37e74f6231cfa0f20fd29576cc03a6f125f",
+      "bytes": 1454
+    },
+    "source-admission.json": {
+      "sha256": "71d168957e8ae652dd68e43d86a6a6ad015180cd1dc0d33de71f527fc4ea7088",
+      "bytes": 2393
+    },
+    "build.sh": {
+      "sha256": "b272b2dc4ea3b864076174775e0364e50a40f0ac7acb35bc7d5fe8f32eaf7ecd",
+      "bytes": 834
+    },
+    "repack.sh": {
+      "sha256": "59696942a3cc535cb235c604306a85ce8a94bed27d850eadac038c1c3cf3cd71",
+      "bytes": 842
+    },
+    "freeze.py": {
+      "sha256": "ced9c4505e2937c39b68da86731e29e8c0d978839048ca4c2c87c7ae36307c3a",
+      "bytes": 1659
+    }
+  },
+  "sourceApk": {
+    "sha256": "68774640e7adedec3c9186896afc2e02477cdc0e533d735f163d4623a45b1c06",
+    "bytes": 46745714
+  },
+  "readScope": {
+    "priorFixture": "Full HTML, Java, build/repack/freeze, manifest, run guidance",
+    "production": "Selected mode-impls.js1191-1340 including full current Cinema1228-1296; selected CSS scope/layer/bar declarations via symbol search"
+  },
+  "limits": [
+    "Source-only adaptation; no Java/DEX compilation, HTML runtime or device witness by author",
+    "Root must freeze generated DEX and fixture APK before baseline, using preparation-verification.json",
+    "Actual embedded Cinema direct mode, not whole app/Dream/provider scheduler",
+    "Static generated landscape/wide without face metadata; no motion/clock/face-crop coverage",
+    "All five geometry expectations are explicit literals independent of production helpers"
+  ],
+  "rootAdapterCorrection": "v1 excluded: exact packaged cinema-grain.png added to finite allowlist; CSS animationName checks actual none rather than shorthand serialization. All geometry, ownership, zero-unknown and static-motion gates retained.",
+  "ok": true,
+  "rootFullyReadBeforeCompilation": true,
+  "fixtureDex": {
+    "sha256": "01ac6a7750edfab7dfe47223380e062935bf6c73c1cb9cc8bbadadc61531c079",
+    "bytes": 12820
+  },
+  "baselineFixture": {
+    "sha256": "00d187e7129f60ff5b1ec75ca719f256f4d38d35796e671968e85cf63d114f71",
+    "bytes": 37511723
+  },
+  "manifestZeroPermissions": true,
+  "permissionsDump": "package: com.immortal.cinemaviewportfixture\n"
+}
