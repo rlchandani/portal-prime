@@ -197,4 +197,65 @@ class ImmichPaginationTest {
       assertTrue(requests.isEmpty())
     }
   }
+
+  private fun rawPage(next: Any?, items: JSONArray): String =
+      JSONObject().put("assets", JSONObject().put("items", items)
+          .put("nextPage", next ?: JSONObject.NULL)).toString()
+
+  private fun image(id: Any?): JSONObject =
+      JSONObject().put("type", "IMAGE").put("id", id ?: JSONObject.NULL)
+
+  @Test fun nullAssetIdDoesNotConsumePhotoCap() {
+    withServer({ rawPage(null, JSONArray().put(image(null)).put(image("a")).put(image("b"))) }) {
+        base, requests ->
+      assertEquals(photos(base, "a", "b"),
+          ImmichSource.listMedia(base, "fixture-key", null, cap = 2))
+      assertEquals(1, requests.size)
+    }
+  }
+
+  @Test fun nonStringAssetIdsDoNotBecomePhotoUrls() {
+    withServer({ rawPage(null, JSONArray().put(image(7)).put(image(true))
+        .put(image(JSONObject())).put(image("a"))) }) { base, requests ->
+      assertEquals(photos(base, "a"), ImmichSource.listMedia(base, "fixture-key", null))
+      assertEquals(1, requests.size)
+    }
+  }
+
+  @Test fun blankAssetIdsDoNotConsumePhotoCap() {
+    withServer({ rawPage(null, JSONArray().put(image("")).put(image("  "))
+        .put(image("a")).put(image("b"))) }) { base, requests ->
+      assertEquals(photos(base, "a", "b"),
+          ImmichSource.listMedia(base, "fixture-key", null, cap = 2))
+      assertEquals(1, requests.size)
+    }
+  }
+
+  @Test fun missingAssetIdKeepsValidNeighbors() {
+    withServer({ rawPage(null, JSONArray().put(image("a"))
+        .put(JSONObject().put("type", "IMAGE")).put(image("b"))) }) { base, requests ->
+      assertEquals(photos(base, "a", "b"), ImmichSource.listMedia(base, "fixture-key", null))
+      assertEquals(1, requests.size)
+    }
+  }
+
+  @Test fun nonObjectRowsKeepValidNeighbors() {
+    withServer({ rawPage(null, JSONArray().put(image("a")).put(JSONObject.NULL)
+        .put(8).put("bad-row").put(image("b"))) }) { base, requests ->
+      assertEquals(photos(base, "a", "b"), ImmichSource.listMedia(base, "fixture-key", null))
+      assertEquals(1, requests.size)
+    }
+  }
+
+  @Test fun malformedContinuationRowKeepsPriorAndLaterPhotos() {
+    withServer({ number ->
+      if (number == 1) page(2, "a" to "IMAGE")
+      else rawPage(null, JSONArray().put(JSONObject().put("type", "IMAGE"))
+          .put(image("a")).put(image("b")))
+    }) { base, requests ->
+      assertEquals(photos(base, "a", "b"),
+          ImmichSource.listMedia(base, "fixture-key", "fixture-album", cap = 2))
+      assertEquals(listOf(1, 2), requests.map { it.getInt("page") })
+    }
+  }
 }

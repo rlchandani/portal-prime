@@ -156,13 +156,14 @@ object ImmichSource {
     val out = ArrayList<Pair<String, Boolean>>()
     var i = 0
     while (i < assets.length() && out.size < limit) {
-      val o = assets.getJSONObject(i++)
+      val o = assets.optJSONObject(i++) ?: continue
       val isVideo = when (o.optString("type")) {
         "IMAGE" -> false
         "VIDEO" -> if (includeVideo) true else continue
         else -> continue
       }
-      val id = o.getString("id")
+      val id = o.opt("id") as? String ?: continue
+      if (id.isBlank()) continue
       if (seen.add(id)) out.add(id to isVideo)
     }
     return out

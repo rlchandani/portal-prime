@@ -1,18 +1,63 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T00:30:13.907279+00:00",
-  "updatedLabel": "5 November2026 · Google monogram filtering delivered in1.185",
+  "updatedAt": "2026-11-05T00:44:19.029471+00:00",
+  "updatedLabel": "5 November2026 \u00b7 Immich asset admission delivered in1.186",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.185/code179, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.186/code180, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "immich-malformed-asset-admission",
+      "title": "Immich photos: keep valid photos beside malformed rows",
+      "summary": "Skip malformed rows and blank/non-string IDs without losing valid photos or consuming the unique-media cap.",
+      "description": "The actual shared asset parser used by album/library loading and continuations keeps valid neighbors. Existing order, cap, video and dedup rules remain.",
+      "status": "delivered",
+      "verification": "4626 JVM /18 HTTP cases /8 native parser cases; exact1.186 both rooms",
+      "kind": "Photo-source correctness",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Media / independent source review / delivery",
+      "deployment": "Exact optimized1.186/code180 fully hashed both rooms; one install each.",
+      "state": "Frozen HTTP six AssertionErrors to zero; native five failures/three controls to eight passes. Preferences/layout/runtime preserved.",
+      "acceptance": [
+        "Reject non-object rows, missing/null/non-string and blank IDs before seen/cap.",
+        "Retain valid neighboring photos, continuation results, order, cap and video selection.",
+        "Use unchanged native fixture and exact signed artifacts; verify both installed identities and owner settings."
+      ],
+      "evidence": [
+        {
+          "text": "Scope, regression/native/artifact/delivery evidence and limits.",
+          "source": "docs/portal-immich-asset-admission-2026-11-05.md"
+        },
+        {
+          "text": "Machine evidence and generated native probe.",
+          "source": "mocks/portal-immich-asset-admission-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated local HTTP fixtures prove active listMedia requests and continuation output, not live Immich compatibility or decoding.",
+        "Native actual debug APK/private parser on Family API29 shell; no Context, provider, pagination, mounted UI, optimized parser, API28 or Living native behavior.",
+        "No UUID enforcement, ID trimming or complete URL-path validation change. Album picker remains outside this correction.",
+        "No phone, account, auth, push or publication; public release metadata remains1.83."
+      ],
+      "next": "Continue other independent work; keep every held clock.",
+      "issueClock": {
+        "startedAt": "2026-11-05T00:33:37Z",
+        "discoveryDeadline": "2026-11-05T00:38:37Z",
+        "target": "2026-11-05T00:48:37Z",
+        "deadline": "2026-11-05T01:03:37Z",
+        "scope": "Immich malformed asset rows preserve playable photos",
+        "reset": false
+      }
+    },
     {
       "id": "google-photos-contributor-monograms",
       "title": "Google Photos: exclude contributor placeholder avatars",
