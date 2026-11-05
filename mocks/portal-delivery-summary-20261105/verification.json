@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "recordedUtc": "2026-11-05T03:00:59.450047+00:00",
+  "status": "verified_offline_tooling",
+  "baseCommit": "d55697bd79cefaadc27d5598e6d1e734fa3d6d89",
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T02:47:12Z",
+    "discoveryCapUtc": "2026-11-05T02:52:12Z",
+    "targetUtc": "2026-11-05T03:02:12Z",
+    "hardLimitUtc": "2026-11-05T03:17:12Z",
+    "baseHead": "d55697bd79cefaadc27d5598e6d1e734fa3d6d89",
+    "scope": "Offline Markdown summary of existing schema-v1 two-room delivery evidence; no device/build/status inference"
+  },
+  "scope": "Offline Markdown summary of existing schema-v1 two-room delivery evidence; no device/build/status inference",
+  "python": {
+    "exitCode": 0,
+    "seconds": 38.8401531670097,
+    "tests": 325,
+    "focusedMethods": 10
+  },
+  "sourceBindings": [
+    {
+      "path": "scripts/portal_delivery_summary.py",
+      "bytes": 6676,
+      "sha256": "a582410f3fc495c1590f7b6f461dec5b314331b42a75bcfd1f5584653ba2ae72"
+    },
+    {
+      "path": "scripts/test_portal_delivery_summary.py",
+      "bytes": 8387,
+      "sha256": "85f25d13d8e7514a7ee380ee4fc4e0a5f2e02eb832d28648c4fd40bf6fef5535"
+    },
+    {
+      "path": "docs/portal-delivery-summary-2026-11-05.md",
+      "bytes": 3812,
+      "sha256": "caaed375a02b651c9f8fe24c104148abcbe67c85b266fd78eec4a34fd8478885"
+    },
+    {
+      "path": "docs/portal-delivery-summary-1.193.md",
+      "bytes": 1554,
+      "sha256": "1313520b914c5dc1d0337a9008b07f41cfe69848d65eb853ee0666d7a9b6c9c0"
+    },
+    {
+      "path": "mocks/portal-catalog-null-numeric-20261105/verification.json",
+      "bytes": 8174,
+      "sha256": "07fed18ebdab4c929501078b244fbf8b7bad3c113d099c6556b6d94a611a5730"
+    },
+    {
+      "path": "mocks/portal-face-image-admission-20261105/verification.json",
+      "bytes": 7393,
+      "sha256": "9d00a0cc15d0d235a5536da05368acb44abddabe003bca5b9b8de5c960951126"
+    }
+  ],
+  "independentReview": {
+    "accepted": true,
+    "sha256": "62c22003750df7e7217c6b429e78057b26dd190f212a16dbddb2bf5fa6f71bf0",
+    "allFiveBindingsRootRehashed": true
+  },
+  "adoption": "docs/portal-delivery-summary-1.193.md byte-identical to final helper output",
+  "historicalEvidenceUnchanged": true,
+  "roomVersionRetained": {
+    "name": "1.193",
+    "code": 187
+  },
+  "noDeviceOrBuildActions": true,
+  "limits": [
+    "Offline consistency and formatting only; no fresh build, device health, artifact cryptographic verification or delivery claim.",
+    "Scope/limit prose must already be public. Unknown fields are omitted; this is not a secret scrubber.",
+    "Explicit Markdown structures are escaped; viewer automatic bare-URL linking remains possible.",
+    "Requires same-filesystem hardlinks; scratch-cleanup failure may retain public temporary bytes. Crash durability and concurrent evidence modification are outside scope.",
+    "Real encoding-write fault executed; disk-full/close faults were source-reviewed, not injected. Original held clocks and whole goal remain."
+  ]
+}

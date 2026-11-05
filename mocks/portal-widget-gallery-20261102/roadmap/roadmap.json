@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T02:44:56.611385+00:00",
-  "updatedLabel": "5 November 2026 \u00b7 Home SMB photo fallback delivered in 1.191",
+  "updatedAt": "2026-11-05T03:00:59.450047+00:00",
+  "updatedLabel": "5 November 2026 \u00b7 Offline delivery summary automation verified",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,51 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+        "id": "offline-delivery-summary",
+        "title": "Release tooling: generate saved delivery summaries",
+        "summary": "One offline CLI formats existing two-room evidence; no custom Python interpolation per summary.",
+        "status": "verified",
+        "kind": "Release formatting automation",
+        "platforms": [
+            "local tooling"
+        ],
+        "owner": "Release tooling / independent review",
+        "deployment": "Adopted by generated1.193 summary; both rooms retain1.193/code187.",
+        "verification": "325Python CI tests;10 focused methods; independent source review accepted.",
+        "acceptance": [
+            "Match both recorded room APK byte/hash/version/readiness to candidate.",
+            "Keep original clocks and limitations.",
+            "Reject malformed/inconsistent evidence without replacing output.",
+            "Publish complete new files exclusively."
+        ],
+        "evidence": [
+            {
+                "text": "Usage, implementation and limits.",
+                "source": "docs/portal-delivery-summary-2026-11-05.md"
+            },
+            {
+                "text": "Checks and source bindings.",
+                "source": "mocks/portal-delivery-summary-20261105/verification.json"
+            }
+        ],
+        "limits": [
+            "Offline consistency and formatting only; no fresh build, device health, artifact cryptographic verification or delivery claim.",
+            "Scope/limit prose must already be public. Unknown fields are omitted; this is not a secret scrubber.",
+            "Explicit Markdown structures are escaped; viewer automatic bare-URL linking remains possible.",
+            "Requires same-filesystem hardlinks; scratch-cleanup failure may retain public temporary bytes. Crash durability and concurrent evidence modification are outside scope.",
+            "Real encoding-write fault executed; disk-full/close faults were source-reviewed, not injected. Original held clocks and whole goal remain."
+        ],
+        "next": "Use this helper for the core summary of compatible future public receipts; continue product backlog.",
+        "issueClock": {
+            "originalStartUtc": "2026-11-05T02:47:12Z",
+            "discoveryCapUtc": "2026-11-05T02:52:12Z",
+            "targetUtc": "2026-11-05T03:02:12Z",
+            "hardLimitUtc": "2026-11-05T03:17:12Z",
+            "baseHead": "d55697bd79cefaadc27d5598e6d1e734fa3d6d89",
+            "scope": "Offline Markdown summary of existing schema-v1 two-room delivery evidence; no device/build/status inference"
+        }
+    },
     {
       "id": "catalog-optional-numeric-null",
       "title": "App Store: accept optional numeric null catalog fields",
