@@ -36,9 +36,9 @@ evidence and backend/phone acceptance boundaries. The focus issue is now closed;
 move to a distinct priority instead of extending it again.
 
 The public manifest remains **1.83**. Local delivery and public publication are
-separate. The roadmap has **211 tasks: 151 delivered, 49 scoped verified,
-8 parked, 2 awaiting approval, 1 queued**. Documentation maintenance changes no
-task statuses, historical acceptance or platform delivery.
+separate. The roadmap has **212 tasks: 151 delivered, 49 scoped verified,
+9 parked, 2 awaiting approval, 1 queued**. The added parked item records the
+optimized fixture gap; prior task statuses, acceptance and delivery remain.
 
 - Use `~/.codex/worktrees/portal-music-player/portal-prime`, branch
   `codex/product-audit-20261103-144114`, for this work. The user checkout at
@@ -101,6 +101,12 @@ native interaction acceptance nor full screensaver acceptance. Do not repeat
 those unchanged editor/preview leads. Private closure:
 `/private/tmp/portal-product-discovery-20261105-063313/closure.json`.
 
+[Optimized photo preflight](portal-optimized-photo-fixture-preflight-2026-11-05.md)
+establishes that the exact 1.205 optimized APK has removed/inlined the frozen
+fixture's presentation and stop entrypoints. The larger harness gap is parked;
+no native run or new app delivery occurred. The distinct **06:44:25–07:14:25 UTC**
+preflight clock remains; prior debug and performance clocks are unchanged.
+
 ## Work requiring a decision or external change
 
 | Roadmap task ID | Current boundary / next action |
@@ -113,6 +119,7 @@ those unchanged editor/preview leads. Private closure:
 | `black-handoff` | Exhausted; rejected latency tradeoff, no retained candidate. |
 | `legacy-night` | Exhausted; rejected candidates and native failures remain. |
 | `performance-experiments` | Cold Shuffle, rejected Home/Apps/settings, typography and gesture cases retain their original boundaries. |
+| `optimized-photo-fixture-abi` | Actual optimized APK lacks the frozen presentation/stop ABI. A broader harness must preserve presentation, containment and normal retirement; no unchanged-fixture retry or debug substitution. |
 | `quick-controls` | Functional mock awaits destination/design approval before native implementation. |
 | `widget-gallery` | Whole gallery remains unapproved; Weather-only approval does not approve it. |
 | `music-browser-playback` | Queued pending normal human Google sign-in; no login automation or cookie extraction. |

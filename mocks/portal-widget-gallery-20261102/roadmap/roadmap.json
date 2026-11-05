@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T06:25:49.235909+00:00",
-  "updatedLabel": "5 November \u00b7 step editor focus return delivered",
+  "updatedAt": "2026-11-05T06:53:41.304650+00:00",
+  "updatedLabel": "5 November \u00b7 optimized photo harness gap parked",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
   "sourceDocument": "docs/portal-product-operating-state.md",
@@ -13,6 +13,49 @@
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "optimized-photo-fixture-abi",
+      "title": "Optimized photo fixture compatibility gap",
+      "summary": "The exact optimized 1.205 APK cannot expose the frozen fixture presentation and normal-stop calls. Larger harness work is parked.",
+      "status": "parked",
+      "kind": "Screensaver acceptance",
+      "platforms": [
+        "portal"
+      ],
+      "owner": "Root actual-APK inspection; independent fixture compatibility review",
+      "verification": "Two actual APK method inventories exit zero; selected mapping confirms inlined presentation and stop; all six input bindings rehashed.",
+      "deployment": "No app build, installation, launch or device request.",
+      "acceptance": [
+        "Frozen fixture presentation and normal stop/budget-zero retirement cannot be preserved through method renaming alone.",
+        "All existing photo pixel, containment, input lifetime and cleanup predicates remain required."
+      ],
+      "evidence": [
+        {
+          "text": "Compatibility and limits",
+          "source": "docs/portal-optimized-photo-fixture-preflight-2026-11-05.md"
+        },
+        {
+          "text": "Exact artifact method inventory",
+          "source": "mocks/portal-optimized-photo-preflight-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Host ABI inventory is not Android visual, cleanup or performance acceptance",
+        "No proof of a renderer defect",
+        "Historical debug acceptance and all prior issue clocks/holds remain",
+        "No debug substitution, relaxed assertion or production keep rule"
+      ],
+      "next": "Keep this gap parked. A future explicitly scoped controller harness must preserve all frozen assertions and cleanup contracts; no unchanged-fixture retry.",
+      "issueClock": {
+        "originalDiscoveryAt": "2026-11-05T06:44:25Z",
+        "discoveryCap": "2026-11-05T06:49:25Z",
+        "target": "2026-11-05T06:59:25Z",
+        "hardDeadline": "2026-11-05T07:14:25Z",
+        "baseCommit": "b9d5eeb043f9e340eae5a4256bb381e7e2ad8a5e",
+        "scope": "Host preflight of the exact optimized 1.205 artifact for the existing frozen static-photo fixture",
+        "notReset": true
+      }
+    },
     {
       "id": "step-editor-focus-return",
       "title": "Step editors: return keyboard focus after a background refresh",

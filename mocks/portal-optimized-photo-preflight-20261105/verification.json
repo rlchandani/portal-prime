@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "scope": "Host preflight of the exact optimized 1.205 artifact for the existing frozen static-photo fixture",
+  "result": "parked-harness-incompatibility",
+  "baseCommit": "b9d5eeb043f9e340eae5a4256bb381e7e2ad8a5e",
+  "issueClock": {
+    "originalDiscoveryAt": "2026-11-05T06:44:25Z",
+    "discoveryCap": "2026-11-05T06:49:25Z",
+    "target": "2026-11-05T06:59:25Z",
+    "hardDeadline": "2026-11-05T07:14:25Z",
+    "inspectionCompletedAt": "2026-11-05T06:46:33.123335+00:00",
+    "notReset": true
+  },
+  "artifact": {
+    "path": "/private/tmp/portal-product-discovery-20261105-060851/candidate-performance-1.205.apk",
+    "bytes": 25887623,
+    "sha256": "f9bbf8fb6eedf889c2a43bfa24848b0619c7adc2d25cef48d47a7b773f6b29a5"
+  },
+  "fixture": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/mocks/portal-native-photo-hardware-20261104/native/AttachedPhotoActivity.java",
+    "bytes": 19968,
+    "sha256": "8a016d30c7cc42d88e048a121507a25551eaf9e5ce85d46847f1c1f6ce3ec16a"
+  },
+  "mapping": {
+    "path": "~/.codex/worktrees/portal-music-player/portal-prime/app/build/outputs/mapping/performance/mapping.txt",
+    "bytes": 83387754,
+    "sha256": "a7d2d624ee0623dd8e51b5700688012197c62141a4f41a8d4f54a8aa0c68ee13"
+  },
+  "analysis": [
+    {
+      "class": "SlideshowStage",
+      "exitCode": 0,
+      "methods": [
+        ".method static constructor <clinit>()V",
+        ".method public constructor <init>(Landroid/content/Context;Lcom/immortal/launcher/SlideshowPixelBudget;)V",
+        ".method public static c(Ljava/util/ArrayList;)Ljava/util/List;",
+        ".method private final getHostActive()Z",
+        ".method private final getPaused()Z",
+        ".method public final a(Lcom/immortal/launcher/SlideshowAdjustment;)V",
+        ".method public final b(Z)V",
+        ".method public final d(Ljava/lang/String;Lcom/immortal/launcher/SlideshowStage$Presentation;)V",
+        ".method public final e()V",
+        ".method public final f(Lcom/immortal/launcher/SlideshowStage$Presentation;)V",
+        ".method public final g(Ljava/util/ArrayList;)V",
+        ".method public final getCurrentPhoto()Lcom/immortal/launcher/SlideshowPhoto;",
+        ".method public final getOnPresented()Lx01;",
+        ".method public final getPhotoCount()I",
+        ".method public final h()V",
+        ".method public final onSizeChanged(IIII)V",
+        ".method public final setHostActive(Z)V",
+        ".method public final setOnPresented(Lx01;)V"
+      ],
+      "stdoutBytes": 75551,
+      "codeSha256": "43d2cc34e286e33f562d2dfa725a8388c1f4faf2d2c07055a9dddf036d55c429"
+    },
+    {
+      "class": "SlideshowPixelBudget",
+      "exitCode": 0,
+      "methods": [
+        ".method public constructor <init>(J)V",
+        ".method public final a(Lcom/immortal/launcher/SlideshowPixelBudget$Reservation;Ljava/lang/String;Ljava/util/List;)V",
+        ".method public final b()V",
+        ".method public final c(Lcom/immortal/launcher/SlideshowPixelBudget$Reservation;)V",
+        ".method public final d(JLx01;)Lcom/immortal/launcher/SlideshowPixelBudget$Reservation;",
+        ".method public final e(Ljava/lang/String;Ljava/util/List;)V",
+        ".method public final f()J"
+      ],
+      "stdoutBytes": 18640,
+      "codeSha256": "ece4c77c5720bc4540fba029f17672a0efcb5c628d5cabbb5524259594b7434e"
+    }
+  ],
+  "inspectionReport": {
+    "path": "/private/tmp/portal-product-discovery-20261105-064425/optimized-methods.json",
+    "bytes": 2666,
+    "sha256": "0d57517fcf8f2b6558efcf5c4f52e9ddf969897a605ad999f3ff74b7040cccf5"
+  },
+  "analysisOutputs": [
+    {
+      "path": "/private/tmp/portal-product-discovery-20261105-064425/SlideshowStage.smali",
+      "bytes": 75551,
+      "sha256": "43d2cc34e286e33f562d2dfa725a8388c1f4faf2d2c07055a9dddf036d55c429"
+    },
+    {
+      "path": "/private/tmp/portal-product-discovery-20261105-064425/SlideshowPixelBudget.smali",
+      "bytes": 18640,
+      "sha256": "ece4c77c5720bc4540fba029f17672a0efcb5c628d5cabbb5524259594b7434e"
+    }
+  ],
+  "compatibility": {
+    "stageShowRetained": false,
+    "stageStopRetained": false,
+    "budgetNoArgumentConstructorRetained": false,
+    "budgetUsedNameRetained": false,
+    "retainedBudgetConstructor": "(J)V",
+    "budgetUsedWrapperRetained": false,
+    "retainedBudgetTotalMethod": "f()J",
+    "budgetTotalMappingLine": 599714,
+    "mappingPresentationTarget": "PhotoFrameController.T",
+    "mappingStopTarget": "PhotoFrameController.x0"
+  },
+  "independentReview": {
+    "reviewer": "calendar_native_fixture",
+    "scope": "Read-only frozen fixture and supplied exact-APK method-inventory compatibility review; selected mapping declarations",
+    "result": "No simple reflection adaptation preserves both presentation and normal stop/budget-zero retirement. Controller-based harness is a larger scope."
+  },
+  "operations": {
+    "fixtureCompiled": false,
+    "fixtureInstalled": false,
+    "fixtureLaunched": false,
+    "appChanged": false,
+    "deviceRequests": 0,
+    "publication": false
+  },
+  "preservedContract": [
+    "Three generated whole-photo static scenes",
+    "Hardware PixelCopy and software Canvas predicates",
+    "Normal stop, budget-zero retirement and input-lifetime fences"
+  ],
+  "limits": [
+    "Host ABI inventory is not Android visual, cleanup or performance acceptance",
+    "No proof of a renderer defect",
+    "Historical debug acceptance and all prior issue clocks/holds remain",
+    "No debug substitution, relaxed assertion or production keep rule"
+  ],
+  "next": "Keep this gap parked. A future explicitly scoped controller harness must preserve all frozen assertions and cleanup contracts; no unchanged-fixture retry."
+}
