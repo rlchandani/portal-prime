@@ -182,10 +182,10 @@ const text = (value, cls = 'detail') => el('p', { class: cls, text: value });
 const group = (...children) => el('section', { class: 'group' }, ...children);
 const sections = (...children) => el('div', { class: 'sections' }, ...children);
 const actions = (...children) => el('div', { class: 'actions' }, ...children);
-function button(label, onClick, { kind = '', disabled = false, icon = null } = {}) {
+function button(label, onClick, { kind = '', disabled = false, icon = null, ariaLabel = null } = {}) {
   return el(
     'button',
-    { class: `button ${kind}`, type: 'button', disabled, onClick },
+    { class: `button ${kind}`, type: 'button', disabled, onClick, 'aria-label': ariaLabel },
     icon ? glyph(icon) : null,
     label,
   );
@@ -5649,19 +5649,23 @@ function sceneEditor() {
                 button('↑', () => moveDraftStep(entry.id, -1, 'scene'), {
                   kind: 'outline',
                   disabled: !index,
+                  ariaLabel: `Move step ${index + 1} up`,
                 }),
                 button('↓', () => moveDraftStep(entry.id, 1, 'scene'), {
                   kind: 'outline',
                   disabled: index === d.steps.length - 1,
+                  ariaLabel: `Move step ${index + 1} down`,
                 }),
-                button('Edit', () => stepDialog(entry, 'scene'), { kind: 'outline' }),
+                button('Edit', () => stepDialog(entry, 'scene'), {
+                  kind: 'outline', ariaLabel: `Edit step ${index + 1}`,
+                }),
                 button(
                   '×',
                   () => {
                     d.steps = d.steps.filter((s) => s.id !== entry.id);
                     render();
                   },
-                  { kind: 'danger' },
+                  { kind: 'danger', ariaLabel: `Remove step ${index + 1}` },
                 ),
               ),
             ),
@@ -6283,19 +6287,24 @@ function presetsPage() {
             { class: 'reorder-row' },
             el('span', { class: 'label', text: `${index + 1}. ${stepSummary(entry.step)}` }),
             actions(
-              button('↑', () => moveDraftStep(entry.id, -1, 'preset'), { kind: 'outline', disabled: !index }),
+              button('↑', () => moveDraftStep(entry.id, -1, 'preset'), {
+                kind: 'outline', disabled: !index, ariaLabel: `Move step ${index + 1} up`,
+              }),
               button('↓', () => moveDraftStep(entry.id, 1, 'preset'), {
                 kind: 'outline',
                 disabled: index === d.steps.length - 1,
+                ariaLabel: `Move step ${index + 1} down`,
               }),
-              button('Edit', () => stepDialog(entry, 'preset'), { kind: 'outline' }),
+              button('Edit', () => stepDialog(entry, 'preset'), {
+                kind: 'outline', ariaLabel: `Edit step ${index + 1}`,
+              }),
               button(
                 '×',
                 () => {
                   d.steps = d.steps.filter((s) => s.id !== entry.id);
                   render();
                 },
-                { kind: 'danger' },
+                { kind: 'danger', ariaLabel: `Remove step ${index + 1}` },
               ),
             ),
           ),

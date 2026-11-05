@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T05:22:30.324711+00:00",
+  "updatedAt": "2026-11-05T05:44:50.843258+00:00",
   "updatedLabel": "5 November2026 \u00b7 choice-label Settings search delivered1.202",
   "snapshotType": "Manually maintained verified snapshot; no live progress, polling or fallback metrics.",
   "scope": "Current tracked priority queue, not an exhaustive product inventory or whole-product acceptance.",
@@ -8,11 +8,54 @@
   "defaultTask": "weather-native-layout",
   "boundaries": [
     "The whole widget gallery is an unapproved design mock; this roadmap grants no UI redesign approval.",
-    "Both rooms contain exact optimized Portal1.202/code196, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
+    "Both rooms contain exact optimized Portal1.203/code197, with complete readback and saved preference/layout preservation. Companion1.7.8/code20 was previously installed on Pixel; all phone control and inspection are prohibited until explicit reauthorization. Historical receipts retain their versions and scoped acceptance.",
     "No GitHub authentication, push or publication. No HA music deployment.",
     "Exhausted work remains parked under the original 30-minute issue rule."
   ],
   "tasks": [
+    {
+      "id": "browser-step-action-labels",
+      "title": "Scene and preset steps: identify every action",
+      "summary": "Numbered accessible button names identify Move/Edit/Remove targets; exact1.203 in both rooms.",
+      "status": "delivered",
+      "verification": "3host cases;2actual packaged Chromium cases;4739JVM/493suites;full APK and served-controller readbacks",
+      "kind": "Browser accessibility",
+      "platforms": [
+        "portal",
+        "browser"
+      ],
+      "owner": "Root implementation/delivery; independent source and generated-browser review",
+      "deployment": "Exact optimized1.203/code197 in both rooms, one install each.",
+      "acceptance": [
+        "Numbered role names for all four step controls in both editors; labels refresh after reorder/remove.",
+        "Visible controls, callbacks, disabled boundaries, Save/Run admission and persistence retain prior behavior.",
+        "Fresh required gates, exact artifacts/served assets and complete saved configuration preserved."
+      ],
+      "evidence": [
+        {
+          "text": "Delivery and scoped acceptance",
+          "source": "docs/portal-step-action-labels-2026-11-05.md"
+        },
+        {
+          "text": "Structured verification",
+          "source": "mocks/portal-step-action-labels-20261105/verification.json"
+        }
+      ],
+      "limits": [
+        "Generated Chrome402x874 cases use exact packaged assets and intercepted generated data; spoken assistive technology, native/physical phone/API28 and other browsers remain unverified.",
+        "Scene/preset saves, execution and backend persistence were not exercised; existing callbacks/admission/storage remain unchanged.",
+        "Fresh APK identity and served-controller readbacks cover both rooms; complete screensaver visual acceptance and universal performance/health remain separate.",
+        "Initial missing Playwright module path was a fixture setup failure before Chrome, excluded from product RED; first artifact comparison used different variants and was replaced by like-variant comparisons.",
+        "No phone, household account/provider/media/source-selection change, GitHub authentication/push/publication or original-clock reset."
+      ],
+      "next": "Continue a distinct small useful unit; keep full screensaver/platform acceptance and all held clocks separate.",
+      "issueClock": {
+        "originalStartUtc": "2026-11-05T05:31:34Z",
+        "discoveryCapUtc": "2026-11-05T05:36:34Z",
+        "targetUtc": "2026-11-05T05:46:34Z",
+        "hardLimitUtc": "2026-11-05T06:01:34Z"
+      }
+    },
 {
     "id": "settings-choice-label-search",
     "title": "Settings search: find a choice by its visible name",

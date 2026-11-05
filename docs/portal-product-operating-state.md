@@ -14,19 +14,19 @@ This document is a handoff, not whole-product acceptance.
 
 ## Current delivery and boundaries
 
-Both rooms last verified at exact optimized **1.202/code196**, SHA256
-`122ded61136f8896e945f3ed5eff32fbbb18e5bc2bbd151837b9749538c678c2`,
-25,887,119 bytes. [Latest receipt](portal-settings-choice-search-2026-11-05.md):
-Settings search includes enum display labels; all 4,739 JVM tests / 493 suites,
-debug/optimized/R8/vital checks passed. Nine host regressions and eight API29
-actual-debug helper queries passed. This does not establish mounted Settings UI,
-installed optimized helper behavior or API28 acceptance. All 43 Family / 30 Living
-preference files, four maps/revisions and scoped Family runtime were preserved.
-The original 05:07:55–05:37:55 UTC issue clock and its target milestones remain
-in the receipt. Those are recorded results, not fresh checks from reading this file.
+Both rooms last verified at exact optimized **1.203/code197**, SHA256
+`7dfac4625b5302d0f41d25d0ca3421397d6a80229dfa90d1a78bb8ad79d7c358`,25,887,183 bytes.
+[Latest receipt](portal-step-action-labels-2026-11-05.md): browser Scene/Preset
+Move/Edit/Remove controls identify their current step. Three frozen host cases and
+two actual packaged-asset Chromium cases pass; all4,739JVM/493suites,
+debug/optimized/R8/vital and JavaScript gates pass. Both rooms serve the exact
+controller. All43Family/30Living preference files, four maps/revisions and scoped
+Family runtime remain. Spoken/native/physical phone/API28/backend Save/Run
+acceptance remain separate. Original05:31:34–06:01:34UTC clock remains in the
+receipt. These are recorded results, not fresh checks from reading this file.
 
 The public manifest remains **1.83**. Local delivery and public publication are
-separate. The roadmap has **208 tasks: 148 delivered, 49 scoped verified,
+separate. The roadmap has **209 tasks: 149 delivered, 49 scoped verified,
 8 parked, 2 awaiting approval, 1 queued**. Documentation maintenance changes no
 task statuses, historical acceptance or platform delivery.
 
@@ -63,7 +63,7 @@ across turns and aliases. Split larger work into independently useful changes.
 When a slice stalls, park it and continue unrelated safe work. Do not manufacture
 bugs or add features merely to increase the task count.
 
-Recent closed units include Settings choice-label indexing, import status/count
+Recent closed units include browser step-action naming, Settings choice-label indexing, import status/count
 wording, calendar date/recurrence parsing, photo-source identity/fallback,
 caption date/timezone parsing, and supplied-APK inspection. Historical bounded
 negative findings also remain closed: do not turn an unchanged hypothesis into a
@@ -116,6 +116,7 @@ release narratives in history. Whole-product progress continues across releases.
 
 The 5 November handoff split retained all 277,802 historical bytes, SHA256
 `2236d2efb2d017e57d937f84e2a6bf4e9d0a91a6803f0ca585ffa00af01640e5`.
-The complete roadmap, its default selection and all task objects/clocks remain
-byte-exact. This documentation-only maintenance changes no app, device,
-permission, deployment or acceptance result.
+At that split, the complete roadmap, its default selection and all task
+objects/clocks were byte-exact. Subsequent deliveries are recorded in dated
+receipts. The split itself changed no app, device, permission, deployment or
+acceptance result.

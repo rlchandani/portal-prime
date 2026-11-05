@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "status": "delivered_and_read_back_in_both_rooms",
+  "scope": "Name each browser scene/preset step action and its current step number",
+  "recordedUtc": "2026-11-05T05:44:50.843258+00:00",
+  "version": {
+    "code": 197,
+    "name": "1.203"
+  },
+  "issueClock": {
+    "originalStartUtc": "2026-11-05T05:31:34Z",
+    "discoveryCapUtc": "2026-11-05T05:36:34Z",
+    "targetUtc": "2026-11-05T05:46:34Z",
+    "hardLimitUtc": "2026-11-05T06:01:34Z"
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 118.95656083400536
+  },
+  "jvm": {
+    "tests": 4739,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 493
+  },
+  "javascript": {
+    "slideshow-js": 404,
+    "remote-js": 778
+  },
+  "regression": {
+    "hostFrozenCases": 3,
+    "hostBaselineMissingNameFailures": 2,
+    "hostBaselineControls": 1,
+    "hostCandidateCasesPass": 3,
+    "hostFixtureSha256": "0f460e6f8dbdf93ac96f2fecea07c9cc82a84064a2f1f96490757eca15d3f100",
+    "chromeFrozenCases": 2,
+    "chromeBaselineMissingNameFailures": 2,
+    "chromeCandidateCasesPass": 2,
+    "chromeFixtureSha256": "e2d2b9284425e24a650068f63ba0e2f3523d4173f623d0a2ac07fdac5da4ce26",
+    "chromePostOutsidePageErrors": 0,
+    "chromeBeforeAt": "2026-11-05T05:37:35.957773+00:00",
+    "chromeAfterAt": "2026-11-05T05:40:29.666825+00:00"
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 46746174,
+      "sha256": "d91107a1798e68d5f14aecec06b2ac4c4e9a2f1fc7667543beafd0f648fd0cea",
+      "sourceAssetChanges": [
+        "remote/control-center.js"
+      ],
+      "allAssetDifferences": [
+        "assets/remote/control-center.js"
+      ]
+    },
+    "performance": {
+      "bytes": 25887183,
+      "sha256": "7dfac4625b5302d0f41d25d0ca3421397d6a80229dfa90d1a78bb8ad79d7c358",
+      "sourceAssetChanges": [
+        "remote/control-center.js"
+      ],
+      "allAssetDifferences": [
+        "assets/remote/control-center.js"
+      ]
+    }
+  },
+  "sourceAssetsEach": 23,
+  "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+  "independentReview": {
+    "accepted": true,
+    "rootSourceBindingsRehashed": 15,
+    "sourceReviewSha256": "99cd3f40c43bc412a175f974d2c43078d8fdba1d0086ceb438ab0210163f6d8e",
+    "browserReportSha256": "02834978dae983eba861d54b3425c13663983941a215c0b5b6b3bd45b590168d"
+  },
+  "delivery": {
+    "family": {
+      "bytes": 25887183,
+      "sha256": "7dfac4625b5302d0f41d25d0ca3421397d6a80229dfa90d1a78bb8ad79d7c358",
+      "app": {
+        "versionCode": 197,
+        "versionName": "1.203"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 6
+      },
+      "installed": {
+        "bytes": 25887183,
+        "sha256": "7dfac4625b5302d0f41d25d0ca3421397d6a80229dfa90d1a78bb8ad79d7c358",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 197,
+          "versionName": "1.203"
+        }
+      }
+    }
+  },
+  "servedController": {
+    "family": {
+      "bytes": 271141,
+      "sha256": "11530904d145e03789b7b24fa81ae12a4d39e8fda96c71c69472a7966f39c1e1",
+      "matchesPackagedController": true
+    },
+    "living": {
+      "bytes": 271141,
+      "sha256": "11530904d145e03789b7b24fa81ae12a4d39e8fda96c71c69472a7966f39c1e1",
+      "matchesPackagedController": true
+    }
+  },
+  "preservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1635,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1832,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      }
+    }
+  },
+  "registryRetirement": {
+    "copiedRegistryRemoved": true,
+    "ownerRecordsByteIdentical": true
+  },
+  "limits": [
+    "Generated Chrome402x874 cases use exact packaged assets and intercepted generated data; spoken assistive technology, native/physical phone/API28 and other browsers remain unverified.",
+    "Scene/preset saves, execution and backend persistence were not exercised; existing callbacks/admission/storage remain unchanged.",
+    "Fresh APK identity and served-controller readbacks cover both rooms; complete screensaver visual acceptance and universal performance/health remain separate.",
+    "Initial missing Playwright module path was a fixture setup failure before Chrome, excluded from product RED; first artifact comparison used different variants and was replaced by like-variant comparisons.",
+    "No phone, household account/provider/media/source-selection change, GitHub authentication/push/publication or original-clock reset."
+  ],
+  "wholeProductGoalComplete": false
+}
