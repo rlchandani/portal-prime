@@ -376,6 +376,7 @@ class PhotoFrameController(
   // that omits MOVE events): clear horizontal swipe = prev/next, clear tap = exit.
   private var downX = 0f
   private var downY = 0f
+  private var webPageActive = false
 
   /** Hosts forward their touch events here. */
   fun onTouch(ev: MotionEvent) {
@@ -386,6 +387,10 @@ class PhotoFrameController(
       if (ev.actionMasked == MotionEvent.ACTION_UP &&
           abs(ev.x - downX) < 48 && abs(ev.y - downY) < 48) onExit?.invoke()
       if (ev.actionMasked == MotionEvent.ACTION_DOWN) { downX = ev.x; downY = ev.y }
+      return
+    }
+    if (webPageActive) {
+      webView?.dispatchTouchEvent(ev)
       return
     }
     // While the timer alarm is showing, the slide-to-stop owns the touch stream.
@@ -754,12 +759,30 @@ class PhotoFrameController(
    *  whole frame; the host's touch handling still gives tap-to-exit. */
   @android.annotation.SuppressLint("SetJavaScriptEnabled")
   private fun startWebPage(url: String) {
-    // Override onTouchEvent/performClick (not just setOnTouchListener, which WebView ignores in its
-    // own onTouchEvent) so the page never eats touch — the host needs it for tap-to-exit / swipe.
+    // Dreams dispatch directly to this child; previews forward the stream through onTouch.
+    // The document owns swipes, while a short tap retains the frame's exit gesture.
     val wv =
         object : android.webkit.WebView(context) {
-          override fun onTouchEvent(event: MotionEvent): Boolean = false
-          override fun performClick(): Boolean = false
+          override fun onTouchEvent(event: MotionEvent): Boolean {
+            if (isNightClockShowing) {
+              this@PhotoFrameController.onTouch(event)
+              return true
+            }
+            when (event.actionMasked) {
+              MotionEvent.ACTION_DOWN -> {
+                downX = event.x
+                downY = event.y
+                DreamPolicy.userExitAt = System.currentTimeMillis()
+              }
+              MotionEvent.ACTION_UP -> {
+                if (abs(event.x - downX) < 48 && abs(event.y - downY) < 48) {
+                  onExit?.invoke()
+                  return true
+                }
+              }
+            }
+            return super.onTouchEvent(event)
+          }
         }
     wv.setBackgroundColor(Color.BLACK)
     wv.isVerticalScrollBarEnabled = false
@@ -783,6 +806,7 @@ class PhotoFrameController(
     wv.resumeTimers()
     wv.onResume()
     webView = wv
+    webPageActive = true
     wv.loadUrl(url)
     if (!hostActive) wv.onPause()
   }
@@ -1222,6 +1246,7 @@ class PhotoFrameController(
     engineLayoutListener = null
     val owned = webView
     webView = null
+    webPageActive = false
     legacyPhotoLayoutBounds = "{}"
     if (faceRendererDelegate.isInitialized()) faceRenderer.setPaperPhotoSurface(false)
     owned?.let { wv ->
@@ -2247,7 +2272,7 @@ class PhotoFrameController(
       }
   // --- navigation (branches on the active source) -----------------------------
   fun next() {
-    if (stopped) return
+    if (stopped || webPageActive) return
     if (deferNativeStartup { next() }) return
     viewerControls.cancelEdit()
     if (viewerControls.isEditing) return
@@ -2262,7 +2287,7 @@ class PhotoFrameController(
   }
 
   fun prev() {
-    if (stopped) return
+    if (stopped || webPageActive) return
     if (deferNativeStartup { prev() }) return
     viewerControls.cancelEdit()
     if (viewerControls.isEditing) return

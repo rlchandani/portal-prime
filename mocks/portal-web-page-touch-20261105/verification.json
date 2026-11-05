@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-05T00:14:19.658951+00:00",
+  "scope": "Generated actual debug controller WebPage entry on Android10/API29; full optimized installed readbacks both rooms",
+  "version": {
+    "name": "1.184",
+    "code": 178
+  },
+  "clock": {
+    "startedAt": "2026-11-04T23:48:21Z",
+    "discoveryCap": "2026-11-04T23:53:21Z",
+    "target": "2026-11-05T00:03:21Z",
+    "deadline": "2026-11-05T00:18:21Z",
+    "originalClockRetained": true,
+    "admitted": "222: webpage swipe retained document",
+    "discarded": "264 exact old executor crash is blocked by current main queue and stopped guards"
+  },
+  "sourceReview": {
+    "verdict": "accepted after night-priority correction",
+    "bindings": {
+      "app/src/main/java/com/immortal/launcher/PhotoFrameController.kt": "2ce414dac4508bfe60e96ab290d750fa9c3f92748e30f9a807963df350c97369",
+      "app/build.gradle.kts": "86198c6624d4c3dfede76c24a9b42e4c5003d40a37f702c2360dec3c559ce92c"
+    },
+    "fixtureBindings": {
+      "src/com/immortal/webtouchfixture/MainActivity.java": "64a5ecc01cede8f927c1d03d9884740aa6c2348c2728e3a302b6d2db71e554f4",
+      "AndroidManifest.xml": "54fb49f2c002ab5ae2a5e74379b03fa41a34379c0a1244c20a27c5284f1c0312"
+    },
+    "reviewScope": "source only; nonweb bytes retained outside flag guards; actual native gate still required",
+    "originalReviewBlocker": "webpage path bypassed night ownership; corrected before final build",
+    "correctedSourceRequiredForPromotion": true
+  },
+  "native": {
+    "baseline": {
+      "controllerSwipe": {
+        "start": 0,
+        "move": 0,
+        "end": 0
+      },
+      "controllerSwipePhotoSubmissions": 1,
+      "directSwipe": {
+        "start": 0,
+        "move": 0,
+        "end": 0
+      },
+      "directSwipePhotoSubmissions": 1,
+      "tapExitCalls": 1,
+      "explicitNavigationPhotoSubmissions": 1,
+      "sameWebViewRetained": true,
+      "phase": "red-classic",
+      "status": "OBSERVED",
+      "scope": "Actual debug controller private WebPage entry; real Config.load Classic fixture snapshot; owned inline HTML; counting executor never runs provider tasks; no start/startFrame",
+      "stopReturned": true
+    },
+    "candidate": {
+      "controllerSwipe": {
+        "start": 1,
+        "move": 1,
+        "end": 1
+      },
+      "controllerSwipePhotoSubmissions": 0,
+      "directSwipe": {
+        "start": 2,
+        "move": 2,
+        "end": 2
+      },
+      "directSwipePhotoSubmissions": 0,
+      "tapExitCalls": 1,
+      "explicitNavigationPhotoSubmissions": 0,
+      "sameWebViewRetained": true,
+      "phase": "green",
+      "status": "OBSERVED",
+      "scope": "Actual debug controller private WebPage entry; real Config.load Classic fixture snapshot; owned inline HTML; counting executor never runs provider tasks; no start/startFrame",
+      "stopReturned": true
+    },
+    "identicalFixtureBindings": {
+      "src/com/immortal/webtouchfixture/MainActivity.java": "64a5ecc01cede8f927c1d03d9884740aa6c2348c2728e3a302b6d2db71e554f4",
+      "AndroidManifest.xml": "54fb49f2c002ab5ae2a5e74379b03fa41a34379c0a1244c20a27c5284f1c0312"
+    },
+    "initialDefaultModeSetupExcludedFromPhotoSubmissionWitness": true,
+    "firstDefaultModeSourceSha256": "f28645c2965a839ff5e559f74ba59ad9be225832ececbec6e95cff3b1a41a1cb"
+  },
+  "jvm": {
+    "tests": 4616,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 481
+  },
+  "build": {
+    "exitCode": 0,
+    "seconds": 89.27423941600136
+  },
+  "artifacts": {
+    "debug": {
+      "bytes": 51407772,
+      "sha256": "598bbbc02318fc73bf76a0b86400dcd9519c511e5c460e1af9c07021ab6bc8cd",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": []
+    },
+    "performance": {
+      "bytes": 25886947,
+      "sha256": "7a77548d2ccdf1ec2b14fb7db4609e2dfea4634ee5db97e37cce6e980dbd305d",
+      "signerSha256": "4f9a3b1d0c86028e831add351642a6167d06e9d3ed6ded6dcf5a790a560b45d6",
+      "all23SourceAssetsUnchangedFromBaseline": true,
+      "generatedOptimizationProfileChanges": [
+        "assets/dexopt/baseline.prof",
+        "assets/dexopt/baseline.profm"
+      ]
+    }
+  },
+  "rooms": {
+    "family": {
+      "bytes": 25886947,
+      "sha256": "7a77548d2ccdf1ec2b14fb7db4609e2dfea4634ee5db97e37cce6e980dbd305d",
+      "app": {
+        "versionCode": 178,
+        "versionName": "1.184"
+      },
+      "serviceReady": true,
+      "singleInstallAccepted": true
+    },
+    "living": {
+      "result": {
+        "status": "ready",
+        "ack": "uncertain",
+        "install_attempted": true,
+        "observations": 7
+      },
+      "installed": {
+        "bytes": 25886947,
+        "sha256": "7a77548d2ccdf1ec2b14fb7db4609e2dfea4634ee5db97e37cce6e980dbd305d",
+        "serviceReady": true,
+        "app": {
+          "versionCode": 178,
+          "versionName": "1.184"
+        }
+      }
+    }
+  },
+  "finalPreservation": {
+    "family": {
+      "preferenceFilesByteIdentical": 43,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1546,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "fontAccessibilityPreserved": true,
+      "originalChromiumActivityRetained": true,
+      "frameResumed": true,
+      "awake": true,
+      "allPreferenceBytesMatchAtFinalCapture": true
+    },
+    "living": {
+      "preferenceFilesByteIdentical": 30,
+      "observedInternalCacheDifferences": {},
+      "preferenceFileSetsIdentical": true,
+      "allFourMapsIdenticalIncludingRevision": true,
+      "nameDevModePreserved": true,
+      "diagnostics": {
+        "diag": {
+          "responseLines": 1,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        },
+        "logcat": {
+          "responseLines": 1502,
+          "capturedFatalAnrMarkers": 0,
+          "ownedFixtureFirstAttemptCrashMarkers": 0,
+          "otherCapturedFatalAnrMarkers": 0
+        }
+      },
+      "allPreferenceBytesMatchAtFinalCapture": true
+    }
+  },
+  "transientObservation": {
+    "initialFamilyExactByteAssertionFailed": true,
+    "file": "WebViewChromiumPrefs.xml",
+    "removedKeys": [
+      "CachedFlagsDisabled",
+      "CachedFlagsEnabled"
+    ],
+    "laterAll43BytesMatchedWithoutRestorationWrites": true
+  },
+  "cleanup": {
+    "copiedRegistriesRetired": true,
+    "ownerRegistriesUnchanged": true,
+    "fixturePackageAbsent": true,
+    "noPhoneProviderAccountAuthenticationPushPublication": true
+  },
+  "limits": [
+    "No normal start/startFrame or actual Dream/Preview Activity dispatch acceptance",
+    "Classic fixture snapshot; generated inline HTML and inert executor only",
+    "Night touch priority source-reviewed; no native night input case",
+    "No actual dashboard/provider/optimized gesture/API28/Living native interaction proof",
+    "No zoom or held black-handoff/night/performance scope reopened"
+  ]
+}
