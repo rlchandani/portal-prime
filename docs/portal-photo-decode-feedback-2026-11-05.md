@@ -47,3 +47,18 @@ hard limit **06:18:09**, 5 November 2026. Actual Chrome baseline completed at
 Public publication remains 1.83; the whole-product goal stays active.
 
 Structured receipt: `mocks/portal-photo-decode-feedback-20261105/verification.json`.
+
+The first rejected post-install XML capture was overwritten by a later read in
+the temporary verification helper; its raw XML cannot be recovered. The final
+preservation verdict above applies to the later complete read, with the initial
+failure retained in tool output and the structured receipt.
+
+A subsequent workflow check at 06:37:29–06:40:34 UTC used generated preferences
+and an in-memory request substitute. The helper's existing exclusive-directory
+guard rejects a reused destination before requests, preserves the first files
+byte-for-byte and allows a changed value in a separately named capture.
+Shared agent instructions now require that rule and retention of reads whose
+comparison failed.
+The existing fleet backup command already publishes unique private snapshots.
+No new capture implementation, app build, device request, recovery of missing
+raw evidence or atomic-snapshot claim accompanies this documentation change.

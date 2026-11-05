@@ -83,9 +83,13 @@ The **06:01:12–06:06:12 UTC discovery window on 5 November** closed without a 
 app candidate. Selected browser navigation, registry fields, profile/source forms
 and snapshot paths yielded no distinct defect in source review; no fresh runtime
 acceptance, build or delivery was performed. Do not repeat those unchanged leads.
-An observed overwrite of a private verification capture is deferred workflow
-maintenance, not a new app feature or screensaver fix. Prioritize a distinct
-reported visible problem within the existing scope boundaries.
+The observed overwrite of a private verification capture is now covered by the
+shared instructions: each read uses a new exclusive private directory and reads
+whose comparison failed remain intact. Generated checks at 06:40:34 UTC verify the temporary
+helper's existing guard; the repository backup tool already publishes unique
+snapshots. See the [qualified workflow note](portal-photo-decode-feedback-2026-11-05.md).
+This is workflow maintenance, not a new app feature or screensaver fix, and does
+not recover the overwritten XML. Prioritize a distinct reported visible problem.
 
 The **06:33:13–06:36:43 UTC discovery on 5 November** also closed without a
 new app candidate, before its 06:38:13 cap. A read-only look at the current local

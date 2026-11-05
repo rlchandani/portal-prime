@@ -46,6 +46,13 @@ the user's per-issue time limit. Parallel workers need disjoint write scopes; th
 owns shared-file integration and device operations. A matching signed APK and an install
 acknowledgment do not replace post-install identity and functional checks.
 
+Every verification capture must create a new private output directory exclusively.
+Reject an existing destination before device requests; never overwrite an earlier
+before/after read when its comparison fails. Retain the first observation and use
+a separate numbered destination for a later read. For preference backups, reuse
+`provisioning/fleet-backup.sh`, which publishes unique private snapshots. Keep raw
+captures and copied registry records out of public receipts and Git.
+
 Prioritize the user's reported screensaver and visible UX problems. Target 10–15 minute
 deliverable slices within the existing 30-minute hard issue limit; retain the original
 clock across continuations. Ship a checked small slice, then move on. Break larger work
