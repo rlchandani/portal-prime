@@ -73,6 +73,14 @@ caption date/timezone parsing, and supplied-APK inspection. Historical bounded
 negative findings also remain closed: do not turn an unchanged hypothesis into a
 new issue. Consult the historical snapshot and task IDs before repeating work.
 
+The **06:01:12–06:06:12 UTC discovery window on 5 November** closed without a new
+app candidate. Selected browser navigation, registry fields, profile/source forms
+and snapshot paths yielded no distinct defect in source review; no fresh runtime
+acceptance, build or delivery was performed. Do not repeat those unchanged leads.
+An observed overwrite of a private verification capture is deferred workflow
+maintenance, not a new app feature or screensaver fix. Prioritize a distinct
+reported visible problem within the existing scope boundaries.
+
 ## Work requiring a decision or external change
 
 | Roadmap task ID | Current boundary / next action |
