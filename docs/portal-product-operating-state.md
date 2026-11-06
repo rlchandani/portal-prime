@@ -15,6 +15,15 @@ records, architecture, exact artifact identities, approval boundaries and
 verification/recovery runbooks. It adds context without a new device check,
 issue clock or product release.
 
+The human's 6 November clarification explicitly requires improvement of **both
+the Portal APK and Portal Toolkit / paired Android companion**. Current Toolkit
+source is `~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit`,
+branch `codex/companion-upload-exceptions-20261103`, with the pre-existing
+uncommitted 1.7.9 transport-exception candidate preserved. Separate clean Toolkit
+maintenance source is `/private/tmp/portal-product-discovery-20261104-063636/toolkit`
+at `205f2e56`. Exact paths, states and portable source/APK packages are in the
+complete handover. Phone/publication/provider restrictions remain.
+
 The whole-product objective remains active:
 `~/.codex/attachments/e1ac08b5-a8c8-4f3e-9d81-6508e323ce04/pasted-text-1.txt`.
 This document is a handoff, not whole-product acceptance.

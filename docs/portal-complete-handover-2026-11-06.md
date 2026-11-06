@@ -36,11 +36,73 @@ The short current-state document is
 This longer document supplies the context, exact boundaries and operating
 instructions the short document deliberately omits.
 
+**The human explicitly clarified that continuation must work on both applications:
+the Immortal Portal APK and Portal Toolkit, including its paired Android companion.**
+Keep both projects in the improvement queue, prioritize the reported visible
+Portal problems, and select small useful work across both. The phone/deployment
+restrictions below still apply; local Toolkit work is not permission to operate
+the Pixel. Do not treat Toolkit as background reference material.
+
+### Exact source projects and supplied code packages
+
+Locations were rechecked for the human's package/path clarification on November 6.
+
+| Project / purpose | Full source directory | Branch and state |
+| --- | --- | --- |
+| **Immortal Portal APK — current continuation** | `~/.codex/worktrees/portal-music-player/portal-prime` | `codex/product-audit-20261103-144114`; implementation `c0389c2d`, followed by handover commits; pre-existing Python cache only |
+| **Portal Toolkit / paired Android companion — current continuation** | `~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit` | `codex/companion-upload-exceptions-20261103`; committed base `d5b1a4de1069ceb02d172bfb10832a60c232bf53`, plus preserved uncommitted 1.7.9 transport-exception candidate |
+| Toolkit maintenance line — separately verified improvements | `/private/tmp/portal-product-discovery-20261104-063636/toolkit` | `codex/toolkit-memory-validity-20261104`, clean at `205f2e56a173273fbde4afd9b03dd6ff4ae7b048`; 1.4.0/code5 |
+| Toolkit owner/base checkout — preserve | `/Volumes/xHome/Github/portal-toolkit` | `roadmap-v1.2-1.4`, clean at `4e1dadb8ec2ec018b6fdc250486e0c476467a7c4`; older base, not the current paired companion |
+
+Both Toolkit lines use application ID `com.portalinstaller`; they are separate
+branches, not two independently installable applications. Do not replace the
+current companion with the older 1.4.0 maintenance APK, discard its pending
+changes or automatically merge the branches. Review relevant maintenance commits
+against the companion source before any separately scoped integration.
+
+Durable transfer directory:
+
+```text
+~/.codex/exports/portal-handover-2026-11-06
+```
+
+It contains:
+
+- `immortal-portal-source.zip` — current Portal tracked working source, including
+  this handover and the roadmap/evidence.
+- `portal-toolkit-companion-source.zip` — current Toolkit companion tracked
+  working source, **including all three pre-existing modified files and the
+  untracked transport-exception receipt**; it is not a clean committed release.
+- `portal-toolkit-maintenance-source.zip` — clean separate 205f2e56 maintenance
+  source, supplied so verified Toolkit work is not stranded in a temporary folder.
+- `immortal-portal-1.208-performance.apk` — exact optimized development APK last
+  delivered to both rooms.
+- `immortal-portal-1.208-debug.apk` — debug build, not the room delivery.
+- `portal-toolkit-1.7.9-preview-candidate.apk` — current locally verified
+  **uncommitted / not deployed** companion candidate.
+- `portal-toolkit-1.4.0-maintenance-local.apk` — maintenance build, not a phone
+  delivery or replacement for the companion.
+- `PACKAGE-MANIFEST.json` and `README.md` — source commits, working changes,
+  byte/hash identities, package status and continuation instructions.
+
+These ZIPs are source snapshots, not Git history or credentials backups.
+They intentionally exclude local SDK/signing properties, keystores, build
+directories, caches and owner-private Fleet records. Existing checkouts retain
+Git history. A copied project needs local SDK/signing configuration supplied
+privately before building; never create a replacement signing key for an
+in-place update.
+
 Paste this into the new agent:
 
-> Continue the Immortal improvement effort from
+> Continue improvement of **both the Immortal Portal APK and Portal Toolkit /
+> its paired Android companion**. The Portal project is
 > `~/.codex/worktrees/portal-music-player/portal-prime`, branch
-> `codex/product-audit-20261103-144114`. Read
+> `codex/product-audit-20261103-144114`. The current Toolkit companion project is
+> `~/.codex/worktrees/portal-companion-compat-20261102/portal-toolkit`,
+> branch `codex/companion-upload-exceptions-20261103`; preserve its uncommitted
+> 1.7.9 candidate. Separate Toolkit maintenance source is
+> `/private/tmp/portal-product-discovery-20261104-063636/toolkit` at `205f2e56`.
+> Read
 > `docs/portal-complete-handover-2026-11-06.md`, `AGENTS.md`, then the selected
 > roadmap task and its dated receipt. Prioritize my reported screensaver and
 > visible UX problems. Work in small, independently useful slices: five-minute
@@ -49,14 +111,15 @@ Paste this into the new agent:
 > issue clocks. Preserve household settings, accounts, sources and existing
 > work. No Google phone/Pixel access, GitHub authentication/push/publication or
 > HA music deployment is authorized. Do useful authorized work, test it, verify
-> any permitted delivery, then move on. Report shipped behavior and remaining
+> any permitted delivery, then move on across both projects. Report shipped behavior and remaining
 > acceptance gaps plainly. This handover is context, not approval to reopen
 > parked work.
 
 Before the next implementation, take these bounded steps:
 
-1. Check the existing branch and `git status --short`. Preserve the pre-existing
-   untracked `scripts/__pycache__/`; use Python `-B`.
+1. Check the existing branch and `git status --short` in both source projects.
+   Preserve the Portal's untracked `scripts/__pycache__/` and all four pending
+   Toolkit companion paths described below; use Python `-B`.
 2. Read this document and the repository instructions. Use the
    [roadmap index](handover/portal-roadmap-index-2026-11-06.md) to avoid repeating
    completed work. Read only the selected task's receipt and relevant history.
@@ -677,11 +740,46 @@ full parity remain open; **all current Pixel/Google phone access is prohibited**
 Do not refresh phone identity, inspect ADB inventory or use an emulator result
 as physical phone proof.
 
+The current companion checkout is available at the full path in section 1.
+Its current branch is `codex/companion-upload-exceptions-20261103`, whose committed
+HEAD is still `d5b1a4de…`; the earlier receipt's photo-activation branch name is
+historical. The checkout has these **pre-existing** uncommitted changes:
+
+```text
+M app/build.gradle.kts
+M app/src/main/java/com/portalinstaller/data/companion/CompanionClient.kt
+M app/src/test/java/com/portalinstaller/data/companion/CompanionPhotoUploadAcknowledgmentTest.kt
+?? docs/companion-photo-transport-exceptions-2026-11-03.md
+```
+
+They form **1.7.9-music-preview/code21**: unexpected post-send transport
+exceptions become Unconfirmed, preserving failure-only retry safety.
+The retained local receipt reports five added tests, 79 focused tests and
+**656 JVM / 81 suites**, debug assembly and matching signer. This candidate
+is neither committed nor phone-deployed. Its existing APK was rehashed and its
+actual manifest/signature inspected during this package clarification:
+14,738,973 bytes, SHA256
+`dcee8a0879a3367462ac1e52482085133927fa2a6461ebe922165cc72d0adbb5`.
+Do not label that build 1.7.8 or erase the dirty paths by checking out another
+branch. The historical 1.7.8 artifact-retention directory is now absent;
+its recorded delivery hash remains evidence, not a currently supplied APK.
+
 Separate Toolkit maintenance receipts record monitoring/cancellation and local
 CI work (`0c9a37ca`, `44d75050`) and later uptime validity coverage.
 Initial August checklist items were stale: connection guards, errors, quoting
 and cleanup already existed. Revalidate actual source before opening a bug.
 The APK-read candidate is withdrawn at its expired clock, not merged.
+
+The latest retained **maintenance** source is clean `205f2e56…`, following
+`d15912d0…`, in the temporary Toolkit checkout in section 1. It fixes negative/
+overflowing RAM parsing. [Receipt](portal-toolkit-memory-validity-2026-11-04.md):
+17 frozen cases, 239 JVM / 39 suites and debug assembly; native/kernel/phone
+acceptance remains unverified. Its existing local 1.4.0/code5 APK is
+13,901,710 bytes, SHA256
+`a76042cddcff791bac8cc45ed319192d780c22c2dfa0166a0cb55e3991af7c1d`.
+The original **November 4 06:36:36–07:06:36 UTC** clock remains.
+The source ZIP preserves this line independently; it does not imply its
+maintenance commits have been integrated into the 1.7.9 companion candidate.
 
 No shipped native iOS app was identified. Gallery iOS columns were design
 interpretations; do not claim implementation or platform parity.
@@ -768,6 +866,18 @@ For a focused small change, run meaningful relevant checks and required
 repository gates; broaden only when a failure/change/real concern warrants it.
 Do not re-run 4,754 tests or rebuild Android merely because the next agent read
 this handover. Documentation changes use strict MkDocs and link/consistency checks.
+
+For Toolkit host source changes, run from the selected **Toolkit** checkout:
+
+```sh
+JAVA_HOME=~/Library/Java/JavaVirtualMachines/jbr-21.0.11/Contents/Home \
+  ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-daemon
+```
+
+Use that branch's docs/test contracts; do not apply Portal's performance-variant
+commands to Toolkit. Current packaged companion and maintenance builds have
+different versions/test totals. Local host work is authorized; physical phone
+operations retain the prohibition above.
 
 Other task-dependent gates:
 
@@ -1005,6 +1115,9 @@ their context exists in the new chat.
   remain; no new issue scope is opened by this transfer.
 - Worktree, commands, tools, artifact identities, preservation and recovery
   procedures are supplied.
+- The human's follow-up explicitly requires work on **both Portal and Toolkit**.
+  Exact current source roots, Toolkit's pending candidate, separate maintenance
+  line, source ZIPs and APK identities are now provided.
 
 Handover validation on November 6 passed strict MkDocs and Git whitespace checks.
 All 300 local links resolved; all 216 index entries and all 12 complete remaining
