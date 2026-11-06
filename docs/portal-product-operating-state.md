@@ -8,6 +8,13 @@ the entire previous handoff byte-for-byte, including the initial inventory,
 closed investigations, approvals and release history. Its dated versions and
 “current” statements are historical. Read relevant sections, not the whole log.
 
+For transfer to a new agent, read the
+[complete 6 November handover](portal-complete-handover-2026-11-06.md).
+It includes the original objective, all 216 task IDs, complete remaining task
+records, architecture, exact artifact identities, approval boundaries and
+verification/recovery runbooks. It adds context without a new device check,
+issue clock or product release.
+
 The whole-product objective remains active:
 `~/.codex/attachments/e1ac08b5-a8c8-4f3e-9d81-6508e323ce04/pasted-text-1.txt`.
 This document is a handoff, not whole-product acceptance.
