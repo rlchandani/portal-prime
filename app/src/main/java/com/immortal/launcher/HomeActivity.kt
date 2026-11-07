@@ -3275,7 +3275,7 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
     add(QC(DinnerCallTile.ICON, DinnerCallTile.LABEL, DinnerCallTile.DESCRIPTION) { showDinner = true })
     if (assistantInstalled) add(QC("mic", "Hey Jarvis", "Open your assistant") { triggerJarvis(context) })
     if (dashboardConfigured) {
-      add(QC("ha", "Home dashboard", "Open your dashboard") {
+      add(QC("ha", "Dashboard", "Open your dashboard") {
         HomeDashboardActivity.openDashboard(context)
       })
     } else if (haInstalled) {
@@ -3293,30 +3293,44 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
       Box(Modifier.fillMaxSize()) { DinnerCallSheet(onDismiss = { showDinner = false }) }
     }
   }
-  ImmortalWidgetShell(title = "Quick controls", openPage = "display", modifier = modifier) {
+  ImmortalWidgetShell(title = "Quick controls", openPage = "display", modifier = modifier, scrollContent = false) {
     if (tiles.isEmpty()) {
       Text("Add an assistant or Home Assistant app to use quick controls.",
           color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp)
     } else {
-      tiles.chunked(2).forEach { row ->
-        Row(Modifier.fillMaxWidth().padding(bottom = 14.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-          row.forEach { qc ->
-            Column(Modifier.weight(1f).heightIn(min = 150.dp).clip(RoundedCornerShape(17.dp))
-                .background(ApprovedHomePalette.Chrome).tvFocusable { qc.onTap() }.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)) {
-              ApprovedHomeIcon(qc.icon, Modifier.size(32.dp), ApprovedHomePalette.Text)
-              Text(qc.label, color = ApprovedHomePalette.Text, fontSize = 23.sp, lineHeight = 30.sp,
-                  fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-              Text(qc.description, color = ApprovedHomePalette.Secondary, fontSize = 20.sp, lineHeight = 27.sp)
+      // Fit every tile in the card (no hidden scroll): split the real height across the rows and
+      // drop the description line when a row is too short to hold it.
+      val rows = tiles.chunked(2)
+      BoxWithConstraints(Modifier.fillMaxSize()) {
+        val gap = 14.dp
+        val rowHeight = (maxHeight - gap * (rows.size - 1)) / rows.size
+        val showDescription = rowHeight >= QUICK_TILE_FULL_HEIGHT
+        val padding = if (rowHeight >= QUICK_TILE_FULL_HEIGHT) 20.dp else 14.dp
+        Column(verticalArrangement = Arrangement.spacedBy(gap)) {
+          rows.forEach { row ->
+            Row(Modifier.fillMaxWidth().height(rowHeight), horizontalArrangement = Arrangement.spacedBy(gap)) {
+              row.forEach { qc ->
+                Column(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(17.dp))
+                    .background(ApprovedHomePalette.Chrome).tvFocusable { qc.onTap() }.padding(padding),
+                    verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)) {
+                  ApprovedHomeIcon(qc.icon, Modifier.size(32.dp), ApprovedHomePalette.Text)
+                  Text(qc.label, color = ApprovedHomePalette.Text, fontSize = 23.sp, lineHeight = 30.sp,
+                      fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                  if (showDescription) Text(qc.description, color = ApprovedHomePalette.Secondary,
+                      fontSize = 20.sp, lineHeight = 27.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
+              }
+              if (row.size == 1) Spacer(Modifier.weight(1f))
             }
           }
-          if (row.size == 1) Spacer(Modifier.weight(1f))
         }
       }
     }
   }
-
 }
+
+/** Row height at which a quick-control tile has room for its description line. */
+private val QUICK_TILE_FULL_HEIGHT = 150.dp
 
 /**
  * The glanceable "Today" strip for the left column: a frosted-glass card with three quick rows —
