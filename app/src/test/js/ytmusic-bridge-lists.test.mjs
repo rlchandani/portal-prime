@@ -13,9 +13,11 @@ import vm from 'node:vm';
 
 const SOURCE = readFileSync(new URL('../../main/assets/ytmusic/bridge.js', import.meta.url), 'utf8');
 
-function el({ text = '', attrs = {}, qs = {}, src } = {}) {
+function el({ text = '', attrs = {}, qs = {}, src, hidden = false } = {}) {
   return {
     textContent: text, src, clicks: 0,
+    // On-screen by default; `hidden` models a closed dialog that stays in the DOM.
+    getBoundingClientRect: () => (hidden ? { width: 0, height: 0 } : { width: 100, height: 40 }),
     getAttribute: n => (n in attrs ? attrs[n] : null),
     hasAttribute: n => n in attrs,
     querySelectorAll: s => qs[s] || [],
@@ -151,4 +153,9 @@ test('promo: only "Not now" is ever clicked', () => {
   const h2 = boot({ doc: { '[role="dialog"]': [el({ qs: { 'button, a, tp-yt-paper-button, yt-button-renderer, yt-button-shape': [lone] } })] } });
   h2.tick();
   assert.equal(lone.clicks, 0);
+  // A closed (zero-size) dialog left in the DOM is never clicked, so no click loop.
+  const ghost = el({ text: 'Not now' });
+  const h3 = boot({ doc: { 'tp-yt-paper-dialog': [el({ hidden: true, qs: { 'button, a, tp-yt-paper-button, yt-button-renderer, yt-button-shape': [ghost] } })] } });
+  h3.tick(); h3.tick();
+  assert.equal(ghost.clicks, 0);
 });

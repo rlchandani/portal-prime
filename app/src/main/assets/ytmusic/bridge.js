@@ -435,6 +435,10 @@
     if (!cfg || typeof i !== 'number' || i < 0 || i % 1 !== 0 || g !== listGen[kind]) return false;
     var row = rowsFor(cfg)[i];
     if (!row) return false;
+    // Library items: YouTube Music's play controls ignore scripted and delivered taps and full
+    // page loads don't autoplay in this WebView (verified on a Portal, 2026-11-07). Open the item
+    // in-page instead (link navigation works); the launcher reveals the page for one real tap.
+    if (kind === 'library' && openLibraryItem(row)) { soon(); return true; }
     for (var t = 0; t < cfg.play.length; t++) {
       try {
         var el = row.querySelector(cfg.play[t]);
@@ -442,6 +446,11 @@
       } catch (e) {}
     }
     return false;
+  }
+  function openLibraryItem(row) {
+    var link = row.querySelector('a[href*="list="], a[href^="channel/"], a[href^="browse/"]');
+    if (!link) return false;
+    try { link.click(); return true; } catch (e) { return false; }
   }
   function search(q) {
     q = str(q, LIST_TEXT);
@@ -471,6 +480,11 @@
       var hosts;
       try { hosts = document.querySelectorAll(PROMO_HOSTS[h]); } catch (e) { continue; }
       for (var i = 0; i < hosts.length; i++) {
+        // A closed dialog can stay in the DOM; only act on one that is actually on screen.
+        try {
+          var hr = hosts[i].getBoundingClientRect();
+          if (!(hr.width > 0 && hr.height > 0)) continue;
+        } catch (e) { continue; }
         var buttons;
         try { buttons = hosts[i].querySelectorAll(PROMO_BUTTONS); } catch (e) { continue; }
         for (var j = 0; j < buttons.length; j++) {
@@ -478,6 +492,7 @@
           var label = '';
           try { label = str(b.getAttribute('aria-label') || b.textContent || '', 40).toLowerCase(); } catch (e) {}
           if (label !== 'not now') continue;
+          try { var br = b.getBoundingClientRect(); if (!(br.width > 0 && br.height > 0)) continue; } catch (e) { continue; }
           try { b.click(); return true; } catch (e) {}
         }
       }

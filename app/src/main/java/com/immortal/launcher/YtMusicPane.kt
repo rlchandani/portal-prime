@@ -100,7 +100,8 @@ fun YtMusicPane(onOpenInBrowser: () -> Unit, modifier: Modifier = Modifier) {
           .clip(RoundedCornerShape(40.dp))
           .background(PaneStyle.frame)
           .padding(horizontal = 20.dp, vertical = 20.dp)) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    // The music screen's close (X) sits over this corner; keep the header clear of it.
+    Row(Modifier.padding(end = 56.dp), verticalAlignment = Alignment.CenterVertically) {
       PaneTabs(pane.tab, enabled = !blocked, onSelect = onSelect)
       Spacer(Modifier.weight(1f))
       if (!blocked) PageLink(if (pane.showPage) "Back to list" else "Show YouTube page", togglePage)
@@ -131,7 +132,13 @@ fun YtMusicPane(onOpenInBrowser: () -> Unit, modifier: Modifier = Modifier) {
                 next.submittedQuery?.let { YtMusicWebHost.search(it) }
               }
             },
-            onPlay = { list, item -> YtMusicWebHost.playItem(list, item) },
+            onPlay = { list, item ->
+              YtMusicWebHost.playItem(list, item)
+              // Library items open on the real page (its Play needs one real tap there).
+              if (pane.tab == YtMusicTab.LIBRARY && !pane.showPage) {
+                pane = YtMusicPaneReducer.reduce(pane, YtMusicPaneEvent.TogglePage)
+              }
+            },
             onShowPage = togglePage,
         )
       }
