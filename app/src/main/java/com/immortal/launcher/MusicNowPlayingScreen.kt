@@ -36,6 +36,8 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -106,7 +108,10 @@ fun MusicPlayerScreen(
 ) {
   val np = rememberNowPlaying()
   val screen = MusicNowPlayingPresentation.screenState(np, hasEverSeenSession)
-  Box(modifier.fillMaxSize().background(ApprovedHomePalette.Background)) {
+  val hideKeyboard = rememberMusicKeyboardPolicy()
+  Box(modifier.fillMaxSize().background(ApprovedHomePalette.Background)
+      // Any tap outside the embedded page (which consumes its own touches) closes the keyboard.
+      .pointerInput(Unit) { detectTapGestures { hideKeyboard() } }) {
     when (screen) {
       MusicScreenState.FIRST_RUN, MusicScreenState.NOTHING_PLAYING ->
         if (paneOpen && rightPane != null) MusicSplitIdle(rightPane)
@@ -118,6 +123,37 @@ fun MusicPlayerScreen(
     NowPlayingIconButton("Close music", NowPlayingGlyph.CLOSE, onClose,
         Modifier.align(Alignment.TopEnd).padding(top = 16.dp, end = 16.dp))
   }
+}
+
+/**
+ * While the music screen is shown the soft keyboard overlays it (ADJUST_NOTHING) instead of
+ * panning the whole launcher up, which hid the header, tabs, close button and the Home dock; the
+ * window's previous mode is restored on close. Returns an action that closes the keyboard and drops
+ * the embedded page's input focus (its search box would otherwise keep the keyboard up).
+ */
+@Composable
+private fun rememberMusicKeyboardPolicy(): () -> Unit {
+  val view = androidx.compose.ui.platform.LocalView.current
+  val hide = remember(view) {
+    {
+      YtMusicWebHost.clearInputFocus()
+      val imm = view.context.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
+          as? android.view.inputmethod.InputMethodManager
+      imm?.hideSoftInputFromWindow(view.windowToken, 0)
+      Unit
+    }
+  }
+  DisposableEffect(view) {
+    val window = generateSequence(view.context) { (it as? android.content.ContextWrapper)?.baseContext }
+        .filterIsInstance<android.app.Activity>().firstOrNull()?.window
+    val previous = window?.attributes?.softInputMode
+    window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+    onDispose {
+      hide()
+      if (window != null && previous != null) window.setSoftInputMode(previous)
+    }
+  }
+  return hide
 }
 
 /** Subscribes to [NowPlayingHub], marshalling every update to the main thread. */

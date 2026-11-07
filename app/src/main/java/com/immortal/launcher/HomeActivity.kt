@@ -1475,7 +1475,7 @@ private fun LauncherScreen(
         }
         if (musicLayout == MusicPlayerLayout.FULL) {
           // Survives this screen's lifetime only; reopening music after a close starts on the hint.
-          var musicPaneOpen by remember { mutableStateOf(YtMusicWebHost.isAlive) }
+          var musicPaneOpen by remember { mutableStateOf(YtMusicWebHost.isAlive || YtMusicWebHost.hasSavedSession()) }
           // YouTube Music player (2026-11-07): native Now Playing beside the embedded page.
           MusicPlayerScreen(roomName = room,
               rightPane = {
@@ -1484,7 +1484,8 @@ private fun LauncherScreen(
               },
               onOpenYouTubeMusic = { YtMusicWebHost.obtain(context); musicPaneOpen = true },
               paneOpen = musicPaneOpen,
-              onClose = { musicLayout = null }, hasEverSeenSession = MusicSessionMemory.seen,
+              onClose = { musicLayout = null },
+              hasEverSeenSession = MusicSessionMemory.seen || YtMusicWebHost.hasSavedSession(),
               modifier = Modifier.fillMaxSize())
         } else musicLayout?.let { layout ->
           MusicPlayerHost(layout,

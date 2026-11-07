@@ -141,6 +141,21 @@ object YtMusicWebHost {
     view.loadUrl(view.url?.takeIf { YtMusicUrls.isMusicPage(it) } ?: YtMusicUrls.HOME)
   }
 
+  /**
+   * True once YouTube Music has been used in this WebView before (it left cookies), e.g. the user
+   * signed in. Lets the music screen skip first-run after a launcher restart. Reads cookie
+   * presence only; values are never inspected or logged.
+   */
+  fun hasSavedSession(): Boolean = runCatching {
+    !CookieManager.getInstance().getCookie(YtMusicUrls.ORIGIN).isNullOrBlank()
+  }.getOrDefault(false)
+
+  /** Drops keyboard focus from the page (e.g. its search box) so the soft keyboard can close. */
+  @MainThread
+  fun clearInputFocus() {
+    web?.clearFocus()
+  }
+
   /** Stops playback and frees the renderer. Call when the user stops or closes music. */
   @MainThread
   fun release() {
