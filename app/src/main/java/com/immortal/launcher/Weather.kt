@@ -38,7 +38,8 @@ object Weather {
   // datacenter city) or a relocated Portal self-corrects instead of being wrong forever.
   private const val LOCATION_TTL_MS = 7L * 24 * 60 * 60 * 1000 // 7 days
 
-  internal data class Conditions(val temp: Int, val code: Int)
+  /** [feelsLike] is Open-Meteo's apparent temperature; null when the response omits it. */
+  internal data class Conditions(val temp: Int, val code: Int, val feelsLike: Int? = null)
   // Independent header/card/frame readers share brief current conditions, never failures.
   private val currentConditions = SingleFlightValueCache<String, Conditions>(30_000L, 4)
 
@@ -51,12 +52,14 @@ object Weather {
   internal fun currentUrl(lat: Double, lon: Double, fahrenheit: Boolean): String {
     val unit = if (fahrenheit) "fahrenheit" else "celsius"
     return "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
-        "&current=temperature_2m,weather_code&temperature_unit=$unit"
+        "&current=temperature_2m,apparent_temperature,weather_code&temperature_unit=$unit"
   }
 
   internal fun parseCurrent(json: String): Conditions {
     val current = JSONObject(json).getJSONObject("current")
-    return Conditions(current.getDouble("temperature_2m").roundToInt(), current.getInt("weather_code"))
+    val apparent = current.optDouble("apparent_temperature")
+    return Conditions(current.getDouble("temperature_2m").roundToInt(), current.getInt("weather_code"),
+        feelsLike = apparent.takeUnless { it.isNaN() }?.roundToInt())
   }
 
   /** Returns e.g. "☀️ 72°", or "" if it can't be fetched (caller can retry). */
@@ -197,13 +200,15 @@ object Weather {
   fun cachedCity(context: Context): String =
       context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("city", "") ?: ""
 
-  /** Current conditions for the redesigned weather widget: city, rounded temp, and weather code. */
-  data class Current(val city: String, val temp: Int, val code: Int)
+  /** Current conditions for the redesigned weather widget: city, rounded temp, and weather code.
+   * [feelsLike] is the rounded apparent temperature, or null when unknown. */
+  data class Current(val city: String, val temp: Int, val code: Int, val feelsLike: Int? = null)
 
   fun fetchCurrent(context: Context): Current? =
       runCatching {
             val current = conditions(context) ?: return null
-            Current(city = cachedCity(context), temp = current.temp, code = current.code)
+            Current(city = cachedCity(context), temp = current.temp, code = current.code,
+                feelsLike = current.feelsLike)
           }
           .getOrNull()
 

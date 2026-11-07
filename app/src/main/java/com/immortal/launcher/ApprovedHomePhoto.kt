@@ -112,8 +112,11 @@ internal fun ApprovedHomePhoto(modifier: Modifier = Modifier, onEnterEdit: (() -
     bitmap?.let {
       Image(it, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
     }
+    // Neutral, eased scrim: the caption stays legible on bright photos without tinting the image
+    // teal or darkening its upper half (approved Home v2, change 6).
     Box(Modifier.fillMaxSize().background(Brush.verticalGradient(
-        0f to Color.Transparent, .4f to Color.Transparent, 1f to Color(0xF2061B1C))))
+        0f to Color.Transparent, .45f to Color.Transparent, .72f to Color(0x7A0B0C0E),
+        1f to Color(0xF20B0C0E))))
     Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 36.dp, vertical = 34.dp)) {
       Text("Photo memory", color = Color(0xFFF4F7F9), fontSize = 36.sp, lineHeight = 46.sp,
           fontWeight = FontWeight.Medium)

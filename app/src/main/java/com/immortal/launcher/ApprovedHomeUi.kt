@@ -398,6 +398,26 @@ internal fun ApprovedHomeTextButton(
   }
 }
 
+/**
+ * A widget's primary in-card action ("Open dashboard", "Add calendar"). The soft pill's left edge
+ * aligns with the card text above it, so the label no longer appears indented by bare padding.
+ */
+@Composable
+internal fun ApprovedHomePillButton(
+    label: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+  val shape = RoundedCornerShape(26.dp)
+  Box(modifier.heightIn(min = 52.dp).clip(shape)
+      .background(ApprovedHomePalette.Chrome)
+      .tvFocusable(shape, ringColor = ApprovedHomePalette.Accent, onClick = onClick)
+      .padding(horizontal = 22.dp, vertical = 10.dp), contentAlignment = Alignment.Center) {
+    Text(label, color = ApprovedHomePalette.Text, fontSize = 22.sp, lineHeight = 30.sp,
+        fontWeight = FontWeight.Medium)
+  }
+}
+
 /** Home-only empty/loading copy; shared legacy widgets retain their own presentation. */
 @Composable
 internal fun ApprovedHomeWidgetMessage(text: String) {
@@ -435,19 +455,30 @@ internal fun ApprovedHomeDock(selected: String, onSelect: (String) -> Unit) {
 }
 
 @Composable
-internal fun ApprovedHomeWidgetHeading(title: String, icon: String, onOpen: () -> Unit) {
+internal fun ApprovedHomeWidgetHeading(
+    title: String,
+    icon: String,
+    action: HomeRefinements.HeaderAction? = HomeRefinements.HeaderAction.SETTINGS,
+    onOpen: () -> Unit,
+) {
   Row(Modifier.fillMaxWidth().height(32.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(12.dp)) {
     ApprovedHomeIcon(icon, Modifier.size(27.dp))
     Text(title, color = ApprovedHomePalette.Secondary, fontSize = 24.sp, lineHeight = 32.sp,
         fontWeight = FontWeight.Medium, maxLines = 1,
         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-    // The negative vertical margin in the approved CSS gives this action a 68dp touch target.
-    Box(Modifier.width(68.dp).height(32.dp)
-        .tvFocusable(RoundedCornerShape(9.dp), ringColor = ApprovedHomePalette.Accent, onClick = onOpen),
-        contentAlignment = Alignment.Center) {
-      Text("Open", color = ApprovedHomePalette.Accent, fontSize = 18.sp, lineHeight = 24.sp,
-          fontWeight = FontWeight.Medium)
+    if (action != null) {
+      // Content actions keep the accent; settings actions are quieter so they don't compete with it.
+      val color = if (action == HomeRefinements.HeaderAction.OPEN) ApprovedHomePalette.Accent
+          else ApprovedHomePalette.Secondary
+      // The negative vertical margin in the approved CSS gives this action a 68dp minimum target.
+      Box(Modifier.widthIn(min = 68.dp).height(32.dp)
+          .tvFocusable(RoundedCornerShape(9.dp), ringColor = ApprovedHomePalette.Accent, onClick = onOpen)
+          .padding(horizontal = 6.dp),
+          contentAlignment = Alignment.Center) {
+        Text(action.label, color = color, fontSize = 18.sp, lineHeight = 24.sp,
+            fontWeight = FontWeight.Medium)
+      }
     }
   }
 }

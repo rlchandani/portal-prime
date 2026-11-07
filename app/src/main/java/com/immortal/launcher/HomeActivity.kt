@@ -1025,39 +1025,70 @@ private fun ApprovedHomePagedWidgets(
         onEnterEdit = onEnterEdit, onPageChanged = changePage, navigation = navigation,
         preserveCounterFocus = counterFocused,
         modifier = Modifier.weight(1f).fillMaxWidth())
-    Spacer(Modifier.height(if (compact) 16.dp else 26.dp))
+    // Widget paging sits under the widgets it pages (approved Home v2, changes 8–9); the favorites
+    // header below no longer carries a counter that described a different control.
+    if (HomeRefinements.showsPageIndicator(page.count)) {
+      ApprovedWidgetPageIndicator(page.index, page.count, changePage,
+          onFocusChanged = { counterFocused = it },
+          modifier = Modifier.fillMaxWidth().padding(top = if (compact) 8.dp else 12.dp))
+    }
+    Spacer(Modifier.height(if (compact) 8.dp else 14.dp))
     Row(Modifier.fillMaxWidth().height(if (compact) 44.dp else 52.dp),
         verticalAlignment = Alignment.CenterVertically) {
       Text("Favorite apps", color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 35.sp,
           fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
       if (editMode) ApprovedHomeTextButton("Add widget", onClick = onAddWidget)
-      Text("${page.index + 1} of ${page.count}", color = ApprovedHomePalette.Text, fontSize = 24.sp,
-          modifier = Modifier.padding(horizontal = 20.dp).semantics {
-            contentDescription = "Widget page ${page.index + 1} of ${page.count}"
-            customActions = buildList {
-              if (page.index > 0) add(CustomAccessibilityAction("Previous widget page") {
-                changePage(page.index - 1); true
-              })
-              if (page.index < page.count - 1) add(CustomAccessibilityAction("Next widget page") {
-                changePage(page.index + 1); true
-              })
-            }
-          }.onPreviewKeyEvent {
-            if (it.type != KeyEventType.KeyDown) false
-            else {
-              val target = when (it.key) {
-                Key.DirectionRight -> page.index + 1
-                Key.DirectionLeft -> page.index - 1
-                else -> return@onPreviewKeyEvent false
-              }.coerceIn(0, page.count - 1)
-              if (target == page.index) false
-              else {
-                changePage(target)
-                true
-              }
-            }
-          }.onFocusChanged { counterFocused = it.isFocused }.focusable())
       ApprovedHomeTextButton("All apps", onClick = onAllApps)
+    }
+  }
+}
+
+/** Page dots plus "n of m"; focusable with Left/Right and accessibility actions to change page. */
+@Composable
+private fun ApprovedWidgetPageIndicator(
+    index: Int,
+    count: Int,
+    changePage: (Int) -> Unit,
+    onFocusChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+  Row(modifier, horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.clip(RoundedCornerShape(18.dp)).semantics {
+          contentDescription = "Widget page ${index + 1} of $count"
+          customActions = buildList {
+            if (index > 0) add(CustomAccessibilityAction("Previous widget page") {
+              changePage(index - 1); true
+            })
+            if (index < count - 1) add(CustomAccessibilityAction("Next widget page") {
+              changePage(index + 1); true
+            })
+          }
+        }.onPreviewKeyEvent {
+          if (it.type != KeyEventType.KeyDown) false
+          else {
+            val target = when (it.key) {
+              Key.DirectionRight -> index + 1
+              Key.DirectionLeft -> index - 1
+              else -> return@onPreviewKeyEvent false
+            }.coerceIn(0, count - 1)
+            if (target == index) false
+            else {
+              changePage(target)
+              true
+            }
+          }
+        }.onFocusChanged { onFocusChanged(it.isFocused) }.focusable()
+        .padding(horizontal = 14.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+      repeat(count) { dot ->
+        val active = dot == index
+        Box(Modifier.height(8.dp).width(if (active) 22.dp else 8.dp).clip(RoundedCornerShape(4.dp))
+            .background(if (active) ApprovedHomePalette.Text else ApprovedHomePalette.Secondary.copy(alpha = .45f))
+            .clickable(onClickLabel = "Widget page ${dot + 1}") { changePage(dot) })
+      }
+      Spacer(Modifier.width(6.dp))
+      Text("${index + 1} of $count", color = ApprovedHomePalette.Secondary, fontSize = 20.sp,
+          lineHeight = 26.sp)
     }
   }
 }
@@ -1322,7 +1353,8 @@ private fun LauncherScreen(
                 onAllApps = { onSelectTab(ApprovedLauncherTab.APPS) },
                 modifier = Modifier.weight(1f).fillMaxWidth())
             Spacer(Modifier.height(if (connected == false) 6.dp else 16.dp))
-            Row(Modifier.fillMaxWidth().height(88.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            // Slimmer favorites strip (approved Home v2, change 7): 88 → 72dp, icons 56 → 46dp.
+            Row(Modifier.fillMaxWidth().height(FAVORITE_TILE_HEIGHT), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
               favorites.forEach { app ->
                 ApprovedFavoriteTile(app, Modifier.weight(1f), { onLaunch(app.component) }, { appMenu = app })
               }
@@ -2906,9 +2938,12 @@ private fun ImmortalWidgetShell(
     modifier: Modifier = Modifier,
     onOpen: (() -> Unit)? = null,
     scrollContent: Boolean = true,
+    /** True when the card body already shows a button doing exactly what [onOpen] does. */
+    duplicatesBodyAction: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
   val context = androidx.compose.ui.platform.LocalContext.current
+  val action = HomeRefinements.headerAction(opensContent = onOpen != null, duplicatesBodyAction)
   val icon = when (openPage) {
     "calendar" -> "calendar"
     "alarm" -> "alarm"
@@ -2921,7 +2956,7 @@ private fun ImmortalWidgetShell(
     else -> "tools"
   }
   Column(modifier = modifier.padding(30.dp)) {
-    ApprovedHomeWidgetHeading(title, icon) {
+    ApprovedHomeWidgetHeading(title, icon, action) {
       if (onOpen != null) onOpen() else context.openApprovedHomeSettings(openPage)
     }
     Spacer(Modifier.height(22.dp))
@@ -3138,19 +3173,20 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
   }
   val sunPair = sun?.formatted(use24)
   ImmortalWidgetShell(title = "Today", openPage = "calendar", modifier = modifier) {
-    TodayCalendarSection(currentCalendar.copy(refreshing = calendarBusy), onRetry = {
-      if (calendarRefresh.request(currentCalendar.copy(refreshing = calendarBusy), calendarUrl)) {
-        nextCalendarRefresh[0] = 0L
-      }
-    }, onAdd = { context.openApprovedHomeSettings("calendar-url") })
-    Spacer(Modifier.height(20.dp))
-    Text(buildString {
-      append(current?.let { "Feels like ${it.temp}°" } ?: "Weather unavailable")
-      sunPair?.let { append(" · Sunrise ${it.first}") }
-      if (sunPair == null) today?.let { append(" · H: ${it.hi}° · L: ${it.lo}°") }
-      append("\n$moonName")
-      sunPair?.let { append(" · Sunset ${it.second}") }
-    }, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 32.sp)
+    // Calendar setup is offered by the Calendar widget and this card's Settings action; Today only
+    // shows calendar content once one is configured (approved Home v2, change 1).
+    if (HomeRefinements.todayShowsCalendar(calendarUrl)) {
+      TodayCalendarSection(currentCalendar.copy(refreshing = calendarBusy), onRetry = {
+        if (calendarRefresh.request(currentCalendar.copy(refreshing = calendarBusy), calendarUrl)) {
+          nextCalendarRefresh[0] = 0L
+        }
+      }, onAdd = { context.openApprovedHomeSettings("calendar-url") })
+      Spacer(Modifier.height(20.dp))
+    }
+    TodayFactsGrid(remember(current, sunPair, today, moonName) {
+      HomeRefinements.todayFacts(temp = current?.temp, feelsLike = current?.feelsLike, sun = sunPair,
+          high = today?.hi, low = today?.lo, moon = moonName)
+    })
     alarmLine?.let { (label, whenStr) ->
       Spacer(Modifier.height(14.dp)); TodayRow("⏰", label, whenStr)
     }
@@ -3162,6 +3198,27 @@ private fun TodayStripWidget(modifier: Modifier = Modifier) {
     }
   }
 
+}
+
+/** Today's facts as a two-column grid of small label over value (approved Home v2, change 3). */
+@Composable
+private fun TodayFactsGrid(facts: List<HomeRefinements.TodayFact>) {
+  Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    facts.chunked(2).forEach { row ->
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+        row.forEach { fact ->
+          Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
+            Text(fact.label, color = ApprovedHomePalette.Secondary, fontSize = 18.sp, lineHeight = 24.sp,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
+            // Two lines so long values ("Waning crescent", localized times) wrap instead of clipping.
+            Text(fact.value, color = ApprovedHomePalette.Text, fontSize = 24.sp, lineHeight = 30.sp,
+                fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+          }
+        }
+        if (row.size == 1) Spacer(Modifier.weight(1f))
+      }
+    }
+  }
 }
 
 @Composable
@@ -4194,12 +4251,13 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
   OnResume { dashboardConfigured = HomeDashboardConfig.configured(context) }
   if (dashboardConfigured) {
     ImmortalWidgetShell(title = "Home Assistant", openPage = "ha", modifier = modifier,
-        onOpen = { HomeDashboardActivity.openDashboard(context) }) {
+        onOpen = { HomeDashboardActivity.openDashboard(context) }, duplicatesBodyAction = true) {
       Text("Your home dashboard", color = ApprovedHomePalette.Text, fontSize = 26.sp,
           lineHeight = 34.sp, fontWeight = FontWeight.Medium)
       Text("Open your rooms, devices and scenes.", color = ApprovedHomePalette.Secondary,
           fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 14.dp))
-      ApprovedHomeTextButton("Open dashboard", onClick = {
+      Spacer(Modifier.height(22.dp))
+      ApprovedHomePillButton("Open dashboard", onClick = {
         HomeDashboardActivity.openDashboard(context)
       })
     }
@@ -5173,13 +5231,16 @@ private fun ApprovedHomeBackgroundEffects(grain: Boolean) {
 }
 
 @OptIn(ExperimentalFoundationApi::class)
+private val FAVORITE_TILE_HEIGHT = 72.dp
+private val FAVORITE_ICON_SIZE = 46.dp
+
 @Composable
 private fun ApprovedFavoriteTile(app: AppEntry, modifier: Modifier, onClick: () -> Unit, onLongClick: () -> Unit) {
-  ApprovedHomeSurface(modifier.height(88.dp), radius = 18.dp) {
+  ApprovedHomeSurface(modifier.height(FAVORITE_TILE_HEIGHT), radius = 16.dp) {
     Row(Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick)
-        .padding(14.dp), verticalAlignment = Alignment.CenterVertically,
+        .padding(horizontal = 14.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-      Image(app.icon, contentDescription = null, modifier = Modifier.size(56.dp))
+      Image(app.icon, contentDescription = null, modifier = Modifier.size(FAVORITE_ICON_SIZE))
       Text(app.label, color = ApprovedHomePalette.Text, fontSize = 22.sp, lineHeight = 30.sp,
           fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }

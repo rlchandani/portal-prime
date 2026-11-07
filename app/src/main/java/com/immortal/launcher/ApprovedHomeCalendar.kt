@@ -90,7 +90,7 @@ internal fun ApprovedHomeCalendar(modifier: Modifier = Modifier) {
           Column(verticalArrangement = Arrangement.spacedBy(23.dp)) {
           Text("Add your calendar", color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 34.sp)
           Text("See your upcoming events here.", color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp)
-          ApprovedHomeTextButton("Add calendar") { context.openApprovedHomeSettings("calendar-url") }
+          ApprovedHomePillButton("Add calendar") { context.openApprovedHomeSettings("calendar-url") }
           }
         }
         rows.isEmpty() && !current.unavailable -> item(key = "empty", contentType = "empty") {
