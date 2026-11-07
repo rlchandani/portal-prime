@@ -1025,20 +1025,16 @@ private fun ApprovedHomePagedWidgets(
         onEnterEdit = onEnterEdit, onPageChanged = changePage, navigation = navigation,
         preserveCounterFocus = counterFocused,
         modifier = Modifier.weight(1f).fillMaxWidth())
-    // Widget paging sits under the widgets it pages (approved Home v2, changes 8–9); the favorites
-    // header below no longer carries a counter that described a different control.
-    if (HomeRefinements.showsPageIndicator(page.count)) {
-      ApprovedWidgetPageIndicator(page.index, page.count, changePage,
-          onFocusChanged = { counterFocused = it },
-          modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
-    }
-    // Tight stack below the widgets so the space goes to the widget grid instead (Home v2 follow-up).
-    Row(Modifier.fillMaxWidth().height(if (compact) 44.dp else 48.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-      Text("Favorite apps", color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 35.sp,
-          fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-      if (editMode) ApprovedHomeTextButton("Add widget", onClick = onAddWidget)
-      ApprovedHomeTextButton("All apps", onClick = onAllApps)
+    // One slim row between widgets and favorites: page dots centred, actions at the edges. The old
+    // separate dots row + "Favorite apps" heading row left ~60px of air on device (Home v2 space).
+    Box(Modifier.fillMaxWidth().padding(top = 4.dp).height(if (compact) 40.dp else 44.dp)) {
+      if (editMode) ApprovedHomeTextButton("Add widget", modifier = Modifier.align(Alignment.CenterStart),
+          onClick = onAddWidget)
+      if (HomeRefinements.showsPageIndicator(page.count)) {
+        ApprovedWidgetPageIndicator(page.index, page.count, changePage,
+            onFocusChanged = { counterFocused = it }, modifier = Modifier.align(Alignment.Center))
+      }
+      ApprovedHomeTextButton("All apps", modifier = Modifier.align(Alignment.CenterEnd), onClick = onAllApps)
     }
   }
 }
