@@ -1030,10 +1030,10 @@ private fun ApprovedHomePagedWidgets(
     if (HomeRefinements.showsPageIndicator(page.count)) {
       ApprovedWidgetPageIndicator(page.index, page.count, changePage,
           onFocusChanged = { counterFocused = it },
-          modifier = Modifier.fillMaxWidth().padding(top = if (compact) 8.dp else 12.dp))
+          modifier = Modifier.fillMaxWidth().padding(top = 4.dp))
     }
-    Spacer(Modifier.height(if (compact) 8.dp else 14.dp))
-    Row(Modifier.fillMaxWidth().height(if (compact) 44.dp else 52.dp),
+    // Tight stack below the widgets so the space goes to the widget grid instead (Home v2 follow-up).
+    Row(Modifier.fillMaxWidth().height(if (compact) 44.dp else 48.dp),
         verticalAlignment = Alignment.CenterVertically) {
       Text("Favorite apps", color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 35.sp,
           fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
@@ -1078,7 +1078,7 @@ private fun ApprovedWidgetPageIndicator(
             }
           }
         }.onFocusChanged { onFocusChanged(it.isFocused) }.focusable()
-        .padding(horizontal = 14.dp, vertical = 6.dp),
+        .padding(horizontal = 14.dp, vertical = 2.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
       repeat(count) { dot ->
         val active = dot == index
@@ -1352,7 +1352,7 @@ private fun LauncherScreen(
                 onEnterEdit = { editMode = true }, onAddWidget = { showLibrary = true },
                 onAllApps = { onSelectTab(ApprovedLauncherTab.APPS) },
                 modifier = Modifier.weight(1f).fillMaxWidth())
-            Spacer(Modifier.height(if (connected == false) 6.dp else 16.dp))
+            Spacer(Modifier.height(6.dp))
             // Slimmer favorites strip (approved Home v2, change 7): 88 → 72dp, icons 56 → 46dp.
             Row(Modifier.fillMaxWidth().height(FAVORITE_TILE_HEIGHT), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
               favorites.forEach { app ->
