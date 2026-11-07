@@ -1286,7 +1286,8 @@ private fun LauncherScreen(
       // A single cached display list for the static/minute-updated wallpaper.
       Box(Modifier.matchParentSize().graphicsLayer {}) { ApprovedHomeBackground() }
       Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth().height(108.dp).padding(horizontal = 56.dp),
+        // Launcher chrome trimmed 108 → 92dp; the 68dp header buttons keep a 12dp margin (Home v2 space).
+        Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = 56.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
             Text("immortal", color = ApprovedHomePalette.Text, fontSize = 30.sp, lineHeight = 40.sp,
@@ -1333,9 +1334,9 @@ private fun LauncherScreen(
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
-          Column(Modifier.fillMaxSize().padding(horizontal = 56.dp).padding(top = if (connected == false) 8.dp else 20.dp)) {
+          Column(Modifier.fillMaxSize().padding(horizontal = 56.dp).padding(top = 6.dp)) {
             ApprovedHomeGreeting(welcome, use24, compact = connected == false)
-            Spacer(Modifier.height(if (connected == false) 16.dp else 28.dp))
+            Spacer(Modifier.height(16.dp))
             if (connected == false) {
               val dark = com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark
               Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
@@ -1382,7 +1383,7 @@ private fun LauncherScreen(
               onDismiss = { musicLayout = null }, onLayoutChange = { musicLayout = it })
         }
         }
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(12.dp))
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
           ApprovedHomeDock(selectedTab.id) { destination ->
             musicLayout = null
@@ -1397,7 +1398,7 @@ private fun LauncherScreen(
             }
           }
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
       }
       if (showLibrary) ApprovedWidgetLibrary(LocalAdvancedSettings.current, homeWidgets, providers, room, connected,
           onAdd = { kind ->
@@ -5386,12 +5387,13 @@ private fun ApprovedHomeGreeting(welcome: WelcomeConfig.Settings, use24: Boolean
   }
   val greetingText = if (welcome.userName.isBlank()) greeting.trimEnd('.', '!') + "."
       else greeting.trimEnd('.', '!') + ", " + welcome.userName
-  Row(Modifier.fillMaxWidth().height(if (compact) 68.dp else 108.dp), verticalAlignment = Alignment.CenterVertically) {
+  // Minimum, not fixed, height: a fixed 96dp clipped the subtitle's descenders on device.
+  Row(Modifier.fillMaxWidth().heightIn(min = if (compact) 68.dp else 96.dp), verticalAlignment = Alignment.CenterVertically) {
     Column(Modifier.weight(1f)) {
-      Text(greetingText, color = ApprovedHomePalette.Text, fontSize = 52.sp, lineHeight = 64.sp,
+      Text(greetingText, color = ApprovedHomePalette.Text, fontSize = 52.sp, lineHeight = 58.sp,
           fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
       if (!compact) Text("Everything within reach.", color = ApprovedHomePalette.Secondary, fontSize = 24.sp,
-          lineHeight = 34.sp, modifier = Modifier.padding(top = 10.dp))
+          lineHeight = 32.sp, modifier = Modifier.padding(top = 4.dp))
     }
     Text(timeFmt.format(now), color = ApprovedHomePalette.Text, fontSize = 80.sp, lineHeight = 88.sp,
         fontWeight = FontWeight.Normal, letterSpacing = (-2).sp)
