@@ -1360,5 +1360,5 @@ object SettingsDomains {
   val all: List<SettingsDomain<*>> =
       listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime, digitalclock, welcome, sunrise,
           homeDashboard, calendarPacks, DinnerSettings.domain,
-          com.immortal.launcher.ShareSettings.domain)
+          com.immortal.launcher.ShareSettings.domain, HouseholdListSettings.domain)
 }

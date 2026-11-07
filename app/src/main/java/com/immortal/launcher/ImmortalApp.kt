@@ -31,6 +31,7 @@ class ImmortalApp : Application() {
     // Household features: phone-provisioned key route + signed Portal↔Portal bus.
     RemoteFeatureRoutes.registerHouseholdKey()
     HouseholdBus.start(this)
+    HouseholdListFeature.install(this)
     DinnerCallFeature.install(this)
     RoutinesFeature.install(this)
     ShareFeature.install(this)

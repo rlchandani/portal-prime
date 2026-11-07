@@ -51,7 +51,7 @@ internal object HomeWidgetPicker {
     HomeWidgetStore.KIND_CALENDAR -> "Calendar"
     HomeWidgetStore.KIND_HA -> "Home Assistant"
     HomeWidgetStore.KIND_TIMERS -> "Timers"
-    HomeWidgetStore.KIND_TODO -> "To-do"
+    HomeWidgetStore.KIND_TODO -> "Household list"
     HomeWidgetStore.KIND_ALARM -> "Alarm"
     HomeWidgetStore.KIND_WORLD_CLOCK -> "World clock"
     HomeWidgetStore.KIND_TODAY -> "Today"

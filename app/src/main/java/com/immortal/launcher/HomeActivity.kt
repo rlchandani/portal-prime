@@ -2049,7 +2049,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_CALENDAR -> "Calendar"
       HomeWidgetStore.KIND_ALARM -> "Alarm"
       HomeWidgetStore.KIND_CRYPTO -> "Crypto"
-      HomeWidgetStore.KIND_TODO -> "To-Do"
+      HomeWidgetStore.KIND_TODO -> "Household list"
       HomeWidgetStore.KIND_ROUTINES -> "Routines"
       HomeWidgetStore.KIND_NEWS -> "News"
       HomeWidgetStore.KIND_STOCKS -> "Stocks"
@@ -3137,7 +3137,8 @@ private fun ImmortalWidgetContent(
     HomeWidgetStore.KIND_CALENDAR -> ApprovedHomeCalendar(modifier)
     HomeWidgetStore.KIND_ALARM -> ImmortalAlarmWidget(modifier)
     HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier, maxRows = listRows(widget.spanY))
-    HomeWidgetStore.KIND_TODO -> ImmortalTodoWidget(modifier, maxRows = listRows(widget.spanY))
+    // The To-do kind now shows the shared household list (old To-do items merge in once).
+    HomeWidgetStore.KIND_TODO -> HouseholdListWidget(modifier, small = widget.spanY < 2)
     HomeWidgetStore.KIND_ROUTINES -> RoutinesHomeWidget(modifier)
     HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier, maxRows = listRows(widget.spanY))
@@ -4200,91 +4201,6 @@ private fun formatUsd(v: Double): String =
       v >= 1 -> "$%,.2f".format(v)
       else -> "$%.4f".format(v)
     }
-
-/**
- * Local checklist widget ([TodoStore]). Rows are tappable to toggle done (strikethrough + dimmed);
- * a footer shows the open count and the shell opens the editor for adding items / clearing completed.
- * Purely local — no network. Re-reads on the retained page's resume so editor changes reflect here;
- * toggles persist immediately, then reload. Every read/action retains its Result: unreadable saved
- * data shows a retryable error instead of an empty list, and never escapes into composition/lifecycle.
- */
-@Composable
-private fun ImmortalTodoWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  var itemsResult by remember(context) { mutableStateOf(runCatching { TodoStore.load(context) }) }
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner, context) {
-    val obs = LifecycleEventObserver { _, e ->
-      if (e == Lifecycle.Event.ON_RESUME) itemsResult = runCatching { TodoStore.load(context) }
-    }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
-  }
-  val open: () -> Unit = { context.openApprovedHomeSettings("todo") }
-  val items = itemsResult.getOrNull()
-  val openCount = items?.count { !it.done } ?: 0
-  val visibleItems = remember(items, maxRows) { items.orEmpty().sortedBy { it.done }.take(maxRows) }
-  ImmortalWidgetShell(title = "To-do", openPage = "todo", modifier = modifier.tvFocusableRow { open() }) {
-    when {
-      items == null -> {
-        ApprovedHomeWidgetMessage("To-do unavailable")
-        ApprovedHomeWidgetMessage("Saved items couldn't be loaded. Try again.")
-        ApprovedHomeTextButton("Try again") {
-          itemsResult = runCatching { TodoStore.load(context) }
-        }
-      }
-      items.isEmpty() -> ApprovedHomeWidgetMessage("No items — tap to add")
-      else -> {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          // Open items first, then completed — the actionable list stays on top.
-          visibleItems.forEach { item ->
-            key(item.id) { TodoRow(item) {
-              itemsResult = runCatching {
-                TodoStore.toggle(context, item.id)
-                TodoStore.load(context)
-              }
-            } }
-          }
-        }
-        Spacer(Modifier.size(16.dp))
-        Text(
-            if (openCount == 0) "All done 🎉" else "$openCount to do",
-            color = ApprovedHomePalette.Secondary,
-            fontSize = 22.sp,
-            lineHeight = 30.sp,
-        )
-      }
-    }
-  }
-}
-
-/** One checklist line: a check glyph + text, struck through and dimmed when done. Tap toggles. */
-@Composable
-private fun TodoRow(item: TodoStore.TodoItem, onToggle: () -> Unit) {
-  Row(
-      modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
-          .tvFocusableRow { onToggle() }.padding(vertical = 8.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(12.dp),
-  ) {
-    Text(
-        if (item.done) "☑" else "☐",
-        color = if (item.done) ApprovedHomePalette.Accent else ApprovedHomePalette.Secondary,
-        fontSize = 26.sp,
-        lineHeight = 35.sp,
-    )
-    Text(
-        item.text,
-        color = if (item.done) ApprovedHomePalette.Secondary else ApprovedHomePalette.Text,
-        fontSize = 26.sp,
-        lineHeight = 35.sp,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        textDecoration = if (item.done) androidx.compose.ui.text.style.TextDecoration.LineThrough else null,
-        modifier = Modifier.weight(1f),
-    )
-  }
-}
 
 /**
  * News headlines widget: aggregates the latest titles across the user's configured RSS/Atom feeds
@@ -5581,7 +5497,7 @@ private fun ApprovedWidgetLibrary(
         Triple(HomeWidgetStore.KIND_QUICK_CONTROLS, "Quick controls", "tools"),
         Triple(HomeWidgetStore.KIND_PHOTO_MEMORY, "Photo memory", "photo"),
         Triple(HomeWidgetStore.KIND_TIMERS, "Timers", "timer"),
-        Triple(HomeWidgetStore.KIND_TODO, "To-do", "notes"),
+        Triple(HomeWidgetStore.KIND_TODO, "Household list", "notes"),
         Triple(HomeWidgetStore.KIND_NEWS, "News", "globe"),
         Triple(HomeWidgetStore.KIND_STOCKS, "Stocks", "calculator"),
         Triple(HomeWidgetStore.KIND_OPTIONS, "Options", "calculator"),
