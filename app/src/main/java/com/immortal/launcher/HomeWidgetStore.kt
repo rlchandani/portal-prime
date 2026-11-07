@@ -63,6 +63,7 @@ object HomeWidgetStore {
   const val KIND_ALARM = "alarm"
   const val KIND_CRYPTO = "crypto"
   const val KIND_TODO = "todo"
+  const val KIND_ROUTINES = "routines"
   const val KIND_NEWS = "news"
   const val KIND_STOCKS = "stocks"
   const val KIND_OPTIONS = "options"

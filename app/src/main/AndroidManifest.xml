@@ -708,6 +708,8 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+            <!-- Share to Portal: opens a shared link after its 5 s countdown. -->
+        <activity android:name=".SharedLinkActivity" android:exported="false" />
     </application>
 
 </manifest>

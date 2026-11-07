@@ -32,6 +32,8 @@ class ImmortalApp : Application() {
     RemoteFeatureRoutes.registerHouseholdKey()
     HouseholdBus.start(this)
     DinnerCallFeature.install(this)
+    RoutinesFeature.install(this)
+    ShareFeature.install(this)
     // Weak window tracking is dormant until an operator starts a bounded Fleet capture.
     FramePerformanceCapture.init(this)
     // Package events invalidate read metadata without scans or work on this main thread.

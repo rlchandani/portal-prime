@@ -820,9 +820,22 @@ private fun ApprovedWidgetGrid(
   val emptySlots = remember(widgets, pageIndex, editMode) {
     if (editMode && addFlow != null) HomeSlots.emptySlots(widgets, pageIndex) else emptyList()
   }
-  val decor: (@Composable BoxScope.(ApprovedSlotGeometry) -> Unit)? =
+  val addDecor: (@Composable BoxScope.(ApprovedSlotGeometry) -> Unit)? =
       if (addFlow == null || (!editMode && addFlow.ring == null)) null
       else { geometry -> HomeAddDecor(geometry, addFlow, pageIndex, emptySlots, HomeWidgetPreviewRenderer) }
+  // A shared note (Share to Portal) takes the first empty slot on page 1 outside Customize.
+  val note = LocalHomeNote.current
+  val noteSlot = remember(widgets, pageIndex, editMode, note?.note?.id) {
+    if (note == null || editMode || pageIndex != 0) null else HomeSlots.emptySlots(widgets, 0).firstOrNull()
+  }
+  val decor: (@Composable BoxScope.(ApprovedSlotGeometry) -> Unit)? =
+      if (addDecor == null && noteSlot == null) null
+      else { geometry ->
+        addDecor?.invoke(this, geometry)
+        if (note != null && noteSlot != null) {
+          HomeNoteCard(note, geometry.cell(noteSlot.column, noteSlot.row * 2, 1, 2))
+        }
+      }
   ApprovedPackedWidgetGrid(visible, spans, fixed, editMode, gridModifier, decor = decor,
       canDrop = { key, column, row ->
         HomeSlots.moveForEditing(widgets, key, HomeWidgetStore.Slot(pageIndex, column, row)) != null
@@ -1433,8 +1446,19 @@ private fun LauncherScreen(
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
+          // Shared notes (Share to Portal): first free page-1 slot, else the greeting-row strip.
+          val shareHome = rememberShareHomeState()
+          val notePlacement = homeNotePlacement(shareHome.note != null,
+              freeSlotOnFirstPage = remember(homeWidgets) { HomeSlots.emptySlots(homeWidgets, 0).isNotEmpty() },
+              customizing = editMode)
+          Box(Modifier.fillMaxSize()) {
+          androidx.compose.runtime.CompositionLocalProvider(
+              LocalHomeNote provides (shareHome.takeIf { notePlacement == HomeNotePlacement.SLOT })) {
           Column(Modifier.fillMaxSize().padding(horizontal = LauncherEdge).padding(top = 6.dp)) {
-            ApprovedHomeGreeting(welcome, use24, compact = connected == false)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Box(Modifier.weight(1f)) { ApprovedHomeGreeting(welcome, use24, compact = connected == false) }
+            }
+            if (notePlacement == HomeNotePlacement.STRIP) HomeNoteStrip(shareHome, Modifier.fillMaxWidth().padding(top = 8.dp))
             Spacer(Modifier.height(16.dp))
             if (connected == false) {
               val dark = com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark
@@ -1460,6 +1484,12 @@ private fun LauncherScreen(
               }
               repeat(6 - favorites.size) { Spacer(Modifier.weight(1f)) }
             }
+          }
+          }
+          // Household overlays: share toasts / chime bubble and the routine "closed" toast.
+          ShareHomeToasts(shareHome, Modifier.align(Alignment.BottomCenter).padding(bottom = 96.dp))
+          HomeNoteChimeBubble(Modifier.align(Alignment.TopEnd).padding(top = 8.dp, end = LauncherEdge))
+          RoutineHomeToast(Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp))
           }
           }
           ApprovedLauncherTab.APPS -> ApprovedAppsScreen(
@@ -2020,6 +2050,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_ALARM -> "Alarm"
       HomeWidgetStore.KIND_CRYPTO -> "Crypto"
       HomeWidgetStore.KIND_TODO -> "To-Do"
+      HomeWidgetStore.KIND_ROUTINES -> "Routines"
       HomeWidgetStore.KIND_NEWS -> "News"
       HomeWidgetStore.KIND_STOCKS -> "Stocks"
       HomeWidgetStore.KIND_OPTIONS -> "Options"
@@ -3107,6 +3138,7 @@ private fun ImmortalWidgetContent(
     HomeWidgetStore.KIND_ALARM -> ImmortalAlarmWidget(modifier)
     HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_TODO -> ImmortalTodoWidget(modifier, maxRows = listRows(widget.spanY))
+    HomeWidgetStore.KIND_ROUTINES -> RoutinesHomeWidget(modifier)
     HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier, maxRows = listRows(widget.spanY))
@@ -4849,6 +4881,7 @@ private fun CustomWidgetGlyph(kind: String) {
         HomeWidgetStore.KIND_TIMERS -> "⏱"
         HomeWidgetStore.KIND_CRYPTO -> "₿"
         HomeWidgetStore.KIND_TODO -> "✓"
+        HomeWidgetStore.KIND_ROUTINES -> "★"
         HomeWidgetStore.KIND_NEWS -> "📰"
         HomeWidgetStore.KIND_STOCKS -> "📈"
         HomeWidgetStore.KIND_OPTIONS -> "Δ"
