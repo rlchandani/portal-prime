@@ -1359,5 +1359,5 @@ object SettingsDomains {
 
   val all: List<SettingsDomain<*>> =
       listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime, digitalclock, welcome, sunrise,
-          homeDashboard, calendarPacks)
+          homeDashboard, calendarPacks, DinnerSettings.domain)
 }

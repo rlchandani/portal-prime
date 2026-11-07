@@ -3237,7 +3237,10 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
   }
 
   data class QC(val icon: String, val label: String, val description: String, val onTap: () -> Unit)
+  var showDinner by remember { mutableStateOf(false) }
   val tiles = buildList {
+    // Call everyone (household feature): chime + speak a message in every room.
+    add(QC(DinnerCallTile.ICON, DinnerCallTile.LABEL, DinnerCallTile.DESCRIPTION) { showDinner = true })
     if (assistantInstalled) add(QC("mic", "Hey Jarvis", "Open your assistant") { triggerJarvis(context) })
     if (dashboardConfigured) {
       add(QC("ha", "Home dashboard", "Open your dashboard") {
@@ -3250,6 +3253,7 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
       add(QC("ha", "Home", "Open Home Assistant") { launch(haPackage.orEmpty()) })
     }
   }
+  if (showDinner) DinnerCallSheet(onDismiss = { showDinner = false })
   ImmortalWidgetShell(title = "Quick controls", openPage = "display", modifier = modifier) {
     if (tiles.isEmpty()) {
       Text("Add an assistant or Home Assistant app to use quick controls.",

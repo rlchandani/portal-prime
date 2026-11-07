@@ -537,6 +537,7 @@ class SettingsDomainTest {
     val registeredAsDomain =
         setOf(
             "ScreensaverConfig",
+            "DinnerConfig",
             "ChimeConfig",
             "DigitalClockConfig",
             "WelcomeConfig",
@@ -565,10 +566,6 @@ class SettingsDomainTest {
             "AlpacaConfig" to "external-service credentials (Alpaca key/secret), like MqttConfig; edited in Stocks/Options",
             "OptionsScanConfig" to "collection+params: options-scanner config (OptionsSettingsActivity)",
             "HaConfig" to "external-service connection (HA URL/token) + pinned entities (HaSettingsActivity)",
-            // TEMPORARY: the spec-complete domain exists (DinnerSettings.domain, pinned by
-            // DinnerRequestsTest); the integrator adds it to SettingsDomains.all, then moves this
-            // entry to registeredAsDomain.
-            "DinnerConfig" to "pending integration: DinnerSettings.domain → SettingsDomains.all",
         )
 
     val classified = registeredAsDomain + exemptCollectionsOrContent.keys
