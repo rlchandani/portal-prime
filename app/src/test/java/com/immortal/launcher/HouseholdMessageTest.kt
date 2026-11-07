@@ -67,5 +67,6 @@ class HouseholdMessageTest {
     assertEquals(HouseholdKey.fingerprint(key), HouseholdKey.fingerprint(key.copyOf()))
     assertNotEquals(HouseholdKey.fingerprint(key), HouseholdKey.fingerprint(other))
     assertEquals(8, HouseholdKey.fingerprint(key).length)
+    assertEquals("9b237533", HouseholdKey.fingerprint(key)) // known answer, identical in Toolkit
   }
 }

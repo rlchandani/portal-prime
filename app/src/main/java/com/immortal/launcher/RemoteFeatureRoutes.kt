@@ -35,14 +35,17 @@ internal object RemoteFeatureRoutes {
   fun json(status: Int, body: JSONObject) = FleetHttpServer.Response(status, body.toString())
 
   /** Contract route: the phone provisions the household key; read-back shows only a fingerprint. */
-  fun registerHouseholdKey() = register("/remote/household-key") { context, method, body ->
+  fun registerHouseholdKey() = register("/remote/household") { context, method, body ->
     when (method) {
       "GET" -> json(200, ok().put("configured", HouseholdKey.get(context) != null)
           .put("fingerprint", HouseholdKey.get(context)?.let(HouseholdKey::fingerprint) ?: JSONObject.NULL))
       "POST" -> {
         val key = HouseholdKey.fromHex(body.optString("key"))
         if (!HouseholdKey.isValidKey(key) || !HouseholdKey.set(context, key!!)) json(400, error("invalid_key"))
-        else json(200, ok().put("fingerprint", HouseholdKey.fingerprint(key)))
+        else {
+          android.util.Log.i("ImmortalHousehold", "household key provisioned fp=${HouseholdKey.fingerprint(key)}")
+          json(200, ok().put("fingerprint", HouseholdKey.fingerprint(key)))
+        }
       }
       else -> json(405, error("method_not_allowed"))
     }

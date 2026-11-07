@@ -12,7 +12,7 @@ import java.security.MessageDigest
 /**
  * The household's shared secret for signing Portal↔Portal [HouseholdMessage]s. The phone (paired
  * with every Portal) generates it and provisions it over the authenticated companion channel
- * (`/remote/household-key`); Portals never exchange pairing tokens. Stored in app-private prefs and
+ * (`/remote/household`); Portals never exchange pairing tokens. Stored in app-private prefs and
  * never returned: read-back exposes only [fingerprint]. Not a user setting (excluded from the
  * settings registry like other credentials).
  */
