@@ -48,6 +48,8 @@ enum class YtMusicPageStatus { IDLE, LOADING, READY, BLOCKED, ERROR }
  */
 object YtMusicWebHost {
   private const val TAG = "ImmortalYtMusicHost"
+  /** How long in-page search gets before we fall back to loading the search URL. */
+  private const val SEARCH_FALLBACK_MS = 2_500L
   private const val PAGE_TEXT_SCRIPT = "(function(){try{return ((document.title||'')+'\\n'+" +
       "(document.body?document.body.innerText:'')).slice(0,4000);}catch(e){return '';}})()"
 
@@ -56,8 +58,13 @@ object YtMusicWebHost {
     private set
   var currentUrl by mutableStateOf<String?>(null)
     private set
+  /** Latest validated native list per tab, read from the hidden page. */
+  var lists by mutableStateOf<Map<YtMusicTab, YtMusicList>>(emptyMap())
+    private set
 
   private val main = Handler(Looper.getMainLooper())
+  /** Only the newest search may fall back to a URL load. */
+  private var latestSearch: String? = null
   private var web: WebView? = null
   private var bridge: YtMusicBridge? = null
   private var wrapper: MutableContextWrapper? = null
@@ -86,6 +93,7 @@ object YtMusicWebHost {
     val ctx = MutableContextWrapper(application)
     val view = createWebView(ctx)
     val b = YtMusicBridge(view).also { it.install(application) }
+    b.onList = { list -> if (bridge === b) lists = lists + (list.tab to list) }
     wrapper = ctx
     web = view
     bridge = b
@@ -133,6 +141,54 @@ object YtMusicWebHost {
     }
   }
 
+  /**
+   * Selects [tab]'s native list: Library steers the hidden page to /library (in-app, so playback
+   * continues); Queue opens the player page when possible; Search waits for a query.
+   */
+  @MainThread
+  fun selectTab(tab: YtMusicTab) {
+    val b = bridge ?: return
+    when (tab) {
+      YtMusicTab.LIBRARY -> showTab(tab)
+      YtMusicTab.QUEUE -> b.go(tab) {}
+      YtMusicTab.SEARCH -> Unit
+    }
+    b.requestList(tab)
+  }
+
+  /** Plays [item] from [list] through the page itself. */
+  @MainThread
+  fun playItem(list: YtMusicList, item: YtMusicListItem) {
+    if (status == YtMusicPageStatus.BLOCKED || !item.playable) return
+    bridge?.playItem(list.tab, item.index, list.generation)
+  }
+
+  /**
+   * Runs [raw] through the page's own search (no reload, so music keeps playing). If the page
+   * does not take it, or has not reached the results within [SEARCH_FALLBACK_MS], the search URL
+   * is loaded instead.
+   */
+  @MainThread
+  fun search(raw: String) {
+    val view = web ?: return
+    val b = bridge ?: return
+    if (status == YtMusicPageStatus.BLOCKED) return
+    val query = YtMusicSearch.normalize(raw) ?: return
+    val url = YtMusicSearch.url(query) ?: return
+    latestSearch = query
+    b.requestList(YtMusicTab.SEARCH)
+    b.search(query) { handled ->
+      if (web !== view) return@search
+      if (!handled) return@search view.loadUrl(url)
+      main.postDelayed({
+        if (web === view && latestSearch == query &&
+            !YtMusicSearch.sameQuery(YtMusicSearch.queryFromUrl(view.url), query)) {
+          view.loadUrl(url)
+        }
+      }, SEARCH_FALLBACK_MS)
+    }
+  }
+
   /** Retry after a connection error or a renderer loss, re-hosting in [container] if needed. */
   @MainThread
   fun retry(container: ViewGroup) {
@@ -173,6 +229,7 @@ object YtMusicWebHost {
     view.destroy()
     status = YtMusicPageStatus.IDLE
     currentUrl = null
+    lists = emptyMap()
   }
 
   @SuppressLint("SetJavaScriptEnabled")

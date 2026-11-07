@@ -26,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,45 +61,84 @@ private object PaneStyle {
 }
 
 /**
- * The right half of the split music player: native Queue / Library / Search tabs over the real,
- * retained YouTube Music page ([YtMusicWebHost]), clearly labelled as embedded. If Google refuses
- * sign-in in the WebView, the page gives way to one sentence and one button ([onOpenInBrowser]).
- * Leaving composition only un-hosts the page; call [YtMusicWebHost.release] to stop music.
+ * The right half of the split music player: native Queue / Library / Search tabs with NATIVE rows
+ * read from the retained YouTube Music page ([YtMusicWebHost]). The page stays attached and laid
+ * out at full size (playback and the page's lazy lists need it) but sits under an opaque native
+ * surface; "Show YouTube page" reveals it (e.g. to sign in). Tapping a row plays it through the
+ * page. If Google refuses sign-in in the WebView, the pane gives way to one sentence and one
+ * button ([onOpenInBrowser]). Leaving composition only un-hosts the page; call
+ * [YtMusicWebHost.release] to stop music.
  */
 @Composable
 fun YtMusicPane(onOpenInBrowser: () -> Unit, modifier: Modifier = Modifier) {
   val status = YtMusicWebHost.status
   val url = YtMusicWebHost.currentUrl
+  val lists = YtMusicWebHost.lists
   val blocked = status == YtMusicPageStatus.BLOCKED
-  var chosen by remember { mutableStateOf(YtMusicTab.QUEUE) }
+  var pane by remember { mutableStateOf(YtMusicPaneState()) }
   var container by remember { mutableStateOf<FrameLayout?>(null) }
-  val selected = YtMusicTab.forUrl(url) ?: chosen
+  LaunchedEffect(Unit) { YtMusicWebHost.selectTab(pane.tab) }
+  val onSelect: (YtMusicTab) -> Unit = { tab ->
+    pane = YtMusicPaneReducer.reduce(pane, YtMusicPaneEvent.SelectTab(tab))
+    YtMusicWebHost.selectTab(tab)
+    // Coming back to Search after the page moved on: re-run the last query.
+    val query = pane.submittedQuery
+    if (tab == YtMusicTab.SEARCH && query != null &&
+        !YtMusicSearch.sameQuery(YtMusicSearch.queryFromUrl(YtMusicWebHost.currentUrl), query)) {
+      YtMusicWebHost.search(query)
+    }
+  }
+  val togglePage = {
+    pane = YtMusicPaneReducer.reduce(pane, YtMusicPaneEvent.TogglePage)
+    if (!pane.showPage) {
+      YtMusicWebHost.clearInputFocus()
+      YtMusicWebHost.selectTab(pane.tab)
+    }
+  }
   Column(
       modifier
           .clip(RoundedCornerShape(40.dp))
           .background(PaneStyle.frame)
           .padding(horizontal = 20.dp, vertical = 20.dp)) {
-    PaneTabs(selected, enabled = !blocked) { tab ->
-      chosen = tab
-      YtMusicWebHost.showTab(tab)
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      PaneTabs(pane.tab, enabled = !blocked, onSelect = onSelect)
+      Spacer(Modifier.weight(1f))
+      if (!blocked) PageLink(if (pane.showPage) "Back to list" else "Show YouTube page", togglePage)
     }
     Spacer(Modifier.height(14.dp))
-    PaneCaption(url)
+    PaneCaption(url, pageShown = pane.showPage)
     Spacer(Modifier.height(12.dp))
     Box(
         Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(32.dp))
             .background(PaneStyle.page)) {
+      // Always attached and full size; only covered. Alpha/visibility would stop it rendering.
       AndroidView(
           factory = { ctx -> FrameLayout(ctx).also { YtMusicWebHost.attach(it); container = it } },
           onRelease = { YtMusicWebHost.detach(it) },
-          modifier = Modifier.fillMaxSize().alpha(if (blocked) 0f else 1f),
+          modifier = Modifier.fillMaxSize(),
       )
+      if (!blocked && !pane.showPage) {
+        YtMusicNativeLists(
+            pane = pane,
+            view = YtMusicPaneReducer.view(pane, lists, pageReady = status == YtMusicPageStatus.READY),
+            pageReady = status == YtMusicPageStatus.READY,
+            onSearch = { raw ->
+              val next = YtMusicPaneReducer.reduce(pane, YtMusicPaneEvent.SubmitSearch(raw))
+              if (next != pane) {
+                pane = next
+                next.submittedQuery?.let { YtMusicWebHost.search(it) }
+              }
+            },
+            onPlay = { list, item -> YtMusicWebHost.playItem(list, item) },
+            onShowPage = togglePage,
+        )
+      }
       when (status) {
         YtMusicPageStatus.BLOCKED -> BlockedFallback(onOpenInBrowser)
         YtMusicPageStatus.ERROR -> PaneError { container?.let { YtMusicWebHost.retry(it) } }
-        YtMusicPageStatus.LOADING, YtMusicPageStatus.IDLE -> PaneLoading()
+        YtMusicPageStatus.LOADING, YtMusicPageStatus.IDLE -> if (pane.showPage) PaneLoading()
         YtMusicPageStatus.READY -> Unit
       }
     }
@@ -132,9 +172,10 @@ private fun PaneTabs(selected: YtMusicTab, enabled: Boolean, onSelect: (YtMusicT
 }
 
 @Composable
-private fun PaneCaption(url: String?) {
+private fun PaneCaption(url: String?, pageShown: Boolean) {
   Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-    Text("YouTube Music page (embedded)", fontSize = 15.sp, color = PaneStyle.caption, maxLines = 1)
+    Text(if (pageShown) "YouTube Music page (embedded)" else "From YouTube Music", fontSize = 15.sp,
+        color = PaneStyle.caption, maxLines = 1)
     Spacer(Modifier.size(10.dp))
     Text(YtMusicUrls.caption(url), fontSize = 15.sp, color = PaneStyle.captionDim,
         maxLines = 1, overflow = TextOverflow.Ellipsis)

@@ -254,6 +254,238 @@
     return false;
   }
 
+  // ---- Native lists (Queue / Library / Search) -------------------------------------------
+  // Selectors verified on a Portal WebView (2026-11-07); later entries are fallbacks.
+  var LIST_TEXT = 200;
+  var LIST_URL = 1024;
+  var MAX_ITEMS = 60;
+  var MAX_SCAN = 200;
+  var PLAY_TARGETS = ['ytmusic-play-button-renderer #play-button', 'ytmusic-play-button-renderer'];
+  var LISTS = {
+    queue: {
+      rows: ['ytmusic-player-queue-item'],
+      title: ['.song-title'], sub: ['.byline'], dur: ['.duration'],
+      play: ['.song-info'].concat(PLAY_TARGETS)
+    },
+    library: {
+      rows: ['ytmusic-browse-response ytmusic-responsive-list-item-renderer, ' +
+          'ytmusic-browse-response ytmusic-two-row-item-renderer',
+        'ytmusic-responsive-list-item-renderer, ytmusic-two-row-item-renderer'],
+      title: ['.title'], sub: ['.secondary-flex-columns yt-formatted-string', '.subtitle'],
+      dur: ['.fixed-columns yt-formatted-string'],
+      play: PLAY_TARGETS.concat(['.title a[href*="watch"]', 'a[href*="watch"]'])
+    },
+    search: {
+      rows: ['ytmusic-search-page ytmusic-responsive-list-item-renderer'],
+      title: ['.title'], sub: ['.secondary-flex-columns yt-formatted-string', '.subtitle'],
+      dur: ['.fixed-columns yt-formatted-string'],
+      play: ['.title a[href*="watch"]'].concat(PLAY_TARGETS)
+    }
+  };
+  var SIGNED_OUT = ['a[href*="accounts.google.com/ServiceLogin"]', 'a[href*="accounts.google.com"]',
+    'ytmusic-guide-signin-promo-renderer', '[aria-label="Sign in"]'];
+  var AVATAR = ['ytmusic-settings-button img[src^="https"]', '#avatar img[src^="https"]'];
+  var KIND_WORDS = { song: 'song', video: 'video', playlist: 'playlist', album: 'album',
+    single: 'album', ep: 'album', artist: 'artist' };
+  var TIME = /^\d{1,2}:\d{2}(:\d{2})?$/;
+  var SEP = ' \u2022 ';
+
+  function rowsFor(cfg) {
+    for (var i = 0; i < cfg.rows.length; i++) {
+      try { var all = document.querySelectorAll(cfg.rows[i]); if (all.length) return all; } catch (e) {}
+    }
+    return [];
+  }
+  function textIn(root, list, max) {
+    for (var i = 0; i < list.length; i++) {
+      try {
+        var all = root.querySelectorAll(list[i]);
+        for (var j = 0; j < all.length; j++) { var t = str(all[j].textContent, max); if (t) return t; }
+      } catch (e) {}
+    }
+    return '';
+  }
+  function textsIn(root, list, max) {
+    for (var i = 0; i < list.length; i++) {
+      try {
+        var all = root.querySelectorAll(list[i]);
+        var out = [];
+        for (var j = 0; j < all.length && out.length < 4; j++) {
+          var t = str(all[j].textContent, max);
+          if (t) out.push(t);
+        }
+        if (out.length) return out.join(SEP);
+      } catch (e) {}
+    }
+    return '';
+  }
+  function imageIn(root) {
+    try {
+      var all = root.querySelectorAll('img');
+      for (var i = 0; i < all.length; i++) {
+        var src = httpsUrl(all[i].src);
+        if (src && src.length <= LIST_URL) return src;
+      }
+    } catch (e) {}
+    return '';
+  }
+  function hasIn(root, list) {
+    for (var i = 0; i < list.length; i++) {
+      try { if (root.querySelector(list[i])) return true; } catch (e) {}
+    }
+    return false;
+  }
+  function kindOf(root, firstWord) {
+    var w = KIND_WORDS[(firstWord || '').toLowerCase()];
+    if (w) return w;
+    try {
+      var a = root.querySelector('a[href]');
+      var href = a ? String(a.getAttribute('href') || '') : '';
+      if (href.indexOf('watch?v=') >= 0) return 'song';
+      if (href.indexOf('playlist?list=') >= 0) return 'playlist';
+      if (href.indexOf('browse/MPRE') >= 0) return 'album';
+      if (href.indexOf('channel/') >= 0 || href.indexOf('browse/UC') >= 0) return 'artist';
+    } catch (e) {}
+    return 'other';
+  }
+  function rowItem(kind, cfg, row, i) {
+    var title = textIn(row, cfg.title, LIST_TEXT);
+    if (!title) return null;
+    var parts = textsIn(row, cfg.sub, LIST_TEXT).split(SEP);
+    var dur = str(textIn(row, cfg.dur, 16), 16);
+    var kept = [];
+    for (var p = 0; p < parts.length; p++) {
+      var part = str(parts[p], LIST_TEXT);
+      if (!part) continue;
+      if (TIME.test(part)) { if (!dur) dur = part; continue; }
+      kept.push(part);
+    }
+    var k = kind === 'queue' ? 'song' : kindOf(row, kept[0]);
+    // Search/library bylines lead with the kind ("Song • Artist • Album"); keep the useful rest.
+    if (kind !== 'queue' && kept.length > 1 && KIND_WORDS[kept[0].toLowerCase()]) kept.shift();
+    var playing = false;
+    try {
+      playing = row.getAttribute('play-button-state') === 'playing' ||
+        (kind === 'queue' && row.hasAttribute('selected'));
+    } catch (e) {}
+    return { i: i, t: title, s: str(kept.join(SEP), LIST_TEXT), d: TIME.test(dur) ? dur : '',
+      art: imageIn(row), p: playing, k: k, pl: hasIn(row, cfg.play) };
+  }
+  function onPageFor(kind) {
+    var path = '';
+    try { path = location.pathname || ''; } catch (e) {}
+    if (kind === 'library') return /^\/(library|browse|playlist)/.test(path);
+    if (kind === 'search') return path === '/search';
+    return true;
+  }
+  function searchQuery() {
+    try { return str(new URLSearchParams(location.search).get('q') || '', LIST_TEXT); } catch (e) { return ''; }
+  }
+  function collect(kind) {
+    var cfg = LISTS[kind];
+    if (!cfg) return null;
+    var items = [];
+    var rows = rowsFor(cfg);
+    for (var i = 0; i < rows.length && i < MAX_SCAN && items.length < MAX_ITEMS; i++) {
+      var item = null;
+      try { item = rowItem(kind, cfg, rows[i], i); } catch (e) {}
+      if (item) items.push(item);
+    }
+    var signedOut = false;
+    if (kind === 'library') {
+      for (var s = 0; s < SIGNED_OUT.length && !signedOut; s++) signedOut = !!first([SIGNED_OUT[s]]);
+      if (signedOut && first(AVATAR)) signedOut = false;
+    }
+    return { items: items, here: onPageFor(kind), so: signedOut,
+      q: kind === 'search' ? searchQuery() : '' };
+  }
+
+  var listKind = null;
+  var listGen = { queue: 0, library: 0, search: 0 };
+  var listItemsJson = { queue: '', library: '', search: '' };
+  var lastListSent = '';
+  function postList(force) {
+    if (!listKind) return;
+    var sink = window[SINK];
+    if (!sink || typeof sink.postMessage !== 'function') return;
+    var kind = listKind;
+    var c = collect(kind);
+    if (!c) return;
+    var itemsJson;
+    try { itemsJson = JSON.stringify(c.items); } catch (e) { return; }
+    if (itemsJson !== listItemsJson[kind]) { listItemsJson[kind] = itemsJson; listGen[kind]++; }
+    // Key order matters: Kotlin routes on the '{"v":1,"type":"list"' prefix.
+    var json;
+    try {
+      json = JSON.stringify({ v: 1, type: 'list', k: kind, g: listGen[kind], here: c.here, so: c.so,
+        q: c.q, items: c.items });
+    } catch (e) { return; }
+    if (!force && json === lastListSent) return;
+    lastListSent = json;
+    try { sink.postMessage(json); } catch (e) {}
+  }
+  function watch(kind) {
+    if (!LISTS[kind]) return false;
+    listKind = kind;
+    postList(true);
+    return true;
+  }
+  function playItem(kind, i, g) {
+    var cfg = LISTS[kind];
+    if (!cfg || typeof i !== 'number' || i < 0 || i % 1 !== 0 || g !== listGen[kind]) return false;
+    var row = rowsFor(cfg)[i];
+    if (!row) return false;
+    for (var t = 0; t < cfg.play.length; t++) {
+      try {
+        var el = row.querySelector(cfg.play[t]);
+        if (el) { el.click(); soon(); return true; }
+      } catch (e) {}
+    }
+    return false;
+  }
+  function search(q) {
+    q = str(q, LIST_TEXT);
+    if (!q) return false;
+    try {
+      closePlayerPage();
+      clickFirst(SEL.searchOpen);
+      var input = first(SEL.searchInput);
+      if (!input) return false;
+      input.value = q;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      var enter = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true };
+      input.dispatchEvent(new KeyboardEvent('keydown', enter));
+      input.dispatchEvent(new KeyboardEvent('keyup', enter));
+      // Never leave the hidden page holding keyboard focus.
+      try { input.blur(); } catch (e) {}
+      return true;
+    } catch (e) { return false; }
+  }
+
+  // ---- "Open in the YouTube Music app" promo: only ever click "Not now" ----------------
+  var PROMO_HOSTS = ['tp-yt-paper-dialog', 'ytmusic-mealbar-promo-renderer', 'yt-mealbar-promo-renderer',
+    'ytmusic-popup-container', '[role="dialog"]', '[role="alertdialog"]'];
+  var PROMO_BUTTONS = 'button, a, tp-yt-paper-button, yt-button-renderer, yt-button-shape';
+  function dismissPromo() {
+    for (var h = 0; h < PROMO_HOSTS.length; h++) {
+      var hosts;
+      try { hosts = document.querySelectorAll(PROMO_HOSTS[h]); } catch (e) { continue; }
+      for (var i = 0; i < hosts.length; i++) {
+        var buttons;
+        try { buttons = hosts[i].querySelectorAll(PROMO_BUTTONS); } catch (e) { continue; }
+        for (var j = 0; j < buttons.length; j++) {
+          var b = buttons[j];
+          var label = '';
+          try { label = str(b.getAttribute('aria-label') || b.textContent || '', 40).toLowerCase(); } catch (e) {}
+          if (label !== 'not now') continue;
+          try { b.click(); return true; } catch (e) {}
+        }
+      }
+    }
+    return false;
+  }
+  setInterval(function () { dismissPromo(); postList(false); }, TICK_MS);
+
   var api = {
     cmd: function (name, arg) {
       var done = false;
@@ -267,7 +499,10 @@
       soon();
       return done;
     },
-    go: go
+    go: go,
+    watch: watch,
+    playItem: playItem,
+    search: search
   };
   try { Object.defineProperty(window, '__portalYtm', { value: Object.freeze(api) }); } catch (e) {}
   soon();
