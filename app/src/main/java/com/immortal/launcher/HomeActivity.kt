@@ -774,7 +774,7 @@ private fun ApprovedWidgetGrid(
     onEnterEdit: () -> Unit,
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
 ) {
-  val spans = remember(visible) { HomePresentation.spans(visible) }
+  val spans = remember(visible, editMode) { HomePresentation.pageSpans(visible, editMode) }
   var move by remember { mutableStateOf<HomeWidgetStore.HomeWidget?>(null) }
   ApprovedPackedWidgetGrid(visible, spans, editMode, gridModifier,
       onMove = { source, target -> onChanged(widgets, HomePresentation.move(widgets, source, target)) }) { widget, cell, span, drag ->

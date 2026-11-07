@@ -89,6 +89,29 @@ internal object HomePresentation {
     }
   }
 
+  /**
+   * Display spans for one page. A page without the photo that holds at most four widgets would fill
+   * only the top half at the standard 1×2 size, so default-sized widgets show at 2×2 instead.
+   * Presentation only: saved sizes are untouched, user-resized and hosted app widgets keep their
+   * size, Customize shows saved sizes, and nothing grows if the result would not fit the grid.
+   */
+  fun pageSpans(visible: List<HomeWidgetStore.HomeWidget>, editMode: Boolean): List<ApprovedWidgetPacking.Span> {
+    val base = spans(visible)
+    if (editMode || visible.size > PAGE_BESIDE_HERO ||
+        visible.any { it.kind == HomeWidgetStore.KIND_PHOTO_MEMORY }) return base
+    val grown = visible.zip(base) { widget, span ->
+      if (isDefaultSized(widget) && span == STANDARD_SPAN) FILL_SPAN else span
+    }
+    return if (grown.sumOf { it.columns * it.rows } <= GRID_CELLS) grown else base
+  }
+
+  private fun isDefaultSized(widget: HomeWidgetStore.HomeWidget): Boolean =
+      !widget.explicitSize && !widget.isAppWidget
+
+  private val STANDARD_SPAN = ApprovedWidgetPacking.Span(1, 2)
+  private val FILL_SPAN = ApprovedWidgetPacking.Span(2, 2)
+  private const val GRID_CELLS = 16
+
   /** Stable identity moves also work across pages; headers never enter the saved order. */
   fun move(
       widgets: List<HomeWidgetStore.HomeWidget>,
