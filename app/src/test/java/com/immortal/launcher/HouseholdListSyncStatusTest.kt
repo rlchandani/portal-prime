@@ -66,4 +66,9 @@ class HouseholdListSyncStatusTest {
     assertEquals("Back online. Nothing changed elsewhere.", HouseholdListSyncStatus.catchUpMessage(0, 0))
     assertEquals("Back online. 3 changes arrived from while this Portal was offline.", HouseholdListSyncStatus.catchUpMessage(3, 0))
   }
+
+  @Test fun wireStates_matchTheToolkitContract() {
+    assertEquals(listOf("ok", "partial", "syncing", "offline", "failing", "first"),
+        Kind.values().map(HouseholdListRoute::wireState))
+  }
 }

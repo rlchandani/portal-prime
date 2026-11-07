@@ -44,6 +44,10 @@ internal object HouseholdListRoute {
     }
   }
 
+  /** Toolkit contract: ok | partial | syncing | offline | failing | first. */
+  fun wireState(kind: HouseholdListSyncStatus.Kind): String =
+      if (kind == HouseholdListSyncStatus.Kind.BUSY) "syncing" else kind.name.lowercase()
+
   fun view(context: Context, s: HouseholdListState): JSONObject {
     val sync = HouseholdListSync.state.value
     val status = sync.status(HouseholdListStore.clock(), s)
@@ -54,7 +58,7 @@ internal object HouseholdListRoute {
         .put("portal", HouseholdListSync.selfName(context))
         .put("items", HouseholdListCodec.publicItems(s))
         .put("usedBefore", JSONArray(HouseholdListOps.usedBefore(s, limit = 8)))
-        .put("sync", JSONObject().put("state", status.kind.name.lowercase()).put("peers", peers))
+        .put("sync", JSONObject().put("state", wireState(status.kind)).put("peers", peers))
   }
 }
 
