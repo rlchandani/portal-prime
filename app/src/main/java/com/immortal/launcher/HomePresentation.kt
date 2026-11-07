@@ -34,6 +34,17 @@ internal object HomePresentation {
     return Page(null, placed.map { it.widget }, index, pages.size, placed.map { it.placement })
   }
 
+  /**
+   * Customize's page: [page], plus (when [extraPage]) one empty page after the last so the add flow
+   * can place a widget there before anything is saved on it.
+   */
+  fun editingPage(widgets: List<HomeWidgetStore.HomeWidget>, requested: Int, extraPage: Boolean): Page {
+    val base = page(widgets, requested)
+    if (!extraPage) return base
+    return if (requested >= base.count) Page(null, emptyList(), base.count, base.count + 1, emptyList())
+    else base.copy(count = base.count + 1)
+  }
+
   fun legacyPage(widgets: List<HomeWidgetStore.HomeWidget>, requested: Int): Page {
     val hero = widgets.firstOrNull { it.kind == HomeWidgetStore.KIND_PHOTO_MEMORY }
     // Additional photo widgets are ordinary paged items, so no configured identity disappears.
