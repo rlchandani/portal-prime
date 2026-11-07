@@ -1593,7 +1593,7 @@ class PhotoFrameController(
     if (photosOnly) return
     metaIo.execute {
       val meta = runCatching { PhotoCaption.read(ExifInterface(path)) }.getOrNull()
-      publishCaption(meta, g)
+      publishCaption(meta, g, runCatching { FreshPhotoStore.badgeFor(context, path) }.getOrNull())
     }
   }
 
@@ -1609,16 +1609,19 @@ class PhotoFrameController(
     }
   }
 
-  private fun publishCaption(meta: PhotoCaption.Meta?, g: Int) {
-    if (meta == null || meta.isEmpty) {
+  private fun publishCaption(meta: PhotoCaption.Meta?, g: Int) = publishCaption(meta, g, null)
+
+  private fun publishCaption(meta: PhotoCaption.Meta?, g: Int, fresh: String?) {
+    if ((meta == null || meta.isEmpty) && fresh == null) {
       ui.post { if (g == gen) faceRenderer.setCaption(null, null) }
       return
     }
     // Resolve the place name on this background thread (network) before touching the UI.
-    val place = if (meta.hasLocation) PhotoCaption.placeName(meta.lat!!, meta.lng!!) else null
-    val date = PhotoCaption.formatDate(meta.dateMillis)
+    val place = if (meta?.hasLocation == true) PhotoCaption.placeName(meta.lat!!, meta.lng!!) else null
+    val date = meta?.let { PhotoCaption.formatDate(it.dateMillis) }
     // "On this day": an amber badge when the photo was taken on today's month+day in a prior year.
-    val memory = PhotoCaption.memoryYears(meta.dateMillis)?.let { PhotoCaption.memoryLabel(it) }
+    // A freshly shared photo's "New from <phone> · just now" uses the same badge for its one turn.
+    val memory = fresh ?: meta?.let { m -> PhotoCaption.memoryYears(m.dateMillis)?.let { PhotoCaption.memoryLabel(it) } }
     ui.post { if (g == gen) faceRenderer.setCaption(place, date, memory) }
   }
 
@@ -2323,7 +2326,18 @@ class PhotoFrameController(
       return
     }
     gen++
-    if (ScreensaverConfig.isNativeStage(settings.mode)) {
+    // Share to Portal: a photo a phone just shared takes the next automatic turn (spliced in after now).
+    // A fresh-photo lookup failure must never stop the slideshow, so it degrades to a normal turn.
+    val fresh = if (dir > 0 && automatic && !isNightClockShowing)
+      runCatching { FreshPhotoStore.slideshowTurn(context, playlist.map { it.path }, localIndex) }.getOrNull() else null
+    if (fresh != null) {
+      if (fresh.inserted) {
+        playlist = playlist.take(fresh.index) + MediaItem(fresh.path, false) + playlist.drop(fresh.index)
+        localDeckKeys = localDeckKeys.take(fresh.index) + localKey(fresh.path) + localDeckKeys.drop(fresh.index)
+      }
+      localIndex = fresh.index
+      if (ScreensaverConfig.isNativeStage(settings.mode)) { clearNativeHistory(); nativeNavigation.cancelRequest() }
+    } else if (ScreensaverConfig.isNativeStage(settings.mode)) {
       clearNativeHistory()
       localIndex = nativeNavigation.request(dir, localDeckKeys)
     } else localIndex = ((localIndex + dir) % playlist.size + playlist.size) % playlist.size
