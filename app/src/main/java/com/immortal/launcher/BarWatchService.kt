@@ -32,6 +32,7 @@ class BarWatchService : AccessibilityService() {
     RemoteInput.register(this) // let the phone-remote routes drive input through us
     RemoteCursor.attach(this) // host the remote touchpad's on-TV pointer overlay
     NotificationOverlay.attach(this) // host MQTT-notify toasts (see MqttPublisher.handleNotify)
+    DinnerCardOverlay.attach(this) // host Call everyone cards (see DinnerCall)
     pinnedFrame = PinnedAppFrameHost(this).also { PinnedAppScreensaver.attach(it) }
     // getWindows() can block for five seconds while Android is still creating Home's first
     // window. Both observations query it, so doing them here delays that very window by ten
@@ -57,6 +58,7 @@ class BarWatchService : AccessibilityService() {
     RemoteInput.unregister()
     RemoteCursor.detach()
     NotificationOverlay.detach()
+    DinnerCardOverlay.detach()
     return super.onUnbind(intent)
   }
 
