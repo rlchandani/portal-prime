@@ -37,5 +37,6 @@ class ClockChangeReceiver : BroadcastReceiver() {
         alarm = { cancelSnooze -> AlarmScheduler.reschedule(context, cancelSnooze) },
         wakeLight = { SunriseScheduler.reschedule(context) },
         chimes = { ChimeScheduler.reschedule(context) })
+    runCatching { RoutinesFeature.onClockChanged(context, intent.action) }
   }
 }

@@ -323,6 +323,16 @@
             android:turnScreenOn="true"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- Picture routines: the full-screen kids' routine shown at its start time. -->
+        <activity
+            android:name=".RoutineTakeoverActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- "Clock": digital clock screensaver style / color / layout settings. -->
         <activity
             android:name=".ClockSettingsActivity"
@@ -514,6 +524,11 @@
         <!-- Internal alarm for the sunrise wake light (launches WakeLightActivity). -->
         <receiver
             android:name=".SunriseReceiver"
+            android:exported="false" />
+
+        <!-- Picture routines: the start/auto-close alarm (launches RoutineTakeoverActivity). -->
+        <receiver
+            android:name=".RoutineAlarmReceiver"
             android:exported="false" />
 
         <!-- Internal alarm for the wake-up alarm clock (launches AlarmRingActivity). -->
