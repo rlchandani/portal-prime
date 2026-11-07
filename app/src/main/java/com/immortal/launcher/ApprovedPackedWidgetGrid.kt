@@ -34,23 +34,29 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.isActive
 import kotlin.math.roundToInt
 
-/** Short swipes scroll; held drags reorder, committing only on release. */
+/**
+ * Short swipes scroll; held drags move a card to the slot under it, committing only on release.
+ * [fixed] carries exact free-placement positions; null packs [spans] in order. [canDrop]/[onDrop]
+ * take a slot column (0–3) and slot row (0–1) on this page.
+ */
 @Composable
 internal fun ApprovedPackedWidgetGrid(
     widgets: List<HomeWidgetStore.HomeWidget>,
     spans: List<ApprovedWidgetPacking.Span>,
+    fixed: List<ApprovedWidgetPacking.Placement>?,
     editMode: Boolean,
     modifier: Modifier,
-    onMove: (String, String) -> Unit,
+    canDrop: (key: String, column: Int, row: Int) -> Boolean,
+    onDrop: (key: String, column: Int, row: Int) -> Unit,
     content: @Composable (HomeWidgetStore.HomeWidget, Modifier, ApprovedWidgetPacking.Span, Modifier) -> Unit,
 ) {
-  val placements = remember(spans) { ApprovedWidgetPacking.pack(spans) }
-  val latestMove = rememberUpdatedState(onMove)
+  val placements = remember(spans, fixed) { fixed ?: ApprovedWidgetPacking.pack(spans) }
+  val latestDrop = rememberUpdatedState(onDrop)
+  val latestCanDrop = rememberUpdatedState(canDrop)
   val scroll = rememberScrollState()
   val dragState = remember { ApprovedWidgetDragState() }
   var preview by remember { mutableStateOf<ApprovedWidgetDragState.Snapshot?>(null) }
   val draggedKey by remember { derivedStateOf { preview?.key } }
-  val targetKey by remember { derivedStateOf { preview?.targetKey } }
   var dragOwner by remember { mutableStateOf<Any?>(null) }
   // Page activation only controls editing gestures. Normal paging reuses the packed grid.
   val pageActive = editMode && LocalApprovedLauncherPageActive.current && LocalApprovedWidgetPageInput.current
@@ -89,6 +95,18 @@ internal fun ApprovedPackedWidgetGrid(
       }
     }
     fun publishPreview() { preview = dragState.snapshot(scroll.value.toFloat(), bounds) }
+    /** The slot (column, slot row) the dragged card's top-left snaps to, clamped onto the page. */
+    fun targetSlot(snapshot: ApprovedWidgetDragState.Snapshot): Pair<Int, Int>? {
+      val index = widgets.indexOfFirst { it.key == snapshot.key }.takeIf { it >= 0 } ?: return null
+      val placement = placements.firstOrNull { it.index == index } ?: return null
+      val source = bounds.firstOrNull { it.key == snapshot.key } ?: return null
+      val left = source.left + snapshot.translationX
+      val logicalLeft = if (rtl) widthPx - left - source.width else left
+      val column = (logicalLeft / columnStep).roundToInt().coerceIn(0, 4 - placement.columns)
+      val halfRow = ((source.top + snapshot.translationY) / rowStep).roundToInt()
+      val row = (halfRow / 2f).roundToInt().coerceIn(0, ((4 - placement.rows) / 2).coerceAtLeast(0))
+      return column to row
+    }
     // Invalidation is synchronous with composition disposal, including retained inactive pages.
     DisposableEffect(editMode, pageActive, widgets, bounds, viewportHeightPx) {
       resetDrag()
@@ -120,7 +138,25 @@ internal fun ApprovedPackedWidgetGrid(
     }
     val rowCount = maxOf(4, placements.maxOfOrNull { it.row + it.rows } ?: 0)
     val height = row * rowCount + gap * (rowCount - 1)
+    val dropTarget = preview?.let { snap -> targetSlot(snap)?.let { Triple(snap.key, it.first, it.second) } }
     Box(Modifier.fillMaxSize().verticalScroll(scroll)) {
+      dropTarget?.let { (key, column, slotRow) ->
+        val index = widgets.indexOfFirst { it.key == key }
+        val placement = placements.firstOrNull { it.index == index }
+        if (placement != null) {
+          val fits = latestCanDrop.value(key, column, slotRow)
+          val outline = if (fits) ApprovedHomePalette.Accent else androidx.compose.ui.graphics.Color(0xFFE5484D)
+          val width = placement.columns * columnStep - gapPx
+          val logicalLeft = column * columnStep
+          val left = if (rtl) widthPx - logicalLeft - width else logicalLeft
+          androidx.compose.foundation.Canvas(Modifier.fillMaxWidth().height(height)) {
+            drawRoundRect(outline, topLeft = androidx.compose.ui.geometry.Offset(left, slotRow * 2 * rowStep),
+                size = androidx.compose.ui.geometry.Size(width, placement.rows * rowStep - gapPx),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(20.dp.toPx()),
+                style = androidx.compose.ui.graphics.drawscope.Stroke(3.dp.toPx()))
+          }
+        }
+      }
       Layout(
           modifier = Modifier.fillMaxWidth().height(height),
           content = {
@@ -155,9 +191,10 @@ internal fun ApprovedPackedWidgetGrid(
                       onDragCancel = { cancelDrag(owner) },
                       onDragEnd = {
                         if (dragState.isOwner(owner)) {
-                          val destination = dragState.finish(owner, scroll.value.toFloat(), bounds)
+                          val target = dragState.snapshot(scroll.value.toFloat(), bounds)?.let(::targetSlot)
+                          dragState.finish(owner, scroll.value.toFloat(), bounds)
                           resetDrag()
-                          if (destination != null) latestMove.value(widget.key, destination)
+                          if (target != null) latestDrop.value(widget.key, target.first, target.second)
                         }
                       },
                   ) { change, _ ->
@@ -174,8 +211,7 @@ internal fun ApprovedPackedWidgetGrid(
                       translationX = preview?.takeIf { it.key == widget.key }?.translationX ?: 0f
                       translationY = preview?.takeIf { it.key == widget.key }?.translationY ?: 0f
                       alpha = if (preview?.key == widget.key) .88f else 1f
-                    }.then(if (targetKey == widget.key && !dragging)
-                        Modifier.border(2.dp, ApprovedHomePalette.Accent, RoundedCornerShape(20.dp)) else Modifier),
+                    },
                     cellSpan, drag)
               }
             }

@@ -688,9 +688,17 @@ private fun ApprovedWidgetCell(
               verticalAlignment = Alignment.CenterVertically) {
             ApprovedWidgetAction("Move", Modifier.weight(1f), onClick = onMove)
             ApprovedWidgetAction("Size", Modifier.weight(1f)) {
-              val next = HomeWidgetStore.nextWidgetSpan(displaySpan)
-              onChanged(widgets, widgets.map { if (it.key == widget.key) it.copy(
-                  spanX = next.first, spanY = next.second, explicitSize = true) else it })
+              // Cycle to the next size that fits here; neighbours never get covered or pushed.
+              var next = displaySpan
+              var resized: List<HomeWidgetStore.HomeWidget>? = null
+              repeat(4) {
+                if (resized == null) {
+                  next = HomeWidgetStore.nextWidgetSpan(next)
+                  resized = HomeSlots.resizeForEditing(widgets, widget.key, next)
+                }
+              }
+              resized?.let { onChanged(widgets, it) }
+                  ?: context.showHomeLayoutRefusal("No room to resize here. Move it or free a spot first.")
             }
             ApprovedWidgetAction("Settings", Modifier.weight(1f)) {
               when {
@@ -743,8 +751,8 @@ private fun ApprovedWidgetCell(
           }, onResizeEnd = {
             resizeDraft?.takeIf { it != startSpan }?.let { span ->
               resizeSnapshot?.let { expected ->
-                onChanged(expected, expected.map { if (it.key == widget.key) it.copy(
-                    spanX = span.first, spanY = span.second, explicitSize = true) else it })
+                HomeSlots.resizeForEditing(expected, widget.key, span)?.let { onChanged(expected, it) }
+                    ?: context.showHomeLayoutRefusal("No room to resize here. Move it or free a spot first.")
               }
             }
             resizeDraft = null; resizeSnapshot = null; resizeAccum = Offset.Zero
@@ -775,24 +783,46 @@ private fun ApprovedWidgetGrid(
     onChanged: HomeWidgetChange,
     onEnterEdit: () -> Unit,
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
+    pageIndex: Int,
+    fixed: List<ApprovedWidgetPacking.Placement>?,
 ) {
+  val context = androidx.compose.ui.platform.LocalContext.current
   val spans = remember(visible) { HomePresentation.spans(visible) }
   var move by remember { mutableStateOf<HomeWidgetStore.HomeWidget?>(null) }
-  ApprovedPackedWidgetGrid(visible, spans, editMode, gridModifier,
-      onMove = { source, target -> onChanged(widgets, HomePresentation.move(widgets, source, target)) }) { widget, cell, span, drag ->
+  ApprovedPackedWidgetGrid(visible, spans, fixed, editMode, gridModifier,
+      canDrop = { key, column, row ->
+        HomeSlots.moveForEditing(widgets, key, HomeWidgetStore.Slot(pageIndex, column, row)) != null
+      },
+      onDrop = { key, column, row ->
+        val moved = HomeSlots.moveForEditing(widgets, key, HomeWidgetStore.Slot(pageIndex, column, row))
+        if (moved == null) context.showHomeLayoutRefusal("That spot is taken. Move or resize the other widget first.")
+        else if (moved != widgets) onChanged(widgets, moved)
+      }) { widget, cell, span, drag ->
     ApprovedWidgetCell(widget, cell, widgets, editMode, host, manager, onChanged, onEnterEdit,
         onRemove, span.columns to span.rows, onMove = { move = widget }, dragHandle = drag)
   }
   move?.let { selected ->
+    val spots = remember(selected, widgets) { HomeSlots.freeSpotsForEditing(widgets, selected.key) }
+    val pages = remember(widgets) { HomePresentation.page(HomeSlots.forEditing(widgets), 0).count }
     ApprovedHomeDialog("Move ${customWidgetLabel(selected.kind)}", onDismiss = { move = null }) {
-      Text("Choose a position, including on another page.", color = ApprovedHomePalette.Secondary, fontSize = 23.sp)
-      widgets.forEachIndexed { index, target ->
-        if (target.key != selected.key) ApprovedHomeTextButton("${index + 1}. ${customWidgetLabel(target.kind)}") {
-          onChanged(widgets, HomePresentation.move(widgets, selected.key, target.key)); move = null
+      Text(if (spots.isEmpty()) "No empty spot fits this size. Make it smaller or free a spot first."
+          else "Choose an empty spot, including on another page.",
+          color = ApprovedHomePalette.Secondary, fontSize = 23.sp)
+      spots.forEach { spot ->
+        val label = if (spot.page >= pages) "New page · row ${spot.row + 1} · column ${spot.column + 1}"
+            else "Page ${spot.page + 1} · row ${spot.row + 1} · column ${spot.column + 1}"
+        ApprovedHomeTextButton(label) {
+          HomeSlots.moveForEditing(widgets, selected.key, spot)?.let { onChanged(widgets, it) }
+          move = null
         }
       }
     }
   }
+}
+
+/** Short, non-blocking explanation when Customize refuses a move or resize that would overlap. */
+private fun android.content.Context.showHomeLayoutRefusal(message: String) {
+  android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
 }
 
 /** Home and Customize keep the same page, identities, measurements and placement rules. */
@@ -809,7 +839,7 @@ private fun ApprovedWidgetPage(
 ) {
   val pageWidgets = remember(displayed, widgets) { HomePresentation.pageWidgets(widgets, displayed) }
   ApprovedWidgetGrid(pageWidgets, Modifier.fillMaxSize(), widgets, editMode, host, manager,
-      onChanged, onEnterEdit, onRemove)
+      onChanged, onEnterEdit, onRemove, pageIndex = displayed.index, fixed = displayed.placements)
 }
 
 /** Bounded pages share the same grid in Home and Customize. */

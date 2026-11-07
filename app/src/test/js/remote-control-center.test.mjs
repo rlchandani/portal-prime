@@ -358,3 +358,24 @@ test('shared settings FIFO captures sessions and values for every endpoint befor
       { value: 60, token: `captured-${i}` },
     ]);
 });
+
+test('browser reorder resets saved Home slots to auto-arrange; other edits keep them', () => {
+  const layout = {
+    assignments: {},
+    homeOrder: [],
+    gridOrder: [],
+    gridSlots: [],
+    widgets: [
+      { kind: 'weather', customId: 'weather:a', spanX: 2, spanY: 2, page: 0, column: 0, row: 0 },
+      { kind: 'alarm', customId: 'alarm:b', spanX: 2, spanY: 2, page: 1, column: 3, row: 1 },
+    ],
+  };
+  const moved = core.moveWidget(layout, 'widget-tile:custom:alarm:b', -1);
+  assert.equal(moved.widgets[0].customId, 'alarm:b');
+  for (const w of moved.widgets) {
+    assert.equal('page' in w || 'column' in w || 'row' in w, false);
+  }
+  assert.equal(layout.widgets[1].page, 1, 'input layout is not mutated');
+  const resized = core.resizeWidget(layout, 'widget-tile:custom:weather:a', 1, 2);
+  assert.deepEqual([resized.widgets[1].page, resized.widgets[1].column, resized.widgets[1].row], [1, 3, 1]);
+});

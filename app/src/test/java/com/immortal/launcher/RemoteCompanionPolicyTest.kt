@@ -44,6 +44,16 @@ class RemoteCompanionPolicyTest {
     w.put("kind", "appwidget").put("id", 7).put("package", "com.test").put("class", "Provider")
     assertFalse(RemoteLayoutPolicy.validate(layout().put("widgets", JSONArray().put(w)), emptyList()).valid)
   }
+  @Test fun layoutAcceptsSavedHomeSlots_andRejectsOutOfRangeOnes() {
+    val w = JSONObject("""{"kind":"weather","customId":"weather:abc","spanX":1,"spanY":2,"page":1,"column":3,"row":1}""")
+    assertTrue(RemoteLayoutPolicy.validate(layout().put("widgets", JSONArray().put(w)), emptyList()).valid)
+    for ((field, bad) in listOf("page" to -1, "column" to 4, "row" to 2)) {
+      val broken = JSONObject(w.toString()).put(field, bad)
+      assertFalse(field, RemoteLayoutPolicy.validate(layout().put("widgets", JSONArray().put(broken)), emptyList()).valid)
+    }
+    val partial = JSONObject(w.toString()).apply { remove("row") }
+    assertFalse(RemoteLayoutPolicy.validate(layout().put("widgets", JSONArray().put(partial)), emptyList()).valid)
+  }
   @Test fun layoutRetainsBoundWidgetsWithoutRebinding() {
     val existing = HomeWidgetStore.HomeWidget(7, "com.test", "Provider")
     val l = layout().put("widgets", JSONArray(HomeWidgetStore.serialize(listOf(existing))))

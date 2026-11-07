@@ -515,6 +515,13 @@ export function moveWidget(layout, key, delta) {
     to = index + delta;
   if (index < 0 || to < 0 || to >= out.widgets.length) return out;
   out.widgets.splice(to, 0, out.widgets.splice(index, 1)[0]);
+  // This editor arranges by order. Reordering here returns the Portal to auto-arrange in the new
+  // order instead of silently keeping saved free-placement slots (2026-11-06).
+  for (const w of out.widgets) {
+    delete w.page;
+    delete w.column;
+    delete w.row;
+  }
   const keys = out.widgets.map(widgetKey);
   for (const field of ['gridOrder', 'gridSlots']) {
     const present = new Set(out[field]);

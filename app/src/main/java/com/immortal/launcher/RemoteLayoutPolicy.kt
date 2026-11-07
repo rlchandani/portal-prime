@@ -50,8 +50,12 @@ internal object RemoteLayoutPolicy {
     else for (i in 0 until widgets.length()) {
       val w = widgets.optJSONObject(i)
       if (w == null) { errors += "invalid_widget"; continue }
-      if (!w.only("id", "package", "class", "spanX", "spanY", "kind", "customId", "explicitSize")) errors += "unknown_widget_field"
+      if (!w.only("id", "package", "class", "spanX", "spanY", "kind", "customId", "explicitSize", "page", "column", "row")) errors += "unknown_widget_field"
       if (w.opt("spanX").integer() !in 1L..4L || w.opt("spanY").integer() !in 1L..4L) errors += "invalid_span"
+      // Free-placement slot: all three or none, within the 2-row × 4-column grid.
+      val slotFields = listOf("page", "column", "row").count { w.has(it) }
+      if (slotFields != 0 && (slotFields != 3 || w.opt("page").integer() !in 0L..63L ||
+          w.opt("column").integer() !in 0L..3L || w.opt("row").integer() !in 0L..1L)) errors += "invalid_slot"
       if (w.has("explicitSize") && w.opt("explicitSize") !is Boolean) errors += "invalid_explicitSize"
       val kind = w.opt("kind") as? String
       val key = if (kind == "appwidget") {

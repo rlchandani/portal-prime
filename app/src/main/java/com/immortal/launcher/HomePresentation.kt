@@ -21,9 +21,20 @@ internal object HomePresentation {
       val widgets: List<HomeWidgetStore.HomeWidget>,
       val index: Int,
       val count: Int,
+      /** Slot mode only: exact placements aligned with [widgets]; null = order-based packing. */
+      val placements: List<ApprovedWidgetPacking.Placement>? = null,
   )
 
+  /** Saved slots switch Home to free placement; otherwise the original order-based paging applies. */
   fun page(widgets: List<HomeWidgetStore.HomeWidget>, requested: Int): Page {
+    if (!HomeSlots.hasSlots(widgets)) return legacyPage(widgets, requested)
+    val pages = HomeSlots.resolve(widgets, spans(widgets))
+    val index = requested.coerceIn(0, pages.size - 1)
+    val placed = pages[index]
+    return Page(null, placed.map { it.widget }, index, pages.size, placed.map { it.placement })
+  }
+
+  fun legacyPage(widgets: List<HomeWidgetStore.HomeWidget>, requested: Int): Page {
     val hero = widgets.firstOrNull { it.kind == HomeWidgetStore.KIND_PHOTO_MEMORY }
     // Additional photo widgets are ordinary paged items, so no configured identity disappears.
     val remaining = widgets.filterNot { it.key == hero?.key }
@@ -56,6 +67,7 @@ internal object HomePresentation {
 
   /** Sharing the photo across pages must not override its saved relative position. */
   fun pageWidgets(widgets: List<HomeWidgetStore.HomeWidget>, page: Page): List<HomeWidgetStore.HomeWidget> {
+    if (page.placements != null) return page.widgets
     val positions = widgets.mapIndexed { index, widget -> widget.key to index }.toMap()
     return (listOfNotNull(page.hero) + page.widgets).sortedBy { positions[it.key] ?: Int.MAX_VALUE }
   }

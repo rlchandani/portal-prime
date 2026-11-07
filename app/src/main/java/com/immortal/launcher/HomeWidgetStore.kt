@@ -34,6 +34,8 @@ object HomeWidgetStore {
       val customId: String = "",
       // Old dashboard spans were presentation hints. New user size choices are exact.
       val explicitSize: Boolean = false,
+      /** Saved free-placement slot; null = auto-arranged in order (every pre-2026-11-06 layout). */
+      val slot: Slot? = null,
   ) {
     val provider: ComponentName
       get() = ComponentName(providerPackage, providerClass)
@@ -43,6 +45,14 @@ object HomeWidgetStore {
 
     val isAppWidget: Boolean
       get() = kind == KIND_APP_WIDGET
+  }
+
+  /**
+   * A widget's saved position on the 2-row × 4-column Home grid: [page] ≥ 0, [column] 0–3 and
+   * slot [row] 0–1 (one slot row = two half-rows of the underlying grid).
+   */
+  data class Slot(val page: Int, val column: Int, val row: Int) {
+    val valid: Boolean get() = page >= 0 && column in 0..3 && row in 0..1
   }
 
   const val KIND_APP_WIDGET = "appwidget"
@@ -167,9 +177,21 @@ object HomeWidgetStore {
               .put("kind", w.kind)
               .put("customId", w.customId)
       if (w.explicitSize) entry.put("explicitSize", true)
+      w.slot?.takeIf { it.valid }?.let {
+        entry.put("page", it.page).put("column", it.column).put("row", it.row)
+      }
       arr.put(entry)
     }
     return arr.toString()
+  }
+
+  /** A saved slot only when all three fields are integers in range; anything else is unplaced. */
+  private fun decodeSlot(obj: JSONObject): Slot? {
+    fun int(name: String): Int? = (obj.opt(name) as? Number)?.toInt()
+    val page = int("page") ?: return null
+    val column = int("column") ?: return null
+    val row = int("row") ?: return null
+    return Slot(page, column, row).takeIf { it.valid }
   }
 
   internal fun deserialize(raw: String): List<HomeWidget> =
@@ -197,6 +219,7 @@ object HomeWidgetStore {
                             kind = kind,
                             customId = customId,
                             explicitSize = obj.optBoolean("explicitSize", false),
+                            slot = decodeSlot(obj),
                         ))
                   }
                 }
