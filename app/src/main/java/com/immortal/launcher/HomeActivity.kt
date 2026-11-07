@@ -1428,7 +1428,17 @@ private fun LauncherScreen(
               libraryRequest = toolsLibraryRequest)
           }
         }
-        musicLayout?.let { layout ->
+        if (musicLayout == MusicPlayerLayout.FULL) {
+          // YouTube Music player (2026-11-07): native Now Playing beside the embedded page.
+          MusicPlayerScreen(roomName = room,
+              rightPane = {
+                YtMusicPane(onOpenInBrowser = { context.launchSafely(WebAppActivity::class.java) },
+                    modifier = Modifier.fillMaxSize())
+              },
+              onOpenYouTubeMusic = { YtMusicWebHost.obtain(context) },
+              onClose = { musicLayout = null }, hasEverSeenSession = MusicSessionMemory.seen,
+              modifier = Modifier.fillMaxSize())
+        } else musicLayout?.let { layout ->
           MusicPlayerHost(layout,
               modifier = if (layout == MusicPlayerLayout.COMPACT)
                 Modifier.align(Alignment.BottomCenter).widthIn(max = 720.dp).fillMaxWidth()

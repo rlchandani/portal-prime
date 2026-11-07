@@ -26,6 +26,8 @@ class ImmortalApp : Application() {
     // default-home role (→ "Select Home app" chooser). This relaunches us straight back so the
     // user never sees it. Installed up front so a crash during the rest of onCreate is covered too.
     CrashGuard.install(this)
+    // Music surfaces control Android media sessions through one shared transport.
+    MediaSessionMusicTransport.install()
     // Weak window tracking is dormant until an operator starts a bounded Fleet capture.
     FramePerformanceCapture.init(this)
     // Package events invalidate read metadata without scans or work on this main thread.
