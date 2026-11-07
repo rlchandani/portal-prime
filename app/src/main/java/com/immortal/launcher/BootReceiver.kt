@@ -29,6 +29,8 @@ class BootReceiver : BroadcastReceiver() {
       AlarmScheduler.reschedule(context, cancelSnooze = false)
       // Kitchen alarms also disappear on reboot; keep future timers and discard missed ones.
       TimerConfig.rearmAll(context)
+      // Picture routines: re-arm the next start/auto-close alarm (and resume a run in progress).
+      runCatching { RoutinesFeature.reschedule(context) }
       // Re-open the WiFi fleet channel after the reboot (the whole point of an
       // in-app agent: it comes back without USB, unlike adb-over-WiFi here).
       FleetAgentService.ensureRunning(context)
