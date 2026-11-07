@@ -87,10 +87,19 @@ object HomeWidgetStore {
   }
 
   /** iOS-style size cycle for a left-column widget: Small 1x1 -> Medium 2x1 -> Large 2x2 -> Small. */
-  fun nextWidgetSpan(current: Pair<Int, Int>): Pair<Int, Int> = when (current) {
-    1 to 1 -> 2 to 1
-    2 to 1 -> 2 to 2
-    else -> 1 to 1
+  /**
+   * Size button cycle over whole slots of the 2-row × 4-column Home grid, in stored half-row units:
+   * one slot (1×2) → two wide (2×2) → two tall (1×4) → 2×2 slots (2×4) → one slot. Legacy
+   * half-height sizes continue from the slot they display as.
+   */
+  fun nextWidgetSpan(current: Pair<Int, Int>): Pair<Int, Int> {
+    val slot = HomePresentation.slotSpan(current.first, current.second)
+    return when (slot.columns to slot.rows) {
+      1 to 2 -> 2 to 2
+      2 to 2 -> 1 to 4
+      1 to 4 -> 2 to 4
+      else -> 1 to 2
+    }
   }
 
   fun load(context: Context): List<HomeWidget> {

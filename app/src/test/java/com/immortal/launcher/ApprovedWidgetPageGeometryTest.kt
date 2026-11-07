@@ -24,12 +24,14 @@ class ApprovedWidgetPageGeometryTest {
     assertEquals(2 to 1, photo.spanX to photo.spanY)
   }
 
-  @Test fun customShortNeighbors_stackBelowEachOtherBesideTallPhoto() {
+  // Half-height cards no longer exist on the 2-row slot grid (2026-11-06): saved 2×1 "short" cards
+  // display as whole 2-wide slots and still stack below each other beside the photo.
+  @Test fun customShortNeighbors_snapToWholeSlots_andStackBesideTallPhoto() {
     val widgets = listOf(widget("photo", HomeWidgetStore.KIND_PHOTO_MEMORY, y = 1),
         widget("short1", HomeWidgetStore.KIND_TODAY, y = 1).copy(explicitSize = true), widget("short2", y = 1))
     val packed = ApprovedWidgetPacking.pack(HomePresentation.spans(widgets))
     assertEquals(2 to 0, packed[1].column to packed[1].row)
-    assertEquals(2 to 1, packed[2].column to packed[2].row)
+    assertEquals(2 to 2, packed[2].column to packed[2].row)
     assertEquals(widgets.indices.toList(), packed.map { it.index })
   }
 
@@ -47,7 +49,8 @@ class ApprovedWidgetPageGeometryTest {
     val widgets = listOf(widget("photo", HomeWidgetStore.KIND_PHOTO_MEMORY, x = 1, y = 3)) +
         (0..7).map { widget("w$it") }
     val first = HomePresentation.page(widgets, 0)
-    assertEquals(ApprovedWidgetPacking.Span(1, 3),
+    // Saved 1×3 half-rows displays as whole slots: 1 column × 2 slots (4 half-rows).
+    assertEquals(ApprovedWidgetPacking.Span(1, 4),
         HomePresentation.spans(listOfNotNull(first.hero) + first.widgets).first())
     assertNull(HomePresentation.page(widgets, 1).hero)
   }
@@ -60,7 +63,8 @@ class ApprovedWidgetPageGeometryTest {
       if (it.customId == "today") it.copy(explicitSize = true) else it
     }
     val after = HomePresentation.spans(changed)
-    assertEquals(ApprovedWidgetPacking.Span(2, 1), after[1])
+    // Explicit saved 2×1 half-rows is honoured as one whole 2-wide slot.
+    assertEquals(ApprovedWidgetPacking.Span(2, 2), after[1])
     assertEquals(before.filterIndexed { index, _ -> index != 1 },
         after.filterIndexed { index, _ -> index != 1 })
     assertEquals(changed, HomeWidgetStore.deserialize(HomeWidgetStore.serialize(changed)))

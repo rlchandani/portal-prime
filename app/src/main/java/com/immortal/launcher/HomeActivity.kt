@@ -735,9 +735,11 @@ private fun ApprovedWidgetCell(
             resizeAccum += Offset(if (resizeRtl) -delta.x else delta.x, delta.y)
             fun steps(value: Float, unit: Float): Int = (kotlin.math.sign(value) *
                 kotlin.math.floor(kotlin.math.abs(value / unit) + .35f)).toInt()
-            val x = (startSpan.first + steps(resizeAccum.x, columnUnit)).coerceIn(1, 4)
-            val y = (startSpan.second + steps(resizeAccum.y, rowUnit)).coerceIn(1, 4)
-            resizeDraft = x to y
+            val x = startSpan.first + steps(resizeAccum.x, columnUnit)
+            val y = startSpan.second + steps(resizeAccum.y, rowUnit)
+            // Corner drag snaps to whole slots of the 2-row × 4-column grid.
+            val slot = HomePresentation.slotSpan(x, y)
+            resizeDraft = slot.columns to slot.rows
           }, onResizeEnd = {
             resizeDraft?.takeIf { it != startSpan }?.let { span ->
               resizeSnapshot?.let { expected ->
@@ -774,7 +776,7 @@ private fun ApprovedWidgetGrid(
     onEnterEdit: () -> Unit,
     onRemove: (HomeWidgetStore.HomeWidget) -> Unit,
 ) {
-  val spans = remember(visible, editMode) { HomePresentation.pageSpans(visible, editMode) }
+  val spans = remember(visible) { HomePresentation.spans(visible) }
   var move by remember { mutableStateOf<HomeWidgetStore.HomeWidget?>(null) }
   ApprovedPackedWidgetGrid(visible, spans, editMode, gridModifier,
       onMove = { source, target -> onChanged(widgets, HomePresentation.move(widgets, source, target)) }) { widget, cell, span, drag ->
