@@ -57,7 +57,8 @@ internal class RemoteCompanionRoutes(private val context: Context) {
       "/remote/scenes" -> scenes(req.method, body)
       "/remote/scene" -> scene(body)
       "/remote/jarvis" -> if (req.method == "GET") json(200, ok().put("jarvis", RemoteCompanionJarvis.status(context))) else RemoteCompanionJarvis.configure(context, body).let { json(if (it.optBoolean("ok")) 200 else 409, it) }
-      else -> json(404, error("not_found"))
+      // Feature-owned endpoints (household features) after the paired-session and body checks above.
+      else -> RemoteFeatureRoutes.lookup(req.path)?.handle(context, req.method, body) ?: json(404, error("not_found"))
       }
     } catch (_: RemoteCompanionStoreUnavailable) {
       json(503, error("companion_storage_unavailable"))

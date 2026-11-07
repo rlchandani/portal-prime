@@ -28,6 +28,9 @@ class ImmortalApp : Application() {
     CrashGuard.install(this)
     // Music surfaces control Android media sessions through one shared transport.
     MediaSessionMusicTransport.install()
+    // Household features: phone-provisioned key route + signed Portal↔Portal bus.
+    RemoteFeatureRoutes.registerHouseholdKey()
+    HouseholdBus.start(this)
     // Weak window tracking is dormant until an operator starts a bounded Fleet capture.
     FramePerformanceCapture.init(this)
     // Package events invalidate read metadata without scans or work on this main thread.
