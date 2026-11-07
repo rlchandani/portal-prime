@@ -66,7 +66,8 @@ internal fun ApprovedPackedWidgetGrid(
   // Capture the unscrolled container, not coordinates of a node with verticalScroll.
   BoxWithConstraints(modifier.onGloballyPositioned { viewportCoordinates = it }) {
     val density = LocalDensity.current
-    val gap = 24.dp
+    // Halved from 24dp on request: tighter grid, larger cards (Home v2 space).
+    val gap = 12.dp
     val column = ((maxWidth - gap * 3) / 4).coerceAtLeast(1.dp)
     val row = ((maxHeight - gap * 3) / 4).coerceAtLeast(1.dp)
     val columnStep = with(density) { (column + gap).toPx() }
