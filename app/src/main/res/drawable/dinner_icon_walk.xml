@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2026 Starbright Lab.
+
+    This source code is licensed under the MIT license found in the
+    LICENSE file in the root directory of this source tree.
+
+    Call everyone glyph "walk", from the approved dinner-call prototype (48-unit viewBox).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="48" android:viewportHeight="48">
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFFFF" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M22,8a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFFFF" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M24 15l-6 9 7 5-3 13M24 15l7 8 7 1M18 24l-6 3M25 29l8 9" />
+</vector>
