@@ -234,6 +234,14 @@
             android:label="Crypto"
             android:theme="@style/Theme.SampleApp.Navigation" />
 
+        <!-- "Household list": the shared list sheet over Home (widget, Tools tile, remote). -->
+        <activity
+            android:name=".HouseholdListActivity"
+            android:exported="false"
+            android:label="Household list"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.SampleApp.Translucent" />
+
         <!-- "To-Do": checklist editor for the local to-do home widget. -->
         <activity
             android:name=".TodoSettingsActivity"

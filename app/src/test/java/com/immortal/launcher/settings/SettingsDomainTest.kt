@@ -543,6 +543,8 @@ class SettingsDomainTest {
             "SunriseConfig",
             "QuickBarConfig",
             "HomeDashboardConfig",
+            // HouseholdListSettings.domain; the integrator adds it to SettingsDomains.all.
+            "HouseholdListConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",
             "FleetConfig",
