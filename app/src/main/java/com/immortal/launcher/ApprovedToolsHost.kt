@@ -39,6 +39,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -75,9 +76,9 @@ internal fun ApprovedToolsHost(
         val content: @Composable BoxScope.() -> Unit = {
             Box(modifier.fillMaxSize()) {
                 if (tool == null) holder.SaveableStateProvider("library") {
-                    ToolsLibrary(grid, advanced) { selected = it.id }
+                    ToolsLibrary(grid, advanced, edge = if (embedded) LauncherEdge else 96.dp) { selected = it.id }
                 }
-                else Row(Modifier.fillMaxSize().padding(horizontal = 56.dp, vertical = 36.dp)) {
+                else Row(Modifier.fillMaxSize().padding(horizontal = if (embedded) LauncherEdge else 56.dp, vertical = 36.dp)) {
                     ToolsRail(tool, advanced) { selected = it.id }
                     Column(Modifier.weight(1f).fillMaxHeight()) {
                         Column(Modifier.fillMaxWidth().heightIn(min = 152.dp)
@@ -181,7 +182,7 @@ private fun ToolsRail(
 }
 
 @Composable
-private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, onOpen: (ApprovedTool) -> Unit) {
+private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpen: (ApprovedTool) -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
     var group by rememberSaveable { mutableStateOf("All tools") }
     val selectedGroup = ApprovedToolsCatalog.resolveGroup(group, advanced)
@@ -199,7 +200,7 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, onOpen: (Approv
             ApprovedToolsSummaries.load(context)
         }
     }
-    BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 96.dp).padding(top = 52.dp, bottom = 24.dp)) {
+    BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = edge).padding(top = 52.dp, bottom = 24.dp)) {
         val columns = if (maxWidth < 1200.dp) 2 else 3
         LazyVerticalGrid(GridCells.Fixed(columns), state = grid, modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),

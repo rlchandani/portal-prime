@@ -352,6 +352,12 @@ private class ApprovedHomeTabViews(
   }
 }
 
+/**
+ * Side margin for everything inside the launcher (header, Home, embedded Apps/Tools). Shared so all
+ * tabs stay aligned. 24dp (twice the widget gap): 12dp sat too close to the bezel on device.
+ */
+internal val LauncherEdge = 24.dp
+
 internal object ApprovedHomePalette {
   val Background: Color @Composable get() =
       LocalApprovedPalette.current.background

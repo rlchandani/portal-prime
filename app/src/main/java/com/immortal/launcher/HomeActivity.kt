@@ -1286,7 +1286,7 @@ private fun LauncherScreen(
       Box(Modifier.matchParentSize().graphicsLayer {}) { ApprovedHomeBackground() }
       Column(Modifier.fillMaxSize()) {
         // Launcher chrome trimmed 108 → 92dp; the 68dp header buttons keep a 12dp margin (Home v2 space).
-        Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = 56.dp),
+        Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = LauncherEdge),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
             Text("immortal", color = ApprovedHomePalette.Text, fontSize = 30.sp, lineHeight = 40.sp,
@@ -1333,7 +1333,7 @@ private fun LauncherScreen(
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
-          Column(Modifier.fillMaxSize().padding(horizontal = 56.dp).padding(top = 6.dp)) {
+          Column(Modifier.fillMaxSize().padding(horizontal = LauncherEdge).padding(top = 6.dp)) {
             ApprovedHomeGreeting(welcome, use24, compact = connected == false)
             Spacer(Modifier.height(16.dp))
             if (connected == false) {

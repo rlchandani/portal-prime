@@ -313,7 +313,7 @@ private fun ApprovedAppsContent(
     when { menuFor != null -> menuFor = null; folder != null -> folder = null; recent && !initiallyRecent -> recent = false; searching -> closeSearch(); else -> onExit() }
   }
   val content: @Composable () -> Unit = {
-    androidx.compose.foundation.lazy.grid.LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(6), horizontalArrangement = Arrangement.spacedBy(32.dp), verticalArrangement = Arrangement.spacedBy(32.dp), modifier = modifier.fillMaxSize().padding(horizontal = 56.dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp)) {
+    androidx.compose.foundation.lazy.grid.LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(6), horizontalArrangement = Arrangement.spacedBy(32.dp), verticalArrangement = Arrangement.spacedBy(32.dp), modifier = modifier.fillMaxSize().padding(horizontal = if (embedded) LauncherEdge else 56.dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp)) {
       item(key = "heading", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
         Column(Modifier.fillMaxWidth()) {
           ApprovedAppsHeading(if (folder != null) folder!! else if (recent) "Recent apps" else "Your apps",
