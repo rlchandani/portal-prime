@@ -544,6 +544,8 @@ class SettingsDomainTest {
             "SunriseConfig",
             "QuickBarConfig",
             "HomeDashboardConfig",
+            // ShareSettings.domain, added to SettingsDomains.all at integration (Share to Portal).
+            "ShareConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",
             "FleetConfig",
