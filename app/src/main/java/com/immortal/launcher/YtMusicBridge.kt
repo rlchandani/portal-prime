@@ -33,6 +33,8 @@ internal class YtMusicBridge(private val webView: WebView) : MusicTransport {
     const val ASSET = "ytmusic/bridge.js"
     /** Kotlin-side floor between handled messages; the script already coalesces. */
     const val MIN_MESSAGE_INTERVAL_MS = 150L
+    /** Floor between handled list messages; the script only posts lists when they change. */
+    const val MIN_LIST_INTERVAL_MS = 250L
     val ALLOWED_ORIGINS = setOf(YtMusicUrls.ORIGIN)
   }
 
@@ -46,6 +48,14 @@ internal class YtMusicBridge(private val webView: WebView) : MusicTransport {
   /** Top-level URL, tracked for the fallback interface (which cannot see the caller's origin). */
   @Volatile private var mainFrameUrl: String? = null
   private val drainPending = Runnable { pendingRaw?.let { pendingRaw = null; handle(it) } }
+  private var lastListAt = 0L
+  private var pendingList: String? = null
+  private val drainList = Runnable { pendingList?.let { pendingList = null; handleList(it) } }
+  /** The list the pane is showing; re-requested after every full page load. */
+  private var watching: YtMusicTab? = null
+
+  /** Receives every validated list snapshot (main thread). */
+  var onList: ((YtMusicList) -> Unit)? = null
 
   /** Latest validated page state (null when nothing is loaded or playing). */
   val state: NowPlayingState? get() = last
@@ -86,7 +96,34 @@ internal class YtMusicBridge(private val webView: WebView) : MusicTransport {
   fun onPageFinished(url: String?) {
     mainFrameUrl = url
     val source = script ?: return
-    if (!released && YtMusicUrls.isMusicPage(url)) webView.evaluateJavascript(source, null)
+    if (!released && YtMusicUrls.isMusicPage(url)) {
+      webView.evaluateJavascript(source, null)
+      watching?.let { requestList(it) }
+    }
+  }
+
+  /** Asks the page to report [tab]'s list now and on every change (replaces any earlier tab). */
+  @MainThread
+  fun requestList(tab: YtMusicTab) {
+    watching = tab
+    if (!released && YtMusicUrls.isMusicPage(webView.url)) {
+      webView.evaluateJavascript(YtMusicListParser.watchScript(tab), null)
+    }
+  }
+
+  /** Plays row [index] of [tab] through the page; the page refuses a stale [generation]. */
+  @MainThread
+  fun playItem(tab: YtMusicTab, index: Int, generation: Int) {
+    val js = YtMusicListParser.playScript(tab, index, generation) ?: return
+    if (!released && YtMusicUrls.isMusicPage(webView.url)) webView.evaluateJavascript(js, null)
+  }
+
+  /** In-page search; [result] is true only when the page accepted the query itself. */
+  @MainThread
+  fun search(query: String, result: (Boolean) -> Unit) {
+    val js = YtMusicSearch.script(query)
+    if (js == null || released || !YtMusicUrls.isMusicPage(webView.url)) return result(false)
+    webView.evaluateJavascript(js) { raw -> result(!released && raw == "true") }
   }
 
   /** In-page navigation for a tab; [result] is true only when the page handled it itself. */
@@ -116,7 +153,11 @@ internal class YtMusicBridge(private val webView: WebView) : MusicTransport {
   fun release() {
     released = true
     main.removeCallbacks(drainPending)
+    main.removeCallbacks(drainList)
     pendingRaw = null
+    pendingList = null
+    onList = null
+    watching = null
     documentStart?.let { runCatching { it.remove() } }
     documentStart = null
     if (MusicTransports.embedded === this) MusicTransports.embedded = null
@@ -125,7 +166,9 @@ internal class YtMusicBridge(private val webView: WebView) : MusicTransport {
   }
 
   private fun onMessage(raw: String?) {
-    if (raw == null || raw.length > YtMusicBridgeParser.MAX_MESSAGE_CHARS) return
+    if (raw == null) return
+    if (YtMusicListParser.isListMessage(raw)) return onListMessage(raw)
+    if (raw.length > YtMusicBridgeParser.MAX_MESSAGE_CHARS) return
     runOnMain {
       if (released) return@runOnMain
       val wait = lastHandledAt + MIN_MESSAGE_INTERVAL_MS - SystemClock.elapsedRealtime()
@@ -135,6 +178,29 @@ internal class YtMusicBridge(private val webView: WebView) : MusicTransport {
         pendingRaw = raw
       } else handle(raw)
     }
+  }
+
+  /** List messages get their own newest-wins slot so they never displace now-playing ones. */
+  private fun onListMessage(raw: String) {
+    if (raw.length > YtMusicListParser.MAX_MESSAGE_CHARS) return
+    runOnMain {
+      if (released) return@runOnMain
+      val wait = lastListAt + MIN_LIST_INTERVAL_MS - SystemClock.elapsedRealtime()
+      if (wait > 0) {
+        if (pendingList == null) main.postDelayed(drainList, wait)
+        pendingList = raw
+      } else handleList(raw)
+    }
+  }
+
+  private fun handleList(raw: String) {
+    if (released) return
+    lastListAt = SystemClock.elapsedRealtime()
+    val list = YtMusicListParser.parse(raw) ?: return
+    // Field diagnostics without track text: kind, row count, flags.
+    Log.i(TAG, "list kind=${list.tab.pageKey} items=${list.items.size} onPage=${list.onPage} " +
+        "signedOut=${list.signedOut} chars=${raw.length}")
+    onList?.invoke(list)
   }
 
   private var lastDiagnosticAt = -DIAGNOSTIC_INTERVAL_MS

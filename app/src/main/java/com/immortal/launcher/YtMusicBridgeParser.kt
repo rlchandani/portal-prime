@@ -91,9 +91,12 @@ object YtMusicBridgeParser {
     return "window.__portalYtm&&window.__portalYtm.cmd($args);"
   }
 
-  private fun text(obj: JSONObject, key: String): String {
-    val raw = obj.opt(key) as? String ?: return ""
-    val cleaned = buildString(minOf(raw.length, MAX_TEXT_CHARS * 2)) {
+  private fun text(obj: JSONObject, key: String): String = cleanText(obj.opt(key), MAX_TEXT_CHARS)
+
+  /** Untrusted page text: strings only, control/format characters removed, whitespace collapsed. */
+  internal fun cleanText(value: Any?, max: Int): String {
+    val raw = value as? String ?: return ""
+    val cleaned = buildString(minOf(raw.length, max * 2)) {
       for (ch in raw) {
         when {
           ch == '\n' || ch == '\r' || ch == '\t' -> append(' ')
@@ -101,10 +104,10 @@ object YtMusicBridgeParser {
           Character.getType(ch) == Character.FORMAT.toInt() -> Unit
           else -> append(ch)
         }
-        if (length > MAX_TEXT_CHARS * 2) break
+        if (length > max * 2) break
       }
     }
-    return cleaned.replace(whitespace, " ").trim().take(MAX_TEXT_CHARS).trim()
+    return cleaned.replace(whitespace, " ").trim().take(max).trim()
   }
 
   private fun seconds(obj: JSONObject, key: String): Long {
@@ -113,7 +116,8 @@ object YtMusicBridgeParser {
     return (value * 1000).toLong()
   }
 
-  private fun artUrl(value: Any?): String {
+  /** An https art URL on a Google image host, or "" (untrusted input). */
+  internal fun artUrl(value: Any?): String {
     val url = value as? String ?: return ""
     if (url.length > MAX_ART_CHARS) return ""
     val uri = YtMusicUrls.httpsUri(url) ?: return ""
