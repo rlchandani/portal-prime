@@ -7,15 +7,14 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.MutatePriority
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -48,7 +47,8 @@ internal fun ApprovedPackedWidgetGrid(
     modifier: Modifier,
     canDrop: (key: String, column: Int, row: Int) -> Boolean,
     onDrop: (key: String, column: Int, row: Int) -> Unit,
-    content: @Composable (HomeWidgetStore.HomeWidget, Modifier, ApprovedWidgetPacking.Span, Modifier) -> Unit,
+    /** (widget, cell, span, card drag = hold then drag, grip drag = immediate) */
+    content: @Composable (HomeWidgetStore.HomeWidget, Modifier, ApprovedWidgetPacking.Span, Modifier, Modifier) -> Unit,
 ) {
   val placements = remember(spans, fixed) { fixed ?: ApprovedWidgetPacking.pack(spans) }
   val latestDrop = rememberUpdatedState(onDrop)
@@ -165,54 +165,68 @@ internal fun ApprovedPackedWidgetGrid(
                 val placement = placements[index]
                 val cellSpan = ApprovedWidgetPacking.Span(placement.columns, placement.rows)
                 val dragging = draggedKey == widget.key
-                var handleCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
-                val drag = if (!editMode || !pageActive) Modifier else Modifier
-                    .onGloballyPositioned { handleCoordinates = it }.pointerInput(
-                    widget.key, editMode, pageActive, widgets, placement, bounds, viewportHeightPx) {
+                var cardCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+                var gripCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+                /**
+                 * One drag path, two triggers: the card starts after a long press (so taps and page
+                 * swipes still work); the grip starts as soon as the finger moves, with no hold.
+                 */
+                fun widgetDrag(coordinates: () -> LayoutCoordinates?, immediate: Boolean): Modifier =
+                    Modifier.pointerInput(widget.key, editMode, pageActive, widgets, placement, bounds,
+                        viewportHeightPx, immediate) {
                   var owner = Any()
                   fun viewportPoint(local: Offset): ApprovedWidgetDragState.Point? {
                     val viewport = viewportCoordinates?.takeIf { it.isAttached } ?: return null
-                    val handle = handleCoordinates?.takeIf { it.isAttached } ?: return null
+                    val handle = coordinates()?.takeIf { it.isAttached } ?: return null
                     // The handle scrolls AND translates with the ghost. Its local position is
                     // not a stable drag accumulator; convert the actual pointer to the viewport.
                     val point = viewport.localPositionOf(handle, local)
                     return ApprovedWidgetDragState.Point(point.x, point.y)
                   }
-                  try { detectDragGesturesAfterLongPress(
-                      onDragStart = { local ->
-                        owner = Any() // A new token for each held gesture, not just each detector.
-                        viewportPoint(local)?.let { point ->
-                          if (dragState.start(owner, bounds[index], point, scroll.value.toFloat())) {
-                            dragOwner = owner
-                            publishPreview()
-                          }
-                        }
-                      },
-                      onDragCancel = { cancelDrag(owner) },
-                      onDragEnd = {
-                        if (dragState.isOwner(owner)) {
-                          val target = dragState.snapshot(scroll.value.toFloat(), bounds)?.let(::targetSlot)
-                          dragState.finish(owner, scroll.value.toFloat(), bounds)
-                          resetDrag()
-                          if (target != null) latestDrop.value(widget.key, target.first, target.second)
-                        }
-                      },
-                  ) { change, _ ->
+                  val onStart: (Offset) -> Unit = { local ->
+                    owner = Any() // A new token for each held gesture, not just each detector.
+                    viewportPoint(local)?.let { point ->
+                      if (dragState.start(owner, bounds[index], point, scroll.value.toFloat())) {
+                        dragOwner = owner
+                        publishPreview()
+                      }
+                    }
+                  }
+                  val onEnd: () -> Unit = {
+                    if (dragState.isOwner(owner)) {
+                      val target = dragState.snapshot(scroll.value.toFloat(), bounds)?.let(::targetSlot)
+                      dragState.finish(owner, scroll.value.toFloat(), bounds)
+                      resetDrag()
+                      if (target != null) latestDrop.value(widget.key, target.first, target.second)
+                    }
+                  }
+                  val onDrag: (androidx.compose.ui.input.pointer.PointerInputChange, Offset) -> Unit = { change, _ ->
                     if (dragState.isOwner(owner)) {
                       change.consume()
                       val point = viewportPoint(change.position)
                       if (point == null) cancelDrag(owner)
                       else if (dragState.move(owner, point)) publishPreview()
                     }
-                  } } finally { cancelDrag(owner) }
+                  }
+                  try {
+                    if (immediate) detectDragGestures(onDragStart = onStart, onDragEnd = onEnd,
+                        onDragCancel = { cancelDrag(owner) }, onDrag = onDrag)
+                    else detectDragGesturesAfterLongPress(onDragStart = onStart, onDragEnd = onEnd,
+                        onDragCancel = { cancelDrag(owner) }, onDrag = onDrag)
+                  } finally { cancelDrag(owner) }
                 }
+                val editing = editMode && pageActive
+                val drag = if (!editing) Modifier else Modifier
+                    .onGloballyPositioned { cardCoordinates = it }.then(widgetDrag({ cardCoordinates }, false))
+                val grip = if (!editing) Modifier else Modifier
+                    .onGloballyPositioned { gripCoordinates = it }.then(widgetDrag({ gripCoordinates }, true))
                 content(widget, Modifier.fillMaxSize().zIndex(if (dragging) 1f else 0f)
                     .graphicsLayer {
                       translationX = preview?.takeIf { it.key == widget.key }?.translationX ?: 0f
                       translationY = preview?.takeIf { it.key == widget.key }?.translationY ?: 0f
                       alpha = if (preview?.key == widget.key) .88f else 1f
                     },
-                    cellSpan, drag)
+                    cellSpan, drag, grip)
               }
             }
           },

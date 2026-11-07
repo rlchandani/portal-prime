@@ -358,6 +358,9 @@ private class ApprovedHomeTabViews(
  */
 internal val LauncherEdge = 24.dp
 
+/** True inside a widget card while Customize is open: header actions hide behind the card's own bar. */
+internal val LocalWidgetEditing = androidx.compose.runtime.staticCompositionLocalOf { false }
+
 internal object ApprovedHomePalette {
   val Background: Color @Composable get() =
       LocalApprovedPalette.current.background
@@ -473,7 +476,7 @@ internal fun ApprovedHomeWidgetHeading(
     Text(title, color = ApprovedHomePalette.Secondary, fontSize = 24.sp, lineHeight = 32.sp,
         fontWeight = FontWeight.Medium, maxLines = 1,
         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-    if (action != null) {
+    if (action != null && !LocalWidgetEditing.current) {
       // Content actions keep the accent; settings actions are quieter so they don't compete with it.
       val color = if (action == HomeRefinements.HeaderAction.OPEN) ApprovedHomePalette.Accent
           else ApprovedHomePalette.Secondary

@@ -648,7 +648,9 @@ private fun ApprovedWidgetCell(
     displaySpan: Pair<Int, Int> = widget.spanX to widget.spanY,
     onMove: () -> Unit = {},
     dragHandle: Modifier = Modifier,
+    gripHandle: Modifier = Modifier,
 ) {
+    androidx.compose.runtime.CompositionLocalProvider(LocalWidgetEditing provides editMode) {
     key(widget.key) {
       val context = LocalContext.current
       var showTimers by remember { mutableStateOf(false) }
@@ -681,6 +683,7 @@ private fun ApprovedWidgetCell(
           // Own the editing gesture above widget content, whose click/scroll handlers
           // otherwise compete with moving the card.
           Box(Modifier.matchParentSize().then(dragHandle))
+          ApprovedWidgetDragGrip(gripHandle, Modifier.align(Alignment.TopEnd).padding(10.dp))
           Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth()
               .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
               .background(ApprovedHomePalette.Card).padding(start = 6.dp, top = 6.dp, bottom = 6.dp, end = 58.dp),
@@ -761,6 +764,27 @@ private fun ApprovedWidgetCell(
       }
       if (showTimers) ApprovedHomeTimersPage { showTimers = false }
     }
+    }
+}
+
+/**
+ * Customize-only drag grip: touching it and moving starts the drag at once, with no long press.
+ * A long press anywhere on the card still works; the grip is the reliable, discoverable handle.
+ */
+@Composable
+private fun ApprovedWidgetDragGrip(drag: Modifier, modifier: Modifier = Modifier) {
+  val dots = ApprovedHomePalette.Text
+  Box(modifier.size(64.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome)
+      .semantics { contentDescription = "Drag to move" }.then(drag),
+      contentAlignment = Alignment.Center) {
+    Canvas(Modifier.size(26.dp)) {
+      val r = 2.6.dp.toPx()
+      for (column in 0..1) for (row in 0..2) {
+        drawCircle(dots, r, androidx.compose.ui.geometry.Offset(
+            size.width * (.32f + column * .36f), size.height * (.18f + row * .32f)))
+      }
+    }
+  }
 }
 
 @Composable
@@ -797,9 +821,9 @@ private fun ApprovedWidgetGrid(
         val moved = HomeSlots.moveForEditing(widgets, key, HomeWidgetStore.Slot(pageIndex, column, row))
         if (moved == null) context.showHomeLayoutRefusal("That spot is taken. Move or resize the other widget first.")
         else if (moved != widgets) onChanged(widgets, moved)
-      }) { widget, cell, span, drag ->
+      }) { widget, cell, span, drag, grip ->
     ApprovedWidgetCell(widget, cell, widgets, editMode, host, manager, onChanged, onEnterEdit,
-        onRemove, span.columns to span.rows, onMove = { move = widget }, dragHandle = drag)
+        onRemove, span.columns to span.rows, onMove = { move = widget }, dragHandle = drag, gripHandle = grip)
   }
   move?.let { selected ->
     val spots = remember(selected, widgets) { HomeSlots.freeSpotsForEditing(widgets, selected.key) }
@@ -1060,7 +1084,7 @@ private fun ApprovedHomePagedWidgets(
     // "All apps" — the dock's Apps tab already does that. The row is omitted when it would be empty.
     val showDots = HomeRefinements.showsPageIndicator(page.count)
     if (showDots || editMode) {
-      Box(Modifier.fillMaxWidth().padding(top = 4.dp).height(40.dp)) {
+      Box(Modifier.fillMaxWidth().padding(top = 4.dp).height(if (editMode) 52.dp else 40.dp)) {
         if (editMode) ApprovedHomeTextButton("Add widget", modifier = Modifier.align(Alignment.CenterStart),
             onClick = onAddWidget)
         if (showDots) {
