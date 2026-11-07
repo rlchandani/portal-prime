@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Portal music v2: split Now Playing (review mock)</title>
+<link rel="stylesheet" href="music.css">
+</head>
+<body>
+<!-- Review mock. Every track, photo and session below is simulated; no audio, no network.
+     State via hash: #split (default) #paused #library #search #blocked #start #idle #ambient #ambient-paused #walkup ; add "&light", "&noseek", "&clean". -->
+<main class="stage" id="stage" aria-live="polite">
+
+  <!-- First run: no YouTube Music session has ever been observed on this Portal -->
+  <section class="screen start" id="s-start" aria-label="Get music started">
+    <button class="np-close" aria-label="Close music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="stack" aria-hidden="true"><div class="art art--moss a1"></div><div class="art art--ember a2"></div><div class="art art--tide a3"></div></div>
+    <div>
+      <h1>Music plays from YouTube&nbsp;Music</h1>
+      <p>It runs in the browser on this Portal. Whatever it plays shows up here and on the photo frame.</p>
+      <ol class="steps">
+        <li><span>Sign in with your Google account<small>Once, in the browser. Your password stays with Google.</small></span></li>
+        <li><span>Choose something to play<small>Then come back, or leave it. The frame shows it.</small></span></li>
+      </ol>
+      <button class="cta" data-handoff><svg class="yt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>Open YouTube Music</button>
+    </div>
+  </section>
+
+  <!-- Returning: a session was seen before, nothing is playing now -->
+  <section class="screen start idle" id="s-idle" aria-label="Nothing playing">
+    <button class="np-close" aria-label="Close music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="stack" aria-hidden="true"><div class="art art--moss a1"></div><div class="art art--ember a2"></div><div class="art art--tide a3"></div></div>
+    <div>
+      <h1>Nothing is playing</h1>
+      <p>Pick something in YouTube Music. It will appear here as soon as it starts.</p>
+      <button class="cta" data-handoff><svg class="yt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>Open YouTube Music</button>
+    </div>
+  </section>
+
+  <!-- Now Playing, split. Left: native, driven only by the Android media session + device volume.
+       Right: the real YouTube Music page in an embedded view (simulated here with generic rows). -->
+  <section class="screen np" id="s-np" aria-label="Now playing">
+    <div class="np-left">
+      <div class="np-room" id="np-room"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="3" width="12" height="18" rx="3"/><circle cx="12" cy="14.5" r="3"/></svg><span>Playing on Family Area</span><i></i></div>
+      <div class="np-art art" id="np-art" role="img"></div>
+      <h1 class="np-title" id="np-title"></h1>
+      <p class="np-artist" id="np-artist"></p>
+      <div class="np-rail" id="np-rail" role="slider" tabindex="0" aria-label="Position">
+        <div class="track"></div><div class="fill"></div><div class="knob"></div>
+      </div>
+      <div class="np-times num"><span id="np-pos">1:24</span><span id="np-dur">4:12</span></div>
+      <div class="np-controls">
+        <button class="ctl" data-act="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h2v14H7zM20 5v14L10 12z"/></svg></button>
+        <button class="ctl ctl--play" data-act="toggle" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor" class="ic-toggle"></svg></button>
+        <button class="ctl" data-act="next" aria-label="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 5h2v14h-2zM4 5v14l10-7z"/></svg></button>
+      </div>
+      <label class="np-volume"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/></svg>
+        <input type="range" id="vol" min="0" max="15" value="6" aria-label="Family Area volume">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4zm12-1a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg></label>
+    </div>
+
+    <div class="np-right" aria-label="YouTube Music page, embedded">
+      <div class="pane-bar">
+        <div class="tabs" role="tablist">
+          <button role="tab" data-tab="queue">Queue</button>
+          <button role="tab" data-tab="library">Library</button>
+          <button role="tab" data-tab="search">Search</button>
+        </div>
+        <button class="pane-close" aria-label="Close music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="page-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>YouTube Music page (embedded)<span id="page-url">music.youtube.com, player page</span></div>
+      <div class="page" id="page">
+        <div class="page-view" data-view="queue"><h3>Up next<small>From Saturday morning</small></h3><div class="row now"><div class="art art--tide"></div><div><b>Low tide, early</b><span>Marrow &amp; Vale</span></div><em>4:12</em></div><div class="row"><div class="art art--moss"></div><div><b>Moss on the north wall</b><span>Ilse Brandt</span></div><em>3:48</em></div><div class="row"><div class="art art--ember"></div><div><b>Embers</b><span>The Quiet Assembly</span></div><em>5:01</em></div><div class="row"><div class="art art--dusk"></div><div><b>Harbour lights</b><span>Marrow &amp; Vale</span></div><em>3:36</em></div><div class="row"><div class="art art--slate"></div><div><b>Second kitchen</b><span>Paloma Reyes</span></div><em>4:20</em></div><div class="row"><div class="art art--moss"></div><div><b>Long grass</b><span>Ilse Brandt</span></div><em>3:05</em></div><div class="row"><div class="art art--ember"></div><div><b>Slow coals</b><span>The Quiet Assembly</span></div><em>6:12</em></div><div class="row"><div class="art art--tide"></div><div><b>Saltwater hours</b><span>Marrow &amp; Vale</span></div><em>4:44</em></div><div class="page-fade"></div></div>
+        <div class="page-view" data-view="library"><div class="chips"><span>Playlists</span><span>Albums</span><span>Artists</span><span>Songs</span></div>
+          <div class="tiles"><div class="tile"><div class="art art--ember"></div><b>Liked songs</b><span>Auto playlist</span></div><div class="tile"><div class="art art--tide"></div><b>Saturday morning</b><span>Playlist, 42 songs</span></div><div class="tile"><div class="art art--moss"></div><b>Garden work</b><span>Playlist, 28 songs</span></div><div class="tile"><div class="art art--slate"></div><b>Dinner, quietly</b><span>Playlist, 35 songs</span></div><div class="tile"><div class="art art--dusk"></div><b>Marrow &amp; Vale</b><span>Artist</span></div><div class="tile"><div class="art art--tide"></div><b>Low tide</b><span>Album, 2025</span></div></div><div class="page-fade"></div></div>
+        <div class="page-view" data-view="search"><div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>Search songs, albums, artists</div><div class="row"><div class="art art--dusk"></div><div><b>Marrow &amp; Vale</b><span>Recent search</span></div><em></em></div><div class="row"><div class="art art--moss"></div><div><b>rain on a tin roof</b><span>Recent search</span></div><em></em></div><div class="row"><div class="art art--slate"></div><div><b>kids dance party</b><span>Recent search</span></div><em></em></div>
+          <p class="kbd-note">Tapping the field opens the Portal's on-screen keyboard</p></div>
+        <div class="blocked">
+          <h4>Sign in isn't allowed here</h4>
+          <p>Google blocks sign-in inside apps like this one. Sign in and choose music in the Portal browser. What plays still shows on the left and on the frame.</p>
+          <button class="cta" data-handoff><svg class="yt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>Sign in on the Portal browser</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Over the photo screensaver -->
+  <section class="screen amb" id="s-amb" aria-label="Photo frame with music">
+    <div class="photo" aria-hidden="true"></div>
+    <div class="clock"><b class="num">7:42</b><span>Friday, 6 November</span></div>
+    <div class="card" id="card">
+      <div class="art" id="card-art"></div>
+      <div class="card-text">
+        <div class="card-title" id="card-title"></div>
+        <div class="card-artist" id="card-artist"></div>
+        <div class="card-rail"><i></i></div>
+      </div>
+      <div class="card-ctl">
+        <button class="ctl" data-act="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h2v14H7zM20 5v14L10 12z"/></svg></button>
+        <button class="ctl ctl--play" data-act="toggle" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor" class="ic-toggle"></svg></button>
+        <button class="ctl" data-act="next" aria-label="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 5h2v14h-2zM4 5v14l10-7z"/></svg></button>
+        <button class="ctl ctl--more" data-go="split" aria-label="Open player"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="sim" id="sim">Mock: simulated media session, generated art</div>
+</main>
+
+<nav class="switch" aria-label="Review states">
+  <button data-go="split">Split, queue</button>
+  <button data-go="paused">Paused</button>
+  <button data-go="library">Library</button>
+  <button data-go="search">Search</button>
+  <button data-go="blocked">Sign-in blocked</button>
+  <button data-go="start">First run</button>
+  <button data-go="idle">Nothing playing</button>
+  <button data-go="ambient">Frame</button>
+  <button data-go="ambient-paused">Frame, paused</button>
+  <button data-go="walkup">Frame, walk-up</button>
+  <span class="sep"></span>
+  <button data-flag="light">Light</button>
+  <button data-flag="noseek">No seek</button>
+  <button data-flag="long">Long title</button>
+</nav>
+<script src="music.js"></script>
+</body>
+</html>

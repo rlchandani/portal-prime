@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<title>Web page size — Portal design review</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Portal screen: 1080x720 CSS px = 2160x1440 physical @2x -->
+<main class="portal" id="portal">
+
+  <!-- View 1: Settings > Screensaver > Web page -->
+  <section class="view view-settings" aria-label="Web page settings">
+    <aside class="sidebar">
+      <h1>Settings</h1>
+      <nav>
+        <button>Display</button>
+        <button aria-current="true">Screensaver</button>
+        <button>Home screen</button>
+        <button>Sound</button>
+        <button>Network</button>
+        <button>About</button>
+      </nav>
+    </aside>
+
+    <div class="detail">
+      <header class="detail-head">
+        <button class="back" aria-label="Back to screensaver sources">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>Web page</h2>
+      </header>
+
+      <div class="detail-grid">
+        <div class="col-main">
+          <button class="row">
+            <span class="row-label"><strong>Address</strong><span>homeassistant.local:8123/kitchen-wall</span></span>
+            <span class="chev" aria-hidden="true">›</span>
+          </button>
+
+          <div class="size-block">
+            <div class="size-head">
+              <strong>Page size</strong>
+              <span class="size-name" data-size-name>Default</span>
+            </div>
+            <div class="stepper" role="group" aria-label="Page size">
+              <button class="step-btn" data-step="-1" aria-label="Smaller">
+                <span class="glyph glyph-s" aria-hidden="true">A</span>
+              </button>
+              <div class="stops" data-stops></div>
+              <button class="step-btn" data-step="1" aria-label="Larger">
+                <span class="glyph glyph-l" aria-hidden="true">A</span>
+              </button>
+            </div>
+            <p class="size-note" data-size-note>The page lays itself out for this screen, as it was designed to.</p>
+          </div>
+
+          <button class="adjust-cta" data-go="adjust">Adjust while viewing the page</button>
+        </div>
+
+        <figure class="col-preview">
+          <div class="preview-frame">
+            <div class="viewport" data-viewport="preview"></div>
+          </div>
+          <figcaption>Live preview of your page at this size</figcaption>
+          <p class="fit-note"><strong>Always fitted to the screen.</strong> If a page is wider than the Portal, it is shrunk to fit so nothing is cut off.</p>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- View 2: in-context adjustment over the real page -->
+  <section class="view view-adjust" aria-label="Adjust page size">
+    <div class="viewport viewport-full" data-viewport="full"></div>
+
+    <div class="adjust-bar" role="group" aria-label="Page size">
+      <button class="round" data-step="-1" aria-label="Smaller">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg>
+      </button>
+      <div class="bar-mid">
+        <span class="bar-name" data-size-name>Default</span>
+        <div class="stops stops-bar" data-stops></div>
+      </div>
+      <button class="round" data-step="1" aria-label="Larger">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12M12 6v12"/></svg>
+      </button>
+      <span class="bar-rule" aria-hidden="true"></span>
+      <button class="done" data-go="settings">Done</button>
+    </div>
+  </section>
+
+  <p class="sim-tag">Mock: dashboard simulated with CSS</p>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

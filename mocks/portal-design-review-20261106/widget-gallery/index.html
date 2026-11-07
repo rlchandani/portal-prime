@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Immortal · Home widget family</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-head">
+      <div>
+        <h1>Eight widgets that belong in the room</h1>
+        <p>A proposed Home widget family for the Family Area Portal. Sample data only; the product sends no commands from this page.</p>
+      </div>
+      <button id="theme" class="theme-btn" type="button"></button>
+    </header>
+
+    <div class="home-slot">
+      <div class="frame fit" data-w="1920"><div id="home" class="device" role="img"></div></div>
+      <p class="caption" id="home-caption"></p>
+    </div>
+
+    <section class="block">
+      <h2>One family, three sizes</h2>
+      <p class="lede">Sizes come straight from the existing 4×4 packed grid and its Small → Medium → Large cycle. The only addition is letting Photo take a full half of the screen (2×4, already legal under MAX_SPAN).</p>
+      <div class="rules">
+        <ul class="rule-list">
+          <li><b>Small, 1×1 (434 × 235 dp)</b><span>One fact. A number or a name you can read from the sofa.</span></li>
+          <li><b>Medium, 2×1 (892 × 235 dp)</b><span>The fact plus its context: the next hours, the next event, the next three tasks.</span></li>
+          <li><b>Large, 2×2 (892 × 494 dp)</b><span>A short list. Never a dashboard.</span></li>
+          <li><b>Photo, 2×4 or 2×2</b><span>Full bleed, same corner radius, no title. It is the reason the object is in the room.</span></li>
+          <li><b>Material</b><span>Warm card on warm ground, 36 dp radius, no border, no shadow, no blur. Photo and widgets share one edge language.</span></li>
+          <li><b>One accent, one meaning</b><span>Green appears only when something is live: a running timer, a light that is on, an event happening now.</span></li>
+          <li><b>Labels only when needed</b><span>“16°” needs no “Weather” heading. Calendar says “Up next”; lists say how many are left.</span></li>
+          <li><b>Settings are not on Home</b><span>Configuration moves to long-press and Customize. No widget carries a settings button.</span></li>
+        </ul>
+        <div id="type-scale"></div>
+      </div>
+    </section>
+
+    <section class="block" id="specimens">
+      <h2>The widgets</h2>
+      <p class="lede">Each board shows Small, Medium and Large at true relative size. The lower row is what the widget looks like when it can't do its job, because that's the state a family sees on a bad day. A dashed outline marks a part that needs data the product doesn't have yet.</p>
+      <div id="boards"></div>
+    </section>
+
+    <section class="block">
+      <h2>Not on Home</h2>
+      <p class="lede">Removed from the Home library. Existing saved placements keep rendering until the owner removes them; nothing disappears on update.</p>
+      <ul class="cut-list" id="cuts"></ul>
+      <p class="ios-note">iOS: there is no native iOS app, so the gallery's iOS column is dropped. The phone surface is the remote browser page at 390 px, and it should show this same family as a read-only list.</p>
+    </section>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

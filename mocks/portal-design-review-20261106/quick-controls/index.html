@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Quick controls — redesign review</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <!-- The device: 1080×720 logical (2160×1440 @2x). Everything inside is the proposed product. -->
+  <main class="device" id="device" aria-live="polite">
+
+    <!-- HOME -->
+    <section class="home" id="home-view" aria-label="Home">
+      <div class="photo" aria-hidden="true"><span class="photo-tag">Photo frame</span></div>
+      <div class="home-clock">
+        <div class="time">7:42</div>
+        <div class="date">Friday, November 6</div>
+      </div>
+      <article class="widget" id="widget" aria-label="Quick controls widget">
+        <button class="widget-head" type="button" data-go="setup">
+          <span>Quick controls</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+        </button>
+        <div class="widget-body" id="widget-body"></div>
+      </article>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="settings" id="setup-view" aria-label="Settings">
+      <header class="topbar">
+        <button type="button" class="back-home" data-go="home">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Home
+        </button>
+      </header>
+      <div class="panes">
+        <aside class="sidebar">
+          <h1>Settings</h1>
+          <nav>
+            <button type="button" aria-current="true"><span class="cat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>Home &amp; widgets</button>
+            <button type="button"><span class="cat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 7V3m6 4V3M7 7h10v4a5 5 0 0 1-10 0zM12 16v5"/></svg></span>Connections</button>
+          </nav>
+        </aside>
+        <div class="detail">
+          <header class="detail-head">
+            <div class="history" role="group" aria-label="Settings history">
+              <button type="button" aria-label="Back to Home &amp; widgets"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+              <button type="button" disabled aria-label="Forward"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
+            </div>
+            <h2>Quick controls</h2>
+          </header>
+          <p class="summary" id="summary"></p>
+          <div class="setup-grid">
+            <figure class="preview">
+              <div class="preview-stage" id="preview-stage"></div>
+              <figcaption>As it appears on Home. Every Quick controls widget shares this.</figcaption>
+            </figure>
+            <div class="sources">
+              <ul class="source-list" id="sources"></ul>
+              <div id="apps-cta"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status" hidden></div>
+  </main>
+
+  <!-- REVIEW CHROME: not product. -->
+  <aside class="review" id="review" aria-label="Review states">
+    <button type="button" class="review-toggle" id="review-toggle" aria-expanded="false">Simulated device</button>
+    <form class="review-panel" id="review-panel" hidden>
+      <p class="review-note">Simulated states. Nothing here talks to a Portal.</p>
+      <fieldset><legend>Screen</legend>
+        <label><input type="radio" name="view" value="setup">Setup</label>
+        <label><input type="radio" name="view" value="home">Home</label>
+      </fieldset>
+      <fieldset><legend>Device</legend>
+        <label><input type="checkbox" name="jarvis">Jarvis launchable</label>
+        <label><input type="checkbox" name="dash">Dashboard address saved</label>
+        <label><input type="checkbox" name="ha">Home Assistant app launchable</label>
+        <label><input type="checkbox" name="check">Still checking apps</label>
+      </fieldset>
+      <fieldset><legend>Home Assistant tiles</legend>
+        <label><input type="radio" name="tiles" value="rec">One tile (recommended)</label>
+        <label><input type="radio" name="tiles" value="current">Four tiles (current)</label>
+      </fieldset>
+      <fieldset><legend>Appearance</legend>
+        <label><input type="radio" name="theme" value="dark">Dark</label>
+        <label><input type="radio" name="theme" value="light">Light</label>
+      </fieldset>
+    </form>
+  </aside>
+
+  <script src="./app.js"></script>
+</body>
+</html>

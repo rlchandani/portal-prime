@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Portal music: Now Playing redesign (review mock)</title>
+<link rel="stylesheet" href="music.css">
+</head>
+<body>
+<!-- Review mock. Every track, photo and session below is simulated; no audio, no network.
+     State via hash: #start #idle #playing #paused #ambient #ambient-paused #walkup ; add "&light", "&noseek", "&clean". -->
+<main class="stage" id="stage" aria-live="polite">
+
+  <!-- First run: no YouTube Music session has ever been observed on this Portal -->
+  <section class="screen start" id="s-start" aria-label="Get music started">
+    <button class="np-close" aria-label="Close music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="stack" aria-hidden="true"><div class="art art--moss a1"></div><div class="art art--ember a2"></div><div class="art art--tide a3"></div></div>
+    <div>
+      <h1>Music plays from YouTube&nbsp;Music</h1>
+      <p>It runs in the browser on this Portal. Whatever it plays shows up here and on the photo frame.</p>
+      <ol class="steps">
+        <li><span>Sign in with your Google account<small>Once, in the browser. Your password stays with Google.</small></span></li>
+        <li><span>Choose something to play<small>Then come back, or leave it. The frame shows it.</small></span></li>
+      </ol>
+      <button class="cta" data-handoff><svg class="yt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>Open YouTube Music</button>
+    </div>
+  </section>
+
+  <!-- Returning: a session was seen before, nothing is playing now -->
+  <section class="screen start idle" id="s-idle" aria-label="Nothing playing">
+    <button class="np-close" aria-label="Close music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="stack" aria-hidden="true"><div class="art art--moss a1"></div><div class="art art--ember a2"></div><div class="art art--tide a3"></div></div>
+    <div>
+      <h1>Nothing is playing</h1>
+      <p>Pick something in YouTube Music. It will appear here as soon as it starts.</p>
+      <button class="cta" data-handoff><svg class="yt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>Open YouTube Music</button>
+    </div>
+  </section>
+
+  <!-- Now Playing: everything here comes from the Android media session -->
+  <section class="screen np" id="s-np" aria-label="Now playing">
+    <button class="np-close" aria-label="Close music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="np-art art" id="np-art" role="img"></div>
+    <div class="np-body">
+      <div class="np-status" id="np-status"><i></i><span>Playing</span></div>
+      <h1 class="np-title" id="np-title"></h1>
+      <p class="np-artist" id="np-artist"></p>
+      <div class="np-rail" id="np-rail" role="slider" tabindex="0" aria-label="Position">
+        <div class="track"></div><div class="fill"></div><div class="knob"></div>
+      </div>
+      <div class="np-times num"><span id="np-pos">1:24</span><span id="np-dur">4:12</span></div>
+    </div>
+    <div class="np-controls">
+      <button class="ctl" data-act="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h2v14H7zM20 5v14L10 12z"/></svg></button>
+      <button class="ctl ctl--play" data-act="toggle" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor" class="ic-toggle"></svg></button>
+      <button class="ctl" data-act="next" aria-label="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 5h2v14h-2zM4 5v14l10-7z"/></svg></button>
+    </div>
+    <p class="np-note">From YouTube Music</p>
+    <button class="np-handoff" data-handoff><svg class="yt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11M4 12h11M4 18h7M18 9v10m0 0-2.5-2.5M18 19l2.5-2.5"/></svg>Queue and library</button>
+  </section>
+
+  <!-- Over the photo screensaver -->
+  <section class="screen amb" id="s-amb" aria-label="Photo frame with music">
+    <div class="photo" aria-hidden="true"></div>
+    <div class="clock"><b class="num">7:42</b><span>Friday, 6 November</span></div>
+    <div class="card" id="card">
+      <div class="art" id="card-art"></div>
+      <div class="card-text">
+        <div class="card-title" id="card-title"></div>
+        <div class="card-artist" id="card-artist"></div>
+        <div class="card-rail"><i></i></div>
+      </div>
+      <div class="card-ctl">
+        <button class="ctl" data-act="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h2v14H7zM20 5v14L10 12z"/></svg></button>
+        <button class="ctl ctl--play" data-act="toggle" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor" class="ic-toggle"></svg></button>
+        <button class="ctl" data-act="next" aria-label="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 5h2v14h-2zM4 5v14l10-7z"/></svg></button>
+        <button class="ctl ctl--more" data-go="playing" aria-label="Open player"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="sim" id="sim">Mock: simulated media session, generated art</div>
+</main>
+
+<nav class="switch" aria-label="Review states">
+  <button data-go="start">First run</button>
+  <button data-go="idle">Nothing playing</button>
+  <button data-go="playing">Playing</button>
+  <button data-go="paused">Paused</button>
+  <button data-go="ambient">Frame, across room</button>
+  <button data-go="ambient-paused">Frame, paused</button>
+  <button data-go="walkup">Frame, walk-up</button>
+  <span class="sep"></span>
+  <button data-flag="light">Light</button>
+  <button data-flag="noseek">No seek</button>
+  <button data-flag="long">Long title</button>
+</nav>
+<script src="music.js"></script>
+</body>
+</html>

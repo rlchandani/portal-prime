@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Immortal · Home v2 before/after</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="bar">
+    <h1>Home v2 <span>· conservative refinement on the current Home · sample data, fallback photo</span></h1>
+    <div class="seg" role="group" aria-label="View">
+      <button type="button" data-view="before">Before</button>
+      <button type="button" data-view="after">After</button>
+      <button type="button" data-view="side">Side by side</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="show"> Show changes</label>
+    <div class="legend"><span><i class="t-removed"></i>Removed</span><span><i class="t-changed"></i>Changed / moved</span><span><i class="t-added"></i>Added</span></div>
+  </div>
+  <div id="stage" class="stage"></div>
+  <section class="changes" aria-label="Change list"><ol id="changes-list"></ol></section>
+  <script src="./app.js"></script>
+</body>
+</html>

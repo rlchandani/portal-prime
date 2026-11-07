@@ -1,0 +1,205 @@
+/* Portal music v2 — split Now Playing + embedded YouTube Music page (review mock, 2026-11-06).
+ * Stage is 1080x720 CSS (2160x1440 @2x). All art is generated; no network. */
+:root{
+  --night:#1b1915;        /* warm charcoal ground */
+  --surface:#29261f;      /* raised surface */
+  --line:#3a362d;         /* hairlines, track rail */
+  --paper:#f4eee4;        /* primary ink */
+  --ash:#a89f90;          /* secondary ink */
+  --brass:#d9b26a;        /* the one accent: progress, focus */
+  --wash:#6b4a2e;         /* set per-track from artwork (Palette API natively) */
+  --ease:cubic-bezier(.2,.7,.2,1);
+  color-scheme:dark;
+}
+:root[data-theme=light]{
+  --night:#efe9df;--surface:#e3dbcd;--line:#cfc5b4;--paper:#25211b;--ash:#6c6355;--brass:#9a6f22;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000}
+body{font-family:Roboto,"Roboto Flex","Helvetica Neue",Arial,sans-serif;color:var(--paper);
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+button:focus-visible{outline:3px solid var(--brass);outline-offset:4px}
+svg{display:block}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- stage ---------- */
+.stage{position:absolute;left:50%;top:50%;width:1080px;height:720px;overflow:hidden;
+  transform:translate(-50%,-50%) scale(var(--fit,1));background:var(--night)}
+.screen{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .5s var(--ease),visibility 0s .5s}
+.screen.on{opacity:1;visibility:visible;transition:opacity .5s var(--ease)}
+.sim{position:absolute;left:24px;bottom:14px;font-size:11px;color:var(--ash);opacity:.55;z-index:9;letter-spacing:.01em}
+.ambient-on .sim{color:#fff;opacity:.4}
+
+/* ---------- generated artwork ---------- */
+.art{position:relative;overflow:hidden;background:#333}
+.art::before,.art::after{content:"";position:absolute;inset:0}
+.art--tide{background:linear-gradient(180deg,#f0c99a 0%,#e59c76 38%,#9a5f5a 58%,#3f4e66 58.5%,#2a3852 100%)}
+.art--tide::before{background:radial-gradient(circle at 62% 50%,#fff3d6 0 11%,transparent 11.4%)}
+.art--tide::after{background:repeating-linear-gradient(180deg,transparent 0 9px,rgba(255,236,210,.10) 9px 11px);
+  -webkit-mask:linear-gradient(180deg,transparent 58%,#000 60%);mask:linear-gradient(180deg,transparent 58%,#000 60%)}
+.art--moss{background:radial-gradient(120% 90% at 20% 110%,#2f4a2c 0 40%,transparent 41%),
+  radial-gradient(110% 80% at 90% 105%,#486b3a 0 45%,transparent 46%),linear-gradient(180deg,#cfd8b8,#93a982)}
+.art--moss::before{background:radial-gradient(circle at 30% 30%,#f5f1dc 0 9%,transparent 9.5%)}
+.art--ember{background:conic-gradient(from 210deg at 50% 60%,#2b1b2e,#7b2f3a,#d9773e,#f2c46b,#7b2f3a,#2b1b2e)}
+.art--ember::before{background:radial-gradient(circle at 50% 60%,transparent 0 22%,rgba(20,10,20,.55) 60%)}
+.art--ember::after{background:radial-gradient(circle at 50% 60%,#1d1218 0 6%,transparent 6.4%)}
+
+.art--dusk{background:linear-gradient(160deg,#2d3557 0%,#6b5a8a 45%,#e0a07a 100%)}
+.art--dusk::before{background:radial-gradient(circle at 70% 30%,#ffe7c2 0 7%,transparent 7.5%)}
+.art--slate{background:repeating-linear-gradient(135deg,#5b6770 0 14px,#6b7880 14px 28px)}
+.art--slate::before{background:radial-gradient(circle at 35% 65%,#e9d9b8 0 18%,transparent 18.5%)}
+
+/* generated "photo" for the screensaver */
+.photo{position:absolute;inset:0;
+  background:
+    radial-gradient(60% 40% at 70% 34%,rgba(255,214,160,.55),transparent 70%),
+    radial-gradient(140% 60% at 30% 100%,#2c2a22 0 40%,transparent 41%),
+    radial-gradient(120% 55% at 85% 100%,#3a3528 0 45%,transparent 46%),
+    radial-gradient(160% 70% at 50% 108%,#55503d 0 50%,transparent 51%),
+    linear-gradient(180deg,#566f86 0%,#9fa9a8 42%,#e2bd8f 66%,#c58a62 80%,#4a3b2c 100%)}
+.photo::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.28) 0%,transparent 30%,transparent 55%,rgba(0,0,0,.55) 100%)}
+
+/* ---------- Now Playing ---------- */
+.np{background:radial-gradient(70% 90% at 0% 30%,color-mix(in srgb,var(--wash) 50%,transparent),transparent 72%),var(--night);
+  transition:background .8s var(--ease)}
+:root[data-theme=light] .np{background:radial-gradient(70% 90% at 0% 30%,color-mix(in srgb,var(--wash) 20%,transparent),transparent 72%),var(--night)}
+.np-close{position:absolute;top:28px;right:28px;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;color:var(--ash)}
+.np-close svg{width:28px;height:28px}
+
+/* left: native Now Playing column (driven only by the media session + device volume) */
+.np-left{position:absolute;left:48px;top:36px;bottom:40px;width:424px;display:flex;flex-direction:column}
+.np-room{display:flex;align-items:center;gap:12px;font-size:20px;color:var(--ash);height:32px}
+.np-room svg{width:22px;height:22px}
+.np-room i{width:8px;height:8px;border-radius:50%;background:var(--brass);margin-left:2px}
+.paused .np-room i{background:var(--ash)}
+.np-head{display:flex;gap:24px;align-items:flex-end;margin-top:20px}
+.np-art{width:200px;height:200px;border-radius:16px;flex:none;margin-top:22px;box-shadow:0 22px 44px -18px rgba(0,0,0,.6);transition:filter .6s var(--ease)}
+.np-title{font-size:44px;line-height:1.1;font-weight:500;letter-spacing:-.012em;margin:26px 0 0;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.np-artist{font-size:28px;line-height:1.25;color:var(--ash);margin:10px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-rail{margin-top:auto;position:relative;height:40px;display:flex;align-items:center;touch-action:none}
+.np-rail .track{position:absolute;left:0;right:0;height:6px;border-radius:3px;background:var(--line)}
+.np-rail .fill{position:absolute;left:0;height:6px;border-radius:3px;background:var(--brass);width:var(--p,30%)}
+.np-rail .knob{position:absolute;left:var(--p,30%);width:22px;height:22px;margin-left:-11px;border-radius:50%;background:var(--paper)}
+.np-rail.noseek .knob{display:none}
+.np-rail.noseek .fill{background:var(--ash)}
+.np-times{display:flex;justify-content:space-between;font-size:18px;color:var(--ash)}
+.np-controls{display:flex;align-items:center;justify-content:space-between;padding:0 28px;margin-top:14px;height:100px}
+.ctl{flex:none;width:76px;height:76px;border-radius:50%;display:grid;place-items:center}
+.ctl svg{width:36px;height:36px}
+.ctl:active{background:color-mix(in srgb,var(--paper) 10%,transparent)}
+.ctl--play{width:100px;height:100px;background:var(--paper);color:var(--night)}
+.ctl--play svg{width:42px;height:42px}
+.np-volume{display:flex;align-items:center;gap:16px;margin-top:16px;height:44px;color:var(--ash)}
+.np-volume svg{width:24px;height:24px;flex:none}
+.np-volume input{flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;margin:0;
+  background:linear-gradient(90deg,var(--paper) var(--v,40%),var(--line) var(--v,40%))}
+.np-volume input::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--paper);box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.paused .np-art{filter:saturate(.55) brightness(.85)}
+
+/* right: the real YouTube Music page in an embedded view, framed so it reads as "a page", not our UI */
+.np-right{position:absolute;left:512px;right:24px;top:24px;bottom:24px;display:flex;flex-direction:column;
+  border-radius:28px;background:color-mix(in srgb,var(--surface) 82%,transparent);overflow:hidden}
+.pane-bar{display:flex;align-items:center;gap:12px;padding:16px 16px 0 24px;height:80px;flex:none}
+.tabs{display:flex;gap:4px;padding:4px;border-radius:30px;background:color-mix(in srgb,var(--night) 55%,transparent)}
+.tabs button{height:52px;padding:0 24px;border-radius:26px;font-size:20px;color:var(--ash)}
+.tabs button[aria-selected=true]{background:var(--paper);color:var(--night)}
+.pane-close{margin-left:auto;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;color:var(--ash)}
+.pane-close svg{width:26px;height:26px}
+.page-label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--ash);padding:12px 28px 0}
+.page-label svg{width:16px;height:16px}
+.page-label span{opacity:.75}
+.page{flex:1;margin:10px 12px 12px;border-radius:18px;background:var(--page-bg);color:var(--page-ink);overflow:hidden;position:relative;
+  font-family:Arial,Helvetica,sans-serif}
+:root{--page-bg:#0f0f0f;--page-ink:#f1f1f1;--page-muted:#9a9a9a;--page-hi:#272727}
+:root[data-theme=light]{--page-bg:#ffffff;--page-ink:#0f0f0f;--page-muted:#606060;--page-hi:#f0f0f0}
+.page-view{position:absolute;inset:0;padding:18px 18px 0;display:none}
+.page-view.on{display:block}
+.page h3{font-size:19px;font-weight:700;margin:4px 8px 12px}
+.page h3 small{font-weight:400;color:var(--page-muted);font-size:15px;margin-left:10px}
+.row{display:grid;grid-template-columns:56px 1fr auto;gap:16px;align-items:center;height:72px;padding:0 12px;border-radius:10px}
+.row.now{background:var(--page-hi)}
+.row .art{width:56px;height:56px;border-radius:6px}
+.row b{display:block;font-size:18px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row span{display:block;font-size:15px;color:var(--page-muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row em{font-style:normal;font-size:15px;color:var(--page-muted)}
+.page-fade{position:absolute;left:0;right:0;bottom:0;height:56px;background:linear-gradient(transparent,var(--page-bg));pointer-events:none}
+.chips{display:flex;gap:8px;margin:0 8px 16px}
+.chips span{font-size:15px;padding:9px 14px;border-radius:8px;background:var(--page-hi)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:0 8px}
+.tile .art{width:100%;aspect-ratio:1;border-radius:8px}
+.tile b{display:block;font-size:16px;font-weight:500;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile span{display:block;font-size:14px;color:var(--page-muted);margin-top:2px}
+.searchbox{margin:4px 8px 18px;height:56px;border-radius:28px;background:var(--page-hi);display:flex;align-items:center;gap:14px;padding:0 20px;font-size:18px;color:var(--page-muted)}
+.searchbox svg{width:22px;height:22px}
+.kbd-note{position:absolute;left:18px;right:18px;bottom:18px;font-size:14px;color:var(--page-muted);text-align:center}
+/* fallback: Google refuses sign-in in the embedded view */
+.blocked{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:0 56px;background:var(--page-bg)}
+.page.is-blocked .blocked{display:flex}
+.blocked h4{font-size:30px;line-height:1.2;font-weight:500;margin:0;font-family:Roboto,Arial,sans-serif}
+.blocked p{font-size:19px;line-height:1.5;color:var(--page-muted);margin:14px 0 0;max-width:36ch;font-family:Roboto,Arial,sans-serif}
+.blocked .cta{margin-top:28px;height:68px;font-size:21px;align-self:flex-start;font-family:Roboto,Arial,sans-serif}
+
+/* ---------- start / nothing playing ---------- */
+.start{display:grid;grid-template-columns:416px 1fr;gap:64px;padding:0 72px;align-items:center}
+.start .np-close{z-index:2}
+.stack{position:relative;width:416px;height:416px}
+.stack .art{position:absolute;width:280px;height:280px;border-radius:18px;box-shadow:0 24px 50px -18px rgba(0,0,0,.6)}
+.stack .a1{left:0;top:96px;transform:rotate(-6deg);opacity:.75}
+.stack .a2{left:136px;top:0;transform:rotate(4deg);opacity:.85}
+.stack .a3{left:96px;top:132px}
+.start h1{font-size:52px;line-height:1.1;font-weight:500;letter-spacing:-.015em;margin:0}
+.start p{font-size:24px;line-height:1.45;color:var(--ash);margin:20px 0 0;max-width:30ch}
+.steps{list-style:none;padding:0;margin:36px 0 0;display:grid;gap:18px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;align-items:baseline;font-size:23px;line-height:1.4}
+.steps li::before{content:counter(s);font-size:19px;color:var(--brass);font-variant-numeric:tabular-nums}
+.steps small{display:block;color:var(--ash);font-size:18px;margin-top:2px}
+.cta{margin-top:40px;display:inline-flex;align-items:center;gap:16px;height:80px;padding:0 36px 0 28px;border-radius:40px;
+  background:var(--paper);color:var(--night);font-size:24px;font-weight:500}
+.cta .yt{width:32px;height:32px}
+.idle .stack .art{filter:saturate(.35) brightness(.7)}
+
+/* ---------- ambient over screensaver ---------- */
+.amb{background:#000;color:#fff}
+.clock{position:absolute;left:72px;top:56px;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+.clock b{display:block;font-size:168px;line-height:1;font-weight:300;letter-spacing:-.03em}
+.clock span{display:block;font-size:28px;margin-top:6px;opacity:.9}
+.card{position:absolute;right:56px;bottom:52px;display:grid;grid-template-columns:120px auto;align-items:center;column-gap:24px;padding:16px;border-radius:28px;
+  transition:background .4s var(--ease),padding .4s var(--ease),box-shadow .4s var(--ease);max-width:620px}
+.card .art{width:120px;height:120px;border-radius:16px;flex:none;box-shadow:0 12px 30px -10px rgba(0,0,0,.6);transition:filter .6s var(--ease)}
+.card-text{min-width:0;text-shadow:0 1px 16px rgba(0,0,0,.45)}
+.card-title{font-size:36px;line-height:1.12;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+.card-artist{font-size:24px;opacity:.82;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+.card-rail{margin-top:14px;height:3px;border-radius:2px;background:rgba(255,255,255,.28);width:280px;position:relative}
+.card-rail i{position:absolute;inset:0 auto 0 0;width:var(--p,30%);background:#fff;border-radius:2px}
+.card-ctl{display:none;grid-column:1/-1;align-items:center;justify-content:space-between;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12)}
+.card-ctl .ctl--more{color:rgba(255,255,255,.8)}
+.card-ctl .ctl{width:80px;height:80px}
+.card-ctl .ctl svg{width:34px;height:34px}
+.card-ctl .ctl--play{width:96px;height:96px;background:#fff;color:#1b1915}
+.card-ctl .ctl--play svg{width:40px;height:40px}
+.amb.paused .card .art{filter:saturate(.5) brightness(.8)}
+.amb.paused .card-rail{display:none}
+/* walk-up: the same card gains a material and transport, nothing else moves */
+.amb.walkup .card{background:rgba(27,25,21,.62);-webkit-backdrop-filter:blur(28px);backdrop-filter:blur(28px);
+  padding:20px 20px 20px 20px;box-shadow:0 30px 60px -24px rgba(0,0,0,.7)}
+.amb.walkup .card-ctl{display:flex}
+.amb.walkup .card-rail{width:100%}
+.amb.walkup .card{width:560px}
+.amb.walkup .card-text{text-shadow:none}
+
+/* ---------- review switcher (not part of the device UI) ---------- */
+.switch{position:fixed;z-index:20;left:50%;bottom:10px;transform:translateX(-50%);display:flex;gap:4px;flex-wrap:wrap;justify-content:center;
+  padding:6px;border-radius:14px;background:rgba(20,18,15,.88);font:13px/1 Roboto,Arial,sans-serif;color:#e8e1d6;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:calc(100vw - 20px)}
+.switch button{padding:9px 12px;border-radius:9px;min-height:34px}
+.switch button[aria-pressed=true]{background:#e8e1d6;color:#1b1915}
+.switch .sep{width:1px;background:#4a453b;margin:4px 4px}
+.clean .switch{display:none}
+.clean *{transition:none!important}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.np.is-blocked .tabs{opacity:.35;pointer-events:none}

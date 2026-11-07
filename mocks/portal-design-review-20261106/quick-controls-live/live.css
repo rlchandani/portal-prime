@@ -1,0 +1,163 @@
+/* Quick controls live prototype. home.css is the faithful current-Home recreation (copied
+ * from widget-gallery-v2). This file adds: page chrome (CSS px) and, inside .device (dp),
+ * the Quick controls widget, Home Assistant widget, settings shell, landings, editor. */
+
+/* ---------- page chrome ---------- */
+body { min-height: 100vh; }
+.explain { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: 18px 24px 14px; }
+.explain p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--secondary); max-width: 52ch; }
+.explain b { color: var(--text); font-weight: 600; }
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; padding: 0 24px 24px; align-items: start; }
+.frame { position: relative; overflow: hidden; border-radius: 10px; }
+.frame > .device { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+
+.sim { background: #1a1c21; border-radius: 14px; padding: 16px 18px 18px; font-size: 14px; line-height: 1.4; border: 1px dashed #4a4d55; }
+.sim h2 { font-size: 13px; font-weight: 600; color: #e7e7e7; margin: 16px 0 8px; }
+.sim h2:first-child { margin-top: 0; }
+.sim-note, .sim-hint { color: var(--secondary); margin: 0 0 10px; font-size: 13px; }
+.sw { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; cursor: pointer; }
+.sw input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--green); flex: none; }
+.sw small { display: block; color: var(--secondary); font-size: 12px; }
+.sim-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0 4px; border-top: 1px solid #2a2d33; margin-top: 6px; }
+.sim-row b { font-weight: 500; text-align: right; overflow-wrap: anywhere; }
+.seg2 { display: grid; grid-template-columns: 1fr 1fr; background: #111317; border-radius: 10px; padding: 3px; gap: 3px; }
+.seg2 button { min-height: 36px; border-radius: 8px; background: none; color: var(--secondary); font-size: 13px; }
+.seg2 button[aria-pressed=true] { background: #3a3d44; color: var(--text); }
+.seg2 + .sim-hint { margin-top: 8px; }
+.effect { margin: 0; font-size: 14px; color: var(--text); }
+.effect.flash { animation: flash 900ms ease-out; }
+@keyframes flash { from { color: var(--green); } }
+.try { margin: 0; padding-left: 18px; color: var(--secondary); font-size: 13px; }
+.try li { margin-bottom: 4px; }
+.try i { color: var(--text); font-style: normal; }
+.reset { margin-top: 14px; width: 100%; min-height: 36px; border-radius: 10px; background: #2b2e35; font-size: 13px; }
+
+body.solo { overflow: hidden; }
+body.solo .explain, body.solo .sim { display: none; }
+body.solo .workspace { display: block; padding: 0; }
+body.solo .frame { border-radius: 0; }
+
+@media (max-width: 1000px) {
+  .explain { grid-template-columns: 1fr; gap: 8px; }
+  .workspace { grid-template-columns: 1fr; }
+}
+
+/* buttons inside the device start unstyled (zero specificity so classes win) */
+:where(.device button) { background: none; }
+
+/* ---------- Home grid with Quick controls placed (dp) ---------- */
+.grid.qc-layout { grid-template-columns: repeat(4, 1fr); }
+.card.qc { grid-column: 3; grid-row: 1 / span 2; }
+.card.tap { cursor: pointer; }
+.head .open { cursor: pointer; border-radius: 12px; padding: 6px 0; }
+.head .open.lbl-settings { width: auto; font-size: 18px; font-weight: 400; color: var(--secondary); padding: 6px 4px; }
+.qc-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; }
+.qc-tile { position: relative; display: flex; flex-direction: column; gap: 6px; min-height: 150px; border-radius: 17px; background: var(--chrome); padding: 20px; text-align: left; min-width: 0; }
+.qc-tile:active { background: var(--selected); }
+.qc-tile .ic { width: 32px; height: 32px; }
+.qc-tile .out { position: absolute; right: 18px; top: 20px; width: 24px; height: 24px; color: var(--secondary); }
+.qc-tile b { font-size: 23px; line-height: 30px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qc-tile.ext-wrap b { white-space: normal; }
+.qc-tile span.d { font-size: 20px; line-height: 27px; color: var(--secondary); }
+.qc-empty { font-size: 22px; line-height: 30px; color: var(--secondary); margin-top: 22px; }
+.qc-empty .tbtn { margin-top: 16px; padding-left: 0; }
+.edit-settings { margin-top: auto; min-height: 60px; border-radius: 16px; background: var(--chrome); font-size: 22px; font-weight: 500; }
+.customizing .card:not(.photo) { box-shadow: 0 0 0 3px var(--secondary); }
+.customize.on { background: var(--text); color: var(--bg); border-radius: 30px; min-height: 52px; }
+.pulse { animation: pulse 1100ms ease-out; }
+@keyframes pulse { from { box-shadow: 0 0 0 6px var(--green); } }
+
+/* Home Assistant widget (ImmortalHaWidget) */
+.ha-ent { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.ent { display: flex; align-items: center; gap: 16px; min-height: 64px; padding: 0 18px; border-radius: 16px; background: var(--chrome); text-align: left; }
+.ent .ic { width: 28px; height: 28px; color: var(--secondary); }
+.ent.on .ic { color: var(--sun); }
+.ent b { flex: 1; font-size: 22px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ent em { font-style: normal; font-size: 20px; color: var(--secondary); }
+.ent.on em { color: var(--text); }
+
+/* ---------- Settings shell (dp) ---------- */
+.st { position: absolute; inset: 0; background: var(--bg); }
+.st-top { height: 104px; display: flex; align-items: center; padding: 0 56px; border-bottom: 1px solid var(--divider); }
+.st-top button { background: none; font-size: 24px; min-height: 68px; display: flex; align-items: center; gap: 10px; padding: 0 12px; }
+.st-top .ic { width: 30px; height: 30px; }
+.st-panes { display: grid; grid-template-columns: 368px 1fr; height: 1176px; }
+.st-side { background: var(--bg); border-right: 1px solid var(--divider); padding: 34px 24px; }
+.st-side h1 { margin: 0 12px 28px; font-size: 40px; font-weight: 500; }
+.st-side nav { display: flex; flex-direction: column; gap: 8px; }
+.st-side nav button { display: flex; align-items: center; gap: 14px; min-height: 76px; padding: 0 12px; border-radius: 12px; background: none; font-size: 22px; text-align: left; }
+.st-side nav button[aria-current=true] { background: var(--selected); }
+.cat { width: 42px; height: 42px; border-radius: 11px; background: #527ab0; display: grid; place-items: center; color: #fff; flex: none; }
+.cat .ic { width: 26px; height: 26px; }
+.st-detail { padding: 40px 48px 0; overflow: hidden; }
+.st-head { display: flex; align-items: center; gap: 24px; }
+.hist { display: flex; background: var(--chrome); border: 1px solid var(--divider); border-radius: 50px; padding: 5px 8px; }
+.hist button { width: 66px; height: 62px; display: grid; place-items: center; background: none; border-radius: 32px; }
+.hist button:disabled { opacity: .3; cursor: default; }
+.hist .ic { width: 28px; height: 28px; }
+.st-head h2 { font-size: 38px; font-weight: 500; margin: 0; }
+.st-sub { font-size: 23px; color: var(--secondary); margin: 14px 0 30px; max-width: 70ch; line-height: 1.45; }
+.st-sub b { color: var(--text); font-weight: 500; }
+.sec { font-size: 22px; color: var(--secondary); margin: 0 6px 12px; font-weight: 400; }
+.rows { background: var(--card); border: 1px solid var(--divider); border-radius: 24px; overflow: hidden; margin-bottom: 26px; }
+.row { display: flex; align-items: center; gap: 24px; width: 100%; min-height: 100px; padding: 22px 28px; background: none; text-align: left; }
+.row + .row { border-top: 1px solid var(--divider); }
+button.row:active { background: var(--chrome); }
+.row .t { flex: 1; min-width: 0; }
+.row .t b { display: block; font-size: 26px; font-weight: 500; }
+.row .t span { display: block; font-size: 20px; color: var(--secondary); margin-top: 6px; line-height: 1.4; }
+.row .v { font-size: 23px; color: var(--secondary); text-align: right; max-width: 46%; overflow-wrap: anywhere; }
+.row .v.in { color: var(--green); }
+.row .chev { width: 28px; height: 28px; color: var(--secondary); }
+.row.static { cursor: default; }
+.knob { width: 64px; height: 38px; border-radius: 20px; background: var(--chrome); border: 1px solid var(--divider); position: relative; flex: none; }
+.knob::after { content: ""; position: absolute; top: 4px; left: 4px; width: 28px; height: 28px; border-radius: 50%; background: #fff; }
+.knob.on { background: var(--green); } .knob.on::after { left: 30px; }
+.banner { display: flex; gap: 18px; align-items: flex-start; padding: 22px 28px; border-radius: 20px; background: rgba(242,178,51,.12); border: 1px dashed #f2b233; font-size: 21px; line-height: 1.45; margin-bottom: 26px; max-width: 1100px; }
+.banner b { color: #f2c35a; font-weight: 600; }
+.qc-setup { display: grid; grid-template-columns: 434px minmax(0, 1fr); gap: 40px; align-items: start; }
+.qc-setup .card.qc { height: 697px; }
+.qc-setup figcaption { font-size: 20px; color: var(--secondary); margin: 14px 4px 0; line-height: 1.4; }
+.qc-setup figure { margin: 0; }
+
+/* ---------- Landing screens (dp) ---------- */
+.land { position: absolute; inset: 0; background: var(--bg); display: flex; flex-direction: column; }
+.land-top { height: 104px; display: flex; align-items: center; gap: 24px; padding: 0 56px; border-bottom: 1px solid var(--divider); }
+.land-top button { font-size: 24px; min-height: 68px; display: flex; align-items: center; gap: 10px; padding: 0 12px; background: none; }
+.land-top .ic { width: 30px; height: 30px; }
+.simtag { margin-left: auto; font-size: 20px; color: #f2c35a; border: 2px dashed #f2b233; border-radius: 30px; padding: 8px 20px; }
+.land-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 200px; }
+.land-body h2 { font-size: 54px; font-weight: 600; margin: 34px 0 16px; letter-spacing: -.01em; }
+.land-body p { font-size: 26px; line-height: 1.5; color: var(--secondary); margin: 0 0 12px; max-width: 64ch; }
+.land-body p b { color: var(--text); font-weight: 500; }
+.orb { width: 200px; height: 200px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(#ffb340, #ff8a00); color: #fff; animation: orb 1.8s ease-in-out infinite; }
+.orb .ic { width: 90px; height: 90px; }
+@keyframes orb { 50% { box-shadow: 0 0 0 36px rgba(255,160,40,.15); } }
+.appicon { width: 200px; height: 200px; border-radius: 48px; display: grid; place-items: center; background: linear-gradient(#41bdf5, #1a8ad1); color: #fff; }
+.appicon .ic { width: 110px; height: 110px; }
+.browser { width: 1400px; border-radius: 24px; overflow: hidden; border: 1px solid var(--divider); background: var(--card); text-align: left; }
+.browser .url { display: flex; align-items: center; gap: 16px; height: 76px; padding: 0 28px; background: var(--chrome); font-size: 22px; color: var(--secondary); }
+.browser .url .ic { width: 26px; height: 26px; }
+.browser .page { padding: 34px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.browser .page div { height: 150px; border-radius: 18px; background: #1d2a33; padding: 22px; font-size: 22px; color: #cfe7f7; }
+.apps-grid { display: grid; grid-template-columns: repeat(2, 560px); gap: 22px; margin: 34px 0 24px; }
+.app-card { display: flex; align-items: center; gap: 22px; padding: 22px 26px; border-radius: 22px; background: var(--card); border: 1px solid var(--divider); text-align: left; }
+.app-card .app { width: 72px; height: 72px; border-radius: 18px; display: grid; place-items: center; color: #fff; flex: none; }
+.app-card .app .ic { width: 40px; height: 40px; }
+.app-card b { flex: 1; font-size: 26px; font-weight: 500; }
+.app-card .pillbtn { min-height: 56px; padding: 0 26px; border-radius: 28px; background: var(--chrome); font-size: 21px; font-weight: 500; }
+.app-card .pillbtn.inst { background: var(--text); color: var(--bg); }
+.dock.land-dock { position: absolute; }
+
+/* ---------- Dashboard address editor (dp) ---------- */
+.scrim-modal { position: absolute; inset: 0; background: rgba(0,0,0,.6); display: grid; place-items: center; }
+.editor { width: 960px; background: var(--card); border: 1px solid var(--divider); border-radius: 28px; padding: 40px; }
+.editor h3 { font-size: 34px; font-weight: 500; margin: 0 0 12px; }
+.editor p { font-size: 22px; color: var(--secondary); margin: 0 0 22px; line-height: 1.45; }
+.editor input { width: 100%; height: 76px; border-radius: 16px; border: 1px solid var(--divider); background: var(--bg); color: var(--text); font: inherit; font-size: 26px; padding: 0 22px; }
+.editor .err { color: #ff7a80; font-size: 21px; min-height: 32px; margin: 12px 0 0; }
+.editor .fill { background: none; color: var(--secondary); font-size: 20px; padding: 6px 0; text-decoration: underline; text-underline-offset: 6px; }
+.editor .acts { display: flex; gap: 16px; margin-top: 18px; }
+.editor .acts button { flex: 1; min-height: 72px; border-radius: 18px; background: var(--chrome); font-size: 24px; font-weight: 500; }
+.editor .acts .primary { background: var(--text); color: var(--bg); }
+.toast { position: absolute; left: 50%; bottom: 140px; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 20px 34px; border-radius: 24px; font-size: 23px; max-width: 1200px; text-align: center; }

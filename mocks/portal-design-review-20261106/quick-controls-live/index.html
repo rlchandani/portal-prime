@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quick controls, live prototype</title>
+  <link rel="stylesheet" href="./home.css">
+  <link rel="stylesheet" href="./live.css">
+</head>
+<body>
+  <header class="explain">
+    <p><b>What it is.</b> Quick controls is a Home widget of big shortcut tiles: Hey Jarvis, plus either your Home Assistant dashboard or the Home Assistant app.</p>
+    <p><b>What setup changes.</b> Nothing on the widget itself. It only reads which apps are installed and whether a dashboard address is saved, then decides which tiles appear.</p>
+    <p><b>End effect on Home.</b> Each tile is a door. It opens Jarvis, the dashboard in the browser, or the Home Assistant app. No tile switches a light by itself.</p>
+  </header>
+
+  <div class="workspace">
+    <div class="frame-wrap" id="frame-wrap">
+      <div class="frame" id="frame"><div class="device" id="device"></div></div>
+    </div>
+
+    <aside class="sim" id="sim" aria-label="Simulated device and review options">
+      <h2>Simulated device</h2>
+      <p class="sim-note">Pretend this Portal has these installed. Nothing here touches a real device.</p>
+      <label class="sw"><input type="checkbox" data-sim="jarvis"><span>Jarvis app installed</span></label>
+      <label class="sw"><input type="checkbox" data-sim="haApp"><span>Home Assistant app installed</span></label>
+      <label class="sw"><input type="checkbox" data-sim="haApi"><span>Home controls connected <small>(server + token, for the separate Home Assistant widget)</small></span></label>
+      <div class="sim-row"><span>Dashboard address</span><b id="sim-url"></b></div>
+      <p class="sim-hint">Change the address on the Portal itself: Settings, then Connections, then Home Assistant dashboard.</p>
+
+      <h2>Where setup lives</h2>
+      <div class="seg2" role="group" aria-label="Setup destinations">
+        <button type="button" data-mode="before">Today</button>
+        <button type="button" data-mode="after">Proposed</button>
+      </div>
+      <p class="sim-hint" id="mode-hint"></p>
+
+      <h2>Home Assistant tiles</h2>
+      <div class="seg2" role="group" aria-label="Home Assistant tiles">
+        <button type="button" data-tiles="current">Current 4 tiles</button>
+        <button type="button" data-tiles="rec">Recommended 1 tile</button>
+      </div>
+
+      <h2>Home shows</h2>
+      <p class="effect" id="effect"></p>
+
+      <h2>Try</h2>
+      <ol class="try">
+        <li>Tap a tile on Home and see what really happens.</li>
+        <li>Tap <i>Settings</i> on the Quick controls card.</li>
+        <li>Tap <i>Customize</i>, then <i>Settings</i> on the card.</li>
+        <li>Save a dashboard address and go back Home.</li>
+      </ol>
+      <button type="button" class="reset" id="reset">Reset example</button>
+    </aside>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

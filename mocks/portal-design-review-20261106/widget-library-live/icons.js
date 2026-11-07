@@ -1,0 +1,47 @@
+// Shared icon set (stroke icons on a 48 grid). Sample mock only.
+'use strict';
+const svgIcon = (body, fill = false) =>
+  `<svg viewBox="0 0 48 48" fill="${fill ? 'currentColor' : 'none'}" stroke="${fill ? 'none' : 'currentColor'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+
+const ICONS = {
+  frame: svgIcon('<rect x="13" y="9" width="27" height="22" rx="3"/><path d="M8 16v19a3 3 0 0 0 3 3h22"/><path d="M17 27l6-6 5 4 4-3 5 5"/>'),
+  wifi: svgIcon('<path d="M6 19a26 26 0 0 1 36 0M12 26a17 17 0 0 1 24 0M18 33a8 8 0 0 1 12 0"/><circle cx="24" cy="39" r="1.5" fill="currentColor"/>'),
+  phone: svgIcon('<rect x="15" y="6" width="18" height="36" rx="4"/><path d="M22 36h4"/>'),
+  sleep: svgIcon('<path d="M36 30A14 14 0 0 1 18 12a14 14 0 1 0 18 18z"/><path d="M28 9h7l-7 8h7"/>'),
+  sun: svgIcon('<circle cx="24" cy="24" r="7"/><path d="M24 6v4M24 38v4M6 24h4M38 24h4M11.3 11.3l2.8 2.8M33.9 33.9l2.8 2.8M11.3 36.7l2.8-2.8M33.9 14.1l2.8-2.8"/>'),
+  music: svgIcon('<path d="M19 35V11l18-4v24"/><circle cx="14" cy="35" r="5"/><circle cx="32" cy="31" r="5"/>'),
+  search: svgIcon('<circle cx="21" cy="21" r="12"/><path d="M30 30l10 10"/>'),
+  gear: svgIcon('<path d="M20.5 5h7l1.2 5.6 3.9 2.2 5.4-1.8 3.5 6-4.2 3.8v4.4l4.2 3.8-3.5 6-5.4-1.8-3.9 2.2L27.5 43h-7l-1.2-5.6-3.9-2.2-5.4 1.8-3.5-6 4.2-3.8v-4.4L6.5 17l3.5-6 5.4 1.8 3.9-2.2zM24 30a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/>', true),
+  home: svgIcon('<path d="M8 22L24 9l16 13v17a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2z"/>'),
+  cal: svgIcon('<rect x="7" y="10" width="34" height="31" rx="4"/><path d="M7 19h34M16 6v8M32 6v8"/>'),
+  cloud: svgIcon('<path d="M15 38h20a9 9 0 0 0 1.2-17.9A12 12 0 0 0 13 22a8 8 0 0 0 2 16z"/>', true),
+  cloudo: svgIcon('<path d="M15 38h20a9 9 0 0 0 1.2-17.9A12 12 0 0 0 13 22a8 8 0 0 0 2 16z"/>'),
+  apps: svgIcon('<g fill="currentColor" stroke="none"><circle cx="12" cy="12" r="3"/><circle cx="24" cy="12" r="3"/><circle cx="36" cy="12" r="3"/><circle cx="12" cy="24" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="36" cy="24" r="3"/><circle cx="12" cy="36" r="3"/><circle cx="24" cy="36" r="3"/><circle cx="36" cy="36" r="3"/></g>'),
+  grid: svgIcon('<rect x="8" y="8" width="13" height="13" rx="3"/><rect x="27" y="8" width="13" height="13" rx="3"/><rect x="8" y="27" width="13" height="13" rx="3"/><rect x="27" y="27" width="13" height="13" rx="3"/>'),
+  tools: svgIcon('<path d="M29 9a9 9 0 0 0-8.6 11.7L9 32a4.2 4.2 0 0 0 6 6l11.3-11.4A9 9 0 0 0 38 18l-6 2-4-4 2-6z"/>'),
+  bug: svgIcon('<rect x="15" y="15" width="18" height="24" rx="9"/><path d="M19 15a5 5 0 0 1 10 0M24 21v18M8 22h7M33 22h7M8 32h7M33 32h7M10 12l6 4M38 12l-6 4"/>'),
+  call: svgIcon('<path d="M15 7l5 9-3.5 3.5a22 22 0 0 0 12 12L32 28l9 5-2 6c-14 2-32-16-30-30z"/>', true),
+  globe: svgIcon('<circle cx="24" cy="24" r="16"/><path d="M8 24h32M24 8c-8 9-8 23 0 32M24 8c8 9 8 23 0 32"/>'),
+  mic: svgIcon('<rect x="18" y="7" width="12" height="22" rx="6"/><path d="M11 23a13 13 0 0 0 26 0M24 36v6"/>'),
+  folder: svgIcon('<path d="M6 13a3 3 0 0 1 3-3h10l4 5h16a3 3 0 0 1 3 3v18a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/>'),
+  radio: svgIcon('<rect x="6" y="15" width="36" height="25" rx="4"/><path d="M14 15L33 7"/><circle cx="31" cy="28" r="5"/><path d="M12 24h8M12 31h8"/>'),
+  clock: svgIcon('<circle cx="24" cy="24" r="17"/><path d="M24 14v10l7 5"/>'),
+  timer: svgIcon('<circle cx="24" cy="27" r="15"/><path d="M24 27v-8M19 6h10M24 6v6"/>'),
+  alarm: svgIcon('<circle cx="24" cy="26" r="14"/><path d="M24 18v8l5 3M8 12l6-5M40 12l-6-5"/>'),
+  coin: svgIcon('<circle cx="24" cy="24" r="17"/><path d="M20 15h7a4.5 4.5 0 0 1 0 9h-7zM20 24h8a4.5 4.5 0 0 1 0 9h-8zM20 12v24M25 12v3M25 33v3"/>'),
+  check: svgIcon('<rect x="8" y="8" width="32" height="32" rx="7"/><path d="M16 24l6 6 11-12"/>'),
+  news: svgIcon('<rect x="7" y="9" width="34" height="30" rx="4"/><path d="M14 17h20M14 24h9M14 31h9M28 24h6v7h-6z"/>'),
+  chart: svgIcon('<path d="M7 39h34M10 32l9-10 7 6 13-15"/><path d="M31 13h8v8"/>'),
+  sliders: svgIcon('<path d="M8 14h20M36 14h4M8 24h6M22 24h18M8 34h22M38 34h2"/><circle cx="32" cy="14" r="4"/><circle cx="18" cy="24" r="4"/><circle cx="34" cy="34" r="4"/>'),
+  bolt: svgIcon('<path d="M27 5L10 27h12l-3 16 19-23H26z"/>'),
+  photo: svgIcon('<rect x="7" y="10" width="34" height="28" rx="4"/><circle cx="17" cy="20" r="3.5"/><path d="M7 33l10-9 8 7 6-5 10 8"/>'),
+  back: svgIcon('<path d="M28 10L14 24l14 14"/>'),
+  bulb: svgIcon('<path d="M17 30a12 12 0 1 1 14 0v5H17zM19 41h10"/>'),
+  thermo: svgIcon('<path d="M20 8a4 4 0 0 1 8 0v20a8 8 0 1 1-8 0z"/><path d="M24 20v12"/>'),
+  film: svgIcon('<rect x="7" y="10" width="34" height="28" rx="4"/><path d="M15 10v28M33 10v28M7 19h8M7 29h8M33 19h8M33 29h8"/>'),
+  pause: svgIcon('<path d="M18 13v22M30 13v22"/>'),
+  plus: svgIcon('<path d="M24 10v28M10 24h28"/>'),
+  resize: svgIcon('<path d="M40 22v18H22M40 40L26 26M16 8H8v8"/>'),
+  chev: svgIcon('<path d="M19 12l12 12-12 12"/>'),
+};
+const icon = (name, cls = '') => `<span class="ic ${cls}">${ICONS[name] || ''}</span>`;
