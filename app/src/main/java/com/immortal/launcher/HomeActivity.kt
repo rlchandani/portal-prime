@@ -1008,7 +1008,6 @@ private fun ApprovedHomePagedWidgets(
     onChanged: HomeWidgetChange,
     onEnterEdit: () -> Unit,
     onAddWidget: () -> Unit,
-    onAllApps: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
   var pageIndex by remember { mutableStateOf(0) }
@@ -1025,16 +1024,20 @@ private fun ApprovedHomePagedWidgets(
         onEnterEdit = onEnterEdit, onPageChanged = changePage, navigation = navigation,
         preserveCounterFocus = counterFocused,
         modifier = Modifier.weight(1f).fillMaxWidth())
-    // One slim row between widgets and favorites: page dots centred, actions at the edges. The old
-    // separate dots row + "Favorite apps" heading row left ~60px of air on device (Home v2 space).
-    Box(Modifier.fillMaxWidth().padding(top = 4.dp).height(if (compact) 40.dp else 44.dp)) {
-      if (editMode) ApprovedHomeTextButton("Add widget", modifier = Modifier.align(Alignment.CenterStart),
-          onClick = onAddWidget)
-      if (HomeRefinements.showsPageIndicator(page.count)) {
-        ApprovedWidgetPageIndicator(page.index, page.count, changePage,
-            onFocusChanged = { counterFocused = it }, modifier = Modifier.align(Alignment.Center))
+    // A slim row under the widgets for page dots (and Add widget while customizing). No heading or
+    // "All apps" — the dock's Apps tab already does that. The row is omitted when it would be empty.
+    val showDots = HomeRefinements.showsPageIndicator(page.count)
+    if (showDots || editMode) {
+      Box(Modifier.fillMaxWidth().padding(top = 4.dp).height(40.dp)) {
+        if (editMode) ApprovedHomeTextButton("Add widget", modifier = Modifier.align(Alignment.CenterStart),
+            onClick = onAddWidget)
+        if (showDots) {
+          ApprovedWidgetPageIndicator(page.index, page.count, changePage,
+              onFocusChanged = { counterFocused = it }, modifier = Modifier.align(Alignment.Center))
+        }
       }
-      ApprovedHomeTextButton("All apps", modifier = Modifier.align(Alignment.CenterEnd), onClick = onAllApps)
+    } else {
+      Spacer(Modifier.height(10.dp))
     }
   }
 }
@@ -1347,7 +1350,6 @@ private fun LauncherScreen(
             }
             ApprovedHomePagedWidgets(homeWidgets, editMode, connected == false, host, manager, saveWidgets,
                 onEnterEdit = { editMode = true }, onAddWidget = { showLibrary = true },
-                onAllApps = { onSelectTab(ApprovedLauncherTab.APPS) },
                 modifier = Modifier.weight(1f).fillMaxWidth())
             Spacer(Modifier.height(6.dp))
             // Slimmer favorites strip (approved Home v2, change 7): 88 → 72dp, icons 56 → 46dp.
