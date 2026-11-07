@@ -107,7 +107,9 @@ class RemoteRoutes internal constructor(
                 SettingsRegistry.schemaJson(context, SettingsRegistry.domains, includeInactive = true)))
           }
         }
-        // Feature-owned routes (household, dinner, routines, share, list) authenticate via companion.
+        // Portal↔Portal list exchange: authenticated by a HouseholdKey HMAC, not a phone session.
+        HouseholdListPeerRoute.PATH -> HouseholdListPeerRoute.handle(context, req)
+        // Feature-owned /remote/<name> routes go through the paired-session checks first.
         else -> if (RemoteFeatureRoutes.lookup(req.path) != null) companion.handle(req) else json(404, err("not_found"))
       }
     } catch (_: RemoteCompanionStoreUnavailable) {
