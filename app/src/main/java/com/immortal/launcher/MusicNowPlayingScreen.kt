@@ -101,13 +101,16 @@ fun MusicPlayerScreen(
     onClose: () -> Unit,
     hasEverSeenSession: Boolean,
     modifier: Modifier = Modifier,
+    /** The embedded page is open: idle states show it beside a short hint instead of full-width. */
+    paneOpen: Boolean = false,
 ) {
   val np = rememberNowPlaying()
   val screen = MusicNowPlayingPresentation.screenState(np, hasEverSeenSession)
   Box(modifier.fillMaxSize().background(ApprovedHomePalette.Background)) {
     when (screen) {
-      MusicScreenState.FIRST_RUN -> MusicStartState(firstRun = true, onOpenYouTubeMusic)
-      MusicScreenState.NOTHING_PLAYING -> MusicStartState(firstRun = false, onOpenYouTubeMusic)
+      MusicScreenState.FIRST_RUN, MusicScreenState.NOTHING_PLAYING ->
+        if (paneOpen && rightPane != null) MusicSplitIdle(rightPane)
+        else MusicStartState(firstRun = screen == MusicScreenState.FIRST_RUN, onOpenYouTubeMusic)
       MusicScreenState.PLAYING, MusicScreenState.PAUSED -> if (np != null) {
         MusicSplit(np, roomName, rightPane, onOpenYouTubeMusic)
       }
@@ -181,6 +184,26 @@ private fun MusicSplit(
       val shape = RoundedCornerShape(PaneRadius)
       Box(Modifier.fillMaxSize().clip(shape).background(ApprovedHomePalette.Card)) {
         if (rightPane != null) rightPane() else RightPanePlaceholder(onOpenYouTubeMusic)
+      }
+    }
+  }
+}
+
+/** Page open, nothing playing yet: the page on the right, one quiet instruction on the left. */
+@Composable
+private fun MusicSplitIdle(rightPane: @Composable () -> Unit) {
+  Row(Modifier.fillMaxSize()) {
+    Column(Modifier.weight(LEFT_WEIGHT).fillMaxHeight().padding(horizontal = 56.dp),
+        verticalArrangement = Arrangement.Center) {
+      Text("Choose something to play", color = ApprovedHomePalette.Text, fontSize = 40.sp,
+          lineHeight = 48.sp, fontWeight = FontWeight.Medium)
+      Text("Sign in on the right if YouTube Music asks. What plays shows up here and on the photo frame.",
+          color = ApprovedHomePalette.Secondary, fontSize = 24.sp, lineHeight = 34.sp,
+          modifier = Modifier.padding(top = 16.dp))
+    }
+    Box(Modifier.weight(RIGHT_WEIGHT).fillMaxHeight().padding(24.dp)) {
+      Box(Modifier.fillMaxSize().clip(RoundedCornerShape(PaneRadius)).background(ApprovedHomePalette.Card)) {
+        rightPane()
       }
     }
   }

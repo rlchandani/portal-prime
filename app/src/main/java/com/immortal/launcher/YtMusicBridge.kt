@@ -29,6 +29,7 @@ internal class YtMusicBridge(private val webView: WebView) : MusicTransport {
   private companion object {
     const val TAG = "ImmortalYtMusicBridge"
     const val SINK_NAME = "portalYtMusic"
+    const val DIAGNOSTIC_INTERVAL_MS = 15_000L
     const val ASSET = "ytmusic/bridge.js"
     /** Kotlin-side floor between handled messages; the script already coalesces. */
     const val MIN_MESSAGE_INTERVAL_MS = 150L
@@ -70,6 +71,8 @@ internal class YtMusicBridge(private val webView: WebView) : MusicTransport {
         WebViewCompat.addDocumentStartJavaScript(webView, source, ALLOWED_ORIGINS)
       }.onFailure { Log.w(TAG, "document-start injection unavailable", it) }.getOrNull()
     }
+    Log.i(TAG, "installed listener=${WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)} " +
+        "documentStart=${documentStart != null}")
   }
 
   /** Called on every top-level navigation (including in-app history changes). */
@@ -134,11 +137,20 @@ internal class YtMusicBridge(private val webView: WebView) : MusicTransport {
     }
   }
 
+  private var lastDiagnosticAt = -DIAGNOSTIC_INTERVAL_MS
+
   private fun handle(raw: String) {
     if (released) return
     val now = SystemClock.elapsedRealtime()
     lastHandledAt = now
     val next = YtMusicBridgeParser.parse(raw, now)
+    // Rate-limited field diagnostics: shows whether page messages arrive and how they parse,
+    // without logging track text (only lengths/flags).
+    if (now - lastDiagnosticAt > DIAGNOSTIC_INTERVAL_MS) {
+      lastDiagnosticAt = now
+      Log.i(TAG, "message chars=${raw.length} parsed=${next != null} active=${next?.active} " +
+          "state=${next?.state} titleChars=${next?.title?.length ?: 0} sample=${raw.take(160).replace(Regex("\"(t|title|a|artist|al|album)\":\"[^\"]*\""), "\"$1\":\"…\"")}")
+    }
     if (next == null) {
       if (last != null) { last = null; clearPublished() }
       return

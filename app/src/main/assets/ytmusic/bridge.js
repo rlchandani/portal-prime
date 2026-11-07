@@ -25,14 +25,27 @@
   var SEL = {
     media: ['#movie_player video', 'video.html5-main-video', 'video', 'audio'],
     bar: 'ytmusic-player-bar',
-    barTitle: ['ytmusic-player-bar .title', 'ytmusic-player-bar yt-formatted-string.title'],
-    barArtist: ['ytmusic-player-bar .byline a', 'ytmusic-player-bar .byline'],
-    barArt: ['ytmusic-player-bar img.image', 'ytmusic-player-bar .thumbnail-image-wrapper img'],
-    next: ['ytmusic-player-bar .next-button', 'ytmusic-player-bar [aria-label="Next"]',
+    // Current layout seen on a Portal WebView (2026-11-07): ytmusic-miniplayer + track-info +
+    // ytmusic-wiz-player-controls. The older ytmusic-player-bar selectors stay as fallbacks.
+    // The selected queue item names the real song even while an ad plays (the mini player then
+    // reads "Video will play after ad"), so it comes first.
+    barTitle: ['ytmusic-player-queue-item[selected] .song-title',
+      'ytmusic-miniplayer ytmusic-track-info span.ytAttributedStringHost',
+      'ytmusic-player-bar .title', 'ytmusic-player-bar yt-formatted-string.title'],
+    barLinks: ['ytmusic-miniplayer ytmusic-track-info a'],
+    barArtistLink: ['ytmusic-player-bar .byline a'],
+    barByline: ['ytmusic-player-queue-item[selected] .byline', 'ytmusic-player-bar .byline'],
+    barArt: ['ytmusic-miniplayer img.ytmusicTrackInfoThumbnail', 'ytmusic-player-queue-item[selected] img',
+      'ytmusic-player-bar img.image', 'ytmusic-player-bar .thumbnail-image-wrapper img'],
+    next: ['ytmusic-wiz-player-controls button[aria-label="Next"]',
+      'ytmusic-player-bar .next-button', 'ytmusic-player-bar [aria-label="Next"]',
       'ytmusic-player-bar [title="Next"]'],
-    previous: ['ytmusic-player-bar .previous-button', 'ytmusic-player-bar [aria-label="Previous"]',
+    previous: ['ytmusic-wiz-player-controls button[aria-label="Previous"]',
+      'ytmusic-player-bar .previous-button', 'ytmusic-player-bar [aria-label="Previous"]',
       'ytmusic-player-bar [title="Previous"]'],
-    playPause: ['ytmusic-player-bar #play-pause-button', 'ytmusic-player-bar .play-pause-button'],
+    playPause: ['ytmusic-wiz-player-controls button[aria-label="Pause"]',
+      'ytmusic-wiz-player-controls button[aria-label="Play"]',
+      'ytmusic-player-bar #play-pause-button', 'ytmusic-player-bar .play-pause-button'],
     playerPageOpen: ['ytmusic-app-layout[player-page-open]', 'ytmusic-app-layout[player-page-open_]'],
     playerPageToggle: ['ytmusic-player-bar .toggle-player-page-button',
       'ytmusic-player-bar [aria-label="Open player page"]', 'ytmusic-player-bar .middle-controls'],
@@ -52,6 +65,31 @@
       try { var el = document.querySelector(list[i]); if (el) return el; } catch (e) {}
     }
     return null;
+  }
+  // The player bar holds several .title/.byline nodes, some empty; take the first with content.
+  function firstText(list, max) {
+    for (var i = 0; i < list.length; i++) {
+      try {
+        var all = document.querySelectorAll(list[i]);
+        for (var j = 0; j < all.length; j++) {
+          var text = str(all[j].textContent, max);
+          if (text) return text;
+        }
+      } catch (e) {}
+    }
+    return '';
+  }
+  function firstImage(list) {
+    for (var i = 0; i < list.length; i++) {
+      try {
+        var all = document.querySelectorAll(list[i]);
+        for (var j = 0; j < all.length; j++) {
+          var src = httpsUrl(all[j].src);
+          if (src) return src;
+        }
+      } catch (e) {}
+    }
+    return '';
   }
   function clickFirst(list) {
     var el = first(list);
@@ -102,9 +140,27 @@
       var list = md && md.artwork;
       if (list && list.length) art = httpsUrl(list[list.length - 1].src);
     } catch (e) {}
-    if (!title) { var t = first(SEL.barTitle); title = t ? str(t.textContent, MAX_TEXT) : ''; }
-    if (!artist) { var a = first(SEL.barArtist); artist = a ? str(a.textContent, MAX_TEXT) : ''; }
-    if (!art) { var i = first(SEL.barArt); art = i ? httpsUrl(i.src) : ''; }
+    // Android WebView has no Media Session API, so YouTube Music never sets metadata there:
+    // the player bar is the real source on a Portal.
+    if (!title) title = firstText(SEL.barTitle, MAX_TEXT);
+    if (!artist || !album) {
+      // Mini player track info: first link = artist, second = album.
+      try {
+        var links = [];
+        for (var k = 0; k < SEL.barLinks.length && !links.length; k++) {
+          links = document.querySelectorAll(SEL.barLinks[k]);
+        }
+        if (!artist && links[0]) artist = str(links[0].textContent, MAX_TEXT);
+        if (!album && links[1]) album = str(links[1].textContent, MAX_TEXT);
+      } catch (e) {}
+    }
+    if (!artist || !album) {
+      // Byline reads "Artist • Album • Year"; the first link is the artist.
+      var byline = firstText(SEL.barByline, MAX_TEXT).split(' \u2022 ');
+      if (!artist) artist = firstText(SEL.barArtistLink, MAX_TEXT) || str(byline[0] || '', MAX_TEXT);
+      if (!album && byline.length > 2) album = str(byline[1], MAX_TEXT);
+    }
+    if (!art) art = firstImage(SEL.barArt);
     var state = 'none';
     if (el && title) state = el.ended ? 'ended' : (el.paused ? 'paused' : 'playing');
     return { v: 1, t: title, a: artist, al: album, art: art,
