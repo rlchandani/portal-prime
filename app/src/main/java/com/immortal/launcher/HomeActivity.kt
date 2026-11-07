@@ -3285,7 +3285,14 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
       add(QC("ha", "Home", "Open Home Assistant") { launch(haPackage.orEmpty()) })
     }
   }
-  if (showDinner) DinnerCallSheet(onDismiss = { showDinner = false })
+  // The sheet is full-screen: host it in its own window, not inside this widget's card bounds.
+  if (showDinner) {
+    androidx.compose.ui.window.Dialog(onDismissRequest = { showDinner = false },
+        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false)) {
+      Box(Modifier.fillMaxSize()) { DinnerCallSheet(onDismiss = { showDinner = false }) }
+    }
+  }
   ImmortalWidgetShell(title = "Quick controls", openPage = "display", modifier = modifier) {
     if (tiles.isEmpty()) {
       Text("Add an assistant or Home Assistant app to use quick controls.",
