@@ -43,14 +43,13 @@ class ApprovedWidgetPageGeometryTest {
     assertEquals(before, HomePresentation.spans(listOfNotNull(after.hero) + after.widgets))
   }
 
-  @Test fun resizedPhoto_usesItsRequestedDimensionsOnBothPages() {
+  @Test fun resizedPhoto_usesItsRequestedDimensionsOnTheFirstPage_andIsAbsentLater() {
     val widgets = listOf(widget("photo", HomeWidgetStore.KIND_PHOTO_MEMORY, x = 1, y = 3)) +
         (0..7).map { widget("w$it") }
-    repeat(2) { index ->
-      val page = HomePresentation.page(widgets, index)
-      assertEquals(ApprovedWidgetPacking.Span(1, 3),
-          HomePresentation.spans(listOfNotNull(page.hero) + page.widgets).first())
-    }
+    val first = HomePresentation.page(widgets, 0)
+    assertEquals(ApprovedWidgetPacking.Span(1, 3),
+        HomePresentation.spans(listOfNotNull(first.hero) + first.widgets).first())
+    assertNull(HomePresentation.page(widgets, 1).hero)
   }
 
   @Test fun explicitSizeMatchingLegacyDefault_isHonoredWithoutResizingNeighbors() {
@@ -89,14 +88,14 @@ class ApprovedWidgetPageGeometryTest {
     assertEquals(widgets.map { it.key }.toSet(), visible.map { it.key }.toSet())
   }
 
-  @Test fun sharedPhoto_preservesSavedRelativeOrderOnEveryPage() {
+  @Test fun photoPage_preservesSavedRelativeOrder_andPhotoShowsOnlyOnFirstPage() {
     val photo = widget("photo", HomeWidgetStore.KIND_PHOTO_MEMORY, y = 1)
     val widgets = (0..7).map { widget("w$it") }.toMutableList().apply { add(3, photo) }
     repeat(2) { index ->
       val visible = HomePresentation.pageWidgets(widgets, HomePresentation.page(widgets, index))
       val selectedKeys = visible.map { it.key }.toSet()
       assertEquals(widgets.filter { it.key in selectedKeys }.map { it.key }, visible.map { it.key })
-      assertEquals(1, visible.count { it.key == photo.key })
+      assertEquals(if (index == 0) 1 else 0, visible.count { it.key == photo.key })
     }
   }
 }

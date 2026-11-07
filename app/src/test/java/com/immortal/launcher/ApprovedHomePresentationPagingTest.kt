@@ -21,9 +21,41 @@ class ApprovedHomePresentationPagingTest {
     val second = HomePresentation.page(configured, 1)
     assertEquals(2, first.count)
     assertSame(photo, first.hero)
-    assertSame(photo, second.hero)
+    // The photo is the first page's hero only; later pages use the whole grid (2026-11-06).
+    assertNull(second.hero)
     assertEquals(widgets, first.widgets + second.widgets)
     assertEquals(configured, widgets.take(2) + photo + widgets.drop(2))
+  }
+
+  @Test fun photoHero_appearsOnFirstPageOnly_andLaterPagesHoldEight() {
+    val photo = widget("photo", HomeWidgetStore.KIND_PHOTO_MEMORY)
+    val others = (0..11).map { widget("id$it") }
+    val configured = listOf(photo) + others
+    val first = HomePresentation.page(configured, 0)
+    val second = HomePresentation.page(configured, 1)
+    assertEquals(2, first.count)
+    assertSame(photo, first.hero)
+    assertEquals(others.take(4), first.widgets)
+    assertNull(second.hero)
+    assertEquals(others.drop(4), second.widgets)
+  }
+
+  @Test fun photoHero_thirdPageStartsAfterFourPlusEight() {
+    val configured = listOf(widget("photo", HomeWidgetStore.KIND_PHOTO_MEMORY)) + (0..12).map { widget("id$it") }
+    assertEquals(3, HomePresentation.page(configured, 0).count)
+    assertEquals(listOf("id12"), HomePresentation.page(configured, 2).widgets.map { it.customId })
+    assertNull(HomePresentation.page(configured, 2).hero)
+  }
+
+  @Test fun photoHero_withFourOrFewerOthers_staysOnePage() {
+    val configured = listOf(widget("photo", HomeWidgetStore.KIND_PHOTO_MEMORY)) + (0..3).map { widget("id$it") }
+    assertEquals(1, HomePresentation.page(configured, 0).count)
+  }
+
+  @Test fun withoutPhoto_pagingIsUnchanged_fourPerPage() {
+    val widgets = (0..8).map { widget("id$it") }
+    assertEquals(3, HomePresentation.page(widgets, 0).count)
+    assertEquals(widgets.drop(4).take(4), HomePresentation.page(widgets, 1).widgets)
   }
 
   @Test fun removalFromLastPage_clampsWithoutLosingWidgets() {

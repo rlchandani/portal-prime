@@ -27,10 +27,25 @@ internal object HomePresentation {
     val hero = widgets.firstOrNull { it.kind == HomeWidgetStore.KIND_PHOTO_MEMORY }
     // Additional photo widgets are ordinary paged items, so no configured identity disappears.
     val remaining = widgets.filterNot { it.key == hero?.key }
-    val count = ((remaining.size + 3) / 4).coerceAtLeast(1)
+    if (hero == null) {
+      val count = ((remaining.size + PAGE_BESIDE_HERO - 1) / PAGE_BESIDE_HERO).coerceAtLeast(1)
+      val index = requested.coerceIn(0, count - 1)
+      return Page(null, remaining.drop(index * PAGE_BESIDE_HERO).take(PAGE_BESIDE_HERO), index, count)
+    }
+    // The photo is the first page's hero only; later pages use the whole grid instead of repeating
+    // the same photo beside four widgets (2026-11-06).
+    val later = (remaining.size - PAGE_BESIDE_HERO).coerceAtLeast(0)
+    val count = 1 + (later + PAGE_FULL_GRID - 1) / PAGE_FULL_GRID
     val index = requested.coerceIn(0, count - 1)
-    return Page(hero, remaining.drop(index * 4).take(4), index, count)
+    return if (index == 0) Page(hero, remaining.take(PAGE_BESIDE_HERO), 0, count)
+    else Page(null, remaining.drop(PAGE_BESIDE_HERO + (index - 1) * PAGE_FULL_GRID).take(PAGE_FULL_GRID),
+        index, count)
   }
+
+  /** Widgets that fit beside the photo hero, and on a page without one. */
+  private const val PAGE_BESIDE_HERO = 4
+  /** Widgets on a later page that no longer shares space with the photo. */
+  private const val PAGE_FULL_GRID = 8
 
   /** Pages increase to the right: a left swipe advances, a right swipe returns. */
   fun pageAfterSwipe(page: Page, swipeRight: Boolean): Int =
