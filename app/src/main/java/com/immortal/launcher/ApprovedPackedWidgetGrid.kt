@@ -10,6 +10,9 @@ import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +30,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -47,6 +52,8 @@ internal fun ApprovedPackedWidgetGrid(
     modifier: Modifier,
     canDrop: (key: String, column: Int, row: Int) -> Boolean,
     onDrop: (key: String, column: Int, row: Int) -> Unit,
+    /** Drawn above the cards with the grid's own geometry: empty-slot outlines, add drafts, rings. */
+    decor: (@Composable BoxScope.(ApprovedSlotGeometry) -> Unit)? = null,
     /** (widget, cell, span, card drag = hold then drag, grip drag = immediate) */
     content: @Composable (HomeWidgetStore.HomeWidget, Modifier, ApprovedWidgetPacking.Span, Modifier, Modifier) -> Unit,
 ) {
@@ -245,6 +252,36 @@ internal fun ApprovedPackedWidgetGrid(
           }
         }
       }
+      if (decor != null) {
+        val geometry = remember(column, row, gap, placements, widgets) {
+          ApprovedSlotGeometry(column, row, gap,
+              placements.associate { widgets[it.index].key to it })
+        }
+        Box(Modifier.fillMaxWidth().height(height)) { decor(geometry) }
+      }
     }
   }
+}
+
+/**
+ * The packed grid's cell geometry for overlays. Offsets are layout-direction aware, matching the
+ * grid's own `placeRelative`, so overlays line up with cards in RTL too.
+ */
+internal class ApprovedSlotGeometry(
+    private val column: Dp,
+    private val halfRow: Dp,
+    private val gap: Dp,
+    private val placements: Map<String, ApprovedWidgetPacking.Placement>,
+) {
+  /** One slot's size (1 column × 2 half-rows). */
+  val slotSize: DpSize get() = DpSize(column, halfRow * 2 + gap)
+
+  fun cell(column: Int, halfRow: Int, columns: Int, halfRows: Int): Modifier =
+      Modifier.offset(x = (this.column + gap) * column, y = (this.halfRow + gap) * halfRow)
+          .size((this.column + gap) * columns - gap, (this.halfRow + gap) * halfRows - gap)
+
+  fun slot(slot: HomeWidgetStore.Slot, span: Pair<Int, Int>): Modifier =
+      HomePresentation.slotSpan(span.first, span.second).let { cell(slot.column, slot.row * 2, it.columns, it.rows) }
+
+  fun widget(key: String): Modifier? = placements[key]?.let { cell(it.column, it.row, it.columns, it.rows) }
 }

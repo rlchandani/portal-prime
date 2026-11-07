@@ -230,6 +230,9 @@ private data class WidgetProviderEntry(
 private data class PendingWidgetAdd(
     val appWidgetId: Int,
     val provider: WidgetProviderEntry,
+    /** Add-flow target: saved exactly here when it still fits, else auto-placed. */
+    val slot: HomeWidgetStore.Slot? = null,
+    val span: Pair<Int, Int>? = null,
 )
 
 /** Home's immutable inventory snapshots retain their icons across Activity resumes/recreation.
@@ -813,7 +816,14 @@ private fun ApprovedWidgetGrid(
   val context = androidx.compose.ui.platform.LocalContext.current
   val spans = remember(visible) { HomePresentation.spans(visible) }
   var move by remember { mutableStateOf<HomeWidgetStore.HomeWidget?>(null) }
-  ApprovedPackedWidgetGrid(visible, spans, fixed, editMode, gridModifier,
+  val addFlow = LocalHomeAddFlow.current
+  val emptySlots = remember(widgets, pageIndex, editMode) {
+    if (editMode && addFlow != null) HomeSlots.emptySlots(widgets, pageIndex) else emptyList()
+  }
+  val decor: (@Composable BoxScope.(ApprovedSlotGeometry) -> Unit)? =
+      if (addFlow == null || (!editMode && addFlow.ring == null)) null
+      else { geometry -> HomeAddDecor(geometry, addFlow, pageIndex, emptySlots, HomeWidgetPreviewRenderer) }
+  ApprovedPackedWidgetGrid(visible, spans, fixed, editMode, gridModifier, decor = decor,
       canDrop = { key, column, row ->
         HomeSlots.moveForEditing(widgets, key, HomeWidgetStore.Slot(pageIndex, column, row)) != null
       },
@@ -881,6 +891,7 @@ private fun ApprovedWidgetArea(
     navigation: ApprovedHomePagerNavigation,
     preserveCounterFocus: Boolean,
     modifier: Modifier = Modifier,
+    extraPage: Boolean = false,
 ) {
   var remove by remember { mutableStateOf<HomeWidgetStore.HomeWidget?>(null) }
   val onRemove: (HomeWidgetStore.HomeWidget) -> Unit = remember { { remove = it } }
@@ -888,9 +899,12 @@ private fun ApprovedWidgetArea(
   val isTv = configuration.uiMode and android.content.res.Configuration.UI_MODE_TYPE_MASK ==
       android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
   if (!isTv) {
-    val prepared = remember(widgets) {
-      List(HomePresentation.page(widgets, 0).count) { HomePresentation.page(widgets, it) }
+    val prepared = remember(widgets, extraPage) {
+      List(HomePresentation.editingPage(widgets, 0, extraPage).count) {
+        HomePresentation.editingPage(widgets, it, extraPage)
+      }
     }
+    val placing = LocalHomeAddFlow.current?.draft != null
     val homeActive = LocalApprovedLauncherPageActive.current
     val focus = androidx.compose.ui.platform.LocalFocusManager.current
     val currentPage = rememberUpdatedState(page)
@@ -905,7 +919,7 @@ private fun ApprovedWidgetArea(
       else slide.animateTo(page.index.toFloat(), tween(180, easing = EaseOutCubic))
     }
     BoxWithConstraints(modifier.clipToBounds().semantics { contentDescription = "Home widgets" }
-        .then(if (!homeActive || page.count < 2) Modifier else Modifier.pointerInput(page.count) {
+        .then(if (!homeActive || page.count < 2 || placing) Modifier else Modifier.pointerInput(page.count) {
           var distance = 0f
           detectHorizontalDragGestures(
               onDragStart = { distance = 0f },
@@ -965,7 +979,7 @@ private fun ApprovedWidgetArea(
         beyondViewportPageCount = 1) { index ->
       val active = LocalApprovedLauncherPageActive.current && index == pager.currentPage
       ApprovedWidgetPageScope(active) {
-        ApprovedWidgetPage(HomePresentation.page(widgets, index), widgets, host, manager,
+        ApprovedWidgetPage(HomePresentation.editingPage(widgets, index, extraPage), widgets, host, manager,
             onChanged, onEnterEdit, onRemove, editMode && active)
       }
     }
@@ -1063,33 +1077,49 @@ private fun ApprovedHomePagedWidgets(
     manager: AppWidgetManager,
     onChanged: HomeWidgetChange,
     onEnterEdit: () -> Unit,
-    onAddWidget: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
   var pageIndex by remember { mutableStateOf(0) }
   var counterFocused by remember { mutableStateOf(false) }
   val navigation = remember { ApprovedHomePagerNavigation() }
-  val page = remember(widgets, pageIndex) { HomePresentation.page(widgets, pageIndex) }
+  val addFlow = LocalHomeAddFlow.current
+  val savedPages = remember(widgets) { HomePresentation.page(widgets, 0).count }
+  val targetPage = addFlow?.targetPage
+  // An empty page after the last while adding there ("+ new page" or a full layout).
+  val extraPage = editMode && addFlow != null && (addFlow.newPage || (targetPage ?: -1) >= savedPages)
+  val page = remember(widgets, pageIndex, extraPage) { HomePresentation.editingPage(widgets, pageIndex, extraPage) }
   LaunchedEffect(page.index) { pageIndex = page.index }
   val changePage: (Int) -> Unit = { index ->
     navigation.request(index)
     pageIndex = index
   }
+  // The draft is placed on its target page: follow it there.
+  LaunchedEffect(targetPage, extraPage) { if (targetPage != null && targetPage != pageIndex) changePage(targetPage) }
+  val pageFull = remember(widgets, page.index, editMode) {
+    editMode && addFlow != null && HomeSlots.emptySlots(widgets, page.index).isEmpty()
+  }
   Column(modifier) {
     ApprovedWidgetArea(widgets, page, editMode, host, manager, onChanged,
         onEnterEdit = onEnterEdit, onPageChanged = changePage, navigation = navigation,
         preserveCounterFocus = counterFocused,
-        modifier = Modifier.weight(1f).fillMaxWidth())
+        modifier = Modifier.weight(1f).fillMaxWidth(), extraPage = extraPage)
     // A slim row under the widgets for page dots (and Add widget while customizing). No heading or
     // "All apps" — the dock's Apps tab already does that. The row is omitted when it would be empty.
     val showDots = HomeRefinements.showsPageIndicator(page.count)
     if (showDots || editMode) {
       Box(Modifier.fillMaxWidth().padding(top = 4.dp).height(if (editMode) 52.dp else 40.dp)) {
-        if (editMode) ApprovedHomeTextButton("Add widget", modifier = Modifier.align(Alignment.CenterStart),
-            onClick = onAddWidget)
-        if (showDots) {
-          ApprovedWidgetPageIndicator(page.index, page.count, changePage,
-              onFocusChanged = { counterFocused = it }, modifier = Modifier.align(Alignment.Center))
+        if (editMode) ApprovedHomeTextButton("Add widget", modifier = Modifier.align(Alignment.CenterStart)) {
+          // Same picker as tapping a slot: the first empty slot here, or a new page when full.
+          addFlow?.openPicker(HomeSlots.firstEmptySlot(widgets, page.index))
+        }
+        Row(Modifier.align(Alignment.Center), verticalAlignment = Alignment.CenterVertically) {
+          if (showDots) ApprovedWidgetPageIndicator(page.index, page.count, changePage,
+              onFocusChanged = { counterFocused = it })
+          // Fallback (approved): a full page offers "+ new page" after the last dot.
+          if (pageFull && addFlow?.draft == null) ApprovedHomeTextButton("+ New page") {
+            addFlow?.newPage = true
+            changePage(savedPages)
+          }
         }
       }
     } else {
@@ -1188,6 +1218,9 @@ private fun LauncherScreen(
 
   var editMode by remember { mutableStateOf(false) }
   var showLibrary by rememberSaveable { mutableStateOf(false) }
+  val addFlow = remember { HomeAddFlowState() }
+  LaunchedEffect(editMode) { if (!editMode) addFlow.reset() }
+  LaunchedEffect(addFlow.ring) { if (addFlow.ring != null) { delay(ADD_RING_MS); addFlow.ring = null } }
   var musicLayout by rememberSaveable { mutableStateOf<MusicPlayerLayout?>(null) }
   LaunchedEffect(musicOpenRequest) {
     if (musicOpenRequest > 0) {
@@ -1279,10 +1312,19 @@ private fun LauncherScreen(
   val completeAdd: () -> Unit = {
     pending?.let { addition ->
       addition.provider.info?.let { info ->
-        homeWidgets = HomeWidgetStore.add(context, HomeWidgetStore.HomeWidget(
+        val widget = HomeWidgetStore.HomeWidget(
             appWidgetId = addition.appWidgetId,
             providerPackage = info.provider.packageName, providerClass = info.provider.className,
-            spanX = addition.provider.spanX, spanY = addition.provider.spanY))
+            spanX = addition.provider.spanX, spanY = addition.provider.spanY)
+        val slot = addition.slot
+        val span = addition.span
+        if (slot != null && span != null && addIntoSlot(context, widget, slot, span)) addFlow.added(widget.key)
+        else {
+          // The slot was taken meanwhile: keep the bound widget, auto-placed.
+          homeWidgets = HomeWidgetStore.add(context, widget)
+          addFlow.draft = null
+        }
+        homeWidgets = HomeWidgetStore.load(context)
       }
     }
     pending = null
@@ -1308,8 +1350,9 @@ private fun LauncherScreen(
     if (it.resultCode == Activity.RESULT_OK) configureOrAdd() else cancelAdd()
   }
   val providers by produceState<List<WidgetProviderEntry>?>(
-      initialValue = ApprovedHomeInventory.providers.peek(), inventoryRevision, showLibrary) {
-    if (showLibrary) {
+      initialValue = ApprovedHomeInventory.providers.peek(), inventoryRevision, showLibrary,
+      addFlow.pickerSlot != null) {
+    if (showLibrary || addFlow.pickerSlot != null) {
       value = ApprovedHomeInventory.providers.peek()
       value = withContext(Dispatchers.IO) {
         ApprovedHomeInventory.providers.load {
@@ -1330,6 +1373,7 @@ private fun LauncherScreen(
     }
   }
   BackHandler(enabled = editMode) { editMode = false }
+  BackHandler(enabled = addFlow.draft != null) { addFlow.draft = null }
   BackHandler(enabled = selectedTab != ApprovedLauncherTab.HOME) { onSelectTab(ApprovedLauncherTab.HOME) }
   BackHandler(enabled = musicLayout != null) { musicLayout = null }
   CompositionLocalProvider(
@@ -1404,9 +1448,10 @@ private fun LauncherScreen(
               }
               Spacer(Modifier.height(24.dp))
             }
-            ApprovedHomePagedWidgets(homeWidgets, editMode, connected == false, host, manager, saveWidgets,
-                onEnterEdit = { editMode = true }, onAddWidget = { showLibrary = true },
-                modifier = Modifier.weight(1f).fillMaxWidth())
+            CompositionLocalProvider(LocalHomeAddFlow provides addFlow) {
+              ApprovedHomePagedWidgets(homeWidgets, editMode, connected == false, host, manager, saveWidgets,
+                  onEnterEdit = { editMode = true }, modifier = Modifier.weight(1f).fillMaxWidth())
+            }
             Spacer(Modifier.height(6.dp))
             // Slimmer favorites strip (approved Home v2, change 7): 88 → 72dp, icons 56 → 46dp.
             Row(Modifier.fillMaxWidth().height(FAVORITE_TILE_HEIGHT), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -1466,6 +1511,62 @@ private fun LauncherScreen(
           }
         }
         Spacer(Modifier.height(12.dp))
+      }
+      addFlow.draft?.let { draft ->
+        val fitting = remember(homeWidgets, draft.tapped) { HomeSlots.fittingShapes(homeWidgets, draft.tapped) }
+        // Covers the favorites and dock while placing, as approved.
+        Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(ADD_BAR_AREA)
+            .background(ApprovedHomePalette.Background), contentAlignment = Alignment.Center) {
+          HomeAddShapeBar(draft, fitting, onBack = addFlow::backToPicker,
+              onShape = { addFlow.reshape(homeWidgets, it) },
+              onAdd = {
+                if (draft.providerKey == null) {
+                  val widget = HomeWidgetStore.custom(draft.kind)
+                  if (addIntoSlot(context, widget, draft.origin, draft.span)) addFlow.added(widget.key)
+                  else Toast.makeText(context, "That spot is no longer free. Choose another.",
+                      Toast.LENGTH_SHORT).show()
+                  homeWidgets = HomeWidgetStore.load(context)
+                } else {
+                  val provider = providers?.firstOrNull { it.info?.provider?.flattenToString() == draft.providerKey }
+                  val info = provider?.info
+                  if (provider == null || info == null) {
+                    Toast.makeText(context, "That app widget is no longer available.", Toast.LENGTH_SHORT).show()
+                    addFlow.draft = null
+                  } else {
+                    val id = host.allocateAppWidgetId()
+                    pending = PendingWidgetAdd(id, provider, draft.origin, draft.span)
+                    if (manager.bindAppWidgetIdIfAllowed(id, info.provider)) configureOrAdd()
+                    else runCatching { bindLauncher.launch(Intent(AppWidgetManager.ACTION_APPWIDGET_BIND)
+                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, info.provider)) }.onFailure { cancelAdd() }
+                  }
+                }
+              })
+        }
+      }
+      addFlow.pickerSlot?.let { slot ->
+        val advanced = LocalAdvancedSettings.current
+        val occupied = remember(homeWidgets, slot.page) {
+          val empty = HomeSlots.emptySlots(homeWidgets, slot.page).map { it.column to it.row }.toSet()
+          (0..3).flatMap { c -> (0..1).map { r -> c to r } }.filterNot { it in empty }.toSet()
+        }
+        val more = remember(advanced, homeWidgets) {
+          HomeWidgetPicker.more(advanced, HomeWidgetPicker.photoMemoryAllowed(homeWidgets))
+        }
+        val providerChoices = remember(providers) {
+          providers?.mapNotNull { entry ->
+            entry.info?.let { HomePickerChoice(it.provider.flattenToString(), entry.label, entry.icon, entry.packageLabel) }
+          }
+        }
+        HomeWidgetPickerSheet(slot, occupied, addFlow.slotSize, HomeWidgetPicker.everyday, more, providerChoices,
+            HomeWidgetPreviewRenderer,
+            onKind = { kind -> addFlow.choose(homeWidgets, kind, null, HomeWidgetPicker.label(kind), null) },
+            onProvider = { choice ->
+              val entry = providers?.firstOrNull { it.info?.provider?.flattenToString() == choice.key }
+              val natural = entry?.let { HomePresentation.slotSpan(it.spanX, it.spanY) }?.let { it.columns to it.rows }
+              addFlow.choose(homeWidgets, HomeWidgetStore.KIND_APP_WIDGET, choice.key, choice.label, choice.image, natural)
+            },
+            onDismiss = { addFlow.pickerSlot = null })
       }
       if (showLibrary) ApprovedWidgetLibrary(LocalAdvancedSettings.current, homeWidgets, providers, room, connected,
           onAdd = { kind ->
@@ -2963,6 +3064,32 @@ private fun WidgetTile(
               .background(Color(0x66000000)))
     }
   }
+}
+
+/** Add-flow ring after Add, and the bottom area the place-and-size bar covers. */
+private const val ADD_RING_MS = 1_200L
+private val ADD_BAR_AREA = 206.dp
+
+/** Saves [widget] exactly at [slot] with [span] if the current saved layout still has room. */
+private fun addIntoSlot(context: Context, widget: HomeWidgetStore.HomeWidget, slot: HomeWidgetStore.Slot,
+    span: Pair<Int, Int>): Boolean = synchronized(RemoteCompanionStore.mutationLock) {
+  val current = HomeWidgetStore.load(context)
+  val updated = HomeSlots.addAt(current, widget, slot, span) ?: return@synchronized false
+  HomeWidgetStore.replaceIfUnchanged(context, current, updated)
+}
+
+/**
+ * Picker and draft previews: the real widget for local-data kinds (cheap, no network), a static
+ * representative preview for kinds that would fetch or poll just to be seen.
+ */
+private val HomeWidgetPreviewRenderer: HomeWidgetPreviewContent = { kind, span, modifier ->
+  if (kind in HomeWidgetPicker.livePreviewKinds) {
+    val widget = remember(kind, span) {
+      HomeWidgetStore.HomeWidget(kind = kind, customId = "preview:$kind", spanX = span.first, spanY = span.second,
+          explicitSize = true)
+    }
+    ImmortalWidgetContent(widget, modifier)
+  } else HomeStaticWidgetPreview(kind, modifier)
 }
 
 @Composable

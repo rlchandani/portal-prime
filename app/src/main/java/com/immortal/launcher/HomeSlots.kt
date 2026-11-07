@@ -147,6 +147,75 @@ internal object HomeSlots {
   fun freeSpotsForEditing(widgets: List<HomeWidget>, key: String): List<Slot> =
       forEditing(widgets).let { freeSpots(it, HomePresentation.spans(it), key) }
 
+  // --- Add into a slot (simplified "Add widget" flow, approved 2026-11-07) -------------------
+
+  /** The four whole-slot shapes in stored half-row units: 1×1, 2 wide, 2 tall, 2×2. */
+  val SHAPES: List<Pair<Int, Int>> = listOf(1 to 2, 2 to 2, 1 to 4, 2 to 4)
+
+  /** Highest page a saved slot may use; matches the remote layout preflight. */
+  private const val MAX_PAGE = 63
+
+  /** Pages Customize shows for [widgets] (legacy layouts as they display today). */
+  fun pageCount(widgets: List<HomeWidget>): Int =
+      forEditing(widgets).let { resolve(it, HomePresentation.spans(it)).size }
+
+  /** Single slots on [page] that no widget covers, row by row. Pages past the last are all empty. */
+  fun emptySlots(widgets: List<HomeWidget>, page: Int): List<Slot> {
+    if (page < 0) return emptyList()
+    val cells = forEditing(widgets).let { placedCells(it, HomePresentation.spans(it)).values }
+    return (0..1).flatMap { row -> (0 until COLUMNS).map { column -> Slot(page, column, row) } }
+        .filter { slot -> cells.none { it.overlaps(Cell(slot.page, slot.column, slot.row * 2, 1, 2)) } }
+  }
+
+  /** The first empty slot on [page], or the top-left of a new page after the last. */
+  fun firstEmptySlot(widgets: List<HomeWidget>, page: Int): Slot =
+      emptySlots(widgets, page).firstOrNull() ?: Slot(pageCount(widgets), 0, 0)
+
+  /** True when a [span] footprint with its top-left at [slot] is on the grid and clear of widgets. */
+  fun canPlace(
+      widgets: List<HomeWidget>,
+      spans: List<ApprovedWidgetPacking.Span>,
+      span: Pair<Int, Int>,
+      slot: Slot,
+  ): Boolean {
+    if (!slot.valid || slot.page > MAX_PAGE) return false
+    val snapped = HomePresentation.slotSpan(span.first, span.second)
+    val cell = Cell(slot.page, slot.column, slot.row * 2, snapped.columns, snapped.rows)
+    return cell.inBounds() && placedCells(widgets, spans).values.none { it.overlaps(cell) }
+  }
+
+  /**
+   * Where a [span] footprint covering the tapped [slot] goes: the tapped slot as top-left when it
+   * fits, otherwise the nearest top-left whose footprint still covers it. Null when none fits.
+   */
+  fun placementFor(widgets: List<HomeWidget>, slot: Slot, span: Pair<Int, Int>): Slot? {
+    val editing = forEditing(widgets)
+    val spans = HomePresentation.spans(editing)
+    val snapped = HomePresentation.slotSpan(span.first, span.second)
+    val slotRows = snapped.rows / 2
+    return (slot.row downTo slot.row - slotRows + 1).flatMap { row ->
+      (slot.column downTo slot.column - snapped.columns + 1).map { column -> Slot(slot.page, column, row) }
+    }.firstOrNull { canPlace(editing, spans, span, it) }
+  }
+
+  /** Shapes from [SHAPES] that fit somewhere covering the tapped [slot]. */
+  fun fittingShapes(widgets: List<HomeWidget>, slot: Slot): List<Pair<Int, Int>> =
+      SHAPES.filter { placementFor(widgets, slot, it) != null }
+
+  /**
+   * Adds [widget] with its top-left at [slot] and an exact [span]. A legacy layout is first saved as
+   * slots exactly as shown, so nothing moves. Refuses (null) overlaps, off-grid footprints, a page
+   * beyond the next new one, and a widget already on Home.
+   */
+  fun addAt(widgets: List<HomeWidget>, widget: HomeWidget, slot: Slot, span: Pair<Int, Int>): List<HomeWidget>? {
+    if (widgets.any { it.key == widget.key }) return null
+    val editing = forEditing(widgets)
+    val spans = HomePresentation.spans(editing)
+    if (slot.page > resolve(editing, spans).size || !canPlace(editing, spans, span, slot)) return null
+    val snapped = HomePresentation.slotSpan(span.first, span.second)
+    return editing + widget.copy(spanX = snapped.columns, spanY = snapped.rows, explicitSize = true, slot = slot)
+  }
+
   private fun placedCells(widgets: List<HomeWidget>, spans: List<ApprovedWidgetPacking.Span>): Map<String, Cell> =
       resolve(widgets, spans).flatMapIndexed { page, list ->
         list.map { it.widget.key to Cell(page, it.placement.column, it.placement.row,
