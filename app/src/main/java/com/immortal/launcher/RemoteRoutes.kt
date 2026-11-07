@@ -107,7 +107,8 @@ class RemoteRoutes internal constructor(
                 SettingsRegistry.schemaJson(context, SettingsRegistry.domains, includeInactive = true)))
           }
         }
-        else -> json(404, err("not_found"))
+        // Feature-owned routes (household, dinner, routines, share, list) authenticate via companion.
+        else -> if (RemoteFeatureRoutes.lookup(req.path) != null) companion.handle(req) else json(404, err("not_found"))
       }
     } catch (_: RemoteCompanionStoreUnavailable) {
       json(503, err("companion_storage_unavailable"))
