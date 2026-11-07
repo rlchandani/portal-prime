@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Immortal · Widget library, live prototype</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand"><span class="brand-mark">i</span>immortal<span class="brand-detail">Widget library · live prototype</span></div>
+    <div class="tabs" role="group" aria-label="View">
+      <button type="button" data-tab="proto">Prototype</button>
+      <button type="button" data-tab="catalog">Widget catalog</button>
+    </div>
+    <span class="review-tag">Mock · sample data · no live commands</span>
+  </header>
+  <main id="proto" class="proto">
+    <div class="stagewrap"><div id="frame" class="frame"><div id="device" class="device"></div></div></div>
+    <aside id="panel" class="panel" aria-label="Where this lives and flow"></aside>
+  </main>
+  <main id="catalog" class="catalog" hidden></main>
+  <script src="./icons.js"></script>
+  <script src="./widgets.js"></script>
+  <script src="./settings.js"></script>
+  <script src="./app.js"></script>
+  <script src="./controller.js"></script>
+</body>
+</html>

@@ -10,15 +10,15 @@ const KINDS = [
   { kind: 'ha', label: 'Home Assistant', icon: 'home', settings: 'dashboard', editSettings: 'ha',
     shows: ['One pinned device toggle', 'Two pinned toggles side by side', 'Pinned toggles plus a sensor'] },
   { kind: 'calendar', label: 'Calendar', icon: 'cal', settings: 'calendar', editSettings: 'calendar',
-    shows: ['The next event', 'Next two events', 'Next five events, grouped by day'] },
+    shows: ['The next event', 'Next two events', 'Next four events with days'] },
   { kind: 'weather', label: 'Weather', icon: 'cloud', settings: 'weather', editSettings: 'weather',
     shows: ['Temperature and high/low', 'Now plus four hours', 'Now plus a five-day forecast'] },
   { kind: 'alarm', label: 'Alarm', icon: 'alarm', settings: 'alarm', editSettings: 'alarm',
-    shows: ['Next alarm and its switch', 'Alarm time, repeat days, switch', 'Alarm, repeat days and snooze length'] },
+    shows: ['Next alarm and its switch', 'Alarm time, snooze and sound', 'Alarm, repeat days and snooze length'] },
   { kind: 'world_clock', label: 'World clock', icon: 'clock', settings: 'world', editSettings: 'world',
     shows: ['One other city', 'Two cities with offsets', 'Four cities with offsets'] },
   { kind: 'crypto', label: 'Crypto', icon: 'coin', settings: 'crypto', editSettings: 'crypto', retire: true,
-    shows: ['One coin price and change', 'Three coins', 'Five coins with 24-hour change'] },
+    shows: ['One coin price and change', 'Two coins', 'Five coins with 24-hour change'] },
   { kind: 'quick_controls', label: 'Quick controls', icon: 'tools', settings: 'display', editSettings: 'quickbar', retire: true,
     shows: ['One shortcut tile', 'Two shortcut tiles', 'Four shortcut tiles'] },
   { kind: 'photo_memory', label: 'Photo memory', icon: 'photo', settings: 'preview', editSettings: 'sources',
@@ -26,11 +26,11 @@ const KINDS = [
   { kind: 'timers', label: 'Timers', icon: 'timer', settings: 'timers', editSettings: 'timers',
     shows: ['Time left, pause', 'Time left, pause and reset', 'Countdown ring, presets'] },
   { kind: 'todo', label: 'To-do', icon: 'check', settings: 'todo', editSettings: 'todo',
-    shows: ['How many are left, the first task', 'Count plus three tasks', 'Count plus six tasks'] },
+    shows: ['How many are left', 'Count plus the next task', 'Count plus four tasks'] },
   { kind: 'news', label: 'News', icon: 'news', settings: 'news', editSettings: 'news', retire: true,
-    shows: ['Top headline', 'Two headlines', 'Five headlines with sources'] },
+    shows: ['Top headline', 'Two headlines', 'Three headlines with sources'] },
   { kind: 'stocks', label: 'Stocks', icon: 'chart', settings: 'stocks', editSettings: 'stocks', retire: true,
-    shows: ['One ticker', 'Three tickers', 'Five tickers with change'] },
+    shows: ['One ticker', 'Two tickers', 'Five tickers with change'] },
   { kind: 'options', label: 'Options', icon: 'sliders', settings: 'options', editSettings: 'options', retire: true, advanced: true,
     shows: ['Top contract', 'Two contracts with delta', 'Contract scan list'] },
   { kind: 'appwidget', label: 'Android app widget', icon: 'apps', settings: 'appconfig', editSettings: 'appconfig',
@@ -68,7 +68,7 @@ const R = {
     const one = ([t, n, d]) => `<div class="s22">${d} · ${t}</div><div class="h26 clamp1">${n}</div>`;
     if (s === 's') return one(ev[0]);
     if (s === 'm') return `<div class="split"><div>${one(ev[0])}</div><div>${one(ev[1])}</div></div>`;
-    const n = s === 't' ? 3 : 5;
+    const n = s === 't' ? 3 : 4;
     return ev.slice(0, n).map(([t, nm, d]) => `<div class="ev"><span class="s20">${d}<br>${t}</span><span class="h24 clamp1">${nm}</span></div>`).join('');
   },
   weather(s) {
@@ -77,7 +77,8 @@ const R = {
     const hours = `<div class="hours">${[['9 AM', 52], ['10 AM', 53], ['11 AM', 54], ['Noon', 55]].map(([h, t]) => `<div><small>${h}</small><span class="ic">${ICONS.cloudo}</span><b>${t}°</b></div>`).join('')}</div>`;
     const days = [['Today', 55, 51], ['Sat', 57, 49], ['Sun', 52, 46], ['Mon', 50, 44], ['Tue', 53, 45]].map(([d, hi, lo]) => row(d, `${hi}° <i>${lo}°</i>`)).join('');
     if (s === 's') return `<div class="wx">${big('51°', 'sm')}<div class="s22" style="margin-left:18px">Edmonds<br>H 55° · L 51°</div></div>`;
-    if (s === 'm') return `<div class="split"><div>${big('51°', 'sm')}<div class="s22">Cloudy · Edmonds</div></div>${hours}</div>`;
+    const hrs = `<div class="hours">${[['9 AM', 52], ['10 AM', 53], ['11 AM', 54], ['Noon', 55]].map(([h, t]) => `<div><small>${h}</small><b>${t}°</b></div>`).join('')}</div>`;
+    if (s === 'm') return `<div class="split" style="align-items:center"><div class="wx" style="justify-content:flex-start">${big('51°', 'sm')}<div class="s22" style="margin-left:16px">Cloudy<br>Edmonds</div></div>${hrs}</div>`;
     if (s === 't') return `${now}${where}<div class="gap"></div>`;
     return `<div class="split"><div>${now}${where}</div><div class="list">${days}</div></div>`;
   },
@@ -90,8 +91,9 @@ const R = {
   world_clock(s) {
     const c = [['London', '4:04 PM', '8 hours ahead'], ['Mumbai', '9:34 PM', '13½ hours ahead'], ['Tokyo', '1:04 AM', 'Tomorrow'], ['New York', '11:04 AM', '3 hours ahead']];
     const one = ([n, t, o]) => `<div><div class="s20">${n}</div><div class="h34">${t}</div><div class="s20">${o}</div></div>`;
-    if (s === 's') return one(c[0]);
-    if (s === 'm') return `<div class="split">${one(c[0])}${one(c[1])}</div>`;
+    const flat = ([n, t, o]) => `<div><div class="s20 clamp1">${n} · ${o}</div><div class="h34">${t}</div></div>`;
+    if (s === 's') return flat(c[0]);
+    if (s === 'm') return `<div class="split">${flat(c[0])}${flat(c[1])}</div>`;
     if (s === 't') return `<div class="stack">${one(c[0])}${one(c[1])}</div>`;
     return `<div class="split" style="row-gap:24px">${c.map(one).join('')}</div>`;
   },
@@ -114,22 +116,25 @@ const R = {
   timers(s) {
     const t = big('6:42', 'live sm');
     if (s === 's') return `<div class="wx">${t}<span class="round">${ICONS.pause}</span></div>`;
-    if (s === 'm' || s === 't') return `${t}<div class="s22">of 10 min</div><div class="chips"><span class="chip">${ICONS.pause}</span><span class="chip">Reset</span><span class="chip">+1 min</span></div>`;
+    if (s === 'm') return `<div class="wx">${t}<span class="s22">of 10 min</span><span class="chip">${ICONS.pause}</span><span class="chip">Reset</span><span class="chip">+1 min</span></div>`;
+    if (s === 't') return `${t}<div class="s22">of 10 min</div><div class="chips"><span class="chip">${ICONS.pause}</span><span class="chip">Reset</span><span class="chip">+1 min</span></div>`;
     return `<div class="split"><div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" stroke="#414141" stroke-width="6" fill="none"/><circle cx="50" cy="50" r="44" stroke="#66c49e" stroke-width="6" fill="none" stroke-linecap="round" pathLength="100" stroke-dasharray="67 100" transform="rotate(-90 50 50)"/></svg><b>6:42</b></div>
       <div><div class="s22">Presets</div><div class="chips">${[1, 5, 10, 15, 30].map((m) => `<span class="chip">${m}m</span>`).join('')}</div></div></div>`;
   },
   todo(s) {
     const t = ['Oat milk', 'Call the plumber', 'Return library books', 'Water the fern', 'Birthday card for Ava', 'Bins out'];
     const task = (x, i) => `<div class="task ${i === 5 ? 'done' : ''}"><span class="box"></span><span class="clamp1">${x}</span></div>`;
-    const count = `<div class="wx">${big('5', 'sm')}<span class="s22" style="margin-left:14px">left to do</span></div>`;
+    const count = `<div class="wx" style="justify-content:flex-start">${big('5', 'sm')}<span class="s22" style="margin-left:14px">left to do</span></div>`;
     if (s === 's') return `${count}`;
-    if (s === 'm') return `<div class="split"><div>${count}</div><div>${t.slice(0, 2).map(task).join('')}</div></div>`;
-    return `${count}${t.slice(0, s === 't' ? 3 : 6).map(task).join('')}`;
+    if (s === 'm') return `<div class="split"><div>${count}</div><div>${t.slice(0, 1).map(task).join('')}</div></div>`;
+    return `${count}${t.slice(0, s === 't' ? 3 : 4).map(task).join('')}`;
   },
   news(s) {
     const n = [['City council approves waterfront park', 'Local · 1 h'], ['Storm system expected Sunday night', 'Weather · 2 h'], ['Library extends weekend hours', 'Community · 3 h'], ['Ferry schedule changes next week', 'Transit · 5 h'], ['High school robotics team heads to state', 'Schools · 6 h']];
     const item = ([h, src]) => `<div class="nw"><div class="h24 clamp2">${h}</div><div class="s20">${src}</div></div>`;
-    return n.slice(0, s === 's' ? 1 : s === 'l' ? 4 : 2).map(item).join('');
+    if (s === 's') return `<div class="h24 clamp2">${n[0][0]}</div>`;
+    if (s === 'm') return `<div class="split">${n.slice(0, 2).map(([h]) => `<div class="h24 clamp2">${h}</div>`).join('')}</div>`;
+    return n.slice(0, 3).map(item).join('');
   },
   stocks(s) {
     const c = [['AAPL', '228.14', '+0.8%', 1], ['MSFT', '431.20', '−0.3%', 0], ['VOO', '512.07', '+0.4%', 1], ['NVDA', '139.60', '+2.2%', 1], ['AMZN', '201.33', '−0.6%', 0]];
@@ -144,7 +149,7 @@ const R = {
   appwidget(s, w) {
     const app = w?.app || 'Keep Notes';
     return `<div class="hosted"><div class="s20">${app}</div><div class="h26">${s === 's' ? 'Groceries' : 'Groceries · 4 items'}</div>
-      ${s === 's' ? '' : '<div class="s22">Hosted Android layout; the app draws this, not Immortal.</div>'}</div>`;
+      ${s === 'l' || s === 't' ? '<div class="s22">Hosted Android layout; the app draws this, not Immortal.</div>' : ''}</div>`;
   },
 };
 
@@ -155,7 +160,7 @@ function widgetCard(w, span, opts = {}) {
   const isPhoto = w.kind === 'photo_memory';
   const isHosted = w.kind === 'appwidget';
   const head = isPhoto || isHosted ? '' : `<div class="head">${icon(k.icon)}<span class="ttl">${k.label}</span>
-    ${k.settings === 'dashboard' ? '' : `<button class="hact" data-act="head-settings" data-id="${w.id}" type="button">Settings</button>`}</div>`;
+    ${k.settings === 'dashboard' ? '' : opts.preview ? '<span class="hact">Settings</span>' : `<button class="hact" data-act="head-settings" data-id="${w.id}" type="button">Settings</button>`}</div>`;
   const edit = opts.editable ? `<div class="editbar">
       <button type="button" data-act="move" data-id="${w.id}">Move</button><button type="button" data-act="size" data-id="${w.id}">Size</button>
       <button type="button" data-act="edit-settings" data-id="${w.id}">Settings</button><button type="button" data-act="remove" data-id="${w.id}">Remove</button></div>
