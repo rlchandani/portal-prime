@@ -395,6 +395,8 @@ class PhotoFrameController(
     }
     // While the timer alarm is showing, the slide-to-stop owns the touch stream.
     if (faceRenderer.handleAlarmTouch(ev)) return
+    // A tap on the now-playing card opens its walk-up controls instead of exiting the frame.
+    if (!welcomeVisible && faceRenderer.handleMusicCardTouch(ev)) return
     when (ev.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
         downX = ev.x

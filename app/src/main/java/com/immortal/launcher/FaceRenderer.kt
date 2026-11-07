@@ -13,18 +13,17 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.Outline
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.BatteryManager
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -51,6 +50,8 @@ class FaceRenderer(
     private val context: Context,
     private val weatherRefreshMs: Long = 30 * 60_000L,
     private val weatherFetch: (Context) -> String = { Weather.fetch(it) },
+    /** Monotonic clock shared with [NowPlayingState.positionUpdatedElapsedMs]. */
+    private val elapsedRealtime: () -> Long = SystemClock::elapsedRealtime,
 ) {
   private val io = Executors.newSingleThreadExecutor()
   private val ui = Handler(Looper.getMainLooper())
@@ -212,12 +213,12 @@ class FaceRenderer(
   // Now-playing card.
   private var nowPlayingCard: LinearLayout? = null
   private var npArt: ImageView? = null
-  private var npTitle: TextView? = null
-  private var npArtist: TextView? = null
   // null means unbound/retry; an empty URL means the current track has no artwork.
   private var lastArtUrl: String? = null
   private var lastArtBitmap: Bitmap? = null
   private var npListener: NowPlayingHub.Listener? = null
+  // Ambient presentation + walk-up controls; null when the face has no now-playing card.
+  private var musicCard: AmbientMusicCardController? = null
 
   // Photo caption (place / date + "on this day" badge). Grid element, fed via [setCaption].
   private var captionPanel: LinearLayout? = null
@@ -275,6 +276,7 @@ class FaceRenderer(
     ui.removeCallbacksAndMessages(null)
     npListener?.let { NowPlayingHub.removeListener(it) }
     npListener = null
+    musicCard?.suspend()
     weatherRequest?.cancel(true)
     weatherRequest = null
     // Retain the overlay views, but release hidden pixels and invalidate pending completions.
@@ -551,71 +553,41 @@ class FaceRenderer(
     }
   }
 
-  /** Now-playing card (album art + track / artist), hidden until something is playing. */
+  /**
+   * Now-playing card (art, title, artist, progress line), hidden until something is playing.
+   * Walk-up transport controls are part of the same card; see [handleMusicCardTouch].
+   */
   private fun buildNowPlaying(spec: NowPlayingSpec) {
-    val scale = spec.sizeScale / 100f
-    val card = LinearLayout(context)
-    card.orientation = LinearLayout.HORIZONTAL
-    card.gravity = Gravity.CENTER_VERTICAL
-    card.visibility = View.GONE
-
-    // Text first, art at the right edge: title/artist hug the cover (right-aligned).
-    val npCol = LinearLayout(context)
-    npCol.orientation = LinearLayout.VERTICAL
-    npCol.gravity = Gravity.END
-    card.addView(npCol, LinearLayout.LayoutParams(WRAP, WRAP))
-
-    val title = text(26f * scale, Color.WHITE, false)
-    title.typeface = Typeface.DEFAULT_BOLD
-    title.maxLines = 1
-    title.ellipsize = TextUtils.TruncateAt.END
-    title.gravity = Gravity.END
-    title.maxWidth = dp(560)
-    npCol.addView(title, LinearLayout.LayoutParams(WRAP, WRAP))
-
-    val artist = text(18f * scale, 0xCCFFFFFF.toInt(), false)
-    artist.maxLines = 1
-    artist.ellipsize = TextUtils.TruncateAt.END
-    artist.gravity = Gravity.END
-    artist.maxWidth = dp(560)
-    npCol.addView(artist, LinearLayout.LayoutParams(WRAP, WRAP))
-
-    val art = ImageView(context)
-    art.scaleType = ImageView.ScaleType.CENTER_CROP
-    art.clipToOutline = true
-    art.outlineProvider =
-        object : ViewOutlineProvider() {
-          override fun getOutline(v: View, o: Outline) {
-            o.setRoundRect(0, 0, v.width, v.height, dp(10).toFloat())
-          }
-        }
-    val artLp = LinearLayout.LayoutParams((dp(72) * scale).toInt(), (dp(72) * scale).toInt())
-    artLp.setMarginStart(dp(16))
-    if (spec.showArt) card.addView(art, artLp)
-
+    val card = AmbientMusicCardView(context, spec.sizeScale, spec.showArt)
     // Explicit WRAP width: a vertical LinearLayout (the bucket) otherwise hands children
     // MATCH_PARENT by default, which would squeeze the card to a narrower cell-mate's width
     // (e.g. the photo caption now sharing this cell) and truncate the track title.
-    bucket(spec.position).addView(card, LinearLayout.LayoutParams(WRAP, WRAP))
-    nowPlayingCard = card
-    npTitle = title
-    npArtist = artist
-    npArt = art
+    bucket(spec.position).addView(card.root, LinearLayout.LayoutParams(WRAP, WRAP))
+    musicCard = AmbientMusicCardController(card, ui, elapsedRealtime, { work.isActive },
+        ::clearNowPlayingArtwork)
+    nowPlayingCard = card.root
+    npArt = card.art
   }
 
-  /** Reflect the latest now-playing state (main thread). Mirrors the original behaviour. */
+  /** Reflect the latest now-playing state (main thread). */
   private fun updateNowPlaying(s: NowPlayingState?) {
     val token = work.token() ?: return
     val card = nowPlayingCard ?: return
-    if (s == null || !s.active) {
-      clearNowPlayingArtwork()
-      card.visibility = View.GONE
-      return
+    // The controller decides presentation (and releases artwork when it hides the card).
+    val shown = musicCard?.update(s) ?: (s?.active == true).also { active ->
+      card.visibility = if (active) View.VISIBLE else View.GONE
+      if (!active) clearNowPlayingArtwork()
     }
-    card.visibility = View.VISIBLE
-    npTitle?.text = s.title
-    npArtist?.text = s.artist
-    npArtist?.visibility = if (s.artist.isBlank()) View.GONE else View.VISIBLE
+    if (shown && s != null) loadNowPlayingArtwork(s, token)
+  }
+
+  /**
+   * Walk-up music controls from the host's touch stream (called by [PhotoFrameController.onTouch]
+   * after the timer alarm). True when the tap belonged to the card.
+   */
+  fun handleMusicCardTouch(ev: MotionEvent): Boolean = musicCard?.handleTouch(ev) ?: false
+
+  private fun loadNowPlayingArtwork(s: NowPlayingState, token: Long) {
     val art = npArt ?: return
     val bitmap = s.artBitmap
     if (bitmap != null) {
