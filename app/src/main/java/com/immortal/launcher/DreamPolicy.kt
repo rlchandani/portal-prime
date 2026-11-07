@@ -218,6 +218,12 @@ object DreamPolicy {
     // frame would wake the screen just to blank it again — a flash every time a stray sibling/system
     // dream cycles overnight (issue #73). Let the scheduler re-blank in place instead.
     if (SleepScheduler.handleRedreamDuringOvernight(context)) return
+    // A routine takeover wakes the screen out of the dream; relaunching the frame here would cover
+    // the routine half a second after it appears. The routine owns the screen until it ends.
+    if (RoutineEngine.visible || RoutineEngine.screen != null) {
+      Log.i(TAG, "routine on screen; not relaunching frame")
+      return
+    }
     if (pinnedOrigin || PinnedAppScreensaver.hasPin()) {
       // An accessibility overlay preserves the underlying external task. Never fall back to
       // the launcher Activity if attaching this curtain fails: that would displace the app.
