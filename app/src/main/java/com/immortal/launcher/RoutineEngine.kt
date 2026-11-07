@@ -55,8 +55,10 @@ internal object RoutineEngine : RoutineActions {
     private set
   private val main = Handler(Looper.getMainLooper())
 
-  var screen by mutableStateOf<RoutineScreen?>(null)
-    private set
+  private var screenState by mutableStateOf<RoutineScreen?>(null)
+  var screen: RoutineScreen?
+    get() = screenState
+    private set(value) { screenState = value; RoutineScreenState.running = value != null }
   var cheer by mutableStateOf<RoutineCheer?>(null)
     private set
   var toast by mutableStateOf<RoutineToast?>(null)
@@ -65,7 +67,9 @@ internal object RoutineEngine : RoutineActions {
   var revision by mutableIntStateOf(0)
     private set
   /** True while the takeover Activity is started. */
-  var visible = false
+  var visible: Boolean
+    get() = RoutineScreenState.visible
+    set(value) { RoutineScreenState.visible = value }
 
   @Synchronized fun init(context: Context, clock: RoutineClock = SystemRoutineClock) {
     if (::app.isInitialized) return

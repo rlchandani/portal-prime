@@ -220,7 +220,7 @@ object DreamPolicy {
     if (SleepScheduler.handleRedreamDuringOvernight(context)) return
     // A routine takeover wakes the screen out of the dream; relaunching the frame here would cover
     // the routine half a second after it appears. The routine owns the screen until it ends.
-    if (RoutineEngine.visible || RoutineEngine.screen != null) {
+    if (RoutineScreenState.ownsScreen()) {
       Log.i(TAG, "routine on screen; not relaunching frame")
       return
     }
