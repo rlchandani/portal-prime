@@ -27,6 +27,8 @@ object YtEngineReducer {
     YtAction.Next -> s.queue.next()?.let { navigate(s, it) } ?: YtStep(s)
     YtAction.Previous -> previous(s)
     YtAction.Play -> play(s)
+    YtAction.PlayWhenVisible -> playWhenVisible(s)
+    is YtAction.PlayEntryNext -> queueOnly(s, s.queue.playEntryNext(a.entryId))
     YtAction.Pause -> pause(s.copy(playWhenVisible = false))
     is YtAction.SeekTo -> seek(s, a.positionMs)
     is YtAction.SetRepeat -> queueOnly(s, s.queue.withRepeat(a.mode))
@@ -99,6 +101,13 @@ object YtEngineReducer {
           listOf(YtEffect.Seek(0), YtEffect.Play))
       else -> YtStep(wanting, listOf(YtEffect.Play))
     }
+  }
+
+  /** Remote play: at once on a visible player, else when the music screen next becomes visible. */
+  private fun playWhenVisible(s: YtEngineState): YtStep = when {
+    s.queue.current == null -> YtStep(s)
+    s.canPlay -> play(s)
+    else -> YtStep(s.copy(playWhenVisible = true))
   }
 
   private fun pause(s: YtEngineState): YtStep {
