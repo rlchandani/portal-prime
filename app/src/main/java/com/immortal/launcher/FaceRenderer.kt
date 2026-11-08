@@ -222,6 +222,8 @@ class FaceRenderer(
 
   // Photo caption (place / date + "on this day" badge). Grid element, fed via [setCaption].
   private var captionPanel: LinearLayout? = null
+  /** False when the face turned photo captions off; only the fresh-photo badge shows then. */
+  private var captionMetadata = true
   private var captionMemory: TextView? = null
   private var captionPlace: TextView? = null
   private var captionDate: TextView? = null
@@ -307,6 +309,7 @@ class FaceRenderer(
     // Caption views are rebuilt below (or not, on a full-bleed face) — drop stale refs so a
     // late setCaption() can't poke a detached view from the previous face.
     captionPanel = null
+    captionMetadata = true
     captionPlace = null
     captionDate = null
 
@@ -346,7 +349,9 @@ class FaceRenderer(
       }
       buildStandaloneWidgets(face)
       // Photo caption is photo metadata, so (like the widgets) it's skipped on a full-bleed clock.
-      if (face.caption.enabled) buildCaption(face.caption)
+      // It is always built on photo faces: with captions off it carries only the fresh-photo badge.
+      captionMetadata = face.caption.enabled
+      buildCaption(face.caption)
     }
     // A running countdown timer is face-independent: it surfaces top-center on every face and
     // self-hides when no timer is active (see [tick]).
@@ -683,16 +688,17 @@ class FaceRenderer(
    * above the place when non-null. No-op when the caption isn't built (disabled, or a full-bleed
    * face).
    */
-  fun setCaption(place: String?, date: String?, memory: String? = null) {
+  fun setCaption(place: String?, date: String?, memory: String? = null, fresh: String? = null) {
     if (work.isStopped) return
     val col = captionPanel ?: return
-    val p = place?.takeIf { it.isNotBlank() }
-    val d = date?.takeIf { it.isNotBlank() }
-    val m = memory?.takeIf { it.isNotBlank() }
-    if (p == null && d == null && m == null) {
+    val lines = CaptionLines.resolve(captionMetadata, place, date, memory, fresh)
+    if (lines == null) {
       col.visibility = View.GONE
       return
     }
+    val p = lines.place
+    val d = lines.date
+    val m = lines.badge
     captionMemory?.apply {
       visibility = if (m == null) View.GONE else View.VISIBLE
       text = m ?: ""

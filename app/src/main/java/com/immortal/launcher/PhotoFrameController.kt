@@ -1621,8 +1621,8 @@ class PhotoFrameController(
     val date = meta?.let { PhotoCaption.formatDate(it.dateMillis) }
     // "On this day": an amber badge when the photo was taken on today's month+day in a prior year.
     // A freshly shared photo's "New from <phone> · just now" uses the same badge for its one turn.
-    val memory = fresh ?: meta?.let { m -> PhotoCaption.memoryYears(m.dateMillis)?.let { PhotoCaption.memoryLabel(it) } }
-    ui.post { if (g == gen) faceRenderer.setCaption(place, date, memory) }
+    val memory = meta?.let { m -> PhotoCaption.memoryYears(m.dateMillis)?.let { PhotoCaption.memoryLabel(it) } }
+    ui.post { if (g == gen) faceRenderer.setCaption(place, date, memory, fresh) }
   }
 
   /** A clean upcoming-events panel top-right, over the photo. Its own translucent
