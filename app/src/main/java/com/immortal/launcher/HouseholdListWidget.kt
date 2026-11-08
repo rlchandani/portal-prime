@@ -109,8 +109,8 @@ private fun EmptyWidgetBody(doneCount: Int, onAdd: () -> Unit) {
   val palette = LocalApprovedPalette.current
   Text(if (doneCount > 0) "All done" else "Nothing on the list", color = palette.text, fontSize = 34.sp, lineHeight = 42.sp)
   Spacer(Modifier.height(8.dp))
-  Text(if (doneCount > 0) "$doneCount ticked off. Add the next thing here, on another Portal or in Toolkit."
-       else "Add something here, on another Portal or in Toolkit on your phone.",
+  Text(if (doneCount > 0) "$doneCount ticked off. Add the next thing here, on another Portal or in Calder Pocket."
+       else "Add something here, on another Portal or in Calder Pocket on your phone.",
       color = palette.secondary, fontSize = 22.sp, lineHeight = 30.sp)
   Spacer(Modifier.height(18.dp))
   ApprovedHomePillButton("+  Add an item", onClick = onAdd)

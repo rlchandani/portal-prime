@@ -80,7 +80,7 @@ class RoutineScheduleTest {
     assertEquals("Off", RoutineSchedule.widgetStatus(r.copy(enabled = false), emptyMap(), at(MON, 7, 0)).text)
     assertEquals("Next: Today, 7:15", RoutineSchedule.statusLine(r, emptyMap(), at(MON, 7, 0)))
     assertEquals("Done today at 7:41", RoutineSchedule.statusLine(r, mapOf("r1" to done), at(MON, 8, 0)))
-    assertEquals("Switched off in Toolkit", RoutineSchedule.statusLine(r.copy(enabled = false), emptyMap(), at(MON, 8, 0)))
+    assertEquals("Switched off in Calder Pocket", RoutineSchedule.statusLine(r.copy(enabled = false), emptyMap(), at(MON, 8, 0)))
     assertEquals("Monday to Friday", RoutineSchedule.daysText(r.days))
     assertEquals("Every day", RoutineSchedule.daysText(bedtime().days))
   }

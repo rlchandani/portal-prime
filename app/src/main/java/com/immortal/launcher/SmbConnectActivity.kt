@@ -95,7 +95,7 @@ private fun SmbConnectScreen(onCancel: () -> Unit) {
                 activity?.let { approvedSourcesReturn(it) }
             }
         } else {
-            ApprovedSourcesForm("Network share", "Enter your server, share name, an optional folder inside the share, and credentials. Immortal tests the connection and counts photos before selecting this source.") {
+            ApprovedSourcesForm("Network share", "Enter your server, share name, an optional folder inside the share, and credentials. Calder tests the connection and counts photos before selecting this source.") {
                 ApprovedSourcesField("Server", host, { host = it }, "192.168.1.50", enabled = !work.busy)
                 ApprovedSourcesField("Share name", share, { share = it }, "media", enabled = !work.busy)
                 ApprovedSourcesField("Folder in the share", path, { path = it }, "photos (optional)", enabled = !work.busy)

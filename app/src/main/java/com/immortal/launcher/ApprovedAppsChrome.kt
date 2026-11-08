@@ -76,7 +76,7 @@ internal fun ApprovedAppsHeader(onSearch: () -> Unit) {
   }
   Column {
     Row(Modifier.fillMaxWidth().height(103.dp).padding(horizontal = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-      Text("immortal", color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Medium, letterSpacing = (-0.6).sp)
+      Text(Brand.WORDMARK, color = IosLabel, fontSize = 30.sp, fontWeight = FontWeight.Medium, letterSpacing = (-0.6).sp)
       Spacer(Modifier.width(30.dp))
       Box(Modifier.width(1.dp).height(40.dp).background(IosDivider))
       Text(FleetConfig.name(context), color = IosSecondary, fontSize = 22.sp, modifier = Modifier.padding(start = 24.dp))

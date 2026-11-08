@@ -249,11 +249,11 @@ internal fun ScreensaverDismissContent() {
     Card {
       NavRow("Open when you tap to exit", value = when {
         settings.dismissHaDashboard != null -> if (choicesReady && haPkg == null)
-          "Immortal launcher" else "Home Assistant dashboard"
+          "Calder launcher" else "Home Assistant dashboard"
         settings.dismissAppComponent != null -> apps?.firstOrNull {
           it.component.flattenToString() == settings.dismissAppComponent
         }?.label ?: "Chosen app"
-        else -> "Immortal launcher"
+        else -> "Calder launcher"
       }, modifier = Modifier.semantics {
         contentDescription = "Open when you tap to exit"
       }) { popup = ApprovedEditorsDismissPopup.TARGET }
@@ -263,7 +263,7 @@ internal fun ScreensaverDismissContent() {
       ApprovedEditorsButton("Try again") { retryCount++ }
     }
     if (settings.dismissHaDashboard != null && haPkg == null && apps != null) {
-      FooterNote("The Home Assistant companion app is unavailable. The screensaver returns to Immortal.")
+      FooterNote("The Home Assistant companion app is unavailable. The screensaver returns to Calder.")
     }
     if (settings.dismissHaDashboard != null && advanced && haPkg != null) {
       SectionLabel("Advanced options")
@@ -280,7 +280,7 @@ internal fun ScreensaverDismissContent() {
     ApprovedEditorsDismissPopup.TARGET -> ApprovedSettingsDialog("Open when you tap to exit",
       onDismiss = { popup = null }) {
       Card {
-        DismissRow(null, "Immortal launcher", "Return to your home screen (default).",
+        DismissRow(null, "Calder launcher", "Return to your home screen (default).",
           settings.dismissHaDashboard == null && settings.dismissAppComponent == null) { chooseLauncher() }
         if (haPkg != null) {
           Divider()

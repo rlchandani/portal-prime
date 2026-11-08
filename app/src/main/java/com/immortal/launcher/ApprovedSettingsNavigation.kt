@@ -171,7 +171,7 @@ internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("sleep", "Sleep timer", "device", standaloneActivity = SleepSettingsActivity::class.java),
     ApprovedSettingsPage("health", "About & device health", "device", standaloneActivity = DeviceHealthActivity::class.java),
     ApprovedSettingsPage("apk", "Install an APK", "device", ApkBrowserActivity::class.java),
-    ApprovedSettingsPage("help", "Welcome to Immortal", "device", HelpActivity::class.java),
+    ApprovedSettingsPage("help", "Welcome to ${Brand.NAME}", "device", HelpActivity::class.java),
     ApprovedSettingsPage("speed", "Speed test", "connections"),
     ApprovedSettingsPage("system", "Android & Portal settings", "device"),
     ApprovedSettingsPage("managed", "Automatically managed settings", "advanced"),

@@ -41,7 +41,7 @@ data class Face(
     fun immortalClassic(context: Context): Face =
         Face(
             id = "immortal-classic",
-            name = "Immortal",
+            name = Brand.NAME,
             clock =
                 ClockSpec(
                     mode = ClockMode.DIGITAL,

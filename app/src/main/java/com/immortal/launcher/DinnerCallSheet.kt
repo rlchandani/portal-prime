@@ -216,7 +216,7 @@ private fun DinnerEmptyState(onClose: () -> Unit) {
     DinnerGlyph("display", 132)
     Text("No other Portals to call yet", color = ApprovedHomePalette.Text, fontSize = 40.sp, fontWeight = FontWeight.Medium,
         modifier = Modifier.padding(top = 36.dp))
-    Text("Call everyone reaches the other Portals on your home Wi-Fi. Pair one from Toolkit on your phone, then it shows up here.",
+    Text("Call everyone reaches the other Portals on your home Wi-Fi. Pair one from Calder Pocket on your phone, then it shows up here.",
         color = ApprovedHomePalette.Secondary, fontSize = 24.sp, lineHeight = 34.sp,
         modifier = Modifier.padding(top = 16.dp, bottom = 40.dp).fillMaxWidth(0.6f))
     ApprovedHomePillButton("Close", onClick = onClose)

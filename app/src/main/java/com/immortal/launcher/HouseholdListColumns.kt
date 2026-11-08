@@ -49,7 +49,7 @@ internal fun HouseholdListColumns(view: HouseholdListView, toast: HouseholdListT
     if (open.isEmpty() && done.isEmpty()) {
       Text("The list is empty", color = palette.text, fontSize = 34.sp, lineHeight = 42.sp)
       Spacer(Modifier.height(10.dp))
-      Text("Anything you add shows up on every Portal and in Toolkit on everyone’s phone.", color = palette.secondary,
+      Text("Anything you add shows up on every Portal and in Calder Pocket on everyone’s phone.", color = palette.secondary,
           fontSize = 22.sp, lineHeight = 30.sp)
       return@Column
     }

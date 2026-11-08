@@ -256,7 +256,7 @@ class MqttPublisher(private val appContext: Context) {
           }
           "open" -> openTarget(payload)
           "identify" ->
-              Toast.makeText(appContext, "Immortal · ${FleetConfig.name(appContext)}", Toast.LENGTH_LONG)
+              Toast.makeText(appContext, "Calder · ${FleetConfig.name(appContext)}", Toast.LENGTH_LONG)
                   .show()
           "media_play_pause" -> NowPlayingHub.playPause()
           "media_next" -> NowPlayingHub.next()

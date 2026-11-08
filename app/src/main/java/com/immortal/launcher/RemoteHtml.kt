@@ -20,7 +20,7 @@ object RemoteHtml {
 <meta name="color-scheme" content="light dark">
 <meta name="referrer" content="no-referrer">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Immortal Control Center</title>
+<title>Calder Control Center</title>
 <link rel="icon" type="image/png" sizes="64x64" href="/remote/app-icon?size=64">
 <link rel="manifest" href="/remote/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/remote/app-icon?size=180">
@@ -31,7 +31,7 @@ object RemoteHtml {
 <a class="skip-link" href="#page">Skip to controls</a>
 <header class="topbar">
   <div class="topbar-inner">
-    <div class="brand"><span class="brand-mark" aria-hidden="true">∞</span><span>Immortal<span class="brand-detail">Control center</span></span></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true">∞</span><span>Calder<span class="brand-detail">Control center</span></span></div>
     <div class="header-actions">
       <button id="room-button" class="room-button" aria-haspopup="dialog">Choose a Portal <span aria-hidden="true">⌄</span></button>
       <button id="refresh-button" class="icon-button" aria-label="Refresh current page">↻</button>
@@ -43,7 +43,7 @@ object RemoteHtml {
 <nav id="navigation" class="navigation" aria-label="Control center"></nav>
 <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
 <dialog id="sheet" aria-labelledby="sheet-title"><div class="sheet-header"><h2 id="sheet-title"></h2><button id="sheet-close" class="icon-button" aria-label="Close dialog">×</button></div><div id="sheet-content"></div><div id="sheet-actions" class="sheet-actions"></div></dialog>
-<noscript><div class="noscript">Enable JavaScript to pair and control your Portal. All browser assets are served locally by Immortal.</div></noscript>
+<noscript><div class="noscript">Enable JavaScript to pair and control your Portal. All browser assets are served locally by Calder.</div></noscript>
 </body>
 </html>
       """.trimIndent()

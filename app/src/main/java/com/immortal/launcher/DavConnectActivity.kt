@@ -86,7 +86,7 @@ private fun DavConnectScreen(onCancel: () -> Unit) {
                 activity?.let { approvedSourcesReturn(it) }
             }
         } else {
-            ApprovedSourcesForm("WebDAV folder", "Paste the full WebDAV folder URL from your NAS or Nextcloud. Enter credentials if required. Immortal checks for photos before selecting this source.") {
+            ApprovedSourcesForm("WebDAV folder", "Paste the full WebDAV folder URL from your NAS or Nextcloud. Enter credentials if required. Calder checks for photos before selecting this source.") {
                 ApprovedSourcesField("WebDAV folder address", url, { url = it }, "http://nas:30035/share/photos/", enabled = !work.busy)
                 ApprovedSourcesField("Username (optional)", user, { user = it }, enabled = !work.busy)
                 ApprovedSourcesField("Password (optional)", pass, { pass = it }, secret = true, enabled = !work.busy)

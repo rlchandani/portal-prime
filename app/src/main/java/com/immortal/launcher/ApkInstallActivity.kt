@@ -115,7 +115,7 @@ class ApkInstallActivity : ComponentActivity() {
   private fun doInstall(apk: File, pkg: String, setStatus: (String) -> Unit) {
     when {
       InstallDaemon.installPaused(this) ->
-          setStatus("Paused — connect to your computer and run the Immortal installer again")
+          setStatus("Paused — connect to your computer and run the Calder installer again")
       InstallDaemon.isAvailable(this) -> {
         setStatus("Installing…")
         installInProgress = true
@@ -233,7 +233,7 @@ private fun InstallPrompt(
         }
         Text("Install $label?", color = Color.White, fontSize = 20.sp, textAlign = TextAlign.Center)
         Text(
-            "via Immortal",
+            "via Calder",
             color = Color(0xFF8A8A8A),
             fontSize = 13.sp,
             modifier = Modifier.padding(top = 2.dp),

@@ -1094,7 +1094,7 @@ internal fun MultiRoomContent() {
                   "Assistant? Learn more at music-assistant.io")
           SetupStep(
               "2",
-              "Install Snapcast from the Immortal App Store, and point it at your Music Assistant " +
+              "Install Snapcast from the Calder App Store, and point it at your Music Assistant " +
                   "server.")
           SetupStep(
               "3", "Turn on the toggle below, then apply your server address, API token and raw " +
@@ -1792,7 +1792,7 @@ internal fun DeviceHealthContent() {
             if (checks.filter { !it.granted }.all { it.repair == DevicePermissions.Repair.RECONNECT_CONTROLS })
               "Use Reconnect controls above. This page will check the connection after reconnecting."
             else
-              "Run Immortal setup from a connected computer to restore missing system permissions, " +
+              "Run Calder setup from a connected computer to restore missing system permissions, " +
                   "then choose Check again. Any available Reconnect controls action can be used here.",
             color = IosSecondary,
             fontSize = Sizes.rowSub,
@@ -1807,15 +1807,15 @@ internal fun DeviceHealthContent() {
       if (advanced && adminActive) {
         Spacer(Modifier.size(28.dp))
         Text(
-            "Prepare to uninstall Immortal",
+            "Prepare to uninstall Calder",
             color = IosSecondary,
             fontSize = Sizes.rowSub,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
         )
         Text(
-            "Remove Immortal’s screen-lock permission before uninstalling. This stops automatic " +
-                "and remote screen-off until Immortal setup restores the permission.",
+            "Remove Calder’s screen-lock permission before uninstalling. This stops automatic " +
+                "and remote screen-off until Calder setup restores the permission.",
             color = IosSecondary,
             fontSize = Sizes.rowSub,
             modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 10.dp),
@@ -1919,7 +1919,7 @@ private fun HealthRow(c: DevicePermissions.Check, advanced: Boolean,
 internal fun BootAppsScreen(onBack: () -> Unit) {
   SettingsScaffold(
       title = "Start on boot",
-      subtitle = "Pick which installed apps Immortal relaunches after a reboot.",
+      subtitle = "Pick which installed apps Calder relaunches after a reboot.",
       onBack = onBack,
   ) { BootAppsContent() }
 }

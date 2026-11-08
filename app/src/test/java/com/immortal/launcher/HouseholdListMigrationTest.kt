@@ -27,7 +27,7 @@ class HouseholdListMigrationTest {
     val summary = HouseholdListMigration.summary(merged)!!
     assertEquals("Your two To-do lists are now one", summary.title)
     assertEquals("Family Area had 3 items and Living Area had 2. They’re all on the household list now. " +
-        "Eggs was on both, so it’s there once. It syncs with Toolkit on your phones too.", summary.body)
+        "Eggs was on both, so it’s there once. It syncs with Calder Pocket on your phones too.", summary.body)
   }
 
   @Test fun onePortal_getsItsOwnWording_andEmptyToDoNeedsNoDialog() {

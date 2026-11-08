@@ -437,7 +437,7 @@
         <activity
             android:name=".ImmortalSettingsActivity"
             android:exported="false"
-            android:label="Immortal Settings"
+            android:label="Calder Settings"
             android:theme="@style/Theme.SampleApp.Settings"
             android:windowSoftInputMode="adjustResize" />
 
@@ -498,7 +498,7 @@
             android:name=".ApkInstallActivity"
             android:exported="true"
             android:excludeFromRecents="true"
-            android:label="Install with Immortal"
+            android:label="Install with Calder"
             android:theme="@style/Theme.SampleApp">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

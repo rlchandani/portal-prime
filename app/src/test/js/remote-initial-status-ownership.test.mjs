@@ -303,7 +303,7 @@ test('initial unsupported companion endpoint keeps working controls and update g
     await h.settle();
     assert.match(connection(h), /Connected/);
     assert.doesNotMatch(connection(h), /Offline|Retry|Pair again/);
-    assert.match(page(h).textContent, /Update Immortal on this Portal/);
+    assert.match(page(h).textContent, /Update Calder on this Portal/);
     assert.equal(statusCalls(h).length, 1);
   } finally { await dispose(); }
 });

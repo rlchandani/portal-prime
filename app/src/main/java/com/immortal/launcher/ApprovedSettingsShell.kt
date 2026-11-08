@@ -402,7 +402,7 @@ private fun ApprovedSettingsDeviceIdentity(deviceName: String) {
     }
     Text(deviceName, color = IosLabel, fontSize = 22.sp,
         fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 10.dp))
-    Text("${android.os.Build.MODEL} · Immortal${versionName?.let { " $it" }.orEmpty()}",
+    Text("${android.os.Build.MODEL} · ${Brand.NAME}${versionName?.let { " $it" }.orEmpty()}",
         color = IosSecondary, fontSize = 18.sp,
         modifier = Modifier.padding(top = 5.dp))
 }
