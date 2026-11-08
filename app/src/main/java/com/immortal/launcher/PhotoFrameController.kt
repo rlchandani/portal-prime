@@ -435,7 +435,8 @@ class PhotoFrameController(
 
   private fun startFrame() {
     stopped = false
-    settings = ScreensaverConfig.load(context).let {
+    // Guest mode swaps personal photos and the calendar for neutral ones (GuestPolicy).
+    settings = GuestPolicy.screensaver(ScreensaverConfig.load(context)).let {
       if (photosOnly) musicPhotoSettings(it) else it
     }
     val root = view as FrameLayout
@@ -2255,7 +2256,7 @@ class PhotoFrameController(
           // Pick up calendar changes pushed over the fleet API (or via in-app
           // settings) without restarting the dream: reload just the calendar fields,
           // leaving the live slideshow state untouched.
-          val fresh = ScreensaverConfig.load(context)
+          val fresh = GuestPolicy.screensaver(ScreensaverConfig.load(context))
           if (fresh.calendarUrl != settings.calendarUrl ||
               fresh.calendarRange != settings.calendarRange) {
             settings = settings.copy(calendarUrl = fresh.calendarUrl, calendarRange = fresh.calendarRange)
@@ -2328,7 +2329,7 @@ class PhotoFrameController(
     gen++
     // Share to Portal: a photo a phone just shared takes the next automatic turn (spliced in after now).
     // A fresh-photo lookup failure must never stop the slideshow, so it degrades to a normal turn.
-    val fresh = if (dir > 0 && automatic && !isNightClockShowing)
+    val fresh = if (dir > 0 && automatic && !isNightClockShowing && !GuestMode.hides(GuestContent.PHOTOS))
       runCatching { FreshPhotoStore.slideshowTurn(context, playlist.map { it.path }, localIndex) }.getOrNull() else null
     if (fresh != null) {
       if (fresh.inserted) {

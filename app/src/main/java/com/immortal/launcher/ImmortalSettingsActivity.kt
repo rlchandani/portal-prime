@@ -446,6 +446,7 @@ private fun ApprovedNativeSettingsPage(page: String) {
     "alarm" -> AlarmContent()
     "world" -> WorldClockContent()
     "countdowns" -> CountdownSettingsContent()
+    "guests" -> GuestSettingsContent()
     "crypto" -> CryptoSettingsContent()
     "todo" -> TodoSettingsContent()
     "news" -> NewsSettingsContent()

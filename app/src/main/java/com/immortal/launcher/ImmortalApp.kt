@@ -36,6 +36,7 @@ class ImmortalApp : Application() {
     MusicHandoff.install(this)
     RoutinesFeature.install(this)
     ShareFeature.install(this)
+    GuestFeature.install(this)
     // Weak window tracking is dormant until an operator starts a bounded Fleet capture.
     FramePerformanceCapture.init(this)
     // Package events invalidate read metadata without scans or work on this main thread.

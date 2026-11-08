@@ -75,7 +75,9 @@ internal fun rememberShareHomeState(): ShareHomeState {
   }
   LaunchedEffect(undoId) { if (undoId != null) { delay(UNDO_MS); undoId = null } }
   LaunchedEffect(restored) { if (restored) { delay(UNDO_MS / 2); restored = false } }
-  return ShareHomeState(notes.newest, undoId, restored,
+  // Guest mode keeps shared notes off Home; they come back when it ends.
+  val guestsHideNotes = rememberGuestHides(GuestContent.SHARED_PHOTO_NOTES)
+  return ShareHomeState(notes.newest.takeUnless { guestsHideNotes }, undoId, restored,
       dismiss = { ShareFeature.dismiss(context, it.id); undoId = it.id; restored = false },
       undo = { undoId?.let { ShareFeature.undo(context, it) }; undoId = null; restored = true })
 }

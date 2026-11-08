@@ -29,8 +29,9 @@ internal fun rememberMusicPhotos(visible: Boolean): MusicPhotoRetention<PhotoFra
     onDispose { owner.lifecycle.removeObserver(observer) }
   }
   // Refresh effective photo inputs only on a layout/resume boundary, never on progress ticks.
-  val restartKey = remember(context, visible, resumeEpoch) {
-    musicPhotoRestartKey(ScreensaverConfig.load(context))
+  val guests by GuestMode.state.collectAsState()
+  val restartKey = remember(context, visible, resumeEpoch, guests) {
+    musicPhotoRestartKey(GuestPolicy.screensaver(ScreensaverConfig.load(context)))
   }
   val retained = remember(context, owner, restartKey) {
     MusicPhotoRetention(

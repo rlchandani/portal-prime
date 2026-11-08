@@ -21,6 +21,7 @@ internal object ApprovedToolsCatalog {
         ApprovedTool("notes", "Leave a note", "A message for whoever comes next.", "Everyday", "notes", 0xFFEED6A6),
         ApprovedTool("camera", "Cameras", "Your saved home camera views.", "Home & downtime", "cameraLens", 0xFFB4DCD0),
         ApprovedTool("intercom", "Intercom", "Broadcast or listen across the house.", "Home & downtime", "megaphone", 0xFFB4DCD0),
+        ApprovedTool("guests", GuestEntry.LABEL, "Wi-Fi card and house basics for visitors.", "Home & downtime", GuestEntry.ICON, 0xFFB4DCD0),
         ApprovedTool("stories", "Bedtime story", "Something gentle before sleep.", "Home & downtime", "book", 0xFFC4B6E7),
         ApprovedTool("iss", "ISS passes", "Know when to look up.", "Discover", "globe", 0xFFA9C9F5),
         ApprovedTool("aurora", "Aurora outlook", "Check the northern lights forecast.", "Discover", "weather", 0xFFB4DCD0),
