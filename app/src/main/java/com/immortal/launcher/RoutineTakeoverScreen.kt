@@ -204,8 +204,13 @@ private fun Footer(r: Routine, ticked: List<String>, preview: Boolean) {
     }
     if (preview) PillButton("✕  End preview") { RoutineEngine.endPreview() }
     else HoldToClose(onHint = { hint = it })
+    // Portal firmware floats its bug-report pill (BugnubPillViewService) in the bottom-right
+    // corner over every app; keep the close controls clear of it so they stay pressable.
+    Spacer(Modifier.width(FIRMWARE_PILL_CLEARANCE))
   }
 }
+
+private val FIRMWARE_PILL_CLEARANCE = 64.dp
 
 private const val HOLDING = "\u0000holding"
 
