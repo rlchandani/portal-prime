@@ -14,7 +14,9 @@ package com.immortal.launcher
  *  - Android media sessions via [MediaSessionReader] (existing; e.g. a browser playing music);
  *  - the embedded YouTube Music page via its JS bridge, with [NowPlayingState.source] =
  *    [SOURCE_EMBEDDED_YT_MUSIC]. An Android WebView does not publish a media session, so the
- *    page itself must be observed and controlled.
+ *    page itself must be observed and controlled;
+ *  - the official YouTube IFrame player engine ([YouTubeMusicEngine]) with
+ *    [NowPlayingState.source] = [SOURCE_YOUTUBE].
  *
  * Commands go through [MusicTransport]. Surfaces call [MusicTransports.forState] and must not
  * reach into MediaController or the WebView directly.
@@ -29,9 +31,15 @@ interface MusicTransport {
 
 const val SOURCE_EMBEDDED_YT_MUSIC = "embedded:youtube-music"
 
+/** The official YouTube IFrame player driven by our native queue. */
+const val SOURCE_YOUTUBE = "youtube:official"
+
 object MusicTransports {
   /** Set by the embedded YouTube Music pane while its page is alive; cleared on release. */
   @Volatile var embedded: MusicTransport? = null
+
+  /** Set by [YouTubeMusicEngine] while its player is alive; cleared on release. */
+  @Volatile var youtube: MusicTransport? = null
 
   /** Set by the integration layer to control Android media sessions for a given state. */
   @Volatile var mediaSession: ((NowPlayingState) -> MusicTransport?)? = null
@@ -40,6 +48,7 @@ object MusicTransports {
   fun forState(state: NowPlayingState?): MusicTransport? = when {
     state == null -> null
     state.source == SOURCE_EMBEDDED_YT_MUSIC -> embedded
+    state.source == SOURCE_YOUTUBE -> youtube
     else -> mediaSession?.invoke(state)
   }
 }
