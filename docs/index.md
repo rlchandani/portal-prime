@@ -1,9 +1,10 @@
-# Immortal
+# Calder
+
+*Formerly Immortal.* The phone companion app is **Calder Pocket** (formerly Portal Toolkit).
 
 **A custom home-screen layer that keeps discontinued Meta Portal devices alive.**
 
-A play on *Portal* — and on keeping it going after Meta wound the platform down.
-Immortal turns a Portal into a device you own: your launcher, your screensaver, and
+Calder turns a Portal into a device you own: your launcher, your screensaver, and
 an app store that installs a curated catalog on-device, with remote self-update so it
 keeps improving without a cable.
 

@@ -1,11 +1,13 @@
-# Immortal
+# Calder
 
-A custom home-screen layer for discontinued Meta Portal devices — a play on *Portal*, and on
-keeping it alive after Meta wound the platform down. Immortal turns a Portal into a device you
+*Formerly Immortal.* The phone companion app is **Calder Pocket** (formerly Portal Toolkit).
+
+A custom home-screen layer for discontinued Meta Portal devices, keeping them alive after Meta
+wound the platform down. Calder turns a Portal into a device you
 own: your launcher, your screensaver, and an app store that installs a curated catalog
 on-device, with remote self-update so it improves over time without a cable.
 
-Package: `com.immortal.launcher` · Target: Meta Portal — **Android 9** (API 28: the 2018 Portal /
+Package: `com.immortal.launcher` (unchanged by the rename, so updates keep working) · Target: Meta Portal — **Android 9** (API 28: the 2018 Portal /
 Portal+ and the Portal TV) and **Android 10** (API 29: the 2019 and 2021 models), arm64, no Google
 services. Touch models and the remote-driven **Portal TV** are both supported.
 
