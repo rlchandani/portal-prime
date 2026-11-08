@@ -58,6 +58,7 @@ class FleetRoutes(private val context: Context) {
       "/apps" -> requireMethod("GET", req) { apps() }
       "/install" -> requireMethod("POST", req) { install(req) }
       "/update" -> requireMethod("POST", req) { update(req) }
+      OtaRoutes.FLEET_PATH -> OtaRoutes.fleet(context, req)
       "/dev" -> dev(req)
       "/config" -> requireMethod("POST", req) { config(req) }
       "/calendar" -> calendar(req)
