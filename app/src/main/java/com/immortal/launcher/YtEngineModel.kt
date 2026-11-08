@@ -94,6 +94,11 @@ sealed interface YtAction {
   data class Restore(val queue: YtQueue, val positionMs: Long) : YtAction
   /** Replaces the queue with one moved here from another Portal and resumes it at [positionMs]. */
   data class Adopt(val queue: YtQueue, val positionMs: Long) : YtAction
+  /**
+   * A queue rebuilt for a song or playlist shared from a phone ([MusicShareQueue]). [restart]
+   * plays its current entry from the start (like [Adopt]); otherwise only the queue changes.
+   */
+  data class ApplyShared(val queue: YtQueue, val restart: Boolean) : YtAction
   data class Foreground(val visible: Boolean) : YtAction
   data class SizeChanged(val ok: Boolean) : YtAction
   /** The WebView renderer died or the host was released; the player must be rebuilt. */
@@ -110,6 +115,9 @@ sealed interface YtPlayerEvent : YtAction {
       val durationMs: Long,
       val videoId: String?,
       val elapsedMs: Long,
+      /** `getVideoData()` title/author, used only to fill placeholder queue metadata. */
+      val title: String? = null,
+      val author: String? = null,
   ) : YtPlayerEvent
   data object AutoplayBlocked : YtPlayerEvent
   data object ApiUnavailable : YtPlayerEvent

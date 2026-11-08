@@ -33,6 +33,7 @@ internal object YtPlayerEventReducer {
     is YtPlayerEvent.StateChanged -> stateChanged(s, e.status)
     is YtPlayerEvent.Error -> error(s, e.code)
     is YtPlayerEvent.Progress -> YtStep(s.copy(
+        queue = fillMeta(s.queue, e),
         positionMs = e.positionMs,
         durationMs = if (e.durationMs > 0) e.durationMs else s.durationMs,
         playerVideoId = e.videoId ?: s.playerVideoId,
@@ -40,6 +41,13 @@ internal object YtPlayerEventReducer {
     YtPlayerEvent.AutoplayBlocked -> YtStep(s.copy(autoplayBlocked = true))
     YtPlayerEvent.ApiUnavailable -> YtStep(s.copy(status = YtPlayerStatus.NOT_READY,
         wantsPlay = false, halt = YtHalt.PlayerUnavailable))
+  }
+
+  private fun fillMeta(queue: YtQueue, e: YtPlayerEvent.Progress): YtQueue {
+    val id = e.videoId ?: return queue
+    val title = e.title ?: return queue
+    if (queue.current?.track?.videoId != id) return queue
+    return queue.fillMeta(id, title, e.author.orEmpty())
   }
 
   /** The player exists: apply the current entry (paused unless the user asked to play). */

@@ -14,10 +14,11 @@ import org.json.JSONObject
  * well-typed messages become events; everything else is dropped.
  *
  * Wire format (v1): `{"v":1,"e":"ready"|"state"|"error"|"progress"|"autoplayBlocked"|"apiError",
- * "s":stateCode,"c":errorCode,"t":seconds,"d":seconds,"id":videoId}`.
+ * "s":stateCode,"c":errorCode,"t":seconds,"d":seconds,"id":videoId,"ti":title,"au":author}`.
  */
 object YtPlayerEventParser {
   const val MAX_MESSAGE_CHARS = 512
+  private const val MAX_TEXT_CHARS = 120
   private const val VERSION = 1
   private const val MAX_MEDIA_SECONDS = 24.0 * 60 * 60
 
@@ -45,8 +46,12 @@ object YtPlayerEventParser {
     val durationMs = (duration * 1_000).toLong()
     val clamped = if (durationMs > 0) positionMs.coerceAtMost(durationMs) else positionMs
     val id = (obj.opt("id") as? String)?.takeIf(YtTrack::isValidVideoId)
-    return YtPlayerEvent.Progress(clamped, durationMs, id, elapsedMs)
+    return YtPlayerEvent.Progress(clamped, durationMs, id, elapsedMs, text(obj, "ti"), text(obj, "au"))
   }
+
+  /** Optional short display text from `getVideoData()`; control characters dropped. */
+  private fun text(obj: JSONObject, key: String): String? =
+      (obj.opt(key) as? String)?.filterNot { it.isISOControl() }?.trim()?.take(MAX_TEXT_CHARS)?.ifBlank { null }
 
   private fun int(obj: JSONObject, key: String): Int? =
       (obj.opt(key) as? Number)?.toDouble()?.takeIf { it % 1.0 == 0.0 && it in -1e6..1e6 }?.toInt()

@@ -191,7 +191,7 @@ internal object MusicHandoff {
   }
 
   /** Playback must be on screen and visible: wake, leave the screensaver and open Calder's music. */
-  private fun openMusicScreen(context: Context) {
+  internal fun openMusicScreen(context: Context) {
     ScreenControl.wake(context)
     runCatching {
       context.startActivity(Intent(context, HomeActivity::class.java).putExtra(APPROVED_HOME_MUSIC, true)
@@ -209,6 +209,9 @@ internal object MusicHandoff {
     step.toast?.let(::notify)
     return step
   }
+
+  /** Shows [text] as the music screen's right-pane toast (also used by music shared from a phone). */
+  internal fun announce(text: String) = notify(text)
 
   private fun notify(text: String) = noticeFlow.update { Notice(text, (it?.seq ?: 0) + 1) }
 

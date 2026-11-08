@@ -77,9 +77,10 @@ object YtPlayerPage {
 (function(){
 var player=null,poll=null,blockTimer=null,wanted=false;
 function post(o){o.v=1;try{window.$BRIDGE_NAME.postMessage(JSON.stringify(o));}catch(e){}}
-function vid(){try{var d=player.getVideoData();return (d&&d.video_id)||'';}catch(e){return '';}}
-function progress(){if(!player||!player.getCurrentTime)return;
-post({e:'progress',t:player.getCurrentTime()||0,d:player.getDuration()||0,id:vid()});}
+function data(){try{return player.getVideoData()||{};}catch(e){return {};}}
+function cut(v){return (typeof v==='string')?v.slice(0,100):'';}
+function progress(){if(!player||!player.getCurrentTime)return;var d=data();
+post({e:'progress',t:player.getCurrentTime()||0,d:player.getDuration()||0,id:d.video_id||'',ti:cut(d.title),au:cut(d.author)});}
 function startPoll(){if(!poll)poll=setInterval(progress,1000);}
 function stopPoll(){if(poll){clearInterval(poll);poll=null;}}
 function armBlockCheck(){clearTimeout(blockTimer);blockTimer=setTimeout(function(){
