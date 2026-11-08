@@ -20,7 +20,7 @@ internal fun Any?.text(max: Int = 256): Boolean = this is String && length <= ma
 
 /** Strict wire preflight; native codecs deliberately tolerate and repair old on-device data. */
 internal object RemoteLayoutPolicy {
-  val kinds = setOf("weather", "world_clock", "timers", "calendar", "alarm", "crypto", "todo", "news", "stocks", "options", "ha", "today", "quick_controls", "photo_memory", "routines")
+  val kinds = setOf("weather", "world_clock", "timers", "calendar", "alarm", "crypto", "todo", "news", "stocks", "options", "ha", "today", "quick_controls", "photo_memory", "routines", "wifi")
   private val packagePattern = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)+")
   fun packageName(value: Any?): Boolean = value is String && value.length <= 200 && packagePattern.matches(value)
 

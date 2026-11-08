@@ -9,15 +9,15 @@ package com.immortal.launcher
 import com.immortal.launcher.HomeWidgetStore.HomeWidget
 
 /**
- * What the simplified "Add a widget" picker offers (approved 2026-11-07): seven everyday widgets
+ * What the simplified "Add a widget" picker offers (approved 2026-11-07): the everyday widgets
  * up front, everything else behind "More". Pure; nothing here touches storage.
  */
 internal object HomeWidgetPicker {
-  /** The seven everyday widgets, in the approved order. */
+  /** The everyday widgets: the approved seven in order, then Wi-Fi (the guest join QR). */
   val everyday: List<String> = listOf(
       HomeWidgetStore.KIND_WEATHER, HomeWidgetStore.KIND_CALENDAR, HomeWidgetStore.KIND_HA,
       HomeWidgetStore.KIND_TIMERS, HomeWidgetStore.KIND_TODO, HomeWidgetStore.KIND_ALARM,
-      HomeWidgetStore.KIND_WORLD_CLOCK)
+      HomeWidgetStore.KIND_WORLD_CLOCK, HomeWidgetStore.KIND_WIFI)
 
   /**
    * Built-in kinds behind "More" (the retire-candidates). Options needs Advanced settings; Photo
@@ -62,6 +62,7 @@ internal object HomeWidgetPicker {
     HomeWidgetStore.KIND_OPTIONS -> "Options"
     HomeWidgetStore.KIND_PHOTO_MEMORY -> "Photo memory"
     HomeWidgetStore.KIND_ROUTINES -> "Routines"
+    HomeWidgetStore.KIND_WIFI -> "Wi-Fi"
     else -> "Widget"
   }
 
@@ -77,6 +78,7 @@ internal object HomeWidgetPicker {
     HomeWidgetStore.KIND_NEWS -> "globe"
     HomeWidgetStore.KIND_PHOTO_MEMORY -> "photo"
     HomeWidgetStore.KIND_ROUTINES -> "timer"
+    HomeWidgetStore.KIND_WIFI -> "wifi"
     HomeWidgetStore.KIND_CRYPTO, HomeWidgetStore.KIND_STOCKS, HomeWidgetStore.KIND_OPTIONS -> "calculator"
     else -> "apps"
   }

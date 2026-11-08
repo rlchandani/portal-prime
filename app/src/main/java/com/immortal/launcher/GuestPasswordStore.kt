@@ -26,13 +26,15 @@ internal open class GuestSecret(private val secure: YtSecureStore, private val a
   fun write(value: String): Boolean {
     if (value.isEmpty()) return clear()
     if (!accepts(value)) return false
-    return runCatching { secure.save(value) }.isSuccess
+    return runCatching { secure.save(value) }.isSuccess.also(::changed)
   }
 
-  fun clear(): Boolean = runCatching { secure.clear() }.isSuccess
+  fun clear(): Boolean = runCatching { secure.clear() }.isSuccess.also(::changed)
 
   /** Stores a value that passed an older, looser check ([GuestSecretsMigration] only). */
-  internal fun writeMigrated(value: String): Boolean = runCatching { secure.save(value) }.isSuccess
+  internal fun writeMigrated(value: String): Boolean = runCatching { secure.save(value) }.isSuccess.also(::changed)
+
+  private fun changed(ok: Boolean) { if (ok) GuestCardChanges.bump() }
 
   companion object {
     const val DIR = "guest"

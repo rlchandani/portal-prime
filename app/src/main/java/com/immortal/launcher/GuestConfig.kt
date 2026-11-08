@@ -8,6 +8,10 @@ package com.immortal.launcher
 
 import android.content.Context
 import android.content.SharedPreferences
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 /**
  * The guest card's non-secret values: the network and the house basics, stored as choices
@@ -51,6 +55,17 @@ internal object GuestConfig {
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
+  /**
+   * Calls [onChange] whenever a stored card value changes. SharedPreferences holds listeners
+   * weakly: keep the returned listener and hand it back to [unobserve].
+   */
+  fun observe(c: Context, onChange: () -> Unit): SharedPreferences.OnSharedPreferenceChangeListener =
+      SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> onChange() }
+          .also { prefs(c).registerOnSharedPreferenceChangeListener(it) }
+
+  fun unobserve(c: Context, listener: SharedPreferences.OnSharedPreferenceChangeListener) =
+      prefs(c).unregisterOnSharedPreferenceChangeListener(listener)
+
   fun load(c: Context): Settings {
     val p = prefs(c)
     if (p.getInt(KEY_SCHEMA, 1) < SCHEMA) migrate(p)
@@ -91,4 +106,15 @@ internal object GuestConfig {
   /** The schema-1 door code, if it hasn't moved to [GuestDoorCodeStore] yet. */
   fun legacyDoorCode(c: Context): String? = prefs(c).getString("doorCode", null)
   fun dropLegacyDoorCode(c: Context): Boolean = prefs(c).edit().remove("doorCode").commit()
+}
+
+/**
+ * Ticks whenever a guest-card secret is stored or cleared, so live surfaces (the Home Wi-Fi
+ * widget) reload; the non-secret values are watched through [GuestConfig.observe]. Carries no data.
+ */
+internal object GuestCardChanges {
+  private val mutable = MutableStateFlow(0L)
+  val revision: StateFlow<Long> = mutable.asStateFlow()
+
+  fun bump() = mutable.update { it + 1 }
 }

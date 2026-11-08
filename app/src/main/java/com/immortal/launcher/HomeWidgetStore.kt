@@ -73,6 +73,8 @@ object HomeWidgetStore {
   const val KIND_TODAY = "today"
   const val KIND_QUICK_CONTROLS = "quick_controls"
   const val KIND_PHOTO_MEMORY = "photo_memory"
+  /** Guest-facing Wi-Fi join QR; reads the Guest card network ([WifiHomeWidget]). */
+  const val KIND_WIFI = "wifi"
 
   const val DEFAULT_SPAN_X = 2
   const val DEFAULT_SPAN_Y = 2

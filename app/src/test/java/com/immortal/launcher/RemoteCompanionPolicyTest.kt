@@ -54,6 +54,11 @@ class RemoteCompanionPolicyTest {
     val partial = JSONObject(w.toString()).apply { remove("row") }
     assertFalse(RemoteLayoutPolicy.validate(layout().put("widgets", JSONArray().put(partial)), emptyList()).valid)
   }
+  @Test fun layoutAcceptsTheWifiWidgetFromThePhone() {
+    val w = JSONObject("""{"kind":"wifi","customId":"wifi:abc","spanX":2,"spanY":4,"page":0,"column":0,"row":0}""")
+    assertTrue(RemoteLayoutPolicy.validate(layout().put("widgets", JSONArray().put(w)), emptyList()).valid)
+  }
+
   @Test fun layoutRetainsBoundWidgetsWithoutRebinding() {
     val existing = HomeWidgetStore.HomeWidget(7, "com.test", "Provider")
     val l = layout().put("widgets", JSONArray(HomeWidgetStore.serialize(listOf(existing))))

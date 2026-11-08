@@ -54,6 +54,12 @@ class GuestPolicyTest {
         HomeWidgetStore.KIND_QUICK_CONTROLS).forEach { assertFalse(it, GuestPolicy.hidesHomeWidget(it)) }
   }
 
+  @Test fun wifiWidgetStaysVisibleForGuests_itIsMeantForThem() {
+    guestsOn()
+    assertNull(GuestPolicy.homeWidgetContent(HomeWidgetStore.KIND_WIFI))
+    assertFalse(GuestPolicy.hidesHomeWidget(HomeWidgetStore.KIND_WIFI))
+  }
+
   @Test fun nothingIsHiddenWhenGuestModeIsOff() {
     assertFalse(GuestPolicy.hidesHomeWidget(HomeWidgetStore.KIND_PHOTO_MEMORY))
     assertFalse(GuestPolicy.hidesTool("notes"))

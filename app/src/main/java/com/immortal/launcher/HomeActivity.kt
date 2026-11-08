@@ -2054,6 +2054,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_TODAY -> "Today"
       HomeWidgetStore.KIND_QUICK_CONTROLS -> "Quick Controls"
       HomeWidgetStore.KIND_PHOTO_MEMORY -> "Photo Memory"
+      HomeWidgetStore.KIND_WIFI -> "Wi-Fi"
       else -> "Widget"
     }
 
@@ -3151,6 +3152,7 @@ private fun ImmortalWidgetContent(
     HomeWidgetStore.KIND_TODAY -> TodayStripWidget(modifier)
     HomeWidgetStore.KIND_QUICK_CONTROLS -> QuickControlsWidget(modifier)
     HomeWidgetStore.KIND_PHOTO_MEMORY -> ApprovedHomePhoto(modifier, onEnterEdit)
+    HomeWidgetStore.KIND_WIFI -> WifiHomeWidget(modifier, WifiWidgetLayout.of(widget.spanX, widget.spanY))
     else -> UnknownImmortalWidget(widget.kind, modifier)
   }
 }
@@ -4843,6 +4845,7 @@ private fun CustomWidgetGlyph(kind: String) {
         HomeWidgetStore.KIND_STOCKS -> "📈"
         HomeWidgetStore.KIND_OPTIONS -> "Δ"
         HomeWidgetStore.KIND_HA -> "🏠"
+        HomeWidgetStore.KIND_WIFI -> "📶"
         else -> "+"
       }
   Text(emoji, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
@@ -5524,6 +5527,7 @@ private fun ApprovedWidgetLibrary(
         Triple(HomeWidgetStore.KIND_PHOTO_MEMORY, "Photo memory", "photo"),
         Triple(HomeWidgetStore.KIND_TIMERS, "Timers", "timer"),
         Triple(HomeWidgetStore.KIND_TODO, "Household list", "notes"),
+        Triple(HomeWidgetStore.KIND_WIFI, "Wi-Fi", "wifi"),
         Triple(HomeWidgetStore.KIND_NEWS, "News", "globe"),
         Triple(HomeWidgetStore.KIND_STOCKS, "Stocks", "calculator"),
         Triple(HomeWidgetStore.KIND_OPTIONS, "Options", "calculator"),

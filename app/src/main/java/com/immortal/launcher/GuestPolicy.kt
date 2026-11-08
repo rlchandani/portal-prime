@@ -32,6 +32,8 @@ internal object GuestPolicy {
     // Today shows the next calendar event and the list count alongside weather.
     HomeWidgetStore.KIND_TODAY -> GuestContent.CALENDAR
     HomeWidgetStore.KIND_TODO -> GuestContent.HOUSEHOLD_LIST
+    // Wi-Fi is the guest-facing join QR: it stays on Home while guests are here.
+    HomeWidgetStore.KIND_WIFI -> null
     else -> null
   }
 

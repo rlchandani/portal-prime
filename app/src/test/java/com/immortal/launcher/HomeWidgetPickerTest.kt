@@ -12,10 +12,21 @@ import org.junit.Test
 
 /** Kind lists and draft defaults for the "Add a widget" picker (approved 2026-11-07). */
 class HomeWidgetPickerTest {
-  @Test fun everyday_isTheSevenApprovedKinds_inMockOrder() {
+  @Test fun everyday_isTheApprovedKinds_inMockOrder_plusWifi() {
+    // Wi-Fi (2026-11-07) joins the everyday seven: a guest-facing join QR.
     assertEquals(listOf(HomeWidgetStore.KIND_WEATHER, HomeWidgetStore.KIND_CALENDAR, HomeWidgetStore.KIND_HA,
         HomeWidgetStore.KIND_TIMERS, HomeWidgetStore.KIND_TODO, HomeWidgetStore.KIND_ALARM,
-        HomeWidgetStore.KIND_WORLD_CLOCK), HomeWidgetPicker.everyday)
+        HomeWidgetStore.KIND_WORLD_CLOCK, HomeWidgetStore.KIND_WIFI), HomeWidgetPicker.everyday)
+  }
+
+  @Test fun wifi_isRegisteredWithItsLabelIconAndRemoteKind() {
+    assertEquals("wifi", HomeWidgetStore.KIND_WIFI)
+    assertEquals("Wi-Fi", HomeWidgetPicker.label(HomeWidgetStore.KIND_WIFI))
+    assertEquals("wifi", HomeWidgetPicker.icon(HomeWidgetStore.KIND_WIFI))
+    assertTrue(HomeWidgetStore.KIND_WIFI in RemoteLayoutPolicy.kinds)
+    assertFalse(HomeWidgetStore.KIND_WIFI in HomeWidgetPicker.more(advanced = true, photoMemoryAllowed = true))
+    // The real widget decrypts the password for its QR; the picker shows a static preview instead.
+    assertFalse(HomeWidgetStore.KIND_WIFI in HomeWidgetPicker.livePreviewKinds)
   }
 
   @Test fun more_holdsTheRetireCandidates_withoutOptionsUnlessAdvanced() {
