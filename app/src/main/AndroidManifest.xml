@@ -36,6 +36,15 @@
     <!-- LAN intercom / "ping the other room": broadcast audio over the local network. -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- Guest card setup: list nearby Wi-Fi networks to pick the guest network (GuestWifiScanner).
+         Android 10 returns scan results and the connected SSID only with fine location, which is
+         requested at runtime when the picker opens; nothing is recorded or sent anywhere. -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.wifi" android:required="false" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- Voice notes: AudioNote records short memos via the handset mic; also used by the
          LAN intercom. Requested at runtime; recording is a no-op until granted. -->
