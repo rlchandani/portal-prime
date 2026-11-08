@@ -49,7 +49,11 @@ internal object GuestFeature {
 
   @Synchronized private fun save(context: Context, state: GuestModeState) {
     prefs(context).edit().putString(KEY_STATE, state.encode()).apply()
+    val wasOn = GuestMode.isOn()
     GuestMode.set(state)
+    // A screensaver already showing household photos can't swap sources in place: end it so the
+    // next one starts neutral (GuestPolicy). Ending Guest mode leaves the current one running.
+    if (!wasOn && state.isOn(System.currentTimeMillis())) main.post { ImmortalDreamNavigation.dismissForNavigation() }
     Log.i(TAG, "guest mode ${if (state.active) "on until=${state.untilMs ?: "ended"}" else "off"}")
     arm(state)
   }

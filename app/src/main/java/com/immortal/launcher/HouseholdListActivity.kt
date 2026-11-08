@@ -41,7 +41,13 @@ class HouseholdListActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val settings = intent.getBooleanExtra(EXTRA_SETTINGS, false)
-    setContent { PortalPrimeTheme(darkTheme = false) { HouseholdListSheet(startInSettings = settings, onClose = ::finish) } }
+    setContent {
+      PortalPrimeTheme(darkTheme = false) {
+        if (rememberGuestHides(GuestContent.HOUSEHOLD_LIST)) {
+          GuestHiddenScreen("The household list is hidden while guests are here.", ::finish)
+        } else HouseholdListSheet(startInSettings = settings, onClose = ::finish)
+      }
+    }
   }
 
   override fun onResume() {

@@ -146,6 +146,7 @@ internal val ApprovedSettingsPages = listOf(
     ApprovedSettingsPage("calendar-url", "Calendar feed", "home", CalendarUrlEntryActivity::class.java),
     ApprovedSettingsPage("world", "World clock", "home", standaloneActivity = WorldClockActivity::class.java),
     ApprovedSettingsPage("countdowns", "Countdowns", "home", standaloneActivity = CountdownSettingsActivity::class.java),
+    ApprovedSettingsPage("guests", "Guest card", "home", standaloneActivity = GuestSettingsActivity::class.java),
     ApprovedSettingsPage("quickbar", "Quick buttons", "home"),
     ApprovedSettingsPage("alarm", "Alarm", "sound", standaloneActivity = AlarmSettingsActivity::class.java),
     ApprovedSettingsPage("crypto", "Crypto", "home", standaloneActivity = CryptoSettingsActivity::class.java),

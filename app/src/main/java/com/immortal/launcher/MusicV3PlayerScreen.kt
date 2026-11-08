@@ -75,9 +75,11 @@ internal fun MusicV3PlayerLayout(
     MusicV3NowPlayingCard(engine, room, Modifier.width(LeftCardWidth).fillMaxHeight())
     Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(MusicV3Dims.PaneRadius))
         .background(ApprovedHomePalette.Card)) {
-      RightPane(library, active, engine.queue, onToast = { toast = it }, onSignInAgain = onAddAccount)
+      // Guest mode: playback stays, the library, searches and accounts don't show.
+      val guests = rememberGuestHides(GuestContent.MUSIC_LIBRARY)
+      RightPane(library, active, engine.queue, guests, onToast = { toast = it }, onSignInAgain = onAddAccount)
       toast?.let { MusicV3Toast(it, Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp, start = 24.dp, end = 24.dp)) }
-      if (accountsOpen) {
+      if (accountsOpen && !guests) {
         AccountsOverlay(library, accounts, active, engine.queue, onClose = { onAccountsOpen(false) },
             onAdd = onAddAccount, onLastSignedOut = onLastSignedOut, onToast = { toast = it })
       }
@@ -120,6 +122,7 @@ private fun RightPane(
     library: YouTubeMusicLibrary,
     active: YtAccount?,
     queue: YtQueue,
+    guests: Boolean,
     onToast: (String) -> Unit,
     onSignInAgain: () -> Unit,
 ) {
@@ -135,10 +138,13 @@ private fun RightPane(
     Box(Modifier.weight(1f).padding(start = 32.dp, end = 32.dp, top = 24.dp)) {
       when (pane) {
         MusicV3Pane.QUEUE -> MusicV3QueuePane(queue) { pane = MusicV3Pane.LIBRARY }
-        MusicV3Pane.LIBRARY -> if (active != null) {
+        MusicV3Pane.LIBRARY, MusicV3Pane.SEARCH -> if (guests) {
+          GuestHiddenNote("Your music library is hidden while guests are here. Playback controls still work.")
+        } else if (pane == MusicV3Pane.SEARCH) {
+          SearchTab(library, actions, search)
+        } else if (active != null) {
           MusicV3LibraryPane(library, active.id, nav, { nav = it }, actions, onSignInAgain)
         }
-        MusicV3Pane.SEARCH -> SearchTab(library, actions, search)
       }
     }
   }

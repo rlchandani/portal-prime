@@ -393,6 +393,23 @@
             android:label="Lamp"
             android:theme="@style/Theme.SampleApp" />
 
+        <!-- Guest card: Wi-Fi QR + house basics; Guest mode hides personal content. -->
+        <activity
+            android:name=".GuestCardActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:screenOrientation="landscape"
+            android:label="Guests"
+            android:theme="@style/Theme.SampleApp" />
+
+        <!-- Settings → Guest card: Wi-Fi network, password and house basics. -->
+        <activity
+            android:name=".GuestSettingsActivity"
+            android:exported="false"
+            android:label="Guest card"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.SampleApp.Navigation" />
+
         <!-- Bedtime stories: public-domain tales read aloud via TTS. -->
         <activity
             android:name=".BedtimeStoryActivity"

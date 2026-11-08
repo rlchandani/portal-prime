@@ -3126,6 +3126,12 @@ private fun ImmortalWidgetContent(
     modifier: Modifier = Modifier,
     onEnterEdit: (() -> Unit)? = null,
 ) {
+  // Guest mode: personal widgets (photos, calendar, Today, the household list) show the time instead.
+  val guestContent = GuestPolicy.homeWidgetContent(widget.kind)
+  if (guestContent != null && rememberGuestHides(guestContent)) {
+    GuestNeutralCard(modifier)
+    return
+  }
   when (widget.kind) {
     HomeWidgetStore.KIND_WEATHER -> ApprovedHomeWeather(modifier)
     HomeWidgetStore.KIND_WORLD_CLOCK -> ImmortalWorldClockWidget(modifier)
@@ -3270,6 +3276,8 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
   val tiles = buildList {
     // Call everyone (household feature): chime + speak a message in every room.
     add(QC(DinnerCallTile.ICON, DinnerCallTile.LABEL, DinnerCallTile.DESCRIPTION) { showDinner = true })
+    // Guests: the Wi-Fi card and Guest mode (hides personal content while visitors are here).
+    add(QC(GuestEntry.ICON, GuestEntry.LABEL, GuestEntry.DESCRIPTION) { GuestEntry.openCard(context) })
     if (assistantInstalled) add(QC("mic", "Hey Jarvis", "Open your assistant") { triggerJarvis(context) })
     if (dashboardConfigured) {
       add(QC("ha", "Dashboard", "Open your dashboard") {

@@ -68,12 +68,14 @@ fun MusicV3Screen(roomName: String, resumeOnOpen: Boolean, onClose: () -> Unit, 
   rememberMusicV3KeyboardPolicy()
   BackHandler(enabled = gate == MusicV3Gate.ADD_ACCOUNT) { adding = false }
   val focus = LocalFocusManager.current
+  val guests = rememberGuestHides(GuestContent.MUSIC_LIBRARY)
   // Drawn over the launcher: swallow stray taps (they'd reach Home below) and drop the keyboard.
   Column(modifier.fillMaxSize().background(ApprovedHomePalette.Background)
       .pointerInput(Unit) { detectTapGestures { focus.clearFocus() } }) {
     MusicV3Header(
         onBack = onClose,
-        account = active.takeIf { gate == MusicV3Gate.PLAYER },
+        // Guest mode hides which household account is signed in.
+        account = active.takeIf { gate == MusicV3Gate.PLAYER && !guests },
         onAccounts = { accountsOpen = !accountsOpen },
         onCancel = if (gate == MusicV3Gate.ADD_ACCOUNT && accounts.isNotEmpty()) ({ adding = false }) else null)
     Box(Modifier.weight(1f).fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 24.dp)) {

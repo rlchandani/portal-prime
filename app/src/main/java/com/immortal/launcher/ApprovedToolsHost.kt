@@ -134,7 +134,10 @@ private fun ToolsWorkspacePanes(selected: String, holder: SaveableStateHolder) {
                                 "countdowns" -> ToolsCountdownsContent()
                                 "converter" -> ToolsConverterContent()
                                 "lamp" -> ToolsLampContent()
-                                "notes" -> ToolsNotesContent()
+                                "notes" -> if (rememberGuestHides(GuestContent.NOTES)) {
+                                    GuestHiddenNote("Notes are hidden while guests are here.")
+                                } else ToolsNotesContent()
+                                "guests" -> ToolsGuestsContent()
                                 "camera" -> ToolsCamerasContent()
                                 "intercom" -> ToolsIntercomContent()
                                 "stories" -> ToolsStoriesContent()
@@ -293,6 +296,7 @@ private fun toolsDefaultSummary(id: String): String = when (id) {
     "converter" -> "Works offline"
     "lamp" -> "Brightness and warmth"
     "notes" -> "Leave a message"
+    "guests" -> "Wi-Fi card for visitors"
     "camera" -> "Saved camera streams"
     "intercom" -> "Broadcast or listen"
     "stories" -> "5 bundled stories"

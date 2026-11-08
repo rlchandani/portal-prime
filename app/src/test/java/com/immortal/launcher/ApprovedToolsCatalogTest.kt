@@ -11,18 +11,24 @@ import org.junit.Test
 
 class ApprovedToolsCatalogTest {
     @Test fun advancedToolCannotBeOpenedOrFoundWithoutConsent() {
-        assertEquals(11, ApprovedToolsCatalog.visible(false).size)
+        assertEquals(12, ApprovedToolsCatalog.visible(false).size)
         assertNull(ApprovedToolsCatalog.resolve("speed", false))
         assertTrue(ApprovedToolsCatalog.visible(false, query = "speed").isEmpty())
         assertEquals("speed", ApprovedToolsCatalog.resolve("speed", true)?.id)
-        assertEquals(12, ApprovedToolsCatalog.visible(true).size)
+        assertEquals(13, ApprovedToolsCatalog.visible(true).size)
     }
 
     @Test fun searchTrimsWhitespaceAndKeepsTheCategoryBoundary() {
         assertEquals(listOf("camera"), ApprovedToolsCatalog.visible(false, query = "  CAMERA ").map { it.id })
         assertTrue(ApprovedToolsCatalog.visible(false, "Everyday", "camera").isEmpty())
         assertEquals(listOf("iss", "aurora"), ApprovedToolsCatalog.visible(false, "Discover").map { it.id })
-        assertEquals(11, ApprovedToolsCatalog.visible(false, query = "  ").size)
+        assertEquals(12, ApprovedToolsCatalog.visible(false, query = "  ").size)
+    }
+
+    @Test fun guestsToolLivesWithHomeTools() {
+        val guests = ApprovedToolsCatalog.resolve("guests", false)
+        assertEquals("Home & downtime", guests?.group)
+        assertEquals(listOf("guests"), ApprovedToolsCatalog.visible(false, query = "wi-fi").map { it.id })
     }
 
     @Test fun unknownRouteReturnsLibraryInsteadOfOpeningAnUnrelatedTool() {
@@ -33,7 +39,7 @@ class ApprovedToolsCatalogTest {
         val group = ApprovedToolsCatalog.resolveGroup("Advanced", false)
         assertEquals("All tools", group)
         val entries = ApprovedToolsCatalog.visible(false, group)
-        assertEquals(11, entries.size)
+        assertEquals(12, entries.size)
         assertFalse(entries.any { it.id == "speed" })
     }
 
@@ -56,7 +62,7 @@ class ApprovedToolsCatalogTest {
     @Test fun enablingAdvancedAgainKeepsTheCorrectedSelection() {
         val corrected = ApprovedToolsCatalog.resolveGroup("Advanced", false)
         assertEquals("All tools", ApprovedToolsCatalog.resolveGroup(corrected, true))
-        assertEquals(12, ApprovedToolsCatalog.visible(true, corrected).size)
+        assertEquals(13, ApprovedToolsCatalog.visible(true, corrected).size)
     }
 
     @Test fun unknownRestoredCategoryFallsBackToVisibleAllTools() {
