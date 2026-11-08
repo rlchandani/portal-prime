@@ -39,7 +39,7 @@ internal object RemoteFeatureRoutes {
     when (method) {
       "GET" -> json(200, ok().put("configured", HouseholdKey.get(context) != null)
           .put("fingerprint", HouseholdKey.get(context)?.let(HouseholdKey::fingerprint) ?: JSONObject.NULL))
-      "POST" -> {
+      "POST" -> if (body.optBoolean("share")) shareKey(context) else {
         val key = HouseholdKey.fromHex(body.optString("key"))
         if (!HouseholdKey.isValidKey(key) || !HouseholdKey.set(context, key!!)) json(400, error("invalid_key"))
         else {
@@ -50,4 +50,13 @@ internal object RemoteFeatureRoutes {
       else -> json(405, error("method_not_allowed"))
     }
   }
+
+  /**
+   * A newly installed phone adopts the household's existing key instead of minting its own (which
+   * would lock the other phones out). Paired phones may already replace the key, so reading it back
+   * to one grants nothing new.
+   */
+  private fun shareKey(context: Context): FleetHttpServer.Response = HouseholdKey.get(context)?.let { k ->
+    json(200, ok().put("key", HouseholdKey.toHex(k)).put("fingerprint", HouseholdKey.fingerprint(k)))
+  } ?: json(404, error("no_household_key"))
 }
