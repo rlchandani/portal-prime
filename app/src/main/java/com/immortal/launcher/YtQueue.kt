@@ -107,6 +107,13 @@ data class YtQueue(
     return copy(entries = reordered, currentIndex = reordered.indexOfFirst { it.id == currentId })
   }
 
+  /** Moves entry [id] to play right after the current entry; current stays current. */
+  fun playEntryNext(id: Long): YtQueue {
+    val from = entries.indexOfFirst { it.id == id }
+    if (from < 0 || from == currentIndex) return this
+    return move(from, if (from > currentIndex) currentIndex + 1 else currentIndex)
+  }
+
   /** Makes entry [id] current and gives it another chance if it was marked unplayable. */
   fun select(id: Long): YtQueue {
     val index = entries.indexOfFirst { it.id == id }

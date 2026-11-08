@@ -35,6 +35,7 @@ class ImmortalApp : Application() {
     DinnerCallFeature.install(this)
     MusicHandoff.install(this)
     MusicShare.install()
+    YtRemoteRoute.install()
     RoutinesFeature.install(this)
     ShareFeature.install(this)
     GuestFeature.install(this)

@@ -106,6 +106,13 @@ sealed interface YtAction {
   data class ApplyShared(val queue: YtQueue, val restart: Boolean) : YtAction
   /** Cue a playlist on the visible player and read its ids (shared playlist, nobody signed in). */
   data class LookUpPlaylist(val listId: String) : YtAction
+  /**
+   * A paired phone pressed Play: plays now when the music screen is visible, otherwise remembers
+   * the intent so it starts once the screen is shown (never hidden or in the background).
+   */
+  data object PlayWhenVisible : YtAction
+  /** A paired phone's "Play next" on a queue row: moves entry [entryId] right after the current one. */
+  data class PlayEntryNext(val entryId: Long) : YtAction
   data class Foreground(val visible: Boolean) : YtAction
   data class SizeChanged(val ok: Boolean) : YtAction
   /** The WebView renderer died or the host was released; the player must be rebuilt. */
