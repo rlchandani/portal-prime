@@ -165,7 +165,7 @@ internal object DinnerCall {
       main.post {
         ScreenControl.wake(context)
         DinnerCardOverlay.show(card) { reply -> sendReply(context, call, reply) }
-        if (delivery.chime) DinnerSpeaker.play(context, call.message.text, delivery.speak)
+        if (delivery.chime) DinnerSpeaker.play(context, call.message.text, delivery.speak, loud = true)
       }
     }
     if (call.replyTo == self) mutableBook.update { it.ack(call.sid, self, selfName(context), delivery.status) }

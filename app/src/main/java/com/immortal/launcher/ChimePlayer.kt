@@ -55,8 +55,8 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
 
   /** Ring for an incoming "ping the other room" (res/raw/ping.mp3), a few times at the
    *  ping volume from Sounds settings. Separate sound + volume from the kitchen timer. */
-  fun playPing(context: Context, repeats: Int = 2) {
-    val vol = (ChimeConfig.load(context).volume / 100f).coerceIn(0f, 1f)
+  fun playPing(context: Context, repeats: Int = 2, volumeOverride: Float? = null) {
+    val vol = (volumeOverride ?: (ChimeConfig.load(context).volume / 100f)).coerceIn(0f, 1f)
     if (vol <= 0f) return
     val h = Handler(Looper.getMainLooper())
     for (i in 0 until repeats) {
@@ -68,6 +68,10 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
 
   /** Speak an arbitrary phrase (e.g. "Pasta timer done") at full volume. */
   fun announce(context: Context, text: String) = speak(context, text, volumeOverride = 1f)
+
+  /** [announce] on the alarm stream, so a household call is heard however the media volume is set. */
+  fun announceOnAlarmStream(context: Context, text: String) =
+      speak(context, text, volumeOverride = 1f, alarmStream = true)
 
   /** Audition the currently selected spoken-time voice without using a clock phrase. */
   fun testVoice(context: Context, voiceName: String = ChimeConfig.load(context).spokenVoice) {
@@ -170,6 +174,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
       volumeOverride: Float? = null,
       voiceNameOverride: String? = null,
       automatic: AutomaticTimeSpeech? = null,
+      alarmStream: Boolean = false,
   ) {
     runCatching {
       val cfg = if (automatic == null) ChimeConfig.load(context)
@@ -197,6 +202,7 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
                   t.language = Locale.getDefault()
                 }
               }
+              if (alarmStream) runCatching { t.setAudioAttributes(ambientAttrs) }
               val listening = t.setOnUtteranceProgressListener(
                   object : android.speech.tts.UtteranceProgressListener() {
                     override fun onStart(id: String?) {}

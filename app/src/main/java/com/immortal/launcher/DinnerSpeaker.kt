@@ -30,18 +30,42 @@ internal object DinnerSpeaker {
   private val main = Handler(Looper.getMainLooper())
   private var focus: AudioFocusRequest? = null
   private var pendingRelease: Runnable? = null
+  private var boost: AnnouncementVolume? = null
+  private var pendingRestore: Runnable? = null
+  /** Speech-length estimates run short on slow engines; restore a little after the hold ends. */
+  private const val RESTORE_MARGIN_MS = 2_500L
 
   fun ttsAvailable(context: Context): Boolean = runCatching {
     context.packageManager.queryIntentServices(Intent(TextToSpeech.Engine.INTENT_ACTION_TTS_SERVICE), 0).isNotEmpty()
   }.getOrDefault(false)
 
-  /** Main thread. [speak] false plays the chime only (Ping, voice off, no engine). */
-  fun play(context: Context, text: String, speak: Boolean) {
+  /**
+   * Main thread. [speak] false plays the chime only (Ping, voice off, no engine). [loud] (a call
+   * received from another room) plays chime and speech on the alarm stream at full volume, even if
+   * the Portal is turned down to 0, then restores the room's level; a local preview stays as set.
+   */
+  fun play(context: Context, text: String, speak: Boolean, loud: Boolean = false) {
     val app = context.applicationContext
     val holdMs = if (speak) (SPEAK_AFTER_CHIME_MS + 1_500L + MS_PER_WORD * text.split(' ').size).coerceAtMost(MAX_FOCUS_MS) else SPEAK_AFTER_CHIME_MS
     requestFocus(app, holdMs)
-    runCatching { ChimePlayer.playPing(app, repeats = 1) }.onFailure { Log.w(TAG, "chime failed", it) }
-    if (speak) main.postDelayed({ runCatching { ChimePlayer.announce(app, text) }.onFailure { Log.w(TAG, "speech failed", it) } }, SPEAK_AFTER_CHIME_MS)
+    if (loud) boostVolume(app, holdMs + RESTORE_MARGIN_MS)
+    val chimeVolume = if (loud) 1f else null
+    runCatching { ChimePlayer.playPing(app, repeats = 1, volumeOverride = chimeVolume) }.onFailure { Log.w(TAG, "chime failed", it) }
+    if (speak) main.postDelayed({
+      runCatching { if (loud) ChimePlayer.announceOnAlarmStream(app, text) else ChimePlayer.announce(app, text) }
+          .onFailure { Log.w(TAG, "speech failed", it) }
+    }, SPEAK_AFTER_CHIME_MS)
+  }
+
+  private fun boostVolume(context: Context, restoreAfterMs: Long) {
+    val audio = context.getSystemService(AudioManager::class.java) ?: return
+    val volume = boost ?: AnnouncementVolume(AnnouncementVolume.System(audio)).also { boost = it }
+    volume.boost(AudioManager.STREAM_ALARM)
+    // A second call while boosted extends the window; the first saved level is what comes back.
+    pendingRestore?.let(main::removeCallbacks)
+    val restore = Runnable { volume.restore(); pendingRestore = null }
+    pendingRestore = restore
+    main.postDelayed(restore, restoreAfterMs)
   }
 
   private fun requestFocus(context: Context, holdMs: Long) {
