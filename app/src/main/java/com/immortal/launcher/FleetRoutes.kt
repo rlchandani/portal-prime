@@ -497,6 +497,7 @@ class FleetRoutes(private val context: Context) {
   private fun fsRead(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val path = req.queryParam("path") ?: return resp(400, err("path_required"))
     val f = File(path)
+    if (FleetSecretPaths.isBlocked(f)) return resp(403, err("protected_path"))
     if (!f.isFile || !f.canRead()) return resp(404, err("not_a_readable_file"))
     return FleetFileRead.response(f)
   }
@@ -504,6 +505,7 @@ class FleetRoutes(private val context: Context) {
   private fun fsWrite(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val path = req.queryParam("path") ?: return resp(400, err("path_required"))
     val f = File(path)
+    if (FleetSecretPaths.isBlocked(f)) return resp(403, err("protected_path"))
     return try {
       val written = FleetUploadWriter.write(f, req::streamBodyTo)
       resp(200, ok().put("path", f.absolutePath).put("bytes", written))

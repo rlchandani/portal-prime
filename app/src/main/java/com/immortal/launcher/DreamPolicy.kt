@@ -224,6 +224,11 @@ object DreamPolicy {
       Log.i(TAG, "routine on screen; not relaunching frame")
       return
     }
+    // A playing YouTube video owns the screen (the photo frame would cover the official player).
+    if (YtVideoScreenState.ownsScreen()) {
+      Log.i(TAG, "YouTube video playing; not relaunching frame")
+      return
+    }
     if (pinnedOrigin || PinnedAppScreensaver.hasPin()) {
       // An accessibility overlay preserves the underlying external task. Never fall back to
       // the launcher Activity if attaching this curtain fails: that would displace the app.
