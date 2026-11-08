@@ -20,7 +20,8 @@ enum class YtMusicCommand(val wire: String) {
 }
 
 /**
- * Pure parser for messages posted by `assets/ytmusic/bridge.js`. Page data is untrusted: sizes,
+ * Pure parser for messages from the retired scraped YouTube Music page (its bridge script was removed
+ * with music v3); [shouldPublish] is still the Now Playing throttle for [YouTubeMusicEngine]. Page data is untrusted: sizes,
  * types, numbers and art URLs are validated, and anything doubtful is dropped rather than shown.
  *
  * Wire format (v1): `{"v":1,"t":title,"a":artist,"al":album,"art":url,"d":durationSec,
