@@ -11,16 +11,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items as listItems
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -115,11 +111,9 @@ private fun LibraryHome(
     }
     when (nav.tab) {
       MusicV3LibraryTab.PLAYLISTS -> LoadOrProblem(rememberLibraryLoad(accountId to "playlists") { library.playlists() },
-          onSignInAgain) { PlaylistGrid(it) { pl -> onNav(nav.copy(playlist = pl)) } }
+          onSignInAgain) { MusicV3PlaylistsTab(library, accountId, it, actions) { pl -> onNav(nav.copy(playlist = pl)) } }
       MusicV3LibraryTab.LIKED -> LoadOrProblem(rememberLibraryLoad(accountId to "liked") { library.likedSongs() },
-          onSignInAgain) { tracks ->
-        MusicV3TrackList(tracks, "${MusicV3Rules.songCount(tracks.size)} you've liked on YouTube", actions, "Liked songs")
-      }
+          onSignInAgain) { tracks -> MusicV3LikedTab(library, accountId, tracks, actions) }
       MusicV3LibraryTab.ARTISTS -> LoadOrProblem(rememberLibraryLoad(accountId to "artists") { library.artists() },
           onSignInAgain) { ArtistList(it) { a -> onNav(nav.copy(artist = a)) } }
     }
@@ -136,27 +130,6 @@ internal fun <T> LoadOrProblem(load: MusicV3Load<T>, onSignInAgain: () -> Unit, 
     is MusicV3Load.Ready -> content(load.value)
     is MusicV3Load.Problem -> MusicV3Empty(if (load.message == MusicV3Load.OFFLINE) "wifi" else "info", load.message,
         action = if (load.signInAgain) "Sign in again" to onSignInAgain else null)
-  }
-}
-
-@Composable
-private fun PlaylistGrid(playlists: List<YtPlaylist>, onOpen: (YtPlaylist) -> Unit) {
-  if (playlists.isEmpty()) {
-    MusicV3Empty("music", MusicV3Message("No playlists yet", "Playlists you make on YouTube show up here."))
-    return
-  }
-  LazyVerticalGrid(GridCells.Fixed(3), Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(28.dp),
-      horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-    items(playlists, key = { it.id }) { pl ->
-      Column(Modifier.clip(RoundedCornerShape(20.dp))
-          .tvFocusable(RoundedCornerShape(20.dp), focusScale = 1f, ringColor = ApprovedHomePalette.Accent) { onOpen(pl) }
-          .semantics(mergeDescendants = true) { role = Role.Button; contentDescription = "${pl.title}, ${MusicV3Rules.songCount(pl.itemCount)}" }) {
-        MusicV3Thumb(pl.thumbnailUrl, Modifier.fillMaxWidth().aspectRatio(1.3f), RoundedCornerShape(20.dp))
-        Text(pl.title, color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 34.sp, fontWeight = FontWeight.Medium,
-            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 12.dp))
-        Text(MusicV3Rules.songCount(pl.itemCount), color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
-      }
-    }
   }
 }
 

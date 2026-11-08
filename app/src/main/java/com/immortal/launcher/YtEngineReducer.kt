@@ -27,13 +27,14 @@ object YtEngineReducer {
     YtAction.Next -> s.queue.next()?.let { navigate(s, it) } ?: YtStep(s)
     YtAction.Previous -> previous(s)
     YtAction.Play -> play(s)
-    YtAction.Pause -> pause(s)
+    YtAction.Pause -> pause(s.copy(playWhenVisible = false))
     is YtAction.SeekTo -> seek(s, a.positionMs)
     is YtAction.SetRepeat -> queueOnly(s, s.queue.withRepeat(a.mode))
     is YtAction.SetShuffle -> queueOnly(s, if (a.on) s.queue.shuffled(a.seed) else s.queue.unshuffled())
-    YtAction.Clear -> YtStep(clearedTrack(s.copy(queue = s.queue.clear(), wantsPlay = false)),
+    YtAction.Clear -> YtStep(clearedTrack(s.copy(queue = s.queue.clear(), wantsPlay = false, playWhenVisible = false)),
         listOf(YtEffect.Stop, YtEffect.Persist))
     is YtAction.Restore -> restore(s, a)
+    is YtAction.Adopt -> adopt(s, a)
     is YtAction.Foreground -> foreground(s, a.visible)
     is YtAction.SizeChanged -> size(s, a.ok)
     YtAction.PlayerLost -> YtStep(
@@ -118,7 +119,27 @@ object YtEngineReducer {
     return YtStep(restored, effects)
   }
 
+  /**
+   * A queue moved here ("Move to…" on another Portal): replaces ours and resumes at the sent
+   * position. It plays at once when the screen is visible, else cues and starts on [foreground].
+   */
+  private fun adopt(s: YtEngineState, a: YtAction.Adopt): YtStep {
+    val entry = a.queue.current ?: return YtStep(s)
+    val position = a.positionMs.coerceAtLeast(0L)
+    val playNow = s.canPlay
+    val adopted = clearedTrack(s.copy(queue = a.queue)).copy(positionMs = position, consecutiveFailures = 0,
+        durationMs = entry.track.durationMs ?: 0L, wantsPlay = playNow, playWhenVisible = !playNow)
+    val id = entry.track.videoId
+    val load = when {
+      !s.ready -> emptyList()
+      playNow -> listOf(YtEffect.Load(id, position))
+      else -> listOf(YtEffect.Cue(id, position))
+    }
+    return YtStep(adopted, load + YtEffect.Persist)
+  }
+
   private fun foreground(s: YtEngineState, visible: Boolean): YtStep {
+    if (visible && s.playWhenVisible) return play(s.copy(foreground = true, playWhenVisible = false))
     if (visible) return YtStep(s.copy(foreground = true))
     val hidden = s.copy(foreground = false, wantsPlay = false)
     val active = s.ready && (s.isPlaying || s.wantsPlay)

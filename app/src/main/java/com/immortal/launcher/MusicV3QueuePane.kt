@@ -34,7 +34,7 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 
 /** Queue tab: Now playing, then Up next (drag grip to reorder, ⋯ for Play next / Remove). */
 @Composable
-internal fun MusicV3QueuePane(queue: YtQueue, onOpenLibrary: () -> Unit) {
+internal fun MusicV3QueuePane(queue: YtQueue, onMove: (() -> Unit)?, onOpenLibrary: () -> Unit) {
   if (queue.isEmpty) {
     MusicV3Empty("notes", MusicV3Message("Your queue is empty",
         "Songs you play from Library or Search line up here."), action = "Open Library" to onOpenLibrary)
@@ -50,7 +50,7 @@ internal fun MusicV3QueuePane(queue: YtQueue, onOpenLibrary: () -> Unit) {
     if (fromIndex > live.currentIndex && toIndex > live.currentIndex) YouTubeMusicEngine.move(fromIndex, toIndex)
   }
   LazyColumn(Modifier.fillMaxSize(), state = listState) {
-    nowPlayingItems(view)
+    nowPlayingItems(view, onMove)
     item(key = "up-next") { UpNextHeader(view) }
     if (view.upNext.isEmpty()) {
       item(key = "nothing-next") {
@@ -68,10 +68,11 @@ internal fun MusicV3QueuePane(queue: YtQueue, onOpenLibrary: () -> Unit) {
   }
 }
 
-private fun LazyListScope.nowPlayingItems(view: MusicV3QueueView) {
+private fun LazyListScope.nowPlayingItems(view: MusicV3QueueView, onMove: (() -> Unit)?) {
   val current = view.current ?: return
+  val actions = listOfNotNull(onMove?.let { MusicV3RowAction(MusicV3MoveControls.MOVE_LABEL, it) })
   item(key = "now-label") { MusicV3SectionLabel("Now playing") }
-  item(key = "now-row") { MusicV3TrackRow(current.toRow(current = true), onPlay = null, actions = emptyList()) }
+  item(key = "now-row") { MusicV3TrackRow(current.toRow(current = true), onPlay = null, actions = actions) }
 }
 
 @Composable

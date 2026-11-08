@@ -76,6 +76,9 @@ object YouTubeMusicEngine : MusicTransport {
   fun playNow(tracks: List<YtTrack>, startIndex: Int = 0, label: String = "") =
       dispatch(YtAction.PlayNow(tracks, startIndex, label))
 
+  /** Takes over a queue moved here from another Portal; it plays once the music screen is visible. */
+  fun adopt(queue: YtQueue, positionMs: Long) = dispatch(YtAction.Adopt(queue, positionMs))
+
   fun playNext(track: YtTrack) = dispatch(YtAction.PlayNext(track))
   fun addToEnd(track: YtTrack) = dispatch(YtAction.AddToEnd(track))
   fun remove(entryId: Long) = dispatch(YtAction.Remove(entryId))

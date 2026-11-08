@@ -47,6 +47,8 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.youtube.YtAccount
 import com.immortal.launcher.youtube.YtAndroid
 import com.immortal.launcher.youtube.YtSignInState
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 /**
  * Music v3 (official YouTube route): one full-screen page with its own header. Shows NotConfigured,
@@ -63,8 +65,9 @@ fun MusicV3Screen(roomName: String, resumeOnOpen: Boolean, onClose: () -> Unit, 
   var adding by remember { mutableStateOf(false) }
   var signedOutLast by remember { mutableStateOf(false) }
   var accountsOpen by remember { mutableStateOf(false) }
+  val hasQueue by remember { derivedQueuePresence() }.collectAsState(initial = !YouTubeMusicEngine.state.value.queue.isEmpty)
   val gate = MusicV3Rules.gate(library.isConfigured, accounts, active, adding, signedOutLast,
-      showingSuccess = signIn is YtSignInState.SignedIn)
+      showingSuccess = signIn is YtSignInState.SignedIn, hasQueue = hasQueue)
   rememberMusicV3KeyboardPolicy()
   BackHandler(enabled = gate == MusicV3Gate.ADD_ACCOUNT) { adding = false }
   val focus = LocalFocusManager.current
@@ -75,7 +78,9 @@ fun MusicV3Screen(roomName: String, resumeOnOpen: Boolean, onClose: () -> Unit, 
         onBack = onClose,
         account = active.takeIf { gate == MusicV3Gate.PLAYER },
         onAccounts = { accountsOpen = !accountsOpen },
-        onCancel = if (gate == MusicV3Gate.ADD_ACCOUNT && accounts.isNotEmpty()) ({ adding = false }) else null)
+        onCancel = if (gate == MusicV3Gate.ADD_ACCOUNT && MusicV3Rules.canCancelSignIn(accounts.size, hasQueue)) {
+          { adding = false }
+        } else null)
     Box(Modifier.weight(1f).fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 24.dp)) {
       when (gate) {
         MusicV3Gate.NOT_CONFIGURED -> MusicV3NotConfigured()
@@ -85,8 +90,9 @@ fun MusicV3Screen(roomName: String, resumeOnOpen: Boolean, onClose: () -> Unit, 
             signedOutLast = false
           }
         MusicV3Gate.NO_ONE -> MusicV3NoOne { signedOutLast = false }
-        MusicV3Gate.PLAYER -> MusicV3PlayerLayout(
-            library = library, accounts = accounts, active = active, room = roomName, resumeOnOpen = resumeOnOpen,
+        MusicV3Gate.PLAYER, MusicV3Gate.GUEST -> MusicV3PlayerLayout(
+            library = library, accounts = accounts, active = active.takeIf { gate == MusicV3Gate.PLAYER },
+            room = roomName, resumeOnOpen = resumeOnOpen,
             accountsOpen = accountsOpen, onAccountsOpen = { accountsOpen = it },
             onAddAccount = { accountsOpen = false; adding = true },
             onLastSignedOut = { signedOutLast = true })
@@ -124,6 +130,9 @@ private fun AccountChip(account: YtAccount, onClick: () -> Unit) {
     MusicV3GlyphIcon(MusicV3Glyph.DOWN, ApprovedHomePalette.Secondary, Modifier.size(24.dp))
   }
 }
+
+/** Whether the engine holds a queue; only changes when it empties or fills, not on every tick. */
+private fun derivedQueuePresence() = YouTubeMusicEngine.state.map { !it.queue.isEmpty }.distinctUntilChanged()
 
 /**
  * While music is on screen the soft keyboard overlays it (ADJUST_NOTHING) instead of panning the

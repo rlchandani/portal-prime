@@ -207,7 +207,7 @@ internal object HouseholdListSync {
   fun selfName(context: Context): String = HouseholdListText.cleanName(FleetConfig.name(context)) ?: "This Portal"
 
   /** This Portal's private LAN IPv4 address, if it has one. */
-  private fun lanAddress(): String? = runCatching {
+  internal fun lanAddress(): String? = runCatching {
     NetworkInterface.getNetworkInterfaces().toList().filter { it.isUp && !it.isLoopback }
         .flatMap { it.inetAddresses.toList() }
         .filterIsInstance<Inet4Address>()

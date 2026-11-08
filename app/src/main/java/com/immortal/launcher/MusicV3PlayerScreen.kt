@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -67,16 +68,30 @@ internal fun MusicV3PlayerLayout(
     onLastSignedOut: () -> Unit,
 ) {
   val engine by YouTubeMusicEngine.state.collectAsState()
+  val move by MusicHandoff.move.collectAsState()
+  val context = LocalContext.current
   var toast by remember { mutableStateOf<String?>(null) }
+  var moveOpen by remember { mutableStateOf(false) }
   LaunchedEffect(toast) { if (toast != null) { delay(TOAST_MS); toast = null } }
   VideoScreenGuards(engine, resumeOnOpen)
   SkipToasts(engine.lastSkip) { toast = it }
+  MoveNotices { toast = it }
+  val canMove = remember(context) { MusicHandoff.available(context) }
+  val onMove = if (canMove && engine.queue.current != null && move == MusicMoveState.Idle) {
+    { onAccountsOpen(false); moveOpen = true }
+  } else null
+  val moveControls = MusicV3MoveControls(move, onMove, onBringBack = { MusicHandoff.bringBack(context) })
   Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(MusicV3Dims.Gap)) {
-    MusicV3NowPlayingCard(engine, room, Modifier.width(LeftCardWidth).fillMaxHeight())
+    MusicV3NowPlayingCard(engine, room, moveControls, Modifier.width(LeftCardWidth).fillMaxHeight())
     Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(MusicV3Dims.PaneRadius))
         .background(ApprovedHomePalette.Card)) {
-      RightPane(library, active, engine.queue, onToast = { toast = it }, onSignInAgain = onAddAccount)
+      RightPane(library, active, engine.queue, onToast = { toast = it }, onSignInAgain = onAddAccount, onMove = onMove)
       toast?.let { MusicV3Toast(it, Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp, start = 24.dp, end = 24.dp)) }
+      if (moveOpen) {
+        BackHandler { moveOpen = false }
+        MusicV3MovePanel(onPick = { room -> moveOpen = false; MusicHandoff.moveTo(context, room) },
+            onClose = { moveOpen = false })
+      }
       if (accountsOpen) {
         AccountsOverlay(library, accounts, active, engine.queue, onClose = { onAccountsOpen(false) },
             onAdd = onAddAccount, onLastSignedOut = onLastSignedOut, onToast = { toast = it })
@@ -106,6 +121,16 @@ private fun VideoScreenGuards(engine: YtEngineState, resumeOnOpen: Boolean) {
   }
 }
 
+/** One toast per "Move to…" notice that arrives while this screen is open. */
+@Composable
+private fun MoveNotices(show: (String) -> Unit) {
+  val notice by MusicHandoff.notice.collectAsState()
+  val seenAtOpen = remember { MusicHandoff.notice.value?.seq ?: 0 }
+  LaunchedEffect(notice?.seq) {
+    notice?.takeIf { it.seq > seenAtOpen }?.let { show(it.text) }
+  }
+}
+
 /** One toast per auto-skip that happens while this screen is open. */
 @Composable
 private fun SkipToasts(skip: YtSkipNotice?, show: (String) -> Unit) {
@@ -122,6 +147,7 @@ private fun RightPane(
     queue: YtQueue,
     onToast: (String) -> Unit,
     onSignInAgain: () -> Unit,
+    onMove: (() -> Unit)?,
 ) {
   val scope = rememberCoroutineScope()
   val actions = remember(library, scope) { MusicV3Actions(library, scope) { onToast(it) } }
@@ -134,11 +160,12 @@ private fun RightPane(
     Segmented(pane) { pane = it }
     Box(Modifier.weight(1f).padding(start = 32.dp, end = 32.dp, top = 24.dp)) {
       when (pane) {
-        MusicV3Pane.QUEUE -> MusicV3QueuePane(queue) { pane = MusicV3Pane.LIBRARY }
-        MusicV3Pane.LIBRARY -> if (active != null) {
-          MusicV3LibraryPane(library, active.id, nav, { nav = it }, actions, onSignInAgain)
+        MusicV3Pane.QUEUE -> MusicV3QueuePane(queue, onMove) { pane = MusicV3Pane.LIBRARY }
+        MusicV3Pane.LIBRARY, MusicV3Pane.SEARCH -> when {
+          active == null -> MusicV3GuestPane(library.isConfigured, onSignInAgain)
+          pane == MusicV3Pane.LIBRARY -> MusicV3LibraryPane(library, active.id, nav, { nav = it }, actions, onSignInAgain)
+          else -> SearchTab(library, actions, search)
         }
-        MusicV3Pane.SEARCH -> SearchTab(library, actions, search)
       }
     }
   }
