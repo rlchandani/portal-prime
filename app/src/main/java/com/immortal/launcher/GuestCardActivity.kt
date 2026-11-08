@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -62,13 +61,11 @@ internal class GuestCardContent(val settings: GuestConfig.Settings, val password
   override fun toString(): String = "GuestCardContent(ready=$ready)"
 }
 
-/** "Until tomorrow 11:00" uses checkout-style defaults; see [GuestSchedule]. */
+/** The card's start choices; schedules resolve in this Portal's time zone ([GuestSchedule]). */
 internal object GuestStartChoices {
   val choices: List<Pair<String, GuestSchedule>> = listOf(
       "Until I end it" to GuestSchedule.UntilEnded,
       "Until tomorrow 11:00" to GuestSchedule.UntilTomorrow(11, 0),
       "For 2 days" to GuestSchedule.ForDays(2),
   )
-
-  fun zone(): ZoneId = ZoneId.systemDefault()
 }

@@ -73,8 +73,8 @@ internal object GuestEntry {
 /** Recomposes when Guest mode starts, ends, or reaches its scheduled end. */
 @Composable
 internal fun rememberGuestHides(content: GuestContent): Boolean {
-  val state by GuestMode.state.collectAsState()
-  return GuestMode.hides(content) && state.active
+  val state by GuestMode.state.collectAsState() // read so a start/end/expiry recomposes the caller
+  return state.active && GuestMode.hides(content)
 }
 
 /** "Until Sat 11:00", "Until you end it". */
