@@ -1235,6 +1235,8 @@ private fun LauncherScreen(
   LaunchedEffect(editMode) { if (!editMode) addFlow.reset() }
   LaunchedEffect(addFlow.ring) { if (addFlow.ring != null) { delay(ADD_RING_MS); addFlow.ring = null } }
   var musicLayout by rememberSaveable { mutableStateOf<MusicPlayerLayout?>(null) }
+  // Set by Home's Now playing chip: the player resumes the paused song once it is on screen.
+  var musicResume by remember { mutableStateOf(false) }
   LaunchedEffect(musicOpenRequest) {
     if (musicOpenRequest > 0) {
       musicLayout = MusicPlayerLayout.FULL
@@ -1408,6 +1410,7 @@ private fun LauncherScreen(
             Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
           }
           ApprovedHeaderButton("screensaver", "Start screensaver", onStartScreensaver)
+          if (musicLayout == null) MusicV3HomeChip { musicResume = true; onOpenMusic() }
           Spacer(Modifier.weight(1f))
           ApprovedHomeIcon("wifi", Modifier.size(22.dp))
           Text(when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" }, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
@@ -1426,7 +1429,7 @@ private fun LauncherScreen(
                 .tvFocusable(CircleShape, onLongClick = { openHeyPicker(context, pkg) }) { fireHey(context, pkg) },
                 contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
           }
-          ApprovedHeaderButton("music", "Open music player", onOpenMusic)
+          ApprovedHeaderButton("music", "Open music player", lit = rememberMusicV3Loaded(), onClick = onOpenMusic)
           if (settings.showMiniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(300.dp), onOpenMusic)
           ApprovedHeaderButton("search", "Search apps and settings") {
             if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
@@ -1490,6 +1493,7 @@ private fun LauncherScreen(
           ShareHomeToasts(shareHome, Modifier.align(Alignment.BottomCenter).padding(bottom = 96.dp))
           HomeNoteChimeBubble(Modifier.align(Alignment.TopEnd).padding(top = 8.dp, end = LauncherEdge))
           RoutineHomeToast(Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp))
+          MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp))
           }
           }
           ApprovedLauncherTab.APPS -> ApprovedAppsScreen(
@@ -1503,21 +1507,8 @@ private fun LauncherScreen(
               libraryRequest = toolsLibraryRequest)
           }
         }
-        if (musicLayout == MusicPlayerLayout.FULL) {
-          // Survives this screen's lifetime only; reopening music after a close starts on the hint.
-          var musicPaneOpen by remember { mutableStateOf(YtMusicWebHost.isAlive || YtMusicWebHost.hasSavedSession()) }
-          // YouTube Music player (2026-11-07): native Now Playing beside the embedded page.
-          MusicPlayerScreen(roomName = room,
-              rightPane = {
-                YtMusicPane(onOpenInBrowser = { context.launchSafely(WebAppActivity::class.java) },
-                    modifier = Modifier.fillMaxSize())
-              },
-              onOpenYouTubeMusic = { YtMusicWebHost.obtain(context); musicPaneOpen = true },
-              paneOpen = musicPaneOpen,
-              onClose = { musicLayout = null },
-              hasEverSeenSession = MusicSessionMemory.seen || YtMusicWebHost.hasSavedSession(),
-              modifier = Modifier.fillMaxSize())
-        } else musicLayout?.let { layout ->
+        // FULL is music v3, drawn over the whole launcher (own header) after this column.
+        if (musicLayout != MusicPlayerLayout.FULL) musicLayout?.let { layout ->
           MusicPlayerHost(layout,
               modifier = if (layout == MusicPlayerLayout.COMPACT)
                 Modifier.align(Alignment.BottomCenter).widthIn(max = 720.dp).fillMaxWidth()
@@ -1542,6 +1533,11 @@ private fun LauncherScreen(
           }
         }
         Spacer(Modifier.height(12.dp))
+      }
+      if (musicLayout == MusicPlayerLayout.FULL) {
+        // Music v3 (official YouTube route): its own header; leaving it pauses (no background play).
+        MusicV3Screen(roomName = room, resumeOnOpen = musicResume,
+            onClose = { musicLayout = null; musicResume = false }, modifier = Modifier.fillMaxSize())
       }
       addFlow.draft?.let { draft ->
         val fitting = remember(homeWidgets, draft.tapped) { HomeSlots.fittingShapes(homeWidgets, draft.tapped) }
@@ -2188,7 +2184,7 @@ private fun HeaderBar(onScreensaver: () -> Unit) {
     // When shown it takes the flexible space (so its text uses the header width before
     // it scrolls); otherwise a weight spacer pushes the weather/date to the right.
     val np = nowPlaying
-    if (showMiniPlayer && np != null && np.active) {
+    if (showMiniPlayer && np != null && np.active && np.source != SOURCE_YOUTUBE) {
       Spacer(Modifier.size(16.dp))
       MiniPlayer(np, modifier = Modifier.weight(1f).padding(end = 16.dp)) {
         context.startActivity(Intent(context, HomeActivity::class.java).putExtra(APPROVED_HOME_MUSIC, true))
@@ -2331,7 +2327,7 @@ private fun ApprovedHomeHeaderPlayer(modifier: Modifier = Modifier, onOpenMusic:
     NowPlayingHub.addListener(listener)
     onDispose { NowPlayingHub.removeListener(listener) }
   }
-  state?.takeIf { it.active }?.let { MiniPlayer(it, modifier, onOpenMusic) }
+  state?.takeIf { it.active && it.source != SOURCE_YOUTUBE }?.let { MiniPlayer(it, modifier, onOpenMusic) }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -5348,12 +5344,18 @@ private fun appWidgetMinDp(context: Context, raw: Int): Int {
 }
 
 @Composable
-private fun ApprovedHeaderButton(icon: String, label: String, onClick: () -> Unit) {
-  Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
+private fun ApprovedHeaderButton(icon: String, label: String, onClick: () -> Unit) =
+    ApprovedHeaderButton(icon, label, lit = false, onClick = onClick)
+
+/** [lit]: inverted fill (the music button while a song is loaded). */
+@Composable
+private fun ApprovedHeaderButton(icon: String, label: String, lit: Boolean, onClick: () -> Unit) {
+  Box(Modifier.size(68.dp).clip(CircleShape)
+      .background(if (lit) ApprovedHomePalette.Text else ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
       .semantics { contentDescription = label }
       .tvFocusable(CircleShape, ringColor = ApprovedHomePalette.Accent, onClick = onClick),
       contentAlignment = Alignment.Center) {
-    ApprovedHomeIcon(icon, tint = ApprovedHomePalette.Text)
+    ApprovedHomeIcon(icon, tint = if (lit) ApprovedHomePalette.Background else ApprovedHomePalette.Text)
   }
 }
 
