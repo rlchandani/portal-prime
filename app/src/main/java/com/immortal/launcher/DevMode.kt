@@ -13,10 +13,9 @@ import org.json.JSONObject
 /**
  * Developer mode for iterating on Immortal over the fleet channel.
  *
- * When ON, Immortal's over-the-air self-updater ([UpdateManager.checkForUpdate]) is
- * paused, so a locally-built APK pushed via the fleet agent isn't silently
- * overwritten the next time the device polls the official `version.json`. It changes
- * nothing else — the launcher, store, and screensaver run exactly as before.
+ * When ON, Hearthpane's wireless updater ([OtaUpdater]) does not check or install on its own, so
+ * a locally-built APK pushed via the fleet agent isn't replaced by the published GitHub release. It
+ * changes nothing else — the launcher, store, and screensaver run exactly as before.
  *
  * Toggled (and read) over the fleet API via `/dev`, and surfaced in `/info`. The
  * companion CLI command is `fleetctl dev on|off|status|update <apk>`.

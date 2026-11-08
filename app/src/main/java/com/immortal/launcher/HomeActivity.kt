@@ -2870,8 +2870,6 @@ private fun PortalHomeTile(onClick: () -> Unit) {
 private const val ICON_CALL =
     "M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
 private const val ICON_DOWNLOAD = "M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"
-private const val ICON_REFRESH =
-    "M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
 private const val ICON_IMAGE =
     "M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
 private const val ICON_WIDGETS =
@@ -2919,53 +2917,6 @@ private fun BuiltInTile(
 }
 
 
-/** Always-present Updates tile. Neutral + refresh glyph when up to date; blue +
- * download glyph (with a badge) when an update is ready. Shows transient status
- * text during a check or install. */
-@Composable
-private fun UpdatesTile(update: UpdateInfo?, status: String?, onClick: () -> Unit) {
-  val available = update != null
-  val label = status ?: if (available) "Update ready" else "Up to date"
-  val background = if (available) Color(0xFF2D6CDF) else Color(0xFF2B2B2B)
-  val glyph = if (available) ICON_DOWNLOAD else ICON_REFRESH
-  val path = remember(glyph) { PathParser().parsePathString(glyph).toPath() }
-  val tileDp = LocalTileDp.current
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxWidth().padding(4.dp).tvFocusable(RoundedCornerShape(22.dp)) { onClick() },
-  ) {
-    Box {
-      Surface(
-          color = background,
-          shape = RoundedCornerShape(20.dp),
-          modifier = Modifier.size(tileDp),
-      ) {
-        Box(contentAlignment = Alignment.Center) {
-          Canvas(Modifier.size(44.dp * (tileDp / 88.dp))) {
-            val s = size.minDimension / 24f
-            scale(s, s, pivot = Offset.Zero) { drawPath(path, Color.White) }
-          }
-        }
-      }
-      if (available) {
-        Surface(
-            color = Color(0xFFE53935),
-            shape = androidx.compose.foundation.shape.CircleShape,
-            modifier = Modifier.size(18.dp).align(Alignment.TopEnd),
-        ) {}
-      }
-    }
-    Spacer(Modifier.size(8.dp))
-    Text(
-        label,
-        color = Color.White,
-        fontSize = 15.sp,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        textAlign = TextAlign.Center,
-    )
-  }
-}
 
 @Composable
 private fun StoreTile(onClick: () -> Unit) {
