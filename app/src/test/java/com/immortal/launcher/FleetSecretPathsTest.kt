@@ -12,7 +12,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** Fleet file routes must never read or overwrite the YouTube sign-in store. */
+/** Fleet file routes must never read or overwrite the YouTube sign-in or guest Wi-Fi stores. */
 class FleetSecretPathsTest {
   private val root = File(Files.createTempDirectory("app").toFile(), "no_backup").apply { mkdirs() }
   private val store = File(root, "youtube").apply { mkdirs() }
@@ -29,6 +29,15 @@ class FleetSecretPathsTest {
     val link = File(root.parentFile, "innocent.bin")
     runCatching { Files.createSymbolicLink(link.toPath(), secret.toPath()) }
     if (link.exists()) assertTrue(FleetSecretPaths.isBlocked(link))
+  }
+
+  @Test fun theGuestWifiStoreIsBlocked() {
+    val guest = File(root, "guest").apply { mkdirs() }
+    val wifi = File(guest, "wifi.bin").apply { writeText("x") }
+    assertTrue(FleetSecretPaths.isBlocked(wifi))
+    assertTrue(FleetSecretPaths.isBlocked(guest))
+    assertTrue(FleetSecretPaths.isBlocked(File(root, "youtube/../guest/wifi.bin")))
+    assertFalse(FleetSecretPaths.isBlocked(File(root, "guestbook.txt")))
   }
 
   @Test fun ordinaryFilesStayReadable() {

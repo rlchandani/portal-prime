@@ -483,6 +483,32 @@ class SettingsDomainTest {
   }
 
   @Test
+  fun guestsRegistry_coversEveryPersistedField_andNeverThePassword() {
+    val fields =
+        com.immortal.launcher.GuestConfig.Settings::class.java.declaredFields
+            .filter { !java.lang.reflect.Modifier.isStatic(it.modifiers) }
+            .map { it.name }
+            .toSet()
+    val domain = GuestSettings.domain
+    assertEquals(fields, domain.specs.map { it.key }.toSet())
+    assertTrue("guests domain is registered", SettingsDomains.all.contains(domain))
+    assertTrue("no password-like key may enter the registry",
+        domain.specs.none { it.key.contains("pass", ignoreCase = true) && it.key != "hidePassword" })
+  }
+
+  @Test
+  fun guestsRegistry_rejectsMultiLineOrOverlongText() {
+    val spec = GuestSettings.domain.specs.first { it.key == "doorCode" } as StringSpec<*>
+    assertTrue(spec.applyWhen("4821#"))
+    assertTrue(spec.applyWhen(""))
+    assertFalse(spec.applyWhen("a\nb"))
+    assertFalse(spec.applyWhen("x".repeat(com.immortal.launcher.GuestConfig.MAX_TEXT + 1)))
+    val security = GuestSettings.domain.specs.first { it.key == "security" } as EnumSpec<*>
+    assertNull(security.coerce("wpa3-enterprise"))
+    assertEquals("wep", security.coerce("wep"))
+  }
+
+  @Test
   fun mqttRegistry_specKeysArePinned() {
     // mqtt still uses Context as the snapshot — no aggregate `Settings` data class for the reflection
     // tripwire to enumerate. Pin the spec-key set: a new MqttConfig setting forces a conscious update
@@ -548,6 +574,8 @@ class SettingsDomainTest {
             "ShareConfig",
             // HouseholdListSettings.domain; added to SettingsDomains.all at integration (shared list).
             "HouseholdListConfig",
+            // GuestSettings.domain (Guest card); the Wi-Fi password is in GuestPasswordStore, not prefs.
+            "GuestConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",
             "FleetConfig",
