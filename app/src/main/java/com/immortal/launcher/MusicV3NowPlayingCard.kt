@@ -41,20 +41,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-/** Square cover, the main visual. */
-private val COVER_SIZE = 520.dp
+/** Square cover, the main visual; nothing is drawn on it. */
+private val COVER_SIZE = 460.dp
 /**
  * Official player tile. YouTube's minimum viewport is 200×200 CSS px (= dp in the WebView), so it is
  * a 208 dp square (234 device px); 16:9 video letterboxes inside it.
  */
 private val MINI_PLAYER_W = 208.dp
 private val MINI_PLAYER_H = 208.dp
-private val MINI_PLAYER_INSET = 16.dp
+private val MINI_PLAYER_GAP = 24.dp
 private const val TICK_MS = 1_000L
 
 /**
- * Left card: the YouTube player at the top (nothing is ever drawn over it while it has an item),
- * then our metadata, progress, transport and Portal volume below it.
+ * Left card: the song's cover, then the official YouTube player tile beside the title (nothing is
+ * ever drawn over the player), then progress, transport and Portal volume.
  */
 @Composable
 internal fun MusicV3NowPlayingCard(
@@ -66,8 +66,8 @@ internal fun MusicV3NowPlayingCard(
   val model = MusicV3NowPlaying.from(engine, room).let { m -> move.banner?.let { m.copy(statusLine = it) } ?: m }
   Column(modifier.clip(RoundedCornerShape(MusicV3Dims.PaneRadius)).background(ApprovedHomePalette.Card)
       .padding(32.dp)) {
-    PlayerTile(model.track)
-    Meta(model)
+    Cover(model.track)
+    NowPlayingRow(model)
     Spacer(Modifier.weight(1f))
     model.halt?.let { HaltNote(it) }
     when {
@@ -80,22 +80,30 @@ internal fun MusicV3NowPlayingCard(
   }
 }
 
-/**
- * The song's square cover is the hero, like the YouTube Music app. YouTube's rules keep the official
- * player visible and uncovered, so it sits as a small video tile in the cover's corner (above the
- * 200×200 px minimum) — the cover is underneath it, never on top of it.
- */
+/** The song's square cover is the hero, like the YouTube Music app; nothing sits on top of it. */
 @Composable
-private fun PlayerTile(track: YtTrack?) {
+private fun Cover(track: YtTrack?) {
   Box(Modifier.fillMaxWidth().height(COVER_SIZE), contentAlignment = Alignment.Center) {
     Box(Modifier.size(COVER_SIZE)) {
       if (track != null) MusicV3Cover(track, Modifier.fillMaxSize()) else IdleTile()
-      Box(Modifier.align(Alignment.BottomEnd).padding(MINI_PLAYER_INSET).size(MINI_PLAYER_W, MINI_PLAYER_H)
-          .clip(RoundedCornerShape(14.dp)).background(Color.Black).approvedOutline(RoundedCornerShape(14.dp))) {
-        // The surface stays composed (and so released only on leave) even before a track loads.
-        YouTubePlayerSurface(Modifier.fillMaxSize())
-      }
     }
+  }
+}
+
+/**
+ * YouTube's rules keep the official player visible and uncovered (≥ 200×200 CSS px), and it is
+ * where the sound comes from, so it sits beside the title like a "now playing" thumbnail. It stays
+ * composed even before a track loads, so the player survives queue changes.
+ */
+@Composable
+private fun NowPlayingRow(model: MusicV3NowPlaying) {
+  Row(Modifier.fillMaxWidth().padding(top = 32.dp), verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(MINI_PLAYER_GAP)) {
+    Box(Modifier.size(MINI_PLAYER_W, MINI_PLAYER_H).clip(RoundedCornerShape(16.dp)).background(Color.Black)
+        .approvedOutline(RoundedCornerShape(16.dp))) {
+      YouTubePlayerSurface(Modifier.fillMaxSize())
+    }
+    Box(Modifier.weight(1f)) { Meta(model) }
   }
 }
 
@@ -114,12 +122,12 @@ private fun IdleTile() {
 @Composable
 private fun Meta(model: MusicV3NowPlaying) {
   val track = model.track ?: return
-  Column(Modifier.padding(top = 36.dp)) {
+  Column {
     if (model.isAd) AdLine() else {
       Text(model.statusLine, color = ApprovedHomePalette.Secondary, fontSize = 23.sp, maxLines = 1)
     }
-    Text(track.title, color = ApprovedHomePalette.Text, fontSize = 44.sp, lineHeight = 52.sp,
-        fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis,
+    Text(track.title, color = ApprovedHomePalette.Text, fontSize = 36.sp, lineHeight = 44.sp,
+        fontWeight = FontWeight.Medium, maxLines = 3, overflow = TextOverflow.Ellipsis,
         modifier = Modifier.padding(top = 6.dp))
     if (track.artist.isNotBlank()) {
       Text(track.artist, color = ApprovedHomePalette.Secondary, fontSize = 28.sp, lineHeight = 36.sp,
