@@ -66,7 +66,12 @@ internal enum class WifiWidgetLayout(val showsDetails: Boolean) {
  * Guest card setting doesn't hide the password, it is simply shown (the card does the same).
  */
 internal data class WifiPasswordReveal(val untilMs: Long? = null) {
-  fun visible(nowMs: Long, hidePassword: Boolean): Boolean = !hidePassword || (untilMs != null && nowMs < untilMs)
+  /**
+   * The widget sits on Home all the time, so the password always needs a tap here (30 s), whatever
+   * the guest card's own "hide until tapped" setting says. [hidePassword] is kept for call sites.
+   */
+  @Suppress("UNUSED_PARAMETER")
+  fun visible(nowMs: Long, hidePassword: Boolean): Boolean = untilMs != null && nowMs < untilMs
 
   fun reveal(nowMs: Long): WifiPasswordReveal = WifiPasswordReveal(nowMs + REVEAL_MS)
 

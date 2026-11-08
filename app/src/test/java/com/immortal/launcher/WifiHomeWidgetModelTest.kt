@@ -96,7 +96,7 @@ class WifiHomeWidgetModelTest {
   }
 
   @Test fun whenTheGuestSettingDoesNotHideIt_thePasswordIsShown() =
-      assertTrue(WifiPasswordReveal().visible(nowMs = 0, hidePassword = false))
+      assertFalse(WifiPasswordReveal().visible(nowMs = 0, hidePassword = false)) // always needs a tap on Home
 
   @Test fun theEnlargedQr_closesItselfAfterTwoMinutes() =
       assertEquals(120_000L, WifiQrOverlay.AUTO_CLOSE_MS)
