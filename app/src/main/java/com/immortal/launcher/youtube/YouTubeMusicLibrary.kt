@@ -56,6 +56,7 @@ class YouTubeMusicLibrary internal constructor(
   private val library = YtLibraryApi(YtApiClient(transport, tokens))
   private val cache = YtLibraryCache(cacheStore, clock)
   private val searcher = YtSearch(library, cacheStore, clock)
+  private val music = YtMusicFilter(library, cacheStore, clock)
   private val signInMutex = Mutex()
   private val signInFlow = MutableStateFlow<YtSignInState>(YtSignInState.Idle)
 
@@ -147,6 +148,34 @@ class YouTubeMusicLibrary internal constructor(
         facts[track.videoId]?.takeIf { it.embeddable }?.let { track.copy(durationMs = it.durationMs ?: track.durationMs) }
       }
     }
+  }
+
+  /**
+   * Whether each playlist is "mostly music" (see [YtMusicRule]): cached verdicts first, then the
+   * rest as they're sampled (videos.list, 1 unit per 50 ids — never the search budget). A playlist
+   * missing from the map is unknown and should be shown.
+   */
+  fun playlistVerdicts(playlists: List<YtPlaylist>): Flow<Map<String, Boolean>> {
+    val accountId = usableAccountId() ?: return flowOf(emptyMap())
+    return music.verdicts(accountId, playlists).flowOn(io)
+  }
+
+  /** [tracks] without the ones YouTube files under a non-Music category (unknown ones stay). */
+  suspend fun musicOnly(tracks: List<YtTrack>): YtResult<List<YtTrack>> = withContext(io) {
+    val accountId = usableAccountId() ?: return@withContext YtResult.NeedsSignIn
+    music.categories(accountId, tracks.map { it.videoId })
+        .map { categories -> tracks.filter { YtMusicRule.keepAsSong(categories[it.videoId]) } }
+  }
+
+  /** The active account's Hide/Show choices (removed when that account signs out). */
+  suspend fun playlistChoices(): Map<String, YtPlaylistChoice> = withContext(io) {
+    store.active.value?.id?.let(music::choices).orEmpty()
+  }
+
+  /** Hide or show [playlistId] on this Portal for the active account; null = automatic again. */
+  suspend fun setPlaylistChoice(playlistId: String, choice: YtPlaylistChoice?) = withContext(io) {
+    store.active.value?.id?.let { music.setChoice(it, playlistId, choice) }
+    Unit
   }
 
   private fun usableAccountId(): String? = store.active.value?.takeUnless { it.needsSignIn }?.id

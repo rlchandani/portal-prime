@@ -62,9 +62,10 @@ internal fun MusicV3TrackDetail(
   }
 }
 
-/** Liked songs: a one-line summary with Play / Shuffle, then the tracks. */
+/** Liked songs: a one-line summary (with an optional quiet [toggle]) and Play / Shuffle, then the tracks. */
 @Composable
-internal fun MusicV3TrackList(tracks: List<YtDataTrack>, summary: String, actions: MusicV3Actions, label: String) {
+internal fun MusicV3TrackList(tracks: List<YtDataTrack>, summary: String, actions: MusicV3Actions, label: String,
+    toggle: Pair<String, () -> Unit>? = null) {
   if (tracks.isEmpty()) {
     MusicV3Empty("music", MusicV3Message("No liked songs yet", "Songs you like on YouTube show up here."))
     return
@@ -73,6 +74,7 @@ internal fun MusicV3TrackList(tracks: List<YtDataTrack>, summary: String, action
     Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(20.dp)) {
       Text(summary, color = ApprovedHomePalette.Secondary, fontSize = 23.sp, modifier = Modifier.weight(1f))
+      toggle?.let { (text, run) -> MusicV3Button(text, style = MusicV3ButtonStyle.GHOST, onClick = run) }
       PlayButtons(tracks, actions, label)
     }
     TrackRows(tracks, actions, label)

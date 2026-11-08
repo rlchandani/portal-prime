@@ -59,6 +59,27 @@ internal class YtLibraryApi(private val api: YtApiClient) {
     return YtResult.Ok(facts)
   }
 
+  /** The first [size] items of a playlist: one page, the "mostly music" sample. */
+  suspend fun playlistSample(accountId: String, playlistId: String, size: Int): YtResult<List<YtTrack>> =
+      api.get(accountId, "playlistItems", mapOf(
+          "part" to "snippet,contentDetails", "playlistId" to playlistId, "maxResults" to size.toString()))
+          .map { YtParsers.playlistItems(it).items.take(size) }
+
+  /** `snippet.categoryId` per video, 50 ids per call (1 unit each, the regular bucket, not search). */
+  suspend fun videoCategories(accountId: String, videoIds: List<String>): YtResult<Map<String, String>> {
+    var categories = emptyMap<String, String>()
+    for (batch in videoIds.distinct().chunked(MAX_IDS)) {
+      val result = api.get(accountId, "videos", mapOf(
+          "part" to "snippet", "id" to batch.joinToString(","), "fields" to "items(id,snippet(categoryId))",
+          "maxResults" to PAGE_SIZE))
+      when (result) {
+        is YtResult.Ok -> categories = categories + YtParsers.videoCategories(result.value)
+        else -> return result.map { emptyMap() }
+      }
+    }
+    return YtResult.Ok(categories)
+  }
+
   /** One search.list call; [onSent] counts it against the budget once it reaches Google. */
   suspend fun search(accountId: String, query: String, onSent: () -> Unit): YtResult<List<YtTrack>> =
       api.get(accountId, "search", mapOf(

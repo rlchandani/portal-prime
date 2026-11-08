@@ -60,6 +60,13 @@ internal object YtParsers {
         id to YtVideoFacts(duration, embeddable)
       }.toMap()
 
+  /** `videos.list?part=snippet` → video id to `snippet.categoryId` (e.g. "10" = Music). */
+  fun videoCategories(json: JSONObject): Map<String, String> =
+      objects(json.optJSONArray("items")).mapNotNull { item ->
+        val id = item.optString("id").ifEmpty { return@mapNotNull null }
+        id to item.optJSONObject("snippet")?.optString("categoryId").orEmpty()
+      }.toMap()
+
   /** `channels.list?part=contentDetails` → `relatedPlaylists.[kind]` (e.g. "likes", "uploads"). */
   fun relatedPlaylist(json: JSONObject, kind: String): String? =
       objects(json.optJSONArray("items")).firstOrNull()

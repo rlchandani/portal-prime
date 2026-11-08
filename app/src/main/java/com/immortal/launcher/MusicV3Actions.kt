@@ -50,6 +50,9 @@ internal class MusicV3Actions(
 
   fun playNext(track: YtDataTrack) = withOne(track) { YouTubeMusicEngine.playNext(it); toast("Plays next: ${it.title}") }
 
+  /** Shows [text] in the right pane's toast. */
+  fun notify(text: String) = toast(text)
+
   fun addToQueue(track: YtDataTrack) = withOne(track) { YouTubeMusicEngine.addToEnd(it); toast("Added to the queue") }
 
   private fun withOne(track: YtDataTrack, then: (YtTrack) -> Unit) = withPlayable(listOf(track)) { ok ->
