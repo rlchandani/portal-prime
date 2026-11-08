@@ -30,9 +30,11 @@ class YtPlayerPageTest {
     assertTrue(html.contains("https://www.youtube.com/iframe_api"))
     assertTrue(html.contains(YtPlayerPage.BRIDGE_NAME))
     assertTrue(html.contains("onAutoplayBlocked"))
-    // Official controls stay on; nothing is layered over the player.
-    assertTrue(html.contains("controls:1"))
-    assertFalse(html.contains("controls:0"))
+    // Our own transport drives the player, so YouTube's duplicate controls are off via official
+    // player parameters (not hidden by overlays); nothing is layered over the player.
+    assertTrue(html.contains("controls:0"))
+    assertTrue(html.contains("fs:0"))
+    assertFalse(html.contains("controls:1"))
   }
 
   @Test fun commandScripts_validateVideoIdsAndNumbers() {

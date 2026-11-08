@@ -17,7 +17,8 @@ import java.util.Locale
  * loaded with base URL `https://<packageName>` so the HTTP Referer identifies the app (YouTube RMF),
  * and the same value is passed as the `origin` player var.
  *
- * The player fills the page and keeps YouTube's own controls; nothing is drawn over it.
+ * The player fills the page with YouTube's own controls turned off (official `controls:0`, no
+ * fullscreen, no annotations) because the Portal draws its own transport; nothing is drawn over it.
  */
 object YtPlayerPage {
   /** Name of the `@JavascriptInterface` object the page posts events to. */
@@ -87,7 +88,7 @@ if(wanted&&(s===-1||s===5))post({e:'autoplayBlocked'});},4000);}
 function ok(){return player&&player.loadVideoById;}
 window.onYouTubeIframeAPIReady=function(){
 player=new YT.Player('player',{host:'https://www.youtube-nocookie.com',width:'100%',height:'100%',
-playerVars:{playsinline:1,controls:1,rel:0,enablejsapi:1,origin:'$origin'},
+playerVars:{playsinline:1,controls:0,fs:0,disablekb:1,iv_load_policy:3,rel:0,enablejsapi:1,origin:'$origin'},
 events:{
 onReady:function(){post({e:'ready'});},
 onStateChange:function(ev){var s=ev.data;if(s===1){wanted=false;startPoll();}else{stopPoll();}
