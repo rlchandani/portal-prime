@@ -4108,18 +4108,34 @@ private fun ImmortalCryptoWidget(modifier: Modifier = Modifier, maxRows: Int = 5
         }
       }
   val open: () -> Unit = { context.openApprovedHomeSettings("crypto") }
-  ImmortalWidgetShell(title = "Crypto", openPage = "crypto", modifier = modifier.tvFocusableRow { open() }) {
+  ImmortalWidgetShell(title = "Crypto", openPage = "crypto", modifier = modifier.tvFocusableRow { open() },
+      scrollContent = false) {
     val rows = quotes
     when {
       rows == null -> ApprovedHomeWidgetMessage("Loading…")
       rows.isEmpty() -> ApprovedHomeWidgetMessage("Add coins to track")
-      else ->
-          Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            rows.take(maxRows).forEach { q -> CryptoRow(q) }
-          }
+      // Fit whole rows to the card (it shrinks when a shared note shows on Home) and say how
+      // many coins are hidden, instead of clipping the last row mid-line.
+      else -> BoxWithConstraints(Modifier.fillMaxSize()) {
+        val visible = remember(rows.size, maxHeight, maxRows) {
+          homeRowsVisibleCount(rows.size, maxHeight.value, CRYPTO_ROW_DP, CRYPTO_GAP_DP, CRYPTO_FOOTER_DP, maxRows)
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(CRYPTO_GAP_DP.dp)) {
+          rows.take(visible).forEach { q -> CryptoRow(q) }
+          val hidden = minOf(rows.size, maxRows) - visible
+          if (hidden > 0) Text(if (visible == 0) "$hidden ${if (hidden == 1) "coin" else "coins"}"
+              else "$hidden more ${if (hidden == 1) "coin" else "coins"}",
+              color = ApprovedHomePalette.Secondary, fontSize = 18.sp, lineHeight = 24.sp, maxLines = 1)
+        }
+      }
     }
   }
 }
+
+// Crypto row budget: 35sp price line + 8dp + 32dp pill row; 16dp between rows; 24sp footer.
+private const val CRYPTO_ROW_DP = 76f
+private const val CRYPTO_GAP_DP = 16f
+private const val CRYPTO_FOOTER_DP = 24f
 
 /** One coin line: symbol · 7d sparkline · price · tinted change pill (Dusk Aurora). */
 @Composable
