@@ -114,6 +114,8 @@ internal class YouTubePlayerHost(
   @MainThread fun pause() = run(YtPlayerPage.PAUSE)
   @MainThread fun stop() = run(YtPlayerPage.STOP)
   @MainThread fun seek(positionMs: Long) = run(YtPlayerPage.seek(positionMs))
+  /** Cues [listId] on this (visible) player and reports its ids as [YtPlayerEvent.Playlist]. */
+  @MainThread fun cuePlaylist(listId: String) = YtPlayerPage.cuePlaylist(listId)?.let(::run)
   /** Player volume 0–100 (the IFrame API's own volume, not the device stream). */
   @MainThread fun setVolume(level: Int) = run(YtPlayerPage.volume(level))
 

@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -37,6 +38,8 @@ internal object MusicShare {
   private const val TAG = "CalderMusicShare"
   private const val MAIN_WAIT_MS = 2_000L
   private const val LIBRARY_WAIT_MS = 8_000L
+  private const val PLAYER_WAIT_MS = 15_000L
+  private const val LOOKUP_WAIT_MS = 15_000L
   private val main by lazy { Handler(Looper.getMainLooper()) }
   private val scope by lazy { CoroutineScope(SupervisorJob() + Dispatchers.Main) }
   private val arrivalFlow = MutableStateFlow<String?>(null)
@@ -67,11 +70,20 @@ internal object MusicShare {
     return onMainBlocking { apply(context, req, listOf(track), label, quietly, needsMeta = req.title.isBlank()) }
   }
 
-  /** Resolves a playlist in the background (signed-in data layer, else the IFrame API) and applies it. */
-  fun sharePlaylist(context: Context, req: MusicShareRequest, quietly: Boolean) {
+  /** What was playing when the request arrived (cueing a playlist on the player stops it). */
+  private data class Before(val playing: Boolean, val positionMs: Long)
+
+  /**
+   * Opens a playlist in the background and applies it: the signed-in data layer, else the ONE
+   * visible engine player on the Music screen (never a hidden player). [source] comes from
+   * [MusicSharePolicy.playlistSource]; the route declines NEEDS_SIGN_IN before calling this.
+   */
+  fun sharePlaylist(context: Context, req: MusicShareRequest, quietly: Boolean, source: MusicSharePolicy.PlaylistSource) {
     last.set(LastShare(req.shareId, emptyList(), null, null))
+    val engine = YouTubeMusicEngine.state.value
+    val before = Before(engine.isPlaying, MusicV3NowPlaying.livePositionMs(engine, SystemClock.elapsedRealtime()))
     scope.launch {
-      val resolved = playlistTracks(context, req)
+      val resolved = playlistTracks(context, req, source, before)
       if (resolved == null || resolved.tracks.isEmpty()) {
         Log.i(TAG, "playlist ${req.id.take(6)}… couldn't be opened")
         last.set(LastShare(req.shareId, emptyList(), 0, "This playlist couldn't be opened on this Portal."))
@@ -79,29 +91,47 @@ internal object MusicShare {
       }
       val prepared = MusicShareQueue.prepare(resolved.tracks, req.shuffle, System.nanoTime())
       val label = MusicShareQueue.label(MusicShareKind.PLAYLIST, req.title, prepared.size)
-      apply(context, req, prepared, label, quietly, needsMeta = resolved.placeholders, playlistCount = prepared.size)
+      // After a player lookup the cue stopped the song; apply as of when the request arrived.
+      apply(context, req, prepared, label, quietly, needsMeta = resolved.placeholders, playlistCount = prepared.size,
+          before = before.takeIf { resolved.placeholders })
     }
   }
 
   private data class Resolved(val tracks: List<YtTrack>, val placeholders: Boolean)
 
-  private suspend fun playlistTracks(context: Context, req: MusicShareRequest): Resolved? {
-    val library = YtAndroid.library(context)
-    if (library.activeAccount.value != null) {
-      val result = withTimeoutOrNull(LIBRARY_WAIT_MS) { library.playlistTracks(req.id).first() }
+  private suspend fun playlistTracks(context: Context, req: MusicShareRequest,
+      source: MusicSharePolicy.PlaylistSource, before: Before): Resolved? {
+    var from = source
+    if (from == MusicSharePolicy.PlaylistSource.LIBRARY) {
+      val result = withTimeoutOrNull(LIBRARY_WAIT_MS) { YtAndroid.library(context).playlistTracks(req.id).first() }
       if (result is YtResult.Ok) return Resolved(result.value.value.map { it.toQueueTrack() }, placeholders = false)
-      Log.i(TAG, "library couldn't list the playlist; trying the official player")
+      from = MusicSharePolicy.libraryFallback(before.playing, req.action)
+      Log.i(TAG, "library couldn't list the playlist; fallback=$from")
     }
-    val ids = YtPlaylistResolver.resolve(context, req.id) ?: return null
+    if (from != MusicSharePolicy.PlaylistSource.PLAYER) return null
+    val ids = lookUpWithPlayer(context, req.id) ?: return null
     return Resolved(MusicShareQueue.placeholders(ids, req.title.ifBlank { "Playlist" }), placeholders = true)
+  }
+
+  /** Opens Music (Follow-me's path), waits for its visible player, cues the list there and reads its ids. */
+  private suspend fun lookUpWithPlayer(context: Context, listId: String): List<String>? {
+    if (!YouTubeMusicEngine.state.value.foreground) MusicHandoff.openMusicScreen(context)
+    withTimeoutOrNull(PLAYER_WAIT_MS) { YouTubeMusicEngine.state.first { it.foreground && it.ready && it.sizeOk } }
+        ?: return null
+    YouTubeMusicEngine.dispatch(YtAction.LookUpPlaylist(listId))
+    val lookup = withTimeoutOrNull(LOOKUP_WAIT_MS) {
+      YouTubeMusicEngine.state.mapNotNull { it.playlistLookup?.takeIf { l -> l.listId == listId } }.first()
+    }
+    return lookup?.videoIds?.takeIf { it.isNotEmpty() }
   }
 
   /** Main thread only. */
   private fun apply(context: Context, req: MusicShareRequest, tracks: List<YtTrack>, label: String,
-      quietly: Boolean, needsMeta: Boolean, playlistCount: Int? = null): MusicShareOutcome? {
+      quietly: Boolean, needsMeta: Boolean, playlistCount: Int? = null, before: Before? = null): MusicShareOutcome? {
     val s = YouTubeMusicEngine.state.value
-    val position = MusicV3NowPlaying.livePositionMs(s, SystemClock.elapsedRealtime())
-    val outcome = MusicShareQueue.apply(s.queue, s.isPlaying, position, tracks, req.action, req.from, label) ?: return null
+    val playing = before?.playing ?: s.isPlaying
+    val position = before?.positionMs ?: MusicV3NowPlaying.livePositionMs(s, SystemClock.elapsedRealtime())
+    val outcome = MusicShareQueue.apply(s.queue, playing, position, tracks, req.action, req.from, label) ?: return null
     val queue = if (!needsMeta) outcome.queue else outcome.queue.copy(entries = outcome.queue.entries.map {
       if (it.id in outcome.sharedIds) it.copy(needsMeta = true) else it })
     YouTubeMusicEngine.dispatch(YtAction.ApplyShared(queue, outcome.restart))

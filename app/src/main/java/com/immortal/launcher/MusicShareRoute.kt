@@ -20,6 +20,8 @@ import org.json.JSONObject
  *   → `{ok, status: playing|queued|quiet|declined, action, interrupted?, before?, ahead?, count?, reason?}`.
  * Quiet hours answer `quiet` unless `playAnyway`; a routine on screen or a call answers `declined`.
  * Guest mode hides the library but playback is allowed, so it doesn't refuse shares.
+ * Playlists on a Portal with no account signed in open on the visible Music player, so Play next /
+ * Add to queue over a playing song there answer `declined` ("Sign in … to queue playlists").
  */
 internal object MusicShareRoute : RemoteFeatureRoutes.Route {
   const val PATH = "/remote/musicshare"
@@ -82,7 +84,13 @@ internal object MusicShareRoute : RemoteFeatureRoutes.Route {
       val engine = YouTubeMusicEngine.state.value
       val current = engine.queue.current?.takeIf { engine.isPlaying }
       val effective = if (current != null) request.action else MusicShareAction.NOW
-      MusicShare.sharePlaylist(context, request, quietly)
+      val signedIn = YtAndroid.library(context).activeAccount.value != null
+      val source = MusicSharePolicy.playlistSource(signedIn, current != null, request.action)
+      if (source == MusicSharePolicy.PlaylistSource.NEEDS_SIGN_IN) {
+        return RemoteFeatureRoutes.json(200, RemoteFeatureRoutes.ok().put("status", "declined")
+            .put("reason", MusicSharePolicy.signInReason(DinnerCall.selfName(context))))
+      }
+      MusicShare.sharePlaylist(context, request, quietly, source)
       return RemoteFeatureRoutes.json(200, RemoteFeatureRoutes.ok().put("status", statusOf(effective))
           .put("action", effective.wire).put("quietly", quietly)
           .put("interrupted", if (effective == MusicShareAction.NOW) current?.track?.title ?: JSONObject.NULL else JSONObject.NULL)

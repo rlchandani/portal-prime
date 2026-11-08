@@ -131,6 +131,7 @@ object YouTubeMusicEngine : MusicTransport {
       YtEffect.Pause -> h?.pause()
       YtEffect.Stop -> h?.stop()
       is YtEffect.Seek -> h?.seek(effect.positionMs)
+      is YtEffect.CuePlaylist -> h?.cuePlaylist(effect.listId)
       YtEffect.Persist -> mutableState.value.let { store?.save(it.queue, it.positionMs) }
     }
   }

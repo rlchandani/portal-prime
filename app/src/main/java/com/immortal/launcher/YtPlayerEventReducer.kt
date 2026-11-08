@@ -38,6 +38,7 @@ internal object YtPlayerEventReducer {
         durationMs = if (e.durationMs > 0) e.durationMs else s.durationMs,
         playerVideoId = e.videoId ?: s.playerVideoId,
         positionAtElapsedMs = e.elapsedMs))
+    is YtPlayerEvent.Playlist -> playlist(s, e)
     YtPlayerEvent.AutoplayBlocked -> YtStep(s.copy(autoplayBlocked = true))
     YtPlayerEvent.ApiUnavailable -> YtStep(s.copy(status = YtPlayerStatus.NOT_READY,
         wantsPlay = false, halt = YtHalt.PlayerUnavailable))
@@ -48,6 +49,14 @@ internal object YtPlayerEventReducer {
     val title = e.title ?: return queue
     if (queue.current?.track?.videoId != id) return queue
     return queue.fillMeta(id, title, e.author.orEmpty())
+  }
+
+  /** Records the ids; if the list couldn't open, the player goes back to showing our current entry. */
+  private fun playlist(s: YtEngineState, e: YtPlayerEvent.Playlist): YtStep {
+    val recorded = s.copy(playlistLookup = YtPlaylistLookup(e.listId, e.videoIds))
+    val entry = s.queue.current
+    if (e.videoIds.isNotEmpty() || entry == null) return YtStep(recorded)
+    return YtStep(recorded, listOf(YtEffect.Cue(entry.track.videoId, s.positionMs)))
   }
 
   /** The player exists: apply the current entry (paused unless the user asked to play). */

@@ -13,11 +13,12 @@ import org.json.JSONObject
  * Messages are untrusted (any frame can reach a JavaScript interface), so only small, versioned,
  * well-typed messages become events; everything else is dropped.
  *
- * Wire format (v1): `{"v":1,"e":"ready"|"state"|"error"|"progress"|"autoplayBlocked"|"apiError",
- * "s":stateCode,"c":errorCode,"t":seconds,"d":seconds,"id":videoId,"ti":title,"au":author}`.
+ * Wire format (v1): `{"v":1,"e":"ready"|"state"|"error"|"progress"|"playlist"|"autoplayBlocked"|"apiError",
+ * "s":stateCode,"c":errorCode,"t":seconds,"d":seconds,"id":videoId,"ti":title,"au":author,"l":listId,"ids":[videoId]}`.
  */
 object YtPlayerEventParser {
-  const val MAX_MESSAGE_CHARS = 512
+  /** Fits a 200-id playlist report; every other message is far smaller. */
+  const val MAX_MESSAGE_CHARS = 4_096
   private const val MAX_TEXT_CHARS = 120
   private const val VERSION = 1
   private const val MAX_MEDIA_SECONDS = 24.0 * 60 * 60
@@ -33,6 +34,7 @@ object YtPlayerEventParser {
           ?.takeIf { it != YtPlayerStatus.NOT_READY }?.let { YtPlayerEvent.StateChanged(it) }
       "error" -> int(obj, "c")?.let { YtPlayerEvent.Error(it) }
       "progress" -> progress(obj, elapsedMs)
+      "playlist" -> playlist(obj)
       "autoplayBlocked" -> YtPlayerEvent.AutoplayBlocked
       "apiError" -> YtPlayerEvent.ApiUnavailable
       else -> null
@@ -52,6 +54,17 @@ object YtPlayerEventParser {
   /** Optional short display text from `getVideoData()`; control characters dropped. */
   private fun text(obj: JSONObject, key: String): String? =
       (obj.opt(key) as? String)?.filterNot { it.isISOControl() }?.trim()?.take(MAX_TEXT_CHARS)?.ifBlank { null }
+
+  /** `{e:"playlist", l:listId, ids:[…]}`: valid ids only, capped; an empty list means it couldn't open. */
+  private fun playlist(obj: JSONObject): YtPlayerEvent? {
+    val listId = (obj.opt("l") as? String)?.takeIf { LIST_ID.matches(it) } ?: return null
+    val array = obj.optJSONArray("ids") ?: return null
+    val ids = (0 until array.length()).mapNotNull { array.opt(it) as? String }
+        .filter(YtTrack::isValidVideoId).take(YtPlayerPage.MAX_PLAYLIST_IDS)
+    return YtPlayerEvent.Playlist(listId, ids)
+  }
+
+  private val LIST_ID = Regex("[A-Za-z0-9_-]{10,64}")
 
   private fun int(obj: JSONObject, key: String): Int? =
       (obj.opt(key) as? Number)?.toDouble()?.takeIf { it % 1.0 == 0.0 && it in -1e6..1e6 }?.toInt()

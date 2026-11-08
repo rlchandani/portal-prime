@@ -36,6 +36,7 @@ object YtEngineReducer {
     is YtAction.Restore -> restore(s, a)
     is YtAction.Adopt -> adopt(s, a)
     is YtAction.ApplyShared -> if (a.restart) adopt(s, YtAction.Adopt(a.queue, 0)) else queueOnly(s, a.queue)
+    is YtAction.LookUpPlaylist -> lookUp(s, a.listId)
     is YtAction.Foreground -> foreground(s, a.visible)
     is YtAction.SizeChanged -> size(s, a.ok)
     YtAction.PlayerLost -> YtStep(
@@ -139,6 +140,15 @@ object YtEngineReducer {
       else -> listOf(YtEffect.Cue(id, position))
     }
     return YtStep(adopted, load + YtEffect.Persist)
+  }
+
+  /**
+   * Cueing a playlist replaces what the visible player shows, so it is only done on a visible,
+   * ready player; the reported ids arrive as [YtPlayerEvent.Playlist].
+   */
+  private fun lookUp(s: YtEngineState, listId: String): YtStep {
+    if (!s.ready || !s.canPlay) return YtStep(s.copy(playlistLookup = YtPlaylistLookup(listId, emptyList())))
+    return YtStep(s.copy(playlistLookup = null, wantsPlay = false), listOf(YtEffect.CuePlaylist(listId)))
   }
 
   private fun foreground(s: YtEngineState, visible: Boolean): YtStep {

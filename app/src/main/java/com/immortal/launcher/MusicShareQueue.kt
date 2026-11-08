@@ -111,6 +111,28 @@ internal object MusicSharePolicy {
         else -> if (quiet) Decision.ACCEPT_QUIETLY else Decision.ACCEPT
       }
 
+  /** Where a shared playlist's songs come from. */
+  enum class PlaylistSource { LIBRARY, PLAYER, NEEDS_SIGN_IN }
+
+  /**
+   * Signed in: the data layer lists it. Signed out: only the ONE visible player can open it, and
+   * cueing replaces what that player shows, so it's allowed only when the playlist is about to
+   * play anyway (nothing playing, or Play now). Play next / Add to queue over a playing song on
+   * a signed-out Portal is declined with [SIGN_IN_REASON] rather than interrupting it.
+   */
+  fun playlistSource(signedIn: Boolean, playing: Boolean, action: MusicShareAction): PlaylistSource = when {
+    signedIn -> PlaylistSource.LIBRARY
+    !playing || action == MusicShareAction.NOW -> PlaylistSource.PLAYER
+    else -> PlaylistSource.NEEDS_SIGN_IN
+  }
+
+  /** Fallback when the signed-in library can't list it: the visible player, if that's allowed. */
+  fun libraryFallback(playing: Boolean, action: MusicShareAction): PlaylistSource =
+      playlistSource(signedIn = false, playing = playing, action = action)
+
+  fun signInReason(room: String): String =
+      "Sign in to YouTube on $room to queue playlists. Play now works without an account."
+
   /** Reason the phone shows for a decline. */
   fun reason(decision: Decision, room: String): String? = when (decision) {
     Decision.ROUTINE -> "A routine is on screen in $room. Nothing was played."
