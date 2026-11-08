@@ -22,8 +22,17 @@ internal sealed interface MusicMoveState {
   /** The music plays in [targetName]; it's paused here. */
   data class Handed(val targetId: String, val targetName: String) : MusicMoveState
 
-  /** "Bring it back" ([id]) is out to [targetId]. */
-  data class Recalling(val id: String, val targetId: String, val targetName: String, val startedMs: Long) : MusicMoveState
+  /**
+   * "Bring it back" ([id]) is out to [targetId]. [follow]: follow-me pulled music this room never
+   * handed away, so giving up returns to [Idle] rather than "Playing in …".
+   */
+  data class Recalling(
+      val id: String,
+      val targetId: String,
+      val targetName: String,
+      val startedMs: Long,
+      val follow: Boolean = false,
+  ) : MusicMoveState
 }
 
 /** One transition: the next state, whether to pause local playback, and a toast to show. */
@@ -63,13 +72,23 @@ internal object MusicMoveMachine {
     s is MusicMoveState.Offering && expired(s, nowMs) -> MusicMoveStep(MusicMoveState.Idle,
         toast = "${s.targetName} didn't answer. The music is still playing here.")
     s is MusicMoveState.Recalling && nowMs - s.startedMs >= ANSWER_MS ->
-      MusicMoveStep(MusicMoveState.Handed(s.targetId, s.targetName), toast = "${s.targetName} didn't answer.")
+      MusicMoveStep(gaveUp(s), toast = "${s.targetName} didn't answer.")
     else -> MusicMoveStep(s)
   }
 
   fun recall(s: MusicMoveState, id: String, nowMs: Long): MusicMoveStep =
       if (s is MusicMoveState.Handed) MusicMoveStep(MusicMoveState.Recalling(id, s.targetId, s.targetName, nowMs))
       else MusicMoveStep(s)
+
+  /**
+   * Follow-me: pull the music playing in [sourceId] here through the "Bring it back" path. From
+   * [MusicMoveState.Idle] it's a fresh pull; if our own music was handed to that room it's a plain recall.
+   */
+  fun follow(s: MusicMoveState, id: String, sourceId: String, sourceName: String, nowMs: Long): MusicMoveStep = when {
+    s is MusicMoveState.Idle -> MusicMoveStep(MusicMoveState.Recalling(id, sourceId, sourceName, nowMs, follow = true))
+    s is MusicMoveState.Handed && s.targetId == sourceId -> recall(s, id, nowMs)
+    else -> MusicMoveStep(s)
+  }
 
   /** An incoming offer that answers our "Bring it back" (quiet hours don't block it). */
   fun isRecallOffer(s: MusicMoveState, from: String, offerId: String): Boolean =
@@ -84,7 +103,8 @@ internal object MusicMoveMachine {
     MusicMoveState.Idle -> null
     is MusicMoveState.Offering -> if (s.fetched) "Starting in ${s.targetName}…" else "Moving to ${s.targetName}…"
     is MusicMoveState.Handed -> "Playing in ${s.targetName}"
-    is MusicMoveState.Recalling -> "Bringing it back from ${s.targetName}…"
+    is MusicMoveState.Recalling ->
+      if (s.follow) "Bringing the music from ${s.targetName}…" else "Bringing it back from ${s.targetName}…"
   }
 
   private fun expired(s: MusicMoveState.Offering, nowMs: Long): Boolean {
@@ -104,9 +124,13 @@ internal object MusicMoveMachine {
   private fun recallAnswered(s: MusicMoveState.Recalling, status: MusicHandoffStatus): MusicMoveStep = when (status) {
     MusicHandoffStatus.NOTHING -> MusicMoveStep(MusicMoveState.Idle, toast = "Nothing is playing in ${s.targetName}.")
     // PLAYING never answers a recall (the music comes back as an offer); anything else is a refusal.
-    else -> MusicMoveStep(MusicMoveState.Handed(s.targetId, s.targetName),
-        toast = "${s.targetName} couldn't send the music back.")
+    else -> MusicMoveStep(gaveUp(s),
+        toast = if (s.follow) "${s.targetName} couldn't send the music." else "${s.targetName} couldn't send the music back.")
   }
+
+  /** A recall that didn't work: our music is still in that room, or (follow-me) nothing changed here. */
+  private fun gaveUp(s: MusicMoveState.Recalling): MusicMoveState =
+      if (s.follow) MusicMoveState.Idle else MusicMoveState.Handed(s.targetId, s.targetName)
 
   fun declineCopy(room: String, status: MusicHandoffStatus): String = when (status) {
     MusicHandoffStatus.DECLINED_QUIET -> "$room is in quiet hours, so the music stayed here."
