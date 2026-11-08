@@ -57,6 +57,8 @@ data class YtEngineState(
     val foreground: Boolean = false,
     /** False when the player is laid out below the 200×200 minimum (enforced in debug builds). */
     val sizeOk: Boolean = true,
+    /** A queue moved here from another Portal starts as soon as the music screen is visible. */
+    val playWhenVisible: Boolean = false,
 ) {
   val ready: Boolean get() = status != YtPlayerStatus.NOT_READY
   val isPlaying: Boolean get() = status == YtPlayerStatus.PLAYING || status == YtPlayerStatus.BUFFERING
@@ -90,6 +92,8 @@ sealed interface YtAction {
   data class SetShuffle(val on: Boolean, val seed: Long) : YtAction
   data object Clear : YtAction
   data class Restore(val queue: YtQueue, val positionMs: Long) : YtAction
+  /** Replaces the queue with one moved here from another Portal and resumes it at [positionMs]. */
+  data class Adopt(val queue: YtQueue, val positionMs: Long) : YtAction
   data class Foreground(val visible: Boolean) : YtAction
   data class SizeChanged(val ok: Boolean) : YtAction
   /** The WebView renderer died or the host was released; the player must be rebuilt. */

@@ -11,7 +11,11 @@ import com.immortal.launcher.youtube.YtSignInState
 import com.immortal.launcher.youtube.YtTrack as YtDataTrack
 
 /** Which full screen the music entry shows (music v3, official YouTube route). */
-internal enum class MusicV3Gate { NOT_CONFIGURED, SIGN_IN, ADD_ACCOUNT, NO_ONE, PLAYER }
+internal enum class MusicV3Gate {
+  NOT_CONFIGURED, SIGN_IN, ADD_ACCOUNT, NO_ONE, PLAYER,
+  /** No usable account, but a queue (e.g. moved here from another Portal): play it, no Library/Search. */
+  GUEST,
+}
 
 /** The right pane's three tabs; Now Playing on the left never moves. */
 internal enum class MusicV3Pane(val label: String) { QUEUE("Queue"), LIBRARY("Library"), SEARCH("Search") }
@@ -46,10 +50,13 @@ internal object MusicV3Rules {
       signedOutLast: Boolean,
       /** The sign-in just succeeded: keep "Signed in as …" up although an account now exists. */
       showingSuccess: Boolean = false,
+      /** The engine holds a queue; public videos play without an account. */
+      hasQueue: Boolean = false,
   ): MusicV3Gate = when {
     showingSuccess && adding -> MusicV3Gate.ADD_ACCOUNT
     showingSuccess -> MusicV3Gate.SIGN_IN
     adding && configured -> MusicV3Gate.ADD_ACCOUNT
+    hasQueue && (active == null || active.needsSignIn) -> MusicV3Gate.GUEST
     accounts.isEmpty() && !configured -> MusicV3Gate.NOT_CONFIGURED
     accounts.isEmpty() && signedOutLast -> MusicV3Gate.NO_ONE
     accounts.isEmpty() -> MusicV3Gate.SIGN_IN
@@ -58,6 +65,9 @@ internal object MusicV3Rules {
   }
 
   fun canAddAccount(count: Int): Boolean = count < MAX_ACCOUNTS
+
+  /** Sign-in can be backed out of when there's something to go back to (an account or a guest queue). */
+  fun canCancelSignIn(accounts: Int, hasQueue: Boolean): Boolean = accounts > 0 || hasQueue
 
   fun signInView(state: YtSignInState, nowMs: Long): MusicV3SignInView = when (state) {
     YtSignInState.Idle -> MusicV3SignInView.Starting
