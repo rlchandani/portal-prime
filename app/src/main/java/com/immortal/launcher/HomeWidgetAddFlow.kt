@@ -233,6 +233,11 @@ internal fun HomeStaticWidgetPreview(kind: String, modifier: Modifier = Modifier
           Box(Modifier.width(120.dp)) { line(1f, 18.dp, 0.dp) }
         }
       }
+      // A QR-shaped placeholder: the real widget would decrypt the password just to be previewed.
+      HomeWidgetStore.KIND_WIFI -> Box(Modifier.size(132.dp).clip(RoundedCornerShape(16.dp))
+          .background(ApprovedHomePalette.Chrome), contentAlignment = Alignment.Center) {
+        ApprovedHomeIcon("qr", Modifier.size(72.dp), ApprovedHomePalette.Secondary)
+      }
       else -> { line(.8f, 26.dp, 0.dp); line(.6f) }
     }
   }
