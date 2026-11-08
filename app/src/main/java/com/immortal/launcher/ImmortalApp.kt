@@ -33,6 +33,7 @@ class ImmortalApp : Application() {
     HouseholdBus.start(this)
     HouseholdListFeature.install(this)
     DinnerCallFeature.install(this)
+    MusicHandoff.install(this)
     RoutinesFeature.install(this)
     ShareFeature.install(this)
     // Weak window tracking is dormant until an operator starts a bounded Fleet capture.

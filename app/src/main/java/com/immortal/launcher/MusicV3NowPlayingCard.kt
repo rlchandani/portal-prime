@@ -57,8 +57,13 @@ private const val TICK_MS = 1_000L
  * then our metadata, progress, transport and Portal volume below it.
  */
 @Composable
-internal fun MusicV3NowPlayingCard(engine: YtEngineState, room: String, modifier: Modifier = Modifier) {
-  val model = MusicV3NowPlaying.from(engine, room)
+internal fun MusicV3NowPlayingCard(
+    engine: YtEngineState,
+    room: String,
+    move: MusicV3MoveControls = MusicV3MoveControls.NONE,
+    modifier: Modifier = Modifier,
+) {
+  val model = MusicV3NowPlaying.from(engine, room).let { m -> move.banner?.let { m.copy(statusLine = it) } ?: m }
   Column(modifier.clip(RoundedCornerShape(MusicV3Dims.PaneRadius)).background(ApprovedHomePalette.Card)
       .padding(32.dp)) {
     PlayerTile(model.track)
@@ -71,7 +76,7 @@ internal fun MusicV3NowPlayingCard(engine: YtEngineState, room: String, modifier
       model.showProgress -> Progress(engine)
     }
     if (model.showBigPlay) BigPlay() else Transport(model)
-    MusicV3VolumeRow(room)
+    MusicV3VolumeRow(room) { MusicV3MoveButton(move) }
   }
 }
 
@@ -208,7 +213,7 @@ private fun BigPlay() {
 
 /** Portal speaker volume (STREAM_MUSIC). Works during ads too. */
 @Composable
-internal fun MusicV3VolumeRow(room: String = "") {
+internal fun MusicV3VolumeRow(room: String = "", trailing: (@Composable () -> Unit)? = null) {
   val context = androidx.compose.ui.platform.LocalContext.current
   val volume = remember(context) { MusicVolume(context) }
   var level by remember(volume) { mutableStateOf(volume.read()) }
@@ -227,6 +232,7 @@ internal fun MusicV3VolumeRow(room: String = "") {
         colors = musicV3SliderColors(ApprovedHomePalette.Text),
         modifier = Modifier.weight(1f).heightIn(min = MusicV3Dims.Touch)
             .semantics { contentDescription = if (room.isBlank()) "Volume" else "$room volume" })
+    trailing?.invoke()
   }
 }
 
