@@ -98,12 +98,37 @@ internal object MusicHandoff {
     val step = transition { MusicMoveMachine.recall(it, id, now()) }
     val recalling = step.state as? MusicMoveState.Recalling ?: return
     if (recalling.id != id) return
+    sendRecall(app, recalling)
+  }
+
+  /**
+   * Follow-me: pull the music playing in [sourceId] here through the same recall as "Bring it back"
+   * (the source answers with an offer this Portal accepts as a recall). Returns the recall id once
+   * it's sent, else null (another move is out, or the household is unreachable).
+   */
+  fun follow(context: Context, sourceId: String, sourceName: String): String? {
+    val app = context.applicationContext
+    val id = newId()
+    val step = transition { MusicMoveMachine.follow(it, id, sourceId, sourceName, now()) }
+    val recalling = step.state as? MusicMoveState.Recalling
+    if (recalling?.id != id) {
+      Log.i(TAG, "follow from $sourceName: not started (state=${step.state.javaClass.simpleName})")
+      return null
+    }
+    return id.takeIf { sendRecall(app, recalling) }
+  }
+
+  private fun sendRecall(app: Context, recalling: MusicMoveState.Recalling): Boolean {
     val sent = HouseholdBus.send(app, MusicHandoffWire.RECALL,
-        MusicHandoffWire.encode(MusicHandoffWire.Recall(id, recalling.targetId, DinnerCall.selfName(app))))
-    Log.i(TAG, "bring back: recall to ${recalling.targetName} sent=$sent")
-    if (!sent) transition { MusicMoveStep(MusicMoveState.Handed(recalling.targetId, recalling.targetName),
-        toast = "Couldn't reach ${recalling.targetName}.") }
+        MusicHandoffWire.encode(MusicHandoffWire.Recall(recalling.id, recalling.targetId, DinnerCall.selfName(app))))
+    Log.i(TAG, "${if (recalling.follow) "follow" else "bring back"}: recall to ${recalling.targetName} sent=$sent")
+    if (!sent) transition { s ->
+      if ((s as? MusicMoveState.Recalling)?.id != recalling.id) MusicMoveStep(s)
+      else MusicMoveStep(if (recalling.follow) MusicMoveState.Idle else MusicMoveState.Handed(recalling.targetId, recalling.targetName),
+          toast = "Couldn't reach ${recalling.targetName}.")
+    }
     else main.postDelayed({ tick() }, MusicMoveMachine.ANSWER_MS)
+    return sent
   }
 
   /** Called by [MusicHandoffNet] when the target fetches: serves offer [offerId] once, to [caller] only. */

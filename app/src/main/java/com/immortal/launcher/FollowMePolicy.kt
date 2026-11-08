@@ -153,3 +153,16 @@ internal object FollowMePolicy {
     return since >= arrivedMs - WINDOW_MS
   }
 }
+
+/** Hearthpane copy for the Ask card and the Automatic banner. */
+internal object FollowMeCopy {
+  const val CONTINUE = "Continue"
+  const val NOT_NOW = "Not now"
+  const val UNDO = "Undo"
+
+  fun askTitle(title: String): String = "Continue $title here?"
+
+  fun askLine(artist: String, room: String): String = if (artist.isBlank()) "from $room" else "$artist · from $room"
+
+  fun followed(room: String): String = "Music followed you from $room"
+}

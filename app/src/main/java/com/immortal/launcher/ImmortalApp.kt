@@ -59,6 +59,8 @@ class ImmortalApp : Application() {
     // the hub's pinned-frame blind spot (always-on frames never sleep, so the dream/sleep
     // proxy can't see the room empty). No-op without the ADB-granted READ_LOGS.
     MetaPresenceReader(this).start()
+    // "Music follows you": needs the bus, the music handoff and the presence hub above.
+    MusicFollowMe.install(this)
     // Read the device's native media session (whatever's playing) into NowPlayingHub
     // for the screensaver card + header mini-player. Dormant until our notification
     // listener is enabled — done at provisioning (`cmd notification allow_listener`);
