@@ -777,7 +777,7 @@ private fun ApprovedWidgetCell(
 @Composable
 private fun ApprovedWidgetDragGrip(drag: Modifier, modifier: Modifier = Modifier) {
   val dots = ApprovedHomePalette.Text
-  Box(modifier.size(64.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome)
+  Box(modifier.size(64.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
       .semantics { contentDescription = "Drag to move" }.then(drag),
       contentAlignment = Alignment.Center) {
     Canvas(Modifier.size(26.dp)) {
@@ -1421,7 +1421,7 @@ private fun LauncherScreen(
           ApprovedThemeButton()
           val hey by produceState<String?>(null, installedApps) { value = withContext(Dispatchers.IO) { heyPackage(context) } }
           hey?.let { pkg ->
-            Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome)
+            Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
                 .semantics { contentDescription = "Voice assistant" }
                 .tvFocusable(CircleShape, onLongClick = { openHeyPicker(context, pkg) }) { fireHey(context, pkg) },
                 contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
@@ -5349,7 +5349,7 @@ private fun appWidgetMinDp(context: Context, raw: Int): Int {
 
 @Composable
 private fun ApprovedHeaderButton(icon: String, label: String, onClick: () -> Unit) {
-  Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome)
+  Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
       .semantics { contentDescription = label }
       .tvFocusable(CircleShape, ringColor = ApprovedHomePalette.Accent, onClick = onClick),
       contentAlignment = Alignment.Center) {

@@ -29,7 +29,7 @@ internal fun ApprovedThemeButton() {
     val context = LocalContext.current
     val palette = LocalApprovedPalette.current
     val label = if (palette.dark) "Switch to day theme" else "Switch to night theme"
-    Box(Modifier.size(68.dp).clip(CircleShape).background(palette.surface2)
+    Box(Modifier.size(68.dp).clip(CircleShape).background(palette.surface2).approvedOutline(CircleShape)
         .semantics { contentDescription = label }
         .tvFocusable(CircleShape, focusScale = 1f, ringColor = palette.accent) {
             val value = if (palette.dark) "light" else "dark"

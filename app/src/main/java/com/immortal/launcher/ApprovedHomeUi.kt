@@ -376,6 +376,9 @@ internal object ApprovedHomePalette {
       LocalApprovedPalette.current.accent
   val Border: Color @Composable get() =
       LocalApprovedPalette.current.divider
+  /** Card / chrome-button edge (a light trim in day theme, a soft lighter edge at night). */
+  val Outline: Color @Composable get() =
+      LocalApprovedPalette.current.outline
   val Selected: Color @Composable get() =
       LocalApprovedPalette.current.selected
 }
@@ -388,8 +391,16 @@ internal fun ApprovedHomeSurface(
 ) {
   val shape = RoundedCornerShape(radius)
   Box(modifier.clip(shape).background(ApprovedHomePalette.Card)
-      .border(1.dp, ApprovedHomePalette.Border, shape), content = content)
+      .approvedOutline(shape), content = content)
 }
+
+/** Width of the trim drawn by [approvedOutline]. */
+internal val ApprovedOutlineWidth = 1.5.dp
+
+/** The shared slim trim for Home cards and round chrome buttons. */
+@Composable
+internal fun Modifier.approvedOutline(shape: androidx.compose.ui.graphics.Shape): Modifier =
+    border(ApprovedOutlineWidth, ApprovedHomePalette.Outline, shape)
 
 @Composable
 internal fun ApprovedHomeTextButton(
