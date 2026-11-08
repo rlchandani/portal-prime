@@ -10,7 +10,7 @@ package com.immortal.launcher
  * Folds the first guest card's free-text basics into the choice-based model, losing nothing: a
  * written time becomes the check-out choice; anything else (and the old "Good to know" and
  * "Emergency contact" lines) becomes a custom "Good to know" note. Used by the saved-settings
- * migration ([GuestConfig.load]) and for older Calder Pocket saves ([GuestRequests]). The old
+ * migration ([GuestConfig.load]) and for older Portal Toolkit saves ([GuestRequests]). The old
  * door code is a secret and moves separately ([GuestSecretsMigration]).
  */
 internal object GuestLegacy {

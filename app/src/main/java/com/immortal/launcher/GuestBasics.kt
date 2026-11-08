@@ -10,8 +10,8 @@ import java.util.Locale
 
 /**
  * The house basics as choices rather than typing: check-out times, "Good to know" chips, contact
- * chips and welcome samples, plus how each is stored. Ids are the wire format shared with Calder
- * Pocket, so they never change. Pure JVM.
+ * chips and welcome samples, plus how each is stored. Ids are the wire format shared with Portal
+ * Toolkit, so they never change. Pure JVM.
  */
 internal object GuestBasics {
   data class Preset(val id: String, val label: String, val icon: String)

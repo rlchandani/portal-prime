@@ -126,7 +126,7 @@ private fun GuestContactChoice(draft: GuestSetupDraft, onDraft: (GuestSetupDraft
     val name = draft.settings.contactName
     if (name.isNotEmpty()) {
       Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        GuestHint("Questions? Ask $name. (Chosen in Calder Pocket.)", modifier = Modifier.weight(1f))
+        GuestHint("Questions? Ask $name. (Chosen in Portal Toolkit.)", modifier = Modifier.weight(1f))
         ToolsButton("Remove") { onDraft(draft.clearContactName()) }
       }
     }

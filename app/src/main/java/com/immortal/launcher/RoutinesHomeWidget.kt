@@ -54,7 +54,7 @@ internal fun RoutinesHomeWidget(modifier: Modifier = Modifier) {
     val list = doc.routines.sortedBy { it.start }
     if (list.isEmpty()) {
       Text("No routines yet", color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 34.sp)
-      ApprovedHomeWidgetMessage("Make one in Calder Pocket on your phone")
+      ApprovedHomeWidgetMessage("Make one in Portal Toolkit on your phone")
     } else Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
       list.take(3).forEach { r -> WidgetRow(r, RoutineSchedule.widgetStatus(r, runs, now)) }
     }
@@ -87,13 +87,13 @@ internal fun RoutinesSheet(doc: RoutineDoc, runs: Map<String, RoutineRun>, now: 
       Row(verticalAlignment = Alignment.CenterVertically) {
         Text("Routines", color = RoutineColors.Text, fontSize = 48.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.width(20.dp))
-        Text("Edit them in Calder Pocket on your phone", color = RoutineColors.Muted, fontSize = 24.sp, modifier = Modifier.weight(1f))
+        Text("Edit them in Portal Toolkit on your phone", color = RoutineColors.Muted, fontSize = 24.sp, modifier = Modifier.weight(1f))
         SheetButton("Close", solid = false, enabled = true, onClose)
       }
       Spacer(Modifier.height(28.dp))
       if (doc.routines.isEmpty()) {
         Text("No routines on this Portal", color = RoutineColors.Text, fontSize = 34.sp)
-        Text("Open Calder Pocket on your phone, then Home › Routines › New routine.", color = RoutineColors.Muted, fontSize = 22.sp)
+        Text("Open Portal Toolkit on your phone, then Home › Routines › New routine.", color = RoutineColors.Muted, fontSize = 22.sp)
       }
       Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         doc.routines.sortedBy { it.start }.forEach { r ->

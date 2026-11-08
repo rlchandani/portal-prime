@@ -2266,7 +2266,7 @@ function settingsPage() {
       group(
         el('h3', { text: 'Device tools' }),
         text(
-          'USB/ADB provisioning, screen mirroring, APK sideloading, uninstall, files and full backups require Calder Pocket with a device connection. They cannot run in this LAN browser.',
+          'USB/ADB provisioning, screen mirroring, APK sideloading, uninstall, files and full backups require Portal Toolkit with a device connection. They cannot run in this LAN browser.',
         ),
       ),
     ),

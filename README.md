@@ -1,6 +1,6 @@
 # Calder
 
-*Formerly Immortal.* The phone companion app is **Calder Pocket** (formerly Portal Toolkit).
+*Formerly Immortal.* The phone companion app is **Portal Toolkit**.
 
 A custom home-screen layer for discontinued Meta Portal devices, keeping them alive after Meta
 wound the platform down. Calder turns a Portal into a device you

@@ -176,7 +176,7 @@ internal fun SharedFromPhonesPane(modifier: Modifier = Modifier) {
   Column(modifier.padding(30.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
     Text("Shared from phones", color = ApprovedHomePalette.Text, fontSize = 32.sp, fontWeight = FontWeight.Medium)
     if (notes.active.isEmpty() && notes.gone.isEmpty())
-      Text("Notes and links shared from Calder Pocket show up here.", color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
+      Text("Notes and links shared from Portal Toolkit show up here.", color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
     notes.active.forEach { NoteRow(it, "On Home · ${HomeNoteTime.byline(it, zone)}", null) }
     notes.gone.forEach { gone ->
       val why = when (gone.why) {

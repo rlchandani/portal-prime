@@ -20,7 +20,7 @@ internal interface GuestPort {
   fun hasDoorCode(): Boolean
   /** A valid [GuestDoorCode] or blank (clears). False when storage failed. */
   fun setDoorCode(value: String): Boolean
-  /** A free-text door code from an older Calder Pocket ([GuestDoorCode.isStorable]). */
+  /** A free-text door code from an older Portal Toolkit ([GuestDoorCode.isStorable]). */
   fun setLegacyDoorCode(value: String): Boolean
   fun mode(): GuestModeState
   fun start(schedule: GuestSchedule)

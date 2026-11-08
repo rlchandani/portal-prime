@@ -110,7 +110,7 @@ internal object RoutineSchedule {
       run?.status == RunStatus.RUNNING -> "On now"
       run?.status == RunStatus.DONE -> "Done today at ${clockOf(run.endedAtMs ?: nowMs)}"
       run?.status == RunStatus.CLOSED -> "Closed today at ${clockOf(run.endedAtMs ?: nowMs)}"
-      !r.enabled -> "Switched off in Calder Pocket"
+      !r.enabled -> "Switched off in Portal Toolkit"
       else -> nextOccurrence(r, runs, nowMs)?.let { "Next: ${it.label}, ${RoutineDates.clock12(r.start)}" } ?: "Not scheduled"
     }
   }
