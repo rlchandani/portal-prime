@@ -124,4 +124,13 @@ class MusicShareQueueTest {
     assertEquals("24 songs from Sunday slow", MusicShareQueue.label(MusicShareKind.PLAYLIST, "Sunday slow", 24))
     assertEquals("1 song", MusicShareQueue.label(MusicShareKind.PLAYLIST, "", 1))
   }
+
+  @Test fun aSingleSharedSongLeavesNoSourceForTheUpNextHeader() {
+    val song = YtTrack("dQw4w9WgXcQ", "Never Gonna Give You Up", "Rick Astley")
+    val out = MusicShareQueue.apply(YtQueue(), playing = false, positionMs = 0, tracks = listOf(song),
+        action = MusicShareAction.NOW, from = "Pixel", label = "“Never Gonna Give You Up”", source = "")!!
+    assertEquals("", out.queue.sourceLabel)
+    assertEquals("Pixel added “Never Gonna Give You Up” · Up next",
+        MusicShareQueue.toast(out.copy(effective = MusicShareAction.NEXT), "Pixel", "“Never Gonna Give You Up”"))
+  }
 }

@@ -67,7 +67,7 @@ internal object MusicShare {
     val track = YtTrack(req.id, req.title.ifBlank { "Shared song" }, req.artist,
         req.thumb ?: MusicShareQueue.thumbnailFor(req.id))
     val label = MusicShareQueue.label(MusicShareKind.VIDEO, track.title, 1)
-    return onMainBlocking { apply(context, req, listOf(track), label, quietly, needsMeta = req.title.isBlank()) }
+    return onMainBlocking { apply(context, req, listOf(track), label, quietly, needsMeta = req.title.isBlank(), source = "") }
   }
 
   /** What was playing when the request arrived (cueing a playlist on the player stops it). */
@@ -127,11 +127,12 @@ internal object MusicShare {
 
   /** Main thread only. */
   private fun apply(context: Context, req: MusicShareRequest, tracks: List<YtTrack>, label: String,
-      quietly: Boolean, needsMeta: Boolean, playlistCount: Int? = null, before: Before? = null): MusicShareOutcome? {
+      quietly: Boolean, needsMeta: Boolean, playlistCount: Int? = null, before: Before? = null,
+      source: String = label): MusicShareOutcome? {
     val s = YouTubeMusicEngine.state.value
     val playing = before?.playing ?: s.isPlaying
     val position = before?.positionMs ?: MusicV3NowPlaying.livePositionMs(s, SystemClock.elapsedRealtime())
-    val outcome = MusicShareQueue.apply(s.queue, playing, position, tracks, req.action, req.from, label) ?: return null
+    val outcome = MusicShareQueue.apply(s.queue, playing, position, tracks, req.action, req.from, label, source) ?: return null
     val queue = if (!needsMeta) outcome.queue else outcome.queue.copy(entries = outcome.queue.entries.map {
       if (it.id in outcome.sharedIds) it.copy(needsMeta = true) else it })
     YouTubeMusicEngine.dispatch(YtAction.ApplyShared(queue, outcome.restart))

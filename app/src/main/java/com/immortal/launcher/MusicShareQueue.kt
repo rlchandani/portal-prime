@@ -41,9 +41,13 @@ internal object MusicShareQueue {
     return if (shuffle) capped.shuffled(Random(seed)) else capped
   }
 
-  /** Null when no track is playable. [playing] is whether the room is playing right now. */
+  /**
+   * Null when no track is playable. [playing] is whether the room is playing right now. [label] names
+   * the share in messages; [source] becomes the queue's "Up next from …" (blank for a single song,
+   * which has no source worth naming).
+   */
   fun apply(queue: YtQueue, playing: Boolean, positionMs: Long, tracks: List<YtTrack>,
-      action: MusicShareAction, from: String, label: String): MusicShareOutcome? {
+      action: MusicShareAction, from: String, label: String, source: String = label): MusicShareOutcome? {
     val valid = tracks.filter { YtTrack.isValidVideoId(it.videoId) }
     if (valid.isEmpty()) return null
     val fresh = valid.mapIndexed { i, t -> YtQueueEntry(queue.nextId + i, t, sharedBy = from.takeIf { i == 0 }) }
@@ -52,13 +56,13 @@ internal object MusicShareQueue {
     val after = if (current == null) emptyList() else queue.entries.drop(queue.currentIndex + 1)
     val nextId = queue.nextId + fresh.size
     if (!playing || current == null) {
-      val q = queue.copy(entries = fresh + after, currentIndex = 0, sourceLabel = label, unshuffledIds = null, nextId = nextId)
+      val q = queue.copy(entries = fresh + after, currentIndex = 0, sourceLabel = source, unshuffledIds = null, nextId = nextId)
       return MusicShareOutcome(q, MusicShareAction.NOW, null, null, 0, ids)
     }
     return when (action) {
       MusicShareAction.NOW -> {
         val resumed = current.copy(resumeMs = positionMs.coerceAtLeast(0L))
-        val q = queue.copy(entries = fresh + resumed + after, currentIndex = 0, sourceLabel = label,
+        val q = queue.copy(entries = fresh + resumed + after, currentIndex = 0, sourceLabel = source,
             unshuffledIds = null, nextId = nextId)
         MusicShareOutcome(q, action, current.track.title, null, 0, ids)
       }
