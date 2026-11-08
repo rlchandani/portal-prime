@@ -82,3 +82,10 @@ equals the pinned digest, compute sha256/size, write manifest, `gh release creat
 1. Build OTA-capable versions, install by cable once (Pixel by USB, Family by USB, Living by fleet).
 2. Publish a test release with a higher version; confirm each device updates by itself.
 3. From then on: bump → `ota-release.sh` → devices update wirelessly.
+
+## Key pinning (review note, 2026-11-08)
+
+Both updaters require every signer of the downloaded APK to match the pinned certificate digest.
+A signing-key change (including v3 key rotation) therefore needs one manual install of a build that
+pins the new digest; OTA cannot cross a key change on its own. This is intentional: it keeps a
+compromised feed from installing anything not signed by our key.

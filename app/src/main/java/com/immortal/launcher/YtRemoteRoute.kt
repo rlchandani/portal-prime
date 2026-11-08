@@ -32,10 +32,15 @@ internal object YtRemoteRoute : RemoteFeatureRoutes.Route {
 
   fun install() = RemoteFeatureRoutes.register(PATH, this)
 
-  override fun handle(context: Context, method: String, body: JSONObject): FleetHttpServer.Response = when (method) {
-    "GET" -> RemoteFeatureRoutes.json(200, RemoteFeatureRoutes.ok().put("player", snapshot(context)))
-    "POST" -> post(context, body)
-    else -> RemoteFeatureRoutes.json(405, RemoteFeatureRoutes.error("method_not_allowed"))
+  override fun handle(context: Context, method: String, body: JSONObject): FleetHttpServer.Response {
+    // After a restart the saved queue only loads when Music opens. Load it (never plays) so the
+    // phone sees the real queue from its first poll and can jump/remove/play-next entries.
+    if (method == "GET" || method == "POST") YouTubeMusicEngine.restoreSaved(context)
+    return when (method) {
+      "GET" -> RemoteFeatureRoutes.json(200, RemoteFeatureRoutes.ok().put("player", snapshot(context)))
+      "POST" -> post(context, body)
+      else -> RemoteFeatureRoutes.json(405, RemoteFeatureRoutes.error("method_not_allowed"))
+    }
   }
 
   private fun snapshot(context: Context): JSONObject =
