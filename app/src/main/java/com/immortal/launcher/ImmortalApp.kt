@@ -36,6 +36,7 @@ class ImmortalApp : Application() {
     MusicHandoff.install(this)
     MusicShare.install()
     YtRemoteRoute.install()
+    OtaRoutes.install()
     RoutinesFeature.install(this)
     ShareFeature.install(this)
     GuestFeature.install(this)
@@ -98,6 +99,9 @@ class ImmortalApp : Application() {
 
     // Bring up the WiFi fleet agent if provisioning enabled it (no-op otherwise).
     FleetAgentService.ensureRunning(this)
+
+    // Wireless Hearthpane updates from GitHub Releases: check soon after start, then every 6 h.
+    OtaUpdater.start(this)
 
     // Start the multi-room now-playing relay if this Portal is set up as a Snapcast
     // speaker (no-op until the user configures a server). Surfaces the group's track on

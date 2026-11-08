@@ -1663,9 +1663,17 @@ internal fun DeviceHealthScreen(onBack: () -> Unit) {
 }
 
 /** Inlinable body of the Device health screen — rendered by [DeviceHealthScreen] (standalone
- *  Activity host) and by the two-panel settings detail panel. */
+ *  Activity host) and by the two-panel settings detail panel. Software update leads the page. */
 @Composable
 internal fun DeviceHealthContent() {
+  Column {
+    OtaSettingsCard()
+    DeviceHealthChecks()
+  }
+}
+
+@Composable
+private fun DeviceHealthChecks() {
   val context = LocalContext.current.applicationContext
   val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
   val owner = LocalLifecycleOwner.current

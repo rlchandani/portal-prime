@@ -151,6 +151,9 @@ object SleepScheduler {
     }
   }
 
+  /** elapsedRealtime of the last real user wake or launcher touch, or 0 when none this process. */
+  fun lastInteractionElapsedMs(): Long = lastUserWakeAt
+
   /** The launcher is no longer foreground: drop any pending overnight re-sleep. */
   fun onLeftLauncher() {
     nightSessionActive = false
