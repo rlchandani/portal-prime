@@ -35,7 +35,7 @@ import kotlinx.coroutines.withTimeoutOrNull
  * refusal by the official player (error 101/150/age) on its next status GET.
  */
 internal object MusicShare {
-  private const val TAG = "CalderMusicShare"
+  private const val TAG = "HearthpaneMusicShare"
   private const val MAIN_WAIT_MS = 2_000L
   private const val LIBRARY_WAIT_MS = 8_000L
   private const val PLAYER_WAIT_MS = 15_000L

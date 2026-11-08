@@ -1404,8 +1404,7 @@ private fun LauncherScreen(
         Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = LauncherEdge),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-            Text(Brand.WORDMARK, color = ApprovedHomePalette.Text, fontSize = 30.sp, lineHeight = 40.sp,
-                fontWeight = FontWeight.Medium, letterSpacing = (-.6).sp)
+            HearthpaneWordmark(ApprovedHomePalette.Text)
             Box(Modifier.padding(horizontal = 12.dp).width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))
             Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
           }

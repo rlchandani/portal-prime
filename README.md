@@ -1,9 +1,9 @@
-# Calder
+# Hearthpane
 
 *Formerly Immortal.* The phone companion app is **Portal Toolkit**.
 
 A custom home-screen layer for discontinued Meta Portal devices, keeping them alive after Meta
-wound the platform down. Calder turns a Portal into a device you
+wound the platform down. Hearthpane turns a Portal into a device you
 own: your launcher, your screensaver, and an app store that installs a curated catalog
 on-device, with remote self-update so it improves over time without a cable.
 

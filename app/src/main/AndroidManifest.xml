@@ -463,7 +463,7 @@
         <activity
             android:name=".ImmortalSettingsActivity"
             android:exported="false"
-            android:label="Calder Settings"
+            android:label="Hearthpane Settings"
             android:theme="@style/Theme.SampleApp.Settings"
             android:windowSoftInputMode="adjustResize" />
 
@@ -524,7 +524,7 @@
             android:name=".ApkInstallActivity"
             android:exported="true"
             android:excludeFromRecents="true"
-            android:label="Install with Calder"
+            android:label="Install with Hearthpane"
             android:theme="@style/Theme.SampleApp">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

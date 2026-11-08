@@ -226,7 +226,7 @@ internal fun SleepSettingsContent() {
         settings = ScreensaverConfig.load(context)
       }
 
-      if (advanced) SleepToggleRow("Close Calder before sleeping", settings.closeAppOnSleep) {
+      if (advanced) SleepToggleRow("Close Hearthpane before sleeping", settings.closeAppOnSleep) {
         SettingsDomains.screensaver.apply(context, JSONObject().put("closeAppOnSleep", it))
         settings = ScreensaverConfig.load(context)
       }

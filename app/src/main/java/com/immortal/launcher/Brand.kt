@@ -7,8 +7,8 @@ package com.immortal.launcher
  */
 object Brand {
   /** Product name shown in copy, titles and labels. Mirrors `@string/app_name`. */
-  const val NAME = "Calder"
+  const val NAME = "Hearthpane"
 
-  /** Lowercase wordmark shown top-left on Home and the app-picker chrome. */
-  const val WORDMARK = "calder"
+  /** Wordmark shown top-left on Home and the app-picker chrome. */
+  const val WORDMARK = "Hearthpane"
 }

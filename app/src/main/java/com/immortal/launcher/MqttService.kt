@@ -63,7 +63,7 @@ class MqttService : Service() {
         if (Build.VERSION.SDK_INT >= 26) Notification.Builder(this, CHANNEL)
         else @Suppress("DEPRECATION") Notification.Builder(this)
     return b.setSmallIcon(R.mipmap.ic_launcher)
-        .setContentTitle("Calder · Home Assistant")
+        .setContentTitle("Hearthpane · Home Assistant")
         .setContentText("Publishing this Portal to Home Assistant")
         .setOngoing(true)
         .build()

@@ -100,7 +100,7 @@ class FleetAgentService : Service() {
         if (Build.VERSION.SDK_INT >= 26) Notification.Builder(this, CHANNEL)
         else @Suppress("DEPRECATION") Notification.Builder(this)
     return b.setSmallIcon(R.mipmap.ic_launcher)
-        .setContentTitle("Calder fleet agent")
+        .setContentTitle("Hearthpane fleet agent")
         .setContentText("Manage this Portal over WiFi")
         .setOngoing(true)
         .build()

@@ -88,8 +88,7 @@ internal fun ApprovedHomeWidgetLibraryScreen(
               .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f,
                   ringColor = ApprovedHomePalette.Accent, onClick = onHome),
               verticalAlignment = Alignment.CenterVertically) {
-            Text(Brand.WORDMARK, color = ApprovedHomePalette.Text, fontSize = 30.sp,
-                fontWeight = FontWeight.Medium, letterSpacing = (-.6).sp)
+            HearthpaneWordmark(ApprovedHomePalette.Text)
           }
           Spacer(Modifier.width(30.dp))
           Box(Modifier.width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))

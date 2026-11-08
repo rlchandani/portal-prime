@@ -531,7 +531,7 @@ class FleetRoutes(private val context: Context) {
   private fun identify() {
     Handler(Looper.getMainLooper()).post {
       runCatching {
-        Toast.makeText(context, "Calder Fleet: ${FleetConfig.name(context)}", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Hearthpane Fleet: ${FleetConfig.name(context)}", Toast.LENGTH_LONG).show()
       }
     }
   }

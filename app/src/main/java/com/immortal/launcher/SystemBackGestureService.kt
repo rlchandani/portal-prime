@@ -80,7 +80,7 @@ class SystemBackGestureService : Service() {
       }
     }
     val notification: Notification = NotificationCompat.Builder(this, channelId)
-        .setContentTitle("Calder Back Gesture")
+        .setContentTitle("Hearthpane Back Gesture")
         .setContentText("Swipe from the right edge to go back")
         .setSmallIcon(android.R.drawable.ic_menu_revert)
         .setOngoing(true)

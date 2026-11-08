@@ -30,7 +30,7 @@ internal fun GuestPasswordStep(draft: GuestSetupDraft, onDraft: (GuestSetupDraft
     GuestHint("For ${draft.settings.ssid} (${draft.settings.wifiSecurity.label}).")
     ApprovedEditorsField("Wi-Fi password", draft.password, { onDraft(draft.withPassword(it)) },
         placeholder = "Type the password", secret = true)
-    GuestHint("Calder stores it encrypted and never shares it.")
+    GuestHint("Hearthpane stores it encrypted and never shares it.")
     GuestToggleRow("Hide password on the card until tapped", draft.settings.hidePassword) { onDraft(draft.withHidePassword(it)) }
   }
 }

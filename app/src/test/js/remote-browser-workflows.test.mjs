@@ -438,7 +438,7 @@ test('phone Settings puts search, category and registry before room options and 
             domains: [
               {
                 id: 'immortal',
-                title: 'Calder',
+                title: 'Hearthpane',
                 controls: [
                   {
                     key: 'clock',
@@ -529,7 +529,7 @@ const guardedSchema = {
     },
     {
       id: 'immortal',
-      title: 'Calder',
+      title: 'Hearthpane',
       controls: [
         { key: 'shuffle', title: 'Shuffle', type: 'bool', value: false },
         {
@@ -875,7 +875,7 @@ test('old scene server without revision keeps editor reachable but never writes 
   assert.ok(h.eval('sceneDraft'));
   assert.match(
     h.document.getElementById('page').textContent,
-    /conflict protection.*unavailable|update Calder/i,
+    /conflict protection.*unavailable|update Hearthpane/i,
   );
 });
 
@@ -2886,7 +2886,7 @@ test('Snapshot review invalid snapshot shapes are rejected before a device revis
     assert.equal(snapshotGets(h).length, before); assert.equal(h.document.getElementById('sheet').open, false);
     assert.equal(restoreReviewButton(h).disabled, false);
     assert.equal(h.document.body.textContent.includes('invalid.json'), true);
-    assert.equal(h.document.body.textContent.includes('supported Calder snapshot'), true);
+    assert.equal(h.document.body.textContent.includes('supported Hearthpane snapshot'), true);
   }
   const { h } = await restoreReviewHarness(), before = snapshotGets(h).length;
   chooseRestoreFile(h, { ...restoreFile('large.json'), size: 240 * 1024 + 1 });

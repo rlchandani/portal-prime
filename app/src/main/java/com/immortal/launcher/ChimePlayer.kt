@@ -77,9 +77,9 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
   fun testVoice(context: Context, voiceName: String = ChimeConfig.load(context).spokenVoice) {
     val sample =
         if (voiceName.contains("ro_RO", ignoreCase = true) || voiceName.contains("ro-ro", ignoreCase = true)) {
-          "Aceasta este vocea selectata pentru Calder."
+          "Aceasta este vocea selectata pentru Hearthpane."
         } else {
-          "This is the selected voice for Calder."
+          "This is the selected voice for Hearthpane."
         }
     speak(context, sample, voiceNameOverride = voiceName)
   }

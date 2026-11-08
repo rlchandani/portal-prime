@@ -121,7 +121,7 @@ private fun FolderPicker(onCancel: () -> Unit) {
         if (!granted) {
             SectionLabel("Photo access")
             Card {
-                NavRow("Allow photo access", subLabel = "Calder needs Android storage permission to read your photos.") {
+                NavRow("Allow photo access", subLabel = "Hearthpane needs Android storage permission to read your photos.") {
                     permission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                 }
             }

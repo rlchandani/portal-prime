@@ -44,10 +44,10 @@ import kotlinx.coroutines.withTimeoutOrNull
  * Bus handlers run on the bus thread, HTTP on its own; state is a thread-safe [MutableStateFlow].
  */
 internal object MusicHandoff {
-  private const val TAG = "CalderMusicMove"
+  private const val TAG = "HearthpaneMusicMove"
   private val main by lazy { Handler(Looper.getMainLooper()) }
   private val scope by lazy { CoroutineScope(SupervisorJob() + Dispatchers.Main) }
-  internal val io = Executors.newSingleThreadExecutor { r -> Thread(r, "calder-music-move").apply { isDaemon = true } }
+  internal val io = Executors.newSingleThreadExecutor { r -> Thread(r, "hearthpane-music-move").apply { isDaemon = true } }
   private val random = SecureRandom()
   private val moveFlow = MutableStateFlow<MusicMoveState>(MusicMoveState.Idle)
   private val noticeFlow = MutableStateFlow<Notice?>(null)
@@ -190,7 +190,7 @@ internal object MusicHandoff {
         MusicHandoffWire.encode(MusicHandoffWire.Ack(id, to, status, DinnerCall.selfName(context))))
   }
 
-  /** Playback must be on screen and visible: wake, leave the screensaver and open Calder's music. */
+  /** Playback must be on screen and visible: wake, leave the screensaver and open Hearthpane's music. */
   internal fun openMusicScreen(context: Context) {
     ScreenControl.wake(context)
     runCatching {

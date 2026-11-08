@@ -107,11 +107,11 @@ private fun GuestAccessMessage(access: Access, onAllow: () -> Unit) {
   val context = LocalContext.current
   when (access) {
     Access.CHECKING, Access.READY -> Unit
-    Access.ASK -> GuestSetupGroup("Allow location to list networks", "Calder needs location permission to list nearby Wi-Fi networks.") {
+    Access.ASK -> GuestSetupGroup("Allow location to list networks", "Hearthpane needs location permission to list nearby Wi-Fi networks.") {
       ToolsButton("Allow", primary = true, onClick = onAllow)
     }
     Access.DENIED_FOREVER -> GuestSetupGroup("Location permission is off",
-        "Calder needs location permission to list nearby Wi-Fi networks. Turn it on in Android settings, or add your network by name.") {
+        "Hearthpane needs location permission to list nearby Wi-Fi networks. Turn it on in Android settings, or add your network by name.") {
       ToolsButton("Open Android settings") { GuestWifiScanner.openAppSettings(context) }
     }
     Access.LOCATION_OFF -> GuestSetupGroup("Location is off",

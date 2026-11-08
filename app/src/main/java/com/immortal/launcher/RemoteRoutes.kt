@@ -144,9 +144,9 @@ class RemoteRoutes internal constructor(
   private fun manifest(): FleetHttpServer.Response {
     val obj =
         JSONObject()
-            .put("name", "Calder Remote")
+            .put("name", "Hearthpane Remote")
             .put("short_name", Brand.NAME)
-            .put("description", "Control your Portal with Calder from your phone.")
+            .put("description", "Control your Portal with Hearthpane from your phone.")
             .put("start_url", "/remote/ui")
             .put("scope", "/remote/")
             .put("display", "standalone")

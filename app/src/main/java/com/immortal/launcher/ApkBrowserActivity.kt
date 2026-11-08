@@ -94,7 +94,7 @@ private fun ApkBrowserScreen() {
         }
       }
       if (!granted) item("permission") {
-        ApkInformation("Allow file access", "Calder needs access to your downloads to find APK files.") {
+        ApkInformation("Allow file access", "Hearthpane needs access to your downloads to find APK files.") {
           Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             ApprovedAppsButton("Allow file access", primary = true) { permission.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE) }
             ApprovedAppsButton("App permissions") { runCatching { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))) } }
@@ -102,7 +102,7 @@ private fun ApkBrowserScreen() {
         }
       }
       if (InstallDaemon.installPaused(context)) item("paused") {
-        ApkInformation("Installing new apps is paused", "Connect to your computer and run Calder setup to restore the first-generation Portal installer. Everything else keeps working.") {}
+        ApkInformation("Installing new apps is paused", "Connect to your computer and run Hearthpane setup to restore the first-generation Portal installer. Everything else keeps working.") {}
       }
       when {
         error != null -> item("error") { ApkInformation("Couldn’t load files", error!!) { ApprovedAppsButton("Try again") { refresh++ } } }

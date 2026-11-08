@@ -174,7 +174,7 @@ object SettingsDomains {
         s.usesWebUrl -> "Web page"
         s.usesUrl -> "Shared album"
         s.usesFolder -> "Local folder"
-        else -> "Calder photos"
+        else -> "Hearthpane photos"
       }
 
   /**
@@ -204,7 +204,7 @@ object SettingsDomains {
                       set = ScreensaverConfig::setEnabled,
                       help =
                           "Turn this off to let your Portal's screen sleep on its own timer (or run " +
-                              "your own screensaver). Calder won't switch it back on."),
+                              "your own screensaver). Hearthpane won't switch it back on."),
                   EnumSpec(
                       "mode",
                       "Screensaver style",
@@ -260,11 +260,11 @@ object SettingsDomains {
                   NavSpec(
                       "dismissTarget",
                       "Open when you tap to exit",
-                      value = { c, _ -> ScreensaverDismiss.chosenLabel(c)?.let { "Opens $it" } ?: "Calder launcher" },
+                      value = { c, _ -> ScreensaverDismiss.chosenLabel(c)?.let { "Opens $it" } ?: "Hearthpane launcher" },
                       activity = ScreensaverDismissAppActivity::class.java,
                       help =
                           "Tapping the screensaver wakes the Portal. By default that brings you home to " +
-                              "Calder - or pick an app (like Home Assistant) to drop straight into.",
+                              "Hearthpane - or pick an app (like Home Assistant) to drop straight into.",
                       visible = { _, s -> s.enabled },
                       valueOnWorker = true),
                   DerivedSpec("source", get = { it.source }),
@@ -670,7 +670,7 @@ object SettingsDomains {
                        get = { it.stayInStartupApp },
                        set = ImmortalSettings::setStayInStartupApp,
                        help = "After reboot, keep the last app that launches on screen. " +
-                           "Off returns to Calder. Takes effect at the next reboot."),
+                           "Off returns to Hearthpane. Takes effect at the next reboot."),
                    // NOTE: `constrainPageWidth` removed — no consumer ever read it. See audit.
                   BoolSpec(
                       "multiRoomEnabled",

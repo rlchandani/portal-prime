@@ -369,8 +369,8 @@ function message(error) {
     unreachable: 'Portal unreachable. Check the address and your network, then retry.',
     timeout: 'The Portal took too long to respond. Retry when it is reachable.',
     no_accessibility:
-      'Enable Calder’s accessibility service on the Portal to use gestures and text.',
-    no_gestures: 'Enable Calder’s accessibility service on the Portal to use the touchpad.',
+      'Enable Hearthpane’s accessibility service on the Portal to use gestures and text.',
+    no_gestures: 'Enable Hearthpane’s accessibility service on the Portal to use the touchpad.',
     stale_revision:
       'The Portal changed since this was loaded. Reload and review before saving again.',
     wrong_device: 'This snapshot belongs to another Portal. Choose the Portal that exported it.',
@@ -453,7 +453,7 @@ function updateHeader() {
     connected: 'Connected',
     offline: 'Offline · Retry when reachable',
     expired: 'Pair again',
-    legacy: 'Connected · Update Calder for management controls',
+    legacy: 'Connected · Update Hearthpane for management controls',
   };
   status.append(
     el('span', { class: `status-dot ${connected ? 'connected' : ''}` }),
@@ -925,7 +925,7 @@ function pairDialog(address = location.origin, pinValue = '') {
     field('Six-digit PIN', pin,
       value => { if (current() && !pairing) pin = value.replace(/\D/g, '').slice(0, 6); }, {
         type: 'password', key: 'pair-pin',
-        help: 'In Calder, open Control from your phone and show a fresh PIN.',
+        help: 'In Hearthpane, open Control from your phone and show a fresh PIN.',
       }),
     error, submitButton, peers,
   );
@@ -1140,7 +1140,7 @@ function render() {
       sections(
         heading('Control unavailable', 'This Portal does not advertise this feature.'),
         group(
-          text('Update Calder or finish the required setup on the Portal, then refresh.'),
+          text('Update Hearthpane or finish the required setup on the Portal, then refresh.'),
           button('Back to Home', () => go('home'), { kind: 'outline' }),
         ),
       ),
@@ -1265,8 +1265,8 @@ function homePage() {
           el('h2', { text: 'On your Portal' }),
           text(
             data.companion
-              ? `${room().name} · Calder ${data.companion.app?.versionName || ''}`
-              : 'Home controls connect directly to Calder.',
+              ? `${room().name} · Hearthpane ${data.companion.app?.versionName || ''}`
+              : 'Home controls connect directly to Hearthpane.',
           ),
           actions(
             button('Start slideshow', () => dispatchKey('screensaver'), {
@@ -1333,7 +1333,7 @@ function homePage() {
           ? empty(
               'Management controls',
               data.statusError?.status === 404
-                ? 'Update Calder on this Portal to enable layouts, scenes, snapshots and the catalog.'
+                ? 'Update Hearthpane on this Portal to enable layouts, scenes, snapshots and the catalog.'
                 : 'Connecting to the Portal’s management API…',
             )
           : null,
@@ -1404,7 +1404,7 @@ function remotePage() {
               mutate('scroll', '/remote/scroll', { dir: 'down' }, { success: '' }),
             ),
           ),
-          text('Gestures and text require Calder’s accessibility service on the Portal.'),
+          text('Gestures and text require Hearthpane’s accessibility service on the Portal.'),
         ),
         keyboard,
       ),
@@ -4308,7 +4308,7 @@ function appsPage() {
     updateAppRecords(records);
   } else appListView = null;
   const body = sections(
-    heading('Apps', 'Launch apps and manage the Calder catalog.'),
+    heading('Apps', 'Launch apps and manage the Hearthpane catalog.'),
     group(
       searchField(
         'Find an app',
@@ -4355,7 +4355,7 @@ function appsPage() {
         ? empty(
             appMode === 'catalog' ? 'Catalog' : 'Installed apps',
             appMode === 'catalog' && data.companion && !supported('catalog')
-              ? 'This Portal does not advertise catalog support. Update Calder.'
+              ? 'This Portal does not advertise catalog support. Update Hearthpane.'
               : 'Loading apps…',
           )
         : !filtered.length
@@ -4709,7 +4709,7 @@ function layoutPage() {
             'div',
             { class: 'label' },
             el('strong', { text: w.kind === 'appwidget' ? w.package : w.kind.replace(/_/g, ' ') }),
-            text(w.kind === 'appwidget' ? 'Bound Android widget' : 'Calder widget'),
+            text(w.kind === 'appwidget' ? 'Bound Android widget' : 'Hearthpane widget'),
           ),
           actions(
             button('↑', () => editLayout((l) => moveWidget(l, key, -1)), {
@@ -4749,7 +4749,7 @@ function layoutPage() {
         ),
       );
     }),
-    layoutDraft.widgets.length ? null : text('Add a Calder widget to get started.'),
+    layoutDraft.widgets.length ? null : text('Add a Hearthpane widget to get started.'),
     row(
       'Add widget',
       'Third-party widgets must first be bound on the Portal.',
@@ -5122,7 +5122,7 @@ async function reviewSnapshotRestore() {
   } catch (error) {
     if (snapshotReviewCurrent(owner, review) && error.code !== 'aborted')
       owner.error = error instanceof SyntaxError ? 'This file is not valid snapshot JSON.'
-        : error.code === 'unsupported_schema' ? 'This file is not a supported Calder snapshot. Choose a snapshot exported by this Portal.'
+        : error.code === 'unsupported_schema' ? 'This file is not a supported Hearthpane snapshot. Choose a snapshot exported by this Portal.'
         : error.code === 'body_too_large' ? 'Snapshot JSON must be 240 KiB or smaller.' : message(error);
   } finally {
     if (owner.review === review) owner.review = null;
@@ -5532,7 +5532,7 @@ function sceneProtectionPanel(expectedRevision = data.scenesRevision) {
   if (!validSceneRevision(expectedRevision))
     return group(
       text(
-        'Conflict protection is unavailable on this Portal. Update Calder before saving or deleting scenes.',
+        'Conflict protection is unavailable on this Portal. Update Hearthpane before saving or deleting scenes.',
         'detail error',
       ),
       button('Refresh to review', loadScenes, { kind: 'outline' }),
@@ -5794,7 +5794,7 @@ async function saveSceneDraft() {
     toast(
       submitted.conflict
         ? 'Scene conflict: refresh to review before discarding and reopening your draft.'
-        : 'Conflict protection is unavailable. Update Calder before saving scenes.',
+        : 'Conflict protection is unavailable. Update Hearthpane before saving scenes.',
       true,
     );
     render();
@@ -5827,7 +5827,7 @@ async function saveScenes(
   if (!session.current(ticket) || scenesSaving(target)) return null;
   if (!validSceneRevision(expectedRevision)) {
     toast(
-      'Conflict protection is unavailable. Update Calder before saving or deleting scenes.',
+      'Conflict protection is unavailable. Update Hearthpane before saving or deleting scenes.',
       true,
     );
     render();
