@@ -91,7 +91,7 @@ internal object SoundPreviewPlayback {
               }
               if (current.setOnUtteranceProgressListener(listener) == TextToSpeech.ERROR) error("Preview listener unavailable")
               val sample = if (voiceName.contains("ro_RO", true) || voiceName.contains("ro-ro", true))
-                  "Aceasta este vocea selectata pentru Immortal." else "This is the selected voice for Immortal."
+                  "Aceasta este vocea selectata pentru Calder." else "This is the selected voice for Calder."
               val params = Bundle().apply {
                 putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume)
                 if (voiceName.isNotBlank()) putString("sherpa_voice_name", voiceName)

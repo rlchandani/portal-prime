@@ -40,7 +40,7 @@ internal object HouseholdListMigration {
     if (portals.size == 1) {
       val (p, n) = counts.single()
       return Summary("Your To-do list is now the household list",
-          "$p had ${items(n)}. They’re on the household list now, shared with every Portal and Toolkit on your phones.")
+          "$p had ${items(n)}. They’re on the household list now, shared with every Portal and Calder Pocket on your phones.")
     }
     val had = counts.mapIndexed { i, (p, n) -> if (i == 0) "$p had ${items(n)}" else "$p had $n" }
     val dups = migrated.filter { it.migratedFrom.size > 1 }.map { it.text.value }.sorted()
@@ -50,7 +50,7 @@ internal object HouseholdListMigration {
       else -> " ${dups.joinToString(", ")} were on both, so they’re there once."
     }
     val title = if (portals.size == 2) "Your two To-do lists are now one" else "Your To-do lists are now one"
-    return Summary(title, "${joinAnd(had)}. They’re all on the household list now.$dupLine It syncs with Toolkit on your phones too.")
+    return Summary(title, "${joinAnd(had)}. They’re all on the household list now.$dupLine It syncs with Calder Pocket on your phones too.")
   }
 
   private fun joinAnd(parts: List<String>): String =

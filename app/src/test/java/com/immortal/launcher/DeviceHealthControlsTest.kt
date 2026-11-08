@@ -31,7 +31,7 @@ class DeviceHealthControlsTest {
     val check = DevicePermissions.controlCheck(connected = false, canRepair = false)
     assertFalse(check.granted)
     assertNull(check.repair)
-    assertTrue(check.fix.contains("Immortal setup"))
+    assertTrue(check.fix.contains("Calder setup"))
     assertTrue(check.fix.contains("computer"))
   }
 

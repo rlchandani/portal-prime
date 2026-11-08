@@ -142,9 +142,9 @@ class RemoteRoutes internal constructor(
   private fun manifest(): FleetHttpServer.Response {
     val obj =
         JSONObject()
-            .put("name", "Immortal Remote")
-            .put("short_name", "Immortal")
-            .put("description", "Control your Immortal Portal from your phone.")
+            .put("name", "Calder Remote")
+            .put("short_name", Brand.NAME)
+            .put("description", "Control your Portal with Calder from your phone.")
             .put("start_url", "/remote/ui")
             .put("scope", "/remote/")
             .put("display", "standalone")

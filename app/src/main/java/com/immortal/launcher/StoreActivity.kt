@@ -242,7 +242,7 @@ private fun StoreBrowse(
           Row(Modifier.heightIn(min = 245.dp).padding(40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(40.dp)) {
             Column(Modifier.weight(1.35f)) {
               Text("More life for your Portal.", color = IosLabel, fontSize = 46.sp, lineHeight = 58.sp, fontWeight = FontWeight.Medium)
-              Text("The actual Immortal catalog. Installed apps and optional downloads are distinct.", color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 18.dp))
+              Text("The actual Calder catalog. Installed apps and optional downloads are distinct.", color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 18.dp))
             }
             Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(30.dp, Alignment.CenterHorizontally)) {
               ApprovedAppsIcon("org.videolan.vlc", "VLC", 116.dp)
@@ -417,7 +417,7 @@ private fun StorePausedBanner() {
   Surface(color = LocalApprovedPalette.current.surface2, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
     Column(Modifier.padding(24.dp)) {
       Text("Installing new apps is paused", color = IosLabel, fontSize = 26.sp, fontWeight = FontWeight.Medium)
-      Text("Connect to your computer and run Immortal setup to restore the first-generation Portal installer. Everything else keeps working.", color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 10.dp))
+      Text("Connect to your computer and run Calder setup to restore the first-generation Portal installer. Everything else keeps working.", color = IosSecondary, fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 10.dp))
     }
   }
 }

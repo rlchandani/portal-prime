@@ -90,9 +90,9 @@ private data class HelpPage(
 private val helpPages =
     listOf(
         HelpPage(
-            title = "Welcome to Immortal",
+            title = "Welcome to ${Brand.NAME}",
             body =
-                "Your Portal has a second life. Immortal is a free, community-made home " +
+                "Your Portal has a second life. Calder is a free, community-made home " +
                     "screen, photo frame, and app store that keeps it useful now that it's no " +
                     "longer supported. Here's a quick tour — it only takes a minute.",
         ),
@@ -102,14 +102,14 @@ private val helpPages =
                 "Use Home, Apps and Tools in the bottom dock. Open Settings with the gear " +
                     "button at the top, then choose a category on the left and its controls on " +
                     "the right. The Back and Forward arrows revisit settings pages. The Portal's " +
-                    "home button returns you to Immortal.",
+                    "home button returns you to Calder.",
         ),
         HelpPage(
             title = "Making video calls",
             body =
                 "Open Apps and choose Calls to reach the Portal's original home screen. " +
                     "Choose the person and call type there. When you've finished, press the " +
-                    "Portal's home button to return to Immortal.",
+                    "Portal's home button to return to Calder.",
         ),
         HelpPage(
             title = "Your personal photo frame",
@@ -129,16 +129,16 @@ private val helpPages =
         HelpPage(
             title = "Checking your device",
             body =
-                "Normal Immortal setup enables the permissions needed for app installation " +
+                "Normal Calder setup enables the permissions needed for app installation " +
                     "and controls. If something stops working, open Settings, choose Device, " +
                     "then About & device health. Use Reconnect controls when offered, then " +
-                    "Check again. If a system permission is missing, rerun Immortal setup from " +
+                    "Check again. If a system permission is missing, rerun Calder setup from " +
                     "a connected computer. A restart alone doesn't always require setup again.",
         ),
         HelpPage(
             title = "A few honest limits",
             body =
-                "Immortal does a lot, but it can't do everything. Some apps that depend on " +
+                "Calder does a lot, but it can't do everything. Some apps that depend on " +
                     "Google's services may not fully work, and we can't change the Portal's " +
                     "built-in software. We focus on the things that work well and reliably — " +
                     "and we're finding more all the time.",
@@ -146,7 +146,7 @@ private val helpPages =
         HelpPage(
             title = "Built by fans, for fans",
             body =
-                "Immortal is made by volunteers who didn't want these lovely devices to end " +
+                "Calder is made by volunteers who didn't want these lovely devices to end " +
                     "up in a drawer. We add new apps and features as the community creates " +
                     "them. Want to help, suggest an app, or just say hello? Come find us on " +
                     "GitHub.",
@@ -177,7 +177,7 @@ private fun HelpTour() {
       },
   ) {
     SettingsScaffold(
-        title = "Welcome to Immortal",
+        title = "Welcome to ${Brand.NAME}",
         onBack = { activity?.finish() },
     ) {
       Surface(

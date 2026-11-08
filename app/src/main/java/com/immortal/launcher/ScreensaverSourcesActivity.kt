@@ -86,7 +86,7 @@ internal fun ScreensaverSourcesContent(onDone: () -> Unit) {
     val showAdvanced = LocalAdvancedSettings.current
     Column(verticalArrangement = Arrangement.spacedBy(22.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
-            SourceTile("Immortal photos", "A calming built-in photo feed. No setup needed.",
+            SourceTile("Calder photos", "A calming built-in photo feed. No setup needed.",
                 settings.source == ScreensaverConfig.SOURCE_DEFAULT,
                 "photo", Modifier.weight(1f)) {
                 ScreensaverConfig.useDefault(context)
@@ -139,7 +139,7 @@ internal fun ScreensaverSourcesContent(onDone: () -> Unit) {
             }
         }
     }
-    FooterNote("If a source can't be read, Immortal falls back to its built-in photos.")
+    FooterNote("If a source can't be read, Calder falls back to its built-in photos.")
 }
 
 @Composable
@@ -196,5 +196,5 @@ private fun sourceStatus(s: ScreensaverConfig.Settings, local: ApprovedSourcesFo
     s.usesDav -> "WebDAV folder"
     s.usesWebUrl -> "Web page"
     s.source != ScreensaverConfig.SOURCE_DEFAULT -> "Connection needs setup · showing built-in photos"
-    else -> "Immortal photos"
+    else -> "Calder photos"
 }

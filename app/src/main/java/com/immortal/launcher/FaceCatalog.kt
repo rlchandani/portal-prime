@@ -44,7 +44,7 @@ object FaceCatalog {
       listOf(
           Entry(
               "immortal-classic",
-              "Immortal",
+              Brand.NAME,
               "Clock, date, weather and now-playing in the corners",
           ) {
             Face.immortalClassic(it)

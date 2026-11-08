@@ -94,7 +94,7 @@ internal enum class DinnerStatus(val wire: String, val rowText: String, val fail
   QUIET("quiet", "Shown quietly, quiet hours"),
   BLOCKED("blocked", "Calls are turned off there", failed = true),
   NO_ANSWER("noanswer", "No answer, not delivered", failed = true, retryable = true),
-  NOT_SET_UP("notsetup", "Not sent. Set up Call everyone from Toolkit", failed = true, retryable = true);
+  NOT_SET_UP("notsetup", "Not sent. Set up Call everyone from Calder Pocket", failed = true, retryable = true);
 
   companion object {
     private val reportable = setOf(SPOKEN, CHIMED, CHIMED_ONLY, QUIET, BLOCKED)

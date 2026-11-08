@@ -87,7 +87,7 @@
           "fdroidId": "de.badaix.snapcast",
           "minSdk": 21,
           "description": "Synchronized multi-room audio — play music in perfect sync across Portals.",
-          "longDescription": "The official Snapcast client and player. Point it at a Snapcast (or Music Assistant) server on your network and the Portal becomes a synchronized speaker — every room plays the same audio in sync, Sonos-style. Bundles the native player, needs no Google services, and runs on every Portal. Note: this is the stock app for testing the multi-room setup; an Immortal-native always-on companion is on the roadmap.",
+          "longDescription": "The official Snapcast client and player. Point it at a Snapcast (or Music Assistant) server on your network and the Portal becomes a synchronized speaker — every room plays the same audio in sync, Sonos-style. Bundles the native player, needs no Google services, and runs on every Portal. Note: this is the stock app for testing the multi-room setup; a Calder-native always-on companion is on the roadmap.",
           "iconUrl": "https://f-droid.org/repo/de.badaix.snapcast/en-US/icon.png",
           "author": "badaix",
           "homepage": "https://github.com/badaix/snapcast"
@@ -186,7 +186,7 @@
           "fdroidId": "com.aurora.store",
           "minSdk": 21,
           "description": "Install Play Store apps anonymously — no Google account or GMS.",
-          "longDescription": "Browse and install Play Store apps without a Google account or Google services. On a first-gen Portal, pair it with Shizuku (set Aurora's installer to Shizuku) so installs work. Note: some modern split-APK apps need Immortal's silent install helper running to install cleanly on any Portal.",
+          "longDescription": "Browse and install Play Store apps without a Google account or Google services. On a first-gen Portal, pair it with Shizuku (set Aurora's installer to Shizuku) so installs work. Note: some modern split-APK apps need Calder's silent install helper running to install cleanly on any Portal.",
           "iconUrl": "https://f-droid.org/repo/com.aurora.store/en-US/icon.png",
           "author": "Aurora OSS",
           "homepage": "https://auroraoss.com"
@@ -222,7 +222,7 @@
           "fdroidId": "org.fossify.gallery",
           "minSdk": 23,
           "description": "Browse local photos and videos, no ads.",
-          "longDescription": "A fast, private gallery for the photos and videos on the device (including USB media) — handy alongside Immortal's photo-frame screensaver.",
+          "longDescription": "A fast, private gallery for the photos and videos on the device (including USB media) — handy alongside Calder's photo-frame screensaver.",
           "iconUrl": "https://f-droid.org/repo/org.fossify.gallery/en-US/icon.png",
           "author": "Fossify",
           "homepage": "https://github.com/FossifyOrg/Gallery"
@@ -245,12 +245,12 @@
       "name": "Portal Originals",
       "apps": [
         {
-          "name": "Immortal",
+          "name": "Calder",
           "packageName": "com.immortal.launcher",
           "source": "url",
           "apkUrl": "https://github.com/starbrightlab/immortal/releases/latest/download/immortal.apk",
           "minSdk": 24,
-          "description": "The Immortal launcher, screensaver, and app store — the project itself.",
+          "description": "The Calder launcher, screensaver, and app store — the project itself.",
           "longDescription": "The launcher you're using right now: home screen, photo-frame screensaver with local media support, this app store, and self-update. Community app submissions welcome — see the project page.",
           "iconUrl": "https://raw.githubusercontent.com/starbrightlab/immortal/main/immortal-icon.png",
           "author": "Starbright Lab",
@@ -334,7 +334,7 @@
           "versionCode": 20260608,
           "minSdk": 21,
           "description": "Offline neural text-to-speech engine — gives the Portal a system voice (it ships with none).",
-          "longDescription": "Meta Portals have no built-in text-to-speech, so apps that speak — like Immortal's spoken time or Portal Overlays' breaking-news read-out — have nothing to talk through. Portal TTS is an offline neural engine (a Sherpa-ONNX fork with Kokoro and Piper voices) that registers as a standard Android TextToSpeech engine: install it, select it under the system text-to-speech settings, and any app on the device can then speak through it — no Google services, fully on-device. Advanced setup: to keep the download small the voice models aren't bundled in the APK — you push a voice-model folder to the app's storage over adb and pick it in the app, so a PC is needed once to add voices. See the project page for models and step-by-step instructions.",
+          "longDescription": "Meta Portals have no built-in text-to-speech, so apps that speak — like Calder's spoken time or Portal Overlays' breaking-news read-out — have nothing to talk through. Portal TTS is an offline neural engine (a Sherpa-ONNX fork with Kokoro and Piper voices) that registers as a standard Android TextToSpeech engine: install it, select it under the system text-to-speech settings, and any app on the device can then speak through it — no Google services, fully on-device. Advanced setup: to keep the download small the voice models aren't bundled in the APK — you push a voice-model folder to the app's storage over adb and pick it in the app, so a PC is needed once to add voices. See the project page for models and step-by-step instructions.",
           "iconUrl": "https://raw.githubusercontent.com/GodricTM/portal-tts-engine/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
           "author": "GodricTM",
           "homepage": "https://github.com/GodricTM/portal-tts-engine",
