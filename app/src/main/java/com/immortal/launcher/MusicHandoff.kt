@@ -165,9 +165,12 @@ internal object MusicHandoff {
   /** Main thread: adopt the queue, bring the music screen up, and report once the player plays. */
   private fun present(context: Context, offer: MusicHandoffWire.Offer, from: String, queue: MusicHandoffQueue) {
     receiving?.cancel()
-    val previous = YouTubeMusicEngine.state.value.queue.current?.track?.videoId
+    val before = YouTubeMusicEngine.state.value
+    val previous = before.queue.current?.track?.videoId
     YouTubeMusicEngine.adopt(queue.toQueue(), queue.positionMs)
-    openMusicScreen(context)
+    // Re-opening an already visible music screen hides and re-shows it, which pauses the player the
+    // adopt just started ("Bring it back" stuck). Only open it when it isn't showing; otherwise wake.
+    if (before.foreground) ScreenControl.wake(context) else openMusicScreen(context)
     val started = SystemClock.elapsedRealtime()
     receiving = scope.launch {
       val status = withTimeoutOrNull(MusicTargetPolicy.START_MS) {
