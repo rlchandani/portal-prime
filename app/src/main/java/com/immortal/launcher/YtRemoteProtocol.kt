@@ -29,6 +29,16 @@ internal sealed interface YtRemoteCommand {
   data class PlayNext(val entryId: Long) : YtRemoteCommand
 }
 
+/** How a phone "play" is carried out; see [YtRemoteProtocol.playPlan]. */
+internal enum class YtRemotePlayPlan {
+  /** The engine already has a current entry. */
+  PLAY,
+  /** The engine is empty but a saved queue exists (cold process, music screen never opened). */
+  RESTORE_THEN_PLAY,
+  /** Neither the engine nor the saved queue has anything to play. */
+  NOTHING_QUEUED,
+}
+
 /** What the room around the player looks like when the phone asks. */
 internal data class YtRemoteRoom(
     val quiet: Boolean,
@@ -47,6 +57,7 @@ internal data class YtRemoteRoom(
  * GET → `{ok, player:{state, room, onScreen, ad, current, positionMs, durationMs, upNext[],
  * upNextTotal, label, repeat, shuffle, halt, signedIn, account, quiet, quietUntil, volume}}`;
  * POST `{cmd: play|pause|next|previous|seek|jump|remove|playnext, positionMs?, entryId?, playAnyway?}`.
+ * Play with nothing in the engine or the saved queue answers `{ok, status: declined, reason: nothing_queued}`.
  */
 internal object YtRemoteProtocol {
   /** Up-next rows sent per poll; the phone shows "and N more" beyond this. */
@@ -55,6 +66,8 @@ internal object YtRemoteProtocol {
   const val MAX_POSITION_MS = 24L * 60 * 60 * 1000
   /** Bound on text fields copied from track metadata. */
   const val MAX_TEXT = 200
+  /** Declined-play reason when neither the engine nor the saved queue has a track. */
+  const val REASON_NOTHING_QUEUED = "nothing_queued"
 
   sealed interface Decoded {
     data class Ok(val command: YtRemoteCommand) : Decoded
@@ -81,13 +94,28 @@ internal object YtRemoteProtocol {
   fun conflict(command: YtRemoteCommand, s: YtEngineState): String? {
     fun known(id: Long) = s.queue.entries.any { it.id == id }
     return when (command) {
-      is YtRemoteCommand.Play -> if (s.queue.current == null) "nothing_queued" else null
+      // An empty engine may only mean the saved queue isn't loaded yet: [playPlan] decides.
+      is YtRemoteCommand.Play -> null
       is YtRemoteCommand.Jump -> if (!known(command.entryId)) "unknown_entry" else null
       is YtRemoteCommand.Remove -> if (!known(command.entryId)) "unknown_entry" else null
       is YtRemoteCommand.PlayNext -> if (!known(command.entryId)) "unknown_entry" else null
       else -> null
     }
   }
+
+  /**
+   * After a restart the saved queue stays on disk until the music screen opens, so an empty engine
+   * restores it first; only when nothing is saved either is play declined ([nothingQueued]).
+   */
+  fun playPlan(engineHasCurrent: Boolean, savedHasCurrent: Boolean): YtRemotePlayPlan = when {
+    engineHasCurrent -> YtRemotePlayPlan.PLAY
+    savedHasCurrent -> YtRemotePlayPlan.RESTORE_THEN_PLAY
+    else -> YtRemotePlayPlan.NOTHING_QUEUED
+  }
+
+  /** Reply to play with nothing to play; the phone says "Nothing is queued on <room>…". */
+  fun nothingQueued(): JSONObject =
+      JSONObject().put("ok", true).put("status", "declined").put("reason", REASON_NOTHING_QUEUED)
 
   fun state(s: YtEngineState, nowElapsedMs: Long, room: YtRemoteRoom): JSONObject {
     val current = s.queue.current

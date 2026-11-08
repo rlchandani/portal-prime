@@ -62,7 +62,8 @@ class YtRemoteProtocolTest {
 
   @Test fun conflictsNeedAQueueAndAKnownEntry() {
     val empty = YtEngineState()
-    assertEquals("nothing_queued", YtRemoteProtocol.conflict(YtRemoteCommand.Play(false), empty))
+    // An empty engine may only mean the saved queue isn't loaded yet; see YtRemotePlayAfterRestartTest.
+    assertNull(YtRemoteProtocol.conflict(YtRemoteCommand.Play(false), empty))
     val queued = YtEngineState(queue = ytQueueOf(3))
     assertNull(YtRemoteProtocol.conflict(YtRemoteCommand.Play(false), queued))
     assertNull(YtRemoteProtocol.conflict(YtRemoteCommand.Remove(2), queued))

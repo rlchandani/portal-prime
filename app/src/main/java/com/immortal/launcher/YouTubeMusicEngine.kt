@@ -61,6 +61,15 @@ object YouTubeMusicEngine : MusicTransport {
     obtainHost(container.context).attach(container)
   }
 
+  /**
+   * Loads the saved queue into an engine whose player was never created this process (e.g. a
+   * phone "play" right after a restart). A no-op once restored or when a queue is already loaded.
+   */
+  fun restoreSaved(context: Context) {
+    val application = context.applicationContext as Application
+    onMain { ensureStore(application) }
+  }
+
   /** Un-hosts the player from [container]; it is released after [RELEASE_GRACE_MS] unless re-attached. */
   @MainThread
   fun detach(container: ViewGroup) {
@@ -139,14 +148,18 @@ object YouTubeMusicEngine : MusicTransport {
   private fun obtainHost(context: Context): YouTubePlayerHost {
     host?.let { return it }
     val application = context.applicationContext as Application
-    if (store == null) {
-      store = YtQueueStore(application).also { s -> s.load()?.let { reduce(YtAction.Restore(it.queue, it.positionMs)) } }
-    }
+    ensureStore(application)
     val h = YouTubePlayerHost(application, hostListener)
     host = h
     app = application.also { it.registerComponentCallbacks(memory) }
     MusicTransports.youtube = this
     return h
+  }
+
+  @MainThread
+  private fun ensureStore(application: Application) {
+    if (store != null) return
+    store = YtQueueStore(application).also { s -> s.load()?.let { reduce(YtAction.Restore(it.queue, it.positionMs)) } }
   }
 
   /** Publishes only meaningful changes; never clears another source's Now Playing. */

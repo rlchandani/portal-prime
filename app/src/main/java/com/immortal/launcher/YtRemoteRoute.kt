@@ -20,8 +20,9 @@ import org.json.JSONObject
  * [RemoteCompanionRoutes]; the wire format lives in [YtRemoteProtocol].
  *
  * POST answers `{ok, status: done|opening|quiet|declined, quietUntil?, reason?}`; 400 for a bad
- * command, 409 `nothing_queued|unknown_entry`. Play never starts hidden: off screen it opens the
- * music screen ([MusicHandoff.openMusicScreen]) and the engine starts once the player is visible.
+ * command, 409 `unknown_entry`. Play never starts hidden: off screen it opens the music screen
+ * ([MusicHandoff.openMusicScreen]) and the engine starts once the player is visible. After a
+ * restart play first restores the saved queue; with nothing saved it is declined `nothing_queued`.
  * Quiet hours answer `quiet` unless `playAnyway`, which plays at the share sheet's quiet volume.
  * Volume itself stays on the existing `/remote/volume`; GET reports it so it works when idle.
  */
@@ -60,6 +61,11 @@ internal object YtRemoteRoute : RemoteFeatureRoutes.Route {
     YtRemoteProtocol.conflict(command, YouTubeMusicEngine.state.value)?.let {
       return RemoteFeatureRoutes.json(409, RemoteFeatureRoutes.error(it))
     }
+    val restore = command is YtRemoteCommand.Play && when (playPlan(context)) {
+      YtRemotePlayPlan.NOTHING_QUEUED -> return RemoteFeatureRoutes.json(200, YtRemoteProtocol.nothingQueued())
+      YtRemotePlayPlan.RESTORE_THEN_PLAY -> true
+      YtRemotePlayPlan.PLAY -> false
+    }
     if (!command.startsPlayback) {
       apply(command)
       return RemoteFeatureRoutes.json(200, RemoteFeatureRoutes.ok().put("status", "done"))
@@ -74,6 +80,8 @@ internal object YtRemoteRoute : RemoteFeatureRoutes.Route {
               .put("reason", MusicSharePolicy.reason(decision, DinnerCall.selfName(context)) ?: JSONObject.NULL))
       MusicSharePolicy.Decision.ACCEPT, MusicSharePolicy.Decision.ACCEPT_QUIETLY -> {
         if (decision == MusicSharePolicy.Decision.ACCEPT_QUIETLY) lowerVolume(context)
+        // Posted to the main thread ahead of PlayWhenVisible, so the restored entry is the one played.
+        if (restore) YouTubeMusicEngine.restoreSaved(context)
         apply(command)
         val opening = !YouTubeMusicEngine.state.value.foreground
         if (opening) MusicHandoff.openMusicScreen(context)
@@ -81,6 +89,12 @@ internal object YtRemoteRoute : RemoteFeatureRoutes.Route {
             .put("quietly", decision == MusicSharePolicy.Decision.ACCEPT_QUIETLY))
       }
     }
+  }
+
+  private fun playPlan(context: Context): YtRemotePlayPlan {
+    val engineHasCurrent = YouTubeMusicEngine.state.value.queue.current != null
+    val savedHasCurrent = !engineHasCurrent && YtQueueStore(context).load()?.queue?.current != null
+    return YtRemoteProtocol.playPlan(engineHasCurrent, savedHasCurrent)
   }
 
   /** Engine calls post to the main thread in order, so Select lands before PlayWhenVisible. */
