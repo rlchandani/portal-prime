@@ -24,6 +24,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -63,7 +64,9 @@ internal fun MusicV3NowPlayingCard(
     move: MusicV3MoveControls = MusicV3MoveControls.NONE,
     modifier: Modifier = Modifier,
 ) {
-  val model = MusicV3NowPlaying.from(engine, room).let { m -> move.banner?.let { m.copy(statusLine = it) } ?: m }
+  val arrival by MusicShare.arrival.collectAsState()
+  val model = MusicV3NowPlaying.from(engine, room)
+      .let { m -> (move.banner ?: arrival)?.let { m.copy(statusLine = it) } ?: m }
   Column(modifier.clip(RoundedCornerShape(MusicV3Dims.PaneRadius)).background(ApprovedHomePalette.Card)
       .padding(32.dp)) {
     Cover(model.track)

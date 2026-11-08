@@ -59,6 +59,8 @@ data class YtEngineState(
     val sizeOk: Boolean = true,
     /** A queue moved here from another Portal starts as soon as the music screen is visible. */
     val playWhenVisible: Boolean = false,
+    /** The visible player's answer to the latest [YtAction.LookUpPlaylist] (not persisted). */
+    val playlistLookup: YtPlaylistLookup? = null,
 ) {
   val ready: Boolean get() = status != YtPlayerStatus.NOT_READY
   val isPlaying: Boolean get() = status == YtPlayerStatus.PLAYING || status == YtPlayerStatus.BUFFERING
@@ -74,6 +76,9 @@ data class YtEngineState(
       return status != YtPlayerStatus.NOT_READY && reported != expected
     }
 }
+
+/** Video ids the official player reported for [listId]; empty when it couldn't open the list. */
+data class YtPlaylistLookup(val listId: String, val videoIds: List<String>)
 
 /** Everything that can happen to the engine: user commands and official player events. */
 sealed interface YtAction {
@@ -94,6 +99,13 @@ sealed interface YtAction {
   data class Restore(val queue: YtQueue, val positionMs: Long) : YtAction
   /** Replaces the queue with one moved here from another Portal and resumes it at [positionMs]. */
   data class Adopt(val queue: YtQueue, val positionMs: Long) : YtAction
+  /**
+   * A queue rebuilt for a song or playlist shared from a phone ([MusicShareQueue]). [restart]
+   * plays its current entry from the start (like [Adopt]); otherwise only the queue changes.
+   */
+  data class ApplyShared(val queue: YtQueue, val restart: Boolean) : YtAction
+  /** Cue a playlist on the visible player and read its ids (shared playlist, nobody signed in). */
+  data class LookUpPlaylist(val listId: String) : YtAction
   data class Foreground(val visible: Boolean) : YtAction
   data class SizeChanged(val ok: Boolean) : YtAction
   /** The WebView renderer died or the host was released; the player must be rebuilt. */
@@ -110,9 +122,14 @@ sealed interface YtPlayerEvent : YtAction {
       val durationMs: Long,
       val videoId: String?,
       val elapsedMs: Long,
+      /** `getVideoData()` title/author, used only to fill placeholder queue metadata. */
+      val title: String? = null,
+      val author: String? = null,
   ) : YtPlayerEvent
   data object AutoplayBlocked : YtPlayerEvent
   data object ApiUnavailable : YtPlayerEvent
+  /** `getPlaylist()` after a [YtAction.LookUpPlaylist] cue. */
+  data class Playlist(val listId: String, val videoIds: List<String>) : YtPlayerEvent
 }
 
 /** Side effects the Android engine executes after a reduction, in order. */
@@ -123,6 +140,7 @@ sealed interface YtEffect {
   data object Pause : YtEffect
   data class Seek(val positionMs: Long) : YtEffect
   data object Stop : YtEffect
+  data class CuePlaylist(val listId: String) : YtEffect
   /** Save queue + position so the queue survives process death. */
   data object Persist : YtEffect
 }

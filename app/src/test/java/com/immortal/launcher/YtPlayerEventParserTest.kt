@@ -28,6 +28,13 @@ class YtPlayerEventParserTest {
         parse("""{"v":1,"e":"progress","t":12.5,"d":200,"id":"abcdefghijk"}"""))
   }
 
+  @Test fun progress_carriesCleanedTitleAndAuthor_forPlaceholderRows() {
+    assertEquals(YtPlayerEvent.Progress(1_000, 200_000, "abcdefghijk", 777, "Saltwater hours", "Marrow & Vale"),
+        parse("""{"v":1,"e":"progress","t":1,"d":200,"id":"abcdefghijk","ti":" Saltwater hours\u0007","au":"Marrow & Vale"}"""))
+    assertEquals(YtPlayerEvent.Progress(1_000, 200_000, null, 777),
+        parse("""{"v":1,"e":"progress","t":1,"d":200,"ti":"  ","au":5}"""))
+  }
+
   @Test fun progress_clampsPositionToDuration_andDropsBadVideoId() {
     assertEquals(YtPlayerEvent.Progress(10_000, 10_000, null, 777),
         parse("""{"v":1,"e":"progress","t":99,"d":10,"id":"<script>"}"""))

@@ -31,6 +31,12 @@ data class YtQueueEntry(
     val track: YtTrack,
     /** Why the official player refused this video (e.g. embedding disabled), or null. */
     val unplayableReason: String? = null,
+    /** Where to start when this entry next loads (a song interrupted by a shared "Play now"). */
+    val resumeMs: Long? = null,
+    /** The phone that shared it ("Rohit's phone"), for the quiet tag on the queue row. */
+    val sharedBy: String? = null,
+    /** Title/artist are placeholders until the official player reports the real ones. */
+    val needsMeta: Boolean = false,
 ) {
   val playable: Boolean get() = unplayableReason == null
 }
@@ -149,6 +155,20 @@ data class YtQueue(
     val currentId = current?.id
     return copy(entries = restored, currentIndex = restored.indexOfFirst { it.id == currentId },
         unshuffledIds = null)
+  }
+
+  /** Forgets [id]'s resume point once it has been loaded. */
+  fun consumeResume(id: Long): YtQueue =
+      if (entries.none { it.id == id && it.resumeMs != null }) this
+      else copy(entries = entries.map { if (it.id == id) it.copy(resumeMs = null) else it })
+
+  /** Fills placeholder metadata of entries playing [videoId] from what the official player reports. */
+  fun fillMeta(videoId: String, title: String, artist: String): YtQueue {
+    if (title.isBlank() || entries.none { it.needsMeta && it.track.videoId == videoId }) return this
+    return copy(entries = entries.map {
+      if (!it.needsMeta || it.track.videoId != videoId) it
+      else it.copy(track = it.track.copy(title = title, artist = artist.ifBlank { it.track.artist }), needsMeta = false)
+    })
   }
 
   /** Empties the queue; repeat mode survives and ids keep counting so they never collide. */

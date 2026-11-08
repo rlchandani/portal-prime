@@ -104,5 +104,5 @@ private fun queueActions(queue: YtQueue, index: Int, entry: YtQueueEntry): List<
 }
 
 private fun YtQueueEntry.toRow(current: Boolean = false) = MusicV3RowModel(
-    key = "q$id", title = track.title, artist = track.artist, thumbnailUrl = track.thumbnailUrl,
+    key = "q$id", title = track.title, artist = sharedBy?.let { "${track.artist} · From $it".removePrefix(" · ") } ?: track.artist, thumbnailUrl = track.thumbnailUrl,
     durationMs = track.durationMs, current = current, unplayableReason = unplayableReason)

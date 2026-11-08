@@ -25,6 +25,9 @@ object YtPlayerPage {
   const val BRIDGE_NAME = "portalYtPlayer"
   private val PACKAGE = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")
   private const val CALL = "window.__portalYt&&window.__portalYt."
+  private val LIST_ID = Regex("[A-Za-z0-9_-]{10,64}")
+  /** Most ids a playlist lookup reports (the share queue's cap). */
+  const val MAX_PLAYLIST_IDS = 200
 
   /** `https://<packageName>`; [packageName] is validated so it is safe to embed in the page. */
   fun baseUrl(packageName: String): String {
@@ -43,6 +46,13 @@ object YtPlayerPage {
   fun cue(videoId: String, startMs: Long): String? = videoCall("cue", videoId, startMs)
 
   fun seek(positionMs: Long): String = "${CALL}seek(${seconds(positionMs)});"
+
+  /**
+   * cuePlaylist on the visible player, then report `getPlaylist()` ids (≤ 200) as a `playlist`
+   * event. Used to open a shared playlist when no account is signed in. Null for an invalid id.
+   */
+  fun cuePlaylist(listId: String): String? =
+      if (!LIST_ID.matches(listId)) null else "${CALL}cueList('$listId');"
 
   /** Player volume, clamped to the IFrame API's 0–100. */
   fun volume(level: Int): String = "${CALL}volume(${level.coerceIn(0, 100)});"
@@ -77,15 +87,19 @@ object YtPlayerPage {
 (function(){
 var player=null,poll=null,blockTimer=null,wanted=false;
 function post(o){o.v=1;try{window.$BRIDGE_NAME.postMessage(JSON.stringify(o));}catch(e){}}
-function vid(){try{var d=player.getVideoData();return (d&&d.video_id)||'';}catch(e){return '';}}
-function progress(){if(!player||!player.getCurrentTime)return;
-post({e:'progress',t:player.getCurrentTime()||0,d:player.getDuration()||0,id:vid()});}
+function data(){try{return player.getVideoData()||{};}catch(e){return {};}}
+function cut(v){return (typeof v==='string')?v.slice(0,100):'';}
+function progress(){if(!player||!player.getCurrentTime)return;var d=data();
+post({e:'progress',t:player.getCurrentTime()||0,d:player.getDuration()||0,id:d.video_id||'',ti:cut(d.title),au:cut(d.author)});}
 function startPoll(){if(!poll)poll=setInterval(progress,1000);}
 function stopPoll(){if(poll){clearInterval(poll);poll=null;}}
 function armBlockCheck(){clearTimeout(blockTimer);blockTimer=setTimeout(function(){
 var s=player&&player.getPlayerState?player.getPlayerState():-1;
 if(wanted&&(s===-1||s===5))post({e:'autoplayBlocked'});},4000);}
 function ok(){return player&&player.loadVideoById;}
+function listPoll(l,n){var ids=null;try{ids=player.getPlaylist();}catch(e){}
+if(ids&&ids.length){post({e:'playlist',l:l,ids:ids.slice(0,$MAX_PLAYLIST_IDS)});return;}
+if(n>48){post({e:'playlist',l:l,ids:[]});return;}setTimeout(function(){listPoll(l,n+1);},250);}
 window.onYouTubeIframeAPIReady=function(){
 player=new YT.Player('player',{host:'https://www.youtube-nocookie.com',width:'100%',height:'100%',
 playerVars:{playsinline:1,controls:0,fs:0,disablekb:1,iv_load_policy:3,rel:0,enablejsapi:1,origin:'$origin'},
@@ -103,7 +117,8 @@ play:function(){if(!ok())return false;wanted=true;player.playVideo();armBlockChe
 pause:function(){if(!ok())return false;wanted=false;player.pauseVideo();return true;},
 stop:function(){if(!ok())return false;wanted=false;stopPoll();player.stopVideo();return true;},
 seek:function(s){if(!ok())return false;player.seekTo(s,true);progress();return true;},
-volume:function(v){if(!ok())return false;player.setVolume(v);return true;}
+volume:function(v){if(!ok())return false;player.setVolume(v);return true;},
+cueList:function(l){if(!ok())return false;wanted=false;stopPoll();player.cuePlaylist({list:l,listType:'playlist'});listPoll(l,0);return true;}
 };
 var tag=document.createElement('script');
 tag.src='https://www.youtube.com/iframe_api';
