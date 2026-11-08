@@ -30,12 +30,15 @@ fun lanIp(): String? =
         }
         .getOrNull()
 
-/** A black-on-white QR code [Bitmap] for [text] (square, [sizePx] px), or null on failure. */
-fun lanSetupQr(text: String, sizePx: Int): Bitmap? =
+/**
+ * A black-on-white QR code [Bitmap] for [text] (square, [sizePx] px), or null on failure.
+ * [quietZone] is the white margin in modules (the QR spec asks for 4).
+ */
+fun lanSetupQr(text: String, sizePx: Int, quietZone: Int = 1): Bitmap? =
     runCatching {
           val matrix =
               QRCodeWriter().encode(
-                  text, BarcodeFormat.QR_CODE, sizePx, sizePx, mapOf(EncodeHintType.MARGIN to 1))
+                  text, BarcodeFormat.QR_CODE, sizePx, sizePx, mapOf(EncodeHintType.MARGIN to quietZone))
           val w = matrix.width
           val h = matrix.height
           val pixels = IntArray(w * h)
