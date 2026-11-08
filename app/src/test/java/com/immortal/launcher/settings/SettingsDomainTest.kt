@@ -497,15 +497,33 @@ class SettingsDomainTest {
   }
 
   @Test
-  fun guestsRegistry_rejectsMultiLineOrOverlongText() {
-    val spec = GuestSettings.domain.specs.first { it.key == "doorCode" } as StringSpec<*>
-    assertTrue(spec.applyWhen("4821#"))
-    assertTrue(spec.applyWhen(""))
-    assertFalse(spec.applyWhen("a\nb"))
-    assertFalse(spec.applyWhen("x".repeat(com.immortal.launcher.GuestConfig.MAX_TEXT + 1)))
+  fun guestsRegistry_neverHoldsTheDoorCodeOrTheFirstCardsFreeTextLines() {
+    val keys = GuestSettings.domain.specs.map { it.key }.toSet()
+    assertTrue("the door code is a secret now", "doorCode" !in keys)
+    assertTrue(keys.none { it in setOf("houseNote", "emergency") })
+  }
+
+  @Test
+  fun guestsRegistry_rejectsMultiLineOrOverlongTextAndNonChoices() {
+    val welcome = GuestSettings.domain.specs.first { it.key == "welcome" } as StringSpec<*>
+    assertTrue(welcome.applyWhen("Hi!"))
+    assertTrue(welcome.applyWhen(""))
+    assertFalse(welcome.applyWhen("a\nb"))
+    assertFalse(welcome.applyWhen("x".repeat(com.immortal.launcher.GuestConfig.MAX_TEXT + 1)))
+    val checkout = GuestSettings.domain.specs.first { it.key == "checkout" } as StringSpec<*>
+    assertTrue(checkout.applyWhen("11:00"))
+    assertTrue(checkout.applyWhen(""))
+    assertFalse(checkout.applyWhen("11:00 on Sunday"))
+    val notes = GuestSettings.domain.specs.first { it.key == "customNotes" } as StringSpec<*>
+    assertTrue(notes.applyWhen("Bins out Tuesday|Spare key under the mat"))
+    assertFalse(notes.applyWhen("a||b"))
     val security = GuestSettings.domain.specs.first { it.key == "security" } as EnumSpec<*>
     assertNull(security.coerce("wpa3-enterprise"))
     assertEquals("wep", security.coerce("wep"))
+    assertEquals("sae", security.coerce("sae"))
+    val contact = GuestSettings.domain.specs.first { it.key == "contact" } as EnumSpec<*>
+    assertEquals("text", contact.coerce("text"))
+    assertNull(contact.coerce("phone_number"))
   }
 
   @Test
@@ -574,7 +592,7 @@ class SettingsDomainTest {
             "ShareConfig",
             // HouseholdListSettings.domain; added to SettingsDomains.all at integration (shared list).
             "HouseholdListConfig",
-            // GuestSettings.domain (Guest card); the Wi-Fi password is in GuestPasswordStore, not prefs.
+            // GuestSettings.domain (Guest card); the Wi-Fi password and door code are GuestSecret stores, not prefs.
             "GuestConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",

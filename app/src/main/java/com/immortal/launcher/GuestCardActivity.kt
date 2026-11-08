@@ -32,15 +32,12 @@ class GuestCardActivity : ComponentActivity() {
   }
 }
 
-/** Snapshot the card once per open; the password is decrypted off the main thread, never logged. */
+/** Snapshot the card once per open; the secrets are decrypted off the main thread, never logged. */
 @androidx.compose.runtime.Composable
 private fun GuestCardHost(onClose: () -> Unit) {
   val context = LocalContext.current.applicationContext
   val card by produceState<GuestCardContent?>(null) {
-    value = withContext(Dispatchers.IO) {
-      GuestCardContent(com.immortal.launcher.settings.GuestSettings.domain.load(context),
-          GuestPasswordStore.get(context).read())
-    }
+    value = withContext(Dispatchers.IO) { loadGuestCard(context) }
   }
   val mode by GuestMode.state.collectAsState()
   GuestCardScreen(
@@ -53,14 +50,6 @@ private fun GuestCardHost(onClose: () -> Unit) {
   )
 }
 
-/** What the card shows; [toString] never includes the password. */
-internal class GuestCardContent(val settings: GuestConfig.Settings, val password: String) {
-  val network: GuestWifi.Network
-    get() = GuestWifi.Network(settings.ssid, password, settings.wifiSecurity, settings.hiddenNetwork)
-  val ready: Boolean get() = GuestWifi.payload(network) != null
-  override fun toString(): String = "GuestCardContent(ready=$ready)"
-}
-
 /** The card's start choices; schedules resolve in this Portal's time zone ([GuestSchedule]). */
 internal object GuestStartChoices {
   val choices: List<Pair<String, GuestSchedule>> = listOf(
@@ -68,4 +57,11 @@ internal object GuestStartChoices {
       "Until tomorrow 11:00" to GuestSchedule.UntilTomorrow(11, 0),
       "For 2 days" to GuestSchedule.ForDays(2),
   )
+}
+
+/** The saved card with its secrets; call off the main thread. */
+internal fun loadGuestCard(context: android.content.Context): GuestCardContent {
+  GuestFeature.migrateSecrets(context)
+  return GuestCardContent(com.immortal.launcher.settings.GuestSettings.domain.load(context),
+      GuestPasswordStore.get(context).read(), GuestDoorCodeStore.get(context).read(), ImmortalSettings.use24HourClock(context))
 }

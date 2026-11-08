@@ -35,6 +35,8 @@ internal object GuestFeature {
     app = appContext
     GuestMode.set(GuestModeState.decode(prefs(appContext).getString(KEY_STATE, null)))
     checkExpiry(appContext)
+    // Keystore work stays off the startup path; every reader of the door code also runs it first.
+    Thread({ migrateSecrets(appContext) }, "guest-migrate").start()
     val api = GuestApi(AndroidPort(appContext))
     RemoteFeatureRoutes.register(ROUTE) { _, method, body ->
       val (status, json) = synchronized(this) { api.handle(method, body) }
@@ -73,12 +75,21 @@ internal object GuestFeature {
 
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-  /** The card as the registry sees it, the password only through [GuestPasswordStore]. */
+  /** Moves the first card's plain door code into its secret store; call off the main thread. */
+  fun migrateSecrets(context: Context) {
+    if (!GuestSecretsMigration.run(context)) Log.w(TAG, "door code migration deferred: secret storage unavailable")
+  }
+
+  /** The card as the registry sees it, the secrets only through their [GuestSecret] stores. */
   private class AndroidPort(private val context: Context) : GuestPort {
     override fun card(): JSONObject = GuestSettings.domain.flatJson(context)
     override fun applyCard(values: JSONObject) { GuestSettings.domain.apply(context, values) }
     override fun hasPassword() = GuestPasswordStore.get(context).isSet()
     override fun setPassword(value: String) = GuestPasswordStore.get(context).write(value)
+    override fun hasDoorCode(): Boolean { migrateSecrets(context); return GuestDoorCodeStore.get(context).isSet() }
+    override fun setDoorCode(value: String) = GuestDoorCodeStore.get(context).write(value)
+    override fun setLegacyDoorCode(value: String) =
+        GuestDoorCode.isStorable(value) && GuestDoorCodeStore.get(context).writeMigrated(value)
     override fun mode() = GuestMode.state.value
     override fun start(schedule: GuestSchedule) = start(context, schedule)
     override fun end() = end(context)

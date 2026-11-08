@@ -11,10 +11,17 @@ package com.immortal.launcher
  * which phone cameras read as "Join network". Pure JVM; [lanSetupQr] renders the result.
  */
 internal object GuestWifi {
+  /**
+   * [qr] is the join payload's `T:` value. WPA3 ([SAE]) deliberately encodes as `WPA`: iPhone and
+   * Android cameras both join WPA3 networks from it, while `T:SAE` isn't read everywhere.
+   */
   enum class Security(val wire: String, val qr: String, val label: String) {
-    WPA("wpa", "WPA", "WPA / WPA2 / WPA3"),
+    WPA("wpa", "WPA", "WPA / WPA2"),
+    SAE("sae", "WPA", "WPA3"),
     WEP("wep", "WEP", "WEP (older)"),
-    NONE("none", "nopass", "No password");
+    NONE("none", "nopass", "Open (no password)");
+
+    val needsPassword: Boolean get() = this != NONE
 
     companion object {
       fun fromWire(value: String?): Security = entries.firstOrNull { it.wire == value } ?: WPA
@@ -41,7 +48,7 @@ internal object GuestWifi {
   /** The join payload, or null when the network can't be joined from it (no name, or no password). */
   fun payload(network: Network): String? {
     if (network.ssid.isBlank()) return null
-    val secured = network.security != Security.NONE
+    val secured = network.security.needsPassword
     if (secured && network.password.isEmpty()) return null
     return buildString {
       append("WIFI:T:").append(network.security.qr).append(";S:").append(escape(network.ssid)).append(';')

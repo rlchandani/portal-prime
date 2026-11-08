@@ -17,6 +17,8 @@ class GuestApiTest {
   private class FakePort : GuestPort {
     var values = JSONObject().put("ssid", "").put("security", "wpa")
     var password = ""
+    var doorCode = ""
+    var legacyDoorCode: String? = null
     var storageBroken = false
     var state = GuestModeState.OFF
     var started: GuestSchedule? = null
@@ -25,6 +27,9 @@ class GuestApiTest {
     override fun applyCard(values: JSONObject) { values.keys().forEach { this.values.put(it, values.get(it)) } }
     override fun hasPassword() = password.isNotEmpty()
     override fun setPassword(value: String) = !storageBroken && true.also { password = value }
+    override fun hasDoorCode() = doorCode.isNotEmpty()
+    override fun setDoorCode(value: String) = !storageBroken && true.also { doorCode = value }
+    override fun setLegacyDoorCode(value: String) = !storageBroken && true.also { legacyDoorCode = value; doorCode = value }
     override fun mode() = state
     override fun start(schedule: GuestSchedule) { started = schedule; state = GuestModeState(true, schedule.endMs(now, java.time.ZoneOffset.UTC)) }
     override fun end() { state = GuestModeState.OFF }
@@ -47,7 +52,7 @@ class GuestApiTest {
   }
 
   @Test fun saveSetsCardAndPasswordButReadBackHidesIt() {
-    val (status, json) = post("""{"action":"save","card":{"ssid":"Guest Net","doorCode":"4821"},"password":"pa;ss word"}""")
+    val (status, json) = post("""{"action":"save","card":{"ssid":"Guest Net"},"password":"pa;ss word"}""")
     assertEquals(200, status)
     assertEquals("pa;ss word", port.password)
     assertEquals("Guest Net", json.getJSONObject("card").getString("ssid"))
@@ -115,6 +120,81 @@ class GuestApiTest {
 
   @Test fun openNetworkIsReadyWithoutPassword() {
     port.values.put("ssid", "Cafe").put("security", "none")
+    assertTrue(api.handle("GET", JSONObject()).second.getBoolean("ready"))
+  }
+
+  @Test fun responsesCarryTheVersionAndDoorCodePresenceButNeverTheCode() {
+    port.doorCode = "4821"
+    val (_, json) = api.handle("GET", JSONObject())
+    assertEquals(GuestApi.VERSION, json.getInt("version"))
+    assertTrue(json.getBoolean("hasDoorCode"))
+    assertFalse(json.toString().contains("4821"))
+    assertEquals(2, post("{}").second.getInt("version"))
+  }
+
+  @Test fun doorCodeIsSetAndClearedAsASecret() {
+    val (status, json) = post("""{"action":"save","version":2,"doorCode":"4821"}""")
+    assertEquals(200, status)
+    assertEquals("4821", port.doorCode)
+    assertFalse(json.toString().contains("4821"))
+    assertEquals(200, post("""{"action":"save","clearDoorCode":true}""").first)
+    assertEquals("", port.doorCode)
+  }
+
+  @Test fun badDoorCodesAreRejected() {
+    listOf(""""12a4"""", """"123"""", """"123456789"""", "4821", """""""").forEach {
+      assertEquals(it, "invalid_doorCode", post("""{"action":"save","doorCode":$it}""").second.getString("error"))
+    }
+    assertEquals("conflicting_doorCode",
+        post("""{"action":"save","doorCode":"4821","clearDoorCode":true}""").second.getString("error"))
+    assertEquals("", port.doorCode)
+  }
+
+  @Test fun v2CardKeysAreAccepted() {
+    val body = """{"action":"save","version":2,"card":{"ssid":"Home","security":"sae","checkout":"11:00",
+      "goodToKnow":"shoes_off,pets","customNotes":"Bins out Tuesday","contact":"text","contactName":"Sam",
+      "welcome":"Hi!","hidePassword":true,"hiddenNetwork":false}}"""
+    assertEquals(200, post(body).first)
+    assertEquals("sae", port.values.getString("security"))
+    assertEquals("shoes_off,pets", port.values.getString("goodToKnow"))
+    assertEquals("text", port.values.getString("contact"))
+  }
+
+  @Test fun v2CardValuesAreValidated() {
+    assertEquals("invalid_contact", post("""{"action":"save","card":{"contact":"555-0100"}}""").second.getString("error"))
+    assertEquals("invalid_customNotes", post("""{"action":"save","card":{"customNotes":"a||b"}}""").second.getString("error"))
+    assertEquals("invalid_contactName",
+        post("""{"action":"save","card":{"contactName":"${"x".repeat(41)}"}}""").second.getString("error"))
+  }
+
+  @Test fun anOlderPhonesV1CardIsFoldedIntoChoices() {
+    port.values.put("customNotes", "Mine")
+    val body = """{"action":"save","card":{"ssid":"Home","security":"wpa","hiddenNetwork":false,"hidePassword":true,
+      "welcome":"Hi","doorCode":"4821#","checkout":"11:00 on Sunday","houseNote":"Bins go out Tuesday","emergency":"Sam 0100"}}"""
+    assertEquals(200, post(body).first)
+    assertEquals("4821#", port.legacyDoorCode)
+    assertFalse(port.values.has("doorCode"))
+    assertFalse(port.values.has("houseNote"))
+    assertFalse(port.values.has("checkout"))
+    assertEquals("Mine|Check-out: 11:00 on Sunday|Bins go out Tuesday|Emergency contact: Sam 0100",
+        port.values.getString("customNotes"))
+  }
+
+  @Test fun anOlderPhoneSendingBackBlankV1LinesChangesNothing() {
+    port.doorCode = "4821"
+    port.values.put("customNotes", "Mine").put("checkout", "10:00")
+    val body = """{"action":"save","card":{"ssid":"Home","doorCode":"","checkout":"9:30","houseNote":"","emergency":""}}"""
+    assertEquals(200, post(body).first)
+    assertEquals("4821", port.doorCode)
+    assertNull(port.legacyDoorCode)
+    assertEquals("Mine", port.values.getString("customNotes"))
+    assertEquals("a written time still maps to the choice", "09:30", port.values.getString("checkout"))
+  }
+
+  @Test fun wpa3NetworkNeedsAPasswordToBeReady() {
+    port.values.put("ssid", "Home").put("security", "sae")
+    assertFalse(api.handle("GET", JSONObject()).second.getBoolean("ready"))
+    port.password = "abcdefgh"
     assertTrue(api.handle("GET", JSONObject()).second.getBoolean("ready"))
   }
 }

@@ -27,6 +27,13 @@ class GuestWifiTest {
       assertEquals("WIFI:T:WEP;S:Old;P:abcde;H:true;;",
           GuestWifi.payload(GuestWifi.Network("Old", "abcde", GuestWifi.Security.WEP, hidden = true)))
 
+  @Test fun wpa3UsesTheWidelySupportedWpaTypeSoEveryCameraCanJoin() =
+      assertEquals("WIFI:T:WPA;S:Home;P:secret123;;",
+          GuestWifi.payload(GuestWifi.Network("Home", "secret123", GuestWifi.Security.SAE)))
+
+  @Test fun everySecurityHasAQrType() =
+      assertEquals(listOf("WPA", "WPA", "WEP", "nopass"), GuestWifi.Security.entries.map { it.qr })
+
   @Test fun blankNameHasNoPayload() = assertNull(GuestWifi.payload(GuestWifi.Network("  ", "x")))
 
   @Test fun securedNetworkWithoutPasswordHasNoPayload() =
@@ -35,6 +42,7 @@ class GuestWifiTest {
   @Test fun securityParsesWireNamesAndFallsBackToWpa() {
     assertEquals(GuestWifi.Security.WEP, GuestWifi.Security.fromWire("wep"))
     assertEquals(GuestWifi.Security.NONE, GuestWifi.Security.fromWire("none"))
+    assertEquals(GuestWifi.Security.SAE, GuestWifi.Security.fromWire("sae"))
     assertEquals(GuestWifi.Security.WPA, GuestWifi.Security.fromWire("bogus"))
   }
 
