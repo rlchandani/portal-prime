@@ -28,6 +28,8 @@ internal object HouseholdBus {
   private const val TAG = "ImmortalHouseholdBus"
   const val PORT = 50122
   private const val SEND_REPEATS = 2 // a dropped Wi-Fi frame should not lose a dinner call
+  /** Music move messages are logged on arrival, to diagnose "Move to…" / "Bring it back". */
+  private const val MUSIC_PREFIX = "music_"
 
   fun interface Handler {
     fun onMessage(context: Context, message: HouseholdMessage)
@@ -72,7 +74,8 @@ internal object HouseholdBus {
     val message = HouseholdMessage.decode(wire, key, System.currentTimeMillis(), replay) ?: return
     val self = runCatching { RemoteCompanionStore.id(context) }.getOrNull()
     if (message.from == self) return
-    val handler = handlers[message.type] ?: return
+    if (message.type.startsWith(MUSIC_PREFIX)) Log.i(TAG, "received ${message.type}")
+    val handler = handlers[message.type] ?: return Unit.also { Log.i(TAG, "no handler for ${message.type}") }
     runCatching { handler.onMessage(context, message) }
         .onFailure { Log.w(TAG, "handler for ${message.type} failed", it) }
   }

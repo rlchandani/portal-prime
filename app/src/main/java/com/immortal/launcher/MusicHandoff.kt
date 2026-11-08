@@ -100,6 +100,7 @@ internal object MusicHandoff {
     if (recalling.id != id) return
     val sent = HouseholdBus.send(app, MusicHandoffWire.RECALL,
         MusicHandoffWire.encode(MusicHandoffWire.Recall(id, recalling.targetId, DinnerCall.selfName(app))))
+    Log.i(TAG, "bring back: recall to ${recalling.targetName} sent=$sent")
     if (!sent) transition { MusicMoveStep(MusicMoveState.Handed(recalling.targetId, recalling.targetName),
         toast = "Couldn't reach ${recalling.targetName}.") }
     else main.postDelayed({ tick() }, MusicMoveMachine.ANSWER_MS)
@@ -119,6 +120,7 @@ internal object MusicHandoff {
       val host = HouseholdListSync.lanAddress()
       val offer = host?.let { MusicHandoffWire.Offer(id, targetId, it, FleetConfig.port(app), DinnerCall.selfName(app)) }
       val sent = offer != null && HouseholdBus.send(app, MusicHandoffWire.OFFER, MusicHandoffWire.encode(offer))
+      Log.i(TAG, "offer to $targetName: lanAddress=${host != null} sent=$sent")
       if (!sent) {
         transition { s ->
           if ((s as? MusicMoveState.Offering)?.id != id) MusicMoveStep(s)
@@ -145,6 +147,7 @@ internal object MusicHandoff {
   private fun onOffer(context: Context, from: String, offer: MusicHandoffWire.Offer) {
     if (offer.to != DinnerCall.selfId(context)) return
     val recall = MusicMoveMachine.isRecallOffer(moveFlow.value, from, offer.id)
+    Log.i(TAG, "offer from ${offer.fromName}: recall=$recall state=${moveFlow.value.javaClass.simpleName}")
     val quiet = DinnerQuiet.isQuiet(ChimeConfig.load(context), System.currentTimeMillis(), TimeZone.getDefault())
     val decline = MusicTargetPolicy.decide(quiet, RoutineScreenState.ownsScreen(), RoutineScheduler.busy(context), recall)
     if (decline != null) {
@@ -179,7 +182,9 @@ internal object MusicHandoff {
 
   private fun onRecall(context: Context, from: String, recall: MusicHandoffWire.Recall) {
     if (recall.to != DinnerCall.selfId(context)) return
-    if (YouTubeMusicEngine.state.value.queue.current == null) return ack(context, recall.id, from, MusicHandoffStatus.NOTHING)
+    val hasCurrent = YouTubeMusicEngine.state.value.queue.current != null
+    Log.i(TAG, "recall from ${recall.fromName}: current=$hasCurrent state=${moveFlow.value.javaClass.simpleName}")
+    if (!hasCurrent) return ack(context, recall.id, from, MusicHandoffStatus.NOTHING)
     val step = transition { MusicMoveMachine.start(it, recall.id, from, recall.fromName, now()) }
     if ((step.state as? MusicMoveState.Offering)?.id != recall.id) return ack(context, recall.id, from, MusicHandoffStatus.FAILED)
     sendOffer(context.applicationContext, recall.id, from, recall.fromName)
