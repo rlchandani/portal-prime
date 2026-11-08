@@ -24,6 +24,19 @@ val keystorePropsFile =
 val keystoreProps =
     Properties().apply { if (keystorePropsFile.exists()) keystorePropsFile.inputStream().use(::load) }
 
+// OAuth client ("TVs and Limited Input devices") for the YouTube music sign-in. Values come from
+// the git-ignored local.properties keys yt.oauth.clientId / yt.oauth.clientSecret and are never
+// committed (the repo is public). Absent keys compile to "" and the app reports sign-in as
+// not set up. Control characters are dropped and quotes escaped so a value can't break Java.
+val localProps =
+    Properties().apply {
+      rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
+    }
+fun localJavaString(key: String): String {
+  val raw = localProps.getProperty(key).orEmpty().trim().filterNot { it.isISOControl() }
+  return "\"" + raw.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+}
+
 android {
   namespace = "com.immortal.launcher"
   compileSdk { version = release(36) { minorApiLevel = 1 } }
@@ -61,6 +74,10 @@ android {
     // Native Home has not met its timing gate and remains opt-in for controlled experiments.
     buildConfigField("boolean", "PORTAL_NATIVE_HOME_TABS",
         (providers.gradleProperty("portalNativeHomeTabs").orNull == "true").toString())
+
+    // Official YouTube music sign-in (see localJavaString above); "" = not configured.
+    buildConfigField("String", "YT_OAUTH_CLIENT_ID", localJavaString("yt.oauth.clientId"))
+    buildConfigField("String", "YT_OAUTH_CLIENT_SECRET", localJavaString("yt.oauth.clientSecret"))
 
     // Fixed-control functional probes stay dormant in production variants.
     buildConfigField("boolean", "PORTAL_HOME_UI_DIAGNOSTICS", "false")
