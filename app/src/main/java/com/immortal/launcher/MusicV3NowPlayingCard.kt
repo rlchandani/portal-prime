@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,8 +41,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-/** The official player tile is 736×414 dp in the mock (828×466 device px, above YouTube's 200×200). */
-private const val PLAYER_ASPECT = 736f / 414f
+/** Square cover, the main visual. */
+private val COVER_SIZE = 520.dp
+/**
+ * Official player tile. YouTube's minimum viewport is 200×200 CSS px (= dp in the WebView), so it is
+ * a 208 dp square (234 device px); 16:9 video letterboxes inside it.
+ */
+private val MINI_PLAYER_W = 208.dp
+private val MINI_PLAYER_H = 208.dp
+private val MINI_PLAYER_INSET = 16.dp
 private const val TICK_MS = 1_000L
 
 /**
@@ -55,7 +61,7 @@ internal fun MusicV3NowPlayingCard(engine: YtEngineState, room: String, modifier
   val model = MusicV3NowPlaying.from(engine, room)
   Column(modifier.clip(RoundedCornerShape(MusicV3Dims.PaneRadius)).background(ApprovedHomePalette.Card)
       .padding(32.dp)) {
-    PlayerTile(model.hasTrack)
+    PlayerTile(model.track)
     Meta(model)
     Spacer(Modifier.weight(1f))
     model.halt?.let { HaltNote(it) }
@@ -69,19 +75,28 @@ internal fun MusicV3NowPlayingCard(engine: YtEngineState, room: String, modifier
   }
 }
 
+/**
+ * The song's square cover is the hero, like the YouTube Music app. YouTube's rules keep the official
+ * player visible and uncovered, so it sits as a small video tile in the cover's corner (above the
+ * 200×200 px minimum) — the cover is underneath it, never on top of it.
+ */
 @Composable
-private fun PlayerTile(hasTrack: Boolean) {
-  Box(Modifier.fillMaxWidth().aspectRatio(PLAYER_ASPECT).clip(RoundedCornerShape(20.dp))
-      .background(ApprovedHomePalette.Chrome)) {
-    YouTubePlayerSurface(Modifier.fillMaxSize())
-    // Only while the queue is empty (the player has no video to show) does anything sit here.
-    if (!hasTrack) IdleTile()
+private fun PlayerTile(track: YtTrack?) {
+  Box(Modifier.fillMaxWidth().height(COVER_SIZE), contentAlignment = Alignment.Center) {
+    Box(Modifier.size(COVER_SIZE)) {
+      if (track != null) MusicV3Cover(track, Modifier.fillMaxSize()) else IdleTile()
+      Box(Modifier.align(Alignment.BottomEnd).padding(MINI_PLAYER_INSET).size(MINI_PLAYER_W, MINI_PLAYER_H)
+          .clip(RoundedCornerShape(14.dp)).background(Color.Black).approvedOutline(RoundedCornerShape(14.dp))) {
+        // The surface stays composed (and so released only on leave) even before a track loads.
+        YouTubePlayerSurface(Modifier.fillMaxSize())
+      }
+    }
   }
 }
 
 @Composable
 private fun IdleTile() {
-  Column(Modifier.fillMaxSize().background(ApprovedHomePalette.Chrome), verticalArrangement = Arrangement.Center,
+  Column(Modifier.fillMaxSize().clip(RoundedCornerShape(24.dp)).background(ApprovedHomePalette.Chrome), verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
     ApprovedIcon("music", Modifier.size(64.dp), ApprovedHomePalette.Secondary)
     Text("Nothing playing", color = ApprovedHomePalette.Text, fontSize = 30.sp, fontWeight = FontWeight.Medium,
