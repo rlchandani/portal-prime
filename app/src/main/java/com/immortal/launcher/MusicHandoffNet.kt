@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import android.content.Context
+import android.util.Log
 import android.os.SystemClock
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -28,6 +29,7 @@ internal object MusicHandoffNet {
   private const val READ_MS = 5_000
   private val replay = HouseholdMessage.ReplayGuard()
   private val random = SecureRandom()
+  private const val TAG = "HearthpaneMusicMove"
 
   /** Source side. Builds the payload from the live engine at fetch time, so the position is current. */
   fun handle(context: Context, req: FleetHttpServer.Request): FleetHttpServer.Response {
@@ -40,13 +42,16 @@ internal object MusicHandoffNet {
     val caller = MusicHandoffAuth.verifyRequest(req.header(MusicHandoffAuth.HEADER), text, key,
         System.currentTimeMillis(), replay, DinnerCall.selfId(context))
         ?: return RemoteFeatureRoutes.json(401, RemoteFeatureRoutes.error("unauthorized"))
+            .also { Log.i(TAG, "serve: request signature rejected") }
     if (!MusicHandoff.claim(caller.offerId, caller.from)) {
+      Log.i(TAG, "serve: no matching offer to claim")
       return RemoteFeatureRoutes.json(404, RemoteFeatureRoutes.error("no_offer"))
     }
     val engine = YouTubeMusicEngine.state.value
     val position = MusicV3NowPlaying.livePositionMs(engine, SystemClock.elapsedRealtime())
     val queue = MusicHandoffCodec.fromQueue(engine.queue, position)
         ?: return RemoteFeatureRoutes.json(409, RemoteFeatureRoutes.error("nothing_playing"))
+            .also { Log.i(TAG, "serve: queue not encodable (entries=${engine.queue.entries.size})") }
     val payload = MusicHandoffCodec.encode(queue)
     return RemoteFeatureRoutes.json(200, JSONObject().put("payload", payload)
         .put("sig", MusicHandoffAuth.signResponse(key, caller.nonce, payload)))
@@ -71,12 +76,14 @@ internal object MusicHandoffNet {
       val bytes = body.toByteArray(Charsets.UTF_8)
       conn.setFixedLengthStreamingMode(bytes.size)
       conn.outputStream.use { it.write(bytes) }
-      if (conn.responseCode != 200) return null
+      if (conn.responseCode != 200) return null.also { Log.i(TAG, "fetch: HTTP ${conn.responseCode}") }
       val text = conn.inputStream.use { readCapped(it, MAX_RESPONSE) } ?: return null
       val envelope = JSONObject(text)
       val payload = envelope.optString("payload")
-      if (!MusicHandoffAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) return null
-      return MusicHandoffCodec.decode(payload)
+      if (!MusicHandoffAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) {
+        return null.also { Log.i(TAG, "fetch: response signature rejected") }
+      }
+      return MusicHandoffCodec.decode(payload).also { if (it == null) Log.i(TAG, "fetch: payload not decodable") }
     } finally {
       conn.disconnect()
     }
