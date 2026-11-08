@@ -37,9 +37,10 @@ internal class MediaSessionMusicTransport(
   companion object {
     private const val TAG = "ImmortalMusicTransport"
 
-    /** A controllable media-session transport, or null for the embedded page / tokenless states. */
+    /** A controllable media-session transport, or null for in-app players / tokenless states. */
     fun forState(state: NowPlayingState): MusicTransport? = when {
-      state.source.isBlank() || state.source == SOURCE_EMBEDDED_YT_MUSIC -> null
+      state.source.isBlank() || state.source == SOURCE_EMBEDDED_YT_MUSIC ||
+          state.source == SOURCE_YOUTUBE -> null
       state.sessionToken == null -> null
       else -> MediaSessionMusicTransport(state)
     }
