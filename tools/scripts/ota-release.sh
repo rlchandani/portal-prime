@@ -90,8 +90,11 @@ ok "clean tree"
 branch="$(git symbolic-ref --short -q HEAD || true)"
 case " $RELEASE_BRANCHES " in
   *" $branch "*) ok "on $branch" ;;
-  *) die "release from one of: $RELEASE_BRANCHES (on: ${branch:-detached HEAD})" ;;
+  *) msg="release from one of: $RELEASE_BRANCHES (on: ${branch:-detached HEAD})"
+     [ "$dry_run" -eq 1 ] || die "$msg"
+     echo "  ! $msg; a real release would stop here" ;;
 esac
+[ -n "$branch" ] || die "detached HEAD"
 head_sha="$(git rev-parse HEAD)"
 
 gradle_file="app/build.gradle.kts"
