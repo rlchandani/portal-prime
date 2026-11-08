@@ -81,4 +81,19 @@ class MusicV3LibraryFilterTest {
     assertEquals("1 video you've liked on YouTube",
         MusicV3PlaylistFilter.liked(listOf(t("a")), songs = emptyList(), showAll = true).summary)
   }
+
+  @Test fun allHiddenExplainsWhyAndNamesAFewPlaylists() {
+    val tech = listOf(YtPlaylist("PL1", "3D", null, 9), YtPlaylist("PL2", "Flutter", null, 5),
+        YtPlaylist("PL3", "Insta360 Editing", null, 3))
+    val m = MusicV3PlaylistFilter.allHiddenMessage(tech)
+    assertEquals("No music playlists yet", m.title)
+    assertEquals("Your 3 playlists look like videos (3D, Flutter…), so they’re tucked away here. " +
+        "Make a playlist in YouTube Music and it shows up on this Portal.", m.detail)
+  }
+
+  @Test fun allHiddenWithOnePlaylistReadsNaturally() {
+    val m = MusicV3PlaylistFilter.allHiddenMessage(listOf(YtPlaylist("PL1", "Game clips", null, 4)))
+    assertEquals("Your playlist “Game clips” looks like videos, so it’s tucked away here. " +
+        "Make a playlist in YouTube Music and it shows up on this Portal.", m.detail)
+  }
 }

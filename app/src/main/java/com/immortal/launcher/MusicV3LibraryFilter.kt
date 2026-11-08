@@ -69,5 +69,24 @@ internal object MusicV3PlaylistFilter {
         if (songs.size < all.size) "Show all liked videos" else null)
   }
 
+  /**
+   * Every playlist was judged "not mostly music" (often tutorials or clips). Say that plainly and
+   * name a few, so it doesn't read as an error, and point to where music playlists come from.
+   */
+  fun allHiddenMessage(hidden: List<YtPlaylist>): MusicV3Message {
+    val tail = "Make a playlist in YouTube Music and it shows up on this Portal."
+    val detail = if (hidden.size == 1) {
+      "Your playlist “${hidden.first().title}” looks like videos, so it’s tucked away here. $tail"
+    } else {
+      val named = hidden.take(NAMED_PLAYLISTS).joinToString(", ") { it.title }
+      val more = if (hidden.size > NAMED_PLAYLISTS) "…" else ""
+      "Your ${hidden.size} playlists look like videos ($named$more), so they’re tucked away here. $tail"
+    }
+    return MusicV3Message("No music playlists yet", detail)
+  }
+
+  /** How many hidden playlists the empty state names. */
+  private const val NAMED_PLAYLISTS = 2
+
   private fun videoCount(count: Int): String = if (count == 1) "1 video" else "$count videos"
 }

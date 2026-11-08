@@ -80,8 +80,7 @@ internal fun MusicV3PlaylistsTab(
   }
   when {
     playlists.isEmpty() -> MusicV3Empty("music", MusicV3Message("No playlists yet", "Playlists you make on YouTube show up here."))
-    view.shown.isEmpty() -> MusicV3Empty("music", MusicV3Message("Every playlist is hidden",
-        "Playlists that aren't mostly music stay off this Portal."), action = toggle)
+    view.shown.isEmpty() -> MusicV3Empty("music", MusicV3PlaylistFilter.allHiddenMessage(playlists), action = toggle)
     else -> PlaylistGrid(view, toggle, onOpen, onChoose)
   }
 }
