@@ -28,6 +28,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -106,6 +107,13 @@ internal fun SettingsSplitShell(
         return "advancedSettings" in applied
     }
 
+    // Hoisted out of the LazyColumn builder (not a composable scope) so its identity survives a page
+    // switch; otherwise every sidebar row receives a new click handler and recomposes.
+    val selectPage = remember(onSelectPage) { { page: String -> query = ""; onSelectPage(page) } }
+    // Read by the sidebar rows, not the list builder (see settingsSidebarGroups).
+    val currentRoot = rememberUpdatedState(selectedRoot)
+    val selectedRootProvider = remember { { currentRoot.value } }
+
     fun pick(result: ApprovedSettingsSearchResult) {
         focus.clearFocus()
         query = ""
@@ -126,7 +134,7 @@ internal fun SettingsSplitShell(
                 if (query.isBlank()) {
                     LazyColumn(listModifier.focusGroup(),
                         contentPadding = PaddingValues(start = 28.dp, end = 28.dp, top = 8.dp, bottom = 40.dp)) {
-                        settingsSidebarGroups(selectedRoot) { page -> query = ""; onSelectPage(page) }
+                        settingsSidebarGroups(selectedRootProvider, selectPage)
                     }
                 } else {
                     SettingsSearchResults(query, results, queryToken, ::pick,
