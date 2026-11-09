@@ -345,6 +345,7 @@ class HomeActivity : ComponentActivity() {
   private var musicOpenRequest by mutableStateOf(0)
   private var pendingResumeIntent: Intent? = null
   private var cancelWebViewStartup: (() -> Unit)? = null
+  private var cancelMusicPrewarm: (() -> Unit)? = null
 
   /** Read-only navigation diagnostics; never simulate Android lifecycle callbacks to read state. */
   internal fun approvedCurrentTab(): ApprovedLauncherTab = launcherTab
@@ -510,6 +511,9 @@ class HomeActivity : ComponentActivity() {
     // arm the touch-renewed "you have the device" session. SleepScheduler owns that policy.
     SleepScheduler.onReturnedToLauncher(this)
     ApprovedHomeNavigation.resumed(this)
+    // Music's first open no longer pays Chromium's start-up: it happens here, once, at idle.
+    cancelMusicPrewarm?.invoke()
+    cancelMusicPrewarm = MusicPlayerPrewarm.scheduleForHome(applicationContext, window.decorView)
     if (BuildConfig.PORTAL_WEBVIEW_BACKGROUND_STARTUP) {
       cancelWebViewStartup?.invoke()
       cancelWebViewStartup =
@@ -520,6 +524,8 @@ class HomeActivity : ComponentActivity() {
   override fun onPause() {
     cancelWebViewStartup?.invoke()
     cancelWebViewStartup = null
+    cancelMusicPrewarm?.invoke()
+    cancelMusicPrewarm = null
     ApprovedHomeNavigation.unavailable(this)
     super.onPause()
     // Don't carry a pending overnight re-sleep into another activity or a real sleep.
