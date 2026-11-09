@@ -1,16 +1,18 @@
 # Settings interactions happen after the launcher starts; compile these hot paths.
 # Keep this scoped to Settings rather than marking the entire launcher as startup code.
+# Each page's composables run once per visit, so the JIT never sees them as hot: without
+# these rules a page switch interprets the whole page. Class wildcards cover the split-view
+# shell, page tree, page content files and the editors they reuse (*SettingsActivity / *Content).
 HPLcom/immortal/launcher/ImmortalSettingsActivity;->onCreate(Landroid/os/Bundle;)V
-HPLcom/immortal/launcher/ImmortalSettingsActivity$**;->**(**)**
-HPLcom/immortal/launcher/ImmortalSettingsActivityKt;->**(**)**
-HPLcom/immortal/launcher/ImmortalSettingsActivityKt$**;->**(**)**
-HPLcom/immortal/launcher/SettingsRendererKt;->**(**)**
-HPLcom/immortal/launcher/SettingsRendererKt$**;->**(**)**
-HPLcom/immortal/launcher/SettingsComponentsKt;->**(**)**
-HPLcom/immortal/launcher/SettingsComponentsKt$**;->**(**)**
-HPLcom/immortal/launcher/ApprovedSettingsShellKt;->**(**)**
-HPLcom/immortal/launcher/ApprovedSettingsShellKt$**;->**(**)**
-HPLcom/immortal/launcher/ApprovedSettingsRowsKt;->**(**)**
-HPLcom/immortal/launcher/ApprovedSettingsRowsKt$**;->**(**)**
-HPLcom/immortal/launcher/ApprovedSettingsNavigationKt;->**(**)**
-HPLcom/immortal/launcher/ApprovedSettingsNavigationKt$**;->**(**)**
+HPLcom/immortal/launcher/*Settings*;->**(**)**
+HPLcom/immortal/launcher/settings/**;->**(**)**
+HPLcom/immortal/launcher/ApprovedIconCatalogKt;->**(**)**
+HPLcom/immortal/launcher/ApprovedIconCatalogKt$**;->**(**)**
+HPLcom/immortal/launcher/HearthpaneMarkKt;->**(**)**
+HPLcom/immortal/launcher/HearthpaneMarkKt$**;->**(**)**
+HPLcom/immortal/launcher/FacePickerActivityKt;->**(**)**
+HPLcom/immortal/launcher/FacePickerActivityKt$**;->**(**)**
+HPLcom/immortal/launcher/TvFocusKt;->**(**)**
+HPLcom/immortal/launcher/TvFocusKt$**;->**(**)**
+HPLcom/immortal/launcher/ui/components/ReuseKt;->**(**)**
+HPLcom/immortal/launcher/ui/components/ReuseKt$**;->**(**)**
