@@ -14,10 +14,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.vectorResource
 
-// Only the eight literal, unqualified sidebar vectors are admitted. Resource tests guard
-// that contract. Neither the cache nor its immutable values retain a Context or Theme.
+// Only the literal, unqualified vectors of the top-level pages are admitted. Resource tests
+// guard that contract. Neither the cache nor its immutable values retain a Context or Theme.
 private val settingsSidebarVectors = SettingsIconCache<Configuration, ImageVector>(
-    ApprovedSettingsCategories.map { it.icon }.toSet(),
+    SettingsTree.topLevel.map { approvedIconResource(it.icon) }.toSet(),
 ) { Configuration(it) }
 
 /** Each composition owns its painter; only parsed vector data outlives a Settings window. */

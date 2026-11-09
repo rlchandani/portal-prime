@@ -19,32 +19,32 @@ class ApprovedSettingsChoiceSearchTest {
     }
 
     @Test fun celsiusFindsTemperatureUnit() {
-        find("Celsius", "immortal.weatherUnit", "weather")
+        find("Celsius", "immortal.weatherUnit", "w-weather")
     }
 
     @Test fun fahrenheitFindsTemperatureUnit() {
-        find("Fahrenheit", "immortal.weatherUnit", "weather")
+        find("Fahrenheit", "immortal.weatherUnit", "w-weather")
     }
 
     @Test fun clockFormatChoiceFindsAppearance() {
-        find("24-hour", "immortal.clockFormat", "appearance")
+        find("24-hour", "immortal.clockFormat", "display")
     }
 
     @Test fun photoStyleChoiceFindsStylePicker() {
-        find("Polaroid Scatter", "screensaver.mode", "styles")
+        find("Polaroid Scatter", "screensaver.mode", "frame")
     }
 
     @Test fun choiceTermsCombineWithControlTitle() {
-        find("temperature Celsius", "immortal.weatherUnit", "weather")
+        find("temperature Celsius", "immortal.weatherUnit", "w-weather")
     }
 
     @Test fun choiceMatchingKeepsCaseAndWhitespaceRules() {
-        find(" \t cELsiUs  temperature ", "immortal.weatherUnit", "weather")
+        find(" \t cELsiUs  temperature ", "immortal.weatherUnit", "w-weather")
     }
 
     @Test fun directTitleStillRanksAheadOfChoiceAlias() {
         val choice = index.single { it.id == "immortal.weatherUnit" }
-        val direct = ApprovedSettingsSearchResult("Celsius", "weather")
+        val direct = ApprovedSettingsSearchResult("Celsius", "w-weather", "test.celsius")
         assertEquals(listOf(direct, choice),
             approvedSettingsSearch(listOf(choice, direct), "Celsius"))
     }
@@ -54,7 +54,7 @@ class ApprovedSettingsChoiceSearchTest {
     }
 
     @Test fun existingGroupedTimeAliasesRemain() {
-        find("sunrise.minute", "sunrise.hour", "sunrise")
-        find("alarm.minute", "alarm.hour", "alarm")
+        find("sunrise.minute", "sunrise.hour", "alarms")
+        find("alarm.minute", "alarm.hour", "alarms")
     }
 }

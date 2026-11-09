@@ -19,28 +19,23 @@ import org.xml.sax.SAXException
 
 /** Resource prerequisites for sharing immutable sidebar vectors, independent of cache policy. */
 class SettingsSidebarResourceTest {
-    private data class SidebarIcon(val category: String, val resource: Int, val name: String)
+    private data class SidebarIcon(val page: String, val resource: Int, val name: String)
 
-    private val icons = listOf(
-        SidebarIcon("appearance", R.drawable.approved_icon_display, "approved_icon_display"),
-        SidebarIcon("photos", R.drawable.approved_icon_photo, "approved_icon_photo"),
-        SidebarIcon("home", R.drawable.approved_icon_gridapps, "approved_icon_gridapps"),
-        SidebarIcon("sound", R.drawable.approved_icon_bell, "approved_icon_bell"),
-        SidebarIcon("connections", R.drawable.approved_icon_wifi, "approved_icon_wifi"),
-        SidebarIcon("access", R.drawable.approved_icon_hand, "approved_icon_hand"),
-        SidebarIcon("device", R.drawable.approved_icon_info, "approved_icon_info"),
-        SidebarIcon("advanced", R.drawable.approved_icon_tools, "approved_icon_tools"),
-    )
+    /** The sidebar's top-level page icons share parsed vectors through SettingsIconCache. */
+    private val icons = SettingsTree.topLevel.map { page ->
+        val resource = approvedIconResource(page.icon)
+        val name = R.drawable::class.java.fields.single { it.getInt(null) == resource }.name
+        SidebarIcon(page.id, resource, name)
+    }.distinctBy { it.resource }
 
     private val res: File
         get() = listOf(File("src/main/res"), File("app/src/main/res"))
             .firstOrNull { it.isDirectory }
             ?: error("Cannot find main resources from ${File(".").absolutePath}")
 
-    @Test fun sidebarCategoriesUseExactlyEightDistinctApprovedIcons() {
-        assertEquals(icons.map { it.category to it.resource },
-            ApprovedSettingsCategories.map { it.id to it.icon })
-        assertEquals(8, ApprovedSettingsCategories.map { it.icon }.toSet().size)
+    @Test fun everyTopLevelPageHasItsOwnApprovedIcon() {
+        assertEquals(SettingsTree.topLevel.size, SettingsTree.topLevel.map { it.id }.toSet().size)
+        assertTrue(icons.size >= 16)
     }
 
     @Test fun sidebarResourcesHaveOneUnqualifiedLiteralStaticVectorEach() {

@@ -66,10 +66,10 @@ internal fun AlmanacSettingsContent() {
     }
   }
   Text("Adds optional daily lines to the Classic screensaver’s ambient dashboard. " +
-      "Choose Classic and enable Ambient dashboard in Slideshow settings.",
+      "Choose Classic and enable Ambient dashboard in Photo Frame.",
       color = IosSecondary, fontSize = Sizes.rowSub)
   Card {
-    NavRow("Slideshow settings") { navigate(approvedSettingsRoute("screensaver")) }
+    NavRow("Photo Frame") { navigate(approvedSettingsRoute(SettingsPageIds.FRAME, "screensaver.ambientDashboard")) }
   }
   val current = snapshot
   if (current == null && !failed) Text("Loading Almanac settings…", color = IosSecondary)

@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.semantics
@@ -55,6 +54,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 internal val LocalApprovedRequestedControl = staticCompositionLocalOf<String?> { null }
+
+private const val DISABLED_SWITCH_ALPHA = .38f
+private val SWITCH_THUMB_RING = Color(0x26000000)
 internal val LocalApprovedSettingsHelp = staticCompositionLocalOf<String?> { null }
 
 @Composable
@@ -118,7 +120,8 @@ internal fun ApprovedSettingsSwitch(
     Box(
         modifier.size(66.dp, 40.dp)
             .then(action)
-            .alpha(if (!enabled && colors == null) .38f else 1f)
+            // Alpha only when disabled: an always-on alpha layer costs a GPU pass per switch.
+            .then(if (!enabled && colors == null) Modifier.alpha(DISABLED_SWITCH_ALPHA) else Modifier)
             .clip(shape)
             .background(track)
             .border(1.dp, border, shape)
@@ -126,7 +129,8 @@ internal fun ApprovedSettingsSwitch(
     ) {
         Box(Modifier.offset(x = if (checked) 30.dp else 4.dp, y = 4.dp)
             .size(32.dp)
-            .shadow(2.dp, RoundedCornerShape(16.dp))
+            // A pre-drawn ring instead of a per-thumb shadow layer (perf report, settings rows).
+            .border(1.dp, SWITCH_THUMB_RING, RoundedCornerShape(16.dp))
             .background(thumb, RoundedCornerShape(16.dp)))
     }
 }
@@ -150,7 +154,7 @@ internal fun ApprovedSettingsBackButton(label: String, modifier: Modifier = Modi
     ) {
         ApprovedIcon("chevL", tint = IosBlue, modifier = Modifier.size(26.dp))
         Text(label, color = IosBlue, fontSize = 24.sp, fontWeight = FontWeight.Medium,
-            lineHeight = 32.sp)
+            lineHeight = 32.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
     }
 }
 

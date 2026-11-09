@@ -6,112 +6,112 @@
  */
 package com.immortal.launcher
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
+/** Ranking and matching of the split-view search (pure, over hand-made and real indexes). */
 class ApprovedSettingsSearchMatchingTest {
-    private fun result(title: String, key: String = title, help: String = "", page: String = "display") =
-        ApprovedSettingsSearchResult(title, page, "test", key, help)
+    private val index = approvedSettingsSearchIndex()
 
-    @Test fun registrySectionAndTitleCanBeCombinedInAQuery() {
-        assertEquals("calendar.side", approvedSettingsSearch(approvedSettingsSearchIndex(),
-            "screensaver widget position").single().id)
-    }
-    @Test fun sectionSearchFindsAllCalendarWidgetControlsWithoutTheSharedFeed() {
-        val ids = approvedSettingsSearch(approvedSettingsSearchIndex(), "screensaver widget")
-            .map { it.id }
-        assertTrue(ids.containsAll(listOf("calendar.widgetOn", "calendar.range", "calendar.size", "calendar.side")))
-        assertFalse(ids.contains("calendar.url"))
-    }
-    @Test fun sectionTermsRemainCaseInsensitiveAndWhitespaceIndependent() {
-        val field = ApprovedSettingsSearchResult("Position", "calendar", "calendar", "side",
-            section = "Screensaver widget")
-        assertEquals(listOf(field), approvedSettingsSearch(listOf(field), "  POSITION \t widget  screensaver "))
-    }
-    @Test fun directTitlesStayAheadOfSectionContextMatches() {
-        val contextual = ApprovedSettingsSearchResult("Position", "calendar", section = "Screensaver widget")
-        val direct = result("Screensaver widget")
-        assertEquals(listOf(direct, contextual), approvedSettingsSearch(listOf(contextual, direct), "screensaver widget"))
-    }
-    @Test fun sectionContextDoesNotIgnoreAnUnmatchedTerm() {
-        val field = ApprovedSettingsSearchResult("Position", "calendar", section = "Screensaver widget")
-        assertTrue(approvedSettingsSearch(listOf(field), "screensaver nonexistent").isEmpty())
-    }
-    @Test fun calendarResultExplainsItsScreensaverScopeWithoutChangingTheRoute() {
-        val field = approvedSettingsSearchIndex().single { it.id == "calendar.side" }
-        assertEquals("Calendar · Screensaver widget", approvedSettingsSearchBreadcrumb(field))
-        assertEquals("calendar", field.page)
-        assertFalse(field.advanced)
-    }
-    @Test fun breadcrumbDoesNotRepeatThePageNameWithDifferentCase() {
-        val field = ApprovedSettingsSearchResult("Position", "calendar", section = "calendar")
-        assertEquals("Calendar", approvedSettingsSearchBreadcrumb(field))
-    }
-    @Test fun resultsWithoutSectionsKeepTheirExistingPageContext() {
-        assertEquals("Display", approvedSettingsSearchBreadcrumb(result("Brightness")))
-    }
+    private fun result(title: String, control: String? = title, keywords: String = "", crumb: String = "Display & Brightness") =
+        ApprovedSettingsSearchResult(title, "display", control, crumb, keywords)
+
     @Test fun reversedWordsFindTheSameSetting() {
         val voice = result("Greeting voice")
         assertEquals(listOf(voice), approvedSettingsSearch(listOf(voice), "voice greeting"))
     }
-    @Test fun repeatedWhitespaceDoesNotChangeTheQuery() {
+
+    @Test fun repeatedWhitespaceAndCaseDoNotChangeTheQuery() {
         val clock = result("Clock face")
-        assertEquals(listOf(clock), approvedSettingsSearch(listOf(clock), "  clock  \t face  "))
+        assertEquals(listOf(clock), approvedSettingsSearch(listOf(clock), "  CLOCK  \t face  "))
     }
-    @Test fun termsCanSpanTheTitleAndItsHelp() {
-        val setting = result("Brightness", help = "Reduce glare at night")
+
+    @Test fun termsCanSpanTheTitleKeywordsAndBreadcrumb() {
+        val setting = result("Brightness", keywords = "Reduce glare at night")
         assertEquals(listOf(setting), approvedSettingsSearch(listOf(setting), "night brightness"))
+        assertEquals(listOf(setting), approvedSettingsSearch(listOf(setting), "display brightness"))
     }
-    @Test fun everyTermIsRequired() {
+
+    @Test fun everyTermIsRequiredAndBlankFindsNothing() {
         val setting = result("Brightness")
         assertTrue(approvedSettingsSearch(listOf(setting), "brightness nonexistent").isEmpty())
+        assertTrue(approvedSettingsSearch(listOf(setting), " \t ").isEmpty())
     }
-    @Test fun exactTitleSurvivesTheTwelveResultLimit() {
-        val incidental = (1..15).map { result("Other $it", help = "Brightness adjustment") }
-        val direct = result("Brightness")
-        val found = approvedSettingsSearch(incidental + direct, "brightness")
-        assertEquals(direct, found.first())
-        assertEquals(12, found.size)
+
+    @Test fun hyphensAreIgnoredSoDashedNamesMatch() {
+        val token = result("Long-lived token")
+        assertSame(token, approvedSettingsSearch(listOf(token), "token longlived").single())
+        assertSame(token, approvedSettingsSearch(listOf(token), "long-lived").single())
     }
-    @Test fun directTitlesComeBeforeIncidentalHelpMatches() {
-        val metadata = result("Wallpaper", help = "Clock settings")
+
+    @Test fun exactThenPrefixThenContainsThenOtherMatches() {
+        val metadata = result("Wallpaper", keywords = "Clock settings")
         val contains = result("Photo clock")
         val prefix = result("Clock face")
         val exact = result("Clock")
         assertEquals(listOf(exact, prefix, contains, metadata),
             approvedSettingsSearch(listOf(metadata, contains, prefix, exact), "clock"))
     }
-    @Test fun equalRelevanceKeepsRegistryOrder() {
-        val first = result("Other one", help = "Brightness settings")
-        val second = result("Other two", help = "Brightness settings")
+
+    @Test fun equalRelevanceKeepsIndexOrder() {
+        val first = result("Other one", keywords = "Brightness settings")
+        val second = result("Other two", keywords = "Brightness settings")
         assertEquals(listOf(first, second), approvedSettingsSearch(listOf(first, second), "brightness"))
     }
-    @Test fun blankInputHasNoResults() {
-        assertTrue(approvedSettingsSearch(listOf(result("Brightness")), " \t ").isEmpty())
+
+    @Test fun resultsAreCappedButTheExactTitleSurvives() {
+        val incidental = (1..40).map { result("Other $it", control = "c$it", keywords = "Brightness adjustment") }
+        val direct = result("Brightness")
+        val found = approvedSettingsSearch(incidental + direct, "brightness")
+        assertEquals(direct, found.first())
+        assertEquals(24, found.size)
     }
-    @Test fun technicalSettingIdentifiersRemainSearchable() {
-        val field = ApprovedSettingsSearchResult("Brightness", "display", "display", "brightness")
-        assertEquals(listOf(field), approvedSettingsSearch(listOf(field), "display.brightness"))
+
+    @Test fun pagesRankJustAheadOfRowsWithTheSameTitleMatch() {
+        val row = result("Sounds", control = "x.sounds")
+        val page = ApprovedSettingsSearchResult("Sounds", "sounds", null, "Page")
+        assertEquals(listOf(page, row), approvedSettingsSearch(listOf(row, page), "sounds"))
     }
-    @Test fun matchingRemainsCaseInsensitive() {
-        val voice = result("Greeting voice")
-        assertEquals(listOf(voice), approvedSettingsSearch(listOf(voice), "VOICE GREETING"))
+
+    @Test fun aliasesRankAfterRealRowsAndAreDroppedWhenTheRowIsListed() {
+        val real = ApprovedSettingsSearchResult("Sleep timer", "night", "screensaver.sleepTimerEnabled", "Night & Sleep")
+        val alias = ApprovedSettingsSearchResult("Sleep timer", "night", "screensaver.sleepTimerEnabled",
+            "Was Device → Night & Sleep", alias = true)
+        assertEquals(listOf(real), approvedSettingsSearch(listOf(alias, real), "sleep timer"))
+        val otherAlias = ApprovedSettingsSearchResult("Slideshow", "frame", null, "Was Photos → Photo Frame", alias = true)
+        val row = ApprovedSettingsSearchResult("Slideshow speed", "frame", "frame.speed", "Photo Frame")
+        assertEquals(listOf(row, otherAlias), approvedSettingsSearch(listOf(otherAlias, row), "slideshow"))
     }
-    @Test fun reorderedTermsRetainAdvancedAndManagedMetadata() {
-        val field = ApprovedSettingsSearchResult("Long-lived token", "ha", "ha", "token", "Connect native controls", automatic = true)
+
+    @Test fun matchingKeepsAdvancedAndManagedMetadata() {
+        val field = ApprovedSettingsSearchResult("Long-lived token", "ha", "ha.token", "Home Assistant",
+            advanced = true, automatic = true)
         val found = approvedSettingsSearch(listOf(field), "token long-lived").single()
         assertSame(field, found)
         assertTrue(found.advanced)
         assertTrue(found.automatic)
+        assertEquals("Home Assistant · Automatic", approvedSettingsSearchBreadcrumb(found))
     }
-    @Test fun pageTitlesParticipateInMatching() {
-        val field = result("Brightness")
-        assertEquals(listOf(field), approvedSettingsSearch(listOf(field), "display brightness"))
+
+    @Test fun realIndexFindsDirectControlsFirst() {
+        assertEquals("display.nightShift", approvedSettingsSearch(index, "night shift").first().id)
+        assertEquals("welcome.voice", approvedSettingsSearch(index, "voice greeting").first().id)
+        assertEquals("display.brightness", approvedSettingsSearch(index, "brightness").first().id)
     }
-    @Test fun realRegistryFindsGreetingVoiceWithReversedWords() {
-        assertEquals("welcome.voice", approvedSettingsSearch(approvedSettingsSearchIndex(), "voice greeting").first().id)
+
+    @Test fun realIndexCombinesSectionAndTitle() {
+        val position = approvedSettingsSearch(index, "photo frame position").map { it.id }
+        assertTrue(position.toString(), "calendar.side" in position)
+        val calendar = index.single { it.id == "calendar.side" }
+        assertEquals("Widgets & Calendar › Calendar › Photo frame", calendar.crumb)
+        assertEquals("w-calendar", calendar.page)
+        assertFalse(calendar.advanced)
     }
-    @Test fun realRegistryPutsTheDirectNightShiftControlFirst() {
-        assertEquals("display.nightShift", approvedSettingsSearch(approvedSettingsSearchIndex(), "night shift").first().id)
+
+    @Test fun technicalIdsStaySearchable() {
+        assertEquals("display.brightness", approvedSettingsSearch(index, "display.brightness").first().id)
     }
 }

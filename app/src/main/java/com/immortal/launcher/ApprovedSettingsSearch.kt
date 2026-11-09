@@ -7,185 +7,185 @@
 
 package com.immortal.launcher
 
-import android.content.Context
 import com.immortal.launcher.settings.BoolSpec
 import com.immortal.launcher.settings.DerivedSpec
 import com.immortal.launcher.settings.EnumSpec
-import com.immortal.launcher.settings.Entry
 import com.immortal.launcher.settings.IntSpec
 import com.immortal.launcher.settings.NavSpec
-import com.immortal.launcher.settings.SettingsDomain
+import com.immortal.launcher.settings.SettingSpec
 import com.immortal.launcher.settings.SettingsPresentation
 import com.immortal.launcher.settings.SettingsRegistry
-import com.immortal.launcher.settings.SettingSpec
 import com.immortal.launcher.settings.StringSpec
 
+/** One searchable page or row. [control] is null for a page; picking a row scrolls to and highlights it. */
 internal data class ApprovedSettingsSearchResult(
     val title: String,
     val page: String,
-    val domain: String = "",
-    val key: String = "",
-    val help: String = "",
-    val automatic: Boolean = false,
-    val section: String = "",
+    val control: String? = null,
+    val crumb: String = "",
+    /** Ids, option labels and synonyms; these rank above help-text and breadcrumb matches. */
     val keywords: String = "",
+    val advanced: Boolean = false,
+    /** An old name that now lives elsewhere ("Slideshow" → Photo Frame). */
+    val alias: Boolean = false,
+    /** A read-only value the app manages for you. */
+    val automatic: Boolean = false,
+    val help: String = "",
 ) {
-    val id: String get() = if (domain.isEmpty()) "" else "$domain.$key"
-    val advanced: Boolean get() = SettingsPresentation.isAdvancedPage(page) ||
-        (domain.isNotEmpty() && SettingsPresentation.isAdvanced(domain, key))
+    /** Kept for callers that expect a blank id for page results. */
+    val id: String get() = control.orEmpty()
 }
 
-/** Routes correspond to the controls actually rendered by each native page body. */
-internal fun approvedPageForControl(domain: String, key: String): String? = when (domain) {
-    "immortal" -> when (key) {
-        "advancedSettings" -> "advanced"
-        "settingsTheme", "tileSize", "showMiniPlayer", "hideStatusBar", "clockFormat" -> "appearance"
-        "weatherUnit", "weatherWidget" -> "weather"
-        "stayInStartupApp" -> "boot"
-        "multiRoomEnabled", "snapcastHost", "maPort", "maUsername", "maPassword",
-        "maApiToken", "maPlayerId" -> "multiroom"
-        else -> null
-    }
-    "screensaver" -> when (key) {
-        "mode", "screensaverStyle" -> "styles"
-        "clockFace" -> "faces"
-        "photoSource", "albumRefreshMin" -> "sources"
-        "dismissTarget" -> "dismiss"
-        "sleepTimerEnabled", "sleepTimerMin", "pauseAudioOnSleep", "closeAppOnSleep" -> "sleep"
-        else -> "screensaver"
-    }
-    "calendar" -> if (key == "url") "calendar-url" else "calendar"
-    "calendarpacks" -> "almanac"
-    "digitalclock" -> "clock"
-    "fleet" -> "device"
-    "home_dashboard" -> "ha"
-    "followme" -> "music"
-    else -> approvedSettingsPage(domain)?.id
-}
-
-/** Registry navigation and atomic editors own their Activity; search uses that same destination. */
-private fun approvedPageForSpec(domain: String, spec: SettingSpec<*>): String? {
-    val activity = when (spec) {
-        is NavSpec<*> -> spec.activity
-        is StringSpec<*> -> (spec.entry as? Entry.Nav)?.activity
-        else -> null
-    }
-    return if (activity != null) {
-        ApprovedSettingsPages.firstOrNull { it.standaloneActivity == activity }?.id
-    } else {
-        approvedPageForControl(domain, spec.key)
-    }
-}
-
-/** Registry titles/help plus native editor field names. No fixture values or credentials. */
-internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> =
-    FramePerformanceCapture.measureSettingsSearchIndex {
-        val entries = mutableListOf<ApprovedSettingsSearchResult>()
-        ApprovedSettingsPages.forEach { entries += ApprovedSettingsSearchResult(it.title, it.id) }
-        SettingsRegistry.domains.forEach { raw ->
-            @Suppress("UNCHECKED_CAST")
-            val domain = raw as SettingsDomain<Any>
-            domain.specs.forEach { spec ->
-                // One native Wake time row edits both persisted scalars.
-                if (domain.id == "sunrise" && spec.key == "minute") return@forEach
-                val title: String
-                val help: String?
-                when (spec) {
-                    is BoolSpec<*> -> { title = spec.title; help = spec.help }
-                    is IntSpec<*> -> { title = spec.title; help = spec.help }
-                    is EnumSpec<*> -> { title = spec.title; help = spec.help }
-                    is StringSpec<*> -> { title = spec.title; help = spec.help }
-                    is NavSpec<*> -> { title = spec.title; help = spec.help }
-                    is DerivedSpec<*> -> return@forEach
-                }
-                // Registry visibility remains authoritative. Hidden managed controls appear in
-                // the read-only audit; conditional controls remain searchable with prerequisites.
-                val managed = "${domain.id}.${spec.key}" in ApprovedManagedControls
-                val page = (if (managed) "managed" else approvedPageForSpec(domain.id, spec))
-                    ?: return@forEach
-                val wakeTime = domain.id == "sunrise" && spec.key == "hour"
-                entries += ApprovedSettingsSearchResult(if (wakeTime) "Wake time" else title, page,
-                    domain.id, spec.key, help.orEmpty(), managed, domain.sections[spec.key].orEmpty(),
-                    keywords = listOfNotNull(
-                        if (wakeTime) "hour minute sunrise.minute" else null,
-                        (spec as? EnumSpec<*>)?.options?.joinToString(" ") { it.second },
-                    ).joinToString(" "))
-            }
-        }
-        entries += ApprovedNativeSettingsFields
-        entries.distinctBy { it.id.ifBlank { "page:${it.page}" } }
-    }
-
-/** Page results show their parent; individual controls keep their page and section context. */
-internal fun approvedSettingsSearchBreadcrumb(result: ApprovedSettingsSearchResult): String {
-    val page = approvedSettingsPage(result.page)
-    val pageTitle = page?.title.orEmpty()
-    val context = if (page != null && !result.title.equals(pageTitle, ignoreCase = true)) {
-        pageTitle
-    } else {
-        val category = page?.let { approvedSettingsCategory(it.id) } ?: result.page
-        ApprovedSettingsCategories.firstOrNull { it.id == category }?.title.orEmpty()
-    }
-    val section = result.section.takeUnless {
-        it.equals(pageTitle, ignoreCase = true) || it.equals(context, ignoreCase = true)
-    }.orEmpty()
-    return listOf(context, section).filter { it.isNotBlank() }.joinToString(" · ")
-}
-
-private const val SETTINGS_SEARCH_RESULT_LIMIT = 12
-private val SETTINGS_SEARCH_WHITESPACE = Regex("\\s+")
-
-/** Every word must match; bounded relevance buckets keep direct titles ahead of incidental text. */
-internal fun approvedSettingsSearch(index: List<ApprovedSettingsSearchResult>, query: String): List<ApprovedSettingsSearchResult> {
-    if (query.isBlank()) return emptyList()
-    val terms = query.trim().split(SETTINGS_SEARCH_WHITESPACE)
-    val phrase = terms.joinToString(" ")
-    val buckets = Array(5) { mutableListOf<ApprovedSettingsSearchResult>() }
-    for (result in index) {
-        val titleMatches = terms.all { result.title.contains(it, ignoreCase = true) }
-        val aliasText = if (result.keywords.isBlank()) null
-            else "${result.title} ${result.id} ${result.keywords}"
-        val aliasMatches = aliasText != null && terms.all { aliasText.contains(it, ignoreCase = true) }
-        if (!titleMatches && !aliasMatches) {
-            val text = "${result.title} ${result.id} ${result.help} ${result.section} ${result.keywords} ${approvedSettingsPage(result.page)?.title.orEmpty()}"
-            if (!terms.all { text.contains(it, ignoreCase = true) }) continue
-        }
-        val rank = when {
-            result.title.equals(phrase, ignoreCase = true) -> 0
-            result.title.startsWith(phrase, ignoreCase = true) -> 1
-            titleMatches -> 2
-            aliasMatches -> 3
-            else -> 4
-        }
-        if (buckets[rank].size < SETTINGS_SEARCH_RESULT_LIMIT) buckets[rank] += result
-    }
-    return buckets.asSequence().flatMap { it.asSequence() }.take(SETTINGS_SEARCH_RESULT_LIMIT).toList()
-}
-
+/** Read-only values shown on the Automatically managed page (hidden registry specs). */
 internal val ApprovedManagedControls = setOf(
     "screensaver.cacheBudgetGb", "screensaver.antiBurnIn",
     "mqtt.validateCert", "digitalclock.style", "digitalclock.color", "digitalclock.font",
     "digitalclock.glow",
 )
 
-internal fun approvedSettingsPrerequisite(context: Context, control: String): String? {
+private const val SEARCH_RESULT_LIMIT = 24
+private const val KEYWORD_ONLY = 3.0
+private const val CRUMB_SEPARATOR = " › "
+private val SEARCH_WHITESPACE = Regex("\\s+")
+private val HYPHENS = Regex("[-‑]")
+
+/** Title, help and option labels of a registry spec; null for derived values. */
+internal fun settingsSpecText(spec: SettingSpec<*>): Triple<String, String, String>? = when (spec) {
+    is BoolSpec<*> -> Triple(spec.title, spec.help.orEmpty(), "")
+    is IntSpec<*> -> Triple(spec.title, spec.help.orEmpty(), "")
+    is EnumSpec<*> -> Triple(spec.title, spec.help.orEmpty(), spec.options.joinToString(" ") { it.second })
+    is StringSpec<*> -> Triple(spec.title, spec.help.orEmpty(), "")
+    is NavSpec<*> -> Triple(spec.title, spec.help.orEmpty(), "")
+    is DerivedSpec<*> -> null
+}
+
+/** Every registry control a block or row list covers, as `domain.key` with its spec. */
+internal fun settingsClaimedSpecs(block: SettingsBlock): List<Pair<String, SettingSpec<*>>> =
+    SettingsRegistry.domains.flatMap { domain ->
+        domain.specs.filter { it !is DerivedSpec<*> && block.claimsControl("${domain.id}.${it.key}") }
+            .map { "${domain.id}.${it.key}" to it }
+    }
+
+/** The registry's presentation policy for a `domain.key` id (native ids share the namespace). */
+internal fun settingsControlIsAdvanced(id: String): Boolean =
+    SettingsPresentation.isAdvanced(id.substringBefore('.'), id.substringAfter('.'))
+
+private fun pageCrumb(page: String): String =
+    SettingsTree.chainOf(page).mapNotNull { SettingsTree.page(it)?.title }.joinToString(CRUMB_SEPARATOR)
+
+private fun specResult(id: String, spec: SettingSpec<*>, page: String, crumb: String, advanced: Boolean):
+    ApprovedSettingsSearchResult? {
+    val (title, help, options) = settingsSpecText(spec) ?: return null
+    // One Wake time editor writes both sunrise scalars; the minute has no row of its own.
+    if (id == "sunrise.minute") return null
+    val wakeTime = id == "sunrise.hour"
+    return ApprovedSettingsSearchResult(
+        title = if (wakeTime) "Wake time" else title, page = page, control = id, crumb = crumb,
+        keywords = listOf(id, options, if (wakeTime) "hour minute sunrise.minute" else "").joinToString(" "),
+        advanced = advanced || settingsControlIsAdvanced(id),
+        automatic = id in ApprovedManagedControls,
+        help = help,
+    )
+}
+
+private fun sectionResults(page: String, section: SettingsSection, pageAdvanced: Boolean): List<ApprovedSettingsSearchResult> {
+    val crumb = listOfNotNull(pageCrumb(page), section.header).joinToString(CRUMB_SEPARATOR)
+    val advanced = pageAdvanced || section.advanced
+    return section.items.flatMap { item ->
+        when (item) {
+            is SettingsDomainRows -> item.keys.mapNotNull { key ->
+                SettingsRegistry.domain(item.domain)?.specs?.firstOrNull { it.key == key }
+                    ?.let { specResult("${item.domain}.$key", it, page, crumb, advanced) }
+            }
+            is SettingsBlockItem -> item.block.rows.map {
+                ApprovedSettingsSearchResult(it.title, page, it.id, crumb, "${it.id} ${it.keywords}",
+                    advanced || it.advanced || settingsControlIsAdvanced(it.id))
+            } + settingsClaimedSpecs(item.block).mapNotNull { (id, spec) -> specResult(id, spec, page, crumb, advanced) }
+            is SettingsLinkItem -> listOf(ApprovedSettingsSearchResult(item.title, page, item.key, crumb,
+                item.keywords, advanced || SettingsTree.needsAdvanced(item.target)))
+            is SettingsExternalItem -> listOf(ApprovedSettingsSearchResult(item.title, page, item.key, crumb,
+                item.keywords, advanced, help = item.subtitle))
+        }
+    }
+}
+
+/** Every page and row of the tree (not only composed pages), plus old names as aliases. */
+internal fun approvedSettingsSearchIndex(): List<ApprovedSettingsSearchResult> =
+    FramePerformanceCapture.measureSettingsSearchIndex {
+        val entries = ArrayList<ApprovedSettingsSearchResult>()
+        SettingsTree.pages.forEach { page ->
+            val pageAdvanced = SettingsTree.needsAdvanced(page.id)
+            val parents = SettingsTree.chainOf(page.id).dropLast(1)
+                .mapNotNull { SettingsTree.page(it)?.title }.joinToString(CRUMB_SEPARATOR)
+            entries += ApprovedSettingsSearchResult(page.title, page.id, null, parents.ifEmpty { "Page" },
+                page.keywords, pageAdvanced)
+            SettingsPageSections.of(page.id).forEach { entries += sectionResults(page.id, it, pageAdvanced) }
+        }
+        SettingsSearchAliases.forEach { alias ->
+            val target = SettingsTree.page(alias.page)?.title.orEmpty()
+            entries += ApprovedSettingsSearchResult(alias.oldName, alias.page, alias.control,
+                "Was ${alias.oldPlace} → $target", alias.oldPlace, SettingsTree.needsAdvanced(alias.page), alias = true)
+        }
+        entries
+    }
+
+/** Breadcrumb shown under a result. */
+internal fun approvedSettingsSearchBreadcrumb(result: ApprovedSettingsSearchResult): String =
+    result.crumb + if (result.automatic) " · Automatic" else ""
+
+private fun normalize(text: String) = text.lowercase().replace(HYPHENS, "")
+
+/**
+ * Every word must appear in the title, keywords, help or breadcrumb. Titles that start with the
+ * query rank first, then titles containing it, then keyword matches, then help/breadcrumb matches;
+ * old-name aliases rank after real rows, and are dropped when the same row is already listed.
+ */
+internal fun approvedSettingsSearch(
+    index: List<ApprovedSettingsSearchResult>,
+    query: String,
+): List<ApprovedSettingsSearchResult> {
+    val phrase = normalize(query.trim().replace(SEARCH_WHITESPACE, " "))
+    if (phrase.isBlank()) return emptyList()
+    val words = phrase.split(' ')
+    val scored = index.mapNotNull { entry ->
+        val title = normalize(entry.title)
+        val named = normalize("${entry.title} ${entry.keywords}")
+        val haystack = normalize("$named ${entry.help} ${entry.crumb}")
+        if (!words.all { it in haystack }) return@mapNotNull null
+        var score = when {
+            title == phrase -> 0.0
+            title.startsWith(phrase) -> 1.0
+            title.contains(phrase) -> 2.0
+            words.all { it in title } -> 2.5
+            words.all { it in named } -> KEYWORD_ONLY
+            else -> KEYWORD_ONLY + 0.5
+        }
+        if (entry.alias) score += 3.0
+        // A page whose title matches leads its rows; one matched only by keywords follows them.
+        if (entry.control == null) score += if (score < KEYWORD_ONLY) -0.5 else 0.5
+        score to entry
+    }.sortedBy { it.first }
+    val seen = HashSet<String>()
+    return scored.asSequence().map { it.second }
+        .filter { seen.add("${it.page}|${it.control.orEmpty()}") }
+        .take(SEARCH_RESULT_LIMIT).toList()
+}
+
+/** Why a highlighted row may be hidden, so search can explain instead of landing on nothing. */
+internal fun approvedSettingsPrerequisite(context: android.content.Context, control: String): String? {
     val domainId = control.substringBefore('.')
     val key = control.substringAfter('.', "")
     val raw = SettingsRegistry.domain(domainId) ?: return null
     @Suppress("UNCHECKED_CAST")
-    val domain = raw as SettingsDomain<Any>
+    val domain = raw as com.immortal.launcher.settings.SettingsDomain<Any>
     val spec = domain.specs.firstOrNull { it.key == key } ?: return null
     if (control in ApprovedManagedControls) return "This value is managed by the existing app and remains read-only."
-    if (domainId == "screensaver" && key != "enabled" && !ScreensaverConfig.load(context).enabled)
-        return "Turn on the photo-frame screensaver to change this setting."
-    // This legacy-hidden scalar is edited by the atomic Sources screen, not SettingsList.
-    if (domainId == "screensaver" && key == "albumRefreshMin")
-        return if (ScreensaverConfig.load(context).usesUrl) null
-            else "Choose a shared album source to change its refresh interval."
+    // Registry rows of the screensaver domain only show while the photo frame screensaver is on.
+    if (domainId == "screensaver" && key != "enabled" && SettingsPageSections.domainRowPage(control) != null &&
+        !ScreensaverConfig.load(context).enabled)
+        return "Turn on the photo frame screensaver in Photo Frame to change this setting."
     if (spec.visibleWhen(context, domain.load(context))) return null
     return when {
-        domainId == "immortal" && key in setOf("snapcastHost", "maPort", "maUsername", "maPassword",
-            "maApiToken", "maPlayerId") -> "Turn on multi-room audio to edit the Music Assistant connection."
         domainId == "calendar" -> "Add a calendar feed and turn on Show on screensaver to see these options."
         domainId == "digitalclock" -> "Turn on the digital clock to see this setting."
         key == "cacheEnabled" -> "Connect an Immich or WebDAV photo source to see cache settings."
@@ -193,93 +193,12 @@ internal fun approvedSettingsPrerequisite(context: Context, control: String): St
         key.startsWith("overnight") -> "Turn on Overnight screen-off to set its times."
         key.startsWith("sleepTimer") -> "Turn on Sleep timer to set its duration."
         key == "fit" -> "Choose the Classic screensaver style to change Fit."
-        key == "soundVolume" -> "Choose an ambient sound to set its volume."
+        key == "soundscapeVolume" -> "Choose an ambient sound to set its volume."
         domainId == "quickbar" -> "Turn on the app-switcher button to see this option."
         domainId == "chime" && key.startsWith("quiet") -> "Turn on Quiet hours to set its times."
         domainId == "chime" -> "Turn on the corresponding sound to see its options."
-        else -> "This setting depends on the parent options on this page."
+        domainId == "immortal" && (key.startsWith("ma") || key == "snapcastHost") ->
+            "Turn on multi-room audio to edit the Music Assistant connection."
+        else -> "This setting depends on the options above it on this page."
     }
 }
-
-private fun nativeField(id: String, title: String, page: String, keywords: String = "") =
-    ApprovedSettingsSearchResult(title, page, id.substringBefore('.'), id.substringAfter('.'),
-        keywords = keywords)
-
-/** Supplemental searchable names for atomic forms and native-only editors. */
-private val ApprovedNativeSettingsFields = listOf(
-    nativeField("display.brightness", "Brightness", "display"),
-    nativeField("display.auto", "Auto-brightness", "display"),
-    nativeField("display.mediaVolume", "Media volume", "display"),
-    nativeField("display.nightShift", "Night Shift", "display"),
-    nativeField("display.from", "From", "display"),
-    nativeField("display.until", "Until", "display"),
-    nativeField("display.warmth", "Warmth", "display"),
-    nativeField("display.touchSounds", "Touch sounds", "touch"),
-    nativeField("wallpaper.mode", "Background", "wallpaper"),
-    nativeField("wallpaper.grain", "Film grain", "wallpaper"),
-    nativeField("sources.selected", "Photo source", "sources"),
-    nativeField("sources.albumRefresh", "Refresh album", "sources"),
-    nativeField("immich.url", "Server address", "immich"),
-    nativeField("immich.key", "API key", "immich"),
-    nativeField("immich.album", "Album", "albums"),
-    nativeField("smb.host", "Server", "smb"),
-    nativeField("smb.share", "Share name", "smb"),
-    nativeField("smb.path", "Folder in the share", "smb"),
-    nativeField("smb.username", "Username", "smb"),
-    nativeField("smb.password", "Password", "smb"),
-    nativeField("dav.url", "WebDAV folder address", "dav"),
-    nativeField("dav.username", "Username (optional)", "dav"),
-    nativeField("dav.password", "Password (optional)", "dav"),
-    nativeField("web.url", "Web page address", "web"),
-    nativeField("album.url", "Shared album link", "album"),
-    nativeField("folder.path", "Folder", "folder"),
-    nativeField("screensaver.mode", "Screensaver style", "styles"),
-    nativeField("faces.enabled", "Show clock face", "faces"),
-    nativeField("faces.id", "Photo clock face", "faces"),
-    nativeField("faces.size", "Size", "faces"),
-    nativeField("dismiss.target", "Open when you tap to exit", "dismiss"),
-    nativeField("dismiss.haPath", "Home Assistant dashboard path", "dismiss"),
-    nativeField("welcome.voice", "Greeting voice", "welcome"),
-    nativeField("welcome.userName", "Your name", "welcome"),
-    nativeField("welcome.greetingNight", "Night greeting", "welcome"),
-    nativeField("welcome.greetingMorning", "Morning greeting", "welcome"),
-    nativeField("welcome.greetingAfternoon", "Afternoon greeting", "welcome"),
-    nativeField("welcome.greetingEvening", "Evening greeting", "welcome"),
-    nativeField("welcome.textScale", "Text size", "welcome"),
-    nativeField("welcome.opacity", "Background opacity", "welcome"),
-    nativeField("chime.voice", "Spoken-time voice", "chime"),
-    nativeField("sunrise.days", "Repeat on", "sunrise"),
-    nativeField("alarm.enabled", "Enabled", "alarm"),
-    nativeField("alarm.hour", "Alarm time", "alarm", keywords = "hour minute alarm.minute"),
-    nativeField("alarm.days", "Repeat on", "alarm"),
-    nativeField("countdowns.name", "Name", "countdowns"),
-    nativeField("countdowns.year", "Year", "countdowns"),
-    nativeField("countdowns.month", "Month", "countdowns"),
-    nativeField("countdowns.day", "Day", "countdowns"),
-    nativeField("countdowns.emoji", "Icon", "countdowns"),
-    nativeField("countdowns.repeat", "Repeats every year", "countdowns"),
-    nativeField("ha.url", "Base URL", "ha"),
-    nativeField("ha.token", "Long-lived token", "ha"),
-    nativeField("ha.search", "Search entities", "ha-entities"),
-    nativeField("world.city", "Search city", "world"),
-    nativeField("crypto.id", "CoinGecko id", "crypto"),
-    nativeField("crypto.symbol", "Display symbol (optional)", "crypto"),
-    nativeField("todo.item", "What needs doing?", "todo"),
-    nativeField("news.name", "Name (optional)", "news"),
-    nativeField("news.url", "RSS / Atom URL", "news"),
-    nativeField("stocks.symbol", "Symbol", "stocks"),
-    nativeField("alpaca.key", "API Key ID", "alpaca"),
-    nativeField("alpaca.secret", "API Secret Key", "alpaca"),
-    nativeField("options.type", "Contract type", "options"),
-    nativeField("options.deltaMin", "Delta min", "options"),
-    nativeField("options.deltaMax", "Delta max", "options"),
-    nativeField("options.expiry", "Expiry within (days)", "options"),
-    nativeField("options.symbol", "Symbol", "options"),
-    nativeField("camera.name", "Name (optional)", "cameras"),
-    nativeField("camera.url", "RTSP URL", "cameras"),
-    nativeField("lamp.brightness", "Brightness", "lamp"),
-    nativeField("lamp.warmth", "Warmth", "lamp"),
-    nativeField("lamp.red", "Red night light", "lamp"),
-    nativeField("intercom.address", "Other Portal’s address", "intercom"),
-    nativeField("debug.enabled", "Debug Mode", "debug"),
-)

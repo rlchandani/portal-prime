@@ -88,18 +88,18 @@ internal fun ScreensaverSourcesContent(onDone: () -> Unit) {
         Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
             SourceTile("Hearthpane photos", "A calming built-in photo feed. No setup needed.",
                 settings.source == ScreensaverConfig.SOURCE_DEFAULT,
-                "photo", Modifier.weight(1f)) {
+                "photo", SettingsTileColors.EMBER, Modifier.weight(1f)) {
                 ScreensaverConfig.useDefault(context)
                 onDone()
             }
             SourceTile("My photos & videos", "Choose a photo folder on your Portal.",
-                settings.usesFolder, "folder", Modifier.weight(1f)) { openSource("folder") }
+                settings.usesFolder, "folder", SettingsTileColors.GOLD, Modifier.weight(1f)) { openSource("folder") }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(22.dp)) {
             SourceTile("Shared album link", "Use an iCloud, Google Photos or Synology share link.",
-                settings.usesUrl, "link", Modifier.weight(1f)) { openSource("album") }
+                settings.usesUrl, "link", SettingsTileColors.BLUE, Modifier.weight(1f)) { openSource("album") }
             SourceTile("Connect your phone", "Set up photos from another device on your Wi-Fi.",
-                false, "phone", Modifier.weight(1f)) { openSource("phone") }
+                false, "phone", SettingsTileColors.LIME, Modifier.weight(1f)) { openSource("phone") }
         }
     }
     if (settings.source != ScreensaverConfig.SOURCE_DEFAULT) {
@@ -144,7 +144,7 @@ internal fun ScreensaverSourcesContent(onDone: () -> Unit) {
 
 @Composable
 private fun SourceTile(
-    title: String, description: String, selected: Boolean, icon: String,
+    title: String, description: String, selected: Boolean, icon: String, tileColor: Long,
     modifier: Modifier, onClick: () -> Unit,
 ) {
     val palette = LocalApprovedPalette.current
@@ -156,7 +156,8 @@ private fun SourceTile(
             .tvFocusable(shape, focusScale = 1f, ringColor = palette.accent, onClick = onClick)) {
         Row(Modifier.padding(30.dp), horizontalArrangement = Arrangement.spacedBy(23.dp),
             verticalAlignment = Alignment.CenterVertically) {
-            Surface(color = palette.accent, shape = RoundedCornerShape(17.dp)) {
+            // A fixed tile colour: the dark theme's accent is white, which hid the white glyph.
+            Surface(color = androidx.compose.ui.graphics.Color(tileColor), shape = RoundedCornerShape(17.dp)) {
                 ApprovedIcon(icon,
                     tint = androidx.compose.ui.graphics.Color.White,
                     modifier = Modifier.size(64.dp).padding(14.dp))

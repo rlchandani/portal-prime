@@ -11,7 +11,7 @@ import org.junit.Test
 
 class HomeDashboardNavigationTest {
     @Test fun dashboardAddressSearchOpensThePageThatRendersItsRegistryRow() {
-        assertEquals("ha", approvedPageForControl("home_dashboard", "url"))
+        assertEquals("ha", settingsControlHome("home_dashboard.url"))
         val result = approvedSettingsSearchIndex().single { it.id == "home_dashboard.url" }
         assertEquals("ha", result.page)
         assertEquals("Dashboard address", result.title)

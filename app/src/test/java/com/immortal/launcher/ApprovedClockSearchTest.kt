@@ -24,32 +24,32 @@ class ApprovedClockSearchTest {
     }
 
     @Test fun visibleAlarmTimeIsSearchable() {
-        assertTime("Alarm time", "Alarm time", "alarm.hour", "alarm")
+        assertTime("Alarm time", "Alarm time", "alarm.hour", "alarms")
     }
 
     @Test fun visibleWakeTimeIsSearchable() {
-        assertTime("Wake time", "Wake time", "sunrise.hour", "sunrise")
-        assertEquals("Time", index.single { it.id == "sunrise.hour" }.section)
+        assertTime("Wake time", "Wake time", "sunrise.hour", "alarms")
+        assertEquals("Alarms & Wake", index.single { it.id == "sunrise.hour" }.crumb)
     }
 
     @Test fun oldAlarmHourAndMinuteQueriesReachOneVisibleEditor() {
         listOf("alarm hour", "alarm minute").forEach {
-            assertTime(it, "Alarm time", "alarm.hour", "alarm")
+            assertTime(it, "Alarm time", "alarm.hour", "alarms")
         }
     }
 
     @Test fun oldSunriseHourAndMinuteQueriesReachOneVisibleEditor() {
         listOf("sunrise hour", "sunrise minute").forEach {
-            assertTime(it, "Wake time", "sunrise.hour", "sunrise")
+            assertTime(it, "Wake time", "sunrise.hour", "alarms")
         }
     }
 
     @Test fun originalTechnicalIdsRemainSearchableAliases() {
         listOf("alarm.hour", "alarm.minute").forEach {
-            assertTime(it, "Alarm time", "alarm.hour", "alarm")
+            assertTime(it, "Alarm time", "alarm.hour", "alarms")
         }
         listOf("sunrise.hour", "sunrise.minute").forEach {
-            assertTime(it, "Wake time", "sunrise.hour", "sunrise")
+            assertTime(it, "Wake time", "sunrise.hour", "alarms")
         }
     }
 
@@ -65,12 +65,12 @@ class ApprovedClockSearchTest {
     @Test fun groupingSearchLeavesBothRegistryScalarsIntact() {
         val keys = SettingsRegistry.domain("sunrise")!!.specs.map { it.key }
         assertTrue(keys.containsAll(listOf("hour", "minute")))
-        assertEquals("sunrise", approvedPageForControl("sunrise", "hour"))
-        assertEquals("sunrise", approvedPageForControl("sunrise", "minute"))
+        assertEquals("alarms", settingsControlHome("sunrise.hour"))
+        assertEquals("alarms", settingsControlHome("sunrise.minute"))
     }
 
     @Test fun visibleNamesKeepUnorderedCaseAndWhitespaceMatching() {
-        assertTime("  TIME \t aLaRm  ", "Alarm time", "alarm.hour", "alarm")
-        assertTime("  time \t WAKE  ", "Wake time", "sunrise.hour", "sunrise")
+        assertTime("  TIME \t aLaRm  ", "Alarm time", "alarm.hour", "alarms")
+        assertTime("  time \t WAKE  ", "Wake time", "sunrise.hour", "alarms")
     }
 }
