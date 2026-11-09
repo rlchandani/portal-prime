@@ -18,8 +18,17 @@ internal enum class FollowMeMode(val wire: String) {
   }
 }
 
-/** What another room says it is playing ([positionMs] at the time it said so). */
-internal data class FollowMeTrack(val title: String, val artist: String, val thumb: String, val positionMs: Long)
+/**
+ * What another room says it is playing ([positionMs] at the time it said so). [idleMs]: how long
+ * nobody had touched that Portal when it said so (null when it doesn't report it).
+ */
+internal data class FollowMeTrack(
+    val title: String,
+    val artist: String,
+    val thumb: String,
+    val positionMs: Long,
+    val idleMs: Long? = null,
+)
 
 /**
  * What this Portal knows about another room, folded by [FollowMeRoster]. Times are this Portal's
@@ -62,7 +71,10 @@ internal sealed interface FollowMeDecision {
  * - the setting isn't Off, and R became present at most [WINDOW_MS] ago;
  * - R isn't playing, mid-move, on a call, showing a routine or in quiet hours;
  * - S reported music within [LIVE_STALE_MS] and is absent (fresh report) for ≥ [ABSENT_MS], or
- *   became absent after R's arrival (its camera notices the empty room a little later);
+ *   became absent after R's arrival (its camera notices the empty room a little later). In Ask
+ *   first only, S also counts when its presence is unknown (Meta's camera presence pauses while
+ *   our music screen is in front) and nobody has touched it for [IDLE_MS]; a wrong guess just
+ *   costs a "Not now";
  * - no other room qualifies as S, and no other idle room also became present around R's arrival
  *   (two arrivals: we can't tell who walked where);
  * - this pair of rooms hasn't followed in either direction within [COOLDOWN_MS].
@@ -76,6 +88,8 @@ internal object FollowMePolicy {
   const val LIVE_STALE_MS = 50_000L
   /** A presence report older than this is unknown (heartbeats come every 2 min). */
   const val PRESENCE_STALE_MS = 5 * 60_000L
+  /** Ask first: an unknown-presence playing room nobody touched for this long may be empty. */
+  const val IDLE_MS = 5 * 60_000L
   /** One follow per pair of rooms (either direction) in this long. */
   const val COOLDOWN_MS = 5 * 60_000L
 
@@ -106,7 +120,7 @@ internal object FollowMePolicy {
     val others = rooms.filter { it.id != here.id }
     val playing = others.filter { isPlaying(it, nowMs) }
     if (playing.isEmpty()) return FollowMeDecision.None(NO_MUSIC)
-    val sources = playing.filter { leftBehind(it, arrived, nowMs) }
+    val sources = playing.filter { leftBehind(it, arrived, nowMs) || (mode == FollowMeMode.ASK && idleUnseen(it, nowMs)) }
     val source = when {
       sources.size > 1 -> return FollowMeDecision.None(SEVERAL_SOURCES)
       sources.isEmpty() ->
@@ -144,6 +158,13 @@ internal object FollowMePolicy {
     if (!fresh(r, nowMs) || r.presence != Presence.ABSENT) return false
     val since = r.presenceSinceMs ?: return false
     return nowMs - since >= ABSENT_MS || since >= arrivedMs
+  }
+
+  /** Presence unknown (not seen present or absent lately) and untouched for [IDLE_MS], counting since the report. */
+  private fun idleUnseen(r: FollowMeRoom, nowMs: Long): Boolean {
+    if (fresh(r, nowMs) && r.presence != Presence.UNKNOWN) return false
+    val idle = r.live?.idleMs ?: return false
+    return idle + (nowMs - r.liveSeenMs).coerceAtLeast(0L) >= IDLE_MS
   }
 
   /** Another idle room that also lit up around R's arrival: someone else may be the listener. */

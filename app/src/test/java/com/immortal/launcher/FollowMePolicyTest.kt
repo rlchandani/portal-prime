@@ -139,4 +139,38 @@ class FollowMePolicyTest {
     assertEquals(FollowMeMode.ASK, FollowMeMode.fromWire("nonsense"))
     assertEquals(FollowMeMode.ASK, FollowMeMode.fromWire(null))
   }
+
+  /**
+   * Meta's camera presence goes quiet while Hearthpane's music screen is in front ("top app is not
+   * whitelisted"), so the playing room often reports UNKNOWN. Ask first then treats a room nobody
+   * has touched for [FollowMePolicy.IDLE_MS] as possibly empty; Automatic still needs ABSENT.
+   */
+  private val unknownIdle = family.copy(presence = Presence.UNKNOWN, presenceSinceMs = arrived - 600_000L,
+      live = track.copy(idleMs = FollowMePolicy.IDLE_MS))
+
+  @Test fun askFirstOffersFromAPlayingRoomNobodyHasTouchedLately() {
+    assertEquals(FollowMeDecision.Ask(unknownIdle), decide(rooms = listOf(unknownIdle)))
+  }
+
+  @Test fun automaticStillNeedsTheRoomToBeSeenEmpty() {
+    assertEquals(none(FollowMePolicy.SOURCE_NOT_ABSENT), decide(FollowMeMode.AUTO, rooms = listOf(unknownIdle)))
+  }
+
+  @Test fun aRecentTouchMeansSomeoneIsStillListening() {
+    val touched = unknownIdle.copy(live = track.copy(idleMs = 30_000L))
+    assertEquals(none(FollowMePolicy.SOURCE_NOT_ABSENT), decide(rooms = listOf(touched)))
+    val unknownIdleTime = unknownIdle.copy(live = track.copy(idleMs = null))
+    assertEquals(none(FollowMePolicy.SOURCE_NOT_ABSENT), decide(rooms = listOf(unknownIdleTime)))
+  }
+
+  @Test fun idleTimeKeepsCountingSinceTheLastReport() {
+    // Reported 4 min 50 s idle, 20 s ago: idle for over 5 minutes now.
+    val aging = unknownIdle.copy(live = track.copy(idleMs = FollowMePolicy.IDLE_MS - 10_000L), liveSeenMs = now - 20_000L)
+    assertEquals(FollowMeDecision.Ask(aging), decide(rooms = listOf(aging)))
+  }
+
+  @Test fun aRoomSeenOccupiedIsNeverTreatedAsIdle() {
+    val present = unknownIdle.copy(presence = Presence.PRESENT)
+    assertEquals(none(FollowMePolicy.SOURCE_PRESENT), decide(rooms = listOf(present)))
+  }
 }

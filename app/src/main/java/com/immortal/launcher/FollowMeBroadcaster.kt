@@ -93,8 +93,14 @@ internal object FollowMeBroadcaster {
     if (!s.isPlaying) return null
     val running = if (s.status == YtPlayerStatus.PLAYING) SystemClock.elapsedRealtime() - s.positionAtElapsedMs else 0L
     val position = (s.positionMs + running.coerceAtLeast(0L)).let { if (s.durationMs > 0) it.coerceAtMost(s.durationMs) else it }
-    return FollowMeTrack(t.title, t.artist, t.thumbnailUrl, position)
+    return FollowMeTrack(t.title, t.artist, t.thumbnailUrl, position, idleMs())
   }
 
   private fun now(): Long = System.currentTimeMillis()
+
+  /** How long nobody has touched this Portal (since the process started when there was no touch yet). */
+  private fun idleMs(): Long {
+    val last = SleepScheduler.lastInteractionElapsedMs().takeIf { it > 0 } ?: android.os.Process.getStartElapsedRealtime()
+    return (SystemClock.elapsedRealtime() - last).coerceAtLeast(0L)
+  }
 }

@@ -63,4 +63,12 @@ class FollowMeWireTest {
     Presence.entries.forEach { assertEquals(it, FollowMeWire.presenceFromWire(FollowMeWire.presenceWire(it))) }
     assertNull(FollowMeWire.presenceFromWire("x"))
   }
+
+  @Test fun liveCarriesHowLongNobodyHasTouchedThePortal() {
+    val note = FollowMeWire.LiveNote(Presence.UNKNOWN, 0L, "Family Area",
+        FollowMeTrack("Song", "Artist", "", 1_000L, idleMs = 400_000L))
+    assertEquals(400_000L, FollowMeWire.decodeLive(FollowMeWire.encode(note))!!.track!!.idleMs)
+    val older = FollowMeWire.encode(note.copy(track = note.track!!.copy(idleMs = null)))
+    assertEquals(null, FollowMeWire.decodeLive(older)!!.track!!.idleMs)
+  }
 }

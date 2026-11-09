@@ -49,6 +49,7 @@ internal object FollowMeWire {
     val t = n.track ?: return body.put("on", 0)
     return body.put("on", 1).put("t", clip(t.title, MAX_TITLE)).put("a", clip(t.artist, MAX_ARTIST))
         .put("th", t.thumb.takeIf { it.length <= MAX_THUMB } ?: "").put("pos", t.positionMs)
+        .also { b -> t.idleMs?.let { b.put("i", it.coerceIn(0L, MAX_FOR_MS)) } }
   }
 
   fun decodePresence(b: JSONObject): PresenceNote? {
@@ -64,7 +65,8 @@ internal object FollowMeWire {
     val title = DinnerMessage.cleanText(b.opt("t") as? String, MAX_TITLE)?.takeIf { it.isNotBlank() } ?: return null
     val artist = DinnerMessage.cleanText(b.opt("a") as? String, MAX_ARTIST) ?: ""
     val thumb = (b.opt("th") as? String)?.takeIf { it.startsWith(HTTPS) && it.length <= MAX_THUMB && it.none(Char::isWhitespace) } ?: ""
-    val track = FollowMeTrack(title, artist, thumb, duration(b.opt("pos"), MAX_POSITION_MS))
+    val idle = (b.opt("i") as? Number)?.toLong()?.coerceIn(0L, MAX_FOR_MS)
+    val track = FollowMeTrack(title, artist, thumb, duration(b.opt("pos"), MAX_POSITION_MS), idle)
     return LiveNote(head.presence, head.forMs, head.name, track)
   }
 
