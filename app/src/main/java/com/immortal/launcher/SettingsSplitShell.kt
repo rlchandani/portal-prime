@@ -106,6 +106,10 @@ internal fun SettingsSplitShell(
         return "advancedSettings" in applied
     }
 
+    // Hoisted out of the LazyColumn builder (not a composable scope) so its identity survives a page
+    // switch; otherwise every sidebar row receives a new click handler and recomposes.
+    val selectPage = remember(onSelectPage) { { page: String -> query = ""; onSelectPage(page) } }
+
     fun pick(result: ApprovedSettingsSearchResult) {
         focus.clearFocus()
         query = ""
@@ -126,7 +130,7 @@ internal fun SettingsSplitShell(
                 if (query.isBlank()) {
                     LazyColumn(listModifier.focusGroup(),
                         contentPadding = PaddingValues(start = 28.dp, end = 28.dp, top = 8.dp, bottom = 40.dp)) {
-                        settingsSidebarGroups(selectedRoot) { page -> query = ""; onSelectPage(page) }
+                        settingsSidebarGroups(selectedRoot, selectPage)
                     }
                 } else {
                     SettingsSearchResults(query, results, queryToken, ::pick,

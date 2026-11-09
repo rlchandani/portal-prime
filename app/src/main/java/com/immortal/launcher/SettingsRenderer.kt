@@ -198,7 +198,8 @@ internal fun ApprovedSettingsLazyRow(
 ) {
     val highlight = requested == id
     val requester = remember { BringIntoViewRequester() }
-    LaunchedEffect(highlight) { if (highlight) requester.bringIntoView() }
+    // Only the highlighted row starts an effect; every other row stays effect-free.
+    if (highlight) LaunchedEffect(Unit) { requester.bringIntoView() }
     Column(modifier.fillMaxWidth().bringIntoViewRequester(requester)
         .approvedSettingsGroupRow(first, last, highlight)
         .semantics { contentDescription = id }

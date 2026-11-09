@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
@@ -186,21 +187,17 @@ private fun SettingsHostScreen(
     }
   }
   val page = stack.current
+  val actions = rememberSettingsHostActions(stack, show)
   SettingsSplitShell(
       selectedRoot = SettingsTree.rootOf(page),
       heading = SettingsDetailHeading(
           title = SettingsTree.page(page)?.title.orEmpty(),
           backTitle = stack.parent?.let { SettingsTree.page(it)?.title },
-          onBack = if (stack.canGoBack) ({ show(stack.back()) }) else null,
+          onBack = if (stack.canGoBack) actions.back else null,
       ),
-      onSelectPage = { show(stack.select(it)) },
-      onSearchResult = { show(SettingsBackStack.of(it.page, it.control)) },
-      onHome = {
-        context.startActivity(Intent(context, HomeActivity::class.java)
-            .putExtra("approved_home_tab", "home")
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
-        (context as? android.app.Activity)?.finish()
-      },
+      onSelectPage = actions.select,
+      onSearchResult = actions.searchResult,
+      onHome = actions.home,
       diagnosticsScope = "${SettingsTree.rootOf(page)}/$page",
       diagnosticsControl = stack.control,
   ) {
@@ -208,14 +205,53 @@ private fun SettingsHostScreen(
       if (SettingsTree.needsAdvanced(page) && !advanced) {
         ApprovedSettingsAdvancedGate(LocalApprovedEnableAdvanced.current)
       } else {
-        SettingsPageView(page, stack.control, onOpenPage = { show(stack.open(it)) },
-            onHighlightShown = clearHighlight)
+        SettingsPageView(page, stack.control, onOpenPage = actions.open, onHighlightShown = clearHighlight)
       }
     }
   }
   prerequisite?.let { message ->
     ApprovedSettingsDialog("Setting prerequisite", onDismiss = { prerequisite = null }, help = message) {
       ApprovedSettingsTextButton("Review parent settings") { prerequisite = null }
+    }
+  }
+}
+
+/** Navigation callbacks with a stable identity, so a page switch leaves unchanged sidebar rows skipped. */
+internal class SettingsHostActions(
+    val select: (String) -> Unit,
+    val open: (String) -> Unit,
+    val back: () -> Unit,
+    val searchResult: (ApprovedSettingsSearchResult) -> Unit,
+    val home: () -> Unit,
+)
+
+/** Built once; each callback reads [stack] when it runs, so it always acts on the latest stack. */
+internal fun settingsHostActions(
+    stack: () -> SettingsBackStack,
+    show: (SettingsBackStack) -> Unit,
+    home: () -> Unit,
+) = SettingsHostActions(
+    select = { show(stack().select(it)) },
+    open = { show(stack().open(it)) },
+    back = { show(stack().back()) },
+    searchResult = { show(SettingsBackStack.of(it.page, it.control)) },
+    home = home,
+)
+
+@Composable
+private fun rememberSettingsHostActions(
+    stack: SettingsBackStack,
+    show: (SettingsBackStack) -> Unit,
+): SettingsHostActions {
+  val context = LocalContext.current
+  val currentStack by rememberUpdatedState(stack)
+  val currentShow by rememberUpdatedState(show)
+  return remember(context) {
+    settingsHostActions({ currentStack }, { currentShow(it) }) {
+      context.startActivity(Intent(context, HomeActivity::class.java)
+          .putExtra("approved_home_tab", "home")
+          .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+      (context as? android.app.Activity)?.finish()
     }
   }
 }
