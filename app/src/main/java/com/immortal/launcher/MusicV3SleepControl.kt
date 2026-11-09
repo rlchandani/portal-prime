@@ -7,70 +7,64 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 /** How often "Stops in N min" re-reads the clock. */
 private const val SLEEP_LABEL_TICK_MS = 15_000L
-private val CHOOSER_HEIGHT = 120.dp
 
-/** The moon button beside volume; highlighted while a sleep timer is armed. */
+/** "Stops in 23 min" / "Stops after this song" while a timer is armed, else null. */
 @Composable
-internal fun MusicV3SleepButton(timer: MusicSleepTimer?, enabled: Boolean, onClick: () -> Unit) {
-  val armed = timer != null
-  val tint = when {
-    !enabled -> ApprovedHomePalette.Secondary.copy(alpha = 0.4f)
-    armed -> ApprovedHomePalette.Accent
-    else -> ApprovedHomePalette.Secondary
-  }
-  MusicV3RoundButton(if (armed) "Sleep timer, on" else "Sleep timer", Modifier.clip(CircleShape),
-      fill = if (armed) ApprovedHomePalette.Selected else ApprovedHomePalette.Chrome, enabled = enabled,
-      onClick = onClick) {
-    ApprovedIcon("moon", Modifier.size(30.dp), tint)
-  }
-}
-
-/** "Stops in 23 min" / "Stops after this song" while a timer is armed. */
-@Composable
-internal fun MusicV3SleepLine(timer: MusicSleepTimer?) {
-  timer ?: return
+internal fun rememberSleepLabel(timer: MusicSleepTimer?): String? {
   val now by produceState(System.currentTimeMillis(), timer) {
-    while (true) {
+    while (timer != null) {
       value = System.currentTimeMillis()
       delay(SLEEP_LABEL_TICK_MS)
     }
   }
-  val label = MusicSleepPolicy.label(timer, now) ?: return
-  Row(Modifier.padding(bottom = 8.dp), verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-    ApprovedIcon("moon", Modifier.size(24.dp), ApprovedHomePalette.Secondary)
-    Text(label, color = ApprovedHomePalette.Secondary, fontSize = 23.sp, maxLines = 1)
-  }
+  return timer?.let { MusicSleepPolicy.label(it, now) }
 }
 
-/** Off / 15 / 30 / 60 min / End of song, shown inline in place of the transport while choosing. */
+/** The "Sleep timer" capsule beside Move to…; ember and showing the time left while armed. */
 @Composable
-internal fun MusicV3SleepChooser(timer: MusicSleepTimer?, onPick: (MusicSleepChoice) -> Unit) {
+internal fun MusicV3SleepPill(timer: MusicSleepTimer?, enabled: Boolean, onClick: () -> Unit) {
+  val label = rememberSleepLabel(timer)
+  MusicStagePill(label ?: MusicV3StageCopy.SLEEP_OFF, icon = "moon", armed = label != null, enabled = enabled,
+      spoken = if (label != null) "Sleep timer, on. $label" else MusicV3StageCopy.SLEEP_OFF, onClick = onClick)
+}
+
+/** "Stops in 23 min" under the title in the header strip. */
+@Composable
+internal fun MusicV3SleepLine(timer: MusicSleepTimer?, modifier: Modifier = Modifier) {
+  val label = rememberSleepLabel(timer) ?: return
+  MusicStageNote(label, glyph = null, icon = "moon", ember = true, modifier = modifier)
+}
+
+/** "Stop the music…": Off / 15 / 30 / 60 min / End of song, an opaque card above the capsule. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun MusicV3SleepPopover(timer: MusicSleepTimer?, modifier: Modifier = Modifier, onPick: (MusicSleepChoice) -> Unit) {
   val selected = MusicSleepPolicy.choice(timer)
-  Row(Modifier.fillMaxWidth().padding(top = 18.dp).height(CHOOSER_HEIGHT), verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)) {
-    MusicSleepChoice.entries.forEach { choice ->
-      MusicV3Button(choice.label, style = if (choice == selected) MusicV3ButtonStyle.SOLID else MusicV3ButtonStyle.LINE) {
-        onPick(choice)
+  val ink = LocalMusicStageInk.current
+  val dims = LocalMusicStageDims.current
+  MusicStageCard(modifier) {
+    Text(MusicV3StageCopy.SLEEP_TITLE, color = ink.ink, fontSize = (dims.body * 0.9f).sp, fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(start = 4.dp, bottom = 14.dp))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+      MusicSleepChoice.entries.forEach { choice ->
+        MusicStagePill(choice.label, style = if (choice == selected) MusicPillStyle.SOLID else MusicPillStyle.QUIET) {
+          onPick(choice)
+        }
       }
     }
   }

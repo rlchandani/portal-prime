@@ -18,37 +18,55 @@ import kotlinx.coroutines.runInterruptible
  * Blocking — call off-main. Returned bitmaps may be shared, so callers must not recycle them.
  */
 object MediaArt {
-  private const val MAX_EDGE = 384
+  /** Default decode edge (screensaver, header mini-player, phone remote). */
+  const val MAX_EDGE = 384
+  /**
+   * Decode edges a display size is rounded up to, so rows of the same size share one cached
+   * bitmap ([MultiRoomArt] keys its LRU by URL and edge) and none is decoded far above its size.
+   */
+  private val EDGE_STEPS = intArrayOf(96, 128, 192, 256, MAX_EDGE)
+
+  /** The decode edge for art drawn [displayPx] pixels wide: the next step up, at most [MAX_EDGE]. */
+  fun edgeFor(displayPx: Int): Int = EDGE_STEPS.firstOrNull { it >= displayPx } ?: MAX_EDGE
 
   /** Resolve supported artwork URIs; failed reads/decodes leave the regular placeholder. */
-  fun resolveUri(context: Context, url: String): Bitmap? = resolveUri(
-      url,
-      network = { spec, edge -> MultiRoomArt.fetch(spec, edge) },
-      local = { spec, edge -> MusicLocalArtwork.fetch(context.contentResolver, spec, edge) })
+  fun resolveUri(context: Context, url: String, edge: Int = MAX_EDGE): Bitmap? = resolveUri(
+      url, edge,
+      network = { spec, e -> MultiRoomArt.fetch(spec, e) },
+      local = { spec, e -> MusicLocalArtwork.fetch(context.contentResolver, spec, e) })
 
   /** UI delivery owns local decodes until publication; cached network art stays shared. */
-  internal suspend fun deliverUri(context: Context, url: String, publish: (Bitmap?) -> Unit) {
+  internal suspend fun deliverUri(context: Context, url: String, edge: Int = MAX_EDGE, publish: (Bitmap?) -> Unit) {
     if (MusicLocalArtwork.routeFor(url) == MusicArtworkRoute.LOCAL) {
       deliverOwnedMusicArtwork(
-          load = { resolveUri(context, url) },
+          load = { resolveUri(context, url, edge) },
           dispose = { if (!it.isRecycled) it.recycle() },
           publish = publish)
     } else {
-      publish(runInterruptible(Dispatchers.IO) { resolveUri(context, url) })
+      publish(runInterruptible(Dispatchers.IO) { resolveUri(context, url, edge) })
     }
   }
 
-  /** Admit the URI before invoking either transport, including access to a local resolver. */
+  /** Admit the URI before invoking either transport, at the default edge. */
   internal fun resolveUri(
       url: String,
       network: (String, Int) -> Bitmap?,
       local: (String, Int) -> Bitmap?,
+  ): Bitmap? = resolveUri(url, MAX_EDGE, network, local)
+
+  /** Admit the URI before invoking either transport, including access to a local resolver. */
+  internal fun resolveUri(
+      url: String,
+      edge: Int,
+      network: (String, Int) -> Bitmap?,
+      local: (String, Int) -> Bitmap?,
   ): Bitmap? {
     if (url.isBlank()) return null
+    val e = edge.coerceIn(1, MAX_EDGE)
     return runCatching {
       when (MusicLocalArtwork.routeFor(url)) {
-        MusicArtworkRoute.NETWORK -> network(url, MAX_EDGE)
-        MusicArtworkRoute.LOCAL -> local(url, MAX_EDGE)
+        MusicArtworkRoute.NETWORK -> network(url, e)
+        MusicArtworkRoute.LOCAL -> local(url, e)
         MusicArtworkRoute.UNSUPPORTED -> null
       }
     }.getOrNull()

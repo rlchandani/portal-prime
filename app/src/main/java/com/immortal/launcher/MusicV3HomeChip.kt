@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,18 +44,29 @@ internal data class MusicV3ChipModel(val track: YtTrack, val title: String, val 
  * Playing: the song and "Playing". Nothing playing but a queue (in the engine, or [saved] on disk
  * after a restart): "Resume · <title>", and a tap plays from the saved position. Else no chip.
  */
-internal fun musicV3Chip(s: YtEngineState, saved: YtTrack?): MusicV3ChipModel? {
-  val current = s.queue.current?.track
-  if (current != null && s.isPlaying) return MusicV3ChipModel(current, current.title, "Playing", resume = false)
+internal fun musicV3Chip(s: YtEngineState, saved: YtTrack?): MusicV3ChipModel? =
+    musicV3Chip(MusicV3ChipSlice.of(s), saved)
+
+internal fun musicV3Chip(s: MusicV3ChipSlice, saved: YtTrack?): MusicV3ChipModel? {
+  val current = s.current
+  if (current != null && s.playing) return MusicV3ChipModel(current, current.title, "Playing", resume = false)
   val track = current ?: saved ?: return null
   return MusicV3ChipModel(track, "Resume · ${track.title}", null, resume = true)
+}
+
+/** The only engine facts Home's chip reads, so position ticks don't recompose Home's header. */
+internal data class MusicV3ChipSlice(val current: YtTrack?, val playing: Boolean, val empty: Boolean) {
+  companion object {
+    fun of(s: YtEngineState) = MusicV3ChipSlice(s.queue.current?.track, s.isPlaying, s.queue.isEmpty)
+  }
 }
 
 /** True while the YouTube queue has a song (the Home music button is highlighted). */
 @Composable
 internal fun rememberMusicV3Loaded(): Boolean {
-  val engine by YouTubeMusicEngine.state.collectAsState()
-  return engine.queue.current != null
+  val flow = remember { engineSlice { it.queue.current != null } }
+  val loaded by flow.collectAsState(initial = YouTubeMusicEngine.state.value.queue.current != null)
+  return loaded
 }
 
 /**
@@ -64,8 +76,9 @@ internal fun rememberMusicV3Loaded(): Boolean {
 @Composable
 internal fun MusicV3HomeChip(onOpen: () -> Unit) {
   val context = LocalContext.current
-  val engine by YouTubeMusicEngine.state.collectAsState()
-  val empty = engine.queue.isEmpty
+  val flow = remember { engineSlice(MusicV3ChipSlice::of) }
+  val engine by flow.collectAsState(initial = MusicV3ChipSlice.of(YouTubeMusicEngine.state.value))
+  val empty = engine.empty
   // After a restart the queue is only on disk until Music opens; read it off the main thread.
   val saved by produceState<YtTrack?>(null, empty) {
     value = if (!empty) null else withContext(Dispatchers.IO) {

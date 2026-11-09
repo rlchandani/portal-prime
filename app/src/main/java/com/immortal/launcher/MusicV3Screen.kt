@@ -39,20 +39,17 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.youtube.YtAccount
 import com.immortal.launcher.youtube.YtAndroid
 import com.immortal.launcher.youtube.YtSignInState
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 /**
- * Music v3 (official YouTube route): one full-screen page with its own header. Shows NotConfigured,
- * the QR sign-in, "No one is signed in", or the player (Now Playing + Queue / Library / Search).
+ * Music v3 (official YouTube route): one full-screen page. Shows NotConfigured, the QR sign-in or
+ * "No one is signed in" under a simple header, or the full-screen player stage ([MusicV3PlayerLayout]).
  * [resumeOnOpen] = opened from Home's Now playing chip, which resumes the paused song.
  */
 @Composable
@@ -64,22 +61,27 @@ fun MusicV3Screen(roomName: String, resumeOnOpen: Boolean, onClose: () -> Unit, 
   val signIn by library.signInState.collectAsState()
   var adding by remember { mutableStateOf(false) }
   var signedOutLast by remember { mutableStateOf(false) }
-  var accountsOpen by remember { mutableStateOf(false) }
   val hasQueue by remember { derivedQueuePresence() }.collectAsState(initial = !YouTubeMusicEngine.state.value.queue.isEmpty)
   val gate = MusicV3Rules.gate(library.isConfigured, accounts, active, adding, signedOutLast,
       showingSuccess = signIn is YtSignInState.SignedIn, hasQueue = hasQueue)
   rememberMusicV3KeyboardPolicy()
   BackHandler(enabled = gate == MusicV3Gate.ADD_ACCOUNT) { adding = false }
   val focus = LocalFocusManager.current
-  val guests = rememberGuestHides(GuestContent.MUSIC_LIBRARY)
   // Drawn over the launcher: swallow stray taps (they'd reach Home below) and drop the keyboard.
-  Column(modifier.fillMaxSize().background(ApprovedHomePalette.Background)
-      .pointerInput(Unit) { detectTapGestures { focus.clearFocus() } }) {
+  val root = modifier.fillMaxSize().pointerInput(Unit) { detectTapGestures { focus.clearFocus() } }
+  if (gate == MusicV3Gate.PLAYER || gate == MusicV3Gate.GUEST) {
+    // The full-screen stage draws its own top bar (back, wordmark, clock, account) and backdrop.
+    Box(root) {
+      MusicV3PlayerLayout(MusicV3StageHost(
+          library = library, accounts = accounts, active = active.takeIf { gate == MusicV3Gate.PLAYER },
+          room = roomName, resumeOnOpen = resumeOnOpen, onBack = onClose,
+          onAddAccount = { adding = true }, onLastSignedOut = { signedOutLast = true }))
+    }
+    return
+  }
+  Column(root.background(ApprovedHomePalette.Background)) {
     MusicV3Header(
         onBack = onClose,
-        // Guest mode hides which household account is signed in.
-        account = active.takeIf { gate == MusicV3Gate.PLAYER && !guests },
-        onAccounts = { accountsOpen = !accountsOpen },
         onCancel = if (gate == MusicV3Gate.ADD_ACCOUNT && MusicV3Rules.canCancelSignIn(accounts.size, hasQueue)) {
           { adding = false }
         } else null)
@@ -92,19 +94,14 @@ fun MusicV3Screen(roomName: String, resumeOnOpen: Boolean, onClose: () -> Unit, 
             signedOutLast = false
           }
         MusicV3Gate.NO_ONE -> MusicV3NoOne { signedOutLast = false }
-        MusicV3Gate.PLAYER, MusicV3Gate.GUEST -> MusicV3PlayerLayout(
-            library = library, accounts = accounts, active = active.takeIf { gate == MusicV3Gate.PLAYER },
-            room = roomName, resumeOnOpen = resumeOnOpen,
-            accountsOpen = accountsOpen, onAccountsOpen = { accountsOpen = it },
-            onAddAccount = { accountsOpen = false; adding = true },
-            onLastSignedOut = { signedOutLast = true })
+        MusicV3Gate.PLAYER, MusicV3Gate.GUEST -> Unit
       }
     }
   }
 }
 
 @Composable
-private fun MusicV3Header(onBack: () -> Unit, account: YtAccount?, onAccounts: () -> Unit, onCancel: (() -> Unit)?) {
+private fun MusicV3Header(onBack: () -> Unit, onCancel: (() -> Unit)?) {
   Row(Modifier.fillMaxWidth().height(112.dp).padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(20.dp)) {
     MusicV3RoundButton("Back to Home", Modifier.clip(CircleShape).approvedOutline(CircleShape), size = 68.dp,
@@ -113,23 +110,7 @@ private fun MusicV3Header(onBack: () -> Unit, account: YtAccount?, onAccounts: (
     }
     Text("Music", color = ApprovedHomePalette.Text, fontSize = 32.sp, fontWeight = FontWeight.Medium)
     Spacer(Modifier.weight(1f))
-    when {
-      onCancel != null -> MusicV3Button("Cancel", onClick = onCancel)
-      account != null -> AccountChip(account, onAccounts)
-    }
-  }
-}
-
-@Composable
-private fun AccountChip(account: YtAccount, onClick: () -> Unit) {
-  val shape = RoundedCornerShape(34.dp)
-  Row(Modifier.height(68.dp).clip(shape).background(ApprovedHomePalette.Card).approvedOutline(shape)
-      .tvFocusable(shape, ringColor = ApprovedHomePalette.Accent, onClick = onClick)
-      .semantics { contentDescription = "Accounts, using ${account.title}" }.padding(start = 9.dp, end = 22.dp),
-      verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-    MusicV3Avatar(account.title, account.thumbnailUrl, 48.dp)
-    Text(account.title, color = ApprovedHomePalette.Text, fontSize = 23.sp, fontWeight = FontWeight.Medium, maxLines = 1)
-    MusicV3GlyphIcon(MusicV3Glyph.DOWN, ApprovedHomePalette.Secondary, Modifier.size(24.dp))
+    onCancel?.let { MusicV3Button("Cancel", onClick = it) }
   }
 }
 

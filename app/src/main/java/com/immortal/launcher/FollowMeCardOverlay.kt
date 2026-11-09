@@ -33,7 +33,8 @@ import android.widget.TextView
  *   [ASK_MS] or a tap outside (both count as Not now);
  * - the Automatic banner: a top strip "Music followed you from <room>" with Undo for [FOLLOWED_MS],
  *   touch-through outside it so the music screen below stays usable.
- * One at a time (replace, don't stack). Main thread only.
+ * One at a time (replace, don't stack). Main thread only. While the music screen is open both are
+ * drawn inside it instead (see [MusicV3FollowMeInScreen]), so nothing covers the YouTube player.
  */
 internal object FollowMeCardOverlay {
   private const val TAG = "HearthpaneFollowMe"
@@ -68,8 +69,13 @@ internal object FollowMeCardOverlay {
     main.post { hide(); host = null; wm = null }
   }
 
-  /** Returns false when the accessibility host isn't attached (nothing shown). */
+  /**
+   * Returns false when the accessibility host isn't attached (nothing shown). While the music screen
+   * is open the ask is shown inside it instead ([MusicV3FollowMeInScreen]): this overlay would cover
+   * the YouTube player.
+   */
   fun showAsk(ask: Ask, onContinue: () -> Unit, onNotNow: () -> Unit): Boolean {
+    if (MusicV3FollowMeInScreen.offerAsk(ask.title, ask.line, ASK_MS, onContinue, onNotNow)) return true.also { hide() }
     val ctx = host ?: return false.also { Log.w(TAG, "ask card before the accessibility host attached; not shown") }
     val root = askRoot(ctx, ask, onContinue = { hide(); onContinue() }, onNotNow = { hide(); onNotNow() })
     val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
@@ -78,6 +84,7 @@ internal object FollowMeCardOverlay {
   }
 
   fun showFollowed(text: String, onUndo: () -> Unit): Boolean {
+    if (MusicV3FollowMeInScreen.offerNotice(text, FOLLOWED_MS, onUndo)) return true.also { hide() }
     val ctx = host ?: return false.also { Log.w(TAG, "followed banner before the accessibility host attached; not shown") }
     val root = bannerRoot(ctx, text) { hide(); onUndo() }
     val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT,

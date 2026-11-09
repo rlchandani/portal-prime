@@ -9,6 +9,7 @@ package com.immortal.launcher
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -44,21 +45,26 @@ internal fun rememberAgoClock(): Long {
 }
 
 /**
- * Library › Recently played: every room's plays (newest first, each song once) with where and
- * when. Tap plays now like a search result; ⋯ = Play next / Add to queue / Remove from history.
+ * Recently played tab: every room's plays (newest first, each song once) with where and when.
+ * Tap plays now like a search result; ⋯ = Play next / Add to queue / Remove from history.
  */
 @Composable
 internal fun MusicV3RecentTab(actions: MusicV3Actions) {
   val plays by MusicHistoryFeature.plays.collectAsState()
   val listing = remember(plays) { MusicHistory.listing(plays) }
   if (listing.isEmpty()) {
-    MusicV3Empty("clock", MusicV3Message("Nothing played yet", "Songs you play show up here."))
+    MusicStageEmpty("Songs you play show up here.")
     return
   }
   val now = rememberAgoClock()
   LazyColumn(Modifier.fillMaxSize()) {
-    items(listing, key = { it.videoId }) { play -> MusicV3RecentRow(play, now, actions, withRemove = true) }
-    item { Spacer(Modifier.height(40.dp)) }
+    item(key = "head", contentType = MusicV3RowKeys.HEADER) {
+      MusicStageHeading(MUSIC_RECENT_LABEL, Modifier.padding(top = 8.dp), detail = "On every Portal")
+    }
+    items(listing, key = { it.videoId }, contentType = { MusicV3RowKeys.TRACK }) { play ->
+      MusicV3RecentRow(play, now, actions, withRemove = true)
+    }
+    item(key = "tail", contentType = MusicV3RowKeys.NOTE) { Spacer(Modifier.height(40.dp)) }
   }
 }
 
@@ -66,14 +72,19 @@ internal fun MusicV3RecentTab(actions: MusicV3Actions) {
 @Composable
 internal fun MusicV3RecentRow(play: MusicPlay, now: Long, actions: MusicV3Actions, withRemove: Boolean) {
   val context = LocalContext.current
-  val track = play.toDataTrack()
-  val menu = listOfNotNull(
-      MusicV3RowAction("Play next") { actions.playNext(track) },
-      MusicV3RowAction("Add to queue") { actions.addToQueue(track) },
-      if (withRemove) MusicV3RowAction("Remove from history") { MusicHistoryFeature.remove(context, play.videoId) } else null)
-  MusicV3TrackRow(
-      MusicV3RowModel("recent:${play.videoId}", play.title, play.artist, track.thumbnailUrl, null,
-          detail = MusicHistory.where(play, now)),
-      onPlay = { actions.playOne(track, MUSIC_RECENT_LABEL) },
-      actions = menu)
+  val track = remember(play) { play.toDataTrack() }
+  val menu = remember(track, actions, withRemove) {
+    listOfNotNull(
+        MusicV3RowAction("Play next") { actions.playNext(track) },
+        MusicV3RowAction("Add to queue") { actions.addToQueue(track) },
+        if (withRemove) MusicV3RowAction("Remove from history", danger = true) {
+          MusicHistoryFeature.remove(context, play.videoId)
+        } else null)
+  }
+  val where = MusicHistory.where(play, now)
+  val row = remember(play, where) {
+    MusicV3RowModel("recent:${play.videoId}", play.title, play.artist, track.thumbnailUrl, null, detail = where)
+  }
+  val tap = remember(track, actions) { { actions.playOne(track, MUSIC_RECENT_LABEL) } }
+  MusicV3TrackRow(row, onPlay = tap, actions = menu)
 }

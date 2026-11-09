@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,10 +28,19 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -57,10 +67,12 @@ internal fun MusicV3SearchPane(
     onQuery: (String) -> Unit,
     onSubmit: (String) -> Unit,
     actions: MusicV3Actions,
+    onFocus: (Boolean) -> Unit = {},
+    autoFocus: Boolean = false,
 ) {
   val run = { q: String -> if (MusicV3Rules.canSubmit(q, state.remaining, state.recent)) onSubmit(q) }
   Column(Modifier.fillMaxSize()) {
-    SearchField(state, onQuery, onSubmit)
+    SearchField(state, onQuery, onSubmit, onFocus, autoFocus)
     state.hint?.let { Hint(it) }
     if (state.resting) RestingNotice()
     Box(Modifier.weight(1f).padding(top = 12.dp)) {
@@ -94,31 +106,51 @@ private fun SearchBody(state: MusicV3SearchState, onSubmit: (String) -> Unit, ac
   }
 }
 
+/**
+ * The search field (the mock's `.sf`): ember ring while focused. Focus is reported through
+ * [onFocus] so the stage can shrink the strip above it; [autoFocus] focuses it on arrival.
+ */
 @Composable
-private fun SearchField(state: MusicV3SearchState, onQuery: (String) -> Unit, onSubmit: (String) -> Unit) {
-  val shape = RoundedCornerShape(44.dp)
+private fun SearchField(
+    state: MusicV3SearchState,
+    onQuery: (String) -> Unit,
+    onSubmit: (String) -> Unit,
+    onFocus: (Boolean) -> Unit,
+    autoFocus: Boolean,
+) {
+  val ink = LocalMusicStageInk.current
+  val dims = LocalMusicStageDims.current
+  val shape = RoundedCornerShape(28.dp)
   val enabled = !state.resting
   val submit = { if (MusicV3Rules.canSubmit(state.query, state.remaining, state.recent)) onSubmit(state.query) }
-  Row(Modifier.fillMaxWidth().height(88.dp).clip(shape).background(ApprovedHomePalette.Chrome).approvedOutline(shape)
+  val focus = remember { FocusRequester() }
+  var focused by remember { mutableStateOf(false) }
+  LaunchedEffect(autoFocus, enabled) { if (autoFocus && enabled) runCatching { focus.requestFocus() } }
+  DisposableEffect(Unit) { onDispose { onFocus(false) } }
+  val textSize = (dims.body * 1.2f).sp
+  Row(Modifier.fillMaxWidth().padding(top = 10.dp).height(dims.searchField.dp).clip(shape).background(ink.fill2)
+      .border(if (focused) 2.dp else 1.dp, if (focused) HearthpaneMark.Ember else ink.line, shape)
       .alpha(if (enabled) 1f else 0.55f).padding(start = 30.dp, end = 12.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-    ApprovedIcon("search", Modifier.size(32.dp), ApprovedHomePalette.Secondary)
+    ApprovedIcon("search", Modifier.size(40.dp), ink.muted)
     Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-      if (state.query.isEmpty()) Text("Search for a song or artist", color = ApprovedHomePalette.Secondary, fontSize = 26.sp)
+      if (state.query.isEmpty()) Text("Search for a song or artist", color = ink.faint, fontSize = textSize)
       BasicTextField(state.query, onQuery, enabled = enabled, singleLine = true,
-          textStyle = TextStyle(color = ApprovedHomePalette.Text, fontSize = 26.sp),
-          cursorBrush = SolidColor(ApprovedHomePalette.Accent),
+          textStyle = TextStyle(color = ink.ink, fontSize = textSize, fontWeight = FontWeight.Medium),
+          cursorBrush = SolidColor(HearthpaneMark.Ember),
           keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
           keyboardActions = KeyboardActions(onSearch = { submit() }),
-          modifier = Modifier.fillMaxWidth().semantics { contentDescription = "Search" }.onPreviewKeyEvent {
+          modifier = Modifier.fillMaxWidth().focusRequester(focus)
+              .onFocusChanged { if (it.isFocused != focused) { focused = it.isFocused; onFocus(it.isFocused) } }
+              .semantics { contentDescription = "Search" }.onPreviewKeyEvent {
             val enter = it.key == Key.Enter || it.key == Key.NumPadEnter
             if (enter && it.type == KeyEventType.KeyUp) submit()
             enter
           })
     }
     if (state.query.isNotEmpty() && enabled) {
-      MusicV3RoundButton("Clear", onClick = { onQuery("") }) {
-        ApprovedIcon("close", Modifier.size(28.dp), ApprovedHomePalette.Secondary)
+      MusicV3RoundButton("Clear search", size = dims.target.dp, onClick = { onQuery("") }) {
+        ApprovedIcon("close", Modifier.size(34.dp), ink.muted)
       }
     }
   }

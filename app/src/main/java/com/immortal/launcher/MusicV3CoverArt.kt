@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
@@ -50,7 +51,7 @@ private const val MIN_ART_PX = 120
 
 /** Square cover art; a quiet note glyph until (or unless) an image loads. */
 @Composable
-internal fun MusicV3Cover(track: YtTrack, modifier: Modifier) {
+internal fun MusicV3Cover(track: YtTrack, modifier: Modifier, radius: Dp = 24.dp) {
   val art by produceState<Bitmap?>(null, track.videoId) {
     value = null
     for (url in MusicV3CoverArt.candidates(track.videoId, track.thumbnailUrl)) {
@@ -61,7 +62,7 @@ internal fun MusicV3Cover(track: YtTrack, modifier: Modifier) {
       if (bitmap != null) { value = bitmap; break }
     }
   }
-  Box(modifier.clip(RoundedCornerShape(24.dp)).background(ApprovedHomePalette.Chrome), contentAlignment = Alignment.Center) {
+  Box(modifier.clip(RoundedCornerShape(radius)).background(ApprovedHomePalette.Chrome), contentAlignment = Alignment.Center) {
     val bitmap = art
     if (bitmap != null) {
       Image(bitmap.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop,

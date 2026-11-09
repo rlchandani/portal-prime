@@ -17,9 +17,6 @@ internal enum class MusicV3Gate {
   GUEST,
 }
 
-/** The right pane's three tabs; Now Playing on the left never moves. */
-internal enum class MusicV3Pane(val label: String) { QUEUE("Queue"), LIBRARY("Library"), SEARCH("Search") }
-
 /** What the sign-in screen shows; derived from [YtSignInState] and the wall clock. */
 internal sealed interface MusicV3SignInView {
   data object Starting : MusicV3SignInView

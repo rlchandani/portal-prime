@@ -7,99 +7,196 @@
 package com.immortal.launcher
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import com.immortal.launcher.youtube.YouTubeMusicLibrary
 import com.immortal.launcher.youtube.YtAccount
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-private const val TOAST_MS = 5_000L
-private val LeftCardWidth = 800.dp
+/** Accounts and navigation callbacks from [MusicV3Screen]. */
+internal data class MusicV3StageHost(
+    val library: YouTubeMusicLibrary,
+    val accounts: List<YtAccount>,
+    /** Null in the guest gate (a queue moved here plays without an account). */
+    val active: YtAccount?,
+    val room: String,
+    val resumeOnOpen: Boolean,
+    val onBack: () -> Unit,
+    val onAddAccount: () -> Unit,
+    val onLastSignedOut: () -> Unit,
+)
 
-/** Signed in: Now Playing on the left (never covered), Queue / Library / Search on the right. */
+/**
+ * Signed in: the approved "Full-screen + pull-up" Music stage. Now Playing owns the screen; one
+ * sheet pulled up from the bottom holds Up next · Library · Recently played · Search. One spring
+ * moves the sheet edge and the ONE YouTube player together; the geometry keeps everything else off
+ * the player's rectangle in every state ([MusicStageGeometry]).
+ */
 @Composable
-internal fun MusicV3PlayerLayout(
-    library: YouTubeMusicLibrary,
-    accounts: List<YtAccount>,
-    active: YtAccount?,
-    room: String,
-    resumeOnOpen: Boolean,
-    accountsOpen: Boolean,
-    onAccountsOpen: (Boolean) -> Unit,
-    onAddAccount: () -> Unit,
-    onLastSignedOut: () -> Unit,
-) {
-  val engine by YouTubeMusicEngine.state.collectAsState()
+internal fun MusicV3PlayerLayout(host: MusicV3StageHost) {
+  val nowState = rememberNowSlice(host.room)
+  val now by nowState
   val move by MusicHandoff.move.collectAsState()
+  val follow by MusicV3FollowMeInScreen.ask.collectAsState()
   val context = LocalContext.current
-  var toast by remember { mutableStateOf<String?>(null) }
-  var moveOpen by remember { mutableStateOf(false) }
-  LaunchedEffect(toast) { if (toast != null) { delay(TOAST_MS); toast = null } }
-  VideoScreenGuards(engine, resumeOnOpen)
-  SkipToasts(engine.lastSkip) { toast = it }
-  MoveNotices { toast = it }
+  val toasts = remember { MusicStageToasts() }
+  toasts.Effects()
+  VideoScreenGuards(now, host.resumeOnOpen)
+  SkipToasts(now.lastSkip) { toasts.show(it) }
+  MoveNotices { toasts.show(it) }
+  FollowNotices(toasts)
+  var sheet by remember { mutableStateOf(MusicSheetMachine.initial(now.idle)) }
+  LaunchedEffect(now.idle) { sheet = MusicSheetMachine.onLoadedChanged(sheet, now.idle) }
   val canMove = remember(context) { MusicHandoff.available(context) }
-  val onMove = if (canMove && engine.queue.current != null && move == MusicMoveState.Idle) {
-    { onAccountsOpen(false); moveOpen = true }
+  val onMove = if (canMove && now.track != null && move == MusicMoveState.Idle) {
+    { sheet = MusicSheetMachine.toggle(MusicSheetMachine.close(sheet), MusicPopover.MOVE) }
   } else null
   val moveControls = MusicV3MoveControls(move, onMove, onBringBack = { MusicHandoff.bringBack(context) })
-  Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(MusicV3Dims.Gap)) {
-    MusicV3NowPlayingCard(engine, room, moveControls, Modifier.width(LeftCardWidth).fillMaxHeight())
-    Box(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(MusicV3Dims.PaneRadius))
-        .background(ApprovedHomePalette.Card)) {
-      // Guest mode: playback stays, the library, searches and accounts don't show.
-      val guests = rememberGuestHides(GuestContent.MUSIC_LIBRARY)
-      RightPane(library, active, engine.queue, guests, onToast = { toast = it }, onSignInAgain = onAddAccount, onMove = onMove)
-      toast?.let { MusicV3Toast(it, Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp, start = 24.dp, end = 24.dp)) }
-      if (moveOpen) {
-        BackHandler { moveOpen = false }
-        MusicV3MovePanel(onPick = { room -> moveOpen = false; MusicHandoff.moveTo(context, room) },
-            onClose = { moveOpen = false })
-      }
-      if (accountsOpen && !guests) {
-        AccountsOverlay(library, accounts, active, engine.queue, onClose = { onAccountsOpen(false) },
-            onAdd = onAddAccount, onLastSignedOut = onLastSignedOut, onToast = { toast = it })
+  val guests = rememberGuestHides(GuestContent.MUSIC_LIBRARY)
+  val scope = rememberCoroutineScope()
+  val actions = remember(host.library, scope) {
+    MusicV3Actions(host.library, scope, toast = { toasts.show(it) }, confirm = { toasts.show(it, long = false) })
+  }
+  var nav by remember(host.active?.id) { mutableStateOf(MusicV3LibraryNav()) }
+  val search = remember { mutableStateOf(MusicV3SearchState()) }
+  val reduced = rememberReducedMotion()
+  val focusManager = LocalFocusManager.current
+  val keyboard = LocalSoftwareKeyboardController.current
+  LaunchedEffect(sheet.open) { if (!sheet.open) { focusManager.clearFocus(); keyboard?.hide() } }
+  BackHandler(enabled = sheet.popover != MusicPopover.NONE || sheet.open) { MusicSheetMachine.back(sheet)?.let { sheet = it } }
+  BackHandler(enabled = sheet.open && sheet.tab == MusicSheetTab.LIBRARY && nav.inDetail) { nav = nav.back() }
+  val minute = rememberMinuteClock()
+  val quiet = rememberQuietNote(minute)
+  BoxWithConstraints(Modifier.fillMaxSize()) {
+    val layout = remember(maxWidth, maxHeight) { MusicStageGeometry.layout(maxWidth.value, maxHeight.value) }
+    val palette = rememberMusicStagePalette(now.track, now.model.isAd)
+    val dark = LocalApprovedPalette.current.dark
+    val ink = remember(palette, dark) { MusicStageColors.of(palette, dark) }
+    val motion = rememberMusicStageMotion(reduced, sheet.open)
+    LaunchedEffect(sheet.openTarget) { motion.follow(sheet.openTarget) }
+    LaunchedEffect(sheet.focusTarget) { motion.focusTo(sheet.focusTarget) }
+    val closedActive by remember(motion) { derivedStateOf { motion.progress.value < MusicStageGeometry.INTERACTIVE_SPLIT } }
+    val peekActive by remember(motion) { derivedStateOf { motion.progress.value < PEEK_UNTIL } }
+    val tabsActive by remember(motion) { derivedStateOf { motion.progress.value >= TABS_FROM } }
+    var stage by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    var util by remember { mutableStateOf<Rect?>(null) }
+    val settle = { open: Boolean, velocity: Float ->
+      sheet = if (open) MusicSheetMachine.open(sheet) else MusicSheetMachine.close(sheet)
+      motion.settle(open, velocity)
+    }
+    val handed = move is MusicMoveState.Handed
+    MusicStageTheme(ink, MusicStageDims.of(layout.spec)) {
+      Box(Modifier.fillMaxSize().onGloballyPositioned { stage = it }) {
+        MusicStageBackdrop(ink, reduced)
+        ClosedLayer(layout, motion, closedActive) {
+          val account = host.active.takeIf { !guests }
+          MusicV3TopBar(layout.spec, minute, account, sheet.popover == MusicPopover.ACCOUNTS, host.onBack,
+              onAccounts = { sheet = MusicSheetMachine.toggle(sheet, MusicPopover.ACCOUNTS) })
+          if (now.idle) {
+            val idle = MusicV3IdleInputs(host.library.takeIf { !guests }, host.active?.id?.takeIf { !guests }, actions,
+                follow, quiet, minute, onOpenPlaylist = { pl ->
+                  nav = MusicV3LibraryNav(playlist = pl)
+                  sheet = MusicSheetMachine.open(sheet, MusicSheetTab.LIBRARY)
+                }, onOpenLibrary = { sheet = MusicSheetMachine.open(sheet, MusicSheetTab.LIBRARY) })
+            MusicV3IdleResumeCard(layout, idle, Modifier.rect(layout.resumeCard))
+            MusicV3IdleColumn(idle, Modifier.rect(layout.column))
+          } else {
+            NowPlaying(layout, now, host.room, moveControls, quiet, reduced, handed,
+                onSleep = { sheet = MusicSheetMachine.toggle(sheet, MusicPopover.SLEEP) },
+                onToast = { toasts.show(it, long = false) },
+                onUtilPlaced = { c -> stage?.let { s -> util = s.localBoundingBoxOf(c) } })
+          }
+        }
+        StripLayer(layout, motion, closedActive, settle, onClose = { sheet = MusicSheetMachine.close(sheet) }) {
+          MusicV3Strip(now, MusicV3StripInputs(moveControls, follow, sheet.searchFocused, onResume = latestResume(actions)))
+        }
+        MusicV3Sheet(layout, motion, sheet, MusicV3SheetInputs(now.idle, now.next, peekActive, tabsActive,
+            onOpen = { sheet = MusicSheetMachine.open(sheet) }, onClose = { sheet = MusicSheetMachine.close(sheet) },
+            onTab = { sheet = MusicSheetMachine.selectTab(sheet, it) }, onDragStart = {}, onSettled = settle)) {
+          MusicV3SheetBody(sheet.tab, MusicV3BodyInputs(host.library, host.active, guests, now.queue, actions, nav,
+              onNav = { nav = it }, search = search, onSignInAgain = host.onAddAccount, onMove = onMove,
+              onOpenLibrary = { sheet = MusicSheetMachine.selectTab(sheet, MusicSheetTab.LIBRARY) },
+              onSearchFocus = { sheet = MusicSheetMachine.focusSearch(sheet, it) },
+              searchAutoFocus = sheet.open && sheet.tab == MusicSheetTab.SEARCH))
+        }
+        if (!sheet.open) {
+          MusicV3StagePopover(layout, sheet.popover, MusicV3PopoverInputs(host.library, host.accounts, host.active,
+              !now.queue.isEmpty, now.sleep, util, onDismiss = { sheet = MusicSheetMachine.dismissPopover(sheet) },
+              onToast = { toasts.show(it) },
+              onAddAccount = { sheet = MusicSheetMachine.dismissPopover(sheet); host.onAddAccount() },
+              onLastSignedOut = host.onLastSignedOut,
+              onMoveTo = { room -> sheet = MusicSheetMachine.dismissPopover(sheet); MusicHandoff.moveTo(context, room) }))
+          follow?.takeIf { !now.idle && sheet.popover == MusicPopover.NONE }?.let { MusicV3FollowCard(layout, it) }
+        }
+        val shown = !now.idle && !(handed && !now.model.playing)
+        val placeholder = when {
+          handed -> MusicV3SlotPlaceholder.Moved((move as MusicMoveState.Handed).targetName, moveControls.onBringBack)
+          now.idle && sheet.open -> MusicV3SlotPlaceholder.Empty
+          else -> null
+        }
+        MusicV3PlayerSlot(layout, motion, shown, placeholder)
+        toasts.Host(layout.toast(sheet.open, sheet.searchFocused), bottom = sheet.open && !sheet.searchFocused,
+            end = sheet.open && sheet.searchFocused)
       }
     }
   }
+}
+
+/** Header-strip handover points of the spring (the mock's peek and tabs fades). */
+private const val PEEK_UNTIL = 0.34f
+private const val TABS_FROM = 0.3f
+
+/** Places a composable in a geometry rect (dp). */
+internal fun Modifier.rect(r: MusicRect): Modifier = stageOffset { r.left to r.top }.size(r.width.dp, r.height.dp)
+
+@Composable
+private fun NowPlaying(
+    layout: MusicStageLayout,
+    now: MusicNowSlice,
+    room: String,
+    move: MusicV3MoveControls,
+    quiet: String?,
+    reduced: Boolean,
+    handed: Boolean,
+    onSleep: () -> Unit,
+    onToast: (String) -> Unit,
+    onUtilPlaced: (LayoutCoordinates) -> Unit,
+) {
+  val live = now.model.playing && !handed && !now.model.isAd
+  MusicV3HeroArt(now.track, now.model.isAd, live, handed, layout.art.dp, layout.spec.artRadius.dp, reduced,
+      Modifier.stageOffset { layout.artRect.left to layout.artRect.top })
+  layout.playerCaption?.takeIf { !handed }?.let { MusicV3PlayerCaption(Modifier.rect(it)) }
+  MusicV3NowColumn(now, MusicV3NowInputs(room, move, quiet, onSleep, onToast, onUtilPlaced), Modifier.rect(layout.column))
+}
+
+/** Most recent household play, as a Resume action for the strip (null when there is none). */
+@Composable
+private fun latestResume(actions: MusicV3Actions): (() -> Unit)? {
+  val plays by MusicHistoryFeature.plays.collectAsState()
+  val last = remember(plays) { MusicHistory.listing(plays).firstOrNull() } ?: return null
+  return { actions.playOne(last.toDataTrack(), MUSIC_RECENT_LABEL) }
 }
 
 /**
@@ -107,15 +204,21 @@ internal fun MusicV3PlayerLayout(
  * [DreamPolicy]); leaving while playing pauses (the surface does that) and Home explains why once.
  */
 @Composable
-private fun VideoScreenGuards(engine: YtEngineState, resumeOnOpen: Boolean) {
-  val holds = YtVideoScreenState.holds(engine)
+private fun VideoScreenGuards(now: MusicNowSlice, resumeOnOpen: Boolean) {
+  val holds = now.holdsScreen
   if (holds) KeepInteractiveScreenAwake()
   DisposableEffect(holds) {
     YtVideoScreenState.playingOnScreen = holds
     onDispose { YtVideoScreenState.playingOnScreen = false }
   }
-  val wasPlaying by rememberUpdatedState(engine.isPlaying || engine.wantsPlay)
-  DisposableEffect(Unit) { onDispose { if (wasPlaying) MusicV3Session.leftWhilePlaying() } }
+  val wasPlaying by rememberUpdatedState(now.playingOrWanted)
+  DisposableEffect(Unit) {
+    MusicV3FollowMeInScreen.screenShown(true)
+    onDispose {
+      MusicV3FollowMeInScreen.screenShown(false)
+      if (wasPlaying) MusicV3Session.leftWhilePlaying()
+    }
+  }
   LaunchedEffect(Unit) {
     if (!resumeOnOpen) return@LaunchedEffect
     YouTubeMusicEngine.state.first { it.foreground }
@@ -142,134 +245,11 @@ private fun SkipToasts(skip: YtSkipNotice?, show: (String) -> Unit) {
   }
 }
 
+/** "Music followed you from …" with Undo, as a stage toast (the overlay banner would cover the player). */
 @Composable
-private fun RightPane(
-    library: YouTubeMusicLibrary,
-    active: YtAccount?,
-    queue: YtQueue,
-    guests: Boolean,
-    onToast: (String) -> Unit,
-    onSignInAgain: () -> Unit,
-    onMove: (() -> Unit)?,
-) {
-  val scope = rememberCoroutineScope()
-  val actions = remember(library, scope) { MusicV3Actions(library, scope) { onToast(it) } }
-  var pane by rememberSaveable { mutableStateOf(if (queue.isEmpty) MusicV3Pane.LIBRARY else MusicV3Pane.QUEUE) }
-  var nav by remember(active?.id) { mutableStateOf(MusicV3LibraryNav()) }
-  // Hoisted so switching tabs keeps the shown results (a new search would cost budget).
-  val search = remember { mutableStateOf(MusicV3SearchState()) }
-  BackHandler(enabled = pane == MusicV3Pane.LIBRARY && nav.inDetail) { nav = nav.back() }
-  Column(Modifier.fillMaxSize()) {
-    Segmented(pane) { pane = it }
-    Box(Modifier.weight(1f).padding(start = 32.dp, end = 32.dp, top = 24.dp)) {
-      when (pane) {
-        MusicV3Pane.QUEUE -> MusicV3QueuePane(queue, onMove) { pane = MusicV3Pane.LIBRARY }
-        MusicV3Pane.LIBRARY, MusicV3Pane.SEARCH -> when {
-          guests -> GuestHiddenNote("Your music library is hidden while guests are here. Playback controls still work.")
-          active == null -> MusicV3GuestPane(library.isConfigured, onSignInAgain)
-          pane == MusicV3Pane.LIBRARY -> MusicV3LibraryPane(library, active.id, nav, { nav = it }, actions, onSignInAgain)
-          else -> SearchTab(library, actions, search)
-        }
-      }
-    }
+private fun FollowNotices(toasts: MusicStageToasts) {
+  val notice by MusicV3FollowMeInScreen.notice.collectAsState()
+  LaunchedEffect(notice?.seq) {
+    notice?.let { n -> toasts.show(n.text, action = "Undo" to { MusicV3FollowMeInScreen.undo(n) }) }
   }
-}
-
-@Composable
-private fun SearchTab(
-    library: YouTubeMusicLibrary,
-    actions: MusicV3Actions,
-    holder: androidx.compose.runtime.MutableState<MusicV3SearchState>,
-) {
-  val scope = rememberCoroutineScope()
-  val keyboard = LocalSoftwareKeyboardController.current
-  val context = LocalContext.current
-  var search by holder
-  LaunchedEffect(Unit) {
-    val (left, recent) = withContext(Dispatchers.IO) {
-      library.searchesRemainingToday() to MusicLocalSearch.recent(context)
-    }
-    search = search.copy(remaining = left, recent = recent.take(MusicV3Rules.MAX_RECENT_SEARCHES).map { it.query })
-  }
-  val suggestions = rememberSuggestions(search)
-  MusicV3SearchPane(search, suggestions, onQuery = { search = search.copy(query = it) }, actions = actions, onSubmit = { q ->
-    keyboard?.hide()
-    search = search.searching(q)
-    scope.launch {
-      val result = library.search(q)
-      val left = withContext(Dispatchers.IO) { library.searchesRemainingToday() }
-      search = search.answered(q, result, left)
-      if (result is com.immortal.launcher.youtube.YtResult.Ok) MusicLocalSearch.remember(context, q)
-    }
-  })
-}
-
-/** Local suggestions for what is being typed, debounced ([MusicSuggest.DEBOUNCE_MS]); no quota. */
-@Composable
-private fun rememberSuggestions(search: MusicV3SearchState): List<MusicSuggestion> {
-  val context = LocalContext.current
-  var suggestions by remember { mutableStateOf(emptyList<MusicSuggestion>()) }
-  val query = search.query.takeIf { search.showsSuggestions }
-  LaunchedEffect(query) {
-    if (query == null) return@LaunchedEffect
-    delay(MusicSuggest.DEBOUNCE_MS)
-    suggestions = withContext(Dispatchers.IO) { MusicLocalSearch.suggest(context, query) }
-  }
-  return if (query == null) emptyList() else suggestions
-}
-
-@Composable
-private fun Segmented(selected: MusicV3Pane, onSelect: (MusicV3Pane) -> Unit) {
-  Row(Modifier.padding(start = 32.dp, top = 28.dp).clip(RoundedCornerShape(42.dp)).background(ApprovedHomePalette.Chrome)
-      .padding(6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-    MusicV3Pane.entries.forEach { pane ->
-      val on = pane == selected
-      val shape = RoundedCornerShape(36.dp)
-      Box(Modifier.height(72.dp).widthIn(min = 200.dp).clip(shape)
-          .background(if (on) ApprovedHomePalette.Card else Color.Transparent)
-          .then(if (on) Modifier.approvedOutline(shape) else Modifier)
-          .tvFocusable(shape, ringColor = ApprovedHomePalette.Accent) { onSelect(pane) }
-          .semantics { role = Role.Tab }.padding(horizontal = 30.dp), contentAlignment = Alignment.Center) {
-        Text(pane.label, color = if (on) ApprovedHomePalette.Text else ApprovedHomePalette.Secondary, fontSize = 25.sp,
-            fontWeight = FontWeight.Medium)
-      }
-    }
-  }
-}
-
-/** Accounts panel wiring: switch keeps the music; signing out the account in use stops it. */
-@Composable
-private fun androidx.compose.foundation.layout.BoxScope.AccountsOverlay(
-    library: YouTubeMusicLibrary,
-    accounts: List<YtAccount>,
-    active: YtAccount?,
-    queue: YtQueue,
-    onClose: () -> Unit,
-    onAdd: () -> Unit,
-    onLastSignedOut: () -> Unit,
-    onToast: (String) -> Unit,
-) {
-  val scope = rememberCoroutineScope()
-  var confirming by remember { mutableStateOf<YtAccount?>(null) }
-  BackHandler { if (confirming != null) confirming = null else onClose() }
-  val actions = MusicV3AccountActions(
-      switchTo = { a ->
-        onClose()
-        scope.launch { if (library.switchAccount(a.id)) onToast("Now using ${a.title}'s library") }
-      },
-      askSignOut = { confirming = it },
-      confirmSignOut = { a ->
-        confirming = null
-        if (a.id == active?.id) YouTubeMusicEngine.clear()
-        if (accounts.size <= 1) onLastSignedOut()
-        scope.launch {
-          library.signOut(a.id)
-          onToast("${a.title} is signed out")
-        }
-      },
-      cancelSignOut = { confirming = null },
-      add = onAdd,
-      close = onClose,
-  )
-  MusicV3AccountsPanel(accounts, active, confirming, !queue.isEmpty, actions)
 }

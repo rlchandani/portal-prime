@@ -7,11 +7,8 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,24 +44,19 @@ internal data class MusicV3AccountActions(
 )
 
 /**
- * "Accounts on this Portal", drawn inside the right pane only (with its own dim layer), so the
- * player on the left is never covered. [confirming] switches it to the sign-out confirm.
+ * "Accounts on this Portal": an opaque card under the top bar at the right edge (the stage keeps it
+ * clear of the player). [confirming] switches it to the sign-out confirm.
  */
 @Composable
-internal fun BoxScope.MusicV3AccountsPanel(
+internal fun MusicV3AccountsPanel(
     accounts: List<YtAccount>,
     active: YtAccount?,
     confirming: YtAccount?,
     queueHasItems: Boolean,
     actions: MusicV3AccountActions,
+    modifier: Modifier = Modifier,
 ) {
-  val none = remember { MutableInteractionSource() }
-  Box(Modifier.matchParentSize().background(ApprovedHomePalette.Background.copy(alpha = 0.6f))
-      .clickable(none, indication = null, onClick = actions.close))
-  val shape = RoundedCornerShape(32.dp)
-  Column(Modifier.align(Alignment.TopEnd).padding(top = 0.dp, end = 16.dp).width(900.dp).clip(shape)
-      .background(ApprovedHomePalette.Card).approvedOutline(shape)
-      .clickable(none, indication = null) {}.padding(start = 36.dp, end = 36.dp, top = 32.dp, bottom = 28.dp)) {
+  MusicStageCard(modifier) {
     if (confirming != null) {
       SignOutConfirm(confirming, stopsMusic = confirming.id == active?.id && queueHasItems, actions)
     } else {
@@ -77,8 +68,8 @@ internal fun BoxScope.MusicV3AccountsPanel(
 @Composable
 private fun AccountList(accounts: List<YtAccount>, active: YtAccount?, actions: MusicV3AccountActions) {
   Row(Modifier.fillMaxWidth().padding(bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
-    Text("Accounts on this Portal", color = ApprovedHomePalette.Text, fontSize = 36.sp, fontWeight = FontWeight.Medium,
-        modifier = Modifier.weight(1f))
+    Text("Accounts on this Portal", color = ApprovedHomePalette.Text, fontSize = 32.sp, fontWeight = FontWeight.Bold,
+        maxLines = 1, modifier = Modifier.weight(1f))
     MusicV3RoundButton("Close", size = 72.dp, fill = ApprovedHomePalette.Chrome, onClick = actions.close) {
       ApprovedIcon("close", Modifier.size(28.dp), ApprovedHomePalette.Text)
     }
@@ -101,7 +92,8 @@ private fun AccountRow(account: YtAccount, inUse: Boolean, actions: MusicV3Accou
       horizontalArrangement = Arrangement.spacedBy(22.dp)) {
     MusicV3Avatar(account.title, account.thumbnailUrl, 72.dp)
     Column(Modifier.weight(1f)) {
-      Text(account.title, color = ApprovedHomePalette.Text, fontSize = 28.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+      Text(account.title, color = ApprovedHomePalette.Text, fontSize = 28.sp, fontWeight = FontWeight.Medium, maxLines = 1,
+          overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
       if (account.needsSignIn) Text("Needs to sign in again", color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
     }
     if (inUse) {
