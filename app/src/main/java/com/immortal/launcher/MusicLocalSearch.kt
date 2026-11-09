@@ -48,8 +48,10 @@ internal object MusicLocalSearch {
         artists = library?.cachedArtists().orEmpty().map { it.name })
   }
 
+  /** Your own matches, then YouTube-style completions ([YtQueryCompletions]); local-only if offline. */
   @WorkerThread
-  fun suggest(context: Context, query: String): List<MusicSuggestion> = MusicSuggest.suggest(query, sources(context))
+  fun suggest(context: Context, query: String): List<MusicSuggestion> =
+      MusicSuggest.withCompletions(MusicSuggest.suggest(query, sources(context)), YtQueryCompletions.fetch(query))
 
   private fun write(context: Context, f: (List<MusicRecentSearch>) -> List<MusicRecentSearch>) {
     val next = synchronized(lock) { f(recent(context)).also { cache = it } }

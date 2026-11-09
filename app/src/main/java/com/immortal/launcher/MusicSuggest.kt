@@ -41,6 +41,8 @@ internal object MusicSuggest {
   const val MAX_SUGGESTIONS = 8
   const val MIN_CHARS = 1
   const val DEBOUNCE_MS = 150L
+  /** With YouTube completions available, at most this many of your own matches come first. */
+  const val MAX_LOCAL_WITH_COMPLETIONS = 4
 
   private enum class Tier { PREFIX, WORD_START, CONTAINS }
 
@@ -60,6 +62,21 @@ internal object MusicSuggest {
         .sortedWith(compareBy<Pair<Tier, Candidate>> { it.first }.thenByDescending { it.second.atMs })
         .map { it.second.suggestion }
     return ranked.distinctBy(::identity).take(MAX_SUGGESTIONS)
+  }
+
+  /**
+   * Your own matches first (at most [MAX_LOCAL_WITH_COMPLETIONS] when there are completions), then
+   * YouTube's search completions as searches, skipping any that repeat a local suggestion's words.
+   */
+  fun withCompletions(local: List<MusicSuggestion>, completions: List<String>): List<MusicSuggestion> {
+    if (completions.isEmpty()) return local.take(MAX_SUGGESTIONS)
+    val mine = local.take(MAX_LOCAL_WITH_COMPLETIONS)
+    // A song you own and a search with the same words do different things (play vs search): keep both.
+    val seen = mine.filter { it.kind != MusicSuggestionKind.SONG }.map { normalize(it.text) }.toMutableSet()
+    val web = completions.mapNotNull { text ->
+      normalize(text).takeIf { it.isNotEmpty() && seen.add(it) }?.let { MusicSuggestion(text.trim().replace(SPACES, " "), MusicSuggestionKind.SEARCH) }
+    }
+    return (mine + web).take(MAX_SUGGESTIONS)
   }
 
   /** Songs are one per video; a search and an artist with the same words are one suggestion. */
