@@ -17,6 +17,7 @@ import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import android.view.ViewGroup
+import android.webkit.WebView
 import androidx.annotation.MainThread
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +51,7 @@ object YouTubeMusicEngine : MusicTransport {
   private var app: Application? = null
   private var published: NowPlayingState? = null
   private val releaseLater = Runnable { release() }
+  private var engineWarmed = false
 
   /** Engine snapshot for the UI (queue, player status, halt/skip notices, unknown-item flag). */
   val state: StateFlow<YtEngineState> = mutableState.asStateFlow()
@@ -68,6 +70,23 @@ object YouTubeMusicEngine : MusicTransport {
   fun restoreSaved(context: Context) {
     val application = context.applicationContext as Application
     onMain { ensureStore(application) }
+  }
+
+  /**
+   * Pays Chromium's one-time start-up (measured at 850–1000 ms on the main thread of a Portal+, the
+   * whole first-open stall of Music) while the launcher is idle, by building and destroying one
+   * throwaway WebView on the application context. Later WebViews, including the player's, then cost
+   * tens of ms. Nothing stays loaded: no page, no player, no audio; playback still happens only in
+   * the visible player. Once per process; a no-op once the player exists.
+   */
+  @MainThread
+  fun prewarm(context: Context) {
+    if (engineWarmed || host != null) return
+    engineWarmed = true
+    val started = SystemClock.elapsedRealtime()
+    runCatching { WebView(context.applicationContext).destroy() }
+        .onSuccess { Log.i(TAG, "WebView engine warmed in ${SystemClock.elapsedRealtime() - started} ms") }
+        .onFailure { Log.w(TAG, "WebView warm-up failed; the player starts it on first open", it) }
   }
 
   /** Un-hosts the player from [container]; it is released after [RELEASE_GRACE_MS] unless re-attached. */
@@ -149,6 +168,7 @@ object YouTubeMusicEngine : MusicTransport {
 
   private fun obtainHost(context: Context): YouTubePlayerHost {
     host?.let { return it }
+    engineWarmed = true
     val application = context.applicationContext as Application
     ensureStore(application)
     val h = YouTubePlayerHost(application, hostListener)

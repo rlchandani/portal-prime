@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -48,6 +49,8 @@ internal object MusicV3Dims {
   val Touch = 64.dp
   val PaneRadius = 32.dp
   val Gap = 24.dp
+  /** Track-row artwork (the stage draws 60–84 dp; this is the decode size for any row). */
+  val RowArt = 84.dp
 }
 
 internal enum class MusicV3ButtonStyle { SOLID, LINE, GHOST, DANGER }
@@ -96,12 +99,21 @@ internal fun MusicV3RoundButton(
       .semantics { contentDescription = label }, contentAlignment = Alignment.Center) { content() }
 }
 
-/** A remote thumbnail (YouTube CDN) with a quiet music-note placeholder. */
+/**
+ * A remote thumbnail (YouTube CDN) with a quiet music-note placeholder. [displaySize] is the size it
+ * is drawn at: the art is decoded near that size ([MediaArt.edgeFor]), not at the 384 px default.
+ */
 @Composable
-internal fun MusicV3Thumb(url: String?, modifier: Modifier, shape: Shape = RoundedCornerShape(12.dp)) {
+internal fun MusicV3Thumb(
+    url: String?,
+    modifier: Modifier,
+    shape: Shape = RoundedCornerShape(12.dp),
+    displaySize: Dp = MusicV3Dims.RowArt,
+) {
   val context = LocalContext.current
-  val bitmap by produceState<Bitmap?>(null, url) {
-    if (!url.isNullOrBlank()) MediaArt.deliverUri(context, url) { value = it }
+  val edge = with(LocalDensity.current) { MediaArt.edgeFor(displaySize.roundToPx()) }
+  val bitmap by produceState<Bitmap?>(null, url, edge) {
+    if (!url.isNullOrBlank()) MediaArt.deliverUri(context, url, edge) { value = it }
   }
   Box(modifier.clip(shape).background(ApprovedHomePalette.Chrome), contentAlignment = Alignment.Center) {
     val art = bitmap?.takeIf { !it.isRecycled }
@@ -118,8 +130,9 @@ internal fun MusicV3Thumb(url: String?, modifier: Modifier, shape: Shape = Round
 @Composable
 internal fun MusicV3Avatar(name: String, url: String?, size: Dp) {
   val context = LocalContext.current
-  val bitmap by produceState<Bitmap?>(null, url) {
-    if (!url.isNullOrBlank()) MediaArt.deliverUri(context, url) { value = it }
+  val edge = with(LocalDensity.current) { MediaArt.edgeFor(size.roundToPx()) }
+  val bitmap by produceState<Bitmap?>(null, url, edge) {
+    if (!url.isNullOrBlank()) MediaArt.deliverUri(context, url, edge) { value = it }
   }
   Box(Modifier.size(size).clip(CircleShape).background(ApprovedHomePalette.Selected),
       contentAlignment = Alignment.Center) {

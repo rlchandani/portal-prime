@@ -18,7 +18,10 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 
 /** Music v3 glyphs drawn on a 24-unit grid (mirrors the mock's SVGs; decorative only). */
-internal enum class MusicV3Glyph { PLAY, PAUSE, PREVIOUS, NEXT, SPEAKER, GRIP, MORE, DOWN, RIGHT, CHECK, SHUFFLE, EQ }
+internal enum class MusicV3Glyph {
+  PLAY, PAUSE, PREVIOUS, NEXT, SPEAKER, GRIP, MORE, DOWN, RIGHT, CHECK, SHUFFLE, EQ,
+  REPEAT, UP, LIST, GRID, MOVE, FOLLOW, SPEAKER_LOW, HUSH,
+}
 
 @Composable
 internal fun MusicV3GlyphIcon(glyph: MusicV3Glyph, color: Color, modifier: Modifier) {
@@ -51,6 +54,31 @@ internal fun MusicV3GlyphIcon(glyph: MusicV3Glyph, color: Color, modifier: Modif
         drawRoundRect(color, Offset(x * u, top * u), Size(3.5f * u, (20f - top) * u),
             androidx.compose.ui.geometry.CornerRadius(1.5f * u))
       }
+      MusicV3Glyph.REPEAT -> repeat(color, u)
+      MusicV3Glyph.UP -> { line(color, u, 6f, 14.5f, 12f, 8.5f); line(color, u, 12f, 8.5f, 18f, 14.5f) }
+      MusicV3Glyph.LIST -> listOf(6.5f, 12f, 17.5f).forEach { y ->
+        drawCircle(color, 1.1f * u, Offset(4.5f * u, y * u)); line(color, u, 9f, y, 20f, y)
+      }
+      MusicV3Glyph.GRID -> listOf(4f to 4f, 13f to 4f, 4f to 13f, 13f to 13f).forEach { (x, y) ->
+        drawRoundRect(color, Offset(x * u, y * u), Size(7f * u, 7f * u), androidx.compose.ui.geometry.CornerRadius(1.6f * u),
+            style = Stroke(1.9f * u))
+      }
+      MusicV3Glyph.MOVE -> {
+        drawRoundRect(color, Offset(3f * u, 5f * u), Size(13f * u, 9.5f * u), androidx.compose.ui.geometry.CornerRadius(2f * u),
+            style = Stroke(1.9f * u))
+        line(color, u, 7f, 19f, 12f, 19f); line(color, u, 18.5f, 9.5f, 21f, 9.5f)
+        line(color, u, 21f, 9.5f, 21f, 18.5f); line(color, u, 21f, 18.5f, 14.5f, 18.5f)
+      }
+      MusicV3Glyph.FOLLOW -> {
+        drawArc(color, 180f, 90f, false, Offset(4f * u, 7f * u), Size(16f * u, 16f * u), style = Stroke(1.9f * u, cap = StrokeCap.Round))
+        drawArc(color, 180f, 90f, false, Offset(4f * u, 7f * u), Size(24f * u, 24f * u), style = Stroke(1.9f * u, cap = StrokeCap.Round))
+        drawCircle(color, 2.5f * u, Offset(18f * u, 17f * u))
+      }
+      MusicV3Glyph.SPEAKER_LOW -> {
+        speakerBody(color, u)
+        drawArc(color, -50f, 100f, false, Offset(10f * u, 7f * u), Size(7f * u, 10f * u), style = Stroke(2f * u, cap = StrokeCap.Round))
+      }
+      MusicV3Glyph.HUSH -> { speakerBody(color, u); line(color, u, 15.5f, 9.5f, 20.5f, 14.5f); line(color, u, 20.5f, 9.5f, 15.5f, 14.5f) }
     }
   }
 }
@@ -66,12 +94,25 @@ private fun DrawScope.fill(c: Color, u: Float, vararg pts: Pair<Float, Float>) {
   drawPath(path, c)
 }
 
-private fun DrawScope.speaker(c: Color, u: Float) {
+private fun DrawScope.speakerBody(c: Color, u: Float) {
   val body = Path().apply {
     moveTo(3f * u, 9f * u); lineTo(7f * u, 9f * u); lineTo(12f * u, 5f * u)
     lineTo(12f * u, 19f * u); lineTo(7f * u, 15f * u); lineTo(3f * u, 15f * u); close()
   }
   drawPath(body, c)
+}
+
+private fun DrawScope.repeat(c: Color, u: Float) {
+  line(c, u, 4f, 11.5f, 4f, 10f); line(c, u, 7.5f, 6.5f, 19f, 6.5f)
+  drawArc(c, 180f, 90f, false, Offset(4f * u, 6.5f * u), Size(7f * u, 7f * u), style = Stroke(1.9f * u, cap = StrokeCap.Round))
+  line(c, u, 16.5f, 4f, 19f, 6.5f); line(c, u, 19f, 6.5f, 16.5f, 9f)
+  line(c, u, 20f, 12.5f, 20f, 14f); line(c, u, 16.5f, 17.5f, 5f, 17.5f)
+  drawArc(c, 0f, 90f, false, Offset(13f * u, 10.5f * u), Size(7f * u, 7f * u), style = Stroke(1.9f * u, cap = StrokeCap.Round))
+  line(c, u, 7.5f, 20f, 5f, 17.5f); line(c, u, 5f, 17.5f, 7.5f, 15f)
+}
+
+private fun DrawScope.speaker(c: Color, u: Float) {
+  speakerBody(c, u)
   drawArc(c, -50f, 100f, false, Offset(10f * u, 7f * u), Size(7f * u, 10f * u),
       style = Stroke(2f * u, cap = StrokeCap.Round))
   drawArc(c, -55f, 110f, false, Offset(10f * u, 3.5f * u), Size(11f * u, 17f * u),

@@ -73,11 +73,13 @@ class MusicV3DataModelTest {
     assertFalse(s.resting)
   }
 
-  @Test fun libraryNavBackLeavesTheChip() {
-    val nav = MusicV3LibraryNav(MusicV3LibraryTab.ARTISTS, artist = com.immortal.launcher.youtube.YtArtist("c", "n", null))
+  // Library is now one page of shelves (no chips), so Back from any opened list returns to the shelves.
+  @Test fun libraryNavBackReturnsToTheShelves() {
+    val nav = MusicV3LibraryNav(artist = com.immortal.launcher.youtube.YtArtist("c", "n", null))
     assertTrue(nav.inDetail)
-    assertEquals(MusicV3LibraryNav(MusicV3LibraryTab.ARTISTS), nav.back())
-    assertEquals(MusicV3LibraryTab.PLAYLISTS, MusicV3LibraryNav().tab)
+    assertEquals(MusicV3LibraryNav(), nav.back())
+    assertTrue(MusicV3LibraryNav(liked = true).inDetail)
+    assertFalse(MusicV3LibraryNav().inDetail)
   }
 
   @Test fun suggestionsShowWhileTypingSomethingNotYetSearched() {

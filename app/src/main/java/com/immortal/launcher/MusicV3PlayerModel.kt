@@ -49,12 +49,7 @@ internal data class MusicV3NowPlaying(
     }
 
     /** Position extrapolated from the last player report while it plays, clamped to the length. */
-    fun livePositionMs(s: YtEngineState, nowElapsedMs: Long): Long {
-      val moving = s.status == YtPlayerStatus.PLAYING && s.positionAtElapsedMs > 0L
-      val raw = s.positionMs + if (moving) (nowElapsedMs - s.positionAtElapsedMs).coerceAtLeast(0L) else 0L
-      val length = durationMs(s)
-      return if (length > 0L) raw.coerceAtMost(length) else raw
-    }
+    fun livePositionMs(s: YtEngineState, nowElapsedMs: Long): Long = MusicProgressSlice.of(s).liveMs(nowElapsedMs)
 
     /** The player's reported length, else the Data API's. */
     fun durationMs(s: YtEngineState): Long =

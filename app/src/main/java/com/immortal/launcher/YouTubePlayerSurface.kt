@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import android.view.View
 import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -23,9 +24,12 @@ import androidx.lifecycle.LifecycleEventObserver
  * While composed and the host lifecycle is RESUMED the engine may play; ON_PAUSE or leaving
  * composition pauses it (no background playback) and nothing resumes without a user action.
  * Leaving composition also schedules the player's release ([YouTubeMusicEngine.RELEASE_GRACE_MS]).
+ *
+ * [shown] = false keeps the one player (and its page) alive but hidden, for "nothing loaded" and
+ * "playing in another room"; the caller also moves it out of the way so it never takes touches.
  */
 @Composable
-fun YouTubePlayerSurface(modifier: Modifier = Modifier) {
+fun YouTubePlayerSurface(modifier: Modifier = Modifier, shown: Boolean = true) {
   val lifecycleOwner = LocalLifecycleOwner.current
   DisposableEffect(lifecycleOwner) {
     val observer = LifecycleEventObserver { _, event ->
@@ -46,6 +50,7 @@ fun YouTubePlayerSurface(modifier: Modifier = Modifier) {
   }
   AndroidView(
       factory = { ctx -> FrameLayout(ctx).also(YouTubeMusicEngine::attach) },
+      update = { it.visibility = if (shown) View.VISIBLE else View.INVISIBLE },
       onRelease = YouTubeMusicEngine::detach,
       modifier = modifier,
   )

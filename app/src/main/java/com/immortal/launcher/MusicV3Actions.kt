@@ -16,18 +16,23 @@ import com.immortal.launcher.youtube.YtTrack as YtDataTrack
 /**
  * Library/Search taps → engine queue. Every list is checked with [YouTubeMusicLibrary.playable]
  * first, so a blocked song never interrupts what is playing; it gets one toast instead.
- * Runs on [scope] (the screen's main-thread scope); [toast] shows a right-pane message.
+ * Runs on [scope] (the screen's main-thread scope); [toast] shows a problem, [confirm] a short
+ * "Playing …" (the sheet stays open on a tap, so this is the only sign that something started).
  */
 internal class MusicV3Actions(
     private val library: YouTubeMusicLibrary,
     private val scope: CoroutineScope,
     private val toast: (String) -> Unit,
+    private val confirm: (String) -> Unit = toast,
 ) {
   /** Tap on a track: plays it and builds the queue from the list (recommended flow 3). */
   fun playFrom(list: List<YtDataTrack>, tapped: YtDataTrack, label: String) = withPlayable(list) { ok ->
     val start = MusicV3Rules.startIndex(tapped, ok)
     if (start == null) toast(MusicV3Rules.blockedToast(tapped.title))
-    else YouTubeMusicEngine.playNow(ok.map { it.toQueueTrack() }, start, label)
+    else {
+      YouTubeMusicEngine.playNow(ok.map { it.toQueueTrack() }, start, label)
+      confirm(MusicV3StageCopy.playing(tapped.title))
+    }
   }
 
   /** Play / Shuffle buttons on a playlist, liked songs or an artist. */
@@ -36,20 +41,24 @@ internal class MusicV3Actions(
     val start = if (shuffle) Random.nextInt(ok.size) else 0
     YouTubeMusicEngine.playNow(ok.map { it.toQueueTrack() }, start, label)
     if (shuffle) YouTubeMusicEngine.setShuffle(true)
+    confirm(if (shuffle) "Shuffling $label" else MusicV3StageCopy.playing(label))
   }
 
   /** Search result tap: plays now and keeps the rest of Up next after it (recommended answer 8). */
   fun playSearchResult(track: YtDataTrack, query: String) = playOne(track, "Search · $query")
 
   /** One song now (a suggestion or a Recently played row), the same way as a search result tap. */
-  fun playOne(track: YtDataTrack, label: String) = withOne(track) { YouTubeMusicEngine.playTrackNow(it, label) }
+  fun playOne(track: YtDataTrack, label: String) = withOne(track) {
+    YouTubeMusicEngine.playTrackNow(it, label)
+    confirm(MusicV3StageCopy.playing(it.title))
+  }
 
-  fun playNext(track: YtDataTrack) = withOne(track) { YouTubeMusicEngine.playNext(it); toast("Plays next: ${it.title}") }
+  fun playNext(track: YtDataTrack) = withOne(track) { YouTubeMusicEngine.playNext(it); confirm("Plays next: ${it.title}") }
 
-  /** Shows [text] in the right pane's toast. */
-  fun notify(text: String) = toast(text)
+  /** Shows [text] in the stage's toast. */
+  fun notify(text: String) = confirm(text)
 
-  fun addToQueue(track: YtDataTrack) = withOne(track) { YouTubeMusicEngine.addToEnd(it); toast("Added to the queue") }
+  fun addToQueue(track: YtDataTrack) = withOne(track) { YouTubeMusicEngine.addToEnd(it); confirm("Added to Up next") }
 
   private fun withOne(track: YtDataTrack, then: (YtTrack) -> Unit) = withPlayable(listOf(track)) { ok ->
     val first = ok.firstOrNull()
