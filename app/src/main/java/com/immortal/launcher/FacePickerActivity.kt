@@ -12,24 +12,18 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.immortal.launcher.settings.SettingsDomains
-import com.immortal.launcher.settings.SettingsRegistry
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import org.json.JSONObject
 
 class FacePickerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,18 +46,16 @@ internal fun FacePickerContent() {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     var settings by remember { mutableStateOf(ScreensaverConfig.load(context)) }
-    var immortal by remember { mutableStateOf(ImmortalSettings.load(context)) }
     DisposableEffect(owner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 settings = ScreensaverConfig.load(context)
-                immortal = ImmortalSettings.load(context)
             }
         }
         owner.lifecycle.addObserver(observer)
         onDispose { owner.lifecycle.removeObserver(observer) }
     }
-    ApprovedSettingsSectionLabel("Options")
+    ApprovedSettingsSectionLabel("Photo frame clock")
     Card {
         ToggleRow("Show clock face", settings.facesEnabled) { enabled ->
             // These three legacy face fields are owned by this rich picker (no scalar spec).
@@ -90,19 +82,7 @@ internal fun FacePickerContent() {
             }
         }
     }
-    Spacer(Modifier.height(32.dp))
-    SettingsList(SettingsDomains.immortal, immortal,
-        exclude = SettingsDomains.immortal.specs.map { it.key }.toSet() - "clockFormat") { key, value ->
-        SettingsRegistry.apply(context, "immortal", JSONObject().put(key, value))
-        immortal = ImmortalSettings.load(context)
-    }
-    // Registry groups include a 22 dp trailing gap; the approved inter-group gap is 32 dp.
-    if (settings.enabled) Spacer(Modifier.height(10.dp))
-    SettingsList(SettingsDomains.screensaver, settings,
-        exclude = SettingsDomains.screensaver.specs.map { it.key }.toSet() - "showNowPlaying") { key, value ->
-        SettingsRegistry.apply(context, "screensaver", JSONObject().put(key, value))
-        settings = ScreensaverConfig.load(context)
-    }
+    // Time format (Display & Brightness) and Show now playing (Photo Frame) each have one home.
     ApprovedSourcesPreviewFooter(topGap = 12.dp) {
         context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
     }

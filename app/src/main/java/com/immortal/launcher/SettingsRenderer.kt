@@ -216,11 +216,12 @@ private fun Modifier.approvedSettingsGroupRow(first: Boolean, last: Boolean, hig
     }
     val fill = if (highlight) IosFocusTint else IosCard
     val divider = IosDivider
+    val outline = com.immortal.launcher.ui.theme.LocalApprovedPalette.current.outline
     val accent = IosBlue
     return clip(shape).drawWithCache {
         val w = size.width
         val h = size.height
-        val half = .5.dp.toPx()
+        val half = ApprovedOutlineWidth.toPx() / 2f
         val radius = 24.dp.toPx().coerceAtMost(minOf(w, h) / 2f)
         val perimeter = Path().apply {
             moveTo(half, if (first) radius else 0f)
@@ -237,22 +238,22 @@ private fun Modifier.approvedSettingsGroupRow(first: Boolean, last: Boolean, hig
             } else moveTo(half, h)
             lineTo(half, if (first) radius else 0f)
         }
-        val borderStroke = Stroke(1.dp.toPx())
+        val borderStroke = Stroke(ApprovedOutlineWidth.toPx())
         val highlightStroke = Stroke(3.dp.toPx())
         val dividerStart = Offset(28.dp.toPx(), half)
         val dividerEnd = Offset(w, half)
         onDrawWithContent {
             drawRect(fill)
             drawContent()
-            drawPath(perimeter, divider, style = borderStroke)
-            if (!first) drawLine(divider, dividerStart, dividerEnd, strokeWidth = borderStroke.width)
+            drawPath(perimeter, outline, style = borderStroke)
+            if (!first) drawLine(divider, dividerStart, dividerEnd, strokeWidth = 1.dp.toPx())
             if (highlight) drawRect(accent, style = highlightStroke)
         }
     }
 }
 
 @Composable
-private fun <S> SettingControl(
+internal fun <S> SettingControl(
     domainId: String,
     spec: SettingSpec<S>,
     snapshot: S,
@@ -263,8 +264,8 @@ private fun <S> SettingControl(
     val context = LocalContext.current
     val navigate = rememberApprovedSettingsNavigator()
     fun open(activity: Class<*>) {
-        val destination = ApprovedSettingsPages.firstOrNull { it.standaloneActivity == activity }
-        if (destination != null) navigate(approvedSettingsRoute(destination.id))
+        val page = settingsPageForActivity(activity)
+        if (page != null) navigate(approvedSettingsRoute(page))
         else context.startActivity(Intent(context, activity))
     }
     val fullHelp = when (spec) {

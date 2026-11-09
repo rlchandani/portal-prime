@@ -24,8 +24,6 @@ class SettingsPresentationTest {
     assertTrue(SettingsPresentation.isAdvanced("immortal", "maPassword"))
     assertTrue(SettingsPresentation.isAdvanced("immortal", "maApiToken"))
     assertTrue(SettingsPresentation.isAdvanced("immortal", "maPlayerId"))
-    assertTrue(SettingsPresentation.isAdvancedPage("smb"))
-    assertFalse(SettingsPresentation.isAdvancedPage("system"))
     assertFalse(SettingsPresentation.isAdvanced("screensaver", "pauseAudioOnSleep"))
     assertFalse(SettingsPresentation.isAdvanced("immortal", "advancedSettings"))
   }

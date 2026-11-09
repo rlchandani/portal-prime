@@ -100,7 +100,7 @@ internal object Sizes {
     val pageSubtitle = 23.sp
     val sectionLabel = 22.sp
     val navLabel = 22.sp
-    val rowTitle = 26.sp
+    val rowTitle = 28.sp
     val rowSub = 20.sp
     val rowValue = 23.sp
     val actionButton = 24.sp
@@ -149,7 +149,7 @@ internal fun Card(content: @Composable () -> Unit) {
     Surface(
         color = IosCard,
         shape = RoundedCornerShape(Sizes.cardRadius),
-        border = BorderStroke(1.dp, IosDivider),
+        border = BorderStroke(ApprovedOutlineWidth, LocalApprovedPalette.current.outline),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column { content() }

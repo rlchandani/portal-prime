@@ -10,9 +10,6 @@ import com.immortal.launcher.ScreensaverConfig
 
 /** Presentation policy shared by the native renderer and phone schema. Never mutates settings. */
 object SettingsPresentation {
-  private val advancedPages = setOf(
-      "almanac", "immich", "albums", "smb", "dav", "web", "multiroom", "mqtt", "boot",
-      "alpaca", "options", "speed", "apk", "managed", "debug", "ha-entities")
   private val advancedControls = setOf(
       "calendarpacks.romanian", "calendarpacks.irish", "calendarpacks.prayer",
       "immortal.hideStatusBar", "immortal.stayInStartupApp", "sources.albumRefresh", "screensaver.cacheEnabled",
@@ -73,7 +70,6 @@ object SettingsPresentation {
     advanced || value == selected || !isAdvancedOption(domainId, key, value)
   }
 
-  fun isAdvancedPage(page: String): Boolean = page in advancedPages
   @Suppress("UNUSED_PARAMETER")
   fun conciseHelp(domainId: String, key: String, fallback: String?): String =
       shortHelp["$domainId.$key"].orEmpty()

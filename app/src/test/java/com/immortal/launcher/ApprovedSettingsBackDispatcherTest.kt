@@ -12,12 +12,12 @@ import org.junit.Test
 class ApprovedSettingsBackDispatcherTest {
   private class Host {
     var eligible = true
-    var history = ApprovedSettingsHistory.initial(ApprovedSettingsRoute("welcome", "sound"))
+    var stack = SettingsBackStack.of("w-weather")
     var backCalls = 0
     fun back(): Boolean {
-      if (history.current.page == null) return false
+      if (!stack.canGoBack) return false
       backCalls++
-      history = history.back()
+      stack = stack.back()
       return true
     }
   }
@@ -27,7 +27,7 @@ class ApprovedSettingsBackDispatcherTest {
     val dispatcher = ApprovedSettingsBackDispatcher<Host>({ it.eligible }, { it.back() })
     dispatcher.resumed(host)
     assertTrue(dispatcher.dispatch())
-    assertEquals(ApprovedSettingsRoute(category = "sound"), host.history.current)
+    assertEquals(listOf("widgets"), host.stack.pages)
     assertEquals(1, host.backCalls)
     assertFalse(dispatcher.dispatch())
     assertEquals(1, host.backCalls)

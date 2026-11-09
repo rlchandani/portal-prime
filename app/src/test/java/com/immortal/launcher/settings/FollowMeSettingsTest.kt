@@ -42,7 +42,7 @@ class FollowMeSettingsTest {
   }
 
   @Test fun searchOpensSettingsMusic() {
-    assertEquals("music", com.immortal.launcher.approvedPageForControl(FollowMeSettings.domain.id, "mode"))
-    assertEquals("sound", com.immortal.launcher.approvedSettingsPage("music")?.category)
+    assertEquals("music", com.immortal.launcher.settingsControlHome("${FollowMeSettings.domain.id}.mode"))
+    assertEquals(com.immortal.launcher.SettingsGroup.CONNECTED_HOME, com.immortal.launcher.SettingsTree.page("music")?.group)
   }
 }

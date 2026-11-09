@@ -25,10 +25,10 @@ internal fun rememberSettingsPaneWorkModifier(page: String, active: Boolean): Mo
   if (!BuildConfig.PORTAL_SETTINGS_PANE_DIAGNOSTICS) return Modifier
   val observation = remember(page) {
     val pane = when (page) {
-      "appearance" -> SettingsPaneWorkId.APPEARANCE
-      "touch" -> SettingsPaneWorkId.TOUCH
-      "wallpaper" -> SettingsPaneWorkId.WALLPAPER
-      "quickbar" -> SettingsPaneWorkId.QUICKBAR
+      SettingsPageIds.DISPLAY -> SettingsPaneWorkId.APPEARANCE
+      SettingsPageIds.SOUNDS -> SettingsPaneWorkId.TOUCH
+      SettingsPageIds.WALLPAPER -> SettingsPaneWorkId.WALLPAPER
+      SettingsPageIds.HOME -> SettingsPaneWorkId.QUICKBAR
       else -> SettingsPaneWorkId.OTHER
     }
     SettingsPaneWorkObservation(pane, active)

@@ -84,8 +84,6 @@ android {
     buildConfigField("boolean", "PORTAL_SETTINGS_UI_DIAGNOSTICS", "false")
     buildConfigField("boolean", "PORTAL_SETTINGS_PANE_DIAGNOSTICS", "false")
 
-    // Bounded Appearance rows avoid nested lazy-layout work on Portal hardware.
-    buildConfigField("boolean", "PORTAL_SETTINGS_DIRECT_APPEARANCE_ROWS", "true")
 
     // Portal hardware is ARM only (gen-1/gen-2 Snapdragon, Portal TV Amlogic).
     // Kept as a guard so any future native dependency can't drag x86/x86_64 .so
@@ -152,8 +150,6 @@ android {
       // Work attribution only; disabled for ordinary and final speed-comparison builds.
       buildConfigField("boolean", "PORTAL_SETTINGS_PANE_DIAGNOSTICS",
           (providers.gradleProperty("portalSettingsPaneDiagnostics").orNull == "true").toString())
-      buildConfigField("boolean", "PORTAL_SETTINGS_DIRECT_APPEARANCE_ROWS",
-          (providers.gradleProperty("portalSettingsDirectAppearanceRows").getOrElse("true") == "true").toString())
       applicationIdSuffix = ".debug"
       isDebuggable = false
       signingConfig = signingConfigs.getByName("debug")
