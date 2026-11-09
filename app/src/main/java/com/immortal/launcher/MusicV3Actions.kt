@@ -39,14 +39,10 @@ internal class MusicV3Actions(
   }
 
   /** Search result tap: plays now and keeps the rest of Up next after it (recommended answer 8). */
-  fun playSearchResult(track: YtDataTrack, query: String) = withOne(track) { t ->
-    if (YouTubeMusicEngine.state.value.queue.isEmpty) {
-      YouTubeMusicEngine.playNow(listOf(t), 0, "Search · $query")
-    } else {
-      YouTubeMusicEngine.playNext(t)
-      YouTubeMusicEngine.next()
-    }
-  }
+  fun playSearchResult(track: YtDataTrack, query: String) = playOne(track, "Search · $query")
+
+  /** One song now (a suggestion or a Recently played row), the same way as a search result tap. */
+  fun playOne(track: YtDataTrack, label: String) = withOne(track) { YouTubeMusicEngine.playTrackNow(it, label) }
 
   fun playNext(track: YtDataTrack) = withOne(track) { YouTubeMusicEngine.playNext(it); toast("Plays next: ${it.title}") }
 

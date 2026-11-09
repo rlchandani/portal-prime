@@ -47,6 +47,8 @@ internal data class MusicV3RowModel(
     val current: Boolean = false,
     /** Why the player refused it (queue rows only); the row is dimmed. */
     val unplayableReason: String? = null,
+    /** Shown where the duration goes, e.g. "Living Area · 2 h ago" on Recently played. */
+    val detail: String? = null,
 )
 
 /**
@@ -76,9 +78,8 @@ internal fun MusicV3TrackRow(
       MusicV3Thumb(row.thumbnailUrl, Modifier.size(72.dp))
       RowText(row, Modifier.weight(1f))
       if (row.current) MusicV3GlyphIcon(MusicV3Glyph.EQ, ApprovedHomePalette.Accent, Modifier.size(28.dp))
-      row.durationMs?.takeIf { it > 0 }?.let {
-        Text(MusicV3Rules.formatPosition(it), color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
-      }
+      val trailing = row.detail ?: row.durationMs?.takeIf { it > 0 }?.let(MusicV3Rules::formatPosition)
+      trailing?.let { Text(it, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1) }
       if (actions.isNotEmpty()) {
         MusicV3RoundButton("More for ${row.title}", onClick = { menuOpen = !menuOpen }) {
           MusicV3GlyphIcon(MusicV3Glyph.MORE, ApprovedHomePalette.Secondary, Modifier.size(28.dp))

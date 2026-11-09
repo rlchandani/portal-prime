@@ -13,8 +13,10 @@ import org.json.JSONObject
 internal sealed interface YtRemoteCommand {
   /** Commands that can start sound; quiet hours, a routine on screen or a call gate them. */
   val startsPlayback: Boolean get() = false
+  /** "Play anyway" after the phone was told about quiet hours (only for [startsPlayback]). */
+  val playAnyway: Boolean get() = false
 
-  data class Play(val playAnyway: Boolean) : YtRemoteCommand {
+  data class Play(override val playAnyway: Boolean) : YtRemoteCommand {
     override val startsPlayback: Boolean get() = true
   }
   data object Pause : YtRemoteCommand
@@ -22,11 +24,18 @@ internal sealed interface YtRemoteCommand {
   data object Previous : YtRemoteCommand
   data class Seek(val positionMs: Long) : YtRemoteCommand
   /** Skip to queue entry [entryId] and play it. */
-  data class Jump(val entryId: Long, val playAnyway: Boolean) : YtRemoteCommand {
+  data class Jump(val entryId: Long, override val playAnyway: Boolean) : YtRemoteCommand {
     override val startsPlayback: Boolean get() = true
   }
   data class Remove(val entryId: Long) : YtRemoteCommand
   data class PlayNext(val entryId: Long) : YtRemoteCommand
+  /** A search result or history row: play now, keeping the rest of Up next after it. */
+  data class PlayTrack(val track: YtTrack, override val playAnyway: Boolean) : YtRemoteCommand {
+    override val startsPlayback: Boolean get() = true
+  }
+  /** Add a song right after the current one ([next]) or at the end. */
+  data class QueueTrack(val track: YtTrack, val next: Boolean) : YtRemoteCommand
+  data class Sleep(val choice: MusicSleepChoice) : YtRemoteCommand
 }
 
 /** How a phone "play" is carried out; see [YtRemoteProtocol.playPlan]. */
@@ -50,13 +59,17 @@ internal data class YtRemoteRoom(
     val account: String?,
     /** STREAM_MUSIC, or null when the audio service is unavailable. */
     val volume: RemoteMedia.VolumeState?,
+    /** "Quieter music during quiet hours", or null when that setting is off. */
+    val nightCap: MusicNightCap? = null,
 )
 
 /**
  * Pure wire format of `/remote/ytmusic` (the official-player queue, [YouTubeMusicEngine]):
  * GET → `{ok, player:{state, room, onScreen, ad, current, positionMs, durationMs, upNext[],
- * upNextTotal, label, repeat, shuffle, halt, signedIn, account, quiet, quietUntil, volume}}`;
- * POST `{cmd: play|pause|next|previous|seek|jump|remove|playnext, positionMs?, entryId?, playAnyway?}`.
+ * upNextTotal, label, repeat, shuffle, halt, signedIn, account, quiet, quietUntil, volume, sleepUntilMs,
+ * sleepEndOfSong, nightCap}}`; POST `{cmd: play|pause|next|previous|seek|jump|remove|playnext, positionMs?,
+ * entryId?, playAnyway?}`, `{cmd: playtrack, videoId, title, artist, thumb, playAnyway?}`,
+ * `{cmd: queuetrack, videoId, title, artist, thumb, position: next|end}`, `{cmd: sleep, minutes: 0|15|30|60|-1}`.
  * Play with nothing in the engine or the saved queue answers `{ok, status: declined, reason: nothing_queued}`.
  */
 internal object YtRemoteProtocol {
@@ -68,6 +81,10 @@ internal object YtRemoteProtocol {
   const val MAX_TEXT = 200
   /** Declined-play reason when neither the engine nor the saved queue has a track. */
   const val REASON_NOTHING_QUEUED = "nothing_queued"
+  /** Bound on a thumbnail URL a phone sends; anything else falls back to YouTube's standard one. */
+  const val MAX_THUMB = 500
+  /** Queue label for songs a phone picked from search or history. */
+  const val PHONE_LABEL = "From your phone"
 
   sealed interface Decoded {
     data class Ok(val command: YtRemoteCommand) : Decoded
@@ -86,9 +103,35 @@ internal object YtRemoteProtocol {
       "jump" -> entry(body) { YtRemoteCommand.Jump(it, playAnyway) }
       "remove" -> entry(body) { YtRemoteCommand.Remove(it) }
       "playnext" -> entry(body) { YtRemoteCommand.PlayNext(it) }
+      "playtrack" -> track(body)?.let { Decoded.Ok(YtRemoteCommand.PlayTrack(it, playAnyway)) }
+          ?: Decoded.Invalid("invalid_video")
+      "queuetrack" -> queueTrack(body)
+      "sleep" -> whole(body.opt("minutes"), -1L..MAX_SLEEP_MINUTES)?.let { MusicSleepChoice.fromMinutes(it.toInt()) }
+          ?.let { Decoded.Ok(YtRemoteCommand.Sleep(it)) } ?: Decoded.Invalid("invalid_minutes")
       else -> Decoded.Invalid("unknown_cmd")
     }
   }
+
+  private fun queueTrack(body: JSONObject): Decoded {
+    val track = track(body) ?: return Decoded.Invalid("invalid_video")
+    return when (body.optString("position")) {
+      "next" -> Decoded.Ok(YtRemoteCommand.QueueTrack(track, next = true))
+      "end" -> Decoded.Ok(YtRemoteCommand.QueueTrack(track, next = false))
+      else -> Decoded.Invalid("invalid_position")
+    }
+  }
+
+  /** A phone-sent song: a valid video id; text capped; only an https thumbnail is kept. */
+  private fun track(body: JSONObject): YtTrack? {
+    val videoId = body.optString("videoId").takeIf(YtTrack::isValidVideoId) ?: return null
+    val thumb = body.optString("thumb").takeIf { it.startsWith("https://") && it.length <= MAX_THUMB }
+        ?: MusicShareQueue.thumbnailFor(videoId)
+    return YtTrack(videoId, body.optString("title").trim().take(MAX_TEXT).ifBlank { UNTITLED },
+        body.optString("artist").trim().take(MAX_TEXT), thumb)
+  }
+
+  private const val MAX_SLEEP_MINUTES = 60L
+  private const val UNTITLED = "Song"
 
   /** Why [command] can't apply to [s] (answered as 409), or null. */
   fun conflict(command: YtRemoteCommand, s: YtEngineState): String? {
@@ -140,6 +183,10 @@ internal object YtRemoteProtocol {
         .put("quiet", room.quiet)
         .put("quietUntil", room.quietUntil?.takeIf { room.quiet } ?: JSONObject.NULL)
         .put("volume", room.volume?.toJson() ?: JSONObject.NULL)
+        .put("sleepUntilMs", s.sleep?.untilMs ?: JSONObject.NULL)
+        .put("sleepEndOfSong", s.sleep?.endOfSong == true)
+        .put("nightCap", room.nightCap?.let { JSONObject().put("active", it.active).put("maxLevel", it.maxLevel) }
+            ?: JSONObject.NULL)
   }
 
   private fun entry(e: YtQueueEntry): JSONObject = JSONObject()

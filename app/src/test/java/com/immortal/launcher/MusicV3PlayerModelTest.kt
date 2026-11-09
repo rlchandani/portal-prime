@@ -96,9 +96,20 @@ class MusicV3PlayerModelTest {
     assertTrue(YtVideoScreenState.ownsScreen())
   }
 
-  @Test fun homeChipSaysPausedOffThePlayer() {
-    assertEquals("Paused", musicV3ChipStatus(playing.copy(status = YtPlayerStatus.PAUSED)))
-    assertEquals("Playing", musicV3ChipStatus(playing))
+  @Test fun homeChipSaysPlayingOrOffersToResume() {
+    val title = playing.queue.current!!.track.title
+    assertEquals(MusicV3ChipModel(playing.queue.current!!.track, "$title", "Playing", resume = false),
+        musicV3Chip(playing, saved = null))
+    val paused = musicV3Chip(playing.copy(status = YtPlayerStatus.PAUSED), saved = null)!!
+    assertEquals("Resume · $title", paused.title)
+    assertEquals(true, paused.resume)
+    assertEquals(null, paused.status)
+  }
+
+  @Test fun homeChipResumesTheSavedQueueAfterARestart() {
+    val saved = YtTrack("abcdefghijk", "Saved song", "Artist")
+    assertEquals("Resume · Saved song", musicV3Chip(YtEngineState(), saved)!!.title)
+    assertNull(musicV3Chip(YtEngineState(), saved = null))
   }
 
   @Test fun pausedNoteShowsOncePerProcess() {

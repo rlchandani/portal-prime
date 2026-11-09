@@ -44,7 +44,9 @@ import com.immortal.launcher.youtube.YtResult
 import kotlinx.coroutines.flow.Flow
 
 /** Library chips; Playlists opens by default (recommended answer 1). */
-internal enum class MusicV3LibraryTab(val label: String) { PLAYLISTS("Playlists"), LIKED("Liked songs"), ARTISTS("Artists") }
+internal enum class MusicV3LibraryTab(val label: String) {
+  PLAYLISTS("Playlists"), LIKED("Liked songs"), ARTISTS("Artists"), RECENT("Recently played"),
+}
 
 /** Where Library is: a chip, or one playlist / artist opened from it. Immutable. */
 internal data class MusicV3LibraryNav(
@@ -116,6 +118,7 @@ private fun LibraryHome(
           onSignInAgain) { tracks -> MusicV3LikedTab(library, accountId, tracks, actions) }
       MusicV3LibraryTab.ARTISTS -> LoadOrProblem(rememberLibraryLoad(accountId to "artists") { library.artists() },
           onSignInAgain) { ArtistList(it) { a -> onNav(nav.copy(artist = a)) } }
+      MusicV3LibraryTab.RECENT -> MusicV3RecentTab(actions)
     }
   }
 }
@@ -171,7 +174,7 @@ private fun Footnote() {
   }
 }
 
-/** A Library filter chip (Playlists / Liked songs / Artists). */
+/** A Library filter chip (Playlists / Liked songs / Artists / Recently played). */
 @Composable
 internal fun MusicV3Chip(label: String, selected: Boolean, onClick: () -> Unit) {
   val shape = RoundedCornerShape(32.dp)

@@ -129,6 +129,12 @@ class YouTubeMusicLibrary internal constructor(
   fun artistTracks(channelId: String, forceRefresh: Boolean = false): Flow<YtResult<YtLoaded<List<YtTrack>>>> =
       cached("uploads.$channelId", YtLibraryCache.TRACKS, forceRefresh) { library.artistTracks(it, channelId) }
 
+  /** The active account's cached liked songs (never the network; may be empty). Call off the main thread. */
+  fun cachedLikedSongs(): List<YtTrack> = peek("liked", YtLibraryCache.TRACKS).orEmpty()
+
+  /** The active account's cached artists (never the network; may be empty). Call off the main thread. */
+  fun cachedArtists(): List<YtArtist> = peek("artists", YtLibraryCache.ARTISTS).orEmpty()
+
   /** Searches music videos for a submitted [query]; see the class doc for the budget rules. */
   suspend fun search(query: String): YtResult<YtSearchPage> =
       withContext(io) { searcher.search(usableAccountId(), query) }
@@ -176,6 +182,11 @@ class YouTubeMusicLibrary internal constructor(
   suspend fun setPlaylistChoice(playlistId: String, choice: YtPlaylistChoice?) = withContext(io) {
     store.active.value?.id?.let { music.setChoice(it, playlistId, choice) }
     Unit
+  }
+
+  private fun <T> peek(name: String, codec: YtCodec<T>): T? {
+    val account = store.active.value ?: return null
+    return cache.peek(YtLibraryCache.accountPrefix(account.id) + name, codec)
   }
 
   private fun usableAccountId(): String? = store.active.value?.takeUnless { it.needsSignIn }?.id

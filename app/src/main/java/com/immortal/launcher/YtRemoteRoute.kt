@@ -25,12 +25,16 @@ import org.json.JSONObject
  * restart play first restores the saved queue; with nothing saved it is declined `nothing_queued`.
  * Quiet hours answer `quiet` unless `playAnyway`, which plays at the share sheet's quiet volume.
  * Volume itself stays on the existing `/remote/volume`; GET reports it so it works when idle.
+ * History, suggestions and search live on their own sub-routes ([YtRemoteLibraryRoutes]).
  */
 internal object YtRemoteRoute : RemoteFeatureRoutes.Route {
   const val PATH = "/remote/ytmusic"
   private const val TAG = "HearthpaneYtRemote"
 
-  fun install() = RemoteFeatureRoutes.register(PATH, this)
+  fun install() {
+    RemoteFeatureRoutes.register(PATH, this)
+    YtRemoteLibraryRoutes.install()
+  }
 
   override fun handle(context: Context, method: String, body: JSONObject): FleetHttpServer.Response {
     // After a restart the saved queue only loads when Music opens. Load it (never plays) so the
@@ -55,7 +59,8 @@ internal object YtRemoteRoute : RemoteFeatureRoutes.Route {
     val account = runCatching { YtAndroid.library(context).activeAccount.value?.title }
         .onFailure { e -> Log.w(TAG, "account read failed: ${e.javaClass.simpleName}") }.getOrNull()
     return YtRemoteRoom(quiet, if (quiet) MusicSharePolicy.clock(chime.quietEndMin) else null,
-        RoutineScreenState.ownsScreen(), RoutineScheduler.busy(context), account?.ifBlank { null }, volume)
+        RoutineScreenState.ownsScreen(), RoutineScheduler.busy(context), account?.ifBlank { null }, volume,
+        MusicNightGuard.state(context, quiet))
   }
 
   private fun post(context: Context, body: JSONObject): FleetHttpServer.Response {
@@ -76,8 +81,7 @@ internal object YtRemoteRoute : RemoteFeatureRoutes.Route {
       return RemoteFeatureRoutes.json(200, RemoteFeatureRoutes.ok().put("status", "done"))
     }
     val room = room(context)
-    val playAnyway = (command as? YtRemoteCommand.Play)?.playAnyway ?: (command as YtRemoteCommand.Jump).playAnyway
-    return when (val decision = MusicSharePolicy.decide(room.quiet, room.routine, room.inCall, playAnyway)) {
+    return when (val decision = MusicSharePolicy.decide(room.quiet, room.routine, room.inCall, command.playAnyway)) {
       MusicSharePolicy.Decision.QUIET -> RemoteFeatureRoutes.json(200, RemoteFeatureRoutes.ok()
           .put("status", "quiet").put("quietUntil", room.quietUntil ?: JSONObject.NULL))
       MusicSharePolicy.Decision.ROUTINE, MusicSharePolicy.Decision.CALL -> RemoteFeatureRoutes.json(200,
@@ -116,6 +120,13 @@ internal object YtRemoteRoute : RemoteFeatureRoutes.Route {
       }
       is YtRemoteCommand.Remove -> YouTubeMusicEngine.remove(command.entryId)
       is YtRemoteCommand.PlayNext -> YouTubeMusicEngine.dispatch(YtAction.PlayEntryNext(command.entryId))
+      is YtRemoteCommand.PlayTrack -> {
+        YouTubeMusicEngine.playTrackNow(command.track, YtRemoteProtocol.PHONE_LABEL)
+        YouTubeMusicEngine.dispatch(YtAction.PlayWhenVisible)
+      }
+      is YtRemoteCommand.QueueTrack ->
+        if (command.next) YouTubeMusicEngine.playNext(command.track) else YouTubeMusicEngine.addToEnd(command.track)
+      is YtRemoteCommand.Sleep -> MusicSleepDriver.set(command.choice)
     }
   }
 

@@ -42,6 +42,9 @@ internal class YtLibraryCache(private val store: YtCacheStore, private val clock
     emit(result.map { YtLoaded(it, clock.nowMs(), isRefreshing = false) })
   }
 
+  /** The cached value only (never the network), or null; for local search suggestions. */
+  fun <T> peek(key: String, codec: YtCodec<T>): T? = read(key, codec)?.value
+
   fun deletePrefix(prefix: String) {
     memory = memory.filterKeys { !it.startsWith(prefix) }
     store.deletePrefix(prefix)

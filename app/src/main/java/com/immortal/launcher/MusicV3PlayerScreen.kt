@@ -157,7 +157,7 @@ private fun RightPane(
   var pane by rememberSaveable { mutableStateOf(if (queue.isEmpty) MusicV3Pane.LIBRARY else MusicV3Pane.QUEUE) }
   var nav by remember(active?.id) { mutableStateOf(MusicV3LibraryNav()) }
   // Hoisted so switching tabs keeps the shown results (a new search would cost budget).
-  val search = remember { mutableStateOf(MusicV3SearchState(recent = MusicV3Session.recentSearches)) }
+  val search = remember { mutableStateOf(MusicV3SearchState()) }
   BackHandler(enabled = pane == MusicV3Pane.LIBRARY && nav.inDetail) { nav = nav.back() }
   Column(Modifier.fillMaxSize()) {
     Segmented(pane) { pane = it }
@@ -183,21 +183,39 @@ private fun SearchTab(
 ) {
   val scope = rememberCoroutineScope()
   val keyboard = LocalSoftwareKeyboardController.current
+  val context = LocalContext.current
   var search by holder
   LaunchedEffect(Unit) {
-    val left = withContext(Dispatchers.IO) { library.searchesRemainingToday() }
-    search = search.copy(remaining = left)
+    val (left, recent) = withContext(Dispatchers.IO) {
+      library.searchesRemainingToday() to MusicLocalSearch.recent(context)
+    }
+    search = search.copy(remaining = left, recent = recent.take(MusicV3Rules.MAX_RECENT_SEARCHES).map { it.query })
   }
-  MusicV3SearchPane(search, onQuery = { search = search.copy(query = it) }, actions = actions, onSubmit = { q ->
+  val suggestions = rememberSuggestions(search)
+  MusicV3SearchPane(search, suggestions, onQuery = { search = search.copy(query = it) }, actions = actions, onSubmit = { q ->
     keyboard?.hide()
     search = search.searching(q)
     scope.launch {
       val result = library.search(q)
       val left = withContext(Dispatchers.IO) { library.searchesRemainingToday() }
       search = search.answered(q, result, left)
-      MusicV3Session.recentSearches = search.recent
+      if (result is com.immortal.launcher.youtube.YtResult.Ok) MusicLocalSearch.remember(context, q)
     }
   })
+}
+
+/** Local suggestions for what is being typed, debounced ([MusicSuggest.DEBOUNCE_MS]); no quota. */
+@Composable
+private fun rememberSuggestions(search: MusicV3SearchState): List<MusicSuggestion> {
+  val context = LocalContext.current
+  var suggestions by remember { mutableStateOf(emptyList<MusicSuggestion>()) }
+  val query = search.query.takeIf { search.showsSuggestions }
+  LaunchedEffect(query) {
+    if (query == null) return@LaunchedEffect
+    delay(MusicSuggest.DEBOUNCE_MS)
+    suggestions = withContext(Dispatchers.IO) { MusicLocalSearch.suggest(context, query) }
+  }
+  return if (query == null) emptyList() else suggestions
 }
 
 @Composable

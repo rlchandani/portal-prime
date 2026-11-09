@@ -89,6 +89,8 @@ object YouTubeMusicEngine : MusicTransport {
   fun adopt(queue: YtQueue, positionMs: Long) = dispatch(YtAction.Adopt(queue, positionMs))
 
   fun playNext(track: YtTrack) = dispatch(YtAction.PlayNext(track))
+  /** Plays [track] now, keeping the rest of Up next after it (a search result or history tap). */
+  fun playTrackNow(track: YtTrack, label: String) = dispatch(YtAction.PlayTrackNow(track, label))
   fun addToEnd(track: YtTrack) = dispatch(YtAction.AddToEnd(track))
   fun remove(entryId: Long) = dispatch(YtAction.Remove(entryId))
   fun move(from: Int, to: Int) = dispatch(YtAction.Move(from, to))

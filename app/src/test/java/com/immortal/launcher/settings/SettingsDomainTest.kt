@@ -594,6 +594,8 @@ class SettingsDomainTest {
             "HouseholdListConfig",
             // GuestSettings.domain (Guest card); the Wi-Fi password and door code are GuestSecret stores, not prefs.
             "GuestConfig",
+            // MusicSettings.domain (Settings › Music: quieter music during quiet hours).
+            "MusicNightConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",
             "FleetConfig",

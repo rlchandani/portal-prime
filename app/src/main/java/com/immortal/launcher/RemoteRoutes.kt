@@ -232,7 +232,8 @@ class RemoteRoutes internal constructor(
       if (audio.isVolumeFixed || max <= 0) return json(409, err("volume_fixed"))
       // The remote renders volume feedback. Meta's system UI intercepts full-screen touch.
       if (level != null) {
-        audio.setStreamVolume(AudioManager.STREAM_MUSIC, level, 0)
+        // Quiet hours may cap music (Settings › Music); raising past it lands on the cap.
+        audio.setStreamVolume(AudioManager.STREAM_MUSIC, MusicNightGuard.allowedStep(context, level, max), 0)
       } else {
         val adjust = when (dir) {
           "up" -> AudioManager.ADJUST_RAISE

@@ -73,13 +73,26 @@ internal fun MusicV3NowPlayingCard(
     NowPlayingRow(model)
     Spacer(Modifier.weight(1f))
     model.halt?.let { HaltNote(it) }
+    MusicV3SleepLine(engine.sleep)
     when {
       model.isAd -> Text(MusicV3NowPlaying.AD_NOTE, color = ApprovedHomePalette.Secondary, fontSize = 23.sp,
           lineHeight = 32.sp, modifier = Modifier.padding(bottom = 12.dp))
       model.showProgress -> Progress(engine)
     }
-    if (model.showBigPlay) BigPlay() else Transport(model)
-    MusicV3VolumeRow(room) { MusicV3MoveButton(move) }
+    var sleepOpen by remember { mutableStateOf(false) }
+    val hasSong = engine.queue.current != null
+    when {
+      sleepOpen && hasSong -> MusicV3SleepChooser(engine.sleep) { choice ->
+        sleepOpen = false
+        MusicSleepDriver.set(choice)
+      }
+      model.showBigPlay -> BigPlay()
+      else -> Transport(model)
+    }
+    MusicV3VolumeRow(room) {
+      MusicV3SleepButton(engine.sleep, enabled = hasSong) { sleepOpen = !sleepOpen }
+      MusicV3MoveButton(move)
+    }
   }
 }
 
@@ -239,7 +252,10 @@ internal fun MusicV3VolumeRow(room: String = "", trailing: (@Composable () -> Un
     MusicV3GlyphIcon(MusicV3Glyph.SPEAKER, ApprovedHomePalette.Secondary, Modifier.size(32.dp))
     Slider(value = level.step.toFloat(), valueRange = 0f..max.coerceAtLeast(1).toFloat(),
         steps = (max - 1).coerceAtLeast(0), enabled = max > 0,
-        onValueChange = { v -> val step = Math.round(v); if (step != level.step) level = volume.setStep(step) },
+        onValueChange = { v ->
+          val step = MusicNightGuard.allowedStep(context, Math.round(v), max)
+          if (step != level.step) level = volume.setStep(step)
+        },
         colors = musicV3SliderColors(ApprovedHomePalette.Text),
         modifier = Modifier.weight(1f).heightIn(min = MusicV3Dims.Touch)
             .semantics { contentDescription = if (room.isBlank()) "Volume" else "$room volume" })

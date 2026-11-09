@@ -439,6 +439,7 @@ private fun ApprovedNativeSettingsPage(page: String) {
     "faces" -> FacePickerContent()
     "clock" -> ClockSettingsContent()
     "chime" -> ChimeSettingsContent()
+    "music" -> MusicSettingsContent()
     "almanac" -> AlmanacSettingsContent()
     "welcome" -> WelcomeSettingsContent()
     "sunrise" -> SunriseContent()

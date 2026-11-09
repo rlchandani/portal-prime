@@ -52,11 +52,20 @@ internal data class MusicV3SearchState(
     val recent: List<String> = emptyList(),
     val outcome: MusicV3SearchOutcome = MusicV3SearchOutcome.Idle,
     val remaining: Int = Int.MAX_VALUE,
+    /** The query last sent to YouTube; typing anything else shows local suggestions instead. */
+    val submitted: String? = null,
 ) {
   val resting: Boolean get() = MusicV3Rules.searchResting(remaining)
+
+  /** Empty field: Recent searches and Recently played show instead of results. */
+  val fieldEmpty: Boolean get() = query.isBlank()
+
+  /** Typing something not yet searched shows local suggestions (no quota) under the field. */
+  val showsSuggestions: Boolean get() = !fieldEmpty && query.trim() != submitted
   val hint: String? get() = if (outcome == MusicV3SearchOutcome.Offline) null else MusicV3Rules.searchHint(remaining)
 
-  fun searching(q: String): MusicV3SearchState = copy(query = q, outcome = MusicV3SearchOutcome.Searching(q.trim()))
+  fun searching(q: String): MusicV3SearchState =
+      copy(query = q, submitted = q.trim(), outcome = MusicV3SearchOutcome.Searching(q.trim()))
 
   /** Applies one search answer. Resting keeps the shown results (saved results stay usable). */
   fun answered(q: String, result: YtResult<YtSearchPage>, remainingNow: Int): MusicV3SearchState {
