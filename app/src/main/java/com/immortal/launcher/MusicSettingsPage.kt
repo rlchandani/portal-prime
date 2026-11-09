@@ -34,7 +34,7 @@ private val LEVEL_LABEL_WIDTH = 240.dp
 private val LEVEL_VALUE_WIDTH = 110.dp
 
 /**
- * Settings › Music: the quiet-hours music cap (written through [MusicSettings.domain], like the
+ * Settings › Music: "Music follows you" ([FollowMeSettingsSection]), the quiet-hours music cap (written through [MusicSettings.domain], like the
  * phone remote) and "Clear music history", which clears Recently played on every Portal.
  */
 @Composable
@@ -45,6 +45,8 @@ internal fun MusicSettingsContent() {
     MusicSettings.domain.apply(context, JSONObject().put(key, value))
     settings = MusicNightConfig.load(context)
   }
+  SectionLabel("Rooms")
+  FollowMeSettingsSection()
   SectionLabel("Quiet hours")
   Card {
     ToggleRow("Quieter music during quiet hours", settings.quietCap) { apply("quietCap", it) }

@@ -62,12 +62,12 @@ internal object DinnerIcons {
 internal object DinnerCardOverlay {
   private const val TAG = "ImmortalDinnerCard"
   const val SHOW_MS = 30_000L
-  private const val CARD = 0xFF2B2B2B.toInt()
-  private const val SECONDARY = 0xFFB8B8B8.toInt()
-  private const val ACCENT = 0xFFF2D58A.toInt()
-  private const val GLYPH_BG = 0xFF4A4535.toInt()
-  private const val TONAL = 0xFF3D3D3D.toInt()
-  private const val SCRIM = 0x99000000.toInt()
+  internal const val CARD = 0xFF2B2B2B.toInt()
+  internal const val SECONDARY = 0xFFB8B8B8.toInt()
+  internal const val ACCENT = 0xFFF2D58A.toInt()
+  internal const val GLYPH_BG = 0xFF4A4535.toInt()
+  internal const val TONAL = 0xFF3D3D3D.toInt()
+  internal const val SCRIM = 0x99000000.toInt()
   private val main = Handler(Looper.getMainLooper())
   private var host: AccessibilityService? = null
   private var wm: WindowManager? = null

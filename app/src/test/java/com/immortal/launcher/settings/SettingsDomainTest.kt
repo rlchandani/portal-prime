@@ -596,6 +596,8 @@ class SettingsDomainTest {
             "GuestConfig",
             // MusicSettings.domain (Settings › Music: quieter music during quiet hours).
             "MusicNightConfig",
+            // FollowMeSettings.domain ("Music follows you", Settings › Music).
+            "FollowMeConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",
             "FleetConfig",

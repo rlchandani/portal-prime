@@ -59,6 +59,7 @@ internal fun approvedPageForControl(domain: String, key: String): String? = when
     "digitalclock" -> "clock"
     "fleet" -> "device"
     "home_dashboard" -> "ha"
+    "followme" -> "music"
     else -> approvedSettingsPage(domain)?.id
 }
 
