@@ -223,4 +223,25 @@ class YtEngineReducerTest {
     val s = reduce(playing(), YtPlayerEvent.StateChanged(YtPlayerStatus.PAUSED)).state
     assertFalse(s.wantsPlay)
   }
+
+  @Test fun playTrackNow_onEmptyQueue_isJustThatSong() {
+    val ready = YtEngineState(status = YtPlayerStatus.UNSTARTED, foreground = true)
+    val step = reduce(ready, YtAction.PlayTrackNow(ytTrack(7), "From your phone"))
+    assertEquals(listOf(id(7)), step.state.queue.entries.map { it.track.videoId })
+    assertEquals("From your phone", step.state.queue.sourceLabel)
+    assertEquals(YtEffect.Load(id(7), 0), step.effects.first())
+  }
+
+  @Test fun playTrackNow_keepsUpNextAfterIt() {
+    val step = reduce(playing(), YtAction.PlayTrackNow(ytTrack(7), "Search · x"))
+    assertEquals(listOf(id(1), id(7), id(2), id(3)), step.state.queue.entries.map { it.track.videoId })
+    assertEquals(id(7), step.state.queue.current?.track?.videoId)
+    assertEquals(YtEffect.Load(id(7), 0), step.effects.first())
+    assertEquals("Mix", step.state.queue.sourceLabel)
+  }
+
+  @Test fun playTrackNow_ignoresAnInvalidVideo() {
+    val s = playing()
+    assertEquals(s, reduce(s, YtAction.PlayTrackNow(YtTrack("bad", "x", "y"), "L")).state)
+  }
 }

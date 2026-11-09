@@ -36,6 +36,10 @@ class ImmortalApp : Application() {
     MusicHandoff.install(this)
     MusicShare.install()
     YtRemoteRoute.install()
+    // Music round: household "Recently played", the quiet-hours music cap and the sleep timer.
+    MusicHistoryFeature.install(this)
+    MusicNightGuard.install(this)
+    MusicSleepDriver.install(this)
     OtaRoutes.install()
     RoutinesFeature.install(this)
     ShareFeature.install(this)

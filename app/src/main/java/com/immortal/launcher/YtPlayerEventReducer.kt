@@ -88,12 +88,20 @@ internal object YtPlayerEventReducer {
   }
 
   private fun ended(s: YtEngineState): YtStep {
+    if (s.sleep?.endOfSong == true) return sleepAtEnd(s)
     val queue = s.queue.onEnded()
         ?: return YtStep(s.copy(wantsPlay = false, halt = YtHalt.EndOfQueue))
     if (queue.current?.id == s.queue.current?.id) {
       return YtStep(s.copy(positionMs = 0L), listOf(YtEffect.Seek(0), YtEffect.Play))
     }
     return YtEngineReducer.loadTrack(s, queue).persisting()
+  }
+
+  /** "End of song" sleep: stop here, with the next song cued so Resume starts it. */
+  private fun sleepAtEnd(s: YtEngineState): YtStep {
+    val stopped = s.copy(wantsPlay = false, sleep = null, playWhenVisible = false)
+    val queue = s.queue.next() ?: return YtStep(stopped, listOf(YtEffect.Persist))
+    return YtEngineReducer.loadTrack(stopped, queue).persisting()
   }
 
   private fun error(s: YtEngineState, code: Int): YtStep {

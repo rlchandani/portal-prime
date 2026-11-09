@@ -11,12 +11,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * Process-lifetime UI memory for music v3 that outlives one screen visit: recent searches (their
- * results stay in the data layer's 24 h cache) and the one-time "why it paused" note for Home.
+ * Process-lifetime UI memory for music v3 that outlives one screen visit: the one-time "why it
+ * paused" note for Home. (Recent searches are stored by [MusicLocalSearch].)
  */
 internal object MusicV3Session {
-  @Volatile var recentSearches: List<String> = emptyList()
-
   private val pausedNote = MutableStateFlow(false)
   @Volatile private var explained = false
 

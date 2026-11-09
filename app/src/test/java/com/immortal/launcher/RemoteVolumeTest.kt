@@ -153,6 +153,8 @@ class RemoteVolumeTest {
     init {
       `when`(context.getSharedPreferences("remote_pairing", Context.MODE_PRIVATE)).thenReturn(prefs)
       `when`(prefs.getString("sessions", null)).thenReturn("synthetic-media-session")
+      // Settings › Music night cap: the mock reads quietCap=false, so "set" is applied unchanged.
+      `when`(context.getSharedPreferences("immortal_music_night", Context.MODE_PRIVATE)).thenReturn(prefs)
       `when`(context.getSystemService(Context.AUDIO_SERVICE)).thenReturn(audio)
       `when`(audio.getStreamVolume(AudioManager.STREAM_MUSIC)).thenReturn(7)
       `when`(audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC)).thenReturn(15)

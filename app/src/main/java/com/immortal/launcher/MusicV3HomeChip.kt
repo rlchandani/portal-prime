@@ -19,21 +19,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 private const val PAUSED_NOTE_MS = 6_000L
 
-/** Home chip label for the engine's current song: Paused (always, off the player) or Playing. */
-internal fun musicV3ChipStatus(s: YtEngineState): String = if (s.isPlaying) "Playing" else "Paused"
+/** What the Home music chip shows; [status] is the trailing "Playing", absent when offering to resume. */
+internal data class MusicV3ChipModel(val track: YtTrack, val title: String, val status: String?, val resume: Boolean)
+
+/**
+ * Playing: the song and "Playing". Nothing playing but a queue (in the engine, or [saved] on disk
+ * after a restart): "Resume · <title>", and a tap plays from the saved position. Else no chip.
+ */
+internal fun musicV3Chip(s: YtEngineState, saved: YtTrack?): MusicV3ChipModel? {
+  val current = s.queue.current?.track
+  if (current != null && s.isPlaying) return MusicV3ChipModel(current, current.title, "Playing", resume = false)
+  val track = current ?: saved ?: return null
+  return MusicV3ChipModel(track, "Resume · ${track.title}", null, resume = true)
+}
 
 /** True while the YouTube queue has a song (the Home music button is highlighted). */
 @Composable
@@ -43,27 +58,37 @@ internal fun rememberMusicV3Loaded(): Boolean {
 }
 
 /**
- * Home header "Now playing" chip (art, title, Paused). Shown while the queue has an item; a tap
- * returns to the player, which resumes the song ([onOpen] asks for that).
+ * Home header music chip: "<title> Playing", or "Resume · <title>" when nothing plays but a queue
+ * is saved. A tap returns to the player, which resumes the song ([onOpen] asks for that).
  */
 @Composable
 internal fun MusicV3HomeChip(onOpen: () -> Unit) {
+  val context = LocalContext.current
   val engine by YouTubeMusicEngine.state.collectAsState()
-  val track = engine.queue.current?.track ?: return
-  val status = musicV3ChipStatus(engine)
+  val empty = engine.queue.isEmpty
+  // After a restart the queue is only on disk until Music opens; read it off the main thread.
+  val saved by produceState<YtTrack?>(null, empty) {
+    value = if (!empty) null else withContext(Dispatchers.IO) {
+      runCatching { YtQueueStore(context).load()?.queue?.current?.track }.getOrNull()
+    }
+  }
+  val chip = musicV3Chip(engine, saved) ?: return
   val shape = RoundedCornerShape(34.dp)
+  val spoken = if (chip.resume) "${chip.title}. Tap to play it again" else
+    "Now playing: ${chip.track.title}. Tap to return to music"
   Row(Modifier.padding(start = 12.dp).height(68.dp).widthIn(max = 520.dp).clip(shape)
       .background(ApprovedHomePalette.Card).approvedOutline(shape)
-      .tvFocusable(shape, ringColor = ApprovedHomePalette.Accent, onClick = onOpen)
-      .semantics(mergeDescendants = true) {
-        contentDescription = "Now playing: ${track.title}, ${status.lowercase()}. Tap to return to music"
+      .tvFocusable(shape, ringColor = ApprovedHomePalette.Accent) {
+        if (chip.resume) YouTubeMusicEngine.restoreSaved(context)
+        onOpen()
       }
+      .semantics(mergeDescendants = true) { contentDescription = spoken }
       .padding(start = 10.dp, end = 22.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-    MusicV3Thumb(track.thumbnailUrl, Modifier.size(48.dp), RoundedCornerShape(10.dp))
-    Text(track.title, color = ApprovedHomePalette.Text, fontSize = 23.sp, fontWeight = FontWeight.Medium, maxLines = 1,
+    MusicV3Thumb(chip.track.thumbnailUrl, Modifier.size(48.dp), RoundedCornerShape(10.dp))
+    Text(chip.title, color = ApprovedHomePalette.Text, fontSize = 23.sp, fontWeight = FontWeight.Medium, maxLines = 1,
         overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-    Text(status, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1)
+    chip.status?.let { Text(it, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1) }
     MusicV3GlyphIcon(MusicV3Glyph.RIGHT, ApprovedHomePalette.Secondary, Modifier.size(24.dp))
   }
 }

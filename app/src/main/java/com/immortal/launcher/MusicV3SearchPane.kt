@@ -46,21 +46,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * Search tab. Searching costs daily budget, so it runs only on Search/Enter ([onSubmit]); typing
- * alone does nothing. Recent chips reopen saved results for free, even while search is resting.
+ * Search tab. Searching costs daily budget, so it runs only on Search/Enter ([onSubmit]) or a tap on
+ * a search/artist suggestion; typing only shows local [suggestions] (no quota). An empty field shows
+ * Recent searches and Recently played. Recent chips reopen saved results for free, even while resting.
  */
 @Composable
 internal fun MusicV3SearchPane(
     state: MusicV3SearchState,
+    suggestions: List<MusicSuggestion>,
     onQuery: (String) -> Unit,
     onSubmit: (String) -> Unit,
     actions: MusicV3Actions,
 ) {
+  val run = { q: String -> if (MusicV3Rules.canSubmit(q, state.remaining, state.recent)) onSubmit(q) }
   Column(Modifier.fillMaxSize()) {
     SearchField(state, onQuery, onSubmit)
     state.hint?.let { Hint(it) }
     if (state.resting) RestingNotice()
-    Box(Modifier.weight(1f).padding(top = 12.dp)) { SearchBody(state, onSubmit, actions) }
+    Box(Modifier.weight(1f).padding(top = 12.dp)) {
+      when {
+        state.fieldEmpty -> MusicV3EmptyField(state.recent, run, actions)
+        state.showsSuggestions && suggestions.isNotEmpty() -> MusicV3SuggestionList(suggestions, run, actions)
+        else -> SearchBody(state, run, actions)
+      }
+    }
   }
 }
 
@@ -77,11 +86,11 @@ private fun SearchBody(state: MusicV3SearchState, onSubmit: (String) -> Unit, ac
       CircularProgressIndicator(color = ApprovedHomePalette.Accent, modifier = Modifier.size(56.dp))
     }
     is MusicV3SearchOutcome.Results -> Column {
-      if (state.resting) RecentChips(state.recent, onSubmit)
+      if (state.resting) MusicV3RecentChips(state.recent, onSubmit)
       MusicV3SectionLabel(state.resultsLabel(outcome.query))
       TrackRows(outcome.tracks, actions, "Search · ${outcome.query}") { actions.playSearchResult(it, outcome.query) }
     }
-    MusicV3SearchOutcome.Idle -> RecentChips(state.recent, onSubmit)
+    MusicV3SearchOutcome.Idle -> MusicV3RecentChips(state.recent, onSubmit)
   }
 }
 
@@ -141,10 +150,10 @@ private fun RestingNotice() {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun RecentChips(recent: List<String>, onRun: (String) -> Unit) {
+internal fun MusicV3RecentChips(recent: List<String>, onRun: (String) -> Unit) {
   if (recent.isEmpty()) return
   Column {
-    MusicV3SectionLabel("Recent", Modifier.padding(top = 8.dp))
+    MusicV3SectionLabel("Recent searches", Modifier.padding(top = 8.dp))
     FlowRow(Modifier.padding(top = 8.dp, bottom = 20.dp), horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
       recent.forEach { q ->

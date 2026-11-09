@@ -20,6 +20,7 @@ object YtEngineReducer {
     is YtAction.PlayNow -> loadTrack(s.copy(wantsPlay = s.canPlay),
         s.queue.playNow(a.tracks, a.startIndex, a.label)).persisting()
     is YtAction.PlayNext -> enqueue(s, s.queue.playNext(a.track))
+    is YtAction.PlayTrackNow -> playTrackNow(s, a)
     is YtAction.AddToEnd -> enqueue(s, s.queue.addToEnd(a.track))
     is YtAction.Remove -> remove(s, a.entryId)
     is YtAction.Move -> queueOnly(s, s.queue.move(a.from, a.to))
@@ -29,11 +30,12 @@ object YtEngineReducer {
     YtAction.Play -> play(s)
     YtAction.PlayWhenVisible -> playWhenVisible(s)
     is YtAction.PlayEntryNext -> queueOnly(s, s.queue.playEntryNext(a.entryId))
-    YtAction.Pause -> pause(s.copy(playWhenVisible = false))
+    YtAction.Pause -> pause(s.copy(playWhenVisible = false, sleep = null))
     is YtAction.SeekTo -> seek(s, a.positionMs)
     is YtAction.SetRepeat -> queueOnly(s, s.queue.withRepeat(a.mode))
     is YtAction.SetShuffle -> queueOnly(s, if (a.on) s.queue.shuffled(a.seed) else s.queue.unshuffled())
-    YtAction.Clear -> YtStep(clearedTrack(s.copy(queue = s.queue.clear(), wantsPlay = false, playWhenVisible = false)),
+    YtAction.Clear -> YtStep(clearedTrack(s.copy(queue = s.queue.clear(), wantsPlay = false, playWhenVisible = false,
+        sleep = null)),
         listOf(YtEffect.Stop, YtEffect.Persist))
     is YtAction.Restore -> restore(s, a)
     is YtAction.Adopt -> adopt(s, a)
@@ -41,8 +43,9 @@ object YtEngineReducer {
     is YtAction.LookUpPlaylist -> lookUp(s, a.listId)
     is YtAction.Foreground -> foreground(s, a.visible)
     is YtAction.SizeChanged -> size(s, a.ok)
+    is YtAction.SetSleep -> YtStep(s.copy(sleep = a.timer))
     YtAction.PlayerLost -> YtStep(
-        s.copy(status = YtPlayerStatus.NOT_READY, wantsPlay = false, autoplayBlocked = false),
+        s.copy(status = YtPlayerStatus.NOT_READY, wantsPlay = false, autoplayBlocked = false, sleep = null),
         listOf(YtEffect.Persist))
   }
 
@@ -76,6 +79,13 @@ object YtEngineReducer {
 
   private fun enqueue(s: YtEngineState, queue: YtQueue): YtStep =
       if (s.queue.isEmpty && !queue.isEmpty) navigate(s, queue) else queueOnly(s, queue)
+
+  private fun playTrackNow(s: YtEngineState, a: YtAction.PlayTrackNow): YtStep {
+    if (s.queue.isEmpty) return reduce(s, YtAction.PlayNow(listOf(a.track), 0, a.label))
+    val inserted = s.queue.playNext(a.track)
+    if (inserted === s.queue) return YtStep(s)
+    return navigate(s, inserted.select(inserted.entries[inserted.currentIndex + 1].id))
+  }
 
   private fun remove(s: YtEngineState, entryId: Long): YtStep {
     val queue = s.queue.remove(entryId)
@@ -163,7 +173,8 @@ object YtEngineReducer {
   private fun foreground(s: YtEngineState, visible: Boolean): YtStep {
     if (visible && s.playWhenVisible) return play(s.copy(foreground = true, playWhenVisible = false))
     if (visible) return YtStep(s.copy(foreground = true))
-    val hidden = s.copy(foreground = false, wantsPlay = false)
+    // Leaving the screen pauses the music, which (like any pause) cancels the sleep timer.
+    val hidden = s.copy(foreground = false, wantsPlay = false, sleep = null)
     val active = s.ready && (s.isPlaying || s.wantsPlay)
     return YtStep(hidden, if (active) listOf(YtEffect.Pause, YtEffect.Persist) else listOf(YtEffect.Persist))
   }

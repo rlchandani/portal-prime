@@ -61,6 +61,8 @@ data class YtEngineState(
     val playWhenVisible: Boolean = false,
     /** The visible player's answer to the latest [YtAction.LookUpPlaylist] (not persisted). */
     val playlistLookup: YtPlaylistLookup? = null,
+    /** The moon button's sleep timer; any pause, Clear or Move cancels it (not persisted). */
+    val sleep: MusicSleepTimer? = null,
 ) {
   val ready: Boolean get() = status != YtPlayerStatus.NOT_READY
   val isPlaying: Boolean get() = status == YtPlayerStatus.PLAYING || status == YtPlayerStatus.BUFFERING
@@ -84,6 +86,11 @@ data class YtPlaylistLookup(val listId: String, val videoIds: List<String>)
 sealed interface YtAction {
   data class PlayNow(val tracks: List<YtTrack>, val startIndex: Int, val label: String) : YtAction
   data class PlayNext(val track: YtTrack) : YtAction
+  /**
+   * Plays [track] now, like a search result tap: an empty queue becomes just this song ([label]);
+   * otherwise it is inserted after the current song and played, keeping the rest of Up next.
+   */
+  data class PlayTrackNow(val track: YtTrack, val label: String) : YtAction
   data class AddToEnd(val track: YtTrack) : YtAction
   data class Remove(val entryId: Long) : YtAction
   data class Move(val from: Int, val to: Int) : YtAction
@@ -114,6 +121,8 @@ sealed interface YtAction {
   /** A paired phone's "Play next" on a queue row: moves entry [entryId] right after the current one. */
   data class PlayEntryNext(val entryId: Long) : YtAction
   data class Foreground(val visible: Boolean) : YtAction
+  /** Arms (or with null, cancels) the sleep timer; [MusicSleepDriver] fades and pauses. */
+  data class SetSleep(val timer: MusicSleepTimer?) : YtAction
   data class SizeChanged(val ok: Boolean) : YtAction
   /** The WebView renderer died or the host was released; the player must be rebuilt. */
   data object PlayerLost : YtAction

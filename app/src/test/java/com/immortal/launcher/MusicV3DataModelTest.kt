@@ -79,4 +79,16 @@ class MusicV3DataModelTest {
     assertEquals(MusicV3LibraryNav(MusicV3LibraryTab.ARTISTS), nav.back())
     assertEquals(MusicV3LibraryTab.PLAYLISTS, MusicV3LibraryNav().tab)
   }
+
+  @Test fun suggestionsShowWhileTypingSomethingNotYetSearched() {
+    val empty = MusicV3SearchState()
+    assertTrue(empty.fieldEmpty)
+    assertFalse(empty.showsSuggestions)
+    val typing = empty.copy(query = "ade")
+    assertTrue(typing.showsSuggestions)
+    val searched = typing.searching("adele ")
+    assertFalse(searched.showsSuggestions)
+    assertTrue(searched.copy(query = "adele b").showsSuggestions)
+    assertFalse(searched.copy(query = "   ").showsSuggestions)
+  }
 }
