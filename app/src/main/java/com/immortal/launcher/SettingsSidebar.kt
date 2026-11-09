@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,10 +56,14 @@ private val AvatarBottom = Color(0xFF1D1714)
 private val StatusOk = Color(0xFF34B864)
 private val StatusAvailable = Color(0xFFEE9B1A)
 
-/** Profile card, then the four groups. Only the two rows whose selection changes recompose. */
-internal fun LazyListScope.settingsSidebarGroups(selectedRoot: String, onSelect: (String) -> Unit) {
+/**
+ * Profile card, then the four groups. [selectedRoot] is read inside each row (never by this builder),
+ * so a page switch leaves the list content unchanged and only the two rows whose selection flips
+ * recompose; capturing the id here would re-run every visible item's composition on each switch.
+ */
+internal fun LazyListScope.settingsSidebarGroups(selectedRoot: () -> String, onSelect: (String) -> Unit) {
     item(key = "profile", contentType = "profile") {
-        SettingsProfileCard(selectedRoot == SettingsPageIds.ABOUT) { onSelect(SettingsPageIds.ABOUT) }
+        SettingsProfileCard(rememberSidebarSelected(SettingsPageIds.ABOUT, selectedRoot)) { onSelect(SettingsPageIds.ABOUT) }
     }
     SettingsGroup.entries.forEach { group ->
         group.title?.let { title ->
@@ -69,10 +74,19 @@ internal fun LazyListScope.settingsSidebarGroups(selectedRoot: String, onSelect:
         }
         val pages = SettingsTree.groupPages(group)
         itemsIndexed(pages, key = { _, page -> "row:${page.id}" }, contentType = { _, _ -> "row" }) { index, page ->
-            SettingsSidebarRow(page, page.id == selectedRoot, index == 0, index == pages.lastIndex) { onSelect(page.id) }
+            SettingsSidebarRow(page, rememberSidebarSelected(page.id, selectedRoot), index == 0, index == pages.lastIndex) {
+                onSelect(page.id)
+            }
         }
         item(key = "gap:${group.name}", contentType = "gap") { Spacer(Modifier.height(22.dp)) }
     }
+}
+
+/** Invalidates its caller only when this row's own selection changes. */
+@Composable
+private fun rememberSidebarSelected(id: String, selectedRoot: () -> String): Boolean {
+    val selected by remember(id, selectedRoot) { derivedStateOf { selectedRoot() == id } }
+    return selected
 }
 
 @Composable
