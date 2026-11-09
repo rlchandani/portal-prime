@@ -74,7 +74,7 @@ private fun SuggestionRow(s: MusicSuggestion, onSearch: (String) -> Unit, action
     when (s.kind) {
       MusicSuggestionKind.SONG -> MusicV3Thumb(s.thumb, Modifier.size(56.dp))
       MusicSuggestionKind.ARTIST -> SuggestionIcon("music")
-      MusicSuggestionKind.SEARCH -> SuggestionIcon("clock")
+      MusicSuggestionKind.SEARCH -> SuggestionIcon(if (s.recent) "clock" else "search")
     }
     Column(Modifier.weight(1f)) {
       Text(s.text, color = ApprovedHomePalette.Text, fontSize = 26.sp, fontWeight = FontWeight.Medium, maxLines = 1,

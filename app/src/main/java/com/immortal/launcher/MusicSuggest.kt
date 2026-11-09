@@ -19,6 +19,8 @@ internal data class MusicSuggestion(
     val videoId: String? = null,
     val artist: String? = null,
     val thumb: String? = null,
+    /** A query this Portal searched before (shown with a clock), vs a fresh completion. */
+    val recent: Boolean = false,
 )
 
 /** A query this Portal searched, newest first. */
@@ -85,7 +87,7 @@ internal object MusicSuggest {
 
   private fun candidates(sources: MusicSuggestSources): List<Candidate> {
     val plays = MusicHistory.listing(sources.history)
-    val searches = sources.searches.map { Candidate(MusicSuggestion(it.query, MusicSuggestionKind.SEARCH), it.query, it.atMs) }
+    val searches = sources.searches.map { Candidate(MusicSuggestion(it.query, MusicSuggestionKind.SEARCH, recent = true), it.query, it.atMs) }
     val played = plays.map { song(it.toTrack(), it.playedAtMs) }
     val playedArtists = plays.filter { it.artist.isNotBlank() }.distinctBy { normalize(it.artist) }
         .map { Candidate(MusicSuggestion(it.artist, MusicSuggestionKind.ARTIST), it.artist, it.playedAtMs) }
