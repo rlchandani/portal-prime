@@ -115,6 +115,9 @@ internal object SettingsPageSections {
         P.GREETING to listOf(section(null, block(B.GREETING_PREVIEW)), section(null, block(B.WELCOME))),
         P.HOME_ASSISTANT to listOf(
             section(null, block(B.HOME_ASSISTANT)),
+            section("Doorbell", rows("doorbell", "trigger", "camera", "motion", "chime", "cooldownSec", "listen"),
+                footer = "When the doorbell rings, every Portal shows the camera and the phone app shows it " +
+                    "while open. Needs the Home Assistant address and token (Advanced)."),
             section("MQTT", link("MQTT publishing", P.MQTT, "broker"), advanced = true),
         ),
         P.MQTT to listOf(section(null, block(B.MQTT))),
