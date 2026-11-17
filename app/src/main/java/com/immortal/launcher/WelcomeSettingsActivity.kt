@@ -90,7 +90,11 @@ internal fun WelcomeSettingsContent() {
   LaunchedEffect(advanced, settings.enableTts) {
     if (!advanced || !settings.enableTts) voiceChooserOpen = false
   }
-  if (advanced && settings.enableTts) DisposableEffect(Unit) {
+  // The engine binds and enumerates on the main thread: start it after the page has settled.
+  val scheduler = LocalSettingsComposition.current
+  var engineAllowed by remember { mutableStateOf(false) }
+  LaunchedEffect(scheduler) { scheduler.awaitPageSettled(); engineAllowed = true }
+  if (engineAllowed && advanced && settings.enableTts) DisposableEffect(Unit) {
     var active = true
     var engine: android.speech.tts.TextToSpeech? = null
     androidVoices = emptyList()

@@ -54,7 +54,9 @@ internal fun rememberScreensaverEditor(): ScreensaverSettingsEditor {
   val application = LocalContext.current.applicationContext
   val writes = remember(application) { ScreensaverSettingsWrites.queue(application) }
   val state = remember(application) { mutableStateOf(ScreensaverConfig.load(application)) }
-  val applying = remember { mutableStateOf(true) }
+  // Rows open enabled unless an earlier visit's write is still in flight: flipping every row
+  // from disabled to enabled after the readback recomposed the whole page a frame later.
+  val applying = remember { mutableStateOf(!writes.isIdle) }
   val failed = remember { mutableStateOf(false) }
   var editRevision by remember { mutableStateOf(0) }
   val completion = rememberCoroutineScope()

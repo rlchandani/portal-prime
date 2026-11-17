@@ -48,6 +48,9 @@ internal class LatestSystemWrites<K, V>(
 
   suspend fun awaitIdle() = synchronized(lock) { idle }.await()
 
+  /** True when no accepted edit is waiting or being written (a page may trust a direct read). */
+  val isIdle: Boolean get() = synchronized(lock) { !running }
+
   private fun drain() {
     while (true) {
       val edit = synchronized(lock) {
@@ -69,6 +72,7 @@ internal class DisplayWriteQueue(onFailure: (Exception) -> Unit = {}, apply: (Di
   private val writes = LatestSystemWrites(DisplayEdit::control, onFailure, apply)
   fun submit(edit: DisplayEdit) = writes.submit(edit)
   suspend fun awaitIdle() = writes.awaitIdle()
+  val isIdle: Boolean get() = writes.isIdle
 }
 
 /** Share one ordering boundary across retained panes and Activity recreation; never retain an Activity. */

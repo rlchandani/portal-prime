@@ -13,11 +13,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -27,9 +26,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.contentDescription
@@ -41,9 +39,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
@@ -66,13 +62,16 @@ private fun ChimeSettingsScreen() {
 
 /** Inlinable body of the Chime settings screen — rendered both by [ChimeSettingsScreen] (standalone
  *  Activity host) and by the two-panel settings detail panel. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun ChimeSettingsContent() {
   val context = LocalContext.current
   val application = context.applicationContext
   val writes = remember(application) { ChimeSettingsWrites.queue(application) }
   var settings by remember(application) { mutableStateOf(ChimeConfig.load(application)) }
-  var saveState by remember { mutableStateOf(ChimeSaveState()) }
+  // Values were just read; rows start enabled unless an earlier visit's write is still in flight.
+  var saveState by remember { mutableStateOf(openedSaveState(writes.isIdle)) }
+  val openedIdle = remember { !saveState.saving }
   val applying = saveState.saving
   val failed = saveState.failed
   val completion = rememberCoroutineScope()
@@ -104,15 +103,27 @@ internal fun ChimeSettingsContent() {
   }
   LaunchedEffect(application, lifecycleOwner, pageActive) {
     if (!pageActive) return@LaunchedEffect
+    var first = true
     lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+      if (first && openedIdle) {
+        // Opened with nothing in flight: confirm quietly. An unchanged read is equal and
+        // recomposes nothing; rows stay enabled instead of flipping a frame after the switch.
+        first = false
+        val revision = saveState.revision
+        val loaded = readSnapshot()
+        if (revision == saveState.revision) settings = loaded
+        return@repeatOnLifecycle
+      }
+      first = false
       saveState = saveState.beginRefresh()
       publishAfterSave(saveState.revision)
     }
   }
-  fun audition(label: String, resource: Int? = null) {
-    if (saveState.saving || settings.volume == 0) return
+  fun audition(preview: ChimePreview) {
+    if (!ChimePreviews.enabled(saveState.saving, settings.volume)) return
     val volume = (settings.volume / 100f).coerceIn(0f, 1f)
-    previews.play(label) { playing, finished ->
+    previews.play(preview.id) { playing, finished ->
+      val resource = preview.resource
       if (resource == null) SoundPreviewPlayback.voice(application, settings.spokenVoice, volume, playing, finished)
       else SoundPreviewPlayback.tone(application, resource, volume, playing, finished)
     }
@@ -124,6 +135,9 @@ internal fun ChimeSettingsContent() {
     writes.submit(key, value)
     completion.launch { publishAfterSave(revision) }
   }
+  // One identity for the page's life, so rows that did not change skip on recomposition.
+  val latestApply = rememberUpdatedState<(String, Any) -> Unit>(::apply)
+  val onApply = remember { { key: String, value: Any -> latestApply.value(key, value) } }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
       // Scalar controls (toggles, volumes, quiet times, sunrise sound) render from the `chime`
@@ -143,118 +157,37 @@ internal fun ChimeSettingsContent() {
         })
       }
 
-      // Keep save feedback visible above the independently scrolling scalar list.
-      SettingsList(SettingsDomains.chime, settings, exclude = setOf("spokenVoice"),
-        editsEnabled = !applying, onApply = ::apply)
+      // Rows go straight into the page's list (no nested list), each precomposed on its own.
+      Column {
+        SettingsRows(SettingsDomains.chime, settings, exclude = setOf("spokenVoice"),
+          editsEnabled = !applying, deferRows = true, onApply = onApply)
+      }
 
       // Bespoke: voice picker + test buttons the registry can't model (TTS voice enumeration is
       // on-device only; test buttons are actions, not settings).
       SectionLabel("Preview sounds")
-      val previewEnabled = !applying && settings.volume > 0
+      val previewEnabled = ChimePreviews.enabled(applying, settings.volume)
       Card {
-        val previewMessage = when (previewState.phase) {
-          SoundPreviewPhase.STARTING -> "Preparing ${previewState.label}…"
-          SoundPreviewPhase.PLAYING -> "Playing ${previewState.label}"
-          SoundPreviewPhase.FAILED -> "${previewState.label} couldn't play. Try again."
-          SoundPreviewPhase.IDLE -> "Choose a sound to preview."
-        }
-        Text(previewMessage, color = if (previewState.phase == SoundPreviewPhase.FAILED) IosRed else IosSecondary,
+        Text(ChimePreviews.message(previewState),
+            color = if (previewState.phase == SoundPreviewPhase.FAILED) IosRed else IosSecondary,
             fontSize = Sizes.rowSub, modifier = Modifier.padding(18.dp)
                 .semantics { contentDescription = "Sound preview: ${previewState.phase.name.lowercase()}" })
-        if (previewState.phase == SoundPreviewPhase.STARTING || previewState.phase == SoundPreviewPhase.PLAYING) {
-          TestButton("Stop preview", enabled = true, isStop = true) { previews.stop() }
-        }
-
         if (settings.spokenTimeOn) {
-          VoicePicker(settings.spokenVoice, enabled = !applying) { name ->
+          ChimeVoicePicker(settings.spokenVoice, enabled = !applying) { name ->
             // Installed identities share the same save lock, worker and readback as other edits.
             apply("spokenVoice", name)
           }
-          TestButton("Test voice", enabled = previewEnabled) { audition("voice") }
         }
-        if (settings.hourlyChimeOn) {
-          TestButton("Play chime", enabled = previewEnabled) { audition("chime", R.raw.chime) }
-        }
-        if (settings.goldenHourOn) {
-          TestButton("Test sunrise", enabled = previewEnabled) {
-            audition("sunrise", if (settings.sunriseVariant == 1) R.raw.golden_sunrise_2 else R.raw.golden_sunrise)
+        FlowRow(Modifier.fillMaxWidth().padding(start = 18.dp, end = 18.dp, bottom = 18.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+          ChimePreviews.available(settings).forEach { preview ->
+            ChimePreviewButton(preview.label, enabled = previewEnabled) { audition(preview) }
           }
-          TestButton("Test sunset", enabled = previewEnabled) { audition("sunset", R.raw.golden_sunset) }
-        }
-        TestButton("Play ping", enabled = previewEnabled) { audition("ping", R.raw.ping) }
-      }
-      FooterNote(if (settings.volume == 0) {
-        "Preview volume is 0%. Raise Volume to hear the sounds."
-      } else {
-        "Previews use your saved volume, including during quiet hours. A new preview replaces the previous one; leaving Sounds stops it."
-      })
-    }
-}
-
-@Composable
-private fun TestButton(label: String, enabled: Boolean, isStop: Boolean = false, onClick: () -> Unit) {
-  Surface(
-      color = IosFocusTint,
-      shape = RoundedCornerShape(12.dp),
-      modifier =
-          Modifier.padding(horizontal = 18.dp, vertical = 2.dp)
-              .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, enabled = enabled) { onClick() },
-  ) {
-    Text(
-        if (isStop) label else "▶  $label",
-        color = if (enabled) IosBlue else IosSecondary,
-        fontSize = 24.sp,
-        fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.padding(horizontal = 24.dp, vertical = 18.dp),
-    )
-  }
-}
-
-/** Bounded chooser over the existing on-device engine. Empty identity means engine default. */
-@Composable
-private fun VoicePicker(current: String, enabled: Boolean, onPick: (String) -> Unit) {
-  val context = LocalContext.current
-  var voices by remember { mutableStateOf<List<InstalledVoiceChoice>>(emptyList()) }
-  var loading by remember { mutableStateOf(true) }
-  var loadFailed by remember { mutableStateOf(false) }
-  var expanded by remember { mutableStateOf(false) }
-  LaunchedEffect(enabled) { if (!enabled) expanded = false }
-
-  DisposableEffect(Unit) {
-    var active = true
-    var tts: android.speech.tts.TextToSpeech? = null
-    try {
-      tts = android.speech.tts.TextToSpeech(context.applicationContext) { status ->
-        if (active) {
-          val found = runCatching {
-            if (status != android.speech.tts.TextToSpeech.SUCCESS) error("TTS initialization unavailable")
-            tts?.voices?.filter { !it.isNetworkConnectionRequired }?.sortedWith(TtsVoiceLabels.sort)
-                ?.map { InstalledVoiceChoice(it.name, TtsVoiceLabels.label(it), it.locale.getDisplayName(java.util.Locale.US)) }
-                ?.distinctBy { it.name } ?: emptyList()
+          if (ChimePreviews.isPlaying(previewState)) {
+            ChimePreviewButton("Stop preview", enabled = true, isStop = true) { previews.stop() }
           }
-          voices = found.getOrDefault(emptyList())
-          loading = false
-          loadFailed = found.isFailure
         }
       }
-    } catch (_: Exception) {
-      loading = false
-      loadFailed = true
+      FooterNote(ChimePreviews.footer(settings.volume))
     }
-    onDispose { active = false; runCatching { tts?.shutdown() } }
-  }
-
-  val label = installedVoiceLabel(current, voices, loading)
-  Row(
-      modifier = Modifier.fillMaxWidth().tvFocusableRow(enabled = enabled) { expanded = true }
-          .semantics { contentDescription = "Spoken-time voice" }
-          .padding(start = 18.dp, end = 18.dp, top = 2.dp, bottom = 6.dp),
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text("Voice", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-    Text(label, color = IosSecondary, fontSize = Sizes.rowValue, fontWeight = FontWeight.SemiBold)
-    Text("  ▾", color = IosSecondary, fontSize = Sizes.rowValue)
-  }
-  if (expanded && enabled) InstalledVoiceChoiceDialog(voices, current, loading, loadFailed, enabled,
-      onDismiss = { expanded = false }, onPick = { if (enabled) onPick(it) })
 }

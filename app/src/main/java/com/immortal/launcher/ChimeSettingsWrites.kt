@@ -18,6 +18,7 @@ internal class ChimeSettingsWriteQueue(apply: (String, Any) -> Boolean) {
   val failureCount: Long get() = failures.get()
   fun submit(key: String, value: Any) = writes.submit(key to value)
   suspend fun awaitIdle() = writes.awaitIdle()
+  val isIdle: Boolean get() = writes.isIdle
 }
 
 /** One process writer retains only the application, never an Activity or settings pane. */
@@ -53,3 +54,9 @@ internal data class SettingsSaveState(
 
 /** Retain the existing Sounds call sites while sharing the same save/readback state machine. */
 internal typealias ChimeSaveState = SettingsSaveState
+
+/**
+ * The state a page opens with. Values were just read in `remember`, so with no write in flight
+ * rows start enabled; flipping them on after the readback would recompose every row a frame later.
+ */
+internal fun openedSaveState(writesIdle: Boolean) = SettingsSaveState(saving = !writesIdle)

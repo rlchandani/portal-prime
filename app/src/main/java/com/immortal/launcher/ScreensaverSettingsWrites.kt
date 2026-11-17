@@ -20,6 +20,7 @@ internal class ScreensaverSettingsWriteQueue(apply: (ScreensaverSettingEdit) -> 
   val failureCount: Long get() = failures.get()
   fun submit(edit: ScreensaverSettingEdit) = writes.submit(edit)
   suspend fun awaitIdle() = writes.awaitIdle()
+  val isIdle: Boolean get() = writes.isIdle
 }
 
 /** Never retain an Activity; the registry still owns validation, locking and side effects. */

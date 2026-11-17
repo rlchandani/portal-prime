@@ -95,18 +95,25 @@ fun <S> SettingsList(
     }
 }
 
-/** Emits a small registry projection directly into the caller's scrolling Column. */
+/**
+ * Emits a small registry projection directly into the caller's scrolling Column (no nested list).
+ * With [deferRows], each row is its own [SettingsDeferredSlot], so a long editor opening inside a
+ * split-view page is composed and measured a few rows per frame.
+ */
 @Composable
 internal fun <S> SettingsRows(
     domain: SettingsDomain<S>,
     snapshot: S,
     exclude: Set<String> = emptySet(),
+    editsEnabled: Boolean = true,
+    deferRows: Boolean = false,
     onApply: (String, Any) -> Unit,
 ) {
-    val model = prepareSettingsList(domain, snapshot, exclude, onApply = onApply)
+    val model = prepareSettingsList(domain, snapshot, exclude, editsEnabled, onApply)
     model.projection.items.forEach { item ->
         key(item.id) {
-            SettingsProjectionItem(model, item)
+            if (deferRows) SettingsDeferredSlot(DeferredRowHeight) { SettingsProjectionItem(model, item) }
+            else SettingsProjectionItem(model, item)
         }
     }
     if (model.showAdvancedHint) {
@@ -115,6 +122,9 @@ internal fun <S> SettingsRows(
         }
     }
 }
+
+/** Placeholder height of a deferred registry row (one standard row). */
+private val DeferredRowHeight = Sizes.rowMinHeight
 
 internal data class PreparedSettingsList<S>(
     val domain: SettingsDomain<S>,
