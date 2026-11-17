@@ -49,8 +49,10 @@ internal object MusicHistoryCodec {
     val at = (body.opt("at") as? Number)?.toLong() ?: return null
     if (!YtTrack.isValidVideoId(videoId) || at <= 0L || at > nowMs + MAX_FUTURE_MS) return null
     val thumb = body.optString("th").takeIf { it.length <= MAX_THUMB && it.startsWith(HTTPS) }.orEmpty()
-    return MusicPlay(videoId, body.optString("t").take(MAX_TITLE), body.optString("a").take(MAX_ARTIST), thumb, at,
-        body.optString("r").take(MAX_ROOM))
+    // Shown as-is on every Portal and phone: drop control/format characters (e.g. bidi overrides).
+    return MusicPlay(videoId, DinnerMessage.cleanText(body.optString("t"), MAX_TITLE).orEmpty(),
+        DinnerMessage.cleanText(body.optString("a"), MAX_ARTIST).orEmpty(), thumb, at,
+        DinnerWire.cleanName(body.optString("r"))?.take(MAX_ROOM).orEmpty())
   }
 
   fun encodeChange(change: Change): JSONObject = when (change) {

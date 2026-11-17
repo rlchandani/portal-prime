@@ -144,4 +144,13 @@ class MusicHistoryTest {
     assertEquals(MusicShareQueue.thumbnailFor(id(1)), json.getString("thumb"))
     assertEquals(setOf("videoId", "title", "artist", "thumb", "playedAtMs", "room"), json.keys().asSequence().toSet())
   }
+
+  @Test fun broadcastTextIsCleanedBeforeItIsShown() {
+    val body = org.json.JSONObject().put("v", "dQw4w9WgXcQ").put("at", 1_000L)
+        .put("t", "Song\u202E\u0007 one").put("a", "Art\nist").put("r", "Living\u202E Area")
+    val play = MusicHistoryCodec.decodeWire(body, nowMs = 2_000L)!!
+    assertEquals("Song one", play.title)
+    assertEquals("Art ist", play.artist)
+    assertEquals("Living Area", play.room)
+  }
 }
