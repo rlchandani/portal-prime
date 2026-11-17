@@ -130,6 +130,16 @@ private fun ApprovedAppsContent(
     mutableStateOf(peekApprovedIconInventory()?.let { appInventory(context, it) })
   }
   val allApps = inventory?.installed
+  // A page composed ahead (hidden, at idle) starts its icon texture uploads on the render thread
+  // now, so the first visible frame of the grid does not upload every icon inside the slide.
+  val hidden by rememberUpdatedState(!pageActive)
+  LaunchedEffect(inventory) {
+    val prepared = inventory ?: return@LaunchedEffect
+    if (!hidden) return@LaunchedEffect
+    awaitMainLooperIdle()
+    prepared.installed.forEach { it.icon.prepareToDraw() }
+    prepared.shortcuts.values.forEach { it.prepareToDraw() }
+  }
   var badges by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
   var query by remember { mutableStateOf("") }
   var searching by remember { mutableStateOf(initiallySearching) }

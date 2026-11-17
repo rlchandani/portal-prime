@@ -1455,7 +1455,8 @@ private fun LauncherScreen(
         Box(Modifier.weight(1f).fillMaxWidth()) {
         ApprovedHomeTabs(selectedTab, Modifier.fillMaxSize().padding(
             bottom = if (musicLayout == MusicPlayerLayout.COMPACT) 210.dp else 0.dp),
-            contentActive = musicLayout == null || musicLayout == MusicPlayerLayout.COMPACT) { tab ->
+            contentActive = musicLayout == null || musicLayout == MusicPlayerLayout.COMPACT,
+            prefetch = LauncherTabPrefetch.HOME_TABS) { tab ->
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
