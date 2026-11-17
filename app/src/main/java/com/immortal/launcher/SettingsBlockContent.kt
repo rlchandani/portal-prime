@@ -39,6 +39,10 @@ internal fun SettingsBlockContent(block: SettingsBlock) {
             SettingsBlock.SCREENSAVER_PREVIEW -> PrimaryPillButton("Preview full screen") {
                 context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
             }
+            SettingsBlock.SLIDESHOW_PREVIEW -> SlideshowLivePreview()
+            SettingsBlock.WALLPAPER_PREVIEW -> WallpaperHomePreview()
+            SettingsBlock.CLOCK_PREVIEW -> ClockFaceLivePreview()
+            SettingsBlock.GREETING_PREVIEW -> GreetingLivePreview()
             SettingsBlock.WALLPAPER -> WallpaperSection()
             SettingsBlock.QUICK_BUTTONS -> QuickButtonsSection()
             SettingsBlock.ALMANAC -> AlmanacSettingsContent()

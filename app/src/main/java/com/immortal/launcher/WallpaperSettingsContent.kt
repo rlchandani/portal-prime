@@ -12,7 +12,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +45,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.immortal.launcher.ui.components.OnResume
+import com.immortal.launcher.ui.components.OnResumeAfterFirstComposition
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 
@@ -60,7 +61,7 @@ private val WallpaperChoices: List<Pair<String, String>> =
 internal fun WallpaperSection() {
   val application = LocalContext.current.applicationContext
   var configuration by remember(application) { mutableStateOf(WallpaperConfig.load(application)) }
-  OnResume { configuration = WallpaperConfig.load(application) }
+  OnResumeAfterFirstComposition { configuration = WallpaperConfig.load(application) }
   val pageActive = LocalApprovedLauncherPageActive.current
   var previewRevision by remember { mutableStateOf(0) }
   var previewsLoading by remember { mutableStateOf(true) }
@@ -89,27 +90,34 @@ internal fun WallpaperSection() {
       }
       Text("Choose a color, photo, or a background that changes through the day.",
           color = IosSecondary, fontSize = Sizes.rowSub)
-      BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val columns = (maxWidth / 180.dp).toInt().coerceIn(1, 6)
-        Column(Modifier.fillMaxWidth().selectableGroup().semantics {
-          contentDescription = when {
-            previewsLoading -> "Wallpaper previews loading"
-            thumbnails?.size == WallpaperConfig.PHOTOS.size -> "Wallpaper previews ready"
-            else -> "Wallpaper previews unavailable"
-          }
-        }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-          WallpaperChoices.chunked(columns).forEach { choices ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-              choices.forEach { (id, label) ->
-                val isPhoto = id.startsWith(WallpaperConfig.PHOTO_PREFIX)
-                val thumb = thumbnails?.get(id)
-                WallpaperSwatch(label, selected = configuration.mode == id,
-                    enabled = !isPhoto || thumb != null, modifier = Modifier.weight(1f), onClick = {
-                      WallpaperConfig.setMode(application, id)
-                      configuration = WallpaperConfig.load(application)
-                    }) { WallpaperChoicePreview(id, thumb) }
+      // Columns follow the split view's page width (no measure-time subcomposition), and each row
+      // is precomposed on its own so ~30 swatches never land in one frame.
+      val screenWidth = LocalConfiguration.current.screenWidthDp
+      val columns = remember(screenWidth) { WallpaperSwatchLayout.columns(screenWidth) }
+      val rowHeight = remember(screenWidth, columns) { WallpaperSwatchLayout.rowHeightDp(screenWidth, columns).dp }
+      val rows = remember(columns) { WallpaperSwatchLayout.rows(WallpaperChoices, columns) }
+      Column(Modifier.fillMaxWidth().selectableGroup().semantics {
+        contentDescription = when {
+          previewsLoading -> "Wallpaper previews loading"
+          thumbnails?.size == WallpaperConfig.PHOTOS.size -> "Wallpaper previews ready"
+          else -> "Wallpaper previews unavailable"
+        }
+      }, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        rows.forEach { choices ->
+          key(choices.first().first) {
+            SettingsDeferredSlot(rowHeight) {
+              Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(WallpaperSwatchLayout.GAP_DP.dp)) {
+                choices.forEach { (id, label) ->
+                  val isPhoto = id.startsWith(WallpaperConfig.PHOTO_PREFIX)
+                  val thumb = thumbnails?.get(id)
+                  WallpaperSwatch(label, selected = configuration.mode == id,
+                      enabled = !isPhoto || thumb != null, modifier = Modifier.weight(1f), onClick = {
+                        WallpaperConfig.setMode(application, id)
+                        configuration = WallpaperConfig.load(application)
+                      }) { WallpaperChoicePreview(id, thumb) }
+                }
+                repeat(columns - choices.size) { Spacer(Modifier.weight(1f)) }
               }
-              repeat(columns - choices.size) { Spacer(Modifier.weight(1f)) }
             }
           }
         }
@@ -143,13 +151,7 @@ internal fun WallpaperSection() {
 
 @Composable
 private fun WallpaperChoicePreview(id: String, thumbnail: android.graphics.Bitmap?) {
-  val colors = when (id) {
-    WallpaperConfig.DUSK_AURORA -> listOf(0xFF050810, 0xFF12234A, 0xFF27436E, 0xFFC98A5E)
-    WallpaperConfig.SCREENSAVER -> listOf(0xFF2C3E50, 0xFF4CA1AF)
-    WallpaperConfig.SKY -> listOf(0xFF3A7BD5, 0xFF8FD3F4)
-    WallpaperConfig.STARFIELD -> listOf(0xFF05060F, 0xFF0C1430)
-    else -> WallpaperConfig.gradientColors(id)
-  }
+  val colors = wallpaperPreviewColors(id)
   when {
     thumbnail != null -> {
       val image = remember(thumbnail) { thumbnail.asImageBitmap() }

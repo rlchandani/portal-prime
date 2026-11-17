@@ -37,7 +37,7 @@ enum class FrameMode {
  */
 object ScreensaverConfig {
 
-  private const val PREFS = "immortal_screensaver"
+  internal const val PREFS = "immortal_screensaver"
 
   const val SOURCE_DEFAULT = "default"
   const val SOURCE_FOLDER = "folder"

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -27,15 +28,49 @@ import kotlinx.coroutines.withContext
  * polling fetch loops, safe activity launches, muted placeholder text) in one place.
  */
 
-/** Run [block] every time the host lifecycle resumes (initial composition does NOT invoke it). */
+/**
+ * Run [block] every time the host lifecycle resumes. Adding a lifecycle observer replays the
+ * events up to the current state, so when the host is already resumed (any composition after
+ * Activity start, e.g. a Home widget) [block] also runs once right after the first composition.
+ * Home widgets rely on that catch-up read; screens that already load in `remember` should use
+ * [OnResumeAfterFirstComposition] instead.
+ */
 @Composable
 fun OnResume(block: () -> Unit) {
   val lifecycleOwner = LocalLifecycleOwner.current
   DisposableEffect(lifecycleOwner) {
-    val obs = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) block() }
-    lifecycleOwner.lifecycle.addObserver(obs)
-    onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+    val stop = observeResumes(lifecycleOwner.lifecycle, replayCurrent = true, block)
+    onDispose { stop() }
   }
+}
+
+/**
+ * Run [block] on each later resume only (returning from another Activity or the screen being
+ * turned back on), never for the catch-up resume replayed while the observer is added. For
+ * content that already read its values in `remember`, so a page is not loaded twice.
+ */
+@Composable
+fun OnResumeAfterFirstComposition(block: () -> Unit) {
+  val lifecycleOwner = LocalLifecycleOwner.current
+  val latest = rememberUpdatedState(block)
+  DisposableEffect(lifecycleOwner) {
+    val stop = observeResumes(lifecycleOwner.lifecycle, replayCurrent = false) { latest.value() }
+    onDispose { stop() }
+  }
+}
+
+/**
+ * Calls [block] on ON_RESUME; returns the unsubscribe. With [replayCurrent] false the events the
+ * registry replays synchronously inside `addObserver` (to catch up to the current state) are ignored.
+ */
+fun observeResumes(lifecycle: Lifecycle, replayCurrent: Boolean, block: () -> Unit): () -> Unit {
+  var catchingUp = !replayCurrent
+  val observer = LifecycleEventObserver { _, event ->
+    if (event == Lifecycle.Event.ON_RESUME && !catchingUp) block()
+  }
+  lifecycle.addObserver(observer)
+  catchingUp = false
+  return { lifecycle.removeObserver(observer) }
 }
 
 /**

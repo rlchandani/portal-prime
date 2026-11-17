@@ -19,7 +19,7 @@ import java.util.Locale
  */
 object ImmortalSettings {
 
-  private const val PREFS = "immortal_settings"
+  internal const val PREFS = "immortal_settings"
 
   // Music Assistant's WebSocket API port. MA's web server listens on 8095 by default.
   const val DEFAULT_MA_PORT = 8095

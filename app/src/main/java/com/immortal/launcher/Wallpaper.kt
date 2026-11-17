@@ -50,7 +50,7 @@ import kotlinx.coroutines.withContext
  */
 object WallpaperConfig {
 
-  private const val PREFS = "immortal_wallpaper"
+  internal const val PREFS = "immortal_wallpaper"
   private const val KEY_MODE = "mode"
   private const val KEY_GRAIN = "grain"
   private const val KEY_MODE_EXPLICIT_SELECTION = "mode_explicitly_selected"
@@ -240,7 +240,7 @@ private fun NightShiftOverlay() {
 
 /** A subtle film-grain overlay (tiled random-noise bitmap at low alpha). */
 @Composable
-private fun GrainOverlay() {
+internal fun GrainOverlay() {
   val noise = remember { makeNoise(128) }
   Canvas(Modifier.fillMaxSize()) {
     drawIntoCanvas { c ->

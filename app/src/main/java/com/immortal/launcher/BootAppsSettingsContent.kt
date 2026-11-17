@@ -54,7 +54,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import com.immortal.launcher.ui.components.OnResume
+import com.immortal.launcher.ui.components.OnResumeAfterFirstComposition
 import com.immortal.launcher.settings.SettingsDomains
 import java.util.Locale
 import kotlinx.coroutines.CancellationException
@@ -110,7 +110,7 @@ internal fun BootAppsContent() {
   val owner = LocalLifecycleOwner.current
   val pageActive = LocalApprovedLauncherPageActive.current
   var startupSettings by remember(context) { mutableStateOf(ImmortalSettings.load(context)) }
-  OnResume { startupSettings = ImmortalSettings.load(context) }
+  OnResumeAfterFirstComposition { startupSettings = ImmortalSettings.load(context) }
   DisposableEffect(context, pageActive) {
     val stop = if (pageActive) ImmortalSettings.observeSnapshot(context) {
       startupSettings = ImmortalSettings.load(context)

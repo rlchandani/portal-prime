@@ -12,10 +12,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,14 +26,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import com.immortal.launcher.ApprovedSettingsSwitch as Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,16 +45,12 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import kotlinx.coroutines.delay
 import kotlin.math.max
 import org.json.JSONObject
 
@@ -87,118 +82,20 @@ internal fun SleepSettingsContent() {
   val context = LocalContext.current
   val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
   var settings by remember { mutableStateOf(ScreensaverConfig.load(context)) }
-  var remainingMs by remember { mutableLongStateOf(0L) }
-  var running by remember { mutableStateOf(false) }
-  var timerEndsAtMs by remember { mutableLongStateOf(0L) }
-
-  LaunchedEffect(settings.sleepTimerEnabled) {
-    if (!settings.sleepTimerEnabled) {
-      remainingMs = 0L
-      running = false
-      timerEndsAtMs = 0L
-    }
-  }
-
-  LaunchedEffect(running, timerEndsAtMs) {
-    while (running && timerEndsAtMs > 0L) {
-      val left = max(0L, timerEndsAtMs - System.currentTimeMillis())
-      remainingMs = left
-      if (left == 0L) {
-        running = false
-        timerEndsAtMs = 0L
-        break
-      }
-      delay(1000L)
-    }
-  }
-
-  val timerText = remember(remainingMs) {
-    val total = remainingMs / 1000
-    val h = total / 3600
-    val m = (total % 3600) / 60
-    val s = total % 60
-    if (h > 0) String.format("%d:%02d:%02d", h, m, s) else String.format("%d:%02d", m, s)
-  }
-
   val firstFocus = remember { FocusRequester() }
   LaunchedEffect(Unit) { runCatching { firstFocus.requestFocus() } }
 
   fun startCountdown() {
     if (!settings.sleepTimerEnabled) return
     SleepScheduler.armSleepTimer(context)
-    val durationMs = ScreensaverConfig.clampSleepTimer(settings.sleepTimerMin) * 60_000L
-    timerEndsAtMs = System.currentTimeMillis() + durationMs
-    remainingMs = durationMs
-    running = true
   }
 
-  fun stopCountdown() {
-    SleepScheduler.cancelSleepTimer(context)
-    remainingMs = 0L
-    timerEndsAtMs = 0L
-    running = false
-  }
+  fun stopCountdown() = SleepScheduler.cancelSleepTimer(context)
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-      Card {
-        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-          Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically,
-          ) {
-            Text("Countdown", color = IosLabel, fontSize = Sizes.rowTitle)
-            Text(
-                if (remainingMs > 0) timerText else "00:00",
-                color = IosBlue,
-                fontSize = 58.sp,
-                fontWeight = FontWeight.Bold,
-            )
-          }
-
-          Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.spacedBy(12.dp),
-          ) {
-            Surface(
-                color = IosBlue,
-                shape = RoundedCornerShape(14.dp),
-                modifier =
-                    Modifier.weight(1f).heightIn(min = 68.dp)
-                        .focusRequester(firstFocus)
-                        .tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
-                          startCountdown()
-                        },
-            ) {
-              Text(
-                  "Start countdown",
-                  color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
-                  fontSize = 24.sp,
-                  fontWeight = FontWeight.SemiBold,
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(),
-              )
-            }
-            Surface(
-                color = if (running) IosRed else IosDivider,
-                shape = RoundedCornerShape(14.dp),
-                modifier =
-                    Modifier.weight(1f).heightIn(min = 68.dp)
-                        .tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) {
-                          stopCountdown()
-                        },
-            ) {
-              Text(
-                  "Stop",
-                  color = if (running) Color.White else IosLabel,
-                  fontSize = 24.sp,
-                  fontWeight = FontWeight.SemiBold,
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(),
-              )
-            }
-          }
-        }
+      Box(Modifier.focusRequester(firstFocus).focusGroup()) {
+        SleepCountdownCard(settings.sleepTimerEnabled, ScreensaverConfig.clampSleepTimer(settings.sleepTimerMin),
+            onStart = ::startCountdown, onStop = ::stopCountdown)
       }
 
       SleepToggleRow("Sleep Timer", settings.sleepTimerEnabled) {
@@ -212,11 +109,9 @@ internal fun SleepSettingsContent() {
           val c = ScreensaverConfig.clampSleepTimer(v)
           SettingsDomains.screensaver.apply(context, JSONObject().put("sleepTimerMin", c))
           settings = ScreensaverConfig.load(context)
-          if (running) {
+          // A running timer restarts at the new length, as before.
+          if (SleepCountdown.isRunning(SleepScheduler.sleepTimerEndsAtMs, System.currentTimeMillis())) {
             SleepScheduler.armSleepTimer(context)
-            val durationMs = c * 60_000L
-            timerEndsAtMs = System.currentTimeMillis() + durationMs
-            remainingMs = durationMs
           }
         }
       }

@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.immortal.launcher.settings.SettingsDomain
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.settings.SettingsRegistry
-import com.immortal.launcher.ui.components.OnResume
+import com.immortal.launcher.ui.components.OnResumeAfterFirstComposition
 import org.json.JSONObject
 
 /**
@@ -71,7 +71,7 @@ private fun rememberScreensaverDomainState(domain: SettingsDomain<Any>): Setting
 private fun rememberPlainDomainState(domain: SettingsDomain<Any>): SettingsDomainState {
     val application = LocalContext.current.applicationContext
     var snapshot by remember(domain) { mutableStateOf(domain.load(application)) }
-    OnResume { snapshot = domain.load(application) }
+    OnResumeAfterFirstComposition { snapshot = domain.load(application) }
     DisposableEffect(domain, application) {
         val stop = observeDomain(application, domain.id) { snapshot = domain.load(application) }
         onDispose { stop?.invoke() }

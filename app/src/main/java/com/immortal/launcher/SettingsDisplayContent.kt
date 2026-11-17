@@ -105,6 +105,9 @@ internal fun DisplaySection(parts: Set<DisplayPart>) {
     }
   }
   val display = snapshot
+  // The first snapshot arrives after the page is up; Night Shift's rows follow a frame later so
+  // the whole editor never composes and measures in a single frame.
+  val laterParts = rememberFrameAfter(display != null)
   if (display == null) {
     // Until the first snapshot arrives there are no writable rows or invented control values.
     FooterNote(if (loadFailed) "Display settings could not be loaded. Reopen this page to try again."
@@ -250,7 +253,7 @@ internal fun DisplaySection(parts: Set<DisplayPart>) {
     }
     FooterNote("Sets the media playback volume (music, videos, chimes).")
   }
-  if (DisplayPart.NIGHT_SHIFT in parts) {
+  if (DisplayPart.NIGHT_SHIFT in parts && laterParts) {
     SectionLabel("Night Shift")
     Card {
       ToggleRow(

@@ -190,6 +190,13 @@ object SleepScheduler {
 
   // ----- one-shot sleep timer ------------------------------------------------
 
+  /**
+   * Wall-clock time the armed sleep timer fires, or 0 when none is armed. This process's own
+   * record (the alarm itself is not queryable), so a Settings countdown survives page switches.
+   */
+  @Volatile var sleepTimerEndsAtMs: Long = 0L
+    private set
+
   /** Arm a one-shot sleep timer. */
   fun armSleepTimer(context: Context) {
     val cfg = ScreensaverConfig.load(context)
@@ -200,14 +207,19 @@ object SleepScheduler {
     val minutes = ScreensaverConfig.clampSleepTimer(cfg.sleepTimerMin)
     val at = System.currentTimeMillis() + minutes * 60_000L
     setAlarm(context, at, ACTION_SLEEP_TIMER, RC_SLEEP_TIMER)
+    sleepTimerEndsAtMs = at
     Log.i(TAG, "sleep timer armed for $minutes min")
   }
 
   /** Cancel the one-shot sleep timer. */
-  fun cancelSleepTimer(context: Context) = cancel(context, ACTION_SLEEP_TIMER, RC_SLEEP_TIMER)
+  fun cancelSleepTimer(context: Context) {
+    sleepTimerEndsAtMs = 0L
+    cancel(context, ACTION_SLEEP_TIMER, RC_SLEEP_TIMER)
+  }
 
   /** An explicitly started timer expired; disabled timers stay harmless after cancellation. */
   fun onSleepTimerElapsed(context: Context) {
+    sleepTimerEndsAtMs = 0L
     val cfg = ScreensaverConfig.load(context)
     if (!cfg.sleepTimerEnabled) return
     sleepNow(context, pauseAudio = cfg.pauseAudioOnSleep, closeApp = cfg.closeAppOnSleep)

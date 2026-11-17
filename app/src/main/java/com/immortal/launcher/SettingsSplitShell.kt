@@ -52,11 +52,7 @@ internal val LocalApprovedEnableAdvanced = staticCompositionLocalOf<() -> Unit> 
 @Composable
 internal fun rememberApprovedAdvanced(): Boolean = LocalAdvancedSettings.current
 
-/** The left column is about a third of the screen: 600 dp at 1920, 420 dp at 1280. */
-private const val SIDEBAR_FRACTION = .31f
-private val SidebarMin = 420.dp
-private val SidebarMax = 600.dp
-private val PageMaxWidth = 1120.dp
+private val PageMaxWidth = SettingsSplitMetrics.PAGE_MAX_WIDTH_DP.dp
 private val NavBarHeight = 104.dp
 private const val BACK_FRACTION = .4f
 private const val TITLE_FRACTION = .5f
@@ -99,7 +95,7 @@ internal fun SettingsSplitShell(
                 queryToken!!, query.length, results.map { SettingsUiProbeRoute(SettingsTree.rootOf(it.page), it.page, it.control) })
         }
     }
-    val sidebarWidth = (LocalConfiguration.current.screenWidthDp * SIDEBAR_FRACTION).dp.coerceIn(SidebarMin, SidebarMax)
+    val sidebarWidth = SettingsSplitMetrics.sidebarWidthDp(LocalConfiguration.current.screenWidthDp).dp
 
     fun applyAdvanced(): Boolean {
         val applied = SettingsDomains.immortal.apply(context, JSONObject().put("advancedSettings", true))
