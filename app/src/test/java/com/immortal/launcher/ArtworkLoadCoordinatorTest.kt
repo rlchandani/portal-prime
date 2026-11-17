@@ -144,4 +144,25 @@ class ArtworkLoadCoordinatorTest {
     val cover = Any()
     assertSame(cover, coordinator.fetch({ null }, { cover }, {}))
   }
+  @Test fun aCancelledQueuedRequestIsDroppedBeforeItLoads() {
+    val coordinator = ArtworkLoadCoordinator()
+    var loads = 0
+    Thread.currentThread().interrupt()
+    try {
+      assertNull(coordinator.fetch<Any>({ null }, { loads++; Any() }, {
+        throw AssertionError("A dropped request must not publish")
+      }))
+      assertTrue("the interrupt stays set for runInterruptible", Thread.currentThread().isInterrupted)
+    } finally { Thread.interrupted() }
+    assertEquals(0, loads)
+  }
+
+  @Test fun aCancelledRequestStillGetsArtThatIsAlreadyCached() {
+    val coordinator = ArtworkLoadCoordinator()
+    val cover = Any()
+    Thread.currentThread().interrupt()
+    try {
+      assertSame(cover, coordinator.fetch({ cover }, { throw AssertionError("cached art must not load") }, {}))
+    } finally { Thread.interrupted() }
+  }
 }
