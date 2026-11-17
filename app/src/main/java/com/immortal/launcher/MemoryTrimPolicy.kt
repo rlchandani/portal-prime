@@ -36,11 +36,12 @@ internal object MemoryTrimPolicy {
 
   /**
    * Whether Music's player WebView is released now rather than after its grace period. A player
-   * on screen goes only when the process is about to be killed; a detached one (Music closed, in
-   * its grace period) goes as soon as memory runs low or our UI is hidden.
+   * on screen goes only when the process is about to be killed; a hidden one (Music closed or
+   * covered by another app or the screensaver, in its grace period) goes as soon as memory runs
+   * low or our UI is hidden.
    */
   @Suppress("DEPRECATION")
-  fun releasePlayer(level: Int, attached: Boolean): Boolean =
-      if (attached) level >= ComponentCallbacks2.TRIM_MEMORY_COMPLETE
+  fun releasePlayer(level: Int, visible: Boolean): Boolean =
+      if (visible) level >= ComponentCallbacks2.TRIM_MEMORY_COMPLETE
       else level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW
 }

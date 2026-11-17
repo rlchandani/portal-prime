@@ -31,9 +31,11 @@ import kotlinx.coroutines.flow.asStateFlow
  *
  * Policy: playback happens only while the music screen is in the foreground with the player
  * visible (see [YouTubePlayerSurface]); leaving the foreground pauses and only a user action
- * resumes. The player is released [RELEASE_GRACE_MS] after its surface leaves composition, or at
- * once on memory pressure ([MemoryTrimPolicy.releasePlayer]); its release also shrinks the shared
- * art cache to [MemoryTrimPolicy.MUSIC_IDLE_ART_BYTES], since the song lists are gone.
+ * resumes. The player is released [RELEASE_GRACE_MS] after it stops being visible
+ * ([MusicPlayerVisibility]: its surface left composition, or the screen left the foreground for
+ * another app or the screensaver), or at once on memory pressure ([MemoryTrimPolicy.releasePlayer]);
+ * its release also shrinks the shared art cache to [MemoryTrimPolicy.MUSIC_IDLE_ART_BYTES], since
+ * the song lists are gone. Shown again within the grace, the same player is kept (no reload).
  *
  * Audio focus: the WebView's media stack requests and honors focus itself (other apps pause; a
  * transient request such as the dinner chime pauses and later resumes it). We mirror whatever the
@@ -52,17 +54,23 @@ object YouTubeMusicEngine : MusicTransport {
   private var store: YtQueueStore? = null
   private var app: Application? = null
   private var published: NowPlayingState? = null
+  /** The composed player slot of the music screen, if any (cleared when it leaves composition). */
+  private var container: ViewGroup? = null
+  private var visibility = MusicPlayerVisibility()
   private val releaseLater = Runnable { release() }
   private var engineWarmed = false
 
   /** Engine snapshot for the UI (queue, player status, halt/skip notices, unknown-item flag). */
   val state: StateFlow<YtEngineState> = mutableState.asStateFlow()
 
-  /** Hosts the player in [container] (creating it, and restoring the saved queue, on first use). */
+  /**
+   * The music screen composed the player's [container]. The player is hosted there (created, and
+   * the saved queue restored, on first use) while the screen is also in the foreground.
+   */
   @MainThread
   fun attach(container: ViewGroup) {
-    main.removeCallbacks(releaseLater)
-    obtainHost(container.context).attach(container)
+    this.container = container
+    updateVisibility(visibility.withHosted(true))
   }
 
   /**
@@ -91,16 +99,43 @@ object YouTubeMusicEngine : MusicTransport {
         .onFailure { Log.w(TAG, "WebView warm-up failed; the player starts it on first open", it) }
   }
 
-  /** Un-hosts the player from [container]; it is released after [RELEASE_GRACE_MS] unless re-attached. */
+  /** [container] left composition: the player is un-hosted and released after [RELEASE_GRACE_MS]. */
   @MainThread
   fun detach(container: ViewGroup) {
+    if (this.container !== container) return
     host?.detach(container)
-    main.removeCallbacks(releaseLater)
-    main.postDelayed(releaseLater, RELEASE_GRACE_MS)
+    this.container = null
+    updateVisibility(visibility.withHosted(false))
   }
 
-  /** Called by the music screen: false pauses (no background playback); true never resumes. */
-  fun setForeground(visible: Boolean) = dispatch(YtAction.Foreground(visible))
+  /**
+   * Called by the music screen: false pauses (no background playback) and starts the release
+   * grace; true cancels it but never resumes playback.
+   */
+  fun setForeground(visible: Boolean) = onMain {
+    updateVisibility(visibility.withForeground(visible))
+    reduce(YtAction.Foreground(visible))
+  }
+
+  /** Shows the player (cancels the grace; hosts or rebuilds it) or starts the release grace. */
+  @MainThread
+  private fun updateVisibility(next: MusicPlayerVisibility) {
+    val effect = visibility.effectTo(next)
+    visibility = next
+    when (effect) {
+      PlayerVisibilityEffect.SHOW -> container?.let { target ->
+        main.removeCallbacks(releaseLater)
+        Log.i(TAG, if (host == null) "shown: creating player" else "shown: keeping player")
+        obtainHost(target.context).attach(target)
+      }
+      PlayerVisibilityEffect.START_GRACE -> if (host != null) {
+        Log.i(TAG, "hidden: release in ${RELEASE_GRACE_MS / 1000} s unless shown again")
+        main.removeCallbacks(releaseLater)
+        main.postDelayed(releaseLater, RELEASE_GRACE_MS)
+      }
+      PlayerVisibilityEffect.NONE -> Unit
+    }
+  }
 
   /** Replaces the queue with [tracks] and plays [startIndex]; [label] e.g. "Playlist · Road trip". */
   fun playNow(tracks: List<YtTrack>, startIndex: Int = 0, label: String = "") =
@@ -136,6 +171,7 @@ object YouTubeMusicEngine : MusicTransport {
     main.removeCallbacks(releaseLater)
     val h = host ?: return
     host = null
+    Log.i(TAG, "released player")
     h.release()
     if (MusicTransports.youtube === this) MusicTransports.youtube = null
     app?.unregisterComponentCallbacks(memory)
@@ -235,7 +271,7 @@ object YouTubeMusicEngine : MusicTransport {
 
   private val memory = object : ComponentCallbacks2 {
     override fun onTrimMemory(level: Int) {
-      main.post { if (MemoryTrimPolicy.releasePlayer(level, host?.isAttached == true)) release() }
+      main.post { if (MemoryTrimPolicy.releasePlayer(level, visibility.visible)) release() }
     }
     override fun onConfigurationChanged(newConfig: Configuration) = Unit
     @Deprecated("Deprecated in Java")

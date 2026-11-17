@@ -74,9 +74,6 @@ internal class YouTubePlayerHost(
     web = createWebView()
   }
 
-  /** True while the player is hosted on screen (Music is open); false in the release grace. */
-  val isAttached: Boolean get() = !released && container != null
-
   /** Hosts the player in [target] (match-parent), moving it out of any previous parent. */
   @MainThread
   fun attach(target: ViewGroup) {
