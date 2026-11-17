@@ -22,6 +22,7 @@ private fun section(header: String?, vararg items: SettingsItem, footer: String?
 
 private const val SCREENSAVER = "screensaver"
 private const val IMMORTAL = "immortal"
+private const val BRIEFING = "briefing"
 
 /**
  * What each page shows, section by section, following the split-view mock's mapping. Every
@@ -57,6 +58,8 @@ internal object SettingsPageSections {
         P.ALARMS to listOf(
             section(null, block(B.ALARM)),
             section(null, block(B.SUNRISE)),
+            section("Morning briefing", rows(BRIEFING, "enabled", "trigger", "speak"),
+                footer = "Quiet hours and the voice are set in Sounds."),
         ),
         P.NIGHT to listOf(
             section("Overnight", rows(SCREENSAVER, "overnightEnabled", "overnightStartMin", "overnightEndMin",

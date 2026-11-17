@@ -276,4 +276,17 @@ class WeatherTest {
     assertEquals(Weather.sunTimesUrl(1.5, -2.25), Weather.sunTimesUrl(1.5, -2.25, 2).replace("forecast_days=2", "forecast_days=1"))
   }
 
+
+  @Test
+  fun `daily rain chance is read when present and null when missing`() {
+    assertEquals(null, Weather.parseForecast(sample, utc("2026-06-07T13:30")).days[0].rainChance)
+    val withRain = sample.replace(
+        "\"temperature_2m_min\": [50.6,51.0,52.0,53.0,54.0,55.0,56.0]",
+        "\"temperature_2m_min\": [50.6,51.0,52.0,53.0,54.0,55.0,56.0],\n\"precipitation_probability_max\": [35.4,null,0,100,5,6,7]")
+    val days = Weather.parseForecast(withRain, utc("2026-06-07T13:30")).days
+    assertEquals(35, days[0].rainChance)
+    assertEquals(null, days[1].rainChance)
+    assertEquals(100, days[3].rainChance)
+    assertTrue(Weather.forecastUrl(1.5, -2.25, fahrenheit = false).contains("precipitation_probability_max"))
+  }
 }

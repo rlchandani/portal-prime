@@ -1475,6 +1475,7 @@ private fun LauncherScreen(
           Column(Modifier.fillMaxSize().padding(horizontal = LauncherEdge).padding(top = 6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
               Box(Modifier.weight(1f)) { ApprovedHomeGreeting(welcome, use24, compact = connected == false) }
+              BriefingHomeCard(Modifier.padding(start = 24.dp))
             }
             if (notePlacement == HomeNotePlacement.STRIP) HomeNoteStrip(shareHome, Modifier.fillMaxWidth().padding(top = 8.dp))
             Spacer(Modifier.height(16.dp))

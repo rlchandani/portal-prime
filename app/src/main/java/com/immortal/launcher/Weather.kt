@@ -212,8 +212,9 @@ object Weather {
           }
           .getOrNull()
 
-  /** One day of the multi-day forecast. [label] is "Today" then "Mon", "Tue", … */
-  data class DayForecast(val label: String, val code: Int, val hi: Int, val lo: Int)
+  /** One day of the multi-day forecast. [label] is "Today" then "Mon", "Tue", … [rainChance] is
+   * the day's highest chance of rain in percent, or null when the response has none. */
+  data class DayForecast(val label: String, val code: Int, val hi: Int, val lo: Int, val rainChance: Int? = null)
 
   /** One hour of the hourly forecast. [label] is "Now" then "1 PM", "2 PM", … */
   data class HourForecast(
@@ -265,7 +266,7 @@ object Weather {
   internal fun forecastUrl(lat: Double, lon: Double, fahrenheit: Boolean): String {
     val unit = if (fahrenheit) "fahrenheit" else "celsius"
     return "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
-        "&daily=weather_code,temperature_2m_max,temperature_2m_min" +
+        "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
         "&hourly=weather_code,temperature_2m" +
         "&forecast_days=7&temperature_unit=$unit&timezone=auto"
   }
@@ -284,6 +285,7 @@ object Weather {
     val code = d.getJSONArray("weather_code")
     val hi = d.getJSONArray("temperature_2m_max")
     val lo = d.getJSONArray("temperature_2m_min")
+    val rain = d.optJSONArray("precipitation_probability_max")
     val dayFmt = SimpleDateFormat("EEE", Locale.getDefault())
     val isoDate = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     return (0 until time.length()).map { i ->
@@ -294,7 +296,9 @@ object Weather {
           label = label,
           code = code.getInt(i),
           hi = hi.getDouble(i).roundToInt(),
-          lo = lo.getDouble(i).roundToInt())
+          lo = lo.getDouble(i).roundToInt(),
+          rainChance = rain?.takeIf { i < it.length() && !it.isNull(i) }?.optDouble(i)
+              ?.takeIf { !it.isNaN() }?.roundToInt()?.coerceIn(0, 100))
     }
   }
 

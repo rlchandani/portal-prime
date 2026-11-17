@@ -168,6 +168,12 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
     }.onFailure { Log.w(TAG, failureMessage, it) }
   }
 
+  /**
+   * Speak [text] once in the chosen chime voice at the chime volume (the morning briefing).
+   * Returns a stop handle that silences it and releases the engine; safe to call more than once.
+   */
+  fun speakInChimeVoice(context: Context, text: String): () -> Unit = speakStoppable(context, text)
+
   private fun speak(
       context: Context,
       text: String,
@@ -176,11 +182,23 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
       automatic: AutomaticTimeSpeech? = null,
       alarmStream: Boolean = false,
   ) {
+    speakStoppable(context, text, volumeOverride, voiceNameOverride, automatic, alarmStream)
+  }
+
+  private fun speakStoppable(
+      context: Context,
+      text: String,
+      volumeOverride: Float? = null,
+      voiceNameOverride: String? = null,
+      automatic: AutomaticTimeSpeech? = null,
+      alarmStream: Boolean = false,
+  ): () -> Unit {
+    var stop: () -> Unit = {}
     runCatching {
       val cfg = if (automatic == null) ChimeConfig.load(context)
-          else automatic.playbackSettings() ?: return
+          else automatic.playbackSettings() ?: return stop
       val vol = (volumeOverride ?: (cfg.volume / 100f)).coerceIn(0f, 1f)
-      if (vol <= 0f) return
+      if (vol <= 0f) return stop
       lateinit var owner: OneShotSpeechOwner<TextToSpeech>
       owner = OneShotSpeechOwner(
           ready = { t ->
@@ -229,10 +247,12 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
             Handler(Looper.getMainLooper()).postDelayed({ runCatching { t.shutdown() } }, 100)
           },
       )
+      stop = owner::finish
       val engine = TextToSpeech(context.applicationContext) { status ->
         owner.initialized(status == TextToSpeech.SUCCESS)
       }
       owner.created(engine)
     }.onFailure { Log.w(TAG, "spoken time failed", it) }
+    return stop
   }
 }

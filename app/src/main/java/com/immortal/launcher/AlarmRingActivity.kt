@@ -98,7 +98,11 @@ class AlarmRingActivity : ComponentActivity() {
   }
 
   private fun dismiss() {
-    if (!preview) { AlarmSound.stop(this); AlarmReceiver.clearNotification(this) }
+    if (!preview) {
+      AlarmSound.stop(this)
+      AlarmReceiver.clearNotification(this)
+      BriefingLauncher.afterWake(this)
+    }
     finish()
   }
 
