@@ -22,8 +22,10 @@ import java.net.Socket
 /**
  * A dependency-free, server-less LAN audio link for the Portal-to-Portal intercom /
  * baby monitor. One device [broadcasts][startBroadcast] (mic → TCP), another
- * [listens][startListening] (TCP → speaker). Raw 16-bit mono PCM at 16 kHz over a
- * plain TCP socket on the local network — no signalling server, no GMS, no library.
+ * [listens][startListening] (TCP → speaker). 16-bit mono PCM at 16 kHz over TCP on the local
+ * network — no signalling server, no GMS, no library. Every connection first passes the mutual
+ * household-key [IntercomHandshake]; audio then flows only as AES-GCM frames under that
+ * session's key ([IntercomSealingOutputStream]). Unproven peers get no audio and play nothing.
  *
  * Uses the handset mic (RECORD_AUDIO); the far-field array needs a Meta-signed
  * permission Immortal can't hold, but the handset mic is fine for a monitor.
@@ -35,16 +37,24 @@ class LanAudio {
   // here would make ServerSocket(PORT) in startBroadcast() fail to bind.
   val PORT = 8724
   private val SAMPLE_RATE = 16000
+  private val CONNECT_TIMEOUT_MS = 5000
+  /** Concurrent authenticated listeners per broadcast (each opens its own mic capture). */
+  private val MAX_LISTENERS = 3
+  /** Concurrent unauthenticated handshakes; each is bounded by [IntercomHandshake.TIMEOUT_MS]. */
+  private val MAX_PENDING_HANDSHAKES = 4
 
   private val sessions = LanAudioSessions()
 
   val isActive: Boolean get() = sessions.isActive
 
-  /** Capture the mic and stream it to every device that connects to this port.
+  /** Capture the mic and stream it to every household Portal (up to [MAX_LISTENERS]) that connects.
    * [onState] reports whether the listening socket bound, so the UI doesn't claim
    * it's broadcasting when the port couldn't be opened (e.g. already in use). */
-  fun startBroadcast(onState: (Boolean) -> Unit = {}) {
+  internal fun startBroadcast(credentials: IntercomCredentials, onState: (Boolean) -> Unit = {}) {
     val session = sessions.start()
+    val handshake = IntercomHandshake(credentials)
+    val replay = HouseholdMessage.ReplayGuard()
+    val slots = IntercomSlots(MAX_PENDING_HANDSHAKES, MAX_LISTENERS)
     Thread {
       try {
         if (!session.isActive) return@Thread
@@ -80,10 +90,15 @@ class LanAudio {
           while (session.isActive) {
             val socket = server.accept()
             val ownedSocket = session.own { socket.close() } ?: break
+            if (!slots.tryBeginHandshake()) {
+              Log.w(TAG, "intercom connection refused: too many pending handshakes")
+              ownedSocket.close()
+              continue
+            }
             // Each listener and microphone belongs to this exact broadcast session.
             Thread {
               try {
-                if (session.isActive) pumpMicTo(session, socket.getOutputStream())
+                serveListener(session, socket, handshake, replay, slots)
               } catch (error: Throwable) {
                 if (session.isActive) Log.w(TAG, "mic pump ended", error)
               } finally {
@@ -100,6 +115,41 @@ class LanAudio {
         sessions.finish(session)
       }
     }.apply { isDaemon = true; start() }
+  }
+
+  private fun serveListener(
+      session: LanAudioSessions.Session,
+      socket: Socket,
+      handshake: IntercomHandshake,
+      replay: HouseholdMessage.ReplayGuard,
+      slots: IntercomSlots,
+  ) {
+    val result = try {
+      if (!session.isActive) return
+      handshake.asBroadcaster(socket, replay)
+    } finally {
+      slots.endHandshake()
+    }
+    if (result !is IntercomHandshake.Result.Accepted) {
+      if (session.isActive) logRejected(result, socket)
+      return
+    }
+    if (!slots.tryBeginListener()) {
+      Log.w(TAG, "intercom listener refused: $MAX_LISTENERS already connected")
+      return
+    }
+    try {
+      if (session.isActive) {
+        pumpMicTo(session, IntercomSealingOutputStream(socket.getOutputStream(), result.sessionKey))
+      }
+    } finally {
+      slots.endListener()
+    }
+  }
+
+  private fun logRejected(result: IntercomHandshake.Result, socket: Socket) {
+    val reason = (result as? IntercomHandshake.Result.Rejected)?.reason
+    Log.w(TAG, "intercom handshake rejected ($reason) from ${socket.inetAddress?.hostAddress}")
   }
 
   private fun pumpMicTo(session: LanAudioSessions.Session, out: OutputStream) {
@@ -125,10 +175,11 @@ class LanAudio {
     }
   }
 
-  /** Connect to [host] and play whatever audio it streams. [onState] reports connect
-   * success/failure so the UI can show status. */
-  fun startListening(host: String, onState: (Boolean) -> Unit) {
+  /** Connect to [host] and, once both sides prove the household key, play its sealed audio.
+   * [onState] reports connect+handshake success/failure so the UI can show status. */
+  internal fun startListening(host: String, credentials: IntercomCredentials, onState: (Boolean) -> Unit) {
     val session = sessions.start()
+    val handshake = IntercomHandshake(credentials)
     Thread {
       try {
         if (!session.isActive) return@Thread
@@ -143,16 +194,23 @@ class LanAudio {
         // Own the pending socket before connect, so stop can interrupt its blocking IO.
         val ownedSocket = session.own { socket.close() } ?: return@Thread
         try {
-          val ok = runCatching {
+          val connected = runCatching {
             if (!session.isActive) return@Thread
-            socket.connect(InetSocketAddress(host, PORT), 5000)
+            socket.connect(InetSocketAddress(host, PORT), CONNECT_TIMEOUT_MS)
             true
           }.getOrDefault(false)
           if (!session.isActive) return@Thread
+          // Nothing is played until the broadcaster proves it holds the household key.
+          val result = if (connected) handshake.asListener(socket) else null
+          if (!session.isActive) return@Thread
+          if (result != null && result !is IntercomHandshake.Result.Accepted) logRejected(result, socket)
+          val accepted = result as? IntercomHandshake.Result.Accepted
+          val ok = accepted != null
           if (!ok) sessions.finish(session)
           onState(ok)
-          if (ok && session.isActive) runCatching { playFrom(session, socket.getInputStream()) }
-              .onFailure { if (session.isActive) Log.w(TAG, "listen ended", it) }
+          if (accepted != null && session.isActive) runCatching {
+            playFrom(session, IntercomOpeningInputStream(socket.getInputStream(), accepted.sessionKey))
+          }.onFailure { if (session.isActive) Log.w(TAG, "listen ended", it) }
         } finally {
           ownedSocket.close()
         }

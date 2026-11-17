@@ -368,13 +368,16 @@ internal fun ToolsIntercomContent() {
             myIp = toolsLocalIp(context)
         }
     }
+    fun householdOrExplain(onMissing: (String) -> Unit): IntercomCredentials? =
+        IntercomCredentials.load(context).also { if (it == null) onMissing(IntercomCredentials.SETUP_MESSAGE) }
     fun beginBroadcast() {
+        val credentials = householdOrExplain { broadcastStatus = it } ?: return
         val request = policy.begin() ?: return
         stop()
         runningRequest = request
         mode = IntercomMode.STARTING_BROADCAST
         broadcastStatus = "Opening broadcast…"
-        lan.startBroadcast { started ->
+        lan.startBroadcast(credentials) { started ->
             handler.post {
                 if (policy.accepts(request)) {
                     if (started && lan.isActive) {
@@ -404,6 +407,7 @@ internal fun ToolsIntercomContent() {
     fun requestBroadcast() {
         policy.begin() ?: return
         stop()
+        if (householdOrExplain { broadcastStatus = it } == null) return
         micGranted = toolsMicrophoneGranted(context)
         if (micGranted) beginBroadcast()
         else {
@@ -418,12 +422,13 @@ internal fun ToolsIntercomContent() {
             listenStatus = "Enter the other Portal's IP address or hostname."
             return
         }
+        val credentials = householdOrExplain { listenStatus = it } ?: return
         val request = policy.begin() ?: return
         stop()
         runningRequest = request
         mode = IntercomMode.CONNECTING
         listenStatus = "Connecting to $address…"
-        lan.startListening(address) { connected ->
+        lan.startListening(address, credentials) { connected ->
             handler.post {
                 if (policy.accepts(request)) {
                     if (connected && lan.isActive) {

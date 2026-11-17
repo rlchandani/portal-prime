@@ -46,7 +46,7 @@ import kotlinx.coroutines.delay
 /**
  * Portal-to-Portal LAN intercom / baby monitor (one-way audio). One Portal
  * broadcasts its mic; another listens. No servers, no GMS — raw PCM over TCP on the
- * local network (see [LanAudio]). Needs the mic permission, requested on first use.
+ * local network (see [LanAudio]), only between Portals holding the household key. Needs the mic permission, requested on first use.
  */
 class IntercomActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,12 +126,20 @@ internal fun IntercomContent() {
     }
   }
 
+  fun householdOrExplain(): IntercomCredentials? = IntercomCredentials.load(context).also {
+    if (it == null) {
+      stop()
+      status = IntercomCredentials.SETUP_MESSAGE
+    }
+  }
+
   fun beginBroadcast() {
     if (!isActive()) return
+    val credentials = householdOrExplain() ?: return
     val request = ++session
     mode = IntercomMode.STARTING_BROADCAST
     status = "Starting…"
-    lan.startBroadcast { ok ->
+    lan.startBroadcast(credentials) { ok ->
       handler.post {
         if (isActive() && request == session) {
           if (ok && lan.isActive) {
@@ -162,6 +170,7 @@ internal fun IntercomContent() {
 
   fun startBroadcast() {
     if (!isActive()) return
+    householdOrExplain() ?: return
     val granted = android.content.pm.PackageManager.PERMISSION_GRANTED ==
         context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
     if (granted) beginBroadcast()
@@ -219,11 +228,12 @@ internal fun IntercomContent() {
           ) {
             if (listenBusy) stop()
             else if (host.isNotBlank() && isActive()) {
+              val credentials = householdOrExplain() ?: return@ActionButton
               val request = ++session
               val address = host.trim()
               mode = IntercomMode.CONNECTING
               status = "Connecting…"
-              lan.startListening(address) { ok ->
+              lan.startListening(address, credentials) { ok ->
                 handler.post {
                   if (isActive() && request == session) {
                     val connected = ok && lan.isActive
