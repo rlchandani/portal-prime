@@ -45,3 +45,25 @@ HPLcom/immortal/launcher/MultiRoomArt*;->**(**)**
 HPLcom/immortal/launcher/ArtworkLoadCoordinator;->**(**)**
 HPLcom/immortal/launcher/MusicArtworkPolicy;->**(**)**
 HPLcom/immortal/launcher/MusicLocalArtwork;->**(**)**
+# Launcher tabs and Home pages: Apps and Tools are composed hidden at idle and activated on their
+# first visit, and a Home swipe activates the settled widget page; each runs once per visit, so
+# precompile the tab host, page lifecycle, Apps grid/chrome, Tools library and the idle helpers.
+HPLcom/immortal/launcher/ApprovedLauncherTabsKt;->**(**)**
+HPLcom/immortal/launcher/ApprovedLauncherTabsKt$**;->**(**)**
+HPLcom/immortal/launcher/LauncherPageInputGate;->**(**)**
+HPLcom/immortal/launcher/LauncherTabPrefetch;->**(**)**
+HPLcom/immortal/launcher/MainLooperIdleKt;->**(**)**
+HPLcom/immortal/launcher/MainLooperIdleKt$**;->**(**)**
+HPLcom/immortal/launcher/HomePagerWindow;->**(**)**
+HPLcom/immortal/launcher/ApprovedWidgetPageScopeKt;->**(**)**
+HPLcom/immortal/launcher/ApprovedWidgetPageScopeKt$**;->**(**)**
+HPLcom/immortal/launcher/AppSwitcherActivityKt;->**(**)**
+HPLcom/immortal/launcher/AppSwitcherActivityKt$**;->**(**)**
+HPLcom/immortal/launcher/ApprovedAppsChromeKt;->**(**)**
+HPLcom/immortal/launcher/ApprovedAppsChromeKt$**;->**(**)**
+HPLcom/immortal/launcher/ApprovedToolsHostKt;->**(**)**
+HPLcom/immortal/launcher/ApprovedToolsHostKt$**;->**(**)**
+HPLcom/immortal/launcher/ApprovedToolsUiKt;->**(**)**
+HPLcom/immortal/launcher/ApprovedToolsUiKt$**;->**(**)**
+HPLcom/immortal/launcher/ApprovedToolsCatalog;->**(**)**
+HPLcom/immortal/launcher/ApprovedToolsSummaries;->**(**)**

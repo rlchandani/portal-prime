@@ -31,7 +31,9 @@ import kotlinx.coroutines.flow.asStateFlow
  *
  * Policy: playback happens only while the music screen is in the foreground with the player
  * visible (see [YouTubePlayerSurface]); leaving the foreground pauses and only a user action
- * resumes. The player is released [RELEASE_GRACE_MS] after its surface leaves composition.
+ * resumes. The player is released [RELEASE_GRACE_MS] after its surface leaves composition, or at
+ * once on memory pressure ([MemoryTrimPolicy.releasePlayer]); its release also shrinks the shared
+ * art cache to [MemoryTrimPolicy.MUSIC_IDLE_ART_BYTES], since the song lists are gone.
  *
  * Audio focus: the WebView's media stack requests and honors focus itself (other apps pause; a
  * transient request such as the dinner chime pauses and later resumes it). We mirror whatever the
@@ -139,6 +141,7 @@ object YouTubeMusicEngine : MusicTransport {
     app?.unregisterComponentCallbacks(memory)
     reduce(YtAction.PlayerLost)
     clearPublished()
+    MultiRoomArt.trimToBytes(MemoryTrimPolicy.MUSIC_IDLE_ART_BYTES)
   }
 
   /** Applies [action] on the main thread. */
@@ -232,8 +235,7 @@ object YouTubeMusicEngine : MusicTransport {
 
   private val memory = object : ComponentCallbacks2 {
     override fun onTrimMemory(level: Int) {
-      @Suppress("DEPRECATION")
-      if (level >= ComponentCallbacks2.TRIM_MEMORY_COMPLETE) main.post { release() }
+      main.post { if (MemoryTrimPolicy.releasePlayer(level, host?.isAttached == true)) release() }
     }
     override fun onConfigurationChanged(newConfig: Configuration) = Unit
     @Deprecated("Deprecated in Java")

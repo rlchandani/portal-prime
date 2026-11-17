@@ -66,16 +66,18 @@ internal val ApprovedHomeTabPalette = ApprovedDarkPalette
  * calls its owner's onLayoutChange on every frame, invalidating the page's semantics geometry.
  * Here only native View translations change per frame; page layout and semantics stay local.
  * The child compositions inherit the current theme/content and share the parent's recomposer.
+ * [prefetch] applies to the Compose host only; the opt-in native host creates pages on first use.
  */
 @Composable
 internal fun ApprovedHomeTabs(
     selected: ApprovedLauncherTab,
     modifier: Modifier = Modifier,
     contentActive: Boolean = true,
+    prefetch: List<ApprovedLauncherTab> = emptyList(),
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
   if (!BuildConfig.PORTAL_NATIVE_HOME_TABS) {
-    ApprovedLauncherTabs(selected, modifier, contentActive, content)
+    ApprovedLauncherTabs(selected, modifier, contentActive, prefetch, content)
     return
   }
   val hostOwner = LocalLifecycleOwner.current

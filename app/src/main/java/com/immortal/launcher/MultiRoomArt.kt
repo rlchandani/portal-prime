@@ -32,6 +32,15 @@ object MultiRoomArt {
   }
   private val loads = ArtworkLoadCoordinator()
 
+  /**
+   * Shrinks the art cache to [fraction] of its budget (memory pressure). Evicted bitmaps are only
+   * dropped, never recycled, so art still on screen stays valid until its owner lets it go.
+   */
+  fun trim(fraction: Float) = trimToBytes(MemoryTrimPolicy.budget(MAX_CACHE_BYTES, fraction))
+
+  /** Shrinks the art cache to at most [bytes], least recently used first (Music was left). */
+  fun trimToBytes(bytes: Int) = synchronized(cache) { cache.trimToSize(bytes.coerceIn(0, MAX_CACHE_BYTES)) }
+
   /** Card/header thumbnail. Blocking — call off-main. */
   fun fetch(url: String): Bitmap? = fetch(url, DEFAULT_EDGE)
 

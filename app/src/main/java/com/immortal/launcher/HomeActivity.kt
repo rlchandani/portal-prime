@@ -106,6 +106,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -933,6 +934,9 @@ private fun ApprovedWidgetArea(
     val currentPage = rememberUpdatedState(page)
     val pageChanged = rememberUpdatedState(onPageChanged)
     val slide = remember { Animatable(page.index.toFloat()) }
+    // The page the last slide finished on. Page work (producers, lifecycle, resume reads) and the
+    // next neighbor's composition follow it, so they start after the slide, not in its first frame.
+    var settled by remember { mutableIntStateOf(page.index) }
     val swipeThreshold = with(androidx.compose.ui.platform.LocalDensity.current) { 64.dp.toPx() }
     LaunchedEffect(page.index, page.count) {
       if (!preserveCounterFocus) focus.clearFocus(force = true)
@@ -940,6 +944,7 @@ private fun ApprovedWidgetArea(
       if (slide.value > prepared.lastIndex || abs(slide.value - page.index) > 1f)
         slide.snapTo(page.index.toFloat())
       else slide.animateTo(page.index.toFloat(), tween(180, easing = EaseOutCubic))
+      settled = page.index
     }
     BoxWithConstraints(modifier.clipToBounds().semantics { contentDescription = "Home widgets" }
         .then(if (!homeActive || page.count < 2 || placing) Modifier else Modifier.pointerInput(page.count) {
@@ -961,12 +966,12 @@ private fun ApprovedWidgetArea(
           }
         })) {
       val widthPx = with(androidx.compose.ui.platform.LocalDensity.current) { maxWidth.toPx() }
-      val first = (page.index - 1).coerceAtLeast(0)
-      val last = (page.index + 1).coerceAtMost(prepared.lastIndex)
-      for (index in first..last) key(index) {
+      for (index in HomePagerWindow.composed(page.index, settled, prepared.lastIndex)) key(index) {
         val displayed = prepared[index]
         val selected = index == page.index
+        // Input, focus and semantics follow the target at once; page work waits for the settle.
         val active = homeActive && selected
+        val working = homeActive && HomePagerWindow.working(index, settled)
         // Deferred placement caches the display list; the viewport clips off-screen pages.
         Box(Modifier.fillMaxSize().absoluteOffset {
           IntOffset((HomePresentation.pageOffset(index, slide.value) * widthPx).roundToInt(), 0)
@@ -977,7 +982,7 @@ private fun ApprovedWidgetArea(
               }
             }
             .focusProperties { canFocus = active }) {
-          ApprovedWidgetPageScope(active) {
+          ApprovedWidgetPageScope(working) {
             ApprovedWidgetPage(displayed, widgets, host, manager, onChanged,
                 onEnterEdit, onRemove, editMode && selected)
           }
@@ -1454,7 +1459,8 @@ private fun LauncherScreen(
         Box(Modifier.weight(1f).fillMaxWidth()) {
         ApprovedHomeTabs(selectedTab, Modifier.fillMaxSize().padding(
             bottom = if (musicLayout == MusicPlayerLayout.COMPACT) 210.dp else 0.dp),
-            contentActive = musicLayout == null || musicLayout == MusicPlayerLayout.COMPACT) { tab ->
+            contentActive = musicLayout == null || musicLayout == MusicPlayerLayout.COMPACT,
+            prefetch = LauncherTabPrefetch.HOME_TABS) { tab ->
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })

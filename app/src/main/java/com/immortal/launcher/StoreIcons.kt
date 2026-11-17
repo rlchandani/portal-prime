@@ -56,6 +56,9 @@ object StoreIcons {
 
   fun cached(pkg: String): Bitmap? = mem.get(pkg)
 
+  /** Drops least recently used icons down to [fraction] of the memory cache; the disk copy stays. */
+  fun trim(fraction: Float) = mem.trimToSize(MemoryTrimPolicy.budget(mem.maxSize(), fraction))
+
   /** The last disposed card cancels both queued work and its active connection. */
   fun load(context: Context, app: CatalogApp, onLoaded: (Bitmap?) -> Unit): Request {
     val interest = Interest(onLoaded)

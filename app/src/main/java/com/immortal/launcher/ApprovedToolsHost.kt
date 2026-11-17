@@ -198,8 +198,10 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpe
     val context = LocalContext.current.applicationContext
     val active = LocalApprovedLauncherPageActive.current
     val resume = rememberApprovedResume()
+    // A library composed ahead of its first visit reads its summaries once while hidden, so the
+    // first visible frame already shows them and activation's re-read publishes an equal map.
     val summaries by produceState<Map<String, String>>(emptyMap(), active, resume) {
-        if (active) value = withContext(Dispatchers.IO) {
+        if (active || value.isEmpty()) value = withContext(Dispatchers.IO) {
             ApprovedToolsSummaries.load(context)
         }
     }

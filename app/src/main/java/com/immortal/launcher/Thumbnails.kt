@@ -23,6 +23,9 @@ object Thumbnails {
   // Bounded LRU so browsing big folders can't grow memory without limit.
   private val cache = LruCache<String, Bitmap>(96)
 
+  /** Drops least recently used thumbnails down to [fraction] of the cache (memory pressure). */
+  fun trim(fraction: Float) = cache.trimToSize(MemoryTrimPolicy.budget(cache.maxSize(), fraction))
+
   /** Square thumbnail [px] wide for [item], or null if it can't be decoded. */
   fun get(item: MediaItem, px: Int): Bitmap? {
     cache.get(item.path)?.let {

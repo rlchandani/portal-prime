@@ -131,12 +131,17 @@ internal enum class ApprovedLauncherTab(val id: String) {
   }
 }
 
-/** Retain visited pages, pause hidden work, and slide display lists without per-frame composition. */
+/**
+ * Retain visited pages, pause hidden work, and slide display lists without per-frame composition.
+ * [prefetch] tabs are composed hidden and inactive at main-looper idle once Home has settled
+ * ([LauncherTabPrefetch]), so their first visit does not compose a whole page inside the slide.
+ */
 @Composable
 internal fun ApprovedLauncherTabs(
     selected: ApprovedLauncherTab,
     modifier: Modifier = Modifier,
     contentActive: Boolean = true,
+    prefetch: List<ApprovedLauncherTab> = emptyList(),
     content: @Composable (ApprovedLauncherTab) -> Unit,
 ) {
   val hostOwner = LocalLifecycleOwner.current
@@ -147,6 +152,17 @@ internal fun ApprovedLauncherTabs(
   var visible by remember { mutableStateOf(setOf(selected)) }
   val focus = LocalFocusManager.current
   val view = LocalView.current
+  LaunchedEffect(contentActive, prefetch) {
+    if (!contentActive || prefetch.isEmpty()) return@LaunchedEffect
+    delay(LauncherTabPrefetch.FIRST_DELAY_MS)
+    while (true) {
+      awaitMainLooperIdle()
+      val next = LauncherTabPrefetch.next(prefetch, visited) ?: break
+      // Hidden and inactive: alpha 0, CREATED lifecycle, producers paused, input gate closed.
+      visited = visited + next
+      delay(LauncherTabPrefetch.GAP_MS)
+    }
+  }
   LaunchedEffect(selected) {
     if (selected == transition.selected) return@LaunchedEffect
     focus.clearFocus(force = true)
