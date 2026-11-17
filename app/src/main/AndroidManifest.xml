@@ -520,6 +520,13 @@
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.SampleApp.Navigation" />
 
+        <!-- Settings › Home Assistant › Doorbell: choose the doorbell, camera and motion entities. -->
+        <activity
+            android:name=".DoorbellPickerActivity"
+            android:exported="false"
+            android:label="Doorbell devices"
+            android:theme="@style/Theme.SampleApp.Navigation" />
+
         <!-- "Install an APK" file browser, opened from the App Store. -->
         <activity
             android:name=".ApkBrowserActivity"

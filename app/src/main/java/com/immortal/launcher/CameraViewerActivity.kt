@@ -52,14 +52,17 @@ class CameraViewerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val streamId = if (intent.hasExtra(APPROVED_CAMERA_STREAM_ID))
             intent.getLongExtra(APPROVED_CAMERA_STREAM_ID, -1L) else null
-        viewingStream = streamId != null
+        val haCamera = haCameraEntity(intent)
+        val haTitle = haCamera?.let { haCameraTitle(intent, it) }.orEmpty()
+        viewingStream = streamId != null || haCamera != null
         originallyKeptAwake = window.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON != 0
         if (viewingStream) applyToolsDisplayBars(this)
         setContent {
             PortalPrimeTheme(darkTheme = viewingStream) {
                 CompositionLocalProvider(LocalApprovedPalette provides
                     if (viewingStream) ApprovedToolsPalette else LocalApprovedPalette.current) {
-                    CameraViewerScreen(streamId,
+                    if (haCamera != null) HaCameraLiveScreen(haCamera, haTitle, onBack = { finish() })
+                    else CameraViewerScreen(streamId,
                         onVideoCreated = { video = it },
                         onVideoReleased = { if (video === it) video = null },
                         canPlay = { foreground && !isFinishing })

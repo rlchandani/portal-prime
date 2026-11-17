@@ -600,6 +600,8 @@ class SettingsDomainTest {
             "FollowMeConfig",
             // BriefingSettings.domain (Settings › Alarms & Wake › Morning briefing).
             "BriefingConfig",
+            // DoorbellSettings.domain (Settings › Home Assistant › Doorbell).
+            "DoorbellConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",
             "FleetConfig",
