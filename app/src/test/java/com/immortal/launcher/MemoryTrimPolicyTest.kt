@@ -40,16 +40,16 @@ class MemoryTrimPolicyTest {
   }
 
   @Test fun playerOnScreenIsReleasedOnlyWhenTheProcessIsAboutToDie() {
-    assertFalse(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL, attached = true))
-    assertFalse(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN, attached = true))
-    assertTrue(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_COMPLETE, attached = true))
+    assertFalse(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL, visible = true))
+    assertFalse(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN, visible = true))
+    assertTrue(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_COMPLETE, visible = true))
   }
 
   @Test fun detachedPlayerInItsGraceIsReleasedUnderPressureOrWhenHidden() {
-    assertFalse(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE, attached = false))
-    assertTrue(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW, attached = false))
-    assertTrue(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN, attached = false))
-    assertTrue(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_BACKGROUND, attached = false))
+    assertFalse(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE, visible = false))
+    assertTrue(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW, visible = false))
+    assertTrue(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN, visible = false))
+    assertTrue(MemoryTrimPolicy.releasePlayer(ComponentCallbacks2.TRIM_MEMORY_BACKGROUND, visible = false))
   }
 
   @Test fun musicIdleArtBudgetIsBelowTheFullArtCache() {

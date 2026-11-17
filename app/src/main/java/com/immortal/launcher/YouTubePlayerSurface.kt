@@ -23,7 +23,8 @@ import androidx.lifecycle.LifecycleEventObserver
  *
  * While composed and the host lifecycle is RESUMED the engine may play; ON_PAUSE or leaving
  * composition pauses it (no background playback) and nothing resumes without a user action.
- * Leaving composition also schedules the player's release ([YouTubeMusicEngine.RELEASE_GRACE_MS]).
+ * Either also schedules the player's release ([YouTubeMusicEngine.RELEASE_GRACE_MS]); ON_RESUME
+ * within the grace keeps the same player, after it the player is rebuilt in place.
  *
  * [shown] = false keeps the one player (and its page) alive but hidden, for "nothing loaded" and
  * "playing in another room"; the caller also moves it out of the way so it never takes touches.
