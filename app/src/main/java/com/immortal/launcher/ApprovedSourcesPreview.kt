@@ -53,6 +53,10 @@ internal fun approvedSourcesThumbnail(item: MediaItem, target: ApprovedSourcePre
     })
 }
 
+/** Drops least recently used previews down to [fraction] of the cache; nothing is recycled. */
+internal fun approvedSourcesTrimPreviews(fraction: Float) = approvedSourcesPreviewCache.trimToSize(
+    MemoryTrimPolicy.budget(approvedSourcesPreviewCache.maxSize(), fraction))
+
 /** Removes only a caller-owned generated fixture; normal preview ownership is unchanged. */
 internal fun approvedSourcesDiscardPreview(item: MediaItem, target: ApprovedSourcePreviewSize? = null): Bitmap? =
     approvedSourcesPreviewCache.remove(approvedSourcesPreviewKey(item, target))

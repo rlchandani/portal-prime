@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import android.app.ActivityManager
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -18,11 +19,26 @@ import androidx.annotation.MainThread
  * Schedules [YouTubeMusicEngine.prewarm] for when Home is idle: after its first draw, a settle
  * delay, then a main-looper idle handler (so it never competes with Home's first frames or touch).
  * Once per process; only when the YouTube route is configured. Home cancels it on pause.
+ *
+ * Chromium's native start-up cannot be undone, so the warm-up is skipped (and retried on a later
+ * Home resume) while the system is short of memory; Music then pays it on its first open instead.
  */
 internal object MusicPlayerPrewarm {
   /** Leave Home's start-up animations and first loads alone for this long after the first draw. */
   private const val SETTLE_MS = 3_000L
+  /** Below this much free system memory, Chromium is only started when Music is actually opened. */
+  const val MIN_AVAILABLE_BYTES = 300L * 1024 * 1024
   @Volatile private var done = false
+
+  /** Pure gate: warm only on a normal-RAM device that is not short of memory. */
+  fun memoryAllows(lowRamDevice: Boolean, lowMemory: Boolean, availableBytes: Long): Boolean =
+      !lowRamDevice && !lowMemory && availableBytes >= MIN_AVAILABLE_BYTES
+
+  private fun memoryAllows(context: Context): Boolean = runCatching {
+    val manager = context.getSystemService(ActivityManager::class.java) ?: return@runCatching true
+    val info = ActivityManager.MemoryInfo().also(manager::getMemoryInfo)
+    memoryAllows(manager.isLowRamDevice, info.lowMemory, info.availMem)
+  }.getOrDefault(true)
 
   /** Main-only. Returns a cancel function. */
   @MainThread
@@ -33,7 +49,7 @@ internal object MusicPlayerPrewarm {
     var cancelled = false
     var drawn = false
     val idle = MessageQueue.IdleHandler {
-      if (!cancelled && !done) {
+      if (!cancelled && !done && memoryAllows(app)) {
         done = true
         YouTubeMusicEngine.prewarm(app)
       }

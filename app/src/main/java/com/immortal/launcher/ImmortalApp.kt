@@ -118,4 +118,10 @@ class ImmortalApp : Application() {
     // (no-op otherwise). Off by default.
     MqttService.sync(this)
   }
+
+  /** Shrinks the decoded-image caches under memory pressure or once our UI is hidden. */
+  override fun onTrimMemory(level: Int) {
+    super.onTrimMemory(level)
+    ImageCacheTrim.onTrimMemory(level)
+  }
 }
