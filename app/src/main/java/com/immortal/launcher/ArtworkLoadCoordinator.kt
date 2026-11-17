@@ -9,6 +9,11 @@ package com.immortal.launcher
 /**
  * Serializes downloads/decodes without blocking ready artwork behind network I/O.
  * Cache callbacks must themselves be thread-safe and never perform a load.
+ *
+ * A request whose worker was interrupted while it queued (its row scrolled away and the coroutine
+ * was cancelled; `runInterruptible` interrupts, but a thread parked on a monitor can't notice) is
+ * dropped before it loads. Otherwise a fling leaves a backlog of dead requests that each pay a
+ * connection round trip in turn, and the rows now on screen wait behind all of them.
  */
 internal class ArtworkLoadCoordinator {
   private val loadLock = Any()
@@ -17,7 +22,7 @@ internal class ArtworkLoadCoordinator {
     cached()?.let { return it }
     return synchronized(loadLock) {
       // A queued request may now be cached by the producer that just finished.
-      cached() ?: load()?.also(publish)
+      cached() ?: if (Thread.currentThread().isInterrupted) null else load()?.also(publish)
     }
   }
 }

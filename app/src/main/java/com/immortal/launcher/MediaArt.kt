@@ -35,6 +35,14 @@ object MediaArt {
       network = { spec, e -> MultiRoomArt.fetch(spec, e) },
       local = { spec, e -> MusicLocalArtwork.fetch(context.contentResolver, spec, e) })
 
+  /**
+   * Network art already in memory at [edge] (as [deliverUri] would publish it), else null. Never
+   * blocks on I/O; local art is decoded per owner, so it is never peeked.
+   */
+  internal fun cachedUri(url: String?, edge: Int = MAX_EDGE): Bitmap? =
+      if (url.isNullOrBlank() || MusicLocalArtwork.routeFor(url) != MusicArtworkRoute.NETWORK) null
+      else MultiRoomArt.peek(url, edge.coerceIn(1, MAX_EDGE))
+
   /** UI delivery owns local decodes until publication; cached network art stays shared. */
   internal suspend fun deliverUri(context: Context, url: String, edge: Int = MAX_EDGE, publish: (Bitmap?) -> Unit) {
     if (MusicLocalArtwork.routeFor(url) == MusicArtworkRoute.LOCAL) {

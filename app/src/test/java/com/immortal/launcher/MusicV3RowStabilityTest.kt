@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -52,6 +53,13 @@ class MusicV3RowStabilityTest {
     assertSame(cover, MediaArt.resolveUri("https://fixture/a", 128, { _, e -> edges += e; cover }, { _, _ -> null }))
     MediaArt.resolveUri("https://fixture/a", 9_000, { _, e -> edges += e; cover }, { _, _ -> null })
     assertEquals(listOf(128, MediaArt.MAX_EDGE), edges)
+  }
+
+  @Test fun onlyNetworkArtIsPeekedFromMemoryOnTheMainThread() {
+    assertNull(MediaArt.cachedUri(null, 128))
+    assertNull(MediaArt.cachedUri("  ", 128))
+    assertNull(MediaArt.cachedUri("content://media/external/audio/albumart/7", 128))
+    assertNull(MediaArt.cachedUri("ftp://fixture/a.jpg", 128))
   }
 
   @Test fun chipSliceIgnoresPositionTicks() {

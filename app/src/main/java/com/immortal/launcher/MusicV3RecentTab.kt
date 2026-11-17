@@ -57,7 +57,7 @@ internal fun MusicV3RecentTab(actions: MusicV3Actions) {
     return
   }
   val now = rememberAgoClock()
-  LazyColumn(Modifier.fillMaxSize()) {
+  LazyColumn(Modifier.fillMaxSize(), state = rememberMusicV3ListState()) {
     item(key = "head", contentType = MusicV3RowKeys.HEADER) {
       MusicStageHeading(MUSIC_RECENT_LABEL, Modifier.padding(top = 8.dp), detail = "On every Portal")
     }

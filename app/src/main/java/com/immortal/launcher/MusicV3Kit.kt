@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -102,6 +103,8 @@ internal fun MusicV3RoundButton(
 /**
  * A remote thumbnail (YouTube CDN) with a quiet music-note placeholder. [displaySize] is the size it
  * is drawn at: the art is decoded near that size ([MediaArt.edgeFor]), not at the 384 px default.
+ * Art already in memory is taken on the spot ([MediaArt.cachedUri]), so a row scrolling back in
+ * composes once, with its art, instead of placeholder → I/O hop → a second composition.
  */
 @Composable
 internal fun MusicV3Thumb(
@@ -112,8 +115,10 @@ internal fun MusicV3Thumb(
 ) {
   val context = LocalContext.current
   val edge = with(LocalDensity.current) { MediaArt.edgeFor(displaySize.roundToPx()) }
-  val bitmap by produceState<Bitmap?>(null, url, edge) {
-    if (!url.isNullOrBlank()) MediaArt.deliverUri(context, url, edge) { value = it }
+  val bitmap by produceState(remember(url, edge) { MediaArt.cachedUri(url, edge) }, url, edge) {
+    val cached = MediaArt.cachedUri(url, edge)
+    if (cached != null) value = cached
+    else if (!url.isNullOrBlank()) MediaArt.deliverUri(context, url, edge) { value = it }
   }
   Box(modifier.clip(shape).background(ApprovedHomePalette.Chrome), contentAlignment = Alignment.Center) {
     val art = bitmap?.takeIf { !it.isRecycled }

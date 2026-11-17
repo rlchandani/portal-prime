@@ -35,6 +35,16 @@ object MultiRoomArt {
   /** Card/header thumbnail. Blocking — call off-main. */
   fun fetch(url: String): Bitmap? = fetch(url, DEFAULT_EDGE)
 
+  /**
+   * The cached bitmap for [url] at [maxEdge], or null; never touches the network. Cheap enough for
+   * the main thread, so a row scrolled back into view draws its art in its first frame.
+   */
+  fun peek(url: String, maxEdge: Int): Bitmap? {
+    if (url.isBlank() || maxEdge <= 0) return null
+    val key = ArtKey(url, minOf(maxEdge, MAX_EDGE))
+    return synchronized(cache) { cache.get(key)?.takeIf { !it.isRecycled } }
+  }
+
   /** Sampled cover, capped at 1024 px even if a caller requests more. Call off-main. */
   fun fetch(url: String, maxEdge: Int): Bitmap? {
     if (url.isBlank() || maxEdge <= 0) return null
