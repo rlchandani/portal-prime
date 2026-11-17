@@ -169,8 +169,12 @@ class FollowMePolicyTest {
     assertEquals(FollowMeDecision.Ask(aging), decide(rooms = listOf(aging)))
   }
 
-  @Test fun aRoomSeenOccupiedIsNeverTreatedAsIdle() {
+  @Test fun aPresentReadingUnderTheMusicScreenDoesNotBlockAskFirstOnceUntouched() {
+    // The camera is paused there, so "present" is usually just the last touch.
     val present = unknownIdle.copy(presence = Presence.PRESENT)
-    assertEquals(none(FollowMePolicy.SOURCE_PRESENT), decide(rooms = listOf(present)))
+    assertEquals(FollowMeDecision.Ask(present), decide(rooms = listOf(present)))
+    val justTouched = present.copy(live = track.copy(idleMs = 30_000L))
+    assertEquals(none(FollowMePolicy.SOURCE_PRESENT), decide(rooms = listOf(justTouched)))
+    assertEquals(none(FollowMePolicy.SOURCE_PRESENT), decide(FollowMeMode.AUTO, rooms = listOf(present)))
   }
 }

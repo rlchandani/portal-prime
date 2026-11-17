@@ -88,7 +88,7 @@ internal object FollowMePolicy {
   const val LIVE_STALE_MS = 50_000L
   /** A presence report older than this is unknown (heartbeats come every 2 min). */
   const val PRESENCE_STALE_MS = 5 * 60_000L
-  /** Ask first: an unknown-presence playing room nobody touched for this long may be empty. */
+  /** Ask first: a playing room nobody touched for this long may be empty (camera presence is paused there). */
   const val IDLE_MS = 5 * 60_000L
   /** One follow per pair of rooms (either direction) in this long. */
   const val COOLDOWN_MS = 5 * 60_000L
@@ -160,9 +160,13 @@ internal object FollowMePolicy {
     return nowMs - since >= ABSENT_MS || since >= arrivedMs
   }
 
-  /** Presence unknown (not seen present or absent lately) and untouched for [IDLE_MS], counting since the report. */
+  /**
+   * Untouched for [IDLE_MS] (counting since the report) while not seen empty. A PRESENT reading
+   * doesn't block this: Meta's camera presence pauses under Hearthpane's music screen, so "present"
+   * there is usually just the last touch. Only Ask first uses it; a wrong guess costs a "Not now".
+   */
   private fun idleUnseen(r: FollowMeRoom, nowMs: Long): Boolean {
-    if (fresh(r, nowMs) && r.presence != Presence.UNKNOWN) return false
+    if (fresh(r, nowMs) && r.presence == Presence.ABSENT) return false
     val idle = r.live?.idleMs ?: return false
     return idle + (nowMs - r.liveSeenMs).coerceAtLeast(0L) >= IDLE_MS
   }
