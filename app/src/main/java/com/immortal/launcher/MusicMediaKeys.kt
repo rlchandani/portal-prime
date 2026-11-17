@@ -11,8 +11,8 @@ import android.view.KeyEvent
 /**
  * Media keys for the YouTube player (there is no MediaSession behind it, so the system can't
  * route them): delivered to Hearthpane's window by remotes, adb and [SleepScheduler]'s pause.
- * Pause/skip always work; Play only while the music screen is on screen (YouTube's
- * visible-player rule). Keys are left alone when nothing is queued or nothing would change.
+ * Pause/skip always work; Play only while the player is on screen (Music or Home's card:
+ * YouTube's visible-player rule). Keys are left alone when nothing is queued or nothing would change.
  */
 internal object MusicMediaKeys {
   enum class Action { PLAY, PAUSE, NEXT, PREVIOUS }

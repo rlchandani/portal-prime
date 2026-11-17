@@ -23,9 +23,6 @@ internal data class MusicNowSlice(
     val queue: YtQueue,
     val sleep: MusicSleepTimer?,
     val lastSkip: YtSkipNotice?,
-    /** A playing video owns the screen (keep awake, no screensaver). */
-    val holdsScreen: Boolean,
-    val playingOrWanted: Boolean,
 ) {
   val track: YtTrack? get() = model.track
   val idle: Boolean get() = model.track == null
@@ -33,8 +30,7 @@ internal data class MusicNowSlice(
 
   companion object {
     fun of(s: YtEngineState, room: String) = MusicNowSlice(
-        model = MusicV3NowPlaying.from(s, room), queue = s.queue, sleep = s.sleep, lastSkip = s.lastSkip,
-        holdsScreen = YtVideoScreenState.holds(s), playingOrWanted = s.isPlaying || s.wantsPlay)
+        model = MusicV3NowPlaying.from(s, room), queue = s.queue, sleep = s.sleep, lastSkip = s.lastSkip)
   }
 }
 

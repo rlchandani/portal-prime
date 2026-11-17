@@ -53,8 +53,15 @@ data class YtEngineState(
     val halt: YtHalt? = null,
     val lastSkip: YtSkipNotice? = null,
     val autoplayBlocked: Boolean = false,
-    /** The music screen is in the foreground; playback is refused otherwise (policy). */
+    /**
+     * The player is on screen in some host (Music or Home's Now Playing card; see
+     * [MusicPlayerHosts]); playback is refused otherwise (policy).
+     */
     val foreground: Boolean = false,
+    /** A full-screen alert card (or a Home dialog) is drawn over the player; playback is refused. */
+    val covered: Boolean = false,
+    /** It was playing when [covered] began: it resumes once uncovered (cleared by any pause). */
+    val resumeAfterCover: Boolean = false,
     /** False when the player is laid out below the 200×200 minimum (enforced in debug builds). */
     val sizeOk: Boolean = true,
     /** A queue moved here from another Portal starts as soon as the music screen is visible. */
@@ -121,6 +128,8 @@ sealed interface YtAction {
   /** A paired phone's "Play next" on a queue row: moves entry [entryId] right after the current one. */
   data class PlayEntryNext(val entryId: Long) : YtAction
   data class Foreground(val visible: Boolean) : YtAction
+  /** A full-screen card or Home dialog is drawn over the player ([on]) or gone; see [MusicCoverRules]. */
+  data class Covered(val on: Boolean) : YtAction
   /** Arms (or with null, cancels) the sleep timer; [MusicSleepDriver] fades and pauses. */
   data class SetSleep(val timer: MusicSleepTimer?) : YtAction
   data class SizeChanged(val ok: Boolean) : YtAction

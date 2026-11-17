@@ -29,13 +29,13 @@ import kotlinx.coroutines.flow.asStateFlow
  * (registered as [MusicTransports.youtube] while the player lives) and publishes
  * [NowPlayingState] with source [SOURCE_YOUTUBE] into [NowPlayingHub].
  *
- * Policy: playback happens only while the music screen is in the foreground with the player
- * visible (see [YouTubePlayerSurface]); leaving the foreground pauses and only a user action
- * resumes. The player is released [RELEASE_GRACE_MS] after it stops being visible
- * ([MusicPlayerVisibility]: its surface left composition, or the screen left the foreground for
- * another app or the screensaver), or at once on memory pressure ([MemoryTrimPolicy.releasePlayer]);
- * its release also shrinks the shared art cache to [MemoryTrimPolicy.MUSIC_IDLE_ART_BYTES], since
- * the song lists are gone. Shown again within the grace, the same player is kept (no reload).
+ * Policy: playback happens only while the player is visible in some host ([MusicPlayerHosts]: the
+ * Music screen or Home's Now Playing card) and nothing covers it ([MusicCoverRules]). Moving between hosts re-parents the same WebView (no reload, no pause).
+ * When no host shows it the engine pauses (after [MusicHostHandoff.SWAP_MS], so a host swap
+ * never stutters) and only a user action resumes. The player is released [RELEASE_GRACE_MS] after it
+ * stopped being visible, or at once on memory pressure ([MemoryTrimPolicy.releasePlayer]); its
+ * release also shrinks the shared art cache to [MemoryTrimPolicy.MUSIC_IDLE_ART_BYTES], since the
+ * song lists are gone. Shown again within the grace, the same player is kept (no reload).
  *
  * Audio focus: the WebView's media stack requests and honors focus itself (other apps pause; a
  * transient request such as the dinner chime pauses and later resumes it). We mirror whatever the
@@ -45,7 +45,7 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 object YouTubeMusicEngine : MusicTransport {
   private const val TAG = "ImmortalYtEngine"
-  /** How long a player whose surface left composition is kept before it is torn down. */
+  /** How long a player no host shows is kept before it is torn down. */
   const val RELEASE_GRACE_MS = 30_000L
 
   private val main = Handler(Looper.getMainLooper())
@@ -54,23 +54,31 @@ object YouTubeMusicEngine : MusicTransport {
   private var store: YtQueueStore? = null
   private var app: Application? = null
   private var published: NowPlayingState? = null
-  /** The composed player slot of the music screen, if any (cleared when it leaves composition). */
-  private var container: ViewGroup? = null
-  private var visibility = MusicPlayerVisibility()
+  /** The composed player slot of each host, if any (cleared when it leaves composition). */
+  private val containers = mutableMapOf<MusicPlayerHostKind, ViewGroup>()
+  private var hosts = MusicPlayerHosts()
+  private val covers = mutableSetOf<MusicCover>()
   private val releaseLater = Runnable { release() }
+  private val hideNow = Runnable { confirmHidden() }
+
+  /** The host showing the player now, readable from any thread (null when it is hidden). */
+  @Volatile var shownIn: MusicPlayerHostKind? = null
+    private set
   private var engineWarmed = false
 
   /** Engine snapshot for the UI (queue, player status, halt/skip notices, unknown-item flag). */
   val state: StateFlow<YtEngineState> = mutableState.asStateFlow()
 
   /**
-   * The music screen composed the player's [container]. The player is hosted there (created, and
-   * the saved queue restored, on first use) while the screen is also in the foreground.
+   * A host composed the player's [container]. The player is hosted there (created, and the saved
+   * queue restored, on first use) while that host is also [setActive] and best-ranked.
    */
   @MainThread
-  fun attach(container: ViewGroup) {
-    this.container = container
-    updateVisibility(visibility.withHosted(true))
+  fun attach(kind: MusicPlayerHostKind, container: ViewGroup) {
+    val previous = containers.put(kind, container)
+    // A new surface for the host already showing the player (its screen was rebuilt): move it there.
+    if (previous != null && previous !== container && hosts.shownIn == kind) host?.attach(container)
+    updateHosts(hosts.withAttached(kind, true))
   }
 
   /**
@@ -99,41 +107,88 @@ object YouTubeMusicEngine : MusicTransport {
         .onFailure { Log.w(TAG, "WebView warm-up failed; the player starts it on first open", it) }
   }
 
-  /** [container] left composition: the player is un-hosted and released after [RELEASE_GRACE_MS]. */
+  /** [container] left composition: un-hosted; with no other host the player pauses and is released later. */
   @MainThread
-  fun detach(container: ViewGroup) {
-    if (this.container !== container) return
+  fun detach(kind: MusicPlayerHostKind, container: ViewGroup) {
+    if (containers[kind] !== container) return
     host?.detach(container)
-    this.container = null
-    updateVisibility(visibility.withHosted(false))
+    containers.remove(kind)
+    updateHosts(hosts.withAttached(kind, false))
   }
+
+  /** The screen around [kind]'s surface came to (true) or left (false) the foreground. */
+  fun setActive(kind: MusicPlayerHostKind, on: Boolean) = onMain { updateHosts(hosts.withActive(kind, on)) }
 
   /**
-   * Called by the music screen: false pauses (no background playback) and starts the release
-   * grace; true cancels it but never resumes playback.
+   * [cover] is drawn over the player (true) or gone (false); see [MusicCoverRules]. Covering pauses
+   * at once; uncovering waits one main-loop turn, so a card replacing another never blips the music.
    */
-  fun setForeground(visible: Boolean) = onMain {
-    updateVisibility(visibility.withForeground(visible))
-    reduce(YtAction.Foreground(visible))
+  fun setCovered(cover: MusicCover, on: Boolean) = onMain {
+    if (on) covers.add(cover) else covers.remove(cover)
+    main.removeCallbacks(applyUncover)
+    if (covers.isEmpty()) main.post(applyUncover) else applyCovered()
   }
 
-  /** Shows the player (cancels the grace; hosts or rebuilds it) or starts the release grace. */
   @MainThread
-  private fun updateVisibility(next: MusicPlayerVisibility) {
-    val effect = visibility.effectTo(next)
-    visibility = next
+  private fun applyCovered() {
+    if (mutableState.value.covered || covers.isEmpty()) return
+    Log.i(TAG, "covered by ${covers.joinToString()}: paused while it shows")
+    reduce(YtAction.Covered(true))
+  }
+
+  private val applyUncover = Runnable {
+    if (covers.isEmpty() && mutableState.value.covered) {
+      Log.i(TAG, "uncovered")
+      reduce(YtAction.Covered(false))
+    }
+  }
+
+  @MainThread
+  private fun updateHosts(next: MusicPlayerHosts) {
+    val effect = hosts.effectTo(next)
+    hosts = next
     when (effect) {
-      PlayerVisibilityEffect.SHOW -> container?.let { target ->
-        main.removeCallbacks(releaseLater)
-        Log.i(TAG, if (host == null) "shown: creating player" else "shown: keeping player")
+      is PlayerHostEffect.Show -> show(effect.host)
+      is PlayerHostEffect.Move -> containers[effect.to]?.let { target ->
+        main.removeCallbacks(hideNow)
+        Log.i(TAG, "host ${effect.from} -> ${effect.to}: same player, no reload")
+        shownIn = effect.to
         obtainHost(target.context).attach(target)
       }
-      PlayerVisibilityEffect.START_GRACE -> if (host != null) {
-        Log.i(TAG, "hidden: release in ${RELEASE_GRACE_MS / 1000} s unless shown again")
-        main.removeCallbacks(releaseLater)
-        main.postDelayed(releaseLater, RELEASE_GRACE_MS)
+      PlayerHostEffect.Hide -> {
+        shownIn = null
+        main.removeCallbacks(hideNow)
+        main.postDelayed(hideNow, MusicHostHandoff.SWAP_MS)
       }
-      PlayerVisibilityEffect.NONE -> Unit
+      PlayerHostEffect.None -> Unit
+    }
+  }
+
+  /** Cancels a pending hide/release and hosts the player in [kind] (creating it if it was released). */
+  @MainThread
+  private fun show(kind: MusicPlayerHostKind) {
+    val target = containers[kind] ?: return
+    main.removeCallbacks(hideNow)
+    main.removeCallbacks(releaseLater)
+    shownIn = kind
+    Log.i(TAG, if (host == null) "shown in $kind: creating player" else "shown in $kind: keeping player")
+    obtainHost(target.context).attach(target)
+    // A play issued in the same turn as the re-attach is dropped by the WebView (measured on the
+    // Portal: the card's Play after ✕ never started); say "visible" once the view has laid out.
+    target.post { if (shownIn == kind && !mutableState.value.foreground) reduce(YtAction.Foreground(true)) }
+  }
+
+  /** No host took the player back within the swap wait: pause and start the release grace. */
+  @MainThread
+  private fun confirmHidden() {
+    if (hosts.visible) return
+    val s = mutableState.value
+    if (s.ready && (s.isPlaying || s.wantsPlay) && !s.covered) MusicV3Session.leftWhilePlaying()
+    if (s.foreground) reduce(YtAction.Foreground(false))
+    if (host != null) {
+      Log.i(TAG, "hidden: paused; release in ${RELEASE_GRACE_MS / 1000} s unless shown again")
+      main.removeCallbacks(releaseLater)
+      main.postDelayed(releaseLater, RELEASE_GRACE_MS)
     }
   }
 
@@ -187,6 +242,7 @@ object YouTubeMusicEngine : MusicTransport {
   private fun reduce(action: YtAction) {
     val step = YtEngineReducer.reduce(mutableState.value, action)
     mutableState.value = step.state
+    YtVideoScreenState.playingOnScreen = YtVideoScreenState.holds(step.state)
     step.effects.forEach(::execute)
     publish(step.state)
   }
@@ -271,7 +327,7 @@ object YouTubeMusicEngine : MusicTransport {
 
   private val memory = object : ComponentCallbacks2 {
     override fun onTrimMemory(level: Int) {
-      main.post { if (MemoryTrimPolicy.releasePlayer(level, visibility.visible)) release() }
+      main.post { if (MemoryTrimPolicy.releasePlayer(level, hosts.visible)) release() }
     }
     override fun onConfigurationChanged(newConfig: Configuration) = Unit
     @Deprecated("Deprecated in Java")

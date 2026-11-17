@@ -80,7 +80,8 @@ internal object FollowMeCardOverlay {
     val root = askRoot(ctx, ask, onContinue = { hide(); onContinue() }, onNotNow = { hide(); onNotNow() })
     val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
         WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
-    return add(root, lp, ASK_MS, onNotNow)
+    // The centred ask has a full-screen scrim: it would cover the YouTube player, so music pauses.
+    return add(root, lp, ASK_MS, onNotNow).also { shown -> if (shown) YouTubeMusicEngine.setCovered(MusicCover.FOLLOW_ASK, true) }
   }
 
   fun showFollowed(text: String, onUndo: () -> Unit): Boolean {
@@ -99,6 +100,7 @@ internal object FollowMeCardOverlay {
     onTimeout = null
     view?.let { v -> runCatching { wm?.removeView(v) } }
     view = null
+    YouTubeMusicEngine.setCovered(MusicCover.FOLLOW_ASK, false)
   }
 
   private fun add(root: View, lp: WindowManager.LayoutParams, showMs: Long, timeout: (() -> Unit)?): Boolean {

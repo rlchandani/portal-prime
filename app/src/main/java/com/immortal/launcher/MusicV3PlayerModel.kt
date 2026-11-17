@@ -70,7 +70,8 @@ internal data class MusicV3NowPlaying(
 /**
  * Whether a playing YouTube video owns the screen: the screensaver must not start or relaunch its
  * frame over it (recommended answer 6). Plain JVM so [DreamPolicy] can read it, like
- * [RoutineScreenState]. Kept in sync by the music screen; pausing frees the normal idle timer.
+ * [RoutineScreenState]. Kept in sync by [YouTubeMusicEngine] for every player host (Music, Home's
+ * card); pausing frees the normal idle timer.
  */
 internal object YtVideoScreenState {
   @Volatile var playingOnScreen = false

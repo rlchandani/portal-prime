@@ -71,7 +71,9 @@ internal fun rememberMusicV3Loaded(): Boolean {
 
 /**
  * Home header music chip: "<title> Playing", or "Resume · <title>" when nothing plays but a queue
- * is saved. A tap returns to the player, which resumes the song ([onOpen] asks for that).
+ * is saved, with Play/Pause and Next. A tap on the song returns to the player, which resumes the
+ * song ([onOpen] asks for that). Play brings Home's Now Playing card back (the player must be on
+ * screen to play, see [MusicHomeCardRules]) and starts the song there.
  */
 @Composable
 internal fun MusicV3HomeChip(onOpen: () -> Unit) {
@@ -89,22 +91,46 @@ internal fun MusicV3HomeChip(onOpen: () -> Unit) {
   val shape = RoundedCornerShape(34.dp)
   val spoken = if (chip.resume) "${chip.title}. Tap to play it again" else
     "Now playing: ${chip.track.title}. Tap to return to music"
-  Row(Modifier.padding(start = 12.dp).height(68.dp).widthIn(max = 520.dp).clip(shape)
-      .background(ApprovedHomePalette.Card).approvedOutline(shape)
-      .tvFocusable(shape, ringColor = ApprovedHomePalette.Accent) {
-        if (chip.resume) YouTubeMusicEngine.restoreSaved(context)
-        onOpen()
-      }
-      .semantics(mergeDescendants = true) { contentDescription = spoken }
-      .padding(start = 10.dp, end = 22.dp), verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-    MusicV3Thumb(chip.track.thumbnailUrl, Modifier.size(48.dp), RoundedCornerShape(10.dp))
-    Text(chip.title, color = ApprovedHomePalette.Text, fontSize = 23.sp, fontWeight = FontWeight.Medium, maxLines = 1,
-        overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-    chip.status?.let { Text(it, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1) }
-    MusicV3GlyphIcon(MusicV3Glyph.RIGHT, ApprovedHomePalette.Secondary, Modifier.size(24.dp))
+  Row(Modifier.padding(start = 12.dp).height(68.dp).widthIn(max = CHIP_MAX_WIDTH.dp).clip(shape)
+      .background(ApprovedHomePalette.Card).approvedOutline(shape), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.weight(1f, fill = false).height(68.dp).clip(shape)
+        .tvFocusable(shape, ringColor = ApprovedHomePalette.Accent) {
+          if (chip.resume) YouTubeMusicEngine.restoreSaved(context)
+          onOpen()
+        }
+        .semantics(mergeDescendants = true) { contentDescription = spoken }
+        .padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+      MusicV3Thumb(chip.track.thumbnailUrl, Modifier.size(48.dp), RoundedCornerShape(10.dp))
+      Text(chip.title, color = ApprovedHomePalette.Text, fontSize = 23.sp, fontWeight = FontWeight.Medium, maxLines = 1,
+          overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+      chip.status?.let { Text(it, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1) }
+    }
+    ChipButtons(engine.playing) { if (empty) YouTubeMusicEngine.restoreSaved(context) }
   }
 }
+
+/** Play/Pause and Next, 64 dp each, at the chip's right end. [ensureQueue] loads a saved queue first. */
+@Composable
+private fun ChipButtons(playing: Boolean, ensureQueue: () -> Unit) {
+  val ink = ApprovedHomePalette.Text
+  MusicV3RoundButton(if (playing) "Pause music" else "Play music", size = CHIP_BUTTON.dp, onClick = {
+    if (playing) {
+      YouTubeMusicEngine.pause()
+    } else {
+      ensureQueue()
+      MusicHomeCardState.restore()
+      YouTubeMusicEngine.dispatch(YtAction.PlayWhenVisible)
+    }
+  }) { MusicV3GlyphIcon(if (playing) MusicV3Glyph.PAUSE else MusicV3Glyph.PLAY, ink, Modifier.size(30.dp)) }
+  MusicV3RoundButton("Next song", size = CHIP_BUTTON.dp, onClick = {
+    ensureQueue()
+    YouTubeMusicEngine.next()
+  }) { MusicV3GlyphIcon(MusicV3Glyph.NEXT, ink, Modifier.size(28.dp)) }
+}
+
+private const val CHIP_MAX_WIDTH = 660
+private const val CHIP_BUTTON = 64
 
 /** The one-time "why it paused" toast on Home after leaving the player mid-song. */
 @Composable

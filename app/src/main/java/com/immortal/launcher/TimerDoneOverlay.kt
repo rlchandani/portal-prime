@@ -71,6 +71,7 @@ internal object TimerDoneOverlay {
     val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
         WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
     runCatching { wmgr.addView(root, lp); view = root; currentId = card.timerId }
+        .onSuccess { YouTubeMusicEngine.setCovered(MusicCover.TIMER, true) } // it would cover the player
         .onFailure { Log.w(TAG, "addView failed", it) }
   }
 
@@ -83,6 +84,7 @@ internal object TimerDoneOverlay {
     view?.let { v -> runCatching { wm?.removeView(v) } }
     view = null
     currentId = null
+    YouTubeMusicEngine.setCovered(MusicCover.TIMER, false)
   }
 
   private fun buildRoot(ctx: Context, card: Card, onStop: () -> Unit, onAddMinute: () -> Unit): View {
