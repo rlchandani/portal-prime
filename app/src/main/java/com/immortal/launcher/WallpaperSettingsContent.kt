@@ -44,7 +44,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.immortal.launcher.ui.components.OnResume
+import com.immortal.launcher.ui.components.OnResumeAfterFirstComposition
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 
@@ -60,7 +60,7 @@ private val WallpaperChoices: List<Pair<String, String>> =
 internal fun WallpaperSection() {
   val application = LocalContext.current.applicationContext
   var configuration by remember(application) { mutableStateOf(WallpaperConfig.load(application)) }
-  OnResume { configuration = WallpaperConfig.load(application) }
+  OnResumeAfterFirstComposition { configuration = WallpaperConfig.load(application) }
   val pageActive = LocalApprovedLauncherPageActive.current
   var previewRevision by remember { mutableStateOf(0) }
   var previewsLoading by remember { mutableStateOf(true) }
