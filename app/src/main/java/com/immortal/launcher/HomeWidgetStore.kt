@@ -64,6 +64,8 @@ object HomeWidgetStore {
   const val KIND_CRYPTO = "crypto"
   const val KIND_TODO = "todo"
   const val KIND_ROUTINES = "routines"
+  /** Chores & stars for kids ([ChoresHomeWidget]); household-wide, managed from the phone. */
+  const val KIND_CHORES = "chores"
   const val KIND_NEWS = "news"
   const val KIND_STOCKS = "stocks"
   const val KIND_OPTIONS = "options"

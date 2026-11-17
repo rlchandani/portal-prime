@@ -24,7 +24,7 @@ internal object HomeWidgetPicker {
    * memory is offered only while Home has none (it is the page hero).
    */
   fun more(advanced: Boolean, photoMemoryAllowed: Boolean): List<String> = listOfNotNull(
-      HomeWidgetStore.KIND_ROUTINES, HomeWidgetStore.KIND_TODAY, HomeWidgetStore.KIND_QUICK_CONTROLS, HomeWidgetStore.KIND_CRYPTO,
+      HomeWidgetStore.KIND_ROUTINES, HomeWidgetStore.KIND_CHORES, HomeWidgetStore.KIND_TODAY, HomeWidgetStore.KIND_QUICK_CONTROLS, HomeWidgetStore.KIND_CRYPTO,
       HomeWidgetStore.KIND_NEWS, HomeWidgetStore.KIND_STOCKS,
       HomeWidgetStore.KIND_OPTIONS.takeIf { advanced },
       HomeWidgetStore.KIND_PHOTO_MEMORY.takeIf { photoMemoryAllowed })
@@ -62,6 +62,7 @@ internal object HomeWidgetPicker {
     HomeWidgetStore.KIND_OPTIONS -> "Options"
     HomeWidgetStore.KIND_PHOTO_MEMORY -> "Photo memory"
     HomeWidgetStore.KIND_ROUTINES -> "Routines"
+    HomeWidgetStore.KIND_CHORES -> "Chores"
     HomeWidgetStore.KIND_WIFI -> "Wi-Fi"
     else -> "Widget"
   }
@@ -78,6 +79,7 @@ internal object HomeWidgetPicker {
     HomeWidgetStore.KIND_NEWS -> "globe"
     HomeWidgetStore.KIND_PHOTO_MEMORY -> "photo"
     HomeWidgetStore.KIND_ROUTINES -> "timer"
+    HomeWidgetStore.KIND_CHORES -> "tools"
     HomeWidgetStore.KIND_WIFI -> "wifi"
     HomeWidgetStore.KIND_CRYPTO, HomeWidgetStore.KIND_STOCKS, HomeWidgetStore.KIND_OPTIONS -> "calculator"
     else -> "apps"

@@ -1509,6 +1509,7 @@ private fun LauncherScreen(
           ShareHomeToasts(shareHome, Modifier.align(Alignment.BottomCenter).padding(bottom = 96.dp))
           HomeNoteChimeBubble(Modifier.align(Alignment.TopEnd).padding(top = 8.dp, end = LauncherEdge))
           RoutineHomeToast(Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp))
+          ChoresCelebrationBanner(Modifier.align(Alignment.BottomCenter))
           MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp))
           }
           }
@@ -2063,6 +2064,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_CRYPTO -> "Crypto"
       HomeWidgetStore.KIND_TODO -> "Household list"
       HomeWidgetStore.KIND_ROUTINES -> "Routines"
+      HomeWidgetStore.KIND_CHORES -> "Chores"
       HomeWidgetStore.KIND_NEWS -> "News"
       HomeWidgetStore.KIND_STOCKS -> "Stocks"
       HomeWidgetStore.KIND_OPTIONS -> "Options"
@@ -3110,6 +3112,7 @@ private fun ImmortalWidgetContent(
     // The To-do kind now shows the shared household list (old To-do items merge in once).
     HomeWidgetStore.KIND_TODO -> HouseholdListWidget(modifier, small = widget.spanY < 2)
     HomeWidgetStore.KIND_ROUTINES -> RoutinesHomeWidget(modifier)
+    HomeWidgetStore.KIND_CHORES -> ChoresHomeWidget(modifier)
     HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier, maxRows = listRows(widget.spanY))
@@ -4660,6 +4663,7 @@ private fun CustomWidgetGlyph(kind: String) {
         HomeWidgetStore.KIND_CRYPTO -> "₿"
         HomeWidgetStore.KIND_TODO -> "✓"
         HomeWidgetStore.KIND_ROUTINES -> "★"
+        HomeWidgetStore.KIND_CHORES -> "★"
         HomeWidgetStore.KIND_NEWS -> "📰"
         HomeWidgetStore.KIND_STOCKS -> "📈"
         HomeWidgetStore.KIND_OPTIONS -> "Δ"
@@ -5347,6 +5351,7 @@ private fun ApprovedWidgetLibrary(
         Triple(HomeWidgetStore.KIND_TIMERS, "Timers", "timer"),
         Triple(HomeWidgetStore.KIND_TODO, "Household list", "notes"),
         Triple(HomeWidgetStore.KIND_WIFI, "Wi-Fi", "wifi"),
+        Triple(HomeWidgetStore.KIND_CHORES, "Chores", "tools"),
         Triple(HomeWidgetStore.KIND_NEWS, "News", "globe"),
         Triple(HomeWidgetStore.KIND_STOCKS, "Stocks", "calculator"),
         Triple(HomeWidgetStore.KIND_OPTIONS, "Options", "calculator"),

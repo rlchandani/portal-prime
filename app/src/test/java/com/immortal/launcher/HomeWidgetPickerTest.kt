@@ -31,8 +31,8 @@ class HomeWidgetPickerTest {
 
   @Test fun more_holdsTheRetireCandidates_withoutOptionsUnlessAdvanced() {
     val basic = HomeWidgetPicker.more(advanced = false, photoMemoryAllowed = true)
-    // Picture routines (2026-11-07) is a new kind offered under More, ahead of the retire-candidates.
-    assertEquals(listOf(HomeWidgetStore.KIND_ROUTINES, HomeWidgetStore.KIND_TODAY, HomeWidgetStore.KIND_QUICK_CONTROLS,
+    // Picture routines (2026-11-07) and Chores (2026-11-17) are new kinds offered under More, ahead of the retire-candidates.
+    assertEquals(listOf(HomeWidgetStore.KIND_ROUTINES, HomeWidgetStore.KIND_CHORES, HomeWidgetStore.KIND_TODAY, HomeWidgetStore.KIND_QUICK_CONTROLS,
         HomeWidgetStore.KIND_CRYPTO, HomeWidgetStore.KIND_NEWS, HomeWidgetStore.KIND_STOCKS,
         HomeWidgetStore.KIND_PHOTO_MEMORY), basic)
     val advanced = HomeWidgetPicker.more(advanced = true, photoMemoryAllowed = true)
