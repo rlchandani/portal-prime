@@ -100,7 +100,7 @@ internal fun TrackRows(tracks: List<YtDataTrack>, actions: MusicV3Actions, label
     onTap: ((YtDataTrack) -> Unit)? = null) {
   val keys = remember(tracks) { MusicV3RowKeys.unique(tracks.map { it.videoId }) }
   val tap by rememberUpdatedState(onTap)
-  LazyColumn(Modifier.fillMaxSize()) {
+  LazyColumn(Modifier.fillMaxSize(), state = rememberMusicV3ListState()) {
     items(tracks.size, key = { keys[it] }, contentType = { MusicV3RowKeys.TRACK }) { i ->
       val t = tracks[i]
       val key = keys[i]
