@@ -60,7 +60,13 @@ class WakeLightActivity : ComponentActivity() {
 
     val rampMin = intent.getIntExtra(EXTRA_RAMP_MIN, 20).coerceIn(1, 60)
     val chime = intent.getBooleanExtra(EXTRA_CHIME, true)
-    setContent { WakeLightScreen(rampMin, chime, ::applyBrightness) { finish() } }
+    setContent { WakeLightScreen(rampMin, chime, ::applyBrightness, ::dismiss) }
+  }
+
+  private fun dismiss() {
+    if (isFinishing) return
+    BriefingLauncher.afterWake(this)
+    finish()
   }
 
   private fun applyBrightness(level: Float) {

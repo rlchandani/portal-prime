@@ -315,6 +315,16 @@
 
         <!-- Full-screen sunrise wake light, launched by SunriseReceiver at the alarm
              time; shows over the lock screen and turns the screen on. -->
+        <!-- Morning briefing (Good morning card on Home, or after the alarm / sunrise light). -->
+        <activity
+            android:name=".BriefingActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.SampleApp" />
+
         <activity
             android:name=".WakeLightActivity"
             android:exported="false"
