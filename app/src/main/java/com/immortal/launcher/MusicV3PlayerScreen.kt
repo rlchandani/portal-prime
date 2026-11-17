@@ -24,6 +24,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -87,6 +88,7 @@ internal fun MusicV3PlayerLayout(host: MusicV3StageHost) {
   LaunchedEffect(sheet.open) { if (!sheet.open) { focusManager.clearFocus(); keyboard?.hide() } }
   BackHandler(enabled = sheet.popover != MusicPopover.NONE || sheet.open) { MusicSheetMachine.back(sheet)?.let { sheet = it } }
   BackHandler(enabled = sheet.open && sheet.tab == MusicSheetTab.LIBRARY && nav.inDetail) { nav = nav.back() }
+  val wash = remember { MusicWashClock() }
   val minute = rememberMinuteClock()
   val quiet = rememberQuietNote(minute)
   BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -108,8 +110,8 @@ internal fun MusicV3PlayerLayout(host: MusicV3StageHost) {
     }
     val handed = move is MusicMoveState.Handed
     MusicStageTheme(ink, MusicStageDims.of(layout.spec)) {
-      Box(Modifier.fillMaxSize().onGloballyPositioned { stage = it }) {
-        MusicStageBackdrop(ink, reduced)
+      Box(Modifier.fillMaxSize().onGloballyPositioned { stage = it }.nestedScroll(wash.connection)) {
+        MusicStageBackdrop(ink, reduced, wash)
         ClosedLayer(layout, motion, closedActive) {
           val account = host.active.takeIf { !guests }
           MusicV3TopBar(layout.spec, minute, account, sheet.popover == MusicPopover.ACCOUNTS, host.onBack,

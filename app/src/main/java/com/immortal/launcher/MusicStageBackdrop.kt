@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import kotlin.math.PI
@@ -52,26 +53,31 @@ private const val COLOR_FADE_MS = 1_200
  * The artwork-coloured background: four soft radial blobs drifting slowly, then a veil. Colours
  * change once per song (a short fade); per frame only positions move, and only in the draw phase
  * of this one layer. Reduce motion holds them still.
+ *
+ * The layer is offscreen (a cached texture): the wash shows through the translucent sheet, so every
+ * list frame repaints it under the rows, and replaying four full-screen radial gradients plus two
+ * fills costs far more GPU fill than blitting one texture. It is re-rendered only when the drift
+ * steps, and [clock] holds the drift while a list scrolls, so a fling never re-renders it.
  */
 @Composable
-internal fun MusicStageBackdrop(ink: MusicStageInk, reduced: Boolean, modifier: Modifier = Modifier) {
+internal fun MusicStageBackdrop(ink: MusicStageInk, reduced: Boolean, clock: MusicWashClock, modifier: Modifier = Modifier) {
   val fade = tween<Color>(COLOR_FADE_MS, easing = FastOutSlowInEasing)
   val base = animateColorAsState(ink.base, fade, label = "wash-base")
   val blobs = ink.blobs.mapIndexed { i, c -> animateColorAsState(c, fade, label = "wash-$i") }
-  val clock = remember { mutableFloatStateOf(0f) }
+  val drift = remember { mutableFloatStateOf(0f) }
   if (!reduced) {
-    LaunchedEffect(Unit) {
-      val start = withFrameMillis { it }
+    LaunchedEffect(clock) {
+      withFrameMillis { clock.secondsAt(it) }
       while (true) {
         delay(DRIFT_FRAME_MS)
-        withFrameMillis { clock.floatValue = (it - start) / 1000f }
+        withFrameMillis { frame -> clock.secondsAt(frame)?.let { drift.floatValue = it } }
       }
     }
   }
   val veil = Brush.verticalGradient(listOf(ink.veilTop, ink.veilBottom))
-  Spacer(modifier.fillMaxSize().graphicsLayer().drawBehind {
+  Spacer(modifier.fillMaxSize().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }.drawBehind {
     drawRect(base.value)
-    drawWash(blobs, clock.floatValue)
+    drawWash(blobs, drift.floatValue)
     drawRect(veil)
   })
 }
