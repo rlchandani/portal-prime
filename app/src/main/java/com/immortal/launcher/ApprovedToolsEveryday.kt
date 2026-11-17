@@ -122,7 +122,7 @@ private val EverydayDanger: Color
 private val EverydayDangerSurface: Color
   @Composable get() = if (LocalApprovedPalette.current.dark) Color(0xFF46383F) else Color(0xFFFBECEE)
 private val EverydayIcons = listOf("📅", "🎂", "🎉", "✈️", "❤️", "🎄", "🏖️", "🎓", "💍", "🍼", "⭐", "🏠")
-private val EverydayTimerPresets = listOf(1, 3, 5, 10, 15, 30)
+internal val EverydayTimerPresets = listOf(1, 3, 5, 10, 15, 30)
 private val EverydayStorageMutex = Mutex()
 private val LocalEverydayCollectionHeight = staticCompositionLocalOf { 576.dp }
 
@@ -261,108 +261,6 @@ internal fun ToolsAlarmContent() {
       }
       EverydayError(operations.error)
     }
-  }
-}
-
-@Composable
-internal fun ToolsTimersContent() {
-  val context = LocalContext.current.applicationContext
-  val load = rememberEverydayLoad { TimerConfig.load(context) }
-  val operations = rememberEverydayOperations()
-  var custom by rememberSaveable { mutableStateOf(false) }
-  var hours by rememberSaveable { mutableStateOf("0") }
-  var minutes by rememberSaveable { mutableStateOf("5") }
-  var seconds by rememberSaveable { mutableStateOf("0") }
-  var cancelId by rememberSaveable { mutableStateOf<String?>(null) }
-  val timers = load.value.orEmpty()
-  val duration = remember(hours, minutes, seconds) {
-    ApprovedToolsEverydayValidation.timerDurationMillis(hours, minutes, seconds)
-  }
-  fun startTimer(label: String, millis: Long, closeEditor: Boolean = false) {
-    operations.run("Couldn’t start the timer. Try again.", task = {
-      TimerConfig.add(context, label, millis) // Persists and schedules atomically at this boundary.
-      TimerConfig.load(context)
-    }) { saved ->
-      load.value = saved
-      if (closeEditor) custom = false
-    }
-  }
-
-  EverydayCollectionPanes(left = {
-    EverydayPanel("Start a timer") {
-      ToolsText("Tap a duration to start.", secondary = true)
-      Spacer(Modifier.height(24.dp))
-      EverydayTimerPresets.chunked(3).forEachIndexed { index, row ->
-        if (index > 0) Spacer(Modifier.height(12.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-          row.forEach { preset ->
-            ToolsButton(
-                "$preset min", enabled = load.value != null && !operations.busy,
-                modifier = Modifier.weight(1f),
-            ) { startTimer("$preset min", preset * 60_000L) }
-          }
-        }
-      }
-      EverydayActions {
-        ToolsButton("Custom timer", primary = true, enabled = load.value != null && !operations.busy) {
-          operations.error = null
-          custom = true
-        }
-      }
-      Spacer(Modifier.height(20.dp))
-      ToolsText("Timers keep their place when you switch tools.", secondary = true)
-      EverydayError(operations.error.takeUnless { custom || cancelId != null })
-    }
-  }, right = {
-    EverydayPanel("Running timers") {
-      EverydayLoadStatus(load)
-      if (load.value != null) {
-        EverydayRunningTimers(timers, enabled = !operations.busy) { id ->
-          operations.error = null
-          cancelId = id
-        }
-      }
-    }
-  })
-
-  if (custom) {
-    EverydaySheet("Custom timer", onDismiss = { if (!operations.busy) custom = false }, actions = {
-      ToolsButton("Cancel", enabled = !operations.busy) { custom = false }
-      ToolsButton("Start timer", primary = true, enabled = duration != null && !operations.busy) {
-        duration?.let { startTimer("Timer", it, closeEditor = true) }
-      }
-    }) {
-      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-        ToolsField("Hours", hours, { hours = it }, numeric = true, modifier = Modifier.weight(1f))
-        ToolsField("Minutes", minutes, { minutes = it }, numeric = true, modifier = Modifier.weight(1f))
-        ToolsField("Seconds", seconds, { seconds = it }, numeric = true, modifier = Modifier.weight(1f))
-      }
-      Spacer(Modifier.height(20.dp))
-      ToolsText("Hours 0–23 · Minutes and seconds 0–59", secondary = true)
-      EverydayError(
-          if (duration == null) "Enter a duration greater than zero, with each field in range."
-          else operations.error)
-    }
-  }
-  cancelId?.let { id ->
-    val selected = timers.firstOrNull { it.id == id }
-    ToolsConfirm(
-        "Cancel this timer?",
-        selected?.let { "Cancel “${it.label}”? Your other timers will keep running." }
-            ?: "This timer has finished.",
-        confirmLabel = "Cancel timer",
-        onDismiss = { cancelId = null },
-        onConfirm = {
-          cancelId = null
-          operations.run("Couldn’t cancel the timer. Try again.", task = {
-            TimerConfig.remove(context, id)
-            TimerConfig.load(context)
-          }) { saved ->
-            load.value = saved
-            cancelId = null
-          }
-        },
-    )
   }
 }
 
@@ -681,89 +579,9 @@ private fun EverydayNumberField(
       "Enter a whole number from $min to $max." else null)
 }
 
-@Composable
-private fun EverydayRunningTimers(timers: List<TimerConfig.Timer>, enabled: Boolean, onCancel: (String) -> Unit) {
-  val owner = LocalLifecycleOwner.current
-  val sorted = remember(timers) { timers.sortedBy { it.endAtMillis } }
-  val clock = remember { mutableStateOf(System.currentTimeMillis()) }
-  var firstLive by remember(sorted) {
-    mutableIntStateOf(firstLiveTimerIndex(sorted, System.currentTimeMillis()))
-  }
-  // Only composed clock texts read this State. Offscreen rows, collection framing,
-  // presets and form drafts do not recompose on ticks. Expiry lookup is logarithmic.
-  LaunchedEffect(owner, sorted) {
-    owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-      while (true) {
-        val now = System.currentTimeMillis()
-        clock.value = now
-        firstLive = firstLiveTimerIndex(sorted, now)
-        if (firstLive == sorted.size) break
-        delay(1000L)
-      }
-    }
-  }
-  // Capture one cutoff for both count and indexing; expiry must not change a live
-  // item provider's index base before its replacement has been composed.
-  val liveStart = firstLive
-  if (liveStart == sorted.size) EverydayEmpty(
-      "timer", "A moment to yourself", "Your active timers will appear here.")
-  else EverydayCollection {
-    items(count = sorted.size - liveStart, key = { index -> sorted[index + liveStart].id }) { index ->
-      val timer = sorted[index + liveStart]
-      Column {
-        if (index > 0) EverydayDivider()
-        EverydayTimerRow(timer, clock, enabled) { onCancel(timer.id) }
-      }
-    }
-  }
-}
-
-/** Upper bound: deadlines equal to now have already expired. The input is sorted once. */
-private fun firstLiveTimerIndex(sorted: List<TimerConfig.Timer>, now: Long): Int {
-  val insertion = sorted.binarySearch { if (it.endAtMillis <= now) -1 else 1 }
-  return -insertion - 1
-}
-
-@Composable
-private fun EverydayTimerRow(timer: TimerConfig.Timer, clock: State<Long>, enabled: Boolean, onCancel: () -> Unit) {
-  val largeText = LocalDensity.current.fontScale > 1.15f
-  if (largeText) {
-    Column(
-        Modifier.fillMaxWidth().padding(vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-      EverydayTitle(timer.label)
-      Row(
-          Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(16.dp),
-      ) {
-        EverydayTimerClock(timer, clock, modifier = Modifier.weight(1f))
-        ToolsButton("Cancel", destructive = true, enabled = enabled, onClick = onCancel)
-      }
-    }
-  } else {
-    Row(
-        Modifier.fillMaxWidth().heightIn(min = 100.dp).padding(vertical = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      EverydayTitle(timer.label, Modifier.weight(1f))
-      EverydayTimerClock(timer, clock)
-      ToolsButton("Cancel", destructive = true, enabled = enabled, onClick = onCancel)
-    }
-  }
-}
-
-@Composable
-private fun EverydayTimerClock(timer: TimerConfig.Timer, clock: State<Long>, modifier: Modifier = Modifier) {
-  EverydayValue(
-      ApprovedToolsEverydayValidation.timerClock(timer.endAtMillis - clock.value),
-      size = 56, modifier = modifier)
-}
-
 /** Capture the finite workspace height before ToolsTwoPane's scroll introduces infinity. */
 @Composable
-private fun EverydayCollectionPanes(
+internal fun EverydayCollectionPanes(
     left: @Composable ColumnScope.() -> Unit, right: @Composable ColumnScope.() -> Unit,
 ) {
   val configuration = LocalConfiguration.current
@@ -779,7 +597,7 @@ private fun EverydayCollectionPanes(
 
 /** ToolsTwoPane's children are vertically unbounded; apply the captured limit to the list. */
 @Composable
-private fun EverydayCollection(content: LazyListScope.() -> Unit) {
+internal fun EverydayCollection(content: LazyListScope.() -> Unit) {
   LazyColumn(
       modifier = Modifier.fillMaxWidth().heightIn(max = LocalEverydayCollectionHeight.current),
       state = rememberLazyListState(), content = content)
@@ -787,12 +605,12 @@ private fun EverydayCollection(content: LazyListScope.() -> Unit) {
 
 /** The shared primitives own their framing; this inner column owns the mock's body spacing. */
 @Composable
-private fun EverydayPanel(title: String, content: @Composable ColumnScope.() -> Unit) {
+internal fun EverydayPanel(title: String, content: @Composable ColumnScope.() -> Unit) {
   ToolsPanel(title) { Column(Modifier.fillMaxWidth(), content = content) }
 }
 
 @Composable
-private fun EverydaySheet(
+internal fun EverydaySheet(
     title: String, onDismiss: () -> Unit,
     actions: @Composable RowScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit,
@@ -802,7 +620,7 @@ private fun EverydaySheet(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun EverydayActions(content: @Composable () -> Unit) {
+internal fun EverydayActions(content: @Composable () -> Unit) {
   FlowRow(
       Modifier.fillMaxWidth().padding(top = 24.dp),
       horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -811,7 +629,7 @@ private fun EverydayActions(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun EverydayValue(
+internal fun EverydayValue(
     text: String, size: Int, modifier: Modifier = Modifier, centered: Boolean = false,
 ) {
   Text(
@@ -822,19 +640,19 @@ private fun EverydayValue(
 }
 
 @Composable
-private fun EverydayTitle(text: String, modifier: Modifier = Modifier) {
+internal fun EverydayTitle(text: String, modifier: Modifier = Modifier) {
   Text(
       text, modifier = modifier, color = EverydayInk, fontFamily = FontFamily.SansSerif,
       fontSize = 26.sp, lineHeight = 35.sp, fontWeight = FontWeight.Medium)
 }
 
 @Composable
-private fun EverydayDivider() {
+internal fun EverydayDivider() {
   Box(Modifier.fillMaxWidth().height(1.dp).background(EverydayDivider))
 }
 
 @Composable
-private fun EverydayEmpty(icon: String, title: String, message: String) {
+internal fun EverydayEmpty(icon: String, title: String, message: String) {
   Column(
       Modifier.fillMaxWidth().heightIn(min = 320.dp).padding(horizontal = 32.dp, vertical = 40.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -851,7 +669,7 @@ private fun EverydayEmpty(icon: String, title: String, message: String) {
 }
 
 @Composable
-private fun EverydayError(error: String?) {
+internal fun EverydayError(error: String?) {
   if (error != null) {
     Text(
         error, color = EverydayDanger, fontFamily = FontFamily.SansSerif,
@@ -874,7 +692,7 @@ private fun everydayFormatNumber(value: Double): String {
 }
 
 @Composable
-private fun <T> rememberEverydayLoad(loader: () -> T): EverydayLoad<T> {
+internal fun <T> rememberEverydayLoad(loader: () -> T): EverydayLoad<T> {
   val owner = LocalLifecycleOwner.current
   val currentLoader by rememberUpdatedState(loader)
   val load = remember { EverydayLoad<T>() }
@@ -902,7 +720,7 @@ private fun <T> EverydayLoadStatus(load: EverydayLoad<T>) {
   }
 }
 
-private class EverydayOperations(private val scope: CoroutineScope) {
+internal class EverydayOperations(private val scope: CoroutineScope) {
   var busy by mutableStateOf(false)
     private set
   var error by mutableStateOf<String?>(null)
@@ -931,7 +749,7 @@ private class EverydayOperations(private val scope: CoroutineScope) {
 }
 
 @Composable
-private fun rememberEverydayOperations(): EverydayOperations {
+internal fun rememberEverydayOperations(): EverydayOperations {
   val scope = rememberCoroutineScope()
   return remember(scope) { EverydayOperations(scope) }
 }

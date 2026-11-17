@@ -1072,7 +1072,7 @@ private fun ApprovedHostedWidget(
 }
 
 @Composable
-private fun ApprovedHomeDialog(
+internal fun ApprovedHomeDialog(
     title: String,
     onDismiss: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
@@ -3102,7 +3102,7 @@ private fun ImmortalWidgetContent(
   when (widget.kind) {
     HomeWidgetStore.KIND_WEATHER -> ApprovedHomeWeather(modifier)
     HomeWidgetStore.KIND_WORLD_CLOCK -> ImmortalWorldClockWidget(modifier)
-    HomeWidgetStore.KIND_TIMERS -> ImmortalTimersWidget(modifier)
+    HomeWidgetStore.KIND_TIMERS -> SharedTimersWidget(modifier)
     HomeWidgetStore.KIND_CALENDAR -> ApprovedHomeCalendar(modifier)
     HomeWidgetStore.KIND_ALARM -> ImmortalAlarmWidget(modifier)
     HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier, maxRows = listRows(widget.spanY))
@@ -3131,7 +3131,7 @@ private fun ImmortalWidgetContent(
 private fun listRows(spanY: Int): Int = (spanY * 3).coerceIn(2, 12)
 
 @Composable
-private fun ImmortalWidgetShell(
+internal fun ImmortalWidgetShell(
     title: String,
     openPage: String,
     modifier: Modifier = Modifier,
@@ -3816,154 +3816,6 @@ private fun AnalogClock(zoneId: String, now: Date, modifier: Modifier = Modifier
   }
 }
 
-@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
-@Composable
-private fun ImmortalTimersWidget(modifier: Modifier = Modifier) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  var state by remember { mutableStateOf(TimerStore.load(context)) }
-  var nowMs by remember { mutableStateOf(System.currentTimeMillis()) }
-  var showCustom by remember { mutableStateOf(false) }
-  var showTimersPage by remember { mutableStateOf(false) }
-  // Live updates if the timer is changed elsewhere (e.g. another Timers widget instance).
-  DisposableEffect(Unit) {
-    val l: () -> Unit = {
-      state = TimerStore.load(context)
-      nowMs = System.currentTimeMillis()
-    }
-    TimerStore.addListener(l)
-    onDispose { TimerStore.removeListener(l) }
-  }
-  // Tick the countdown while it's running. When it hits zero we stop ticking but DON'T clear —
-  // the exact alarm ([TimerAlarmReceiver]) flips the timer to ringing, which the listener picks up.
-  val active = LocalApprovedLauncherPageActive.current
-  LaunchedEffect(state.running, state.endsAt, active) {
-    if (!active) return@LaunchedEffect
-    while (state.running) {
-      nowMs = System.currentTimeMillis()
-      if (state.remaining(nowMs) <= 0L) break
-      delay(1_000)
-    }
-  }
-  val remainingMs = state.remaining(nowMs)
-  val mins = (remainingMs / 60_000).toInt()
-  val secs = ((remainingMs / 1000) % 60).toInt()
-  ImmortalWidgetShell(title = "Timers", openPage = "timers", modifier = modifier,
-      onOpen = { showTimersPage = true }) {
-    Text(
-        when {
-          state.ringing -> "Time's up"
-          remainingMs > 0 -> "%d:%02d".format(mins, secs)
-          else -> "Ready"
-        },
-        color = ApprovedHomePalette.Text,
-        fontSize = 48.sp,
-        lineHeight = 100.sp,
-        fontWeight = FontWeight.Normal,
-    )
-    Text(if (state.ringing) "Stop the alarm" else "Set a timer",
-        color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp,
-        modifier = Modifier.padding(top = 12.dp, bottom = 16.dp))
-    androidx.compose.foundation.layout.FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)) {
-      if (state.ringing) {
-        TimerChip("Stop") { TimerAlarm.stop(context) }
-      } else if (remainingMs > 0) {
-        TimerChip(if (state.running) "Pause" else "Start") {
-          if (state.running) TimerStore.pause(context) else TimerStore.resume(context)
-        }
-        TimerChip("Reset") {
-          TimerStore.clear(context)
-        }
-      } else {
-        listOf(5, 10, 30).forEach { minutes ->
-          TimerChip("${minutes}m") { TimerStore.start(context, minutes * 60_000L) }
-        }
-        TimerChip("Custom") { showCustom = true }
-      }
-    }
-  }
-  if (showCustom) {
-    CustomTimerDialog(
-        onStart = { ms ->
-          if (ms > 0) TimerStore.start(context, ms)
-          showCustom = false
-        },
-        onDismiss = { showCustom = false },
-    )
-  }
-  if (showTimersPage) ApprovedHomeTimersPage { showTimersPage = false }
-}
-
-/** The Home editor shares the widget/screensaver countdown and its existing alarm. */
-@Composable
-internal fun ApprovedHomeTimerEditor(onDismiss: () -> Unit) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  var state by remember(context) { mutableStateOf(TimerStore.load(context)) }
-  var nowMs by remember { mutableStateOf(System.currentTimeMillis()) }
-  var showCustom by remember { mutableStateOf(false) }
-  DisposableEffect(context) {
-    val listener: () -> Unit = {
-      state = TimerStore.load(context)
-      nowMs = System.currentTimeMillis()
-    }
-    TimerStore.addListener(listener)
-    onDispose { TimerStore.removeListener(listener) }
-  }
-  val active = LocalApprovedLauncherPageActive.current
-  LaunchedEffect(state.running, state.endsAt, active) {
-    if (!active) return@LaunchedEffect
-    while (state.running) {
-      nowMs = System.currentTimeMillis()
-      if (state.remaining(nowMs) <= 0L) break
-      delay(1_000)
-    }
-  }
-  if (showCustom) {
-    CustomTimerDialog(
-        onStart = { duration ->
-          if (duration > 0L) {
-            if (state.ringing) TimerAlarm.stop(context)
-            TimerStore.start(context, duration)
-          }
-          showCustom = false
-        },
-        onDismiss = { showCustom = false },
-    )
-  } else {
-    ApprovedHomeDialog("Timer", onDismiss) {
-      val remaining = state.remaining(nowMs)
-      Text(
-          when {
-            state.ringing -> "Time's up"
-            remaining > 0L -> "%d:%02d".format(remaining / 60_000, remaining / 1_000 % 60)
-            else -> "Ready"
-          },
-          color = ApprovedHomePalette.Text, fontSize = 48.sp, lineHeight = 60.sp,
-      )
-      Text(
-          "Shown on Home and in the screensaver.",
-          color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp,
-      )
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        when {
-          state.ringing -> TimerChip("Stop") { TimerAlarm.stop(context) }
-          remaining > 0L -> {
-            TimerChip(if (state.running) "Pause" else "Resume") {
-              if (state.running) TimerStore.pause(context) else TimerStore.resume(context)
-            }
-            TimerChip("Reset") { TimerStore.clear(context) }
-          }
-          else -> listOf(5, 10, 30).forEach { minutes ->
-            TimerChip("${minutes}m") { TimerStore.start(context, minutes * 60_000L) }
-          }
-        }
-      }
-      if (!state.ringing) TimerChip("Custom duration") { showCustom = true }
-    }
-  }
-}
-
 /**
  * Home widget for the wake-up alarm ([AlarmConfig]). Shows the next fire time + label when armed,
  * or "No alarm" when off; a chip toggles it on/off, and tapping the body opens the alarm editor.
@@ -4570,7 +4422,7 @@ private fun HaSensorTile(name: String, value: String, modifier: Modifier = Modif
 
 /** A keyboard-free duration picker (±steppers, remote/touch friendly) for a custom timer. */
 @Composable
-private fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
+internal fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
   var minutes by remember { mutableStateOf(5) }
   var seconds by remember { mutableStateOf(0) }
   ApprovedHomeDialog("Custom timer", onDismiss) {

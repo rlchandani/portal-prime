@@ -12,6 +12,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
+ * This Portal's alarm ledger for running timers. Household timers ([SharedTimers]) own the state
+ * (paused, ringing, which room) and arm/disarm their countdown here; legacy entries from before
+ * shared timers are adopted by [SharedTimers] on start.
+ *
  * Several named kitchen timers running at once (pasta, oven, tea). Each is a chip
  * on the home screen; when one elapses it rings through the existing chime system
  * ([ChimePlayer]). Persisted as JSON in SharedPrefs and re-armed via [TimerScheduler]
@@ -74,6 +78,23 @@ object TimerConfig {
     save(context, load(context) + t)
     TimerScheduler.schedule(context, t)
     return t
+  }
+
+  /**
+   * Persist + (re)schedule [timer] under its own id, replacing a saved one with that id. This is
+   * how [SharedTimers] arms this Portal's alarm for a household timer (start, resume, +1 min).
+   */
+  @Synchronized fun arm(context: Context, timer: Timer) {
+    save(context, load(context).filterNot { it.id == timer.id } + timer)
+    TimerScheduler.schedule(context, timer)
+  }
+
+  /** Disarm and forget [id] if it is saved; a no-op (no write) otherwise. */
+  @Synchronized fun disarm(context: Context, id: String) {
+    val existing = load(context)
+    val timer = existing.firstOrNull { it.id == id } ?: return
+    TimerScheduler.cancel(context, timer)
+    save(context, existing.filterNot { it.id == id })
   }
 
   @Synchronized fun remove(context: Context, id: String) {

@@ -741,8 +741,11 @@ class FaceRenderer(
           weatherView?.visibility = if (hasWeather) View.VISIBLE else View.GONE
           weatherDivider?.visibility = if (hasWeather) View.VISIBLE else View.GONE
           // Shared countdown timer: show "M:SS" while running, the alarm banner while ringing.
+          // A household timer ([SharedTimers]) counts down here too; its "Timer done" card is an overlay.
           val timerState = TimerStore.load(context)
-          val timerRemaining = timerState.remaining(now.time)
+          val sharedRemaining = SharedTimerMerge.display(SharedTimers.timers.value, now.time)
+              .firstOrNull { it.state == SharedTimerState.RUNNING }?.remaining(now.time) ?: 0L
+          val timerRemaining = timerState.remaining(now.time).takeIf { it > 0L } ?: sharedRemaining
           if (timerRemaining > 0L && !timerState.ringing) {
             val tm = (timerRemaining / 60_000).toInt()
             val ts = ((timerRemaining / 1000) % 60).toInt()
