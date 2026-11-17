@@ -40,6 +40,8 @@ private val TileRadius = 14.dp
 private val TileMinHeight = 76.dp
 private val TileMinWidth = 96.dp
 private val InlineTrackMinWidth = 420.dp
+/** Inline tracks stop here so the title beside them keeps its width (tiles share it evenly). */
+private val InlineTrackMaxWidth = 520.dp
 private val TileLabelSize = 24.sp
 private val RowPaddingH = 28.dp
 private val RowPaddingV = 18.dp
@@ -74,7 +76,7 @@ internal fun SettingsChoiceTilesRow(
     } else {
         Row(padding, verticalAlignment = Alignment.CenterVertically) {
             ApprovedSettingsLabel(title, help, Modifier.weight(1f).padding(end = 24.dp))
-            SettingsTileTrack(tiles, enabled, Modifier.widthIn(min = InlineTrackMinWidth), onSelect)
+            SettingsTileTrack(tiles, enabled, Modifier.widthIn(min = InlineTrackMinWidth, max = InlineTrackMaxWidth), onSelect)
         }
     }
 }
