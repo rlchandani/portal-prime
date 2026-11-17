@@ -33,6 +33,7 @@ class ImmortalApp : Application() {
     HouseholdBus.start(this)
     HouseholdListFeature.install(this)
     DinnerCallFeature.install(this)
+    SharedTimersFeature.install(this)
     MusicHandoff.install(this)
     MusicShare.install()
     YtRemoteRoute.install()

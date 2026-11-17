@@ -10,22 +10,18 @@ package com.immortal.launcher
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 
-/** Fires when a kitchen timer elapses: rings the chime a few times, announces the
- *  timer's label, and forgets it. A deliberately-set timer rings even during the
- *  chime's quiet hours. */
+/** Fires when a timer's alarm elapses here. A household timer ([SharedTimers]) rings in every
+ *  room and shows the "Timer done" card; an older local-only timer rings the chime a few times and
+ *  announces its label, as before. Either way the alarm is claimed once and forgotten. */
 class TimerReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action != TimerScheduler.ACTION_FIRE) return
     val timer = TimerConfig.consumeDue(context, intent.getStringExtra(TimerScheduler.EXTRA_ID)) ?: return
-    val label = timer.label.ifBlank { "Timer" }
-    Log.i(TAG, "timer fired: $label (${timer.id})")
-    ChimePlayer.playTimerRing(context)
-    Handler(Looper.getMainLooper())
-        .postDelayed({ ChimePlayer.announce(context, "$label timer done") }, 3 * 1400L)
+    Log.i(TAG, "timer fired: ${timer.id}")
+    if (SharedTimers.onAlarm(context, timer.id)) return
+    TimerRingSound.play(context, timer.label)
   }
 
   private companion object {

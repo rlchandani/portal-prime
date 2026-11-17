@@ -69,7 +69,7 @@ internal fun Context.openApprovedHomeApps() {
   openApprovedHomeTab(ApprovedLauncherTab.APPS)
 }
 
-/** Home edits the shared countdown; Tools keeps its independent kitchen-timer collection. */
+/** Home and Tools › Timers both edit the household timers ([SharedTimers]). */
 @Composable
 internal fun ApprovedHomeTimersPage(onDismiss: () -> Unit) {
   if (!LocalApprovedLauncherPageActive.current || !LocalApprovedWidgetPageInput.current) return
