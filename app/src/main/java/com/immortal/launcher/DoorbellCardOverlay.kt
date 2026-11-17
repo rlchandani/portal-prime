@@ -80,6 +80,8 @@ internal object DoorbellCardOverlay {
     val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
         WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
     runCatching { wmgr.addView(root, lp); view = root }.onFailure { Log.w(TAG, "addView failed", it); return }
+    // Full-screen card: it would cover the YouTube player, so music pauses while it shows.
+    YouTubeMusicEngine.setCovered(MusicCover.DOORBELL, true)
     if (card.camera.isNotBlank()) {
       feed = HaCameraFeed(ctx, card.camera,
           onFrame = { bitmap -> picture.setImageBitmap(bitmap); placeholder.visibility = View.GONE },
@@ -95,6 +97,7 @@ internal object DoorbellCardOverlay {
     feed?.stop(); feed = null
     view?.let { v -> runCatching { wm?.removeView(v) } }
     view = null
+    YouTubeMusicEngine.setCovered(MusicCover.DOORBELL, false)
   }
 
   private fun openCamera(ctx: Context, camera: String, title: String) {

@@ -17,42 +17,43 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 
 /**
- * The official YouTube player, embeddable in Compose. The caller sizes it via [modifier]; it must
- * be at least 200×200 dp/CSS px and nothing may be drawn over it or its controls (YouTube RMF).
- * Debug builds refuse playback while it is smaller (see [YtPlayerSize]).
+ * The official YouTube player, embeddable in Compose, as one of its hosts ([MusicPlayerHostKind]).
+ * The caller sizes it via [modifier]; it must be at least 200×200 dp/CSS px and nothing may be drawn
+ * over it or its controls (YouTube RMF). Debug builds refuse playback while it is smaller (see
+ * [YtPlayerSize]).
  *
- * While composed and the host lifecycle is RESUMED the engine may play; ON_PAUSE or leaving
- * composition pauses it (no background playback) and nothing resumes without a user action.
- * Either also schedules the player's release ([YouTubeMusicEngine.RELEASE_GRACE_MS]); ON_RESUME
- * within the grace keeps the same player, after it the player is rebuilt in place.
+ * The host counts as on screen while composed and its lifecycle is at least [activeFrom]. The ONE
+ * player moves between hosts without reloading; when no host shows it the engine pauses it (no
+ * background playback), nothing resumes without a user action, and it is released after
+ * [YouTubeMusicEngine.RELEASE_GRACE_MS].
  *
  * [shown] = false keeps the one player (and its page) alive but hidden, for "nothing loaded" and
  * "playing in another room"; the caller also moves it out of the way so it never takes touches.
  */
 @Composable
-fun YouTubePlayerSurface(modifier: Modifier = Modifier, shown: Boolean = true) {
+fun YouTubePlayerSurface(
+    host: MusicPlayerHostKind,
+    modifier: Modifier = Modifier,
+    shown: Boolean = true,
+    activeFrom: Lifecycle.State = Lifecycle.State.RESUMED,
+) {
   val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
+  DisposableEffect(lifecycleOwner, host, activeFrom) {
+    val lifecycle = lifecycleOwner.lifecycle
     val observer = LifecycleEventObserver { _, event ->
-      when (event) {
-        Lifecycle.Event.ON_RESUME -> YouTubeMusicEngine.setForeground(true)
-        Lifecycle.Event.ON_PAUSE -> YouTubeMusicEngine.setForeground(false)
-        else -> Unit
-      }
+      YouTubeMusicEngine.setActive(host, event.targetState.isAtLeast(activeFrom))
     }
-    lifecycleOwner.lifecycle.addObserver(observer)
-    if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-      YouTubeMusicEngine.setForeground(true)
-    }
+    lifecycle.addObserver(observer)
+    YouTubeMusicEngine.setActive(host, lifecycle.currentState.isAtLeast(activeFrom))
     onDispose {
-      lifecycleOwner.lifecycle.removeObserver(observer)
-      YouTubeMusicEngine.setForeground(false)
+      lifecycle.removeObserver(observer)
+      YouTubeMusicEngine.setActive(host, false)
     }
   }
   AndroidView(
-      factory = { ctx -> FrameLayout(ctx).also(YouTubeMusicEngine::attach) },
+      factory = { ctx -> FrameLayout(ctx).also { YouTubeMusicEngine.attach(host, it) } },
       update = { it.visibility = if (shown) View.VISIBLE else View.INVISIBLE },
-      onRelease = YouTubeMusicEngine::detach,
+      onRelease = { YouTubeMusicEngine.detach(host, it) },
       modifier = modifier,
   )
 }

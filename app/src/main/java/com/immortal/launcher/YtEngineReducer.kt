@@ -10,9 +10,9 @@ package com.immortal.launcher
  * Pure reducer for the official-player music engine: `(state, action) -> (state, effects)`.
  * User commands live here; official player events are handled by [YtPlayerEventReducer].
  *
- * Policy encoded here (not in the UI): nothing starts playing unless the music screen is in the
- * foreground and the player is at least the minimum size; leaving the foreground pauses and only
- * a user action resumes.
+ * Policy encoded here (not in the UI): nothing starts playing unless the player is on screen in a
+ * host ([MusicPlayerHosts]), uncovered ([MusicCoverRules]) and at least the minimum size; leaving
+ * the screen pauses and only a user action resumes.
  */
 object YtEngineReducer {
   fun reduce(s: YtEngineState, a: YtAction): YtStep = when (a) {
@@ -30,18 +30,19 @@ object YtEngineReducer {
     YtAction.Play -> play(s)
     YtAction.PlayWhenVisible -> playWhenVisible(s)
     is YtAction.PlayEntryNext -> queueOnly(s, s.queue.playEntryNext(a.entryId))
-    YtAction.Pause -> pause(s.copy(playWhenVisible = false, sleep = null))
+    YtAction.Pause -> pause(s.copy(playWhenVisible = false, resumeAfterCover = false, sleep = null))
     is YtAction.SeekTo -> seek(s, a.positionMs)
     is YtAction.SetRepeat -> queueOnly(s, s.queue.withRepeat(a.mode))
     is YtAction.SetShuffle -> queueOnly(s, if (a.on) s.queue.shuffled(a.seed) else s.queue.unshuffled())
     YtAction.Clear -> YtStep(clearedTrack(s.copy(queue = s.queue.clear(), wantsPlay = false, playWhenVisible = false,
-        sleep = null)),
+        resumeAfterCover = false, sleep = null)),
         listOf(YtEffect.Stop, YtEffect.Persist))
     is YtAction.Restore -> restore(s, a)
     is YtAction.Adopt -> adopt(s, a)
     is YtAction.ApplyShared -> if (a.restart) adopt(s, YtAction.Adopt(a.queue, 0)) else queueOnly(s, a.queue)
     is YtAction.LookUpPlaylist -> lookUp(s, a.listId)
     is YtAction.Foreground -> foreground(s, a.visible)
+    is YtAction.Covered -> MusicCoverRules.reduce(s, a.on)
     is YtAction.SizeChanged -> size(s, a.ok)
     is YtAction.SetSleep -> YtStep(s.copy(sleep = a.timer))
     YtAction.PlayerLost -> YtStep(
@@ -100,7 +101,7 @@ object YtEngineReducer {
     return YtStep(s.copy(positionMs = 0L), listOf(YtEffect.Seek(0)))
   }
 
-  private fun play(s: YtEngineState): YtStep {
+  internal fun play(s: YtEngineState): YtStep {
     val entry = s.queue.current ?: return YtStep(s)
     if (!s.canPlay) return YtStep(s)
     val wanting = s.copy(wantsPlay = true)
@@ -171,10 +172,10 @@ object YtEngineReducer {
   }
 
   private fun foreground(s: YtEngineState, visible: Boolean): YtStep {
-    if (visible && s.playWhenVisible) return play(s.copy(foreground = true, playWhenVisible = false))
+    if (visible && s.playWhenVisible && !s.covered) return play(s.copy(foreground = true, playWhenVisible = false))
     if (visible) return YtStep(s.copy(foreground = true))
     // Leaving the screen pauses the music, which (like any pause) cancels the sleep timer.
-    val hidden = s.copy(foreground = false, wantsPlay = false, sleep = null)
+    val hidden = s.copy(foreground = false, wantsPlay = false, resumeAfterCover = false, sleep = null)
     val active = s.ready && (s.isPlaying || s.wantsPlay)
     return YtStep(hidden, if (active) listOf(YtEffect.Pause, YtEffect.Persist) else listOf(YtEffect.Persist))
   }
@@ -185,5 +186,5 @@ object YtEngineReducer {
   }
 }
 
-/** Policy gate: playback only while the screen is visible and the player is large enough. */
-internal val YtEngineState.canPlay: Boolean get() = foreground && sizeOk
+/** Policy gate: playback only while the player is on screen, uncovered and large enough. */
+internal val YtEngineState.canPlay: Boolean get() = foreground && !covered && sizeOk

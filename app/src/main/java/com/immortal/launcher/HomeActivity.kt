@@ -1406,6 +1406,12 @@ private fun LauncherScreen(
   BackHandler(enabled = addFlow.draft != null) { addFlow.draft = null }
   BackHandler(enabled = selectedTab != ApprovedLauncherTab.HOME) { onSelectTab(ApprovedLauncherTab.HOME) }
   BackHandler(enabled = musicLayout != null) { musicLayout = null }
+  // Home's Now Playing card hosts the YouTube player once the Music screen closes (no pause).
+  val musicCard = rememberMusicHomeCardShown(musicOpen = musicLayout != null, customizing = editMode)
+  val toastEnd = if (musicCard) MusicHomeCardDims.TOAST_RESERVE.dp else 0.dp
+  MusicHomeDialogCover(showLibrary || addFlow.pickerSlot != null || addFlow.draft != null || showPair || showSleep ||
+      showSearch || pendingSetting != null || appMenu != null)
+  MusicVideoScreenHold()
   CompositionLocalProvider(
       com.immortal.launcher.ui.theme.LocalApprovedPalette provides
           if (com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark) ApprovedHomeTabPalette
@@ -1506,11 +1512,12 @@ private fun LauncherScreen(
           }
           }
           // Household overlays: share toasts / chime bubble and the routine "closed" toast.
-          ShareHomeToasts(shareHome, Modifier.align(Alignment.BottomCenter).padding(bottom = 96.dp))
+          // Bottom toasts centre left of the Now Playing card so they never overlap the player.
+          ShareHomeToasts(shareHome, Modifier.align(Alignment.BottomCenter).padding(end = toastEnd, bottom = 96.dp))
           HomeNoteChimeBubble(Modifier.align(Alignment.TopEnd).padding(top = 8.dp, end = LauncherEdge))
-          RoutineHomeToast(Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp))
-          ChoresCelebrationBanner(Modifier.align(Alignment.BottomCenter))
-          MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp))
+          RoutineHomeToast(Modifier.align(Alignment.BottomCenter).padding(end = toastEnd, bottom = 24.dp))
+          ChoresCelebrationBanner(Modifier.align(Alignment.BottomCenter).padding(end = toastEnd))
+          MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).padding(end = toastEnd, bottom = 24.dp))
           }
           }
           ApprovedLauncherTab.APPS -> ApprovedAppsScreen(
@@ -1533,6 +1540,8 @@ private fun LauncherScreen(
               else Modifier.fillMaxSize().padding(horizontal = 32.dp),
               onDismiss = { musicLayout = null }, onLayoutChange = { musicLayout = it })
         }
+        if (musicCard) MusicHomeNowPlayingCard(room, onOpenMusic,
+            Modifier.align(Alignment.BottomEnd).padding(end = LauncherEdge, bottom = FAVORITE_TILE_HEIGHT + 16.dp))
         }
         Spacer(Modifier.height(12.dp))
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -1552,7 +1561,7 @@ private fun LauncherScreen(
         Spacer(Modifier.height(12.dp))
       }
       if (musicLayout == MusicPlayerLayout.FULL) {
-        // Music v3 (official YouTube route): its own header; leaving it pauses (no background play).
+        // Music v3 (official YouTube route): its own header; leaving it hands the player to Home's card.
         MusicV3Screen(roomName = room, resumeOnOpen = musicResume,
             onClose = { musicLayout = null; musicResume = false }, modifier = Modifier.fillMaxSize())
       }

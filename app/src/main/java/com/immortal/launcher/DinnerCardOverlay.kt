@@ -90,6 +90,8 @@ internal object DinnerCardOverlay {
     val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
         WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
     runCatching { wmgr.addView(root, lp); view = root }.onFailure { Log.w(TAG, "addView failed", it); return }
+    // Full-screen card: it would cover the YouTube player, so music pauses while it shows.
+    YouTubeMusicEngine.setCovered(MusicCover.DINNER, true)
     main.postDelayed(dismissRunnable, SHOW_MS)
   }
 
@@ -97,6 +99,7 @@ internal object DinnerCardOverlay {
     main.removeCallbacks(dismissRunnable)
     view?.let { v -> runCatching { wm?.removeView(v) } }
     view = null
+    YouTubeMusicEngine.setCovered(MusicCover.DINNER, false)
   }
 
   private fun buildRoot(ctx: Context, model: DinnerCardModel, onReply: (DinnerReply) -> Unit): View {

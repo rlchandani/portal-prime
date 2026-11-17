@@ -116,12 +116,11 @@ object NotificationOverlay {
                 PixelFormat.TRANSLUCENT,
             )
             .apply {
-              gravity =
-                  Gravity.CENTER_HORIZONTAL or
-                      when (spec.position) {
-                        NotifyPayload.Position.TOP -> Gravity.TOP
-                        NotifyPayload.Position.BOTTOM -> Gravity.BOTTOM
-                      }
+              // Full width: at the bottom it would land on Home's Now Playing card, so it
+              // moves to the top while the card shows the YouTube player.
+              val bottom = spec.position == NotifyPayload.Position.BOTTOM &&
+                  !MusicCoverRules.avoidBottom(YouTubeMusicEngine.shownIn)
+              gravity = Gravity.CENTER_HORIZONTAL or if (bottom) Gravity.BOTTOM else Gravity.TOP
               y = standoffPx
             }
 

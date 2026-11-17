@@ -72,7 +72,7 @@ internal fun MusicV3PlayerSlot(
   val parked = Modifier.stageOffset { PARKED_X to layout.playerClosed.top }.size(spec.playerW.dp, spec.playerH.dp)
   Box((if (shown) at.shadow(24.dp, shape, clip = false) else parked).clip(shape).background(Color.Black)
       .semantics { contentDescription = "YouTube player" }) {
-    if (attach) YouTubePlayerSurface(Modifier.fillMaxSize(), shown = shown)
+    if (attach) YouTubePlayerSurface(MusicPlayerHostKind.MUSIC_SCREEN, Modifier.fillMaxSize(), shown = shown)
   }
 }
 

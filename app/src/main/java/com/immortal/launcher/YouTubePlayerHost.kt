@@ -87,6 +87,7 @@ internal class YouTubePlayerHost(
     wrapper.baseContext = target.context
     val parent = view.parent as? ViewGroup
     if (parent !== target) {
+      if (parent != null) Log.i(TAG, "player re-parented (same WebView, page kept)")
       parent?.removeView(view)
       target.addView(view, ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -158,6 +159,7 @@ internal class YouTubePlayerHost(
     webChromeClient = WebChromeClient()
     addJavascriptInterface(Bridge(this), YtPlayerPage.BRIDGE_NAME)
     // Base URL https://<package>: the Referer identifies the app (YouTube RMF); same as origin.
+    Log.i(TAG, "player page loading")
     loadDataWithBaseURL(baseUrl, YtPlayerPage.html(baseUrl), "text/html", "utf-8", null)
   }
 

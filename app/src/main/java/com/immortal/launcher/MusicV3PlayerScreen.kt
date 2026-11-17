@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
@@ -64,7 +63,7 @@ internal fun MusicV3PlayerLayout(host: MusicV3StageHost) {
   val context = LocalContext.current
   val toasts = remember { MusicStageToasts() }
   toasts.Effects()
-  VideoScreenGuards(now, host.resumeOnOpen)
+  VideoScreenGuards(host.resumeOnOpen)
   SkipToasts(now.lastSkip) { toasts.show(it) }
   MoveNotices { toasts.show(it) }
   FollowNotices(toasts)
@@ -202,24 +201,15 @@ private fun latestResume(actions: MusicV3Actions): (() -> Unit)? {
 }
 
 /**
- * The screensaver must not start over a playing video (keep the screen awake and tell
- * [DreamPolicy]); leaving while playing pauses (the surface does that) and Home explains why once.
+ * Follow-me asks are drawn inside the stage while it shows, and [resumeOnOpen] (Home's chip) plays
+ * the paused song once the player is on screen. Keeping the screen awake over a playing video and
+ * telling [DreamPolicy] is the engine's and [MusicVideoScreenHold]'s job, for every player host.
  */
 @Composable
-private fun VideoScreenGuards(now: MusicNowSlice, resumeOnOpen: Boolean) {
-  val holds = now.holdsScreen
-  if (holds) KeepInteractiveScreenAwake()
-  DisposableEffect(holds) {
-    YtVideoScreenState.playingOnScreen = holds
-    onDispose { YtVideoScreenState.playingOnScreen = false }
-  }
-  val wasPlaying by rememberUpdatedState(now.playingOrWanted)
+private fun VideoScreenGuards(resumeOnOpen: Boolean) {
   DisposableEffect(Unit) {
     MusicV3FollowMeInScreen.screenShown(true)
-    onDispose {
-      MusicV3FollowMeInScreen.screenShown(false)
-      if (wasPlaying) MusicV3Session.leftWhilePlaying()
-    }
+    onDispose { MusicV3FollowMeInScreen.screenShown(false) }
   }
   LaunchedEffect(Unit) {
     if (!resumeOnOpen) return@LaunchedEffect
