@@ -350,6 +350,10 @@ class HomeActivity : ComponentActivity() {
   /** Read-only navigation diagnostics; never simulate Android lifecycle callbacks to read state. */
   internal fun approvedCurrentTab(): ApprovedLauncherTab = launcherTab
 
+  /** Media keys drive the YouTube player (it has no MediaSession); see [MusicMediaKeys]. */
+  override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean =
+      MusicMediaKeys.dispatch(event) || super.dispatchKeyEvent(event)
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // A restored Activity carries its old launch Intent; only a new launch or onNewIntent
