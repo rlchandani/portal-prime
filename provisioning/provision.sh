@@ -535,6 +535,17 @@ disable_presence() {
   ok "Presence detector disabled"
 }
 
+hide_meta_bug_pill() {
+  # Meta's internal "bug reporter" pill (com.facebook.aloha.system.services
+  # bugreporter.PillViewService) floats in the bottom-right corner over every
+  # app. Its component can't be disabled from the shell, but it is that
+  # package's only overlay window, so denying its overlay permission hides just
+  # the pill. Reversible: appops set <pkg> SYSTEM_ALERT_WINDOW default
+  step "Hiding Meta's floating bug-report button"
+  a shell appops set com.facebook.aloha.system.services SYSTEM_ALERT_WINDOW ignore >/dev/null 2>&1
+  ok "Bug-report button hidden"
+}
+
 snapshot_stock() {
   # Record this device's real stock components for an accurate restore. Done
   # once per device; a re-provision keeps the original values.
@@ -958,6 +969,7 @@ do_provision() {
   disable_installer_overlay
   disable_ota
   disable_presence
+  hide_meta_bug_pill
   snapshot_stock
   set_launcher
   set_screensaver
