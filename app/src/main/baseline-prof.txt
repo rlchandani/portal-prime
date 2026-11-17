@@ -10,6 +10,23 @@ HPLcom/immortal/launcher/ApprovedIconCatalogKt;->**(**)**
 HPLcom/immortal/launcher/ApprovedIconCatalogKt$**;->**(**)**
 HPLcom/immortal/launcher/HearthpaneMarkKt;->**(**)**
 HPLcom/immortal/launcher/HearthpaneMarkKt$**;->**(**)**
+# Phase 2 live previews and the editors' new helpers (named outside the *Settings* wildcard).
+HPLcom/immortal/launcher/ChimePreview*;->**(**)**
+HPLcom/immortal/launcher/ChimeVoicePicker*;->**(**)**
+HPLcom/immortal/launcher/SleepCountdown*;->**(**)**
+HPLcom/immortal/launcher/TouchSoundTest*;->**(**)**
+HPLcom/immortal/launcher/SlideshowPreview*;->**(**)**
+HPLcom/immortal/launcher/SlideshowLivePreview*;->**(**)**
+HPLcom/immortal/launcher/ClockFacePreview*;->**(**)**
+HPLcom/immortal/launcher/ClockFaceLivePreview*;->**(**)**
+HPLcom/immortal/launcher/GreetingPreview*;->**(**)**
+HPLcom/immortal/launcher/GreetingLivePreview*;->**(**)**
+HPLcom/immortal/launcher/WallpaperHomePreview*;->**(**)**
+HPLcom/immortal/launcher/WallpaperPreviewModel*;->**(**)**
+HPLcom/immortal/launcher/WallpaperSwatchLayout*;->**(**)**
+HPLcom/immortal/launcher/PreviewClock*;->**(**)**
+HPLcom/immortal/launcher/PreviewGate*;->**(**)**
+HPLcom/immortal/launcher/PreviewActivity*;->**(**)**
 HPLcom/immortal/launcher/FacePickerActivityKt;->**(**)**
 HPLcom/immortal/launcher/FacePickerActivityKt$**;->**(**)**
 HPLcom/immortal/launcher/TvFocusKt;->**(**)**

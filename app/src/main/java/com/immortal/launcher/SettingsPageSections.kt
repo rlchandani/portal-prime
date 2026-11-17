@@ -42,6 +42,7 @@ internal object SettingsPageSections {
                 footer = "Plays softly while the photo frame is showing."),
         ),
         P.FRAME to listOf(
+            section(null, block(B.SLIDESHOW_PREVIEW)),
             section(null, rows(SCREENSAVER, "enabled")),
             section("Style", rows(SCREENSAVER, "mode", "photo_motion", "keep_people_in_frame", "fit")),
             section("Photos", rows(SCREENSAVER, "photoSource", "intervalSec", "shuffle", "includeVideo")),
@@ -64,7 +65,7 @@ internal object SettingsPageSections {
             section("Power", rows(SCREENSAVER, "presenceMode", "idleSleepMin", "batterySaver"), advanced = true),
             section("Lamp", ext("Open Lamp", E.LAMP, "Brightness, warmth and a red night light.", "light night light")),
         ),
-        P.WALLPAPER to listOf(section(null, block(B.WALLPAPER))),
+        P.WALLPAPER to listOf(section(null, block(B.WALLPAPER_PREVIEW)), section(null, block(B.WALLPAPER))),
         P.HOME to listOf(
             section(null, ext("Customize Home…", E.CUSTOMIZE_HOME,
                 "Touch and hold a widget on Home to move, resize or remove it.", "edit layout arrange widgets")),
@@ -98,6 +99,7 @@ internal object SettingsPageSections {
         P.GUEST to listOf(section(null, block(B.GUEST))),
         P.OPTIONS to listOf(section(null, block(B.OPTIONS))),
         P.CLOCK to listOf(
+            section(null, block(B.CLOCK_PREVIEW)),
             section(null, block(B.PHOTO_CLOCK_FACE),
                 footer = "Time format (12/24-hour) is set once, in Display & Brightness."),
             section(null, block(B.DIGITAL_CLOCK)),
@@ -108,7 +110,7 @@ internal object SettingsPageSections {
                 footer = "Keeps a copy so photos show when offline."),
         ),
         P.DISMISS to listOf(section(null, block(B.DISMISS))),
-        P.GREETING to listOf(section(null, block(B.WELCOME))),
+        P.GREETING to listOf(section(null, block(B.GREETING_PREVIEW)), section(null, block(B.WELCOME))),
         P.HOME_ASSISTANT to listOf(
             section(null, block(B.HOME_ASSISTANT)),
             section("MQTT", link("MQTT publishing", P.MQTT, "broker"), advanced = true),

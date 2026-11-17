@@ -91,6 +91,8 @@ internal fun ApprovedTouchSounds() {
           }
         }
       }
+      Divider()
+      TouchSoundTestRow(enabled = current.enabled)
     }
   }
   if (applying) FooterNote("Applying touch sound setting…")

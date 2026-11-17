@@ -78,6 +78,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
     if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) SettingsUiDiagnostics.paused(this)
     entryFirstDraw?.dispose()
     entryFirstDraw = null
+    SettingsPreviewPhotos.clear()
     entryReport?.record(SettingsEntryStage.DESTROYED)
     entryReport = null
     super.onDestroy()

@@ -15,7 +15,7 @@ import android.content.Context
  */
 object WelcomeConfig {
 
-  private const val PREFS = "immortal_welcome"
+  internal const val PREFS = "immortal_welcome"
 
   data class Settings(
       // Display duration in milliseconds before auto-dismiss
