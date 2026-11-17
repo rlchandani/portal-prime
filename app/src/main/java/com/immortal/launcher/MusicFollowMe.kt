@@ -36,6 +36,7 @@ internal object MusicFollowMe {
   private var rooms: Map<String, FollowMeRoom> = emptyMap()
   private var cooldowns: Map<String, Long> = emptyMap()
   private var presence = Presence.UNKNOWN
+  private var presenceSinceMs = 0L
   private var arrivedMs: Long? = null
   private var lastReason: String? = null
   private var pendingAuto: PendingAuto? = null
@@ -57,7 +58,7 @@ internal object MusicFollowMe {
       FollowMeWire.decodeLive(m.body)?.let { n -> main.post { onRoomLive(m.from, n) } }
     }
     FollowMeBroadcaster.start(c)
-    PresenceHub.addListener { s -> main.post { onPresenceHere(s.presence) } }
+    PresenceHub.addListener { s -> main.post { onPresenceHere(FollowMeArrival.local(s.presence, s.confident)) } }
     scope.launch {
       var previous = MusicHandoff.move.value
       MusicHandoff.move.collect { s -> onMove(previous, s); previous = s }
@@ -69,11 +70,13 @@ internal object MusicFollowMe {
   private fun onPresenceHere(p: Presence) {
     if (p == presence) return
     val previous = presence
+    val previousSince = presenceSinceMs
     presence = p
     val now = now()
+    presenceSinceMs = now
     Log.i(TAG, "presence here $previous -> $p")
     FollowMeBroadcaster.onPresence(p, now)
-    if (previous == Presence.ABSENT && p == Presence.PRESENT) {
+    if (FollowMeArrival.isArrival(previous, previousSince, p, now)) {
       arrivedMs = now
       lastReason = null
       evaluate("arrival")
