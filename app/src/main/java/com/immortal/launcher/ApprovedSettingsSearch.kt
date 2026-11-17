@@ -15,6 +15,7 @@ import com.immortal.launcher.settings.NavSpec
 import com.immortal.launcher.settings.SettingSpec
 import com.immortal.launcher.settings.SettingsPresentation
 import com.immortal.launcher.settings.SettingsRegistry
+import com.immortal.launcher.settings.SettingsChoicePolicy
 import com.immortal.launcher.settings.StringSpec
 
 /** One searchable page or row. [control] is null for a page; picking a row scrolls to and highlights it. */
@@ -75,13 +76,17 @@ private fun pageCrumb(page: String): String =
 
 private fun specResult(id: String, spec: SettingSpec<*>, page: String, crumb: String, advanced: Boolean):
     ApprovedSettingsSearchResult? {
-    val (title, help, options) = settingsSpecText(spec) ?: return null
+    val (registryTitle, help, options) = settingsSpecText(spec) ?: return null
     // One Wake time editor writes both sunrise scalars; the minute has no row of its own.
     if (id == "sunrise.minute") return null
     val wakeTime = id == "sunrise.hour"
+    // Search shows the title the row shows; the registry's own wording still matches.
+    val title = SettingsChoicePolicy.displayTitle(id.substringBefore('.'), id.substringAfter('.'), registryTitle)
+    val formerTitle = if (title == registryTitle) "" else registryTitle
     return ApprovedSettingsSearchResult(
         title = if (wakeTime) "Wake time" else title, page = page, control = id, crumb = crumb,
-        keywords = listOf(id, options, if (wakeTime) "hour minute sunrise.minute" else "").joinToString(" "),
+        keywords = listOf(id, options, formerTitle, if (wakeTime) "hour minute sunrise.minute" else "")
+            .filter { it.isNotEmpty() }.joinToString(" "),
         advanced = advanced || settingsControlIsAdvanced(id),
         automatic = id in ApprovedManagedControls,
         help = help,
@@ -201,4 +206,12 @@ internal fun approvedSettingsPrerequisite(context: android.content.Context, cont
             "Turn on multi-room audio to edit the Music Assistant connection."
         else -> "This setting depends on the options above it on this page."
     }
+}
+
+/** Where [query] appears in [title] (case-insensitive), so the result row can mark it; null if not. */
+internal fun approvedSettingsSearchMatch(title: String, query: String): IntRange? {
+    val phrase = query.trim()
+    if (phrase.isEmpty()) return null
+    val start = title.indexOf(phrase, ignoreCase = true)
+    return if (start < 0) null else start until start + phrase.length
 }

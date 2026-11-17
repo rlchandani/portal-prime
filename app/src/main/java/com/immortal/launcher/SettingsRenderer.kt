@@ -63,6 +63,7 @@ import com.immortal.launcher.settings.IntSpec
 import com.immortal.launcher.settings.NavSpec
 import com.immortal.launcher.settings.SettingSpec
 import com.immortal.launcher.settings.SettingsDomain
+import com.immortal.launcher.settings.SettingsChoicePolicy
 import com.immortal.launcher.settings.SettingsPresentation
 import com.immortal.launcher.settings.StringSpec
 import androidx.lifecycle.Lifecycle
@@ -288,12 +289,13 @@ internal fun <S> SettingControl(
         is DerivedSpec<*> -> null
     }
     val help = if (advanced) fullHelp else SettingsPresentation.conciseHelp(domainId, spec.key, fullHelp)
+    val title = settingsSpecText(spec)?.first?.let { SettingsChoicePolicy.displayTitle(domainId, spec.key, it) }.orEmpty()
     CompositionLocalProvider(LocalApprovedSettingsHelp provides help) {
         @Suppress("UNCHECKED_CAST")
         when (nativeSettingsEditor(spec)) {
             NativeSettingsEditor.TOGGLE -> {
                 val s = spec as BoolSpec<S>
-                ToggleRow(s.title, s.get(snapshot), enabled = editsEnabled) { onApply(s.key, it) }
+                ToggleRow(title, s.get(snapshot), enabled = editsEnabled) { onApply(s.key, it) }
             }
             NativeSettingsEditor.CHOICE -> {
                 val s = spec as EnumSpec<S>
@@ -303,23 +305,23 @@ internal fun <S> SettingControl(
                 val applyCurrentSelection = s.get(snapshot) != selected
                 val options = SettingsPresentation.visibleEnumOptions(
                     domainId, s.key, s.options, selected, advanced)
-                PickerRow(s.title, selected, options.map { (value, label) -> PickerOption(value, label) },
-                    enabled = editsEnabled, applyCurrentSelection = applyCurrentSelection) {
-                    onApply(s.key, it)
-                }
+                SettingsChoiceControl(domainId, s.key, title, help, selected, options, editsEnabled,
+                    applyCurrentSelection) { onApply(s.key, it) }
             }
             NativeSettingsEditor.CLOCK_TIME -> {
                 val s = spec as IntSpec<S>
-                ApprovedClockTimeSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
+                ApprovedClockTimeSetting(title, s.get(snapshot), s.format(s.get(snapshot)), help, editsEnabled) {
+                    onApply(s.key, it)
+                }
             }
             NativeSettingsEditor.INTEGER -> {
                 val s = spec as IntSpec<S>
-                ApprovedIntSetting(s, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
+                SettingsNumberControl(domainId, s, title, s.get(snapshot), help, editsEnabled) { onApply(s.key, it) }
             }
             NativeSettingsEditor.TEXT_NAVIGATION -> {
                 val s = spec as StringSpec<S>
                 val entry = s.entry as Entry.Nav
-                NavRow(s.title, s.get(snapshot).ifBlank { "Not set" }) {
+                NavRow(title, s.get(snapshot).ifBlank { "Not set" }) {
                     open(entry.activity)
                 }
             }
@@ -335,7 +337,7 @@ internal fun <S> SettingControl(
                 if (s.valueOnWorker) {
                     WorkerNavigationRow(domainId, s, snapshot) { open(s.activity) }
                 } else {
-                    NavRow(s.title, s.value(context, snapshot)) { open(s.activity) }
+                    NavRow(title, s.value(context, snapshot)) { open(s.activity) }
                 }
             }
             NativeSettingsEditor.HIDDEN -> Unit
@@ -376,45 +378,51 @@ private fun <S> WorkerNavigationRow(domainId: String, spec: NavSpec<S>, snapshot
 
 /** Numeric choices open the approved dialog; bounds/wrapping come exclusively from the spec. */
 @Composable
-internal fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?, enabled: Boolean, onApply: (Int) -> Unit) {
+internal fun <S> ApprovedIntSetting(spec: IntSpec<S>, value: Int, help: String?, enabled: Boolean,
+    title: String = spec.title, onApply: (Int) -> Unit) {
     var open by remember { mutableStateOf(false) }
-    var draft by remember(open, value) { mutableStateOf(value.toString()) }
-    var error by remember(open) { mutableStateOf<String?>(null) }
-    NavRow(spec.title, spec.format(value), enabled = enabled) { open = true }
-    if (open) {
-        ApprovedSettingsDialog(spec.title, onDismiss = { open = false }, help = help) {
-            if (spec.asText) {
-                IosTextField(draft, { draft = it; error = null }, spec.title,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
-            } else {
-                Stepper(spec.title, draft.toIntOrNull()?.let(spec.format) ?: draft,
-                    onMinus = {
-                        draft.toIntOrNull()?.let { current ->
-                            draft = stepSettingNumber(current, -spec.step, spec.min, spec.max, spec.wrap).toString()
-                        }
-                    },
-                    onPlus = {
-                        draft.toIntOrNull()?.let { current ->
-                            draft = stepSettingNumber(current, spec.step, spec.min, spec.max, spec.wrap).toString()
-                        }
-                    })
-            }
-            error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub) }
-            Row(Modifier.padding(top = 24.dp)) {
-                ActionPill("Save", enabled = enabled) {
-                    val number = draft.toIntOrNull()
-                    if (number == null || (!spec.wrap && number !in spec.min..spec.max)) {
-                        error = "Enter a value from ${spec.min} to ${spec.max}."
-                    } else {
-                        // Wrapping is advertised by the spec; normalize only a wrapping draft.
-                        val range = spec.max - spec.min + 1
-                        val chosen = if (spec.wrap) Math.floorMod(number - spec.min, range) + spec.min else number
-                        onApply(chosen)
-                        open = false
+    NavRow(title, spec.format(value), enabled = enabled) { open = true }
+    if (open) ApprovedIntDialog(spec, value, help, enabled, title, onDismiss = { open = false }, onApply = onApply)
+}
+
+/** The number editor itself: stepper (or number field), validation, Save and Cancel. */
+@Composable
+internal fun <S> ApprovedIntDialog(spec: IntSpec<S>, value: Int, help: String?, enabled: Boolean, title: String,
+    onDismiss: () -> Unit, onApply: (Int) -> Unit) {
+    var draft by remember(value) { mutableStateOf(value.toString()) }
+    var error by remember { mutableStateOf<String?>(null) }
+    ApprovedSettingsDialog(title, onDismiss = onDismiss, help = help) {
+        if (spec.asText) {
+            IosTextField(draft, { draft = it; error = null }, spec.title,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+        } else {
+            Stepper(spec.title, draft.toIntOrNull()?.let(spec.format) ?: draft,
+                onMinus = {
+                    draft.toIntOrNull()?.let { current ->
+                        draft = stepSettingNumber(current, -spec.step, spec.min, spec.max, spec.wrap).toString()
                     }
+                },
+                onPlus = {
+                    draft.toIntOrNull()?.let { current ->
+                        draft = stepSettingNumber(current, spec.step, spec.min, spec.max, spec.wrap).toString()
+                    }
+                })
+        }
+        error?.let { Text(it, color = IosRed, fontSize = Sizes.rowSub) }
+        Row(Modifier.padding(top = 24.dp)) {
+            ActionPill("Save", enabled = enabled) {
+                val number = draft.toIntOrNull()
+                if (number == null || (!spec.wrap && number !in spec.min..spec.max)) {
+                    error = "Enter a value from ${spec.min} to ${spec.max}."
+                } else {
+                    // Wrapping is advertised by the spec; normalize only a wrapping draft.
+                    val range = spec.max - spec.min + 1
+                    val chosen = if (spec.wrap) Math.floorMod(number - spec.min, range) + spec.min else number
+                    onApply(chosen)
+                    onDismiss()
                 }
-                ApprovedSettingsTextButton("Cancel") { open = false }
             }
+            ApprovedSettingsTextButton("Cancel", onDismiss)
         }
     }
 }

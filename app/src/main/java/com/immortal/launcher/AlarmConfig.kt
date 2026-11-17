@@ -17,7 +17,7 @@ import java.util.Calendar
  */
 object AlarmConfig {
 
-  private const val PREFS = "immortal_alarm"
+  internal const val PREFS = "immortal_alarm"
 
   data class Config(
       val enabled: Boolean,

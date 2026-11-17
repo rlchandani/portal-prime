@@ -109,6 +109,8 @@ internal fun SettingsSplitShell(
     // Read by the sidebar rows, not the list builder (see settingsSidebarGroups).
     val currentRoot = rememberUpdatedState(selectedRoot)
     val selectedRootProvider = remember { { currentRoot.value } }
+    val sidebarFacts = rememberSettingsSidebarFacts()
+    val sidebarFactsProvider = remember(sidebarFacts) { { sidebarFacts.value } }
 
     fun pick(result: ApprovedSettingsSearchResult) {
         focus.clearFocus()
@@ -130,7 +132,7 @@ internal fun SettingsSplitShell(
                 if (query.isBlank()) {
                     LazyColumn(listModifier.focusGroup(),
                         contentPadding = PaddingValues(start = 28.dp, end = 28.dp, top = 8.dp, bottom = 40.dp)) {
-                        settingsSidebarGroups(selectedRootProvider, selectPage)
+                        settingsSidebarGroups(selectedRootProvider, sidebarFactsProvider, selectPage)
                     }
                 } else {
                     SettingsSearchResults(query, results, queryToken, ::pick,

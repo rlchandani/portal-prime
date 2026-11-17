@@ -41,6 +41,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -55,13 +58,18 @@ private val AvatarTop = Color(0xFF3A2A20)
 private val AvatarBottom = Color(0xFF1D1714)
 private val StatusOk = Color(0xFF34B864)
 private val StatusAvailable = Color(0xFFEE9B1A)
+private const val SEARCH_MARK_ALPHA = .28f
 
 /**
  * Profile card, then the four groups. [selectedRoot] is read inside each row (never by this builder),
  * so a page switch leaves the list content unchanged and only the two rows whose selection flips
  * recompose; capturing the id here would re-run every visible item's composition on each switch.
  */
-internal fun LazyListScope.settingsSidebarGroups(selectedRoot: () -> String, onSelect: (String) -> Unit) {
+internal fun LazyListScope.settingsSidebarGroups(
+    selectedRoot: () -> String,
+    facts: () -> SettingsSidebarFacts,
+    onSelect: (String) -> Unit,
+) {
     item(key = "profile", contentType = "profile") {
         SettingsProfileCard(rememberSidebarSelected(SettingsPageIds.ABOUT, selectedRoot)) { onSelect(SettingsPageIds.ABOUT) }
     }
@@ -74,7 +82,8 @@ internal fun LazyListScope.settingsSidebarGroups(selectedRoot: () -> String, onS
         }
         val pages = SettingsTree.groupPages(group)
         itemsIndexed(pages, key = { _, page -> "row:${page.id}" }, contentType = { _, _ -> "row" }) { index, page ->
-            SettingsSidebarRow(page, rememberSidebarSelected(page.id, selectedRoot), index == 0, index == pages.lastIndex) {
+            SettingsSidebarRow(page, rememberSidebarSelected(page.id, selectedRoot), rememberSidebarHint(page.id, facts),
+                index == 0, index == pages.lastIndex) {
                 onSelect(page.id)
             }
         }
@@ -89,8 +98,23 @@ private fun rememberSidebarSelected(id: String, selectedRoot: () -> String): Boo
     return selected
 }
 
+/** Invalidates its caller only when this row's own hint text changes. */
 @Composable
-private fun SettingsSidebarRow(page: SettingsPageDef, selected: Boolean, first: Boolean, last: Boolean, onClick: () -> Unit) {
+private fun rememberSidebarHint(id: String, facts: () -> SettingsSidebarFacts): String? {
+    val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
+    val hint by remember(id, facts, advanced) { derivedStateOf { settingsSidebarHint(id, facts(), advanced) } }
+    return hint
+}
+
+@Composable
+private fun SettingsSidebarRow(
+    page: SettingsPageDef,
+    selected: Boolean,
+    hint: String?,
+    first: Boolean,
+    last: Boolean,
+    onClick: () -> Unit,
+) {
     val shape = remember(first, last) {
         RoundedCornerShape(topStart = if (first) SidebarGroupRadius else 0.dp, topEnd = if (first) SidebarGroupRadius else 0.dp,
             bottomStart = if (last) SidebarGroupRadius else 0.dp, bottomEnd = if (last) SidebarGroupRadius else 0.dp)
@@ -114,10 +138,7 @@ private fun SettingsSidebarRow(page: SettingsPageDef, selected: Boolean, first: 
         Text(page.title, color = IosLabel, fontSize = 27.sp, lineHeight = 32.sp, maxLines = 1,
             overflow = TextOverflow.Ellipsis, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
             modifier = Modifier.weight(1f))
-        if (page.id == SettingsPageIds.ADVANCED) {
-            Text(if (com.immortal.launcher.ui.theme.LocalAdvancedSettings.current) "On" else "Off",
-                color = IosSecondary, fontSize = 23.sp)
-        }
+        hint?.let { Text(it, color = IosSecondary, fontSize = 23.sp, maxLines = 1) }
     }
 }
 
@@ -186,7 +207,7 @@ internal fun SettingsSearchResults(
         }
         itemsIndexed(results, key = { _, r -> "${r.page}|${r.control.orEmpty()}|${r.title}" },
             contentType = { _, _ -> "result" }) { index, result ->
-            SettingsSearchResultRow(result, index == 0, index == results.lastIndex,
+            SettingsSearchResultRow(result, query, index == 0, index == results.lastIndex,
                 if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
                     Modifier.settingsUiTarget("result", index.toString(), queryToken = queryToken) else Modifier) {
                 onPick(result)
@@ -198,6 +219,7 @@ internal fun SettingsSearchResults(
 @Composable
 private fun SettingsSearchResultRow(
     result: ApprovedSettingsSearchResult,
+    query: String,
     first: Boolean,
     last: Boolean,
     modifier: Modifier,
@@ -216,13 +238,26 @@ private fun SettingsSearchResultRow(
         SettingsTileIcon(root.icon, Color(root.color), SettingsTileSize.SMALL, shared = true)
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(result.title, color = IosLabel, fontSize = 27.sp, lineHeight = 32.sp,
-                    modifier = Modifier.weight(1f, fill = false))
+                Text(rememberSearchMatchTitle(result.title, query), color = IosLabel, fontSize = 27.sp,
+                    lineHeight = 32.sp, modifier = Modifier.weight(1f, fill = false))
                 if (result.advanced) SettingsAdvancedBadge()
             }
             Text(approvedSettingsSearchBreadcrumb(result), color = IosSecondary, fontSize = 20.sp,
                 lineHeight = 26.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp))
+        }
+    }
+}
+
+/** Matched text gets a soft accent mark, as in the mock, so the eye finds it across the room. */
+@Composable
+private fun rememberSearchMatchTitle(title: String, query: String): AnnotatedString {
+    val mark = IosBlue.copy(alpha = SEARCH_MARK_ALPHA)
+    return remember(title, query, mark) {
+        val match = approvedSettingsSearchMatch(title, query)
+        buildAnnotatedString {
+            append(title)
+            if (match != null) addStyle(SpanStyle(background = mark), match.first, match.last + 1)
         }
     }
 }

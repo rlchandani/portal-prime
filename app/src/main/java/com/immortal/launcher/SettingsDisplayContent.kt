@@ -59,6 +59,10 @@ private data class DisplaySnapshot(
 /** Which parts of the Display editor a page shows; Media volume lives in Sounds. */
 internal enum class DisplayPart { BRIGHTNESS, VOLUME, NIGHT_SHIFT }
 
+private const val WARMTH_MIN = 0
+private const val WARMTH_MAX = 100
+private const val WARMTH_STEP = 10
+
 @Composable
 internal fun DisplaySection(parts: Set<DisplayPart>) {
   val context = LocalContext.current
@@ -266,59 +270,23 @@ internal fun DisplaySection(parts: Set<DisplayPart>) {
       )
       if (ns.enabled) {
         Divider()
-        Stepper(
-            label = "From",
-            valueText = minuteLabel(ns.startMin),
-            onMinus = {
-              val next = stepSettingNumber(ns.startMin, -30, 0, 1439, wrap = true)
-              DisplayControl.setNightShiftStart(context, next)
-              updateNightShift { it.copy(startMin = next) }
-            },
-            onPlus = {
-              val next = stepSettingNumber(ns.startMin, 30, 0, 1439, wrap = true)
-              DisplayControl.setNightShiftStart(context, next)
-              updateNightShift { it.copy(startMin = next) }
-            },
-        )
+        // Times open the same clock editor as every other time row; warmth is a level slider.
+        ApprovedClockTimeSetting("From", ns.startMin, clockLabel(ns.startMin), null, enabled = true) { next ->
+          DisplayControl.setNightShiftStart(context, next)
+          updateNightShift { it.copy(startMin = next) }
+        }
         Divider()
-        Stepper(
-            label = "Until",
-            valueText = minuteLabel(ns.endMin),
-            onMinus = {
-              val next = stepSettingNumber(ns.endMin, -30, 0, 1439, wrap = true)
-              DisplayControl.setNightShiftEnd(context, next)
-              updateNightShift { it.copy(endMin = next) }
-            },
-            onPlus = {
-              val next = stepSettingNumber(ns.endMin, 30, 0, 1439, wrap = true)
-              DisplayControl.setNightShiftEnd(context, next)
-              updateNightShift { it.copy(endMin = next) }
-            },
-        )
+        ApprovedClockTimeSetting("Until", ns.endMin, clockLabel(ns.endMin), null, enabled = true) { next ->
+          DisplayControl.setNightShiftEnd(context, next)
+          updateNightShift { it.copy(endMin = next) }
+        }
         Divider()
-        Stepper(
-            label = "Warmth",
-            valueText = "${ns.strength}%",
-            onMinus = {
-              DisplayControl.setNightShiftStrength(context, ns.strength - 10)
-              updateNightShift { it.copy(strength = (ns.strength - 10).coerceIn(0, 100)) }
-            },
-            onPlus = {
-              DisplayControl.setNightShiftStrength(context, ns.strength + 10)
-              updateNightShift { it.copy(strength = (ns.strength + 10).coerceIn(0, 100)) }
-            },
-        )
+        SettingsSliderRow("Warmth", null, ns.strength, WARMTH_MIN, WARMTH_MAX, WARMTH_STEP, { "$it%" }) { next ->
+          DisplayControl.setNightShiftStrength(context, next)
+          updateNightShift { it.copy(strength = next) }
+        }
       }
     }
     FooterNote("Warms the screen with an amber tint during the night window, easier on the eyes after dark.")
   }
-}
-
-/** "h:mm a" / "HH:mm"-ish label for a minute-of-day (uses 12-hour with AM/PM for readability). */
-private fun minuteLabel(min: Int): String {
-  val h = (min / 60) % 24
-  val m = min % 60
-  val ampm = if (h < 12) "AM" else "PM"
-  val h12 = when { h == 0 -> 12; h > 12 -> h - 12; else -> h }
-  return "%d:%02d %s".format(h12, m, ampm)
 }

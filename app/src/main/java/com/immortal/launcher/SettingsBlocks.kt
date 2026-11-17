@@ -129,7 +129,13 @@ internal data class SettingsBlockItem(val block: SettingsBlock) : SettingsItem {
 }
 
 /** A row that opens a sub-page in the right column. */
-internal data class SettingsLinkItem(val title: String, val target: String, val keywords: String = "") : SettingsItem {
+internal data class SettingsLinkItem(
+    val title: String,
+    val target: String,
+    val keywords: String = "",
+    /** Show the target page's coloured tile, as the mock's widget list does. */
+    val showTile: Boolean = false,
+) : SettingsItem {
     override val key: String get() = "link.$target"
 }
 

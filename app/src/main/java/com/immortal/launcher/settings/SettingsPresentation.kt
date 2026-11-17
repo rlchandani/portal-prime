@@ -56,7 +56,12 @@ object SettingsPresentation {
       "display.nightShift" to "Use warmer colors after dark.",
       "welcome.enableTts" to "Read the greeting aloud.",
       "welcome.userName" to "Personalize your greeting.",
-      "chime.quietHoursOn" to "Silence scheduled sounds. Matching times silence nothing.")
+      "chime.quietHoursOn" to "Silence scheduled sounds. Matching times silence nothing.",
+      // Subtitles the approved split-view mock shows (accurate to what each switch does).
+      "chime.hourlyChimeOn" to "A soft chime on the hour.",
+      "chime.spokenTimeOn" to "Says the time after the chime.",
+      "chime.goldenHourOn" to "A gentle sound at sunrise and sunset.",
+      "quickbar.enabled" to "A floating button to jump between apps.")
 
   fun isAdvanced(domainId: String, key: String): Boolean = "$domainId.$key" in advancedControls
   fun isAdvancedOption(domainId: String, key: String, value: String): Boolean =

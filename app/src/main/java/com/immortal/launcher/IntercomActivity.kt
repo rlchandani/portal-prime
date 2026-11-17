@@ -15,6 +15,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,7 +38,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
@@ -188,10 +188,15 @@ internal fun IntercomContent() {
   val listenBusy = mode == IntercomMode.LISTENING || mode == IntercomMode.CONNECTING
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+      // Grouped as in the approved mock: what this Portal sends, then listening to another room.
+      ApprovedSettingsSectionLabel("This Portal")
       if (myIp.isNotBlank()) {
         Card {
-          Text("This Portal's address: $myIp", color = IosLabel, fontSize = Sizes.rowSub,
-              modifier = Modifier.padding(16.dp))
+          Row(Modifier.fillMaxWidth().padding(horizontal = 28.dp, vertical = 26.dp),
+              verticalAlignment = Alignment.CenterVertically) {
+            Text("Address", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
+            Text(myIp, color = IosSecondary, fontSize = Sizes.rowValue)
+          }
         }
       }
 
@@ -213,6 +218,7 @@ internal fun IntercomContent() {
       }
 
       // Listen (kitchen Portal): connect to the broadcasting Portal's address.
+      ApprovedSettingsSectionLabel("Listen to another room")
       Card {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
           OutlinedTextField(colors = iosTextFieldColors(), value = host, onValueChange = { host = it }, singleLine = true,

@@ -13,6 +13,8 @@ import com.immortal.launcher.SettingsPageIds as P
 private fun rows(domain: String, vararg keys: String) = SettingsDomainRows(domain, keys.toList())
 private fun block(block: B) = SettingsBlockItem(block)
 private fun link(title: String, target: String, keywords: String = "") = SettingsLinkItem(title, target, keywords)
+private fun tileLink(title: String, target: String, keywords: String = "") =
+    SettingsLinkItem(title, target, keywords, showTile = true)
 private fun ext(title: String, target: E, subtitle: String = "", keywords: String = "") =
     SettingsExternalItem(title, target, subtitle, keywords)
 private fun section(header: String?, vararg items: SettingsItem, footer: String? = null, advanced: Boolean = false) =
@@ -73,10 +75,10 @@ internal object SettingsPageSections {
             section(null, block(B.QUICK_BUTTONS)),
         ),
         P.WIDGETS to listOf(
-            section(null, link("Calendar", P.CALENDAR, "feed events")),
-            section("Widgets", link("Weather", P.WEATHER), link("World clock", P.WORLD_CLOCK),
-                link("Countdowns", P.COUNTDOWNS), link("To-do", P.TODO), link("News", P.NEWS),
-                link("Stocks", P.STOCKS), link("Crypto", P.CRYPTO), link("Guest card", P.GUEST),
+            section(null, tileLink("Calendar", P.CALENDAR, "feed events")),
+            section("Widgets", tileLink("Weather", P.WEATHER), tileLink("World clock", P.WORLD_CLOCK),
+                tileLink("Countdowns", P.COUNTDOWNS), tileLink("To-do", P.TODO), tileLink("News", P.NEWS),
+                tileLink("Stocks", P.STOCKS), tileLink("Crypto", P.CRYPTO), tileLink("Guest card", P.GUEST),
                 footer = "Alarm and Home Assistant widgets are set up in Alarms & Wake and Home Assistant."),
             section("Advanced", link("Options scanner", P.OPTIONS), advanced = true),
         ),

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Hearthpane Settings · mock vs build</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0d0e11;color:#e9ebef;font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Roboto,system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#121418;border-bottom:1px solid #23262c;padding:14px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+h1{font-size:17px;margin:0}
+h1 small{color:#8d939e;font-weight:500;margin-left:6px}
+.count{display:inline-flex;gap:8px;align-items:center;font-weight:600}
+.count b{font-size:20px}
+nav{display:flex;gap:6px;flex-wrap:wrap;padding:12px 22px;border-bottom:1px solid #1d2026}
+nav a{color:#b9bec7;text-decoration:none;font-size:13px;padding:5px 9px;border-radius:7px;background:#1a1d22}
+nav a:hover{background:#262a31;color:#fff}
+main{padding:10px 22px 80px}
+section{margin:26px 0 40px;scroll-margin-top:120px}
+h2{font-size:22px;margin:0 0 4px}
+.sub{color:#8d939e;font-size:13px;margin-bottom:12px}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.col h3{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#9aa0aa;margin:0 0 6px}
+.frame{background:#15171b;border:1px solid #23262c;border-radius:12px;overflow:hidden;aspect-ratio:3/2;position:relative}
+.frame img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.frame.tall img{object-fit:contain;background:#0f1114}
+.ph{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#7f8590;font-size:14px;text-align:center;padding:20px;border:1px dashed #333842;border-radius:12px}
+.frame.missing img,.frame.missing a.zoom{display:none}.frame.missing .ph{display:flex}
+.ph code{color:#aab0ba;font-size:12px}
+.frame a.zoom{position:absolute;right:8px;bottom:8px;font-size:12px;color:#cfe0ff;background:rgba(0,0,0,.55);padding:3px 8px;border-radius:6px;text-decoration:none}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid #20232a;vertical-align:top}
+th{color:#9aa0aa;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+td:first-child{font-weight:600;color:#fff;width:17%}
+td.v{white-space:nowrap}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;padding:2px 7px;border-radius:5px}
+.MOCK{background:#173a6b;color:#bcd6ff}.BUILD{background:#2a2d33;color:#c5c9d1}.NEW{background:#123326;color:#79d9a9}
+.hidebuild tr.b{display:none}
+label.tg{font-size:13px;color:#b9bec7;display:inline-flex;gap:6px;align-items:center;margin-left:auto}
+</style>
+</head>
+<body>
+<header>
+  <h1>Hearthpane Settings<small>approved mock vs build · 17 Nov 2026</small></h1>
+  <span class="count"><span class="tag MOCK">MOCK</span><b id="cm"></b></span>
+  <span class="count"><span class="tag BUILD">BUILD</span><b id="cb"></b></span>
+  <span class="count"><span class="tag NEW">NEW</span><b id="cn"></b></span>
+  <span style="color:#8d939e;font-size:13px">MOCK = the mock wins and is now built · BUILD = the build wins or is equivalent, unchanged · NEW = an improvement on both, built</span>
+  <label class="tg"><input type="checkbox" id="hb"> Hide BUILD rows</label>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<script>
+const DATA = __DATA__;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const md = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+const vclass = v => v.startsWith('MOCK') ? 'MOCK' : v.startsWith('NEW') ? 'NEW' : 'BUILD';
+document.getElementById('cm').textContent = DATA.counts.MOCK;
+document.getElementById('cb').textContent = DATA.counts.BUILD;
+document.getElementById('cn').textContent = DATA.counts.NEW;
+const live = id => id === 'sidebar' ? 'display' : id === 'search' ? 'display&q=clock' : id;
+function shot(kind, id, title, tall) {
+  const src = `./${kind}/${id}.png`;
+  return `<div class="frame ${tall ? 'tall' : ''}"><img loading="lazy" src="${src}" alt="${esc(title)} — ${kind}" onerror="this.parentElement.classList.add('missing')">
+    <div class="ph">Screenshot not captured yet<code>${src}</code></div><a class="zoom" href="${src}" target="_blank">open</a></div>`;
+}
+document.getElementById('nav').innerHTML = DATA.pages.map(p => {
+  const n = p.rows.filter(r => vclass(r.verdict) !== 'BUILD').length;
+  return `<a href="#${p.id}">${esc(p.title)}${n ? ` · ${n}` : ''}</a>`; }).join('');
+document.getElementById('main').innerHTML = DATA.pages.map(p => {
+  const changed = p.rows.filter(r => vclass(r.verdict) !== 'BUILD').length;
+  return `<section id="${p.id}"><h2>${esc(p.title)}</h2>
+    <div class="sub">${changed} changed · ${p.rows.length - changed} kept · <a style="color:#8fbcff" href="../settings-redesign-20261109/split-view/index.html#page=${live(p.id)}" target="_blank">open the live mock</a></div>
+    <div class="cols">
+      <div class="col"><h3>Mock</h3>${shot('mock', p.id, p.title, true)}</div>
+      <div class="col"><h3>Built (before)</h3>${shot('built', p.id, p.title)}</div>
+      <div class="col"><h3>Final</h3>${shot('final', p.id, p.title)}</div>
+    </div>
+    <table><thead><tr><th>Element</th><th>Mock</th><th>Built (before)</th><th>Verdict</th><th>Why</th></tr></thead><tbody>
+    ${p.rows.map(r => `<tr class="${vclass(r.verdict) === 'BUILD' ? 'b' : ''}"><td>${md(r.element)}</td><td>${md(r.mock)}</td><td>${md(r.built)}</td>
+      <td class="v"><span class="tag ${vclass(r.verdict)}">${esc(r.verdict)}</span></td><td>${md(r.reason)}</td></tr>`).join('')}
+    </tbody></table></section>`; }).join('');
+document.getElementById('hb').addEventListener('change', e => document.getElementById('main').classList.toggle('hidebuild', e.target.checked));
+</script>
+</body>
+</html>

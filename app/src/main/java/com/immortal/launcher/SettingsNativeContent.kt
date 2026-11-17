@@ -68,7 +68,7 @@ internal fun ApprovedTouchSounds() {
     FooterNote(if (failed) "Touch sound change unavailable" else "Loading touch sound settings…")
     return
   }
-  SectionLabel("Options")
+  SectionLabel("Touch")
   Card {
     if (!current.canWrite) {
       NavRow("Allow touch sound control", value = "Grant") { SystemSounds.requestWriteAccess(context) }

@@ -1,0 +1,341 @@
+{
+  "screen": {
+    "px": [
+      2160,
+      1440
+    ],
+    "density": 1.125,
+    "dp": [
+      1920,
+      1280
+    ]
+  },
+  "notes": [
+    "Settings reopens on the last page used; open each page by tapping its sidebar row.",
+    "Coordinates are px on a 2160×1440 Portal, derived from layout constants (rows 80 dp, sidebar 31 % wide); treat them as approximate and prefer the row label.",
+    "scrollSidebar=toEnd: fling the sidebar list to its end first (rows below Photo Sources are off screen).",
+    "Capture the whole screen to ./built/<id>.png (before, from main) and ./final/<id>.png (settings-fidelity build). Use the dark theme and Advanced settings ON to match the mock captures."
+  ],
+  "pages": [
+    {
+      "id": "sidebar",
+      "sidebarLabel": "Display & Brightness",
+      "title": "Sidebar & profile card",
+      "tap": [
+        {
+          "sidebarRow": "Display & Brightness",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 542,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "search",
+      "sidebarLabel": "Search field",
+      "title": "Search",
+      "tap": [
+        {
+          "searchField": "Search",
+          "x": 334,
+          "y": 250,
+          "type": "clock",
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "display",
+      "sidebarLabel": "Display & Brightness",
+      "title": "Display & Brightness",
+      "tap": [
+        {
+          "sidebarRow": "Display & Brightness",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 542,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "sounds",
+      "sidebarLabel": "Sounds",
+      "title": "Sounds",
+      "tap": [
+        {
+          "sidebarRow": "Sounds",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 632,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "frame",
+      "sidebarLabel": "Photo Frame",
+      "title": "Photo Frame",
+      "tap": [
+        {
+          "sidebarRow": "Photo Frame",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 722,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "alarms",
+      "sidebarLabel": "Alarms & Wake",
+      "title": "Alarms & Wake",
+      "tap": [
+        {
+          "sidebarRow": "Alarms & Wake",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 812,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "night",
+      "sidebarLabel": "Night & Sleep",
+      "title": "Night & Sleep",
+      "tap": [
+        {
+          "sidebarRow": "Night & Sleep",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 902,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "wallpaper",
+      "sidebarLabel": "Wallpaper",
+      "title": "Wallpaper",
+      "tap": [
+        {
+          "sidebarRow": "Wallpaper",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 1060,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "home",
+      "sidebarLabel": "Home Screen",
+      "title": "Home Screen",
+      "tap": [
+        {
+          "sidebarRow": "Home Screen",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 1150,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "widgets",
+      "sidebarLabel": "Widgets & Calendar",
+      "title": "Widgets & Calendar",
+      "tap": [
+        {
+          "sidebarRow": "Widgets & Calendar",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 1240,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "w-weather",
+      "sidebarLabel": "Widgets & Calendar",
+      "title": "Widgets & Calendar › Weather",
+      "tap": [
+        {
+          "sidebarRow": "Widgets & Calendar",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 1240,
+          "approximate": true
+        },
+        {
+          "detailRow": "Weather",
+          "x": 1415,
+          "y": 562,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "w-calendar",
+      "sidebarLabel": "Widgets & Calendar",
+      "title": "Widgets & Calendar › Calendar",
+      "tap": [
+        {
+          "sidebarRow": "Widgets & Calendar",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 1240,
+          "approximate": true
+        },
+        {
+          "detailRow": "Calendar",
+          "x": 1415,
+          "y": 369,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "clock",
+      "sidebarLabel": "Clock Faces",
+      "title": "Clock Faces",
+      "tap": [
+        {
+          "sidebarRow": "Clock Faces",
+          "scrollSidebar": "none",
+          "x": 334,
+          "y": 1330,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "sources",
+      "sidebarLabel": "Photo Sources",
+      "title": "Photo Sources",
+      "tap": [
+        {
+          "sidebarRow": "Photo Sources",
+          "scrollSidebar": "toEnd",
+          "x": 334,
+          "y": 470,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "greeting",
+      "sidebarLabel": "Welcome Greeting",
+      "title": "Welcome Greeting",
+      "tap": [
+        {
+          "sidebarRow": "Welcome Greeting",
+          "scrollSidebar": "toEnd",
+          "x": 334,
+          "y": 560,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "ha",
+      "sidebarLabel": "Home Assistant",
+      "title": "Home Assistant",
+      "tap": [
+        {
+          "sidebarRow": "Home Assistant",
+          "scrollSidebar": "toEnd",
+          "x": 334,
+          "y": 718,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "phone",
+      "sidebarLabel": "Phone Remote",
+      "title": "Phone Remote",
+      "tap": [
+        {
+          "sidebarRow": "Phone Remote",
+          "scrollSidebar": "toEnd",
+          "x": 334,
+          "y": 808,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "intercom",
+      "sidebarLabel": "Intercom",
+      "title": "Intercom",
+      "tap": [
+        {
+          "sidebarRow": "Intercom",
+          "scrollSidebar": "toEnd",
+          "x": 334,
+          "y": 898,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "music",
+      "sidebarLabel": "Music",
+      "title": "Music",
+      "tap": [
+        {
+          "sidebarRow": "Music",
+          "scrollSidebar": "toEnd",
+          "x": 334,
+          "y": 988,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "about",
+      "sidebarLabel": "About & Health",
+      "title": "About & Health",
+      "tap": [
+        {
+          "sidebarRow": "About & Health",
+          "scrollSidebar": "toEnd",
+          "x": 334,
+          "y": 1145,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "system",
+      "sidebarLabel": "Portal & Android",
+      "title": "Portal & Android",
+      "tap": [
+        {
+          "sidebarRow": "Portal & Android",
+          "scrollSidebar": "toEnd",
+          "x": 334,
+          "y": 1235,
+          "approximate": true
+        }
+      ]
+    },
+    {
+      "id": "advanced",
+      "sidebarLabel": "Advanced",
+      "title": "Advanced",
+      "tap": [
+        {
+          "sidebarRow": "Advanced",
+          "scrollSidebar": "toEnd",
+          "x": 334,
+          "y": 1325,
+          "approximate": true
+        }
+      ]
+    }
+  ]
+}

@@ -14,12 +14,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,11 +25,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import com.immortal.launcher.settings.SettingsChoicePolicy
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -59,6 +56,8 @@ class SunriseSettingsActivity : ComponentActivity() {
     setContent { PortalPrimeTheme(darkTheme = false) { SunriseScreen() } }
   }
 }
+
+private const val SUNRISE_SWITCH_HELP = "Slowly brightens the screen to wake you gently."
 
 private val DAY_LABELS =
     listOf(
@@ -123,6 +122,7 @@ internal fun SunriseContent() {
     completion.launch { publishAfterSave(revision) }
   }
   fun apply(key: String, value: Any) = submit { writes.submit(key, value) }
+  val weekdayNames = remember { java.text.DateFormatSymbols().weekdays }
 
   Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
     Column(Modifier.semantics { contentDescription = when {
@@ -137,11 +137,14 @@ internal fun SunriseContent() {
         else -> "Choose your wake time and gradual light ramp."
       })
     }
+    // One card, as in the approved mock; rows below the switch follow the same parent gates.
+    ApprovedSettingsSectionLabel("Sunrise wake")
     Card {
-      ToggleRow("Enabled", settings.enabled, enabled = !applying) { apply("enabled", it) }
-    }
-    if ("hour" in visibleKeys || "minute" in visibleKeys) {
-      Card {
+      CompositionLocalProvider(LocalApprovedSettingsHelp provides SUNRISE_SWITCH_HELP) {
+        ToggleRow("Sunrise wake", settings.enabled, enabled = !applying) { apply("enabled", it) }
+      }
+      if ("hour" in visibleKeys || "minute" in visibleKeys) {
+        Divider()
         ApprovedClockTimeSetting(
             title = "Wake time",
             value = settings.hour * 60 + settings.minute,
@@ -155,37 +158,22 @@ internal fun SunriseContent() {
             submit { writes.submitTime(hour, minute) }
           }
         }
-      }
-      // Weekdays are a bespoke set; follow the same parent gate as the wake time.
-      SectionLabel("Wake on")
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        DAY_LABELS.forEach { (day, label) ->
-          val on = day in settings.days
-          Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
-              modifier = Modifier.size(68.dp).semantics {
-                contentDescription = java.text.DateFormatSymbols().weekdays[day]
-              }.then(if (applying) Modifier.semantics { disabled() } else
-                  Modifier.tvFocusable(CircleShape, focusScale = 1f) {
-                    val days = if (on) settings.days - day else settings.days + day
-                    submit { writes.submitDays(days) }
-                  })) {
-            Text(label, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel,
-                fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-                modifier = Modifier.padding(14.dp))
-          }
+        // Weekdays are a bespoke set; follow the same parent gate as the wake time.
+        Divider()
+        SettingsDayChipsRow("Wake on", DAY_LABELS, settings.days, weekdayNames, enabled = !applying) { day ->
+          val days = if (day in settings.days) settings.days - day else settings.days + day
+          submit { writes.submitDays(days) }
         }
       }
-    }
-    // Bounds, help and visibility come from the same spec as the remote numeric picker.
-    if ("rampMinutes" in visibleKeys) {
-      Card {
-        ApprovedIntSetting(rampSpec, settings.rampMinutes, rampSpec.help, !applying) {
-          apply("rampMinutes", it)
-        }
+      // Bounds and visibility come from the same spec as the remote numeric picker.
+      if ("rampMinutes" in visibleKeys) {
+        Divider()
+        SettingsNumberControl("sunrise", rampSpec,
+            SettingsChoicePolicy.displayTitle("sunrise", rampSpec.key, rampSpec.title), settings.rampMinutes,
+            null, !applying) { apply("rampMinutes", it) }
       }
-    }
-    if ("chime" in visibleKeys) {
-      Card {
+      if ("chime" in visibleKeys) {
+        Divider()
         ToggleRow("Chime at the end", settings.chime, enabled = !applying) { apply("chime", it) }
       }
     }
