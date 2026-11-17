@@ -49,7 +49,7 @@ import com.immortal.launcher.ui.components.OnResumeAfterFirstComposition
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 
-private val WallpaperChoices: List<Pair<String, String>> =
+internal val WallpaperChoices: List<Pair<String, String>> =
     listOf(WallpaperConfig.DUSK_AURORA to "Dusk Aurora", WallpaperConfig.DARK to "Dark") +
         WallpaperConfig.GRADIENTS.map { (id, _) ->
           id to id.removePrefix("g_").replaceFirstChar { it.uppercase() }
