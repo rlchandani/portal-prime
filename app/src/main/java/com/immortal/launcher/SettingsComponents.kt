@@ -336,6 +336,8 @@ internal fun NavRow(
     iconSymbol: String = "",
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    /** Optional leading content (e.g. a page's coloured tile), drawn before the title. */
+    leading: (@Composable () -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     Row(
@@ -350,6 +352,10 @@ internal fun NavRow(
         if (iconSymbol.isNotEmpty()) {
             IconBadge(color = iconColor, symbol = iconSymbol)
             Spacer(Modifier.size(12.dp))
+        }
+        leading?.let {
+            it()
+            Spacer(Modifier.size(20.dp))
         }
         Column(modifier = Modifier.weight(1f).padding(end = 24.dp)) {
             Text(

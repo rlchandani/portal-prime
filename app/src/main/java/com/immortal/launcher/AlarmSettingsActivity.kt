@@ -13,13 +13,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import com.immortal.launcher.ApprovedSettingsSwitch as Switch
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -27,18 +20,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
@@ -132,17 +117,11 @@ internal fun AlarmContent() {
   }
 
   Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+      // One card, as in the approved mock: the switch, its time and its days belong together.
+      ApprovedSettingsSectionLabel("Alarm")
       Card {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
-        ) {
-          Text("Enabled", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-          Switch(checked = enabled, onCheckedChange = { config = editor.setEnabled(it) }, colors = iosSwitchColors())
-        }
-      }
-
-      Card {
+        ToggleRow("Alarm", enabled) { config = editor.setEnabled(it) }
+        Divider()
         ApprovedClockTimeSetting(
             title = "Alarm time",
             value = hour * 60 + minute,
@@ -151,23 +130,8 @@ internal fun AlarmContent() {
             enabled = true,
             onApply = { config = editor.setTime(it / 60, it % 60) },
         )
-      }
-
-      SectionLabel("Repeat on")
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        ALARM_DAY_LABELS.forEach { (d, label) ->
-          val on = d in days
-          Surface(color = if (on) IosBlue else IosDivider, shape = CircleShape,
-              modifier = Modifier.size(68.dp).semantics {
-                contentDescription = weekdayNames[d]
-                selected = on
-              }.tvFocusable(CircleShape, focusScale = 1f) {
-                config = editor.toggleDay(d)
-              }) {
-            Text(label, color = if (on) androidx.compose.material3.MaterialTheme.colorScheme.onPrimary else IosLabel, fontSize = 24.sp,
-                fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.padding(14.dp))
-          }
-        }
+        Divider()
+        SettingsDayChipsRow("Repeat", ALARM_DAY_LABELS, days, weekdayNames) { config = editor.toggleDay(it) }
       }
       FooterNote(repeatNote)
 

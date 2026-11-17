@@ -142,9 +142,14 @@ internal fun SettingsNavigationRow(
     first: Boolean,
     last: Boolean,
     highlight: String?,
+    value: String = "",
+    tile: SettingsPageDef? = null,
     onClick: () -> Unit,
 ) {
-    ApprovedSettingsLazyRow(id, first, last, highlight) { NavRow(title, subLabel = subtitle, onClick = onClick) }
+    ApprovedSettingsLazyRow(id, first, last, highlight) {
+        NavRow(title, value = value, subLabel = subtitle, onClick = onClick,
+            leading = tile?.let { { SettingsTileIcon(it.icon, Color(it.color), SettingsTileSize.SMALL) } })
+    }
 }
 
 /** Search jumps highlight a row briefly; the host then clears the request so it never repeats. */

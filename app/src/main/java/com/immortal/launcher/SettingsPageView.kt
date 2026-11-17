@@ -92,7 +92,9 @@ private fun SettingsPageEntryContent(
         }
         SettingsEntryKind.LINK -> {
             val link = entry.item as SettingsLinkItem
-            SettingsNavigationRow(link.key, link.title, "", entry.first, entry.last, highlight) { onOpenPage(link.target) }
+            SettingsNavigationRow(link.key, link.title, "", entry.first, entry.last, highlight,
+                value = settingsLinkValue(link.target, states), tile = SettingsTree.page(link.target)?.takeIf { link.showTile },
+            ) { onOpenPage(link.target) }
         }
         SettingsEntryKind.EXTERNAL -> {
             val context = LocalContext.current
@@ -105,5 +107,18 @@ private fun SettingsPageEntryContent(
         SettingsEntryKind.NOTICE -> SettingsNotice(entry.text.orEmpty())
         SettingsEntryKind.ADVANCED_HINT -> SettingsAdvancedHintRow()
         SettingsEntryKind.GAP -> SettingsSectionGap()
+    }
+}
+
+private const val CALENDAR_NOT_SET = "Not set"
+
+/** The value a link row shows, from snapshots the page already holds (never a fresh read). */
+internal fun settingsLinkValue(target: String, states: Map<String, SettingsDomainState>): String {
+    if (target != SettingsPageIds.CALENDAR) return ""
+    val snapshot = (states["calendar"] ?: states["screensaver"])?.snapshot as? ScreensaverConfig.Settings ?: return ""
+    return when {
+        !snapshot.hasCalendarLink -> CALENDAR_NOT_SET
+        snapshot.calendarEnabled -> "On"
+        else -> "Off"
     }
 }

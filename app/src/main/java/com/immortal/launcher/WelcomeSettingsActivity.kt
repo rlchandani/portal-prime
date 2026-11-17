@@ -12,23 +12,15 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.focusGroup
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
@@ -44,6 +36,9 @@ import org.json.JSONObject
 import kotlin.math.roundToInt
 
 private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
+private const val SPEAK_GREETING_HELP = "Reads the greeting aloud."
+private const val PERCENT = 100f
+private const val OPACITY_STEP_PERCENT = 5
 
 /**
  * Settings screen for the welcome-back overlay. Customize greeting messages,
@@ -154,25 +149,28 @@ internal fun WelcomeSettingsContent() {
   }
 
       Column(modifier = Modifier.focusRequester(firstFocus).focusGroup()) {
+        SectionLabel("Show")
         Card {
-          ToggleRow("Show greeting message", settings.showGreeting) {
+          ToggleRow("Greeting message", settings.showGreeting) {
             SettingsDomains.welcome.apply(context, JSONObject().put("showGreeting", it))
             settings = WelcomeConfig.load(context)
           }
           Divider()
-          ToggleRow("Show clock", settings.showClock) {
+          ToggleRow("Clock", settings.showClock) {
             SettingsDomains.welcome.apply(context, JSONObject().put("showClock", it))
             settings = WelcomeConfig.load(context)
           }
           Divider()
-          ToggleRow("Show date", settings.showDate) {
+          ToggleRow("Date", settings.showDate) {
             SettingsDomains.welcome.apply(context, JSONObject().put("showDate", it))
             settings = WelcomeConfig.load(context)
           }
           Divider()
-          ToggleRow("Speak greeting (TTS)", settings.enableTts) {
-            SettingsDomains.welcome.apply(context, JSONObject().put("enableTts", it))
-            settings = WelcomeConfig.load(context)
+          CompositionLocalProvider(LocalApprovedSettingsHelp provides SPEAK_GREETING_HELP) {
+            ToggleRow("Speak greeting", settings.enableTts) {
+              SettingsDomains.welcome.apply(context, JSONObject().put("enableTts", it))
+              settings = WelcomeConfig.load(context)
+            }
           }
         }
 
@@ -242,59 +240,46 @@ internal fun WelcomeSettingsContent() {
 
         Spacer(Modifier.size(26.dp))
 
-        if (advanced) {
-        SectionLabel("Timing")
+        // Timing & look share one card, as in the approved mock; duration and opacity stay ADV.
+        SectionLabel("Timing & look")
         Card {
-          val duration = remember { WelcomeDurationAdapter() }
-          fun adjustDuration(increase: Boolean) {
-            if (pageActive) settings = duration.adjust(settings, increase,
-                apply = { key, ms ->
-                  SettingsDomains.welcome.apply(context, JSONObject().put(key, ms))
-                },
-                reload = { SettingsDomains.welcome.load(context) })
+          if (advanced) {
+            val duration = remember { WelcomeDurationAdapter() }
+            fun adjustDuration(increase: Boolean) {
+              if (pageActive) settings = duration.adjust(settings, increase,
+                  apply = { key, ms ->
+                    SettingsDomains.welcome.apply(context, JSONObject().put(key, ms))
+                  },
+                  reload = { SettingsDomains.welcome.load(context) })
+            }
+            Stepper(duration.title, duration.label(settings), enabled = pageActive,
+                onMinus = { adjustDuration(false) }, onPlus = { adjustDuration(true) })
+            Divider()
           }
-          Stepper(duration.title, duration.label(settings), enabled = pageActive,
-              onMinus = { adjustDuration(false) }, onPlus = { adjustDuration(true) })
-        }
-        FooterNote(
-            "How long the welcome overlay displays before auto-dismissing.",
-        )
-
-        Spacer(Modifier.size(26.dp))
-        }
-
-        SectionLabel("TEXT SIZE")
-        Card {
-          PickerRow(
-              title = "Text size",
-              selected = settings.textScale,
-              options = listOf(
-                  PickerOption(WelcomeConfig.SCALE_SMALL, "Small"),
-                  PickerOption(WelcomeConfig.SCALE_MEDIUM, "Medium"),
-                  PickerOption(WelcomeConfig.SCALE_LARGE, "Large"),
-              ),
-              onSelect = { scale ->
-                WelcomeConfig.setTextScale(context, scale)
-                settings = settings.copy(textScale = scale)
-              },
-          )
-        }
-
-        Spacer(Modifier.size(26.dp))
-
-        if (advanced) {
-        SectionLabel("Background")
-        Card {
-          OpacityStepper(settings.backgroundOpacity) { opacity ->
-            val clamped = WelcomeConfig.clampOpacity(opacity)
-            WelcomeConfig.setBackgroundOpacity(context, clamped)
-            settings = settings.copy(backgroundOpacity = clamped)
+          val scales = listOf(WelcomeConfig.SCALE_SMALL to "Small", WelcomeConfig.SCALE_MEDIUM to "Medium",
+              WelcomeConfig.SCALE_LARGE to "Large")
+          SettingsChoiceTilesRow("Text size", null,
+              scales.map { (scale, label) -> SettingsTile(label, scale == settings.textScale) }) { index ->
+            val scale = scales[index].first
+            if (scale != settings.textScale) {
+              WelcomeConfig.setTextScale(context, scale)
+              settings = settings.copy(textScale = scale)
+            }
+          }
+          if (advanced) {
+            Divider()
+            SettingsSliderRow("Background opacity", null, (settings.backgroundOpacity * PERCENT).roundToInt(),
+                0, PERCENT.toInt(), OPACITY_STEP_PERCENT, { "$it%" }) { percent ->
+              val clamped = WelcomeConfig.clampOpacity(percent / PERCENT)
+              WelcomeConfig.setBackgroundOpacity(context, clamped)
+              settings = settings.copy(backgroundOpacity = clamped)
+            }
           }
         }
-        FooterNote(
-            "Background darkness behind the welcome text (0% = transparent, 100% = opaque).",
+        if (advanced) FooterNote(
+            "Display duration is how long the welcome overlay stays up. Background opacity darkens " +
+                "the photo behind the text (0% = transparent, 100% = opaque).",
         )
-        }
 
         Spacer(Modifier.size(28.dp))
         Surface(
@@ -364,38 +349,3 @@ private fun EditableTextRow(label: String, value: String, onChange: (String) -> 
 }
 
 
-@Composable
-private fun OpacityStepper(opacity: Float, onChange: (Float) -> Unit) {
-  val src = remember { MutableInteractionSource() }
-  val focused by src.collectIsFocusedAsState()
-  val percent = (opacity * 100).roundToInt()
-  Row(
-      modifier =
-          Modifier.fillMaxWidth()
-              .onKeyEvent { e ->
-                if (e.type == KeyEventType.KeyDown) {
-                  when (e.key) {
-                    Key.DirectionLeft -> { onChange(opacity - 0.05f); true }
-                    Key.DirectionRight -> { onChange(opacity + 0.05f); true }
-                    else -> false
-                  }
-                } else false
-              }
-              .focusable(interactionSource = src)
-              .background(if (focused) IosFocusTint else Color.Transparent)
-              .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
-      verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text("Opacity", color = IosLabel, fontSize = Sizes.rowTitle, modifier = Modifier.weight(1f))
-    ArrowButton("◀", focused) { onChange(opacity - 0.05f) }
-    Text(
-        "$percent%",
-        color = if (focused) IosLabel else IosSecondary,
-        fontSize = 17.sp,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.widthIn(min = 64.dp),
-    )
-    ArrowButton("▶", focused) { onChange(opacity + 0.05f) }
-  }
-}

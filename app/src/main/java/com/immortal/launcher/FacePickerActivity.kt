@@ -64,20 +64,26 @@ internal fun FacePickerContent() {
         }
         if (settings.facesEnabled) {
             Divider()
-            PickerRow("Photo clock face", settings.faceId,
-                FaceCatalog.entries.map { PickerOption(it.id, it.name) }) { id ->
-                ScreensaverConfig.setFaceId(context, id)
-                settings = ScreensaverConfig.load(context)
+            // Big one-tap tiles, as in the approved mock (the live preview above shows the result).
+            SettingsChoiceTilesRow("Face", null,
+                FaceCatalog.entries.map { SettingsTile(it.name, it.id == settings.faceId) }) { index ->
+                val id = FaceCatalog.entries[index].id
+                if (id != settings.faceId) {
+                    ScreensaverConfig.setFaceId(context, id)
+                    settings = ScreensaverConfig.load(context)
+                }
             }
             val entry = FaceCatalog.entryFor(settings.faceId)
             if (entry.sizes.isNotEmpty()) {
                 Divider()
-                PickerRow("Size", settings.faceSizeIndex.coerceIn(0, entry.sizes.lastIndex),
-                    FaceCatalog.SIZE_LABELS.mapIndexed { index, label -> PickerOption(index, label) },
-                    applyCurrentSelection = settings.faceSizeIndex !=
-                        settings.faceSizeIndex.coerceIn(0, entry.sizes.lastIndex)) { size ->
-                    ScreensaverConfig.setFaceSizeIndex(context, size)
-                    settings = ScreensaverConfig.load(context)
+                val shown = settings.faceSizeIndex.coerceIn(0, entry.sizes.lastIndex)
+                SettingsChoiceTilesRow("Size", null,
+                    FaceCatalog.SIZE_LABELS.mapIndexed { index, label -> SettingsTile(label, index == shown) }) { size ->
+                    // A clamped (displayed) size is persisted when tapped, as the picker did.
+                    if (size != settings.faceSizeIndex) {
+                        ScreensaverConfig.setFaceSizeIndex(context, size)
+                        settings = ScreensaverConfig.load(context)
+                    }
                 }
             }
         }
