@@ -16,3 +16,15 @@ HPLcom/immortal/launcher/TvFocusKt;->**(**)**
 HPLcom/immortal/launcher/TvFocusKt$**;->**(**)**
 HPLcom/immortal/launcher/ui/components/ReuseKt;->**(**)**
 HPLcom/immortal/launcher/ui/components/ReuseKt$**;->**(**)**
+# Music stage: a fling through a long song list composes a row per frame (MusicV3TrackRow,
+# MusicV3Thumb, glyphs, cache window) and the stage parts around it (MusicStage*, the wash
+# clock, art cache). Each row composable runs only a handful of times per visit, so without
+# these rules the first flings run them interpreted while the JIT warms up.
+HPLcom/immortal/launcher/MusicV3*;->**(**)**
+HPLcom/immortal/launcher/MusicStage*;->**(**)**
+HPLcom/immortal/launcher/MusicWashClock*;->**(**)**
+HPLcom/immortal/launcher/MediaArt;->**(**)**
+HPLcom/immortal/launcher/MultiRoomArt*;->**(**)**
+HPLcom/immortal/launcher/ArtworkLoadCoordinator;->**(**)**
+HPLcom/immortal/launcher/MusicArtworkPolicy;->**(**)**
+HPLcom/immortal/launcher/MusicLocalArtwork;->**(**)**
