@@ -59,7 +59,7 @@ internal data class CcRailSlice(val screen: CcScreen, val alerts: Int, val kids:
 internal fun CcRail(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
   val c = LocalCc.current
   val alerts = r.alerts
-  Column(Modifier.width(CcStyle.RailWidth).fillMaxHeight().graphicsLayer().background(c.rail).padding(top = 22.dp, bottom = 20.dp),
+  Column(Modifier.width(CcStyle.RailWidth).fillMaxHeight().ccRegionLayer(c.rail).padding(top = 22.dp, bottom = 20.dp),
       horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
     Box(Modifier.size(72.dp).clip(CircleShape).clickable(role = Role.Button, onClick = onHome)
         .semantics { contentDescription = "Back to Hearthpane home" }, contentAlignment = Alignment.Center) {
@@ -119,7 +119,7 @@ internal data class CcHeaderSlice(
 @Composable
 internal fun CcHeader(h: CcHeaderSlice, ui: CcUi, onJarvis: () -> Unit) {
   val c = LocalCc.current
-  Row(Modifier.fillMaxWidth().height(CcStyle.HeaderHeight).graphicsLayer().padding(horizontal = 34.dp),
+  Row(Modifier.fillMaxWidth().height(CcStyle.HeaderHeight).ccRegionLayer(c.bg).padding(horizontal = 34.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
     Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       HearthpaneGlyph(30.dp)

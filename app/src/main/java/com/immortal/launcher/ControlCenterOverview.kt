@@ -51,7 +51,7 @@ internal fun CcOverviewScreen(s: CcUiState, ui: CcUi) {
       }
     }
     if (loading) CcSideSkeleton(Modifier.width(CcStyle.SideWidth).fillMaxHeight())
-    else CcSideColumn(s, ui, Modifier.width(CcStyle.SideWidth).fillMaxHeight())
+    else CcSideColumn(s, ui, Modifier.width(CcStyle.SideWidth).fillMaxHeight().ccRegionLayer(c.bg))
   }
 }
 
