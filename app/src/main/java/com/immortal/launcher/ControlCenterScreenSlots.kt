@@ -12,12 +12,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.SubcomposeLayoutState
@@ -57,11 +60,18 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
     slotContent.getOrPut(screen) {
       {
         val active = screen == shownScreen.value
+        // True once a parked screen has had a frame to record its draw lists (see [ccSlotDraw]).
+        var settled by remember { mutableStateOf(false) }
+        LaunchedEffect(active) {
+          settled = false
+          if (!active) { withFrameNanos { }; withFrameNanos { }; settled = true }
+        }
+        val mode = ccSlotDraw(screen, active, settled)
         // A parked screen is off-screen: it stays out of the semantics tree, which Compose diffs
         // after every change while the Portal's accessibility services are on (always).
-        // It is also fully transparent, which the renderer skips outright: Compose repaints the
-        // whole window on every frame, and parked screens would otherwise be walked each time.
-        val layer = if (active) Modifier.graphicsLayer() else Modifier.graphicsLayer { alpha = 0f }.clearAndSetSemantics {}
+        val layer = Modifier.graphicsLayer { alpha = if (mode == CcSlotDraw.RECORDING) 0f else 1f }
+            .drawWithContent { if (mode != CcSlotDraw.DETACHED) drawContent() }
+            .then(if (active) Modifier else Modifier.clearAndSetSemantics {})
         Box(Modifier.fillMaxSize().then(layer)) {
           CompositionLocalProvider(LocalCcScreenActive provides active, LocalCcMotion provides (active && motionOn.value)) {
             draw(screen, if (active || screen !in CC_KEEP_ALIVE) shownState.value else frozen.getValue(screen))
@@ -111,6 +121,22 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
       }
     }
   }
+}
+
+/** How a kept-alive screen's slot draws: on screen, transparent (recording its draw lists), or not at all. */
+internal enum class CcSlotDraw { SHOWN, RECORDING, DETACHED }
+
+/**
+ * A parked screen is drawn fully transparent until it has recorded its draw lists, then left out
+ * of the render tree. The renderer skips transparent nodes when drawing but still walks every node
+ * in the tree on every frame (sync + prepare), so the four parked screens cost the map about 0.5 ms
+ * of RenderThread per frame. Their draw lists stay recorded, so showing one again only re-adds it.
+ * The map is never detached: its plan keeps cached textures, and it is the screen most returned to.
+ */
+internal fun ccSlotDraw(screen: CcScreen, active: Boolean, settled: Boolean): CcSlotDraw = when {
+  active -> CcSlotDraw.SHOWN
+  screen == CcScreen.MAP || !settled -> CcSlotDraw.RECORDING
+  else -> CcSlotDraw.DETACHED
 }
 
 /** Suspends until there has been no touch for [PREWARM_QUIET_MS]. */
