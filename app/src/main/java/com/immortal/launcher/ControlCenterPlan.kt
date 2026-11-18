@@ -20,8 +20,11 @@ import org.json.JSONObject
 internal data class CcPlan(val floors: List<CcFloor>, val updatedAt: Long = 0L) {
   val isEmpty: Boolean get() = floors.all { it.rooms.isEmpty() }
   fun floor(id: String?): CcFloor? = floors.firstOrNull { it.id == id } ?: floors.firstOrNull()
-  fun roomOf(entityId: String): CcRoom? = floors.asSequence().flatMap { it.rooms.asSequence() }
-      .firstOrNull { r -> r.devices.any { it.entityId == entityId } }
+  fun roomOf(entityId: String): CcRoom? = roomByEntity[entityId]
+  /** Device → its (first) room, built once per plan: alerts ask for every entity on every HA update. */
+  private val roomByEntity: Map<String, CcRoom> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    HashMap<String, CcRoom>().also { m -> floors.forEach { f -> f.rooms.forEach { r -> r.devices.forEach { m.putIfAbsent(it.entityId, r) } } } }
+  }
   fun room(id: String): CcRoom? = floors.asSequence().flatMap { it.rooms.asSequence() }.firstOrNull { it.id == id }
   /** Every entity the plan shows (rooms + openings) — the live subscription's core set. */
   val entityIds: Set<String>

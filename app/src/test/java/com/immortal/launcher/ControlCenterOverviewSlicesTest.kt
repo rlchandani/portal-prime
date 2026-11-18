@@ -92,9 +92,27 @@ class ControlCenterOverviewSlicesTest {
   @Test fun modelKeysCompareByValue() {
     val f = plan.floors[0]
     val s = ControlCenterConfig.Settings()
-    assertEquals(CcModelKey(f, 3, s, 10, emptyMap()), CcModelKey(f.copy(), 3, s.copy(), 10, HashMap()))
-    assertFalse(CcModelKey(f, 3, s, 10, emptyMap()) == CcModelKey(f, 4, s, 10, emptyMap()))
+    val ids = CcPlanDeps.ids(f)
+    val ents = ids.associateWith { CcEntity(it, "on") }
+    assertEquals(CcModelKey(f, CcPlanDeps.of(ids, ents), s, 10, emptyMap()), CcModelKey(f.copy(), CcPlanDeps.of(ids, HashMap(ents)), s.copy(), 10, HashMap()))
+    assertFalse(CcModelKey(f, CcPlanDeps.of(ids, ents), s, 10, emptyMap()) == CcModelKey(f, CcPlanDeps.of(ids, ents), s, 11, emptyMap()))
     assertEquals(CcPxKey(f, 100, 50, 2f), CcPxKey(f.copy(), 100, 50, 2f))
+  }
+
+  @Test fun planDepsIgnoreEntitiesTheFloorDoesNotShow() {
+    val floor = CcFloor("g", "G", listOf(CcRoom("hall", "Hall", CcRect(0, 0, 4, 4), devices = listOf(CcPlaced(lock.id, .5f, .5f)))),
+        openings = listOf(CcOpening("binary_sensor.door", "hall", CcSide.N, 1f, 1f)))
+    val ids = CcPlanDeps.ids(floor)
+    assertEquals(listOf(lock.id, "binary_sensor.door"), ids.toList())
+    val door = CcEntity("binary_sensor.door", "off")
+    val before = mapOf(lock.id to lock, door.id to door, "sensor.power" to CcEntity("sensor.power", "120"))
+    // A meter elsewhere ticks: same instances on this floor, so the model is reused.
+    assertEquals(CcPlanDeps.of(ids, before), CcPlanDeps.of(ids, before + ("sensor.power" to CcEntity("sensor.power", "125"))))
+    // HA re-sends an identical state as a new object: still equal.
+    assertEquals(CcPlanDeps.of(ids, before), CcPlanDeps.of(ids, before + (lock.id to lock.copy())))
+    // The floor's own lock changes (or disappears): rebuild.
+    assertFalse(CcPlanDeps.of(ids, before) == CcPlanDeps.of(ids, before + (lock.id to lock.copy(state = "unlocked"))))
+    assertFalse(CcPlanDeps.of(ids, before) == CcPlanDeps.of(ids, before - lock.id))
   }
 
   @Test fun kidsModelHidesWhileFullModeReusesEntities() {

@@ -65,7 +65,10 @@ internal data class CcUiState(
 
   /** Entities grouped by domain, computed once per snapshot (screens ask many times per frame). */
   private val byDomain: Map<String, List<CcEntity>> by lazy(LazyThreadSafetyMode.PUBLICATION) {
-    entities.values.groupBy { it.domain }.mapValues { (_, list) -> list.sortedBy { it.name.lowercase() } }
+    // Sort keys are lowercased once per entity, not on every comparison (this runs per HA update).
+    entities.values.groupBy { it.domain }.mapValues { (_, list) ->
+      list.map { it.name.lowercase() to it }.sortedBy { it.first }.map { it.second }
+    }
   }
   private val activeAlerts: List<CcAlert> by lazy(LazyThreadSafetyMode.PUBLICATION) { computeAlerts() }
 
@@ -90,10 +93,11 @@ internal data class CcUiState(
 
   val weather: CcEntity? get() = entities.values.firstOrNull { it.domain == "weather" }
 
-  /** Uses °F when HA reports temperatures in °F. */
-  val fahrenheit: Boolean
-    get() = entities.values.firstOrNull { CcKind.of(it) == CcKind.TEMPERATURE }?.unit?.contains("F") == true ||
+  /** Uses °F when HA reports temperatures in °F. Worked out once per snapshot (asked many times per frame). */
+  val fahrenheit: Boolean by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    entities.values.firstOrNull { CcKind.of(it) == CcKind.TEMPERATURE }?.unit?.contains("F") == true ||
         entities.values.firstOrNull { it.domain == "weather" }?.attrs?.get("temperature_unit")?.toString()?.contains("F") == true
+  }
 }
 
 private const val MS_PER_MINUTE = 60_000L

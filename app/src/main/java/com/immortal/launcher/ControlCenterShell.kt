@@ -22,15 +22,8 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import kotlinx.coroutines.delay
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.foundation.layout.offset
-import androidx.compose.runtime.key
 import androidx.compose.ui.platform.LocalContext
 
 /**
@@ -79,50 +72,11 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
 /** False for a kept-alive screen that isn't showing: cameras stop polling, nothing animates. */
 internal val LocalCcScreenActive = compositionLocalOf { true }
 
-/** Screens kept composed after the first visit so switching back costs no composition or redraw. */
-private val KEEP_ALIVE = setOf(CcScreen.MAP, CcScreen.CAMERAS, CcScreen.ENERGY, CcScreen.ALERTS, CcScreen.SECURITY)
-
-/**
- * The current screen, plus every kept-alive screen already visited, parked off-screen with the
- * snapshot it last showed (same instance, so it skips recomposition and keeps its draw lists).
- */
+/** The current screen plus the kept-alive ones (see [CcScreenSlots]). */
 @Composable
 private fun CcScreenBody(s: CcUiState, ui: CcUi) {
-  val current = ui.nav.screen
-  val visited = remember { mutableStateListOf<CcScreen>() }
-  val frozen = remember { HashMap<CcScreen, CcUiState>() }
-  if (current in KEEP_ALIVE) { if (current !in visited) visited += current; frozen[current] = s }
-  val motion = LocalCcMotion.current
-  val latest by rememberUpdatedState(s)
-  // Prewarm: once the first screen has settled, compose the other screens off-screen one at a
-  // time while nothing else happens, so a first visit is a cheap swap instead of a 50-90 ms build.
-  LaunchedEffect(Unit) {
-    delay(PREWARM_AFTER_MS)
-    KEEP_ALIVE.filter { it !in visited && !CcPolicy.screenHidden(it, latest.settings) }.forEach { screen ->
-      frozen[screen] = latest
-      visited += screen
-      delay(PREWARM_STEP_MS)
-    }
-  }
-  Box(Modifier.fillMaxSize().clipToBounds()) {
-    visited.forEach { screen ->
-      key(screen) {
-        val active = screen == current
-        val parked = if (active) Modifier.fillMaxSize() else Modifier.fillMaxSize().offset { IntOffset(PARK_OFFSET_PX, 0) }
-        Box(parked.graphicsLayer()) {
-          CompositionLocalProvider(LocalCcScreenActive provides active, LocalCcMotion provides (active && motion)) {
-            CcScreenContent(screen, if (active) s else frozen.getValue(screen), ui)
-          }
-        }
-      }
-    }
-    if (current !in KEEP_ALIVE) CcScreenContent(current, s, ui)
-  }
+  CcScreenSlots(s, ui) { screen, state -> CcScreenContent(screen, state, ui) }
 }
-
-private const val PARK_OFFSET_PX = 100_000
-private const val PREWARM_AFTER_MS = 2_500L
-private const val PREWARM_STEP_MS = 700L
 
 @Composable
 private fun CcScreenContent(screen: CcScreen, s: CcUiState, ui: CcUi) {

@@ -60,9 +60,17 @@ internal object CcSideLogic {
 
   /** Up to [SCENE_TILES] scenes/scripts: the recognisable ones first; kids don't get "leaving home". */
   fun pick(all: List<CcEntity>, kids: Boolean): List<CcEntity> =
-      all.filterNot { kids && tone(it) == CcSceneTone.LEAVE }
-          .sortedWith(compareBy<CcEntity> { tone(it) == CcSceneTone.NEUTRAL }.thenBy { tone(it).ordinal }.thenBy { it.name.lowercase() })
+      // Each entity's tone and sort name are worked out once, not on every comparison (this runs
+      // on every Home Assistant update; tone() tokenises the name).
+      all.map { SceneKey(it, tone(it), it.name.lowercase()) }
+          .filterNot { kids && it.tone == CcSceneTone.LEAVE }
+          .sortedWith(SCENE_ORDER)
           .take(SCENE_TILES)
+          .map { it.entity }
+
+  private class SceneKey(val entity: CcEntity, val tone: CcSceneTone, val sortName: String)
+
+  private val SCENE_ORDER = compareBy<SceneKey> { it.tone == CcSceneTone.NEUTRAL }.thenBy { it.tone.ordinal }.thenBy { it.sortName }
 
   /** The attention card from the active alerts (top [ATTENTION_ROWS]); the all-clear line when there are none. */
   fun attention(alerts: List<CcAlert>, entities: Map<String, CcEntity>, plan: CcPlan?, settings: ControlCenterConfig.Settings): CcAttentionSlice {

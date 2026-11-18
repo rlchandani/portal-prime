@@ -169,6 +169,9 @@ internal class CcPlanDraw(
         alpha = breathe, style = focusStroke)
   }
 
+  /** True when [drawAnimated] draws anything at all (an Energy lens with no flows has nothing to move). */
+  val animates: Boolean get() = model.pulses.isNotEmpty() || flows?.lines?.isNotEmpty() == true || (focus != null && focus in px.rects)
+
   private fun frac(v: Float): Float = v - kotlin.math.floor(v)
 
   companion object {

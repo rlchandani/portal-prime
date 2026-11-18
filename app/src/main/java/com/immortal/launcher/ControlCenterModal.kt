@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
@@ -73,7 +74,7 @@ private fun ModalFrame(ui: CcUi, open: Boolean, pop: CcPresence, fade: CcPresenc
   val c = LocalCc.current
   val lift = with(LocalDensity.current) { MODAL_LIFT.toPx() }
   Box(Modifier.fillMaxSize()) {
-    Box(Modifier.fillMaxSize().graphicsLayer { alpha = fade.progress.value }.background(c.scrim)
+    Box(Modifier.fillMaxSize().graphicsLayer { alpha = fade.progress.value; compositingStrategy = CompositingStrategy.ModulateAlpha }.background(c.scrim)
         .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null) { ui.modal(null) }
             .semantics { contentDescription = "Dismiss" } else Modifier))
     Column(Modifier.align(Alignment.Center).width(CcStyle.ModalWidth)

@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
@@ -53,8 +54,9 @@ internal sealed interface CcPlanHit {
  *     markers) and 6. top (names + captions, energy nodes) — redraw only when the derived
  *     [CcPlanModel] / lens / focus change (equal models skip);
  *  5. animation (pulses, energy dashes, focus edge, scene walk) — the only layer read per frame,
- *     and it only exists while [LocalCcMotion] is on and something animates. With motion off the
- *     same marks are drawn once, still, in the over layer.
+ *     and it only exists while [LocalCcMotion] is on and something visibly animates
+ *     ([CcPlanDraw.animates]). With motion off the same marks are drawn once, still, in the over layer.
+ * Layers 1-4 and 6 keep their pixels in offscreen textures (see the comments at each).
  */
 @Composable
 internal fun CcPlanCanvas(
@@ -90,30 +92,39 @@ internal fun CcPlanCanvas(
     CcPlanDraw(model, px, flows, paint, c, labels, chipText, lens, focus, stale, dashes, sources, fahrenheit, density.density)
   }
   val motion = LocalCcMotion.current
-  val loops = model.pulses.isNotEmpty() || flows != null || focus != null
   val latestTap by rememberUpdatedState(onTap)
   val description = remember(model.views) { "Floor plan: " + model.views.joinToString(", ") { it.room.name } }
   val ready = size != IntSize.Zero && px.fit.scale > 0f
   Box(modifier.onSizeChanged { size = it }.semantics { contentDescription = description }
       .pointerInput(px, model) { detectTapGestures { pos -> hit(model, px, pos, TAP_DP.dp.toPx())?.let { latestTap(it) } } }) {
     if (!ready) return@Box
-    PlanLayer { base.drawFloors(this) }
-    PlanLayer { ctx.drawUnder(this) }
-    PlanLayer { base.drawWalls(this) }
+    val loops = ctx.animates
     val still = !motion && loops
-    PlanLayer {
-      ctx.drawOver(this)
-      if (still) ctx.drawAnimated(this, STILL_T)
+    // Layers 1-4 rasterize once into one GPU texture: an animation frame (or the sheet sliding
+    // over the plan) then blits it instead of replaying every fill, glow and wall path.
+    Box(Modifier.fillMaxSize().graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)) {
+      PlanLayer { base.drawFloors(this) }
+      PlanLayer { ctx.drawUnder(this) }
+      PlanLayer { base.drawWalls(this) }
+      PlanLayer {
+        ctx.drawOver(this)
+        if (still) ctx.drawAnimated(this, STILL_T)
+      }
     }
     if (motion && (loops || walk != null)) CcPlanAnimLayer(ctx, walk, model.floor, loops)
-    PlanLayer { ctx.drawTop(this) }
+    // Labels sit above the motion; their soft text shadows are blurs, so they get a texture too.
+    PlanLayer(cached = true) { ctx.drawTop(this) }
   }
 }
 
-/** One cached RenderNode; its draw lambda is memoized by what it captures, so it re-records only when those change. */
+/**
+ * One RenderNode; its draw lambda is memoized by what it captures, so it re-records only when
+ * those change. [cached] also keeps its pixels in an offscreen texture between re-records.
+ */
 @Composable
-private fun PlanLayer(draw: DrawScope.() -> Unit) {
-  Spacer(Modifier.fillMaxSize().graphicsLayer().drawBehind(draw))
+private fun PlanLayer(cached: Boolean = false, draw: DrawScope.() -> Unit) {
+  val layer = if (cached) Modifier.graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen) else Modifier.graphicsLayer()
+  Spacer(Modifier.fillMaxSize().then(layer).drawBehind(draw))
 }
 
 /**

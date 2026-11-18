@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
@@ -75,13 +76,14 @@ private fun SheetFrame(ui: CcUi, open: Boolean, slide: CcPresence, scrim: CcPres
   val c = LocalCc.current
   val widthPx = with(LocalDensity.current) { (CcStyle.SheetWidth + SHEET_INSET).toPx() }
   Box(Modifier.fillMaxSize()) {
-    Box(Modifier.fillMaxSize().graphicsLayer { alpha = scrim.progress.value }.background(c.scrim)
+    Box(Modifier.fillMaxSize().graphicsLayer { alpha = scrim.progress.value; compositingStrategy = CompositingStrategy.ModulateAlpha }.background(c.scrim)
         .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null, onClick = ui::closeSheets)
             .semantics { contentDescription = "Close" } else Modifier))
     Column(Modifier.align(Alignment.CenterEnd).padding(SHEET_INSET).width(CcStyle.SheetWidth).fillMaxHeight()
         .graphicsLayer { translationX = (1f - slide.progress.value) * widthPx * SLIDE_OVERSHOOT }
         .shadow(if (c.dark) 40.dp else 24.dp, CcStyle.Sheet, ambientColor = Color.Black, spotColor = Color.Black)
-        .clip(CcStyle.Sheet).background(c.bg)
+        // The page rasterizes once into a texture; sliding then moves the texture, not every tile.
+        .graphicsLayer { shape = CcStyle.Sheet; clip = true; compositingStrategy = CompositingStrategy.Offscreen }.background(c.bg)
         .clickable(remember { MutableInteractionSource() }, indication = null) {}, content = content)
   }
 }

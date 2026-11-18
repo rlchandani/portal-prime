@@ -62,7 +62,10 @@ private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan) {
   // Derived once per entity version / minute; an equal model makes every plan layer skip.
   // Floors already shown keep their model while nothing they depend on changed (LRU of a few floors).
   val models = remember { CcLru<String, Pair<CcModelKey, CcPlanModel>>(FLOOR_CACHE) }
-  val key = CcModelKey(floor, s.entitiesVersion, s.settings, s.minute, s.appliancesDone)
+  // Keyed by the entities this floor actually shows, so an HA update elsewhere in the house
+  // (power meters, other floors) reuses the model instead of rebuilding it.
+  val depIds = remember(floor) { CcPlanDeps.ids(floor) }
+  val key = CcModelKey(floor, CcPlanDeps.of(depIds, s.entities), s.settings, s.minute, s.appliancesDone)
   val model = remember(key) {
     models[floor.id]?.takeIf { it.first == key }?.second
         ?: CcPlanModel.build(floor, s.entities, s.settings, s.now, s.appliancesDone).also { models.put(floor.id, key to it) }
@@ -141,5 +144,28 @@ private const val WALK_HOLD_MS = 1_200L
 private const val FLOOR_CACHE = 4
 
 /** Everything a floor's [CcPlanModel] depends on. */
-internal data class CcModelKey(val floor: CcFloor, val version: Long, val settings: ControlCenterConfig.Settings, val minute: Long,
+internal data class CcModelKey(val floor: CcFloor, val deps: CcPlanDeps, val settings: ControlCenterConfig.Settings, val minute: Long,
                                 val done: Map<String, Long>)
+
+/**
+ * The entities one floor's model reads — its rooms' devices and its openings — in a fixed order.
+ * Equal when every slot holds the same instance (the engine keeps unchanged entities) or an
+ * equal one (HA re-sent the same state).
+ */
+internal class CcPlanDeps(private val refs: Array<CcEntity?>) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is CcPlanDeps || other.refs.size != refs.size) return false
+    for (i in refs.indices) if (refs[i] !== other.refs[i] && refs[i] != other.refs[i]) return false
+    return true
+  }
+
+  override fun hashCode(): Int = refs.size
+
+  companion object {
+    fun ids(floor: CcFloor): Array<String> =
+        (floor.rooms.flatMap { r -> r.devices.map { it.entityId } } + floor.openings.map { it.entityId }).distinct().toTypedArray()
+
+    fun of(ids: Array<String>, entities: Map<String, CcEntity>): CcPlanDeps = CcPlanDeps(Array(ids.size) { entities[ids[it]] })
+  }
+}

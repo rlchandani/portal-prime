@@ -1,0 +1,129 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+package com.immortal.launcher
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.SubcomposeLayoutState
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import kotlinx.coroutines.delay
+
+/** Screens kept composed after the first visit so switching back costs no composition or redraw. */
+internal val CC_KEEP_ALIVE = setOf(CcScreen.MAP, CcScreen.CAMERAS, CcScreen.ENERGY, CcScreen.ALERTS, CcScreen.SECURITY)
+
+/**
+ * The current screen, plus every kept-alive screen already visited, parked off-screen with the
+ * snapshot it last showed (same instance, so it skips recomposition and keeps its draw lists).
+ *
+ * Each screen is its own subcomposition, so the prewarm can build an unvisited screen a few
+ * milliseconds per frame (a paused precomposition) instead of in one 50-90 ms frame, and a first
+ * visit is then a cheap swap.
+ */
+@Composable
+internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScreen, CcUiState) -> Unit) {
+  val current = ui.nav.screen
+  val visited = remember { mutableStateListOf<CcScreen>() }
+  val frozen = remember { HashMap<CcScreen, CcUiState>() }
+  if (current in CC_KEEP_ALIVE) { if (current !in visited) visited += current; frozen[current] = s }
+  val motion = LocalCcMotion.current
+  val latest by rememberUpdatedState(s)
+  val shownScreen = rememberUpdatedState(current)
+  val shownState = rememberUpdatedState(s)
+  val motionOn = rememberUpdatedState(motion)
+  val draw by rememberUpdatedState(content)
+  val slots = remember { SubcomposeLayoutState() }
+  val warming = remember { CcWarming() }
+  // One content lambda per screen, created once: it reads the current screen / state / motion
+  // through State, so a slot recomposes only when those change, and a prewarmed composition is
+  // exactly the one the layout later adopts.
+  val slotContent = remember { HashMap<CcScreen, @Composable () -> Unit>() }
+  val slot: (CcScreen) -> @Composable () -> Unit = { screen ->
+    slotContent.getOrPut(screen) {
+      {
+        val active = screen == shownScreen.value
+        // A parked screen is off-screen: it stays out of the semantics tree, which Compose diffs
+        // after every change while the Portal's accessibility services are on (always).
+        // It is also fully transparent, which the renderer skips outright: Compose repaints the
+        // whole window on every frame, and parked screens would otherwise be walked each time.
+        val layer = if (active) Modifier.graphicsLayer() else Modifier.graphicsLayer { alpha = 0f }.clearAndSetSemantics {}
+        Box(Modifier.fillMaxSize().then(layer)) {
+          CompositionLocalProvider(LocalCcScreenActive provides active, LocalCcMotion provides (active && motionOn.value)) {
+            draw(screen, if (active || screen !in CC_KEEP_ALIVE) shownState.value else frozen.getValue(screen))
+          }
+        }
+      }
+    }
+  }
+
+  LaunchedEffect(Unit) {
+    delay(PREWARM_AFTER_MS)
+    for (screen in CC_KEEP_ALIVE) {
+      if (screen in visited || CcPolicy.screenHidden(screen, latest.settings)) continue
+      frozen[screen] = latest
+      val paused = slots.createPausedPrecomposition(screen, slot(screen))
+      warming.start(screen, paused)
+      var done = false
+      while (!done && warming.screen == screen) {
+        withFrameNanos { }
+        if (warming.screen != screen) break // visited (and cancelled by the layout) meanwhile
+        // A visit (or another frame's work) owns this frame: compose only within a small budget.
+        val deadline = System.nanoTime() + PREWARM_FRAME_BUDGET_NS
+        done = shownScreen.value != screen && paused.resume { System.nanoTime() > deadline }
+      }
+      if (done && warming.screen == screen) {
+        paused.apply()
+        warming.clear()
+        if (screen !in visited) visited += screen
+        delay(PREWARM_STEP_MS)
+      }
+    }
+  }
+
+  SubcomposeLayout(slots, Modifier.fillMaxSize().clipToBounds()) { constraints ->
+    // A screen visited while it was still warming is composed for real now.
+    warming.screen?.let { if (it == current) warming.cancel() }
+    val ids = if (current in CC_KEEP_ALIVE) visited.toList() else visited.toList() + current
+    val placed = ids.map { screen -> screen to subcompose(screen, slot(screen)).map { it.measure(constraints) } }
+    layout(constraints.maxWidth, constraints.maxHeight) {
+      for ((screen, ps) in placed) {
+        val x = if (screen == current) 0 else PARK_OFFSET_PX
+        ps.forEach { it.place(x, 0) }
+      }
+    }
+  }
+}
+
+/** The one screen being prewarmed (if any) and its paused composition. */
+private class CcWarming {
+  var screen: CcScreen? = null
+    private set
+  private var paused: SubcomposeLayoutState.PausedPrecomposition? = null
+
+  fun start(s: CcScreen, p: SubcomposeLayoutState.PausedPrecomposition) { screen = s; paused = p }
+
+  fun cancel() { paused?.cancel(); clear() }
+
+  fun clear() { screen = null; paused = null }
+}
+
+private const val PARK_OFFSET_PX = 100_000
+private const val PREWARM_AFTER_MS = 2_500L
+private const val PREWARM_STEP_MS = 700L
+/** Composition time a prewarm may take per frame (the rest of the 16.7 ms is the frame's own work). */
+private const val PREWARM_FRAME_BUDGET_NS = 5_000_000L

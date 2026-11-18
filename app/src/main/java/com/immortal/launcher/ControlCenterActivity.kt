@@ -35,6 +35,9 @@ class ControlCenterActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     val start = screenOf(intent)
     setContent { CcApp(motion = motion.value, initialScreen = start ?: CcScreen.MAP, requested = requested.value, onExit = ::finish) }
+    // The Compose root paints the whole window opaque, so the theme's window background would only
+    // be a second full-screen fill on every frame.
+    window.setBackgroundDrawable(null)
   }
 
   override fun onNewIntent(intent: Intent) {
