@@ -45,39 +45,50 @@ import com.immortal.launcher.settings.ControlCenterSettings
 
 /**
  * PIN pad (`security-pin`): the alarm code goes to Home Assistant with the arm/disarm call (never
- * stored here); the kids-mode PIN is checked against the salted hash on this Portal. Auto-submits
- * at [ControlCenterConfig.Settings.pinLength] digits; a wrong code shakes the dots.
+ * stored here); the kids-mode PIN is checked against the salted hash on this Portal. The alarm pad
+ * auto-submits at [ControlCenterConfig.Settings.pinLength] digits; the kids pad never shows its PIN's
+ * length (dots only as typed, then "Leave kids mode") and shares [CcKidsPinAttempts]' tries and rest.
+ * A wrong code shakes the dots.
  */
 @Composable
 internal fun CcPinModal(s: CcUiState, ui: CcUi, m: CcModal.Pin) {
   val kids = m.panelId == null
   if (kids && !ControlCenterConfig.hasKidsPin(ui.context)) { NoKidsPin(ui); return }
-  var entry by remember(m) { mutableStateOf(CcPinEntry(s.settings.pinLength)) }
+  var entry by remember(m) {
+    mutableStateOf(if (kids) CcKidsPinAttempts.open(SystemClock.elapsedRealtime()) else CcPinEntry(s.settings.pinLength))
+  }
+  fun put(e: CcPinEntry) { entry = e; if (kids) CcKidsPinAttempts.keep(e) }
   val panel = m.panelId?.let { s.entity(it) }
   fun submit(code: String) {
     if (kids) {
       if (ControlCenterConfig.checkKidsPin(ui.context, code)) {
+        CcKidsPinAttempts.reset()
         ControlCenterSettings.set(ui.context, "portalMode", ControlCenterConfig.MODE_FULL)
         ui.modal(null)
-      } else entry = entry.failed(SystemClock.elapsedRealtime())
+      } else put(entry.failed(SystemClock.elapsedRealtime()))
       return
     }
     if (panel == null) { entry = entry.unchecked("Home Assistant has no alarm panel"); return }
     ControlCenter.alarm(ui.context, panel, m.mode ?: CcAlarmMode.DISARM, code) { ok, msg ->
       when {
         ok -> if (ui.nav.modal == m) ui.modal(null)
-        msg == null -> entry = entry.unchecked(s.connection.disabledReason ?: "Couldn't reach Home Assistant")
-        else -> entry = entry.failed(SystemClock.elapsedRealtime())
+        msg == null -> put(entry.unchecked(s.connection.disabledReason ?: "Couldn't reach Home Assistant"))
+        else -> put(entry.failed(SystemClock.elapsedRealtime()))
       }
     }
   }
   CcModalTitle(m.title, m.subtitle, center = true)
   PinDots(entry)
   PinStatus(entry)
-  PinPad(enabled = !entry.busy && (kids || s.connection.canControl), onCancel = { ui.modal(null) }) { key ->
+  val onKey: (Char) -> Unit = { key ->
     val (next, code) = entry.press(key, SystemClock.elapsedRealtime())
-    entry = next
+    put(next)
     code?.let(::submit)
+  }
+  PinPad(enabled = !entry.busy && (kids || s.connection.canControl), onCancel = { ui.modal(null) }, onKey = onKey)
+  if (!entry.autoSubmit) CcModalActions {
+    CcButton("Leave kids mode", { onKey(CcPinEntry.ENTER) }, ModalButton, style = CcButtonStyle.PRIMARY,
+        enabled = !entry.busy && entry.digits.isNotEmpty())
   }
   Text(if (kids) "Checked on this Portal, never sent anywhere" else "Checked by Home Assistant, never stored on the Portal",
       color = LocalCc.current.sec, fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 20.dp))
@@ -95,12 +106,14 @@ private fun PinDots(entry: CcPinEntry) {
       -shakePx at SHAKE_MS / 5; shakePx at SHAKE_MS * 2 / 5; -shakePx at SHAKE_MS * 3 / 5; shakePx at SHAKE_MS * 4 / 5
     })
   }
-  Row(Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 18.dp).graphicsLayer { translationX = shake.value }
-      .semantics { contentDescription = "${entry.digits.length} of ${entry.length} digits" },
+  // Without auto-submit the code's length is secret: only the digits typed so far show as dots.
+  val shown = if (entry.autoSubmit) entry.length else entry.digits.length
+  Row(Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 18.dp).height(DOT).graphicsLayer { translationX = shake.value }
+      .semantics { contentDescription = if (entry.autoSubmit) "${entry.digits.length} of ${entry.length} digits" else "${entry.digits.length} digits" },
       horizontalArrangement = Arrangement.spacedBy(26.dp, Alignment.CenterHorizontally)) {
-    repeat(entry.length) { i ->
+    repeat(shown) { i ->
       val filled = i < entry.digits.length
-      Box(Modifier.size(30.dp).clip(CircleShape).border(3.dp, c.text, CircleShape).then(if (filled) Modifier.background(c.text) else Modifier))
+      Box(Modifier.size(DOT).clip(CircleShape).border(3.dp, c.text, CircleShape).then(if (filled) Modifier.background(c.text) else Modifier))
     }
   }
 }
@@ -151,4 +164,5 @@ private fun NoKidsPin(ui: CcUi) {
 }
 
 private val SHAKE = 14.dp
+private val DOT = 30.dp
 private const val SHAKE_MS = 450
