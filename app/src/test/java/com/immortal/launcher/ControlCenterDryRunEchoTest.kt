@@ -24,6 +24,13 @@ class ControlCenterDryRunEchoTest {
   }
 
   @Test
+  fun transitionalStates_settleLikeTheDeviceFinished() {
+    assertEquals("open", dryRunEcho(closed, CcOptimistic(state = "opening"), now = 9_000L).state)
+    val open = closed.copy(state = "open")
+    assertEquals("closed", dryRunEcho(open, CcOptimistic(state = "closing"), now = 9_000L).state)
+  }
+
+  @Test
   fun attributeOnlyChange_keepsLastChanged() {
     val on = CcEntity("light.desk", "on", mapOf("brightness" to 10), lastChanged = 1_000L)
     val echo = dryRunEcho(on, CcOptimistic(brightnessPct = 50), now = 9_000L)

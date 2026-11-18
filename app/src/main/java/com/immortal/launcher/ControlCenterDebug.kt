@@ -70,11 +70,17 @@ internal object CcTestPlan {
 
 // --- engine side (engine thread) ----------------------------------------------------------
 
-/** What HA would echo for [opt]: a state change also restarts `last_changed` (attributes alone don't). */
+/**
+ * What HA would end up echoing for [opt]: a transition settles (no device will report "open" later
+ * in a dry run, so "opening" would stick), and a state change restarts `last_changed`.
+ */
 internal fun dryRunEcho(raw: CcEntity, opt: CcOptimistic, now: Long): CcEntity {
-  val next = opt.applyTo(raw)
+  val applied = opt.applyTo(raw)
+  val next = DRY_RUN_SETTLED[applied.state]?.let { applied.copy(state = it) } ?: applied
   return if (next.state == raw.state) next else next.copy(lastChanged = now, userId = null)
 }
+
+private val DRY_RUN_SETTLED = mapOf("opening" to "open", "closing" to "closed")
 
 /** Dry run: log, then behave as if HA had echoed the optimistic state at once. */
 internal fun CcEngine.dryRunCall(call: CcCall, onResult: ((Boolean, String?) -> Unit)?) {
