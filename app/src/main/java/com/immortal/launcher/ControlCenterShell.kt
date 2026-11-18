@@ -24,6 +24,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 
 /**
@@ -46,7 +48,7 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
   CcTheme(dark = state.settings.darkTheme) {
     CompositionLocalProvider(LocalCcMotion provides (motion && !state.settings.reducedMotion)) {
       val c = LocalCc.current
-      Box(Modifier.fillMaxSize().background(c.bg)) {
+      Box(Modifier.fillMaxSize().background(c.bg).ccObserveTouches(ui)) {
         if (state.settings.bannersOnly) CcBannersOnly(onExit)
         else {
           Row(Modifier.fillMaxSize()) {
@@ -119,3 +121,13 @@ private fun BoxScope.CcBannersOnly(onExit: () -> Unit) {
 }
 
 private val DAY_PART = Regex(" (morning|afternoon|evening|night)")
+
+/** Notes every touch (without consuming it) so the prewarm only works while nobody is touching. */
+private fun Modifier.ccObserveTouches(ui: CcUi): Modifier = pointerInput(ui) {
+  awaitPointerEventScope {
+    while (true) {
+      awaitPointerEvent(PointerEventPass.Initial)
+      ui.touched(android.os.SystemClock.uptimeMillis())
+    }
+  }
+}

@@ -75,11 +75,15 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
     delay(PREWARM_AFTER_MS)
     for (screen in CC_KEEP_ALIVE) {
       if (screen in visited || CcPolicy.screenHidden(screen, latest.settings)) continue
+      awaitQuiet(ui)
       frozen[screen] = latest
       val paused = slots.createPausedPrecomposition(screen, slot(screen))
       warming.start(screen, paused)
       var done = false
       while (!done && warming.screen == screen) {
+        // A composition step can overrun its budget (one big group can't pause), so steps run
+        // only while nobody is touching: a tap never lands on a prewarm step.
+        awaitQuiet(ui)
         withFrameNanos { }
         if (warming.screen != screen) break // visited (and cancelled by the layout) meanwhile
         // A visit (or another frame's work) owns this frame: compose only within a small budget.
@@ -109,6 +113,21 @@ internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScree
   }
 }
 
+/** Suspends until there has been no touch for [PREWARM_QUIET_MS]. */
+private suspend fun awaitQuiet(ui: CcUi) {
+  while (true) {
+    val wait = ccQuietWait(android.os.SystemClock.uptimeMillis(), ui.lastInputAt)
+    if (wait == 0L) return
+    delay(wait)
+  }
+}
+
+/** How long to wait (0 = go now) until [lastInputAt] is [PREWARM_QUIET_MS] in the past; polls at least every [PREWARM_POLL_MS]. */
+internal fun ccQuietWait(now: Long, lastInputAt: Long): Long {
+  val quietFor = now - lastInputAt
+  return if (quietFor >= PREWARM_QUIET_MS) 0L else maxOf(PREWARM_POLL_MS, PREWARM_QUIET_MS - quietFor)
+}
+
 /** The one screen being prewarmed (if any) and its paused composition. */
 private class CcWarming {
   var screen: CcScreen? = null
@@ -123,7 +142,11 @@ private class CcWarming {
 }
 
 private const val PARK_OFFSET_PX = 100_000
-private const val PREWARM_AFTER_MS = 2_500L
+/** Past the opening frames and animations. */
+private const val PREWARM_AFTER_MS = 4_000L
+/** No touch for this long before (and during) prewarm steps. */
+private const val PREWARM_QUIET_MS = 3_000L
+private const val PREWARM_POLL_MS = 250L
 private const val PREWARM_STEP_MS = 700L
 /** Composition time a prewarm may take per frame (the rest of the 16.7 ms is the frame's own work). */
 private const val PREWARM_FRAME_BUDGET_NS = 5_000_000L

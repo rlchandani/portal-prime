@@ -82,6 +82,12 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
   val openModal: CcModal? get() = modalOf.value
   val cameraFull: String? get() = cameraFullOf.value
 
+  /** Uptime of the last touch anywhere on the Control Center (background work waits for quiet). */
+  @Volatile var lastInputAt: Long = 0L
+    private set
+
+  fun touched(now: Long) { lastInputAt = now }
+
   fun go(screen: CcScreen) {
     if (CcPolicy.screenHidden(screen, stateOf().settings)) return
     set(nav.copy(screen = screen, sheets = emptyList(), modal = null, cameraFull = null, highlightRoom = null))
