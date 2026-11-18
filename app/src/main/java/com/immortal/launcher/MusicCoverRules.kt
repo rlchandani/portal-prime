@@ -14,9 +14,8 @@ package com.immortal.launcher
  *   and Home's dialogs and sheets COVER it: music pauses while one shows; when the last one closes it
  *   resumes by itself only if it was playing when covered. Any pause meanwhile (or leaving the
  *   screen) cancels that, so a later Play is the user's.
- * - Everything smaller AVOIDS it instead: Home's toasts centre in the space left of the card, and a
- *   bottom-anchored notification toast moves to the top while the card shows the player
- *   ([avoidBottom]).
+ * - Everything smaller AVOIDS it instead, wherever the card has been dragged ([MusicCardAvoidance]):
+ *   Home's bottom toasts centre beside it, and a notification toast takes the screen edge away from it.
  *
  * The sleep timer survives a cover (it is not the user's pause). Pure.
  */
@@ -39,12 +38,6 @@ internal object MusicCoverRules {
     if (!resume || !open.canPlay) return YtStep(open)
     return YtEngineReducer.play(open.copy(playWhenVisible = false))
   }
-
-  /**
-   * True when a full-width bottom toast would land on the player: Home's card sits bottom-right above
-   * the dock. The Music screen places its own toasts.
-   */
-  fun avoidBottom(shownIn: MusicPlayerHostKind?): Boolean = shownIn == MusicPlayerHostKind.HOME_CARD
 }
 
 /** Who is drawing over the player. Several can at once; the player is covered while any is. */

@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 /** Music v3 glyphs drawn on a 24-unit grid (mirrors the mock's SVGs; decorative only). */
 internal enum class MusicV3Glyph {
   PLAY, PAUSE, PREVIOUS, NEXT, SPEAKER, GRIP, MORE, DOWN, RIGHT, CHECK, SHUFFLE, EQ,
-  REPEAT, UP, LIST, GRID, MOVE, FOLLOW, SPEAKER_LOW, HUSH,
+  REPEAT, UP, LIST, GRID, MOVE, FOLLOW, SPEAKER_LOW, HUSH, EXPAND, COLLAPSE,
 }
 
 @Composable
@@ -79,6 +79,15 @@ internal fun MusicV3GlyphIcon(glyph: MusicV3Glyph, color: Color, modifier: Modif
         drawArc(color, -50f, 100f, false, Offset(10f * u, 7f * u), Size(7f * u, 10f * u), style = Stroke(2f * u, cap = StrokeCap.Round))
       }
       MusicV3Glyph.HUSH -> { speakerBody(color, u); line(color, u, 15.5f, 9.5f, 20.5f, 14.5f); line(color, u, 20.5f, 9.5f, 15.5f, 14.5f) }
+      // Two corner arrows pointing out (restore the full card) / in (minimize to the video tile).
+      MusicV3Glyph.EXPAND -> {
+        line(color, u, 14f, 4f, 20f, 4f); line(color, u, 20f, 4f, 20f, 10f); line(color, u, 20f, 4f, 13.5f, 10.5f)
+        line(color, u, 4f, 14f, 4f, 20f); line(color, u, 4f, 20f, 10f, 20f); line(color, u, 4f, 20f, 10.5f, 13.5f)
+      }
+      MusicV3Glyph.COLLAPSE -> {
+        line(color, u, 13.5f, 4.5f, 13.5f, 10.5f); line(color, u, 13.5f, 10.5f, 19.5f, 10.5f); line(color, u, 13.5f, 10.5f, 20f, 4f)
+        line(color, u, 4.5f, 13.5f, 10.5f, 13.5f); line(color, u, 10.5f, 13.5f, 10.5f, 19.5f); line(color, u, 10.5f, 13.5f, 4f, 20f)
+      }
     }
   }
 }

@@ -28,18 +28,41 @@ really (re)built.
 ## Home's Now Playing card
 
 - Shown whenever a song is current and the Music screen is closed, except while customizing Home
-  or after ✕ (`MusicHomeCardRules`). ✕ pauses and hides; the card returns when music plays again.
-  A card left paused hides itself after 10 minutes.
-- Bottom-right, above the favourites strip, floating over the widget area (the saved Home layout is
-  untouched). 788×256 dp: the player at the Music stage's 384×216 dp, then title/artist (tap opens
-  Music), ✕, previous / play-pause / next (64–76 dp) and the speaker volume (quiet-hours capped).
+  or after it hid itself (`MusicHomeCardRules`): a card left paused hides after 10 minutes (only
+  while paused) and returns when music plays again.
+- 788×256 dp: the player at the Music stage's 384×216 dp, then title/artist (tap opens Music),
+  minimize, previous / play-pause / next (64–76 dp) and the speaker volume (quiet-hours capped).
   Colours come from the song's artwork palette, light or dark like the Music stage.
-- A playing card keeps the screen awake and blocks the screensaver, like the Music screen.
+- **Draggable** (`MusicHomeFloatingPlayer`, `MusicFloatMath`): drag it by its chrome (the player
+  keeps its own touches) anywhere in Home's content area, between the header bar and the
+  favourites strip / dock, with a 24 dp side and 16 dp top margin. A drag may stretch 12 dp past the
+  bounds; the release springs it back inside and snaps onto an edge within 32 dp. It only moves the
+  same view (`Modifier.offset`): no re-attach, no reload. First appearance: bottom-right.
+- **Minimize, not close**: the old ✕ (now a collapse glyph, "Minimize player, music keeps playing")
+  turns the card into a video-only tile: the same player at 208×208 dp (YouTube minimum 200), and
+  beside it — never over it — a 64 dp rail with expand and a drag grip. The player keeps playing
+  (still visible, uncovered), so the header chip keeps controlling it. Expand restores the card.
+  The player is always the card's first child, so switching modes only resizes the same view.
+  Only Pause (chip, card, media keys, a phone) stops the music.
+- The card and the tile each remember their own spot on this Portal
+  (`MusicFloatPositionStore`, SharedPreferences `immortal_music_home_card`, `v1:<fx>,<fy>` fractions
+  of the free travel, so a spot survives another tab or a size change).
+- A playing card or tile keeps the screen awake and blocks the screensaver, like the Music screen.
 
 ## Header chip
 
-`MusicV3HomeChip` gains Play/Pause and Next (64 dp). Play brings the card back (the player must be
-on screen to play) and starts the song there; after a restart it first loads the saved queue.
+`MusicV3HomeChip` is compact and fixed at 198 dp: the song's cover (tap opens Music), Play/Pause
+and Next (64 dp). No title text; the cover's accessibility label names the song. Play brings the
+card back (the player must be on screen to play) and starts the song there; after a restart it
+first loads the saved queue.
+
+`HomeHeaderBudget` keeps every round header button at 68 dp: below the needed width optional pieces
+drop in order — mini player, "Connected" text, room name, wordmark, and last the chip. The room
+name also ellipsizes as a weighted child. At 1920 dp (the Portal) everything but the legacy mini
+player fits; at 1280 dp the chip and all buttons stay, the text goes.
+
+Checked on the Family Portal (2026-11-17, 1920×1280 dp): chip 223 px (198 dp), every header button
+77 px (68 dp), paused or playing.
 
 ## What may cover the player (`MusicCoverRules`)
 
@@ -47,9 +70,11 @@ on screen to play) and starts the song there; after a restart it first loads the
   follow-me "Continue here?" ask (all full-screen scrims), and Home's dialogs and sheets. Music
   pauses while one shows; when the last closes it resumes only if it was playing when covered. Any
   pause meanwhile, or leaving the screen, cancels that. The sleep timer is kept.
-- **Avoid it:** Home's bottom toasts centre in the space left of the card; a bottom-anchored MQTT
-  notification moves to the top while the card shows the player. The follow-me banner is a top
-  strip and does not reach it.
+- **Avoid it** wherever it was dragged (`MusicCardAvoidance`, fed by the card's resting rectangle):
+  Home's bottom toasts centre in the wider space beside the card or tile when it reaches their
+  220 dp band; a full-width MQTT notification takes the screen edge away from it (bottom → top while
+  it rests in the lower half, top → bottom in the upper half). The follow-me banner is a top strip
+  above the content area and does not reach it.
 - Customize hides the card (it would sit on the widgets being arranged), so the music pauses as
   when leaving the screen.
 

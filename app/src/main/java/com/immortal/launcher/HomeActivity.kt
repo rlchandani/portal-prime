@@ -166,6 +166,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -1408,7 +1409,7 @@ private fun LauncherScreen(
   BackHandler(enabled = musicLayout != null) { musicLayout = null }
   // Home's Now Playing card hosts the YouTube player once the Music screen closes (no pause).
   val musicCard = rememberMusicHomeCardShown(musicOpen = musicLayout != null, customizing = editMode)
-  val toastEnd = if (musicCard) MusicHomeCardDims.TOAST_RESERVE.dp else 0.dp
+  val toastInsets = rememberMusicToastInsets(musicCard)
   MusicHomeDialogCover(showLibrary || addFlow.pickerSlot != null || addFlow.draft != null || showPair || showSleep ||
       showSearch || pendingSetting != null || appMenu != null)
   MusicVideoScreenHold()
@@ -1422,19 +1423,31 @@ private fun LauncherScreen(
       Box(Modifier.matchParentSize().graphicsLayer {}) { ApprovedHomeBackground() }
       Column(Modifier.fillMaxSize()) {
         // Launcher chrome trimmed 108 → 92dp; the 68dp header buttons keep a 12dp margin (Home v2 space).
-        Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = LauncherEdge),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-          Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-            HearthpaneWordmark(ApprovedHomePalette.Text)
-            Box(Modifier.padding(horizontal = 12.dp).width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))
-            Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
+        val hey by produceState<String?>(null, installedApps) { value = withContext(Dispatchers.IO) { heyPackage(context) } }
+        val showCustomize = selectedTab == ApprovedLauncherTab.HOME && musicLayout == null
+        // Optional header pieces drop at narrow widths so the round buttons never squish.
+        val header = HomeHeaderBudget.plan(LocalConfiguration.current.screenWidthDp, HomeHeaderItems(
+            musicChip = musicLayout == null, miniPlayer = settings.showMiniPlayer, mic = hey != null,
+            customize = showCustomize))
+        Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = HomeHeaderBudget.EDGE.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.GAP.dp)) {
+          if (header.wordmark || header.room) {
+            Row(Modifier.weight(1f, fill = false), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+              if (header.wordmark) HearthpaneWordmark(ApprovedHomePalette.Text)
+              if (header.wordmark && header.room)
+                Box(Modifier.padding(horizontal = 12.dp).width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))
+              if (header.room) Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1,
+                  overflow = TextOverflow.Ellipsis)
+            }
           }
           ApprovedHeaderButton("screensaver", "Start screensaver", onStartScreensaver)
-          if (musicLayout == null) MusicV3HomeChip { musicResume = true; onOpenMusic() }
+          if (header.musicChip) MusicV3HomeChip { musicResume = true; onOpenMusic() }
           Spacer(Modifier.weight(1f))
           ApprovedHomeIcon("wifi", Modifier.size(22.dp))
-          Text(when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" }, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
-          if (selectedTab == ApprovedLauncherTab.HOME && musicLayout == null)
+          if (header.connectedLabel)
+            Text(when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" }, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
+          if (showCustomize)
             ApprovedHomeTextButton(if (editMode) "Done" else "Customize") { editMode = !editMode }
           ApprovedHeaderButton("remote", "Connect your phone") {
             val (url, pin) = enableRemoteAndMintPin(context)
@@ -1442,7 +1455,6 @@ private fun LauncherScreen(
           }
           ApprovedHeaderButton("sleep", "Sleep screen") { showSleep = true }
           ApprovedThemeButton()
-          val hey by produceState<String?>(null, installedApps) { value = withContext(Dispatchers.IO) { heyPackage(context) } }
           hey?.let { pkg ->
             Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
                 .semantics { contentDescription = "Voice assistant" }
@@ -1450,7 +1462,7 @@ private fun LauncherScreen(
                 contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
           }
           ApprovedHeaderButton("music", "Open music player", lit = rememberMusicV3Loaded(), onClick = onOpenMusic)
-          if (settings.showMiniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(300.dp), onOpenMusic)
+          if (header.miniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(HomeHeaderBudget.MINI_PLAYER.dp), onOpenMusic)
           ApprovedHeaderButton("search", "Search apps and settings") {
             if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
           }
@@ -1512,12 +1524,13 @@ private fun LauncherScreen(
           }
           }
           // Household overlays: share toasts / chime bubble and the routine "closed" toast.
-          // Bottom toasts centre left of the Now Playing card so they never overlap the player.
-          ShareHomeToasts(shareHome, Modifier.align(Alignment.BottomCenter).padding(end = toastEnd, bottom = 96.dp))
+          // Bottom toasts centre beside the (draggable) Now Playing card so they never overlap the player.
+          val toastSides = Modifier.padding(start = toastInsets.start, end = toastInsets.end)
+          ShareHomeToasts(shareHome, Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 96.dp))
           HomeNoteChimeBubble(Modifier.align(Alignment.TopEnd).padding(top = 8.dp, end = LauncherEdge))
-          RoutineHomeToast(Modifier.align(Alignment.BottomCenter).padding(end = toastEnd, bottom = 24.dp))
-          ChoresCelebrationBanner(Modifier.align(Alignment.BottomCenter).padding(end = toastEnd))
-          MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).padding(end = toastEnd, bottom = 24.dp))
+          RoutineHomeToast(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))
+          ChoresCelebrationBanner(Modifier.align(Alignment.BottomCenter).then(toastSides))
+          MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))
           }
           }
           ApprovedLauncherTab.APPS -> ApprovedAppsScreen(
@@ -1540,8 +1553,9 @@ private fun LauncherScreen(
               else Modifier.fillMaxSize().padding(horizontal = 32.dp),
               onDismiss = { musicLayout = null }, onLayoutChange = { musicLayout = it })
         }
-        if (musicCard) MusicHomeNowPlayingCard(room, onOpenMusic,
-            Modifier.align(Alignment.BottomEnd).padding(end = LauncherEdge, bottom = FAVORITE_TILE_HEIGHT + 16.dp))
+        // Draggable over the content area only: never onto the header, the favourites or the dock.
+        if (musicCard) MusicHomeFloatingPlayer(room, onOpenMusic, sideInset = LauncherEdge,
+            bottomInset = FAVORITE_TILE_HEIGHT + 16.dp, modifier = Modifier.matchParentSize())
         }
         Spacer(Modifier.height(12.dp))
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {

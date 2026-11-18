@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,10 +38,11 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
-import kotlinx.coroutines.delay
 
 /** Home card geometry (dp). The player matches the Music stage's 384×216, above YouTube's 200×200. */
 internal object MusicHomeCardDims {
@@ -56,45 +58,63 @@ internal object MusicHomeCardDims {
   const val CLOSE = 64
   const val WIDTH = PAD + PLAYER_W + GAP + SIDE_W + PAD
   const val HEIGHT = PAD + PLAYER_H + PAD
-  /** Space Home's bottom toasts leave on the right while the card shows ([MusicCoverRules]). */
-  const val TOAST_RESERVE = WIDTH + 24
+
+  /** The minimized tile: the player alone at YouTube's minimum (with a little margin), square. */
+  const val TILE_PLAYER = 208
+  /** The tile's expand / drag rail, beside the player (never over it). */
+  const val RAIL_W = 64
+  const val RAIL_GAP = 8
+  const val TILE_W = TILE_PLAYER + RAIL_GAP + RAIL_W
+  const val TILE_H = TILE_PLAYER
   private const val DISABLED_ALPHA = 0.32f
   fun alpha(enabled: Boolean) = if (enabled) 1f else DISABLED_ALPHA
+
+  fun widthOf(mode: MusicHomeCardMode) = if (mode == MusicHomeCardMode.CARD) WIDTH else TILE_W
+  fun heightOf(mode: MusicHomeCardMode) = if (mode == MusicHomeCardMode.CARD) HEIGHT else TILE_H
 }
 
 /**
- * Home's Now Playing card (Apple-Music-style mini player in the song's colours): the ONE official
- * YouTube player, moved here from the Music screen without reloading, with previous / play-pause /
- * next, the speaker volume (quiet-hours capped) and ✕ (pause and hide). The title opens Music.
- * Nothing is drawn over it; Home's toasts avoid it and full-screen cards pause it ([MusicCoverRules]).
+ * Home's Now Playing card (Apple-Music-style mini player in the song's colours) or, after ✕, its
+ * video-only tile: the ONE official YouTube player, moved here from the Music screen without
+ * reloading. The player is always this Row's first child, so switching modes only resizes the same
+ * view (no re-attach, no reload). Card: previous / play-pause / next, the speaker volume
+ * (quiet-hours capped), ✕ (minimize; the music keeps playing) and the title (opens Music). Tile: the
+ * player and, beside it, expand and a drag grip. Nothing is drawn over the player.
  */
 @Composable
-internal fun MusicHomeNowPlayingCard(room: String, onOpenMusic: () -> Unit, modifier: Modifier = Modifier) {
-  val flow = remember(room) { engineSlice { MusicV3NowPlaying.from(it, room) } }
-  val now by flow.collectAsState(initial = MusicV3NowPlaying.from(YouTubeMusicEngine.state.value, room))
-  val track = now.track ?: return
-  LaunchedEffect(now.playing) {
-    if (now.playing) return@LaunchedEffect
-    delay(MusicHomeCardRules.PAUSED_HIDE_MS)
-    MusicHomeCardState.dismiss()
-  }
+internal fun MusicHomeCardBody(
+    mode: MusicHomeCardMode,
+    track: YtTrack,
+    now: MusicV3NowPlaying,
+    room: String,
+    onOpenMusic: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
   val palette = rememberMusicStagePalette(track, now.isAd)
   val dark = LocalApprovedPalette.current.dark
   val ink = remember(palette, dark) { MusicStageColors.of(palette, dark) }
+  val card = mode == MusicHomeCardMode.CARD
   val shape = RoundedCornerShape(MusicHomeCardDims.RADIUS.dp)
+  val frame = if (card) Modifier.shadow(24.dp, shape, clip = false).clip(shape).background(ink.card)
+      .border(1.dp, ink.line, shape).padding(MusicHomeCardDims.PAD.dp) else Modifier
+  val gap = if (card) MusicHomeCardDims.GAP else MusicHomeCardDims.RAIL_GAP
   MusicStageTheme(ink, MusicStageDims.COMPACT) {
-    Row(modifier.width(MusicHomeCardDims.WIDTH.dp).height(MusicHomeCardDims.HEIGHT.dp)
-        .shadow(24.dp, shape, clip = false).clip(shape).background(ink.card).border(1.dp, ink.line, shape)
-        .padding(MusicHomeCardDims.PAD.dp), horizontalArrangement = Arrangement.spacedBy(MusicHomeCardDims.GAP.dp)) {
+    Row(modifier.width(MusicHomeCardDims.widthOf(mode).dp).height(MusicHomeCardDims.heightOf(mode).dp).then(frame),
+        horizontalArrangement = Arrangement.spacedBy(gap.dp)) {
       val playerShape = RoundedCornerShape(MusicHomeCardDims.PLAYER_RADIUS.dp)
-      Box(Modifier.size(MusicHomeCardDims.PLAYER_W.dp, MusicHomeCardDims.PLAYER_H.dp).clip(playerShape)
-          .background(Color.Black).semantics { contentDescription = "YouTube player" }) {
+      val playerSize = if (card) Modifier.size(MusicHomeCardDims.PLAYER_W.dp, MusicHomeCardDims.PLAYER_H.dp)
+      else Modifier.size(MusicHomeCardDims.TILE_PLAYER.dp)
+      Box(playerSize.clip(playerShape).background(Color.Black).semantics { contentDescription = "YouTube player" }) {
         YouTubePlayerSurface(MusicPlayerHostKind.HOME_CARD, Modifier.fillMaxSize())
       }
-      Column(Modifier.width(MusicHomeCardDims.SIDE_W.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-        CardHeader(track, now, onOpenMusic)
-        CardTransport(now)
-        MusicV3StageVolume(room)
+      if (card) {
+        Column(Modifier.width(MusicHomeCardDims.SIDE_W.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+          CardHeader(track, now, onOpenMusic)
+          CardTransport(now)
+          MusicV3StageVolume(room)
+        }
+      } else {
+        TileRail(track)
       }
     }
   }
@@ -113,10 +133,26 @@ private fun CardHeader(track: YtTrack, now: MusicV3NowPlaying, onOpenMusic: () -
           fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
       Text(track.artist, color = ink.muted, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
-    MusicV3RoundButton("Pause and hide music", size = MusicHomeCardDims.CLOSE.dp, onClick = {
-      YouTubeMusicEngine.pause()
-      MusicHomeCardState.dismiss()
-    }) { ApprovedIcon("close", Modifier.size(26.dp), ink.muted) }
+    MusicV3RoundButton("Minimize player, music keeps playing", size = MusicHomeCardDims.CLOSE.dp,
+        onClick = MusicHomeCardState::minimize) {
+      MusicV3GlyphIcon(MusicV3Glyph.COLLAPSE, ink.muted, Modifier.size(28.dp))
+    }
+  }
+}
+
+/** The tile's rail beside the player: expand (the full card again) above a drag grip. */
+@Composable
+private fun TileRail(track: YtTrack) {
+  val ink = LocalMusicStageInk.current
+  val shape = RoundedCornerShape(MusicHomeCardDims.RAIL_W.dp / 2)
+  Column(Modifier.width(MusicHomeCardDims.RAIL_W.dp).fillMaxHeight().shadow(12.dp, shape, clip = false).clip(shape)
+      .background(ink.card).border(1.dp, ink.line, shape), horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.SpaceBetween) {
+    MusicV3RoundButton("Expand player: ${track.title}", size = MusicHomeCardDims.RAIL_W.dp,
+        onClick = MusicHomeCardState::expand) {
+      MusicV3GlyphIcon(MusicV3Glyph.EXPAND, ink.ink, Modifier.size(28.dp))
+    }
+    MusicV3GlyphIcon(MusicV3Glyph.GRIP, ink.muted, Modifier.padding(bottom = 18.dp).size(26.dp))
   }
 }
 
@@ -161,6 +197,22 @@ internal fun rememberMusicHomeCardShown(musicOpen: Boolean, customizing: Boolean
   val dismissed by MusicHomeCardState.dismissed.collectAsState()
   LaunchedEffect(isPlaying) { MusicHomeCardState.onPlaying(isPlaying) }
   return MusicHomeCardRules.shows(MusicHomeCardInputs(hasCurrent, musicOpen, customizing, dismissed))
+}
+
+/** Dp side padding for Home's bottom toasts so they centre beside the card ([MusicCardAvoidance]). */
+internal data class MusicToastPadding(val start: Dp, val end: Dp)
+
+@Composable
+internal fun rememberMusicToastInsets(cardShown: Boolean): MusicToastPadding {
+  val placement by MusicHomeCardState.placement.collectAsState()
+  val density = LocalDensity.current
+  val card = placement.takeIf { cardShown }
+  return remember(card, density) {
+    with(density) {
+      val px = MusicCardAvoidance.toastInsets(card, MusicHomeFloatDims.TOAST_BAND.toPx(), MusicHomeFloatDims.TOAST_GAP.toPx())
+      MusicToastPadding(px.start.toDp(), px.end.toDp())
+    }
+  }
 }
 
 /** Home's dialogs and sheets are drawn over the card: the music pauses while one is open ([MusicCoverRules]). */

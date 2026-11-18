@@ -9,12 +9,9 @@ package com.immortal.launcher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,10 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -70,10 +64,11 @@ internal fun rememberMusicV3Loaded(): Boolean {
 }
 
 /**
- * Home header music chip: "<title> Playing", or "Resume · <title>" when nothing plays but a queue
- * is saved, with Play/Pause and Next. A tap on the song returns to the player, which resumes the
- * song ([onOpen] asks for that). Play brings Home's Now Playing card back (the player must be on
- * screen to play, see [MusicHomeCardRules]) and starts the song there.
+ * Home header music chip, compact so the header buttons never squish ([HomeHeaderBudget]): the
+ * song's cover (a music glyph until it loads) then Play/Pause and Next, at a fixed
+ * [MusicV3HomeChipDims.WIDTH]. No title text; the cover's accessibility label names the song. A tap
+ * on the cover opens Music ([onOpen]), which resumes the song. Play brings Home's Now Playing card
+ * back (the player must be on screen to play, see [MusicHomeCardRules]) and starts the song there.
  */
 @Composable
 internal fun MusicV3HomeChip(onOpen: () -> Unit) {
@@ -88,33 +83,33 @@ internal fun MusicV3HomeChip(onOpen: () -> Unit) {
     }
   }
   val chip = musicV3Chip(engine, saved) ?: return
-  val shape = RoundedCornerShape(34.dp)
-  val spoken = if (chip.resume) "${chip.title}. Tap to play it again" else
-    "Now playing: ${chip.track.title}. Tap to return to music"
-  Row(Modifier.padding(start = 12.dp).height(68.dp).widthIn(max = CHIP_MAX_WIDTH.dp).clip(shape)
-      .background(ApprovedHomePalette.Card).approvedOutline(shape), verticalAlignment = Alignment.CenterVertically) {
-    Row(Modifier.weight(1f, fill = false).height(68.dp).clip(shape)
-        .tvFocusable(shape, ringColor = ApprovedHomePalette.Accent) {
+  val shape = RoundedCornerShape(MusicV3HomeChipDims.HEIGHT.dp / 2)
+  Row(Modifier.size(MusicV3HomeChipDims.WIDTH.dp, MusicV3HomeChipDims.HEIGHT.dp).clip(shape)
+      .background(ApprovedHomePalette.Card).approvedOutline(shape)
+      .padding(start = MusicV3HomeChipDims.PAD_START.dp, end = MusicV3HomeChipDims.PAD_END.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(MusicV3HomeChipDims.GAP.dp)) {
+    val thumbShape = RoundedCornerShape(MusicV3HomeChipDims.THUMB_RADIUS.dp)
+    MusicV3Thumb(chip.track.thumbnailUrl, Modifier.size(MusicV3HomeChipDims.THUMB.dp)
+        .tvFocusable(thumbShape, ringColor = ApprovedHomePalette.Accent) {
           if (chip.resume) YouTubeMusicEngine.restoreSaved(context)
           onOpen()
         }
-        .semantics(mergeDescendants = true) { contentDescription = spoken }
-        .padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-      MusicV3Thumb(chip.track.thumbnailUrl, Modifier.size(48.dp), RoundedCornerShape(10.dp))
-      Text(chip.title, color = ApprovedHomePalette.Text, fontSize = 23.sp, fontWeight = FontWeight.Medium, maxLines = 1,
-          overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-      chip.status?.let { Text(it, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1) }
-    }
+        .semantics { contentDescription = musicV3ChipSpoken(chip) },
+        thumbShape, displaySize = MusicV3HomeChipDims.THUMB.dp)
     ChipButtons(engine.playing) { if (empty) YouTubeMusicEngine.restoreSaved(context) }
   }
 }
 
-/** Play/Pause and Next, 64 dp each, at the chip's right end. [ensureQueue] loads a saved queue first. */
+/** The cover's accessibility label: the chip shows no text, so this names the song. */
+internal fun musicV3ChipSpoken(chip: MusicV3ChipModel): String =
+    if (chip.resume) "${chip.title}. Open music to play it again" else "Now playing: ${chip.track.title}. Open music"
+
+/** Play/Pause and Next at the chip's right end. [ensureQueue] loads a saved queue first. */
 @Composable
 private fun ChipButtons(playing: Boolean, ensureQueue: () -> Unit) {
   val ink = ApprovedHomePalette.Text
-  MusicV3RoundButton(if (playing) "Pause music" else "Play music", size = CHIP_BUTTON.dp, onClick = {
+  MusicV3RoundButton(if (playing) "Pause music" else "Play music", size = MusicV3HomeChipDims.BUTTON.dp, onClick = {
     if (playing) {
       YouTubeMusicEngine.pause()
     } else {
@@ -123,14 +118,23 @@ private fun ChipButtons(playing: Boolean, ensureQueue: () -> Unit) {
       YouTubeMusicEngine.dispatch(YtAction.PlayWhenVisible)
     }
   }) { MusicV3GlyphIcon(if (playing) MusicV3Glyph.PAUSE else MusicV3Glyph.PLAY, ink, Modifier.size(30.dp)) }
-  MusicV3RoundButton("Next song", size = CHIP_BUTTON.dp, onClick = {
+  MusicV3RoundButton("Next song", size = MusicV3HomeChipDims.BUTTON.dp, onClick = {
     ensureQueue()
     YouTubeMusicEngine.next()
   }) { MusicV3GlyphIcon(MusicV3Glyph.NEXT, ink, Modifier.size(28.dp)) }
 }
 
-private const val CHIP_MAX_WIDTH = 660
-private const val CHIP_BUTTON = 64
+/** The compact header chip's geometry (dp): cover + two 64 dp touch targets, fixed width. */
+internal object MusicV3HomeChipDims {
+  const val HEIGHT = 68
+  const val THUMB = 52
+  const val THUMB_RADIUS = 12
+  const val BUTTON = 64
+  const val GAP = 4
+  const val PAD_START = 8
+  const val PAD_END = 2
+  const val WIDTH = PAD_START + THUMB + GAP + BUTTON + GAP + BUTTON + PAD_END
+}
 
 /** The one-time "why it paused" toast on Home after leaving the player mid-song. */
 @Composable
