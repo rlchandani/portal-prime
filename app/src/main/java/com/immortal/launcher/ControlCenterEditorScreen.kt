@@ -124,17 +124,28 @@ private fun CcEditorBody(saved: CcPlan, registry: CcRegistry?, live: Map<String,
   }
 }
 
-/** Mock `.edTools`: floor seg, the draw/move seg on Rooms, step dashes (first build) or tabs (editing). */
+/**
+ * Mock `.edTools`: floor seg, the draw/move seg on Rooms, step dashes (first build) or tabs (editing).
+ * The step tabs and the tool seg always keep their full size; the floor seg (short names, as on the
+ * map) takes what is left and scrolls sideways with soft edges when a home has many or long
+ * floor names, keeping the chosen floor in view. Nothing is ever clipped out of reach.
+ */
 @Composable
 private fun CcEditorTools(ctx: CcEdCtx, floors: List<CcHaFloor>, modifier: Modifier) {
   val st = ctx.st
+  val floorTabs = remember(floors) { floors.map { Triple(it.id, CcOverviewText.shortFloor(it.name), null as String?) } }
   Row(modifier, horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-    if (floors.size > 1) CcSeg(floors.map { Triple(it.id, it.name, null) }, st.floorId, { id -> ctx.update { CcEd.setFloor(it, id) } })
-    if (st.step == CcEdStep.ROOMS) {
-      CcSeg(listOf(Triple(CcEdTool.DRAW, "Draw room", "draw"), Triple(CcEdTool.MOVE, "Move", "select")), st.tool,
-          { t -> ctx.update { CcEd.setTool(it, t) } })
+    Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+      if (floors.size > 1) {
+        CcScrollingSeg(st.floorId, Modifier.weight(1f, fill = false)) { inView ->
+          CcSeg(floorTabs, st.floorId, { id -> ctx.update { CcEd.setFloor(it, id) } }, selectedModifier = inView)
+        }
+      }
+      if (st.step == CcEdStep.ROOMS) {
+        CcSeg(listOf(Triple(CcEdTool.DRAW, "Draw room", "draw"), Triple(CcEdTool.MOVE, "Move", "select")), st.tool,
+            { t -> ctx.update { CcEd.setTool(it, t) } })
+      }
     }
-    Spacer(Modifier.weight(1f))
     if (st.first) CcStepDashes(st.step.number)
     else CcSeg(CcEdStep.TABS.map { Triple(it, it.tab, null) }, st.step, { step -> ctx.update { CcEd.goStep(it, step) } })
   }

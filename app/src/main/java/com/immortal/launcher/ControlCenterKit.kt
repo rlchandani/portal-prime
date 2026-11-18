@@ -75,12 +75,13 @@ internal fun CcButton(
 
 /** Segmented control; [options] are (key, label, icon?). */
 @Composable
-internal fun <T> CcSeg(options: List<Triple<T, String, String?>>, selected: T, onSelect: (T) -> Unit, modifier: Modifier = Modifier) {
+internal fun <T> CcSeg(options: List<Triple<T, String, String?>>, selected: T, onSelect: (T) -> Unit, modifier: Modifier = Modifier,
+                       selectedModifier: Modifier = Modifier) {
   val c = LocalCc.current
   Row(modifier.clip(CcStyle.Pill).background(c.surface2).padding(5.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
     options.forEach { (key, label, icon) ->
       val on = key == selected
-      Box {
+      Box(if (on) selectedModifier else Modifier) {
         // Every option keeps its raised pill; selection only fades it in (a layer alpha), so a
         // tap changes no modifier chain — nothing is inserted, re-laid out or re-recorded.
         Box(Modifier.matchParentSize().graphicsLayer { alpha = if (on) 1f else 0f }.ccCard(CcStyle.Pill, c.segOn))
