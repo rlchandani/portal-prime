@@ -72,14 +72,16 @@ internal object HomeHeaderBudget {
     return plan
   }
 
-  /** The dp the header needs with [plan]: every child, the gaps between them and both edges. */
+  /**
+   * The dp the header needs with [plan]: every child, the gaps between them and both edges. The
+   * leading group (wordmark, room, screensaver, chip) takes the free width itself, so no spacer.
+   */
   fun width(plan: HomeHeaderPlan, items: HomeHeaderItems): Int {
     val pieces = buildList {
       val left = (if (plan.wordmark) WORDMARK_GROUP else 0) + (if (plan.room) ROOM else 0)
       if (left > 0) add(left)
       repeat(FIXED_BUTTONS + if (items.mic) 1 else 0) { add(BUTTON) }
       if (plan.musicChip) add(MusicV3HomeChipDims.WIDTH)
-      add(0) // the flexible spacer
       add(WIFI)
       if (plan.connectedLabel) add(CONNECTED_LABEL)
       if (items.customize) add(CUSTOMIZE)

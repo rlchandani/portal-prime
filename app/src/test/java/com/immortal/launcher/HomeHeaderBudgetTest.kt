@@ -52,7 +52,7 @@ class HomeHeaderBudgetTest {
   @Test fun anEmptyHeaderWidthCountsEdgesGapsAndButtons() {
     val bare = HomeHeaderItems(musicChip = false, miniPlayer = false, mic = false, customize = false)
     val none = HomeHeaderPlan(wordmark = false, room = false, connectedLabel = false, miniPlayer = false, musicChip = false)
-    // 7 buttons + spacer + wifi = 9 pieces, 8 gaps.
-    assertEquals(2 * 24 + 7 * 68 + 22 + 8 * 16, HomeHeaderBudget.width(none, bare))
+    // 7 buttons + wifi = 8 pieces, 7 gaps (the leading group takes the free width; no spacer).
+    assertEquals(2 * 24 + 7 * 68 + 22 + 7 * 16, HomeHeaderBudget.width(none, bare))
   }
 }
