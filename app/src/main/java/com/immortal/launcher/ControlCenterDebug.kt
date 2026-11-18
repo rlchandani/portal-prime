@@ -70,12 +70,18 @@ internal object CcTestPlan {
 
 // --- engine side (engine thread) ----------------------------------------------------------
 
+/** What HA would echo for [opt]: a state change also restarts `last_changed` (attributes alone don't). */
+internal fun dryRunEcho(raw: CcEntity, opt: CcOptimistic, now: Long): CcEntity {
+  val next = opt.applyTo(raw)
+  return if (next.state == raw.state) next else next.copy(lastChanged = now, userId = null)
+}
+
 /** Dry run: log, then behave as if HA had echoed the optimistic state at once. */
 internal fun CcEngine.dryRunCall(call: CcCall, onResult: ((Boolean, String?) -> Unit)?) {
   Log.i(CcEngine.TAG, "dry-run ${call.domain}.${call.service} data=${call.data.keys.sorted()}")
   val id = call.entityId
   val raw = id?.let { live.raw[it] }
-  if (raw != null && call.optimistic != null) live = live.update(mapOf(id to call.optimistic.applyTo(raw)), clock())
+  if (raw != null && call.optimistic != null) live = live.update(mapOf(id to dryRunEcho(raw, call.optimistic, clock())), clock())
   toast("Dry run: ${call.label.ifBlank { "${call.domain}.${call.service}" }} (not sent)")
   onResult?.invoke(true, null)
 }
