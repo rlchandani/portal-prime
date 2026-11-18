@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -76,12 +77,12 @@ internal fun CcWizNav(ctx: CcEdCtx, continueLabel: String = "Continue") {
 internal fun CcAreaRow(icon: String, label: String, note: String, iconTint: androidx.compose.ui.graphics.Color? = null,
                        highlighted: Boolean = false, onClick: (() -> Unit)? = null) {
   val c = LocalCc.current
-  val base = Modifier.fillMaxWidth().height(62.dp).clip(CcStyle.CardSmall).background(c.surface2)
+  val base = Modifier.fillMaxWidth().heightIn(min = 62.dp).clip(CcStyle.CardSmall).background(c.surface2)
   Row((if (onClick != null) base.ccPress(label, onClick) else base)
       .then(if (highlighted) Modifier.ccOutline(CcStyle.Ember) else Modifier).padding(horizontal = 16.dp),
       horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
     CcIcon(icon, iconTint ?: c.text, 26.dp)
-    Text(label, color = c.text, fontSize = 21.sp, maxLines = 1, modifier = Modifier.weight(1f))
+    Text(label, color = c.text, fontSize = 21.sp, maxLines = 2, modifier = Modifier.weight(1f).padding(vertical = 10.dp))
     Text(note, color = c.sec, fontSize = 18.sp, maxLines = 1)
   }
 }
@@ -112,10 +113,11 @@ private fun ColumnScope.CcStepFound(ctx: CcEdCtx) {
     if (counts.withArea > 0) CcAreaRow("sparkle", "${counts.withArea} ${plural(counts.withArea, "device")} with an area", "auto-placed later")
     CcAreaRow(if (counts.withoutArea > 0) "warn" else "check", "${counts.withoutArea} ${plural(counts.withoutArea, "device")} without an area",
         if (counts.withoutArea > 0) "you'll drag these" else "nothing to drag")
-    Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      CcButton("Start drawing", { ctx.update(CcEd::next) }, style = CcButtonStyle.PRIMARY)
-      if (ctx.hasAreas && counts.areas > 0) CcButton("Suggest a layout", { ctx.update { CcEd.suggest(CcEd.next(it), ctx.reg) } }, icon = "sparkle")
-    }
+  }
+  // Kept outside the scrolling card so the next step is always in reach, however many areas HA has.
+  Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+    CcButton("Start drawing", { ctx.update(CcEd::next) }, style = CcButtonStyle.PRIMARY)
+    if (ctx.hasAreas && counts.areas > 0) CcButton("Suggest a layout", { ctx.update { CcEd.suggest(CcEd.next(it), ctx.reg) } }, icon = "sparkle")
   }
 }
 

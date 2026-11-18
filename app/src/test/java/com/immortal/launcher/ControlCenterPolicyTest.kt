@@ -36,6 +36,16 @@ class ControlCenterPolicyTest {
     assertEquals(CcPolicy.Ask.NONE, CcPolicy.ask(CcEntity("light.a", "on"), CcCalls.brightness(CcEntity("light.a", "on"), 5), s))
   }
 
+  @Test fun securityScripts_alwaysAsk() {
+    val arm = CcEntity("script.ring_arm_away", "off", mapOf("friendly_name" to "[Ring]: Arm Away"))
+    assertEquals(CcPolicy.Ask.CONFIRM, CcPolicy.ask(arm, CcCalls.run(arm), s.copy(askScenes = false)))
+    val warm = CcEntity("scene.warm_white", "x", mapOf("friendly_name" to "Warm farm lights"))
+    assertEquals(CcPolicy.Ask.NONE, CcPolicy.ask(warm, CcCalls.run(warm), s))
+    val unlocking = CcEntity("scene.welcome", "x", mapOf("entity_id" to listOf("light.a", "lock.front")))
+    assertEquals(CcPolicy.Ask.CONFIRM, CcPolicy.ask(unlocking, CcCalls.run(unlocking), s))
+    assertFalse(CcPolicy.sensitive(CcEntity("script.all_lights_off", "off", mapOf("friendly_name" to "[All Light]: Turn Off"))))
+  }
+
   @Test fun kids_hidesSecurityThingsOnly() {
     assertTrue(CcPolicy.hidden(lock, kids))
     assertTrue(CcPolicy.hidden(garage, kids))

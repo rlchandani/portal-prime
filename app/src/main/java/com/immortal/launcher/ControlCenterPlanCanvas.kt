@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -84,7 +85,7 @@ internal fun CcPlanCanvas(
   }
   val latestTap by rememberUpdatedState(onTap)
   val description = remember(model.views) { "Floor plan: " + model.views.joinToString(", ") { it.room.name } }
-  Canvas(modifier.onSizeChanged { size = it }.semantics { contentDescription = description }
+  Canvas(modifier.graphicsLayer().onSizeChanged { size = it }.semantics { contentDescription = description }
       .pointerInput(px, model) { detectTapGestures { pos -> hit(model, px, pos, TAP_DP.dp.toPx())?.let { latestTap(it) } } }) {
     if (px.fit.scale <= 0f || size == IntSize.Zero) return@Canvas
     val t = clock.value

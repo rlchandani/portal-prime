@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -23,6 +24,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.key
 import androidx.compose.ui.platform.LocalContext
 
 /**
@@ -33,13 +39,14 @@ internal val LocalCcMotion = compositionLocalOf { false }
 
 /** The whole Control Center: rail + header + the current screen, the sheet, modals and toasts. */
 @Composable
-internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, onExit: () -> Unit) {
+internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requested: Pair<CcScreen, Long>? = null, onExit: () -> Unit) {
   val context = LocalContext.current
   val state by ControlCenter.state(context).collectAsState()
   val latest by rememberUpdatedState(state)
   val navState = remember { mutableStateOf(CcNav(screen = initialScreen)) }
   val ui = remember { CcUi(context, navState, { latest }) }
   BackHandler { if (!ui.handleBack()) onExit() }
+  LaunchedEffect(requested) { requested?.let { ui.go(it.first) } }
   CcTheme(dark = state.settings.darkTheme) {
     CompositionLocalProvider(LocalCcMotion provides (motion && !state.settings.reducedMotion)) {
       val c = LocalCc.current
@@ -64,9 +71,44 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, onEx
   }
 }
 
+/** False for a kept-alive screen that isn't showing: cameras stop polling, nothing animates. */
+internal val LocalCcScreenActive = compositionLocalOf { true }
+
+/** Screens kept composed after the first visit so switching back costs no composition or redraw. */
+private val KEEP_ALIVE = setOf(CcScreen.MAP, CcScreen.CAMERAS, CcScreen.ENERGY, CcScreen.ALERTS, CcScreen.SECURITY)
+
+/**
+ * The current screen, plus every kept-alive screen already visited, parked off-screen with the
+ * snapshot it last showed (same instance, so it skips recomposition and keeps its draw lists).
+ */
 @Composable
 private fun CcScreenBody(s: CcUiState, ui: CcUi) {
-  when (ui.nav.screen) {
+  val current = ui.nav.screen
+  val visited = remember { LinkedHashSet<CcScreen>() }
+  val frozen = remember { HashMap<CcScreen, CcUiState>() }
+  if (current in KEEP_ALIVE) { visited += current; frozen[current] = s }
+  val motion = LocalCcMotion.current
+  Box(Modifier.fillMaxSize().clipToBounds()) {
+    visited.forEach { screen ->
+      key(screen) {
+        val active = screen == current
+        val parked = if (active) Modifier.fillMaxSize() else Modifier.fillMaxSize().offset { IntOffset(PARK_OFFSET_PX, 0) }
+        Box(parked.graphicsLayer()) {
+          CompositionLocalProvider(LocalCcScreenActive provides active, LocalCcMotion provides (active && motion)) {
+            CcScreenContent(screen, if (active) s else frozen.getValue(screen), ui)
+          }
+        }
+      }
+    }
+    if (current !in KEEP_ALIVE) CcScreenContent(current, s, ui)
+  }
+}
+
+private const val PARK_OFFSET_PX = 100_000
+
+@Composable
+private fun CcScreenContent(screen: CcScreen, s: CcUiState, ui: CcUi) {
+  when (screen) {
     CcScreen.MAP -> CcOverviewScreen(s, ui)
     CcScreen.CAMERAS -> CcCamerasScreen(s, ui)
     CcScreen.ENERGY -> CcEnergyScreen(s, ui)

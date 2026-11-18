@@ -193,6 +193,8 @@ internal object CcPolicy {
     call.domain == "cover" && CcKind.of(e) == CcKind.GARAGE && call.service != "stop_cover" -> if (s.askGarage) Ask.CAMERA_CONFIRM else Ask.NONE
     call.domain == "valve" -> if (s.askValve) Ask.CONFIRM else Ask.NONE
     call.domain == "alarm_control_panel" -> if (call.service == "alarm_disarm" || e.attrs["code_arm_required"] == true && e.codeFormat != null) Ask.PIN else Ask.NONE
+    // A scene/script that arms, unlocks or opens something is a security action in disguise: it always asks.
+    (call.domain == "scene" || call.domain == "script") && sensitive(e) -> Ask.CONFIRM
     call.domain == "scene" && call.service == "turn_on" && s.askScenes && e.id !in scenesSeen && e.members.size >= WHOLE_HOUSE -> Ask.CONFIRM
     else -> Ask.NONE
   }
@@ -219,6 +221,17 @@ internal object CcPolicy {
     CcScreen.EDIT, CcScreen.SETTINGS -> true
     else -> false
   }
+
+  /** Names that mark a scene/script as touching security (alarm, locks, garage, doors, water). */
+  fun sensitive(e: CcEntity): Boolean {
+    val words = "${e.id} ${e.name}".lowercase().split(NON_LETTERS).toSet()
+    return words.any { it in SENSITIVE_WORDS } || e.members.any { m -> SENSITIVE_DOMAINS.any { m.startsWith(it) } }
+  }
+
+  private val NON_LETTERS = Regex("[^a-z]+")
+  private val SENSITIVE_WORDS = setOf("arm", "arming", "armed", "disarm", "alarm", "lock", "unlock", "garage", "gate", "valve",
+      "security", "away")
+  private val SENSITIVE_DOMAINS = listOf("lock.", "alarm_control_panel.", "valve.", "cover.garage")
 
   /** A scene touching this many entities is "whole house" and gets a first-run preview. */
   const val WHOLE_HOUSE = 6

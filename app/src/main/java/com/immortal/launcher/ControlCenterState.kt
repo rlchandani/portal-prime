@@ -37,12 +37,20 @@ internal data class CcUiState(
 
   fun entity(id: String): CcEntity? = entities[id]
 
+  /** Entities grouped by domain, computed once per snapshot (screens ask many times per frame). */
+  private val byDomain: Map<String, List<CcEntity>> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    entities.values.groupBy { it.domain }.mapValues { (_, list) -> list.sortedBy { it.name.lowercase() } }
+  }
+  private val activeAlerts: List<CcAlert> by lazy(LazyThreadSafetyMode.PUBLICATION) { computeAlerts() }
+
   /** Entities of [domain], kids-mode hiding applied. */
   fun ofDomain(domain: String): List<CcEntity> =
-      entities.values.filter { it.domain == domain && !CcPolicy.hidden(it, settings) }.sortedBy { it.name.lowercase() }
+      byDomain[domain].orEmpty().let { list -> if (settings.kids) list.filter { !CcPolicy.hidden(it, settings) } else list }
 
-  /** Active alerts (kids mode hides the hidden kinds; criticals always remain). */
-  fun alerts(): List<CcAlert> {
+  /** Active alerts (kids mode hides the hidden kinds; criticals always remain). Cached per snapshot. */
+  fun alerts(): List<CcAlert> = activeAlerts
+
+  private fun computeAlerts(): List<CcAlert> {
     val roomName: (String) -> String? = { id -> plan?.roomOf(id)?.name }
     return CcAlerts.active(entities, now, settings.warningAfterMin, roomName, appliancesDone)
         .filter { a -> (dismissed[a.id] ?: 0L) < now }

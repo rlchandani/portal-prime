@@ -28,12 +28,22 @@ class ControlCenterActivity : ComponentActivity() {
     override fun onReceive(context: Context, intent: Intent) { updateMotion() }
   }
   private var resumed = false
+  /** Screen asked for by the latest intent (fleet `open_control_center`, banners). */
+  private val requested = mutableStateOf<Pair<CcScreen, Long>?>(null)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val start = intent?.getStringExtra(EXTRA_SCREEN)?.let { n -> CcScreen.entries.firstOrNull { it.name.equals(n, ignoreCase = true) } }
-    setContent { CcApp(motion = motion.value, initialScreen = start ?: CcScreen.MAP, onExit = ::finish) }
+    val start = screenOf(intent)
+    setContent { CcApp(motion = motion.value, initialScreen = start ?: CcScreen.MAP, requested = requested.value, onExit = ::finish) }
   }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    screenOf(intent)?.let { requested.value = it to System.nanoTime() }
+  }
+
+  private fun screenOf(intent: Intent?): CcScreen? =
+      intent?.getStringExtra(EXTRA_SCREEN)?.let { n -> CcScreen.entries.firstOrNull { it.name.equals(n, ignoreCase = true) } }
 
   override fun onStart() {
     super.onStart()

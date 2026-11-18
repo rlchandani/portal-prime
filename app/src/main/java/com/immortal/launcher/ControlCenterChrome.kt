@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -48,7 +49,7 @@ import java.util.Locale
 internal fun CcRail(s: CcUiState, ui: CcUi, onHome: () -> Unit) {
   val c = LocalCc.current
   val alerts = s.alerts().size
-  Column(Modifier.width(CcStyle.RailWidth).fillMaxHeight().background(c.rail).padding(top = 22.dp, bottom = 20.dp),
+  Column(Modifier.width(CcStyle.RailWidth).fillMaxHeight().graphicsLayer().background(c.rail).padding(top = 22.dp, bottom = 20.dp),
       horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
     Box(Modifier.size(72.dp).clip(CircleShape).clickable(role = Role.Button, onClick = onHome)
         .semantics { contentDescription = "Back to Hearthpane home" }, contentAlignment = Alignment.Center) {
@@ -92,7 +93,7 @@ private fun RailItem(icon: String, label: String, on: Boolean, badge: Int = 0, o
 @Composable
 internal fun CcHeader(s: CcUiState, title: String, subtitle: String, ui: CcUi, onJarvis: () -> Unit) {
   val c = LocalCc.current
-  Row(Modifier.fillMaxWidth().height(CcStyle.HeaderHeight).padding(horizontal = 34.dp),
+  Row(Modifier.fillMaxWidth().height(CcStyle.HeaderHeight).graphicsLayer().padding(horizontal = 34.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
     Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       HearthpaneGlyph(30.dp)
@@ -178,8 +179,9 @@ internal fun CcAvatars(people: List<CcEntity>, size: Int = 36) {
 @Composable
 internal fun Modifier.ccCard(shape: androidx.compose.ui.graphics.Shape = CcStyle.Card, color: Color? = null): Modifier {
   val c = LocalCc.current
-  return if (c.dark) this.clip(shape).background(color ?: c.surface).border(1.dp, c.cardEdge, shape)
-  else this.shadow(6.dp, shape, ambientColor = Color(0x2E182C39), spotColor = Color(0x2E182C39)).clip(shape).background(color ?: c.surface)
+  // Each card is its own render layer: a change inside one card re-records only that card.
+  return if (c.dark) this.graphicsLayer().clip(shape).background(color ?: c.surface).border(1.dp, c.cardEdge, shape)
+  else this.graphicsLayer().shadow(6.dp, shape, ambientColor = Color(0x2E182C39), spotColor = Color(0x2E182C39)).clip(shape).background(color ?: c.surface)
 }
 
 internal fun alarmLabel(state: String): String = when (state) {

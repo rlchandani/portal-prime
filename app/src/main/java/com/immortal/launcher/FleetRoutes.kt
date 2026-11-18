@@ -373,7 +373,8 @@ class FleetRoutes(private val context: Context) {
       // security, edit, settings) — for remote checks and on-device measurement.
       "open_control_center" -> {
         val intent = ControlCenterActivity.intent(context).putExtra(ControlCenterActivity.EXTRA_SCREEN, body.optString("screen", "map"))
-            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP)
         val opened = runCatching { context.startActivity(intent) }.isSuccess
         resp(200, JSONObject().put("ok", opened).put("action", "open_control_center"))
       }

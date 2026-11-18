@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -79,10 +80,11 @@ internal enum class CcCameraTileSize(val radius: Dp, val label: Int, val labelIn
 internal fun CcCameraTileSized(s: CcUiState, cameraId: String, live: Boolean, modifier: Modifier, label: String?,
                                onClick: (() -> Unit)?, size: CcCameraTileSize) {
   if (s.settings.kids && CcPolicy.hiddenKind(CcKind.CAMERA, null, s.settings)) return
+  val onScreen = LocalCcScreenActive.current
   val configured = s.connection.phase != CcPhase.NOT_CONFIGURED
   var token by remember(cameraId, live) { mutableLongStateOf(CcLiveGuard.NONE) }
-  DisposableEffect(cameraId, live, configured) {
-    val claimed = if (live && configured) CcLiveStream.claim() else CcLiveGuard.NONE
+  DisposableEffect(cameraId, live, configured, onScreen) {
+    val claimed = if (live && configured && onScreen) CcLiveStream.claim() else CcLiveGuard.NONE
     token = claimed
     onDispose { CcLiveStream.release(claimed) }
   }
@@ -90,12 +92,13 @@ internal fun CcCameraTileSized(s: CcUiState, cameraId: String, live: Boolean, mo
   val streaming = token != CcLiveGuard.NONE && owner == token
   var frame by remember(cameraId) { mutableStateOf<CcFrame?>(null) }
   var failed by remember(cameraId) { mutableStateOf(false) }
-  if (configured) {
+  // A parked (kept-alive) screen keeps its last picture but fetches nothing.
+  if (configured && onScreen) {
     if (streaming) LiveFeed(cameraId, { frame = it; failed = false }, { failed = true })
     else SnapshotLoop(cameraId, { frame = it; failed = false }, { if (frame == null) failed = true })
   }
   val name = label ?: s.entity(cameraId)?.name ?: CcEntity.prettyId(cameraId)
-  Box(modifier.clip(RoundedCornerShape(size.radius)).background(TILE_BG)
+  Box(modifier.graphicsLayer().clip(RoundedCornerShape(size.radius)).background(TILE_BG)
       .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
       .semantics { contentDescription = "$name camera${if (streaming) ", live" else ""}" }) {
     val f = frame

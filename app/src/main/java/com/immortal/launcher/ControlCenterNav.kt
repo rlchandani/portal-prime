@@ -95,10 +95,16 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
   fun runScene(e: CcEntity) = act(e, CcCalls.run(e))
 
   /** Sends a confirmed call (from a modal) and closes it. */
-  fun confirmed(call: CcCall) { ControlCenter.send(context, call); modal(null) }
+  fun confirmed(call: CcCall) {
+    val e = call.entityId?.let { stateOf().entity(it) }
+    if (e != null && (e.domain == "scene" || e.domain == "script")) ControlCenter.runScene(context, e) else ControlCenter.send(context, call)
+    modal(null)
+  }
 
   private fun confirmFor(e: CcEntity, call: CcCall): CcModal = when {
     e.domain == "scene" -> CcModal.ScenePreview(e.id)
+    e.domain == "script" -> CcModal.Confirm(e.id, call, "Run ${e.name}?",
+        "This Home Assistant script can arm, unlock or open things, so it asks first.", "Run")
     e.domain == "valve" -> CcModal.Confirm(e.id, call, if (call.service == "close_valve") "Shut off the water?" else "Turn the water back on?",
         "${e.name} will ${if (call.service == "close_valve") "close" else "open"}.", if (call.service == "close_valve") "Shut off" else "Open")
     else -> CcModal.Confirm(e.id, call, "Unlock ${e.name.lowercase()}?", lockLine(e), "Unlock")
