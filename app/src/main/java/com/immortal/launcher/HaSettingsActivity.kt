@@ -180,7 +180,12 @@ private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
                     context.startActivity(approvedSettingsIntent(context, "ha-entities"))
                 }
                 Divider()
-                NavRow("Home Assistant dashboard") {
+                NavRow("Home Control Center") {
+                    cancelConnection()
+                    context.startActivity(ControlCenterActivity.intent(context))
+                }
+                Divider()
+                NavRow("Classic dashboard") {
                     cancelConnection()
                     context.startActivity(android.content.Intent(context, HaDashboardActivity::class.java))
                 }

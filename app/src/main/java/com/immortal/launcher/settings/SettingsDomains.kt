@@ -1362,5 +1362,6 @@ object SettingsDomains {
       listOf(screensaver, calendar, immortal, mqtt, quickbar, fleet, chime, digitalclock, welcome, sunrise,
           homeDashboard, calendarPacks, DinnerSettings.domain,
           com.immortal.launcher.ShareSettings.domain, HouseholdListSettings.domain, GuestSettings.domain,
-          MusicSettings.domain, FollowMeSettings.domain, BriefingSettings.domain, DoorbellSettings.domain)
+          MusicSettings.domain, FollowMeSettings.domain, BriefingSettings.domain, DoorbellSettings.domain,
+          ControlCenterSettings.domain)
 }

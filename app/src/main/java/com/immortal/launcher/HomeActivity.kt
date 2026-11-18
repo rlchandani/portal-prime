@@ -407,6 +407,9 @@ class HomeActivity : ComponentActivity() {
                 } else if (cn == ComponentName(this@HomeActivity, HomeDashboardActivity::class.java)) {
                   HomeDashboardActivity.openDashboard(this@HomeActivity)
                 } else if (cn.packageName == packageName &&
+                    cn.className == ControlCenterActivity::class.java.name) {
+                  startActivity(ControlCenterActivity.intent(this@HomeActivity))
+                } else if (cn.packageName == packageName &&
                     cn.className == WebAppActivity::class.java.name) {
                   // Music stays inside the retained Home host; no separate Activity/theme.
                   musicOpenRequest++
@@ -5040,6 +5043,18 @@ private fun loadApps(context: Context): List<AppEntry> {
               label = "Home dashboard",
               component = ComponentName(context, HomeDashboardActivity::class.java),
               icon = dashboardIcon,
+          )
+        }
+        // "Home Control" — the Control Center — once Home Assistant is connected (not on
+        // banners-only Portals, which keep alerts but no app).
+        if (HaConfig.isConfigured(context) && !ControlCenterConfig.load(context).bannersOnly) {
+          val controlIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_ha_tile)
+              ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+          if (controlIcon != null) out = out + AppEntry(
+              label = "Home Control",
+              component = ComponentName(context.packageName, ControlCenterActivity::class.java.name),
+              icon = controlIcon,
+              uninstallable = false,
           )
         }
         if (musicIcon != null) {
