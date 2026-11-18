@@ -28,7 +28,7 @@ class AppShortcutPreparationTest {
     mockConstruction(ComponentName::class.java).use { constructors ->
       assertTrue(approvedShortcutIcons(ctx, apps).isEmpty())
       assertTrue("Shortcut targets must not be rebuilt for every installed app; created ${constructors.constructed().size}",
-        constructors.constructed().size <= 4)
+        constructors.constructed().size <= 5)
     }
   }
 
@@ -52,9 +52,10 @@ class AppShortcutPreparationTest {
     }.use {
       approvedShortcutIcons(first, apps)
       approvedShortcutIcons(next, apps)
-      assertEquals(8, contexts.size)
-      assertTrue(contexts.take(4).all { it === first })
-      assertTrue(contexts.drop(4).all { it === next })
+      // Store, Music, Home dashboard, Home Control and Settings: five targets per visit.
+      assertEquals(10, contexts.size)
+      assertTrue(contexts.take(5).all { it === first })
+      assertTrue(contexts.drop(5).all { it === next })
     }
   }
 }

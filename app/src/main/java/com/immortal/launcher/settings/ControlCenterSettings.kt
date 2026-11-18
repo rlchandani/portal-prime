@@ -52,7 +52,7 @@ internal object ControlCenterSettings {
                   min = ControlCenterConfig.MIN_WARN_MIN, max = ControlCenterConfig.MAX_WARN_MIN, format = { "$it min" }),
               bool("bannersInfo", "Info: washer, dryer, dishwasher done", { it.bannersInfo }, ControlCenterConfig::setBannersInfo,
                   "Never during quiet hours."),
-              bool("criticalSoundAtNight", "Leak, smoke and CO alarms sound in quiet hours", { it.criticalSoundAtNight },
+              bool("criticalSoundAtNight", "Leak, smoke and CO play a sound at night", { it.criticalSoundAtNight },
                   ControlCenterConfig::setCriticalSoundAtNight,
                   "Every other alert is silent at night. Off: these three still take over the screen, silently."),
               bool("reducedMotion", "Reduced motion", { it.reducedMotion }, ControlCenterConfig::setReducedMotion,
