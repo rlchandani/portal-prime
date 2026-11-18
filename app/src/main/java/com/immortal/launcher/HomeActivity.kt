@@ -1431,19 +1431,25 @@ private fun LauncherScreen(
             customize = showCustomize))
         Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = HomeHeaderBudget.EDGE.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.GAP.dp)) {
-          if (header.wordmark || header.room) {
-            Row(Modifier.weight(1f, fill = false), verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-              if (header.wordmark) HearthpaneWordmark(ApprovedHomePalette.Text)
-              if (header.wordmark && header.room)
-                Box(Modifier.padding(horizontal = 12.dp).width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))
-              if (header.room) Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1,
-                  overflow = TextOverflow.Ellipsis)
+          // The leading group owns all the free width, so the trailing buttons always end on the
+          // 24 dp edge on every tab. (A fill=false weight beside a weighted Spacer split the free
+          // width and left the unused half after Settings: 8 px short on Home, ~100–190 px on
+          // Apps and Tools, where Customize is absent.)
+          Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.GAP.dp)) {
+            if (header.wordmark || header.room) {
+              Row(Modifier.weight(1f, fill = false), verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                if (header.wordmark) HearthpaneWordmark(ApprovedHomePalette.Text)
+                if (header.wordmark && header.room)
+                  Box(Modifier.padding(horizontal = 12.dp).width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))
+                if (header.room) Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
+              }
             }
+            ApprovedHeaderButton("screensaver", "Start screensaver", onStartScreensaver)
+            if (header.musicChip) MusicV3HomeChip { musicResume = true; onOpenMusic() }
           }
-          ApprovedHeaderButton("screensaver", "Start screensaver", onStartScreensaver)
-          if (header.musicChip) MusicV3HomeChip { musicResume = true; onOpenMusic() }
-          Spacer(Modifier.weight(1f))
           ApprovedHomeIcon("wifi", Modifier.size(22.dp))
           if (header.connectedLabel)
             Text(when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" }, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
