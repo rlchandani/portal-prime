@@ -20,9 +20,12 @@ internal object CcInterest {
   const val MAX_FOREGROUND = 600
   const val MAX_BACKGROUND = 200
 
-  /** Null = registry unavailable (non-admin token): subscribe to everything, filter on the Portal. */
+  /**
+   * Null = registry unavailable (non-admin token): subscribe to everything while on screen; the
+   * plan, scenes, people and alarm all need entities the plan alone doesn't list.
+   */
   fun foreground(reg: CcRegistry?, plan: CcPlan?): Set<String>? {
-    if (reg == null || reg.entities.isEmpty()) return plan?.entityIds?.takeIf { it.isNotEmpty() }
+    if (reg == null || reg.entities.isEmpty()) return null
     val wanted = reg.entities.filter { id ->
       val domain = id.substringBefore('.')
       domain in GLOBAL_DOMAINS || CcPlanEdit.planWorthy(id, reg, null) ||

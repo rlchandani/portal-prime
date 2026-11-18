@@ -74,6 +74,7 @@ internal class CcEngine(val app: Context) {
     heartbeat?.cancel(false); heartbeat = null
     socket?.close(CLOSE_NORMAL, null); socket = null
     protocol = null; subscribed = null; parts.clear(); planResolved = false
+    calls.values.forEach { it.onResult?.invoke(false, null) }
     calls.clear()
   }
 
@@ -97,10 +98,19 @@ internal class CcEngine(val app: Context) {
 
   private fun dropped(why: String) {
     Log.i(TAG, "control center socket $why")
-    socket = null; protocol = null; subscribed = null; parts.clear(); planResolved = false
-    heartbeat?.cancel(false); heartbeat = null
+    abandonSocket()
     if (!wantSocket) return
     scheduleRetry(generation, if (hadLive && attempt == 0) CcPhase.STALE else CcPhase.UNREACHABLE)
+  }
+
+  /** Forget the current socket; its late callbacks belong to an old generation and are ignored. */
+  private fun abandonSocket() {
+    generation++
+    socket?.cancel(); socket = null
+    protocol = null; subscribed = null; parts.clear(); planResolved = false
+    heartbeat?.cancel(false); heartbeat = null
+    calls.values.forEach { it.onResult?.invoke(false, null) }
+    calls.clear()
   }
 
   fun scheduleRetry(gen: Long, phase: CcPhase, delay: Long = CcBackoff.delayMs(attempt)) {
@@ -123,8 +133,8 @@ internal class CcEngine(val app: Context) {
     for (out in p.onMessage(text)) when (out) {
       is CcProtocol.Out.Send -> ws.send(out.text)
       CcProtocol.Out.AuthOk -> authOk(ws, p)
-      CcProtocol.Out.AuthFailed -> { Log.w(TAG, "control center token refused"); socket?.close(CLOSE_NORMAL, null); socket = null
-        scheduleRetry(generation, CcPhase.AUTH_FAILED, CcBackoff.AUTH_MS) }
+      CcProtocol.Out.AuthFailed -> { Log.w(TAG, "control center token refused"); abandonSocket()
+        scheduleRetry(generation, CcPhase.AUTH_FAILED, CcBackoff.AUTH_MS); return }
       is CcProtocol.Out.Entities -> entities { live.applyCompressed(out.event, clock()) }
       is CcProtocol.Out.Snapshot -> entities { live.snapshot(out.entities) }
       is CcProtocol.Out.Changed -> entities { live.update(mapOf(out.entityId to out.entity), clock()) }
@@ -145,7 +155,7 @@ internal class CcEngine(val app: Context) {
     val p = protocol ?: return
     val ws = socket ?: return
     val sent = p.pingSentAt
-    if (sent > 0 && clock() - sent > PONG_TIMEOUT_MS) { Log.i(TAG, "control center: no pong; reconnecting"); ws.cancel(); dropped("stale"); return }
+    if (sent > 0 && clock() - sent > PONG_TIMEOUT_MS) { Log.i(TAG, "control center: no pong; reconnecting"); dropped("stale"); return }
     ws.send(p.ping(clock()).text)
     ui = ui.copy(now = clock())
     publish(alertsToo = true)
@@ -203,6 +213,8 @@ internal class CcEngine(val app: Context) {
     val ids = interest()
     subscribed = ids
     subscribedForeground = visible > 0
+    // Nothing worth watching in the background (no registry, no plan): stay quiet, no subscription.
+    if (ids != null && ids.isEmpty()) { setPhase(CcPhase.LIVE, ""); return }
     ws.send(p.subscribe(ids).text)
   }
 
@@ -220,7 +232,8 @@ internal class CcEngine(val app: Context) {
   }
 
   private fun interest(): Set<String>? =
-      if (visible > 0) CcInterest.foreground(ui.registry, ui.plan) else CcInterest.background(ui.registry)
+      if (visible > 0) CcInterest.foreground(ui.registry, ui.plan)
+      else CcInterest.background(ui.registry) ?: ui.plan?.entityIds.orEmpty()
 
   // --- publishing --------------------------------------------------------------------------
 

@@ -112,7 +112,7 @@ class ControlCenterPlanEditTest {
     val bg = CcInterest.background(reg)!!
     assertEquals(setOf("binary_sensor.kdoor", "cover.gd", "binary_sensor.wild"), bg)
     assertNull(CcInterest.foreground(null, null))
-    assertEquals(setOf("light.z"), CcInterest.foreground(null, CcPlan(listOf(CcFloor("g", "G", listOf(CcRoom("r", "R", CcRect(0, 0, 1, 1),
+    assertNull(CcInterest.foreground(null, CcPlan(listOf(CcFloor("g", "G", listOf(CcRoom("r", "R", CcRect(0, 0, 1, 1),
         devices = listOf(CcPlaced("light.z", 0f, 0f)))))))))
     assertNull(CcInterest.background(null))
   }
