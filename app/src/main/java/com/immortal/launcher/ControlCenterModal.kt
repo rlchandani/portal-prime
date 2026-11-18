@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 internal fun CcModalHost(s: CcUiState, ui: CcUi) {
-  val modal = ui.nav.modal
+  val modal = ui.openModal
   val motion = LocalCcMotion.current
   val pop = rememberCcPresence(modal != null, if (motion) CC_MODAL_MS else 0, CcSpringEase)
   val fade = rememberCcPresence(modal != null, if (motion) CC_MODAL_FADE_MS else 0, LinearEasing)

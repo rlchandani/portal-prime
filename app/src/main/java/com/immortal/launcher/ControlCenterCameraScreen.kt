@@ -43,7 +43,7 @@ internal fun CcCamerasScreen(s: CcUiState, ui: CcUi) {
   val configured = s.connection.phase != CcPhase.NOT_CONFIGURED
   val all = remember(s.entitiesVersion, s.settings) { s.ofDomain("camera") }
   val grid = remember(all) { CcCamGrid(CcCameraLogic.gridCameras(all).map { CcCamRef(it.id, it.name) }) }
-  val fullId = ui.nav.cameraFull
+  val fullId = ui.cameraFull
   val full = remember(fullId, s.entitiesVersion, s.plan, s.connection.canControl, all) {
     fullId?.let { id -> s.entity(id)?.let { cam -> fullSlice(cam, s, all) } }
   }

@@ -33,9 +33,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -55,6 +56,14 @@ internal fun CcCameraTile(s: CcUiState, cameraId: String, live: Boolean, modifie
   if (ccCamerasHidden(s.settings)) return
   val name = label ?: s.entity(cameraId)?.name ?: CcEntity.prettyId(cameraId)
   CcCameraPicture(cameraId, name, live, s.connection.phase != CcPhase.NOT_CONFIGURED, modifier, onClick, CcCameraTileSize.GRID)
+}
+
+/** What a camera picture needs from the state, so a card of pictures skips on HA updates. */
+@androidx.compose.runtime.Immutable
+internal data class CcCameraFeedState(val hidden: Boolean, val configured: Boolean) {
+  companion object {
+    fun of(s: CcUiState) = CcCameraFeedState(ccCamerasHidden(s.settings), s.connection.phase != CcPhase.NOT_CONFIGURED)
+  }
 }
 
 /** Kids mode on a Portal that hides cameras. */
@@ -86,12 +95,12 @@ internal fun CcCameraPicture(cameraId: String, name: String, live: Boolean, conf
   if (configured && onScreen) { if (streaming) CcLiveFeed(cameraId, holder) else CcSnapshotLoop(cameraId, holder) }
   Box(modifier.graphicsLayer().clip(RoundedCornerShape(size.radius)).background(TILE_BG)
       .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
-      .semantics { contentDescription = "$name camera${if (streaming) ", live" else ""}" }) {
+      .ccSpeak("$name camera${if (streaming) ", live" else ""}")) {
     val has = holder.hasFrame
     if (has) FrameLayer(holder)
     else Placeholder(when { !configured -> "Home Assistant isn't set up"; holder.failed -> "Camera unavailable"; else -> "Loading camera…" })
     Box(Modifier.fillMaxSize().background(SHADE))
-    if (has) FrameStamp(holder, Modifier.align(Alignment.TopStart).padding(start = 12.dp, top = 10.dp))
+    if (has) FrameStamp(holder)
     if (streaming && has) LiveTag(size, Modifier.align(Alignment.TopEnd))
     Text(name, style = overlay(size.label), fontWeight = FontWeight.SemiBold, color = Color.White, maxLines = 1,
         modifier = Modifier.align(Alignment.BottomStart).padding(start = size.labelInset, bottom = size.labelInset * LABEL_BOTTOM))
@@ -108,13 +117,21 @@ private fun BoxScope.FrameLayer(holder: CcFrameHolder) {
   })
 }
 
-/** The burnt-in clock: its own tiny scope, re-formatted at most once a second. */
+/**
+ * The burnt-in clock, drawn rather than composed: a new frame re-records only this layer — no
+ * recomposition, no text re-measure in layout and no semantics change (a Text would make Compose
+ * re-diff the whole accessibility tree on every snapshot). Pixels are the same as the former Text.
+ */
 @Composable
-private fun FrameStamp(holder: CcFrameHolder, modifier: Modifier) {
-  val second by remember(holder) { derivedStateOf { (holder.frame?.at ?: 0L) / MS_PER_S } }
+private fun BoxScope.FrameStamp(holder: CcFrameHolder) {
+  val second = remember(holder) { derivedStateOf { (holder.frame?.at ?: 0L) / MS_PER_S } }
   val format = remember { CcCameraLogic.timestampFormat() }
-  val text = remember(second) { format.format(java.util.Date(second * MS_PER_S)) }
-  Text(text, style = STAMP, fontFamily = CcStyle.Mono, fontWeight = FontWeight.SemiBold, color = Color(0xD9FFFFFF), modifier = modifier)
+  val measurer = rememberTextMeasurer(cacheSize = STAMP_CACHE)
+  val style = remember { STAMP.merge(TextStyle(color = Color(0xD9FFFFFF), fontFamily = CcStyle.Mono, fontWeight = FontWeight.SemiBold)) }
+  Box(Modifier.matchParentSize().graphicsLayer().drawBehind {
+    val text = format.format(java.util.Date(second.value * MS_PER_S))
+    drawText(measurer.measure(text, style), topLeft = Offset(STAMP_X.dp.toPx(), STAMP_Y.dp.toPx()))
+  })
 }
 
 @Composable
@@ -143,3 +160,6 @@ private val SHADE = Brush.verticalGradient(0.6f to Color.Transparent, 1f to Colo
 private val PLACEHOLDER = Brush.verticalGradient(listOf(Color(0xFF151A24), Color(0xFF0B0D10)))
 private const val LABEL_BOTTOM = 0.82f
 private const val MS_PER_S = 1000L
+private const val STAMP_X = 12
+private const val STAMP_Y = 10
+private const val STAMP_CACHE = 4

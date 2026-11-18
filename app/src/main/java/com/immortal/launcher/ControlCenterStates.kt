@@ -46,7 +46,7 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun CcConnectionOverlay(s: CcUiState, ui: CcUi) {
   val context = LocalContext.current
-  if (ui.nav.screen == CcScreen.SETTINGS) return
+  if (ui.screen == CcScreen.SETTINGS) return
   val phase = s.connection.phase
   if (phase !in setOf(CcPhase.UNREACHABLE, CcPhase.AUTH_FAILED, CcPhase.NOT_CONFIGURED, CcPhase.OFFLINE)) return
   val c = LocalCc.current

@@ -38,6 +38,11 @@ internal data class CcUiState(
     val entitiesVersion: Long = 0L,
     /** "Dry run · Test plan" while operator test switches are on (see [CcDebugStore]); null normally. */
     val debug: String? = null,
+    /**
+     * Each floor's plan model, built by the engine off the main thread ([CcPlanModelCache]) while
+     * someone looks. Derived from the fields [equals] compares, so it isn't compared itself.
+     */
+    val planModels: Map<String, CcPlanModel> = emptyMap(),
 ) {
   /**
    * Cheap equality for Compose skipping: the entity map is compared by [entitiesVersion] (the
@@ -86,12 +91,25 @@ internal data class CcUiState(
         .filter { a -> a.severity == CcSeverity.CRITICAL || entities[a.entityId]?.let { !CcPolicy.hidden(it, settings) } != false }
   }
 
+  /** The overview's side column, derived once per snapshot ([warm] does it off the main thread). */
+  val side: CcSideSlices by lazy(LazyThreadSafetyMode.PUBLICATION) { CcSideSlices.of(this) }
+
+  /**
+   * Computes the per-snapshot derivations ([ofDomain] grouping, [alerts], [fahrenheit], [side])
+   * now. The engine calls it on its own thread before publishing, so screens reading them on
+   * the main thread find them ready instead of building them inside a frame.
+   */
+  fun warm(): CcUiState {
+    byDomain; alerts(); fahrenheit; weather; side
+    return this
+  }
+
   /** The household alarm panel, when HA has one (and kids mode doesn't hide it). */
   val alarm: CcEntity? get() = ofDomain("alarm_control_panel").firstOrNull()
 
   val people: List<CcEntity> get() = ofDomain("person")
 
-  val weather: CcEntity? get() = entities.values.firstOrNull { it.domain == "weather" }
+  val weather: CcEntity? by lazy(LazyThreadSafetyMode.PUBLICATION) { entities.values.firstOrNull { it.domain == "weather" } }
 
   /** Uses °F when HA reports temperatures in °F. Worked out once per snapshot (asked many times per frame). */
   val fahrenheit: Boolean by lazy(LazyThreadSafetyMode.PUBLICATION) {

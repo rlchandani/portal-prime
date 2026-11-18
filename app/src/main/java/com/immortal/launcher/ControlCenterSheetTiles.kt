@@ -84,7 +84,8 @@ internal fun CcDeviceTile(ui: CcUi, e: CcEntity, pending: Boolean, enabled: Bool
       CcCtlBusy(pending, 30)
       TileTrailing(ui, e, enabled, guarded)
     }
-    Column {
+    // The tile itself says "name, status"; its texts are not nodes of their own.
+    Column(Modifier.ccSilent()) {
       Text(e.name, color = c.text, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 26.sp)
       Text(status, color = if (stale) c.faint else if (tone == CcTileTone.WARN) c.amber else c.sec, fontSize = 19.sp,
           maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -147,11 +148,12 @@ private fun SensorRow(ui: CcUi, e: CcEntity, now: Long, divider: Boolean) {
   val c = LocalCc.current
   if (divider) HorizontalDivider(color = c.div, thickness = 1.dp)
   val tone = CcSheetLogic.tone(e)
-  Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).clickable(role = Role.Button) { ui.openDevice(e.id) },
+  val status = CcSheetLogic.status(e, now)
+  Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).clickable(role = Role.Button) { ui.openDevice(e.id) }.ccSpeak("${e.name}, $status"),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
     CcIcon(tileIcon(e), if (tone == CcTileTone.WARN) c.amber else c.sec, 30.dp)
     Text(e.name, color = c.text, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-    Text(CcSheetLogic.status(e, now), color = if (tone == CcTileTone.WARN) c.amber else c.sec, fontSize = 21.sp,
+    Text(status, color = if (tone == CcTileTone.WARN) c.amber else c.sec, fontSize = 21.sp,
         fontWeight = FontWeight.SemiBold, maxLines = 1)
   }
 }

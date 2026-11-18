@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 internal fun ColumnScope.CcDeviceSheet(s: CcUiState, ui: CcUi, entityId: String) {
-  val stack = ui.nav.sheets
+  val stack = ui.sheets
   val d = remember(s, entityId, stack) { CcSlices.device(s, entityId, stack) }
   CcDeviceHeader(ui, d.backLabel, d.entity?.name ?: "Not found", d.pending)
   val e = d.entity

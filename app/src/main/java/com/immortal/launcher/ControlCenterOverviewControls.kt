@@ -17,8 +17,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -44,10 +46,26 @@ internal fun CcPlanTopRow(floors: CcFloorTabs, floorId: String, lens: CcLens, on
   }
 }
 
+/**
+ * The three lens legends, all composed and stacked; only [lens]'s is drawn (layer alpha) and in
+ * the semantics tree. A lens tap then inserts no nodes and measures no text.
+ */
 @Composable
-internal fun CcPlanLegend(legend: CcLegend, modifier: Modifier = Modifier) {
+internal fun CcPlanLegends(legends: List<CcLegend>, lens: CcLens, modifier: Modifier = Modifier) {
+  Box(modifier, contentAlignment = Alignment.BottomStart) {
+    legends.forEach { l ->
+      key(l.lens) {
+        val shown = l.lens == lens
+        CcPlanLegend(l, shown, Modifier.graphicsLayer { alpha = if (shown) 1f else 0f })
+      }
+    }
+  }
+}
+
+@Composable
+internal fun CcPlanLegend(legend: CcLegend, shown: Boolean = true, modifier: Modifier = Modifier) {
   val c = LocalCc.current
-  LegendPill(modifier) {
+  LegendPill(if (shown) modifier.ccSpeak(CcSpeech.legend(legend)) else modifier.ccSilent()) {
     when (legend.lens) {
       CcLens.LIVE -> {
         LegendDot(Color(OPAQUE or CcOverviewText.WARM_WASH), "Lights on: ${legend.lightsOn}")
@@ -80,7 +98,7 @@ internal fun CcPlanLegend(legend: CcLegend, modifier: Modifier = Modifier) {
 @Composable
 internal fun CcFreshnessPill(text: String, live: Boolean, modifier: Modifier = Modifier) {
   val c = LocalCc.current
-  LegendPill(modifier) {
+  LegendPill(modifier.ccSpeak(text)) {
     if (live) {
       Box(Modifier.size(22.dp), contentAlignment = Alignment.Center) {
         Box(Modifier.size(22.dp).clip(CircleShape).background(c.green.copy(alpha = DOT_HALO)))

@@ -10,6 +10,7 @@ import androidx.compose.runtime.Immutable
 import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 
 /** The plan's three lenses on the same map (Live / Climate / Energy). */
 internal enum class CcLens { LIVE, CLIMATE, ENERGY }
@@ -34,6 +35,10 @@ internal sealed interface CcModal {
   data class ArmCheck(val panelId: String, val mode: CcAlarmMode) : CcModal
 }
 
+/** What the plan card reads from [CcNav]: floor, lens and the highlighted room. */
+@Immutable
+internal data class CcPlanView(val floorId: String?, val lens: CcLens, val highlightRoom: String?)
+
 /** Screen-local navigation (immutable; replaced, never mutated). */
 @Immutable
 internal data class CcNav(
@@ -57,8 +62,25 @@ internal data class CcNav(
  */
 @Stable
 internal class CcUi(val context: Context, private val navState: MutableState<CcNav>, private val stateOf: () -> CcUiState) {
+  /** The whole navigation; reading it in composition recomposes on ANY change (prefer the narrow reads below). */
   val nav: CcNav get() = navState.value
   private fun set(n: CcNav) { navState.value = n }
+
+  // Narrow reads: a composable reading one of these recomposes only when that part changes, so a
+  // lens tap doesn't recompose the shell, the sheet host, the modal host or the parked screens.
+  private val screenOf = derivedStateOf { navState.value.screen }
+  private val floorOf = derivedStateOf { navState.value.floorId }
+  private val planViewOf = derivedStateOf { navState.value.let { CcPlanView(it.floorId, it.lens, it.highlightRoom) } }
+  private val sheetsOf = derivedStateOf { navState.value.sheets }
+  private val modalOf = derivedStateOf { navState.value.modal }
+  private val cameraFullOf = derivedStateOf { navState.value.cameraFull }
+  val screen: CcScreen get() = screenOf.value
+  val floorId: String? get() = floorOf.value
+  val planView: CcPlanView get() = planViewOf.value
+  val sheets: List<CcSheet> get() = sheetsOf.value
+  val topSheet: CcSheet? get() = sheetsOf.value.lastOrNull()
+  val openModal: CcModal? get() = modalOf.value
+  val cameraFull: String? get() = cameraFullOf.value
 
   fun go(screen: CcScreen) {
     if (CcPolicy.screenHidden(screen, stateOf().settings)) return

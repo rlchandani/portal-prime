@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -65,7 +66,7 @@ internal fun CcButton(
     CcButtonStyle.DANGER -> c.red to Color.White
   }
   Row(modifier.height(height.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA).clip(CcStyle.Pill).background(bg)
-      .clickable(enabled = enabled, role = Role.Button, onClick = onClick).padding(horizontal = 34.dp),
+      .clickable(enabled = enabled, role = Role.Button, onClick = onClick).ccSpeak(label).padding(horizontal = 34.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)) {
     icon?.let { CcIcon(it, fg, 30.dp) }
     Text(label, color = fg, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
@@ -79,12 +80,16 @@ internal fun <T> CcSeg(options: List<Triple<T, String, String?>>, selected: T, o
   Row(modifier.clip(CcStyle.Pill).background(c.surface2).padding(5.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
     options.forEach { (key, label, icon) ->
       val on = key == selected
-      Row(Modifier.height(58.dp).then(if (on) Modifier.ccCard(CcStyle.Pill, c.segOn) else Modifier).clip(CcStyle.Pill)
-          .clickable(role = Role.Tab) { onSelect(key) }.padding(horizontal = 24.dp)
-          .semantics { contentDescription = if (on) "$label, selected" else label },
-          verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        icon?.let { CcIcon(it, if (on) c.text else c.sec, 26.dp) }
-        Text(label, color = if (on) c.text else c.sec, fontSize = 21.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1)
+      Box {
+        // Every option keeps its raised pill; selection only fades it in (a layer alpha), so a
+        // tap changes no modifier chain — nothing is inserted, re-laid out or re-recorded.
+        Box(Modifier.matchParentSize().graphicsLayer { alpha = if (on) 1f else 0f }.ccCard(CcStyle.Pill, c.segOn))
+        Row(Modifier.height(58.dp).clip(CcStyle.Pill)
+            .clickable(role = Role.Tab) { onSelect(key) }.ccSpeak(label, selected = on).padding(horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+          icon?.let { CcIcon(it, if (on) c.text else c.sec, 26.dp) }
+          Text(label, color = if (on) c.text else c.sec, fontSize = 21.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1)
+        }
       }
     }
   }
@@ -93,7 +98,7 @@ internal fun <T> CcSeg(options: List<Triple<T, String, String?>>, selected: T, o
 @Composable
 internal fun CcSectionLabel(text: String, modifier: Modifier = Modifier) {
   val c = LocalCc.current
-  Text(text.uppercase(), color = c.sec, fontSize = 21.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.6.sp, modifier = modifier)
+  Text(text.uppercase(), color = c.sec, fontSize = 21.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.6.sp, modifier = modifier.ccSpeak(text, heading = true))
 }
 
 /** iOS-style switch from the mock (green when on), 88×50. */

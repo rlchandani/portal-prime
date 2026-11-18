@@ -33,6 +33,25 @@ internal data class CcCameraList(val cams: List<CcFloorTab>)
 @Immutable
 internal data class CcSceneTile(val entity: CcEntity, val tone: CcSceneTone, val subtitle: String)
 
+/**
+ * The overview side column's whole input, derived once per snapshot ([CcUiState.side]). The engine
+ * computes it on its own thread before publishing, so an HA update costs the main thread only the
+ * equality checks that let unchanged cards skip.
+ */
+@Immutable
+internal data class CcSideSlices(val attention: CcAttentionSlice, val scenes: CcSceneGrid, val energy: CcEnergyNow?, val cameras: CcCameraList) {
+  companion object {
+    fun of(s: CcUiState): CcSideSlices = CcSideSlices(
+        attention = CcSideLogic.attention(s.alerts(), s.entities, s.plan, s.settings),
+        scenes = CcSceneGrid(CcSideLogic.tiles(s.ofDomain("scene") + s.ofDomain("script"), s.plan, s.settings.kids)),
+        energy = if (CcPolicy.screenHidden(CcScreen.ENERGY, s.settings)) null
+            else CcEnergy.now(s.entities).takeIf { it.hasFlow || it.batteryPct != null },
+        cameras = CcCameraList(if (CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings)) emptyList()
+            else s.ofDomain("camera").take(CcSideLogic.CAMERA_TILES).map { CcFloorTab(it.id, it.name) }),
+    )
+  }
+}
+
 internal object CcSideLogic {
   const val SCENE_TILES = 4
   const val ATTENTION_ROWS = 4

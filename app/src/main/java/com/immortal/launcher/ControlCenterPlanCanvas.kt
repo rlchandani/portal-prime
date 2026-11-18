@@ -32,8 +32,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
@@ -86,16 +84,21 @@ internal fun CcPlanCanvas(
   val base = remember(px, c, density) { CcPlanBase(px, c, density.density) }
   val flows = remember(px, model.flows, sources, lens) { if (lens == CcLens.ENERGY) CcFlowPx(px, model.flows, sources) else null }
   val dashes = remember(density) { with(density) { CcMapDashes(DASH_DP.dp.toPx(), GAP_DP.dp.toPx()) } }
-  val labels = remember(model.views, lens, textPaints) { roomTexts(model, lens, textPaints) }
-  val chipText = remember(model.badges, model.chips, sources, lens, textPaints) { chipTexts(model, sources, lens, textPaints) }
+  // Texts per (model, lens), kept for the lenses just shown: switching back measures nothing.
+  val texts = remember(textPaints) { CcLru<CcLensKey, Pair<Map<String, CcRoomText>, CcMapChipText>>(LENS_CACHE) }
+  val (labels, chipText) = remember(model, lens, sources, textPaints) {
+    texts.getOrPut(CcLensKey(model, lens, sources)) { roomTexts(model, lens, textPaints) to chipTexts(model, sources, lens, textPaints) }
+  }
   val ctx = remember(model, px, flows, paint, c, labels, chipText, lens, focus, stale, sources, fahrenheit) {
     CcPlanDraw(model, px, flows, paint, c, labels, chipText, lens, focus, stale, dashes, sources, fahrenheit, density.density)
   }
   val motion = LocalCcMotion.current
   val latestTap by rememberUpdatedState(onTap)
-  val description = remember(model.views) { "Floor plan: " + model.views.joinToString(", ") { it.room.name } }
+  val description = remember(model.views, model.floor.name, lens) {
+    CcSpeech.plan(CcOverviewText.shortFloor(model.floor.name), lens, model.views.map { it.room.name to CcOverviewText.caption(it, lens) })
+  }
   val ready = size != IntSize.Zero && px.fit.scale > 0f
-  Box(modifier.onSizeChanged { size = it }.semantics { contentDescription = description }
+  Box(modifier.onSizeChanged { size = it }.ccSpeak(description)
       .pointerInput(px, model) { detectTapGestures { pos -> hit(model, px, pos, TAP_DP.dp.toPx())?.let { latestTap(it) } } }) {
     if (!ready) return@Box
     val loops = ctx.animates
@@ -156,6 +159,16 @@ private fun hit(model: CcPlanModel, px: CcPlanPx, pos: Offset, radiusPx: Float):
   }
   return CcPlanGeo.roomAt(model.floor, cx, cy)?.let { CcPlanHit.Room(it.id) }
 }
+
+/** A plan model (by identity: the engine keeps unchanged models) shown in one lens. */
+internal class CcLensKey(private val model: CcPlanModel, private val lens: CcLens, private val sources: CcMapSources) {
+  override fun equals(other: Any?): Boolean = other is CcLensKey && other.model === model && other.lens == lens && other.sources == sources
+  override fun hashCode(): Int = System.identityHashCode(model) * HASH_PRIME + lens.ordinal
+}
+
+private const val HASH_PRIME = 31
+/** Model × lens text sets kept (three lenses, a floor or two). */
+private const val LENS_CACHE = 6
 
 /** Plan sizes from the mock (dp; geometry itself is in cells). */
 internal const val MAX_CELL_DP = 34f

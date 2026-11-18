@@ -87,7 +87,7 @@ private fun RailItem(icon: String, label: String, on: Boolean, badge: Int = 0, o
   Box(Modifier.size(104.dp, 96.dp)
       .then(if (on) Modifier.ccCard(RoundedCornerShape(24.dp)) else Modifier)
       .clip(RoundedCornerShape(24.dp)).clickable(role = Role.Tab, onClick = onClick)
-      .semantics { contentDescription = if (badge > 0) "$label, $badge" else label }) {
+      .ccSpeak(if (badge > 0) "$label, $badge" else label, selected = on)) {
     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
       CcIcon(icon, if (on) c.text else c.sec, 38.dp)
       Text(label, color = if (on) c.text else c.sec, fontSize = 17.sp, maxLines = 1)
@@ -123,31 +123,34 @@ internal fun CcHeader(h: CcHeaderSlice, ui: CcUi, onJarvis: () -> Unit) {
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
     Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       HearthpaneGlyph(30.dp)
-      Column {
+      Column(Modifier.ccSpeak("${h.title}. ${h.subtitle}", heading = true)) {
         Text(h.title, color = c.text, fontSize = 46.sp, fontFamily = CcStyle.Serif, maxLines = 1, lineHeight = 48.sp)
         Text(h.subtitle, color = c.sec, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
       }
     }
     val home = h.people.filter { it.state == "home" }
-    if (h.people.isNotEmpty()) CcPill(onClick = { ui.go(CcScreen.SECURITY) }) {
+    if (h.people.isNotEmpty()) CcPill(CcSpeech.people(home.map { it.name }, h.people.size), onClick = { ui.go(CcScreen.SECURITY) }) {
       CcAvatars(home.ifEmpty { h.people }.take(4))
       Text(if (home.isEmpty()) "Nobody home" else "${home.size} home", color = c.text, fontSize = 22.sp)
     }
     h.alarm?.let { a ->
       val armed = a.state.startsWith("armed")
-      CcPill(onClick = { ui.go(CcScreen.SECURITY) }) {
+      CcPill(CcSpeech.alarm(alarmLabel(a.state)), onClick = { ui.go(CcScreen.SECURITY) }) {
         CcIcon(if (armed) "shieldck" else "shield", if (armed) c.green else c.text, 28.dp)
         Text(alarmLabel(a.state), color = if (armed) c.green else c.text, fontSize = 22.sp)
       }
     }
-    if (h.weatherTemp != null || h.weatherText != null) CcPill {
-      CcIcon(if (h.night) "moon" else "sun", c.text, 28.dp)
-      Text(listOfNotNull(h.weatherTemp?.let { "$it°" }, h.weatherText).joinToString(" · "), color = c.text, fontSize = 22.sp)
+    if (h.weatherTemp != null || h.weatherText != null) {
+      val weather = listOfNotNull(h.weatherTemp?.let { "$it°" }, h.weatherText).joinToString(" · ")
+      CcPill("Weather $weather") {
+        CcIcon(if (h.night) "moon" else "sun", c.text, 28.dp)
+        Text(weather, color = c.text, fontSize = 22.sp)
+      }
     }
-    h.debug?.let { label -> CcPill { CcIcon("warn", c.amber, 26.dp); Text(label, color = c.amber, fontSize = 22.sp) } }
+    h.debug?.let { label -> CcPill(label) { CcIcon("warn", c.amber, 26.dp); Text(label, color = c.amber, fontSize = 22.sp) } }
     CcLivePill(h.phase)
     Row(Modifier.height(72.dp).shadow(14.dp, CcStyle.Pill, ambientColor = CcStyle.Ember, spotColor = CcStyle.Ember)
-        .clip(CcStyle.Pill).background(CcStyle.JarvisBrush).clickable(role = Role.Button, onClick = onJarvis)
+        .clip(CcStyle.Pill).background(CcStyle.JarvisBrush).clickable(role = Role.Button, onClick = onJarvis).ccSpeak("Ask Jarvis")
         .padding(start = 18.dp, end = 28.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       Box(Modifier.size(40.dp).clip(CircleShape).background(Brush.radialGradient(listOf(Color(0xFFFFF7EA), Color(0xFFFFD3A1), CcStyle.Ember))))
       Text("Ask Jarvis", color = CcStyle.EmberInk, fontSize = 23.sp, fontWeight = FontWeight.SemiBold)
@@ -168,7 +171,7 @@ internal fun CcLivePill(phase: CcPhase) {
     CcPhase.OFFLINE -> c.red to "Portal offline"
     CcPhase.NOT_CONFIGURED -> c.red to "Not set up"
   }
-  CcPill {
+  CcPill("Home Assistant: $label") {
     Box(Modifier.size(22.dp), contentAlignment = Alignment.Center) {
       Box(Modifier.size(22.dp).clip(CircleShape).background(color.copy(alpha = 0.22f)))
       Box(Modifier.size(12.dp).clip(CircleShape).background(color))
@@ -177,10 +180,11 @@ internal fun CcLivePill(phase: CcPhase) {
   }
 }
 
+/** A header pill: one screen-reader node saying [description]. */
 @Composable
-internal fun CcPill(onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {
+internal fun CcPill(description: String, onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {
   Row(Modifier.height(60.dp).ccCard(CcStyle.Pill).clip(CcStyle.Pill)
-      .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
+      .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier).ccSpeak(description)
       .padding(horizontal = 22.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { content() }
 }
 

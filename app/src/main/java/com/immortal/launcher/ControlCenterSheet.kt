@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 internal fun CcSheetHost(s: CcUiState, ui: CcUi) {
-  val top = ui.nav.topSheet
+  val top = ui.topSheet
   val motion = LocalCcMotion.current
   val slide = rememberCcPresence(top != null, if (motion) CC_SHEET_MS else 0, CcEase)
   val scrim = rememberCcPresence(top != null, if (motion) CC_SCRIM_MS else 0, LinearEasing)

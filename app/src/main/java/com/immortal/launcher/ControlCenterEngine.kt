@@ -54,6 +54,8 @@ internal class CcEngine(val app: Context) {
   var dryRun = CcDebugStore.dryRun(app)
   var testPlan: CcPlan? = CcDebugStore.testPlan(app)
   @Volatile var clock: () -> Long = System::currentTimeMillis
+  /** Floor models for the plan, kept between snapshots (engine thread only). */
+  private val planModels = CcPlanModelCache()
 
   private val client by lazy { OkHttpClient.Builder().readTimeout(0, TimeUnit.MILLISECONDS).connectTimeout(CONNECT_S, TimeUnit.SECONDS).build() }
 
@@ -276,7 +278,10 @@ internal class CcEngine(val app: Context) {
       publishedLive = live
       ui = ui.copy(entities = live.view(), pending = live.pending.keys, appliancesDone = live.done, entitiesVersion = ui.entitiesVersion + 1)
     }
+    // Derive what every screen reads once, here on the engine thread, not inside a frame.
     ui = ui.copy(now = clock())
+    ui = ui.copy(planModels = if (visible > 0) planModels.of(ui) else emptyMap()).warm()
+    if (visible == 0) planModels.clear()
     flow.value = ui
     if (alertsToo && ui.connection.phase == CcPhase.LIVE) presentNewAlerts()
   }

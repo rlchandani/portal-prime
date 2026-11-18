@@ -61,7 +61,8 @@ private fun RowScope.SceneTile(tile: CcSceneTile, enabled: Boolean, ui: CcUi) {
   val look = remember(tile.tone, c) { SceneLook.of(tile.tone, c) }
   val run = remember(tile.entity, ui) { { ui.runScene(tile.entity) } }
   Column(Modifier.weight(1f).height(118.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA).clip(SCENE).background(look.bg)
-      .clickable(enabled = enabled, role = Role.Button, onClick = run).padding(horizontal = 22.dp),
+      .clickable(enabled = enabled, role = Role.Button, onClick = run).ccSpeak(CcSpeech.scene(tile.entity.name, tile.subtitle))
+      .padding(horizontal = 22.dp),
       verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)) {
     CcIcon(CcSideLogic.icon(tile.tone), look.fg, 36.dp)
     Text(tile.entity.name, color = look.fg, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -87,14 +88,18 @@ private class SceneLook(val bg: Brush, val fg: Color, val sub: Color) {
 @Composable
 internal fun CcEnergyNowCard(now: CcEnergyNow, ui: CcUi) {
   val open = remember(ui) { { ui.go(CcScreen.ENERGY) } }
-  Column(Modifier.fillMaxWidth().ccCard().clickable(role = Role.Button, onClick = open).padding(horizontal = 24.dp, vertical = 22.dp),
-      verticalArrangement = Arrangement.spacedBy(14.dp)) {
+  val home = CcEnergy.kw(now.homeW)
+  val solar = CcEnergy.kw(now.solarW)
+  val battery = now.batteryPct?.let { "$it%" } ?: "—"
+  val grid = CcEnergy.kw(now.gridW)
+  Column(Modifier.fillMaxWidth().ccCard().clickable(role = Role.Button, onClick = open).ccSpeak(CcSpeech.energyNow(home, solar, battery, grid))
+      .padding(horizontal = 24.dp, vertical = 22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
     CcSectionLabel("Energy now")
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-      EnergyCell(CcEnergy.kw(now.homeW), "home", "kW use")
-      EnergyCell(CcEnergy.kw(now.solarW), "sun", "solar")
-      EnergyCell(now.batteryPct?.let { "$it%" } ?: "—", "battery", "battery")
-      EnergyCell(CcEnergy.kw(now.gridW), "grid", "grid")
+      EnergyCell(home, "home", "kW use")
+      EnergyCell(solar, "sun", "solar")
+      EnergyCell(battery, "battery", "battery")
+      EnergyCell(grid, "grid", "grid")
     }
   }
 }
@@ -111,17 +116,19 @@ private fun RowScope.EnergyCell(value: String, icon: String, label: String) {
   }
 }
 
-/** [cams] are (id, name); [s] is passed through only because [CcCameraTile] (cameras screen) takes it. */
+/** [cams] are (id, name); [feed] is all the pictures read from the state. */
 @Composable
-internal fun CcCamerasCard(s: CcUiState, list: CcCameraList, ui: CcUi) {
+internal fun CcCamerasCard(feed: CcCameraFeedState, list: CcCameraList, ui: CcUi) {
+  if (feed.hidden) return
   val cams = list.cams
   Column(Modifier.fillMaxWidth().ccCard()) {
     CcSectionLabel("Cameras", Modifier.padding(start = 24.dp, end = 24.dp, top = 22.dp))
     Row(Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 22.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
       cams.forEach { cam ->
         key(cam.id) {
-          CcCameraTile(s, cam.id, live = false, modifier = Modifier.weight(1f).aspectRatio(CAMERA_ASPECT).clip(CELL),
-              label = cam.label, onClick = remember(cam.id, ui) { { ui.camera(cam.id) } })
+          CcCameraPicture(cam.id, cam.label, live = false, configured = feed.configured,
+              modifier = Modifier.weight(1f).aspectRatio(CAMERA_ASPECT).clip(CELL),
+              onClick = remember(cam.id, ui) { { ui.camera(cam.id) } }, size = CcCameraTileSize.GRID)
         }
       }
       if (cams.size == 1) Box(Modifier.weight(1f))

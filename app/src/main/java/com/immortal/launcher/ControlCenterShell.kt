@@ -50,11 +50,14 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
         if (state.settings.bannersOnly) CcBannersOnly(onExit)
         else {
           Row(Modifier.fillMaxSize()) {
-            val nav = navState.value
-            val rail = CcRailSlice.of(state, nav.screen)
+            val screen = ui.screen
+            val rail = CcRailSlice.of(state, screen)
             CcRail(rail, ui, onHome = onExit)
             Column(Modifier.weight(1f).fillMaxSize()) {
-              val header = CcHeaderSlice.of(state, ccTitle(nav.screen), subtitleFor(state, nav))
+              val floorId = ui.floorId
+              // Formatted once per minute / screen / floor, not on every HA update.
+              val subtitle = remember(state.minute, screen, floorId, state.plan, state.settings.kids) { subtitleFor(state, screen, floorId) }
+              val header = CcHeaderSlice.of(state, ccTitle(screen), subtitle)
               CcHeader(header, ui, onJarvis)
               Box(Modifier.weight(1f).fillMaxWidth()) { CcScreenBody(state, ui) }
             }
@@ -101,9 +104,9 @@ internal fun ccTitle(screen: CcScreen): String = when (screen) {
   CcScreen.SETTINGS -> "Home settings"
 }
 
-private fun subtitleFor(s: CcUiState, nav: CcNav): String {
-  if (nav.screen != CcScreen.MAP) return ccSubtitle(s.now).replace(Regex(" (morning|afternoon|evening|night)"), "")
-  val floor = s.plan?.floor(nav.floorId)?.name
+private fun subtitleFor(s: CcUiState, screen: CcScreen, floorId: String?): String {
+  if (screen != CcScreen.MAP) return ccSubtitle(s.now).replace(DAY_PART, "")
+  val floor = s.plan?.floor(floorId)?.name
   val kids = if (s.settings.kids) "Kids mode" else null
   return ccSubtitle(s.now, listOfNotNull(floor, kids).joinToString(" · ").ifBlank { null })
 }
@@ -114,3 +117,5 @@ private fun BoxScope.CcBannersOnly(onExit: () -> Unit) {
       body = "This Portal shows Home Assistant alerts as banners. Change it in Settings › Home Assistant › Control Center.",
       primary = "Back" to onExit)
 }
+
+private val DAY_PART = Regex(" (morning|afternoon|evening|night)")

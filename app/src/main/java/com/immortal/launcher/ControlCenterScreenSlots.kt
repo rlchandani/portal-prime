@@ -37,7 +37,7 @@ internal val CC_KEEP_ALIVE = setOf(CcScreen.MAP, CcScreen.CAMERAS, CcScreen.ENER
  */
 @Composable
 internal fun CcScreenSlots(s: CcUiState, ui: CcUi, content: @Composable (CcScreen, CcUiState) -> Unit) {
-  val current = ui.nav.screen
+  val current = ui.screen
   val visited = remember { mutableStateListOf<CcScreen>() }
   val frozen = remember { HashMap<CcScreen, CcUiState>() }
   if (current in CC_KEEP_ALIVE) { if (current !in visited) visited += current; frozen[current] = s }
