@@ -99,7 +99,8 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
   /** Sends a confirmed call (from a modal) and closes it. */
   fun confirmed(call: CcCall) {
     val e = call.entityId?.let { stateOf().entity(it) }
-    if (e != null && (e.domain == "scene" || e.domain == "script")) ControlCenter.runScene(context, e) else ControlCenter.send(context, call)
+    if (e != null && (e.domain == "scene" || e.domain == "script")) ControlCenter.runScene(context, e, confirmed = true)
+    else ControlCenter.send(context, call, confirmed = true)
     modal(null)
   }
 

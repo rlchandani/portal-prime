@@ -52,12 +52,25 @@ internal object ControlCenter {
 
   fun retryNow(context: Context) { val e = engine(context); e.post { e.attempt = 0; e.restart() } }
 
-  /** Sends [call] now or refuses (returns false) when HA isn't live. Confirmations happen before this. */
-  fun send(context: Context, call: CcCall, undoable: Boolean = true, onResult: ((Boolean, String?) -> Unit)? = null): Boolean {
+  /**
+   * Sends [call] now, or refuses (returns false) when HA isn't live or [CcPolicy.refusal] says no.
+   * Every call passes this one gate: [confirmed] is true only from the household's answer to a
+   * modal or the PIN pad ([CcUi.confirmed], the alarm paths); sliders and dials send unconfirmed.
+   */
+  fun send(context: Context, call: CcCall, undoable: Boolean = true, onResult: ((Boolean, String?) -> Unit)? = null,
+           confirmed: Boolean = false): Boolean {
     val e = engine(context)
-    val reason = e.flow.value.connection.disabledReason
+    val s = e.flow.value
+    if (refused(context, s, call, confirmed)) return false
+    val reason = s.connection.disabledReason
     if (reason != null) { e.post { e.toast(reason, error = true) }; return false }
     e.post { e.dispatch(call, undoable, onResult) }
+    return true
+  }
+
+  private fun refused(context: Context, s: CcUiState, call: CcCall, confirmed: Boolean): Boolean {
+    val why = ccSendRefusal(s, call, confirmed) { ControlCenterConfig.scenesSeen(context) } ?: return false
+    Log.w(TAG, "refused ${call.domain}.${call.service}: $why")
     return true
   }
 
@@ -66,8 +79,9 @@ internal object ControlCenter {
   fun dismissToast(context: Context, id: Long) { val e = engine(context); e.post { if (e.ui.toast?.id == id) { e.ui = e.ui.copy(toast = null); e.publish() } } }
 
   /** Runs a scene/script in HA and walks the house on the plan while it happens. */
-  fun runScene(context: Context, scene: CcEntity): Boolean {
+  fun runScene(context: Context, scene: CcEntity, confirmed: Boolean = false): Boolean {
     val e = engine(context)
+    if (refused(context, e.flow.value, CcCalls.run(scene), confirmed)) return false
     val reason = e.flow.value.connection.disabledReason
     if (reason != null) { e.post { e.toast(reason, error = true) }; return false }
     e.post { e.startWalk(scene) }
@@ -77,10 +91,13 @@ internal object ControlCenter {
 
   fun clearSceneRun(context: Context) { val e = engine(context); e.post { e.ui = e.ui.copy(sceneRun = null); e.publish() } }
 
-  /** Arm/disarm; [onResult] on the main thread (false + HA's message for a wrong code). */
+  /**
+   * Arm/disarm; [onResult] on the main thread (false + HA's message for a wrong code). Called only
+   * from the PIN pad and the arm check, which are the household's confirmation.
+   */
   fun alarm(context: Context, panel: CcEntity, mode: CcAlarmMode, code: String?, onResult: (Boolean, String?) -> Unit) {
     val delivered: (Boolean, String?) -> Unit = { ok, msg -> main.post { onResult(ok, msg) } }
-    if (!send(context, CcCalls.alarm(panel, mode, code), undoable = false, onResult = delivered)) delivered(false, null)
+    if (!send(context, CcCalls.alarm(panel, mode, code), undoable = false, onResult = delivered, confirmed = true)) delivered(false, null)
   }
 
   /** Fleet `cc_debug` (operator only): dry run on/off, `load`/`clear` the local test plan. Blocks briefly. */
@@ -230,3 +247,7 @@ internal fun CcEngine.statsResult(r: CcProtocol.Out.Result) {
   ui = if (week) ui.copy(energyWeek = series) else ui.copy(energyToday = series)
   publish()
 }
+
+/** [CcPolicy.refusal] for [call] against the current state (pure; what [ControlCenter.send] checks). */
+internal fun ccSendRefusal(s: CcUiState, call: CcCall, confirmed: Boolean, scenesSeen: () -> Set<String>): String? =
+    CcPolicy.refusal(call.entityId?.let(s::entity), call, s.settings, confirmed, scenesSeen)

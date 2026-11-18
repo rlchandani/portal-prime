@@ -39,7 +39,7 @@ internal fun CcScenePreviewModal(s: CcUiState, ui: CcUi, m: CcModal.ScenePreview
   }
   CcModalActions {
     CcButton("Not now", { ui.modal(null) }, ModalButton)
-    CcButton("Run ${scene.name}", { if (ControlCenter.runScene(ui.context, scene)) ui.modal(null) }, ModalButton,
+    CcButton("Run ${scene.name}", { if (ControlCenter.runScene(ui.context, scene, confirmed = true)) ui.modal(null) }, ModalButton,
         icon = sceneIcon(scene.name), style = CcButtonStyle.EMBER, enabled = s.connection.canControl)
   }
   s.connection.disabledReason?.let { CcCtlNote(it, Modifier.fillMaxWidth().padding(top = 12.dp)) }

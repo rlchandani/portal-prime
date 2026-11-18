@@ -202,6 +202,22 @@ internal object CcPolicy {
     else -> Ask.NONE
   }
 
+  /**
+   * The one gate every outgoing call passes ([ControlCenter.send] / [ControlCenter.runScene]):
+   * null when [call] may go now, else why not. Hidden and read-only things never send; anything
+   * that asks first sends only when [confirmed] (the household answered the modal or the PIN pad).
+   * Sliders and dials send unconfirmed, so a future ask rule covers them too.
+   * [scenesSeen] is read only for scene calls (it touches preferences).
+   */
+  fun refusal(e: CcEntity?, call: CcCall, s: ControlCenterConfig.Settings, confirmed: Boolean, scenesSeen: () -> Set<String>): String? {
+    if (e == null) return if (confirmed || call.domain !in ASKING_DOMAINS) null else "unknown ${call.domain} entity"
+    if (hidden(e, s)) return "hidden on this Portal"
+    if (readOnly(e, s)) return "read-only on this Portal"
+    if (confirmed) return null
+    val ask = ask(e, call, s, if (call.domain == "scene") scenesSeen() else emptySet())
+    return if (ask == Ask.NONE) null else "needs ${ask.name.lowercase()} first"
+  }
+
   /** Hidden from this Portal entirely while in kids mode. */
   fun hidden(e: CcEntity, s: ControlCenterConfig.Settings): Boolean = s.kids && hiddenKind(CcKind.of(e), e, s)
 
@@ -231,6 +247,8 @@ internal object CcPolicy {
     return words.any { it in SENSITIVE_WORDS } || e.members.any { m -> SENSITIVE_DOMAINS.any { m.startsWith(it) } }
   }
 
+  /** Domains [ask] can stop: a call into one of these for an entity we don't know needs a confirmation. */
+  private val ASKING_DOMAINS = setOf("lock", "cover", "valve", "alarm_control_panel", "scene", "script")
   private val NON_LETTERS = Regex("[^a-z]+")
   private val SENSITIVE_WORDS = setOf("arm", "arming", "armed", "disarm", "alarm", "lock", "unlock", "garage", "gate", "valve",
       "security", "away")
