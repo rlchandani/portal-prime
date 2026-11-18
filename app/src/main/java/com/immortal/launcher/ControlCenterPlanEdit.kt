@@ -108,11 +108,23 @@ internal object CcPlanEdit {
   }
 
   private fun layout(ids: List<String>, startIndex: Int): List<CcPlaced> = ids.mapIndexed { i, id ->
-    val n = startIndex + i
-    val col = n % DEVICE_COLS
-    val row = n / DEVICE_COLS
-    CcPlaced(id, (0.2f + col * 0.2f).coerceIn(0.1f, 0.9f), (0.25f + row * 0.25f).coerceIn(0.1f, 0.9f))
+    val (fx, fy) = deviceSlot(startIndex + i)
+    CcPlaced(id, fx, fy)
   }
+
+  /**
+   * Where the [n]th auto-placed device goes in its room (fractions of the room): four to a row,
+   * rows alternating above and below the centred room label so a crowded room never covers it.
+   */
+  fun deviceSlot(n: Int): Pair<Float, Float> {
+    val col = n % DEVICE_COLS
+    val row = (n / DEVICE_COLS) % ROW_SLOTS.size
+    val fx = 0.2f + col * 0.2f
+    return fx to ROW_SLOTS[row]
+  }
+
+  /** Row heights, nearest the edges first; the band around 0.5 stays free for the label. */
+  private val ROW_SLOTS = floatArrayOf(0.2f, 0.8f, 0.32f, 0.68f, 0.08f, 0.92f)
 
   /** Plan-worthy entities on this floor's areas (or with no area) that are on no room yet. */
   fun unplaced(plan: CcPlan, floor: CcFloor, reg: CcRegistry, live: Map<String, CcEntity>): List<String> {
