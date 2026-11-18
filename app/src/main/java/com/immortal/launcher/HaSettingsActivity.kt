@@ -102,6 +102,7 @@ private fun ApprovedEditorsHaContent(entitiesOnly: Boolean) {
                         // No suspension between the cancellation check and this atomic Config write.
                         HaConfig.setConnection(context, candidateUrl, candidateToken)
                         DoorbellListener.restart(context) // the doorbell watches the new connection
+                        ControlCenter.restart(context) // so does the Control Center
                         url = HaConfig.baseUrl(context); token = ""
                     }
                     discovered = result

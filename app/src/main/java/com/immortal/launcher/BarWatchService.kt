@@ -36,6 +36,7 @@ class BarWatchService : AccessibilityService() {
     FollowMeCardOverlay.attach(this) // host "Music follows you" cards (see MusicFollowMe)
     TimerDoneOverlay.attach(this) // host "Timer done" cards (see SharedTimerPresenter)
     DoorbellCardOverlay.attach(this) // host doorbell camera cards (see DoorbellPresenter)
+    ControlCenterBanners.attach(this) // host Control Center alert banners (see ControlCenterBanners)
     pinnedFrame = PinnedAppFrameHost(this).also { PinnedAppScreensaver.attach(it) }
     // getWindows() can block for five seconds while Android is still creating Home's first
     // window. Both observations query it, so doing them here delays that very window by ten
@@ -65,6 +66,7 @@ class BarWatchService : AccessibilityService() {
     FollowMeCardOverlay.detach()
     TimerDoneOverlay.detach()
     DoorbellCardOverlay.detach()
+    ControlCenterBanners.detach()
     return super.onUnbind(intent)
   }
 

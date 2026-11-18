@@ -286,6 +286,15 @@
             android:label="Home Assistant"
             android:theme="@style/Theme.SampleApp.Navigation" />
 
+        <!-- Home Control Center: live floor plan, rooms, cameras, energy, alerts, security. -->
+        <activity
+            android:name=".ControlCenterActivity"
+            android:exported="false"
+            android:label="Home Control"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- Full-screen HA dashboard (mock 08 port). -->
         <activity
             android:name=".HaDashboardActivity"
