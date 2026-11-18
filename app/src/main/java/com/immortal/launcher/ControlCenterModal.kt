@@ -6,8 +6,7 @@
  */
 package com.immortal.launcher
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,8 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,38 +47,46 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 internal fun CcModalHost(s: CcUiState, ui: CcUi) {
-  val c = LocalCc.current
   val modal = ui.nav.modal
-  val last = remember { mutableStateOf<CcModal?>(null) }
-  if (modal != null) last.value = modal
   val motion = LocalCcMotion.current
-  val shown by animateFloatAsState(if (modal != null) 1f else 0f, tween(if (motion) CC_MODAL_MS else 0, easing = CcSpringEase), label = "modal")
-  val fade by animateFloatAsState(if (modal != null) 1f else 0f, tween(if (motion) CC_MODAL_FADE_MS else 0), label = "modalFade")
-  if (fade == 0f && modal == null) return
+  val pop = rememberCcPresence(modal != null, if (motion) CC_MODAL_MS else 0, CcSpringEase)
+  val fade = rememberCcPresence(modal != null, if (motion) CC_MODAL_FADE_MS else 0, LinearEasing)
+  val last = remember { CcLast<CcModal>() }
+  if (modal != null) last.value = modal
+  // Nothing open and nothing fading out: cost nothing.
+  if (!pop.visible(modal != null) && !fade.visible(modal != null)) return
   val page = modal ?: last.value ?: return
+  ModalFrame(ui, modal != null, pop, fade) {
+    when (page) {
+      is CcModal.Confirm -> ConfirmModal(s, ui, page)
+      is CcModal.Garage -> GarageModal(s, ui, page)
+      is CcModal.Pin -> CcPinModal(s, ui, page)
+      is CcModal.ScenePreview -> CcScenePreviewModal(s, ui, page)
+      is CcModal.ArmCheck -> CcArmCheckModal(s, ui, page)
+    }
+  }
+}
+
+/** Scrim + card; the spring and fade are read only in graphicsLayer. */
+@Composable
+private fun ModalFrame(ui: CcUi, open: Boolean, pop: CcPresence, fade: CcPresence, content: @Composable ColumnScope.() -> Unit) {
+  val c = LocalCc.current
   val lift = with(LocalDensity.current) { MODAL_LIFT.toPx() }
   Box(Modifier.fillMaxSize()) {
-    Box(Modifier.fillMaxSize().graphicsLayer { alpha = fade }.background(c.scrim)
-        .then(if (modal != null) Modifier.clickable(remember { MutableInteractionSource() }, indication = null) { ui.modal(null) } else Modifier)
-        .semantics { contentDescription = "Dismiss" })
+    Box(Modifier.fillMaxSize().graphicsLayer { alpha = fade.progress.value }.background(c.scrim)
+        .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null) { ui.modal(null) }
+            .semantics { contentDescription = "Dismiss" } else Modifier))
     Column(Modifier.align(Alignment.Center).width(CcStyle.ModalWidth)
         .graphicsLayer {
+          val shown = pop.progress.value
           val k = MODAL_START_SCALE + (1f - MODAL_START_SCALE) * shown
-          scaleX = k; scaleY = k; alpha = fade; translationY = (1f - shown) * lift
+          scaleX = k; scaleY = k; alpha = fade.progress.value; translationY = (1f - shown) * lift
         }
         .shadow(if (c.dark) 40.dp else 24.dp, CcStyle.Modal, ambientColor = Color.Black, spotColor = Color.Black)
         .clip(CcStyle.Modal).background(c.bg)
         .clickable(remember { MutableInteractionSource() }, indication = null) {}
         .verticalScroll(rememberScrollState())
-        .padding(start = 46.dp, end = 46.dp, top = 44.dp, bottom = 40.dp)) {
-      when (page) {
-        is CcModal.Confirm -> ConfirmModal(s, ui, page)
-        is CcModal.Garage -> GarageModal(s, ui, page)
-        is CcModal.Pin -> CcPinModal(s, ui, page)
-        is CcModal.ScenePreview -> CcScenePreviewModal(s, ui, page)
-        is CcModal.ArmCheck -> CcArmCheckModal(s, ui, page)
-      }
-    }
+        .padding(start = 46.dp, end = 46.dp, top = 44.dp, bottom = 40.dp), content = content)
   }
 }
 

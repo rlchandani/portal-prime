@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 
 /** Media page (`ctl-media`): now playing, transport (big centre button), volume, power. */
 @Composable
-internal fun CcMediaControl(s: CcUiState, ui: CcUi, e: CcEntity, gate: CcGate) {
+internal fun CcMediaControl(ui: CcUi, e: CcEntity, gate: CcGate) {
   val c = LocalCc.current
   val off = e.state == "off" || e.state == "standby"
   val tv = !(e.deviceClass == "speaker" || "speaker" in e.id)

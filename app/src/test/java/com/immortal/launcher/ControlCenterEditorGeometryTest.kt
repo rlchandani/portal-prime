@@ -137,4 +137,34 @@ class ControlCenterEditorGeometryTest {
     val devices = plain.copy(step = CcEdStep.DEVICES)
     assertEquals(devices, CcEdGesture.tap(devices, CcEd.floor(devices, reg), 3f, 3f, reg, now))
   }
+
+  @Test fun staticFloor_leavesOutOnlyTheDraggedItem() {
+    val move = CcEdGesture.staticFloor(floor, CcEdDrag.Move("living", 0f, 0f, 1f, 1f))
+    assertEquals(listOf("kitchen"), move.rooms.map { it.id })
+    assertTrue(move.openings.isEmpty())
+    assertEquals(listOf("kitchen"), CcEdGesture.staticFloor(floor, CcEdDrag.Resize("living", living.rect, 1f, 1f)).rooms.map { it.id })
+    val op = CcEdGesture.staticFloor(floor, CcEdDrag.Opening(door.entityId, 1f, 1f))
+    assertEquals(2, op.rooms.size)
+    assertTrue(op.openings.isEmpty())
+    assertTrue(CcEdGesture.staticFloor(floor, CcEdDrag.Device("light.kitchen", null, null)).rooms.all { it.devices.isEmpty() })
+    assertEquals(floor, CcEdGesture.staticFloor(floor, null))
+    assertEquals(floor, CcEdGesture.staticFloor(floor, CcEdDrag.Draw(0f, 0f, 1f, 1f)))
+  }
+
+  @Test fun liveRect_followsMoveAndResizeOfThatRoomOnly() {
+    val r = kitchen.rect
+    assertEquals(CcRect(3, 1, 10, 8), CcEdGesture.liveRect("kitchen", r, CcEdDrag.Move("kitchen", 0f, 0f, 2.2f, 0.1f)))
+    assertEquals(CcRect(0, 1, 10, 8), CcEdGesture.liveRect("kitchen", r, CcEdDrag.Move("kitchen", 5f, 0f, 0f, 0f)))
+    assertEquals(CcRect(1, 1, 5, 4), CcEdGesture.liveRect("kitchen", r, CcEdDrag.Resize("kitchen", r, 6f, 5f)))
+    assertEquals(r, CcEdGesture.liveRect("kitchen", r, CcEdDrag.Move("living", 0f, 0f, 3f, 3f)))
+    assertEquals(r, CcEdGesture.liveRect("kitchen", r, null))
+  }
+
+  @Test fun hotRoomAt_onlyForCarriedDeviceOverARoom() {
+    assertEquals("living", CcEdGesture.hotRoomAt(floor, CcEdDrag.Device("light.porch", 15f, 4f))!!.id)
+    assertNull(CcEdGesture.hotRoomAt(floor, CcEdDrag.Device("light.porch", null, 4f)))
+    assertNull(CcEdGesture.hotRoomAt(floor, CcEdDrag.Device("light.porch", 15f, null)))
+    assertNull(CcEdGesture.hotRoomAt(floor, CcEdDrag.Device("light.porch", 40f, 25f)))
+    assertNull(CcEdGesture.hotRoomAt(floor, CcEdDrag.Draw(0f, 0f, 1f, 1f)))
+  }
 }

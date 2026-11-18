@@ -21,39 +21,34 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 
 /** Thermostat page: dial, modes, and the plan rooms this thermostat sits in. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun CcClimateControl(s: CcUiState, ui: CcUi, e: CcEntity, gate: CcGate) {
-  val room = s.plan?.roomOf(e.id)
-  val humidity = room?.let { CcRooms.view(it, s.entities, listOf(e)).humidity } ?: e.humidity
+internal fun CcClimateControl(ui: CcUi, e: CcEntity, d: CcDeviceSlice) {
   Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-    CcThermostatDial(ui, e, gate, humidity)
-    if (!CcPolicy.readOnly(e, s.settings)) CcThermostatModes(ui, e, gate)
+    CcThermostatDial(ui, e, d.gate, d.humidity, d.fahrenheit)
+    if (!d.readOnly) CcThermostatModes(ui, e, d.gate)
   }
-  val rooms = CcSheetLogic.thermostatRooms(s.plan, e.id)
-  if (rooms.isNotEmpty()) {
+  if (d.rooms.isNotEmpty()) {
     CcCtlSection("Rooms on this thermostat")
     FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-      rooms.forEach { r ->
-        val t = CcRooms.view(r, s.entities, listOf(e)).temperature
-        CcCtlChip(listOfNotNull(r.name, t?.let { CcSheetLogic.temp(it) }).joinToString(" · "), { ui.openRoom(r.id) })
-      }
+      d.rooms.forEach { r -> key(r.roomId) { CcCtlChip(r.label, { ui.openRoom(r.roomId) }) } }
     }
   }
 }
 
 /** Fan page: the fan glyph spins with the speed; segments (or a slider for many speeds). */
 @Composable
-internal fun CcFanControl(s: CcUiState, ui: CcUi, e: CcEntity, gate: CcGate) {
+internal fun CcFanControl(ui: CcUi, e: CcEntity, gate: CcGate) {
   val speeds = CcControlMath.fanSpeeds(e)
-  FanGlyph(e)
+  FanGlyph(e.isOn, e.percentage ?: FULL)
   if (speeds.size > 1) {
     val labels = CcControlMath.fanLabels(speeds.size)
     val idx = CcControlMath.fanSpeedIndex(e, speeds)
@@ -70,17 +65,17 @@ internal fun CcFanControl(s: CcUiState, ui: CcUi, e: CcEntity, gate: CcGate) {
   }
 }
 
+/** The fan spins in graphicsLayer only (no recomposition per frame); still when motion is off. */
 @Composable
-private fun FanGlyph(e: CcEntity) {
+private fun FanGlyph(on: Boolean, pct: Int) {
   val c = LocalCc.current
-  val spinning = e.isOn && LocalCcMotion.current
-  val period = fanPeriodMs(e.percentage ?: FULL)
+  val spinning = on && LocalCcMotion.current
   val angle = if (spinning) {
-    val t = rememberInfiniteTransition(label = "fan")
-    t.animateFloat(0f, FULL_TURN, infiniteRepeatable(tween(period, easing = LinearEasing), RepeatMode.Restart), label = "fanSpin").value
-  } else 0f
+    rememberInfiniteTransition(label = "fan")
+        .animateFloat(0f, FULL_TURN, infiniteRepeatable(tween(fanPeriodMs(pct), easing = LinearEasing), RepeatMode.Restart), label = "fanSpin")
+  } else null
   Box(Modifier.fillMaxWidth().padding(vertical = 20.dp), contentAlignment = Alignment.Center) {
-    CcIcon("fan", c.text, 220.dp, Modifier.size(220.dp).rotate(angle))
+    CcIcon("fan", c.text, 220.dp, Modifier.size(220.dp).graphicsLayer { rotationZ = angle?.value ?: 0f })
   }
 }
 

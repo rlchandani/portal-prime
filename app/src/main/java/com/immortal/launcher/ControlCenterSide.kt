@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,31 +38,42 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 internal fun CcSideColumn(s: CcUiState, ui: CcUi, modifier: Modifier = Modifier) {
+  // Each card gets only its slice, derived once per change; equal slices skip the card.
+  val alerts = s.alerts()
+  val attention = remember(alerts, s.entitiesVersion, s.plan, s.settings) { CcSideLogic.attention(alerts, s.entities, s.plan, s.settings) }
+  val scenes = remember(s.entitiesVersion, s.plan, s.settings) { CcSceneGrid(CcSideLogic.tiles(s.ofDomain("scene") + s.ofDomain("script"), s.plan, s.settings.kids)) }
+  val energy = remember(s.entitiesVersion, s.settings) {
+    if (CcPolicy.screenHidden(CcScreen.ENERGY, s.settings)) null
+    else CcEnergy.now(s.entities).takeIf { it.hasFlow || it.batteryPct != null }
+  }
+  val cameras = remember(s.entitiesVersion, s.settings) {
+    CcCameraList(if (CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings)) emptyList()
+    else s.ofDomain("camera").take(CcSideLogic.CAMERA_TILES).map { CcFloorTab(it.id, it.name) })
+  }
+  val canControl = s.connection.canControl
   Column(modifier.verticalScroll(rememberScrollState()).padding(bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-    CcAttentionCard(s, ui)
-    CcScenesCard(s, ui)
-    CcEnergyNowCard(s, ui)
-    CcCamerasCard(s, ui)
+    CcAttentionCard(attention, canControl, ui)
+    CcScenesCard(scenes, canControl, ui)
+    energy?.let { CcEnergyNowCard(it, ui) }
+    if (cameras.cams.isNotEmpty()) CcCamerasCard(s, cameras, ui)
   }
 }
 
 @Composable
-private fun CcAttentionCard(s: CcUiState, ui: CcUi) {
-  val alerts = remember(s.entities, s.now, s.dismissed, s.settings, s.appliancesDone, s.plan) { s.alerts().take(CcSideLogic.ATTENTION_ROWS) }
+private fun CcAttentionCard(slice: CcAttentionSlice, canControl: Boolean, ui: CcUi) {
   Column(Modifier.fillMaxWidth().ccCard().padding(horizontal = 24.dp, vertical = 22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-    CcSectionLabel(if (alerts.isEmpty()) "All good" else "Needs attention", Modifier.padding(bottom = 2.dp))
-    if (alerts.isEmpty()) AllClearRow(s)
-    alerts.forEach { AttentionRow(it, s, ui) }
+    CcSectionLabel(if (slice.rows.isEmpty()) "All good" else "Needs attention", Modifier.padding(bottom = 2.dp))
+    if (slice.rows.isEmpty()) AllClearRow(slice.allClear)
+    slice.rows.forEach { key(it.alert.id) { AttentionRow(it, canControl, ui) } }
   }
 }
 
 @Composable
-private fun AttentionRow(a: CcAlert, s: CcUiState, ui: CcUi) {
+private fun AttentionRow(row: CcAttentionRow, canControl: Boolean, ui: CcUi) {
   val c = LocalCc.current
-  val e = s.entity(a.entityId)
-  val room = s.plan?.roomOf(a.entityId)
-  val close = a.action == CcAlertAction.CLOSE && e != null && e.domain == "cover"
-  val tap = if (close && room != null) ({ ui.openRoom(room.id) }) else ({ ui.go(CcScreen.ALERTS) })
+  val a = row.alert
+  val e = row.entity
+  val tap = remember(row, ui) { if (row.close && row.roomId != null) ({ ui.openRoom(row.roomId) }) else ({ ui.go(CcScreen.ALERTS) }) }
   Row(Modifier.fillMaxWidth().heightIn(min = 76.dp).clip(ROW).clickable(role = Role.Button, onClick = tap)
       .padding(start = 6.dp, end = 10.dp, top = 8.dp, bottom = 8.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -72,16 +84,15 @@ private fun AttentionRow(a: CcAlert, s: CcUiState, ui: CcUi) {
       Text(a.title, color = c.text, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
       Text(a.body, color = c.sec, fontSize = 19.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 26.sp)
     }
-    if (close) CcButton("Close", { ui.act(e, CcCalls.coverClose(e)) }, height = 64, enabled = s.connection.canControl)
+    if (row.close && e != null) CcButton("Close", { ui.act(e, CcCalls.coverClose(e)) }, height = 64, enabled = canControl)
     else CcIcon("chev", c.sec, 30.dp)
   }
 }
 
 /** Designed empty state: nothing needs attention, said honestly from what the house has. */
 @Composable
-private fun AllClearRow(s: CcUiState) {
+private fun AllClearRow(line: String) {
   val c = LocalCc.current
-  val line = remember(s.entities, s.settings) { CcSideLogic.allClear(s.entities.values.filter { !CcPolicy.hidden(it, s.settings) }) }
   Row(Modifier.fillMaxWidth().heightIn(min = 76.dp).padding(start = 6.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(16.dp)) {
     Box(Modifier.size(60.dp).clip(ICON_TILE).background(c.greenBg), contentAlignment = Alignment.Center) { CcIcon("check", c.green, 32.dp) }

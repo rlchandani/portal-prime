@@ -32,16 +32,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -59,67 +58,74 @@ import kotlinx.coroutines.delay
 /** Security (`security`, `security-arming`): the alarm ring and modes left; who's home and the checklist right. */
 @Composable
 internal fun CcSecurityScreen(s: CcUiState, ui: CcUi) {
+  val panel = remember(s.entitiesVersion, s.settings) { s.alarm }
+  val side = remember(s.entitiesVersion, s.settings) { CcSecurity.side(s.people, s.entities.values, ::ccTime) }
+  val reason = s.connection.disabledReason
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     Column(Modifier.weight(MAIN_WEIGHT).fillMaxHeight().ccCard().padding(36.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(26.dp, Alignment.CenterVertically)) {
-      val panel = s.alarm
-      if (panel == null) NoPanel(s) else AlarmPanel(s, ui, panel)
+      if (panel == null) NoPanel(s.ready) else AlarmPanel(panel, s.settings.exitDelaySec, reason, ui)
     }
-    CcSecuritySide(s, Modifier.weight(1f).fillMaxHeight())
+    CcSecuritySide(side, Modifier.weight(1f).fillMaxHeight())
   }
 }
 
 private const val MAIN_WEIGHT = 1.2f
 
 @Composable
-private fun NoPanel(s: CcUiState) {
+private fun NoPanel(ready: Boolean) {
   val c = LocalCc.current
-  Ring(CcRingTone.OFF, null)
+  Ring(CcRingTone.OFF, 0L, 0)
   Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    Text(if (s.ready) "No alarm panel" else "Loading…", color = c.text, fontSize = 54.sp, fontFamily = CcStyle.Serif)
-    Text(if (s.ready) "No alarm panel in Home Assistant. Add one (Manual alarm, Alarmo or your alarm's integration) to arm from here."
+    Text(if (ready) "No alarm panel" else "Loading…", color = c.text, fontSize = 54.sp, fontFamily = CcStyle.Serif)
+    Text(if (ready) "No alarm panel in Home Assistant. Add one (Manual alarm, Alarmo or your alarm's integration) to arm from here."
     else "Connecting to Home Assistant", color = c.sec, fontSize = 22.sp, textAlign = TextAlign.Center)
   }
 }
 
 @Composable
-private fun AlarmPanel(s: CcUiState, ui: CcUi, panel: CcEntity) {
+private fun AlarmPanel(panel: CcEntity, delaySec: Int, connectionReason: String?, ui: CcUi) {
   val c = LocalCc.current
   val tone = CcSecurity.tone(panel.state)
-  val delay = s.settings.exitDelaySec
-  val clock = rememberSecondClock(tone == CcRingTone.ARMING)
-  val remaining = CcSecurity.exitRemaining(panel.lastChanged, delay, clock)
-  Ring(tone, if (tone == CcRingTone.ARMING) CcSecurity.exitFraction(remaining, delay) else null)
+  Ring(tone, panel.lastChanged, delaySec)
   Column(horizontalAlignment = Alignment.CenterHorizontally) {
     Text(CcSecurity.title(panel), color = c.text, fontSize = 54.sp, fontFamily = CcStyle.Serif)
-    Text(CcSecurity.subtitle(panel, remaining), color = c.sec, fontSize = 22.sp, textAlign = TextAlign.Center)
+    if (tone == CcRingTone.ARMING) ArmingSubtitle(panel, delaySec)
+    else Text(CcSecurity.subtitle(panel, 0), color = c.sec, fontSize = 22.sp, textAlign = TextAlign.Center)
   }
   val current = CcSecurity.currentMode(panel)
-  val enabled = s.connection.canControl && !panel.unavailable
+  val enabled = connectionReason == null && !panel.unavailable
+  val modes = remember(panel.supportedFeatures) { CcAlarmMode.offered(panel) }
   Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-    CcAlarmMode.offered(panel).forEach { m ->
-      ModeButton(m, on = m == current, enabled = enabled, modifier = Modifier.weight(1f)) {
-        CcSecurity.tap(panel, m)?.let(ui::modal)
-      }
+    modes.forEach { m ->
+      val tap = remember(panel, m, ui) { { CcSecurity.tap(panel, m)?.let(ui::modal); Unit } }
+      ModeButton(m, on = m == current, enabled = enabled, modifier = Modifier.weight(1f), onClick = tap)
     }
   }
-  val reason = s.connection.disabledReason ?: if (panel.unavailable) "The alarm panel is unavailable in Home Assistant" else null
+  val reason = connectionReason ?: if (panel.unavailable) "The alarm panel is unavailable in Home Assistant" else null
   reason?.let { Text(it, color = c.faint, fontSize = 19.sp) }
 }
 
-/** Wall-clock that ticks four times a second while [running] (the exit-delay text always updates). */
+/** "Leave now · 21s to go": its own scope, so the 4 Hz clock recomposes only this line (once a second). */
 @Composable
-private fun rememberSecondClock(running: Boolean): Long {
-  var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
-  if (running) LaunchedEffect(Unit) { while (true) { now = System.currentTimeMillis(); delay(CLOCK_TICK_MS) } }
-  return now
+private fun ArmingSubtitle(panel: CcEntity, delaySec: Int) {
+  val c = LocalCc.current
+  val remaining by rememberExitRemaining(panel.lastChanged, delaySec)
+  Text(CcSecurity.subtitle(panel, remaining), color = c.sec, fontSize = 22.sp, textAlign = TextAlign.Center)
 }
+
+/** Seconds of exit delay left; polled 4×/s, but the State only changes when the second does. */
+@Composable
+private fun rememberExitRemaining(since: Long, delaySec: Int): State<Int> =
+    produceState(CcSecurity.exitRemaining(since, delaySec, System.currentTimeMillis()), since, delaySec) {
+      while (true) { value = CcSecurity.exitRemaining(since, delaySec, System.currentTimeMillis()); delay(CLOCK_TICK_MS) }
+    }
 
 private const val CLOCK_TICK_MS = 250L
 
 /** `.shield`: 330 dp disc; armed has a soft ripple, arming an amber countdown arc. */
 @Composable
-private fun Ring(tone: CcRingTone, fraction: Float?) {
+private fun Ring(tone: CcRingTone, armingSince: Long, delaySec: Int) {
   val c = LocalCc.current
   val motion = LocalCcMotion.current
   val (bg, fg) = when (tone) {
@@ -128,27 +134,36 @@ private fun Ring(tone: CcRingTone, fraction: Float?) {
     CcRingTone.ARMING -> c.amberBg to c.amber
     CcRingTone.ALERT -> c.redBg to c.red
   }
-  val sweep by animateFloatAsState(fraction ?: 0f, if (motion) tween(ARC_MS, easing = LinearEasing) else snap(), label = "exit")
   Box(Modifier.size(RING_OUTER.dp), contentAlignment = Alignment.Center) {
     if (tone == CcRingTone.ARMED) Ripple(c.green, motion)
     Box(Modifier.size(RING.dp).clip(CircleShape).background(bg), contentAlignment = Alignment.Center) {
       CcIcon(when (tone) { CcRingTone.ARMED -> "shieldck"; CcRingTone.ALERT -> "warn"; else -> "shield" }, fg, 140.dp)
     }
-    if (fraction != null) Canvas(Modifier.size(RING_OUTER.dp)) {
-      val w = ARC_WIDTH * density
-      drawArc(c.amber, -QUARTER, FULL * sweep, false, topLeft = Offset(w / 2, w / 2),
-          size = Size(size.width - w, size.height - w), style = Stroke(w, cap = StrokeCap.Round))
-    }
+    if (tone == CcRingTone.ARMING) CountdownArc(armingSince, delaySec, c.amber, motion)
   }
 }
 
-/** The armed ripple (`.shield.armed::after`): one ring, still while motion is off. */
+/** The exit-delay arc; the animated sweep is read only while drawing. */
+@Composable
+private fun CountdownArc(since: Long, delaySec: Int, color: Color, motion: Boolean) {
+  val remaining by rememberExitRemaining(since, delaySec)
+  val sweep = animateFloatAsState(CcSecurity.exitFraction(remaining, delaySec), if (motion) tween(ARC_MS, easing = LinearEasing) else snap(), label = "exit")
+  Canvas(Modifier.size(RING_OUTER.dp).graphicsLayer()) {
+    val w = ARC_WIDTH * density
+    drawArc(color, -QUARTER, FULL * sweep.value, false, topLeft = Offset(w / 2, w / 2),
+        size = Size(size.width - w, size.height - w), style = Stroke(w, cap = StrokeCap.Round))
+  }
+}
+
+/** The armed ripple (`.shield.armed::after`): one ring animated in its layer, still while motion is off. */
 @Composable
 private fun Ripple(color: Color, motion: Boolean) {
   val t = if (motion) rememberInfiniteTransition(label = "ripple")
-      .animateFloat(0f, 1f, infiniteRepeatable(tween(RIPPLE_MS, easing = LinearEasing), RepeatMode.Restart), label = "r").value else 0f
-  Box(Modifier.size((RING + RIPPLE_INSET * 2).dp).scale(1f + t * RIPPLE_GROW).alpha(RIPPLE_ALPHA * (1f - t))
-      .border(4.dp, color, CircleShape))
+      .animateFloat(0f, 1f, infiniteRepeatable(tween(RIPPLE_MS, easing = LinearEasing), RepeatMode.Restart), label = "r") else null
+  Box(Modifier.size((RING + RIPPLE_INSET * 2).dp).graphicsLayer {
+    val v = t?.value ?: 0f
+    scaleX = 1f + v * RIPPLE_GROW; scaleY = scaleX; alpha = RIPPLE_ALPHA * (1f - v)
+  }.border(4.dp, color, CircleShape))
 }
 
 /** `.mode`: 140 tall, icon over label; the current mode is inverted. */

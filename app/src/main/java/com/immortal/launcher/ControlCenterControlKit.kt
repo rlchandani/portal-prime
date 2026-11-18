@@ -9,13 +9,10 @@ package com.immortal.launcher
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,17 +20,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -50,6 +41,7 @@ internal const val CC_MODAL_MS = 300
 internal const val CC_MODAL_FADE_MS = 200
 
 /** Whether [e] can be acted on here, and if not, why (connection first, then kids mode). */
+@androidx.compose.runtime.Immutable
 internal data class CcGate(val enabled: Boolean, val reason: String?)
 
 internal fun ccGate(s: CcUiState, e: CcEntity): CcGate {
@@ -115,40 +107,6 @@ internal fun CcCtlBusy(busy: Boolean, size: Int = 30) {
       trackColor = Color.Transparent)
 }
 
-/**
- * `.hslider`: a 76 dp pill you drag or tap. [value] is 0…100; [onLive] fires while dragging (for
- * throttled sends) and [onCommit] once on release. Local drag state keeps it from jumping back.
- */
-@Composable
-internal fun CcCtlHSlider(value: Int, label: (Int) -> String, onCommit: (Int) -> Unit, modifier: Modifier = Modifier,
-                          enabled: Boolean = true, onLive: ((Int) -> Unit)? = null, description: String = "Slider") {
-  val c = LocalCc.current
-  var drag by remember { mutableStateOf<Int?>(null) }
-  val commit by rememberUpdatedState(onCommit)
-  val live by rememberUpdatedState(onLive)
-  val shown = drag ?: value
-  Box(modifier.height(76.dp).fillMaxWidth().alpha(if (enabled) 1f else CC_DISABLED_ALPHA).clip(CcStyle.Pill).background(c.surface2)
-      .semantics { contentDescription = "$description ${label(shown)}" }
-      .then(if (!enabled) Modifier else Modifier
-          .pointerInput(Unit) {
-            detectTapGestures { o -> commit(CcControlMath.pctFromHorizontal(o.x, size.width.toFloat())) }
-          }
-          .pointerInput(Unit) {
-            detectHorizontalDragGestures(
-                onDragStart = { o -> drag = CcControlMath.pctFromHorizontal(o.x, size.width.toFloat()) },
-                onDragEnd = { drag?.let { commit(it) }; drag = null },
-                onDragCancel = { drag = null },
-            ) { change, _ ->
-              val p = CcControlMath.pctFromHorizontal(change.position.x, size.width.toFloat())
-              drag = p; live?.invoke(p); change.consume()
-            }
-          })) {
-    Box(Modifier.fillMaxHeight().fillMaxWidth(shown / 100f).background(c.text.copy(alpha = 0.85f)))
-    Text(label(shown), color = if (shown > LABEL_ON_FILL) c.bg else c.text, fontSize = 21.sp, fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.align(Alignment.CenterStart).padding(start = 24.dp))
-  }
-}
-
 /** One `.cklist` row. */
 @Composable
 internal fun CcCtlCheckRow(line: CcCheckLine, trailing: (@Composable () -> Unit)? = null) {
@@ -179,4 +137,3 @@ internal fun CcCtlEmpty(icon: String, title: String, body: String, action: Pair<
   }
 }
 
-private const val LABEL_ON_FILL = 30

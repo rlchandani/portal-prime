@@ -11,6 +11,7 @@ package com.immortal.launcher
  * mock's order, the sensors as read-only rows, the room's thermostat and camera, its scenes,
  * who is there, and each tile's one-line status.
  */
+@androidx.compose.runtime.Immutable
 internal data class CcRoomContents(
     val tiles: List<CcEntity>,
     val sensors: List<CcEntity>,

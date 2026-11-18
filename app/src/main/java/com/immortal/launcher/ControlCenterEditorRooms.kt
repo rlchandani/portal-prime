@@ -24,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,12 +55,12 @@ internal fun ColumnScope.CcStepRooms(ctx: CcEdCtx) {
       "Or let Hearthpane suggest a layout from the area names and you fix the shapes."
   else "Drag on the grid to draw a room, then name it. Use Move to drag a room; pull the orange corner to resize."
   CcWizCard(ctx, body, tag = tag, scroll = true, modifier = Modifier.weight(1f, fill = false)) {
-    if (ctx.hasAreas) areas.forEach { a ->
+    if (ctx.hasAreas) areas.forEach { a -> key(a.id) {
       val status = CcEd.areaStatus(st, a)
       CcAreaRow(if (status == CcAreaStatus.PLACED) "check" else "plan", a.name, status.label,
           iconTint = if (status == CcAreaStatus.PLACED) LocalCc.current.green else null, highlighted = st.selectedArea == a.id,
           onClick = { ctx.update { s -> if (status == CcAreaStatus.PLACED) CcEd.selectRoom(s, a.id) else CcEd.selectArea(s, a.id) } })
-    }
+    } }
     floorRooms.filter { r -> areas.none { it.id == r.id } }.forEach { r ->
       CcAreaRow("check", r.name, "drawn", iconTint = LocalCc.current.green, highlighted = st.selectedRoom == r.id,
           onClick = { ctx.update { CcEd.selectRoom(it, r.id) } })

@@ -6,6 +6,8 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
+
 /**
  * The floor-plan editor's state machine (pure, unit tested). A first build walks five steps
  * (found → rooms → devices → doors & windows → ready); editing an existing plan opens on Rooms
@@ -30,6 +32,7 @@ internal enum class CcEdTool { DRAW, MOVE }
 
 internal enum class CcAreaStatus(val label: String) { PLACED("placed"), OUTDOOR("outdoor"), TO_DRAW("to draw") }
 
+@Immutable
 internal data class CcEdState(
     /** True for the five-step first build (the saved plan was empty). */
     val first: Boolean,
@@ -57,6 +60,7 @@ internal data class CcEdState(
 }
 
 /** Counts for the summary on the last step. */
+@Immutable
 internal data class CcPlanSummary(val rooms: Int, val devices: Int, val openings: Int)
 
 internal object CcEd {
@@ -260,6 +264,7 @@ internal object CcEd {
 }
 
 /** Step 1's "We found your home" numbers. */
+@Immutable
 internal data class CcFoundCounts(val floors: Int, val areas: Int, val withArea: Int, val withoutArea: Int)
 
 internal object CcEdFound {

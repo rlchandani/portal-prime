@@ -13,13 +13,12 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,14 +26,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,8 +42,9 @@ import androidx.compose.ui.unit.sp
 
 /** Lock page (`ctl-lock`): big state, who & when, Lock now (at once) / Unlock… (asks first). */
 @Composable
-internal fun CcLockControl(s: CcUiState, ui: CcUi, e: CcEntity, gate: CcGate) {
+internal fun CcLockControl(ui: CcUi, e: CcEntity, d: CcDeviceSlice) {
   val c = LocalCc.current
+  val gate = d.gate
   val locked = e.state == "locked" || e.state == "locking"
   val jammed = e.state == "jammed"
   Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -53,34 +54,26 @@ internal fun CcLockControl(s: CcUiState, ui: CcUi, e: CcEntity, gate: CcGate) {
       else -> BigState("unlock", c.amberBg, c.amber)
     }
     Text(CcSheetLogic.lockText(e.state), color = if (jammed) c.red else c.text, fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
-    Text(lockWhoWhen(s, e), color = c.sec, fontSize = 21.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 6.dp, bottom = 22.dp))
+    Text(d.who, color = c.sec, fontSize = 21.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 6.dp, bottom = 22.dp))
     if (locked && !jammed) CcButton("Unlock…", { ui.act(e, CcCalls.unlock(e)) }, icon = "unlock", style = CcButtonStyle.PRIMARY, enabled = gate.enabled)
     else CcButton("Lock now", { ui.act(e, CcCalls.lock(e)) }, icon = "lock", style = CcButtonStyle.PRIMARY, enabled = gate.enabled)
   }
-  if (s.settings.askUnlock) CcCtlNote("Unlocking always asks first on this Portal.", Modifier.padding(top = 24.dp))
-}
-
-/** "Locked by Sam · 7:31 pm" (HA's changed_by or the person behind the change). */
-internal fun lockWhoWhen(s: CcUiState, e: CcEntity): String {
-  val who = CcSheetLogic.who(s, e)
-  val verb = CcSheetLogic.lockText(e.state)
-  val parts = listOfNotNull(who?.let { "$verb by $it" } ?: verb.takeIf { e.lastChanged > 0 }, e.lastChanged.takeIf { it > 0 }?.let { ccTime(it) })
-  return parts.joinToString(" · ").ifEmpty { "Home Assistant hasn't said who changed it" }
+  if (d.askUnlock) CcCtlNote("Unlocking always asks first on this Portal.", Modifier.padding(top = 24.dp))
 }
 
 /** Garage page (`ctl-garage`): door picture, state + since, Close…/Open… (camera confirm), Stop. */
 @Composable
-internal fun CcGarageControl(s: CcUiState, ui: CcUi, e: CcEntity, gate: CcGate) {
+internal fun CcGarageControl(ui: CcUi, e: CcEntity, d: CcDeviceSlice) {
   val c = LocalCc.current
-  val camera = CcSheetLogic.garageCamera(s, e)
+  val gate = d.gate
+  val camera = d.cameraId
   val moving = e.state == "opening" || e.state == "closing"
   val isCover = e.domain == "cover"
-  if (camera != null) CcCameraTile(s, camera, live = true, modifier = Modifier.fillMaxWidth().height(330.dp).clip(RoundedCornerShape(30.dp)), label = "Garage")
-  else GarageDoor(e)
+  if (camera == null) GarageDoor(e)
   Row(Modifier.fillMaxWidth().padding(vertical = 20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
     Column(Modifier.weight(1f)) {
-      Text(CcSheetLogic.garageText(e, s.now), color = c.text, fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
-      Text(garageSince(s, e), color = c.sec, fontSize = 20.sp)
+      Text(d.status, color = c.text, fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
+      Text(d.who, color = c.sec, fontSize = 20.sp)
     }
     when {
       !isCover -> {}
@@ -93,16 +86,9 @@ internal fun CcGarageControl(s: CcUiState, ui: CcUi, e: CcEntity, gate: CcGate) 
   CcCtlNote(when {
     !isCover -> "This is a door sensor — Home Assistant can't move this door."
     moving -> "Watching the camera while it moves — Stop is always one tap."
-    s.settings.askGarage -> "Opening and closing always ask first. The camera shows the doorway before you confirm."
+    d.askGarage -> "Opening and closing always ask first. The camera shows the doorway before you confirm."
     else -> "Opening and closing happen straight away on this Portal."
   }, Modifier.padding(top = 12.dp))
-}
-
-private fun garageSince(s: CcUiState, e: CcEntity): String {
-  if (e.lastChanged <= 0) return ""
-  val who = CcSheetLogic.who(s, e)
-  val verb = if (e.isOpen) "Since" else "Closed at"
-  return listOfNotNull("$verb ${ccTime(e.lastChanged)}", who).joinToString(" · ")
 }
 
 /**
@@ -114,28 +100,35 @@ private fun GarageDoor(e: CcEntity, modifier: Modifier = Modifier.height(330.dp)
   val moving = e.state == "opening" || e.state == "closing"
   val known = (e.attrs["current_position"] as? Number)?.toFloat()?.div(FULL)
   val base = known ?: if (e.isOpen && e.state != "closing") 1f else 0f
-  val motion = LocalCcMotion.current
-  val glide = if (moving && known == null && motion) {
-    val t = rememberInfiniteTransition(label = "garage")
-    t.animateFloat(0f, 1f, infiniteRepeatable(tween(GLIDE_MS, easing = LinearEasing), RepeatMode.Restart), label = "garageGlide").value
+  val gliding = moving && known == null && LocalCcMotion.current
+  val opening = e.state == "opening"
+  // Both animations are States read only inside the draw lambda (no recomposition per frame).
+  val glide = if (gliding) {
+    rememberInfiniteTransition(label = "garage")
+        .animateFloat(0f, 1f, infiniteRepeatable(tween(GLIDE_MS, easing = LinearEasing), RepeatMode.Restart), label = "garageGlide")
   } else null
-  val openness = glide?.let { if (e.state == "opening") it else 1f - it } ?: base
-  val shown by animateFloatAsState(openness, tween(if (glide != null) 0 else PANEL_MS), label = "garagePanel")
-  BoxWithConstraints(modifier.fillMaxWidth().clip(RoundedCornerShape(30.dp)).background(Brush.verticalGradient(listOf(FRAME_TOP, FRAME_BOTTOM)))) {
-    Canvas(Modifier.fillMaxSize()) {
-      val slatPx = SLAT.dp.toPx(); val gapPx = SLAT_GAP.dp.toPx()
-      val left = size.width * OPENING_SIDE; val top = size.height * OPENING_TOP
-      val w = size.width * (1 - 2 * OPENING_SIDE); val h = size.height - top
-      drawRect(Brush.verticalGradient(listOf(NIGHT_A, NIGHT_B, NIGHT_C), startY = top, endY = size.height), Offset(left, top), Size(w, h))
-      val panel = h * (1f - shown)
-      var y = top
-      while (y < top + panel) {
-        val slat = minOf(slatPx, top + panel - y)
-        drawRect(SLAT_LIGHT, Offset(left, y), Size(w, slat))
-        if (slat >= slatPx) drawRect(SLAT_DARK, Offset(left, y + slatPx - gapPx), Size(w, gapPx))
-        y += slatPx
-      }
-    }
+  val settled = animateFloatAsState(base, tween(PANEL_MS), label = "garagePanel")
+  Box(modifier.fillMaxWidth().clip(RoundedCornerShape(30.dp)).background(Brush.verticalGradient(listOf(FRAME_TOP, FRAME_BOTTOM)))) {
+    Spacer(Modifier.fillMaxSize().drawWithCache {
+      val top = size.height * OPENING_TOP
+      val sky = Brush.verticalGradient(listOf(NIGHT_A, NIGHT_B, NIGHT_C), startY = top, endY = size.height)
+      onDrawBehind { drawGarage(sky, glide?.value?.let { if (opening) it else 1f - it } ?: settled.value) }
+    })
+  }
+}
+
+private fun DrawScope.drawGarage(sky: Brush, shown: Float) {
+  val slatPx = SLAT.dp.toPx(); val gapPx = SLAT_GAP.dp.toPx()
+  val left = size.width * OPENING_SIDE; val top = size.height * OPENING_TOP
+  val w = size.width * (1 - 2 * OPENING_SIDE); val h = size.height - top
+  drawRect(sky, Offset(left, top), Size(w, h))
+  val panel = h * (1f - shown)
+  var y = top
+  while (y < top + panel) {
+    val slat = minOf(slatPx, top + panel - y)
+    drawRect(SLAT_LIGHT, Offset(left, y), Size(w, slat))
+    if (slat >= slatPx) drawRect(SLAT_DARK, Offset(left, y + slatPx - gapPx), Size(w, gapPx))
+    y += slatPx
   }
 }
 

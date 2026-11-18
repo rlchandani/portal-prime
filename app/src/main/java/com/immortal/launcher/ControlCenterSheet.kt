@@ -6,8 +6,7 @@
  */
 package com.immortal.launcher
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,7 +29,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,30 +52,37 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 internal fun CcSheetHost(s: CcUiState, ui: CcUi) {
-  val c = LocalCc.current
   val top = ui.nav.topSheet
-  val last = remember { mutableStateOf<CcSheet?>(null) }
-  if (top != null) last.value = top
   val motion = LocalCcMotion.current
-  val shown by animateFloatAsState(if (top != null) 1f else 0f, tween(if (motion) CC_SHEET_MS else 0, easing = CcEase), label = "sheet")
-  val scrim by animateFloatAsState(if (top != null) 1f else 0f, tween(if (motion) CC_SCRIM_MS else 0), label = "sheetScrim")
-  if (shown == 0f && top == null) return
+  val slide = rememberCcPresence(top != null, if (motion) CC_SHEET_MS else 0, CcEase)
+  val scrim = rememberCcPresence(top != null, if (motion) CC_SCRIM_MS else 0, LinearEasing)
+  val last = remember { CcLast<CcSheet>() }
+  if (top != null) last.value = top
+  // Nothing open and nothing sliding out: cost nothing.
+  if (!slide.visible(top != null)) return
   val page = top ?: last.value ?: return
+  SheetFrame(ui, top != null, slide, scrim) {
+    when (page) {
+      is CcSheet.Room -> CcRoomSheet(s, ui, page.roomId)
+      is CcSheet.Device -> CcDeviceSheet(s, ui, page.entityId)
+    }
+  }
+}
+
+/** Scrim + sliding card; progress is read only in graphicsLayer, so sliding never recomposes the page. */
+@Composable
+private fun SheetFrame(ui: CcUi, open: Boolean, slide: CcPresence, scrim: CcPresence, content: @Composable ColumnScope.() -> Unit) {
+  val c = LocalCc.current
   val widthPx = with(LocalDensity.current) { (CcStyle.SheetWidth + SHEET_INSET).toPx() }
   Box(Modifier.fillMaxSize()) {
-    Box(Modifier.fillMaxSize().graphicsLayer { alpha = scrim }.background(c.scrim)
-        .then(if (top != null) Modifier.clickable(remember { MutableInteractionSource() }, indication = null) { ui.closeSheets() } else Modifier)
-        .semantics { contentDescription = "Close" })
+    Box(Modifier.fillMaxSize().graphicsLayer { alpha = scrim.progress.value }.background(c.scrim)
+        .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null, onClick = ui::closeSheets)
+            .semantics { contentDescription = "Close" } else Modifier))
     Column(Modifier.align(Alignment.CenterEnd).padding(SHEET_INSET).width(CcStyle.SheetWidth).fillMaxHeight()
-        .graphicsLayer { translationX = (1f - shown) * widthPx * SLIDE_OVERSHOOT }
+        .graphicsLayer { translationX = (1f - slide.progress.value) * widthPx * SLIDE_OVERSHOOT }
         .shadow(if (c.dark) 40.dp else 24.dp, CcStyle.Sheet, ambientColor = Color.Black, spotColor = Color.Black)
         .clip(CcStyle.Sheet).background(c.bg)
-        .clickable(remember { MutableInteractionSource() }, indication = null) {}) {
-      when (page) {
-        is CcSheet.Room -> CcRoomSheet(s, ui, page.roomId)
-        is CcSheet.Device -> CcDeviceSheet(s, ui, page.entityId)
-      }
-    }
+        .clickable(remember { MutableInteractionSource() }, indication = null) {}, content = content)
   }
 }
 
@@ -113,11 +118,8 @@ internal fun ColumnScope.CcSheetBody(scroll: Boolean = true, content: @Composabl
 
 /** Device page header: back pill + close, then the serif name with a busy ring. */
 @Composable
-internal fun CcDeviceHeader(s: CcUiState, ui: CcUi, e: CcEntity?, title: String) {
+internal fun CcDeviceHeader(ui: CcUi, backLabel: String, title: String, busy: Boolean) {
   val c = LocalCc.current
-  val stack = ui.nav.sheets
-  val prevRoom = stack.dropLast(1).filterIsInstance<CcSheet.Room>().lastOrNull()?.let { s.plan?.room(it.roomId)?.name }
-  val backLabel = prevRoom ?: e?.let { s.plan?.roomOf(it.id)?.name }?.takeIf { stack.size > 1 } ?: "Back"
   Row(Modifier.fillMaxWidth().padding(start = 34.dp, end = 34.dp, top = 30.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
     CcSheetBack(backLabel, ui)
     Spacer(Modifier.weight(1f))
@@ -127,22 +129,8 @@ internal fun CcDeviceHeader(s: CcUiState, ui: CcUi, e: CcEntity?, title: String)
       horizontalArrangement = Arrangement.spacedBy(16.dp)) {
     Text(title, color = c.text, fontSize = 50.sp, fontFamily = CcStyle.Serif, lineHeight = 54.sp, maxLines = 1,
         overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-    CcCtlBusy(e != null && e.id in s.pending)
+    CcCtlBusy(busy)
   }
-}
-
-/** A device page: header + the control for its kind. */
-@Composable
-private fun ColumnScope.CcDeviceSheet(s: CcUiState, ui: CcUi, entityId: String) {
-  val e = s.entity(entityId)?.takeIf { !CcPolicy.hidden(it, s.settings) }
-  CcDeviceHeader(s, ui, e, e?.name ?: "Not found")
-  if (e == null) {
-    Column(Modifier.padding(34.dp)) {
-      CcCtlEmpty("warn", "This device isn't in Home Assistant", "It may have been renamed or removed. Edit the plan to place it again.")
-    }
-    return
-  }
-  CcDeviceControl(s, ui, e)
 }
 
 private val SHEET_INSET = 18.dp

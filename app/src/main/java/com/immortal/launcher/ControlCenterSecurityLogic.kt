@@ -6,10 +6,20 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import kotlin.math.ceil
 
 /** One row of the Security checklist; [ok] null = informational (no tag colour). */
+@Immutable
 internal data class CcCheck(val icon: String, val title: String, val detail: String, val tag: String?, val ok: Boolean?)
+
+/** A WHO'S HOME card: the person, their avatar colour slot, home or not, and the line under the name. */
+@Immutable
+internal data class CcPersonItem(val id: String, val name: String, val index: Int, val home: Boolean, val line: String)
+
+/** The side column's slice: equal (and skipped) while nothing it shows changed. */
+@Immutable
+internal data class CcSecuritySideSlice(val people: List<CcPersonItem>, val checks: List<CcCheck>, val open: Int)
 
 /** How the big ring looks. */
 internal enum class CcRingTone { OFF, ARMED, ARMING, ALERT }
@@ -140,6 +150,10 @@ internal object CcSecurity {
     val what = if (on == 0) "No motion right now" else "Motion in $on ${if (on == 1) "place" else "places"}"
     return CcCheck("motion", "Motion", "$what · ignored in Home & Night", null, null)
   }
+
+  fun side(people: List<CcEntity>, entities: Collection<CcEntity>, time: (Long) -> String): CcSecuritySideSlice =
+      CcSecuritySideSlice(people.mapIndexed { i, p -> CcPersonItem(p.id, p.name, i, isHome(p), personLine(p)) },
+          checklist(entities, time), openCount(entities))
 
   /** Things still open that arming will ask about (doors, windows, garage). */
   fun openCount(entities: Collection<CcEntity>): Int = entities.count { e ->

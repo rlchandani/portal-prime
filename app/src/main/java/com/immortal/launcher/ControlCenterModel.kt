@@ -60,8 +60,10 @@ internal data class CcEntity(
 
   val currentTemp: Double? get() = (attrs["current_temperature"] as? Number)?.toDouble()
   val targetTemp: Double? get() = (attrs["temperature"] as? Number)?.toDouble()
-  val minTemp: Double get() = (attrs["min_temp"] as? Number)?.toDouble() ?: DEFAULT_MIN_TEMP
-  val maxTemp: Double get() = (attrs["max_temp"] as? Number)?.toDouble() ?: DEFAULT_MAX_TEMP
+  /** HA's min/max, else a unit-aware default (a setpoint above 40 can only be °F). */
+  val minTemp: Double get() = (attrs["min_temp"] as? Number)?.toDouble() ?: if (looksFahrenheit) DEFAULT_MIN_TEMP_F else DEFAULT_MIN_TEMP
+  val maxTemp: Double get() = (attrs["max_temp"] as? Number)?.toDouble() ?: if (looksFahrenheit) DEFAULT_MAX_TEMP_F else DEFAULT_MAX_TEMP
+  private val looksFahrenheit: Boolean get() = (targetTemp ?: currentTemp ?: 0.0) > CELSIUS_CEILING
   val tempStep: Double get() = (attrs["target_temp_step"] as? Number)?.toDouble() ?: 1.0
   val hvacModes: List<String> get() = (attrs["hvac_modes"] as? List<*>)?.filterIsInstance<String>().orEmpty()
   val hvacAction: String? get() = attrs["hvac_action"] as? String
@@ -94,6 +96,9 @@ internal data class CcEntity(
     const val DEFAULT_MAX_K = 6500
     const val DEFAULT_MIN_TEMP = 7.0
     const val DEFAULT_MAX_TEMP = 35.0
+    const val DEFAULT_MIN_TEMP_F = 45.0
+    const val DEFAULT_MAX_TEMP_F = 95.0
+    private const val CELSIUS_CEILING = 40.0
     private val ON_STATES = setOf("on", "playing", "open", "heat", "cool", "heat_cool", "auto", "dry", "fan_only")
     val OPENING_CLASSES = setOf("door", "window", "garage_door", "opening", "garage")
     private val COLOR_MODES = setOf("hs", "rgb", "rgbw", "rgbww", "xy")

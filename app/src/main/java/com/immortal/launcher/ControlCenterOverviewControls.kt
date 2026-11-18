@@ -33,36 +33,33 @@ import androidx.compose.ui.unit.sp
  * the per-lens legend pill, the "Live from Home Assistant" freshness pill and the stale bar.
  */
 @Composable
-internal fun CcPlanTopRow(plan: CcPlan, floor: CcFloor, lens: CcLens, ui: CcUi, modifier: Modifier = Modifier) {
+internal fun CcPlanTopRow(floors: CcFloorTabs, floorId: String, lens: CcLens, onFloor: (String) -> Unit, onLens: (CcLens) -> Unit,
+                          modifier: Modifier = Modifier) {
   Row(modifier, horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
-    if (plan.floors.size > 1) {
-      val floors = remember(plan.floors) { plan.floors.map { Triple(it.id, CcOverviewText.shortFloor(it.name), null as String?) } }
-      CcSeg(floors, floor.id, { ui.floor(it) })
+    if (floors.tabs.size > 1) {
+      val options = remember(floors) { floors.tabs.map { Triple(it.id, it.label, null as String?) } }
+      CcSeg(options, floorId, onFloor)
     }
-    CcSeg(LENSES, lens, { ui.lens(it) })
+    CcSeg(LENSES, lens, onLens)
   }
 }
 
 @Composable
-internal fun CcPlanLegend(s: CcUiState, model: CcPlanModel, lens: CcLens, modifier: Modifier = Modifier) {
+internal fun CcPlanLegend(legend: CcLegend, modifier: Modifier = Modifier) {
   val c = LocalCc.current
   LegendPill(modifier) {
-    when (lens) {
+    when (legend.lens) {
       CcLens.LIVE -> {
-        LegendDot(Color(OPAQUE or CcOverviewText.WARM_WASH), "Lights on: ${model.lightsOn}")
+        LegendDot(Color(OPAQUE or CcOverviewText.WARM_WASH), "Lights on: ${legend.lightsOn}")
         LegendDot(c.amber, "Open")
         LegendDot(Color(CcPlanDraw.WINDOW_RGB), "Motion")
         LegendDot(c.green, "Locked")
       }
       CcLens.CLIMATE -> {
-        val (lo, hi) = CcOverviewText.heatRange(s.fahrenheit)
-        val line = remember(model.floor, s.entities) {
-          CcOverviewText.climateLine(model.views.mapNotNull { v -> v.climateId?.let(s.entities::get) }.distinctBy { it.id })
-        }
-        LegendText(lo)
+        LegendText(legend.cold)
         Box(Modifier.size(180.dp, 14.dp).clip(CcStyle.Pill).background(HEAT_BRUSH))
-        LegendText(hi)
-        line?.let {
+        LegendText(legend.warm)
+        legend.climate?.let {
           Row(Modifier.padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             CcIcon("heat", c.sec, 22.dp)
             LegendText(it)
@@ -81,29 +78,30 @@ internal fun CcPlanLegend(s: CcUiState, model: CcPlanModel, lens: CcLens, modifi
 
 /** "Live from Home Assistant" (green dot), or how old the map is when it isn't live. */
 @Composable
-internal fun CcFreshnessPill(s: CcUiState, modifier: Modifier = Modifier) {
+internal fun CcFreshnessPill(text: String, live: Boolean, modifier: Modifier = Modifier) {
   val c = LocalCc.current
   LegendPill(modifier) {
-    if (s.connection.phase == CcPhase.LIVE) {
+    if (live) {
       Box(Modifier.size(22.dp), contentAlignment = Alignment.Center) {
         Box(Modifier.size(22.dp).clip(CircleShape).background(c.green.copy(alpha = DOT_HALO)))
         Box(Modifier.size(12.dp).clip(CircleShape).background(c.green))
       }
     } else CcIcon("clock", c.text, 24.dp)
-    Text(CcOverviewText.freshness(s.connection, s.now), color = c.text, fontSize = 18.sp, maxLines = 1)
+    Text(text, color = c.text, fontSize = 18.sp, maxLines = 1)
   }
 }
 
 /** Mock `.staleBar`: live updates paused, how old the data is, and Retry. */
 @Composable
-internal fun CcStaleBar(s: CcUiState, modifier: Modifier = Modifier) {
+internal fun CcStaleBar(text: String, modifier: Modifier = Modifier) {
   val c = LocalCc.current
   val context = LocalContext.current
+  val retry = remember(context) { { ControlCenter.retryNow(context) } }
   Row(modifier.clip(CcStyle.Pill).background(c.amberBg).padding(start = 26.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
     CcIcon("clock", c.amber, 26.dp)
-    Text(CcOverviewText.staleLine(s.connection, s.now), color = c.amber, fontSize = 21.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-    CcButton("Retry", { ControlCenter.retryNow(context) }, height = 64)
+    Text(text, color = c.amber, fontSize = 21.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+    CcButton("Retry", retry, height = 64)
   }
 }
 

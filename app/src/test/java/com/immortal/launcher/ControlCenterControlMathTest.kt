@@ -122,4 +122,26 @@ class ControlCenterControlMathTest {
     assertFalse(t.shouldSend(5_000, 40))
     assertFalse(t.shouldSend(5_000, 40, final = true))
   }
+
+  @Test fun tempRangeUsesHaThenTheRightUnit() {
+    val withAttrs = CcEntity("climate.c", "heat", mapOf("min_temp" to 50, "max_temp" to 86, "temperature" to 70))
+    assertEquals(50.0 to 86.0, CcControlMath.tempRange(withAttrs, fahrenheit = true))
+    // The Family Portal case: °F setpoint, no min/max from HA → 45–95, never the 7–35 °C default.
+    val bare = CcEntity("climate.c", "cool", mapOf("temperature" to 86, "current_temperature" to 71))
+    assertEquals(45.0 to 95.0, CcControlMath.tempRange(bare, fahrenheit = false))
+    val celsius = CcEntity("climate.c", "heat", mapOf("temperature" to 21))
+    assertEquals(7.0 to 35.0, CcControlMath.tempRange(celsius, fahrenheit = false))
+    val outside = CcEntity("climate.c", "heat", mapOf("min_temp" to 60, "max_temp" to 80, "temperature" to 85))
+    assertEquals(60.0 to 85.0, CcControlMath.tempRange(outside, fahrenheit = true))
+    val broken = CcEntity("climate.c", "heat", mapOf("min_temp" to 90, "max_temp" to 50, "temperature" to 70))
+    assertEquals(45.0 to 95.0, CcControlMath.tempRange(broken, fahrenheit = true))
+    assertEquals(0.82f, CcControlMath.dialFractionOf(86.0, 45.0, 95.0), 0.001f)
+  }
+
+  @Test fun dialHeadlineFallsBackToTheMode() {
+    assertEquals("Cooling to", dialHeadline(CcEntity("climate.c", "cool")))
+    assertEquals("Heating to", dialHeadline(CcEntity("climate.c", "heat_cool", mapOf("hvac_action" to "heating"))))
+    assertEquals("Set to", dialHeadline(CcEntity("climate.c", "cool", mapOf("hvac_action" to "idle"))))
+    assertEquals("Off", dialHeadline(CcEntity("climate.c", "off")))
+  }
 }

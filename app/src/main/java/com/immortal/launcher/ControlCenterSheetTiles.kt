@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,28 +35,44 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/** `.tiles`: two columns of device tiles. */
+/** `.tiles`: two columns of device tiles, keyed by entity so each tile skips on its own. */
 @Composable
-internal fun CcTileGrid(s: CcUiState, ui: CcUi, tiles: List<CcEntity>) {
+internal fun CcTileGrid(ui: CcUi, slice: CcRoomSlice) {
+  val rows = slice.contents.tiles.chunked(2)
   Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-    tiles.chunked(2).forEach { row ->
-      Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-        row.forEach { CcDeviceTile(s, ui, it, Modifier.weight(1f)) }
-        if (row.size == 1) Spacer(Modifier.weight(1f))
+    rows.forEach { row ->
+      key(row.first().id) {
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+          row.forEach { e ->
+            key(e.id) {
+              val kind = CcKind.of(e)
+              CcDeviceTile(ui, e, pending = e.id in slice.pending, enabled = slice.canControl && !e.unavailable, done = e.id in slice.done,
+                  stale = slice.stale, guarded = guarded(kind, slice), now = if (kind == CcKind.GARAGE) slice.minuteNow else 0L,
+                  modifier = Modifier.weight(1f))
+            }
+          }
+          if (row.size == 1) Spacer(Modifier.weight(1f))
+        }
       }
     }
   }
 }
 
-/** `.tile`: tinted icon square, power button for lights/switches/media, name and status line. */
+private fun guarded(kind: CcKind, slice: CcRoomSlice): Boolean = when (kind) {
+  CcKind.GARAGE -> slice.askGarage; CcKind.LOCK -> slice.askUnlock; CcKind.VALVE -> slice.askValve; else -> false
+}
+
+/**
+ * `.tile`: tinted icon square, power button for lights/switches/media, name and status line.
+ * Takes only its entity and primitives ([now] is 0 unless the status line shows a duration).
+ */
 @Composable
-internal fun CcDeviceTile(s: CcUiState, ui: CcUi, e: CcEntity, modifier: Modifier = Modifier) {
+internal fun CcDeviceTile(ui: CcUi, e: CcEntity, pending: Boolean, enabled: Boolean, done: Boolean, stale: Boolean, guarded: Boolean,
+                          now: Long, modifier: Modifier = Modifier) {
   val c = LocalCc.current
-  val done = e.id in s.appliancesDone
   val tone = CcSheetLogic.tone(e, done)
   val (iconBg, iconFg) = tileColors(e, tone)
-  val status = CcSheetLogic.status(e, s.now, done)
-  val stale = s.connection.phase == CcPhase.STALE
+  val status = CcSheetLogic.status(e, now, done)
   Column(modifier.heightIn(min = 150.dp).ccCard(CcStyle.Tile).clickable(role = Role.Button) { ui.openDevice(e.id) }
       .semantics { contentDescription = "${e.name}, $status" }
       .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -64,8 +81,8 @@ internal fun CcDeviceTile(s: CcUiState, ui: CcUi, e: CcEntity, modifier: Modifie
         CcIcon(tileIcon(e), iconFg, 32.dp)
       }
       Spacer(Modifier.weight(1f))
-      CcCtlBusy(e.id in s.pending, 30)
-      TileTrailing(s, ui, e)
+      CcCtlBusy(pending, 30)
+      TileTrailing(ui, e, enabled, guarded)
     }
     Column {
       Text(e.name, color = c.text, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 26.sp)
@@ -76,11 +93,10 @@ internal fun CcDeviceTile(s: CcUiState, ui: CcUi, e: CcEntity, modifier: Modifie
 }
 
 @Composable
-private fun TileTrailing(s: CcUiState, ui: CcUi, e: CcEntity) {
+private fun TileTrailing(ui: CcUi, e: CcEntity, enabled: Boolean, guarded: Boolean) {
   val c = LocalCc.current
   if (CcSheetLogic.hasPower(e)) {
     val on = e.isOn
-    val enabled = ccGate(s, e).enabled
     Box(Modifier.padding(start = 10.dp).size(64.dp).clip(CircleShape).background(if (on) c.text else c.surface2)
         .clickable(enabled = enabled, role = Role.Switch) { ui.act(e, powerCall(e, !on)) }
         .semantics { contentDescription = "${e.name} power, ${if (on) "on" else "off"}" }, contentAlignment = Alignment.Center) {
@@ -88,7 +104,6 @@ private fun TileTrailing(s: CcUiState, ui: CcUi, e: CcEntity) {
     }
     return
   }
-  val guarded = when (CcKind.of(e)) { CcKind.GARAGE -> s.settings.askGarage; CcKind.LOCK -> s.settings.askUnlock; CcKind.VALVE -> s.settings.askValve; else -> false }
   if (guarded) CcIcon("shield", c.faint, 26.dp)
 }
 
@@ -118,20 +133,26 @@ internal fun tileIcon(e: CcEntity): String = when (CcKind.of(e)) {
 
 /** Sensors as read-only rows (value + when it last changed). */
 @Composable
-internal fun CcSensorRows(s: CcUiState, ui: CcUi, sensors: List<CcEntity>) {
-  val c = LocalCc.current
+internal fun CcSensorRows(ui: CcUi, contents: CcRoomContents, now: Long) {
+  val sensors = contents.sensors
   Column(Modifier.fillMaxWidth().ccCard(CcStyle.Tile).padding(horizontal = 22.dp, vertical = 4.dp)) {
     sensors.forEachIndexed { i, e ->
-      if (i > 0) HorizontalDivider(color = c.div, thickness = 1.dp)
-      val tone = CcSheetLogic.tone(e)
-      Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).clickable(role = Role.Button) { ui.openDevice(e.id) },
-          verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        CcIcon(tileIcon(e), if (tone == CcTileTone.WARN) c.amber else c.sec, 30.dp)
-        Text(e.name, color = c.text, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-        Text(CcSheetLogic.status(e, s.now), color = if (tone == CcTileTone.WARN) c.amber else c.sec, fontSize = 21.sp,
-            fontWeight = FontWeight.SemiBold, maxLines = 1)
-      }
+      key(e.id) { SensorRow(ui, e, now, divider = i > 0) }
     }
+  }
+}
+
+@Composable
+private fun SensorRow(ui: CcUi, e: CcEntity, now: Long, divider: Boolean) {
+  val c = LocalCc.current
+  if (divider) HorizontalDivider(color = c.div, thickness = 1.dp)
+  val tone = CcSheetLogic.tone(e)
+  Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).clickable(role = Role.Button) { ui.openDevice(e.id) },
+      verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+    CcIcon(tileIcon(e), if (tone == CcTileTone.WARN) c.amber else c.sec, 30.dp)
+    Text(e.name, color = c.text, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+    Text(CcSheetLogic.status(e, now), color = if (tone == CcTileTone.WARN) c.amber else c.sec, fontSize = 21.sp,
+        fontWeight = FontWeight.SemiBold, maxLines = 1)
   }
 }
 

@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -33,29 +35,46 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/** Picks the control for the device's kind (one composable per [CcKind]). */
+/**
+ * A device page: derives one [CcDeviceSlice] per snapshot and picks the control for the kind.
+ * Controls take only the entity, the gate and primitives, so they skip when nothing they show
+ * changed (camera pictures are the only children that read the whole state).
+ */
 @Composable
-internal fun ColumnScope.CcDeviceControl(s: CcUiState, ui: CcUi, e: CcEntity) {
-  val gate = ccGate(s, e)
+internal fun ColumnScope.CcDeviceSheet(s: CcUiState, ui: CcUi, entityId: String) {
+  val stack = ui.nav.sheets
+  val d = remember(s, entityId, stack) { CcSlices.device(s, entityId, stack) }
+  CcDeviceHeader(ui, d.backLabel, d.entity?.name ?: "Not found", d.pending)
+  val e = d.entity
+  if (e == null) {
+    Column(Modifier.padding(34.dp)) {
+      CcCtlEmpty("warn", "This device isn't in Home Assistant", "It may have been renamed or removed. Edit the plan to place it again.")
+    }
+    return
+  }
+  val gate = d.gate
   when (CcKind.of(e)) {
-    CcKind.LIGHT -> CcSheetBody(scroll = false) { CcCtlReason(gate); CcLightControl(s, ui, e, gate) }
-    CcKind.CLIMATE -> CcSheetBody { CcCtlReason(gate); CcClimateControl(s, ui, e, gate) }
-    CcKind.LOCK -> CcSheetBody { CcCtlReason(gate); CcLockControl(s, ui, e, gate) }
-    CcKind.GARAGE -> CcSheetBody { CcCtlReason(gate); CcGarageControl(s, ui, e, gate) }
-    CcKind.COVER -> CcSheetBody { CcCtlReason(gate); CcCoverControl(s, ui, e, gate) }
-    CcKind.FAN -> CcSheetBody { CcCtlReason(gate); CcFanControl(s, ui, e, gate) }
-    CcKind.MEDIA -> CcSheetBody { CcCtlReason(gate); CcMediaControl(s, ui, e, gate) }
+    CcKind.LIGHT -> CcSheetBody(scroll = false) { CcCtlReason(gate); CcLightControl(ui, e, gate) }
+    CcKind.CLIMATE -> CcSheetBody { CcCtlReason(gate); CcClimateControl(ui, e, d) }
+    CcKind.LOCK -> CcSheetBody { CcCtlReason(gate); CcLockControl(ui, e, d) }
+    CcKind.GARAGE -> CcSheetBody {
+      CcCtlReason(gate)
+      d.cameraId?.let { CcCameraTile(s, it, live = true, modifier = Modifier.fillMaxWidth().height(330.dp).clip(RoundedCornerShape(30.dp)), label = "Garage") }
+      CcGarageControl(ui, e, d)
+    }
+    CcKind.COVER -> CcSheetBody { CcCtlReason(gate); CcCoverControl(ui, e, gate) }
+    CcKind.FAN -> CcSheetBody { CcCtlReason(gate); CcFanControl(ui, e, gate) }
+    CcKind.MEDIA -> CcSheetBody { CcCtlReason(gate); CcMediaControl(ui, e, gate) }
     CcKind.VALVE -> CcSheetBody { CcCtlReason(gate); CcValveControl(ui, e, gate) }
     CcKind.CAMERA -> CcSheetBody {
-      CcCameraTile(s, e.id, live = false, modifier = Modifier.fillMaxWidth().height(446.dp), label = e.name,
-          onClick = { ui.camera(e.id) })
+      CcCameraTile(s, e.id, live = false, modifier = Modifier.fillMaxWidth().height(446.dp), label = e.name, onClick = { ui.camera(e.id) })
     }
     CcKind.SWITCH -> CcSheetBody { CcCtlReason(gate); CcSwitchControl(ui, e, gate) }
     CcKind.APPLIANCE -> CcSheetBody {
       if (e.domain == "switch" || e.domain == "input_boolean") { CcCtlReason(gate); CcSwitchControl(ui, e, gate) }
-      else CcSensorControl(s, e)
+      else CcSensorControl(e, d.status, d.done)
     }
-    else -> CcSheetBody { CcSensorControl(s, e) }
+    else -> CcSheetBody { CcSensorControl(e, d.status, d.done) }
   }
 }
 
@@ -94,13 +113,13 @@ internal fun CcValveControl(ui: CcUi, e: CcEntity, gate: CcGate) {
 
 /** Sensors and anything read-only: the value, when it changed, battery if known. */
 @Composable
-internal fun CcSensorControl(s: CcUiState, e: CcEntity) {
+internal fun CcSensorControl(e: CcEntity, status: String, done: Boolean) {
   val c = LocalCc.current
-  val tone = CcSheetLogic.tone(e, e.id in s.appliancesDone)
+  val tone = CcSheetLogic.tone(e, done)
   val warn = tone == CcTileTone.WARN
   Column(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
     BigState(tileIcon(e), if (warn) c.amberBg else c.surface2, if (warn) c.amber else c.text)
-    Text(CcSheetLogic.status(e, s.now, e.id in s.appliancesDone), color = if (warn) c.amber else c.text, fontSize = 40.sp,
+    Text(status, color = if (warn) c.amber else c.text, fontSize = 40.sp,
         fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
     val facts = listOfNotNull(e.battery?.let { "Battery $it%" }, e.lastChanged.takeIf { it > 0 }?.let { "Changed ${ccTime(it)}" })
     if (facts.isNotEmpty()) CcCtlNote(facts.joinToString(" · "), Modifier.padding(top = 8.dp))

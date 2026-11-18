@@ -6,11 +6,25 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Pure text and colour rules for the overview (unit tested): room captions per lens, the
  * climate heat ramp, light wash mixing, the "Live / Updated N min ago" pill and the honest
  * loading checklist.
  */
+/** One floor in the floor switch. */
+@Immutable
+internal data class CcFloorTab(val id: String, val label: String)
+
+/** The floor switch's tabs (wrapper so equal floors skip). */
+@Immutable
+internal data class CcFloorTabs(val tabs: List<CcFloorTab>)
+
+/** What the legend pill shows for a lens (primitives only, so equal legends skip). */
+@Immutable
+internal data class CcLegend(val lens: CcLens, val lightsOn: Int = 0, val cold: String = "", val warm: String = "", val climate: String? = null)
+
 internal object CcOverviewText {
   private const val MS_PER_MIN = 60_000L
   private const val W_PER_KW = 1000.0
@@ -94,6 +108,16 @@ internal object CcOverviewText {
     val c = climates.firstOrNull { it.hvacAction != null && it.hvacAction != "off" && it.hvacAction != "idle" } ?: climates.firstOrNull() ?: return null
     val action = c.hvacAction?.takeIf { it.isNotBlank() } ?: c.state
     return "${c.name} ${action.replace('_', ' ')}"
+  }
+
+  fun legend(model: CcPlanModel, lens: CcLens, entities: Map<String, CcEntity>, fahrenheit: Boolean): CcLegend = when (lens) {
+    CcLens.LIVE -> CcLegend(lens, lightsOn = model.lightsOn)
+    CcLens.ENERGY -> CcLegend(lens)
+    CcLens.CLIMATE -> {
+      val (cold, warm) = heatRange(fahrenheit)
+      CcLegend(lens, cold = cold, warm = warm,
+          climate = climateLine(model.views.mapNotNull { v -> v.climateId?.let(entities::get) }.distinctBy { it.id }))
+    }
   }
 
   /** Climate legend ends: the ramp's cold and warm temperatures. */

@@ -86,4 +86,28 @@ class ControlCenterAlertsScreenLogicTest {
     assertEquals(listOf("a" to false), CcAlertRules.list(CcAlertFilter.RESOLVED, listOf(b), resolved).map { it.first.id to it.second })
     assertEquals(listOf("b" to true, "a" to false), CcAlertRules.list(CcAlertFilter.ALL, listOf(b), resolved).map { it.first.id to it.second })
   }
+
+  @Test fun item_derivesTheButton() {
+    val now = at(19, 42)
+    val t: (Long) -> String = { "7:25 pm" }
+    val garage = CcEntity("cover.garage", "open", mapOf("device_class" to "garage"))
+    val ents = mapOf(garage.id to garage)
+    val close = CcAlertRules.item(CcAlert("g", CcSeverity.WARNING, CcKind.GARAGE, garage.id, "Garage door is open", "Open 17 min", 5L,
+        CcAlertAction.CLOSE), true, ents, { null }, canControl = false, now = now, time = t, zone = utc)
+    assertEquals("Close", close.label)
+    assertEquals("Open 17 min · 7:25 pm", close.line)
+    assertEquals(false, close.enabled)
+    assertEquals("close_cover", (close.op as CcAlertOp.Act).call.service)
+    val remind = CcAlertRules.item(alert("w", CcAlertAction.REMIND, kind = CcKind.WINDOW), true, emptyMap(), { null }, true, now, t, utc)
+    assertEquals(CcAlertOp.Dismiss(at(22)), remind.op)
+    assertEquals("Remind 10 pm", remind.label)
+    val view = CcAlertRules.item(alert("s", CcAlertAction.VIEW, "binary_sensor.smoke", CcSeverity.CRITICAL, CcKind.SMOKE), true, emptyMap(),
+        { "kitchen" }, true, now, t, utc)
+    assertEquals(CcAlertOp.OpenRoom("kitchen"), view.op)
+    assertEquals(true, view.danger)
+    val noValve = CcAlertRules.item(alert("l", CcAlertAction.SHUT_WATER, kind = CcKind.LEAK), true, emptyMap(), { null }, true, now, t, utc)
+    assertNull(noValve.label)
+    val resolved = CcAlertRules.item(alert("r", CcAlertAction.SNOOZE), false, emptyMap(), { null }, true, now, t, utc)
+    assertNull(resolved.op)
+  }
 }

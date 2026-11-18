@@ -78,7 +78,6 @@ internal fun CcPlanDraw.drawLabels(s: DrawScope) {
 }
 
 private fun CcPlanDraw.label(s: DrawScope, t: TextLayoutResult, at: Offset, alpha: Float) {
-  s.drawText(t, color = c.floor, topLeft = at, alpha = alpha * HALO_ALPHA, drawStyle = halo)
   s.drawText(t, topLeft = at, alpha = alpha)
 }
 
@@ -125,7 +124,6 @@ private const val CAM_ICON = 22f
 private const val APPLIANCE_ICON = 22f
 private const val LEAK_R = 24f
 private const val LEAK_ICON = 26f
-private const val HALO_ALPHA = 0.55f
 private const val FADED = 0.45f
 private const val LINE_GAP = 2f
 private const val FIT_SLACK = 1.1f

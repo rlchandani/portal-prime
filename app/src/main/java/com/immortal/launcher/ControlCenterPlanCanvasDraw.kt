@@ -15,13 +15,14 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.graphics.lerp
 
 /**
  * Everything one plan frame needs, assembled at composition (strokes, dash effects and colours
  * are created here, never per frame). The draw passes live in this file (floor, openings,
  * pulses, walk, flows, focus) and in ControlCenterPlanCanvasMarks.kt (markers, labels, nodes).
+ * Which pass belongs to which cached layer is documented on [CcPlanCanvas].
  */
+@androidx.compose.runtime.Immutable
 internal class CcPlanDraw(
     val model: CcPlanModel,
     val px: CcPlanPx,
@@ -42,15 +43,11 @@ internal class CcPlanDraw(
   private class Lit(val wash: Color, val washAlpha: Float, val centers: List<Offset>, val radii: FloatArray, val tints: List<androidx.compose.ui.graphics.ColorFilter>)
 
   val lightFactor = if (stale) STALE_FACTOR else 1f
-  val wallStroke = Stroke(WALL_DP * dp, join = StrokeJoin.Round)
-  val outdoorStroke = Stroke(2f * dp, pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f * dp, 8f * dp)))
   val arcStroke = Stroke(2.5f * dp, pathEffect = PathEffect.dashPathEffect(floatArrayOf(5f * dp, 6f * dp)))
   val windowOpenDash = PathEffect.dashPathEffect(floatArrayOf(10f * dp, 7f * dp))
   val dotStroke = Stroke(3f * dp)
   val focusStroke = Stroke(FOCUS_DP * dp, join = StrokeJoin.Round)
   val nodeStroke = Stroke(3f * dp)
-  val halo = Stroke(HALO_DP * dp)
-  val selFloor = lerp(c.floor, CcStyle.EmberLight, SEL_MIX)
   val window = Color(WINDOW_RGB)
   val flowBase = flows?.lines?.map { Stroke(it.widthDp * dp, cap = StrokeCap.Round) }.orEmpty()
   val flowMoving = flows?.lines?.map { l -> dashes.effects.map { Stroke(l.widthDp * dp, cap = StrokeCap.Round, pathEffect = it) } }.orEmpty()
@@ -64,15 +61,30 @@ internal class CcPlanDraw(
   }
   private val glowAlpha = when (lens) { CcLens.ENERGY -> GLOW_ENERGY; CcLens.CLIMATE -> GLOW_CLIMATE; CcLens.LIVE -> if (c.dark) 1f else GLOW_LIGHT } * lightFactor
 
-  fun drawFloor(s: DrawScope) {
-    for (i in px.outdoorPaths.indices) {
-      s.drawPath(px.outdoorPaths[i], c.floor2)
-      s.drawPath(px.outdoorPaths[i], c.div, style = outdoorStroke)
-    }
-    for ((id, r) in px.indoor) s.drawRect(if (id == focus) selFloor else c.floor, r.topLeft, r.size)
+  /** Layer 2: the focused room's ember tint, lens tints, light washes and glows. */
+  fun drawUnder(s: DrawScope) {
+    focus?.let(px.rects::get)?.let { s.drawRect(CcStyle.EmberLight, it.topLeft, it.size, alpha = SEL_MIX) }
     for (v in model.views) px.rects[v.room.id]?.let { roomFill(s, v, it) }
-    s.drawPath(px.walls, c.wall, style = wallStroke)
-    model.openings.forEachIndexed { i, o -> drawOpening(s, o, px.openings[i]) }
+  }
+
+  /** Layer 4: openings over the walls, the focus veil, then badges / dots / chips. */
+  fun drawOver(s: DrawScope) {
+    for (i in model.openings.indices) drawOpening(s, model.openings[i], px.openings[i])
+    focusVeil(s)
+    drawMarks(s)
+  }
+
+  /** Layer 6: names + captions and the energy nodes, above everything that moves. */
+  fun drawTop(s: DrawScope) {
+    drawLabels(s)
+    drawEnergyNodes(s)
+  }
+
+  /** Layer 5 at clock [t]: pulses, energy dashes and the focus edge. */
+  fun drawAnimated(s: DrawScope, t: Float) {
+    drawPulses(s, t)
+    drawFlows(s, t)
+    focusEdge(s, t)
   }
 
   private fun roomFill(s: DrawScope, v: CcRoomView, r: Rect) {
@@ -109,7 +121,7 @@ internal class CcPlanDraw(
     }
   }
 
-  fun drawPulses(s: DrawScope, t: Float) {
+  private fun drawPulses(s: DrawScope, t: Float) {
     model.pulses.forEachIndexed { i, p ->
       val k = frac(t * PULSE_CYCLES + i * PULSE_STAGGER)
       val color = when (p.tone) { CcMapPulseTone.MOTION -> window; CcMapPulseTone.OPEN -> c.amber; CcMapPulseTone.LEAK -> c.red }
@@ -130,7 +142,7 @@ internal class CcPlanDraw(
     }
   }
 
-  fun drawFlows(s: DrawScope, t: Float) {
+  private fun drawFlows(s: DrawScope, t: Float) {
     val f = flows ?: return
     val phase = frac(t * DASH_CYCLES)
     f.lines.forEachIndexed { i, l ->
@@ -141,11 +153,15 @@ internal class CcPlanDraw(
     }
   }
 
-  /** While a room's sheet is open the rest of the floor dims and the room gets an ember edge. */
-  fun drawFocus(s: DrawScope, t: Float) {
+  /** While a room's sheet is open the rest of the floor dims… */
+  private fun focusVeil(s: DrawScope) {
     val f = focus ?: return
-    val r = px.rects[f] ?: return
     for ((id, other) in px.rects) if (id != f) s.drawRect(c.planBg, other.topLeft, other.size, alpha = FOCUS_VEIL)
+  }
+
+  /** …and the room gets a breathing ember edge. */
+  private fun focusEdge(s: DrawScope, t: Float) {
+    val r = focus?.let(px.rects::get) ?: return
     val k = frac(t * FOCUS_CYCLES)
     val breathe = FOCUS_ALPHA_MIN + (1f - FOCUS_ALPHA_MIN) * (1f - kotlin.math.abs(k * 2f - 1f))
     val inset = FOCUS_INSET_CELLS * px.fit.scale
@@ -159,8 +175,8 @@ internal class CcPlanDraw(
     private const val OPAQUE = 0xFF000000.toInt()
     const val WINDOW_RGB = 0xFF7FB2E5
     private const val WALK_RGB = 0xFFF1D6
-    const val WALL_DP = 4f
-    private const val HALO_DP = 4f
+    /** The mock's 5-unit `.wl` stroke. */
+    const val WALL_DP = 5f
     private const val GAP_DP = 9f
     private const val WINDOW_DP = 6f
     private const val DOOR_DP = 7f
@@ -195,5 +211,27 @@ internal class CcPlanDraw(
     /** The mock's 150-unit sweep light, in cells. */
     private const val WALK_CELLS = 7.5f
     private const val FLOW_BASE_ALPHA = 0.18f
+  }
+}
+
+/** The static layers (1 floors + slabs, 3 walls): depend only on floor geometry, size and theme. */
+internal class CcPlanBase(private val px: CcPlanPx, private val c: CcColors, dp: Float) {
+  private val wallStroke = Stroke(CcPlanDraw.WALL_DP * dp, cap = StrokeCap.Round, join = StrokeJoin.Round)
+  private val outdoorStroke = Stroke(OUTDOOR_DP * dp, pathEffect = PathEffect.dashPathEffect(floatArrayOf(OUTDOOR_DASH * dp, OUTDOOR_GAP * dp)))
+
+  fun drawFloors(s: DrawScope) {
+    for (i in px.outdoorPaths.indices) {
+      s.drawPath(px.outdoorPaths[i], c.floor2)
+      s.drawPath(px.outdoorPaths[i], c.div, style = outdoorStroke)
+    }
+    for ((_, r) in px.indoor) s.drawRect(c.floor, r.topLeft, r.size)
+  }
+
+  fun drawWalls(s: DrawScope) = s.drawPath(px.walls, c.wall, style = wallStroke)
+
+  private companion object {
+    const val OUTDOOR_DP = 2f
+    const val OUTDOOR_DASH = 6f
+    const val OUTDOOR_GAP = 8f
   }
 }

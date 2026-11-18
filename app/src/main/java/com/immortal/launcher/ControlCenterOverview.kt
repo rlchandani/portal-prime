@@ -59,26 +59,32 @@ internal fun CcOverviewScreen(s: CcUiState, ui: CcUi) {
 private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan) {
   val floor = plan.floor(ui.nav.floorId) ?: return
   val lens = ui.nav.lens
-  val minute = s.now / MS_PER_MIN
-  val model = remember(floor, s.entities, s.settings, minute, s.appliancesDone) {
+  // Derived once per entity version / minute; an equal model makes every plan layer skip.
+  val model = remember(floor, s.entitiesVersion, s.settings, s.minute, s.appliancesDone) {
     CcPlanModel.build(floor, s.entities, s.settings, s.now, s.appliancesDone)
   }
   // House-level sources (solar, grid, battery) belong to the first floor, as in the mock.
-  val sources = remember(s.entities, lens, floor.id) {
+  val sources = remember(s.entitiesVersion, lens, floor.id) {
     if (lens == CcLens.ENERGY && floor.id == plan.floors.firstOrNull()?.id) CcMapSources.of(CcEnergy.now(s.entities)) else CcMapSources.NONE
   }
+  val legend = remember(model, lens, s.fahrenheit) { CcOverviewText.legend(model, lens, s.entities, s.fahrenheit) }
+  val floors = remember(plan.floors) { CcFloorTabs(plan.floors.map { CcFloorTab(it.id, CcOverviewText.shortFloor(it.name)) }) }
+  val phase = s.connection.phase
+  val fresh = remember(s.connection, s.minute) { CcOverviewText.freshness(s.connection, s.now) }
+  val staleLine = remember(s.connection, s.minute) { if (phase == CcPhase.STALE) CcOverviewText.staleLine(s.connection, s.now) else null }
   val walk = rememberWalkView(s.sceneRun)
-  val down = s.connection.phase in DOWN_PHASES
   val latest by rememberUpdatedState(s)
   val onTap = remember(ui) { { hit: CcPlanHit -> onPlanTap(hit, latest, ui) } }
+  val onFloor = remember(ui) { { id: String -> ui.floor(id) } }
+  val onLens = remember(ui) { { l: CcLens -> ui.lens(l) } }
   Box(Modifier.fillMaxSize()) {
-    CcPlanCanvas(model, lens, ui.nav.highlightRoom, walk, sources, stale = s.connection.phase == CcPhase.STALE,
+    CcPlanCanvas(model, lens, ui.nav.highlightRoom, walk, sources, stale = phase == CcPhase.STALE,
         fahrenheit = s.fahrenheit, onTap = onTap,
-        modifier = Modifier.fillMaxSize().padding(top = 96.dp, bottom = 84.dp).alpha(if (down) DOWN_ALPHA else 1f))
-    CcPlanTopRow(plan, floor, lens, ui, Modifier.align(Alignment.TopStart).padding(start = 24.dp, end = 24.dp, top = 22.dp))
-    if (s.connection.phase == CcPhase.STALE) CcStaleBar(s, Modifier.align(Alignment.TopCenter).padding(top = 100.dp))
-    CcPlanLegend(s, model, lens, Modifier.align(Alignment.BottomStart).padding(start = 24.dp, bottom = 22.dp))
-    CcFreshnessPill(s, Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = 22.dp))
+        modifier = Modifier.fillMaxSize().padding(top = 96.dp, bottom = 84.dp).alpha(if (phase in DOWN_PHASES) DOWN_ALPHA else 1f))
+    CcPlanTopRow(floors, floor.id, lens, onFloor, onLens, Modifier.align(Alignment.TopStart).padding(start = 24.dp, end = 24.dp, top = 22.dp))
+    staleLine?.let { CcStaleBar(it, Modifier.align(Alignment.TopCenter).padding(top = 100.dp)) }
+    CcPlanLegend(legend, Modifier.align(Alignment.BottomStart).padding(start = 24.dp, bottom = 22.dp))
+    CcFreshnessPill(fresh, phase == CcPhase.LIVE, Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = 22.dp))
   }
 }
 
@@ -126,6 +132,5 @@ private fun CcSceneWalkClock(s: CcUiState) {
 private val PLAN_CARD = RoundedCornerShape(36.dp)
 private val DOWN_PHASES = setOf(CcPhase.UNREACHABLE, CcPhase.OFFLINE, CcPhase.AUTH_FAILED, CcPhase.NOT_CONFIGURED)
 private const val DOWN_ALPHA = 0.55f
-private const val MS_PER_MIN = 60_000L
 /** How long the finished walk lingers before the run is cleared. */
 private const val WALK_HOLD_MS = 1_200L

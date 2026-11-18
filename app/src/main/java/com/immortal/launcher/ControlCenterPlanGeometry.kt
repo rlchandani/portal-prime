@@ -157,3 +157,33 @@ internal object CcPlanGeo {
 /** The id of the point nearest ([x], [y]) within [radius] (all in the same units), or null. */
 internal fun ccNearest(points: List<Pair<String, CcMapPt>>, x: Float, y: Float, radius: Float): String? =
     points.map { (id, p) -> id to kotlin.math.hypot(p.x - x, p.y - y) }.filter { it.second <= radius }.minByOrNull { it.second }?.first
+
+/**
+ * Every indoor wall on the floor as merged straight runs: each room's four edges are split into
+ * unit grid steps, shared edges between neighbours kept once (so nothing is drawn twice), then
+ * merged back into the longest straight lines. Interior walls are therefore always drawn.
+ */
+internal fun ccWalls(rooms: List<CcRoom>): List<CcMapLine> {
+  val h = HashSet<Long>()
+  val v = HashSet<Long>()
+  fun key(a: Int, b: Int) = (a.toLong() shl 32) or (b.toLong() and 0xFFFFFFFFL)
+  for (r in rooms) if (!r.outdoor) with(r.rect) {
+    for (i in x until right) { h += key(y, i); h += key(bottom, i) }
+    for (j in y until bottom) { v += key(x, j); v += key(right, j) }
+  }
+  fun runs(set: Set<Long>, horizontal: Boolean): List<CcMapLine> =
+      set.groupBy({ (it shr 32).toInt() }, { (it and 0xFFFFFFFFL).toInt() }).toSortedMap().flatMap { (line, steps) ->
+        val sorted = steps.sorted()
+        val out = ArrayList<CcMapLine>()
+        var start = sorted.first()
+        var prev = start
+        fun emit() {
+          val l = line.toFloat()
+          out += if (horizontal) CcMapLine(start.toFloat(), l, prev + 1f, l) else CcMapLine(l, start.toFloat(), l, prev + 1f)
+        }
+        for (s in sorted.drop(1)) { if (s != prev + 1) { emit(); start = s }; prev = s }
+        emit()
+        out
+      }
+  return runs(h, true) + runs(v, false)
+}

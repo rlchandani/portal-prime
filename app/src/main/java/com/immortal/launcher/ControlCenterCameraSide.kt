@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -38,40 +37,39 @@ import androidx.compose.ui.unit.sp
 /** Back pill, camera name, how the picture arrives, and the room's shortcuts (porch light, lock, garage). */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun CcCameraSideHead(s: CcUiState, ui: CcUi, camera: CcEntity) {
+internal fun CcCameraSideHead(name: String, ctx: CcCameraLogic.Context, canControl: Boolean, reason: String?, ui: CcUi) {
   val c = LocalCc.current
-  val ctx = remember(camera.id, s.plan, s.entities) { CcCameraLogic.context(camera.id, s.plan, s.entities) }
   Column(Modifier.fillMaxWidth().ccCard().padding(22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     BackPill { ui.camera(null) }
-    Text(camera.name, color = c.text, fontSize = 34.sp, fontFamily = CcStyle.Serif, fontWeight = FontWeight.SemiBold, maxLines = 2)
+    Text(name, color = c.text, fontSize = 34.sp, fontFamily = CcStyle.Serif, fontWeight = FontWeight.SemiBold, maxLines = 2)
     Text(listOfNotNull(ctx.roomName, "Live via Home Assistant · snapshot fallback").joinToString(" · "), color = c.sec, fontSize = 19.sp)
     if (ctx.shortcuts.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
       ctx.shortcuts.forEach { e ->
         val call = CcCameraLogic.shortcutCall(e)
-        ShortcutChip(CcIcons.forKind(CcKind.of(e)), CcCameraLogic.shortcutLabel(e), enabled = call != null && s.connection.canControl) {
+        ShortcutChip(CcIcons.forKind(CcKind.of(e)), CcCameraLogic.shortcutLabel(e), enabled = call != null && canControl) {
           call?.let { ui.act(e, it) }
         }
       }
     }
-    s.connection.disabledReason?.takeIf { ctx.shortcuts.isNotEmpty() }?.let { Text(it, color = c.faint, fontSize = 17.sp) }
+    reason?.takeIf { ctx.shortcuts.isNotEmpty() }?.let { Text(it, color = c.faint, fontSize = 17.sp) }
   }
 }
 
 /** Recent activity next to the camera: its own state and the motion sensors in its room. */
 @Composable
-internal fun CcCameraRecent(s: CcUiState, camera: CcEntity, modifier: Modifier) {
+internal fun CcCameraRecent(camera: CcEntity, near: CcCameraLogic.Context, modifier: Modifier) {
   val c = LocalCc.current
-  val ctx = remember(camera.id, s.plan, s.entities) { CcCameraLogic.context(camera.id, s.plan, s.entities) }
+  val motion = near.motion
   Column(modifier.ccCard().padding(22.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
     CcSectionLabel("Recent")
     EventRow("cam", cameraState(camera), camera.lastChanged.takeIf { it > 0 }?.let { "since ${ccTime(it)}" } ?: "", highlighted = false)
-    ctx.motion.forEach { m ->
+    motion.forEach { m ->
       val on = m.state == "on"
       val title = if (on) "Motion · ${m.name}" else "No motion · ${m.name}"
       val time = m.lastChanged.takeIf { it > 0 }?.let { if (on) "since ${ccTime(it)}" else "last ${ccTime(it)}" } ?: ""
       EventRow("motion", title, time, highlighted = on)
     }
-    if (ctx.motion.isEmpty()) Text("No motion sensor next to this camera. Put one in the same room on the plan to see activity here.",
+    if (motion.isEmpty()) Text("No motion sensor next to this camera. Put one in the same room on the plan to see activity here.",
         color = c.sec, fontSize = 18.sp, lineHeight = 25.sp)
   }
 }

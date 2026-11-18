@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Currency
@@ -25,6 +26,7 @@ internal enum class CcEnergyNode(val x: Float, val y: Float, val radius: Float) 
 }
 
 /** One line between a node and Home; dots move [from] → [to] (the direction power flows). */
+@Immutable
 internal data class CcEnergyLine(val node: CcEnergyNode, val from: CcEnergyNode, val to: CcEnergyNode, val kw: Double) {
   val active: Boolean get() = kw >= CcEnergyFlow.ACTIVE_KW
   /** Stroke width in the 800×700 design space (mock: 8 + min(kW, 3) × 4). */
@@ -36,6 +38,7 @@ internal data class CcEnergyLine(val node: CcEnergyNode, val from: CcEnergyNode,
 
 internal enum class CcEnergyTone { GREEN, AMBER, NEUTRAL }
 
+@Immutable
 internal data class CcEnergyStatus(val text: String, val icon: String, val tone: CcEnergyTone)
 
 /** Pure rules for the "Right now" flow card (unit tested). */
@@ -110,6 +113,7 @@ internal object CcEnergyFlow {
 }
 
 /** A drawn chart: values in kW (today) or kWh (week) per bucket, scaled to [max]. */
+@Immutable
 internal data class CcChartModel(
     val week: Boolean,
     val use: List<Double>,
@@ -184,7 +188,23 @@ internal object CcChart {
 }
 
 /** A KPI tile: big value + caption. */
+@Immutable
 internal data class CcKpi(val value: String, val label: String)
+
+/** The KPI row's slice (list equality, so an equal row skips). */
+@Immutable
+internal data class CcKpis(val items: List<CcKpi>)
+
+/** A TOP CONSUMERS row: the consumer, its plan room and its bar share. */
+@Immutable
+internal data class CcConsumerItem(val consumer: CcConsumer, val roomId: String?, val roomName: String?, val share: Float)
+
+@Immutable
+internal data class CcConsumerItems(val items: List<CcConsumerItem>)
+
+/** The EV row's slice: shown only when a charger power sensor exists. */
+@Immutable
+internal data class CcEvSlice(val title: String, val soc: Int?, val switch: CcEntity?, val canControl: Boolean)
 
 /** KPI tiles and consumer bars (pure). */
 internal object CcEnergyKpis {
@@ -220,6 +240,24 @@ internal object CcEnergyKpis {
     "fridge" in entityId || "freezer" in entityId -> "power"
     else -> "bolt"
   }
+
+  /** Consumers with their plan room ([room] → id to name) and bar share. */
+  fun consumerItems(consumers: List<CcConsumer>, room: (String) -> Pair<String, String>?): CcConsumerItems {
+    val shares = shares(consumers)
+    return CcConsumerItems(consumers.mapIndexed { i, k -> room(k.entityId).let { r -> CcConsumerItem(k, r?.first, r?.second, shares[i]) } })
+  }
+
+  /** The EV row, or null without a charger power sensor. */
+  fun ev(entities: Map<String, CcEntity>, chargerW: Double?, canControl: Boolean): CcEvSlice? {
+    if (chargerW == null) return null
+    val soc = carBattery(entities)
+    val charging = chargerW / W_PER_KW >= CcEnergyFlow.ACTIVE_KW
+    val title = listOfNotNull(soc?.let { "Car $it%" }, if (charging) "charging ${CcEnergyFlow.value(CcEnergyNode.CHARGER, chargerW)}" else "charger idle")
+        .joinToString(" · ").replaceFirstChar { it.uppercase() }
+    return CcEvSlice(title, soc, chargeSwitch(entities), canControl)
+  }
+
+  private const val W_PER_KW = 1000.0
 
   /** The EV charge switch, if HA has one ("switch.*charg*"). */
   fun chargeSwitch(entities: Map<String, CcEntity>): CcEntity? =

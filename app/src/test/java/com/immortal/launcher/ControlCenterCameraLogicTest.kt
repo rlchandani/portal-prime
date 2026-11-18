@@ -94,4 +94,16 @@ class ControlCenterCameraLogicTest {
     assertEquals(CcLiveGuard.NONE, g.owner.value)
     assertFalse(g.owns(CcLiveGuard.NONE))
   }
+
+  @Test fun centerCrop_keepsTheMiddleAtTheTileAspect() {
+    assertEquals(CcCameraLogic.Crop(80, 0, 480, 360), CcCameraLogic.centerCrop(640, 360, 400, 300))   // wide → trim sides
+    assertEquals(CcCameraLogic.Crop(0, 60, 640, 240), CcCameraLogic.centerCrop(640, 360, 800, 300))   // tall → trim top/bottom
+    assertEquals(CcCameraLogic.Crop(0, 0, 640, 360), CcCameraLogic.centerCrop(640, 360, 1280, 720))
+    assertEquals(CcCameraLogic.Crop(0, 0, 640, 360), CcCameraLogic.centerCrop(640, 360, 0, 0))
+  }
+
+  @Test fun timestampFormat_isReusable() {
+    val f = CcCameraLogic.timestampFormat(TimeZone.getTimeZone("UTC"))
+    assertEquals("2026-11-17 19:42:30", f.format(java.util.Date(1_794_944_550_000L)))
+  }
 }

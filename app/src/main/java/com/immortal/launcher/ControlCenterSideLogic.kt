@@ -6,11 +6,32 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Pure rules for the overview's side column (unit tested): which scenes get the four tiles and
  * how each looks, what the scene does in a few words, and the honest "all clear" line.
  */
 internal enum class CcSceneTone { NIGHT, MOVIE, LEAVE, MORNING, NEUTRAL }
+
+/** One "Needs attention" row: the alert, the entity it acts on, its plan room and whether it offers Close. */
+@Immutable
+internal data class CcAttentionRow(val alert: CcAlert, val entity: CcEntity?, val roomId: String?, val close: Boolean)
+
+/** The attention card's whole input; equal slices skip the card. */
+@Immutable
+internal data class CcAttentionSlice(val rows: List<CcAttentionRow>, val allClear: String)
+
+/** List wrappers so an equal list from a new state (same scenes / cameras) skips its card. */
+@Immutable
+internal data class CcSceneGrid(val tiles: List<CcSceneTile>)
+
+@Immutable
+internal data class CcCameraList(val cams: List<CcFloorTab>)
+
+/** One scene tile: the entity to run, its look and what it touches. */
+@Immutable
+internal data class CcSceneTile(val entity: CcEntity, val tone: CcSceneTone, val subtitle: String)
 
 internal object CcSideLogic {
   const val SCENE_TILES = 4
@@ -42,6 +63,20 @@ internal object CcSideLogic {
       all.filterNot { kids && tone(it) == CcSceneTone.LEAVE }
           .sortedWith(compareBy<CcEntity> { tone(it) == CcSceneTone.NEUTRAL }.thenBy { tone(it).ordinal }.thenBy { it.name.lowercase() })
           .take(SCENE_TILES)
+
+  /** The attention card from the active alerts (top [ATTENTION_ROWS]); the all-clear line when there are none. */
+  fun attention(alerts: List<CcAlert>, entities: Map<String, CcEntity>, plan: CcPlan?, settings: ControlCenterConfig.Settings): CcAttentionSlice {
+    val rows = alerts.take(ATTENTION_ROWS).map { a ->
+      val e = entities[a.entityId]
+      CcAttentionRow(a, e, plan?.roomOf(a.entityId)?.id, a.action == CcAlertAction.CLOSE && e?.domain == "cover")
+    }
+    val clear = if (rows.isEmpty()) allClear(entities.values.filter { !CcPolicy.hidden(it, settings) }) else ""
+    return CcAttentionSlice(rows, clear)
+  }
+
+  /** The scene grid's tiles, picked and described once per state change. */
+  fun tiles(all: List<CcEntity>, plan: CcPlan?, kids: Boolean): List<CcSceneTile> =
+      pick(all, kids).map { CcSceneTile(it, tone(it), subtitle(it, plan)) }
 
   /** What the scene touches: "Living room", "Kitchen & Dining", "Walks the house", "4 devices". */
   fun subtitle(e: CcEntity, plan: CcPlan?): String {

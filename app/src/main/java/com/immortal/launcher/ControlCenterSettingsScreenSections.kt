@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 
 /** Portals: this Portal's mode. Other Portals are set on each Portal or from the phone. */
 @Composable
-internal fun CcSetPortals(s: CcUiState, ui: CcUi, write: (String, Any) -> Unit, needPin: () -> Unit) {
+internal fun CcSetPortals(mode: String, hasPin: Boolean, ui: CcUi, write: (String, Any) -> Unit, needPin: () -> Unit) {
   val c = LocalCc.current
   var pending by remember { mutableStateOf<String?>(null) }
   CcSetHeading("Portals that show it", "Each Portal picks its own mode. Kids hides what you choose under Kids & guests; " +
@@ -42,11 +42,11 @@ internal fun CcSetPortals(s: CcUiState, ui: CcUi, write: (String, Any) -> Unit, 
       Box(Modifier.size(72.dp, 50.dp).alpha(PORTAL_ICON_ALPHA).border(4.dp, c.text, RoundedCornerShape(10.dp)))
       Column(Modifier.weight(1f)) {
         Text("This Portal", color = c.text, fontSize = 22.sp)
-        Text(modeLine(s.settings.portalMode), color = c.sec, fontSize = 18.sp)
+        Text(modeLine(mode), color = c.sec, fontSize = 18.sp)
       }
       CcSeg(listOf(Triple(ControlCenterConfig.MODE_FULL, "Full", null), Triple(ControlCenterConfig.MODE_KIDS, "Kids", null),
-          Triple(ControlCenterConfig.MODE_BANNERS, "Banners only", null)), pending ?: s.settings.portalMode, { target ->
-        when (CcSetLogic.modeStep(s.settings.portalMode, target, ControlCenterConfig.hasKidsPin(ui.context))) {
+          Triple(ControlCenterConfig.MODE_BANNERS, "Banners only", null)), pending ?: mode, { target ->
+        when (CcSetLogic.modeStep(mode, target, hasPin)) {
           CcModeStep.NOTHING -> { pending = null; write("portalMode", target) }
           CcModeStep.CONFIRM -> pending = target
           CcModeStep.SET_PIN -> { pending = null; needPin() }
@@ -75,8 +75,7 @@ private fun modeLine(mode: String): String = when (mode) {
 
 /** Kids & guests: what kids mode hides, and the PIN that leaves it. */
 @Composable
-internal fun CcSetKids(s: CcUiState, ui: CcUi, write: (String, Any) -> Unit, changePin: () -> Unit) {
-  val st = s.settings
+internal fun CcSetKids(st: ControlCenterConfig.Settings, hasPin: Boolean, write: (String, Any) -> Unit, changePin: () -> Unit) {
   CcSetHeading("Kids & guests", "Applies when this Portal is in Kids mode. It is a Portal-side lock: Home Assistant has no " +
       "per-entity permissions, so the token this Portal uses can still do everything.")
   CcSetGroup {
@@ -87,7 +86,6 @@ internal fun CcSetKids(s: CcUiState, ui: CcUi, write: (String, Any) -> Unit, cha
     CcSetToggle("Hide the water valve", null, "kidsHideValve", st.kidsHideValve, write)
     CcSetToggle("Lock the thermostats", "Shown, but they can't be changed", "kidsLockThermostat", st.kidsLockThermostat, write, divider = false)
   }
-  val hasPin = ControlCenterConfig.hasKidsPin(ui.context)
   CcSetGroup {
     CcSetRow("Leaving kids mode", if (hasPin) "Asks for the kids PIN on this Portal" else "Set a kids PIN before turning kids mode on", divider = false) {
       CcButton(if (hasPin) "Change PIN" else "Set PIN", changePin, height = 60)
@@ -97,8 +95,7 @@ internal fun CcSetKids(s: CcUiState, ui: CcUi, write: (String, Any) -> Unit, cha
 
 /** Ask before…: what confirms first (everything else acts at once with Undo). */
 @Composable
-internal fun CcSetConfirm(s: CcUiState, write: (String, Any) -> Unit) {
-  val st = s.settings
+internal fun CcSetConfirm(st: ControlCenterConfig.Settings, write: (String, Any) -> Unit) {
   CcSetHeading("Ask before…", "Everything else acts at once and offers Undo for 5 seconds.")
   CcSetGroup {
     CcSetToggle("Unlocking a door", "Locking never asks", "askUnlock", st.askUnlock, write)
@@ -112,8 +109,7 @@ internal fun CcSetConfirm(s: CcUiState, write: (String, Any) -> Unit) {
 
 /** Alerts & banners on this Portal. */
 @Composable
-internal fun CcSetBanners(s: CcUiState, ui: CcUi, write: (String, Any) -> Unit) {
-  val st = s.settings
+internal fun CcSetBanners(st: ControlCenterConfig.Settings, ui: CcUi, write: (String, Any) -> Unit) {
   val quiet = remember { runCatching { ChimeConfig.load(ui.context) }.getOrNull() }
   val quietText = quiet?.let { CcSetLogic.quietLabel(it.quietHoursOn, it.quietStartMin, it.quietEndMin) } ?: QUIET_DEFAULT
   CcSetHeading("Alerts & banners", "Banners appear over any Portal app, like the doorbell card.")
@@ -134,8 +130,7 @@ internal fun CcSetBanners(s: CcUiState, ui: CcUi, write: (String, Any) -> Unit) 
 
 /** Plan style & motion, plus the alarm keypad's numbers. */
 @Composable
-internal fun CcSetLook(s: CcUiState, ui: CcUi, write: (String, Any) -> Unit) {
-  val st = s.settings
+internal fun CcSetLook(st: ControlCenterConfig.Settings, ui: CcUi, write: (String, Any) -> Unit) {
   CcSetHeading("Plan style & motion", "The dark plan reads best from across the room; reduced motion stills every glow and walk.")
   CcSetGroup {
     CcSetRow("Theme") {
@@ -161,16 +156,15 @@ internal fun CcSetLook(s: CcUiState, ui: CcUi, write: (String, Any) -> Unit) {
 /** Home Assistant: connection, registry and where the plan lives. Never shows the server address. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun CcSetHomeAssistant(s: CcUiState, ui: CcUi) {
-  val (phase, tone) = CcSetLogic.phaseTag(s.connection.phase)
-  val (where, whereSub) = CcSetLogic.planSource(s.planSource, s.plan)
+internal fun CcSetHomeAssistant(slice: CcSetSlice, ui: CcUi) {
+  val (phase, tone) = CcSetLogic.phaseTag(slice.phase)
   CcSetHeading("Home Assistant", "Uses the server and long-lived token saved in Hearthpane Settings › Home Assistant.")
   CcSetGroup {
-    CcSetRow("Connection", s.connection.disabledReason ?: "Live updates over one connection · ${s.entities.size} entities") { CcTag(phase, tone) }
-    CcSetRow("Floors & areas", CcSetLogic.registryLine(s.registry)) {
-      if (s.registry == null) CcTag("Admin token", CcTone.AMBER)
+    CcSetRow("Connection", slice.reason ?: "Live updates over one connection · ${slice.entityCount} entities") { CcTag(phase, tone) }
+    CcSetRow("Floors & areas", slice.registryLine) {
+      if (slice.registryMissing) CcTag("Admin token", CcTone.AMBER)
     }
-    CcSetRow("Floor plan stored", "$where · $whereSub", divider = false)
+    CcSetRow("Floor plan stored", "${slice.planWhere} · ${slice.planWhereSub}", divider = false)
   }
   FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     CcButton("Connection settings", { ui.context.openApprovedHomeSettings("ha") }, icon = "link")

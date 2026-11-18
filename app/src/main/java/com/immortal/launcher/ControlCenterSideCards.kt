@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,19 +36,19 @@ import androidx.compose.ui.unit.sp
 
 /** Side cards: the 2×2 scene grid (mock `.scenes`), Energy now (`.enMini`) and Cameras (`.camRow`). */
 @Composable
-internal fun CcScenesCard(s: CcUiState, ui: CcUi) {
+internal fun CcScenesCard(grid: CcSceneGrid, canControl: Boolean, ui: CcUi) {
+  val tiles = grid.tiles
   val c = LocalCc.current
-  val scenes = remember(s.entities, s.settings) { CcSideLogic.pick(s.ofDomain("scene") + s.ofDomain("script"), s.settings.kids) }
   Column(Modifier.fillMaxWidth().ccCard().padding(horizontal = 24.dp, vertical = 22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
     CcSectionLabel("Scenes")
-    if (scenes.isEmpty()) {
+    if (tiles.isEmpty()) {
       Text("Add scenes in Home Assistant and they'll appear here — Good night, Movie time, Leaving home…",
           color = c.sec, fontSize = 19.sp, lineHeight = 26.sp)
       return@Column
     }
-    scenes.chunked(2).forEach { pair ->
+    tiles.chunked(2).forEach { pair ->
       Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-        pair.forEach { SceneTile(it, s, ui) }
+        pair.forEach { key(it.entity.id) { SceneTile(it, canControl, ui) } }
         if (pair.size == 1) Box(Modifier.weight(1f))
       }
     }
@@ -55,18 +56,16 @@ internal fun CcScenesCard(s: CcUiState, ui: CcUi) {
 }
 
 @Composable
-private fun RowScope.SceneTile(e: CcEntity, s: CcUiState, ui: CcUi) {
+private fun RowScope.SceneTile(tile: CcSceneTile, enabled: Boolean, ui: CcUi) {
   val c = LocalCc.current
-  val tone = CcSideLogic.tone(e)
-  val look = remember(tone, c) { SceneLook.of(tone, c) }
-  val sub = remember(e, s.plan) { CcSideLogic.subtitle(e, s.plan) }
-  val enabled = s.connection.canControl
+  val look = remember(tile.tone, c) { SceneLook.of(tile.tone, c) }
+  val run = remember(tile.entity, ui) { { ui.runScene(tile.entity) } }
   Column(Modifier.weight(1f).height(118.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA).clip(SCENE).background(look.bg)
-      .clickable(enabled = enabled, role = Role.Button) { ui.runScene(e) }.padding(horizontal = 22.dp),
+      .clickable(enabled = enabled, role = Role.Button, onClick = run).padding(horizontal = 22.dp),
       verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)) {
-    CcIcon(CcSideLogic.icon(tone), look.fg, 36.dp)
-    Text(e.name, color = look.fg, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    Text(sub, color = look.sub, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    CcIcon(CcSideLogic.icon(tile.tone), look.fg, 36.dp)
+    Text(tile.entity.name, color = look.fg, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Text(tile.subtitle, color = look.sub, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
   }
 }
 
@@ -86,11 +85,9 @@ private class SceneLook(val bg: Brush, val fg: Color, val sub: Color) {
 }
 
 @Composable
-internal fun CcEnergyNowCard(s: CcUiState, ui: CcUi) {
-  if (CcPolicy.screenHidden(CcScreen.ENERGY, s.settings)) return
-  val now = remember(s.entities) { CcEnergy.now(s.entities) }
-  if (!now.hasFlow && now.batteryPct == null) return
-  Column(Modifier.fillMaxWidth().ccCard().clickable(role = Role.Button) { ui.go(CcScreen.ENERGY) }.padding(horizontal = 24.dp, vertical = 22.dp),
+internal fun CcEnergyNowCard(now: CcEnergyNow, ui: CcUi) {
+  val open = remember(ui) { { ui.go(CcScreen.ENERGY) } }
+  Column(Modifier.fillMaxWidth().ccCard().clickable(role = Role.Button, onClick = open).padding(horizontal = 24.dp, vertical = 22.dp),
       verticalArrangement = Arrangement.spacedBy(14.dp)) {
     CcSectionLabel("Energy now")
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -114,17 +111,18 @@ private fun RowScope.EnergyCell(value: String, icon: String, label: String) {
   }
 }
 
+/** [cams] are (id, name); [s] is passed through only because [CcCameraTile] (cameras screen) takes it. */
 @Composable
-internal fun CcCamerasCard(s: CcUiState, ui: CcUi) {
-  if (CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings)) return
-  val cams = remember(s.entities, s.settings) { s.ofDomain("camera").take(CcSideLogic.CAMERA_TILES) }
-  if (cams.isEmpty()) return
+internal fun CcCamerasCard(s: CcUiState, list: CcCameraList, ui: CcUi) {
+  val cams = list.cams
   Column(Modifier.fillMaxWidth().ccCard()) {
     CcSectionLabel("Cameras", Modifier.padding(start = 24.dp, end = 24.dp, top = 22.dp))
     Row(Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 22.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
       cams.forEach { cam ->
-        CcCameraTile(s, cam.id, live = false, modifier = Modifier.weight(1f).aspectRatio(CAMERA_ASPECT).clip(CELL),
-            label = cam.name, onClick = { ui.camera(cam.id) })
+        key(cam.id) {
+          CcCameraTile(s, cam.id, live = false, modifier = Modifier.weight(1f).aspectRatio(CAMERA_ASPECT).clip(CELL),
+              label = cam.label, onClick = remember(cam.id, ui) { { ui.camera(cam.id) } })
+        }
       }
       if (cams.size == 1) Box(Modifier.weight(1f))
     }

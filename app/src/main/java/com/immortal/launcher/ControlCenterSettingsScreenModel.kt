@@ -6,6 +6,8 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Pure pieces of the Control Center settings screen (unit tested): its sections, the two-entry
  * kids-PIN reducer, steppers, and the honest labels for the connection, plan source and registry.
@@ -20,6 +22,7 @@ internal enum class CcSetSection(val icon: String, val label: String) {
 }
 
 /** Setting a kids PIN: type it, type it again; [done] holds the agreed PIN. */
+@Immutable
 internal data class CcPinSet(
     val confirming: Boolean = false,
     val first: String = "",

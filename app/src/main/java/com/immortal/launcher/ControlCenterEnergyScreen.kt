@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,16 +45,20 @@ internal fun CcEnergyScreen(s: CcUiState, ui: CcUi) {
   val context = ui.context
   LaunchedEffect(Unit) { while (true) { ControlCenter.loadEnergy(context); delay(ENERGY_RELOAD_MS) } }
   LaunchedEffect(s.energyPrefs, s.connection.canControl) { if (s.energyPrefs != null && s.connection.canControl) ControlCenter.loadEnergy(context) }
-  val now = remember(s.entities) { CcEnergy.now(s.entities) }
+  val now = remember(s.entitiesVersion) { CcEnergy.now(s.entities) }
+  val ev = remember(s.entitiesVersion, s.connection.canControl) { CcEnergyKpis.ev(s.entities, now.chargerW, s.connection.canControl) }
+  val consumers = remember(now.consumers, s.plan) { CcEnergyKpis.consumerItems(now.consumers) { id -> s.plan?.roomOf(id)?.let { it.id to it.name } } }
   var week by rememberSaveable { mutableStateOf(false) }
+  val onWeek = remember { { w: Boolean -> week = w } }
+  val series = if (week) s.energyWeek else s.energyToday
+  val kpis = remember(series, s.energyPrefs, week) { series?.let { CcKpis(CcEnergyKpis.kpis(it, s.energyPrefs, week)) } }
   val dim = if (s.connection.phase == CcPhase.STALE) CC_DIMMED_ALPHA else 1f
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(22.dp)) {
-    CcFlowCard(s, ui, now, Modifier.weight(FLOW_WEIGHT).fillMaxHeight().alpha(dim))
+    CcFlowCard(now, s.ready, ev, ui, Modifier.weight(FLOW_WEIGHT).fillMaxHeight().alpha(dim))
     Column(Modifier.weight(1f).fillMaxHeight().alpha(dim), verticalArrangement = Arrangement.spacedBy(22.dp)) {
-      val series = if (week) s.energyWeek else s.energyToday
-      series?.let { Kpis(CcEnergyKpis.kpis(it, s.energyPrefs, week)) }
-      ChartCard(s, week, { week = it }, Modifier.weight(1f).fillMaxWidth())
-      Consumers(s, ui, now)
+      kpis?.let { Kpis(it) }
+      ChartCard(week, onWeek, s.energyPrefs, series, s.minute, Modifier.weight(1f).fillMaxWidth())
+      Consumers(consumers, ui)
     }
   }
 }
@@ -61,19 +66,20 @@ internal fun CcEnergyScreen(s: CcUiState, ui: CcUi) {
 private const val FLOW_WEIGHT = 1.05f
 
 @Composable
-private fun CcFlowCard(s: CcUiState, ui: CcUi, now: CcEnergyNow, modifier: Modifier) {
-  val c = LocalCc.current
+private fun CcFlowCard(now: CcEnergyNow, ready: Boolean, ev: CcEvSlice?, ui: CcUi, modifier: Modifier) {
+  val status = remember(now) { CcEnergyFlow.status(now) }
+  val empty = remember(now) { CcEnergyFlow.nodes(now).isEmpty() }
   Column(modifier.ccCard().padding(28.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically) {
       CcSectionLabel("Right now", Modifier.weight(1f))
-      CcEnergyFlow.status(now)?.let { IconTag(it) }
+      status?.let { IconTag(it) }
     }
-    if (CcEnergyFlow.nodes(now).isEmpty()) Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-      EnergyNote("bolt", if (s.ready) "No power sensors yet" else "Loading power…",
+    if (empty) Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+      EnergyNote("bolt", if (ready) "No power sensors yet" else "Loading power…",
           "The live flow needs power sensors in watts: solar production, grid power (positive while importing, negative while exporting) " +
               "and battery power (positive while discharging). Give them device_class power in Home Assistant.")
     } else CcEnergyFlowDiagram(now, Modifier.weight(1f).fillMaxWidth())
-    if (now.chargerW != null) EvRow(s, ui, now)
+    ev?.let { EvRow(it, ui) }
   }
 }
 
@@ -90,39 +96,34 @@ private fun IconTag(st: CcEnergyStatus) {
 
 /** `.ev`: the car charger, its state, the car's charge and "Charge now" when HA has a charge switch. */
 @Composable
-private fun EvRow(s: CcUiState, ui: CcUi, now: CcEnergyNow) {
+private fun EvRow(ev: CcEvSlice, ui: CcUi) {
   val c = LocalCc.current
-  val switch = remember(s.entities) { CcEnergyKpis.chargeSwitch(s.entities) }
-  val soc = remember(s.entities) { CcEnergyKpis.carBattery(s.entities) }
-  val charging = (now.chargerW ?: 0.0) / W_PER_KW >= CcEnergyFlow.ACTIVE_KW
-  val title = listOfNotNull(soc?.let { "Car $it%" }, if (charging) "charging ${CcEnergyFlow.value(CcEnergyNode.CHARGER, now.chargerW)}" else "charger idle")
-      .joinToString(" · ").replaceFirstChar { it.uppercase() }
   Box(Modifier.fillMaxWidth().height(1.dp).background(c.div))
   Row(Modifier.fillMaxWidth().padding(top = 16.dp, start = 4.dp, end = 4.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
     CcIcon("car", c.sec, 34.dp)
     Column(Modifier.weight(1f)) {
-      Text(title, color = c.text, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-      soc?.let { pct ->
+      Text(ev.title, color = c.text, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+      ev.soc?.let { pct ->
         Box(Modifier.padding(top = 8.dp).fillMaxWidth().height(14.dp).clip(RoundedCornerShape(7.dp)).background(c.surface2)) {
           Box(Modifier.fillMaxWidth(pct / PCT).fillMaxHeight().clip(RoundedCornerShape(7.dp)).background(c.green))
         }
       }
     }
-    switch?.let { sw ->
-      CcButton(if (sw.isOn) "Stop" else "Charge now", { ui.act(sw, CcCalls.power(sw, !sw.isOn)) }, height = 64, enabled = s.connection.canControl)
+    ev.switch?.let { sw ->
+      val toggle = remember(sw, ui) { { ui.act(sw, CcCalls.power(sw, !sw.isOn)) } }
+      CcButton(if (sw.isOn) "Stop" else "Charge now", toggle, height = 64, enabled = ev.canControl)
     }
   }
 }
 
-private const val W_PER_KW = 1000.0
 private const val PCT = 100f
 
 @Composable
-private fun Kpis(kpis: List<CcKpi>) {
+private fun Kpis(kpis: CcKpis) {
   val c = LocalCc.current
   Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-    kpis.forEach { k ->
+    kpis.items.forEach { k ->
       Column(Modifier.weight(1f).ccCard(RoundedCornerShape(26.dp)).padding(horizontal = 22.dp, vertical = 20.dp)) {
         Text(k.value, color = c.text, fontSize = 34.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, lineHeight = 38.sp)
         Text(k.label, color = c.sec, fontSize = 18.sp, maxLines = 1)
@@ -132,16 +133,14 @@ private fun Kpis(kpis: List<CcKpi>) {
 }
 
 @Composable
-private fun ChartCard(s: CcUiState, week: Boolean, onWeek: (Boolean) -> Unit, modifier: Modifier) {
+private fun ChartCard(week: Boolean, onWeek: (Boolean) -> Unit, prefs: CcEnergyPrefs?, series: CcEnergySeries?, minute: Long, modifier: Modifier) {
   Column(modifier.ccCard().padding(horizontal = 26.dp, vertical = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically) {
       CcSectionLabel(if (week) "This week · kWh used, solar share" else "Today · use vs solar (kW)", Modifier.weight(1f))
-      CcSeg(listOf(Triple(false, "Today", null), Triple(true, "Week", null)), week, onWeek)
+      CcSeg(RANGES, week, onWeek)
     }
-    val prefs = s.energyPrefs
-    val series = if (week) s.energyWeek else s.energyToday
-    val model = remember(series, week, s.now / CHART_MINUTE) {
-      series?.let { if (week) CcChart.week(it) else CcChart.today(it, s.now) }
+    val model = remember(series, week, minute) {
+      series?.let { if (week) CcChart.week(it) else CcChart.today(it, minute * MS_PER_MINUTE) }
     }
     Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
       when {
@@ -156,21 +155,18 @@ private fun ChartCard(s: CcUiState, week: Boolean, onWeek: (Boolean) -> Unit, mo
   }
 }
 
-private const val CHART_MINUTE = 60_000L
+private val RANGES = listOf(Triple(false, "Today", null), Triple(true, "Week", null))
+private const val MS_PER_MINUTE = 60_000L
 
 /** TOP CONSUMERS NOW: the biggest other power sensors, with their room and an ember bar. */
 @Composable
-private fun Consumers(s: CcUiState, ui: CcUi, now: CcEnergyNow) {
+private fun Consumers(consumers: CcConsumerItems, ui: CcUi) {
   val c = LocalCc.current
-  val shares = remember(now.consumers) { CcEnergyKpis.shares(now.consumers) }
   Column(Modifier.fillMaxWidth().ccCard().padding(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
     CcSectionLabel("Top consumers now")
-    if (now.consumers.isEmpty()) Text("No other power sensors are drawing power right now. Smart plugs with power monitoring show up here.",
+    if (consumers.items.isEmpty()) Text("No other power sensors are drawing power right now. Smart plugs with power monitoring show up here.",
         color = c.sec, fontSize = 19.sp, lineHeight = 26.sp, modifier = Modifier.padding(vertical = 8.dp))
-    now.consumers.forEachIndexed { i, k ->
-      val room = s.plan?.roomOf(k.entityId)
-      CcConsumerRow(k, room?.name, shares[i]) { room?.let { ui.openRoom(it.id) } }
-    }
+    consumers.items.forEach { item -> key(item.consumer.entityId) { CcConsumerRow(item, ui) } }
   }
 }
 

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,8 +37,12 @@ import androidx.compose.ui.unit.sp
 
 /** `.consR`: icon · name + room over an ember bar · kW. Tapping opens the room when the plan has it. */
 @Composable
-internal fun CcConsumerRow(k: CcConsumer, room: String?, share: Float, onClick: () -> Unit) {
+internal fun CcConsumerRow(item: CcConsumerItem, ui: CcUi) {
   val c = LocalCc.current
+  val k = item.consumer
+  val room = item.roomName
+  val share = item.share
+  val onClick = remember(item.roomId, ui) { { item.roomId?.let(ui::openRoom); Unit } }
   Row(Modifier.fillMaxWidth().heightIn(min = CcStyle.MinTarget).clip(RoundedCornerShape(16.dp))
       .clickable(enabled = room != null, role = Role.Button, onClick = onClick).padding(horizontal = 6.dp, vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {

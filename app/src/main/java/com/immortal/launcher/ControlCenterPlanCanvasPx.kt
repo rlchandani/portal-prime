@@ -28,8 +28,10 @@ internal class CcPlanPx(val fit: CcPlanFit, model: CcPlanModel) {
     it.id to RoundRect(r, CornerRadius(OUTDOOR_CORNER_CELLS * fit.scale))
   }
   val outdoorPaths: List<Path> = outdoor.map { (_, rr) -> Path().apply { addRoundRect(rr) } }
-  /** Wall outline of every indoor room as one path (shared walls overlap cleanly). */
-  val walls: Path = Path().apply { indoor.forEach { (_, r) -> addRect(r) } }
+  /** Every indoor wall, shared edges once ([ccWalls]), as one path of straight runs. */
+  val walls: Path = Path().apply {
+    ccWalls(model.floor.rooms).forEach { l -> moveTo(fit.x(l.x1), fit.y(l.y1)); lineTo(fit.x(l.x2), fit.y(l.y2)) }
+  }
   val openings: List<OpeningPx> = model.openings.map { o -> opening(o) }
   val center: Offset = pt(model.bounds.center)
   val bounds: Rect = Rect(fit.x(model.bounds.l), fit.y(model.bounds.t), fit.x(model.bounds.r), fit.y(model.bounds.b))

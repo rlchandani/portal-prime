@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
@@ -43,8 +44,23 @@ internal object CcCameraLogic {
   }
 
   /** "2026-11-17 19:42:30", like a camera's burnt-in clock. */
-  fun timestamp(ms: Long, zone: TimeZone = TimeZone.getDefault()): String =
-      SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).apply { timeZone = zone }.format(Date(ms))
+  fun timestamp(ms: Long, zone: TimeZone = TimeZone.getDefault()): String = timestampFormat(zone).format(Date(ms))
+
+  /** One formatter per tile (SimpleDateFormat isn't thread-safe; the tile formats on the main thread). */
+  fun timestampFormat(zone: TimeZone = TimeZone.getDefault()): SimpleDateFormat =
+      SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).apply { timeZone = zone }
+
+  /** Source rectangle in pixels. */
+  data class Crop(val x: Int, val y: Int, val w: Int, val h: Int)
+
+  /** CENTER_CROP: the largest centred part of a [srcW]×[srcH] picture with the [dstW]×[dstH] aspect. */
+  fun centerCrop(srcW: Int, srcH: Int, dstW: Int, dstH: Int): Crop {
+    if (srcW <= 0 || srcH <= 0 || dstW <= 0 || dstH <= 0) return Crop(0, 0, srcW.coerceAtLeast(0), srcH.coerceAtLeast(0))
+    val scale = maxOf(dstW.toDouble() / srcW, dstH.toDouble() / srcH)
+    val w = Math.round(dstW / scale).toInt().coerceIn(1, srcW)
+    val h = Math.round(dstH / scale).toInt().coerceIn(1, srcH)
+    return Crop((srcW - w) / 2, (srcH - h) / 2, w, h)
+  }
 
   /** Cameras for the grid: the front door / doorbell first (it gets the large live tile), then by name. */
   fun gridCameras(cameras: List<CcEntity>, max: Int = GRID_MAX): List<CcEntity> {
@@ -53,6 +69,7 @@ internal object CcCameraLogic {
   }
 
   /** What the full view lists beside [cameraId]: motion near it and the controls a person reaches for. */
+  @Immutable
   data class Context(val roomName: String?, val motion: List<CcEntity>, val shortcuts: List<CcEntity>)
 
   fun context(cameraId: String, plan: CcPlan?, entities: Map<String, CcEntity>): Context {

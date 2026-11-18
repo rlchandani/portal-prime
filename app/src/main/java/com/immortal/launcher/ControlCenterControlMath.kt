@@ -70,8 +70,28 @@ internal object CcControlMath {
     return (cx + radius * cos(a).toFloat()) to (cy + radius * sin(a).toFloat())
   }
 
+  private const val F_MIN = 45.0
+  private const val F_MAX = 95.0
+  /** A setpoint above this can only be °F (no home is heated to 45 °C). */
+  private const val F_HINT = 40.0
+
+  /**
+   * The dial's range: HA's min_temp/max_temp, else a range in the right unit (°F 45–95, °C 7–35,
+   * guessed from the values when HA doesn't say), always wide enough to include the setpoint.
+   */
+  fun tempRange(e: CcEntity, fahrenheit: Boolean): Pair<Double, Double> {
+    val f = fahrenheit || listOfNotNull(e.targetTemp, e.currentTemp).any { it > F_HINT }
+    val (dMin, dMax) = if (f) F_MIN to F_MAX else CcEntity.DEFAULT_MIN_TEMP to CcEntity.DEFAULT_MAX_TEMP
+    val lo = (e.attrs["min_temp"] as? Number)?.toDouble() ?: dMin
+    val hi = (e.attrs["max_temp"] as? Number)?.toDouble() ?: dMax
+    val (a, b) = if (hi > lo) lo to hi else dMin to dMax
+    val t = e.targetTemp ?: return a to b
+    return minOf(a, t) to maxOf(b, t)
+  }
+
   // --- swatches -------------------------------------------------------------------------------
 
+  @androidx.compose.runtime.Immutable
   data class White(val kelvin: Int, val label: String)
 
   private val WHITE_PRESETS = listOf(White(2200, "Candle"), White(2700, "Warm"), White(3000, "Soft"),

@@ -132,4 +132,27 @@ class ControlCenterEnergyChartTest {
     assertEquals(64, CcEnergyKpis.carBattery(ents))
     assertNull(CcEnergyKpis.chargeSwitch(emptyMap()))
   }
+
+  @Test fun consumerItems_carryRoomAndShare() {
+    val items = CcEnergyKpis.consumerItems(listOf(CcConsumer("sensor.dryer", "Dryer", 1200.0), CcConsumer("sensor.tv", "TV", 300.0))) { id ->
+      if (id == "sensor.dryer") "laundry" to "Laundry" else null
+    }
+    assertEquals("Laundry", items.items[0].roomName)
+    assertEquals("laundry", items.items[0].roomId)
+    assertNull(items.items[1].roomId)
+    assertEquals(0.25f, items.items[1].share)
+    assertEquals(items, CcEnergyKpis.consumerItems(listOf(CcConsumer("sensor.dryer", "Dryer", 1200.0), CcConsumer("sensor.tv", "TV", 300.0))) { id ->
+      if (id == "sensor.dryer") "laundry" to "Laundry" else null
+    })  // equal slices let the row skip
+  }
+
+  @Test fun ev_onlyWithAChargerAndSaysWhatItDoes() {
+    val ents = listOf(CcEntity("switch.ev_charging", "off"), CcEntity("sensor.car_battery", "64", mapOf("device_class" to "battery")))
+        .associateBy { it.id }
+    assertNull(CcEnergyKpis.ev(ents, null, true))
+    val idle = CcEnergyKpis.ev(ents, 0.0, true)!!
+    assertEquals("Car 64% · charger idle", idle.title)
+    assertEquals("switch.ev_charging", idle.switch?.id)
+    assertEquals("Charging 7.2 kW", CcEnergyKpis.ev(emptyMap(), 7200.0, false)!!.title)
+  }
 }

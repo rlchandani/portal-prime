@@ -111,4 +111,28 @@ class ControlCenterPlanGeometryTest {
     assertNull(ccNearest(pts, 6.5f, 0f, 2f))
     assertNull(ccNearest(emptyList(), 0f, 0f, 2f))
   }
+
+  @Test fun wallsIncludeSharedEdgesOnce() {
+    val a = CcRoom("a", "A", CcRect(0, 0, 2, 2))
+    val b = CcRoom("b", "B", CcRect(2, 0, 2, 2))
+    val yard = CcRoom("y", "Y", CcRect(0, 2, 4, 2), outdoor = true)
+    val walls = ccWalls(listOf(a, b, yard))
+    // Top and bottom run straight across both rooms; the shared x=2 wall appears once.
+    assertTrue(CcMapLine(0f, 0f, 4f, 0f) in walls)
+    assertTrue(CcMapLine(0f, 2f, 4f, 2f) in walls)
+    assertEquals(1, walls.count { it == CcMapLine(2f, 0f, 2f, 2f) })
+    assertTrue(CcMapLine(0f, 0f, 0f, 2f) in walls)
+    assertTrue(CcMapLine(4f, 0f, 4f, 2f) in walls)
+    assertEquals(5, walls.size)
+    assertTrue("outdoor slabs have no walls", walls.none { it.y1 > 2f || it.y2 > 2f })
+  }
+
+  @Test fun wallsSplitWhereNeighboursDiffer() {
+    val tall = CcRoom("t", "T", CcRect(0, 0, 2, 4))
+    val small = CcRoom("s", "S", CcRect(2, 1, 2, 2))
+    val walls = ccWalls(listOf(tall, small))
+    assertTrue(CcMapLine(2f, 0f, 2f, 4f) in walls)
+    assertTrue(CcMapLine(4f, 1f, 4f, 3f) in walls)
+    assertTrue(ccWalls(emptyList()).isEmpty())
+  }
 }

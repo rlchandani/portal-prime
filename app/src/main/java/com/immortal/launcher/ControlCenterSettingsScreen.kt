@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,20 +49,46 @@ import com.immortal.launcher.settings.ControlCenterSettings
  */
 @Composable
 internal fun CcSettingsScreen(s: CcUiState, ui: CcUi) {
+  // Only these few values matter here; an HA entity update yields an equal slice and the body skips.
+  val regLine = remember(s.registry) { CcSetLogic.registryLine(s.registry) }
+  val plan = remember(s.planSource, s.plan) { CcSetLogic.planSource(s.planSource, s.plan) }
+  val slice = CcSetSlice(s.settings, s.connection.phase, s.connection.disabledReason, s.entities.size, regLine, s.registry == null,
+      plan.first, plan.second)
+  CcSettingsBody(slice, ui)
+}
+
+/** Everything the settings screen shows that comes from the runtime. */
+@Immutable
+internal data class CcSetSlice(
+    val settings: ControlCenterConfig.Settings,
+    val phase: CcPhase,
+    val reason: String?,
+    val entityCount: Int,
+    val registryLine: String,
+    val registryMissing: Boolean,
+    val planWhere: String,
+    val planWhereSub: String,
+)
+
+@Composable
+private fun CcSettingsBody(slice: CcSetSlice, ui: CcUi) {
   var section by remember { mutableStateOf(CcSetSection.PORTALS) }
   var pinFor by remember { mutableStateOf<CcPinPurpose?>(null) }
-  val write: (String, Any) -> Unit = { key, value -> ControlCenterSettings.set(ui.context, key, value) }
+  var pinVersion by remember { mutableStateOf(0) }
+  val hasPin = remember(pinVersion) { ControlCenterConfig.hasKidsPin(ui.context) }
+  val write: (String, Any) -> Unit = remember(ui) { { key, value -> ControlCenterSettings.set(ui.context, key, value) } }
+  val st = slice.settings
   Box(Modifier.fillMaxSize()) {
     Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
       CcSettingsNav(section) { section = it }
       Column(Modifier.weight(1f).fillMaxHeight().ccCard().verticalScroll(rememberScrollState()).padding(horizontal = 36.dp, vertical = 30.dp)) {
         when (section) {
-          CcSetSection.PORTALS -> CcSetPortals(s, ui, write) { pinFor = CcPinPurpose.ENTER_KIDS }
-          CcSetSection.KIDS -> CcSetKids(s, ui, write) { pinFor = CcPinPurpose.CHANGE }
-          CcSetSection.CONFIRM -> CcSetConfirm(s, write)
-          CcSetSection.BANNERS -> CcSetBanners(s, ui, write)
-          CcSetSection.LOOK -> CcSetLook(s, ui, write)
-          CcSetSection.HA -> CcSetHomeAssistant(s, ui)
+          CcSetSection.PORTALS -> CcSetPortals(st.portalMode, hasPin, ui, write) { pinFor = CcPinPurpose.ENTER_KIDS }
+          CcSetSection.KIDS -> CcSetKids(st, hasPin, write) { pinFor = CcPinPurpose.CHANGE }
+          CcSetSection.CONFIRM -> CcSetConfirm(st, write)
+          CcSetSection.BANNERS -> CcSetBanners(st, ui, write)
+          CcSetSection.LOOK -> CcSetLook(st, ui, write)
+          CcSetSection.HA -> CcSetHomeAssistant(slice, ui)
         }
       }
     }
@@ -69,6 +96,7 @@ internal fun CcSettingsScreen(s: CcUiState, ui: CcUi) {
       CcPinSetOverlay(onCancel = { pinFor = null }) { pin ->
         val ok = ControlCenterConfig.setKidsPin(ui.context, pin)
         pinFor = null
+        pinVersion++
         if (ok && purpose == CcPinPurpose.ENTER_KIDS) { write("portalMode", ControlCenterConfig.MODE_KIDS); ui.go(CcScreen.MAP) }
       }
     }

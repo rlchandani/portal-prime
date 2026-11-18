@@ -108,4 +108,14 @@ class ControlCenterSecurityLogicTest {
     assertNull(CcSecurity.sourceLabel(null))
     assertTrue(CcSecurity.isHome(e("person.a", "home")))
   }
+
+  @Test fun side_slicesPeopleChecksAndOpen() {
+    val people = listOf(e("person.alex", "home", "friendly_name" to "Alex"), e("person.sam", "not_home", "friendly_name" to "Sam"))
+    val ents = people + e("binary_sensor.office_window", "on", "device_class" to "window")
+    val side = CcSecurity.side(people, ents, time)
+    assertEquals(listOf(CcPersonItem("person.alex", "Alex", 0, true, "Home"), CcPersonItem("person.sam", "Sam", 1, false, "Away")), side.people)
+    assertEquals(1, side.open)
+    assertEquals(listOf("Windows"), side.checks.map { it.title })
+    assertEquals(side, CcSecurity.side(people, ents, time))
+  }
 }

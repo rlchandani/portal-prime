@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -91,7 +92,7 @@ internal fun CcAreaRow(icon: String, label: String, note: String, iconTint: andr
 @Composable
 private fun ColumnScope.CcStepFound(ctx: CcEdCtx) {
   val c = LocalCc.current
-  val counts = remember(ctx.reg, ctx.live.keys) { CcEdFound.counts(ctx.reg, ctx.live) }
+  val counts = remember(ctx.reg, ctx.live) { CcEdFound.counts(ctx.reg, ctx.live) }
   val body = when {
     !ctx.hasAreas -> "Home Assistant didn't share its floors and areas — reading the registry needs an administrator's token. " +
         "You can still draw rooms and name them yourself, then drag devices in."
@@ -106,7 +107,7 @@ private fun ColumnScope.CcStepFound(ctx: CcEdCtx) {
       if (areas.isEmpty()) return@forEach
       CcSectionLabel("${f.name} · ${areas.size} ${plural(areas.size, "area")}", Modifier.padding(top = 8.dp))
       FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        areas.forEach { a -> Text(a.name, color = c.text, fontSize = 18.sp, modifier = Modifier.clip(CcStyle.Pill).background(c.surface2).padding(horizontal = 20.dp, vertical = 10.dp)) }
+        areas.forEach { a -> key(a.id) { CcAreaChip(a.name) } }
       }
     }
     Spacer(Modifier.height(6.dp))
@@ -124,7 +125,7 @@ private fun ColumnScope.CcStepFound(ctx: CcEdCtx) {
 @Composable
 private fun ColumnScope.CcStepReady(ctx: CcEdCtx) {
   val sum = remember(ctx.st.plan) { CcEd.summary(ctx.st.plan) }
-  val live = ctx.s.connection.canControl
+  val live = ctx.canControl
   val body = "${sum.rooms} ${plural(sum.rooms, "room")} · ${sum.devices} ${plural(sum.devices, "device")} · " +
       "${sum.openings} ${if (sum.openings == 1) "door or window" else "doors & windows"}."
   val tag = if (live) "Saves to Home Assistant" to CcTone.GREEN else "Saves on this Portal until Home Assistant is back" to CcTone.AMBER
@@ -154,6 +155,13 @@ private fun CcEditSaveBar(ctx: CcEdCtx) {
       }, style = if (confirm) CcButtonStyle.DANGER else CcButtonStyle.TONAL)
     }
   }
+}
+
+/** One area name chip in step 1 (takes just the name, so it skips). */
+@Composable
+private fun CcAreaChip(name: String) {
+  val c = LocalCc.current
+  Text(name, color = c.text, fontSize = 18.sp, modifier = Modifier.clip(CcStyle.Pill).background(c.surface2).padding(horizontal = 20.dp, vertical = 10.dp))
 }
 
 internal fun plural(n: Int, word: String): String = if (n == 1) word else "${word}s"

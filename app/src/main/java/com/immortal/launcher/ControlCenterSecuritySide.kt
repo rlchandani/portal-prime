@@ -22,7 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -35,25 +35,25 @@ import androidx.compose.ui.unit.sp
 
 /** `.secSide`: WHO'S HOME, the SENSORS checklist and the "N things open" note. */
 @Composable
-internal fun CcSecuritySide(s: CcUiState, modifier: Modifier) {
+internal fun CcSecuritySide(side: CcSecuritySideSlice, modifier: Modifier) {
   val c = LocalCc.current
-  val checks = remember(s.entities) { CcSecurity.checklist(s.entities.values, ::ccTime) }
-  val open = remember(s.entities) { CcSecurity.openCount(s.entities.values) }
+  val checks = side.checks
+  val open = side.open
   Column(modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(20.dp)) {
     Column(Modifier.fillMaxWidth().ccCard().padding(24.dp)) {
       CcSectionLabel("Who's home", Modifier.padding(bottom = 14.dp))
-      if (s.people.isEmpty()) Text("No people in Home Assistant yet. Add a person with a phone or presence sensor to see who's home.",
+      if (side.people.isEmpty()) Text("No people in Home Assistant yet. Add a person with a phone or presence sensor to see who's home.",
           color = c.sec, fontSize = 19.sp, lineHeight = 26.sp)
-      s.people.chunked(2).forEachIndexed { row, pair ->
+      side.people.chunked(2).forEachIndexed { row, pair ->
         Row(Modifier.fillMaxWidth().padding(top = if (row == 0) 0.dp else 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-          pair.forEachIndexed { i, p -> PersonCard(p, row * 2 + i, Modifier.weight(1f)) }
+          pair.forEach { p -> key(p.id) { PersonCard(p, Modifier.weight(1f)) } }
           if (pair.size == 1) Spacer(Modifier.weight(1f))
         }
       }
     }
     if (checks.isNotEmpty()) Column(Modifier.fillMaxWidth().ccCard().padding(horizontal = 28.dp, vertical = 24.dp)) {
       CcSectionLabel("Sensors", Modifier.padding(bottom = 6.dp))
-      checks.forEachIndexed { i, ck -> CheckRow(ck, divider = i < checks.lastIndex) }
+      checks.forEachIndexed { i, ck -> key(ck.title) { CheckRow(ck, divider = i < checks.lastIndex) } }
     }
     Row(Modifier.fillMaxWidth().ccCard().padding(horizontal = 28.dp, vertical = 20.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -65,19 +65,19 @@ internal fun CcSecuritySide(s: CcUiState, modifier: Modifier) {
 
 /** `.whoC`: avatar (greyed when away), name, where + how HA knows. */
 @Composable
-private fun PersonCard(p: CcEntity, index: Int, modifier: Modifier) {
+private fun PersonCard(p: CcPersonItem, modifier: Modifier) {
   val c = LocalCc.current
-  val home = CcSecurity.isHome(p)
+  val home = p.home
   Row(modifier.clip(RoundedCornerShape(22.dp)).background(c.surface2).padding(14.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-    val tint = CcStyle.Avatars[index % CcStyle.Avatars.size]
+    val tint = CcStyle.Avatars[p.index % CcStyle.Avatars.size]
     Box(Modifier.size(60.dp).alpha(if (home) 1f else AWAY_ALPHA).clip(CircleShape).background(if (home) tint else grey(tint)),
         contentAlignment = Alignment.Center) {
       Text(p.name.take(1).uppercase(), color = Color(0xFF14161B), fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
     }
     Column(Modifier.weight(1f)) {
       Text(p.name, color = c.text, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      Text(CcSecurity.personLine(p), color = c.sec, fontSize = 18.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+      Text(p.line, color = c.sec, fontSize = 18.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
   }
 }

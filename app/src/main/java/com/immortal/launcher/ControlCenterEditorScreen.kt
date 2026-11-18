@@ -22,6 +22,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.font.FontWeight
@@ -39,24 +41,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
 
+/** The editor's actions on its working state (stable: one instance per editor). */
+@Stable
+internal class CcEdActions(
+    private val state: MutableState<CcEdState>,
+    val save: () -> Unit,
+    val discard: () -> Unit,
+) {
+  /** Applies a pure [CcEd] operation to the working plan. */
+  fun update(op: (CcEdState) -> CcEdState) { state.value = op(state.value) }
+  /** Wall clock for stamping edits — read inside handlers only, never in composition. */
+  fun now(): Long = System.currentTimeMillis()
+}
+
 /**
  * What the side panels need: the working state, the registry (real or the no-areas stand-in),
- * live entities and the actions. [update] applies a pure [CcEd] operation to the working plan.
+ * the entity snapshot (refreshed only when entities appear or vanish) and the actions. Immutable,
+ * so a step skips unless one of these changed.
  */
-internal class CcEdCtx(
+@Immutable
+internal data class CcEdCtx(
     val st: CcEdState,
     val reg: CcRegistry,
     /** False when HA withheld its registries (non-admin token): rooms are named by hand. */
     val hasAreas: Boolean,
-    val s: CcUiState,
+    val live: Map<String, CcEntity>,
+    val canControl: Boolean,
     val host: CcEdDragHost,
-    val update: ((CcEdState) -> CcEdState) -> Unit,
-    val save: () -> Unit,
-    val discard: () -> Unit,
+    val act: CcEdActions,
 ) {
-  val live: Map<String, CcEntity> get() = s.entities
-  val now: Long get() = s.now
+  val now: Long get() = act.now()
   val floor: CcFloor get() = CcEd.floor(st, reg)
+  fun update(op: (CcEdState) -> CcEdState) = act.update(op)
+  val save: () -> Unit get() = act.save
+  val discard: () -> Unit get() = act.discard
 }
 
 @Composable
@@ -68,40 +86,41 @@ internal fun CcEditorScreen(s: CcUiState, ui: CcUi) {
     }
     return
   }
-  CcEditorBody(s, ui, plan)
+  // The editor reads names/classes only: re-snapshot entities when the set of ids changes, not on every state tick.
+  val ids = s.entities.keys
+  val live = remember(ids.size, ids.hashCode()) { s.entities }
+  CcEditorBody(plan, s.registry, live, s.connection.canControl, ui)
 }
 
 @Composable
-private fun CcEditorBody(s: CcUiState, ui: CcUi, saved: CcPlan) {
-  val reg = remember(s.registry, s.entities.keys) { s.registry ?: CcEd.fallbackRegistry(s.entities) }
-  var st by remember { mutableStateOf(CcEd.start(saved, reg)) }
+private fun CcEditorBody(saved: CcPlan, registry: CcRegistry?, live: Map<String, CcEntity>, canControl: Boolean, ui: CcUi) {
+  val reg = remember(registry, live) { registry ?: CcEd.fallbackRegistry(live) }
+  val stState = remember { mutableStateOf(CcEd.start(saved, reg)) }
+  val st = stState.value
   val host = remember { CcEdDragHost() }
-  var origin by remember { mutableStateOf(Offset.Zero) }
+  val act = remember(ui) {
+    CcEdActions(stState, save = { ControlCenter.savePlan(ui.context, CcEd.forSave(stState.value, System.currentTimeMillis())); ui.go(CcScreen.MAP) },
+        discard = { ui.go(CcScreen.MAP) })
+  }
   val floors = remember(reg, st.plan.floors) { CcEd.floors(reg, st.plan) }
-  LaunchedEffect(floors) { if (floors.none { it.id == st.floorId }) st = CcEd.setFloor(st, floors.first().id) }
-  val ctx = CcEdCtx(st, reg, s.registry != null, s, host, update = { op -> st = op(st) },
-      save = { ControlCenter.savePlan(ui.context, CcEd.forSave(st, s.now)); ui.go(CcScreen.MAP) },
-      discard = { ui.go(CcScreen.MAP) })
-  val floor = ctx.floor
+  LaunchedEffect(floors) { if (floors.none { it.id == stState.value.floorId }) act.update { CcEd.setFloor(it, floors.first().id) } }
+  val ctx = remember(st, reg, registry != null, live, canControl) { CcEdCtx(st, reg, registry != null, live, canControl, host, act) }
+  val floor = remember(st, reg) { CcEd.floor(st, reg) }
   val motion = LocalCcMotion.current
-  Box(Modifier.fillMaxSize().onGloballyPositioned { origin = it.positionInRoot() }) {
+  val onTap = remember(act, reg) { { gx: Float, gy: Float -> act.update { CcEdGesture.tap(it, CcEd.floor(it, reg), gx, gy, reg, act.now()) } } }
+  val onDrop = remember(act, reg, live) { { d: CcEdDrag -> act.update { CcEdGesture.commit(it, d, reg, live, act.now()) } } }
+  Box(Modifier.fillMaxSize().onGloballyPositioned { host.editorOrigin = it.positionInRoot() }) {
     Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(22.dp)) {
       Box(Modifier.weight(1f).fillMaxHeight()) {
-        if (st.step == CcEdStep.FOUND) {
-          CcEditorCanvas(st, floor, reg, s.entities, host, motion, onTap = { _, _ -> }, onDrop = {}, modifier = Modifier.fillMaxSize())
-          CcEditorEmptyHint()
-        } else {
-          CcEditorCanvas(st, floor, reg, s.entities, host, motion,
-              onTap = { gx, gy -> st = CcEdGesture.tap(st, CcEd.floor(st, reg), gx, gy, reg, s.now) },
-              onDrop = { d -> st = CcEdGesture.commit(st, d, reg, s.entities, s.now) }, modifier = Modifier.fillMaxSize())
-        }
+        CcEditorCanvas(st, floor, reg, live, host, motion, onTap = onTap, onDrop = onDrop, modifier = Modifier.fillMaxSize())
+        if (st.step == CcEdStep.FOUND) CcEditorEmptyHint()
         CcEditorTools(ctx, floors, Modifier.align(Alignment.TopStart).fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 22.dp))
       }
       Column(Modifier.width(CcStyle.SideWidth).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         CcEditorSide(ctx)
       }
     }
-    CcEditorGhost(host, s, reg, origin)
+    CcEditorGhost(host, live, reg)
   }
 }
 
@@ -143,18 +162,20 @@ private fun androidx.compose.foundation.layout.BoxScope.CcEditorEmptyHint() {
   }
 }
 
-/** The chip that follows the finger while a device is carried (mock `.ghost`). */
+/** The chip that follows the finger while a device is carried (mock `.ghost`); it moves in layout, never recomposes. */
 @Composable
-private fun CcEditorGhost(host: CcEdDragHost, s: CcUiState, reg: CcRegistry, origin: Offset) {
+private fun CcEditorGhost(host: CcEdDragHost, live: Map<String, CcEntity>, reg: CcRegistry) {
   val c = LocalCc.current
-  val d = host.drag as? CcEdDrag.Device ?: return
-  val at = host.ghost ?: return
-  val name = s.entities[d.entityId]?.name ?: d.entityId
-  Row(Modifier.offset { IntOffset((at.x - origin.x).roundToInt(), (at.y - origin.y).roundToInt()) }
+  val d = host.active as? CcEdDrag.Device ?: return
+  val name = live[d.entityId]?.name ?: d.entityId
+  Row(Modifier.offset {
+        val at = host.ghost ?: host.editorOrigin
+        IntOffset((at.x - host.editorOrigin.x).roundToInt(), (at.y - host.editorOrigin.y).roundToInt())
+      }
       .offset(x = (-GHOST_LIFT_X).dp, y = (-GHOST_LIFT_Y).dp)
       .clip(CcStyle.CardSmall).background(c.accent).padding(horizontal = 18.dp, vertical = 12.dp),
       horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-    CcIcon(CcEd.iconFor(d.entityId, reg, s.entities[d.entityId]), c.accentInk, 26.dp)
+    CcIcon(CcEd.iconFor(d.entityId, reg, live[d.entityId]), c.accentInk, 26.dp)
     Text(name, color = c.accentInk, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
   }
 }

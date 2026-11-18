@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import kotlin.math.hypot
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -15,6 +16,7 @@ import kotlin.math.roundToInt
  * the map, finger → grid cell mapping, hit-testing (rooms, the resize handle, device dots,
  * openings) and the gesture reducer ([CcEdDrag]) that turns a drag into a plan edit.
  */
+@Immutable
 internal data class CcEdGeom(val width: Float, val height: Float, val insetTop: Float = 0f, val insetBottom: Float = 0f,
                              val insetSide: Float = 0f) {
   private val usableW = (width - 2 * insetSide).coerceAtLeast(1f)
@@ -122,21 +124,22 @@ internal object CcEdGeo {
 }
 
 /** One finger drag on the editor canvas, in grid units. */
+@Immutable
 internal sealed interface CcEdDrag {
-  data class Draw(val ax: Float, val ay: Float, val bx: Float, val by: Float) : CcEdDrag {
+  @Immutable data class Draw(val ax: Float, val ay: Float, val bx: Float, val by: Float) : CcEdDrag {
     val rect: CcRect get() = CcPlanEdit.rectFrom(ax, ay, bx, by)
   }
-  data class Move(val roomId: String, val sx: Float, val sy: Float, val cx: Float, val cy: Float) : CcEdDrag {
+  @Immutable data class Move(val roomId: String, val sx: Float, val sy: Float, val cx: Float, val cy: Float) : CcEdDrag {
     val dx: Int get() = (cx - sx).roundToInt()
     val dy: Int get() = (cy - sy).roundToInt()
   }
-  data class Resize(val roomId: String, val orig: CcRect, val cx: Float, val cy: Float) : CcEdDrag {
+  @Immutable data class Resize(val roomId: String, val orig: CcRect, val cx: Float, val cy: Float) : CcEdDrag {
     val w: Int get() = (cx - orig.x).roundToInt().coerceAtLeast(CcEd.MIN_ROOM_CELLS)
     val h: Int get() = (cy - orig.y).roundToInt().coerceAtLeast(CcEd.MIN_ROOM_CELLS)
   }
   /** A device carried by the finger; [gx]/[gy] null while it's off the canvas (drop = unplace). */
-  data class Device(val entityId: String, val gx: Float?, val gy: Float?) : CcEdDrag
-  data class Opening(val entityId: String, val gx: Float, val gy: Float) : CcEdDrag
+  @Immutable data class Device(val entityId: String, val gx: Float?, val gy: Float?) : CcEdDrag
+  @Immutable data class Opening(val entityId: String, val gx: Float, val gy: Float) : CcEdDrag
 }
 
 internal object CcEdGesture {
@@ -179,6 +182,34 @@ internal object CcEdGesture {
     is CcEdDrag.Resize -> CcPlanEdit.resizeRoom(floor, d.roomId, d.w, d.h)
     is CcEdDrag.Device -> CcPlanEdit.removeEntity(floor, d.entityId)
     is CcEdDrag.Opening -> CcEdGeo.moveOpening(floor, d.entityId, d.gx, d.gy) ?: floor
+  }
+
+  /**
+   * The floor drawn in the static layer while [active] is held: the dragged room (with its
+   * openings) or opening is left out — the drag layer draws it per frame. Devices stay (dots
+   * follow [liveRect] in layout); a carried device is hidden.
+   */
+  fun staticFloor(floor: CcFloor, active: CcEdDrag?): CcFloor = when (active) {
+    is CcEdDrag.Move -> floor.copy(rooms = floor.rooms.filterNot { it.id == active.roomId }, openings = floor.openings.filterNot { it.roomId == active.roomId })
+    is CcEdDrag.Resize -> floor.copy(rooms = floor.rooms.filterNot { it.id == active.roomId }, openings = floor.openings.filterNot { it.roomId == active.roomId })
+    is CcEdDrag.Opening -> floor.copy(openings = floor.openings.filterNot { it.entityId == active.entityId })
+    is CcEdDrag.Device -> CcPlanEdit.removeEntity(floor, active.entityId)
+    null, is CcEdDrag.Draw -> floor
+  }
+
+  /** Where room [roomId] (normally at [rect]) is mid-drag: moved / resized boxes follow the finger, clamped like the commit. */
+  fun liveRect(roomId: String, rect: CcRect, d: CcEdDrag?): CcRect = when {
+    d is CcEdDrag.Move && d.roomId == roomId -> rect.copy(x = rect.x + d.dx, y = rect.y + d.dy).clamped()
+    d is CcEdDrag.Resize && d.roomId == roomId -> rect.copy(w = d.w, h = d.h).clamped()
+    else -> rect
+  }
+
+  /** The room under a carried device, read by the drag layer (no allocation). */
+  fun hotRoomAt(floor: CcFloor, d: CcEdDrag?): CcRoom? {
+    val dev = d as? CcEdDrag.Device ?: return null
+    val x = dev.gx ?: return null
+    val y = dev.gy ?: return null
+    return CcEdGeo.roomAt(floor, x, y)
   }
 
   /** The room a carried device would land in (highlighted green). */
