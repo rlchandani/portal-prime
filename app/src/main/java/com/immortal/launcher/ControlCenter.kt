@@ -84,9 +84,9 @@ internal object ControlCenter {
   }
 
   /** Fleet `cc_debug` (operator only): dry run on/off, `load`/`clear` the local test plan. Blocks briefly. */
-  fun debug(context: Context, dryRun: Boolean?, testPlan: String?): String {
+  fun debug(context: Context, dryRun: Boolean?, testPlan: String?, testAlert: String? = null): String {
     val e = engine(context)
-    return runCatching { e.exec.submit<String> { e.debug(dryRun, testPlan) }.get(DEBUG_WAIT_S, java.util.concurrent.TimeUnit.SECONDS) }
+    return runCatching { e.exec.submit<String> { testAlert?.let { e.testAlert(it) } ?: e.debug(dryRun, testPlan) }.get(DEBUG_WAIT_S, java.util.concurrent.TimeUnit.SECONDS) }
         .getOrElse { "timeout" }
   }
 

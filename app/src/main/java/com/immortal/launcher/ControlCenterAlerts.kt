@@ -27,6 +27,8 @@ internal data class CcAlert(
     val body: String,
     val since: Long,
     val action: CcAlertAction,
+    /** HA device class behind the alert (moisture, smoke, carbon_monoxide, gas, door…), when known. */
+    val deviceClass: String? = null,
 )
 
 internal object CcAlerts {
@@ -55,9 +57,9 @@ internal object CcAlerts {
     val where = rooms(e.id)
     return when {
       kind == CcKind.LEAK && e.state == "on" -> CcAlert(id(e), CcSeverity.CRITICAL, kind, e.id, "Water leak${where?.let { " · $it" } ?: ""}",
-          "${e.name} is wet. Shut off the water?", e.lastChanged, CcAlertAction.SHUT_WATER)
+          "${e.name} is wet. Shut off the water?", e.lastChanged, CcAlertAction.SHUT_WATER, e.deviceClass ?: "moisture")
       kind == CcKind.SMOKE && e.state == "on" -> CcAlert(id(e), CcSeverity.CRITICAL, kind, e.id, "${hazard(e)}${where?.let { " · $it" } ?: ""}",
-          "${e.name} detected it. Get everyone out and check.", e.lastChanged, CcAlertAction.VIEW)
+          "${e.name} detected it. Get everyone out and check.", e.lastChanged, CcAlertAction.VIEW, e.deviceClass)
       kind in OPEN_WARN && e.isOpen && openLongEnough(e, now, warnAfterMin) -> openAlert(e, kind, now, where)
       kind == CcKind.BATTERY || e.battery != null -> battery(e, where)
       else -> null
@@ -117,10 +119,18 @@ internal object CcBannerPolicy {
 
   data class Decision(val show: Show, val sound: Boolean)
 
+  /** The three alarms that may sound during quiet hours. */
+  val NIGHT_SOUND_CLASSES = setOf("moisture", "smoke", "carbon_monoxide")
+
+  fun soundsAtNight(alert: CcAlert): Boolean =
+      alert.severity == CcSeverity.CRITICAL && (alert.deviceClass in NIGHT_SOUND_CLASSES ||
+          alert.deviceClass == null && alert.kind == CcKind.LEAK)
+
   fun decide(alert: CcAlert, s: ControlCenterConfig.Settings, quietHours: Boolean): Decision = when (alert.severity) {
-    // Critical shows everywhere: kids mode, banners-only Portals, quiet hours. Sound obeys quiet hours
-    // unless the household opted in to night sound for critical alerts.
-    CcSeverity.CRITICAL -> Decision(Show.TAKEOVER, sound = !quietHours || s.criticalSoundAtNight)
+    // Critical shows everywhere: kids mode, banners-only Portals, quiet hours. In quiet hours only a
+    // leak, smoke or carbon-monoxide alarm makes a sound (owner's decision, on by default); every
+    // other alert — gas and other critical kinds included — stays silent at night.
+    CcSeverity.CRITICAL -> Decision(Show.TAKEOVER, sound = !quietHours || (s.criticalSoundAtNight && soundsAtNight(alert)))
     CcSeverity.WARNING -> if (s.bannersWarnings && s.portalMode == ControlCenterConfig.MODE_FULL &&
         !(s.kids && alert.kind == CcKind.GARAGE)) Decision(Show.BANNER, sound = false) else Decision(Show.NONE, false)
     CcSeverity.INFO -> if (s.bannersInfo && s.portalMode == ControlCenterConfig.MODE_FULL && !quietHours &&

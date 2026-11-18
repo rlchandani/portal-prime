@@ -122,7 +122,7 @@ internal fun CcSetBanners(st: ControlCenterConfig.Settings, ui: CcUi, write: (St
           { write("warningAfterMin", CcSetLogic.warnStep(st.warningAfterMin, true)) }, enabled = st.bannersWarnings)
     }
     CcSetToggle("Info — washer, dryer, dishwasher done", "Never during quiet hours", "bannersInfo", st.bannersInfo, write)
-    CcSetToggle("Critical alerts sound in quiet hours", "Off: they still take over the screen, silently", "criticalSoundAtNight",
+    CcSetToggle("Leak, smoke and CO sound in quiet hours", "Everything else stays silent at night", "criticalSoundAtNight",
         st.criticalSoundAtNight, write)
     CcSetRow("Quiet hours", "$quietText · set in Settings › Sounds", divider = false)
   }

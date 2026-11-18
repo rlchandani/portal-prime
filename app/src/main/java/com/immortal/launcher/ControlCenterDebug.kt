@@ -68,6 +68,18 @@ internal fun CcEngine.dryRunCall(call: CcCall, onResult: ((Boolean, String?) -> 
   onResult?.invoke(true, null)
 }
 
+/**
+ * Fleet `cc_debug` `testAlert`: runs the banner policy for a synthetic critical alert of HA device class
+ * [deviceClass] with dry run forced on — the decision is logged, nothing is shown or played.
+ */
+internal fun CcEngine.testAlert(deviceClass: String): String {
+  val kind = if (deviceClass == "moisture") CcKind.LEAK else CcKind.SMOKE
+  val alert = CcAlert("test:$deviceClass:${clock()}", CcSeverity.CRITICAL, kind, "binary_sensor.test", "Test alert", "", clock(),
+      CcAlertAction.VIEW, deviceClass)
+  ControlCenterBanners.offer(app, alert, ui.settings, appVisible = visible > 0, dryRun = true)
+  return "testAlert=$deviceClass logged (dry run)"
+}
+
 /** Fleet `cc_debug`: switch dry run, load/clear the local-only test plan. Returns a short status. */
 internal fun CcEngine.debug(dry: Boolean?, plan: String?): String {
   dry?.let { dryRun = it; CcDebugStore.setDryRun(app, it) }

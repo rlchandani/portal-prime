@@ -382,7 +382,8 @@ class FleetRoutes(private val context: Context) {
       "cc_debug" -> {
         val dry = if (body.has("dryRun")) body.optBoolean("dryRun") else null
         val plan = body.optString("testPlan").takeIf { it == "load" || it == "clear" }
-        resp(200, JSONObject().put("ok", true).put("action", "cc_debug").put("result", ControlCenter.debug(context, dry, plan)))
+        val alert = body.optString("testAlert").takeIf { it.matches(Regex("[a-z_]{1,32}")) }
+        resp(200, JSONObject().put("ok", true).put("action", "cc_debug").put("result", ControlCenter.debug(context, dry, plan, alert)))
       }
       // Needs the signature/privileged REBOOT permission we don't hold — report honestly.
       "reboot" -> resp(200, JSONObject().put("ok", false).put("action", "reboot").put("result", "not_permitted"))

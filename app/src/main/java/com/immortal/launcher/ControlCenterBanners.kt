@@ -54,11 +54,17 @@ internal object ControlCenterBanners {
   fun detach() = main.post { remove(); host = null; wm = null }
 
   /** From the engine thread when an alert first becomes active. */
-  fun offer(context: Context, alert: CcAlert, settings: ControlCenterConfig.Settings, appVisible: Boolean) {
+  fun offer(context: Context, alert: CcAlert, settings: ControlCenterConfig.Settings, appVisible: Boolean, dryRun: Boolean = false) {
     val app = context.applicationContext
     val chime = runCatching { ChimeConfig.load(app) }.getOrNull()
     val quiet = chime?.let { DinnerQuiet.isQuiet(it, System.currentTimeMillis(), TimeZone.getDefault()) } ?: true
     val decision = CcBannerPolicy.decide(alert, settings, quiet)
+    if (dryRun) {
+      // Dry run: the decision is logged; nothing is shown and no sound plays.
+      Log.i(TAG, "dry-run banner ${alert.severity.name.lowercase()} class=${alert.deviceClass ?: "-"} quiet=$quiet " +
+          "show=${decision.show.name.lowercase()} sound=${decision.sound}")
+      return
+    }
     if (decision.show == CcBannerPolicy.Show.NONE) return
     // The Control Center already lists warnings and info while it's on screen; only criticals cover it.
     if (appVisible && decision.show != CcBannerPolicy.Show.TAKEOVER) return

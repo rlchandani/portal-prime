@@ -50,7 +50,8 @@ internal object ControlCenterConfig {
       val bannersWarnings: Boolean = true,
       val warningAfterMin: Int = 10,
       val bannersInfo: Boolean = true,
-      val criticalSoundAtNight: Boolean = false,
+      /** Leak, smoke and CO alarms sound in quiet hours (owner's decision); everything else stays silent. */
+      val criticalSoundAtNight: Boolean = true,
       val reducedMotion: Boolean = false,
       val darkTheme: Boolean = true,
       val pinLength: Int = MIN_PIN,

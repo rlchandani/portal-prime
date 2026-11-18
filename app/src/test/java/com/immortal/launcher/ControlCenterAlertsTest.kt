@@ -65,8 +65,9 @@ class ControlCenterAlertsTest {
     val kidsMode = full.copy(portalMode = ControlCenterConfig.MODE_KIDS)
     val bannersOnly = full.copy(portalMode = ControlCenterConfig.MODE_BANNERS)
     assertEquals(CcBannerPolicy.Decision(CcBannerPolicy.Show.TAKEOVER, true), CcBannerPolicy.decide(crit, full, quietHours = false))
-    assertEquals(CcBannerPolicy.Decision(CcBannerPolicy.Show.TAKEOVER, false), CcBannerPolicy.decide(crit, kidsMode, quietHours = true))
-    assertTrue(CcBannerPolicy.decide(crit, full.copy(criticalSoundAtNight = true), quietHours = true).sound)
+    // crit has no device class but is a LEAK: sounds at night by default (owner's decision).
+    assertEquals(CcBannerPolicy.Decision(CcBannerPolicy.Show.TAKEOVER, true), CcBannerPolicy.decide(crit, kidsMode, quietHours = true))
+    assertFalse(CcBannerPolicy.decide(crit, full.copy(criticalSoundAtNight = false), quietHours = true).sound)
     assertEquals(CcBannerPolicy.Show.TAKEOVER, CcBannerPolicy.decide(crit, bannersOnly, true).show)
     assertEquals(CcBannerPolicy.Show.BANNER, CcBannerPolicy.decide(warn, full, true).show)
     assertFalse(CcBannerPolicy.decide(warn, full, false).sound)
@@ -75,6 +76,28 @@ class ControlCenterAlertsTest {
     assertEquals(CcBannerPolicy.Show.BANNER, CcBannerPolicy.decide(info, full, false).show)
     assertEquals(CcBannerPolicy.Show.NONE, CcBannerPolicy.decide(info, full, true).show)
     assertEquals(CcBannerPolicy.Show.NONE, CcBannerPolicy.decide(battery, full, false).show)
+  }
+
+  @Test fun nightSound_onlyLeakSmokeAndCo() {
+    val s = ControlCenterConfig.Settings()
+    assertTrue(s.criticalSoundAtNight)
+    fun crit(cls: String, kind: CcKind) = CcAlert("a", CcSeverity.CRITICAL, kind, "binary_sensor.x", "t", "", now, CcAlertAction.VIEW, cls)
+    listOf(crit("moisture", CcKind.LEAK), crit("smoke", CcKind.SMOKE), crit("carbon_monoxide", CcKind.SMOKE)).forEach { a ->
+      assertEquals(CcBannerPolicy.Decision(CcBannerPolicy.Show.TAKEOVER, true), CcBannerPolicy.decide(a, s, quietHours = true))
+    }
+    listOf(crit("gas", CcKind.SMOKE), crit("safety", CcKind.SMOKE)).forEach { a ->
+      assertEquals(CcBannerPolicy.Decision(CcBannerPolicy.Show.TAKEOVER, false), CcBannerPolicy.decide(a, s, quietHours = true))
+      assertTrue(CcBannerPolicy.decide(a, s, quietHours = false).sound)
+    }
+    val warn = crit("garage_door", CcKind.GARAGE).copy(severity = CcSeverity.WARNING)
+    val info = crit("", CcKind.APPLIANCE).copy(severity = CcSeverity.INFO)
+    assertFalse(CcBannerPolicy.decide(warn, s, quietHours = true).sound)
+    assertFalse(CcBannerPolicy.decide(warn, s, quietHours = false).sound)
+    assertFalse(CcBannerPolicy.decide(info, s, quietHours = false).sound)
+    // From live state: CO and leak sensors carry their class into the alert.
+    val co = CcEntity("binary_sensor.co", "on", mapOf("device_class" to "carbon_monoxide"), now)
+    val leak = CcEntity("binary_sensor.l", "on", mapOf("device_class" to "moisture"), now)
+    CcAlerts.active(map(co, leak), now, 10).forEach { assertTrue(CcBannerPolicy.soundsAtNight(it)) }
   }
 
   @Test fun uiState_alertsHonourDismissAndKids() {
