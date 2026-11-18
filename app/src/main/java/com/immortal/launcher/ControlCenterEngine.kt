@@ -53,6 +53,8 @@ internal class CcEngine(val app: Context) {
   /** Operator test switches (Fleet `cc_debug`); see [CcDebugStore]. */
   var dryRun = CcDebugStore.dryRun(app)
   var testPlan: CcPlan? = CcDebugStore.testPlan(app)
+  /** Operator-only, never persisted: connect to a dead port (see [CcTestPlan.unreachableUrl]). */
+  var haUnreachable = false
   @Volatile var clock: () -> Long = System::currentTimeMillis
   /** Floor models for the plan, kept between snapshots (engine thread only). */
   private val planModels = CcPlanModelCache()
@@ -102,7 +104,7 @@ internal class CcEngine(val app: Context) {
   private fun connect() {
     val gen = ++generation
     retry = null
-    val url = DoorbellUrls.websocket(HaConfig.baseUrl(app))
+    val url = DoorbellUrls.websocket(HaConfig.baseUrl(app))?.let { if (haUnreachable) CcTestPlan.unreachableUrl(it) else it }
     if (url == null) { setPhase(CcPhase.NOT_CONFIGURED, ""); return }
     if (!online()) { scheduleRetry(gen, CcPhase.OFFLINE); return }
     setPhase(if (hadLive) CcPhase.STALE else CcPhase.CONNECTING, "Connecting")

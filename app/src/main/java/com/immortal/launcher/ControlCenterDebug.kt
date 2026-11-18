@@ -15,6 +15,8 @@ import java.io.File
  * (`/action {"action":"cc_debug", …}`), never from the Portal UI:
  *  - **dry run**: service calls are logged (domain.service + data keys only) and simulated
  *    locally instead of being sent to Home Assistant;
+ *  - **HA unreachable** (in memory only, cleared on restart): the socket targets a dead port, so the
+ *    stale and unreachable states can be checked without touching the saved connection;
  *  - **test plan**: a plan built from the real HA floors/areas (the editor's suggested rooms +
  *    auto-placed devices) kept in a separate local file. While it is active the plan is never
  *    written to Home Assistant (`frontend/set_user_data` is not sent) and HA's own plan is ignored.
@@ -52,8 +54,18 @@ internal object CcTestPlan {
   }
 
   /** "Dry run · Test plan" for the header pill, or null in normal use. */
-  fun label(dryRun: Boolean, testPlan: Boolean): String? = listOfNotNull(
-      "Dry run".takeIf { dryRun }, "Test plan".takeIf { testPlan }).joinToString(" · ").ifBlank { null }
+  fun label(dryRun: Boolean, testPlan: Boolean, unreachable: Boolean = false): String? = listOfNotNull(
+      "Dry run".takeIf { dryRun }, "Test plan".takeIf { testPlan }, "HA unreachable".takeIf { unreachable })
+      .joinToString(" · ").ifBlank { null }
+
+  /** The socket URL with its port swapped for the discard port (nothing listens), or null if unparseable. */
+  fun unreachableUrl(url: String): String? = runCatching {
+    val u = java.net.URI(url)
+    if (u.scheme == null || u.host == null) return null
+    java.net.URI(u.scheme, u.userInfo, u.host, DEAD_PORT, u.path, u.query, null).toString()
+  }.getOrNull()
+
+  private const val DEAD_PORT = 9
 }
 
 // --- engine side (engine thread) ----------------------------------------------------------
@@ -81,7 +93,7 @@ internal fun CcEngine.testAlert(deviceClass: String): String {
 }
 
 /** Fleet `cc_debug`: switch dry run, load/clear the local-only test plan. Returns a short status. */
-internal fun CcEngine.debug(dry: Boolean?, plan: String?): String {
+internal fun CcEngine.debug(dry: Boolean?, plan: String?, unreachable: Boolean? = null): String {
   dry?.let { dryRun = it; CcDebugStore.setDryRun(app, it) }
   when (plan) {
     "load" -> ui.registry?.let { reg ->
@@ -92,9 +104,11 @@ internal fun CcEngine.debug(dry: Boolean?, plan: String?): String {
     } ?: return "no registry yet (open the Control Center once, or wait for Home Assistant)"
     "clear" -> { CcDebugStore.clearTestPlan(app); testPlan = null; ui = ui.copy(plan = CcPlanStore.load(app) ?: CcPlan.EMPTY) }
   }
-  ui = ui.copy(debug = CcTestPlan.label(dryRun, testPlan != null))
+  val reconnect = unreachable != null && unreachable != haUnreachable
+  unreachable?.let { haUnreachable = it }
+  ui = ui.copy(debug = CcTestPlan.label(dryRun, testPlan != null, haUnreachable))
   publish()
-  ensure()
+  if (reconnect) restart() else ensure()
   val rooms = testPlan?.floors?.sumOf { it.rooms.size } ?: 0
-  return "dryRun=$dryRun testPlan=${testPlan != null} floors=${testPlan?.floors?.size ?: 0} rooms=$rooms"
+  return "dryRun=$dryRun testPlan=${testPlan != null} floors=${testPlan?.floors?.size ?: 0} rooms=$rooms haUnreachable=$haUnreachable"
 }

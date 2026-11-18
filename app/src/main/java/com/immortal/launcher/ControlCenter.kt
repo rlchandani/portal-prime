@@ -100,10 +100,10 @@ internal object ControlCenter {
     if (!send(context, CcCalls.alarm(panel, mode, code), undoable = false, onResult = delivered, confirmed = true)) delivered(false, null)
   }
 
-  /** Fleet `cc_debug` (operator only): dry run on/off, `load`/`clear` the local test plan. Blocks briefly. */
-  fun debug(context: Context, dryRun: Boolean?, testPlan: String?, testAlert: String? = null): String {
+  /** Fleet `cc_debug` (operator only): dry run, local test plan, HA-unreachable switch. Blocks briefly. */
+  fun debug(context: Context, dryRun: Boolean?, testPlan: String?, testAlert: String? = null, haUnreachable: Boolean? = null): String {
     val e = engine(context)
-    return runCatching { e.exec.submit<String> { testAlert?.let { e.testAlert(it) } ?: e.debug(dryRun, testPlan) }.get(DEBUG_WAIT_S, java.util.concurrent.TimeUnit.SECONDS) }
+    return runCatching { e.exec.submit<String> { testAlert?.let { e.testAlert(it) } ?: e.debug(dryRun, testPlan, haUnreachable) }.get(DEBUG_WAIT_S, java.util.concurrent.TimeUnit.SECONDS) }
         .getOrElse { "timeout" }
   }
 
