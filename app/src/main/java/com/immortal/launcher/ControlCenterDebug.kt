@@ -80,6 +80,17 @@ internal fun dryRunEcho(raw: CcEntity, opt: CcOptimistic, now: Long): CcEntity {
   return if (next.state == raw.state) next else next.copy(lastChanged = now, userId = null)
 }
 
+/**
+ * The state a dry run shows after [call]. Alarm calls carry no optimistic state on purpose (a real
+ * panel must confirm), so the dry run supplies the panel's resulting mode to keep the flow testable.
+ */
+internal fun dryRunOptimistic(call: CcCall): CcOptimistic? =
+    call.optimistic ?: DRY_RUN_ALARM[call.service]?.takeIf { call.domain == "alarm_control_panel" }?.let { CcOptimistic(state = it) }
+
+private val DRY_RUN_ALARM = mapOf(
+    "alarm_disarm" to "disarmed", "alarm_arm_home" to "armed_home", "alarm_arm_away" to "armed_away",
+    "alarm_arm_night" to "armed_night", "alarm_arm_vacation" to "armed_vacation")
+
 private val DRY_RUN_SETTLED = mapOf("opening" to "open", "closing" to "closed")
 
 /** Dry run: log, then behave as if HA had echoed the optimistic state at once. */
@@ -87,7 +98,8 @@ internal fun CcEngine.dryRunCall(call: CcCall, onResult: ((Boolean, String?) -> 
   Log.i(CcEngine.TAG, "dry-run ${call.domain}.${call.service} data=${call.data.keys.sorted()}")
   val id = call.entityId
   val raw = id?.let { live.raw[it] }
-  if (raw != null && call.optimistic != null) live = live.update(mapOf(id to dryRunEcho(raw, call.optimistic, clock())), clock())
+  val opt = dryRunOptimistic(call)
+  if (raw != null && opt != null) live = live.update(mapOf(id to dryRunEcho(raw, opt, clock())), clock())
   toast("Dry run: ${call.label.ifBlank { "${call.domain}.${call.service}" }} (not sent)")
   onResult?.invoke(true, null)
 }

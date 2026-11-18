@@ -36,4 +36,18 @@ class ControlCenterDryRunEchoTest {
     val echo = dryRunEcho(on, CcOptimistic(brightnessPct = 50), now = 9_000L)
     assertEquals(1_000L, echo.lastChanged)
   }
+
+  @Test
+  fun alarmCalls_simulateThePanelState() {
+    val panel = CcEntity("alarm_control_panel.home", "disarmed")
+    assertEquals("armed_away", dryRunOptimistic(CcCalls.alarm(panel, CcAlarmMode.AWAY, null))?.state)
+    assertEquals("armed_home", dryRunOptimistic(CcCalls.alarm(panel, CcAlarmMode.HOME, null))?.state)
+    assertEquals("disarmed", dryRunOptimistic(CcCalls.alarm(panel, CcAlarmMode.DISARM, "1234"))?.state)
+  }
+
+  @Test
+  fun callsWithTheirOwnOptimisticState_keepIt() {
+    val light = CcEntity("light.desk", "off")
+    assertEquals("on", dryRunOptimistic(CcCalls.lightPower(light, true))?.state)
+  }
 }
