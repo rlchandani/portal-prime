@@ -86,8 +86,9 @@ internal data class CcPlanModel(
         now: Long,
         appliancesDone: Map<String, Long> = emptyMap(),
     ): CcPlanModel {
-      val visible = entities.filterValues { !CcPolicy.hidden(it, settings) }
-      val climates = visible.values.filter { it.domain == "climate" }
+      // Only kids mode hides anything; otherwise reuse the map as is (no copy of every entity).
+      val visible = if (settings.kids) entities.filterValues { !CcPolicy.hidden(it, settings) } else entities
+      val climates = floor.rooms.flatMap { r -> r.devices.mapNotNull { visible[it.entityId] } }.filter { it.domain == "climate" }
       val views = floor.rooms.map { CcRooms.view(it, visible, climates) }
       val openings = floor.openings.mapNotNull { o -> opening(o, floor, entities, settings) }
       val badges = views.flatMap { badges(it, visible, appliancesDone) }

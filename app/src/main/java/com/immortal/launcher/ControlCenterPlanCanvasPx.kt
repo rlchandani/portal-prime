@@ -129,3 +129,23 @@ internal class CcMapDashes(dashPx: Float, gapPx: Float) {
 
   companion object { const val STEPS = 25 }
 }
+
+/** A tiny least-recently-used cache (floors already shown keep their geometry / model). Not thread-safe; UI thread only. */
+internal class CcLru<K, V>(private val max: Int) {
+  private val map = LinkedHashMap<K, V>(max + 1, LOAD, true)
+  val size: Int get() = map.size
+
+  operator fun get(key: K): V? = map[key]
+
+  fun getOrPut(key: K, make: () -> V): V = map[key] ?: make().also { put(key, it) }
+
+  fun put(key: K, value: V) {
+    map[key] = value
+    if (map.size > max) map.remove(map.keys.first())
+  }
+
+  private companion object { const val LOAD = 0.75f }
+}
+
+/** What a floor's pixel geometry depends on. */
+internal data class CcPxKey(val floor: CcFloor, val width: Int, val height: Int, val maxScale: Float)

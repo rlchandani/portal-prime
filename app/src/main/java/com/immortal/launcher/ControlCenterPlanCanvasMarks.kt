@@ -11,8 +11,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.drawText
 
 /**
  * The plan's top layers, drawn over the floor: light dots, lock / thermostat / camera /
@@ -29,9 +27,9 @@ internal fun CcPlanDraw.drawMarks(s: DrawScope) {
   for (ch in model.chips) {
     val t = chips.chip[ch.entityId] ?: continue
     val p = px.pt(ch.x, ch.y)
-    val w = t.size.width + CHIP_PAD * 2 * dp
+    val w = t.width + CHIP_PAD * 2 * dp
     s.drawRoundRect(c.amber, Offset(p.x, p.y - CHIP_H / 2 * dp), Size(w, CHIP_H * dp), CornerRadius(CHIP_H / 2 * dp))
-    s.drawText(t, topLeft = Offset(p.x + CHIP_PAD * dp, p.y - t.size.height / 2f))
+    t.draw(s, p.x + CHIP_PAD * dp, p.y - t.height / 2f)
   }
 }
 
@@ -45,10 +43,10 @@ private fun CcPlanDraw.drawBadge(s: DrawScope, b: CcMapBadge) {
     }
     CcMapBadgeKind.CLIMATE -> {
       val t = chips.badge[b.entityId]
-      val w = (t?.size?.width ?: 0) + THERMO_PAD * dp
+      val w = (t?.width ?: 0f) + THERMO_PAD * dp
       s.drawRoundRect(c.surface, Offset(p.x - THERMO_LEFT * dp, p.y - CHIP_H / 2 * dp), Size(w, CHIP_H * dp), CornerRadius(CHIP_H / 2 * dp), alpha = THERMO_ALPHA)
       s.ccIcon(paint, "heat", Offset(p.x - THERMO_ICON_X * dp, p.y), THERMO_ICON * dp, paint.tint(if (b.hot) HEATING else c.sec))
-      t?.let { s.drawText(it, topLeft = Offset(p.x + THERMO_TEXT_X * dp, p.y - it.size.height / 2f)) }
+      t?.draw(s, p.x + THERMO_TEXT_X * dp, p.y - t.height / 2f)
     }
     CcMapBadgeKind.CAMERA -> s.ccIcon(paint, "cam", p, CAM_ICON * dp, paint.tint(c.sec))
     CcMapBadgeKind.APPLIANCE, CcMapBadgeKind.APPLIANCE_DONE -> {
@@ -69,16 +67,12 @@ internal fun CcPlanDraw.drawLabels(s: DrawScope) {
     val r = px.rects[v.room.id] ?: continue
     val t = labels[v.room.id] ?: continue
     val alpha = if (focus != null && focus != v.room.id) FADED else 1f
-    val cap = t.caption?.takeIf { r.height > (t.name.size.height + it.size.height) * FIT_SLACK }
-    val total = t.name.size.height + (cap?.size?.height ?: 0) + if (cap != null) LINE_GAP * dp else 0f
+    val cap = t.caption?.takeIf { r.height > (t.name.height + it.height) * FIT_SLACK }
+    val total = t.name.height + (cap?.height ?: 0f) + if (cap != null) LINE_GAP * dp else 0f
     val top = r.center.y - total / 2f
-    label(s, t.name, Offset(r.center.x - t.name.size.width / 2f, top), alpha)
-    cap?.let { label(s, it, Offset(r.center.x - it.size.width / 2f, top + t.name.size.height + LINE_GAP * dp), alpha) }
+    t.name.draw(s, r.center.x - t.name.width / 2f, top, alpha)
+    cap?.draw(s, r.center.x - cap.width / 2f, top + t.name.height + LINE_GAP * dp, alpha)
   }
-}
-
-private fun CcPlanDraw.label(s: DrawScope, t: TextLayoutResult, at: Offset, alpha: Float) {
-  s.drawText(t, topLeft = at, alpha = alpha)
 }
 
 /** Energy lens: the "2.3 kW home" hub and the solar / grid / battery nodes the flows start from. */
@@ -90,20 +84,20 @@ internal fun CcPlanDraw.drawEnergyNodes(s: DrawScope) {
   val home = chips.hub ?: return
   val unit = chips.hubUnit
   s.drawCircle(c.text, HUB_R * dp, f.hub)
-  val h = home.size.height + (unit?.size?.height ?: 0)
-  s.drawText(home, topLeft = Offset(f.hub.x - home.size.width / 2f, f.hub.y - h / 2f))
-  unit?.let { s.drawText(it, topLeft = Offset(f.hub.x - it.size.width / 2f, f.hub.y - h / 2f + home.size.height)) }
+  val h = home.height + (unit?.height ?: 0f)
+  home.draw(s, f.hub.x - home.width / 2f, f.hub.y - h / 2f)
+  unit?.draw(s, f.hub.x - unit.width / 2f, f.hub.y - h / 2f + home.height)
 }
 
-private fun CcPlanDraw.node(s: DrawScope, at: Offset, icon: String, color: Color, label: TextLayoutResult?) {
+private fun CcPlanDraw.node(s: DrawScope, at: Offset, icon: String, color: Color, label: CcPlanLabel?) {
   s.drawCircle(c.surface, NODE_R * dp, at)
   s.drawCircle(color, NODE_R * dp, at, style = nodeStroke)
   s.ccIcon(paint, icon, at, NODE_ICON * dp, paint.tint(color))
   label?.let {
-    val top = Offset(at.x - it.size.width / 2f, at.y + (NODE_R + NODE_LABEL_GAP) * dp)
+    val top = Offset(at.x - it.width / 2f, at.y + (NODE_R + NODE_LABEL_GAP) * dp)
     s.drawRoundRect(c.surface, Offset(top.x - NODE_LABEL_PAD * dp, top.y - NODE_LABEL_PAD / 2 * dp),
-        Size(it.size.width + NODE_LABEL_PAD * 2 * dp, it.size.height + NODE_LABEL_PAD * dp), CornerRadius(it.size.height.toFloat()), alpha = THERMO_ALPHA)
-    s.drawText(it, topLeft = top)
+        Size(it.width + NODE_LABEL_PAD * 2 * dp, it.height + NODE_LABEL_PAD * dp), CornerRadius(it.height), alpha = THERMO_ALPHA)
+    it.draw(s, top.x, top.y)
   }
 }
 

@@ -33,7 +33,6 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
@@ -72,17 +71,21 @@ internal fun CcPlanCanvas(
   val c = LocalCc.current
   val density = LocalDensity.current
   val paint = rememberCcPlanPaint()
-  val measurer = rememberTextMeasurer(cacheSize = TEXT_CACHE)
+  val textPaints = remember(c, density) { CcPlanTextPaints(c, density) }
   var size by remember { mutableStateOf(IntSize.Zero) }
   val maxScale = with(density) { MAX_CELL_DP.dp.toPx() }
+  // Floors already shown keep their geometry, so switching back costs no path building.
+  val pxCache = remember { CcLru<CcPxKey, CcPlanPx>(FLOOR_CACHE) }
   val px = remember(model.floor, size, maxScale) {
-    CcPlanPx(CcPlanGeo.fit(model.bounds, size.width.toFloat(), size.height.toFloat(), maxScale = maxScale), model)
+    pxCache.getOrPut(CcPxKey(model.floor, size.width, size.height, maxScale)) {
+      CcPlanPx(CcPlanGeo.fit(model.bounds, size.width.toFloat(), size.height.toFloat(), maxScale = maxScale), model)
+    }
   }
   val base = remember(px, c, density) { CcPlanBase(px, c, density.density) }
   val flows = remember(px, model.flows, sources, lens) { if (lens == CcLens.ENERGY) CcFlowPx(px, model.flows, sources) else null }
   val dashes = remember(density) { with(density) { CcMapDashes(DASH_DP.dp.toPx(), GAP_DP.dp.toPx()) } }
-  val labels = remember(model.views, lens, c, density) { measureRooms(model, lens, c, measurer, density.density) }
-  val chipText = remember(model.badges, model.chips, sources, lens, c, density) { measureChips(model, sources, lens, c, measurer) }
+  val labels = remember(model.views, lens, textPaints) { roomTexts(model, lens, textPaints) }
+  val chipText = remember(model.badges, model.chips, sources, lens, textPaints) { chipTexts(model, sources, lens, textPaints) }
   val ctx = remember(model, px, flows, paint, c, labels, chipText, lens, focus, stale, sources, fahrenheit) {
     CcPlanDraw(model, px, flows, paint, c, labels, chipText, lens, focus, stale, dashes, sources, fahrenheit, density.density)
   }
@@ -148,8 +151,9 @@ internal const val MAX_CELL_DP = 34f
 private const val TAP_DP = 36f
 private const val DASH_DP = 3f
 private const val GAP_DP = 22f
-private const val TEXT_CACHE = 64
 /** Loop period: pulses (÷3 = 2.2 s), dashes (÷6 = 1.1 s) and the highlight (÷4 = 1.65 s) all divide it. */
 private const val CLOCK_MS = 6_600
+/** Floors whose geometry stays cached (a Portal home rarely has more). */
+private const val FLOOR_CACHE = 4
 /** Clock value of the still frame (pulses drawn mid-ring so they still read). */
 private const val STILL_T = 0.1f

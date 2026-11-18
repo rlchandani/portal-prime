@@ -73,4 +73,34 @@ class ControlCenterOverviewSlicesTest {
     val b = CcPlanModel.build(plan.floors[0], HashMap(ents), ControlCenterConfig.Settings(), 60_000L)
     assertEquals(a, b)
   }
+
+  @Test fun lruKeepsTheMostRecentFloors() {
+    val lru = CcLru<String, Int>(2)
+    var built = 0
+    assertEquals(1, lru.getOrPut("g") { ++built })
+    assertEquals(2, lru.getOrPut("u") { ++built })
+    assertEquals(1, lru.getOrPut("g") { ++built }) // reused, and now most recent
+    lru.getOrPut("b") { ++built } // evicts "u", the least recently used
+    assertEquals(3, built)
+    assertNull(lru["u"])
+    assertEquals(1, lru["g"])
+    assertEquals(2, lru.size)
+    lru.put("g", 9)
+    assertEquals(9, lru["g"])
+  }
+
+  @Test fun modelKeysCompareByValue() {
+    val f = plan.floors[0]
+    val s = ControlCenterConfig.Settings()
+    assertEquals(CcModelKey(f, 3, s, 10, emptyMap()), CcModelKey(f.copy(), 3, s.copy(), 10, HashMap()))
+    assertFalse(CcModelKey(f, 3, s, 10, emptyMap()) == CcModelKey(f, 4, s, 10, emptyMap()))
+    assertEquals(CcPxKey(f, 100, 50, 2f), CcPxKey(f.copy(), 100, 50, 2f))
+  }
+
+  @Test fun kidsModelHidesWhileFullModeReusesEntities() {
+    val ents = mapOf(lock.id to lock)
+    val floor = CcFloor("g", "G", listOf(CcRoom("hall", "Hall", CcRect(0, 0, 4, 4), devices = listOf(CcPlaced(lock.id, .5f, .5f)))))
+    assertEquals(1, CcPlanModel.build(floor, ents, ControlCenterConfig.Settings(), 0).badges.size)
+    assertTrue(CcPlanModel.build(floor, ents, ControlCenterConfig.Settings(portalMode = ControlCenterConfig.MODE_KIDS), 0).badges.isEmpty())
+  }
 }

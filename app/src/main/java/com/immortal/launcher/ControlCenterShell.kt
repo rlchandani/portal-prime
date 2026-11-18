@@ -22,6 +22,8 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -87,10 +89,21 @@ private val KEEP_ALIVE = setOf(CcScreen.MAP, CcScreen.CAMERAS, CcScreen.ENERGY, 
 @Composable
 private fun CcScreenBody(s: CcUiState, ui: CcUi) {
   val current = ui.nav.screen
-  val visited = remember { LinkedHashSet<CcScreen>() }
+  val visited = remember { mutableStateListOf<CcScreen>() }
   val frozen = remember { HashMap<CcScreen, CcUiState>() }
-  if (current in KEEP_ALIVE) { visited += current; frozen[current] = s }
+  if (current in KEEP_ALIVE) { if (current !in visited) visited += current; frozen[current] = s }
   val motion = LocalCcMotion.current
+  val latest by rememberUpdatedState(s)
+  // Prewarm: once the first screen has settled, compose the other screens off-screen one at a
+  // time while nothing else happens, so a first visit is a cheap swap instead of a 50-90 ms build.
+  LaunchedEffect(Unit) {
+    delay(PREWARM_AFTER_MS)
+    KEEP_ALIVE.filter { it !in visited && !CcPolicy.screenHidden(it, latest.settings) }.forEach { screen ->
+      frozen[screen] = latest
+      visited += screen
+      delay(PREWARM_STEP_MS)
+    }
+  }
   Box(Modifier.fillMaxSize().clipToBounds()) {
     visited.forEach { screen ->
       key(screen) {
@@ -108,6 +121,8 @@ private fun CcScreenBody(s: CcUiState, ui: CcUi) {
 }
 
 private const val PARK_OFFSET_PX = 100_000
+private const val PREWARM_AFTER_MS = 2_500L
+private const val PREWARM_STEP_MS = 700L
 
 @Composable
 private fun CcScreenContent(screen: CcScreen, s: CcUiState, ui: CcUi) {

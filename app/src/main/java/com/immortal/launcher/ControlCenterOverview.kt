@@ -60,8 +60,12 @@ private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan) {
   val floor = plan.floor(ui.nav.floorId) ?: return
   val lens = ui.nav.lens
   // Derived once per entity version / minute; an equal model makes every plan layer skip.
-  val model = remember(floor, s.entitiesVersion, s.settings, s.minute, s.appliancesDone) {
-    CcPlanModel.build(floor, s.entities, s.settings, s.now, s.appliancesDone)
+  // Floors already shown keep their model while nothing they depend on changed (LRU of a few floors).
+  val models = remember { CcLru<String, Pair<CcModelKey, CcPlanModel>>(FLOOR_CACHE) }
+  val key = CcModelKey(floor, s.entitiesVersion, s.settings, s.minute, s.appliancesDone)
+  val model = remember(key) {
+    models[floor.id]?.takeIf { it.first == key }?.second
+        ?: CcPlanModel.build(floor, s.entities, s.settings, s.now, s.appliancesDone).also { models.put(floor.id, key to it) }
   }
   // House-level sources (solar, grid, battery) belong to the first floor, as in the mock.
   val sources = remember(s.entitiesVersion, lens, floor.id) {
@@ -134,3 +138,8 @@ private val DOWN_PHASES = setOf(CcPhase.UNREACHABLE, CcPhase.OFFLINE, CcPhase.AU
 private const val DOWN_ALPHA = 0.55f
 /** How long the finished walk lingers before the run is cleared. */
 private const val WALK_HOLD_MS = 1_200L
+private const val FLOOR_CACHE = 4
+
+/** Everything a floor's [CcPlanModel] depends on. */
+internal data class CcModelKey(val floor: CcFloor, val version: Long, val settings: ControlCenterConfig.Settings, val minute: Long,
+                                val done: Map<String, Long>)
