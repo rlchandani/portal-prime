@@ -83,10 +83,9 @@ internal fun rememberCountdown(at: Long): Long {
 
 /** Bottom toast with Undo (`.toast`); disappears after [TOAST_MS]. */
 @Composable
-internal fun CcToastHost(s: CcUiState) {
+internal fun CcToastHost(toast: CcToast?) {
   val context = LocalContext.current
   val c = LocalCc.current
-  val toast = s.toast
   LaunchedEffect(toast?.id) { if (toast != null) { delay(TOAST_MS); ControlCenter.dismissToast(context, toast.id) } }
   Box(Modifier.fillMaxSize().padding(bottom = 36.dp), contentAlignment = Alignment.BottomCenter) {
     AnimatedVisibility(toast != null, enter = fadeIn() + slideInVertically { it / 2 }, exit = fadeOut() + slideOutVertically { it / 2 }) {

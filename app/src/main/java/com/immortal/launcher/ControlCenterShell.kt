@@ -45,6 +45,7 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
   val latest by rememberUpdatedState(state)
   val navState = remember { mutableStateOf(CcNav(screen = initialScreen)) }
   val ui = remember { CcUi(context, navState, { latest }) }
+  val onJarvis = remember { { JarvisHandoff.launch(context); Unit } }
   BackHandler { if (!ui.handleBack()) onExit() }
   LaunchedEffect(requested) { requested?.let { ui.go(it.first) } }
   CcTheme(dark = state.settings.darkTheme) {
@@ -54,17 +55,19 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
         if (state.settings.bannersOnly) CcBannersOnly(onExit)
         else {
           Row(Modifier.fillMaxSize()) {
-            CcRail(state, ui, onHome = onExit)
+            val nav = navState.value
+            val rail = CcRailSlice.of(state, nav.screen)
+            CcRail(rail, ui, onHome = onExit)
             Column(Modifier.weight(1f).fillMaxSize()) {
-              val nav = navState.value
-              CcHeader(state, ccTitle(nav.screen), subtitleFor(state, nav), ui) { JarvisHandoff.launch(context) }
+              val header = CcHeaderSlice.of(state, ccTitle(nav.screen), subtitleFor(state, nav))
+              CcHeader(header, ui, onJarvis)
               Box(Modifier.weight(1f).fillMaxWidth()) { CcScreenBody(state, ui) }
             }
           }
           CcSheetHost(state, ui)
           CcConnectionOverlay(state, ui)
           CcModalHost(state, ui)
-          CcToastHost(state)
+          CcToastHost(state.toast)
         }
       }
     }

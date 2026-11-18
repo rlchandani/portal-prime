@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -44,11 +45,20 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/** What the rail shows; equal slices skip the rail entirely on HA updates. */
+@Immutable
+internal data class CcRailSlice(val screen: CcScreen, val alerts: Int, val kids: Boolean, val hideCameras: Boolean, val hideSecurity: Boolean) {
+  companion object {
+    fun of(s: CcUiState, screen: CcScreen) = CcRailSlice(screen, s.alerts().size, s.settings.kids,
+        CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings), CcPolicy.screenHidden(CcScreen.SECURITY, s.settings))
+  }
+}
+
 /** Left rail (`.rail`): back to Hearthpane Home, the six sections, Edit plan + Settings at the foot. */
 @Composable
-internal fun CcRail(s: CcUiState, ui: CcUi, onHome: () -> Unit) {
+internal fun CcRail(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
   val c = LocalCc.current
-  val alerts = s.alerts().size
+  val alerts = r.alerts
   Column(Modifier.width(CcStyle.RailWidth).fillMaxHeight().graphicsLayer().background(c.rail).padding(top = 22.dp, bottom = 20.dp),
       horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
     Box(Modifier.size(72.dp).clip(CircleShape).clickable(role = Role.Button, onClick = onHome)
@@ -56,17 +66,17 @@ internal fun CcRail(s: CcUiState, ui: CcUi, onHome: () -> Unit) {
       CcIcon("home", c.text, 34.dp)
     }
     Spacer(Modifier.height(10.dp))
-    RailItem("map", "Home", ui.nav.screen == CcScreen.MAP) { ui.go(CcScreen.MAP) }
-    if (!CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings)) RailItem("cam", "Cameras", ui.nav.screen == CcScreen.CAMERAS) { ui.go(CcScreen.CAMERAS) }
-    RailItem("bolt", "Energy", ui.nav.screen == CcScreen.ENERGY) { ui.go(CcScreen.ENERGY) }
-    RailItem("bell", "Alerts", ui.nav.screen == CcScreen.ALERTS, badge = alerts) { ui.go(CcScreen.ALERTS) }
-    if (!CcPolicy.screenHidden(CcScreen.SECURITY, s.settings)) RailItem("shield", "Security", ui.nav.screen == CcScreen.SECURITY) { ui.go(CcScreen.SECURITY) }
+    RailItem("map", "Home", r.screen == CcScreen.MAP) { ui.go(CcScreen.MAP) }
+    if (!r.hideCameras) RailItem("cam", "Cameras", r.screen == CcScreen.CAMERAS) { ui.go(CcScreen.CAMERAS) }
+    RailItem("bolt", "Energy", r.screen == CcScreen.ENERGY) { ui.go(CcScreen.ENERGY) }
+    RailItem("bell", "Alerts", r.screen == CcScreen.ALERTS, badge = alerts) { ui.go(CcScreen.ALERTS) }
+    if (!r.hideSecurity) RailItem("shield", "Security", r.screen == CcScreen.SECURITY) { ui.go(CcScreen.SECURITY) }
     Spacer(Modifier.weight(1f))
-    if (s.settings.kids) {
+    if (r.kids) {
       RailItem("lock", "Leave kids", false) { ui.modal(CcModal.Pin(null, null, "Leave kids mode", "Enter the household PIN")) }
     } else {
-      RailItem("edit", "Edit plan", ui.nav.screen == CcScreen.EDIT) { ui.go(CcScreen.EDIT) }
-      RailItem("gear", "Settings", ui.nav.screen == CcScreen.SETTINGS) { ui.go(CcScreen.SETTINGS) }
+      RailItem("edit", "Edit plan", r.screen == CcScreen.EDIT) { ui.go(CcScreen.EDIT) }
+      RailItem("gear", "Settings", r.screen == CcScreen.SETTINGS) { ui.go(CcScreen.SETTINGS) }
     }
   }
 }
@@ -89,41 +99,53 @@ private fun RailItem(icon: String, label: String, on: Boolean, badge: Int = 0, o
   }
 }
 
+/** What the header shows (people, alarm, weather, connection, debug pill) — skips when equal. */
+@Immutable
+internal data class CcHeaderSlice(
+    val title: String, val subtitle: String, val people: List<CcEntity>, val alarm: CcEntity?,
+    val weatherTemp: Long?, val weatherText: String?, val night: Boolean, val phase: CcPhase, val debug: String?,
+) {
+  companion object {
+    fun of(s: CcUiState, title: String, subtitle: String): CcHeaderSlice {
+      val w = s.weather
+      return CcHeaderSlice(title, subtitle, s.people, s.alarm,
+          w?.attrs?.get("temperature")?.toString()?.toDoubleOrNull()?.let { Math.round(it) },
+          w?.state?.replace('-', ' ')?.replace('_', ' ')?.takeIf { it.isNotBlank() }, isNight(s.now), s.connection.phase, s.debug)
+    }
+  }
+}
+
 /** Header (`.hdr`): ember glyph + serif title, then who's home, alarm, weather, live state, Ask Jarvis. */
 @Composable
-internal fun CcHeader(s: CcUiState, title: String, subtitle: String, ui: CcUi, onJarvis: () -> Unit) {
+internal fun CcHeader(h: CcHeaderSlice, ui: CcUi, onJarvis: () -> Unit) {
   val c = LocalCc.current
   Row(Modifier.fillMaxWidth().height(CcStyle.HeaderHeight).graphicsLayer().padding(horizontal = 34.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
     Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       HearthpaneGlyph(30.dp)
       Column {
-        Text(title, color = c.text, fontSize = 46.sp, fontFamily = CcStyle.Serif, maxLines = 1, lineHeight = 48.sp)
-        Text(subtitle, color = c.sec, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(h.title, color = c.text, fontSize = 46.sp, fontFamily = CcStyle.Serif, maxLines = 1, lineHeight = 48.sp)
+        Text(h.subtitle, color = c.sec, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
       }
     }
-    val home = s.people.filter { it.state == "home" }
-    if (s.people.isNotEmpty()) CcPill(onClick = { ui.go(CcScreen.SECURITY) }) {
-      CcAvatars(home.ifEmpty { s.people }.take(4))
+    val home = h.people.filter { it.state == "home" }
+    if (h.people.isNotEmpty()) CcPill(onClick = { ui.go(CcScreen.SECURITY) }) {
+      CcAvatars(home.ifEmpty { h.people }.take(4))
       Text(if (home.isEmpty()) "Nobody home" else "${home.size} home", color = c.text, fontSize = 22.sp)
     }
-    s.alarm?.let { a ->
+    h.alarm?.let { a ->
       val armed = a.state.startsWith("armed")
       CcPill(onClick = { ui.go(CcScreen.SECURITY) }) {
         CcIcon(if (armed) "shieldck" else "shield", if (armed) c.green else c.text, 28.dp)
         Text(alarmLabel(a.state), color = if (armed) c.green else c.text, fontSize = 22.sp)
       }
     }
-    s.weather?.let { w ->
-      CcPill {
-        CcIcon(if (isNight(s.now)) "moon" else "sun", c.text, 28.dp)
-        val t = w.attrs["temperature"]?.toString()?.toDoubleOrNull()
-        Text(listOfNotNull(t?.let { "${Math.round(it)}°" }, w.state.replace('-', ' ').replace('_', ' ').takeIf { it.isNotBlank() })
-            .joinToString(" · "), color = c.text, fontSize = 22.sp)
-      }
+    if (h.weatherTemp != null || h.weatherText != null) CcPill {
+      CcIcon(if (h.night) "moon" else "sun", c.text, 28.dp)
+      Text(listOfNotNull(h.weatherTemp?.let { "$it°" }, h.weatherText).joinToString(" · "), color = c.text, fontSize = 22.sp)
     }
-    s.debug?.let { label -> CcPill { CcIcon("warn", c.amber, 26.dp); Text(label, color = c.amber, fontSize = 22.sp) } }
-    CcLivePill(s)
+    h.debug?.let { label -> CcPill { CcIcon("warn", c.amber, 26.dp); Text(label, color = c.amber, fontSize = 22.sp) } }
+    CcLivePill(h.phase)
     Row(Modifier.height(72.dp).shadow(14.dp, CcStyle.Pill, ambientColor = CcStyle.Ember, spotColor = CcStyle.Ember)
         .clip(CcStyle.Pill).background(CcStyle.JarvisBrush).clickable(role = Role.Button, onClick = onJarvis)
         .padding(start = 18.dp, end = 28.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -135,9 +157,9 @@ internal fun CcHeader(s: CcUiState, title: String, subtitle: String, ui: CcUi, o
 
 /** "Live" / "Stale · 2 min" / "HA unreachable" pill with its status dot. */
 @Composable
-internal fun CcLivePill(s: CcUiState) {
+internal fun CcLivePill(phase: CcPhase) {
   val c = LocalCc.current
-  val (color, label) = when (s.connection.phase) {
+  val (color, label) = when (phase) {
     CcPhase.LIVE -> c.green to "Live"
     CcPhase.STALE -> c.amber to "Reconnecting"
     CcPhase.CONNECTING -> c.amber to "Connecting"
