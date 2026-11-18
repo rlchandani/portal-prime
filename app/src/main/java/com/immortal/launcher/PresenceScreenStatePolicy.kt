@@ -22,3 +22,12 @@ internal fun presenceAfterScreenOn(previous: PresenceState, confident: Boolean):
         screen = if (previous.screen == ScreenState.DREAMING) ScreenState.DREAMING else ScreenState.INTERACTIVE,
         confident = confident,
     )
+
+/**
+ * An app window took input focus with the screen on, so no dream window is above it (Android 10
+ * dreams are focus-taking windows, not activities). Opening an app over the frame without a tap
+ * (fleet action, alert banner) fires no dream-stop, so this is the only signal that the dream is
+ * gone from the screen. Occupancy is untouched: a remote open is not evidence that someone is here.
+ */
+internal fun presenceAfterAppFocused(previous: PresenceState): PresenceState =
+    if (previous.screen == ScreenState.INTERACTIVE) previous else previous.copy(screen = ScreenState.INTERACTIVE)

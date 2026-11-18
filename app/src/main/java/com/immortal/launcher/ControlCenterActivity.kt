@@ -68,9 +68,15 @@ class ControlCenterActivity : ComponentActivity() {
     super.onStop()
   }
 
+  /** Focus means no dream window is on top, so a dream left over from before CC opened is over. */
+  override fun onWindowFocusChanged(hasFocus: Boolean) {
+    super.onWindowFocusChanged(hasFocus)
+    if (hasFocus) { PresenceHub.onAppFocused(this); updateMotion() }
+  }
+
   private fun updateMotion() {
     val interactive = (getSystemService(Context.POWER_SERVICE) as? PowerManager)?.isInteractive != false
-    motion.value = resumed && interactive && PresenceHub.current.screen != ScreenState.DREAMING
+    motion.value = ccMotionAllowed(resumed, interactive, PresenceHub.current.screen)
   }
 
   companion object {
@@ -84,3 +90,7 @@ class ControlCenterActivity : ComponentActivity() {
     }
   }
 }
+
+/** Animations run only while resumed, with the screen on and no dream on top. */
+internal fun ccMotionAllowed(resumed: Boolean, interactive: Boolean, screen: ScreenState): Boolean =
+    resumed && interactive && screen != ScreenState.DREAMING

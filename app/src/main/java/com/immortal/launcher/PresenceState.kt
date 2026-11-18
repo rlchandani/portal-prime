@@ -219,6 +219,17 @@ object PresenceHub {
     set(presence, current.screen, confident = true, context = c)
   }
 
+  /**
+   * One of our activities holds window focus over the frame with the screen on (see
+   * [presenceAfterAppFocused]). Keeps presence and confidence; only the screen state changes.
+   */
+  fun onAppFocused(c: Context) {
+    val interactive = runCatching { c.getSystemService(PowerManager::class.java)?.isInteractive }.getOrNull()
+    if (interactive == false) return
+    val next = presenceAfterAppFocused(current)
+    set(next.presence, next.screen, next.confident, c)
+  }
+
   /** Waking the display does not establish room occupancy or end an observed dream. */
   private fun onScreenOn(c: Context) {
     val next = presenceAfterScreenOn(current, isConfident(c))
