@@ -59,7 +59,7 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun CcSecurityScreen(s: CcUiState, ui: CcUi) {
   val panel = remember(s.entitiesVersion, s.settings) { s.alarm }
-  val side = remember(s.entitiesVersion, s.settings) { CcSecurity.side(s.people, s.entities.values, ::ccTime) }
+  val side = remember(s.entitiesVersion, s.settings) { CcSecurity.side(s.people, s.entities.values, ::ccTime, s.alarm) }
   val reason = s.connection.disabledReason
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     Column(Modifier.weight(MAIN_WEIGHT).fillMaxHeight().ccCard().padding(36.dp),

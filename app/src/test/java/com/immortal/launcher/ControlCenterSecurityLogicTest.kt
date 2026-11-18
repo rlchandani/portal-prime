@@ -118,4 +118,25 @@ class ControlCenterSecurityLogicTest {
     assertEquals(listOf("Windows"), side.checks.map { it.title })
     assertEquals(side, CcSecurity.side(people, ents, time))
   }
+
+  @Test fun readiness_followsTheAlarmState() {
+    fun r(state: String, vararg attrs: Pair<String, Any?>, open: Int = 0) = CcSecurity.readiness(e("alarm_control_panel.home", state, *attrs), open)
+    assertEquals(CcReadiness("Armed · Away", "The whole house is watched.", CcRingTone.ARMED), r("armed_away"))
+    assertEquals(CcReadiness("Armed · Home", "Doors and windows are watched · motion is ignored.", CcRingTone.ARMED), r("armed_home"))
+    assertEquals(CcReadiness("Armed · Night", "Doors and windows are watched · motion is ignored.", CcRingTone.ARMED), r("armed_night"))
+    assertEquals(CcReadiness("Arming Away", "Exit delay running · leave now.", CcRingTone.ARMING), r("arming", "next_state" to "armed_away"))
+    assertEquals(CcReadiness("Arming", "Exit delay running · leave now.", CcRingTone.ARMING), r("arming"))
+    assertEquals(CcReadiness("Entry delay", "Enter the PIN to stop the alarm.", CcRingTone.ALERT), r("pending"))
+    assertEquals(CcReadiness("Triggered!", "The alarm is sounding · disarm with the PIN.", CcRingTone.ALERT), r("triggered"))
+    assertEquals(CcReadiness("Ready to arm.", null, CcRingTone.OFF), r("disarmed"))
+    assertEquals(CcReadiness(CcSecurity.note(2), null, CcRingTone.OFF), r("disarmed", open = 2))
+    assertEquals("Alarm unavailable", r("unavailable").title)
+    assertEquals(CcReadiness("Ready to arm.", null, CcRingTone.OFF), CcSecurity.readiness(null, 0))
+  }
+
+  @Test fun side_armedPanelNeverSaysReadyToArm() {
+    val side = CcSecurity.side(emptyList(), emptyList(), time, e("alarm_control_panel.home", "armed_away"))
+    assertEquals("Armed · Away", side.readiness.title)
+    assertEquals("Ready to arm.", CcSecurity.side(emptyList(), emptyList(), time).readiness.title)
+  }
 }

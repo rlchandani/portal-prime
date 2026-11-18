@@ -57,8 +57,17 @@ internal fun CcSecuritySide(side: CcSecuritySideSlice, modifier: Modifier) {
     }
     Row(Modifier.fillMaxWidth().ccCard().padding(horizontal = 28.dp, vertical = 20.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-      CcIcon(if (open > 0) "warn" else "check", if (open > 0) c.text else c.green, 26.dp)
-      Text(CcSecurity.note(open), color = c.text, fontSize = 20.sp)
+      val ready = side.readiness
+      when (ready.tone) {
+        CcRingTone.OFF -> CcIcon(if (open > 0 || ready.line != null) "warn" else "check", if (open > 0 || ready.line != null) c.text else c.green, 26.dp)
+        CcRingTone.ARMED -> CcIcon("shield", c.green, 26.dp)
+        CcRingTone.ARMING -> CcIcon("shield", c.amber, 26.dp)
+        CcRingTone.ALERT -> CcIcon("warn", c.red, 26.dp)
+      }
+      Column(Modifier.weight(1f)) {
+        Text(ready.title, color = c.text, fontSize = 20.sp, fontWeight = if (ready.line != null) FontWeight.Bold else null)
+        ready.line?.let { Text(it, color = c.sec, fontSize = 18.sp) }
+      }
     }
   }
 }

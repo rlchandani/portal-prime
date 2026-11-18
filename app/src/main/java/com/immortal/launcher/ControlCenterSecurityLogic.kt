@@ -17,9 +17,14 @@ internal data class CcCheck(val icon: String, val title: String, val detail: Str
 @Immutable
 internal data class CcPersonItem(val id: String, val name: String, val index: Int, val home: Boolean, val line: String)
 
+/** The readiness card: "Armed · Away" and a short [line] under it (null = one line, e.g. "Ready to arm."). */
+@Immutable
+internal data class CcReadiness(val title: String, val line: String?, val tone: CcRingTone)
+
 /** The side column's slice: equal (and skipped) while nothing it shows changed. */
 @Immutable
-internal data class CcSecuritySideSlice(val people: List<CcPersonItem>, val checks: List<CcCheck>, val open: Int)
+internal data class CcSecuritySideSlice(val people: List<CcPersonItem>, val checks: List<CcCheck>, val open: Int,
+    val readiness: CcReadiness = CcReadiness(CcSecurity.note(open), null, CcRingTone.OFF))
 
 /** How the big ring looks. */
 internal enum class CcRingTone { OFF, ARMED, ARMING, ALERT }
@@ -151,9 +156,26 @@ internal object CcSecurity {
     return CcCheck("motion", "Motion", "$what · ignored in Home & Night", null, null)
   }
 
-  fun side(people: List<CcEntity>, entities: Collection<CcEntity>, time: (Long) -> String): CcSecuritySideSlice =
-      CcSecuritySideSlice(people.mapIndexed { i, p -> CcPersonItem(p.id, p.name, i, isHome(p), personLine(p)) },
-          checklist(entities, time), openCount(entities))
+  fun side(people: List<CcEntity>, entities: Collection<CcEntity>, time: (Long) -> String, panel: CcEntity? = null): CcSecuritySideSlice {
+    val open = openCount(entities)
+    return CcSecuritySideSlice(people.mapIndexed { i, p -> CcPersonItem(p.id, p.name, i, isHome(p), personLine(p)) },
+        checklist(entities, time), open, readiness(panel, open))
+  }
+
+  /** The readiness card, from the alarm_control_panel state; disarmed (or no panel) says what arming will ask about. */
+  fun readiness(panel: CcEntity?, open: Int): CcReadiness {
+    if (panel == null || panel.state == "disarmed") return CcReadiness(note(open), null, CcRingTone.OFF)
+    if (panel.unavailable) return CcReadiness("Alarm unavailable", "Home Assistant can't reach the alarm panel.", CcRingTone.OFF)
+    val line = when (panel.state) {
+      "armed_away", "armed_vacation" -> "The whole house is watched."
+      "armed_home", "armed_night" -> "Doors and windows are watched · motion is ignored."
+      "arming" -> "Exit delay running · leave now."
+      "pending" -> "Enter the PIN to stop the alarm."
+      "triggered" -> "The alarm is sounding · disarm with the PIN."
+      else -> null
+    }
+    return CcReadiness(title(panel), line, tone(panel.state))
+  }
 
   /** Things still open that arming will ask about (doors, windows, garage). */
   fun openCount(entities: Collection<CcEntity>): Int = entities.count { e ->
