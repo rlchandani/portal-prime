@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -14,6 +15,7 @@ import org.json.JSONObject
  * Built only by [CcCalls]; sent by the runtime over the websocket (`call_service`). [data] values
  * are JSON-safe (numbers, strings, booleans, lists of numbers).
  */
+@Immutable
 internal data class CcCall(
     val domain: String,
     val service: String,
@@ -30,6 +32,7 @@ internal data class CcCall(
 }
 
 /** Fields the UI overrides while a call is in flight; null = leave as HA says. */
+@Immutable
 internal data class CcOptimistic(
     val state: String? = null,
     val brightnessPct: Int? = null,

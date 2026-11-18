@@ -122,6 +122,7 @@ internal fun CcHeader(s: CcUiState, title: String, subtitle: String, ui: CcUi, o
             .joinToString(" · "), color = c.text, fontSize = 22.sp)
       }
     }
+    s.debug?.let { label -> CcPill { CcIcon("warn", c.amber, 26.dp); Text(label, color = c.amber, fontSize = 22.sp) } }
     CcLivePill(s)
     Row(Modifier.height(72.dp).shadow(14.dp, CcStyle.Pill, ambientColor = CcStyle.Ember, spotColor = CcStyle.Ember)
         .clip(CcStyle.Pill).background(CcStyle.JarvisBrush).clickable(role = Role.Button, onClick = onJarvis)

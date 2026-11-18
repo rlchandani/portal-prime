@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import android.content.Context
 import java.security.MessageDigest
 import java.security.SecureRandom
@@ -32,6 +33,7 @@ internal object ControlCenterConfig {
   private const val HEX_RADIX = 16
   private const val BYTE_MASK = 0xff
 
+  @Immutable
   data class Settings(
       val portalMode: String = MODE_FULL,
       val kidsHideLocks: Boolean = true,

@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import kotlin.math.ln
 import kotlin.math.pow
 
@@ -14,10 +15,13 @@ import kotlin.math.pow
  * light's real colour and brightness at its position), temperature, open things, motion, locks and
  * power. The canvas only draws these; it never reads entities itself.
  */
+@Immutable
 internal data class CcGlow(val entityId: String, val fx: Float, val fy: Float, val rgb: Int, val strength: Float)
 
+@Immutable
 internal data class CcMarker(val entityId: String, val fx: Float, val fy: Float, val kind: CcKind, val active: Boolean)
 
+@Immutable
 internal data class CcRoomView(
     val room: CcRoom,
     val lightsOn: Int,

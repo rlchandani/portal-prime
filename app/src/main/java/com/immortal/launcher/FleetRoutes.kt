@@ -378,6 +378,12 @@ class FleetRoutes(private val context: Context) {
         val opened = runCatching { context.startActivity(intent) }.isSuccess
         resp(200, JSONObject().put("ok", opened).put("action", "open_control_center"))
       }
+      // Control Center test switches (operator only): {"dryRun":true|false, "testPlan":"load"|"clear"}.
+      "cc_debug" -> {
+        val dry = if (body.has("dryRun")) body.optBoolean("dryRun") else null
+        val plan = body.optString("testPlan").takeIf { it == "load" || it == "clear" }
+        resp(200, JSONObject().put("ok", true).put("action", "cc_debug").put("result", ControlCenter.debug(context, dry, plan)))
+      }
       // Needs the signature/privileged REBOOT permission we don't hold — report honestly.
       "reboot" -> resp(200, JSONObject().put("ok", false).put("action", "reboot").put("result", "not_permitted"))
       else -> resp(400, err("unknown_action"))

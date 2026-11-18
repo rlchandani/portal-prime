@@ -239,3 +239,12 @@ dependencies {
   // passed through to setters, so a mock that's never dereferenced is enough.
   testImplementation("org.mockito:mockito-core:5.11.0")
 }
+
+// Compose stability/skippability reports on demand (`-PcomposeReports=true`): writes
+// build/compose-reports/*-classes.txt and *-composables.txt. Off for normal builds.
+if (providers.gradleProperty("composeReports").orNull == "true") {
+  composeCompiler {
+    reportsDestination.set(layout.buildDirectory.dir("compose-reports"))
+    metricsDestination.set(layout.buildDirectory.dir("compose-reports"))
+  }
+}

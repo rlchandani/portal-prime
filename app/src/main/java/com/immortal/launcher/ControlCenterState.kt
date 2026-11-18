@@ -6,11 +6,13 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 /**
  * Everything a Control Center screen renders, as one immutable snapshot published by
  * [ControlCenter.state] (at most a few times a second). Screens derive rooms/alerts/energy from
  * it with the pure helpers ([CcRooms], [CcAlerts], [CcEnergy]); they never mutate it.
  */
+@Immutable
 internal data class CcUiState(
     val connection: CcConnection = CcConnection(),
     /** HA state with optimistic overrides applied. */
@@ -32,7 +34,31 @@ internal data class CcUiState(
     val dismissed: Map<String, Long> = emptyMap(),
     val sceneRun: CcSceneRun? = null,
     val now: Long = 0L,
+    /** Bumped by the engine whenever [entities] or [pending] change; equality uses it instead of the map. */
+    val entitiesVersion: Long = 0L,
+    /** "Dry run · Test plan" while operator test switches are on (see [CcDebugStore]); null normally. */
+    val debug: String? = null,
 ) {
+  /**
+   * Cheap equality for Compose skipping: the entity map is compared by [entitiesVersion] (the
+   * engine reuses the same map instance until it changes) and [now] only to the minute, so a
+   * snapshot that changed nothing a screen shows compares equal and its readers skip.
+   */
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is CcUiState) return false
+    return entitiesVersion == other.entitiesVersion && minute == other.minute && connection == other.connection &&
+        registry === other.registry && plan == other.plan && planSource == other.planSource && settings == other.settings &&
+        toast == other.toast && energyPrefs == other.energyPrefs && energyToday == other.energyToday &&
+        energyWeek == other.energyWeek && appliancesDone == other.appliancesDone && dismissed == other.dismissed &&
+        sceneRun == other.sceneRun && debug == other.debug
+  }
+
+  override fun hashCode(): Int = (entitiesVersion * HASH_PRIME + minute).hashCode()
+
+  /** [now] to the minute — what durations ("open 17 min") and the clock line need. */
+  val minute: Long get() = now / MS_PER_MINUTE
+
   val ready: Boolean get() = plan != null && (entities.isNotEmpty() || connection.phase != CcPhase.CONNECTING)
 
   fun entity(id: String): CcEntity? = entities[id]
@@ -70,15 +96,20 @@ internal data class CcUiState(
         entities.values.firstOrNull { it.domain == "weather" }?.attrs?.get("temperature_unit")?.toString()?.contains("F") == true
 }
 
+private const val MS_PER_MINUTE = 60_000L
+private const val HASH_PRIME = 31L
+
 internal enum class CcPlanSource { NONE, HOME_ASSISTANT, THIS_PORTAL }
 
 /** A short message at the bottom of the screen; [undo] offers the 5 s Undo. */
+@Immutable
 internal data class CcToast(val id: Long, val text: String, val undo: Boolean = false, val error: Boolean = false)
 
 /**
  * A scene being walked through the house: a soft light visits [rooms] in order over [durationMs]
  * (~10 s), so the household can watch it work. [open] lists what was still open at the start.
  */
+@Immutable
 internal data class CcSceneRun(
     val sceneId: String,
     val name: String,

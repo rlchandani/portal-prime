@@ -83,6 +83,13 @@ internal object ControlCenter {
     if (!send(context, CcCalls.alarm(panel, mode, code), undoable = false, onResult = delivered)) delivered(false, null)
   }
 
+  /** Fleet `cc_debug` (operator only): dry run on/off, `load`/`clear` the local test plan. Blocks briefly. */
+  fun debug(context: Context, dryRun: Boolean?, testPlan: String?): String {
+    val e = engine(context)
+    return runCatching { e.exec.submit<String> { e.debug(dryRun, testPlan) }.get(DEBUG_WAIT_S, java.util.concurrent.TimeUnit.SECONDS) }
+        .getOrElse { "timeout" }
+  }
+
   fun savePlan(context: Context, plan: CcPlan) { val e = engine(context); e.post { e.savePlan(plan) } }
 
   fun dismissAlert(context: Context, alert: CcAlert, untilMs: Long) {
@@ -107,6 +114,7 @@ internal object ControlCenter {
     return (0 until DAYS).map { d -> (c.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, d) }.timeInMillis }
   }
 
+  private const val DEBUG_WAIT_S = 5L
   private const val HOURS = 24
   private const val DAYS = 7
   const val TAG = CcEngine.TAG
@@ -121,6 +129,7 @@ internal fun CcEngine.toast(text: String, undo: Boolean = false, error: Boolean 
 internal fun CcEngine.dispatch(call: CcCall, undoable: Boolean, onResult: ((Boolean, String?) -> Unit)?) {
   val ws = socket; val p = protocol
   if (ws == null || p == null || !ui.connection.canControl) { toast(ui.connection.disabledReason ?: "Not connected", error = true); onResult?.invoke(false, null); return }
+  if (dryRun) { dryRunCall(call, onResult); return }
   val key = "c${++callSeq}"
   val before = call.entityId?.let { live.raw[it] }
   calls[key] = CcCallInfo(call, before, undoable, onResult)
@@ -178,11 +187,16 @@ internal fun CcEngine.startWalk(scene: CcEntity) {
 
 internal fun CcEngine.savePlan(plan: CcPlan) {
   val stamped = plan.copy(updatedAt = clock())
+  if (testPlan != null) {
+    // Test plan: local only, never Home Assistant.
+    testPlan = stamped; CcDebugStore.saveTestPlan(app, stamped)
+    ui = ui.copy(plan = stamped, planSource = CcPlanSource.THIS_PORTAL)
+    toast("Test plan saved on this Portal only")
+    publish(); ensure(); return
+  }
   CcPlanStore.save(app, stamped)
   ui = ui.copy(plan = stamped, planSource = CcPlanSource.THIS_PORTAL)
-  val ws = socket; val p = protocol
-  if (ws != null && p != null && CcPlanJson.fits(stamped)) ws.send(p.setPlan(CcPlanJson.encode(stamped)).text)
-  else toast("Saved on this Portal. It will copy to Home Assistant when connected.")
+  if (!sendPlanToHa(stamped)) toast("Saved on this Portal. It will copy to Home Assistant when connected.")
   publish()
   ensure()
 }

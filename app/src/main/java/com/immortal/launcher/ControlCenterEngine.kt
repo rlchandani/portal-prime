@@ -31,6 +31,7 @@ internal class CcEngine(val app: Context) {
   val flow = MutableStateFlow(CcUiState(settings = ControlCenterConfig.load(app)))
   var ui: CcUiState = flow.value
   var live = CcLive()
+  private var publishedLive: CcLive? = null
   var protocol: CcProtocol? = null
   var socket: WebSocket? = null
   var generation = 0L
@@ -49,11 +50,29 @@ internal class CcEngine(val app: Context) {
   var toastSeq = 0L
   var lastUndo: CcCall? = null
   var seenAlerts: Set<String>? = null
+  /** Operator test switches (Fleet `cc_debug`); see [CcDebugStore]. */
+  var dryRun = CcDebugStore.dryRun(app)
+  var testPlan: CcPlan? = CcDebugStore.testPlan(app)
   @Volatile var clock: () -> Long = System::currentTimeMillis
 
   private val client by lazy { OkHttpClient.Builder().readTimeout(0, TimeUnit.MILLISECONDS).connectTimeout(CONNECT_S, TimeUnit.SECONDS).build() }
 
   val wantSocket: Boolean get() = visible > 0 || (ui.settings.bannersListen && HaConfig.isConfigured(app))
+
+  init {
+    ui = ui.copy(debug = CcTestPlan.label(dryRun, testPlan != null))
+    flow.value = ui
+  }
+
+  /** The only path that writes the plan to Home Assistant; never while a test plan or dry run is on. */
+  fun sendPlanToHa(plan: CcPlan): Boolean {
+    if (testPlan != null || dryRun) return false
+    val ws = socket ?: return false
+    val p = protocol ?: return false
+    if (!CcPlanJson.fits(plan)) return false
+    ws.send(p.setPlan(CcPlanJson.encode(plan)).text)
+    return true
+  }
 
   fun post(block: () -> Unit) = exec.execute { runCatching(block).onFailure { Log.w(TAG, "control center task failed", it) } }
 
@@ -201,9 +220,11 @@ internal class CcEngine(val app: Context) {
     val local = CcPlanStore.load(app)
     val chosen = CcPlanStore.newest(ha, local)
     val source = when { chosen == null -> CcPlanSource.NONE; chosen === ha -> CcPlanSource.HOME_ASSISTANT; else -> CcPlanSource.THIS_PORTAL }
-    if (chosen != null && chosen === local && CcPlanJson.fits(chosen)) ws.send(p.setPlan(CcPlanJson.encode(chosen)).text)
+    if (chosen != null && chosen === local) sendPlanToHa(chosen)
     if (chosen === ha && ha != null) CcPlanStore.save(app, ha)
-    ui = ui.copy(plan = chosen ?: CcPlan.EMPTY, planSource = source)
+    val test = testPlan
+    ui = if (test != null) ui.copy(plan = test, planSource = CcPlanSource.THIS_PORTAL)
+    else ui.copy(plan = chosen ?: CcPlan.EMPTY, planSource = source)
     planResolved = true
     if (parts.size == REGISTRY_PARTS) subscribe(ws, p)
     publish()
@@ -242,7 +263,7 @@ internal class CcEngine(val app: Context) {
     publish()
   }
 
-  /** Coalesces websocket bursts into at most [FLUSH_HZ] UI updates a second. */
+  /** Coalesces websocket bursts: the UI sees at most one update per [FLUSH_MS]. */
   fun scheduleFlush() {
     if (flushQueued) return
     flushQueued = true
@@ -250,7 +271,12 @@ internal class CcEngine(val app: Context) {
   }
 
   fun publish(alertsToo: Boolean = false) {
-    ui = ui.copy(entities = live.view(), pending = live.pending.keys, appliancesDone = live.done, now = clock())
+    // Reuse the same entity map until the live state actually changes, so Compose readers skip.
+    if (live !== publishedLive) {
+      publishedLive = live
+      ui = ui.copy(entities = live.view(), pending = live.pending.keys, appliancesDone = live.done, entitiesVersion = ui.entitiesVersion + 1)
+    }
+    ui = ui.copy(now = clock())
     flow.value = ui
     if (alertsToo && ui.connection.phase == CcPhase.LIVE) presentNewAlerts()
   }
@@ -270,8 +296,8 @@ internal class CcEngine(val app: Context) {
     const val PING_S = 30L
     const val PONG_TIMEOUT_MS = 10_000L
     private const val REGISTRY_PARTS = 4
-    const val FLUSH_HZ = 4
-    const val FLUSH_MS = 1000L / FLUSH_HZ
+    /** Websocket bursts are batched for this long before the UI sees them (~10 updates/s max). */
+    const val FLUSH_MS = 100L
   }
 }
 

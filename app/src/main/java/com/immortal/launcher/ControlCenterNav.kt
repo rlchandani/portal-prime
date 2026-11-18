@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -34,6 +35,7 @@ internal sealed interface CcModal {
 }
 
 /** Screen-local navigation (immutable; replaced, never mutated). */
+@Immutable
 internal data class CcNav(
     val screen: CcScreen = CcScreen.MAP,
     val floorId: String? = null,

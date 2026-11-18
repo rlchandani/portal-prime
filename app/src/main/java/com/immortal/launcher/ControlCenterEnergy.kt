@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -15,6 +16,7 @@ import org.json.JSONObject
  * statistics (`recorder/statistics_during_period`, `change` per hour/day). Anything the house
  * doesn't have stays null so the screen can say so instead of inventing numbers.
  */
+@Immutable
 internal data class CcEnergyNow(
     val homeW: Double?,
     val solarW: Double?,
@@ -29,9 +31,11 @@ internal data class CcEnergyNow(
   val hasFlow: Boolean get() = listOf(homeW, solarW, gridW, batteryW).count { it != null } >= 1
 }
 
+@Immutable
 internal data class CcConsumer(val entityId: String, val name: String, val watts: Double)
 
 /** The stat ids HA's energy dashboard is set up with. */
+@Immutable
 internal data class CcEnergyPrefs(
     val gridIn: List<String> = emptyList(),
     val gridOut: List<String> = emptyList(),
@@ -46,6 +50,7 @@ internal data class CcEnergyPrefs(
 }
 
 /** Per-bucket kWh: [use] is what the home consumed, [solar] what the panels made. */
+@Immutable
 internal data class CcEnergySeries(val starts: List<Long>, val use: List<Double>, val solar: List<Double>, val gridIn: List<Double>, val cost: Double?) {
   val usedTotal: Double get() = use.sum()
   val solarTotal: Double get() = solar.sum()

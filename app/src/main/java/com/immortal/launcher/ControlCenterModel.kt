@@ -6,12 +6,14 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 /**
  * Home Control Center data model: immutable snapshots of Home Assistant entities as the plan,
  * room sheet and policies read them. Built by [CcEntityParser] from either a full HA state object
  * or the compressed `subscribe_entities` form; [attrs] keeps the raw attributes so a later
  * compressed diff can be applied without a fresh snapshot.
  */
+@Immutable
 internal data class CcEntity(
     val id: String,
     val state: String,
@@ -159,6 +161,7 @@ internal val CcKind.controllable: Boolean
 /** Connection to Home Assistant as the screens show it (see the mock's States group). */
 internal enum class CcPhase { NOT_CONFIGURED, CONNECTING, LIVE, STALE, UNREACHABLE, AUTH_FAILED, OFFLINE }
 
+@Immutable
 internal data class CcConnection(
     val phase: CcPhase = CcPhase.CONNECTING,
     /** Honest progress while connecting, e.g. "Loading rooms". */
@@ -184,6 +187,7 @@ internal data class CcConnection(
 }
 
 /** HA's floor/area/device/entity registries reduced to what the plan needs. */
+@Immutable
 internal data class CcRegistry(
     val floors: List<CcHaFloor> = emptyList(),
     val areas: List<CcHaArea> = emptyList(),
@@ -198,5 +202,7 @@ internal data class CcRegistry(
   fun areasOn(floorId: String?): List<CcHaArea> = areas.filter { it.floorId == floorId }
 }
 
+@Immutable
 internal data class CcHaFloor(val id: String, val name: String, val level: Int?)
+@Immutable
 internal data class CcHaArea(val id: String, val name: String, val floorId: String?)

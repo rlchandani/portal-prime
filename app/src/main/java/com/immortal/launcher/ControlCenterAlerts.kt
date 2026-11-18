@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 /**
  * Alerts from live Home Assistant state (pure, unit tested). Three severities, as in the mock:
  * critical (leak, smoke, gas, CO) take over every Portal; warnings (garage/door/window left open)
@@ -15,6 +16,7 @@ internal enum class CcSeverity { CRITICAL, WARNING, INFO }
 
 internal enum class CcAlertAction { CLOSE, SHUT_WATER, VIEW, DISMISS, SNOOZE, REMIND }
 
+@Immutable
 internal data class CcAlert(
     /** Stable per occurrence: entity + when it started, so a new leak is a new alert. */
     val id: String,

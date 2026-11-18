@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.Immutable
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -15,6 +16,7 @@ import org.json.JSONObject
  * device positions inside a room. Stored as JSON in HA's frontend user data (shared by every
  * Portal on the same HA user) and cached on each Portal ([CcPlanStore]). Pure + immutable.
  */
+@Immutable
 internal data class CcPlan(val floors: List<CcFloor>, val updatedAt: Long = 0L) {
   val isEmpty: Boolean get() = floors.all { it.rooms.isEmpty() }
   fun floor(id: String?): CcFloor? = floors.firstOrNull { it.id == id } ?: floors.firstOrNull()
@@ -34,6 +36,7 @@ internal data class CcPlan(val floors: List<CcFloor>, val updatedAt: Long = 0L) 
   }
 }
 
+@Immutable
 internal data class CcFloor(
     val id: String,
     val name: String,
@@ -41,6 +44,7 @@ internal data class CcFloor(
     val openings: List<CcOpening> = emptyList(),
 )
 
+@Immutable
 internal data class CcRoom(
     /** The HA area id (rooms without an area use a local "room_<n>" id). */
     val id: String,
@@ -52,6 +56,7 @@ internal data class CcRoom(
 )
 
 /** Grid cells; always at least 1×1 and inside the floor. */
+@Immutable
 internal data class CcRect(val x: Int, val y: Int, val w: Int, val h: Int) {
   val right: Int get() = x + w
   val bottom: Int get() = y + h
@@ -66,11 +71,13 @@ internal data class CcRect(val x: Int, val y: Int, val w: Int, val h: Int) {
 }
 
 /** A device inside a room at a fractional position (0..1 on each axis of the room box). */
+@Immutable
 internal data class CcPlaced(val entityId: String, val fx: Float, val fy: Float)
 
 internal enum class CcSide { N, E, S, W }
 
 /** A door/window/garage opening sitting on one wall of [roomId]; [at] and [span] are 0..1 of that wall. */
+@Immutable
 internal data class CcOpening(val entityId: String, val roomId: String, val side: CcSide, val at: Float, val span: Float)
 
 /** JSON round trip for the plan; tolerant on read (bad rooms dropped, values clamped). */
