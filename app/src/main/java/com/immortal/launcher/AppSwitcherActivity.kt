@@ -277,7 +277,8 @@ private fun ApprovedAppsContent(
   val installedIds = remember(ordered) { ordered.map { it.component.flattenToString() } }
   val packageName = context.packageName
   val builtinIds = remember(packageName) {
-    listOf(StoreActivity::class.java, ToolsActivity::class.java, WebAppActivity::class.java, ImmortalSettingsActivity::class.java, HomeDashboardActivity::class.java)
+    listOf(StoreActivity::class.java, ToolsActivity::class.java, WebAppActivity::class.java, ImmortalSettingsActivity::class.java, HomeDashboardActivity::class.java,
+        ControlCenterActivity::class.java)
         .map { ComponentName(packageName, it.name).flattenToString() } + ComponentName("com.immortal.launcher", "__immortal_calls_bridge__").flattenToString()
   }
   val favoriteKeys = remember(order, installedIds, builtinIds) {
@@ -306,11 +307,8 @@ private fun ApprovedAppsContent(
   val tiles = remember(shown, folderNames, allApps != null, recent, folder, query, shortcutIcons) {
     val hasQuery = query.isNotBlank()
     val includeDestinations = hasQuery || (!recent && folder == null)
-    val builtins = if (allApps != null && includeDestinations) {
-      (listOf("store" to "App Store", "music" to "Music", "calls" to "Calls", "settings" to "Settings") +
-          if ("dashboard" in shortcutIcons) listOf("dashboard" to "Home dashboard") else emptyList())
-          .filter { !hasQuery || it.second.contains(query.trim(), ignoreCase = true) }
-    } else emptyList()
+    val builtins = if (allApps != null && includeDestinations) ApprovedAppsBuiltins.tiles(shortcutIcons.keys, query)
+    else emptyList()
     val otherFolders = if (allApps != null && includeDestinations) {
       folderNames.filter { name ->
         if (hasQuery) "$name folder".contains(query.trim(), ignoreCase = true) else name != "Settings"
@@ -549,6 +547,7 @@ private fun launchApprovedBuiltin(context: Context, id: String) {
     "music" -> launchApprovedIntent(context, Intent(context, HomeActivity::class.java)
         .putExtra(APPROVED_HOME_MUSIC, true))
     "dashboard" -> HomeDashboardActivity.openDashboard(context)
+    ApprovedAppsBuiltins.CONTROL -> launchApprovedIntent(context, ControlCenterActivity.intent(context))
     "calls" -> PortalHomeBridge.launch(context)
   }
 }

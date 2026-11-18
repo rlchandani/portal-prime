@@ -74,7 +74,8 @@ internal object RemoteLayoutPolicy {
       value.startsWith("app:") -> homeId(value.removePrefix("app:"))
       value.startsWith("folder:") -> value.removePrefix("folder:").let { it.isNotBlank() && it.text(48) }
       value.startsWith("widget-tile:") -> value.removePrefix("widget-tile:") in widgetKeys
-      else -> value in setOf("builtin:calls", "builtin:store", "builtin:tools", "builtin:music", "builtin:settings", "builtin:dashboard")
+      else -> value in setOf("builtin:calls", "builtin:store", "builtin:tools", "builtin:music", "builtin:settings", "builtin:dashboard",
+          "builtin:control")
     }
     for (field in listOf("homeOrder", "gridOrder", "gridSlots")) {
       val arr = layout.optJSONArray(field)

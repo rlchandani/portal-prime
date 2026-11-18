@@ -72,7 +72,8 @@ internal val SettingsActivityDestinations: Map<String, Class<*>> = mapOf(
     "calendar-url" to CalendarUrlEntryActivity::class.java,
     "lamp" to LampActivity::class.java,
     "ha-entities" to HaSettingsActivity::class.java,
-    "ha-dashboard" to HaDashboardActivity::class.java,
+    // The Home Control Center supersedes the classic dashboard (still reachable from HA settings).
+    "ha-dashboard" to ControlCenterActivity::class.java,
     "apk" to ApkBrowserActivity::class.java,
     "help" to HelpActivity::class.java,
 )

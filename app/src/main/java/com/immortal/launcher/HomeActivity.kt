@@ -296,12 +296,14 @@ internal fun approvedShortcutIcons(context: Context, inventory: List<AppEntry>):
   val store = ComponentName(context, StoreActivity::class.java)
   val music = ComponentName(context, WebAppActivity::class.java)
   val dashboard = ComponentName(context, HomeDashboardActivity::class.java)
+  val control = ComponentName(context, ControlCenterActivity::class.java)
   val settings = ComponentName(context, ImmortalSettingsActivity::class.java)
   return inventory.mapNotNull { app ->
     val key = when (app.component) {
       store -> "store"
       music -> "music"
       dashboard -> "dashboard"
+      control -> ApprovedAppsBuiltins.CONTROL
       settings -> "settings"
       CALLS_COMPONENT -> "calls"
       else -> null
@@ -406,6 +408,9 @@ class HomeActivity : ComponentActivity() {
                   launcherTab = ApprovedLauncherTab.TOOLS
                 } else if (cn == ComponentName(this@HomeActivity, HomeDashboardActivity::class.java)) {
                   HomeDashboardActivity.openDashboard(this@HomeActivity)
+                } else if (cn.packageName == packageName &&
+                    cn.className == ControlCenterActivity::class.java.name) {
+                  startActivity(ControlCenterActivity.intent(this@HomeActivity))
                 } else if (cn.packageName == packageName &&
                     cn.className == WebAppActivity::class.java.name) {
                   // Music stays inside the retained Home host; no separate Activity/theme.
@@ -4290,18 +4295,23 @@ private fun expiryShort(iso: String): String =
 private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var dashboardConfigured by remember { mutableStateOf(HomeDashboardConfig.configured(context)) }
-  OnResume { dashboardConfigured = HomeDashboardConfig.configured(context) }
+  var target by remember { mutableStateOf(haWidgetTarget(context)) }
+  OnResume {
+    dashboardConfigured = HomeDashboardConfig.configured(context)
+    target = haWidgetTarget(context)
+  }
+  val controlCenter = target == HomeRefinements.HaWidgetTarget.CONTROL_CENTER
+  val openControlCenter: () -> Unit = { ControlCenterActivity.open(context) }
   if (dashboardConfigured) {
+    val openHome: () -> Unit = if (controlCenter) openControlCenter else { { HomeDashboardActivity.openDashboard(context) } }
     ImmortalWidgetShell(title = "Home Assistant", openPage = "ha", modifier = modifier,
-        onOpen = { HomeDashboardActivity.openDashboard(context) }, duplicatesBodyAction = true) {
+        onOpen = openHome, duplicatesBodyAction = true) {
       Text("Your home dashboard", color = ApprovedHomePalette.Text, fontSize = 26.sp,
           lineHeight = 34.sp, fontWeight = FontWeight.Medium)
       Text("Open your rooms, devices and scenes.", color = ApprovedHomePalette.Secondary,
           fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 14.dp))
       Spacer(Modifier.height(22.dp))
-      ApprovedHomePillButton("Open dashboard", onClick = {
-        HomeDashboardActivity.openDashboard(context)
-      })
+      ApprovedHomePillButton(if (controlCenter) "Open Home Control" else "Open dashboard", onClick = openHome)
     }
     return
   }
@@ -4328,8 +4338,8 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
       }
   val open: () -> Unit = { context.openApprovedHomeSettings("ha") }
   val openDashboard: () -> Unit = { context.openApprovedHomeSettings("ha-dashboard") }
-  ImmortalWidgetShell(title = "Home Assistant", openPage = "ha",
-      modifier = modifier.tvFocusableRow { open() }) {
+  ImmortalWidgetShell(title = "Home Assistant", openPage = "ha", onOpen = if (controlCenter) openControlCenter else null,
+      modifier = modifier.tvFocusableRow { if (controlCenter) openControlCenter() else open() }) {
     when {
       !configured -> {
         Text("Connect your home", color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 34.sp)
@@ -4384,6 +4394,11 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
     }
   }
 }
+
+/** [HomeRefinements.haWidgetTarget] from the saved Home Assistant, Portal-mode and dashboard settings. */
+private fun haWidgetTarget(context: Context): HomeRefinements.HaWidgetTarget =
+    HomeRefinements.haWidgetTarget(HaConfig.isConfigured(context), ControlCenterConfig.load(context).bannersOnly,
+        HomeDashboardConfig.configured(context))
 
 /**
  * One HA control tile: name + status line. Toggle entities show On/Off (dimmed while unknown);
@@ -5046,6 +5061,18 @@ private fun loadApps(context: Context): List<AppEntry> {
               label = "Home dashboard",
               component = ComponentName(context, HomeDashboardActivity::class.java),
               icon = dashboardIcon,
+          )
+        }
+        // "Home Control" — the Control Center — once Home Assistant is connected (not on
+        // banners-only Portals, which keep alerts but no app).
+        if (HaConfig.isConfigured(context) && !ControlCenterConfig.load(context).bannersOnly) {
+          val controlIcon = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.icon_ha_tile)
+              ?.let { IconRenderer.renderAppIcon(context, it, 144).asImageBitmap() }
+          if (controlIcon != null) out = out + AppEntry(
+              label = "Home Control",
+              component = ComponentName(context.packageName, ControlCenterActivity::class.java.name),
+              icon = controlIcon,
+              uninstallable = false,
           )
         }
         if (musicIcon != null) {

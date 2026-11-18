@@ -29,6 +29,20 @@ internal object HomeRefinements {
     else -> HeaderAction.SETTINGS
   }
 
+  /** Where the Home Assistant widget's primary tap and open action go. */
+  enum class HaWidgetTarget { CONTROL_CENTER, WEB_DASHBOARD, SETTINGS }
+
+  /**
+   * The Home Assistant widget opens the Control Center once HA is connected — except on banners-only
+   * Portals, which have no Control Center app. Otherwise the web dashboard (if set), else Settings.
+   * The web dashboard stays reachable from Settings › Home Assistant and its launcher tile.
+   */
+  fun haWidgetTarget(haConfigured: Boolean, bannersOnly: Boolean, dashboardConfigured: Boolean): HaWidgetTarget = when {
+    haConfigured && !bannersOnly -> HaWidgetTarget.CONTROL_CENTER
+    dashboardConfigured -> HaWidgetTarget.WEB_DASHBOARD
+    else -> HaWidgetTarget.SETTINGS
+  }
+
   /** One labelled fact in Today's 2×2 grid. */
   data class TodayFact(val label: String, val value: String)
 

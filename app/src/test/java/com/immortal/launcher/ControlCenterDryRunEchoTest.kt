@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+package com.immortal.launcher
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+/** Dry run stands in for HA's echo, so a state change restarts the "since" clock like HA would. */
+class ControlCenterDryRunEchoTest {
+  private val closed = CcEntity("cover.garage", "closed", mapOf("device_class" to "garage"), lastChanged = 1_000L, userId = "u1")
+
+  @Test
+  fun stateChange_stampsLastChangedNow() {
+    val echo = dryRunEcho(closed, CcOptimistic(state = "open"), now = 9_000L)
+    assertEquals("open", echo.state)
+    assertEquals(9_000L, echo.lastChanged)
+    assertNull(echo.userId)
+  }
+
+  @Test
+  fun transitionalStates_settleLikeTheDeviceFinished() {
+    assertEquals("open", dryRunEcho(closed, CcOptimistic(state = "opening"), now = 9_000L).state)
+    val open = closed.copy(state = "open")
+    assertEquals("closed", dryRunEcho(open, CcOptimistic(state = "closing"), now = 9_000L).state)
+  }
+
+  @Test
+  fun attributeOnlyChange_keepsLastChanged() {
+    val on = CcEntity("light.desk", "on", mapOf("brightness" to 10), lastChanged = 1_000L)
+    val echo = dryRunEcho(on, CcOptimistic(brightnessPct = 50), now = 9_000L)
+    assertEquals(1_000L, echo.lastChanged)
+  }
+
+  @Test
+  fun alarmCalls_simulateThePanelState() {
+    val panel = CcEntity("alarm_control_panel.home", "disarmed")
+    assertEquals("armed_away", dryRunOptimistic(CcCalls.alarm(panel, CcAlarmMode.AWAY, null))?.state)
+    assertEquals("armed_home", dryRunOptimistic(CcCalls.alarm(panel, CcAlarmMode.HOME, null))?.state)
+    assertEquals("disarmed", dryRunOptimistic(CcCalls.alarm(panel, CcAlarmMode.DISARM, "1234"))?.state)
+  }
+
+  @Test
+  fun callsWithTheirOwnOptimisticState_keepIt() {
+    val light = CcEntity("light.desk", "off")
+    assertEquals("on", dryRunOptimistic(CcCalls.lightPower(light, true))?.state)
+  }
+}

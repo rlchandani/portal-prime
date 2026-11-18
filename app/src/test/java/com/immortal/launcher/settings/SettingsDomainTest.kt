@@ -602,6 +602,9 @@ class SettingsDomainTest {
             "BriefingConfig",
             // DoorbellSettings.domain (Settings › Home Assistant › Doorbell).
             "DoorbellConfig",
+            // ControlCenterSettings.domain (Settings › Home Assistant › Control Center); the kids PIN
+            // hash is a Portal-only secret, not a setting.
+            "ControlCenterConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",
             "FleetConfig",

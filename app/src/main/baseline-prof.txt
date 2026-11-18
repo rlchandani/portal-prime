@@ -67,3 +67,8 @@ HPLcom/immortal/launcher/ApprovedToolsUiKt;->**(**)**
 HPLcom/immortal/launcher/ApprovedToolsUiKt$**;->**(**)**
 HPLcom/immortal/launcher/ApprovedToolsCatalog;->**(**)**
 HPLcom/immortal/launcher/ApprovedToolsSummaries;->**(**)**
+# Home Control Center: every screen composes once per visit, so without these the first open
+# and first room sheet run interpreted (gfxinfo: "Slow UI thread" on the opening frames).
+HPLcom/immortal/launcher/ControlCenter*;->**(**)**
+HPLcom/immortal/launcher/Cc*;->**(**)**
+HPLcom/immortal/launcher/settings/ControlCenterSettings;->**(**)**

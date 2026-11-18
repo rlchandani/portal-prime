@@ -36,6 +36,8 @@ class ImmortalApp : Application() {
     SharedTimersFeature.install(this)
     ChoresFeature.install(this)
     DoorbellFeature.install(this)
+    // Home Control Center: background alert subscription for Portal-wide banners (if enabled).
+    ControlCenter.install(this)
     MusicHandoff.install(this)
     MusicShare.install()
     YtRemoteRoute.install()

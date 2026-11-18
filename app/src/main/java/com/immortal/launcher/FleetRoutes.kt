@@ -369,6 +369,23 @@ class FleetRoutes(private val context: Context) {
         identify()
         resp(200, ok().put("action", "identify"))
       }
+      // Opens the Home Control Center (optionally on a screen: map, cameras, energy, alerts,
+      // security, edit, settings) — for remote checks and on-device measurement.
+      "open_control_center" -> {
+        val intent = ControlCenterActivity.intent(context).putExtra(ControlCenterActivity.EXTRA_SCREEN, body.optString("screen", "map"))
+            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        val opened = runCatching { context.startActivity(intent) }.isSuccess
+        resp(200, JSONObject().put("ok", opened).put("action", "open_control_center"))
+      }
+      // Control Center test switches (operator only): {"dryRun":true|false, "testPlan":"load"|"clear", "haUnreachable":true|false}.
+      "cc_debug" -> {
+        val dry = if (body.has("dryRun")) body.optBoolean("dryRun") else null
+        val plan = body.optString("testPlan").takeIf { it == "load" || it == "clear" }
+        val alert = body.optString("testAlert").takeIf { it.matches(Regex("[a-z_]{1,32}")) }
+        val unreachable = if (body.has("haUnreachable")) body.optBoolean("haUnreachable") else null
+        resp(200, JSONObject().put("ok", true).put("action", "cc_debug").put("result", ControlCenter.debug(context, dry, plan, alert, unreachable)))
+      }
       // Needs the signature/privileged REBOOT permission we don't hold — report honestly.
       "reboot" -> resp(200, JSONObject().put("ok", false).put("action", "reboot").put("result", "not_permitted"))
       else -> resp(400, err("unknown_action"))

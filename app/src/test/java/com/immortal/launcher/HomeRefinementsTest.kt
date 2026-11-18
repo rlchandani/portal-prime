@@ -104,4 +104,23 @@ class HomeRefinementsTest {
     assertFalse(HomeRefinements.showsPageIndicator(1))
     assertTrue(HomeRefinements.showsPageIndicator(2))
   }
+
+  // --- Home Assistant widget (bug: "Open dashboard" opened the web dashboard, not Control Center) ---
+
+  @Test fun haWidget_opensControlCenterOnceHomeAssistantIsConnected() {
+    val cc = HomeRefinements.HaWidgetTarget.CONTROL_CENTER
+    assertEquals(cc, HomeRefinements.haWidgetTarget(haConfigured = true, bannersOnly = false, dashboardConfigured = true))
+    assertEquals(cc, HomeRefinements.haWidgetTarget(haConfigured = true, bannersOnly = false, dashboardConfigured = false))
+  }
+
+  @Test fun haWidget_bannersOnlyOrUnconnectedKeepsTheOldTargets() {
+    assertEquals(HomeRefinements.HaWidgetTarget.WEB_DASHBOARD,
+        HomeRefinements.haWidgetTarget(haConfigured = true, bannersOnly = true, dashboardConfigured = true))
+    assertEquals(HomeRefinements.HaWidgetTarget.WEB_DASHBOARD,
+        HomeRefinements.haWidgetTarget(haConfigured = false, bannersOnly = false, dashboardConfigured = true))
+    assertEquals(HomeRefinements.HaWidgetTarget.SETTINGS,
+        HomeRefinements.haWidgetTarget(haConfigured = true, bannersOnly = true, dashboardConfigured = false))
+    assertEquals(HomeRefinements.HaWidgetTarget.SETTINGS,
+        HomeRefinements.haWidgetTarget(haConfigured = false, bannersOnly = false, dashboardConfigured = false))
+  }
 }
