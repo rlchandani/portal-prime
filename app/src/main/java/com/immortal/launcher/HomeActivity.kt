@@ -4295,18 +4295,23 @@ private fun expiryShort(iso: String): String =
 private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var dashboardConfigured by remember { mutableStateOf(HomeDashboardConfig.configured(context)) }
-  OnResume { dashboardConfigured = HomeDashboardConfig.configured(context) }
+  var target by remember { mutableStateOf(haWidgetTarget(context)) }
+  OnResume {
+    dashboardConfigured = HomeDashboardConfig.configured(context)
+    target = haWidgetTarget(context)
+  }
+  val controlCenter = target == HomeRefinements.HaWidgetTarget.CONTROL_CENTER
+  val openControlCenter: () -> Unit = { ControlCenterActivity.open(context) }
   if (dashboardConfigured) {
+    val openHome: () -> Unit = if (controlCenter) openControlCenter else { { HomeDashboardActivity.openDashboard(context) } }
     ImmortalWidgetShell(title = "Home Assistant", openPage = "ha", modifier = modifier,
-        onOpen = { HomeDashboardActivity.openDashboard(context) }, duplicatesBodyAction = true) {
+        onOpen = openHome, duplicatesBodyAction = true) {
       Text("Your home dashboard", color = ApprovedHomePalette.Text, fontSize = 26.sp,
           lineHeight = 34.sp, fontWeight = FontWeight.Medium)
       Text("Open your rooms, devices and scenes.", color = ApprovedHomePalette.Secondary,
           fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 14.dp))
       Spacer(Modifier.height(22.dp))
-      ApprovedHomePillButton("Open dashboard", onClick = {
-        HomeDashboardActivity.openDashboard(context)
-      })
+      ApprovedHomePillButton(if (controlCenter) "Open Home Control" else "Open dashboard", onClick = openHome)
     }
     return
   }
@@ -4333,8 +4338,8 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
       }
   val open: () -> Unit = { context.openApprovedHomeSettings("ha") }
   val openDashboard: () -> Unit = { context.openApprovedHomeSettings("ha-dashboard") }
-  ImmortalWidgetShell(title = "Home Assistant", openPage = "ha",
-      modifier = modifier.tvFocusableRow { open() }) {
+  ImmortalWidgetShell(title = "Home Assistant", openPage = "ha", onOpen = if (controlCenter) openControlCenter else null,
+      modifier = modifier.tvFocusableRow { if (controlCenter) openControlCenter() else open() }) {
     when {
       !configured -> {
         Text("Connect your home", color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 34.sp)
@@ -4389,6 +4394,11 @@ private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3
     }
   }
 }
+
+/** [HomeRefinements.haWidgetTarget] from the saved Home Assistant, Portal-mode and dashboard settings. */
+private fun haWidgetTarget(context: Context): HomeRefinements.HaWidgetTarget =
+    HomeRefinements.haWidgetTarget(HaConfig.isConfigured(context), ControlCenterConfig.load(context).bannersOnly,
+        HomeDashboardConfig.configured(context))
 
 /**
  * One HA control tile: name + status line. Toggle entities show On/Off (dimmed while unknown);
