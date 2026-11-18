@@ -97,8 +97,8 @@ internal object CcCameraLogic {
   /** The chip label for a shortcut, saying what tapping it will do. */
   fun shortcutLabel(e: CcEntity): String = when (CcKind.of(e)) {
     CcKind.LIGHT -> "${e.name} ${if (e.isOn) "off" else "on"}"
-    CcKind.LOCK -> "${if (e.isOpen) "Lock" else "Unlock"} ${e.name.lowercase()}"
-    CcKind.GARAGE -> "${if (e.isOpen) "Close" else "Open"} ${e.name.lowercase()}"
+    CcKind.LOCK -> "${if (e.isOpen) "Lock" else "Unlock"} ${e.name}"
+    CcKind.GARAGE -> "${if (e.isOpen) "Close" else "Open"} ${e.name}"
     else -> e.name
   }
 

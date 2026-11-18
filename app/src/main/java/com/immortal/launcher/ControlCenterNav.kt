@@ -134,11 +134,11 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
 
   private fun confirmFor(e: CcEntity, call: CcCall): CcModal = when {
     e.domain == "scene" -> CcModal.ScenePreview(e.id)
-    e.domain == "script" -> CcModal.Confirm(e.id, call, "Run ${e.name}?",
+    e.domain == "script" -> CcModal.Confirm(e.id, call, CcModalLogic.confirmTitle(e, call),
         "This Home Assistant script can arm, unlock or open things, so it asks first.", "Run")
-    e.domain == "valve" -> CcModal.Confirm(e.id, call, if (call.service == "close_valve") "Shut off the water?" else "Turn the water back on?",
+    e.domain == "valve" -> CcModal.Confirm(e.id, call, CcModalLogic.confirmTitle(e, call),
         "${e.name} will ${if (call.service == "close_valve") "close" else "open"}.", if (call.service == "close_valve") "Shut off" else "Open")
-    else -> CcModal.Confirm(e.id, call, "Unlock ${e.name.lowercase()}?", lockLine(e), "Unlock")
+    else -> CcModal.Confirm(e.id, call, CcModalLogic.confirmTitle(e, call), lockLine(e), "Unlock")
   }
 
   private fun lockLine(e: CcEntity): String {

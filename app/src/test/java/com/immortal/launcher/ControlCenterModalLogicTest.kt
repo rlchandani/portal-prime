@@ -61,4 +61,14 @@ class ControlCenterModalLogicTest {
     assertEquals("1 thing is open:", CcModalLogic.openCountLine(1))
     assertEquals("3 things are open:", CcModalLogic.openCountLine(3))
   }
+
+  @Test fun confirmTitlesKeepTheDeviceNameAsHomeAssistantGivesIt() {
+    val lock = e("lock.stargate", "locked", "friendly_name" to "Stargate Lock")
+    assertEquals("Unlock Stargate Lock?", CcModalLogic.confirmTitle(lock, CcCalls.unlock(lock)))
+    val script = e("script.goodnight", "off", "friendly_name" to "Goodnight Routine")
+    assertEquals("Run Goodnight Routine?", CcModalLogic.confirmTitle(script, CcCalls.run(script)))
+    val valve = e("valve.main_water", "open", "friendly_name" to "Main Water")
+    assertEquals("Shut off the water?", CcModalLogic.confirmTitle(valve, CcCalls.valveClose(valve)))
+    assertEquals("Turn the water back on?", CcModalLogic.confirmTitle(valve, CcCalls.valveOpen(valve)))
+  }
 }

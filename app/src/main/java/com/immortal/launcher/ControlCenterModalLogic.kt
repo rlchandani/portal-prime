@@ -76,6 +76,13 @@ internal object CcModalLogic {
     else -> "$n things are open:"
   }
 
+  /** A confirm title. The device's name stays exactly as Home Assistant gives it ("Unlock Stargate Lock?"). */
+  fun confirmTitle(e: CcEntity, call: CcCall): String = when (e.domain) {
+    "script" -> "Run ${e.name}?"
+    "valve" -> if (call.service == "close_valve") "Shut off the water?" else "Turn the water back on?"
+    else -> "Unlock ${e.name}?"
+  }
+
   private fun count(n: Int, one: String, many: String) = if (n == 1) "1 $one" else "$n $many"
 
   private fun joinAnd(names: List<String>): String =

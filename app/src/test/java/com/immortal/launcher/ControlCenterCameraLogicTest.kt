@@ -73,10 +73,10 @@ class ControlCenterCameraLogicTest {
     assertEquals("Porch light off", CcCameraLogic.shortcutLabel(light))
     assertEquals("turn_off", CcCameraLogic.shortcutCall(light)?.service)
     val lock = e("lock.front", "locked", "friendly_name" to "Front door")
-    assertEquals("Unlock front door", CcCameraLogic.shortcutLabel(lock))
+    assertEquals("Unlock Front door", CcCameraLogic.shortcutLabel(lock))
     assertEquals("unlock", CcCameraLogic.shortcutCall(lock)?.service)
     val garage = e("cover.garage", "open", "device_class" to "garage", "friendly_name" to "Garage")
-    assertEquals("Close garage", CcCameraLogic.shortcutLabel(garage))
+    assertEquals("Close Garage", CcCameraLogic.shortcutLabel(garage))
     assertEquals("close_cover", CcCameraLogic.shortcutCall(garage)?.service)
     assertNull(CcCameraLogic.shortcutCall(e("binary_sensor.garage", "on", "device_class" to "garage_door")))
   }
