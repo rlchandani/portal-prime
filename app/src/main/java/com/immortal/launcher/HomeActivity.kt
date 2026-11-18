@@ -296,12 +296,14 @@ internal fun approvedShortcutIcons(context: Context, inventory: List<AppEntry>):
   val store = ComponentName(context, StoreActivity::class.java)
   val music = ComponentName(context, WebAppActivity::class.java)
   val dashboard = ComponentName(context, HomeDashboardActivity::class.java)
+  val control = ComponentName(context, ControlCenterActivity::class.java)
   val settings = ComponentName(context, ImmortalSettingsActivity::class.java)
   return inventory.mapNotNull { app ->
     val key = when (app.component) {
       store -> "store"
       music -> "music"
       dashboard -> "dashboard"
+      control -> ApprovedAppsBuiltins.CONTROL
       settings -> "settings"
       CALLS_COMPONENT -> "calls"
       else -> null
