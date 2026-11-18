@@ -31,7 +31,8 @@ class ControlCenterActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { CcApp(motion = motion.value, onExit = ::finish) }
+    val start = intent?.getStringExtra(EXTRA_SCREEN)?.let { n -> CcScreen.entries.firstOrNull { it.name.equals(n, ignoreCase = true) } }
+    setContent { CcApp(motion = motion.value, initialScreen = start ?: CcScreen.MAP, onExit = ::finish) }
   }
 
   override fun onStart() {
@@ -60,6 +61,9 @@ class ControlCenterActivity : ComponentActivity() {
   }
 
   companion object {
+    /** Optional [CcScreen] name to open on (fleet `open_control_center`, banners). */
+    const val EXTRA_SCREEN = "screen"
+
     fun intent(context: Context): Intent = Intent(context, ControlCenterActivity::class.java)
 
     fun open(context: Context) {

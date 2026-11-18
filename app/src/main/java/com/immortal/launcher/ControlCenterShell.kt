@@ -33,11 +33,11 @@ internal val LocalCcMotion = compositionLocalOf { false }
 
 /** The whole Control Center: rail + header + the current screen, the sheet, modals and toasts. */
 @Composable
-internal fun CcApp(motion: Boolean, onExit: () -> Unit) {
+internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, onExit: () -> Unit) {
   val context = LocalContext.current
   val state by ControlCenter.state(context).collectAsState()
   val latest by rememberUpdatedState(state)
-  val navState = remember { mutableStateOf(CcNav()) }
+  val navState = remember { mutableStateOf(CcNav(screen = initialScreen)) }
   val ui = remember { CcUi(context, navState, { latest }) }
   BackHandler { if (!ui.handleBack()) onExit() }
   CcTheme(dark = state.settings.darkTheme) {

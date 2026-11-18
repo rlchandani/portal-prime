@@ -369,6 +369,14 @@ class FleetRoutes(private val context: Context) {
         identify()
         resp(200, ok().put("action", "identify"))
       }
+      // Opens the Home Control Center (optionally on a screen: map, cameras, energy, alerts,
+      // security, edit, settings) — for remote checks and on-device measurement.
+      "open_control_center" -> {
+        val intent = ControlCenterActivity.intent(context).putExtra(ControlCenterActivity.EXTRA_SCREEN, body.optString("screen", "map"))
+            .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val opened = runCatching { context.startActivity(intent) }.isSuccess
+        resp(200, JSONObject().put("ok", opened).put("action", "open_control_center"))
+      }
       // Needs the signature/privileged REBOOT permission we don't hold — report honestly.
       "reboot" -> resp(200, JSONObject().put("ok", false).put("action", "reboot").put("result", "not_permitted"))
       else -> resp(400, err("unknown_action"))
