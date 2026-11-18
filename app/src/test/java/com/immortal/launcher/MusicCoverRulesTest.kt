@@ -87,10 +87,4 @@ class MusicCoverRulesTest {
     val open = paused()
     assertTrue(reduce(open, YtAction.Covered(false)).effects.isEmpty())
   }
-
-  @Test fun bottomToastsAvoidTheHomeCardOnly() {
-    assertTrue(MusicCoverRules.avoidBottom(MusicPlayerHostKind.HOME_CARD))
-    assertFalse(MusicCoverRules.avoidBottom(MusicPlayerHostKind.MUSIC_SCREEN))
-    assertFalse(MusicCoverRules.avoidBottom(null))
-  }
 }

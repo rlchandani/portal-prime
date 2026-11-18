@@ -15,7 +15,11 @@ import org.junit.Test
 class MusicHomeCardRulesTest {
   private val home = MusicHomeCardInputs(hasCurrent = true, musicOpen = false, customizing = false, dismissed = false)
 
-  @After fun reset() = MusicHomeCardState.restore()
+  @After fun reset() {
+    MusicHomeCardState.restore()
+    MusicHomeCardState.expand()
+    MusicHomeCardState.place(null)
+  }
 
   @Test fun showsOnHomeWhenASongIsCurrentPlayingOrPaused() {
     assertTrue(MusicHomeCardRules.shows(home))
@@ -53,7 +57,46 @@ class MusicHomeCardRulesTest {
     assertTrue(MusicHomeCardDims.PLAYER_W >= YtPlayerSize.MIN_CSS_PX && MusicHomeCardDims.PLAYER_H >= 208)
     assertEquals(MusicHomeCardDims.PAD * 2 + MusicHomeCardDims.PLAYER_W + MusicHomeCardDims.GAP + MusicHomeCardDims.SIDE_W,
         MusicHomeCardDims.WIDTH)
-    assertTrue(MusicHomeCardDims.TOAST_RESERVE > MusicHomeCardDims.WIDTH)
     assertTrue(MusicHomeCardDims.SKIP >= 64 && MusicHomeCardDims.PLAY >= 64 && MusicHomeCardDims.CLOSE >= 64)
+  }
+
+  @Test fun closeMinimizesToTheTileAndExpandRestoresTheCardWithoutTouchingPlayback() {
+    assertEquals(MusicHomeCardMode.CARD, MusicHomeCardRules.mode(MusicHomeCardState.minimized.value))
+    MusicHomeCardState.minimize()
+    assertEquals(MusicHomeCardMode.TILE, MusicHomeCardRules.mode(MusicHomeCardState.minimized.value))
+    assertFalse("minimizing never hides the card", MusicHomeCardState.dismissed.value)
+    assertTrue(MusicHomeCardRules.shows(home))
+    MusicHomeCardState.expand()
+    assertEquals(MusicHomeCardMode.CARD, MusicHomeCardRules.mode(MusicHomeCardState.minimized.value))
+  }
+
+  @Test fun theTileStaysMinimizedAcrossAPausedHideAndPlayAgain() {
+    MusicHomeCardState.minimize()
+    MusicHomeCardState.dismiss()
+    MusicHomeCardState.onPlaying(true)
+    assertFalse(MusicHomeCardState.dismissed.value)
+    assertTrue(MusicHomeCardState.minimized.value)
+  }
+
+  @Test fun onlyAPausedCardOrTileAutoHides() {
+    assertTrue(MusicHomeCardRules.autoHides(playing = false))
+    assertFalse(MusicHomeCardRules.autoHides(playing = true))
+  }
+
+  @Test fun theTileIsThePlayerAtYouTubesMinimumWithTheRailBesideIt() {
+    assertTrue(MusicHomeCardDims.TILE_PLAYER >= YtPlayerSize.MIN_CSS_PX)
+    assertEquals(MusicHomeCardDims.TILE_PLAYER, MusicHomeCardDims.TILE_H)
+    assertEquals(MusicHomeCardDims.TILE_PLAYER + MusicHomeCardDims.RAIL_GAP + MusicHomeCardDims.RAIL_W,
+        MusicHomeCardDims.TILE_W)
+    assertTrue(MusicHomeCardDims.RAIL_W >= 64)
+    assertEquals(MusicHomeCardDims.TILE_W, MusicHomeCardDims.widthOf(MusicHomeCardMode.TILE))
+    assertEquals(MusicHomeCardDims.WIDTH, MusicHomeCardDims.widthOf(MusicHomeCardMode.CARD))
+    assertEquals(MusicHomeCardDims.HEIGHT, MusicHomeCardDims.heightOf(MusicHomeCardMode.CARD))
+  }
+
+  @Test fun theCardAndTheTileRememberSeparatePositions() {
+    assertEquals(MusicFloatKind.CARD, MusicHomeCardMode.CARD.kind)
+    assertEquals(MusicFloatKind.TILE, MusicHomeCardMode.TILE.kind)
+    assertTrue(MusicFloatKind.CARD.key != MusicFloatKind.TILE.key)
   }
 }

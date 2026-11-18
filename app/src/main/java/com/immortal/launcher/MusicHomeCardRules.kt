@@ -18,7 +18,7 @@ internal data class MusicHomeCardInputs(
     val musicOpen: Boolean,
     /** Home is in Customize: the card would sit on the widgets being arranged. */
     val customizing: Boolean,
-    /** ✕ was tapped (or the card sat paused for [MusicHomeCardRules.PAUSED_HIDE_MS]). */
+    /** The card sat paused for [MusicHomeCardRules.PAUSED_HIDE_MS] (✕ only minimizes now). */
     val dismissed: Boolean,
 )
 
@@ -27,8 +27,12 @@ internal data class MusicHomeCardInputs(
  * after leaving the Music screen). Pure.
  *
  * Shown on Home, Apps and Tools whenever a song is current, unless the Music screen is open (it hosts
- * the player itself), Home is being customized, or the card was dismissed. A dismissal lasts until
- * music plays again (from Music, the header chip's Play, a phone) — see [afterPlaying].
+ * the player itself), Home is being customized, or the card hid itself after sitting paused. That
+ * lasts until music plays again (from Music, the header chip's Play, a phone) — see [afterPlaying].
+ *
+ * ✕ never stops the music: it MINIMIZES the card to a video-only tile ([MusicHomeCardMode.TILE]),
+ * the same player at YouTube's minimum size, still visible and uncovered, so it keeps playing and
+ * the header chip keeps controlling it. Only Pause (chip, card, media keys, a phone) stops it.
  */
 internal object MusicHomeCardRules {
   /** A paused card hides itself after this long, so Home doesn't keep a paused video forever. */
@@ -38,16 +42,49 @@ internal object MusicHomeCardRules {
 
   /** Music started playing: the card comes back. */
   fun afterPlaying(dismissed: Boolean, playing: Boolean): Boolean = dismissed && !playing
+
+  fun mode(minimized: Boolean): MusicHomeCardMode = if (minimized) MusicHomeCardMode.TILE else MusicHomeCardMode.CARD
+
+  /** The paused auto-hide applies only while paused, in either mode; a playing card never hides. */
+  fun autoHides(playing: Boolean): Boolean = !playing
 }
 
-/** Process-lifetime card memory (the ✕), shared by Home's card and header chip. Thread-safe. */
+/** The full Now Playing card, or the minimized video-only tile (✕) that keeps playing. */
+internal enum class MusicHomeCardMode(val kind: MusicFloatKind) {
+  CARD(MusicFloatKind.CARD),
+  TILE(MusicFloatKind.TILE),
+}
+
+/**
+ * Process-lifetime card memory shared by Home's card and header chip, plus where the card is now
+ * (for the toasts and notifications that avoid it). Thread-safe.
+ */
 internal object MusicHomeCardState {
   private val dismissedFlow = MutableStateFlow(false)
   val dismissed: StateFlow<Boolean> = dismissedFlow.asStateFlow()
+  private val minimizedFlow = MutableStateFlow(false)
+  val minimized: StateFlow<Boolean> = minimizedFlow.asStateFlow()
+  private val placementFlow = MutableStateFlow<MusicFloatRect?>(null)
+  /** The card's (or tile's) rectangle on Home while it shows, else null. */
+  val placement: StateFlow<MusicFloatRect?> = placementFlow.asStateFlow()
 
-  /** ✕ on the card: pause and hide. */
+  /** The paused card hid itself ([MusicHomeCardRules.PAUSED_HIDE_MS]). */
   fun dismiss() {
     dismissedFlow.value = true
+  }
+
+  /** ✕: collapse to the video-only tile. The music keeps playing. */
+  fun minimize() {
+    minimizedFlow.value = true
+  }
+
+  /** The tile's expand button: the full card again, playback untouched. */
+  fun expand() {
+    minimizedFlow.value = false
+  }
+
+  fun place(rect: MusicFloatRect?) {
+    placementFlow.value = rect
   }
 
   /** The header chip's Play, or music started anywhere. */
