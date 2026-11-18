@@ -154,6 +154,13 @@ internal object CcSheetLogic {
     else -> when (val p = e.position) { null -> pretty(e.state); 0 -> "Closed"; 100 -> "Open"; else -> "$p% open" }
   }
 
+  /** Footnote for a cover without a position: blind wording only for blind-like covers. */
+  fun coverNote(e: CcEntity): String =
+      if (e.deviceClass in BLIND_CLASSES) "These blinds only open and close — Home Assistant doesn't report a position."
+      else "This only opens and closes — Home Assistant doesn't report a position."
+
+  private val BLIND_CLASSES = setOf("blind", "shade", "curtain", "shutter", "awning")
+
   fun mediaText(e: CcEntity): String {
     val title = e.mediaTitle?.takeIf { it.isNotBlank() }
     return when (e.state) {

@@ -67,7 +67,7 @@ internal fun CcCoverControl(ui: CcUi, e: CcEntity, gate: CcGate) {
         if (e.state == "opening" || e.state == "closing") CcCtlChip("Stop", { ui.act(e, CcCalls.coverStop(e)) }, enabled = gate.enabled)
       }
       Spacer(Modifier.weight(1f))
-      if (!settable) CcCtlNote("These blinds only open and close — Home Assistant doesn't report a position.")
+      if (!settable) CcCtlNote(CcSheetLogic.coverNote(e))
     }
   }
 }
