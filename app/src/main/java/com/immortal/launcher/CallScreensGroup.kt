@@ -96,7 +96,7 @@ private fun GroupTile(tile: CallTile, media: CallMedia?, motion: Boolean, layout
 
 /** A SurfaceView ignores Compose clipping: paint the stage colour into the four corners above it. */
 @Composable
-private fun CornerMask(radius: Dp) {
+internal fun CornerMask(radius: Dp) {
   Box(Modifier.fillMaxSize().drawWithCache {
     val r = radius.toPx()
     val outside = Path().apply {

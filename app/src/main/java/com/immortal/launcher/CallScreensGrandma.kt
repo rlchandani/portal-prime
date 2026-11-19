@@ -135,7 +135,9 @@ private fun GrandmaCountdown(autoAt: Long, r: GrandmaLayout.Ring) {
 
 /**
  * Grandma mode in a call (mock `gmIncallScr`): the other side full screen, the live bar, the self
- * view (always visible while the camera is on), and only Quieter, Hang up and Louder.
+ * view (always visible while the camera is on), and only Quieter, Hang up and Louder. With several
+ * people every other person gets a big face tile ([GrandmaGroupStage]) between the live bar and
+ * the buttons.
  */
 @Composable
 internal fun CallGrandmaLive(call: ActiveCall, media: CallMedia?, motion: Boolean) {
@@ -146,38 +148,62 @@ internal fun CallGrandmaLive(call: ActiveCall, media: CallMedia?, motion: Boolea
   val volume = remember { CallVolume(context) }
   var level by remember { mutableIntStateOf(volume.level()) }
   var shownAt by remember { mutableStateOf(0L) }
-  fun step(delta: Int) { level = volume.step(level, delta); shownAt = Calling.now() }
+  val step: (Int) -> Unit = { delta -> level = volume.step(level, delta); shownAt = Calling.now() }
+  val controls: @Composable (Modifier) -> Unit = { m ->
+    GrandmaControls(g, sizes, shownAt, CallVolumeMath.percent(level, volume.max), step, m)
+  }
+  val group = call.group
+  val with = if (group) GrandmaGroup.with(GrandmaGroup.members(call).map { it.contact.name }) else call.peer.name
+  val bar = GrandmaCopy.liveBar(call.cameraOn, call.micOn, with)
   Box(Modifier.fillMaxSize().background(CallColors.VideoBg)) {
-    GrandmaRemote(call, media, motion)
-    CallLiveBar(GrandmaCopy.liveBar(call.cameraOn, call.micOn, call.peer.name), CallingCopy.liveDotActive(call.cameraOn, call.micOn),
-        motion, Modifier.align(Alignment.TopStart).padding(start = g.edge.dp, top = g.edge.dp,
-            end = (g.edge * 2 + g.self.widthDp).dp))
-    CallSelfFrame(media, call.cameraOn, "You", Modifier.align(Alignment.TopEnd).padding(g.edge.dp),
-        width = g.self.widthDp.dp, height = g.self.heightDp.dp)
+    if (group) {
+      val self = GrandmaGroup.self(layout)
+      Column(Modifier.fillMaxSize().padding(g.edge.dp), verticalArrangement = Arrangement.spacedBy(sizes.gap)) {
+        Row(Modifier.fillMaxWidth().height(self.heightDp.dp), verticalAlignment = Alignment.CenterVertically) {
+          CallLiveBar(bar, CallingCopy.liveDotActive(call.cameraOn, call.micOn), motion, Modifier.weight(1f).padding(end = g.edge.dp))
+          CallSelfFrame(media, call.cameraOn, "You", width = self.widthDp.dp, height = self.heightDp.dp)
+        }
+        GrandmaGroupStage(call, media, motion, layout, sizes, Modifier.weight(1f).fillMaxWidth())
+        controls(Modifier.fillMaxWidth())
+      }
+    } else {
+      GrandmaRemote(call, media, motion)
+      CallLiveBar(bar, CallingCopy.liveDotActive(call.cameraOn, call.micOn),
+          motion, Modifier.align(Alignment.TopStart).padding(start = g.edge.dp, top = g.edge.dp,
+              end = (g.edge * 2 + g.self.widthDp).dp))
+      CallSelfFrame(media, call.cameraOn, "You", Modifier.align(Alignment.TopEnd).padding(g.edge.dp),
+          width = g.self.widthDp.dp, height = g.self.heightDp.dp)
+      controls(Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(g.edge.dp))
+    }
     if (call.phase == CallPhase.CONNECTING) Box(Modifier.align(Alignment.Center)) { CallGlassChip("Connecting securely…", "lock") }
     if (call.phase == CallPhase.RECONNECTING) Box(Modifier.align(Alignment.Center)) {
       CallChip("Reconnecting… the Wi-Fi dropped for a moment", "wifiOff", CallChipTone.WARN)
     }
-    Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(g.edge.dp),
-        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(sizes.gap)) {
-      VolumeFlash(shownAt, CallVolumeMath.percent(level, volume.max))
-      val quieter: @Composable (Modifier) -> Unit = { m ->
-        GrandmaButton(GrandmaCopy.QUIETER, "volLow", CallColors.Controls, Color.White, sizes, { step(-1) }, m)
+  }
+}
+
+/** Quieter, Hang up and Louder (upright Mini: Hang up on its own row), with the volume flash above. */
+@Composable
+private fun GrandmaControls(g: GrandmaLayout.InCall, sizes: GrandmaSizes, shownAt: Long, percent: Int, step: (Int) -> Unit,
+                            modifier: Modifier) {
+  Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(sizes.gap)) {
+    VolumeFlash(shownAt, percent)
+    val quieter: @Composable (Modifier) -> Unit = { m ->
+      GrandmaButton(GrandmaCopy.QUIETER, "volLow", CallColors.Controls, Color.White, sizes, { step(-1) }, m)
+    }
+    val louder: @Composable (Modifier) -> Unit = { m ->
+      GrandmaButton(GrandmaCopy.LOUDER, "vol", CallColors.Controls, Color.White, sizes, { step(1) }, m)
+    }
+    val hangUp: @Composable (Modifier) -> Unit = { m ->
+      GrandmaButton(GrandmaCopy.HANG_UP, "end", CallColors.Bad, Color.White, sizes, Calling::hangUp, m)
+    }
+    if (g.stackButtons) {
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(sizes.gap)) {
+        quieter(Modifier.weight(1f)); louder(Modifier.weight(1f))
       }
-      val louder: @Composable (Modifier) -> Unit = { m ->
-        GrandmaButton(GrandmaCopy.LOUDER, "vol", CallColors.Controls, Color.White, sizes, { step(1) }, m)
-      }
-      val hangUp: @Composable (Modifier) -> Unit = { m ->
-        GrandmaButton(GrandmaCopy.HANG_UP, "end", CallColors.Bad, Color.White, sizes, Calling::hangUp, m)
-      }
-      if (g.stackButtons) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(sizes.gap)) {
-          quieter(Modifier.weight(1f)); louder(Modifier.weight(1f))
-        }
-        hangUp(Modifier.fillMaxWidth())
-      } else Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(sizes.gap)) {
-        quieter(Modifier.weight(1f)); hangUp(Modifier.weight(HANG_UP_WEIGHT)); louder(Modifier.weight(1f))
-      }
+      hangUp(Modifier.fillMaxWidth())
+    } else Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(sizes.gap)) {
+      quieter(Modifier.weight(1f)); hangUp(Modifier.weight(HANG_UP_WEIGHT)); louder(Modifier.weight(1f))
     }
   }
 }
@@ -197,11 +223,14 @@ private fun VolumeFlash(shownAt: Long, percent: Int) {
 
 @Composable
 private fun GrandmaRemote(call: ActiveCall, media: CallMedia?, motion: Boolean) {
-  var hasFrames by remember(media) { mutableStateOf(false) }
-  LaunchedEffect(media) {
-    while (media != null && !hasFrames) { hasFrames = media.remote.frames > 0; delay(FRAME_POLL_MS) }
+  // Real calls key each peer's picture by its device id (like the 1:1 screen); the unkeyed
+  // `media.remote` sink is only fed by the loopback test.
+  val sink = media?.sink(call.peer.deviceId)
+  var hasFrames by remember(sink) { mutableStateOf(false) }
+  LaunchedEffect(sink) {
+    while (sink != null && !hasFrames) { hasFrames = sink.frames > 0; delay(FRAME_POLL_MS) }
   }
-  if (media != null) CallRemoteVideo(media, Modifier.fillMaxSize())
+  if (media != null && sink != null) CallRemoteVideo(media, Modifier.fillMaxSize(), sink = sink)
   if (!hasFrames || !call.remoteCameraOn) Box(Modifier.fillMaxSize()) {
     CallRingBackground(call.peer.name, motion && call.phase != CallPhase.LIVE)
     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally,
