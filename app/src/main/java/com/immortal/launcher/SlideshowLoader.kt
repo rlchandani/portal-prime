@@ -23,6 +23,8 @@ internal data class SlideshowAsset(
 internal class SlideshowLoader(
     context: Context,
     private val budget: SlideshowPixelBudget = SlideshowPixelBudget(),
+    /** Panel long edge; decode sizes derive from it instead of a fixed 2400 px. */
+    private val displayLongEdge: Int = PhotoEdges.displayLongEdge(context),
     private val onCancelTransports: () -> Unit = {},
     // Share the host queue so late decoded scenes remain budgeted until the host returns.
     private val ui: PausableFrameCallbacks = PausableFrameCallbacks(),
@@ -38,6 +40,8 @@ internal class SlideshowLoader(
   )
   private var ready: Ready? = null
   private var deliveryPosted = false
+  private val decodeEdge = PhotoEdges.decodeEdge(displayLongEdge)
+  private val partnerEdge = PhotoEdges.partnerEdge(displayLongEdge)
   @Volatile private var closed = false
   @Volatile private var generation = 0
 
@@ -78,7 +82,7 @@ internal class SlideshowLoader(
           // Decoder sampling plus EXIF output can hold two bounded 12 MiB images.
           val scratch = if (warm == null) 24L * 1024 * 1024 else 12L * 1024 * 1024
           val needsShrink = warm != null && (maxOf(warm.width, warm.height) > maxEdge ||
-              (shrinkPortrait && warm.height > warm.width && warm.height > 1400))
+              (shrinkPortrait && warm.height > warm.width && warm.height > partnerEdge))
           if (warm != null && !needsShrink) return warm
           val token = budget.reserve(scratch) { current() && !closed }
           if (token == null) {
@@ -92,7 +96,7 @@ internal class SlideshowLoader(
             if (warm == null) identities[candidate.key] =
                 candidate.identity?.invoke(bitmap) ?: if (candidate.contentIdentity)
                   analysisKey(candidate, bitmap) else null
-            val edge = if (shrinkPortrait && bitmap.height > bitmap.width) 1400 else maxEdge
+            val edge = if (shrinkPortrait && bitmap.height > bitmap.width) partnerEdge else maxEdge
             if (maxOf(bitmap.width, bitmap.height) > edge) {
               val scale = edge.toFloat() / maxOf(bitmap.width, bitmap.height)
               val smaller = Bitmap.createScaledBitmap(bitmap,
@@ -106,7 +110,7 @@ internal class SlideshowLoader(
             return bitmap
           } finally { budget.release(token) }
         }
-        val first = acquire(asset, 2400, shrinkPortrait = pair)
+        val first = acquire(asset, decodeEdge, shrinkPortrait = pair)
         if (first == null) {
           ui.post { if (!closed && ticket == generation) onFailure() }
           return@submit
@@ -115,7 +119,7 @@ internal class SlideshowLoader(
         if (pair && first.height > first.width && current()) {
           for (partner in partners.take(4)) {
             if (partner.key == asset.key || partner.portrait?.invoke() == false) continue
-            val bitmap = acquire(partner, 1400) ?: continue
+            val bitmap = acquire(partner, partnerEdge) ?: continue
             val duplicate = identities[asset.key]?.let { it == identities[partner.key] } == true
             if (bitmap.height > bitmap.width && !duplicate) { owned.add(partner to bitmap); break }
             bitmap.recycle()
@@ -133,7 +137,9 @@ internal class SlideshowLoader(
           val regions = if (people && revisionKey != null)
             faceDelegate.value.regionsFor(revisionKey).orEmpty() else emptyList()
           val identity = if (item.contentIdentity) revisionKey ?: item.key else item.key
-          SlideshowPhoto(identity, bitmap, regions, positions.get(identity), item.key)
+          // Single photos get a small pre-blurred backdrop + analysis (a few hundred KB).
+          val look = if (owned.size == 1) PhotoLook.derive(bitmap, displayLongEdge) else null
+          SlideshowPhoto(identity, bitmap, regions, positions.get(identity), item.key, look)
         }
         // Copy analysis derivatives before publishing: an obsolete UI runnable can recycle
         // a never-displayed scene, so the worker must not read those bitmaps afterwards.
@@ -151,7 +157,15 @@ internal class SlideshowLoader(
           val token = budget.reserve(24L * 1024 * 1024) { current() && !closed }
               ?: return@submit
           try {
-            val bitmap = upcoming.decode(2400)
+            val bitmap = upcoming.decode(decodeEdge)?.let { decoded ->
+              // Feed decoders ignore the edge; bound the retained lookahead like a scene.
+              if (maxOf(decoded.width, decoded.height) <= decodeEdge) decoded else {
+                val scale = decodeEdge.toFloat() / maxOf(decoded.width, decoded.height)
+                Bitmap.createScaledBitmap(decoded, (decoded.width * scale).toInt().coerceAtLeast(1),
+                    (decoded.height * scale).toInt().coerceAtLeast(1), true)
+                    .also { if (it !== decoded) decoded.recycle() }
+              }
+            }
             if (bitmap != null) {
               if (!current() || closed) bitmap.recycle()
               else {

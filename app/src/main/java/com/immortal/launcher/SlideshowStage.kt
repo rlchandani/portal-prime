@@ -26,6 +26,8 @@ internal data class SlideshowPhoto(
     val regions: List<SlideshowGeometry.Region> = emptyList(),
     val adjustment: SlideshowAdjustment? = null,
     val sourceKey: String = key,
+    /** Pre-blurred backdrop + analysis; null when the photo could not be sampled. */
+    val look: PhotoLook? = null,
 )
 
 /** Fixed bitmap views animated with RenderNode properties, not per-frame decoding or layout. */
@@ -285,6 +287,23 @@ internal class SlideshowStage(
       background = if (p.galleryStyle) printMatte else matte
       visibility = View.VISIBLE
       val gallery = galleryPlans(p, width, height)
+      // Portrait panels only (Portal Mini): a badly mismatched single photo is shown whole over
+      // its own blurred backdrop rather than hard-cropped or floated on the flat matte.
+      val single = p.photos.singleOrNull()
+      val portraitWhole = single != null && gallery == null && !p.editing && single.adjustment == null &&
+          height > width && PremiumFraming.mismatch(single.bitmap.width, single.bitmap.height,
+              width, height) > PremiumFraming.MISMATCH
+      val look = single?.look
+      if (portraitWhole && look != null) {
+        background = null
+        val fill = PhotoBackdropView(context)
+        addView(fill, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        val contain = minOf(width.toFloat() / single.bitmap.width, height.toFloat() / single.bitmap.height)
+        val w = single.bitmap.width * contain
+        val h = single.bitmap.height * contain
+        fill.show(look.backdrop, floatArrayOf((width - w) / 2f, (height - h) / 2f, (width + w) / 2f,
+            (height + h) / 2f), 0f, 0f)
+      }
       val margin = if (p.photos.size == 2) (20 * resources.displayMetrics.density).toInt() else 0
       val tileWidth = (width - margin) / p.photos.size
       p.photos.forEachIndexed { index, photo ->
@@ -293,9 +312,10 @@ internal class SlideshowStage(
         val print = gallery?.getOrNull(index)
         val initial = print?.path ?: SlideshowGeometry.plan(
             photo.bitmap.width, photo.bitmap.height, tile.width(), tile.height(), photo.regions,
-            p.fill, p.motion && photo.adjustment == null, index % 2 == 1)
+            p.fill && !portraitWhole, p.motion && photo.adjustment == null && !portraitWhole, index % 2 == 1)
         // Reserve a measured free area only if a protected face would intersect an overlay.
-        val overlaps = print == null && photo.regions.any { region ->
+        // A whole portrait-panel photo keeps its backdrop hole exact, so it is never shrunk.
+        val overlaps = print == null && !portraitWhole && photo.regions.any { region ->
           val rw = region.right - region.left
           val rh = region.bottom - region.top
           fun protected(transform: SlideshowGeometry.Transform): Rect = Rect(

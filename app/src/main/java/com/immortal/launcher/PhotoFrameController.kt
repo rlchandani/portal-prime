@@ -139,7 +139,9 @@ class PhotoFrameController(
   private val sourceDiscoveryDelegate = lazy { SlideshowSourceDiscovery() }
   private val sourceDiscovery get() = sourceDiscoveryDelegate.value
   // Decode-once screen-sized copies of local photos for the engine (see [EngineScaledCache]).
-  private val scaledCache = EngineScaledCache(java.io.File(context.cacheDir, "ss_scaled"))
+  // Decode/cache edges follow the panel's long edge (2400 on a Portal+, 1472 on a Portal Mini).
+  private val photoDecodeEdge = PhotoEdges.decodeEdge(PhotoEdges.displayLongEdge(context))
+  private val scaledCache = EngineScaledCache(java.io.File(context.cacheDir, "ss_scaled"), targetEdge = photoDecodeEdge)
   // A separate single-thread executor for caption work (EXIF read + the reverse-geocode
   // network call), so an 8s geocode lookup can never stall the image-decode pipeline on [io].
   private val metaIo = Executors.newSingleThreadExecutor()
@@ -1074,7 +1076,7 @@ class PhotoFrameController(
                     @android.webkit.JavascriptInterface fun use24Hour(): Boolean = use24
                     // Ready copies or opaque bounded requests; bridge calls never decode or wait.
                     @android.webkit.JavascriptInterface
-                    fun scaledUrl(url: String): String = scaledUrlForSize(url, EngineScaledCache.TARGET_EDGE)
+                    fun scaledUrl(url: String): String = scaledUrlForSize(url, photoDecodeEdge)
                     @android.webkit.JavascriptInterface
                     fun scaledUrlForSize(url: String, edge: Int): String {
                       remotePhotoRequests.urlFor(url, edge)?.let { pending ->
@@ -3010,7 +3012,7 @@ class PhotoFrameController(
   /** The next generated verification scene, sized like a decoded photo for this panel. */
   private fun nextTestPhoto(): Bitmap {
     val index = testIndex.getAndIncrement()
-    val bitmap = ScreensaverTestSource.photo(index, SlideshowDecodeBudget.MAX_EDGE)
+    val bitmap = ScreensaverTestSource.photo(index, photoDecodeEdge)
     testScenes[bitmap] = ScreensaverTestSource.scene(index)
     return bitmap
   }

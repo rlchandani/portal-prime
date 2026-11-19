@@ -187,6 +187,7 @@
             android:exported="false"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:theme="@style/Theme.SampleApp" />
 
         <!-- Screensaver settings (source folder/USB, fit, interval, …), opened from
