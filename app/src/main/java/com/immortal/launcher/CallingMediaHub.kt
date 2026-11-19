@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Owns the one live [CallMedia] and enforces the capture rules from the camera spike:
@@ -38,7 +39,7 @@ internal object CallMediaHub {
   val stats: StateFlow<CallStats?> = mutableStats.asStateFlow()
 
   private var mediaCallId: String? = null
-  private var foreground = false
+  @Volatile private var foreground = false
   private var queued: (() -> Unit)? = null
   private var audio: SavedAudio? = null
   private var statsCount = 0
@@ -77,15 +78,21 @@ internal object CallMediaHub {
    */
   fun answerBlocking(context: Context, call: ActiveCall, offerSdp: String): String? {
     val latch = CountDownLatch(1)
+    val abandoned = AtomicBoolean(false)
     var result: String? = null
     main.post {
-      if (!foreground) { latch.countDown(); return@post }
+      // Re-check on the main thread: the screen is still in front, this is still the call being
+      // set up, and the HTTP side hasn't given up. Otherwise nothing opens.
+      val current = Calling.state.value.call
+      if (!foreground || abandoned.get() || current?.id != call.id || current.phase != CallPhase.CONNECTING) {
+        latch.countDown(); return@post
+      }
       val m = ensure(context, call.id)
       m.camera(call.cameraOn)
       m.mic(call.micOn)
       m.answer(offerSdp) { sdp -> result = sdp?.takeIf(CallSignalAuth::hasLanCandidate); latch.countDown() }
     }
-    if (!latch.await(ANSWER_WAIT_MS, TimeUnit.MILLISECONDS)) return null
+    if (!latch.await(ANSWER_WAIT_MS, TimeUnit.MILLISECONDS)) { abandoned.set(true); return null }
     return result
   }
 

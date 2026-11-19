@@ -82,9 +82,5 @@ internal object CallStatsParser {
     )
   }
 
-  private fun num(v: Any?): Number? = when (v) {
-    is Number -> v
-    is java.math.BigInteger -> v
-    else -> null
-  }
+  private fun num(v: Any?): Number? = v as? Number
 }

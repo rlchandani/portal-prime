@@ -69,7 +69,7 @@ internal class CallMedia(
   private var capturer: CameraVideoCapturer? = null
   private var captureHelper: SurfaceTextureHelper? = null
   private var gathered: (() -> Unit)? = null
-  private var previousStats: CallStats? = null
+  @Volatile private var previousStats: CallStats? = null
   private var degraded = quality == CallQuality.LOW_MEMORY
   @Volatile private var released = false
 
