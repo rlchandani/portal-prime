@@ -9,6 +9,7 @@ package com.immortal.launcher
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
+import android.os.SystemClock
 import android.util.Log
 import android.view.MotionEvent
 import org.junit.Assert.assertEquals
@@ -33,6 +34,18 @@ class ScreensaverTouchRecoveryTest {
   @Test fun interruptionWithoutTouchStillRecoversTheScreensaver() = withFrame { _, context ->
     DreamPolicy.onImmortalDreamingStopped(context)
     Mockito.verify(context, Mockito.times(1)).startActivity(Mockito.any(Intent::class.java))
+  }
+
+  @Test fun armedInstallConfirmationIsNotCoveredByARecoveredFrame() = withFrame { _, context ->
+    Mockito.mockStatic(SystemClock::class.java).use {
+      val lease = InstallAutoConfirm.arm(60_000L)
+      try {
+        DreamPolicy.onImmortalDreamingStopped(context)
+      } finally {
+        InstallAutoConfirm.disarm(lease)
+      }
+    }
+    Mockito.verify(context, Mockito.never()).startActivity(Mockito.any(Intent::class.java))
   }
 
   @Test fun fingerDownDoesNotExitAndTheCompletedTapExitsOnce() = withFrame { frame, _ ->

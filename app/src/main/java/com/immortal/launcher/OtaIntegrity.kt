@@ -18,6 +18,7 @@ internal enum class OtaError(val code: String, val message: String) {
   INTEGRITY("integrity", "The download didn't match the published update. Nothing was installed."),
   SIGNATURE("signature", "The download isn't signed by Hearthpane. Nothing was installed."),
   INSTALL("install_failed", "Android couldn't install the update. Hearthpane will try again later."),
+  CONFIRM_FAILED("confirm_failed", "The install confirmation didn't go through. Hearthpane will try again shortly."),
   PAUSED("paused", "Updates are paused on this Portal. Connect it to your computer to update."),
   DEV_MODE("dev_mode", "Automatic updates are off while developer mode is on."),
 }

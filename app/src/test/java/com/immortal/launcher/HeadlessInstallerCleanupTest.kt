@@ -22,6 +22,7 @@ import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -32,6 +33,75 @@ import org.mockito.Mockito.`when`
 
 class HeadlessInstallerCleanupTest {
   @get:Rule val files = TemporaryFolder()
+  private var lastOutcome: HeadlessInstallOutcome? = null
+
+  @Test fun timeoutIsReportedAsAnUnacceptedConfirmationNotSuccess() =
+      withInstaller(terminalStatus = null) { _, _, _, install ->
+        assertFalse(install())
+        val outcome = lastOutcome as HeadlessInstallOutcome.ConfirmTimeout
+        assertTrue(outcome.confirmationFailed)
+        assertFalse("nothing tapped Install in this fixture", outcome.tapped)
+        assertEquals(0, outcome.presentations)
+      }
+
+  @Test fun abortedSessionIsAConfirmationFailureCarryingItsMessage() =
+      withInstaller(terminalStatus = PackageInstaller.STATUS_FAILURE_ABORTED) { _, installer, _, install ->
+        assertFalse(install())
+        assertEquals(HeadlessInstallOutcome.Failed(PackageInstaller.STATUS_FAILURE_ABORTED, null), lastOutcome)
+        assertTrue(lastOutcome!!.confirmationFailed)
+        Mockito.verify(installer).abandonSession(37)
+      }
+
+  @Test fun rejectedApkIsAPlainFailureNotARetryableConfirmation() =
+      withInstaller(terminalStatus = PackageInstaller.STATUS_FAILURE_INCOMPATIBLE) { _, _, _, install ->
+        assertFalse(install())
+        assertFalse(lastOutcome!!.confirmationFailed)
+      }
+
+  @Test fun successComesFromTheSessionResult() =
+      withInstaller { _, _, _, install ->
+        assertTrue(install())
+        assertEquals(HeadlessInstallOutcome.Installed, lastOutcome)
+      }
+
+  @Test fun autoConfirmIsArmedOnlyAfterStagingWithoutDisarmingEarly() =
+      withInstaller { _, _, session, install ->
+        var armedWhileStaging = true
+        `when`(session.openWrite(Mockito.anyString(), Mockito.anyLong(), Mockito.anyLong())).thenAnswer {
+          armedWhileStaging = InstallAutoConfirm.isArmed() // harness already mocks SystemClock
+          ByteArrayOutputStream()
+        }
+        assertTrue(install())
+        assertFalse("a slow copy must not burn the confirmation window", armedWhileStaging)
+      }
+
+  @Test fun processStartSweepAbandonsOrphanedOwnedSessions() {
+    val context = Mockito.mock(Context::class.java)
+    val packages = Mockito.mock(PackageManager::class.java)
+    val installer = Mockito.mock(PackageInstaller::class.java)
+    `when`(context.applicationContext).thenReturn(context)
+    `when`(context.packageManager).thenReturn(packages)
+    `when`(packages.packageInstaller).thenReturn(installer)
+    val sessions = listOf(303252533, 41).map { id ->
+      Mockito.mock(PackageInstaller.SessionInfo::class.java).also { `when`(it.sessionId).thenReturn(id) }
+    }
+    `when`(installer.mySessions).thenReturn(sessions)
+    Mockito.doThrow(SecurityException("Public fixture already gone")).`when`(installer).abandonSession(41)
+    Mockito.mockStatic(Log::class.java).use {
+      assertEquals(1, HeadlessInstaller.abandonOrphanedSessions(context))
+    }
+    Mockito.verify(installer).abandonSession(303252533)
+    Mockito.verify(installer).abandonSession(41)
+  }
+
+  @Test fun sweepFailureIsContained() {
+    val context = Mockito.mock(Context::class.java)
+    `when`(context.applicationContext).thenReturn(context)
+    `when`(context.packageManager).thenThrow(IllegalStateException("Public fixture no package manager"))
+    Mockito.mockStatic(Log::class.java).use {
+      assertEquals(0, HeadlessInstaller.abandonOrphanedSessions(context))
+    }
+  }
 
   @Test fun finishingOneInstallCannotDisarmAnotherAwaitingInstall() {
     fun armed(): Boolean = Mockito.mockStatic(SystemClock::class.java).use {
@@ -254,7 +324,8 @@ class HeadlessInstallerCleanupTest {
                       Mockito.any(Intent::class.java), Mockito.anyInt())
                 }.thenReturn(pending)
                 action(context, installer, session) {
-                  HeadlessInstaller.install(context, apk, "public.fixture.app", timeoutMs = timeoutMs)
+                  HeadlessInstaller.installForResult(context, apk, "public.fixture.app", timeoutMs = timeoutMs)
+                      .also { lastOutcome = it }.ok
                 }
               }
             }

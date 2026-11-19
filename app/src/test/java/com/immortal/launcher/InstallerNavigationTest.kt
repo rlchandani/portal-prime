@@ -54,7 +54,8 @@ class InstallerNavigationTest {
         assertTrue("Confirmation must be shown while auto-confirm is armed", armedAtConfirmation)
         assertFalse("Terminal completion must disarm auto-confirm", InstallAutoConfirm.isArmed())
         Mockito.verify(dream, Mockito.times(1)).finish()
-        Mockito.verify(confirmation).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        // CLEAR_TASK: a stale dialog from an abandoned session must never be brought forward.
+        Mockito.verify(confirmation).addFlags(InstallerNavigation.CONFIRMATION_FLAGS)
         Mockito.verify(context, Mockito.times(1)).startActivity(confirmation)
       } finally { ImmortalDreamNavigation.detached(dream) }
     }
@@ -104,6 +105,11 @@ class InstallerNavigationTest {
         Mockito.verify(context, Mockito.never()).startActivity(Mockito.any(Intent::class.java))
       } finally { ImmortalDreamNavigation.detached(dream) }
     }
+  }
+
+  @Test fun confirmationAlwaysReplacesAnyExistingInstallerTask() {
+    assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK,
+        InstallerNavigation.CONFIRMATION_FLAGS)
   }
 
   @Suppress("DEPRECATION")

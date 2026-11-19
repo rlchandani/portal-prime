@@ -29,6 +29,10 @@ internal data class OtaState(
     val error: OtaError? = null,
     val waitingFor: OtaWait? = null,
     val devMode: Boolean = false,
+    /** Consecutive automatic attempts whose install confirmation didn't go through. */
+    val confirmFailures: Int = 0,
+    /** Wall-clock time of the next confirmation retry, when one is scheduled. */
+    val nextRetryAtMs: Long? = null,
 ) {
   val busy: Boolean
     get() = phase == OtaPhase.CHECKING || phase == OtaPhase.DOWNLOADING || phase == OtaPhase.INSTALLING
@@ -57,6 +61,8 @@ internal object OtaWire {
       .put("error", s.error?.let { JSONObject().put("code", it.code).put("message", it.message) } ?: JSONObject.NULL)
       .put("waitingFor", s.waitingFor?.wire ?: JSONObject.NULL)
       .put("devMode", s.devMode)
+      .put("retry", if (s.confirmFailures > 0) JSONObject().put("failures", s.confirmFailures)
+          .put("nextAt", s.nextRetryAtMs ?: JSONObject.NULL) else JSONObject.NULL)
 
   private fun available(m: OtaManifest): JSONObject = JSONObject()
       .put("versionCode", m.versionCode)

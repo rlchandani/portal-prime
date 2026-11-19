@@ -224,6 +224,12 @@ object DreamPolicy {
       Log.i(TAG, "routine on screen; not relaunching frame")
       return
     }
+    // A headless install's system confirmation owns the screen: a relaunched frame would cover
+    // and pause that dialog, and Android 10 disables its Install button while it is paused.
+    if (InstallAutoConfirm.isArmed()) {
+      Log.i(TAG, "install confirmation on screen; not relaunching frame")
+      return
+    }
     // A playing YouTube video owns the screen (the photo frame would cover the official player).
     if (YtVideoScreenState.ownsScreen()) {
       Log.i(TAG, "YouTube video playing; not relaunching frame")

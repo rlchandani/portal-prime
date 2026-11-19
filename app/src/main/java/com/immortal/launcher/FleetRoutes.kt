@@ -537,10 +537,9 @@ class FleetRoutes(private val context: Context) {
     if (m.paused) return "paused"
     if (!inFlight.add(pkg)) return BUSY
     return try {
-      val ok =
-          if (m.mode == "silent") InstallDaemon.install(context, apk, pkg)
-          else HeadlessInstaller.install(context, apk, pkg)
-      if (ok) "installed" else "failed"
+      if (m.mode == "silent") {
+        if (InstallDaemon.install(context, apk, pkg)) "installed" else "failed"
+      } else HeadlessInstaller.installForResult(context, apk, pkg).fleetResult()
     } finally {
       // Publish completion only after invalidating any pre-install read snapshot.
       InstalledPackageVersions.invalidate()
@@ -572,7 +571,7 @@ class FleetRoutes(private val context: Context) {
     val apk = File(context.cacheDir, "${app.packageName}.fleet.apk")
     return try {
       StoreCatalog.download(StoreCatalog.resolveApkUrl(app), apk)
-      if (HeadlessInstaller.install(context, apk, app.packageName)) "installed" else "failed"
+      HeadlessInstaller.installForResult(context, apk, app.packageName).fleetResult()
     } catch (t: Throwable) {
       "failed"
     } finally {
@@ -658,6 +657,14 @@ class FleetRoutes(private val context: Context) {
             code to (pi.versionName ?: "")
           }
           .getOrDefault(0L to "")
+
+  /** Session-verified result; "confirm_failed" means the system dialog was never accepted. */
+  private fun HeadlessInstallOutcome.fleetResult(): String =
+      when {
+        ok -> "installed"
+        confirmationFailed -> "confirm_failed"
+        else -> "failed"
+      }
 
   private fun installMode(): InstallLifecycle.Plan = InstallDaemon.installPlan(context)
 
