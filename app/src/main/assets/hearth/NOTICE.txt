@@ -1,0 +1,12 @@
+Fonts in this directory are licensed under the SIL Open Font License 1.1.
+They are Latin subsets (fontTools pyftsubset); neither family declares a Reserved Font Name.
+They are used only by the new screensaver modes (Split glance, Night photo) and the
+digital clock screensaver, through HearthFonts; clock faces never load them by name.
+
+PlusJakartaSans.ttf — Plus Jakarta Sans (variable weight 200–800)
+  Copyright 2020 The Plus Jakarta Sans Project Authors (https://github.com/tokotype/PlusJakartaSans)
+  Full licence: PlusJakartaSans-OFL.txt
+
+InstrumentSerif.ttf, InstrumentSerif-Italic.ttf — Instrument Serif
+  Copyright 2022 The Instrument Serif Project Authors (https://github.com/Instrument/instrument-serif)
+  Full licence: InstrumentSerif-OFL.txt
