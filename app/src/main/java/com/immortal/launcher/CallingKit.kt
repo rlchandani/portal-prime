@@ -52,6 +52,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -139,7 +141,8 @@ internal fun CallPill(label: String, onClick: () -> Unit, modifier: Modifier = M
       .callClick(label, enabled, onClick).padding(horizontal = size.padding),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterHorizontally)) {
     icon?.let { CallIcon(it, ink, size.icon) }
-    Text(label, color = ink, fontSize = size.text, fontWeight = FontWeight.SemiBold, maxLines = 1)
+    Text(label, color = ink, fontSize = size.text, fontWeight = FontWeight.SemiBold, maxLines = 1,
+        overflow = if (currentLayoutClass().compact) TextOverflow.Ellipsis else TextOverflow.Clip)
   }
 }
 
@@ -248,15 +251,15 @@ internal fun CallRingBackground(name: String, motion: Boolean, modifier: Modifie
 /** `.bigb`: 176 dp ring answer/decline buttons with a label under them. */
 @Composable
 internal fun CallBigButton(icon: String, label: String, color: Color, onClick: () -> Unit, nudge: Boolean = false,
-                           iconRotation: Float = 0f) {
+                           iconRotation: Float = 0f, size: Dp = 176.dp, iconSize: Dp = 70.dp) {
   val dy = if (nudge) {
     val t = rememberInfiniteTransition(label = "nudge")
     t.animateFloat(0f, 1f, infiniteRepeatable(tween(NUDGE_MS, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "y").value
   } else 0f
   Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(18.dp)) {
-    Box(Modifier.graphicsLayer { translationY = -NUDGE_DP * density * dy }.size(176.dp).background(color, CircleShape)
+    Box(Modifier.graphicsLayer { translationY = -NUDGE_DP * density * dy }.size(size).background(color, CircleShape)
         .callClick(label, true, onClick), contentAlignment = Alignment.Center) {
-      CallIcon(icon, Color.White, 70.dp, Modifier.graphicsLayer { rotationZ = iconRotation })
+      CallIcon(icon, Color.White, iconSize, Modifier.graphicsLayer { rotationZ = iconRotation })
     }
     Text(label, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
   }
@@ -264,12 +267,14 @@ internal fun CallBigButton(icon: String, label: String, color: Color, onClick: (
 
 /** Title + subtitle block used on ring and result screens. */
 @Composable
-internal fun CallHeadline(title: String, sub: String?, titleSize: TextUnit = 72.sp) {
+internal fun CallHeadline(title: String, sub: String?, titleSize: TextUnit = 72.sp, subSize: TextUnit = 30.sp) {
+  // Compact (the Mini): the subtitle wraps within the window instead of a fixed 1100 dp column.
+  val compact = currentLayoutClass().compact
   Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
     Text(title, color = Color.White, fontSize = titleSize, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-        letterSpacing = (-0.5).sp, maxLines = 2)
-    sub?.let { Text(it, color = Color.White.copy(alpha = 0.72f), fontSize = 30.sp, textAlign = TextAlign.Center,
-        modifier = Modifier.width(1100.dp)) }
+        letterSpacing = (-0.5).sp, maxLines = 2, overflow = if (compact) TextOverflow.Ellipsis else TextOverflow.Clip)
+    sub?.let { Text(it, color = Color.White.copy(alpha = 0.72f), fontSize = subSize, textAlign = TextAlign.Center,
+        modifier = if (compact) Modifier.widthIn(max = 1100.dp) else Modifier.width(1100.dp)) }
   }
 }
 

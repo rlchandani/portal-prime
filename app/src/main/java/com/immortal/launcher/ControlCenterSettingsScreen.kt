@@ -79,7 +79,17 @@ private fun CcSettingsBody(slice: CcSetSlice, ui: CcUi) {
   val write: (String, Any) -> Unit = remember(ui) { { key, value -> ControlCenterSettings.set(ui.context, key, value) } }
   val st = slice.settings
   Box(Modifier.fillMaxSize()) {
-    Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+    if (currentLayoutClass().compactPortrait) {
+      // The Mini upright: the sections as a sideways-scrolling tab strip above one full-width page.
+      Column(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        CcScrollingSeg(section, Modifier.fillMaxWidth()) { inView ->
+          CcSeg(SECTION_TABS, section, { section = it }, selectedModifier = inView)
+        }
+        Column(Modifier.weight(1f).fillMaxWidth().ccCard().verticalScroll(rememberScrollState()).padding(horizontal = 32.dp, vertical = 28.dp)) {
+          CcSettingsSectionPage(section, slice, hasPin, ui, write) { pinFor = it }
+        }
+      }
+    } else Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
       CcSettingsNav(section) { section = it }
       Column(Modifier.weight(1f).fillMaxHeight().ccCard().verticalScroll(rememberScrollState()).padding(horizontal = 36.dp, vertical = 30.dp)) {
         when (section) {
@@ -104,6 +114,24 @@ private fun CcSettingsBody(slice: CcSetSlice, ui: CcUi) {
 }
 
 internal enum class CcPinPurpose { ENTER_KIDS, CHANGE }
+
+/** The portrait page for [section] (the landscape body inlines the same choice). */
+@Composable
+private fun CcSettingsSectionPage(section: CcSetSection, slice: CcSetSlice, hasPin: Boolean, ui: CcUi, write: (String, Any) -> Unit,
+                                  onPin: (CcPinPurpose) -> Unit) {
+  val st = slice.settings
+  when (section) {
+    CcSetSection.PORTALS -> CcSetPortals(st.portalMode, hasPin, ui, write) { onPin(CcPinPurpose.ENTER_KIDS) }
+    CcSetSection.KIDS -> CcSetKids(st, hasPin, write) { onPin(CcPinPurpose.CHANGE) }
+    CcSetSection.CONFIRM -> CcSetConfirm(st, write)
+    CcSetSection.BANNERS -> CcSetBanners(st, ui, write)
+    CcSetSection.LOOK -> CcSetLook(st, ui, write)
+    CcSetSection.HA -> CcSetHomeAssistant(slice, ui)
+  }
+}
+
+/** Portrait tab strip: (section, label, icon). */
+private val SECTION_TABS = CcSetSection.entries.map { Triple(it, it.label, it.icon) }
 
 /** Mock `.stNav`. */
 @Composable

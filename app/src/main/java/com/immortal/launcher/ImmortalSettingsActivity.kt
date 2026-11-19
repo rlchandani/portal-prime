@@ -28,6 +28,19 @@ import kotlinx.coroutines.withContext
 
 private const val STATE_STACK = "settings_split_stack"
 private const val STATE_CONTROL = "settings_split_control"
+private const val STATE_LIST = "settings_single_pane_list"
+
+/**
+ * Where Settings opens. A recreate (rotation, theme) restores its saved stack and never re-applies
+ * the launch intent's deep link, which was consumed on first open (it would otherwise reopen the
+ * deep-linked page or relaunch its editor). Pure.
+ */
+internal fun settingsEntryStack(
+    recreated: Boolean,
+    deepLink: () -> SettingsBackStack?,
+    restored: () -> SettingsBackStack?,
+    lastPage: () -> SettingsBackStack,
+): SettingsBackStack = (if (recreated) restored() else deepLink()) ?: lastPage()
 
 /**
  * Hearthpane Settings: an iPadOS-style split view. The left column lists the pages in four
@@ -46,6 +59,13 @@ class ImmortalSettingsActivity : ComponentActivity() {
   private var entryFirstDraw: SettingsEntryFirstDrawObservation? = null
 
   private var stack by mutableStateOf(SettingsBackStack.of(SettingsPageIds.DEFAULT))
+  /** Single-pane Settings (narrow window): the page list is showing rather than a page. */
+  private var showList by mutableStateOf(true)
+
+  private fun singlePaneNow(): Boolean {
+    val config = resources.configuration
+    return LayoutClass.of(config).compact && config.screenWidthDp < LayoutClass.NARROW_WIDTH_DP
+  }
 
   private fun observeEntryFirstDraw() {
     val report = entryReport ?: return
@@ -84,6 +104,12 @@ class ImmortalSettingsActivity : ComponentActivity() {
     super.onDestroy()
   }
 
+  /** A page was picked (list row, search result, in-page link): single-pane shows the page. */
+  private fun reveal(next: SettingsBackStack) {
+    showList = false
+    show(next)
+  }
+
   /** Every navigation funnels here: one state write, and the page id is remembered for next time. */
   private fun show(next: SettingsBackStack) {
     if (next == stack) return
@@ -107,14 +133,20 @@ class ImmortalSettingsActivity : ComponentActivity() {
     }
   }
 
-  private fun initialStack(intent: Intent, saved: Bundle?): SettingsBackStack =
-      requestedStack(intent)
-          ?: SettingsBackStack.restore(saved?.getStringArrayList(STATE_STACK), saved?.getString(STATE_CONTROL))
-          ?: SettingsBackStack.of(SettingsLastPage.resolve(SettingsLastPage.read(this),
-              ImmortalSettings.advancedSettings(this)))
+  private fun initialStack(intent: Intent, saved: Bundle?): SettingsBackStack = settingsEntryStack(
+      recreated = saved != null,
+      deepLink = { requestedStack(intent)?.also { showList = false } },
+      restored = { SettingsBackStack.restore(saved?.getStringArrayList(STATE_STACK), saved?.getString(STATE_CONTROL)) },
+      lastPage = { SettingsBackStack.of(SettingsLastPage.resolve(SettingsLastPage.read(this),
+          ImmortalSettings.advancedSettings(this))) },
+  )
 
   /** Remote and physical Back walk up the right column; at the top they leave Settings. */
   internal fun handleRemoteSettingsBack(): Boolean {
+    if (!stack.canGoBack && singlePaneNow() && !showList) {
+      showList = true
+      return true
+    }
     if (!stack.canGoBack) return false
     show(stack.back())
     return true
@@ -123,7 +155,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
   /** Content rows (Stocks › Alpaca, Photo source, …) open pages here; full-screen editors launch. */
   private fun navigateLocal(route: ApprovedSettingsRoute) {
     when (val destination = SettingsLegacyIds.resolve(route.page, route.category, route.control)) {
-      is SettingsDestination.Page -> show(stack.open(destination.page, destination.control))
+      is SettingsDestination.Page -> reveal(stack.open(destination.page, destination.control))
       is SettingsDestination.Activity -> startActivity(approvedSettingsIntent(this, destination.id))
       null -> Unit
     }
@@ -138,6 +170,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
           SettingsTree.topLevel.map { it.id }.toSet(), SettingsTree.pages.map { it.id }.toSet(),
           index.mapNotNull { it.control }.toSet())
     }
+    savedInstanceState?.let { showList = it.getBoolean(STATE_LIST, true) }
     stack = initialStack(intent, savedInstanceState)
     SettingsLastPage.write(this, stack.current)
     setContent {
@@ -152,7 +185,9 @@ class ImmortalSettingsActivity : ComponentActivity() {
             LocalApprovedSettingsBack provides back,
             LocalApprovedSettingsViewportMemory provides viewports,
         ) {
-          SettingsHostScreen(stack, ::show, clearHighlight)
+          val listPane = remember { SettingsPane(showList = true, onShowList = { showList = true }) }
+          val pagePane = remember { SettingsPane(showList = false, onShowList = listPane.onShowList) }
+          SettingsHostScreen(stack, ::show, ::reveal, clearHighlight, if (showList) listPane else pagePane)
         }
       }
     }
@@ -162,12 +197,13 @@ class ImmortalSettingsActivity : ComponentActivity() {
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
-    requestedStack(intent)?.let(::show)
+    requestedStack(intent)?.let(::reveal)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
     outState.putStringArrayList(STATE_STACK, ArrayList(stack.pages))
     stack.control?.let { outState.putString(STATE_CONTROL, it) }
+    outState.putBoolean(STATE_LIST, showList)
     super.onSaveInstanceState(outState)
   }
 }
@@ -176,11 +212,15 @@ class ImmortalSettingsActivity : ComponentActivity() {
 private fun SettingsHostScreen(
     stack: SettingsBackStack,
     show: (SettingsBackStack) -> Unit,
+    reveal: (SettingsBackStack) -> Unit,
     clearHighlight: () -> Unit,
+    pane: SettingsPane,
 ) {
   val context = LocalContext.current
   val advanced = rememberApprovedAdvanced()
   BackHandler(enabled = stack.canGoBack) { show(stack.back()) }
+  // Single pane: Back at a page's root returns to the page list before leaving Settings.
+  BackHandler(enabled = !stack.canGoBack && !pane.showList && settingsSinglePane()) { pane.onShowList() }
   var prerequisite by remember(stack.current, stack.control) { mutableStateOf<String?>(null) }
   LaunchedEffect(stack.current, stack.control) {
     stack.control?.let { control ->
@@ -188,7 +228,7 @@ private fun SettingsHostScreen(
     }
   }
   val page = stack.current
-  val actions = rememberSettingsHostActions(stack, show)
+  val actions = rememberSettingsHostActions(stack, show, reveal)
   SettingsSplitShell(
       selectedRoot = SettingsTree.rootOf(page),
       heading = SettingsDetailHeading(
@@ -201,6 +241,7 @@ private fun SettingsHostScreen(
       onHome = actions.home,
       diagnosticsScope = "${SettingsTree.rootOf(page)}/$page",
       diagnosticsControl = stack.control,
+      pane = pane,
   ) {
     key(page) {
       if (SettingsTree.needsAdvanced(page) && !advanced) {
@@ -230,12 +271,13 @@ internal class SettingsHostActions(
 internal fun settingsHostActions(
     stack: () -> SettingsBackStack,
     show: (SettingsBackStack) -> Unit,
+    reveal: (SettingsBackStack) -> Unit = show,
     home: () -> Unit,
 ) = SettingsHostActions(
-    select = { show(stack().select(it)) },
-    open = { show(stack().open(it)) },
+    select = { reveal(stack().select(it)) },
+    open = { reveal(stack().open(it)) },
     back = { show(stack().back()) },
-    searchResult = { show(SettingsBackStack.of(it.page, it.control)) },
+    searchResult = { reveal(SettingsBackStack.of(it.page, it.control)) },
     home = home,
 )
 
@@ -243,12 +285,14 @@ internal fun settingsHostActions(
 private fun rememberSettingsHostActions(
     stack: SettingsBackStack,
     show: (SettingsBackStack) -> Unit,
+    reveal: (SettingsBackStack) -> Unit,
 ): SettingsHostActions {
   val context = LocalContext.current
   val currentStack by rememberUpdatedState(stack)
   val currentShow by rememberUpdatedState(show)
+  val currentReveal by rememberUpdatedState(reveal)
   return remember(context) {
-    settingsHostActions({ currentStack }, { currentShow(it) }) {
+    settingsHostActions({ currentStack }, { currentShow(it) }, { currentReveal(it) }) {
       context.startActivity(Intent(context, HomeActivity::class.java)
           .putExtra("approved_home_tab", "home")
           .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))

@@ -304,10 +304,14 @@ private fun LampControlDialog(
         state.brightness else state.warmth) * 100).roundToInt().toString()) }
     var error by remember { mutableStateOf<String?>(null) }
     Dialog(onDismissRequest = onCancel, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        val compact = currentLayoutClass().compact
+        // Compact: a side margin at 800 dp and a height cap for the 740 dp landscape window.
+        val frame = if (compact) compactDialogFrame(maxWidthDp = 900, maxHeightDp = 1100)
+            else Modifier.widthIn(max = 900.dp).fillMaxWidth().heightIn(max = 1100.dp)
         Surface(color = palette.surface, shape = RoundedCornerShape(28.dp),
             border = BorderStroke(1.dp, palette.divider),
-            modifier = Modifier.widthIn(max = 900.dp).fillMaxWidth().heightIn(max = 1100.dp)) {
-            Column(Modifier.verticalScroll(rememberScrollState()).padding(38.dp)) {
+            modifier = frame) {
+            Column(Modifier.verticalScroll(rememberScrollState()).padding(if (compact) 30.dp else 38.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(control.title, color = palette.text, fontSize = 34.sp, lineHeight = 44.sp,
                         fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))

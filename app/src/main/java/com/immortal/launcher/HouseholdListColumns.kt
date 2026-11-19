@@ -39,7 +39,16 @@ private val COL_GAP = 40.dp
 /** Right pane: open items in two columns (long-press a name to drag), then the Done section. */
 @Composable
 internal fun HouseholdListColumns(view: HouseholdListView, toast: HouseholdListToast, singleColumn: Boolean,
-                                  onOpenItem: (String) -> Unit, onClearDone: () -> Unit, modifier: Modifier = Modifier) {
+                                  onOpenItem: (String) -> Unit, onClearDone: () -> Unit, modifier: Modifier = Modifier,
+                                  footer: (@Composable () -> Unit)? = null) {
+  if (footer != null) {
+    // Compact portrait: the same sections, then the footer, in one scroll.
+    Column(modifier.verticalScroll(rememberScrollState())) {
+      ListSections(view, toast, singleColumn, onOpenItem, onClearDone)
+      footer()
+    }
+    return
+  }
   val palette = LocalApprovedPalette.current
   val open = view.list.open()
   val done = view.list.done()
@@ -68,6 +77,38 @@ internal fun HouseholdListColumns(view: HouseholdListView, toast: HouseholdListT
     }
     if (doneOpen) ItemGrid(done, cols, view, toast, onOpenItem, draggable = false)
   }
+}
+
+/** [HouseholdListColumns]' sections (open items, Done) for a caller-owned scrolling column. */
+@Composable
+private fun ListSections(view: HouseholdListView, toast: HouseholdListToast, singleColumn: Boolean,
+                         onOpenItem: (String) -> Unit, onClearDone: () -> Unit) {
+  val palette = LocalApprovedPalette.current
+  val open = view.list.open()
+  val done = view.list.done()
+  var doneOpen by remember { mutableStateOf(true) }
+  val cols = if (singleColumn) 1 else 2
+  if (open.isEmpty() && done.isEmpty()) {
+    Text("The list is empty", color = palette.text, fontSize = 34.sp, lineHeight = 42.sp)
+    Spacer(Modifier.height(10.dp))
+    Text("Anything you add shows up on every Portal and in Portal Toolkit on everyone’s phone.", color = palette.secondary,
+        fontSize = 22.sp, lineHeight = 30.sp)
+    return
+  }
+  if (open.isEmpty()) Text("Everything’s ticked off", color = palette.text, fontSize = 34.sp, lineHeight = 42.sp,
+      modifier = Modifier.padding(vertical = 24.dp))
+  else ItemGrid(open, cols, view, toast, onOpenItem, draggable = true)
+  if (done.isEmpty()) return
+  Row(Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.heightIn(min = 64.dp).tvFocusableRow { doneOpen = !doneOpen }.padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      Text(if (doneOpen) "⌄" else "›", color = palette.secondary, fontSize = 26.sp)
+      Text("Done (${done.size})", color = palette.secondary, fontSize = 24.sp, lineHeight = 30.sp, maxLines = 1)
+    }
+    Spacer(Modifier.weight(1f))
+    ApprovedHomePillButton("Clear done", onClick = onClearDone)
+  }
+  if (doneOpen) ItemGrid(done, cols, view, toast, onOpenItem, draggable = false)
 }
 
 @Composable

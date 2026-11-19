@@ -9,6 +9,7 @@ package com.immortal.launcher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -47,14 +48,16 @@ internal fun GuestCardScreen(
     onEnd: () -> Unit,
     onEdit: () -> Unit,
 ) {
+  val compactPortrait = currentLayoutClass().compactPortrait
   var touchedAt by remember { mutableLongStateOf(System.currentTimeMillis()) }
   LaunchedEffect(touchedAt) { delay(IDLE_CLOSE_MS); onClose() }
   Box(Modifier.fillMaxSize().background(ApprovedHomePalette.Background).pointerInput(Unit) {
     awaitPointerEventScope { while (true) { awaitPointerEvent(PointerEventPass.Initial); touchedAt = System.currentTimeMillis() } }
-  }.padding(horizontal = 48.dp, vertical = 32.dp)) {
+  }.padding(horizontal = if (compactPortrait) 32.dp else 48.dp, vertical = 32.dp)) {
     when {
       content == null -> Unit
       !content.ready -> GuestCardEmpty(onEdit)
+      compactPortrait -> GuestCardStacked(content, mode, onStart, onEnd)
       else -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(48.dp),
           verticalAlignment = Alignment.CenterVertically) {
         GuestQr(content.network)
@@ -67,6 +70,29 @@ internal fun GuestCardScreen(
     Box(Modifier.align(Alignment.TopEnd)) { RoundIconButton("x", "Close guest card", onClose) }
   }
 }
+
+/**
+ * Compact portrait: the QR (as large as the width allows, up to the Portal+ size) centred on top,
+ * then the details and Guest mode controls below, all in one scroll.
+ */
+@Composable
+private fun GuestCardStacked(content: GuestCardContent, mode: GuestModeState, onStart: (GuestSchedule) -> Unit,
+                             onEnd: () -> Unit) {
+  BoxWithConstraints(Modifier.fillMaxSize()) {
+    // Leave room for the close button beside the centred code.
+    val qr = minOf(maxWidth - STACKED_QR_INSET * 2, STACKED_QR_MAX)
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+      Box(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp), contentAlignment = Alignment.Center) {
+        GuestQr(content.network, size = qr)
+      }
+      GuestCardDetails(content)
+      GuestModeControls(mode, onStart, onEnd)
+    }
+  }
+}
+
+private val STACKED_QR_MAX = 400.dp
+private val STACKED_QR_INSET = 96.dp
 
 @Composable
 private fun GuestCardEmpty(onEdit: () -> Unit) {

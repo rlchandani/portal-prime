@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,6 +48,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -115,16 +119,51 @@ private fun statusColor(status: DinnerStatus): Color = when {
 /** One row per room, Try again where it can help, and replies under their room. */
 @Composable
 internal fun DinnerResultDialog(send: DinnerSend, onRetry: (String) -> Unit, onDone: () -> Unit) {
+  val layoutClass = currentLayoutClass()
   Box(Modifier.fillMaxSize().background(DinnerColors.Scrim), contentAlignment = Alignment.Center) {
     val shape = RoundedCornerShape(36.dp)
-    Column(Modifier.width(1080.dp).clip(shape).background(ApprovedHomePalette.Background).border(1.dp, ApprovedHomePalette.Border, shape)
-        .padding(horizontal = 54.dp, vertical = 50.dp)) {
+    // Compact: the card fills the narrow window (with a margin) and scrolls when many rooms answer.
+    val frame = if (layoutClass.compact) {
+      Modifier.padding(horizontal = 24.dp, vertical = 32.dp).fillMaxWidth().widthIn(max = 1080.dp).clip(shape)
+          .background(ApprovedHomePalette.Background).border(1.dp, ApprovedHomePalette.Border, shape)
+          .verticalScroll(rememberScrollState()).padding(horizontal = 32.dp, vertical = 30.dp)
+    } else {
+      Modifier.width(1080.dp).clip(shape).background(ApprovedHomePalette.Background).border(1.dp, ApprovedHomePalette.Border, shape)
+          .padding(horizontal = 54.dp, vertical = 50.dp)
+    }
+    Column(frame) {
       Text(DinnerCopy.resultTitle(send), color = ApprovedHomePalette.Text, fontSize = 44.sp, fontWeight = FontWeight.Medium)
       HorizontalDivider(Modifier.padding(vertical = 28.dp), color = ApprovedHomePalette.Border)
       if (send.rows.isEmpty()) Text("No other Portal answered.", color = ApprovedHomePalette.Secondary, fontSize = 26.sp)
-      send.rows.forEach { row -> ResultRow(row, onRetry) }
+      send.rows.forEach { row -> if (layoutClass.compact) CompactResultRow(row, onRetry) else ResultRow(row, onRetry) }
       HorizontalDivider(Modifier.padding(vertical = 28.dp), color = ApprovedHomePalette.Border)
       Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) { DinnerSolidButton("Done", onClick = onDone) }
+    }
+  }
+}
+
+/** Compact [ResultRow]: the status sits under the room name so neither is squeezed mid-word. */
+@Composable
+private fun CompactResultRow(row: DinnerRow, onRetry: (String) -> Unit) {
+  Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+    Icon(painterResource(DinnerIcons.resource("display")), null, tint = ApprovedHomePalette.Secondary, modifier = Modifier.size(34.dp))
+    Column(Modifier.weight(1f).padding(start = 20.dp)) {
+      Text(row.roomName, color = ApprovedHomePalette.Text, fontSize = 30.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      val color = statusColor(row.status).takeIf { it != Color.Unspecified } ?: ApprovedHomePalette.Secondary
+      Text(row.status.rowText, color = color, fontSize = 26.sp)
+    }
+    if (row.status.retryable) {
+      Spacer(Modifier.width(16.dp))
+      ApprovedHomePillButton("Try again", onClick = { onRetry(row.roomId) })
+    }
+  }
+  row.reply?.let { reply ->
+    Row(Modifier.padding(start = 54.dp, top = 8.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+      Icon(painterResource(DinnerIcons.resource("reply")), null, tint = DinnerColors.Glyph, modifier = Modifier.size(30.dp))
+      Text(buildAnnotatedString {
+        append("${row.roomName} replied: ")
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(reply.label) }
+      }, color = ApprovedHomePalette.Text, fontSize = 28.sp, modifier = Modifier.padding(start = 16.dp))
     }
   }
 }
@@ -155,14 +194,18 @@ private fun ResultRow(row: DinnerRow, onRetry: (String) -> Unit) {
 /** Ping confirms with a toast, not a dialog. */
 @Composable
 internal fun DinnerPingToast(send: DinnerSend, onRetry: (String) -> Unit) {
+  val compact = currentLayoutClass().compact
   Box(Modifier.fillMaxSize().padding(bottom = 140.dp), contentAlignment = Alignment.BottomCenter) {
     val shape = RoundedCornerShape(40.dp)
     val bad = send.rows.firstOrNull { it.status.retryable }
-    Row(Modifier.clip(shape).background(ApprovedHomePalette.Chrome).padding(horizontal = 36.dp, vertical = 22.dp),
+    // Compact: a side margin bounds the toast; the message then wraps by whole words.
+    val margin = if (compact) Modifier.padding(horizontal = 24.dp) else Modifier
+    Row(margin.clip(shape).background(ApprovedHomePalette.Chrome).padding(horizontal = 36.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically) {
       Icon(painterResource(DinnerIcons.resource("bell")), null, tint = if (bad != null && !send.pending) DinnerColors.Bad else ApprovedHomePalette.Text,
           modifier = Modifier.size(30.dp))
-      Text(DinnerCopy.pingToast(send), color = ApprovedHomePalette.Text, fontSize = 28.sp, modifier = Modifier.padding(start = 18.dp))
+      val textModifier = if (compact) Modifier.weight(1f, fill = false).padding(start = 18.dp) else Modifier.padding(start = 18.dp)
+      Text(DinnerCopy.pingToast(send), color = ApprovedHomePalette.Text, fontSize = 28.sp, modifier = textModifier)
       if (bad != null && !send.pending) {
         Spacer(Modifier.width(20.dp))
         ApprovedHomeTextButton("Try again") { onRetry(bad.roomId) }

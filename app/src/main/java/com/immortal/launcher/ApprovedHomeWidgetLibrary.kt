@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -79,9 +80,13 @@ internal fun ApprovedHomeWidgetLibraryScreen(
       onDispose { }
     }
     // Library and the retained launcher share the saved appearance.
+    val layoutClass = currentLayoutClass()
+    val side = WidgetPickerColumns.librarySidePaddingDp(layoutClass).dp
     CompositionLocalProvider(LocalApprovedHomePopup provides true) {
       Column(Modifier.fillMaxSize().background(ApprovedHomePalette.Background)) {
-        Row(Modifier.fillMaxWidth().height(103.dp).padding(horizontal = 56.dp),
+        if (layoutClass.compactPortrait) {
+          CompactLibraryHeader(room, connected, providers, onBack, onHome, onPair, onSleep, onSearch, onSettings)
+        } else Row(Modifier.fillMaxWidth().height(103.dp).padding(horizontal = side),
             verticalAlignment = Alignment.CenterVertically) {
           Row(Modifier.heightIn(min = 68.dp)
               .semantics { contentDescription = "Home" }
@@ -119,9 +124,10 @@ internal fun ApprovedHomeWidgetLibraryScreen(
         }
         Box(Modifier.fillMaxWidth().height(1.dp).background(ApprovedHomePalette.Border))
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
+            columns = GridCells.Fixed(WidgetPickerColumns.library(layoutClass)),
             modifier = Modifier.weight(1f).fillMaxWidth(),
-            contentPadding = PaddingValues(start = 56.dp, end = 56.dp, top = 36.dp, bottom = 150.dp),
+            contentPadding = PaddingValues(start = side, end = side, top = 36.dp,
+                bottom = if (layoutClass.compact) 48.dp else 150.dp),
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
@@ -134,7 +140,7 @@ internal fun ApprovedHomeWidgetLibraryScreen(
                   else "Add, configure or remove any existing widget family.",
                   color = ApprovedHomePalette.Secondary, fontSize = 23.sp, lineHeight = 33.sp,
                   modifier = Modifier.padding(top = 12.dp))
-              Row(Modifier.padding(top = 34.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+              LibraryActionsRow(layoutClass.compact) {
                 LibraryPrimaryAction(if (providers) "Refresh" else "Customize home",
                     if (providers) onRefresh else onCustomize)
                 if (providers) ApprovedHomeTextButton("Home & widgets",
@@ -170,6 +176,65 @@ internal fun ApprovedHomeWidgetLibraryScreen(
         }
       }
     }
+  }
+}
+
+/** The heading's actions: today's row on the Portal+, wrapping when compact. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun LibraryActionsRow(compact: Boolean, content: @Composable () -> Unit) {
+  if (compact) {
+    FlowRow(Modifier.padding(top = 28.dp), horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)) { content() }
+  } else {
+    Row(Modifier.padding(top = 34.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) { content() }
+  }
+}
+
+/**
+ * Compact portrait header: the wordmark and the five round actions on the first line; the room,
+ * Back/Home and the connection state on the second (one 800 dp line can't hold all of them).
+ */
+@Composable
+private fun CompactLibraryHeader(
+    room: String, connected: Boolean?, providers: Boolean, onBack: () -> Unit, onHome: () -> Unit,
+    onPair: () -> Unit, onSleep: () -> Unit, onSearch: () -> Unit, onSettings: () -> Unit,
+) {
+  val side = WidgetPickerColumns.librarySidePaddingDp(LayoutClass.COMPACT_PORTRAIT).dp
+  Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = side), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.heightIn(min = 68.dp)
+        .semantics { contentDescription = "Home" }
+        .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f,
+            ringColor = ApprovedHomePalette.Accent, onClick = onHome),
+        verticalAlignment = Alignment.CenterVertically) {
+      HearthpaneWordmark(ApprovedHomePalette.Text)
+    }
+    Spacer(Modifier.weight(1f))
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      LibraryRoundAction("remote", "Connect your phone", onPair)
+      LibraryRoundAction("sleep", "Sleep screen", onSleep)
+      ApprovedThemeButton()
+      LibraryRoundAction("search", "Search apps and settings", onSearch)
+      LibraryRoundAction("settings", "Settings", onSettings)
+    }
+  }
+  Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).padding(horizontal = side), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.heightIn(min = 68.dp)
+        .tvFocusable(RoundedCornerShape(16.dp), focusScale = 1f,
+            ringColor = ApprovedHomePalette.Accent, onClick = onBack)
+        .padding(end = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      ApprovedHomeIcon("back", Modifier.size(28.dp), ApprovedHomePalette.Accent)
+      Text(if (providers) "Back" else "Home", color = ApprovedHomePalette.Accent,
+          fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+    }
+    Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.weight(1f).padding(start = 12.dp))
+    ApprovedHomeIcon("wifi", Modifier.size(22.dp))
+    Text(when (connected) { true -> "Connected"; false -> "Offline"; null -> "Connecting" },
+        color = ApprovedHomePalette.Secondary, fontSize = 20.sp, maxLines = 1,
+        modifier = Modifier.padding(start = 10.dp))
   }
 }
 

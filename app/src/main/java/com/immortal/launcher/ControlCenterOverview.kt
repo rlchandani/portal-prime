@@ -10,6 +10,11 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -42,6 +47,7 @@ internal fun CcOverviewScreen(s: CcUiState, ui: CcUi) {
   val plan = s.plan
   val loading = plan == null || (s.connection.phase == CcPhase.CONNECTING && s.entities.isEmpty())
   CcSceneWalkClock(s)
+  if (currentLayoutClass().compactPortrait) { CcOverviewPortrait(s, ui, loading); return }
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     Box(Modifier.weight(1f).fillMaxHeight().clip(PLAN_CARD).background(c.planBg)) {
       when {
@@ -55,8 +61,29 @@ internal fun CcOverviewScreen(s: CcUiState, ui: CcUi) {
   }
 }
 
+/**
+ * The Mini upright: the plan card on top (the plan is wider than tall, so it gets the larger
+ * share), the side column's cards below it, scrolling on their own.
+ */
 @Composable
-private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan) {
+private fun CcOverviewPortrait(s: CcUiState, ui: CcUi, loading: Boolean) {
+  val c = LocalCc.current
+  val plan = s.plan
+  Column(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    Box(Modifier.weight(PORTRAIT_PLAN_WEIGHT).fillMaxWidth().clip(PLAN_CARD).background(c.planBg)) {
+      when {
+        loading || plan == null -> CcOverviewLoading(s)
+        plan.isEmpty -> CcPlanEmpty(s, ui)
+        else -> CcPlanCard(s, ui, plan, portrait = true)
+      }
+    }
+    if (loading) CcSideSkeleton(Modifier.weight(1f).fillMaxWidth().clipToBounds())
+    else CcSideColumn(s, ui, Modifier.weight(1f).fillMaxWidth().ccRegionLayer(c.bg))
+  }
+}
+
+@Composable
+private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan, portrait: Boolean = false) {
   val view = ui.planView
   val floor = plan.floor(view.floorId) ?: return
   val lens = view.lens
@@ -91,8 +118,17 @@ private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan) {
         modifier = Modifier.fillMaxSize().padding(top = 96.dp, bottom = 84.dp).alpha(if (phase in DOWN_PHASES) DOWN_ALPHA else 1f))
     CcPlanTopRow(floors, floor.id, lens, onFloor, onLens, Modifier.align(Alignment.TopStart).padding(start = 24.dp, end = 24.dp, top = 22.dp))
     staleLine?.let { CcStaleBar(it, Modifier.align(Alignment.TopCenter).padding(top = 100.dp)) }
-    CcPlanLegends(legends, lens, Modifier.align(Alignment.BottomStart).padding(start = 24.dp, bottom = 22.dp))
-    CcFreshnessPill(fresh, phase == CcPhase.LIVE, Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = 22.dp))
+    if (portrait) {
+      // Narrow card: the legend and the freshness pill share one row; a long legend scrolls instead of colliding.
+      Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 22.dp),
+          verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Box(Modifier.weight(1f).horizontalScroll(rememberScrollState())) { CcPlanLegends(legends, lens) }
+        CcFreshnessPill(fresh, phase == CcPhase.LIVE)
+      }
+    } else {
+      CcPlanLegends(legends, lens, Modifier.align(Alignment.BottomStart).padding(start = 24.dp, bottom = 22.dp))
+      CcFreshnessPill(fresh, phase == CcPhase.LIVE, Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = 22.dp))
+    }
   }
 }
 
@@ -138,6 +174,8 @@ private fun CcSceneWalkClock(s: CcUiState) {
 }
 
 private val PLAN_CARD = RoundedCornerShape(36.dp)
+/** Portrait: the plan card's share of the height against the side cards' 1. */
+private const val PORTRAIT_PLAN_WEIGHT = 1.5f
 private val DOWN_PHASES = setOf(CcPhase.UNREACHABLE, CcPhase.OFFLINE, CcPhase.AUTH_FAILED, CcPhase.NOT_CONFIGURED)
 private const val DOWN_ALPHA = 0.55f
 /** How long the finished walk lingers before the run is cleared. */

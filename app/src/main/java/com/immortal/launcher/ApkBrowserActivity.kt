@@ -21,6 +21,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -83,7 +85,7 @@ private fun ApkBrowserScreen() {
     } else apks = emptyList()
   }
   ApprovedAppsShell("store", { activity?.finish() }) {
-    LazyColumn(Modifier.fillMaxSize().padding(horizontal = 56.dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+    LazyColumn(Modifier.fillMaxSize().padding(horizontal = storeSidePaddingDp(currentLayoutClass()).dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
       item("heading") {
         Column(Modifier.fillMaxWidth()) {
           ApprovedAppsHeading("Install an APK", "Choose a downloaded Android app to install.")
@@ -158,8 +160,12 @@ private fun ApkBrowserScreen() {
   selected?.let { selection ->
     val apk = selection.metadata
     Dialog(onDismissRequest = { selected = null; selection.close() }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-      Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = BorderStroke(1.dp, IosDivider), modifier = Modifier.width(760.dp)) {
-        Column(Modifier.padding(36.dp)) {
+      val compact = currentLayoutClass().compact
+      // Compact: fits the 800 dp width and scrolls within the 740 dp landscape height.
+      val frame = if (compact) compactDialogFrame(maxWidthDp = 760, maxHeightDp = 980) else Modifier.width(760.dp)
+      val body = if (compact) Modifier.verticalScroll(rememberScrollState()).padding(28.dp) else Modifier.padding(36.dp)
+      Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = BorderStroke(1.dp, IosDivider), modifier = frame) {
+        Column(body) {
           Text("Install ${apk.label}?", color = IosLabel, fontSize = 34.sp, fontWeight = FontWeight.Medium)
           Text("${apk.file.name}\nAndroid verifies this APK’s compatibility and signing certificate before installing it.", color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 20.dp))
           Row(Modifier.padding(top = 28.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {

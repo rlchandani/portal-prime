@@ -57,6 +57,20 @@ private val NavBarHeight = 104.dp
 private const val BACK_FRACTION = .4f
 private const val TITLE_FRACTION = .5f
 
+/**
+ * True when Settings runs single-pane (master list → detail page) because the window is too narrow
+ * for the split view (the Portal Mini upright). Pages read it for their side padding.
+ */
+internal val LocalSettingsSinglePane = staticCompositionLocalOf { false }
+
+/** The split view needs [LayoutClass.NARROW_WIDTH_DP]; below it a compact window goes single-pane. */
+@Composable
+internal fun settingsSinglePane(): Boolean =
+    currentLayoutClass().compact && LocalConfiguration.current.screenWidthDp < LayoutClass.NARROW_WIDTH_DP
+
+/** Which pane a single-pane Settings shows. The split view ignores it. */
+internal class SettingsPane(val showList: Boolean, val onShowList: () -> Unit)
+
 /** What the right column shows at the top: the page title and, below the root, a back button. */
 internal data class SettingsDetailHeading(val title: String, val backTitle: String?, val onBack: (() -> Unit)?)
 
@@ -74,6 +88,7 @@ internal fun SettingsSplitShell(
     onHome: () -> Unit,
     diagnosticsScope: String,
     diagnosticsControl: String?,
+    pane: SettingsPane? = null,
     detail: @Composable () -> Unit,
 ) {
     val composition = FramePerformanceCapture.beginSettingsUiWork(SettingsUiWorkStage.SHELL_COMPOSITION)
@@ -95,6 +110,7 @@ internal fun SettingsSplitShell(
                 queryToken!!, query.length, results.map { SettingsUiProbeRoute(SettingsTree.rootOf(it.page), it.page, it.control) })
         }
     }
+    val singlePane = settingsSinglePane()
     val sidebarWidth = SettingsSplitMetrics.sidebarWidthDp(LocalConfiguration.current.screenWidthDp).dp
 
     fun applyAdvanced(): Boolean {
@@ -118,36 +134,57 @@ internal fun SettingsSplitShell(
         if (result.advanced && !advanced) { pending = result; consent = true } else onSearchResult(result)
     }
 
-    CompositionLocalProvider(LocalApprovedEnableAdvanced provides { consent = true }) {
-        Row(Modifier.fillMaxSize().background(IosBackground)) {
-            Column(Modifier.width(sidebarWidth).fillMaxHeight().background(IosSidebar)
-                .settingsUiWorkMeasure(SettingsUiWorkStage.SIDEBAR_MEASURE)) {
-                Column(Modifier.padding(start = 28.dp, end = 28.dp, top = 22.dp, bottom = 10.dp)) {
-                    ApprovedSettingsBackButton("Home", onClick = onHome)
-                    Text("Settings", color = IosLabel, fontSize = 52.sp, lineHeight = 60.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 4.dp, top = 18.dp, bottom = 16.dp))
-                    SettingsSearchField(query) { query = it }
-                }
-                val listModifier = Modifier.weight(1f).fillMaxWidth()
-                if (query.isBlank()) {
-                    LazyColumn(listModifier.focusGroup(),
-                        contentPadding = PaddingValues(start = 28.dp, end = 28.dp, top = 8.dp, bottom = 40.dp)) {
-                        settingsSidebarGroups(selectedRootProvider, sidebarFactsProvider, selectPage)
-                    }
-                } else {
-                    SettingsSearchResults(query, results, queryToken, ::pick,
-                        listModifier.padding(horizontal = 28.dp))
-                }
+    // The master column: Home, the title, search and the grouped pages (or search results).
+    val master = @Composable { modifier: Modifier ->
+        Column(modifier.fillMaxHeight().background(IosSidebar)
+            .settingsUiWorkMeasure(SettingsUiWorkStage.SIDEBAR_MEASURE)) {
+            Column(Modifier.padding(start = 28.dp, end = 28.dp, top = 22.dp, bottom = 10.dp)) {
+                ApprovedSettingsBackButton("Home", onClick = onHome)
+                Text("Settings", color = IosLabel, fontSize = 52.sp, lineHeight = 60.sp, fontWeight = FontWeight.Bold,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(start = 4.dp, top = 18.dp, bottom = 16.dp))
+                SettingsSearchField(query) { query = it }
             }
-            Box(Modifier.width(1.dp).fillMaxHeight().background(IosDivider))
-            Column(Modifier.weight(1f).fillMaxHeight().settingsUiWorkMeasure(SettingsUiWorkStage.DETAIL_MEASURE)
-                .then(if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
-                    Modifier.settingsUiDrawn(diagnosticsScope, diagnosticsControl) else Modifier)) {
-                SettingsNavBar(heading)
-                Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-                    Box(Modifier.widthIn(max = PageMaxWidth).fillMaxSize().focusGroup()) { detail() }
+            val listModifier = Modifier.weight(1f).fillMaxWidth()
+            if (query.isBlank()) {
+                LazyColumn(listModifier.focusGroup(),
+                    contentPadding = PaddingValues(start = 28.dp, end = 28.dp, top = 8.dp, bottom = 40.dp)) {
+                    settingsSidebarGroups(selectedRootProvider, sidebarFactsProvider, selectPage)
                 }
+            } else {
+                SettingsSearchResults(query, results, queryToken, ::pick,
+                    listModifier.padding(horizontal = 28.dp))
             }
+        }
+    }
+    // The detail column: the nav bar and the page, capped and centred.
+    val detailColumn = @Composable { modifier: Modifier, navHeading: SettingsDetailHeading ->
+        Column(modifier.fillMaxHeight().settingsUiWorkMeasure(SettingsUiWorkStage.DETAIL_MEASURE)
+            .then(if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS)
+                Modifier.settingsUiDrawn(diagnosticsScope, diagnosticsControl) else Modifier)) {
+            SettingsNavBar(navHeading)
+            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+                Box(Modifier.widthIn(max = PageMaxWidth).fillMaxSize().focusGroup()) { detail() }
+            }
+        }
+    }
+
+    CompositionLocalProvider(LocalApprovedEnableAdvanced provides { consent = true },
+        LocalSettingsSinglePane provides singlePane) {
+        if (!singlePane) {
+            Row(Modifier.fillMaxSize().background(IosBackground)) {
+                master(Modifier.width(sidebarWidth))
+                Box(Modifier.width(1.dp).fillMaxHeight().background(IosDivider))
+                detailColumn(Modifier.weight(1f), heading)
+            }
+        } else if (pane != null && pane.showList) {
+            // Single-pane master: only the list is composed (the page is not built behind it).
+            Box(Modifier.fillMaxSize().background(IosSidebar)) { master(Modifier.fillMaxWidth()) }
+        } else {
+            // Single-pane detail: at a page's root, Back returns to the list ("Settings").
+            val navHeading = if (heading.onBack != null || pane == null) heading
+                else heading.copy(backTitle = "Settings", onBack = pane.onShowList)
+            Box(Modifier.fillMaxSize().background(IosBackground)) { detailColumn(Modifier.fillMaxWidth(), navHeading) }
         }
     }
     if (consent) {

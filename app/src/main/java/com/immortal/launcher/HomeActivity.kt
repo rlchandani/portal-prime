@@ -231,11 +231,31 @@ private data class WidgetProviderEntry(
 
 private data class PendingWidgetAdd(
     val appWidgetId: Int,
-    val provider: WidgetProviderEntry,
+    /** The provider's flattened component; the bound id's own info is read back when completing. */
+    val provider: String,
+    val spanX: Int,
+    val spanY: Int,
     /** Add-flow target: saved exactly here when it still fits, else auto-placed. */
     val slot: HomeWidgetStore.Slot? = null,
     val span: Pair<Int, Int>? = null,
-)
+) {
+  companion object {
+    fun of(id: Int, entry: WidgetProviderEntry, info: AppWidgetProviderInfo,
+           slot: HomeWidgetStore.Slot? = null, span: Pair<Int, Int>? = null) =
+        PendingWidgetAdd(id, info.provider.flattenToString(), entry.spanX, entry.spanY, slot, span)
+
+    /**
+     * Saved across a recreate or process death while the system bind/configure screen is in
+     * front, so its result still completes the add (and a cancel still frees the allocated id).
+     */
+    val Saver = androidx.compose.runtime.saveable.listSaver<PendingWidgetAdd?, Any>(
+        save = { p -> if (p == null) emptyList() else listOf(p.appWidgetId, p.provider, p.spanX, p.spanY,
+            p.slot?.page ?: -1, p.slot?.column ?: -1, p.slot?.row ?: -1, p.span?.first ?: -1, p.span?.second ?: -1) },
+        restore = { v -> if (v.size < 9) null else PendingWidgetAdd(v[0] as Int, v[1] as String, v[2] as Int, v[3] as Int,
+            (v[4] as Int).takeIf { it >= 0 }?.let { HomeWidgetStore.Slot(it, v[5] as Int, v[6] as Int) },
+            (v[7] as Int).takeIf { it >= 0 }?.let { it to (v[8] as Int) }) })
+  }
+}
 
 /** Home's immutable inventory snapshots retain their icons across Activity resumes/recreation.
  * The application receiver survives Home being stopped; no Activity is retained by this cache.
@@ -688,6 +708,7 @@ private fun ApprovedWidgetCell(
       val resizeRtl = androidx.compose.ui.platform.LocalLayoutDirection.current ==
           androidx.compose.ui.unit.LayoutDirection.Rtl
       LaunchedEffect(editMode) { resizeDraft = null; resizeSnapshot = null; resizeAccum = Offset.Zero }
+      val compactLegend = currentLayoutClass().compact
       Box(cell.zIndex(if (resizeDraft != null) 2f else 0f)
           .onSizeChanged { widthPx = it.width; heightPx = it.height }
           .semantics { contentDescription = "${if (widget.isAppWidget) "App" else customWidgetLabel(widget.kind)} widget" }) {
@@ -705,13 +726,7 @@ private fun ApprovedWidgetCell(
           // otherwise compete with moving the card.
           Box(Modifier.matchParentSize().then(dragHandle))
           ApprovedWidgetDragGrip(gripHandle, Modifier.align(Alignment.TopEnd).padding(10.dp))
-          Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth()
-              .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-              .background(ApprovedHomePalette.Card).padding(start = 6.dp, top = 6.dp, bottom = 6.dp, end = 58.dp),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically) {
-            ApprovedWidgetAction("Move", Modifier.weight(1f), onClick = onMove)
-            ApprovedWidgetAction("Size", Modifier.weight(1f)) {
+          val onSize: () -> Unit = {
               // Cycle to the next size that fits here; neighbours never get covered or pushed.
               var next = displaySpan
               var resized: List<HomeWidgetStore.HomeWidget>? = null
@@ -724,7 +739,7 @@ private fun ApprovedWidgetCell(
               resized?.let { onChanged(widgets, it) }
                   ?: context.showHomeLayoutRefusal("No room to resize here. Move it or free a spot first.")
             }
-            ApprovedWidgetAction("Settings", Modifier.weight(1f)) {
+          val onSettings: () -> Unit = {
               when {
                 widget.kind == HomeWidgetStore.KIND_TIMERS -> showTimers = true
                 widget.isAppWidget -> {
@@ -746,7 +761,29 @@ private fun ApprovedWidgetCell(
                 })
               }
             }
-            ApprovedWidgetAction("Remove", Modifier.weight(1f)) { onRemove(widget) }
+          val legend = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+              .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+              .background(ApprovedHomePalette.Card).padding(start = 6.dp, top = 6.dp, bottom = 6.dp, end = 58.dp)
+          if (!compactLegend) {
+            Row(legend, horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+              ApprovedWidgetAction("Move", Modifier.weight(1f), onClick = onMove)
+              ApprovedWidgetAction("Size", Modifier.weight(1f), onClick = onSize)
+              ApprovedWidgetAction("Settings", Modifier.weight(1f), onClick = onSettings)
+              ApprovedWidgetAction("Remove", Modifier.weight(1f)) { onRemove(widget) }
+            }
+          } else {
+            // Narrow cards (compact Customize): two rows of two, so no label is cut to a letter.
+            Column(legend) {
+              Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                ApprovedWidgetAction("Move", Modifier.weight(1f), onClick = onMove)
+                ApprovedWidgetAction("Size", Modifier.weight(1f), onClick = onSize)
+              }
+              Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                ApprovedWidgetAction("Settings", Modifier.weight(1f), onClick = onSettings)
+                ApprovedWidgetAction("Remove", Modifier.weight(1f)) { onRemove(widget) }
+              }
+            }
           }
           resizeDraft?.let { span ->
             Canvas(Modifier.matchParentSize()) {
@@ -813,7 +850,8 @@ private fun ApprovedWidgetAction(label: String, modifier: Modifier, onClick: () 
   Box(modifier.heightIn(min = 52.dp)
       .tvFocusable(RoundedCornerShape(12.dp), focusScale = 1f, onClick = onClick)
       .padding(horizontal = 6.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
-    Text(label, color = ApprovedHomePalette.Accent, fontSize = 18.sp, lineHeight = 26.sp, maxLines = 1)
+    Text(label, color = ApprovedHomePalette.Accent, fontSize = 18.sp, lineHeight = 26.sp, maxLines = 1,
+        overflow = TextOverflow.Ellipsis)
   }
 }
 
@@ -855,6 +893,7 @@ private fun ApprovedWidgetGrid(
         }
       }
   ApprovedPackedWidgetGrid(visible, spans, fixed, editMode, gridModifier, decor = decor,
+      reservedLeftHalfRows = noteSlot?.takeIf { it.column < CompactWidgetGrid.FOLDED_COLUMNS }?.let { it.row * 2 + 2 } ?: 0,
       canDrop = { key, column, row ->
         HomeSlots.moveForEditing(widgets, key, HomeWidgetStore.Slot(pageIndex, column, row)) != null
       },
@@ -1346,14 +1385,17 @@ private fun LauncherScreen(
   }
   val host = remember { AppWidgetHost(context, HOME_APP_WIDGET_HOST_ID) }
   val manager = remember { AppWidgetManager.getInstance(context) }
-  var pending by remember { mutableStateOf<PendingWidgetAdd?>(null) }
+  var pending by androidx.compose.runtime.saveable.rememberSaveable(stateSaver = PendingWidgetAdd.Saver) {
+    mutableStateOf<PendingWidgetAdd?>(null)
+  }
   val completeAdd: () -> Unit = {
     pending?.let { addition ->
-      addition.provider.info?.let { info ->
+      (manager.getAppWidgetInfo(addition.appWidgetId)?.provider
+          ?: android.content.ComponentName.unflattenFromString(addition.provider))?.let { component ->
         val widget = HomeWidgetStore.HomeWidget(
             appWidgetId = addition.appWidgetId,
-            providerPackage = info.provider.packageName, providerClass = info.provider.className,
-            spanX = addition.provider.spanX, spanY = addition.provider.spanY)
+            providerPackage = component.packageName, providerClass = component.className,
+            spanX = addition.spanX, spanY = addition.spanY)
         val slot = addition.slot
         val span = addition.span
         if (slot != null && span != null && addIntoSlot(context, widget, slot, span)) addFlow.added(widget.key)
@@ -1377,7 +1419,7 @@ private fun LauncherScreen(
   }
   val configureOrAdd: () -> Unit = {
     val addition = pending
-    val component = addition?.provider?.info?.configure
+    val component = addition?.let { manager.getAppWidgetInfo(it.appWidgetId)?.configure }
     if (addition != null && component != null) {
       runCatching { configureLauncher.launch(Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
           .setComponent(component).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, addition.appWidgetId)) }
@@ -1437,55 +1479,99 @@ private fun LauncherScreen(
         val header = HomeHeaderBudget.plan(LocalConfiguration.current.screenWidthDp, HomeHeaderItems(
             musicChip = musicLayout == null, miniPlayer = settings.showMiniPlayer, mic = hey != null,
             customize = showCustomize, homeControl = homeControl))
-        Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = HomeHeaderBudget.EDGE.dp),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.GAP.dp)) {
-          // The leading group owns all the free width, so the trailing buttons always end on the
-          // 24 dp edge on every tab. (A fill=false weight beside a weighted Spacer split the free
-          // width and left the unused half after Settings: 8 px short on Home, ~100–190 px on
-          // Apps and Tools, where Customize is absent.)
-          Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.GAP.dp)) {
-            if (header.wordmark || header.room) {
-              Row(Modifier.weight(1f, fill = false), verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-                if (header.wordmark) HearthpaneWordmark(ApprovedHomePalette.Text)
-                if (header.wordmark && header.room)
-                  Box(Modifier.padding(horizontal = 12.dp).width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))
-                if (header.room) Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
-              }
+        val openSettings: () -> Unit = {
+          runCatching {
+            FramePerformanceCapture.launchSettings(context,
+                Intent(context, ImmortalSettingsActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+          }
+        }
+        if (header.compact) {
+          // Compact tier (the Mini upright): 56 dp buttons; phone, sleep and theme live in "⋯".
+          val b = HomeHeaderBudget.COMPACT_BUTTON.dp
+          Row(Modifier.fillMaxWidth().height(HomeHeaderBudget.COMPACT_HEIGHT.dp).padding(horizontal = HomeHeaderBudget.EDGE.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.COMPACT_GAP.dp)) {
+            Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.COMPACT_GAP.dp)) {
+              ApprovedHeaderButton("screensaver", "Start screensaver", size = b, onClick = onStartScreensaver)
+              if (header.musicChip) MusicV3HomeChip { musicResume = true; onOpenMusic() }
             }
-            ApprovedHeaderButton("screensaver", "Start screensaver", onStartScreensaver)
-            if (header.musicChip) MusicV3HomeChip { musicResume = true; onOpenMusic() }
+            if (header.wifi) ApprovedHomeIcon("wifi", Modifier.size(22.dp))
+            if (showCustomize)
+              ApprovedHeaderButton(if (editMode) "check" else "edit", if (editMode) "Done" else "Customize",
+                  lit = editMode, size = b) { editMode = !editMode }
+            HomeHeaderOverflowButton(size = b,
+                status = when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" },
+                onRemote = {
+                  val (url, pin) = enableRemoteAndMintPin(context)
+                  pairUrl = url; pairPin = pin; showPair = true
+                },
+                onSleep = { showSleep = true })
+            hey?.let { pkg ->
+              Box(Modifier.size(b).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
+                  .semantics { contentDescription = "Voice assistant" }
+                  .tvFocusable(CircleShape, onLongClick = { openHeyPicker(context, pkg) }) { fireHey(context, pkg) },
+                  contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
+            }
+            ApprovedHeaderButton("music", "Open music player", lit = rememberMusicV3Loaded(), size = b, onClick = onOpenMusic)
+            if (homeControl) HomeControlHeaderButton(size = b)
+            ApprovedHeaderButton("search", "Search apps and settings", size = b) {
+              if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
+            }
+            ApprovedHeaderButton("settings", "Settings", size = b, onClick = openSettings)
           }
-          ApprovedHomeIcon("wifi", Modifier.size(22.dp))
-          if (header.connectedLabel)
-            Text(when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" }, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
-          if (showCustomize)
-            ApprovedHomeTextButton(if (editMode) "Done" else "Customize") { editMode = !editMode }
-          ApprovedHeaderButton("remote", "Connect your phone") {
-            val (url, pin) = enableRemoteAndMintPin(context)
-            pairUrl = url; pairPin = pin; showPair = true
-          }
-          ApprovedHeaderButton("sleep", "Sleep screen") { showSleep = true }
-          ApprovedThemeButton()
-          hey?.let { pkg ->
-            Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
-                .semantics { contentDescription = "Voice assistant" }
-                .tvFocusable(CircleShape, onLongClick = { openHeyPicker(context, pkg) }) { fireHey(context, pkg) },
-                contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
-          }
-          ApprovedHeaderButton("music", "Open music player", lit = rememberMusicV3Loaded(), onClick = onOpenMusic)
-          if (header.miniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(HomeHeaderBudget.MINI_PLAYER.dp), onOpenMusic)
-          if (homeControl) HomeControlHeaderButton()
-          ApprovedHeaderButton("search", "Search apps and settings") {
-            if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
-          }
-          ApprovedHeaderButton("settings", "Settings") {
-            runCatching {
-              FramePerformanceCapture.launchSettings(context,
-                  Intent(context, ImmortalSettingsActivity::class.java)
-                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        } else {
+          Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = HomeHeaderBudget.EDGE.dp),
+              verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.GAP.dp)) {
+            // The leading group owns all the free width, so the trailing buttons always end on the
+            // 24 dp edge on every tab. (A fill=false weight beside a weighted Spacer split the free
+            // width and left the unused half after Settings: 8 px short on Home, ~100–190 px on
+            // Apps and Tools, where Customize is absent.)
+            Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.GAP.dp)) {
+              if (header.wordmark || header.room) {
+                Row(Modifier.weight(1f, fill = false), verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                  if (header.wordmark) HearthpaneWordmark(ApprovedHomePalette.Text)
+                  if (header.wordmark && header.room)
+                    Box(Modifier.padding(horizontal = 12.dp).width(1.dp).height(40.dp).background(ApprovedHomePalette.Border))
+                  if (header.room) Text(room, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, maxLines = 1,
+                      overflow = TextOverflow.Ellipsis)
+                }
+              }
+              ApprovedHeaderButton("screensaver", "Start screensaver", onClick = onStartScreensaver)
+              if (header.musicChip) MusicV3HomeChip { musicResume = true; onOpenMusic() }
+            }
+            ApprovedHomeIcon("wifi", Modifier.size(22.dp))
+            if (header.connectedLabel)
+              Text(when (connected) { true -> "Connected"; false -> "Offline"; else -> "Connecting" }, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
+            if (showCustomize)
+              ApprovedHomeTextButton(if (editMode) "Done" else "Customize") { editMode = !editMode }
+            ApprovedHeaderButton("remote", "Connect your phone") {
+              val (url, pin) = enableRemoteAndMintPin(context)
+              pairUrl = url; pairPin = pin; showPair = true
+            }
+            ApprovedHeaderButton("sleep", "Sleep screen") { showSleep = true }
+            ApprovedThemeButton()
+            hey?.let { pkg ->
+              Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
+                  .semantics { contentDescription = "Voice assistant" }
+                  .tvFocusable(CircleShape, onLongClick = { openHeyPicker(context, pkg) }) { fireHey(context, pkg) },
+                  contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
+            }
+            ApprovedHeaderButton("music", "Open music player", lit = rememberMusicV3Loaded(), onClick = onOpenMusic)
+            if (header.miniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(HomeHeaderBudget.MINI_PLAYER.dp), onOpenMusic)
+            if (homeControl) HomeControlHeaderButton()
+            ApprovedHeaderButton("search", "Search apps and settings") {
+              if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
+            }
+            ApprovedHeaderButton("settings", "Settings") {
+              runCatching {
+                FramePerformanceCapture.launchSettings(context,
+                    Intent(context, ImmortalSettingsActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+              }
             }
           }
         }
@@ -1506,9 +1592,18 @@ private fun LauncherScreen(
           androidx.compose.runtime.CompositionLocalProvider(
               LocalHomeNote provides (shareHome.takeIf { notePlacement == HomeNotePlacement.SLOT })) {
           Column(Modifier.fillMaxSize().padding(horizontal = LauncherEdge).padding(top = 6.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-              Box(Modifier.weight(1f)) { ApprovedHomeGreeting(welcome, use24, compact = connected == false) }
-              BriefingHomeCard(Modifier.padding(start = 24.dp))
+            val homeLayout = currentLayoutClass()
+            if (homeLayout.compactPortrait) {
+              // Upright Mini: greeting above the clock, the briefing card on its own row.
+              ApprovedHomeGreeting(welcome, use24, compact = connected == false, layout = homeLayout)
+              BriefingHomeCard(Modifier.padding(top = 10.dp))
+            } else {
+              Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.weight(1f)) {
+                  ApprovedHomeGreeting(welcome, use24, compact = connected == false, layout = homeLayout)
+                }
+                BriefingHomeCard(Modifier.padding(start = 24.dp))
+              }
             }
             if (notePlacement == HomeNotePlacement.STRIP) HomeNoteStrip(shareHome, Modifier.fillMaxWidth().padding(top = 8.dp))
             Spacer(Modifier.height(16.dp))
@@ -1530,9 +1625,11 @@ private fun LauncherScreen(
             }
             Spacer(Modifier.height(6.dp))
             // Slimmer favorites strip (approved Home v2, change 7): 88 → 72dp, icons 56 → 46dp.
-            Row(Modifier.fillMaxWidth().height(FAVORITE_TILE_HEIGHT), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(Modifier.fillMaxWidth().height(favoriteTileHeight(homeLayout)),
+                horizontalArrangement = Arrangement.spacedBy(if (homeLayout.compactPortrait) 10.dp else 16.dp)) {
               favorites.forEach { app ->
-                ApprovedFavoriteTile(app, Modifier.weight(1f), { onLaunch(app.component) }, { appMenu = app })
+                ApprovedFavoriteTile(app, Modifier.weight(1f), { onLaunch(app.component) }, { appMenu = app },
+                    layout = homeLayout)
               }
               repeat(6 - favorites.size) { Spacer(Modifier.weight(1f)) }
             }
@@ -1570,7 +1667,7 @@ private fun LauncherScreen(
         }
         // Draggable over the content area only: never onto the header, the favourites or the dock.
         if (musicCard) MusicHomeFloatingPlayer(room, onOpenMusic, sideInset = LauncherEdge,
-            bottomInset = FAVORITE_TILE_HEIGHT + 16.dp, modifier = Modifier.matchParentSize())
+            bottomInset = favoriteTileHeight(currentLayoutClass()) + 16.dp, modifier = Modifier.matchParentSize())
         }
         Spacer(Modifier.height(12.dp))
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -1616,7 +1713,7 @@ private fun LauncherScreen(
                     addFlow.draft = null
                   } else {
                     val id = host.allocateAppWidgetId()
-                    pending = PendingWidgetAdd(id, provider, draft.origin, draft.span)
+                    pending = PendingWidgetAdd.of(id, provider, info, draft.origin, draft.span)
                     if (manager.bindAppWidgetIdIfAllowed(id, info.provider)) configureOrAdd()
                     else runCatching { bindLauncher.launch(Intent(AppWidgetManager.ACTION_APPWIDGET_BIND)
                         .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
@@ -1660,7 +1757,7 @@ private fun LauncherScreen(
             val info = provider.info
             if (info != null) {
               val id = host.allocateAppWidgetId()
-              pending = PendingWidgetAdd(id, provider)
+              pending = PendingWidgetAdd.of(id, provider, info)
               if (manager.bindAppWidgetIdIfAllowed(id, info.provider)) configureOrAdd()
               else runCatching { bindLauncher.launch(Intent(AppWidgetManager.ACTION_APPWIDGET_BIND)
                   .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
@@ -5241,13 +5338,13 @@ private fun appWidgetMinDp(context: Context, raw: Int): Int {
 }
 
 @Composable
-private fun ApprovedHeaderButton(icon: String, label: String, onClick: () -> Unit) =
-    ApprovedHeaderButton(icon, label, lit = false, onClick = onClick)
+private fun ApprovedHeaderButton(icon: String, label: String, size: Dp = 68.dp, onClick: () -> Unit) =
+    ApprovedHeaderButton(icon, label, lit = false, size = size, onClick = onClick)
 
-/** [lit]: inverted fill (the music button while a song is loaded). */
+/** [lit]: inverted fill (the music button while a song is loaded). [size]: 56 dp in the compact tier. */
 @Composable
-private fun ApprovedHeaderButton(icon: String, label: String, lit: Boolean, onClick: () -> Unit) {
-  Box(Modifier.size(68.dp).clip(CircleShape)
+private fun ApprovedHeaderButton(icon: String, label: String, lit: Boolean, size: Dp = 68.dp, onClick: () -> Unit) {
+  Box(Modifier.size(size).clip(CircleShape)
       .background(if (lit) ApprovedHomePalette.Text else ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
       .semantics { contentDescription = label }
       .tvFocusable(CircleShape, ringColor = ApprovedHomePalette.Accent, onClick = onClick),
@@ -5318,16 +5415,35 @@ private fun ApprovedHomeBackgroundEffects(grain: Boolean) {
 @OptIn(ExperimentalFoundationApi::class)
 private val FAVORITE_TILE_HEIGHT = 72.dp
 private val FAVORITE_ICON_SIZE = 46.dp
+/** Upright Mini: six ~112 dp tiles, so the label sits under the icon instead of beside it. */
+private val COMPACT_FAVORITE_TILE_HEIGHT = 88.dp
+
+private fun favoriteTileHeight(layout: LayoutClass): Dp =
+    if (layout.compactPortrait) COMPACT_FAVORITE_TILE_HEIGHT else FAVORITE_TILE_HEIGHT
 
 @Composable
-private fun ApprovedFavoriteTile(app: AppEntry, modifier: Modifier, onClick: () -> Unit, onLongClick: () -> Unit) {
+private fun ApprovedFavoriteTile(app: AppEntry, modifier: Modifier, onClick: () -> Unit, onLongClick: () -> Unit,
+                                 layout: LayoutClass = LayoutClass.LARGE) {
+  if (layout.compactPortrait) {
+    ApprovedHomeSurface(modifier.height(COMPACT_FAVORITE_TILE_HEIGHT), radius = 16.dp) {
+      Column(Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick)
+          .padding(horizontal = 6.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally,
+          verticalArrangement = Arrangement.Center) {
+        Image(app.icon, contentDescription = null, modifier = Modifier.size(40.dp))
+        Text(app.label, color = ApprovedHomePalette.Text, fontSize = 16.sp, lineHeight = 20.sp,
+            fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 6.dp))
+      }
+    }
+    return
+  }
   ApprovedHomeSurface(modifier.height(FAVORITE_TILE_HEIGHT), radius = 16.dp) {
     Row(Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick)
         .padding(horizontal = 14.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp)) {
       Image(app.icon, contentDescription = null, modifier = Modifier.size(FAVORITE_ICON_SIZE))
-      Text(app.label, color = ApprovedHomePalette.Text, fontSize = 22.sp, lineHeight = 30.sp,
-          fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Text(app.label, color = ApprovedHomePalette.Text, fontSize = if (layout.compactLandscape) 19.sp else 22.sp,
+          lineHeight = 30.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
   }
 }
@@ -5451,7 +5567,12 @@ private fun ApprovedWidgetLibrary(
 
 /** Minute ticking is scoped to this chrome; the dashboard never reads this clock state. */
 @Composable
-private fun ApprovedHomeGreeting(welcome: WelcomeConfig.Settings, use24: Boolean, compact: Boolean = false) {
+private fun ApprovedHomeGreeting(
+    welcome: WelcomeConfig.Settings,
+    use24: Boolean,
+    compact: Boolean = false,
+    layout: LayoutClass = LayoutClass.LARGE,
+) {
   val now by produceState(initialValue = Date()) {
     while (true) {
       delay(60_000L - System.currentTimeMillis() % 60_000L)
@@ -5474,6 +5595,11 @@ private fun ApprovedHomeGreeting(welcome: WelcomeConfig.Settings, use24: Boolean
   }
   val greetingText = if (welcome.userName.isBlank()) greeting.trimEnd('.', '!') + "."
       else greeting.trimEnd('.', '!') + ", " + welcome.userName
+  if (layout.compact) {
+    CompactHomeGreeting(greetingText, timeFmt.format(now), dayFmt.format(now), dateFmt.format(now),
+        offline = compact, portrait = layout.compactPortrait)
+    return
+  }
   // Minimum, not fixed, height: a fixed 96dp clipped the subtitle's descenders on device.
   Row(Modifier.fillMaxWidth().heightIn(min = if (compact) 68.dp else 96.dp), verticalAlignment = Alignment.CenterVertically) {
     Column(Modifier.weight(1f)) {
@@ -5486,5 +5612,39 @@ private fun ApprovedHomeGreeting(welcome: WelcomeConfig.Settings, use24: Boolean
         fontWeight = FontWeight.Normal, letterSpacing = (-2).sp)
     Text(dayFmt.format(now) + "\n" + dateFmt.format(now), color = ApprovedHomePalette.Secondary,
         fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(start = 24.dp))
+  }
+}
+
+/**
+ * The compact greeting. Upright (800 dp): the greeting on its own line above the clock and date,
+ * so neither truncates the other. Turned (1280×740 dp): one row, smaller, to leave the widgets height.
+ * Every line is single-line; nothing can wrap mid-word.
+ */
+@Composable
+private fun CompactHomeGreeting(greeting: String, time: String, day: String, date: String, offline: Boolean,
+                                portrait: Boolean) {
+  if (portrait) {
+    Column(Modifier.fillMaxWidth()) {
+      Text(greeting, color = ApprovedHomePalette.Text, fontSize = 36.sp, lineHeight = 44.sp,
+          fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Row(Modifier.fillMaxWidth().padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(time, color = ApprovedHomePalette.Text, fontSize = 56.sp, lineHeight = 64.sp,
+            fontWeight = FontWeight.Normal, letterSpacing = (-1.5).sp, maxLines = 1, softWrap = false)
+        Text("$day, $date", color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp,
+            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(start = 20.dp))
+      }
+      if (!offline) Text("Everything within reach.", color = ApprovedHomePalette.Secondary, fontSize = 20.sp,
+          lineHeight = 28.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+  } else {
+    Row(Modifier.fillMaxWidth().heightIn(min = 60.dp), verticalAlignment = Alignment.CenterVertically) {
+      Text(greeting, color = ApprovedHomePalette.Text, fontSize = 40.sp, lineHeight = 48.sp,
+          fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+      Text(time, color = ApprovedHomePalette.Text, fontSize = 60.sp, lineHeight = 66.sp,
+          fontWeight = FontWeight.Normal, letterSpacing = (-1.5).sp, maxLines = 1, softWrap = false,
+          modifier = Modifier.padding(start = 24.dp))
+      Text(day + "\n" + date, color = ApprovedHomePalette.Secondary, fontSize = 20.sp, lineHeight = 26.sp,
+          maxLines = 2, softWrap = false, modifier = Modifier.padding(start = 20.dp))
+    }
   }
 }

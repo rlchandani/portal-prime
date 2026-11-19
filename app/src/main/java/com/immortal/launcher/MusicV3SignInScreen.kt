@@ -11,12 +11,19 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -40,6 +47,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.ApprovedLightPalette
@@ -84,6 +93,11 @@ internal fun MusicV3SignIn(library: YouTubeMusicLibrary, adding: Boolean, onSign
 
 @Composable
 private fun SignInCard(view: MusicV3SignInView, adding: Boolean, onNewCode: () -> Unit) {
+  val layoutClass = currentLayoutClass()
+  if (layoutClass.compact) {
+    CompactSignInCard(view, adding, layoutClass.compactPortrait, onNewCode)
+    return
+  }
   Row(Modifier.fillMaxSize().clip(RoundedCornerShape(MusicV3Dims.PaneRadius)).background(ApprovedHomePalette.Card)
       .padding(horizontal = 96.dp, vertical = 64.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(88.dp)) {
@@ -107,13 +121,13 @@ private fun SignInCard(view: MusicV3SignInView, adding: Boolean, onNewCode: () -
 }
 
 @Composable
-private fun Steps(view: MusicV3SignInView) {
+private fun Steps(view: MusicV3SignInView, codeSize: TextUnit = 76.sp, codeLine: TextUnit = 88.sp, top: Dp = 44.dp) {
   val code = view as? MusicV3SignInView.Code
-  Column(Modifier.padding(top = 44.dp), verticalArrangement = Arrangement.spacedBy(30.dp)) {
+  Column(Modifier.padding(top = top), verticalArrangement = Arrangement.spacedBy(30.dp)) {
     Step(1, "Scan the code with your phone", "Or open ${code?.shortUrl ?: "google.com/device"} in any browser")
     Step(2, "Enter this code", null) {
       val text = code?.userCode ?: "––––-––––"
-      Text(text, color = ApprovedHomePalette.Text, fontSize = 76.sp, lineHeight = 88.sp, fontWeight = FontWeight.SemiBold,
+      Text(text, color = ApprovedHomePalette.Text, fontSize = codeSize, lineHeight = codeLine, fontWeight = FontWeight.SemiBold,
           fontFamily = FontFamily.Monospace, letterSpacing = 6.sp,
           modifier = Modifier.alpha(if (code != null) 1f else 0.5f)
               .semantics { contentDescription = "Code " + text.toList().joinToString(" ") })
@@ -156,6 +170,92 @@ private fun SignInStatus(view: MusicV3SignInView, onNewCode: () -> Unit) {
   }
 }
 
+/**
+ * Compact sign-in. Portrait: the QR on top (sized to the width), the steps below, scrolling when the
+ * window is short. Landscape: side by side with the QR sized to the available height.
+ */
+@Composable
+private fun CompactSignInCard(view: MusicV3SignInView, adding: Boolean, portrait: Boolean, onNewCode: () -> Unit) {
+  BoxWithConstraints(Modifier.fillMaxSize().clip(RoundedCornerShape(MusicV3Dims.PaneRadius))
+      .background(ApprovedHomePalette.Card)) {
+    if (portrait) {
+      val qr = minOf(maxWidth - COMPACT_PORTRAIT_PAD * 2, COMPACT_QR_MAX_PORTRAIT).coerceAtLeast(COMPACT_QR_MIN)
+      Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+          .padding(horizontal = COMPACT_PORTRAIT_PAD, vertical = 36.dp),
+          horizontalAlignment = Alignment.CenterHorizontally) {
+        QrCard(view, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
+        CompactSignInCopy(view, adding, onNewCode, Modifier.fillMaxWidth().padding(top = 36.dp))
+      }
+    } else {
+      val qr = minOf(maxHeight - COMPACT_LANDSCAPE_VPAD * 2, COMPACT_QR_MAX_LANDSCAPE).coerceAtLeast(COMPACT_QR_MIN)
+      Row(Modifier.fillMaxSize().padding(horizontal = 48.dp, vertical = COMPACT_LANDSCAPE_VPAD),
+          verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(48.dp)) {
+        QrCard(view, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
+        Box(Modifier.weight(1f).fillMaxSize(), contentAlignment = Alignment.CenterStart) {
+          CompactSignInCopy(view, adding, onNewCode, Modifier.fillMaxWidth().verticalScroll(rememberScrollState()))
+        }
+      }
+    }
+  }
+}
+
+/** The compact title, steps, status and privacy note (whole words; buttons wrap to a new line). */
+@Composable
+private fun CompactSignInCopy(view: MusicV3SignInView, adding: Boolean, onNewCode: () -> Unit, modifier: Modifier) {
+  Column(modifier) {
+    Text(if (adding) "Add another account" else "Sign in with your phone", color = ApprovedHomePalette.Text,
+        fontSize = 44.sp, lineHeight = 54.sp, fontWeight = FontWeight.Medium)
+    Text(if (adding) "Each person gets their own playlists and liked songs here."
+        else "Play your YouTube playlists and liked songs on this Portal.",
+        color = ApprovedHomePalette.Secondary, fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 12.dp))
+    Steps(view, codeSize = 60.sp, codeLine = 72.sp, top = 32.dp)
+    CompactSignInStatus(view, onNewCode)
+    Row(Modifier.padding(top = 28.dp), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      ApprovedIcon("lock", Modifier.size(26.dp), ApprovedHomePalette.Secondary)
+      Text("Portal can only look at your library. It can't post, like or change anything.",
+          color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp)
+    }
+  }
+}
+
+/** [SignInStatus] for a narrow column: the same pieces in a wrapping row. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CompactSignInStatus(view: MusicV3SignInView, onNewCode: () -> Unit) {
+  FlowRow(Modifier.padding(top = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp),
+      verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    when (view) {
+      is MusicV3SignInView.Code -> {
+        Row(Modifier.heightIn(min = MusicV3Dims.Touch), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+          Box(Modifier.size(14.dp).clip(RoundedCornerShape(7.dp)).background(ApprovedHomePalette.Accent))
+          Text("Waiting for your phone…", color = ApprovedHomePalette.Text, fontSize = 24.sp)
+        }
+        Box(Modifier.heightIn(min = MusicV3Dims.Touch), contentAlignment = Alignment.CenterStart) {
+          Text("Code works for ${view.remaining}", color = ApprovedHomePalette.Secondary, fontSize = 24.sp)
+        }
+        MusicV3Button("Get a new code", style = MusicV3ButtonStyle.GHOST, onClick = onNewCode)
+      }
+      MusicV3SignInView.Starting -> Text("Getting a code…", color = ApprovedHomePalette.Text, fontSize = 24.sp)
+      else -> {
+        val (message, action) = problemCopy(view)
+        Text(message, color = ApprovedHomePalette.Text, fontSize = 24.sp, lineHeight = 32.sp)
+        MusicV3Button(action, style = MusicV3ButtonStyle.SOLID, onClick = onNewCode)
+      }
+    }
+  }
+}
+
+private val COMPACT_PORTRAIT_PAD = 40.dp
+private val COMPACT_LANDSCAPE_VPAD = 32.dp
+private val COMPACT_QR_MAX_PORTRAIT = 440.dp
+private val COMPACT_QR_MAX_LANDSCAPE = 560.dp
+/** Below this a phone camera struggles to read the code. */
+private val COMPACT_QR_MIN = 260.dp
+/** The QR image inside its white card, as on the Portal+ (560 of 640 dp). */
+private const val QR_IMAGE_RATIO = 0.875f
+
 private fun problemCopy(view: MusicV3SignInView): Pair<String, String> = when (view) {
   MusicV3SignInView.Expired -> "Codes last 15 minutes." to "Get a new code"
   MusicV3SignInView.Denied -> "Sign-in was cancelled on the phone. Nothing was shared." to "Try again"
@@ -174,17 +274,17 @@ private fun qrOverlay(view: MusicV3SignInView): Triple<String, String, String>? 
 
 /** The QR always sits on a white card (the day palette's surface) so phones can read it. */
 @Composable
-private fun QrCard(view: MusicV3SignInView) {
+private fun QrCard(view: MusicV3SignInView, boxSize: Dp = 640.dp, imageSize: Dp = 560.dp) {
   val url = (view as? MusicV3SignInView.Code)?.qrText
-  val px = with(LocalDensity.current) { 560.dp.roundToPx() }
-  val qr by produceState<Bitmap?>(null, url) { value = url?.let { withContext(Dispatchers.Default) { lanSetupQr(it, px) } } }
+  val px = with(LocalDensity.current) { imageSize.roundToPx() }
+  val qr by produceState<Bitmap?>(null, url, px) { value = url?.let { withContext(Dispatchers.Default) { lanSetupQr(it, px) } } }
   val shape = RoundedCornerShape(36.dp)
-  Box(Modifier.size(640.dp).clip(shape).background(ApprovedLightPalette.surface).approvedOutline(shape),
+  Box(Modifier.size(boxSize).clip(shape).background(ApprovedLightPalette.surface).approvedOutline(shape),
       contentAlignment = Alignment.Center) {
     val bitmap = qr
     val overlay = qrOverlay(view)
     if (bitmap != null && url != null) {
-      Image(bitmap.asImageBitmap(), contentDescription = "QR code for $url", modifier = Modifier.size(560.dp)
+      Image(bitmap.asImageBitmap(), contentDescription = "QR code for $url", modifier = Modifier.size(imageSize)
           .alpha(if (overlay == null) 1f else 0.08f))
     } else if (overlay == null) {
       CircularProgressIndicator(color = ApprovedLightPalette.accent, modifier = Modifier.size(64.dp))
@@ -193,8 +293,9 @@ private fun QrCard(view: MusicV3SignInView) {
       Column(horizontalAlignment = Alignment.CenterHorizontally) {
         ApprovedIcon(icon, Modifier.size(72.dp), ApprovedLightPalette.secondary)
         Text(title, color = ApprovedLightPalette.text, fontSize = 32.sp, fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(top = 14.dp))
-        Text(detail, color = ApprovedLightPalette.secondary, fontSize = 23.sp, modifier = Modifier.padding(top = 6.dp))
+            textAlign = TextAlign.Center, modifier = Modifier.padding(top = 14.dp))
+        Text(detail, color = ApprovedLightPalette.secondary, fontSize = 23.sp, textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 6.dp))
       }
     }
   }

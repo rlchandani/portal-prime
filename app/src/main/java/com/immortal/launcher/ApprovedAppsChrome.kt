@@ -142,7 +142,7 @@ internal fun ApprovedAppsButton(label: String, primary: Boolean = false, enabled
           ringColor = if (primary) MaterialTheme.colorScheme.onPrimary else LocalApprovedPalette.current.accent,
           onClick = onClick)
       .padding(horizontal = 26.dp, vertical = 18.dp), contentAlignment = Alignment.Center) {
-    Text(label, color = (if (primary) MaterialTheme.colorScheme.onPrimary else IosLabel).copy(alpha = if (enabled) 1f else 0.5f), fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium)
+    Text(label, color = (if (primary) MaterialTheme.colorScheme.onPrimary else IosLabel).copy(alpha = if (enabled) 1f else 0.5f), fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium, maxLines = 1)
   }
 }
 

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -48,8 +49,10 @@ internal fun CallEndedScreen(ended: EndedCall, motion: Boolean, onCallBack: (Cal
   val copy = CallingCopy.ended(ended, time, ended.quietEndMin?.let { CallingCopy.minuteLabel(it, use24) })
   val normal = ended.reason in AUTO_CLOSE
   if (normal) LaunchedEffect(ended.id) { delay(CallTimings.ENDED_AUTO_CLOSE_MS); onDone() }
+  val layout = currentLayoutClass()
   Box(Modifier.fillMaxSize()) {
     CallRingBackground(ended.peer.name, motion = false)
+    if (layout.compact) { EndedCompact(ended, copy, normal, layout, onCallBack, onDone); return@Box }
     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(30.dp)) {
       Box(Modifier.size(150.dp).background(if (copy.warn) CallColors.WarnTint else CallColors.Glass, CircleShape),
@@ -70,6 +73,29 @@ internal fun CallEndedScreen(ended: EndedCall, motion: Boolean, onCallBack: (Cal
   }
 }
 
+/** Compact ended: the same content, smaller icon and title, medium buttons, kept off the edges. */
+@Composable
+private fun androidx.compose.foundation.layout.BoxScope.EndedCompact(ended: EndedCall, copy: CallingCopy.Ended, normal: Boolean,
+    layout: LayoutClass, onCallBack: (CallKind) -> Unit, onDone: () -> Unit) {
+  val r = CallsCompactLayout.ring(layout)
+  Column(Modifier.align(Alignment.Center).padding(horizontal = 32.dp), horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(r.gap.dp)) {
+    Box(Modifier.size(ENDED_ICON_COMPACT).background(if (copy.warn) CallColors.WarnTint else CallColors.Glass, CircleShape),
+        contentAlignment = Alignment.Center) { CallIcon(copy.icon, if (copy.warn) CallColors.WarnIcon else Color.White, 56.dp) }
+    CallHeadline(copy.title, copy.body, titleSize = r.endedTitle.sp, subSize = r.sub.sp)
+    Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+      when {
+        ended.reason == CallEndReason.DROP_INS_OFF -> CallPill("Ring ${ended.peer.name}", { onCallBack(CallKind.CALL) },
+            icon = "phone", style = CallButtonStyle.OK)
+        copy.retry -> CallPill(if (ended.connectedMs != null || ended.direction == CallDirection.INCOMING) "Call back" else "Try again",
+            { onCallBack(CallKind.CALL) }, icon = "phone", style = CallButtonStyle.OK)
+      }
+      CallPill(if (copy.retry || ended.reason == CallEndReason.DROP_INS_OFF) "Close" else "Done", onDone, style = CallButtonStyle.GLASS)
+    }
+    if (normal) Text("Closing in 5 s", color = Color.White.copy(alpha = 0.5f), fontSize = 22.sp)
+  }
+}
+
 /** Volume popover above the controls: slider, Quieter / Louder (±10 %), the echo note. */
 @Composable
 internal fun CallVolumePopover(modifier: Modifier = Modifier) {
@@ -83,7 +109,9 @@ internal fun CallVolumePopover(modifier: Modifier = Modifier) {
     runCatching { audio?.setStreamVolume(AudioManager.STREAM_VOICE_CALL, level, 0) }
   }
   val pct = level * PERCENT / max
-  Column(modifier.width(620.dp).callPanel(CallColors.Popover, RoundedCornerShape(36.dp)).padding(32.dp),
+  // Compact: never wider than the window (the caller insets it); the designed 620 when it fits.
+  val width = if (currentLayoutClass().compact) Modifier.widthIn(max = 620.dp).fillMaxWidth() else Modifier.width(620.dp)
+  Column(modifier.then(width).callPanel(CallColors.Popover, RoundedCornerShape(36.dp)).padding(32.dp),
       verticalArrangement = Arrangement.spacedBy(22.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
       CallIcon("volLow", Color.White, 32.dp)
@@ -110,4 +138,5 @@ private fun VolumeStep(label: String, modifier: Modifier, onClick: () -> Unit) {
 private val AUTO_CLOSE = setOf(CallEndReason.HUNG_UP, CallEndReason.LEFT, CallEndReason.CANCELLED, CallEndReason.DECLINED,
     CallEndReason.CAP_REACHED, CallEndReason.MISSED)
 private const val VOLUME_STEP = 0.1f
+private val ENDED_ICON_COMPACT = 120.dp
 private const val PERCENT = 100

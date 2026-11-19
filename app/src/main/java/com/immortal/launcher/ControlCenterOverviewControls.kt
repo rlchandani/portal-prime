@@ -40,7 +40,10 @@ internal fun CcPlanTopRow(floors: CcFloorTabs, floorId: String, lens: CcLens, on
   Row(modifier, horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
     if (floors.tabs.size > 1) {
       val options = remember(floors) { floors.tabs.map { Triple(it.id, it.label, null as String?) } }
-      CcSeg(options, floorId, onFloor)
+      // Narrow (Mini upright): the floor tabs take what the lens leaves and scroll sideways if needed.
+      if (currentLayoutClass().compactPortrait) CcScrollingSeg(floorId, Modifier.weight(1f, fill = false)) { inView ->
+        CcSeg(options, floorId, onFloor, selectedModifier = inView)
+      } else CcSeg(options, floorId, onFloor)
     }
     CcSeg(LENSES, lens, onLens)
   }

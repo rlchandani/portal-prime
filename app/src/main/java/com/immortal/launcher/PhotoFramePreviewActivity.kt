@@ -82,7 +82,9 @@ class PhotoFramePreviewActivity : ComponentActivity() {
 
     val construction = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.CONTROLLER_CONSTRUCTION)
     try {
-      frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
+      // The welcome note shows once per launch: a recreate (rotation) must not show it again.
+      frame = PhotoFrameController(this, showWelcome = savedInstanceState == null &&
+          intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
           interactivePreview = !intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock,
           nightClockOnly = nightClock)
     } finally { construction?.finish() }

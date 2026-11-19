@@ -9,6 +9,8 @@ package com.immortal.launcher
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -151,7 +153,11 @@ internal fun CcCardBox(modifier: Modifier = Modifier, padding: Int = 24, content
 internal fun BoxScope.CcCenteredMessage(icon: String, title: String, body: String, primary: Pair<String, () -> Unit>? = null,
                                         secondary: Pair<String, () -> Unit>? = null, tone: CcTone = CcTone.NEUTRAL) {
   val c = LocalCc.current
-  Column(Modifier.align(Alignment.Center).widthIn(max = 900.dp).ccCard(CcStyle.Modal).padding(48.dp),
+  // Compact: kept off the screen edges (and scrolls if a short landscape window can't hold it).
+  val frame = if (currentLayoutClass().compact) Modifier.align(Alignment.Center).padding(horizontal = 30.dp, vertical = 24.dp)
+      .widthIn(max = 900.dp).ccCard(CcStyle.Modal).verticalScroll(rememberScrollState())
+  else Modifier.align(Alignment.Center).widthIn(max = 900.dp).ccCard(CcStyle.Modal)
+  Column(frame.padding(48.dp),
       verticalArrangement = Arrangement.spacedBy(20.dp)) {
     Box(Modifier.size(100.dp).clip(CcStyle.CardSmall).background(when (tone) { CcTone.RED -> c.redBg; CcTone.AMBER -> c.amberBg; else -> c.surface2 }),
         contentAlignment = Alignment.Center) {
