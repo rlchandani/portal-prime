@@ -162,6 +162,25 @@ internal object ScreenContext {
   fun none(): JSONObject = JSONObject().put("screen", JSONObject.NULL)
       .put("note", "No Hearthpane screen is in front. Other apps' screens can't be read.")
 
+  /** A Settings row that matches the user's words, wherever it lives: its target, title and where to find it. */
+  data class Match(val control: String, val title: String, val path: String)
+
+  const val MAX_MATCHES = 5
+
+  /**
+   * [out] plus the Settings rows matching [query] ("how do I…"). Highlighting one works only while Settings is in
+   * front (it opens the row's page); elsewhere the path tells the user where to go.
+   */
+  fun withMatches(out: JSONObject, query: String, matches: List<Match>): JSONObject {
+    val array = JSONArray()
+    matches.take(MAX_MATCHES).forEach {
+      array.put(JSONObject().put("target", SETTINGS_TARGET + it.control).put("title", text(it.title))
+          .put("where", text(it.path)))
+    }
+    out.put("settings_matches", array).put("query", text(query))
+    return fit(out, "settings_matches", "devices", "rows", "rooms", "up_next", "recent")
+  }
+
   /** [out] cut to [MAX_CHARS] by dropping the last items of [lists], in the order given. */
   internal fun fit(out: JSONObject, vararg lists: String): JSONObject {
     for (key in lists) {

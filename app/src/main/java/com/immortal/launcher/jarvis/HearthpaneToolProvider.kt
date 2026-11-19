@@ -21,7 +21,8 @@ import android.util.Log
  * tool timeout.
  */
 class HearthpaneToolProvider : ContentProvider() {
-  private val tools = HearthpaneTools(HearthpaneScreens::current, JarvisHighlight::show)
+  private val tools = HearthpaneTools(HearthpaneScreens::current, { target, hint -> JarvisHighlight.show(target, hint) },
+      SettingsJarvisContext::search)
 
   override fun onCreate(): Boolean = true
 

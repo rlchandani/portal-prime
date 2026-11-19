@@ -18,16 +18,22 @@ import org.json.JSONObject
 internal class HearthpaneTools(
     private val screen: () -> HearthpaneScreens.Entry?,
     private val highlight: (target: String, hint: String?) -> Unit,
+    /** Settings rows anywhere that match a few words ("dark mode"), best first. */
+    private val search: (query: String) -> List<ScreenContext.Match> = { emptyList() },
 ) {
   fun invoke(name: String?, argsJson: String?): JSONObject = when (name) {
-    SCREEN_CONTEXT -> screenContext()
+    SCREEN_CONTEXT -> screenContext(args(argsJson)?.optString("query")?.trim()?.take(MAX_QUERY).orEmpty())
     HIGHLIGHT -> highlight(args(argsJson))
     else -> error("unknown tool: ${name.orEmpty().take(MAX_NAME)}")
   }
 
-  private fun screenContext(): JSONObject {
-    val entry = screen() ?: return ScreenContext.none()
-    return runCatching { entry.context() }.getOrElse { error("screen context unavailable") }
+  private fun screenContext(query: String): JSONObject {
+    val entry = screen()
+    val out = if (entry == null) ScreenContext.none()
+        else runCatching { entry.context() }.getOrElse { return error("screen context unavailable") }
+    if (query.isEmpty()) return out
+    val matches = runCatching { search(query) }.getOrDefault(emptyList())
+    return ScreenContext.withMatches(out, query, matches)
   }
 
   private fun highlight(args: JSONObject?): JSONObject {
@@ -59,6 +65,7 @@ internal class HearthpaneTools(
     private const val MAX_TARGET = 160
     private const val MAX_HINT = 60
     private const val MAX_NAME = 60
+    private const val MAX_QUERY = 60
 
     /** The screen a target id belongs to, or null for an id no screen hands out. */
     fun screenOf(target: String): String? = when {

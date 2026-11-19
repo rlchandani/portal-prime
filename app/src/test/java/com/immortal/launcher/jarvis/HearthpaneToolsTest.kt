@@ -76,4 +76,21 @@ class HearthpaneToolsTest {
     assertFalse(HearthpaneToolProvider.allowedCaller(listOf("com.example.other")))
     assertFalse(HearthpaneToolProvider.allowedCaller(emptyList()))
   }
+
+  @Test fun aQueryAddsSettingsMatchesFromAnywhere() {
+    val searching = HearthpaneTools({ screen("home") }, { _, _ -> }) { q ->
+      if (q == "dark mode") listOf(ScreenContext.Match("immortal.settingsTheme", "Appearance", "Display & Brightness"))
+      else emptyList()
+    }
+    val out = searching.invoke(HearthpaneTools.SCREEN_CONTEXT, """{"query":"dark mode"}""")
+    val match = out.getJSONArray("settings_matches").getJSONObject(0)
+    assertEquals("settings:immortal.settingsTheme", match.getString("target"))
+    assertEquals("Display & Brightness", match.getString("where"))
+    assertEquals("home", out.getString("screen"))
+  }
+
+  @Test fun noQueryMeansNoMatches() {
+    front = screen("home")
+    assertFalse(tools.invoke(HearthpaneTools.SCREEN_CONTEXT, "{}").has("settings_matches"))
+  }
 }

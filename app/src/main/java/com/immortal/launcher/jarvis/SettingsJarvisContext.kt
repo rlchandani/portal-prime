@@ -9,6 +9,7 @@ package com.immortal.launcher.jarvis
 import android.content.Context
 import com.immortal.launcher.ImmortalSettings
 import com.immortal.launcher.SettingsTree
+import com.immortal.launcher.approvedSettingsSearch
 import com.immortal.launcher.approvedSettingsSearchIndex
 import com.immortal.launcher.settings.SettingsRegistry
 import org.json.JSONObject
@@ -35,6 +36,17 @@ internal object SettingsJarvisContext {
           ScreenContext.SettingsRow(control, row.title, flat?.opt(key)?.takeUnless { it == JSONObject.NULL })
         }
     return ScreenContext.settings(title, path, rows)
+  }
+
+  /** Rows anywhere in Settings matching [query], ranked like Settings search; each word tried alone if none match. */
+  fun search(query: String): List<ScreenContext.Match> {
+    val index = approvedSettingsSearchIndex()
+    val rows = { q: String -> approvedSettingsSearch(index, q).filter { it.control != null && !it.alias } }
+    val hits = rows(query).ifEmpty { query.split(' ').filter { it.length > 2 }.flatMap(rows).distinctBy { it.control } }
+    return hits.take(ScreenContext.MAX_MATCHES).map { hit ->
+      val page = SettingsTree.page(hit.page)?.title ?: hit.page
+      ScreenContext.Match(hit.control.orEmpty(), hit.title, listOf(hit.crumb, page).filter { it.isNotBlank() && it != "Page" }.joinToString(" › "))
+    }
   }
 
   /** The page holding [control], for a highlight on a row of another page. */
