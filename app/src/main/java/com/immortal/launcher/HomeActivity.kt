@@ -1327,6 +1327,7 @@ private fun LauncherScreen(
   }
   var homeWidgets by remember {
     HomeWidgetStore.migrateDashboardCards(context)
+    HomeWidgetStore.dropHomeAssistantWidgetOnce(context)
     mutableStateOf(HomeWidgetStore.load(context))
   }
   OnResume { homeWidgets = HomeWidgetStore.load(context) }
@@ -1431,10 +1432,11 @@ private fun LauncherScreen(
         // Launcher chrome trimmed 108 → 92dp; the 68dp header buttons keep a 12dp margin (Home v2 space).
         val hey by produceState<String?>(null, installedApps) { value = withContext(Dispatchers.IO) { heyPackage(context) } }
         val showCustomize = selectedTab == ApprovedLauncherTab.HOME && musicLayout == null
+        val homeControl = rememberHomeControlShown()
         // Optional header pieces drop at narrow widths so the round buttons never squish.
         val header = HomeHeaderBudget.plan(LocalConfiguration.current.screenWidthDp, HomeHeaderItems(
             musicChip = musicLayout == null, miniPlayer = settings.showMiniPlayer, mic = hey != null,
-            customize = showCustomize))
+            customize = showCustomize, homeControl = homeControl))
         Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = HomeHeaderBudget.EDGE.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.GAP.dp)) {
           // The leading group owns all the free width, so the trailing buttons always end on the
@@ -1475,6 +1477,7 @@ private fun LauncherScreen(
           }
           ApprovedHeaderButton("music", "Open music player", lit = rememberMusicV3Loaded(), onClick = onOpenMusic)
           if (header.miniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(HomeHeaderBudget.MINI_PLAYER.dp), onOpenMusic)
+          if (homeControl) HomeControlHeaderButton()
           ApprovedHeaderButton("search", "Search apps and settings") {
             if (selectedTab == ApprovedLauncherTab.APPS) appsSearchRequest++ else showSearch = true
           }

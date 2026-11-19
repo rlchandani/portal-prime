@@ -12,8 +12,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 
-/** The plan's three lenses on the same map (Live / Climate / Energy). */
-internal enum class CcLens { LIVE, CLIMATE, ENERGY }
+/** The plan's two lenses on the same map (Live / Climate). */
+internal enum class CcLens { LIVE, CLIMATE }
 
 /** What slides in from the right: a room, then a device inside it (a back-stack). */
 internal sealed interface CcSheet {
@@ -110,11 +110,13 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
   }
 
   /** Acts on [e] with [call], asking first where the household chose so. */
-  fun act(e: CcEntity, call: CcCall) {
+  fun act(e: CcEntity, call: CcCall, onResult: ((Boolean, String?) -> Unit)? = null) {
     val s = stateOf()
     if (CcPolicy.hidden(e, s.settings) || CcPolicy.readOnly(e, s.settings)) return
+    if (call.guard != CcGuard.NONE && s.settings.kids) return
     when (CcPolicy.ask(e, call, s.settings, ControlCenterConfig.scenesSeen(context))) {
-      CcPolicy.Ask.NONE -> if (e.domain == "scene" || e.domain == "script") ControlCenter.runScene(context, e) else ControlCenter.send(context, call)
+      CcPolicy.Ask.NONE -> if (e.domain == "scene" || e.domain == "script") ControlCenter.runScene(context, e)
+          else if (!ControlCenter.send(context, call, undoable = onResult == null, onResult = onResult)) onResult?.invoke(false, null)
       CcPolicy.Ask.CONFIRM -> modal(confirmFor(e, call))
       CcPolicy.Ask.CAMERA_CONFIRM -> modal(CcModal.Garage(e.id, call, cameraNear(e, s)))
       CcPolicy.Ask.PIN -> modal(CcModal.Pin(e.id, CcAlarmMode.entries.firstOrNull { it.service == call.service }, "Disarm",
@@ -133,6 +135,8 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
   }
 
   private fun confirmFor(e: CcEntity, call: CcCall): CcModal = when {
+    call.guard == CcGuard.CONFIRM -> CcTeslaCalls.confirm(stateOf().registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL, call)
+        .let { (title, body, label) -> CcModal.Confirm(e.id, call, title, body, label) }
     e.domain == "scene" -> CcModal.ScenePreview(e.id)
     e.domain == "script" -> CcModal.Confirm(e.id, call, CcModalLogic.confirmTitle(e, call),
         "This Home Assistant script can arm, unlock or open things, so it asks first.", "Run")

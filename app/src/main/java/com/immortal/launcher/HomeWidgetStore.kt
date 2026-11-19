@@ -103,6 +103,23 @@ object HomeWidgetStore {
     prefs.edit().putBoolean(KEY_DASH_MIGRATED, true).apply()
   }
 
+  // One-time migration (1.252): the Home Assistant widget's only job became opening Home Control,
+  // which now has its own header button — drop it from saved layouts once. It stays in the widget
+  // picker, and a household that adds it back keeps it (the flag is set on every install).
+  private const val KEY_HA_DROPPED = "ha_widget_dropped"
+
+  fun dropHomeAssistantWidgetOnce(context: Context) = synchronized(RemoteCompanionStore.mutationLock) {
+    val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    if (prefs.getBoolean(KEY_HA_DROPPED, false)) return@synchronized
+    val current = load(context)
+    val kept = withoutHomeAssistant(current)
+    if (kept.size != current.size) save(context, kept)
+    prefs.edit().putBoolean(KEY_HA_DROPPED, true).apply()
+  }
+
+  /** [widgets] without Home Assistant widgets; everything else keeps its slot and size. */
+  fun withoutHomeAssistant(widgets: List<HomeWidget>): List<HomeWidget> = widgets.filter { it.kind != KIND_HA }
+
   /** iOS-style size cycle for a left-column widget: Small 1x1 -> Medium 2x1 -> Large 2x2 -> Small. */
   /**
    * Size button cycle over whole slots of the 2-row × 4-column Home grid, in stored half-row units:

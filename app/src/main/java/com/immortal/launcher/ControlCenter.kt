@@ -117,22 +117,26 @@ internal object ControlCenter {
     }
   }
 
-  /** Loads today (hourly) and this week (daily) from the recorder, once the energy prefs are known. */
-  fun loadEnergy(context: Context) { val e = engine(context); e.post { e.requestEnergy() } }
+  /** A camera's HLS URL from HA (`camera/stream`), absolute, or null; [onUrl] runs on the engine thread. */
+  fun cameraStream(context: Context, entityId: String, onUrl: (String?) -> Unit) {
+    val e = engine(context)
+    e.post { e.requestStream(entityId) { rel -> onUrl(rel?.let { CcCameraLogic.streamUrl(HaConfig.baseUrl(e.app), it) }) } }
+  }
+
+  /** Loads this week's home charging (daily recorder statistics) for the Tesla screen. Reads HA only, never the car. */
+  fun loadChargeWeek(context: Context) { val e = engine(context); e.post { e.requestChargeWeek() } }
 
   internal fun isoUtc(ms: Long): String =
       SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply { timeZone = TimeZone.getTimeZone("UTC") }.format(ms)
 
-  /** Local-midnight bucket starts: 24 hours of today, or the last 7 days. */
-  internal fun buckets(now: Long, zone: TimeZone, week: Boolean): List<Long> {
+  /** Local-midnight starts of the last 7 days (today last). */
+  internal fun weekBuckets(now: Long, zone: TimeZone): List<Long> {
     val c = Calendar.getInstance(zone).apply { timeInMillis = now; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }
-    if (!week) return (0 until HOURS).map { h -> (c.clone() as Calendar).apply { add(Calendar.HOUR_OF_DAY, h) }.timeInMillis }
     c.add(Calendar.DAY_OF_YEAR, -(DAYS - 1))
     return (0 until DAYS).map { d -> (c.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, d) }.timeInMillis }
   }
 
   private const val DEBUG_WAIT_S = 5L
-  private const val HOURS = 24
   private const val DAYS = 7
   const val TAG = CcEngine.TAG
 }
@@ -224,29 +228,25 @@ internal fun CcEngine.planSaved(ok: Boolean) {
   publish()
 }
 
-internal fun CcEngine.requestEnergy() {
-  val prefs = ui.energyPrefs ?: return
+internal fun CcEngine.requestChargeWeek() {
+  val stat = ui.registry?.tesla?.weekStat ?: return
   val ws = socket ?: return
   val p = protocol ?: return
-  if (!prefs.configured) return
-  val zone = TimeZone.getDefault()
   val now = clock()
-  val today = ControlCenter.buckets(now, zone, week = false)
-  val week = ControlCenter.buckets(now, zone, week = true)
-  ws.send(p.statistics("today", prefs.all, ControlCenter.isoUtc(today.first()), ControlCenter.isoUtc(now), "hour").text)
-  ws.send(p.statistics("week", prefs.all, ControlCenter.isoUtc(week.first()), ControlCenter.isoUtc(now), "day").text)
+  val week = ControlCenter.weekBuckets(now, TimeZone.getDefault())
+  ws.send(p.statistics(CHARGE_WEEK, listOf(stat), ControlCenter.isoUtc(week.first()), ControlCenter.isoUtc(now), "day").text)
 }
 
-internal fun CcEngine.statsResult(r: CcProtocol.Out.Result) {
-  val prefs = ui.energyPrefs ?: return
-  if (!r.ok) return
-  val stats = CcEnergy.stats(r.result)
-  val zone = TimeZone.getDefault()
-  val week = r.req.key == "week"
-  val series = CcEnergy.series(prefs, stats, ControlCenter.buckets(clock(), zone, week))
-  ui = if (week) ui.copy(energyWeek = series) else ui.copy(energyToday = series)
+internal fun CcEngine.chargeStatsResult(r: CcProtocol.Out.Result) {
+  val ids = ui.registry?.tesla ?: return
+  val stat = ids.weekStat ?: return
+  if (!r.ok || r.req.key != CHARGE_WEEK) return
+  val starts = ControlCenter.weekBuckets(clock(), TimeZone.getDefault())
+  ui = ui.copy(chargeWeek = CcTeslaCharger.week(stat, CcTeslaCharger.stats(r.result), starts, CcTeslaCharger.price(ids, ui.entities)))
   publish()
 }
+
+private const val CHARGE_WEEK = "charge_week"
 
 /** [CcPolicy.refusal] for [call] against the current state (pure; what [ControlCenter.send] checks). */
 internal fun ccSendRefusal(s: CcUiState, call: CcCall, confirmed: Boolean, scenesSeen: () -> Set<String>): String? =

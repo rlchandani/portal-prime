@@ -45,8 +45,8 @@ android {
     applicationId = "com.immortal.launcher"
     minSdk = 24
     targetSdk = 36
-    versionCode = 245
-    versionName = "1.251"
+    versionCode = 246
+    versionName = "1.252"
     // AGP rewrites the test manifest's instrumentation name from this setting.
     // The opt-in runner uses framework APIs against optimized targets; app builds are unchanged.
     testInstrumentationRunner =
@@ -239,6 +239,10 @@ dependencies {
   implementation("androidx.media3:media3-transformer:1.5.1")
   implementation("androidx.media3:media3-effect:1.5.1")
   implementation("androidx.media3:media3-common:1.5.1")
+  // Live camera video in the Control Center: HA's `camera/stream` HLS, played by the ExoPlayer that
+  // Transformer already brings in (this adds only the HLS extractor/playlist module).
+  implementation("androidx.media3:media3-exoplayer:1.5.1")
+  implementation("androidx.media3:media3-exoplayer-hls:1.5.1")
 
   // Hearthpane Calling: Google's libwebrtc, prebuilt (Apache-2.0, no GMS). Camera2 capture, HW
   // H.264/VP8 via MediaCodec, software AEC3/NS/AGC, DTLS-SRTP. Only the arm64-v8a .so ships (see

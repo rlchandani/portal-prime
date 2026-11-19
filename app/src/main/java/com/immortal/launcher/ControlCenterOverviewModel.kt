@@ -10,9 +10,9 @@ import androidx.compose.runtime.Immutable
 
 /**
  * Everything the overview canvas draws for one floor, derived purely from the state (unit
- * tested): room views, openings with their wall segments, pulses (capped), badges, light dots,
- * chips and energy flows. Positions are grid cells. Rebuilt only when the floor, entities,
- * settings or the minute change; the canvas never reads entities itself.
+ * tested): room views, openings with their wall segments, pulses (capped), badges, light dots
+ * and chips. Positions are grid cells. Rebuilt only when the floor, entities, settings or the
+ * minute change; the canvas never reads entities itself.
  */
 internal enum class CcMapOpeningKind { WINDOW, DOOR, GARAGE }
 
@@ -39,8 +39,6 @@ internal data class CcMapDot(val entityId: String, val x: Float, val y: Float, v
 
 internal data class CcMapChip(val entityId: String, val x: Float, val y: Float, val text: String)
 
-internal data class CcMapFlow(val roomId: String, val target: CcMapPt, val kw: Double)
-
 @Immutable
 internal data class CcPlanModel(
     val floor: CcFloor,
@@ -51,8 +49,6 @@ internal data class CcPlanModel(
     val badges: List<CcMapBadge>,
     val dots: List<CcMapDot>,
     val chips: List<CcMapChip>,
-    val flows: List<CcMapFlow>,
-    val maxPowerW: Double,
     val lightsOn: Int,
 ) {
   fun view(roomId: String): CcRoomView? = views.firstOrNull { it.room.id == roomId }
@@ -60,11 +56,6 @@ internal data class CcPlanModel(
   companion object {
     /** At most this many pulses animate at once (Portal GPU budget). */
     const val MAX_PULSES = 6
-    /** At most this many moving dash lines in the energy lens. */
-    const val MAX_FLOWS = 8
-    /** Rooms drawing at least this much get a flow line. */
-    const val FLOW_MIN_W = 200.0
-    private const val W_PER_KW = 1000.0
     private const val MS_PER_MIN = 60_000L
     private const val MIN_PER_H = 60L
     private const val PCT = 100f
@@ -94,9 +85,8 @@ internal data class CcPlanModel(
       val badges = views.flatMap { badges(it, visible, appliancesDone) }
       val dots = views.flatMap(::dots)
       val chips = openings.mapNotNull { chip(it, entities, now) }
-      val power = views.mapNotNull { it.powerW }
       return CcPlanModel(floor, CcPlanGeo.bounds(floor), views, openings, pulses(views, openings, visible), badges, dots, chips,
-          flows(views), power.maxOrNull() ?: 0.0, views.sumOf { it.lightsOn })
+          views.sumOf { it.lightsOn })
     }
 
     private fun opening(o: CcOpening, floor: CcFloor, entities: Map<String, CcEntity>, s: ControlCenterConfig.Settings): CcOpeningView? {
@@ -187,10 +177,5 @@ internal data class CcPlanModel(
         }
       }
     }
-
-    /** Rooms drawing ≥ [FLOW_MIN_W], biggest first, at most [MAX_FLOWS]. */
-    fun flows(views: List<CcRoomView>): List<CcMapFlow> =
-        views.filter { (it.powerW ?: 0.0) >= FLOW_MIN_W }.sortedByDescending { it.powerW }.take(MAX_FLOWS)
-            .map { CcMapFlow(it.room.id, CcPlanGeo.center(it.room.rect), (it.powerW ?: 0.0) / W_PER_KW) }
   }
 }

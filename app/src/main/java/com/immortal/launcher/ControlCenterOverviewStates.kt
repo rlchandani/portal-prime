@@ -49,7 +49,7 @@ internal fun BoxScope.CcOverviewLoading(s: CcUiState) {
   val floor = plan?.takeIf { !it.isEmpty }?.floors?.firstOrNull()
   if (floor != null) {
     val model = remember(floor, s.entities, s.settings) { CcPlanModel.build(floor, s.entities, s.settings, s.now) }
-    CcPlanCanvas(model, CcLens.LIVE, null, null, CcMapSources.NONE, stale = true, fahrenheit = s.fahrenheit, onTap = {},
+    CcPlanCanvas(model, CcLens.LIVE, null, null, stale = true, fahrenheit = s.fahrenheit, onTap = {},
         modifier = Modifier.fillMaxSize().padding(top = 96.dp, bottom = 84.dp).alpha(SKELETON_ALPHA))
   }
   CcShimmer()

@@ -16,6 +16,8 @@ internal data class HomeHeaderItems(
     val mic: Boolean,
     /** Customize / Done (Home tab only). */
     val customize: Boolean,
+    /** The Home Control button (HA set up, this Portal isn't banners-only). */
+    val homeControl: Boolean = false,
 )
 
 /** What the header shows at a given width. The round buttons are never dropped or squished. */
@@ -29,7 +31,7 @@ internal data class HomeHeaderPlan(
 
 /**
  * Home header width budget (dp), so the round header buttons (screensaver, phone, sleep, theme,
- * voice, music, search, settings) always get their full 68 dp. Optional pieces drop, in this order,
+ * voice, music, Home Control, search, settings) always get their full 68 dp. Optional pieces drop, in this order,
  * until everything fits: the mini player, the "Connected" text (the Wi-Fi glyph stays), the room
  * name, the wordmark, and last the music chip. The room name is also an ellipsizing weight in the
  * row, so a long name can never push a button. Pure.
@@ -80,7 +82,7 @@ internal object HomeHeaderBudget {
     val pieces = buildList {
       val left = (if (plan.wordmark) WORDMARK_GROUP else 0) + (if (plan.room) ROOM else 0)
       if (left > 0) add(left)
-      repeat(FIXED_BUTTONS + if (items.mic) 1 else 0) { add(BUTTON) }
+      repeat(FIXED_BUTTONS + (if (items.mic) 1 else 0) + (if (items.homeControl) 1 else 0)) { add(BUTTON) }
       if (plan.musicChip) add(MusicV3HomeChipDims.WIDTH)
       add(WIFI)
       if (plan.connectedLabel) add(CONNECTED_LABEL)

@@ -19,14 +19,13 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 /**
  * Everything one plan frame needs, assembled at composition (strokes, dash effects and colours
  * are created here, never per frame). The draw passes live in this file (floor, openings,
- * pulses, walk, flows, focus) and in ControlCenterPlanCanvasMarks.kt (markers, labels, nodes).
+ * pulses, walk, focus) and in ControlCenterPlanCanvasMarks.kt (markers, labels).
  * Which pass belongs to which cached layer is documented on [CcPlanCanvas].
  */
 @androidx.compose.runtime.Immutable
 internal class CcPlanDraw(
     val model: CcPlanModel,
     val px: CcPlanPx,
-    val flows: CcFlowPx?,
     val paint: CcPlanPaint,
     val c: CcColors,
     val labels: Map<String, CcRoomText>,
@@ -34,8 +33,6 @@ internal class CcPlanDraw(
     val lens: CcLens,
     val focus: String?,
     val stale: Boolean,
-    val dashes: CcMapDashes,
-    val sources: CcMapSources,
     val fahrenheit: Boolean,
     val dp: Float,
 ) {
@@ -47,19 +44,16 @@ internal class CcPlanDraw(
   val windowOpenDash = PathEffect.dashPathEffect(floatArrayOf(10f * dp, 7f * dp))
   val dotStroke = Stroke(3f * dp)
   val focusStroke = Stroke(FOCUS_DP * dp, join = StrokeJoin.Round)
-  val nodeStroke = Stroke(3f * dp)
   val window = Color(WINDOW_RGB)
-  val flowBase = flows?.lines?.map { Stroke(it.widthDp * dp, cap = StrokeCap.Round) }.orEmpty()
-  val flowMoving = flows?.lines?.map { l -> dashes.effects.map { Stroke(l.widthDp * dp, cap = StrokeCap.Round, pathEffect = it) } }.orEmpty()
   private val lit: Map<String, Lit> = model.views.filter { it.glows.isNotEmpty() }.associate { v ->
     val maxB = v.glows.maxOf { it.strength }
-    val wash = (if (lens == CcLens.ENERGY) WASH_ENERGY else if (c.dark) WASH_DARK else WASH_LIGHT) + maxB * (if (c.dark) WASH_B_DARK else WASH_B_LIGHT)
+    val wash = (if (c.dark) WASH_DARK else WASH_LIGHT) + maxB * (if (c.dark) WASH_B_DARK else WASH_B_LIGHT)
     v.room.id to Lit(Color(OPAQUE or CcOverviewText.mixRgb(v.glows.map { it.rgb })), wash * lightFactor,
         v.glows.map { g -> px.pt(CcPlanGeo.device(v.room.rect, g.fx, g.fy)) },
         FloatArray(v.glows.size) { CcPlanGeo.glowRadius(v.glows[it].strength) * px.fit.scale },
         v.glows.map { paint.tint(it.rgb) })
   }
-  private val glowAlpha = when (lens) { CcLens.ENERGY -> GLOW_ENERGY; CcLens.CLIMATE -> GLOW_CLIMATE; CcLens.LIVE -> if (c.dark) 1f else GLOW_LIGHT } * lightFactor
+  private val glowAlpha = when (lens) { CcLens.CLIMATE -> GLOW_CLIMATE; CcLens.LIVE -> if (c.dark) 1f else GLOW_LIGHT } * lightFactor
 
   /** Layer 2: the focused room's ember tint, lens tints, light washes and glows. */
   fun drawUnder(s: DrawScope) {
@@ -74,16 +68,12 @@ internal class CcPlanDraw(
     drawMarks(s)
   }
 
-  /** Layer 6: names + captions and the energy nodes, above everything that moves. */
-  fun drawTop(s: DrawScope) {
-    drawLabels(s)
-    drawEnergyNodes(s)
-  }
+  /** Layer 6: names + captions, above everything that moves. */
+  fun drawTop(s: DrawScope) = drawLabels(s)
 
-  /** Layer 5 at clock [t]: pulses, energy dashes and the focus edge. */
+  /** Layer 5 at clock [t]: pulses and the focus edge. */
   fun drawAnimated(s: DrawScope, t: Float) {
     drawPulses(s, t)
-    drawFlows(s, t)
     focusEdge(s, t)
   }
 
@@ -91,9 +81,6 @@ internal class CcPlanDraw(
     when (lens) {
       CcLens.CLIMATE -> v.temperature?.let { t ->
         s.drawRect(Color(OPAQUE or CcOverviewText.heatRgb(CcRooms.heat(t, fahrenheit))), r.topLeft, r.size, alpha = if (c.dark) CLIMATE_DARK else CLIMATE_LIGHT)
-      }
-      CcLens.ENERGY -> v.powerW?.takeIf { it > 0 && model.maxPowerW > 0 }?.let { w ->
-        s.drawRect(Color(OPAQUE or CcFlowPx.ROOM_RGB), r.topLeft, r.size, alpha = ENERGY_BASE + ENERGY_RANGE * (w / model.maxPowerW).toFloat())
       }
       CcLens.LIVE -> Unit
     }
@@ -142,17 +129,6 @@ internal class CcPlanDraw(
     }
   }
 
-  private fun drawFlows(s: DrawScope, t: Float) {
-    val f = flows ?: return
-    val phase = frac(t * DASH_CYCLES)
-    f.lines.forEachIndexed { i, l ->
-      val col = Color(OPAQUE or l.rgb)
-      s.drawPath(l.path, col, alpha = FLOW_BASE_ALPHA, style = flowBase[i])
-      val p = if (l.reverse) 1f - phase else phase
-      s.drawPath(l.path, col, style = flowMoving[i][((p * CcMapDashes.STEPS).toInt()).coerceIn(0, CcMapDashes.STEPS - 1)])
-    }
-  }
-
   /** While a room's sheet is open the rest of the floor dims… */
   private fun focusVeil(s: DrawScope) {
     val f = focus ?: return
@@ -169,8 +145,8 @@ internal class CcPlanDraw(
         alpha = breathe, style = focusStroke)
   }
 
-  /** True when [drawAnimated] draws anything at all (an Energy lens with no flows has nothing to move). */
-  val animates: Boolean get() = model.pulses.isNotEmpty() || flows?.lines?.isNotEmpty() == true || (focus != null && focus in px.rects)
+  /** True when [drawAnimated] draws anything at all (no pulses and no focused room: nothing moves). */
+  val animates: Boolean get() = model.pulses.isNotEmpty() || (focus != null && focus in px.rects)
 
   private fun frac(v: Float): Float = v - kotlin.math.floor(v)
 
@@ -190,14 +166,10 @@ internal class CcPlanDraw(
     private const val SEL_MIX = 0.2f
     private const val CLIMATE_DARK = 0.5f
     private const val CLIMATE_LIGHT = 0.55f
-    private const val ENERGY_BASE = 0.06f
-    private const val ENERGY_RANGE = 0.3f
-    private const val WASH_ENERGY = 0.06f
     private const val WASH_DARK = 0.16f
     private const val WASH_LIGHT = 0.22f
     private const val WASH_B_DARK = 0.22f
     private const val WASH_B_LIGHT = 0.2f
-    private const val GLOW_ENERGY = 0.25f
     private const val GLOW_CLIMATE = 0.5f
     private const val GLOW_LIGHT = 0.9f
     private const val PULSE_CYCLES = 3f
@@ -205,7 +177,6 @@ internal class CcPlanDraw(
     private const val PULSE_FROM = 0.35f
     private const val PULSE_GROW = 1.25f
     private const val PULSE_ALPHA = 0.55f
-    private const val DASH_CYCLES = 6f
     private const val FOCUS_CYCLES = 4f
     private const val FOCUS_ALPHA_MIN = 0.55f
     private const val FOCUS_INSET_CELLS = 0.2f
@@ -213,7 +184,6 @@ internal class CcPlanDraw(
     private const val WALK_VEIL = 0.45f
     /** The mock's 150-unit sweep light, in cells. */
     private const val WALK_CELLS = 7.5f
-    private const val FLOW_BASE_ALPHA = 0.18f
   }
 }
 

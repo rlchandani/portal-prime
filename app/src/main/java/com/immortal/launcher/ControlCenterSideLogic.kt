@@ -39,13 +39,12 @@ internal data class CcSceneTile(val entity: CcEntity, val tone: CcSceneTone, val
  * equality checks that let unchanged cards skip.
  */
 @Immutable
-internal data class CcSideSlices(val attention: CcAttentionSlice, val scenes: CcSceneGrid, val energy: CcEnergyNow?, val cameras: CcCameraList) {
+internal data class CcSideSlices(val attention: CcAttentionSlice, val scenes: CcSceneGrid, val car: CcCarMini?, val cameras: CcCameraList) {
   companion object {
     fun of(s: CcUiState): CcSideSlices = CcSideSlices(
         attention = CcSideLogic.attention(s.alerts(), s.entities, s.plan, s.settings),
         scenes = CcSceneGrid(CcSideLogic.tiles(s.ofDomain("scene") + s.ofDomain("script"), s.plan, s.settings.kids)),
-        energy = if (CcPolicy.screenHidden(CcScreen.ENERGY, s.settings)) null
-            else CcEnergy.now(s.entities).takeIf { it.hasFlow || it.batteryPct != null },
+        car = s.registry?.tesla?.let { ids -> CcTeslaCar.view(ids, s.entities, s.connection.phase)?.let { CcTeslaText.mini(ids, it, s.now) } },
         cameras = CcCameraList(if (CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings)) emptyList()
             else s.ofDomain("camera").take(CcSideLogic.CAMERA_TILES).map { CcFloorTab(it.id, it.name) }),
     )

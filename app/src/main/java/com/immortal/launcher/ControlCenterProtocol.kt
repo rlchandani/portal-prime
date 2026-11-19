@@ -17,7 +17,7 @@ import org.json.JSONObject
  * The token appears only in the auth message and is never logged or echoed.
  */
 internal class CcProtocol(private val token: String) {
-  enum class Kind { FLOORS, AREAS, DEVICES, ENTITIES, PLAN_GET, PLAN_SET, SUBSCRIBE, GET_STATES, EVENTS, CALL, PING, ENERGY_PREFS, STATS, UNSUBSCRIBE }
+  enum class Kind { FLOORS, AREAS, DEVICES, ENTITIES, CLASSES, PLAN_GET, PLAN_SET, SUBSCRIBE, GET_STATES, EVENTS, CALL, PING, STATS, UNSUBSCRIBE, CAMERA_STREAM }
 
   data class Req(val kind: Kind, val key: String = "")
 
@@ -74,6 +74,14 @@ internal class CcProtocol(private val token: String) {
       request(Req(Kind.DEVICES), JSONObject().put("type", "config/device_registry/list")),
       request(Req(Kind.ENTITIES), JSONObject().put("type", "config/entity_registry/list")))
 
+  /**
+   * Full registry entries for [ids]: `config/entity_registry/list` leaves out `device_class` and
+   * `original_device_class`, so without this a door or smoke sensor's class is unknown until its
+   * state arrives — and it is never subscribed unless it is on the plan.
+   */
+  fun classes(ids: List<String>): Out.Send =
+      request(Req(Kind.CLASSES), JSONObject().put("type", "config/entity_registry/get_entries").put("entity_ids", JSONArray(ids)))
+
   fun getPlan(): Out.Send = request(Req(Kind.PLAN_GET), JSONObject().put("type", "frontend/get_user_data").put("key", CcPlanJson.HA_KEY))
 
   fun setPlan(plan: JSONObject): Out.Send =
@@ -108,7 +116,9 @@ internal class CcProtocol(private val token: String) {
     return request(Req(Kind.PING), JSONObject().put("type", "ping")).also { pingId = nextId - 1; pending.remove(pingId) }
   }
 
-  fun energyPrefs(): Out.Send = request(Req(Kind.ENERGY_PREFS), JSONObject().put("type", "energy/get_prefs"))
+  /** HA starts (or reuses) an HLS stream for [entityId]; the result carries `{"url": "/api/hls/…"}`. */
+  fun cameraStream(entityId: String, key: String): Out.Send =
+      request(Req(Kind.CAMERA_STREAM, key), JSONObject().put("type", "camera/stream").put("entity_id", entityId))
 
   /** Hourly/daily `change` statistics for [ids] between ISO [start] and [end]. */
   fun statistics(key: String, ids: List<String>, startIso: String, endIso: String, period: String): Out.Send =

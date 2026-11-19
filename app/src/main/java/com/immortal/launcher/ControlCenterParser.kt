@@ -118,6 +118,9 @@ internal object CcRegistryParser {
     val entityArea = HashMap<String, String>()
     val entityClass = HashMap<String, String>()
     val usable = HashSet<String>()
+    val diagnostics = HashSet<String>()
+    val cameraPlatform = HashMap<String, String>()
+    val byDevice = HashMap<String, MutableList<String>>()
     objects(entities).forEach { o ->
       val id = o.optString("entity_id").takeIf { it.contains('.') } ?: return@forEach
       val own = o.optString("area_id").takeIf { it.isNotBlank() && it != "null" }
@@ -130,9 +133,41 @@ internal object CcRegistryParser {
       val hidden = !o.isNull("hidden_by") && o.optString("hidden_by").isNotBlank()
       val category = if (o.isNull("entity_category")) "" else o.optString("entity_category")
       if (!disabled && !hidden && category in USABLE_CATEGORIES) usable += id
+      if (!disabled && !hidden && category == DIAGNOSTIC && id.startsWith("binary_sensor.")) diagnostics += id
+      if (id.startsWith("camera.")) o.optString("platform").takeIf { it.isNotBlank() && it != "null" }?.let { cameraPlatform[id] = it }
+      if (!disabled && device != null && (id.startsWith("camera.") || isSnapshotButton(id, o))) byDevice.getOrPut(device) { ArrayList() } += id
     }
-    return CcRegistry(floors, areas, entityArea, entityClass, usable)
+    return CcRegistry(floors, areas, entityArea, entityClass, usable, diagnostics, cameraPlatform = cameraPlatform,
+        snapshotButtons = snapshotButtons(byDevice))
   }
+
+  private fun isSnapshotButton(id: String, o: JSONObject): Boolean =
+      id.startsWith("button.") && ("take_snapshot" in id || o.optString("translation_key") == "take_snapshot")
+
+  /** Cameras and the "take snapshot" buttons that share their device (ring-mqtt puts both on the camera). */
+  private fun snapshotButtons(byDevice: Map<String, List<String>>): Map<String, List<String>> {
+    val out = HashMap<String, List<String>>()
+    byDevice.values.forEach { ids ->
+      val buttons = ids.filter { it.startsWith("button.") }.sorted()
+      if (buttons.isNotEmpty()) ids.filter { it.startsWith("camera.") }.forEach { out[it] = buttons }
+    }
+    return out
+  }
+
+  /** `get_entries` result (entity id → entry or null) → entity id → device class. */
+  fun classes(result: JSONObject?): Map<String, String> {
+    if (result == null) return emptyMap()
+    val out = HashMap<String, String>()
+    result.keys().forEach { id ->
+      val o = result.optJSONObject(id) ?: return@forEach
+      val cls = o.optString("device_class").takeIf { it.isNotBlank() && it != "null" }
+          ?: o.optString("original_device_class").takeIf { it.isNotBlank() && it != "null" }
+      cls?.let { out[id] = it }
+    }
+    return out
+  }
+
+  private const val DIAGNOSTIC = "diagnostic"
 
   private fun objects(a: JSONArray?): List<JSONObject> =
       if (a == null) emptyList() else (0 until a.length()).mapNotNull { a.optJSONObject(it) }

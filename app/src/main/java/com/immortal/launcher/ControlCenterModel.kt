@@ -202,8 +202,26 @@ internal data class CcRegistry(
     val entityClass: Map<String, String> = emptyMap(),
     /** Entities the registry lists as usable (not disabled, hidden, diagnostic or config). */
     val entities: Set<String> = emptySet(),
+    /** Enabled, visible binary sensors filed as diagnostics (where integrations put tamper sensors). */
+    val diagnostics: Set<String> = emptySet(),
+    /**
+     * Binary-sensor classes from `get_entries` (the list call omits them). On-screen use only: the
+     * background banner set still reads [entityClass], so this fix can't start new banners.
+     */
+    val fetchedClass: Map<String, String> = emptyMap(),
+    /** camera entity → its integration (`mqtt` for ring-mqtt, `wyze_ha`, …), to explain what it can do. */
+    val cameraPlatform: Map<String, String> = emptyMap(),
+    /** camera entity → "take snapshot" buttons on the same device (ring-mqtt), for the Refresh button. */
+    val snapshotButtons: Map<String, List<String>> = emptyMap(),
+    /** The car, its home charger and a price entity, for the Tesla screen (diagnostic ones included). */
+    val tesla: CcTeslaIds = CcTeslaIds.NONE,
 ) {
   fun areaOf(entityId: String): String? = entityArea[entityId]
+  /** The best class known before the state arrives. */
+  fun classOf(entityId: String): String? = entityClass[entityId] ?: fetchedClass[entityId]
+  /** Binary sensors whose class we still need to ask HA for. */
+  val classless: List<String> get() = (entities + diagnostics).filter { it.startsWith("binary_sensor.") && it !in entityClass }.sorted()
+  fun areaName(entityId: String): String? = areaOf(entityId)?.let { a -> areas.firstOrNull { it.id == a }?.name }
   fun areasOn(floorId: String?): List<CcHaArea> = areas.filter { it.floorId == floorId }
 }
 

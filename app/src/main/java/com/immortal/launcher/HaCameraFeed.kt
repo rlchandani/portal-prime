@@ -24,12 +24,18 @@ import kotlin.concurrent.thread
  * [FIRST_FRAME_MS] or breaks, a snapshot loop (`/api/camera_proxy/<camera>`) about once a second.
  * Frames are downsampled to at most [MAX_WIDTH] wide and delivered on the main thread. [stop]
  * ends everything; a stopped feed never delivers again. Never logs the address or the token.
+ *
+ * With [onPicture] every frame is reported with a hash of its bytes, and a frame identical to the
+ * last one is not decoded again (the bitmap is null): the Control Center judges "live" on that.
+ * Without [snapshotFallback] the feed ends (via [onUnavailable]) when the stream does.
  */
 internal class HaCameraFeed(
     context: Context,
     private val camera: String,
     private val onFrame: (Bitmap) -> Unit,
     private val onUnavailable: () -> Unit,
+    private val snapshotFallback: Boolean = true,
+    private val onPicture: ((Bitmap?, Long) -> Unit)? = null,
 ) {
   private val app = context.applicationContext
   private val main = Handler(Looper.getMainLooper())
@@ -37,6 +43,10 @@ internal class HaCameraFeed(
   @Volatile private var call: Call? = null
   @Volatile private var lastFrameAt = 0L
   private var sampleSize = 0
+  private var lastHash = 0L
+  private var statsFrom = 0L
+  private var statsFrames = 0
+  private var statsDistinct = 0
 
   fun start() {
     if (!HaConfig.isConfigured(app) || !DoorbellEntities.isCamera(camera)) { main.post { if (!stopped) onUnavailable() }; return }
@@ -52,8 +62,9 @@ internal class HaCameraFeed(
     val base = HaConfig.baseUrl(app)
     val headers = HaConfig.authHeaders(app)
     val streamed = runCatching { stream(DoorbellUrls.stream(base, camera), headers) }
-        .onFailure { if (!stopped) Log.i(TAG, "camera stream ended (${it.javaClass.simpleName}); using snapshots") }
+        .onFailure { if (!stopped) Log.i(TAG, "camera stream ended (${it.javaClass.simpleName})${if (snapshotFallback) "; using snapshots" else ""}") }
     if (stopped) return
+    if (!snapshotFallback) { Log.i(TAG, "camera stream ended"); main.post { if (!stopped) onUnavailable() }; return }
     if (streamed.isSuccess) Log.i(TAG, "camera stream closed; using snapshots")
     snapshots(DoorbellUrls.snapshot(base, camera), headers)
   }
@@ -97,19 +108,46 @@ internal class HaCameraFeed(
   }
 
   private fun deliver(jpeg: ByteArray): Boolean {
+    val picture = onPicture
+    if (picture != null) {
+      val hash = CcCamLiveness.hash(jpeg)
+      count(hash != lastHash)
+      if (hash == lastHash && lastFrameAt > 0) { lastFrameAt = System.currentTimeMillis(); main.post { if (!stopped) picture(null, hash) }; return true }
+      val bitmap = decode(jpeg) ?: return false
+      lastHash = hash
+      lastFrameAt = System.currentTimeMillis()
+      main.post { if (!stopped) picture(bitmap, hash) }
+      return true
+    }
+    val bitmap = decode(jpeg) ?: return false
+    lastFrameAt = System.currentTimeMillis()
+    main.post { if (!stopped) onFrame(bitmap) }
+    return true
+  }
+
+  /** Frame rate for the logs, every [STATS_MS]: how many frames, how many actually new. */
+  private fun count(distinct: Boolean) {
+    val now = System.currentTimeMillis()
+    if (statsFrom == 0L) statsFrom = now
+    statsFrames++
+    if (distinct) statsDistinct++
+    if (now - statsFrom >= STATS_MS) {
+      val s = (now - statsFrom) / 1000.0
+      Log.i(TAG, "camera mjpeg: %.1f fps, %.1f new/s".format(statsFrames / s, statsDistinct / s))
+      statsFrom = now; statsFrames = 0; statsDistinct = 0
+    }
+  }
+
+  private fun decode(jpeg: ByteArray): Bitmap? {
     if (sampleSize == 0) {
       val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
       BitmapFactory.decodeByteArray(jpeg, 0, jpeg.size, bounds)
-      if (bounds.outWidth <= 0) return false
+      if (bounds.outWidth <= 0) return null
       var s = 1
       while (bounds.outWidth / (s * 2) >= MAX_WIDTH) s *= 2
       sampleSize = s
     }
-    val bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.size, BitmapFactory.Options().apply { inSampleSize = sampleSize })
-        ?: return false
-    lastFrameAt = System.currentTimeMillis()
-    main.post { if (!stopped) onFrame(bitmap) }
-    return true
+    return BitmapFactory.decodeByteArray(jpeg, 0, jpeg.size, BitmapFactory.Options().apply { inSampleSize = sampleSize })
   }
 
   companion object {
@@ -119,6 +157,7 @@ internal class HaCameraFeed(
     /** At most ~8 decoded frames a second: plenty for a door, light on a Portal. */
     private const val MIN_FRAME_GAP_MS = 120L
     private const val MAX_SNAPSHOT_FAILURES = 3
+    private const val STATS_MS = 10_000L
     private const val MAX_WIDTH = 1280
     private const val READ_BUFFER = 16 * 1024
     private const val CONNECT_S = 8L
