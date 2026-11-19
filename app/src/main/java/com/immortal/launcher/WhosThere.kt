@@ -87,6 +87,7 @@ internal object WhosThere {
   private var lastSkip: GlanceSkip? = null
   private var lastTimings: GlanceTimings? = null
   private var lastGreetingMs = -1L
+  private var lastBestScore = -1f
   private var notYouHold: Pair<String, Long>? = null
   /** Enrolment holds the camera; glances wait. */
   @Volatile var enrolling = false
@@ -303,7 +304,8 @@ internal object WhosThere {
     // Ids and counts only; the outcome holds no embeddings.
     Log.i(TAG, "glance done faces=${r.outcome.faceCount} recognised=${r.outcome.recognised.size} " +
         "unsure=${r.outcome.unsure != null} view=${view.javaClass.simpleName} luma=${"%.0f".format(r.meanLuma)} " +
-        "failed=${r.failed} ${r.timings.log()} glance→greeting=${lastGreetingMs}ms")
+        "failed=${r.failed} best=${"%.3f".format(r.bestScore)} rot=${r.rotation} ${r.timings.log()} glance→greeting=${lastGreetingMs}ms")
+    lastBestScore = r.bestScore
   }
 
   /** After "Not you?", the corrected-away person isn't put straight back. */
@@ -442,5 +444,6 @@ internal object WhosThere {
         .put("indicator", u.indicator.javaClass.simpleName).put("view", u.view.javaClass.simpleName)
         .put("homeVisible", homeVisible).put("lastSkip", lastSkip?.log ?: JSONObject.NULL)
         .put("lastGlance", lastTimings?.log() ?: JSONObject.NULL).put("glanceToGreetingMs", lastGreetingMs)
+        .put("lastBestScore", lastBestScore.toDouble())
   }
 }

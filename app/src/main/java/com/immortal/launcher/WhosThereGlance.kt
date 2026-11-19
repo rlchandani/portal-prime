@@ -35,6 +35,10 @@ internal data class GlanceResult(
     val meanLuma: Float,
     val failed: String?,
     val timings: GlanceTimings,
+    /** Highest cosine seen against any template (a number only, for daytime threshold tuning). */
+    val bestScore: Float = -1f,
+    /** The rotation that found a face (Mini upright check), null if none was found. */
+    val rotation: Int? = null,
 ) {
   /** No light at all (privacy shutter / covered lens: the virtual camera sends black frames). */
   val covered: Boolean get() = failed == null && timings.framesSeen > 0 && meanLuma < COVERED_LUMA
@@ -82,6 +86,7 @@ internal class WhosThereGlance(
   private var embedded = 0
   private var analysed = 0
   private var earlySent = false
+  private var bestScore = -1f
 
   fun start() {
     camera.open()
@@ -137,7 +142,10 @@ internal class WhosThereGlance(
       val sample = models.embed(frame, face)
       embedNs += SystemClock.elapsedRealtimeNanos() - t1
       embedded++
-      sample.embedding?.let { WhosThereMatcher.match(it, templates, thresholds) } ?: FaceMatch.Unknown
+      sample.embedding?.let { e ->
+        WhosThereMatcher.scores(e, templates).values.maxOrNull()?.let { if (it > bestScore) bestScore = it }
+        WhosThereMatcher.match(e, templates, thresholds)
+      } ?: FaceMatch.Unknown
     }
     matches += frameMatches
     if (!earlySent) WhosThereMatcher.early(matches)?.let { earlySent = true; onEarly(it) }
@@ -178,7 +186,7 @@ internal class WhosThereGlance(
     val timings = GlanceTimings(openMs, first, if (firstFrameAt == 0L) -1 else now - firstFrameAt, seen.get(), analysed,
         if (analysed == 0) 0.0 else detectNs / analysed / 1e6, if (embedded == 0) 0.0 else embedNs / embedded / 1e6,
         closeMs, now - started)
-    onDone(GlanceResult(outcome, if (lumaFrames == 0) 0f else lumaSum / lumaFrames, failed, timings))
+    onDone(GlanceResult(outcome, if (lumaFrames == 0) 0f else lumaSum / lumaFrames, failed, timings, bestScore, lockedRotation))
   }
 
   companion object {
