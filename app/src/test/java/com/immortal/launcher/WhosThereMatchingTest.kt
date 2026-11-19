@@ -153,6 +153,17 @@ class WhosThereMatchingTest {
     assertTrue(o.recognised.isEmpty())
   }
 
+  @Test fun earlyVerdictNeedsThreeClearSingleFaceFramesInARow() {
+    val m = listOf(acceptMaya)
+    assertNull(WhosThereMatcher.early(listOf(m, m)))
+    assertEquals(listOf("mayaaaaa"), WhosThereMatcher.early(listOf(emptyList(), m, m, m))!!.recognised)
+    assertEquals(3, WhosThereMatcher.early(listOf(emptyList(), m, m, m))!!.framesAnalysed)
+    assertNull(WhosThereMatcher.early(listOf(m, m, listOf(unsureMaya))))
+    assertNull(WhosThereMatcher.early(listOf(m, m, listOf(acceptArjun))))
+    assertNull(WhosThereMatcher.early(listOf(m, m, listOf(acceptMaya, FaceMatch.Unknown)))) // a second face: wait
+    assertNull(WhosThereMatcher.early(listOf(listOf(FaceMatch.Unknown), listOf(FaceMatch.Unknown), listOf(FaceMatch.Unknown))))
+  }
+
   @Test fun personColoursAndNames() {
     assertEquals(WhosThereColors.at(0), WhosThereColors.at(8))
     assertEquals(WhosThereColors.at(7), WhosThereColors.at(-1))

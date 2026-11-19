@@ -10,9 +10,9 @@ Who's there? — on-device face models and runtime
    Source: https://github.com/opencv/opencv_zoo/tree/main/models/face_recognition_sface
    Licensed under the Apache License, Version 2.0.
    Modified by Starbright Lab: the ONNX graph was rebuilt layer by layer as an NHWC
-   TensorFlow graph with the original weights and converted to TensorFlow Lite with
+   TensorFlow graph with the original weights and converted (TensorFlow 2.16.1, matching the runtime) to TensorFlow Lite with
    dynamic-range int8 weights (face_recognition_sface_2021dec_int8dr.tflite).
-   SHA-256 102fdae9e7103ce757a3d36b73e31fb1784bd274f27b3a55165769a1476d27bf
+   SHA-256 5bf1e5b705d5c0f26314b2b5dededf60b5c324b45cdf536654b67498df9e6f0c
 
 3. Runtime: TensorFlow Lite 2.16.1 (org.tensorflow:tensorflow-lite)
    Copyright The TensorFlow Authors. Licensed under the Apache License, Version 2.0.

@@ -30,6 +30,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -111,26 +113,30 @@ private fun IndicatorPill(modifier: Modifier, description: String, onClick: (() 
 @Composable
 private fun PillText(text: String, color: Color = ApprovedHomePalette.Text) =
     Text(text, color = color, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
-        overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(end = 12.dp))
+        overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 180.dp).padding(end = 12.dp))
 
 /**
  * The top-right "who's there" spot. While the camera is open it shows the live preview, a
  * pulsing green dot and "Looking…": always, it can't be hidden.
  */
 @Composable
-internal fun WhosThereIndicatorChip(ui: WhosThereUi, use24: Boolean, onWho: () -> Unit, modifier: Modifier = Modifier) {
+internal fun WhosThereIndicatorChip(use24: Boolean, onWho: () -> Unit, modifier: Modifier = Modifier, fixedSlot: Boolean = false) {
+  val ui by rememberWhosThereUi()
+  if (ui.indicator == WhosThereIndicator.Hidden) return
+  // In the greeting row the chip sits in a fixed-width slot, so its state changes never re-measure
+  // the greeting and clock beside it (that was the one long frame when a glance started).
+  if (fixedSlot) Box(modifier.width(INDICATOR_SLOT), contentAlignment = Alignment.CenterEnd) { IndicatorFor(ui, use24, onWho, Modifier) }
+  else IndicatorFor(ui, use24, onWho, modifier)
+}
+
+private val INDICATOR_SLOT = 280.dp
+
+@Composable
+private fun IndicatorFor(ui: WhosThereUi, use24: Boolean, onWho: () -> Unit, modifier: Modifier) {
   when (val ind = ui.indicator) {
     WhosThereIndicator.Hidden -> Unit
-    WhosThereIndicator.Ready -> IndicatorPill(modifier.size(64.dp), "Recognition on. Tap to look again", { WhosThere.requestGlance(GlanceTrigger.MANUAL) }) {
-      WhosThereGlyph(WtGlyph.EYE, ApprovedHomePalette.Secondary, 30.dp, Modifier.padding(start = 9.dp))
-    }
-    WhosThereIndicator.Looking -> IndicatorPill(modifier, "Camera on: looking who’s here", null) {
-      Box(Modifier.size(48.dp).clip(CircleShape).background(Color(0xFF1A1F2B))) {
-        if (ui.previewWanted) WhosThereGlancePreview(Modifier.fillMaxSize())
-      }
-      PulsingDot()
-      PillText("Looking…")
-    }
+    // One call site for Ready and Looking keeps the same preview view alive between them.
+    WhosThereIndicator.Ready, WhosThereIndicator.Looking -> PreviewPill(ind == WhosThereIndicator.Looking, modifier)
     is WhosThereIndicator.Recognised -> {
       val p = ui.person(ind.personId)
       IndicatorPill(modifier, "Showing ${p?.name}’s Home. Tap if this isn’t you", onWho) {
@@ -176,6 +182,31 @@ internal fun WhosThereIndicatorChip(ui: WhosThereUi, use24: Boolean, onWho: () -
 private fun minuteOf(ms: Long): Int =
     java.util.Calendar.getInstance().apply { timeInMillis = ms }.let { it.get(java.util.Calendar.HOUR_OF_DAY) * 60 + it.get(java.util.Calendar.MINUTE) }
 
+/**
+ * Ready: an eye on a disc. Looking: the disc lifts off the live preview once the first new frame
+ * lands (never an old frame), with the green dot and "Looking…". The preview view stays mounted
+ * in both states so starting a glance creates nothing mid-frame.
+ */
+@Composable
+private fun PreviewPill(looking: Boolean, modifier: Modifier) {
+  var frameSeen by remember { mutableStateOf(false) }
+  LaunchedEffect(looking) { frameSeen = false }
+  val description = if (looking) "Camera on: looking who’s here" else "Recognition on. Tap to look again"
+  IndicatorPill(modifier, description, if (looking) null else ({ WhosThere.requestGlance(GlanceTrigger.MANUAL) })) {
+    Box(Modifier.size(48.dp).clip(CircleShape)) {
+      WhosThereGlancePreview(Modifier.fillMaxSize(), onFrame = { if (looking) frameSeen = true })
+      if (!looking || !frameSeen) Box(Modifier.fillMaxSize().background(if (looking) Color(0xFF1A1F2B) else ApprovedHomePalette.Card),
+          contentAlignment = Alignment.Center) {
+        if (!looking) WhosThereGlyph(WtGlyph.EYE, ApprovedHomePalette.Secondary, 30.dp)
+      }
+    }
+    if (looking) {
+      PulsingDot()
+      PillText("Looking…")
+    }
+  }
+}
+
 @Composable
 private fun PulsingDot() {
   val t = rememberInfiniteTransition(label = "wtDot")
@@ -185,7 +216,8 @@ private fun PulsingDot() {
 
 /** The glance's visible live preview: a small TextureView fed by camera 0 for ~1.5 s. */
 @Composable
-private fun WhosThereGlancePreview(modifier: Modifier) {
+private fun WhosThereGlancePreview(modifier: Modifier, onFrame: () -> Unit) {
+  val frame by androidx.compose.runtime.rememberUpdatedState(onFrame)
   AndroidView(modifier = modifier, factory = { ctx ->
     TextureView(ctx).apply {
       surfaceTextureListener = object : TextureView.SurfaceTextureListener {
@@ -193,14 +225,17 @@ private fun WhosThereGlancePreview(modifier: Modifier) {
         override fun onSurfaceTextureAvailable(st: SurfaceTexture, w: Int, h: Int) {
           st.setDefaultBufferSize(WhosThereCamera.WIDTH, WhosThereCamera.HEIGHT)
           setTransform(fill(w, h))
-          surface = Surface(st).also(WhosThere::onPreviewReady)
+          // Hand over after this frame: never start the camera from inside a draw pass.
+          val s = Surface(st).also { surface = it }
+          post { if (surface === s) WhosThere.onPreviewAvailable(s) }
         }
         override fun onSurfaceTextureSizeChanged(st: SurfaceTexture, w: Int, h: Int) = setTransform(fill(w, h))
         override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
+          surface?.let(WhosThere::onPreviewGone)
           surface?.release(); surface = null
           return true
         }
-        override fun onSurfaceTextureUpdated(st: SurfaceTexture) = Unit
+        override fun onSurfaceTextureUpdated(st: SurfaceTexture) = frame()
       }
     }
   })
@@ -218,7 +253,8 @@ private fun fill(w: Int, h: Int): Matrix {
 
 /** The warm room tint: the person's colour washed in from the top (two colours for Family). */
 @Composable
-internal fun WhosThereTint(ui: WhosThereUi, modifier: Modifier = Modifier) {
+internal fun WhosThereTint(modifier: Modifier = Modifier) {
+  val ui by rememberWhosThereUi()
   val colors = WhosThereViewPolicy.people(ui.view).mapNotNull { ui.person(it)?.color?.tint?.argb() }
   var last by remember { mutableStateOf(listOf(Color.Transparent)) }
   if (colors.isNotEmpty()) last = colors
@@ -236,7 +272,8 @@ internal fun WhosThereTint(ui: WhosThereUi, modifier: Modifier = Modifier) {
 
 /** The subtle "Hi Maya" chip that drops in when someone's Home appears, then leaves. */
 @Composable
-internal fun WhosThereHiChip(ui: WhosThereUi, modifier: Modifier = Modifier) {
+internal fun WhosThereHiChip(modifier: Modifier = Modifier) {
+  val ui by rememberWhosThereUi()
   var visible by remember { mutableStateOf(false) }
   LaunchedEffect(ui.greetedAtMs) {
     if (ui.greetedAtMs <= 0L || System.currentTimeMillis() - ui.greetedAtMs > HI_CHIP_MS) return@LaunchedEffect

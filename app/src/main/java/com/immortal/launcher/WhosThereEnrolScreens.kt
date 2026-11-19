@@ -157,14 +157,16 @@ internal fun WhosThereEnrolCapture(p: WhosTherePerson, onCancel: () -> Unit, onD
                   val s = Surface(st).also { surface = it }
                   val (models, analysis) = WhosThere.modelsForEnrolment() ?: return onError(FaceModels.UNAVAILABLE)
                   val rotations = if (portrait) listOf(270, 90, 0) else listOf(0)
-                  WhosThereEnrolSession(context, s, models, analysis, rotations, onState = { state = it },
+                  val session = WhosThereEnrolSession(context, s, models, analysis, rotations, onState = { state = it },
                       onFinished = { looks, err ->
                         WhosThereEnrolCapture.set(null)
                         when {
                           looks != null -> onDone(looks)
                           err != null -> onError(err)
                         }
-                      }).also { WhosThereEnrolCapture.set(it); it.start() }
+                      })
+                  WhosThereEnrolCapture.set(session)
+                  post { if (surface === s) session.start() }
                 }
                 override fun onSurfaceTextureSizeChanged(st: SurfaceTexture, w: Int, h: Int) = Unit
                 override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {

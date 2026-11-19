@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,7 +37,8 @@ private const val PAUSE_ONE_HOUR_MS = 60 * 60_000L
  * Nothing here ever changes anyone's face template; corrections are counted in the audit only.
  */
 @Composable
-internal fun WhosThereNotYouSheet(ui: WhosThereUi, onSettings: () -> Unit, onDismiss: () -> Unit) {
+internal fun WhosThereNotYouSheet(onSettings: () -> Unit, onDismiss: () -> Unit) {
+  val ui by rememberWhosThereUi()
   val shown = WhosThereViewPolicy.people(ui.view)
   val thought = shown.mapNotNull { ui.person(it)?.name }.joinToString(" & ")
   ApprovedHomeDialog("Who’s here?", onDismiss) {

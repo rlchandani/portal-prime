@@ -46,13 +46,18 @@ internal class WhosThereCamera(
   private val thread = HandlerThread("whos-there-camera").apply { start() }
   private val handler = Handler(thread.looper)
   private val closed = AtomicBoolean(false)
-  private var reader: ImageReader? = null
-  private var device: CameraDevice? = null
-  private var session: CameraCaptureSession? = null
+  @Volatile private var reader: ImageReader? = null
+  @Volatile private var device: CameraDevice? = null
+  @Volatile private var session: CameraCaptureSession? = null
   private var openedAt = 0L
 
-  @SuppressLint("MissingPermission") // checked just below
+  /** Opens on the camera thread: no binder calls or allocations on the UI thread mid-frame. */
   fun open() {
+    handler.post { if (!closed.get()) openNow() }
+  }
+
+  @SuppressLint("MissingPermission") // checked just below
+  private fun openNow() {
     if (context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
       fail("camera permission missing"); return
     }
@@ -134,9 +139,21 @@ internal class WhosThereCamera(
     close()
   }
 
-  /** Release now: session, device, reader, thread. Returns the close duration in ms. */
+  /**
+   * Release now: session, device, reader, thread. From the UI thread the (blocking) release is
+   * handed to the camera thread at once, so leaving Home never stalls a frame; from any other
+   * thread it runs inline. Returns the inline close duration in ms (0 when handed over).
+   */
   fun close(): Long {
     if (!closed.compareAndSet(false, true)) return 0L
+    if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+      handler.post { release() }
+      return 0L
+    }
+    return release()
+  }
+
+  private fun release(): Long {
     val t0 = SystemClock.elapsedRealtime()
     runCatching { session?.stopRepeating() }
     runCatching { session?.close() }

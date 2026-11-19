@@ -101,4 +101,19 @@ internal object WhosThereMatcher {
   }
 
   fun minVotes(frames: Int): Int = if (frames >= 3) 2 else 1
+
+  /** Votes needed for an early verdict (one face, the same person, these many frames running). */
+  const val EARLY_VOTES = 3
+
+  /**
+   * A verdict safe to act on before the glance ends: the last [EARLY_VOTES] analysed frames each
+   * hold exactly one face, accepted as the same person. Anything else waits for the full vote.
+   */
+  fun early(frames: List<List<FaceMatch>>): GlanceOutcome? {
+    val recent = frames.filter { it.isNotEmpty() }.takeLast(EARLY_VOTES)
+    if (recent.size < EARLY_VOTES || recent.any { it.size != 1 }) return null
+    val ids = recent.map { (it.single() as? FaceMatch.Accepted)?.personId }
+    val id = ids.first() ?: return null
+    return if (ids.all { it == id }) GlanceOutcome(listOf(id), null, 1, frames.count { it.isNotEmpty() }) else null
+  }
 }

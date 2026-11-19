@@ -45,6 +45,9 @@ internal data class WhosThereUi(
   val owner: WhosTherePerson? get() = (view as? WhosThereView.Personal)?.let { person(it.personId) }
 }
 
+/** The coarse part Home itself reads: whether a personal/Family Home is up, and for whom. */
+internal data class WhosThereHomeView(val personal: Boolean = false, val names: List<String> = emptyList())
+
 /**
  * The Who's there? runtime. Main-thread state machine around the pure policies: listens to
  * presence, decides with [WhosThereGlancePolicy], runs a [WhosThereGlance] off the main thread,
@@ -62,6 +65,9 @@ internal object WhosThere {
   }
   private val ui = MutableStateFlow(WhosThereUi())
   val state: StateFlow<WhosThereUi> = ui.asStateFlow()
+  private val home = MutableStateFlow(WhosThereHomeView())
+  /** Changes only when whose Home is showing changes (StateFlow drops equal values). */
+  val homeView: StateFlow<WhosThereHomeView> = home.asStateFlow()
 
   @Volatile private var app: Context? = null
   // Main-thread state.
@@ -110,14 +116,38 @@ internal object WhosThere {
   fun setHomeVisible(visible: Boolean) {
     if (homeVisible == visible) return
     homeVisible = visible
+    val now = SystemClock.elapsedRealtime()
     if (!visible) {
+      hiddenSince = now
       glance?.cancel("home left")
       clearPending()
+      return
     }
+    // Back on Home after a while away (the dream ended, the screen woke) with someone here.
+    if (hiddenSince > 0L) WhosThereGlancePolicy.onReturn(now - hiddenSince, PresenceHub.current)
+        ?.let { main.post { requestGlance(it) } }
   }
 
-  /** The indicator's preview surface is ready: open the camera. */
-  fun onPreviewReady(surface: Surface) {
+  private var hiddenSince = 0L
+
+  private var preview: Surface? = null
+  private var glanceSurface: Surface? = null
+
+  /**
+   * The indicator keeps its small preview mounted while recognition is ready, so a glance starts
+   * without creating views mid-frame. A pending glance starts as soon as a surface exists.
+   */
+  fun onPreviewAvailable(surface: Surface) {
+    preview = surface
+    if (pendingTrigger != null && glance == null) startGlance(surface)
+  }
+
+  fun onPreviewGone(surface: Surface) {
+    if (preview === surface) preview = null
+    if (glanceSurface === surface) glance?.cancel("preview gone")
+  }
+
+  private fun startGlance(surface: Surface) {
     val trigger = pendingTrigger ?: return
     val c = app ?: return
     val m = models ?: return clearPending()
@@ -126,8 +156,9 @@ internal object WhosThere {
       h.templates.filter { t -> h.person(t.personId)?.pausedAt(System.currentTimeMillis()) == false }
     }
     Log.i(TAG, "glance start trigger=$trigger")
-    glance = WhosThereGlance(c, surface, m, templates, analysis, rotations(c)) { r -> main.post { onGlanceDone(r) } }
-        .also { it.start() }
+    glanceSurface = surface
+    glance = WhosThereGlance(c, surface, m, templates, analysis, rotations(c),
+        onEarly = { o -> main.post { onGlanceEarly(o) } }, onDone = { r -> main.post { onGlanceDone(r) } }).also { it.start() }
   }
 
   fun requestGlance(trigger: GlanceTrigger, operator: Boolean = false): String {
@@ -143,9 +174,11 @@ internal object WhosThere {
       return "skipped: ${decision.reason.log}"
     }
     pendingTrigger = trigger
+    lastGreetingMs = -1L
     pendingSince = SystemClock.elapsedRealtime()
     triggerAt = pendingSince
     publish()
+    preview?.let { s -> main.post { if (pendingTrigger != null && glance == null && preview === s) startGlance(s) } }
     main.postDelayed({ if (pendingTrigger != null && glance == null && SystemClock.elapsedRealtime() - pendingSince >= PREVIEW_WAIT_MS) clearPending() }, PREVIEW_WAIT_MS)
     return if (operator) "started (operator)" else "started"
   }
@@ -232,9 +265,24 @@ internal object WhosThere {
     WhosThereGlancePolicy.trigger(prev, next, System.currentTimeMillis())?.let { requestGlance(it) }
   }
 
+  /** Greet as soon as one face is clearly someone; the full look still runs (a second face blurs). */
+  private fun onGlanceEarly(o: GlanceOutcome) {
+    if (glance == null) return
+    val now = System.currentTimeMillis()
+    val next = held(WhosThereViewPolicy.update(view, o, WhosThereStore.householdState.value.people, now), now)
+    if (next !is WhosThereView.Personal) return
+    if ((view as? WhosThereView.Personal)?.personId != next.personId) greetedAtMs = now
+    view = next
+    lastRecognisedMs = now
+    lastGreetingMs = SystemClock.elapsedRealtime() - triggerAt
+    publish()
+    Log.i(TAG, "glance early verdict after ${o.framesAnalysed} frames glance→greeting=${lastGreetingMs}ms")
+  }
+
   private fun onGlanceDone(r: GlanceResult) {
     val c = app ?: return
     glance = null
+    glanceSurface = null
     pendingTrigger = null
     lastGlanceEndMs = System.currentTimeMillis()
     lastTimings = r.timings
@@ -251,7 +299,7 @@ internal object WhosThere {
       WhosThereStore.record(c, WhosThereAudit.kindFor(next, r.outcome), r.outcome.faceCount)
     }
     publish()
-    lastGreetingMs = SystemClock.elapsedRealtime() - triggerAt
+    if (lastGreetingMs < 0) lastGreetingMs = SystemClock.elapsedRealtime() - triggerAt // no early verdict this time
     // Ids and counts only; the outcome holds no embeddings.
     Log.i(TAG, "glance done faces=${r.outcome.faceCount} recognised=${r.outcome.recognised.size} " +
         "unsure=${r.outcome.unsure != null} view=${view.javaClass.simpleName} luma=${"%.0f".format(r.meanLuma)} " +
@@ -274,7 +322,11 @@ internal object WhosThere {
   private fun ensureModelsIfNeeded() {
     val s = WhosThereStore.settingsState.value
     val wanted = s.enabled && WhosThereStore.householdState.value.enrolled.isNotEmpty()
-    if (wanted) ensureModels {} else if (!enrolling) analysis.execute { models?.close(); models = null }
+    if (wanted) { ensureModels {}; return }
+    // Switched off or nobody left: stop any glance now, then free the models — unless enrolment
+    // or a glance still owns them (the close is queued behind their work on the same thread).
+    glance?.cancel("recognition off")
+    if (!enrolling && glance == null) analysis.execute { if (!enrolling) { models?.close(); models = null } }
   }
 
   /** Loads the models on the analysis thread (idempotent); [then] runs on main afterwards. */
@@ -304,7 +356,8 @@ internal object WhosThere {
   }
 
   private fun quiet(c: Context): Boolean {
-    val s = runCatching { ChimeConfig.load(c) }.getOrNull() ?: return true // unreadable: fail safe
+    val s = runCatching { ChimeConfig.load(c) }.onFailure { Log.w(TAG, "quiet hours unreadable; treating as quiet") }
+        .getOrNull() ?: return true // unreadable: fail safe, never glance
     return ChimeConfig.inQuietWindow(minuteNow(), s.quietStartMin, s.quietEndMin)
   }
 
@@ -312,8 +365,8 @@ internal object WhosThere {
 
   private fun inputs(c: Context, trigger: GlanceTrigger): GlanceInputs {
     val s = WhosThereStore.settingsState.value
-    val awake = PresenceHub.current.screen == ScreenState.INTERACTIVE &&
-        runCatching { c.getSystemService(PowerManager::class.java)?.isInteractive }.getOrNull() != false
+    // The display itself, not the presence hub's last screen event (which can lag a dream exit).
+    val awake = runCatching { c.getSystemService(PowerManager::class.java)?.isInteractive }.getOrNull() == true
     return GlanceInputs(trigger, System.currentTimeMillis(), s.enabled, WhosThereStore.householdState.value.enrolled.size,
         models != null, WhosThereCamera.granted(c), s.pausedUntilMs, quiet(c), WhosThereDebug.ignoreQuietHours, inCall(),
         homeVisible, awake, glance != null || pendingTrigger != null || enrolling, lastGlanceEndMs, lastRecognisedMs)
@@ -348,6 +401,8 @@ internal object WhosThere {
     val p = privacy(c)
     ui.value = WhosThereUi(indicator, view, h.people, WhosTherePrivacy.hidePrivate(p), WhosTherePrivacy.canReveal(p),
         previewWanted = pendingTrigger != null || glance != null, greetedAtMs = greetedAtMs)
+    home.value = WhosThereHomeView(view != WhosThereView.Shared,
+        WhosThereViewPolicy.people(view).mapNotNull { id -> h.person(id)?.name })
   }
 
   /** Expected rotations to make faces upright: none in landscape; the Mini upright tries both turns. */

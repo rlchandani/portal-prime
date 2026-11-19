@@ -57,8 +57,11 @@ internal class FaceModels private constructor(
     scoreIndex = names["classificators"] ?: 1
   }
 
+  @Volatile private var closed = false
+
   /** Faces in [frame], largest first, at [rotation] degrees (0/90/180/270) to make them upright. */
   fun detect(frame: YuvFrame, rotation: Int): List<FrameFace> {
+    if (closed) return emptyList()
     val toFrame = FaceGeometry.letterbox(frame.width, frame.height, DET, rotation)
     FaceFrameSampler.sample(frame, toFrame, DET, TensorFormat.RGB_SIGNED, detPixels)
     detIn.rewind()
@@ -78,6 +81,7 @@ internal class FaceModels private constructor(
 
   /** Aligns [face] to 112×112 and embeds it with SFace. Null embedding if alignment fails. */
   fun embed(frame: YuvFrame, face: FrameFace): FaceSample {
+    if (closed) return FaceSample(face, null, 0f)
     val align = FaceGeometry.alignment(face.eyeA, face.eyeB, face.nose, face.mouth)
         ?: return FaceSample(face, null, 0f)
     FaceFrameSampler.sample(frame, align.inverse(), EMB, TensorFormat.BGR_255, embPixels)
@@ -112,6 +116,7 @@ internal class FaceModels private constructor(
   }
 
   override fun close() {
+    closed = true
     runCatching { detector.close() }
     runCatching { embedder.close() }
   }
@@ -149,7 +154,8 @@ internal class FaceModels private constructor(
       } catch (t: Throwable) {
         // UnsatisfiedLinkError (32-bit), IOException (asset), IllegalArgumentException (model): all degrade.
         runCatching { detector?.close() }
-        Log.w(TAG, "face models unavailable: ${t.javaClass.simpleName}")
+        // The message names the failing op/asset only (no user data).
+        Log.w(TAG, "face models unavailable: ${t.javaClass.simpleName}: ${t.message?.take(300)}")
         Loaded.Failed(UNAVAILABLE)
       }
     }

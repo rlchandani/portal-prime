@@ -67,6 +67,8 @@ internal object WhosThereGlancePolicy {
   const val COOLDOWN_MS = 20_000L
   const val MANUAL_COOLDOWN_MS = 3_000L
   const val RECOGNISED_HOLD_MS = 20_000L
+  /** Coming back to Home after this long away (dream, screen off) counts as a wake. */
+  const val RETURN_AFTER_MS = 60_000L
 
   fun decide(i: GlanceInputs): GlanceDecision {
     val skip = firstSkip(i) ?: return GlanceDecision.Go
@@ -89,6 +91,10 @@ internal object WhosThereGlancePolicy {
       GlanceSkip.RECENTLY_RECOGNISED
     else -> null
   }
+
+  /** Home came back after [awayMs] (dream ended, screen woke): a wake glance if someone is here. */
+  fun onReturn(awayMs: Long, presence: PresenceState): GlanceTrigger? =
+      if (awayMs >= RETURN_AFTER_MS && presence.presence == Presence.PRESENT && presence.confident) GlanceTrigger.WAKE else null
 
   private fun cooldown(trigger: GlanceTrigger): Long =
       if (trigger == GlanceTrigger.MANUAL) MANUAL_COOLDOWN_MS else COOLDOWN_MS

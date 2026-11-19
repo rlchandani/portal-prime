@@ -93,6 +93,14 @@ class WhosTherePolicyTest {
         ps(Presence.UNKNOWN, ScreenState.INTERACTIVE), now))
   }
 
+  @Test fun returningToHomeAfterAWhileWithSomeoneHereIsAWake() {
+    val here = ps(Presence.PRESENT, ScreenState.INTERACTIVE)
+    assertEquals(GlanceTrigger.WAKE, WhosThereGlancePolicy.onReturn(WhosThereGlancePolicy.RETURN_AFTER_MS, here))
+    assertNull(WhosThereGlancePolicy.onReturn(5_000, here)) // back from Settings: no glance
+    assertNull(WhosThereGlancePolicy.onReturn(120_000, ps(Presence.ABSENT, ScreenState.INTERACTIVE)))
+    assertNull(WhosThereGlancePolicy.onReturn(120_000, ps(Presence.PRESENT, ScreenState.INTERACTIVE, confident = false)))
+  }
+
   @Test fun longUnknownThenPresentIsAnArrival() {
     assertEquals(GlanceTrigger.ARRIVAL, WhosThereGlancePolicy.trigger(
         ps(Presence.UNKNOWN, ScreenState.INTERACTIVE, since = now - 61_000), ps(Presence.PRESENT, ScreenState.INTERACTIVE), now))

@@ -392,7 +392,7 @@ class FleetRoutes(private val context: Context) {
       }
       // Who's there? test switches (operator only, in memory): {"ignoreQuietHours":bool, "glance":true, "benchmark":true}.
       "whos_there_debug" -> resp(200, JSONObject().put("ok", true).put("action", "whos_there_debug")
-          .put("result", WhosThereDebug.apply(body)))
+          .put("result", WhosThereDebug.apply(context, body)))
       // Layout test hook (operator only): opens one of a fixed set of internal screens for captures.
       "open_screen" -> {
         val target = when (body.optString("screen")) {
@@ -405,10 +405,15 @@ class FleetRoutes(private val context: Context) {
           "guest_card" -> GuestCardActivity::class.java
           "store" -> StoreActivity::class.java
           "web_app" -> WebAppActivity::class.java
+          "whos_there_enrol" -> WhosThereEnrolActivity::class.java
           else -> null
         }
         val opened = target != null && runCatching {
-          context.startActivity(android.content.Intent(context, target).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+          val intent = android.content.Intent(context, target).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+          // Optional Settings page for captures, e.g. {"screen":"settings","page":"people"}.
+          body.optString("page").takeIf { target == ImmortalSettingsActivity::class.java && SettingsTree.contains(it) }
+              ?.let { intent.putExtra(APPROVED_SETTINGS_PAGE, it) }
+          context.startActivity(intent)
         }.isSuccess
         resp(200, JSONObject().put("ok", opened).put("action", "open_screen"))
       }

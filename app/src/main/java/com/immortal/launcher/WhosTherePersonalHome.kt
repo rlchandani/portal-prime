@@ -54,8 +54,9 @@ private const val CALENDAR_REFRESH_MS = 15 * 60_000L
  * recognised. Same 24 dp cards and 1.5 dp trim as Home; nothing jumps when it swaps in.
  */
 @Composable
-internal fun WhosTherePersonalHome(ui: WhosThereUi, use24: Boolean, compactPortrait: Boolean, onNotYou: () -> Unit,
+internal fun WhosTherePersonalHome(use24: Boolean, compactPortrait: Boolean, onNotYou: () -> Unit,
                                    modifier: Modifier = Modifier) {
+  val ui by rememberWhosThereUi()
   val view = ui.view
   val viewKey = WhosThereViewPolicy.people(view)
   val appear = androidx.compose.runtime.remember(viewKey) { androidx.compose.animation.core.Animatable(0f) }

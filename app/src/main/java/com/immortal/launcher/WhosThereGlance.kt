@@ -61,6 +61,8 @@ internal class WhosThereGlance(
     private val analysis: ExecutorService,
     private val rotations: List<Int>,
     private val thresholds: MatchThresholds = MatchThresholds(),
+    /** A confident single-person verdict before the look ends, so the greeting needn't wait. */
+    private val onEarly: (GlanceOutcome) -> Unit = {},
     private val onDone: (GlanceResult) -> Unit,
 ) : WhosThereCamera.Listener {
   private val started = SystemClock.elapsedRealtime()
@@ -79,6 +81,7 @@ internal class WhosThereGlance(
   private var embedNs = 0L
   private var embedded = 0
   private var analysed = 0
+  private var earlySent = false
 
   fun start() {
     camera.open()
@@ -137,6 +140,7 @@ internal class WhosThereGlance(
       sample.embedding?.let { WhosThereMatcher.match(it, templates, thresholds) } ?: FaceMatch.Unknown
     }
     matches += frameMatches
+    if (!earlySent) WhosThereMatcher.early(matches)?.let { earlySent = true; onEarly(it) }
   }
 
   /** Tries the expected rotation first; once a face is found that rotation is kept. */
