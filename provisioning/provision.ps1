@@ -260,6 +260,12 @@ function Grant-Perms {
   # Lets the app switcher (Quick buttons) list recently-used apps via UsageStatsManager -
   # getRecentTasks can't see other apps since Android 5. Harmless when the feature is off.
   A shell appops set $cfg["PKG"] GET_USAGE_STATS allow | Out-Null
+  # Lets Immortal write Settings.System: brightness / auto-brightness and the
+  # "Touch & keypress sounds" toggle. See docs/guides/portal-sync.md.
+  A shell appops set $cfg["PKG"] WRITE_SETTINGS allow | Out-Null
+  # Microphone + camera for Calls, drop-ins, video messages and the doorbell.
+  A shell pm grant $cfg["PKG"] android.permission.RECORD_AUDIO | Out-Null
+  A shell pm grant $cfg["PKG"] android.permission.CAMERA | Out-Null
   # Device admin (force-lock only): lets Immortal turn the screen off for its idle and
   # overnight sleep features (and the Home Assistant screen control) via lockNow(). Warn
   # rather than swallow a failure - without it, screen-off silently won't work.
@@ -272,6 +278,19 @@ function Grant-Perms {
   # the screensaver card + header mini-player. Also self-enabled on app launch.
   A shell cmd notification allow_listener "$($cfg["PKG"])/com.immortal.launcher.MediaNotificationListenerService" | Out-Null
   Ok "Permission setup requested; controls are verified after launch."
+}
+
+# Household companion apps (Jarvis, Portal Calendar): microphone for voice and, for
+# Jarvis, the overlay op for its floating button. Only installed packages are touched.
+function Grant-CompanionPerms {
+  $any = $false
+  foreach ($p in ("$($cfg["COMPANION_MIC_PKGS"])" -split "\s+")) {
+    if ($p -and "$(A shell pm path $p)".Trim()) { A shell pm grant $p android.permission.RECORD_AUDIO | Out-Null; $any = $true }
+  }
+  foreach ($p in ("$($cfg["COMPANION_OVERLAY_PKGS"])" -split "\s+")) {
+    if ($p -and "$(A shell pm path $p)".Trim()) { A shell appops set $p SYSTEM_ALERT_WINDOW allow | Out-Null; $any = $true }
+  }
+  if ($any) { Ok "Companion app microphone/overlay access granted" }
 }
 
 # Read diagnostics without exposing adb output or letting a failed read look ready.
@@ -922,6 +941,7 @@ if ($UpdateHey) {
 if ($Apps) {
   Wait-Device
   Install-Apps
+  Grant-CompanionPerms
   exit 0
 }
 
@@ -1012,6 +1032,7 @@ Start-Shizuku
 Install-Apps
 Push-Assets
 Grant-Perms
+Grant-CompanionPerms
 Apply-SystemTweaks
 Disable-Verifier
 Disable-InstallerOverlay

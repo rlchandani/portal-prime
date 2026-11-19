@@ -325,6 +325,15 @@ grant_perms() {
   # Lets the app switcher (Quick buttons) list recently-used apps via UsageStatsManager —
   # getRecentTasks can't see other apps since Android 5. Harmless when the feature is off.
   a shell appops set "$PKG" GET_USAGE_STATS allow >/dev/null 2>&1
+  # Lets Immortal write Settings.System: the brightness / auto-brightness controls
+  # (DisplayControl) and the "Touch & keypress sounds" toggle (SystemSounds). Without it
+  # those controls silently bounce. Applied by hand on the Portal+ units before this step
+  # existed; see docs/guides/portal-sync.md.
+  a shell appops set "$PKG" WRITE_SETTINGS allow >/dev/null 2>&1
+  # Microphone + camera for Calls, drop-ins, video messages and the doorbell. Granting
+  # here avoids a first-call permission prompt on a device nobody is standing at.
+  a shell pm grant "$PKG" android.permission.RECORD_AUDIO >/dev/null 2>&1
+  a shell pm grant "$PKG" android.permission.CAMERA >/dev/null 2>&1
   # Device admin (force-lock only): lets Immortal turn the screen off for its idle and
   # overnight sleep features (and the Home Assistant screen control) via lockNow(). Warn
   # rather than swallow a failure — without it, screen-off silently won't work, which is a
@@ -341,6 +350,22 @@ grant_perms() {
   a shell cmd notification allow_listener \
     "$PKG/com.immortal.launcher.MediaNotificationListenerService" >/dev/null 2>&1 || true
   ok "Permission setup requested; controls are verified after launch."
+}
+
+grant_companion_perms() {
+  # Household companion apps (Jarvis, Portal Calendar) need the microphone for voice, and
+  # Jarvis needs the overlay op for its floating button. These were granted by hand on the
+  # Portal+ units; only installed packages are touched, so it's safe on any Portal.
+  local p any=0
+  for p in ${COMPANION_MIC_PKGS:-}; do
+    a shell pm path "$p" >/dev/null 2>&1 || continue
+    a shell pm grant "$p" android.permission.RECORD_AUDIO >/dev/null 2>&1 && any=1
+  done
+  for p in ${COMPANION_OVERLAY_PKGS:-}; do
+    a shell pm path "$p" >/dev/null 2>&1 || continue
+    a shell appops set "$p" SYSTEM_ALERT_WINDOW allow >/dev/null 2>&1 && any=1
+  done
+  [ "$any" = 1 ] && ok "Companion app microphone/overlay access granted" || true
 }
 
 
@@ -964,6 +989,7 @@ do_provision() {
   install_apps
   push_assets
   grant_perms
+  grant_companion_perms
   apply_system_tweaks
   disable_verifier
   disable_installer_overlay
@@ -1055,14 +1081,47 @@ do_status() {
   printf "  installer dialog: %s\n" "$([ "$(a shell settings get global immortal_overlay_fix 2>/dev/null | tr -d '\r')" = "1" ] && echo 'fixed (overlay disabled)' || echo 'stock')"
   printf "  OS updates: %s\n" "$(a shell pm list packages -d 2>/dev/null | tr -d '\r' | grep -qE 'alohaotasetup|otaui' && echo disabled || echo enabled)"
   printf "  client:     %s\n" "$(a shell pm list packages "$PKG" 2>/dev/null | tr -d '\r' | grep -q . && echo installed || echo 'not installed')"
+  check_manual_settings
   check_calls_access || true
+}
+
+# Read-only: the hand-applied settings every Portal in the household should share
+# (docs/guides/portal-sync.md). Prints one line each; changes nothing.
+check_manual_settings() {
+  step "Household settings (should match on every Portal)"
+  local v p
+  sync_line() { printf "  %-34s %s\n" "$1" "$2"; }
+  v="$(a shell settings get global hidden_api_policy 2>/dev/null | tr -d '\r')"
+  sync_line "hidden API policy (1)" "$v"
+  v="$(a shell settings get global package_verifier_enable 2>/dev/null | tr -d '\r')"
+  sync_line "package verifier setting (0)" "$v"
+  v="$(a shell settings get global wifi_sleep_policy 2>/dev/null | tr -d '\r')"
+  sync_line "Wi-Fi sleep policy (2 = never)" "$v"
+  v="$(a shell settings get secure screensaver_enabled 2>/dev/null | tr -d '\r')"
+  sync_line "screensaver enabled (1)" "$v"
+  v="$(a shell appops get com.facebook.aloha.system.services SYSTEM_ALERT_WINDOW 2>/dev/null | tr -d '\r' | awk -F'[:;]' 'NR==1{gsub(/ /,"",$2);print $2}')"
+  sync_line "Meta bug pill overlay (ignore)" "${v:-default}"
+  v="$(a shell appops get "$PKG" WRITE_SETTINGS 2>/dev/null | tr -d '\r' | awk -F'[:;]' 'NR==1{gsub(/ /,"",$2);print $2}')"
+  sync_line "client WRITE_SETTINGS (allow)" "${v:-default}"
+  for p in "$PKG" ${COMPANION_MIC_PKGS:-}; do
+    a shell pm path "$p" >/dev/null 2>&1 || continue
+    v="$(a shell dumpsys package "$p" 2>/dev/null | tr -d '\r' | grep -m1 -o 'RECORD_AUDIO: granted=[a-z]*' | cut -d= -f2)"
+    sync_line "$p mic (true)" "${v:-not requested}"
+  done
+  for p in ${COMPANION_OVERLAY_PKGS:-}; do
+    a shell pm path "$p" >/dev/null 2>&1 || continue
+    v="$(a shell appops get "$p" SYSTEM_ALERT_WINDOW 2>/dev/null | tr -d '\r' | awk -F'[:;]' 'NR==1{gsub(/ /,"",$2);print $2}')"
+    sync_line "$p overlay (allow)" "${v:-default}"
+  done
+  v="$(a shell settings get system accelerometer_rotation 2>/dev/null | tr -d '\r')"
+  sync_line "auto-rotate (per device)" "$v"
 }
 
 case "${1:-}" in
   --restore|-r) do_restore ;;
   --status|-s)  do_status ;;
   --check-access) resolve_adb; wait_for_device; check_calls_access; exit $? ;;
-  --apps|-a)    resolve_adb; wait_for_device; install_apps ;;
+  --apps|-a)    resolve_adb; wait_for_device; install_apps; grant_companion_perms ;;
   --overlay-fix) resolve_adb; wait_for_device; disable_installer_overlay ;;
   --shizuku|-z) resolve_adb; wait_for_device; start_shizuku ;;
   --fleet|-f)   resolve_adb; wait_for_device; enable_fleet ;;
