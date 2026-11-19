@@ -48,6 +48,8 @@ internal object ControlCenterSettings {
               bool("bannersListen", "Alert banners on this Portal", { it.bannersListen }, ControlCenterConfig::setBannersListen,
                   "Keeps a small Home Assistant connection open for alerts. Critical alerts (leak, smoke, CO) always take over."),
               bool("bannersWarnings", "Warnings: doors, windows, garage left open", { it.bannersWarnings }, ControlCenterConfig::setBannersWarnings),
+              bool("sharedRoom", "Shared room", { it.sharedRoom }, ControlCenterConfig::setSharedRoom,
+                  "Doors, windows and the garage left open banner only on shared-room Portals, at most once an hour."),
               IntSpec("warningAfterMin", "Warn after", get = { it.warningAfterMin }, set = ControlCenterConfig::setWarningAfterMin,
                   min = ControlCenterConfig.MIN_WARN_MIN, max = ControlCenterConfig.MAX_WARN_MIN, format = { "$it min" }),
               bool("bannersInfo", "Info: washer, dryer, dishwasher done", { it.bannersInfo }, ControlCenterConfig::setBannersInfo,

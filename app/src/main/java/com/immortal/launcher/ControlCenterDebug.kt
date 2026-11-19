@@ -116,6 +116,45 @@ internal fun CcEngine.testAlert(deviceClass: String): String {
   return "testAlert=$deviceClass logged (dry run)"
 }
 
+/**
+ * Fleet `cc_debug` `fakeState`: a made-up state change for [CcFakeState.entityId], run through the
+ * normal live update → alerts → background banner path. Dry run only (refused otherwise), so the
+ * policy's decisions are logged and nothing is shown, played or relayed. The fake entity stays in
+ * the live view until the next reconnect; send `"state":"off"` (or closed) to end its alert.
+ */
+internal fun CcEngine.fakeState(fake: CcFakeState): String {
+  if (!dryRun) return "fakeState refused: turn dry run on first"
+  if (ui.connection.phase != CcPhase.LIVE) return "fakeState refused: not live (${ui.connection.phase.name.lowercase()})"
+  val now = clock()
+  val entity = CcEntity(fake.entityId, fake.state, mapOf("device_class" to fake.deviceClass, "friendly_name" to fake.name),
+      lastChanged = now - fake.changedMinAgo * CcFakeState.MS_PER_MIN)
+  live = live.update(mapOf(fake.entityId to entity), now)
+  publish(alertsToo = true)
+  return "fakeState ${fake.entityId}=${fake.state} class=${fake.deviceClass} changedMinAgo=${fake.changedMinAgo} (dry run)"
+}
+
+/** A validated `cc_debug` `fakeState` request. Ids are forced into a `fake_` namespace so a real entity is never overwritten. */
+internal data class CcFakeState(val entityId: String, val state: String, val deviceClass: String, val name: String, val changedMinAgo: Long) {
+  companion object {
+    const val MS_PER_MIN = 60_000L
+    private const val MAX_MIN_AGO = 24 * 60L
+    private val SLUG = Regex("[a-z0-9_]{1,40}")
+    private val STATES = setOf("on", "off", "open", "closed")
+    private val DOMAINS = setOf("binary_sensor", "cover")
+
+    fun parse(o: org.json.JSONObject?): CcFakeState? {
+      if (o == null) return null
+      val domain = o.optString("domain", "binary_sensor").takeIf { it in DOMAINS } ?: return null
+      val slug = o.optString("slug").takeIf { it.matches(SLUG) } ?: return null
+      val state = o.optString("state").takeIf { it in STATES } ?: return null
+      val cls = o.optString("deviceClass").takeIf { it.matches(SLUG) } ?: return null
+      val minAgo = o.optLong("changedMinAgo", 0L).takeIf { it in 0..MAX_MIN_AGO } ?: return null
+      val name = o.optString("name").take(40).ifBlank { "Fake $cls" }
+      return CcFakeState("$domain.fake_$slug", state, cls, name, minAgo)
+    }
+  }
+}
+
 /** Fleet `cc_debug`: switch dry run, load/clear the local-only test plan. Returns a short status. */
 internal fun CcEngine.debug(dry: Boolean?, plan: String?, unreachable: Boolean? = null): String {
   dry?.let { dryRun = it; CcDebugStore.setDryRun(app, it) }

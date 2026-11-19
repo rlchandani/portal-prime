@@ -95,6 +95,11 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
   fun floor(id: String) = set(nav.copy(floorId = id, sheets = emptyList(), highlightRoom = null))
   fun lens(l: CcLens) = set(nav.copy(lens = l))
   fun openRoom(roomId: String) = set(nav.copy(sheets = listOf(CcSheet.Room(roomId)), highlightRoom = roomId))
+  /** Floating Jarvis points at [roomId]: the map on its floor, the room lit, no sheet over it. */
+  fun pointAt(roomId: String, floorId: String?) = set(nav.copy(screen = CcScreen.MAP, floorId = floorId ?: nav.floorId,
+      sheets = emptyList(), modal = null, highlightRoom = roomId))
+  /** The pointing ended: drop the highlight unless the user already moved on to another room. */
+  fun stopPointing(roomId: String) { if (nav.highlightRoom == roomId && nav.sheets.isEmpty()) set(nav.copy(highlightRoom = null)) }
   fun openDevice(entityId: String) = set(nav.copy(sheets = nav.sheets + CcSheet.Device(entityId)))
   fun back() = set(if (nav.modal != null) nav.copy(modal = null) else nav.copy(sheets = nav.sheets.dropLast(1),
       highlightRoom = if (nav.sheets.size <= 1) null else nav.highlightRoom))

@@ -83,7 +83,7 @@ internal data class CcUiState(
   fun alerts(): List<CcAlert> = activeAlerts
 
   private fun computeAlerts(): List<CcAlert> {
-    val roomName: (String) -> String? = { id -> plan?.roomOf(id)?.name }
+    val roomName: (String) -> String? = { id -> plan?.roomOf(id)?.name ?: registry?.areaName(id) }
     // The car isn't the house: its battery level and doors belong on the Tesla screen, not in alerts.
     val car = registry?.tesla?.all.orEmpty()
     val house = if (car.isEmpty()) entities else entities.filterKeys { it !in car }

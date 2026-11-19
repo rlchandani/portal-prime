@@ -7,6 +7,8 @@
 
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.LocalJarvisPulse
+import com.immortal.launcher.jarvis.jarvisPulse
 import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -213,6 +215,7 @@ internal fun ApprovedSettingsLazyRow(
     if (highlight) LaunchedEffect(Unit) { requester.bringIntoView() }
     Column(modifier.fillMaxWidth().bringIntoViewRequester(requester)
         .approvedSettingsGroupRow(first, last, highlight)
+        .jarvisPulse(LocalJarvisPulse.current == id)
         .semantics { contentDescription = id }
         .padding(top = if (first) 0.dp else 1.dp)) { content() }
 }

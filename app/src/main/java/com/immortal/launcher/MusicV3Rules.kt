@@ -78,6 +78,17 @@ internal object MusicV3Rules {
     is YtSignInState.Failed -> MusicV3SignInView.Failed
   }
 
+  /**
+   * [signInView] without the per-second countdown: equal from tick to tick, so the sign-in card
+   * (QR, copy, steps) recomposes only when the code changes or expires. [countdown] supplies the time.
+   */
+  fun stillSignInView(state: YtSignInState, nowMs: Long): MusicV3SignInView =
+      signInView(state, nowMs).let { if (it is MusicV3SignInView.Code) it.copy(remaining = "") else it }
+
+  /** "12:34" while a code is live, else "". */
+  fun countdown(state: YtSignInState, nowMs: Long): String =
+      (signInView(state, nowMs) as? MusicV3SignInView.Code)?.remaining.orEmpty()
+
   private fun code(userCode: String, url: String, expiresAtMs: Long, nowMs: Long): MusicV3SignInView {
     val left = expiresAtMs - nowMs
     if (left <= 0L) return MusicV3SignInView.Expired

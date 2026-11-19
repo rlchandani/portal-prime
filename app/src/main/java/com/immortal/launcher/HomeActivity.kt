@@ -7,6 +7,8 @@
 
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.HearthpaneScreens
+import com.immortal.launcher.jarvis.ScreenContext
 import android.app.Activity
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
@@ -387,6 +389,7 @@ class HomeActivity : ComponentActivity() {
         ?: ApprovedLauncherTab.HOME
     consumeLauncherTabIntent(intent)
     consumeWidgetLibraryIntent(intent)
+    trackForJarvis()
     enterImmersive()
     // First launch: show the friendly tour once so new users aren't dropped in cold.
     if (!HelpActivity.hasSeen(this)) {
@@ -469,6 +472,18 @@ class HomeActivity : ComponentActivity() {
         )
       }
     }
+  }
+
+  /** Floating Jarvis: Home (or the Music screen over it) is what `screen_context` describes; never its photos. */
+  private fun trackForJarvis() {
+    fun musicShown() = YouTubeMusicEngine.shownIn == MusicPlayerHostKind.MUSIC_SCREEN
+    HearthpaneScreens.track(this, HearthpaneScreens.Entry(
+        id = { if (musicShown()) HearthpaneScreens.MUSIC else HearthpaneScreens.HOME },
+        context = {
+          if (musicShown()) ScreenContext.music(YouTubeMusicEngine.state.value, FleetConfig.name(this))
+          else ScreenContext.home(approvedCurrentTab().id, YouTubeMusicEngine.state.value)
+        },
+    ))
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -1452,10 +1467,22 @@ private fun LauncherScreen(
       delay(15_000)
     }
   }
-  BackHandler(enabled = editMode) { editMode = false }
-  BackHandler(enabled = addFlow.draft != null) { addFlow.draft = null }
-  BackHandler(enabled = selectedTab != ApprovedLauncherTab.HOME) { onSelectTab(ApprovedLauncherTab.HOME) }
-  BackHandler(enabled = musicLayout != null) { musicLayout = null }
+  // Always enabled: the launcher root consumes Back (Android 10 would finish it and show Meta's home).
+  // Overlays composed below (widget picker, dialogs) register later and still close first.
+  BackHandler(enabled = true) {
+    when (HomeBackPolicy.resolve(
+        musicOpen = musicLayout != null,
+        onHomeTab = selectedTab == ApprovedLauncherTab.HOME,
+        hasDraft = addFlow.draft != null,
+        editMode = editMode,
+    )) {
+      HomeBackAction.CLOSE_MUSIC -> musicLayout = null
+      HomeBackAction.GO_HOME_TAB -> onSelectTab(ApprovedLauncherTab.HOME)
+      HomeBackAction.CLEAR_DRAFT -> addFlow.draft = null
+      HomeBackAction.EXIT_EDIT -> editMode = false
+      HomeBackAction.CONSUME -> Unit
+    }
+  }
   // Home's Now Playing card hosts the YouTube player once the Music screen closes (no pause).
   val musicCard = rememberMusicHomeCardShown(musicOpen = musicLayout != null, customizing = editMode)
   val toastInsets = rememberMusicToastInsets(musicCard)
@@ -1467,17 +1494,25 @@ private fun LauncherScreen(
           if (com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark) ApprovedHomeTabPalette
           else com.immortal.launcher.ui.theme.ApprovedLightPalette,
       LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = FontFamily.Default)) {
+    // Full-screen Music is opaque: Home stays composed beneath it but isn't drawn, so every Music
+    // frame (open, countdown, spinner) composites one layer instead of three (Portal Mini GPU).
+    val musicCovers = rememberUpdatedState(musicLayout == MusicPlayerLayout.FULL)
+    val homeHiddenUnderMusic = remember { Modifier.drawWithContent { if (!musicCovers.value) drawContent() } }
     Box(Modifier.fillMaxSize()) {
       // A single cached display list for the static/minute-updated wallpaper.
-      Box(Modifier.matchParentSize().graphicsLayer {}) { ApprovedHomeBackground() }
-      Column(Modifier.fillMaxSize()) {
+      Box(Modifier.matchParentSize().then(homeHiddenUnderMusic).graphicsLayer {}) { ApprovedHomeBackground() }
+      Column(Modifier.fillMaxSize().then(homeHiddenUnderMusic)) {
         // Launcher chrome trimmed 108 → 92dp; the 68dp header buttons keep a 12dp margin (Home v2 space).
         val hey by produceState<String?>(null, installedApps) { value = withContext(Dispatchers.IO) { heyPackage(context) } }
+        // Without Millennium the header mic opens Jarvis's floating card (through JarvisHandoff), when installed.
+        val jarvisMic by produceState(false, installedApps, hey) {
+          value = hey == null && withContext(Dispatchers.IO) { jarvisInstalled(context) }
+        }
         val showCustomize = selectedTab == ApprovedLauncherTab.HOME && musicLayout == null
         val homeControl = rememberHomeControlShown()
         // Optional header pieces drop at narrow widths so the round buttons never squish.
         val header = HomeHeaderBudget.plan(LocalConfiguration.current.screenWidthDp, HomeHeaderItems(
-            musicChip = musicLayout == null, miniPlayer = settings.showMiniPlayer, mic = hey != null,
+            musicChip = musicLayout == null, miniPlayer = settings.showMiniPlayer, mic = hey != null || jarvisMic,
             customize = showCustomize, homeControl = homeControl))
         val openSettings: () -> Unit = {
           runCatching {
@@ -1514,6 +1549,7 @@ private fun LauncherScreen(
                   .tvFocusable(CircleShape, onLongClick = { openHeyPicker(context, pkg) }) { fireHey(context, pkg) },
                   contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
             }
+            if (jarvisMic) JarvisHeaderButton(b) { triggerJarvis(context) }
             ApprovedHeaderButton("music", "Open music player", lit = rememberMusicV3Loaded(), size = b, onClick = onOpenMusic)
             if (homeControl) HomeControlHeaderButton(size = b)
             ApprovedHeaderButton("search", "Search apps and settings", size = b) {
@@ -1562,6 +1598,7 @@ private fun LauncherScreen(
                   .tvFocusable(CircleShape, onLongClick = { openHeyPicker(context, pkg) }) { fireHey(context, pkg) },
                   contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
             }
+            if (jarvisMic) JarvisHeaderButton(68.dp) { triggerJarvis(context) }
             ApprovedHeaderButton("music", "Open music player", lit = rememberMusicV3Loaded(), onClick = onOpenMusic)
             if (header.miniPlayer) ApprovedHomeHeaderPlayer(Modifier.width(HomeHeaderBudget.MINI_PLAYER.dp), onOpenMusic)
             if (homeControl) HomeControlHeaderButton()
@@ -2762,6 +2799,18 @@ private fun heyPackage(context: android.content.Context): String? =
 /** Ask Millennium to activate the user's active assistant (same path as a wake word). */
 private fun fireHey(context: android.content.Context, pkg: String) {
   context.sendBroadcast(Intent(HEY_TRIGGER_ACTION).setPackage(pkg))
+}
+
+private fun jarvisInstalled(context: android.content.Context): Boolean =
+    runCatching { context.packageManager.getPackageInfo(JarvisHandoff.PACKAGE, 0); true }.getOrDefault(false)
+
+/** The header mic when Millennium isn't installed: Jarvis's floating card, same chrome as the Millennium mic. */
+@Composable
+private fun JarvisHeaderButton(size: androidx.compose.ui.unit.Dp, onClick: () -> Unit) {
+  Box(Modifier.size(size).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
+      .semantics { contentDescription = "Ask Jarvis" }
+      .tvFocusable(CircleShape, onClick = onClick),
+      contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
 }
 
 private fun triggerJarvis(context: android.content.Context) {

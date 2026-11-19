@@ -48,6 +48,8 @@ internal object ControlCenterConfig {
       val askScenes: Boolean = true,
       val bannersListen: Boolean = true,
       val bannersWarnings: Boolean = true,
+      /** A shared room (kitchen, family, living): only these show the doors-left-open banner. */
+      val sharedRoom: Boolean = true,
       val warningAfterMin: Int = 10,
       val bannersInfo: Boolean = true,
       /** Leak, smoke and CO alarms sound in quiet hours (owner's decision); everything else stays silent. */
@@ -80,6 +82,7 @@ internal object ControlCenterConfig {
         askScenes = p.getBoolean("ask_scenes", d.askScenes),
         bannersListen = p.getBoolean("banners_listen", d.bannersListen),
         bannersWarnings = p.getBoolean("banners_warn", d.bannersWarnings),
+        sharedRoom = p.getBoolean("shared_room", d.sharedRoom),
         warningAfterMin = p.getInt("warn_after_min", d.warningAfterMin).coerceIn(MIN_WARN_MIN, MAX_WARN_MIN),
         bannersInfo = p.getBoolean("banners_info", d.bannersInfo),
         criticalSoundAtNight = p.getBoolean("crit_sound_night", d.criticalSoundAtNight),
@@ -106,6 +109,7 @@ internal object ControlCenterConfig {
   fun setAskScenes(c: Context, v: Boolean) = putBool(c, "ask_scenes", v)
   fun setBannersListen(c: Context, v: Boolean) = putBool(c, "banners_listen", v)
   fun setBannersWarnings(c: Context, v: Boolean) = putBool(c, "banners_warn", v)
+  fun setSharedRoom(c: Context, v: Boolean) = putBool(c, "shared_room", v)
   fun setWarningAfterMin(c: Context, v: Int) = putInt(c, "warn_after_min", v.coerceIn(MIN_WARN_MIN, MAX_WARN_MIN))
   fun setBannersInfo(c: Context, v: Boolean) = putBool(c, "banners_info", v)
   fun setCriticalSoundAtNight(c: Context, v: Boolean) = putBool(c, "crit_sound_night", v)

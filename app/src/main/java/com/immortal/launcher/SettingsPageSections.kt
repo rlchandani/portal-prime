@@ -121,7 +121,7 @@ internal object SettingsPageSections {
             section("Doorbell", rows("doorbell", "trigger", "camera", "motion", "chime", "cooldownSec", "listen"),
                 footer = "When the doorbell rings, every Portal shows the camera and the phone app shows it " +
                     "while open. Needs the Home Assistant address and token (Advanced)."),
-            section("Control Center", rows("controlcenter", "portalMode", "bannersListen", "bannersWarnings", "warningAfterMin",
+            section("Control Center", rows("controlcenter", "portalMode", "bannersListen", "bannersWarnings", "sharedRoom", "warningAfterMin",
                 "bannersInfo", "criticalSoundAtNight"),
                 footer = "Critical alerts (leak, smoke, CO) take over every Portal, even in kids mode. Sound follows quiet hours."),
             section("Control Center · kids & confirmations", rows("controlcenter", "kidsHideLocks", "kidsHideGarage",

@@ -40,6 +40,8 @@ class ImmortalApp : Application() {
     DoorbellFeature.install(this)
     // Home Control Center: background alert subscription for Portal-wide banners (if enabled).
     ControlCenter.install(this)
+    // Leak/smoke/CO/gas takeovers seen by another Portal show here too (deduped per alert).
+    CcAlertRelay.install(this)
     MusicHandoff.install(this)
     MusicShare.install()
     YtRemoteRoute.install()

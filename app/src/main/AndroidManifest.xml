@@ -794,6 +794,18 @@
         </receiver>
             <!-- Share to Portal: opens a shared link after its 5 s countdown. -->
         <activity android:name=".SharedLinkActivity" android:exported="false" />
+            <!-- Floating Jarvis: Hearthpane's screen_context and highlight tools, through Jarvis's tool-provider contract.
+             Exported for Jarvis (another signing key); HearthpaneToolProvider answers only Jarvis's uid and refuses
+             every table operation. No pixels cross it. -->
+        <provider
+            android:name=".jarvis.HearthpaneToolProvider"
+            android:authorities="${applicationId}.jarvis-tools"
+            android:exported="true"
+            android:grantUriPermissions="false"
+            tools:ignore="ExportedContentProvider">
+            <meta-data android:name="com.portal.assistant.tools" android:value="@string/jarvis_tools" />
+            <meta-data android:name="com.portal.assistant.tools.summary" android:value="@string/jarvis_tools_summary" />
+        </provider>
     </application>
 
 </manifest>
