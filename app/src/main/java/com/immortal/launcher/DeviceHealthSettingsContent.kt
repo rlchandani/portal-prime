@@ -67,8 +67,43 @@ internal fun DeviceHealthScreen(onBack: () -> Unit) {
 internal fun DeviceHealthContent() {
   Column {
     OtaSettingsCard()
+    MemoryHealthRow()
     DeviceHealthChecks()
   }
+}
+
+/**
+ * One honest line from [MemoryHealth]'s 15-minute sample: "Good", or "Restart recommended" with the
+ * plain-words cause. Read on resume (sampling once if the monitor hasn't run yet); never a popup.
+ */
+@Composable
+private fun MemoryHealthRow() {
+  val owner = LocalLifecycleOwner.current
+  val sample by produceState<MemoryHealth.Sample?>(MemoryHealth.latest(), owner) {
+    owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+      value = withContext(Dispatchers.IO) { runCatching { MemoryHealth.latestOrSample() }.getOrNull() }
+    }
+  }
+  val current = sample
+  val status = current?.result?.status
+  val label = when (status) {
+    null -> "Checking…"
+    MemoryHealthPolicy.Status.GOOD -> "Good"
+    MemoryHealthPolicy.Status.RESTART_RECOMMENDED -> "Restart recommended"
+    MemoryHealthPolicy.Status.UNKNOWN -> "Not available"
+  }
+  Card { ApprovedSourcesInfoRow("Memory", label) }
+  if (current != null && status == MemoryHealthPolicy.Status.RESTART_RECOMMENDED) {
+    val cause = current.result.reasons.firstOrNull()?.let { MemoryHealthPolicy.describe(it, current.values) }
+    Text(
+        listOfNotNull(cause, "Restarting the Portal frees it.").joinToString(" "),
+        color = IosSecondary,
+        fontSize = Sizes.rowSub,
+        lineHeight = 28.sp,
+        modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 8.dp),
+    )
+  }
+  Spacer(Modifier.size(20.dp))
 }
 
 @Composable

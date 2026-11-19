@@ -61,6 +61,8 @@ class ImmortalApp : Application() {
     RotationFollower.install(this)
     // Package events invalidate read metadata without scans or work on this main thread.
     InstalledPackageVersions.register(this)
+    // One memory sample every 15 minutes on its own background thread; flags a restart, never acts.
+    MemoryHealth.start()
     // Restore bridge state persisted by HomeActivity.launchStockHome. If Android killed our
     // process while the stock Portal home was in the foreground and a new process is now
     // starting to handle a PhotoDreamService instance, DreamPolicy would otherwise see

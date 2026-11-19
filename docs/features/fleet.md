@@ -64,6 +64,16 @@ The CLI checks per-package receipts, including responses from older agents that
 always report top-level success. A failed or incomplete batch exits with failure
 while preserving its printed results.
 
+## Memory health
+
+Hearthpane samples memory every 15 minutes and reports `memoryHealth {status, reasons, values}`
+in `/info` (the last sample) and `/diag` (sampled on request). A Portal is flagged
+`restart_recommended` when system_server PSS is above 500 MB, swap free is below 15 %, or
+MemAvailable is below 300 MB; Settings › About & Health shows one "Memory" row. system_server PSS
+comes from ActivityManager's `am_pss` events-log lines (needs the kit's `READ_LOGS` grant) and is
+judged only while under two hours old. `./fleetctl health` prints one line per Portal without
+addresses. Hearthpane only flags: restart the Portal with `adb reboot` over USB.
+
 ## Timed rendering diagnostics
 
 Developer mode provides an explicit, temporary `/perf` capture for Immortal's Activity
