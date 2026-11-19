@@ -6,6 +6,8 @@
  */
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.HearthpaneScreens
+import com.immortal.launcher.jarvis.ScreenContext
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -52,6 +54,11 @@ class CallsActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     val start = if (intent.getStringExtra(EXTRA_TAB) == TAB_RECENT) CallsTab.RECENT else CallsTab.ROOMS
     setContent { PortalPrimeTheme(darkTheme = false) { CallsApp(start, onBack = ::finish) } }
+    // Floating Jarvis: the rooms and recent calls are what `screen_context` describes here.
+    HearthpaneScreens.track(this, HearthpaneScreens.Entry({ HearthpaneScreens.CALLS }) {
+      ScreenContext.calls(CallingStore.peers.value, CallingStore.history.value, Calling.state.value.busy,
+          System.currentTimeMillis())
+    })
   }
 
   override fun onResume() {

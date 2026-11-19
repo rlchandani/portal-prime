@@ -7,6 +7,8 @@
 
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.HearthpaneScreens
+import com.immortal.launcher.jarvis.ScreenContext
 import android.app.Activity
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
@@ -367,6 +369,7 @@ class HomeActivity : ComponentActivity() {
         ?: ApprovedLauncherTab.HOME
     consumeLauncherTabIntent(intent)
     consumeWidgetLibraryIntent(intent)
+    trackForJarvis()
     enterImmersive()
     // First launch: show the friendly tour once so new users aren't dropped in cold.
     if (!HelpActivity.hasSeen(this)) {
@@ -449,6 +452,18 @@ class HomeActivity : ComponentActivity() {
         )
       }
     }
+  }
+
+  /** Floating Jarvis: Home (or the Music screen over it) is what `screen_context` describes; never its photos. */
+  private fun trackForJarvis() {
+    fun musicShown() = YouTubeMusicEngine.shownIn == MusicPlayerHostKind.MUSIC_SCREEN
+    HearthpaneScreens.track(this, HearthpaneScreens.Entry(
+        id = { if (musicShown()) HearthpaneScreens.MUSIC else HearthpaneScreens.HOME },
+        context = {
+          if (musicShown()) ScreenContext.music(YouTubeMusicEngine.state.value, FleetConfig.name(this))
+          else ScreenContext.home(approvedCurrentTab().id, YouTubeMusicEngine.state.value)
+        },
+    ))
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

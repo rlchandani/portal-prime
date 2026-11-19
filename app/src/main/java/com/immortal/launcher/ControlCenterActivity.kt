@@ -6,6 +6,8 @@
  */
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.HearthpaneScreens
+import com.immortal.launcher.jarvis.ScreenContext
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -38,6 +40,10 @@ class ControlCenterActivity : ComponentActivity() {
     // The Compose root paints the whole window opaque, so the theme's window background would only
     // be a second full-screen fill on every frame.
     window.setBackgroundDrawable(null)
+    // Floating Jarvis: Control Center is what `screen_context` describes while it's on screen.
+    HearthpaneScreens.track(this, HearthpaneScreens.Entry({ HearthpaneScreens.CONTROL_CENTER }) {
+      ScreenContext.controlCenter(ControlCenter.state(this).value)
+    })
   }
 
   override fun onNewIntent(intent: Intent) {

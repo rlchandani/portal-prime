@@ -6,6 +6,8 @@
  */
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.JarvisHighlight
+import com.immortal.launcher.jarvis.ScreenContext
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -45,6 +47,21 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
   val onJarvis = remember { { JarvisHandoff.launch(context); Unit } }
   BackHandler { if (!ui.handleBack()) onExit() }
   LaunchedEffect(requested) { requested?.let { ui.go(it.first) } }
+  LaunchedEffect(Unit) {
+    JarvisHighlight.current.collect { request ->
+      val target = request?.target ?: return@collect
+      val plan = latest.plan ?: return@collect
+      val roomId = when {
+        target.startsWith(ScreenContext.ROOM_TARGET) -> target.removePrefix(ScreenContext.ROOM_TARGET)
+        target.startsWith(ScreenContext.ENTITY_TARGET) -> plan.roomOf(target.removePrefix(ScreenContext.ENTITY_TARGET))?.id
+        else -> null
+      } ?: return@collect
+      ui.pointAt(roomId, plan.floors.firstOrNull { f -> f.rooms.any { it.id == roomId } }?.id)
+      kotlinx.coroutines.delay(JarvisHighlight.SHOW_MS)
+      ui.stopPointing(roomId)
+      JarvisHighlight.done(request)
+    }
+  }
   CcTheme(dark = state.settings.darkTheme) {
     CompositionLocalProvider(LocalCcMotion provides (motion && !state.settings.reducedMotion)) {
       val c = LocalCc.current
