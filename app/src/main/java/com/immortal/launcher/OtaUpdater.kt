@@ -54,11 +54,16 @@ internal object OtaUpdater {
   @Volatile private var lastFetchFailed = false
   /** A version whose install failed is retried automatically only after the next fetch. */
   @Volatile private var autoInstallBlockedFor: Long? = null
+  /** A version whose confirmation didn't go through is retried sooner, with backoff. */
+  @Volatile private var confirmRetry: OtaConfirmRetry? = null
 
   /** Arms the background tick once per process (called from [ImmortalApp]). */
   fun start(context: Context) {
     val app = context.applicationContext
     if (!started.compareAndSet(false, true)) return
+    // Before any install can start in this process: drop sessions an earlier process left
+    // pending (their result receiver is gone, so they could never finish or be cleaned up).
+    HeadlessInstaller.abandonOrphanedSessions(app)
     refresh(app)
     scheduleTick(app, OtaConstants.STARTUP_DELAY_MS)
   }
@@ -107,6 +112,7 @@ internal object OtaUpdater {
     if (trigger == OtaTrigger.CHECK) return mutable.value
     if (trigger == OtaTrigger.SCHEDULED) {
       if (autoInstallBlockedFor == manifest.versionCode) return mutable.value
+      if (!OtaRetryPolicy.due(confirmRetry, manifest.versionCode, SystemClock.elapsedRealtime())) return mutable.value
       val wait = OtaIdlePolicy.waitReason(OtaDevice.signals(context, pendingFor(context, manifest)), manual = false)
       mutable.update { it.copy(waitingFor = wait) }
       if (wait != null) return mutable.value
@@ -161,13 +167,34 @@ internal object OtaUpdater {
       mutable.update { it.copy(phase = OtaPhase.INSTALLING) }
       Log.i(TAG, "installing ${manifest.versionName} (${manifest.versionCode})")
       // On success Android replaces this process; reaching the lines below means it survived.
-      if (!OtaDevice.install(context, apk)) return blocked(manifest, OtaError.INSTALL)
+      val outcome = OtaDevice.install(context, apk)
+      if (outcome.confirmationFailed) return confirmFailed(context, manifest, outcome)
+      if (!outcome.ok) {
+        Log.w(TAG, "install of ${manifest.versionName} failed: ${HeadlessInstallPolicy.describe(outcome)}")
+        return blocked(manifest, OtaError.INSTALL)
+      }
+      confirmRetry = null
       refresh(context)
-      mutable.update { it.copy(phase = OtaPhase.UP_TO_DATE, available = null) }
+      mutable.update { it.copy(phase = OtaPhase.UP_TO_DATE, available = null, confirmFailures = 0, nextRetryAtMs = null) }
       return mutable.value
     } finally {
       if (apk.exists() && !apk.delete()) Log.w(TAG, "couldn't remove the downloaded APK")
     }
+  }
+
+  /** The dialog was never accepted: say so, and retry on a short backoff instead of waiting 6 h. */
+  private fun confirmFailed(context: Context, manifest: OtaManifest, outcome: HeadlessInstallOutcome): OtaState {
+    val now = SystemClock.elapsedRealtime()
+    val retry = OtaRetryPolicy.afterFailure(confirmRetry, manifest.versionCode, now).also { confirmRetry = it }
+    val delay = retry.nextAtElapsedMs - now
+    Log.w(TAG, "install of ${manifest.versionName} not confirmed (failure ${retry.failures}): " +
+        "${HeadlessInstallPolicy.describe(outcome)}; retrying in ${delay / 1000}s")
+    scheduleRetry(context, delay)
+    mutable.update {
+      it.copy(phase = OtaPhase.FAILED, error = OtaError.CONFIRM_FAILED, confirmFailures = retry.failures,
+          nextRetryAtMs = System.currentTimeMillis() + delay)
+    }
+    return mutable.value
   }
 
   private fun blocked(manifest: OtaManifest, error: OtaError): OtaState {
@@ -206,6 +233,17 @@ internal object OtaUpdater {
       alarms.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, TAG, listener, main)
     }.onFailure { Log.w(TAG, "update alarm not armed", it) }.isSuccess
     // Without AlarmManager the process-lifetime handler still keeps the schedule.
+    if (!armed) main.postDelayed({ listener.onAlarm() }, delayMs)
+  }
+
+  /** One extra scheduled run for a confirmation retry; the regular tick keeps its own cadence. */
+  private fun scheduleRetry(context: Context, delayMs: Long) {
+    val alarms = context.getSystemService(AlarmManager::class.java)
+    val at = SystemClock.elapsedRealtime() + delayMs
+    val listener = AlarmManager.OnAlarmListener { submit(context, OtaTrigger.SCHEDULED) }
+    val armed = alarms != null && runCatching {
+      alarms.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, "$TAG:retry", listener, main)
+    }.onFailure { Log.w(TAG, "retry alarm not armed", it) }.isSuccess
     if (!armed) main.postDelayed({ listener.onAlarm() }, delayMs)
   }
 

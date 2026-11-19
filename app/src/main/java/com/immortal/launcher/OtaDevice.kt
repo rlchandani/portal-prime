@@ -64,11 +64,12 @@ internal object OtaDevice {
   }
 
   /** Same path as a fleet file install: the shell daemon when it runs, else [HeadlessInstaller]. */
-  fun install(context: Context, apk: File): Boolean {
+  fun install(context: Context, apk: File): HeadlessInstallOutcome {
     val pkg = context.packageName
-    return if (InstallDaemon.installPlan(context).mode == InstallLifecycle.MODE_SILENT)
-        InstallDaemon.install(context, apk, "hearthpane-ota")
-    else HeadlessInstaller.install(context, apk, pkg)
+    return if (InstallDaemon.installPlan(context).mode == InstallLifecycle.MODE_SILENT) {
+      if (InstallDaemon.install(context, apk, "hearthpane-ota")) HeadlessInstallOutcome.Installed
+      else HeadlessInstallOutcome.Error("silent daemon install failed")
+    } else HeadlessInstaller.installForResult(context, apk, pkg)
   }
 
   private fun currentSigners(info: PackageInfo): List<Signature> =
