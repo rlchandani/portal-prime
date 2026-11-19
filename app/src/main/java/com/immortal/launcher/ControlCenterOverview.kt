@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
 /**
- * The Home overview (mock `map`, `map-climate`, `map-energy`, `loading`, `stale`): the live
+ * The Home overview (mock `map`, `map-climate`, `loading`, `stale`): the live
  * floor plan card on the left — floor / lens controls, the plan canvas, legend and freshness
- * pill — and the side column (attention, scenes, energy, cameras) on the right.
+ * pill — and the side column (attention, scenes, the car, cameras) on the right.
  */
 @Composable
 internal fun CcOverviewScreen(s: CcUiState, ui: CcUi) {
@@ -75,10 +75,6 @@ private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan) {
           ?: CcPlanModel.build(floor, s.entities, s.settings, s.now, s.appliancesDone).also { models.put(floor.id, key to it) }
     }
   }
-  // House-level sources (solar, grid, battery) belong to the first floor, as in the mock.
-  val sources = remember(s.entitiesVersion, lens, floor.id) {
-    if (lens == CcLens.ENERGY && floor.id == plan.floors.firstOrNull()?.id) CcMapSources.of(CcEnergy.now(s.entities)) else CcMapSources.NONE
-  }
   val legends = remember(model, s.fahrenheit) { CcLens.entries.map { CcOverviewText.legend(model, it, s.entities, s.fahrenheit) } }
   val floors = remember(plan.floors) { CcFloorTabs(plan.floors.map { CcFloorTab(it.id, CcOverviewText.shortFloor(it.name)) }) }
   val phase = s.connection.phase
@@ -90,7 +86,7 @@ private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan) {
   val onFloor = remember(ui) { { id: String -> ui.floor(id) } }
   val onLens = remember(ui) { { l: CcLens -> ui.lens(l) } }
   Box(Modifier.fillMaxSize()) {
-    CcPlanCanvas(model, lens, view.highlightRoom, walk, sources, stale = phase == CcPhase.STALE,
+    CcPlanCanvas(model, lens, view.highlightRoom, walk, stale = phase == CcPhase.STALE,
         fahrenheit = s.fahrenheit, onTap = onTap,
         modifier = Modifier.fillMaxSize().padding(top = 96.dp, bottom = 84.dp).alpha(if (phase in DOWN_PHASES) DOWN_ALPHA else 1f))
     CcPlanTopRow(floors, floor.id, lens, onFloor, onLens, Modifier.align(Alignment.TopStart).padding(start = 24.dp, end = 24.dp, top = 22.dp))

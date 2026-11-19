@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 
 /**
  * The plan's top layers, drawn over the floor: light dots, lock / thermostat / camera /
- * appliance / leak badges, the garage "OPEN 17m" chip, room names + captions, and the
- * energy lens's home hub and source nodes. Sizes are the mock's, in dp.
+ * appliance / leak badges, the garage "OPEN 17m" chip, and room names + captions. Sizes are
+ * the mock's, in dp.
  */
 internal fun CcPlanDraw.drawMarks(s: DrawScope) {
   for (d in model.dots) {
@@ -75,32 +75,6 @@ internal fun CcPlanDraw.drawLabels(s: DrawScope) {
   }
 }
 
-/** Energy lens: the "2.3 kW home" hub and the solar / grid / battery nodes the flows start from. */
-internal fun CcPlanDraw.drawEnergyNodes(s: DrawScope) {
-  val f = flows ?: return
-  f.solar?.let { node(s, it, "sun", Color(OPAQUE or CcFlowPx.SOLAR_RGB), chips.solar) }
-  f.grid?.let { node(s, it, "grid", Color(OPAQUE or CcFlowPx.GRID_RGB), chips.grid) }
-  f.battery?.let { node(s, it, "battery", Color(OPAQUE or CcFlowPx.BATTERY_RGB), chips.battery) }
-  val home = chips.hub ?: return
-  val unit = chips.hubUnit
-  s.drawCircle(c.text, HUB_R * dp, f.hub)
-  val h = home.height + (unit?.height ?: 0f)
-  home.draw(s, f.hub.x - home.width / 2f, f.hub.y - h / 2f)
-  unit?.draw(s, f.hub.x - unit.width / 2f, f.hub.y - h / 2f + home.height)
-}
-
-private fun CcPlanDraw.node(s: DrawScope, at: Offset, icon: String, color: Color, label: CcPlanLabel?) {
-  s.drawCircle(c.surface, NODE_R * dp, at)
-  s.drawCircle(color, NODE_R * dp, at, style = nodeStroke)
-  s.ccIcon(paint, icon, at, NODE_ICON * dp, paint.tint(color))
-  label?.let {
-    val top = Offset(at.x - it.width / 2f, at.y + (NODE_R + NODE_LABEL_GAP) * dp)
-    s.drawRoundRect(c.surface, Offset(top.x - NODE_LABEL_PAD * dp, top.y - NODE_LABEL_PAD / 2 * dp),
-        Size(it.width + NODE_LABEL_PAD * 2 * dp, it.height + NODE_LABEL_PAD * dp), CornerRadius(it.height), alpha = THERMO_ALPHA)
-    it.draw(s, top.x, top.y)
-  }
-}
-
 private const val OPAQUE = 0xFF000000.toInt()
 private val HEATING = Color(0xFFF08A4B)
 private const val DOT_R = 8f
@@ -121,8 +95,3 @@ private const val LEAK_ICON = 26f
 private const val FADED = 0.45f
 private const val LINE_GAP = 2f
 private const val FIT_SLACK = 1.1f
-private const val HUB_R = 46f
-private const val NODE_R = 30f
-private const val NODE_ICON = 28f
-private const val NODE_LABEL_GAP = 8f
-private const val NODE_LABEL_PAD = 8f

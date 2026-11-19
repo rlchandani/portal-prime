@@ -213,6 +213,8 @@ internal data class CcRegistry(
     val cameraPlatform: Map<String, String> = emptyMap(),
     /** camera entity → "take snapshot" buttons on the same device (ring-mqtt), for the Refresh button. */
     val snapshotButtons: Map<String, List<String>> = emptyMap(),
+    /** The car, its home charger and a price entity, for the Tesla screen (diagnostic ones included). */
+    val tesla: CcTeslaIds = CcTeslaIds.NONE,
 ) {
   fun areaOf(entityId: String): String? = entityArea[entityId]
   /** The best class known before the state arrives. */

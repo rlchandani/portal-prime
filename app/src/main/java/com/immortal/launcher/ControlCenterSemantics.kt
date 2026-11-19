@@ -77,7 +77,6 @@ internal object CcSpeech {
   fun legend(l: CcLegend): String = "Legend: " + when (l.lens) {
     CcLens.LIVE -> "${l.lightsOn} ${if (l.lightsOn == 1) "light" else "lights"} on, amber open, blue motion, green locked"
     CcLens.CLIMATE -> listOfNotNull("blue ${l.cold} to orange ${l.warm}", l.climate).joinToString(", ")
-    CcLens.ENERGY -> "solar, battery, grid and rooms by colour"
   }
 
   /**
@@ -86,21 +85,13 @@ internal object CcSpeech {
    * listener would hear changes, not on every Home Assistant tick.
    */
   fun plan(floor: String, lens: CcLens, rooms: List<Pair<String, String>>): String {
-    val view = when (lens) { CcLens.LIVE -> "live view"; CcLens.CLIMATE -> "climate view"; CcLens.ENERGY -> "energy view" }
+    val view = when (lens) { CcLens.LIVE -> "live view"; CcLens.CLIMATE -> "climate view" }
     val list = rooms.joinToString(". ") { (name, caption) -> if (caption.isBlank()) name else "$name, ${caption.replace(" · ", ", ")}" }
     return "$floor floor plan, $view. $list. Tap a room to open it"
   }
 
   /** A scene tile: "Good night, scene. Turns 8 things off". */
   fun scene(name: String, subtitle: String): String = if (subtitle.isBlank()) name else "$name. $subtitle"
-
-  /** Energy now card, from the values shown on it ("1.2" kW strings, "80%", or "—" for unknown). */
-  fun energyNow(home: String, solar: String, battery: String, grid: String): String =
-      "Energy now: using ${kw(home)}, solar ${kw(solar)}, battery ${known(battery)}, grid ${kw(grid)}. Opens Energy"
-
-  private fun known(v: String): String = if (v == UNKNOWN) "unknown" else v
-  private fun kw(v: String): String = if (v == UNKNOWN) "unknown" else "$v kilowatts"
-  private const val UNKNOWN = "—"
 
   /** An attention row: "Garage door open. Open for 12 min". */
   fun row(title: String, body: String): String = if (body.isBlank()) title else "$title. $body"

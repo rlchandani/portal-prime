@@ -34,7 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/** Side cards: the 2×2 scene grid (mock `.scenes`), Energy now (`.enMini`) and Cameras (`.camRow`). */
+/** Side cards: the 2×2 scene grid (mock `.scenes`), the car (in place of the mock's `.enMini`) and Cameras (`.camRow`). */
 @Composable
 internal fun CcScenesCard(grid: CcSceneGrid, canControl: Boolean, ui: CcUi) {
   val tiles = grid.tiles
@@ -85,36 +85,28 @@ private class SceneLook(val bg: Brush, val fg: Color, val sub: Color) {
   }
 }
 
+/** The car at a glance (battery, range, what it's doing); opens the Tesla screen. */
 @Composable
-internal fun CcEnergyNowCard(now: CcEnergyNow, ui: CcUi) {
-  val open = remember(ui) { { ui.go(CcScreen.ENERGY) } }
-  val home = CcEnergy.kw(now.homeW)
-  val solar = CcEnergy.kw(now.solarW)
-  val battery = now.batteryPct?.let { "$it%" } ?: "—"
-  val grid = CcEnergy.kw(now.gridW)
-  Column(Modifier.fillMaxWidth().ccCard().clickable(role = Role.Button, onClick = open).ccSpeak(CcSpeech.energyNow(home, solar, battery, grid))
-      .padding(horizontal = 24.dp, vertical = 22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-    CcSectionLabel("Energy now")
-    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-      EnergyCell(home, "home", "kW use")
-      EnergyCell(solar, "sun", "solar")
-      EnergyCell(battery, "battery", "battery")
-      EnergyCell(grid, "grid", "grid")
+internal fun CcCarCard(car: CcCarMini, ui: CcUi) {
+  val c = LocalCc.current
+  val open = remember(ui) { { ui.go(CcScreen.TESLA) } }
+  Column(Modifier.fillMaxWidth().ccCard().clickable(role = Role.Button, onClick = open).ccSpeak(CcTeslaText.speech(car))
+      .padding(horizontal = 24.dp, vertical = 22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    CcSectionLabel(car.label)
+    Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+      Text(car.batteryPct?.let { "$it%" } ?: "—", color = c.text, fontSize = 44.sp, fontWeight = FontWeight.Light, maxLines = 1)
+      car.range?.let { Text(it, color = c.sec, fontSize = 21.sp, maxLines = 1, modifier = Modifier.padding(bottom = 7.dp)) }
+      Box(Modifier.weight(1f))
+      CcIcon(if (car.charging) "charger" else "car", if (car.charging) c.green else c.sec, 34.dp)
     }
+    Box(Modifier.fillMaxWidth().height(10.dp).clip(CcStyle.Pill).background(c.surface2)) {
+      Box(Modifier.fillMaxWidth((car.batteryPct ?: 0) / PCT).height(10.dp).clip(CcStyle.Pill).background(c.green))
+    }
+    Text(car.line, color = if (car.charging) c.green else c.sec, fontSize = 19.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
   }
 }
 
-@Composable
-private fun RowScope.EnergyCell(value: String, icon: String, label: String) {
-  val c = LocalCc.current
-  Column(Modifier.weight(1f).clip(CELL).background(c.surface2).padding(horizontal = 16.dp, vertical = 14.dp)) {
-    Text(value, color = c.text, fontSize = 30.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-      CcIcon(icon, c.sec, 22.dp)
-      Text(label, color = c.sec, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
-  }
-}
+private const val PCT = 100f
 
 /** [cams] are (id, name); [feed] is all the pictures read from the state. */
 @Composable

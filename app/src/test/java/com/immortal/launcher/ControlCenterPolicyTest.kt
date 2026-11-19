@@ -58,7 +58,7 @@ class ControlCenterPolicyTest {
     assertTrue(CcPolicy.readOnly(CcEntity("climate.c", "heat"), kids.copy(kidsLockThermostat = true)))
     assertTrue(CcPolicy.screenHidden(CcScreen.CAMERAS, kids))
     assertTrue(CcPolicy.screenHidden(CcScreen.EDIT, kids))
-    assertFalse(CcPolicy.screenHidden(CcScreen.ENERGY, kids))
+    assertFalse(CcPolicy.screenHidden(CcScreen.TESLA, kids))
     assertFalse(CcPolicy.screenHidden(CcScreen.SECURITY, s))
     assertFalse(CcPolicy.hidden(lock, kids.copy(kidsHideLocks = false)))
   }

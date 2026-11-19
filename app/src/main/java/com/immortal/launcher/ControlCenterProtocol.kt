@@ -17,7 +17,7 @@ import org.json.JSONObject
  * The token appears only in the auth message and is never logged or echoed.
  */
 internal class CcProtocol(private val token: String) {
-  enum class Kind { FLOORS, AREAS, DEVICES, ENTITIES, CLASSES, PLAN_GET, PLAN_SET, SUBSCRIBE, GET_STATES, EVENTS, CALL, PING, ENERGY_PREFS, STATS, UNSUBSCRIBE, CAMERA_STREAM }
+  enum class Kind { FLOORS, AREAS, DEVICES, ENTITIES, CLASSES, PLAN_GET, PLAN_SET, SUBSCRIBE, GET_STATES, EVENTS, CALL, PING, STATS, UNSUBSCRIBE, CAMERA_STREAM }
 
   data class Req(val kind: Kind, val key: String = "")
 
@@ -119,8 +119,6 @@ internal class CcProtocol(private val token: String) {
   /** HA starts (or reuses) an HLS stream for [entityId]; the result carries `{"url": "/api/hls/…"}`. */
   fun cameraStream(entityId: String, key: String): Out.Send =
       request(Req(Kind.CAMERA_STREAM, key), JSONObject().put("type", "camera/stream").put("entity_id", entityId))
-
-  fun energyPrefs(): Out.Send = request(Req(Kind.ENERGY_PREFS), JSONObject().put("type", "energy/get_prefs"))
 
   /** Hourly/daily `change` statistics for [ids] between ISO [start] and [end]. */
   fun statistics(key: String, ids: List<String>, startIso: String, endIso: String, period: String): Out.Send =

@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 
 /**
  * The overview's right column (mock `.side`, 540 dp, scrolls): Needs attention, Scenes,
- * Energy now and Cameras. Cards the house can't fill are left out rather than faked.
+ * the car and Cameras. Cards the house can't fill are left out rather than faked.
  */
 @Composable
 internal fun CcSideColumn(s: CcUiState, ui: CcUi, modifier: Modifier = Modifier) {
@@ -47,7 +47,7 @@ private fun CcSideCards(side: CcSideSlices, canControl: Boolean, ui: CcUi, feed:
   Column(modifier.verticalScroll(rememberScrollState()).padding(bottom = 6.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
     CcAttentionCard(side.attention, canControl, ui)
     CcScenesCard(side.scenes, canControl, ui)
-    side.energy?.let { CcEnergyNowCard(it, ui) }
+    side.car?.let { CcCarCard(it, ui) }
     if (side.cameras.cams.isNotEmpty()) CcCamerasCard(feed, side.cameras, ui)
   }
 }

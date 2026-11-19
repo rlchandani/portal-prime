@@ -59,7 +59,7 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
               val floorId = ui.floorId
               // Formatted once per minute / screen / floor, not on every HA update.
               val subtitle = remember(state.minute, screen, floorId, state.plan, state.settings.kids) { subtitleFor(state, screen, floorId) }
-              val header = CcHeaderSlice.of(state, ccTitle(screen), subtitle)
+              val header = CcHeaderSlice.of(state, ccTitle(screen, state.registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL), subtitle)
               CcHeader(header, ui, onJarvis)
               Box(Modifier.weight(1f).fillMaxWidth()) { CcScreenBody(state, ui) }
             }
@@ -88,7 +88,7 @@ private fun CcScreenContent(screen: CcScreen, s: CcUiState, ui: CcUi) {
   when (screen) {
     CcScreen.MAP -> CcOverviewScreen(s, ui)
     CcScreen.CAMERAS -> CcCamerasScreen(s, ui)
-    CcScreen.ENERGY -> CcEnergyScreen(s, ui)
+    CcScreen.TESLA -> CcTeslaScreen(s, ui)
     CcScreen.ALERTS -> CcAlertsScreen(s, ui)
     CcScreen.SECURITY -> CcSecurityScreen(s, ui)
     CcScreen.EDIT -> CcEditorScreen(s, ui)
@@ -96,10 +96,11 @@ private fun CcScreenContent(screen: CcScreen, s: CcUiState, ui: CcUi) {
   }
 }
 
-internal fun ccTitle(screen: CcScreen): String = when (screen) {
+/** The header title; the Tesla screen is called by the car's HA name ([car]). */
+internal fun ccTitle(screen: CcScreen, car: String = CcTeslaIds.DEFAULT_LABEL): String = when (screen) {
   CcScreen.MAP -> "Home"
   CcScreen.CAMERAS -> "Cameras"
-  CcScreen.ENERGY -> "Energy"
+  CcScreen.TESLA -> car
   CcScreen.ALERTS -> "Alerts"
   CcScreen.SECURITY -> "Security"
   CcScreen.EDIT -> "Edit floor plan"

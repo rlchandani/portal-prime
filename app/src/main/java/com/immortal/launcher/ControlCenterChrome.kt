@@ -47,10 +47,12 @@ import java.util.Locale
 
 /** What the rail shows; equal slices skip the rail entirely on HA updates. */
 @Immutable
-internal data class CcRailSlice(val screen: CcScreen, val alerts: Int, val kids: Boolean, val hideCameras: Boolean, val hideSecurity: Boolean) {
+internal data class CcRailSlice(val screen: CcScreen, val alerts: Int, val kids: Boolean, val hideCameras: Boolean, val hideSecurity: Boolean,
+                                  val car: String = CcTeslaIds.DEFAULT_LABEL) {
   companion object {
     fun of(s: CcUiState, screen: CcScreen) = CcRailSlice(screen, s.alerts().size, s.settings.kids,
-        CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings), CcPolicy.screenHidden(CcScreen.SECURITY, s.settings))
+        CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings), CcPolicy.screenHidden(CcScreen.SECURITY, s.settings),
+        s.registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL)
   }
 }
 
@@ -68,7 +70,7 @@ internal fun CcRail(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
     Spacer(Modifier.height(10.dp))
     RailItem("map", "Home", r.screen == CcScreen.MAP) { ui.go(CcScreen.MAP) }
     if (!r.hideCameras) RailItem("cam", "Cameras", r.screen == CcScreen.CAMERAS) { ui.go(CcScreen.CAMERAS) }
-    RailItem("bolt", "Energy", r.screen == CcScreen.ENERGY) { ui.go(CcScreen.ENERGY) }
+    RailItem("car", r.car, r.screen == CcScreen.TESLA) { ui.go(CcScreen.TESLA) }
     RailItem("bell", "Alerts", r.screen == CcScreen.ALERTS, badge = alerts) { ui.go(CcScreen.ALERTS) }
     if (!r.hideSecurity) RailItem("shield", "Security", r.screen == CcScreen.SECURITY) { ui.go(CcScreen.SECURITY) }
     Spacer(Modifier.weight(1f))

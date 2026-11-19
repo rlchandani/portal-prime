@@ -28,7 +28,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import kotlinx.coroutines.delay
 
 /** Screens kept composed after the first visit so switching back costs no composition or redraw. */
-internal val CC_KEEP_ALIVE = setOf(CcScreen.MAP, CcScreen.CAMERAS, CcScreen.ENERGY, CcScreen.ALERTS, CcScreen.SECURITY)
+internal val CC_KEEP_ALIVE = setOf(CcScreen.MAP, CcScreen.CAMERAS, CcScreen.TESLA, CcScreen.ALERTS, CcScreen.SECURITY)
 
 /**
  * The current screen, plus every kept-alive screen already visited, parked off-screen with the

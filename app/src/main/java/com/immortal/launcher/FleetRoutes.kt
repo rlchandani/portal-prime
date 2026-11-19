@@ -369,7 +369,7 @@ class FleetRoutes(private val context: Context) {
         identify()
         resp(200, ok().put("action", "identify"))
       }
-      // Opens the Home Control Center (optionally on a screen: map, cameras, energy, alerts,
+      // Opens the Home Control Center (optionally on a screen: map, cameras, tesla, alerts,
       // security, edit, settings) — for remote checks and on-device measurement.
       "open_control_center" -> {
         val intent = ControlCenterActivity.intent(context).putExtra(ControlCenterActivity.EXTRA_SCREEN, body.optString("screen", "map"))

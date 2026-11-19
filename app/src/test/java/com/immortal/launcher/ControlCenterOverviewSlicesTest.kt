@@ -62,7 +62,6 @@ class ControlCenterOverviewSlicesTest {
     val ents = mapOf(climate.id to climate, garage.id to garage)
     val model = CcPlanModel.build(plan.floors[0], ents, ControlCenterConfig.Settings(), 0L)
     assertEquals(CcLegend(CcLens.LIVE, lightsOn = 0), CcOverviewText.legend(model, CcLens.LIVE, ents, true))
-    assertEquals(CcLegend(CcLens.ENERGY), CcOverviewText.legend(model, CcLens.ENERGY, ents, true))
     assertEquals(CcLegend(CcLens.CLIMATE, cold = "61°", warm = "75°", climate = "Downstairs heating"),
         CcOverviewText.legend(model, CcLens.CLIMATE, ents, true))
   }
