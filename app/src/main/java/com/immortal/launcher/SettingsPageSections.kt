@@ -116,6 +116,12 @@ internal object SettingsPageSections {
         ),
         P.DISMISS to listOf(section(null, block(B.DISMISS))),
         P.GREETING to listOf(section(null, block(B.GREETING_PREVIEW)), section(null, block(B.WELCOME))),
+        P.PEOPLE to listOf(
+            section(null, block(B.PEOPLE)),
+            section("Privacy", link("Privacy & Camera", P.PEOPLE_PRIVACY, "audit delete pause quiet"),
+                footer = "Face templates stay on this Portal. Each Portal sets people up separately."),
+        ),
+        P.PEOPLE_PRIVACY to listOf(section(null, block(B.PEOPLE_PRIVACY))),
         P.HOME_ASSISTANT to listOf(
             section(null, block(B.HOME_ASSISTANT)),
             section("Doorbell", rows("doorbell", "trigger", "camera", "motion", "chime", "cooldownSec", "listen"),

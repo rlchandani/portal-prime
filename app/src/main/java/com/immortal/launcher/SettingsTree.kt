@@ -44,6 +44,8 @@ internal object SettingsPageIds {
     const val CLOCK = "clock"
     const val SOURCES = "sources"
     const val GREETING = "greeting"
+    const val PEOPLE = "people"
+    const val PEOPLE_PRIVACY = "people-privacy"
     const val HOME_ASSISTANT = "ha"
     const val PHONE = "phone"
     const val INTERCOM = "intercom"
@@ -93,7 +95,7 @@ internal object SettingsTileColors {
     const val SLATE = 0xFF4F5663
 }
 
-/** The page tree: 4 groups, 19 top-level pages, and their sub-pages (at most 3 levels deep). */
+/** The page tree: 4 groups, 20 top-level pages, and their sub-pages (at most 3 levels deep). */
 internal object SettingsTree {
     private val C = SettingsTileColors
     private val P = SettingsPageIds
@@ -131,6 +133,9 @@ internal object SettingsTree {
         SettingsPageDef(P.GREETING, "Welcome Greeting", "hand", C.ROSE, SettingsGroup.PERSONALIZE,
             lede = "The message shown when someone walks up to the Portal.",
             keywords = "greeting name morning evening night afternoon speak tts overlay"),
+        SettingsPageDef(P.PEOPLE, "People & Recognition", "camera", C.PURPLE, SettingsGroup.PERSONALIZE,
+            lede = "When someone who set this up walks up, this Portal shows their own Home. Off until an adult turns it on.",
+            keywords = "who's there whos face recognition personal home people person add kid teen adult enrol camera template"),
         SettingsPageDef(P.HOME_ASSISTANT, "Home Assistant", "home", C.CYAN, SettingsGroup.CONNECTED_HOME,
             lede = "Show your Home Assistant dashboard and control the Portal from it.",
             keywords = "dashboard url token entities mqtt broker"),
@@ -171,6 +176,8 @@ internal object SettingsTree {
             keywords = "broker host port tls"),
         SettingsPageDef(P.DISMISS, "Open when you tap to exit", "photo", C.EMBER, parent = P.FRAME,
             keywords = "dismiss target leave screensaver"),
+        SettingsPageDef(P.PEOPLE_PRIVACY, "Privacy & Camera", "lock", C.GREEN, parent = P.PEOPLE,
+            keywords = "privacy camera indicator audit log delete recognition data pause quiet hours private items blur"),
         SettingsPageDef(P.BOOT, "Start on boot", "tools", C.GRAPHITE, parent = P.ADVANCED, advanced = true,
             keywords = "startup app reboot"),
         SettingsPageDef(P.MANAGED, "Automatically managed", "tools", C.GRAPHITE, parent = P.ADVANCED, advanced = true,

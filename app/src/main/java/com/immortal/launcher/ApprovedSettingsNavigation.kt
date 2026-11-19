@@ -91,6 +91,8 @@ internal val SettingsStandalonePages: Map<Class<*>, String> = mapOf(
     ScreensaverDismissAppActivity::class.java to SettingsPageIds.DISMISS,
     WorldClockActivity::class.java to SettingsPageIds.WORLD_CLOCK,
     CountdownSettingsActivity::class.java to SettingsPageIds.COUNTDOWNS,
+    WhosTherePersonActivity::class.java to SettingsPageIds.PEOPLE,
+    WhosThereEnrolActivity::class.java to SettingsPageIds.PEOPLE,
     GuestSettingsActivity::class.java to SettingsPageIds.GUEST,
     AlarmSettingsActivity::class.java to SettingsPageIds.ALARMS,
     CryptoSettingsActivity::class.java to SettingsPageIds.CRYPTO,

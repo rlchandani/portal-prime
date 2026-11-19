@@ -196,7 +196,14 @@ android {
       // WebRTC is ~6.5 MB per 32-bit ABI. Calling needs a 64-bit Portal; a 32-bit process reports
       // calling as unavailable instead of crashing (CallMedia.available()).
       excludes += "lib/armeabi-v7a/libjingle_peerconnection_so.so"
+      // Who's there? runs on 64-bit Portals only; a 32-bit process reports recognition as
+      // unavailable (FaceModels.load catches the missing library) instead of crashing.
+      excludes += "lib/armeabi-v7a/libtensorflowlite_jni.so"
     }
+  }
+  // Face models are memory-mapped straight from the APK, so they must stay uncompressed.
+  androidResources {
+    noCompress += "tflite"
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -255,6 +262,11 @@ dependencies {
   // H.264/VP8 via MediaCodec, software AEC3/NS/AGC, DTLS-SRTP. Only the arm64-v8a .so ships (see
   // packaging below): every calling-capable Portal runs a 64-bit process.
   implementation("io.getstream:stream-webrtc-android:1.3.10")
+
+  // Who's there?: on-device face detection (MediaPipe BlazeFace) + embedding (OpenCV Zoo SFace),
+  // both bundled TFLite models under Apache-2.0 (assets/whos_there/NOTICES.txt). Plain TFLite
+  // runtime (Apache-2.0, no Play services): 3.4 MB arm64 vs 17.6 MB for ONNX Runtime.
+  implementation("org.tensorflow:tensorflow-lite:2.16.1")
 
   // Unit tests (pure JVM — no device/emulator). org.json provides a real
   // implementation so JSON-parsing logic can be tested off-device (the android.jar

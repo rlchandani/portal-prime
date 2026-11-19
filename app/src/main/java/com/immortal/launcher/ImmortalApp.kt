@@ -76,6 +76,9 @@ class ImmortalApp : Application() {
     MetaPresenceReader(this).start()
     // "Music follows you": needs the bus, the music handoff and the presence hub above.
     MusicFollowMe.install(this)
+    // Who's there?: opt-in on-device recognition. Off until an adult enables it; only listens to
+    // presence here, the camera is opened later and only from a resumed Home.
+    WhosThere.install(this)
     // Read the device's native media session (whatever's playing) into NowPlayingHub
     // for the screensaver card + header mini-player. Dormant until our notification
     // listener is enabled — done at provisioning (`cmd notification allow_listener`);

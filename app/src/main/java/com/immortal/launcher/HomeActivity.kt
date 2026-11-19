@@ -1501,6 +1501,10 @@ private fun LauncherScreen(
     Box(Modifier.fillMaxSize()) {
       // A single cached display list for the static/minute-updated wallpaper.
       Box(Modifier.matchParentSize().then(homeHiddenUnderMusic).graphicsLayer {}) { ApprovedHomeBackground() }
+      // Who's there?: the recognised person's warm tint, over the wallpaper and under the chrome.
+      // Only the coarse "whose Home" snapshot is read here, so indicator/camera states never recompose Home.
+      val whosThereHome by WhosThere.homeView.collectAsState()
+      if (whosThereHome.personal) WhosThereTint(Modifier.matchParentSize().then(homeHiddenUnderMusic))
       Column(Modifier.fillMaxSize().then(homeHiddenUnderMusic)) {
         // Launcher chrome trimmed 108 → 92dp; the 68dp header buttons keep a 12dp margin (Home v2 space).
         val hey by produceState<String?>(null, installedApps) { value = withContext(Dispatchers.IO) { heyPackage(context) } }
@@ -1622,6 +1626,13 @@ private fun LauncherScreen(
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
+          // Who's there? may only open the camera while this Home page is really in front.
+          WhosThereHomeVisibility(LocalApprovedLauncherPageActive.current && musicLayout != MusicPlayerLayout.FULL && !editMode)
+          var whoSheet by remember { mutableStateOf(false) }
+          val personal = whosThereHome.personal && !editMode
+          val greetWelcome = remember(welcome, whosThereHome) {
+            if (whosThereHome.names.isEmpty()) welcome else welcome.copy(userName = whosThereHome.names.joinToString(" & "))
+          }
           // Shared notes (Share to Portal): first free page-1 slot, else the greeting-row strip.
           val shareHome = rememberShareHomeState()
           val notePlacement = homeNotePlacement(shareHome.note != null,
@@ -1634,13 +1645,17 @@ private fun LauncherScreen(
             val homeLayout = currentLayoutClass()
             if (homeLayout.compactPortrait) {
               // Upright Mini: greeting above the clock, the briefing card on its own row.
-              ApprovedHomeGreeting(welcome, use24, compact = connected == false, layout = homeLayout)
+              Box(Modifier.fillMaxWidth()) {
+                ApprovedHomeGreeting(greetWelcome, use24, compact = connected == false, layout = homeLayout)
+                WhosThereIndicatorChip(use24, { whoSheet = true }, Modifier.align(Alignment.TopEnd))
+              }
               BriefingHomeCard(Modifier.padding(top = 10.dp))
             } else {
               Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.weight(1f)) {
-                  ApprovedHomeGreeting(welcome, use24, compact = connected == false, layout = homeLayout)
+                  ApprovedHomeGreeting(greetWelcome, use24, compact = connected == false, layout = homeLayout)
                 }
+                WhosThereIndicatorChip(use24, { whoSheet = true }, Modifier.padding(start = 24.dp), fixedSlot = true)
                 BriefingHomeCard(Modifier.padding(start = 24.dp))
               }
             }
@@ -1658,9 +1673,16 @@ private fun LauncherScreen(
               }
               Spacer(Modifier.height(24.dp))
             }
-            CompositionLocalProvider(LocalHomeAddFlow provides addFlow) {
-              ApprovedHomePagedWidgets(homeWidgets, editMode, connected == false, host, manager, saveWidgets,
-                  onEnterEdit = { editMode = true }, modifier = Modifier.weight(1f).fillMaxWidth())
+            // The shared widgets stay composed under a personal Home (just not drawn), so returning to
+            // the shared Home is a redraw, not a rebuild of every widget.
+            val personalNow = rememberUpdatedState(personal)
+            Box(Modifier.weight(1f).fillMaxWidth()) {
+              CompositionLocalProvider(LocalHomeAddFlow provides addFlow) {
+                ApprovedHomePagedWidgets(homeWidgets, editMode, connected == false, host, manager, saveWidgets,
+                    onEnterEdit = { editMode = true },
+                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = if (personalNow.value) 0f else 1f })
+              }
+              if (personal) WhosTherePersonalHome(use24, homeLayout.compactPortrait, { whoSheet = true }, Modifier.fillMaxSize())
             }
             Spacer(Modifier.height(6.dp))
             // Slimmer favorites strip (approved Home v2, change 7): 88 → 72dp, icons 56 → 46dp.
@@ -1682,6 +1704,9 @@ private fun LauncherScreen(
           RoutineHomeToast(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))
           ChoresCelebrationBanner(Modifier.align(Alignment.BottomCenter).then(toastSides))
           MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))
+          WhosThereHiChip(Modifier.align(Alignment.TopCenter).padding(top = 4.dp))
+          if (whoSheet) WhosThereNotYouSheet(onSettings = { context.openApprovedHomeSettings(SettingsPageIds.PEOPLE) },
+              onDismiss = { whoSheet = false })
           }
           }
           ApprovedLauncherTab.APPS -> ApprovedAppsScreen(
