@@ -103,6 +103,8 @@ internal object CallPeerRoute {
     }
     val self = Calling.selfId(context)
     val caller = CallSignalAuth.verifyRequest(req.header(CallSignalAuth.HEADER), text, key, System.currentTimeMillis(), replay, self)
+        // A phone offers only through its session route; a Portal can't pose as one here.
+        ?.takeUnless { CallPhoneId.isPhone(it.from) }
         ?: return RemoteFeatureRoutes.json(401, RemoteFeatureRoutes.error("unauthorized"))
     val offer = CallSignalAuth.parseOffer(text) ?: return RemoteFeatureRoutes.json(400, RemoteFeatureRoutes.error("bad_offer"))
     if (offer.to != self) return RemoteFeatureRoutes.json(403, RemoteFeatureRoutes.error("not_for_this_portal"))

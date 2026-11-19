@@ -88,7 +88,9 @@ internal sealed interface CallEvent {
   data class Incoming(val id: String, val peer: CallContact, val kind: CallKind, val video: Boolean, val host: String?,
                       val port: Int, val decision: IncomingDecision, val now: Long,
                       /** A group ring: who is already in the call (we join each of them on Accept). */
-                      val members: List<CallMemberRef> = emptyList()) : CallEvent
+                      val members: List<CallMemberRef> = emptyList(),
+                      /** The ring named other members (even if this Portal won't join groups): never auto-answer it. */
+                      val groupRing: Boolean = members.isNotEmpty()) : CallEvent
   data class Accept(val audioOnly: Boolean, val now: Long) : CallEvent
   data class Decline(val now: Long) : CallEvent
   data class HangUp(val now: Long) : CallEvent
@@ -247,7 +249,7 @@ internal object CallMachine {
             CallEffect.Present, CallEffect.StartRing(d.silent), CallEffect.AnnouncePresence))
       }
       // A group ring never answers by itself: the countdown is for one chosen person, not their guests.
-      IncomingDecision.AutoAnswer -> if (e.members.isNotEmpty()) incoming(state, e.copy(decision = IncomingDecision.Ring(false))) else {
+      IncomingDecision.AutoAnswer -> if (e.groupRing) incoming(state, e.copy(decision = IncomingDecision.Ring(false))) else {
         val call = ActiveCall(e.id, e.peer, CallDirection.INCOMING, CallKind.CALL, e.video, CallPhase.RINGING, e.now, e.now,
             cameraOn = e.video, peerHost = e.host, peerPort = e.port, autoAnswerAtMs = e.now + CallTimings.AUTO_ANSWER_MS,
             invited = invited(e))

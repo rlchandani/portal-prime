@@ -161,7 +161,7 @@ internal object Calling {
     val decision = decide(context, from, ring.kind, ring.id, fromPhone = false)
     Log.i(TAG, "ring ${ring.kind} decision=${decision.javaClass.simpleName}")
     dispatch(CallEvent.Incoming(ring.id, CallContact(from, ring.name), ring.kind, ring.video, ring.host, ring.port, decision, now(),
-        members = if (CallingConfig.load(context).groupsOn) ring.members else emptyList()))
+        members = if (CallingConfig.load(context).groupsOn) ring.members else emptyList(), groupRing = ring.members.isNotEmpty()))
   }
 
   /** A paired phone rang this Portal (its signed `/remote/call/send`). Returns what was decided. */

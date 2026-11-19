@@ -116,3 +116,17 @@ class CallAutoAnswerGroupTest {
     assertEquals(s, CallMachine.reduce(s, CallEvent.AddPerson(den, t0 + 12_000)).state)
   }
 }
+
+/** Review finding: a group ring stripped of members (Group calls off here) still never auto-answers. */
+class CallAutoAnswerStrippedGroupTest {
+  @Test fun groupRingFlagSurvivesStrippedMembers() {
+    val sam = CallContact("22222222-2222-2222-2222-222222222222", "Sam")
+    val step = CallMachine.reduce(CallState(), CallEvent.Incoming("0123456789abcdef", sam, CallKind.CALL, true, "192.168.1.20", 8723,
+        IncomingDecision.AutoAnswer, 1_000L, emptyList(), groupRing = true))
+    assertNull(step.state.call!!.autoAnswerAtMs)
+  }
+
+  @Test fun householdKeyWindowIsClosedUntilAPairing() {
+    assertFalse(RemotePairing.householdWindowOpen(System.currentTimeMillis()))
+  }
+}

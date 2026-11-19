@@ -29,7 +29,7 @@ internal object CallPhoneRoute {
 
   fun handle(context: Context, req: FleetHttpServer.Request, token: String?): FleetHttpServer.Response {
     if (req.method != "POST") return RemoteFeatureRoutes.json(405, RemoteFeatureRoutes.error("method_not_allowed"))
-    if (token == null || !RemotePairing.isValidSession(context, token)) return unauthorized()
+    if (token == null || !RemotePairing.isEnabled(context) || !RemotePairing.isValidSession(context, token)) return unauthorized()
     if (req.contentLength !in 1..MAX_BODY) return RemoteFeatureRoutes.json(413, RemoteFeatureRoutes.error("body_too_large"))
     val key = HouseholdKey.get(context) ?: return RemoteFeatureRoutes.json(503, RemoteFeatureRoutes.error("no_household_key"))
     val text = try { req.bodyText(MAX_BODY) } catch (e: Exception) {

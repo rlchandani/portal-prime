@@ -105,12 +105,25 @@ object RemotePairing {
     pin = null
     pinExpiresAt = 0L
     pinAttempts = 0
+    lastRedeemMs = now
     val token = randomToken()
     val sessions = loadSessions(c).toMutableSet().apply { add(token) }
     prefs(c).edit().putString(KEY_SESSIONS, sessions.joinToString("\n")).apply()
     publishPinChange()
     return token
   }
+
+  /**
+   * The household key may be shared with or set by a phone only shortly after someone paired in
+   * person (PIN on this screen). Session tokens travel in cleartext on the LAN, so a sniffed token
+   * must not be enough to read the key that signs calls (Calling 2a review). In memory only: after
+   * a restart, pair again to re-provision.
+   */
+  @Volatile private var lastRedeemMs = 0L
+  const val HOUSEHOLD_WINDOW_MS = 10 * 60_000L
+
+  fun householdWindowOpen(now: Long = System.currentTimeMillis()): Boolean =
+      lastRedeemMs > 0 && now - lastRedeemMs in 0..HOUSEHOLD_WINDOW_MS
 
   // --- sessions ---------------------------------------------------------------
 
