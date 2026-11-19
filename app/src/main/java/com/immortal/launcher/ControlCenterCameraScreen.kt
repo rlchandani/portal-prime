@@ -98,11 +98,12 @@ private const val BOTTOM_ROW_FROM = 3
 /** `.camFull`: the live picture, then a side column with shortcuts, recent activity and the others. */
 @Composable
 private fun CcCameraFull(f: CcCamFull, ui: CcUi) {
+  val holder = remember(f.camera.id) { CcFrameHolder(f.camera.id) }
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(22.dp)) {
     CcCameraPicture(f.camera.id, f.camera.name, live = true, configured = true, modifier = Modifier.weight(1f).fillMaxHeight(),
-        onClick = null, size = CcCameraTileSize.FULL)
+        onClick = null, size = CcCameraTileSize.FULL, holder = holder)
     Column(Modifier.width(420.dp).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-      CcCameraSideHead(f.camera.name, f.near, f.canControl, f.reason, ui)
+      CcCameraSideHead(f.camera, f.near, f.canControl, f.reason, ui, holder)
       CcCameraRecent(f.camera, f.near, Modifier.weight(1f).fillMaxWidth())
       OtherCameras(f.others, ui)
     }

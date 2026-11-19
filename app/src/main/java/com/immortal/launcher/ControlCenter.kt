@@ -118,6 +118,12 @@ internal object ControlCenter {
   }
 
   /** Loads today (hourly) and this week (daily) from the recorder, once the energy prefs are known. */
+  /** A camera's HLS URL from HA (`camera/stream`), absolute, or null; [onUrl] runs on the engine thread. */
+  fun cameraStream(context: Context, entityId: String, onUrl: (String?) -> Unit) {
+    val e = engine(context)
+    e.post { e.requestStream(entityId) { rel -> onUrl(rel?.let { CcCameraLogic.streamUrl(HaConfig.baseUrl(e.app), it) }) } }
+  }
+
   fun loadEnergy(context: Context) { val e = engine(context); e.post { e.requestEnergy() } }
 
   internal fun isoUtc(ms: Long): String =

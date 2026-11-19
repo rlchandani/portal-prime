@@ -16,6 +16,8 @@ internal object CcInterest {
   private val ALERT_CLASSES = setOf("moisture", "smoke", "gas", "carbon_monoxide", "safety") + CcEntity.OPENING_CLASSES
   private val SENSOR_CLASSES = setOf("power", "battery", "temperature", "humidity")
   private val APPLIANCE_HINTS = listOf("washer", "washing", "dryer", "dishwasher")
+  /** What the Security screen lists (beyond locks, covers and the alarm, which are always in). */
+  private val SECURITY_CLASSES = ALERT_CLASSES + setOf("motion", "occupancy", "presence", CcSecurityList.TAMPER_CLASS)
   /** Upper bound so a huge install can't flood a Portal (HA sends a full snapshot first). */
   const val MAX_FOREGROUND = 600
   const val MAX_BACKGROUND = 200
@@ -29,11 +31,15 @@ internal object CcInterest {
     val wanted = reg.entities.filter { id ->
       val domain = id.substringBefore('.')
       domain in GLOBAL_DOMAINS || CcPlanEdit.planWorthy(id, reg, null) ||
-          (domain == "sensor" && reg.entityClass[id] in SENSOR_CLASSES) || alertWorthy(id, reg)
-    }
+          (domain == "sensor" && reg.entityClass[id] in SENSOR_CLASSES) || alertWorthy(id, reg) || securityWorthy(id, reg)
+    } + reg.diagnostics.filter { reg.classOf(it) == CcSecurityList.TAMPER_CLASS } + reg.snapshotButtons.values.flatten()
     val planIds = plan?.entityIds.orEmpty()
     return (planIds + wanted.sortedBy { priority(it) }).take(MAX_FOREGROUND).toSet()
   }
+
+  /** Doors, windows, garage, smoke/CO/leak, motion and tamper sensors (classes fetched on connect). */
+  fun securityWorthy(id: String, reg: CcRegistry): Boolean =
+      id.startsWith("binary_sensor.") && reg.classOf(id) in SECURITY_CLASSES
 
   fun background(reg: CcRegistry?): Set<String>? {
     if (reg == null || reg.entities.isEmpty()) return null

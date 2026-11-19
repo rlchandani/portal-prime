@@ -110,11 +110,12 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
   }
 
   /** Acts on [e] with [call], asking first where the household chose so. */
-  fun act(e: CcEntity, call: CcCall) {
+  fun act(e: CcEntity, call: CcCall, onResult: ((Boolean, String?) -> Unit)? = null) {
     val s = stateOf()
     if (CcPolicy.hidden(e, s.settings) || CcPolicy.readOnly(e, s.settings)) return
     when (CcPolicy.ask(e, call, s.settings, ControlCenterConfig.scenesSeen(context))) {
-      CcPolicy.Ask.NONE -> if (e.domain == "scene" || e.domain == "script") ControlCenter.runScene(context, e) else ControlCenter.send(context, call)
+      CcPolicy.Ask.NONE -> if (e.domain == "scene" || e.domain == "script") ControlCenter.runScene(context, e)
+          else if (!ControlCenter.send(context, call, undoable = onResult == null, onResult = onResult)) onResult?.invoke(false, null)
       CcPolicy.Ask.CONFIRM -> modal(confirmFor(e, call))
       CcPolicy.Ask.CAMERA_CONFIRM -> modal(CcModal.Garage(e.id, call, cameraNear(e, s)))
       CcPolicy.Ask.PIN -> modal(CcModal.Pin(e.id, CcAlarmMode.entries.firstOrNull { it.service == call.service }, "Disarm",
