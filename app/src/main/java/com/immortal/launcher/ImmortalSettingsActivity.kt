@@ -22,7 +22,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import com.immortal.launcher.jarvis.HearthpaneScreens
+import com.immortal.launcher.jarvis.JarvisHighlight
+import com.immortal.launcher.jarvis.LocalJarvisPulse
+import com.immortal.launcher.jarvis.ScreenContext
+import com.immortal.launcher.jarvis.SettingsJarvisContext
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -186,6 +196,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
             LocalApprovedSettingsNavigate provides navigate,
             LocalApprovedSettingsBack provides back,
             LocalApprovedSettingsViewportMemory provides viewports,
+            LocalJarvisPulse provides jarvisPulse,
         ) {
           val listPane = remember { SettingsPane(showList = true, onShowList = { showList = true }) }
           val pagePane = remember { SettingsPane(showList = false, onShowList = listPane.onShowList) }
@@ -194,7 +205,31 @@ class ImmortalSettingsActivity : ComponentActivity() {
       }
     }
     observeEntryFirstDraw()
+    trackForJarvis()
   }
+
+  /** Floating Jarvis: this page is what `screen_context` describes, and Jarvis can point at its rows. */
+  private fun trackForJarvis() {
+    HearthpaneScreens.track(this, HearthpaneScreens.Entry({ HearthpaneScreens.SETTINGS }) {
+      SettingsJarvisContext.build(this, stack.current)
+    })
+    lifecycleScope.launch {
+      repeatOnLifecycle(Lifecycle.State.STARTED) {
+        JarvisHighlight.current.collect { request ->
+          val control = request?.target?.takeIf { it.startsWith(ScreenContext.SETTINGS_TARGET) }
+              ?.removePrefix(ScreenContext.SETTINGS_TARGET) ?: return@collect
+          val page = SettingsJarvisContext.pageOf(control) ?: return@collect
+          jarvisPulse = control
+          show(if (stack.current == page) stack.copy(control = control) else stack.open(page, control))
+          delay(JarvisHighlight.SHOW_MS)
+          if (jarvisPulse == control) jarvisPulse = null
+          JarvisHighlight.done(request)
+        }
+      }
+    }
+  }
+
+  private var jarvisPulse by mutableStateOf<String?>(null)
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
