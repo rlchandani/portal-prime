@@ -109,7 +109,7 @@ internal fun canLeaveMessage(ended: EndedCall): Boolean =
 
 private fun leaveMessage(context: android.content.Context, ended: EndedCall, onDone: () -> Unit) {
   onDone()
-  CallMessages.compose(context, ended.peer)
+  CallMessages.compose(context, ended.peer, callId = ended.id)
 }
 
 private val MESSAGE_REASONS = setOf(CallEndReason.NO_ANSWER, CallEndReason.DECLINED, CallEndReason.QUIET, CallEndReason.BUSY,

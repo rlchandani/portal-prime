@@ -37,12 +37,23 @@ internal object CallInbox {
   const val PAIR_WINDOW_MS = 10 * 60_000L
 
   fun items(messages: List<CallMessage>, history: List<CallHistoryEntry>): List<InboxItem> {
-    val missed = history.filter { it.missed }.filterNot { e ->
-      messages.any { it.fromId == e.peerId && it.atMs >= e.atMs && it.atMs - e.atMs <= PAIR_WINDOW_MS }
-    }
-    return (messages.map(InboxItem::Message) + missed.map(InboxItem::Missed)).sortedByDescending { it.atMs }
+    val received = CallMessageList.received(messages)
+    val missed = history.filter { it.missed }.filterNot { e -> messageFor(e, received) != null }
+    return (received.map(InboxItem::Message) + missed.map(InboxItem::Missed)).sortedByDescending { it.atMs }
+  }
+
+  /**
+   * The message [e]'s caller left after it: the one that names this call, else (older senders
+   * that don't say) the first from the same caller within [PAIR_WINDOW_MS] after it.
+   */
+  fun messageFor(e: CallHistoryEntry, messages: List<CallMessage>): CallMessage? {
+    if (!e.missed) return null
+    val incoming = messages.filter { !it.outgoing && it.fromId == e.peerId }
+    incoming.firstOrNull { it.callId == e.id }?.let { return it }
+    return incoming.filter { it.callId == null && it.atMs >= e.atMs && it.atMs - e.atMs <= PAIR_WINDOW_MS }.minByOrNull { it.atMs }
   }
 
   /** What the Home widget's missed card should show: the newest unseen message, else null. */
-  fun latestUnseen(messages: List<CallMessage>): CallMessage? = messages.filter { !it.seen }.maxByOrNull { it.atMs }
+  fun latestUnseen(messages: List<CallMessage>): CallMessage? =
+      messages.filter { !it.seen && !it.outgoing }.maxByOrNull { it.atMs }
 }

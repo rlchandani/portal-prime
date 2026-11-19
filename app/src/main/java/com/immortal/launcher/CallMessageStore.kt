@@ -20,7 +20,7 @@ import java.io.FileOutputStream
 import java.io.OutputStream
 
 /**
- * Video messages received by this Portal (the only place they ever live): sealed files under
+ * Video messages received by this Portal, plus its own copies of the ones it sent: sealed files under
  * `no_backup/hearthpane_vmsg` (blocked for the fleet file routes, excluded from backups), plus a
  * metadata index. Files are re-sealed at rest under the Keystore-wrapped data key as the upload
  * streams in; nothing is ever decrypted to disk. Also owns the sender's temp directory, which must
@@ -97,13 +97,57 @@ internal object CallMessageStore {
       if (!part.renameTo(sealed)) throw java.io.IOException("rename failed")
       synchronized(lock) {
         save(c, CallMessageList.add(mutable.value, CallMessage(put.id, v.from, put.fromName, now, put.durationMs, sealed.length(),
-            put.audioOnly), now))
+            put.audioOnly, callId = put.callId), now))
       }
       Log.i(TAG, "message ${put.id.take(4)}… stored (${sealed.length() / 1024} KiB)")
       return null
     } finally {
       part.delete()
       synchronized(lock) { inflight.remove(put.id) }
+    }
+  }
+
+  /**
+   * After the recipient confirmed [id], keeps this Portal's own copy of the message it sent, sealed
+   * at rest under this Portal's data key exactly like a received one (Recent plays it back). Reads
+   * the take through [input] (opened before the upload, so it still works if the take was unlinked).
+   * Best effort: a sent copy that can't be kept never fails the send.
+   */
+  fun keepSent(context: Context, input: java.io.InputStream, plainBytes: Long, id: String, to: CallPeer, durationMs: Long,
+               audioOnly: Boolean, callId: String?, now: Long): Boolean {
+    ensureLoaded(context)
+    val c = context.applicationContext
+    if (!CallMessageList.isId(id) || plainBytes <= 0 || plainBytes > CallMessageLimits.MAX_BYTES) return false
+    val name = DinnerWire.cleanName(to.name) ?: return false
+    if (!DinnerWire.isDeviceId(to.id)) return false
+    synchronized(lock) {
+      if (mutable.value.any { it.id == id } || id in inflight) return false
+      if (dir(c).usableSpace - plainBytes < CallMessageLimits.MIN_FREE_BYTES) { Log.i(TAG, "sent copy skipped: low space"); return false }
+      inflight.add(id)
+    }
+    val part = File(dir(c), id + PART)
+    return try {
+      val restKey = CallMessageCrypto.restKey(CallMessageKeys.dataKey(c, dir(c)), id)
+      FileOutputStream(part).use { fos ->
+        val out = BufferedOutputStream(fos, CallMessageCrypto.SEALED_CHUNK)
+        CallMessageCrypto.seal(restKey, id, java.io.BufferedInputStream(input, CallMessageLimits.CHUNK), plainBytes, out)
+        out.flush()
+        fos.fd.sync()
+      }
+      val sealed = File(dir(c), id + SEALED)
+      if (!part.renameTo(sealed)) throw java.io.IOException("rename failed")
+      synchronized(lock) {
+        save(c, CallMessageList.add(mutable.value, CallMessage(id, to.id, name, now, durationMs, sealed.length(), audioOnly,
+            seen = true, outgoing = true, callId = callId?.takeIf(CallWire::isCallId)), now))
+      }
+      Log.i(TAG, "sent copy ${id.take(4)}… kept (${sealed.length() / 1024} KiB)")
+      true
+    } catch (e: Exception) {
+      Log.w(TAG, "sent copy not kept: ${e.javaClass.simpleName}")
+      false
+    } finally {
+      part.delete()
+      synchronized(lock) { inflight.remove(id) }
     }
   }
 
@@ -115,6 +159,7 @@ internal object CallMessageStore {
   fun delete(context: Context, id: String) = synchronized(lock) {
     val c = context.applicationContext
     file(c, id)?.delete()
+    CallMessagePosters.forget(id)
     save(c, mutable.value.filterNot { it.id == id })
   }
 
@@ -123,6 +168,7 @@ internal object CallMessageStore {
     val c = context.applicationContext
     dir(c).listFiles()?.forEach { it.delete() }
     CallMessageKeys.forget(dir(c))
+    CallMessagePosters.forgetAll()
     save(c, emptyList())
   }
 

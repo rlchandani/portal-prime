@@ -125,10 +125,19 @@ private fun Detail(item: InboxItem, modifier: Modifier) {
   var confirm by remember(item.key) { mutableStateOf(false) }
   Column(modifier.clip(RoundedCornerShape(32.dp)).background(p.surface)) {
     Box(Modifier.weight(1f).fillMaxWidth()) {
-      CallRingBackground(item.fromName, motion = false)
-      Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        CallRoomAvatar(item.fromName, 180.dp)
-        if (item is InboxItem.Missed) Text("No message left", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+      // A video message shows its first frame (decoded in memory from the sealed file); until then,
+      // and for sound-only messages or missed calls, the room's colours and avatar.
+      val poster = if (item is InboxItem.Message) rememberCallMessagePoster(item.m).value else null
+      if (poster != null) {
+        androidx.compose.foundation.Image(poster, contentDescription = null, contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+            filterQuality = androidx.compose.ui.graphics.FilterQuality.Medium, modifier = Modifier.fillMaxSize())
+        Box(Modifier.fillMaxSize().background(Color(0x33000000)))
+      } else {
+        CallRingBackground(item.fromName, motion = false)
+        Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(24.dp)) {
+          CallRoomAvatar(item.fromName, 180.dp)
+          if (item is InboxItem.Missed) Text("No message left", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+        }
       }
       if (item is InboxItem.Message) Box(Modifier.align(Alignment.Center).size(160.dp).background(Color(0x73000000), CircleShape)
           .callClick("Play message", true) { CallMessages.play(context, item.m.id) }, contentAlignment = Alignment.Center) {

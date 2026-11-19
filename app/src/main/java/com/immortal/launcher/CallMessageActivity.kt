@@ -53,7 +53,8 @@ class CallMessageActivity : ComponentActivity() {
     // No message is being composed yet, so anything in the sender's temp directory is a leftover.
     CallMessageStore.sweepOutgoing(this)
     if (!test) askForMedia()
-    val c = CallMessageComposer(this, peer, test, onFinish = ::finish)
+    val callId = intent.getStringExtra(EXTRA_CALL)?.takeIf(CallWire::isCallId)
+    val c = CallMessageComposer(this, peer, test, onFinish = ::finish, callId = callId)
     composer = c
     setContent { Box(Modifier.fillMaxSize().background(CallColors.VideoBg)) { CallMessageComposeScreen(c, auto) } }
   }
@@ -99,6 +100,8 @@ class CallMessageActivity : ComponentActivity() {
     private const val PERMISSIONS = 7311
     const val EXTRA_PEER = "peer"
     const val EXTRA_MESSAGE = "message"
+    /** The unanswered call a message is left after (links it to that missed call on the other Portal). */
+    const val EXTRA_CALL = "call"
     const val EXTRA_TEST_FRAMES = "testFrames"
     const val EXTRA_AUTO = "auto"
   }
@@ -112,10 +115,11 @@ internal object CallMessages {
   fun canSend(contact: CallContact): Boolean =
       !contact.phone && canSend(CallingStore.peers.value.firstOrNull { it.id == contact.deviceId })
 
-  fun compose(context: Context, peer: CallContact, testFrames: Boolean = false, auto: Boolean = false) {
+  fun compose(context: Context, peer: CallContact, testFrames: Boolean = false, auto: Boolean = false, callId: String? = null) {
     runCatching {
       context.startActivity(Intent(context, CallMessageActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
           .putExtra(CallMessageActivity.EXTRA_PEER, peer.deviceId)
+          .apply { callId?.let { putExtra(CallMessageActivity.EXTRA_CALL, it) } }
           .apply { if (BuildConfig.PORTAL_CALL_LOOPBACK && testFrames) { putExtra(CallMessageActivity.EXTRA_TEST_FRAMES, true); putExtra(CallMessageActivity.EXTRA_AUTO, auto) } })
     }
   }

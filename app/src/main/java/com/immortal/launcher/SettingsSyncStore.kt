@@ -26,6 +26,16 @@ internal object SettingsSyncStore {
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY, encode(ledger).toString()).apply()
   }
 
+  private const val ADOPT_CARD_DISMISSED = "adopt_card_dismissed"
+
+  fun adoptCardDismissed(context: Context): Boolean =
+      context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(ADOPT_CARD_DISMISSED, false)
+
+  fun setAdoptCardDismissed(context: Context, on: Boolean) {
+    val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    if (prefs.getBoolean(ADOPT_CARD_DISMISSED, false) != on) prefs.edit().putBoolean(ADOPT_CARD_DISMISSED, on).apply()
+  }
+
   fun clear(context: Context) {
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().remove(KEY).apply()
   }

@@ -49,14 +49,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Calendar
 
-/**
- * Hooks other Calling slices fill in for Grandma mode. The messages slice sets [openMessages]
- * (its "Missed & messages" screen) and [unseen] (new messages + missed calls). Until then the
- * Grandma home opens Recent and counts unseen missed calls.
- */
-internal object CallGrandmaHooks {
-  @Volatile var openMessages: ((Context) -> Unit)? = null
-  @Volatile var unseen: (Context) -> Int = { CallHistory.unseenMissed(CallingStore.history.value) }
+/** What the Grandma home's Messages button counts (pure, unit tested). */
+internal object GrandmaInbox {
+  /** New video messages plus missed calls that left none (a miss with a message counts once, as the message). */
+  fun unseen(messages: List<CallMessage>, history: List<CallHistoryEntry>): Int =
+      CallInbox.items(messages, history).count { item ->
+        when (item) {
+          is InboxItem.Message -> !item.m.seen
+          is InboxItem.Missed -> !item.e.seen
+        }
+      }
 }
 
 /** A face on the Grandma home. */
@@ -90,23 +92,23 @@ internal fun CallsGrandmaHome() {
   val peers by CallingStore.peers.collectAsState()
   val phones by CallPhoneMailbox.phones.collectAsState()
   val history by CallingStore.history.collectAsState()
-  var recent by remember { mutableStateOf(false) }
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context) }
+  val messages by CallMessageStore.messages.collectAsState()
+  var inbox by remember { mutableStateOf(false) }
   val now = rememberCallClock(CLOCK_STEP_MS)
   LaunchedEffect(Unit) {
     CallingStore.importDinnerRoster(context)
     while (true) { Calling.refreshPresence(context); delay(PRESENCE_POLL_MS) }
   }
-  if (recent) { GrandmaRecent(history, sizes) { recent = false }; return }
+  if (inbox) { GrandmaMessages(sizes) { inbox = false }; return }
   val faces = remember(peers, phones, now / FACE_REFRESH_MS) { GrandmaFaces.pick(peers, phones, now) }
-  val unseen = remember(history) { CallGrandmaHooks.unseen(context) }
+  val unseen = remember(messages, history) { GrandmaInbox.unseen(messages, history) }
   Column(Modifier.fillMaxSize().background(p.background).padding(horizontal = sizes.edge + 12.dp, vertical = sizes.edge)) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
       GrandmaClock(now, Modifier.weight(1f)) { context.startActivity(settingsPageIntent(context, SettingsPageIds.CALLS)) }
       GrandmaButton(GrandmaCopy.messages(unseen), "msg", if (unseen > 0) p.accent else p.surface, if (unseen > 0) Color.White else p.text,
-          sizes.copy(button = MESSAGE_BUTTON, buttonText = sizes.buttonText * 0.8f), onClick = {
-            val open = CallGrandmaHooks.openMessages
-            if (open != null) open(context) else recent = true
-          }, edge = if (unseen > 0) null else p.outline)
+          sizes.copy(button = MESSAGE_BUTTON, buttonText = sizes.buttonText * 0.8f), onClick = { inbox = true },
+          edge = if (unseen > 0) null else p.outline)
     }
     Spacer(Modifier.height(sizes.gap + 8.dp))
     if (faces.isEmpty()) Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -177,15 +179,16 @@ private fun GrandmaFaceCard(face: GrandmaFace, avatar: androidx.compose.ui.unit.
   }
 }
 
-/** Until the messages slice provides its screen: Recent, with a big way back. */
+/** Messages (mock `gmHomeScr` → `missed`): the "Missed & messages" list, with a big way back. */
 @Composable
-private fun GrandmaRecent(history: List<CallHistoryEntry>, sizes: GrandmaSizes, onBack: () -> Unit) {
+private fun GrandmaMessages(sizes: GrandmaSizes, onBack: () -> Unit) {
   val p = LocalApprovedPalette.current
+  androidx.activity.compose.BackHandler(onBack = onBack)
   Column(Modifier.fillMaxSize().background(p.background)) {
     Box(Modifier.padding(sizes.edge)) {
       GrandmaButton("Back", "back", p.surface, p.text, sizes, onBack, Modifier.width(360.dp), edge = p.outline)
     }
-    Box(Modifier.weight(1f)) { CallsRecent(history) }
+    Box(Modifier.weight(1f)) { CallMessagesTab() }
   }
 }
 

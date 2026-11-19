@@ -19,7 +19,16 @@ internal data class SettingsSyncStatus(
     /** Whether "Keep this Portal's settings" would keep anything adopting wouldn't. */
     val adoptHasConflicts: Boolean = false,
     val adoptedFrom: String? = null,
+    /** "Later" was tapped on the Home card for this join (About › Sync still offers the choice). */
+    val adoptCardDismissed: Boolean = false,
 ) {
+  /**
+   * The one-time Home card: only while a real choice waits (a silent adopt resolves the rest), the
+   * household key is set, sync isn't paused and nobody tapped "Later".
+   */
+  val showAdoptCard: Boolean
+    get() = available && !paused && phase == SyncPhase.JOINING && adoptFrom != null && adoptHasConflicts && !adoptCardDismissed
+
   val summary: String
     get() = when {
       !available -> "Set up the household key with Portal Toolkit to sync settings between Portals."
@@ -35,8 +44,9 @@ internal data class SettingsSyncStatus(
   fun peerLabel(peer: SyncPeer, now: Long): String = "Seen ${ago(now - peer.seenAt)}"
 
   companion object {
-    fun from(ledger: SyncLedger, available: Boolean, paused: Boolean, conflicts: Boolean): SettingsSyncStatus =
-        SettingsSyncStatus(
+    fun from(ledger: SyncLedger, available: Boolean, paused: Boolean, conflicts: Boolean,
+             adoptCardDismissed: Boolean = false): SettingsSyncStatus =
+        SettingsSyncStatus(adoptCardDismissed = adoptCardDismissed,
             available = available, paused = paused, phase = ledger.phase, lastSyncAt = ledger.lastSyncAt,
             peers = ledger.peers.values.sortedByDescending { it.seenAt }, recordCount = ledger.records.size,
             adoptFrom = ledger.pending?.fromName, adoptHasConflicts = conflicts, adoptedFrom = ledger.adoptedFrom)

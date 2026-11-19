@@ -24,6 +24,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.key
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -102,7 +108,9 @@ private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan, portrait: Boolean =
           ?: CcPlanModel.build(floor, s.entities, s.settings, s.now, s.appliancesDone).also { models.put(floor.id, key to it) }
     }
   }
-  val legends = remember(model, s.fahrenheit) { CcLens.entries.map { CcOverviewText.legend(model, it, s.entities, s.fahrenheit) } }
+  val legends = remember(model, s.fahrenheit) {
+    ccTrace("cc:legendsBuild") { CcLens.entries.map { CcOverviewText.legend(model, it, s.entities, s.fahrenheit) } }
+  }
   val floors = remember(plan.floors) { CcFloorTabs(plan.floors.map { CcFloorTab(it.id, CcOverviewText.shortFloor(it.name)) }) }
   val phase = s.connection.phase
   val fresh = remember(s.connection, s.minute) { CcOverviewText.freshness(s.connection, s.now) }
@@ -112,25 +120,76 @@ private fun CcPlanCard(s: CcUiState, ui: CcUi, plan: CcPlan, portrait: Boolean =
   val onTap = remember(ui) { { hit: CcPlanHit -> onPlanTap(hit, latest, ui) } }
   val onFloor = remember(ui) { { id: String -> ui.floor(id) } }
   val onLens = remember(ui) { { l: CcLens -> ui.lens(l) } }
+  // Floors already shown stay composed and laid out, parked unplaced with what they last showed:
+  // switching back to one re-places it instead of recomposing its plan, re-measuring its legend
+  // texts and re-recording its layers inside the tap's frame.
+  val parking = remember { CcFloorParking<CcFloorFrame>(FLOOR_CACHE) }
+  val order = parking.show(floor.id, CcFloorFrame(model, legends, lens, view.highlightRoom, phase == CcPhase.STALE, s.fahrenheit))
+  val motion = LocalCcMotion.current
+  val paint = rememberCcPlanPaint()
   Box(Modifier.fillMaxSize()) {
-    CcPlanCanvas(model, lens, view.highlightRoom, walk, stale = phase == CcPhase.STALE,
-        fahrenheit = s.fahrenheit, onTap = onTap,
-        modifier = Modifier.fillMaxSize().padding(top = 96.dp, bottom = 84.dp).alpha(if (phase in DOWN_PHASES) DOWN_ALPHA else 1f))
+    Box(Modifier.fillMaxSize().padding(top = 96.dp, bottom = 84.dp).alpha(if (phase in DOWN_PHASES) DOWN_ALPHA else 1f)) {
+      order.forEach { id ->
+        key(id) {
+          val f = parking.frame(id)
+          val active = id == floor.id
+          if (f != null) CompositionLocalProvider(LocalCcMotion provides (motion && active)) {
+            CcPlanCanvas(f.model, f.lens, f.focus, if (active) walk else null, stale = f.stale, fahrenheit = f.fahrenheit,
+                onTap = onTap, modifier = Modifier.fillMaxSize().ccFloorCanvasSlot(active), paint = paint, parked = !active)
+          }
+        }
+      }
+    }
     CcPlanTopRow(floors, floor.id, lens, onFloor, onLens, Modifier.align(Alignment.TopStart).padding(start = 24.dp, end = 24.dp, top = 22.dp))
     staleLine?.let { CcStaleBar(it, Modifier.align(Alignment.TopCenter).padding(top = 100.dp)) }
+    val floorLegends: @Composable (Modifier) -> Unit = { m ->
+      Box(m, contentAlignment = Alignment.BottomStart) {
+        order.forEach { id ->
+          key(id) {
+            val f = parking.frame(id)
+            val active = id == floor.id
+            if (f != null) CcPlanLegends(f.legends, if (active) lens else f.lens, Modifier.ccFloorSlot(active))
+          }
+        }
+      }
+    }
     if (portrait) {
       // Narrow card: the legend and the freshness pill share one row; a long legend scrolls instead of colliding.
       Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 22.dp),
           verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Box(Modifier.weight(1f).horizontalScroll(rememberScrollState())) { CcPlanLegends(legends, lens) }
+        floorLegends(Modifier.weight(1f).horizontalScroll(rememberScrollState()))
         CcFreshnessPill(fresh, phase == CcPhase.LIVE)
       }
     } else {
-      CcPlanLegends(legends, lens, Modifier.align(Alignment.BottomStart).padding(start = 24.dp, bottom = 22.dp))
+      floorLegends(Modifier.align(Alignment.BottomStart).padding(start = 24.dp, bottom = 22.dp))
       CcFreshnessPill(fresh, phase == CcPhase.LIVE, Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = 22.dp))
     }
   }
 }
+
+/** What a floor last showed: a parked floor keeps exactly these instances, so it skips recomposition. */
+@androidx.compose.runtime.Immutable
+internal data class CcFloorFrame(val model: CcPlanModel, val legends: List<CcLegend>, val lens: CcLens, val focus: String?,
+                                 val stale: Boolean, val fahrenheit: Boolean)
+
+/**
+ * A floor's canvas, shown or parked. A parked canvas stays placed (so the renderer still syncs it
+ * and frees its offscreen textures: see `parked` on [CcPlanCanvas]) but is fully transparent, sits
+ * under the shown floor, ignores taps and is hidden from screen readers.
+ */
+internal fun Modifier.ccFloorCanvasSlot(active: Boolean): Modifier =
+    (if (active) this else this.clearAndSetSemantics {}).zIndex(if (active) 1f else 0f)
+        .graphicsLayer { alpha = if (active) 1f else 0f }
+
+/**
+ * A shown-or-parked slot: the shown floor is placed and readable; a parked one keeps its
+ * composition and measurement but is not placed (so not drawn, tapped or read by a screen reader).
+ */
+internal fun Modifier.ccFloorSlot(active: Boolean): Modifier =
+    (if (active) this else this.clearAndSetSemantics {}).layout { measurable, constraints ->
+      val p = measurable.measure(constraints)
+      if (active) layout(p.width, p.height) { p.place(0, 0) } else layout(0, 0) {}
+    }
 
 private fun onPlanTap(hit: CcPlanHit, s: CcUiState, ui: CcUi) {
   when (hit) {

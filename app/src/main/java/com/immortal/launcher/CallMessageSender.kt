@@ -19,8 +19,9 @@ import java.security.SecureRandom
 
 /**
  * Sends one recorded message to the recipient Portal over the LAN, sealed chunk by chunk under the
- * household-derived transit key while it streams (no sealed copy on the sender), and only reports
- * success for an answer signed over our header nonce. Blocking: call off the main thread.
+ * household-derived transit key while it streams, and only reports success for an answer signed
+ * over our header nonce. Once confirmed, the sender keeps its own copy sealed at rest
+ * ([CallMessageStore.keepSent]) so Recent can play what was sent. Blocking: call off the main thread.
  */
 internal object CallMessageSender {
   private const val TAG = "HearthpaneCallMsg"
@@ -30,7 +31,7 @@ internal object CallMessageSender {
   private val random = SecureRandom()
 
   /** Outcome: null when the recipient confirmed it, else a short reason for the screen. */
-  fun send(context: Context, take: File, peer: CallPeer, durationMs: Long, audioOnly: Boolean): String? = runCatching {
+  fun send(context: Context, take: File, peer: CallPeer, durationMs: Long, audioOnly: Boolean, callId: String? = null): String? = runCatching {
     val host = peer.host ?: return "no_address"
     if (!HouseholdListPeerAuth.isPrivateLan(host) || peer.port !in 1..65535) return "no_address"
     val key = HouseholdKey.get(context) ?: return "no_household_key"
@@ -39,7 +40,10 @@ internal object CallMessageSender {
     if (plain <= 0 || plain > CallMessageLimits.MAX_BYTES) return CallMessageRefusal.TOO_LARGE.code
     val id = ByteArray(ID_BYTES).also(random::nextBytes).let(HouseholdKey::toHex)
     val sealed = CallMessageCrypto.sealedLength(plain)
-    val put = CallMessageWire.Put(id, peer.id, Calling.selfName(context), durationMs, sealed, CallMessageCrypto.chunkCount(plain), audioOnly)
+    val put = CallMessageWire.Put(id, peer.id, Calling.selfName(context), durationMs, sealed, CallMessageCrypto.chunkCount(plain), audioOnly,
+        callId?.takeIf(CallWire::isCallId))
+    // Opened now so this Portal's own copy can still be kept if the screen closes (unlinking the take) mid-upload.
+    val keep = runCatching { FileInputStream(take) }.getOrNull()
     val nonce = ByteArray(NONCE_BYTES).also(random::nextBytes).let(HouseholdKey::toHex)
     val header = CallMessageWire.requestHeader(key, self, nonce, System.currentTimeMillis(), put) ?: return "bad_header"
     val conn = URL("http", host, peer.port, CallMessageWire.PATH).openConnection() as HttpURLConnection
@@ -68,9 +72,11 @@ internal object CallMessageSender {
       val payload = env.optString("payload")
       if (!CallMessageWire.verifyAck(key, nonce, payload, env.optString("sig"), id)) return "bad_ack"
       Log.i(TAG, "message ${id.take(4)}… delivered (${sealed / 1024} KiB)")
+      keep?.let { CallMessageStore.keepSent(context, it, plain, id, peer, durationMs, audioOnly, put.callId, System.currentTimeMillis()) }
       null
     } finally {
       conn.disconnect()
+      runCatching { keep?.close() }
     }
   }.getOrElse { Log.w(TAG, "message send failed: ${it.javaClass.simpleName}"); "unreachable" }
 
