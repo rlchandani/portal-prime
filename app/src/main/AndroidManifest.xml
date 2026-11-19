@@ -232,6 +232,19 @@
 
         <!-- Countdown chips (birthdays, trips, holidays), opened from the Countdowns
              tile in the launcher's Settings folder. -->
+        <!-- Who's there?: person detail and the on-Portal enrolment (camera only after Start). -->
+        <activity
+            android:name=".WhosTherePersonActivity"
+            android:exported="false"
+            android:label="Person"
+            android:theme="@style/Theme.SampleApp.Navigation" />
+        <activity
+            android:name=".WhosThereEnrolActivity"
+            android:exported="false"
+            android:label="Add person"
+            android:screenOrientation="unspecified"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:theme="@style/Theme.SampleApp.Navigation" />
         <activity
             android:name=".CountdownSettingsActivity"
             android:exported="false"

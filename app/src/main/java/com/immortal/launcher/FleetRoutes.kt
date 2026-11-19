@@ -390,6 +390,9 @@ class FleetRoutes(private val context: Context) {
         resp(200, JSONObject().put("ok", true).put("action", "cc_debug")
             .put("result", ControlCenter.debug(context, dry, plan, alert, unreachable, fake)))
       }
+      // Who's there? test switches (operator only, in memory): {"ignoreQuietHours":bool, "glance":true, "benchmark":true}.
+      "whos_there_debug" -> resp(200, JSONObject().put("ok", true).put("action", "whos_there_debug")
+          .put("result", WhosThereDebug.apply(body)))
       // Layout test hook (operator only): opens one of a fixed set of internal screens for captures.
       "open_screen" -> {
         val target = when (body.optString("screen")) {

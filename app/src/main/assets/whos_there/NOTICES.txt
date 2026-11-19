@@ -1,0 +1,25 @@
+Who's there? — on-device face models and runtime
+
+1. Face detection: MediaPipe BlazeFace (short range), blaze_face_short_range.tflite (float16)
+   Source: https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/
+   Copyright Google LLC. Licensed under the Apache License, Version 2.0.
+   SHA-256 b4578f35940bf5a1a655214a1cce5cab13eba73c1297cd78e1a04c2380b0152f
+
+2. Face embedding: SFace (MobileFaceNet trained with the SFace loss), OpenCV Zoo
+   face_recognition_sface_2021dec.onnx, by Yaoyao Zhong; ONNX conversion by Chengrui Wang.
+   Source: https://github.com/opencv/opencv_zoo/tree/main/models/face_recognition_sface
+   Licensed under the Apache License, Version 2.0.
+   Modified by Starbright Lab: the ONNX graph was rebuilt layer by layer as an NHWC
+   TensorFlow graph with the original weights and converted to TensorFlow Lite with
+   dynamic-range int8 weights (face_recognition_sface_2021dec_int8dr.tflite).
+   SHA-256 102fdae9e7103ce757a3d36b73e31fb1784bd274f27b3a55165769a1476d27bf
+
+3. Runtime: TensorFlow Lite 2.16.1 (org.tensorflow:tensorflow-lite)
+   Copyright The TensorFlow Authors. Licensed under the Apache License, Version 2.0.
+
+Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software distributed under the
+License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND.
+
+Nothing in these models runs off the Portal. No images are stored; only numeric face
+templates of people who enrolled on this Portal are kept, encrypted, on this Portal.

@@ -43,6 +43,8 @@ internal fun SettingsBlockContent(block: SettingsBlock) {
             SettingsBlock.WALLPAPER_PREVIEW -> WallpaperHomePreview()
             SettingsBlock.CLOCK_PREVIEW -> ClockFaceLivePreview()
             SettingsBlock.GREETING_PREVIEW -> GreetingLivePreview()
+            SettingsBlock.PEOPLE -> WhosTherePeopleBlock()
+            SettingsBlock.PEOPLE_PRIVACY -> WhosTherePrivacyBlock()
             SettingsBlock.WALLPAPER -> WallpaperSection()
             SettingsBlock.QUICK_BUTTONS -> QuickButtonsSection()
             SettingsBlock.ALMANAC -> AlmanacSettingsContent()

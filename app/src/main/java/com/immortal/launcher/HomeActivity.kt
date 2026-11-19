@@ -1501,6 +1501,9 @@ private fun LauncherScreen(
     Box(Modifier.fillMaxSize()) {
       // A single cached display list for the static/minute-updated wallpaper.
       Box(Modifier.matchParentSize().then(homeHiddenUnderMusic).graphicsLayer {}) { ApprovedHomeBackground() }
+      // Who's there?: the recognised person's warm tint, over the wallpaper and under the chrome.
+      val whosThere by rememberWhosThereUi()
+      if (whosThere.view != WhosThereView.Shared) WhosThereTint(whosThere, Modifier.matchParentSize().then(homeHiddenUnderMusic))
       Column(Modifier.fillMaxSize().then(homeHiddenUnderMusic)) {
         // Launcher chrome trimmed 108 → 92dp; the 68dp header buttons keep a 12dp margin (Home v2 space).
         val hey by produceState<String?>(null, installedApps) { value = withContext(Dispatchers.IO) { heyPackage(context) } }
@@ -1622,6 +1625,14 @@ private fun LauncherScreen(
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
+          // Who's there? may only open the camera while this Home page is really in front.
+          WhosThereHomeVisibility(LocalApprovedLauncherPageActive.current && musicLayout != MusicPlayerLayout.FULL && !editMode)
+          var whoSheet by remember { mutableStateOf(false) }
+          val personal = whosThere.view != WhosThereView.Shared && !editMode
+          val greetWelcome = remember(welcome, whosThere.view, whosThere.people) {
+            val names = WhosThereViewPolicy.people(whosThere.view).mapNotNull { whosThere.person(it)?.name }
+            if (names.isEmpty()) welcome else welcome.copy(userName = names.joinToString(" & "))
+          }
           // Shared notes (Share to Portal): first free page-1 slot, else the greeting-row strip.
           val shareHome = rememberShareHomeState()
           val notePlacement = homeNotePlacement(shareHome.note != null,
@@ -1634,13 +1645,17 @@ private fun LauncherScreen(
             val homeLayout = currentLayoutClass()
             if (homeLayout.compactPortrait) {
               // Upright Mini: greeting above the clock, the briefing card on its own row.
-              ApprovedHomeGreeting(welcome, use24, compact = connected == false, layout = homeLayout)
+              Box(Modifier.fillMaxWidth()) {
+                ApprovedHomeGreeting(greetWelcome, use24, compact = connected == false, layout = homeLayout)
+                WhosThereIndicatorChip(whosThere, use24, { whoSheet = true }, Modifier.align(Alignment.TopEnd))
+              }
               BriefingHomeCard(Modifier.padding(top = 10.dp))
             } else {
               Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.weight(1f)) {
-                  ApprovedHomeGreeting(welcome, use24, compact = connected == false, layout = homeLayout)
+                  ApprovedHomeGreeting(greetWelcome, use24, compact = connected == false, layout = homeLayout)
                 }
+                WhosThereIndicatorChip(whosThere, use24, { whoSheet = true }, Modifier.padding(start = 24.dp))
                 BriefingHomeCard(Modifier.padding(start = 24.dp))
               }
             }
@@ -1658,7 +1673,10 @@ private fun LauncherScreen(
               }
               Spacer(Modifier.height(24.dp))
             }
-            CompositionLocalProvider(LocalHomeAddFlow provides addFlow) {
+            if (personal) {
+              WhosTherePersonalHome(whosThere, use24, homeLayout.compactPortrait, { whoSheet = true },
+                  Modifier.weight(1f).fillMaxWidth())
+            } else CompositionLocalProvider(LocalHomeAddFlow provides addFlow) {
               ApprovedHomePagedWidgets(homeWidgets, editMode, connected == false, host, manager, saveWidgets,
                   onEnterEdit = { editMode = true }, modifier = Modifier.weight(1f).fillMaxWidth())
             }
@@ -1682,6 +1700,9 @@ private fun LauncherScreen(
           RoutineHomeToast(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))
           ChoresCelebrationBanner(Modifier.align(Alignment.BottomCenter).then(toastSides))
           MusicV3PausedNote(Modifier.align(Alignment.BottomCenter).then(toastSides).padding(bottom = 24.dp))
+          WhosThereHiChip(whosThere, Modifier.align(Alignment.TopCenter).padding(top = 4.dp))
+          if (whoSheet) WhosThereNotYouSheet(whosThere, onSettings = { context.openApprovedHomeSettings(SettingsPageIds.PEOPLE) },
+              onDismiss = { whoSheet = false })
           }
           }
           ApprovedLauncherTab.APPS -> ApprovedAppsScreen(

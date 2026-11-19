@@ -21,22 +21,22 @@ class SettingsTreeTest {
     }
 
     // Calls (Hearthpane Calling, 2026-11-18) joins Connected home after Phone Remote: 19 pages.
-    @Test fun sidebarHasTheMocksFourGroupsAndNineteenPagesInOrder() {
+    @Test fun sidebarHasTheMocksFourGroupsAndTwentyPagesInOrder() {
         assertEquals(listOf("display", "sounds", "frame", "alarms", "night"),
             SettingsTree.groupPages(SettingsGroup.MOST_USED).map { it.id })
-        assertEquals(listOf("wallpaper", "home", "widgets", "clock", "sources", "greeting"),
+        assertEquals(listOf("wallpaper", "home", "widgets", "clock", "sources", "greeting", "people"),
             SettingsTree.groupPages(SettingsGroup.PERSONALIZE).map { it.id })
         assertEquals(listOf("ha", "phone", "calls", "intercom", "music"),
             SettingsTree.groupPages(SettingsGroup.CONNECTED_HOME).map { it.id })
         assertEquals(listOf("about", "system", "advanced"),
             SettingsTree.groupPages(SettingsGroup.GENERAL).map { it.id })
-        assertEquals(19, SettingsTree.topLevel.size)
+        assertEquals(20, SettingsTree.topLevel.size)
         assertEquals(listOf(null, "Personalize", "Connected home", "General"), SettingsGroup.entries.map { it.title })
     }
 
     @Test fun titlesFollowTheMock() {
         assertEquals(listOf("Display & Brightness", "Sounds", "Photo Frame", "Alarms & Wake", "Night & Sleep",
-            "Wallpaper", "Home Screen", "Widgets & Calendar", "Clock Faces", "Photo Sources", "Welcome Greeting",
+            "Wallpaper", "Home Screen", "Widgets & Calendar", "Clock Faces", "Photo Sources", "Welcome Greeting", "People & Recognition",
             "Home Assistant", "Phone Remote", "Calls", "Intercom", "Music", "About & Health", "Portal & Android", "Advanced"),
             SettingsTree.topLevel.map { it.title })
     }
