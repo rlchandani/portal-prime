@@ -10,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -27,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.HouseholdListSettings
@@ -117,10 +120,19 @@ private fun ItemDetails(id: String, view: HouseholdListView, toast: HouseholdLis
 @Composable
 private fun DialogFrame(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
   val palette = LocalApprovedPalette.current
+  val compact = currentLayoutClass().compact
   Box(Modifier.fillMaxSize().background(Color(0x66000000)).clickable(MutableInteractionSource(), null, onClick = onDismiss),
       contentAlignment = Alignment.Center) {
-    Column(Modifier.widthIn(max = 980.dp).fillMaxWidth(0.6f).clip(RoundedCornerShape(32.dp)).background(palette.surface)
-        .clickable(MutableInteractionSource(), null) {}.padding(40.dp), content = content)
+    // Compact: nearly full width (60% of 800 dp is too narrow) and scrolling on the short landscape window.
+    val frame = if (compact) {
+      Modifier.padding(horizontal = 24.dp, vertical = 32.dp).fillMaxWidth().widthIn(max = 980.dp)
+          .clip(RoundedCornerShape(32.dp)).background(palette.surface)
+          .clickable(MutableInteractionSource(), null) {}.verticalScroll(rememberScrollState()).padding(32.dp)
+    } else {
+      Modifier.widthIn(max = 980.dp).fillMaxWidth(0.6f).clip(RoundedCornerShape(32.dp)).background(palette.surface)
+          .clickable(MutableInteractionSource(), null) {}.padding(40.dp)
+    }
+    Column(frame, content = content)
   }
 }
 
@@ -130,9 +142,21 @@ private fun DialogFrame(onDismiss: () -> Unit, content: @Composable ColumnScope.
 @Composable private fun DialogBody(text: String) =
     Text(text, color = LocalApprovedPalette.current.secondary, fontSize = 22.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 8.dp))
 
-@Composable private fun DialogActions(content: @Composable RowScope.() -> Unit) =
+@Composable private fun DialogActions(content: @Composable RowScope.() -> Unit) {
+  if (currentLayoutClass().compact) {
+    CompactDialogActions(content)
+  } else {
     Row(Modifier.fillMaxWidth().padding(top = 32.dp), horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically, content = content)
+  }
+}
+
+/** Compact: the action buttons wrap to another line rather than squeeze a label. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable private fun CompactDialogActions(content: @Composable RowScope.() -> Unit) {
+  FlowRow(Modifier.fillMaxWidth().padding(top = 28.dp), horizontalArrangement = Arrangement.spacedBy(16.dp),
+      verticalArrangement = Arrangement.spacedBy(12.dp)) { content() }
+}
 
 /** "Household list settings": the registry-driven rows for this Portal's display options. */
 @Composable
@@ -144,11 +168,13 @@ internal fun HouseholdListSettingsPanel(view: HouseholdListView, onBack: () -> U
       horizontalArrangement = Arrangement.spacedBy(20.dp)) {
     RoundIconButton("back", "Back", onBack)
     Text("Household list settings", color = palette.text, fontSize = 40.sp, lineHeight = 48.sp,
-        fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+        fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
     RoundIconButton("x", "Close", onClose)
   }
   Spacer(Modifier.height(24.dp))
-  Column(Modifier.widthIn(max = 1000.dp)) {
+  // Compact: the rows scroll inside the shorter sheet.
+  val rowsFrame = if (currentLayoutClass().compact) Modifier.verticalScroll(rememberScrollState()) else Modifier
+  Column(Modifier.widthIn(max = 1000.dp).then(rowsFrame)) {
     SettingsRows(HouseholdListSettings.domain, snapshot) { key, value ->
       HouseholdListSettings.domain.apply(context, JSONObject().put(key, value))
       snapshot = HouseholdListConfig.load(context)

@@ -48,6 +48,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -62,7 +63,10 @@ internal fun CallLiveBar(text: String, live: Boolean, motion: Boolean, modifier:
       .semantics { liveRegion = LiveRegionMode.Polite }, verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(18.dp)) {
     LiveDot(live, motion)
-    Text(text, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+    // Compact (the Mini): a narrow bar ellipsizes the state words before it drops the E2E mark.
+    if (currentLayoutClass().compact) Text(text, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+        overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+    else Text(text, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
     if (e2e) {
       Box(Modifier.width(1.5.dp).height(30.dp).background(CallColors.BarDivider))
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -86,12 +90,12 @@ private fun LiveDot(live: Boolean, motion: Boolean) {
   })
 }
 
-/** The self view frame: 420×280, radius 28, 3 dp glass ring, label under the picture. */
+/** The self view frame: 420×280 (compact: see [CallsCompactLayout.selfView]), radius 28, 3 dp glass ring, label under the picture. */
 @Composable
 internal fun CallSelfFrame(media: CallMedia?, cameraOn: Boolean, label: String, modifier: Modifier = Modifier,
-                           width: androidx.compose.ui.unit.Dp = 420.dp) {
+                           width: androidx.compose.ui.unit.Dp = 420.dp, height: androidx.compose.ui.unit.Dp = width * 2 / 3) {
   val shape = RoundedCornerShape(28.dp)
-  Box(modifier.width(width).height(width * 2 / 3).clip(shape).background(CallColors.VideoBg)
+  Box(modifier.width(width).height(height).clip(shape).background(CallColors.VideoBg)
       .border(3.dp, CallColors.GlassEdge, shape)) {
     if (media != null && cameraOn) CallSelfVideo(media, Modifier.fillMaxSize())
     AnimatedVisibility(!cameraOn, enter = slideInHorizontally(spring(Spring.DampingRatioLowBouncy)) { -it } + fadeIn(),

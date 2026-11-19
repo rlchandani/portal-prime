@@ -50,7 +50,11 @@ internal fun CcConnectionOverlay(s: CcUiState, ui: CcUi) {
   val phase = s.connection.phase
   if (phase !in setOf(CcPhase.UNREACHABLE, CcPhase.AUTH_FAILED, CcPhase.NOT_CONFIGURED, CcPhase.OFFLINE)) return
   val c = LocalCc.current
-  Box(Modifier.fillMaxSize().padding(start = CcStyle.RailWidth, top = CcStyle.HeaderHeight).background(c.scrim.copy(alpha = 0.35f))) {
+  // Portrait (Mini upright): the header is on top and the bar at the bottom instead of the rail.
+  val inset = if (currentLayoutClass().compactPortrait)
+    Modifier.padding(top = CcCompactChrome.HeaderHeight, bottom = CcCompactChrome.NavHeight)
+  else Modifier.padding(start = CcStyle.RailWidth, top = CcStyle.HeaderHeight)
+  Box(Modifier.fillMaxSize().then(inset).background(c.scrim.copy(alpha = 0.35f))) {
     val retry = rememberCountdown(s.connection.retryAt)
     val last = s.connection.lastLiveAt.takeIf { it > 0 }?.let { "Showing last known state from ${ccTime(it)}. " } ?: ""
     when (phase) {
@@ -86,15 +90,20 @@ internal fun rememberCountdown(at: Long): Long {
 internal fun CcToastHost(toast: CcToast?) {
   val context = LocalContext.current
   val c = LocalCc.current
+  val layout = currentLayoutClass()
   LaunchedEffect(toast?.id) { if (toast != null) { delay(TOAST_MS); ControlCenter.dismissToast(context, toast.id) } }
-  Box(Modifier.fillMaxSize().padding(bottom = 36.dp), contentAlignment = Alignment.BottomCenter) {
+  // Portrait: above the bottom bar, inset from the screen edges, the text wrapping before Undo.
+  val frame = if (layout.compactPortrait) Modifier.padding(start = 24.dp, end = 24.dp, bottom = CcCompactChrome.NavHeight + 24.dp)
+  else Modifier.padding(bottom = 36.dp)
+  Box(Modifier.fillMaxSize().then(frame), contentAlignment = Alignment.BottomCenter) {
     AnimatedVisibility(toast != null, enter = fadeIn() + slideInVertically { it / 2 }, exit = fadeOut() + slideOutVertically { it / 2 }) {
       val t = toast ?: return@AnimatedVisibility
       Row(Modifier.widthIn(max = 1100.dp).clip(CcStyle.Pill).background(if (c.dark) c.surface2 else c.text)
           .padding(start = 30.dp, end = 12.dp, top = 10.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(20.dp)) {
         if (t.error) CcIcon("warn", c.red, 30.dp) else CcIcon("check", c.green, 30.dp)
-        Text(t.text, color = if (c.dark) c.text else c.bg, fontSize = 23.sp, maxLines = 2, modifier = Modifier.padding(vertical = 14.dp))
+        Text(t.text, color = if (c.dark) c.text else c.bg, fontSize = 23.sp, maxLines = 2,
+            modifier = (if (layout.compact) Modifier.weight(1f, fill = false) else Modifier).padding(vertical = 14.dp))
         if (t.undo) Row(Modifier.clip(CcStyle.Pill).background(c.bg.copy(alpha = 0.18f)).clickable {
           ControlCenter.undo(context); ControlCenter.dismissToast(context, t.id)
         }.padding(horizontal = 26.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {

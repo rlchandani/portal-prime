@@ -109,8 +109,23 @@ private fun CcEditorBody(saved: CcPlan, registry: CcRegistry?, live: Map<String,
   val motion = LocalCcMotion.current
   val onTap = remember(act, reg) { { gx: Float, gy: Float -> act.update { CcEdGesture.tap(it, CcEd.floor(it, reg), gx, gy, reg, act.now()) } } }
   val onDrop = remember(act, reg, live) { { d: CcEdDrag -> act.update { CcEdGesture.commit(it, d, reg, live, act.now()) } } }
+  val portrait = currentLayoutClass().compactPortrait
   Box(Modifier.fillMaxSize().onGloballyPositioned { host.editorOrigin = it.positionInRoot() }) {
-    Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(22.dp)) {
+    if (portrait) Column(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp)) {
+      // The Mini upright: steps above the canvas (the canvas keeps its own top row for floor and tool),
+      // then the canvas, then the step's panel full width. Devices drag up from the panel onto the plan.
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { CcEditorSteps(ctx) }
+      Box(Modifier.weight(PORTRAIT_CANVAS_WEIGHT).fillMaxWidth()) {
+        CcEditorCanvas(st, floor, reg, live, host, motion, onTap = onTap, onDrop = onDrop, modifier = Modifier.fillMaxSize())
+        if (st.step == CcEdStep.FOUND) CcEditorEmptyHint()
+        CcEditorTools(ctx, floors, Modifier.align(Alignment.TopStart).fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 22.dp),
+            steps = false)
+      }
+      Column(Modifier.weight(1f).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+        CcEditorSide(ctx)
+      }
+    } else Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(22.dp)) {
       Box(Modifier.weight(1f).fillMaxHeight()) {
         CcEditorCanvas(st, floor, reg, live, host, motion, onTap = onTap, onDrop = onDrop, modifier = Modifier.fillMaxSize())
         if (st.step == CcEdStep.FOUND) CcEditorEmptyHint()
@@ -131,7 +146,7 @@ private fun CcEditorBody(saved: CcPlan, registry: CcRegistry?, live: Map<String,
  * floor names, keeping the chosen floor in view. Nothing is ever clipped out of reach.
  */
 @Composable
-private fun CcEditorTools(ctx: CcEdCtx, floors: List<CcHaFloor>, modifier: Modifier) {
+private fun CcEditorTools(ctx: CcEdCtx, floors: List<CcHaFloor>, modifier: Modifier, steps: Boolean = true) {
   val st = ctx.st
   val floorTabs = remember(floors) { floors.map { Triple(it.id, CcOverviewText.shortFloor(it.name), null as String?) } }
   Row(modifier, horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -146,9 +161,19 @@ private fun CcEditorTools(ctx: CcEdCtx, floors: List<CcHaFloor>, modifier: Modif
             { t -> ctx.update { CcEd.setTool(it, t) } })
       }
     }
-    if (st.first) CcStepDashes(st.step.number)
-    else CcSeg(CcEdStep.TABS.map { Triple(it, it.tab, null) }, st.step, { step -> ctx.update { CcEd.goStep(it, step) } })
+    if (steps) {
+      if (st.first) CcStepDashes(st.step.number)
+      else CcSeg(CcEdStep.TABS.map { Triple(it, it.tab, null) }, st.step, { step -> ctx.update { CcEd.goStep(it, step) } })
+    }
   }
+}
+
+/** Portrait: the step dashes (first build) or step tabs, on their own row above the canvas. */
+@Composable
+private fun CcEditorSteps(ctx: CcEdCtx) {
+  val st = ctx.st
+  if (st.first) Box(Modifier.height(58.dp), contentAlignment = Alignment.Center) { CcStepDashes(st.step.number) }
+  else CcSeg(CcEdStep.TABS.map { Triple(it, it.tab, null) }, st.step, { step -> ctx.update { CcEd.goStep(it, step) } })
 }
 
 /** Mock `.steps`: five dashes, ember up to the current step. */
@@ -199,4 +224,6 @@ internal fun CcEdMessage(text: String?) {
 }
 
 private const val GHOST_LIFT_X = 60
+/** Portrait: the canvas's share of the height against the step panel's 1. */
+private const val PORTRAIT_CANVAS_WEIGHT = 1.25f
 private const val GHOST_LIFT_Y = 70

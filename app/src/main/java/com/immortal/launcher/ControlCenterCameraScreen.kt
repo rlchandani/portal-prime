@@ -8,6 +8,7 @@ package com.immortal.launcher
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -70,6 +71,7 @@ private fun fullSlice(cam: CcEntity, s: CcUiState, all: List<CcEntity>): CcCamFu
 private fun CameraGrid(grid: CcCamGrid, ui: CcUi) {
   val gap = 20.dp
   val cameras = grid.cameras
+  if (currentLayoutClass().compactPortrait) { CameraGridPortrait(cameras, gap, ui); return }
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(gap)) {
     val large = cameras.first()
     val rest = cameras.drop(1)
@@ -86,6 +88,24 @@ private fun CameraGrid(grid: CcCamGrid, ui: CcUi) {
   }
 }
 
+/** The Mini upright: the live tile full width on top, the snapshots two to a row beneath it. */
+@Composable
+private fun CameraGridPortrait(cameras: List<CcCamRef>, gap: androidx.compose.ui.unit.Dp, ui: CcUi) {
+  Column(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(gap)) {
+    val rest = cameras.drop(1)
+    GridTile(cameras.first(), true, ui, Modifier.weight(if (rest.isEmpty()) 1f else PORTRAIT_LARGE_WEIGHT).fillMaxWidth())
+    rest.chunked(2).forEach { pair ->
+      Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(gap)) {
+        pair.forEach { key(it.id) { GridTile(it, false, ui, Modifier.weight(1f).fillMaxHeight()) } }
+        if (pair.size == 1) Spacer(Modifier.weight(1f))
+      }
+    }
+  }
+}
+
+/** Portrait: the live tile's share of the height against each snapshot row's 1. */
+private const val PORTRAIT_LARGE_WEIGHT = 1.6f
+
 @Composable
 private fun GridTile(cam: CcCamRef, live: Boolean, ui: CcUi, modifier: Modifier) {
   val open = remember(cam.id, ui) { { ui.camera(cam.id) } }
@@ -94,11 +114,26 @@ private fun GridTile(cam: CcCamRef, live: Boolean, ui: CcUi, modifier: Modifier)
 
 /** Four cameras or more fill the third row (the mock's 2+1 / 1 / 1+1 grid). */
 private const val BOTTOM_ROW_FROM = 3
+/** Portrait full view: the picture at 16:9, as cameras deliver it. */
+private const val PORTRAIT_FULL_ASPECT = 16f / 9f
 
 /** `.camFull`: the live picture, then a side column with shortcuts, recent activity and the others. */
 @Composable
 private fun CcCameraFull(f: CcCamFull, ui: CcUi) {
   val holder = remember(f.camera.id) { CcFrameHolder(f.camera.id) }
+  if (currentLayoutClass().compactPortrait) {
+    // The Mini upright: the live picture full width at the camera's shape, the side column below it.
+    Column(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+      CcCameraPicture(f.camera.id, f.camera.name, live = true, configured = true, modifier = Modifier.fillMaxWidth().aspectRatio(PORTRAIT_FULL_ASPECT),
+          onClick = null, size = CcCameraTileSize.FULL, holder = holder)
+      Column(Modifier.weight(1f).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        CcCameraSideHead(f.camera, f.near, f.canControl, f.reason, ui, holder)
+        CcCameraRecent(f.camera, f.near, Modifier.weight(1f).fillMaxWidth())
+        OtherCameras(f.others, ui)
+      }
+    }
+    return
+  }
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(22.dp)) {
     CcCameraPicture(f.camera.id, f.camera.name, live = true, configured = true, modifier = Modifier.weight(1f).fillMaxHeight(),
         onClick = null, size = CcCameraTileSize.FULL, holder = holder)

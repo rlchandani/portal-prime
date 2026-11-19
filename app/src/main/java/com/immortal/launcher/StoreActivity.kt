@@ -234,12 +234,14 @@ private fun StoreBrowse(
   val advanced = com.immortal.launcher.ui.theme.LocalAdvancedSettings.current
   val filtered = remember(apps, query) { apps.filter { "${it.name} ${it.category} ${it.description} ${it.author.orEmpty()}".contains(query.trim(), ignoreCase = true) } }
   val categories = remember(filtered) { filtered.groupBy { it.category } }
-  androidx.compose.foundation.lazy.grid.LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(20.dp), state = listState, modifier = Modifier.fillMaxSize().padding(horizontal = 56.dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp)) {
+  val layoutClass = currentLayoutClass()
+  val sidePadding = storeSidePaddingDp(layoutClass).dp
+  androidx.compose.foundation.lazy.grid.LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(storeGridColumns(layoutClass)), horizontalArrangement = Arrangement.spacedBy(20.dp), state = listState, modifier = Modifier.fillMaxSize().padding(horizontal = sidePadding), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp)) {
     item("hero", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
       val dark = LocalApprovedPalette.current.dark
       Column(Modifier.fillMaxWidth()) {
         Surface(color = if (dark) Color(0xFF26463E) else Color(0xFFDCECE4), shape = RoundedCornerShape(28.dp), border = BorderStroke(1.dp, if (dark) Color(0xFF44675D) else Color(0xFFC2DBD0)), modifier = Modifier.fillMaxWidth()) {
-          Row(Modifier.heightIn(min = 245.dp).padding(40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(40.dp)) {
+          if (layoutClass.compactPortrait) CompactStoreHero() else Row(Modifier.heightIn(min = 245.dp).padding(40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(40.dp)) {
             Column(Modifier.weight(1.35f)) {
               Text("More life for your Portal.", color = IosLabel, fontSize = 46.sp, lineHeight = 58.sp, fontWeight = FontWeight.Medium)
               Text("The actual Hearthpane catalog. Installed apps and optional downloads are distinct.", color = IosSecondary, fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 18.dp))
@@ -254,7 +256,7 @@ private fun StoreBrowse(
         if (InstallDaemon.installPaused(context)) { StorePausedBanner(); Spacer(Modifier.height(24.dp)) }
         ApprovedAppsSearch(query, onQuery, if (loaded) "Search all ${apps.size} apps" else "Search catalog")
         Spacer(Modifier.height(24.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        StoreActionsRow(layoutClass.compact) {
           ApprovedAppsButton("Updates", onClick = onUpdates)
           if (advanced) ApprovedAppsButton("Install an APK") { context.startActivity(Intent(context, ApkBrowserActivity::class.java)) }
         }
@@ -280,6 +282,40 @@ private fun StoreBrowse(
         }
       }
     }
+  }
+}
+
+/** Catalog grid columns: one in compact portrait (a card needs ~560 dp), else today's two. */
+internal fun storeGridColumns(layoutClass: LayoutClass): Int = if (layoutClass.compactPortrait) 1 else 2
+
+/** Side padding of the browse grid and detail list (dp); 56 on the Portal+. */
+internal fun storeSidePaddingDp(layoutClass: LayoutClass): Int = when (layoutClass) {
+  LayoutClass.COMPACT_PORTRAIT -> 24
+  LayoutClass.COMPACT_LANDSCAPE -> 32
+  LayoutClass.LARGE -> 56
+}
+
+/** Compact portrait hero: the copy above the two featured icons. */
+@Composable
+private fun CompactStoreHero() {
+  Column(Modifier.padding(32.dp)) {
+    Text("More life for your Portal.", color = IosLabel, fontSize = 40.sp, lineHeight = 50.sp, fontWeight = FontWeight.Medium)
+    Text("The actual Hearthpane catalog. Installed apps and optional downloads are distinct.", color = IosSecondary, fontSize = 22.sp, lineHeight = 32.sp, modifier = Modifier.padding(top = 14.dp))
+    Row(Modifier.padding(top = 24.dp), horizontalArrangement = Arrangement.spacedBy(30.dp)) {
+      ApprovedAppsIcon("org.videolan.vlc", "VLC", 96.dp)
+      ApprovedAppsIcon("io.homeassistant.companion.android.minimal", "Home Assistant", 96.dp)
+    }
+  }
+}
+
+/** Updates / Install an APK: a plain row on the Portal+, wrapping when compact. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun StoreActionsRow(compact: Boolean, alignment: Alignment.Vertical = Alignment.Top, content: @Composable () -> Unit) {
+  if (compact) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { content() }
+  } else {
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = alignment) { content() }
   }
 }
 
@@ -358,13 +394,14 @@ private fun StoreDetail(app: CatalogApp, status: String?, updates: Map<String, L
     onBack: () -> Unit, onInstall: () -> Unit) {
   val context = LocalContext.current
   val compatible = StoreCatalog.isCompatible(app)
-  LazyColumn(Modifier.fillMaxSize().padding(horizontal = 56.dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(26.dp)) {
+  val layoutClass = currentLayoutClass()
+  LazyColumn(Modifier.fillMaxSize().padding(horizontal = storeSidePaddingDp(layoutClass).dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(26.dp)) {
     item { ApprovedAppsButton("‹  App Store", onClick = onBack) }
     item { ApprovedAppsHeading(app.name, app.description) }
     item {
       Column(Modifier.fillMaxWidth()) {
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
-          StoreIcon(app, 140.dp)
+        StoreActionsRow(layoutClass.compact, Alignment.CenterVertically) {
+          StoreIcon(app, if (layoutClass.compact) 112.dp else 140.dp)
           StoreAction(app, status, updates, installed, onInstall)
           if (installed == true && compatible && !storeBusy(status)) ApprovedAppsButton("Reinstall", onClick = onInstall)
         }
@@ -406,6 +443,14 @@ private fun StoreInformationCard(title: String, content: @Composable ColumnScope
 
 @Composable
 private fun StoreDetailRow(label: String, value: String) {
+  if (currentLayoutClass().compactPortrait) {
+    // A long value (a package name) would squeeze the label to nothing: stack them instead.
+    Column(Modifier.fillMaxWidth().padding(vertical = 14.dp)) {
+      Text(label, color = IosLabel, fontSize = 26.sp)
+      Text(value, color = IosSecondary, fontSize = 24.sp, modifier = Modifier.padding(top = 4.dp))
+    }
+    return
+  }
   Row(Modifier.fillMaxWidth().padding(vertical = 21.dp), verticalAlignment = Alignment.CenterVertically) {
     Text(label, color = IosLabel, fontSize = 26.sp, modifier = Modifier.weight(1f))
     Text(value, color = IosSecondary, fontSize = 24.sp, modifier = Modifier.widthIn(max = 850.dp))
@@ -425,8 +470,10 @@ private fun StorePausedBanner() {
 @Composable
 private fun StoreDialog(title: String, onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
   Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-    Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = BorderStroke(1.dp, IosDivider), modifier = Modifier.width(760.dp).heightIn(max = 980.dp)) {
-      LazyColumn(contentPadding = PaddingValues(36.dp)) {
+    val compact = currentLayoutClass().compact
+    val frame = if (compact) compactDialogFrame(maxWidthDp = 760, maxHeightDp = 980) else Modifier.width(760.dp).heightIn(max = 980.dp)
+    Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = BorderStroke(1.dp, IosDivider), modifier = frame) {
+      LazyColumn(contentPadding = PaddingValues(if (compact) 28.dp else 36.dp)) {
         item {
           Column(Modifier.fillMaxWidth()) {
             Text(title, color = IosLabel, fontSize = 34.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(bottom = 24.dp))

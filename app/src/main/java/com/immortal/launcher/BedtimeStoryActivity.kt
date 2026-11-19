@@ -78,7 +78,9 @@ private fun BedtimeScreen() {
     Surface(
         color = Color(0xFF0E0E1A),
         shape = RoundedCornerShape(28.dp),
-        modifier = Modifier.width(cardWidth).heightIn(max = cardMaxHeight)
+        // Compact: two-thirds of 800 dp is too narrow for the reader, so fill the width less a margin.
+        modifier = (if (currentLayoutClass().compact) compactDialogFrame(maxWidthDp = 760, maxHeightDp = cardMaxHeight.value.toInt())
+            else Modifier.width(cardWidth).heightIn(max = cardMaxHeight))
             .tvFocusable(RoundedCornerShape(28.dp), focusScale = 1f) { /* consume card taps */ },
     ) {
       BedtimeContent(onExit = { activity?.finish() })

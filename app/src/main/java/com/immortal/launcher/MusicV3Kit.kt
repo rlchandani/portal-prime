@@ -40,6 +40,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,7 +81,8 @@ internal fun MusicV3Button(
       .padding(horizontal = 26.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)) {
     glyph?.let { MusicV3GlyphIcon(it, ink.copy(alpha = alpha), Modifier.size(26.dp)) }
-    Text(label, color = ink.copy(alpha = alpha), fontSize = 23.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+    Text(label, color = ink.copy(alpha = alpha), fontSize = 23.sp, fontWeight = FontWeight.Medium, maxLines = 1,
+        overflow = TextOverflow.Ellipsis)
   }
 }
 

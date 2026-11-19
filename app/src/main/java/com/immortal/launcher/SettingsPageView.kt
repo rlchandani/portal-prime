@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.immortal.launcher.ui.theme.LocalAdvancedSettings
 
 private val PageSidePadding = SettingsSplitMetrics.PAGE_SIDE_PADDING_DP.dp
+private val SinglePaneSidePadding = SettingsSplitMetrics.SINGLE_PANE_SIDE_PADDING_DP.dp
 private val PageBottomPadding = 80.dp
 
 /**
@@ -58,7 +59,9 @@ internal fun SettingsPageView(
     CompositionLocalProvider(LocalApprovedRequestedControl provides highlight, LocalSettingsComposition provides scheduler) {
         // Pane-work attribution is a no-op unless the benchmark build opts in.
         LazyColumn(Modifier.fillMaxSize().then(rememberSettingsPaneWorkModifier(page, active = true)), state = listState,
-            contentPadding = PaddingValues(start = PageSidePadding, end = PageSidePadding, bottom = PageBottomPadding)) {
+            contentPadding = if (LocalSettingsSinglePane.current)
+              PaddingValues(start = SinglePaneSidePadding, end = SinglePaneSidePadding, bottom = PageBottomPadding)
+            else PaddingValues(start = PageSidePadding, end = PageSidePadding, bottom = PageBottomPadding)) {
             itemsIndexed(layout.entries, key = { _, entry -> entry.key }, contentType = { _, entry -> entry.kind }) { index, entry ->
                 val draw = @Composable {
                     SettingsPageEntryContent(page, entry, states, highlight, index == highlightIndex, onOpenPage)

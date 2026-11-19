@@ -15,6 +15,8 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import com.immortal.launcher.ui.components.Glass
 import com.immortal.launcher.ui.components.GlassCard
@@ -143,8 +146,69 @@ private fun HaDashboardScreen() {
         } else {
             val currentDetails = detailsCache[roomId] ?: emptyList()
             val tiles = HaDashboardModel.tilesFor(currentDetails)
+            val onRoomSelected = { id: String ->
+                selectedRoomId = id
+                optimistic = emptyMap(); optimisticBri = emptyMap(); optimisticTemp = emptyMap()
+            }
+            val onScene = { entityId: String ->
+                scope.launch { withContext(Dispatchers.IO) { HaClient.activate(context, entityId) } }
+                Unit
+            }
+            val roomGrid: @Composable () -> Unit = {
+                RoomGrid(
+                    tiles = tiles,
+                    optimistic = optimistic,
+                    optimisticBri = optimisticBri,
+                    optimisticTemp = optimisticTemp,
+                    historyCache = historyCache,
+                    nowPlaying = nowPlaying,
+                    onToggle = { entityId, curOn ->
+                        optimistic = optimistic + (entityId to !curOn)
+                        scope.launch { withContext(Dispatchers.IO) { HaClient.toggle(context, entityId) } }
+                    },
+                    onBrightness = { entityId, pct ->
+                        optimisticBri = optimisticBri + (entityId to pct)
+                        optimistic = optimistic + (entityId to (pct > 0))
+                        scope.launch { withContext(Dispatchers.IO) { HaDashboardApi.setBrightness(context, entityId, pct) } }
+                    },
+                    onTempStep = { entityId, delta, curTarget ->
+                        val next = curTarget + delta
+                        optimisticTemp = optimisticTemp + (entityId to next)
+                        scope.launch { withContext(Dispatchers.IO) { HaDashboardApi.setTemperature(context, entityId, next) } }
+                    },
+                    onMediaAction = { action ->
+                        when (action) {
+                            MediaAction.PLAY_PAUSE -> NowPlayingHub.playPause()
+                            MediaAction.NEXT -> NowPlayingHub.next()
+                            MediaAction.PREVIOUS -> NowPlayingHub.previous()
+                        }
+                    }
+                )
+            }
 
-            Row(
+            if (currentLayoutClass().compactPortrait) {
+                // Compact portrait: the house rail becomes a strip above the full-width room canvas.
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(top = 32.dp, start = 24.dp, end = 24.dp, bottom = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    CompactHouseStrip(
+                        areas = areas,
+                        selectedId = roomId,
+                        allDetails = detailsCache,
+                        presence = PresenceHub.current,
+                        onRoomSelected = onRoomSelected,
+                        onScene = onScene,
+                    )
+                    Column(Modifier.weight(1f).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        RoomHeader(
+                            name = areas.find { it.id == roomId }?.name ?: "",
+                            details = currentDetails
+                        )
+                        roomGrid()
+                    }
+                }
+            } else Row(
                 modifier = Modifier.fillMaxSize().padding(top = 42.dp, start = 34.dp, end = 34.dp, bottom = 26.dp),
                 horizontalArrangement = Arrangement.spacedBy(26.dp)
             ) {
@@ -202,6 +266,73 @@ private fun HaDashboardScreen() {
                     )
                 }
             }
+        }
+    }
+}
+
+// ─── house strip (compact portrait) ───────────────────────────────────────────
+
+/** The [HouseRail]'s hero, rooms and scenes as a compact top strip: rooms scroll sideways. */
+@Composable
+private fun CompactHouseStrip(
+    areas: List<HaDashboardApi.Area>,
+    selectedId: String?,
+    allDetails: Map<String, List<HaDashboardApi.Detail>>,
+    presence: PresenceState?,
+    onRoomSelected: (String) -> Unit,
+    onScene: (String) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        GlassCard(Modifier.fillMaxWidth().wrapContentHeight()) {
+            Row(Modifier.padding(horizontal = 22.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text("GOOD EVENING", color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.4.sp)
+                    Text("Home", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Light, letterSpacing = (-0.5).sp)
+                    val totalLit = allDetails.values.flatten().let { HaDashboardModel.litCount(it) }
+                    Text("$totalLit lights on", color = Color.White.copy(alpha = 0.72f), fontSize = 13.sp)
+                }
+                if (presence?.presence == Presence.PRESENT) PresenceChip()
+            }
+        }
+        LazyRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(areas, key = { it.id }) { area ->
+                RoomChip(area.name, HaDashboardModel.litCount(allDetails[area.id] ?: emptyList()),
+                    selected = area.id == selectedId) { onRoomSelected(area.id) }
+            }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+            COMPACT_SCENES.forEach { (id, label) ->
+                SceneChip(label = label, modifier = Modifier.weight(1f)) { onScene(id) }
+            }
+        }
+    }
+}
+
+/** The same four scenes the rail shows. */
+private val COMPACT_SCENES = listOf(
+    "scene.evening" to "Evening",
+    "scene.night" to "Night",
+    "scene.movie" to "Movie",
+    "scene.leave" to "Leave",
+)
+
+@Composable
+private fun RoomChip(name: String, litCount: Int, selected: Boolean, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.heightIn(min = 56.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(if (selected) Color.White.copy(alpha = 0.16f) else Color.White.copy(alpha = 0.06f))
+            .clickable { onClick() }
+            .padding(horizontal = 18.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(name, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1,
+            overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 260.dp))
+        if (litCount > 0) {
+            Text("$litCount", color = Color.White.copy(alpha = 0.45f), fontSize = 12.sp)
+            Box(Modifier.size(7.dp).clip(CircleShape).background(AmberOn))
         }
     }
 }

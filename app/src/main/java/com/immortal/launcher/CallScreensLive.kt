@@ -35,6 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import org.webrtc.RendererCommon
 import kotlinx.coroutines.delay
 
 /** In a call (connecting, live, reconnecting): remote video, live bar, self view, controls. */
@@ -44,6 +48,13 @@ internal fun CallLiveScreen(call: ActiveCall, media: CallMedia?, motion: Boolean
   var busyDismissed by remember(call.id) { mutableStateOf(false) }
   val dropIn = call.kind == CallKind.DROP_IN
   CallToggleToasts(call, toast)
+  val layout = currentLayoutClass()
+  if (layout.compact) {
+    // The Mini, either way up (rotation stays in this branch, so the remote surface is kept).
+    CallLiveCompact(call, media, motion, layout, volumeOpen, onVolume = { volumeOpen = !volumeOpen },
+        busy = call.cameraIssue == CameraIssue.BUSY && !busyDismissed, onBusyDone = { busyDismissed = true }, toast = toast)
+    return
+  }
   Box(Modifier.fillMaxSize()) {
     RemoteStage(call, media, motion)
     if (dropIn) DropInBar(call, Modifier.align(Alignment.TopCenter))
@@ -64,21 +75,159 @@ internal fun CallLiveScreen(call: ActiveCall, media: CallMedia?, motion: Boolean
   }
 }
 
+/**
+ * Compact call screen. Upright (800 wide): live bar and title stacked top-left beside a 9:16 self
+ * view, smaller controls (≈624 dp), the drop-in bar on two rows, and the remote picture
+ * balanced-cropped (a landscape room keeps ≥ 56 % of its width). Turned (1280×740): the Portal+
+ * arrangement with tighter insets, a 300×200 self view and the same smaller controls, so
+ * nothing overlaps vertically.
+ */
 @Composable
-private fun RemoteStage(call: ActiveCall, media: CallMedia?, motion: Boolean) {
+private fun CallLiveCompact(call: ActiveCall, media: CallMedia?, motion: Boolean, layout: LayoutClass, volumeOpen: Boolean,
+                            onVolume: () -> Unit, busy: Boolean, onBusyDone: () -> Unit, toast: CallToastState) {
+  val dropIn = call.kind == CallKind.DROP_IN
+  val portrait = layout.compactPortrait
+  val edge = CallsCompactLayout.edge(layout).dp
+  val self = CallsCompactLayout.selfView(layout)
+  val ctl = CallsCompactLayout.controls(layout)
+  Box(Modifier.fillMaxSize()) {
+    RemoteStage(call, media, motion, avatar = CallsCompactLayout.remoteAvatar(layout).dp,
+        scaling = if (portrait) RendererCommon.ScalingType.SCALE_ASPECT_BALANCED else RendererCommon.ScalingType.SCALE_ASPECT_FILL)
+    val liveBar = CallingCopy.liveBar(call.cameraOn, call.micOn)
+    val liveDot = CallingCopy.liveDotActive(call.cameraOn, call.micOn)
+    when {
+      dropIn -> CompactDropInBar(call, portrait, Modifier.align(Alignment.TopCenter))
+      portrait -> Column(Modifier.align(Alignment.TopStart).padding(start = edge, top = edge, end = edge + self.widthDp.dp + SELF_GAP),
+          verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        CallLiveBar(liveBar, liveDot, motion)
+        CallTitle(call, Modifier)
+      }
+      else -> {
+        CallLiveBar(liveBar, liveDot, motion, Modifier.align(Alignment.TopStart).padding(edge))
+        CallTitle(call, Modifier.align(Alignment.TopCenter).padding(top = edge))
+      }
+    }
+    val selfTop = if (dropIn) (if (portrait) DROP_BAR_TALL else DROP_BAR) + edge else edge
+    CallSelfFrame(media, call.cameraOn, CallingCopy.SELF_LABEL, Modifier.align(Alignment.TopEnd).padding(top = selfTop, end = edge),
+        width = self.widthDp.dp, height = self.heightDp.dp)
+    ConnectionChip(call, Modifier.align(Alignment.Center), top = CallsCompactLayout.connectionChipOffset(layout).dp)
+    if (volumeOpen) CallVolumePopover(Modifier.align(Alignment.BottomCenter)
+        .padding(start = edge, end = edge, bottom = (ctl.bottom + ctl.height).dp + POPOVER_GAP))
+    CompactCallControls(call, ctl, volumeOpen, onVolume, onFraming = { toast.show("Portal frames you automatically", "follow") },
+        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = ctl.bottom.dp))
+    if (busy) CameraBusySheet(onAudio = onBusyDone, onRetry = { onBusyDone(); Calling.toggleCamera() },
+        modifier = Modifier.align(Alignment.Center).padding(horizontal = edge), layout = layout)
+  }
+}
+
+/** Compact `.ctl`: the same five controls at [CallsCompactLayout.controls] size. */
+@Composable
+private fun CompactCallControls(call: ActiveCall, ctl: CallsCompactLayout.Controls, volumeOpen: Boolean, onVolume: () -> Unit,
+                                onFraming: () -> Unit, modifier: Modifier) {
+  Row(modifier.background(CallColors.Controls, RoundedCornerShape(52.dp)).padding(start = ctl.padding.dp, end = ctl.padding.dp, top = 20.dp, bottom = 16.dp),
+      verticalAlignment = Alignment.Top) {
+    CompactControl(ctl, if (call.micOn) "mic" else "micOff", if (call.micOn) "Mute" else "Unmute", ControlLook.of(off = !call.micOn)) { Calling.toggleMic() }
+    CompactControl(ctl, if (call.cameraOn) "video" else "videoOff", if (call.cameraOn) "Camera off" else "Camera on",
+        ControlLook.of(off = !call.cameraOn)) { Calling.toggleCamera() }
+    CompactControl(ctl, "follow", "Auto frame", if (call.cameraOn) ControlLook.ON else ControlLook.DISABLED, onFraming)
+    CompactControl(ctl, "vol", "Volume", if (volumeOpen) ControlLook.ON else ControlLook.PLAIN, onVolume)
+    Column(Modifier.width(ctl.endColumn.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+      Box(Modifier.width(ctl.endWidth.dp).height(ctl.endHeight.dp).background(CallColors.Bad, RoundedCornerShape(50))
+          .callClick("End call", true, Calling::hangUp), contentAlignment = Alignment.Center) { CallIcon("end", Color.White, ctl.endIcon.dp) }
+      Text("End", color = Color.White, fontSize = ctl.label.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
+    }
+  }
+}
+
+@Composable
+private fun CompactControl(ctl: CallsCompactLayout.Controls, icon: String, label: String, look: ControlLook, onClick: () -> Unit) {
+  val fill = when (look) { ControlLook.OFF -> Color.White; ControlLook.ON -> CallColors.EmberOn; else -> CallColors.ControlFill }
+  val tint = when (look) { ControlLook.OFF -> CallColors.OffIcon; ControlLook.ON -> CallColors.EmberOnIcon; else -> Color.White }
+  Column(Modifier.width(ctl.column.dp).alpha(if (look == ControlLook.DISABLED) 0.38f else 1f), horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Box(Modifier.size(ctl.circle.dp).background(fill, CircleShape).callClick(label, look != ControlLook.DISABLED, onClick),
+        contentAlignment = Alignment.Center) { CallIcon(icon, tint, ctl.icon.dp) }
+    Text(label, color = Color.White, fontSize = ctl.label.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 1,
+        overflow = TextOverflow.Ellipsis)
+  }
+}
+
+/** Compact drop-in bar. Upright: the state line and E2E on top, the timer, Keep going and End below. */
+@Composable
+private fun CompactDropInBar(call: ActiveCall, portrait: Boolean, modifier: Modifier) {
+  val line = CallingCopy.dropInBar(call.peer.name, call.direction == CallDirection.INCOMING, call.cameraOn, call.micOn)
+  val brush = Brush.verticalGradient(listOf(CallColors.DropTop, CallColors.DropBottom))
+  if (!portrait) {
+    Row(modifier.fillMaxWidth().height(DROP_BAR).background(brush).padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+      Box(Modifier.size(18.dp).background(Color.White, CircleShape))
+      Text(line, color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+          modifier = Modifier.weight(1f, fill = false))
+      DropInE2E()
+      Box(Modifier.weight(1f)) { DropInTimer(call) }
+      DropInActions()
+    }
+    return
+  }
+  Column(modifier.fillMaxWidth().height(DROP_BAR_TALL).background(brush).padding(horizontal = 24.dp, vertical = 14.dp),
+      verticalArrangement = Arrangement.SpaceBetween) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      Box(Modifier.size(18.dp).background(Color.White, CircleShape))
+      Text(line, color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+          modifier = Modifier.weight(1f))
+      DropInE2E()
+    }
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      Box(Modifier.weight(1f)) { DropInTimer(call) }
+      DropInActions()
+    }
+  }
+}
+
+@Composable
+private fun DropInE2E() {
+  Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    CallIcon("lock", Color.White, 24.dp)
+    Text(CallingCopy.E2E, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
+  }
+}
+
+@Composable
+private fun DropInTimer(call: ActiveCall) {
+  val cap = call.capAtMs
+  val start = call.connectedMs
+  if (cap != null && start != null) Box(Modifier.alpha(0.75f)) {
+    CallTimer(call) { elapsed -> "$elapsed of ${CallingCopy.clock(cap - start)}" }
+  }
+}
+
+@Composable
+private fun DropInActions() {
+  Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+    CallPill("Keep going", Calling::keepGoing, style = CallButtonStyle.GLASS, size = CallButtonSize.SM)
+    Box(Modifier.height(72.dp).background(Color.White, RoundedCornerShape(50)).callClick("End", true, Calling::hangUp)
+        .padding(horizontal = 34.dp), contentAlignment = Alignment.Center) {
+      Text("End", color = CallColors.DropBottom, fontSize = 24.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+    }
+  }
+}
+
+@Composable
+private fun RemoteStage(call: ActiveCall, media: CallMedia?, motion: Boolean, avatar: Dp = 260.dp,
+                        scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL) {
   // The remote SurfaceView stays composed for the whole call (no surface churn); the camera-off
   // card simply covers it.
   var hasFrames by remember(media) { mutableStateOf(false) }
   LaunchedEffect(media) {
     while (media != null && !hasFrames) { hasFrames = media.remote.frames > 0; delay(FRAME_POLL_MS) }
   }
-  if (media != null) CallRemoteVideo(media, Modifier.fillMaxSize())
+  if (media != null) CallRemoteVideo(media, Modifier.fillMaxSize(), scaling)
   if (!hasFrames || !call.remoteCameraOn) {
     Box(Modifier.fillMaxSize()) {
       CallRingBackground(call.peer.name, motion && call.phase != CallPhase.LIVE)
       Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally,
           verticalArrangement = Arrangement.spacedBy(26.dp)) {
-        CallRoomAvatar(call.peer.name, 260.dp)
+        CallRoomAvatar(call.peer.name, avatar)
         if (call.phase == CallPhase.LIVE && !call.remoteCameraOn) {
           CallGlassChip("${call.peer.name}’s camera is off", "videoOff")
         }
@@ -131,10 +280,10 @@ private fun DropInBar(call: ActiveCall, modifier: Modifier) {
 }
 
 @Composable
-private fun ConnectionChip(call: ActiveCall, modifier: Modifier) {
+private fun ConnectionChip(call: ActiveCall, modifier: Modifier, top: Dp = 360.dp) {
   when (call.phase) {
-    CallPhase.CONNECTING -> Box(modifier.padding(top = 360.dp)) { CallGlassChip("Connecting securely…", "lock") }
-    CallPhase.RECONNECTING -> Box(modifier.padding(top = 360.dp)) {
+    CallPhase.CONNECTING -> Box(modifier.padding(top = top)) { CallGlassChip("Connecting securely…", "lock") }
+    CallPhase.RECONNECTING -> Box(modifier.padding(top = top)) {
       CallChip("Reconnecting… the Wi-Fi dropped for a moment", "wifiOff", CallChipTone.WARN)
     }
     else -> Unit
@@ -198,8 +347,10 @@ private fun CallControl(icon: String, label: String, look: ControlLook, onClick:
 
 /** "The camera is busy": honest, with audio carrying on. */
 @Composable
-private fun CameraBusySheet(onAudio: () -> Unit, onRetry: () -> Unit, modifier: Modifier) {
-  Column(modifier.width(980.dp).callPanel(CallColors.Popover, RoundedCornerShape(40.dp), CallColors.GlassEdge).padding(48.dp),
+private fun CameraBusySheet(onAudio: () -> Unit, onRetry: () -> Unit, modifier: Modifier, layout: LayoutClass = LayoutClass.LARGE) {
+  // Compact: as wide as the window allows (at most the designed 980); upright the two choices stack.
+  val width = if (layout.compact) Modifier.widthIn(max = 980.dp).fillMaxWidth() else Modifier.width(980.dp)
+  Column(modifier.then(width).callPanel(CallColors.Popover, RoundedCornerShape(40.dp), CallColors.GlassEdge).padding(48.dp),
       horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(22.dp)) {
     Box(Modifier.size(110.dp).background(CallColors.WarnTint, CircleShape), contentAlignment = Alignment.Center) {
       CallIcon("camera", CallColors.WarnIcon, 54.dp)
@@ -207,7 +358,10 @@ private fun CameraBusySheet(onAudio: () -> Unit, onRetry: () -> Unit, modifier: 
     Text("The camera is busy", color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Bold)
     Text("Portal’s built-in camera service is holding the camera right now. You can keep talking with audio, " +
         "and turn the camera on when it frees up.", color = Color.White.copy(alpha = 0.75f), fontSize = 26.sp, textAlign = TextAlign.Center)
-    Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+    if (layout.compactPortrait) Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+      CallPill("Carry on with audio", onAudio, Modifier.fillMaxWidth(), icon = "phone", style = CallButtonStyle.PRIMARY)
+      CallPill("Try the camera again", onRetry, Modifier.fillMaxWidth(), icon = "redo")
+    } else Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
       CallPill("Carry on with audio", onAudio, icon = "phone", style = CallButtonStyle.PRIMARY)
       CallPill("Try the camera again", onRetry, icon = "redo")
     }
@@ -215,4 +369,9 @@ private fun CameraBusySheet(onAudio: () -> Unit, onRetry: () -> Unit, modifier: 
 }
 
 private const val FRAME_POLL_MS = 150L
+/** Compact drop-in bar heights: one row (turned), two rows (upright). */
+private val DROP_BAR = 110.dp
+private val DROP_BAR_TALL = 172.dp
+private val SELF_GAP = 16.dp
+private val POPOVER_GAP = 24.dp
 private const val TIMER_STEP_MS = 1_000L

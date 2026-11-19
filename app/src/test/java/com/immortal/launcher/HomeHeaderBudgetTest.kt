@@ -44,9 +44,56 @@ class HomeHeaderBudgetTest {
   }
 
   @Test fun theChipIsTheLastThingToGo() {
-    val plan = HomeHeaderBudget.plan(900, typical)
+    // The narrowest width the regular tier serves (below it the compact tier takes over).
+    val plan = HomeHeaderBudget.plan(HomeHeaderBudget.COMPACT_BELOW, typical)
+    assertFalse(plan.compact)
     assertFalse(plan.musicChip)
     assertFalse(plan.wordmark || plan.room || plan.connectedLabel || plan.miniPlayer)
+  }
+
+  @Test fun theMiniUprightGetsTheCompactTier() {
+    for (items in listOf(busiest, typical, busiest.copy(homeControl = true), typical.copy(homeControl = true))) {
+      val plan = HomeHeaderBudget.plan(800, items)
+      assertTrue("$items -> $plan", plan.compact)
+      assertTrue("$items -> $plan", HomeHeaderBudget.width(plan, items) <= 800)
+      assertFalse(plan.wordmark || plan.room || plan.connectedLabel || plan.miniPlayer)
+    }
+  }
+
+  @Test fun theCompactTierKeepsTheMusicChipAndDropsWifiFirst() {
+    val withHc = typical.copy(homeControl = true)
+    val plan = HomeHeaderBudget.plan(800, withHc)
+    assertTrue("the chip survives at 800 even with Home Control", plan.musicChip)
+    assertFalse(plan.wifi)
+    val noHc = HomeHeaderBudget.plan(800, typical)
+    assertTrue(noHc.musicChip)
+    assertTrue("room for the Wi-Fi glyph without Home Control", noHc.wifi)
+  }
+
+  @Test fun theCompactWidthCountsFiftySixDpButtonsAndTheOverflow() {
+    val bare = HomeHeaderItems(musicChip = false, miniPlayer = false, mic = false, customize = false)
+    val none = HomeHeaderPlan(wordmark = false, room = false, connectedLabel = false, miniPlayer = false,
+        musicChip = false, compact = true, wifi = false)
+    // Screensaver, overflow (phone/sleep/theme), music, search, settings.
+    assertEquals(2 * 24 + 5 * 56 + 4 * 12, HomeHeaderBudget.width(none, bare))
+    // The pencil (Customize), voice and Home Control each add one 56 dp button.
+    val all = bare.copy(mic = true, customize = true, homeControl = true)
+    assertEquals(2 * 24 + 8 * 56 + 7 * 12, HomeHeaderBudget.width(none, all))
+    assertEquals(56, HomeHeaderBudget.COMPACT_BUTTON)
+  }
+
+  @Test fun theMiniTurnedKeepsTheRegularTier() {
+    // 1280×740 is COMPACT_LANDSCAPE for the grid, but its header width is the existing 1280 case.
+    assertEquals(LayoutClass.COMPACT_LANDSCAPE, LayoutClass.of(1280, 740))
+    for (items in listOf(busiest, typical.copy(homeControl = true))) {
+      val plan = HomeHeaderBudget.plan(1280, items)
+      assertFalse(plan.compact)
+      assertTrue(HomeHeaderBudget.width(plan, items) <= 1280)
+    }
+  }
+
+  @Test fun everyCheckedWidthIncludesTheMini() {
+    assertEquals(listOf(1920, 1280, 800), HomeHeaderBudget.CHECKED_WIDTHS)
   }
 
   @Test fun anEmptyHeaderWidthCountsEdgesGapsAndButtons() {

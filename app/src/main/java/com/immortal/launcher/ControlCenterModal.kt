@@ -77,7 +77,11 @@ private fun ModalFrame(ui: CcUi, open: Boolean, pop: CcPresence, fade: CcPresenc
     Box(Modifier.fillMaxSize().graphicsLayer { alpha = fade.progress.value; compositingStrategy = CompositingStrategy.ModulateAlpha }.background(c.scrim)
         .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null) { ui.modal(null) }
             .semantics { contentDescription = "Dismiss" } else Modifier))
-    Column(Modifier.align(Alignment.Center).width(CcStyle.ModalWidth)
+    // Compact: never wider than the window (kept off its edges); the designed width when it fits.
+    val width = if (currentLayoutClass().compact)
+      Modifier.padding(horizontal = 24.dp, vertical = 24.dp).widthIn(max = CcStyle.ModalWidth).fillMaxWidth()
+    else Modifier.width(CcStyle.ModalWidth)
+    Column(Modifier.align(Alignment.Center).then(width)
         .graphicsLayer {
           val shown = pop.progress.value
           val k = MODAL_START_SCALE + (1f - MODAL_START_SCALE) * shown

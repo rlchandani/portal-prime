@@ -32,14 +32,19 @@ internal fun ApprovedThemeButton() {
     Box(Modifier.size(68.dp).clip(CircleShape).background(palette.surface2).approvedOutline(CircleShape)
         .semantics { contentDescription = label }
         .tvFocusable(CircleShape, focusScale = 1f, ringColor = palette.accent) {
-            val value = if (palette.dark) "light" else "dark"
-            val applied = runCatching {
-                SettingsDomains.immortal.apply(context, JSONObject().put("settingsTheme", value))
-            }.getOrDefault(emptySet())
-            if ("settingsTheme" !in applied) {
-                Toast.makeText(context, "Appearance could not be changed.", Toast.LENGTH_SHORT).show()
-            }
+            toggleApprovedTheme(context, palette.dark)
         }, contentAlignment = Alignment.Center) {
         ApprovedIcon(if (palette.dark) "theme_day" else "theme_night", tint = palette.text)
+    }
+}
+
+/** Flips the saved appearance through the registry (the header button and the compact "⋯" menu). */
+internal fun toggleApprovedTheme(context: android.content.Context, dark: Boolean) {
+    val value = if (dark) "light" else "dark"
+    val applied = runCatching {
+        SettingsDomains.immortal.apply(context, JSONObject().put("settingsTheme", value))
+    }.getOrDefault(emptySet())
+    if ("settingsTheme" !in applied) {
+        Toast.makeText(context, "Appearance could not be changed.", Toast.LENGTH_SHORT).show()
     }
 }

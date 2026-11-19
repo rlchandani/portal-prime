@@ -7,6 +7,9 @@
 package com.immortal.launcher
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -67,6 +70,18 @@ private fun TeslaBody(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcCarView, c
   val actions = remember(s.entitiesVersion, ids, car) { CcTeslaActions.list(ids, s.entities, car) }
   val canAct = s.connection.canControl && car.life != CcCarLife.OFFLINE && !kids
   val dim = if (car.life == CcCarLife.STALE) CC_DIMMED_ALPHA else 1f
+  if (currentLayoutClass().compactPortrait) {
+    // The Mini upright: one scrolling column — the hero, its controls, the charger, the car's status.
+    // Hero and charger draw by weight inside, so they get fixed heights here.
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(22.dp)) {
+      CcTeslaHero(s, ui, ids, car, charger, canAct, Modifier.fillMaxWidth().height(PORTRAIT_HERO.dp).alpha(dim))
+      CcTeslaControls(actions, canAct, kids, s.entities, ui, Modifier.fillMaxWidth())
+      CcChargerCard(charger, s.chargeWeek, ids.charger.isNotEmpty(), Modifier.fillMaxWidth().height(PORTRAIT_CHARGER.dp).alpha(dim))
+      CcCarStatusCard(car, Modifier.fillMaxWidth().alpha(dim))
+    }
+    return
+  }
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(22.dp)) {
     Column(Modifier.weight(LEFT_WEIGHT).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(22.dp)) {
       CcTeslaHero(s, ui, ids, car, charger, canAct, Modifier.weight(1f).fillMaxWidth().alpha(dim))
@@ -78,3 +93,7 @@ private fun TeslaBody(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcCarView, c
     }
   }
 }
+
+/** Portrait heights (scaled dp) for the cards that size their art / chart by weight. */
+private const val PORTRAIT_HERO = 780
+private const val PORTRAIT_CHARGER = 520

@@ -238,8 +238,9 @@ internal fun SpeedTestOverlay(onDismiss: () -> Unit) {
   BackHandler { onDismiss() }
   if (LocalApprovedToolPage.current) ApprovedToolsSpeedScreen(onDismiss)
   else Scrim(onDismiss) {
+    val frame = if (currentLayoutClass().compact) compactDialogFrame(maxWidthDp = 1120, maxHeightDp = 1040) else Modifier.widthIn(max = 1120.dp).heightIn(max = 1040.dp)
     Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider),
-        modifier = Modifier.widthIn(max = 1120.dp).heightIn(max = 1040.dp)) {
+        modifier = frame) {
       ApprovedToolsSpeedScreen(onDismiss)
     }
   }
@@ -591,15 +592,17 @@ internal fun ToolCard(maxWidth: Int = 860, onClose: (() -> Unit)? = null, conten
   }
   val page = LocalApprovedToolPage.current
   val cfg = androidx.compose.ui.platform.LocalConfiguration.current
+  val compact = currentLayoutClass().compact
   if (page) {
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 56.dp, vertical = 36.dp),
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = if (compact) 24.dp else 56.dp, vertical = 36.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)) {
       if (onClose != null) ApprovedAppsButton("‹  Tools", onClick = onClose)
       content()
     }
   } else {
     Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider),
-        modifier = Modifier.width((cfg.screenWidthDp * .72f).dp.coerceAtMost(maxWidth.dp)).heightIn(max = (cfg.screenHeightDp * .82f).dp)) {
+        modifier = if (compact) compactDialogFrame(maxWidthDp = maxWidth, maxHeightDp = cfg.screenHeightDp)
+            else Modifier.width((cfg.screenWidthDp * .72f).dp.coerceAtMost(maxWidth.dp)).heightIn(max = (cfg.screenHeightDp * .82f).dp)) {
       Column(Modifier.verticalScroll(rememberScrollState()).padding(36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         if (onClose != null) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { CloseCircle(onClose) }
         content()
@@ -638,11 +641,37 @@ private fun ToolDialog(title: String, onDismiss: () -> Unit, content: @Composabl
   if (!LocalApprovedLauncherPageActive.current) return
   androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
     KeepInteractiveScreenAwake()
-    Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider), modifier = Modifier.width(760.dp).heightIn(max = 980.dp)) {
-      Column(Modifier.verticalScroll(rememberScrollState()).padding(36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+    val compact = currentLayoutClass().compact
+    val frame = if (compact) compactDialogFrame(maxWidthDp = 760, maxHeightDp = 980) else Modifier.width(760.dp).heightIn(max = 980.dp)
+    Surface(color = IosCard, shape = RoundedCornerShape(28.dp), border = androidx.compose.foundation.BorderStroke(1.dp, IosDivider), modifier = frame) {
+      Column(Modifier.verticalScroll(rememberScrollState()).padding(if (compact) 28.dp else 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         Text(title, color = IosLabel, fontSize = 34.sp, lineHeight = 46.sp, fontWeight = FontWeight.Medium)
         content()
       }
     }
   }
+}
+
+/**
+ * Compact window frame for a centred dialog card: full width less a 24 dp margin, no wider than
+ * [maxWidthDp], and no taller than the window less [CompactDialogLayout.VERTICAL_MARGIN_DP] (the
+ * Mini turned is only 740 dp tall).
+ */
+@Composable
+internal fun compactDialogFrame(maxWidthDp: Int, maxHeightDp: Int): Modifier {
+  val screenHeight = androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp
+  return Modifier.padding(horizontal = CompactDialogLayout.SIDE_MARGIN_DP.dp).fillMaxWidth().widthIn(max = maxWidthDp.dp)
+      .heightIn(max = CompactDialogLayout.maxHeightDp(screenHeight, maxHeightDp).dp)
+}
+
+/** Pure sizing for compact dialog cards (unit tested); the Portal+ keeps each dialog's fixed size. */
+internal object CompactDialogLayout {
+  const val SIDE_MARGIN_DP = 24
+  /** Kept free above and below a dialog card (40 dp each side). */
+  const val VERTICAL_MARGIN_DP = 80
+  /** Never shorter than this, even in a tiny split-screen window. */
+  const val MIN_HEIGHT_DP = 240
+
+  fun maxHeightDp(screenHeightDp: Int, capDp: Int): Int =
+      minOf(capDp, screenHeightDp - VERTICAL_MARGIN_DP).coerceAtLeast(MIN_HEIGHT_DP)
 }

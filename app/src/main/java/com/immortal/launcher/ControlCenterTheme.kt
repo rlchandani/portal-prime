@@ -103,8 +103,9 @@ internal object CcStyle {
 @Composable
 internal fun CcTheme(dark: Boolean, content: @Composable () -> Unit) {
   val density = LocalDensity.current
-  val widthDp = LocalConfiguration.current.screenWidthDp
-  val scaled = if (widthDp in 1 until CcStyle.COMPACT_BREAK_DP)
-    Density(density.density * CcStyle.COMPACT_SCALE, density.fontScale) else density
+  val config = LocalConfiguration.current
+  // LARGE keeps the width-only rule; compact (the Mini) also reads the height (see CcCompactScale).
+  val scale = CcCompactScale.of(currentLayoutClass(), config.screenWidthDp)
+  val scaled = if (scale != 1f) Density(density.density * scale, density.fontScale) else density
   CompositionLocalProvider(LocalCc provides if (dark) CcDark else CcLight, LocalDensity provides scaled, content = content)
 }
