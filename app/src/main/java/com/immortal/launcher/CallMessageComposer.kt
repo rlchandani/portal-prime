@@ -19,7 +19,8 @@ import java.util.concurrent.Executors
  * Runs one "Leave a message" screen: feeds taps, recorder callbacks and a 250 ms tick into the
  * pure [CallMessageCompose] reducer and performs its effects. Main thread, except the upload.
  */
-internal class CallMessageComposer(context: Context, val peer: CallPeer, testFrames: Boolean, private val onFinish: () -> Unit) {
+internal class CallMessageComposer(context: Context, val peer: CallPeer, testFrames: Boolean, private val onFinish: () -> Unit,
+                                   private val callId: String? = null) {
   private val app = context.applicationContext
   private val main = Handler(Looper.getMainLooper())
   private val net = Executors.newSingleThreadExecutor { r -> Thread(r, "hearthpane-vmsg-send").apply { isDaemon = true } }
@@ -77,7 +78,7 @@ internal class CallMessageComposer(context: Context, val peer: CallPeer, testFra
     val duration = state.durationMs
     val audioOnly = !state.cameraOn
     net.execute {
-      val failure = CallMessageSender.send(app, take, peer, duration, audioOnly)
+      val failure = CallMessageSender.send(app, take, peer, duration, audioOnly, callId)
       main.post { dispatch(if (failure == null) ComposeEvent.SendOk else ComposeEvent.SendFailed(failure)) }
     }
   }

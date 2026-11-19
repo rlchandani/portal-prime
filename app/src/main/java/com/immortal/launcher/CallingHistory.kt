@@ -31,7 +31,7 @@ internal data class CallHistoryEntry(
   }
 }
 
-internal enum class CallHistoryFilter(val label: String) { ALL("All"), MISSED("Missed"), DROP_INS("Drop-ins") }
+internal enum class CallHistoryFilter(val label: String) { ALL("All"), MISSED("Missed"), DROP_INS("Drop-ins"), MESSAGES("Messages") }
 
 /** Pure history operations plus a strict codec (stored data is still validated). */
 internal object CallHistory {
@@ -62,6 +62,8 @@ internal object CallHistory {
     CallHistoryFilter.ALL -> list
     CallHistoryFilter.MISSED -> list.filter { it.missed }
     CallHistoryFilter.DROP_INS -> list.filter { it.kind == CallKind.DROP_IN }
+    // Messages live in their own store; Recent joins them in (CallRecent).
+    CallHistoryFilter.MESSAGES -> emptyList()
   }
 
   fun encode(list: List<CallHistoryEntry>): String = JSONArray(list.map { e ->
