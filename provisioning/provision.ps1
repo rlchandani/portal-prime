@@ -290,6 +290,10 @@ function Grant-CompanionPerms {
   foreach ($p in ("$($cfg["COMPANION_OVERLAY_PKGS"])" -split "\s+")) {
     if ($p -and "$(A shell pm path $p)".Trim()) { A shell appops set $p SYSTEM_ALERT_WINDOW allow | Out-Null; $any = $true }
   }
+  # Jarvis's one screenshot on an explicit ask: no system capture dialog (its own indicator shows).
+  foreach ($p in ("$($cfg["COMPANION_PROJECTION_PKGS"])" -split "\s+")) {
+    if ($p -and "$(A shell pm path $p)".Trim()) { A shell appops set $p PROJECT_MEDIA allow | Out-Null; $any = $true }
+  }
   if ($any) { Ok "Companion app microphone/overlay access granted" }
 }
 

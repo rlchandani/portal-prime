@@ -43,6 +43,21 @@ class HearthpaneToolsTest {
     assertEquals(listOf("settings:immortal.settingsTheme" to "Tap here"), pointed)
   }
 
+  @Test fun highlightPointsAtMusicAndCallsControls() {
+    front = screen(HearthpaneScreens.MUSIC)
+    assertEquals(true, tools.invoke(HearthpaneTools.HIGHLIGHT, """{"target":"music.controls"}""").getBoolean("ok"))
+    assertTrue(tools.invoke(HearthpaneTools.HIGHLIGHT, """{"target":"calls.video.p1"}""").has("error"))
+    front = screen(HearthpaneScreens.CALLS)
+    assertEquals(true, tools.invoke(HearthpaneTools.HIGHLIGHT, """{"target":"calls.video.p1"}""").getBoolean("ok"))
+    assertTrue(tools.invoke(HearthpaneTools.HIGHLIGHT, """{"target":"music.queue"}""").has("error"))
+    assertEquals(listOf("music.controls", "calls.video.p1"), pointed.map { it.first })
+  }
+
+  @Test fun anUnknownMusicTargetIsRefused() {
+    front = screen(HearthpaneScreens.MUSIC)
+    assertTrue(tools.invoke(HearthpaneTools.HIGHLIGHT, """{"target":"music.volume"}""").has("error"))
+  }
+
   @Test fun highlightRefusesAControlOfAnotherScreen() {
     front = screen(HearthpaneScreens.SETTINGS)
     assertTrue(tools.invoke(HearthpaneTools.HIGHLIGHT, """{"target":"cc.room.kitchen"}""").has("error"))

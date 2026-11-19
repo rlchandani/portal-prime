@@ -40,6 +40,14 @@ internal object ScreenContext {
   const val ROOM_TARGET = "cc.room."
   const val ENTITY_TARGET = "cc.entity."
   const val SETTINGS_TARGET = "settings:"
+  /** Music's transport row (shuffle, previous, play/pause, next, repeat). */
+  const val MUSIC_CONTROLS = "music.controls"
+  /** Music's bottom strip, pulled up for Up next (the queue). */
+  const val MUSIC_QUEUE = "music.queue"
+  val MUSIC_TARGETS = setOf(MUSIC_CONTROLS, MUSIC_QUEUE)
+  /** A Calls room card, then that room's Video call button: `calls.room.<id>`, `calls.video.<id>`. */
+  const val CALL_ROOM_TARGET = "calls.room."
+  const val CALL_VIDEO_TARGET = "calls.video."
 
   private val DEVICE_DOMAINS = setOf("light", "switch", "fan", "lock", "cover", "climate", "media_player", "valve")
 
@@ -108,6 +116,12 @@ internal object ScreenContext {
     }
     out.put("up_next", next)
     if (queue.sourceLabel.isNotBlank()) out.put("source", text(queue.sourceLabel))
+    val controls = JSONArray()
+    if (queue.current != null) {
+      controls.put(JSONObject().put("target", MUSIC_CONTROLS).put("what", "Play or pause, previous, next, shuffle, repeat"))
+    }
+    controls.put(JSONObject().put("target", MUSIC_QUEUE).put("what", "Up next: pull up the strip at the bottom"))
+    out.put("controls", controls)
     return fit(out, "up_next")
   }
 
@@ -135,8 +149,10 @@ internal object ScreenContext {
   fun calls(peers: List<CallPeer>, history: List<CallHistoryEntry>, inCall: Boolean, nowMs: Long): JSONObject {
     val rooms = JSONArray()
     peers.take(MAX_PEERS).forEach {
-      rooms.put(JSONObject().put("name", text(it.name)).put("accepts_calls", it.acceptsCalls)
-          .put("in_call", it.inCall).put("quiet", it.quiet))
+      val room = JSONObject().put("target", CALL_ROOM_TARGET + it.id).put("name", text(it.name))
+          .put("accepts_calls", it.acceptsCalls).put("in_call", it.inCall).put("quiet", it.quiet)
+      if (it.acceptsCalls) room.put("video_call_target", CALL_VIDEO_TARGET + it.id)
+      rooms.put(room)
     }
     val recent = JSONArray()
     history.sortedByDescending { it.atMs }.take(MAX_HISTORY).forEach {

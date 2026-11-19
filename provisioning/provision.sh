@@ -365,7 +365,12 @@ grant_companion_perms() {
     a shell pm path "$p" >/dev/null 2>&1 || continue
     a shell appops set "$p" SYSTEM_ALERT_WINDOW allow >/dev/null 2>&1 && any=1
   done
-  [ "$any" = 1 ] && ok "Companion app microphone/overlay access granted" || true
+  # Jarvis's one screenshot on an explicit ask: no system capture dialog (its own indicator shows).
+  for p in ${COMPANION_PROJECTION_PKGS:-}; do
+    a shell pm path "$p" >/dev/null 2>&1 || continue
+    a shell appops set "$p" PROJECT_MEDIA allow >/dev/null 2>&1 && any=1
+  done
+  [ "$any" = 1 ] && ok "Companion app microphone/overlay/screen-capture access granted" || true
 }
 
 
@@ -1112,6 +1117,11 @@ check_manual_settings() {
     a shell pm path "$p" >/dev/null 2>&1 || continue
     v="$(a shell appops get "$p" SYSTEM_ALERT_WINDOW 2>/dev/null | tr -d '\r' | awk -F'[:;]' 'NR==1{gsub(/ /,"",$2);print $2}')"
     sync_line "$p overlay (allow)" "${v:-default}"
+  done
+  for p in ${COMPANION_PROJECTION_PKGS:-}; do
+    a shell pm path "$p" >/dev/null 2>&1 || continue
+    v="$(a shell appops get "$p" PROJECT_MEDIA 2>/dev/null | tr -d '\r' | awk -F'[:;]' 'NR==1{gsub(/ /,"",$2);print $2}')"
+    sync_line "$p screen capture (allow)" "${v:-default}"
   done
   v="$(a shell settings get system accelerometer_rotation 2>/dev/null | tr -d '\r')"
   sync_line "auto-rotate (per device)" "$v"

@@ -35,6 +35,7 @@ value it should have.
 | Device admin (`AdminReceiver`) | Lets Hearthpane turn the screen off. |
 | Media notification listener; accessibility services (`BarWatchService`, `InstallConfirmService`) | Provide now-playing, Calls/remote access and install confirmation. |
 | Jarvis (`com.portal.assistant`) and Portal Calendar: `RECORD_AUDIO`; Jarvis: `SYSTEM_ALERT_WINDOW` (**new**, `COMPANION_*` in `config.env`) | Voice input, and Jarvis's floating button. Applied only when the app is installed. |
+| Jarvis: `PROJECT_MEDIA` app-op (**new**, `COMPANION_PROJECTION_PKGS`) | "What's on my screen?" over another app: Jarvis takes one screenshot on an explicit ask without Meta's capture dialog (its own "looking" chip and thumbnail show instead). Never on Home, the photo frame, calls or while the camera is in use. By hand: `adb shell appops set com.portal.assistant PROJECT_MEDIA allow`. |
 
 ## Household key
 

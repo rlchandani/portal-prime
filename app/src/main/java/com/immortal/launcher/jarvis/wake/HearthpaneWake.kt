@@ -55,7 +55,7 @@ internal object HearthpaneWake {
   private lateinit var signals: WakeSignals
   private lateinit var jarvisRecording: JarvisRecording
   private var resumed: WeakReference<Activity>? = null
-  private var callActive = false
+  @Volatile private var callActive = false
   private var handoff = WakeHandoff()
   private var model: WakeWordModel? = null
   private var modelState = ModelState.UNLOADED
@@ -76,6 +76,7 @@ internal object HearthpaneWake {
     jarvisRecording = JarvisRecording(app, main)
     MicClaims.onChange = { main.post { evaluate() } }
     application.registerActivityLifecycleCallbacks(Lifecycle)
+    com.immortal.launcher.jarvis.JarvisPrivacy.install(application)
     CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).launch {
       Calling.state.map { it.busy }.distinctUntilChanged().collect { busy ->
         callActive = busy
@@ -83,6 +84,13 @@ internal object HearthpaneWake {
       }
     }
   }
+
+  /** The dream, a Hearthpane call and camera 0 as last seen, for [com.immortal.launcher.jarvis.JarvisPrivacy]. Any thread. */
+  fun dreaming(): Boolean = ::signals.isInitialized && signals.dreaming
+
+  fun cameraInUse(): Boolean = ::signals.isInitialized && signals.cameraInUse
+
+  fun callActive(): Boolean = callActive
 
   /** A setting changed (Settings › Jarvis, or the phone remote): decide again. Any thread. */
   fun refresh(@Suppress("UNUSED_PARAMETER") context: Context) {
@@ -224,6 +232,7 @@ internal object HearthpaneWake {
 
   private object Lifecycle : Application.ActivityLifecycleCallbacks {
     override fun onActivityResumed(activity: Activity) {
+      com.immortal.launcher.jarvis.JarvisKeepWarm.onScreenResumed(activity)
       resumed = WeakReference(activity)
       handoff = handoff.hostResumed()
       evaluate()
