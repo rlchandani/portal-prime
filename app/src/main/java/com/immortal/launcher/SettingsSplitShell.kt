@@ -27,6 +27,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -43,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.SettingsDomains
 import com.immortal.launcher.ui.theme.LocalAdvancedSettings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 /** Asks the shell to explain and turn on Advanced settings (hint rows, gated pages). */
@@ -101,8 +104,12 @@ internal fun SettingsSplitShell(
     var pending by remember { mutableStateOf<ApprovedSettingsSearchResult?>(null) }
     var consent by remember { mutableStateOf(false) }
     var applyError by remember { mutableStateOf<String?>(null) }
-    val index = remember { approvedSettingsSearchIndex() }
-    val results = remember(index, query) { approvedSettingsSearch(index, query) }
+    // Built off the main thread once Settings is up; nothing reads it until a query is typed.
+    val index by produceState<List<ApprovedSettingsSearchResult>?>(null) {
+        value = withContext(Dispatchers.Default) { approvedSettingsSearchIndex() }
+    }
+    val results = remember(index, query) { index?.let { approvedSettingsSearch(it, query) }.orEmpty() }
+    val stage = rememberSettingsOpenStage()
     val queryToken = if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) remember(query) { Any() } else null
     if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) {
         val host = context as? ImmortalSettingsActivity
@@ -170,22 +177,27 @@ internal fun SettingsSplitShell(
         }
     }
 
+    // Entry is staged over three frames (see [SettingsOpenStage]): the first frame is the shell's
+    // own backdrops, then the master column, then the page. Each pane keeps its final position.
     CompositionLocalProvider(LocalApprovedEnableAdvanced provides { consent = true },
         LocalSettingsSinglePane provides singlePane) {
         if (!singlePane) {
             Row(Modifier.fillMaxSize().background(IosBackground)) {
-                master(Modifier.width(sidebarWidth))
+                if (stage.showsMaster) master(Modifier.width(sidebarWidth))
+                else Box(Modifier.width(sidebarWidth).fillMaxHeight().background(IosSidebar))
                 Box(Modifier.width(1.dp).fillMaxHeight().background(IosDivider))
-                detailColumn(Modifier.weight(1f), heading)
+                if (stage.showsDetail) detailColumn(Modifier.weight(1f), heading)
             }
         } else if (pane != null && pane.showList) {
             // Single-pane master: only the list is composed (the page is not built behind it).
-            Box(Modifier.fillMaxSize().background(IosSidebar)) { master(Modifier.fillMaxWidth()) }
+            Box(Modifier.fillMaxSize().background(IosSidebar)) { if (stage.showsMaster) master(Modifier.fillMaxWidth()) }
         } else {
             // Single-pane detail: at a page's root, Back returns to the list ("Settings").
             val navHeading = if (heading.onBack != null || pane == null) heading
                 else heading.copy(backTitle = "Settings", onBack = pane.onShowList)
-            Box(Modifier.fillMaxSize().background(IosBackground)) { detailColumn(Modifier.fillMaxWidth(), navHeading) }
+            Box(Modifier.fillMaxSize().background(IosBackground)) {
+                if (stage.showsMaster) detailColumn(Modifier.fillMaxWidth(), navHeading)
+            }
         }
     }
     if (consent) {

@@ -205,8 +205,8 @@ internal data class CcRegistry(
     /** Enabled, visible binary sensors filed as diagnostics (where integrations put tamper sensors). */
     val diagnostics: Set<String> = emptySet(),
     /**
-     * Binary-sensor classes from `get_entries` (the list call omits them). On-screen use only: the
-     * background banner set still reads [entityClass], so this fix can't start new banners.
+     * Binary-sensor classes from `get_entries` (the list call omits them). Read through [classOf]
+     * by the screens and by the background banner set ([CcInterest.background]).
      */
     val fetchedClass: Map<String, String> = emptyMap(),
     /** camera entity → its integration (`mqtt` for ring-mqtt, `wyze_ha`, …), to explain what it can do. */

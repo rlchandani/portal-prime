@@ -116,7 +116,9 @@ internal fun CcSetBanners(st: ControlCenterConfig.Settings, ui: CcUi, write: (St
   CcSetGroup {
     CcSetRow("Critical — leak, smoke, CO", "Full screen with sound, even in kids mode · can't be turned off") { CcTag("Always", CcTone.RED) }
     CcSetToggle("Alert banners on this Portal", "Keeps a small Home Assistant connection open for alerts", "bannersListen", st.bannersListen, write)
-    CcSetToggle("Warnings — garage, doors, windows left open", null, "bannersWarnings", st.bannersWarnings, write)
+    CcSetToggle("Warnings — garage, doors, windows left open", "One silent banner, at most once an hour",
+        "bannersWarnings", st.bannersWarnings, write)
+    CcSetToggle("Shared room", "Only shared-room Portals show left-open banners", "sharedRoom", st.sharedRoom, write)
     CcSetRow("Warn after", "How long something stays open before the banner") {
       CcStepper("${st.warningAfterMin} min", "warning delay", { write("warningAfterMin", CcSetLogic.warnStep(st.warningAfterMin, false)) },
           { write("warningAfterMin", CcSetLogic.warnStep(st.warningAfterMin, true)) }, enabled = st.bannersWarnings)

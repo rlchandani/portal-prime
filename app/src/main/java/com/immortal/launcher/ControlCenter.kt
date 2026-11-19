@@ -101,9 +101,10 @@ internal object ControlCenter {
   }
 
   /** Fleet `cc_debug` (operator only): dry run, local test plan, HA-unreachable switch. Blocks briefly. */
-  fun debug(context: Context, dryRun: Boolean?, testPlan: String?, testAlert: String? = null, haUnreachable: Boolean? = null): String {
+  fun debug(context: Context, dryRun: Boolean?, testPlan: String?, testAlert: String? = null, haUnreachable: Boolean? = null,
+            fakeState: CcFakeState? = null): String {
     val e = engine(context)
-    return runCatching { e.exec.submit<String> { testAlert?.let { e.testAlert(it) } ?: e.debug(dryRun, testPlan, haUnreachable) }.get(DEBUG_WAIT_S, java.util.concurrent.TimeUnit.SECONDS) }
+    return runCatching { e.exec.submit<String> { fakeState?.let { e.fakeState(it) } ?: testAlert?.let { e.testAlert(it) } ?: e.debug(dryRun, testPlan, haUnreachable) }.get(DEBUG_WAIT_S, java.util.concurrent.TimeUnit.SECONDS) }
         .getOrElse { "timeout" }
   }
 

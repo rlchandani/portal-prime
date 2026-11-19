@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -80,24 +81,36 @@ internal fun MusicV3SignIn(library: YouTubeMusicLibrary, adding: Boolean, onSign
   LaunchedEffect(Unit) { restart() }
   DisposableEffect(Unit) { onDispose { job.value?.cancel() } }
   val state by library.signInState.collectAsState()
-  val now by produceState(System.currentTimeMillis()) {
+  // The clock is read only by the countdown text and the derived view below: a tick re-renders that
+  // one line, and the card recomposes only when the code changes or expires (Mini: 1.254 regression).
+  val clock = produceState(System.currentTimeMillis()) {
     while (true) { delay(CLOCK_TICK_MS); value = System.currentTimeMillis() }
   }
-  val view = MusicV3Rules.signInView(state, now)
+  val signIn = state
+  val stillView = remember(signIn) { derivedStateOf { MusicV3Rules.stillSignInView(signIn, clock.value) } }
+  val view = stillView.value
+  val remaining = remember(signIn) { { MusicV3Rules.countdown(signIn, clock.value) } }
   if (view is MusicV3SignInView.Success) {
     LaunchedEffect(view) { delay(SUCCESS_HOLD_MS); library.resetSignIn(); onSignedIn() }
     SignedInCard(view.name)
     return
   }
   if (view is MusicV3SignInView.NotConfigured) { MusicV3NotConfigured(); return }
-  SignInCard(view, adding, restart)
+  SignInCard(view, remaining, adding, restart)
+}
+
+/** The only reader of the clock: one Text, recomposed each second. */
+@Composable
+private fun CountdownText(remaining: () -> String, fontSize: TextUnit, singleLine: Boolean = false) {
+  Text("Code works for ${remaining()}", color = ApprovedHomePalette.Secondary, fontSize = fontSize,
+      maxLines = if (singleLine) 1 else Int.MAX_VALUE, softWrap = !singleLine)
 }
 
 @Composable
-private fun SignInCard(view: MusicV3SignInView, adding: Boolean, onNewCode: () -> Unit) {
+private fun SignInCard(view: MusicV3SignInView, remaining: () -> String, adding: Boolean, onNewCode: () -> Unit) {
   val layoutClass = currentLayoutClass()
   if (layoutClass.compact) {
-    CompactSignInCard(view, adding, layoutClass.compactPortrait, onNewCode)
+    CompactSignInCard(view, remaining, adding, layoutClass.compactPortrait, onNewCode)
     return
   }
   Row(Modifier.fillMaxSize().clip(RoundedCornerShape(MusicV3Dims.PaneRadius)).background(ApprovedHomePalette.Card)
@@ -111,7 +124,7 @@ private fun SignInCard(view: MusicV3SignInView, adding: Boolean, onNewCode: () -
           else "Play your YouTube playlists and liked songs on this Portal.",
           color = ApprovedHomePalette.Secondary, fontSize = 26.sp, lineHeight = 36.sp, modifier = Modifier.padding(top = 14.dp))
       Steps(view)
-      SignInStatus(view, onNewCode)
+      SignInStatus(view, remaining, onNewCode)
       Row(Modifier.padding(top = 36.dp), verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         ApprovedIcon("lock", Modifier.size(26.dp), ApprovedHomePalette.Secondary)
@@ -161,14 +174,14 @@ private fun Step(n: Int, title: String, detail: String?, extra: @Composable () -
 }
 
 @Composable
-private fun SignInStatus(view: MusicV3SignInView, onNewCode: () -> Unit) {
+private fun SignInStatus(view: MusicV3SignInView, remaining: () -> String, onNewCode: () -> Unit) {
   Row(Modifier.padding(top = 44.dp).widthIn(min = 72.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     when (view) {
       is MusicV3SignInView.Code -> {
         Box(Modifier.size(14.dp).clip(RoundedCornerShape(7.dp)).background(ApprovedHomePalette.Accent))
         Text("Waiting for your phone…", color = ApprovedHomePalette.Text, fontSize = 25.sp)
-        Text("Code works for ${view.remaining}", color = ApprovedHomePalette.Secondary, fontSize = 25.sp)
+        CountdownText(remaining, 25.sp)
         MusicV3Button("Get a new code", style = MusicV3ButtonStyle.GHOST, onClick = onNewCode)
       }
       MusicV3SignInView.Starting -> Text("Getting a code…", color = ApprovedHomePalette.Text, fontSize = 25.sp)
@@ -186,10 +199,9 @@ private fun SignInStatus(view: MusicV3SignInView, onNewCode: () -> Unit) {
  * window is short. Landscape: side by side with the QR sized to the available height.
  */
 @Composable
-private fun CompactSignInCard(view: MusicV3SignInView, adding: Boolean, portrait: Boolean, onNewCode: () -> Unit) {
-  // Only the countdown changes every second: the QR card and the steps get the view without it, so
-  // they skip recomposition on each tick (the status row below still gets the live view).
-  val still = if (view is MusicV3SignInView.Code) view.copy(remaining = "") else view
+private fun CompactSignInCard(view: MusicV3SignInView, remaining: () -> String, adding: Boolean, portrait: Boolean,
+                              onNewCode: () -> Unit) {
+  // [view] carries no countdown, so nothing here recomposes on a tick; [remaining] is read only by CountdownText.
   BoxWithConstraints(Modifier.fillMaxSize().clip(RoundedCornerShape(MusicV3Dims.PaneRadius))
       .background(ApprovedHomePalette.Card)) {
     if (portrait) {
@@ -197,16 +209,16 @@ private fun CompactSignInCard(view: MusicV3SignInView, adding: Boolean, portrait
       Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())
           .padding(horizontal = COMPACT_PORTRAIT_PAD, vertical = 36.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
-        QrCard(still, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
-        CompactSignInCopy(still, view, adding, onNewCode, Modifier.fillMaxWidth().padding(top = 36.dp))
+        QrCard(view, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
+        CompactSignInCopy(view, remaining, adding, onNewCode, Modifier.fillMaxWidth().padding(top = 36.dp))
       }
     } else {
       val qr = minOf(maxHeight - COMPACT_LANDSCAPE_VPAD * 2, COMPACT_QR_MAX_LANDSCAPE).coerceAtLeast(COMPACT_QR_MIN)
       Row(Modifier.fillMaxSize().padding(horizontal = 48.dp, vertical = COMPACT_LANDSCAPE_VPAD),
           verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(48.dp)) {
-        QrCard(still, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
+        QrCard(view, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
         Box(Modifier.weight(1f).fillMaxSize(), contentAlignment = Alignment.CenterStart) {
-          CompactSignInCopy(still, view, adding, onNewCode, Modifier.fillMaxWidth().verticalScroll(rememberScrollState()))
+          CompactSignInCopy(view, remaining, adding, onNewCode, Modifier.fillMaxWidth().verticalScroll(rememberScrollState()))
         }
       }
     }
@@ -215,7 +227,7 @@ private fun CompactSignInCard(view: MusicV3SignInView, adding: Boolean, portrait
 
 /** The compact title, steps, status and privacy note (whole words; buttons wrap to a new line). */
 @Composable
-private fun CompactSignInCopy(view: MusicV3SignInView, live: MusicV3SignInView, adding: Boolean, onNewCode: () -> Unit,
+private fun CompactSignInCopy(view: MusicV3SignInView, remaining: () -> String, adding: Boolean, onNewCode: () -> Unit,
                               modifier: Modifier) {
   Column(modifier) {
     Text(if (adding) "Add another account" else "Sign in with your phone", color = ApprovedHomePalette.Text,
@@ -224,7 +236,7 @@ private fun CompactSignInCopy(view: MusicV3SignInView, live: MusicV3SignInView, 
         else "Play your YouTube playlists and liked songs on this Portal.",
         color = ApprovedHomePalette.Secondary, fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 12.dp))
     Steps(view, codeSize = 60.sp, codeLine = 72.sp, top = 32.dp)
-    CompactSignInStatus(live, onNewCode)
+    CompactSignInStatus(view, remaining, onNewCode)
     Row(Modifier.padding(top = 28.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       ApprovedIcon("lock", Modifier.size(26.dp), ApprovedHomePalette.Secondary)
@@ -237,7 +249,7 @@ private fun CompactSignInCopy(view: MusicV3SignInView, live: MusicV3SignInView, 
 /** [SignInStatus] for a narrow column: the same pieces in a wrapping row. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun CompactSignInStatus(view: MusicV3SignInView, onNewCode: () -> Unit) {
+private fun CompactSignInStatus(view: MusicV3SignInView, remaining: () -> String, onNewCode: () -> Unit) {
   FlowRow(Modifier.padding(top = 32.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp),
       verticalArrangement = Arrangement.spacedBy(14.dp)) {
     when (view) {
@@ -247,12 +259,11 @@ private fun CompactSignInStatus(view: MusicV3SignInView, onNewCode: () -> Unit) 
           Box(Modifier.size(14.dp).clip(RoundedCornerShape(7.dp)).background(ApprovedHomePalette.Accent))
           Text("Waiting for your phone…", color = ApprovedHomePalette.Text, fontSize = 24.sp)
         }
-        // The countdown ticks every second: a fixed-size box on its own layer, so a tick redraws and
-        // re-measures only this text, never the card around it.
+        // The countdown ticks every second: a fixed-width box on its own layer, so a tick re-measures
+        // and redraws only this text, never the card around it.
         Box(Modifier.heightIn(min = MusicV3Dims.Touch).width(COUNTDOWN_WIDTH).graphicsLayer { },
             contentAlignment = Alignment.CenterStart) {
-          Text("Code works for ${view.remaining}", color = ApprovedHomePalette.Secondary, fontSize = 24.sp,
-              maxLines = 1, softWrap = false)
+          CountdownText(remaining, 24.sp, singleLine = true)
         }
         MusicV3Button("Get a new code", style = MusicV3ButtonStyle.GHOST, onClick = onNewCode)
       }

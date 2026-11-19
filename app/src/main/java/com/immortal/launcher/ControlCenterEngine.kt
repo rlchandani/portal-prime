@@ -325,8 +325,7 @@ internal class CcEngine(val app: Context) {
     val active = ui.alerts()
     val seen = seenAlerts
     seenAlerts = active.map { it.id }.toSet() + (seen ?: emptySet())
-    val fresh = active.filter { seen == null && it.severity == CcSeverity.CRITICAL || seen != null && it.id !in seen }
-    fresh.forEach { ControlCenterBanners.offer(app, it, ui.settings, appVisible = visible > 0, dryRun = dryRun) }
+    CcAlertRelay.present(app, CcBackgroundPolicy.plan(active, seen), ui.settings, appVisible = visible > 0, dryRun = dryRun)
   }
 
   companion object {

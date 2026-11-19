@@ -42,6 +42,10 @@ internal object CcInterest {
   fun securityWorthy(id: String, reg: CcRegistry): Boolean =
       id.startsWith("binary_sensor.") && reg.classOf(id) in SECURITY_CLASSES
 
+  /**
+   * Every entity that can raise a background banner, by its device class: the registry's own class
+   * or, for binary sensors, the class fetched with `get_entries` (the plan plays no part).
+   */
   fun background(reg: CcRegistry?): Set<String>? {
     if (reg == null || reg.entities.isEmpty()) return null
     return reg.entities.filter { alertWorthy(it, reg) }.sorted().take(MAX_BACKGROUND).toSet()
@@ -49,9 +53,9 @@ internal object CcInterest {
 
   fun alertWorthy(id: String, reg: CcRegistry): Boolean {
     val domain = id.substringBefore('.')
-    val cls = reg.entityClass[id]
+    val cls = reg.classOf(id)
     return when (domain) {
-      "binary_sensor" -> cls in ALERT_CLASSES || APPLIANCE_HINTS.any { it in id }
+      "binary_sensor" -> CcBackgroundPolicy.subscribes(cls) || APPLIANCE_HINTS.any { it in id }
       "cover" -> cls == "garage" || cls == "gate"
       "sensor", "switch" -> APPLIANCE_HINTS.any { it in id }
       else -> false

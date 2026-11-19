@@ -131,7 +131,8 @@ internal object CcBannerPolicy {
     // leak, smoke or carbon-monoxide alarm makes a sound (owner's decision, on by default); every
     // other alert — gas and other critical kinds included — stays silent at night.
     CcSeverity.CRITICAL -> Decision(Show.TAKEOVER, sound = !quietHours || (s.criticalSoundAtNight && soundsAtNight(alert)))
-    CcSeverity.WARNING -> if (s.bannersWarnings && s.portalMode == ControlCenterConfig.MODE_FULL &&
+    // Left-open warnings are for shared rooms only, never a takeover, silent day and night.
+    CcSeverity.WARNING -> if (s.bannersWarnings && s.sharedRoom && s.portalMode == ControlCenterConfig.MODE_FULL &&
         !(s.kids && alert.kind == CcKind.GARAGE)) Decision(Show.BANNER, sound = false) else Decision(Show.NONE, false)
     CcSeverity.INFO -> if (s.bannersInfo && s.portalMode == ControlCenterConfig.MODE_FULL && !quietHours &&
         alert.kind == CcKind.APPLIANCE) Decision(Show.BANNER, sound = false) else Decision(Show.NONE, false)
