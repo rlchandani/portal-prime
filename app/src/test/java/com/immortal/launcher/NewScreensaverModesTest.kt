@@ -51,6 +51,26 @@ class NewScreensaverModesTest {
     assertTrue(ScreensaverConfig.NIGHT_TONE_PHOTO in ScreensaverConfig.NIGHT_TONES)
   }
 
+  @Test fun overnightWindowRoutesTheFrameByItsSettings() {
+    val photo = ScreensaverConfig.NIGHT_TONE_PHOTO
+    // Outside the window (or overnight off) the frame is the normal day frame, whatever the tone.
+    assertEquals(OvernightFrame.DAY, OvernightFrame.of(inWindow = false, nightClock = true, tone = photo))
+    // Inside the window without the night clock the screen goes dark.
+    assertEquals(OvernightFrame.SLEEP, OvernightFrame.of(inWindow = true, nightClock = false, tone = photo))
+    // Night clock + "Night photo" colour: dim warm photos keep going.
+    assertEquals(OvernightFrame.NIGHT_PHOTO, OvernightFrame.of(inWindow = true, nightClock = true, tone = photo))
+    // Night clock in the other colours: the clock-only frame, no photo pipeline.
+    assertEquals(OvernightFrame.NIGHT_CLOCK, OvernightFrame.of(inWindow = true, nightClock = true, tone = "warm"))
+    assertEquals(OvernightFrame.NIGHT_CLOCK, OvernightFrame.of(inWindow = true, nightClock = true, tone = "red"))
+  }
+
+  @Test fun onlyTheClockOnlyNightSkipsThePhotoPipeline() {
+    assertTrue(OvernightFrame.NIGHT_CLOCK.clockOnly)
+    assertFalse(OvernightFrame.NIGHT_PHOTO.clockOnly)
+    assertTrue(OvernightFrame.NIGHT_PHOTO.nightClock && OvernightFrame.NIGHT_CLOCK.nightClock)
+    assertFalse(OvernightFrame.DAY.nightClock)
+  }
+
   @Test fun digitalFacesMapEveryStoredStyle() {
     assertEquals(Face.CLASSIC, DigitalClockFaceSpec.face(DigitalClockConfig.STYLE_CLASSIC))
     assertEquals(Face.BOLD, DigitalClockFaceSpec.face(DigitalClockConfig.STYLE_BOLD))
