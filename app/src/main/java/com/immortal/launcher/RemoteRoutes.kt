@@ -59,6 +59,8 @@ class RemoteRoutes internal constructor(
   private val remoteAssets = mutableMapOf<String, ByteArray>()
 
   fun handle(req: FleetHttpServer.Request): FleetHttpServer.Response = try {
+      // Grandma mode: arming auto-answer needs a person at the screen, not the phone remote.
+      if (req.path in CallInPerson.INPUT_PATHS) CallInPerson.noteRemoteInput(System.currentTimeMillis())
       when (req.path) {
         "/remote/companion", "/remote/layout", "/remote/snapshot", "/remote/catalog",
         "/remote/operation", "/remote/operations", "/remote/jarvis", "/remote/scenes",

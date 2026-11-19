@@ -33,6 +33,7 @@ internal fun CallApp(motion: Boolean, lowMemory: Int, onClose: () -> Unit, onNee
   val state by Calling.state.collectAsState()
   val media by CallMediaHub.media.collectAsState()
   val toast = rememberCallToast()
+  val grandma by CallAutoAnswerStore.flow(context).collectAsState()
   val call = state.call
   val ended = state.ended
 
@@ -57,6 +58,7 @@ internal fun CallApp(motion: Boolean, lowMemory: Int, onClose: () -> Unit, onNee
           onCallBack = { kind -> Calling.dismissEnded(); if (!Calling.dial(context, ended.peer.deviceId, kind, video = true)) onClose() },
           onDone = { Calling.dismissEnded(); onClose() })
       call == null -> Unit
+      grandma.grandmaMode && GrandmaScreens.handles(call) -> CallGrandma(call, media, motion)
       call.direction == CallDirection.INCOMING && call.phase.beforeAnswer ->
         if (call.kind == CallKind.DROP_IN) CallDropInIncoming(call, motion) else CallIncomingScreen(call, motion)
       call.direction == CallDirection.OUTGOING && call.phase.beforeAnswer -> CallOutgoingScreen(call, media, motion)

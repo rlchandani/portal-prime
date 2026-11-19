@@ -20,7 +20,9 @@ import org.json.JSONObject
 /**
  * Settings › Calls ([CallingConfig]). Privacy guarantees are not settings: they render as
  * locked "Always" rows in the page's own block, so there is nothing here that could turn them
- * off. The drop-in grid writes this Portal's column through [set] like every other row.
+ * off. Grandma mode and auto-answer are deliberately absent too: this registry also drives the
+ * phone remote, and those may only be set at the Portal itself ([CallAutoAnswerStore]). The
+ * drop-in grid writes this Portal's column through [set] like every other row.
  */
 internal object CallingSettings {
   val domain: SettingsDomain<Settings> =
@@ -50,6 +52,8 @@ internal object CallingSettings {
                   help = "Auto sends 720p and steps down by itself when the Portal is busy or low on memory."),
               BoolSpec("dropInsOn", "Drop-ins on this Portal", get = { it.dropInsOn }, set = CallingConfig::setDropInsOn,
                   help = "Off until you turn it on. Rooms then ask first unless you choose Chime, join below."),
+              BoolSpec("groupsOn", "Group calls", get = { it.groupsOn }, set = CallingConfig::setGroupsOn,
+                  help = "Up to 4 people. With 3 or more, each picture is sent at 360p to keep the Portal cool."),
               BoolSpec("phonesOn", "Phones can call this Portal", get = { it.phonesOn }, set = CallingConfig::setPhonesOn,
                   help = "Paired phones with Portal Toolkit, on the home Wi-Fi. Phones call, they never drop in."),
               StringSpec("dropInRooms", "Drop-ins room by room", get = { it.dropInRooms }, set = CallingConfig::setDropInRooms,

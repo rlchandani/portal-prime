@@ -58,7 +58,13 @@ class CallsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val start = if (intent.getStringExtra(EXTRA_TAB) == TAB_RECENT) CallsTab.RECENT else CallsTab.ROOMS
-    setContent { PortalPrimeTheme(darkTheme = false) { CallsApp(start, onBack = ::finish) } }
+    setContent {
+      PortalPrimeTheme(darkTheme = false) {
+        // Grandma mode replaces the whole app with big faces (set up on this Portal only).
+        val rules by CallAutoAnswerStore.flow(this).collectAsState()
+        if (rules.grandmaMode) CallsGrandmaHome() else CallsApp(start, onBack = ::finish)
+      }
+    }
     // Floating Jarvis: the rooms and recent calls are what `screen_context` describes here.
     HearthpaneScreens.track(this, HearthpaneScreens.Entry({ HearthpaneScreens.CALLS }) {
       ScreenContext.calls(CallingStore.peers.value, CallingStore.history.value, Calling.state.value.busy,

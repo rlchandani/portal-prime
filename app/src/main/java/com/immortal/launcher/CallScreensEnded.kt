@@ -6,7 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.media.AudioManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,15 +99,10 @@ private fun androidx.compose.foundation.layout.BoxScope.EndedCompact(ended: Ende
 @Composable
 internal fun CallVolumePopover(modifier: Modifier = Modifier) {
   val context = LocalContext.current
-  val audio = remember { context.getSystemService(AudioManager::class.java) }
-  val max = remember { audio?.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL)?.coerceAtLeast(1) ?: 1 }
-  var level by remember { mutableIntStateOf(audio?.getStreamVolume(AudioManager.STREAM_VOICE_CALL) ?: 0) }
-  fun step(delta: Int) {
-    val stepUnits = maxOf(1, Math.round(max * VOLUME_STEP))
-    level = (level + delta * stepUnits).coerceIn(0, max)
-    runCatching { audio?.setStreamVolume(AudioManager.STREAM_VOICE_CALL, level, 0) }
-  }
-  val pct = level * PERCENT / max
+  val volume = remember { CallVolume(context) }
+  var level by remember { mutableIntStateOf(volume.level()) }
+  fun step(delta: Int) { level = volume.step(level, delta) }
+  val pct = CallVolumeMath.percent(level, volume.max)
   // Compact: never wider than the window (the caller insets it); the designed 620 when it fits.
   val width = if (currentLayoutClass().compact) Modifier.widthIn(max = 620.dp).fillMaxWidth() else Modifier.width(620.dp)
   Column(modifier.then(width).callPanel(CallColors.Popover, RoundedCornerShape(36.dp)).padding(32.dp),
@@ -137,6 +131,5 @@ private fun VolumeStep(label: String, modifier: Modifier, onClick: () -> Unit) {
 
 private val AUTO_CLOSE = setOf(CallEndReason.HUNG_UP, CallEndReason.LEFT, CallEndReason.CANCELLED, CallEndReason.DECLINED,
     CallEndReason.CAP_REACHED, CallEndReason.MISSED)
-private const val VOLUME_STEP = 0.1f
 private val ENDED_ICON_COMPACT = 120.dp
 private const val PERCENT = 100
