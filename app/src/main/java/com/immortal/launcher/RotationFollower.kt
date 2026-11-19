@@ -190,7 +190,15 @@ internal object RotationFollower {
         }
       }
     }
-    return JSONObject().put("request", request ?: "").put("forced", forced ?: JSONObject.NULL)
+    // The handler applies the request next; report the state it leads to.
+    val nextForced: Any = when (request) {
+      "portrait" -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+      "landscape" -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+      "reverse_landscape" -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+      "auto", "forget" -> JSONObject.NULL
+      else -> forced ?: JSONObject.NULL
+    }
+    return JSONObject().put("request", request ?: "").put("forced", nextForced)
         .put("settled", policy.settled?.name ?: JSONObject.NULL)
         .put("listening", listener != null)
         .put("ignoredPoses", JSONArray(ignored.map { it.name }))

@@ -173,6 +173,8 @@ class ImmortalSettingsActivity : ComponentActivity() {
     savedInstanceState?.let { showList = it.getBoolean(STATE_LIST, true) }
     stack = initialStack(intent, savedInstanceState)
     SettingsLastPage.write(this, stack.current)
+    // Kept awake while visible, set before the first frame so it costs no second window relayout.
+    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     setContent {
       PortalPrimeTheme(darkTheme = false) {
         val navigate = remember { ::navigateLocal }

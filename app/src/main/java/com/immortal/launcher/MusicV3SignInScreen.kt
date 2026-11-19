@@ -127,10 +127,19 @@ private fun Steps(view: MusicV3SignInView, codeSize: TextUnit = 76.sp, codeLine:
     Step(1, "Scan the code with your phone", "Or open ${code?.shortUrl ?: "google.com/device"} in any browser")
     Step(2, "Enter this code", null) {
       val text = code?.userCode ?: "––––-––––"
-      Text(text, color = ApprovedHomePalette.Text, fontSize = codeSize, lineHeight = codeLine, fontWeight = FontWeight.SemiBold,
-          fontFamily = FontFamily.Monospace, letterSpacing = 6.sp,
-          modifier = Modifier.alpha(if (code != null) 1f else 0.5f)
-              .semantics { contentDescription = "Code " + text.toList().joinToString(" ") })
+      val codeText = @Composable { size: TextUnit, line: TextUnit ->
+        Text(text, color = ApprovedHomePalette.Text, fontSize = size, lineHeight = line, fontWeight = FontWeight.SemiBold,
+            fontFamily = FontFamily.Monospace, letterSpacing = 6.sp, maxLines = 1, softWrap = false,
+            modifier = Modifier.alpha(if (code != null) 1f else 0.5f)
+                .semantics { contentDescription = "Code " + text.toList().joinToString(" ") })
+      }
+      if (!currentLayoutClass().compact) codeText(codeSize, codeLine)
+      else BoxWithConstraints(Modifier.fillMaxWidth()) {
+        // The code is one token: shrink it to the column (monospace ≈ 0.6 em + 6 sp tracking per glyph).
+        val fit = (maxWidth.value / text.length.coerceAtLeast(1) - 6f) / 0.62f
+        val size = minOf(codeSize.value, fit).coerceAtLeast(24f)
+        codeText(size.sp, (size * 1.16f).sp)
+      }
     }
     Step(3, "Choose your account", "and allow Portal to see your YouTube library")
   }

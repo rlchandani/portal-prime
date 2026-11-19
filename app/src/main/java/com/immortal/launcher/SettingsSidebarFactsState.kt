@@ -13,7 +13,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.awaitCancellation
 
@@ -36,9 +35,10 @@ internal fun loadSettingsSidebarFacts(context: Context): SettingsSidebarFacts {
 @Composable
 internal fun rememberSettingsSidebarFacts(): State<SettingsSidebarFacts> {
     val context = LocalContext.current.applicationContext
-    val facts = remember { mutableStateOf(SettingsSidebarFacts()) }
+    // Read in the first composition: the launcher process already holds these small preference
+    // files in memory, and the first frame then shows the final hints (no second relayout of the list).
+    val facts = remember { mutableStateOf(loadSettingsSidebarFacts(context)) }
     LaunchedEffect(context) {
-        withFrameNanos { }
         // Held here: SharedPreferences keeps listeners weakly.
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
             facts.value = loadSettingsSidebarFacts(context)
@@ -46,6 +46,7 @@ internal fun rememberSettingsSidebarFacts(): State<SettingsSidebarFacts> {
         val prefs = SidebarFactPrefs.map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
         prefs.forEach { it.registerOnSharedPreferenceChangeListener(listener) }
         try {
+            // Anything that changed between the first composition and registering the listener.
             facts.value = loadSettingsSidebarFacts(context)
             awaitCancellation()
         } finally {
