@@ -54,15 +54,16 @@ import com.immortal.launcher.settings.ControlCenterSettings
 internal fun CcPinModal(s: CcUiState, ui: CcUi, m: CcModal.Pin) {
   val kids = m.panelId == null
   if (kids && !ControlCenterConfig.hasKidsPin(ui.context)) { NoKidsPin(ui); return }
+  val tries = remember { CcPinTriesPrefs(ui.context) }
   var entry by remember(m) {
-    mutableStateOf(if (kids) CcKidsPinAttempts.open(SystemClock.elapsedRealtime()) else CcPinEntry(s.settings.pinLength))
+    mutableStateOf(if (kids) CcKidsPinAttempts.open(CcPinClock.now(ui.context), tries) else CcPinEntry(s.settings.pinLength))
   }
-  fun put(e: CcPinEntry) { entry = e; if (kids) CcKidsPinAttempts.keep(e) }
+  fun put(e: CcPinEntry) { entry = e; if (kids) CcKidsPinAttempts.keep(e, CcPinClock.now(ui.context), tries) }
   val panel = m.panelId?.let { s.entity(it) }
   fun submit(code: String) {
     if (kids) {
       if (ControlCenterConfig.checkKidsPin(ui.context, code)) {
-        CcKidsPinAttempts.reset()
+        CcKidsPinAttempts.reset(tries)
         ControlCenterSettings.set(ui.context, "portalMode", ControlCenterConfig.MODE_FULL)
         ui.modal(null)
       } else put(entry.failed(SystemClock.elapsedRealtime()))
