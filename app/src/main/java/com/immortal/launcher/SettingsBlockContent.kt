@@ -77,6 +77,7 @@ internal fun SettingsBlockContent(block: SettingsBlock) {
             SettingsBlock.MULTIROOM -> MultiRoomContent()
             SettingsBlock.DEVICE_NAME -> DeviceNameSection()
             SettingsBlock.ABOUT_HEALTH -> DeviceHealthContent()
+            SettingsBlock.SYNC -> SettingsSyncBlock()
             SettingsBlock.ADVANCED_SWITCH -> AdvancedSettingsSwitch()
             SettingsBlock.DEBUG_MODE -> Card { IosDebugRow(context) }
             SettingsBlock.BOOT_APPS -> BootAppsContent()

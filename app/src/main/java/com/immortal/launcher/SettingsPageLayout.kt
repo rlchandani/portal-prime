@@ -7,6 +7,8 @@
 package com.immortal.launcher
 
 import com.immortal.launcher.settings.SettingsPresentation
+import com.immortal.launcher.settings.SettingsRegistry
+import com.immortal.launcher.settings.effectiveScope
 
 /** Lazy-list item kinds; each is its own `contentType` so Compose can reuse row compositions. */
 internal enum class SettingsEntryKind { LEDE, HEADER, ROWS, BLOCK, LINK, EXTERNAL, FOOTER, NOTICE, ADVANCED_HINT, GAP }
@@ -63,7 +65,8 @@ private fun SettingsItem.kind(): SettingsEntryKind = when (this) {
  * (Advanced while Advanced is off, screensaver rows while the screensaver is off) is left out,
  * and a single hint or notice explains it instead.
  */
-internal fun settingsPageLayout(page: String, advanced: Boolean, screensaverOn: Boolean): SettingsPageLayout {
+internal fun settingsPageLayout(page: String, advanced: Boolean, screensaverOn: Boolean,
+                                syncNote: String? = null): SettingsPageLayout {
     val entries = ArrayList<SettingsPageEntry>()
     val index = LinkedHashMap<String, Int>()
     var hiddenAdvanced = false
@@ -71,6 +74,9 @@ internal fun settingsPageLayout(page: String, advanced: Boolean, screensaverOn: 
     val def = SettingsTree.page(page)
     if (def?.lede != null && def.parent == null) {
         entries += SettingsPageEntry("lede", SettingsEntryKind.LEDE, text = def.lede)
+    }
+    if (syncNote != null && settingsPageHasHouseholdRows(page)) {
+        entries += SettingsPageEntry("note:sync", SettingsEntryKind.FOOTER, text = syncNote)
     }
     SettingsPageSections.of(page).forEachIndexed { sectionIndex, section ->
         if (section.advanced && !advanced) { hiddenAdvanced = true; return@forEachIndexed }
@@ -105,6 +111,19 @@ internal fun settingsPageLayout(page: String, advanced: Boolean, screensaverOn: 
 internal fun settingsControlHome(control: String): String? = SettingsTree.pages.firstOrNull { page ->
     settingsPageLayout(page.id, advanced = true, screensaverOn = true).controlIndex.containsKey(control)
 }?.id
+
+/** Whether [page] draws any registry row that syncs across the household's Portals. */
+internal fun settingsPageHasHouseholdRows(page: String): Boolean =
+    SettingsPageSections.of(page).flatMap { it.items }.any { item ->
+        when (item) {
+            is SettingsDomainRows -> {
+                val specs = SettingsRegistry.domain(item.domain)?.specs.orEmpty()
+                item.keys.any { key -> specs.firstOrNull { it.key == key }?.effectiveScope?.synced == true }
+            }
+            is SettingsBlockItem -> settingsClaimedSpecs(item.block).any { it.second.effectiveScope.synced }
+            else -> false
+        }
+    }
 
 /** Domains whose registry rows a page draws through the shared renderer. */
 internal fun settingsPageDomains(page: String): List<String> =

@@ -24,7 +24,8 @@ internal object MusicSettings {
                       get = { it.quietCap },
                       set = MusicNightConfig::setQuietCap,
                       help = "Music can't go above the level below while quiet hours are on. " +
-                          "Announcements aren't affected."),
+                          "Announcements aren't affected.",
+                          scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "quietMaxLevel",
                       "Loudest music during quiet hours",
@@ -33,7 +34,8 @@ internal object MusicSettings {
                       min = MusicNightCapMath.MIN_LEVEL,
                       max = MusicNightCapMath.SCALE,
                       format = { "$it of ${MusicNightCapMath.SCALE}" },
-                      visible = { _, s -> s.quietCap }),
+                      visible = { _, s -> s.quietCap },
+                      scope = SettingScope.HOUSEHOLD),
               ),
           defaults = { MusicNightConfig.Settings() },
       )

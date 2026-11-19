@@ -107,6 +107,7 @@ internal enum class SettingsBlock(
     ABOUT_HEALTH(rows = listOf(row("about.version", "Hearthpane version", "check for updates update now"),
         row("about.checks", "Device checks", "health permissions reconnect"),
         row("about.screenLock", "Remove screen-lock permission", "uninstall"))),
+    SYNC(rows = listOf(row("about.sync", "Household sync", "synced across portals adopt settings peers last sync"))),
     ADVANCED_SWITCH(claims = setOf("immortal.advancedSettings")),
     PEOPLE(rows = listOf(row("people.enabled", "Recognise people on this Portal", "who's there face camera"),
         row("people.add", "Add person", "enrol face set up kid teen adult"), row("people.list", "People on this Portal"))),

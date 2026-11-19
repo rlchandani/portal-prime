@@ -13,6 +13,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
@@ -42,7 +45,10 @@ internal fun SettingsPageView(
     val advanced = LocalAdvancedSettings.current
     val states = rememberSettingsDomainStates(page)
     val screensaverOn = states.screensaverOn()
-    val layout = remember(page, advanced, screensaverOn) { settingsPageLayout(page, advanced, screensaverOn) }
+    // Only the note itself recomposes the page, not every peer heartbeat in the status.
+    val syncStatus = SettingsSync.status.collectAsState()
+    val syncNote by remember { derivedStateOf { settingsSyncPageNote(syncStatus.value) } }
+    val layout = remember(page, advanced, screensaverOn, syncNote) { settingsPageLayout(page, advanced, screensaverOn, syncNote) }
     val highlight = rememberBriefHighlight(control, onHighlightShown)
     val highlightIndex = highlight?.let { layout.controlIndex[it] }
     val listState = rememberApprovedSettingsLazyScrollState(page)
@@ -56,7 +62,8 @@ internal fun SettingsPageView(
     }
     LaunchedEffect(scheduler) { scheduler.run() }
     LaunchedEffect(control, highlightIndex) { if (highlightIndex != null) listState.scrollToItem(highlightIndex) }
-    CompositionLocalProvider(LocalApprovedRequestedControl provides highlight, LocalSettingsComposition provides scheduler) {
+    CompositionLocalProvider(LocalApprovedRequestedControl provides highlight, LocalSettingsComposition provides scheduler,
+        LocalSettingsSyncLabels provides (syncNote != null)) {
         // Pane-work attribution is a no-op unless the benchmark build opts in.
         LazyColumn(Modifier.fillMaxSize().then(rememberSettingsPaneWorkModifier(page, active = true)), state = listState,
             contentPadding = if (LocalSettingsSinglePane.current)
