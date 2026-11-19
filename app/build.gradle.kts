@@ -180,6 +180,13 @@ android {
       matchingFallbacks += "release"
     }
   }
+  packaging {
+    jniLibs {
+      // WebRTC is ~6.5 MB per 32-bit ABI. Calling needs a 64-bit Portal; a 32-bit process reports
+      // calling as unavailable instead of crashing (CallMedia.available()).
+      excludes += "lib/armeabi-v7a/libjingle_peerconnection_so.so"
+    }
+  }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -228,6 +235,11 @@ dependencies {
   implementation("androidx.media3:media3-transformer:1.5.1")
   implementation("androidx.media3:media3-effect:1.5.1")
   implementation("androidx.media3:media3-common:1.5.1")
+
+  // Hearthpane Calling: Google's libwebrtc, prebuilt (Apache-2.0, no GMS). Camera2 capture, HW
+  // H.264/VP8 via MediaCodec, software AEC3/NS/AGC, DTLS-SRTP. Only the arm64-v8a .so ships (see
+  // packaging below): every calling-capable Portal runs a 64-bit process.
+  implementation("io.getstream:stream-webrtc-android:1.3.10")
 
   // Unit tests (pure JVM — no device/emulator). org.json provides a real
   // implementation so JSON-parsing logic can be tested off-device (the android.jar

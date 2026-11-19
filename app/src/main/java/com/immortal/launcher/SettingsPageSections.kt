@@ -137,6 +137,16 @@ internal object SettingsPageSections {
                 footer = "The QR code and PIN appear only after you tap Show pairing code."),
             section("Sharing", rows("share", "allowSharing", "freshPhotoBadge", "noteChime", "clearNotesOvernight")),
         ),
+        P.CALLS to listOf(
+            section("Calls", rows("calling", "whoCanCall", "quality")),
+            section("Ring & sound", rows("calling", "ringtone", "ringVolume"), block(B.CALL_RINGTONES)),
+            section("Quiet hours", rows("calling", "quietMode"),
+                footer = "Quiet hours are shared with the chime and Call everyone: Sounds › Chimes."),
+            section("Drop-ins", rows("calling", "dropInsOn"), block(B.CALL_DROP_INS),
+                footer = "Never from phones, never from other homes, never in quiet hours."),
+            section("Camera", block(B.CALL_CAMERA)),
+            section("Privacy", block(B.CALL_PRIVACY)),
+        ),
         P.INTERCOM to listOf(
             section(null, block(B.INTERCOM)),
             section("Calls from other rooms", rows("dinner", "receive", "speak")),

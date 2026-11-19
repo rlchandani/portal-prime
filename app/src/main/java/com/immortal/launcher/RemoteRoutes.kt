@@ -113,6 +113,8 @@ class RemoteRoutes internal constructor(
         MusicHandoffNet.PATH -> MusicHandoffNet.handle(context, req)
         // Portal↔Portal chores exchange: HouseholdKey-signed like the list, its own message types.
         ChoresPeerRoute.PATH -> ChoresPeerRoute.handle(context, req)
+        // Portal↔Portal call setup: household-signed SDP offer/answer with bound DTLS fingerprints.
+        CallSignalAuth.PATH -> CallPeerRoute.handle(context, req)
         // Feature-owned /remote/<name> routes go through the paired-session checks first.
         else -> if (RemoteFeatureRoutes.lookup(req.path) != null) companion.handle(req) else json(404, err("not_found"))
       }

@@ -33,6 +33,8 @@ class ImmortalApp : Application() {
     HouseholdBus.start(this)
     HouseholdListFeature.install(this)
     DinnerCallFeature.install(this)
+    // Hearthpane Calling: Portal↔Portal video calls and drop-ins over the signed household bus.
+    Calling.install(this)
     SharedTimersFeature.install(this)
     ChoresFeature.install(this)
     DoorbellFeature.install(this)

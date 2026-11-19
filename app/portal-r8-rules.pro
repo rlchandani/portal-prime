@@ -18,3 +18,7 @@
 -dontwarn org.ietf.jgss.**
 # SMBJ handlers use the empty condition default; no application EL handlers exist.
 -dontwarn javax.el.**
+
+# Hearthpane Calling: libwebrtc calls back into Java through JNI (@CalledByNative), by name.
+-keep class org.webrtc.** { *; }
+-dontwarn org.webrtc.**

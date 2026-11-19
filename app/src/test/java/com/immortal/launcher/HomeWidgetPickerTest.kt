@@ -13,10 +13,11 @@ import org.junit.Test
 /** Kind lists and draft defaults for the "Add a widget" picker (approved 2026-11-07). */
 class HomeWidgetPickerTest {
   @Test fun everyday_isTheApprovedKinds_inMockOrder_plusWifi() {
-    // Wi-Fi (2026-11-07) joins the everyday seven: a guest-facing join QR.
+    // Wi-Fi (2026-11-07) joins the everyday seven: a guest-facing join QR. Calls (2026-11-18): the
+    // Calling mock's Home card with favourite rooms.
     assertEquals(listOf(HomeWidgetStore.KIND_WEATHER, HomeWidgetStore.KIND_CALENDAR, HomeWidgetStore.KIND_HA,
         HomeWidgetStore.KIND_TIMERS, HomeWidgetStore.KIND_TODO, HomeWidgetStore.KIND_ALARM,
-        HomeWidgetStore.KIND_WORLD_CLOCK, HomeWidgetStore.KIND_WIFI), HomeWidgetPicker.everyday)
+        HomeWidgetStore.KIND_WORLD_CLOCK, HomeWidgetStore.KIND_WIFI, HomeWidgetStore.KIND_CALLS), HomeWidgetPicker.everyday)
   }
 
   @Test fun wifi_isRegisteredWithItsLabelIconAndRemoteKind() {

@@ -605,6 +605,8 @@ class SettingsDomainTest {
             // ControlCenterSettings.domain (Settings › Home Assistant › Control Center); the kids PIN
             // hash is a Portal-only secret, not a setting.
             "ControlCenterConfig",
+            // CallingSettings.domain (Settings › Calls); privacy rules are locked rows, not settings.
+            "CallingConfig",
             // Context-typed domains (no aggregate Settings class); pinned by their own tests above.
             "MqttConfig",
             "FleetConfig",

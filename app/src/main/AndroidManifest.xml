@@ -446,6 +446,29 @@
             android:label="Bedtime story"
             android:theme="@style/Theme.SampleApp.Translucent" />
 
+        <!-- Hearthpane Calling: the Calls app (rooms, recent) and the call screen. The call screen
+             shows over the lock screen / photo frame and wakes the screen for an incoming call;
+             camera and mic live only while it is in front. -->
+        <activity
+            android:name=".CallsActivity"
+            android:exported="false"
+            android:label="Calls"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:theme="@style/Theme.SampleApp" />
+        <activity
+            android:name=".CallActivity"
+            android:exported="false"
+            android:label="Call"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.immortal.launcher.call"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
+            android:theme="@style/Theme.SampleApp" />
+
         <!-- "Intercom": LAN one-way intercom / baby monitor (LanAudio). -->
         <activity
             android:name=".IntercomActivity"
