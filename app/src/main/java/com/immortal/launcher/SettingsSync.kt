@@ -83,6 +83,7 @@ internal object SettingsSync {
       if (ledger.lastKnown.isEmpty()) ledger = ledger.copy(lastKnown = catalog.read(appContext))
       persist()
       reconcile(appContext)
+      autoAdoptIfNothingToChoose(appContext)
     }
     watchNetwork(appContext)
     main.postDelayed(gossip, NETWORK_SETTLE_MS)
@@ -98,14 +99,14 @@ internal object SettingsSync {
   /** The one-time join choice from Settings: adopt the household's settings, or keep this Portal's. */
   fun resolveJoin(keepMine: Boolean) = worker.execute {
     val c = app ?: return@execute
-    if (ledger.pending == null) return@execute
-    val (next, writes) = SettingsSyncEngine.resolveJoin(ledger, catalog.read(c), catalog.defaults(), self(c) ?: return@execute,
-        System.currentTimeMillis(), keepMine)
-    ledger = next
-    write(c, writes)
-    persist()
-    signal()
-    Log.i(TAG, "joined household settings (${if (keepMine) "kept" else "adopted"}, ${writes.size} written)")
+    resolveJoinNow(c, keepMine, how = if (keepMine) "kept" else "adopted")
+  }
+
+  /** "Later" on the Home card: hide the card; the choice stays in About › Sync. */
+  fun dismissAdoptCard() = worker.execute {
+    val c = app ?: return@execute
+    SettingsSyncStore.setAdoptCardDismissed(c, true)
+    publish()
   }
 
   /** Debug/fleet hook: stop sending and receiving (simulates this Portal being offline). */
@@ -119,6 +120,7 @@ internal object SettingsSync {
   fun rejoin() = worker.execute {
     val c = app ?: return@execute
     SettingsSyncStore.clear(c)
+    SettingsSyncStore.setAdoptCardDismissed(c, false)
     ledger = SyncLedger(lastKnown = catalog.read(c))
     persist()
     signal()
@@ -144,10 +146,42 @@ internal object SettingsSync {
 
   // ---- worker thread ------------------------------------------------------------------------
 
+  private fun resolveJoinNow(c: Context, keepMine: Boolean, how: String) {
+    if (ledger.pending == null) return
+    val me = self(c) ?: return
+    val (next, writes) = SettingsSyncEngine.resolveJoin(ledger, catalog.read(c), catalog.defaults(), me,
+        System.currentTimeMillis(), keepMine)
+    ledger = next
+    write(c, writes)
+    SettingsSyncStore.setAdoptCardDismissed(c, false)
+    persist()
+    signal()
+    count(if (how == "auto-adopted") "joinsAuto" else "joinsChosen")
+    Log.i(TAG, "joined household settings ($how, ${writes.size} written)")
+  }
+
+  /**
+   * A new Portal whose settings the household wouldn't override (untouched defaults, or only keys
+   * the household never set) joins silently: there is nothing to choose.
+   */
+  private fun autoAdoptIfNothingToChoose(c: Context) {
+    if (paused || ledger.phase != SyncPhase.JOINING) return
+    if (!SettingsSyncEngine.canAutoAdopt(ledger.pending, catalog.read(c), catalog.defaults())) return
+    resolveJoinNow(c, keepMine = false, how = "auto-adopted")
+  }
+
   private fun detect() {
     val c = app ?: return
     val me = self(c) ?: return
     val (next, changed) = SettingsSyncEngine.detectLocal(ledger, catalog.read(c), me, System.currentTimeMillis())
+    if (ledger.phase == SyncPhase.JOINING && ledger.pending != null) {
+      // Joining records nothing, but a setting put back to its default can leave nothing to choose.
+      val moved = next != ledger
+      ledger = next
+      autoAdoptIfNothingToChoose(c)
+      if (moved && ledger.phase == SyncPhase.JOINING) persist()
+      return
+    }
     if (next == ledger) return
     ledger = next
     persist()
@@ -225,6 +259,7 @@ internal object SettingsSync {
     if (!paused) {
       if (ledger.phase == SyncPhase.JOINING) {
         ledger = SettingsSyncEngine.addPending(ledger, from, theirs.name, theirs.records, wellFormed)
+        autoAdoptIfNothingToChoose(c)
       } else if (!theirs.joining) {
         detect()
         mergeAndWrite(c, theirs.records, from, theirs.name)
@@ -266,6 +301,7 @@ internal object SettingsSync {
     if (ledger.phase == SyncPhase.JOINING) {
       ledger = SettingsSyncEngine.addPending(ledger, peer, theirs.name, theirs.records, wellFormed)
       persist()
+      autoAdoptIfNothingToChoose(c)
     } else {
       mergeAndWrite(c, theirs.records, peer, theirs.name)
     }
@@ -313,7 +349,8 @@ internal object SettingsSync {
   private fun publish() {
     val c = app ?: return
     val conflicts = ledger.pending?.let { SettingsSyncEngine.hasConflicts(it, catalog.read(c), catalog.defaults()) } ?: false
-    _status.value = SettingsSyncStatus.from(ledger, HouseholdKey.get(c) != null, paused, conflicts)
+    _status.value = SettingsSyncStatus.from(ledger, HouseholdKey.get(c) != null, paused, conflicts,
+        adoptCardDismissed = SettingsSyncStore.adoptCardDismissed(c))
   }
 
   private fun self(c: Context): String? = runCatching { RemoteCompanionStore.id(c) }.getOrNull()

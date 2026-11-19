@@ -171,6 +171,15 @@ internal object SettingsSyncEngine {
       }
 
   /**
+   * Whether the join choice can be made silently: nothing this Portal changed from the defaults would
+   * be overridden by the household, so "Adopt" and "Keep this Portal's" give the same result (adopt
+   * keeps this Portal's changes to keys the household never set). A new Portal with untouched
+   * defaults always qualifies.
+   */
+  fun canAutoAdopt(pending: PendingAdopt?, current: Map<String, Any>, defaults: Map<String, Any>): Boolean =
+      pending != null && pending.records.isNotEmpty() && !hasConflicts(pending, current, defaults)
+
+  /**
    * Resolves the one-time join choice. Both take every household record; [keepMine] then lets this
    * Portal's own changes win where they differ (new versions after the household's), while adopting
    * leaves only this Portal's changes to keys the household never changed. Returns the new ledger
