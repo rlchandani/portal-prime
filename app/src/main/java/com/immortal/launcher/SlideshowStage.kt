@@ -16,7 +16,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Rect
-import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
@@ -296,7 +295,14 @@ internal class SlideshowStage(
     private val printMatte = NativePhotoMatte(PRINT_MATTE, resources.displayMetrics.density)
     /** Easing of a new-mode settle; null for classic linear motion. */
     private var featureEasing: android.animation.TimeInterpolator? = null
+    /** A Night photo scene is one full-bleed cover photo and nothing else (see [displayFeature]). */
+    private var singleOpaquePhoto = false
     init { background = matte; clipChildren = true }
+
+    // The dissolve fades this whole layer. A single full-bleed photo cannot overlap itself, so
+    // its alpha is applied to the photo directly instead of through a full-screen offscreen
+    // layer every frame. Every other scene keeps the default (exactly as before).
+    override fun hasOverlappingRendering(): Boolean = !singleOpaquePhoto
 
     fun display(p: Presentation, width: Int, height: Int) {
       // Keep admission held across rebinding; a worker cannot reserve scratch
@@ -421,7 +427,11 @@ internal class SlideshowStage(
           it.show(look.backdrop, floatArrayOf(box.left + radius, box.top + radius, box.right - radius,
               box.bottom - radius), 0f, 0f, SPLIT_BACKDROP)
         }, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-      } else background = ColorDrawable(Color.BLACK)
+      } else {
+        // The cover photo fills the whole panel, so a black backing would be pure overdraw.
+        background = null
+        singleOpaquePhoto = true
+      }
       val holder = FrameLayout(context).apply {
         clipChildren = true
         if (split) {
@@ -630,6 +640,7 @@ internal class SlideshowStage(
     fun clear(releasePixels: Boolean = true) {
       displayed = null
       featureEasing = null
+      singleOpaquePhoto = false
       moves.forEach { it.cancel() }
       moves.clear()
       movePhotos.clear()
