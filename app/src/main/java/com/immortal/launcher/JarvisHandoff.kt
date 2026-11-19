@@ -53,6 +53,13 @@ internal object JarvisHandoff {
   fun cancelPending(context: Context) { host(context)?.let { pendingHosts.cancel(it) } }
 
   /**
+   * True while a Jarvis tap on this screen is still being prepared. A screen that resumes in that window (Home
+   * reappearing as a closing card finishes) must not clear the photo-frame bridge: that supersedes the tap.
+   */
+  fun isPreparing(context: Context): Boolean =
+      host(context)?.let { pendingHosts.isPreparing(it, SystemClock.uptimeMillis()) } == true
+
+  /**
    * Every Hearthpane Jarvis entry point. With Floating Jarvis installed (Jarvis 2.6+) one intent opens the ember card
    * over the screen in front — no WAKE broadcast and no wait for this screen to stop, since the card only pauses it.
    * An older Jarvis gets the full-app handoff. True acknowledges preparation; onLaunched closes standalone callers

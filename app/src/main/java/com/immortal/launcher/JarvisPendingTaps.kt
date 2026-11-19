@@ -39,6 +39,10 @@ internal class JarvisPendingTaps<K : Any>(private val staleAfterMs: Long = STALE
 
   fun isHeld(host: K): Boolean = host in pending
 
+  /** A preparation still settling on [host] (not a stuck one): the screen must not supersede its bridge. */
+  fun isPreparing(host: K, nowMs: Long): Boolean =
+      pending[host]?.let { nowMs - it.sinceMs in 0 until staleAfterMs } == true
+
   companion object {
     const val STALE_AFTER_MS = 2_000L
   }

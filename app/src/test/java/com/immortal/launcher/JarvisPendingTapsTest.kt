@@ -98,4 +98,13 @@ class JarvisPendingTapsTest {
     assertFalse(JarvisTapHost.stillShowing(resumedAtTap = false, now = State.DESTROYED))
     assertFalse(JarvisTapHost.stillShowing(resumedAtTap = false, now = null))
   }
+
+  @Test fun aSettlingPreparationIsProtectedButAStuckOneIsNot() {
+    val taps = JarvisPendingTaps<String>()
+    assertFalse(taps.isPreparing(home, nowMs = 0))
+    taps.hold(home, nowMs = 1_000) {}
+    assertTrue(taps.isPreparing(home, nowMs = 1_300))
+    assertFalse(taps.isPreparing(home, nowMs = 1_000 + JarvisPendingTaps.STALE_AFTER_MS))
+    assertFalse(taps.isPreparing("controlCenter", nowMs = 1_300))
+  }
 }
