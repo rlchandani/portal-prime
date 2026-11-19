@@ -128,7 +128,7 @@ private fun Details(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcCarView, cha
     } else {
       val idle = remember(car, charger, ids.model) { CcTeslaIdle.of(car, charger, ids.model) }
       IdleTile(idle)
-      Tile(added, "added last charge")
+      Tile(added, "last charge")
     }
     LimitTile(s, ui, ids, car, canAct)
   }
