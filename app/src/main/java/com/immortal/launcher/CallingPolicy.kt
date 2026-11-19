@@ -14,6 +14,11 @@ internal sealed interface IncomingDecision {
   data class Ring(val silent: Boolean) : IncomingDecision
   /** A permitted Chime-then-join drop-in: chime, banner, 3 s countdown, then join. */
   data object Countdown : IncomingDecision
+  /**
+   * Grandma mode auto-answer for a chosen caller: chime, a 10 s countdown with Not now, then the
+   * call connects. Only ever decided outside quiet hours (see [CallPolicy.decide] order).
+   */
+  data object AutoAnswer : IncomingDecision
   /** Turn it away; the caller is told why. Nothing rings and the screen stays dark. */
   data class Reject(val reply: CallReply) : IncomingDecision
 }
@@ -29,6 +34,12 @@ internal data class IncomingContext(
     /** This Portal's rule for drop-ins from the calling room. */
     val dropInFromCaller: DropInPolicy,
     val busy: Boolean,
+    /** [CallAutoAnswer.eligible] for this caller right now (Grandma mode, chosen, not snoozed). */
+    val autoAnswer: Boolean = false,
+    /** The caller is a paired phone: phones never drop in. */
+    val fromPhone: Boolean = false,
+    /** Settings › Calls › Phones: "Phones can call this Portal". */
+    val phonesAllowed: Boolean = true,
 )
 
 /**
@@ -39,8 +50,11 @@ internal object CallPolicy {
   fun decide(c: IncomingContext): IncomingDecision = when {
     c.busy -> IncomingDecision.Reject(CallReply.BUSY)
     c.whoCanCall == CallWhoCanCall.NOBODY -> IncomingDecision.Reject(CallReply.CALLS_OFF)
+    c.fromPhone && (!c.phonesAllowed || c.kind == CallKind.DROP_IN) -> IncomingDecision.Reject(CallReply.CALLS_OFF)
     c.kind == CallKind.DROP_IN -> dropIn(c)
+    // Quiet hours come before auto-answer: a Grandma-mode Portal never answers by itself at night.
     c.quiet -> quietRing(c)
+    c.autoAnswer -> IncomingDecision.AutoAnswer
     else -> IncomingDecision.Ring(silent = false)
   }
 
@@ -85,6 +99,9 @@ internal data class CallPeer(
     /** That Portal's rule for drop-ins from each room, by device id (its column of the grid). */
     val dropInPolicies: Map<String, DropInPolicy> = emptyMap(),
     val favourite: Boolean = false,
+    /** Where its fleet agent listens (from its signed hello), for video messages. Null if unknown. */
+    val host: String? = null,
+    val port: Int = 0,
 ) {
   fun contact() = CallContact(id, name)
 }

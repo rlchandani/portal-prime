@@ -6,7 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.media.AudioManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +64,8 @@ internal fun CallEndedScreen(ended: EndedCall, motion: Boolean, onCallBack: (Cal
           copy.retry -> CallPill(if (ended.connectedMs != null || ended.direction == CallDirection.INCOMING) "Call back" else "Try again",
               { onCallBack(CallKind.CALL) }, icon = "phone", style = CallButtonStyle.OK, size = CallButtonSize.LG)
         }
+        if (canLeaveMessage(ended)) CallPill(CallMessageCopy.LEAVE, { leaveMessage(context, ended, onDone) }, icon = "msg",
+            style = CallButtonStyle.GLASS, size = CallButtonSize.LG)
         CallPill(if (copy.retry || ended.reason == CallEndReason.DROP_INS_OFF) "Close" else "Done", onDone,
             style = CallButtonStyle.GLASS, size = CallButtonSize.LG)
       }
@@ -90,25 +91,38 @@ private fun androidx.compose.foundation.layout.BoxScope.EndedCompact(ended: Ende
         copy.retry -> CallPill(if (ended.connectedMs != null || ended.direction == CallDirection.INCOMING) "Call back" else "Try again",
             { onCallBack(CallKind.CALL) }, icon = "phone", style = CallButtonStyle.OK)
       }
+      if (canLeaveMessage(ended)) {
+        val context = LocalContext.current
+        CallPill(if (layout.compactPortrait) "Message" else CallMessageCopy.LEAVE, { leaveMessage(context, ended, onDone) }, icon = "msg",
+            style = CallButtonStyle.GLASS)
+      }
       CallPill(if (copy.retry || ended.reason == CallEndReason.DROP_INS_OFF) "Close" else "Done", onDone, style = CallButtonStyle.GLASS)
     }
     if (normal) Text("Closing in 5 s", color = Color.White.copy(alpha = 0.5f), fontSize = 22.sp)
   }
 }
 
+/** Mock `noanswerScr` / `callQuietScr`: an outgoing call to a Portal that nobody took can leave a video message. */
+internal fun canLeaveMessage(ended: EndedCall): Boolean =
+    ended.direction == CallDirection.OUTGOING && ended.kind == CallKind.CALL && ended.reason in MESSAGE_REASONS &&
+        CallMessages.canSend(ended.peer)
+
+private fun leaveMessage(context: android.content.Context, ended: EndedCall, onDone: () -> Unit) {
+  onDone()
+  CallMessages.compose(context, ended.peer)
+}
+
+private val MESSAGE_REASONS = setOf(CallEndReason.NO_ANSWER, CallEndReason.DECLINED, CallEndReason.QUIET, CallEndReason.BUSY,
+    CallEndReason.MISSED)
+
 /** Volume popover above the controls: slider, Quieter / Louder (±10 %), the echo note. */
 @Composable
 internal fun CallVolumePopover(modifier: Modifier = Modifier) {
   val context = LocalContext.current
-  val audio = remember { context.getSystemService(AudioManager::class.java) }
-  val max = remember { audio?.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL)?.coerceAtLeast(1) ?: 1 }
-  var level by remember { mutableIntStateOf(audio?.getStreamVolume(AudioManager.STREAM_VOICE_CALL) ?: 0) }
-  fun step(delta: Int) {
-    val stepUnits = maxOf(1, Math.round(max * VOLUME_STEP))
-    level = (level + delta * stepUnits).coerceIn(0, max)
-    runCatching { audio?.setStreamVolume(AudioManager.STREAM_VOICE_CALL, level, 0) }
-  }
-  val pct = level * PERCENT / max
+  val volume = remember { CallVolume(context) }
+  var level by remember { mutableIntStateOf(volume.level()) }
+  fun step(delta: Int) { level = volume.step(level, delta) }
+  val pct = CallVolumeMath.percent(level, volume.max)
   // Compact: never wider than the window (the caller insets it); the designed 620 when it fits.
   val width = if (currentLayoutClass().compact) Modifier.widthIn(max = 620.dp).fillMaxWidth() else Modifier.width(620.dp)
   Column(modifier.then(width).callPanel(CallColors.Popover, RoundedCornerShape(36.dp)).padding(32.dp),
@@ -137,6 +151,5 @@ private fun VolumeStep(label: String, modifier: Modifier, onClick: () -> Unit) {
 
 private val AUTO_CLOSE = setOf(CallEndReason.HUNG_UP, CallEndReason.LEFT, CallEndReason.CANCELLED, CallEndReason.DECLINED,
     CallEndReason.CAP_REACHED, CallEndReason.MISSED)
-private const val VOLUME_STEP = 0.1f
 private val ENDED_ICON_COMPACT = 120.dp
 private const val PERCENT = 100

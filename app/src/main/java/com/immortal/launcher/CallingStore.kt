@@ -89,6 +89,7 @@ internal object CallPeerCodec {
   fun encode(list: List<CallPeer>): String = JSONArray(list.map { p ->
     JSONObject().put("id", p.id).put("n", p.name).put("s", p.seenMs).put("c", p.inCall).put("q", p.quiet)
         .put("rc", p.acceptsCalls).put("di", p.dropInsOn).put("dp", DropInGrid.encode(p.dropInPolicies)).put("f", p.favourite)
+        .apply { if (p.host != null) { put("h", p.host); put("pt", p.port) } }
   }).toString()
 
   fun decode(raw: String?): List<CallPeer> {
@@ -97,8 +98,11 @@ internal object CallPeerCodec {
       val o = arr.optJSONObject(i) ?: return@mapNotNull null
       val id = o.optString("id").takeIf(DinnerWire::isDeviceId) ?: return@mapNotNull null
       val name = DinnerWire.cleanName(o.optString("n")) ?: return@mapNotNull null
+      val host = o.optString("h").takeIf(HouseholdListPeerAuth::isPrivateLan)
+      val port = o.optInt("pt", 0).takeIf { it in 1..65535 }
       CallPeer(id, name, o.optLong("s", 0L), o.optBoolean("c"), o.optBoolean("q"), o.optBoolean("rc", true),
-          o.optBoolean("di"), DropInGrid.decode(o.optString("dp")) ?: emptyMap(), o.optBoolean("f"))
+          o.optBoolean("di"), DropInGrid.decode(o.optString("dp")) ?: emptyMap(), o.optBoolean("f"),
+          host = host.takeIf { port != null }, port = if (host != null) port ?: 0 else 0)
     }.distinctBy { it.id }.take(CallPeers.CAPACITY)
   }
 }

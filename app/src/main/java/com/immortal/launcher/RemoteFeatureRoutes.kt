@@ -39,7 +39,9 @@ internal object RemoteFeatureRoutes {
     when (method) {
       "GET" -> json(200, ok().put("configured", HouseholdKey.get(context) != null)
           .put("fingerprint", HouseholdKey.get(context)?.let(HouseholdKey::fingerprint) ?: JSONObject.NULL))
-      "POST" -> if (body.optBoolean("share")) shareKey(context) else {
+      // Reading or replacing the key needs a pairing done in person in the last 10 minutes.
+      "POST" -> if (!RemotePairing.householdWindowOpen()) json(403, error("pair_again"))
+      else if (body.optBoolean("share")) shareKey(context) else {
         val key = HouseholdKey.fromHex(body.optString("key"))
         if (!HouseholdKey.isValidKey(key) || !HouseholdKey.set(context, key!!)) json(400, error("invalid_key"))
         else {

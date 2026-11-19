@@ -59,6 +59,8 @@ class RemoteRoutes internal constructor(
   private val remoteAssets = mutableMapOf<String, ByteArray>()
 
   fun handle(req: FleetHttpServer.Request): FleetHttpServer.Response = try {
+      // Grandma mode: arming auto-answer needs a person at the screen, not the phone remote.
+      if (req.path in CallInPerson.INPUT_PATHS) CallInPerson.noteRemoteInput(System.currentTimeMillis())
       when (req.path) {
         "/remote/companion", "/remote/layout", "/remote/snapshot", "/remote/catalog",
         "/remote/operation", "/remote/operations", "/remote/jarvis", "/remote/scenes",
@@ -115,6 +117,10 @@ class RemoteRoutes internal constructor(
         ChoresPeerRoute.PATH -> ChoresPeerRoute.handle(context, req)
         // Portal↔Portal call setup: household-signed SDP offer/answer with bound DTLS fingerprints.
         CallSignalAuth.PATH -> CallPeerRoute.handle(context, req)
+        // Portal↔Portal video message delivery: household-signed header, sealed chunked body.
+        CallMessageWire.PATH -> CallMessageRoute.handle(context, req)
+        // Phone ↔ Portal calls: a paired phone session *and* a household-signed header (CallPhoneRoute).
+        in CallPhoneRoute.PATHS -> CallPhoneRoute.handle(context, req, bearer(req.header("authorization")))
         // Feature-owned /remote/<name> routes go through the paired-session checks first.
         else -> if (RemoteFeatureRoutes.lookup(req.path) != null) companion.handle(req) else json(404, err("not_found"))
       }
