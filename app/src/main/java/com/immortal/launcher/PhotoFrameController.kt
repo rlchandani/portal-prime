@@ -2120,6 +2120,7 @@ class PhotoFrameController(
     placeSplitPanel(root.width, root.height)
     root.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ -> v.post { placeSplitPanel(v.width, v.height) } }
     panel.start()
+    renderCalendar()
     refreshSplitWeather()
   }
 
@@ -2133,7 +2134,6 @@ class PhotoFrameController(
     lp.width = area.width; lp.height = area.height; lp.leftMargin = area.left; lp.topMargin = area.top
     lp.gravity = Gravity.TOP or Gravity.START
     panel.view.layoutParams = lp
-    panel.setCentered(h > w)
   }
 
   private fun refreshSplitWeather() {

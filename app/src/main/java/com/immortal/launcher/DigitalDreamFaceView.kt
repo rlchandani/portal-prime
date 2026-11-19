@@ -63,6 +63,8 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
   private var changedAt = 0L
   private var flipAnimator: ValueAnimator? = null
   private var sweepOn = false
+  private var dial: Shader? = null
+  private var dialKey = -1L
 
   /** Refresh the displayed time; called by the dream's minute (or second) tick. */
   fun update(now: Date = Date()) {
@@ -237,46 +239,75 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
     }
   }
 
-  /** One split-flap card: static halves, then the top flap falls and the bottom flap lands. */
-  private fun drawCard(canvas: Canvas, x: Float, y: Float, f: DigitalClockFaceSpec.Flip, nv: String, ov: String, p: Float) {
-    val mid = y + f.cardH / 2f
-    rect.set(x, y, x + f.cardW, y + f.cardH)
-    fill.color = 0
-    fill.setShadowLayer(26f * density, 0f, 14f * density, 0xB3000000.toInt())
-    canvas.drawRoundRect(rect, f.radius, f.radius, fill)
-    fill.clearShadowLayer()
-    half(canvas, x, y, f, true, nv)                       // new digit's top is revealed beneath
-    half(canvas, x, y, f, false, if (p >= 1f) nv else ov) // old bottom until the flap lands
-    if (p < 1f) {
-      val a = (p / .5f).coerceIn(0f, 1f)
-      val b = ((p - .5f) / .5f).coerceIn(0f, 1f)
-      if (a < 1f) flap(canvas, x, y, f, true, ov, -90f * a * a, a * a * .9f)
-      if (p > .5f) flap(canvas, x, y, f, false, nv, 90f - 90f * BOUNCE.getInterpolation(b), (1f - b) * .9f)
+  /** Card art cached per size: drawing it per frame (gradients, blurred shadow) janked the flip. */
+  private class CardArt(val w: Int, val h: Int, val shadow: android.graphics.Bitmap, val pad: Int,
+      val top: android.graphics.Bitmap, val bottom: android.graphics.Bitmap, val seam: Shader)
+  private var art: CardArt? = null
+
+  private fun cardArt(f: DigitalClockFaceSpec.Flip): CardArt {
+    val w = f.cardW.toInt().coerceAtLeast(1)
+    val h = f.cardH.toInt().coerceAtLeast(2)
+    art?.let { if (it.w == w && it.h == h) return it }
+    val pad = (40f * density).toInt()
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    val shadow = android.graphics.Bitmap.createBitmap(w + 2 * pad, h + 2 * pad, android.graphics.Bitmap.Config.ARGB_8888)
+    Canvas(shadow).apply {
+      paint.color = 0
+      paint.setShadowLayer(26f * density, 0f, 14f * density, 0xB3000000.toInt())
+      drawRoundRect(RectF(pad.toFloat(), pad.toFloat(), (pad + w).toFloat(), (pad + h).toFloat()), f.radius, f.radius, paint)
+      paint.clearShadowLayer()
     }
-    stroke.shader = LinearGradient(x, mid, x + f.cardW, mid, intArrayOf(SEAM_EDGE, SEAM_GLOW, SEAM_EDGE),
+    fun halfBitmap(top: Boolean): android.graphics.Bitmap {
+      val b = android.graphics.Bitmap.createBitmap(w, h / 2, android.graphics.Bitmap.Config.ARGB_8888)
+      val c = Canvas(b)
+      paint.shader = LinearGradient(0f, 0f, 0f, h / 2f, if (top) CARD_TOP_A else CARD_BOTTOM_A,
+          if (top) CARD_TOP_B else CARD_BOTTOM_B, Shader.TileMode.CLAMP)
+      // Round only the outer corners: draw the full card offset so the cut edge is square.
+      c.drawRoundRect(RectF(0f, if (top) 0f else -h / 2f, w.toFloat(), if (top) h.toFloat() else h / 2f),
+          f.radius, f.radius, paint)
+      paint.shader = null
+      return b
+    }
+    val seam = LinearGradient(0f, 0f, w.toFloat(), 0f, intArrayOf(SEAM_EDGE, SEAM_GLOW, SEAM_EDGE),
         floatArrayOf(0f, .5f, 1f), Shader.TileMode.CLAMP)
-    stroke.strokeWidth = maxOf(2f, 2f * density)
-    stroke.strokeCap = Paint.Cap.BUTT
-    canvas.drawLine(x, mid, x + f.cardW, mid, stroke)
-    stroke.shader = null
+    return CardArt(w, h, shadow, pad, halfBitmap(true), halfBitmap(false), seam).also { art = it }
   }
 
-  private fun half(canvas: Canvas, x: Float, y: Float, f: DigitalClockFaceSpec.Flip, top: Boolean, digit: String) {
+  /** One split-flap card: static halves, then the top flap falls and the bottom flap lands. */
+  private fun drawCard(canvas: Canvas, x: Float, y: Float, f: DigitalClockFaceSpec.Flip, nv: String, ov: String, p: Float) {
+    val a = cardArt(f)
     val mid = y + f.cardH / 2f
+    canvas.drawBitmap(a.shadow, x - a.pad, y - a.pad, null)
+    half(canvas, a, x, y, f, true, nv)                       // new digit's top is revealed beneath
+    half(canvas, a, x, y, f, false, if (p >= 1f) nv else ov) // old bottom until the flap lands
+    if (p < 1f) {
+      val t1 = (p / .5f).coerceIn(0f, 1f)
+      val t2 = ((p - .5f) / .5f).coerceIn(0f, 1f)
+      if (t1 < 1f) flap(canvas, a, x, y, f, true, ov, -90f * t1 * t1, t1 * t1 * .9f)
+      if (p > .5f) flap(canvas, a, x, y, f, false, nv, 90f - 90f * BOUNCE.getInterpolation(t2), (1f - t2) * .9f)
+    }
+    val save = canvas.save()
+    canvas.translate(x, 0f)
+    stroke.shader = a.seam
+    stroke.strokeWidth = maxOf(2f, 2f * density)
+    stroke.strokeCap = Paint.Cap.BUTT
+    canvas.drawLine(0f, mid, f.cardW, mid, stroke)
+    stroke.shader = null
+    canvas.restoreToCount(save)
+  }
+
+  private fun half(canvas: Canvas, a: CardArt, x: Float, y: Float, f: DigitalClockFaceSpec.Flip, top: Boolean, digit: String) {
+    val mid = y + f.cardH / 2f
+    canvas.drawBitmap(if (top) a.top else a.bottom, x, if (top) y else mid, null)
     val save = canvas.save()
     canvas.clipRect(x, if (top) y else mid, x + f.cardW, if (top) mid else y + f.cardH)
-    rect.set(x, y, x + f.cardW, y + f.cardH)
-    fill.shader = LinearGradient(0f, if (top) y else mid, 0f, if (top) mid else y + f.cardH,
-        if (top) CARD_TOP_A else CARD_BOTTOM_A, if (top) CARD_TOP_B else CARD_BOTTOM_B, Shader.TileMode.CLAMP)
-    canvas.drawRoundRect(rect, f.radius, f.radius, fill)
-    fill.shader = null
     time.color = INK_FLIP
     canvas.drawText(digit, x + f.cardW / 2f, mid - (time.ascent() + time.descent()) / 2f, time)
     canvas.restoreToCount(save)
   }
 
-  private fun flap(canvas: Canvas, x: Float, y: Float, f: DigitalClockFaceSpec.Flip, top: Boolean, digit: String,
-      degrees: Float, shade: Float) {
+  private fun flap(canvas: Canvas, a: CardArt, x: Float, y: Float, f: DigitalClockFaceSpec.Flip, top: Boolean,
+      digit: String, degrees: Float, shade: Float) {
     val mid = y + f.cardH / 2f
     val save = canvas.save()
     camera.save()
@@ -287,7 +318,7 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
     cameraMatrix.preTranslate(-(x + f.cardW / 2f), -mid)
     cameraMatrix.postTranslate(x + f.cardW / 2f, mid)
     canvas.concat(cameraMatrix)
-    half(canvas, x, y, f, top, digit)
+    half(canvas, a, x, y, f, top, digit)
     fill.color = if (top) ((shade * 140).toInt() shl 24) else ((shade * 100).toInt() shl 24)
     canvas.drawRect(x, if (top) y else mid, x + f.cardW, if (top) mid else y + f.cardH, fill)
     canvas.restoreToCount(save)
@@ -298,7 +329,12 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
     val r = minOf(w * .42f, (h - dateRoom) * .42f) * (DigitalClockFaceSpec.timeSizeDp(settings.size) / 250f).coerceIn(.7f, 1.1f)
     val cx = w / 2f
     val dy = cy - dateRoom / 2f
-    fill.shader = RadialGradient(cx, dy - r * .2f, r, DIAL_CENTRE, DIAL_EDGE, Shader.TileMode.CLAMP)
+    val key = (cx.toInt().toLong() shl 40) or (dy.toInt().toLong() shl 20) or r.toInt().toLong()
+    if (dialKey != key) {
+      dial = RadialGradient(cx, dy - r * .2f, r, DIAL_CENTRE, DIAL_EDGE, Shader.TileMode.CLAMP)
+      dialKey = key
+    }
+    fill.shader = dial
     canvas.drawCircle(cx, dy, r, fill)
     fill.shader = null
     stroke.strokeCap = Paint.Cap.ROUND

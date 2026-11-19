@@ -146,16 +146,6 @@ internal class SplitGlancePanel(private val context: Context) {
     if (nextTime.text.toString() != t) nextTime.text = t
   }
 
-  /** Narrow viewports (Mini portrait) centre the panel under the card. */
-  fun setCentered(centered: Boolean) {
-    view.gravity = if (centered) Gravity.CENTER else Gravity.CENTER_VERTICAL or Gravity.START
-    val g = if (centered) Gravity.CENTER_HORIZONTAL else Gravity.START
-    for (i in 0 until view.childCount) (view.getChildAt(i).layoutParams as? LinearLayout.LayoutParams)?.let {
-      it.gravity = g
-      view.getChildAt(i).layoutParams = it
-    }
-  }
-
   private val tick = object : Runnable {
     override fun run() {
       if (!running) return
