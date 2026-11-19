@@ -461,17 +461,24 @@ class PhotoFrameController(
       onNightClockChanged?.invoke(true)
       return
     }
-    if (!photosOnly && settings.darkRoomClock) {
+    // Verification builds only: generated scenes replace every configured (household) source.
+    testSourceOn = !photosOnly && ScreensaverTestSource.active(context)
+    if (testSourceOn) Log.i(TAG, "screensaver test source active: generated scenes only")
+    // Operator verification: the dark room is forced on, so the light sensor must not undo it.
+    val forcedNight = testSourceOn && ScreensaverTestSource.forcedNight(context)
+    if (!photosOnly && settings.darkRoomClock && !forcedNight) {
       darkRoomObserver = DarkRoomObserver(context, settings.darkRoomLux.toFloat(),
           onNightChanged = ::setAmbientNight)
       darkRoomObserver?.setActive(hostVisible)
     }
-    // Verification builds only: generated scenes replace every configured (household) source.
-    testSourceOn = !photosOnly && ScreensaverTestSource.active(context)
-    if (testSourceOn) Log.i(TAG, "screensaver test source active: generated scenes only")
     val source = if (testSourceOn) PhotoFrameSource.DefaultFeed
         else PhotoFrameSource.from(settings, allowWebPage = !photosOnly && faceOverride == null)
     nativePhotoMode = ScreensaverConfig.isNativeStage(settings.mode) && source !is PhotoFrameSource.WebPage
+    if (forcedNight) {
+      // Like lights going out: the day frame draws first, then the room turns dark.
+      Log.i("ImmortalNight", "dark room forced by the operator test source")
+      ui.postDelayed({ setAmbientNight(true) }, ScreensaverTestSource.FORCED_NIGHT_DELAY_MS)
+    }
     if (nativePhotoMode) {
       nativeStarting = true
       nativeStage.visibility = View.VISIBLE
@@ -559,7 +566,8 @@ class PhotoFrameController(
     // it's disabled whenever an engine mode is active — the user never asked for that overlay.
     val engineMode = ScreensaverConfig.usesEngine(settings.mode)
     if (!photosOnly) refreshWeather.run()
-    if (!photosOnly && !overnightNightPhoto && !splitGlance && settings.ambientDashboard && !engineMode)
+    // The dashboard reads the household calendar, so it never runs on the verification source.
+    if (!photosOnly && !overnightNightPhoto && !splitGlance && !testSourceOn && settings.ambientDashboard && !engineMode)
       ui.postDelayed(dashboardCycle, 45_000L)
 
     if (!photosOnly && showWelcome && settings.welcomeEnabled && !engineMode) showWelcomeOverlay()

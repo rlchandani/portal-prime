@@ -27,7 +27,14 @@ import kotlin.math.sin
 internal object ScreensaverTestSource {
   private const val PREFS = "screensaver_test_source"
   private const val KEY_UNTIL = "until"
+  private const val KEY_NIGHT_UNTIL = "night_until"
   const val MAX_MINUTES = 240
+  /** A forced dark room arrives after the day frame has drawn, as when the lights go out. */
+  const val FORCED_NIGHT_DELAY_MS = 12_000L
+  // The marker's centre as a fraction of the scene: the framing target, so it stays inside every
+  // cover crop (a portrait scene on a landscape panel keeps only its middle band).
+  internal const val MARKER_X = .5f
+  internal const val MARKER_Y = .45f
 
   /** A generated scene: aspect, palette, and a synthetic caption. */
   class Scene(
@@ -58,16 +65,27 @@ internal object ScreensaverTestSource {
   fun until(context: Context): Long =
       context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(KEY_UNTIL, 0L)
 
-  /** Enable for [minutes] (clamped to 1..[MAX_MINUTES]); false when this build has no test source. */
-  fun enable(context: Context, minutes: Int, nowMs: Long = System.currentTimeMillis()): Boolean {
+  /**
+   * Enable for [minutes] (clamped to 1..[MAX_MINUTES]); false when this build has no test source.
+   * [night] also forces the dark-room state for the same span (operator verification of the night
+   * colours without the light sensor); it expires with the source and is dropped by a plain enable.
+   */
+  fun enable(context: Context, minutes: Int, nowMs: Long = System.currentTimeMillis(), night: Boolean = false): Boolean {
     if (!available()) return false
-    val span = minutes.coerceIn(1, MAX_MINUTES) * 60_000L
-    return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-        .putLong(KEY_UNTIL, nowMs + span).commit()
+    val until = nowMs + minutes.coerceIn(1, MAX_MINUTES) * 60_000L
+    val edit = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putLong(KEY_UNTIL, until)
+    if (night) edit.putLong(KEY_NIGHT_UNTIL, until) else edit.remove(KEY_NIGHT_UNTIL)
+    return edit.commit()
   }
 
   fun disable(context: Context): Boolean =
-      context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().remove(KEY_UNTIL).commit()
+      context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+          .remove(KEY_UNTIL).remove(KEY_NIGHT_UNTIL).commit()
+
+  /** True while an operator forced the dark room on together with an active test source. */
+  fun forcedNight(context: Context, nowMs: Long = System.currentTimeMillis()): Boolean =
+      active(context, nowMs) &&
+          context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(KEY_NIGHT_UNTIL, 0L) > nowMs
 
   fun scene(index: Int): Scene = scenes[Math.floorMod(index, scenes.size)]
 
@@ -120,10 +138,16 @@ internal object ScreensaverTestSource {
       paint.color = color
       canvas.drawPath(path, paint)
     }
-    // A visible marker: anything captured from this source is self-evidently a test scene.
-    paint.color = Color.argb(150, 255, 255, 255)
-    paint.textSize = minOf(w, h) * .028f
-    canvas.drawText("TEST SCENE ${Math.floorMod(index, scenes.size) + 1} - generated", w * .03f, h * .05f, paint)
+    // A visible marker: anything captured from this source is self-evidently a test scene. It sits
+    // well inside the frame, because cover framing and the settle zoom crop the outer edges away
+    // (a corner marker was cut off on a Portal+), and it stays bright enough to read under the
+    // Night photo's warm dim veil.
+    paint.shader = null
+    paint.textAlign = Paint.Align.CENTER
+    paint.textSize = minOf(w, h) * .036f
+    paint.color = Color.argb(220, 255, 255, 255)
+    paint.setShadowLayer(paint.textSize * .15f, 0f, 0f, Color.argb(200, 0, 0, 0))
+    canvas.drawText("TEST SCENE ${Math.floorMod(index, scenes.size) + 1} - generated", w * MARKER_X, h * MARKER_Y, paint)
     return bitmap
   }
 }

@@ -17,6 +17,7 @@ import org.mockito.Mockito
 class ScreensaverTestSourceTest {
   private class Prefs {
     var until: Long? = null
+    var nightUntil: Long? = null
     val context: Context = Mockito.mock(Context::class.java)
 
     init {
@@ -29,6 +30,11 @@ class ScreensaverTestSourceTest {
         until = it.getArgument(1); editor
       }
       Mockito.`when`(editor.remove("until")).thenAnswer { until = null; editor }
+      Mockito.`when`(prefs.getLong(Mockito.eq("night_until"), Mockito.anyLong())).thenAnswer { nightUntil ?: it.getArgument<Long>(1) }
+      Mockito.`when`(editor.putLong(Mockito.eq("night_until"), Mockito.anyLong())).thenAnswer {
+        nightUntil = it.getArgument(1); editor
+      }
+      Mockito.`when`(editor.remove("night_until")).thenAnswer { nightUntil = null; editor }
       Mockito.`when`(editor.commit()).thenReturn(true)
     }
   }
@@ -56,6 +62,42 @@ class ScreensaverTestSourceTest {
     ScreensaverTestSource.enable(p.context, 30, nowMs = 0L)
     assertTrue(ScreensaverTestSource.disable(p.context))
     assertFalse(ScreensaverTestSource.active(p.context, 1L))
+  }
+
+  @Test fun forcedNightNeedsTheSourceAndExpiresWithIt() {
+    if (!ScreensaverTestSource.available()) return
+    val p = Prefs()
+    assertTrue(ScreensaverTestSource.enable(p.context, 30, nowMs = 0L))
+    assertFalse(ScreensaverTestSource.forcedNight(p.context, 1L))
+    assertTrue(ScreensaverTestSource.enable(p.context, 30, nowMs = 0L, night = true))
+    assertTrue(ScreensaverTestSource.forcedNight(p.context, 1L))
+    assertFalse(ScreensaverTestSource.forcedNight(p.context, 30 * 60_000L + 1))
+    // Re-enabling without night drops the forced dark room.
+    assertTrue(ScreensaverTestSource.enable(p.context, 30, nowMs = 0L))
+    assertFalse(ScreensaverTestSource.forcedNight(p.context, 1L))
+  }
+
+  @Test fun disablingAlsoEndsForcedNight() {
+    if (!ScreensaverTestSource.available()) return
+    val p = Prefs()
+    ScreensaverTestSource.enable(p.context, 30, nowMs = 0L, night = true)
+    assertTrue(ScreensaverTestSource.disable(p.context))
+    assertFalse(ScreensaverTestSource.forcedNight(p.context, 1L))
+    assertEquals(null, p.nightUntil)
+  }
+
+  @Test fun markerStaysInsideEveryCoverCrop() {
+    // Panels: Portal+ landscape, Mini portrait and landscape. Cover crops centre on x and on the
+    // framing target (.45) on y; a corner marker was cut off on a Portal+ capture.
+    val panels = listOf(2160f / 1440f, 800f / 1280f, 1280f / 800f)
+    for (scene in ScreensaverTestSource.scenes) for (panel in panels) {
+      val aspect = scene.width.toFloat() / scene.height
+      val visibleX = minOf(1f, panel / aspect)
+      val visibleY = minOf(1f, aspect / panel)
+      val y0 = (.45f - visibleY / 2f).coerceIn(0f, 1f - visibleY)
+      assertTrue(kotlin.math.abs(ScreensaverTestSource.MARKER_X - .5f) < visibleX / 2f)
+      assertTrue(ScreensaverTestSource.MARKER_Y in y0..(y0 + visibleY))
+    }
   }
 
   @Test fun scenesCoverEveryFramingCaseAndCycle() {

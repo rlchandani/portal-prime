@@ -391,7 +391,7 @@ class FleetRoutes(private val context: Context) {
             .put("result", ControlCenter.debug(context, dry, plan, alert, unreachable, fake)))
       }
       // Verification only: swap every photo source for generated scenes (expires on its own), or
-      // switch back. {"enabled":true|false, "minutes":1..240}. Any frame already on screen is
+      // switch back. {"enabled":true|false, "minutes":1..240, "night":false|true}. Any frame already on screen is
       // retired first so household photos are never on screen while the switch is on; enabling
       // then opens a fresh frame on the generated scenes. Release builds report unavailable.
       "screensaver_test_source" -> {
@@ -399,7 +399,9 @@ class FleetRoutes(private val context: Context) {
         val minutes = body.optInt("minutes", 30)
         if (enable && minutes !in 1..ScreensaverTestSource.MAX_MINUTES)
           return resp(400, err("bad_minutes"))
-        val applied = if (enable) ScreensaverTestSource.enable(context, minutes)
+        // "night":true also forces the dark-room state (night colours) without the light sensor.
+        val night = body.optBoolean("night", false)
+        val applied = if (enable) ScreensaverTestSource.enable(context, minutes, night = night)
             else ScreensaverTestSource.disable(context)
         if (applied) {
           val main = android.os.Handler(android.os.Looper.getMainLooper())
@@ -416,6 +418,7 @@ class FleetRoutes(private val context: Context) {
             .put("digitalClockFace", DigitalClockConfig.faceOf(DigitalClockConfig.load(context)))
             .put("available", ScreensaverTestSource.available())
             .put("active", ScreensaverTestSource.active(context))
+            .put("night", ScreensaverTestSource.forcedNight(context))
             .put("until", ScreensaverTestSource.until(context)))
       }
       // Verification only (test-source builds): open the digital clock preview, optionally on a
