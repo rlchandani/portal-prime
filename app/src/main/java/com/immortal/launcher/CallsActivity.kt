@@ -87,6 +87,7 @@ private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
   val p = LocalApprovedPalette.current
   var tab by rememberSaveable { mutableStateOf(start) }
   var everyone by remember { mutableStateOf(false) }
+  var loopback by remember { mutableStateOf(false) }
   val history by CallingStore.history.collectAsState()
   // While the app is open, ask the rooms who's around every 30 s (presence goes stale after 90 s).
   LaunchedEffect(Unit) {
@@ -96,18 +97,19 @@ private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
   LaunchedEffect(tab) { if (tab == CallsTab.RECENT) CallingStore.markSeen(context) }
   Box(Modifier.fillMaxSize().background(p.background)) {
     Column(Modifier.fillMaxSize()) {
-      CallsHeader(tab, CallHistory.unseenMissed(history), onTab = { tab = it }, onBack = onBack)
+      CallsHeader(tab, CallHistory.unseenMissed(history), onTab = { tab = it }, onBack = onBack, onLoopback = { loopback = true })
       when (tab) {
         CallsTab.ROOMS -> CallsRooms(onEveryone = { everyone = true })
         CallsTab.RECENT -> CallsRecent(history)
       }
     }
     if (everyone) Box(Modifier.fillMaxSize()) { DinnerCallSheet(onDismiss = { everyone = false }) }
+    if (loopback && BuildConfig.PORTAL_CALL_LOOPBACK) CallLoopbackScreen(onClose = { loopback = false })
   }
 }
 
 @Composable
-private fun CallsHeader(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, onBack: () -> Unit) {
+private fun CallsHeader(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, onBack: () -> Unit, onLoopback: () -> Unit) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
   val surface = callsSurface()
@@ -121,6 +123,7 @@ private fun CallsHeader(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, o
     Spacer(Modifier.weight(1f))
     CallsSegmented(CallsTab.entries.map { it.label + if (it == CallsTab.RECENT && missed > 0) " · $missed" else "" },
         tab.ordinal) { onTab(CallsTab.entries[it]) }
+    if (BuildConfig.PORTAL_CALL_LOOPBACK) CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
     CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
     CallRoundButton("gear", "Call settings", { context.startActivity(settingsPageIntent(context, SettingsPageIds.CALLS)) },
         surface = surface)

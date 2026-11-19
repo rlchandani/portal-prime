@@ -83,6 +83,10 @@ android {
     buildConfigField("boolean", "PORTAL_HOME_UI_DIAGNOSTICS", "false")
     buildConfigField("boolean", "PORTAL_SETTINGS_UI_DIAGNOSTICS", "false")
     buildConfigField("boolean", "PORTAL_SETTINGS_PANE_DIAGNOSTICS", "false")
+    // Calling perf probe: an in-process two-peer loopback call (camera → HW encode → LAN →
+    // decode → render) behind a Calls app button. Off in every normal build; measurement only.
+    buildConfigField("boolean", "PORTAL_CALL_LOOPBACK",
+        (providers.gradleProperty("portalCallLoopback").orNull == "true").toString())
 
 
     // Portal hardware is ARM only (gen-1/gen-2 Snapdragon, Portal TV Amlogic).
