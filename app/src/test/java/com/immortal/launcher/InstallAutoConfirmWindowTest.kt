@@ -158,6 +158,37 @@ class InstallAutoConfirmWindowTest {
     assertFalse(window.isArmed())
   }
 
+  @Test fun leaseCanCoverALongResultWait() {
+    val clock = FakeClock()
+    val window = InstallAutoConfirmWindow(clock = { clock.nowMs })
+    window.arm(ttl = 294_000L)
+
+    clock.advanceBy(120_000L)
+    assertTrue("a 52 MB install's dialog may appear well after the old 30 s cap", window.isArmed())
+    clock.advanceBy(174_000L)
+    assertFalse(window.isArmed())
+  }
+
+  @Test fun tapIsRecordedOnlyForLiveLeases() {
+    val clock = FakeClock()
+    val window = InstallAutoConfirmWindow(clock = { clock.nowMs })
+    val lease = window.arm()
+    assertFalse(window.tapped(lease))
+
+    window.recordTap()
+    assertTrue(window.tapped(lease))
+
+    val later = window.arm()
+    assertFalse("a tap before this lease existed isn't its tap", window.tapped(later))
+    window.disarm(lease)
+    assertFalse(window.tapped(lease))
+  }
+
+  @Test fun dormantWindowNeverReadsTheClock() {
+    val window = InstallAutoConfirmWindow(clock = { error("clock read while dormant") })
+    assertFalse(window.isArmed())
+  }
+
   private class FakeClock(var nowMs: Long = 1_000L) {
     fun advanceBy(elapsedMs: Long) {
       nowMs += elapsedMs
