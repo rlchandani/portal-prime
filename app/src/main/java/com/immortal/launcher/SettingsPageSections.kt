@@ -168,6 +168,11 @@ internal object SettingsPageSections {
             section(null, block(B.MUSIC)),
             section("Multi-room audio", block(B.MULTIROOM), advanced = true),
         ),
+        P.JARVIS to listOf(
+            section("Voice", rows("jarvis", "wakeOnScreens"),
+                footer = "Hearthpane listens on this Portal only while one of its screens is in front. " +
+                    "Nothing is recorded or sent until Jarvis opens."),
+        ),
         P.ABOUT to listOf(
             section("This Portal", block(B.DEVICE_NAME)),
             section(null, block(B.ABOUT_HEALTH)),

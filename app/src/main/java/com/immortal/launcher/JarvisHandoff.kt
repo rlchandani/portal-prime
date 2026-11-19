@@ -73,6 +73,16 @@ internal object JarvisHandoff {
     }
   }
 
+  /**
+   * "Hey Jarvis" heard on a Hearthpane screen ([HearthpaneWake]): the same handoff as a tap on [context]'s screen,
+   * timed from [heardAtUptimeMs] and opening the card in its wake state. The mic is already released.
+   */
+  fun launchFromWake(context: Context, heardAtUptimeMs: Long): Boolean =
+      when (JarvisFloatLaunch.route(floatInstalled(context))) {
+        JarvisFloatLaunch.Route.FLOAT -> launchFloat(context, heardAtUptimeMs, onLaunched = {}, wake = true)
+        JarvisFloatLaunch.Route.FULL_APP -> launchFullApp(context, onLaunched = {})
+      }
+
   /** False when this tap joins a preparation already pending for [owner]; every decision is logged. */
   private fun admit(owner: LifecycleOwner, route: String): Boolean =
       when (pendingHosts.admit(owner, SystemClock.uptimeMillis())) {
@@ -96,7 +106,7 @@ internal object JarvisHandoff {
   }.getOrDefault(false)
 
   /** What the card is told: the screen behind it, quiet hours, a Hearthpane call, the theme, the tap time. */
-  private fun floatIntent(context: Context, tapUptimeMs: Long): Intent {
+  private fun floatIntent(context: Context, tapUptimeMs: Long, wake: Boolean): Intent {
     val request = JarvisFloatLaunch.Request(
         screen = runCatching { HearthpaneScreens.current()?.id?.invoke() }.getOrNull(),
         quiet = ChimeConfig.isQuietNow(context,
@@ -104,6 +114,7 @@ internal object JarvisHandoff {
         callActive = Calling.state.value.busy,
         light = ImmortalSettings.settingsTheme(context) == "light",
         tapUptimeMs = tapUptimeMs,
+        wake = wake,
     )
     val intent = Intent().setClassName(PACKAGE, JarvisFloatLaunch.FLOAT_ACTIVITY)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
@@ -122,7 +133,7 @@ internal object JarvisHandoff {
    * intent. The caller is only paused behind the card, so nothing waits for ON_STOP and there is no WAKE broadcast:
    * Jarvis opens its own mic once its card is the top resumed Activity.
    */
-  private fun launchFloat(context: Context, tapUptimeMs: Long, onLaunched: () -> Unit): Boolean {
+  private fun launchFloat(context: Context, tapUptimeMs: Long, onLaunched: () -> Unit, wake: Boolean = false): Boolean {
     val owner = host(context)
     val lifecycle = owner?.lifecycle
     val canObserve = lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) == true
@@ -139,9 +150,10 @@ internal object JarvisHandoff {
     val request = JarvisPreparedLaunch(
         current = { DreamPolicy.isCurrentBridge(ticket) &&
             (!canObserve || JarvisTapHost.stillShowing(resumedAtTap, lifecycle?.currentState)) },
-        dispatch = { context.startActivity(floatIntent(context, tapUptimeMs)); true },
+        dispatch = { context.startActivity(floatIntent(context, tapUptimeMs, wake)); true },
         succeeded = {
-          Log.i(TAG, "float card started ${SystemClock.uptimeMillis() - tapUptimeMs} ms after the tap")
+          Log.i(TAG, "float card started ${SystemClock.uptimeMillis() - tapUptimeMs} ms after the " +
+              if (wake) "wake word" else "tap")
           retire(clear = false); runCatching(onLaunched)
         },
         failed = {

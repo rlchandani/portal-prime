@@ -21,6 +21,9 @@ internal object JarvisFloatLaunch {
   const val EXTRA_CALL = "com.portal.assistant.float.extra.CALL"
   const val EXTRA_TAP_UPTIME = "com.portal.assistant.float.extra.TAP_UPTIME"
   const val EXTRA_THEME = "com.portal.assistant.float.extra.THEME"
+  const val MODE_TEXT = "text"
+  /** A wake word opened the card: Jarvis shows "Heard “Hey Jarvis”" (an older Jarvis treats it as a voice tap). */
+  const val MODE_WAKE = "wake"
 
   /** What the card is told about the moment it opens over. */
   data class Request(
@@ -30,6 +33,8 @@ internal object JarvisFloatLaunch {
       val light: Boolean,
       val tapUptimeMs: Long,
       val typing: Boolean = false,
+      /** Opened by "Hey Jarvis" heard on a Hearthpane screen ([tapUptimeMs] is then when it was heard). */
+      val wake: Boolean = false,
   )
 
   /** Typed extras, ready for `Intent.putExtra`. Only set flags are sent; the screen id only when it's valid. */
@@ -38,7 +43,7 @@ internal object JarvisFloatLaunch {
     if (request.quiet) put(EXTRA_QUIET, true)
     if (request.callActive) put(EXTRA_CALL, true)
     if (request.light) put(EXTRA_THEME, "light")
-    if (request.typing) put(EXTRA_MODE, "text")
+    if (request.typing) put(EXTRA_MODE, MODE_TEXT) else if (request.wake) put(EXTRA_MODE, MODE_WAKE)
     request.screen?.takeIf(HearthpaneScreens::isValidId)?.let { put(EXTRA_SCREEN, it) }
   }
 

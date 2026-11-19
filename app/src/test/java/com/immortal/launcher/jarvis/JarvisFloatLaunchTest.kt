@@ -44,4 +44,14 @@ class JarvisFloatLaunchTest {
     assertEquals(JarvisFloatLaunch.Route.FLOAT, JarvisFloatLaunch.route(floatInstalled = true))
     assertEquals(JarvisFloatLaunch.Route.FULL_APP, JarvisFloatLaunch.route(floatInstalled = false))
   }
+
+  @Test fun aWakeOpensTheCardInItsWakeStateTimedFromWhenItWasHeard() {
+    val extras = JarvisFloatLaunch.extras(base.copy(wake = true))
+    assertEquals(JarvisFloatLaunch.MODE_WAKE, extras[JarvisFloatLaunch.EXTRA_MODE])
+    assertEquals(4_242L, extras[JarvisFloatLaunch.EXTRA_TAP_UPTIME])
+  }
+
+  @Test fun typingWinsOverAWake() {
+    assertEquals(JarvisFloatLaunch.MODE_TEXT, JarvisFloatLaunch.extras(base.copy(wake = true, typing = true))[JarvisFloatLaunch.EXTRA_MODE])
+  }
 }

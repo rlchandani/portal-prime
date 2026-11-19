@@ -1,0 +1,31 @@
+"Hey Jarvis" on Hearthpane screens — on-device wake word model and audio frontend
+
+1. Wake word model: microWakeWord "hey_jarvis" v2 (hey_jarvis.tflite), by Kevin Ahrendt.
+   Source: https://github.com/esphome/micro-wake-word-models (models/v2, commit 9a72109)
+   Copyright 2024-2026 Open Home Foundation. Licensed under the Apache License, Version 2.0,
+   which covers the trained model weights. Training code: https://github.com/kahrendt/microWakeWord
+   (Apache-2.0). Published settings used as-is: probability cutoff 0.97, sliding window 5.
+   SHA-256 21a7976add39ee24ec96c63d96b7aaa18e24d1d9824b963e451da8feb4b78b77
+   "Jarvis" is used only to name what the model detects; no affiliation is claimed.
+
+2. Audio frontend: a Kotlin port of TensorFlow Lite Micro's microfrontend
+   (tensorflow/lite/experimental/microfrontend/lib). Copyright The TensorFlow Authors.
+   Licensed under the Apache License, Version 2.0. Its fixed-point FFT is ported from
+   KISS FFT, Copyright (c) 2003-2010 Mark Borgerding, BSD 3-Clause License:
+   Redistribution and use in source and binary forms, with or without modification, are
+   permitted provided that the following conditions are met: redistributions of source code
+   must retain the above copyright notice, this list of conditions and the following
+   disclaimer; redistributions in binary form must reproduce the above copyright notice, this
+   list of conditions and the following disclaimer in the documentation and/or other materials
+   provided with the distribution; neither the author nor the names of any contributors may be
+   used to endorse or promote products derived from this software without specific prior
+   written permission. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED.
+
+3. Runtime: TensorFlow Lite 2.16.1 (org.tensorflow:tensorflow-lite), Apache License 2.0.
+
+Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+
+Everything runs on this Portal. The microphone is open only while a Hearthpane screen is in
+front and nothing else needs it. Audio is processed 10 ms at a time and immediately
+discarded: it is never stored, logged or sent anywhere by the detector.
