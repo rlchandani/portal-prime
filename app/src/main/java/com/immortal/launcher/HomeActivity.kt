@@ -1522,7 +1522,9 @@ private fun LauncherScreen(
             ApprovedHeaderButton("settings", "Settings", size = b, onClick = openSettings)
           }
         } else {
-          Row(Modifier.fillMaxWidth().height(92.dp).padding(horizontal = HomeHeaderBudget.EDGE.dp),
+          // The turned Mini (740 dp tall) gives the widgets 12 dp more; LARGE keeps 92 dp.
+          Row(Modifier.fillMaxWidth().height(if (currentLayoutClass().compactLandscape) HomeHeaderBudget.COMPACT_HEIGHT.dp else 92.dp)
+              .padding(horizontal = HomeHeaderBudget.EDGE.dp),
               verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.GAP.dp)) {
             // The leading group owns all the free width, so the trailing buttons always end on the
             // 24 dp edge on every tab. (A fill=false weight beside a weighted Spacer split the free
@@ -1606,7 +1608,7 @@ private fun LauncherScreen(
               }
             }
             if (notePlacement == HomeNotePlacement.STRIP) HomeNoteStrip(shareHome, Modifier.fillMaxWidth().padding(top = 8.dp))
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(if (homeLayout.compactLandscape) 8.dp else 16.dp))
             if (connected == false) {
               val dark = com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark
               Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
@@ -3415,16 +3417,25 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
       // Fit every tile in the card (no hidden scroll): split the real height across the rows and
       // drop the description line when a row is too short to hold it.
       val rows = tiles.chunked(2)
+      val compactCards = currentLayoutClass().compact
       BoxWithConstraints(Modifier.fillMaxSize()) {
         val gap = 14.dp
         val rowHeight = (maxHeight - gap * (rows.size - 1)) / rows.size
         val showDescription = rowHeight >= QUICK_TILE_FULL_HEIGHT
         val padding = if (rowHeight >= QUICK_TILE_FULL_HEIGHT) 20.dp else 14.dp
+        // Compact cards can leave a row too short for icon over label: lay those tiles out side by side.
+        val sideBySide = compactCards && rowHeight < QUICK_TILE_STACKED_MIN
         Column(verticalArrangement = Arrangement.spacedBy(gap)) {
           rows.forEach { row ->
             Row(Modifier.fillMaxWidth().height(rowHeight), horizontalArrangement = Arrangement.spacedBy(gap)) {
               row.forEach { qc ->
-                Column(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(17.dp))
+                if (sideBySide) Row(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(17.dp))
+                    .background(ApprovedHomePalette.Chrome).tvFocusable { qc.onTap() }.padding(horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                  ApprovedHomeIcon(qc.icon, Modifier.size(28.dp), ApprovedHomePalette.Text)
+                  Text(qc.label, color = ApprovedHomePalette.Text, fontSize = 21.sp, lineHeight = 26.sp,
+                      fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                } else Column(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(17.dp))
                     .background(ApprovedHomePalette.Chrome).tvFocusable { qc.onTap() }.padding(padding),
                     verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)) {
                   ApprovedHomeIcon(qc.icon, Modifier.size(32.dp), ApprovedHomePalette.Text)
@@ -3445,6 +3456,8 @@ private fun QuickControlsWidget(modifier: Modifier = Modifier) {
 
 /** Row height at which a quick-control tile has room for its description line. */
 private val QUICK_TILE_FULL_HEIGHT = 150.dp
+/** Below this row height a compact tile can't stack its 32 dp icon over a 30 dp label. */
+private val QUICK_TILE_STACKED_MIN = 100.dp
 
 /**
  * The glanceable "Today" strip for the left column: a frosted-glass card with three quick rows —

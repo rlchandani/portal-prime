@@ -86,7 +86,8 @@ class CompactWidgetGridTest {
     assertEquals(CompactWidgetGrid.MIN_HALF_ROW_LANDSCAPE_DP, g.halfRowDp, 0f)
     val tall = CompactWidgetGrid.geometry(LayoutClass.COMPACT_LANDSCAPE, editing = false, miniPage, 1232f, 400f, gap)
     assertEquals((400f - 3 * gap) / 4, tall.halfRowDp, 0f)
-    assertEquals(CompactWidgetGrid.COMPACT_WIDGET_SCALE, CompactWidgetGrid.cardScale(LayoutClass.COMPACT_LANDSCAPE, false), 0f)
+    assertEquals(CompactWidgetGrid.COMPACT_LANDSCAPE_SCALE, CompactWidgetGrid.cardScale(LayoutClass.COMPACT_LANDSCAPE, false), 0f)
+    assertEquals(CompactWidgetGrid.COMPACT_WIDGET_SCALE, CompactWidgetGrid.cardScale(LayoutClass.COMPACT_PORTRAIT, true), 0f)
   }
 
   @Test fun overlayCellsFoldWithTheirWidgets() {

@@ -45,9 +45,13 @@ internal object CompactWidgetGrid {
   const val COMPACT_EDIT_SCALE = 0.75f
 
   /** The density factor for widget cards on a compact window (LARGE never scales). */
+  /** The turned Mini's cards are ~299 × 190 dp (740 dp tall window): laid out denser still. */
+  const val COMPACT_LANDSCAPE_SCALE = 0.75f
+
   fun cardScale(layout: LayoutClass, folded: Boolean): Float = when {
     !layout.compact -> 1f
-    layout.compactPortrait && !folded -> COMPACT_EDIT_SCALE
+    layout.compactLandscape -> COMPACT_LANDSCAPE_SCALE
+    !folded -> COMPACT_EDIT_SCALE
     else -> COMPACT_WIDGET_SCALE
   }
 
