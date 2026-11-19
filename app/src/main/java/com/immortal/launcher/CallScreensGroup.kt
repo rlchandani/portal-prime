@@ -29,6 +29,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,7 +56,7 @@ internal fun CallGroupStage(call: ActiveCall, media: CallMedia?, motion: Boolean
   val tiles = CallTiles.of(call, probe)
   val gap = if (layout.compact) COMPACT_GAP else GAP
   val box = Modifier.fillMaxSize().background(CallColors.VideoBg).padding(gap)
-  val tile: @Composable (Int, Modifier) -> Unit = { i, m -> GroupTile(tiles[i], media, motion, layout, m) }
+  val tile: @Composable (Int, Modifier) -> Unit = { i, m -> GroupTile(tiles[i], media, motion, layout, m, first = i == 0) }
   Box(modifier.then(box)) {
     when (CallTiles.arrangement(tiles.size, layout)) {
       TileArrangement.THREE_SIDE -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(gap)) {
@@ -77,14 +84,28 @@ internal fun CallGroupStage(call: ActiveCall, media: CallMedia?, motion: Boolean
 }
 
 @Composable
-private fun GroupTile(tile: CallTile, media: CallMedia?, motion: Boolean, layout: LayoutClass, modifier: Modifier) {
-  val shape = RoundedCornerShape(if (layout.compact) COMPACT_RADIUS else RADIUS)
-  Box(modifier.clip(shape).background(CallColors.RingBg)) {
+private fun GroupTile(tile: CallTile, media: CallMedia?, motion: Boolean, layout: LayoutClass, modifier: Modifier, first: Boolean) {
+  val radius = if (layout.compact) COMPACT_RADIUS else RADIUS
+  Box(modifier.clip(RoundedCornerShape(radius)).background(CallColors.RingBg)) {
     when (tile) {
       is CallTile.Self -> SelfTile(tile, media, layout)
-      is CallTile.Member -> MemberTile(tile, media, motion, layout)
+      is CallTile.Member -> { MemberTile(tile, media, motion, layout, first); CornerMask(radius) }
     }
   }
+}
+
+/** A SurfaceView ignores Compose clipping: paint the stage colour into the four corners above it. */
+@Composable
+private fun CornerMask(radius: Dp) {
+  Box(Modifier.fillMaxSize().drawWithCache {
+    val r = radius.toPx()
+    val outside = Path().apply {
+      fillType = PathFillType.EvenOdd
+      addRect(Rect(Offset.Zero, size))
+      addRoundRect(RoundRect(Rect(Offset.Zero, size), CornerRadius(r, r)))
+    }
+    onDrawBehind { drawPath(outside, CallColors.VideoBg) }
+  })
 }
 
 @Composable
@@ -97,12 +118,14 @@ private fun BoxScope.SelfTile(tile: CallTile.Self, media: CallMedia?, layout: La
 }
 
 @Composable
-private fun BoxScope.MemberTile(tile: CallTile.Member, media: CallMedia?, motion: Boolean, layout: LayoutClass) {
+private fun BoxScope.MemberTile(tile: CallTile.Member, media: CallMedia?, motion: Boolean, layout: LayoutClass, first: Boolean) {
   val ringing = tile.state == CallTile.State.RINGING
   val sink = if (ringing) null else media?.sink(tile.contact.deviceId)
   var hasFrames by remember(sink) { mutableStateOf(false) }
   LaunchedEffect(sink) { while (sink != null && !hasFrames) { hasFrames = sink.frames > 0; delay(FRAME_POLL_MS) } }
-  if (media != null && sink != null) CallTileVideo(media, sink, Modifier.fillMaxSize())
+  // Remote tiles use SurfaceViews (no app redraw per video frame, the cheapest path on both Portals);
+  // the rounded corners are painted over them by [CornerMask].
+  if (media != null && sink != null) CallRemoteVideo(media, Modifier.fillMaxSize(), sink = sink)
   val avatar = if (layout.compact) COMPACT_AVATAR else AVATAR
   if (ringing || !hasFrames || !tile.cameraOn) {
     Box(Modifier.fillMaxSize().alpha(if (ringing) RINGING_DIM else 1f)) { CallRingBackground(tile.contact.name, motion && ringing) }
@@ -120,7 +143,9 @@ private fun BoxScope.MemberTile(tile: CallTile.Member, media: CallMedia?, motion
           maxLines = 1, overflow = TextOverflow.Ellipsis) }
     }
   }
-  TileLabel(tile.contact.name, layout, Modifier.align(Alignment.TopEnd))
+  // Upright, the first tile's top edge is the live bar's: its name moves to the bottom corner.
+  TileLabel(tile.contact.name, layout, Modifier.align(if (first && layout.compactPortrait) Alignment.BottomEnd else Alignment.TopEnd),
+      bottom = first && layout.compactPortrait)
   if (!ringing && !tile.micOn) Box(Modifier.align(Alignment.BottomStart).padding(if (layout.compact) 16.dp else 24.dp)
       .size(if (layout.compact) 52.dp else 64.dp).background(CallColors.Bar, CircleShape), contentAlignment = Alignment.Center) {
     CallIcon("micOff", Color.White, if (layout.compact) 26.dp else 32.dp)
@@ -129,10 +154,11 @@ private fun BoxScope.MemberTile(tile: CallTile.Member, media: CallMedia?, motion
 
 /** `.tiles .feed .lbl`: the name pill, top-right of each tile. */
 @Composable
-private fun TileLabel(text: String, layout: LayoutClass, modifier: Modifier) {
+private fun TileLabel(text: String, layout: LayoutClass, modifier: Modifier, bottom: Boolean = false) {
   val edge: Dp = if (layout.compact) 16.dp else 22.dp
   Text(text, color = Color.White, fontSize = if (layout.compact) 19.sp else 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
-      overflow = TextOverflow.Ellipsis, modifier = modifier.padding(top = edge, end = edge + 4.dp)
+      overflow = TextOverflow.Ellipsis, modifier = modifier.padding(top = if (bottom) 0.dp else edge, bottom = if (bottom) edge else 0.dp,
+          end = edge + 4.dp)
           .background(CallColors.Bar, RoundedCornerShape(50)).border(1.dp, CallColors.GlassChipEdge, RoundedCornerShape(50))
           .padding(horizontal = 18.dp, vertical = 8.dp))
 }

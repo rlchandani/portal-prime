@@ -43,6 +43,8 @@ internal object CallPerfProbe {
         "camera" -> Calling.state.value.call?.let { if (it.cameraOn != on) Calling.toggleCamera(); true } ?: false
         "announce" -> { Calling.announce(context.applicationContext, ask = true); true }
         "probe" -> CallMediaHub.probe(on)
+        // Night tests: "visual" rings silently in quiet hours (no sound by policy); restore "block" after.
+        "quietMode" -> req.queryParam("v")?.let { com.immortal.launcher.settings.CallingSettings.set(context, "quietMode", it) } ?: false
         else -> false
       }
     }

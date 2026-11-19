@@ -50,11 +50,17 @@ internal object CallMediaHub {
 
   private data class SavedAudio(val mode: Int, val speaker: Boolean)
 
-  /** The call screen started (true) or stopped (false). Queued media work waits for true. */
+  /**
+   * A call screen started (true) or stopped (false). Counted, because the last call's screen can stop
+   * after the next one started. Queued media work waits until one is in front.
+   */
   fun foreground(on: Boolean) {
-    foreground = on
-    if (on && queued.isNotEmpty()) { val work = queued.toList(); queued.clear(); work.forEach { it() } }
+    started = (started + if (on) 1 else -1).coerceAtLeast(0)
+    foreground = started > 0
+    if (foreground && queued.isNotEmpty()) { val work = queued.toList(); queued.clear(); work.forEach { it() } }
   }
+
+  private var started = 0
 
   /** Caller: show or hide the self preview while it rings. Never opens the mic. */
   fun preview(context: Context, call: ActiveCall, camera: Boolean) = whenForeground {
