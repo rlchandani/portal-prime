@@ -11,6 +11,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.os.SystemClock
+import android.util.Log
 import com.immortal.launcher.jarvis.HearthpaneScreens
 import com.immortal.launcher.jarvis.JarvisFloatLaunch
 import androidx.lifecycle.Lifecycle
@@ -40,15 +41,16 @@ internal object JarvisHandoff {
   const val PACKAGE = "com.portal.assistant"
   private const val WAKE_ACTION = "com.portal.wake.action.WAKE"
   private const val WAKE_ID = "com.portal.wake.extra.ID"
-  // UI-thread only. Rapid taps on the same launching Activity share its pending handoff.
-  private val pendingHosts = mutableMapOf<LifecycleOwner, () -> Unit>()
+  private const val TAG = "JarvisHandoff"
+  // UI-thread only. Rapid taps on the same launching Activity share its pending handoff; a stuck one expires.
+  private val pendingHosts = JarvisPendingTaps<LifecycleOwner>()
 
   private fun host(context: Context): LifecycleOwner? = generateSequence(context) { current ->
     (current as? ContextWrapper)?.baseContext?.takeUnless { it === current }
   }.filterIsInstance<LifecycleOwner>().firstOrNull()
 
   /** Tab changes retain their Activity, so they explicitly cancel pending preparation. */
-  fun cancelPending(context: Context) { host(context)?.let { pendingHosts[it]?.invoke() } }
+  fun cancelPending(context: Context) { host(context)?.let { pendingHosts.cancel(it) } }
 
   /**
    * Every Hearthpane Jarvis entry point. With Floating Jarvis installed (Jarvis 2.6+) one intent opens the ember card
@@ -62,6 +64,23 @@ internal object JarvisHandoff {
       JarvisFloatLaunch.Route.FLOAT -> launchFloat(context, tapUptimeMs, onLaunched)
       JarvisFloatLaunch.Route.FULL_APP -> launchFullApp(context, onLaunched)
     }
+  }
+
+  /** False when this tap joins a preparation already pending for [owner]; every decision is logged. */
+  private fun admit(owner: LifecycleOwner, route: String): Boolean =
+      when (pendingHosts.admit(owner, SystemClock.uptimeMillis())) {
+        JarvisPendingTaps.Admission.NEW -> true
+        JarvisPendingTaps.Admission.JOINED -> { Log.i(TAG, "$route tap joined a pending preparation"); false }
+        JarvisPendingTaps.Admission.REPLACED_STALE -> {
+          Log.w(TAG, "$route tap replaced a preparation that never completed"); true
+        }
+      }
+
+  /** Why a prepared tap did not open Jarvis, for the log: a newer bridge, or this screen is no longer resumed. */
+  private fun supersededReason(ticket: Long, lifecycle: Lifecycle?, canObserve: Boolean): String = when {
+    !DreamPolicy.isCurrentBridge(ticket) -> "a newer photo-frame bridge"
+    canObserve -> "host ${lifecycle?.currentState}"
+    else -> "unknown"
   }
 
   private fun floatInstalled(context: Context): Boolean = runCatching {
@@ -100,35 +119,47 @@ internal object JarvisHandoff {
     val owner = host(context)
     val lifecycle = owner?.lifecycle
     val canObserve = lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) == true
-    if (canObserve && owner != null && owner in pendingHosts) return true
+    if (canObserve && owner != null && !admit(owner, "float")) return true
+    val resumedAtTap = lifecycle?.currentState == Lifecycle.State.RESUMED
     lateinit var observer: LifecycleEventObserver
     var ticket = 0L
+    var held: JarvisPendingTaps.Ticket? = null
     fun retire(clear: Boolean) {
       lifecycle?.removeObserver(observer)
-      owner?.let { pendingHosts.remove(it) }
+      owner?.let { pendingHosts.release(it, held) }
       if (clear && ticket != 0L) DreamPolicy.clearBridgeIfCurrent(context, ticket)
     }
     val request = JarvisPreparedLaunch(
         current = { DreamPolicy.isCurrentBridge(ticket) &&
-            (!canObserve || lifecycle?.currentState == Lifecycle.State.RESUMED) },
+            (!canObserve || JarvisTapHost.stillShowing(resumedAtTap, lifecycle?.currentState)) },
         dispatch = { context.startActivity(floatIntent(context, tapUptimeMs)); true },
-        succeeded = { retire(clear = false); runCatching(onLaunched) },
+        succeeded = {
+          Log.i(TAG, "float card started ${SystemClock.uptimeMillis() - tapUptimeMs} ms after the tap")
+          retire(clear = false); runCatching(onLaunched)
+        },
         failed = {
+          Log.w(TAG, "float card could not be started")
           retire(clear = true)
           android.widget.Toast.makeText(context, "Jarvis couldn’t be opened.",
               android.widget.Toast.LENGTH_LONG).show()
         },
-        superseded = { retire(clear = true) },
+        superseded = {
+          Log.i(TAG, "float tap dropped: ${supersededReason(ticket, lifecycle, canObserve)}")
+          retire(clear = true)
+        },
     )
     observer = LifecycleEventObserver { _, event ->
       when (event) {
-        Lifecycle.Event.ON_PAUSE -> if (!request.launched) { request.cancel(); retire(clear = true) }
+        Lifecycle.Event.ON_PAUSE, Lifecycle.Event.ON_STOP ->
+          if (!request.launched) { request.cancel(); retire(clear = true) }
         Lifecycle.Event.ON_DESTROY -> { request.cancel(); retire(clear = !request.launched) }
         else -> Unit
       }
     }
     if (canObserve && owner != null) {
-      pendingHosts[owner] = { if (!request.launched) { request.cancel(); retire(clear = true) } }
+      held = pendingHosts.hold(owner, SystemClock.uptimeMillis()) {
+        if (!request.launched) { request.cancel(); retire(clear = true) }
+      }
       lifecycle?.addObserver(observer)
     }
     return runCatching {
@@ -147,12 +178,13 @@ internal object JarvisHandoff {
     // UI callers have a started Activity. A non-UI caller can open Jarvis, but must not start
     // a potentially background microphone without a foreground handoff to observe.
     val canObserve = lifecycle?.currentState?.isAtLeast(Lifecycle.State.STARTED) == true
-    if (canObserve && owner != null && owner in pendingHosts) return true
+    if (canObserve && owner != null && !admit(owner, "full-app")) return true
     lateinit var observer: LifecycleEventObserver
     var ticket = 0L
+    var held: JarvisPendingTaps.Ticket? = null
     fun retire(clear: Boolean) {
       lifecycle?.removeObserver(observer)
-      owner?.let { pendingHosts.remove(it) }
+      owner?.let { pendingHosts.release(it, held) }
       if (clear && ticket != 0L) DreamPolicy.clearBridgeIfCurrent(context, ticket)
     }
     val gate = JarvisForegroundWake {
@@ -177,7 +209,10 @@ internal object JarvisHandoff {
           android.widget.Toast.makeText(context, "Jarvis couldn’t be opened.",
               android.widget.Toast.LENGTH_LONG).show()
         },
-        superseded = { gate.cancel(); retire(clear = true) },
+        superseded = {
+          Log.i(TAG, "full-app tap dropped: ${supersededReason(ticket, lifecycle, canObserve)}")
+          gate.cancel(); retire(clear = true)
+        },
     )
     observer = LifecycleEventObserver { _, event ->
       when (event) {
@@ -192,7 +227,7 @@ internal object JarvisHandoff {
       }
     }
     if (canObserve && owner != null) {
-      pendingHosts[owner] = {
+      held = pendingHosts.hold(owner, SystemClock.uptimeMillis()) {
         if (!request.launched) {
           request.cancel(); gate.cancel(); retire(clear = true)
         }
