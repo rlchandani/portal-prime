@@ -37,13 +37,13 @@ internal data class CallAddControl(val label: String, val look: ControlLook, val
 /** A group call on screen: tiles, the live bar with "N of 4", the same controls, volume. */
 @Composable
 internal fun CallGroupLive(call: ActiveCall, media: CallMedia?, motion: Boolean, layout: LayoutClass, volumeOpen: Boolean,
-                           onVolume: () -> Unit, add: CallAddControl, toast: CallToastState) {
+                           onVolume: () -> Unit, add: CallAddControl, toast: CallToastState, probe: Boolean = false) {
   val edge = (CallsCompactLayout.edge(layout) + TILE_INSET).dp
   val ctl = CallsCompactLayout.controls(layout)
   val framing = { toast.show("Portal frames you automatically", "follow") }
   Box(Modifier.fillMaxSize()) {
-    CallGroupStage(call, media, motion, layout)
-    CallLiveBar(CallTiles.liveBar(call), CallingCopy.liveDotActive(call.cameraOn, call.micOn), motion,
+    CallGroupStage(call, media, motion, layout, probe = probe)
+    CallLiveBar(CallTiles.liveBar(call) + if (probe) " · +1 test peer" else "", CallingCopy.liveDotActive(call.cameraOn, call.micOn), motion,
         Modifier.align(Alignment.TopStart).padding(edge))
     if (volumeOpen) CallVolumePopover(Modifier.align(Alignment.BottomCenter).padding(bottom = (ctl.bottom + ctl.height).dp + POPOVER_GAP))
     val bottom = Modifier.align(Alignment.BottomCenter).padding(bottom = ctl.bottom.dp)

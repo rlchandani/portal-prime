@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,8 +54,9 @@ internal fun CallLiveScreen(call: ActiveCall, media: CallMedia?, motion: Boolean
   LaunchedEffect(call.notice) { call.notice?.let { toast.show(CallAddPeople.notice(it), "users") } }
   val layout = currentLayoutClass()
   val add = CallAddControl.of(call, LocalContext.current) { addOpen = true }
-  if (call.group) {
-    CallGroupLive(call, media, motion, layout, volumeOpen, onVolume = { volumeOpen = !volumeOpen }, add = add, toast = toast)
+  val probe by CallMediaHub.probeOn.collectAsState()
+  if (call.group || probe) {
+    CallGroupLive(call, media, motion, layout, volumeOpen, onVolume = { volumeOpen = !volumeOpen }, add = add, toast = toast, probe = probe)
     if (addOpen) Box(Modifier.fillMaxSize()) { CallAddPersonSheet(call, layout) { addOpen = false } }
     return
   }

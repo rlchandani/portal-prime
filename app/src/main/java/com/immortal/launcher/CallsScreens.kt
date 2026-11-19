@@ -56,6 +56,7 @@ import java.util.Date
 internal fun CallsRooms(onEveryone: () -> Unit) {
   val context = LocalContext.current
   val peers by CallingStore.peers.collectAsState()
+  val phones by CallPhoneMailbox.phones.collectAsState()
   val self = remember { Calling.selfId(context).orEmpty() }
   val now = rememberCallClock(PRESENCE_TICK_MS)
   val layout = currentLayoutClass()
@@ -68,10 +69,12 @@ internal fun CallsRooms(onEveryone: () -> Unit) {
         "Rooms appear here when another Portal in this home answers. Check it’s on the same Wi-Fi.") {
       CallPill("Try again", { Calling.announce(context, ask = true) }, icon = "redo", surface = callsSurface())
     }
-    layout.compact -> CallsRoomsCompact(peers, self, now, layout, onEveryone)
+    layout.compact -> CallsRoomsCompact(peers, phones, self, now, layout, onEveryone)
     else -> LazyVerticalGrid(GridCells.Fixed(COLUMNS), Modifier.fillMaxSize(), contentPadding = PaddingValues(56.dp, 8.dp, 56.dp, 40.dp),
         horizontalArrangement = Arrangement.spacedBy(32.dp), verticalArrangement = Arrangement.spacedBy(32.dp)) {
       items(peers.sortedBy { it.name.lowercase() }, key = { it.id }) { peer -> RoomCard(peer, self, now) }
+      items(phones, key = { it.id }) { phone -> CallPhoneCard(phone, now, compact = false) }
+      if (phones.isNotEmpty()) item(span = { GridItemSpan(COLUMNS) }) { CallPhonesNote() }
       item(span = { GridItemSpan(COLUMNS) }) { EveryoneCard(onEveryone) }
       item(span = { GridItemSpan(COLUMNS) }) {
         Text(CallingCopy.CALLS_FOOTER, color = LocalApprovedPalette.current.secondary, fontSize = 22.sp, textAlign = TextAlign.Center,
@@ -86,12 +89,15 @@ internal fun CallsRooms(onEveryone: () -> Unit) {
  * and the call buttons wrap onto a second line rather than overflow a narrow card.
  */
 @Composable
-private fun CallsRoomsCompact(peers: List<CallPeer>, self: String, now: Long, layout: LayoutClass, onEveryone: () -> Unit) {
+private fun CallsRoomsCompact(peers: List<CallPeer>, phones: List<CallPhone>, self: String, now: Long, layout: LayoutClass,
+                              onEveryone: () -> Unit) {
   val columns = CallsCompactLayout.roomColumns(layout)
   val pad = CallsCompactLayout.pagePadding(layout).dp
   LazyVerticalGrid(GridCells.Fixed(columns), Modifier.fillMaxSize(), contentPadding = PaddingValues(pad, 4.dp, pad, 32.dp),
       horizontalArrangement = Arrangement.spacedBy(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
     items(peers.sortedBy { it.name.lowercase() }, key = { it.id }) { peer -> RoomCardCompact(peer, self, now) }
+    items(phones, key = { it.id }) { phone -> CallPhoneCard(phone, now, compact = true) }
+    if (phones.isNotEmpty()) item(span = { GridItemSpan(columns) }) { CallPhonesNote() }
     item(span = { GridItemSpan(columns) }) { EveryoneCardCompact(onEveryone, stacked = layout.compactPortrait) }
     item(span = { GridItemSpan(columns) }) {
       Text(CallingCopy.CALLS_FOOTER, color = LocalApprovedPalette.current.secondary, fontSize = 20.sp, textAlign = TextAlign.Center,

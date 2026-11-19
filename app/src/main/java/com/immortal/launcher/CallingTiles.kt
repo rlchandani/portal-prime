@@ -37,11 +37,16 @@ internal object CallTiles {
   const val BIG_SHARE = 1.25f
 
   /** The first member big, then the others in the order they were added, this Portal last. */
-  fun of(call: ActiveCall): List<CallTile> = buildList {
+  fun of(call: ActiveCall, probe: Boolean = false): List<CallTile> = buildList {
     add(CallTile.Member(call.peer, firstState(call.phase), call.remoteCameraOn, call.remoteMicOn))
     call.legs.forEach { add(CallTile.Member(it.peer, legState(it.phase), it.remoteCameraOn, it.remoteMicOn)) }
+    // Measurement builds only: the in-process load probe holds a tile like a real member would.
+    if (probe && call.legs.size < CallGroup.MAX_LEGS) add(CallTile.Member(CallContact(CallMedia.PROBE, PROBE_NAME), CallTile.State.LIVE, true, false))
     add(CallTile.Self(call.cameraOn))
   }
+
+  const val PROBE_NAME = "Test peer"
+
 
   fun arrangement(people: Int, layout: LayoutClass): TileArrangement = when {
     people <= 2 -> TileArrangement.SOLO

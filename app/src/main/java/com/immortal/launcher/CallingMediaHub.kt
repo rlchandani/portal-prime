@@ -135,6 +135,18 @@ internal object CallMediaHub {
     mutableStats.value = mutableStats.value - peer
   }
 
+  private val mutableProbe = MutableStateFlow(false)
+  /** Measurement builds: the in-process 3rd-member load probe is on (the UI shows its tile). */
+  val probeOn: StateFlow<Boolean> = mutableProbe.asStateFlow()
+
+  fun probe(on: Boolean): Boolean {
+    if (!BuildConfig.PORTAL_CALL_LOOPBACK) return false
+    val m = mutableMedia.value ?: return false
+    m.probe(on)
+    mutableProbe.value = on
+    return true
+  }
+
   /** Keeps the send profile in step with the number of people (360p at 3+). */
   fun groupSize(people: Int) { mutableMedia.value?.groupSize(people) }
 
@@ -144,6 +156,7 @@ internal object CallMediaHub {
     val m = mutableMedia.value ?: return
     mutableMedia.value = null
     mutableStats.value = emptyMap()
+    mutableProbe.value = false
     mediaCallId = null
     m.release()
     restoreAudio(context)

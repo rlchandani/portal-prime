@@ -70,6 +70,10 @@ internal class CallMedia(
   private var generator: CallTestFrames? = null
   private var degraded = quality == CallQuality.LOW_MEMORY
   private var people = 2
+  private var probe: Probe? = null
+
+  /** Measurement-only 3rd member: an in-process peer sending generated frames ([CallPerfProbe]). */
+  private class Probe(val link: CallMediaLink, val source: org.webrtc.VideoSource, val track: VideoTrack, val frames: CallTestFrames)
   @Volatile private var released = false
 
   init {
@@ -117,6 +121,13 @@ internal class CallMedia(
     applyProfile("group of $count")
   }
 
+  /**
+   * Measurement builds: add (or remove) an in-process extra member. Our side runs a real link
+   * named [PROBE] (encode, DTLS-SRTP over loopback, decode, render); the far side sends generated
+   * frames. It costs one more encode + decode than a real member, so it is an upper bound.
+   */
+  fun probe(on: Boolean) = post { if (on) startProbe() else stopProbe() }
+
   /** Low memory or a busy CPU: step down to 360p and a smaller bitrate for the rest of the call. */
   fun degrade() = post {
     if (degraded) return@post
@@ -131,6 +142,7 @@ internal class CallMedia(
     sinks.values.forEach { it.target = null }
     thread.execute {
       runCatching { stopCamera() }.onFailure { Log.w(TAG, "camera stop failed", it) }
+      runCatching { stopProbe() }
       links.values.forEach { runCatching { it.close() } }
       links.clear()
       runCatching { videoTrack?.dispose(); audioTrack?.dispose() }
@@ -149,7 +161,43 @@ internal class CallMedia(
     runCatching { thread.execute { if (!released) runCatching(block).onFailure { Log.w(TAG, "media task failed", it) } } }
   }
 
-  private fun profile(): SendProfile = CallGroupQuality.profile(quality, people, degraded)
+  private fun profile(): SendProfile = CallGroupQuality.profile(quality, people + if (probe != null) 1 else 0, degraded)
+
+  private fun startProbe() {
+    if (probe != null) return
+    val f = factory ?: return
+    val source = f.createVideoSource(false)
+    val track = f.createVideoTrack(PROBE_VIDEO_ID, source)
+    val frames = CallTestFrames(source.capturerObserver, PROBE_W, PROBE_H, PROBE_FPS).also { it.start() }
+    val far = CallMediaLink(PROBE_FAR, f, null, track, thread, CallVideoSink(), probeEvents, ::post)
+    probe = Probe(far, source, track, frames)
+    applyProfile("probe on")
+    val near = link(PROBE) ?: return
+    val p = profile()
+    near.createOffer(p) { offer ->
+      if (offer == null) { Log.w(TAG, "probe: no offer"); return@createOffer }
+      far.answer(p, offer) { answer -> if (answer != null) near.applyAnswer(answer) { ok -> Log.i(TAG, "probe negotiated=$ok") } }
+    }
+  }
+
+  private fun stopProbe() {
+    val p = probe ?: return
+    probe = null
+    links.remove(PROBE)?.close()
+    sinks.remove(PROBE)?.target = null
+    p.link.close()
+    p.frames.stop()
+    runCatching { p.track.dispose(); p.source.dispose() }
+    applyProfile("probe off")
+  }
+
+  private val probeEvents = object : Events {
+    override fun onConnected(peer: String) = Unit
+    override fun onDisconnected(peer: String) = Unit
+    override fun onFailed(peer: String) = Unit
+    override fun onCameraIssue(issue: CameraIssue) = Unit
+    override fun onStats(peer: String, stats: CallStats) = Unit
+  }
 
   private fun applyProfile(why: String) {
     val p = profile()
@@ -252,6 +300,13 @@ internal class CallMedia(
     const val CAMERA_ID = "0"
     /** The link name for a 1:1 media object that doesn't name its peer (the loopback probe). */
     const val SOLO = "solo"
+    /** The measurement probe's member name (never a device id: device ids have no '~'). */
+    const val PROBE = "probe~near"
+    private const val PROBE_FAR = "probe~far"
+    private const val PROBE_VIDEO_ID = "hp-probe"
+    private const val PROBE_W = 640
+    private const val PROBE_H = 360
+    private const val PROBE_FPS = 30
     private const val VIDEO_ID = "hp-video"
     private const val AUDIO_ID = "hp-audio"
     private const val STATS_MS = 2_000L

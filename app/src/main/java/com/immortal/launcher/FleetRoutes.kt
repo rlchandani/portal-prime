@@ -93,6 +93,7 @@ class FleetRoutes(private val context: Context) {
       "/perf/webapp" -> WebAppProbe.handle(context, req)
       "/perf/source-preview" -> SourcePreviewProbe.handle(context, req)
       "/perf/photo-upload" -> PhotoUploadProbe.handle(context, req)
+      "/perf/calling" -> CallPerfProbe.handle(context, req)
       "/perf/photo-thumbnail" -> PhotoThumbnailProbe.handle(context, req)
       "/perf/source-cache" -> SourceCacheProbe.handle(context, req)
       "/perf/source-photo-preview" -> SourcePhotoPreviewProbe.handle(context, req)

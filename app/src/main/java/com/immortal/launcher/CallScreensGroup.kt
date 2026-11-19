@@ -44,8 +44,9 @@ import kotlinx.coroutines.delay
  * ripple card.
  */
 @Composable
-internal fun CallGroupStage(call: ActiveCall, media: CallMedia?, motion: Boolean, layout: LayoutClass, modifier: Modifier = Modifier) {
-  val tiles = CallTiles.of(call)
+internal fun CallGroupStage(call: ActiveCall, media: CallMedia?, motion: Boolean, layout: LayoutClass, modifier: Modifier = Modifier,
+                            probe: Boolean = false) {
+  val tiles = CallTiles.of(call, probe)
   val gap = if (layout.compact) COMPACT_GAP else GAP
   val box = Modifier.fillMaxSize().background(CallColors.VideoBg).padding(gap)
   val tile: @Composable (Int, Modifier) -> Unit = { i, m -> GroupTile(tiles[i], media, motion, layout, m) }
