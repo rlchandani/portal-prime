@@ -1479,10 +1479,14 @@ private fun LauncherScreen(
           if (com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark) ApprovedHomeTabPalette
           else com.immortal.launcher.ui.theme.ApprovedLightPalette,
       LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = FontFamily.Default)) {
+    // Full-screen Music is opaque: Home stays composed beneath it but isn't drawn, so every Music
+    // frame (open, countdown, spinner) composites one layer instead of three (Portal Mini GPU).
+    val musicCovers = rememberUpdatedState(musicLayout == MusicPlayerLayout.FULL)
+    val homeHiddenUnderMusic = remember { Modifier.drawWithContent { if (!musicCovers.value) drawContent() } }
     Box(Modifier.fillMaxSize()) {
       // A single cached display list for the static/minute-updated wallpaper.
-      Box(Modifier.matchParentSize().graphicsLayer {}) { ApprovedHomeBackground() }
-      Column(Modifier.fillMaxSize()) {
+      Box(Modifier.matchParentSize().then(homeHiddenUnderMusic).graphicsLayer {}) { ApprovedHomeBackground() }
+      Column(Modifier.fillMaxSize().then(homeHiddenUnderMusic)) {
         // Launcher chrome trimmed 108 → 92dp; the 68dp header buttons keep a 12dp margin (Home v2 space).
         val hey by produceState<String?>(null, installedApps) { value = withContext(Dispatchers.IO) { heyPackage(context) } }
         val showCustomize = selectedTab == ApprovedLauncherTab.HOME && musicLayout == null

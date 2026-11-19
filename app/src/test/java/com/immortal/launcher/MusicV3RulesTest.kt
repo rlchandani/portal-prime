@@ -130,4 +130,19 @@ class MusicV3RulesTest {
     assertEquals("R", MusicV3Rules.initial(" rohit"))
     assertEquals("?", MusicV3Rules.initial(""))
   }
+
+  /** Mini regression (1.254): the card must not see a new value every second, only the countdown does. */
+  @Test fun stillSignInView_equalAcrossTicks_countdownCarriesTheTime() {
+    val code = YtSignInState.ShowingCode("KQWT-ZMHR", "https://www.google.com/device", expiresAtMs = 900_000)
+    val a = MusicV3Rules.stillSignInView(code, nowMs = 27_500)
+    val b = MusicV3Rules.stillSignInView(code, nowMs = 28_500)
+    assertEquals(a, b)
+    assertEquals("", (a as MusicV3SignInView.Code).remaining)
+    assertEquals("google.com/device", a.shortUrl)
+    assertEquals("14:33", MusicV3Rules.countdown(code, 27_500))
+    assertEquals("14:32", MusicV3Rules.countdown(code, 28_500))
+    assertEquals(MusicV3SignInView.Expired, MusicV3Rules.stillSignInView(code, nowMs = 900_000))
+    assertEquals("", MusicV3Rules.countdown(code, 900_000))
+    assertEquals(MusicV3SignInView.Starting, MusicV3Rules.stillSignInView(YtSignInState.Idle, 0))
+  }
 }
