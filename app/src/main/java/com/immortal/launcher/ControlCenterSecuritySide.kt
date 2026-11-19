@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.sp
 
 /** `.secSide`: WHO'S HOME, the SENSORS checklist and the "N things open" note. */
 @Composable
-internal fun CcSecuritySide(side: CcSecuritySideSlice, modifier: Modifier) {
+internal fun CcSecuritySide(side: CcSecuritySideSlice, modifier: Modifier, ui: CcUi) {
   val c = LocalCc.current
   val checks = side.checks
   val open = side.open
@@ -51,7 +51,8 @@ internal fun CcSecuritySide(side: CcSecuritySideSlice, modifier: Modifier) {
         }
       }
     }
-    if (checks.isNotEmpty()) Column(Modifier.fillMaxWidth().ccCard().padding(horizontal = 28.dp, vertical = 24.dp)) {
+    if (side.sections.isNotEmpty()) CcSecuritySensors(side.sections, side.canControl, side.reason) { item -> securityAction(ui, item) }
+    else if (checks.isNotEmpty()) Column(Modifier.fillMaxWidth().ccCard().padding(horizontal = 28.dp, vertical = 24.dp)) {
       CcSectionLabel("Sensors", Modifier.padding(bottom = 6.dp))
       checks.forEachIndexed { i, ck -> key(ck.title) { CheckRow(ck, divider = i < checks.lastIndex) } }
     }
@@ -70,6 +71,17 @@ internal fun CcSecuritySide(side: CcSecuritySideSlice, modifier: Modifier) {
       }
     }
   }
+}
+
+/** An inline Close / Lock: the current entity, through the normal policy (garage asks with its camera). */
+private fun securityAction(ui: CcUi, item: CcSecItem) {
+  val e = ControlCenter.state(ui.context).value.entity(item.id) ?: return
+  val call = when (item.action) {
+    CcSecAction.CLOSE -> CcCalls.coverClose(e)
+    CcSecAction.LOCK -> CcCalls.lock(e)
+    null -> return
+  }
+  ui.act(e, call)
 }
 
 /** `.whoC`: avatar (greyed when away), name, where + how HA knows. */

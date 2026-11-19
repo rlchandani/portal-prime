@@ -228,6 +228,10 @@ dependencies {
   implementation("androidx.media3:media3-transformer:1.5.1")
   implementation("androidx.media3:media3-effect:1.5.1")
   implementation("androidx.media3:media3-common:1.5.1")
+  // Live camera video in the Control Center: HA's `camera/stream` HLS, played by the ExoPlayer that
+  // Transformer already brings in (this adds only the HLS extractor/playlist module).
+  implementation("androidx.media3:media3-exoplayer:1.5.1")
+  implementation("androidx.media3:media3-exoplayer-hls:1.5.1")
 
   // Unit tests (pure JVM — no device/emulator). org.json provides a real
   // implementation so JSON-parsing logic can be tested off-device (the android.jar

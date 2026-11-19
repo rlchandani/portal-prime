@@ -35,6 +35,32 @@ internal object CcCameraLogic {
   fun snapshotUrl(base: String, cameraId: String, width: Int = SNAPSHOT_WIDTH): String =
       "${DoorbellUrls.snapshot(base, cameraId)}?width=$width"
 
+  /**
+   * The same, never served from a cache: a fresh query each time (HA ignores unknown parameters),
+   * paired with `Cache-Control: no-cache` on the request.
+   */
+  fun freshSnapshotUrl(base: String, cameraId: String, now: Long, width: Int = SNAPSHOT_WIDTH): String =
+      "${snapshotUrl(base, cameraId, width)}&_=$now"
+
+  /** HA's `camera/stream` answer (`/api/hls/<token>/master_playlist.m3u8`) on [base]; null for anything else. */
+  fun streamUrl(base: String, url: String): String? {
+    val clean = base.trim().trimEnd('/')
+    if (clean.isEmpty()) return null
+    return when {
+      url.startsWith("/api/hls/") -> clean + url
+      url.startsWith("$clean/api/hls/") -> url
+      else -> null
+    }
+  }
+
+  /** A short, stable tag for a camera in logs (logs never carry entity names). */
+  fun logId(cameraId: String): String = "cam-" + Integer.toHexString(cameraId.hashCode() and 0xFFFF)
+
+  /** HA's SUPPORT_STREAM bit: the camera can give an HLS stream. */
+  const val SUPPORT_STREAM = 2
+
+  fun canStream(e: CcEntity): Boolean = !e.unavailable && (e.supportedFeatures and SUPPORT_STREAM) != 0
+
   /** Power-of-two `inSampleSize` so a [srcWidth] picture decodes at most [maxWidth] wide. */
   fun sampleSize(srcWidth: Int, maxWidth: Int = SNAPSHOT_WIDTH): Int {
     if (srcWidth <= 0 || maxWidth <= 0) return 1
@@ -62,10 +88,14 @@ internal object CcCameraLogic {
     return Crop((srcW - w) / 2, (srcH - h) / 2, w, h)
   }
 
-  /** Cameras for the grid: the front door / doorbell first (it gets the large live tile), then by name. */
+  /**
+   * Cameras for the grid: working before unavailable, streamable before still-only, then the front
+   * door / doorbell first (it gets the large live tile), then by name.
+   */
   fun gridCameras(cameras: List<CcEntity>, max: Int = GRID_MAX): List<CcEntity> {
     fun rank(e: CcEntity): Int = PREFERRED.indexOfFirst { it in e.id }.let { if (it < 0) PREFERRED.size else it }
-    return cameras.sortedWith(compareBy<CcEntity>({ rank(it) }, { it.name.lowercase() })).take(max)
+    return cameras.sortedWith(compareBy<CcEntity>({ if (it.unavailable) 1 else 0 }, { if (canStream(it)) 0 else 1 }, { rank(it) },
+        { it.name.lowercase() })).take(max)
   }
 
   /** What the full view lists beside [cameraId]: motion near it and the controls a person reaches for. */

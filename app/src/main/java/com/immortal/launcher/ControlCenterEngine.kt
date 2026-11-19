@@ -46,6 +46,9 @@ internal class CcEngine(val app: Context) {
   val parts = HashMap<CcProtocol.Kind, Any?>()
   var planResolved = false
   val calls = HashMap<String, CcCallInfo>()
+  /** Waiting `camera/stream` answers by request key (engine thread only). */
+  val streams = HashMap<String, (String?) -> Unit>()
+  var streamSeq = 0L
   var callSeq = 0L
   var toastSeq = 0L
   var lastUndo: CcCall? = null
@@ -99,6 +102,7 @@ internal class CcEngine(val app: Context) {
     protocol = null; subscribed = null; parts.clear(); planResolved = false
     calls.values.forEach { it.onResult?.invoke(false, null) }
     calls.clear()
+    failStreams()
   }
 
   private fun connect() {
@@ -134,6 +138,7 @@ internal class CcEngine(val app: Context) {
     heartbeat?.cancel(false); heartbeat = null
     calls.values.forEach { it.onResult?.invoke(false, null) }
     calls.clear()
+    failStreams()
   }
 
   fun scheduleRetry(gen: Long, phase: CcPhase, delay: Long = CcBackoff.delayMs(attempt)) {
@@ -195,8 +200,9 @@ internal class CcEngine(val app: Context) {
 
   private fun result(ws: WebSocket, p: CcProtocol, r: CcProtocol.Out.Result) {
     when (r.req.kind) {
-      CcProtocol.Kind.FLOORS, CcProtocol.Kind.AREAS, CcProtocol.Kind.DEVICES, CcProtocol.Kind.ENTITIES -> {
+      CcProtocol.Kind.FLOORS, CcProtocol.Kind.AREAS, CcProtocol.Kind.DEVICES, CcProtocol.Kind.ENTITIES, CcProtocol.Kind.CLASSES -> {
         parts[r.req.kind] = if (r.ok) r.result else null
+        if (r.req.kind == CcProtocol.Kind.ENTITIES) requestClasses(ws, p, parts[r.req.kind] as? org.json.JSONArray)
         if (parts.size == REGISTRY_PARTS) registryReady(ws, p)
       }
       CcProtocol.Kind.PLAN_GET -> planLoaded(ws, p, if (r.ok) (r.result as? org.json.JSONObject)?.optJSONObject("value") else null)
@@ -204,8 +210,30 @@ internal class CcEngine(val app: Context) {
       CcProtocol.Kind.CALL -> callResult(r)
       CcProtocol.Kind.ENERGY_PREFS -> { ui = ui.copy(energyPrefs = if (r.ok) CcEnergy.prefs(r.result) else CcEnergyPrefs()); publish() }
       CcProtocol.Kind.STATS -> statsResult(r)
+      CcProtocol.Kind.CAMERA_STREAM -> streams.remove(r.req.key)?.invoke(if (r.ok) (r.result as? org.json.JSONObject)?.optString("url") else null)
       else -> Unit
     }
+  }
+
+  /** Asks HA for [entityId]'s HLS stream; [onUrl] gets the relative URL, or null (no socket, refused). */
+  fun requestStream(entityId: String, onUrl: (String?) -> Unit) {
+    val ws = socket; val p = protocol
+    if (ws == null || p == null) { onUrl(null); return }
+    val key = "s${++streamSeq}"
+    streams[key] = onUrl
+    ws.send(p.cameraStream(entityId, key).text)
+  }
+
+  private fun failStreams() {
+    val waiting = streams.values.toList()
+    streams.clear()
+    waiting.forEach { it(null) }
+  }
+
+  /** The list call has no device classes; ask for the binary sensors' entries (one request). */
+  private fun requestClasses(ws: WebSocket, p: CcProtocol, ents: org.json.JSONArray?) {
+    val ids = ents?.let { CcRegistryParser.registry(emptyList(), emptyList(), emptyMap(), it).classless }.orEmpty()
+    if (ids.isEmpty()) parts[CcProtocol.Kind.CLASSES] = null else ws.send(p.classes(ids).text)
   }
 
   private fun registryReady(ws: WebSocket, p: CcProtocol) {
@@ -213,8 +241,10 @@ internal class CcEngine(val app: Context) {
     val areas = CcRegistryParser.areas(parts[CcProtocol.Kind.AREAS] as? org.json.JSONArray)
     val devices = CcRegistryParser.deviceAreas(parts[CcProtocol.Kind.DEVICES] as? org.json.JSONArray)
     val ents = parts[CcProtocol.Kind.ENTITIES] as? org.json.JSONArray
-    ui = ui.copy(registry = if (ents == null) null else CcRegistryParser.registry(floors, areas, devices, ents))
-    Log.i(TAG, "control center registry: ${floors.size} floors, ${areas.size} areas, ${ui.registry?.entities?.size ?: 0} entities")
+    val classes = CcRegistryParser.classes(parts[CcProtocol.Kind.CLASSES] as? org.json.JSONObject)
+    ui = ui.copy(registry = if (ents == null) null else CcRegistryParser.registry(floors, areas, devices, ents).copy(fetchedClass = classes))
+    Log.i(TAG, "control center registry: ${floors.size} floors, ${areas.size} areas, ${ui.registry?.entities?.size ?: 0} entities, " +
+        "${classes.size} sensor classes")
     setPhase(ui.connection.phase, "Loading devices")
     if (planResolved) subscribe(ws, p)
   }
@@ -285,6 +315,7 @@ internal class CcEngine(val app: Context) {
     ui = ui.copy(planModels = if (visible > 0) planModels.of(ui) else emptyMap()).warm()
     if (visible == 0) planModels.clear()
     flow.value = ui
+    HomeControlDotStore.update(ui, visible > 0)
     if (alertsToo && ui.connection.phase == CcPhase.LIVE) presentNewAlerts()
   }
 
@@ -302,7 +333,8 @@ internal class CcEngine(val app: Context) {
     private const val CONNECT_S = 8L
     const val PING_S = 30L
     const val PONG_TIMEOUT_MS = 10_000L
-    private const val REGISTRY_PARTS = 4
+    /** Floors, areas, devices, entities and the binary sensors' classes. */
+    private const val REGISTRY_PARTS = 5
     /** Websocket bursts are batched for this long before the UI sees them (~10 updates/s max). */
     const val FLUSH_MS = 100L
   }

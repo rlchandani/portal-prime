@@ -55,4 +55,17 @@ class HomeHeaderBudgetTest {
     // 7 buttons + wifi = 8 pieces, 7 gaps (the leading group takes the free width; no spacer).
     assertEquals(2 * 24 + 7 * 68 + 22 + 7 * 16, HomeHeaderBudget.width(none, bare))
   }
+
+  @Test fun theHomeControlButtonFitsAndKeepsThePortalHeaderWhole() {
+    val withHc = typical.copy(homeControl = true)
+    assertEquals(HomeHeaderPlan(wordmark = true, room = true, connectedLabel = true, miniPlayer = false, musicChip = true),
+        HomeHeaderBudget.plan(1920, withHc))
+    for (width in HomeHeaderBudget.CHECKED_WIDTHS) for (items in listOf(busiest.copy(homeControl = true), withHc)) {
+      val plan = HomeHeaderBudget.plan(width, items)
+      assertTrue("$width $items -> $plan", HomeHeaderBudget.width(plan, items) <= width)
+    }
+    val bare = HomeHeaderItems(musicChip = false, miniPlayer = false, mic = false, customize = false)
+    val none = HomeHeaderPlan(wordmark = false, room = false, connectedLabel = false, miniPlayer = false, musicChip = false)
+    assertEquals(HomeHeaderBudget.width(none, bare) + 68 + 16, HomeHeaderBudget.width(none, bare.copy(homeControl = true)))
+  }
 }

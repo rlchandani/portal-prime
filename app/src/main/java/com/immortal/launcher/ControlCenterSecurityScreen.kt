@@ -59,14 +59,18 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun CcSecurityScreen(s: CcUiState, ui: CcUi) {
   val panel = remember(s.entitiesVersion, s.settings) { s.alarm }
-  val side = remember(s.entitiesVersion, s.settings) { CcSecurity.side(s.people, s.entities.values, ::ccTime, s.alarm) }
+  val side = remember(s.entitiesVersion, s.settings, s.registry, s.plan, s.connection.canControl) {
+    CcSecurity.side(s.people, s.entities.values, ::ccTime, s.alarm).copy(
+        sections = CcSecurityList.sections(s.entities.values, s.settings) { id -> s.registry?.areaName(id) ?: s.plan?.roomOf(id)?.name },
+        canControl = s.connection.canControl, reason = s.connection.disabledReason)
+  }
   val reason = s.connection.disabledReason
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     Column(Modifier.weight(MAIN_WEIGHT).fillMaxHeight().ccCard().padding(36.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(26.dp, Alignment.CenterVertically)) {
       if (panel == null) NoPanel(s.ready) else AlarmPanel(panel, s.settings.exitDelaySec, reason, ui)
     }
-    CcSecuritySide(side, Modifier.weight(1f).fillMaxHeight())
+    CcSecuritySide(side, Modifier.weight(1f).fillMaxHeight(), ui)
   }
 }
 

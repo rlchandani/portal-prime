@@ -24,7 +24,11 @@ internal data class CcReadiness(val title: String, val line: String?, val tone: 
 /** The side column's slice: equal (and skipped) while nothing it shows changed. */
 @Immutable
 internal data class CcSecuritySideSlice(val people: List<CcPersonItem>, val checks: List<CcCheck>, val open: Int,
-    val readiness: CcReadiness = CcReadiness(CcSecurity.note(open), null, CcRingTone.OFF))
+    val readiness: CcReadiness = CcReadiness(CcSecurity.note(open), null, CcRingTone.OFF),
+    /** Every security entity, grouped (the SENSORS card); see [CcSecurityList]. */
+    val sections: List<CcSecSection> = emptyList(),
+    val canControl: Boolean = false,
+    val reason: String? = null)
 
 /** How the big ring looks. */
 internal enum class CcRingTone { OFF, ARMED, ARMING, ALERT }
