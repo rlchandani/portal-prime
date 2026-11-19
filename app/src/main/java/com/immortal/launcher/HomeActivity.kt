@@ -1673,12 +1673,16 @@ private fun LauncherScreen(
               }
               Spacer(Modifier.height(24.dp))
             }
-            if (personal) {
-              WhosTherePersonalHome(use24, homeLayout.compactPortrait, { whoSheet = true },
-                  Modifier.weight(1f).fillMaxWidth())
-            } else CompositionLocalProvider(LocalHomeAddFlow provides addFlow) {
-              ApprovedHomePagedWidgets(homeWidgets, editMode, connected == false, host, manager, saveWidgets,
-                  onEnterEdit = { editMode = true }, modifier = Modifier.weight(1f).fillMaxWidth())
+            // The shared widgets stay composed under a personal Home (just not drawn), so returning to
+            // the shared Home is a redraw, not a rebuild of every widget.
+            val personalNow = rememberUpdatedState(personal)
+            Box(Modifier.weight(1f).fillMaxWidth()) {
+              CompositionLocalProvider(LocalHomeAddFlow provides addFlow) {
+                ApprovedHomePagedWidgets(homeWidgets, editMode, connected == false, host, manager, saveWidgets,
+                    onEnterEdit = { editMode = true },
+                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = if (personalNow.value) 0f else 1f })
+              }
+              if (personal) WhosTherePersonalHome(use24, homeLayout.compactPortrait, { whoSheet = true }, Modifier.fillMaxSize())
             }
             Spacer(Modifier.height(6.dp))
             // Slimmer favorites strip (approved Home v2, change 7): 88 → 72dp, icons 56 → 46dp.

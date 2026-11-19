@@ -9,6 +9,7 @@ package com.immortal.launcher
 import android.content.Context
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,9 +60,7 @@ internal fun WhosTherePersonalHome(use24: Boolean, compactPortrait: Boolean, onN
                                    modifier: Modifier = Modifier) {
   val ui by rememberWhosThereUi()
   val view = ui.view
-  val viewKey = WhosThereViewPolicy.people(view)
-  val appear = androidx.compose.runtime.remember(viewKey) { androidx.compose.animation.core.Animatable(0f) }
-  androidx.compose.runtime.LaunchedEffect(viewKey) { appear.animateTo(1f, tween(500)) }
+  val viewKey = WhosThereViewPolicy.people(view) to (view is WhosThereView.Family)
   val cards: List<PersonalCard> = when (view) {
     is WhosThereView.Personal -> {
       val p = ui.person(view.personId) ?: return
@@ -77,18 +77,44 @@ internal fun WhosTherePersonalHome(use24: Boolean, compactPortrait: Boolean, onN
     }
     WhosThereView.Shared -> return
   }
-  Column(modifier.graphicsLayer { alpha = appear.value }) {
+  // The mock's arrival: cards fade in one by one, ~90 ms apart. Composing one card per step also
+  // spreads the work over several frames instead of one long frame when the Home changes.
+  var shown by androidx.compose.runtime.remember(viewKey) { androidx.compose.runtime.mutableIntStateOf(0) }
+  androidx.compose.runtime.LaunchedEffect(viewKey, cards.size) {
+    for (i in 1..cards.size) {
+      androidx.compose.runtime.withFrameNanos { }
+      shown = i
+      kotlinx.coroutines.delay(CARD_STAGGER_MS)
+    }
+  }
+  // The panel covers the shared widgets kept alive underneath, so it takes every touch.
+  val absorb = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+  Column(modifier.androidxClickable(absorb)) {
     NotYouRow(ui, onNotYou)
     if (compactPortrait) {
       Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        cards.forEach { Card(it, ui, use24, Modifier.fillMaxWidth().weight(1f)) }
+        cards.forEachIndexed { i, c -> Slot(i < shown, Modifier.fillMaxWidth().weight(1f)) { m -> Card(c, ui, use24, m) } }
       }
     } else {
       Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-        cards.forEach { Card(it, ui, use24, Modifier.fillMaxHeight().weight(1f)) }
+        cards.forEachIndexed { i, c -> Slot(i < shown, Modifier.fillMaxHeight().weight(1f)) { m -> Card(c, ui, use24, m) } }
       }
     }
   }
+}
+
+private const val CARD_STAGGER_MS = 90L
+
+private fun Modifier.androidxClickable(source: androidx.compose.foundation.interaction.MutableInteractionSource): Modifier =
+    clickable(interactionSource = source, indication = null) {}
+
+/** A card's place in the grid: empty until its turn, then the card fades in (the grid never moves). */
+@Composable
+private fun Slot(visible: Boolean, modifier: Modifier, content: @Composable (Modifier) -> Unit) {
+  if (!visible) { Spacer(modifier); return }
+  val alpha = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(0f) }
+  androidx.compose.runtime.LaunchedEffect(Unit) { alpha.animateTo(1f, tween(320)) }
+  content(modifier.graphicsLayer { this.alpha = alpha.value; translationY = (1f - alpha.value) * 18f })
 }
 
 private sealed interface PersonalCard {

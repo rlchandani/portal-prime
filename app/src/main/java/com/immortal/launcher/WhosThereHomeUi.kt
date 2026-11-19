@@ -258,7 +258,7 @@ internal fun WhosThereTint(modifier: Modifier = Modifier) {
   val colors = WhosThereViewPolicy.people(ui.view).mapNotNull { ui.person(it)?.color?.tint?.argb() }
   var last by remember { mutableStateOf(listOf(Color.Transparent)) }
   if (colors.isNotEmpty()) last = colors
-  val alpha by animateFloatAsState(if (colors.isEmpty()) 0f else 1f, tween(900), label = "wtTint")
+  val alpha by animateFloatAsState(if (colors.isEmpty()) 0f else 1f, tween(450), label = "wtTint")
   if (alpha <= 0f) return
   val dark = LocalApprovedPalette.current.dark
   val strength = if (dark) 0.22f else 0.16f

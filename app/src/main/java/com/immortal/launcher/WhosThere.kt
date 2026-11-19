@@ -409,6 +409,22 @@ internal object WhosThere {
   private fun rotations(c: Context): List<Int> =
       if (c.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) listOf(270, 90, 0) else listOf(0)
 
+  /** Operator-only (see [WhosThereDebug]): show a view for the enrolled people without a glance. */
+  fun simulate(kind: String) {
+    if (Looper.myLooper() != Looper.getMainLooper()) { main.post { simulate(kind) }; return }
+    val ids = WhosThereStore.householdState.value.enrolled.map { it.id }
+    val first = ids.firstOrNull() ?: return
+    view = when (kind) {
+      "personal" -> WhosThereView.Personal(first, othersNear = false)
+      "near" -> WhosThereView.Personal(first, othersNear = true)
+      "confirm" -> WhosThereView.Personal(first, othersNear = false, confirm = true)
+      "family" -> if (ids.size >= 2) WhosThereView.Family(ids.take(2)) else WhosThereView.Personal(first, true)
+      else -> WhosThereView.Shared
+    }
+    if (view != WhosThereView.Shared) greetedAtMs = System.currentTimeMillis()
+    publish()
+  }
+
   fun benchmark(): JSONObject {
     val out = JSONObject()
     val m = models ?: return out.put("error", modelsError ?: "models not loaded")

@@ -22,6 +22,8 @@ import org.json.JSONObject
  *   is a synthetic random vector (no face), so the glance pipeline can be exercised at night
  *   with nobody in front of the camera. It can never match a real face.
  * - `enabled`: switches recognition on/off on this Portal (operator testing only).
+ * - `simulate`: `"personal"`, `"near"`, `"family"`, `"confirm"` or `"shared"` puts the Home in that
+ *   view for the operator test person(s), without the camera, to check layout and frame times.
  */
 internal object WhosThereDebug {
   @Volatile var ignoreQuietHours: Boolean = false
@@ -41,6 +43,7 @@ internal object WhosThereDebug {
       })
     }
     if (body.optBoolean("clearTestPerson")) WhosThereStore.updateHousehold(context, { it.without(TEST_ID) })
+    body.optString("simulate").takeIf { it.isNotEmpty() }?.let { WhosThere.simulate(it) }
     val out = JSONObject().put("ignoreQuietHours", ignoreQuietHours)
     if (body.optBoolean("glance")) out.put("glance", WhosThere.requestGlance(GlanceTrigger.MANUAL, operator = true))
     if (body.optBoolean("benchmark")) out.put("benchmark", WhosThere.benchmark())

@@ -20,9 +20,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -142,16 +145,18 @@ internal fun CaptureFrame(onCancel: () -> Unit, cameraOn: Boolean, cancelLabel: 
   Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Brush.radialGradient(listOf(Color(0xFF1A1F2B), Color(0xFF0B0D12)))),
       contentAlignment = Alignment.TopCenter) {
     Column(Modifier.fillMaxSize().padding(horizontal = 32.dp, vertical = 28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-      Row(verticalAlignment = Alignment.CenterVertically) {
+      Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
         val pill = RoundedCornerShape(32.dp)
-        Row(Modifier.height(64.dp).clip(pill).background(Color.White.copy(alpha = if (cameraOn) .10f else .06f)).padding(horizontal = 24.dp),
+        // weight(fill = false): on the upright Mini the banner ellipsizes instead of pushing Cancel off screen.
+        Row(Modifier.weight(1f, fill = false).height(64.dp).clip(pill).background(Color.White.copy(alpha = if (cameraOn) .10f else .06f)).padding(horizontal = 24.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
           if (cameraOn) Box(Modifier.size(14.dp).clip(CircleShape).background(Color(0xFF2BB673)))
           else WhosThereGlyph(WtGlyph.CAMERA_OFF, Color.White.copy(alpha = .8f), 24.dp)
           Text(if (cameraOn) "Camera on for set-up · only a template of numbers is kept" else "Camera not in use",
-              color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+              color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+              overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.width(16.dp))
         LightButton(cancelLabel, subtle = true, onClick = onCancel)
       }
       Spacer(Modifier.height(48.dp))
@@ -162,11 +167,13 @@ internal fun CaptureFrame(onCancel: () -> Unit, cameraOn: Boolean, cancelLabel: 
 
 @Composable
 internal fun CaptureTitle(text: String) =
-    Text(text, color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Bold, lineHeight = 48.sp)
+    Text(text, color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Bold, lineHeight = 48.sp,
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center)
 
 @Composable
 internal fun CaptureHint(text: String, color: Color = Color.White.copy(alpha = .72f)) =
-    Text(text, color = color, fontSize = 23.sp, lineHeight = 32.sp, modifier = Modifier.padding(top = 10.dp))
+    Text(text, color = color, fontSize = 23.sp, lineHeight = 32.sp, modifier = Modifier.padding(top = 10.dp).widthIn(max = 900.dp),
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center)
 
 @Composable
 internal fun LightButton(label: String, subtle: Boolean = false, onClick: () -> Unit) {
