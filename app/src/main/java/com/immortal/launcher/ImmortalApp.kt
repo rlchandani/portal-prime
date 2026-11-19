@@ -53,6 +53,8 @@ class ImmortalApp : Application() {
     RoutinesFeature.install(this)
     ShareFeature.install(this)
     GuestFeature.install(this)
+    // Household settings sync: household-scoped settings stay the same on every Portal.
+    SettingsSync.install(this)
     // Weak window tracking is dormant until an operator starts a bounded Fleet capture.
     FramePerformanceCapture.init(this)
     // Compact Portals only: covers the right turn the platform's rotation ignores (sensor dormant elsewhere).

@@ -170,6 +170,7 @@ internal object SettingsPageSections {
         ),
         P.ABOUT to listOf(
             section("This Portal", block(B.DEVICE_NAME)),
+            section("Sync", block(B.SYNC)),
             section(null, block(B.ABOUT_HEALTH)),
             section("Help", ext("Take the Hearthpane tour", E.HELP_TOUR, keywords = "welcome to hearthpane guided")),
         ),

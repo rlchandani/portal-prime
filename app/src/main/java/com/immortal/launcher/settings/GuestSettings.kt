@@ -25,7 +25,8 @@ internal object GuestSettings {
       key: String, title: String, get: (GuestConfig.Settings) -> String, help: String? = null,
       valid: (String) -> Boolean = GuestConfig::isValidText,
       set: (Context, String) -> Unit = { c, v -> GuestConfig.setText(c, key, v) },
-  ) = StringSpec(key = key, title = title, get = get, set = set, applyWhen = valid, help = help)
+  ) = StringSpec(key = key, title = title, get = get, set = set, applyWhen = valid, help = help,
+      scope = SettingScope.DEVICE) // the guest card belongs to the one room that shows it
 
   private val wifi: List<SettingSpec<GuestConfig.Settings>> = listOf(
       text("ssid", "Wi-Fi network name", { it.ssid }, "Exactly as it appears when joining."),
@@ -35,11 +36,14 @@ internal object GuestSettings {
           set = GuestConfig::setSecurity,
           options = GuestWifi.Security.entries.map { it.wire to it.label },
           coerce = { v -> GuestWifi.Security.entries.firstOrNull { it.wire == v }?.wire },
+          scope = SettingScope.DEVICE,
       ),
       BoolSpec("hiddenNetwork", "Network is hidden", get = { it.hiddenNetwork }, set = GuestConfig::setHiddenNetwork,
-          help = "Turn on if the network doesn't show up in the Wi-Fi list."),
+          help = "Turn on if the network doesn't show up in the Wi-Fi list.",
+          scope = SettingScope.DEVICE),
       BoolSpec("hidePassword", "Hide password on the card until tapped", get = { it.hidePassword },
-          set = GuestConfig::setHidePassword, help = "Guests tap Show password. The QR code always works."),
+          set = GuestConfig::setHidePassword, help = "Guests tap Show password. The QR code always works.",
+          scope = SettingScope.DEVICE),
   )
 
   private val basics: List<SettingSpec<GuestConfig.Settings>> = listOf(
@@ -57,6 +61,7 @@ internal object GuestSettings {
           set = { c, v -> GuestConfig.setText(c, "contact", v) },
           options = GuestBasics.CONTACTS.map { it.id to it.label },
           coerce = { v -> v.takeIf(GuestBasics::isValidContact) },
+          scope = SettingScope.DEVICE,
       ),
       text("contactName", "Contact name", { it.contactName }, "Shown as \"Questions? Ask <name>.\" Name only.",
           valid = GuestBasics::isValidContactName),

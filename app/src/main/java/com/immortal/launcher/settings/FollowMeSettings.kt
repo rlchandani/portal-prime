@@ -32,7 +32,8 @@ internal object FollowMeSettings {
                       options = modeOptions,
                       coerce = { v -> v.takeIf { raw -> modeOptions.any { it.first == raw } } },
                       help = "When you walk in from a room playing music, this Portal can offer to " +
-                          "continue it here (Ask first) or bring it over on its own (Automatic)."),
+                          "continue it here (Ask first) or bring it over on its own (Automatic).",
+                          scope = SettingScope.HOUSEHOLD),
               ),
           defaults = { FollowMeConfig.Settings() },
       )

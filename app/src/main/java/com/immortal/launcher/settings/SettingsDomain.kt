@@ -102,8 +102,19 @@ class SettingsDomain<S>(
       synchronized(this) {
         val applied = LinkedHashSet<String>()
         specs.forEach { if (it.applyFrom(c, body)) applied.add(it.key) }
+        if (applied.isNotEmpty()) valuesApplied?.invoke(c, id, applied)
         applied
       }
+
+  companion object {
+    /**
+     * Observes every registry write (on-device, phone remote, fleet, and sync's own applies) after
+     * the values are stored. Household settings sync installs it to notice local changes; it must
+     * only hand off (it runs on the writer's thread, inside the domain lock).
+     */
+    @Volatile
+    internal var valuesApplied: ((Context, String, Set<String>) -> Unit)? = null
+  }
 }
 
 /**

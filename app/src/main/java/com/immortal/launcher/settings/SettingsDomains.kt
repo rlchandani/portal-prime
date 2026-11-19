@@ -88,6 +88,7 @@ object SettingsDomains {
                       help =
                           "One feed supplies Home and the screensaver. Use a public iCalendar (.ics) link, " +
                               "a Google secret iCal address or an Apple iCloud public-calendar link.",
+                      scope = SettingScope.DEVICE,
                   ),
                   BoolSpec(
                       key = "widgetOn",
@@ -97,6 +98,7 @@ object SettingsDomains {
                       set = ScreensaverConfig::setCalendarEnabled,
                       aliases = listOf("enabled"),
                       visible = { _, s -> s.hasCalendarLink },
+                      scope = SettingScope.HOUSEHOLD,
                   ),
                   EnumSpec(
                       key = "range",
@@ -105,6 +107,7 @@ object SettingsDomains {
                       set = ScreensaverConfig::setCalendarRange,
                       options = FleetCalendar.RANGES.map { it to rangeLabel(it) },
                       visible = { _, s -> s.usesCalendar },
+                      scope = SettingScope.HOUSEHOLD,
                   ),
                   IntSpec(
                       key = "size",
@@ -116,6 +119,7 @@ object SettingsDomains {
                       step = 1,
                       format = { CAL_SIZE_LABELS.getOrElse(it) { _ -> it.toString() } },
                       visible = { _, s -> s.usesCalendar },
+                      scope = SettingScope.HOUSEHOLD,
                   ),
                   EnumSpec(
                       key = "side",
@@ -127,23 +131,26 @@ object SettingsDomains {
                               ScreensaverConfig.CAL_SIDE_LEFT to "Left",
                               ScreensaverConfig.CAL_SIDE_RIGHT to "Right"),
                       visible = { _, s -> s.usesCalendar },
+                      scope = SettingScope.HOUSEHOLD,
                   ),
                   // Read-only derived views (flat-payload-only — they round-trip the legacy format).
-                  DerivedSpec(key = "enabled", get = { it.usesCalendar }),
-                  DerivedSpec(key = "hasLink", get = { it.hasCalendarLink }),
+                  DerivedSpec(key = "enabled", get = { it.usesCalendar }, scope = SettingScope.DEVICE),
+                  DerivedSpec(key = "hasLink", get = { it.hasCalendarLink }, scope = SettingScope.DEVICE),
                   DerivedSpec(
                       key = "provider",
                       get = {
                         val u = it.calendarUrl.orEmpty()
                         if (u.isBlank()) "" else CalendarFeed.providerName(u)
-                      }),
+                      },
+                      scope = SettingScope.DEVICE),
                   DerivedSpec(
                       key = "supported",
                       get = {
                         val u = it.calendarUrl.orEmpty()
                         u.isNotBlank() && CalendarFeed.isSupported(u)
-                      }),
-                  DerivedSpec(key = "ranges", get = { JSONArray(FleetCalendar.RANGES) }),
+                      },
+                      scope = SettingScope.DEVICE),
+                  DerivedSpec(key = "ranges", get = { JSONArray(FleetCalendar.RANGES) }, scope = SettingScope.DEVICE),
               ),
           sections = mapOf(
               "url" to "Home & screensaver",
@@ -204,7 +211,8 @@ object SettingsDomains {
                       set = ScreensaverConfig::setEnabled,
                       help =
                           "Turn this off to let your Portal's screen sleep on its own timer (or run " +
-                              "your own screensaver). Hearthpane won't switch it back on."),
+                              "your own screensaver). Hearthpane won't switch it back on.",
+                              scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "mode",
                       "Screensaver style",
@@ -219,7 +227,8 @@ object SettingsDomains {
                               "spread pairs whole portraits, with a single-photo landscape fallback. Split " +
                               "glance shows a large clock beside a photo card. Existing " +
                               "styles remain available.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "photo_motion",
                       "Gentle photo motion",
@@ -227,7 +236,8 @@ object SettingsDomains {
                       set = ScreensaverConfig::setPhotoMotion,
                       help = "Let photos move gently when there is room. Off keeps them still " +
                           "between photo changes. Transitions and navigation continue.",
-                      visible = { _, s -> s.enabled && ScreensaverConfig.supportsPhotoMotion(s.mode) }),
+                      visible = { _, s -> s.enabled && ScreensaverConfig.supportsPhotoMotion(s.mode) },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "keep_people_in_frame",
                       "Keep people in frame",
@@ -239,7 +249,8 @@ object SettingsDomains {
                       visible = { _, s ->
                         s.enabled && (s.mode == ScreensaverConfig.MODE_SMART ||
                             s.mode == ScreensaverConfig.MODE_PORTRAITS)
-                      }),
+                      },
+                      scope = SettingScope.HOUSEHOLD),
                   NavSpec(
                       "clockFace",
                       "Clock face",
@@ -248,7 +259,8 @@ object SettingsDomains {
                       help =
                           "Choose how the time looks - the classic corner clock, a big centred clock, " +
                               "or the full-screen flip clock.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   NavSpec(
                       "photoSource",
                       "Photo source",
@@ -257,7 +269,8 @@ object SettingsDomains {
                       help =
                           "Where your photos come from - the built-in feed, your own folder or a shared " +
                               "album, or a self-hosted source like Immich or a NAS.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD), // shared sources sync (PhotoFrameSyncSettings); folders and logins stay
                   NavSpec(
                       "dismissTarget",
                       "Open when you tap to exit",
@@ -267,10 +280,11 @@ object SettingsDomains {
                           "Tapping the screensaver wakes the Portal. By default that brings you home to " +
                               "Hearthpane - or pick an app (like Home Assistant) to drop straight into.",
                       visible = { _, s -> s.enabled },
-                      valueOnWorker = true),
-                  DerivedSpec("source", get = { it.source }),
-                  DerivedSpec("folderPath", get = { it.folderPath ?: "" }),
-                  DerivedSpec("albumUrl", get = { it.albumUrl ?: "" }),
+                      valueOnWorker = true,
+                      scope = SettingScope.DEVICE),
+                  DerivedSpec("source", get = { it.source }, scope = SettingScope.DEVICE),
+                  DerivedSpec("folderPath", get = { it.folderPath ?: "" }, scope = SettingScope.DEVICE),
+                  DerivedSpec("albumUrl", get = { it.albumUrl ?: "" }, scope = SettingScope.DEVICE),
                   IntSpec(
                       "albumRefreshMin",
                       "Album refresh",
@@ -284,7 +298,8 @@ object SettingsDomains {
                       // Auto-managed: hidden on-device (settings-reimagining Phase 5). The default
                       // refresh cadence is fine for every album source; the phone remote can still
                       // set it. (Was network-album-only: !s.usesFolder && source != DEFAULT.)
-                      visible = { _, _ -> false }),
+                      visible = { _, _ -> false },
+                      scope = SettingScope.HOUSEHOLD),
                   // Fit only affects Classic. The native stage and engine styles own their framing.
                   // Photo interval drives all renderers, so it stays visible.
                   EnumSpec(
@@ -295,7 +310,8 @@ object SettingsDomains {
                       options =
                           listOf(ScreensaverConfig.FIT_FILL to "Fill", ScreensaverConfig.FIT_FIT to "Fit"),
                       coerce = { FleetScreensaver.coerceFit(it) },
-                      visible = { _, s -> s.enabled && s.mode == ScreensaverConfig.MODE_CLASSIC }),
+                      visible = { _, s -> s.enabled && s.mode == ScreensaverConfig.MODE_CLASSIC },
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "intervalSec",
                       "Photo interval",
@@ -307,15 +323,18 @@ object SettingsDomains {
                       asText = true,
                       format = { "${it}s" },
                       help = "Seconds between photos, from 5 to 600.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec("shuffle", "Shuffle", get = { it.shuffle }, set = ScreensaverConfig::setShuffle,
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "includeVideo",
                       "Play videos",
                       get = { it.includeVideo },
                       set = ScreensaverConfig::setIncludeVideo,
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   // On-device cache: only meaningful for a network source that re-fetches the same
                   // assets every loop (Immich / WebDAV / SMB). Hidden for a local folder or the built-in
                   // feed, where there's nothing to save a round-trip on.
@@ -329,7 +348,8 @@ object SettingsDomains {
                               "this device on every loop instead of fetching it again. Videos are " +
                               "shrunk to fit the screen. The frame loads faster and your server does " +
                               "far less work; it uses some of this device's storage.",
-                      visible = { _, s -> s.enabled && (s.usesImmich || s.usesDav || s.usesSmb) }),
+                      visible = { _, s -> s.enabled && (s.usesImmich || s.usesDav || s.usesSmb) },
+                      scope = SettingScope.DEVICE),
                   IntSpec(
                       "cacheBudgetGb",
                       "Storage limit",
@@ -345,7 +365,8 @@ object SettingsDomains {
                       // Auto-managed: hidden on-device (settings-reimagining Phase 5). The cache
                       // self-evicts oldest-first within the default budget (and free space); the
                       // phone remote can still tune it. (Was: (usesImmich||usesDav) && cacheEnabled.)
-                      visible = { _, _ -> false }),
+                      visible = { _, _ -> false },
+                      scope = SettingScope.DEVICE),
                   BoolSpec(
                       "batterySaver",
                       "Sleep on battery when nobody's around",
@@ -354,14 +375,16 @@ object SettingsDomains {
                       help =
                           "Unplugged, keep showing photos while someone's nearby and sleep when the room " +
                               "empties (saves the battery). Off: the frame stays on, on battery too.",
-                      visible = { c, s -> s.enabled && DreamPolicy.hasBattery(c) }),
+                      visible = { c, s -> s.enabled && DreamPolicy.hasBattery(c) },
+                      scope = SettingScope.DEVICE),
                   BoolSpec(
                       "showNowPlaying",
                       "Show now playing",
                       get = { it.showNowPlaying },
                       set = ScreensaverConfig::setShowNowPlaying,
                       help = "Overlay the current track and cover art on the photo frame while music is playing.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   // On-by-default and auto-managed: hidden on-device (settings-reimagining Phase 5).
                   // Burn-in reduction should always be on for an always-on frame; the phone remote
                   // can still toggle it if ever needed.
@@ -370,7 +393,8 @@ object SettingsDomains {
                       "Reduce screen burn-in",
                       get = { it.antiBurnIn },
                       set = ScreensaverConfig::setAntiBurnIn,
-                      visible = { _, _ -> false }),
+                      visible = { _, _ -> false },
+                      scope = SettingScope.HOUSEHOLD),
                   // NOTE: `showGradient` removed — FaceRenderer chooses legibility shading by
                   // presentation; Gallery uses reserved matte space. The old toggle did nothing.
                   EnumSpec(
@@ -386,7 +410,8 @@ object SettingsDomains {
                       help =
                           "Follow presence: photos while someone's around, screen off (and multi-room " +
                               "music paused) when the room empties. Always on: a permanent frame on mains power.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "idleSleepMin",
                       "Idle screen-off",
@@ -399,14 +424,16 @@ object SettingsDomains {
                       help =
                           "After the screensaver shows this long with no touch, the screen turns off; " +
                               "tap to wake. A simple timer - it can't tell whether someone's in the room.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "overnightEnabled",
                       "Overnight screen-off",
                       get = { it.overnightEnabled },
                       set = ScreensaverConfig::setOvernightEnabled,
                       help = "Keep the screen off (or show a dim night clock) between two times every night.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "overnightStartMin",
                       "Off from",
@@ -418,7 +445,8 @@ object SettingsDomains {
                       wrap = true,
                       timeOfDay = true,
                       format = ::hhmm,
-                      visible = { _, s -> s.enabled && s.overnightEnabled }),
+                      visible = { _, s -> s.enabled && s.overnightEnabled },
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "overnightEndMin",
                       "Off until",
@@ -430,13 +458,15 @@ object SettingsDomains {
                       wrap = true,
                       timeOfDay = true,
                       format = ::hhmm,
-                      visible = { _, s -> s.enabled && s.overnightEnabled }),
+                      visible = { _, s -> s.enabled && s.overnightEnabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "overnightNightClock",
                       "Show a dim night clock",
                       get = { it.overnightNightClock },
                       set = ScreensaverConfig::setOvernightNightClock,
-                      visible = { _, s -> s.enabled && s.overnightEnabled }),
+                      visible = { _, s -> s.enabled && s.overnightEnabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "darkRoomClock",
                       "Clock when the room is dark",
@@ -444,7 +474,8 @@ object SettingsDomains {
                       set = ScreensaverConfig::setDarkRoomClock,
                       help = "A dim clock replaces photos after 20 seconds of darkness. Photos resume " +
                           "when the lights return. Requires a light sensor; no camera is used.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "darkRoomLux",
                       "Darkness threshold",
@@ -452,7 +483,8 @@ object SettingsDomains {
                       set = ScreensaverConfig::setDarkRoomLux,
                       min = 1, max = 20, step = 1,
                       format = { "$it lux" },
-                      visible = { _, s -> s.enabled && s.darkRoomClock }),
+                      visible = { _, s -> s.enabled && s.darkRoomClock },
+                      scope = SettingScope.DEVICE),
                   IntSpec(
                       "nightClockBrightness",
                       "Night clock brightness",
@@ -461,7 +493,8 @@ object SettingsDomains {
                       min = 1, max = 15, step = 1,
                       format = { "$it%" },
                       visible = { _, s -> s.enabled &&
-                          (s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock)) }),
+                          (s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock)) },
+                          scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "nightClockTone",
                       "Night clock colour",
@@ -472,7 +505,8 @@ object SettingsDomains {
                       coerce = { it.takeIf { value -> value in ScreensaverConfig.NIGHT_TONES } },
                       help = "Night photo keeps your photos showing, very dim and warm, with a small clock.",
                       visible = { _, s -> s.enabled &&
-                          (s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock)) }),
+                          (s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock)) },
+                          scope = SettingScope.HOUSEHOLD),
                   // NOTE: `feed` (Photo feed picker) removed — PhotoFrameController hardcodes the
                   // built-in source chain and never read the setting. See settings-reimagining-audit.
                   BoolSpec(
@@ -481,7 +515,8 @@ object SettingsDomains {
                       get = { it.sleepTimerEnabled },
                       set = ScreensaverConfig::setSleepTimerEnabled,
                       help = "Turn the screensaver off after a set time.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "sleepTimerMin",
                       "Sleep after",
@@ -491,19 +526,22 @@ object SettingsDomains {
                       max = 240,
                       step = 5,
                       format = { "$it min" },
-                      visible = { _, s -> s.enabled && s.sleepTimerEnabled }),
+                      visible = { _, s -> s.enabled && s.sleepTimerEnabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "pauseAudioOnSleep",
                       "Pause audio on sleep",
                       get = { it.pauseAudioOnSleep },
                       set = ScreensaverConfig::setPauseAudioOnSleep,
-                      visible = { _, s -> s.enabled && s.sleepTimerEnabled }),
+                      visible = { _, s -> s.enabled && s.sleepTimerEnabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "closeAppOnSleep",
                       "Close app on sleep",
                       get = { it.closeAppOnSleep },
                       set = ScreensaverConfig::setCloseAppOnSleep,
-                      visible = { _, s -> s.enabled && s.sleepTimerEnabled }),
+                      visible = { _, s -> s.enabled && s.sleepTimerEnabled },
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "soundscape",
                       "Ambient sound",
@@ -512,7 +550,8 @@ object SettingsDomains {
                       options = ScreensaverConfig.SOUNDSCAPES.map { it to ScreensaverConfig.soundscapeLabel(it) },
                       coerce = { v -> v.takeIf { it in ScreensaverConfig.SOUNDSCAPES } },
                       help = "Synthesised ambient sound played while the screensaver shows.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "soundscapeVolume",
                       "Soundscape volume",
@@ -522,25 +561,29 @@ object SettingsDomains {
                       max = 100,
                       step = 5,
                       format = { "$it%" },
-                      visible = { _, s -> s.enabled && s.soundscape != ScreensaverConfig.SOUND_OFF }),
+                      visible = { _, s -> s.enabled && s.soundscape != ScreensaverConfig.SOUND_OFF },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "ambientDashboard",
                       "Ambient dashboard",
                       get = { it.ambientDashboard },
                       set = ScreensaverConfig::setAmbientDashboard,
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "gestureWave",
                       "Gesture wave to wake",
                       get = { it.gestureWave },
                       set = ScreensaverConfig::setGestureWave,
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "welcomeEnabled",
                       "Welcome screen",
                       get = { it.welcomeEnabled },
                       set = ScreensaverConfig::setWelcomeEnabled,
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
               ),
           sections =
               mapOf(
@@ -596,14 +639,16 @@ object SettingsDomains {
                       "Advanced settings",
                       get = { it.advancedSettings },
                       set = ImmortalSettings::setAdvancedSettings,
-                      help = "Show technical connections, automation and diagnostics."),
+                      help = "Show technical connections, automation and diagnostics.",
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "settingsTheme",
                       "Appearance",
                       get = { it.settingsTheme },
                       set = ImmortalSettings::setSettingsTheme,
                       options = listOf("light" to "Light", "dark" to "Dark"),
-                      coerce = oneOf("light", "dark")),
+                      coerce = oneOf("light", "dark"),
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "weatherUnit",
                       "Temperature unit",
@@ -615,7 +660,8 @@ object SettingsDomains {
                               ImmortalSettings.UNIT_F to "Fahrenheit",
                               ImmortalSettings.UNIT_C to "Celsius"),
                       coerce = oneOf(ImmortalSettings.UNIT_AUTO, ImmortalSettings.UNIT_F, ImmortalSettings.UNIT_C),
-                      help = "Auto follows your Portal's language & region setting."),
+                      help = "Auto follows your Portal's language & region setting.",
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "tileSize",
                       "App tile size",
@@ -627,7 +673,8 @@ object SettingsDomains {
                               ImmortalSettings.SIZE_LARGE to "Large",
                               ImmortalSettings.SIZE_XL to "XL"),
                       coerce = oneOf(ImmortalSettings.SIZE_STANDARD, ImmortalSettings.SIZE_LARGE, ImmortalSettings.SIZE_XL),
-                      help = "Large is closer to the stock Portal launcher."),
+                      help = "Large is closer to the stock Portal launcher.",
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "weatherWidget",
                       "Weather widget",
@@ -639,7 +686,8 @@ object SettingsDomains {
                               ImmortalSettings.WIDGET_HOURLY to "Hourly",
                               ImmortalSettings.WIDGET_DAILY to "Daily"),
                       coerce = oneOf(ImmortalSettings.WIDGET_OFF, ImmortalSettings.WIDGET_HOURLY, ImmortalSettings.WIDGET_DAILY),
-                      help = "Show a forecast below your apps. Off by default."),
+                      help = "Show a forecast below your apps. Off by default.",
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "clockFormat",
                       "Clock",
@@ -652,40 +700,46 @@ object SettingsDomains {
                               ImmortalSettings.CLOCK_24 to "24-hour"),
                       coerce = oneOf(ImmortalSettings.CLOCK_AUTO, ImmortalSettings.CLOCK_12, ImmortalSettings.CLOCK_24),
                       help =
-                          "Applies to the home screen, screensaver and forecast. Auto follows your Portal's system setting."),
+                          "Applies to the home screen, screensaver and forecast. Auto follows your Portal's system setting.",
+                          scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "showMiniPlayer",
                       "Now-playing mini-player",
                       get = { it.showMiniPlayer },
                       set = ImmortalSettings::setShowMiniPlayer,
                       help =
-                          "Show the current track, cover art and controls in the header while music is playing."),
+                          "Show the current track, cover art and controls in the header while music is playing.",
+                          scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "hideStatusBar",
                       "Hide status bar",
                       get = { it.hideStatusBar },
                       set = ImmortalSettings::setHideStatusBar,
                       help =
-                          "Hidden by default for a cleaner full-screen look. Swipe down from the top to reveal it briefly."),
+                          "Hidden by default for a cleaner full-screen look. Swipe down from the top to reveal it briefly.",
+                          scope = SettingScope.HOUSEHOLD),
                    BoolSpec(
                        "stayInStartupApp",
                        "Stay in startup app",
                        get = { it.stayInStartupApp },
                        set = ImmortalSettings::setStayInStartupApp,
                        help = "After reboot, keep the last app that launches on screen. " +
-                           "Off returns to Hearthpane. Takes effect at the next reboot."),
+                           "Off returns to Hearthpane. Takes effect at the next reboot.",
+                           scope = SettingScope.DEVICE),
                    // NOTE: `constrainPageWidth` removed — no consumer ever read it. See audit.
                   BoolSpec(
                       "multiRoomEnabled",
                       "Multi-room audio",
                       get = { it.multiRoomEnabled },
-                      set = ImmortalSettings::setMultiRoomEnabled),
+                      set = ImmortalSettings::setMultiRoomEnabled,
+                      scope = SettingScope.HOUSEHOLD),
                   StringSpec(
                       "snapcastHost",
                       "Snapcast host",
                       get = { it.snapcastHost },
                       set = ImmortalSettings::setSnapcastHost,
-                      visible = { _, s -> s.multiRoomEnabled }),
+                      visible = { _, s -> s.multiRoomEnabled },
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "maPort",
                       "Music Assistant port",
@@ -695,20 +749,23 @@ object SettingsDomains {
                       max = 65535,
                       asText = true,
                       help = "Music Assistant's web server port — 8095 by default.",
-                      visible = { _, s -> s.multiRoomEnabled }),
+                      visible = { _, s -> s.multiRoomEnabled },
+                      scope = SettingScope.HOUSEHOLD),
                   StringSpec(
                       "maUsername",
                       "Music Assistant user",
                       get = { it.maUsername },
                       set = ImmortalSettings::setMaUsername,
-                      visible = { _, _ -> false }),
+                      visible = { _, _ -> false },
+                      scope = SettingScope.DEVICE),
                   StringSpec(
                       "maPassword",
                       "Music Assistant password",
                       get = { it.maPassword },
                       set = ImmortalSettings::setMaPassword,
                       secret = true,
-                      visible = { _, _ -> false }),
+                      visible = { _, _ -> false },
+                      scope = SettingScope.DEVICE_SECRET),
                   StringSpec(
                       "maApiToken",
                       "Music Assistant API token",
@@ -719,7 +776,8 @@ object SettingsDomains {
                       help = "API tokens are required for this Music Assistant connection. Enter up to " +
                           "4096 printable ASCII characters without spaces. Leave blank to keep the saved token. " +
                           "YouTube and other music-provider credentials stay on your Music Assistant server.",
-                      visible = { _, s -> s.multiRoomEnabled }),
+                      visible = { _, s -> s.multiRoomEnabled },
+                      scope = SettingScope.DEVICE_SECRET),
                   StringSpec(
                       "maPlayerId",
                       "Music Assistant player ID",
@@ -729,7 +787,8 @@ object SettingsDomains {
                           it.all { ch -> ch in ' '..'~' }) },
                       help = "Use the raw Music Assistant player_id, not its display name. Enter up to " +
                           "256 printable ASCII characters, or leave blank for no explicit player selection.",
-                      visible = { _, s -> s.multiRoomEnabled }),
+                      visible = { _, s -> s.multiRoomEnabled },
+                      scope = SettingScope.DEVICE),
               ),
           sections =
               mapOf(
@@ -777,13 +836,14 @@ object SettingsDomains {
           explicitApply = true,
           specs =
               listOf(
-                  BoolSpec("enabled", "Publish to MQTT", get = { MqttConfig.isEnabled(it) }, set = MqttConfig::setEnabled),
+                  BoolSpec("enabled", "Publish to MQTT", get = { MqttConfig.isEnabled(it) }, set = MqttConfig::setEnabled, scope = SettingScope.DEVICE),
                   StringSpec(
                       "host",
                       "Broker host",
                       get = { MqttConfig.host(it) },
                       set = MqttConfig::setHost,
-                      visible = { c, _ -> MqttConfig.isEnabled(c) }),
+                      visible = { c, _ -> MqttConfig.isEnabled(c) },
+                      scope = SettingScope.DEVICE),
                   IntSpec(
                       "port",
                       "Port",
@@ -792,26 +852,30 @@ object SettingsDomains {
                       min = 1,
                       max = 65535,
                       asText = true,
-                      visible = { c, _ -> MqttConfig.isEnabled(c) }),
+                      visible = { c, _ -> MqttConfig.isEnabled(c) },
+                      scope = SettingScope.DEVICE),
                   StringSpec(
                       "username",
                       "Username",
                       get = { MqttConfig.username(it) },
                       set = MqttConfig::setUsername,
-                      visible = { c, _ -> MqttConfig.isEnabled(c) }),
+                      visible = { c, _ -> MqttConfig.isEnabled(c) },
+                      scope = SettingScope.DEVICE),
                   StringSpec(
                       "password",
                       "Password",
                       get = { MqttConfig.password(it) },
                       set = MqttConfig::setPassword,
                       secret = true,
-                      visible = { c, _ -> MqttConfig.isEnabled(c) }),
+                      visible = { c, _ -> MqttConfig.isEnabled(c) },
+                      scope = SettingScope.DEVICE_SECRET),
                   BoolSpec(
                       "useTls",
                       "Use TLS",
                       get = { MqttConfig.useTls(it) },
                       set = MqttConfig::setUseTls,
-                      visible = { c, _ -> MqttConfig.isEnabled(c) }),
+                      visible = { c, _ -> MqttConfig.isEnabled(c) },
+                      scope = SettingScope.DEVICE),
                   // On-by-default and auto-managed: hidden on-device (settings-reimagining Phase 5).
                   // Certificate validation should stay on; the phone remote can still turn it off
                   // for a self-signed broker. (Was: isEnabled && useTls.)
@@ -820,7 +884,8 @@ object SettingsDomains {
                       "Validate certificate",
                       get = { MqttConfig.validateCert(it) },
                       set = MqttConfig::setValidateCert,
-                      visible = { _, _ -> false }),
+                      visible = { _, _ -> false },
+                      scope = SettingScope.DEVICE),
               ),
           sections =
               mapOf(
@@ -861,14 +926,16 @@ object SettingsDomains {
                       "App-switcher button",
                       get = { it.enabled },
                       set = QuickBarConfig::setEnabled,
-                      help = "A centered button at the top that opens your recent apps to switch between them."),
+                      help = "A centered button at the top that opens your recent apps to switch between them.",
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "alwaysShow",
                       "Always show",
                       get = { it.alwaysShow },
                       set = QuickBarConfig::setAlwaysShow,
                       help = "On: always visible. Off: only while the system top bar is revealed.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
               ),
           defaults = { QuickBarConfig.Settings() },
           onApplied = { c, _ ->
@@ -900,6 +967,7 @@ object SettingsDomains {
                       // Reject blank or over-long names; the trimmed form must be 1..48 chars.
                       applyWhen = { it.trim().length in 1..48 },
                       help = "Shown in the phone remote and in Home Assistant.",
+                      scope = SettingScope.DEVICE,
                   ),
               ),
       )
@@ -928,26 +996,30 @@ object SettingsDomains {
                       "Hourly chime",
                       get = { it.hourlyChimeOn },
                       set = ChimeConfig::setHourlyChime,
-                      help = "A soft chime on the hour."),
+                      help = "A soft chime on the hour.",
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "spokenTimeOn",
                       "Spoken time",
                       get = { it.spokenTimeOn },
                       set = ChimeConfig::setSpokenTime,
-                      help = "Spoken time on the hour (\"It's three o'clock\"), via TTS."),
+                      help = "Spoken time on the hour (\"It's three o'clock\"), via TTS.",
+                      scope = SettingScope.HOUSEHOLD),
                   StringSpec(
                       "spokenVoice",
                       "Spoken-time voice",
                       get = { it.spokenVoice },
                       set = ChimeConfig::setSpokenVoice,
                       // Presentation belongs to the installed-voice chooser, not free-text entry.
-                      visible = { _, _ -> false }),
+                      visible = { _, _ -> false },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "goldenHourOn",
                       "Golden-hour tone",
                       get = { it.goldenHourOn },
                       set = ChimeConfig::setGoldenHour,
-                      help = "A sound at sunrise and sunset."),
+                      help = "A sound at sunrise and sunset.",
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "sunriseVariant",
                       "Sunrise sound",
@@ -957,7 +1029,8 @@ object SettingsDomains {
                       max = 1,
                       step = 1,
                       format = { if (it == 0) "Morning" else "Rooster" },
-                      visible = { _, s -> s.goldenHourOn }),
+                      visible = { _, s -> s.goldenHourOn },
+                      scope = SettingScope.HOUSEHOLD),
                   // One shared volume for every cue (consolidated from four per-cue volumes,
                   // settings-reimagining Phase 8). Shown whenever any audible cue is on; the ping
                   // ring also uses it, so it's shown regardless once cues exist.
@@ -970,14 +1043,16 @@ object SettingsDomains {
                       max = 100,
                       step = 10,
                       format = { "$it%" },
-                      help = "Playback volume for chimes, spoken time, the golden-hour tone, and the room ping."),
+                      help = "Playback volume for chimes, spoken time, the golden-hour tone, and the room ping.",
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "quietHoursOn",
                       "Quiet hours",
                       get = { it.quietHoursOn },
                       set = ChimeConfig::setQuietHours,
                       help = "Silence scheduled sounds within this window. If the start and end times match, " +
-                          "no sounds are silenced."),
+                          "no sounds are silenced.",
+                          scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "quietStartMin",
                       "Quiet from",
@@ -989,7 +1064,8 @@ object SettingsDomains {
                       wrap = true,
                       timeOfDay = true,
                       format = ::hhmm,
-                      visible = { _, s -> s.quietHoursOn }),
+                      visible = { _, s -> s.quietHoursOn },
+                      scope = SettingScope.HOUSEHOLD),
                   IntSpec(
                       "quietEndMin",
                       "Quiet until",
@@ -1001,7 +1077,8 @@ object SettingsDomains {
                       wrap = true,
                       timeOfDay = true,
                       format = ::hhmm,
-                      visible = { _, s -> s.quietHoursOn }),
+                      visible = { _, s -> s.quietHoursOn },
+                      scope = SettingScope.HOUSEHOLD),
               ),
           sections =
               mapOf(
@@ -1039,7 +1116,8 @@ object SettingsDomains {
                       "Sunrise alarm",
                       get = { it.enabled },
                       set = SunriseConfig::setEnabled,
-                      help = "Wake to a gradual screen-brightening ramp, optionally finishing with a chime."),
+                      help = "Wake to a gradual screen-brightening ramp, optionally finishing with a chime.",
+                      scope = SettingScope.DEVICE),
                   IntSpec(
                       "hour",
                       "Hour",
@@ -1049,7 +1127,8 @@ object SettingsDomains {
                       max = 23,
                       step = 1,
                       format = { "%02d:00".format(it) },
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.DEVICE),
                   IntSpec(
                       "minute",
                       "Minute",
@@ -1059,7 +1138,8 @@ object SettingsDomains {
                       max = 59,
                       step = 5,
                       format = { ":%02d".format(it) },
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.DEVICE),
                   IntSpec(
                       "rampMinutes",
                       "Ramp minutes",
@@ -1070,14 +1150,16 @@ object SettingsDomains {
                       step = 5,
                       format = { "$it min" },
                       help = "How long the screen takes to brighten from ember to full daylight.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.DEVICE),
                   BoolSpec(
                       "chime",
                       "Chime at end",
                       get = { it.chime },
                       set = SunriseConfig::setChime,
                       help = "Finish the ramp with a soft chime crescendo.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.DEVICE),
               ),
           sections =
               mapOf(
@@ -1112,7 +1194,8 @@ object SettingsDomains {
                       "Digital clock",
                       get = { it.enabled },
                       set = DigitalClockConfig::setEnabled,
-                      help = "Use a large clock instead of the photo frame screensaver."),
+                      help = "Use a large clock instead of the photo frame screensaver.",
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "style",
                       "Clock style",
@@ -1130,7 +1213,8 @@ object SettingsDomains {
                           DigitalClockConfig.STYLE_CLASSIC, DigitalClockConfig.STYLE_FLIP,
                           DigitalClockConfig.STYLE_BOLD, DigitalClockConfig.STYLE_NEON,
                           DigitalClockConfig.STYLE_SEGMENT, DigitalClockConfig.STYLE_ANALOG),
-                      visible = { _, _ -> false }), // superseded by the face preset on-device
+                      visible = { _, _ -> false },
+                      scope = SettingScope.HOUSEHOLD), // superseded by the face preset on-device
                   // One curated "face" preset replaces the raw style/font/color/glow enums on-device
                   // (settings-reimagining Phase 8b). Selecting a face writes all four together via
                   // setFace; the value is derived from the stored style via faceOf. The raw enums stay
@@ -1143,7 +1227,8 @@ object SettingsDomains {
                       set = DigitalClockConfig::setFace,
                       options = DigitalClockConfig.FACES.map { it.id to it.label },
                       coerce = oneOf(*DigitalClockConfig.FACES.map { it.id }.toTypedArray()),
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "color",
                       "Color",
@@ -1164,7 +1249,8 @@ object SettingsDomains {
                           DigitalClockConfig.COLOR_GREEN, DigitalClockConfig.COLOR_BLUE,
                           DigitalClockConfig.COLOR_YELLOW, DigitalClockConfig.COLOR_CYAN,
                           DigitalClockConfig.COLOR_PINK, DigitalClockConfig.COLOR_ORANGE),
-                      visible = { _, _ -> false }), // folded into the face preset on-device
+                      visible = { _, _ -> false },
+                      scope = SettingScope.HOUSEHOLD), // folded into the face preset on-device
                   EnumSpec(
                       "font",
                       "Font",
@@ -1185,7 +1271,8 @@ object SettingsDomains {
                           DigitalClockConfig.FONT_BOLD, DigitalClockConfig.FONT_MONO,
                           DigitalClockConfig.FONT_SERIF, DigitalClockConfig.FONT_SEGMENT_LED,
                           DigitalClockConfig.FONT_DIGITAL_7, DigitalClockConfig.FONT_TECHNOLOGY),
-                      visible = { _, _ -> false }), // folded into the face preset on-device
+                      visible = { _, _ -> false },
+                      scope = SettingScope.HOUSEHOLD), // folded into the face preset on-device
                   EnumSpec(
                       "size",
                       "Size",
@@ -1200,7 +1287,8 @@ object SettingsDomains {
                       coerce = oneOf(
                           DigitalClockConfig.SIZE_SMALL, DigitalClockConfig.SIZE_MEDIUM,
                           DigitalClockConfig.SIZE_LARGE, DigitalClockConfig.SIZE_XL),
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "layout",
                       "Position",
@@ -1215,7 +1303,8 @@ object SettingsDomains {
                       coerce = oneOf(
                           DigitalClockConfig.LAYOUT_CENTER, DigitalClockConfig.LAYOUT_TOP,
                           DigitalClockConfig.LAYOUT_BOTTOM, DigitalClockConfig.LAYOUT_MINIMAL),
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "background",
                       "Background",
@@ -1229,7 +1318,8 @@ object SettingsDomains {
                       coerce = oneOf(
                           DigitalClockConfig.BG_BLACK, DigitalClockConfig.BG_GRADIENT,
                           DigitalClockConfig.BG_RED),
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "glow",
                       "Glow",
@@ -1243,19 +1333,22 @@ object SettingsDomains {
                       coerce = oneOf(
                           DigitalClockConfig.GLOW_NONE, DigitalClockConfig.GLOW_SOFT,
                           DigitalClockConfig.GLOW_STRONG),
-                      visible = { _, _ -> false }), // folded into the face preset on-device
+                      visible = { _, _ -> false },
+                      scope = SettingScope.HOUSEHOLD), // folded into the face preset on-device
                   BoolSpec(
                       "showDate",
                       "Show date",
                       get = { it.showDate },
                       set = DigitalClockConfig::setShowDate,
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "showSeconds",
                       "Show seconds",
                       get = { it.showSeconds },
                       set = DigitalClockConfig::setShowSeconds,
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
               ),
           sections =
               mapOf(
@@ -1299,29 +1392,34 @@ object SettingsDomains {
                       max = 10000,
                       step = 200,
                       format = { "${it / 1000.0}s" },
-                      help = "How long the welcome overlay shows before auto-dismissing."),
+                      help = "How long the welcome overlay shows before auto-dismissing.",
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "showGreeting",
                       "Show greeting",
                       get = { it.showGreeting },
                       set = WelcomeConfig::setShowGreeting,
-                      help = "Show a time-of-day greeting (\"Good morning\")."),
+                      help = "Show a time-of-day greeting (\"Good morning\").",
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "showClock",
                       "Show clock",
                       get = { it.showClock },
-                      set = WelcomeConfig::setShowClock),
+                      set = WelcomeConfig::setShowClock,
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "showDate",
                       "Show date",
                       get = { it.showDate },
-                      set = WelcomeConfig::setShowDate),
+                      set = WelcomeConfig::setShowDate,
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "enableTts",
                       "Speak greeting",
                       get = { it.enableTts },
                       set = WelcomeConfig::setEnableTts,
-                      help = "Speak the greeting through Android TTS when the overlay shows."),
+                      help = "Speak the greeting through Android TTS when the overlay shows.",
+                      scope = SettingScope.HOUSEHOLD),
               ),
           defaults = { WelcomeConfig.Settings() },
       )
@@ -1340,6 +1438,7 @@ object SettingsDomains {
                       set = HomeDashboardConfig::setUrl,
                       applyWhen = { HomeDashboardConfig.normalizeUrl(it) != null },
                       help = "An HTTP or HTTPS dashboard address. Leave blank to disable.",
+                      scope = SettingScope.HOUSEHOLD,
                   ),
               ),
           defaults = { HomeDashboardConfig.Settings() },
@@ -1356,6 +1455,7 @@ object SettingsDomains {
             get = { settings: CalendarPacks.Settings -> settings.isEnabled(pack.id) },
             set = { context, enabled -> CalendarPacks.setEnabled(context, pack.id, enabled) },
             help = pack.blurb,
+            scope = SettingScope.HOUSEHOLD,
         )
       },
       defaults = { CalendarPacks.Settings() },
@@ -1367,4 +1467,10 @@ object SettingsDomains {
           com.immortal.launcher.ShareSettings.domain, HouseholdListSettings.domain, GuestSettings.domain,
           MusicSettings.domain, FollowMeSettings.domain, BriefingSettings.domain, DoorbellSettings.domain,
           ControlCenterSettings.domain, CallingSettings.domain)
+
+  /**
+   * Domains that exist only so household sync can carry settings edited on their own picker
+   * screens. Not rendered and not on the phone remote; scope rules apply exactly as in [all].
+   */
+  val syncOnly: List<SettingsDomain<*>> = listOf(PhotoFrameSyncSettings.domain)
 }

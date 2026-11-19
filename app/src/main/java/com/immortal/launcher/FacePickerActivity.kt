@@ -61,6 +61,7 @@ internal fun FacePickerContent() {
             // These three legacy face fields are owned by this rich picker (no scalar spec).
             ScreensaverConfig.setFacesEnabled(context, enabled)
             settings = ScreensaverConfig.load(context)
+            SettingsSync.noteLocalChange() // household: the face syncs to the other Portals
         }
         if (settings.facesEnabled) {
             Divider()
@@ -71,6 +72,7 @@ internal fun FacePickerContent() {
                 if (id != settings.faceId) {
                     ScreensaverConfig.setFaceId(context, id)
                     settings = ScreensaverConfig.load(context)
+                    SettingsSync.noteLocalChange() // household: the face syncs to the other Portals
                 }
             }
             val entry = FaceCatalog.entryFor(settings.faceId)
@@ -83,6 +85,7 @@ internal fun FacePickerContent() {
                     if (size != settings.faceSizeIndex) {
                         ScreensaverConfig.setFaceSizeIndex(context, size)
                         settings = ScreensaverConfig.load(context)
+                        SettingsSync.noteLocalChange() // household: the face syncs to the other Portals
                     }
                 }
             }

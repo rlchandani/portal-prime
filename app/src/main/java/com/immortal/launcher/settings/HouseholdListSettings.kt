@@ -21,10 +21,12 @@ object HouseholdListSettings {
           specs = listOf(
               BoolSpec("showWho", "Show who added each item",
                   get = { it.showWho }, set = HouseholdListConfig::setShowWho,
-                  help = "Shows the device name and time under each item in the full list."),
+                  help = "Shows the device name and time under each item in the full list.",
+                  scope = SettingScope.HOUSEHOLD),
               BoolSpec("widgetShowsDone", "Show ticked items on the widget",
                   get = { it.widgetShowsDone }, set = HouseholdListConfig::setWidgetShowsDone,
-                  help = "When there’s room, the widget shows the last few ticked items."),
+                  help = "When there’s room, the widget shows the last few ticked items.",
+                  scope = SettingScope.HOUSEHOLD),
           ),
           defaults = { HouseholdListConfig.Settings() },
       )
