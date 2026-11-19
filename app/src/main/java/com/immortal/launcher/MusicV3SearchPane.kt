@@ -124,6 +124,7 @@ private fun SearchField(
   val enabled = !state.resting
   val submit = { if (MusicV3Rules.canSubmit(state.query, state.remaining, state.recent)) onSubmit(state.query) }
   val focus = remember { FocusRequester() }
+  val keyboard = LocalMusicKeyboardPolicy.current
   var focused by remember { mutableStateOf(false) }
   LaunchedEffect(autoFocus, enabled) { if (autoFocus && enabled) runCatching { focus.requestFocus() } }
   DisposableEffect(Unit) { onDispose { onFocus(false) } }
@@ -141,7 +142,11 @@ private fun SearchField(
           keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
           keyboardActions = KeyboardActions(onSearch = { submit() }),
           modifier = Modifier.fillMaxWidth().focusRequester(focus)
-              .onFocusChanged { if (it.isFocused != focused) { focused = it.isFocused; onFocus(it.isFocused) } }
+              .onFocusChanged {
+                // The keyboard overlays Music: set the window's mode before it shows (see MusicKeyboardPolicy).
+                if (it.isFocused) keyboard?.ensure()
+                if (it.isFocused != focused) { focused = it.isFocused; onFocus(it.isFocused) }
+              }
               .semantics { contentDescription = "Search" }.onPreviewKeyEvent {
             val enter = it.key == Key.Enter || it.key == Key.NumPadEnter
             if (enter && it.type == KeyEventType.KeyUp) submit()
