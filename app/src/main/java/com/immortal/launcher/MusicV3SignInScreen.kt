@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -185,6 +187,9 @@ private fun SignInStatus(view: MusicV3SignInView, onNewCode: () -> Unit) {
  */
 @Composable
 private fun CompactSignInCard(view: MusicV3SignInView, adding: Boolean, portrait: Boolean, onNewCode: () -> Unit) {
+  // Only the countdown changes every second: the QR card and the steps get the view without it, so
+  // they skip recomposition on each tick (the status row below still gets the live view).
+  val still = if (view is MusicV3SignInView.Code) view.copy(remaining = "") else view
   BoxWithConstraints(Modifier.fillMaxSize().clip(RoundedCornerShape(MusicV3Dims.PaneRadius))
       .background(ApprovedHomePalette.Card)) {
     if (portrait) {
@@ -192,16 +197,16 @@ private fun CompactSignInCard(view: MusicV3SignInView, adding: Boolean, portrait
       Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())
           .padding(horizontal = COMPACT_PORTRAIT_PAD, vertical = 36.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
-        QrCard(view, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
-        CompactSignInCopy(view, adding, onNewCode, Modifier.fillMaxWidth().padding(top = 36.dp))
+        QrCard(still, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
+        CompactSignInCopy(still, view, adding, onNewCode, Modifier.fillMaxWidth().padding(top = 36.dp))
       }
     } else {
       val qr = minOf(maxHeight - COMPACT_LANDSCAPE_VPAD * 2, COMPACT_QR_MAX_LANDSCAPE).coerceAtLeast(COMPACT_QR_MIN)
       Row(Modifier.fillMaxSize().padding(horizontal = 48.dp, vertical = COMPACT_LANDSCAPE_VPAD),
           verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(48.dp)) {
-        QrCard(view, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
+        QrCard(still, boxSize = qr, imageSize = qr * QR_IMAGE_RATIO)
         Box(Modifier.weight(1f).fillMaxSize(), contentAlignment = Alignment.CenterStart) {
-          CompactSignInCopy(view, adding, onNewCode, Modifier.fillMaxWidth().verticalScroll(rememberScrollState()))
+          CompactSignInCopy(still, view, adding, onNewCode, Modifier.fillMaxWidth().verticalScroll(rememberScrollState()))
         }
       }
     }
@@ -210,7 +215,8 @@ private fun CompactSignInCard(view: MusicV3SignInView, adding: Boolean, portrait
 
 /** The compact title, steps, status and privacy note (whole words; buttons wrap to a new line). */
 @Composable
-private fun CompactSignInCopy(view: MusicV3SignInView, adding: Boolean, onNewCode: () -> Unit, modifier: Modifier) {
+private fun CompactSignInCopy(view: MusicV3SignInView, live: MusicV3SignInView, adding: Boolean, onNewCode: () -> Unit,
+                              modifier: Modifier) {
   Column(modifier) {
     Text(if (adding) "Add another account" else "Sign in with your phone", color = ApprovedHomePalette.Text,
         fontSize = 44.sp, lineHeight = 54.sp, fontWeight = FontWeight.Medium)
@@ -218,7 +224,7 @@ private fun CompactSignInCopy(view: MusicV3SignInView, adding: Boolean, onNewCod
         else "Play your YouTube playlists and liked songs on this Portal.",
         color = ApprovedHomePalette.Secondary, fontSize = 24.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 12.dp))
     Steps(view, codeSize = 60.sp, codeLine = 72.sp, top = 32.dp)
-    CompactSignInStatus(view, onNewCode)
+    CompactSignInStatus(live, onNewCode)
     Row(Modifier.padding(top = 28.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       ApprovedIcon("lock", Modifier.size(26.dp), ApprovedHomePalette.Secondary)
@@ -241,8 +247,12 @@ private fun CompactSignInStatus(view: MusicV3SignInView, onNewCode: () -> Unit) 
           Box(Modifier.size(14.dp).clip(RoundedCornerShape(7.dp)).background(ApprovedHomePalette.Accent))
           Text("Waiting for your phone…", color = ApprovedHomePalette.Text, fontSize = 24.sp)
         }
-        Box(Modifier.heightIn(min = MusicV3Dims.Touch), contentAlignment = Alignment.CenterStart) {
-          Text("Code works for ${view.remaining}", color = ApprovedHomePalette.Secondary, fontSize = 24.sp)
+        // The countdown ticks every second: a fixed-size box on its own layer, so a tick redraws and
+        // re-measures only this text, never the card around it.
+        Box(Modifier.heightIn(min = MusicV3Dims.Touch).width(COUNTDOWN_WIDTH).graphicsLayer { },
+            contentAlignment = Alignment.CenterStart) {
+          Text("Code works for ${view.remaining}", color = ApprovedHomePalette.Secondary, fontSize = 24.sp,
+              maxLines = 1, softWrap = false)
         }
         MusicV3Button("Get a new code", style = MusicV3ButtonStyle.GHOST, onClick = onNewCode)
       }
@@ -256,6 +266,10 @@ private fun CompactSignInStatus(view: MusicV3SignInView, onNewCode: () -> Unit) 
   }
 }
 
+/** The QR is encoded once at this size (the Portal+ card's image). */
+private val QR_SOURCE = 560.dp
+/** "Code works for 29:59" at 24 sp, with room to spare. */
+private val COUNTDOWN_WIDTH = 270.dp
 private val COMPACT_PORTRAIT_PAD = 40.dp
 private val COMPACT_LANDSCAPE_VPAD = 32.dp
 private val COMPACT_QR_MAX_PORTRAIT = 440.dp
@@ -283,18 +297,23 @@ private fun qrOverlay(view: MusicV3SignInView): Triple<String, String, String>? 
 
 /** The QR always sits on a white card (the day palette's surface) so phones can read it. */
 @Composable
-private fun QrCard(view: MusicV3SignInView, boxSize: Dp = 640.dp, imageSize: Dp = 560.dp) {
+private fun QrCard(view: MusicV3SignInView, boxSize: Dp = 640.dp, imageSize: Dp = QR_SOURCE) {
   val url = (view as? MusicV3SignInView.Code)?.qrText
-  val px = with(LocalDensity.current) { imageSize.roundToPx() }
-  val qr by produceState<Bitmap?>(null, url, px) { value = url?.let { withContext(Dispatchers.Default) { lanSetupQr(it, px) } } }
+  // Encoded once per code at the Portal+ size: a compact card scales it (nearest-neighbour, crisp),
+  // so a size change while the screen animates or rotates never re-encodes or blanks the code.
+  val px = with(LocalDensity.current) { QR_SOURCE.roundToPx() }
+  val qr by produceState<Bitmap?>(null, url) { value = url?.let { withContext(Dispatchers.Default) { lanSetupQr(it, px) } } }
   val shape = RoundedCornerShape(36.dp)
   Box(Modifier.size(boxSize).clip(shape).background(ApprovedLightPalette.surface).approvedOutline(shape),
       contentAlignment = Alignment.Center) {
     val bitmap = qr
     val overlay = qrOverlay(view)
     if (bitmap != null && url != null) {
-      Image(bitmap.asImageBitmap(), contentDescription = "QR code for $url", modifier = Modifier.size(imageSize)
+      val image = remember(bitmap) { bitmap.asImageBitmap() }
+      if (imageSize == QR_SOURCE) Image(image, contentDescription = "QR code for $url", modifier = Modifier.size(imageSize)
           .alpha(if (overlay == null) 1f else 0.08f))
+      else Image(image, contentDescription = "QR code for $url", modifier = Modifier.size(imageSize)
+          .alpha(if (overlay == null) 1f else 0.08f), filterQuality = androidx.compose.ui.graphics.FilterQuality.None)
     } else if (overlay == null) {
       CircularProgressIndicator(color = ApprovedLightPalette.accent, modifier = Modifier.size(64.dp))
     }

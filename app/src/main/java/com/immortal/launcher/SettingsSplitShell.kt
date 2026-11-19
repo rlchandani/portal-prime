@@ -56,6 +56,7 @@ private val PageMaxWidth = SettingsSplitMetrics.PAGE_MAX_WIDTH_DP.dp
 private val NavBarHeight = 104.dp
 private const val BACK_FRACTION = .4f
 private const val TITLE_FRACTION = .5f
+private const val SINGLE_PANE_BACK_FRACTION = .3f
 
 /**
  * True when Settings runs single-pane (master list → detail page) because the window is too narrow
@@ -210,6 +211,21 @@ internal fun SettingsSplitShell(
 /** Back button with the parent's name (≤ 40%), and the page title centred (≤ 50%), like iPadOS. */
 @Composable
 private fun SettingsNavBar(heading: SettingsDetailHeading) {
+    if (LocalSettingsSinglePane.current) {
+        // Single pane (800 dp): the back button and the centred title get disjoint widths, so a
+        // long parent name can never run under the title.
+        BoxWithConstraints(Modifier.fillMaxWidth().height(NavBarHeight).padding(horizontal = 20.dp),
+            contentAlignment = Alignment.CenterStart) {
+            val side = maxWidth * SINGLE_PANE_BACK_FRACTION
+            if (heading.onBack != null) {
+                ApprovedSettingsBackButton(heading.backTitle ?: "Back", Modifier.widthIn(max = side), heading.onBack)
+            }
+            Text(heading.title, color = IosLabel, fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.SemiBold,
+                maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.Center).widthIn(max = maxWidth - side * 2 - 16.dp))
+        }
+        return
+    }
     BoxWithConstraints(Modifier.fillMaxWidth().height(NavBarHeight).padding(horizontal = 28.dp),
         contentAlignment = Alignment.CenterStart) {
         if (heading.onBack != null) {
