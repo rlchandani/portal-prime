@@ -57,8 +57,11 @@ import kotlinx.coroutines.delay
 class CallsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-<<<<<<< HEAD
-    val start = if (intent.getStringExtra(EXTRA_TAB) == TAB_RECENT) CallsTab.RECENT else CallsTab.ROOMS
+    val start = when (intent.getStringExtra(EXTRA_TAB)) {
+      TAB_RECENT -> CallsTab.RECENT
+      TAB_MESSAGES -> CallsTab.MESSAGES
+      else -> CallsTab.ROOMS
+    }
     setContent {
       PortalPrimeTheme(darkTheme = false) {
         // Grandma mode replaces the whole app with big faces (set up on this Portal only).
@@ -66,14 +69,6 @@ class CallsActivity : ComponentActivity() {
         if (rules.grandmaMode) CallsGrandmaHome() else CallsApp(start, onBack = ::finish)
       }
     }
-=======
-    val start = when (intent.getStringExtra(EXTRA_TAB)) {
-      TAB_RECENT -> CallsTab.RECENT
-      TAB_MESSAGES -> CallsTab.MESSAGES
-      else -> CallsTab.ROOMS
-    }
-    setContent { PortalPrimeTheme(darkTheme = false) { CallsApp(start, onBack = ::finish) } }
->>>>>>> calling-2a-vmsg
     // Floating Jarvis: the rooms and recent calls are what `screen_context` describes here.
     HearthpaneScreens.track(this, HearthpaneScreens.Entry({ HearthpaneScreens.CALLS }) {
       ScreenContext.calls(CallingStore.peers.value, CallingStore.history.value, Calling.state.value.busy,

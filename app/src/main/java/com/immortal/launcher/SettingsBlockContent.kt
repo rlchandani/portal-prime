@@ -70,12 +70,9 @@ internal fun SettingsBlockContent(block: SettingsBlock) {
             SettingsBlock.CALL_DROP_INS -> CallDropInGridBlock()
             SettingsBlock.CALL_CAMERA -> CallCameraBlock()
             SettingsBlock.CALL_PRIVACY -> CallPrivacyBlock()
-<<<<<<< HEAD
             SettingsBlock.CALL_PHONES -> CallPhonesBlock()
             SettingsBlock.CALL_GRANDMA -> CallGrandmaBlock()
-=======
             SettingsBlock.CALL_MESSAGES -> CallMessagesSettingsBlock()
->>>>>>> calling-2a-vmsg
             SettingsBlock.MUSIC -> MusicSettingsContent()
             SettingsBlock.MULTIROOM -> MultiRoomContent()
             SettingsBlock.DEVICE_NAME -> DeviceNameSection()
