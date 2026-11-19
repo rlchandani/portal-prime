@@ -123,6 +123,9 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
   }
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    // Build the flip card art now, not inside the first card turn (which janked on the Mini).
+    if (face == Face.FLIP && w > 0 && h > 0)
+      cardArt(DigitalClockFaceSpec.flip(h * DigitalClockFaceSpec.flipHeightFraction(settings.size), w * .9f))
     val b = DigitalClockFaceSpec.backdrop(face, settings.background)
     backdrop.shader = if (b.radial) RadialGradient(w * .5f, h * .42f, maxOf(w, h) * .62f, b.inner, b.outer, Shader.TileMode.CLAMP)
     else LinearGradient(0f, 0f, w * .35f, h.toFloat(), b.inner, b.outer, Shader.TileMode.CLAMP)
