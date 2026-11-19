@@ -290,7 +290,8 @@ internal object SettingsSync {
         .onFailure { Log.w(TAG, "applying synced settings failed", it) }.getOrDefault(emptySet())
     val refused = values.keys - applied
     if (refused.isNotEmpty()) Log.i(TAG, "kept this Portal's value for ${refused.joinToString()} (not valid here)")
-    val readBack = catalog.read(c).filterKeys { it in values }
+    val siblings = catalog.siblingKeys(values.keys)
+    val readBack = catalog.read(c).filterKeys { it in siblings }
     ledger = SettingsSyncEngine.noteWritten(ledger, readBack)
   }
 

@@ -73,6 +73,16 @@ internal class SettingsSyncCatalog(domains: List<SettingsDomain<*>>) {
     }
   }
 
+  /**
+   * Every household key in the same domains as [keys]. A setter may write sibling keys too (a
+   * clock face sets its style, font, colour and glow), so after applying peer values all of these
+   * are the peer's doing, not local edits to send back.
+   */
+  fun siblingKeys(keys: Collection<String>): Set<String> {
+    val domains = keys.mapNotNull { entries[it]?.domain }.toSet()
+    return entries.values.filter { it.domain in domains }.map { it.key }.toSet()
+  }
+
   /** This Portal's current household values (`domain.key` → value). Reads only. */
   fun read(c: Context): Map<String, Any> = flat { it.flatJson(c) }
 

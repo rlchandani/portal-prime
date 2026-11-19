@@ -97,6 +97,15 @@ class SettingsSyncCatalogTest {
   }
 
   @Test
+  fun siblingsCoverTheWholeDomainSoSideEffectWritesAreNotEchoed() {
+    assertEquals(catalog.keys, catalog.siblingKeys(listOf("test.face")))
+    assertTrue(catalog.siblingKeys(listOf("other.x")).isEmpty())
+    val face = SettingsSyncCatalog.household.siblingKeys(listOf("digitalclock.face"))
+    assertTrue(face.containsAll(listOf("digitalclock.style", "digitalclock.font", "digitalclock.color", "digitalclock.glow")))
+    assertTrue(face.none { !it.startsWith("digitalclock.") })
+  }
+
+  @Test
   fun applyWritesValidValuesThroughTheRegistryOncePerDomain() {
     val applied = catalog.apply(context, mapOf("test.on" to true, "test.face" to "neon", "test.level" to 99,
         "test.token" to "stolen", "test.room" to "Hall"))
