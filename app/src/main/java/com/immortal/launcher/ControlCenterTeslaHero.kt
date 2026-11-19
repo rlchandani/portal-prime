@@ -145,7 +145,7 @@ private fun RowScope.LimitTile(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcC
     pending = null
   }
   val shown = pending ?: car.limitPct
-  Row(Modifier.weight(1.3f).clip(TILE).background(c.surface2).padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
+  Row(Modifier.weight(LIMIT_WEIGHT).clip(TILE).background(c.surface2).padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
       verticalAlignment = Alignment.CenterVertically) {
     Column(Modifier.weight(1f)) {
       Text(shown?.let { "$it%" } ?: "—", color = c.text, fontSize = 30.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
@@ -160,3 +160,5 @@ private fun RowScope.LimitTile(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcC
 }
 
 private val TILE = RoundedCornerShape(22.dp)
+/** The limit tile carries two 64 dp buttons, so it is wider than the read-only tiles. */
+private const val LIMIT_WEIGHT = 1.6f
