@@ -80,7 +80,9 @@ class CallActivity : ComponentActivity() {
   override fun onStop() {
     runCatching { unregisterReceiver(screen) }
     CallMediaHub.foreground(false)
-    if (!isChangingConfigurations) endIfActive("left the call screen")
+    // A finishing screen (the last call's ended card closing) can stop after the next call's screen
+    // has started: it must not end that new call. Leaving a live call (Home, another app) still does.
+    if (!isChangingConfigurations && !isFinishing) endIfActive("left the call screen")
     if (Calling.state.value.call == null) finish()
     super.onStop()
   }

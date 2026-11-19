@@ -64,7 +64,11 @@ class FleetRoutes(private val context: Context) {
       "/calendar" -> calendar(req)
       "/screensaver" -> screensaver(req)
       "/action" -> requireMethod("POST", req) { action(req) }
-      "/fs/list" -> requireMethod("GET", req) { resp(200, FleetFs.list(req.queryParam("path") ?: "/sdcard")) }
+      "/fs/list" -> requireMethod("GET", req) {
+        val path = req.queryParam("path") ?: "/sdcard"
+        // Protected stores can't be listed either (message ids and sizes are metadata too).
+        if (FleetSecretPaths.isBlocked(java.io.File(path))) resp(403, err("protected_path")) else resp(200, FleetFs.list(path))
+      }
       "/fs/read" -> requireMethod("GET", req) { fsRead(req) }
       "/fs/write" -> requireMethod("POST", req) { fsWrite(req) }
       "/logcat" -> requireMethod("GET", req) { logcat(req) }
@@ -93,7 +97,9 @@ class FleetRoutes(private val context: Context) {
       "/perf/webapp" -> WebAppProbe.handle(context, req)
       "/perf/source-preview" -> SourcePreviewProbe.handle(context, req)
       "/perf/photo-upload" -> PhotoUploadProbe.handle(context, req)
+      "/perf/calling" -> CallPerfProbe.handle(context, req)
       "/perf/photo-thumbnail" -> PhotoThumbnailProbe.handle(context, req)
+      "/perf/callmsg" -> CallMessageProbe.handle(context, req)
       "/perf/source-cache" -> SourceCacheProbe.handle(context, req)
       "/perf/source-photo-preview" -> SourcePhotoPreviewProbe.handle(context, req)
       "/perf/bridge-write" -> BridgeWriteProbe.handle(context, req)

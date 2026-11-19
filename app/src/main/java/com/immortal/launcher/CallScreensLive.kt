@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,14 +47,38 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun CallLiveScreen(call: ActiveCall, media: CallMedia?, motion: Boolean, toast: CallToastState) {
   var volumeOpen by remember { mutableStateOf(false) }
+  var addOpen by remember(call.id) { mutableStateOf(false) }
   var busyDismissed by remember(call.id) { mutableStateOf(false) }
   val dropIn = call.kind == CallKind.DROP_IN
   CallToggleToasts(call, toast)
+  LaunchedEffect(call.notice) { call.notice?.let { toast.show(CallAddPeople.notice(it), "users") } }
   val layout = currentLayoutClass()
+  val add = CallAddControl.of(call, LocalContext.current) { addOpen = true }
+  val probe by CallMediaHub.probeOn.collectAsState()
+  if (call.group || probe) {
+    CallGroupLive(call, media, motion, layout, volumeOpen, onVolume = { volumeOpen = !volumeOpen }, add = add, toast = toast, probe = probe)
+    if (addOpen) Box(Modifier.fillMaxSize()) { CallAddPersonSheet(call, layout) { addOpen = false } }
+    return
+  }
+  if (addOpen) {
+    Box(Modifier.fillMaxSize()) {
+      CallLiveSolo(call, media, motion, toast, layout, volumeOpen, { volumeOpen = !volumeOpen }, busyDismissed, { busyDismissed = true }, add)
+      CallAddPersonSheet(call, layout) { addOpen = false }
+    }
+    return
+  }
+  CallLiveSolo(call, media, motion, toast, layout, volumeOpen, { volumeOpen = !volumeOpen }, busyDismissed, { busyDismissed = true }, add)
+}
+
+/** The 1:1 call (phase 1 layout), now with Add person. */
+@Composable
+private fun CallLiveSolo(call: ActiveCall, media: CallMedia?, motion: Boolean, toast: CallToastState, layout: LayoutClass,
+                         volumeOpen: Boolean, onVolume: () -> Unit, busyDismissed: Boolean, onBusyDone: () -> Unit, add: CallAddControl) {
+  val dropIn = call.kind == CallKind.DROP_IN
   if (layout.compact) {
     // The Mini, either way up (rotation stays in this branch, so the remote surface is kept).
-    CallLiveCompact(call, media, motion, layout, volumeOpen, onVolume = { volumeOpen = !volumeOpen },
-        busy = call.cameraIssue == CameraIssue.BUSY && !busyDismissed, onBusyDone = { busyDismissed = true }, toast = toast)
+    CallLiveCompact(call, media, motion, layout, volumeOpen, onVolume = onVolume,
+        busy = call.cameraIssue == CameraIssue.BUSY && !busyDismissed, onBusyDone = onBusyDone, toast = toast, add = add)
     return
   }
   Box(Modifier.fillMaxSize()) {
@@ -67,11 +93,11 @@ internal fun CallLiveScreen(call: ActiveCall, media: CallMedia?, motion: Boolean
         Modifier.align(Alignment.TopEnd).padding(top = if (dropIn) 150.dp else 40.dp, end = 40.dp))
     ConnectionChip(call, Modifier.align(Alignment.Center))
     if (volumeOpen) CallVolumePopover(Modifier.align(Alignment.BottomCenter).padding(bottom = 210.dp))
-    CallControls(call, volumeOpen, onVolume = { volumeOpen = !volumeOpen },
-        onFraming = { toast.show("Portal frames you automatically", "follow") },
+    CallControls(call, volumeOpen, onVolume = onVolume,
+        onFraming = { toast.show("Portal frames you automatically", "follow") }, add = add,
         modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 36.dp))
-    if (call.cameraIssue == CameraIssue.BUSY && !busyDismissed) CameraBusySheet(onAudio = { busyDismissed = true },
-        onRetry = { busyDismissed = true; Calling.toggleCamera() }, modifier = Modifier.align(Alignment.Center))
+    if (call.cameraIssue == CameraIssue.BUSY && !busyDismissed) CameraBusySheet(onAudio = onBusyDone,
+        onRetry = { onBusyDone(); Calling.toggleCamera() }, modifier = Modifier.align(Alignment.Center))
   }
 }
 
@@ -84,7 +110,7 @@ internal fun CallLiveScreen(call: ActiveCall, media: CallMedia?, motion: Boolean
  */
 @Composable
 private fun CallLiveCompact(call: ActiveCall, media: CallMedia?, motion: Boolean, layout: LayoutClass, volumeOpen: Boolean,
-                            onVolume: () -> Unit, busy: Boolean, onBusyDone: () -> Unit, toast: CallToastState) {
+                            onVolume: () -> Unit, busy: Boolean, onBusyDone: () -> Unit, toast: CallToastState, add: CallAddControl) {
   val dropIn = call.kind == CallKind.DROP_IN
   val portrait = layout.compactPortrait
   val edge = CallsCompactLayout.edge(layout).dp
@@ -114,7 +140,7 @@ private fun CallLiveCompact(call: ActiveCall, media: CallMedia?, motion: Boolean
     if (volumeOpen) CallVolumePopover(Modifier.align(Alignment.BottomCenter)
         .padding(start = edge, end = edge, bottom = (ctl.bottom + ctl.height).dp + POPOVER_GAP))
     CompactCallControls(call, ctl, volumeOpen, onVolume, onFraming = { toast.show("Portal frames you automatically", "follow") },
-        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = ctl.bottom.dp))
+        add = add, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = ctl.bottom.dp))
     if (busy) CameraBusySheet(onAudio = onBusyDone, onRetry = { onBusyDone(); Calling.toggleCamera() },
         modifier = Modifier.align(Alignment.Center).padding(horizontal = edge), layout = layout)
   }
@@ -122,8 +148,8 @@ private fun CallLiveCompact(call: ActiveCall, media: CallMedia?, motion: Boolean
 
 /** Compact `.ctl`: the same five controls at [CallsCompactLayout.controls] size. */
 @Composable
-private fun CompactCallControls(call: ActiveCall, ctl: CallsCompactLayout.Controls, volumeOpen: Boolean, onVolume: () -> Unit,
-                                onFraming: () -> Unit, modifier: Modifier) {
+internal fun CompactCallControls(call: ActiveCall, ctl: CallsCompactLayout.Controls, volumeOpen: Boolean, onVolume: () -> Unit,
+                                onFraming: () -> Unit, add: CallAddControl, modifier: Modifier) {
   Row(modifier.background(CallColors.Controls, RoundedCornerShape(52.dp)).padding(start = ctl.padding.dp, end = ctl.padding.dp, top = 20.dp, bottom = 16.dp),
       verticalAlignment = Alignment.Top) {
     CompactControl(ctl, if (call.micOn) "mic" else "micOff", if (call.micOn) "Mute" else "Unmute", ControlLook.of(off = !call.micOn)) { Calling.toggleMic() }
@@ -131,6 +157,7 @@ private fun CompactCallControls(call: ActiveCall, ctl: CallsCompactLayout.Contro
         ControlLook.of(off = !call.cameraOn)) { Calling.toggleCamera() }
     CompactControl(ctl, "follow", "Auto frame", if (call.cameraOn) ControlLook.ON else ControlLook.DISABLED, onFraming)
     CompactControl(ctl, "vol", "Volume", if (volumeOpen) ControlLook.ON else ControlLook.PLAIN, onVolume)
+    CompactControl(ctl, "addp", add.label, add.look, add.onClick)
     Column(Modifier.width(ctl.endColumn.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Box(Modifier.width(ctl.endWidth.dp).height(ctl.endHeight.dp).background(CallColors.Bad, RoundedCornerShape(50))
           .callClick("End call", true, Calling::hangUp), contentAlignment = Alignment.Center) { CallIcon("end", Color.White, ctl.endIcon.dp) }
@@ -217,11 +244,12 @@ private fun RemoteStage(call: ActiveCall, media: CallMedia?, motion: Boolean, av
                         scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL) {
   // The remote SurfaceView stays composed for the whole call (no surface churn); the camera-off
   // card simply covers it.
-  var hasFrames by remember(media) { mutableStateOf(false) }
-  LaunchedEffect(media) {
-    while (media != null && !hasFrames) { hasFrames = media.remote.frames > 0; delay(FRAME_POLL_MS) }
+  val sink = media?.sink(call.peer.deviceId)
+  var hasFrames by remember(sink) { mutableStateOf(false) }
+  LaunchedEffect(sink) {
+    while (sink != null && !hasFrames) { hasFrames = sink.frames > 0; delay(FRAME_POLL_MS) }
   }
-  if (media != null) CallRemoteVideo(media, Modifier.fillMaxSize(), scaling)
+  if (media != null && sink != null) CallRemoteVideo(media, Modifier.fillMaxSize(), scaling, sink)
   if (!hasFrames || !call.remoteCameraOn) {
     Box(Modifier.fillMaxSize()) {
       CallRingBackground(call.peer.name, motion && call.phase != CallPhase.LIVE)
@@ -313,7 +341,8 @@ private fun CallToggleToasts(call: ActiveCall, toast: CallToastState) {
 
 /** `.ctl`: Mute, Camera, Auto frame, Volume, End. */
 @Composable
-private fun CallControls(call: ActiveCall, volumeOpen: Boolean, onVolume: () -> Unit, onFraming: () -> Unit, modifier: Modifier) {
+internal fun CallControls(call: ActiveCall, volumeOpen: Boolean, onVolume: () -> Unit, onFraming: () -> Unit, add: CallAddControl,
+                          modifier: Modifier) {
   Row(modifier.background(CallColors.Controls, RoundedCornerShape(56.dp)).padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 16.dp),
       verticalAlignment = Alignment.Top) {
     CallControl(if (call.micOn) "mic" else "micOff", if (call.micOn) "Mute" else "Unmute", ControlLook.of(off = !call.micOn)) { Calling.toggleMic() }
@@ -321,6 +350,7 @@ private fun CallControls(call: ActiveCall, volumeOpen: Boolean, onVolume: () -> 
         ControlLook.of(off = !call.cameraOn)) { Calling.toggleCamera() }
     CallControl("follow", "Auto frame", if (call.cameraOn) ControlLook.ON else ControlLook.DISABLED, onFraming)
     CallControl("vol", "Volume", if (volumeOpen) ControlLook.ON else ControlLook.PLAIN, onVolume)
+    CallControl("addp", add.label, add.look, add.onClick)
     Column(Modifier.width(170.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Box(Modifier.width(150.dp).height(96.dp).background(CallColors.Bad, RoundedCornerShape(50.dp)).callClick("End call", true, Calling::hangUp),
           contentAlignment = Alignment.Center) { CallIcon("end", Color.White, 46.dp) }
@@ -329,7 +359,7 @@ private fun CallControls(call: ActiveCall, volumeOpen: Boolean, onVolume: () -> 
   }
 }
 
-private enum class ControlLook { PLAIN, OFF, ON, DISABLED;
+internal enum class ControlLook { PLAIN, OFF, ON, DISABLED;
   companion object { fun of(off: Boolean) = if (off) OFF else PLAIN }
 }
 

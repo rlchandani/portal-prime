@@ -28,26 +28,32 @@ internal object CallSignalClient {
   private val main = Handler(Looper.getMainLooper())
   private val random = SecureRandom()
 
-  /** [done] runs on the main thread with the verified answer SDP, or null. */
-  fun sendOffer(context: Context, call: ActiveCall, sdp: String, done: (String?) -> Unit) {
-    val host = call.peerHost
-    if (host == null || call.peerPort !in 1..65535) { main.post { done(null) }; return }
+  sealed interface Result {
+    data class Answer(val sdp: String) : Result
+    /** 409: that member doesn't know about us yet (its `call_join` is still on the way). */
+    data object NotYet : Result
+    data object Failed : Result
+  }
+
+  /** [done] runs on the main thread with the verified answer, [Result.NotYet] or [Result.Failed]. */
+  fun sendOffer(context: Context, callId: String, to: String, host: String?, port: Int, sdp: String, done: (Result) -> Unit) {
+    if (host == null || port !in 1..65535) { main.post { done(Result.Failed) }; return }
     net.execute {
-      val answer = runCatching { exchange(context, call, host, sdp) }
+      val answer = runCatching { exchange(context, callId, to, host, port, sdp) }
           .onFailure { Log.i(TAG, "offer exchange failed: ${it.javaClass.simpleName}") }
-          .getOrNull()
+          .getOrDefault(Result.Failed)
       main.post { done(answer) }
     }
   }
 
-  private fun exchange(context: Context, call: ActiveCall, host: String, sdp: String): String? {
-    val key = HouseholdKey.get(context) ?: return null
+  private fun exchange(context: Context, callId: String, to: String, host: String, port: Int, sdp: String): Result {
+    val key = HouseholdKey.get(context) ?: return Result.Failed
     val self = RemoteCompanionStore.id(context)
-    val fp = CallSignalAuth.fingerprintOf(sdp) ?: return null
-    val body = CallSignalAuth.offerBody(CallSignalAuth.Offer(call.id, call.peer.deviceId, sdp, fp))
+    val fp = CallSignalAuth.fingerprintOf(sdp) ?: return Result.Failed
+    val body = CallSignalAuth.offerBody(CallSignalAuth.Offer(callId, to, sdp, fp))
     val nonce = ByteArray(12).also(random::nextBytes).let(HouseholdKey::toHex)
-    val header = CallSignalAuth.requestHeader(key, self, nonce, System.currentTimeMillis(), body) ?: return null
-    val conn = URL("http", host, call.peerPort, CallSignalAuth.PATH).openConnection() as HttpURLConnection
+    val header = CallSignalAuth.requestHeader(key, self, nonce, System.currentTimeMillis(), body) ?: return Result.Failed
+    val conn = URL("http", host, port, CallSignalAuth.PATH).openConnection() as HttpURLConnection
     try {
       conn.connectTimeout = CONNECT_MS
       conn.readTimeout = READ_MS
@@ -59,21 +65,23 @@ internal object CallSignalClient {
       val bytes = body.toByteArray(Charsets.UTF_8)
       conn.setFixedLengthStreamingMode(bytes.size)
       conn.outputStream.use { it.write(bytes) }
-      if (conn.responseCode != HTTP_OK) { Log.i(TAG, "offer refused: ${conn.responseCode}"); return null }
+      if (conn.responseCode == HTTP_CONFLICT) return Result.NotYet
+      if (conn.responseCode != HTTP_OK) { Log.i(TAG, "offer refused: ${conn.responseCode}"); return Result.Failed }
       val text = conn.inputStream.use { input ->
         val buf = input.readBytes()
-        if (buf.size > MAX_RESPONSE) return null
+        if (buf.size > MAX_RESPONSE) return Result.Failed
         String(buf, Charsets.UTF_8)
       }
       val envelope = JSONObject(text)
       val payload = envelope.optString("payload")
-      if (!CallSignalAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) { Log.w(TAG, "answer signature bad"); return null }
-      return CallSignalAuth.parseAnswer(payload, call.id)?.sdp
+      if (!CallSignalAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) { Log.w(TAG, "answer signature bad"); return Result.Failed }
+      return CallSignalAuth.parseAnswer(payload, callId)?.sdp?.let(Result::Answer) ?: Result.Failed
     } finally {
       conn.disconnect()
     }
   }
 
+  private const val HTTP_CONFLICT = 409
   private const val HTTP_OK = 200
 }
 
@@ -95,12 +103,14 @@ internal object CallPeerRoute {
     }
     val self = Calling.selfId(context)
     val caller = CallSignalAuth.verifyRequest(req.header(CallSignalAuth.HEADER), text, key, System.currentTimeMillis(), replay, self)
+        // A phone offers only through its session route; a Portal can't pose as one here.
+        ?.takeUnless { CallPhoneId.isPhone(it.from) }
         ?: return RemoteFeatureRoutes.json(401, RemoteFeatureRoutes.error("unauthorized"))
     val offer = CallSignalAuth.parseOffer(text) ?: return RemoteFeatureRoutes.json(400, RemoteFeatureRoutes.error("bad_offer"))
     if (offer.to != self) return RemoteFeatureRoutes.json(403, RemoteFeatureRoutes.error("not_for_this_portal"))
     val call = Calling.acceptRemoteOffer(offer.callId, caller.from)
         ?: return RemoteFeatureRoutes.json(409, RemoteFeatureRoutes.error("no_such_call"))
-    val answer = CallMediaHub.answerBlocking(context, call, offer.sdp)
+    val answer = CallMediaHub.answerBlocking(context, call, caller.from, offer.sdp)
     val fp = answer?.let(CallSignalAuth::fingerprintOf)
     if (answer == null || fp == null) {
       Calling.dispatch(CallEvent.MediaFailed(call.id, CallEndReason.FAILED, Calling.now()))
