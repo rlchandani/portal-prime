@@ -375,6 +375,22 @@ class FleetRoutes(private val context: Context) {
         identify()
         resp(200, ok().put("action", "identify"))
       }
+      // Household settings sync: status, the one-time join choice, and pause/resume for testing
+      // catch-up (a paused Portal neither sends nor accepts sync traffic).
+      "settings_sync" -> {
+        when (body.optString("op", "status")) {
+          "status", "values" -> Unit
+          "pause" -> SettingsSync.setPaused(true)
+          "resume" -> SettingsSync.setPaused(false)
+          "adopt" -> SettingsSync.resolveJoin(keepMine = false)
+          "keep" -> SettingsSync.resolveJoin(keepMine = true)
+          "rejoin" -> SettingsSync.rejoin()
+          else -> return resp(400, err("bad_op"))
+        }
+        val out = ok().put("action", "settings_sync").put("sync", SettingsSync.statusJson())
+        if (body.optString("op") == "values") out.put("values", SettingsSync.valuesJson())
+        resp(200, out)
+      }
       // Opens the Home Control Center (optionally on a screen: map, cameras, tesla, alerts,
       // security, edit, settings) — for remote checks and on-device measurement.
       "open_control_center" -> {

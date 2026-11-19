@@ -25,6 +25,12 @@ sealed interface SettingSpec<S> {
   /** Canonical wire + UI key. */
   val key: String
 
+  /**
+   * Household (synced across Portals) or this-Portal-only. Must be declared on every registered
+   * spec (`SettingScopeTest`); null is treated as device-only so an undeclared setting never syncs.
+   */
+  val scope: SettingScope?
+
   /** Whether this control should be shown, given the snapshot and the environment. */
   fun visibleWhen(c: Context, s: S): Boolean
 
@@ -108,6 +114,7 @@ class BoolSpec<S>(
     /** Extra accepted write-keys (e.g. the calendar's `enabled` aliasing the `widgetOn` toggle). */
     val aliases: List<String> = emptyList(),
     val visible: (Context, S) -> Boolean = { _, _ -> true },
+    override val scope: SettingScope? = null,
 ) : SettingSpec<S> {
   override fun visibleWhen(c: Context, s: S) = visible(c, s)
 
@@ -144,6 +151,7 @@ class IntSpec<S>(
     val visible: (Context, S) -> Boolean = { _, _ -> true },
     /** Declarative editor hint; does not change persistence or integer validation. */
     val timeOfDay: Boolean = false,
+    override val scope: SettingScope? = null,
 ) : SettingSpec<S> {
   override fun visibleWhen(c: Context, s: S) = visible(c, s)
 
@@ -196,6 +204,7 @@ class EnumSpec<S>(
     val help: String? = null,
     val aliases: List<String> = emptyList(),
     val visible: (Context, S) -> Boolean = { _, _ -> true },
+    override val scope: SettingScope? = null,
 ) : SettingSpec<S> {
   override fun visibleWhen(c: Context, s: S) = visible(c, s)
 
@@ -236,7 +245,13 @@ class StringSpec<S>(
     val help: String? = null,
     val aliases: List<String> = emptyList(),
     val visible: (Context, S) -> Boolean = { _, _ -> true },
+    override val scope: SettingScope? = null,
 ) : SettingSpec<S> {
+  init {
+    // A credential can never be a household setting: it would be broadcast to every Portal.
+    require(!(secret && scope == SettingScope.HOUSEHOLD)) { "secret setting '$key' must not be household-scoped" }
+  }
+
   override fun visibleWhen(c: Context, s: S) = visible(c, s)
 
   override fun putValue(out: JSONObject, s: S) {
@@ -280,6 +295,7 @@ class DerivedSpec<S>(
     val title: String? = null,
     /** Whether to surface it in the schema at all (some derived fields are flat-payload-only). */
     val render: Boolean = false,
+    override val scope: SettingScope? = null,
 ) : SettingSpec<S> {
   override fun visibleWhen(c: Context, s: S) = render
 
@@ -318,6 +334,7 @@ class NavSpec<S>(
     val visible: (Context, S) -> Boolean = { _, _ -> true },
     /** UI-only execution policy for labels that query an Android service. */
     val valueOnWorker: Boolean = false,
+    override val scope: SettingScope? = null,
 ) : SettingSpec<S> {
   override fun visibleWhen(c: Context, s: S) = visible(c, s)
 

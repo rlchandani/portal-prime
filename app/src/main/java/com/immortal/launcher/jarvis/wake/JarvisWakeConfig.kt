@@ -9,8 +9,8 @@ package com.immortal.launcher.jarvis.wake
 import android.content.Context
 
 /**
- * This Portal's "Hey Jarvis on Hearthpane screens" choice; per room, never shared. On by default (quiet hours
- * still silence it). Edited only through [com.immortal.launcher.settings.JarvisSettings.domain]: on-device
+ * The household's "Hey Jarvis on Hearthpane screens" choice (household scope: synced to every Portal in the home).
+ * On by default (quiet hours still silence it). Edited only through [com.immortal.launcher.settings.JarvisSettings.domain]: on-device
  * Settings › Jarvis and the phone remote.
  */
 internal object JarvisWakeConfig {

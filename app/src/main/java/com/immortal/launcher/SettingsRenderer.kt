@@ -68,6 +68,7 @@ import com.immortal.launcher.settings.SettingsDomain
 import com.immortal.launcher.settings.SettingsChoicePolicy
 import com.immortal.launcher.settings.SettingsPresentation
 import com.immortal.launcher.settings.StringSpec
+import com.immortal.launcher.settings.effectiveScope
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 
@@ -291,7 +292,10 @@ internal fun <S> SettingControl(
         is NavSpec<*> -> spec.help
         is DerivedSpec<*> -> null
     }
-    val help = if (advanced) fullHelp else SettingsPresentation.conciseHelp(domainId, spec.key, fullHelp)
+    val shownHelp = if (advanced) fullHelp else SettingsPresentation.conciseHelp(domainId, spec.key, fullHelp)
+    val help = if (LocalSettingsSyncLabels.current && spec !is DerivedSpec<*> && !spec.effectiveScope.synced) {
+        thisPortalOnlyHelp(shownHelp)
+    } else shownHelp
     val title = settingsSpecText(spec)?.first?.let { SettingsChoicePolicy.displayTitle(domainId, spec.key, it) }.orEmpty()
     CompositionLocalProvider(LocalApprovedSettingsHelp provides help) {
         @Suppress("UNCHECKED_CAST")

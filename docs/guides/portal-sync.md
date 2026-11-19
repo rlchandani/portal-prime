@@ -78,9 +78,75 @@ Toolkit/fleet settings route.
 | Guest card (Wi-Fi, house notes, contact) and the location grant it needs for Wi-Fi scans | Only the room that shows the guest card needs it. |
 | Meta `sleep_timeout` | Each device keeps its Meta default unless the owner decides otherwise. |
 
-## Not synced automatically (yet)
+## Household settings sync
 
-The household key is shared, but Hearthpane settings are not. Today each Portal keeps its own
-copy, so a change made on one Portal doesn't reach the others. A HouseholdBus
-`settings_sync` message could fix this. It would carry the household-scoped domains listed
-above, signed with the household key, and would never include secrets or per-device keys.
+Portals that share the household key keep their household settings the same automatically.
+A change on one Portal reaches the others within a few seconds, and a Portal that was off or
+offline catches up when it comes back. Settings that belong to a room never leave it.
+
+### What syncs
+
+Every setting in Hearthpane's registry declares a `scope` in its definition
+(`app/src/main/java/com/immortal/launcher/settings/`). `SettingScopeTest` fails the build if a
+setting has no scope, if a credential is not `DEVICE_SECRET`, or if a protected key is marked
+household.
+
+| Scope | Settings |
+| --- | --- |
+| `HOUSEHOLD` (synced) | Screensaver mode, style, fit, interval, shuffle, videos, now playing, presence and idle sleep, overnight, night clock (tone, brightness, dark-room clock), sleep timer, soundscape, ambient dashboard, welcome; calendar widget look (on, range, size, side); the photo-frame clock face, its size and on/off; the photo source when it is the built-in feed or a shared album link; digital clock face and style; chime, spoken time, golden hour, chime volume, quiet hours; music quiet cap and follow-me; Control Center policies (kids restrictions, confirmations, banners, warnings, look, PIN length, exit delay); Calls policies (who can call, ringtone, ring volume, quiet mode, quality, groups, messages, phones); theme, advanced settings, weather unit, tile size, clock format, mini player, status bar; quick buttons; home dashboard, almanac packs, dinner, sharing, household list, briefing, doorbell, multi-room on/off and its Snapcast/Music Assistant host and port. |
+| `DEVICE` (this Portal only) | Room name; drop-ins on this Portal and the per-room drop-in grid; Control Center "This Portal shows" (Kids mode) and Shared room; the guest card; the sunrise alarm (it wakes one room); MQTT connection; the Music Assistant user and player id; the calendar feed link (it can carry a private token); this Portal's photo folder and Immich/NAS/WebDAV logins; the screensaver cache, battery saver, dark-room light threshold and dismiss app; the startup app. |
+| `DEVICE_SECRET` (never synced, never sent) | Music Assistant password and API token, MQTT password. |
+
+Rotation, brightness, volume levels, Grandma mode and its auto-answer list, Who's there
+recognition, dev and debug flags and the household key live outside the registry, so sync can't
+reach them. Hearthpane-internal levels (chime, ring and soundscape volume) are household
+policies; Android's own volume and brightness stay per device.
+
+### How it works
+
+- **Changes.** A change made on this Portal, on the phone remote or by fleet is noticed after the
+  registry write and sent at once as a signed bus message
+  `setting_changed {key, value, version, deviceId, ts}`. Each key has a Lamport version
+  (counter, then device id). The highest version wins; wall clocks never decide.
+- **Catch-up.** Every Portal gossips `settings_rev {digest, address, port, joining}` every
+  60 seconds, when its network comes back and after any change. A Portal whose digest differs
+  POSTs its versions to the sender's `/remote/settingspeer`; both sides merge, so one exchange
+  brings both up to date. The request carries a fresh household-signed header that pins the body
+  and is replay-guarded. The reply is signed against that request's nonce.
+- **Validation.** A peer value is applied only if its key is a household setting and the value
+  matches that setting's schema: the right type, the integer range, one of the enum's options
+  exactly, and strings at most 2,048 characters with no control characters. Unknown keys are
+  refused. A bus change must come from the Portal that wrote it. Batches hold at most
+  512 records and bodies at most 256 KB. A drop-in, Kids-mode, Shared-room, room-name, MQTT or
+  credential key can't be household: the catalog refuses to build.
+- **Live apply.** Values are written through the same registry apply as the on-device page, so
+  each domain's side effects run as usual: screensaver reaffirm and night-clock refresh, chime
+  rescheduling, Control Center reload, call announce, and the theme's live listener.
+- **Joining.** Untouched defaults are never sent. When a Portal first runs this version it joins
+  the household:
+  - If the household already has settings, Settings › About & Health › Sync offers a one-time
+    **Adopt settings from …**. Adopting takes the household's values. Values this Portal changed
+    that the household never set are shared.
+  - If this Portal changed something the household also set, **Keep this Portal's settings** is
+    offered too. Either way, a fresh Portal with defaults never overwrites the household.
+  - If no Portal has settings yet, the first one (the lower device id when two meet) founds them
+    from its own changes.
+
+Settings pages that hold household rows say **Synced across your Portals**. Rows that stay
+on the Portal say **This Portal only**. **About & Health › Sync** shows the status, the last sync
+time and each Portal last seen.
+
+For testing, the fleet action `{"action":"settings_sync","op":"status|pause|resume|adopt|keep|rejoin"}`
+reports the digest and peers. It can also pause sync on one Portal (it neither sends nor accepts),
+or resolve the join choice.
+
+### Limits
+
+- Catch-up uses the peer HTTP route, which runs only while the Fleet agent or phone pairing is
+  on (the household list and chores use the same route). Live `setting_changed` messages work
+  without it.
+- The clock-face picker reports its changes at once. The photo-source screens write outside the
+  registry, so their changes are noticed by the 60-second check.
+- Settings with no registry spec don't sync. That includes the welcome overlay's colours and
+  greetings.
+- Jarvis has no settings in Hearthpane's registry yet, so there is nothing of Jarvis to sync.

@@ -26,13 +26,15 @@ internal object DinnerSettings {
                       "Let other rooms call this Portal",
                       get = { it.receive },
                       set = DinnerConfig::setReceive,
-                      help = "Messages show here full width for 30 seconds."),
+                      help = "Messages show here full width for 30 seconds.",
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "speak",
                       "Say the message out loud",
                       get = { it.speak },
                       set = DinnerConfig::setSpeak,
-                      help = "After the chime, the message is spoken once."),
+                      help = "After the chime, the message is spoken once.",
+                      scope = SettingScope.HOUSEHOLD),
               ),
           defaults = { DinnerConfig.Settings() },
       )

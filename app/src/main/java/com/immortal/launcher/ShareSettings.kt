@@ -7,6 +7,7 @@
 package com.immortal.launcher
 
 import com.immortal.launcher.settings.BoolSpec
+import com.immortal.launcher.settings.SettingScope
 import com.immortal.launcher.settings.SettingsDomain
 
 /**
@@ -23,16 +24,20 @@ internal object ShareSettings {
           specs = listOf(
               BoolSpec("allowSharing", "Allow sharing from phones", get = { it.allowSharing },
                   set = ShareConfig::setAllowSharing,
-                  help = "Paired phones can send photos, notes and links to this Portal."),
+                  help = "Paired phones can send photos, notes and links to this Portal.",
+                  scope = SettingScope.HOUSEHOLD),
               BoolSpec("clearNotesOvernight", "Clear notes overnight", get = { it.clearNotesOvernight },
                   set = ShareConfig::setClearNotesOvernight,
-                  help = "Notes leave Home at 4:00 AM. They stay under Tools → Shared from phones."),
+                  help = "Notes leave Home at 4:00 AM. They stay under Tools → Shared from phones.",
+                  scope = SettingScope.HOUSEHOLD),
               BoolSpec("freshPhotoBadge", "Show “New from” on new photos", get = { it.freshPhotoBadge },
                   set = ShareConfig::setFreshPhotoBadge,
-                  help = "A shared photo's first turn says who sent it and when."),
+                  help = "A shared photo's first turn says who sent it and when.",
+                  scope = SettingScope.HOUSEHOLD),
               BoolSpec("noteChime", "Chime when a note arrives", get = { it.noteChime },
                   set = ShareConfig::setNoteChime,
-                  help = "One soft chime. Never during quiet hours."),
+                  help = "One soft chime. Never during quiet hours.",
+                  scope = SettingScope.HOUSEHOLD),
           ),
           defaults = { ShareConfig.Settings() },
       )

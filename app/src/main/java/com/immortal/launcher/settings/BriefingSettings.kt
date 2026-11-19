@@ -27,7 +27,8 @@ internal object BriefingSettings {
                       get = { it.enabled },
                       set = BriefingConfig::setEnabled,
                       help = "Weather, today's calendar, the shared list, timers and the first routine. " +
-                          "A Good morning card shows on Home from 6 to 11."),
+                          "A Good morning card shows on Home from 6 to 11.",
+                          scope = SettingScope.HOUSEHOLD),
                   EnumSpec(
                       "trigger",
                       "When it opens",
@@ -36,14 +37,16 @@ internal object BriefingSettings {
                       options = BriefingTrigger.entries.map { it.wire to it.label },
                       coerce = { raw -> BriefingTrigger.fromWire(raw)?.wire },
                       help = "At alarm time, it opens when you turn off the alarm or the sunrise light.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
                   BoolSpec(
                       "speak",
                       "Read it aloud",
                       get = { it.speak },
                       set = BriefingConfig::setSpeak,
                       help = "Uses the chime voice. Never during quiet hours.",
-                      visible = { _, s -> s.enabled }),
+                      visible = { _, s -> s.enabled },
+                      scope = SettingScope.HOUSEHOLD),
               ),
           defaults = { BriefingConfig.Settings() },
       )

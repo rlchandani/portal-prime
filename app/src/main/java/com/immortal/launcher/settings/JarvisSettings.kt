@@ -25,7 +25,8 @@ internal object JarvisSettings {
                       set = JarvisWakeConfig::setWakeOnScreens,
                       help = "Say “Hey Jarvis” while Home, Control Center, Music or Settings is on screen. " +
                           "Listening happens on this Portal and nothing is recorded. It stops during calls, " +
-                          "while the camera is in use, on the photo frame and in quiet hours."),
+                          "while the camera is in use, on the photo frame and in quiet hours.",
+                      scope = SettingScope.HOUSEHOLD),
               ),
           defaults = { JarvisWakeConfig.Settings() },
           onApplied = { context, _ -> HearthpaneWake.refresh(context) },
