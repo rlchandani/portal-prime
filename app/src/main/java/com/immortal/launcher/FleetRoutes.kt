@@ -390,6 +390,63 @@ class FleetRoutes(private val context: Context) {
         resp(200, JSONObject().put("ok", true).put("action", "cc_debug")
             .put("result", ControlCenter.debug(context, dry, plan, alert, unreachable, fake)))
       }
+      // Verification only: swap every photo source for generated scenes (expires on its own), or
+      // switch back. {"enabled":true|false, "minutes":1..240, "night":false|true}. Any frame already on screen is
+      // retired first so household photos are never on screen while the switch is on; enabling
+      // then opens a fresh frame on the generated scenes. Release builds report unavailable.
+      "screensaver_test_source" -> {
+        val enable = body.optBoolean("enabled", false)
+        val minutes = body.optInt("minutes", 30)
+        if (enable && minutes !in 1..ScreensaverTestSource.MAX_MINUTES)
+          return resp(400, err("bad_minutes"))
+        // "night":true also forces the dark-room state (night colours) without the light sensor.
+        val night = body.optBoolean("night", false)
+        val applied = if (enable) ScreensaverTestSource.enable(context, minutes, night = night)
+            else ScreensaverTestSource.disable(context)
+        if (applied) {
+          val main = android.os.Handler(android.os.Looper.getMainLooper())
+          main.post { ImmortalDreamNavigation.dismissForNavigation() }
+          // The singleTask frame must finish before a fresh one is created on the new source.
+          if (enable) main.postDelayed({
+            runCatching {
+              context.startActivity(android.content.Intent(context, PhotoFramePreviewActivity::class.java)
+                  .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+            }.onFailure { android.util.Log.w("FleetRoutes", "test frame launch failed", it) }
+          }, 800L)
+        }
+        resp(200, JSONObject().put("ok", applied).put("action", "screensaver_test_source")
+            .put("digitalClockFace", DigitalClockConfig.faceOf(DigitalClockConfig.load(context)))
+            .put("available", ScreensaverTestSource.available())
+            .put("active", ScreensaverTestSource.active(context))
+            .put("night", ScreensaverTestSource.forcedNight(context))
+            .put("until", ScreensaverTestSource.until(context)))
+      }
+      // Verification only (test-source builds): open the digital clock preview, optionally on a
+      // face {"face":"classic|bold|neon|led|flip|analog"}. The reply carries the exact previous
+      // look; send it back as {"restore":{...},"open":false} afterwards.
+      "digital_clock_preview" -> {
+        if (!ScreensaverTestSource.available()) return resp(400, err("unavailable"))
+        val face = body.optString("face").takeIf { id -> DigitalClockConfig.FACES.any { it.id == id } }
+        val prior = DigitalClockConfig.load(context)
+        val before = JSONObject().put("style", prior.style).put("font", prior.font)
+            .put("color", prior.color).put("glow", prior.glow)
+        body.optJSONObject("restore")?.let { r ->
+          // Write back the exact previous look (it may be a custom combination, not a preset).
+          r.optString("style").takeIf { it.isNotEmpty() }?.let { DigitalClockConfig.setStyle(context, it) }
+          r.optString("font").takeIf { it.isNotEmpty() }?.let { DigitalClockConfig.setFont(context, it) }
+          r.optString("color").takeIf { it.isNotEmpty() }?.let { DigitalClockConfig.setColor(context, it) }
+          r.optString("glow").takeIf { it.isNotEmpty() }?.let { DigitalClockConfig.setGlow(context, it) }
+        }
+        if (face != null) DigitalClockConfig.setFace(context, face)
+        if (body.optBoolean("open", true)) android.os.Handler(android.os.Looper.getMainLooper()).post {
+          runCatching {
+            context.startActivity(android.content.Intent(context, DigitalClockPreviewActivity::class.java)
+                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP))
+          }
+        }
+        resp(200, ok().put("action", "digital_clock_preview").put("previousFace", before)
+            .put("face", DigitalClockConfig.faceOf(DigitalClockConfig.load(context))))
+      }
       // Layout test hook (operator only): opens one of a fixed set of internal screens for captures.
       "open_screen" -> {
         val target = when (body.optString("screen")) {

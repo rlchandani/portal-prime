@@ -765,11 +765,11 @@ class FaceRenderer(
           }
           // Burn-in: drift the whole overlay a few px so no pixel stays lit in place. Skipped
           // (overlay held still) when the user turns the pixel-shift off.
-          val drift =
-              if (antiBurnInOn) AntiBurnIn.shift(now.time, burnInMaxPx.toFloat())
-              else AntiBurnIn.Shift(0f, 0f)
-          view.translationX = drift.x
-          view.translationY = drift.y
+          AntiBurnIn.overlayShift(view.visibility == View.VISIBLE, antiBurnInOn, now.time,
+              burnInMaxPx.toFloat())?.let { drift ->
+            view.translationX = drift.x
+            view.translationY = drift.y
+          }
           ui.postDelayed(this, 1_000L)
         }
       }

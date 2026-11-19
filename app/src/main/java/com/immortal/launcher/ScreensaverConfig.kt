@@ -56,6 +56,11 @@ object ScreensaverConfig {
   const val MODE_WHOLE = "wholePhoto"
   const val MODE_GALLERY_PRINT = "galleryPrint"
   const val MODE_GALLERY_SPREAD = "gallerySpread"
+  /** Split glance (StandBy-style): a clock panel beside a rounded photo card. */
+  const val MODE_SPLIT_GLANCE = "splitGlance"
+  /** Night clock colour that keeps photos showing, dim and warm ("Night photo"). */
+  const val NIGHT_TONE_PHOTO = "photo"
+  val NIGHT_TONES = listOf("warm", "red", NIGHT_TONE_PHOTO)
   const val MODE_CLASSIC = "classic"
   const val MODE_SHUFFLE = "shuffle"
   // Engine mode ids — MUST match the SS.MODES keys in assets/screensaver/modes.js.
@@ -64,8 +69,8 @@ object ScreensaverConfig {
       "panorama", "polaroid", "mosaic", "filmstrip", "cinema", "heroSidebar")
   // Preferred styles first; all existing IDs stay selectable and valid for saved preferences.
   val MODES = listOf(MODE_SMART, MODE_PORTRAITS, MODE_WHOLE, MODE_GALLERY_PRINT,
-      MODE_GALLERY_SPREAD, MODE_CLASSIC, MODE_SHUFFLE) + ENGINE_MODES
-  private val PHOTO_MOTION_MODES = setOf(MODE_SMART, MODE_PORTRAITS, MODE_SHUFFLE,
+      MODE_GALLERY_SPREAD, MODE_SPLIT_GLANCE, MODE_CLASSIC, MODE_SHUFFLE) + ENGINE_MODES
+  private val PHOTO_MOTION_MODES = setOf(MODE_SMART, MODE_PORTRAITS, MODE_SPLIT_GLANCE, MODE_SHUFFLE,
       "kenBurns", "diptych", "framed", "push", "memories", "panorama", "mosaic",
       "cinema", "heroSidebar")
   fun supportsPhotoMotion(mode: String): Boolean = mode in PHOTO_MOTION_MODES
@@ -76,6 +81,7 @@ object ScreensaverConfig {
     MODE_WHOLE -> "Whole photo"
     MODE_GALLERY_PRINT -> "Gallery print"
     MODE_GALLERY_SPREAD -> "Gallery spread"
+    MODE_SPLIT_GLANCE -> "Split glance"
     MODE_CLASSIC -> "Classic (existing)"
     MODE_SHUFFLE -> "Shuffle - all styles (existing)"
     "kenBurns" -> "Cinematic Ken Burns (existing)"
@@ -94,7 +100,7 @@ object ScreensaverConfig {
   }
   fun isNativeStage(mode: String): Boolean =
       mode == MODE_SMART || mode == MODE_PORTRAITS || mode == MODE_WHOLE ||
-          mode == MODE_GALLERY_PRINT || mode == MODE_GALLERY_SPREAD
+          mode == MODE_GALLERY_PRINT || mode == MODE_GALLERY_SPREAD || mode == MODE_SPLIT_GLANCE
 
   /** Existing engine IDs keep their WebView; Classic and the preferred styles remain native. */
   fun usesEngine(mode: String): Boolean = mode != MODE_CLASSIC && !isNativeStage(mode)

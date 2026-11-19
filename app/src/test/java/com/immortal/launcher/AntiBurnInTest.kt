@@ -2,6 +2,7 @@ package com.immortal.launcher
 
 import kotlin.math.abs
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -47,5 +48,18 @@ class AntiBurnInTest {
     val big = AntiBurnIn.shift(40_000L, 10f)
     assertEquals(small.x * 2f, big.x, 1e-3f)
     assertEquals(small.y * 2f, big.y, 1e-3f)
+  }
+  @Test
+  fun overlayShift_leavesAHiddenOverlayUntouched() {
+    // A hidden overlay that still has a display list draws a whole frame for every nudge, so
+    // a covered face (Night photo, Split glance) must take no per-second drift at all.
+    assertNull(AntiBurnIn.overlayShift(visible = false, enabled = true, nowMs = 60_000L, maxPx = 8f))
+    assertNull(AntiBurnIn.overlayShift(visible = false, enabled = false, nowMs = 60_000L, maxPx = 8f))
+  }
+
+  @Test
+  fun overlayShift_matchesShiftWhenShownAndCentresWhenOff() {
+    assertEquals(AntiBurnIn.shift(60_000L, 8f), AntiBurnIn.overlayShift(true, true, 60_000L, 8f))
+    assertEquals(AntiBurnIn.Shift(0f, 0f), AntiBurnIn.overlayShift(true, false, 60_000L, 8f))
   }
 }

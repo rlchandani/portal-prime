@@ -77,8 +77,9 @@ class SplitFlapClockFaceView(
             val w = width.toFloat()
             val h = height.toFloat()
 
-            val cardW = w * 0.18f
-            val cardH = h * 0.55f
+            val fit = SplitFlapGeometry.fit(w, h)
+            val cardW = fit.cardWidth
+            val cardH = fit.cardHeight
             val radius = cardW * 0.12f
             val gap    = cardW * 0.06f
             val colonW = cardW * 0.3f
@@ -88,8 +89,8 @@ class SplitFlapClockFaceView(
             val startX = (w - totalW) / 2f
             val startY = (h - cardH) / 2f
 
-            textPaint.textSize  = cardH * 0.7f
-            colonPaint.textSize = cardH * 0.5f
+            textPaint.textSize  = fit.digitSize
+            colonPaint.textSize = fit.digitSize * (0.5f / 0.7f)
 
             var x = startX
             for (i in 0..3) {
@@ -216,5 +217,23 @@ class SplitFlapClockFaceView(
         disposed = true
         hostActive = false
         cancelFlips()
+    }
+}
+
+/**
+ * Split-flap card geometry. Landscape panels keep their original proportions exactly. On a
+ * portrait panel (Portal Mini) the height-derived card was far taller than its width and the
+ * digit overflowed it, so there the card height is capped by its width and the digit by both.
+ */
+internal object SplitFlapGeometry {
+    data class Fit(val cardWidth: Float, val cardHeight: Float, val digitSize: Float)
+    private const val MAX_CARD_ASPECT = 1.45f
+    private const val MAX_DIGIT_TO_CARD_WIDTH = 1.3f
+
+    fun fit(width: Float, height: Float): Fit {
+        val cardW = (width * 0.18f).coerceAtLeast(0f)
+        if (height <= width) return Fit(cardW, height * 0.55f, height * 0.55f * 0.7f)
+        val cardH = minOf(height * 0.55f, cardW * MAX_CARD_ASPECT).coerceAtLeast(0f)
+        return Fit(cardW, cardH, minOf(cardH * 0.7f, cardW * MAX_DIGIT_TO_CARD_WIDTH))
     }
 }

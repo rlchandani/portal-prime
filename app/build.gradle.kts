@@ -83,6 +83,9 @@ android {
     buildConfigField("boolean", "PORTAL_HOME_UI_DIAGNOSTICS", "false")
     buildConfigField("boolean", "PORTAL_SETTINGS_UI_DIAGNOSTICS", "false")
     buildConfigField("boolean", "PORTAL_SETTINGS_PANE_DIAGNOSTICS", "false")
+    // Generated screensaver scenes for verification captures (never a household's photos).
+    // Release and dev builds cannot enable it; see ScreensaverTestSource.
+    buildConfigField("boolean", "PORTAL_SCREENSAVER_TEST_SOURCE", "false")
     // Calling perf probe: an in-process two-peer loopback call (camera → HW encode → LAN →
     // decode → render) behind a Calls app button. Off in every normal build; measurement only.
     buildConfigField("boolean", "PORTAL_CALL_LOOPBACK",
@@ -129,6 +132,7 @@ android {
     debug {
       // Lets a debug build install alongside a provisioned release for testing.
       applicationIdSuffix = ".debug"
+      buildConfigField("boolean", "PORTAL_SCREENSAVER_TEST_SOURCE", "true")
     }
     // Family iteration uses the accepted native R8 rules with ordinary production
     // feature gates. Debug fixtures and benchmark-only UI observers stay excluded.
@@ -140,6 +144,8 @@ android {
       signingConfig = signingConfigs.getByName("debug")
       matchingFallbacks += "release"
       proguardFiles("portal-r8-rules.pro", "benchmark-r8-native-rules.pro")
+      // Verification captures on family devices must use generated scenes (fleet action).
+      buildConfigField("boolean", "PORTAL_SCREENSAVER_TEST_SOURCE", "true")
     }
     // Measure without replacing a provisioned release or losing the debug device's
     // configuration. Native R8 is the accepted Family Area benchmark default;
@@ -148,6 +154,7 @@ android {
       initWith(getByName("release"))
       // Benchmark-only test access; Fleet auth, Dev Mode, Window and collector guards remain.
       buildConfigField("boolean", "PORTAL_HOME_UI_DIAGNOSTICS", "true")
+      buildConfigField("boolean", "PORTAL_SCREENSAVER_TEST_SOURCE", "true")
       // Functional observation has separate opt-in; never use it for timing comparisons.
       buildConfigField("boolean", "PORTAL_SETTINGS_UI_DIAGNOSTICS",
           (providers.gradleProperty("portalSettingsUiDiagnostics").orNull == "true").toString())

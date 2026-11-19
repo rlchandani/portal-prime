@@ -73,20 +73,26 @@ class PhotoFramePreviewActivity : ComponentActivity() {
     }
     // Overnight behaviour: dark mode → don't show photos, just blank. Night-clock mode → fall
     // through and render the dimmed flip clock instead.
-    nightClock = SleepScheduler.isOvernightNow(this) && ScreensaverConfig.load(this).overnightNightClock
-    if (SleepScheduler.isOvernightNow(this) && !nightClock) {
+    val config = ScreensaverConfig.load(this)
+    val overnight = OvernightFrame.of(SleepScheduler.isOvernightNow(this), config.overnightNightClock,
+        config.nightClockTone)
+    nightClock = overnight.nightClock
+    if (overnight == OvernightFrame.SLEEP) {
       ScreenControl.sleep(this)
       finish()
       return
     }
+    if (nightClock) Log.i(TAG, "overnight frame: $overnight")
 
     val construction = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.CONTROLLER_CONSTRUCTION)
     try {
+      // The "Night photo" colour keeps dim warm photos up overnight instead of a clock on black.
+      val nightPhoto = overnight == OvernightFrame.NIGHT_PHOTO
       // The welcome note shows once per launch: a recreate (rotation) must not show it again.
       frame = PhotoFrameController(this, showWelcome = savedInstanceState == null &&
           intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
           interactivePreview = !intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock,
-          nightClockOnly = nightClock)
+          nightClockOnly = nightClock && !nightPhoto, overnightNightPhoto = nightPhoto)
     } finally { construction?.finish() }
     // Only the screensaver-continuation launch (DreamPolicy's force-wake handoff) honours the
     // "open when dismissed" choice — to the user that frame IS the screensaver, so a tap must

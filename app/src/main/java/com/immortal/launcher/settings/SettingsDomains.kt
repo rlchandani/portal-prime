@@ -216,7 +216,8 @@ object SettingsDomains {
                           "Smart frame shows one photo with gentle motion. Portrait pair places two " +
                               "portraits together. Whole photo preserves the complete image. Gallery " +
                               "print holds the whole photo still inside a restrained matte. Gallery " +
-                              "spread pairs whole portraits, with a single-photo landscape fallback. Existing " +
+                              "spread pairs whole portraits, with a single-photo landscape fallback. Split " +
+                              "glance shows a large clock beside a photo card. Existing " +
                               "styles remain available.",
                       visible = { _, s -> s.enabled }),
                   BoolSpec(
@@ -466,8 +467,10 @@ object SettingsDomains {
                       "Night clock colour",
                       get = { it.nightClockTone },
                       set = ScreensaverConfig::setNightClockTone,
-                      options = listOf("warm" to "Warm", "red" to "Red"),
-                      coerce = { it.takeIf { value -> value == "warm" || value == "red" } },
+                      options = listOf("warm" to "Warm", "red" to "Red",
+                          ScreensaverConfig.NIGHT_TONE_PHOTO to "Night photo"),
+                      coerce = { it.takeIf { value -> value in ScreensaverConfig.NIGHT_TONES } },
+                      help = "Night photo keeps your photos showing, very dim and warm, with a small clock.",
                       visible = { _, s -> s.enabled &&
                           (s.darkRoomClock || (s.overnightEnabled && s.overnightNightClock)) }),
                   // NOTE: `feed` (Photo feed picker) removed — PhotoFrameController hardcodes the
