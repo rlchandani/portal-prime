@@ -11,12 +11,14 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * A video message ("Leave a message") stored on this Portal, the recipient. Metadata only: the
- * picture and sound live encrypted in the store's file and are never decrypted to disk.
+ * A video message ("Leave a message") stored on this Portal: one it received, or ([outgoing]) the
+ * sender's own copy of one it sent. Metadata only: the picture and sound live encrypted in the
+ * store's file and are never decrypted to disk.
  */
 @Immutable
 internal data class CallMessage(
     val id: String,
+    /** The other Portal: the sender of a received message, the recipient of an [outgoing] one. */
     val fromId: String,
     val fromName: String,
     val atMs: Long,
@@ -26,6 +28,10 @@ internal data class CallMessage(
     /** Recorded with the camera off: sound only. */
     val audioOnly: Boolean = false,
     val seen: Boolean = false,
+    /** Sent from this Portal (its own copy, so Recent can play it back). Always seen. */
+    val outgoing: Boolean = false,
+    /** The unanswered call this message was left after, when the sender said (links "Missed call · left a message"). */
+    val callId: String? = null,
 )
 
 /** Named limits from the owner-approved mock and the 2a brief. */
@@ -37,6 +43,8 @@ internal object CallMessageLimits {
   /** 2 min at ~1.6 Mbps is ~25 MB; anything over this is refused before a byte is stored. */
   const val MAX_BYTES = 48L * 1024 * 1024
   const val MAX_STORED = 40
+  /** Copies of messages this Portal sent, kept so Recent can play them; the oldest go first. */
+  const val MAX_SENT_KEPT = 10
   /** No single room can take over the store. */
   const val MAX_PER_SENDER = 10
   /** A whole upload must arrive within this (a slow drip can't hold an HTTP thread for long). */
@@ -75,25 +83,34 @@ internal object CallMessageList {
         list.any { it.id == id } -> CallMessageRefusal.DUPLICATE
         plainBytes <= 0 || plainBytes > CallMessageLimits.MAX_BYTES -> CallMessageRefusal.TOO_LARGE
         durationMs <= 0 || durationMs > CallMessageLimits.MAX_DURATION_MS + DURATION_SLACK_MS -> CallMessageRefusal.TOO_LONG
-        list.size >= CallMessageLimits.MAX_STORED || list.count { it.fromId == from } >= CallMessageLimits.MAX_PER_SENDER ->
-          CallMessageRefusal.FULL
+        // Sent copies have their own small budget: they never make this Portal refuse a message.
+        list.count { !it.outgoing } >= CallMessageLimits.MAX_STORED ||
+            list.count { !it.outgoing && it.fromId == from } >= CallMessageLimits.MAX_PER_SENDER -> CallMessageRefusal.FULL
         freeBytes - plainBytes < CallMessageLimits.MIN_FREE_BYTES -> CallMessageRefusal.NO_SPACE
         else -> null
       }
 
   /** Newest first; anything older than 30 days drops off (the store deletes its file). */
-  fun prune(list: List<CallMessage>, nowMs: Long): List<CallMessage> =
-      list.filter { nowMs - it.atMs <= CallMessageLimits.KEEP_MS }.sortedByDescending { it.atMs }.take(CallMessageLimits.MAX_STORED)
+  fun prune(list: List<CallMessage>, nowMs: Long): List<CallMessage> {
+    val fresh = list.filter { nowMs - it.atMs <= CallMessageLimits.KEEP_MS }.sortedByDescending { it.atMs }
+    val (sent, received) = fresh.partition { it.outgoing }
+    val kept = (received.take(CallMessageLimits.MAX_STORED) + sent.take(CallMessageLimits.MAX_SENT_KEPT)).toSet()
+    return fresh.filter { it in kept }
+  }
+
+  /** Received messages only: what "Missed & messages", badges and the Home card are about. */
+  fun received(list: List<CallMessage>): List<CallMessage> = list.filterNot { it.outgoing }
 
   fun add(list: List<CallMessage>, m: CallMessage, nowMs: Long): List<CallMessage> = prune(listOf(m) + list.filterNot { it.id == m.id }, nowMs)
 
-  fun unseen(list: List<CallMessage>): Int = list.count { !it.seen }
+  fun unseen(list: List<CallMessage>): Int = list.count { !it.seen && !it.outgoing }
 
   fun markSeen(list: List<CallMessage>, id: String): List<CallMessage> = list.map { if (it.id == id) it.copy(seen = true) else it }
 
   fun encode(list: List<CallMessage>): String = JSONArray(list.map { m ->
     JSONObject().put("i", m.id).put("f", m.fromId).put("n", m.fromName).put("t", m.atMs).put("ms", m.durationMs)
         .put("z", m.sizeBytes).put("a", m.audioOnly).put("s", m.seen)
+        .apply { if (m.outgoing) put("o", true); m.callId?.let { put("ci", it) } }
   }).toString()
 
   fun decode(raw: String?): List<CallMessage> {
@@ -108,7 +125,9 @@ internal object CallMessageList {
     val at = (o.opt("t") as? Number)?.toLong()?.takeIf { it > 0 } ?: return null
     val ms = (o.opt("ms") as? Number)?.toLong()?.takeIf { it > 0 } ?: return null
     val size = (o.opt("z") as? Number)?.toLong()?.takeIf { it > 0 } ?: return null
-    return CallMessage(id, from, name, at, ms, size, o.optBoolean("a", false), o.optBoolean("s", false))
+    val outgoing = o.optBoolean("o", false)
+    val callId = o.optString("ci").takeIf(CallWire::isCallId)
+    return CallMessage(id, from, name, at, ms, size, o.optBoolean("a", false), outgoing || o.optBoolean("s", false), outgoing, callId)
   }
 
   /** MediaRecorder's own 2:00 cap can overshoot by a frame or two. */

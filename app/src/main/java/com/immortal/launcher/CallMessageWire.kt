@@ -24,13 +24,14 @@ internal object CallMessageWire {
   const val TYPE = "vmsg_put"
   private const val ACK_DOMAIN = "vmsg_ack"
 
+  /** [callId]: the unanswered call this message follows, when there was one (older senders omit it). */
   data class Put(val id: String, val to: String, val fromName: String, val durationMs: Long, val sealedBytes: Long,
-                 val chunks: Int, val audioOnly: Boolean)
+                 val chunks: Int, val audioOnly: Boolean, val callId: String? = null)
 
   data class Verified(val put: Put, val from: String, val nonce: String)
 
   fun encode(p: Put): JSONObject = JSONObject().put("i", p.id).put("to", p.to).put("fn", p.fromName).put("ms", p.durationMs)
-      .put("z", p.sealedBytes).put("c", p.chunks).put("a", p.audioOnly)
+      .put("z", p.sealedBytes).put("c", p.chunks).put("a", p.audioOnly).apply { p.callId?.let { put("ci", it) } }
 
   /** Everything checked that can be checked before a byte of the body is read. */
   fun decode(b: JSONObject): Put? {
@@ -42,7 +43,8 @@ internal object CallMessageWire {
     val c = (b.opt("c") as? Number)?.toInt() ?: return null
     val plain = CallMessageCrypto.plainLength(z)
     if (plain <= 0 || CallMessageCrypto.chunkCount(plain) != c) return null
-    return Put(id, to, name, ms, z, c, b.optBoolean("a", false))
+    // An unknown or malformed call id only loses the link; it never refuses the message.
+    return Put(id, to, name, ms, z, c, b.optBoolean("a", false), b.optString("ci").takeIf(CallWire::isCallId))
   }
 
   fun requestHeader(key: ByteArray, from: String, nonce: String, ts: Long, put: Put): String? =

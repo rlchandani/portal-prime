@@ -45,7 +45,7 @@ internal data class CcPinEntry(
     val rest = f >= MAX_TRIES
     return copy(digits = "", busy = false, shakes = shakes + 1, failures = if (rest) 0 else f,
         lockedUntil = if (rest) now + LOCKOUT_MS else lockedUntil,
-        error = if (rest) "Too many tries — wait 30 seconds" else message)
+        error = if (rest) LOCKED else message)
   }
 
   /** The check couldn't run (not connected): clear without counting a failure. */
@@ -55,6 +55,7 @@ internal data class CcPinEntry(
     const val DELETE = '<'
     const val ENTER = '>'
     const val WRONG = "Wrong code"
+    const val LOCKED = "Too many tries — wait 30 seconds"
     const val MAX_TRIES = 5
     const val LOCKOUT_MS = 30_000L
   }
@@ -62,12 +63,37 @@ internal data class CcPinEntry(
 
 /**
  * Leaving kids mode: one entry for the whole process, so its 5 tries and 30 s rest outlive the pad
- * (Cancel and reopen can't reset them). The kids PIN's length is never shown: no auto-submit.
+ * (Cancel and reopen can't reset them). With a [CcPinTriesStore] the tries and rest also outlive the
+ * process: a fresh process restores them through [CcPinTriesClock.restore], so restarting the app
+ * can't reset the lockout. The kids PIN's length is never shown: no auto-submit.
  */
 internal object CcKidsPinAttempts {
   @Volatile private var kept: CcPinEntry? = null
 
-  fun open(now: Long): CcPinEntry = kept?.reopened(now) ?: CcPinEntry(ControlCenterConfig.MAX_PIN, autoSubmit = false)
+  fun open(now: Long): CcPinEntry = open(CcPinClock(now, 0L, CcPinClock.UNKNOWN_BOOT), null)
+
+  fun open(clock: CcPinClock, store: CcPinTriesStore?): CcPinEntry {
+    kept?.let { return it.reopened(clock.elapsed) }
+    val fresh = CcPinEntry(ControlCenterConfig.MAX_PIN, autoSubmit = false)
+    val restored = store?.load()?.let { CcPinTriesClock.restore(it, clock) } ?: return fresh
+    val entry = fresh.copy(failures = restored.failures, lockedUntil = restored.lockedUntil,
+        error = if (restored.lockedUntil > clock.elapsed) CcPinEntry.LOCKED else null)
+    kept = entry
+    return entry
+  }
+
   fun keep(e: CcPinEntry) { kept = e }
-  fun reset() { kept = null }
+
+  /** Keeps [e]; writes [store] only when the tries or the rest changed (not on every digit). */
+  fun keep(e: CcPinEntry, clock: CcPinClock, store: CcPinTriesStore?) {
+    val before = kept
+    kept = e
+    if (before != null && before.failures == e.failures && before.lockedUntil == e.lockedUntil) return
+    store?.save(CcPinTriesClock.record(e.failures, e.lockedUntil, clock))
+  }
+
+  fun reset(store: CcPinTriesStore? = null) { kept = null; store?.save(null) }
+
+  /** Tests only: forget the in-process entry, as a fresh process would. */
+  internal fun forgetProcess() { kept = null }
 }

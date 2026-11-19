@@ -41,8 +41,10 @@ internal object CallMessageProbe {
       .put("messages", JSONArray(CallMessageStore.messages.value.map { m ->
         JSONObject().put("id", m.id).put("from", m.fromName).put("fromId", m.fromId).put("durationMs", m.durationMs)
             .put("bytes", m.sizeBytes).put("atMs", m.atMs).put("seen", m.seen).put("audioOnly", m.audioOnly)
+            .put("outgoing", m.outgoing).put("linkedCall", m.callId != null)
       }))
       .put("bytesUsed", CallMessageStore.bytesUsed(context))
+      .put("postersInMemory", CallMessagePosters.stats().first).put("posterBytes", CallMessagePosters.stats().second)
       .put("outgoingTempFiles", CallMessageStore.outgoingCount(context))
       .put("rooms", JSONArray(CallingStore.peers.value.filter(CallMessages::canSend).map { JSONObject().put("id", it.id).put("name", it.name) }))
 }

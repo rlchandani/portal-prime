@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
@@ -66,10 +68,13 @@ internal fun CcPlanCanvas(
     fahrenheit: Boolean,
     onTap: (CcPlanHit) -> Unit,
     modifier: Modifier = Modifier,
+    /** Shared by the parked floors' canvases (one glow bitmap and one set of icon caches). */
+    paint: CcPlanPaint = rememberCcPlanPaint(),
+    /** Kept composed but not shown ([ccFloorSlot]): holds no offscreen textures (GPU memory) while parked. */
+    parked: Boolean = false,
 ) {
   val c = LocalCc.current
   val density = LocalDensity.current
-  val paint = rememberCcPlanPaint()
   val textPaints = remember(c, density) { CcPlanTextPaints(c, density) }
   var size by remember { mutableStateOf(IntSize.Zero) }
   val maxScale = with(density) { MAX_CELL_DP.dp.toPx() }
@@ -80,40 +85,64 @@ internal fun CcPlanCanvas(
       CcPlanPx(CcPlanGeo.fit(model.bounds, size.width.toFloat(), size.height.toFloat(), maxScale = maxScale), model)
     }
   }
-  val base = remember(px, c, density) { CcPlanBase(px, c, density.density) }
+  // Floors already shown keep their draw objects too, so their recorded passes (below) are reused.
+  val bases = remember { CcLru<CcBaseKey, CcPlanBase>(FLOOR_CACHE) }
+  val base = remember(px, c, density) {
+    bases.getOrPut(CcBaseKey(CcSame(px), c, density.density)) { CcPlanBase(px, c, density.density) }
+  }
   // Texts per (model, lens), kept for the lenses just shown: switching back measures nothing.
   val texts = remember(textPaints) { CcLru<CcLensKey, Pair<Map<String, CcRoomText>, CcMapChipText>>(LENS_CACHE) }
   val (labels, chipText) = remember(model, lens, textPaints) {
-    texts.getOrPut(CcLensKey(model, lens)) { roomTexts(model, lens, textPaints) to chipTexts(model, textPaints) }
+    texts.getOrPut(CcLensKey(model, lens)) { ccTrace("cc:texts") { roomTexts(model, lens, textPaints) to chipTexts(model, textPaints) } }
   }
+  val draws = remember { CcLru<CcDrawKey, CcPlanDraw>(DRAW_CACHE) }
   val ctx = remember(model, px, paint, c, labels, chipText, lens, focus, stale, fahrenheit) {
-    CcPlanDraw(model, px, paint, c, labels, chipText, lens, focus, stale, fahrenheit, density.density)
+    draws.getOrPut(CcDrawKey(CcSame(model), CcSame(px), CcSame(paint), c, CcSame(labels), CcSame(chipText), lens, focus, stale,
+        fahrenheit, density.density)) {
+      ccTrace("cc:drawCtx") { CcPlanDraw(model, px, paint, c, labels, chipText, lens, focus, stale, fahrenheit, density.density) }
+    }
   }
+  // Each pass recorded once per floor/model/lens/focus into a retained GraphicsLayer (display list).
+  val graphics = LocalGraphicsContext.current
+  val layers = remember(graphics) { CcPlanLayers(graphics) }
+  DisposableEffect(layers) { onDispose { layers.release() } }
   val motion = LocalCcMotion.current
   val latestTap by rememberUpdatedState(onTap)
+  // The tap detector reads the current floor; it isn't restarted on every floor switch.
+  val latestHitArea by rememberUpdatedState(model to px)
+  val isParked by rememberUpdatedState(parked)
   val description = remember(model.views, model.floor.name, lens) {
-    CcSpeech.plan(CcOverviewText.shortFloor(model.floor.name), lens, model.views.map { it.room.name to CcOverviewText.caption(it, lens) })
+    ccTrace("cc:speech") { CcSpeech.plan(CcOverviewText.shortFloor(model.floor.name), lens, model.views.map { it.room.name to CcOverviewText.caption(it, lens) }) }
   }
   val ready = size != IntSize.Zero && px.fit.scale > 0f
   Box(modifier.onSizeChanged { size = it }.ccSpeak(description)
-      .pointerInput(px, model) { detectTapGestures { pos -> hit(model, px, pos, TAP_DP.dp.toPx())?.let { latestTap(it) } } }) {
+      .pointerInput(Unit) {
+        detectTapGestures { pos ->
+          if (isParked) return@detectTapGestures
+          val (m, p) = latestHitArea
+          hit(m, p, pos, TAP_DP.dp.toPx())?.let { latestTap(it) }
+        }
+      }) {
     if (!ready) return@Box
     val loops = ctx.animates
     val still = !motion && loops
     // Layers 1-4 rasterize once into one GPU texture: an animation frame (or the sheet sliding
     // over the plan) then blits it instead of replaying every fill, glow and wall path.
-    Box(Modifier.fillMaxSize().graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)) {
-      PlanLayer { base.drawFloors(this) }
-      PlanLayer { ctx.drawUnder(this) }
-      PlanLayer { base.drawWalls(this) }
+    val strategy = if (parked) CompositingStrategy.Auto else CompositingStrategy.Offscreen
+    Box(Modifier.fillMaxSize().graphicsLayer(compositingStrategy = strategy)) {
+      PlanLayer { layers.draw(this, CcPassKey(CcPlanPass.FLOORS, CcSame(base))) { base.drawFloors(this) } }
+      PlanLayer { layers.draw(this, CcPassKey(CcPlanPass.UNDER, CcSame(ctx))) { ctx.drawUnder(this) } }
+      PlanLayer { layers.draw(this, CcPassKey(CcPlanPass.WALLS, CcSame(base))) { base.drawWalls(this) } }
       PlanLayer {
-        ctx.drawOver(this)
-        if (still) ctx.drawAnimated(this, STILL_T)
+        layers.draw(this, CcPassKey(if (still) CcPlanPass.OVER_STILL else CcPlanPass.OVER, CcSame(ctx))) {
+          ctx.drawOver(this)
+          if (still) ctx.drawAnimated(this, STILL_T)
+        }
       }
     }
     if (motion && (loops || walk != null)) CcPlanAnimLayer(ctx, walk, model.floor, loops)
     // Labels sit above the motion; their soft text shadows are blurs, so they get a texture too.
-    PlanLayer(cached = true) { ctx.drawTop(this) }
+    PlanLayer(cached = !parked) { layers.draw(this, CcPassKey(CcPlanPass.TOP, CcSame(ctx))) { ctx.drawTop(this) } }
   }
 }
 
@@ -164,8 +193,10 @@ internal class CcLensKey(private val model: CcPlanModel, private val lens: CcLen
 }
 
 private const val HASH_PRIME = 31
-/** Model × lens text sets kept (two lenses, a floor or two). */
-private const val LENS_CACHE = 4
+/** Model × lens text sets kept (two lenses on each of four floors). */
+private const val LENS_CACHE = 8
+/** Draw objects kept: one per floor and lens shown, plus the ones an HA update just replaced. */
+private const val DRAW_CACHE = 8
 
 /** Plan sizes from the mock (dp; geometry itself is in cells). */
 internal const val MAX_CELL_DP = 34f

@@ -1675,6 +1675,7 @@ private fun LauncherScreen(
               }
             }
             if (notePlacement == HomeNotePlacement.STRIP) HomeNoteStrip(shareHome, Modifier.fillMaxWidth().padding(top = 8.dp))
+            SettingsSyncHomeCard(Modifier.padding(top = 8.dp))
             Spacer(Modifier.height(if (homeLayout.compactLandscape) 8.dp else 16.dp))
             if (connected == false) {
               val dark = com.immortal.launcher.ui.theme.LocalApprovedPalette.current.dark

@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -241,14 +242,16 @@ private fun EveryoneCard(onEveryone: () -> Unit) {
   }
 }
 
-/** Recent: missed calls and history, grouped by day; lives on this Portal only. */
+/** Recent: calls, missed calls and video messages (received and sent), grouped by day; lives on this Portal only. */
 @Composable
 internal fun CallsRecent(history: List<CallHistoryEntry>) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context) }
+  val messages by CallMessageStore.messages.collectAsState()
   var filter by rememberSaveable { mutableStateOf(CallHistoryFilter.ALL) }
   var confirm by remember { mutableStateOf(false) }
-  val rows = CallHistory.filter(history, filter)
+  val rows = remember(history, messages, filter) { CallRecent.items(history, messages, filter) }
   val now = Calling.now()
   val zone = Calling.zone()
   val compact = currentLayoutClass().compact
@@ -257,8 +260,11 @@ internal fun CallsRecent(history: List<CallHistoryEntry>) {
     Spacer(Modifier.height(24.dp))
     if (rows.isEmpty()) {
       Box(Modifier.weight(1f)) {
-        CallsNotice("clock", if (filter == CallHistoryFilter.MISSED) "No missed calls" else "No calls yet",
-            "Calls and drop-ins between rooms show up here.")
+        when (filter) {
+          CallHistoryFilter.MISSED -> CallsNotice("clock", "No missed calls", "Calls and drop-ins between rooms show up here.")
+          CallHistoryFilter.MESSAGES -> CallsNotice("msg", "No video messages", "Messages you send and receive show up here.")
+          else -> CallsNotice("clock", "No calls yet", "Calls and drop-ins between rooms show up here.")
+        }
       }
     } else LazyColumn(Modifier.weight(1f).then(if (compact) Modifier.widthIn(max = 1200.dp).fillMaxWidth() else Modifier.width(1200.dp)),
         verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -267,7 +273,7 @@ internal fun CallsRecent(history: List<CallHistoryEntry>) {
         item(key = "h-$day") {
           Text(day, color = p.secondary, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 32.dp, top = 18.dp, bottom = 12.dp))
         }
-        items(list, key = { it.id }) { e -> if (compact) HistoryRowCompact(e) else HistoryRow(e) }
+        items(list, key = { it.key }) { item -> RecentRow(item, compact) }
       }
       item(key = "footer") {
         Column(Modifier.fillMaxWidth().padding(vertical = 28.dp), horizontalAlignment = Alignment.CenterHorizontally,
@@ -283,52 +289,45 @@ internal fun CallsRecent(history: List<CallHistoryEntry>) {
   }
 }
 
+/**
+ * One Recent row. Compact (Mini) keeps tighter padding and ellipsizes the words; the actions keep
+ * their size. A row with a message gets Play (mock `historyScr` / `homemissed`: Watch + Call back).
+ */
 @Composable
-private fun HistoryRow(e: CallHistoryEntry) {
+private fun RecentRow(item: RecentItem, compact: Boolean) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
-  val time = remember(e.atMs) { DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(e.atMs)) }
-  val (icon, tint) = when {
-    e.missed -> "inc" to p.error
-    e.kind == CallKind.DROP_IN -> "door" to if (p.dark) HearthpaneMark.EmberLight else EMBER_TEXT
-    e.direction == CallDirection.INCOMING -> "inc" to p.green
-    else -> "phone" to p.green
-  }
-  Row(Modifier.fillMaxWidth().background(p.surface, RoundedCornerShape(24.dp)).padding(horizontal = 32.dp, vertical = 16.dp)
-      .height(78.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(26.dp)) {
-    Box(Modifier.size(64.dp).background(tint.copy(alpha = 0.14f), CircleShape), contentAlignment = Alignment.Center) { CallIcon(icon, tint, 32.dp) }
-    Column(Modifier.weight(1f)) {
-      Text(e.peerName, color = if (e.missed) p.error else p.text, fontSize = 29.sp, fontWeight = FontWeight.SemiBold)
-      Text(CallingCopy.historyLine(e, time), color = p.secondary, fontSize = 22.5.sp)
+  val time = remember(item.atMs) { DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(item.atMs)) }
+  val missed = item is RecentItem.Call && item.e.missed
+  val (icon, tint) = when (item) {
+    is RecentItem.Message -> "msg" to p.accent
+    is RecentItem.Call -> when {
+      item.e.missed -> "inc" to p.error
+      item.e.kind == CallKind.DROP_IN -> "door" to if (p.dark) HearthpaneMark.EmberLight else EMBER_TEXT
+      item.e.direction == CallDirection.INCOMING -> "inc" to p.green
+      else -> "phone" to p.green
     }
-    if (e.missed) CallChip("Missed", tone = CallChipTone.RED)
-    CallPill("Call back", { Calling.dial(context, e.peerId, CallKind.CALL, video = true) }, icon = "phone",
-        style = CallButtonStyle.OK, size = CallButtonSize.SM, surface = callsSurface())
   }
-}
-
-/** Compact history row: tighter padding; name and line ellipsize, Call back keeps its size. */
-@Composable
-private fun HistoryRowCompact(e: CallHistoryEntry) {
-  val context = LocalContext.current
-  val p = LocalApprovedPalette.current
-  val time = remember(e.atMs) { DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(e.atMs)) }
-  val (icon, tint) = when {
-    e.missed -> "inc" to p.error
-    e.kind == CallKind.DROP_IN -> "door" to if (p.dark) HearthpaneMark.EmberLight else EMBER_TEXT
-    e.direction == CallDirection.INCOMING -> "inc" to p.green
-    else -> "phone" to p.green
-  }
-  Row(Modifier.fillMaxWidth().background(p.surface, RoundedCornerShape(24.dp)).padding(horizontal = 22.dp, vertical = 14.dp)
-      .height(78.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-    Box(Modifier.size(60.dp).background(tint.copy(alpha = 0.14f), CircleShape), contentAlignment = Alignment.Center) { CallIcon(icon, tint, 30.dp) }
-    Column(Modifier.weight(1f)) {
-      Text(e.peerName, color = if (e.missed) p.error else p.text, fontSize = 27.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
-          overflow = TextOverflow.Ellipsis)
-      Text(CallingCopy.historyLine(e, time), color = p.secondary, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+  val unseen = item.message?.let { !it.seen && !it.outgoing } == true
+  Row(Modifier.fillMaxWidth().background(p.surface, RoundedCornerShape(24.dp))
+      .padding(horizontal = if (compact) 22.dp else 32.dp, vertical = if (compact) 14.dp else 16.dp)
+      .height(78.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(if (compact) 18.dp else 26.dp)) {
+    val badge = if (compact) 60.dp else 64.dp
+    Box(Modifier.size(badge).background(tint.copy(alpha = 0.14f), CircleShape), contentAlignment = Alignment.Center) {
+      CallIcon(icon, tint, if (compact) 30.dp else 32.dp)
     }
-    if (e.missed) CallChip("Missed", tone = CallChipTone.RED)
-    CallPill("Call back", { Calling.dial(context, e.peerId, CallKind.CALL, video = true) }, icon = "phone",
+    Column(Modifier.weight(1f)) {
+      Text(item.peerName, color = if (missed) p.error else p.text, fontSize = if (compact) 27.sp else 29.sp,
+          fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Text(CallRecent.line(item, time), color = if (unseen) p.text else p.secondary, fontSize = if (compact) 21.sp else 22.5.sp,
+          maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+    if (missed && !compact) CallChip("Missed", tone = CallChipTone.RED)
+    item.message?.let { m ->
+      CallPill("Play", { CallMessages.play(context, m.id) }, icon = "play", style = CallButtonStyle.PRIMARY,
+          size = CallButtonSize.SM, surface = callsSurface())
+    }
+    CallPill("Call back", { Calling.dial(context, item.peerId, CallKind.CALL, video = true) }, icon = "phone",
         style = CallButtonStyle.OK, size = CallButtonSize.SM, surface = callsSurface())
   }
 }
