@@ -51,6 +51,7 @@ internal object SettingsPageIds {
     const val INTERCOM = "intercom"
     const val CALLS = "calls"
     const val MUSIC = "music"
+    const val JARVIS = "jarvis"
     const val ABOUT = "about"
     const val SYSTEM = "system"
     const val ADVANCED = "advanced"
@@ -95,7 +96,7 @@ internal object SettingsTileColors {
     const val SLATE = 0xFF4F5663
 }
 
-/** The page tree: 4 groups, 20 top-level pages, and their sub-pages (at most 3 levels deep). */
+/** The page tree: 4 groups, 21 top-level pages, and their sub-pages (at most 3 levels deep). */
 internal object SettingsTree {
     private val C = SettingsTileColors
     private val P = SettingsPageIds
@@ -150,6 +151,9 @@ internal object SettingsTree {
         SettingsPageDef(P.MUSIC, "Music", "music", C.RED, SettingsGroup.CONNECTED_HOME,
             lede = "Music that follows you between rooms, and how loud it may get.",
             keywords = "follow rooms quiet loudest history multi-room snapcast group music assistant"),
+        SettingsPageDef(P.JARVIS, "Jarvis", "mic", C.EMBER, SettingsGroup.CONNECTED_HOME,
+            lede = "Your voice assistant, opened by a tap or by saying “Hey Jarvis”.",
+            keywords = "hey jarvis wake word voice assistant microphone listen hands-free speak gemini"),
         SettingsPageDef(P.ABOUT, "About & Health", "info", C.GRAY, SettingsGroup.GENERAL,
             keywords = "version update device name model health checks tour help welcome uninstall screen lock permission"),
         SettingsPageDef(P.SYSTEM, "Portal & Android", "gear", C.SLATE, SettingsGroup.GENERAL,

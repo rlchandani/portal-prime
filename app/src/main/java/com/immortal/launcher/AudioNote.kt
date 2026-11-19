@@ -33,6 +33,8 @@ class AudioNote(private val context: Context) {
   private val main = Handler(Looper.getMainLooper())
   // Native handles are accessed only by the shared audio worker.
   private var recorder: MediaRecorder? = null
+  // "Hey Jarvis" listening steps aside while a memo records.
+  private var micClaim: com.immortal.launcher.jarvis.wake.MicClaims.Claim? = null
   private var recordingFile: File? = null
   private var player: MediaPlayer? = null
   private var recordStarted = false
@@ -111,6 +113,7 @@ class AudioNote(private val context: Context) {
       return false
     }
     return runCatching {
+      micClaim = com.immortal.launcher.jarvis.wake.MicClaims.claim()
       rec.start()
       recordStarted = true
       recordStartMs = SystemClock.elapsedRealtime()
@@ -144,6 +147,8 @@ class AudioNote(private val context: Context) {
     val r = recorder ?: return NotesConfig.hasAudioNote(context)
     val file = recordingFile
     recorder = null
+    micClaim?.close()
+    micClaim = null
     recordingFile = null
     recording = false
     val tooShort = !recordStarted || SystemClock.elapsedRealtime() - recordStartMs < 500
