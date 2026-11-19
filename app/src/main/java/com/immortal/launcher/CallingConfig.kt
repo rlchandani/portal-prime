@@ -34,6 +34,8 @@ internal object CallingConfig {
       val dropInsOn: Boolean = false,
       /** This Portal's column of the drop-in grid ([DropInGrid] text). */
       val dropInRooms: String = "",
+      /** Settings › Calls › Phones: paired phones (Portal Toolkit, home Wi-Fi) may ring this Portal. */
+      val phonesOn: Boolean = true,
   ) {
     val who: CallWhoCanCall get() = CallWhoCanCall.fromWire(whoCanCall)
     val tone: CallRingtone get() = CallRingtone.fromWire(ringtone)
@@ -53,6 +55,7 @@ internal object CallingConfig {
         quality = p.getString("quality", null) ?: CallQuality.AUTO.wire,
         dropInsOn = p.getBoolean("dropInsOn", false),
         dropInRooms = p.getString("dropInRooms", null).orEmpty(),
+        phonesOn = p.getBoolean("phonesOn", true),
     )
   }
 
@@ -70,4 +73,5 @@ internal object CallingConfig {
   fun setQuality(c: Context, v: String) = prefs(c).edit().putString("quality", v).apply()
   fun setDropInsOn(c: Context, v: Boolean) = prefs(c).edit().putBoolean("dropInsOn", v).apply()
   fun setDropInRooms(c: Context, v: String) = prefs(c).edit().putString("dropInRooms", v).apply()
+  fun setPhonesOn(c: Context, v: Boolean) = prefs(c).edit().putBoolean("phonesOn", v).apply()
 }

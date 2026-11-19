@@ -30,7 +30,10 @@ internal data class CallContact(
     val household: String = CallHousehold.HOME,
     val kind: Kind = Kind.ROOM,
 ) {
-  enum class Kind { ROOM, PERSON }
+  /** [PHONE]: a paired phone running Portal Toolkit; it signals over this Portal's HTTP routes. */
+  enum class Kind { ROOM, PERSON, PHONE }
+
+  val phone: Boolean get() = kind == Kind.PHONE
 }
 
 /** How a call's signalling reaches the other side. Phase 1: [LAN]. A relay transport comes later. */
@@ -183,6 +186,8 @@ internal object CallTimings {
   const val OFFLINE_AFTER_MS = 90_000L
   /** The ended screen closes itself after this (mock: back to Photos in 5 s). */
   const val ENDED_AUTO_CLOSE_MS = 5_000L
+  /** Grandma mode: auto-answer connects after this countdown (chime, Not now, Answer now). */
+  const val AUTO_ANSWER_MS = 10_000L
   /** History is kept on this Portal for 30 days. */
   const val HISTORY_KEEP_MS = 30L * 24 * 60 * 60_000L
 }

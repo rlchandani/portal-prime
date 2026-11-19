@@ -39,6 +39,8 @@ internal data class ActiveCall(
     /** Incoming only: where the caller's signalling route lives (from its signed ring). */
     val peerHost: String? = null,
     val peerPort: Int = 0,
+    /** Grandma mode auto-answer: the call connects by itself at this time unless declined. */
+    val autoAnswerAtMs: Long? = null,
 )
 
 /** How the last call ended, for the ended/error screens. */
@@ -66,7 +68,7 @@ internal data class CallState(val call: ActiveCall? = null, val ended: EndedCall
 internal sealed interface CallEvent {
   data class Dial(val id: String, val peer: CallContact, val kind: CallKind, val video: Boolean, val now: Long) : CallEvent
   data class Replied(val id: String, val from: String, val reply: CallReply, val quietEndMin: Int?, val now: Long) : CallEvent
-  data class Incoming(val id: String, val peer: CallContact, val kind: CallKind, val video: Boolean, val host: String,
+  data class Incoming(val id: String, val peer: CallContact, val kind: CallKind, val video: Boolean, val host: String?,
                       val port: Int, val decision: IncomingDecision, val now: Long) : CallEvent
   data class Accept(val audioOnly: Boolean, val now: Long) : CallEvent
   data class Decline(val now: Long) : CallEvent
@@ -105,6 +107,10 @@ internal sealed interface CallEffect {
   data class OpenPreview(val camera: Boolean) : CallEffect
   /** Callee after Accept: open camera + mic and send the signed offer. */
   data class StartMedia(val call: ActiveCall) : CallEffect
+  /** Callee of a phone's call after Accept: tell the phone to open its media and send its offer. */
+  data class SendGo(val id: String, val to: String) : CallEffect
+  /** Grandma mode: the auto-answer chime (the countdown itself is on screen). */
+  data object AutoAnswerChime : CallEffect
   data class SetCamera(val on: Boolean) : CallEffect
   data class SetMic(val on: Boolean) : CallEffect
   data object StopMedia : CallEffect
@@ -199,6 +205,12 @@ internal object CallMachine {
         CallStep(CallState(call = call), listOf(CallEffect.SendReply(e.id, e.peer.deviceId, CallReply.RINGING),
             CallEffect.Present, CallEffect.StartRing(d.silent), CallEffect.AnnouncePresence))
       }
+      IncomingDecision.AutoAnswer -> {
+        val call = ActiveCall(e.id, e.peer, CallDirection.INCOMING, CallKind.CALL, e.video, CallPhase.RINGING, e.now, e.now,
+            cameraOn = e.video, peerHost = e.host, peerPort = e.port, autoAnswerAtMs = e.now + CallTimings.AUTO_ANSWER_MS)
+        CallStep(CallState(call = call), listOf(CallEffect.SendReply(e.id, e.peer.deviceId, CallReply.RINGING),
+            CallEffect.Present, CallEffect.AutoAnswerChime, CallEffect.AnnouncePresence))
+      }
       IncomingDecision.Countdown -> {
         val call = ActiveCall(e.id, e.peer, CallDirection.INCOMING, CallKind.DROP_IN, e.video, CallPhase.COUNTDOWN, e.now, e.now,
             cameraOn = e.video, peerHost = e.host, peerPort = e.port)
@@ -229,8 +241,10 @@ internal object CallMachine {
 
   private fun accept(state: CallState, call: ActiveCall, audioOnly: Boolean, now: Long): CallStep {
     if (call.direction != CallDirection.INCOMING || !call.phase.beforeAnswer) return CallStep(state)
-    val next = call.copy(phase = CallPhase.CONNECTING, phaseSinceMs = now, cameraOn = call.video && !audioOnly)
-    return CallStep(state.copy(call = next), listOf(CallEffect.StopRing, CallEffect.StartMedia(next)))
+    val next = call.copy(phase = CallPhase.CONNECTING, phaseSinceMs = now, cameraOn = call.video && !audioOnly, autoAnswerAtMs = null)
+    // A phone has no server: it is always the offerer, so the Portal tells it to go and waits for the offer.
+    val media = if (call.peer.phone) CallEffect.SendGo(call.id, call.peer.deviceId) else CallEffect.StartMedia(next)
+    return CallStep(state.copy(call = next), listOf(CallEffect.StopRing, media))
   }
 
   private fun hangUp(state: CallState, call: ActiveCall, now: Long, left: Boolean): CallStep {
@@ -268,6 +282,7 @@ internal object CallMachine {
     return when (call.phase) {
       CallPhase.DIALING -> if (inPhase >= CallTimings.DIAL_ACK_MS) end(state, call, CallEndReason.OFFLINE, now) else CallStep(state)
       CallPhase.RINGING -> when {
+        !outgoing && call.autoAnswerAtMs != null && now >= call.autoAnswerAtMs -> accept(state, call, audioOnly = false, now)
         outgoing && inPhase >= CallTimings.RING_MS ->
           end(state, call, CallEndReason.NO_ANSWER, now, CallEffect.SendEnd(call.id, call.peer.deviceId, CallEndReason.NO_ANSWER))
         !outgoing && inPhase >= CallTimings.RING_MS + RING_GRACE_MS -> end(state, call, CallEndReason.MISSED, now)

@@ -16,12 +16,14 @@ internal object CallingEffects {
   fun perform(c: Context, effect: CallEffect) {
     when (effect) {
       is CallEffect.SendRing -> sendRing(c, effect.call)
-      is CallEffect.SendReply -> send(c, CallWire.REPLY, CallWire.encode(CallWire.Reply(effect.id, effect.to, effect.reply,
+      is CallEffect.SendReply -> send(c, effect.to, CallWire.REPLY, CallWire.encode(CallWire.Reply(effect.id, effect.to, effect.reply,
           if (effect.reply == CallReply.QUIET) ChimeConfig.load(c).quietEndMin else null)))
-      is CallEffect.SendEnd -> send(c, CallWire.END, CallWire.encode(CallWire.End(effect.id, effect.to, effect.reason)))
-      is CallEffect.SendKeep -> send(c, CallWire.KEEP, CallWire.encode(CallWire.Keep(effect.id, effect.to, effect.capAtMs)))
-      is CallEffect.SendMediaState -> send(c, CallWire.MEDIA,
+      is CallEffect.SendEnd -> send(c, effect.to, CallWire.END, CallWire.encode(CallWire.End(effect.id, effect.to, effect.reason)))
+      is CallEffect.SendKeep -> send(c, effect.to, CallWire.KEEP, CallWire.encode(CallWire.Keep(effect.id, effect.to, effect.capAtMs)))
+      is CallEffect.SendMediaState -> send(c, effect.to, CallWire.MEDIA,
           CallWire.encode(CallWire.Media(effect.id, effect.to, effect.cameraOn, effect.micOn)))
+      is CallEffect.SendGo -> send(c, effect.to, CallPhoneWire.GO, CallPhoneWire.encodeGo(effect.id, effect.to))
+      CallEffect.AutoAnswerChime -> CallRinger.chime(c)
       CallEffect.Present -> present(c)
       is CallEffect.StartRing -> if (!effect.silent) CallRinger.ring(c)
       CallEffect.StopRing -> CallRinger.stop()
@@ -37,6 +39,12 @@ internal object CallingEffects {
   }
 
   private fun sendRing(c: Context, call: ActiveCall) {
+    if (call.peer.phone) {
+      // A phone has no server: the ring waits in its mailbox until Portal Toolkit polls (it must be open).
+      CallPhoneMailbox.post(call.peer.deviceId, CallWire.RING, CallPhoneWire.encodeRing(call.id, call.peer.deviceId, call.video,
+          Calling.selfName(c)), Calling.now())
+      return
+    }
     // Our LAN address goes in the signed ring so the callee knows where to POST its offer.
     Thread({
       val host = HouseholdListSync.lanAddress()
@@ -49,7 +57,9 @@ internal object CallingEffects {
     }, "hearthpane-call-ring").apply { isDaemon = true }.start()
   }
 
-  private fun send(c: Context, type: String, body: org.json.JSONObject) {
+  /** Portals hear us on the signed bus; a phone collects the same message from its mailbox on its next poll. */
+  private fun send(c: Context, to: String, type: String, body: org.json.JSONObject) {
+    if (CallPhoneId.isPhone(to)) { CallPhoneMailbox.post(to, type, body, Calling.now()); return }
     if (!HouseholdBus.send(c, type, body)) Log.w(TAG, "$type not sent (no household key)")
   }
 

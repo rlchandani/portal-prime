@@ -45,16 +45,18 @@ internal object Calling {
     val c = context.applicationContext
     app = c
     CallingStore.load(c)
-    HouseholdBus.register(CallWire.RING) { ctx, m -> CallWire.decodeRing(m.body)?.let { onRing(ctx, m.from, it) } }
-    HouseholdBus.register(CallWire.REPLY) { ctx, m -> CallWire.decodeReply(m.body)?.takeIf { it.to == selfId(ctx) }
+    // A phone id never speaks on the bus: phones reach Calling only through their signed session routes.
+    fun portal(m: HouseholdMessage) = !CallPhoneId.isPhone(m.from)
+    HouseholdBus.register(CallWire.RING) { ctx, m -> if (portal(m)) CallWire.decodeRing(m.body)?.let { onRing(ctx, m.from, it) } }
+    HouseholdBus.register(CallWire.REPLY) { ctx, m -> if (portal(m)) CallWire.decodeReply(m.body)?.takeIf { it.to == selfId(ctx) }
         ?.let { dispatch(CallEvent.Replied(it.id, m.from, it.reply, it.quietEndMin, now())) } }
-    HouseholdBus.register(CallWire.END) { ctx, m -> CallWire.decodeEnd(m.body)?.takeIf { it.to == selfId(ctx) }
+    HouseholdBus.register(CallWire.END) { ctx, m -> if (portal(m)) CallWire.decodeEnd(m.body)?.takeIf { it.to == selfId(ctx) }
         ?.let { dispatch(CallEvent.RemoteEnded(it.id, m.from, it.reason, now())) } }
-    HouseholdBus.register(CallWire.KEEP) { ctx, m -> CallWire.decodeKeep(m.body)?.takeIf { it.to == selfId(ctx) }
+    HouseholdBus.register(CallWire.KEEP) { ctx, m -> if (portal(m)) CallWire.decodeKeep(m.body)?.takeIf { it.to == selfId(ctx) }
         ?.let { dispatch(CallEvent.RemoteKeepGoing(it.id, m.from, it.capAtMs)) } }
-    HouseholdBus.register(CallWire.MEDIA) { ctx, m -> CallWire.decodeMedia(m.body)?.takeIf { it.to == selfId(ctx) }
+    HouseholdBus.register(CallWire.MEDIA) { ctx, m -> if (portal(m)) CallWire.decodeMedia(m.body)?.takeIf { it.to == selfId(ctx) }
         ?.let { dispatch(CallEvent.RemoteMedia(it.id, m.from, it.cameraOn, it.micOn)) } }
-    HouseholdBus.register(CallWire.HELLO) { ctx, m -> CallWire.decodeHello(m.body)?.let { onHello(ctx, m.from, it) } }
+    HouseholdBus.register(CallWire.HELLO) { ctx, m -> if (portal(m)) CallWire.decodeHello(m.body)?.let { onHello(ctx, m.from, it) } }
     main.post { announce(c, ask = true) }
   }
 
@@ -66,10 +68,13 @@ internal object Calling {
 
   /** Starts a call or drop-in to [peerId] and opens the call screen. False if one is running. */
   fun dial(context: Context, peerId: String, kind: CallKind, video: Boolean): Boolean {
-    val peer = CallingStore.peers.value.firstOrNull { it.id == peerId } ?: return false
+    val contact = CallingStore.peers.value.firstOrNull { it.id == peerId }?.contact()
+        ?: CallPhoneMailbox.phone(peerId)?.contact() ?: return false
+    // Phones can be called, never dropped in on.
+    if (contact.phone && kind == CallKind.DROP_IN) return false
     if (state.value.call != null || !ready(context)) return false
     CallActivity.open(context)
-    dispatch(CallEvent.Dial(newId(), peer.contact(), kind, video, now()))
+    dispatch(CallEvent.Dial(newId(), contact, kind, video, now()))
     return true
   }
 
@@ -133,20 +138,36 @@ internal object Calling {
   private fun onRing(context: Context, from: String, ring: CallWire.Ring) {
     if (ring.to != selfId(context)) return
     CallingStore.heard(context, CallPeer(from, ring.name, now()), keepFlags = true)
-    val config = CallingConfig.load(context)
-    val chime = ChimeConfig.load(context)
-    val decision = CallPolicy.decide(IncomingContext(
-        kind = ring.kind, whoCanCall = config.who, quiet = DinnerQuiet.isQuiet(chime, now(), zone()),
-        quietMode = config.quiet, dropInsOn = config.dropInsOn,
-        dropInFromCaller = DropInGrid.policyFor(config.dropIns, from),
-        busy = state.value.call?.id?.let { it != ring.id } == true))
+    val decision = decide(context, from, ring.kind, ring.id, fromPhone = false)
     Log.i(TAG, "ring ${ring.kind} decision=${decision.javaClass.simpleName}")
     dispatch(CallEvent.Incoming(ring.id, CallContact(from, ring.name), ring.kind, ring.video, ring.host, ring.port, decision, now()))
   }
 
+  /** A paired phone rang this Portal (its signed `/remote/call/send`). Returns what was decided. */
+  fun onPhoneRing(context: Context, phone: CallContact, id: String, video: Boolean): IncomingDecision {
+    val decision = decide(context, phone.deviceId, CallKind.CALL, id, fromPhone = true)
+    Log.i(TAG, "phone ring decision=${decision.javaClass.simpleName}")
+    dispatch(CallEvent.Incoming(id, phone, CallKind.CALL, video, null, 0, decision, now()))
+    return decision
+  }
+
+  private fun decide(context: Context, from: String, kind: CallKind, ringId: String, fromPhone: Boolean): IncomingDecision {
+    val config = CallingConfig.load(context)
+    val t = now()
+    val quiet = DinnerQuiet.isQuiet(ChimeConfig.load(context), t, zone())
+    val autoAnswer = CallAutoAnswer.eligible(CallAutoAnswerStore.rules(context), from, kind, quiet,
+        CallAutoAnswer.lastDeclinedMs(CallingStore.history.value, from), t)
+    return CallPolicy.decide(IncomingContext(
+        kind = kind, whoCanCall = config.who, quiet = quiet,
+        quietMode = config.quiet, dropInsOn = config.dropInsOn,
+        dropInFromCaller = DropInGrid.policyFor(config.dropIns, from),
+        busy = state.value.call?.id?.let { it != ringId } == true,
+        autoAnswer = autoAnswer, fromPhone = fromPhone, phonesAllowed = config.phonesOn))
+  }
+
   private fun onHello(context: Context, from: String, hello: CallWire.Hello) {
     CallingStore.heard(context, CallPeer(from, hello.name, now(), hello.inCall, hello.quiet, hello.acceptsCalls,
-        hello.dropInsOn, hello.dropInPolicies))
+        hello.dropInsOn, hello.dropInPolicies, host = hello.host, port = hello.port))
     if (hello.ask) main.post { announce(context.applicationContext, ask = false) }
   }
 
@@ -155,7 +176,8 @@ internal object Calling {
     val config = CallingConfig.load(context)
     val quiet = DinnerQuiet.isQuiet(ChimeConfig.load(context), now(), zone())
     HouseholdBus.send(context, CallWire.HELLO, CallWire.encode(CallWire.Hello(selfName(context), ask, state.value.call != null,
-        quiet, config.who == CallWhoCanCall.HOME, config.dropInsOn, config.dropIns)))
+        quiet, config.who == CallWhoCanCall.HOME, config.dropInsOn, config.dropIns,
+        host = HouseholdListSync.lanAddress(), port = FleetConfig.port(context))))
   }
 
   private fun newId(): String = ByteArray(ID_BYTES).also(random::nextBytes).let(HouseholdKey::toHex)
