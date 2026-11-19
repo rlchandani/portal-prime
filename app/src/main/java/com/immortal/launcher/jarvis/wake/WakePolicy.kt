@@ -31,8 +31,11 @@ internal object WakePolicy {
       val callActive: Boolean,
       /** The camera Hearthpane and Meta's calls use (camera 0) is open: a Who's there? glance, a call, a message. */
       val cameraInUse: Boolean,
-      /** Another recording that isn't silenced: Jarvis's card, a voice memo, intercom, a third-party app. */
-      val otherRecording: Boolean,
+      /**
+       * Another Hearthpane feature holds the mic ([MicClaims]: the intercom's broadcast, a voice memo). Other apps
+       * need no fact: one in front pauses this screen, and one behind it is silenced while Hearthpane is on top.
+       */
+      val micClaimed: Boolean,
       val quietHours: Boolean,
       /** A wake was just handed to Jarvis; the mic is Jarvis's until this screen pauses and resumes again. */
       val handingOff: Boolean,
@@ -49,7 +52,7 @@ internal object WakePolicy {
     INELIGIBLE_SCREEN("photo frame or screensaver"),
     CALL("a call is active"),
     CAMERA("the camera is in use"),
-    MIC_BUSY("another app is using the mic"),
+    MIC_BUSY("another Hearthpane feature is using the mic"),
     QUIET_HOURS("quiet hours"),
     HANDING_OFF("Jarvis is opening"),
   }
@@ -72,7 +75,7 @@ internal object WakePolicy {
       !f.hostEligible -> Reason.INELIGIBLE_SCREEN
       f.callActive -> Reason.CALL
       f.cameraInUse -> Reason.CAMERA
-      f.otherRecording -> Reason.MIC_BUSY
+      f.micClaimed -> Reason.MIC_BUSY
       f.quietHours -> Reason.QUIET_HOURS
       else -> null
     }

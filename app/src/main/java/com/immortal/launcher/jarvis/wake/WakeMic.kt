@@ -16,9 +16,9 @@ import android.util.Log
 
 /**
  * Listening sessions on the microphone. Each [start] runs one capture thread that reads 30 ms of 16 kHz PCM at a
- * time, runs it through a [MicroFrontend] and the [WakeWordModel], and forgets it. The mic is released the moment a
- * session ends: [stop] (main thread) unblocks the read, and a wake stops *and releases* the recorder on the capture
- * thread before it is reported, so Jarvis finds the mic free when its card opens.
+ * time, gains it ([WakeGain]), runs it through a [MicroFrontend] and the [WakeWordModel], and forgets it. The mic is released the moment a
+ * session ends: [stop] (main thread) unblocks the read. A wake ends detection at once and is reported; the recorder
+ * then bridges (reads and discards) until Jarvis's own recording is live, so Jarvis starts on a warm input.
  *
  * Audio never leaves this class: nothing is kept past the frontend's 30 ms window, logged or stored.
  */
@@ -27,14 +27,11 @@ internal class WakeMic(
     private val events: Events,
 ) {
   interface Events {
-    /** Capture thread, mic already released: "Hey Jarvis" was heard at [uptimeMs] with smoothed [score]. */
-    fun onWake(uptimeMs: Long, score: Float)
-
     /**
-     * Capture thread, just before recording starts: [sessionId] identifies our own capture among the device's
-     * recordings (reported first, so our own start never reads as "another app took the mic").
+     * Capture thread: "Hey Jarvis" was heard at [uptimeMs] with smoothed [score]. Detection has ended; the recorder
+     * stays open, discarding everything, until [stop] (Jarvis is recording) or at most 1.5 s (the warm-mic bridge).
      */
-    fun onOpened(sessionId: Int)
+    fun onWake(uptimeMs: Long, score: Float)
 
     /** Capture thread: a session ended without a wake ([reason] is for the log). */
     fun onEnded(reason: String)
@@ -73,18 +70,22 @@ internal class WakeMic(
       val pcm = ByteArray(READ_BYTES)
       val features = IntArray(MicroFilterbank.CHANNELS)
       var score = WakeScore()
-      events.onOpened(rec.audioSessionId)
       rec.startRecording()
       if (rec.recordingState != AudioRecord.RECORDSTATE_RECORDING) return Outcome.Ended("mic busy")
       try {
         while (live) {
           val n = rec.read(pcm, 0, READ_BYTES)
           if (n < 0) return Outcome.Ended("read error $n")
+          WakeGain.apply(pcm, n)
           for (offset in 0..n - CHUNK_BYTES step CHUNK_BYTES) {
             if (!frontend.process(pcm, offset, features)) continue
             val q8 = model.push(features) ?: continue
             score = score.next(q8)
-            if (score.triggered) return Outcome.Woke(SystemClock.uptimeMillis(), score.mean)
+            if (score.triggered) {
+              events.onWake(SystemClock.uptimeMillis(), score.mean)
+              bridge(rec, pcm)
+              return Outcome.Reported
+            }
           }
         }
         return Outcome.Ended("stopped")
@@ -93,17 +94,29 @@ internal class WakeMic(
       }
     }
 
+    /**
+     * The warm-mic bridge after a wake: keep the input running, reading and discarding everything (nothing reaches
+     * the frontend, nothing is kept), until [stop] — Jarvis's own recording went live — or [BRIDGE_MS]. Jarvis's card
+     * is the top app by then, so Android gives *it* the audio; its recorder attaches to a running input instead of
+     * waking the audio HAL from standby (~250 ms on Family), which is most of wake-to-listening.
+     */
+    private fun bridge(rec: AudioRecord, pcm: ByteArray) {
+      val end = SystemClock.uptimeMillis() + BRIDGE_MS
+      while (live && SystemClock.uptimeMillis() < end && rec.read(pcm, 0, READ_BYTES) >= 0) pcm.fill(0)
+    }
+
     private fun report(outcome: Outcome) {
       live = false
       when (outcome) {
-        is Outcome.Woke -> events.onWake(outcome.uptimeMs, outcome.score)
+        Outcome.Reported -> Unit
         is Outcome.Ended -> events.onEnded(outcome.reason)
       }
     }
   }
 
   private sealed interface Outcome {
-    data class Woke(val uptimeMs: Long, val score: Float) : Outcome
+    /** A wake, already reported from the capture thread. */
+    data object Reported : Outcome
     data class Ended(val reason: String) : Outcome
   }
 
@@ -148,5 +161,6 @@ internal class WakeMic(
     const val READ_BYTES = 3 * CHUNK_BYTES // 30 ms: one model step per read, ~33 wakeups a second
     const val BUFFER_BYTES = 8 * READ_BYTES // 240 ms of slack so a busy moment never drops audio
     const val JOIN_MS = 1_000L
+    const val BRIDGE_MS = 1_500L
   }
 }

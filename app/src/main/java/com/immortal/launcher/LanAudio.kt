@@ -154,6 +154,11 @@ class LanAudio {
 
   private fun pumpMicTo(session: LanAudioSessions.Session, out: OutputStream) {
     if (!session.isActive) return
+    // "Hey Jarvis" listening steps aside while this room broadcasts.
+    com.immortal.launcher.jarvis.wake.MicClaims.claim().use { pumpClaimedMicTo(session, out) }
+  }
+
+  private fun pumpClaimedMicTo(session: LanAudioSessions.Session, out: OutputStream) {
     val minBuf = AudioRecord.getMinBufferSize(
         SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
     val rec = AudioRecord(

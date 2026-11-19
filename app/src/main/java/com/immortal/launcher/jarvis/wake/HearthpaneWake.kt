@@ -22,6 +22,7 @@ import com.immortal.launcher.Calling
 import com.immortal.launcher.ChimeConfig
 import com.immortal.launcher.JarvisHandoff
 import com.immortal.launcher.PhotoFramePreviewActivity
+import com.immortal.launcher.RemoteCompanionJarvis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -52,6 +53,7 @@ internal object HearthpaneWake {
   private val loader = Executors.newSingleThreadExecutor { Thread(it, "hearthpane-wake-load").apply { isDaemon = true } }
   private lateinit var app: Context
   private lateinit var signals: WakeSignals
+  private lateinit var jarvisRecording: JarvisRecording
   private var resumed: WeakReference<Activity>? = null
   private var callActive = false
   private var handoff = WakeHandoff()
@@ -59,6 +61,7 @@ internal object HearthpaneWake {
   private var modelState = ModelState.UNLOADED
   private var mic: WakeMic? = null
   private var lastDecision: WakePolicy.Decision? = null
+  private var jarvisWakeChecked = false
   private var retryMs = RETRY_MS
   private var startPending = false
   private val startRunnable = Runnable { startPending = false; startNow() }
@@ -70,6 +73,8 @@ internal object HearthpaneWake {
     app = application.applicationContext
     signals = WakeSignals(app, main) { evaluate() }
     signals.register()
+    jarvisRecording = JarvisRecording(app, main)
+    MicClaims.onChange = { main.post { evaluate() } }
     application.registerActivityLifecycleCallbacks(Lifecycle)
     CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).launch {
       Calling.state.map { it.busy }.distinctUntilChanged().collect { busy ->
@@ -81,7 +86,12 @@ internal object HearthpaneWake {
 
   /** A setting changed (Settings › Jarvis, or the phone remote): decide again. Any thread. */
   fun refresh(@Suppress("UNUSED_PARAMETER") context: Context) {
-    main.post { if (::app.isInitialized) evaluate() }
+    main.post {
+      if (::app.isInitialized) {
+        jarvisWakeChecked = false // turned back on: check Jarvis's background wake again
+        evaluate()
+      }
+    }
   }
 
   private fun facts(now: Long): WakePolicy.Facts {
@@ -97,7 +107,7 @@ internal object HearthpaneWake {
         hostEligible = host != null && host !is PhotoFramePreviewActivity,
         callActive = callActive,
         cameraInUse = signals.cameraInUse,
-        otherRecording = signals.otherRecording,
+        micClaimed = MicClaims.active,
         quietHours = ChimeConfig.isQuietNow(app, BriefingPolicy.minuteOfDay(System.currentTimeMillis(), TimeZone.getDefault())),
         handingOff = handoff.active(now),
     )
@@ -114,8 +124,12 @@ internal object HearthpaneWake {
     if (resumed?.get() != null) main.postDelayed(minuteTick, MINUTE_MS - System.currentTimeMillis() % MINUTE_MS)
     if (decision is WakePolicy.Decision.Pause) {
       cancelStart()
-      mic?.stop()
-      if (decision.reason == WakePolicy.Reason.HANDING_OFF) main.postDelayed(minuteTick, WakeHandoff.EXPIRY_MS)
+      if (decision.reason == WakePolicy.Reason.HANDING_OFF) {
+        // The warm-mic bridge ends itself when Jarvis records ([JarvisRecording]) or after 1.5 s.
+        main.postDelayed(minuteTick, WakeHandoff.EXPIRY_MS)
+      } else {
+        mic?.stop()
+      }
       return
     }
     if (mic?.active != true) scheduleStart(START_DELAY_MS)
@@ -134,6 +148,10 @@ internal object HearthpaneWake {
 
   private fun startNow() {
     if (WakePolicy.decide(facts(SystemClock.uptimeMillis())) != WakePolicy.Decision.Listen) return
+    if (!jarvisWakeChecked) {
+      jarvisWakeChecked = true
+      loader.execute(::turnOffJarvisBackgroundWake)
+    }
     val loaded = model
     if (loaded == null) return loadModel()
     val current = mic ?: WakeMic(loaded, MicEvents).also { mic = it }
@@ -153,28 +171,40 @@ internal object HearthpaneWake {
     }
   }
 
+  /** Loader thread, once per process: Jarvis's own background wake competes for the mic ([JarvisBackgroundWake]). */
+  private fun turnOffJarvisBackgroundWake() {
+    val body = JarvisBackgroundWake.configurationFor(JarvisWakeConfig.load(app).wakeOnScreens,
+        RemoteCompanionJarvis.status(app)) ?: return
+    val ok = RemoteCompanionJarvis.configure(app, body).optBoolean("ok")
+    Log.i(TAG, if (ok) "turned Jarvis's background wake off (Hearthpane listens on its screens)"
+        else "Jarvis's background wake could not be turned off")
+  }
+
   private fun jarvisInstalled(): Boolean = runCatching {
     app.packageManager.getPackageInfo(JarvisHandoff.PACKAGE, 0)
     true
   }.getOrDefault(false)
 
-  private fun onWake(heardAtMs: Long, score: Float) {
-    signals.ownSession = 0
+  private fun handleWake(heardAtMs: Long, score: Float) {
     retryMs = RETRY_MS
     handoff = handoff.woke(SystemClock.uptimeMillis())
     evaluate()
     val host = resumed?.get()
     if (host == null || host.isFinishing) {
       Log.i(TAG, "heard Hey Jarvis but no Hearthpane screen is in front any more")
+      mic?.stop()
       return
     }
     Log.i(TAG, "heard Hey Jarvis (score ${"%.2f".format(score)}); opening Jarvis " +
         "${SystemClock.uptimeMillis() - heardAtMs} ms later")
-    if (!JarvisHandoff.launchFromWake(host, heardAtMs)) Log.w(TAG, "Jarvis could not be opened from a wake")
+    jarvisRecording.watch { mic?.stop() }
+    if (!JarvisHandoff.launchFromWake(host, heardAtMs)) {
+      Log.w(TAG, "Jarvis could not be opened from a wake")
+      mic?.stop()
+    }
   }
 
-  private fun onEnded(reason: String) {
-    signals.ownSession = 0
+  private fun handleEnded(reason: String) {
     if (reason == "stopped") return
     Log.w(TAG, "listening ended: $reason; retrying in ${retryMs / 1000} s")
     cancelStart()
@@ -184,15 +214,11 @@ internal object HearthpaneWake {
 
   private object MicEvents : WakeMic.Events {
     override fun onWake(uptimeMs: Long, score: Float) {
-      main.post { onWake(uptimeMs, score) }
-    }
-
-    override fun onOpened(sessionId: Int) {
-      signals.ownSession = sessionId
+      main.post { handleWake(uptimeMs, score) }
     }
 
     override fun onEnded(reason: String) {
-      main.post { onEnded(reason) }
+      main.post { handleEnded(reason) }
     }
   }
 

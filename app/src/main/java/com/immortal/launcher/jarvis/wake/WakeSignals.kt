@@ -11,15 +11,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.camera2.CameraManager
-import android.media.AudioManager
-import android.media.AudioRecordingConfiguration
-import android.os.Build
 import android.os.Handler
 import android.util.Log
 
 /**
- * The platform signals [WakePolicy] reads that arrive as callbacks: the screen and the dream, camera 0, and the
- * device's other recordings. All callbacks run on the main [handler] and only flip a field and call [changed];
+ * The platform signals [WakePolicy] reads that arrive as callbacks: the screen and the dream, and camera 0. All callbacks run on the main [handler] and only flip a field and call [changed];
  * the decision stays in [WakePolicy]. Registered once for the process lifetime (a few cheap callbacks, no polling).
  */
 internal class WakeSignals(private val context: Context, private val handler: Handler, private val changed: () -> Unit) {
@@ -27,22 +23,10 @@ internal class WakeSignals(private val context: Context, private val handler: Ha
     private set
   @Volatile var cameraInUse = false
     private set
-  @Volatile var otherRecording = false
-    private set
-
-  /** Our own capture's session id, so it never counts as "another recording". 0 = not capturing. */
-  @Volatile var ownSession = 0
-    set(value) {
-      field = value
-      handler.post { recordingsChanged(audio?.activeRecordingConfigurations.orEmpty()) }
-    }
-
-  private val audio = context.getSystemService(AudioManager::class.java)
 
   fun register() {
     registerScreen()
     registerCamera()
-    registerRecordings()
   }
 
   private fun registerScreen() {
@@ -80,29 +64,6 @@ internal class WakeSignals(private val context: Context, private val handler: Ha
     cameraInUse = inUse
     changed()
   }
-
-  private fun registerRecordings() {
-    val manager = audio ?: return
-    manager.registerAudioRecordingCallback(object : AudioManager.AudioRecordingCallback() {
-      override fun onRecordingConfigChanged(configs: MutableList<AudioRecordingConfiguration>) =
-          recordingsChanged(configs)
-    }, handler)
-    recordingsChanged(manager.activeRecordingConfigurations)
-  }
-
-  /**
-   * Another app's (or another Hearthpane feature's) live recording claims the mic. A silenced one doesn't: Android
-   * 10 silences background captures (Jarvis's own background wake arms and gets silence), and we are what it hears.
-   */
-  private fun recordingsChanged(configs: List<AudioRecordingConfiguration>) {
-    val busy = configs.any { it.clientAudioSessionId != ownSession && !silenced(it) }
-    if (busy == otherRecording) return
-    otherRecording = busy
-    changed()
-  }
-
-  private fun silenced(config: AudioRecordingConfiguration): Boolean =
-      Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && config.isClientSilenced
 
   private companion object {
     const val TAG = "HearthpaneWake"
