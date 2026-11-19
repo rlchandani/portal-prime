@@ -34,10 +34,13 @@ internal class PhotoBackdropView(context: Context) : View(context) {
   private val paint = Paint(Paint.FILTER_BITMAP_FLAG or Paint.DITHER_FLAG)
   private val matrix = Matrix()
   private var night = 0f
+  private var brightness = HearthReadability.AMBIENT_BRIGHTNESS
 
   /** [photoRect] is the photo's smallest on-screen rectangle; [inset] keeps its rounded corners covered. */
-  fun show(backdrop: Bitmap, photoRect: FloatArray, inset: Float, nightLevel: Float) {
+  fun show(backdrop: Bitmap, photoRect: FloatArray, inset: Float, nightLevel: Float,
+      backdropBrightness: Float = HearthReadability.AMBIENT_BRIGHTNESS) {
     bitmap = backdrop
+    brightness = backdropBrightness
     hole.set(photoRect[0] + inset, photoRect[1] + inset, photoRect[2] - inset, photoRect[3] - inset)
     night = nightLevel
     rebuild()
@@ -74,7 +77,7 @@ internal class PhotoBackdropView(context: Context) : View(context) {
       })
     }
     paint.shader = ComposeShader(image, veil, PorterDuff.Mode.MULTIPLY)
-    paint.colorFilter = ColorMatrixColorFilter(grade(night))
+    paint.colorFilter = ColorMatrixColorFilter(grade(night, brightness))
   }
 
   @Suppress("DEPRECATION")
@@ -102,9 +105,9 @@ internal class PhotoBackdropView(context: Context) : View(context) {
     }
 
     /** Brightness .62, saturation 1.15 (mock Ambient), times the evening warm dim. */
-    fun grade(nightLevel: Float): ColorMatrix {
+    fun grade(nightLevel: Float, brightness: Float = HearthReadability.AMBIENT_BRIGHTNESS): ColorMatrix {
       val m = ColorMatrix().apply { setSaturation(SATURATION) }
-      m.postConcat(warmth(nightLevel, HearthReadability.AMBIENT_BRIGHTNESS))
+      m.postConcat(warmth(nightLevel, brightness))
       return m
     }
 

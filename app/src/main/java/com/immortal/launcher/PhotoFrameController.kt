@@ -134,6 +134,8 @@ class PhotoFrameController(
     private val photosOnly: Boolean = false,
     /** Scheduled night clock: don't start a photo, calendar, weather or audio pipeline at all. */
     private val nightClockOnly: Boolean = false,
+    /** Scheduled night clock in the "Night photo" colour: dim warm photos with a small clock. */
+    private val overnightNightPhoto: Boolean = false,
 ) {
   private val io = Executors.newSingleThreadExecutor()
   private val sourceDiscoveryDelegate = lazy { SlideshowSourceDiscovery() }
@@ -255,6 +257,12 @@ class PhotoFrameController(
   private lateinit var calendarHeader: TextView
   private lateinit var calendarRows: LinearLayout
   private var calendarEvents: List<CalendarFeed.Event> = emptyList()
+  // New modes: Split glance's clock panel and the Night photo veil + clock; null until used.
+  private var splitPanel: SplitGlancePanel? = null
+  private var nightPhotoOverlay: NightPhotoOverlay? = null
+  private var nightPhotoOn = false
+  private val splitGlance: Boolean
+    get() = !photosOnly && settings.mode == ScreensaverConfig.MODE_SPLIT_GLANCE
   // Verification-only generated scenes (see ScreensaverTestSource); decided once per start.
   private var testSourceOn = false
   private val testIndex = java.util.concurrent.atomic.AtomicInteger()
@@ -492,7 +500,9 @@ class PhotoFrameController(
     }
     // Build + drive the overlay from the user's selected face ([FaceCatalog]); faceOverride lets
     // the debug preview harness (and the overnight night clock) render a specific face instead.
-    if (!photosOnly) faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
+    if (!photosOnly && splitGlance && !overnightNightPhoto) startSplitGlance(root)
+    else if (!photosOnly) faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
+    if (overnightNightPhoto) setNightPhoto(true)
     if (!photosOnly) {
       galleryOverlayObserver?.close()
       galleryOverlayObserver = GalleryOverlayLayoutObserver(root, ::refreshGalleryOverlays).also {
@@ -535,7 +545,8 @@ class PhotoFrameController(
     }
 
     // Start the ambient soundscape (no-op when set to Off).
-    if (!photosOnly && settings.soundscape != ScreensaverConfig.SOUND_OFF) updateSoundscape()
+    // The overnight Night photo is a bedside display: never start a soundscape.
+    if (!photosOnly && !overnightNightPhoto && settings.soundscape != ScreensaverConfig.SOUND_OFF) updateSoundscape()
 
     // Optional "wave to advance" — wholly guarded; any failure just disables it so the
     // always-on dream process is never put at risk.
@@ -548,7 +559,8 @@ class PhotoFrameController(
     // it's disabled whenever an engine mode is active — the user never asked for that overlay.
     val engineMode = ScreensaverConfig.usesEngine(settings.mode)
     if (!photosOnly) refreshWeather.run()
-    if (!photosOnly && settings.ambientDashboard && !engineMode) ui.postDelayed(dashboardCycle, 45_000L)
+    if (!photosOnly && !overnightNightPhoto && !splitGlance && settings.ambientDashboard && !engineMode)
+      ui.postDelayed(dashboardCycle, 45_000L)
 
     if (!photosOnly && showWelcome && settings.welcomeEnabled && !engineMode) showWelcomeOverlay()
     when (source) {
@@ -765,7 +777,7 @@ class PhotoFrameController(
         // aspect ratios (portraits/landscapes/squares/panos) so every mode has material to work with
         // out of the box, before the user configures their own photo source. Otherwise, classic feed.
         if (ScreensaverConfig.usesEngine(settings.mode)) {
-          startEngine(defaultFeedUrls())
+          if (testSourceOn) startEngineOnTestScenes() else startEngine(defaultFeedUrls())
         } else startWeb()
       }
     }
@@ -1326,6 +1338,11 @@ class PhotoFrameController(
 
   private fun setAmbientNight(value: Boolean) {
     if (stopped || ambientNight == value) return
+    if (settings.nightClockTone == ScreensaverConfig.NIGHT_TONE_PHOTO && nativePhotoMode) {
+      ambientNight = value
+      setNightPhoto(value)
+      return
+    }
     revealClockRefresh.reset()
     ambientNight = value
     val root = view as FrameLayout
@@ -1448,6 +1465,8 @@ class PhotoFrameController(
   @androidx.annotation.MainThread
   fun stop() {
     stopped = true
+    splitPanel?.stop()
+    nightPhotoOverlay?.setActive(false)
     if (sourceDiscoveryDelegate.isInitialized()) sourceDiscovery.close()
     revealClockRefresh.reset()
     nightTransition.close()
@@ -1544,6 +1563,9 @@ class PhotoFrameController(
       visibility = View.GONE
       onPresented = {
         finishNativeStartup()
+        // Split glance's wordmark follows the photo's accent with the dissolve.
+        splitPanel?.setAccent(HearthReadability.accent(currentPhoto?.look?.analysis?.dominant, false),
+            SlideshowStage.SPLIT_DISSOLVE_MS)
         // Finite native scene admission, only while a bounded capture owns a listener.
         val style = when (settings.mode) {
           ScreensaverConfig.MODE_GALLERY_PRINT -> SlideshowStyle.GALLERY_PRINT
@@ -1669,6 +1691,17 @@ class PhotoFrameController(
    *  (no network) — called when a fetch lands and once per minute from [tick]. */
   private fun renderCalendar() {
     if (!this::calendarPanel.isInitialized) return
+    if (splitGlance || nightPhotoOn) {
+      // The new modes own the screen: Split glance shows only the next event in its panel.
+      calendarPanel.visibility = View.GONE
+      val now = System.currentTimeMillis()
+      val events = if (testSourceOn) ScreensaverTestSource.events(now)
+          else if (settings.usesCalendar) calendarEvents else emptyList()
+      val next = SplitGlancePanel.nextEvent(events, now)
+      val pattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm a"
+      splitPanel?.setNext(next?.title, next?.let { SimpleDateFormat(pattern, Locale.getDefault()).format(Date(it.startMillis)) })
+      return
+    }
     if (!settings.usesCalendar && !testSourceOn) {
       calendarPanel.visibility = View.GONE
       return
@@ -1988,6 +2021,8 @@ class PhotoFrameController(
       object : Runnable {
         override fun run() {
           if (!settings.ambientDashboard) return
+          // Never pop the bright dashboard over the dark-room Night photo.
+          if (nightPhotoOn) { ui.postDelayed(this, 90_000L); return }
           showDashboard()
           ui.postDelayed({ hideDashboard() }, 9_000L)
           ui.postDelayed(this, 90_000L) // reappear roughly every 90s
@@ -2071,7 +2106,73 @@ class PhotoFrameController(
     return t
   }
 
-  private fun intervalMs(): Long = settings.intervalSec * 1000L
+  private fun intervalMs(): Long = (settings.intervalSec * 1000L).let {
+    if (nightPhotoOn) NightPhotoOverlay.intervalMs(it) else it
+  }
+
+  /** Split glance: the clock panel replaces the face overlay; the calendar feeds "Next". */
+  private fun startSplitGlance(root: FrameLayout) {
+    faceRendererDelegate.value.view.visibility = View.GONE
+    if (this::calendarPanel.isInitialized) calendarPanel.visibility = View.GONE
+    val panel = splitPanel ?: SplitGlancePanel(context).also { splitPanel = it }
+    if (panel.view.parent == null) root.addView(panel.view, FrameLayout.LayoutParams(WRAP, WRAP))
+    panel.setOrbitEnabled(settings.antiBurnIn)
+    placeSplitPanel(root.width, root.height)
+    root.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ -> v.post { placeSplitPanel(v.width, v.height) } }
+    panel.start()
+    refreshSplitWeather()
+  }
+
+  private fun placeSplitPanel(width: Int, height: Int) {
+    val panel = splitPanel ?: return
+    val w = if (width > 0) width else context.resources.displayMetrics.widthPixels
+    val h = if (height > 0) height else context.resources.displayMetrics.heightPixels
+    val area = SplitGlancePanel.layout(w, h, context.resources.displayMetrics.density).second
+    val lp = (panel.view.layoutParams as? FrameLayout.LayoutParams) ?: FrameLayout.LayoutParams(WRAP, WRAP)
+    if (lp.width == area.width && lp.height == area.height && lp.leftMargin == area.left && lp.topMargin == area.top) return
+    lp.width = area.width; lp.height = area.height; lp.leftMargin = area.left; lp.topMargin = area.top
+    lp.gravity = Gravity.TOP or Gravity.START
+    panel.view.layoutParams = lp
+    panel.setCentered(h > w)
+  }
+
+  private fun refreshSplitWeather() {
+    if (stopped || splitPanel == null) return
+    metaIo.execute {
+      val text = runCatching { Weather.fetch(context) }.getOrDefault("")
+      ui.post { if (!stopped) splitPanel?.setWeather(text) }
+    }
+    ui.postDelayed(::refreshSplitWeather, weatherRefreshMs)
+  }
+
+  /**
+   * Night photo: photos keep showing, warm and dim, under a vignette with a small amber clock.
+   * Used for the dark-room clock and the overnight clock when the night colour is "photo".
+   */
+  private fun setNightPhoto(value: Boolean) {
+    if (nightPhotoOn == value) return
+    nightPhotoOn = value
+    val root = view as FrameLayout
+    if (value && nightPhotoOverlay == null) nightPhotoOverlay = NightPhotoOverlay(context).also {
+      root.addView(it, FrameLayout.LayoutParams(MATCH, MATCH))
+    }
+    nightPhotoOverlay?.let { overlay ->
+      overlay.bringToFront()
+      overlay.setActive(value && hostVisible)
+      overlay.animate().cancel()
+      if (value) {
+        overlay.visibility = View.VISIBLE
+        overlay.alpha = 0f
+        overlay.animate().alpha(1f).setDuration(SlideshowStage.NIGHT_DISSOLVE_MS).start()
+      } else overlay.visibility = View.GONE
+    }
+    val day = if (value) View.GONE else View.VISIBLE
+    if (faceRendererDelegate.isInitialized() && !splitGlance) faceRenderer.view.visibility = day
+    splitPanel?.view?.visibility = day
+    if (!value) renderCalendar() else if (this::calendarPanel.isInitialized) calendarPanel.visibility = View.GONE
+    onNightClockChanged?.invoke(value)
+    Log.i("ImmortalNight", if (value) "night photo: warm dim photos" else "night photo: day frame restored")
+  }
   private fun isGalleryStyle(): Boolean =
       settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT ||
           settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD
@@ -2199,7 +2300,13 @@ class PhotoFrameController(
         intervalMs(), measuredNativeOcclusions(),
         galleryPrint = settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT,
         gallerySpread = settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD,
-        automatic = automatic)
+        automatic = automatic,
+        feature = when {
+          nightPhotoOn -> SlideshowStage.Feature.NIGHT_PHOTO
+          splitGlance -> SlideshowStage.Feature.SPLIT
+          else -> SlideshowStage.Feature.NONE
+        },
+        keepPeople = analyzePeople())
     viewerControls.photoChanged()
     Log.i("ImmortalSlideshow", "ready native scene: photos=${photos.size}, pixels=${photos.sumOf { it.bitmap.width.toLong() * it.bitmap.height }}")
   }
@@ -3015,6 +3122,25 @@ class PhotoFrameController(
     val bitmap = ScreensaverTestSource.photo(index, photoDecodeEdge)
     testScenes[bitmap] = ScreensaverTestSource.scene(index)
     return bitmap
+  }
+
+  /** WebView styles read URLs: write the generated scenes to app cache and hand over file URLs. */
+  private fun startEngineOnTestScenes() {
+    io.execute {
+      val dir = java.io.File(context.cacheDir, "ss_test_scenes").apply { mkdirs() }
+      val dims = HashMap<String, Pair<Int, Int>>()
+      val urls = (0 until ScreensaverTestSource.scenes.size * 2).mapNotNull { i ->
+        val file = java.io.File(dir, "scene_$i.jpg")
+        runCatching {
+          val bitmap = ScreensaverTestSource.photo(i, 1600)
+          dims["file://" + file.path] = bitmap.width to bitmap.height
+          file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
+          bitmap.recycle()
+          "file://" + file.path
+        }.onFailure { Log.w(TAG, "test scene write failed", it) }.getOrNull()
+      }
+      ui.post { if (!stopped) startEngine(urls, dims = dims) }
+    }
   }
 
   private fun publishTestCaption(photo: SlideshowPhoto) {

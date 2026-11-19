@@ -73,13 +73,14 @@ object PremiumFraming {
       imageWidth: Int, imageHeight: Int, viewportWidth: Int, viewportHeight: Int,
       regions: List<Region>?, keepPeople: Boolean, fill: Boolean, motion: Boolean,
       focus: Focus?, target: Target = Target.DEFAULT, reverse: Boolean = false,
+      mismatchLimit: Double = MISMATCH,
   ): Frame {
     if (imageWidth <= 0 || imageHeight <= 0 || viewportWidth <= 0 || viewportHeight <= 0) {
       val empty = Transform(0f, 0f, 0f)
       return Frame(Motion(empty, empty, true), true)
     }
     val contained = contained(imageWidth, imageHeight, viewportWidth, viewportHeight, motion, reverse)
-    if (!fill || mismatch(imageWidth, imageHeight, viewportWidth, viewportHeight) > MISMATCH) return contained
+    if (!fill || mismatch(imageWidth, imageHeight, viewportWidth, viewportHeight) > mismatchLimit) return contained
     val faces = if (keepPeople) regions.orEmpty() else emptyList()
     val safe = SafeBox.of(faces, imageWidth, imageHeight) ?: return contained
     // Known faces outrank a saliency estimate; with neither the crop stays centred.

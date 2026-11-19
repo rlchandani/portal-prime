@@ -72,7 +72,7 @@ class SettingsDomainTest {
     val values = (0 until options.length()).map { options.getJSONObject(it).getString("value") }
     assertEquals(listOf("smartFrame", "portraitPair", "wholePhoto"), values.take(3))
     assertEquals(
-        setOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "gallerySpread", "classic", "shuffle", "kenBurns",
+        setOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "gallerySpread", "splitGlance", "classic", "shuffle", "kenBurns",
             "diptych", "framed", "galleryWall", "push", "memories", "panorama", "polaroid",
             "mosaic", "filmstrip", "cinema", "heroSidebar"),
         values.toSet())
@@ -141,7 +141,7 @@ class SettingsDomainTest {
     var values = domain.flatJson(ScreensaverConfig.load(prefs.context))
     assertFalse(values.getBoolean("photo_motion"))
     assertFalse(values.getBoolean("keep_people_in_frame"))
-    val modes = listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "gallerySpread", "classic", "shuffle", "kenBurns",
+    val modes = listOf("smartFrame", "portraitPair", "wholePhoto", "galleryPrint", "gallerySpread", "splitGlance", "classic", "shuffle", "kenBurns",
         "diptych", "framed", "galleryWall", "push", "memories", "panorama", "polaroid",
         "mosaic", "filmstrip", "cinema", "heroSidebar")
     modes.forEach { mode ->

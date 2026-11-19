@@ -14,7 +14,9 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
@@ -38,9 +40,21 @@ internal class SlideshowStage(
       val photos: List<SlideshowPhoto>, val fill: Boolean, val motion: Boolean, val dwell: Long,
       val occupied: List<Rect>, val galleryPrint: Boolean, val gallerySpread: Boolean,
       val editing: Boolean = false, val automatic: Boolean = true,
+      val feature: Feature = Feature.NONE, val keepPeople: Boolean = false,
   ) {
     val galleryStyle: Boolean get() = galleryPrint || gallerySpread
+    /** A new-mode scene: one unedited photo without a saved crop. */
+    val featureScene: Boolean
+      get() = feature != Feature.NONE && !editing && photos.size == 1 && photos[0].adjustment == null
+    val dissolveMs: Long get() = when (feature) {
+      Feature.SPLIT -> SPLIT_DISSOLVE_MS
+      Feature.NIGHT_PHOTO -> NIGHT_DISSOLVE_MS
+      Feature.NONE -> DISSOLVE_MS
+    }
   }
+
+  /** The new photo modes; [NONE] is every existing style, drawn exactly as before. */
+  enum class Feature { NONE, SPLIT, NIGHT_PHOTO }
   private val layers = arrayOf(Composition(context, budget, "stage0"), Composition(context, budget, "stage1"))
   private var current = 0
   private var fade: ObjectAnimator? = null
@@ -71,6 +85,7 @@ internal class SlideshowStage(
       photos: List<SlideshowPhoto>, fill: Boolean, motion: Boolean, dwell: Long,
       occupied: List<Rect> = emptyList(), galleryPrint: Boolean = false,
       gallerySpread: Boolean = false, automatic: Boolean = true,
+      feature: Feature = Feature.NONE, keepPeople: Boolean = false,
   ) {
     if (photos.isEmpty() || photos.any { it.bitmap.isRecycled }) return
     // Retain one extra obstacle as an overflow sentinel; gallery styles then take their
@@ -79,7 +94,8 @@ internal class SlideshowStage(
     val measured = if (gallery) galleryOcclusions(occupied) else occupied.map(::Rect)
     val presentation = Presentation(photos.take(if (galleryPrint) 1 else 2),
         fill && !gallery, motion && !gallery, dwell, measured, galleryPrint,
-        gallerySpread && !galleryPrint, automatic = automatic)
+        gallerySpread && !galleryPrint, automatic = automatic,
+        feature = if (gallery) Feature.NONE else feature, keepPeople = keepPeople)
     if (width <= 0 || height <= 0) {
       pending = presentation
       own("pending", presentation)
@@ -144,8 +160,12 @@ internal class SlideshowStage(
     // Keep the outgoing scene opaque. Fading both layers simultaneously introduces a
     // dark dip because the incoming alpha also reveals the matte beneath the outgoing.
     fade = ObjectAnimator.ofFloat(layer, View.ALPHA, 0f, 1f).apply {
-      duration = DISSOLVE_MS
-      interpolator = LinearInterpolator()
+      duration = presentation.dissolveMs
+      interpolator = when (presentation.feature) {
+        Feature.SPLIT -> HearthEasing.SOFT
+        Feature.NIGHT_PHOTO -> SINE
+        Feature.NONE -> LinearInterpolator()
+      }
       addListener(object : AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: Animator) {
           if (ticket != revision) return
@@ -274,6 +294,8 @@ internal class SlideshowStage(
     private var displayed: Presentation? = null
     private val matte = NativePhotoMatte(MATTE, resources.displayMetrics.density)
     private val printMatte = NativePhotoMatte(PRINT_MATTE, resources.displayMetrics.density)
+    /** Easing of a new-mode settle; null for classic linear motion. */
+    private var featureEasing: android.animation.TimeInterpolator? = null
     init { background = matte; clipChildren = true }
 
     fun display(p: Presentation, width: Int, height: Int) {
@@ -284,6 +306,7 @@ internal class SlideshowStage(
       budget.setOwner(owner, p.photos.map {
         SlideshowPixelBudget.Entry(it.bitmap, it.bitmap.allocationByteCount.toLong())
       })
+      if (p.featureScene && displayFeature(p, p.photos[0], width, height)) return
       background = if (p.galleryStyle) printMatte else matte
       visibility = View.VISIBLE
       val gallery = galleryPlans(p, width, height)
@@ -371,6 +394,74 @@ internal class SlideshowStage(
           })
         }
       }
+    }
+
+    /**
+     * Split glance: a rounded photo card with a settle motion over the photo's dim blurred
+     * backdrop. Night photo: the photo full-bleed under a warm multiply with a slow settle. False
+     * without a look, so the classic presentation is used instead.
+     */
+    private fun displayFeature(p: Presentation, photo: SlideshowPhoto, width: Int, height: Int): Boolean {
+      val look = photo.look ?: return false
+      val density = resources.displayMetrics.density
+      val split = p.feature == Feature.SPLIT
+      val box = (if (split) SplitGlancePanel.layout(width, height, density).first
+          else SplitGlancePanel.Box(0, 0, width, height)).let { Rect(it.left, it.top, it.right, it.bottom) }
+      val bw = photo.bitmap.width
+      val bh = photo.bitmap.height
+      val plan = PremiumFraming.plan(bw, bh, box.width(), box.height(), photo.regions, p.keepPeople,
+          fill = true, motion = p.motion, focus = look.analysis.focus,
+          target = PremiumFraming.Target(.5f, .45f), reverse = (featureParity++ and 1) == 1,
+          mismatchLimit = Double.MAX_VALUE)
+      visibility = View.VISIBLE
+      if (split) {
+        background = null
+        val radius = SPLIT_CORNER_DP * density
+        addView(PhotoBackdropView(context).also {
+          it.show(look.backdrop, floatArrayOf(box.left + radius, box.top + radius, box.right - radius,
+              box.bottom - radius), 0f, 0f, SPLIT_BACKDROP)
+        }, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+      } else background = ColorDrawable(Color.BLACK)
+      val holder = FrameLayout(context).apply {
+        clipChildren = true
+        if (split) {
+          clipToOutline = true
+          outlineProvider = object : android.view.ViewOutlineProvider() {
+            override fun getOutline(v: View, outline: android.graphics.Outline) =
+                outline.setRoundRect(0, 0, v.width, v.height, SPLIT_CORNER_DP * density)
+          }
+          elevation = 20f * density
+          setBackgroundColor(Color.BLACK)
+        }
+      }
+      addView(holder, LayoutParams(box.width(), box.height()).apply { leftMargin = box.left; topMargin = box.top })
+      val image = NativePhotoView(context).apply {
+        scaleType = ImageView.ScaleType.FIT_XY
+        setImageBitmap(photo.bitmap)
+        pivotX = 0f; pivotY = 0f
+        if (!split) colorFilter = ColorMatrixColorFilter(NightPhotoOverlay.warmFilter())
+      }
+      holder.addView(image, LayoutParams(bw, bh))
+      val start = plan.motion.start
+      image.scaleX = start.scale; image.scaleY = start.scale
+      image.translationX = start.x; image.translationY = start.y
+      paths[0] = plan.motion
+      featureEasing = if (split) HearthEasing.DRIFT else SINE
+      if (plan.motion.start != plan.motion.end && animationsAllowed()) {
+        val end = plan.motion.end
+        movePhotos.add(0)
+        moves.add(AnimatorSet().apply {
+          playTogether(
+              ObjectAnimator.ofFloat(image, View.SCALE_X, start.scale, end.scale),
+              ObjectAnimator.ofFloat(image, View.SCALE_Y, start.scale, end.scale),
+              ObjectAnimator.ofFloat(image, View.TRANSLATION_X, start.x, end.x),
+              ObjectAnimator.ofFloat(image, View.TRANSLATION_Y, start.y, end.y))
+          duration = motionDuration(p)
+          interpolator = featureEasing
+          start()
+        })
+      }
+      return true
     }
 
     /** Reuses only bitmap dimensions and views; no composite images or extra pixel owners. */
@@ -493,7 +584,7 @@ internal class SlideshowStage(
 
     private fun restoreMotionTimes(times: Map<Int, Long>, fromPhoto: Int = 0) {
       if (android.os.Build.VERSION.SDK_INT < 26) return
-      val duration = (displayed?.dwell ?: return) + DISSOLVE_MS
+      val duration = motionDuration(displayed ?: return)
       rememberedTimes.clear()
       times.filterKeys { it in fromPhoto until childCount }.forEach { (index, time) ->
         rememberedTimes[index] = time.coerceIn(0L, duration)
@@ -507,7 +598,8 @@ internal class SlideshowStage(
         val image = pictures.getOrNull(index) ?: return@forEach
         // API 26-28 queue a started set's seek while paused. Apply the new geometry now,
         // and leave its queued seek to continue from the same phase when resumed.
-        val transform = path.at(time.toFloat() / duration)
+        val linear = time.toFloat() / duration
+        val transform = path.at(featureEasing?.getInterpolation(linear) ?: linear)
         image.scaleX = transform.scale; image.scaleY = transform.scale
         image.translationX = transform.x; image.translationY = transform.y
       }
@@ -537,6 +629,7 @@ internal class SlideshowStage(
     }
     fun clear(releasePixels: Boolean = true) {
       displayed = null
+      featureEasing = null
       moves.forEach { it.cancel() }
       moves.clear()
       movePhotos.clear()
@@ -566,6 +659,24 @@ internal class SlideshowStage(
   }
 
   companion object {
+    const val SPLIT_DISSOLVE_MS = 1800L
+    const val NIGHT_DISSOLVE_MS = 4000L
+    /** New-mode settles finish well before the next photo, then hold still (no idle frames). */
+    const val SPLIT_SETTLE_MS = 9000L
+    const val NIGHT_SETTLE_MS = 14000L
+    private const val SPLIT_CORNER_DP = 30f
+    /** Split glance backdrop is dimmer than the ambient fill (mock .38). */
+    private const val SPLIT_BACKDROP = .38f
+    private var featureParity = 0
+    /** CSS sine ease-in-out, the mock's night dissolve and drift. */
+    private val SINE = android.animation.TimeInterpolator { t -> (-(Math.cos(Math.PI * t) - 1) / 2).toFloat() }
+
+    private fun motionDuration(p: Presentation): Long = when {
+      !p.featureScene -> p.dwell + DISSOLVE_MS
+      p.feature == Feature.SPLIT -> minOf(SPLIT_SETTLE_MS, p.dwell + p.dissolveMs)
+      else -> minOf(NIGHT_SETTLE_MS, p.dwell + p.dissolveMs)
+    }
+
     private fun animationsAllowed(): Boolean =
         android.os.Build.VERSION.SDK_INT < 26 || android.animation.ValueAnimator.areAnimatorsEnabled()
     val MATTE: Int = Color.rgb(20, 22, 27)

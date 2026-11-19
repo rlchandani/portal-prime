@@ -44,7 +44,8 @@ internal object SlideshowPreview {
 
     private val SHUFFLE = listOf(SlideLayout.FILL, SlideLayout.PAIR, SlideLayout.PRINT)
     private val PAIRED = setOf(ScreensaverConfig.MODE_PORTRAITS, ScreensaverConfig.MODE_GALLERY_SPREAD, "diptych", "mosaic")
-    private val PRINTED = setOf(ScreensaverConfig.MODE_GALLERY_PRINT, "framed", "polaroid", "galleryWall")
+    private val PRINTED = setOf(ScreensaverConfig.MODE_GALLERY_PRINT, ScreensaverConfig.MODE_SPLIT_GLANCE,
+        "framed", "polaroid", "galleryWall")
     private val PUSHED = setOf("push", "filmstrip")
 
     fun layoutFor(mode: String, fit: String): SlideLayout = when {

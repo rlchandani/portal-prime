@@ -82,9 +82,12 @@ class PhotoFramePreviewActivity : ComponentActivity() {
 
     val construction = FramePerformanceCapture.beginSlideshowWork(SlideshowWorkStage.CONTROLLER_CONSTRUCTION)
     try {
+      // The "Night photo" colour keeps dim warm photos up overnight instead of a clock on black.
+      val nightPhoto = nightClock &&
+          ScreensaverConfig.load(this).nightClockTone == ScreensaverConfig.NIGHT_TONE_PHOTO
       frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
           interactivePreview = !intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock,
-          nightClockOnly = nightClock)
+          nightClockOnly = nightClock && !nightPhoto, overnightNightPhoto = nightPhoto)
     } finally { construction?.finish() }
     // Only the screensaver-continuation launch (DreamPolicy's force-wake handoff) honours the
     // "open when dismissed" choice — to the user that frame IS the screensaver, so a tap must
