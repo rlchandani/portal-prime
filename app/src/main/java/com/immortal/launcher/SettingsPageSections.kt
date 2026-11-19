@@ -147,6 +147,7 @@ internal object SettingsPageSections {
             section("Calls", rows("calling", "whoCanCall", "quality")),
             section("Groups", rows("calling", "groupsOn"),
                 footer = "Anyone in a call can add someone. Everyone added gets keys for that call only."),
+            section("Messages", rows("calling", "messagesOn"), block(B.CALL_MESSAGES), footer = CallMessageCopy.FOOTER),
             section("Ringtone", block(B.CALL_RINGTONES)),
             section("Ring volume", rows("calling", "ringVolume")),
             section("Quiet hours", rows("calling", "quietMode"),

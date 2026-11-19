@@ -471,6 +471,13 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
             android:theme="@style/Theme.SampleApp" />
         <activity
+            android:name=".CallMessageActivity"
+            android:exported="false"
+            android:label="Video message"
+            android:excludeFromRecents="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
+            android:theme="@style/Theme.SampleApp" />
+        <activity
             android:name=".CallActivity"
             android:exported="false"
             android:label="Call"

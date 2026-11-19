@@ -64,6 +64,8 @@ internal fun CallEndedScreen(ended: EndedCall, motion: Boolean, onCallBack: (Cal
           copy.retry -> CallPill(if (ended.connectedMs != null || ended.direction == CallDirection.INCOMING) "Call back" else "Try again",
               { onCallBack(CallKind.CALL) }, icon = "phone", style = CallButtonStyle.OK, size = CallButtonSize.LG)
         }
+        if (canLeaveMessage(ended)) CallPill(CallMessageCopy.LEAVE, { leaveMessage(context, ended, onDone) }, icon = "msg",
+            style = CallButtonStyle.GLASS, size = CallButtonSize.LG)
         CallPill(if (copy.retry || ended.reason == CallEndReason.DROP_INS_OFF) "Close" else "Done", onDone,
             style = CallButtonStyle.GLASS, size = CallButtonSize.LG)
       }
@@ -89,11 +91,29 @@ private fun androidx.compose.foundation.layout.BoxScope.EndedCompact(ended: Ende
         copy.retry -> CallPill(if (ended.connectedMs != null || ended.direction == CallDirection.INCOMING) "Call back" else "Try again",
             { onCallBack(CallKind.CALL) }, icon = "phone", style = CallButtonStyle.OK)
       }
+      if (canLeaveMessage(ended)) {
+        val context = LocalContext.current
+        CallPill(if (layout.compactPortrait) "Message" else CallMessageCopy.LEAVE, { leaveMessage(context, ended, onDone) }, icon = "msg",
+            style = CallButtonStyle.GLASS)
+      }
       CallPill(if (copy.retry || ended.reason == CallEndReason.DROP_INS_OFF) "Close" else "Done", onDone, style = CallButtonStyle.GLASS)
     }
     if (normal) Text("Closing in 5 s", color = Color.White.copy(alpha = 0.5f), fontSize = 22.sp)
   }
 }
+
+/** Mock `noanswerScr` / `callQuietScr`: an outgoing call to a Portal that nobody took can leave a video message. */
+internal fun canLeaveMessage(ended: EndedCall): Boolean =
+    ended.direction == CallDirection.OUTGOING && ended.kind == CallKind.CALL && ended.reason in MESSAGE_REASONS &&
+        CallMessages.canSend(ended.peer)
+
+private fun leaveMessage(context: android.content.Context, ended: EndedCall, onDone: () -> Unit) {
+  onDone()
+  CallMessages.compose(context, ended.peer)
+}
+
+private val MESSAGE_REASONS = setOf(CallEndReason.NO_ANSWER, CallEndReason.DECLINED, CallEndReason.QUIET, CallEndReason.BUSY,
+    CallEndReason.MISSED)
 
 /** Volume popover above the controls: slider, Quieter / Louder (±10 %), the echo note. */
 @Composable

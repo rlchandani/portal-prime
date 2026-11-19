@@ -54,6 +54,8 @@ internal object CallingSettings {
                   help = "Off until you turn it on. Rooms then ask first unless you choose Chime, join below."),
               BoolSpec("groupsOn", "Group calls", get = { it.groupsOn }, set = CallingConfig::setGroupsOn,
                   help = "Up to 4 people. With 3 or more, each picture is sent at 360p to keep the Portal cool."),
+              BoolSpec("messagesOn", "Video messages to this Portal", get = { it.messagesOn }, set = CallingConfig::setMessagesOn,
+                  help = "When nobody answers, a room can leave a message of up to 2 minutes. Kept encrypted here for 30 days."),
               BoolSpec("phonesOn", "Phones can call this Portal", get = { it.phonesOn }, set = CallingConfig::setPhonesOn,
                   help = "Paired phones with Portal Toolkit, on the home Wi-Fi. Phones call, they never drop in."),
               StringSpec("dropInRooms", "Drop-ins room by room", get = { it.dropInRooms }, set = CallingConfig::setDropInRooms,
