@@ -2242,6 +2242,18 @@ class PhotoFrameController(
     })
   }
 
+  /** Make decode room for a fresh photo: keep only the one on screen (see [NativeHistoryTrim]). */
+  private fun trimNativeHistoryForFreshLoad() {
+    val kept = NativeHistoryTrim.forFreshLoad(nativeHistory, index)
+    if (kept.size == nativeHistory.size) return
+    nativeHistory.clear()
+    nativeHistory.addAll(kept)
+    index = nativeHistory.lastIndex
+    pixelBudget.setOwner("history", nativeHistory.map {
+      SlideshowPixelBudget.Entry(it.bitmap, it.bitmap.allocationByteCount.toLong())
+    })
+  }
+
   private fun clearNativeHistory() {
     nativeHistory.clear()
     pixelBudget.setOwner("history", emptyList())
@@ -3073,6 +3085,7 @@ class PhotoFrameController(
   private fun loadFresh(automatic: Boolean = true) {
     if (ScreensaverConfig.isNativeStage(settings.mode)) {
       val g = ++gen
+      trimNativeHistoryForFreshLoad()
       photoPause.requested(automatic)
       nativeLoader.load(SlideshowAsset("feed", { fetchWebPhoto() }, contentIdentity = true,
               identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } }),
