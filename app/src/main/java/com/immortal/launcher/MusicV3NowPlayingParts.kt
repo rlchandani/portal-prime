@@ -6,6 +6,10 @@
  */
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.LocalJarvisPulse
+import com.immortal.launcher.jarvis.ScreenContext
+import com.immortal.launcher.jarvis.jarvisPulse
+
 import android.os.SystemClock
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -140,8 +144,8 @@ internal fun MusicV3Transport(model: MusicV3NowPlaying, queue: YtQueue, enabled:
   val dims = LocalMusicStageDims.current
   val ink = LocalMusicStageInk.current
   val alpha = if (enabled) 1f else DISABLED_ALPHA
-  Row(Modifier.fillMaxWidth().alpha(alpha), verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween) {
+  Row(Modifier.fillMaxWidth().jarvisPulse(LocalJarvisPulse.current == ScreenContext.MUSIC_CONTROLS).alpha(alpha),
+      verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
     val shuffled = queue.isShuffled
     SideToggle(if (shuffled) "Shuffle, on" else "Shuffle", MusicV3Glyph.SHUFFLE, shuffled, enabled) {
       YouTubeMusicEngine.setShuffle(!shuffled)

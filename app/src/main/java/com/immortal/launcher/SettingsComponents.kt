@@ -145,12 +145,12 @@ internal fun SectionLabel(text: String) {
  * the iOS grouped-table-view card style with horizontal 16dp margin applied by the caller.
  */
 @Composable
-internal fun Card(content: @Composable () -> Unit) {
+internal fun Card(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Surface(
         color = IosCard,
         shape = RoundedCornerShape(Sizes.cardRadius),
         border = BorderStroke(ApprovedOutlineWidth, LocalApprovedPalette.current.outline),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Column { content() }
     }

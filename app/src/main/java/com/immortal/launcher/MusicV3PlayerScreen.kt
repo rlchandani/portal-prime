@@ -6,6 +6,13 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.CompositionLocalProvider
+import com.immortal.launcher.jarvis.HearthpaneScreens
+import com.immortal.launcher.jarvis.LocalJarvisPulse
+import com.immortal.launcher.jarvis.ScreenContext
+import com.immortal.launcher.jarvis.jarvisPulse
+import com.immortal.launcher.jarvis.rememberJarvisTarget
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -87,6 +94,8 @@ internal fun MusicV3PlayerLayout(host: MusicV3StageHost) {
   LaunchedEffect(sheet.open) { if (!sheet.open) { focusManager.clearFocus(); keyboard?.hide() } }
   BackHandler(enabled = sheet.popover != MusicPopover.NONE || sheet.open) { MusicSheetMachine.back(sheet)?.let { sheet = it } }
   BackHandler(enabled = sheet.open && sheet.tab == MusicSheetTab.LIBRARY && nav.inDetail) { nav = nav.back() }
+  // Jarvis pointing at the play controls or the queue strip (`hearthpane.highlight`).
+  val jarvisTarget = rememberJarvisTarget(HearthpaneScreens.MUSIC)
   val wash = remember { MusicWashClock() }
   val minute = rememberMinuteClock()
   val quiet = rememberQuietNote(minute)
@@ -109,6 +118,7 @@ internal fun MusicV3PlayerLayout(host: MusicV3StageHost) {
     }
     val handed = move is MusicMoveState.Handed
     MusicStageTheme(ink, MusicStageDims.of(layout.spec)) {
+      CompositionLocalProvider(LocalJarvisPulse provides jarvisTarget) {
       Box(Modifier.fillMaxSize().onGloballyPositioned { stage = it }.nestedScroll(wash.connection)) {
         MusicStageBackdrop(ink, reduced, wash)
         ClosedLayer(layout, motion, closedActive) {
@@ -131,7 +141,8 @@ internal fun MusicV3PlayerLayout(host: MusicV3StageHost) {
           }
         }
         StripLayer(layout, motion, closedActive, settle, onClose = { sheet = MusicSheetMachine.close(sheet) }) {
-          MusicV3Strip(now, MusicV3StripInputs(moveControls, follow, sheet.searchFocused, onResume = latestResume(actions)))
+          MusicV3Strip(now, MusicV3StripInputs(moveControls, follow, sheet.searchFocused, onResume = latestResume(actions)),
+              Modifier.jarvisPulse(jarvisTarget == ScreenContext.MUSIC_QUEUE))
         }
         MusicV3Sheet(layout, motion, sheet, MusicV3SheetInputs(now.idle, now.next, peekActive, tabsActive,
             onOpen = { sheet = MusicSheetMachine.open(sheet) }, onClose = { sheet = MusicSheetMachine.close(sheet) },
@@ -160,6 +171,7 @@ internal fun MusicV3PlayerLayout(host: MusicV3StageHost) {
         MusicV3PlayerSlot(layout, motion, shown, placeholder)
         toasts.Host(layout.toast(sheet.open, sheet.searchFocused), bottom = sheet.open && !sheet.searchFocused,
             end = sheet.open && sheet.searchFocused)
+      }
       }
     }
   }

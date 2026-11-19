@@ -13,6 +13,10 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Bundle
 import android.util.Log
+import com.immortal.launcher.Calling
+import com.immortal.launcher.DoorbellCardOverlay
+import com.immortal.launcher.jarvis.wake.HearthpaneWake
+import org.json.JSONObject
 
 /**
  * Jarvis's tool provider in Hearthpane (Jarvis's `ToolContract`: discovered by manifest meta-data, invoked with
@@ -29,13 +33,28 @@ class HearthpaneToolProvider : ContentProvider() {
   override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
     val ctx = context ?: return null
     val uidPackages = ctx.packageManager.getPackagesForUid(Binder.getCallingUid())?.toList().orEmpty()
-    if (method != METHOD_INVOKE || !allowedCaller(uidPackages)) {
+    if (method !in METHODS || !allowedCaller(uidPackages)) {
       Log.w(TAG, "refused call $method from $uidPackages")
       return null
     }
+    if (method == JarvisPrivacy.METHOD) return Bundle().apply { putString(EXTRA_RESULT, privacy().toString()) }
     val result = tools.invoke(arg, extras?.getString(EXTRA_ARGS))
     Log.i(TAG, "$arg → ${if (result.has("error")) "error" else "ok"} (${result.toString().length} chars)")
     return Bundle().apply { putString(EXTRA_RESULT, result.toString()) }
+  }
+
+  /** Facts for Jarvis's screenshot guard; never pixels, and nothing the model sees. */
+  private fun privacy(): JSONObject {
+    val facts = JarvisPrivacy.Facts(
+        screen = runCatching { HearthpaneScreens.current()?.id?.invoke() }.getOrNull(),
+        launcherInFront = JarvisPrivacy.launcherStarted(),
+        dreaming = HearthpaneWake.dreaming(),
+        callActive = runCatching { Calling.state.value.busy }.getOrDefault(true),
+        cameraInUse = HearthpaneWake.cameraInUse(),
+        cameraFeedShowing = DoorbellCardOverlay.showing,
+    )
+    Log.i(TAG, "privacy → $facts")
+    return JarvisPrivacy.json(facts)
   }
 
   override fun query(uri: Uri, projection: Array<out String>?, selection: String?, args: Array<out String>?,
@@ -49,6 +68,7 @@ class HearthpaneToolProvider : ContentProvider() {
     private const val TAG = "HearthpaneTools"
     const val JARVIS_PACKAGE = "com.portal.assistant"
     const val METHOD_INVOKE = "invoke"
+    private val METHODS = setOf(METHOD_INVOKE, JarvisPrivacy.METHOD)
     const val EXTRA_ARGS = "com.portal.assistant.tools.extra.ARGS"
     const val EXTRA_RESULT = "com.portal.assistant.tools.extra.RESULT"
 

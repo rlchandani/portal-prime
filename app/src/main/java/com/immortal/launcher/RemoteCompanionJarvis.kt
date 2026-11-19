@@ -32,6 +32,20 @@ internal object RemoteCompanionJarvis {
     return runCatching { result.get(2, TimeUnit.SECONDS) }.getOrNull()
   }
 
+  /**
+   * Keep-warm: ask Jarvis to bring its resident service up if it isn't (Jarvis 2.7+ `warm`; an older Jarvis rejects
+   * it, which is fine). Fire and forget on the IPC thread, never blocking the caller; skipped while another call runs.
+   */
+  fun warm(c: Context) {
+    if (!gate.tryAcquire()) return
+    try {
+      ipc.execute {
+        try { runCatching { c.applicationContext.contentResolver.call(uri, "warm", null, null) } }
+        finally { gate.release() }
+      }
+    } catch (e: Exception) { gate.release() }
+  }
+
   fun status(c: Context): JSONObject {
     val installed = StoreCatalog.isInstalled(c, "com.portal.assistant")
     val bundle = call(c, "status")

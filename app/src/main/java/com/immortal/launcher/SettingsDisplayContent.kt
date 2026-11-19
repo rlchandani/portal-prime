@@ -7,6 +7,10 @@
 
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.LocalJarvisPulse
+import com.immortal.launcher.jarvis.SettingsJarvisPulse
+import com.immortal.launcher.jarvis.jarvisPulse
+
 import androidx.compose.foundation.background
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
@@ -173,9 +177,11 @@ internal fun DisplaySection(parts: Set<DisplayPart>) {
   val volume = display.volume
   val ns = display.nightShift
 
+  // Jarvis pointing at one of these controls rings the card that holds it.
+  val pulse = SettingsJarvisPulse.displayCard(LocalJarvisPulse.current)
   if (DisplayPart.BRIGHTNESS in parts) {
     ApprovedSettingsSectionLabel("Brightness")
-    Card {
+    Card(Modifier.jarvisPulse(pulse == SettingsJarvisPulse.DisplayCard.BRIGHTNESS)) {
       if (!display.canWrite) {
         NavRow(
             title = "Allow brightness control",
@@ -232,7 +238,7 @@ internal fun DisplaySection(parts: Set<DisplayPart>) {
   }
   if (DisplayPart.VOLUME in parts) {
     ApprovedSettingsSectionLabel("Volume")
-    Card {
+    Card(Modifier.jarvisPulse(pulse == SettingsJarvisPulse.DisplayCard.VOLUME)) {
       Row(
           modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = Sizes.rowMinHeight)
               .padding(horizontal = 16.dp, vertical = 10.dp),
@@ -259,7 +265,7 @@ internal fun DisplaySection(parts: Set<DisplayPart>) {
   }
   if (DisplayPart.NIGHT_SHIFT in parts && laterParts) {
     SectionLabel("Night Shift")
-    Card {
+    Card(Modifier.jarvisPulse(pulse == SettingsJarvisPulse.DisplayCard.NIGHT_SHIFT)) {
       ToggleRow(
           title = "Night Shift",
           checked = ns.enabled,

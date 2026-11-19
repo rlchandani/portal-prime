@@ -79,6 +79,21 @@ class ScreenContextTest {
     assertEquals("Song 3", out.getJSONArray("up_next").getJSONObject(0).getString("title"))
   }
 
+  @Test fun musicHandsOutItsControlsAndQueueTargets() {
+    val tracks = (1..3).map { YtQueueEntry(it.toLong(), YtTrack("vid0000000$it", "Song $it", "Band")) }
+    val playing = ScreenContext.music(YtEngineState(queue = YtQueue(tracks, currentIndex = 0)), null)
+    val targets = (0 until playing.getJSONArray("controls").length())
+        .map { playing.getJSONArray("controls").getJSONObject(it).getString("target") }
+    assertEquals(listOf(ScreenContext.MUSIC_CONTROLS, ScreenContext.MUSIC_QUEUE), targets)
+    targets.forEach { assertEquals(HearthpaneScreens.MUSIC, HearthpaneTools.screenOf(it)) }
+  }
+
+  @Test fun idleMusicOffersOnlyTheQueueStrip() {
+    val controls = ScreenContext.music(YtEngineState(), null).getJSONArray("controls")
+    assertEquals(1, controls.length())
+    assertEquals(ScreenContext.MUSIC_QUEUE, controls.getJSONObject(0).getString("target"))
+  }
+
   @Test fun nothingPlayingIsSaid() {
     assertTrue(ScreenContext.music(YtEngineState(), null).isNull("now_playing"))
   }
@@ -104,6 +119,17 @@ class ScreenContextTest {
     val recent = out.getJSONArray("recent").getJSONObject(0)
     assertTrue(recent.getBoolean("missed"))
     assertEquals(5, recent.getInt("minutes_ago"))
+  }
+
+  @Test fun callsRoomsCarryRoomAndVideoCallTargets() {
+    val peers = listOf(CallPeer("p1", "Living Area", seenMs = 0L), CallPeer("p2", "Den", seenMs = 0L, acceptsCalls = false))
+    val rooms = ScreenContext.calls(peers, emptyList(), inCall = false, nowMs = 0L).getJSONArray("rooms")
+    val living = rooms.getJSONObject(0)
+    assertEquals("calls.room.p1", living.getString("target"))
+    assertEquals("calls.video.p1", living.getString("video_call_target"))
+    assertFalse(rooms.getJSONObject(1).has("video_call_target")) // calls off: nothing to point at
+    assertEquals(HearthpaneScreens.CALLS, HearthpaneTools.screenOf("calls.video.p1"))
+    assertEquals(HearthpaneScreens.CALLS, HearthpaneTools.screenOf("calls.room.p1"))
   }
 
   @Test fun homeNeverDescribesPhotos() {

@@ -6,6 +6,10 @@
  */
 package com.immortal.launcher
 
+import androidx.compose.runtime.CompositionLocalProvider
+import com.immortal.launcher.jarvis.LocalJarvisPulse
+import com.immortal.launcher.jarvis.rememberJarvisTarget
+
 import com.immortal.launcher.jarvis.HearthpaneScreens
 import com.immortal.launcher.jarvis.ScreenContext
 import android.content.Context
@@ -130,12 +134,17 @@ private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
     while (true) { Calling.refreshPresence(context); delay(PRESENCE_POLL_MS) }
   }
   LaunchedEffect(tab) { if (tab == CallsTab.RECENT) CallingStore.markSeen(context) }
+  // Jarvis pointing at a room or its Video call button (`hearthpane.highlight`): show the rooms.
+  val jarvisTarget = rememberJarvisTarget(HearthpaneScreens.CALLS)
+  LaunchedEffect(jarvisTarget) { if (jarvisTarget != null) tab = CallsTab.ROOMS }
   Box(Modifier.fillMaxSize().background(p.background)) {
     Column(Modifier.fillMaxSize()) {
       CallsHeader(tab, CallsBadges(CallHistory.unseenMissed(history), CallMessageList.unseen(messages)), onTab = { tab = it },
           onBack = onBack, onLoopback = { loopback = true }, onTestMessage = { testMessage = true })
       when (tab) {
-        CallsTab.ROOMS -> CallsRooms(onEveryone = { everyone = true })
+        CallsTab.ROOMS -> CompositionLocalProvider(LocalJarvisPulse provides jarvisTarget) {
+          CallsRooms(onEveryone = { everyone = true })
+        }
         CallsTab.RECENT -> CallsRecent(history)
         CallsTab.MESSAGES -> CallMessagesTab()
       }

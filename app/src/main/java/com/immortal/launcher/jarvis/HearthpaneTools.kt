@@ -72,6 +72,9 @@ internal class HearthpaneTools(
       target.startsWith(ScreenContext.ROOM_TARGET) || target.startsWith(ScreenContext.ENTITY_TARGET) ->
         HearthpaneScreens.CONTROL_CENTER
       target.startsWith(ScreenContext.SETTINGS_TARGET) -> HearthpaneScreens.SETTINGS
+      target in ScreenContext.MUSIC_TARGETS -> HearthpaneScreens.MUSIC
+      target.startsWith(ScreenContext.CALL_ROOM_TARGET) || target.startsWith(ScreenContext.CALL_VIDEO_TARGET) ->
+        HearthpaneScreens.CALLS
       else -> null
     }
   }

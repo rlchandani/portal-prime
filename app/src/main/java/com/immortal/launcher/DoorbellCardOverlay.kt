@@ -53,7 +53,7 @@ internal object DoorbellCardOverlay {
   private val main = Handler(Looper.getMainLooper())
   private var host: AccessibilityService? = null
   private var wm: WindowManager? = null
-  private var view: View? = null
+  @Volatile private var view: View? = null
   private var feed: HaCameraFeed? = null
   private val timeout = Runnable { remove() }
 
@@ -78,7 +78,9 @@ internal object DoorbellCardOverlay {
     }
     val root = buildRoot(ctx, card, picture, placeholder)
     val lp = WindowManager.LayoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
-        WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
+        WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+        // FLAG_SECURE: the live door camera never shows in a screenshot or screen capture (Jarvis's included).
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_SECURE, PixelFormat.TRANSLUCENT)
     runCatching { wmgr.addView(root, lp); view = root }.onFailure { Log.w(TAG, "addView failed", it); return }
     // Full-screen card: it would cover the YouTube player, so music pauses while it shows.
     YouTubeMusicEngine.setCovered(MusicCover.DOORBELL, true)

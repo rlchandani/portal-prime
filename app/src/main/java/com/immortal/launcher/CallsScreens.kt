@@ -6,6 +6,10 @@
  */
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.LocalJarvisPulse
+import com.immortal.launcher.jarvis.ScreenContext
+import com.immortal.launcher.jarvis.jarvisPulse
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -116,7 +120,8 @@ private fun RoomCardCompact(peer: CallPeer, self: String, now: Long) {
   val presence = CallPolicy.presence(peer, now)
   val drop = CallPolicy.dropInOn(peer, self)
   val calls = peer.acceptsCalls
-  Column(Modifier.callPanel(p.surface, RoundedCornerShape(32.dp), p.outline).padding(28.dp).alpha(if (presence == CallPresence.OFFLINE) 0.72f else 1f),
+  Column(Modifier.jarvisPulse(LocalJarvisPulse.current == ScreenContext.CALL_ROOM_TARGET + peer.id, 32.dp)
+      .callPanel(p.surface, RoundedCornerShape(32.dp), p.outline).padding(28.dp).alpha(if (presence == CallPresence.OFFLINE) 0.72f else 1f),
       verticalArrangement = Arrangement.spacedBy(16.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(22.dp)) {
       CallRoomAvatar(peer.name, 120.dp, presence, ring = p.surface)
@@ -141,7 +146,8 @@ private fun RoomCardCompact(peer: CallPeer, self: String, now: Long) {
       }
     }
     FlowRow(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-      CallPill("Video call", { Calling.dial(context, peer.id, CallKind.CALL, video = true) }, icon = "video",
+      CallPill("Video call", { Calling.dial(context, peer.id, CallKind.CALL, video = true) },
+          Modifier.jarvisPulse(LocalJarvisPulse.current == ScreenContext.CALL_VIDEO_TARGET + peer.id, 48.dp), icon = "video",
           style = CallButtonStyle.OK, enabled = calls, surface = surface, size = CallButtonSize.SM)
       CallPill(when (drop) { DropInPolicy.CHIME -> "Drop in"; DropInPolicy.ASK -> "Ask to join"; DropInPolicy.OFF -> "Not allowed" },
           { Calling.dial(context, peer.id, CallKind.DROP_IN, video = true) }, icon = "door", enabled = calls && drop != DropInPolicy.OFF,
@@ -184,7 +190,8 @@ private fun RoomCard(peer: CallPeer, self: String, now: Long) {
   val presence = CallPolicy.presence(peer, now)
   val drop = CallPolicy.dropInOn(peer, self)
   val calls = peer.acceptsCalls
-  Column(Modifier.callPanel(p.surface, RoundedCornerShape(32.dp), p.outline).padding(36.dp).alpha(if (presence == CallPresence.OFFLINE) 0.72f else 1f),
+  Column(Modifier.jarvisPulse(LocalJarvisPulse.current == ScreenContext.CALL_ROOM_TARGET + peer.id, 32.dp)
+      .callPanel(p.surface, RoundedCornerShape(32.dp), p.outline).padding(36.dp).alpha(if (presence == CallPresence.OFFLINE) 0.72f else 1f),
       verticalArrangement = Arrangement.spacedBy(18.dp)) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(26.dp)) {
       CallRoomAvatar(peer.name, 160.dp, presence, ring = p.surface)
@@ -209,7 +216,8 @@ private fun RoomCard(peer: CallPeer, self: String, now: Long) {
       }
     }
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-      CallPill("Video call", { Calling.dial(context, peer.id, CallKind.CALL, video = true) }, icon = "video",
+      CallPill("Video call", { Calling.dial(context, peer.id, CallKind.CALL, video = true) },
+          Modifier.jarvisPulse(LocalJarvisPulse.current == ScreenContext.CALL_VIDEO_TARGET + peer.id, 48.dp), icon = "video",
           style = CallButtonStyle.OK, enabled = calls, surface = surface)
       CallPill(when (drop) { DropInPolicy.CHIME -> "Drop in"; DropInPolicy.ASK -> "Ask to join"; DropInPolicy.OFF -> "Not allowed" },
           { Calling.dial(context, peer.id, CallKind.DROP_IN, video = true) }, icon = "door", enabled = calls && drop != DropInPolicy.OFF,

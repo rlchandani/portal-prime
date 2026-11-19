@@ -6,6 +6,10 @@
  */
 package com.immortal.launcher
 
+import com.immortal.launcher.jarvis.LocalJarvisPulse
+import com.immortal.launcher.jarvis.SettingsJarvisPulse
+import com.immortal.launcher.jarvis.jarvisPulse
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +22,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -97,8 +102,12 @@ private fun SettingsPageEntryContent(
             val rows = entry.item as SettingsDomainRows
             states[rows.domain]?.let { SettingsDomainRowsCard(rows, it, highlight, entry.first, entry.last) }
         }
-        SettingsEntryKind.BLOCK -> SettingsBlockHighlight(highlighted) {
-            SettingsBlockContent((entry.item as SettingsBlockItem).block)
+        SettingsEntryKind.BLOCK -> {
+            val block = (entry.item as SettingsBlockItem).block
+            // Jarvis pointing at a control this block draws (Night Shift, Touch sounds…) rings the block.
+            Box(Modifier.jarvisPulse(SettingsJarvisPulse.blockPulses(block, LocalJarvisPulse.current))) {
+                SettingsBlockHighlight(highlighted) { SettingsBlockContent(block) }
+            }
         }
         SettingsEntryKind.LINK -> {
             val link = entry.item as SettingsLinkItem
