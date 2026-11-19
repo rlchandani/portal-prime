@@ -409,9 +409,36 @@ class FleetRoutes(private val context: Context) {
           }, 800L)
         }
         resp(200, JSONObject().put("ok", applied).put("action", "screensaver_test_source")
+            .put("digitalClockFace", DigitalClockConfig.faceOf(DigitalClockConfig.load(context)))
             .put("available", ScreensaverTestSource.available())
             .put("active", ScreensaverTestSource.active(context))
             .put("until", ScreensaverTestSource.until(context)))
+      }
+      // Verification only (test-source builds): open the digital clock preview, optionally on a
+      // face {"face":"classic|bold|neon|led|flip|analog"}. The reply carries the exact previous
+      // look; send it back as {"restore":{...},"open":false} afterwards.
+      "digital_clock_preview" -> {
+        if (!ScreensaverTestSource.available()) return resp(400, err("unavailable"))
+        val face = body.optString("face").takeIf { id -> DigitalClockConfig.FACES.any { it.id == id } }
+        val prior = DigitalClockConfig.load(context)
+        val before = JSONObject().put("style", prior.style).put("font", prior.font)
+            .put("color", prior.color).put("glow", prior.glow)
+        body.optJSONObject("restore")?.let { r ->
+          // Write back the exact previous look (it may be a custom combination, not a preset).
+          r.optString("style").takeIf { it.isNotEmpty() }?.let { DigitalClockConfig.setStyle(context, it) }
+          r.optString("font").takeIf { it.isNotEmpty() }?.let { DigitalClockConfig.setFont(context, it) }
+          r.optString("color").takeIf { it.isNotEmpty() }?.let { DigitalClockConfig.setColor(context, it) }
+          r.optString("glow").takeIf { it.isNotEmpty() }?.let { DigitalClockConfig.setGlow(context, it) }
+        }
+        if (face != null) DigitalClockConfig.setFace(context, face)
+        if (body.optBoolean("open", true)) android.os.Handler(android.os.Looper.getMainLooper()).post {
+          runCatching {
+            context.startActivity(android.content.Intent(context, DigitalClockPreviewActivity::class.java)
+                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP))
+          }
+        }
+        resp(200, ok().put("action", "digital_clock_preview").put("previousFace", before)
+            .put("face", DigitalClockConfig.faceOf(DigitalClockConfig.load(context))))
       }
       // Needs the signature/privileged REBOOT permission we don't hold — report honestly.
       "reboot" -> resp(200, JSONObject().put("ok", false).put("action", "reboot").put("result", "not_permitted"))
