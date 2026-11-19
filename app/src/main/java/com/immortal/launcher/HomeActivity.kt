@@ -1452,10 +1452,22 @@ private fun LauncherScreen(
       delay(15_000)
     }
   }
-  BackHandler(enabled = editMode) { editMode = false }
-  BackHandler(enabled = addFlow.draft != null) { addFlow.draft = null }
-  BackHandler(enabled = selectedTab != ApprovedLauncherTab.HOME) { onSelectTab(ApprovedLauncherTab.HOME) }
-  BackHandler(enabled = musicLayout != null) { musicLayout = null }
+  // Always enabled: the launcher root consumes Back (Android 10 would finish it and show Meta's home).
+  // Overlays composed below (widget picker, dialogs) register later and still close first.
+  BackHandler(enabled = true) {
+    when (HomeBackPolicy.resolve(
+        musicOpen = musicLayout != null,
+        onHomeTab = selectedTab == ApprovedLauncherTab.HOME,
+        hasDraft = addFlow.draft != null,
+        editMode = editMode,
+    )) {
+      HomeBackAction.CLOSE_MUSIC -> musicLayout = null
+      HomeBackAction.GO_HOME_TAB -> onSelectTab(ApprovedLauncherTab.HOME)
+      HomeBackAction.CLEAR_DRAFT -> addFlow.draft = null
+      HomeBackAction.EXIT_EDIT -> editMode = false
+      HomeBackAction.CONSUME -> Unit
+    }
+  }
   // Home's Now Playing card hosts the YouTube player once the Music screen closes (no pause).
   val musicCard = rememberMusicHomeCardShown(musicOpen = musicLayout != null, customizing = editMode)
   val toastInsets = rememberMusicToastInsets(musicCard)
