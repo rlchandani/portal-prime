@@ -47,11 +47,11 @@ internal class CallLoopback private constructor(context: Context, onStats: (Stri
   val callee = CallMedia(context, CallQuality.AUTO, events("recv") { recv = it; report(onStats) })
 
   private fun events(tag: String, sink: (CallStats) -> Unit) = object : CallMedia.Events {
-    override fun onConnected() { Log.i(TAG, "$tag connected") }
-    override fun onDisconnected() { Log.i(TAG, "$tag disconnected") }
-    override fun onFailed() { Log.w(TAG, "$tag failed") }
+    override fun onConnected(peer: String) { Log.i(TAG, "$tag connected") }
+    override fun onDisconnected(peer: String) { Log.i(TAG, "$tag disconnected") }
+    override fun onFailed(peer: String) { Log.w(TAG, "$tag failed") }
     override fun onCameraIssue(issue: CameraIssue) { Log.w(TAG, "$tag camera issue $issue") }
-    override fun onStats(stats: CallStats) { main.post { sink(stats) } }
+    override fun onStats(peer: String, stats: CallStats) { main.post { sink(stats) } }
   }
 
   private fun report(onStats: (String) -> Unit) {
@@ -70,9 +70,9 @@ internal class CallLoopback private constructor(context: Context, onStats: (Stri
     callee.mic(false)
     caller.createOffer { offer ->
       if (offer == null) { Log.w(TAG, "no offer"); return@createOffer }
-      callee.answer(offer) { answer ->
+      callee.answer(offerSdp = offer) { answer ->
         if (answer == null) { Log.w(TAG, "no answer"); return@answer }
-        caller.applyAnswer(answer) { ok -> Log.i(TAG, "loopback negotiated=$ok") }
+        caller.applyAnswer(sdp = answer) { ok -> Log.i(TAG, "loopback negotiated=$ok") }
       }
     }
   }

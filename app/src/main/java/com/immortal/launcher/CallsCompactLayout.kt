@@ -32,7 +32,7 @@ internal object CallsCompactLayout {
   /** Distance of the self view, live bar and title from the screen edges. */
   fun edge(layout: LayoutClass): Int = if (layout.compact) 24 else 40
 
-  /** The in-call control strip (`.ctl`): four round controls and End. */
+  /** The in-call control strip (`.ctl`): five round controls (Mute, Camera, Auto frame, Volume, Add person) and End. */
   data class Controls(val circle: Int, val column: Int, val icon: Int, val endWidth: Int, val endHeight: Int, val endColumn: Int,
                       val endIcon: Int, val padding: Int, val label: Float, val bottom: Int) {
     /** The strip's whole width. */
@@ -42,7 +42,7 @@ internal object CallsCompactLayout {
   }
 
   fun controls(layout: LayoutClass): Controls =
-      if (layout.compact) Controls(circle = 80, column = 112, icon = 36, endWidth = 124, endHeight = 80, endColumn = 136, endIcon = 40,
+      if (layout.compact) Controls(circle = 80, column = 104, icon = 36, endWidth = 116, endHeight = 80, endColumn = 128, endIcon = 40,
           padding = 20, label = 18f, bottom = 24)
       else Controls(circle = 96, column = 134, icon = 42, endWidth = 150, endHeight = 96, endColumn = 170, endIcon = 46,
           padding = 24, label = 19.5f, bottom = 36)
@@ -77,7 +77,7 @@ internal object CallsCompactLayout {
   /** Horizontal page padding in the Calls app. */
   fun pagePadding(layout: LayoutClass): Int = if (layout.compact) 32 else 56
 
-  private const val CONTROLS = 4
+  private const val CONTROLS = 5
   private const val TOP_PAD = 20
   private const val BOTTOM_PAD = 16
   private const val LABEL_GAP = 8

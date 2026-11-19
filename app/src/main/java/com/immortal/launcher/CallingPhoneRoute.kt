@@ -89,7 +89,7 @@ internal object CallPhoneRoute {
     if (offer.to != Calling.selfId(context)) return RemoteFeatureRoutes.json(403, RemoteFeatureRoutes.error("not_for_this_portal"))
     val call = Calling.acceptRemoteOffer(offer.callId, auth.phoneId)
         ?: return RemoteFeatureRoutes.json(409, RemoteFeatureRoutes.error("no_such_call"))
-    val answer = CallMediaHub.answerBlocking(context, call, offer.sdp)
+    val answer = CallMediaHub.answerBlocking(context, call, auth.phoneId, offer.sdp)
     val fp = answer?.let(CallSignalAuth::fingerprintOf)
     if (answer == null || fp == null) {
       Calling.dispatch(CallEvent.MediaFailed(call.id, CallEndReason.FAILED, Calling.now()))

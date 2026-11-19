@@ -13,6 +13,7 @@ import java.util.TimeZone
 internal object CallingCopy {
   const val E2E = "E2E"
   const val SELF_LABEL = "You · Auto-framed"
+  const val SELF_LABEL_SHORT = "You"
   const val CAMERA_OFF = "Camera off"
   const val NOBODY_SEES = "Nobody can see you"
   const val ANSWER_PRIVACY = "Your camera and mic stay off until you answer"

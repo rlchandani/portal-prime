@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -22,12 +23,15 @@ internal object CallWire {
   const val KEEP = "call_keep"
   const val MEDIA = "call_media"
   const val HELLO = "call_hello"
+  /** Group: a member vouches that someone joined (they will offer to you). */
+  const val JOIN = "call_join"
   private val CALL_ID = Regex("^[a-f0-9]{16}$")
 
   fun isCallId(text: String?) = text != null && CALL_ID.matches(text)
 
   data class Ring(val id: String, val to: String, val kind: CallKind, val video: Boolean, val name: String,
-                  val host: String, val port: Int)
+                  val host: String, val port: Int, val members: List<CallMemberRef> = emptyList())
+  data class Join(val id: String, val to: String, val newcomer: CallContact)
   data class Reply(val id: String, val to: String, val reply: CallReply, val quietEndMin: Int?)
   data class End(val id: String, val to: String, val reason: CallEndReason)
   data class Keep(val id: String, val to: String, val capAtMs: Long)
@@ -38,6 +42,12 @@ internal object CallWire {
 
   fun encode(r: Ring): JSONObject = JSONObject().put("i", r.id).put("to", r.to).put("k", r.kind.wire).put("v", r.video)
       .put("fn", r.name).put("h", r.host).put("p", r.port)
+      .apply { if (r.members.isNotEmpty()) put("g", JSONArray(r.members.map(::encodeMember))) }
+  fun encode(j: Join): JSONObject = JSONObject().put("i", j.id).put("to", j.to).put("n", j.newcomer.deviceId)
+      .put("fn", j.newcomer.name)
+
+  private fun encodeMember(m: CallMemberRef): JSONObject = JSONObject().put("d", m.contact.deviceId).put("fn", m.contact.name)
+      .apply { if (m.host != null && m.port in 1..65535) { put("h", m.host); put("p", m.port) } }
   fun encode(r: Reply): JSONObject = JSONObject().put("i", r.id).put("to", r.to).put("r", r.reply.wire)
       .apply { r.quietEndMin?.let { put("qe", it) } }
   fun encode(e: End): JSONObject = JSONObject().put("i", e.id).put("to", e.to).put("e", e.reason.wire)
@@ -55,7 +65,31 @@ internal object CallWire {
     val name = DinnerWire.cleanName(b.optString("fn")) ?: return null
     val host = b.optString("h").takeIf(HouseholdListPeerAuth::isPrivateLan) ?: return null
     val port = (b.opt("p") as? Number)?.toInt()?.takeIf { it in 1..65535 } ?: return null
-    return Ring(id, to, kind, video, name, host, port)
+    val members = if (kind == CallKind.CALL) decodeMembers(b.optJSONArray("g")) ?: return null else emptyList()
+    return Ring(id, to, kind, video, name, host, port, members)
+  }
+
+  /** A group ring's member list: null if malformed or over the cap; phones are never mesh members. */
+  private fun decodeMembers(arr: JSONArray?): List<CallMemberRef>? {
+    if (arr == null) return emptyList()
+    if (arr.length() > CallGroup.MAX_LEGS + 1) return null
+    val out = (0 until arr.length()).map { i ->
+      val o = arr.optJSONObject(i) ?: return null
+      val id = o.optString("d").takeIf(DinnerWire::isDeviceId)?.takeUnless(CallPhoneId::isPhone) ?: return null
+      val name = DinnerWire.cleanName(o.optString("fn")) ?: return null
+      val host = o.optString("h").takeIf(HouseholdListPeerAuth::isPrivateLan)
+      val port = (o.opt("p") as? Number)?.toInt()?.takeIf { it in 1..65535 }
+      CallMemberRef(CallContact(id, name), host.takeIf { port != null }, if (host != null) port ?: 0 else 0)
+    }
+    return out.takeIf { list -> list.map { it.contact.deviceId }.toSet().size == list.size }
+  }
+
+  fun decodeJoin(b: JSONObject): Join? {
+    val id = b.optString("i").takeIf(::isCallId) ?: return null
+    val to = b.optString("to").takeIf(DinnerWire::isDeviceId) ?: return null
+    val newcomer = b.optString("n").takeIf(DinnerWire::isDeviceId)?.takeUnless(CallPhoneId::isPhone) ?: return null
+    val name = DinnerWire.cleanName(b.optString("fn")) ?: return null
+    return Join(id, to, CallContact(newcomer, name))
   }
 
   fun decodeReply(b: JSONObject): Reply? {

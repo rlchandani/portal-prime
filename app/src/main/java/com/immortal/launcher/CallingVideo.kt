@@ -10,6 +10,7 @@ import android.content.Context
 import android.graphics.SurfaceTexture
 import android.view.TextureView
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import org.webrtc.EglBase
@@ -28,25 +29,47 @@ import java.util.concurrent.TimeUnit
  */
 @Composable
 internal fun CallRemoteVideo(media: CallMedia, modifier: Modifier = Modifier,
-                              scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL) {
-  AndroidView(
-      factory = { ctx ->
-        SurfaceViewRenderer(ctx).apply {
-          init(media.egl.eglBaseContext, null)
-          setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
-          tag = RendererCommon.ScalingType.SCALE_ASPECT_FILL
-          setEnableHardwareScaler(true)
-          media.remote.target = this
-        }
-      },
-      modifier = modifier,
-      // Rotating the Mini changes only the scaling (no new surface); a no-op while it is unchanged.
-      update = { view -> if (view.tag != scaling) { view.tag = scaling; view.setScalingType(scaling) } },
-      onRelease = { view ->
-        if (media.remote.target === view) media.remote.target = null
-        view.release()
-      },
-  )
+                              scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL,
+                              sink: CallVideoSink = media.remote) {
+  // A new member in the big picture (the first member left a group) gets a fresh renderer.
+  key(sink) {
+    AndroidView(
+        factory = { ctx ->
+          SurfaceViewRenderer(ctx).apply {
+            init(media.egl.eglBaseContext, null)
+            setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
+            tag = RendererCommon.ScalingType.SCALE_ASPECT_FILL
+            setEnableHardwareScaler(true)
+            sink.target = this
+          }
+        },
+        modifier = modifier,
+        // Rotating the Mini changes only the scaling (no new surface); a no-op while it is unchanged.
+        update = { view -> if (view.tag != scaling) { view.tag = scaling; view.setScalingType(scaling) } },
+        onRelease = { view ->
+          if (sink.target === view) sink.target = null
+          view.release()
+        },
+    )
+  }
+}
+
+/**
+ * A group tile: a TextureView renderer so the tile clips to its rounded corners (the mock's
+ * 26 dp radius). Group pictures are 360p, so the extra composition pass is cheap.
+ */
+@Composable
+internal fun CallTileVideo(media: CallMedia, sink: CallVideoSink, modifier: Modifier = Modifier, mirror: Boolean = false) {
+  key(sink) {
+    AndroidView(
+        factory = { ctx -> CallTextureRenderer(ctx).apply { init(media.egl.eglBaseContext, mirror = mirror); sink.target = this } },
+        modifier = modifier,
+        onRelease = { view ->
+          if (sink.target === view) sink.target = null
+          view.release()
+        },
+    )
+  }
 }
 
 /**
@@ -71,6 +94,7 @@ internal class CallTextureRenderer(context: Context) : TextureView(context), Tex
   private val renderer = EglRenderer("hearthpane-call-self")
   private var initialized = false
 
+  /** Frames are centre-cropped to the view's aspect ([EglRenderer.setLayoutAspectRatio]), like the mock's tiles. */
   fun init(shared: EglBase.Context, mirror: Boolean) {
     renderer.init(shared, EglBase.CONFIG_PLAIN, GlRectDrawer())
     renderer.setMirror(mirror)

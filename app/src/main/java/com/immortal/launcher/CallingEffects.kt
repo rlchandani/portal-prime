@@ -35,6 +35,10 @@ internal object CallingEffects {
       CallEffect.StopMedia -> CallMediaHub.stop(c)
       is CallEffect.Log -> CallingStore.log(c, effect.entry)
       CallEffect.AnnouncePresence -> Calling.announce(c, ask = false)
+      is CallEffect.SendGroupRing -> sendGroupRing(c, effect)
+      is CallEffect.SendJoin -> send(c, effect.to, CallWire.JOIN, CallWire.encode(CallWire.Join(effect.id, effect.to, effect.newcomer)))
+      is CallEffect.StartLeg -> CallMediaHub.startLeg(c, effect.id, effect.leg)
+      is CallEffect.ClosePeer -> CallMediaHub.closePeer(effect.peer)
     }
   }
 
@@ -54,6 +58,23 @@ internal object CallingEffects {
         Log.w(TAG, "ring not sent (no LAN address or household key)")
         Calling.dispatch(CallEvent.MediaFailed(call.id, CallEndReason.UNAVAILABLE, Calling.now()))
       }
+    }, "hearthpane-call-ring").apply { isDaemon = true }.start()
+  }
+
+  /** Group ring: like a ring, plus each member and where it listens (so the newcomer can offer to them). */
+  private fun sendGroupRing(c: Context, e: CallEffect.SendGroupRing) {
+    val call = Calling.state.value.call
+    val members = e.members.map { m ->
+      val known = CallingStore.peers.value.firstOrNull { it.id == m.deviceId }
+      val host = known?.host ?: call?.peerHost?.takeIf { call.peer.deviceId == m.deviceId }
+      val port = known?.port?.takeIf { known.host != null } ?: call?.peerPort?.takeIf { call.peer.deviceId == m.deviceId } ?: 0
+      CallMemberRef(m, host, port)
+    }
+    Thread({
+      val host = HouseholdListSync.lanAddress()
+      val sent = host != null && HouseholdBus.send(c, CallWire.RING, CallWire.encode(CallWire.Ring(e.id, e.to.deviceId,
+          CallKind.CALL, e.video, Calling.selfName(c), host, FleetConfig.port(c), members)))
+      if (!sent) Log.w(TAG, "group ring not sent (no LAN address or household key)")
     }, "hearthpane-call-ring").apply { isDaemon = true }.start()
   }
 

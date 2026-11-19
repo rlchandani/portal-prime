@@ -30,17 +30,21 @@ internal object CallMediaHub {
   private const val TAG = "HearthpaneCallMedia"
   private const val ANSWER_WAIT_MS = 8_000L
   private const val STATS_LOG_EVERY = 5
+  /** A newcomer may reach a member before the vouching `call_join` does: retry the offer briefly. */
+  private const val LEG_OFFER_TRIES = 5
+  private const val LEG_RETRY_MS = 700L
 
   private val main = Handler(Looper.getMainLooper())
   private val mutableMedia = MutableStateFlow<CallMedia?>(null)
   /** The UI binds its renderers to this media's sinks and EGL context. */
   val media: StateFlow<CallMedia?> = mutableMedia.asStateFlow()
-  private val mutableStats = MutableStateFlow<CallStats?>(null)
-  val stats: StateFlow<CallStats?> = mutableStats.asStateFlow()
+  private val mutableStats = MutableStateFlow<Map<String, CallStats>>(emptyMap())
+  /** Latest stats per member (device id). */
+  val stats: StateFlow<Map<String, CallStats>> = mutableStats.asStateFlow()
 
   private var mediaCallId: String? = null
   @Volatile private var foreground = false
-  private var queued: (() -> Unit)? = null
+  private val queued = ArrayList<() -> Unit>()
   private var audio: SavedAudio? = null
   private var statsCount = 0
 
@@ -49,7 +53,7 @@ internal object CallMediaHub {
   /** The call screen started (true) or stopped (false). Queued media work waits for true. */
   fun foreground(on: Boolean) {
     foreground = on
-    if (on) queued?.let { queued = null; it() }
+    if (on && queued.isNotEmpty()) { val work = queued.toList(); queued.clear(); work.forEach { it() } }
   }
 
   /** Caller: show or hide the self preview while it rings. Never opens the mic. */
@@ -63,34 +67,59 @@ internal object CallMediaHub {
     val m = ensure(context, call.id)
     m.camera(call.cameraOn)
     m.mic(call.micOn)
-    m.createOffer { sdp ->
-      if (sdp == null || !CallSignalAuth.hasLanCandidate(sdp)) fail(call.id, "no offer / no LAN candidate")
-      else CallSignalClient.sendOffer(context.applicationContext, call, sdp) { answer ->
-        if (answer == null) fail(call.id, "no verified answer")
-        else m.applyAnswer(answer) { ok -> if (!ok) fail(call.id, "answer rejected") }
+    offer(context, m, call.id, call.peer.deviceId, call.peerHost, call.peerPort, tries = 1)
+  }
+
+  /** Group newcomer: offer to one more member (camera and mic are already open for the call). */
+  fun startLeg(context: Context, callId: String, leg: CallLeg) = whenForeground {
+    val call = Calling.state.value.call?.takeIf { it.id == callId } ?: return@whenForeground
+    val m = ensure(context, callId)
+    m.camera(call.cameraOn)
+    m.mic(call.micOn)
+    offer(context, m, callId, leg.peer.deviceId, leg.host, leg.port, tries = LEG_OFFER_TRIES)
+  }
+
+  private fun offer(context: Context, m: CallMedia, callId: String, peer: String, host: String?, port: Int, tries: Int) {
+    m.createOffer(peer) { sdp ->
+      if (sdp == null || !CallSignalAuth.hasLanCandidate(sdp)) { fail(callId, peer, "no offer / no LAN candidate"); return@createOffer }
+      exchange(context, m, callId, peer, host, port, sdp, tries)
+    }
+  }
+
+  private fun exchange(context: Context, m: CallMedia, callId: String, peer: String, host: String?, port: Int, sdp: String, left: Int) {
+    CallSignalClient.sendOffer(context.applicationContext, callId, peer, host, port, sdp) { result ->
+      val stillHere = Calling.state.value.call?.let { it.id == callId && it.isMember(peer) } == true
+      when {
+        !stillHere || mutableMedia.value !== m -> Unit
+        result is CallSignalClient.Result.Answer -> m.applyAnswer(peer, result.sdp) { ok -> if (!ok) fail(callId, peer, "answer rejected") }
+        result == CallSignalClient.Result.NotYet && left > 1 ->
+          main.postDelayed({ exchange(context, m, callId, peer, host, port, sdp, left - 1) }, LEG_RETRY_MS)
+        else -> fail(callId, peer, "no verified answer")
       }
     }
   }
 
   /**
-   * Caller, on the HTTP thread: build the answer to a verified offer. Null when this Portal can't
+   * On the HTTP thread: build the answer to [from]'s verified offer. Null when this Portal can't
    * take it (screen not in front, media failure, timeout).
    */
-  fun answerBlocking(context: Context, call: ActiveCall, offerSdp: String): String? {
+  fun answerBlocking(context: Context, call: ActiveCall, from: String, offerSdp: String): String? {
     val latch = CountDownLatch(1)
     val abandoned = AtomicBoolean(false)
     var result: String? = null
     main.post {
-      // Re-check on the main thread: the screen is still in front, this is still the call being
-      // set up, and the HTTP side hasn't given up. Otherwise nothing opens.
+      // Re-check on the main thread: the screen is still in front, this is still the call and the
+      // member being set up, and the HTTP side hasn't given up. Otherwise nothing opens.
       val current = Calling.state.value.call
-      if (!foreground || abandoned.get() || current?.id != call.id || current.phase != CallPhase.CONNECTING) {
-        latch.countDown(); return@post
-      }
+      val settingUp = current?.id == call.id && (
+          (current.peer.deviceId == from && current.phase == CallPhase.CONNECTING) ||
+              current.leg(from)?.phase == LegPhase.JOINING)
+      if (!foreground || abandoned.get() || current == null || !settingUp) { latch.countDown(); return@post }
       val m = ensure(context, call.id)
-      m.camera(call.cameraOn)
-      m.mic(call.micOn)
-      m.answer(offerSdp) { sdp -> result = sdp?.takeIf(CallSignalAuth::hasLanCandidate); latch.countDown() }
+      m.camera(current.cameraOn)
+      m.mic(current.micOn)
+      m.groupSize(current.people)
+      m.answer(from, offerSdp) { sdp -> result = sdp?.takeIf(CallSignalAuth::hasLanCandidate); latch.countDown() }
     }
     if (!latch.await(ANSWER_WAIT_MS, TimeUnit.MILLISECONDS)) { abandoned.set(true); return null }
     return result
@@ -100,19 +129,28 @@ internal object CallMediaHub {
   fun mic(on: Boolean) { mutableMedia.value?.mic(on) }
   fun degrade() { mutableMedia.value?.degrade() }
 
-  /** Ends all capture now: camera, mic, peer connection, EGL. Safe to call repeatedly. */
+  /** A member left: close only its link. */
+  fun closePeer(peer: String) {
+    mutableMedia.value?.close(peer)
+    mutableStats.value = mutableStats.value - peer
+  }
+
+  /** Keeps the send profile in step with the number of people (360p at 3+). */
+  fun groupSize(people: Int) { mutableMedia.value?.groupSize(people) }
+
+  /** Ends all capture now: camera, mic, every peer connection, EGL. Safe to call repeatedly. */
   fun stop(context: Context) {
-    queued = null
+    queued.clear()
     val m = mutableMedia.value ?: return
     mutableMedia.value = null
-    mutableStats.value = null
+    mutableStats.value = emptyMap()
     mediaCallId = null
     m.release()
     restoreAudio(context)
   }
 
   private fun whenForeground(block: () -> Unit) {
-    if (foreground) block() else queued = block
+    if (foreground) block() else queued.add(block)
   }
 
   private fun current(callId: String): CallMedia? = mutableMedia.value?.takeIf { mediaCallId == callId }
@@ -121,29 +159,32 @@ internal object CallMediaHub {
     current(callId)?.let { return it }
     stop(context)
     val quality = CallingQualityPolicy.startQuality(context, CallingConfig.load(context).callQuality)
-    val m = CallMedia(context, quality, events(callId))
+    val m = CallMedia(context, quality, events(callId), testFrames = CallTestMode.frames)
     mediaCallId = callId
     mutableMedia.value = m
+    Calling.state.value.call?.takeIf { it.id == callId }?.let { m.groupSize(it.people) }
     useCommunicationAudio(context)
     return m
   }
 
   private fun events(callId: String) = object : CallMedia.Events {
-    override fun onConnected() = Calling.dispatch(CallEvent.MediaUp(callId, Calling.now()))
-    override fun onDisconnected() = Calling.dispatch(CallEvent.MediaDown(callId, Calling.now()))
-    override fun onFailed() = Calling.dispatch(CallEvent.MediaDown(callId, Calling.now()))
+    override fun onConnected(peer: String) = Calling.dispatch(CallEvent.MediaUp(callId, Calling.now(), peer))
+    override fun onDisconnected(peer: String) = Calling.dispatch(CallEvent.MediaDown(callId, Calling.now(), peer))
+    override fun onFailed(peer: String) = Calling.dispatch(CallEvent.MediaDown(callId, Calling.now(), peer))
     override fun onCameraIssue(issue: CameraIssue) = Calling.dispatch(CallEvent.CameraProblem(issue))
-    override fun onStats(stats: CallStats) {
-      mutableStats.value = stats
-      if (statsCount++ % STATS_LOG_EVERY == 0) Log.i("HearthpaneCallStats", stats.logLine())
+    override fun onStats(peer: String, stats: CallStats) {
+      mutableStats.value = mutableStats.value + (peer to stats)
+      if (statsCount++ % STATS_LOG_EVERY == 0) Log.i("HearthpaneCallStats", "${peer.take(PEER_TAG)} ${stats.logLine()}")
       if (CallingQualityPolicy.shouldDegrade(stats)) main.post(::degrade)
     }
   }
 
-  private fun fail(callId: String, why: String) {
+  private fun fail(callId: String, peer: String, why: String) {
     Log.w(TAG, "call setup failed: $why")
-    Calling.dispatch(CallEvent.MediaFailed(callId, CallEndReason.FAILED, Calling.now()))
+    Calling.dispatch(CallEvent.MediaFailed(callId, CallEndReason.FAILED, Calling.now(), peer))
   }
+
+  private const val PEER_TAG = 8
 
   private fun useCommunicationAudio(context: Context) {
     val am = context.getSystemService(AudioManager::class.java) ?: return
