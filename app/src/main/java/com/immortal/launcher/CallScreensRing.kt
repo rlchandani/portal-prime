@@ -87,8 +87,9 @@ private fun OutgoingLiveBar(call: ActiveCall, motion: Boolean, modifier: Modifie
 /** 110 dp side toggles beside Cancel (`.ctl`-style labels under the circle). */
 @Composable
 internal fun CallSideToggle(icon: String, label: String, off: Boolean, enabled: Boolean = true, onClick: () -> Unit) {
-  Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(18.dp),
-      modifier = Modifier.padding(top = 33.dp)) {
+  // Centred on the 176 dp Cancel circle, label on Cancel's baseline.
+  Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(18.dp + SIDE_INSET),
+      modifier = Modifier.padding(top = SIDE_INSET)) {
     Box(Modifier.size(110.dp).background(if (off) Color.White else CallColors.ControlFill, CircleShape)
         .callClick(label, enabled, onClick), contentAlignment = Alignment.Center) {
       CallIcon(icon, if (off) CallColors.OffIcon else Color.White.copy(alpha = if (enabled) 1f else 0.38f), 46.dp)
@@ -170,3 +171,4 @@ private fun DropInCountdownLine(call: ActiveCall, ask: Boolean) {
 
 private const val MS_PER_S = 1_000L
 private const val COUNTDOWN_S = 3L
+private val SIDE_INSET = 33.dp

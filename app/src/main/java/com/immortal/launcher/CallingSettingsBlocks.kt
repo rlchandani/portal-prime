@@ -38,15 +38,26 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.settings.CallingSettings
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 
-/** Settings › Calls › Ringtone preview: play one ring of each tone at the ring volume. */
+/** Settings › Calls › Ringtone (mock "Ringtone" list): tap a row to choose it, Play to hear it once. */
 @Composable
 internal fun CallRingtonePreviewBlock() {
   val context = LocalContext.current
+  val p = LocalApprovedPalette.current
+  var selected by remember { mutableStateOf(CallingConfig.load(context).tone) }
+  DisposableEffect(context) {
+    val stop = CallingConfig.observe(context) { selected = CallingConfig.load(context).tone }
+    onDispose { stop() }
+  }
   Card {
     CallRingtone.entries.forEachIndexed { i, tone ->
       if (i > 0) Divider()
-      SettingsInfoRow(tone.label, tone.help) {
-        CallPill("Play", { CallRinger.preview(context, tone) }, icon = "vol", size = CallButtonSize.SM, surface = callsSurface())
+      Box(Modifier.callClick("Ringtone ${tone.label}", true) { CallingSettings.set(context, "ringtone", tone.wire) }) {
+        SettingsInfoRow(tone.label, tone.help) {
+          Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+            if (tone == selected) CallIcon("check", p.accent, 34.dp)
+            CallPill("Play", { CallRinger.preview(context, tone) }, icon = "vol", size = CallButtonSize.SM, surface = callsSurface())
+          }
+        }
       }
     }
   }

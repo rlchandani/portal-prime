@@ -242,6 +242,9 @@ internal class CallMedia(
 
   private fun applyEncoding() {
     val q = if (degraded) CallQuality.LOW_MEMORY else quality
+    // LAN: start the bandwidth estimate near the target so the picture opens sharp instead of
+    // ramping up from 360p over ~15 s (measured on the Family Portal).
+    runCatching { pc?.setBitrate(MIN_KBPS * KBPS, minOf(START_KBPS, q.maxKbps) * KBPS, q.maxKbps * KBPS) }
     pc?.transceivers?.filter { it.mediaType == MediaStreamTrack.MediaType.MEDIA_TYPE_VIDEO }?.forEach { t ->
       val params = t.sender.parameters
       params.degradationPreference = RtpParameters.DegradationPreference.BALANCED
@@ -297,6 +300,8 @@ internal class CallMedia(
     private const val AUDIO_ID = "hp-audio"
     private const val STREAM_ID = "hp"
     private const val KBPS = 1_000
+    private const val MIN_KBPS = 150
+    private const val START_KBPS = 1_500
     private const val STATS_MS = 2_000L
     private const val GATHER_TIMEOUT_MS = 2_500L
   }

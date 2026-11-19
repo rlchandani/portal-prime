@@ -139,7 +139,8 @@ internal object SettingsPageSections {
         ),
         P.CALLS to listOf(
             section("Calls", rows("calling", "whoCanCall", "quality")),
-            section("Ring & sound", rows("calling", "ringtone", "ringVolume"), block(B.CALL_RINGTONES)),
+            section("Ringtone", block(B.CALL_RINGTONES)),
+            section("Ring volume", rows("calling", "ringVolume")),
             section("Quiet hours", rows("calling", "quietMode"),
                 footer = "Quiet hours are shared with the chime and Call everyone: Sounds › Chimes."),
             section("Drop-ins", rows("calling", "dropInsOn"), block(B.CALL_DROP_INS),
