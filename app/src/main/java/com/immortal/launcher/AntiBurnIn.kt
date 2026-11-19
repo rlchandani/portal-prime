@@ -48,4 +48,15 @@ object AntiBurnIn {
     val y = cos(2.0 * PI * nowMs / PERIOD_Y_MS) * maxPx
     return Shift(x.toFloat(), y.toFloat())
   }
+
+  /**
+   * The offset to apply to an overlay this tick, or null to leave it alone. A hidden overlay
+   * takes none: on a view that has drawn before, every translation change damages its parent and
+   * costs a full frame, so a covered face would otherwise redraw the screen once a second.
+   */
+  fun overlayShift(visible: Boolean, enabled: Boolean, nowMs: Long, maxPx: Float): Shift? = when {
+    !visible -> null
+    enabled -> shift(nowMs, maxPx)
+    else -> Shift(0f, 0f)
+  }
 }
