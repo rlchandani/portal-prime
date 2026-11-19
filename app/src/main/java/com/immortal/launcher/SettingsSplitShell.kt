@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -109,7 +111,9 @@ internal fun SettingsSplitShell(
         value = withContext(Dispatchers.Default) { approvedSettingsSearchIndex() }
     }
     val results = remember(index, query) { index?.let { approvedSettingsSearch(it, query) }.orEmpty() }
-    val stage = rememberSettingsOpenStage()
+    // The master column being built while Settings opens; the page waits for it (see SettingsOpenStage).
+    val openingMaster = remember { mutableStateOf<SettingsMasterReveal?>(null) }
+    val stage = rememberSettingsOpenStage(holdDetail = { openingMaster.value?.shown == false })
     val queryToken = if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) remember(query) { Any() } else null
     if (BuildConfig.PORTAL_SETTINGS_UI_DIAGNOSTICS) {
         val host = context as? ImmortalSettingsActivity
@@ -142,22 +146,28 @@ internal fun SettingsSplitShell(
         if (result.advanced && !advanced) { pending = result; consent = true } else onSearchResult(result)
     }
 
-    // The master column: Home, the title, search and the grouped pages (or search results).
+    // The master column: Home, the title, search and the grouped pages (or search results). While
+    // Settings opens it is built over a few frames and appears at once (see [SettingsMasterReveal]).
     val master = @Composable { modifier: Modifier ->
-        Column(modifier.fillMaxHeight().background(IosSidebar)
+        val reveal = rememberSettingsMasterReveal(stage)
+        if (!reveal.shown) SideEffect { openingMaster.value = reveal }
+        val sidebarList = rememberLazyListState()
+        SettingsMasterRevealEffect(reveal, sidebarList, remember { settingsSidebarEntryCount() })
+        Column(modifier.fillMaxHeight().background(IosSidebar).settingsRevealed(reveal)
             .settingsUiWorkMeasure(SettingsUiWorkStage.SIDEBAR_MEASURE)) {
             Column(Modifier.padding(start = 28.dp, end = 28.dp, top = 22.dp, bottom = 10.dp)) {
                 ApprovedSettingsBackButton("Home", onClick = onHome)
                 Text("Settings", color = IosLabel, fontSize = 52.sp, lineHeight = 60.sp, fontWeight = FontWeight.Bold,
                     maxLines = 1, overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(start = 4.dp, top = 18.dp, bottom = 16.dp))
-                SettingsSearchField(query) { query = it }
+                if (reveal.searchComposed) SettingsSearchField(query) { query = it }
+                else Spacer(Modifier.fillMaxWidth().height(SettingsSearchFieldHeight))
             }
             val listModifier = Modifier.weight(1f).fillMaxWidth()
             if (query.isBlank()) {
-                LazyColumn(listModifier.focusGroup(),
+                LazyColumn(listModifier.focusGroup(), state = sidebarList,
                     contentPadding = PaddingValues(start = 28.dp, end = 28.dp, top = 8.dp, bottom = 40.dp)) {
-                    settingsSidebarGroups(selectedRootProvider, sidebarFactsProvider, selectPage)
+                    settingsSidebarGroups(selectedRootProvider, sidebarFactsProvider, selectPage, reveal.listLimit)
                 }
             } else {
                 SettingsSearchResults(query, results, queryToken, ::pick,

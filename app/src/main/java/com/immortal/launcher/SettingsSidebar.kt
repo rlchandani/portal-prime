@@ -69,27 +69,40 @@ internal fun LazyListScope.settingsSidebarGroups(
     selectedRoot: () -> String,
     facts: () -> SettingsSidebarFacts,
     onSelect: (String) -> Unit,
+    limit: Int = Int.MAX_VALUE,
 ) {
+    // Entries in order, at most [limit] of them (Settings opening adds a few per frame: SettingsMasterReveal).
+    var left = limit
+    if (left-- <= 0) return
     item(key = "profile", contentType = "profile") {
         SettingsProfileCard(rememberSidebarSelected(SettingsPageIds.ABOUT, selectedRoot)) { onSelect(SettingsPageIds.ABOUT) }
     }
-    SettingsGroup.entries.forEach { group ->
+    for (group in SettingsGroup.entries) {
         group.title?.let { title ->
+            if (left-- <= 0) return
             item(key = "group:${group.name}", contentType = "group-header") {
                 Text(title, color = IosSecondary, fontSize = 20.sp, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(start = 22.dp, end = 6.dp, bottom = 10.dp))
             }
         }
         val pages = SettingsTree.groupPages(group)
-        itemsIndexed(pages, key = { _, page -> "row:${page.id}" }, contentType = { _, _ -> "row" }) { index, page ->
+        val shown = minOf(pages.size, left)
+        left -= shown
+        itemsIndexed(if (shown == pages.size) pages else pages.subList(0, shown), key = { _, page -> "row:${page.id}" },
+            contentType = { _, _ -> "row" }) { index, page ->
             SettingsSidebarRow(page, rememberSidebarSelected(page.id, selectedRoot), rememberSidebarHint(page.id, facts),
                 index == 0, index == pages.lastIndex) {
                 onSelect(page.id)
             }
         }
+        if (left-- <= 0) return
         item(key = "gap:${group.name}", contentType = "gap") { Spacer(Modifier.height(22.dp)) }
     }
 }
+
+/** How many entries [settingsSidebarGroups] lists in full: the profile card, then each group's title, rows and gap. */
+internal fun settingsSidebarEntryCount(): Int =
+    1 + SettingsGroup.entries.sumOf { (if (it.title != null) 1 else 0) + SettingsTree.groupPages(it).size + 1 }
 
 /** Invalidates its caller only when this row's own selection changes. */
 @Composable

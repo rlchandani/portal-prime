@@ -28,7 +28,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val SearchFieldHeight = 76.dp
+/** The search field's fixed height (Settings opening holds its place with a spacer of this height). */
+internal val SettingsSearchFieldHeight = 76.dp
+private val SearchFieldHeight = SettingsSearchFieldHeight
 private val SearchFieldRadius = 22.dp
 
 /** The sidebar search field; a clear button appears while there is a query. */

@@ -64,7 +64,7 @@ fun MusicV3Screen(roomName: String, resumeOnOpen: Boolean, onClose: () -> Unit, 
   val hasQueue by remember { derivedQueuePresence() }.collectAsState(initial = !YouTubeMusicEngine.state.value.queue.isEmpty)
   val gate = MusicV3Rules.gate(library.isConfigured, accounts, active, adding, signedOutLast,
       showingSuccess = signIn is YtSignInState.SignedIn, hasQueue = hasQueue)
-  rememberMusicV3KeyboardPolicy()
+  val keyboard = rememberMusicV3KeyboardPolicy()
   BackHandler(enabled = gate == MusicV3Gate.ADD_ACCOUNT) { adding = false }
   val focus = LocalFocusManager.current
   // Drawn over the launcher: swallow stray taps (they'd reach Home below) and drop the keyboard.
@@ -72,10 +72,12 @@ fun MusicV3Screen(roomName: String, resumeOnOpen: Boolean, onClose: () -> Unit, 
   if (gate == MusicV3Gate.PLAYER || gate == MusicV3Gate.GUEST) {
     // The full-screen stage draws its own top bar (back, wordmark, clock, account) and backdrop.
     Box(root) {
-      MusicV3PlayerLayout(MusicV3StageHost(
-          library = library, accounts = accounts, active = active.takeIf { gate == MusicV3Gate.PLAYER },
-          room = roomName, resumeOnOpen = resumeOnOpen, onBack = onClose,
-          onAddAccount = { adding = true }, onLastSignedOut = { signedOutLast = true }))
+      androidx.compose.runtime.CompositionLocalProvider(LocalMusicKeyboardPolicy provides keyboard) {
+        MusicV3PlayerLayout(MusicV3StageHost(
+            library = library, accounts = accounts, active = active.takeIf { gate == MusicV3Gate.PLAYER },
+            room = roomName, resumeOnOpen = resumeOnOpen, onBack = onClose,
+            onAddAccount = { adding = true }, onLastSignedOut = { signedOutLast = true }))
+      }
     }
     return
   }
@@ -119,16 +121,53 @@ private fun derivedQueuePresence() = YouTubeMusicEngine.state.map { !it.queue.is
 
 /**
  * While music is on screen the soft keyboard overlays it (ADJUST_NOTHING) instead of panning the
- * launcher, so it rises from the bottom and stops below the player; restored on close.
+ * launcher, so it rises from the bottom and stops below the player; restored on close. Changing the
+ * mode relayouts the launcher's window (a binder round trip to the window manager, 3 ms to ~50 ms on
+ * the Portal Mini), so it is applied when a Music text field takes focus (before its keyboard shows)
+ * or once Music has opened ([MusicKeyboardPolicy.SETTLE_MS]), never inside the opening frame. It is
+ * restored only if it was applied.
  */
 @Composable
-private fun rememberMusicV3KeyboardPolicy() {
+private fun rememberMusicV3KeyboardPolicy(): MusicKeyboardPolicy {
   val view = LocalView.current
-  DisposableEffect(view) {
+  val policy = remember(view) {
     val window = generateSequence(view.context) { (it as? ContextWrapper)?.baseContext }
         .filterIsInstance<Activity>().firstOrNull()?.window
-    val previous = window?.attributes?.softInputMode
-    window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
-    onDispose { if (window != null && previous != null) window.setSoftInputMode(previous) }
+    MusicKeyboardPolicy(window)
+  }
+  DisposableEffect(policy) {
+    val settle = Runnable { policy.ensure() }
+    view.postDelayed(settle, MusicKeyboardPolicy.SETTLE_MS)
+    onDispose {
+      view.removeCallbacks(settle)
+      policy.restore()
+    }
+  }
+  return policy
+}
+
+/** Applies Music's soft-keyboard mode to the launcher window at most once per visit; see [rememberMusicV3KeyboardPolicy]. */
+internal class MusicKeyboardPolicy(private val window: android.view.Window?) {
+  private var previous: Int? = null
+
+  fun ensure() {
+    val window = window ?: return
+    if (previous != null) return
+    previous = window.attributes.softInputMode
+    window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+  }
+
+  fun restore() {
+    val mode = previous ?: return
+    previous = null
+    window?.setSoftInputMode(mode)
+  }
+
+  internal companion object {
+    /** After Music's opening work (about 1 s) and before Home goes inactive ([HomeMusicCover.SETTLE_MS]). */
+    const val SETTLE_MS = 2_000L
   }
 }
+
+/** Music's keyboard policy, for its text fields to apply before their keyboard shows; null outside Music v3. */
+internal val LocalMusicKeyboardPolicy = androidx.compose.runtime.staticCompositionLocalOf<MusicKeyboardPolicy?> { null }

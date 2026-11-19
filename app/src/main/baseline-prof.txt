@@ -72,3 +72,40 @@ HPLcom/immortal/launcher/ApprovedToolsSummaries;->**(**)**
 HPLcom/immortal/launcher/ControlCenter*;->**(**)**
 HPLcom/immortal/launcher/Cc*;->**(**)**
 HPLcom/immortal/launcher/settings/ControlCenterSettings;->**(**)**
+# Once-per-visit paths outside Settings that the JIT never sees as hot, so without these they run
+# interpreted every time (gfxinfo: "Slow UI thread"; simpleperf: the interpreter bridge):
+# Home's own composition when Music opens or closes over it, and the header taps that open Music and Jarvis.
+HPLcom/immortal/launcher/HomeActivity;->**(**)**
+HPLcom/immortal/launcher/HomeActivityKt;->**(**)**
+HPLcom/immortal/launcher/HomeActivityKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeHeader*;->**(**)**
+HPLcom/immortal/launcher/HomeMusicCover*;->**(**)**
+HPLcom/immortal/launcher/MusicHome*;->**(**)**
+HPLcom/immortal/launcher/MusicPlayer*;->**(**)**
+# The Jarvis tap: the launcher's handoff, the durable bridge write and the screen context it sends.
+HPLcom/immortal/launcher/JarvisHandoff*;->**(**)**
+HPLcom/immortal/launcher/JarvisPreparedLaunch;->**(**)**
+HPLcom/immortal/launcher/JarvisForegroundWake;->**(**)**
+HPLcom/immortal/launcher/jarvis/**;->**(**)**
+HPLcom/immortal/launcher/DreamPolicy;->**(**)**
+HPLcom/immortal/launcher/DreamBridge*;->**(**)**
+# Window-change bookkeeping on every Activity switch (opening Settings, Jarvis's card): the bar watch
+# service, the pinned-app reader and the quick bar run on the main thread.
+HPLcom/immortal/launcher/BarWatchService;->**(**)**
+HPLcom/immortal/launcher/PinWindowReader*;->**(**)**
+HPLcom/immortal/launcher/PinnedApp*;->**(**)**
+HPLcom/immortal/launcher/QuickBar*;->**(**)**
+# Screensaver faces that animate once a minute or once a night: the flip clock's card turn and the
+# night switch (photo dissolve, vignette and night clocks). Their first animation after the process
+# starts ran interpreted (p90 27-34 ms; later ones, JIT-compiled, about 10 ms).
+HPLcom/immortal/launcher/DigitalDreamFaceView;->**(**)**
+HPLcom/immortal/launcher/DigitalClock*;->**(**)**
+HPLcom/immortal/launcher/FaceRenderer*;->**(**)**
+HPLcom/immortal/launcher/Night*;->**(**)**
+HPLcom/immortal/launcher/QuietNightClockView;->**(**)**
+HPLcom/immortal/launcher/DarkRoom*;->**(**)**
+HPLcom/immortal/launcher/OvernightFrame*;->**(**)**
+HPLcom/immortal/launcher/PhotoFrameController*;->**(**)**
+HPLcom/immortal/launcher/Slideshow*;->**(**)**
+HPLcom/immortal/launcher/NativePhoto*;->**(**)**
+HPLcom/immortal/launcher/Hearth*;->**(**)**
