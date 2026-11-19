@@ -21,6 +21,25 @@ internal object RemoteFeatureRoutes {
     fun handle(context: Context, method: String, body: JSONObject): FleetHttpServer.Response
   }
 
+  /**
+   * A route that also needs to know which paired phone is calling (rate limits, confirm tickets).
+   * [caller] is [callerKey] of the session: stable per pairing, never the token itself.
+   */
+  interface CallerRoute : Route {
+    fun handleFrom(context: Context, method: String, body: JSONObject, caller: String): FleetHttpServer.Response
+    /** Without a caller there is nobody to bind limits or confirmations to. */
+    override fun handle(context: Context, method: String, body: JSONObject): FleetHttpServer.Response =
+        json(401, error("unauthorized"))
+  }
+
+  /** An opaque per-session key: the first 64 bits of SHA-256 over the token (safe to keep in memory). */
+  fun callerKey(token: String): String =
+      java.security.MessageDigest.getInstance("SHA-256").digest(token.toByteArray(Charsets.UTF_8))
+          .take(CALLER_BYTES).joinToString("") { "%02x".format(it.toInt() and BYTE_MASK) }
+
+  private const val CALLER_BYTES = 8
+  private const val BYTE_MASK = 0xff
+
   private val routes = ConcurrentHashMap<String, Route>()
 
   fun register(path: String, route: Route) {

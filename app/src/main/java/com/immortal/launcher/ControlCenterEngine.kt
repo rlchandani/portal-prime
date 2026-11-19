@@ -40,6 +40,9 @@ internal class CcEngine(val app: Context) {
   var heartbeat: ScheduledFuture<*>? = null
   var flushQueued = false
   var visible = 0
+  /** A paired phone is watching until then (epoch ms): live, foreground state without a screen here. */
+  var remoteUntil = 0L
+  var remoteExpiry: ScheduledFuture<*>? = null
   var hadLive = false
   var subscribed: Set<String>? = null
   var subscribedForeground = false
@@ -64,7 +67,10 @@ internal class CcEngine(val app: Context) {
 
   private val client by lazy { OkHttpClient.Builder().readTimeout(0, TimeUnit.MILLISECONDS).connectTimeout(CONNECT_S, TimeUnit.SECONDS).build() }
 
-  val wantSocket: Boolean get() = visible > 0 || (ui.settings.bannersListen && HaConfig.isConfigured(app))
+  /** Someone needs the full on-screen subscription: this Portal's screen, or a phone's lease. */
+  val foreground: Boolean get() = visible > 0 || remoteUntil > clock()
+
+  val wantSocket: Boolean get() = foreground || (ui.settings.bannersListen && HaConfig.isConfigured(app))
 
   init {
     ui = ui.copy(debug = CcTestPlan.label(dryRun, testPlan != null))
@@ -269,7 +275,7 @@ internal class CcEngine(val app: Context) {
   private fun subscribe(ws: WebSocket, p: CcProtocol) {
     val ids = interest()
     subscribed = ids
-    subscribedForeground = visible > 0
+    subscribedForeground = foreground
     // Nothing worth watching in the background (no registry, no plan): stay quiet, no subscription.
     if (ids != null && ids.isEmpty()) { setPhase(CcPhase.LIVE, ""); return }
     ws.send(p.subscribe(ids).text)
@@ -281,15 +287,16 @@ internal class CcEngine(val app: Context) {
     val p = protocol ?: return
     if (!planResolved || parts.size != REGISTRY_PARTS) return
     val ids = interest()
-    if (ids == subscribed && subscribedForeground == (visible > 0)) return
-    if (visible == 0) live = live.snapshot(live.raw.values.filter { ids == null || it.id in ids })
+    val fg = foreground
+    if (ids == subscribed && subscribedForeground == fg) return
+    if (!fg) live = live.snapshot(live.raw.values.filter { ids == null || it.id in ids })
     subscribed = ids
-    subscribedForeground = visible > 0
+    subscribedForeground = fg
     p.resubscribe(ids).forEach { ws.send(it.text) }
   }
 
   private fun interest(): Set<String>? =
-      if (visible > 0) CcInterest.foreground(ui.registry, ui.plan)
+      if (foreground) CcInterest.foreground(ui.registry, ui.plan)
       else CcInterest.background(ui.registry) ?: ui.plan?.entityIds.orEmpty()
 
   // --- publishing --------------------------------------------------------------------------

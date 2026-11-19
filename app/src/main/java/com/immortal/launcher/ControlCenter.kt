@@ -74,6 +74,33 @@ internal object ControlCenter {
     return true
   }
 
+  /**
+   * A paired phone is looking ([CcRemoteRoute]): hold the live, on-screen subscription for
+   * [CcRemoteWatch.LEASE_MS] more. Banners, plan models and the Home dot still follow this
+   * Portal's own screen only. When the last lease lapses the socket drops back to background.
+   */
+  fun remoteWatch(context: Context) {
+    val e = engine(context)
+    e.post {
+      e.remoteUntil = e.clock() + CcRemoteWatch.LEASE_MS
+      e.ensure()
+      if (e.remoteExpiry?.isDone != false) e.scheduleRemoteExpiry()
+    }
+  }
+
+  /**
+   * Sends a paired phone's call. [CcPhonePolicy] has already passed it (with the household's asks
+   * and the phone's confirmation); kids mode is per Portal and doesn't apply. Null = sent and
+   * [onResult] will run on the engine thread; else why not (HA isn't live).
+   */
+  fun sendFromPhone(context: Context, call: CcCall, onResult: (Boolean, String?) -> Unit): String? {
+    val e = engine(context)
+    e.flow.value.connection.disabledReason?.let { return it }
+    Log.i(TAG, "phone call ${call.domain}.${call.service}")
+    e.post { e.dispatch(call, undoable = false, onResult = onResult) }
+    return null
+  }
+
   fun undo(context: Context) { val e = engine(context); e.post { e.undoLast() } }
 
   fun dismissToast(context: Context, id: Long) { val e = engine(context); e.post { if (e.ui.toast?.id == id) { e.ui = e.ui.copy(toast = null); e.publish() } } }
@@ -252,3 +279,13 @@ private const val CHARGE_WEEK = "charge_week"
 /** [CcPolicy.refusal] for [call] against the current state (pure; what [ControlCenter.send] checks). */
 internal fun ccSendRefusal(s: CcUiState, call: CcCall, confirmed: Boolean, scenesSeen: () -> Set<String>): String? =
     CcPolicy.refusal(call.entityId?.let(s::entity), call, s.settings, confirmed, scenesSeen)
+
+/** The phone lease ran out unless renewed meanwhile; then back to whatever this Portal needs. */
+internal fun CcEngine.scheduleRemoteExpiry() {
+  val wait = (remoteUntil - clock()).coerceAtLeast(0L) + CcRemoteWatch.EXPIRY_SLACK_MS
+  remoteExpiry = exec.schedule({
+    post {
+      if (remoteUntil > clock()) scheduleRemoteExpiry() else { remoteExpiry = null; ensure() }
+    }
+  }, wait, java.util.concurrent.TimeUnit.MILLISECONDS)
+}
