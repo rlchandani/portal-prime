@@ -253,6 +253,11 @@ class PhotoFrameController(
   private lateinit var calendarHeader: TextView
   private lateinit var calendarRows: LinearLayout
   private var calendarEvents: List<CalendarFeed.Event> = emptyList()
+  // Verification-only generated scenes (see ScreensaverTestSource); decided once per start.
+  private var testSourceOn = false
+  private val testIndex = java.util.concurrent.atomic.AtomicInteger()
+  private val testScenes = java.util.Collections.synchronizedMap(
+      java.util.WeakHashMap<Bitmap, ScreensaverTestSource.Scene>())
   // Text/padding scale for the current calendar size (0/1/2 → small/medium/large),
   // applied as the panel is (re)rendered so a size change takes effect live.
   private var calScale: Float = 1f
@@ -451,7 +456,11 @@ class PhotoFrameController(
           onNightChanged = ::setAmbientNight)
       darkRoomObserver?.setActive(hostVisible)
     }
-    val source = PhotoFrameSource.from(settings, allowWebPage = !photosOnly && faceOverride == null)
+    // Verification builds only: generated scenes replace every configured (household) source.
+    testSourceOn = !photosOnly && ScreensaverTestSource.active(context)
+    if (testSourceOn) Log.i(TAG, "screensaver test source active: generated scenes only")
+    val source = if (testSourceOn) PhotoFrameSource.DefaultFeed
+        else PhotoFrameSource.from(settings, allowWebPage = !photosOnly && faceOverride == null)
     nativePhotoMode = ScreensaverConfig.isNativeStage(settings.mode) && source !is PhotoFrameSource.WebPage
     if (nativePhotoMode) {
       nativeStarting = true
@@ -1658,12 +1667,14 @@ class PhotoFrameController(
    *  (no network) — called when a fetch lands and once per minute from [tick]. */
   private fun renderCalendar() {
     if (!this::calendarPanel.isInitialized) return
-    if (!settings.usesCalendar) {
+    if (!settings.usesCalendar && !testSourceOn) {
       calendarPanel.visibility = View.GONE
       return
     }
     val now = System.currentTimeMillis()
-    val shown = CalendarFeed.window(calendarEvents, settings.calendarRange, now)
+    // The verification source shows synthetic events, never the household's own agenda.
+    val shown = if (testSourceOn) CalendarFeed.window(ScreensaverTestSource.events(now), CalendarFeed.RANGE_3DAY, now)
+        else CalendarFeed.window(calendarEvents, settings.calendarRange, now)
     // Size + position can change at runtime (settings screen or a fleet push), so
     // (re)apply the chrome each render. Scale drives text/padding; side drives the edge.
     calScale =
@@ -2263,7 +2274,7 @@ class PhotoFrameController(
             renderCalendar()
           }
           val url = settings.calendarUrl
-          if (settings.usesCalendar && !url.isNullOrBlank()) {
+          if (!testSourceOn && settings.usesCalendar && !url.isNullOrBlank()) {
             metaIo.execute {
               val events = CalendarFeed.fetch(url)
               ui.post {
@@ -2958,6 +2969,7 @@ class PhotoFrameController(
               stopVideo()
               rememberNativePhoto(ready.first())
               presentNative(ready, automatic)
+              publishTestCaption(ready.first())
               armHold(rotate)
             }
           }, { if (g == gen && !stopped) { photoPause.cancel(); armHold(rotate) } })
@@ -2995,7 +3007,22 @@ class PhotoFrameController(
     }
   }
 
+  /** The next generated verification scene, sized like a decoded photo for this panel. */
+  private fun nextTestPhoto(): Bitmap {
+    val index = testIndex.getAndIncrement()
+    val bitmap = ScreensaverTestSource.photo(index, SlideshowDecodeBudget.MAX_EDGE)
+    testScenes[bitmap] = ScreensaverTestSource.scene(index)
+    return bitmap
+  }
+
+  private fun publishTestCaption(photo: SlideshowPhoto) {
+    if (photosOnly || !testSourceOn) return
+    val scene = testScenes[photo.bitmap] ?: return
+    faceRenderer.setCaption(scene.place, scene.date, if (scene.memory) PhotoCaption.memoryLabel(2) else null)
+  }
+
   private fun fetchWebPhoto(): Bitmap? {
+    if (testSourceOn) return nextTestPhoto()
     val generation = photoTransportGeneration.get()
     val now = System.currentTimeMillis()
     for ((name, fetch) in webSources) {
@@ -3231,6 +3258,7 @@ class PhotoFrameController(
 
   /** Terminal fallback: CC0/public-domain photos bundled in the APK — never fails. */
   private fun bundledBitmap(): Bitmap? {
+    if (testSourceOn) return nextTestPhoto()
     if (bundledNames.isEmpty()) {
       bundledNames =
           runCatching {

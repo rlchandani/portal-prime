@@ -386,6 +386,33 @@ class FleetRoutes(private val context: Context) {
         val unreachable = if (body.has("haUnreachable")) body.optBoolean("haUnreachable") else null
         resp(200, JSONObject().put("ok", true).put("action", "cc_debug").put("result", ControlCenter.debug(context, dry, plan, alert, unreachable)))
       }
+      // Verification only: swap every photo source for generated scenes (expires on its own), or
+      // switch back. {"enabled":true|false, "minutes":1..240}. Any frame already on screen is
+      // retired first so household photos are never on screen while the switch is on; enabling
+      // then opens a fresh frame on the generated scenes. Release builds report unavailable.
+      "screensaver_test_source" -> {
+        val enable = body.optBoolean("enabled", false)
+        val minutes = body.optInt("minutes", 30)
+        if (enable && minutes !in 1..ScreensaverTestSource.MAX_MINUTES)
+          return resp(400, err("bad_minutes"))
+        val applied = if (enable) ScreensaverTestSource.enable(context, minutes)
+            else ScreensaverTestSource.disable(context)
+        if (applied) {
+          val main = android.os.Handler(android.os.Looper.getMainLooper())
+          main.post { ImmortalDreamNavigation.dismissForNavigation() }
+          // The singleTask frame must finish before a fresh one is created on the new source.
+          if (enable) main.postDelayed({
+            runCatching {
+              context.startActivity(android.content.Intent(context, PhotoFramePreviewActivity::class.java)
+                  .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+            }.onFailure { android.util.Log.w("FleetRoutes", "test frame launch failed", it) }
+          }, 800L)
+        }
+        resp(200, JSONObject().put("ok", applied).put("action", "screensaver_test_source")
+            .put("available", ScreensaverTestSource.available())
+            .put("active", ScreensaverTestSource.active(context))
+            .put("until", ScreensaverTestSource.until(context)))
+      }
       // Needs the signature/privileged REBOOT permission we don't hold — report honestly.
       "reboot" -> resp(200, JSONObject().put("ok", false).put("action", "reboot").put("result", "not_permitted"))
       else -> resp(400, err("unknown_action"))
