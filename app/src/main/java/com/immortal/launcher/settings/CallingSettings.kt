@@ -20,7 +20,9 @@ import org.json.JSONObject
 /**
  * Settings › Calls ([CallingConfig]). Privacy guarantees are not settings: they render as
  * locked "Always" rows in the page's own block, so there is nothing here that could turn them
- * off. The drop-in grid writes this Portal's column through [set] like every other row.
+ * off. Grandma mode and auto-answer are deliberately absent too: this registry also drives the
+ * phone remote, and those may only be set at the Portal itself ([CallAutoAnswerStore]). The
+ * drop-in grid writes this Portal's column through [set] like every other row.
  */
 internal object CallingSettings {
   val domain: SettingsDomain<Settings> =
