@@ -50,10 +50,10 @@ internal fun CcTeslaHero(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcCarView
   }
   Column(modifier.ccCard().padding(horizontal = 34.dp, vertical = 28.dp)) {
     TitleRow(s, ui, ids, car, canAct)
-    CcCarArt(cable, charger != null, animate = motion && car.life == CcCarLife.AWAKE, modifier = Modifier.weight(1f).fillMaxWidth().padding(vertical = 8.dp))
+    CcCarArt(car.paint, cable, charger != null, animate = motion && car.life == CcCarLife.AWAKE, modifier = Modifier.weight(1f).fillMaxWidth().padding(vertical = 8.dp))
     BatteryRow(car, s.now)
     ChargeBar(car.batteryPct, car.limitPct, car.charging, Modifier.padding(top = 18.dp))
-    Details(s, ui, ids, car, canAct, Modifier.padding(top = 22.dp))
+    Details(s, ui, ids, car, charger, canAct, Modifier.padding(top = 22.dp))
   }
 }
 
@@ -113,14 +113,37 @@ private fun ChargeBar(pct: Int?, limit: Int?, charging: Boolean, modifier: Modif
 
 private const val BAR_IDLE = 0.8f
 
+/**
+ * Charging: power, energy added, time to full and the limit. Otherwise three tiles: what the
+ * charge port is doing with an estimate to the limit, the last session's energy and the limit.
+ */
 @Composable
-private fun Details(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcCarView, canAct: Boolean, modifier: Modifier) {
-  val toFull = CcTeslaText.toFull(car.fullAt, s.now)
+private fun Details(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcCarView, charger: CcChargerView?, canAct: Boolean, modifier: Modifier) {
+  val added = car.energyAddedKwh?.let { "${CcTeslaText.kwh(it)} kWh" } ?: "—"
   Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-    Tile(if (car.charging) car.powerKw?.let { "${CcTeslaText.kw(it)} kW" } ?: "—" else "—", "charging power")
-    Tile(car.energyAddedKwh?.let { "${CcTeslaText.kwh(it)} kWh" } ?: "—", "added this session")
-    Tile(if (car.charging) toFull ?: "—" else "—", "to full")
+    if (car.charging) {
+      Tile(car.powerKw?.let { "${CcTeslaText.kw(it)} kW" } ?: "—", "charging power")
+      Tile(added, "added this session")
+      Tile(CcTeslaText.toFull(car.fullAt, s.now) ?: "—", "to full")
+    } else {
+      val idle = remember(car, charger, ids.model) { CcTeslaIdle.of(car, charger, ids.model) }
+      IdleTile(idle)
+      Tile(added, "added last charge")
+    }
     LimitTile(s, ui, ids, car, canAct)
+  }
+}
+
+@Composable
+private fun RowScope.IdleTile(idle: CcIdleCharge) {
+  val c = LocalCc.current
+  Row(Modifier.weight(IDLE_WEIGHT).clip(TILE).background(c.surface2).padding(horizontal = 20.dp, vertical = 16.dp),
+      verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+    CcIcon("charger", c.sec, 34.dp)
+    Column {
+      Text(idle.title, color = c.text, fontSize = 26.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+      Text(idle.detail ?: "Not charging", color = c.sec, fontSize = 18.sp, maxLines = 1)
+    }
   }
 }
 
@@ -162,3 +185,5 @@ private fun RowScope.LimitTile(s: CcUiState, ui: CcUi, ids: CcTeslaIds, car: CcC
 private val TILE = RoundedCornerShape(22.dp)
 /** The limit tile carries two 64 dp buttons, so it is wider than the read-only tiles. */
 private const val LIMIT_WEIGHT = 1.6f
+/** The idle tile stands in for two read-only tiles. */
+private const val IDLE_WEIGHT = 2.2f

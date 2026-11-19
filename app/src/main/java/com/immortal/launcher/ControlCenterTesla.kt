@@ -25,6 +25,7 @@ internal enum class CcCarRole(val domain: String, val keys: List<String>, val su
   ENERGY_ADDED("sensor", listOf("charge_state_charge_energy_added"), listOf("_charge_energy_added", "_energy_added")),
   TIME_TO_FULL("sensor", listOf("charge_state_minutes_to_full_charge", "charge_state_time_to_full_charge"), listOf("_time_to_full_charge")),
   CHARGE_LIMIT("number", listOf("charge_state_charge_limit_soc"), listOf("_charge_limit")),
+  CHARGE_CURRENT("number", listOf("charge_state_charge_current_request"), listOf("_charge_current")),
   CHARGE_SWITCH("switch", listOf("charge_state_charging_state", "charge_state_charge_enable_request", "charge"), listOf("_charge", "_charger")),
   CABLE("binary_sensor", listOf("charge_state_conn_charge_cable"), listOf("_charge_cable", "_plugged_in")),
   CHARGE_PORT("cover", listOf("charge_state_charge_port_door_open"), listOf("_charge_port_door", "_charge_port")),
@@ -68,6 +69,7 @@ internal enum class CcChargerRole(val domain: String, val keys: List<String>, va
   LIFETIME("sensor", listOf("energy_kwh"), listOf("_lifetime_energy")),
   STATUS("sensor", listOf("status"), listOf("_status", "_session_state")),
   CONNECTED("binary_sensor", listOf("vehicle_connected"), listOf("_vehicle_connected")),
+  GRID_VOLTAGE("sensor", listOf("grid_v"), listOf("_grid_voltage")),
   COST("sensor", emptyList(), listOf("_session_cost")),
 }
 
@@ -82,10 +84,12 @@ internal data class CcTeslaIds(
     val chargerSource: String? = null,
     /** An electricity price entity (unit per kWh), when the house has one. */
     val price: String? = null,
+    /** The car's paint name (e.g. TeslaMate's `sensor.<car>_exterior_color`), for the art's body colour. */
+    val paint: String? = null,
 ) {
   val hasCar: Boolean get() = car.isNotEmpty()
   /** Everything the Tesla screen and side card read (subscribed while the Control Center is on screen). */
-  val all: Set<String> get() = car.values.toSet() + charger.values + listOfNotNull(price)
+  val all: Set<String> get() = car.values.toSet() + charger.values + listOfNotNull(price, paint)
   /** The recorder statistic behind the week chart: the charger's lifetime meter, else the car's energy added. */
   val weekStat: String? get() = charger[CcChargerRole.LIFETIME] ?: car[CcCarRole.ENERGY_ADDED]
   /** Rail and header label: the car's HA name when it has a short one, else "Tesla". */
@@ -120,7 +124,7 @@ internal object CcTeslaRegistry {
     val car = CcCarRole.entries.mapNotNull { role -> match(ownRows, role.domain, role.keys, role.suffixes)?.let { role to it } }.toMap()
     val (charger, source) = charger(rows, carRows)
     val info = deviceInfo[carDevice]
-    return CcTeslaIds(info?.name, info?.model, car, charger, source, price(rows))
+    return CcTeslaIds(info?.name, info?.model, car, charger, source, price(rows), paint(rows, ownRows))
   }
 
   /** The car = the device with a battery level (first by id, so a household with two cars is stable). */
@@ -152,6 +156,12 @@ internal object CcTeslaRegistry {
     keys.forEach { k -> inDomain.firstOrNull { it.key == k }?.let { return it.id } }
     return suffixes.firstNotNullOfOrNull { s -> inDomain.filter { it.key == null && it.id.endsWith(s) }.minByOrNull { it.id }?.id }
   }
+
+  /** The car's own paint sensor first, else any `*_exterior_color` sensor (TeslaMate publishes it over MQTT). */
+  private fun paint(rows: List<Row>, own: List<Row>): String? =
+      (own + rows).firstOrNull { it.domain == "sensor" && (it.key == "vehicle_config_exterior_color" || it.id.endsWith(PAINT_SUFFIX)) }?.id
+
+  private const val PAINT_SUFFIX = "_exterior_color"
 
   private fun price(rows: List<Row>): String? =
       rows.filter { it.domain == "sensor" || it.domain == "input_number" }.firstOrNull { r -> PRICE_HINTS.any { it in r.id } }?.id

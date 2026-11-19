@@ -52,7 +52,14 @@ internal object CcTeslaText {
   /** Time until [fullAt]: "1 h 20 min", "45 min"; null when it's not coming. */
   fun toFull(fullAt: Long?, now: Long): String? {
     val mins = fullAt?.let { (it - now) / MS_PER_MIN }?.takeIf { it > 0 } ?: return null
-    return if (mins < MIN_PER_H) "$mins min" else "${mins / MIN_PER_H} h ${mins % MIN_PER_H} min"
+    return duration(mins)
+  }
+
+  /** "45 min", "1 h 20 min", "2 h". */
+  fun duration(mins: Long): String = when {
+    mins < MIN_PER_H -> "$mins min"
+    mins % MIN_PER_H == 0L -> "${mins / MIN_PER_H} h"
+    else -> "${mins / MIN_PER_H} h ${mins % MIN_PER_H} min"
   }
 
   fun kw(v: Double): String = "%.1f".format(v)
@@ -123,4 +130,52 @@ internal object CcTeslaStatus {
     return CcStatusRow("warn".takeIf { warn } ?: "check", if (warn) "Tyres · check pressure" else "Tyres", text,
         if (warn) CcTone.AMBER else CcTone.NEUTRAL)
   }
+}
+
+/** While the car isn't charging, the hero's wide tile: what's happening and how long a charge to the limit would take. */
+@Immutable
+internal data class CcIdleCharge(val title: String, val detail: String?)
+
+/** Idle charge wording and a home-charge estimate (pure): kWh to the limit ÷ the Wall Connector rate. */
+internal object CcTeslaIdle {
+  private const val NOMINAL_VOLTS = 240.0
+  private const val EFFICIENCY = 0.9
+  private const val W_PER_KW = 1000.0
+  private const val PCT = 100.0
+  private const val MIN_PER_H = 60.0
+  /** Usable pack size by model (kWh): an estimate, so it's labelled "about". */
+  private fun packKwh(model: String?): Double = when {
+    model == null -> PACK_DEFAULT
+    "cyber" in model.lowercase() -> PACK_CYBERTRUCK
+    "model s" in model.lowercase() || "model x" in model.lowercase() -> PACK_SX
+    else -> PACK_DEFAULT
+  }
+  private const val PACK_DEFAULT = 75.0
+  private const val PACK_SX = 95.0
+  private const val PACK_CYBERTRUCK = 123.0
+
+  fun of(v: CcCarView, charger: CcChargerView?, model: String?): CcIdleCharge {
+    val title = when (v.charge) {
+      CcChargeState.COMPLETE -> "Charge complete"
+      CcChargeState.STOPPED -> "Plugged in · paused"
+      CcChargeState.PLUGGED -> "Plugged in · not charging"
+      CcChargeState.NO_POWER -> "Plugged in · no power"
+      else -> "Not plugged in"
+    }
+    return CcIdleCharge(title, detail(v, charger, model))
+  }
+
+  private fun detail(v: CcCarView, charger: CcChargerView?, model: String?): String? {
+    val pct = v.batteryPct ?: return null
+    val limit = v.limitPct ?: return null
+    if (pct >= limit) return "At your $limit% limit"
+    val kw = rateKw(v.chargeAmps, charger?.gridVolts) ?: return null
+    val mins = minutesTo(pct, limit, packKwh(model), kw)
+    return "About ${CcTeslaText.duration(mins)} to $limit% at ${Math.round(kw)} kW"
+  }
+
+  fun rateKw(amps: Int?, volts: Double?): Double? = amps?.let { it * (volts ?: NOMINAL_VOLTS) / W_PER_KW }
+
+  fun minutesTo(pct: Int, limit: Int, packKwh: Double, kw: Double): Long =
+      Math.round((limit - pct) / PCT * packKwh / (kw * EFFICIENCY) * MIN_PER_H)
 }

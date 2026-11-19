@@ -37,6 +37,10 @@ internal data class CcCarView(
     val limitPct: Int?,
     val limitMin: Int,
     val limitMax: Int,
+    /** The current the car asks the charger for (A), for the idle "time to limit" estimate. */
+    val chargeAmps: Int?,
+    /** Body colour for the art: from HA's paint name, else a neutral graphite. */
+    val paint: CcPaint,
     val pluggedIn: Boolean?,
     val home: Boolean?,
     /** "Home", "Away" or the HA zone name; never coordinates. */
@@ -97,6 +101,8 @@ internal object CcTeslaCar {
         limitPct = limit?.takeIf { !it.unavailable }?.numeric?.toInt(),
         limitMin = (limit?.attrs?.get("min") as? Number)?.toInt() ?: DEFAULT_LIMIT_MIN,
         limitMax = (limit?.attrs?.get("max") as? Number)?.toInt() ?: PCT_MAX,
+        chargeAmps = live(CcCarRole.CHARGE_CURRENT)?.numeric?.toInt()?.takeIf { it > 0 },
+        paint = CcTeslaPaint.of(ids.paint?.let(entities::get)?.state),
         pluggedIn = live(CcCarRole.CABLE)?.isOn,
         home = tracker?.let { it.state == "home" },
         place = tracker?.let(::place),

@@ -20,6 +20,8 @@ internal data class CcChargerView(
     val status: String?,
     val connected: Boolean?,
     val sessionCost: Double?,
+    /** Mains voltage at the Wall Connector (for the idle charge-rate estimate). */
+    val gridVolts: Double?,
 ) {
   val delivering: Boolean get() = (powerKw ?: 0.0) > CcTeslaCharger.MIN_KW
 }
@@ -35,6 +37,8 @@ internal data class CcChargeWeek(val starts: List<Long>, val kwh: List<Double>, 
 
 internal object CcTeslaCharger {
   const val MIN_KW = 0.05
+  /** Below this the Wall Connector is reporting its idle contactor, not the mains. */
+  private const val MIN_GRID_V = 100.0
   private const val W_PER_KW = 1000.0
 
   fun view(ids: CcTeslaIds, entities: Map<String, CcEntity>): CcChargerView? {
@@ -47,6 +51,7 @@ internal object CcTeslaCharger {
         status = live(CcChargerRole.STATUS)?.state?.let(::status),
         connected = live(CcChargerRole.CONNECTED)?.isOn,
         sessionCost = live(CcChargerRole.COST)?.numeric,
+        gridVolts = live(CcChargerRole.GRID_VOLTAGE)?.numeric?.takeIf { it > MIN_GRID_V },
     )
   }
 
