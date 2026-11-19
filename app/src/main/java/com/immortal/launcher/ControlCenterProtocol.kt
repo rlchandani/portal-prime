@@ -17,7 +17,7 @@ import org.json.JSONObject
  * The token appears only in the auth message and is never logged or echoed.
  */
 internal class CcProtocol(private val token: String) {
-  enum class Kind { FLOORS, AREAS, DEVICES, ENTITIES, PLAN_GET, PLAN_SET, SUBSCRIBE, GET_STATES, EVENTS, CALL, PING, ENERGY_PREFS, STATS, UNSUBSCRIBE }
+  enum class Kind { FLOORS, AREAS, DEVICES, ENTITIES, PLAN_GET, PLAN_SET, SUBSCRIBE, GET_STATES, EVENTS, CALL, PING, STATS, UNSUBSCRIBE }
 
   data class Req(val kind: Kind, val key: String = "")
 
@@ -107,8 +107,6 @@ internal class CcProtocol(private val token: String) {
     pingSentAt = now
     return request(Req(Kind.PING), JSONObject().put("type", "ping")).also { pingId = nextId - 1; pending.remove(pingId) }
   }
-
-  fun energyPrefs(): Out.Send = request(Req(Kind.ENERGY_PREFS), JSONObject().put("type", "energy/get_prefs"))
 
   /** Hourly/daily `change` statistics for [ids] between ISO [start] and [end]. */
   fun statistics(key: String, ids: List<String>, startIso: String, endIso: String, period: String): Out.Send =

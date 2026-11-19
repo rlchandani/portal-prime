@@ -96,9 +96,16 @@ internal object CcAlertRules {
   }
 
   fun icon(alert: CcAlert, entity: CcEntity?): String = when (alert.kind) {
-    CcKind.APPLIANCE -> CcEnergyKpis.consumerIcon(alert.entityId).takeIf { it != "bolt" } ?: "washer"
+    CcKind.APPLIANCE -> applianceIcon(alert.entityId)
     CcKind.SMOKE -> "warn"
     else -> CcIcons.forKind(entity?.let(CcKind::of) ?: alert.kind)
+  }
+
+  private fun applianceIcon(entityId: String): String = when {
+    "dish" in entityId -> "dish"
+    "dryer" in entityId -> "dryer"
+    "oven" in entityId || "stove" in entityId || "cook" in entityId -> "oven"
+    else -> "washer"
   }
 
   /**

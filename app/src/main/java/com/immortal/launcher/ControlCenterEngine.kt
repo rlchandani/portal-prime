@@ -169,7 +169,7 @@ internal class CcEngine(val app: Context) {
 
   private fun authOk(ws: WebSocket, p: CcProtocol) {
     setPhase(ui.connection.phase, "Loading rooms")
-    (p.registry() + p.getPlan() + p.energyPrefs()).forEach { ws.send(it.text) }
+    (p.registry() + p.getPlan()).forEach { ws.send(it.text) }
     heartbeat?.cancel(false)
     heartbeat = exec.scheduleWithFixedDelay({ post(::beat) }, PING_S, PING_S, TimeUnit.SECONDS)
   }
@@ -202,8 +202,7 @@ internal class CcEngine(val app: Context) {
       CcProtocol.Kind.PLAN_GET -> planLoaded(ws, p, if (r.ok) (r.result as? org.json.JSONObject)?.optJSONObject("value") else null)
       CcProtocol.Kind.PLAN_SET -> planSaved(r.ok)
       CcProtocol.Kind.CALL -> callResult(r)
-      CcProtocol.Kind.ENERGY_PREFS -> { ui = ui.copy(energyPrefs = if (r.ok) CcEnergy.prefs(r.result) else CcEnergyPrefs()); publish() }
-      CcProtocol.Kind.STATS -> statsResult(r)
+      CcProtocol.Kind.STATS -> chargeStatsResult(r)
       else -> Unit
     }
   }
@@ -211,9 +210,11 @@ internal class CcEngine(val app: Context) {
   private fun registryReady(ws: WebSocket, p: CcProtocol) {
     val floors = CcRegistryParser.floors(parts[CcProtocol.Kind.FLOORS] as? org.json.JSONArray)
     val areas = CcRegistryParser.areas(parts[CcProtocol.Kind.AREAS] as? org.json.JSONArray)
-    val devices = CcRegistryParser.deviceAreas(parts[CcProtocol.Kind.DEVICES] as? org.json.JSONArray)
+    val deviceList = parts[CcProtocol.Kind.DEVICES] as? org.json.JSONArray
+    val devices = CcRegistryParser.deviceAreas(deviceList)
     val ents = parts[CcProtocol.Kind.ENTITIES] as? org.json.JSONArray
-    ui = ui.copy(registry = if (ents == null) null else CcRegistryParser.registry(floors, areas, devices, ents))
+    ui = ui.copy(registry = if (ents == null) null
+        else CcRegistryParser.registry(floors, areas, devices, ents).copy(tesla = CcTeslaRegistry.parse(deviceList, ents)))
     Log.i(TAG, "control center registry: ${floors.size} floors, ${areas.size} areas, ${ui.registry?.entities?.size ?: 0} entities")
     setPhase(ui.connection.phase, "Loading devices")
     if (planResolved) subscribe(ws, p)

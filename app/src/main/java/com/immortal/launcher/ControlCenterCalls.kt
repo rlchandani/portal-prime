@@ -24,12 +24,17 @@ internal data class CcCall(
     val optimistic: CcOptimistic? = null,
     /** Short past-tense label for the Undo toast, e.g. "Floor lamp off". */
     val label: String = "",
+    /** A car command ([CcTeslaCalls]): kids mode never sends it, and [CcGuard.CONFIRM] always asks first. */
+    val guard: CcGuard = CcGuard.NONE,
 ) {
   fun toMessage(id: Int): JSONObject = JSONObject().put("id", id).put("type", "call_service")
       .put("domain", domain).put("service", service)
       .put("service_data", JSONObject().apply { data.forEach { (k, v) -> put(k, if (v is List<*>) JSONArray(v) else v) } })
       .apply { entityId?.let { put("target", JSONObject().put("entity_id", it)) } }
 }
+
+/** How [CcPolicy] treats a car command, whatever entity it targets. */
+internal enum class CcGuard { NONE, VEHICLE, CONFIRM }
 
 /** Fields the UI overrides while a call is in flight; null = leave as HA says. */
 @Immutable
@@ -156,9 +161,9 @@ internal object CcCalls {
 
   /**
    * The call that puts [before] back after [call], for the 5 s Undo. Null where undo isn't safe or
-   * meaningful (locks, garages, valves, alarms and scenes have their own paths).
+   * meaningful (locks, garages, valves, alarms, scenes and car commands have their own paths).
    */
-  fun undo(before: CcEntity, call: CcCall): CcCall? = when (call.domain) {
+  fun undo(before: CcEntity, call: CcCall): CcCall? = if (call.guard != CcGuard.NONE) null else when (call.domain) {
     "light" -> if (!before.isOn) lightPower(before, false)
     else before.brightnessPct?.let { brightness(before, it) } ?: lightPower(before, true)
     "switch", "fan", "input_boolean" -> if (call.service == "set_percentage") before.percentage?.let { fanSpeed(before, it) } else power(before, before.isOn)
@@ -192,6 +197,8 @@ internal object CcPolicy {
   enum class Ask { NONE, CONFIRM, CAMERA_CONFIRM, PIN }
 
   fun ask(e: CcEntity, call: CcCall, s: ControlCenterConfig.Settings, scenesSeen: Set<String> = emptySet()): Ask = when {
+    // Unlocking the car and opening its frunk, trunk or charge port always ask, whatever the house settings say.
+    call.guard == CcGuard.CONFIRM -> Ask.CONFIRM
     call.domain == "lock" && call.service == "unlock" -> if (s.askUnlock) Ask.CONFIRM else Ask.NONE
     call.domain == "cover" && CcKind.of(e) == CcKind.GARAGE && call.service != "stop_cover" -> if (s.askGarage) Ask.CAMERA_CONFIRM else Ask.NONE
     call.domain == "valve" -> if (s.askValve) Ask.CONFIRM else Ask.NONE
@@ -210,7 +217,8 @@ internal object CcPolicy {
    * [scenesSeen] is read only for scene calls (it touches preferences).
    */
   fun refusal(e: CcEntity?, call: CcCall, s: ControlCenterConfig.Settings, confirmed: Boolean, scenesSeen: () -> Set<String>): String? {
-    if (e == null) return if (confirmed || call.domain !in ASKING_DOMAINS) null else "unknown ${call.domain} entity"
+    if (call.guard != CcGuard.NONE && s.kids) return "kids mode · car is look only"
+    if (e == null) return if (confirmed || call.domain !in ASKING_DOMAINS && call.guard != CcGuard.CONFIRM) null else "unknown ${call.domain} entity"
     if (hidden(e, s)) return "hidden on this Portal"
     if (readOnly(e, s)) return "read-only on this Portal"
     if (confirmed) return null
@@ -259,4 +267,4 @@ internal object CcPolicy {
   private val VALVE_HINTS = listOf("valve", "water_main", "main_water")
 }
 
-internal enum class CcScreen { MAP, CAMERAS, ENERGY, ALERTS, SECURITY, EDIT, SETTINGS }
+internal enum class CcScreen { MAP, CAMERAS, TESLA, ALERTS, SECURITY, EDIT, SETTINGS }

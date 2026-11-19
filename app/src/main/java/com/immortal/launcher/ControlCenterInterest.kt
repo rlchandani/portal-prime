@@ -8,8 +8,9 @@ package com.immortal.launcher
 
 /**
  * Which entities the shared socket subscribes to (pure, unit tested). On screen: the plan plus
- * everything the side column, alerts, scenes, cameras, energy and the editor read — never the
- * whole house's diagnostics. In the background: only what can raise a banner.
+ * everything the side column, alerts, scenes, cameras, the Tesla screen and the editor read — never
+ * the whole house's diagnostics (the car's own are the exception: its doors, tyres and charge
+ * details are diagnostic in HA). In the background: only what can raise a banner.
  */
 internal object CcInterest {
   private val GLOBAL_DOMAINS = setOf("alarm_control_panel", "person", "camera", "scene", "script", "weather", "climate", "lock", "valve", "media_player")
@@ -32,7 +33,7 @@ internal object CcInterest {
           (domain == "sensor" && reg.entityClass[id] in SENSOR_CLASSES) || alertWorthy(id, reg)
     }
     val planIds = plan?.entityIds.orEmpty()
-    return (planIds + wanted.sortedBy { priority(it) }).take(MAX_FOREGROUND).toSet()
+    return (planIds + wanted.sortedBy { priority(it) }).take(MAX_FOREGROUND).toSet() + reg.tesla.all
   }
 
   fun background(reg: CcRegistry?): Set<String>? {

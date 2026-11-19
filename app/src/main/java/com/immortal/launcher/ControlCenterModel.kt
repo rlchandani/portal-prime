@@ -202,6 +202,8 @@ internal data class CcRegistry(
     val entityClass: Map<String, String> = emptyMap(),
     /** Entities the registry lists as usable (not disabled, hidden, diagnostic or config). */
     val entities: Set<String> = emptySet(),
+    /** The car, its home charger and a price entity, for the Tesla screen (diagnostic ones included). */
+    val tesla: CcTeslaIds = CcTeslaIds.NONE,
 ) {
   fun areaOf(entityId: String): String? = entityArea[entityId]
   fun areasOn(floorId: String?): List<CcHaArea> = areas.filter { it.floorId == floorId }

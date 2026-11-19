@@ -9,8 +9,8 @@ package com.immortal.launcher
 import androidx.compose.runtime.Immutable
 /**
  * Everything a Control Center screen renders, as one immutable snapshot published by
- * [ControlCenter.state] (at most a few times a second). Screens derive rooms/alerts/energy from
- * it with the pure helpers ([CcRooms], [CcAlerts], [CcEnergy]); they never mutate it.
+ * [ControlCenter.state] (at most a few times a second). Screens derive rooms/alerts/the car from
+ * it with the pure helpers ([CcRooms], [CcAlerts], [CcTeslaCar]); they never mutate it.
  */
 @Immutable
 internal data class CcUiState(
@@ -25,9 +25,8 @@ internal data class CcUiState(
     val planSource: CcPlanSource = CcPlanSource.NONE,
     val settings: ControlCenterConfig.Settings = ControlCenterConfig.Settings(),
     val toast: CcToast? = null,
-    val energyPrefs: CcEnergyPrefs? = null,
-    val energyToday: CcEnergySeries? = null,
-    val energyWeek: CcEnergySeries? = null,
+    /** Home charging per day this week (recorder statistics), loaded while the Tesla screen shows. */
+    val chargeWeek: CcChargeWeek? = null,
     /** Appliances that finished recently: entity id → when (for "Washer is done"). */
     val appliancesDone: Map<String, Long> = emptyMap(),
     /** Dismissed/snoozed alert ids → until (epoch ms). */
@@ -54,8 +53,7 @@ internal data class CcUiState(
     if (other !is CcUiState) return false
     return entitiesVersion == other.entitiesVersion && minute == other.minute && connection == other.connection &&
         registry === other.registry && plan == other.plan && planSource == other.planSource && settings == other.settings &&
-        toast == other.toast && energyPrefs == other.energyPrefs && energyToday == other.energyToday &&
-        energyWeek == other.energyWeek && appliancesDone == other.appliancesDone && dismissed == other.dismissed &&
+        toast == other.toast && chargeWeek == other.chargeWeek && appliancesDone == other.appliancesDone && dismissed == other.dismissed &&
         sceneRun == other.sceneRun && debug == other.debug
   }
 
@@ -86,7 +84,10 @@ internal data class CcUiState(
 
   private fun computeAlerts(): List<CcAlert> {
     val roomName: (String) -> String? = { id -> plan?.roomOf(id)?.name }
-    return CcAlerts.active(entities, now, settings.warningAfterMin, roomName, appliancesDone)
+    // The car isn't the house: its battery level and doors belong on the Tesla screen, not in alerts.
+    val car = registry?.tesla?.all.orEmpty()
+    val house = if (car.isEmpty()) entities else entities.filterKeys { it !in car }
+    return CcAlerts.active(house, now, settings.warningAfterMin, roomName, appliancesDone)
         .filter { a -> (dismissed[a.id] ?: 0L) < now }
         .filter { a -> a.severity == CcSeverity.CRITICAL || entities[a.entityId]?.let { !CcPolicy.hidden(it, settings) } != false }
   }
