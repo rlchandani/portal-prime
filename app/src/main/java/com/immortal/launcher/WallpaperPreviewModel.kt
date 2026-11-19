@@ -20,8 +20,8 @@ internal object WallpaperSwatchLayout {
     fun columnsForWidth(widthDp: Int): Int = (widthDp / MIN_CELL_DP).coerceIn(1, MAX_COLUMNS)
 
     /** Columns for a split-view page on a screen [screenWidthDp] wide (5 at 1920 dp, 3 at 1280 dp). */
-    fun columns(screenWidthDp: Int): Int =
-        columnsForWidth(SettingsSplitMetrics.pageContentWidthDp(screenWidthDp) - 2 * CARD_PADDING_DP)
+    fun columns(screenWidthDp: Int, singlePane: Boolean = false): Int =
+        columnsForWidth(SettingsSplitMetrics.pageContentWidthDp(screenWidthDp, singlePane) - 2 * CARD_PADDING_DP)
 
     const val GAP_DP = 12
     private const val SWATCH_ASPECT = 240f / 145f
@@ -29,8 +29,8 @@ internal object WallpaperSwatchLayout {
     private const val LABEL_DP = 34
 
     /** One row's height (swatch plus label), for its placeholder while it is precomposed. */
-    fun rowHeightDp(screenWidthDp: Int, columns: Int = columns(screenWidthDp)): Int {
-        val inner = SettingsSplitMetrics.pageContentWidthDp(screenWidthDp) - 2 * CARD_PADDING_DP
+    fun rowHeightDp(screenWidthDp: Int, columns: Int = columns(screenWidthDp), singlePane: Boolean = false): Int {
+        val inner = SettingsSplitMetrics.pageContentWidthDp(screenWidthDp, singlePane) - 2 * CARD_PADDING_DP
         val cell = (inner - (columns - 1) * GAP_DP).toFloat() / columns.coerceAtLeast(1)
         return (cell / SWATCH_ASPECT).toInt() + LABEL_DP
     }

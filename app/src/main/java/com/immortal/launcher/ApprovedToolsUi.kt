@@ -189,11 +189,24 @@ internal fun ToolsSheet(
                     .verticalScroll(rememberScrollState()).padding(32.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp), content = content)
                 Box(Modifier.fillMaxWidth().height(1.dp).background(p.divider))
-                Row(Modifier.fillMaxWidth().padding(24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End), content = actions)
+                if (currentLayoutClass().compact) {
+                    ToolsSheetFlowActions(actions)
+                } else {
+                    Row(Modifier.fillMaxWidth().padding(24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End), content = actions)
+                }
             }
         }
     }
+}
+
+/** Compact sheet actions: right-aligned, wrapping to another line instead of squeezing a label. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ToolsSheetFlowActions(actions: @Composable RowScope.() -> Unit) {
+    FlowRow(Modifier.fillMaxWidth().padding(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) { actions() }
 }
 
 @Composable
@@ -208,7 +221,9 @@ internal fun ToolsChoice(title: String, value: String, options: List<String>, on
     if (open) ToolsSheet(title, { open = false }, actions = {
         ToolsButton("Cancel") { open = false }
     }) {
-        options.chunked(3).forEach { row ->
+        // Compact portrait: two choices a row so each label keeps whole words.
+        val perRow = if (currentLayoutClass().compactPortrait) 2 else 3
+        options.chunked(perRow).forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 row.forEach { option ->
                     ToolsButton(option + if (option == value) "  ✓" else "",
@@ -216,7 +231,7 @@ internal fun ToolsChoice(title: String, value: String, options: List<String>, on
                         onSelect(option); open = false
                     }
                 }
-                repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                repeat(perRow - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }

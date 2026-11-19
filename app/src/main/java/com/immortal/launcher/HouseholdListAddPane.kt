@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
@@ -38,7 +39,8 @@ import com.immortal.launcher.ui.theme.LocalApprovedPalette
 @OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
 internal fun HouseholdAddPane(view: HouseholdListView, toast: HouseholdListToast, typing: Boolean,
-                              onTyping: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+                              onTyping: (Boolean) -> Unit, modifier: Modifier = Modifier,
+                              compact: Boolean = false, sharedWith: Boolean = true) {
   val context = LocalContext.current
   val palette = LocalApprovedPalette.current
   var draft by remember { mutableStateOf("") }
@@ -74,14 +76,28 @@ internal fun HouseholdAddPane(view: HouseholdListView, toast: HouseholdListToast
     }
     val used = remember(view.list) { HouseholdListOps.usedBefore(view.list, limit = 6) }
     if (used.isNotEmpty()) {
-      Spacer(Modifier.height(44.dp))
+      Spacer(Modifier.height(if (compact) 28.dp else 44.dp))
       Text("Used before", color = palette.secondary, fontSize = 20.sp, lineHeight = 26.sp)
       Spacer(Modifier.height(16.dp))
       ChipFlow(used) { submit(it) }
     }
-    Spacer(Modifier.weight(1f))
-    SharedWith(view)
+    if (compact) {
+      // Compact panes wrap or scroll their content, so no weighted spacer here.
+      if (sharedWith) {
+        Spacer(Modifier.height(32.dp))
+        SharedWith(view)
+      }
+    } else {
+      Spacer(Modifier.weight(1f))
+      SharedWith(view)
+    }
   }
+}
+
+/** "Shared with" on its own (the compact portrait sheet shows it at the end of the list). */
+@Composable
+internal fun HouseholdSharedWith(view: HouseholdListView, modifier: Modifier = Modifier) {
+  Column(modifier.fillMaxWidth().padding(top = 32.dp)) { SharedWith(view) }
 }
 
 /** Up to three earlier names starting with what's typed (or the top "Used before" when empty). */
@@ -102,7 +118,8 @@ private fun ChipFlow(labels: List<String>, onPick: (String) -> Unit) {
           .tvFocusableRow { onPick(label) }.padding(horizontal = 24.dp),
           verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("+", color = palette.secondary, fontSize = 28.sp)
-        Text(label, color = palette.text, fontSize = 28.sp, lineHeight = 34.sp, maxLines = 1)
+        Text(label, color = palette.text, fontSize = 28.sp, lineHeight = 34.sp, maxLines = 1,
+            overflow = TextOverflow.Ellipsis)
       }
     }
   }
@@ -129,7 +146,8 @@ private fun DeviceRow(name: String, ok: Boolean, why: String) {
   Row(Modifier.fillMaxWidth().height(54.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(16.dp)) {
     Box(Modifier.size(14.dp).clip(CircleShape).background(if (ok) HouseholdListColors.Green else palette.secondary))
-    Text(name, color = palette.text, fontSize = 24.sp, lineHeight = 30.sp, modifier = Modifier.weight(1f))
-    Text(why, color = palette.secondary, fontSize = 22.sp, lineHeight = 28.sp)
+    Text(name, color = palette.text, fontSize = 24.sp, lineHeight = 30.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.weight(1f))
+    Text(why, color = palette.secondary, fontSize = 22.sp, lineHeight = 28.sp, maxLines = 1)
   }
 }

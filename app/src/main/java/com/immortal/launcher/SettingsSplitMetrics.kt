@@ -18,12 +18,16 @@ internal object SettingsSplitMetrics {
     const val DIVIDER_DP = 1
     const val PAGE_MAX_WIDTH_DP = 1120
     const val PAGE_SIDE_PADDING_DP = 56
+    /** Single-pane Settings (narrow windows, see [settingsSinglePane]): the page has the full width. */
+    const val SINGLE_PANE_SIDE_PADDING_DP = 28
 
     fun sidebarWidthDp(screenWidthDp: Int): Int =
         (screenWidthDp * SIDEBAR_FRACTION).toInt().coerceIn(SIDEBAR_MIN_DP, SIDEBAR_MAX_DP)
 
     /** Width of a page's cards (inside the page's side padding). */
-    fun pageContentWidthDp(screenWidthDp: Int): Int {
+    fun pageContentWidthDp(screenWidthDp: Int, singlePane: Boolean = false): Int {
+        if (singlePane)
+            return (screenWidthDp.coerceAtMost(PAGE_MAX_WIDTH_DP) - 2 * SINGLE_PANE_SIDE_PADDING_DP).coerceAtLeast(0)
         val detail = (screenWidthDp - sidebarWidthDp(screenWidthDp) - DIVIDER_DP).coerceAtMost(PAGE_MAX_WIDTH_DP)
         return (detail - 2 * PAGE_SIDE_PADDING_DP).coerceAtLeast(0)
     }

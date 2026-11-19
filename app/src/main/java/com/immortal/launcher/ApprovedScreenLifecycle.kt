@@ -15,6 +15,10 @@ import androidx.compose.ui.platform.LocalView
 internal fun KeepInteractiveScreenAwake() {
     val view = LocalView.current
     DisposableEffect(view) {
+        // A window that already keeps the screen on (Settings sets it before its first frame) needs
+        // nothing: setting the view flag after the first frame forces a second window relayout.
+        val flags = (view.context as? android.app.Activity)?.window?.attributes?.flags ?: 0
+        if (flags and android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON != 0) return@DisposableEffect onDispose { }
         val before = view.keepScreenOn
         view.keepScreenOn = true
         onDispose { view.keepScreenOn = before }

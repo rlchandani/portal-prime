@@ -85,7 +85,9 @@ class PhotoFramePreviewActivity : ComponentActivity() {
       // The "Night photo" colour keeps dim warm photos up overnight instead of a clock on black.
       val nightPhoto = nightClock &&
           ScreensaverConfig.load(this).nightClockTone == ScreensaverConfig.NIGHT_TONE_PHOTO
-      frame = PhotoFrameController(this, showWelcome = intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
+      // The welcome note shows once per launch: a recreate (rotation) must not show it again.
+      frame = PhotoFrameController(this, showWelcome = savedInstanceState == null &&
+          intent.getBooleanExtra(EXTRA_SHOW_WELCOME, false),
           interactivePreview = !intent.getBooleanExtra(EXTRA_LAUNCH_DISMISS_APP, false) && !nightClock,
           nightClockOnly = nightClock && !nightPhoto, overnightNightPhoto = nightPhoto)
     } finally { construction?.finish() }

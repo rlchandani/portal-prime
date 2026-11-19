@@ -93,8 +93,10 @@ internal fun WallpaperSection() {
       // Columns follow the split view's page width (no measure-time subcomposition), and each row
       // is precomposed on its own so ~30 swatches never land in one frame.
       val screenWidth = LocalConfiguration.current.screenWidthDp
-      val columns = remember(screenWidth) { WallpaperSwatchLayout.columns(screenWidth) }
-      val rowHeight = remember(screenWidth, columns) { WallpaperSwatchLayout.rowHeightDp(screenWidth, columns).dp }
+      val singlePane = LocalSettingsSinglePane.current
+      val columns = remember(screenWidth, singlePane) { WallpaperSwatchLayout.columns(screenWidth, singlePane) }
+      val rowHeight = remember(screenWidth, columns, singlePane) {
+        WallpaperSwatchLayout.rowHeightDp(screenWidth, columns, singlePane).dp }
       val rows = remember(columns) { WallpaperSwatchLayout.rows(WallpaperChoices, columns) }
       Column(Modifier.fillMaxWidth().selectableGroup().semantics {
         contentDescription = when {

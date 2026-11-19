@@ -27,17 +27,21 @@ import java.util.concurrent.TimeUnit
  * 30 fps full-screen video on the Portal GPU). Detached and released when it leaves composition.
  */
 @Composable
-internal fun CallRemoteVideo(media: CallMedia, modifier: Modifier = Modifier) {
+internal fun CallRemoteVideo(media: CallMedia, modifier: Modifier = Modifier,
+                              scaling: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL) {
   AndroidView(
       factory = { ctx ->
         SurfaceViewRenderer(ctx).apply {
           init(media.egl.eglBaseContext, null)
           setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
+          tag = RendererCommon.ScalingType.SCALE_ASPECT_FILL
           setEnableHardwareScaler(true)
           media.remote.target = this
         }
       },
       modifier = modifier,
+      // Rotating the Mini changes only the scaling (no new surface); a no-op while it is unchanged.
+      update = { view -> if (view.tag != scaling) { view.tag = scaling; view.setScalingType(scaling) } },
       onRelease = { view ->
         if (media.remote.target === view) media.remote.target = null
         view.release()

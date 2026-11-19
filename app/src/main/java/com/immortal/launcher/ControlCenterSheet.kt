@@ -79,8 +79,13 @@ private fun SheetFrame(ui: CcUi, open: Boolean, slide: CcPresence, scrim: CcPres
     Box(Modifier.fillMaxSize().graphicsLayer { alpha = scrim.progress.value; compositingStrategy = CompositingStrategy.ModulateAlpha }.background(c.scrim)
         .then(if (open) Modifier.clickable(remember { MutableInteractionSource() }, indication = null, onClick = ui::closeSheets)
             .semantics { contentDescription = "Close" } else Modifier))
-    Column(Modifier.align(Alignment.CenterEnd).padding(SHEET_INSET).width(CcStyle.SheetWidth).fillMaxHeight()
+    // The Mini upright: a full-width sheet rising from the bottom (a side sheet would leave a sliver of map).
+    val frame = if (currentLayoutClass().compactPortrait)
+      Modifier.align(Alignment.BottomCenter).padding(SHEET_INSET).fillMaxWidth().fillMaxHeight(PORTRAIT_SHEET_HEIGHT)
+          .graphicsLayer { translationY = (1f - slide.progress.value) * (size.height + SHEET_INSET.toPx()) * SLIDE_OVERSHOOT }
+    else Modifier.align(Alignment.CenterEnd).padding(SHEET_INSET).width(CcStyle.SheetWidth).fillMaxHeight()
         .graphicsLayer { translationX = (1f - slide.progress.value) * widthPx * SLIDE_OVERSHOOT }
+    Column(frame
         .shadow(if (c.dark) 40.dp else 24.dp, CcStyle.Sheet, ambientColor = Color.Black, spotColor = Color.Black)
         // The page rasterizes once into a texture; sliding then moves the texture, not every tile.
         .graphicsLayer { shape = CcStyle.Sheet; clip = true; compositingStrategy = CompositingStrategy.Offscreen }.background(c.bg)
@@ -136,5 +141,7 @@ internal fun CcDeviceHeader(ui: CcUi, backLabel: String, title: String, busy: Bo
 }
 
 private val SHEET_INSET = 18.dp
+/** Portrait sheet height: most of the screen, a band of the page left visible above it. */
+private const val PORTRAIT_SHEET_HEIGHT = 0.88f
 /** `translateX(110%)` when hidden. */
 private const val SLIDE_OVERSHOOT = 1.1f

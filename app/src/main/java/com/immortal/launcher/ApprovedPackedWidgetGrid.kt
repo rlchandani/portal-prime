@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -55,9 +56,12 @@ internal fun ApprovedPackedWidgetGrid(
     /** Drawn above the cards with the grid's own geometry: empty-slot outlines, add drafts, rings. */
     decor: (@Composable BoxScope.(ApprovedSlotGeometry) -> Unit)? = null,
     /** (widget, cell, span, card drag = hold then drag, grip drag = immediate) */
+    /** Upright Mini fold: half-rows of the left half an overlay occupies (a shared note's slot). */
+    reservedLeftHalfRows: Int = 0,
     content: @Composable (HomeWidgetStore.HomeWidget, Modifier, ApprovedWidgetPacking.Span, Modifier, Modifier) -> Unit,
 ) {
   val placements = remember(spans, fixed) { fixed ?: ApprovedWidgetPacking.pack(spans) }
+  val layoutClass = currentLayoutClass()
   val latestDrop = rememberUpdatedState(onDrop)
   val latestCanDrop = rememberUpdatedState(canDrop)
   val scroll = rememberScrollState()
@@ -81,8 +85,25 @@ internal fun ApprovedPackedWidgetGrid(
     val density = LocalDensity.current
     // Halved from 24dp on request: tighter grid, larger cards (Home v2 space).
     val gap = 12.dp
-    val column = ((maxWidth - gap * 3) / 4).coerceAtLeast(1.dp)
-    val row = ((maxHeight - gap * 3) / 4).coerceAtLeast(1.dp)
+    // Compact windows fold or floor the grid (CompactWidgetGrid); LARGE keeps the exact 4 × 4 division.
+    val compactGeometry = if (!layoutClass.compact) null else remember(layoutClass, editMode, placements,
+        maxWidth, maxHeight, reservedLeftHalfRows) {
+      CompactWidgetGrid.geometry(layoutClass, editMode, placements, maxWidth.value, maxHeight.value, gap.value,
+          reservedLeftHalfRows)
+    }
+    val foldOffset = compactGeometry?.foldOffset ?: 0
+    val folded = compactGeometry?.folded == true
+    val column = if (compactGeometry == null) ((maxWidth - gap * 3) / 4).coerceAtLeast(1.dp) else compactGeometry.columnDp.dp
+    val row = if (compactGeometry == null) ((maxHeight - gap * 3) / 4).coerceAtLeast(1.dp) else compactGeometry.halfRowDp.dp
+    // What is drawn: the 4-column placements, or their 2-column fold on the upright Mini.
+    val shown = remember(placements, folded, foldOffset) {
+      if (folded) placements.map { CompactWidgetGrid.fold(it, foldOffset) } else placements
+    }
+    // The compact widget scale: cards (not hosted app widgets) lay out in a slightly denser dp space.
+    val cardDensity = if (!layoutClass.compact) null else remember(density, layoutClass, folded) {
+      androidx.compose.ui.unit.Density(density.density * CompactWidgetGrid.cardScale(layoutClass, folded),
+          density.fontScale)
+    }
     val columnStep = with(density) { (column + gap).toPx() }
     val rowStep = with(density) { (row + gap).toPx() }
     val gapPx = with(density) { gap.toPx() }
@@ -91,8 +112,8 @@ internal fun ApprovedPackedWidgetGrid(
     val edgeBandPx = with(density) { 64.dp.toPx() }
     val maxScrollSpeedPx = with(density) { 480.dp.toPx() }
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val bounds = remember(widgets, placements, columnStep, rowStep, widthPx, gapPx, rtl) {
-      placements.map {
+    val bounds = remember(widgets, shown, columnStep, rowStep, widthPx, gapPx, rtl) {
+      shown.map {
         val width = (it.columns * columnStep - gapPx).roundToInt().coerceAtLeast(1)
         val logicalLeft = (it.column * columnStep).roundToInt()
         ApprovedWidgetDragState.Bounds(widgets[it.index].key,
@@ -143,7 +164,7 @@ internal fun ApprovedPackedWidgetGrid(
         cancelDrag(owner)
       }
     }
-    val rowCount = maxOf(4, placements.maxOfOrNull { it.row + it.rows } ?: 0)
+    val rowCount = maxOf(4, shown.maxOfOrNull { it.row + it.rows } ?: 0)
     val height = row * rowCount + gap * (rowCount - 1)
     val dropTarget = preview?.let { snap -> targetSlot(snap)?.let { Triple(snap.key, it.first, it.second) } }
     Box(Modifier.fillMaxSize().verticalScroll(scroll)) {
@@ -227,35 +248,37 @@ internal fun ApprovedPackedWidgetGrid(
                     .onGloballyPositioned { cardCoordinates = it }.then(widgetDrag({ cardCoordinates }, false))
                 val grip = if (!editing) Modifier else Modifier
                     .onGloballyPositioned { gripCoordinates = it }.then(widgetDrag({ gripCoordinates }, true))
-                content(widget, Modifier.fillMaxSize().zIndex(if (dragging) 1f else 0f)
+                val cardContent = @Composable { content(widget, Modifier.fillMaxSize().zIndex(if (dragging) 1f else 0f)
                     .graphicsLayer {
                       translationX = preview?.takeIf { it.key == widget.key }?.translationX ?: 0f
                       translationY = preview?.takeIf { it.key == widget.key }?.translationY ?: 0f
                       alpha = if (preview?.key == widget.key) .88f else 1f
                     },
-                    cellSpan, drag, grip)
+                    cellSpan, drag, grip) }
+                if (cardDensity == null || widget.isAppWidget) cardContent()
+                else CompositionLocalProvider(LocalDensity provides cardDensity) { cardContent() }
               }
             }
           },
       ) { measurables, constraints ->
         val measured = measurables.mapIndexed { index, measurable ->
-          val placement = placements[index]
+          val placement = shown[index]
           measurable.measure(Constraints.fixed(
               (placement.columns * columnStep - gapPx).roundToInt().coerceAtLeast(1),
               (placement.rows * rowStep - gapPx).roundToInt().coerceAtLeast(1)))
         }
         layout(constraints.maxWidth, with(density) { height.roundToPx() }) {
           measured.forEachIndexed { index, placeable ->
-            val placement = placements[index]
+            val placement = shown[index]
             placeable.placeRelative((placement.column * columnStep).roundToInt(),
                 (placement.row * rowStep).roundToInt())
           }
         }
       }
       if (decor != null) {
-        val geometry = remember(column, row, gap, placements, widgets) {
+        val geometry = remember(column, row, gap, shown, widgets, folded, foldOffset) {
           ApprovedSlotGeometry(column, row, gap,
-              placements.associate { widgets[it.index].key to it })
+              shown.associate { widgets[it.index].key to it }, if (folded) foldOffset else null)
         }
         Box(Modifier.fillMaxWidth().height(height)) { decor(geometry) }
       }
@@ -272,16 +295,25 @@ internal class ApprovedSlotGeometry(
     private val halfRow: Dp,
     private val gap: Dp,
     private val placements: Map<String, ApprovedWidgetPacking.Placement>,
+    /** The upright Mini's 2-column fold offset: logical 4-column cells move with [CompactWidgetGrid.foldCell]. */
+    private val foldOffset: Int? = null,
 ) {
   /** One slot's size (1 column × 2 half-rows). */
   val slotSize: DpSize get() = DpSize(column, halfRow * 2 + gap)
 
-  fun cell(column: Int, halfRow: Int, columns: Int, halfRows: Int): Modifier =
+  /** A cell given in the slot model's 4-column coordinates. */
+  fun cell(column: Int, halfRow: Int, columns: Int, halfRows: Int): Modifier {
+    val (c, r) = if (foldOffset != null) CompactWidgetGrid.foldCell(column, halfRow, foldOffset) else column to halfRow
+    return drawn(c, r, columns, halfRows)
+  }
+
+  private fun drawn(column: Int, halfRow: Int, columns: Int, halfRows: Int): Modifier =
       Modifier.offset(x = (this.column + gap) * column, y = (this.halfRow + gap) * halfRow)
           .size((this.column + gap) * columns - gap, (this.halfRow + gap) * halfRows - gap)
 
   fun slot(slot: HomeWidgetStore.Slot, span: Pair<Int, Int>): Modifier =
       HomePresentation.slotSpan(span.first, span.second).let { cell(slot.column, slot.row * 2, it.columns, it.rows) }
 
-  fun widget(key: String): Modifier? = placements[key]?.let { cell(it.column, it.row, it.columns, it.rows) }
+  /** The placements are already drawn coordinates (folded or not). */
+  fun widget(key: String): Modifier? = placements[key]?.let { drawn(it.column, it.row, it.columns, it.rows) }
 }

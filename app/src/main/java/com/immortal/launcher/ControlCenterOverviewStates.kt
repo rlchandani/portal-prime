@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,7 +55,10 @@ internal fun BoxScope.CcOverviewLoading(s: CcUiState) {
   }
   CcShimmer()
   val rows = remember(s.connection, s.registry, s.entities.size) { CcOverviewText.loading(s.connection, s.registry, s.entities.size) }
-  Column(Modifier.align(Alignment.Center).width(900.dp).clip(CcStyle.Modal).background(c.glass).padding(horizontal = 50.dp, vertical = 46.dp)) {
+  // Compact: as wide as the plan card allows, at most the designed 900.
+  val width = if (currentLayoutClass().compact) Modifier.padding(horizontal = 24.dp).widthIn(max = 900.dp).fillMaxWidth()
+  else Modifier.width(900.dp)
+  Column(Modifier.align(Alignment.Center).then(width).clip(CcStyle.Modal).background(c.glass).padding(horizontal = 50.dp, vertical = 46.dp)) {
     Box(Modifier.size(96.dp).clip(STATE_ICON).background(c.sel), contentAlignment = Alignment.Center) { CcIcon("home", c.text, 52.dp) }
     Box(Modifier.height(20.dp))
     Text("Connecting to your home…", color = c.text, fontSize = 46.sp, fontFamily = CcStyle.Serif, lineHeight = 52.sp)

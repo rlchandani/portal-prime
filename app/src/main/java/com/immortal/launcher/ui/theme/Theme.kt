@@ -22,9 +22,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ImmortalSettings
+import com.immortal.launcher.LayoutClass
+import com.immortal.launcher.LocalLayoutClass
 
 // Bounded process-wide templates: no Context, settings snapshot or live values.
 private val ApprovedLightColorScheme = buildApprovedColorScheme(false)
@@ -89,6 +92,8 @@ fun PortalPrimeTheme(
         typography  = Typography,
     ) {
         CompositionLocalProvider(
+            // The one responsive source of truth, re-derived when the window's configuration changes.
+            LocalLayoutClass provides LayoutClass.of(LocalConfiguration.current),
             LocalApprovedPalette provides palette,
             LocalAdvancedSettings provides advanced,
             LocalTextStyle provides LocalTextStyle.current.copy(

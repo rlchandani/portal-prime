@@ -53,6 +53,8 @@ class ImmortalApp : Application() {
     GuestFeature.install(this)
     // Weak window tracking is dormant until an operator starts a bounded Fleet capture.
     FramePerformanceCapture.init(this)
+    // Compact Portals only: covers the right turn the platform's rotation ignores (sensor dormant elsewhere).
+    RotationFollower.install(this)
     // Package events invalidate read metadata without scans or work on this main thread.
     InstalledPackageVersions.register(this)
     // Restore bridge state persisted by HomeActivity.launchStockHome. If Android killed our

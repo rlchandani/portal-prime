@@ -126,6 +126,7 @@
              category) that just opens this activity, so it appears like VLC etc. -->
         <activity
             android:name=".HomeActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
@@ -168,15 +169,16 @@
             android:theme="@style/Theme.SampleApp.Navigation" />
 
         <!-- Fullscreen kiosk WebView for web apps with no installable Portal client
-             (Music tile → YouTube Music PWA). URL comes via Intent extra; landscape,
+             (Music tile → YouTube Music PWA). URL comes via Intent extra; follows the
+             device orientation and relayouts on rotation (no WebView reload),
              internal-only like the other tile activities. -->
         <activity
             android:name=".WebAppActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:launchMode="singleTask"
             android:taskAffinity="${applicationId}.web"
             android:exported="false"
             android:label="Music"
-            android:screenOrientation="landscape"
             android:theme="@style/Theme.SampleApp" />
 
         <!-- Full-screen photo frame: on-demand preview AND the permanent frame
@@ -292,8 +294,7 @@
             android:name=".ControlCenterActivity"
             android:exported="false"
             android:label="Home Control"
-            android:screenOrientation="landscape"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
             android:theme="@style/Theme.SampleApp" />
 
         <!-- Full-screen HA dashboard (mock 08 port). -->
@@ -416,18 +417,18 @@
         <!-- Lamp mode: full-screen warm-white light panel. -->
         <activity
             android:name=".LampActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="false"
             android:excludeFromRecents="true"
-            android:screenOrientation="landscape"
             android:label="Lamp"
             android:theme="@style/Theme.SampleApp" />
 
         <!-- Guest card: Wi-Fi QR + house basics; Guest mode hides personal content. -->
         <activity
             android:name=".GuestCardActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="false"
             android:excludeFromRecents="true"
-            android:screenOrientation="landscape"
             android:label="Guests"
             android:theme="@style/Theme.SampleApp" />
 
@@ -442,8 +443,8 @@
         <!-- Bedtime stories: public-domain tales read aloud via TTS. -->
         <activity
             android:name=".BedtimeStoryActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="false"
-            android:screenOrientation="landscape"
             android:label="Bedtime story"
             android:theme="@style/Theme.SampleApp.Translucent" />
 
@@ -454,8 +455,7 @@
             android:name=".CallsActivity"
             android:exported="false"
             android:label="Calls"
-            android:screenOrientation="landscape"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
             android:theme="@style/Theme.SampleApp" />
         <activity
             android:name=".CallActivity"
@@ -466,7 +466,6 @@
             android:taskAffinity="com.immortal.launcher.call"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
-            android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
             android:theme="@style/Theme.SampleApp" />
 
@@ -505,6 +504,7 @@
              size), opened from the Immortal tile in the launcher's Settings folder. -->
         <activity
             android:name=".ImmortalSettingsActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="false"
             android:label="Hearthpane Settings"
             android:theme="@style/Theme.SampleApp.Settings"

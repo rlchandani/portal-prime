@@ -44,6 +44,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -320,13 +321,18 @@ private fun ApprovedAppsContent(
   BackHandler {
     when { menuFor != null -> menuFor = null; folder != null -> folder = null; recent && !initiallyRecent -> recent = false; searching -> closeSearch(); else -> onExit() }
   }
+  val appsLayout = currentLayoutClass()
+  val appsColumns = AppsGridMetrics.columns(appsLayout, androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp -
+      2 * (if (embedded) LauncherEdge.value.toInt() else 56))
+  val appsGap = if (appsLayout.compact) AppsGridMetrics.COMPACT_GAP_DP.dp else 32.dp
   val content: @Composable () -> Unit = {
-    androidx.compose.foundation.lazy.grid.LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(6), horizontalArrangement = Arrangement.spacedBy(32.dp), verticalArrangement = Arrangement.spacedBy(32.dp), modifier = modifier.fillMaxSize().padding(horizontal = if (embedded) LauncherEdge else 56.dp), contentPadding = PaddingValues(top = 36.dp, bottom = 24.dp)) {
+    androidx.compose.foundation.lazy.grid.LazyVerticalGrid(columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(appsColumns), horizontalArrangement = Arrangement.spacedBy(appsGap), verticalArrangement = Arrangement.spacedBy(appsGap), modifier = modifier.fillMaxSize().padding(horizontal = if (embedded) LauncherEdge else 56.dp), contentPadding = PaddingValues(top = if (appsLayout.compactPortrait) 24.dp else 36.dp, bottom = 24.dp)) {
       item(key = "heading", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
         Column(Modifier.fillMaxWidth()) {
           ApprovedAppsHeading(if (folder != null) folder!! else if (recent) "Recent apps" else "Your apps",
               if (folder != null) "Apps in your folder." else if (recent) "Open, inspect, close or uninstall an app." else "Installed apps on this Portal.")
-          Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+          // Compact windows wrap the buttons onto a second line instead of clipping the last one.
+          AppsButtonRow(appsLayout.compact) {
             if (folder == null && !recent) {
               ApprovedAppsButton("App Store", primary = true) { launchApprovedIntent(context, Intent(context, StoreActivity::class.java)) }
               if ("Settings" in folderNames) ApprovedAppsButton("Settings folder") { openFolder("Settings") }
@@ -357,7 +363,7 @@ private fun ApprovedAppsContent(
       items(tiles.size, key = { index -> tiles[index].app?.component?.flattenToString() ?: "${tiles[index].builtin}:${tiles[index].folder}" }, contentType = { "app-tile" }) { index ->
         val entry = tiles[index]
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-          InstalledAppTile(entry, entry.app?.component?.packageName?.let { badges[it] } ?: 0, if (showingRecents) entry.app?.let(::recencyLine) else null,
+          InstalledAppTile(entry, appsLayout, entry.app?.component?.packageName?.let { badges[it] } ?: 0, if (showingRecents) entry.app?.let(::recencyLine) else null,
               shortcutIcon = shortcutIcons[entry.builtin],
               onOpen = {
                 when {
@@ -464,7 +470,11 @@ private data class AppsTileEntry(val label: String, val app: AppItem? = null, va
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun InstalledAppTile(entry: AppsTileEntry, badge: Int, subtitle: String?, shortcutIcon: ImageBitmap?, onOpen: () -> Unit, onOptions: () -> Unit) {
+private fun InstalledAppTile(entry: AppsTileEntry, layout: LayoutClass, badge: Int, subtitle: String?, shortcutIcon: ImageBitmap?, onOpen: () -> Unit, onOptions: () -> Unit) {
+    if (layout.compact) {
+      CompactAppTile(entry, layout, badge, subtitle, shortcutIcon, onOpen, onOptions)
+      return
+    }
     Column(Modifier.fillMaxWidth().heightIn(min = 205.dp).combinedClickable(
         onClick = onOpen, onLongClickLabel = "App actions",
         onLongClick = if (entry.app != null) onOptions else null)
@@ -476,6 +486,35 @@ private fun InstalledAppTile(entry: AppsTileEntry, badge: Int, subtitle: String?
       Text(entry.label, color = IosLabel, fontSize = 24.sp, lineHeight = 30.sp, fontWeight = FontWeight.Normal, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 14.dp))
       if (subtitle != null) Text(subtitle, color = IosSecondary, fontSize = 20.sp, lineHeight = 28.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 7.dp))
     }
+}
+
+/** The compact Apps tile: a smaller icon and a label that wraps only between words. */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun CompactAppTile(entry: AppsTileEntry, layout: LayoutClass, badge: Int, subtitle: String?, shortcutIcon: ImageBitmap?, onOpen: () -> Unit, onOptions: () -> Unit) {
+    val lines = remember(entry.label) { AppsGridMetrics.labelLines(entry.label) }
+    Column(Modifier.fillMaxWidth().heightIn(min = 168.dp).combinedClickable(
+        onClick = onOpen, onLongClickLabel = "App actions",
+        onLongClick = if (entry.app != null) onOptions else null)
+        .padding(horizontal = 10.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+      BadgedBox(badge = { if (badge > 0) Badge { Text(if (badge > 9) "9+" else "$badge") } }) {
+        ApprovedAppsIcon(entry.app?.component?.packageName ?: "builtin:${entry.builtin ?: "folder"}",
+            entry.label, if (layout.compactPortrait) 88.dp else 96.dp, entry.app?.icon ?: shortcutIcon, plain = entry.folder == null)
+      }
+      Text(entry.label, color = IosLabel, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Normal, textAlign = TextAlign.Center,
+          maxLines = lines, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 12.dp))
+      if (subtitle != null) Text(subtitle, color = IosSecondary, fontSize = 17.sp, lineHeight = 22.sp, textAlign = TextAlign.Center,
+          maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 5.dp))
+    }
+}
+
+/** The Apps header buttons: one row on LARGE (unchanged), wrapping rows on compact windows. */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun AppsButtonRow(compact: Boolean, content: @Composable () -> Unit) {
+  if (compact) androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp),
+      verticalArrangement = Arrangement.spacedBy(12.dp)) { content() }
+  else Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) { content() }
 }
 
 @Composable
@@ -548,7 +587,8 @@ private fun launchApprovedBuiltin(context: Context, id: String) {
         .putExtra(APPROVED_HOME_MUSIC, true))
     "dashboard" -> HomeDashboardActivity.openDashboard(context)
     ApprovedAppsBuiltins.CONTROL -> launchApprovedIntent(context, ControlCenterActivity.intent(context))
-    "calls" -> PortalHomeBridge.launch(context)
+    // Same as Home's Calls tile: Hearthpane Calling (Messenger/WhatsApp stay one tap away inside it).
+    "calls" -> CallsActivity.open(context)
   }
 }
 private fun recencyLine(app: AppItem): String {

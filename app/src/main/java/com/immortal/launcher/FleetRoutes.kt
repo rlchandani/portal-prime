@@ -440,6 +440,32 @@ class FleetRoutes(private val context: Context) {
         resp(200, ok().put("action", "digital_clock_preview").put("previousFace", before)
             .put("face", DigitalClockConfig.faceOf(DigitalClockConfig.load(context))))
       }
+      // Layout test hook (operator only): opens one of a fixed set of internal screens for captures.
+      "open_screen" -> {
+        val target = when (body.optString("screen")) {
+          "calls" -> CallsActivity::class.java
+          "settings" -> ImmortalSettingsActivity::class.java
+          "help" -> HelpActivity::class.java
+          "household_list" -> HouseholdListActivity::class.java
+          "ha_dashboard" -> HaDashboardActivity::class.java
+          "lamp" -> LampActivity::class.java
+          "guest_card" -> GuestCardActivity::class.java
+          "store" -> StoreActivity::class.java
+          "web_app" -> WebAppActivity::class.java
+          else -> null
+        }
+        val opened = target != null && runCatching {
+          context.startActivity(android.content.Intent(context, target).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+        }.isSuccess
+        resp(200, JSONObject().put("ok", opened).put("action", "open_screen"))
+      }
+      // Rotation test hook (operator only): {"request":"portrait"|"landscape"|"reverse_landscape"|"auto"|"forget"}.
+      "orientation" -> {
+        val request = body.optString("request").takeIf {
+          it in setOf("portrait", "landscape", "reverse_landscape", "auto", "forget") }
+        resp(200, JSONObject().put("ok", true).put("action", "orientation")
+            .put("result", RotationFollower.operator(context, request)))
+      }
       // Needs the signature/privileged REBOOT permission we don't hold — report honestly.
       "reboot" -> resp(200, JSONObject().put("ok", false).put("action", "reboot").put("result", "not_permitted"))
       else -> resp(400, err("unknown_action"))

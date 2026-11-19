@@ -46,7 +46,7 @@ internal fun ApprovedToolWorkspace(
         LocalApprovedSettingsBack provides onDismiss,
     ) {
         Column(Modifier.fillMaxSize().background(IosBackground)
-            .padding(horizontal = 56.dp, vertical = 36.dp)) {
+            .padding(horizontal = if (currentLayoutClass().compactPortrait) 24.dp else 56.dp, vertical = 36.dp)) {
             ApprovedAppsButton("‹  Tools", onClick = onDismiss)
             Spacer(Modifier.height(26.dp))
             ApprovedAppsHeading(title)

@@ -65,6 +65,17 @@ internal fun CcSecurityScreen(s: CcUiState, ui: CcUi) {
         canControl = s.connection.canControl, reason = s.connection.disabledReason)
   }
   val reason = s.connection.disabledReason
+  if (currentLayoutClass().compactPortrait) {
+    // The Mini upright: the alarm ring and modes on top, who's home and the checklist scrolling below.
+    Column(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(22.dp)) {
+      Column(Modifier.fillMaxWidth().ccCard().padding(horizontal = 36.dp, vertical = 30.dp),
+          horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(22.dp)) {
+        if (panel == null) NoPanel(s.ready) else AlarmPanel(panel, s.settings.exitDelaySec, reason, ui)
+      }
+      CcSecuritySide(side, Modifier.weight(1f).fillMaxWidth(), ui)
+    }
+    return
+  }
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     Column(Modifier.weight(MAIN_WEIGHT).fillMaxHeight().ccCard().padding(36.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(26.dp, Alignment.CenterVertically)) {

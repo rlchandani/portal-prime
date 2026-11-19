@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 private val StandaloneSidePadding = 56.dp
+private val SinglePaneSidePadding = SettingsSplitMetrics.SINGLE_PANE_SIDE_PADDING_DP.dp
 private val StandaloneBottomPadding = 80.dp
 
 /**
@@ -69,7 +70,9 @@ internal fun SettingsScaffold(
         diagnosticsControl = control,
     ) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberApprovedSettingsScrollState("standalone/$title"))
-            .padding(start = StandaloneSidePadding, end = StandaloneSidePadding, bottom = StandaloneBottomPadding)) {
+            .then(if (LocalSettingsSinglePane.current) Modifier.padding(start = SinglePaneSidePadding,
+                end = SinglePaneSidePadding, bottom = StandaloneBottomPadding)
+            else Modifier.padding(start = StandaloneSidePadding, end = StandaloneSidePadding, bottom = StandaloneBottomPadding))) {
             if (subtitle.isNotEmpty()) {
                 Text(subtitle, color = IosSecondary, fontSize = 23.sp, lineHeight = 34.sp,
                     modifier = Modifier.padding(bottom = 30.dp))
