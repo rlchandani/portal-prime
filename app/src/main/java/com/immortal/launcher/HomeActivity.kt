@@ -553,8 +553,9 @@ class HomeActivity : ComponentActivity() {
     pendingResumeIntent = null
     if (PortalHomeHandoffRecovery.recoverColdHome(this, incoming)) return
     // The user is back on Immortal, so any stock-launcher call handoff is over:
-    // allow the photo frame to resume its normal screensaver behaviour.
-    DreamPolicy.clearBridge(this)
+    // allow the photo frame to resume its normal screensaver behaviour. A Jarvis tap still being
+    // prepared here owns the bridge (clearing it would silently drop the tap); its own retire clears.
+    if (!JarvisHandoff.isPreparing(this)) DreamPolicy.clearBridge(this)
     SettingsGuard.reaffirmScreensaver(this)
     // The user is back on the launcher: end the idle session and, inside the overnight window,
     // arm the touch-renewed "you have the device" session. SleepScheduler owns that policy.
