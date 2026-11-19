@@ -120,13 +120,6 @@ class ControlCenterOverviewModelTest {
     assertNull(off.rgb)
   }
 
-  @Test fun flowsOnlyForBusyRooms() {
-    val m = build()
-    assertEquals(listOf("laundry"), m.flows.map { it.roomId })
-    assertEquals(1.2, m.flows.single().kw, 1e-6)
-    assertEquals(1200.0, m.maxPowerW, 1e-6)
-  }
-
   @Test fun applianceIcons() {
     assertEquals("dish", CcPlanModel.applianceIcon("switch.dishwasher"))
     assertEquals("dryer", CcPlanModel.applianceIcon("sensor.dryer"))

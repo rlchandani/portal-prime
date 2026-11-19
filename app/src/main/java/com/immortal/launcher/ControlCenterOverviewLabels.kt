@@ -27,20 +27,12 @@ internal data class CcLegend(val lens: CcLens, val lightsOn: Int = 0, val cold: 
 
 internal object CcOverviewText {
   private const val MS_PER_MIN = 60_000L
-  private const val W_PER_KW = 1000.0
-  private const val SMALL_KW = 0.1
   private const val BYTE = 255
 
-  /** The caption under a room's name for [lens]: "71° · 2 lights on", "71° · 46%", "0.5 kW". */
+  /** The caption under a room's name for [lens]: "71° · 2 lights on", "71° · 46%". */
   fun caption(v: CcRoomView, lens: CcLens): String = when (lens) {
     CcLens.LIVE -> if (v.room.outdoor) v.temperature?.let { "${Math.round(it)}°" } ?: "" else v.caption()
     CcLens.CLIMATE -> listOfNotNull(v.temperature?.let { "${Math.round(it)}°" }, v.humidity?.let { "$it%" }).joinToString(" · ")
-    CcLens.ENERGY -> v.powerW?.let { kw(it) } ?: ""
-  }
-
-  fun kw(watts: Double): String {
-    val k = watts / W_PER_KW
-    return if (k < SMALL_KW) "%.2f kW".format(k) else "%.1f kW".format(k)
   }
 
   /** The mock's climate ramp (`tempColor`): blue → green → yellow → orange over heat 0..1. Packed RGB. */
@@ -112,7 +104,6 @@ internal object CcOverviewText {
 
   fun legend(model: CcPlanModel, lens: CcLens, entities: Map<String, CcEntity>, fahrenheit: Boolean): CcLegend = when (lens) {
     CcLens.LIVE -> CcLegend(lens, lightsOn = model.lightsOn)
-    CcLens.ENERGY -> CcLegend(lens)
     CcLens.CLIMATE -> {
       val (cold, warm) = heatRange(fahrenheit)
       CcLegend(lens, cold = cold, warm = warm,

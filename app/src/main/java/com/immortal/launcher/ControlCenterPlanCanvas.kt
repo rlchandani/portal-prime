@@ -49,9 +49,9 @@ internal sealed interface CcPlanHit {
  * The floor plan, drawn as separately invalidated layers (each its own RenderNode):
  *  1. base floors + 3. walls — static: redraw only on floor / size / theme change;
  *  2. under (lens tints, light washes, glows), 4. over (openings, focus veil, badges, chips,
- *     markers) and 6. top (names + captions, energy nodes) — redraw only when the derived
+ *     markers) and 6. top (names + captions) — redraw only when the derived
  *     [CcPlanModel] / lens / focus change (equal models skip);
- *  5. animation (pulses, energy dashes, focus edge, scene walk) — the only layer read per frame,
+ *  5. animation (pulses, focus edge, scene walk) — the only layer read per frame,
  *     and it only exists while [LocalCcMotion] is on and something visibly animates
  *     ([CcPlanDraw.animates]). With motion off the same marks are drawn once, still, in the over layer.
  * Layers 1-4 and 6 keep their pixels in offscreen textures (see the comments at each).
@@ -62,7 +62,6 @@ internal fun CcPlanCanvas(
     lens: CcLens,
     focus: String?,
     walk: CcWalkView?,
-    sources: CcMapSources,
     stale: Boolean,
     fahrenheit: Boolean,
     onTap: (CcPlanHit) -> Unit,
@@ -82,15 +81,13 @@ internal fun CcPlanCanvas(
     }
   }
   val base = remember(px, c, density) { CcPlanBase(px, c, density.density) }
-  val flows = remember(px, model.flows, sources, lens) { if (lens == CcLens.ENERGY) CcFlowPx(px, model.flows, sources) else null }
-  val dashes = remember(density) { with(density) { CcMapDashes(DASH_DP.dp.toPx(), GAP_DP.dp.toPx()) } }
   // Texts per (model, lens), kept for the lenses just shown: switching back measures nothing.
   val texts = remember(textPaints) { CcLru<CcLensKey, Pair<Map<String, CcRoomText>, CcMapChipText>>(LENS_CACHE) }
-  val (labels, chipText) = remember(model, lens, sources, textPaints) {
-    texts.getOrPut(CcLensKey(model, lens, sources)) { roomTexts(model, lens, textPaints) to chipTexts(model, sources, lens, textPaints) }
+  val (labels, chipText) = remember(model, lens, textPaints) {
+    texts.getOrPut(CcLensKey(model, lens)) { roomTexts(model, lens, textPaints) to chipTexts(model, textPaints) }
   }
-  val ctx = remember(model, px, flows, paint, c, labels, chipText, lens, focus, stale, sources, fahrenheit) {
-    CcPlanDraw(model, px, flows, paint, c, labels, chipText, lens, focus, stale, dashes, sources, fahrenheit, density.density)
+  val ctx = remember(model, px, paint, c, labels, chipText, lens, focus, stale, fahrenheit) {
+    CcPlanDraw(model, px, paint, c, labels, chipText, lens, focus, stale, fahrenheit, density.density)
   }
   val motion = LocalCcMotion.current
   val latestTap by rememberUpdatedState(onTap)
@@ -161,21 +158,19 @@ private fun hit(model: CcPlanModel, px: CcPlanPx, pos: Offset, radiusPx: Float):
 }
 
 /** A plan model (by identity: the engine keeps unchanged models) shown in one lens. */
-internal class CcLensKey(private val model: CcPlanModel, private val lens: CcLens, private val sources: CcMapSources) {
-  override fun equals(other: Any?): Boolean = other is CcLensKey && other.model === model && other.lens == lens && other.sources == sources
+internal class CcLensKey(private val model: CcPlanModel, private val lens: CcLens) {
+  override fun equals(other: Any?): Boolean = other is CcLensKey && other.model === model && other.lens == lens
   override fun hashCode(): Int = System.identityHashCode(model) * HASH_PRIME + lens.ordinal
 }
 
 private const val HASH_PRIME = 31
-/** Model × lens text sets kept (three lenses, a floor or two). */
-private const val LENS_CACHE = 6
+/** Model × lens text sets kept (two lenses, a floor or two). */
+private const val LENS_CACHE = 4
 
 /** Plan sizes from the mock (dp; geometry itself is in cells). */
 internal const val MAX_CELL_DP = 34f
 private const val TAP_DP = 36f
-private const val DASH_DP = 3f
-private const val GAP_DP = 22f
-/** Loop period: pulses (÷3 = 2.2 s), dashes (÷6 = 1.1 s) and the highlight (÷4 = 1.65 s) all divide it. */
+/** Loop period: pulses (÷3 = 2.2 s) and the highlight (÷4 = 1.65 s) both divide it. */
 private const val CLOCK_MS = 6_600
 /** Floors whose geometry stays cached (a Portal home rarely has more). */
 private const val FLOOR_CACHE = 4

@@ -76,9 +76,7 @@ class ControlCenterOverviewSideTest {
     val v = CcRoomView(room, 2, 3, emptyList(), emptyList(), 70.6, 46, false, 0, 450.0, null)
     assertEquals("71° · 2 lights on", CcOverviewText.caption(v, CcLens.LIVE))
     assertEquals("71° · 46%", CcOverviewText.caption(v, CcLens.CLIMATE))
-    assertEquals("0.5 kW", CcOverviewText.caption(v, CcLens.ENERGY))
-    assertEquals("0.05 kW", CcOverviewText.caption(v.copy(powerW = 50.0), CcLens.ENERGY))
-    assertEquals("", CcOverviewText.caption(v.copy(powerW = null), CcLens.ENERGY))
+    assertEquals("", CcOverviewText.caption(v.copy(temperature = null, humidity = null), CcLens.CLIMATE))
     val out = v.copy(room = room.copy(outdoor = true))
     assertEquals("71°", CcOverviewText.caption(out, CcLens.LIVE))
   }

@@ -84,12 +84,6 @@ internal fun CcPlanLegend(legend: CcLegend, shown: Boolean = true, modifier: Mod
           }
         }
       }
-      CcLens.ENERGY -> {
-        LegendDot(Color(OPAQUE or CcFlowPx.SOLAR_RGB), "Solar")
-        LegendDot(Color(OPAQUE or CcFlowPx.BATTERY_RGB), "Battery")
-        LegendDot(Color(OPAQUE or CcFlowPx.GRID_RGB), "Grid")
-        LegendDot(Color(OPAQUE or CcFlowPx.ROOM_RGB), "Rooms")
-      }
     }
   }
 }
@@ -143,7 +137,7 @@ private fun LegendText(text: String) {
   Text(text, color = LocalCc.current.sec, fontSize = 18.sp, maxLines = 1)
 }
 
-private val LENSES = listOf(Triple(CcLens.LIVE, "Live", "bulb"), Triple(CcLens.CLIMATE, "Climate", "therm"), Triple(CcLens.ENERGY, "Energy", "bolt"))
+private val LENSES = listOf(Triple(CcLens.LIVE, "Live", "bulb"), Triple(CcLens.CLIMATE, "Climate", "therm"))
 private val LEGEND = RoundedCornerShape(24.dp)
 private val HEAT_BRUSH = Brush.horizontalGradient(listOf(Color(0xFF5AA9FF), Color(0xFF61D0A6), Color(0xFFF4D36B), Color(0xFFF08A4B)))
 private const val OPAQUE = 0xFF000000.toInt()
