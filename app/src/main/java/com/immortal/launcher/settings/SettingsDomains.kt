@@ -1363,5 +1363,5 @@ object SettingsDomains {
           homeDashboard, calendarPacks, DinnerSettings.domain,
           com.immortal.launcher.ShareSettings.domain, HouseholdListSettings.domain, GuestSettings.domain,
           MusicSettings.domain, FollowMeSettings.domain, BriefingSettings.domain, DoorbellSettings.domain,
-          ControlCenterSettings.domain)
+          ControlCenterSettings.domain, CallingSettings.domain)
 }

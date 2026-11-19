@@ -47,6 +47,7 @@ internal object SettingsPageIds {
     const val HOME_ASSISTANT = "ha"
     const val PHONE = "phone"
     const val INTERCOM = "intercom"
+    const val CALLS = "calls"
     const val MUSIC = "music"
     const val ABOUT = "about"
     const val SYSTEM = "system"
@@ -92,7 +93,7 @@ internal object SettingsTileColors {
     const val SLATE = 0xFF4F5663
 }
 
-/** The page tree: 4 groups, 18 top-level pages, and their sub-pages (at most 3 levels deep). */
+/** The page tree: 4 groups, 19 top-level pages, and their sub-pages (at most 3 levels deep). */
 internal object SettingsTree {
     private val C = SettingsTileColors
     private val P = SettingsPageIds
@@ -136,6 +137,9 @@ internal object SettingsTree {
         SettingsPageDef(P.PHONE, "Phone Remote", "remote", C.LIME, SettingsGroup.CONNECTED_HOME,
             lede = "Use your phone as a remote and to send photos.",
             keywords = "pair qr code pin remote control photo imports share sharing notes"),
+        SettingsPageDef(P.CALLS, "Calls", "calls", C.GREEN, SettingsGroup.CONNECTED_HOME,
+            lede = "Video calls and drop-ins between the rooms in this home. Private, encrypted, never recorded.",
+            keywords = "call video drop-in drop in ring ringtone quiet hours camera mic privacy room favourite"),
         SettingsPageDef(P.INTERCOM, "Intercom", "intercom", C.PURPLE, SettingsGroup.CONNECTED_HOME,
             lede = "Talk to other rooms with a Portal.", keywords = "broadcast listen room address dinner call"),
         SettingsPageDef(P.MUSIC, "Music", "music", C.RED, SettingsGroup.CONNECTED_HOME,

@@ -386,8 +386,9 @@ class HomeActivity : ComponentActivity() {
             onLaunch = { cn ->
               runCatching {
                 if (cn == CALLS_COMPONENT) {
-                  // The "Calls" tile: bridge to the stock Portal calling surface (trusted caller).
-                  launchStockHome()
+                  // The "Calls" tile opens Hearthpane Calling (rooms, recent, Call everyone); Portal's
+                  // own Messenger/WhatsApp calling stays one tap away inside it.
+                  CallsActivity.open(this@HomeActivity)
                 } else if (cn.packageName == JarvisHandoff.PACKAGE) {
                   if (!JarvisHandoff.launch(this@HomeActivity))
                     android.widget.Toast.makeText(this@HomeActivity, "Jarvis couldn’t be opened.",
@@ -2102,6 +2103,7 @@ private fun customWidgetLabel(kind: String): String =
       HomeWidgetStore.KIND_TODO -> "Household list"
       HomeWidgetStore.KIND_ROUTINES -> "Routines"
       HomeWidgetStore.KIND_CHORES -> "Chores"
+      HomeWidgetStore.KIND_CALLS -> "Calls"
       HomeWidgetStore.KIND_NEWS -> "News"
       HomeWidgetStore.KIND_STOCKS -> "Stocks"
       HomeWidgetStore.KIND_OPTIONS -> "Options"
@@ -3150,6 +3152,7 @@ private fun ImmortalWidgetContent(
     HomeWidgetStore.KIND_TODO -> HouseholdListWidget(modifier, small = widget.spanY < 2)
     HomeWidgetStore.KIND_ROUTINES -> RoutinesHomeWidget(modifier)
     HomeWidgetStore.KIND_CHORES -> ChoresHomeWidget(modifier)
+    HomeWidgetStore.KIND_CALLS -> CallsHomeWidget(modifier)
     HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier, maxRows = listRows(widget.spanY))
     HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier, maxRows = listRows(widget.spanY))
@@ -4711,6 +4714,7 @@ private fun CustomWidgetGlyph(kind: String) {
         HomeWidgetStore.KIND_TODO -> "✓"
         HomeWidgetStore.KIND_ROUTINES -> "★"
         HomeWidgetStore.KIND_CHORES -> "★"
+        HomeWidgetStore.KIND_CALLS -> "☎"
         HomeWidgetStore.KIND_NEWS -> "📰"
         HomeWidgetStore.KIND_STOCKS -> "📈"
         HomeWidgetStore.KIND_OPTIONS -> "Δ"
@@ -5411,6 +5415,7 @@ private fun ApprovedWidgetLibrary(
         Triple(HomeWidgetStore.KIND_TODO, "Household list", "notes"),
         Triple(HomeWidgetStore.KIND_WIFI, "Wi-Fi", "wifi"),
         Triple(HomeWidgetStore.KIND_CHORES, "Chores", "tools"),
+        Triple(HomeWidgetStore.KIND_CALLS, "Calls", "calls"),
         Triple(HomeWidgetStore.KIND_NEWS, "News", "globe"),
         Triple(HomeWidgetStore.KIND_STOCKS, "Stocks", "calculator"),
         Triple(HomeWidgetStore.KIND_OPTIONS, "Options", "calculator"),

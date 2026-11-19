@@ -17,7 +17,7 @@ internal object HomeWidgetPicker {
   val everyday: List<String> = listOf(
       HomeWidgetStore.KIND_WEATHER, HomeWidgetStore.KIND_CALENDAR, HomeWidgetStore.KIND_HA,
       HomeWidgetStore.KIND_TIMERS, HomeWidgetStore.KIND_TODO, HomeWidgetStore.KIND_ALARM,
-      HomeWidgetStore.KIND_WORLD_CLOCK, HomeWidgetStore.KIND_WIFI)
+      HomeWidgetStore.KIND_WORLD_CLOCK, HomeWidgetStore.KIND_WIFI, HomeWidgetStore.KIND_CALLS)
 
   /**
    * Built-in kinds behind "More" (the retire-candidates). Options needs Advanced settings; Photo
@@ -63,6 +63,7 @@ internal object HomeWidgetPicker {
     HomeWidgetStore.KIND_PHOTO_MEMORY -> "Photo memory"
     HomeWidgetStore.KIND_ROUTINES -> "Routines"
     HomeWidgetStore.KIND_CHORES -> "Chores"
+    HomeWidgetStore.KIND_CALLS -> "Calls"
     HomeWidgetStore.KIND_WIFI -> "Wi-Fi"
     else -> "Widget"
   }
@@ -80,6 +81,7 @@ internal object HomeWidgetPicker {
     HomeWidgetStore.KIND_PHOTO_MEMORY -> "photo"
     HomeWidgetStore.KIND_ROUTINES -> "timer"
     HomeWidgetStore.KIND_CHORES -> "tools"
+    HomeWidgetStore.KIND_CALLS -> "calls"
     HomeWidgetStore.KIND_WIFI -> "wifi"
     HomeWidgetStore.KIND_CRYPTO, HomeWidgetStore.KIND_STOCKS, HomeWidgetStore.KIND_OPTIONS -> "calculator"
     else -> "apps"

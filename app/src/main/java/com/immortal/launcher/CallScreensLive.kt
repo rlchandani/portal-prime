@@ -1,0 +1,218 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+package com.immortal.launcher
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+
+/** In a call (connecting, live, reconnecting): remote video, live bar, self view, controls. */
+@Composable
+internal fun CallLiveScreen(call: ActiveCall, media: CallMedia?, motion: Boolean, toast: CallToastState) {
+  var volumeOpen by remember { mutableStateOf(false) }
+  var busyDismissed by remember(call.id) { mutableStateOf(false) }
+  val dropIn = call.kind == CallKind.DROP_IN
+  CallToggleToasts(call, toast)
+  Box(Modifier.fillMaxSize()) {
+    RemoteStage(call, media, motion)
+    if (dropIn) DropInBar(call, Modifier.align(Alignment.TopCenter))
+    else {
+      CallLiveBar(CallingCopy.liveBar(call.cameraOn, call.micOn), CallingCopy.liveDotActive(call.cameraOn, call.micOn), motion,
+          Modifier.align(Alignment.TopStart).padding(40.dp))
+      CallTitle(call, Modifier.align(Alignment.TopCenter).padding(top = 40.dp))
+    }
+    CallSelfFrame(media, call.cameraOn, CallingCopy.SELF_LABEL,
+        Modifier.align(Alignment.TopEnd).padding(top = if (dropIn) 150.dp else 40.dp, end = 40.dp))
+    ConnectionChip(call, Modifier.align(Alignment.Center))
+    if (volumeOpen) CallVolumePopover(Modifier.align(Alignment.BottomCenter).padding(bottom = 210.dp))
+    CallControls(call, volumeOpen, onVolume = { volumeOpen = !volumeOpen },
+        onFraming = { toast.show("Portal frames you automatically", "follow") },
+        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 36.dp))
+    if (call.cameraIssue == CameraIssue.BUSY && !busyDismissed) CameraBusySheet(onAudio = { busyDismissed = true },
+        onRetry = { busyDismissed = true; Calling.toggleCamera() }, modifier = Modifier.align(Alignment.Center))
+  }
+}
+
+@Composable
+private fun RemoteStage(call: ActiveCall, media: CallMedia?, motion: Boolean) {
+  // The remote SurfaceView stays composed for the whole call (no surface churn); the camera-off
+  // card simply covers it.
+  var hasFrames by remember(media) { mutableStateOf(false) }
+  LaunchedEffect(media) {
+    while (media != null && !hasFrames) { hasFrames = media.remote.frames > 0; delay(FRAME_POLL_MS) }
+  }
+  if (media != null) CallRemoteVideo(media, Modifier.fillMaxSize())
+  if (!hasFrames || !call.remoteCameraOn) {
+    Box(Modifier.fillMaxSize()) {
+      CallRingBackground(call.peer.name, motion && call.phase != CallPhase.LIVE)
+      Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally,
+          verticalArrangement = Arrangement.spacedBy(26.dp)) {
+        CallRoomAvatar(call.peer.name, 260.dp)
+        if (call.phase == CallPhase.LIVE && !call.remoteCameraOn) {
+          CallGlassChip("${call.peer.name}’s camera is off", "videoOff")
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun CallTitle(call: ActiveCall, modifier: Modifier) {
+  Column(modifier.background(CallColors.Bar, RoundedCornerShape(36.dp)).padding(horizontal = 30.dp, vertical = 12.dp),
+      horizontalAlignment = Alignment.CenterHorizontally) {
+    Text(call.peer.name, color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+    CallTimer(call) { elapsed -> "$elapsed · ${if (call.remoteMicOn) "Portal in this home" else "${call.peer.name} is muted"}" }
+  }
+}
+
+@Composable
+private fun CallTimer(call: ActiveCall, format: (String) -> String) {
+  val now = rememberCallClock(TIMER_STEP_MS)
+  val elapsed = call.connectedMs?.let { now - it } ?: 0L
+  Text(format(CallingCopy.clock(elapsed)), color = Color.White.copy(alpha = 0.75f), fontSize = 24.sp)
+}
+
+/** Drop-in live bar: red, full width, "Drop-in with X · Camera on · Mic on", "2:14 of 15:00", Keep going, End. */
+@Composable
+private fun DropInBar(call: ActiveCall, modifier: Modifier) {
+  Row(modifier.fillMaxWidth().height(110.dp).background(Brush.verticalGradient(listOf(CallColors.DropTop, CallColors.DropBottom)))
+      .padding(horizontal = 40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(22.dp)) {
+    Box(Modifier.size(18.dp).background(Color.White, CircleShape))
+    Text(CallingCopy.dropInBar(call.peer.name, call.direction == CallDirection.INCOMING, call.cameraOn, call.micOn),
+        color = Color.White, fontSize = 27.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      CallIcon("lock", Color.White, 24.dp)
+      Text(CallingCopy.E2E, color = Color.White, fontSize = 23.sp, fontWeight = FontWeight.SemiBold)
+    }
+    Box(Modifier.weight(1f)) {
+      val cap = call.capAtMs
+      val start = call.connectedMs
+      if (cap != null && start != null) Box(Modifier.alpha(0.75f)) {
+        CallTimer(call) { elapsed -> "$elapsed of ${CallingCopy.clock(cap - start)}" }
+      }
+    }
+    CallPill("Keep going", Calling::keepGoing, style = CallButtonStyle.GLASS, size = CallButtonSize.SM)
+    Box(Modifier.height(72.dp).background(Color.White, RoundedCornerShape(50)).callClick("End", true, Calling::hangUp)
+        .padding(horizontal = 34.dp), contentAlignment = Alignment.Center) {
+      Text("End", color = CallColors.DropBottom, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    }
+  }
+}
+
+@Composable
+private fun ConnectionChip(call: ActiveCall, modifier: Modifier) {
+  when (call.phase) {
+    CallPhase.CONNECTING -> Box(modifier.padding(top = 360.dp)) { CallGlassChip("Connecting securely…", "lock") }
+    CallPhase.RECONNECTING -> Box(modifier.padding(top = 360.dp)) {
+      CallChip("Reconnecting… the Wi-Fi dropped for a moment", "wifiOff", CallChipTone.WARN)
+    }
+    else -> Unit
+  }
+}
+
+/** Toasts for each toggle, as in the mock ("Muted · they can’t hear you", "Camera off · shutter closed"). */
+@Composable
+private fun CallToggleToasts(call: ActiveCall, toast: CallToastState) {
+  var mic by remember(call.id) { mutableStateOf(call.micOn) }
+  var camera by remember(call.id) { mutableStateOf(call.cameraOn) }
+  LaunchedEffect(call.micOn) {
+    if (call.micOn != mic) toast.show(if (call.micOn) "Mic on" else "Muted · they can’t hear you", if (call.micOn) "mic" else "micOff")
+    mic = call.micOn
+  }
+  LaunchedEffect(call.cameraOn, call.cameraIssue) {
+    if (call.cameraOn != camera) toast.show(when {
+      call.cameraOn -> "Camera on"
+      call.cameraIssue == CameraIssue.SHUTTER -> "Camera off · shutter closed. Audio carries on"
+      call.cameraIssue == CameraIssue.PERMISSION -> "Camera not allowed · audio only"
+      call.cameraIssue == CameraIssue.BUSY -> "The camera is busy · audio carries on"
+      else -> "Camera off · audio carries on"
+    }, if (call.cameraOn) "video" else "videoOff")
+    camera = call.cameraOn
+  }
+}
+
+/** `.ctl`: Mute, Camera, Auto frame, Volume, End. */
+@Composable
+private fun CallControls(call: ActiveCall, volumeOpen: Boolean, onVolume: () -> Unit, onFraming: () -> Unit, modifier: Modifier) {
+  Row(modifier.background(CallColors.Controls, RoundedCornerShape(56.dp)).padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 16.dp),
+      verticalAlignment = Alignment.Top) {
+    CallControl(if (call.micOn) "mic" else "micOff", if (call.micOn) "Mute" else "Unmute", ControlLook.of(off = !call.micOn)) { Calling.toggleMic() }
+    CallControl(if (call.cameraOn) "video" else "videoOff", if (call.cameraOn) "Camera off" else "Camera on",
+        ControlLook.of(off = !call.cameraOn)) { Calling.toggleCamera() }
+    CallControl("follow", "Auto frame", if (call.cameraOn) ControlLook.ON else ControlLook.DISABLED, onFraming)
+    CallControl("vol", "Volume", if (volumeOpen) ControlLook.ON else ControlLook.PLAIN, onVolume)
+    Column(Modifier.width(170.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+      Box(Modifier.width(150.dp).height(96.dp).background(CallColors.Bad, RoundedCornerShape(50.dp)).callClick("End call", true, Calling::hangUp),
+          contentAlignment = Alignment.Center) { CallIcon("end", Color.White, 46.dp) }
+      Text("End", color = Color.White, fontSize = 19.5.sp, fontWeight = FontWeight.SemiBold)
+    }
+  }
+}
+
+private enum class ControlLook { PLAIN, OFF, ON, DISABLED;
+  companion object { fun of(off: Boolean) = if (off) OFF else PLAIN }
+}
+
+@Composable
+private fun CallControl(icon: String, label: String, look: ControlLook, onClick: () -> Unit) {
+  val fill = when (look) { ControlLook.OFF -> Color.White; ControlLook.ON -> CallColors.EmberOn; else -> CallColors.ControlFill }
+  val tint = when (look) { ControlLook.OFF -> CallColors.OffIcon; ControlLook.ON -> CallColors.EmberOnIcon; else -> Color.White }
+  Column(Modifier.width(134.dp).alpha(if (look == ControlLook.DISABLED) 0.38f else 1f), horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Box(Modifier.size(96.dp).background(fill, CircleShape).callClick(label, look != ControlLook.DISABLED, onClick),
+        contentAlignment = Alignment.Center) { CallIcon(icon, tint, 42.dp) }
+    Text(label, color = Color.White, fontSize = 19.5.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 1)
+  }
+}
+
+/** "The camera is busy": honest, with audio carrying on. */
+@Composable
+private fun CameraBusySheet(onAudio: () -> Unit, onRetry: () -> Unit, modifier: Modifier) {
+  Column(modifier.width(980.dp).callPanel(CallColors.Popover, RoundedCornerShape(40.dp), CallColors.GlassEdge).padding(48.dp),
+      horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(22.dp)) {
+    Box(Modifier.size(110.dp).background(CallColors.WarnTint, CircleShape), contentAlignment = Alignment.Center) {
+      CallIcon("camera", CallColors.WarnIcon, 54.dp)
+    }
+    Text("The camera is busy", color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.Bold)
+    Text("Portal’s built-in camera service is holding the camera right now. You can keep talking with audio, " +
+        "and turn the camera on when it frees up.", color = Color.White.copy(alpha = 0.75f), fontSize = 26.sp, textAlign = TextAlign.Center)
+    Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+      CallPill("Carry on with audio", onAudio, icon = "phone", style = CallButtonStyle.PRIMARY)
+      CallPill("Try the camera again", onRetry, icon = "redo")
+    }
+  }
+}
+
+private const val FRAME_POLL_MS = 150L
+private const val TIMER_STEP_MS = 1_000L
