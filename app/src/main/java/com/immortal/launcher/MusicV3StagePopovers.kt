@@ -79,8 +79,8 @@ internal fun BoxScope.MusicV3StagePopover(layout: MusicStageLayout, popover: Mus
 private fun SleepChips(layout: MusicStageLayout, inputs: MusicV3PopoverInputs) {
   val density = LocalDensity.current
   val anchorTopDp = inputs.utilBounds?.let { with(density) { it.top.toDp().value } } ?: layout.sheetClosedTop
-  Box(Modifier.stageOffset { layout.columnX to layout.spec.top }.width(layout.columnW.dp)
-      .height((anchorTopDp - POP_GAP - layout.spec.top).coerceAtLeast(0f).dp)) {
+  Box(Modifier.stageOffset { layout.columnX to layout.columnTop }.width(layout.columnW.dp)
+      .height((anchorTopDp - POP_GAP - layout.columnTop).coerceAtLeast(0f).dp)) {
     MusicV3SleepPopover(inputs.sleep, Modifier.align(Alignment.BottomStart).widthIn(max = layout.columnW.dp)) { choice ->
       inputs.onDismiss()
       MusicSleepDriver.set(choice)
@@ -91,8 +91,8 @@ private fun SleepChips(layout: MusicStageLayout, inputs: MusicV3PopoverInputs) {
 /** A card filling the right column's width, bottom-aligned just above the sheet's bar. */
 @Composable
 internal fun ColumnBottomCard(layout: MusicStageLayout, content: @Composable BoxScope.() -> Unit) {
-  Box(Modifier.stageOffset { layout.columnX to layout.spec.top }.width(layout.columnW.dp)
-      .height((layout.sheetClosedTop - CARD_ABOVE_BAR - layout.spec.top).dp)) {
+  Box(Modifier.stageOffset { layout.columnX to layout.columnTop }.width(layout.columnW.dp)
+      .height((layout.sheetClosedTop - CARD_ABOVE_BAR - layout.columnTop).coerceAtLeast(0f).dp)) {
     Box(Modifier.align(Alignment.BottomStart).fillMaxWidth(), content = content)
   }
 }

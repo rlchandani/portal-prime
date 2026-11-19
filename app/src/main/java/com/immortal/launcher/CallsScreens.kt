@@ -42,6 +42,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
@@ -55,6 +58,7 @@ internal fun CallsRooms(onEveryone: () -> Unit) {
   val peers by CallingStore.peers.collectAsState()
   val self = remember { Calling.selfId(context).orEmpty() }
   val now = rememberCallClock(PRESENCE_TICK_MS)
+  val layout = currentLayoutClass()
   when {
     !CallMediaRuntime.available() -> CallsNotice("warn", "Calls can’t run on this Portal",
         "Hearthpane Calling needs a 64-bit Portal. This one can still use Call everyone.")
@@ -64,6 +68,7 @@ internal fun CallsRooms(onEveryone: () -> Unit) {
         "Rooms appear here when another Portal in this home answers. Check it’s on the same Wi-Fi.") {
       CallPill("Try again", { Calling.announce(context, ask = true) }, icon = "redo", surface = callsSurface())
     }
+    layout.compact -> CallsRoomsCompact(peers, self, now, layout, onEveryone)
     else -> LazyVerticalGrid(GridCells.Fixed(COLUMNS), Modifier.fillMaxSize(), contentPadding = PaddingValues(56.dp, 8.dp, 56.dp, 40.dp),
         horizontalArrangement = Arrangement.spacedBy(32.dp), verticalArrangement = Arrangement.spacedBy(32.dp)) {
       items(peers.sortedBy { it.name.lowercase() }, key = { it.id }) { peer -> RoomCard(peer, self, now) }
@@ -73,6 +78,94 @@ internal fun CallsRooms(onEveryone: () -> Unit) {
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
       }
     }
+  }
+}
+
+/**
+ * Compact rooms (the Mini): one column upright, two turned; narrower padding, a smaller avatar,
+ * and the call buttons wrap onto a second line rather than overflow a narrow card.
+ */
+@Composable
+private fun CallsRoomsCompact(peers: List<CallPeer>, self: String, now: Long, layout: LayoutClass, onEveryone: () -> Unit) {
+  val columns = CallsCompactLayout.roomColumns(layout)
+  val pad = CallsCompactLayout.pagePadding(layout).dp
+  LazyVerticalGrid(GridCells.Fixed(columns), Modifier.fillMaxSize(), contentPadding = PaddingValues(pad, 4.dp, pad, 32.dp),
+      horizontalArrangement = Arrangement.spacedBy(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+    items(peers.sortedBy { it.name.lowercase() }, key = { it.id }) { peer -> RoomCardCompact(peer, self, now) }
+    item(span = { GridItemSpan(columns) }) { EveryoneCardCompact(onEveryone, stacked = layout.compactPortrait) }
+    item(span = { GridItemSpan(columns) }) {
+      Text(CallingCopy.CALLS_FOOTER, color = LocalApprovedPalette.current.secondary, fontSize = 20.sp, textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+    }
+  }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RoomCardCompact(peer: CallPeer, self: String, now: Long) {
+  val context = LocalContext.current
+  val p = LocalApprovedPalette.current
+  val surface = callsSurface()
+  val presence = CallPolicy.presence(peer, now)
+  val drop = CallPolicy.dropInOn(peer, self)
+  val calls = peer.acceptsCalls
+  Column(Modifier.callPanel(p.surface, RoundedCornerShape(32.dp), p.outline).padding(28.dp).alpha(if (presence == CallPresence.OFFLINE) 0.72f else 1f),
+      verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(22.dp)) {
+      CallRoomAvatar(peer.name, 120.dp, presence, ring = p.surface)
+      Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(peer.name, color = p.text, fontSize = 32.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+          Box(Modifier.size(14.dp).background(CallColors.presence(presence), CircleShape))
+          Text(presence.label, color = p.secondary, fontSize = 22.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+      }
+      CallRoundButton("star", if (peer.favourite) "Remove from Home" else "Show on Home",
+          { CallingStore.setFavourite(context, peer.id, !peer.favourite) }, surface = if (peer.favourite)
+            surface.copy(fill = HearthpaneMark.EmberLight.copy(alpha = 0.3f), ink = HearthpaneMark.Ember) else surface, size = 72.dp)
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      val plain = p.surface2
+      when {
+        !calls -> CallChip("Calls off", "bellOff", CallChipTone.RED, plain, p.secondary)
+        drop == DropInPolicy.CHIME -> CallChip("Drop-ins on", "door", CallChipTone.OK, plain, p.secondary)
+        drop == DropInPolicy.ASK -> CallChip("Asks first", "door", CallChipTone.PLAIN, plain, p.secondary)
+        else -> CallChip("Drop-ins off", "door", CallChipTone.PLAIN, plain, p.secondary)
+      }
+    }
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+      CallPill("Video call", { Calling.dial(context, peer.id, CallKind.CALL, video = true) }, icon = "video",
+          style = CallButtonStyle.OK, enabled = calls, surface = surface, size = CallButtonSize.SM)
+      CallPill(when (drop) { DropInPolicy.CHIME -> "Drop in"; DropInPolicy.ASK -> "Ask to join"; DropInPolicy.OFF -> "Not allowed" },
+          { Calling.dial(context, peer.id, CallKind.DROP_IN, video = true) }, icon = "door", enabled = calls && drop != DropInPolicy.OFF,
+          surface = surface, size = CallButtonSize.SM)
+      CallRoundButton("phone", "Audio call", { Calling.dial(context, peer.id, CallKind.CALL, video = false) }, surface = surface, size = 72.dp)
+    }
+  }
+}
+
+/** Compact Call everyone: upright the button goes under the text, so neither is squeezed. */
+@Composable
+private fun EveryoneCardCompact(onEveryone: () -> Unit, stacked: Boolean) {
+  val p = LocalApprovedPalette.current
+  val text: @Composable (Modifier) -> Unit = { m ->
+    Column(m) {
+      Text("Need everyone at once?", color = p.text, fontSize = 27.sp, fontWeight = FontWeight.SemiBold)
+      Text("Call everyone chimes a short message in every room. Drop-ins always chime and show a banner first.",
+          color = p.secondary, fontSize = 21.sp)
+    }
+  }
+  val panel = Modifier.fillMaxWidth().callPanel(p.surface, RoundedCornerShape(32.dp), p.outline).padding(28.dp)
+  if (stacked) Column(panel, verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(22.dp)) {
+      CallIcon("users", p.secondary, 48.dp)
+      text(Modifier.weight(1f))
+    }
+    CallPill("Call everyone", onEveryone, Modifier.align(Alignment.End), icon = "bell", style = CallButtonStyle.PRIMARY, surface = callsSurface())
+  } else Row(panel, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(22.dp)) {
+    CallIcon("users", p.secondary, 48.dp)
+    text(Modifier.weight(1f))
+    CallPill("Call everyone", onEveryone, icon = "bell", style = CallButtonStyle.PRIMARY, surface = callsSurface())
   }
 }
 
@@ -144,7 +237,8 @@ internal fun CallsRecent(history: List<CallHistoryEntry>) {
   val rows = CallHistory.filter(history, filter)
   val now = Calling.now()
   val zone = Calling.zone()
-  Column(Modifier.fillMaxSize().padding(horizontal = 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+  val compact = currentLayoutClass().compact
+  Column(Modifier.fillMaxSize().padding(horizontal = if (compact) 32.dp else 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
     CallsSegmented(CallHistoryFilter.entries.map { it.label }, filter.ordinal) { filter = CallHistoryFilter.entries[it] }
     Spacer(Modifier.height(24.dp))
     if (rows.isEmpty()) {
@@ -152,13 +246,14 @@ internal fun CallsRecent(history: List<CallHistoryEntry>) {
         CallsNotice("clock", if (filter == CallHistoryFilter.MISSED) "No missed calls" else "No calls yet",
             "Calls and drop-ins between rooms show up here.")
       }
-    } else LazyColumn(Modifier.weight(1f).width(1200.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    } else LazyColumn(Modifier.weight(1f).then(if (compact) Modifier.widthIn(max = 1200.dp).fillMaxWidth() else Modifier.width(1200.dp)),
+        verticalArrangement = Arrangement.spacedBy(2.dp)) {
       val groups = rows.groupBy { CallingCopy.historyDay(it.atMs, now, zone) }
       groups.forEach { (day, list) ->
         item(key = "h-$day") {
           Text(day, color = p.secondary, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 32.dp, top = 18.dp, bottom = 12.dp))
         }
-        items(list, key = { it.id }) { e -> HistoryRow(e) }
+        items(list, key = { it.id }) { e -> if (compact) HistoryRowCompact(e) else HistoryRow(e) }
       }
       item(key = "footer") {
         Column(Modifier.fillMaxWidth().padding(vertical = 28.dp), horizontalAlignment = Alignment.CenterHorizontally,
@@ -191,6 +286,32 @@ private fun HistoryRow(e: CallHistoryEntry) {
     Column(Modifier.weight(1f)) {
       Text(e.peerName, color = if (e.missed) p.error else p.text, fontSize = 29.sp, fontWeight = FontWeight.SemiBold)
       Text(CallingCopy.historyLine(e, time), color = p.secondary, fontSize = 22.5.sp)
+    }
+    if (e.missed) CallChip("Missed", tone = CallChipTone.RED)
+    CallPill("Call back", { Calling.dial(context, e.peerId, CallKind.CALL, video = true) }, icon = "phone",
+        style = CallButtonStyle.OK, size = CallButtonSize.SM, surface = callsSurface())
+  }
+}
+
+/** Compact history row: tighter padding; name and line ellipsize, Call back keeps its size. */
+@Composable
+private fun HistoryRowCompact(e: CallHistoryEntry) {
+  val context = LocalContext.current
+  val p = LocalApprovedPalette.current
+  val time = remember(e.atMs) { DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(e.atMs)) }
+  val (icon, tint) = when {
+    e.missed -> "inc" to p.error
+    e.kind == CallKind.DROP_IN -> "door" to if (p.dark) HearthpaneMark.EmberLight else EMBER_TEXT
+    e.direction == CallDirection.INCOMING -> "inc" to p.green
+    else -> "phone" to p.green
+  }
+  Row(Modifier.fillMaxWidth().background(p.surface, RoundedCornerShape(24.dp)).padding(horizontal = 22.dp, vertical = 14.dp)
+      .height(78.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+    Box(Modifier.size(60.dp).background(tint.copy(alpha = 0.14f), CircleShape), contentAlignment = Alignment.Center) { CallIcon(icon, tint, 30.dp) }
+    Column(Modifier.weight(1f)) {
+      Text(e.peerName, color = if (e.missed) p.error else p.text, fontSize = 27.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+          overflow = TextOverflow.Ellipsis)
+      Text(CallingCopy.historyLine(e, time), color = p.secondary, fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
     if (e.missed) CallChip("Missed", tone = CallChipTone.RED)
     CallPill("Call back", { Calling.dial(context, e.peerId, CallKind.CALL, video = true) }, icon = "phone",

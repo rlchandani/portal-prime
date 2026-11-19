@@ -19,6 +19,8 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +51,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
@@ -157,6 +160,7 @@ private val helpPages =
 
 @Composable
 private fun HelpTour() {
+  val layoutClass = currentLayoutClass()
   val context = LocalContext.current
   val activity = context as? Activity
   var page by remember { mutableIntStateOf(0) }
@@ -195,13 +199,15 @@ private fun HelpTour() {
                 )
               },
       ) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 36.dp, vertical = 34.dp)) {
+        val cardPadding = if (layoutClass.compact) {
+          Modifier.padding(horizontal = 24.dp, vertical = 26.dp)
+        } else {
+          Modifier.padding(horizontal = 36.dp, vertical = 34.dp)
+        }
+        Column(Modifier.fillMaxWidth().then(cardPadding)) {
           // Only the current topic is composed; the shared scaffold owns bounded scrolling.
           PageContent(helpPages[page])
-          Row(
-              horizontalArrangement = Arrangement.spacedBy(16.dp),
-              verticalAlignment = Alignment.CenterVertically,
-          ) {
+          val buttons: @Composable () -> Unit = {
             PillButton(label = "Back", filled = false) { go(-1) }
             PillButton(label = "Skip", filled = false) { activity?.finish() }
             PillButton(
@@ -212,9 +218,31 @@ private fun HelpTour() {
               if (page < last) go(1) else activity?.finish()
             }
           }
+          if (layoutClass.compact) {
+            HelpButtonFlow(buttons)
+          } else {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+              buttons()
+            }
+          }
         }
       }
     }
+  }
+}
+
+/** Compact: the tour's buttons wrap to a second line instead of squeezing a label mid-word. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun HelpButtonFlow(buttons: @Composable () -> Unit) {
+  FlowRow(
+      horizontalArrangement = Arrangement.spacedBy(16.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
+  ) {
+    buttons()
   }
 }
 
@@ -272,6 +300,8 @@ private fun PillButton(
           lineHeight = 32.sp,
           fontWeight = FontWeight.Medium,
           textAlign = TextAlign.Center,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
       )
     }
   }

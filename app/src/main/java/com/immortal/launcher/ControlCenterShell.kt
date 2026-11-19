@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -62,13 +63,25 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
       JarvisHighlight.done(request)
     }
   }
+  val layout = currentLayoutClass()
+  // One body moved between the portrait and landscape frames, so rotating keeps the screens' state.
+  val body = remember(ui) { movableContentOf { s: CcUiState -> CcScreenBody(s, ui) } }
   CcTheme(dark = state.settings.darkTheme) {
     CompositionLocalProvider(LocalCcMotion provides (motion && !state.settings.reducedMotion)) {
       val c = LocalCc.current
       Box(Modifier.fillMaxSize().background(c.bg).ccObserveTouches(ui)) {
         if (state.settings.bannersOnly) CcBannersOnly(onExit)
         else {
-          Row(Modifier.fillMaxSize()) {
+          if (layout.compactPortrait) Column(Modifier.fillMaxSize()) {
+            // The Mini upright: two-row header on top, the screen, the bottom bar instead of the rail.
+            val screen = ui.screen
+            val floorId = ui.floorId
+            val subtitle = remember(state.minute, screen, floorId, state.plan, state.settings.kids) { subtitleFor(state, screen, floorId) }
+            val header = CcHeaderSlice.of(state, ccTitle(screen, state.registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL), subtitle)
+            CcCompactHeader(header, ui, onJarvis)
+            Box(Modifier.weight(1f).fillMaxWidth()) { body(state) }
+            CcCompactNavBar(CcRailSlice.of(state, screen), ui, onHome = onExit)
+          } else Row(Modifier.fillMaxSize()) {
             val screen = ui.screen
             val rail = CcRailSlice.of(state, screen)
             CcRail(rail, ui, onHome = onExit)
@@ -78,7 +91,7 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
               val subtitle = remember(state.minute, screen, floorId, state.plan, state.settings.kids) { subtitleFor(state, screen, floorId) }
               val header = CcHeaderSlice.of(state, ccTitle(screen, state.registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL), subtitle)
               CcHeader(header, ui, onJarvis)
-              Box(Modifier.weight(1f).fillMaxWidth()) { CcScreenBody(state, ui) }
+              Box(Modifier.weight(1f).fillMaxWidth()) { body(state) }
             }
           }
           CcSheetHost(state, ui)

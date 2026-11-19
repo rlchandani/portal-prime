@@ -39,6 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
@@ -120,6 +125,10 @@ private fun CallsHeader(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, o
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
   val surface = callsSurface()
+  if (currentLayoutClass().compact) {
+    CallsHeaderCompact(tab, missed, onTab, onBack, onLoopback)
+    return
+  }
   Row(Modifier.fillMaxWidth().height(130.dp).padding(horizontal = 56.dp), verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     CallRoundButton("back", "Back", onBack, surface = surface)
@@ -134,6 +143,35 @@ private fun CallsHeader(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, o
     CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
     CallRoundButton("gear", "Call settings", { context.startActivity(settingsPageIntent(context, SettingsPageIds.CALLS)) },
         surface = surface)
+  }
+}
+
+/**
+ * Compact header (the Mini, either way up): back, title and settings on the first row; the
+ * Rooms/Recent tabs and the Messenger hand-off on the second (scrolls sideways if it must).
+ */
+@Composable
+private fun CallsHeaderCompact(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, onBack: () -> Unit, onLoopback: () -> Unit) {
+  val context = LocalContext.current
+  val p = LocalApprovedPalette.current
+  val surface = callsSurface()
+  Column(Modifier.fillMaxWidth().padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+      CallRoundButton("back", "Back", onBack, surface = surface)
+      Column(Modifier.weight(1f)) {
+        Text("Calls", color = p.text, fontSize = 40.sp, fontWeight = FontWeight.Bold, letterSpacing = (-1).sp, maxLines = 1)
+        Text("Rooms in this home · end-to-end encrypted", color = p.secondary, fontSize = 22.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      }
+      CallRoundButton("gear", "Call settings", { context.startActivity(settingsPageIntent(context, SettingsPageIds.CALLS)) },
+          surface = surface)
+    }
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      CallsSegmented(CallsTab.entries.map { it.label + if (it == CallsTab.RECENT && missed > 0) " · $missed" else "" },
+          tab.ordinal) { onTab(CallsTab.entries[it]) }
+      if (BuildConfig.PORTAL_CALL_LOOPBACK) CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
+      CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
+    }
   }
 }
 
@@ -156,8 +194,12 @@ internal fun CallsSegmented(labels: List<String>, selected: Int, onSelect: (Int)
 @Composable
 internal fun CallsNotice(icon: String, title: String, body: String, action: (@Composable () -> Unit)? = null) {
   val p = LocalApprovedPalette.current
+  // Compact: as wide as the window allows (at most the designed 980), scrolling if a short window needs it.
+  val frame = if (currentLayoutClass().compact)
+    Modifier.padding(horizontal = 32.dp, vertical = 24.dp).widthIn(max = 980.dp).fillMaxWidth().verticalScroll(rememberScrollState())
+  else Modifier.width(980.dp)
   Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    Column(Modifier.width(980.dp).callPanel(p.surface, RoundedCornerShape(32.dp), p.outline).padding(56.dp),
+    Column(frame.callPanel(p.surface, RoundedCornerShape(32.dp), p.outline).padding(56.dp),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(20.dp)) {
       CallIcon(icon, p.secondary, 64.dp)
       Text(title, color = p.text, fontSize = 40.sp, fontWeight = FontWeight.Bold)

@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -61,6 +62,21 @@ internal fun CcAlertsScreen(s: CcUiState, ui: CcUi) {
     }
   }
   val onOp = remember(ui) { { item: CcAlertItem -> runOp(ui, item) } }
+  if (currentLayoutClass().compactPortrait) {
+    // The Mini upright: one column; the Portal-wide banner policy follows the alerts.
+    val set = remember(ui) { { key: String, v: Boolean -> com.immortal.launcher.settings.ControlCenterSettings.set(ui.context, key, v); Unit } }
+    LazyColumn(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp), contentPadding = PaddingValues(bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)) {
+      item(key = "seg") { Row { CcSeg(segs, filter, onFilter) } }
+      if (items.isEmpty()) item(key = "clear") { AllClear(filter) }
+      items(items, key = { "${it.alert.id}:${it.active}" }) { AlertCard(it, onOp) }
+      item(key = "banners") {
+        BannersCard(s.settings.warningAfterMin, s.settings.bannersWarnings, s.settings.bannersInfo, set,
+            Modifier.fillMaxWidth().padding(top = 10.dp))
+      }
+    }
+    return
+  }
   Row(Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 4.dp, bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
     LazyColumn(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
       item(key = "seg") { Row { CcSeg(segs, filter, onFilter) } }

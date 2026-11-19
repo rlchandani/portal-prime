@@ -74,6 +74,11 @@ internal fun ApprovedAppsHeader(onSearch: () -> Unit) {
       info.supplicantState == android.net.wifi.SupplicantState.COMPLETED && info.ipAddress != 0
     }.getOrDefault(false)
   }
+  val layoutClass = currentLayoutClass()
+  if (layoutClass.compact) {
+    CompactAppsHeader(connected, showWordmark = layoutClass.compactLandscape, onSearch = onSearch)
+    return
+  }
   Column {
     Row(Modifier.fillMaxWidth().height(103.dp).padding(horizontal = 56.dp), verticalAlignment = Alignment.CenterVertically) {
       HearthpaneWordmark(IosLabel)
@@ -91,7 +96,7 @@ internal fun ApprovedAppsHeader(onSearch: () -> Unit) {
         ApprovedAppsRoundAction("remote", "Connect your phone") { context.startActivity(Intent(context, RemotePairActivity::class.java)) }
         ApprovedAppsRoundAction("sleep", "Sleep screen") { ScreenControl.sleep(context) }
         ApprovedThemeButton()
-        ApprovedAppsRoundAction("search", "Search apps", onSearch)
+        ApprovedAppsRoundAction("search", "Search apps", onClick = onSearch)
         ApprovedAppsRoundAction("gear", "Settings") { context.startActivity(Intent(context, ImmortalSettingsActivity::class.java)) }
       }
     }
@@ -99,9 +104,37 @@ internal fun ApprovedAppsHeader(onSearch: () -> Unit) {
   }
 }
 
+/**
+ * The standalone screens' header on compact windows (Store, APK browser): the same 56 dp buttons
+ * and "⋯" overflow as Home's compact tier, so nothing is squeezed or clipped at 800 dp.
+ */
 @Composable
-private fun ApprovedAppsRoundAction(glyph: String, label: String, onClick: () -> Unit) {
-  Box(Modifier.size(68.dp).clip(CircleShape).background(LocalApprovedPalette.current.surface2)
+private fun CompactAppsHeader(connected: Boolean, showWordmark: Boolean, onSearch: () -> Unit) {
+  val context = LocalContext.current
+  val b = HomeHeaderBudget.COMPACT_BUTTON.dp
+  Column {
+    Row(Modifier.fillMaxWidth().height(HomeHeaderBudget.COMPACT_HEIGHT.dp).padding(horizontal = HomeHeaderBudget.EDGE.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(HomeHeaderBudget.COMPACT_GAP.dp)) {
+      if (showWordmark) HearthpaneWordmark(IosLabel)
+      ApprovedAppsRoundAction("screensaver", "Start screensaver", b) {
+        context.startActivity(Intent(context, PhotoFramePreviewActivity::class.java))
+      }
+      Spacer(Modifier.weight(1f))
+      ApprovedAppsGlyph("wifi", IosSecondary, 22.dp)
+      HomeHeaderOverflowButton(size = b, status = if (connected) "Connected" else "Offline",
+          onRemote = { context.startActivity(Intent(context, RemotePairActivity::class.java)) },
+          onSleep = { ScreenControl.sleep(context) })
+      ApprovedAppsRoundAction("search", "Search apps", b, onSearch)
+      ApprovedAppsRoundAction("gear", "Settings", b) { context.startActivity(Intent(context, ImmortalSettingsActivity::class.java)) }
+    }
+    Box(Modifier.fillMaxWidth().height(1.dp).background(IosDivider))
+  }
+}
+
+@Composable
+private fun ApprovedAppsRoundAction(glyph: String, label: String, size: androidx.compose.ui.unit.Dp = 68.dp, onClick: () -> Unit) {
+  Box(Modifier.size(size).clip(CircleShape).background(LocalApprovedPalette.current.surface2)
       .tvFocusable(CircleShape, focusScale = 1f, ringColor = LocalApprovedPalette.current.accent,
           onClick = onClick), contentAlignment = Alignment.Center) {
     ApprovedAppsGlyph(glyph, IosLabel, 30.dp, label)
@@ -142,7 +175,7 @@ internal fun ApprovedAppsButton(label: String, primary: Boolean = false, enabled
           ringColor = if (primary) MaterialTheme.colorScheme.onPrimary else LocalApprovedPalette.current.accent,
           onClick = onClick)
       .padding(horizontal = 26.dp, vertical = 18.dp), contentAlignment = Alignment.Center) {
-    Text(label, color = (if (primary) MaterialTheme.colorScheme.onPrimary else IosLabel).copy(alpha = if (enabled) 1f else 0.5f), fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium)
+    Text(label, color = (if (primary) MaterialTheme.colorScheme.onPrimary else IosLabel).copy(alpha = if (enabled) 1f else 0.5f), fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Medium, maxLines = 1)
   }
 }
 

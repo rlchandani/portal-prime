@@ -282,13 +282,18 @@ internal fun HomeWidgetPickerSheet(
     CompositionLocalProvider(LocalApprovedHomePopup provides true) {
       Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .55f))
           .pointerInput(Unit) { detectTapGestures { onDismiss() } }) {
-        ApprovedHomeSurface(Modifier.fillMaxSize().padding(start = LauncherEdge, end = LauncherEdge, top = 104.dp,
+        val compact = currentLayoutClass().compact
+        // Compact: a shorter top inset (the Mini turned is 740 dp tall) and a tighter card padding.
+        ApprovedHomeSurface(Modifier.fillMaxSize().padding(start = LauncherEdge, end = LauncherEdge,
+            top = if (compact) 72.dp else 104.dp,
             bottom = LauncherEdge).pointerInput(Unit) { detectTapGestures { } }, radius = 32.dp) {
-          Column(Modifier.fillMaxSize().padding(start = 36.dp, end = 36.dp, top = 32.dp)) {
+          Column(Modifier.fillMaxSize().padding(start = if (compact) 24.dp else 36.dp, end = if (compact) 24.dp else 36.dp,
+              top = if (compact) 24.dp else 32.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
               HomeSlotMiniMap(slot, occupied)
-              Text("Add a widget", color = ApprovedHomePalette.Text, fontSize = 44.sp, lineHeight = 54.sp,
-                  fontWeight = FontWeight.Medium, letterSpacing = (-.5).sp,
+              Text("Add a widget", color = ApprovedHomePalette.Text, fontSize = if (compact) 38.sp else 44.sp,
+                  lineHeight = if (compact) 46.sp else 54.sp,
+                  fontWeight = FontWeight.Medium, letterSpacing = (-.5).sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                   modifier = Modifier.padding(start = 24.dp).weight(1f))
               Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome)
                   .semantics { contentDescription = "Close" }
@@ -318,9 +323,15 @@ private fun ColumnScope.HomePickerGrid(
     onKind: (String) -> Unit,
     onProvider: (HomePickerChoice) -> Unit,
 ) {
-  val tileHeight = if (slotSize.height == Dp.Unspecified) 360.dp else slotSize.height.coerceIn(220.dp, 440.dp)
+  val layoutClass = currentLayoutClass()
+  val tileHeight = when {
+    layoutClass.compact -> if (slotSize.height == Dp.Unspecified) 300.dp
+        else slotSize.height.coerceIn(WidgetPickerColumns.COMPACT_TILE_MIN_DP.dp, WidgetPickerColumns.COMPACT_TILE_MAX_DP.dp)
+    slotSize.height == Dp.Unspecified -> 360.dp
+    else -> slotSize.height.coerceIn(220.dp, 440.dp)
+  }
   val extra = more.size + (providers?.size ?: 0)
-  LazyVerticalGrid(GridCells.Fixed(4), Modifier.weight(1f).fillMaxWidth(),
+  LazyVerticalGrid(GridCells.Fixed(WidgetPickerColumns.picker(layoutClass)), Modifier.weight(1f).fillMaxWidth(),
       contentPadding = PaddingValues(top = 32.dp, bottom = 32.dp),
       horizontalArrangement = Arrangement.spacedBy(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
     items(everyday, key = { it }, contentType = { "kind" }) { kind ->
@@ -383,8 +394,10 @@ private fun HomeMoreTile(title: String, subtitle: String?, height: Dp, onClick: 
           style = Stroke(stroke, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10.dp.toPx(), 8.dp.toPx()))))
     }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-      Text(title, color = ApprovedHomePalette.Text, fontSize = 34.sp, lineHeight = 42.sp, fontWeight = FontWeight.Medium)
-      subtitle?.let { Text(it, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp) }
+      Text(title, color = ApprovedHomePalette.Text, fontSize = 34.sp, lineHeight = 42.sp, fontWeight = FontWeight.Medium,
+          maxLines = 1, overflow = TextOverflow.Ellipsis)
+      subtitle?.let { Text(it, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp, maxLines = 1,
+          overflow = TextOverflow.Ellipsis) }
     }
   }
 }
@@ -495,4 +508,24 @@ private fun HomeShapeButton(shape: Pair<Int, Int>, selected: Boolean, enabled: B
       }
     }
   }
+}
+
+/** Column counts and paddings for the widget picker and the widget library (pure; unit tested). */
+internal object WidgetPickerColumns {
+  /** Compact picker tiles keep a preview readable without one tile filling the 740 dp landscape height. */
+  const val COMPACT_TILE_MIN_DP = 200
+  const val COMPACT_TILE_MAX_DP = 380
+
+  /** "Add a widget" grid: 4 on the Portal+, 2 upright on the Mini, 3 turned. */
+  fun picker(layoutClass: LayoutClass): Int = when (layoutClass) {
+    LayoutClass.COMPACT_PORTRAIT -> 2
+    LayoutClass.COMPACT_LANDSCAPE -> 3
+    LayoutClass.LARGE -> 4
+  }
+
+  /** "Home & widgets" library cards: 3 on the Portal+ and the Mini turned, 2 upright. */
+  fun library(layoutClass: LayoutClass): Int = if (layoutClass.compactPortrait) 2 else 3
+
+  /** The library's side padding (dp): 56 on the Portal+, 24 compact. */
+  fun librarySidePaddingDp(layoutClass: LayoutClass): Int = if (layoutClass.compact) 24 else 56
 }

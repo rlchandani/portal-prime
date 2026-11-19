@@ -11,6 +11,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +40,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,10 +75,20 @@ internal fun ApprovedToolsHost(
         LocalApprovedToolPage provides true,
         LocalApprovedToolWorkspace provides true,
     ) {
+        val layoutClass = currentLayoutClass()
         val content: @Composable BoxScope.() -> Unit = {
             Box(modifier.fillMaxSize()) {
                 if (tool == null) holder.SaveableStateProvider("library") {
-                    ToolsLibrary(grid, advanced, edge = if (embedded) LauncherEdge else 96.dp) { selected = it.id }
+                    val edge = when {
+                        embedded -> LauncherEdge
+                        layoutClass.compactPortrait -> COMPACT_PORTRAIT_EDGE
+                        layoutClass.compactLandscape -> COMPACT_LANDSCAPE_EDGE
+                        else -> 96.dp
+                    }
+                    ToolsLibrary(grid, advanced, edge = edge) { selected = it.id }
+                }
+                else if (layoutClass.compact) {
+                    CompactToolWorkspace(tool, advanced, embedded, layoutClass.compactPortrait, holder) { selected = it.id }
                 }
                 else Row(Modifier.fillMaxSize().padding(horizontal = if (embedded) LauncherEdge else 56.dp, vertical = 36.dp)) {
                     ToolsRail(tool, advanced) { selected = it.id }
@@ -99,6 +111,75 @@ internal fun ApprovedToolsHost(
         }
         if (embedded) Box(content = content)
         else ApprovedAppsShell("tools", onExit, content = content)
+    }
+}
+
+private val COMPACT_PORTRAIT_EDGE = 24.dp
+private val COMPACT_LANDSCAPE_EDGE = 48.dp
+private val COMPACT_RAIL_W = 260.dp
+
+/**
+ * Compact open tool. Portrait: the tool list becomes a scrolling tab strip above the full-width tool.
+ * Landscape: a narrower rail beside the tool, with tighter padding for the 740 dp height.
+ */
+@Composable
+private fun CompactToolWorkspace(
+    tool: ApprovedTool, advanced: Boolean, embedded: Boolean, portrait: Boolean, holder: SaveableStateHolder,
+    onSelect: (ApprovedTool) -> Unit,
+) {
+    val edge = if (embedded) LauncherEdge else COMPACT_PORTRAIT_EDGE
+    val heading: @Composable () -> Unit = {
+        Column(Modifier.fillMaxWidth().padding(horizontal = if (portrait) 8.dp else 28.dp, vertical = 20.dp)) {
+            Text(tool.title, color = IosLabel, fontSize = 36.sp, lineHeight = 45.sp,
+                fontWeight = FontWeight.Medium, letterSpacing = (-.6).sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(tool.description, color = IosSecondary, fontSize = 22.sp,
+                lineHeight = 30.sp, modifier = Modifier.padding(top = 6.dp))
+        }
+    }
+    if (portrait) {
+        Column(Modifier.fillMaxSize().padding(horizontal = edge, vertical = 24.dp)) {
+            ToolsTabStrip(tool, advanced, onSelect)
+            heading()
+            Box(Modifier.fillMaxWidth().height(1.dp).background(IosDivider))
+            Box(Modifier.weight(1f).fillMaxWidth().padding(start = 8.dp, end = 8.dp, top = 24.dp, bottom = 8.dp)) {
+                ToolsWorkspacePanes(tool.id, holder)
+            }
+        }
+    } else {
+        Row(Modifier.fillMaxSize().padding(horizontal = edge, vertical = 20.dp)) {
+            ToolsRail(tool, advanced, width = COMPACT_RAIL_W, singleLine = true, onSelect = onSelect)
+            Column(Modifier.weight(1f).fillMaxHeight()) {
+                heading()
+                Box(Modifier.fillMaxWidth().height(1.dp).background(IosDivider))
+                Box(Modifier.weight(1f).fillMaxWidth().padding(start = 28.dp, end = 28.dp, top = 24.dp, bottom = 8.dp)) {
+                    ToolsWorkspacePanes(tool.id, holder)
+                }
+            }
+        }
+    }
+}
+
+/** Compact portrait: the rail's tools as one horizontally scrolling row of tabs. */
+@Composable
+private fun ToolsTabStrip(selectedTool: ApprovedTool, advanced: Boolean, onSelect: (ApprovedTool) -> Unit) {
+    val tools = remember(advanced) { ApprovedToolsCatalog.visible(advanced) }
+    val p = LocalApprovedPalette.current
+    LazyRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp)) {
+        items(tools, key = { it.id }) { tool ->
+            val selected = selectedTool.id == tool.id
+            Row(Modifier.heightIn(min = 64.dp).clip(RoundedCornerShape(14.dp))
+                .background(if (selected) p.surface2 else Color.Transparent)
+                .semantics { this.selected = selected; role = Role.Tab }
+                .tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f, ringColor = p.accent) { onSelect(tool) }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ToolsGlyph(tool.glyph, toolsTint(tool), Modifier.size(28.dp))
+                Text(tool.title, color = if (selected) p.accent else p.secondary,
+                    fontSize = 22.sp, lineHeight = 30.sp, maxLines = 1)
+            }
+        }
     }
 }
 
@@ -155,11 +236,12 @@ private fun ToolsWorkspacePanes(selected: String, holder: SaveableStateHolder) {
 
 @Composable
 private fun ToolsRail(
-    selectedTool: ApprovedTool, advanced: Boolean, onSelect: (ApprovedTool) -> Unit,
+    selectedTool: ApprovedTool, advanced: Boolean, width: Dp = 300.dp, singleLine: Boolean = false,
+    onSelect: (ApprovedTool) -> Unit,
 ) {
     val tools = remember(advanced) { ApprovedToolsCatalog.visible(advanced) }
     val p = LocalApprovedPalette.current
-    Row(Modifier.width(300.dp).fillMaxHeight()) {
+    Row(Modifier.width(width).fillMaxHeight()) {
         Column(Modifier.weight(1f).fillMaxHeight().padding(horizontal = 16.dp)
             .padding(top = 28.dp, bottom = 32.dp)) {
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -174,8 +256,13 @@ private fun ToolsRail(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         ToolsGlyph(tool.glyph, toolsTint(tool), Modifier.size(32.dp))
-                        Text(tool.title, color = if (selected) p.accent else p.secondary,
-                            fontSize = 22.sp, lineHeight = 30.sp)
+                        if (singleLine) {
+                            Text(tool.title, color = if (selected) p.accent else p.secondary,
+                                fontSize = 22.sp, lineHeight = 30.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        } else {
+                            Text(tool.title, color = if (selected) p.accent else p.secondary,
+                                fontSize = 22.sp, lineHeight = 30.sp)
+                        }
                     }
                 }
             }
@@ -195,6 +282,7 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpe
         ApprovedToolsCatalog.visible(advanced, selectedGroup, query)
     }
     val p = LocalApprovedPalette.current
+    val layoutClass = currentLayoutClass()
     val context = LocalContext.current.applicationContext
     val active = LocalApprovedLauncherPageActive.current
     val resume = rememberApprovedResume()
@@ -210,7 +298,14 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpe
         LazyVerticalGrid(GridCells.Fixed(columns), state = grid, modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp), contentPadding = PaddingValues(bottom = 24.dp)) {
-            item(key = "heading", span = { GridItemSpan(maxLineSpan) }) {
+            if (layoutClass.compactPortrait) item(key = "heading", span = { GridItemSpan(maxLineSpan) }) {
+                // Compact portrait: the search goes full width under the title.
+                Column(Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
+                    Text("Tools", color = p.text, fontSize = 44.sp, lineHeight = 55.sp, fontWeight = FontWeight.Medium)
+                    ToolsText("Small things that make the day easier.", true, Modifier.padding(top = 10.dp))
+                    ApprovedAppsSearch(query, { query = it }, "Find a tool", Modifier.fillMaxWidth().padding(top = 20.dp))
+                }
+            } else item(key = "heading", span = { GridItemSpan(maxLineSpan) }) {
                 Row(Modifier.fillMaxWidth().padding(bottom = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(32.dp)) {
@@ -258,7 +353,8 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpe
                             fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 8.dp))
                     }
                     items(members, key = { it.id }) { tool ->
-                        ToolsLibraryEntry(tool, summaries[tool.id] ?: toolsDefaultSummary(tool.id)) { onOpen(tool) }
+                        ToolsLibraryEntry(tool, summaries[tool.id] ?: toolsDefaultSummary(tool.id),
+                            compact = layoutClass.compact) { onOpen(tool) }
                     }
                 }
             }
@@ -267,7 +363,7 @@ private fun ToolsLibrary(grid: LazyGridState, advanced: Boolean, edge: Dp, onOpe
 }
 
 @Composable
-private fun ToolsLibraryEntry(tool: ApprovedTool, summary: String, onOpen: () -> Unit) {
+private fun ToolsLibraryEntry(tool: ApprovedTool, summary: String, compact: Boolean = false, onOpen: () -> Unit) {
     val p = LocalApprovedPalette.current
     Surface(color = p.surface, shape = RoundedCornerShape(24.dp),
         border = BorderStroke(1.dp, p.divider), modifier = Modifier.fillMaxWidth()) {
@@ -280,7 +376,12 @@ private fun ToolsLibraryEntry(tool: ApprovedTool, summary: String, onOpen: () ->
                 ToolsGlyph(tool.glyph, toolsTint(tool), Modifier.size(36.dp))
             }
             Column(Modifier.weight(1f)) {
-                Text(tool.title, color = p.text, fontSize = 26.sp, lineHeight = 35.sp, fontWeight = FontWeight.Medium)
+                if (compact) {
+                    Text(tool.title, color = p.text, fontSize = 26.sp, lineHeight = 35.sp, fontWeight = FontWeight.Medium,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                } else {
+                    Text(tool.title, color = p.text, fontSize = 26.sp, lineHeight = 35.sp, fontWeight = FontWeight.Medium)
+                }
                 Text(tool.description, color = p.secondary, fontSize = 20.sp, lineHeight = 27.sp,
                     modifier = Modifier.padding(top = 2.dp))
                 Text(summary, color = p.secondary, fontSize = 18.sp, lineHeight = 24.sp,

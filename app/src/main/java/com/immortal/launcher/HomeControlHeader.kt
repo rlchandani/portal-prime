@@ -88,11 +88,11 @@ private fun homeControlShown(context: Context): Boolean =
 
 /** A 68 dp header button like its neighbours, with the status dot at its top-right. */
 @Composable
-internal fun HomeControlHeaderButton() {
+internal fun HomeControlHeaderButton(size: androidx.compose.ui.unit.Dp = 68.dp) {
   val context = LocalContext.current
   val dot by HomeControlDotStore.flow.collectAsState()
-  Box(Modifier.size(68.dp)) {
-    Box(Modifier.size(68.dp).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
+  Box(Modifier.size(size)) {
+    Box(Modifier.size(size).clip(CircleShape).background(ApprovedHomePalette.Chrome).approvedOutline(CircleShape)
         .semantics { contentDescription = "Home Control" }
         .tvFocusable(CircleShape, ringColor = ApprovedHomePalette.Accent) { ControlCenterActivity.open(context) },
         contentAlignment = Alignment.Center) {
