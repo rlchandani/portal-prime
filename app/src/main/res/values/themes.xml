@@ -12,8 +12,17 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
+    <!-- Home never asks for a splash starting window. The system relaunches Home after every
+         launcher death and dozens of times per install, usually for an ActivityRecord that is
+         already finishing; on Android 10 each such failed splash add ("starting window not
+         displayed") leaks its ViewRootImpl, DecorView and package Context inside system_server
+         for good (Family reached 13,428 of them, 1.8 GB). Animations stay the system's. -->
+    <style name="Theme.SampleApp.Home" parent="Theme.SampleApp">
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
     <!-- Internal handoffs keep the previous surface until Compose draws, then fade.
-         Home, ambient previews, alarms and external applications keep their own policy. -->
+         Ambient previews, alarms and external applications keep their own policy. -->
     <style name="Theme.SampleApp.Navigation" parent="Theme.SampleApp">
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowAnimationStyle">@style/Animation.Immortal.Navigation</item>
