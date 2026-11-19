@@ -17,8 +17,11 @@ import androidx.compose.runtime.State
  * at once when Music closes. Inline layouts (compact, photos) show over Home and apply immediately. Pure.
  */
 internal object HomeMusicCover {
-    /** Music's open (stage, list, then the player attaching) is done well within this. */
-    const val SETTLE_MS = 1_500L
+    /**
+     * After Music's own opening work (stage, list, the player attaching and, signed out, the sign-in code
+     * arriving at about 1 s), so Home's one recomposition never lands in a frame Music needs.
+     */
+    const val SETTLE_MS = 3_000L
 
     fun homeLayout(layout: MusicPlayerLayout?, covered: Boolean): MusicPlayerLayout? =
         if (layout == MusicPlayerLayout.FULL && !covered) null else layout

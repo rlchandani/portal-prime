@@ -164,8 +164,8 @@ internal class MusicKeyboardPolicy(private val window: android.view.Window?) {
   }
 
   internal companion object {
-    /** After the opening frames (stage, list, then the player attaching). */
-    const val SETTLE_MS = 1_000L
+    /** After Music's opening work (about 1 s) and before Home goes inactive ([HomeMusicCover.SETTLE_MS]). */
+    const val SETTLE_MS = 2_000L
   }
 }
 
