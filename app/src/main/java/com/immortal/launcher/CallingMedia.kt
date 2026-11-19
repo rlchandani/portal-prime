@@ -88,7 +88,8 @@ internal class CallMedia(
 
   fun camera(on: Boolean) = post { if (on) startCamera() else stopCamera() }
 
-  fun mic(on: Boolean) = post { audioTrack?.setEnabled(on) }
+  /** Test frames (measurement builds, night tests) never send the room's sound either. */
+  fun mic(on: Boolean) = post { audioTrack?.setEnabled(on && !testFrames) }
 
   /** Offer to [peer] (all LAN candidates gathered, non-trickle). Null on failure. */
   fun createOffer(peer: String = SOLO, done: (String?) -> Unit) = post {
@@ -235,7 +236,7 @@ internal class CallMedia(
     videoTrack = f.createVideoTrack(VIDEO_ID, vs).also { it.addSink(local); it.setEnabled(false) }
     val audio = f.createAudioSource(CallSdp.audioConstraints())
     audioSource = audio
-    audioTrack = f.createAudioTrack(AUDIO_ID, audio)
+    audioTrack = f.createAudioTrack(AUDIO_ID, audio).also { it.setEnabled(!testFrames) }
     thread.scheduleWithFixedDelay({ if (!released) post { links.values.forEach(CallMediaLink::pollStats) } },
         STATS_MS, STATS_MS, TimeUnit.MILLISECONDS)
   }
