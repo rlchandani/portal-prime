@@ -50,6 +50,8 @@ internal object CallingSettings {
                   help = "Auto sends 720p and steps down by itself when the Portal is busy or low on memory."),
               BoolSpec("dropInsOn", "Drop-ins on this Portal", get = { it.dropInsOn }, set = CallingConfig::setDropInsOn,
                   help = "Off until you turn it on. Rooms then ask first unless you choose Chime, join below."),
+              BoolSpec("messagesOn", "Video messages to this Portal", get = { it.messagesOn }, set = CallingConfig::setMessagesOn,
+                  help = "When nobody answers, a room can leave a message of up to 2 minutes. Kept encrypted here for 30 days."),
               BoolSpec("phonesOn", "Phones can call this Portal", get = { it.phonesOn }, set = CallingConfig::setPhonesOn,
                   help = "Paired phones with Portal Toolkit, on the home Wi-Fi. Phones call, they never drop in."),
               StringSpec("dropInRooms", "Drop-ins room by room", get = { it.dropInRooms }, set = CallingConfig::setDropInRooms,

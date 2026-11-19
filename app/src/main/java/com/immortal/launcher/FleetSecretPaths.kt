@@ -11,12 +11,15 @@ import java.io.File
 /**
  * Paths the authenticated fleet file routes must refuse, even though the app itself can read
  * them: the YouTube sign-in store (encrypted tokens) under the app's `no_backup/youtube`, and the
- * guest Wi-Fi password ([GuestPasswordStore]) under `no_backup/guest`.
+ * guest Wi-Fi password ([GuestPasswordStore]) under `no_backup/guest`, and Calling's video messages
+ * ([CallMessageStore]) under `no_backup/hearthpane_vmsg` and `no_backup/hearthpane_vmsg_out`.
  * Checked on canonical paths, so `..` and symlinks can't reach it, and without touching the
  * Android context (the read route is context-free by design).
  */
 internal object FleetSecretPaths {
-  private val protectedStores = listOf(listOf("no_backup", "youtube"), listOf("no_backup", GuestPasswordStore.DIR))
+  private val protectedStores = listOf(listOf("no_backup", "youtube"), listOf("no_backup", GuestPasswordStore.DIR),
+      // Video messages (sealed, with their wrapped key) and the sender's temp take.
+      listOf("no_backup", CallMessageStore.DIR), listOf("no_backup", CallMessageStore.OUT_DIR))
 
   fun isBlocked(target: File): Boolean {
     val resolved = runCatching { target.canonicalFile }.getOrNull() ?: return true

@@ -145,6 +145,7 @@ internal object SettingsPageSections {
         ),
         P.CALLS to listOf(
             section("Calls", rows("calling", "whoCanCall", "quality")),
+            section("Messages", rows("calling", "messagesOn"), block(B.CALL_MESSAGES), footer = CallMessageCopy.FOOTER),
             section("Ringtone", block(B.CALL_RINGTONES)),
             section("Ring volume", rows("calling", "ringVolume")),
             section("Quiet hours", rows("calling", "quietMode"),

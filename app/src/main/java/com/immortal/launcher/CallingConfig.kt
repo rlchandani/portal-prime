@@ -36,6 +36,8 @@ internal object CallingConfig {
       val dropInRooms: String = "",
       /** Settings › Calls › Phones: paired phones (Portal Toolkit, home Wi-Fi) may ring this Portal. */
       val phonesOn: Boolean = true,
+      /** Settings › Calls › Messages: callers who get no answer may leave a video message here. */
+      val messagesOn: Boolean = true,
   ) {
     val who: CallWhoCanCall get() = CallWhoCanCall.fromWire(whoCanCall)
     val tone: CallRingtone get() = CallRingtone.fromWire(ringtone)
@@ -56,6 +58,7 @@ internal object CallingConfig {
         dropInsOn = p.getBoolean("dropInsOn", false),
         dropInRooms = p.getString("dropInRooms", null).orEmpty(),
         phonesOn = p.getBoolean("phonesOn", true),
+        messagesOn = p.getBoolean("messagesOn", true),
     )
   }
 
@@ -74,4 +77,5 @@ internal object CallingConfig {
   fun setDropInsOn(c: Context, v: Boolean) = prefs(c).edit().putBoolean("dropInsOn", v).apply()
   fun setDropInRooms(c: Context, v: String) = prefs(c).edit().putString("dropInRooms", v).apply()
   fun setPhonesOn(c: Context, v: Boolean) = prefs(c).edit().putBoolean("phonesOn", v).apply()
+  fun setMessagesOn(c: Context, v: Boolean) = prefs(c).edit().putBoolean("messagesOn", v).apply()
 }

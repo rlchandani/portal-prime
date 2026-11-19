@@ -57,7 +57,11 @@ import kotlinx.coroutines.delay
 class CallsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val start = if (intent.getStringExtra(EXTRA_TAB) == TAB_RECENT) CallsTab.RECENT else CallsTab.ROOMS
+    val start = when (intent.getStringExtra(EXTRA_TAB)) {
+      TAB_RECENT -> CallsTab.RECENT
+      TAB_MESSAGES -> CallsTab.MESSAGES
+      else -> CallsTab.ROOMS
+    }
     setContent { PortalPrimeTheme(darkTheme = false) { CallsApp(start, onBack = ::finish) } }
     // Floating Jarvis: the rooms and recent calls are what `screen_context` describes here.
     HearthpaneScreens.track(this, HearthpaneScreens.Entry({ HearthpaneScreens.CALLS }) {
@@ -74,6 +78,7 @@ class CallsActivity : ComponentActivity() {
   companion object {
     const val EXTRA_TAB = "tab"
     const val TAB_RECENT = "recent"
+    const val TAB_MESSAGES = "messages"
 
     fun open(context: Context, recent: Boolean = false) {
       runCatching {
@@ -84,7 +89,16 @@ class CallsActivity : ComponentActivity() {
   }
 }
 
-internal enum class CallsTab(val label: String) { ROOMS("Rooms"), RECENT("Recent") }
+/** Unseen counts on the tabs: "Recent · 2", "Messages · 1". */
+internal data class CallsBadges(val missed: Int, val messages: Int) {
+  fun label(tab: CallsTab): String = tab.label + when {
+    tab == CallsTab.RECENT && missed > 0 -> " · $missed"
+    tab == CallsTab.MESSAGES && messages > 0 -> " · $messages"
+    else -> ""
+  }
+}
+
+internal enum class CallsTab(val label: String) { ROOMS("Rooms"), RECENT("Recent"), MESSAGES("Messages") }
 
 /** Page surfaces from the refined Home palette (light or dark, as Settings › Display says). */
 @Composable
@@ -100,7 +114,10 @@ private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
   var tab by rememberSaveable { mutableStateOf(start) }
   var everyone by remember { mutableStateOf(false) }
   var loopback by remember { mutableStateOf(false) }
+  var testMessage by remember { mutableStateOf(false) }
   val history by CallingStore.history.collectAsState()
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context) }
+  val messages by CallMessageStore.messages.collectAsState()
   // While the app is open, ask the rooms who's around every 30 s (presence goes stale after 90 s).
   LaunchedEffect(Unit) {
     CallingStore.importDinnerRoster(context)
@@ -109,24 +126,28 @@ private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
   LaunchedEffect(tab) { if (tab == CallsTab.RECENT) CallingStore.markSeen(context) }
   Box(Modifier.fillMaxSize().background(p.background)) {
     Column(Modifier.fillMaxSize()) {
-      CallsHeader(tab, CallHistory.unseenMissed(history), onTab = { tab = it }, onBack = onBack, onLoopback = { loopback = true })
+      CallsHeader(tab, CallsBadges(CallHistory.unseenMissed(history), CallMessageList.unseen(messages)), onTab = { tab = it },
+          onBack = onBack, onLoopback = { loopback = true }, onTestMessage = { testMessage = true })
       when (tab) {
         CallsTab.ROOMS -> CallsRooms(onEveryone = { everyone = true })
         CallsTab.RECENT -> CallsRecent(history)
+        CallsTab.MESSAGES -> CallMessagesTab()
       }
     }
     if (everyone) Box(Modifier.fillMaxSize()) { DinnerCallSheet(onDismiss = { everyone = false }) }
     if (loopback && BuildConfig.PORTAL_CALL_LOOPBACK) CallLoopbackScreen(onClose = { loopback = false })
+    if (testMessage && BuildConfig.PORTAL_CALL_LOOPBACK) CallMessageTestSheet(onDismiss = { testMessage = false })
   }
 }
 
 @Composable
-private fun CallsHeader(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, onBack: () -> Unit, onLoopback: () -> Unit) {
+private fun CallsHeader(tab: CallsTab, badges: CallsBadges, onTab: (CallsTab) -> Unit, onBack: () -> Unit, onLoopback: () -> Unit,
+                        onTestMessage: () -> Unit) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
   val surface = callsSurface()
   if (currentLayoutClass().compact) {
-    CallsHeaderCompact(tab, missed, onTab, onBack, onLoopback)
+    CallsHeaderCompact(tab, badges, onTab, onBack, onLoopback, onTestMessage)
     return
   }
   Row(Modifier.fillMaxWidth().height(130.dp).padding(horizontal = 56.dp), verticalAlignment = Alignment.CenterVertically,
@@ -137,9 +158,12 @@ private fun CallsHeader(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, o
       Text("Rooms in this home · end-to-end encrypted", color = p.secondary, fontSize = 24.sp)
     }
     Spacer(Modifier.weight(1f))
-    CallsSegmented(CallsTab.entries.map { it.label + if (it == CallsTab.RECENT && missed > 0) " · $missed" else "" },
+    CallsSegmented(CallsTab.entries.map(badges::label),
         tab.ordinal) { onTab(CallsTab.entries[it]) }
-    if (BuildConfig.PORTAL_CALL_LOOPBACK) CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
+    if (BuildConfig.PORTAL_CALL_LOOPBACK) {
+      CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
+      CallPill("Test message", onTestMessage, icon = "msg", surface = surface, size = CallButtonSize.SM)
+    }
     CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
     CallRoundButton("gear", "Call settings", { context.startActivity(settingsPageIntent(context, SettingsPageIds.CALLS)) },
         surface = surface)
@@ -151,7 +175,8 @@ private fun CallsHeader(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, o
  * Rooms/Recent tabs and the Messenger hand-off on the second (scrolls sideways if it must).
  */
 @Composable
-private fun CallsHeaderCompact(tab: CallsTab, missed: Int, onTab: (CallsTab) -> Unit, onBack: () -> Unit, onLoopback: () -> Unit) {
+private fun CallsHeaderCompact(tab: CallsTab, badges: CallsBadges, onTab: (CallsTab) -> Unit, onBack: () -> Unit, onLoopback: () -> Unit,
+                               onTestMessage: () -> Unit) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
   val surface = callsSurface()
@@ -167,9 +192,12 @@ private fun CallsHeaderCompact(tab: CallsTab, missed: Int, onTab: (CallsTab) -> 
     }
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-      CallsSegmented(CallsTab.entries.map { it.label + if (it == CallsTab.RECENT && missed > 0) " · $missed" else "" },
+      CallsSegmented(CallsTab.entries.map(badges::label),
           tab.ordinal) { onTab(CallsTab.entries[it]) }
-      if (BuildConfig.PORTAL_CALL_LOOPBACK) CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
+      if (BuildConfig.PORTAL_CALL_LOOPBACK) {
+      CallPill("Loopback test", onLoopback, icon = "video", surface = surface, size = CallButtonSize.SM)
+      CallPill("Test message", onTestMessage, icon = "msg", surface = surface, size = CallButtonSize.SM)
+    }
       CallPill("Messenger & WhatsApp", { PortalHomeBridge.launch(context) }, icon = "phone", surface = surface, size = CallButtonSize.SM)
     }
   }

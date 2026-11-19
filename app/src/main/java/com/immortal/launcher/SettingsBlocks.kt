@@ -93,6 +93,7 @@ internal enum class SettingsBlock(
     CALL_RINGTONES(claims = setOf("calling.ringtone"), rows = listOf(row("calls.preview", "Play ringtone", "preview hearth chime wind bells marimba classic"))),
     CALL_DROP_INS(claims = setOf("calling.dropInRooms"), rows = listOf(row("calls.grid", "Drop-ins room by room", "grid matrix ask chime join"))),
     CALL_CAMERA(rows = listOf(row("calls.framing", "Camera framing", "follow auto frame"), row("calls.selfView", "Self view"))),
+    CALL_MESSAGES(rows = listOf(row("calls.messages", "Messages on this Portal", "video message voicemail storage delete all"))),
     CALL_PRIVACY(rows = listOf(row("calls.privacy", "Calls privacy", "always recording encrypted live bar shutter"))),
     INTERCOM(rows = listOf(row("intercom.address", "Other Portal’s address"),
         row("intercom.broadcast", "Broadcast this room"), row("intercom.listen", "Listen"))),

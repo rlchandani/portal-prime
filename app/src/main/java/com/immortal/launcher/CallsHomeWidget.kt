@@ -47,9 +47,13 @@ internal fun CallsHomeWidget(modifier: Modifier = Modifier) {
   LaunchedEffect(Unit) { Calling.refreshPresence(context) }
   val now = rememberCallClock(PRESENCE_TICK_MS)
   val missed = remember(history) { CallHistory.latestUnseenMissed(history) }
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context) }
+  val messages by CallMessageStore.messages.collectAsState()
+  val message = remember(messages) { CallInbox.latestUnseen(messages) }
   ImmortalWidgetShell(title = "Calls", openPage = "calls", modifier = modifier, onOpen = { CallsActivity.open(context) },
       scrollContent = false) {
-    if (missed != null) MissedStrip(missed)
+    // A new video message takes the missed-call card (with Play); otherwise the plain missed call.
+    if (message != null) CallMessageStrip(message) else if (missed != null) MissedStrip(missed)
     BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
       val count = (maxWidth / FACE_WIDTH).toInt().coerceIn(1, MAX_FACES)
       val faces = CallPeers.forHome(peers, count)

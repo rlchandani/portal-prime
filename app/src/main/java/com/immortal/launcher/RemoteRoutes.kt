@@ -115,6 +115,8 @@ class RemoteRoutes internal constructor(
         ChoresPeerRoute.PATH -> ChoresPeerRoute.handle(context, req)
         // Portal↔Portal call setup: household-signed SDP offer/answer with bound DTLS fingerprints.
         CallSignalAuth.PATH -> CallPeerRoute.handle(context, req)
+        // Portal↔Portal video message delivery: household-signed header, sealed chunked body.
+        CallMessageWire.PATH -> CallMessageRoute.handle(context, req)
         // Phone ↔ Portal calls: a paired phone session *and* a household-signed header (CallPhoneRoute).
         in CallPhoneRoute.PATHS -> CallPhoneRoute.handle(context, req, bearer(req.header("authorization")))
         // Feature-owned /remote/<name> routes go through the paired-session checks first.
