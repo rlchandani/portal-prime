@@ -2170,6 +2170,11 @@ class PhotoFrameController(
     if (faceRendererDelegate.isInitialized() && !splitGlance) faceRenderer.view.visibility = day
     splitPanel?.view?.visibility = day
     if (!value) renderCalendar() else if (this::calendarPanel.isInitialized) calendarPanel.visibility = View.GONE
+    // Re-present the photo on screen so it warms (or returns to day) now, through the slow
+    // night dissolve, instead of waiting for the next photo.
+    if (nativePhotoMode && !stopped && nativeStage.photoCount == 1) nativeStage.currentPhoto?.let {
+      presentNative(listOf(it), automatic = true)
+    }
     onNightClockChanged?.invoke(value)
     Log.i("ImmortalNight", if (value) "night photo: warm dim photos" else "night photo: day frame restored")
   }
