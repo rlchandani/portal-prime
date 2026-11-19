@@ -57,7 +57,7 @@ internal object ControlCenterBanners {
   fun offer(context: Context, alert: CcAlert, settings: ControlCenterConfig.Settings, appVisible: Boolean, dryRun: Boolean = false) {
     val app = context.applicationContext
     val chime = runCatching { ChimeConfig.load(app) }.getOrNull()
-    val quiet = chime?.let { DinnerQuiet.isQuiet(it, System.currentTimeMillis(), TimeZone.getDefault()) } ?: true
+    val quiet = quietNow(chime)
     val decision = CcBannerPolicy.decide(alert, settings, quiet)
     if (dryRun) {
       // Dry run: the decision is logged; nothing is shown and no sound plays.
@@ -79,6 +79,12 @@ internal object ControlCenterBanners {
       }
     }
   }
+
+  /** Household quiet hours now (Settings › Sounds); unreadable settings count as quiet, so nothing sounds by mistake. */
+  fun quietNow(context: Context): Boolean = quietNow(runCatching { ChimeConfig.load(context.applicationContext) }.getOrNull())
+
+  private fun quietNow(chime: ChimeConfig.Settings?): Boolean =
+      chime?.let { DinnerQuiet.isQuiet(it, System.currentTimeMillis(), TimeZone.getDefault()) } ?: true
 
   private fun show(alert: CcAlert, takeover: Boolean) {
     val ctx = host ?: run { Log.w(TAG, "banner before the accessibility host attached; not shown"); return }

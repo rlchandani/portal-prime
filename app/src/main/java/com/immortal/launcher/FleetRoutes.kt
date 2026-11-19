@@ -384,7 +384,11 @@ class FleetRoutes(private val context: Context) {
         val plan = body.optString("testPlan").takeIf { it == "load" || it == "clear" }
         val alert = body.optString("testAlert").takeIf { it.matches(Regex("[a-z_]{1,32}")) }
         val unreachable = if (body.has("haUnreachable")) body.optBoolean("haUnreachable") else null
-        resp(200, JSONObject().put("ok", true).put("action", "cc_debug").put("result", ControlCenter.debug(context, dry, plan, alert, unreachable)))
+        // {"fakeState":{"slug":"leak1","state":"on","deviceClass":"moisture","changedMinAgo":0}}: dry run only.
+        val fake = if (body.has("fakeState")) CcFakeState.parse(body.optJSONObject("fakeState"))
+            ?: return resp(400, err("bad_fakeState")) else null
+        resp(200, JSONObject().put("ok", true).put("action", "cc_debug")
+            .put("result", ControlCenter.debug(context, dry, plan, alert, unreachable, fake)))
       }
       // Layout test hook (operator only): opens one of a fixed set of internal screens for captures.
       "open_screen" -> {

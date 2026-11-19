@@ -180,8 +180,13 @@ class ControlCenterSecurityListTest {
     assertTrue("ring-mqtt's take-snapshot button feeds Refresh", "button.front_door_cam_take_snapshot_2" in after)
     assertEquals(mapOf("camera.front_door_cam_snapshot" to listOf("button.front_door_cam_take_snapshot_2")), reg.snapshotButtons)
     assertEquals("mqtt", reg.cameraPlatform["camera.front_door_cam_snapshot"])
-    // The background (banner) set is deliberately unchanged by the fetched classes.
-    assertEquals(CcInterest.background(bare), CcInterest.background(reg))
+    // The background (banner) set now follows the fetched classes: the door can warn, tamper and
+    // connectivity sensors never banner.
+    assertFalse("binary_sensor.pantry_door_sensor" in CcInterest.background(bare)!!)
+    val bg = CcInterest.background(reg)!!
+    assertTrue("binary_sensor.pantry_door_sensor" in bg)
+    assertFalse("binary_sensor.front_door_tamper" in bg)
+    assertFalse("binary_sensor.ble_connected" in bg)
   }
 
   @Test fun protocolAsksForEntriesAndStreams() {
