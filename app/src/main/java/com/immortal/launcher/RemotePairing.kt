@@ -35,6 +35,8 @@ object RemotePairing {
   private const val PREFS = "remote_pairing"
   private const val KEY_ENABLED = "enabled"
   private const val KEY_SESSIONS = "sessions" // newline-separated session tokens
+  private const val KEY_TEST_SESSIONS = "test_sessions"
+  private const val AUDIT_TAG = "ImmortalRemote"
   internal const val PIN_TTL_MS = 5 * 60_000L
   /** Wrong guesses that burn the PIN. A 6-digit PIN is 10^6, but with no lockout the whole
    *  5-min window is brute-forceable on a fast LAN; a hard cap makes online guessing infeasible. */
@@ -129,6 +131,31 @@ object RemotePairing {
 
   fun isValidSession(c: Context, token: String): Boolean =
       token.isNotBlank() && loadSessions(c).any { FleetRoutes.constantTimeEquals(it, token) }
+
+  /**
+   * Operator verification only (Fleet `phone_test_session`, fleet token): a session marked as a
+   * test so [revokeTestSessions] removes it alone, leaving the household's real phones paired.
+   */
+  @Synchronized
+  fun mintTestSession(c: Context): String {
+    val token = randomToken()
+    val p = prefs(c)
+    val tests = p.getStringSet(KEY_TEST_SESSIONS, emptySet()).orEmpty() + token
+    p.edit().putString(KEY_SESSIONS, (loadSessions(c) + token).joinToString("\n")).putStringSet(KEY_TEST_SESSIONS, tests).apply()
+    android.util.Log.i(AUDIT_TAG, "operator minted a test phone session (${tests.size} test sessions)")
+    return token
+  }
+
+  /** Removes every test session; returns how many. Real pairings are untouched. */
+  @Synchronized
+  fun revokeTestSessions(c: Context): Int {
+    val p = prefs(c)
+    val tests = p.getStringSet(KEY_TEST_SESSIONS, emptySet()).orEmpty()
+    val kept = loadSessions(c) - tests
+    p.edit().putString(KEY_SESSIONS, kept.joinToString("\n")).remove(KEY_TEST_SESSIONS).apply()
+    android.util.Log.i(AUDIT_TAG, "operator revoked ${tests.size} test phone sessions")
+    return tests.size
+  }
 
   fun revokeAll(c: Context) {
     prefs(c).edit().remove(KEY_SESSIONS).apply()

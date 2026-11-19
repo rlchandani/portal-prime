@@ -412,6 +412,15 @@ class FleetRoutes(private val context: Context) {
         val opened = runCatching { context.startActivity(intent) }.isSuccess
         resp(200, JSONObject().put("ok", opened).put("action", "open_control_center"))
       }
+      // Operator verification of phone routes: {"op":"mint"} returns a paired-phone session marked as a
+      // test; {"op":"revoke"} removes every test session (real pairings stay). The fleet token already
+      // has full control of this Portal, so this grants nothing new.
+      "phone_test_session" -> when (body.optString("op")) {
+        "mint" -> resp(200, ok().put("action", "phone_test_session").put("remoteEnabled", RemotePairing.isEnabled(context))
+            .put("token", RemotePairing.mintTestSession(context)))
+        "revoke" -> resp(200, ok().put("action", "phone_test_session").put("revoked", RemotePairing.revokeTestSessions(context)))
+        else -> resp(400, err("bad_op"))
+      }
       // Control Center test switches (operator only): {"dryRun":true|false, "testPlan":"load"|"clear", "haUnreachable":true|false}.
       "cc_debug" -> {
         val dry = if (body.has("dryRun")) body.optBoolean("dryRun") else null
