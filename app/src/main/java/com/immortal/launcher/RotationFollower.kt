@@ -50,18 +50,31 @@ internal object RotationFollower {
   private var resumed: WeakReference<Activity>? = null
   private val live = mutableListOf<WeakReference<Activity>>()
   private val declared = HashMap<String, Int>()
+  /** What the follower last requested per activity (null = never overridden: its declared value). */
+  private val requested = java.util.WeakHashMap<Activity, Int>()
+  private val gate = RotationListenGate()
   private var ignored: Set<RotationPose> = emptySet()
   private var settledAt = 0L
   /** Operator override from the Fleet `orientation` action (null = follow the device). */
   private var forced: Int? = null
 
   private val tick = Runnable { onDecision(policy.onTick(SystemClock.uptimeMillis())) }
-  private val stop = Runnable { stopListening() }
+  private val stop = Runnable { if (gate.onIdleStop()) stopListening() }
   private val probe = Runnable { probePlatform() }
 
   fun install(application: Application) {
     app = application
     ignored = loadIgnored(application)
+    // Auto-rotate switched in Settings takes effect at once, not at the next activity resume.
+    application.contentResolver.registerContentObserver(
+        Settings.System.getUriFor(Settings.System.ACCELEROMETER_ROTATION), false,
+        object : android.database.ContentObserver(handler) {
+          override fun onChange(selfChange: Boolean) {
+            val front = resumed?.get() ?: return
+            if (gate.onSettingChanged(eligible(front))) startListening() else stopListening()
+            apply(front)
+          }
+        })
     application.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
       override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         live.removeAll { it.get() == null }
@@ -72,11 +85,12 @@ internal object RotationFollower {
       override fun onActivityResumed(activity: Activity) {
         resumed = WeakReference(activity)
         handler.removeCallbacks(stop)
-        if (eligible(activity)) startListening() else stopListening()
+        if (gate.onResumed(eligible(activity))) startListening() else stopListening()
         apply(activity)
       }
       override fun onActivityPaused(activity: Activity) {
         if (resumed?.get() === activity) resumed = null
+        gate.onPaused()
         handler.removeCallbacks(stop)
         handler.postDelayed(stop, IDLE_STOP_MS)
       }
@@ -120,11 +134,9 @@ internal object RotationFollower {
     listener = null
     handler.removeCallbacks(tick)
     handler.removeCallbacks(probe)
-    if (policy.settled != null) {
-      // Nobody of ours is in front: forget the pose and hand every activity back its own orientation.
-      policy.reset()
-      if (forced == null) live.mapNotNull { it.get() }.forEach(::apply)
-    }
+    // Forget the pose and hand every activity we overrode back its own orientation.
+    policy.reset()
+    if (forced == null) live.mapNotNull { it.get() }.forEach(::restoreDeclared)
   }
 
   private fun onDecision(decision: RotationFollowPolicy.Decision) {
@@ -151,7 +163,7 @@ internal object RotationFollower {
     if (pose in ignored || forced != null) return
     // Only judge the platform while the activity is on its own declared, pose-allowing orientation.
     val own = declaredOf(activity)
-    if (!RotationPlatformProbe.allows(own, pose) || activity.requestedOrientation != own) return
+    if (!RotationPlatformProbe.allows(own, pose) || (requested[activity] ?: own) != own) return
     @Suppress("DEPRECATION")
     val rotation = activity.windowManager.defaultDisplay.rotation
     if (!RotationPlatformProbe.ignored(pose, rotation, SystemClock.uptimeMillis() - settledAt)) return
@@ -167,8 +179,19 @@ internal object RotationFollower {
       val pose = policy.settled ?: return
       RotationPlatformProbe.requestFor(pose, ignored, declaredOf(activity)) ?: return
     }
-    if (activity.requestedOrientation != want) runCatching { activity.requestedOrientation = want }
+    request(activity, want)
+  }
+
+  /** One place sets the orientation and remembers it (no binder read-back of requestedOrientation). */
+  private fun request(activity: Activity, want: Int) {
+    if ((requested[activity] ?: declaredOf(activity)) == want) return
+    runCatching { activity.requestedOrientation = want }
+        .onSuccess { requested[activity] = want }
         .onFailure { Log.w(TAG, "setRequestedOrientation failed (${it.javaClass.simpleName})") }
+  }
+
+  private fun restoreDeclared(activity: Activity) {
+    if (requested[activity] != null) request(activity, declaredOf(activity))
   }
 
   /**
@@ -213,9 +236,9 @@ internal object RotationFollower {
     forced = null
     live.mapNotNull { it.get() }.forEach { a ->
       val back = policy.settled?.let { RotationPlatformProbe.requestFor(it, ignored, declaredOf(a)) } ?: declaredOf(a)
-      runCatching { a.requestedOrientation = back }
+      request(a, back)
     }
-    resumed?.get()?.let { if (eligible(it)) startListening() }
+    resumed?.get()?.let { if (gate.onResumed(eligible(it))) startListening() }
   }
 
   private fun loadIgnored(context: Context): Set<RotationPose> =

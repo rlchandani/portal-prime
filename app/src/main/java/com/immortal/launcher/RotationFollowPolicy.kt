@@ -149,3 +149,41 @@ internal object RotationPlatformProbe {
       SCREEN_ORIENTATION_FULL_SENSOR, SCREEN_ORIENTATION_FULL_USER)
   private val LANDSCAPE_FAMILY = setOf(SCREEN_ORIENTATION_SENSOR_LANDSCAPE, SCREEN_ORIENTATION_USER_LANDSCAPE)
 }
+
+/**
+ * When the follower listens. A resume of an eligible activity starts it; a pause only schedules
+ * a stop ([RotationFollower]'s idle delay), and that delayed stop is honoured only if no eligible
+ * activity has resumed since, so an activity switch (pause A, resume B) never ends up stopped.
+ * Turning auto-rotate off stops it at once. Pure (JVM tested).
+ */
+internal class RotationListenGate {
+  var listening = false
+    private set
+  private var resumedEligible = false
+
+  /** An activity resumed; [eligible]: compact display, auto-rotate on, a followable orientation. */
+  fun onResumed(eligible: Boolean): Boolean {
+    resumedEligible = eligible
+    listening = eligible
+    return listening
+  }
+
+  fun onPaused() {
+    resumedEligible = false
+  }
+
+  /** The idle delay after a pause elapsed: stop only if nothing eligible is in front. */
+  fun onIdleStop(): Boolean {
+    if (resumedEligible) return false
+    val wasListening = listening
+    listening = false
+    return wasListening
+  }
+
+  /** The auto-rotate setting changed while [eligible] describes the activity in front. */
+  fun onSettingChanged(eligible: Boolean): Boolean {
+    resumedEligible = eligible
+    listening = eligible
+    return listening
+  }
+}

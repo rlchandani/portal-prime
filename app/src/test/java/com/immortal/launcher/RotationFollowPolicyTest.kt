@@ -132,4 +132,60 @@ class RotationFollowPolicyTest {
     assertEquals(90, RotationFollowPolicy.distance(0, 270))
     assertEquals(0, RotationFollowPolicy.distance(720, 0))
   }
+
+  @Test fun jitterAcrossTheHysteresisEdgeNeverFlips() {
+    val p = RotationFollowPolicy()
+    settle(p, 0, 0)
+    // Wobbling between 40° (inside portrait's ±60° stay) and 70° (inside the right turn's ±30°)
+    // every 100 ms: the right turn is never held for 600 ms, so nothing ever settles.
+    var t = 1000L
+    repeat(200) { i ->
+      val d = p.onAngle(if (i % 2 == 0) 70 else 40, t)
+      assertTrue("flip at $t", d !is Decision.Settled)
+      assertTrue(p.onTick(t + 50) !is Decision.Settled)
+      t += 100
+    }
+    assertEquals(RotationPose.PORTRAIT, p.settled)
+  }
+
+  @Test fun settlesAreNeverCloserThanTheHold() {
+    val p = RotationFollowPolicy()
+    val random = java.util.Random(7)
+    var t = 0L
+    var last = Long.MIN_VALUE / 2
+    repeat(5000) {
+      t += 20 + random.nextInt(180)
+      val d = p.onAngle(random.nextInt(360), t)
+      if (d is Decision.Settled) {
+        assertTrue("settled ${t - last} ms after the previous", t - last >= p.holdMs)
+        last = t
+      }
+    }
+  }
+
+  @Test fun aSwitchBetweenActivitiesNeverStopsTheSensor() {
+    val g = RotationListenGate()
+    assertTrue(g.onResumed(eligible = true))
+    g.onPaused()                 // Home pauses…
+    assertTrue(g.onResumed(eligible = true)) // …Settings resumes within the idle delay
+    assertFalse("the delayed stop from Home's pause is ignored", g.onIdleStop())
+    assertTrue(g.listening)
+  }
+
+  @Test fun leavingForAnotherAppStopsAfterTheDelay() {
+    val g = RotationListenGate()
+    g.onResumed(eligible = true)
+    g.onPaused()
+    assertTrue(g.onIdleStop())
+    assertFalse(g.listening)
+    assertFalse("a second delayed stop is a no-op", g.onIdleStop())
+  }
+
+  @Test fun anIneligibleActivityInFrontStopsAndAutoRotateTogglesAtOnce() {
+    val g = RotationListenGate()
+    assertFalse(g.onResumed(eligible = false))
+    assertTrue(g.onSettingChanged(eligible = true))
+    assertFalse(g.onSettingChanged(eligible = false))
+    assertFalse(g.listening)
+  }
 }

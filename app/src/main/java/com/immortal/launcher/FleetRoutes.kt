@@ -397,6 +397,7 @@ class FleetRoutes(private val context: Context) {
           "lamp" -> LampActivity::class.java
           "guest_card" -> GuestCardActivity::class.java
           "store" -> StoreActivity::class.java
+          "web_app" -> WebAppActivity::class.java
           else -> null
         }
         val opened = target != null && runCatching {
