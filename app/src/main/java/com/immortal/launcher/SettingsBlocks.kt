@@ -105,6 +105,7 @@ internal enum class SettingsBlock(
         rows = listOf(row("multiroom.test", "Test connection"))),
     DEVICE_NAME(claims = setOf("fleet.*"), rows = listOf(row("about.model", "Model"))),
     ABOUT_HEALTH(rows = listOf(row("about.version", "Hearthpane version", "check for updates update now"),
+        row("about.memory", "Memory", "ram swap restart reboot slow stutter system server"),
         row("about.checks", "Device checks", "health permissions reconnect"),
         row("about.screenLock", "Remove screen-lock permission", "uninstall"))),
     SYNC(rows = listOf(row("about.sync", "Household sync", "synced across portals adopt settings peers last sync"))),

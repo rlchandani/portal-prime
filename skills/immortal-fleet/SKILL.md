@@ -73,6 +73,7 @@ Read-only / inventory:
 ./fleetctl info   --device all           # identity, version, install/presence state
 ./fleetctl apps   --device "Living Room" # catalog apps + what's installed
 ./fleetctl diag   --device all           # diagnostics snapshot
+./fleetctl health                        # one memory line per Portal (restart recommended?)
 ```
 
 App install / update:

@@ -11,6 +11,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import java.io.EOFException
 import java.io.File
@@ -72,7 +73,9 @@ class FleetRoutes(private val context: Context) {
       "/fs/read" -> requireMethod("GET", req) { fsRead(req) }
       "/fs/write" -> requireMethod("POST", req) { fsWrite(req) }
       "/logcat" -> requireMethod("GET", req) { logcat(req) }
-      "/diag" -> requireMethod("GET", req) { resp(200, FleetDiag.snapshot(context)) }
+      "/diag" -> requireMethod("GET", req) {
+        resp(200, FleetDiag.snapshot(context).put("memoryHealth", memoryHealth(fresh = true)))
+      }
       "/perf" -> performance(req)
       "/perf/home-ui" -> HomeUiDiagnostics.handle(context, req)
       "/perf/app-badges" -> AppBadgeProbe.handle(context, req)
@@ -168,6 +171,7 @@ class FleetRoutes(private val context: Context) {
                     .put("paused", m.paused)
                     // dialog-mode is still unattended when auto-confirm is on
                     .put("autoConfirm", SettingsGuard.isInstallConfirmEnabled(context)))
+            .put("memoryHealth", memoryHealth(fresh = false))
             .put("canWriteSecureSettings", SettingsGuard.canWriteSecureSettings(context))
             .put("devMode", DevMode.isEnabled(context))
             .put(
@@ -191,6 +195,14 @@ class FleetRoutes(private val context: Context) {
     }
     o.put("apps", arr)
     return resp(200, o)
+  }
+
+  /** `/diag` samples now; `/info` (the dashboard poll) reuses the 15-minute sample. Never fails the call. */
+  private fun memoryHealth(fresh: Boolean): JSONObject = runCatching {
+    MemoryHealth.toJson(if (fresh) MemoryHealth.sampleNow() else MemoryHealth.latestOrSample())
+  }.getOrElse {
+    Log.w("ImmortalFleet", "memory health unavailable", it)
+    MemoryHealth.toJson(null)
   }
 
   private fun apps(): FleetHttpServer.Response {

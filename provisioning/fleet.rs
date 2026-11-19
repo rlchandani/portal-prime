@@ -1249,6 +1249,158 @@ fn cmd_raw(args: &Args) -> i32 {
     })
 }
 
+// ===================== health (memory) =====================
+
+/// The label `health` prints: name / serial, never the address (a `--host` target has no name).
+fn health_label(d: &Device) -> String {
+    if d.serial.is_empty() && d.name == d.host {
+        "(direct host)".to_string()
+    } else {
+        d.label()
+    }
+}
+
+// The app's thresholds (MemoryHealthPolicy), used only for the meminfo fallback below.
+const HEALTH_SWAP_FREE_MIN_PERCENT: i64 = 15;
+const HEALTH_MEM_AVAILABLE_MIN_MB: i64 = 300;
+
+/// kB value of `key` in raw /proc/meminfo text.
+fn meminfo_kb(text: &str, key: &str) -> Option<i64> {
+    text.lines().find_map(|line| {
+        let (k, rest) = line.split_once(':')?;
+        if k.trim() != key {
+            return None;
+        }
+        rest.split_whitespace().next()?.parse::<i64>().ok()
+    })
+}
+
+/// For a Hearthpane without `memoryHealth` (before 1.263): judge the raw meminfo `/diag` already
+/// returns, with the app's MemAvailable and swap thresholds. system_server can't be read this way.
+fn memory_health_from_meminfo(meminfo: &str) -> Option<Json> {
+    let available = meminfo_kb(meminfo, "MemAvailable")? / 1024;
+    let swap_total = meminfo_kb(meminfo, "SwapTotal").unwrap_or(0);
+    let swap_free = meminfo_kb(meminfo, "SwapFree").unwrap_or(0);
+    let swap_percent = if swap_total > 0 { Some(swap_free.clamp(0, swap_total) * 100 / swap_total) } else { None };
+    let mut reasons = Vec::new();
+    if swap_total > 0 && swap_free.max(0) * 100 < swap_total * HEALTH_SWAP_FREE_MIN_PERCENT {
+        reasons.push(Json::Str("swap_free_low".into()));
+    }
+    if available < HEALTH_MEM_AVAILABLE_MIN_MB {
+        reasons.push(Json::Str("mem_available_low".into()));
+    }
+    let status = if reasons.is_empty() { "good" } else { "restart_recommended" };
+    let mut values = vec![("memAvailableMb".to_string(), Json::Num(available as f64))];
+    if let Some(p) = swap_percent {
+        values.push(("swapFreePercent".to_string(), Json::Num(p as f64)));
+    }
+    Some(Json::Obj(vec![
+        ("status".to_string(), Json::Str(status.into())),
+        ("reasons".to_string(), Json::Arr(reasons)),
+        ("values".to_string(), Json::Obj(values)),
+    ]))
+}
+
+/// One line for a Portal's `/info` reply, and whether it is healthy. Pure, for the tests.
+/// [fallback] is the meminfo-only verdict for an app that reports no `memoryHealth`.
+fn health_line(label: &str, info: &Json, fallback: Option<&Json>) -> (String, bool) {
+    let version = info
+        .get("app")
+        .and_then(|a| a.get("versionName"))
+        .and_then(|v| v.as_str())
+        .unwrap_or("?");
+    let (mh, note) = match (info.get("memoryHealth"), fallback) {
+        (Some(m), _) => (m, String::new()),
+        (None, Some(f)) => (f, format!("  (Hearthpane {}: meminfo only, no system_server reading)", version)),
+        (None, None) => {
+            return (format!("{:<34} UNKNOWN  Hearthpane {} reports no memoryHealth", label, version), false);
+        }
+    };
+    let status = mh.get("status").and_then(|v| v.as_str()).unwrap_or("unknown");
+    let v = mh.get("values");
+    let num = |k: &str| v.and_then(|v| v.get(k)).and_then(|x| x.as_i64());
+    let mb = |k: &str| num(k).map(|n| format!("{} MB", n)).unwrap_or_else(|| "n/a".to_string());
+    let system = match (num("systemServerPssMb"), num("systemServerSampleAgeMin")) {
+        (Some(p), Some(age)) => format!("{} MB ({} min ago)", p, age),
+        (Some(p), None) => format!("{} MB", p),
+        _ => "n/a".to_string(),
+    };
+    let swap = num("swapFreePercent").map(|p| format!("{}%", p)).unwrap_or_else(|| "n/a".to_string());
+    let reasons: Vec<&str> = match mh.get("reasons") {
+        Some(Json::Arr(a)) => a.iter().filter_map(|r| r.as_str()).collect(),
+        _ => Vec::new(),
+    };
+    let (word, ok) = match status {
+        "good" => ("Good", true),
+        "restart_recommended" => ("RESTART RECOMMENDED", false),
+        _ => ("UNKNOWN", false),
+    };
+    let mut line = format!(
+        "{:<34} {}  system_server {} · available {} · swap free {} · Hearthpane {}",
+        label,
+        word,
+        system,
+        mb("memAvailableMb"),
+        swap,
+        mb("ownPssMb")
+    );
+    if !reasons.is_empty() {
+        line.push_str(&format!("  [{}]", reasons.join(", ")));
+    }
+    line.push_str(&note);
+    (line, ok)
+}
+
+/// The meminfo-only verdict from `/diag`, for an app without `memoryHealth`; None if unreadable.
+fn diag_meminfo_health(d: &Device) -> Option<Json> {
+    let (status, body) = request(d, "GET", "/diag", &[], None);
+    if status != 200 {
+        return None;
+    }
+    let diag = Json::parse(&body).ok()?;
+    memory_health_from_meminfo(diag.get("meminfo")?.as_str()?)
+}
+
+/// `health`: one memory line per Portal from `/info` (`memoryHealth`). Defaults to every device.
+/// Exit 0 only when every target answered "good".
+fn cmd_health(args: &Args) -> i32 {
+    let targets = if args.flag("device").is_none() && args.flag("host").is_none() {
+        let all = load_registry();
+        if all.is_empty() {
+            die(&format!(
+                "no devices in registry ({}). Run ./provision.sh --fleet, or use --host/--token.",
+                registry_dir().display()
+            ));
+        }
+        all
+    } else {
+        resolve_targets(args)
+    };
+    let mut rc = 0;
+    for d in &targets {
+        let label = health_label(d);
+        let (status, body) = request(d, "GET", "/info", &[], None);
+        let line = if status == 0 {
+            (format!("{:<34} UNREACHABLE  {}", label, String::from_utf8_lossy(&body).replace(&d.host, "<host>")), false)
+        } else if status != 200 {
+            (format!("{:<34} UNKNOWN  HTTP {}", label, status), false)
+        } else {
+            match Json::parse(&body) {
+                Ok(info) => {
+                    let fallback = if info.get("memoryHealth").is_none() { diag_meminfo_health(d) } else { None };
+                    health_line(&label, &info, fallback.as_ref())
+                }
+                Err(_) => (format!("{:<34} UNKNOWN  reply was not JSON", label), false),
+            }
+        };
+        println!("{}", line.0);
+        if !line.1 {
+            rc = 1;
+        }
+    }
+    rc
+}
+
 const HELP: &str = "fleetctl — manage Immortal Portals over WiFi (Fleet Agent client)
 
 USAGE:
@@ -1259,7 +1411,8 @@ COMMANDS:
   devices                       list devices in the local registry (fleet/*.json)
   info                          device identity, version, install/presence state
   apps                          catalog apps and what's installed
-  diag                          diagnostics snapshot
+  diag                          diagnostics snapshot (incl. memoryHealth, sampled now)
+  health [--device all]         one memory line per Portal (default: every device; no IPs)
   install <pkg> [--apk-url URL] install a catalog package (or a direct APK URL)
   update [<pkg>|--all|--check]  update apps (or dry-run available updates)
   config [--name N|--set k=v]   read or push the agent's free-form config
@@ -1293,6 +1446,14 @@ DEV (iterate on Immortal over WiFi):
   NOTE: an in-place update is signature-checked by Android — build/sign your local
   APK with the SAME key as the installed Immortal, or the install is rejected.
 
+HEALTH (memory):
+  Hearthpane samples memory every 15 min and flags RESTART RECOMMENDED when
+  system_server PSS > 500 MB, swap free < 15 %, or MemAvailable < 300 MB.
+  It only flags: the app can't reboot a Portal and `action reboot` is refused.
+  Restart over USB with `adb -s <serial> reboot`. The owner has pre-approved
+  adb reboots for Family Area and the Mini (Rohit Office); ask before rebooting
+  any other Portal. Exit status is 0 only when every Portal reports Good.
+
 Register a device first with `./provision.sh --fleet` on a connected Portal.";
 
 fn main() {
@@ -1312,6 +1473,7 @@ fn main() {
         "info" => simple_get(&args, "/info"),
         "apps" => simple_get(&args, "/apps"),
         "diag" => simple_get(&args, "/diag"),
+        "health" => cmd_health(&args),
         "install" => cmd_install(&args),
         "update" => cmd_update(&args),
         "config" => cmd_config(&args),
@@ -1343,6 +1505,69 @@ mod tests {
 
     fn parse(s: &str) -> Json {
         Json::parse(s.as_bytes()).expect("valid json")
+    }
+
+    #[test]
+    fn health_line_reads_good_and_restart_without_addresses() {
+        let good = parse(r#"{"ok":true,"ip":"192.0.2.7","memoryHealth":{"status":"good","reasons":[],
+            "values":{"systemServerPssMb":121,"systemServerSampleAgeMin":4,"memAvailableMb":700,
+            "swapFreePercent":52,"ownPssMb":190}}}"#);
+        let (line, ok) = health_line("Family Area / S1", &good, None);
+        assert!(ok);
+        assert!(line.contains("Good"));
+        assert!(line.contains("system_server 121 MB (4 min ago)"));
+        assert!(line.contains("available 700 MB"));
+        assert!(line.contains("swap free 52%"));
+        assert!(!line.contains("192.0.2.7"));
+
+        let bad = parse(r#"{"memoryHealth":{"status":"restart_recommended",
+            "reasons":["system_server_pss_high","swap_free_low"],
+            "values":{"systemServerPssMb":1905,"memAvailableMb":210,"swapFreePercent":2,"ownPssMb":190}}}"#);
+        let (line, ok) = health_line("Mini", &bad, None);
+        assert!(!ok);
+        assert!(line.contains("RESTART RECOMMENDED"));
+        assert!(line.contains("[system_server_pss_high, swap_free_low]"));
+        assert!(line.contains("system_server 1905 MB ·"));
+    }
+
+    #[test]
+    fn health_line_flags_unknown_and_old_apps() {
+        let (line, ok) = health_line("X", &parse(r#"{"app":{"versionName":"1.262"}}"#), None);
+        assert!(!ok);
+        assert!(line.contains("UNKNOWN") && line.contains("1.262"));
+        let (line, ok) = health_line("X", &parse(r#"{"memoryHealth":{"status":"unknown","reasons":[],"values":{}}}"#), None);
+        assert!(!ok);
+        assert!(line.contains("UNKNOWN") && line.contains("system_server n/a"));
+    }
+
+    #[test]
+    fn health_falls_back_to_diag_meminfo_for_an_older_app() {
+        let healthy = "MemTotal: 3884300 kB\nMemAvailable:  716800 kB\nSwapTotal: 1572860 kB\nSwapFree: 786430 kB\n";
+        let fallback = memory_health_from_meminfo(healthy).expect("readable");
+        let info = parse(r#"{"app":{"versionName":"1.262"}}"#);
+        let (line, ok) = health_line("Living Area / S2", &info, Some(&fallback));
+        assert!(ok, "{}", line);
+        assert!(line.contains("Good") && line.contains("available 700 MB") && line.contains("swap free 50%"), "{}", line);
+        assert!(line.contains("1.262: meminfo only"));
+
+        let pressured = "MemAvailable:  204800 kB\nSwapTotal: 1572860 kB\nSwapFree: 102400 kB\n";
+        let (line, ok) = health_line("X", &info, memory_health_from_meminfo(pressured).as_ref());
+        assert!(!ok);
+        assert!(line.contains("RESTART RECOMMENDED") && line.contains("[swap_free_low, mem_available_low]"));
+
+        let no_swap = memory_health_from_meminfo("MemAvailable: 716800 kB\nSwapTotal: 0 kB\nSwapFree: 0 kB\n");
+        assert!(health_line("X", &info, no_swap.as_ref()).1);
+        assert!(memory_health_from_meminfo("error: denied").is_none());
+    }
+
+    #[test]
+    fn health_label_hides_a_direct_host_address() {
+        let d = Device { name: "192.0.2.7".into(), host: "192.0.2.7".into(), token: "t".into(), port: 8723,
+            serial: String::new(), model: String::new() };
+        assert_eq!(health_label(&d), "(direct host)");
+        let d = Device { name: "Family Area".into(), host: "192.0.2.7".into(), token: "t".into(), port: 8723,
+            serial: "S1".into(), model: String::new() };
+        assert_eq!(health_label(&d), "Family Area / S1");
     }
 
     #[test]
