@@ -230,7 +230,7 @@ On the first run the kit snapshots the device's real stock launcher and screensa
 
 ```bash
 ./provision.sh                 # full provision (default)
-./provision.sh --status        # report current home / screensaver / install state
+./provision.sh --status        # report home / screensaver / install state + household settings check
 ./provision.sh --check-access  # read-only Calls / remote-controls access check
 ./provision.sh --restore       # undo everything
 ./provision.sh --overlay-fix   # apply just the Gen-1 dialog fix
@@ -244,6 +244,9 @@ On the first run the kit snapshots the device's real stock launcher and screensa
 
 On Windows the same flags are PowerShell switches, e.g. `provision.ps1 -Status`, `-Restore`,
 `-OverlayFix`.
+
+For the full list of settings that every Portal in a household should share, and the ones
+that are meant to differ per device, see [Keeping Portals in sync](guides/portal-sync.md).
 
 !!! note "In-kit reference"
     The kit ships its own
