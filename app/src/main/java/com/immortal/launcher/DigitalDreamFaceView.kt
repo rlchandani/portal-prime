@@ -135,6 +135,7 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
     val h = height.toFloat()
     if (w <= 0f || h <= 0f) return
     canvas.drawRect(0f, 0f, w, h, backdrop)
+    unit = HearthMockUnit.boost(width, height, density)
     val cy = when (settings.layout) {
       DigitalClockConfig.LAYOUT_TOP -> h * .36f
       DigitalClockConfig.LAYOUT_BOTTOM -> h * .64f
@@ -149,17 +150,23 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
     if (sweepOn) postInvalidateDelayed(DigitalClockFaceSpec.SWEEP_FRAME_MS)
   }
 
-  private fun sizePx(): Float = DigitalClockFaceSpec.timeSizeDp(settings.size) * density *
+  /** Mock units per dp for this view ([HearthMockUnit]): 1.33 full screen on a Portal+, else 1. */
+  private var unit = 1f
+
+  private fun sizePx(): Float = DigitalClockFaceSpec.timeSizeDp(settings.size) * density * unit *
       (if (settings.layout == DigitalClockConfig.LAYOUT_MINIMAL) 1.2f else 1f)
+
+  /** The serif date: 38 units under 250-unit numerals (mock), so it follows the size setting. */
+  private fun dateSizePx(): Float = (sizePx() * DATE_RATIO).coerceAtLeast(16f * density)
 
   private fun drawNumerals(canvas: Canvas, w: Float, cy: Float) {
     time.textSize = sizePx()
     time.textSize = DigitalClockFaceSpec.fit(time.textSize, time.measureText(shown), w * .86f)
     // Mock: 38 dp serif date under 250 dp numerals; keep that ratio, then fit the width.
-    date.textSize = (38f * density * time.textSize / (250f * density)).coerceAtLeast(16f * density)
+    date.textSize = (time.textSize * DATE_RATIO).coerceAtLeast(16f * density)
     date.textSize = DigitalClockFaceSpec.fit(date.textSize, date.measureText(dateText), w * .86f)
     val timeH = time.descent() - time.ascent()
-    val dateH = if (dateText.isEmpty()) 0f else date.descent() - date.ascent() + 18f * density
+    val dateH = if (dateText.isEmpty()) 0f else date.descent() - date.ascent() + DATE_GAP * density * unit
     val top = cy - (timeH + dateH) / 2f
     val baseline = top - time.ascent()
     if (face == Face.NEON) {
@@ -174,30 +181,34 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
       time.setShadowLayer(10f * density, 0f, 4f * density, 0x99000000.toInt())
     }
     canvas.drawText(shown, w / 2f, baseline, time)
-    if (dateText.isNotEmpty()) canvas.drawText(dateText, w / 2f, baseline + time.descent() + 18f * density - date.ascent(), date)
+    if (dateText.isNotEmpty()) canvas.drawText(dateText, w / 2f,
+        baseline + time.descent() + DATE_GAP * density * unit - date.ascent(), date)
   }
 
   private fun drawLed(canvas: Canvas, w: Float, cy: Float) {
     // Each digit cell is 60x100 units; the colon slot is 40 units and digits are 14 units apart.
-    var unit = sizePx() / 100f
+    // Mock: 230-unit digits beside 250-unit numerals.
+    var cell = sizePx() * LED_RATIO / 100f
     val units = 4 * 60f + 3 * 14f + 40f
-    unit = DigitalClockFaceSpec.fit(unit, units * unit, w * .86f)
-    val totalH = 100f * unit
-    val dateH = if (dateText.isEmpty()) 0f else 50f * density
-    var x = (w - units * unit) / 2f
+    cell = DigitalClockFaceSpec.fit(cell, units * cell, w * .86f)
+    val totalH = 100f * cell
+    if (dateText.isNotEmpty()) date.textSize = DigitalClockFaceSpec.fit(dateSizePx(), date.measureText(dateText), w * .86f)
+    val dateGap = DATE_GAP * density * unit
+    val dateH = if (dateText.isEmpty()) 0f else date.descent() - date.ascent() + dateGap
+    var x = (w - units * cell) / 2f
     val y = cy - (totalH + dateH) / 2f
     fill.setShadowLayer(10f * density, 0f, 0f, LED_GLOW)
     for (c in shown) {
       if (c == ':') {
         fill.color = LED_ON
-        val r = 5f * unit
-        canvas.drawCircle(x + 20f * unit, y + 34f * unit, r, fill)
-        canvas.drawCircle(x + 20f * unit, y + 66f * unit, r, fill)
-        x += 40f * unit
+        val r = 5f * cell
+        canvas.drawCircle(x + 20f * cell, y + 34f * cell, r, fill)
+        canvas.drawCircle(x + 20f * cell, y + 66f * cell, r, fill)
+        x += 40f * cell
         continue
       }
       val lit = DigitalClockFaceSpec.segments(c)
-      segmentMatrix.setScale(unit, unit)
+      segmentMatrix.setScale(cell, cell)
       segmentMatrix.postTranslate(x, y)
       for ((key, path) in segments) {
         scratch.reset()
@@ -208,12 +219,11 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
         canvas.drawPath(scratch, fill)
         if (!on) fill.setShadowLayer(10f * density, 0f, 0f, LED_GLOW)
       }
-      x += (60f + 14f) * unit
+      x += (60f + 14f) * cell
     }
     fill.clearShadowLayer()
     if (dateText.isNotEmpty()) {
-      date.textSize = DigitalClockFaceSpec.fit(30f * density, date.measureText(dateText), w * .86f)
-      canvas.drawText(dateText, w / 2f, y + totalH + 40f * density, date)
+      canvas.drawText(dateText, w / 2f, y + totalH + dateGap - date.ascent(), date)
     }
   }
 
@@ -327,8 +337,10 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
   }
 
   private fun drawAnalog(canvas: Canvas, w: Float, h: Float, cy: Float) {
-    val dateRoom = if (dateText.isEmpty()) 0f else 70f * density
-    val r = minOf(w * .42f, (h - dateRoom) * .42f) * (DigitalClockFaceSpec.timeSizeDp(settings.size) / 250f).coerceIn(.7f, 1.1f)
+    val dateRoom = if (dateText.isEmpty()) 0f else 70f * density * unit
+    // Mock: a 560-unit dial at Large; never larger than the old fit-to-panel radius.
+    val r = minOf(minOf(w * .42f, (h - dateRoom) * .42f), ANALOG_RADIUS * density * unit) *
+        (DigitalClockFaceSpec.timeSizeDp(settings.size) / 250f).coerceIn(.7f, 1.1f)
     val cx = w / 2f
     val dy = cy - dateRoom / 2f
     val key = (cx.toInt().toLong() shl 40) or (dy.toInt().toLong() shl 20) or r.toInt().toLong()
@@ -374,8 +386,8 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
     fill.clearShadowLayer()
     if (dateText.isNotEmpty()) {
       date.color = DATE_INK
-      date.textSize = DigitalClockFaceSpec.fit(34f * density, date.measureText(dateText), w * .86f)
-      canvas.drawText(dateText, cx, dy + r + 56f * density, date)
+      date.textSize = DigitalClockFaceSpec.fit(34f * density * unit, date.measureText(dateText), w * .86f)
+      canvas.drawText(dateText, cx, dy + r + 56f * density * unit, date)
     }
   }
 
@@ -388,6 +400,10 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
   }
 
   private companion object {
+    const val DATE_RATIO = 38f / 250f
+    const val DATE_GAP = 18f
+    const val LED_RATIO = 230f / 250f
+    const val ANALOG_RADIUS = 280f
     const val INK = 0xFFF6EEE4.toInt()
     const val INK_FLIP = 0xFFF4EEE6.toInt()
     const val NEON_INK = 0xFFFFE2C2.toInt()

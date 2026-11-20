@@ -23,7 +23,7 @@ internal object DigitalClockFaceSpec {
     else -> Face.CLASSIC
   }
 
-  /** Mock size at "Large" is 250 dp of a 1280 dp-tall panel; other sizes scale from it. */
+  /** Mock size at "Large" is 250 mock units (x [HearthMockUnit] = 333 dp on a Portal+); other sizes scale from it. */
   fun timeSizeDp(size: String): Float = when (size) {
     DigitalClockConfig.SIZE_SMALL -> 150f
     DigitalClockConfig.SIZE_MEDIUM -> 200f
