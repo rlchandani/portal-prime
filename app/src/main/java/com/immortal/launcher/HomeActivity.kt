@@ -138,7 +138,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.asImageBitmap
@@ -1846,7 +1845,7 @@ private fun LauncherScreen(
 }
 
 // Minimal weather condition text without network deps
-private fun weatherConditionText(code: Int): String = when (code) {
+internal fun weatherConditionText(code: Int): String = when (code) {
   0 -> "Clear Sky"
   in 1..3 -> "Partly Cloudy"
   in 45..48 -> "Foggy"
@@ -2754,7 +2753,7 @@ private fun JarvisHeaderButton(size: androidx.compose.ui.unit.Dp, onClick: () ->
       contentAlignment = Alignment.Center) { MicGlyph(ApprovedHomePalette.Text) }
 }
 
-private fun triggerJarvis(context: android.content.Context) {
+internal fun triggerJarvis(context: android.content.Context) {
   if (!JarvisHandoff.launch(context))
     android.widget.Toast.makeText(context, "Jarvis couldn’t be opened.",
         android.widget.Toast.LENGTH_LONG).show()
@@ -3204,644 +3203,8 @@ private fun addIntoSlot(context: Context, widget: HomeWidgetStore.HomeWidget, sl
   HomeWidgetStore.replaceIfUnchanged(context, current, updated)
 }
 
-/**
- * Picker and draft previews: the real widget for local-data kinds (cheap, no network), a static
- * representative preview for kinds that would fetch or poll just to be seen.
- */
-private val HomeWidgetPreviewRenderer: HomeWidgetPreviewContent = { kind, span, modifier ->
-  if (kind in HomeWidgetPicker.livePreviewKinds) {
-    val widget = remember(kind, span) {
-      HomeWidgetStore.HomeWidget(kind = kind, customId = "preview:$kind", spanX = span.first, spanY = span.second,
-          explicitSize = true)
-    }
-    ImmortalWidgetContent(widget, modifier)
-  } else HomeStaticWidgetPreview(kind, modifier)
-}
-
 @Composable
-private fun ImmortalWidgetContent(
-    widget: HomeWidgetStore.HomeWidget,
-    modifier: Modifier = Modifier,
-    onEnterEdit: (() -> Unit)? = null,
-) {
-  // Guest mode: personal widgets (photos, calendar, Today, the household list) show the time instead.
-  val guestContent = GuestPolicy.homeWidgetContent(widget.kind)
-  if (guestContent != null && rememberGuestHides(guestContent)) {
-    GuestNeutralCard(modifier)
-    return
-  }
-  when (widget.kind) {
-    HomeWidgetStore.KIND_WEATHER -> ApprovedHomeWeather(modifier)
-    HomeWidgetStore.KIND_WORLD_CLOCK -> ImmortalWorldClockWidget(modifier)
-    HomeWidgetStore.KIND_TIMERS -> SharedTimersWidget(modifier)
-    HomeWidgetStore.KIND_CALENDAR -> ApprovedHomeCalendar(modifier)
-    HomeWidgetStore.KIND_ALARM -> ImmortalAlarmWidget(modifier)
-    HomeWidgetStore.KIND_CRYPTO -> ImmortalCryptoWidget(modifier, maxRows = listRows(widget.spanY))
-    // The To-do kind now shows the shared household list (old To-do items merge in once).
-    HomeWidgetStore.KIND_TODO -> HouseholdListWidget(modifier, small = widget.spanY < 2)
-    HomeWidgetStore.KIND_ROUTINES -> RoutinesHomeWidget(modifier)
-    HomeWidgetStore.KIND_CHORES -> ChoresHomeWidget(modifier)
-    HomeWidgetStore.KIND_CALLS -> CallsHomeWidget(modifier)
-    HomeWidgetStore.KIND_NEWS -> ImmortalNewsWidget(modifier, maxRows = listRows(widget.spanY))
-    HomeWidgetStore.KIND_STOCKS -> ImmortalStocksWidget(modifier, maxRows = listRows(widget.spanY))
-    HomeWidgetStore.KIND_OPTIONS -> ImmortalOptionsWidget(modifier, maxRows = listRows(widget.spanY))
-    HomeWidgetStore.KIND_HA -> ImmortalHaWidget(modifier, maxTileRows = widget.spanY.coerceIn(1, 4))
-    // The former fixed dashboard cards, now regular widgets. They keep their self-sizing card
-    // look; the grid cell just gives them room.
-    HomeWidgetStore.KIND_TODAY -> TodayStripWidget(modifier)
-    HomeWidgetStore.KIND_QUICK_CONTROLS -> QuickControlsWidget(modifier)
-    HomeWidgetStore.KIND_PHOTO_MEMORY -> ApprovedHomePhoto(modifier, onEnterEdit)
-    HomeWidgetStore.KIND_WIFI -> WifiHomeWidget(modifier, WifiWidgetLayout.of(widget.spanX, widget.spanY))
-    else -> UnknownImmortalWidget(widget.kind, modifier)
-  }
-}
-
-/**
- * How many list rows a scrolling widget should show at a given vertical span. One grid unit fits a
- * title + ~2 rows; each extra unit adds ~3. Clamped so a 1-tall widget still shows a couple of rows
- * and a 4-tall one doesn't run away.
- */
-private fun listRows(spanY: Int): Int = (spanY * 3).coerceIn(2, 12)
-
-@Composable
-internal fun ImmortalWidgetShell(
-    title: String,
-    openPage: String,
-    modifier: Modifier = Modifier,
-    onOpen: (() -> Unit)? = null,
-    scrollContent: Boolean = true,
-    /** True when the card body already shows a button doing exactly what [onOpen] does. */
-    duplicatesBodyAction: Boolean = false,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  val action = HomeRefinements.headerAction(opensContent = onOpen != null, duplicatesBodyAction)
-  val icon = when (openPage) {
-    "calendar" -> "calendar"
-    "alarm" -> "alarm"
-    "ha" -> "ha_widget"
-    "world" -> "clock"
-    "crypto", "stocks", "options" -> "calculator"
-    "timers" -> "timer"
-    "todo" -> "notes"
-    "news" -> "globe"
-    else -> "tools"
-  }
-  Column(modifier = modifier.padding(30.dp)) {
-    ApprovedHomeWidgetHeading(title, icon, action) {
-      if (onOpen != null) onOpen() else context.openApprovedHomeSettings(openPage)
-    }
-    Spacer(Modifier.height(22.dp))
-    Column(Modifier.weight(1f).fillMaxWidth().then(
-        if (scrollContent) Modifier.verticalScroll(rememberScrollState()) else Modifier)) { content() }
-  }
-
-}
-
-/**
- * "On this day" photo-memory strip: a glass row with a small thumbnail from the user's screensaver
- * photo folder and a caption; tapping opens the full photo-frame. Only shown when a local photo
- * folder is configured and readable — otherwise it stays hidden (no empty chrome).
- */
-@Composable
-private fun PhotoMemoryStrip(modifier: Modifier = Modifier) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  val onOpen: () -> Unit = { context.launchSafely(PhotoFramePreviewActivity::class.java) }
-  val photo by
-      produceState<ImageBitmap?>(initialValue = null) {
-        value = withContext(Dispatchers.IO) {
-          runCatching {
-            val cfg = ScreensaverConfig.load(context)
-            val folder = cfg.folderPath
-            if (cfg.usesFolder && folder != null && LocalMedia.isAccessible(folder)) {
-              LocalMedia.enumerate(folder, includeVideo = false, max = 60)
-                  .filterNot { it.isVideo }
-                  .randomOrNull()
-                  ?.let { android.graphics.BitmapFactory.decodeFile(it.path)?.asImageBitmap() }
-            } else null
-          }.getOrNull()
-        }
-      }
-  val bmp = photo ?: return // no readable local photos → hide the strip entirely
-
-  // Bare content — the widget grid cell provides the glass surface.
-  Box(modifier = modifier) {
-    Row(
-        modifier = Modifier.fillMaxWidth().clickable { onOpen() }.padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-      Image(
-          bitmap = bmp,
-          contentDescription = null,
-          contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-          modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)),
-      )
-      Column(Modifier.weight(1f)) {
-        Text("On this day", color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, fontWeight = FontWeight.Medium)
-        Text("A memory from your photos", color = Color.White.copy(alpha = 0.9f), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      }
-      Text("›", color = Color.White.copy(alpha = 0.5f), fontSize = 24.sp)
-    }
-  }
-}
-
-/**
- * Home quick-controls: a glass grid of tap targets for the smart-home stuff a Portal owner reaches
- * for — a Hey Portal voice tile (launches the on-device assistant), and Home Assistant shortcuts
- * that open the HA app (the one-way MQTT bridge can't toggle devices, so we hand off to HA itself).
- * Tiles whose target isn't installed are hidden, so the grid only shows what actually works here.
- */
-@Composable
-private fun QuickControlsWidget(modifier: Modifier = Modifier) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  val pm = context.packageManager
-  var refresh by remember { mutableStateOf(0) }
-  OnResume { refresh++ }
-  val installed by produceState(initialValue = emptySet<String>(), refresh) {
-    value = withContext(Dispatchers.IO) {
-      listOf("io.homeassistant.companion.android", "io.homeassistant.companion.android.minimal", "com.portal.assistant")
-          .filter { runCatching { pm.getLaunchIntentForPackage(it) != null }.getOrDefault(false) }.toSet()
-    }
-  }
-  val haPackage = installed.firstOrNull { it.startsWith("io.homeassistant.") }
-  val haInstalled = haPackage != null
-  val assistantInstalled = "com.portal.assistant" in installed
-  val dashboardConfigured = remember(refresh) { HomeDashboardConfig.configured(context) }
-  fun launch(pkg: String) {
-    runCatching { pm.getLaunchIntentForPackage(pkg)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)?.let { context.startActivity(it) } }
-  }
-
-  data class QC(val icon: String, val label: String, val description: String, val onTap: () -> Unit)
-  var showDinner by remember { mutableStateOf(false) }
-  val tiles = buildList {
-    // Call everyone (household feature): chime + speak a message in every room.
-    add(QC(DinnerCallTile.ICON, DinnerCallTile.LABEL, DinnerCallTile.DESCRIPTION) { showDinner = true })
-    // Guests: the Wi-Fi card and Guest mode (hides personal content while visitors are here).
-    add(QC(GuestEntry.ICON, GuestEntry.LABEL, GuestEntry.DESCRIPTION) { GuestEntry.openCard(context) })
-    if (assistantInstalled) add(QC("mic", "Hey Jarvis", "Open your assistant") { triggerJarvis(context) })
-    if (dashboardConfigured) {
-      add(QC("ha", "Dashboard", "Open your dashboard") {
-        HomeDashboardActivity.openDashboard(context)
-      })
-    } else if (haInstalled) {
-      add(QC("bulb", "Lights", "Open Home Assistant") { launch(haPackage.orEmpty()) })
-      add(QC("film", "Scenes", "Open Home Assistant") { launch(haPackage.orEmpty()) })
-      add(QC("weather", "Climate", "Open Home Assistant") { launch(haPackage.orEmpty()) })
-      add(QC("ha", "Home", "Open Home Assistant") { launch(haPackage.orEmpty()) })
-    }
-  }
-  // The sheet is full-screen: host it in its own window, not inside this widget's card bounds.
-  if (showDinner) {
-    androidx.compose.ui.window.Dialog(onDismissRequest = { showDinner = false },
-        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false)) {
-      Box(Modifier.fillMaxSize()) { DinnerCallSheet(onDismiss = { showDinner = false }) }
-    }
-  }
-  ImmortalWidgetShell(title = "Quick controls", openPage = "display", modifier = modifier, scrollContent = false) {
-    if (tiles.isEmpty()) {
-      Text("Add an assistant or Home Assistant app to use quick controls.",
-          color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp)
-    } else {
-      // Fit every tile in the card (no hidden scroll): split the real height across the rows and
-      // drop the description line when a row is too short to hold it.
-      val rows = tiles.chunked(2)
-      val compactCards = currentLayoutClass().compact
-      BoxWithConstraints(Modifier.fillMaxSize()) {
-        val gap = 14.dp
-        val rowHeight = (maxHeight - gap * (rows.size - 1)) / rows.size
-        val showDescription = rowHeight >= QUICK_TILE_FULL_HEIGHT
-        val padding = if (rowHeight >= QUICK_TILE_FULL_HEIGHT) 20.dp else 14.dp
-        // Compact cards can leave a row too short for icon over label: lay those tiles out side by side.
-        val sideBySide = compactCards && rowHeight < QUICK_TILE_STACKED_MIN
-        Column(verticalArrangement = Arrangement.spacedBy(gap)) {
-          rows.forEach { row ->
-            Row(Modifier.fillMaxWidth().height(rowHeight), horizontalArrangement = Arrangement.spacedBy(gap)) {
-              row.forEach { qc ->
-                if (sideBySide) Row(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(17.dp))
-                    .background(ApprovedHomePalette.Chrome).tvFocusable { qc.onTap() }.padding(horizontal = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                  ApprovedHomeIcon(qc.icon, Modifier.size(28.dp), ApprovedHomePalette.Text)
-                  Text(qc.label, color = ApprovedHomePalette.Text, fontSize = 21.sp, lineHeight = 26.sp,
-                      fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                } else Column(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(17.dp))
-                    .background(ApprovedHomePalette.Chrome).tvFocusable { qc.onTap() }.padding(padding),
-                    verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)) {
-                  ApprovedHomeIcon(qc.icon, Modifier.size(32.dp), ApprovedHomePalette.Text)
-                  Text(qc.label, color = ApprovedHomePalette.Text, fontSize = 23.sp, lineHeight = 30.sp,
-                      fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                  if (showDescription) Text(qc.description, color = ApprovedHomePalette.Secondary,
-                      fontSize = 20.sp, lineHeight = 27.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                }
-              }
-              if (row.size == 1) Spacer(Modifier.weight(1f))
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-/** Row height at which a quick-control tile has room for its description line. */
-private val QUICK_TILE_FULL_HEIGHT = 150.dp
-/** Below this row height a compact tile can't stack its 32 dp icon over a 30 dp label. */
-private val QUICK_TILE_STACKED_MIN = 100.dp
-
-/**
- * The glanceable "Today" strip for the left column: a frosted-glass card with three quick rows —
- * next calendar event, weather feels-like + hi/lo, and the moon phase with today's sunrise/sunset.
- * All data is already fetched elsewhere (weather + sun times keyless from Open-Meteo; moon phase is
- * pure date math). Re-reads the clock format on resume so times match the user's 12/24h setting.
- */
-@Composable
-private fun TodayStripWidget(modifier: Modifier = Modifier) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
-  var fahrenheit by remember { mutableStateOf(ImmortalSettings.useFahrenheit(context)) }
-  OnResume {
-        use24 = ImmortalSettings.use24HourClock(context)
-        fahrenheit = ImmortalSettings.useFahrenheit(context)
-  }
-  val current by
-      produceHomeState<Weather.Current?>(initialValue = null, fahrenheit) {
-        while (true) {
-          value = withContext(Dispatchers.IO) { Weather.fetchCurrent(context) }
-          homeRefreshDelay(if (value == null) 60_000L else 30L * 60 * 1000)
-        }
-      }
-  val forecast by
-      produceHomeState<Weather.Forecast?>(initialValue = null, fahrenheit) {
-        value = withContext(Dispatchers.IO) { Weather.fetchForecast(context) }
-      }
-  val sun by
-      produceHomeState<Weather.SunTimes?>(initialValue = null) {
-        value = withContext(Dispatchers.IO) { Weather.fetchSunTimes(context) }
-      }
-  var calendarUrl by remember { mutableStateOf(ScreensaverConfig.load(context).calendarUrl) }
-  OnResume { calendarUrl = ScreensaverConfig.load(context).calendarUrl }
-  val calendarRefresh = remember { TodayCalendarRefreshGate() }
-  val nextCalendarRefresh = remember(calendarUrl, use24, calendarRefresh.revision) { longArrayOf(0L) }
-  val calendarState by produceHomeState(TodayCalendarState(), calendarUrl, use24, calendarRefresh.revision) {
-    val sourceUrl = calendarUrl
-    val clock24 = use24
-    if (sourceUrl.isNullOrBlank()) {
-      value = TodayCalendarState(sourceUrl)
-      calendarRefresh.consume(sourceUrl)
-      return@produceHomeState
-    }
-    while (true) {
-      val remaining = nextCalendarRefresh[0] - android.os.SystemClock.elapsedRealtime()
-      if (remaining > 0) delay(remaining)
-      value = value.forSource(sourceUrl).copy(refreshing = true)
-      val forceRefresh = calendarRefresh.consume(sourceUrl)
-      value = withContext(Dispatchers.IO) {
-        val now = System.currentTimeMillis()
-        prepareTodayCalendarState(sourceUrl,
-            CalendarFeed.read(sourceUrl, now, forceRefresh = forceRefresh), now, clock24)
-      }
-      nextCalendarRefresh[0] = android.os.SystemClock.elapsedRealtime() + 30L * 60 * 1000
-    }
-  }
-  val currentCalendar = calendarState.forSource(calendarUrl)
-  val calendarBusy = currentCalendar.refreshing || calendarRefresh.pending(calendarUrl)
-
-
-
-  // Nearest upcoming countdown (birthday/trip) from Settings > Countdown, plus the next alarm and
-  // open to-do count. Re-read on resume so newly-added items show. Each is null/absent when empty,
-  // so the dashboard rows self-hide rather than showing dead chrome.
-  var countdown by remember { mutableStateOf<Pair<String, String>?>(null) }
-  var alarmLine by remember { mutableStateOf<Pair<String, String>?>(null) }
-  var todoOpen by remember { mutableStateOf(0) }
-  val refreshTodayLines = {
-    countdown = runCatching {
-      CountdownConfig.loadSorted(context)
-          .firstOrNull { it.daysUntil() >= 0 }
-          ?.let { "${it.emoji} ${it.label}" to it.phrase() }
-    }.getOrNull()
-    alarmLine = runCatching {
-      val cfg = AlarmConfig.load(context)
-      val next = if (cfg.enabled) AlarmConfig.nextTrigger(cfg) else null
-      next?.let {
-        val fmt = SimpleDateFormat(if (use24) "EEE HH:mm" else "EEE h:mm a", Locale.getDefault())
-        cfg.label.ifBlank { "Alarm" } to fmt.format(java.util.Date(it))
-      }
-    }.getOrNull()
-    todoOpen = runCatching { TodoStore.load(context).count { !it.done } }.getOrDefault(0)
-  }
-  LaunchedEffect(Unit) { refreshTodayLines() }
-  OnResume { refreshTodayLines() }
-
-  val today = forecast?.days?.firstOrNull()
-  val moonName by produceHomeState(initialValue = moonPhase(System.currentTimeMillis()).second) {
-    while (true) {
-      value = moonPhase(System.currentTimeMillis()).second
-      delay(60L * 60 * 1000)
-    }
-  }
-  val sunPair = sun?.formatted(use24)
-  ImmortalWidgetShell(title = "Today", openPage = "calendar", modifier = modifier) {
-    // Calendar setup is offered by the Calendar widget and this card's Settings action; Today only
-    // shows calendar content once one is configured (approved Home v2, change 1).
-    if (HomeRefinements.todayShowsCalendar(calendarUrl)) {
-      TodayCalendarSection(currentCalendar.copy(refreshing = calendarBusy), onRetry = {
-        if (calendarRefresh.request(currentCalendar.copy(refreshing = calendarBusy), calendarUrl)) {
-          nextCalendarRefresh[0] = 0L
-        }
-      }, onAdd = { context.openApprovedHomeSettings("calendar-url") })
-      Spacer(Modifier.height(20.dp))
-    }
-    TodayFactsGrid(remember(current, sunPair, today, moonName) {
-      HomeRefinements.todayFacts(temp = current?.temp, feelsLike = current?.feelsLike, sun = sunPair,
-          high = today?.hi, low = today?.lo, moon = moonName)
-    })
-    alarmLine?.let { (label, whenStr) ->
-      Spacer(Modifier.height(14.dp)); TodayRow("⏰", label, whenStr)
-    }
-    if (todoOpen > 0) {
-      Spacer(Modifier.height(14.dp)); TodayRow("✓", if (todoOpen == 1) "1 to-do" else "$todoOpen to-dos", "open")
-    }
-    countdown?.let { (label, phrase) ->
-      Spacer(Modifier.height(14.dp)); TodayRow("⏳", label, phrase)
-    }
-  }
-
-}
-
-/** Today's facts as a two-column grid of small label over value (approved Home v2, change 3). */
-@Composable
-private fun TodayFactsGrid(facts: List<HomeRefinements.TodayFact>) {
-  Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-    facts.chunked(2).forEach { row ->
-      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-        row.forEach { fact ->
-          Column(Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
-            Text(fact.label, color = ApprovedHomePalette.Secondary, fontSize = 18.sp, lineHeight = 24.sp,
-                maxLines = 1, overflow = TextOverflow.Ellipsis)
-            // Two lines so long values ("Waning crescent", localized times) wrap instead of clipping.
-            Text(fact.value, color = ApprovedHomePalette.Text, fontSize = 24.sp, lineHeight = 30.sp,
-                fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
-          }
-        }
-        if (row.size == 1) Spacer(Modifier.weight(1f))
-      }
-    }
-  }
-}
-
-@Composable
-private fun TodayRow(glyph: String, text: String, trailing: String?) {
-  Row(
-      modifier = Modifier.fillMaxWidth(),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(12.dp),
-  ) {
-    Text(glyph, color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 35.sp,
-        modifier = Modifier.width(30.dp), textAlign = TextAlign.Center)
-    Text(
-        text,
-        color = ApprovedHomePalette.Text,
-        fontSize = 26.sp,
-        lineHeight = 35.sp,
-        fontWeight = FontWeight.Medium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.weight(1f),
-    )
-    if (trailing != null) {
-      Text(trailing, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp,
-          maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 160.dp))
-    }
-  }
-}
-
-/**
- * Moon phase (glyph + name) from the epoch, via the standard synodic-month approximation
- * (29.53059 days from a known new moon). Pure date math — no network, good to ~1 day.
- */
-private fun moonPhase(nowMillis: Long): Pair<String, String> {
-  val synodic = 29.530588853
-  val knownNew = 947182440000L // 2000-01-06 18:14 UTC, a reference new moon
-  val days = (nowMillis - knownNew).toDouble() / 86_400_000.0
-  val age = ((days % synodic) + synodic) % synodic
-  return when {
-    age < 1.84 -> "🌑" to "New moon"
-    age < 5.53 -> "🌒" to "Waxing crescent"
-    age < 9.22 -> "🌓" to "First quarter"
-    age < 12.91 -> "🌔" to "Waxing gibbous"
-    age < 16.61 -> "🌕" to "Full moon"
-    age < 20.30 -> "🌖" to "Waning gibbous"
-    age < 23.99 -> "🌗" to "Last quarter"
-    age < 27.68 -> "🌘" to "Waning crescent"
-    else -> "🌑" to "New moon"
-  }
-}
-
-@Composable
-private fun ImmortalWeatherWidget(modifier: Modifier = Modifier) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  var fahrenheit by remember { mutableStateOf(ImmortalSettings.useFahrenheit(context)) }
-  // Forecast mode from Settings > Appearance > Weather widget: Off / Hourly / Daily. Re-read on
-  // resume so a change applies when the user returns home.
-  var forecastMode by remember { mutableStateOf(ImmortalSettings.load(context).weatherWidget) }
-  var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
-  OnResume {
-        fahrenheit = ImmortalSettings.useFahrenheit(context)
-        forecastMode = ImmortalSettings.load(context).weatherWidget
-        use24 = ImmortalSettings.use24HourClock(context)
-  }
-  val current by
-      produceHomeState<Weather.Current?>(initialValue = null, fahrenheit) {
-        while (true) {
-          value = withContext(Dispatchers.IO) { Weather.fetchCurrent(context) }
-          homeRefreshDelay(if (value == null) 60_000L else 30L * 60 * 1000)
-        }
-      }
-  val forecast by
-      produceHomeState<Weather.Forecast?>(initialValue = null, fahrenheit) {
-        value = withContext(Dispatchers.IO) { Weather.fetchForecast(context) }
-      }
-  val sunTimes by
-      produceHomeState<Weather.SunTimes?>(initialValue = null) {
-        value = withContext(Dispatchers.IO) { Weather.fetchSunTimes(context) }
-      }
-  val code = current?.code ?: 0
-  val phase = skyPhase()
-  val sky = weatherSky(code, phase)
-  // The widget paints its own sky (Dusk Aurora design): a multi-stop vertical gradient that tracks
-  // condition + time of day — night sky fading into a warm horizon at dusk — with a glowing
-  // sun/moon orb when skies are clear. City + big temp top-left, hourly strip along the bottom.
-  Box(
-      modifier =
-          modifier
-              // 22dp matches the grid cell's LiquidGlass exactly, so the painted sky fills the
-              // glass card edge-to-edge with no rim peeking through.
-              .clip(RoundedCornerShape(22.dp))
-              .background(Brush.verticalGradient(sky))
-              .padding(18.dp),
-  ) {
-    Column(Modifier.fillMaxSize()) {
-      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        Column(Modifier.weight(1f)) {
-          Text(
-              current?.city?.ifBlank { "Weather" } ?: "Weather",
-              color = Color.White,
-              fontSize = 18.sp,
-              fontWeight = FontWeight.SemiBold,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis,
-          )
-          Text(
-              current?.let { "${it.temp}°" } ?: "—",
-              color = Color.White,
-              fontSize = 46.sp,
-              fontWeight = FontWeight.Light,
-          )
-          // Always-present hero subline: condition · today's H/L · sunset — so the card reads as a
-          // premium weather hero even when the forecast strip mode is Off.
-          val today = forecast?.days?.firstOrNull()
-          val condition = weatherConditionText(code)
-          val sunsetLabel = sunTimes?.formatted(use24)?.second
-          Text(
-              buildString {
-                append(condition)
-                today?.let { append("  ·  H:${it.hi}° L:${it.lo}°") }
-                sunsetLabel?.let { append("  ·  ↓$it") }
-              },
-              color = Color(0xE6FFFFFF),
-              fontSize = 14.sp,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis,
-              modifier = Modifier.padding(top = 2.dp),
-          )
-        }
-        // Clear skies get a glowing sun/moon orb (the Dusk Aurora "paints its own sky" look);
-        // anything with real weather keeps the condition glyph.
-        if (code <= 1) SkyOrb(night = phase == SkyPhase.NIGHT) else Text(Weather.emoji(code), fontSize = 34.sp)
-      }
-      Spacer(Modifier.weight(1f))
-      // Forecast strip honors the Weather-widget mode: Off shows just the current conditions,
-      // Hourly shows the next 5 hours, Daily shows the next 5 days with high/low.
-      when (forecastMode) {
-        ImmortalSettings.WIDGET_HOURLY -> {
-          val hours = forecast?.hours?.take(5).orEmpty()
-          if (hours.isNotEmpty()) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-              hours.forEach { h ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f),
-                ) {
-                  Text(h.label, color = Color(0xCCFFFFFF), fontSize = 11.sp, maxLines = 1)
-                  Text(Weather.emoji(h.code), fontSize = 18.sp, modifier = Modifier.padding(vertical = 3.dp))
-                  Text("${h.temp}°", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                }
-              }
-            }
-          }
-        }
-        ImmortalSettings.WIDGET_DAILY -> {
-          val days = forecast?.days?.take(5).orEmpty()
-          if (days.isNotEmpty()) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-              days.forEach { d ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f),
-                ) {
-                  Text(d.label, color = Color(0xCCFFFFFF), fontSize = 11.sp, maxLines = 1)
-                  Text(Weather.emoji(d.code), fontSize = 18.sp, modifier = Modifier.padding(vertical = 3.dp))
-                  Text("${d.hi}°", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                  Text("${d.lo}°", color = Color(0x99FFFFFF), fontSize = 11.sp)
-                }
-              }
-            }
-          }
-        }
-        else -> {} // WIDGET_OFF: current conditions only, no forecast strip.
-      }
-    }
-  }
-}
-
-/** Time-of-day bucket for the widget's painted sky. */
-private enum class SkyPhase { DAY, DUSK, NIGHT }
-
-private fun skyPhase(): SkyPhase {
-  val h = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-  return when (h) {
-    in 8..17 -> SkyPhase.DAY
-    in 5..7, in 18..20 -> SkyPhase.DUSK // dawn shares the dusk palette
-    else -> SkyPhase.NIGHT
-  }
-}
-
-/**
- * The widget's sky: a multi-stop vertical gradient per condition + phase (Dusk Aurora design).
- * Dusk is the signature — deep night blue melting into a warm ember horizon; weather conditions
- * mute it toward grey. Colors match mocks/ipados (weatherw / .hero .sun).
- */
-private fun weatherSky(code: Int, phase: SkyPhase): List<Color> {
-  val precip = code in 51..99
-  val grey = code == 3 || code in 45..48
-  return when (phase) {
-    SkyPhase.DUSK ->
-        when {
-          precip -> listOf(Color(0xFF232C3D), Color(0xFF3A4457), Color(0xFF5D5350))
-          grey -> listOf(Color(0xFF27303F), Color(0xFF434D5C), Color(0xFF6B6058))
-          else -> listOf(Color(0xFF16294F), Color(0xFF2C4470), Color(0xFF8A5F52), Color(0xFFC98A5E))
-        }
-    SkyPhase.NIGHT ->
-        when {
-          precip -> listOf(Color(0xFF1C2330), Color(0xFF333E4E))
-          grey -> listOf(Color(0xFF1D2634), Color(0xFF37424F))
-          else -> listOf(Color(0xFF0A1226), Color(0xFF16294F), Color(0xFF27436E))
-        }
-    SkyPhase.DAY ->
-        when {
-          code in 71..77 -> listOf(Color(0xFF7E93A8), Color(0xFFBFCEDC)) // snow
-          code in 51..67 || code in 80..82 -> listOf(Color(0xFF45607A), Color(0xFF7791A6)) // rain
-          code in 95..99 -> listOf(Color(0xFF3A4A5C), Color(0xFF5E7286)) // thunder
-          code == 3 -> listOf(Color(0xFF5E7E98), Color(0xFF93ABC0)) // overcast
-          code in 45..48 -> listOf(Color(0xFF7E8E9C), Color(0xFFAEBBC6)) // fog
-          else -> listOf(Color(0xFF2E6BB8), Color(0xFF4F97DC), Color(0xFF8FC3EE)) // clear
-        }
-  }
-}
-
-/** A glowing sun (or moon) orb for clear skies — radial core + soft halo, drawn not emoji. */
-@Composable
-private fun SkyOrb(night: Boolean) {
-  androidx.compose.foundation.Canvas(Modifier.size(44.dp)) {
-    val r = size.minDimension / 2f
-    val c = center
-    if (night) {
-      drawCircle(
-          Brush.radialGradient(
-              listOf(Color(0x66AFC6FF), Color(0x00AFC6FF)), center = c, radius = r),
-          radius = r, center = c)
-      drawCircle(
-          Brush.radialGradient(
-              listOf(Color(0xFFF4F6FB), Color(0xFFC9D4E8)), center = c.copy(x = c.x - r * 0.15f), radius = r * 0.62f),
-          radius = r * 0.55f, center = c)
-    } else {
-      drawCircle(
-          Brush.radialGradient(
-              listOf(Color(0x80FFC96B), Color(0x00FFC96B)), center = c, radius = r),
-          radius = r, center = c)
-      drawCircle(
-          Brush.radialGradient(
-              listOf(Color(0xFFFFF3D6), Color(0xFFFFCF7D), Color(0xFFFF9D4D)),
-              center = c.copy(x = c.x - r * 0.12f, y = c.y - r * 0.15f), radius = r * 0.62f),
-          radius = r * 0.55f, center = c)
-    }
-  }
-}
-
-@Composable
-private fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
+internal fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var zones by remember { mutableStateOf(ImmortalSettings.worldClockZones(context)) }
   var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
@@ -3966,7 +3329,7 @@ private fun AnalogClock(zoneId: String, now: Date, modifier: Modifier = Modifier
  * Re-reads config on resume so edits in the editor reflect here.
  */
 @Composable
-private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
+internal fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var cfg by remember { mutableStateOf(AlarmConfig.load(context)) }
   var use24 by remember { mutableStateOf(ImmortalSettings.use24HourClock(context)) }
@@ -4064,7 +3427,7 @@ private fun ImmortalAlarmWidget(modifier: Modifier = Modifier) {
  * an edit applies on return home.
  */
 @Composable
-private fun ImmortalCryptoWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
+internal fun ImmortalCryptoWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var coins by remember { mutableStateOf(CryptoConfig.load(context)) }
   OnResume { coins = CryptoConfig.load(context) }
@@ -4192,7 +3555,7 @@ private fun formatUsd(v: Double): String =
  * in the browser; tapping the chrome (or when empty) opens the feed editor. Re-reads feeds on resume.
  */
 @Composable
-private fun ImmortalNewsWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
+internal fun ImmortalNewsWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var feeds by remember { mutableStateOf(NewsConfig.load(context)) }
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -4263,7 +3626,7 @@ private fun interleave(lists: List<List<NewsFeed.Headline>>): List<NewsFeed.Head
  * "connect" prompt until configured. Tapping opens the editor. Data is IEX real-time (free tier).
  */
 @Composable
-private fun ImmortalStocksWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
+internal fun ImmortalStocksWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var tickers by remember { mutableStateOf(StocksConfig.load(context)) }
   var configured by remember { mutableStateOf(AlpacaConfig.isConfigured(context)) }
@@ -4317,7 +3680,7 @@ private fun StockRow(q: AlpacaClient.StockQuote) {
  * and free data is 15-min delayed anyway). Requires Alpaca credentials; tap opens the editor.
  */
 @Composable
-private fun ImmortalOptionsWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
+internal fun ImmortalOptionsWidget(modifier: Modifier = Modifier, maxRows: Int = 5) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var tickers by remember { mutableStateOf(OptionsScanConfig.tickers(context)) }
   var configured by remember { mutableStateOf(AlpacaConfig.isConfigured(context)) }
@@ -4398,7 +3761,7 @@ private fun expiryShort(iso: String): String =
  * the publish-only MQTT integration.
  */
 @Composable
-private fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3) {
+internal fun ImmortalHaWidget(modifier: Modifier = Modifier, maxTileRows: Int = 3) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var dashboardConfigured by remember { mutableStateOf(HomeDashboardConfig.configured(context)) }
   var target by remember { mutableStateOf(haWidgetTarget(context)) }
@@ -4647,13 +4010,6 @@ private fun TimerChip(label: String, enabled: Boolean = true, onClick: () -> Uni
         fontWeight = FontWeight.Medium,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 11.dp),
     )
-  }
-}
-
-@Composable
-private fun UnknownImmortalWidget(kind: String, modifier: Modifier = Modifier) {
-  Box(modifier.padding(30.dp), contentAlignment = Alignment.Center) {
-    Text(kind, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 30.sp)
   }
 }
 
