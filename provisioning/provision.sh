@@ -24,6 +24,8 @@
 #                             wake word installs by default (config opt-out)
 #   ./provision.sh --update-hey  refresh just the "hey" wake-word app to the current
 #                             release (no ~115 MB falcon re-download); leaves falcon as-is
+#   ./provision.sh --debloat  opt-in: disable unused Meta background apps (DEBLOAT_PACKAGES)
+#   ./provision.sh --undebloat  re-enable them (--restore does this too)
 
 set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -565,6 +567,56 @@ disable_presence() {
   ok "Presence detector disabled"
 }
 
+# OPT-IN (--debloat / --undebloat only, never part of a normal provision). Disables the Meta
+# background apps in DEBLOAT_PACKAGES with `pm disable-user` — reversible, no root, no
+# uninstall — to free RAM/CPU for Hearthpane. DEBLOAT_PROTECTED is a hard guard: those are
+# what camera, presence, Calls, key events, TTS and the stock home need. See
+# docs/guides/portal-debloat.md.
+DEBLOAT_SAVE_WAIT_S=15 # PackageManager writes package-restrictions after a ~10 s delay
+debloat_protected() { case " ${DEBLOAT_PROTECTED:-} " in *" $1 "*) return 0 ;; esac; return 1; }
+
+debloat_meta() {
+  [ -n "${DEBLOAT_PACKAGES:-}" ] || die "DEBLOAT_PACKAGES is empty in config.env"
+  step "Disabling unused Meta background apps (undo: --undebloat)"
+  local p out n=0
+  for p in $DEBLOAT_PACKAGES; do
+    if debloat_protected "$p"; then warn "$p is protected (Hearthpane needs it) — skipped"; continue; fi
+    a shell pm path "$p" >/dev/null 2>&1 || { warn "$p not on this Portal — skipped"; continue; }
+    out="$(a shell pm disable-user --user 0 "$p" 2>&1 | tr -d '\r')"
+    case "$out" in
+      *"new state: disabled-user"*) ok "$p disabled"; n=$((n + 1)) ;;
+      *) warn "$p: ${out:-no response}" ;;
+    esac
+  done
+  # Android saves package state lazily (~10 s); an immediate reboot can silently undo it.
+  [ "$n" -gt 0 ] && { sleep "$DEBLOAT_SAVE_WAIT_S"; ok "Saved"; }
+  ok "$n package(s) disabled. Reboot the Portal for a clean start: adb reboot"
+}
+
+undebloat_meta() {
+  step "Re-enabling Meta background apps from the debloat list"
+  local p out n=0
+  for p in ${DEBLOAT_PACKAGES:-}; do
+    a shell pm path "$p" >/dev/null 2>&1 || continue
+    out="$(a shell pm enable --user 0 "$p" 2>&1 | tr -d '\r')"
+    case "$out" in
+      *"new state: enabled"*) ok "$p enabled"; n=$((n + 1)) ;;
+      *) warn "$p: ${out:-no response}" ;;
+    esac
+  done
+  [ "$n" -gt 0 ] && { sleep "$DEBLOAT_SAVE_WAIT_S"; ok "Saved"; }
+  ok "$n package(s) enabled. Reboot the Portal so Meta's services start cleanly: adb reboot"
+}
+
+debloat_status() {
+  local p d=0 t=0 disabled
+  disabled="$(a shell pm list packages -d 2>/dev/null | tr -d '\r')"
+  for p in ${DEBLOAT_PACKAGES:-}; do
+    t=$((t + 1)); printf '%s\n' "$disabled" | grep -qx "package:$p" && d=$((d + 1))
+  done
+  printf "  Meta debloat: %s of %s listed apps disabled\n" "$d" "$t"
+}
+
 hide_meta_bug_pill() {
   # Meta's internal "bug reporter" pill (com.facebook.aloha.system.services
   # bugreporter.PillViewService) floats in the bottom-right corner over every
@@ -1047,6 +1099,7 @@ do_restore() {
   for p in $OTA_PACKAGES; do a shell pm enable "$p" >/dev/null 2>&1; done; ok "OS updates restored"
   step "Re-enabling Meta's presence detector"
   a shell pm enable "$PRESENCE_PKG" >/dev/null 2>&1; ok "Presence detector restored"
+  undebloat_meta
   step "Removing Immortal's screen-off device admin"
   # Android refuses to let the shell force-remove a non-test device admin, so this
   # usually fails on a real device — don't claim success when it didn't. The active
@@ -1086,6 +1139,7 @@ do_status() {
   printf "  installer dialog: %s\n" "$([ "$(a shell settings get global immortal_overlay_fix 2>/dev/null | tr -d '\r')" = "1" ] && echo 'fixed (overlay disabled)' || echo 'stock')"
   printf "  OS updates: %s\n" "$(a shell pm list packages -d 2>/dev/null | tr -d '\r' | grep -qE 'alohaotasetup|otaui' && echo disabled || echo enabled)"
   printf "  client:     %s\n" "$(a shell pm list packages "$PKG" 2>/dev/null | tr -d '\r' | grep -q . && echo installed || echo 'not installed')"
+  debloat_status
   check_manual_settings
   check_calls_access || true
 }
@@ -1138,7 +1192,9 @@ case "${1:-}" in
   --wifi-adb)   enable_wifi_adb_now ;;
   --alexa|-A)   resolve_adb; wait_for_device; restore_alexa ;;
   --update-hey) do_update_hey ;;
-  --help|-h)    sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//' ;;
+  --debloat)    resolve_adb; wait_for_device; debloat_meta ;;
+  --undebloat)  resolve_adb; wait_for_device; undebloat_meta ;;
+  --help|-h)    sed -n '2,28p' "$0" | sed 's/^# \{0,1\}//' ;;
   "")           do_provision ;;
-  *)            die "Unknown option: $1 (use --restore, --status, or no argument)" ;;
+  *)            die "Unknown option: $1 (use --restore, --status, --debloat, --undebloat, or no argument)" ;;
 esac
