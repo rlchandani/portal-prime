@@ -201,7 +201,8 @@ internal object CcPolicy {
     call.guard == CcGuard.CONFIRM -> Ask.CONFIRM
     call.domain == "lock" && call.service == "unlock" -> if (s.askUnlock) Ask.CONFIRM else Ask.NONE
     call.domain == "cover" && CcKind.of(e) == CcKind.GARAGE && call.service != "stop_cover" -> if (s.askGarage) Ask.CAMERA_CONFIRM else Ask.NONE
-    call.domain == "valve" -> if (s.askValve) Ask.CONFIRM else Ask.NONE
+    // A water main wired as a switch is the valve everywhere else (kids mode, Security, alerts, voice).
+    call.domain == "valve" || call.domain == "switch" && valveSwitch(e) -> if (s.askValve) Ask.CONFIRM else Ask.NONE
     call.domain == "alarm_control_panel" -> if (call.service == "alarm_disarm" || e.attrs["code_arm_required"] == true && e.codeFormat != null) Ask.PIN else Ask.NONE
     // A scene/script that arms, unlocks or opens something is a security action in disguise: it always asks.
     (call.domain == "scene" || call.domain == "script") && sensitive(e) -> Ask.CONFIRM
@@ -235,8 +236,11 @@ internal object CcPolicy {
     CcKind.ALARM -> s.kidsHideSecurity
     CcKind.CAMERA -> s.kidsHideCameras
     CcKind.VALVE -> s.kidsHideValve
-    else -> e != null && e.id.startsWith("switch.") && VALVE_HINTS.any { it in e.id } && s.kidsHideValve
+    else -> e != null && valveSwitch(e) && s.kidsHideValve
   }
+
+  /** A switch that drives the water main (named like one), handled as the valve. */
+  private fun valveSwitch(e: CcEntity): Boolean = e.id.startsWith("switch.") && VALVE_HINTS.any { it in e.id }
 
   /** Thermostats shown but not adjustable in kids mode when the parent chose so. */
   fun readOnly(e: CcEntity, s: ControlCenterConfig.Settings): Boolean = s.kids && e.domain == "climate" && s.kidsLockThermostat

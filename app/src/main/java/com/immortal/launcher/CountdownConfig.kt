@@ -43,7 +43,8 @@ object CountdownConfig {
         if (year > 0) set(Calendar.YEAR, year)
       }
       if (year == 0 && target.before(today)) target.add(Calendar.YEAR, 1)
-      return ((target.timeInMillis - today.timeInMillis) / DAY_MS).toInt()
+      // Rounded: a span between two local midnights is 23 or 25 h across a DST change.
+      return Math.round((target.timeInMillis - today.timeInMillis).toDouble() / DAY_MS).toInt()
     }
 
     /** "today", "tomorrow", "in N days", or "N days ago". */
