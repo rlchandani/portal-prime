@@ -90,6 +90,7 @@ class ControlCenterActivity : ComponentActivity() {
     updateMotion()
     runCatching { unregisterReceiver(screen) }
     ControlCenter.setVisible(this, false)
+    ControlCenterBanners.releaseActivity(this)
     super.onStop()
   }
 
