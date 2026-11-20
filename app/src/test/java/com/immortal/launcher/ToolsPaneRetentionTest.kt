@@ -54,4 +54,9 @@ class ToolsPaneRetentionTest {
             assertFalse(it, ToolsPaneRetention.keepsWorkspace(it))
         }
     }
+
+    @Test fun thePrebuiltWorkspaceIsOneThatStaysComposedAndExistsInTheCatalog() {
+        assertTrue(ToolsPaneRetention.keepsWorkspace(ToolsPaneRetention.PREBUILT_WORKSPACE))
+        assertTrue(ApprovedToolsCatalog.resolve(ToolsPaneRetention.PREBUILT_WORKSPACE, advanced = false) != null)
+    }
 }
