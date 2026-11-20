@@ -43,12 +43,16 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import java.text.DateFormat
 import java.util.Date
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /** `missedScr`: missed calls and video messages in one list, with a preview card (Portal+) or rows (Mini). */
 @Composable
 internal fun CallMessagesTab() {
   val context = LocalContext.current
-  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context); CallMessageStore.prune(context) }
+  LaunchedEffect(Unit) {
+    withContext(Dispatchers.IO) { CallMessageStore.ensureLoaded(context); CallMessageStore.prune(context) }
+  }
   val messages by CallMessageStore.messages.collectAsState()
   val history by CallingStore.history.collectAsState()
   val items = remember(messages, history) { CallInbox.items(messages, history) }

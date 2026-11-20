@@ -176,7 +176,10 @@ object QuickBar {
     // BarWatchService is baseline-enabled now (it also backs the remote + the Calls→stock-home
     // bridge), so the service being connected no longer implies the quick-button feature is on.
     // Gate the cluster on its own setting; show only when enabled AND (always-show or bar shown).
-    val showSwitcher = QuickBarConfig.isEnabled(ctx) && (QuickBarConfig.alwaysShow(ctx) || barVisible)
+    // The application context's preferences-path cache is warm; the service's re-resolves the
+    // prefs directory (a main-thread stat) on every bar show/hide.
+    val prefs = ctx.applicationContext ?: ctx
+    val showSwitcher = QuickBarConfig.isEnabled(prefs) && (QuickBarConfig.alwaysShow(prefs) || barVisible)
     val showPin = (pinAvailable || pinned) && barVisible && !frameCovered
     switcher?.visibility = if (showSwitcher) View.VISIBLE else View.GONE
     pinButton?.apply {
