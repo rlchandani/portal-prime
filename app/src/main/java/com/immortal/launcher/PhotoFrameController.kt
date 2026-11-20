@@ -18,10 +18,6 @@ import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Rect
-import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
-import android.speech.tts.TextToSpeech
-import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
@@ -31,15 +27,8 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.exifinterface.media.ExifInterface
-import java.net.HttpURLConnection
-import java.net.URL
-import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import java.util.concurrent.Executors
 import org.json.JSONObject
 import com.immortal.launcher.PhotoFrameViews.Companion.MATCH
@@ -329,7 +318,6 @@ class PhotoFrameController(
   private var transcoder: VideoTranscoder? = null
   private val transcodeIo = Executors.newSingleThreadExecutor()
   @Volatile private var prefetchRunning = false
-  @Volatile private var videoPrefetchConnection: HttpURLConnection? = null
   // Set when a prefetch pass finds the cache out of room, so later misses don't spawn a worker
   // (and log) just to rediscover that every ~30s. Cleared when a corrupt entry is deleted (space
   // freed); resets with the controller each dream session.
@@ -345,21 +333,11 @@ class PhotoFrameController(
   private val nativeHistory = ArrayList<SlideshowPhoto>()
   private val photoIdentities = java.util.WeakHashMap<Bitmap, String>()
   private var index = -1
-  private val photoTransportGeneration = java.util.concurrent.atomic.AtomicLong()
-  private val photoTransportLock = Any()
-  private val photoConnections = HashSet<HttpURLConnection>()
-  private val photoStreams = HashSet<java.io.InputStream>()
-  private val photoCancelIo = Executors.newSingleThreadExecutor { runnable ->
-    Thread(runnable, "slideshow-close-transports").apply { isDaemon = true }
-  }
-
-  // Default-feed source-chain state (see [fetchWebPhoto]).
-  // Wikimedia Commons featured-landscape image list: fetched once per session, then cycled.
-  private var wikimediaUrls: List<String> = emptyList()
-  private var wikimediaIdx = 0
-  // Bundled offline photos (assets/[FALLBACK_DIR]): shuffled once, then cycled.
-  private var bundledNames: List<String> = emptyList()
-  private var bundledIdx = 0
+  private val transport = PhotoFrameTransport { stopped }
+  // The built-in feed's sources (see [fetchWebPhoto]).
+  private val webFeed = PhotoFrameWebFeed(context, transport, clock, unsplashKey, unsplashQuery,
+      download = { url, generation -> downloadBitmap(url, generation = generation) },
+      decodeStream = { decodeBoundedStream(it) }, testSource = { testSourceOn }, testPhoto = ::nextTestPhoto)
 
   /** Host (dream / preview activity) sets this to dismiss the frame on tap. */
   var onExit: (() -> Unit)? = null
@@ -462,7 +440,7 @@ class PhotoFrameController(
       // A local bundled image is immediately available while source discovery is underway.
       // It never waits behind calendar/weather requests or a failing network provider.
       nativeLoader.load(
-          SlideshowAsset("feed", { bundledBitmap() }, contentIdentity = true,
+          SlideshowAsset("feed", { webFeed.bundled() }, contentIdentity = true,
               identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } }),
           emptyList(), null, false, false,
           { photos, _ ->
@@ -845,11 +823,11 @@ class PhotoFrameController(
               webView = wv
               if (BuildConfig.DEBUG) android.webkit.WebView.setWebContentsDebuggingEnabled(true)
               val remoteTransports = if (remotePhotoRequests.hasSources)
-                EnginePhotoTransports { photoCancelIo.execute(it) }.also { legacyRemoteTransports = it } else null
+                EnginePhotoTransports { transport.cancelIo.execute(it) }.also { legacyRemoteTransports = it } else null
               val remoteImages = if (remotePhotoRequests.hasSources) EngineRemoteImageCache(
                   java.io.File(context.cacheDir, "ss_remote/${java.util.UUID.randomUUID()}"),
                   download = { url, target, current ->
-                    val generation = photoTransportGeneration.get()
+                    val generation = transport.generation.get()
                     runCatching {
                       EngineRemoteHttp.download(url, headers, USER_AGENT, target, remoteTransports!!) {
                         current() && photoRequestCurrent(generation)
@@ -919,7 +897,7 @@ class PhotoFrameController(
                       if (!req.method.equals("GET", ignoreCase = true)) return null
                       // Auxiliary non-photo image requests keep their existing behavior, but no
                       // longer allocate an unbounded byte array or bypass transport cancellation.
-                      val generation = photoTransportGeneration.get()
+                      val generation = transport.generation.get()
                       val bytes = runCatching { downloadBytes(u.toString(), headers, generation) }.getOrNull()
                           ?: return android.webkit.WebResourceResponse("image/jpeg", null,
                               404, "Photo unavailable", emptyMap(), java.io.ByteArrayInputStream(byteArrayOf()))
@@ -1368,11 +1346,7 @@ class PhotoFrameController(
     }
   }
 
-  private fun cancelVideoPrefetchTransport() {
-    videoPrefetchConnection?.let { connection ->
-      photoCancelIo.execute { runCatching { connection.disconnect() } }
-    }
-  }
+  private fun cancelVideoPrefetchTransport() = transport.cancelVideoPrefetch()
 
   /** Capture the cached playback position before Android tears down the surface. */
   fun retainVideoPosition() {
@@ -1454,7 +1428,7 @@ class PhotoFrameController(
     io.shutdownNow()
     metaIo.shutdownNow()
     transcodeIo.shutdownNow()
-    photoCancelIo.shutdown() // Drain owned closes; never wait for a network read on the UI thread.
+    transport.shutdown() // Drain owned closes; never wait for a network read on the UI thread.
   }
 
   // --- UI ---------------------------------------------------------------------
@@ -2564,25 +2538,6 @@ class PhotoFrameController(
     }
   }
 
-  // The default feed (and the universal fallback for any other source that's unset,
-  // empty, or unreachable) walks an ordered chain of keyless sources and returns the
-  // first image it can fetch:
-  //   1. Unsplash  — only when an API key was supplied (richest, but rate-limited)
-  //   2. Picsum    — keyless; the historical default
-  //   3. Wikimedia — Commons "Featured pictures of landscapes"; keyless, and on
-  //                  infrastructure independent of Picsum (the point of having it)
-  //   4. Bundled   — CC0/public-domain photos shipped in the APK; can't fail, so a
-  //                  fresh device with no network yet — or a day every web source is
-  //                  down (e.g. the Picsum outage that prompted this) — is never blank.
-  private val webSources: List<Pair<String, (Long) -> Bitmap?>> by lazy {
-    buildList {
-      if (unsplashKey.isNotBlank()) add("unsplash" to ::unsplashBitmap)
-      add("picsum" to ::picsumBitmap)
-      add("wikimedia" to ::wikimediaBitmap)
-      add("bundled" to { generation: Long -> if (photoRequestCurrent(generation)) bundledBitmap() else null })
-    }
-  }
-
   /** The next generated verification scene, sized like a decoded photo for this panel. */
   private fun nextTestPhoto(): Bitmap {
     val index = testIndex.getAndIncrement()
@@ -2618,8 +2573,8 @@ class PhotoFrameController(
 
   private fun fetchWebPhoto(): Bitmap? {
     if (testSourceOn) return nextTestPhoto()
-    val generation = photoTransportGeneration.get()
-    return webChain.fetch(webSources.map { (name, fetch) -> name to { fetch(generation) } },
+    val generation = transport.generation.get()
+    return webChain.fetch(webFeed.sources.map { (name, fetch) -> name to { fetch(generation) } },
         current = { photoRequestCurrent(generation) }, discard = { it.recycle() })
   }
 
@@ -2758,70 +2713,6 @@ class PhotoFrameController(
     return PhotoFrameFeedUrls.engineBatch(m.widthPixels, m.heightPixels)
   }
 
-  // --- default-feed sources (tried in turn by [fetchWebPhoto]) ----------------
-  private fun picsumBitmap(generation: Long): Bitmap? {
-    val m = context.resources.displayMetrics
-    return downloadBitmap(PhotoFrameFeedUrls.picsum(m.widthPixels, m.heightPixels, clock.wallMs()), generation = generation)
-  }
-
-  private fun unsplashBitmap(generation: Long): Bitmap? {
-    val m = context.resources.displayMetrics
-    // Match the Unsplash crop to the screen aspect so portrait panels (e.g. Portal
-    // Mini at 800x1280) don't get a letterboxed/upscaled landscape shot.
-    val orientation = PhotoFrameFeedUrls.unsplashOrientation(m.widthPixels, m.heightPixels)
-    val json = httpGet(PhotoFrameFeedUrls.unsplash(orientation, unsplashQuery, unsplashKey), generation)
-    return downloadBitmap(JSONObject(json).getJSONObject("urls").getString("regular"), generation = generation)
-  }
-
-  /**
-   * Keyless Wikimedia Commons feed: the curated "Featured pictures of landscapes"
-   * category. The file list is fetched once per session (then shuffled and cycled),
-   * so steady state is just a thumbnail download from Wikimedia's upload CDN.
-   */
-  private fun wikimediaBitmap(generation: Long): Bitmap? {
-    if (wikimediaUrls.isEmpty()) wikimediaUrls = fetchWikimediaUrls(generation)
-    if (!photoRequestCurrent(generation)) return null
-    if (wikimediaUrls.isEmpty()) return null
-    val url = wikimediaUrls[wikimediaIdx % wikimediaUrls.size]
-    wikimediaIdx++
-    return downloadBitmap(url, generation = generation)
-  }
-
-  private fun fetchWikimediaUrls(generation: Long): List<String> {
-    val json = httpGet(PhotoFrameFeedUrls.wikimedia(context.resources.displayMetrics.widthPixels), generation)
-    val pages =
-        JSONObject(json).optJSONObject("query")?.optJSONObject("pages") ?: return emptyList()
-    val urls = ArrayList<String>()
-    for (key in pages.keys()) {
-      val info = pages.getJSONObject(key).optJSONArray("imageinfo")?.optJSONObject(0) ?: continue
-      val url = info.optString("thumburl").ifBlank { info.optString("url") }
-      if (url.isNotBlank()) urls.add(url)
-    }
-    urls.shuffle()
-    return urls
-  }
-
-  /** Terminal fallback: CC0/public-domain photos bundled in the APK — never fails. */
-  private fun bundledBitmap(): Bitmap? {
-    if (testSourceOn) return nextTestPhoto()
-    if (bundledNames.isEmpty()) {
-      bundledNames =
-          runCatching {
-                context.assets.list(FALLBACK_DIR)?.filter { it.endsWith(".jpg", ignoreCase = true) }
-              }
-              .getOrNull()
-              .orEmpty()
-              .shuffled()
-    }
-    if (bundledNames.isEmpty()) return null
-    val name = bundledNames[bundledIdx % bundledNames.size]
-    bundledIdx++
-    return runCatching {
-          context.assets.open("$FALLBACK_DIR/$name").use { decodeBoundedStream(it) }
-        }
-        .getOrNull()
-  }
-
   // --- data -------------------------------------------------------------------
   /** A rejected/retired callback must close even after the decode executor has shut down. */
   private fun closeSmbSourceAsync(source: SmbSource) {
@@ -2830,97 +2721,29 @@ class PhotoFrameController(
     }.start()
   }
 
-  private fun photoRequestCurrent(generation: Long): Boolean =
-      !stopped && generation == photoTransportGeneration.get() && !Thread.currentThread().isInterrupted
+  private fun photoRequestCurrent(generation: Long): Boolean = transport.current(generation)
 
   /** SMB retains its custom transport while sharing encoded storage and bounded decoding. */
   private fun fetchSmbImage(source: SmbSource, path: String, maxEdge: Int): Bitmap? {
-    val generation = photoTransportGeneration.get()
+    val generation = transport.generation.get()
     val current = { photoRequestCurrent(generation) }
     return fetchCachedSmbPhoto(mediaCache, source.photoCacheKey(path), current,
         read = {
           readSmbPhotoEncoded({ source.openStream(path) }, current,
-              register = { input ->
-                synchronized(photoTransportLock) {
-                  if (!current()) false else { photoStreams.add(input); true }
-                }
-              },
-              unregister = { input ->
-                synchronized(photoTransportLock) { photoStreams.remove(input) }
-              })
+              register = { input -> transport.register(input, current) },
+              unregister = transport::unregister)
         },
         decodeFile = { decodeBoundedFile(it.path, maxEdge) },
         decodeBytes = { decodeBoundedBytes(it, maxEdge) },
         discard = { if (!it.isRecycled) it.recycle() })
   }
 
-  /** Epoch invalidation is synchronous; physical closes are serialized away from the UI. */
-  private fun cancelPhotoTransports() {
-    val closing = synchronized(photoTransportLock) {
-      photoTransportGeneration.incrementAndGet()
-      val snapshot = photoConnections.toList() to photoStreams.toList()
-      photoConnections.clear()
-      photoStreams.clear()
-      snapshot
-    }
-    if (closing.first.isEmpty() && closing.second.isEmpty()) return
-    photoCancelIo.execute {
-      closing.first.forEach { runCatching { it.disconnect() } }
-      closing.second.forEach { runCatching { it.close() } }
-    }
-  }
-
-  private fun <T> withPhotoConnection(
-      spec: String, headers: Map<String, String>, timeout: Int, generation: Long,
-      read: (java.io.InputStream) -> T,
-  ): T {
-    if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
-    val c = PhotoSourceRedirects.open(spec, headers, readTimeoutMs = timeout,
-        configure = { it.setRequestProperty("User-Agent", USER_AGENT) },
-        opened = { connection ->
-          synchronized(photoTransportLock) {
-            if (!photoRequestCurrent(generation))
-              throw java.io.InterruptedIOException("Photo request canceled")
-            photoConnections.add(connection)
-          }
-        },
-        closed = { connection ->
-          synchronized(photoTransportLock) { photoConnections.remove(connection) }
-        })
-    var input: java.io.InputStream? = null
-    try {
-      val stream = c.inputStream
-      input = stream
-      synchronized(photoTransportLock) {
-        if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
-        photoStreams.add(stream)
-      }
-      return read(stream)
-    } finally {
-      synchronized(photoTransportLock) {
-        photoConnections.remove(c)
-        input?.let { photoStreams.remove(it) }
-      }
-      runCatching { c.disconnect() }
-      runCatching { input?.close() }
-    }
-  }
-
-  private fun httpGet(spec: String, generation: Long): String =
-      withPhotoConnection(spec, emptyMap(), 8000, generation) { input ->
-        val bytes = SlideshowDecoder.readEncoded(input, 2 * 1024 * 1024)
-            ?: throw java.io.IOException("Photo manifest unavailable")
-        if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
-        bytes.toString(Charsets.UTF_8)
-      }
+  private fun cancelPhotoTransports() = transport.cancelAll()
 
   private fun downloadBitmap(
-      spec: String, headers: Map<String, String> = emptyMap(), maxEdge: Int = 2400,
-      generation: Long = photoTransportGeneration.get(),
-  ): Bitmap? = withPhotoConnection(spec, headers, 12000, generation) { input ->
-    val bitmap = decodeBoundedStream(input, maxEdge)
-    if (photoRequestCurrent(generation)) bitmap else { bitmap?.recycle(); null }
-  }
+      spec: String, headers: Map<String, String> = emptyMap(), maxEdge: Int = PhotoFrameDecodePlan.DEFAULT_EDGE,
+      generation: Long = transport.generation.get(),
+  ): Bitmap? = transport.download(spec, headers, generation, { decodeBoundedStream(it, maxEdge) }, { it.recycle() })
 
   // --- on-device media cache (Immich / WebDAV) --------------------------------
 
@@ -2957,7 +2780,7 @@ class PhotoFrameController(
     }
     // SMB's bitmap-only transport cannot prove that its original was static. Keep its legacy path.
     if (fetch != null) throw NativeFilmstripUnsupportedFormat()
-    val generation = photoTransportGeneration.get()
+    val generation = transport.generation.get()
     if (!photoRequestCurrent(generation)) return null
     val cache = mediaCache
     cache?.getIfPresent(url, isVideo = false)?.let { file ->
@@ -2987,7 +2810,7 @@ class PhotoFrameController(
       url: String, maxEdge: Int = 2400, headers: Map<String, String> = remoteHeaders,
       fetch: ((String, Int) -> Bitmap?)? = remoteFetch,
   ): Bitmap? {
-    val generation = photoTransportGeneration.get()
+    val generation = transport.generation.get()
     if (!photoRequestCurrent(generation)) return null
     val cache = mediaCache
     if (cache != null && fetch == null) {
@@ -3004,45 +2827,12 @@ class PhotoFrameController(
     return if (fetch != null) fetch(url, maxEdge) else downloadBitmap(url, headers, maxEdge, generation)
   }
 
-  /** Raw bytes of an authed HTTP GET (for caching before decode). Null on failure. */
-  private fun downloadBytes(
-      spec: String, headers: Map<String, String>, generation: Long,
-  ): ByteArray? = withPhotoConnection(spec, headers, 12000, generation) { input ->
-    SlideshowDecoder.readEncoded(input)?.takeIf { photoRequestCurrent(generation) }
-  }
+  private fun downloadBytes(spec: String, headers: Map<String, String>, generation: Long): ByteArray? =
+      transport.downloadBytes(spec, headers, generation)
 
   /** Stream an authed HTTP GET straight to [dst] (for the video prefetch source). */
   private fun downloadToFile(spec: String, headers: Map<String, String>, dst: java.io.File): Boolean =
-      runCatching {
-            if (!hostActive || stopped) return@runCatching false
-            val c = PhotoSourceRedirects.open(spec, headers, readTimeoutMs = 20000,
-                configure = { it.setRequestProperty("User-Agent", USER_AGENT) },
-                opened = { connection ->
-                  videoPrefetchConnection = connection
-                  if (!hostActive || stopped)
-                    throw java.io.InterruptedIOException("Video prefetch canceled")
-                },
-                closed = { connection ->
-                  if (videoPrefetchConnection === connection) videoPrefetchConnection = null
-                })
-            try {
-              c.inputStream.use { input ->
-                dst.outputStream().use { output ->
-                  val buffer = ByteArray(32 * 1024)
-                  while (hostActive && !stopped && !Thread.currentThread().isInterrupted) {
-                    val count = input.read(buffer)
-                    if (count < 0) return@runCatching dst.length() > 0L
-                    output.write(buffer, 0, count)
-                  }
-                }
-              }
-              false
-            } finally {
-              if (videoPrefetchConnection === c) videoPrefetchConnection = null
-              c.disconnect()
-            }
-          }
-          .getOrDefault(false)
+      transport.downloadToFile(spec, headers, dst) { hostActive && !stopped }
 
   /**
    * Background-warm the video cache: for each not-yet-cached video, pull the source once,
@@ -3148,8 +2938,6 @@ class PhotoFrameController(
 
     // Delay before the engine's scaled-copy cache starts warming (lets Chromium cold-start first).
     const val ENGINE_WARM_DELAY_MS = 20_000L
-    // Bundled fallback photos live under app/src/main/assets/<FALLBACK_DIR>/.
-    const val FALLBACK_DIR = "photoframe_fallback"
     // Descriptive UA — Wikimedia's API policy asks for an identifiable agent + contact.
     const val USER_AGENT = "Immortal/1.0 (+https://github.com/starbrightlab/immortal)"
   }
