@@ -35,6 +35,7 @@ internal object ControlCenterBanners {
   private const val TAG = "HearthpaneBanner"
   private const val BANNER_MS = 20_000L
   private const val TAKEOVER_MS = 10 * 60_000L
+  private const val PREVIEW_MS = 8_000L
   private const val CRITICAL_RINGS = 3
   private const val PERCENT = 100f
   private const val MIN_VOLUME = 0.5f
@@ -80,13 +81,25 @@ internal object ControlCenterBanners {
     }
   }
 
+  /**
+   * A preview from the Alerts screen ([CcBannerPreview]): drawn exactly as the real banner or
+   * takeover, silently, without waking the screen, and gone after [PREVIEW_MS]. Not a sample? Ignored.
+   */
+  fun preview(alert: CcAlert) {
+    if (!CcBannerPreview.isPreview(alert)) return
+    main.post {
+      Log.i(TAG, "banner preview ${alert.severity.name.lowercase()}")
+      show(alert, CcBannerPreview.takeover(alert), PREVIEW_MS)
+    }
+  }
+
   /** Household quiet hours now (Settings › Sounds); unreadable settings count as quiet, so nothing sounds by mistake. */
   fun quietNow(context: Context): Boolean = quietNow(runCatching { ChimeConfig.load(context.applicationContext) }.getOrNull())
 
   private fun quietNow(chime: ChimeConfig.Settings?): Boolean =
       chime?.let { DinnerQuiet.isQuiet(it, System.currentTimeMillis(), TimeZone.getDefault()) } ?: true
 
-  private fun show(alert: CcAlert, takeover: Boolean) {
+  private fun show(alert: CcAlert, takeover: Boolean, timeoutMs: Long = if (takeover) TAKEOVER_MS else BANNER_MS) {
     val ctx = host ?: run { Log.w(TAG, "banner before the accessibility host attached; not shown"); return }
     val wmgr = wm ?: return
     remove()
@@ -96,7 +109,7 @@ internal object ControlCenterBanners {
         WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT)
         .apply { gravity = Gravity.TOP }
     runCatching { wmgr.addView(root, lp); view = root; showingSeverity = alert.severity }.onFailure { Log.w(TAG, "addView failed", it); return }
-    main.postDelayed(timeout, if (takeover) TAKEOVER_MS else BANNER_MS)
+    main.postDelayed(timeout, timeoutMs)
   }
 
   fun hide() = main.post { remove() }

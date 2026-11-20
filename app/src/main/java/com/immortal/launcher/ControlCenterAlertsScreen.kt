@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -74,6 +76,7 @@ internal fun CcAlertsScreen(s: CcUiState, ui: CcUi) {
         BannersCard(s.settings.warningAfterMin, s.settings.bannersWarnings, s.settings.bannersInfo, set,
             Modifier.fillMaxWidth().padding(top = 10.dp))
       }
+      item(key = "preview") { BannerPreviewCard(Modifier.fillMaxWidth()) }
     }
     return
   }
@@ -84,7 +87,10 @@ internal fun CcAlertsScreen(s: CcUiState, ui: CcUi) {
       items(items, key = { "${it.alert.id}:${it.active}" }) { AlertCard(it, onOp) }
     }
     val set = remember(ui) { { key: String, v: Boolean -> com.immortal.launcher.settings.ControlCenterSettings.set(ui.context, key, v); Unit } }
-    BannersCard(s.settings.warningAfterMin, s.settings.bannersWarnings, s.settings.bannersInfo, set, Modifier.width(520.dp))
+    Column(Modifier.width(520.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+      BannersCard(s.settings.warningAfterMin, s.settings.bannersWarnings, s.settings.bannersInfo, set, Modifier.fillMaxWidth())
+      BannerPreviewCard(Modifier.fillMaxWidth())
+    }
   }
 }
 
@@ -170,6 +176,20 @@ private fun BannersCard(warnAfterMin: Int, warnings: Boolean, info: Boolean, set
   }
 }
 
+/** PREVIEW A BANNER ON PORTAL HOME: one chip per severity; silent, never touches Home Assistant. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun BannerPreviewCard(modifier: Modifier) {
+  Column(modifier.ccCard().padding(horizontal = 28.dp, vertical = 24.dp)) {
+    CcSectionLabel("Preview a banner on Portal home", Modifier.padding(bottom = 14.dp))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+      CcBannerPreview.samples.forEach { sample ->
+        CcButton(sample.label, { ControlCenterBanners.preview(sample.alert) }, icon = sample.icon, height = PREVIEW_CHIP_HEIGHT)
+      }
+    }
+  }
+}
+
 /** `.setRow`: title + grey line, the control on the right, a hairline under it. */
 @Composable
 private fun BannerRow(title: String, sub: String, divider: Boolean, control: @Composable () -> Unit) {
@@ -183,3 +203,5 @@ private fun BannerRow(title: String, sub: String, divider: Boolean, control: @Co
   }
   if (divider) Box(Modifier.fillMaxWidth().height(1.dp).background(c.div))
 }
+
+private const val PREVIEW_CHIP_HEIGHT = 60
