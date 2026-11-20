@@ -9,7 +9,6 @@ package com.immortal.launcher
 
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
-import java.io.EOFException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetSocketAddress
@@ -39,6 +38,8 @@ class MqttClient(
     private val password: String,
     private val will: Will?,
     private val tls: Tls? = null,
+    /** Where a skipped oversized packet is reported (once per connection). */
+    private val log: (String) -> Unit = { android.util.Log.w(TAG, it) },
 ) {
   /**
    * TLS options. [validateCert] off uses a trust-all manager and skips hostname checks — only
@@ -55,6 +56,7 @@ class MqttClient(
   private var socket: Socket? = null
   private var out: OutputStream? = null
   private var inp: InputStream? = null
+  private var reader = MqttPacketReader(log = log)
   private val writeLock = Any()
   private var packetId = 0
 
@@ -68,6 +70,7 @@ class MqttClient(
     socket = s
     out = BufferedOutputStream(s.getOutputStream())
     inp = BufferedInputStream(s.getInputStream())
+    reader = MqttPacketReader(log = log)
     sendConnect(keepAliveSec)
     val ack = readPacket() ?: return false
     // CONNACK (0x20): byte[1] is the return code; 0 = accepted.
@@ -129,15 +132,13 @@ class MqttClient(
     socket = null
   }
 
-  /** Read one full control packet, blocking. Returns null on a clean EOF. */
+  /**
+   * Read one full control packet, blocking. Returns null on a clean EOF or a malformed length.
+   * Packets over [MqttPacketReader.MAX_PACKET_BYTES] are skipped, not returned (see there).
+   */
   fun readPacket(): Packet? {
     val i = inp ?: return null
-    val first = i.read()
-    if (first < 0) return null
-    val len = readRemainingLength(i) ?: return null
-    val body = ByteArray(len)
-    readFully(i, body)
-    return Packet(first and 0xF0, first and 0x0F, body)
+    return reader.read(i)
   }
 
   /** Parse a PUBLISH packet's body into (topic, payload). */
@@ -180,7 +181,7 @@ class MqttClient(
     synchronized(writeLock) {
       val o = out ?: return
       o.write(header)
-      o.write(remainingLength(body.size))
+      o.write(MqttRemainingLength.encode(body.size))
       o.write(body)
       o.flush()
     }
@@ -202,43 +203,8 @@ class MqttClient(
   private fun encShort(v: Int): ByteArray =
       byteArrayOf(((v shr 8) and 0xff).toByte(), (v and 0xff).toByte())
 
-  /** MQTT "remaining length" varint (1–4 bytes). */
-  private fun remainingLength(len: Int): ByteArray {
-    val out = ArrayList<Byte>(4)
-    var x = len
-    do {
-      var enc = x % 128
-      x /= 128
-      if (x > 0) enc = enc or 0x80
-      out.add(enc.toByte())
-    } while (x > 0)
-    return out.toByteArray()
-  }
-
-  private fun readRemainingLength(i: InputStream): Int? {
-    var multiplier = 1
-    var value = 0
-    var digit: Int
-    do {
-      digit = i.read()
-      if (digit < 0) return null
-      value += (digit and 0x7f) * multiplier
-      multiplier *= 128
-      if (multiplier > 128 * 128 * 128) return null // malformed (>4 bytes)
-    } while (digit and 0x80 != 0)
-    return value
-  }
-
-  private fun readFully(i: InputStream, buf: ByteArray) {
-    var off = 0
-    while (off < buf.size) {
-      val n = i.read(buf, off, buf.size - off)
-      if (n < 0) throw EOFException("socket closed mid-packet")
-      off += n
-    }
-  }
-
   private companion object {
+    const val TAG = "ImmortalMqtt"
     val EMPTY = ByteArray(0)
   }
 }

@@ -661,7 +661,7 @@ class RemoteRoutes internal constructor(
     val token = bearer(req.header("authorization")) ?: return false
     // A phone session works only while the remote is on (it is turned on by showing a pairing code).
     return RemotePairing.isEnabled(context) && RemotePairing.isValidSession(context, token) ||
-        FleetRoutes.constantTimeEquals(token, FleetConfig.token(context))
+        FleetAuth.constantTimeEquals(token, FleetConfig.token(context))
   }
 
   private inline fun requireMethod(

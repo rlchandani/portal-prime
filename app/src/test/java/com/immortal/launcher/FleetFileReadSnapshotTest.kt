@@ -7,7 +7,6 @@
 
 package com.immortal.launcher
 
-import android.content.Context
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.EOFException
@@ -16,13 +15,11 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 import java.io.RandomAccessFile
-import java.lang.reflect.InvocationTargetException
 import java.net.URLEncoder
 import java.nio.file.Files
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
-import org.mockito.Mockito
 
 /** Actual private /fs/read boundary; generated files only, no sockets, auth or Android services. */
 class FleetFileReadSnapshotTest {
@@ -160,23 +157,13 @@ class FleetFileReadSnapshotTest {
     })
   }
 
+  /** The `/fs/read` route itself, which is context-free by construction (it takes only [FleetFiles]). */
   private fun read(file: File?): FleetHttpServer.Response {
-    val context = Mockito.mock(Context::class.java)
-    val routes = FleetRoutes(context)
     val query = if (file == null) "" else
       "path=" + URLEncoder.encode(file.absolutePath, "UTF-8")
     val request = FleetHttpServer.Request("GET", "/fs/read", query, emptyMap(),
         ByteArrayInputStream(byteArrayOf()), 0)
-    val method = FleetRoutes::class.java.getDeclaredMethod(
-        "fsRead", FleetHttpServer.Request::class.java)
-    method.isAccessible = true
-    val response = try {
-      method.invoke(routes, request) as FleetHttpServer.Response
-    } catch (error: InvocationTargetException) {
-      throw error.targetException
-    }
-    Mockito.verifyNoInteractions(context)
-    return response
+    return FleetFileApi(JvmFleetFiles).read(request)
   }
 
   private fun body(response: FleetHttpServer.Response): String {
