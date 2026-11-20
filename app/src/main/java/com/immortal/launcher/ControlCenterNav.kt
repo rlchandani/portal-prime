@@ -37,7 +37,7 @@ internal sealed interface CcModal {
 
 /** What the plan card reads from [CcNav]: floor, lens and the highlighted room. */
 @Immutable
-internal data class CcPlanView(val floorId: String?, val lens: CcLens, val highlightRoom: String?)
+internal data class CcPlanView(val floorId: String?, val lens: CcLens, val highlightRoom: String?, val pointing: Boolean = false)
 
 /** Screen-local navigation (immutable; replaced, never mutated). */
 @Immutable
@@ -51,6 +51,8 @@ internal data class CcNav(
     val cameraFull: String? = null,
     /** Room highlighted on the plan (open sheet or scene walk). */
     val highlightRoom: String? = null,
+    /** [highlightRoom] is Jarvis pointing (no sheet): its edge pulses rather than breathes. */
+    val pointing: Boolean = false,
 ) {
   val topSheet: CcSheet? get() = sheets.lastOrNull()
   val openRoomId: String? get() = sheets.filterIsInstance<CcSheet.Room>().lastOrNull()?.roomId
@@ -64,13 +66,13 @@ internal data class CcNav(
 internal class CcUi(val context: Context, private val navState: MutableState<CcNav>, private val stateOf: () -> CcUiState) {
   /** The whole navigation; reading it in composition recomposes on ANY change (prefer the narrow reads below). */
   val nav: CcNav get() = navState.value
-  private fun set(n: CcNav) { navState.value = n }
+  private fun set(n: CcNav) { navState.value = if (n.pointing && n.highlightRoom == null) n.copy(pointing = false) else n }
 
   // Narrow reads: a composable reading one of these recomposes only when that part changes, so a
   // lens tap doesn't recompose the shell, the sheet host, the modal host or the parked screens.
   private val screenOf = derivedStateOf { navState.value.screen }
   private val floorOf = derivedStateOf { navState.value.floorId }
-  private val planViewOf = derivedStateOf { navState.value.let { CcPlanView(it.floorId, it.lens, it.highlightRoom) } }
+  private val planViewOf = derivedStateOf { navState.value.let { CcPlanView(it.floorId, it.lens, it.highlightRoom, it.pointing && it.sheets.isEmpty()) } }
   private val sheetsOf = derivedStateOf { navState.value.sheets }
   private val modalOf = derivedStateOf { navState.value.modal }
   private val cameraFullOf = derivedStateOf { navState.value.cameraFull }
@@ -94,12 +96,15 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
   }
   fun floor(id: String) = set(nav.copy(floorId = id, sheets = emptyList(), highlightRoom = null))
   fun lens(l: CcLens) = set(nav.copy(lens = l))
-  fun openRoom(roomId: String) = set(nav.copy(sheets = listOf(CcSheet.Room(roomId)), highlightRoom = roomId))
+  fun openRoom(roomId: String) = set(nav.copy(sheets = listOf(CcSheet.Room(roomId)), highlightRoom = roomId, pointing = false))
   /** Floating Jarvis points at [roomId]: the map on its floor, the room lit, no sheet over it. */
   fun pointAt(roomId: String, floorId: String?) = set(nav.copy(screen = CcScreen.MAP, floorId = floorId ?: nav.floorId,
-      sheets = emptyList(), modal = null, highlightRoom = roomId))
+      sheets = emptyList(), modal = null, highlightRoom = roomId, pointing = true))
   /** The pointing ended: drop the highlight unless the user already moved on to another room. */
-  fun stopPointing(roomId: String) { if (nav.highlightRoom == roomId && nav.sheets.isEmpty()) set(nav.copy(highlightRoom = null)) }
+  fun stopPointing(roomId: String) {
+    if (nav.highlightRoom == roomId && nav.sheets.isEmpty()) set(nav.copy(highlightRoom = null, pointing = false))
+    else if (nav.highlightRoom == roomId) set(nav.copy(pointing = false))
+  }
   fun openDevice(entityId: String) = set(nav.copy(sheets = nav.sheets + CcSheet.Device(entityId)))
   fun back() = set(if (nav.modal != null) nav.copy(modal = null) else nav.copy(sheets = nav.sheets.dropLast(1),
       highlightRoom = if (nav.sheets.size <= 1) null else nav.highlightRoom))
@@ -119,17 +124,37 @@ internal class CcUi(val context: Context, private val navState: MutableState<CcN
     val s = stateOf()
     if (CcPolicy.hidden(e, s.settings) || CcPolicy.readOnly(e, s.settings)) return
     if (call.guard != CcGuard.NONE && s.settings.kids) return
-    when (CcPolicy.ask(e, call, s.settings, ControlCenterConfig.scenesSeen(context))) {
+    when (val ask = CcPolicy.ask(e, call, s.settings, ControlCenterConfig.scenesSeen(context))) {
       CcPolicy.Ask.NONE -> if (e.domain == "scene" || e.domain == "script") ControlCenter.runScene(context, e)
           else if (!ControlCenter.send(context, call, undoable = onResult == null, onResult = onResult)) onResult?.invoke(false, null)
+      else -> askModal(e, call, ask, s)
+    }
+  }
+
+  fun runScene(e: CcEntity) = act(e, CcCalls.run(e))
+
+  /**
+   * Jarvis asked for something that asks first ([CcJarvisHome.confirm]): show exactly the sheet a
+   * tap would, never send. Kids-hidden or no-longer-asking calls show nothing (Jarvis already told
+   * the user what happens; a call that stopped asking is left for them to repeat).
+   */
+  fun askFirst(e: CcEntity, call: CcCall) {
+    val s = stateOf()
+    if (CcPolicy.hidden(e, s.settings) || CcPolicy.readOnly(e, s.settings)) return
+    if (call.guard != CcGuard.NONE && s.settings.kids) return
+    val ask = CcPolicy.ask(e, call, s.settings, ControlCenterConfig.scenesSeen(context))
+    if (ask != CcPolicy.Ask.NONE) askModal(e, call, ask, s)
+  }
+
+  private fun askModal(e: CcEntity, call: CcCall, ask: CcPolicy.Ask, s: CcUiState) {
+    when (ask) {
+      CcPolicy.Ask.NONE -> Unit
       CcPolicy.Ask.CONFIRM -> modal(confirmFor(e, call))
       CcPolicy.Ask.CAMERA_CONFIRM -> modal(CcModal.Garage(e.id, call, cameraNear(e, s)))
       CcPolicy.Ask.PIN -> modal(CcModal.Pin(e.id, CcAlarmMode.entries.firstOrNull { it.service == call.service }, "Disarm",
           "Alarm is ${e.state.replace('_', ' ')}"))
     }
   }
-
-  fun runScene(e: CcEntity) = act(e, CcCalls.run(e))
 
   /** Sends a confirmed call (from a modal) and closes it. */
   fun confirmed(call: CcCall) {

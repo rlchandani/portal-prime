@@ -47,4 +47,11 @@ class ControlCenterPresenceTest {
     assertFalse(ccMotionAllowed(resumed = false, interactive = true, screen = ScreenState.INTERACTIVE))
     assertFalse(ccMotionAllowed(resumed = true, interactive = false, screen = ScreenState.INTERACTIVE))
   }
+
+  @Test
+  fun jarvisPointingUnderItsCardAnimatesWhilePausedButNeverOffScreenOrDreaming() {
+    assertTrue(ccMotionAllowed(resumed = false, interactive = true, screen = ScreenState.INTERACTIVE, pointedAt = true))
+    assertFalse(ccMotionAllowed(resumed = false, interactive = false, screen = ScreenState.INTERACTIVE, pointedAt = true))
+    assertFalse(ccMotionAllowed(resumed = false, interactive = true, screen = ScreenState.DREAMING, pointedAt = true))
+  }
 }

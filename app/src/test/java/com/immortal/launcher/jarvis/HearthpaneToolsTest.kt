@@ -108,4 +108,18 @@ class HearthpaneToolsTest {
     front = screen("home")
     assertFalse(tools.invoke(HearthpaneTools.SCREEN_CONTEXT, "{}").has("settings_matches"))
   }
+
+  @Test fun homeControlHandsTheRawArgumentsToTheControlCenter() {
+    val seen = mutableListOf<String?>()
+    val t = HearthpaneTools({ front }, { _, _ -> }, homeControl = { a -> seen += a; JSONObject().put("ok", true).put("result", "done") })
+    assertEquals("done", t.invoke(HearthpaneTools.HOME_CONTROL, "{\"request\":\"turn off the kitchen lights\"}").getString("result"))
+    assertEquals(listOf("{\"request\":\"turn off the kitchen lights\"}"), seen)
+  }
+
+  @Test fun aFailingHomeControlIsAnErrorNotACrash() {
+    val t = HearthpaneTools({ front }, { _, _ -> }, homeControl = { throw IllegalStateException("boom") })
+    assertTrue(t.invoke(HearthpaneTools.HOME_CONTROL, "{}").has("error"))
+    // Without the Control Center seam (the default) it says so.
+    assertTrue(tools.invoke(HearthpaneTools.HOME_CONTROL, "{}").has("error"))
+  }
 }
