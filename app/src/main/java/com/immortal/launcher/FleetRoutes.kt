@@ -460,7 +460,7 @@ class FleetRoutes(private val context: Context) {
             .put("result", ControlCenter.debug(context, dry, plan, alert, unreachable, fake)))
       }
       // Verification only: swap every photo source for generated scenes (expires on its own), or
-      // switch back. {"enabled":true|false, "minutes":1..240, "night":false|true}. Any frame already on screen is
+      // switch back. {"enabled":true|false, "minutes":1..240, "night":false|true, "mode":"kenBurns", "intervalSec":5..600}. Any frame already on screen is
       // retired first so household photos are never on screen while the switch is on; enabling
       // then opens a fresh frame on the generated scenes. Release builds report unavailable.
       "screensaver_test_source" -> {
@@ -470,7 +470,14 @@ class FleetRoutes(private val context: Context) {
           return resp(400, err("bad_minutes"))
         // "night":true also forces the dark-room state (night colours) without the light sensor.
         val night = body.optBoolean("night", false)
-        val applied = if (enable) ScreensaverTestSource.enable(context, minutes, night = night)
+        // Performance A/B: {"mode":"<screensaver mode>","intervalSec":5..600} pins one mode at a
+        // fixed beat for the same span instead of the household's mode and interval.
+        val pinMode = body.optString("mode", "")
+        val pin = if (enable && pinMode.isNotEmpty()) {
+          ScreensaverTestSource.Pin.of(pinMode, body.optInt("intervalSec", 30))
+              ?: return resp(400, err("bad_pin"))
+        } else null
+        val applied = if (enable) ScreensaverTestSource.enable(context, minutes, night = night, pin = pin)
             else ScreensaverTestSource.disable(context)
         if (applied) {
           val main = android.os.Handler(android.os.Looper.getMainLooper())
@@ -488,6 +495,7 @@ class FleetRoutes(private val context: Context) {
             .put("available", ScreensaverTestSource.available())
             .put("active", ScreensaverTestSource.active(context))
             .put("night", ScreensaverTestSource.forcedNight(context))
+            .put("pin", ScreensaverTestSource.pin(context)?.let { "${it.mode}@${it.intervalSec}s" } ?: JSONObject.NULL)
             .put("until", ScreensaverTestSource.until(context)))
       }
       // Verification only (test-source builds): open the digital clock preview, optionally on a

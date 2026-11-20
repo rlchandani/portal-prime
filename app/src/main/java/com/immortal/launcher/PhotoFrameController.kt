@@ -452,7 +452,8 @@ class PhotoFrameController(
     stopped = false
     // Guest mode swaps personal photos and the calendar for neutral ones (GuestPolicy).
     settings = GuestPolicy.screensaver(ScreensaverConfig.load(context)).let {
-      if (photosOnly) musicPhotoSettings(it) else it
+      // Operator performance runs: the test source can hold one mode at a fixed interval.
+      if (photosOnly) musicPhotoSettings(it) else ScreensaverTestSource.pinned(it, ScreensaverTestSource.pin(context))
     }
     val root = view as FrameLayout
     observeNightSettings()
