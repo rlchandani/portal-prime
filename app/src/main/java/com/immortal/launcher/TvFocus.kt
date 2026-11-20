@@ -18,13 +18,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -114,40 +111,4 @@ fun Modifier.tvFocusableRow(
   return focusable.clickable(interactionSource = source, indication = null, enabled = clickEnabled) {
     if (gate?.acceptsAction() ?: clickEnabled) onClick()
   }
-}
-
-/**
- * A focus ring for an element that's already focusable+clickable on its own (e.g. a
- * Material Button). Pass the element's [interactionSource] so the ring lights up when
- * the remote selects it, without adding a second click handler.
- */
-@Composable
-fun Modifier.focusRing(
-    interactionSource: MutableInteractionSource,
-    shape: Shape = RoundedCornerShape(14.dp),
-    ringColor: Color = Color.White,
-): Modifier {
-  val focused by interactionSource.collectIsFocusedAsState()
-  val scale by animateFloatAsState(if (focused) 1.04f else 1f, label = "focusRingScale")
-  return this.scale(scale)
-      .border(
-          BorderStroke(if (focused) 3.dp else 0.dp, if (focused) ringColor else Color.Transparent),
-          shape,
-      )
-}
-
-/**
- * Remembers a [FocusRequester] and requests focus once the node is attached, so a
- * screen opens with something selected for the remote. Attach the returned modifier
- * to the element that should start focused.
- */
-@Composable
-fun rememberInitialFocus(): Pair<FocusRequester, Modifier> {
-  val requester = remember { FocusRequester() }
-  val modifier = Modifier.focusRequester(requester)
-  DisposableEffect(Unit) {
-    runCatching { requester.requestFocus() }
-    onDispose {}
-  }
-  return requester to modifier
 }

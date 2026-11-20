@@ -78,7 +78,6 @@ internal data class CcEntity(
   val mediaTitle: String? get() = attrs["media_title"] as? String
   val mediaArtist: String? get() = (attrs["media_artist"] ?: attrs["media_album_name"]) as? String
   val volume: Float? get() = (attrs["volume_level"] as? Number)?.toFloat()
-  val isMuted: Boolean get() = attrs["is_volume_muted"] == true
 
   val supportedFeatures: Int get() = (attrs["supported_features"] as? Number)?.toInt() ?: 0
   val codeFormat: String? get() = attrs["code_format"] as? String

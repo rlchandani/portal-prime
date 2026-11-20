@@ -45,7 +45,6 @@ object RemotePairing {
   internal const val PIN_TTL_MS = 5 * 60_000L
   /** Wrong guesses (from any address) that burn the PIN; see [PairingThrottle] for the waits. */
   internal const val MAX_PIN_ATTEMPTS = PairingThrottle.PIN_FAILURES
-  const val HOUSEHOLD_WINDOW_MS = HouseholdGrantPolicy.WINDOW_MS
 
   /** The result of one `/remote/pair` attempt. */
   sealed interface RedeemResult {

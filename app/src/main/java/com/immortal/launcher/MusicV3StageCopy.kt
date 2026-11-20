@@ -31,8 +31,6 @@ internal object MusicV3StageCopy {
   /** "Browse · Up next" while something is loaded, "Browse · Library" with nothing. */
   fun peekLabel(idle: Boolean): String = if (idle) "Library" else "Up next"
 
-  fun peekNext(next: YtTrack?): String? = next?.let { if (it.artist.isBlank()) it.title else "${it.title} · ${it.artist}" }
-
   fun playing(title: String): String = "Playing $title"
 
   fun movedSlot(room: String): String = "Playing in $room"

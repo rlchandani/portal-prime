@@ -17,13 +17,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
@@ -39,7 +36,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -171,24 +167,6 @@ internal fun BoxScope.CcCenteredMessage(icon: String, title: String, body: Strin
     }
   }
 }
-
-/** A full-size area that dims and blocks touches while controls are disabled, with the reason. */
-@Composable
-internal fun CcDisabledVeil(reason: String?, content: @Composable () -> Unit) {
-  val c = LocalCc.current
-  Box {
-    Box(Modifier.alpha(if (reason == null) 1f else CC_DIMMED_ALPHA)) { content() }
-    if (reason != null) Box(Modifier.matchParentSizeCompat().clickable(enabled = true, onClick = {}).semantics { contentDescription = reason }) {
-      Text(reason, color = c.sec, fontSize = 19.sp, textAlign = TextAlign.Center, modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp))
-    }
-  }
-}
-
-@Composable
-private fun Modifier.matchParentSizeCompat(): Modifier = this.then(Modifier.fillMaxSize())
-
-@Composable
-internal fun RowScope.CcSpacer(w: Int) { Box(Modifier.width(w.dp)) }
 
 internal const val CC_DISABLED_ALPHA = 0.35f
 internal const val CC_DIMMED_ALPHA = 0.55f

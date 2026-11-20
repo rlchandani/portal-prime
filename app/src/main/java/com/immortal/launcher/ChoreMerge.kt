@@ -26,9 +26,6 @@ internal object ChoreMerge {
     )
   }
 
-  /** Positive when [a] should replace [b]. */
-  fun compareTicks(a: ChoreTick, b: ChoreTick): Int = tickOrder.compare(a, b)
-
   private fun <T> mergeMaps(a: Map<String, T>, b: Map<String, T>, order: Comparator<T>): Map<String, T> {
     if (a == b) return a
     return (a.keys + b.keys).associateWith { id ->

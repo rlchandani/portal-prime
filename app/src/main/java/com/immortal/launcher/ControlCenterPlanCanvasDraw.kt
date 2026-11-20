@@ -49,7 +49,6 @@ internal class CcPlanDraw(
   val windowOpenDash = PathEffect.dashPathEffect(floatArrayOf(10f * dp, 7f * dp))
   val dotStroke = Stroke(3f * dp)
   val personStroke = Stroke(4f * dp)
-  val focusStroke = Stroke(FOCUS_DP * dp, join = StrokeJoin.Round)
   val window = Color(WINDOW_RGB)
   private val lit: Map<String, Lit> = model.views.filter { it.glows.isNotEmpty() }.associate { v ->
     val maxB = v.glows.maxOf { it.strength }

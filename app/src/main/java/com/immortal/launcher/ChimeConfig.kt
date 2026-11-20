@@ -41,9 +41,6 @@ object ChimeConfig {
       val sunriseVariant: Int = 0,
   )
 
-  /** True if any audible hourly feature is enabled (so the scheduler should run). */
-  fun Settings.anyHourlyOn(): Boolean = hourlyChimeOn || spokenTimeOn
-
   private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
   fun load(context: Context): Settings {

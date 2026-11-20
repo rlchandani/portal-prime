@@ -260,15 +260,6 @@ internal fun ApprovedAppsIcon(
   }
 }
 
-@Composable
-internal fun rememberApprovedPackageInstalled(pkg: String, status: String? = null): State<Boolean?> {
-  val context = LocalContext.current
-  val resume = rememberApprovedResume()
-  return produceState<Boolean?>(null, pkg, status, resume) {
-    value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { StoreCatalog.isInstalled(context, pkg) }
-  }
-}
-
 /** Keep the 1920 × 1280 dp canvas aligned after permission and external-app handoffs. */
 @Composable
 private fun ApprovedAppsImmersive() {

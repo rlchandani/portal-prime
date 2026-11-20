@@ -40,8 +40,6 @@ object PremiumFraming {
     companion object {
       /** Subject leans right, away from the bottom-left clock. */
       val DEFAULT = Target(.58f, .42f)
-      /** Subject leans left, away from a right-hand calendar panel. */
-      val AWAY_FROM_RIGHT_PANEL = Target(.42f, .45f)
     }
   }
 

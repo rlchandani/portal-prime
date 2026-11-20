@@ -130,8 +130,6 @@ internal object SettingsPreviewPhotos {
 
     fun clear() = cache.evictAll()
 
-    /** Photo [index] wraps around the bundled set. */
-    fun nameAt(index: Int): String = names[Math.floorMod(index, names.size)]
 }
 
 /** The bundled photos once [start] is true (never decoded during a page switch). */

@@ -11,8 +11,6 @@ object SlideshowDecodeBudget {
   const val MAX_EDGE = 2400
   const val MAX_PIXELS = 3L * 1024 * 1024
   const val MAX_PIXEL_BYTES = MAX_PIXELS * 4
-  /** A mirrored/rotated decode may temporarily own the sampled source and upright output. */
-  const val MAX_TRANSFORM_PIXEL_BYTES = MAX_PIXEL_BYTES * 2
   const val MAX_ENCODED_BYTES = 32 * 1024 * 1024
 
   data class Size(val width: Int, val height: Int)

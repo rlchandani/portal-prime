@@ -128,9 +128,6 @@ private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
   /** Gentle sound marking sunset (res/raw/golden_sunset.mp3 — "Goodnight"). */
   fun playSunsetTone(context: Context) = playRaw(context, R.raw.golden_sunset)
 
-  /** Generic golden-hour preview (used by the Sounds "Play tone" test button). */
-  fun playGoldenHourTone(context: Context) = playSunriseTone(context)
-
   /** Play a bundled raw audio resource through the alarm stream at the golden volume. */
   private fun playRaw(context: Context, resId: Int) {
     runCatching {

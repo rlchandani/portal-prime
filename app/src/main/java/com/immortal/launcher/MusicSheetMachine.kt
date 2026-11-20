@@ -75,8 +75,6 @@ internal object MusicSheetMachine {
  * 1 open; drags past either end are rubber-banded; release flicks by velocity, else by position.
  */
 internal object MusicSheetDrag {
-  /** Movement before a press becomes a drag (dp). */
-  const val SLOP_DP = 10f
   /** Past either end the sheet follows the finger at this share. */
   const val RUBBER = 0.25f
   /** Release faster than this (progress per second) decides by direction. */

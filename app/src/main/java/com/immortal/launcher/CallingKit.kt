@@ -78,7 +78,6 @@ internal object CallColors {
   val BarDivider = Color(0x33FFFFFF)
   val EmberOn = Color(0x47F0A65A)
   val EmberOnIcon = Color(0xFFFFD2A1)
-  val EmberEdge = Color(0x99F0A65A)
   val OffIcon = Color(0xFF16181D)
   val DropTop = Color(0xFFB3262F)
   val DropBottom = Color(0xFF8E1C24)

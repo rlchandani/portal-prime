@@ -64,11 +64,6 @@ internal fun Context.dispatchApprovedHomeTab(tab: ApprovedLauncherTab, searchApp
       true
     }.acknowledgeNavigation(onNavigated)
 
-/** Keep the existing Apps entry point for callers outside the launcher. */
-internal fun Context.openApprovedHomeApps() {
-  openApprovedHomeTab(ApprovedLauncherTab.APPS)
-}
-
 /** Home and Tools › Timers both edit the household timers ([SharedTimers]). */
 @Composable
 internal fun ApprovedHomeTimersPage(onDismiss: () -> Unit) {
