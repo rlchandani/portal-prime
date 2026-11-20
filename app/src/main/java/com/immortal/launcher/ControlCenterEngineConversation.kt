@@ -23,7 +23,8 @@ internal fun CcEngine.handle(ws: CcSocket, p: CcProtocol, text: String) {
     is CcProtocol.Out.Entities -> entities { live.applyCompressed(out.event, clock()) }
     is CcProtocol.Out.Snapshot -> entities { live.snapshot(out.entities) }
     is CcProtocol.Out.Changed -> entities { live.update(mapOf(out.entityId to out.entity), clock()) }
-    CcProtocol.Out.Subscribed -> setPhase(ui.connection.phase, "Waiting for the first update")
+    // Already live (a resubscribe, or get_states answered first): the states are here, nothing to wait for.
+    CcProtocol.Out.Subscribed -> if (ui.connection.phase != CcPhase.LIVE) setPhase(ui.connection.phase, "Waiting for the first update")
     CcProtocol.Out.Pong -> Unit
     is CcProtocol.Out.Result -> result(ws, p, out)
   }
@@ -40,7 +41,7 @@ private fun CcEngine.entities(change: () -> CcLive) {
   if (ui.connection.phase != CcPhase.LIVE) {
     attempt = 0; hadLive = true
     ui = ui.copy(connection = CcConnection(CcPhase.LIVE, "", clock(), 0L))
-  } else ui = ui.copy(connection = ui.connection.copy(lastLiveAt = clock()))
+  } else ui = ui.copy(connection = ui.connection.copy(step = "", lastLiveAt = clock()))
   scheduleFlush()
 }
 

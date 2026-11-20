@@ -85,7 +85,15 @@ internal fun CcEngine.savePlan(plan: CcPlan) {
   }
   host.savePlan(stamped)
   ui = ui.copy(plan = stamped, planSource = CcPlanSource.THIS_PORTAL)
-  if (!sendPlanToHa(stamped)) toast("Saved on this Portal. It will copy to Home Assistant when connected.")
+  // Over HA's ceiling the plan never copies, connected or not: say so rather than promise it.
+  val bytes = CcPlanJson.encodedBytes(stamped)
+  when {
+    bytes > CcPlanJson.MAX_BYTES -> {
+      log.i("control center plan is $bytes bytes, over Home Assistant's ${CcPlanJson.MAX_BYTES}; kept on this Portal")
+      toast(CcPlanJson.tooLargeToast(bytes), error = true)
+    }
+    !sendPlanToHa(stamped) -> toast("Saved on this Portal. It will copy to Home Assistant when connected.")
+  }
   publish()
   ensure()
 }

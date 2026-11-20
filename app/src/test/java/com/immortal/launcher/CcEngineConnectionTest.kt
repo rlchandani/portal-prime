@@ -74,6 +74,39 @@ class CcEngineConnectionTest {
         .put("new_state", JSONObject().put("entity_id", "light.kitchen").put("state", "off").put("attributes", JSONObject()))))
     r.advance(CcEngine.FLUSH_MS)
     assertEquals("off", r.state.entity("light.kitchen")?.state)
+    assertEquals("", r.state.connection.step)
+  }
+
+  @Test fun theGetStatesFallbackDoesNotShowWaitingOnceStatesArrived() {
+    val r = CcEngineRig()
+    r.engine.setVisible(true); r.sched.runDue()
+    r.handshake()
+    r.reply("subscribe_entities", ok = false, error = "Unknown command")
+    r.reply("get_states", JSONArray().put(JSONObject().put("entity_id", "light.kitchen").put("state", "on").put("attributes", JSONObject())))
+    r.reply("subscribe_events")
+    r.advance(CcEngine.FLUSH_MS)
+    assertEquals(CcPhase.LIVE, r.state.connection.phase)
+    assertEquals("", r.state.connection.step)
+  }
+
+  @Test fun aResubscribeWhileLiveClearsTheStepOnceStateArrives() {
+    val r = CcEngineRig().apply { connectLive() }
+    r.engine.setVisible(false); r.sched.runDue()
+    r.reply("subscribe_entities")
+    assertEquals(CcPhase.LIVE, r.state.connection.phase)
+    assertEquals("", r.state.connection.step)
+    r.event("subscribe_entities", JSONObject().put("a", JSONObject().put("binary_sensor.leak", CcEngineRig.state("on", "Leak", "moisture"))))
+    r.advance(CcEngine.FLUSH_MS)
+    assertEquals("", r.state.connection.step)
+    assertEquals("on", r.state.entity("binary_sensor.leak")?.state)
+  }
+
+  @Test fun aStepLeftOverWhileLiveIsClearedByTheNextState() {
+    val r = CcEngineRig().apply { connectLive() }
+    r.run { setPhase(CcPhase.LIVE, "Waiting for the first update") }
+    r.event("subscribe_entities", diff("light.kitchen", "off"))
+    r.advance(CcEngine.FLUSH_MS)
+    assertEquals("", r.state.connection.step)
   }
 
   @Test fun disconnectMidCallFailsTheCallAndReconnectsOnANewGeneration() {

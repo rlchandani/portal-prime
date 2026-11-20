@@ -106,15 +106,15 @@ send#0 {"id":8,"type":"get_states"}
 send#0 {"event_type":"state_changed","id":9,"type":"subscribe_events"}
 ha#0 {"result":[{"attributes":{"friendly_name":"Kitchen light"},"state":"on","entity_id":"light.kitchen","last_changed":"2023-11-14T22:00:00.000000+00:00"},{"attributes":{"friendly_name":"Front lock"},"state":"locked","entity_id":"lock.front","last_changed":"2023-11-14T22:00:00.000000+00:00"},{"attributes":{"friendly_name":"Garage light"},"state":"on","entity_id":"light.not_watched","last_changed":"2023-11-14T22:00:00.000000+00:00"}],"success":true,"id":8,"type":"result"}
 ha#0 {"success":true,"id":9,"type":"result"}
-state LIVE 'Waiting for the first update' live=+0 retry=0 v=2 ents=2[light.kitchen=on,lock.front=locked] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
 advance 100 -> t=+100
+state LIVE '' live=+0 retry=0 v=2 ents=2[light.kitchen=on,lock.front=locked] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
 ha#0 {"id":9,"type":"event","event":{"event_type":"state_changed","data":{"new_state":{"attributes":{"friendly_name":"Kitchen light"},"state":"off","entity_id":"light.kitchen","last_changed":"2023-11-14T22:13:21.000000+00:00"},"entity_id":"light.kitchen"}}}
 ha#0 {"id":9,"type":"event","event":{"event_type":"state_changed","data":{"new_state":{"attributes":{},"state":"off","entity_id":"light.not_watched","last_changed":"2023-11-14T22:13:21.000000+00:00"},"entity_id":"light.not_watched"}}}
 advance 100 -> t=+200
-state LIVE 'Waiting for the first update' live=+100 retry=0 v=3 ents=2[light.kitchen=off,lock.front=locked] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+state LIVE '' live=+100 retry=0 v=3 ents=2[light.kitchen=off,lock.front=locked] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
 ha#0 {"id":9,"type":"event","event":{"event_type":"state_changed","data":{"new_state":null,"entity_id":"lock.front"}}}
 advance 100 -> t=+300
-state LIVE 'Waiting for the first update' live=+200 retry=0 v=4 ents=1[light.kitchen=off] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+state LIVE '' live=+200 retry=0 v=4 ents=1[light.kitchen=off] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
 
 ## heartbeat, pong, stale socket and reconnect with a new generation
 state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
@@ -472,12 +472,13 @@ ha#0 {"id":999,"type":"event","event":{"a":{"light.ghost":{"s":"on"}}}}
 ha#0 {"type":"mystery"}
 advance 100 -> t=+300
 do savePlan {"bigRooms":1400}
-state LIVE '' live=+100 retry=0 v=3 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Saved on this Portal. It will copy to Home Assistant when connected.' debug=- alerts=[] scene=- - dismissed=[]
+log i HearthpaneControl: control center plan is 347130 bytes, over Home Assistant's 262144; kept on this Portal
+state LIVE '' live=+100 retry=0 v=3 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Too large to save in Home Assistant · kept on this Portal (339 KB, limit 256 KB). Simplify the plan (fewer rooms or devices) to share it.'! debug=- alerts=[] scene=- - dismissed=[]
 do files
 files plan=1f@+300 testPlan=- dryRunPref=false
 ha#0 {"id":7,"type":"event","event":{"c":{"light.kitchen":{"+":{"s":"off"}}}}}
 advance 100 -> t=+400
-state LIVE '' live=+300 retry=0 v=4 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Saved on this Portal. It will copy to Home Assistant when connected.' debug=- alerts=[] scene=- - dismissed=[]
+state LIVE '' live=+300 retry=0 v=4 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Too large to save in Home Assistant · kept on this Portal (339 KB, limit 256 KB). Simplify the plan (fewer rooms or devices) to share it.'! debug=- alerts=[] scene=- - dismissed=[]
 
 ## plan load and save: newer local copy, HA ack and refusal, dry run, test plan
 state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]
@@ -839,10 +840,9 @@ do visible {"on":true}
 send#0 {"id":9,"subscription":7,"type":"unsubscribe_events"}
 send#0 {"entity_ids":["alarm_control_panel.home","binary_sensor.front_door","binary_sensor.kitchen_leak","camera.porch","light.kitchen","lock.front","scene.movie","sensor.kitchen_temp","sensor.model_y_battery_level","sensor.model_y_charge_energy_added","valve.water_main"],"id":10,"type":"subscribe_entities"}
 ha#0 {"success":true,"id":10,"type":"result"}
-state LIVE 'Waiting for the first update' live=+100 retry=0 v=3 ents=2[binary_sensor.front_door=off,binary_sensor.kitchen_leak=on] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[binary_sensor.kitchen_leak:critical] scene=- - dismissed=[]
 ha#0 {"id":10,"type":"event","event":{"a":{"camera.porch":{"a":{"friendly_name":"Porch"},"s":"idle","lc":1699999000},"alarm_control_panel.home":{"a":{"friendly_name":"Alarm"},"s":"disarmed","lc":1699999000},"light.kitchen":{"a":{"friendly_name":"Kitchen light","brightness":200},"s":"on","lc":1699999000},"binary_sensor.front_door":{"a":{"friendly_name":"Front door","device_class":"door"},"s":"off","lc":1699999000},"scene.movie":{"a":{"friendly_name":"Movie time","entity_id":["light.kitchen"]},"s":"unknown","lc":1699999000},"sensor.model_y_charge_energy_added":{"a":{"friendly_name":"Model Y energy added","unit_of_measurement":"kWh"},"s":"12.0","lc":1699999000},"valve.water_main":{"a":{"friendly_name":"Water main"},"s":"open","lc":1699999000},"sensor.kitchen_temp":{"a":{"friendly_name":"Kitchen temperature","unit_of_measurement":"°C","device_class":"temperature"},"s":"21.5","lc":1699999000},"sensor.model_y_battery_level":{"a":{"friendly_name":"Model Y battery","unit_of_measurement":"%"},"s":"80","lc":1699999000},"lock.front":{"a":{"friendly_name":"Front lock"},"s":"locked","lc":1699999000},"binary_sensor.kitchen_leak":{"a":{"friendly_name":"Kitchen leak","device_class":"moisture"},"s":"off","lc":1699999000}}}}
 advance 100 -> t=+30300
-state LIVE 'Waiting for the first update' live=+30200 retry=0 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+state LIVE '' live=+30200 retry=0 v=4 ents=11[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
 do visible {"on":false}
 send#0 {"id":11,"subscription":10,"type":"unsubscribe_events"}
 send#0 {"entity_ids":["binary_sensor.front_door","binary_sensor.kitchen_leak"],"id":12,"type":"subscribe_entities"}
@@ -850,7 +850,7 @@ advance 100 -> t=+30400
 do prefs {"prefs":{"hearthpane_control_center":{"banners_listen":false}}}
 do reloadSettings
 close#0 1000
-state LIVE 'Waiting for the first update' live=+30200 retry=0 v=5 ents=2[binary_sensor.front_door=off,binary_sensor.kitchen_leak=off] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
+state LIVE '' live=+30200 retry=0 v=5 ents=2[binary_sensor.front_door=off,binary_sensor.kitchen_leak=off] pending=[] reg=11e/2c plan=1f/2r@-10000000/HOME_ASSISTANT toast=- debug=- alerts=[] scene=- - dismissed=[]
 do pending
 timers []
 

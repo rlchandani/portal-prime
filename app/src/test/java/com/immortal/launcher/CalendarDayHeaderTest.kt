@@ -17,7 +17,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito
-import sun.misc.Unsafe
 
 class CalendarDayHeaderTest {
   @Test fun tomorrowSurvivesTheTwentyFiveHourDay() = fixture("fall") { f ->
@@ -104,15 +103,6 @@ class CalendarDayHeaderTest {
           start.get(Calendar.MONTH), ruleDay(start), ruleWeekday(start), 2 * hour,
           end.get(Calendar.MONTH), ruleDay(end), ruleWeekday(end), 2 * hour, hour)
     }
-    private val unsafe = Unsafe::class.java.getDeclaredField("theUnsafe").run {
-      isAccessible = true
-      get(null) as Unsafe
-    }
-    private val controller =
-        unsafe.allocateInstance(PhotoFrameController::class.java) as PhotoFrameController
-    private val method = PhotoFrameController::class.java.getDeclaredMethod(
-        "dayHeader", Long::class.javaPrimitiveType).apply { isAccessible = true }
-
     fun header(dayOffset: Int): String {
       // Construct the event's local date independently of elapsed-hour arithmetic.
       val event = GregorianCalendar(zone, Locale.US).apply {
@@ -128,7 +118,7 @@ class CalendarDayHeaderTest {
         assertEquals(23, localNow.get(Calendar.HOUR_OF_DAY))
         assertEquals(30, localNow.get(Calendar.MINUTE))
       }
-      return method.invoke(controller, event.timeInMillis) as String
+      return PhotoFrameCalendarPanel.dayHeader(event.timeInMillis)
     }
   }
 }

@@ -51,6 +51,7 @@ class ClassicLocalImageFailureTest {
     val bitmap = Mockito.mock(Bitmap::class.java)
 
     init {
+      PhotoFrameTestPorts.install(controller, Mockito.mock(android.content.Context::class.java))
       set("io", worker)
       set("ui", main)
       set("settings", ScreensaverConfig.Settings(mode = ScreensaverConfig.MODE_CLASSIC,

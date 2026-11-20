@@ -1,0 +1,2739 @@
+## smart frame on the built-in feed: native stage, first photo, dwell and advance
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+pending [0, 1800000, 1800000]
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 17000)
+pending [17000, 1800000, 1800000]
+> advance 17000
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 17000)
+pending [17000, 1783000, 1783000]
+
+## classic on the built-in feed: web feed worker and a rotate every interval
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+Handler1.postDelayed(fn, 23000)
+pending [23000, 1800000, 1800000]
+> advance 23000
+exec io
+Handler1.postDelayed(fn, 23000)
+pending [23000, 1777000, 1777000]
+
+## engine style on the built-in feed: keyless Picsum batch sized to the panel
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+FaceFocusStore1.setActive(true)
+LegacySlideshowPreparation1.request(fn, fn, fn)
+> prepareEngine
+FaceFocusStore1.focusFor("https://picsum.photos/seed/ridge/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/ridge/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/harbor/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/harbor/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/desert/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/desert/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/forest7/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/forest7/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/coast22/1920/1200")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/coast22/1920/1200")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/city88/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/city88/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitA/1280/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitA/1280/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitB/1280/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitB/1280/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitC/1371/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitC/1371/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitD/1280/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitD/1280/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/waterfall/1200/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/waterfall/1200/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/tower55/1280/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/tower55/1280/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/square1/1920/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/square1/1920/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/square2/1920/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/square2/1920/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/square3/1920/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/square3/1920/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/pano1/1920/720")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/pano1/1920/720")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/pano2/1920/640")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/pano2/1920/640")
+engine photos [{"url":"https://picsum.photos/seed/ridge/1920/1280"},{"url":"https://picsum.photos/seed/harbor/1920/1280"},{"url":"https://picsum.photos/seed/desert/1920/1280"},{"url":"https://picsum.photos/seed/forest7/1920/1280"},{"url":"https://picsum.photos/seed/coast22/1920/1200"},{"url":"https://picsum.photos/seed/city88/1920/1280"},{"url":"https://picsum.photos/seed/portraitA/1280/1920"},{"url":"https://picsum.photos/seed/portraitB/1280/1920"},{"url":"https://picsum.photos/seed/portraitC/1371/1920"},{"url":"https://picsum.photos/seed/portraitD/1280/1920"},{"url":"https://picsum.photos/seed/waterfall/1200/1920"},{"url":"https://picsum.photos/seed/tower55/1280/1920"},{"url":"https://picsum.photos/seed/square1/1920/1920"},{"url":"https://picsum.photos/seed/square2/1920/1920"},{"url":"https://picsum.photos/seed/square3/1920/1920"},{"url":"https://picsum.photos/seed/pano1/1920/720"},{"url":"https://picsum.photos/seed/pano2/1920/640"}]
+pending [1800000, 1800000]
+
+## engine style on a portrait Mini panel caps the batch at its long edge
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+FaceFocusStore1.setActive(true)
+LegacySlideshowPreparation1.request(fn, fn, fn)
+> prepareEngine
+FaceFocusStore1.focusFor("https://picsum.photos/seed/ridge/1280/853")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/ridge/1280/853")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/harbor/1280/853")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/harbor/1280/853")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/desert/1280/853")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/desert/1280/853")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/forest7/1280/853")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/forest7/1280/853")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/coast22/1280/800")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/coast22/1280/800")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/city88/1280/853")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/city88/1280/853")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitA/853/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitA/853/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitB/853/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitB/853/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitC/914/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitC/914/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitD/853/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitD/853/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/waterfall/800/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/waterfall/800/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/tower55/853/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/tower55/853/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/square1/1280/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/square1/1280/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/square2/1280/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/square2/1280/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/square3/1280/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/square3/1280/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/pano1/1280/480")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/pano1/1280/480")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/pano2/1280/426")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/pano2/1280/426")
+engine photos [{"url":"https://picsum.photos/seed/ridge/1280/853"},{"url":"https://picsum.photos/seed/harbor/1280/853"},{"url":"https://picsum.photos/seed/desert/1280/853"},{"url":"https://picsum.photos/seed/forest7/1280/853"},{"url":"https://picsum.photos/seed/coast22/1280/800"},{"url":"https://picsum.photos/seed/city88/1280/853"},{"url":"https://picsum.photos/seed/portraitA/853/1280"},{"url":"https://picsum.photos/seed/portraitB/853/1280"},{"url":"https://picsum.photos/seed/portraitC/914/1280"},{"url":"https://picsum.photos/seed/portraitD/853/1280"},{"url":"https://picsum.photos/seed/waterfall/800/1280"},{"url":"https://picsum.photos/seed/tower55/853/1280"},{"url":"https://picsum.photos/seed/square1/1280/1280"},{"url":"https://picsum.photos/seed/square2/1280/1280"},{"url":"https://picsum.photos/seed/square3/1280/1280"},{"url":"https://picsum.photos/seed/pano1/1280/480"},{"url":"https://picsum.photos/seed/pano2/1280/426"}]
+
+## filmstrip uses the native filmstrip stage
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+FaceRenderer1.setPaperPhotoSurface(false)
+FaceFocusStore1.setActive(true)
+new FilmstripEngine(ctx, ["https://picsum.photos/seed/ridge/1920/1280", "https://picsum.photos/seed/harbor/1920/1280", "https://picsum.photos/seed/desert/1920/1280", "https://picsum.photos/seed/forest7/1920/1280", "https://picsum.photos/seed/coast22/1920/1200", "https://picsum.photos/seed/city88/1920/1280", "https://picsum.photos/seed/portraitA/1280/1920", "https://picsum.photos/seed/portraitB/1280/1920", "https://picsum.photos/seed/portraitC/1371/1920", "https://picsum.photos/seed/portraitD/1280/1920", "https://picsum.photos/seed/waterfall/1200/1920", "https://picsum.photos/seed/tower55/1280/1920", "https://picsum.photos/seed/square1/1920/1920", "https://picsum.photos/seed/square2/1920/1920", "https://picsum.photos/seed/square3/1920/1920", "https://picsum.photos/seed/pano1/1920/720", "https://picsum.photos/seed/pano2/1920/640"], 12000, fn, fn, false, fn, fn, false, false, null, false, null, 7936, null)
+FrameLayout1.addView(FilmstripEngine1, LayoutParams15)
+FaceRenderer1.view.bringToFront()
+FrameLayout2.bringToFront()
+FrameLayout3.bringToFront()
+FilmstripEngine1.setHostActive(true)
+FilmstripEngine1.setPaused(false)
+FilmstripEngine1.start()
+pending [1800000, 1800000]
+
+## shuffle style (engine) with photo motion off
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+FaceFocusStore1.setActive(true)
+LegacySlideshowPreparation1.request(fn, fn, fn)
+> prepareEngine
+FaceFocusStore1.focusFor("https://picsum.photos/seed/ridge/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/ridge/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/harbor/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/harbor/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/desert/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/desert/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/forest7/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/forest7/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/coast22/1920/1200")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/coast22/1920/1200")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/city88/1920/1280")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/city88/1920/1280")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitA/1280/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitA/1280/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitB/1280/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitB/1280/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitC/1371/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitC/1371/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/portraitD/1280/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/portraitD/1280/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/waterfall/1200/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/waterfall/1200/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/tower55/1280/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/tower55/1280/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/square1/1920/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/square1/1920/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/square2/1920/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/square2/1920/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/square3/1920/1920")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/square3/1920/1920")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/pano1/1920/720")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/pano1/1920/720")
+FaceFocusStore1.focusFor("https://picsum.photos/seed/pano2/1920/640")
+FaceFocusStore1.weightFor("https://picsum.photos/seed/pano2/1920/640")
+engine photos [{"url":"https://picsum.photos/seed/ridge/1920/1280"},{"url":"https://picsum.photos/seed/harbor/1920/1280"},{"url":"https://picsum.photos/seed/desert/1920/1280"},{"url":"https://picsum.photos/seed/forest7/1920/1280"},{"url":"https://picsum.photos/seed/coast22/1920/1200"},{"url":"https://picsum.photos/seed/city88/1920/1280"},{"url":"https://picsum.photos/seed/portraitA/1280/1920"},{"url":"https://picsum.photos/seed/portraitB/1280/1920"},{"url":"https://picsum.photos/seed/portraitC/1371/1920"},{"url":"https://picsum.photos/seed/portraitD/1280/1920"},{"url":"https://picsum.photos/seed/waterfall/1200/1920"},{"url":"https://picsum.photos/seed/tower55/1280/1920"},{"url":"https://picsum.photos/seed/square1/1920/1920"},{"url":"https://picsum.photos/seed/square2/1920/1920"},{"url":"https://picsum.photos/seed/square3/1920/1920"},{"url":"https://picsum.photos/seed/pano1/1920/720"},{"url":"https://picsum.photos/seed/pano2/1920/640"}]
+
+## whole photo: no fill or motion, no people framing
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], false, false, 20000, [], false, false, true, NONE, false)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+
+## gallery print and spread flags reach the stage
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, true, true, NONE, false)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, true, true, NONE, false)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 17000)
+
+## split glance: clock panel instead of the face, split feature on the stage
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.view.setVisibility(8)
+LinearLayout1.setVisibility(8)
+new SplitGlancePanel(ctx)
+SplitGlancePanel1.setOrbitEnabled(true)
+SplitGlancePanel1.view.setLayoutParams(LayoutParams15)
+FrameLayout1.addOnLayoutChangeListener(fn)
+SplitGlancePanel1.start()
+LinearLayout1.setVisibility(8)
+SplitGlancePanel1.setNext(null, null)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, SPLIT, true)
+Handler1.postDelayed(fn, 0)
+SplitGlancePanel1.setAccent(-1005990, 1800)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+
+## scheduled night clock only: quiet clock, no photo pipeline
+> create
+> start
+registerReceiver
+QuietNightClockView1.setActive(true)
+nightClockChanged true
+pending []
+> touch 0 10.0,10.0
+> touch 1 12.0,14.0
+exit
+
+## overnight night photo: warm dim photos, longer dwell, no soundscape
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+new NightPhotoOverlay(ctx)
+FrameLayout1.addView(NightPhotoOverlay1, LayoutParams15)
+NightPhotoOverlay1.bringToFront()
+NightPhotoOverlay1.setActive(true)
+NightPhotoOverlay1.animate()
+NightPhotoOverlay1.animate.cancel()
+NightPhotoOverlay1.setVisibility(0)
+NightPhotoOverlay1.setAlpha(0.0)
+NightPhotoOverlay1.animate()
+NightPhotoOverlay1.animate.alpha(1.0)
+NightPhotoOverlay1.animate.setDuration(4000)
+NightPhotoOverlay1.animate.start()
+FaceRenderer1.view.setVisibility(8)
+LinearLayout1.setVisibility(8)
+nightClockChanged true
+log i ImmortalNight: night photo: warm dim photos
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 32000, [], false, false, true, NIGHT_PHOTO, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 32000, [], false, false, true, NIGHT_PHOTO, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 32000)
+pending [32000, 1800000, 1800000]
+
+## music photos (photos only): no overlays, the operator pin is ignored
+> create
+> start
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+> deliver feed x1
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+SlideshowStage1.show([photo(feed#0)], false, false, 45000, [], false, false, true, NONE, false)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+> deliver feed x1
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+SlideshowStage1.show([photo(feed#0)], false, false, 45000, [], false, false, true, NONE, false)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 45000)
+pending [45000]
+
+## welcome overlay with a spoken greeting on a presence start
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+FrameLayout3.setAlpha(0.0)
+FrameLayout3.setVisibility(0)
+FrameLayout3.animate()
+FrameLayout3.animate.alpha(1.0)
+FrameLayout3.animate.setDuration(500)
+FrameLayout3.animate.start()
+Handler1.postDelayed(fn, 3200)
+exec io
+Handler1.postDelayed(fn, 30000)
+pending [3200, 30000, 1800000, 1800000]
+> touch 0 100.0,100.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+> touch 1 101.0,101.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+Handler1.removeCallbacks(fn)
+FrameLayout3.animate()
+FrameLayout3.animate.alpha(0.0)
+FrameLayout3.animate.setDuration(600)
+FrameLayout3.animate.withEndAction(fn)
+FrameLayout3.animate.start()
+
+## ambient dashboard cycles on classic, never on an engine style
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+Handler1.postDelayed(fn, 45000)
+exec io
+Handler1.postDelayed(fn, 30000)
+pending [30000, 45000, 1800000, 1800000]
+
+## ambient dashboard is off under an engine style
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+FaceFocusStore1.setActive(true)
+LegacySlideshowPreparation1.request(fn, fn, fn)
+pending [1800000, 1800000]
+
+## soundscape and wave-to-advance follow the host
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec sound
+new GestureCamera(ctx, fn)
+GestureCamera1.start()
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> hostActive false
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+SlideshowStage1.setHostActive(false)
+FaceRenderer1.setHostActive(false)
+GestureCamera1.stop()
+GalleryOverlayLayoutObserver1.setActive(false)
+exec sound
+> hostActive true
+Handler2.removeCallbacks(fn)
+SlideshowStage1.setHostActive(true)
+FaceRenderer1.setHostActive(true)
+Handler1.postDelayed(fn, 1800000)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+new GestureCamera(ctx, fn)
+GestureCamera2.start()
+GalleryOverlayLayoutObserver1.setActive(true)
+exec sound
+
+## folder on smart frame: deck keys, partners, dwell, next and previous
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> drain io
+Handler1.postDelayed(fn, 0)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+pending [0, 1800000, 1800000]
+> advance 17000
+SlideshowLoader1.load(asset(local:<dir>/photos/a.jpg:10:1600000000000), [asset(local:<dir>/photos/b.jpg:11:1600000000000)], asset(local:<dir>/photos/b.jpg:11:1600000000000), false, true, fn, fn, fn)
+> deliver local:<dir>/photos/a.jpg:10:1600000000000 x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(local:<dir>/photos/a.jpg:10:1600000000000#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+exec meta
+Handler1.postDelayed(fn, 17000)
+> next
+SlideshowViewerControls1.cancelEdit()
+Handler1.removeCallbacks(fn)
+SlideshowLoader1.load(asset(local:<dir>/photos/b.jpg:11:1600000000000), [asset(local:<dir>/photos/c.png:13:1600000000000)], asset(local:<dir>/photos/c.png:13:1600000000000), false, true, fn, fn, fn)
+> deliver local:<dir>/photos/b.jpg:11:1600000000000 x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(local:<dir>/photos/b.jpg:11:1600000000000#0)], true, true, 17000, [], false, false, false, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+exec meta
+Handler1.postDelayed(fn, 17000)
+> prev
+SlideshowViewerControls1.cancelEdit()
+Handler1.removeCallbacks(fn)
+SlideshowLoader1.load(asset(local:<dir>/photos/a.jpg:10:1600000000000), [asset(local:<dir>/photos/b.jpg:11:1600000000000)], asset(local:<dir>/photos/b.jpg:11:1600000000000), false, true, fn, fn, fn)
+> deliver local:<dir>/photos/a.jpg:10:1600000000000 x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(local:<dir>/photos/a.jpg:10:1600000000000#0)], true, true, 17000, [], false, false, false, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+exec meta
+Handler1.postDelayed(fn, 17000)
+pending [17000, 1783000, 1783000]
+
+## folder on portrait pair asks for partner pairs
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> drain io
+Handler1.postDelayed(fn, 0)
+> deliver feed x2
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0), photo(feed#1)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=2, pixels=0
+
+## folder video plays through the video view with a five-minute safety net
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> drain io
+Handler1.postDelayed(fn, 0)
+pending [0, 1800000, 1800000]
+
+## folder on an engine style: oriented sizes for a seed, junk dropped, videos skipped
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+> drain io
+Handler1.postDelayed(fn, 0)
+> advance 0
+FaceFocusStore1.setActive(true)
+LegacySlideshowPreparation1.request(fn, fn, fn)
+> prepareEngine
+FaceFocusStore1.focusFor("file://<dir>/photos/a_3000x2000.jpg")
+FaceFocusStore1.weightFor("file://<dir>/photos/a_3000x2000.jpg")
+FaceFocusStore1.focusFor("file://<dir>/photos/rot90_4000x3000.jpg")
+FaceFocusStore1.weightFor("file://<dir>/photos/rot90_4000x3000.jpg")
+FaceFocusStore1.focusFor("file://<dir>/photos/unknown.jpg")
+FaceFocusStore1.weightFor("file://<dir>/photos/unknown.jpg")
+engine photos [{"w":3000,"h":2000,"url":"file://<dir>/photos/a_3000x2000.jpg"},{"w":3000,"h":4000,"url":"file://<dir>/photos/rot90_4000x3000.jpg"},{"url":"file://<dir>/photos/unknown.jpg"}]
+pending [1800000, 1800000]
+
+## folder on classic: decode on the worker, fallback after a full failed pass
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+> drain io
+Handler1.postDelayed(fn, 0)
+> drain io
+> advance 0
+exec io
+> drain io
+decode file "<dir>/photos/a.jpg" edge=2400
+Handler1.postDelayed(fn, 0)
+> advance 0
+ImageView2.setVisibility(0)
+FaceRenderer1.setCaption(null, null, null, null)
+ImageView1.setImageBitmap(bitmap(decoded <dir>/photos/a.jpg))
+ImageView1.setAlpha(0.0)
+ImageView1.setVisibility(0)
+ImageView1.setScaleX(1.0)
+ImageView1.setScaleY(1.0)
+ImageView1.setTranslationX(0.0)
+ImageView1.setTranslationY(0.0)
+ImageView1.setPivotX(960.0)
+ImageView1.setPivotY(540.0)
+AnimatorSet1.playTogether(null, null)
+AnimatorSet1.setDuration(18200)
+AnimatorSet1.setInterpolator(LinearInterpolator1)
+AnimatorSet1.start()
+AnimatorSet2.playTogether(null, null)
+AnimatorSet2.setDuration(1500)
+AnimatorSet2.setInterpolator(AccelerateDecelerateInterpolator1)
+AnimatorSet2.addListener(fn)
+AnimatorSet2.start()
+exec meta
+Handler1.postDelayed(fn, 17000)
+pending [17000, 1800000, 1800000]
+
+## empty folder falls back to the built-in feed
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> drain io
+Handler1.postDelayed(fn, 0)
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 17000)
+pending [17000, 1800000, 1800000]
+
+## local decode sizes: native bounded bytes with identity, classic file decode
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+> decodeAsset feed 2400
+decode bytes 64B edge=2400
+decoded bitmap(decoded 64B) portrait=null identity=encoded:fdeab9acf3710362bd2658cdc9a29e8f9c757fcf9811603a8c447cd1d9151108
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> drain io
+Handler1.postDelayed(fn, 0)
+> advance 0
+SlideshowLoader1.load(asset(local:<dir>/photos/p_3000x4000.jpg:10:1600000000000), [asset(local:<dir>/photos/q_4000x3000.jpg:11:1600000000000)], asset(local:<dir>/photos/q_4000x3000.jpg:11:1600000000000), false, true, fn, fn, fn)
+> decodeAsset local:<dir>/photos/p_3000x4000.jpg:10:1600000000000 2400
+decode bytes 10B edge=2400
+decoded bitmap(decoded 10B) portrait=true identity=encoded:01d448afd928065458cf670b60f5a594d735af0172c8d67f22a81680132681ca
+> decodeAsset local:<dir>/photos/p_3000x4000.jpg:10:1600000000000 1400
+decode bytes 10B edge=1400
+decoded bitmap(decoded 10B) portrait=true identity=encoded:01d448afd928065458cf670b60f5a594d735af0172c8d67f22a81680132681ca
+
+## Immich on smart frame: remote deck, videos marked, cache on
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+SlideshowSourceDiscovery1.load(fn, fn)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> discover [Media, Media, Media]
+Handler1.postDelayed(fn, 0)
+> advance 0
+SlideshowLoader1.load(asset(remote:immich:https://immich.test/a), [], null, false, true, fn, fn, fn)
+> deliver remote:immich:https://immich.test/a x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(remote:immich:https://immich.test/a#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+FaceRenderer1.setCaption(null, null, null, null)
+Handler1.postDelayed(fn, 17000)
+pending [17000, 1800000, 1800000]
+> advance 17000
+SlideshowLoader1.cancel()
+SlideshowStage1.pause()
+SlideshowStage1.setVisibility(0)
+ImageView2.setScaleX(1.0)
+ImageView2.setScaleY(1.0)
+ImageView2.setTranslationX(0.0)
+ImageView2.setTranslationY(0.0)
+ImageView1.setScaleX(1.0)
+ImageView1.setScaleY(1.0)
+ImageView1.setTranslationX(0.0)
+ImageView1.setTranslationY(0.0)
+FaceRenderer1.setCaption(null, null, null, null)
+ImageView2.setImageDrawable(null)
+ImageView2.setVisibility(8)
+ImageView1.setImageDrawable(null)
+ImageView1.setVisibility(8)
+SlideshowVideoView1.setVisibility(0)
+SlideshowVideoView1.setOnInfoListener(fn)
+SlideshowViewerControls1.photoChanged()
+SlideshowVideoView1.setOnPreparedListener(fn)
+SlideshowVideoView1.setOnCompletionListener(fn)
+SlideshowVideoView1.setOnErrorListener(fn)
+SlideshowVideoView1.setVideoURI(uri(https://immich.test/v), {"x-api-key"="k1"})
+Handler1.postDelayed(fn, 300000)
+pending [300000, 1783000, 1783000]
+> advance 17000
+> deliver remote:immich:https://immich.test/a x1
+> fail remote:immich:https://immich.test/b
+Handler1.removeCallbacks(fn)
+SlideshowLoader1.load(asset(remote:immich:https://immich.test/b), [asset(remote:immich:https://immich.test/a)], asset(remote:immich:https://immich.test/a), false, true, fn, fn, fn)
+pending [1766000, 1766000]
+
+## Immich on an engine style hands images (no videos) to the engine with the key header
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+SlideshowSourceDiscovery1.load(fn, fn)
+> discover [Media, Media]
+Handler1.postDelayed(fn, 0)
+> advance 0
+FaceFocusStore1.setActive(true)
+LegacySlideshowPreparation1.request(fn, fn, fn)
+> prepareEngine
+FaceFocusStore1.focusFor("https://immich.test/a")
+FaceFocusStore1.weightFor("https://immich.test/a")
+engine photos [{"url":"https://immich.test/a"}]
+
+## Immich with nothing to show falls back to the built-in feed
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+SlideshowSourceDiscovery1.load(fn, fn)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> discover null
+Handler1.postDelayed(fn, 0)
+> advance 0
+log w ImmortalPhotoFrame: Immich gave no media (album=library); falling back to built-in feed
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+pending [1800000, 1800000]
+
+## shared album on smart frame refreshes on its interval
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+SlideshowSourceDiscovery1.load(fn, fn)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> discover Album
+Handler1.postDelayed(fn, 0)
+> advance 0
+SlideshowLoader1.load(asset(remote:url:https://cdn.test/1), [asset(remote:url:https://cdn.test/2)], asset(remote:url:https://cdn.test/2), false, true, fn, fn, fn)
+Handler1.postDelayed(fn, 900000)
+> deliver remote:url:https://cdn.test/1 x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(remote:url:https://cdn.test/1#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+FaceRenderer1.setCaption(null, null, null, null)
+Handler1.postDelayed(fn, 17000)
+pending [17000, 900000, 1800000, 1800000]
+
+## shared album on an engine style schedules the engine's album refresh
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+SlideshowSourceDiscovery1.load(fn, fn)
+> discover Album
+Handler1.postDelayed(fn, 0)
+> advance 0
+FaceFocusStore1.setActive(true)
+LegacySlideshowPreparation1.request(fn, fn, fn)
+Handler1.postDelayed(fn, 1800000)
+> prepareEngine
+FaceFocusStore1.focusFor("https://cdn.test/1")
+FaceFocusStore1.weightFor("https://cdn.test/1")
+engine photos [{"url":"https://cdn.test/1"}]
+pending [1800000, 1800000, 1800000]
+
+## viewer pause holds the remaining dwell and resumes it
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 20000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 20000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 20000)
+> advance 5000
+> viewerPause true
+Handler1.removeCallbacks(fn)
+SlideshowStage1.pause()
+pending [1795000, 1795000]
+> advance 60000
+> viewerPause false
+SlideshowStage1.resume()
+Handler1.postDelayed(fn, 15000)
+pending [15000, 1735000, 1735000]
+
+## host suspension freezes the dwell and shifts the deadline
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 20000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 20000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 20000)
+> advance 4000
+> hostActive false
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+SlideshowStage1.setHostActive(false)
+FaceRenderer1.setHostActive(false)
+GalleryOverlayLayoutObserver1.setActive(false)
+pending []
+> advance 90000
+> hostActive true
+Handler2.removeCallbacks(fn)
+SlideshowStage1.setHostActive(true)
+FaceRenderer1.setHostActive(true)
+Handler1.postDelayed(fn, 1796000)
+Handler1.postDelayed(fn, 1796000)
+Handler1.postDelayed(fn, 16000)
+CalendarMinuteRefresh1.run()
+GalleryOverlayLayoutObserver1.setActive(true)
+pending [16000, 1796000, 1796000]
+> advance 16000
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+pending [1780000, 1780000]
+
+## dark room: the sensor fades to the quiet clock and back
+> create
+> start
+registerReceiver
+darkRoom lux=5.0 initialNight=false
+DarkRoomObserver1.setActive(true)
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> room dark=true
+new QuietNightClockView(ctx, "warm")
+QuietNightClockView1.setReveal(0.0)
+FrameLayout1.addView(QuietNightClockView1, LayoutParams15)
+QuietNightClockView1.setVisibility(0)
+QuietNightClockView1.bringToFront()
+QuietNightClockView1.setActive(true)
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+SlideshowStage1.setHostActive(false)
+FaceRenderer1.setHostActive(false)
+GalleryOverlayLayoutObserver1.setActive(false)
+Handler2.removeCallbacks(fn)
+Handler2.removeCallbacks(fn)
+Handler2.postDelayed(fn, 16)
+nightClockChanged true
+log i ImmortalNight: dark room: fading to clock; photos suspended
+pending [16]
+> advance 20000
+QuietNightClockView1.setReveal(8.5029926E-5)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(3.3890607E-4)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(7.5980806E-4)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0013459151)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0020954076)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0030064643)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.004077264)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0053059882)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0066908165)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.008229926)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.009921497)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.011763713)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.013754745)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.015892783)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.018175999)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.020602575)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.023170693)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.02587853)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.028724262)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.031706072)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.034822147)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.03807065)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.041449774)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0449577)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0485926)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.052352637)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.056236025)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.060240928)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.06436553)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.068608)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.07296652)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.07743927)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.08202445)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.08672021)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.091524735)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.096436225)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.101452835)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.10657277)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.11179419)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.11711526)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.1225342)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.12804917)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.13365832)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.13935986)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.145152)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.15103287)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.15700069)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.16305359)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.16918978)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.17540744)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.1817047)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.1880798)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.19453092)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.20105624)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.20765392)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.2143221)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.22105905)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.2278629)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.23473182)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.241664)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.2486576)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.25571084)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.26282188)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.26998886)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.27721006)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.28448358)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.29180762)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.29918036)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.30659994)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.3140646)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.3215725)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.3291218)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.3367107)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.34433737)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.35200003)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.3596968)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.36742583)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.37518543)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.38297367)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.39078873)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.39862886)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.40649223)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.41437694)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.42228127)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.43020326)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4381412)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4460933)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.45405766)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.46203253)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.47001597)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4780063)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.48600164)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4940001)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.50200003)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5099994)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5179966)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5259896)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5339768)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5419561)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.549926)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5578844)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.56582963)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.57375985)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5816732)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.589568)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5974422)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.60529417)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.613122)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.62092394)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.62869805)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.63644266)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.64415574)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.65183574)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6594806)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6670886)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6746579)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6821868)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.68967324)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6971156)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.704512)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7118606)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.71915954)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.72640723)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7336015)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7407408)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.74782306)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.75484675)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7618098)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7687107)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.77554727)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.78231794)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.78902066)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7956539)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8022156)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.808704)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.81511736)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.82145375)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8277115)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.83388865)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8399834)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.84599394)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8519186)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.85775524)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8635024)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8691579)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8747203)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8801874)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8855576)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.890829)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.896)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9010685)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9060328)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.91089106)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.91564137)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.92028207)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9248113)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9292272)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9335278)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9377116)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9417766)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.945721)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9495429)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9532406)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.95681226)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.960256)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.96357006)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9667525)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9698017)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.97271574)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9754928)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.97813094)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9806285)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.98298365)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9851945)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9872592)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9891761)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9909432)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9925588)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.994021)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.995328)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.99647796)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9974691)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.99829966)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.99896765)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9994714)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.999809)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.99997866)
+Handler2.postDelayed(fn, 8)
+QuietNightClockView1.setReveal(1.0)
+QuietNightClockView1.setActive(true)
+> touch 0 1.0,1.0
+> touch 1 1.0,1.0
+exit
+> room dark=false
+Handler2.removeCallbacks(fn)
+Handler2.postDelayed(fn, 16)
+nightClockChanged false
+log i ImmortalNight: light returned: fading to retained photo
+> advance 20000
+FaceRenderer1.refreshRetainedTime(Date)
+QuietNightClockView1.setReveal(0.99991494)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9996611)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9992402)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.99865407)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9979046)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.99699354)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.99592274)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.994694)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9933092)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9917701)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9900785)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9882363)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9862453)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9841072)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.981824)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9793974)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9768293)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.97412145)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.97127575)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9682939)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.96517783)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9619293)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9585502)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9550423)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9514074)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.94764733)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.943764)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9397591)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9356345)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.931392)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9270335)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.92256075)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.91797554)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9132798)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9084753)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.9035638)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8985472)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.89342725)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8882058)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.88288474)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8774658)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.87195086)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8663417)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.86064017)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.854848)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.84896713)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.84299934)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8369464)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8308102)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8245926)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8182953)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.81192017)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.8054691)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.79894376)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.79234606)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7856779)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7789409)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7721371)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7652682)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.758336)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7513424)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.74428916)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7371781)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7300111)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.72278994)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.71551645)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.70819235)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.7008196)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6934)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6859354)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.67842746)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6708782)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6632893)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.65566266)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.648)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6403032)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6325742)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.62481457)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.6170263)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.60921127)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.60137117)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.59350777)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.585623)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.57771873)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.56979674)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5618588)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5539067)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5459423)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.53796744)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.529984)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5219937)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5139984)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.5059999)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.49799997)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4900006)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4820034)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4740104)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4660232)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.45804387)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.45007402)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4421156)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.43417037)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.42624015)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4183268)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.41043198)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.4025578)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.39470583)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.386878)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.37907606)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.37130195)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.36355734)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.35584426)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.34816426)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.34051943)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.33291137)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.32534212)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.31781322)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.31032676)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.3028844)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.295488)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.2881394)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.28084046)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.27359277)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.2663985)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.25925922)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.25217694)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.24515325)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.23819017)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.23128933)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.22445273)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.21768206)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.21097934)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.20434612)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.19778442)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.19129598)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.18488264)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.17854625)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.17228848)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.16611135)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.1600166)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.15400606)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.14808142)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.14224476)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.13649762)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.13084209)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.12527972)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.11981261)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.11444241)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.10917097)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.10399997)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.09893149)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0939672)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.089108944)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.08435863)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.079717934)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0751887)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.07077283)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.06647217)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.062288404)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.058223426)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.05427903)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.05045712)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.046759427)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.043187737)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.03974402)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.03642994)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.03324747)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.030198276)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.027284265)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.024507225)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.021869063)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.01937151)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.017016351)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.014805496)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.012740791)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0108239055)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.009056807)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0074412227)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0059790015)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.004671991)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0035220385)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0025308728)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0017003417)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(0.0010323524)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(5.28574E-4)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(1.9097328E-4)
+Handler2.postDelayed(fn, 16)
+QuietNightClockView1.setReveal(2.1338463E-5)
+Handler2.postDelayed(fn, 8)
+QuietNightClockView1.setReveal(0.0)
+QuietNightClockView1.setVisibility(8)
+QuietNightClockView1.setActive(false)
+SlideshowStage1.setHostActive(true)
+FaceRenderer1.setHostActive(true)
+Handler1.postDelayed(fn, 1800000)
+Handler1.postDelayed(fn, 1800000)
+Handler1.postDelayed(fn, 0)
+CalendarMinuteRefresh1.run()
+GalleryOverlayLayoutObserver1.setActive(true)
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+pending [1783000, 1783000]
+
+## dark room in the photo tone keeps photos, warm and dim
+> create
+> start
+registerReceiver
+darkRoom lux=3.0 initialNight=false
+DarkRoomObserver1.setActive(true)
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 20000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> room dark=true
+new NightPhotoOverlay(ctx)
+FrameLayout1.addView(NightPhotoOverlay1, LayoutParams15)
+NightPhotoOverlay1.bringToFront()
+NightPhotoOverlay1.setActive(true)
+NightPhotoOverlay1.animate()
+NightPhotoOverlay1.animate.cancel()
+NightPhotoOverlay1.setVisibility(0)
+NightPhotoOverlay1.setAlpha(0.0)
+NightPhotoOverlay1.animate()
+NightPhotoOverlay1.animate.alpha(1.0)
+NightPhotoOverlay1.animate.setDuration(4000)
+NightPhotoOverlay1.animate.start()
+FaceRenderer1.view.setVisibility(8)
+LinearLayout1.setVisibility(8)
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 32000, [], false, false, true, NIGHT_PHOTO, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+nightClockChanged true
+log i ImmortalNight: night photo: warm dim photos
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 32000, [], false, false, true, NIGHT_PHOTO, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 32000)
+pending [32000, 1800000, 1800000]
+> room dark=false
+NightPhotoOverlay1.bringToFront()
+NightPhotoOverlay1.setActive(false)
+NightPhotoOverlay1.animate()
+NightPhotoOverlay1.animate.cancel()
+NightPhotoOverlay1.setVisibility(8)
+FaceRenderer1.view.setVisibility(0)
+LinearLayout1.setVisibility(8)
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 20000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+nightClockChanged false
+log i ImmortalNight: night photo: day frame restored
+
+## night settings broadcast: lux, tone, brightness and turning the sensor off
+> create
+> start
+registerReceiver
+darkRoom lux=3.0 initialNight=false
+DarkRoomObserver1.setActive(true)
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> nightSettings {dark_room_lux=8}
+DarkRoomObserver1.setActive(false)
+darkRoom lux=8.0 initialNight=false
+DarkRoomObserver2.setActive(true)
+> room dark=true
+new QuietNightClockView(ctx, "warm")
+QuietNightClockView1.setReveal(0.0)
+FrameLayout1.addView(QuietNightClockView1, LayoutParams15)
+QuietNightClockView1.setVisibility(0)
+QuietNightClockView1.bringToFront()
+QuietNightClockView1.setActive(true)
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+SlideshowStage1.setHostActive(false)
+FaceRenderer1.setHostActive(false)
+GalleryOverlayLayoutObserver1.setActive(false)
+Handler2.removeCallbacks(fn)
+Handler2.removeCallbacks(fn)
+Handler2.postDelayed(fn, 16)
+nightClockChanged true
+log i ImmortalNight: dark room: fading to clock; photos suspended
+> nightSettings {night_clock_tone=red}
+QuietNightClockView1.updateTone("red")
+> nightSettings {night_clock_brightness=1}
+nightClockChanged true
+> nightSettings {dark_room_clock=false}
+DarkRoomObserver2.setActive(false)
+Handler2.removeCallbacks(fn)
+QuietNightClockView1.setActive(false)
+SlideshowStage1.setHostActive(true)
+FaceRenderer1.setHostActive(true)
+Handler1.postDelayed(fn, 1800000)
+Handler1.postDelayed(fn, 1800000)
+Handler1.postDelayed(fn, 0)
+CalendarMinuteRefresh1.run()
+GalleryOverlayLayoutObserver1.setActive(true)
+nightClockChanged false
+log i ImmortalNight: light returned: fading to retained photo
+> advance 20000
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+
+## dark room switched on by a night settings broadcast
+> create
+> start
+registerReceiver
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+Handler1.postDelayed(fn, 17000)
+> nightSettings {dark_room_clock=true, dark_room_lux=2}
+darkRoom lux=2.0 initialNight=false
+DarkRoomObserver1.setActive(true)
+> room dark=true
+new QuietNightClockView(ctx, "warm")
+QuietNightClockView1.setReveal(0.0)
+FrameLayout1.addView(QuietNightClockView1, LayoutParams15)
+QuietNightClockView1.setVisibility(0)
+QuietNightClockView1.bringToFront()
+QuietNightClockView1.setActive(true)
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+SlideshowStage1.setHostActive(false)
+FaceRenderer1.setHostActive(false)
+GalleryOverlayLayoutObserver1.setActive(false)
+Handler2.removeCallbacks(fn)
+Handler2.removeCallbacks(fn)
+Handler2.postDelayed(fn, 16)
+nightClockChanged true
+log i ImmortalNight: dark room: fading to clock; photos suspended
+pending [16]
+
+## test source replaces the household folder with generated scenes
+> create
+> start
+registerReceiver
+log i ImmortalPhotoFrame: screensaver test source active: generated scenes only
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(0)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> decodeAsset feed 2400
+testPhoto index=0 edge=2208
+decoded bitmap(test0) portrait=null identity=null
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> decodeAsset feed 2400
+testPhoto index=1 edge=2208
+decoded bitmap(test1) portrait=null identity=null
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 17000)
+pending [17000, 1800000, 1800000]
+
+## test source forces the dark room after the day frame draws
+> create
+> start
+registerReceiver
+log i ImmortalPhotoFrame: screensaver test source active: generated scenes only
+log i ImmortalNight: dark room forced by the operator test source
+Handler1.postDelayed(fn, 12000)
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(0)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+pending [0, 12000, 1800000, 1800000]
+> advance 12000
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+new QuietNightClockView(ctx, "warm")
+QuietNightClockView1.setReveal(0.0)
+FrameLayout1.addView(QuietNightClockView1, LayoutParams20)
+QuietNightClockView1.setVisibility(0)
+QuietNightClockView1.bringToFront()
+QuietNightClockView1.setActive(true)
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+SlideshowStage1.setHostActive(false)
+FaceRenderer1.setHostActive(false)
+GalleryOverlayLayoutObserver1.setActive(false)
+Handler2.removeCallbacks(fn)
+Handler2.removeCallbacks(fn)
+Handler2.postDelayed(fn, 16)
+nightClockChanged true
+log i ImmortalNight: dark room: fading to clock; photos suspended
+pending [16]
+
+## test source pin holds one mode at a fixed interval
+> create
+> start
+registerReceiver
+log i ImmortalPhotoFrame: screensaver test source active: generated scenes only
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(0)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 9000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 9000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 9000)
+pending [9000, 1800000, 1800000]
+
+## test source pin to an engine style writes scene files for the engine
+> create
+> start
+registerReceiver
+log i ImmortalPhotoFrame: screensaver test source active: generated scenes only
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(0)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+exec io
+> drain io
+testPhoto index=0 edge=1600
+testPhoto index=1 edge=1600
+testPhoto index=2 edge=1600
+testPhoto index=3 edge=1600
+testPhoto index=4 edge=1600
+testPhoto index=5 edge=1600
+testPhoto index=6 edge=1600
+testPhoto index=7 edge=1600
+testPhoto index=8 edge=1600
+testPhoto index=9 edge=1600
+testPhoto index=10 edge=1600
+testPhoto index=11 edge=1600
+Handler1.postDelayed(fn, 0)
+> advance 0
+FaceFocusStore1.setActive(true)
+LegacySlideshowPreparation1.request(fn, fn, fn)
+> prepareEngine
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_0.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_0.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_1.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_1.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_2.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_2.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_3.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_3.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_4.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_4.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_5.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_5.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_6.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_6.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_7.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_7.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_8.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_8.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_9.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_9.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_10.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_10.jpg")
+FaceFocusStore1.focusFor("file://<dir>/cache/ss_test_scenes/scene_11.jpg")
+FaceFocusStore1.weightFor("file://<dir>/cache/ss_test_scenes/scene_11.jpg")
+engine photos [{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_0.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_1.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_2.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_3.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_4.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_5.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_6.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_7.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_8.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_9.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_10.jpg"},{"w":0,"h":0,"url":"file://<dir>/cache/ss_test_scenes/scene_11.jpg"}]
+
+## an invalid pin leaves the household mode
+> create
+> start
+registerReceiver
+log i ImmortalPhotoFrame: screensaver test source active: generated scenes only
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(0)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], false, false, 25000, [], false, false, true, NONE, false)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+
+## touch: swipes navigate, a tap exits, small moves are ignored
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> advance 0
+SlideshowLoader1.cancel()
+SlideshowStage1.setVisibility(0)
+SlideshowStage1.resume()
+SlideshowViewerControls1.photoChanged()
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 17000)
+> touch 0 500.0,300.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+> touch 1 300.0,310.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+SlideshowViewerControls1.cancelEdit()
+Handler1.removeCallbacks(fn)
+SlideshowLoader1.cancel()
+SlideshowLoader1.load(asset(feed), [], null, false, true, fn, fn, null)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, false, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 17000)
+> touch 0 300.0,300.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+> touch 1 500.0,290.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+SlideshowViewerControls1.cancelEdit()
+Handler1.removeCallbacks(fn)
+SlideshowLoader1.cancel()
+SlideshowLoader1.cachedRegions("feed#0")
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, false, NONE, true)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+Handler1.postDelayed(fn, 17000)
+> deliver feed x1
+> touch 0 300.0,300.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+> touch 1 360.0,300.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+> touch 0 300.0,300.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+> touch 1 330.0,330.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+exit
+> touch 0 300.0,300.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+> touch 1 310.0,320.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+exit
+
+## touch in the interactive viewer toggles its controls
+> create
+> start
+registerReceiver
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> touch 0 300.0,300.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+> touch 1 305.0,305.0
+FaceRenderer1.handleAlarmTouch(MotionEvent)
+FaceRenderer1.handleMusicCardTouch(MotionEvent)
+SlideshowViewerControls1.toggle()
+
+## stop releases everything
+> create
+> start
+registerReceiver
+darkRoom lux=3.0 initialNight=false
+DarkRoomObserver1.setActive(true)
+SlideshowStage1.setVisibility(0)
+FrameLayout1.setBackgroundColor(MATTE)
+SlideshowLoader1.load(asset(feed), [], null, false, false, fn, fn, null)
+ImageView2.setScaleType(CENTER_CROP)
+ImageView1.setScaleType(CENTER_CROP)
+LinearLayout1.setVisibility(8)
+Handler1.postDelayed(fn, 1800000)
+CalendarMinuteRefresh1.run()
+FaceRenderer1.start(Face)
+GalleryOverlayLayoutObserver1.setActive(true)
+exec meta
+Handler1.postDelayed(fn, 1800000)
+> deliver feed x1
+FaceRenderer1.setCaption(null, null, null, null)
+SlideshowStage1.setVisibility(0)
+ImageView2.setVisibility(8)
+ImageView1.setVisibility(8)
+SlideshowStage1.resume()
+FaceRenderer1.photoOcclusions()
+SlideshowStage1.show([photo(feed#0)], true, true, 17000, [], false, false, true, NONE, true)
+Handler1.postDelayed(fn, 0)
+SlideshowViewerControls1.photoChanged()
+log i ImmortalSlideshow: ready native scene: photos=1, pixels=0
+> stop
+Handler2.removeCallbacks(fn)
+ctx.unregisterReceiver(fn)
+GalleryOverlayLayoutObserver1.close()
+DarkRoomObserver1.setActive(false)
+FaceRenderer1.setPaperPhotoSurface(false)
+SlideshowLoader1.close()
+SlideshowStage1.stop()
+SlideshowViewerControls1.stop()
+EngineScaledCache1.cancel()
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+Handler1.removeCallbacks(fn)
+ImageView2.setScaleX(1.0)
+ImageView2.setScaleY(1.0)
+ImageView2.setTranslationX(0.0)
+ImageView2.setTranslationY(0.0)
+ImageView1.setScaleX(1.0)
+ImageView1.setScaleY(1.0)
+ImageView1.setTranslationX(0.0)
+ImageView1.setTranslationY(0.0)
+ImageView2.setImageDrawable(null)
+ImageView1.setImageDrawable(null)
+FaceRenderer1.stop()
+SlideshowVideoView1.close()
+pending []
+

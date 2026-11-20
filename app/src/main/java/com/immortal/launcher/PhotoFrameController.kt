@@ -16,14 +16,8 @@ import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Matrix
 import android.graphics.Rect
-import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
-import android.speech.tts.TextToSpeech
-import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
@@ -33,20 +27,12 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.exifinterface.media.ExifInterface
-import java.net.HttpURLConnection
-import java.net.URL
-import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import java.util.concurrent.Executors
-import kotlin.math.abs
 import org.json.JSONObject
-
-private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
+import com.immortal.launcher.PhotoFrameViews.Companion.MATCH
+import com.immortal.launcher.PhotoFrameViews.Companion.WRAP
 
 /** Layout-driven reservations, with no timer and no callback ownership after close. */
 internal class GalleryOverlayLayoutObserver(
@@ -137,6 +123,15 @@ class PhotoFrameController(
     /** Scheduled night clock in the "Night photo" colour: dim warm photos with a small clock. */
     private val overnightNightPhoto: Boolean = false,
 ) {
+  // The pure screensaver logic and its platform edges (see PhotoFramePorts).
+  private val ports = PhotoFrameAndroidPorts(context)
+  private val clock: PhotoFrameClock = ports
+  private val prefs: PhotoFramePrefs = ports
+  private val presence: PhotoFramePresence = ports
+  private val decoder: PhotoFrameDecoder<Bitmap> = ports
+  private val decodePlan = PhotoFrameDecodePlan(decoder)
+  private val schedule = PhotoFrameSchedule(clock)
+  private val webChain = PhotoFrameWebChain<Bitmap>(clock::wallMs, { Log.w(TAG, it) })
   private val io = Executors.newSingleThreadExecutor()
   private val sourceDiscoveryDelegate = lazy { SlideshowSourceDiscovery() }
   private val sourceDiscovery get() = sourceDiscoveryDelegate.value
@@ -207,13 +202,13 @@ class PhotoFrameController(
   }
   private val nightTransitionHandler = android.os.Handler(android.os.Looper.getMainLooper())
   private val nightTransition = NightClockTransition(
-      nowMs = android.os.SystemClock::uptimeMillis,
+      nowMs = clock::uptimeMs,
       postDelayed = { task, delay -> nightTransitionHandler.postDelayed(task, delay) },
       removeCallbacks = { task -> nightTransitionHandler.removeCallbacks(task) },
       onReveal = { level ->
         // Photos remain suspended throughout the dissolve, but their clock is already visible.
         if (!ambientNight && hostVisible && !stopped && level < 1f)
-          revealClockRefresh.update(System.currentTimeMillis())
+          revealClockRefresh.update(clock.wallMs())
         quietClock?.setReveal(level)
         if (level == 0f) quietClock?.visibility = View.GONE
       },
@@ -225,11 +220,8 @@ class PhotoFrameController(
   /** Hosts apply window-scoped dimming; restoring it never writes the device's global brightness. */
   var onNightClockChanged: ((Boolean) -> Unit)? = null
   val isNightClockShowing: Boolean get() = nightClockOnly || ambientNight
-  private var hostSuspendedAt = 0L
   private var retainedVideoPosition = 0
   private var photoFade: AnimatorSet? = null
-  private var holdDeadline = 0L
-  private var remainingHold = 0L
   private var nativeFailures = 0
   private lateinit var viewerControls: SlideshowViewerControls
   private lateinit var videoView: SlideshowVideoView
@@ -251,46 +243,26 @@ class PhotoFrameController(
   private val faceRendererDelegate = lazy { FaceRenderer(context, weatherRefreshMs) }
   private val faceRenderer get() = faceRendererDelegate.value
 
-  // Calendar widget (top-right): a clean upcoming-events panel fed by a public ICS
-  // feed (Google secret-iCal / Apple iCloud public-calendar). Hidden when no link.
-  private lateinit var calendarPanel: LinearLayout
-  private lateinit var calendarHeader: TextView
-  private lateinit var calendarRows: LinearLayout
-  private var calendarEvents: List<CalendarFeed.Event> = emptyList()
   // New modes: Split glance's clock panel and the Night photo veil + clock; null until used.
   private var splitPanel: SplitGlancePanel? = null
   private var nightPhotoOverlay: NightPhotoOverlay? = null
   private var nightPhotoOn = false
   private val splitGlance: Boolean
-    get() = !photosOnly && settings.mode == ScreensaverConfig.MODE_SPLIT_GLANCE
+    get() = PhotoFrameStartPlan.splitGlance(settings, host())
   // Verification-only generated scenes (see ScreensaverTestSource); decided once per start.
   private var testSourceOn = false
   private val testIndex = java.util.concurrent.atomic.AtomicInteger()
   private val testScenes = java.util.Collections.synchronizedMap(
       java.util.WeakHashMap<Bitmap, ScreensaverTestSource.Scene>())
-  // Text/padding scale for the current calendar size (0/1/2 → small/medium/large),
-  // applied as the panel is (re)rendered so a size change takes effect live.
-  private var calScale: Float = 1f
 
-  // Ambient dashboard: full-screen glanceable info card shown periodically (fork feature).
-  private var dashboardPanel: View? = null
-  private lateinit var dashClock: TextView
-  private lateinit var dashDate: TextView
-  private lateinit var dashWeather: TextView
-  private lateinit var dashEvent: TextView
-  private lateinit var dashAlmanac: TextView
-  private var dashboardVisible = false
-  // Weather string for the dashboard. The Face overlay fetches its own weather; this
-  // small keyless fetch feeds the ambient-dashboard card so it stays self-contained.
-  private var weatherText: String = ""
-
-  // Welcome-back overlay + TTS greeting (fork feature; off unless WelcomeConfig enables it).
-  private lateinit var welcomeOverlay: View
-  private var welcomeVisible = false
-  private val dismissWelcomeRunnable = Runnable { dismissWelcomeAnimated() }
-  private var tts: TextToSpeech? = null
-  @Volatile private var ttsReady = false
-  @Volatile private var pendingSpeech: String? = null
+  // The frame's panels over the photos: calendar widget, ambient dashboard, welcome-back overlay.
+  private val views = PhotoFrameViews(context)
+  private val calendar = PhotoFrameCalendarPanel(context, views, clock, settings = { settings },
+      testSource = { testSourceOn }, featureOwnsScreen = { splitGlance || nightPhotoOn }, splitPanel = { splitPanel })
+  private val dashboard = PhotoFrameDashboard(context, views, io = { io }, post = { r, d -> ui.postDelayed(r, d) },
+      enabled = { settings.ambientDashboard }, nightPhoto = { nightPhotoOn })
+  private val welcome = PhotoFrameWelcome(context, views, post = { r, d -> ui.postDelayed(r, d) },
+      remove = { ui.removeCallbacks(it) })
 
   // Ambient soundscape (synthesized) played while the frame is up (fork feature).
   private val soundscape = SoundscapePlayer()
@@ -346,7 +318,6 @@ class PhotoFrameController(
   private var transcoder: VideoTranscoder? = null
   private val transcodeIo = Executors.newSingleThreadExecutor()
   @Volatile private var prefetchRunning = false
-  @Volatile private var videoPrefetchConnection: HttpURLConnection? = null
   // Set when a prefetch pass finds the cache out of room, so later misses don't spawn a worker
   // (and log) just to rediscover that every ~30s. Cleared when a corrupt entry is deleted (space
   // freed); resets with the controller each dream session.
@@ -362,24 +333,11 @@ class PhotoFrameController(
   private val nativeHistory = ArrayList<SlideshowPhoto>()
   private val photoIdentities = java.util.WeakHashMap<Bitmap, String>()
   private var index = -1
-  private val photoTransportGeneration = java.util.concurrent.atomic.AtomicLong()
-  private val photoTransportLock = Any()
-  private val photoConnections = HashSet<HttpURLConnection>()
-  private val photoStreams = HashSet<java.io.InputStream>()
-  private val photoCancelIo = Executors.newSingleThreadExecutor { runnable ->
-    Thread(runnable, "slideshow-close-transports").apply { isDaemon = true }
-  }
-
-  // Default-feed source-chain state (see [fetchWebPhoto]).
-  // Wikimedia Commons featured-landscape image list: fetched once per session, then cycled.
-  private var wikimediaUrls: List<String> = emptyList()
-  private var wikimediaIdx = 0
-  // Bundled offline photos (assets/[FALLBACK_DIR]): shuffled once, then cycled.
-  private var bundledNames: List<String> = emptyList()
-  private var bundledIdx = 0
-  // Per-source failure backoff so a dead remote (e.g. a Picsum outage) isn't retried
-  // every tick; the entry expires after [SOURCE_COOLDOWN_MS] so recovery self-heals.
-  private val sourceCooldownUntil = HashMap<String, Long>()
+  private val transport = PhotoFrameTransport { stopped }
+  // The built-in feed's sources (see [fetchWebPhoto]).
+  private val webFeed = PhotoFrameWebFeed(context, transport, clock, unsplashKey, unsplashQuery,
+      download = { url, generation -> downloadBitmap(url, generation = generation) },
+      decodeStream = { decodeBoundedStream(it) }, testSource = { testSourceOn }, testPhoto = ::nextTestPhoto)
 
   /** Host (dream / preview activity) sets this to dismiss the frame on tap. */
   var onExit: (() -> Unit)? = null
@@ -397,10 +355,9 @@ class PhotoFrameController(
   fun onTouch(ev: MotionEvent) {
     // Meta can stop the Dream before ACTION_UP arrives. An in-progress touch is user
     // interaction, so recovery must not reopen photos between finger-down and dismissal.
-    if (!photosOnly && ev.actionMasked == MotionEvent.ACTION_DOWN) DreamPolicy.userExitAt = System.currentTimeMillis()
+    if (!photosOnly && ev.actionMasked == MotionEvent.ACTION_DOWN) presence.touched(clock.wallMs())
     if (isNightClockShowing) {
-      if (ev.actionMasked == MotionEvent.ACTION_UP &&
-          abs(ev.x - downX) < 48 && abs(ev.y - downY) < 48) onExit?.invoke()
+      if (ev.actionMasked == MotionEvent.ACTION_UP && PhotoFrameGesture.isTap(ev.x - downX, ev.y - downY)) onExit?.invoke()
       if (ev.actionMasked == MotionEvent.ACTION_DOWN) { downX = ev.x; downY = ev.y }
       return
     }
@@ -411,7 +368,7 @@ class PhotoFrameController(
     // While the timer alarm is showing, the slide-to-stop owns the touch stream.
     if (faceRenderer.handleAlarmTouch(ev)) return
     // A tap on the now-playing card opens its walk-up controls instead of exiting the frame.
-    if (!welcomeVisible && faceRenderer.handleMusicCardTouch(ev)) return
+    if (!welcome.visible && faceRenderer.handleMusicCardTouch(ev)) return
     when (ev.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
         downX = ev.x
@@ -422,16 +379,15 @@ class PhotoFrameController(
         val dy = ev.y - downY
         // A tap while the welcome overlay is showing dismisses it early
         // rather than exiting the screensaver.
-        if (welcomeVisible && abs(dx) < 48 && abs(dy) < 48) {
-          dismissWelcome()
+        if (welcome.visible && PhotoFrameGesture.isTap(dx, dy)) {
+          welcome.dismiss()
           return
         }
-        if (abs(dx) > 120 && abs(dx) > abs(dy) * 1.5f) {
-          if (dx < 0) next() else prev()
-        } else if (abs(dx) < 48 && abs(dy) < 48) {
-          if (interactivePreview && nativePhotoMode)
-            viewerControls.toggle()
-          else onExit?.invoke()
+        when (PhotoFrameGesture.classify(dx, dy)) {
+          PhotoFrameGesture.Kind.NEXT -> next()
+          PhotoFrameGesture.Kind.PREVIOUS -> prev()
+          PhotoFrameGesture.Kind.TAP -> if (interactivePreview && nativePhotoMode) viewerControls.toggle() else onExit?.invoke()
+          PhotoFrameGesture.Kind.NONE -> Unit
         }
       }
     }
@@ -450,11 +406,9 @@ class PhotoFrameController(
 
   private fun startFrame() {
     stopped = false
-    // Guest mode swaps personal photos and the calendar for neutral ones (GuestPolicy).
-    settings = GuestPolicy.screensaver(ScreensaverConfig.load(context)).let {
-      // Operator performance runs: the test source can hold one mode at a fixed interval.
-      if (photosOnly) musicPhotoSettings(it) else ScreensaverTestSource.pinned(it, ScreensaverTestSource.pin(context))
-    }
+    // Guest mode swaps personal photos and the calendar for neutral ones (GuestPolicy); operator
+    // performance runs may hold one mode at a fixed interval (the test-source pin).
+    settings = PhotoFrameStartPlan.settings(prefs.household(), host(), prefs::testSourcePin)
     val root = view as FrameLayout
     observeNightSettings()
     if (nightClockOnly) {
@@ -462,20 +416,19 @@ class PhotoFrameController(
       onNightClockChanged?.invoke(true)
       return
     }
+    val welcomeCfg = WelcomeConfig.load(context)
+    val plan = PhotoFrameStartPlan.plan(settings, host(), prefs, welcomeCfg.enableTts)
     // Verification builds only: generated scenes replace every configured (household) source.
-    testSourceOn = !photosOnly && ScreensaverTestSource.active(context)
+    testSourceOn = plan.testSource
     if (testSourceOn) Log.i(TAG, "screensaver test source active: generated scenes only")
-    // Operator verification: the dark room is forced on, so the light sensor must not undo it.
-    val forcedNight = testSourceOn && ScreensaverTestSource.forcedNight(context)
-    if (!photosOnly && settings.darkRoomClock && !forcedNight) {
+    if (plan.darkRoomSensor) {
       darkRoomObserver = DarkRoomObserver(context, settings.darkRoomLux.toFloat(),
           onNightChanged = ::setAmbientNight)
       darkRoomObserver?.setActive(hostVisible)
     }
-    val source = if (testSourceOn) PhotoFrameSource.DefaultFeed
-        else PhotoFrameSource.from(settings, allowWebPage = !photosOnly && faceOverride == null)
-    nativePhotoMode = ScreensaverConfig.isNativeStage(settings.mode) && source !is PhotoFrameSource.WebPage
-    if (forcedNight) {
+    val source = plan.source
+    nativePhotoMode = plan.nativePhotoMode
+    if (plan.forcedNight) {
       // Like lights going out: the day frame draws first, then the room turns dark.
       Log.i("ImmortalNight", "dark room forced by the operator test source")
       ui.postDelayed({ setAmbientNight(true) }, ScreensaverTestSource.FORCED_NIGHT_DELAY_MS)
@@ -487,7 +440,7 @@ class PhotoFrameController(
       // A local bundled image is immediately available while source discovery is underway.
       // It never waits behind calendar/weather requests or a failing network provider.
       nativeLoader.load(
-          SlideshowAsset("feed", { bundledBitmap() }, contentIdentity = true,
+          SlideshowAsset("feed", { webFeed.bundled() }, contentIdentity = true,
               identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } }),
           emptyList(), null, false, false,
           { photos, _ ->
@@ -498,20 +451,23 @@ class PhotoFrameController(
           }, { finishNativeStartup() })
     }
     // Caching off? Reclaim any space a previous "on" session left behind (best-effort, off-thread).
-    if (!settings.cacheEnabled) Thread {
-      if (!stopped && !ScreensaverConfig.load(context).cacheEnabled) MediaCache.purge(context)
+    if (plan.purgeCache) Thread {
+      if (!stopped && !prefs.saved().cacheEnabled) MediaCache.purge(context)
     }.apply { name = "slideshow-cache-housekeeping"; start() }
     applyFit()
-    if (!photosOnly) {
+    if (plan.calendar) {
       refreshCalendar.run()
       calendarTick.run()
     }
     // Build + drive the overlay from the user's selected face ([FaceCatalog]); faceOverride lets
     // the debug preview harness (and the overnight night clock) render a specific face instead.
-    if (!photosOnly && splitGlance && !overnightNightPhoto) startSplitGlance(root)
-    else if (!photosOnly) faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
-    if (overnightNightPhoto) setNightPhoto(true)
-    if (!photosOnly) {
+    when (plan.overlay) {
+      PhotoFrameOverlay.SPLIT -> startSplitGlance(root)
+      PhotoFrameOverlay.FACE -> faceRenderer.start(faceOverride ?: FaceCatalog.active(context))
+      PhotoFrameOverlay.NONE -> Unit
+    }
+    if (plan.nightPhoto) setNightPhoto(true)
+    if (plan.galleryObserver) {
       galleryOverlayObserver?.close()
       galleryOverlayObserver = GalleryOverlayLayoutObserver(root, ::refreshGalleryOverlays).also {
         it.setActive(hostActive)
@@ -521,57 +477,28 @@ class PhotoFrameController(
     // --- fork features layered on top of the Face overlay ---
     // Only spin up TTS when the welcome overlay will actually speak. The greeting uses the
     // Android TTS service selected on the device, keeping any neural engine out-of-process.
-    val welcomeCfg = WelcomeConfig.load(context)
-    val ttsEnabled = !photosOnly && showWelcome && settings.welcomeEnabled && welcomeCfg.enableTts
-    if (ttsEnabled) {
-      tts = TextToSpeech(context) { status ->
-        if (status == TextToSpeech.SUCCESS && !ttsReady) {
-          tts?.language = Locale.US
-          tts?.setPitch(1.0f)
-          tts?.setSpeechRate(0.9f)
-          // Apply the user's chosen voice; if none chosen, auto-pick the highest-quality
-          // voice the device has so the greeting sounds as good as possible by default.
-          runCatching {
-            val voices = tts?.voices
-            val chosen =
-                if (welcomeCfg.ttsVoice.isNotBlank()) voices?.firstOrNull { it.name == welcomeCfg.ttsVoice }
-                else voices
-                    ?.filter { it.locale.language == Locale.US.language && !it.isNetworkConnectionRequired }
-                    ?.maxByOrNull { it.quality }
-            chosen?.let {
-              tts?.language = it.locale
-              tts?.voice = it
-            }
-          }
-          ttsReady = true
-          pendingSpeech?.let { text ->
-            speakWelcome(text, welcomeCfg)
-            pendingSpeech = null
-          }
-        }
-      }
-    }
+    if (plan.speakWelcome) welcome.startVoice(welcomeCfg)
 
     // Start the ambient soundscape (no-op when set to Off).
-    // The overnight Night photo is a bedside display: never start a soundscape.
-    if (!photosOnly && !overnightNightPhoto && settings.soundscape != ScreensaverConfig.SOUND_OFF) updateSoundscape()
+    if (plan.soundscape) updateSoundscape()
 
     // Optional "wave to advance" — wholly guarded; any failure just disables it so the
     // always-on dream process is never put at risk.
-    if (!photosOnly && settings.gestureWave) resumeGestureCamera()
+    if (plan.gestureWave) resumeGestureCamera()
 
     // Feed the ambient dashboard's weather, and schedule its cycle (first card after ~45s).
-    // The ambient dashboard is a Classic-renderer feature: it pauses the photo and shows a big
-    // clock/date/weather card periodically. Under the engine that's just an interruption (the engine
-    // already shows a clock overlay, and the dashboard would render behind the opaque WebView), so
-    // it's disabled whenever an engine mode is active — the user never asked for that overlay.
-    val engineMode = ScreensaverConfig.usesEngine(settings.mode)
-    if (!photosOnly) refreshWeather.run()
-    // The dashboard reads the household calendar, so it never runs on the verification source.
-    if (!photosOnly && !overnightNightPhoto && !splitGlance && !testSourceOn && settings.ambientDashboard && !engineMode)
-      ui.postDelayed(dashboardCycle, 45_000L)
+    if (plan.weather) refreshWeather.run()
+    if (plan.dashboard) ui.postDelayed(dashboard.cycle, PhotoFrameStartPlan.DASHBOARD_FIRST_MS)
 
-    if (!photosOnly && showWelcome && settings.welcomeEnabled && !engineMode) showWelcomeOverlay()
+    if (plan.welcomeOverlay) welcome.show()
+    startSource(source, plan.feedRoute)
+  }
+
+  /** How this frame is hosted; the face override is read at each start. */
+  private fun host() = PhotoFrameHost(photosOnly, nightClockOnly, overnightNightPhoto, showWelcome, faceOverride != null)
+
+  /** Starts [source]'s pipeline: discovery off Main, then the engine, the native deck or the web feed. */
+  private fun startSource(source: PhotoFrameSource, feedRoute: PhotoFrameFeedRoute) {
     when (source) {
       is PhotoFrameSource.WebPage -> {
         // Web-page source takes over the whole frame — no photo feed, no Immortal overlay.
@@ -582,44 +509,18 @@ class PhotoFrameController(
           val list =
               if (LocalMedia.isAccessible(source.path)) LocalMedia.enumerate(source.path, source.includeVideo)
               else emptyList()
-          val ordered = if (source.shuffle) list.shuffled() else list
+          val ordered = PhotoFrameDeck.ordered(list, source.shuffle)
           val deckKeys = if (ScreensaverConfig.isNativeStage(settings.mode)) {
             ordered.map { localKey(it.path) }
           } else emptyList()
-          // Engine mode: precompute each photo's ORIENTED w/h (header-only decode) so the
-          // orientation-aware mode scheduler in modes.js can match photos to modes, and drop
-          // sub-[MIN_PHOTO_EDGE] thumbnails/junk that cheapen the wall. Bounded to
-          // [ENGINE_MAX_PHOTOS] to keep this pass (and the deck) small. Images only — the HTML
-          // engine can't play local videos.
+          // Engine mode: each photo's oriented size (header-only) for the orientation-aware mode
+          // scheduler in modes.js, junk dropped, the pool bounded ([PhotoFrameDeck.enginePool]).
           val useEngine = ScreensaverConfig.usesEngine(settings.mode)
-          val engineDims = HashMap<String, Pair<Int, Int>>()
-          val engineUrls =
-              if (useEngine) {
-                val urls = ArrayList<String>()
-                var measured = 0
-                for (item in ordered) {
-                  if (item.isVideo) continue
-                  if (urls.size >= ENGINE_MAX_PHOTOS) break
-                  val u = "file://" + item.path
-                  // Measure oriented w/h for a bounded SEED only (this pre-pass gates first paint).
-                  // Tiny junk is dropped among the measured (a sub-[MIN_PHOTO_EDGE] header is the
-                  // reliable junk signal); unmeasured photos still show, defaulting to a safe bucket.
-                  if (measured < DIMS_SEED) {
-                    measured++
-                    val d = orientedImageDims(item.path)
-                    if (d != null) {
-                      if (minOf(d.first, d.second) < MIN_PHOTO_EDGE) continue
-                      engineDims[u] = d
-                    }
-                  }
-                  urls.add(u)
-                }
-                urls
-              } else emptyList()
+          val pool = if (useEngine) PhotoFrameDeck.enginePool(ordered, decodePlan::orientedSize) else null
           ui.post {
             if (stopped) return@post
-            if (useEngine && engineUrls.isNotEmpty()) {
-              startEngine(engineUrls, dims = engineDims, warmLocalCopies = true)
+            if (pool != null && pool.urls.isNotEmpty()) {
+              startEngine(pool.urls, dims = pool.dims, warmLocalCopies = true)
               return@post
             }
             if (ordered.isNotEmpty()) {
@@ -645,7 +546,7 @@ class PhotoFrameController(
           ui.post {
             if (stopped) return@post
             if (urls.isNotEmpty()) {
-              val ordered = if (source.shuffle) urls.shuffled() else urls
+              val ordered = PhotoFrameDeck.ordered(urls, source.shuffle)
               // Shared-album URLs are direct https with no auth header, so the WebView engine can
               // load them straight into <img>. Hand off to the engine when a mode is selected.
               // The album keeps refreshing underneath (scheduleEngineAlbumRefresh): photos the
@@ -681,10 +582,10 @@ class PhotoFrameController(
           ui.post {
             if (stopped) return@post
             if (media.isNotEmpty()) {
-              val ordered = if (source.shuffle) media.shuffled() else media
+              val ordered = PhotoFrameDeck.ordered(media, source.shuffle)
               // Engine mode: images only (WebView can't play the video URLs), auth via header inject.
               if (ScreensaverConfig.usesEngine(settings.mode)) {
-                val urls = ordered.filterNot { it.isVideo }.map { it.url }
+                val urls = PhotoFrameDeck.engineImages(ordered, { it.isVideo }, { it.url })
                 if (urls.isNotEmpty()) {
                   startEngine(urls, authHeaders = ImmichSource.authHeaders(source.key)); return@post
                 }
@@ -718,9 +619,9 @@ class PhotoFrameController(
           ui.post {
             if (stopped) return@post
             if (media.isNotEmpty()) {
-              val ordered = if (source.shuffle) media.shuffled() else media
+              val ordered = PhotoFrameDeck.ordered(media, source.shuffle)
               if (ScreensaverConfig.usesEngine(settings.mode)) {
-                val urls = ordered.filterNot { it.isVideo }.map { it.url }
+                val urls = PhotoFrameDeck.engineImages(ordered, { it.isVideo }, { it.url })
                 if (urls.isNotEmpty()) {
                   startEngine(urls, authHeaders = DavSource.authHeaders(source.user, source.pass)); return@post
                 }
@@ -766,7 +667,7 @@ class PhotoFrameController(
                       return@Runnable
                     }
                     smbSource = connected
-                    remoteUrls = if (source.shuffle) paths.shuffled() else paths
+                    remoteUrls = PhotoFrameDeck.ordered(paths, source.shuffle)
                     remoteFetch = { p, edge -> fetchSmbImage(connected, p, edge) }
                     remoteMode = true
                     remoteIndex = -1
@@ -785,9 +686,11 @@ class PhotoFrameController(
         // Engine mode + built-in feed: give the engine a batch of keyless Picsum URLs with varied
         // aspect ratios (portraits/landscapes/squares/panos) so every mode has material to work with
         // out of the box, before the user configures their own photo source. Otherwise, classic feed.
-        if (ScreensaverConfig.usesEngine(settings.mode)) {
-          if (testSourceOn) startEngineOnTestScenes() else startEngine(defaultFeedUrls())
-        } else startWeb()
+        when (feedRoute) {
+          PhotoFrameFeedRoute.TEST_SCENES -> startEngineOnTestScenes()
+          PhotoFrameFeedRoute.ENGINE -> startEngine(defaultFeedUrls())
+          PhotoFrameFeedRoute.WEB -> startWeb()
+        }
       }
     }
   }
@@ -809,10 +712,10 @@ class PhotoFrameController(
               MotionEvent.ACTION_DOWN -> {
                 downX = event.x
                 downY = event.y
-                DreamPolicy.userExitAt = System.currentTimeMillis()
+                presence.touched(clock.wallMs())
               }
               MotionEvent.ACTION_UP -> {
-                if (abs(event.x - downX) < 48 && abs(event.y - downY) < 48) {
+                if (PhotoFrameGesture.isTap(event.x - downX, event.y - downY)) {
                   onExit?.invoke()
                   return true
                 }
@@ -920,11 +823,11 @@ class PhotoFrameController(
               webView = wv
               if (BuildConfig.DEBUG) android.webkit.WebView.setWebContentsDebuggingEnabled(true)
               val remoteTransports = if (remotePhotoRequests.hasSources)
-                EnginePhotoTransports { photoCancelIo.execute(it) }.also { legacyRemoteTransports = it } else null
+                EnginePhotoTransports { transport.cancelIo.execute(it) }.also { legacyRemoteTransports = it } else null
               val remoteImages = if (remotePhotoRequests.hasSources) EngineRemoteImageCache(
                   java.io.File(context.cacheDir, "ss_remote/${java.util.UUID.randomUUID()}"),
                   download = { url, target, current ->
-                    val generation = photoTransportGeneration.get()
+                    val generation = transport.generation.get()
                     runCatching {
                       EngineRemoteHttp.download(url, headers, USER_AGENT, target, remoteTransports!!) {
                         current() && photoRequestCurrent(generation)
@@ -994,7 +897,7 @@ class PhotoFrameController(
                       if (!req.method.equals("GET", ignoreCase = true)) return null
                       // Auxiliary non-photo image requests keep their existing behavior, but no
                       // longer allocate an unbounded byte array or bypass transport cancellation.
-                      val generation = photoTransportGeneration.get()
+                      val generation = transport.generation.get()
                       val bytes = runCatching { downloadBytes(u.toString(), headers, generation) }.getOrNull()
                           ?: return android.webkit.WebResourceResponse("image/jpeg", null,
                               404, "Photo unavailable", emptyMap(), java.io.ByteArrayInputStream(byteArrayOf()))
@@ -1024,9 +927,9 @@ class PhotoFrameController(
                     isCurrent={ !stopped && owner == legacyEngineRevision && webView === wv && legacyFaceStore === faceStore },
                     liftOverlays={
                       runCatching { faceRenderer.view.bringToFront() }
-                      runCatching { calendarPanel.bringToFront() }
-                      dashboardPanel?.let { runCatching { it.bringToFront() } }
-                      runCatching { welcomeOverlay.bringToFront() }
+                      calendar.bringToFront()
+                      dashboard.bringToFront()
+                      welcome.bringToFront()
                     }).also {
                   hybridFilmstrip = it
                   it.setHostActive(hostActive)
@@ -1145,9 +1048,9 @@ class PhotoFrameController(
               root.addOnLayoutChangeListener(resize)
               // Re-stack the overlays above the engine (bringToFront preserves their relative order).
               runCatching { faceRenderer.view.bringToFront() }
-              runCatching { calendarPanel.bringToFront() }
-              dashboardPanel?.let { runCatching { it.bringToFront() } }
-              runCatching { welcomeOverlay.bringToFront() }
+              calendar.bringToFront()
+              dashboard.bringToFront()
+              welcome.bringToFront()
               // Bust the WebView cache on app UPDATES by versioning the asset URL (VERSION_CODE bumps each
               // release) rather than clearCache(true) on every start — clearing every start wiped the disk
               // cache during the most latency-sensitive moment of cold start. Same URL within a version keeps
@@ -1159,8 +1062,7 @@ class PhotoFrameController(
               // Resume before loading: dimension measurement, image admission and promotion need JS timers.
               wv.resumeTimers()
               wv.onResume()
-              val initiallyPaused = if (hostActive && !paused) 0 else 1
-              wv.loadUrl("file:///android_asset/screensaver/index.html?nativeClock=1&v=$assetVer&hostPaused=$initiallyPaused")
+              wv.loadUrl(PhotoFrameEngineScript.pageUrl(assetVer, hostActive, paused))
               if (!hostActive) wv.onPause()
               // Cached face hints were read during metadata preparation. New analysis waits for
               // the first decoded scene, leaving page/image startup free of that extra work.
@@ -1228,9 +1130,9 @@ class PhotoFrameController(
     nativeFilmstrip = stage // Main owns the stage before layout/start can fail.
     root.addView(stage, FrameLayout.LayoutParams(MATCH, MATCH))
     runCatching { faceRenderer.view.bringToFront() }
-    runCatching { calendarPanel.bringToFront() }
-    dashboardPanel?.let { runCatching { it.bringToFront() } }
-    runCatching { welcomeOverlay.bringToFront() }
+    calendar.bringToFront()
+    dashboard.bringToFront()
+    welcome.bringToFront()
     stage.setHostActive(hostActive)
     stage.setPaused(paused)
     stage.start()
@@ -1304,10 +1206,10 @@ class PhotoFrameController(
     if (hostVisible != value) revealClockRefresh.reset()
     hostVisible = value
     darkRoomObserver?.setActive(value && !stopped)
-    quietClock?.setActive(value && (isNightClockShowing || nightTransition.coversPhotos) && !stopped)
+    quietClock?.setActive(PhotoFrameNight.quietClockActive(value, isNightClockShowing, nightTransition.coversPhotos, stopped))
     if (nightClockOnly) return
     nightTransition.setActive(value && !stopped)
-    applyHostActive(value && !nightTransition.coversPhotos)
+    applyHostActive(PhotoFrameNight.photosActive(value, nightTransition.coversPhotos))
   }
 
   private fun observeNightSettings() {
@@ -1315,7 +1217,7 @@ class PhotoFrameController(
     val receiver = object : BroadcastReceiver() {
       override fun onReceive(context: Context?, intent: Intent?) {
         if (!stopped && nightSettingsReceiver === this && intent?.action == NightSettingsChanges.ACTION)
-          applyNightSettings(ScreensaverConfig.load(this@PhotoFrameController.context))
+          applyNightSettings(prefs.saved())
       }
     }
     nightSettingsReceiver = receiver
@@ -1326,14 +1228,10 @@ class PhotoFrameController(
 
   /** Update only clock controls; source discovery and the retained media session stay intact. */
   private fun applyNightSettings(fresh: ScreensaverConfig.Settings) {
-    val sensorChanged = settings.darkRoomClock != fresh.darkRoomClock ||
-        settings.darkRoomLux != fresh.darkRoomLux
-    val brightnessChanged = settings.nightClockBrightness != fresh.nightClockBrightness
-    val toneChanged = settings.nightClockTone != fresh.nightClockTone
-    settings = settings.copy(darkRoomClock = fresh.darkRoomClock, darkRoomLux = fresh.darkRoomLux,
-        nightClockBrightness = fresh.nightClockBrightness, nightClockTone = fresh.nightClockTone)
-    if (toneChanged) quietClock?.updateTone(fresh.nightClockTone)
-    if (sensorChanged && !nightClockOnly) {
+    val change = PhotoFrameNight.change(settings, fresh)
+    settings = change.settings
+    if (change.toneChanged) quietClock?.updateTone(fresh.nightClockTone)
+    if (change.sensorChanged && !nightClockOnly) {
       darkRoomObserver?.setActive(false)
       darkRoomObserver = null
       if (fresh.darkRoomClock) {
@@ -1342,15 +1240,14 @@ class PhotoFrameController(
         darkRoomObserver?.setActive(hostVisible)
       } else setAmbientNight(false)
     }
-    if (brightnessChanged && isNightClockShowing) onNightClockChanged?.invoke(true)
+    if (change.brightnessChanged && isNightClockShowing) onNightClockChanged?.invoke(true)
   }
 
   private fun setAmbientNight(value: Boolean) {
-    if (stopped || ambientNight == value) return
-    if (settings.nightClockTone == ScreensaverConfig.NIGHT_TONE_PHOTO && nativePhotoMode) {
-      ambientNight = value
-      setNightPhoto(value)
-      return
+    when (PhotoFrameNight.ambient(value, ambientNight, stopped, settings.nightClockTone, nativePhotoMode)) {
+      PhotoFrameNight.Ambient.NONE -> return
+      PhotoFrameNight.Ambient.NIGHT_PHOTO -> { ambientNight = value; setNightPhoto(value); return }
+      PhotoFrameNight.Ambient.QUIET_CLOCK -> Unit
     }
     revealClockRefresh.reset()
     ambientNight = value
@@ -1371,15 +1268,15 @@ class PhotoFrameController(
     nightTransition.setActive(hostVisible)
     nightTransition.setNight(value)
     onNightClockChanged?.invoke(value)
-    Log.i("ImmortalNight", if (value) "dark room: fading to clock; photos suspended" else "light returned: fading to retained photo")
+    Log.i("ImmortalNight", PhotoFrameNight.quietClockLog(value))
   }
 
   /** Effective renderer state combines external visibility with the ambient clock cover. */
   private fun applyHostActive(value: Boolean) {
     if (stopped || hostActive == value) return
-    val now = android.os.SystemClock.uptimeMillis()
+    val now = clock.uptimeMs()
     if (!value) {
-      hostSuspendedAt = now
+      schedule.suspend(now)
       hostActive = false
       photoPause.setHostActive(false)
       legacyRemoteTransports?.cancelCurrent()
@@ -1403,7 +1300,7 @@ class PhotoFrameController(
       }
     } else {
       // The callback queue freezes delays. Keep the viewer's pause deadline on that same clock.
-      if (holdDeadline > 0L) holdDeadline += now - hostSuspendedAt
+      schedule.resume(now)
       hostActive = true
       webView?.let { wv ->
         wv.onResume()
@@ -1449,11 +1346,7 @@ class PhotoFrameController(
     }
   }
 
-  private fun cancelVideoPrefetchTransport() {
-    videoPrefetchConnection?.let { connection ->
-      photoCancelIo.execute { runCatching { connection.disconnect() } }
-    }
-  }
+  private fun cancelVideoPrefetchTransport() = transport.cancelVideoPrefetch()
 
   /** Capture the cached playback position before Android tears down the surface. */
   fun retainVideoPosition() {
@@ -1462,13 +1355,13 @@ class PhotoFrameController(
     if (position > 0) retainedVideoPosition = position
   }
 
-  private fun playbackUptime(): Long =
-      if (hostActive) android.os.SystemClock.uptimeMillis() else hostSuspendedAt
+
+  /** The engine page's script bridge on [wv]. */
+  private fun bridge(wv: android.webkit.WebView) = PhotoFrameWebBridge { script -> wv.evaluateJavascript(script, null) }
 
   private fun applyEnginePlayback(wv: android.webkit.WebView) {
-    val action = if (hostActive && !paused) "resume" else "pause"
-    wv.evaluateJavascript("window.immortalSlideshow?.$action()", null)
-    if (hostActive && !paused) legacyWarmup?.resume()
+    bridge(wv).run(PhotoFrameEngineScript.playback(hostActive, paused))
+    if (PhotoFrameEngineScript.plays(hostActive, paused)) legacyWarmup?.resume()
   }
 
   @androidx.annotation.MainThread
@@ -1503,16 +1396,13 @@ class PhotoFrameController(
     clearNativeHistory()
     if (this::viewerControls.isInitialized) viewerControls.stop()
     scaledCache.cancel() // don't keep burning CPU on copies while Home redraws
-    ui.removeCallbacks(dashboardCycle)
+    ui.removeCallbacks(dashboard.cycle)
     ui.close()
     runCatching { gestureCamera?.stop() }
     gestureCamera = null
     // TTS stop/shutdown is an IPC round-trip to the system TTS service, and soundscape.stop() can
     // block briefly — move both off the main thread so neither delays the exit.
-    val ttsRef = tts
-    tts = null
-    ttsReady = false
-    pendingSpeech = null
+    val ttsRef = welcome.release()
     Thread {
       runCatching { ttsRef?.stop() }
       runCatching { ttsRef?.shutdown() }
@@ -1538,7 +1428,7 @@ class PhotoFrameController(
     io.shutdownNow()
     metaIo.shutdownNow()
     transcodeIo.shutdownNow()
-    photoCancelIo.shutdown() // Drain owned closes; never wait for a network read on the UI thread.
+    transport.shutdown() // Drain owned closes; never wait for a network read on the UI thread.
   }
 
   // --- UI ---------------------------------------------------------------------
@@ -1576,11 +1466,7 @@ class PhotoFrameController(
         splitPanel?.setAccent(HearthReadability.accent(currentPhoto?.look?.analysis?.dominant, false),
             SlideshowStage.SPLIT_DISSOLVE_MS)
         // Finite native scene admission, only while a bounded capture owns a listener.
-        val style = when (settings.mode) {
-          ScreensaverConfig.MODE_GALLERY_PRINT -> SlideshowStyle.GALLERY_PRINT
-          ScreensaverConfig.MODE_GALLERY_SPREAD -> SlideshowStyle.GALLERY_SPREAD
-          else -> null
-        }
+        val style = PhotoFrameStagePolicy.reportedStyle(settings.mode)
         if (style != null && !stopped && hostActive && !paused) {
           val host = when (context) {
             is PhotoFramePreviewActivity -> SlideshowStyleHost.PREVIEW
@@ -1595,17 +1481,17 @@ class PhotoFrameController(
 
     if (!photosOnly) {
       root.addView(faceRenderer.view)
-      buildCalendar(root)
+      calendar.build(root)
     }
 
     // Ambient dashboard panel — full-screen glanceable card, hidden until cycled in.
-    dashboardPanel = buildDashboardPanel().also {
+    dashboard.build().also {
       it.visibility = View.GONE
       root.addView(it, FrameLayout.LayoutParams(MATCH, MATCH))
     }
 
     // Welcome-back overlay — added last so it renders above photos and the Face overlay.
-    welcomeOverlay = buildWelcomeOverlay()
+    val welcomeOverlay = welcome.build()
     welcomeOverlay.visibility = View.GONE
     root.addView(welcomeOverlay, FrameLayout.LayoutParams(MATCH, MATCH))
     viewerControls = SlideshowViewerControls(
@@ -1668,167 +1554,6 @@ class PhotoFrameController(
     ui.post { if (g == gen) faceRenderer.setCaption(place, date, memory, fresh) }
   }
 
-  /** A clean upcoming-events panel top-right, over the photo. Its own translucent
-   *  rounded backing keeps it legible without a full-screen scrim. Hidden until a
-   *  calendar link is set and there's something to show. */
-  private fun buildCalendar(root: FrameLayout) {
-    calendarPanel = LinearLayout(context)
-    calendarPanel.orientation = LinearLayout.VERTICAL
-    calendarPanel.visibility = View.GONE
-    val bg = GradientDrawable()
-    bg.setColor(0x66000000)
-    bg.cornerRadius = dp(18).toFloat()
-    calendarPanel.background = bg
-    calendarPanel.setPadding(dp(22), dp(18), dp(22), dp(18))
-    val lp = FrameLayout.LayoutParams(WRAP, WRAP, Gravity.TOP or Gravity.END)
-    lp.setMargins(0, dp(40), dp(40), 0)
-    root.addView(calendarPanel, lp)
-
-    calendarHeader = text(15f, 0xCCFFFFFF.toInt(), false)
-    calendarHeader.typeface = Typeface.DEFAULT_BOLD
-    calendarHeader.letterSpacing = 0.08f
-    calendarPanel.addView(calendarHeader)
-
-    calendarRows = LinearLayout(context)
-    calendarRows.orientation = LinearLayout.VERTICAL
-    val rowsLp = LinearLayout.LayoutParams(WRAP, WRAP)
-    rowsLp.topMargin = dp(10)
-    calendarPanel.addView(calendarRows, rowsLp)
-  }
-
-  /** Rebuild the calendar panel from the cached events for the chosen range. Cheap
-   *  (no network) — called when a fetch lands and once per minute from [tick]. */
-  private fun renderCalendar() {
-    if (!this::calendarPanel.isInitialized) return
-    if (splitGlance || nightPhotoOn) {
-      // The new modes own the screen: Split glance shows only the next event in its panel.
-      calendarPanel.visibility = View.GONE
-      val now = System.currentTimeMillis()
-      val events = if (testSourceOn) ScreensaverTestSource.events(now)
-          else if (settings.usesCalendar) calendarEvents else emptyList()
-      val next = SplitGlancePanel.nextEvent(events, now)
-      val pattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm a"
-      splitPanel?.setNext(next?.title, next?.let { SimpleDateFormat(pattern, Locale.getDefault()).format(Date(it.startMillis)) })
-      return
-    }
-    if (!settings.usesCalendar && !testSourceOn) {
-      calendarPanel.visibility = View.GONE
-      return
-    }
-    val now = System.currentTimeMillis()
-    // The verification source shows synthetic events, never the household's own agenda.
-    val shown = if (testSourceOn) CalendarFeed.window(ScreensaverTestSource.events(now), CalendarFeed.RANGE_3DAY, now)
-        else CalendarFeed.window(calendarEvents, settings.calendarRange, now)
-    // Size + position can change at runtime (settings screen or a fleet push), so
-    // (re)apply the chrome each render. Scale drives text/padding; side drives the edge.
-    calScale =
-        when (settings.calendarSize) {
-          0 -> 0.82f
-          2 -> 1.22f
-          else -> 1f
-        }
-    applyCalendarChrome()
-    calendarHeader.textSize = 15f * calScale
-    calendarHeader.text = rangeLabel(settings.calendarRange).uppercase(Locale.getDefault())
-    calendarRows.removeAllViews()
-    calendarPanel.visibility = View.VISIBLE
-
-    if (shown.isEmpty()) {
-      val empty = text(17f * calScale, 0xCCFFFFFF.toInt(), false)
-      empty.text = "Nothing scheduled"
-      calendarRows.addView(empty)
-      return
-    }
-
-    val agenda = settings.calendarRange == CalendarFeed.RANGE_AGENDA
-    var lastDayKey = ""
-    for (ev in shown) {
-      // Day header whenever the day changes (and always in agenda mode, which spans
-      // arbitrary dates). A single-day range needs no per-day header.
-      val key = dayKey(ev.startMillis)
-      if (key != lastDayKey && (agenda || settings.calendarRange != CalendarFeed.RANGE_DAY)) {
-        val header = text(13f * calScale, 0x99FFFFFF.toInt(), false)
-        header.typeface = Typeface.DEFAULT_BOLD
-        header.text = dayHeader(ev.startMillis).uppercase(Locale.getDefault())
-        val hlp = LinearLayout.LayoutParams(WRAP, WRAP)
-        hlp.topMargin = if (calendarRows.childCount == 0) 0 else dp(12)
-        calendarRows.addView(header, hlp)
-      }
-      lastDayKey = key
-      calendarRows.addView(buildEventRow(ev))
-    }
-  }
-
-  /** Position the panel against the chosen edge and scale its padding to the size. */
-  private fun applyCalendarChrome() {
-    val pad = (22 * calScale).toInt()
-    val padV = (18 * calScale).toInt()
-    calendarPanel.setPadding(dp(pad), dp(padV), dp(pad), dp(padV))
-    val gravity =
-        Gravity.TOP or
-            (if (settings.calendarSide == ScreensaverConfig.CAL_SIDE_LEFT) Gravity.START
-            else Gravity.END)
-    val lp = FrameLayout.LayoutParams(WRAP, WRAP, gravity)
-    val side = dp(40)
-    if (settings.calendarSide == ScreensaverConfig.CAL_SIDE_LEFT) lp.setMargins(side, dp(40), 0, 0)
-    else lp.setMargins(0, dp(40), side, 0)
-    calendarPanel.layoutParams = lp
-  }
-
-  private fun buildEventRow(ev: CalendarFeed.Event): View {
-    val row = LinearLayout(context)
-    row.orientation = LinearLayout.HORIZONTAL
-    row.gravity = Gravity.CENTER_VERTICAL
-    val rowLp = LinearLayout.LayoutParams(WRAP, WRAP)
-    rowLp.topMargin = dp(6)
-
-    val time = text(17f * calScale, Color.WHITE, false)
-    time.text = if (ev.allDay) "All day" else timeLabel(ev.startMillis)
-    time.width = dp((96 * calScale).toInt())
-
-    val title = text(17f * calScale, Color.WHITE, false)
-    title.typeface = Typeface.DEFAULT_BOLD
-    title.text = ev.title
-    title.maxLines = 1
-    title.ellipsize = TextUtils.TruncateAt.END
-    title.maxWidth = dp((360 * calScale).toInt())
-
-    row.addView(time)
-    row.addView(title)
-    row.layoutParams = rowLp
-    return row
-  }
-
-  private fun rangeLabel(range: String): String =
-      when (range) {
-        CalendarFeed.RANGE_3DAY -> "Next 3 days"
-        CalendarFeed.RANGE_WEEK -> "This week"
-        CalendarFeed.RANGE_AGENDA -> "Upcoming"
-        else -> "Today"
-      }
-
-  private fun timeLabel(millis: Long): String {
-    val pattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm a"
-    return SimpleDateFormat(pattern, Locale.getDefault()).format(Date(millis))
-  }
-
-  /** A stable per-day key (yyyyDDD) so the renderer can tell when the day changes. */
-  private fun dayKey(millis: Long): String =
-      SimpleDateFormat("yyyyDDD", Locale.US).format(Date(millis))
-
-  /** "Today" / "Tomorrow" / "Sat, Jun 21" relative to now. */
-  private fun dayHeader(millis: Long): String {
-    val day = Calendar.getInstance()
-    val today = dayKey(day.timeInMillis)
-    day.add(Calendar.DAY_OF_YEAR, 1)
-    val tomorrow = dayKey(day.timeInMillis)
-    return when (dayKey(millis)) {
-      today -> "Today"
-      tomorrow -> "Tomorrow"
-      else -> DateFormatter.format(Date(millis), "EEEMMMd")
-    }
-  }
-
   private fun applyFit() {
     // Video gets the same choice via [applyVideoFit], sized per-clip once its dimensions are known.
     val scaleType =
@@ -1858,237 +1583,7 @@ class PhotoFrameController(
     videoView.layoutParams = lp
   }
 
-  // --- welcome-back overlay (fork) --------------------------------------------
-
-  private fun buildWelcomeOverlay(): View {
-    val welcomeCfg = WelcomeConfig.load(context)
-
-    val overlay = FrameLayout(context)
-    // Semi-opaque dark scrim so the photo is faintly visible behind the greeting.
-    val bgAlpha = (welcomeCfg.backgroundOpacity * 255).toInt()
-    overlay.setBackgroundColor((bgAlpha shl 24) or 0x000000)
-
-    val col = LinearLayout(context)
-    col.orientation = LinearLayout.VERTICAL
-    col.gravity = Gravity.CENTER_HORIZONTAL
-    // Add horizontal padding to prevent text cutoff at screen edges
-    col.setPadding(dp(40), dp(20), dp(40), dp(20))
-
-    val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-    val greeting = when {
-      hour < 5  -> welcomeCfg.greetingNight
-      hour < 12 -> welcomeCfg.greetingMorning
-      hour < 17 -> welcomeCfg.greetingAfternoon
-      hour < 22 -> welcomeCfg.greetingEvening
-      else      -> welcomeCfg.greetingNight
-    }
-    val fullGreeting = if (welcomeCfg.userName.isNotBlank()) {
-      "$greeting, ${welcomeCfg.userName}"
-    } else {
-      greeting
-    }
-
-    if (welcomeCfg.showGreeting) {
-      val greetingView = text(welcomeCfg.greetingSize, welcomeCfg.greetingColor, false)
-      greetingView.text = fullGreeting
-      greetingView.gravity = Gravity.CENTER
-      greetingView.letterSpacing = welcomeCfg.greetingLetterSpacing
-      greetingView.maxLines = 2
-      val greetingLp = LinearLayout.LayoutParams(
-          LinearLayout.LayoutParams.MATCH_PARENT,
-          LinearLayout.LayoutParams.WRAP_CONTENT)
-      col.addView(greetingView, greetingLp)
-    }
-
-    if (welcomeCfg.showClock) {
-      val clockPattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm"
-      val clockView = text(welcomeCfg.clockSize, welcomeCfg.clockColor, true)
-      clockView.text = SimpleDateFormat(clockPattern, Locale.getDefault()).format(Date())
-      clockView.gravity = Gravity.CENTER
-      clockView.maxLines = 1
-      val clockLp = LinearLayout.LayoutParams(
-          LinearLayout.LayoutParams.MATCH_PARENT,
-          LinearLayout.LayoutParams.WRAP_CONTENT)
-      col.addView(clockView, clockLp)
-    }
-
-    if (welcomeCfg.showDate) {
-      val dateView = text(welcomeCfg.dateSize, welcomeCfg.dateColor, false)
-      dateView.text = DateFormatter.format(Date(), "EEEEMMMd")
-      dateView.gravity = Gravity.CENTER
-      dateView.maxLines = 1
-      val dateLp = LinearLayout.LayoutParams(
-          LinearLayout.LayoutParams.MATCH_PARENT,
-          LinearLayout.LayoutParams.WRAP_CONTENT)
-      dateLp.topMargin = dp(4)
-      col.addView(dateView, dateLp)
-    }
-
-    // Use MATCH_PARENT width with the padding above to ensure text stays visible
-    overlay.addView(col, FrameLayout.LayoutParams(MATCH, WRAP, Gravity.CENTER))
-    return overlay
-  }
-
-  private fun showWelcomeOverlay() {
-    val welcomeCfg = WelcomeConfig.load(context)
-    welcomeVisible = true
-    welcomeOverlay.alpha = 0f
-    welcomeOverlay.visibility = View.VISIBLE
-    welcomeOverlay.animate().alpha(1f).setDuration(500).start()
-
-    // Speak the greeting if TTS is enabled
-    if (welcomeCfg.enableTts) {
-      val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-      val greeting = when {
-        hour < 5  -> welcomeCfg.greetingNight
-        hour < 12 -> welcomeCfg.greetingMorning
-        hour < 17 -> welcomeCfg.greetingAfternoon
-        hour < 22 -> welcomeCfg.greetingEvening
-        else      -> welcomeCfg.greetingNight
-      }
-      val fullGreeting = if (welcomeCfg.userName.isNotBlank()) {
-        "$greeting, ${welcomeCfg.userName}"
-      } else {
-        greeting
-      }
-      // Speak immediately if TTS is ready, otherwise queue it
-      if (ttsReady) {
-        speakWelcome(fullGreeting, welcomeCfg)
-      } else {
-        pendingSpeech = fullGreeting
-      }
-    }
-
-    // Auto-dismiss after configured duration.
-    ui.postDelayed(dismissWelcomeRunnable, welcomeCfg.durationMs.toLong())
-  }
-
-  /** Dismiss immediately (e.g. on tap). */
-  private fun dismissWelcome() {
-    if (!welcomeVisible) return
-    ui.removeCallbacks(dismissWelcomeRunnable)
-    tts?.stop()
-    pendingSpeech = null
-    dismissWelcomeAnimated()
-  }
-
-  private fun dismissWelcomeAnimated() {
-    welcomeVisible = false
-    welcomeOverlay.animate()
-        .alpha(0f)
-        .setDuration(600)
-        .withEndAction { welcomeOverlay.visibility = View.GONE }
-        .start()
-  }
-
-  private fun speakWelcome(text: String, cfg: WelcomeConfig.Settings) {
-    val params = welcomeTtsParams(cfg)
-    runCatching {
-      tts?.speak(text, TextToSpeech.QUEUE_FLUSH, params, "welcome_greeting")
-    }.onFailure { Log.w(TAG, "Welcome TTS speak failed", it) }
-  }
-
-  private fun welcomeTtsParams(cfg: WelcomeConfig.Settings): android.os.Bundle? =
-      if (cfg.ttsVoice.isBlank()) {
-        null
-      } else {
-        android.os.Bundle().apply { putString(SHERPA_VOICE_PARAM, cfg.ttsVoice) }
-      }
-
   // --- ambient dashboard (fork) -----------------------------------------------
-
-  private fun buildDashboardPanel(): View {
-    val panel = FrameLayout(context)
-    panel.setBackgroundColor(0xF20D0D12.toInt()) // near-opaque dark
-    val col = LinearLayout(context)
-    col.orientation = LinearLayout.VERTICAL
-    col.gravity = Gravity.CENTER
-    panel.addView(col, FrameLayout.LayoutParams(WRAP, WRAP, Gravity.CENTER))
-    dashClock = text(120f, Color.WHITE, true).also { it.gravity = Gravity.CENTER; col.addView(it) }
-    dashDate = text(28f, Color.WHITE, false).also { it.gravity = Gravity.CENTER; col.addView(it) }
-    dashWeather = text(26f, Color.WHITE, false).also {
-      it.gravity = Gravity.CENTER
-      (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(18)
-      col.addView(it)
-    }
-    dashEvent = text(22f, Color.WHITE, false).also {
-      it.gravity = Gravity.CENTER
-      (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(10)
-      col.addView(it)
-    }
-    // Almanac line(s): enabled calendar packs (Irish holidays, prayer times) + a quote of the day.
-    dashAlmanac = text(20f, Color.WHITE, false).also {
-      it.gravity = Gravity.CENTER
-      (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(14)
-      col.addView(it)
-    }
-    return panel
-  }
-
-  /** Shows the dashboard card for a few seconds, then returns to the photos. */
-  private val dashboardCycle =
-      object : Runnable {
-        override fun run() {
-          if (!settings.ambientDashboard) return
-          // Never pop the bright dashboard over the dark-room Night photo.
-          if (nightPhotoOn) { ui.postDelayed(this, 90_000L); return }
-          showDashboard()
-          ui.postDelayed({ hideDashboard() }, 9_000L)
-          ui.postDelayed(this, 90_000L) // reappear roughly every 90s
-        }
-      }
-
-  private fun showDashboard() {
-    val panel = dashboardPanel ?: return
-    val now = Date()
-    val clockPattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm"
-    dashClock.text = SimpleDateFormat(clockPattern, Locale.getDefault()).format(now)
-    dashDate.text = DateFormatter.format(now, "EEEEMMMMd")
-    dashWeather.text = weatherText
-    dashWeather.visibility = if (weatherText.isNotBlank()) View.VISIBLE else View.GONE
-    dashEvent.visibility = View.GONE
-    dashAlmanac.visibility = View.GONE
-    io.execute {
-      val lines = buildList {
-        runCatching { CalendarPacks.headerLines(context) }.getOrDefault(emptyList()).forEach { add(it) }
-        val q = DailyContent.quoteOfDay()
-        add("“${q.text}”  — ${q.author}")
-      }
-      val txt = lines.joinToString("\n")
-      ui.post {
-        if (dashboardVisible && txt.isNotBlank()) {
-          dashAlmanac.text = txt
-          dashAlmanac.visibility = View.VISIBLE
-        }
-      }
-    }
-    io.execute {
-      val ev = runCatching {
-        if (CalendarHelper.hasPermission(context)) CalendarHelper.upcoming(context).firstOrNull() else null
-      }.getOrNull()
-      ui.post {
-        if (ev != null) {
-          val cal = Calendar.getInstance().apply { timeInMillis = ev.begin }
-          val whenStr =
-              if (ev.allDay) SimpleDateFormat("MMM d", Locale.getDefault()).format(cal.time)
-              else SimpleDateFormat(if (ImmortalSettings.use24HourClock(context)) "HH:mm" else "h:mm a",
-                  Locale.getDefault()).format(cal.time)
-          dashEvent.text = "Next: $whenStr · ${ev.title}"
-          if (dashboardVisible) dashEvent.visibility = View.VISIBLE
-        }
-      }
-    }
-    panel.alpha = 0f
-    panel.visibility = View.VISIBLE
-    panel.animate().alpha(1f).setDuration(600).start()
-    dashboardVisible = true
-  }
-
-  private fun hideDashboard() {
-    val panel = dashboardPanel ?: return
-    panel.animate().alpha(0f).setDuration(600).withEndAction { panel.visibility = View.GONE }.start()
-    dashboardVisible = false
-  }
 
   private val refreshWeather =
       object : Runnable {
@@ -2102,27 +1597,18 @@ class PhotoFrameController(
     metaIo.execute {
       // Shared resilient fetch: cached location + multi-provider geolocation.
       val w = Weather.fetch(context)
-      if (w.isNotBlank()) weatherText = w
+      if (w.isNotBlank()) dashboard.weatherText = w
     }
   }
 
-  private fun text(sizeSp: Float, color: Int, light: Boolean): TextView {
-    val t = TextView(context)
-    t.textSize = sizeSp
-    t.setTextColor(color)
-    if (light) t.typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
-    t.setShadowLayer(8f, 0f, 2f, 0x99000000.toInt())
-    return t
-  }
+  private fun renderCalendar() = calendar.render()
 
-  private fun intervalMs(): Long = (settings.intervalSec * 1000L).let {
-    if (nightPhotoOn) NightPhotoOverlay.intervalMs(it) else it
-  }
+  private fun intervalMs(): Long = PhotoFrameSchedule.intervalMs(settings.intervalSec, nightPhotoOn)
 
   /** Split glance: the clock panel replaces the face overlay; the calendar feeds "Next". */
   private fun startSplitGlance(root: FrameLayout) {
     faceRendererDelegate.value.view.visibility = View.GONE
-    if (this::calendarPanel.isInitialized) calendarPanel.visibility = View.GONE
+    calendar.hide()
     val panel = splitPanel ?: SplitGlancePanel(context).also { splitPanel = it }
     if (panel.view.parent == null) root.addView(panel.view, FrameLayout.LayoutParams(WRAP, WRAP))
     panel.setOrbitEnabled(settings.antiBurnIn)
@@ -2175,24 +1661,21 @@ class PhotoFrameController(
         overlay.animate().alpha(1f).setDuration(SlideshowStage.NIGHT_DISSOLVE_MS).start()
       } else overlay.visibility = View.GONE
     }
-    val day = if (value) View.GONE else View.VISIBLE
-    if (faceRendererDelegate.isInitialized() && !splitGlance) faceRenderer.view.visibility = day
+    val overlays = PhotoFrameStagePolicy.nightPhotoOverlays(value, splitGlance)
+    val day = if (overlays.dayVisible) View.VISIBLE else View.GONE
+    if (faceRendererDelegate.isInitialized() && overlays.faceFollows) faceRenderer.view.visibility = day
     splitPanel?.view?.visibility = day
-    if (!value) renderCalendar() else if (this::calendarPanel.isInitialized) calendarPanel.visibility = View.GONE
+    if (overlays.rerenderCalendar) renderCalendar() else calendar.hide()
     // Re-present the photo on screen so it warms (or returns to day) now, through the slow
     // night dissolve, instead of waiting for the next photo.
-    if (nativePhotoMode && !stopped && nativeStage.photoCount == 1) nativeStage.currentPhoto?.let {
+    if (PhotoFrameStagePolicy.representForNightPhoto(nativePhotoMode, stopped, nativeStage.photoCount)) nativeStage.currentPhoto?.let {
       presentNative(listOf(it), automatic = true)
     }
     onNightClockChanged?.invoke(value)
-    Log.i("ImmortalNight", if (value) "night photo: warm dim photos" else "night photo: day frame restored")
+    Log.i("ImmortalNight", PhotoFrameNight.nightPhotoLog(value))
   }
-  private fun isGalleryStyle(): Boolean =
-      settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT ||
-          settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD
-  private fun analyzePeople(): Boolean =
-      settings.keepPeopleInFrame && settings.mode != ScreensaverConfig.MODE_WHOLE &&
-          !isGalleryStyle()
+  private fun isGalleryStyle(): Boolean = PhotoFrameStagePolicy.isGallery(settings.mode)
+  private fun analyzePeople(): Boolean = PhotoFrameStagePolicy.keepPeople(settings)
 
   private fun localKey(path: String): String {
     val file = java.io.File(path)
@@ -2201,7 +1684,7 @@ class PhotoFrameController(
 
   private fun localAsset(path: String, key: String = localKey(path)): SlideshowAsset =
       SlideshowAsset(key, { edge -> decodeBoundedFile(path, edge) }, {
-        orientedImageDims(path)?.let { it.second > it.first } ?: false
+        decodePlan.orientedSize(path)?.let { it.second > it.first } ?: false
       }, revisionVerified = true,
           identity = { bitmap -> synchronized(photoIdentities) { photoIdentities.remove(bitmap) } })
 
@@ -2271,10 +1754,7 @@ class PhotoFrameController(
 
   private fun measuredNativeOcclusions(): List<Rect> {
     val occupied = if (photosOnly) mutableListOf<Rect>() else faceRenderer.photoOcclusions().toMutableList()
-    if (this::calendarPanel.isInitialized && calendarPanel.visibility == View.VISIBLE && calendarPanel.width > 0) {
-      occupied.add(Rect(calendarPanel.left - dp(20), calendarPanel.top - dp(20),
-          calendarPanel.right + dp(20), calendarPanel.bottom + dp(20)))
-    }
+    calendar.occlusion { dp(PhotoFrameStagePolicy.CALENDAR_MARGIN_DP) }?.let(occupied::add)
     return occupied
   }
 
@@ -2290,12 +1770,8 @@ class PhotoFrameController(
         val clocks = if (photosOnly) emptyList() else faceRenderer.photoOcclusions().map { area ->
           SlideshowPresentationPolicy.Bounds(area.left, area.top, area.right, area.bottom)
         }
-        val calendar = if (this::calendarPanel.isInitialized &&
-            calendarPanel.visibility == View.VISIBLE && calendarPanel.width > 0) {
-          listOf(SlideshowPresentationPolicy.Bounds(calendarPanel.left - dp(20), calendarPanel.top - dp(20),
-              calendarPanel.right + dp(20), calendarPanel.bottom + dp(20)))
-        } else emptyList()
-        SlideshowPresentationPolicy.paperOcclusions(origin[0], origin[1], clocks, calendar).forEach { area ->
+        val calendarArea = listOfNotNull(calendar.bounds { dp(PhotoFrameStagePolicy.CALENDAR_MARGIN_DP) })
+        SlideshowPresentationPolicy.paperOcclusions(origin[0], origin[1], clocks, calendarArea).forEach { area ->
           bounds.put(JSONObject().put("left", area.left).put("top", area.top)
               .put("right", area.right).put("bottom", area.bottom))
         }
@@ -2303,7 +1779,7 @@ class PhotoFrameController(
             .put("occupied", bounds).toString()
         if (legacyPhotoLayoutBounds != snapshot) {
           legacyPhotoLayoutBounds = snapshot
-          wv.evaluateJavascript("window.dispatchEvent(new Event('resize'))", null)
+          bridge(wv).run(PhotoFrameEngineScript.RESIZE)
         }
       }
     }
@@ -2320,27 +1796,17 @@ class PhotoFrameController(
     photo.visibility = View.GONE
     photoBack.visibility = View.GONE
     if (paused) nativeStage.pause() else nativeStage.resume()
-    nativeStage.show(photos,
-        settings.fit == ScreensaverConfig.FIT_FILL && settings.mode != ScreensaverConfig.MODE_WHOLE,
-        settings.photoMotion && settings.mode != ScreensaverConfig.MODE_WHOLE,
-        intervalMs(), measuredNativeOcclusions(),
-        galleryPrint = settings.mode == ScreensaverConfig.MODE_GALLERY_PRINT,
-        gallerySpread = settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD,
-        automatic = automatic,
-        feature = when {
-          nightPhotoOn -> SlideshowStage.Feature.NIGHT_PHOTO
-          splitGlance -> SlideshowStage.Feature.SPLIT
-          else -> SlideshowStage.Feature.NONE
-        },
-        keepPeople = analyzePeople())
+    val look = PhotoFrameStagePolicy.presentation(settings, nightPhotoOn, splitGlance)
+    nativeStage.show(photos, look.fill, look.motion, intervalMs(), measuredNativeOcclusions(),
+        galleryPrint = look.galleryPrint, gallerySpread = look.gallerySpread, automatic = automatic,
+        feature = look.feature, keepPeople = look.keepPeople)
     viewerControls.photoChanged()
     Log.i("ImmortalSlideshow", "ready native scene: photos=${photos.size}, pixels=${photos.sumOf { it.bitmap.width.toLong() * it.bitmap.height }}")
   }
 
   private fun armHold(task: Runnable, delay: Long = intervalMs()) {
     ui.removeCallbacks(task)
-    holdDeadline = playbackUptime() + delay
-    remainingHold = delay
+    schedule.arm(delay, hostActive)
     if (!paused && !stopped) ui.postDelayed(task, delay)
   }
 
@@ -2354,7 +1820,7 @@ class PhotoFrameController(
     if (hybridFilmstrip != null) webView?.let(::applyEnginePlayback)
     if (!value && hostActive) legacyWarmup?.resume()
     if (value) {
-      remainingHold = (holdDeadline - playbackUptime()).coerceAtLeast(100L)
+      schedule.pause(hostActive)
       ui.removeCallbacks(localTick); ui.removeCallbacks(remoteTick); ui.removeCallbacks(rotate)
       nativeStage.pause()
       if (videoView.visibility == View.VISIBLE) runCatching { videoView.pause() }
@@ -2364,7 +1830,7 @@ class PhotoFrameController(
       val tick = when { localMode -> localTick; remoteMode -> remoteTick; else -> rotate }
       // A still-decoding photo owns the next advance. Its delivery arms the full dwell.
       if (!presentedHeldPhoto && !photoPause.pending)
-        armHold(tick, remainingHold.coerceAtLeast(100L))
+        armHold(tick, schedule.resumeDelay())
     }
   }
 
@@ -2402,23 +1868,22 @@ class PhotoFrameController(
           // Pick up calendar changes pushed over the fleet API (or via in-app
           // settings) without restarting the dream: reload just the calendar fields,
           // leaving the live slideshow state untouched.
-          val fresh = GuestPolicy.screensaver(ScreensaverConfig.load(context))
-          if (fresh.calendarUrl != settings.calendarUrl ||
-              fresh.calendarRange != settings.calendarRange) {
+          val fresh = prefs.household()
+          if (PhotoFrameStagePolicy.calendarChanged(settings, fresh)) {
             settings = settings.copy(calendarUrl = fresh.calendarUrl, calendarRange = fresh.calendarRange)
             renderCalendar()
           }
-          val url = settings.calendarUrl
-          if (!testSourceOn && settings.usesCalendar && !url.isNullOrBlank()) {
+          val url = PhotoFrameStagePolicy.fetchCalendar(settings, testSourceOn)
+          if (url != null) {
             metaIo.execute {
               val events = CalendarFeed.fetch(url)
               ui.post {
-                calendarEvents = events
+                calendar.events = events
                 renderCalendar()
               }
             }
           } else {
-            calendarEvents = emptyList()
+            calendar.events = emptyList()
             renderCalendar()
           }
           ui.postDelayed(this, calendarRefreshMs)
@@ -2433,7 +1898,7 @@ class PhotoFrameController(
     photoPause.beforeManualNavigation(::cancelNativeRequest)
     when {
       nativeFilmstrip != null -> nativeFilmstrip?.next()
-      engineActive -> webView?.evaluateJavascript("window.immortalSlideshow?.next()", null)
+      engineActive -> webView?.let { bridge(it).run(PhotoFrameEngineScript.NEXT) }
       localMode -> advanceLocal(+1, automatic = false)
       remoteMode -> advanceRemote(+1, automatic = false)
       else -> webNext(automatic = false)
@@ -2448,7 +1913,7 @@ class PhotoFrameController(
     photoPause.beforeManualNavigation(::cancelNativeRequest)
     when {
       nativeFilmstrip != null -> nativeFilmstrip?.previous()
-      engineActive -> webView?.evaluateJavascript("window.immortalSlideshow?.previous()", null)
+      engineActive -> webView?.let { bridge(it).run(PhotoFrameEngineScript.PREVIOUS) }
       localMode -> advanceLocal(-1, automatic = false)
       remoteMode -> advanceRemote(-1, automatic = false)
       else -> webPrev()
@@ -2475,19 +1940,19 @@ class PhotoFrameController(
     gen++
     // Share to Portal: a photo a phone just shared takes the next automatic turn (spliced in after now).
     // A fresh-photo lookup failure must never stop the slideshow, so it degrades to a normal turn.
-    val fresh = if (dir > 0 && automatic && !isNightClockShowing && !GuestMode.hides(GuestContent.PHOTOS))
+    val fresh = if (dir > 0 && automatic && !isNightClockShowing && !presence.hidesPhotos())
       runCatching { FreshPhotoStore.slideshowTurn(context, playlist.map { it.path }, localIndex) }.getOrNull() else null
     if (fresh != null) {
       if (fresh.inserted) {
-        playlist = playlist.take(fresh.index) + MediaItem(fresh.path, false) + playlist.drop(fresh.index)
-        localDeckKeys = localDeckKeys.take(fresh.index) + localKey(fresh.path) + localDeckKeys.drop(fresh.index)
+        playlist = PhotoFrameDeck.splice(playlist, fresh.index, MediaItem(fresh.path, false))
+        localDeckKeys = PhotoFrameDeck.splice(localDeckKeys, fresh.index, localKey(fresh.path))
       }
       localIndex = fresh.index
       if (ScreensaverConfig.isNativeStage(settings.mode)) { clearNativeHistory(); nativeNavigation.cancelRequest() }
     } else if (ScreensaverConfig.isNativeStage(settings.mode)) {
       clearNativeHistory()
       localIndex = nativeNavigation.request(dir, localDeckKeys)
-    } else localIndex = ((localIndex + dir) % playlist.size + playlist.size) % playlist.size
+    } else localIndex = PhotoFrameDeck.step(localIndex, dir, playlist.size)
     val item = playlist[localIndex]
     if (item.isVideo) showVideo(item.path, gen, automatic) else showLocalImage(item.path, gen, automatic)
   }
@@ -2496,15 +1961,13 @@ class PhotoFrameController(
     if (ScreensaverConfig.isNativeStage(settings.mode)) {
       photoPause.requested(automatic)
       val anchor = localIndex
-      val partners = (1 until minOf(playlist.size, 2)).map { offset ->
-        (anchor + offset) % playlist.size
-      }.filterNot { playlist[it].isVideo }.map { localAsset(playlist[it].path, localDeckKeys[it]) }
-      val nextIndex = (anchor + 1) % playlist.size
+      val partners = PhotoFrameDeck.partnerIndices(anchor, playlist.size)
+          .filterNot { playlist[it].isVideo }.map { localAsset(playlist[it].path, localDeckKeys[it]) }
+      val nextIndex = PhotoFrameDeck.after(anchor, playlist.size)
       val next = playlist.getOrNull(nextIndex)?.takeUnless { it.isVideo }
           ?.let { localAsset(it.path, localDeckKeys[nextIndex]) }
       nativeLoader.load(localAsset(path, localDeckKeys[anchor]), partners, next,
-          settings.mode == ScreensaverConfig.MODE_PORTRAITS ||
-              settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD, analyzePeople(),
+          PhotoFrameStagePolicy.pairs(settings.mode), analyzePeople(),
           { photos, partner ->
             if (g != gen || stopped) return@load
             photoPause.deliver(photos) { ready ->
@@ -2520,7 +1983,7 @@ class PhotoFrameController(
             if (++nativeFailures >= playlist.size) startWeb(automatic) else advanceLocal(+1, automatic)
           }, nextAfterPartner = { key ->
             val at = localDeckKeys.indexOf(key)
-            val nextAt = (at + 1) % playlist.size
+            val nextAt = PhotoFrameDeck.after(at, playlist.size)
             playlist.getOrNull(nextAt)?.takeUnless { it.isVideo }
                 ?.let { localAsset(it.path, localDeckKeys[nextAt]) }
           })
@@ -2557,76 +2020,26 @@ class PhotoFrameController(
    * throws "trying to draw too large bitmap" on the main thread and crashes the whole launcher —
    * and because Android responds to a *home app* crashing by clearing its preferred-activity (HOME)
    * association, the very next Home press pops the "Select Home app" chooser. Bounding the longest
-   * edge to [MAX_EDGE] here (the same two-pass trick used by [Thumbnails]/[MediaArt]) keeps every
-   * source — folder, SMB, Immich, WebDAV, bundled — well under the cap, so it can't happen.
-   *
-   * The bound never upscales (small images decode untouched) and uses a power-of-two
-   * [BitmapFactory.Options.inSampleSize], the only value the decoder honours efficiently.
+   * edge here keeps every source — folder, SMB, Immich, WebDAV, bundled — well under the cap. The
+   * routing (classic vs. native, encoded identity) is [PhotoFrameDecodePlan]'s.
    */
-  private fun decodeBoundedFile(path: String, maxEdge: Int = 2400): Bitmap? {
-    if (!ScreensaverConfig.isNativeStage(settings.mode)) return SlideshowDecoder.file(path, maxEdge)
-    return runCatching {
-      java.io.File(path).inputStream().use { decodeBoundedStream(it, maxEdge) }
-    }.getOrNull()
-  }
+  private fun decodeBoundedFile(path: String, maxEdge: Int = PhotoFrameDecodePlan.DEFAULT_EDGE): Bitmap? =
+      decodePlan.file(path, maxEdge, ScreensaverConfig.isNativeStage(settings.mode), ::identify)
 
   /** Stream variant: buffers to bytes so the bounds pass can run before the real decode. */
-  private fun decodeBoundedStream(input: java.io.InputStream, maxEdge: Int = 2400): Bitmap? {
-    if (!ScreensaverConfig.isNativeStage(settings.mode)) return SlideshowDecoder.stream(input, maxEdge)
-    val bytes = SlideshowDecoder.readEncoded(input) ?: return null
-    return decodeBoundedBytes(bytes, maxEdge)
+  private fun decodeBoundedStream(input: java.io.InputStream, maxEdge: Int = PhotoFrameDecodePlan.DEFAULT_EDGE): Bitmap? =
+      decodePlan.stream(input, maxEdge, ScreensaverConfig.isNativeStage(settings.mode), ::identify)
+
+  /** Two-pass decode of in-memory image bytes. */
+  private fun decodeBoundedBytes(bytes: ByteArray, maxEdge: Int = PhotoFrameDecodePlan.DEFAULT_EDGE): Bitmap? =
+      decodePlan.bytes(bytes, maxEdge, ScreensaverConfig.isNativeStage(settings.mode), ::identify)
+
+  private fun identify(bitmap: Bitmap, identity: String) {
+    synchronized(photoIdentities) { photoIdentities[bitmap] = identity }
   }
 
-  /** Two-pass decode of in-memory image bytes, bounded to [MAX_EDGE] (see [sampleSizeFor]). */
-  private fun decodeBoundedBytes(bytes: ByteArray, maxEdge: Int = 2400): Bitmap? {
-    val bitmap = SlideshowDecoder.bytes(bytes, maxEdge) ?: return null
-    if (ScreensaverConfig.isNativeStage(settings.mode)) {
-      // Encoded identity survives sampling, presentation resizing, and changes of serving URL.
-      val hash = java.security.MessageDigest.getInstance("SHA-256").digest(bytes)
-          .joinToString("") { "%02x".format(it.toInt() and 255) }
-      synchronized(photoIdentities) { photoIdentities[bitmap] = "encoded:$hash" }
-    }
-    return bitmap
-  }
-
-  /**
-   * Decode a local image and apply its EXIF orientation. Phone cameras save the
-   * raw sensor buffer and record the intended rotation in an EXIF tag rather than
-   * baking it into the pixels, so [BitmapFactory.decodeFile] alone shows portrait
-   * shots sideways and some landscapes upside-down. The web feed is unaffected (its
-   * images carry no rotation flag), so this only matters for the folder source.
-   *
-   * Reading the tag is best-effort: a missing or unreadable EXIF block falls back to
-   * the upright orientation so a quirky file still shows (just unrotated) instead of
-   * being skipped.
-   */
-  private fun decodeCorrected(path: String): Bitmap? = SlideshowDecoder.file(path)
-
-  /**
-   * Fast ORIENTED dimensions of a local image: a header-only bounds decode plus the EXIF
-   * orientation tag, swapping W/H for the quarter-turn orientations so a portrait shot saved as a
-   * landscape sensor buffer reports as portrait. Feeds the engine's orientation-aware mode
-   * scheduler (modes.js buckets by W/H) without decoding pixels. Null if the header is unreadable.
-   */
-  private fun orientedImageDims(path: String): Pair<Int, Int>? {
-    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    runCatching { BitmapFactory.decodeFile(path, bounds) }
-    val w = bounds.outWidth
-    val h = bounds.outHeight
-    if (w <= 0 || h <= 0) return null
-    val orient =
-        runCatching {
-              ExifInterface(path)
-                  .getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-            }
-            .getOrDefault(ExifInterface.ORIENTATION_NORMAL)
-    val swap =
-        orient == ExifInterface.ORIENTATION_ROTATE_90 ||
-            orient == ExifInterface.ORIENTATION_ROTATE_270 ||
-            orient == ExifInterface.ORIENTATION_TRANSPOSE ||
-            orient == ExifInterface.ORIENTATION_TRANSVERSE
-    return if (swap) h to w else w to h
-  }
+  /** Classic local decode with EXIF orientation applied (see [SlideshowDecoder.file]). */
+  private fun decodeCorrected(path: String): Bitmap? = decoder.file(path, PhotoFrameDecodePlan.DEFAULT_EDGE)
 
   private fun showVideo(path: String, g: Int, automatic: Boolean) {
     beginVideo(g, localDeckKeys.getOrNull(localIndex) ?: localKey(path)) {
@@ -2664,7 +2077,7 @@ class PhotoFrameController(
           }
           videoView.setVideoPath(path)
           // Safety net: advance even if a clip is very long or never reports done.
-          armHold(localTick, maxOf(intervalMs(), 5 * 60_000L))
+          armHold(localTick, PhotoFrameSchedule.videoHoldMs(intervalMs()))
         }
         .onFailure { failed() }
   }
@@ -2760,7 +2173,7 @@ class PhotoFrameController(
   private fun scheduleRemoteRefresh() {
     if (stopped || !remoteMode) return
     ui.removeCallbacks(remoteRefresh)
-    ui.postDelayed(remoteRefresh, settings.albumRefreshMin * 60_000L)
+    ui.postDelayed(remoteRefresh, PhotoFrameSchedule.albumRefreshMs(settings.albumRefreshMin))
   }
 
   // --- engine-mode album auto-refresh ------------------------------------------
@@ -2793,19 +2206,19 @@ class PhotoFrameController(
             if (!engineActive || stopped || owner != legacyEngineRevision) return@post
             if (fresh.isNotEmpty() && (fresh.toSet() != current.toSet() || headers != currentHeaders)) {
               Log.i(TAG, "album changed (${current.size} -> ${fresh.size} photos); restarting engine")
-              val ordered = if (shuffle) fresh.shuffled() else fresh
+              val ordered = PhotoFrameDeck.ordered(fresh, shuffle)
               startEngine(ordered, authHeaders = headers)
               scheduleEngineAlbumRefresh(shareUrl, ordered, shuffle, headers)
             } else {
               // Unchanged or transient failure: keep showing what we have, try again later.
-              ui.postDelayed(this, settings.albumRefreshMin * 60_000L)
+              ui.postDelayed(this, PhotoFrameSchedule.albumRefreshMs(settings.albumRefreshMin))
             }
           }
         }
       }
     }
     engineAlbumRefresh = task
-    ui.postDelayed(task, settings.albumRefreshMin * 60_000L)
+    ui.postDelayed(task, PhotoFrameSchedule.albumRefreshMs(settings.albumRefreshMin))
   }
 
   private fun applyRemoteManifest(urls: List<String>, headers: Map<String, String>) {
@@ -2820,7 +2233,7 @@ class PhotoFrameController(
       remoteIndex = if (keepVideo) urls.indexOfFirst { it == oldUrl }
           else urls.indexOfFirst { remoteKey(it) == nativeNavigation.currentKey }
       if (!keepVideo && !viewerControls.isEditing)
-        armHold(remoteTick, (holdDeadline - android.os.SystemClock.uptimeMillis()).coerceAtLeast(100L))
+        armHold(remoteTick, schedule.leftAfterManifest())
     } else remoteIndex = urls.indexOfFirst { it == oldUrl }
   }
 
@@ -2844,7 +2257,7 @@ class PhotoFrameController(
     if (ScreensaverConfig.isNativeStage(settings.mode)) {
       clearNativeHistory()
       remoteIndex = nativeNavigation.request(dir, remoteUrls.map(::remoteKey))
-    } else remoteIndex = ((remoteIndex + dir) % remoteUrls.size + remoteUrls.size) % remoteUrls.size
+    } else remoteIndex = PhotoFrameDeck.step(remoteIndex, dir, remoteUrls.size)
     val url = remoteUrls[remoteIndex]
     val g = gen
     if (url in remoteVideos) {
@@ -2864,13 +2277,12 @@ class PhotoFrameController(
       photoPause.requested(automatic)
       val anchor = remoteIndex
       val deck = remoteUrls
-      val partners = (1 until minOf(deck.size, 2)).map { offset -> deck[(anchor + offset) % deck.size] }
+      val partners = PhotoFrameDeck.partnerIndices(anchor, deck.size).map { deck[it] }
           .filterNot { it in remoteVideos }.map(::remoteAsset)
-      val next = deck.getOrNull((anchor + 1) % deck.size)?.takeUnless { it in remoteVideos }
+      val next = deck.getOrNull(PhotoFrameDeck.after(anchor, deck.size))?.takeUnless { it in remoteVideos }
           ?.let(::remoteAsset)
       nativeLoader.load(remoteAsset(url), partners, next,
-          settings.mode == ScreensaverConfig.MODE_PORTRAITS ||
-              settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD, analyzePeople(),
+          PhotoFrameStagePolicy.pairs(settings.mode), analyzePeople(),
           { photos, partner ->
             if (g != gen || stopped) return@load
             photoPause.deliver(photos) { ready ->
@@ -2883,7 +2295,7 @@ class PhotoFrameController(
             }
           }, { nativeNavigation.skipFailed(); remoteFailStreak++; advanceRemote(+1, automatic) }, nextAfterPartner = { key ->
             val at = deck.indexOfFirst { remoteKey(it) == key }
-            deck.getOrNull((at + 1) % deck.size)?.takeUnless { it in remoteVideos }?.let(::remoteAsset)
+            deck.getOrNull(PhotoFrameDeck.after(at, deck.size))?.takeUnless { it in remoteVideos }?.let(::remoteAsset)
           })
       return
     }
@@ -2973,7 +2385,7 @@ class PhotoFrameController(
           }
           videoView.setVideoURI(uri, headers)
           // Safety net: advance even if a clip is very long or never reports done.
-          armHold(remoteTick, maxOf(intervalMs(), 5 * 60_000L))
+          armHold(remoteTick, PhotoFrameSchedule.videoHoldMs(intervalMs()))
         }
         .onFailure { failed() }
   }
@@ -3010,7 +2422,7 @@ class PhotoFrameController(
         val recoveredAutomatic = remoteRecovery.finish()
         if (!remoteMode || stopped) return@post // raced with a source change / exit
         if (urls.isNotEmpty()) {
-          applyRemoteManifest(if (settings.shuffle) urls.shuffled() else urls, fresh?.headers.orEmpty())
+          applyRemoteManifest(PhotoFrameDeck.ordered(urls, settings.shuffle), fresh?.headers.orEmpty())
           remoteFailStreak = 0
           advanceRemote(+1, recoveredAutomatic)
         } else {
@@ -3053,15 +2465,17 @@ class PhotoFrameController(
     if (ScreensaverConfig.isNativeStage(settings.mode)) {
       ui.removeCallbacks(rotate)
       cancelNativeRequest()
-      if (index in 0 until nativeHistory.lastIndex) {
-        index++
+      val forward = PhotoFrameDeck.historyForward(index, nativeHistory.size)
+      if (forward != null) {
+        index = forward
         presentNativeHistory(nativeHistory[index], automatic)
         armHold(rotate)
       } else loadFresh(automatic)
       return
     }
-    if (index in 0 until history.size - 1) {
-      index++
+    val forward = PhotoFrameDeck.historyForward(index, history.size)
+    if (forward != null) {
+      index = forward
       show(history[index])
     } else {
       loadFresh(automatic)
@@ -3116,30 +2530,11 @@ class PhotoFrameController(
       ui.postOwned(Runnable {
         if (stopped) { bmp.recycle(); return@Runnable }
         photo.visibility = View.VISIBLE
-        if (history.size >= 6) history.removeAt(0) // cap memory; GC reclaims
+        if (history.size >= PhotoFrameDeck.CLASSIC_HISTORY) history.removeAt(0) // cap memory; GC reclaims
         history.add(bmp)
         index = history.size - 1
         show(bmp)
       }, onDiscard = { if (!bmp.isRecycled) bmp.recycle() })
-    }
-  }
-
-  // The default feed (and the universal fallback for any other source that's unset,
-  // empty, or unreachable) walks an ordered chain of keyless sources and returns the
-  // first image it can fetch:
-  //   1. Unsplash  — only when an API key was supplied (richest, but rate-limited)
-  //   2. Picsum    — keyless; the historical default
-  //   3. Wikimedia — Commons "Featured pictures of landscapes"; keyless, and on
-  //                  infrastructure independent of Picsum (the point of having it)
-  //   4. Bundled   — CC0/public-domain photos shipped in the APK; can't fail, so a
-  //                  fresh device with no network yet — or a day every web source is
-  //                  down (e.g. the Picsum outage that prompted this) — is never blank.
-  private val webSources: List<Pair<String, (Long) -> Bitmap?>> by lazy {
-    buildList {
-      if (unsplashKey.isNotBlank()) add("unsplash" to ::unsplashBitmap)
-      add("picsum" to ::picsumBitmap)
-      add("wikimedia" to ::wikimediaBitmap)
-      add("bundled" to { generation: Long -> if (photoRequestCurrent(generation)) bundledBitmap() else null })
     }
   }
 
@@ -3156,10 +2551,10 @@ class PhotoFrameController(
     io.execute {
       val dir = java.io.File(context.cacheDir, "ss_test_scenes").apply { mkdirs() }
       val dims = HashMap<String, Pair<Int, Int>>()
-      val urls = (0 until ScreensaverTestSource.scenes.size * 2).mapNotNull { i ->
+      val urls = (0 until PhotoFrameDecodePlan.testSceneCount()).mapNotNull { i ->
         val file = java.io.File(dir, "scene_$i.jpg")
         runCatching {
-          val bitmap = ScreensaverTestSource.photo(i, 1600)
+          val bitmap = ScreensaverTestSource.photo(i, PhotoFrameDecodePlan.TEST_SCENE_EDGE)
           dims["file://" + file.path] = bitmap.width to bitmap.height
           file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it) }
           bitmap.recycle()
@@ -3178,28 +2573,9 @@ class PhotoFrameController(
 
   private fun fetchWebPhoto(): Bitmap? {
     if (testSourceOn) return nextTestPhoto()
-    val generation = photoTransportGeneration.get()
-    val now = System.currentTimeMillis()
-    for ((name, fetch) in webSources) {
-      if (!photoRequestCurrent(generation)) return null
-      if ((sourceCooldownUntil[name] ?: 0L) > now) continue // dead recently; skip until cooldown
-      val bmp = runCatching { fetch(generation) }.getOrNull()
-      if (!photoRequestCurrent(generation)) { bmp?.recycle(); return null }
-      if (bmp != null) return bmp
-      Log.w(TAG, "screensaver photo source '$name' unavailable; backing off")
-      sourceCooldownUntil[name] = now + SOURCE_COOLDOWN_MS
-    }
-    // Everything failed or is cooling down (e.g. all remotes down *and* the bundled
-    // assets are unreadable). Retry the whole chain ignoring cooldowns rather than
-    // leave the frame blank.
-    for ((_, fetch) in webSources) {
-      if (!photoRequestCurrent(generation)) return null
-      val bmp = runCatching { fetch(generation) }.getOrNull()
-      if (!photoRequestCurrent(generation)) { bmp?.recycle(); return null }
-      if (bmp != null) return bmp
-    }
-    Log.w(TAG, "screensaver: no photo source available")
-    return null
+    val generation = transport.generation.get()
+    return webChain.fetch(webFeed.sources.map { (name, fetch) -> name to { fetch(generation) } },
+        current = { photoRequestCurrent(generation) }, discard = { it.recycle() })
   }
 
   private fun show(bmp: Bitmap) {
@@ -3305,7 +2681,7 @@ class PhotoFrameController(
     // Outlast the dwell so the motion never visibly stalls at the end; LinearInterpolator
     // gives constant-speed motion (the crossfade's AccelerateDecelerateInterpolator provides
     // the ease-in/ease-out feel during the reveal, so the Ken Burns itself should be linear).
-    set.duration = intervalMs() + 1200L
+    set.duration = intervalMs() + PhotoFrameSchedule.KEN_BURNS_TAIL_MS
     set.interpolator = LinearInterpolator()
     set.start()
     if (!hostActive) set.pause()
@@ -3331,105 +2707,10 @@ class PhotoFrameController(
     }
   }
 
-  /**
-   * A batch of keyless Picsum URLs with deliberately varied aspect ratios, for the WebView engine
-   * when the built-in feed is the source. Fixed seeds so orientation-aware modes (diptych, panorama,
-   * hero+sidebar) reliably have portraits, landscapes, squares, and panoramas to compose with. The
-   * engine measures true dimensions on load; the seeds just guarantee a good spread.
-   */
+  /** Keyless Picsum URLs with varied aspects for the engine on the built-in feed ([PhotoFrameFeedUrls]). */
   private fun defaultFeedUrls(): List<String> {
-    // seed to (w,h) — portraits, landscapes, squares, panoramas.
-    val specs = listOf(
-        "ridge" to (1600 to 1067), "harbor" to (1600 to 1067), "desert" to (1600 to 1067),
-        "forest7" to (1600 to 1067), "coast22" to (1600 to 1000), "city88" to (1600 to 1067),
-        "portraitA" to (1000 to 1500), "portraitB" to (1000 to 1500), "portraitC" to (1000 to 1400),
-        "portraitD" to (1000 to 1500), "waterfall" to (1000 to 1600), "tower55" to (1000 to 1500),
-        "square1" to (1200 to 1200), "square2" to (1200 to 1200), "square3" to (1200 to 1200),
-        "pano1" to (2400 to 900), "pano2" to (2400 to 800),
-    )
-    // Cap the long edge to the screen size so we don't pull needlessly huge images on the device.
     val m = context.resources.displayMetrics
-    val cap = maxOf(m.widthPixels, m.heightPixels).coerceIn(1080, 2200)
-    return specs.map { (seed, wh) ->
-      val (w, h) = wh
-      val scale = cap.toDouble() / maxOf(w, h)
-      "https://picsum.photos/seed/$seed/${(w * scale).toInt()}/${(h * scale).toInt()}"
-    }
-  }
-
-  // --- default-feed sources (tried in turn by [fetchWebPhoto]) ----------------
-  private fun picsumBitmap(generation: Long): Bitmap? {
-    val m = context.resources.displayMetrics
-    return downloadBitmap(
-        "https://picsum.photos/${m.widthPixels}/${m.heightPixels}?random=${System.currentTimeMillis()}",
-        generation = generation)
-  }
-
-  private fun unsplashBitmap(generation: Long): Bitmap? {
-    val m = context.resources.displayMetrics
-    // Match the Unsplash crop to the screen aspect so portrait panels (e.g. Portal
-    // Mini at 800x1280) don't get a letterboxed/upscaled landscape shot.
-    val orientation = if (m.heightPixels > m.widthPixels) "portrait" else "landscape"
-    val json =
-        httpGet(
-            "https://api.unsplash.com/photos/random?orientation=$orientation" +
-                "&query=$unsplashQuery&client_id=$unsplashKey", generation)
-    return downloadBitmap(JSONObject(json).getJSONObject("urls").getString("regular"), generation = generation)
-  }
-
-  /**
-   * Keyless Wikimedia Commons feed: the curated "Featured pictures of landscapes"
-   * category. The file list is fetched once per session (then shuffled and cycled),
-   * so steady state is just a thumbnail download from Wikimedia's upload CDN.
-   */
-  private fun wikimediaBitmap(generation: Long): Bitmap? {
-    if (wikimediaUrls.isEmpty()) wikimediaUrls = fetchWikimediaUrls(generation)
-    if (!photoRequestCurrent(generation)) return null
-    if (wikimediaUrls.isEmpty()) return null
-    val url = wikimediaUrls[wikimediaIdx % wikimediaUrls.size]
-    wikimediaIdx++
-    return downloadBitmap(url, generation = generation)
-  }
-
-  private fun fetchWikimediaUrls(generation: Long): List<String> {
-    val width = context.resources.displayMetrics.widthPixels.coerceIn(640, 1920)
-    val json =
-        httpGet(
-            "https://commons.wikimedia.org/w/api.php?action=query&format=json" +
-                "&generator=categorymembers&gcmtype=file&gcmlimit=200" +
-                "&gcmtitle=Category:Featured_pictures_of_landscapes" +
-                "&prop=imageinfo&iiprop=url&iiurlwidth=$width", generation)
-    val pages =
-        JSONObject(json).optJSONObject("query")?.optJSONObject("pages") ?: return emptyList()
-    val urls = ArrayList<String>()
-    for (key in pages.keys()) {
-      val info = pages.getJSONObject(key).optJSONArray("imageinfo")?.optJSONObject(0) ?: continue
-      val url = info.optString("thumburl").ifBlank { info.optString("url") }
-      if (url.isNotBlank()) urls.add(url)
-    }
-    urls.shuffle()
-    return urls
-  }
-
-  /** Terminal fallback: CC0/public-domain photos bundled in the APK — never fails. */
-  private fun bundledBitmap(): Bitmap? {
-    if (testSourceOn) return nextTestPhoto()
-    if (bundledNames.isEmpty()) {
-      bundledNames =
-          runCatching {
-                context.assets.list(FALLBACK_DIR)?.filter { it.endsWith(".jpg", ignoreCase = true) }
-              }
-              .getOrNull()
-              .orEmpty()
-              .shuffled()
-    }
-    if (bundledNames.isEmpty()) return null
-    val name = bundledNames[bundledIdx % bundledNames.size]
-    bundledIdx++
-    return runCatching {
-          context.assets.open("$FALLBACK_DIR/$name").use { decodeBoundedStream(it) }
-        }
-        .getOrNull()
+    return PhotoFrameFeedUrls.engineBatch(m.widthPixels, m.heightPixels)
   }
 
   // --- data -------------------------------------------------------------------
@@ -3440,97 +2721,29 @@ class PhotoFrameController(
     }.start()
   }
 
-  private fun photoRequestCurrent(generation: Long): Boolean =
-      !stopped && generation == photoTransportGeneration.get() && !Thread.currentThread().isInterrupted
+  private fun photoRequestCurrent(generation: Long): Boolean = transport.current(generation)
 
   /** SMB retains its custom transport while sharing encoded storage and bounded decoding. */
   private fun fetchSmbImage(source: SmbSource, path: String, maxEdge: Int): Bitmap? {
-    val generation = photoTransportGeneration.get()
+    val generation = transport.generation.get()
     val current = { photoRequestCurrent(generation) }
     return fetchCachedSmbPhoto(mediaCache, source.photoCacheKey(path), current,
         read = {
           readSmbPhotoEncoded({ source.openStream(path) }, current,
-              register = { input ->
-                synchronized(photoTransportLock) {
-                  if (!current()) false else { photoStreams.add(input); true }
-                }
-              },
-              unregister = { input ->
-                synchronized(photoTransportLock) { photoStreams.remove(input) }
-              })
+              register = { input -> transport.register(input, current) },
+              unregister = transport::unregister)
         },
         decodeFile = { decodeBoundedFile(it.path, maxEdge) },
         decodeBytes = { decodeBoundedBytes(it, maxEdge) },
         discard = { if (!it.isRecycled) it.recycle() })
   }
 
-  /** Epoch invalidation is synchronous; physical closes are serialized away from the UI. */
-  private fun cancelPhotoTransports() {
-    val closing = synchronized(photoTransportLock) {
-      photoTransportGeneration.incrementAndGet()
-      val snapshot = photoConnections.toList() to photoStreams.toList()
-      photoConnections.clear()
-      photoStreams.clear()
-      snapshot
-    }
-    if (closing.first.isEmpty() && closing.second.isEmpty()) return
-    photoCancelIo.execute {
-      closing.first.forEach { runCatching { it.disconnect() } }
-      closing.second.forEach { runCatching { it.close() } }
-    }
-  }
-
-  private fun <T> withPhotoConnection(
-      spec: String, headers: Map<String, String>, timeout: Int, generation: Long,
-      read: (java.io.InputStream) -> T,
-  ): T {
-    if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
-    val c = PhotoSourceRedirects.open(spec, headers, readTimeoutMs = timeout,
-        configure = { it.setRequestProperty("User-Agent", USER_AGENT) },
-        opened = { connection ->
-          synchronized(photoTransportLock) {
-            if (!photoRequestCurrent(generation))
-              throw java.io.InterruptedIOException("Photo request canceled")
-            photoConnections.add(connection)
-          }
-        },
-        closed = { connection ->
-          synchronized(photoTransportLock) { photoConnections.remove(connection) }
-        })
-    var input: java.io.InputStream? = null
-    try {
-      val stream = c.inputStream
-      input = stream
-      synchronized(photoTransportLock) {
-        if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
-        photoStreams.add(stream)
-      }
-      return read(stream)
-    } finally {
-      synchronized(photoTransportLock) {
-        photoConnections.remove(c)
-        input?.let { photoStreams.remove(it) }
-      }
-      runCatching { c.disconnect() }
-      runCatching { input?.close() }
-    }
-  }
-
-  private fun httpGet(spec: String, generation: Long): String =
-      withPhotoConnection(spec, emptyMap(), 8000, generation) { input ->
-        val bytes = SlideshowDecoder.readEncoded(input, 2 * 1024 * 1024)
-            ?: throw java.io.IOException("Photo manifest unavailable")
-        if (!photoRequestCurrent(generation)) throw java.io.InterruptedIOException("Photo request canceled")
-        bytes.toString(Charsets.UTF_8)
-      }
+  private fun cancelPhotoTransports() = transport.cancelAll()
 
   private fun downloadBitmap(
-      spec: String, headers: Map<String, String> = emptyMap(), maxEdge: Int = 2400,
-      generation: Long = photoTransportGeneration.get(),
-  ): Bitmap? = withPhotoConnection(spec, headers, 12000, generation) { input ->
-    val bitmap = decodeBoundedStream(input, maxEdge)
-    if (photoRequestCurrent(generation)) bitmap else { bitmap?.recycle(); null }
-  }
+      spec: String, headers: Map<String, String> = emptyMap(), maxEdge: Int = PhotoFrameDecodePlan.DEFAULT_EDGE,
+      generation: Long = transport.generation.get(),
+  ): Bitmap? = transport.download(spec, headers, generation, { decodeBoundedStream(it, maxEdge) }, { it.recycle() })
 
   // --- on-device media cache (Immich / WebDAV) --------------------------------
 
@@ -3567,7 +2780,7 @@ class PhotoFrameController(
     }
     // SMB's bitmap-only transport cannot prove that its original was static. Keep its legacy path.
     if (fetch != null) throw NativeFilmstripUnsupportedFormat()
-    val generation = photoTransportGeneration.get()
+    val generation = transport.generation.get()
     if (!photoRequestCurrent(generation)) return null
     val cache = mediaCache
     cache?.getIfPresent(url, isVideo = false)?.let { file ->
@@ -3597,7 +2810,7 @@ class PhotoFrameController(
       url: String, maxEdge: Int = 2400, headers: Map<String, String> = remoteHeaders,
       fetch: ((String, Int) -> Bitmap?)? = remoteFetch,
   ): Bitmap? {
-    val generation = photoTransportGeneration.get()
+    val generation = transport.generation.get()
     if (!photoRequestCurrent(generation)) return null
     val cache = mediaCache
     if (cache != null && fetch == null) {
@@ -3614,45 +2827,12 @@ class PhotoFrameController(
     return if (fetch != null) fetch(url, maxEdge) else downloadBitmap(url, headers, maxEdge, generation)
   }
 
-  /** Raw bytes of an authed HTTP GET (for caching before decode). Null on failure. */
-  private fun downloadBytes(
-      spec: String, headers: Map<String, String>, generation: Long,
-  ): ByteArray? = withPhotoConnection(spec, headers, 12000, generation) { input ->
-    SlideshowDecoder.readEncoded(input)?.takeIf { photoRequestCurrent(generation) }
-  }
+  private fun downloadBytes(spec: String, headers: Map<String, String>, generation: Long): ByteArray? =
+      transport.downloadBytes(spec, headers, generation)
 
   /** Stream an authed HTTP GET straight to [dst] (for the video prefetch source). */
   private fun downloadToFile(spec: String, headers: Map<String, String>, dst: java.io.File): Boolean =
-      runCatching {
-            if (!hostActive || stopped) return@runCatching false
-            val c = PhotoSourceRedirects.open(spec, headers, readTimeoutMs = 20000,
-                configure = { it.setRequestProperty("User-Agent", USER_AGENT) },
-                opened = { connection ->
-                  videoPrefetchConnection = connection
-                  if (!hostActive || stopped)
-                    throw java.io.InterruptedIOException("Video prefetch canceled")
-                },
-                closed = { connection ->
-                  if (videoPrefetchConnection === connection) videoPrefetchConnection = null
-                })
-            try {
-              c.inputStream.use { input ->
-                dst.outputStream().use { output ->
-                  val buffer = ByteArray(32 * 1024)
-                  while (hostActive && !stopped && !Thread.currentThread().isInterrupted) {
-                    val count = input.read(buffer)
-                    if (count < 0) return@runCatching dst.length() > 0L
-                    output.write(buffer, 0, count)
-                  }
-                }
-              }
-              false
-            } finally {
-              if (videoPrefetchConnection === c) videoPrefetchConnection = null
-              c.disconnect()
-            }
-          }
-          .getOrDefault(false)
+      transport.downloadToFile(spec, headers, dst) { hostActive && !stopped }
 
   /**
    * Background-warm the video cache: for each not-yet-cached video, pull the source once,
@@ -3671,7 +2851,7 @@ class PhotoFrameController(
     val tc = transcoder ?: return
     if (stopped || !hostActive || prefetchRunning || prefetchFull || !tc.isIdle) return
     // Snapshot playlist order + headers on the UI thread (both are mutated here only).
-    val queue = prefetchOrder(remoteUrls, remoteVideos, remoteIndex)
+    val queue = PhotoFrameDeck.prefetchOrder(remoteUrls, remoteVideos, remoteIndex)
     if (queue.isEmpty()) return
     val headers = remoteHeaders
     prefetchRunning = true
@@ -3727,15 +2907,13 @@ class PhotoFrameController(
         .onFailure { prefetchRunning = false }
   }
 
-  private val MATCH = FrameLayout.LayoutParams.MATCH_PARENT
-  private val WRAP = FrameLayout.LayoutParams.WRAP_CONTENT
   // Ken Burns overscan: the photo is scaled to this at the zoomed end / throughout a pan, giving
   // pan styles room to travel without exposing the black background behind the image.
   private val BIG = 1.12f
   // Cap on consecutive shared-album re-resolves before yielding to the built-in feed (a real
   // sustained outage), reset on any successful photo. See [reresolveOrFallback].
   private val MAX_RERESOLVE = 3
-  private fun dp(v: Int): Int = (v * context.resources.displayMetrics.density).toInt()
+  private fun dp(v: Int): Int = views.dp(v)
 
   internal companion object {
     /**
@@ -3758,45 +2936,8 @@ class PhotoFrameController(
     // something at least as warm, so it would only add churn. See [enableMediaCache].
     const val MIN_CACHE_BUDGET_BYTES = 256L * 1024L * 1024L
 
-    /**
-     * The video URLs from [urls] in playlist order starting *after* [currentIndex] (wrapping),
-     * i.e. the order the slideshow will actually want them — so the prefetch worker warms the
-     * near future first, not a HashSet's arbitrary order. Skips the currently-playing index
-     * (it's already streaming; downloading it again in parallel would double the bandwidth).
-     * Tolerates currentIndex = -1 (nothing shown yet -> playlist order from the top). Pure.
-     */
-    internal fun prefetchOrder(urls: List<String>, videos: Set<String>, currentIndex: Int): List<String> {
-      if (urls.isEmpty() || videos.isEmpty()) return emptyList()
-      val start = if (currentIndex in urls.indices) currentIndex + 1 else 0
-      return (0 until urls.size - if (currentIndex in urls.indices) 1 else 0)
-          .map { urls[(start + it) % urls.size] }
-          .filter { it in videos }
-    }
-    // Cap on the longest edge of any decoded photo. Full-res camera originals (tens of MP) decode
-    // to bitmaps larger than the hardware Canvas can draw (~100MB), which crashes the launcher and
-    // makes Android drop its default-home role. The largest Portal panel is 1920px; 2560 leaves
-    // Ken-Burns overscan headroom (2560²·4 ≈ 26MB) while staying far under the cap. See
-    // [decodeBoundedFile]/[decodeBoundedStream].
-    const val MAX_EDGE = 2560
-    // Local-folder curation: skip images whose short side is below this (thumbnails, icons,
-    // tiny web junk) — they read as clutter on a 2160px wall display. Real photos clear it easily.
-    const val MIN_PHOTO_EDGE = 512
-    // Cap the engine's local-photo pool: enough for rich variety with no visible repetition, while
-    // bounding the header-decode dimension pass at startup and the deck's memory. The pool is a
-    // random sample when shuffle is on.
-    const val ENGINE_MAX_PHOTOS = 300
     // Delay before the engine's scaled-copy cache starts warming (lets Chromium cold-start first).
     const val ENGINE_WARM_DELAY_MS = 20_000L
-    // Oriented-dimension SEED: measure only this many photos up front (header decode + EXIF is the
-    // single-threaded pre-pass that gates first paint AND the background face warm-up). The seed
-    // gives the scheduler real orientation variety; the rest default via the engine's own measure /
-    // NaN-safe bucket. Keeps cold start to a few seconds instead of ~15s for the whole pool.
-    const val DIMS_SEED = 80
-    // Bundled fallback photos live under app/src/main/assets/<FALLBACK_DIR>/.
-    const val FALLBACK_DIR = "photoframe_fallback"
-    // How long to skip a web source after it fails, so a dead host (e.g. a Picsum
-    // outage) isn't re-hammered every tick. Expires on its own so recovery self-heals.
-    const val SOURCE_COOLDOWN_MS = 5 * 60_000L
     // Descriptive UA — Wikimedia's API policy asks for an identifiable agent + contact.
     const val USER_AGENT = "Immortal/1.0 (+https://github.com/starbrightlab/immortal)"
   }
