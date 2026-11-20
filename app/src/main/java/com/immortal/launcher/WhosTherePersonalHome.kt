@@ -187,7 +187,8 @@ internal fun Modifier.redacted(hidden: Boolean, color: Color): Modifier = if (!h
   drawRoundRect(color, cornerRadius = CornerRadius(size.height / 2, size.height / 2))
 }
 
-private data class DayData(val events: List<PersonalEvent>, val source: String?, val unavailable: Boolean)
+/** Today's events for a person's (or the family's) Home and personal briefing; [source] null = no calendar. */
+internal data class DayData(val events: List<PersonalEvent>, val source: String?, val unavailable: Boolean)
 
 @Composable
 private fun rememberPersonEvents(person: WhosTherePerson?, people: List<WhosTherePerson>): DayData {
@@ -195,14 +196,15 @@ private fun rememberPersonEvents(person: WhosTherePerson?, people: List<WhosTher
   val key = people.joinToString { it.id + it.name + it.calendarUrl }
   val data by produceHomeState(DayData(emptyList(), null, false), person?.id, key) {
     while (true) {
-      value = withContext(Dispatchers.IO) { loadEvents(context, person, people) }
+      value = withContext(Dispatchers.IO) { loadWhosThereDay(context, person, people) }
       homeRefreshDelay(CALENDAR_REFRESH_MS)
     }
   }
   return data
 }
 
-private fun loadEvents(context: Context, person: WhosTherePerson?, people: List<WhosTherePerson>): DayData {
+/** Network: call off the main thread. The person's own feed, else the shared one filtered to them. */
+internal fun loadWhosThereDay(context: Context, person: WhosTherePerson?, people: List<WhosTherePerson>): DayData {
   val shared = ScreensaverConfig.load(context).calendarUrl?.takeIf { it.isNotBlank() }
   val own = person?.calendarUrl
   val url = own ?: shared ?: return DayData(emptyList(), null, false)

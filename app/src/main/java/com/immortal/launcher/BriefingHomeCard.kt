@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -59,19 +60,28 @@ internal fun BriefingHomeCard(modifier: Modifier = Modifier) {
     }
   }
   if (!visible) return
+  // Who's there? recognised an adult: the card (and the briefing it opens) is theirs. Read through
+  // derivedStateOf so indicator and camera states never recompose the card; only a new owner does.
+  val whosThere = rememberWhosThereUi()
+  val owner = remember { derivedStateOf { BriefingPersonalPolicy.owner(whosThere.value) } }.value
   val shape = RoundedCornerShape(CardHeight / 2)
   ApprovedHomeSurface(modifier.widthIn(max = CardMaxWidth).heightIn(min = CardHeight), radius = CardHeight / 2) {
     Row(Modifier.padding(start = 8.dp, end = 12.dp).heightIn(min = CardHeight),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       Row(Modifier.weight(1f, fill = false).heightIn(min = CardHeight)
-          .tvFocusable(shape, focusScale = 1f, ringColor = ApprovedHomePalette.Accent) { BriefingActivity.open(context) }
-          .semantics(mergeDescendants = true) { contentDescription = "Open the morning briefing" }
+          .tvFocusable(shape, focusScale = 1f, ringColor = ApprovedHomePalette.Accent) { BriefingActivity.open(context, owner?.id) }
+          .semantics(mergeDescendants = true) {
+            contentDescription = owner?.let { "Open ${it.name}'s morning briefing" } ?: "Open the morning briefing"
+          }
           .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-        ApprovedHomeIcon("sun", Modifier.size(40.dp), ApprovedHomePalette.Accent)
+        if (owner != null) WhosThereAvatar(owner, 40.dp)
+        else ApprovedHomeIcon("sun", Modifier.size(40.dp), ApprovedHomePalette.Accent)
         Column(Modifier.padding(start = 16.dp)) {
-          Text(BriefingCopy.CARD_TITLE, color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 32.sp,
+          Text(owner?.let { BriefingCopy.greeting(BriefingCopy.CARD_TITLE, it.name) } ?: BriefingCopy.CARD_TITLE,
+              color = ApprovedHomePalette.Text, fontSize = 26.sp, lineHeight = 32.sp,
               fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-          Text(BriefingCopy.CARD_SUBTITLE, color = ApprovedHomePalette.Secondary, fontSize = 20.sp,
+          Text(if (owner != null) BriefingCopy.PERSONAL_SUBTITLE else BriefingCopy.CARD_SUBTITLE,
+              color = ApprovedHomePalette.Secondary, fontSize = 20.sp,
               lineHeight = 26.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
       }

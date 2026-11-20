@@ -17,6 +17,13 @@ internal object BriefingCopy {
   const val CARD_TITLE = "Good morning"
   const val CARD_SUBTITLE = "Your morning briefing"
   const val DISMISS = "Dismiss"
+  const val PERSONAL_SUBTITLE = "Your briefing"
+  const val PERSONAL_DAY = "Your day"
+  const val PERSONAL_REMINDERS = "Your reminders"
+  const val PRIVATE_HIDDEN = "Hidden while others may be near"
+
+  /** The personal briefing's privacy promise (who's there mock). */
+  fun personalNote(name: String): String = "Reminders are read aloud only when $name is alone"
   const val NOON_MINUTE = 12 * 60
 
   private const val MS_PER_MINUTE = 60_000L

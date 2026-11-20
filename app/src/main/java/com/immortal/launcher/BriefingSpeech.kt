@@ -25,6 +25,42 @@ internal object BriefingSpeech {
       routine?.let { "${it.name} starts at ${BriefingCopy.clockOfMinute(it.startMinute, inputs.use24Hour)}." },
   ).joinToString(" ")
 
+  /**
+   * The personal summary: their name, their day, and their reminders only while private items show
+   * (alone). A private event is "something private" while hidden.
+   */
+  fun personal(
+      inputs: BriefingInputs,
+      p: BriefingPersonalInputs,
+      today: List<PersonalEvent>?,
+      routine: BriefingRoutine?,
+      time: String,
+  ): String = listOfNotNull(
+      "${BriefingCopy.greeting(inputs.greeting, p.name)}. It's $time.",
+      weather(inputs),
+      personalCalendar(inputs, p, today),
+      if (p.hidePrivate || p.reminders.isEmpty()) null else reminders(p.reminders),
+      timers(inputs.timers),
+      routine?.let { "${it.name} starts at ${BriefingCopy.clockOfMinute(it.startMinute, inputs.use24Hour)}." },
+  ).joinToString(" ")
+
+  private fun personalCalendar(inputs: BriefingInputs, p: BriefingPersonalInputs, today: List<PersonalEvent>?): String? {
+    if ((p.events as? BriefingPart.Ready)?.value == null) return null
+    if (today.isNullOrEmpty()) return "Nothing on your calendar today."
+    val first = today.first()
+    val name = if (first.private && p.hidePrivate) "something private" else first.title
+    val firstText = if (first.allDay) name
+        else "$name at ${BriefingCopy.clock(first.startMillis, inputs.zone, inputs.locale, inputs.use24Hour)}"
+    val count = if (today.size == 1) "One thing on your calendar today" else "${today.size} things on your calendar today"
+    return "$count, starting with $firstText."
+  }
+
+  private fun reminders(items: List<String>): String {
+    val names = BriefingCopy.joinNames(items.take(BriefingBuilder.MAX_LIST_NAMES))
+    val more = if (items.size > BriefingBuilder.MAX_LIST_NAMES) ", and more" else ""
+    return "You have ${BriefingCopy.plural(items.size, "reminder")}: $names$more."
+  }
+
   private fun weather(inputs: BriefingInputs): String? {
     val w = (inputs.weather as? BriefingPart.Ready)?.value ?: return null
     val unit = if (inputs.fahrenheit) "degrees Fahrenheit" else "degrees"

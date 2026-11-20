@@ -56,6 +56,8 @@ internal data class BriefingInputs(
     val speakOn: Boolean = false,
     /** The chime's quiet hours are on and it's inside the window now. */
     val quiet: Boolean = false,
+    /** Who's there? recognised an adult: the briefing is theirs ([BriefingPersonalPolicy]). */
+    val personal: BriefingPersonalInputs? = null,
 )
 
 internal enum class BriefingSectionKind(val icon: String) {
@@ -64,6 +66,7 @@ internal enum class BriefingSectionKind(val icon: String) {
   LIST("todo"),
   TIMERS("timer"),
   ROUTINE("tools"),
+  REMINDERS("todo"),
 }
 
 /** One block of the card. [muted] lines are status copy (loading, empty, unavailable). */
@@ -82,4 +85,6 @@ internal data class Briefing(
     val spoken: String?,
     /** Weather and calendar have both answered (the spoken summary waits for this). */
     val complete: Boolean,
+    /** A quiet line under the sections (the personal briefing's privacy promise). */
+    val note: String? = null,
 )
