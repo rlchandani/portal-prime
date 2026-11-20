@@ -51,7 +51,11 @@ internal class CcEvictingLru<K : Any, V : Any>(private val max: Int, private val
 }
 
 /** Which plan pass a recorded layer holds (see [CcPlanCanvas]). */
-internal enum class CcPlanPass { FLOORS, UNDER, WALLS, OVER, OVER_STILL, TOP }
+internal enum class CcPlanPass {
+  FLOORS, UNDER, WALLS, OVER, OVER_STILL, TOP,
+  /** 3D ([CcIsoPx]): the slab, the floor-lying part of OVER, the standing walls, the upright markers and labels. */
+  SLAB3D, FLAT, FLAT_STILL, WALLS3D, MARKS3D, TOP3D,
+}
 
 /** One recorded pass: the pass and the identity of the object that draws it. */
 internal data class CcPassKey(val pass: CcPlanPass, val source: CcSame)
@@ -84,8 +88,11 @@ internal class CcPlanLayers(private val graphics: GraphicsContext, max: Int = MA
   fun release() = cache.clear()
 
   companion object {
-    /** One canvas per floor ([CcFloorParking]): five passes, plus room for the ones an HA update just replaced. */
-    const val MAX_LAYERS = 10
+    /**
+     * One canvas per floor ([CcFloorParking]): five 2D passes and, once shown in 3D, five more,
+     * plus room for the ones an HA update just replaced.
+     */
+    const val MAX_LAYERS = 16
     private val RECORD_SECTIONS = CcPlanPass.entries.map { "cc:record:${it.name}" }
   }
 }
@@ -94,6 +101,7 @@ internal class CcPlanLayers(private val graphics: GraphicsContext, max: Int = MA
 internal data class CcDrawKey(
     val model: CcSame, val px: CcSame, val paint: CcSame, val c: CcColors, val labels: CcSame, val chips: CcSame,
     val lens: CcLens, val focus: String?, val stale: Boolean, val fahrenheit: Boolean, val dp: Float,
+    val skipLit: Set<String> = emptySet(), val pulse: Boolean = false,
 )
 
 /** What a [CcPlanBase] is built from. */

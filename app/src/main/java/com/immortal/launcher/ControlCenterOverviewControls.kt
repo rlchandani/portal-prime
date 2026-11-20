@@ -36,16 +36,20 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 internal fun CcPlanTopRow(floors: CcFloorTabs, floorId: String, lens: CcLens, onFloor: (String) -> Unit, onLens: (CcLens) -> Unit,
-                          modifier: Modifier = Modifier) {
+                          style3d: Boolean, onStyle: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+  val portrait = currentLayoutClass().compactPortrait
   Row(modifier, horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
     if (floors.tabs.size > 1) {
       val options = remember(floors) { floors.tabs.map { Triple(it.id, it.label, null as String?) } }
-      // Narrow (Mini upright): the floor tabs take what the lens leaves and scroll sideways if needed.
-      if (currentLayoutClass().compactPortrait) CcScrollingSeg(floorId, Modifier.weight(1f, fill = false)) { inView ->
+      // Narrow (Mini upright): the floor tabs take what the lens and style leave and scroll sideways if needed.
+      if (portrait) CcScrollingSeg(floorId, Modifier.weight(1f, fill = false)) { inView ->
         CcSeg(options, floorId, onFloor, selectedModifier = inView)
       } else CcSeg(options, floorId, onFloor)
     }
     CcSeg(LENSES, lens, onLens)
+    // The mock's `.planTop`: the style switch sits at the far end; upright it drops its icons to fit.
+    if (!portrait) androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+    CcSeg(if (portrait) STYLES_NARROW else STYLES, style3d, onStyle)
   }
 }
 
@@ -141,6 +145,8 @@ private fun LegendText(text: String) {
 }
 
 private val LENSES = listOf(Triple(CcLens.LIVE, "Live", "bulb"), Triple(CcLens.CLIMATE, "Climate", "therm"))
+private val STYLES = listOf(Triple(false, "2D", "plan"), Triple(true, "3D", "cube"))
+private val STYLES_NARROW = listOf(Triple(false, "2D", null), Triple(true, "3D", null))
 private val LEGEND = RoundedCornerShape(24.dp)
 private val HEAT_BRUSH = Brush.horizontalGradient(listOf(Color(0xFF5AA9FF), Color(0xFF61D0A6), Color(0xFFF4D36B), Color(0xFFF08A4B)))
 private const val OPAQUE = 0xFF000000.toInt()

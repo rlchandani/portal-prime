@@ -87,3 +87,11 @@ internal fun DrawScope.ccIcon(paint: CcPlanPaint, name: String, center: Offset, 
     with(p) { draw(Size(sizePx, sizePx), alpha = alpha, colorFilter = filter) }
   }
 }
+
+/** The shared glow as an oval ([rx] × [ry] px radii) centred at [center]: a round glow seen in the 3D view. */
+internal fun DrawScope.ccGlowOval(paint: CcPlanPaint, center: Offset, rx: Float, ry: Float, alpha: Float, filter: ColorFilter) {
+  drawImage(paint.glow, srcOffset = IntOffset.Zero, srcSize = IntSize(paint.glow.width, paint.glow.height),
+      dstOffset = IntOffset((center.x - rx).toInt(), (center.y - ry).toInt()),
+      dstSize = IntSize((rx * 2f).toInt().coerceAtLeast(1), (ry * 2f).toInt().coerceAtLeast(1)),
+      alpha = alpha.coerceIn(0f, 1f), colorFilter = filter)
+}

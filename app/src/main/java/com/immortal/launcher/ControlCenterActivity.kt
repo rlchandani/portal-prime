@@ -17,6 +17,12 @@ import android.os.PowerManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.lifecycleScope
+import com.immortal.launcher.jarvis.HearthpaneTools
+import com.immortal.launcher.jarvis.JarvisHighlight
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 /**
  * Home Control Center (the approved big-ideas mock): the live floor plan and everything around it.
@@ -30,6 +36,9 @@ class ControlCenterActivity : ComponentActivity() {
     override fun onReceive(context: Context, intent: Intent) { updateMotion() }
   }
   private var resumed = false
+  private var started = false
+  /** Jarvis is pointing at something here (a highlight or a home_control room), so the plan animates under its card. */
+  private var pointing = false
   /** Screen asked for by the latest intent (fleet `open_control_center`, banners). */
   private val requested = mutableStateOf<Pair<CcScreen, Long>?>(null)
 
@@ -44,6 +53,11 @@ class ControlCenterActivity : ComponentActivity() {
     HearthpaneScreens.track(this, HearthpaneScreens.Entry({ HearthpaneScreens.CONTROL_CENTER }) {
       ScreenContext.controlCenter(ControlCenter.state(this).value)
     })
+    lifecycleScope.launch {
+      combine(CcJarvisHome.flash, JarvisHighlight.current) { f, h ->
+        f != null || h?.target?.let { HearthpaneTools.screenOf(it) == HearthpaneScreens.CONTROL_CENTER } == true
+      }.distinctUntilChanged().collect { pointing = it; updateMotion() }
+    }
   }
 
   override fun onNewIntent(intent: Intent) {
@@ -56,6 +70,8 @@ class ControlCenterActivity : ComponentActivity() {
 
   override fun onStart() {
     super.onStart()
+    started = true
+    CcJarvisHome.screenStarted()
     ControlCenter.reloadSettings(this)
     ControlCenter.setVisible(this, true)
     registerReceiver(screen, IntentFilter().apply {
@@ -69,6 +85,9 @@ class ControlCenterActivity : ComponentActivity() {
   override fun onPause() { resumed = false; updateMotion(); super.onPause() }
 
   override fun onStop() {
+    started = false
+    CcJarvisHome.screenStopped()
+    updateMotion()
     runCatching { unregisterReceiver(screen) }
     ControlCenter.setVisible(this, false)
     super.onStop()
@@ -82,7 +101,7 @@ class ControlCenterActivity : ComponentActivity() {
 
   private fun updateMotion() {
     val interactive = (getSystemService(Context.POWER_SERVICE) as? PowerManager)?.isInteractive != false
-    motion.value = ccMotionAllowed(resumed, interactive, PresenceHub.current.screen)
+    motion.value = ccMotionAllowed(resumed, interactive, PresenceHub.current.screen, pointedAt = started && pointing)
   }
 
   companion object {
@@ -97,6 +116,10 @@ class ControlCenterActivity : ComponentActivity() {
   }
 }
 
-/** Animations run only while resumed, with the screen on and no dream on top. */
-internal fun ccMotionAllowed(resumed: Boolean, interactive: Boolean, screen: ScreenState): Boolean =
-    resumed && interactive && screen != ScreenState.DREAMING
+/**
+ * Animations run only while resumed, with the screen on and no dream on top — or while Jarvis's
+ * floating card (which pauses this screen but leaves it in view) points at something here
+ * ([pointedAt]: started and pointing), so the room it changed visibly pulses under the card.
+ */
+internal fun ccMotionAllowed(resumed: Boolean, interactive: Boolean, screen: ScreenState, pointedAt: Boolean = false): Boolean =
+    (resumed || pointedAt) && interactive && screen != ScreenState.DREAMING

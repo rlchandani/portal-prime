@@ -33,7 +33,7 @@ class SettingScopeTest {
   @Test
   fun roomCameraAndConnectionSettingsStayOnThisPortal() {
     val local = listOf("fleet.name", "calling.dropInsOn", "calling.dropInRooms", "controlcenter.sharedRoom",
-        "controlcenter.portalMode", "mqtt.host", "mqtt.username", "calendar.url", "immortal.maPlayerId",
+        "controlcenter.portalMode", "controlcenter.planStyle", "mqtt.host", "mqtt.username", "calendar.url", "immortal.maPlayerId",
         "screensaver.darkRoomLux", "screensaver.batterySaver", "sunrise.enabled", "guests.ssid", "guests.welcome")
     val scopes = all.toMap()
     local.forEach { key ->

@@ -21,7 +21,7 @@ internal class CcPlanModelCache {
     val out = LinkedHashMap<String, CcPlanModel>(plan.floors.size * 2)
     for (floor in plan.floors) {
       val ids = deps[floor.id]?.takeIf { it.first == floor }?.second ?: CcPlanDeps.ids(floor).also { deps[floor.id] = floor to it }
-      val key = CcModelKey(floor, CcPlanDeps.of(ids, s.entities), s.settings, s.minute, s.appliancesDone)
+      val key = CcModelKey(floor, CcPlanDeps.of(ids, s.entities), s.settings.forPlanModel(), s.minute, s.appliancesDone)
       out[floor.id] = models[floor.id]?.takeIf { it.first == key }?.second
           ?: CcPlanModel.build(floor, s.entities, s.settings, s.now, s.appliancesDone).also { models[floor.id] = key to it }
     }

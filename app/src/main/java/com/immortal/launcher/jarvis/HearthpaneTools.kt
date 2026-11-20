@@ -11,19 +11,24 @@ import org.json.JSONObject
 
 /**
  * The tools Hearthpane gives Jarvis through Jarvis's tool-provider contract: `hearthpane.screen_context` (what the
- * screen in front shows, as text — never pixels) and `hearthpane.highlight` (pulse one of that screen's controls).
+ * screen in front shows, as text — never pixels), `hearthpane.highlight` (pulse one of that screen's controls) and
+ * `hearthpane.home_control` (do something in the house through the Control Center, see
+ * [com.immortal.launcher.CcJarvisHome]).
  * Pure apart from its two seams, so every rule is JVM-tested: arguments are untrusted (from the model, via Jarvis),
  * and a highlight must name a target of the screen that is actually in front.
  */
 internal class HearthpaneTools(
     private val screen: () -> HearthpaneScreens.Entry?,
     private val highlight: (target: String, hint: String?) -> Unit,
+    /** `hearthpane.home_control` with its raw (untrusted) arguments; validated and policed by the Control Center. */
+    private val homeControl: (argsJson: String?) -> JSONObject = { JSONObject().put("error", "home control unavailable") },
     /** Settings rows anywhere that match a few words ("dark mode"), best first. */
     private val search: (query: String) -> List<ScreenContext.Match> = { emptyList() },
 ) {
   fun invoke(name: String?, argsJson: String?): JSONObject = when (name) {
     SCREEN_CONTEXT -> screenContext(args(argsJson)?.optString("query")?.trim()?.take(MAX_QUERY).orEmpty())
     HIGHLIGHT -> highlight(args(argsJson))
+    HOME_CONTROL -> runCatching { homeControl(argsJson) }.getOrElse { error("home control failed") }
     else -> error("unknown tool: ${name.orEmpty().take(MAX_NAME)}")
   }
 
@@ -62,6 +67,7 @@ internal class HearthpaneTools(
   companion object {
     const val SCREEN_CONTEXT = "hearthpane.screen_context"
     const val HIGHLIGHT = "hearthpane.highlight"
+    const val HOME_CONTROL = "hearthpane.home_control"
     private const val MAX_TARGET = 160
     private const val MAX_HINT = 60
     private const val MAX_NAME = 60
