@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.flow.collectLatest
 
 /**
  * True while ambient animation may run (resumed, screen on, no dream, motion not reduced).
@@ -63,6 +64,7 @@ internal fun CcApp(motion: Boolean, initialScreen: CcScreen = CcScreen.MAP, requ
       JarvisHighlight.done(request)
     }
   }
+  CcJarvisHomeEffects(ui) { latest }
   val layout = currentLayoutClass()
   // One body moved between the portrait and landscape frames, so rotating keeps the screens' state.
   val body = remember(ui) { movableContentOf { s: CcUiState -> CcScreenBody(s, ui) } }
@@ -159,6 +161,39 @@ private fun Modifier.ccObserveTouches(ui: CcUi): Modifier = pointerInput(ui) {
     while (true) {
       awaitPointerEvent(PointerEventPass.Initial)
       ui.touched(android.os.SystemClock.uptimeMillis())
+    }
+  }
+}
+
+/**
+ * `hearthpane.home_control` on this screen: the rooms Jarvis just changed pulse on the plan (their
+ * lights fade on the canvas as the state arrives), and an asking-first request opens the Portal's
+ * own confirm sheet over its room. A sheet asked for more than [CcJarvisHome.CONFIRM_TTL_MS] ago is
+ * dropped, so an old request never pops up later.
+ */
+@Composable
+private fun CcJarvisHomeEffects(ui: CcUi, state: () -> CcUiState) {
+  LaunchedEffect(Unit) {
+    CcJarvisHome.flash.collectLatest { f ->
+      f ?: return@collectLatest
+      val room = f.roomIds.singleOrNull()
+      try {
+        if (room != null) ui.pointAt(room, f.floorId) else f.floorId?.let { if (ui.floorId != it) ui.floor(it) }
+        kotlinx.coroutines.delay(com.immortal.launcher.jarvis.JarvisHighlight.SHOW_MS)
+      } finally {
+        room?.let(ui::stopPointing)
+        CcJarvisHome.flashDone(f)
+      }
+    }
+  }
+  LaunchedEffect(Unit) {
+    CcJarvisHome.confirm.collect { c ->
+      c ?: return@collect
+      CcJarvisHome.confirmShown(c)
+      if (!c.fresh(System.currentTimeMillis())) return@collect
+      val e = state().entity(c.entityId) ?: return@collect
+      c.roomId?.let { ui.pointAt(it, c.floorId) }
+      ui.askFirst(e, c.call)
     }
   }
 }

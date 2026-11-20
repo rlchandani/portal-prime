@@ -27,6 +27,10 @@ internal object ControlCenterConfig {
   const val MAX_WARN_MIN = 120
   const val MIN_PIN = 4
   const val MAX_PIN = 8
+  /** The floor plan's style on this Portal: the 2D top-down plan or the mock's 3D isometric view. */
+  const val PLAN_2D = "2d"
+  const val PLAN_ISO = "iso"
+  val PLAN_STYLES = listOf(PLAN_2D, PLAN_ISO)
   const val MIN_EXIT_S = 0
   const val MAX_EXIT_S = 180
   private const val SALT_BYTES = 16
@@ -58,8 +62,14 @@ internal object ControlCenterConfig {
       val darkTheme: Boolean = true,
       val pinLength: Int = MIN_PIN,
       val exitDelaySec: Int = 30,
+      /** [PLAN_2D] or [PLAN_ISO]; per Portal (a showcase on one wall, the readable plan on another). */
+      val planStyle: String = PLAN_2D,
   ) {
     val kids: Boolean get() = portalMode == MODE_KIDS
+    val plan3d: Boolean get() = planStyle == PLAN_ISO
+
+    /** These settings as the plan model sees them: the style only changes how it is drawn, never what. */
+    fun forPlanModel(): Settings = if (planStyle == PLAN_2D) this else copy(planStyle = PLAN_2D)
     val bannersOnly: Boolean get() = portalMode == MODE_BANNERS
   }
 
@@ -90,6 +100,7 @@ internal object ControlCenterConfig {
         darkTheme = p.getBoolean("dark_theme", d.darkTheme),
         pinLength = p.getInt("pin_length", d.pinLength).coerceIn(MIN_PIN, MAX_PIN),
         exitDelaySec = p.getInt("exit_delay_s", d.exitDelaySec).coerceIn(MIN_EXIT_S, MAX_EXIT_S),
+        planStyle = p.getString("plan_style", d.planStyle)?.takeIf { it in PLAN_STYLES } ?: d.planStyle,
     )
   }
 
@@ -117,6 +128,7 @@ internal object ControlCenterConfig {
   fun setDarkTheme(c: Context, v: Boolean) = putBool(c, "dark_theme", v)
   fun setPinLength(c: Context, v: Int) = putInt(c, "pin_length", v.coerceIn(MIN_PIN, MAX_PIN))
   fun setExitDelaySec(c: Context, v: Int) = putInt(c, "exit_delay_s", v.coerceIn(MIN_EXIT_S, MAX_EXIT_S))
+  fun setPlanStyle(c: Context, v: String) { if (v in PLAN_STYLES) prefs(c).edit().putString("plan_style", v).apply() }
 
   // --- scenes previewed once (first run shows the preview, later runs are one tap) ----------
 

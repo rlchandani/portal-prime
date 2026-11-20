@@ -138,6 +138,10 @@ internal fun CcSetLook(st: ControlCenterConfig.Settings, ui: CcUi, write: (Strin
     CcSetRow("Theme") {
       CcSeg(listOf(Triple(true, "Dark", "moon"), Triple(false, "Light", "sun")), st.darkTheme, { write("darkTheme", it) })
     }
+    CcSetRow("Floor plan style", "Remembered on this Portal. 2D reads best from across the room; 3D is a showcase view") {
+      CcSeg(listOf(Triple(false, "2D top-down", "plan"), Triple(true, "3D isometric", "cube")), st.plan3d,
+          { write("planStyle", if (it) ControlCenterConfig.PLAN_ISO else ControlCenterConfig.PLAN_2D) })
+    }
     CcSetRow("Animation", "Reduced: no pulses or flowing lines (older Portals, ambient mode)") {
       CcSeg(listOf(Triple(false, "Full", null), Triple(true, "Reduced", null)), st.reducedMotion, { write("reducedMotion", it) })
     }

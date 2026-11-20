@@ -14,6 +14,7 @@ import android.os.Binder
 import android.os.Bundle
 import android.util.Log
 import com.immortal.launcher.Calling
+import com.immortal.launcher.CcJarvisHome
 import com.immortal.launcher.DoorbellCardOverlay
 import com.immortal.launcher.jarvis.wake.HearthpaneWake
 import org.json.JSONObject
@@ -25,8 +26,10 @@ import org.json.JSONObject
  * tool timeout.
  */
 class HearthpaneToolProvider : ContentProvider() {
-  private val tools = HearthpaneTools(HearthpaneScreens::current, { target, hint -> JarvisHighlight.show(target, hint) },
-      SettingsJarvisContext::search)
+  private val tools by lazy {
+    HearthpaneTools(HearthpaneScreens::current, { target, hint -> JarvisHighlight.show(target, hint) },
+        homeControl = { args -> CcJarvisHome.run(requireNotNull(context), args) }, search = SettingsJarvisContext::search)
+  }
 
   override fun onCreate(): Boolean = true
 

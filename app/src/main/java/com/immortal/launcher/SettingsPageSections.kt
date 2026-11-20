@@ -133,7 +133,7 @@ internal object SettingsPageSections {
             section("Control Center · kids & confirmations", rows("controlcenter", "kidsHideLocks", "kidsHideGarage",
                 "kidsHideSecurity", "kidsHideCameras", "kidsHideValve", "kidsLockThermostat", "askUnlock", "askGarage", "askValve",
                 "askScenes"), footer = "Kids mode is enforced on this Portal only: Home Assistant can't limit what a token may do."),
-            section("Control Center · look", rows("controlcenter", "darkTheme", "reducedMotion", "pinLength", "exitDelaySec"),
+            section("Control Center · look", rows("controlcenter", "darkTheme", "planStyle", "reducedMotion", "pinLength", "exitDelaySec"),
                 advanced = true),
             section("MQTT", link("MQTT publishing", P.MQTT, "broker"), advanced = true),
         ),
