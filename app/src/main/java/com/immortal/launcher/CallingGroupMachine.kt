@@ -27,6 +27,10 @@ internal object CallGroupMachine {
     is CallEvent.MoveTo -> addPerson(state, call, event.target, event.now, move = true)
     is CallEvent.RemoteMoved -> if (event.id == call.id && call.move?.to == event.from && targetLive(call))
       completeMove(state, call, event.now) else CallStep(state)
+    // Only the phone we took the call over from may ask for it back; its tap there is the consent.
+    is CallEvent.RemotePull -> if (event.id == call.id && call.cameFrom == event.from && CallPhoneId.isPhone(event.from))
+      addPerson(state, call, CallContact(event.from, call.cameFromName ?: "Phone", kind = CallContact.Kind.PHONE), event.now, move = true)
+    else CallStep(state)
     is CallEvent.RemoteJoin -> remoteJoin(state, call, event)
     is CallEvent.Replied -> call.leg(event.from)?.takeIf { event.id == call.id }?.let { replied(state, call, it, event) }
     is CallEvent.RemoteAccepted -> call.leg(event.from)?.takeIf { event.id == call.id }?.let { offered(state, call, it, event.now) }
@@ -182,7 +186,9 @@ internal object CallGroupMachine {
     // The device we were moving to didn't come: the move is off and the call stays here.
     val moveOff = leg.moving && call.move?.to == leg.peer.deviceId
     val next = call.copy(legs = call.legs - leg, notice = CallNotice(leg.peer.name, reason, now, to = to, move = moveOff),
-        move = if (moveOff) null else call.move?.takeUnless { it.from == leg.peer.deviceId })
+        move = if (moveOff) null else call.move?.takeUnless { it.from == leg.peer.deviceId },
+        cameFrom = if (call.move?.from == leg.peer.deviceId) leg.peer.deviceId else call.cameFrom,
+        cameFromName = if (call.move?.from == leg.peer.deviceId) leg.peer.name else call.cameFromName)
     val effects = buildList {
       if (tell) add(CallEffect.SendEnd(call.id, leg.peer.deviceId, reason))
       if (leg.phase != LegPhase.RINGING) add(CallEffect.ClosePeer(leg.peer.deviceId))
@@ -203,7 +209,9 @@ internal object CallGroupMachine {
         remoteCameraOn = heir.remoteCameraOn, remoteMicOn = heir.remoteMicOn, legs = call.legs - heir,
         notice = CallNotice(call.peer.name, reason, now, to = to),
         // The first member moved away from us, so the move (if we were its target) is complete for us.
-        move = call.move?.takeUnless { it.from == call.peer.deviceId })
+        move = call.move?.takeUnless { it.from == call.peer.deviceId },
+        cameFrom = if (call.move?.from == call.peer.deviceId) call.peer.deviceId else call.cameFrom,
+        cameFromName = if (call.move?.from == call.peer.deviceId) call.peer.name else call.cameFromName)
     return CallStep(state.copy(call = next), listOfNotNull(first, CallEffect.ClosePeer(call.peer.deviceId)))
   }
 

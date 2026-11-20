@@ -89,6 +89,7 @@ internal object CallPhoneRoute {
       // The phone vouches for the Portal it moved its call to (only a connected member's vouch counts).
       CallWire.JOIN -> CallPhoneWire.decodeJoin(b)?.let { Calling.dispatch(CallEvent.RemoteJoin(it.id, phoneId, it.newcomer, now)); ok() }
       CallPhoneWire.MOVED -> CallPhoneWire.decodeMoved(b)?.let { Calling.dispatch(CallEvent.RemoteMoved(it.id, phoneId, now)); ok() }
+      CallPhoneWire.PULL -> CallPhoneWire.decodeMoved(b)?.let { Calling.dispatch(CallEvent.RemotePull(it.id, phoneId, now)); ok() }
       CallWire.MEDIA -> CallWire.decodeMedia(b)?.let {
         Calling.dispatch(CallEvent.RemoteMedia(it.id, phoneId, it.cameraOn, it.micOn)); ok()
       }

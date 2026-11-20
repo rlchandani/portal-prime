@@ -208,6 +208,25 @@ class CallPhoneGroupMoveTest {
     assertEquals("Sam’s phone handed the call over", CallAddPeople.notice(call.notice!!))
   }
 
+  @Test fun onlyThePhoneTheCallCameFromMayPullItBack() {
+    val ring = CallEvent.Incoming(id, phone, CallKind.CALL, true, null, 0, IncomingDecision.Ring(false), t0,
+        members = listOf(CallMemberRef(den, "192.168.1.22", 8723)), move = true)
+    var s = reduce(CallState(), ring).state
+    s = reduce(s, CallEvent.Accept(false, t0 + 1_000)).state
+    s = reduce(s, CallEvent.MediaUp(id, t0 + 2_000, phone.deviceId)).state
+    s = reduce(s, CallEvent.MediaUp(id, t0 + 2_500, den.deviceId)).state
+    s = reduce(s, CallEvent.RemoteEnded(id, phone.deviceId, CallEndReason.HUNG_UP, t0 + 4_000, movedTo = "x")).state
+    assertEquals(phone.deviceId, s.call!!.cameFrom)
+    assertEquals(s, reduce(s, CallEvent.RemotePull(id, "phfedcba9876543210", t0 + 5_000)).state)
+    assertEquals(s, reduce(s, CallEvent.RemotePull("ffffffffffffffff", phone.deviceId, t0 + 5_000)).state)
+    val pulled = reduce(s, CallEvent.RemotePull(id, phone.deviceId, t0 + 5_000))
+    val ringBack = pulled.effects.filterIsInstance<CallEffect.SendGroupRing>().single()
+    assertTrue(ringBack.move)
+    assertEquals(phone.deviceId, ringBack.to.deviceId)
+    assertEquals("Sam’s phone", ringBack.to.name)
+    assertEquals(listOf(den), ringBack.members)
+  }
+
   @Test fun aMemberThatMovedIsToldAsAMoveNotALeave() {
     // Sam's phone is a leg here; it moved to the Kids Portal (also in the call).
     var s = reduce(withPhoneLive(), CallEvent.RemoteJoin(id, kitchen.deviceId, kids, t0 + 20_000)).state

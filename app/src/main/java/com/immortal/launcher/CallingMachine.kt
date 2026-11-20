@@ -53,6 +53,9 @@ internal data class ActiveCall(
     val remoteAutoAnswered: Boolean = false,
     /** Phase 2b: this call is being handed to (or from) another of this person's devices. */
     val move: CallMove? = null,
+    /** The phone this call moved here from: only it may ask for the call back ("Move it back here"). */
+    val cameFrom: String? = null,
+    val cameFromName: String? = null,
 ) {
   /** Everyone else in (or being added to) this call, [peer] first. */
   val members: List<CallContact> get() = listOf(peer) + legs.map { it.peer }
@@ -123,6 +126,8 @@ internal sealed interface CallEvent {
   data class MoveTo(val target: CallContact, val now: Long) : CallEvent
   /** The device we are moving to says it is connected to everyone (`call_moved`). */
   data class RemoteMoved(val id: String, val from: String, val now: Long) : CallEvent
+  /** The phone this call moved here from asks for it back (`call_pull`): move it there. */
+  data class RemotePull(val id: String, val from: String, val now: Long) : CallEvent
   /** Group: member [from] says [newcomer] joined; it will offer to us. */
   data class RemoteJoin(val id: String, val from: String, val newcomer: CallContact, val now: Long) : CallEvent
   data class Tick(val now: Long) : CallEvent

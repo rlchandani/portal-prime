@@ -89,7 +89,7 @@ class CallPhone2bWireTest {
     assertNull(CallPhoneWire.decodeMoved(JSONObject().put("i", "x").put("to", self)))
     assertEquals(id, CallPhoneWire.encodePull(id, phone.deviceId).getString("i"))
     assertTrue(CallWire.JOIN in CallPhoneWire.SENDABLE && CallPhoneWire.MOVED in CallPhoneWire.SENDABLE)
-    assertFalse(CallPhoneWire.PULL in CallPhoneWire.SENDABLE)
+    assertTrue("a phone may pull back a call it moved here", CallPhoneWire.PULL in CallPhoneWire.SENDABLE)
   }
 
   @Test fun pollInfoKeepsOnlyWellFormedAliasesAndClampsTheWait() {
@@ -221,6 +221,13 @@ class CallPhone2bWireTest {
     val a = CallPhoneAuth.sign(key, CallPhoneMessageRoute.GET_DOMAIN, "n1", CallPhoneMessageRoute.getBinding("00000000000000a1", 1_016))
     assertNotEquals(a, CallPhoneAuth.sign(key, CallPhoneMessageRoute.GET_DOMAIN, "n2", CallPhoneMessageRoute.getBinding("00000000000000a1", 1_016)))
     assertNotEquals(a, CallPhoneAuth.sign(key, CallPhoneMessageRoute.GET_DOMAIN, "n1", CallPhoneMessageRoute.getBinding("00000000000000a1", 1_017)))
+  }
+
+  @Test fun sealedChunksMatchPortalToolkitByteForByte() {
+    // The same vector is asserted in Portal Toolkit's Calling2bWireAndMessagesTest (PhoneMessageCrypto).
+    val msgId = "00000000000000a1"
+    val sealed = CallMessageCrypto.sealChunk(CallMessageCrypto.transitKey(key, msgId), msgId, 0, true, "hearthpane".toByteArray())
+    assertEquals("6a4d7aae7dd801d90426113708b4d946dafe7a82fc9a16f54570", sealed.joinToString("") { "%02x".format(it) })
   }
 
   @Test fun copyForGroupRingsMovesAndMovedCalls() {

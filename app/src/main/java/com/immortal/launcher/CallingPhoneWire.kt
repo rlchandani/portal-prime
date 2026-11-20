@@ -35,11 +35,11 @@ internal object CallPhoneId {
  */
 internal object CallPhoneWire {
   const val GO = "call_go"
-  /** Portal → phone: "Move it back here" was tapped on the Portal that moved this call to the phone. */
+  /** Either way: "Move it back here" was tapped on the device the call moved away from. */
   const val PULL = "call_pull"
   /** Either way: the device a call moved to is connected to everyone; the old one may leave. */
   const val MOVED = "call_moved"
-  val SENDABLE = setOf(CallWire.RING, CallWire.REPLY, CallWire.END, CallWire.MEDIA, CallWire.JOIN, MOVED)
+  val SENDABLE = setOf(CallWire.RING, CallWire.REPLY, CallWire.END, CallWire.MEDIA, CallWire.JOIN, MOVED, PULL)
   /** A phone may only say these about a ring: ringing there, declined, or busy. */
   private val PHONE_REPLIES = setOf(CallReply.RINGING, CallReply.DECLINED, CallReply.BUSY)
 
