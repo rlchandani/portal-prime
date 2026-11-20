@@ -146,8 +146,25 @@ internal object CcPlanJson {
 
   private fun unit(v: Double): Float = (if (v.isNaN()) 0.5 else v).toFloat().coerceIn(0f, 1f)
 
-  /** Fits HA's user-data store? (UTF-8 size of the encoded plan.) */
-  fun fits(plan: CcPlan): Boolean = encode(plan).toString().toByteArray(Charsets.UTF_8).size <= MAX_BYTES
+  /** UTF-8 size of the encoded plan, as Home Assistant's user-data store would hold it. */
+  fun encodedBytes(plan: CcPlan): Int = encode(plan).toString().toByteArray(Charsets.UTF_8).size
+
+  /** Fits HA's user-data store? */
+  fun fits(plan: CcPlan): Boolean = encodedBytes(plan) <= MAX_BYTES
+
+  /** Whole kilobytes, rounded up, for "312 KB, limit 256 KB". */
+  fun kilobytes(bytes: Int): Int = (bytes + KB - 1) / KB
+
+  /** Save toast for a plan of [bytes] that Home Assistant will never hold, connected or not. */
+  fun tooLargeToast(bytes: Int): String =
+      "Too large to save in Home Assistant · kept on this Portal (${kilobytes(bytes)} KB, limit ${MAX_BYTES / KB} KB). " +
+          "Simplify the plan (fewer rooms or devices) to share it."
+
+  /** Settings line under "On this Portal only" for the same plan. */
+  fun tooLargeLine(bytes: Int): String =
+      "Too large to save in Home Assistant (${kilobytes(bytes)} KB, limit ${MAX_BYTES / KB} KB) · simplify the plan to share it"
+
+  private const val KB = 1024
 
   private const val RECT_PARTS = 4
   const val OPENING_SPAN = 0.3

@@ -472,12 +472,13 @@ ha#0 {"id":999,"type":"event","event":{"a":{"light.ghost":{"s":"on"}}}}
 ha#0 {"type":"mystery"}
 advance 100 -> t=+300
 do savePlan {"bigRooms":1400}
-state LIVE '' live=+100 retry=0 v=3 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Saved on this Portal. It will copy to Home Assistant when connected.' debug=- alerts=[] scene=- - dismissed=[]
+log i HearthpaneControl: control center plan is 347130 bytes, over Home Assistant's 262144; kept on this Portal
+state LIVE '' live=+100 retry=0 v=3 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=on,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Too large to save in Home Assistant · kept on this Portal (339 KB, limit 256 KB). Simplify the plan (fewer rooms or devices) to share it.'! debug=- alerts=[] scene=- - dismissed=[]
 do files
 files plan=1f@+300 testPlan=- dryRunPref=false
 ha#0 {"id":7,"type":"event","event":{"c":{"light.kitchen":{"+":{"s":"off"}}}}}
 advance 100 -> t=+400
-state LIVE '' live=+300 retry=0 v=4 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Saved on this Portal. It will copy to Home Assistant when connected.' debug=- alerts=[] scene=- - dismissed=[]
+state LIVE '' live=+300 retry=0 v=4 ents=12[alarm_control_panel.home=disarmed,binary_sensor.front_door=off,binary_sensor.kitchen_leak=off,camera.porch=idle,light.kitchen=off,lock.front=locked,scene.movie=unknown,sensor.big=on,sensor.kitchen_temp=21.5,sensor.model_y_battery_level=80,sensor.model_y_charge_energy_added=12.0,valve.water_main=open] pending=[] reg=11e/2c plan=1f/1400r@+300/THIS_PORTAL toast='Too large to save in Home Assistant · kept on this Portal (339 KB, limit 256 KB). Simplify the plan (fewer rooms or devices) to share it.'! debug=- alerts=[] scene=- - dismissed=[]
 
 ## plan load and save: newer local copy, HA ack and refusal, dry run, test plan
 state CONNECTING '' live=0 retry=0 v=0 ents=0[] pending=[] reg=- plan=-/NONE toast=- debug=- alerts=[] scene=- - dismissed=[]

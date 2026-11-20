@@ -152,6 +152,29 @@ class CcEngineActionsTest {
     assertEquals(1_400, r.host.plan?.floors?.single()?.rooms?.size)
   }
 
+  @Test fun anOversizedPlanSavedWhileConnectedSaysItIsTooLargeInsteadOfPromisingACopy() {
+    val r = live()
+    val big = CcPlan(listOf(CcFloor("g", "G", (0 until 1_400).map {
+      CcRoom("r$it", "Room $it " + "n".repeat(180), CcRect(it % 40, it / 40, 1, 1), false, emptyList())
+    })), 0L)
+    r.engine.queueSavePlan(big); r.sched.runDue()
+    assertEquals(CcPhase.LIVE, r.state.connection.phase)
+    val toast = requireNotNull(r.state.toast)
+    val kb = (CcPlanJson.encodedBytes(r.host.plan!!) + 1023) / 1024
+    assertEquals("Too large to save in Home Assistant · kept on this Portal ($kb KB, limit 256 KB). " +
+        "Simplify the plan (fewer rooms or devices) to share it.", toast.text)
+    assertTrue(toast.error)
+    assertFalse(toast.text.contains("when connected"))
+    assertEquals(0, r.ws.types().count { it == "frontend/set_user_data" })
+  }
+
+  @Test fun aPlanThatFitsSavedWhileOfflineStillPromisesTheCopy() {
+    val r = CcEngineRig()
+    r.engine.queueSavePlan(CcEngineRig.PLAN); r.sched.runDue()
+    assertEquals("Saved on this Portal. It will copy to Home Assistant when connected.", r.state.toast?.text)
+    assertFalse(r.state.toast!!.error)
+  }
+
   @Test fun alertsReachTheRelayOnceAndFakeStatesNeedDryRunAndLive() {
     val r = live { dry = true }
     r.event("subscribe_entities", diff("binary_sensor.leak", "on"))

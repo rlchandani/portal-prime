@@ -101,7 +101,10 @@ internal object CcSetLogic {
   fun planSource(src: CcPlanSource, plan: CcPlan?): Pair<String, String> = when {
     plan == null || plan.isEmpty -> "No floor plan yet" to "Build one with Rebuild plan below."
     src == CcPlanSource.HOME_ASSISTANT -> "In Home Assistant" to "Shared by every Portal on this HA user · a copy is cached on this Portal"
-    src == CcPlanSource.THIS_PORTAL -> "On this Portal only" to "Home Assistant hasn't stored it yet — saving again while connected shares it"
+    src == CcPlanSource.THIS_PORTAL -> "On this Portal only" to CcPlanJson.encodedBytes(plan).let { bytes ->
+      if (bytes > CcPlanJson.MAX_BYTES) CcPlanJson.tooLargeLine(bytes)
+      else "Home Assistant hasn't stored it yet — saving again while connected shares it"
+    }
     else -> "Not loaded yet" to "Looking for the plan in Home Assistant"
   }
 

@@ -90,6 +90,12 @@ class ControlCenterSettingsScreenModelTest {
     assertEquals("On this Portal only", CcSetLogic.planSource(CcPlanSource.THIS_PORTAL, plan).first)
     assertEquals("No floor plan yet", CcSetLogic.planSource(CcPlanSource.HOME_ASSISTANT, CcPlan.EMPTY).first)
     assertEquals("Not loaded yet", CcSetLogic.planSource(CcPlanSource.NONE, plan).first)
+    val big = CcPlan(listOf(CcFloor("g", "G", (0 until 1_400).map {
+      CcRoom("r$it", "Room $it " + "n".repeat(180), CcRect(it % 40, it / 40, 1, 1))
+    })))
+    val kb = (CcPlanJson.encodedBytes(big) + 1023) / 1024
+    assertEquals("On this Portal only" to "Too large to save in Home Assistant ($kb KB, limit 256 KB) · simplify the plan to share it",
+        CcSetLogic.planSource(CcPlanSource.THIS_PORTAL, big))
     assertTrue(CcSetLogic.registryLine(null).contains("administrator"))
     assertEquals("2 floors · 3 areas · 7 entities", CcSetLogic.registryLine(EdFixture.reg))
     assertEquals("0 floors · 0 areas · 1 entity", CcSetLogic.registryLine(CcRegistry(entities = setOf("a.b"))))
