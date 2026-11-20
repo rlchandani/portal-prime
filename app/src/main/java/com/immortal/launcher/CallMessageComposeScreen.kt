@@ -86,7 +86,7 @@ private fun BoxScope.TopRow(c: CallMessageComposer, s: ComposeState, edge: Dp, l
       Column(Modifier.weight(1f)) {
         Text(CallMessageCopy.title(c.peer.name), color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold, maxLines = 1,
             overflow = TextOverflow.Ellipsis)
-        Text(CallMessageCopy.sub(s.phase, s.failure), color = Color.White.copy(alpha = 0.75f), fontSize = 24.sp, maxLines = 2,
+        Text(CallMessageCopy.sub(s.phase, s.failure, phone = CallPhoneId.isPhone(c.peer.id)), color = Color.White.copy(alpha = 0.75f), fontSize = 24.sp, maxLines = 2,
             overflow = TextOverflow.Ellipsis)
       }
       if (s.phase == ComposePhase.RECORDING) RecChip()

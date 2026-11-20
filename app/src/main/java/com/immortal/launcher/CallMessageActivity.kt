@@ -46,7 +46,7 @@ class CallMessageActivity : ComponentActivity() {
       setContent { Box(Modifier.fillMaxSize().background(CallColors.VideoBg)) { CallMessagePlayScreen(m, onClose = ::finish) } }
       return
     }
-    val peer = intent.getStringExtra(EXTRA_PEER)?.let { id -> CallingStore.peers.value.firstOrNull { it.id == id } }
+    val peer = intent.getStringExtra(EXTRA_PEER)?.let(CallMessages::recipient)
     if (peer == null || !CallMessages.canSend(peer)) { Log.w(TAG, "no deliverable recipient"); finish(); return }
     val test = BuildConfig.PORTAL_CALL_LOOPBACK && intent.getBooleanExtra(EXTRA_TEST_FRAMES, false)
     val auto = test && intent.getBooleanExtra(EXTRA_AUTO, false)
@@ -109,11 +109,18 @@ class CallMessageActivity : ComponentActivity() {
 
 /** Entry points for the rest of Calling (ended screen, Calls app, Home widget, probes). */
 internal object CallMessages {
-  /** A message can go to a Portal in this home whose address we heard (never to a phone). */
-  fun canSend(peer: CallPeer?): Boolean = peer != null && !CallPhoneId.isPhone(peer.id) && peer.host != null && peer.port in 1..65535
+  /**
+   * A message can go to a Portal in this home whose address we heard, or (phase 2b) to a paired
+   * phone this Portal knows: it waits here until Portal Toolkit collects it.
+   */
+  fun canSend(peer: CallPeer?): Boolean = peer != null &&
+      (if (CallPhoneId.isPhone(peer.id)) CallPhoneMailbox.phone(peer.id) != null else peer.host != null && peer.port in 1..65535)
 
-  fun canSend(contact: CallContact): Boolean =
-      !contact.phone && canSend(CallingStore.peers.value.firstOrNull { it.id == contact.deviceId })
+  fun canSend(contact: CallContact): Boolean = canSend(recipient(contact.deviceId))
+
+  /** The Portal (from its hello) or the phone (from its polls) a message would go to. */
+  fun recipient(id: String): CallPeer? = CallingStore.peers.value.firstOrNull { it.id == id }
+      ?: CallPhoneMailbox.phone(id)?.let { CallPeer(it.id, it.name, it.seenMs) }
 
   fun compose(context: Context, peer: CallContact, testFrames: Boolean = false, auto: Boolean = false, callId: String? = null) {
     runCatching {

@@ -78,7 +78,9 @@ internal class CallMessageComposer(context: Context, val peer: CallPeer, testFra
     val duration = state.durationMs
     val audioOnly = !state.cameraOn
     net.execute {
-      val failure = CallMessageSender.send(app, take, peer, duration, audioOnly, callId)
+      // A phone has no server: its message waits here, sealed, until Portal Toolkit collects it.
+      val failure = if (CallPhoneId.isPhone(peer.id)) CallPhoneOutbox.put(app, take, peer, duration, audioOnly, callId)
+      else CallMessageSender.send(app, take, peer, duration, audioOnly, callId)
       main.post { dispatch(if (failure == null) ComposeEvent.SendOk else ComposeEvent.SendFailed(failure)) }
     }
   }

@@ -107,7 +107,13 @@ internal enum class CallEndReason(val wire: String) {
   /** No camera/mic permission and the user declined to grant it. */
   NO_PERMISSION("p"),
   /** Calling can't run on this Portal (no WebRTC for this CPU). */
-  UNAVAILABLE("u");
+  UNAVAILABLE("u"),
+  /**
+   * Phase 2b, local only: this device handed the call to another one ("Move to phone"). On the wire
+   * the mover sends [HUNG_UP] plus an optional `mv` naming the device that took over, so older
+   * Portals still close the leg cleanly.
+   */
+  MOVED("mv");
 
   companion object {
     fun fromWire(raw: String?): CallEndReason? = entries.firstOrNull { it.wire == raw }
@@ -188,6 +194,12 @@ internal object CallTimings {
   const val ENDED_AUTO_CLOSE_MS = 5_000L
   /** Grandma mode: auto-answer connects after this countdown (chime, Not now, Answer now). */
   const val AUTO_ANSWER_MS = 10_000L
+  /** Move to phone / Portal: once the new device is connected, the old one leaves after at most this. */
+  const val MOVE_SETTLE_MS = 8_000L
+  /** "Move it back here": the phone's move ring is taken without a second tap for this long. */
+  const val PULL_BACK_MS = 20_000L
+  /** The phone a call moved from may ask for it back only this soon after the move. */
+  const val PULL_WINDOW_MS = 120_000L
   /** History is kept on this Portal for 30 days. */
   const val HISTORY_KEEP_MS = 30L * 24 * 60 * 60_000L
 }

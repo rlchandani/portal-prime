@@ -14,7 +14,7 @@ import org.json.JSONObject
  * `/perf/callmsg` (fleet-token authed, measurement builds only — 404 otherwise). GET lists stored
  * messages (ids, sizes, sender, duration: never content) and the sender temp file count, which
  * must be 0 whenever no message is being composed. POST `?action=deleteAll` removes every stored
- * message; POST `?action=send&to=<room id>` opens a test-frames message to that room that records
+ * message (`?action=delete&id=` just one); POST `?action=send&to=<room id or phone id>` opens a test-frames message to that room that records
  * 5 s and sends itself (no camera, no mic).
  */
 internal object CallMessageProbe {
@@ -25,10 +25,15 @@ internal object CallMessageProbe {
       "GET" -> RemoteFeatureRoutes.json(200, state(context))
       "POST" -> when (req.queryParam("action")) {
         "deleteAll" -> { CallMessageStore.deleteAll(context); RemoteFeatureRoutes.json(200, state(context)) }
+        // Night tests clean up only what they made (never the household's own messages).
+        "delete" -> { req.queryParam("id")?.takeIf(CallMessageList::isId)?.let { CallMessageStore.delete(context, it) }
+          RemoteFeatureRoutes.json(200, state(context)) }
         "send" -> {
-          val peer = CallingStore.peers.value.firstOrNull { it.id == req.queryParam("to") }?.takeIf(CallMessages::canSend)
+          // A room, or (Calling 2b) a paired phone this Portal has heard from: its message waits in the outbox.
+          val peer = req.queryParam("to")?.let(CallMessages::recipient)?.takeIf(CallMessages::canSend)
               ?: return RemoteFeatureRoutes.json(404, RemoteFeatureRoutes.error("no_such_room"))
-          CallMessages.compose(context, peer.contact(), testFrames = true, auto = true)
+          val contact = if (CallPhoneId.isPhone(peer.id)) CallContact(peer.id, peer.name, kind = CallContact.Kind.PHONE) else peer.contact()
+          CallMessages.compose(context, contact, testFrames = true, auto = true)
           RemoteFeatureRoutes.json(200, RemoteFeatureRoutes.ok().put("to", peer.name))
         }
         else -> RemoteFeatureRoutes.json(400, RemoteFeatureRoutes.error("bad_action"))
@@ -46,5 +51,6 @@ internal object CallMessageProbe {
       .put("bytesUsed", CallMessageStore.bytesUsed(context))
       .put("postersInMemory", CallMessagePosters.stats().first).put("posterBytes", CallMessagePosters.stats().second)
       .put("outgoingTempFiles", CallMessageStore.outgoingCount(context))
+      .put("phoneOutbox", JSONArray(CallPhoneOutbox.list(context).map { JSONObject().put("id", it.id).put("bytes", it.sealedBytes) }))
       .put("rooms", JSONArray(CallingStore.peers.value.filter(CallMessages::canSend).map { JSONObject().put("id", it.id).put("name", it.name) }))
 }

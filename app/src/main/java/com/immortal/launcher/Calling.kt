@@ -51,11 +51,11 @@ internal object Calling {
     HouseholdBus.register(CallWire.REPLY) { ctx, m -> if (portal(m)) CallWire.decodeReply(m.body)?.takeIf { it.to == selfId(ctx) }
         ?.let { dispatch(CallEvent.Replied(it.id, m.from, it.reply, it.quietEndMin, now())) } }
     HouseholdBus.register(CallWire.END) { ctx, m -> if (portal(m)) CallWire.decodeEnd(m.body)?.takeIf { it.to == selfId(ctx) }
-        ?.let { dispatch(CallEvent.RemoteEnded(it.id, m.from, it.reason, now())) } }
+        ?.let { dispatch(CallEvent.RemoteEnded(it.id, m.from, it.reason, now(), it.movedTo)) } }
     HouseholdBus.register(CallWire.KEEP) { ctx, m -> if (portal(m)) CallWire.decodeKeep(m.body)?.takeIf { it.to == selfId(ctx) }
         ?.let { dispatch(CallEvent.RemoteKeepGoing(it.id, m.from, it.capAtMs)) } }
     HouseholdBus.register(CallWire.MEDIA) { ctx, m -> if (portal(m)) CallWire.decodeMedia(m.body)?.takeIf { it.to == selfId(ctx) }
-        ?.let { dispatch(CallEvent.RemoteMedia(it.id, m.from, it.cameraOn, it.micOn)) } }
+        ?.let { dispatch(CallEvent.RemoteMedia(it.id, m.from, it.cameraOn, it.micOn, it.autoAnswered)) } }
     HouseholdBus.register(CallWire.HELLO) { ctx, m -> if (portal(m)) CallWire.decodeHello(m.body)?.let { onHello(ctx, m.from, it) } }
     HouseholdBus.register(CallWire.JOIN) { ctx, m -> if (portal(m)) CallWire.decodeJoin(m.body)
         ?.takeIf { it.to == selfId(ctx) && it.newcomer.deviceId != it.to }
@@ -90,13 +90,43 @@ internal object Calling {
   fun toggleCamera() = dispatch(CallEvent.ToggleCamera)
   fun dismissEnded() = dispatch(CallEvent.DismissEnded)
 
-  /** Add person: ring a room in this home into the current call (no-op when full or not allowed). */
+  /** Add person: ring a room (or a paired phone) in this home into the current call (no-op when not allowed). */
   fun addPerson(context: Context, peerId: String): Boolean {
-    val peer = CallingStore.peers.value.firstOrNull { it.id == peerId } ?: return false
     if (!CallingConfig.load(context).groupsOn) return false
-    dispatch(CallEvent.AddPerson(peer.contact(), now()))
+    val call = state.value.call ?: return false
+    val phone = CallPhoneMailbox.phone(peerId)
+    val contact = if (phone != null) {
+      if (CallAddPeople.phoneOption(call, phone, selfId(context), now()) != CallAddPeople.Option.ADD) return false
+      phone.contact()
+    } else CallingStore.peers.value.firstOrNull { it.id == peerId }?.contact() ?: return false
+    dispatch(CallEvent.AddPerson(contact, now()))
     return state.value.call?.leg(peerId) != null
   }
+
+  /** "To phone": ring [phoneId] to take this call over; this Portal leaves once the phone is in. */
+  fun moveToPhone(context: Context, phoneId: String): Boolean {
+    val call = state.value.call ?: return false
+    val phone = CallPhoneMailbox.phone(phoneId) ?: return false
+    if (CallMoves.option(call, phone, selfId(context), now()) != CallMoves.Option.READY) return false
+    dispatch(CallEvent.MoveTo(phone.contact(), now()))
+    return state.value.call?.move?.to == phoneId
+  }
+
+  /**
+   * "Move it back here" after a move to a phone: ask the phone to ring us with the call; its ring
+   * is taken without another tap here (the tap was this one). Nothing opens until it rings.
+   */
+  fun pullBack(context: Context): Boolean {
+    val ended = state.value.ended?.takeIf { it.reason == CallEndReason.MOVED } ?: return false
+    val phone = ended.movedTo?.takeIf { it.phone } ?: return false
+    if (state.value.call != null || !ready(context)) return false
+    pendingPull = PendingPull(ended.id, phone.deviceId, now() + CallTimings.PULL_BACK_MS)
+    CallPhoneMailbox.post(phone.deviceId, CallPhoneWire.PULL, CallPhoneWire.encodePull(ended.id, phone.deviceId), now())
+    return true
+  }
+
+  private data class PendingPull(val callId: String, val phoneId: String, val untilMs: Long)
+  @Volatile private var pendingPull: PendingPull? = null
 
   /** Settings changed: tell the other rooms (drop-in column, calls on/off). */
   fun settingsChanged(context: Context) = main.post { announce(context.applicationContext, ask = false) }
@@ -164,15 +194,35 @@ internal object Calling {
         members = if (CallingConfig.load(context).groupsOn) ring.members else emptyList(), groupRing = ring.members.isNotEmpty()))
   }
 
-  /** A paired phone rang this Portal (its signed `/remote/call/send`). Returns what was decided. */
-  fun onPhoneRing(context: Context, phone: CallContact, id: String, video: Boolean): IncomingDecision {
-    val decision = decide(context, phone.deviceId, CallKind.CALL, id, fromPhone = true)
-    Log.i(TAG, "phone ring decision=${decision.javaClass.simpleName}")
-    dispatch(CallEvent.Incoming(id, phone, CallKind.CALL, video, null, 0, decision, now()))
+  /**
+   * A paired phone rang this Portal (its signed `/remote/call/send`). Returns what was decided.
+   * Phase 2b: a "To Portal" ring names the Portals already in the call; we join each of them on
+   * Accept (their addresses come from their own signed hellos, never from the phone).
+   */
+  fun onPhoneRing(context: Context, phone: CallContact, ring: CallPhoneWire.PhoneRing): IncomingDecision {
+    val groupsOn = CallingConfig.load(context).groupsOn
+    val members = ring.members.map { m ->
+      val known = CallingStore.peers.value.firstOrNull { it.id == m.deviceId }
+      CallMemberRef(m, known?.host, known?.port ?: 0)
+    }
+    val decision = if (members.isNotEmpty() && (!groupsOn || members.any { it.host == null })) {
+      // We couldn't reach the others: refuse rather than strand them when the phone leaves.
+      IncomingDecision.Reject(CallReply.CALLS_OFF)
+    } else decide(context, phone.deviceId, CallKind.CALL, ring.id, fromPhone = true, move = ring.move)
+    Log.i(TAG, "phone ring decision=${decision.javaClass.simpleName} move=${ring.move} members=${members.size}")
+    dispatch(CallEvent.Incoming(ring.id, phone, CallKind.CALL, ring.video, null, 0, decision, now(), members = members,
+        groupRing = members.isNotEmpty(), move = ring.move))
+    val pull = pendingPull
+    if (ring.move && decision is IncomingDecision.Ring && pull != null && pull.callId == ring.id && pull.phoneId == phone.deviceId &&
+        now() <= pull.untilMs) {
+      pendingPull = null
+      main.post { accept(audioOnly = false) }
+    }
     return decision
   }
 
-  private fun decide(context: Context, from: String, kind: CallKind, ringId: String, fromPhone: Boolean): IncomingDecision {
+  private fun decide(context: Context, from: String, kind: CallKind, ringId: String, fromPhone: Boolean,
+                     move: Boolean = false): IncomingDecision {
     val config = CallingConfig.load(context)
     val t = now()
     val quiet = DinnerQuiet.isQuiet(ChimeConfig.load(context), t, zone())
@@ -183,7 +233,7 @@ internal object Calling {
         quietMode = config.quiet, dropInsOn = config.dropInsOn,
         dropInFromCaller = DropInGrid.policyFor(config.dropIns, from),
         busy = state.value.call?.id?.let { it != ringId } == true,
-        autoAnswer = autoAnswer, fromPhone = fromPhone, phonesAllowed = config.phonesOn))
+        autoAnswer = autoAnswer && !move, fromPhone = fromPhone, phonesAllowed = config.phonesOn, move = move))
   }
 
   private fun onHello(context: Context, from: String, hello: CallWire.Hello) {

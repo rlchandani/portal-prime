@@ -40,6 +40,8 @@ internal data class IncomingContext(
     val fromPhone: Boolean = false,
     /** Settings › Calls › Phones: "Phones can call this Portal". */
     val phonesAllowed: Boolean = true,
+    /** Phase 2b: someone is moving their own call here ("To Portal"); at night it shows silently. */
+    val move: Boolean = false,
 )
 
 /**
@@ -70,8 +72,9 @@ internal object CallPolicy {
     else -> IncomingDecision.Countdown
   }
 
+  /** A move is someone carrying their own call to this room: in quiet hours it never sounds, but it may show. */
   private fun quietRing(c: IncomingContext): IncomingDecision =
-      if (c.quietMode == CallQuietMode.VISUAL) IncomingDecision.Ring(silent = true) else IncomingDecision.Reject(CallReply.QUIET)
+      if (c.quietMode == CallQuietMode.VISUAL || c.move) IncomingDecision.Ring(silent = true) else IncomingDecision.Reject(CallReply.QUIET)
 
   /** How a room looks in the Calls app right now. */
   fun presence(peer: CallPeer, nowMs: Long): CallPresence = when {

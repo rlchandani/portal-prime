@@ -46,12 +46,13 @@ class CallGroupMachineTest {
     assertEquals(listOf(kitchen), ring.members)
   }
 
-  @Test fun addPersonOnlyWhileLiveForCallsAndNeverPhonesOrMembers() {
+  @Test fun addPersonOnlyWhileLiveForCallsAndNeverMembers() {
     val ringing = reduce(CallState(), CallEvent.Dial(id, kitchen, CallKind.CALL, true, t0)).state
     assertEquals(ringing, reduce(ringing, CallEvent.AddPerson(den, t0 + 1)).state)
     val s = live()
     assertEquals(s, reduce(s, CallEvent.AddPerson(kitchen, t0 + 1)).state)
-    assertEquals(s, reduce(s, CallEvent.AddPerson(phone, t0 + 1)).state)
+    // Phase 2b: a phone can be added (one per call); see CallPhoneGroupMoveTest.
+    assertEquals(LegPhase.RINGING, reduce(s, CallEvent.AddPerson(phone, t0 + 1)).state.call!!.leg(phone.deviceId)!!.phase)
   }
 
   @Test fun dropInsNeverBecomeGroups() {
@@ -115,7 +116,8 @@ class CallGroupMachineTest {
     assertFalse(vouched.leg(den.deviceId)!!.offerer)
     assertEquals(s, reduce(s, CallEvent.RemoteJoin(id, office.deviceId, den, t0 + 5_000)).state)
     assertEquals(s, reduce(s, CallEvent.RemoteJoin("fedcba9876543210", kitchen.deviceId, den, t0 + 5_000)).state)
-    assertEquals(s, reduce(s, CallEvent.RemoteJoin(id, kitchen.deviceId, phone, t0 + 5_000)).state)
+    // Phase 2b: a vouched phone joins too; it offers to us.
+    assertFalse(reduce(s, CallEvent.RemoteJoin(id, kitchen.deviceId, phone, t0 + 5_000)).state.call!!.leg(phone.deviceId)!!.offerer)
   }
 
   @Test fun joiningTimesOutAndClosesItsPeer() {

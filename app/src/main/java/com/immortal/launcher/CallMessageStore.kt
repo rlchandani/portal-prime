@@ -56,8 +56,12 @@ internal object CallMessageStore {
       pruneLocked(c)
       sweepOutgoing(c)
     }
+    runCatching { CallPhoneOutbox.prune(context) }
     Handler(Looper.getMainLooper()).postDelayed(object : Runnable {
-      override fun run() { app?.let(::prune); Handler(Looper.getMainLooper()).postDelayed(this, PRUNE_EVERY_MS) }
+      override fun run() {
+        app?.let { prune(it); CallPhoneOutbox.prune(it) }
+        Handler(Looper.getMainLooper()).postDelayed(this, PRUNE_EVERY_MS)
+      }
     }, PRUNE_EVERY_MS)
   }
 

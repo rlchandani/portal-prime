@@ -58,6 +58,34 @@ internal object CallingCopy {
     else -> "Audio call from $name"
   }
 
+  /**
+   * The incoming line, phase 2b aware: a move ("Sam’s phone wants to move its call here · with
+   * Kitchen"), a group ring (mock `phgroup`: "Living room added you to a call with Kitchen"), else
+   * the 1:1 line.
+   */
+  fun incomingLine(call: ActiveCall): String {
+    val others = call.invited.map { it.contact.name }
+    val with = if (others.isEmpty()) "" else " · with ${names(others)}"
+    return when {
+      call.move != null -> "Moving a call here$with"
+      others.isNotEmpty() -> "${call.peer.name} added you to a call with ${names(others)}"
+      else -> incomingSub(call.kind, call.video, call.peer.name)
+    }
+  }
+
+  /** "Kitchen", "Kitchen and Den", "Kitchen, Den and Kids". */
+  fun names(list: List<String>): String = when (list.size) {
+    0 -> ""
+    1 -> list[0]
+    else -> list.dropLast(1).joinToString(", ") + " and " + list.last()
+  }
+
+  /** The answer button: "Pick up here" for a move. */
+  fun answerLabel(call: ActiveCall) = if (call.move != null) "Pick up here" else "Answer"
+
+  /** Group tile label (mock "Priya · phone"). */
+  fun tileName(contact: CallContact) = if (contact.phone) "${contact.name} · phone" else contact.name
+
   fun dropInBannerTitle(ask: Boolean, name: String) = if (ask) "$name wants to drop in" else "$name is dropping in"
 
   fun dropInBannerSub(ask: Boolean, seconds: Int) =
@@ -96,8 +124,12 @@ internal object CallingCopy {
       CallEndReason.QUIET -> Ended("$n is in quiet hours",
           (quietEndLabel?.let { "Their Portal won’t ring until $it. " } ?: "Their Portal won’t ring right now. ") +
               "We didn’t wake anyone.", false, "moon")
-      CallEndReason.OFFLINE -> Ended("Their Portal is offline",
+      CallEndReason.OFFLINE -> if (e.peer.phone) Ended("$n didn’t pick up the ring",
+          "Portal Toolkit needs to be open on the phone, or “Ring when Portal Toolkit is closed” turned on there.",
+          true, "wifiOff", warn = true)
+      else Ended("Their Portal is offline",
           "$n didn’t answer the network. It may be unplugged or off Wi-Fi.", true, "wifiOff", warn = true)
+      CallEndReason.MOVED -> Ended("Call moved to ${e.movedTo?.name ?: "your phone"}", MOVED_BODY, false, "handoff")
       CallEndReason.BUSY -> Ended("$n is in another call", "Try again in a little while.", true, "phone")
       CallEndReason.DECLINED -> if (e.direction == CallDirection.OUTGOING)
         Ended("$n can’t talk right now", "They tapped Not now. Nothing was recorded.", true, "phone")
@@ -124,6 +156,9 @@ internal object CallingCopy {
           else "$timeLabel · nothing was recorded", true, "phone")
     }
   }
+
+  const val MOVED_BODY = "This Portal’s camera and mic are off. The call carries on, still end-to-end encrypted."
+  const val MOVE_BACK = "Move it back here"
 
   /** History row subtitle. */
   fun historyLine(e: CallHistoryEntry, timeLabel: String): String {
