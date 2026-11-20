@@ -247,6 +247,8 @@ class PhotoFrameController(
   private var splitPanel: SplitGlancePanel? = null
   private var nightPhotoOverlay: NightPhotoOverlay? = null
   private var nightPhotoOn = false
+  /** Split glance in a dark room: its own layout, warm and dimmed ([setSplitNight]). */
+  private var splitNightOn = false
   private val splitGlance: Boolean
     get() = PhotoFrameStartPlan.splitGlance(settings, host())
   // Verification-only generated scenes (see ScreensaverTestSource); decided once per start.
@@ -1244,9 +1246,10 @@ class PhotoFrameController(
   }
 
   private fun setAmbientNight(value: Boolean) {
-    when (PhotoFrameNight.ambient(value, ambientNight, stopped, settings.nightClockTone, nativePhotoMode)) {
+    when (PhotoFrameNight.ambient(value, ambientNight, stopped, settings.nightClockTone, nativePhotoMode, splitGlance)) {
       PhotoFrameNight.Ambient.NONE -> return
       PhotoFrameNight.Ambient.NIGHT_PHOTO -> { ambientNight = value; setNightPhoto(value); return }
+      PhotoFrameNight.Ambient.SPLIT_DIM -> { ambientNight = value; setSplitNight(value); return }
       PhotoFrameNight.Ambient.QUIET_CLOCK -> Unit
     }
     revealClockRefresh.reset()
@@ -1463,7 +1466,7 @@ class PhotoFrameController(
       onPresented = {
         finishNativeStartup()
         // Split glance's wordmark follows the photo's accent with the dissolve.
-        splitPanel?.setAccent(HearthReadability.accent(currentPhoto?.look?.analysis?.dominant, false),
+        splitPanel?.setAccent(HearthReadability.accent(currentPhoto?.look?.analysis?.dominant, splitNightOn),
             SlideshowStage.SPLIT_DISSOLVE_MS)
         // Finite native scene admission, only while a bounded capture owns a listener.
         val style = PhotoFrameStagePolicy.reportedStyle(settings.mode)
@@ -1641,6 +1644,23 @@ class PhotoFrameController(
   }
 
   /**
+   * Split glance in a dark room (mock: the split layout, dimmed): the panel turns to its warm night
+   * ink and the on-screen photo is re-presented through the slow night dissolve with the night veil
+   * on its draw, so it dims now instead of at the next photo. The screen's night brightness follows,
+   * as for the other night looks, and a tap still leaves the screensaver.
+   */
+  private fun setSplitNight(value: Boolean) {
+    if (splitNightOn == value) return
+    splitNightOn = value
+    splitPanel?.setNight(value, SlideshowStage.NIGHT_DISSOLVE_MS)
+    if (PhotoFrameStagePolicy.representForNightPhoto(nativePhotoMode, stopped, nativeStage.photoCount)) nativeStage.currentPhoto?.let {
+      presentNative(listOf(it), automatic = true)
+    }
+    onNightClockChanged?.invoke(value)
+    Log.i("ImmortalNight", PhotoFrameNight.splitNightLog(value))
+  }
+
+  /**
    * Night photo: photos keep showing, warm and dim, under a vignette with a small amber clock.
    * Used for the dark-room clock and the overnight clock when the night colour is "photo".
    */
@@ -1796,7 +1816,7 @@ class PhotoFrameController(
     photo.visibility = View.GONE
     photoBack.visibility = View.GONE
     if (paused) nativeStage.pause() else nativeStage.resume()
-    val look = PhotoFrameStagePolicy.presentation(settings, nightPhotoOn, splitGlance)
+    val look = PhotoFrameStagePolicy.presentation(settings, nightPhotoOn, splitGlance, splitNightOn)
     nativeStage.show(photos, look.fill, look.motion, intervalMs(), measuredNativeOcclusions(),
         galleryPrint = look.galleryPrint, gallerySpread = look.gallerySpread, automatic = automatic,
         feature = look.feature, keepPeople = look.keepPeople)

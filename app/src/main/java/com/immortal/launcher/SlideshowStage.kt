@@ -47,13 +47,18 @@ internal class SlideshowStage(
       get() = feature != Feature.NONE && !editing && photos.size == 1 && photos[0].adjustment == null
     val dissolveMs: Long get() = when (feature) {
       Feature.SPLIT -> SPLIT_DISSOLVE_MS
-      Feature.NIGHT_PHOTO -> NIGHT_DISSOLVE_MS
+      Feature.NIGHT_PHOTO, Feature.SPLIT_NIGHT -> NIGHT_DISSOLVE_MS
       Feature.NONE -> DISSOLVE_MS
     }
   }
 
-  /** The new photo modes; [NONE] is every existing style, drawn exactly as before. */
-  enum class Feature { NONE, SPLIT, NIGHT_PHOTO }
+  /**
+   * The new photo modes; [NONE] is every existing style, drawn exactly as before. [SPLIT_NIGHT] is
+   * Split glance in a dark room: the same card, warm and dimmed under the mock's night veil.
+   */
+  enum class Feature { NONE, SPLIT, NIGHT_PHOTO, SPLIT_NIGHT;
+    val split: Boolean get() = this == SPLIT || this == SPLIT_NIGHT
+  }
   private val layers = arrayOf(Composition(context, budget, "stage0"), Composition(context, budget, "stage1"))
   private var current = 0
   private var fade: ObjectAnimator? = null
@@ -162,7 +167,7 @@ internal class SlideshowStage(
       duration = presentation.dissolveMs
       interpolator = when (presentation.feature) {
         Feature.SPLIT -> HearthEasing.SOFT
-        Feature.NIGHT_PHOTO -> SINE
+        Feature.NIGHT_PHOTO, Feature.SPLIT_NIGHT -> SINE
         Feature.NONE -> LinearInterpolator()
       }
       addListener(object : AnimatorListenerAdapter() {
@@ -410,7 +415,9 @@ internal class SlideshowStage(
     private fun displayFeature(p: Presentation, photo: SlideshowPhoto, width: Int, height: Int): Boolean {
       val look = photo.look ?: return false
       val density = resources.displayMetrics.density
-      val split = p.feature == Feature.SPLIT
+      val split = p.feature.split
+      // The night veil as a colour matrix on the draw (free in the shader; no full-screen layer).
+      val nightLevel = if (p.feature == Feature.SPLIT_NIGHT) 1f else 0f
       // The card's 30-unit corner is a mock unit like the rest of Split glance ([HearthMockUnit]).
       val corner = SPLIT_CORNER_DP * density * HearthMockUnit.boost(width, height, density)
       val box = (if (split) SplitGlancePanel.layout(width, height, density).first
@@ -427,7 +434,7 @@ internal class SlideshowStage(
         val radius = corner
         addView(PhotoBackdropView(context).also {
           it.show(look.backdrop, floatArrayOf(box.left + radius, box.top + radius, box.right - radius,
-              box.bottom - radius), 0f, 0f, SPLIT_BACKDROP)
+              box.bottom - radius), 0f, nightLevel, SPLIT_BACKDROP)
         }, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
       } else {
         // The cover photo fills the whole panel, so a black backing would be pure overdraw.
@@ -452,6 +459,7 @@ internal class SlideshowStage(
         setImageBitmap(photo.bitmap)
         pivotX = 0f; pivotY = 0f
         if (!split) colorFilter = ColorMatrixColorFilter(NightPhotoOverlay.warmFilter())
+        else if (nightLevel > 0f) colorFilter = ColorMatrixColorFilter(PhotoBackdropView.warmth(nightLevel))
       }
       holder.addView(image, LayoutParams(bw, bh))
       val start = plan.motion.start
@@ -686,7 +694,7 @@ internal class SlideshowStage(
 
     private fun motionDuration(p: Presentation): Long = when {
       !p.featureScene -> p.dwell + DISSOLVE_MS
-      p.feature == Feature.SPLIT -> minOf(SPLIT_SETTLE_MS, p.dwell + p.dissolveMs)
+      p.feature.split -> minOf(SPLIT_SETTLE_MS, p.dwell + p.dissolveMs)
       else -> minOf(NIGHT_SETTLE_MS, p.dwell + p.dissolveMs)
     }
 

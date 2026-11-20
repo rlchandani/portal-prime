@@ -68,6 +68,11 @@ internal class SplitGlancePanel(private val context: Context) {
   private val nextTime = text(17f, 400)
   private var accent = HearthReadability.EMBER
   private var accentFade: ValueAnimator? = null
+  /** 0 = day ink, 1 = the dark room's warm, dimmed ink (mock night veil); see [setNight]. */
+  private var nightMix = 0f
+  private var nightFade: ValueAnimator? = null
+  /** The small WEATHER / NEXT labels (filled while the views are built, so declared before them). */
+  private val faintLabels = mutableListOf<TextView>()
   private var running = false
   private var shownTime = ""
   private var orbitOn = true
@@ -92,11 +97,7 @@ internal class SplitGlancePanel(private val context: Context) {
         LinearLayout.LayoutParams.WRAP_CONTENT).apply { marginEnd = dp(36f) })
     facts.addView(nextColumn, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
     view.addView(facts)
-    listOf(clock, temperature, nextTitle).forEach { it.setTextColor(INK) }
-    date.setTextColor(SUB)
-    nextTime.setTextColor(FAINT)
-    glyph.color = EMBER_GLYPH
-    brand.setTextColor(accent)
+    applyInk()
     setWeather("")
     setNext(null, null)
   }
@@ -121,16 +122,45 @@ internal class SplitGlancePanel(private val context: Context) {
     accentFade?.cancel()
     val from = accent
     if (from == target) return
-    if (durationMs <= 0 || !ValueAnimator.areAnimatorsEnabled()) { accent = target; brand.setTextColor(target); return }
+    if (durationMs <= 0 || !ValueAnimator.areAnimatorsEnabled()) { accent = target; brand.setTextColor(shade(target, nightMix)); return }
     accentFade = ValueAnimator.ofFloat(0f, 1f).apply {
       duration = durationMs
       interpolator = HearthEasing.SOFT
       addUpdateListener {
         accent = HearthReadability.lerpArgb(from, target, it.animatedValue as Float)
-        brand.setTextColor(accent)
+        brand.setTextColor(shade(accent, nightMix))
       }
       start()
     }
+  }
+
+  /**
+   * The dark room: the panel keeps its layout and turns to the mock's night ink under its night
+   * veil (warm, dimmed), cross-fading over [durationMs] with the photo card. Only colours change.
+   */
+  fun setNight(night: Boolean, durationMs: Long) {
+    val target = if (night) 1f else 0f
+    nightFade?.cancel()
+    if (nightMix == target) return
+    if (durationMs <= 0 || !ValueAnimator.areAnimatorsEnabled()) { nightMix = target; applyInk(); return }
+    nightFade = ValueAnimator.ofFloat(nightMix, target).apply {
+      duration = durationMs
+      interpolator = HearthEasing.SOFT
+      addUpdateListener { nightMix = it.animatedValue as Float; applyInk() }
+      start()
+    }
+  }
+
+  private fun applyInk() {
+    val m = nightMix
+    listOf(clock, temperature, nextTitle).forEach { it.setTextColor(HearthReadability.lerpArgb(INK, NIGHT_INK, m)) }
+    date.setTextColor(HearthReadability.lerpArgb(SUB, NIGHT_SUB, m))
+    nextTime.setTextColor(HearthReadability.lerpArgb(FAINT, NIGHT_FAINT, m))
+    faintLabels.forEach { it.setTextColor(HearthReadability.lerpArgb(FAINT, NIGHT_FAINT, m)) }
+    glyph.color = shade(EMBER_GLYPH, m)
+    brand.setTextColor(shade(accent, m))
+    ember.alpha = 1f - (1f - NIGHT_MARK_ALPHA) * m
+    rule.alpha = 1f - (1f - NIGHT_MARK_ALPHA) * m
   }
 
   fun setWeather(text: String) {
@@ -190,6 +220,7 @@ internal class SplitGlancePanel(private val context: Context) {
   }
 
   private fun label(value: String) = text(12f, 600, tracking = .16f).apply {
+    faintLabels += this
     text = value
     setTextColor(FAINT)
   }
@@ -225,6 +256,21 @@ internal class SplitGlancePanel(private val context: Context) {
     private const val SUB = 0xDBFBF7F1.toInt()
     private const val FAINT = 0x8CFBF7F1.toInt()
     private const val EMBER_GLYPH = 0xFFF0A65A.toInt()
+    /** Mock night ink rgba(243,208,172,.9) under its night veil ([HearthNight.multiplyColor] at 1). */
+    private val NIGHT_INK = nightInk(0xE6F3D0AC.toInt())
+    private val NIGHT_SUB = nightInk(0xC5F3D0AC.toInt())
+    private val NIGHT_FAINT = nightInk(0x7EF3D0AC.toInt())
+    private const val NIGHT_MARK_ALPHA = .58f
+
+    /** [argb] under the night veil (warm multiply and dim), alpha kept. */
+    fun nightInk(argb: Int): Int {
+      val veil = HearthNight.multiplyColor(1f)
+      fun ch(shift: Int) = ((argb shr shift and 255) * (veil shr shift and 255) / 255)
+      return (argb and 0xFF000000.toInt()) or (ch(16) shl 16) or (ch(8) shl 8) or ch(0)
+    }
+
+    /** [argb] [mix] of the way to its veiled night colour. */
+    fun shade(argb: Int, mix: Float): Int = if (mix <= 0f) argb else HearthReadability.lerpArgb(argb, nightInk(argb), mix)
 
     /** The panel's next item: an event in progress, else the first upcoming one. */
     fun nextEvent(events: List<CalendarFeed.Event>, now: Long): CalendarFeed.Event? =
