@@ -73,7 +73,6 @@ internal object CallPhoneRoute {
     val self = Calling.selfId(context) ?: return null
     if (b.optString("to") != self) return null
     val now = Calling.now()
-    val name = CallPhoneMailbox.phone(phoneId)?.name ?: CallPhoneWire.DEFAULT_NAME
     return when (type) {
       CallWire.RING -> CallPhoneWire.decodeRing(b)?.let { ring ->
         val decision = Calling.onPhoneRing(context, CallContact(phoneId, ring.name, kind = CallContact.Kind.PHONE), ring)
@@ -94,7 +93,7 @@ internal object CallPhoneRoute {
         Calling.dispatch(CallEvent.RemoteMedia(it.id, phoneId, it.cameraOn, it.micOn)); ok()
       }
       else -> null
-    }.also { if (it != null) Log.i(TAG, "$type from $name") }
+    }.also { if (it != null) Log.i(TAG, "$type from phone ${phoneId.take(4)}…") } // the phone's chosen name stays out of logcat
   }
 
   private fun offer(context: Context, key: ByteArray, auth: CallPhoneAuth.Request, text: String): FleetHttpServer.Response {

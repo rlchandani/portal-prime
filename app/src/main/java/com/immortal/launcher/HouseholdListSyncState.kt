@@ -28,6 +28,12 @@ internal data class HouseholdListSyncState(
     val offlineEdits: Int = 0,
 ) {
   data class PeerInfo(val name: String, val reachable: Boolean, val lastAt: Long)
+  /** [peers] with [id] set; only the [MAX_PEERS] most recently heard stay (sender ids are claimed, not proven). */
+  fun withPeer(id: String, info: PeerInfo): HouseholdListSyncState {
+    val next = peers + (id to info)
+    if (next.size <= MAX_PEERS) return copy(peers = next)
+    return copy(peers = next.entries.sortedByDescending { it.value.lastAt }.take(MAX_PEERS).associate { it.key to it.value })
+  }
   data class Arrival(val at: Long, val whileOffline: Boolean)
   data class CatchUp(val since: Long, val arrived: Int = 0, val sent: Int = 0)
   data class Notice(val text: String, val until: Long, val seq: Long)
@@ -58,6 +64,7 @@ internal data class HouseholdListSyncState(
   }
 
   companion object {
+    const val MAX_PEERS = 16
     const val FRESH_MS = 60_000L
     const val NOTICE_MS = 6_000L
     const val PHONE_WINDOW_MS = 24L * 60 * 60 * 1000

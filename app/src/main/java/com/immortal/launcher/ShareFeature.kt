@@ -32,7 +32,7 @@ internal object ShareFeature {
   fun install(context: Context) {
     val app = context.applicationContext
     RemoteFeatureRoutes.register(ROUTE) { ctx, method, body -> route(ctx, method, body) }
-    HouseholdBus.register(BUS_NOTE) { ctx, message -> main.post { onPeerNote(ctx, message.body) } }
+    HouseholdBus.register(BUS_NOTE) { ctx, message -> main.post(HouseholdBus.contained(BUS_NOTE) { onPeerNote(ctx, message.body) }) }
     main.post { HomeNoteStore.clearIfDue(app) }
   }
 

@@ -62,6 +62,7 @@ internal object SharedTimers {
   @Volatile private var installed = false
   @Volatile private var lastAskReplyMs = 0L
   private val lastCorrection = ConcurrentHashMap<String, Long>()
+  private const val MAX_CORRECTION_ENTRIES = 64
 
   fun install(context: Context) {
     if (installed) return
@@ -162,6 +163,7 @@ internal object SharedTimers {
     val now = clock()
     val last = lastCorrection[newer.id] ?: 0L
     if (now - last < CORRECTION_MIN_MS) return
+    if (lastCorrection.size >= MAX_CORRECTION_ENTRIES) lastCorrection.clear() // ids of long-gone timers
     lastCorrection[newer.id] = now
     HouseholdBus.send(context, SharedTimerWire.UPDATE, SharedTimerWire.encode(newer, now))
   }
