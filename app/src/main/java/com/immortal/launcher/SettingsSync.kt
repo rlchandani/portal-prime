@@ -51,6 +51,7 @@ internal object SettingsSync {
   /** Worker-confined. */
   @Volatile private var ledger = SyncLedger()
   private val joinerPushedAt = HashMap<String, Long>()
+  private const val MAX_RATE_ENTRIES = 32
   @Volatile var paused = false
     private set
 
@@ -76,8 +77,8 @@ internal object SettingsSync {
     app = appContext
     val householdDomains = catalog.entries.values.map { it.domain.id }.toSet()
     SettingsDomain.valuesApplied = { _, domainId, _ -> if (domainId in householdDomains) noteLocalChange() }
-    HouseholdBus.register(SettingsSyncWire.CHANGED_TYPE) { _, m -> worker.execute { onChanged(m) } }
-    HouseholdBus.register(SettingsSyncWire.SIGNAL_TYPE) { _, m -> worker.execute { onSignal(m) } }
+    HouseholdBus.register(SettingsSyncWire.CHANGED_TYPE) { _, m -> worker.execute(HouseholdBus.contained(m.type) { onChanged(m) }) }
+    HouseholdBus.register(SettingsSyncWire.SIGNAL_TYPE) { _, m -> worker.execute(HouseholdBus.contained(m.type) { onSignal(m) }) }
     worker.execute {
       ledger = SettingsSyncStore.load(appContext, wellFormed) ?: SyncLedger()
       if (ledger.lastKnown.isEmpty()) ledger = ledger.copy(lastKnown = catalog.read(appContext))
@@ -248,7 +249,11 @@ internal object SettingsSync {
     }
     if (signal.digest == SettingsSyncEngine.digest(ledger.records)) return persist()
     if (signal.joining && now - (joinerPushedAt[m.from] ?: 0L) < JOINER_PUSH_MS) return persist()
-    if (signal.joining) joinerPushedAt[m.from] = now
+    if (signal.joining) {
+      // Rate-limit memory only: sender ids are claimed, so never let them grow it without bound.
+      if (joinerPushedAt.size >= MAX_RATE_ENTRIES) joinerPushedAt.clear()
+      joinerPushedAt[m.from] = now
+    }
     exchange(c, signal, m.from)
   }
 

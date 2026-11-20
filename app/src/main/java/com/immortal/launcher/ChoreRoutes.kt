@@ -66,6 +66,9 @@ internal object ChoresPeerRoute {
     if (req.method != "POST") return RemoteFeatureRoutes.json(405, RemoteFeatureRoutes.error("method_not_allowed"))
     if (req.contentLength !in 1..MAX_BODY) return RemoteFeatureRoutes.json(413, RemoteFeatureRoutes.error("body_too_large"))
     val key = HouseholdKey.get(context) ?: return RemoteFeatureRoutes.json(503, RemoteFeatureRoutes.error("no_household_key"))
+    // Header first: an unsigned or stale request never gets its body read.
+    if (!PeerRequestGate.admits(req.header(ChorePeerAuth.HEADER), ChorePeerAuth.REQUEST_TYPE, key, System.currentTimeMillis()))
+      return RemoteFeatureRoutes.json(401, RemoteFeatureRoutes.error("unauthorized"))
     val text = try { req.bodyText(MAX_BODY) } catch (e: Exception) {
       return FleetHttpServer.requestBodyError(e) ?: RemoteFeatureRoutes.json(400, RemoteFeatureRoutes.error("bad_body"))
     }

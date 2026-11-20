@@ -18,7 +18,9 @@ import java.net.InetAddress
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.URLDecoder
-import java.util.concurrent.Executors
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 /**
  * A tiny, dependency-free HTTP/1.1 server for the [FleetAgentService]. One accept
@@ -43,13 +45,14 @@ class FleetHttpServer(
    * Six threads: up to [CallPhones.MAX_PARKED] may be held by phones' background long-polls
    * (Calling 2b), which still leaves four for everything else, as before.
    */
-  private val pool = Executors.newFixedThreadPool(6)
+  private val pool = ThreadPoolExecutor(THREADS, THREADS, 0L, TimeUnit.MILLISECONDS, ArrayBlockingQueue(MAX_QUEUED))
   @Volatile private var server: ServerSocket? = null
   @Volatile private var running = false
   private var acceptThread: Thread? = null
 
   internal class IncompleteRequestBody : EOFException("Incomplete request body")
   internal class RequestBodyTooLarge : IOException("Request body exceeds text limit")
+  internal class RequestBodyTooSlow : IOException("Request body outlasted its time budget")
 
   class Request(
       val method: String,
@@ -58,6 +61,7 @@ class FleetHttpServer(
       val headers: Map<String, String>, // keys lower-cased
       private val input: InputStream,
       val contentLength: Int,
+      private val clock: () -> Long = ::monotonicMs,
   ) {
     private var consumed = 0
 
@@ -83,11 +87,14 @@ class FleetHttpServer(
       if (want <= 0) return ""
       val buf = ByteArray(want)
       var read = 0
+      // A client trickling under the per-read socket timeout would otherwise hold a thread for hours.
+      val deadline = clock() + BODY_TEXT_BUDGET_MS
       while (read < want) {
         val n = input.read(buf, read, want - read)
         if (n == -1) throw IncompleteRequestBody()
         read += n
         consumed += n
+        if (read < want && clock() > deadline) throw RequestBodyTooSlow()
       }
       return String(buf, 0, read, Charsets.UTF_8)
     }
@@ -111,14 +118,18 @@ class FleetHttpServer(
     }
 
     /** Discard any body the handler didn't read, so closing the socket doesn't RST
-     *  the connection and cost the client our response. Called by the server. */
-    internal fun drainRemaining() {
-      var remaining = contentLength - consumed
+     *  the connection and cost the client our response. Called by the server. Bounded in bytes
+     *  and time: a refused 2 GB upload (or one sent a byte at a time) must not keep a thread. */
+    internal fun drainRemaining(maxBytes: Int = MAX_DRAIN_BYTES, budgetMs: Long = DRAIN_BUDGET_MS) {
+      var remaining = minOf(contentLength - consumed, maxBytes)
+      val deadline = clock() + budgetMs
       val buf = ByteArray(64 * 1024)
       while (remaining > 0) {
         val n = input.read(buf, 0, minOf(buf.size, remaining))
         if (n == -1) break
         remaining -= n
+        consumed += n
+        if (clock() > deadline) break
       }
     }
   }
@@ -201,6 +212,7 @@ class FleetHttpServer(
                 if (running) Log.w(TAG, "accept failed", it)
                 return
               }
+      // A full queue (a flood of connections) is shed here instead of piling up sockets.
       runCatching { pool.execute { serve(socket) } }
           .onFailure { runCatching { socket.close() } }
     }
@@ -214,10 +226,13 @@ class FleetHttpServer(
         Log.w(TAG, "rejecting non-LAN peer ${it.inetAddress?.hostAddress}")
         return
       }
-      it.soTimeout = 30_000
+      // The request head has a short per-read timeout and a total budget, before any auth, so a
+      // client dribbling header bytes can't park one of the few server threads indefinitely.
+      it.soTimeout = HEAD_READ_TIMEOUT_MS
       val input = it.getInputStream().buffered(16 * 1024)
       val out = it.getOutputStream()
-      val head = readHead(input)
+      val head = runCatching { readHead(input) }.getOrNull()
+      it.soTimeout = 30_000
       if (head == null) {
         runCatching { writeResponse(out, Response(400, """{"ok":false,"error":"bad_request"}""")) }
         return
@@ -271,20 +286,7 @@ class FleetHttpServer(
 
   // --- parsing (pure helpers are internal for unit tests) ---------------------
 
-  /** Read up to the blank line and parse the request line + headers. */
-  private fun readHead(input: InputStream): Head? {
-    val headBytes = ByteArrayOutputStream()
-    var last4 = 0
-    while (true) {
-      val b = input.read()
-      if (b == -1) return null
-      headBytes.write(b)
-      last4 = (last4 shl 8) or b
-      if (last4 == CRLF_CRLF) break // "\r\n\r\n"
-      if (headBytes.size() > MAX_HEAD_BYTES) return null
-    }
-    return parseHead(headBytes.toString("UTF-8"))
-  }
+  private fun readHead(input: InputStream): Head? = readHead(input, ::monotonicMs)
 
   internal data class Head(
       val method: String,
@@ -297,11 +299,39 @@ class FleetHttpServer(
     private const val TAG = "ImmortalFleet"
     private const val MAX_HEAD_BYTES = 64 * 1024
     private const val CRLF_CRLF = 0x0D0A0D0A
+    /** Portal HTTP is small on purpose; [MAX_QUEUED] more connections wait, the rest are shed. */
+    private const val THREADS = 6
+    private const val MAX_QUEUED = 32
+    internal const val HEAD_READ_TIMEOUT_MS = 10_000
+    internal const val HEAD_BUDGET_MS = 15_000L
+    internal const val BODY_TEXT_BUDGET_MS = 30_000L
+    internal const val MAX_DRAIN_BYTES = 1024 * 1024
+    internal const val DRAIN_BUDGET_MS = 5_000L
+
+    internal fun monotonicMs(): Long = System.nanoTime() / 1_000_000
+
+    /** Read up to the blank line and parse the request line + headers, within [HEAD_BUDGET_MS]. */
+    internal fun readHead(input: InputStream, clock: () -> Long): Head? {
+      val deadline = clock() + HEAD_BUDGET_MS
+      val headBytes = ByteArrayOutputStream()
+      var last4 = 0
+      while (true) {
+        val b = input.read()
+        if (b == -1) return null
+        headBytes.write(b)
+        last4 = (last4 shl 8) or b
+        if (last4 == CRLF_CRLF) break // "\r\n\r\n"
+        if (headBytes.size() > MAX_HEAD_BYTES) return null
+        if (clock() > deadline) return null
+      }
+      return parseHead(headBytes.toString("UTF-8"))
+    }
 
     /** Preserve request framing errors when a route also catches JSON parsing failures. */
     internal fun requestBodyError(error: Throwable): Response? = when (error) {
       is IncompleteRequestBody -> Response(400, """{"ok":false,"error":"incomplete_body"}""")
       is RequestBodyTooLarge -> Response(413, """{"ok":false,"error":"body_too_large"}""")
+      is RequestBodyTooSlow -> Response(408, """{"ok":false,"error":"body_timeout"}""")
       else -> null
     }
 
@@ -340,9 +370,11 @@ class FleetHttpServer(
           403 -> "Forbidden"
           404 -> "Not Found"
           405 -> "Method Not Allowed"
+          408 -> "Request Timeout"
           409 -> "Conflict"
           413 -> "Payload Too Large"
           500 -> "Internal Server Error"
+          429 -> "Too Many Requests"
           503 -> "Service Unavailable"
           else -> "OK"
         }

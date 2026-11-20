@@ -63,11 +63,11 @@ internal object CallMessageSender {
       }
       val code = conn.responseCode
       if (code != HTTP_OK) {
-        val err = runCatching { JSONObject(conn.errorStream.use(::readCapped)).optString("error") }.getOrNull()
+        val err = runCatching { BoundedRead.errorReply(conn, MAX_RESPONSE)?.let(::JSONObject)?.optString("error") }.getOrNull()
         Log.i(TAG, "message refused: $code $err")
         return err?.takeIf { it.isNotBlank() } ?: "http_$code"
       }
-      val text = conn.inputStream.use(::readCapped)
+      val text = BoundedRead.reply(conn, MAX_RESPONSE) ?: return "bad_ack"
       val env = JSONObject(text)
       val payload = env.optString("payload")
       if (!CallMessageWire.verifyAck(key, nonce, payload, env.optString("sig"), id)) return "bad_ack"
@@ -79,14 +79,6 @@ internal object CallMessageSender {
       runCatching { keep?.close() }
     }
   }.getOrElse { Log.w(TAG, "message send failed: ${it.javaClass.simpleName}"); "unreachable" }
-
-  /** A reply is a few hundred bytes; never read more than [MAX_RESPONSE] from the other side. */
-  private fun readCapped(input: java.io.InputStream): String {
-    val buf = ByteArray(MAX_RESPONSE)
-    var n = 0
-    while (n < buf.size) { val r = input.read(buf, n, buf.size - n); if (r < 0) break; n += r }
-    return String(buf, 0, n, Charsets.UTF_8)
-  }
 
   private const val ID_BYTES = 8
   private const val NONCE_BYTES = 12

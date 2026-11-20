@@ -81,8 +81,8 @@ class ReminderPeerSecurityTest {
   }
 
   @Test fun aPeerCantMakeUsBufferOrKeepUnboundedData() {
-    assertEquals("abc", ReminderSync.readBounded("abc".byteInputStream(), 3))
-    assertNull(ReminderSync.readBounded(ByteArray(40_000).inputStream(), 32_000))
+    assertEquals("abc", BoundedRead.utf8("abc".byteInputStream(), 3))
+    assertNull(BoundedRead.utf8(ByteArray(40_000).inputStream(), 32_000))
     val many = org.json.JSONArray((1..ReminderCodec.MAX_ENTRIES + 50).map { i ->
       ReminderCodec.reminderJson(ReminderFixtures.clinic.copy(id = "rflood$i"))
     })

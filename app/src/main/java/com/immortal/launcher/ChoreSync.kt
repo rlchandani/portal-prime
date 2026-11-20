@@ -83,11 +83,7 @@ internal object ChoreSync {
       conn.setFixedLengthStreamingMode(bytes.size)
       conn.outputStream.use { it.write(bytes) }
       if (conn.responseCode != 200) return false
-      val text = conn.inputStream.use { input ->
-        val buf = input.readBytes()
-        if (buf.size > MAX_RESPONSE) return false
-        String(buf, Charsets.UTF_8)
-      }
+      val text = BoundedRead.reply(conn, MAX_RESPONSE) ?: return false
       val envelope = JSONObject(text)
       val payload = envelope.optString("payload")
       if (!ChorePeerAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) return false

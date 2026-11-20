@@ -448,7 +448,7 @@ class FleetRoutes(private val context: Context) {
             else ScreensaverTestSource.disable(context)
         if (applied) {
           val main = android.os.Handler(android.os.Looper.getMainLooper())
-          main.post { ImmortalDreamNavigation.dismissForNavigation() }
+          main.post { runCatching { ImmortalDreamNavigation.dismissForNavigation() } }
           // The singleTask frame must finish before a fresh one is created on the new source.
           if (enable) main.postDelayed({
             runCatching {
