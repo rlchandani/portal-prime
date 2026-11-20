@@ -6,7 +6,6 @@
  */
 package com.immortal.launcher
 
-import java.util.Calendar
 import java.util.TimeZone
 
 /** Every Calling sentence, from the approved mock's copy, as pure functions (JVM-tested). */
@@ -183,10 +182,8 @@ internal object CallingCopy {
     }
   }
 
-  private fun dayIndex(ms: Long, zone: TimeZone): Long {
-    val c = Calendar.getInstance(zone).apply { timeInMillis = ms }
-    return c.get(Calendar.YEAR) * DAYS_PER_YEAR_KEY + c.get(Calendar.DAY_OF_YEAR).toLong()
-  }
+  /** Local calendar day number (days since the epoch in [zone]), continuous across years. */
+  private fun dayIndex(ms: Long, zone: TimeZone): Long = Math.floorDiv(ms + zone.getOffset(ms), DAY_MS)
 
   fun minuteLabel(minuteOfDay: Int, use24: Boolean): String {
     val h = minuteOfDay / MIN_PER_H
@@ -206,5 +203,5 @@ internal object CallingCopy {
   private const val S_PER_H = 3_600L
   private const val MIN_PER_H = 60
   private const val HALF_DAY = 12
-  private const val DAYS_PER_YEAR_KEY = 400L
+  private const val DAY_MS = 24L * 60 * 60 * 1000
 }
