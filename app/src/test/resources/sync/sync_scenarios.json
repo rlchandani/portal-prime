@@ -1,0 +1,195 @@
+{
+  "data": {},
+  "scenarios": [
+    {
+      "name": "a lone Portal founds the household when a synced peer has nothing",
+      "steps": [
+        {"do": "local", "values": {"chime.volume": 40, "welcome.showClock": false}},
+        {"do": "install"},
+        {"do": "signal", "from": "hi", "digest": "$empty", "joining": false},
+        {"do": "values", "keys": ["chime.volume", "welcome.showClock", "immortal.maPassword", "mqtt.password", "fleet.name"]}
+      ]
+    },
+    {
+      "name": "two joining Portals: the lower id founds, the higher waits",
+      "steps": [
+        {"do": "install"},
+        {"do": "signal", "from": "lo", "digest": "$empty", "joining": true},
+        {"do": "signal", "from": "hi", "digest": "$empty", "joining": true},
+        {"do": "signal", "from": "hi", "digest": "$mine", "joining": false}
+      ]
+    },
+    {
+      "name": "a new Portal fetches the household and adopts silently; sibling writes are not echoed",
+      "steps": [
+        {"do": "install"},
+        {"do": "signal", "from": "hi", "digest": "0123456789ab", "joining": false},
+        {"do": "peer", "from": "hi", "payload": {"name": "Living", "joining": false, "records": [
+          {"key": "chime.volume", "value": 55, "v": 3, "by": "hi"},
+          {"key": "digitalclock.face", "value": "neon", "v": 2, "by": "hi"}]}},
+        {"do": "fireMain"},
+        {"do": "signal", "from": "hi", "digest": "0123456789ab", "joining": false},
+        {"do": "route", "auth": "none", "body": "{}"}
+      ]
+    },
+    {
+      "name": "join choice with a conflict: keep this Portal's",
+      "steps": [
+        {"do": "local", "values": {"chime.volume": 40}},
+        {"do": "install"},
+        {"do": "peer", "from": "hi", "payload": {"name": "Living", "joining": false, "records": [
+          {"key": "chime.volume", "value": 55, "v": 3, "by": "hi"},
+          {"key": "welcome.showClock", "value": false, "v": 1, "by": "hi"}]}},
+        {"do": "peer", "from": "lo", "payload": {"name": "Mini", "joining": false, "records": [
+          {"key": "chime.volume", "value": 60, "v": 4, "by": "lo"}]}},
+        {"do": "dismissAdoptCard"},
+        {"do": "resolveJoin", "keepMine": true},
+        {"do": "fireMain"},
+        {"do": "resolveJoin", "keepMine": false}
+      ]
+    },
+    {
+      "name": "join choice with a conflict: adopt the household's",
+      "steps": [
+        {"do": "local", "values": {"chime.volume": 40, "welcome.showGreeting": false}},
+        {"do": "install"},
+        {"do": "signal", "from": "hi", "digest": "0123456789ab", "joining": false},
+        {"do": "peer", "from": "hi", "payload": {"name": "Living", "joining": false, "records": [
+          {"key": "chime.volume", "value": 55, "v": 3, "by": "hi"}]}},
+        {"do": "signal", "from": "hi", "digest": "0123456789ab", "joining": false},
+        {"do": "resolveJoin", "keepMine": false},
+        {"do": "fireMain"}
+      ]
+    },
+    {
+      "name": "synced: bus changes merge; stale, forged, malformed and out-of-scope ones are refused",
+      "ledger": {"phase": "SYNCED", "clock": 5, "records": [{"key": "chime.volume", "value": 55, "v": 5, "by": "hi"}], "lastKnown": {"chime.volume": 55}},
+      "prefs": {"immortal_chime": {"volume": 55}},
+      "steps": [
+        {"do": "install"},
+        {"do": "changed", "from": "hi", "record": {"key": "digitalclock.face", "value": "neon", "v": 6, "by": "hi"}},
+        {"do": "fireMain"},
+        {"do": "changed", "from": "hi", "record": {"key": "digitalclock.face", "value": "bold", "v": 4, "by": "hi"}},
+        {"do": "changed", "from": "hi", "record": {"key": "digitalclock.face", "value": "neon", "v": 6, "by": "hi"}},
+        {"do": "changed", "from": "lo", "record": {"key": "chime.volume", "value": 20, "v": 9, "by": "hi"}},
+        {"do": "changed", "from": "hi", "record": {"key": "chime.volume", "value": 500, "v": 7, "by": "hi"}},
+        {"do": "changed", "from": "hi", "record": {"key": "nope.key", "value": "x", "v": 7, "by": "hi"}},
+        {"do": "changed", "from": "hi", "record": {"key": "fleet.name", "value": "Hacked", "v": 7, "by": "hi"}},
+        {"do": "changed", "from": "hi", "record": {"key": "immortal.maPassword", "value": "hunter2", "v": 7, "by": "hi"}},
+        {"do": "changed", "from": "hi", "record": {"key": "controlcenter.sharedRoom", "value": true, "v": 7, "by": "hi"}},
+        {"do": "changed", "from": "hi", "raw": {"key": 1}},
+        {"do": "changed", "from": "hi", "record": {"key": "chime.volume", "value": 35, "v": 8, "by": "hi"}},
+        {"do": "fireMain"}
+      ]
+    },
+    {
+      "name": "synced: a local edit gets the next version",
+      "ledger": {"phase": "SYNCED", "clock": 5, "records": [{"key": "chime.volume", "value": 55, "v": 5, "by": "hi"}], "lastKnown": {"chime.volume": 55}},
+      "prefs": {"immortal_chime": {"volume": 55}},
+      "steps": [
+        {"do": "install"},
+        {"do": "local", "values": {"chime.volume": 30}},
+        {"do": "local", "values": {"welcome.showClock": false}},
+        {"do": "fireMain"},
+        {"do": "changed", "from": "hi", "record": {"key": "chime.volume", "value": 31, "v": 6, "by": "hi"}},
+        {"do": "local", "values": {"chime.volume": 32}},
+        {"do": "changed", "from": "hi", "record": {"key": "chime.volume", "value": 33, "v": 7, "by": "hi"}},
+        {"do": "fireMain"}
+      ]
+    },
+    {
+      "name": "versions: counter first, then device id breaks a tie",
+      "ledger": {"phase": "SYNCED", "clock": 1, "records": []},
+      "steps": [
+        {"do": "install"},
+        {"do": "changed", "from": "hi", "record": {"key": "chime.volume", "value": 50, "v": 3, "by": "hi"}},
+        {"do": "changed", "from": "lo", "record": {"key": "chime.volume", "value": 45, "v": 3, "by": "lo"}},
+        {"do": "changed", "from": "lo", "record": {"key": "chime.volume", "value": 45, "v": 4, "by": "lo"}},
+        {"do": "changed", "from": "hi", "record": {"key": "chime.volume", "value": 51, "v": 1099511627777, "by": "hi"}},
+        {"do": "fireMain"}
+      ]
+    },
+    {
+      "name": "pause stops sending and receiving; resume picks up",
+      "ledger": {"phase": "SYNCED", "clock": 2, "records": [{"key": "chime.volume", "value": 50, "v": 2, "by": "hi"}], "lastKnown": {"chime.volume": 50}},
+      "prefs": {"immortal_chime": {"volume": 50}},
+      "steps": [
+        {"do": "install"},
+        {"do": "pause", "on": true},
+        {"do": "changed", "from": "hi", "record": {"key": "chime.volume", "value": 20, "v": 3, "by": "hi"}},
+        {"do": "signal", "from": "hi", "digest": "0123456789ab", "joining": false},
+        {"do": "peer", "from": "hi", "payload": {"name": "Living", "joining": false, "records": [{"key": "chime.volume", "value": 20, "v": 3, "by": "hi"}]}},
+        {"do": "local", "values": {"chime.volume": 10}},
+        {"do": "fireMain"},
+        {"do": "pause", "on": false},
+        {"do": "changed", "from": "hi", "record": {"key": "chime.volume", "value": 21, "v": 9, "by": "hi"}}
+      ]
+    },
+    {
+      "name": "synced catch-up: digests, exchanges, joiner rate limit and served exchanges",
+      "ledger": {"phase": "SYNCED", "clock": 3, "records": [{"key": "chime.volume", "value": 50, "v": 3, "by": "hi"}], "lastKnown": {"chime.volume": 50}},
+      "prefs": {"immortal_chime": {"volume": 50}},
+      "steps": [
+        {"do": "install"},
+        {"do": "signal", "from": "hi", "digest": "$mine", "joining": false},
+        {"do": "signal", "from": "hi", "digest": "0123456789ab", "joining": false},
+        {"do": "signal", "from": "lo", "digest": "$empty", "joining": true},
+        {"do": "signal", "from": "lo", "digest": "$empty", "joining": true},
+        {"do": "signal", "from": "hi", "digest": "0123456789ab", "port": 22, "joining": false},
+        {"do": "peer", "from": "hi", "payload": {"name": "Living", "joining": false, "records": [
+          {"key": "chime.volume", "value": 65, "v": 4, "by": "hi"},
+          {"key": "immortal.maPassword", "value": "hunter2", "v": 4, "by": "hi"},
+          {"key": "calling.dropInsOn", "value": true, "v": 4, "by": "hi"},
+          {"key": "welcome.showClock", "value": false, "v": 2, "by": "hi"}]}},
+        {"do": "peer", "from": "lo", "payload": {"name": "Mini", "joining": true, "records": [{"key": "chime.volume", "value": 1, "v": 99, "by": "lo"}]}},
+        {"do": "peer", "from": "lo", "raw": "{not json"},
+        {"do": "fireMain"}
+      ]
+    },
+    {
+      "name": "rejoin forgets the ledger but keeps the settings",
+      "ledger": {"phase": "SYNCED", "clock": 3, "records": [{"key": "chime.volume", "value": 50, "v": 3, "by": "hi"}], "lastKnown": {"chime.volume": 50}},
+      "prefs": {"immortal_chime": {"volume": 50}},
+      "steps": [
+        {"do": "install"},
+        {"do": "dismissAdoptCard"},
+        {"do": "rejoin"},
+        {"do": "signal", "from": "hi", "digest": "0123456789ab", "joining": false}
+      ]
+    },
+    {
+      "name": "after an update, household records this build can now apply are reconciled",
+      "ledger": {"phase": "SYNCED", "clock": 4, "records": [
+        {"key": "chime.volume", "value": 65, "v": 4, "by": "hi"},
+        {"key": "digitalclock.face", "value": "hologram", "v": 3, "by": "hi"}], "lastKnown": {}},
+      "steps": [
+        {"do": "install"},
+        {"do": "install"},
+        {"do": "fireMain"}
+      ]
+    },
+    {
+      "name": "the signed peer route: method, size, signature, replay and pause",
+      "steps": [
+        {"do": "key"},
+        {"do": "local", "values": {"chime.volume": 40}},
+        {"do": "install"},
+        {"do": "route", "method": "GET", "body": "{}"},
+        {"do": "route", "body": "", "contentLength": 0},
+        {"do": "route", "body": "{}", "contentLength": 300000},
+        {"do": "route", "auth": "none", "body": "{}"},
+        {"do": "route", "auth": "otherKey", "body": "{}"},
+        {"do": "route", "auth": "otherBody", "body": "{}"},
+        {"do": "route", "auth": "stale", "body": "{}"},
+        {"do": "route", "from": "self", "nonce": "selfcall", "payload": {"name": "Me", "joining": false, "records": []}},
+        {"do": "route", "nonce": "fixed-nonce-1", "payload": {"name": "Living", "joining": false, "records": [
+          {"key": "chime.volume", "value": 55, "v": 3, "by": "hi"}]}},
+        {"do": "route", "nonce": "fixed-nonce-1", "payload": {"name": "Living", "joining": false, "records": [
+          {"key": "chime.volume", "value": 55, "v": 3, "by": "hi"}]}},
+        {"do": "route", "body": "{not json"},
+        {"do": "pause", "on": true},
+        {"do": "route", "payload": {"name": "Living", "joining": false, "records": []}}
+      ]
+    }
+  ]
+}
