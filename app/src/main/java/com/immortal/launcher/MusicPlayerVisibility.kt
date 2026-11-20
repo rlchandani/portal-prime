@@ -74,4 +74,11 @@ internal sealed interface PlayerHostEffect {
 internal object MusicHostHandoff {
   /** Covers a same-screen swap (one or two frames), short enough that hidden audio is never noticeable. */
   const val SWAP_MS = 250L
+
+  /**
+   * Hidden for good (no host took the player back): explain "Music paused" only when the user still
+   * wanted it playing — not after their own Pause or the tile's ✕ (the player may not have reported
+   * paused yet, so [YtEngineState.isPlaying] can lag; [YtEngineState.wantsPlay] is the intent).
+   */
+  fun explainsPause(s: YtEngineState): Boolean = s.ready && s.wantsPlay && !s.covered
 }

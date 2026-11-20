@@ -183,7 +183,7 @@ object YouTubeMusicEngine : MusicTransport {
   private fun confirmHidden() {
     if (hosts.visible) return
     val s = mutableState.value
-    if (s.ready && (s.isPlaying || s.wantsPlay) && !s.covered) MusicV3Session.leftWhilePlaying()
+    if (MusicHostHandoff.explainsPause(s)) MusicV3Session.leftWhilePlaying()
     if (s.foreground) reduce(YtAction.Foreground(false))
     if (host != null) {
       Log.i(TAG, "hidden: paused; release in ${RELEASE_GRACE_MS / 1000} s unless shown again")

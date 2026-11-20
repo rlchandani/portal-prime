@@ -43,7 +43,20 @@ really (re)built.
   beside it — never over it — a 64 dp rail with expand and a drag grip. The player keeps playing
   (still visible, uncovered), so the header chip keeps controlling it. Expand restores the card.
   The player is always the card's first child, so switching modes only resizes the same view.
-  Only Pause (chip, card, media keys, a phone) stops the music.
+  Only Pause (chip, card, media keys, a phone) or the tile's ✕ stops the music.
+- **The tile's ✕ = pause and close** (`MusicTileCloseRules`, `MusicTileClose`; owner, 2026-11-17: "if I
+  can close it, it should not stop the music" — YouTube allows no background playback, so closing
+  must pause, and this was offered as the default). A small ✕ (22 dp glyph, 64 dp target) tops the
+  rail, above expand. A tap pauses (queue and position saved: a pause, not a stop) and hides the
+  tile; the header chip then offers "Resume · <title>" for the same song, `/remote/ytmusic` reports
+  `paused`, and other Portals' follow-me sees the room not playing, exactly as after Pause.
+  "Paused · Undo" (Home's inverted toast pill, Undo a 64 dp target) shows for 5 s on whichever tab
+  it was closed; Undo brings the tile back and resumes if it was playing. Any request to play — the
+  chip's Play, a phone's Play, Music, a move here from another Portal — also brings the tile back
+  (also lifts the 10-minute paused auto-hide, which a phone's Play could not before). Closing does not
+  show the one-time "Music paused" note: that note now keys off `wantsPlay` (the user's intent), not
+  the lagging player status. The tile's size is unchanged, so the Mini's compact layouts (800 dp
+  upright, 740 dp tall turned) fit it as before.
 - The card and the tile each remember their own spot on this Portal
   (`MusicFloatPositionStore`, SharedPreferences `immortal_music_home_card`, `v1:<fx>,<fy>` fractions
   of the free travel, so a spot survives another tab or a size change).
