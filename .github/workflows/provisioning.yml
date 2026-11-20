@@ -31,7 +31,10 @@ on:
       - "provisioning/test_fleet_registry_encoding.py"
       - "provisioning/fleet-backup.sh"
       - "provisioning/fleet-backup-data.py"
+      - "provisioning/fleet-backup-seal.py"
+      - "provisioning/sealed_portal_fake.py"
       - "provisioning/test_fleet_backup.py"
+      - "provisioning/test_fleet_sealed_restore.py"
       - "provisioning/fleet-restore.sh"
       - "provisioning/test_fleet_restore.py"
       - "scripts/provision-access.test.mjs"
@@ -53,7 +56,10 @@ on:
       - "provisioning/test_fleet_registry_encoding.py"
       - "provisioning/fleet-backup.sh"
       - "provisioning/fleet-backup-data.py"
+      - "provisioning/fleet-backup-seal.py"
+      - "provisioning/sealed_portal_fake.py"
       - "provisioning/test_fleet_backup.py"
+      - "provisioning/test_fleet_sealed_restore.py"
       - "provisioning/fleet-restore.sh"
       - "provisioning/test_fleet_restore.py"
       - "scripts/provision-access.test.mjs"
@@ -98,10 +104,14 @@ jobs:
           python provisioning/test_deploy_snapshot.py -v
           python provisioning/test_room_registry_encoding.py -v
 
+      - name: Install the sealed backup dependency
+        run: python -m pip install cryptography
+
       - name: Run private backup integrity tests
         run: |
           bash -n provisioning/fleet-backup.sh
           python provisioning/test_fleet_backup.py -v
+          python provisioning/test_fleet_sealed_restore.py -v
 
       - name: Run app restore integrity tests
         run: |

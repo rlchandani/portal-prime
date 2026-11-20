@@ -26,7 +26,8 @@ import java.io.File
  * reach another file or the process memory by a side door (`fd`, `map_files`, `mem`, `root`,
  * `cwd`, ...). Everything the fleet tools read stays readable: `/sdcard`, the installed APK under
  * `/data/app`, and `/proc/self/maps` and `cmdline`. Listing and writing are unchanged, so
- * `fleet-restore.sh --prefs` can still push preferences back.
+ * `fleet-restore.sh --prefs` can still push an older plaintext snapshot back. Preferences leave
+ * the Portal only sealed to the operator's USB-confirmed backup key ([FleetBackupRoutes]).
  *
  * Checked on canonical paths, so `..` and symlinks can't reach a store, and without touching the
  * Android context (the read route is context-free by design).

@@ -46,6 +46,9 @@ Limits are the body cap and, for clients, the reply cap.
 | `/remote/*` session routes (list, chores, reminders, timers, dinner, CC, ...) | Session (+ remote enabled for companion routes) | 256 KiB companion; 1 MiB legacy; CC per-caller limiter | Bodies read after auth; JSON parse failures give 400 | Server-level head/body/drain budgets now apply |
 | `POST /remote/pair` | none (LAN only) | 1 MiB; PIN lives 5 min, 5 tries | **A client could hold a server thread indefinitely by dribbling the head or body, or by declaring a 2 GB body that was then drained in full** | Head and body budgets, bounded drain |
 | Fleet routes (`/install`, `/fs/*`, `/config`, `/action`, ...) | Fleet token (constant-time) | 1 MiB text; `/fs/write` streamed | Bodies read after auth | Server budgets apply; `/action` dream dismissal is contained |
+| `GET/POST /backup/key` (sealed backups, 1.275) | Fleet token; a key becomes active only after a USB (adb shell, `DUMP`) confirmation | 16 KiB; RSA 3072-4096 SPKI; 2 s gap, 30/h | - | First-use proposal, USB-confirmed, then pinned |
+| `POST /backup/export` | Fleet token + active backup key (optional `keyId` pin) | 16 KiB request; 8 MiB archive; 2 s gap, 30/h; one at a time | - | Sealed in memory to the backup key; never written to storage |
+| `POST /backup/import` (`begin`, `apply`) | Fleet token + the data key re-wrapped to a one-time key | 12 MiB body; 8 MiB inflated; each step 2 s gap, 30/h; one apply at a time; session single-use, 5 min | - | Opened, schema-checked, size-capped and scoped before any write |
 | Whole server (6 threads) | - | - | **Unbounded accept queue; per-read timeouts only (30 s), before auth** | Bounded queue (32) and total budgets |
 
 ## Findings by severity
@@ -112,6 +115,72 @@ session is a test session) and `{"op":"revoke_id","id":"…"}`.
 
 Tests: `FleetSecretPathsTest` (+8: every secret store under each data-dir alias, the fleet manifest, `/proc` side doors versus `maps`/`cmdline`/`status`, the fleet tools' paths, judging the resolved target, failed resolution, list/write left open) and `ImmichPinnedFetchTest` (10, against a loopback server under an unresolvable `.test` name: `Host` header and key, pinned DNS refuses other names, a URL for another host is refused before connecting, same-origin redirect stays pinned, cross-host redirect refused, oversized reply, error status, HTTPS ClientHello carries the typed name as SNI to the pinned address, a rebinding resolver is called once and its first answer is the one used, the saved server is not pinned). `:app:testDebugUnitTest`: 7,344 tests, 0 failures. `:app:assemblePerformance`: passes. `provisioning/test_fleet_backup.py`: 23 passed.
 
+### Sealed settings backups (branch `sealed-backup`, on top of 1.274)
+
+Finding 7 made `fleet-backup.sh` fail at its preference step. The replacement keeps the secrets
+off the wire and off both disks instead of reopening `/fs/read`:
+
+- **Key.** The Mac makes an RSA-3072 backup key once (private half in the login Keychain, or a
+  `0600` file). `POST /backup/key` only *proposes* its public half: the key stays pending until
+  `FleetBackupKeyAdbReceiver` confirms it by id. That receiver is exported but guarded by
+  `android.permission.DUMP`, which the adb shell holds and apps can't be granted without adb, so
+  confirmation needs USB. `fleet-backup.sh` sends it with `adb -s <serial>` when the Portal is
+  on USB. After that the key is pinned: the same key is a no-op, any other is `409
+  backup_key_mismatch`; replacing it means `FORGET_BACKUP_KEY` over USB.
+- **Export.** The Portal reads its preferences through `SharedPreferences` (typed values, not
+  XML), the allowlisted data files (household list, chores, reminders, the companion store) and
+  its household settings, gzips them and seals them in memory: AES-256-GCM under a fresh 256-bit
+  data key and 96-bit nonce, the header (format, key id, device id, time, version) as associated
+  data, and the data key wrapped with RSA-OAEP (SHA-256, MGF1-SHA-256). The export is checked
+  against the importer's own parser before sealing. Never in an archive: `fleet_agent` (fleet
+  token), the backup key, caches, and Who's there templates (sealed under a non-exportable
+  Keystore key that a reinstall destroys).
+- **Import.** `begin` makes a one-time RSA-3072 key in memory (single use, 5 minutes). The Mac
+  opens and checks the snapshot in memory, then re-wraps only the 32-byte data key to it, so an
+  import needs the Mac's private key and the plaintext is never on the wire or written to the
+  Mac's disk. The Portal opens it (tag, key length, nonce, 8 MiB inflate cap), parses it strictly
+  (exact fields, typed values, name patterns, the file allowlist, per-file and per-value caps,
+  unknown household keys dropped by the settings sync catalog) and only then writes. Scope
+  follows settings sync: the same device (SHA-256 of `ANDROID_ID`) gets everything; `crossDevice`
+  gets household settings only, each through `SettingsSyncCatalog.validate` and the registry;
+  `sameSerial` is the Mac vouching from its adb serial after a reinstall with another signing
+  key changed `ANDROID_ID`. Preferences are written through `SharedPreferences.commit`, so the
+  app's in-memory copy changes with the file; a reboot afterwards is recommended.
+- **Mac.** The fleet token and keys never reach argv or output (the Keychain is written through
+  `security -i` stdin); errors print only a code or an exception type; files are created
+  `O_EXCL | O_NOFOLLOW`, `0600`; a key file that isn't private and owned is refused.
+
+| # | Finding (review of the new routes) | Status | Fix |
+|---|---|---|---|
+| 9 | **Critical: first-use enrolment over the fleet route.** On any Portal without a key (all of them at first), a fleet-token holder could enrol their own key first and export the household key, tokens and sessions, undoing finding 7 | Fixed | A fleet enrolment is only pending; it activates on the USB-only `CONFIRM_BACKUP_KEY` naming that key id. A later proposal replaces the pending key, so the owner's confirm (by their own id) can't activate an attacker's key. Export refuses until a key is active |
+| 10 | **Medium: import steps rate-limited as one route.** `begin` and `apply` shared the 2 s gap, so every real restore hit `429` (found on Family) | Fixed | Each step is limited on its own key; the Mac retries a `429` after its `retryAfterSec` |
+| 11 | **Low: `begin` replaces the pending import session.** A token holder can cancel an operator's in-flight import (rate-limited) | Accepted | Needs the fleet token, which already controls the device; the operator reruns |
+| 14 | **Low: a pending key can be replaced before the owner confirms it.** The owner's confirm then names a key id that is no longer pending and does nothing | Accepted | Activation still needs USB and the exact id; the owner reruns `fleet-backup.sh` |
+| 12 | **Info: replaying an old archive.** An attacker can't re-wrap an exported data key without the Mac's private key, so a token holder can only import archives they build, which `/fs/write` to `shared_prefs` already allows | Accepted | - |
+| 13 | **Info: Kotlin `org.json` keeps the last of duplicate keys; Python data keys can't be zeroed** | Accepted | The archive is authenticated and fully re-validated after parsing; the Mac already holds the private key |
+
+Tests: `FleetBackupCryptoTest` (13: only the backup key opens it, fresh key and nonce, header,
+ciphertext and wrapped-key tampering, inflate cap, envelope parsing, RSA size, a Python-sealed
+vector), `FleetBackupArchiveTest` (16: every type round-trips, float bits, strict fields, never
+`fleet_agent`/backup key, file allowlist, value shapes, caps, same-device, cross-device and
+same-serial scope), `FleetBackupRoutesTest` (16: pending then USB-confirmed key, mismatch,
+forget, sealed export without the fleet token, same-device restore, different device refused,
+cross-device household only, dry run, single-use and expiring sessions, the original wrapped
+key refused, tampering refused before any write, method checks, rate limits),
+`FleetBackupGuardsTest` (8). `provisioning/test_fleet_backup.py` (25) and
+`test_fleet_sealed_restore.py` (12) run the scripts against a loopback stand-in Portal and check
+that no token, key or preference value reaches output or disk.
+
+Family (Portal+, `2221B01C7T01C0`), performance build of this branch (sha256 `906704f1...`), then
+restored to official 1.274 (sha256 `1aea49e8...a9d5`, matching the OTA log):
+
+| Check | Result |
+|---|---|
+| `fleet-backup.sh`: key created (scratch `0600` file), proposed, confirmed over USB, sealed export | 61 preference files, 223 values, 3 data files, 128 household settings; 14.9 KB ciphertext; no preference names in the snapshot; another key can't unwrap it |
+| Export naming another key id; enrolling another valid key; the export's own wrapped key at `apply`; a reused session | `409 backup_key_mismatch`; `409 backup_key_mismatch`; `422 wrong_key`; `409 import_session_unknown` |
+| Round trip: `darkRoomLux` 3 → 4 and test phone sessions revoked (`401`), then `fleet-restore.sh --prefs` and a reboot | `darkRoomLux` 3 again; the revoked test session valid again (`200`, so sessions came back from the archive); household key fingerprint `6c4fd1f1` unchanged; Home Assistant `live` before and after |
+| `FORGET_BACKUP_KEY` over adb | key cleared; no `FATAL` in logcat |
+
 ### Still open
 
 - **Residual (finding 5):** a private-LAN Immich URL may name the Portal's own LAN address. It needs a
@@ -119,6 +188,12 @@ Tests: `FleetSecretPathsTest` (+8: every secret store under each data-dir alias,
 - **Info: any household-key holder can claim any device id** (no per-device keys), point peer
   clients at any RFC 1918 host:port, wipe music history, or raise a forged leak alert. That is the
   household trust model; replies are still HMAC-verified and redirects are off.
+- **Existing, unchanged:** `/fs/write` still accepts `shared_prefs` (older plaintext restores use
+  it), so a fleet-token holder can still overwrite preferences. A follow-up can close it now that
+  sealed import exists.
+- **Sealed backups:** a Portal reinstalled with another signing key reports a new `ANDROID_ID`;
+  restoring everything then needs the operator's `--same-serial`. Pending enrolments are
+  confirmed over USB only; an on-screen confirmation would remove that step.
 - **Info:** room names and per-room presence are logged by follow-me and music handoff. These
   are Portal names, not people. Message bodies, keys and tokens are never logged.
 

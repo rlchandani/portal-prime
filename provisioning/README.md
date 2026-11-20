@@ -339,39 +339,55 @@ apps you'd installed. `fleet-backup.sh` snapshots all of that first, and
 ./fleet-backup.sh "Portal Mini"   # …or one (by name or serial)
 ```
 
-The backup command requires Python 3 (`PYTHON3=/path/to/python3` can select it).
-Each successful capture writes `backups/<serial>/<timestamp>-<unique-id>/` with `info.json`, `apps.json`
-(the installed-app list), `registry.json` (host/port/token), and every readable
-`shared_prefs/*.xml` — the agent runs *as* Immortal, so it reads its own
-`/data/data/.../shared_prefs` over `/fs/read`, no root or adb needed. Hearthpane
-1.274 and later refuse every read of the app's private data over `/fs/read`
-(preferences hold the household key, Home Assistant and music tokens and the phone
-sessions), so against those agents the backup stops at the preferences step and
-keeps the previous snapshot; `ls` and `push` (and so `fleet-restore.sh --prefs`
-from an older snapshot) still work. **The
-`backups/` tree holds tokens and cleartext credentials, so it is git-ignored —
-keep it private.** New backup directories use mode `0700` and new files are
-created under umask `077`. Existing backup parents must be directories owned by
-the current user; symlink parents are rejected.
+The backup command requires Python 3 (`PYTHON3=/path/to/python3` can select it)
+with the `cryptography` package (`python3 -m pip install cryptography`), and
+Hearthpane 1.275 or later. Each successful capture writes
+`backups/<serial>/<timestamp>-<unique-id>/` with `info.json`, `apps.json` (the
+installed-app list), `registry.json` (host/port/token) and `sealed-backup.json`:
+the Portal's preferences, a few data files (household list, chores, reminders,
+the phone companion store) and its household settings, **sealed on the Portal**
+before they leave it.
 
-The command validates the success replies, exact preference listing and every
-listed XML preference map before replacing the room's `latest` link. A failed
-capture removes its partial directory and retains the previous snapshot. Other
-rooms continue, and any failed room makes the command exit nonzero. Runs in the
-same second get distinct folders. This captures preferences and install metadata,
-not photo files, other apps' data or an atomic view of concurrently changing
-preferences.
+How the seal works: the first run creates this Mac's **backup key** (RSA-3072) and
+keeps the private half in the login Keychain (service `hearthpane-fleet-backup`), or
+in `~/.config/hearthpane/fleet-backup-key` (mode `600`) when the Keychain isn't
+available. Its public half is enrolled with each Portal (`POST /backup/key`). An
+enrolment from the network only *proposes* the key: it becomes active when it is
+confirmed over **USB**, which `fleet-backup.sh` does by itself when the Portal is on
+adb (`adb -s <serial> shell am broadcast -a com.immortal.launcher.action.CONFIRM_BACKUP_KEY
+--es keyId <id> -p <package>`; only the adb shell may send it). So a fleet token alone
+can't point a Portal's backups at a key it holds. Each export (`POST /backup/export`)
+is encrypted on the Portal with AES-256-GCM under a fresh data key, and that data key
+is wrapped with RSA-OAEP-256 to the enrolled key: only this Mac can open it, and the
+plaintext never touches the Portal's storage, the network or this disk. The script
+opens every export in memory before calling the snapshot complete. **Keep the
+backup key:** without it a sealed snapshot can't be restored. To move to a new Mac
+key, clear the old one over USB (`... -a com.immortal.launcher.action.FORGET_BACKUP_KEY
+-p <package>`) and run `fleet-backup.sh` again. Hearthpane 1.274 and later refuse
+every `/fs/read` of the app's private data (preferences hold the household key, Home
+Assistant and music tokens and the phone sessions), so plaintext preference
+snapshots can no longer be taken.
 
-The default package is `com.immortal.launcher`. For an agent running in the debug
-package, use `IMMORTAL_BACKUP_PACKAGE=com.immortal.launcher.debug`. This selects
-the backup's preference path only; the existing raw restore still targets the
-release package and is not a cross-package migration tool.
+`registry.json` holds the fleet token, so the `backups/` tree is git-ignored —
+keep it private. New backup directories use mode `0700` and new files are created
+under umask `077`. Existing backup parents must be directories owned by the current
+user; symlink parents are rejected.
+
+The command validates the success replies and the sealed export before replacing
+the room's `latest` link. A failed capture removes its partial directory and
+retains the previous snapshot. Other rooms continue, and any failed room makes the
+command exit nonzero. Runs in the same second get distinct folders. This captures
+preferences and install metadata, not photo files, other apps' data or an atomic
+view of concurrently changing preferences. Never in a backup: the fleet token (a
+restore keeps the freshly provisioned one), the backup key itself, and Who's there
+face templates (sealed under a Keystore key a reinstall destroys; enrol faces again).
 
 After reinstalling the new build and re-registering the agent
 (`./provision.sh --fleet` over USB, which mints a fresh token):
 
 ```bash
-./fleet-restore.sh "Portal Mini"                 # reinstall apps + restore prefs, then reboot
+./fleet-restore.sh "Portal Mini"                 # reinstall apps + restore prefs (then reboot it)
+./fleet-restore.sh "Portal Mini" --prefs --dry-run   # open and check the sealed snapshot only
 ./fleet-restore.sh "Portal Mini" --config        # instead: re-apply only screensaver/calendar
 ./fleet-restore.sh "Portal Mini" --apps --dry-run # preview what would run
 ```
@@ -392,12 +408,25 @@ an automatic retry. Check the device's partial state before rerunning.
 This reinstalls from the current catalog; it does not restore original APK bytes
 or guarantee the former app version.
 
-By default restore reinstalls the third-party apps that were present and pushes the
-saved `shared_prefs` back **verbatim** (full fidelity, including stored credentials),
-skipping `fleet_agent.xml` so the freshly-provisioned token is kept, then reboots so
-the app reloads them from disk. `--config` is a lighter alternative that re-applies
-only the endpoint-covered screensaver + calendar subset (no stored credentials, no
-reboot). `--prefs`, `--apps`, and `--dry-run` can be combined as needed.
+By default restore reinstalls the third-party apps that were present and restores
+the saved preferences (full fidelity, including stored credentials). For a sealed
+snapshot, the Mac opens and checks it in memory, then re-wraps only its 32-byte data
+key to a one-time key the Portal makes for that import (`POST /backup/import`); the
+Portal decrypts, validates (schema, size caps, allowlisted files, settings-sync scope
+rules) and applies it through its preference store, then asks for a reboot. Scope:
+
+| Restore onto | Flag | Applied |
+|---|---|---|
+| The Portal that made it | none | everything in the snapshot |
+| The same serial after a reinstall with another signing key (the app's Android identity changes) | `--same-serial` | everything; you vouch it is the same Portal |
+| Another Portal | `--cross-device` | household settings only, each checked like a settings-sync value; the room name, phone sessions, household key, tokens and data files stay behind |
+
+`--dry-run` opens and checks a sealed snapshot locally without contacting the
+Portal. An older plaintext snapshot (`shared_prefs/*.xml`) is pushed back
+**verbatim**, skipping `fleet_agent.xml` so the freshly-provisioned token is kept, then
+a reboot is requested. `--config` (plaintext snapshots only) is a lighter
+alternative that re-applies only the endpoint-covered screensaver + calendar subset
+(no stored credentials, no reboot). `--prefs`, `--apps`, and `--dry-run` can be combined as needed.
 
 When `--config` is selected, restore parses the saved screensaver XML and freezes
 both endpoint argument lists before any install, preference push or reboot.
