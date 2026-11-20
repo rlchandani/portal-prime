@@ -143,10 +143,14 @@ internal sealed interface CcEdDrag {
 }
 
 internal object CcEdGesture {
-  /** What a finger landing at ([gx], [gy]) grabs in the current step/tool, or null (nothing to drag). */
-  fun begin(st: CcEdState, floor: CcFloor, gx: Float, gy: Float, tolCells: Float): CcEdDrag? = when (st.step) {
+  /**
+   * What a finger landing at ([gx], [gy]) grabs in the current step/tool, or null (nothing to drag).
+   * [dots] is where the canvas drew the device dots ([CcEdDots]); without it the saved spots are used.
+   */
+  fun begin(st: CcEdState, floor: CcFloor, gx: Float, gy: Float, tolCells: Float, dots: CcEdDotLayout? = null): CcEdDrag? = when (st.step) {
     CcEdStep.ROOMS -> beginRooms(st, floor, gx, gy, tolCells)
-    CcEdStep.DEVICES -> CcEdGeo.deviceAt(floor, gx, gy, tolCells)?.let { CcEdDrag.Device(it, gx, gy) }
+    CcEdStep.DEVICES -> (if (dots != null) dots.deviceAt(gx, gy, tolCells) else CcEdGeo.deviceAt(floor, gx, gy, tolCells))
+        ?.let { CcEdDrag.Device(it, gx, gy) }
     CcEdStep.OPENINGS -> CcEdGeo.openingAt(floor, gx, gy, tolCells)?.let { CcEdDrag.Opening(it, gx, gy) }
     CcEdStep.FOUND, CcEdStep.READY -> null
   }

@@ -6,6 +6,9 @@
  */
 package com.immortal.launcher
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -180,11 +184,13 @@ private fun BannersCard(warnAfterMin: Int, warnings: Boolean, info: Boolean, set
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun BannerPreviewCard(modifier: Modifier) {
+  // The Control Center's window: the preview's fallback when the accessibility overlay host isn't bound.
+  val activity = LocalContext.current.ccActivity()
   Column(modifier.ccCard().padding(horizontal = 28.dp, vertical = 24.dp)) {
     CcSectionLabel("Preview a banner on Portal home", Modifier.padding(bottom = 14.dp))
     FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
       CcBannerPreview.samples.forEach { sample ->
-        CcButton(sample.label, { ControlCenterBanners.preview(sample.alert) }, icon = sample.icon, height = PREVIEW_CHIP_HEIGHT)
+        CcButton(sample.label, { ControlCenterBanners.preview(activity, sample.alert) }, icon = sample.icon, height = PREVIEW_CHIP_HEIGHT)
       }
     }
   }
@@ -205,3 +211,9 @@ private fun BannerRow(title: String, sub: String, divider: Boolean, control: @Co
 }
 
 private const val PREVIEW_CHIP_HEIGHT = 60
+
+private tailrec fun Context.ccActivity(): Activity? = when (this) {
+  is Activity -> this
+  is ContextWrapper -> if (baseContext === this) null else baseContext.ccActivity()
+  else -> null
+}
