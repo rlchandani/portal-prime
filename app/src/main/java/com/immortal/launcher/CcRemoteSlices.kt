@@ -54,7 +54,7 @@ internal object CcRemoteSlices {
     val sections = CcSecurityList.sections(s.entities.values, phone, roomName(s))
     val panel = s.entities.values.filter { it.domain == "alarm_control_panel" }.minByOrNull { it.id }
     val side = CcSecurity.side(s.entities.values.filter { it.domain == "person" }.sortedBy { it.name.lowercase() },
-        s.entities.values, ::ccTime, panel)
+        s.entities.values, ::ccTime, panel, s.occupancy, CcPeoplePolicy.named(s.settings), now)
     return JSONObject().putOpt("alarm", panel?.let { alarmJson(it, s.settings, now) })
         .put("readiness", JSONObject().put("title", side.readiness.title).putOpt("line", side.readiness.line)
             .put("tone", side.readiness.tone.name.lowercase()))
@@ -113,11 +113,27 @@ internal object CcRemoteSlices {
   fun roomsJson(s: CcUiState): JSONArray = JSONArray().also { out ->
     val climates = s.entities.values.filter { it.domain == "climate" }
     s.plan?.floors.orEmpty().forEach { f ->
-      CcRooms.views(f, s.entities, climates).forEach { v -> out.put(roomJson(f.id, v)) }
+      CcRooms.views(f, s.entities, climates).forEach { v -> out.put(roomJson(f.id, v, s.occupancy.room(v.room.id))) }
     }
   }
 
-  private fun roomJson(floorId: String, v: CcRoomView): JSONObject = JSONObject().put("id", v.room.id).put("floor", floorId)
+  /**
+   * One room. `occ` (0..1, only when someone is there) and `ppl` (recognised people: key, name, initial,
+   * colour) come from [CcUiState.occupancy], which the engine already filtered by [CcPeoplePolicy]: no
+   * `occ` with the map setting Off, no `ppl` unless it is Names and each person allowed it.
+   */
+  private fun roomJson(floorId: String, v: CcRoomView, occ: CcRoomOcc?): JSONObject = roomBase(floorId, v).also { o ->
+    if (occ == null || !occ.occupied) return@also
+    o.put("occ", Math.round(occ.confidence * OCC_PLACES) / OCC_PLACES) // 0.8, not 0.800000011920929
+    if (occ.people.isNotEmpty()) o.put("ppl", JSONArray(occ.people.map { p ->
+      JSONObject().put("k", p.key).put("n", p.name).put("i", p.initial).put("c", p.rgb and RGB_MASK)
+    }))
+  }
+
+  private const val RGB_MASK = 0xFFFFFF
+  private const val OCC_PLACES = 100.0
+
+  private fun roomBase(floorId: String, v: CcRoomView): JSONObject = JSONObject().put("id", v.room.id).put("floor", floorId)
       .put("lightsOn", v.lightsOn).put("lights", v.lights).putOpt("temp", v.temperature).putOpt("humidity", v.humidity)
       .put("motion", v.motion).put("open", v.openCount).putOpt("powerW", v.powerW).putOpt("climate", v.climateId)
       .put("glows", JSONArray(v.glows.map { g ->

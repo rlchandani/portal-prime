@@ -21,6 +21,7 @@ import org.json.JSONObject
  * - `seedTestPerson` / `clearTestPerson`: adds or removes an operator test person whose template
  *   is a synthetic random vector (no face), so the glance pipeline can be exercised at night
  *   with nobody in front of the camera. It can never match a real face.
+ * - `testOnMap`: the operator test person's "Show my room on the home map" (people-in-rooms tests).
  * - `enabled`: switches recognition on/off on this Portal (operator testing only).
  * - `simulate`: `"personal"`, `"near"`, `"family"`, `"confirm"` or `"shared"` puts the Home in that
  *   view for the operator test person(s), without the camera, to check layout and frame times.
@@ -43,10 +44,13 @@ internal object WhosThereDebug {
       })
     }
     if (body.optBoolean("clearTestPerson")) WhosThereStore.updateHousehold(context, { it.without(TEST_ID) })
+    if (body.has("testOnMap")) WhosThereStore.updateHousehold(context, { h ->
+      h.person(TEST_ID)?.let { h.upsert(it.copy(onMap = body.optBoolean("testOnMap"))) } ?: h
+    })
     body.optString("simulate").takeIf { it.isNotEmpty() }?.let { WhosThere.simulate(it) }
     val out = JSONObject().put("ignoreQuietHours", ignoreQuietHours)
     if (body.optBoolean("glance")) out.put("glance", WhosThere.requestGlance(GlanceTrigger.MANUAL, operator = true))
     if (body.optBoolean("benchmark")) out.put("benchmark", WhosThere.benchmark())
-    return out.put("status", WhosThere.debugStatus())
+    return out.put("status", WhosThere.debugStatus()).put("roomSignals", JSONObject(RoomSignals.debugCounts()))
   }
 }

@@ -154,7 +154,7 @@ internal object WhosThere {
     val m = models ?: return clearPending()
     if (glance != null) return
     val templates = WhosThereStore.householdState.value.let { h ->
-      h.templates.filter { t -> h.person(t.personId)?.pausedAt(System.currentTimeMillis()) == false }
+      h.templates.filter { t -> h.person(t.personId)?.recognisableAt(System.currentTimeMillis()) == true }
     }
     Log.i(TAG, "glance start trigger=$trigger")
     glanceSurface = surface
@@ -388,8 +388,8 @@ internal object WhosThere {
     val now = System.currentTimeMillis()
     // A person deleted or paused while their Home is up drops back to shared.
     view = when (val v = view) {
-      is WhosThereView.Personal -> if (h.person(v.personId)?.pausedAt(now) == false) v else WhosThereView.Shared
-      is WhosThereView.Family -> v.personIds.filter { h.person(it)?.pausedAt(now) == false }.let {
+      is WhosThereView.Personal -> if (h.person(v.personId)?.recognisableAt(now) == true) v else WhosThereView.Shared
+      is WhosThereView.Family -> v.personIds.filter { h.person(it)?.recognisableAt(now) == true }.let {
         when (it.size) { 0 -> WhosThereView.Shared; 1 -> WhosThereView.Personal(it[0], othersNear = true); else -> WhosThereView.Family(it) }
       }
       WhosThereView.Shared -> v

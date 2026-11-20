@@ -78,6 +78,11 @@ internal object CcSheetLogic {
   fun presence(s: CcUiState, room: CcRoom): Pair<String, Boolean>? {
     val here = s.people.filter { it.state.equals(room.name, ignoreCase = true) || it.state.equals(room.id, ignoreCase = true) }
     if (here.isNotEmpty()) return "${here.joinToString(" & ") { it.name }} here" to true
+    // Fused occupancy (already filtered by CcPeoplePolicy): recognised names, else an anonymous "someone".
+    s.occupancy.room(room.id)?.takeIf { it.occupied }?.let { o ->
+      if (o.people.isNotEmpty()) return "${o.people.joinToString(" & ") { it.name }} here" to true
+      if (o.sources.any { it == CcOccSource.PRESENCE || it == CcOccSource.OCCUPANCY }) return "Someone here" to true
+    }
     val sensors = room.devices.mapNotNull { s.entity(it.entityId) }.filter { CcKind.of(it) == CcKind.MOTION && !it.unavailable }
     if (sensors.isEmpty()) return null
     return if (sensors.any { it.isOn }) "Motion now" to true else "No one here" to false

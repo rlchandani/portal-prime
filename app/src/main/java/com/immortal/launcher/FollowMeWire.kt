@@ -11,7 +11,8 @@ import org.json.JSONObject
 /**
  * [HouseholdBus] bodies for follow-me. Both are broadcasts (no `to`), small enough for one
  * datagram, and carry durations rather than timestamps so Portal clocks never need to agree:
- * - `presence` `{p, d, fn}`: this room's presence (`p`/`a`/`u`), for `d` ms, and its name.
+ * - `presence` `{p, d, fn, rm?}`: this room's presence (`p`/`a`/`u`), for `d` ms, its name, and (optional,
+ *   ignored by older Portals) the Control Center plan room it chose for itself ([ControlCenterConfig.Settings.planRoom]).
  * - `music_live` `{on, t, a, th, pos, p, d, fn}`: what plays here (`on`=1) or that it stopped
  *   (`on`=0), plus the same presence fields (`d` with `p`=`a` is how long the room has been empty).
  * The bus already checks signature, freshness and replay; decoders still treat every field as untrusted.
@@ -30,7 +31,7 @@ internal object FollowMeWire {
   const val MAX_BODY_CHARS = 700
   private const val HTTPS = "https://"
 
-  data class PresenceNote(val presence: Presence, val forMs: Long, val name: String)
+  data class PresenceNote(val presence: Presence, val forMs: Long, val name: String, val room: String? = null)
   data class LiveNote(val presence: Presence, val forMs: Long, val name: String, val track: FollowMeTrack?)
 
   fun presenceWire(p: Presence): String = when (p) {
@@ -43,6 +44,10 @@ internal object FollowMeWire {
 
   fun encode(n: PresenceNote): JSONObject =
       JSONObject().put("p", presenceWire(n.presence)).put("d", n.forMs).put("fn", clip(n.name, DinnerWire.MAX_NAME))
+          .also { b -> n.room?.takeIf(::validRoom)?.let { b.put("rm", it) } }
+
+  private val ROOM = Regex("^[A-Za-z0-9_.-]{1,64}$")
+  fun validRoom(id: String): Boolean = ROOM.matches(id)
 
   fun encode(n: LiveNote): JSONObject {
     val body = JSONObject().put("p", presenceWire(n.presence)).put("d", n.forMs).put("fn", clip(n.name, DinnerWire.MAX_NAME))
@@ -55,7 +60,8 @@ internal object FollowMeWire {
   fun decodePresence(b: JSONObject): PresenceNote? {
     val presence = presenceFromWire(b.opt("p") as? String) ?: return null
     val name = DinnerWire.cleanName(b.opt("fn") as? String) ?: return null
-    return PresenceNote(presence, duration(b.opt("d"), MAX_FOR_MS), name)
+    val room = (b.opt("rm") as? String)?.takeIf(::validRoom)
+    return PresenceNote(presence, duration(b.opt("d"), MAX_FOR_MS), name, room)
   }
 
   fun decodeLive(b: JSONObject): LiveNote? {

@@ -33,7 +33,7 @@ internal object WhosThereViewPolicy {
   const val NOT_YOU_HOLD_MS = 120_000L
 
   fun select(outcome: GlanceOutcome, people: List<WhosTherePerson>, nowMs: Long): WhosThereView {
-    val active = people.filterNot { it.pausedAt(nowMs) }.associateBy { it.id }
+    val active = people.filter { it.recognisableAt(nowMs) }.associateBy { it.id }
     val recognised = outcome.recognised.filter { it in active }
     return when {
       recognised.size >= 2 -> WhosThereView.Family(recognised)

@@ -145,6 +145,7 @@ internal fun CcSetLook(st: ControlCenterConfig.Settings, ui: CcUi, write: (Strin
     CcSetRow("Animation", "Reduced: no pulses or flowing lines (older Portals, ambient mode)") {
       CcSeg(listOf(Triple(false, "Full", null), Triple(true, "Reduced", null)), st.reducedMotion, { write("reducedMotion", it) })
     }
+    CcSetMapPeopleRow(st.mapPeople, write)
     CcSetRow("Alarm PIN digits", "How many digits the alarm keypad expects") {
       CcStepper("${st.pinLength}", "PIN digits",
           { write("pinLength", CcSetLogic.stepped(st.pinLength, -1, ControlCenterConfig.MIN_PIN, ControlCenterConfig.MAX_PIN)) },

@@ -281,7 +281,7 @@ private const val ISO_SWITCH_MS = 650
 
 /** Everything a floor's [CcPlanModel] depends on. */
 internal data class CcModelKey(val floor: CcFloor, val deps: CcPlanDeps, val settings: ControlCenterConfig.Settings, val minute: Long,
-                                val done: Map<String, Long>)
+                                val done: Map<String, Long>, val occupancy: Map<String, CcRoomOcc> = emptyMap())
 
 /**
  * The entities one floor's model reads — its rooms' devices and its openings — in a fixed order.

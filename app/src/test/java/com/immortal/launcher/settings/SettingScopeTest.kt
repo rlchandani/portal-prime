@@ -33,7 +33,7 @@ class SettingScopeTest {
   @Test
   fun roomCameraAndConnectionSettingsStayOnThisPortal() {
     val local = listOf("fleet.name", "calling.dropInsOn", "calling.dropInRooms", "controlcenter.sharedRoom",
-        "controlcenter.portalMode", "controlcenter.planStyle", "mqtt.host", "mqtt.username", "calendar.url", "immortal.maPlayerId",
+        "controlcenter.portalMode", "controlcenter.planStyle", "controlcenter.planRoom", "mqtt.host", "mqtt.username", "calendar.url", "immortal.maPlayerId",
         "screensaver.darkRoomLux", "screensaver.batterySaver", "sunrise.enabled", "guests.ssid", "guests.welcome")
     val scopes = all.toMap()
     local.forEach { key ->
@@ -48,7 +48,7 @@ class SettingScopeTest {
   fun householdCoversTheSharedPolicies() {
     val keys = SettingsSyncCatalog.household.keys
     listOf("screensaver.mode", "screensaver.overnightNightClock", "digitalclock.face", "chime.quietHoursOn",
-        "chime.hourlyChimeOn", "music.quietCap", "controlcenter.askUnlock", "calling.ringtone", "calling.whoCanCall",
+        "chime.hourlyChimeOn", "music.quietCap", "controlcenter.askUnlock", "controlcenter.mapPeople", "calling.ringtone", "calling.whoCanCall",
         "immortal.settingsTheme", "photoframe.faceId", "photoframe.sharedSource", "followme.mode").forEach {
       assertTrue("$it should sync", it in keys)
     }

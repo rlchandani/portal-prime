@@ -125,8 +125,12 @@ internal fun CcPlanCanvas(
   val latestHitArea by rememberUpdatedState(Triple(model, px, iso3))
   val latestIso by rememberUpdatedState(iso)
   val isParked by rememberUpdatedState(parked)
-  val description = remember(model.views, model.floor.name, lens) {
-    ccTrace("cc:speech") { CcSpeech.plan(CcOverviewText.shortFloor(model.floor.name), lens, model.views.map { it.room.name to CcOverviewText.caption(it, lens) }) }
+  val description = remember(model.views, model.floor.name, lens, model.people, model.pulses) {
+    ccTrace("cc:speech") {
+      CcSpeech.plan(CcOverviewText.shortFloor(model.floor.name), lens, model.views.map { v ->
+        v.room.name to listOf(CcOverviewText.caption(v, lens), CcSpeech.who(model, v.room)).filter { it.isNotBlank() }.joinToString(" · ")
+      })
+    }
   }
   val outline = remember(density) { CcIsoPx.outline(density.density) }
   // Composition and the cached passes only learn whether the view left 2D / reached 3D, not every frame.
