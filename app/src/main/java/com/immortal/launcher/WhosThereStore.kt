@@ -34,7 +34,7 @@ internal object WhosThereStore {
   private const val TAG = "HearthpaneWhosThere"
   private const val PREFS = "hearthpane_whos_there"
   private const val ALIAS = "hearthpane.whosthere.household"
-  private const val DIR = "whos_there"
+  internal const val DIR = "whos_there"
 
   private val io = Executors.newSingleThreadExecutor { r -> Thread(r, "whos-there-io").apply { isDaemon = true } }
   private val household = MutableStateFlow(WhosThereHousehold())

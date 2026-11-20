@@ -72,20 +72,24 @@ object ImmichSource {
   /** List uniquely identified albums for the picker. Null on request or document failure. */
   fun listAlbums(base: String, apiKey: String, maxBytes: Int = PhotoSourceHttp.MAX_METADATA_BYTES): List<Album>? =
       runCatching {
-            val body = httpGet("${normalizeBase(base)}/api/albums", authHeaders(apiKey), maxBytes) ?: return null
-            val arr = JSONArray(body)
-            buildList {
-              val seen = HashSet<String>()
-              for (i in 0 until arr.length()) {
-                val o = arr.optJSONObject(i) ?: continue
-                val id = o.opt("id") as? String ?: continue
-                if (id.isBlank() || !seen.add(id)) continue
-                add(Album(id, o.optString("albumName", "Album"), o.optInt("assetCount", 0)))
-              }
-            }
+            parseAlbums(httpGet("${normalizeBase(base)}/api/albums", authHeaders(apiKey), maxBytes) ?: return null)
           }
           .onFailure { Log.w(TAG, "album list failed", it) }
           .getOrNull()
+
+  /** The uniquely identified albums in an `/api/albums` reply. Throws on a malformed document. */
+  internal fun parseAlbums(body: String): List<Album> {
+    val arr = JSONArray(body)
+    return buildList {
+      val seen = HashSet<String>()
+      for (i in 0 until arr.length()) {
+        val o = arr.optJSONObject(i) ?: continue
+        val id = o.opt("id") as? String ?: continue
+        if (id.isBlank() || !seen.add(id)) continue
+        add(Album(id, o.optString("albumName", "Album"), o.optInt("assetCount", 0)))
+      }
+    }
+  }
 
   /**
    * Playable media for [albumId] (or the whole library when null/blank), capped at [cap] items:
