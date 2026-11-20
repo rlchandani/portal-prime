@@ -20,6 +20,13 @@ import android.content.IntentFilter
  * PhotoDreamService's own stop callback owns automatic photo-frame recovery.
  */
 class ImmortalApp : Application() {
+  override fun attachBaseContext(base: Context) {
+    super.attachBaseContext(base)
+    // Earliest app hook (before content providers and onCreate): start warming the page cache
+    // with our compiled code so a cold boot's class linking doesn't fault it in 4 KB at a time.
+    StartupPrefetch.start(base)
+  }
+
   override fun onCreate() {
     super.onCreate()
     // Arm first, before any other init: as the home app, an uncaught crash makes Android drop our

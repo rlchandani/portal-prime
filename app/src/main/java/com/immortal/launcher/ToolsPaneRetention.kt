@@ -10,6 +10,10 @@ package com.immortal.launcher
 internal object ToolsPaneRetention {
     private val local = setOf("alarm", "timers", "countdowns", "converter", "lamp")
     private const val CAPACITY = 4
+    /** Composed hidden under the library ahead of its first open (its first open was the measured 145 ms hitch). */
+    const val PREBUILT_WORKSPACE = "reminders"
+    /** After the Tools tab itself was composed ahead, so the two never share an idle frame. */
+    const val PREBUILD_DELAY_MS = 1_000L
 
     /** Local tools (and Reminders) whose open workspace may stay composed, hidden, under the library. */
     fun keepsWorkspace(id: String): Boolean = id in local || id == "reminders"

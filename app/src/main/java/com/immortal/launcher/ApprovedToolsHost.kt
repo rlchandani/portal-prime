@@ -48,6 +48,7 @@ import androidx.compose.ui.zIndex
 import com.immortal.launcher.ui.theme.LocalAdvancedSettings
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 /** Saveable drafts plus a bounded local-pane cache; hidden producers have no active lifecycle. */
@@ -83,6 +84,15 @@ internal fun ApprovedToolsHost(
         var keptWorkspace by remember { mutableStateOf<ApprovedTool?>(null) }
         val workspace = tool ?: keptWorkspace?.takeIf { ToolsPaneRetention.keepsWorkspace(it.id) }
         SideEffect { keptWorkspace = workspace }
+        // The first Reminders open of a session still composed its workspace inside the tap (145 ms on
+        // Family). Like the launcher's hidden tabs, compose it ahead, hidden and inactive, at an idle
+        // moment after the library; that first open then only flips which layer draws.
+        LaunchedEffect(Unit) {
+            delay(ToolsPaneRetention.PREBUILD_DELAY_MS)
+            awaitMainLooperIdle()
+            if (keptWorkspace == null && selected == null)
+                keptWorkspace = ApprovedToolsCatalog.resolve(ToolsPaneRetention.PREBUILT_WORKSPACE, advanced)
+        }
         val content: @Composable BoxScope.() -> Unit = {
             Box(modifier.fillMaxSize()) {
                 ToolsLayer(visible = tool == null) {
