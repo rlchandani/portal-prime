@@ -25,6 +25,9 @@ class ImmortalApp : Application() {
     // Earliest app hook (before content providers and onCreate): start warming the page cache
     // with our compiled code so a cold boot's class linking doesn't fault it in 4 KB at a time.
     StartupPrefetch.start(base)
+    // Start the SharedPreferences loads that setup and Home's first frame read, in parallel, so
+    // the main thread doesn't wait on each file in turn (StartupPrefsWarmup).
+    StartupPrefsWarmup.start(base)
   }
 
   override fun onCreate() {

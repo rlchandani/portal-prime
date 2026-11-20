@@ -18,6 +18,8 @@ class ScreensaverTestSourceTest {
   private class Prefs {
     var until: Long? = null
     var nightUntil: Long? = null
+    var pinMode: String? = null
+    var pinInterval: Int? = null
     val context: Context = Mockito.mock(Context::class.java)
 
     init {
@@ -35,6 +37,12 @@ class ScreensaverTestSourceTest {
         nightUntil = it.getArgument(1); editor
       }
       Mockito.`when`(editor.remove("night_until")).thenAnswer { nightUntil = null; editor }
+      Mockito.`when`(prefs.getString(Mockito.eq("pin_mode"), Mockito.any())).thenAnswer { pinMode ?: it.getArgument<String?>(1) }
+      Mockito.`when`(prefs.getInt(Mockito.eq("pin_interval_sec"), Mockito.anyInt())).thenAnswer { pinInterval ?: it.getArgument<Int>(1) }
+      Mockito.`when`(editor.putString(Mockito.eq("pin_mode"), Mockito.any())).thenAnswer { pinMode = it.getArgument(1); editor }
+      Mockito.`when`(editor.putInt(Mockito.eq("pin_interval_sec"), Mockito.anyInt())).thenAnswer { pinInterval = it.getArgument(1); editor }
+      Mockito.`when`(editor.remove("pin_mode")).thenAnswer { pinMode = null; editor }
+      Mockito.`when`(editor.remove("pin_interval_sec")).thenAnswer { pinInterval = null; editor }
       Mockito.`when`(editor.commit()).thenReturn(true)
     }
   }
@@ -116,5 +124,35 @@ class ScreensaverTestSourceTest {
     assertEquals(1, events.count { it.startMillis <= now && it.endMillis > now })
     val next = events.filter { it.startMillis > now }.minByOrNull { it.startMillis }!!
     assertEquals(25 * 60_000L, next.startMillis - (now - now % 60_000L))
+  }
+
+  @Test fun pinAcceptsOnlyKnownModesAndTheSettingsIntervalRange() {
+    assertEquals(ScreensaverTestSource.Pin("filmstrip", 12), ScreensaverTestSource.Pin.of("filmstrip", 12))
+    assertEquals(ScreensaverTestSource.Pin("shuffle", 5), ScreensaverTestSource.Pin.of("shuffle", 5))
+    assertEquals(null, ScreensaverTestSource.Pin.of("notAMode", 30))
+    assertEquals(null, ScreensaverTestSource.Pin.of("kenBurns", 4))
+    assertEquals(null, ScreensaverTestSource.Pin.of("kenBurns", 601))
+  }
+
+  @Test fun pinnedReplacesOnlyModeAndInterval() {
+    val household = ScreensaverConfig.Settings(mode = "shuffle", intervalSec = 45, photoMotion = false)
+    val pinned = ScreensaverTestSource.pinned(household, ScreensaverTestSource.Pin("polaroid", 10))
+    assertEquals(household.copy(mode = "polaroid", intervalSec = 10), pinned)
+    assertEquals(household, ScreensaverTestSource.pinned(household, null))
+  }
+
+  @Test fun pinLastsAsLongAsTheSourceAndAPlainEnableDropsIt() {
+    if (!ScreensaverTestSource.available()) return
+    val p = Prefs()
+    val pin = ScreensaverTestSource.Pin("mosaic", 15)
+    assertTrue(ScreensaverTestSource.enable(p.context, 10, nowMs = 0L, pin = pin))
+    assertEquals(pin, ScreensaverTestSource.pin(p.context, 1_000L))
+    assertEquals(null, ScreensaverTestSource.pin(p.context, p.until!! + 1))
+    assertTrue(ScreensaverTestSource.enable(p.context, 10, nowMs = 0L))
+    assertEquals(null, ScreensaverTestSource.pin(p.context, 1_000L))
+    assertTrue(ScreensaverTestSource.enable(p.context, 10, nowMs = 0L, pin = pin))
+    assertTrue(ScreensaverTestSource.disable(p.context))
+    assertEquals(null, p.pinMode)
+    assertEquals(null, ScreensaverTestSource.pin(p.context, 1_000L))
   }
 }

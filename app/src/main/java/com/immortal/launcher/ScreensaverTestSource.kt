@@ -28,6 +28,8 @@ internal object ScreensaverTestSource {
   private const val PREFS = "screensaver_test_source"
   private const val KEY_UNTIL = "until"
   private const val KEY_NIGHT_UNTIL = "night_until"
+  private const val KEY_PIN_MODE = "pin_mode"
+  private const val KEY_PIN_INTERVAL = "pin_interval_sec"
   const val MAX_MINUTES = 240
   /** A forced dark room arrives after the day frame has drawn, as when the lights go out. */
   const val FORCED_NIGHT_DELAY_MS = 12_000L
@@ -69,18 +71,55 @@ internal object ScreensaverTestSource {
    * Enable for [minutes] (clamped to 1..[MAX_MINUTES]); false when this build has no test source.
    * [night] also forces the dark-room state for the same span (operator verification of the night
    * colours without the light sensor); it expires with the source and is dropped by a plain enable.
+   * [pin] holds one screensaver mode at a fixed interval for the same span, so a performance A/B
+   * sees the same mode change on the same beat every run; a plain enable drops it.
    */
-  fun enable(context: Context, minutes: Int, nowMs: Long = System.currentTimeMillis(), night: Boolean = false): Boolean {
+  fun enable(
+      context: Context, minutes: Int, nowMs: Long = System.currentTimeMillis(), night: Boolean = false,
+      pin: Pin? = null,
+  ): Boolean {
     if (!available()) return false
     val until = nowMs + minutes.coerceIn(1, MAX_MINUTES) * 60_000L
-    val edit = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putLong(KEY_UNTIL, until)
+    val edit = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+    edit.putLong(KEY_UNTIL, until)
     if (night) edit.putLong(KEY_NIGHT_UNTIL, until) else edit.remove(KEY_NIGHT_UNTIL)
+    if (pin != null) {
+      edit.putString(KEY_PIN_MODE, pin.mode)
+      edit.putInt(KEY_PIN_INTERVAL, pin.intervalSec)
+    } else {
+      edit.remove(KEY_PIN_MODE)
+      edit.remove(KEY_PIN_INTERVAL)
+    }
     return edit.commit()
   }
 
-  fun disable(context: Context): Boolean =
-      context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-          .remove(KEY_UNTIL).remove(KEY_NIGHT_UNTIL).commit()
+  fun disable(context: Context): Boolean {
+    val edit = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+    listOf(KEY_UNTIL, KEY_NIGHT_UNTIL, KEY_PIN_MODE, KEY_PIN_INTERVAL).forEach { edit.remove(it) }
+    return edit.commit()
+  }
+
+  /** One screensaver mode held at a fixed photo interval (operator performance runs only). */
+  data class Pin(val mode: String, val intervalSec: Int) {
+    companion object {
+      /** A valid pin, or null when [mode] isn't a known mode or [intervalSec] is outside 5..600 s. */
+      fun of(mode: String, intervalSec: Int): Pin? =
+          if (mode in ScreensaverConfig.MODES && intervalSec == ScreensaverConfig.clampInterval(intervalSec))
+            Pin(mode, intervalSec) else null
+    }
+  }
+
+  /** The operator pin while the test source is active, else null. */
+  fun pin(context: Context, nowMs: Long = System.currentTimeMillis()): Pin? {
+    if (!active(context, nowMs)) return null
+    val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    val mode = prefs.getString(KEY_PIN_MODE, null) ?: return null
+    return Pin.of(mode, prefs.getInt(KEY_PIN_INTERVAL, 0))
+  }
+
+  /** [settings] with [pin]'s mode and interval in place of the household's, or unchanged. */
+  fun pinned(settings: ScreensaverConfig.Settings, pin: Pin?): ScreensaverConfig.Settings =
+      if (pin == null) settings else settings.copy(mode = pin.mode, intervalSec = pin.intervalSec)
 
   /** True while an operator forced the dark room on together with an active test source. */
   fun forcedNight(context: Context, nowMs: Long = System.currentTimeMillis()): Boolean =

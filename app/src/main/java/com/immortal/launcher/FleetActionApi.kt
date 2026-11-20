@@ -115,7 +115,8 @@ internal class FleetActionApi(private val actions: FleetActions) {
 
   /**
    * Verification only: swap every photo source for generated scenes (expires on its own), or
-   * switch back. {"enabled":true|false, "minutes":1..240, "night":false|true}. Any frame already on
+   * switch back. {"enabled":true|false, "minutes":1..240, "night":false|true, "mode":"<mode>",
+   * "intervalSec":5..600}. Any frame already on
    * screen is retired first so household photos are never on screen while the switch is on;
    * enabling then opens a fresh frame on the generated scenes. Release builds report unavailable.
    */
@@ -125,13 +126,21 @@ internal class FleetActionApi(private val actions: FleetActions) {
     if (enable && minutes !in 1..ScreensaverTestSource.MAX_MINUTES) return json(400, err("bad_minutes"))
     // "night":true also forces the dark-room state (night colours) without the light sensor.
     val night = body.optBoolean("night", false)
-    val applied = if (enable) actions.enableTestSource(minutes, night = night) else actions.disableTestSource()
+    // Performance A/B: "mode" (+ "intervalSec", default 30) pins one screensaver mode at a fixed
+    // beat for the same span instead of the household's mode and interval.
+    val pinMode = body.optString("mode", "")
+    val pin = if (enable && pinMode.isNotEmpty()) {
+      ScreensaverTestSource.Pin.of(pinMode, body.optInt("intervalSec", DEFAULT_PIN_INTERVAL_SEC))
+          ?: return json(400, err("bad_pin"))
+    } else null
+    val applied = if (enable) actions.enableTestSource(minutes, night = night, pin = pin) else actions.disableTestSource()
     if (applied) actions.reopenFrame(enable)
     return json(200, JSONObject().put("ok", applied).put("action", "screensaver_test_source")
         .put("digitalClockFace", actions.clockLook().face)
         .put("available", actions.testSourceAvailable())
         .put("active", actions.testSourceActive())
         .put("night", actions.testSourceNight())
+        .put("pin", actions.testSourcePin() ?: JSONObject.NULL)
         .put("until", actions.testSourceUntil()))
   }
 
@@ -172,6 +181,7 @@ internal class FleetActionApi(private val actions: FleetActions) {
     /** Upper bound for the `phone_test_session` debug clock (a little past the 1-year mark). */
     const val MAX_TEST_AGE_DAYS = 400L
     const val DEFAULT_TEST_SOURCE_MINUTES = 30
+    const val DEFAULT_PIN_INTERVAL_SEC = 30
     const val SETTINGS_SCREEN = "settings"
     val SYNC_OPS = setOf("status", "values", "pause", "resume", "adopt", "keep", "rejoin")
     val ORIENTATIONS = setOf("portrait", "landscape", "reverse_landscape", "auto", "forget")

@@ -323,3 +323,112 @@ All 7431 unit tests pass (817 classes), and `:app:assemblePerformance` passes on
 3. **Calls Back / Settings:** trace Home's 75 ms Back frame and its second frame under Settings with app tracing
    (profileable scratch build), then gate the resume reloads on an actual settings change.
 4. **Mini survey** when it is on USB.
+
+---
+
+# Round 6 (perf-6)
+
+Family Portal+ (`<family>`), debloated, performance build plus its `.dm`. Before every run I checked `reason=install-dm` and
+the APK sha. Cold starts are real reboots with no force-stop, and the numbers come from untraced reboots. Main moved from
+1.282 to 1.283 to 1.284 during the round. Each A/B pair uses one base: 1.282 for the first cold A/B and the Home and
+screensaver surveys, 1.283 for the final cold and galleryWall runs. perf-6 is merged with 1.284, and its full unit tests and
+`:app:assemblePerformance` pass there. The Mini was not on USB.
+
+## Fixes kept
+
+1. `perf: start cold-start SharedPreferences loads in parallel from attachBaseContext` (165ce191).
+   - The first composition opened about 20 prefs files one after another. Each load started only on its first read, so
+     the main thread waited on them in series.
+   - `StartupPrefsWarmup` starts one background thread in `attachBaseContext`, before the Application's own setup. It
+     calls `getSharedPreferences` for the 22 files that setup and Home's first frame read.
+   - Their platform loader threads then run in parallel with `bindApplication`, and the main thread's later calls get
+     the same cached instances. Nothing is read or parsed by the warm-up itself.
+   - This is not round 5's rejected prefetch, which read the files' bytes on the odex thread.
+   - A unit test checks that every name in the list is still a prefs file with an owner.
+2. `perf: operator test source can pin one screensaver mode at a fixed interval` (8dcbeb38, plus db6717f1 for the split
+   `FleetActionApi`).
+   - `screensaver_test_source` takes `{"mode":"<mode>","intervalSec":5..600}`. While the test source is active, the frame
+     uses that mode and interval instead of the household's.
+   - The pin expires with the source, and a plain enable or disable drops it. A bad mode or interval returns
+     `400 bad_pin`. Release builds are unchanged.
+   - Tooling: `perf-6/tools/sspin.sh <build> <tag> <mode>...` runs 75 s of polled framestats per mode at a 10 s beat,
+     after a 12 s start.
+
+## Cold start: before / after (3 reboots each, median (range), ms)
+
+| | 1.282 | + prefs warm-up | 1.283 | + prefs warm-up |
+|---|---|---|---|---|
+| Home `Displayed` | 1641 (1611–1683) | **1488 (1351–1506)** | 1649 (1560–1654) | **1547 (1328–1559)** |
+| First frame, gfxinfo | 458 (433–475) | **324 (280–374)** | 421 (401–516) | 444 (386–534) |
+| Second frame | 543 (505–555) | **399 (361–427)** | 454 (432–546) | 505 (354–539) |
+| First frame on screen, after process start | 1379 (1359–1382) | **1217 (1129–1229)** | 1372 (1324–1381) | 1256 (1067–2320) |
+
+- Pooled over all 6 reboots per side: `Displayed` 1645 → **1497 ms**, first frame 446 → **380 ms**, second frame
+  524 → **413 ms**, first frame on screen 1376 → **1240 ms**.
+- `Displayed` improved on every reboot.
+- The 1.283 pair is noisier on the first and second frames, and one reboot put the first frame on screen at +2.3 s
+  (round 5 saw the same kind of outlier).
+- Traced (1 reboot each, 1.282): the first `Choreographer#doFrame` falls from 446 to 393 ms, and its sleep time from 165 to
+  104 ms. `bindApplication`'s sleep falls from 86 to 39 ms.
+
+Pixel diffs (1.283 + pin vs perf-6 on 1.283):
+- Tools library, Reminders, library after Back, Reminders reopened: **100.0000 % identical**.
+- Settings: identical outside the OTA status line. 1.284 was released between the two captures, so it changed from
+  "Up to date" to "Update available".
+- Music: identical outside the live sign-in code.
+
+## Screensaver: per-mode survey (1.282, pinned, 10 s beat, 75 s, generated scenes only)
+
+| Mode | frames > 32 ms | > 100 ms | max | jank (Σ over 16.7 ms) |
+|---|---|---|---|---|
+| **galleryWall** | 49 | **26** | **332** | 7.3 s |
+| heroSidebar | 50 | 7 | 120 | 5.6 s |
+| memories | 134 | 2 | 113 | 35.5 s |
+| diptych | 43 | 1 | 103 | 8.1 s |
+| kenBurns / framed / push / panorama / polaroid / mosaic / cinema | 37–237 | 0 | 65–93 | 4–40 s |
+| filmstrip (native) | 0 | 0 | 30 | 0.04 s |
+
+The continuous-motion modes (kenBurns, framed, memories) sit at about 29 ms per frame for the whole run, i.e. ~34 fps
+motion. That is their sustained cost, not photo-change spikes. Gallery Wall is the worst on photo changes: each swap
+crossfades one cell, and it produces 4–5 frames of 100–330 ms.
+
+## Tried, not kept
+
+- **Gallery Wall: a permanent compositor layer per cell** (`will-change: transform` on `.gallery-wall .ss-gcell`).
+  - A/B (2 rounds each): frames over 100 ms fell from 29/20 to **12/7**, jank from 7.98/7.71 s to **3.04/2.82 s**, and the
+    median frame from 28 to 13 ms. GPU memory didn't rise (gfx 130–139 vs 142–143 MB).
+  - **Not pixel-identical.** In headless Chromium renders of the same layout, shadows and photos move by 1–4/255 over
+    about 11 % of the wall (max 7/255 in 10 px). This is layer resampling.
+  - Left for an owner decision: `scratch-tmp/perf6/not-kept-gallery-permanent-layers.patch`.
+- **Gallery Wall: a layer only while the cell dissolves.** A settled wall is bit-identical, but this gave no gain
+  (26/24 frames over 100 ms vs 26/25). So the cost is rastering the incoming cell and its layer, not repainting the root.
+- **Home frames.** simpleperf on a profileable `benchmark` scratch build (2 kHz, dwarf, main thread, 3 Calls Backs).
+  Per Back, the main thread spent:
+  - about 12 ms in `BarWatchService` → `readPinAppWindow` → `AccessibilityWindowInfo.getRoot()`. On API 29 this prefetches
+    descendants, so Home's own main thread builds node infos for its Compose tree on each `TYPE_WINDOWS_CHANGED`;
+  - about 5 ms recomposing `LauncherScreen` (the resume `appsRefreshKey`);
+  - about 3 ms in `HearthpaneWake.evaluate`;
+  - about 1.5 ms in `use24HourClock`.
+
+  Two fixes removed those costs but didn't move the frames:
+  - naming our own focused window without a root lookup while one of our activities is resumed;
+  - a structural-equality resume snapshot (settings, greeting, room, clock format) that writes nothing when nothing
+    changed.
+
+  Per-window results, 6 visits each (1.282 / + own window / + both):
+  - Calls Back, Home's first frame: medians 61 / 71 / 71 ms.
+  - Under Settings, Home's max: 60 / 73 / 58 ms.
+
+  Both are within noise. The saved CPU falls outside the measured frame. Patches:
+  `scratch-tmp/perf6/not-kept-own-window/`, `scratch-tmp/perf6/not-kept-home-resume/`.
+
+## Next
+
+1. **Home Back frame (~60–75 ms):** the main-thread work above isn't inside it. Next is RenderThread / surface attribution
+   (Home's surface recreation and re-record on Back, from round 3) with perfetto `gfx` plus `--trace-offcpu`.
+2. **Gallery Wall:** the owner decides on permanent cell layers (2.7× less jank, not bit-identical). Otherwise pre-raster
+   the incoming cell before its fade, e.g. a hidden layer one beat ahead.
+3. **Continuous-motion modes** (kenBurns, framed, memories: ~29 ms frames throughout): check the Ken Burns layer size and
+   the doodle tiling under motion.
+4. **Cold start:** prefs loads now overlap. Next is the ~390 ms first doFrame itself (measure 270 ms in round 4).
+5. **Mini survey** when it is on USB.
