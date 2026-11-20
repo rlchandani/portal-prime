@@ -110,7 +110,7 @@ session is a test session) and `{"op":"revoke_id","id":"…"}`.
 
 | # | Finding | Status | Fix |
 |---|---|---|---|
-| 7 | **Low: the `/fs/read` blocklist didn't cover `shared_prefs`** | Fixed | `/fs/read` now refuses (`403 protected_path`) the app's whole private data directory: `shared_prefs` (household key, Home Assistant token, music tokens, phone sessions and pairing, fleet token), `databases`, `files`, `no_backup` (Who's there templates, companion store, sealed stores), `app_*` and `cache`, under `/data/data/<pkg>`, `/data/user/<n>/<pkg>`, `/data/user_de/<n>/<pkg>` and the Android 11+ `data_mirror` aliases. It also refuses the fleet manifest on external storage (`Android/data/<pkg>/files/fleet`, which carries the fleet token) and the `/proc/<pid>` side doors (`fd`, `fdinfo`, `map_files`, `mem`, `pagemap`, `root`, `cwd`, `exe`, `environ`, also under `task/<tid>`). The rule is checked on both the requested and the canonical path, so `..`, symlinks and `/proc/self/root/...` can't reach a store; a path that can't be resolved is refused. What the fleet tools read stays readable: `/sdcard` (`fleetctl cat`/`pull`, dev APKs), the installed APK under `/data/app` and `/proc/self/maps`/`cmdline` (`room-fleet.py`). Who's there's `no_backup/whos_there` also joins the stores `/fs/list` and `/fs/write` refuse. Listing and writing `shared_prefs` are unchanged, so `fleet-restore.sh --prefs` from an older snapshot still works. **Consequence:** `fleet-backup.sh` can no longer copy preferences from a 1.274+ agent; it now fails at that step with a clear message and keeps the previous snapshot (README updated). |
+| 7 | **Low: the `/fs/read` blocklist didn't cover `shared_prefs`** | Fixed | `/fs/read` now refuses (`403 protected_path`) the app's whole private data directory: `shared_prefs` (household key, Home Assistant token, music tokens, phone sessions and pairing, fleet token), `databases`, `files`, `no_backup` (Who's there templates, companion store, sealed stores), `app_*` and `cache`, under `/data/data/<pkg>`, `/data/user/<n>/<pkg>`, `/data/user_de/<n>/<pkg>` and the Android 11+ `data_mirror` aliases. It also refuses the fleet manifest on external storage (`Android/data/<pkg>/files/fleet`, which carries the fleet token) and the `/proc/<pid>` side doors (`fd`, `fdinfo`, `map_files`, `mem`, `pagemap`, `root`, `cwd`, `exe`, `environ`, also under `task/<tid>`). The rule is checked on both the requested and the canonical path, so `..`, symlinks and `/proc/self/root/...` can't reach a store; a path that can't be resolved is refused. What the fleet tools read stays readable: `/sdcard` (`fleetctl cat`/`pull`, dev APKs), the installed APK under `/data/app` and `/proc/self/maps`/`cmdline` (`room-fleet.py`). Who's there's `no_backup/whos_there` also joins the stores `/fs/list` and `/fs/write` refuse. Listing and writing `shared_prefs` were left open here for `fleet-restore.sh --prefs` from an older snapshot; finding 15 closes them. **Consequence:** `fleet-backup.sh` can no longer copy preferences from a 1.274+ agent; it now fails at that step with a clear message and keeps the previous snapshot (README updated). |
 | 8 | **Residual of 5: DNS rebinding on the Immich album check** | Fixed | `LanUrlPolicy.immichAlbumsTarget` resolves a phone-typed host once and returns the checked answer (`Target.Pinned`). `ImmichPinnedFetch` then connects to exactly those addresses through OkHttp with a pinned `Dns` (answers only that host, only with those addresses; any other name is `UnknownHostException`) and no proxy, so there is no second lookup. The URL keeps the host name, so the `Host` header, TLS SNI and certificate verification use the typed name. Redirects stay on the credential's origin and never downgrade (`PhotoSourceRedirects.redirectTarget`, at most 5), the reply is capped at 4 MiB, and the 20 s budget is also the OkHttp call timeout. The saved server (`Target.Saved`) keeps its normal path. |
 
 Tests: `FleetSecretPathsTest` (+8: every secret store under each data-dir alias, the fleet manifest, `/proc` side doors versus `maps`/`cmdline`/`status`, the fleet tools' paths, judging the resolved target, failed resolution, list/write left open) and `ImmichPinnedFetchTest` (10, against a loopback server under an unresolvable `.test` name: `Host` header and key, pinned DNS refuses other names, a URL for another host is refused before connecting, same-origin redirect stays pinned, cross-host redirect refused, oversized reply, error status, HTTPS ClientHello carries the typed name as SNI to the pinned address, a rebinding resolver is called once and its first answer is the one used, the saved server is not pinned). `:app:testDebugUnitTest`: 7,344 tests, 0 failures. `:app:assemblePerformance`: passes. `provisioning/test_fleet_backup.py`: 23 passed.
@@ -156,7 +156,7 @@ off the wire and off both disks instead of reopening `/fs/read`:
 | 10 | **Medium: import steps rate-limited as one route.** `begin` and `apply` shared the 2 s gap, so every real restore hit `429` (found on Family) | Fixed | Each step is limited on its own key; the Mac retries a `429` after its `retryAfterSec` |
 | 11 | **Low: `begin` replaces the pending import session.** A token holder can cancel an operator's in-flight import (rate-limited) | Accepted | Needs the fleet token, which already controls the device; the operator reruns |
 | 14 | **Low: a pending key can be replaced before the owner confirms it.** The owner's confirm then names a key id that is no longer pending and does nothing | Accepted | Activation still needs USB and the exact id; the owner reruns `fleet-backup.sh` |
-| 12 | **Info: replaying an old archive.** An attacker can't re-wrap an exported data key without the Mac's private key, so a token holder can only import archives they build, which `/fs/write` to `shared_prefs` already allows | Accepted | - |
+| 12 | **Info: replaying an old archive.** An attacker can't re-wrap an exported data key without the Mac's private key, so a token holder can only import archives they build | Accepted | The import validates and scopes what it applies (allowlisted files, schema, caps, never `fleet_agent` or the backup key); since finding 15 it is the only way in |
 | 13 | **Info: Kotlin `org.json` keeps the last of duplicate keys; Python data keys can't be zeroed** | Accepted | The archive is authenticated and fully re-validated after parsing; the Mac already holds the private key |
 
 Tests: `FleetBackupCryptoTest` (13: only the backup key opens it, fresh key and nonce, header,
@@ -181,6 +181,31 @@ restored to official 1.274 (sha256 `1aea49e8...a9d5`, matching the OTA log):
 | Round trip: `darkRoomLux` 3 → 4 and test phone sessions revoked (`401`), then `fleet-restore.sh --prefs` and a reboot | `darkRoomLux` 3 again; the revoked test session valid again (`200`, so sessions came back from the archive); household key fingerprint `6c4fd1f1` unchanged; Home Assistant `live` before and after |
 | `FORGET_BACKUP_KEY` over adb | key cleared; no `FATAL` in logcat |
 
+### Raw writes into private data (branch `fswrite-guard`, on top of 1.276)
+
+| # | Finding | Status | Fix |
+|---|---|---|---|
+| 15 | **Low: `/fs/write` accepted the app's private data.** A fleet-token holder could overwrite `shared_prefs` (household key, sessions, tokens), `databases`, `files` and `no_backup` directly, bypassing the sealed import's validation | Fixed | `/fs/write` and `/fs/list` now apply the same rule as `/fs/read` (`FleetSecretPaths.isPrivate`, `403 protected_path`): the private data directory under `/data/data/<pkg>`, `/data/user/<n>/<pkg>`, `/data/user_de/<n>/<pkg>` and `data_mirror`, the fleet manifest on external storage and the `/proc/<pid>` side doors (`root`, `cwd`, `fd`, ...). It is judged on the requested path and on the canonical one, so `..`, symlinks and `/proc/self/root/...` land on the same rule, and a path that can't be resolved is refused. The writer commits to that same canonical path. Still open to the fleet tools: `/sdcard` (`fleetctl push`, `fleetctl dev update`'s APK under `Android/data/<pkg>/files/dev`), and listing the installed APK's directory under `/data/app` (`room-fleet.py`). No tool writes music files through `/fs/write`. `fleet-restore.sh --prefs` (and the default `--apps --prefs`) now refuses an older plaintext snapshot before any action and tells the operator to take a sealed backup first; `--apps` and `--config` still read it. Preferences come back only through `/backup/import` |
+
+Tests: `FleetSecretPathsTest` (+5: every private store under each alias for writes, the requested
+and the resolved path judged separately, real `..` and a real symlink into a private tree, the
+fleet tools' push targets stay open, listings refuse the private tree but keep `/data/app`).
+`provisioning/test_fleet_restore.py`: the plaintext preference tests are replaced by refusal tests
+(every `--prefs` combination, the default modes; `--apps --config` still restores from a plaintext
+snapshot without a push). `:app:testDebugUnitTest`: 7,403 tests, 0 failures. `:app:assemblePerformance`:
+passes. `test_fleet_restore.py`, `test_fleet_backup.py`, `test_fleet_sealed_restore.py`: 74 passed.
+
+On Family (Portal+, over the fleet route with its token), this build (performance APK, sha256
+`271119e7...4af43d3a`), then restored to official 1.276 (sha256 `26338204...aea01613e`, matching the OTA log):
+
+| Check | Before (the 1.276 code on the device) | This build |
+|---|---|---|
+| `/fs/list` of `shared_prefs` (`/data/data/<pkg>`, `/data/user/0/<pkg>`, `/proc/self/root/...`) | 200, file list | 403 `protected_path` |
+| `/fs/write` into `shared_prefs` via `/data/data`, `/data/user/0`, `/proc/self/root`, `/proc/self/cwd`, `files/../shared_prefs`, `/sdcard/../../../data/...`, `/storage/emulated/0/../../../data/user/0/...` | - | 403 `protected_path` each |
+| `/fs/write` into `databases`, `files`, `no_backup`, `/data/user_de/0/<pkg>`, the fleet manifest | - | 403 `protected_path` each |
+| `/fs/write` through an adb-made symlink in `/data/local/tmp` pointing at `shared_prefs` | - | 500 `Permission denied` (the app can't traverse the shell's directory; nothing written). The symlink case itself is covered on the JVM |
+| `/fs/write` to `/sdcard/Download` and to `Android/data/<pkg>/files/dev` (dev APK location), then `/fs/read` | - | 200, content read back; probe files deleted |
+
 ### Still open
 
 - **Residual (finding 5):** a private-LAN Immich URL may name the Portal's own LAN address. It needs a
@@ -188,9 +213,6 @@ restored to official 1.274 (sha256 `1aea49e8...a9d5`, matching the OTA log):
 - **Info: any household-key holder can claim any device id** (no per-device keys), point peer
   clients at any RFC 1918 host:port, wipe music history, or raise a forged leak alert. That is the
   household trust model; replies are still HMAC-verified and redirects are off.
-- **Existing, unchanged:** `/fs/write` still accepts `shared_prefs` (older plaintext restores use
-  it), so a fleet-token holder can still overwrite preferences. A follow-up can close it now that
-  sealed import exists.
 - **Sealed backups:** a Portal reinstalled with another signing key reports a new `ANDROID_ID`;
   restoring everything then needs the operator's `--same-serial`. Pending enrolments are
   confirmed over USB only; an on-screen confirmation would remove that step.
