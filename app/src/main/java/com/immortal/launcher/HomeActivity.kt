@@ -65,6 +65,8 @@ class HomeActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    // Cold start: the RenderThread's one-time EGL setup overlaps the first composition.
+    RenderThreadWarmup.start()
     // A restored Activity carries its old launch Intent; only a new launch or onNewIntent
     // delivery can identify Meta's bootstrap redirect.
     pendingResumeIntent = if (savedInstanceState == null) intent else null

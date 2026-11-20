@@ -43,6 +43,12 @@ class StartupPrefsWarmupTest {
     assertEquals(listOf("a", "b", "c"), opened)
   }
 
+  @Test fun homesFirstFrameFilesAreWarmed() {
+    // Cold-boot trace (1.285): unwarmed, these five cost ~47 ms of main-thread waits inside Home's first frame.
+    val firstFrame = listOf("immortal_display", "immortal_share_fresh", "immortal_countdown", "immortal_todos", "immortal_crypto")
+    assertEquals(emptyList<String>(), firstFrame.filterNot { it in StartupPrefsWarmup.FILES })
+  }
+
   @Test fun theListStartsWithApplicationSetup() {
     assertTrue(StartupPrefsWarmup.FILES.indexOf("immortal_routines") < StartupPrefsWarmup.FILES.indexOf("immortal_welcome"))
   }
