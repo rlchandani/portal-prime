@@ -115,6 +115,8 @@ class RemoteRoutes internal constructor(
         MusicHandoffNet.PATH -> MusicHandoffNet.handle(context, req)
         // Portal↔Portal chores exchange: HouseholdKey-signed like the list, its own message types.
         ChoresPeerRoute.PATH -> ChoresPeerRoute.handle(context, req)
+        // Portal↔Portal reminders exchange: HouseholdKey-signed, the replica sealed (AES-GCM) inside.
+        RemindersPeerRoute.PATH -> RemindersPeerRoute.handle(context, req)
         // Portal↔Portal household settings exchange: HouseholdKey-signed, its own message types.
         SettingsSyncNet.PATH -> SettingsSyncNet.handle(context, req)
         // Portal↔Portal call setup: household-signed SDP offer/answer with bound DTLS fingerprints.

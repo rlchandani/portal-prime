@@ -124,7 +124,7 @@ private fun BriefingHost(personId: String?, onDismiss: () -> Unit, onSpeak: (Str
 
 /**
  * The personal part, live: null (the household briefing) unless Who's there? still shows [personId]'s Home.
- * Their events load once; their reminders come from the shared list; private items follow
+ * Their events load once; their reminders come from the reminders store; private items follow
  * [BriefingPersonalPolicy.hidePrivate], re-checked on every Who's there? change and when the hold ends.
  */
 @androidx.compose.runtime.Composable
@@ -139,7 +139,7 @@ private fun rememberBriefingPersonal(personId: String?): BriefingPersonalInputs?
   var reminders by remember(owner.id) { mutableStateOf(emptyList<String>()) }
   LaunchedEffect(owner.id) {
     reminders = withContext(Dispatchers.IO) {
-      runCatching { WhosThereContent.reminders(HouseholdListStore.current(context).open().map { it.text.value }, owner) }
+      runCatching { ReminderVisibility.briefingTitles(ReminderStore.current(context), owner, ui.people) }
           .getOrElse { Log.w("ImmortalBriefing", "personal reminders unavailable", it); emptyList() }
     }
     val day = withContext(Dispatchers.IO) { loadWhosThereDay(context.applicationContext, owner, ui.people) }

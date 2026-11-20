@@ -16,6 +16,10 @@ import android.util.Log
 import com.immortal.launcher.Calling
 import com.immortal.launcher.CcJarvisHome
 import com.immortal.launcher.DoorbellCardOverlay
+import com.immortal.launcher.ReminderLimits
+import com.immortal.launcher.ReminderStore
+import com.immortal.launcher.RemindersFeature
+import com.immortal.launcher.WhosThere
 import com.immortal.launcher.jarvis.wake.HearthpaneWake
 import org.json.JSONObject
 
@@ -28,7 +32,18 @@ import org.json.JSONObject
 class HearthpaneToolProvider : ContentProvider() {
   private val tools by lazy {
     HearthpaneTools(HearthpaneScreens::current, { target, hint -> JarvisHighlight.show(target, hint) },
-        homeControl = { args -> CcJarvisHome.run(requireNotNull(context), args) }, search = SettingsJarvisContext::search)
+        homeControl = { args -> CcJarvisHome.run(requireNotNull(context), args) }, search = SettingsJarvisContext::search,
+        reminders = { args -> reminderTool.invoke(args) })
+  }
+  private val reminderTool by lazy {
+    val ctx = requireNotNull(context).applicationContext
+    HearthpaneReminders(
+        who = { WhosThere.state.value },
+        state = { ReminderStore.current(ctx) },
+        add = { draft -> RemindersFeature.add(ctx, draft, ReminderLimits.JARVIS, ReminderStore.Source.JARVIS) },
+        setDone = { id -> RemindersFeature.setDone(ctx, id, true, ReminderStore.Source.JARVIS) },
+        use24 = { android.text.format.DateFormat.is24HourFormat(ctx) },
+    )
   }
 
   override fun onCreate(): Boolean = true

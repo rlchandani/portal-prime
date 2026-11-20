@@ -27,7 +27,8 @@ class HearthpaneToolDeclarationsTest {
   @Test fun everyToolHearthpaneAnswersIsDeclaredWithItsShape() {
     val decls = declarations()
     val names = (0 until decls.length()).map { decls.getJSONObject(it).getString("name") }
-    assertEquals(listOf(HearthpaneTools.SCREEN_CONTEXT, HearthpaneTools.HIGHLIGHT, HearthpaneTools.HOME_CONTROL), names)
+    assertEquals(listOf(HearthpaneTools.SCREEN_CONTEXT, HearthpaneTools.HIGHLIGHT, HearthpaneTools.HOME_CONTROL,
+        HearthpaneTools.REMINDERS), names)
     for (i in 0 until decls.length()) {
       val d = decls.getJSONObject(i)
       assertTrue(d.getString("description").isNotBlank())
@@ -42,5 +43,16 @@ class HearthpaneToolDeclarationsTest {
     assertTrue(home.getString("description").contains("needs_confirmation"))
     // No percent sign: aapt would read it as a format string.
     assertTrue(!File("src/main/res/values/jarvis_tools.xml").readText().contains('%'))
+  }
+
+  @Test fun remindersTakesAnActionAndPromisesPrivateItemsAreNeverReadOut() {
+    val decls = declarations()
+    val r = (0 until decls.length()).map { decls.getJSONObject(it) }.single { it.getString("name") == HearthpaneTools.REMINDERS }
+    assertEquals("action", r.getJSONObject("parameters").getJSONArray("required").getString(0))
+    val props = r.getJSONObject("parameters").getJSONObject("properties")
+    for (key in listOf("action", "title", "for", "time", "date", "private", "id")) assertTrue(key, props.has(key))
+    assertEquals("BOOLEAN", props.getJSONObject("private").getString("type"))
+    assertTrue(r.getString("description").contains("needs_person"))
+    assertTrue(r.getString("description").contains("never read out"))
   }
 }

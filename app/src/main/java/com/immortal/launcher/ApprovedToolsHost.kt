@@ -212,6 +212,7 @@ private fun ToolsWorkspacePanes(selected: String, holder: SaveableStateHolder) {
                             when (id) {
                                 "alarm" -> ToolsAlarmContent()
                                 "timers" -> ToolsTimersContent()
+                                "reminders" -> ToolsRemindersContent()
                                 "countdowns" -> ToolsCountdownsContent()
                                 "converter" -> ToolsConverterContent()
                                 "lamp" -> ToolsLampContent()
@@ -395,6 +396,7 @@ private fun ToolsLibraryEntry(tool: ApprovedTool, summary: String, compact: Bool
 private fun toolsDefaultSummary(id: String): String = when (id) {
     "alarm" -> "Your next wake-up time"
     "timers" -> "Ready when you are"
+    "reminders" -> "For everyone, or just you"
     "countdowns" -> "Dates to look forward to"
     "converter" -> "Works offline"
     "lamp" -> "Brightness and warmth"
