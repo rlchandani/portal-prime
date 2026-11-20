@@ -30,6 +30,8 @@ class DigitalClockDreamService : DreamService() {
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
+    // A dream on a cold process: presence listeners (Music follows you, Who's there) must exist.
+    DeferredStartup.ensureStarted()
     Log.i(TAG, "attached: digital clock dream starting")
     isInteractive = true
     isFullscreen = true

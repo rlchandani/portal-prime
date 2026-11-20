@@ -204,3 +204,122 @@ merged branch.
 3. **CC:** decide whether ~10 MB of reclaimable GPU cache is worth a hidden-API trim and a slower reopen.
 4. **Settings and Calls Back:** per-window attribution of Home's frames.
 5. **Mini survey** when it is on USB.
+
+---
+
+# Round 5 (perf-5)
+
+Family Portal+ (`<family>`), debloated as in round 4, performance build plus its `.dm`. Before every run I checked
+`reason=install-dm` and the APK sha. Cold starts are real reboots with no force-stop, and the numbers come from untraced
+reboots. Main moved from 1.279 to 1.280 (split-home) during the round. The first A/B uses 1.279, and the final table
+uses main 1.280 against perf-5 merged with 1.280. The Mini was not on USB.
+
+## Cold start: what the trace showed
+
+- **What requested the stale first frame: `ProfileInstallerInitializer`.** At +456 ms, inside `bindApplication`, it
+  calls `Choreographer.postFrameCallback`. In the perf-4 trace that is a `scheduleFrameLocked` slice under
+  `ProfileInstallerInitializer`, and it lands on exactly the first frame's IntendedVsync. Home's traversal joined that
+  frame, so gfxinfo timed the first frame from inside `Application.onCreate`.
+- **EmojiCompat and ProcessLifecycle** spent 132 ms in `Startup`, 121 ms of it I/O wait. App code reads neither: the
+  dex shows only androidx-internal references. EmojiCompat can't load a font on a Portal anyway, because there is no
+  font provider and no GMS.
+- **`Application.onCreate` installs** took about 590 ms. The largest were DinnerCall 92, HouseholdList 63, Calling 45,
+  HouseholdBus 38, MediaSessionReader 30, HearthpaneWake 29, SettingsSync 28, MusicHandoff 27, SharedTimers 26 and
+  OtaUpdater 26 ms. Most of that time was page faults.
+- **After both fixes** (traced 1.279 + perf-5):
+  - `bindApplication` takes 794 ms, down from 1150.
+  - The first doFrame (535 ms) still spends about 120 ms asleep waiting on SharedPreferences loader threads, and
+    another 88 ms before it. Home's first composition reads about 17 prefs files from a cold eMMC.
+  - The second frame's stale IntendedVsync comes from a frame request inside that long first doFrame. Its own doFrame
+    takes 21 ms.
+
+## Fixes kept
+
+1. `perf: drop androidx Startup initializers from the cold-start path` (c87076e7).
+   - Removes the InitializationProvider.
+   - `BackgroundProfileInstall` writes the baseline profile from its own background-priority thread 10 s after
+     startup. This keeps OTA/sideload installs compiled, with no frame request.
+2. `perf: defer Application setup that Home's first frame doesn't need` (13a72589).
+   - About 30 installs run after the first frame any of our activities draws, in their original order, one
+     main-thread message per step (`DeferredStartup`). A 3 s fallback covers a process with no activity.
+   - Still synchronous: CrashGuard, Fleet route registrations, guest mode, DreamPolicy, PresenceHub, Who's there,
+     Hey Jarvis (its activity counter must see Home), rotation, status bar, and every alarm/timer re-arm.
+   - FleetAgentService (sticky restart), both dreams, TimerReceiver and the Jarvis tool provider call
+     `ensureStarted()` first.
+   - Every boot-critical service still starts. Fleet, OTA, the household bus, doorbell and Control Center alerts start
+     about 1 s after Home's first frame, and the fleet service was created at +1.95 s in the trace.
+
+## Before / after (Family, debloated, 3 reboots each, median (range), ms)
+
+First A/B on 1.279 (b0 = main, c1 = fix 1, c2 = fixes 1 + 2):
+
+| | 1.279 | + initializers | + deferred setup |
+|---|---|---|---|
+| Home `Displayed` | 1859 (1736–2115) | 1792 (1700–1922) | 1627 (1558–1725) |
+| First frame, gfxinfo | 896 (876–981) | 504 (447–628) | **474 (384–518)** |
+| First frame on screen, after process start | 1489 (1475–1828) | 1657 (1484–1662) | **1371 (1233–1406)** |
+
+Final, on 1.280 (main vs perf-5 merged with 1.280):
+
+| | Before (1.280) | After (perf-5) |
+|---|---|---|
+| Home `Displayed` | 1745 (1673–1778) | **1638 (1606–1684)** |
+| First frame, gfxinfo | 918 (875–918) | **367 (254–443)** |
+| Second frame | 525 (444–535) | **413 (338–550)** |
+| First frame on screen, after process start | 1480 (1390–1509) | 1397 (1306–2038) |
+
+**First frame under 800 ms: met** (367 ms median on 1.280).
+
+Pixel diffs (main 1.280 vs perf-5; header with the clock blacked out):
+- Settings, Tools library, Reminders, library after Back, Reminders reopened, and Calls: **100.0000 % identical**.
+- Music: identical outside the live sign-in code, which changes on every open.
+- Control Center (cc_debug dry-run plan, whole frame blurred so no names are stored): no pixel differs by more than
+  4/255 outside two live areas.
+
+All 7431 unit tests pass (817 classes), and `:app:assemblePerformance` passes on the merged branch.
+
+## Tried, not kept
+
+- **Reading `shared_prefs` first in the startup prefetch.** This targets the 210 ms of SharedPreferences waits.
+  On 1.280 (3 reboots), `Displayed` improved to 1552 ms, but the first frame rose to 406 ms (vs 367) and one run put
+  its first frame on screen at +2.6 s. Not a measurable win. It matches round 4's appComponentFactory result.
+- **Screensaver CSS probes**, injected live over DevTools on a scratch debuggable build: outgoing scene not frozen
+  during the fade, and doodle SVG backgrounds removed. Neither was measurably better on natural beats, and keeping
+  the outgoing scene running was worse (440 ms frames).
+
+## Findings without a change
+
+- **Screensaver photo change (Chromium trace, scratch debuggable build, test source only).**
+  - The long frames are the RenderThread's `DrawFn_DrawGL` waiting in
+    `BlockingSequenceRunner::Sequence::RunAllTasks::Wait` on the in-process GPU thread. That thread is in
+    `RasterDecoderImpl::DoEndRasterCHROMIUM::Flush`, i.e. GPU raster of the new scene's tiles.
+  - Image decode is cheap: `GpuImageDecodeCache::DecodeImage` totals 12 ms on a worker. `img.decode()` already runs
+    before every promotion (`preloadDecoded`), so decode-before-swap is in place.
+  - The 3 × ~480 ms pattern doesn't reproduce reliably. One natural beat gave 421/410/408 ms. Four more minutes of
+    beats on the same build peaked at 108–181 ms. Beats fall about 30–60 s apart in shuffle, so A/B needs a pinned
+    mode or a shorter interval.
+  - Forced `immortalSlideshow.next()` calls are not a valid substitute. They queue behind a running fade and once
+    stalled the engine.
+  - The framestats buffer keeps only 120 frames, so a change has to be sampled by polling (`bursts.py`), not by a
+    single dump.
+- **Settings open (per window, 6 opens).** Home draws 2 frames as Settings covers it: 20–57 ms and then 25–69 ms
+  (median about 64). Settings' own first frame is 44–149 ms.
+- **Calls (per window, 6 visits).**
+  - Back: Home's first frame takes 64–88 ms (median about 75), then 27–43 ms.
+  - Open: Home keeps drawing 20–25 frames, mostly 8–20 ms, under Calls' opening. Isolated 56–195 ms frames happen
+    in 3 of 6 opens.
+  - Home's composition reloads `ImmortalSettings`/`WelcomeConfig`/`FleetConfig` on every `ON_RESUME`
+    (`appsRefreshKey`), and the apps chrome bumps its revision on resume. These are the first candidates for the Back
+    frame, but they need a traced attribution before any change, because they are how Home picks up Settings edits.
+
+## Next
+
+1. **Cold start:** the SharedPreferences waits (about 210 ms on the main thread) are now the largest block before
+   Home's first frame. Find which files the first composition reads and either read them before `setContent` off the
+   main thread or batch them. The second frame's stale vsync comes from a frame request inside the 535 ms first
+   doFrame.
+2. **Screensaver:** pin a mode (or shorten the interval) for a repeatable A/B. Then attribute the GPU-thread raster
+   per mode with the CDP tracer (`disabled-by-default-gpu.service`).
+3. **Calls Back / Settings:** trace Home's 75 ms Back frame and its second frame under Settings with app tracing
+   (profileable scratch build), then gate the resume reloads on an actual settings change.
+4. **Mini survey** when it is on USB.

@@ -228,6 +228,8 @@ dependencies {
   implementation(libs.androidx.lifecycle.runtime.ktx)
   // Stable background-only startup API; minSdk 24, with supported legacy-provider fallback.
   implementation("androidx.webkit:webkit:1.17.1")
+  // Baseline-profile install for OTA/sideloaded builds, run by BackgroundProfileInstall (not androidx Startup).
+  implementation("androidx.profileinstaller:profileinstaller:1.4.0")
   // Smooth drag-to-reorder + animated reflow for the home-screen app grid (Apache-2.0).
   implementation(libs.reorderable)
   debugImplementation(libs.androidx.compose.ui.tooling)
