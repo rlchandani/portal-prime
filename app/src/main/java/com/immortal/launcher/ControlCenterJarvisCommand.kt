@@ -117,6 +117,8 @@ internal object CcHomeCommand {
         "switch", "fan", "input_boolean" -> if (kindOf(e) == CcHomeWhat.VALVE) valve(e, on) else CcCalls.power(e, on)
         "media_player" -> CcCalls.mediaPower(e, on)
         "valve" -> valve(e, on)
+        // bestDevice lets a scene be named under ON ("turn on movie time"): that means run it.
+        "scene", "script" -> if (on) CcCalls.run(e) else null
         else -> null
       }
     }
