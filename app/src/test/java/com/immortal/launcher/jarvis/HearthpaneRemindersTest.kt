@@ -140,4 +140,22 @@ class HearthpaneRemindersTest {
     val failing = HearthpaneTools({ null }, { _, _ -> }, reminders = { error("boom") })
     assertEquals("reminders failed", failing.invoke(HearthpaneTools.REMINDERS, "{}").getString("error"))
   }
+
+  /** Regression (Family, 1.270): "tomorrow at 9" landed two days out when the model sent a UTC date. */
+  @Test fun relativeDaysResolveOnThePortalsClock() {
+    assertTrue(call("action" to "add", "title" to "a", "day" to "tomorrow", "time" to "09:00").getBoolean("ok"))
+    assertEquals(NOW + 23 * 3_600_000, added.last().dueMs)
+    assertTrue(call("action" to "add", "title" to "b", "day" to "Today", "time" to "18:00").getBoolean("ok"))
+    assertEquals(NOW + 8 * 3_600_000, added.last().dueMs)
+    // NOW is a Friday: "friday" is next week's, "sunday" is in two days (9:00 by default).
+    assertTrue(call("action" to "add", "title" to "c", "day" to "friday", "time" to "10:30").getBoolean("ok"))
+    assertEquals(NOW + 7 * 86_400_000L + 30 * 60_000, added.last().dueMs)
+    assertTrue(call("action" to "add", "title" to "d", "day" to "sunday").getBoolean("ok"))
+    assertEquals(NOW + 2 * 86_400_000L - 3_600_000, added.last().dueMs)
+    // "day" wins over a conflicting date; a passed time today and junk are refused.
+    assertTrue(call("action" to "add", "title" to "e", "day" to "tomorrow", "date" to "2027-01-17", "time" to "09:00").getBoolean("ok"))
+    assertEquals(NOW + 23 * 3_600_000, added.last().dueMs)
+    assertTrue(call("action" to "add", "title" to "f", "day" to "today", "time" to "08:00").has("error"))
+    assertTrue(call("action" to "add", "title" to "g", "day" to "someday").has("error"))
+  }
 }
