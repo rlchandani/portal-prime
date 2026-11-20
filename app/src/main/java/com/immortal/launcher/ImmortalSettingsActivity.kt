@@ -185,6 +185,7 @@ class ImmortalSettingsActivity : ComponentActivity() {
     SettingsLastPage.write(this, stack.current)
     // Kept awake while visible, set before the first frame so it costs no second window relayout.
     window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    keepHomesBarState()
     setContent {
       PortalPrimeTheme(darkTheme = false) {
         val navigate = remember { ::navigateLocal }
@@ -206,6 +207,19 @@ class ImmortalSettingsActivity : ComponentActivity() {
     }
     observeEntryFirstDraw()
     trackForJarvis()
+  }
+
+  /**
+   * Home hides the navigation bar (immersive, sticky). A focused window that doesn't makes Android clear Home's
+   * hide-navigation flag as Settings covers it, which relayouts Home's whole window (insets, measure, a fresh
+   * recording) in the frames Settings opens. Settings asks for the same hidden navigation bar before its first
+   * frame, so the bars' state never changes. The Portal has no navigation bar to show, so Settings looks the same.
+   */
+  private fun keepHomesBarState() {
+    androidx.core.view.WindowInsetsControllerCompat(window, window.decorView).apply {
+      hide(androidx.core.view.WindowInsetsCompat.Type.navigationBars())
+      systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
   }
 
   /** Floating Jarvis: this page is what `screen_context` describes, and Jarvis can point at its rows. */

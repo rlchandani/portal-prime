@@ -17,7 +17,7 @@ import android.util.Log
 /**
  * Listening sessions on the microphone. Each [start] runs one capture thread that reads 30 ms of 16 kHz PCM at a
  * time, gains it ([WakeGain]), runs it through a [MicroFrontend] and the [WakeWordModel], and forgets it. The mic is released the moment a
- * session ends: [stop] (main thread) unblocks the read. A wake ends detection at once and is reported; the recorder
+ * session ends: [stop] (main thread, never blocking it) unblocks the read. A wake ends detection at once and is reported; the recorder
  * then bridges (reads and discards) until Jarvis's own recording is live, so Jarvis starts on a warm input.
  *
  * Audio never leaves this class: nothing is kept past the frontend's 30 ms window, logged or stored.
@@ -134,12 +134,17 @@ internal class WakeMic(
     thread = Thread(session, "hearthpane-wake").apply { isDaemon = true; start() }
   }
 
-  /** Main thread. Stops at once: the blocked read returns and the capture thread releases the mic. */
+  /**
+   * Main thread. Stops at once: the blocked read returns and the capture thread releases the mic. The recorder's
+   * stop is a call into the audio server that took 41–47 ms on Family; it runs on [stopper], so Home leaving the
+   * screen (Settings opening, for one) never waits on it. The capture thread ends within one 30 ms read anyway.
+   */
   fun stop() {
     val session = current ?: return
     current = null
     session.live = false
-    runCatching { session.record?.stop() }
+    val record = session.record ?: return
+    stopper.execute { runCatching { record.stop() } }
   }
 
   @SuppressLint("MissingPermission") // WakePolicy only listens with RECORD_AUDIO granted.
@@ -156,6 +161,10 @@ internal class WakeMic(
   }
 
   private companion object {
+    /** One daemon thread for recorder stops, off the main thread (see [stop]). */
+    val stopper: java.util.concurrent.Executor = java.util.concurrent.Executors.newSingleThreadExecutor { task ->
+      Thread(task, "hearthpane-wake-stop").apply { isDaemon = true }
+    }
     const val TAG = "HearthpaneWake"
     const val CHUNK_BYTES = 2 * MicroFrontend.STEP // 10 ms
     const val READ_BYTES = 3 * CHUNK_BYTES // 30 ms: one model step per read, ~33 wakeups a second

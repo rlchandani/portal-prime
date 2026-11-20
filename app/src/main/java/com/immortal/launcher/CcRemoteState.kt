@@ -12,28 +12,37 @@ import org.json.JSONObject
 /**
  * The phone's state answer (pure, unit tested). The phone sends the `rev` and `minute` it holds;
  * when neither moved it gets only the connection (`unchanged`), else the entity delta from
- * [CcRemoteJournal] plus every derived slice, worked out once here.
+ * [CcRemoteJournal] plus the derived slices, worked out once here. A phone that sends the section
+ * versions it holds (`sv`) gets only the slices that changed, and `sv` ([CcRemoteSections]).
  *
  * `{ok, v, rev, minute, now, portal, conn, asks, fahrenheit, planAt, full?, unchanged?,
- *   entities[], removed[], alerts[], security{}, cameras[], scenes[], rooms[], tesla?}`
+ *   entities[], removed[], alerts[]?, security{}?, cameras[]?, scenes[]?, rooms[]?, tesla?, sv{}?}`
  */
 internal object CcRemoteState {
   const val VERSION = 1
   private const val MS_PER_MIN = 60_000L
 
-  fun json(s: CcUiState, journal: CcRemoteJournal, since: Long, minute: Long, now: Long, portal: String): JSONObject {
+  fun json(s: CcUiState, journal: CcRemoteJournal, since: Long, minute: Long, now: Long, portal: String,
+      held: Map<String, String>? = null): JSONObject {
     val delta = journal.read(s.entities, s.entitiesVersion, since)
     val nowMinute = now / MS_PER_MIN
     val out = JSONObject().put("ok", true).put("v", VERSION).put("rev", delta.rev).put("minute", nowMinute).put("now", now)
         .put("portal", portal).put("conn", conn(s.connection)).put("planAt", s.plan?.updatedAt ?: -1L)
         .put("hasPlan", s.plan?.isEmpty == false)
     if (!delta.full && delta.changed.isEmpty() && delta.removed.isEmpty() && minute == nowMinute) return out.put("unchanged", true)
-    return out.put("full", delta.full).put("asks", asks(s.settings)).put("fahrenheit", s.fahrenheit)
+    out.put("full", delta.full).put("asks", asks(s.settings)).put("fahrenheit", s.fahrenheit)
         .put("entities", CcRemoteEntities.encodeAll(delta.changed)).put("removed", JSONArray(delta.removed))
-        .put("alerts", CcRemoteSlices.alertsJson(s, now)).put("security", CcRemoteSlices.securityJson(s, now))
-        .put("cameras", CcRemoteSlices.camerasJson(s)).put("scenes", CcRemoteSlices.scenesJson(s))
-        .put("rooms", CcRemoteSlices.roomsJson(s)).putOpt("tesla", CcRemoteTesla.json(s, now))
+    return CcRemoteSections.put(out, sections(s, now), held)
   }
+
+  /** The derived slices, in a fixed order (their JSON text is what [CcRemoteSections.version] hashes). */
+  private fun sections(s: CcUiState, now: Long): Map<String, Any?> = linkedMapOf(
+      CcRemoteSections.ALERTS to CcRemoteSlices.alertsJson(s, now),
+      CcRemoteSections.SECURITY to CcRemoteSlices.securityJson(s, now),
+      CcRemoteSections.CAMERAS to CcRemoteSlices.camerasJson(s),
+      CcRemoteSections.SCENES to CcRemoteSlices.scenesJson(s),
+      CcRemoteSections.ROOMS to CcRemoteSlices.roomsJson(s),
+      CcRemoteSections.TESLA to CcRemoteTesla.json(s, now))
 
   fun conn(c: CcConnection): JSONObject = JSONObject().put("phase", c.phase.name.lowercase()).put("step", c.step)
       .put("lastLiveAt", c.lastLiveAt).put("retryAt", c.retryAt).putOpt("reason", c.disabledReason)

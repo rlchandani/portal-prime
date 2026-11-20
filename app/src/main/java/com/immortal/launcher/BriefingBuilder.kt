@@ -17,6 +17,7 @@ internal object BriefingBuilder {
   const val MAX_LIST_NAMES = 3
 
   fun build(inputs: BriefingInputs): Briefing {
+    inputs.personal?.let { return BriefingPersonalBuilder.build(inputs, it) }
     val todayEvents = (inputs.events as? BriefingPart.Ready)?.value?.let { todaysEvents(it, inputs) }
     val routine = firstMorningRoutine(inputs)
     val sections = listOfNotNull(
@@ -39,21 +40,24 @@ internal object BriefingBuilder {
 
   /** Events still to come or under way today, soonest first, at most [MAX_EVENTS]. */
   fun todaysEvents(events: List<CalendarFeed.Event>, inputs: BriefingInputs): List<CalendarFeed.Event> {
-    val endOfDay = Calendar.getInstance(inputs.zone, inputs.locale).apply {
-      timeInMillis = inputs.nowMs
-      set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
-      add(Calendar.DAY_OF_MONTH, 1)
-    }.timeInMillis
+    val endOfDay = endOfDay(inputs)
     return events.filter { it.endMillis > inputs.nowMs && it.startMillis < endOfDay }
         .sortedWith(compareBy<CalendarFeed.Event> { !it.allDay }.thenBy { it.startMillis })
         .take(MAX_EVENTS)
   }
 
+  /** Local midnight at the end of [BriefingInputs.nowMs]'s day. */
+  fun endOfDay(inputs: BriefingInputs): Long = Calendar.getInstance(inputs.zone, inputs.locale).apply {
+    timeInMillis = inputs.nowMs
+    set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+    add(Calendar.DAY_OF_MONTH, 1)
+  }.timeInMillis
+
   /** The earliest routine of today that starts before noon. */
   fun firstMorningRoutine(inputs: BriefingInputs): BriefingRoutine? =
       inputs.routines.filter { it.startMinute < BriefingCopy.NOON_MINUTE }.minByOrNull { it.startMinute }
 
-  private fun weatherSection(inputs: BriefingInputs): BriefingSection {
+  internal fun weatherSection(inputs: BriefingInputs): BriefingSection {
     val heading = "Weather"
     val part = inputs.weather
     if (part !is BriefingPart.Ready) return BriefingSection(BriefingSectionKind.WEATHER, heading,
@@ -97,7 +101,7 @@ internal object BriefingBuilder {
     return BriefingSection(BriefingSectionKind.LIST, heading, lines)
   }
 
-  private fun timersSection(timers: List<BriefingTimer>): BriefingSection? {
+  internal fun timersSection(timers: List<BriefingTimer>): BriefingSection? {
     if (timers.isEmpty()) return null
     val lines = timers.sortedBy { it.remainingMs }.map { t ->
       val left = if (t.paused) "Paused, " + BriefingCopy.remaining(t.remainingMs).replaceFirstChar { it.lowercase() }
@@ -107,7 +111,7 @@ internal object BriefingBuilder {
     return BriefingSection(BriefingSectionKind.TIMERS, if (timers.size == 1) "Timer" else "Timers", lines)
   }
 
-  private fun routineSection(r: BriefingRoutine, use24Hour: Boolean): BriefingSection =
+  internal fun routineSection(r: BriefingRoutine, use24Hour: Boolean): BriefingSection =
       BriefingSection(BriefingSectionKind.ROUTINE, "First routine",
           listOf("${r.name} at ${BriefingCopy.clockOfMinute(r.startMinute, use24Hour)}"))
 }

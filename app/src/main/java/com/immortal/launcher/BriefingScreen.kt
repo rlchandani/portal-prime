@@ -60,6 +60,17 @@ internal fun BriefingScreen(briefing: Briefing?, onDismiss: () -> Unit) {
       SectionColumn(left, Modifier.weight(1f))
       SectionColumn(right, Modifier.weight(1f))
     }
+    briefing.note?.let { BriefingNote(it) }
+  }
+}
+
+/** The personal briefing's privacy promise, quiet, under the sections. */
+@Composable
+private fun BriefingNote(note: String) {
+  Row(Modifier.fillMaxWidth().padding(top = 20.dp), verticalAlignment = Alignment.CenterVertically) {
+    ApprovedHomeIcon("lock", Modifier.size(24.dp), ApprovedHomePalette.Secondary)
+    Text(note, color = ApprovedHomePalette.Secondary, fontSize = 22.sp, lineHeight = 28.sp, maxLines = 1,
+        overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 10.dp))
   }
 }
 

@@ -20,6 +20,12 @@ phone. It is an admin-equivalent secret for the whole house, so it stays on the 
   app is started. It sends the `rev` it holds. `CcRemoteJournal` returns only the entities that
   changed, or `unchanged` when nothing moved within the same minute. A full answer goes to
   a new phone, one that fell too far behind, or one ahead of a restarted Portal.
+- **Only the sections that changed.** The phone also sends the version it holds of each derived
+  section (`sv`: alerts, security, cameras, scenes, rooms, tesla; `{}` when it holds none). The
+  Portal answers with every current version and only the sections whose version differs
+  (`CcRemoteSections`: a hash of the section's JSON, so it is stateless and the same for every
+  phone). A phone that sends no `sv` (Toolkit 1.8.17 and older) gets every section as before; a
+  Portal that predates `sv` ignores it and sends every section, and the phone takes them all.
 - **One source of truth for wording.** Alerts, the Security sensor list, people, cameras,
   scenes, room summaries and the Tesla screen are derived on the Portal by the same helpers
   its own screens use (`CcAlerts`, `CcSecurityList`, `CcTeslaCar`…). The phone draws them.
@@ -34,7 +40,7 @@ All require `Authorization: Bearer <paired session>`. The fleet token is not acc
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/remote/controlcenter` | Everything (same as `POST {since:0}`) |
-| `POST` | `/remote/controlcenter` | `{since, minute, want?}` → `{rev, conn, entities[] (delta), removed[], alerts[], security{}, cameras[], scenes[], rooms[], tesla?}` or `{unchanged:true, conn}` |
+| `POST` | `/remote/controlcenter` | `{since, minute, sv?, want?}` → `{rev, conn, entities[] (delta), removed[], alerts[]?, security{}?, cameras[]?, scenes[]?, rooms[]?, tesla?, sv{}?}` or `{unchanged:true, conn}` |
 | `GET` | `/remote/controlcenter/plan` | The floor plan (`CcPlanJson`) |
 | `POST` | `/remote/controlcenter/act` | `{entity, action, value?, on?, mode?, code?, ticket?}` or `{action:"car", key}` / `{action:"car_limit", value}` → `{ok, done}` |
 | `POST` | `/remote/controlcenter/camera` | `{entity, width?}` → JPEG, fetched by the Portal from HA's `camera_proxy` |

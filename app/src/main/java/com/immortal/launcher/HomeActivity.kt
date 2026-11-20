@@ -117,6 +117,8 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -126,7 +128,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -1318,12 +1319,44 @@ private fun LauncherScreen(
   // full-screen Music recomposes nothing of Home (see HomeMusicCover).
   var musicLayout by musicLayoutState
   var musicCovered by remember { mutableStateOf(false) }
+  // Home's tab pages come back a frame before its chrome when Music closes (HomeMusicCover.closePlan).
+  var musicTabsCovered by remember { mutableStateOf(false) }
   LaunchedEffect(musicLayoutState) {
     snapshotFlow { musicLayoutState.value == MusicPlayerLayout.FULL }.collectLatest { full ->
-      if (full) { delay(HomeMusicCover.SETTLE_MS); musicCovered = true } else musicCovered = false
+      if (full) { delay(HomeMusicCover.SETTLE_MS); musicCovered = true; musicTabsCovered = true }
+      else { musicCovered = false; musicTabsCovered = false }
     }
   }
   val homeMusicLayout by remember { derivedStateOf { HomeMusicCover.homeLayout(musicLayoutState.value, musicCovered) } }
+  val homeTabsMusicLayout by remember { derivedStateOf { HomeMusicCover.homeLayout(musicLayoutState.value, musicTabsCovered) } }
+  // Leaving full-screen Music runs over three frames (HomeMusicCover.closePlan). Read in layer blocks only.
+  val homeShownOverMusic = remember { mutableStateOf(false) }
+  var musicClosing by remember { mutableStateOf(false) }
+  val musicCloseScope = rememberCoroutineScope()
+  val closeMusic: (onRemoved: () -> Unit) -> Unit = { onRemoved ->
+    if (!musicClosing) {
+      val plan = HomeMusicCover.closePlan(musicLayoutState.value, musicCovered)
+      if (plan.size == 1) { musicLayout = null; onRemoved() } else {
+        musicClosing = true
+        musicCloseScope.launch {
+          try {
+            for (step in plan) withFrameNanos {
+              when (step) {
+                MusicCloseStep.UNCOVER_TABS -> musicTabsCovered = false
+                MusicCloseStep.UNCOVER_HOME -> musicCovered = false
+                MusicCloseStep.SETTLE -> Unit
+                MusicCloseStep.SHOW_HOME -> homeShownOverMusic.value = true
+                MusicCloseStep.REMOVE_MUSIC -> { musicLayout = null; onRemoved() }
+              }
+            }
+          } finally {
+            musicClosing = false
+            homeShownOverMusic.value = false
+          }
+        }
+      }
+    }
+  }
   // Set by Home's Now playing chip: the player resumes the paused song once it is on screen.
   var musicResume by remember { mutableStateOf(false) }
   LaunchedEffect(musicOpenRequest) {
@@ -1489,7 +1522,7 @@ private fun LauncherScreen(
         hasDraft = addFlow.draft != null,
         editMode = editMode,
     )) {
-      HomeBackAction.CLOSE_MUSIC -> musicLayout = null
+      HomeBackAction.CLOSE_MUSIC -> closeMusic {}
       HomeBackAction.GO_HOME_TAB -> onSelectTab(ApprovedLauncherTab.HOME)
       HomeBackAction.CLEAR_DRAFT -> addFlow.draft = null
       HomeBackAction.EXIT_EDIT -> editMode = false
@@ -1497,7 +1530,8 @@ private fun LauncherScreen(
     }
   }
   // Home's Now Playing card hosts the YouTube player once the Music screen closes (no pause).
-  val musicCard = rememberMusicHomeCardShown(musicOpen = homeMusicLayout != null, customizing = editMode)
+  val musicCard = rememberMusicHomeCardShown(
+      musicOpen = HomeMusicCover.cardSeesMusicOpen(homeMusicLayout, musicClosing), customizing = editMode)
   val toastInsets = rememberMusicToastInsets(musicCard)
   MusicHomeDialogCover(showLibrary || addFlow.pickerSlot != null || addFlow.draft != null || showPair || showSleep ||
       showSearch || pendingSetting != null || appMenu != null)
@@ -1509,13 +1543,14 @@ private fun LauncherScreen(
       LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = FontFamily.Default)) {
     // Full-screen Music is opaque: Home stays composed beneath it but isn't drawn, so every Music
     // frame (open, countdown, spinner) composites one layer instead of three (Portal Mini GPU).
-    // Read in the draw phase: hiding Home redraws it and recomposes nothing.
+    // A zero-alpha layer is skipped by the renderer yet keeps its recorded display list, so hiding and
+    // showing Home is a layer property: it recomposes nothing and re-records nothing.
     val homeHiddenUnderMusic = remember {
-      Modifier.drawWithContent { if (musicLayoutState.value != MusicPlayerLayout.FULL) drawContent() }
+      Modifier.graphicsLayer { alpha = HomeMusicCover.homeAlpha(musicLayoutState.value, homeShownOverMusic.value) }
     }
     Box(Modifier.fillMaxSize()) {
       // A single cached display list for the static/minute-updated wallpaper.
-      Box(Modifier.matchParentSize().then(homeHiddenUnderMusic).graphicsLayer {}) { ApprovedHomeBackground() }
+      Box(Modifier.matchParentSize().then(homeHiddenUnderMusic)) { ApprovedHomeBackground() }
       // Who's there?: the recognised person's warm tint, over the wallpaper and under the chrome.
       // Only the coarse "whose Home" snapshot is read here, so indicator/camera states never recompose Home.
       val whosThereHome by WhosThere.homeView.collectAsState()
@@ -1635,14 +1670,14 @@ private fun LauncherScreen(
         }
         Box(Modifier.weight(1f).fillMaxWidth()) {
         ApprovedHomeTabs(selectedTab, Modifier.fillMaxSize().padding(
-            bottom = if (homeMusicLayout == MusicPlayerLayout.COMPACT) 210.dp else 0.dp),
-            contentActive = homeMusicLayout == null || homeMusicLayout == MusicPlayerLayout.COMPACT,
+            bottom = if (homeTabsMusicLayout == MusicPlayerLayout.COMPACT) 210.dp else 0.dp),
+            contentActive = homeTabsMusicLayout == null || homeTabsMusicLayout == MusicPlayerLayout.COMPACT,
             prefetch = LauncherTabPrefetch.HOME_TABS) { tab ->
           when (tab) {
           ApprovedLauncherTab.HOME -> {
           ApprovedHomeWidgetListening(host, enabled = homeWidgets.any { it.isAppWidget })
           // Who's there? may only open the camera while this Home page is really in front.
-          WhosThereHomeVisibility(LocalApprovedLauncherPageActive.current && homeMusicLayout != MusicPlayerLayout.FULL && !editMode)
+          WhosThereHomeVisibility(LocalApprovedLauncherPageActive.current && homeTabsMusicLayout != MusicPlayerLayout.FULL && !editMode)
           var whoSheet by remember { mutableStateOf(false) }
           val personal = whosThereHome.personal && !editMode
           val greetWelcome = remember(welcome, whosThereHome) {
@@ -1766,10 +1801,10 @@ private fun LauncherScreen(
         }
         Spacer(Modifier.height(12.dp))
       }
-      MusicFullScreenSlot(musicLayoutState) {
+      MusicFullScreenSlot(musicLayoutState, hidden = homeShownOverMusic) {
         // Music v3 (official YouTube route): its own header; leaving it hands the player to Home's card.
         MusicV3Screen(roomName = room, resumeOnOpen = musicResume,
-            onClose = { musicLayout = null; musicResume = false }, modifier = Modifier.fillMaxSize())
+            onClose = { closeMusic { musicResume = false } }, modifier = Modifier.fillMaxSize())
       }
       addFlow.draft?.let { draft ->
         val fitting = remember(homeWidgets, draft.tapped) { HomeSlots.fittingShapes(homeWidgets, draft.tapped) }

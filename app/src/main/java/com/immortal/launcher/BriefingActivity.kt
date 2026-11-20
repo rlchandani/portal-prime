@@ -16,6 +16,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +45,7 @@ class BriefingActivity : ComponentActivity() {
     setContent {
       PortalPrimeTheme(darkTheme = false) {
         BackHandler(onBack = ::dismiss)
-        BriefingHost(onDismiss = ::dismiss, onSpeak = ::speak)
+        BriefingHost(personId = intent.getStringExtra(EXTRA_PERSON), onDismiss = ::dismiss, onSpeak = ::speak)
       }
     }
   }
@@ -68,9 +69,13 @@ class BriefingActivity : ComponentActivity() {
   }
 
   companion object {
-    fun open(context: Context) {
+    /** Who's there? person id: the briefing is theirs while their Home is showing ([BriefingPersonalPolicy]). */
+    private const val EXTRA_PERSON = "person"
+
+    fun open(context: Context, personId: String? = null) {
       runCatching {
-        context.startActivity(Intent(context, BriefingActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        context.startActivity(Intent(context, BriefingActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .apply { personId?.let { putExtra(EXTRA_PERSON, it) } })
       }.onFailure { Log.w("ImmortalBriefing", "briefing could not open", it) }
     }
   }
@@ -84,9 +89,10 @@ private const val SPEAK_WAIT_MS = 12_000L
 private const val AUTO_CLOSE_MS = 10 * 60_000L
 
 @androidx.compose.runtime.Composable
-private fun BriefingHost(onDismiss: () -> Unit, onSpeak: (String) -> Unit) {
+private fun BriefingHost(personId: String?, onDismiss: () -> Unit, onSpeak: (String) -> Unit) {
   val context = androidx.compose.ui.platform.LocalContext.current
   var inputs by remember { mutableStateOf<BriefingInputs?>(null) }
+  val personal = rememberBriefingPersonal(personId)
   var spoken by rememberSaveable { mutableStateOf(false) }
   var speakTimedOut by remember { mutableStateOf(false) }
   LaunchedEffect(Unit) {
@@ -106,7 +112,7 @@ private fun BriefingHost(onDismiss: () -> Unit, onSpeak: (String) -> Unit) {
       inputs = inputs?.copy(nowMs = System.currentTimeMillis())
     }
   }
-  val briefing = remember(inputs) { inputs?.let(BriefingBuilder::build) }
+  val briefing = remember(inputs, personal) { inputs?.copy(personal = personal)?.let(BriefingBuilder::build) }
   LaunchedEffect(briefing?.complete, speakTimedOut) {
     val text = briefing?.spoken ?: return@LaunchedEffect
     if (spoken || !(briefing.complete || speakTimedOut)) return@LaunchedEffect
@@ -115,3 +121,30 @@ private fun BriefingHost(onDismiss: () -> Unit, onSpeak: (String) -> Unit) {
   }
   BriefingScreen(briefing, onDismiss)
 }
+
+/**
+ * The personal part, live: null (the household briefing) unless Who's there? still shows [personId]'s Home.
+ * Their events load once; their reminders come from the shared list; private items follow
+ * [BriefingPersonalPolicy.hidePrivate], re-checked on every Who's there? change and when the hold ends.
+ */
+@androidx.compose.runtime.Composable
+private fun rememberBriefingPersonal(personId: String?): BriefingPersonalInputs? {
+  if (personId == null) return null
+  val context = androidx.compose.ui.platform.LocalContext.current
+  val ui by WhosThere.state.collectAsState()
+  var holdOver by remember { mutableStateOf(false) }
+  LaunchedEffect(Unit) { delay(BriefingPersonalPolicy.PRIVATE_HOLD_MS); holdOver = true }
+  val owner = BriefingPersonalPolicy.owner(ui, personId) ?: return null
+  var events by remember(owner.id) { mutableStateOf<BriefingPart<List<PersonalEvent>?>>(BriefingPart.Loading) }
+  var reminders by remember(owner.id) { mutableStateOf(emptyList<String>()) }
+  LaunchedEffect(owner.id) {
+    reminders = withContext(Dispatchers.IO) {
+      runCatching { WhosThereContent.reminders(HouseholdListStore.current(context).open().map { it.text.value }, owner) }
+          .getOrElse { Log.w("ImmortalBriefing", "personal reminders unavailable", it); emptyList() }
+    }
+    val day = withContext(Dispatchers.IO) { loadWhosThereDay(context.applicationContext, owner, ui.people) }
+    events = BriefingPart.Ready(day.events.takeIf { day.source != null })
+  }
+  return BriefingPersonalInputs(owner.name, BriefingPersonalPolicy.hidePrivate(ui, holdOver), events, reminders)
+}
+
