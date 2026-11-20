@@ -107,7 +107,7 @@ class ControlCenterPlanPeopleTest {
     val rooms = CcRemoteSlices.roomsJson(s)
     val byId = (0 until rooms.length()).map { rooms.getJSONObject(it) }.associateBy { it.getString("id") }
     val k = byId.getValue("kitchen")
-    assertEquals(0.99, k.getDouble("occ"), 1e-6)
+    assertEquals("0.99", k.get("occ").toString())
     val p: JSONObject = k.getJSONArray("ppl").getJSONObject(0)
     assertEquals("Maya", p.getString("n"))
     assertEquals("M", p.getString("i"))

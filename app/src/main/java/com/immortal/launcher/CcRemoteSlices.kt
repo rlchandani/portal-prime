@@ -124,13 +124,14 @@ internal object CcRemoteSlices {
    */
   private fun roomJson(floorId: String, v: CcRoomView, occ: CcRoomOcc?): JSONObject = roomBase(floorId, v).also { o ->
     if (occ == null || !occ.occupied) return@also
-    o.put("occ", occ.confidence.toDouble())
+    o.put("occ", Math.round(occ.confidence * OCC_PLACES) / OCC_PLACES) // 0.8, not 0.800000011920929
     if (occ.people.isNotEmpty()) o.put("ppl", JSONArray(occ.people.map { p ->
       JSONObject().put("k", p.key).put("n", p.name).put("i", p.initial).put("c", p.rgb and RGB_MASK)
     }))
   }
 
   private const val RGB_MASK = 0xFFFFFF
+  private const val OCC_PLACES = 100.0
 
   private fun roomBase(floorId: String, v: CcRoomView): JSONObject = JSONObject().put("id", v.room.id).put("floor", floorId)
       .put("lightsOn", v.lightsOn).put("lights", v.lights).putOpt("temp", v.temperature).putOpt("humidity", v.humidity)
