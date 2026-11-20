@@ -322,7 +322,10 @@ writing files on shared and app-external storage (`push`/`pull`/`ls`/`cat`),
 Immortal's own config and the screensaver calendar, logcat, and diagnostics. It is
 **not** a full adb shell: it can't read other apps' private data dirs or run
 `pm` / `appops` / `settings` directly — those need the shell user (a USB adb run or
-the provisioning kit). The `raw` subcommand calls any endpoint the agent grows
+the provisioning kit). Nor can it list, read or write Immortal's own private data
+(`shared_prefs`, `databases`, `files`, `no_backup`, ...) or its fleet manifest:
+those routes answer `403 protected_path`; settings move only through the sealed
+backup and import below. The `raw` subcommand calls any endpoint the agent grows
 later, so the CLI keeps working as the API expands.
 
 #### Back up & restore a Portal (before a risky reinstall)
@@ -366,7 +369,10 @@ key, clear the old one over USB (`... -a com.immortal.launcher.action.FORGET_BAC
 -p <package>`) and run `fleet-backup.sh` again. Hearthpane 1.274 and later refuse
 every `/fs/read` of the app's private data (preferences hold the household key, Home
 Assistant and music tokens and the phone sessions), so plaintext preference
-snapshots can no longer be taken.
+snapshots can no longer be taken. Hearthpane 1.277 and later also refuse every
+`/fs/list` and `/fs/write` there (`403 protected_path`), under every alias of the
+data directory (`/data/data/<pkg>`, `/data/user/<n>/<pkg>`, `/proc/self/root/...`,
+`..` and symlinks): preferences come back only through the sealed import below.
 
 `registry.json` holds the fleet token, so the `backups/` tree is git-ignored —
 keep it private. New backup directories use mode `0700` and new files are created
@@ -422,14 +428,16 @@ rules) and applies it through its preference store, then asks for a reboot. Scop
 | Another Portal | `--cross-device` | household settings only, each checked like a settings-sync value; the room name, phone sessions, household key, tokens and data files stay behind |
 
 `--dry-run` opens and checks a sealed snapshot locally without contacting the
-Portal. An older plaintext snapshot (`shared_prefs/*.xml`) is pushed back
-**verbatim**, skipping `fleet_agent.xml` so the freshly-provisioned token is kept, then
-a reboot is requested. `--config` (plaintext snapshots only) is a lighter
-alternative that re-applies only the endpoint-covered screensaver + calendar subset
-(no stored credentials, no reboot). `--prefs`, `--apps`, and `--dry-run` can be combined as needed.
+Portal. An older plaintext snapshot (`shared_prefs/*.xml`, taken before 1.275) can't
+restore preferences: the Portal no longer accepts raw writes into `shared_prefs`, so
+`--prefs` (and the default `--apps --prefs`) stops before any action and asks you to
+take a sealed backup first (`./fleet-backup.sh` against a 1.275+ Portal that still
+has its settings). From such a snapshot, `--apps` and `--config` still work: `--config`
+re-applies only the endpoint-covered screensaver + calendar subset (no stored
+credentials, no reboot). `--prefs`, `--apps`, and `--dry-run` can be combined as needed.
 
 When `--config` is selected, restore parses the saved screensaver XML and freezes
-both endpoint argument lists before any install, preference push or reboot.
+both endpoint argument lists before any install or config call.
 XML entities, Unicode, CDATA and multiline strings are decoded as literal
 arguments. Malformed XML, duplicate selected keys or wrong selected field types
 stop the run before any action. Each config command must exit successfully and
@@ -443,7 +451,7 @@ the `default` source and submits nonempty folder/album values in the same order.
 Those fields can change the active source through endpoint precedence; this is
 not a guarantee that every saved source or setting is restored.
 `--config --dry-run` validates and prints the decoded plan locally without contacting the
-Portal. Raw `--prefs` restore behavior is separate.
+Portal.
 
 Provisioning deliberately does **not** switch the Portal into raw adb-over-WiFi:
 `adb tcpip` restarts adbd, which would stop Shizuku, and it doesn't survive a

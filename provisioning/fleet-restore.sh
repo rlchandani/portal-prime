@@ -15,8 +15,9 @@
 #              one-time key (POST /backup/import); the Portal validates and applies it. Only
 #              onto the Portal it came from, unless --cross-device. The fleet token is never
 #              part of a backup, so the freshly provisioned one is kept. Reboot afterwards.
-#              An older plaintext snapshot (shared_prefs/*.xml) is pushed back verbatim, as
-#              before; fleet_agent.xml is skipped and a reboot is requested.
+#              An older plaintext snapshot (shared_prefs/*.xml) is refused: the Portal no
+#              longer accepts raw writes into its private data (/fs/write). Take a sealed
+#              backup with ./fleet-backup.sh first; --apps and --config still read it.
 #   --cross-device  with a sealed snapshot: restore onto another Portal, household settings
 #              only. Device-local and secret items (room name, phone sessions, the household
 #              key, tokens, data files) stay behind; Who's there templates are never backed up.
@@ -43,7 +44,6 @@ cd "$here"
 FLEETCTL="${FLEETCTL:-./fleetctl}"
 FLEET_DIR="${IMMORTAL_FLEET_DIR:-./fleet}"
 PYTHON3="${PYTHON3:-python3}"
-PREFS_DIR="/data/data/com.immortal.launcher/shared_prefs"
 
 usage() { sed -n '2,41p' "$0"; exit 2; }
 
@@ -85,6 +85,14 @@ if [ $cross -eq 1 ] && [ $same_serial -eq 1 ]; then
   report "error: --cross-device and --same-serial can't be combined" >&2
   exit 2
 fi
+if [ $do_prefs -eq 1 ] && [ $sealed -eq 0 ]; then
+  report "error: $backup is an older plaintext snapshot (no sealed-backup.json)." >&2
+  report "       Hearthpane refuses raw writes into its private data, so --prefs restores only a" >&2
+  report "       sealed snapshot. Take a sealed backup first (./fleet-backup.sh, Hearthpane 1.275+)" >&2
+  report "       and restore that. From this snapshot, --apps and --config (screensaver and" >&2
+  report "       calendar, no credentials) still work." >&2
+  exit 2
+fi
 if [ $sealed -eq 1 ] && [ $do_config -eq 1 ]; then
   report "error: a sealed snapshot restores with --prefs (--config reads an older plaintext snapshot)" >&2
   exit 2
@@ -106,14 +114,9 @@ cal_args=()
 if [ $dry -eq 0 ] || [ $do_prefs -eq 1 ] || { [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" ]; }; then
   scratch="$(mktemp -d "${TMPDIR:-/tmp}/immortal-restore-apps.XXXXXX")" || exit 1
 fi
-if [ $do_prefs -eq 1 ] && [ $sealed -eq 1 ]; then
+if [ $do_prefs -eq 1 ]; then
   # Open and check the sealed archive in memory before installs or any device call.
   "$PYTHON3" "$here/fleet-backup-seal.py" inspect "$backup" || exit 1
-elif [ $do_prefs -eq 1 ]; then
-  # Validate and freeze every raw file before installs, writes or config calls.
-  # Dry-run uses the same preflight without calling the device CLI.
-  "$PYTHON3" "$here/fleet-backup-data.py" restore-preferences \
-    "$backup" "$scratch/preferences" "$scratch/preferences.names" || exit 1
 fi
 if [ $do_config -eq 1 ] && [ -f "$backup/shared_prefs/immortal_screensaver.xml" ]; then
   # Decode and validate the complete subset before installs, prefs or reboot.
@@ -174,8 +177,8 @@ if [ $do_apps -eq 1 ]; then
   done <<< "$pkgs"
 fi
 
-# 2a) Sealed snapshot: the Portal opens, validates, scopes and applies it.
-if [ $do_prefs -eq 1 ] && [ $sealed -eq 1 ]; then
+# 2) Sealed snapshot: the Portal opens, validates, scopes and applies it.
+if [ $do_prefs -eq 1 ]; then
   report "-- prefs (sealed import) --"
   seal_args=()
   [ $cross -eq 1 ] && seal_args+=(--cross-device)
@@ -185,25 +188,6 @@ if [ $do_prefs -eq 1 ] && [ $sealed -eq 1 ]; then
   elif ! "$PYTHON3" "$here/fleet-backup-seal.py" import "$scratch/registry/$serial.json" "$backup" ${seal_args[@]+"${seal_args[@]}"}; then
     report "error: sealed import unconfirmed; inspect the device before retrying" >&2
     exit 1
-  fi
-fi
-
-# 2b) Older plaintext snapshot: push raw shared_prefs back (full fidelity).
-if [ $do_prefs -eq 1 ] && [ $sealed -eq 0 ]; then
-  echo "-- prefs (full restore) --"
-  pushed=0
-  while IFS= read -r -d '' n; do
-    if [ "$n" = "fleet_agent.xml" ]; then
-      echo "  skip $n (keep freshly-provisioned token)"
-      continue
-    fi
-    echo "  push $n"
-    run "$FLEETCTL" push "$scratch/preferences/$n" "$PREFS_DIR/$n" --device "$serial"
-    pushed=$((pushed + 1))
-  done < "$scratch/preferences.names"
-  if [ $pushed -gt 0 ]; then
-    echo "  rebooting so prefs reload from disk"
-    run "$FLEETCTL" action reboot --device "$serial"
   fi
 fi
 

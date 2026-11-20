@@ -70,8 +70,8 @@ class FleetRoutes(private val context: Context) {
       "/action" -> requireMethod("POST", req) { action(req) }
       "/fs/list" -> requireMethod("GET", req) {
         val path = req.queryParam("path") ?: "/sdcard"
-        // Protected stores can't be listed either (message ids and sizes are metadata too).
-        if (FleetSecretPaths.isBlocked(java.io.File(path))) resp(403, err("protected_path")) else resp(200, FleetFs.list(path))
+        // The app's private data can't be listed either (names and sizes are metadata too).
+        if (FleetSecretPaths.isPrivate(java.io.File(path))) resp(403, err("protected_path")) else resp(200, FleetFs.list(path))
       }
       in FleetBackupRoutes.PATHS -> backup.handle(req)
       "/fs/read" -> requireMethod("GET", req) { fsRead(req) }
@@ -679,8 +679,8 @@ class FleetRoutes(private val context: Context) {
   private fun fsRead(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val path = req.queryParam("path") ?: return resp(400, err("path_required"))
     val f = File(path)
-    // Reads also refuse the app's private data (prefs, keys, tokens, sessions) and /proc side doors.
-    if (FleetSecretPaths.isReadBlocked(f)) return resp(403, err("protected_path"))
+    // Refuses the app's private data (prefs, keys, tokens, sessions) and /proc side doors.
+    if (FleetSecretPaths.isPrivate(f)) return resp(403, err("protected_path"))
     if (!f.isFile || !f.canRead()) return resp(404, err("not_a_readable_file"))
     return FleetFileRead.response(f)
   }
@@ -688,7 +688,8 @@ class FleetRoutes(private val context: Context) {
   private fun fsWrite(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val path = req.queryParam("path") ?: return resp(400, err("path_required"))
     val f = File(path)
-    if (FleetSecretPaths.isBlocked(f)) return resp(403, err("protected_path"))
+    // Private data comes back only through the sealed import (/backup/import), never raw.
+    if (FleetSecretPaths.isPrivate(f)) return resp(403, err("protected_path"))
     // Checked before reading a byte: a size cap, and enough free space left after the write.
     FsWritePolicy.refusal(req.contentLength.toLong(), usableSpaceFor(f))?.let {
       return resp(if (it == "body_too_large") 413 else 507, err(it)
