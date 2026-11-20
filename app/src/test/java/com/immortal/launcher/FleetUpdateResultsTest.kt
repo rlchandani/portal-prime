@@ -21,7 +21,7 @@ class FleetUpdateResultsTest {
     val answers = outcomes.toMap()
     val calls = mutableListOf<String>()
     val result =
-        FleetRoutes.updateResult(targets) { pkg ->
+        FleetInstallApi.updateResult(targets) { pkg ->
           calls.add(pkg)
           answers.getValue(pkg)
         }
@@ -109,7 +109,7 @@ class FleetUpdateResultsTest {
   @Test
   fun emptyTargetsAreCompletedSuccessWithoutCallingInstaller() {
     val result =
-        FleetRoutes.updateResult(emptyList()) {
+        FleetInstallApi.updateResult(emptyList()) {
           throw AssertionError("An empty selection must not invoke an installer")
         }
     assertSummary(result, ok = true, count = 0, installedCount = 0, failedCount = 0)
@@ -128,13 +128,13 @@ class FleetUpdateResultsTest {
 
   @Test
   fun incompleteDiscoveryWithEmptyMapIsUnconfirmed() {
-    assertNull(FleetRoutes.completedUpdates(completed = false, updates = emptyMap()))
+    assertNull(FleetInstallApi.completedUpdates(completed = false, updates = emptyMap()))
   }
 
   @Test
   fun incompleteDiscoveryWithPartialResultsIsUnconfirmed() {
     val partial = linkedMapOf("org.public.zebra" to 2L, "org.public.alpha" to 4_294_967_296L)
-    assertNull(FleetRoutes.completedUpdates(completed = false, updates = partial))
+    assertNull(FleetInstallApi.completedUpdates(completed = false, updates = partial))
     assertEquals(
         linkedMapOf("org.public.zebra" to 2L, "org.public.alpha" to 4_294_967_296L), partial)
   }
@@ -142,7 +142,7 @@ class FleetUpdateResultsTest {
   @Test
   fun completedDiscoveryPreservesSuppliedPackagesAndLongVersions() {
     val updates = linkedMapOf("org.public.zebra" to 2L, "org.public.alpha" to 4_294_967_296L)
-    val result = FleetRoutes.completedUpdates(completed = true, updates = updates)
+    val result = FleetInstallApi.completedUpdates(completed = true, updates = updates)
     assertEquals(updates, result)
   }
 
@@ -150,6 +150,6 @@ class FleetUpdateResultsTest {
   fun completedDiscoveryWithNoUpdatesIsSuccessfulEmptyResult() {
     assertEquals(
         emptyMap<String, Long>(),
-        FleetRoutes.completedUpdates(completed = true, updates = emptyMap()))
+        FleetInstallApi.completedUpdates(completed = true, updates = emptyMap()))
   }
 }
