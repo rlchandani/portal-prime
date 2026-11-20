@@ -61,8 +61,11 @@ internal object MusicHomeCardDims {
 
   /** The minimized tile: the player alone at YouTube's minimum (with a little margin), square. */
   const val TILE_PLAYER = 208
-  /** The tile's expand / drag rail, beside the player (never over it). */
+  /** The tile's close / expand / drag rail, beside the player (never over it). */
   const val RAIL_W = 64
+  /** The tile's ✕: a full 64 dp target around a small glyph, so it reads quieter than expand. */
+  const val TILE_CLOSE = 64
+  const val TILE_CLOSE_GLYPH = 22
   const val RAIL_GAP = 8
   const val TILE_W = TILE_PLAYER + RAIL_GAP + RAIL_W
   const val TILE_H = TILE_PLAYER
@@ -79,7 +82,8 @@ internal object MusicHomeCardDims {
  * reloading. The player is always this Row's first child, so switching modes only resizes the same
  * view (no re-attach, no reload). Card: previous / play-pause / next, the speaker volume
  * (quiet-hours capped), ✕ (minimize; the music keeps playing) and the title (opens Music). Tile: the
- * player and, beside it, expand and a drag grip. Nothing is drawn over the player.
+ * player and, beside it, ✕ (pause and close, [MusicTileCloseRules]), expand and a drag grip. Nothing
+ * is drawn over the player.
  */
 @Composable
 internal fun MusicHomeCardBody(
@@ -140,7 +144,10 @@ private fun CardHeader(track: YtTrack, now: MusicV3NowPlaying, onOpenMusic: () -
   }
 }
 
-/** The tile's rail beside the player: expand (the full card again) above a drag grip. */
+/**
+ * The tile's rail beside the player: ✕ (pause and close, with Undo), expand (the full card again),
+ * then a drag grip.
+ */
 @Composable
 private fun TileRail(track: YtTrack) {
   val ink = LocalMusicStageInk.current
@@ -148,9 +155,15 @@ private fun TileRail(track: YtTrack) {
   Column(Modifier.width(MusicHomeCardDims.RAIL_W.dp).fillMaxHeight().shadow(12.dp, shape, clip = false).clip(shape)
       .background(ink.card).border(1.dp, ink.line, shape), horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.SpaceBetween) {
-    MusicV3RoundButton("Expand player: ${track.title}", size = MusicHomeCardDims.RAIL_W.dp,
-        onClick = MusicHomeCardState::expand) {
-      MusicV3GlyphIcon(MusicV3Glyph.EXPAND, ink.ink, Modifier.size(28.dp))
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+      MusicV3RoundButton("Close player and pause: ${track.title}", size = MusicHomeCardDims.TILE_CLOSE.dp,
+          onClick = MusicTileClose::close) {
+        MusicV3GlyphIcon(MusicV3Glyph.CLOSE, ink.muted, Modifier.size(MusicHomeCardDims.TILE_CLOSE_GLYPH.dp))
+      }
+      MusicV3RoundButton("Expand player: ${track.title}", size = MusicHomeCardDims.RAIL_W.dp,
+          onClick = MusicHomeCardState::expand) {
+        MusicV3GlyphIcon(MusicV3Glyph.EXPAND, ink.ink, Modifier.size(28.dp))
+      }
     }
     MusicV3GlyphIcon(MusicV3Glyph.GRIP, ink.muted, Modifier.padding(bottom = 18.dp).size(26.dp))
   }
@@ -187,16 +200,20 @@ internal fun MusicVideoScreenHold() {
   if (holds) KeepInteractiveScreenAwake()
 }
 
-/** Whether Home shows its Now Playing card now ([MusicHomeCardRules]); also lifts a dismissal once music plays. */
+/**
+ * Whether Home shows its Now Playing card now ([MusicHomeCardRules]); also lifts a dismissal or a ✕
+ * close once music plays or is asked to play (a phone's Play waits for the player to be visible).
+ */
 @Composable
 internal fun rememberMusicHomeCardShown(musicOpen: Boolean, customizing: Boolean): Boolean {
   val current = remember { engineSlice { it.queue.current != null } }
-  val playing = remember { engineSlice { it.isPlaying } }
+  val playing = remember { engineSlice(MusicTileCloseRules::playRequested) }
   val hasCurrent by current.collectAsState(initial = YouTubeMusicEngine.state.value.queue.current != null)
-  val isPlaying by playing.collectAsState(initial = YouTubeMusicEngine.state.value.isPlaying)
+  val isPlaying by playing.collectAsState(initial = MusicTileCloseRules.playRequested(YouTubeMusicEngine.state.value))
   val dismissed by MusicHomeCardState.dismissed.collectAsState()
+  val closed by MusicHomeCardState.closed.collectAsState()
   LaunchedEffect(isPlaying) { MusicHomeCardState.onPlaying(isPlaying) }
-  return MusicHomeCardRules.shows(MusicHomeCardInputs(hasCurrent, musicOpen, customizing, dismissed))
+  return MusicHomeCardRules.shows(MusicHomeCardInputs(hasCurrent, musicOpen, customizing, dismissed, closed))
 }
 
 /** Dp side padding for Home's bottom toasts so they centre beside the card ([MusicCardAvoidance]). */

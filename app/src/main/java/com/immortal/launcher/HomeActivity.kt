@@ -1784,6 +1784,8 @@ private fun LauncherScreen(
         // Draggable over the content area only: never onto the header, the favourites or the dock.
         if (musicCard) MusicHomeFloatingPlayer(room, onOpenMusic, sideInset = LauncherEdge,
             bottomInset = favoriteTileHeight(currentLayoutClass()) + 16.dp, modifier = Modifier.matchParentSize())
+        // The tile's ✕ paused and closed it: "Paused · Undo" for 5 s, on whichever tab it was closed.
+        MusicTileUndoToast(Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp))
         }
         Spacer(Modifier.height(12.dp))
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
