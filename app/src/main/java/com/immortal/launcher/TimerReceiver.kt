@@ -18,6 +18,8 @@ import android.util.Log
 class TimerReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action != TimerScheduler.ACTION_FIRE) return
+    // A timer waking a cold process: shared timers sync over the household bus.
+    DeferredStartup.ensureStarted()
     val timer = TimerConfig.consumeDue(context, intent.getStringExtra(TimerScheduler.EXTRA_ID)) ?: return
     Log.i(TAG, "timer fired: ${timer.id}")
     if (SharedTimers.onAlarm(context, timer.id)) return

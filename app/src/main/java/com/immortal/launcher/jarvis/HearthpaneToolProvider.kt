@@ -14,6 +14,7 @@ import android.os.Binder
 import android.os.Bundle
 import android.util.Log
 import com.immortal.launcher.Calling
+import com.immortal.launcher.DeferredStartup
 import com.immortal.launcher.CcJarvisHome
 import com.immortal.launcher.DoorbellCardOverlay
 import com.immortal.launcher.ReminderLimits
@@ -50,6 +51,8 @@ class HearthpaneToolProvider : ContentProvider() {
 
   override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
     val ctx = context ?: return null
+    // Binder thread: Calling and Reminders state come from deferred startup steps.
+    DeferredStartup.ensureStarted()
     val uidPackages = ctx.packageManager.getPackagesForUid(Binder.getCallingUid())?.toList().orEmpty()
     if (method !in METHODS || !allowedCaller(uidPackages)) {
       Log.w(TAG, "refused call $method from $uidPackages")

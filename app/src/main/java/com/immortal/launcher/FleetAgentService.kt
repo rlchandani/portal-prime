@@ -41,6 +41,8 @@ class FleetAgentService : Service() {
 
   override fun onCreate() {
     super.onCreate()
+    // A sticky restart can create us before the deferred startup steps register our routes.
+    DeferredStartup.ensureStarted()
     createChannel()
     startForeground(NOTIF_ID, notification())
     acquireWifiLock()
