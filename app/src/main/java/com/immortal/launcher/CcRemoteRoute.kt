@@ -87,7 +87,8 @@ internal object CcRemoteRoute : RemoteFeatureRoutes.CallerRoute {
     if (body.optString("want") == "tesla" && s.chargeWeek == null && s.registry?.tesla?.weekStat != null) ControlCenter.loadChargeWeek(context)
     val since = body.optLong("since", 0L).coerceAtLeast(0L)
     val minute = body.optLong("minute", -1L)
-    return RemoteFeatureRoutes.json(200, CcRemoteState.json(s, journal, since, minute, clock(), FleetConfig.name(context)))
+    return RemoteFeatureRoutes.json(200, CcRemoteState.json(s, journal, since, minute, clock(), FleetConfig.name(context),
+        held = CcRemoteSections.held(body)))
   }
 
   private fun act(context: Context, s: CcUiState, body: JSONObject, caller: String): FleetHttpServer.Response {
