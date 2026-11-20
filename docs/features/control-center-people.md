@@ -107,6 +107,24 @@ reduced motion. Chips are drawn in the cached "over" layer (re-recorded only whe
 changes). No occupied room → no pulses → the animated layer is not composed (no idle frames). The
 phone draws rings on a separate canvas composed only while a room on that floor is occupied.
 
+### Measured on Family (Portal+, 2160×1440), 2026-11-19 night
+
+Performance build, CC map in front, screen awake, no input, 15 s windows (`dumpsys gfxinfo`, process
+CPU from `/proc/<pid>/stat`). Meta's own presence CV was using ~200 % CPU throughout.
+
+| Build · scene | fps | janky | p50 / p90 / p99 | CPU |
+|---|---|---|---|---|
+| official 1.271 · Ground, one motion ring (legacy) | 60.5 | 1.8 % | 9 / 11 / 22 ms | 60.7 % |
+| this · Ground, one occupancy ring (Someone) | 60.7 | 1.9 % | 9 / 11 / 18 ms | 54.1 % |
+| this · Ground, setting Off (legacy ring) | 60.8 | 0.9 % | 9 / 11 / 15 ms | 53.1 % |
+| this · Ground, Names (ring + test chip) | 60.7 | 1.0 % | 8 / 11 / 16 ms | 51.7 % |
+| official 1.271 · Outdoor, nothing animating | 1.9 | — | — | 9.5 % |
+| this · Outdoor, nothing occupied or open | 1.3 | — | — | 4.1 % |
+
+A ring costs what the existing ring cost; with nobody home the plan draws no animation frames. Note
+that rooms now ring for Portal presence and area sensors too, so the plan animates more often than
+before while someone is home (the cost per ring is unchanged). Not measured: the Mini (off USB).
+
 ## Tests
 
 `ControlCenterOccupancyTest`, `ControlCenterPeoplePolicyTest`, `RoomSeenWireTest`,
