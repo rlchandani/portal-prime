@@ -73,7 +73,12 @@ internal object CcAlerts {
 
   private fun openAlert(e: CcEntity, kind: CcKind, now: Long, where: String?): CcAlert {
     val mins = ((now - e.lastChanged) / MS_PER_MIN).coerceAtLeast(0)
-    val what = when (kind) { CcKind.GARAGE -> "Garage door"; CcKind.WINDOW -> "${where ?: e.name} window"; else -> e.name }
+    // A door reads by its friendly name ("Office door is open"), never "<hardware> is open is open".
+    val what = when (kind) {
+      CcKind.GARAGE -> "Garage door"
+      CcKind.WINDOW -> "${where ?: e.name} window"
+      else -> CcSecNames.friendly(e.name, where, "door")
+    }
     val action = if (kind == CcKind.GARAGE) CcAlertAction.CLOSE else CcAlertAction.REMIND
     return CcAlert(id(e), CcSeverity.WARNING, kind, e.id, "$what is open", "Open ${duration(mins)}", e.lastChanged, action)
   }

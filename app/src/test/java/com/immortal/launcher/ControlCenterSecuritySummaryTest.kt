@@ -182,6 +182,17 @@ class ControlCenterSecuritySummaryTest {
     assertEquals("Smoke, CO & leaks, Tamper, Alarm", CcSecuritySummary.moreLine(card(house, areas)))
   }
 
+  @Test fun doorAlertsUseTheFriendlyName() {
+    val now = 100L * 60_000L
+    val tilt = bs("tilt", "on", "door", "Tilt Shock XS Sensor Window/door is open", changed = 1L)
+    val inRoom = CcAlerts.active(mapOf(tilt.id to tilt), now, 10, { "Office" }).single()
+    assertEquals("Office door is open", inRoom.title)
+    val noRoom = CcAlerts.active(mapOf(tilt.id to tilt), now, 10).single()
+    assertEquals("Tilt Shock XS Sensor Window/door is open", noRoom.title)
+    val plain = bs("pantry", "on", "door", "Pantry Door Sensor", changed = 1L)
+    assertEquals("Pantry door is open", CcAlerts.active(mapOf(plain.id to plain), now, 10).single().title)
+  }
+
   @Test fun anEmptyHouseHasAnEmptyCard() {
     assertTrue(card(emptyList()).isEmpty)
   }
