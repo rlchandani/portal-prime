@@ -31,6 +31,12 @@ internal fun CcPlanDraw.drawMarks(s: DrawScope, view: CcAffine) {
     s.drawRoundRect(c.amber, Offset(p.x, p.y - CHIP_H / 2 * dp), Size(w, CHIP_H * dp), CornerRadius(CHIP_H / 2 * dp))
     t.draw(s, p.x + CHIP_PAD * dp, p.y - t.height / 2f)
   }
+  for (pp in model.people) {
+    val p = view.at(px.pt(pp.x, pp.y))
+    s.drawCircle(Color(pp.rgb or OPAQUE), PERSON_R * dp, p)
+    s.drawCircle(c.floor, PERSON_R * dp, p, style = personStroke)
+    chips.person[pp.key]?.let { t -> t.draw(s, p.x - t.width / 2f, p.y - t.height / 2f) }
+  }
 }
 
 private fun CcPlanDraw.drawBadge(s: DrawScope, b: CcMapBadge, view: CcAffine) {
@@ -98,6 +104,8 @@ private const val CAM_ICON = 22f
 private const val APPLIANCE_ICON = 22f
 private const val LEAK_R = 24f
 private const val LEAK_ICON = 26f
+/** The mock's `.pp circle`: r 20 with a 4 px floor-coloured ring. */
+private const val PERSON_R = 20f
 private const val FADED = 0.45f
 private const val LINE_GAP = 2f
 private const val FIT_SLACK = 1.1f

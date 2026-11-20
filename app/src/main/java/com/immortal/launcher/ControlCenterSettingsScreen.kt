@@ -52,8 +52,9 @@ internal fun CcSettingsScreen(s: CcUiState, ui: CcUi) {
   // Only these few values matter here; an HA entity update yields an equal slice and the body skips.
   val regLine = remember(s.registry) { CcSetLogic.registryLine(s.registry) }
   val plan = remember(s.planSource, s.plan) { CcSetLogic.planSource(s.planSource, s.plan) }
+  val rooms = remember(s.plan) { CcSetRooms.of(s.plan, DinnerCall.selfName(ui.context)) }
   val slice = CcSetSlice(s.settings, s.connection.phase, s.connection.disabledReason, s.entities.size, regLine, s.registry == null,
-      plan.first, plan.second)
+      plan.first, plan.second, rooms)
   CcSettingsBody(slice, ui)
 }
 
@@ -68,6 +69,7 @@ internal data class CcSetSlice(
     val registryMissing: Boolean,
     val planWhere: String,
     val planWhereSub: String,
+    val rooms: CcSetRooms = CcSetRooms(),
 )
 
 @Composable
@@ -93,7 +95,10 @@ private fun CcSettingsBody(slice: CcSetSlice, ui: CcUi) {
       CcSettingsNav(section) { section = it }
       Column(Modifier.weight(1f).fillMaxHeight().ccCard().verticalScroll(rememberScrollState()).padding(horizontal = 36.dp, vertical = 30.dp)) {
         when (section) {
-          CcSetSection.PORTALS -> CcSetPortals(st.portalMode, hasPin, ui, write) { pinFor = CcPinPurpose.ENTER_KIDS }
+          CcSetSection.PORTALS -> {
+            CcSetPortals(st.portalMode, hasPin, ui, write) { pinFor = CcPinPurpose.ENTER_KIDS }
+            CcSetPortalRoom(st.planRoom, slice.rooms, write)
+          }
           CcSetSection.KIDS -> CcSetKids(st, hasPin, write) { pinFor = CcPinPurpose.CHANGE }
           CcSetSection.CONFIRM -> CcSetConfirm(st, write)
           CcSetSection.BANNERS -> CcSetBanners(st, ui, write)
@@ -121,7 +126,10 @@ private fun CcSettingsSectionPage(section: CcSetSection, slice: CcSetSlice, hasP
                                   onPin: (CcPinPurpose) -> Unit) {
   val st = slice.settings
   when (section) {
-    CcSetSection.PORTALS -> CcSetPortals(st.portalMode, hasPin, ui, write) { onPin(CcPinPurpose.ENTER_KIDS) }
+    CcSetSection.PORTALS -> {
+      CcSetPortals(st.portalMode, hasPin, ui, write) { onPin(CcPinPurpose.ENTER_KIDS) }
+      CcSetPortalRoom(st.planRoom, slice.rooms, write)
+    }
     CcSetSection.KIDS -> CcSetKids(st, hasPin, write) { onPin(CcPinPurpose.CHANGE) }
     CcSetSection.CONFIRM -> CcSetConfirm(st, write)
     CcSetSection.BANNERS -> CcSetBanners(st, ui, write)

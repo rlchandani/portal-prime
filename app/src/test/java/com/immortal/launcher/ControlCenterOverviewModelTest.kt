@@ -87,9 +87,14 @@ class ControlCenterOverviewModelTest {
   }
 
   @Test fun pulsesAreOrderedAndCapped() {
-    val m = build()
+    // "Show who's where" Off: motion rings at the sensor, as before people-in-rooms.
+    val m = build(ControlCenterConfig.Settings(mapPeople = ControlCenterConfig.MAP_OFF))
     assertEquals(CcMapPulseTone.LEAK, m.pulses.first().tone)
     assertEquals(listOf(CcMapPulseTone.LEAK, CcMapPulseTone.OPEN, CcMapPulseTone.OPEN, CcMapPulseTone.MOTION), m.pulses.map { it.tone })
+    // On (the default): the hall's motion is part of its fused occupancy, one ring at the room centre.
+    val occ = mapOf("hall" to CcRoomOcc(0.8f, setOf(CcOccSource.MOTION)))
+    val people = CcPlanModel.build(floor, entities, ControlCenterConfig.Settings(), now, occupancy = occ)
+    assertEquals(listOf(CcMapPulseTone.LEAK, CcMapPulseTone.OPEN, CcMapPulseTone.OPEN, CcMapPulseTone.OCCUPIED), people.pulses.map { it.tone })
     val many = (1..10).map { i -> CcMapOpeningViewFixture.open(i) }
     assertEquals(CcPlanModel.MAX_PULSES, CcPlanModel.pulses(emptyList(), many, emptyMap()).size)
   }

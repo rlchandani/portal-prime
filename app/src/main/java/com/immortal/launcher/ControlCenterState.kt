@@ -42,6 +42,10 @@ internal data class CcUiState(
      * someone looks. Derived from the fields [equals] compares, so it isn't compared itself.
      */
     val planModels: Map<String, CcPlanModel> = emptyMap(),
+    /** Presence and recognitions from the household ([RoomSignals]); fused into [occupancy] by the engine. */
+    val signals: CcRoomSignals = CcRoomSignals.NONE,
+    /** Who is where, by plan room ([CcOccupancyFusion]); already filtered by [CcPeoplePolicy]. */
+    val occupancy: CcOccupancy = CcOccupancy.NONE,
 ) {
   /**
    * Cheap equality for Compose skipping: the entity map is compared by [entitiesVersion] (the
@@ -54,7 +58,7 @@ internal data class CcUiState(
     return entitiesVersion == other.entitiesVersion && minute == other.minute && connection == other.connection &&
         registry === other.registry && plan == other.plan && planSource == other.planSource && settings == other.settings &&
         toast == other.toast && chargeWeek == other.chargeWeek && appliancesDone == other.appliancesDone && dismissed == other.dismissed &&
-        sceneRun == other.sceneRun && debug == other.debug
+        sceneRun == other.sceneRun && debug == other.debug && occupancy == other.occupancy
   }
 
   override fun hashCode(): Int = (entitiesVersion * HASH_PRIME + minute).hashCode()

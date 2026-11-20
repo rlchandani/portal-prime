@@ -129,7 +129,7 @@ internal class SettingsSyncCatalog(domains: List<SettingsDomain<*>>) {
      */
     val NEVER_SYNC: Set<String> = setOf(
         "calling.dropInsOn", "calling.dropInRooms",
-        "controlcenter.portalMode", "controlcenter.sharedRoom",
+        "controlcenter.portalMode", "controlcenter.sharedRoom", "controlcenter.planRoom",
         "fleet.name",
         "mqtt.enabled", "mqtt.host", "mqtt.port", "mqtt.username", "mqtt.password", "mqtt.useTls", "mqtt.validateCert",
         "immortal.maPassword", "immortal.maApiToken", "immortal.maUsername", "immortal.maPlayerId",

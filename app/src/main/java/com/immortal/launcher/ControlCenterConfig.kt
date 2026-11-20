@@ -31,6 +31,14 @@ internal object ControlCenterConfig {
   const val PLAN_2D = "2d"
   const val PLAN_ISO = "iso"
   val PLAN_STYLES = listOf(PLAN_2D, PLAN_ISO)
+  /** "Show who's where on the map" (household): nothing, an anonymous "someone" pulse, or names (see [CcPeoplePolicy]). */
+  const val MAP_OFF = "off"
+  const val MAP_SOMEONE = "someone"
+  const val MAP_NAMES = "names"
+  val MAP_MODES = listOf(MAP_OFF, MAP_SOMEONE, MAP_NAMES)
+  /** A plan room id (HA area id or the plan's local `room_<n>`), as this Portal's room override. */
+  private val ROOM_ID = Regex("^[A-Za-z0-9_.-]{1,64}$")
+  fun validRoomId(v: String): Boolean = v.isEmpty() || ROOM_ID.matches(v)
   const val MIN_EXIT_S = 0
   const val MAX_EXIT_S = 180
   private const val SALT_BYTES = 16
@@ -64,6 +72,10 @@ internal object ControlCenterConfig {
       val exitDelaySec: Int = 30,
       /** [PLAN_2D] or [PLAN_ISO]; per Portal (a showcase on one wall, the readable plan on another). */
       val planStyle: String = PLAN_2D,
+      /** [MAP_OFF], [MAP_SOMEONE] (default: anonymous pulses) or [MAP_NAMES]; household. */
+      val mapPeople: String = MAP_SOMEONE,
+      /** This Portal's plan room ("" = matched from its name); per Portal. */
+      val planRoom: String = "",
   ) {
     val kids: Boolean get() = portalMode == MODE_KIDS
     val plan3d: Boolean get() = planStyle == PLAN_ISO
@@ -101,6 +113,8 @@ internal object ControlCenterConfig {
         pinLength = p.getInt("pin_length", d.pinLength).coerceIn(MIN_PIN, MAX_PIN),
         exitDelaySec = p.getInt("exit_delay_s", d.exitDelaySec).coerceIn(MIN_EXIT_S, MAX_EXIT_S),
         planStyle = p.getString("plan_style", d.planStyle)?.takeIf { it in PLAN_STYLES } ?: d.planStyle,
+        mapPeople = p.getString("map_people", d.mapPeople)?.takeIf { it in MAP_MODES } ?: d.mapPeople,
+        planRoom = p.getString("plan_room", d.planRoom)?.takeIf(::validRoomId) ?: d.planRoom,
     )
   }
 
@@ -129,6 +143,8 @@ internal object ControlCenterConfig {
   fun setPinLength(c: Context, v: Int) = putInt(c, "pin_length", v.coerceIn(MIN_PIN, MAX_PIN))
   fun setExitDelaySec(c: Context, v: Int) = putInt(c, "exit_delay_s", v.coerceIn(MIN_EXIT_S, MAX_EXIT_S))
   fun setPlanStyle(c: Context, v: String) { if (v in PLAN_STYLES) prefs(c).edit().putString("plan_style", v).apply() }
+  fun setMapPeople(c: Context, v: String) { if (v in MAP_MODES) prefs(c).edit().putString("map_people", v).apply() }
+  fun setPlanRoom(c: Context, v: String) { if (validRoomId(v)) prefs(c).edit().putString("plan_room", v).apply() }
 
   // --- scenes previewed once (first run shows the preview, later runs are one tap) ----------
 

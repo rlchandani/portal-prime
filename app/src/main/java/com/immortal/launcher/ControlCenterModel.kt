@@ -217,6 +217,10 @@ internal data class CcRegistry(
     val tesla: CcTeslaIds = CcTeslaIds.NONE,
 ) {
   fun areaOf(entityId: String): String? = entityArea[entityId]
+  /** Area id → the binary sensors filed under it (motion/occupancy candidates), built once per registry. */
+  val areaSensors: Map<String, List<String>> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+    entityArea.entries.filter { it.key.startsWith("binary_sensor.") }.groupBy({ it.value }, { it.key })
+  }
   /** The best class known before the state arrives. */
   fun classOf(entityId: String): String? = entityClass[entityId] ?: fetchedClass[entityId]
   /** Binary sensors whose class we still need to ask HA for. */

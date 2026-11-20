@@ -48,6 +48,7 @@ internal class CcPlanDraw(
   val arcStroke = Stroke(2.5f * dp, pathEffect = PathEffect.dashPathEffect(floatArrayOf(5f * dp, 6f * dp)))
   val windowOpenDash = PathEffect.dashPathEffect(floatArrayOf(10f * dp, 7f * dp))
   val dotStroke = Stroke(3f * dp)
+  val personStroke = Stroke(4f * dp)
   val focusStroke = Stroke(FOCUS_DP * dp, join = StrokeJoin.Round)
   val window = Color(WINDOW_RGB)
   private val lit: Map<String, Lit> = model.views.filter { it.glows.isNotEmpty() }.associate { v ->
@@ -166,12 +167,16 @@ internal class CcPlanDraw(
     val sy = view.rowY
     model.pulses.forEachIndexed { i, p ->
       val k = frac(t * PULSE_CYCLES + i * PULSE_STAGGER)
-      val color = when (p.tone) { CcMapPulseTone.MOTION -> window; CcMapPulseTone.OPEN -> c.amber; CcMapPulseTone.LEAK -> c.red }
+      val color = when (p.tone) {
+        CcMapPulseTone.MOTION, CcMapPulseTone.OCCUPIED -> window
+        CcMapPulseTone.OPEN -> c.amber
+        CcMapPulseTone.LEAK -> c.red
+      }
       val r = p.radius * px.fit.scale * (PULSE_FROM + PULSE_GROW * k)
       val at = view.at(px.pt(p.x, p.y))
-      if (view.isIdentity) s.drawCircle(color, r, at, alpha = PULSE_ALPHA * (1f - k))
-      else s.drawOval(color, Offset(at.x - r * sx, at.y - r * sy), androidx.compose.ui.geometry.Size(2f * r * sx, 2f * r * sy),
-          alpha = PULSE_ALPHA * (1f - k))
+      val alpha = PULSE_ALPHA * p.strength * (1f - k)
+      if (view.isIdentity) s.drawCircle(color, r, at, alpha = alpha)
+      else s.drawOval(color, Offset(at.x - r * sx, at.y - r * sy), androidx.compose.ui.geometry.Size(2f * r * sx, 2f * r * sy), alpha = alpha)
     }
   }
 

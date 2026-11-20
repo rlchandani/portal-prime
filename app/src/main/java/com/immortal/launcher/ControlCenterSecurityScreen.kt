@@ -59,8 +59,8 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun CcSecurityScreen(s: CcUiState, ui: CcUi) {
   val panel = remember(s.entitiesVersion, s.settings) { s.alarm }
-  val side = remember(s.entitiesVersion, s.settings, s.registry, s.plan, s.connection.canControl) {
-    CcSecurity.side(s.people, s.entities.values, ::ccTime, s.alarm).copy(
+  val side = remember(s.entitiesVersion, s.settings, s.registry, s.plan, s.connection.canControl, s.occupancy, s.minute) {
+    CcSecurity.side(s.people, s.entities.values, ::ccTime, s.alarm, s.occupancy, CcPeoplePolicy.named(s.settings), s.now).copy(
         sections = CcSecurityList.sections(s.entities.values, s.settings) { id -> s.registry?.areaName(id) ?: s.plan?.roomOf(id)?.name },
         canControl = s.connection.canControl, reason = s.connection.disabledReason)
   }

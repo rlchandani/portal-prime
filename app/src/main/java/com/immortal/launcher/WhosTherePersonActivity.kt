@@ -80,7 +80,21 @@ private fun PersonScreen(id: String, onBack: () -> Unit) {
         WhosThereStore.updateHousehold(context, { h -> h.upsert(p.copy(pausedUntilMs = until)) })
         if (!paused) WhosThereStore.record(context, AuditKind.PAUSED)
       }
+      Divider()
+      ToggleRow("Never recognise ${if (p.role.parentManaged) p.name else "me"} on this Portal", p.neverHere) { on ->
+        WhosThereStore.updateHousehold(context, { h -> h.upsert(p.copy(neverHere = on)) })
+      }
     }
+    SectionLabel("Home map")
+    Card {
+      ToggleRow("Show ${if (p.role.parentManaged) "${p.name}’s" else "my"} room on the home map", p.onMap && !p.neverHere,
+          enabled = !p.neverHere) { on ->
+        WhosThereStore.updateHousehold(context, { h -> h.upsert(p.copy(onMap = on)) })
+      }
+    }
+    FooterNote("When this Portal recognises ${p.name}, Control Center and the phone’s House tab can show “${p.initial}” in this " +
+        "room for 5 minutes — only if the household setting Control Center › Plan style › Show who’s where is set to Names. " +
+        "Other Portals get the name, colour and room in a sealed household message; never a photo or face data. Pausing stops it at once.")
     if (!p.role.parentManaged) {
       SectionLabel("${p.name}’s calendar")
       Card {

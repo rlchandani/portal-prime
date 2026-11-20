@@ -60,6 +60,7 @@ internal object WhosThereCodec {
       .put("id", p.id).put("name", p.name).put("role", p.role.name).put("color", p.colorIndex)
       .put("created", p.createdMs).put("paused", p.pausedUntilMs)
       .apply { p.calendarUrl?.let { put("calendar", it) } }
+      .apply { if (p.neverHere) put("never", true); if (p.onMap) put("map", true) }
 
   private fun readPerson(o: JSONObject): WhosTherePerson? {
     val id = o.optString("id")
@@ -67,7 +68,8 @@ internal object WhosThereCodec {
     if (!validId(id) || name.isEmpty()) return null
     return WhosTherePerson(id, name, WhosThereRole.parse(o.optString("role")), o.optInt("color").coerceIn(0, 63),
         o.optLong("created"), o.optLong("paused").coerceAtLeast(0L),
-        o.optString("calendar").takeIf { it.startsWith("https://") || it.startsWith("webcal://") })
+        o.optString("calendar").takeIf { it.startsWith("https://") || it.startsWith("webcal://") },
+        neverHere = o.optBoolean("never"), onMap = o.optBoolean("map"))
   }
 
   private fun templates(t: FaceTemplates) = JSONObject()

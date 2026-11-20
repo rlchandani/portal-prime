@@ -160,10 +160,16 @@ internal object CcSecurity {
     return CcCheck("motion", "Motion", "$what · ignored in Home & Night", null, null)
   }
 
-  fun side(people: List<CcEntity>, entities: Collection<CcEntity>, time: (Long) -> String, panel: CcEntity? = null): CcSecuritySideSlice {
+  /**
+   * The side column. With [named] (the map may show names, [CcPeoplePolicy]) a person at home also gets
+   * the room Who's there? last saw them in from [occupancy] ("Home · Kitchen · 3 min ago").
+   */
+  fun side(people: List<CcEntity>, entities: Collection<CcEntity>, time: (Long) -> String, panel: CcEntity? = null,
+           occupancy: CcOccupancy = CcOccupancy.NONE, named: Boolean = false, now: Long = 0L): CcSecuritySideSlice {
     val open = openCount(entities)
-    return CcSecuritySideSlice(people.mapIndexed { i, p -> CcPersonItem(p.id, p.name, i, isHome(p), personLine(p)) },
-        checklist(entities, time), open, readiness(panel, open))
+    return CcSecuritySideSlice(people.mapIndexed { i, p ->
+      CcPersonItem(p.id, p.name, i, isHome(p), CcPeoplePolicy.whoLine(personLine(p), p.name, isHome(p), occupancy, named, now))
+    }, checklist(entities, time), open, readiness(panel, open))
   }
 
   /** The readiness card, from the alarm_control_panel state; disarmed (or no panel) says what arming will ask about. */

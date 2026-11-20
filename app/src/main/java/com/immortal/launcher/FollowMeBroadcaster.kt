@@ -64,7 +64,7 @@ internal object FollowMeBroadcaster {
   private fun sendPresence() {
     val c = app ?: return
     val now = now()
-    val note = FollowMeWire.PresenceNote(presence, now - presenceSinceMs, DinnerCall.selfName(c))
+    val note = FollowMeWire.PresenceNote(presence, now - presenceSinceMs, DinnerCall.selfName(c), RoomSignals.selfRoom(c))
     val sent = HouseholdBus.send(c, FollowMeWire.PRESENCE, FollowMeWire.encode(note))
     if (note.presence != lastSentPresence) Log.i(TAG, "presence ${note.presence} broadcast sent=$sent")
     lastSentPresence = note.presence
