@@ -42,8 +42,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.Executors
 import org.json.JSONObject
-
-private const val SHERPA_VOICE_PARAM = "sherpa_voice_name"
+import com.immortal.launcher.PhotoFrameViews.Companion.MATCH
+import com.immortal.launcher.PhotoFrameViews.Companion.WRAP
 
 /** Layout-driven reservations, with no timer and no callback ownership after close. */
 internal class GalleryOverlayLayoutObserver(
@@ -254,12 +254,6 @@ class PhotoFrameController(
   private val faceRendererDelegate = lazy { FaceRenderer(context, weatherRefreshMs) }
   private val faceRenderer get() = faceRendererDelegate.value
 
-  // Calendar widget (top-right): a clean upcoming-events panel fed by a public ICS
-  // feed (Google secret-iCal / Apple iCloud public-calendar). Hidden when no link.
-  private lateinit var calendarPanel: LinearLayout
-  private lateinit var calendarHeader: TextView
-  private lateinit var calendarRows: LinearLayout
-  private var calendarEvents: List<CalendarFeed.Event> = emptyList()
   // New modes: Split glance's clock panel and the Night photo veil + clock; null until used.
   private var splitPanel: SplitGlancePanel? = null
   private var nightPhotoOverlay: NightPhotoOverlay? = null
@@ -271,29 +265,15 @@ class PhotoFrameController(
   private val testIndex = java.util.concurrent.atomic.AtomicInteger()
   private val testScenes = java.util.Collections.synchronizedMap(
       java.util.WeakHashMap<Bitmap, ScreensaverTestSource.Scene>())
-  // Text/padding scale for the current calendar size (0/1/2 → small/medium/large),
-  // applied as the panel is (re)rendered so a size change takes effect live.
-  private var calScale: Float = 1f
 
-  // Ambient dashboard: full-screen glanceable info card shown periodically (fork feature).
-  private var dashboardPanel: View? = null
-  private lateinit var dashClock: TextView
-  private lateinit var dashDate: TextView
-  private lateinit var dashWeather: TextView
-  private lateinit var dashEvent: TextView
-  private lateinit var dashAlmanac: TextView
-  private var dashboardVisible = false
-  // Weather string for the dashboard. The Face overlay fetches its own weather; this
-  // small keyless fetch feeds the ambient-dashboard card so it stays self-contained.
-  private var weatherText: String = ""
-
-  // Welcome-back overlay + TTS greeting (fork feature; off unless WelcomeConfig enables it).
-  private lateinit var welcomeOverlay: View
-  private var welcomeVisible = false
-  private val dismissWelcomeRunnable = Runnable { dismissWelcomeAnimated() }
-  private var tts: TextToSpeech? = null
-  @Volatile private var ttsReady = false
-  @Volatile private var pendingSpeech: String? = null
+  // The frame's panels over the photos: calendar widget, ambient dashboard, welcome-back overlay.
+  private val views = PhotoFrameViews(context)
+  private val calendar = PhotoFrameCalendarPanel(context, views, clock, settings = { settings },
+      testSource = { testSourceOn }, featureOwnsScreen = { splitGlance || nightPhotoOn }, splitPanel = { splitPanel })
+  private val dashboard = PhotoFrameDashboard(context, views, io = { io }, post = { r, d -> ui.postDelayed(r, d) },
+      enabled = { settings.ambientDashboard }, nightPhoto = { nightPhotoOn })
+  private val welcome = PhotoFrameWelcome(context, views, post = { r, d -> ui.postDelayed(r, d) },
+      remove = { ui.removeCallbacks(it) })
 
   // Ambient soundscape (synthesized) played while the frame is up (fork feature).
   private val soundscape = SoundscapePlayer()
@@ -410,7 +390,7 @@ class PhotoFrameController(
     // While the timer alarm is showing, the slide-to-stop owns the touch stream.
     if (faceRenderer.handleAlarmTouch(ev)) return
     // A tap on the now-playing card opens its walk-up controls instead of exiting the frame.
-    if (!welcomeVisible && faceRenderer.handleMusicCardTouch(ev)) return
+    if (!welcome.visible && faceRenderer.handleMusicCardTouch(ev)) return
     when (ev.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
         downX = ev.x
@@ -421,8 +401,8 @@ class PhotoFrameController(
         val dy = ev.y - downY
         // A tap while the welcome overlay is showing dismisses it early
         // rather than exiting the screensaver.
-        if (welcomeVisible && PhotoFrameGesture.isTap(dx, dy)) {
-          dismissWelcome()
+        if (welcome.visible && PhotoFrameGesture.isTap(dx, dy)) {
+          welcome.dismiss()
           return
         }
         when (PhotoFrameGesture.classify(dx, dy)) {
@@ -519,7 +499,7 @@ class PhotoFrameController(
     // --- fork features layered on top of the Face overlay ---
     // Only spin up TTS when the welcome overlay will actually speak. The greeting uses the
     // Android TTS service selected on the device, keeping any neural engine out-of-process.
-    if (plan.speakWelcome) startWelcomeVoice(welcomeCfg)
+    if (plan.speakWelcome) welcome.startVoice(welcomeCfg)
 
     // Start the ambient soundscape (no-op when set to Off).
     if (plan.soundscape) updateSoundscape()
@@ -530,43 +510,14 @@ class PhotoFrameController(
 
     // Feed the ambient dashboard's weather, and schedule its cycle (first card after ~45s).
     if (plan.weather) refreshWeather.run()
-    if (plan.dashboard) ui.postDelayed(dashboardCycle, PhotoFrameStartPlan.DASHBOARD_FIRST_MS)
+    if (plan.dashboard) ui.postDelayed(dashboard.cycle, PhotoFrameStartPlan.DASHBOARD_FIRST_MS)
 
-    if (plan.welcomeOverlay) showWelcomeOverlay()
+    if (plan.welcomeOverlay) welcome.show()
     startSource(source, plan.feedRoute)
   }
 
   /** How this frame is hosted; the face override is read at each start. */
   private fun host() = PhotoFrameHost(photosOnly, nightClockOnly, overnightNightPhoto, showWelcome, faceOverride != null)
-
-  private fun startWelcomeVoice(welcomeCfg: WelcomeConfig.Settings) {
-    tts = TextToSpeech(context) { status ->
-      if (status == TextToSpeech.SUCCESS && !ttsReady) {
-        tts?.language = Locale.US
-        tts?.setPitch(1.0f)
-        tts?.setSpeechRate(0.9f)
-        // Apply the user's chosen voice; if none chosen, auto-pick the highest-quality
-        // voice the device has so the greeting sounds as good as possible by default.
-        runCatching {
-          val voices = tts?.voices
-          val chosen =
-              if (welcomeCfg.ttsVoice.isNotBlank()) voices?.firstOrNull { it.name == welcomeCfg.ttsVoice }
-              else voices
-                  ?.filter { it.locale.language == Locale.US.language && !it.isNetworkConnectionRequired }
-                  ?.maxByOrNull { it.quality }
-          chosen?.let {
-            tts?.language = it.locale
-            tts?.voice = it
-          }
-        }
-        ttsReady = true
-        pendingSpeech?.let { text ->
-          speakWelcome(text, welcomeCfg)
-          pendingSpeech = null
-        }
-      }
-    }
-  }
 
   /** Starts [source]'s pipeline: discovery off Main, then the engine, the native deck or the web feed. */
   private fun startSource(source: PhotoFrameSource, feedRoute: PhotoFrameFeedRoute) {
@@ -998,9 +949,9 @@ class PhotoFrameController(
                     isCurrent={ !stopped && owner == legacyEngineRevision && webView === wv && legacyFaceStore === faceStore },
                     liftOverlays={
                       runCatching { faceRenderer.view.bringToFront() }
-                      runCatching { calendarPanel.bringToFront() }
-                      dashboardPanel?.let { runCatching { it.bringToFront() } }
-                      runCatching { welcomeOverlay.bringToFront() }
+                      calendar.bringToFront()
+                      dashboard.bringToFront()
+                      welcome.bringToFront()
                     }).also {
                   hybridFilmstrip = it
                   it.setHostActive(hostActive)
@@ -1119,9 +1070,9 @@ class PhotoFrameController(
               root.addOnLayoutChangeListener(resize)
               // Re-stack the overlays above the engine (bringToFront preserves their relative order).
               runCatching { faceRenderer.view.bringToFront() }
-              runCatching { calendarPanel.bringToFront() }
-              dashboardPanel?.let { runCatching { it.bringToFront() } }
-              runCatching { welcomeOverlay.bringToFront() }
+              calendar.bringToFront()
+              dashboard.bringToFront()
+              welcome.bringToFront()
               // Bust the WebView cache on app UPDATES by versioning the asset URL (VERSION_CODE bumps each
               // release) rather than clearCache(true) on every start — clearing every start wiped the disk
               // cache during the most latency-sensitive moment of cold start. Same URL within a version keeps
@@ -1201,9 +1152,9 @@ class PhotoFrameController(
     nativeFilmstrip = stage // Main owns the stage before layout/start can fail.
     root.addView(stage, FrameLayout.LayoutParams(MATCH, MATCH))
     runCatching { faceRenderer.view.bringToFront() }
-    runCatching { calendarPanel.bringToFront() }
-    dashboardPanel?.let { runCatching { it.bringToFront() } }
-    runCatching { welcomeOverlay.bringToFront() }
+    calendar.bringToFront()
+    dashboard.bringToFront()
+    welcome.bringToFront()
     stage.setHostActive(hostActive)
     stage.setPaused(paused)
     stage.start()
@@ -1471,16 +1422,13 @@ class PhotoFrameController(
     clearNativeHistory()
     if (this::viewerControls.isInitialized) viewerControls.stop()
     scaledCache.cancel() // don't keep burning CPU on copies while Home redraws
-    ui.removeCallbacks(dashboardCycle)
+    ui.removeCallbacks(dashboard.cycle)
     ui.close()
     runCatching { gestureCamera?.stop() }
     gestureCamera = null
     // TTS stop/shutdown is an IPC round-trip to the system TTS service, and soundscape.stop() can
     // block briefly — move both off the main thread so neither delays the exit.
-    val ttsRef = tts
-    tts = null
-    ttsReady = false
-    pendingSpeech = null
+    val ttsRef = welcome.release()
     Thread {
       runCatching { ttsRef?.stop() }
       runCatching { ttsRef?.shutdown() }
@@ -1559,17 +1507,17 @@ class PhotoFrameController(
 
     if (!photosOnly) {
       root.addView(faceRenderer.view)
-      buildCalendar(root)
+      calendar.build(root)
     }
 
     // Ambient dashboard panel — full-screen glanceable card, hidden until cycled in.
-    dashboardPanel = buildDashboardPanel().also {
+    dashboard.build().also {
       it.visibility = View.GONE
       root.addView(it, FrameLayout.LayoutParams(MATCH, MATCH))
     }
 
     // Welcome-back overlay — added last so it renders above photos and the Face overlay.
-    welcomeOverlay = buildWelcomeOverlay()
+    val welcomeOverlay = welcome.build()
     welcomeOverlay.visibility = View.GONE
     root.addView(welcomeOverlay, FrameLayout.LayoutParams(MATCH, MATCH))
     viewerControls = SlideshowViewerControls(
@@ -1632,167 +1580,6 @@ class PhotoFrameController(
     ui.post { if (g == gen) faceRenderer.setCaption(place, date, memory, fresh) }
   }
 
-  /** A clean upcoming-events panel top-right, over the photo. Its own translucent
-   *  rounded backing keeps it legible without a full-screen scrim. Hidden until a
-   *  calendar link is set and there's something to show. */
-  private fun buildCalendar(root: FrameLayout) {
-    calendarPanel = LinearLayout(context)
-    calendarPanel.orientation = LinearLayout.VERTICAL
-    calendarPanel.visibility = View.GONE
-    val bg = GradientDrawable()
-    bg.setColor(0x66000000)
-    bg.cornerRadius = dp(18).toFloat()
-    calendarPanel.background = bg
-    calendarPanel.setPadding(dp(22), dp(18), dp(22), dp(18))
-    val lp = FrameLayout.LayoutParams(WRAP, WRAP, Gravity.TOP or Gravity.END)
-    lp.setMargins(0, dp(40), dp(40), 0)
-    root.addView(calendarPanel, lp)
-
-    calendarHeader = text(15f, 0xCCFFFFFF.toInt(), false)
-    calendarHeader.typeface = Typeface.DEFAULT_BOLD
-    calendarHeader.letterSpacing = 0.08f
-    calendarPanel.addView(calendarHeader)
-
-    calendarRows = LinearLayout(context)
-    calendarRows.orientation = LinearLayout.VERTICAL
-    val rowsLp = LinearLayout.LayoutParams(WRAP, WRAP)
-    rowsLp.topMargin = dp(10)
-    calendarPanel.addView(calendarRows, rowsLp)
-  }
-
-  /** Rebuild the calendar panel from the cached events for the chosen range. Cheap
-   *  (no network) — called when a fetch lands and once per minute from [tick]. */
-  private fun renderCalendar() {
-    if (!this::calendarPanel.isInitialized) return
-    if (splitGlance || nightPhotoOn) {
-      // The new modes own the screen: Split glance shows only the next event in its panel.
-      calendarPanel.visibility = View.GONE
-      val now = System.currentTimeMillis()
-      val events = if (testSourceOn) ScreensaverTestSource.events(now)
-          else if (settings.usesCalendar) calendarEvents else emptyList()
-      val next = SplitGlancePanel.nextEvent(events, now)
-      val pattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm a"
-      splitPanel?.setNext(next?.title, next?.let { SimpleDateFormat(pattern, Locale.getDefault()).format(Date(it.startMillis)) })
-      return
-    }
-    if (!settings.usesCalendar && !testSourceOn) {
-      calendarPanel.visibility = View.GONE
-      return
-    }
-    val now = System.currentTimeMillis()
-    // The verification source shows synthetic events, never the household's own agenda.
-    val shown = if (testSourceOn) CalendarFeed.window(ScreensaverTestSource.events(now), CalendarFeed.RANGE_3DAY, now)
-        else CalendarFeed.window(calendarEvents, settings.calendarRange, now)
-    // Size + position can change at runtime (settings screen or a fleet push), so
-    // (re)apply the chrome each render. Scale drives text/padding; side drives the edge.
-    calScale =
-        when (settings.calendarSize) {
-          0 -> 0.82f
-          2 -> 1.22f
-          else -> 1f
-        }
-    applyCalendarChrome()
-    calendarHeader.textSize = 15f * calScale
-    calendarHeader.text = rangeLabel(settings.calendarRange).uppercase(Locale.getDefault())
-    calendarRows.removeAllViews()
-    calendarPanel.visibility = View.VISIBLE
-
-    if (shown.isEmpty()) {
-      val empty = text(17f * calScale, 0xCCFFFFFF.toInt(), false)
-      empty.text = "Nothing scheduled"
-      calendarRows.addView(empty)
-      return
-    }
-
-    val agenda = settings.calendarRange == CalendarFeed.RANGE_AGENDA
-    var lastDayKey = ""
-    for (ev in shown) {
-      // Day header whenever the day changes (and always in agenda mode, which spans
-      // arbitrary dates). A single-day range needs no per-day header.
-      val key = dayKey(ev.startMillis)
-      if (key != lastDayKey && (agenda || settings.calendarRange != CalendarFeed.RANGE_DAY)) {
-        val header = text(13f * calScale, 0x99FFFFFF.toInt(), false)
-        header.typeface = Typeface.DEFAULT_BOLD
-        header.text = dayHeader(ev.startMillis).uppercase(Locale.getDefault())
-        val hlp = LinearLayout.LayoutParams(WRAP, WRAP)
-        hlp.topMargin = if (calendarRows.childCount == 0) 0 else dp(12)
-        calendarRows.addView(header, hlp)
-      }
-      lastDayKey = key
-      calendarRows.addView(buildEventRow(ev))
-    }
-  }
-
-  /** Position the panel against the chosen edge and scale its padding to the size. */
-  private fun applyCalendarChrome() {
-    val pad = (22 * calScale).toInt()
-    val padV = (18 * calScale).toInt()
-    calendarPanel.setPadding(dp(pad), dp(padV), dp(pad), dp(padV))
-    val gravity =
-        Gravity.TOP or
-            (if (settings.calendarSide == ScreensaverConfig.CAL_SIDE_LEFT) Gravity.START
-            else Gravity.END)
-    val lp = FrameLayout.LayoutParams(WRAP, WRAP, gravity)
-    val side = dp(40)
-    if (settings.calendarSide == ScreensaverConfig.CAL_SIDE_LEFT) lp.setMargins(side, dp(40), 0, 0)
-    else lp.setMargins(0, dp(40), side, 0)
-    calendarPanel.layoutParams = lp
-  }
-
-  private fun buildEventRow(ev: CalendarFeed.Event): View {
-    val row = LinearLayout(context)
-    row.orientation = LinearLayout.HORIZONTAL
-    row.gravity = Gravity.CENTER_VERTICAL
-    val rowLp = LinearLayout.LayoutParams(WRAP, WRAP)
-    rowLp.topMargin = dp(6)
-
-    val time = text(17f * calScale, Color.WHITE, false)
-    time.text = if (ev.allDay) "All day" else timeLabel(ev.startMillis)
-    time.width = dp((96 * calScale).toInt())
-
-    val title = text(17f * calScale, Color.WHITE, false)
-    title.typeface = Typeface.DEFAULT_BOLD
-    title.text = ev.title
-    title.maxLines = 1
-    title.ellipsize = TextUtils.TruncateAt.END
-    title.maxWidth = dp((360 * calScale).toInt())
-
-    row.addView(time)
-    row.addView(title)
-    row.layoutParams = rowLp
-    return row
-  }
-
-  private fun rangeLabel(range: String): String =
-      when (range) {
-        CalendarFeed.RANGE_3DAY -> "Next 3 days"
-        CalendarFeed.RANGE_WEEK -> "This week"
-        CalendarFeed.RANGE_AGENDA -> "Upcoming"
-        else -> "Today"
-      }
-
-  private fun timeLabel(millis: Long): String {
-    val pattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm a"
-    return SimpleDateFormat(pattern, Locale.getDefault()).format(Date(millis))
-  }
-
-  /** A stable per-day key (yyyyDDD) so the renderer can tell when the day changes. */
-  private fun dayKey(millis: Long): String =
-      SimpleDateFormat("yyyyDDD", Locale.US).format(Date(millis))
-
-  /** "Today" / "Tomorrow" / "Sat, Jun 21" relative to now. */
-  private fun dayHeader(millis: Long): String {
-    val day = Calendar.getInstance()
-    val today = dayKey(day.timeInMillis)
-    day.add(Calendar.DAY_OF_YEAR, 1)
-    val tomorrow = dayKey(day.timeInMillis)
-    return when (dayKey(millis)) {
-      today -> "Today"
-      tomorrow -> "Tomorrow"
-      else -> DateFormatter.format(Date(millis), "EEEMMMd")
-    }
-  }
-
   private fun applyFit() {
     // Video gets the same choice via [applyVideoFit], sized per-clip once its dimensions are known.
     val scaleType =
@@ -1822,237 +1609,7 @@ class PhotoFrameController(
     videoView.layoutParams = lp
   }
 
-  // --- welcome-back overlay (fork) --------------------------------------------
-
-  private fun buildWelcomeOverlay(): View {
-    val welcomeCfg = WelcomeConfig.load(context)
-
-    val overlay = FrameLayout(context)
-    // Semi-opaque dark scrim so the photo is faintly visible behind the greeting.
-    val bgAlpha = (welcomeCfg.backgroundOpacity * 255).toInt()
-    overlay.setBackgroundColor((bgAlpha shl 24) or 0x000000)
-
-    val col = LinearLayout(context)
-    col.orientation = LinearLayout.VERTICAL
-    col.gravity = Gravity.CENTER_HORIZONTAL
-    // Add horizontal padding to prevent text cutoff at screen edges
-    col.setPadding(dp(40), dp(20), dp(40), dp(20))
-
-    val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-    val greeting = when {
-      hour < 5  -> welcomeCfg.greetingNight
-      hour < 12 -> welcomeCfg.greetingMorning
-      hour < 17 -> welcomeCfg.greetingAfternoon
-      hour < 22 -> welcomeCfg.greetingEvening
-      else      -> welcomeCfg.greetingNight
-    }
-    val fullGreeting = if (welcomeCfg.userName.isNotBlank()) {
-      "$greeting, ${welcomeCfg.userName}"
-    } else {
-      greeting
-    }
-
-    if (welcomeCfg.showGreeting) {
-      val greetingView = text(welcomeCfg.greetingSize, welcomeCfg.greetingColor, false)
-      greetingView.text = fullGreeting
-      greetingView.gravity = Gravity.CENTER
-      greetingView.letterSpacing = welcomeCfg.greetingLetterSpacing
-      greetingView.maxLines = 2
-      val greetingLp = LinearLayout.LayoutParams(
-          LinearLayout.LayoutParams.MATCH_PARENT,
-          LinearLayout.LayoutParams.WRAP_CONTENT)
-      col.addView(greetingView, greetingLp)
-    }
-
-    if (welcomeCfg.showClock) {
-      val clockPattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm"
-      val clockView = text(welcomeCfg.clockSize, welcomeCfg.clockColor, true)
-      clockView.text = SimpleDateFormat(clockPattern, Locale.getDefault()).format(Date())
-      clockView.gravity = Gravity.CENTER
-      clockView.maxLines = 1
-      val clockLp = LinearLayout.LayoutParams(
-          LinearLayout.LayoutParams.MATCH_PARENT,
-          LinearLayout.LayoutParams.WRAP_CONTENT)
-      col.addView(clockView, clockLp)
-    }
-
-    if (welcomeCfg.showDate) {
-      val dateView = text(welcomeCfg.dateSize, welcomeCfg.dateColor, false)
-      dateView.text = DateFormatter.format(Date(), "EEEEMMMd")
-      dateView.gravity = Gravity.CENTER
-      dateView.maxLines = 1
-      val dateLp = LinearLayout.LayoutParams(
-          LinearLayout.LayoutParams.MATCH_PARENT,
-          LinearLayout.LayoutParams.WRAP_CONTENT)
-      dateLp.topMargin = dp(4)
-      col.addView(dateView, dateLp)
-    }
-
-    // Use MATCH_PARENT width with the padding above to ensure text stays visible
-    overlay.addView(col, FrameLayout.LayoutParams(MATCH, WRAP, Gravity.CENTER))
-    return overlay
-  }
-
-  private fun showWelcomeOverlay() {
-    val welcomeCfg = WelcomeConfig.load(context)
-    welcomeVisible = true
-    welcomeOverlay.alpha = 0f
-    welcomeOverlay.visibility = View.VISIBLE
-    welcomeOverlay.animate().alpha(1f).setDuration(500).start()
-
-    // Speak the greeting if TTS is enabled
-    if (welcomeCfg.enableTts) {
-      val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-      val greeting = when {
-        hour < 5  -> welcomeCfg.greetingNight
-        hour < 12 -> welcomeCfg.greetingMorning
-        hour < 17 -> welcomeCfg.greetingAfternoon
-        hour < 22 -> welcomeCfg.greetingEvening
-        else      -> welcomeCfg.greetingNight
-      }
-      val fullGreeting = if (welcomeCfg.userName.isNotBlank()) {
-        "$greeting, ${welcomeCfg.userName}"
-      } else {
-        greeting
-      }
-      // Speak immediately if TTS is ready, otherwise queue it
-      if (ttsReady) {
-        speakWelcome(fullGreeting, welcomeCfg)
-      } else {
-        pendingSpeech = fullGreeting
-      }
-    }
-
-    // Auto-dismiss after configured duration.
-    ui.postDelayed(dismissWelcomeRunnable, welcomeCfg.durationMs.toLong())
-  }
-
-  /** Dismiss immediately (e.g. on tap). */
-  private fun dismissWelcome() {
-    if (!welcomeVisible) return
-    ui.removeCallbacks(dismissWelcomeRunnable)
-    tts?.stop()
-    pendingSpeech = null
-    dismissWelcomeAnimated()
-  }
-
-  private fun dismissWelcomeAnimated() {
-    welcomeVisible = false
-    welcomeOverlay.animate()
-        .alpha(0f)
-        .setDuration(600)
-        .withEndAction { welcomeOverlay.visibility = View.GONE }
-        .start()
-  }
-
-  private fun speakWelcome(text: String, cfg: WelcomeConfig.Settings) {
-    val params = welcomeTtsParams(cfg)
-    runCatching {
-      tts?.speak(text, TextToSpeech.QUEUE_FLUSH, params, "welcome_greeting")
-    }.onFailure { Log.w(TAG, "Welcome TTS speak failed", it) }
-  }
-
-  private fun welcomeTtsParams(cfg: WelcomeConfig.Settings): android.os.Bundle? =
-      if (cfg.ttsVoice.isBlank()) {
-        null
-      } else {
-        android.os.Bundle().apply { putString(SHERPA_VOICE_PARAM, cfg.ttsVoice) }
-      }
-
   // --- ambient dashboard (fork) -----------------------------------------------
-
-  private fun buildDashboardPanel(): View {
-    val panel = FrameLayout(context)
-    panel.setBackgroundColor(0xF20D0D12.toInt()) // near-opaque dark
-    val col = LinearLayout(context)
-    col.orientation = LinearLayout.VERTICAL
-    col.gravity = Gravity.CENTER
-    panel.addView(col, FrameLayout.LayoutParams(WRAP, WRAP, Gravity.CENTER))
-    dashClock = text(120f, Color.WHITE, true).also { it.gravity = Gravity.CENTER; col.addView(it) }
-    dashDate = text(28f, Color.WHITE, false).also { it.gravity = Gravity.CENTER; col.addView(it) }
-    dashWeather = text(26f, Color.WHITE, false).also {
-      it.gravity = Gravity.CENTER
-      (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(18)
-      col.addView(it)
-    }
-    dashEvent = text(22f, Color.WHITE, false).also {
-      it.gravity = Gravity.CENTER
-      (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(10)
-      col.addView(it)
-    }
-    // Almanac line(s): enabled calendar packs (Irish holidays, prayer times) + a quote of the day.
-    dashAlmanac = text(20f, Color.WHITE, false).also {
-      it.gravity = Gravity.CENTER
-      (it.layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(14)
-      col.addView(it)
-    }
-    return panel
-  }
-
-  /** Shows the dashboard card for a few seconds, then returns to the photos. */
-  private val dashboardCycle =
-      object : Runnable {
-        override fun run() {
-          if (!settings.ambientDashboard) return
-          // Never pop the bright dashboard over the dark-room Night photo.
-          if (nightPhotoOn) { ui.postDelayed(this, PhotoFrameSchedule.DASHBOARD_RETRY_MS); return }
-          showDashboard()
-          ui.postDelayed({ hideDashboard() }, 9_000L)
-          ui.postDelayed(this, 90_000L) // reappear roughly every 90s
-        }
-      }
-
-  private fun showDashboard() {
-    val panel = dashboardPanel ?: return
-    val now = Date()
-    val clockPattern = if (ImmortalSettings.use24HourClock(context)) "H:mm" else "h:mm"
-    dashClock.text = SimpleDateFormat(clockPattern, Locale.getDefault()).format(now)
-    dashDate.text = DateFormatter.format(now, "EEEEMMMMd")
-    dashWeather.text = weatherText
-    dashWeather.visibility = if (weatherText.isNotBlank()) View.VISIBLE else View.GONE
-    dashEvent.visibility = View.GONE
-    dashAlmanac.visibility = View.GONE
-    io.execute {
-      val lines = buildList {
-        runCatching { CalendarPacks.headerLines(context) }.getOrDefault(emptyList()).forEach { add(it) }
-        val q = DailyContent.quoteOfDay()
-        add("“${q.text}”  — ${q.author}")
-      }
-      val txt = lines.joinToString("\n")
-      ui.post {
-        if (dashboardVisible && txt.isNotBlank()) {
-          dashAlmanac.text = txt
-          dashAlmanac.visibility = View.VISIBLE
-        }
-      }
-    }
-    io.execute {
-      val ev = runCatching {
-        if (CalendarHelper.hasPermission(context)) CalendarHelper.upcoming(context).firstOrNull() else null
-      }.getOrNull()
-      ui.post {
-        if (ev != null) {
-          val cal = Calendar.getInstance().apply { timeInMillis = ev.begin }
-          val whenStr =
-              if (ev.allDay) SimpleDateFormat("MMM d", Locale.getDefault()).format(cal.time)
-              else SimpleDateFormat(if (ImmortalSettings.use24HourClock(context)) "HH:mm" else "h:mm a",
-                  Locale.getDefault()).format(cal.time)
-          dashEvent.text = "Next: $whenStr · ${ev.title}"
-          if (dashboardVisible) dashEvent.visibility = View.VISIBLE
-        }
-      }
-    }
-    panel.alpha = 0f
-    panel.visibility = View.VISIBLE
-    panel.animate().alpha(1f).setDuration(600).start()
-    dashboardVisible = true
-  }
-
-  private fun hideDashboard() {
-    val panel = dashboardPanel ?: return
-    panel.animate().alpha(0f).setDuration(600).withEndAction { panel.visibility = View.GONE }.start()
-    dashboardVisible = false
-  }
 
   private val refreshWeather =
       object : Runnable {
@@ -2066,25 +1623,18 @@ class PhotoFrameController(
     metaIo.execute {
       // Shared resilient fetch: cached location + multi-provider geolocation.
       val w = Weather.fetch(context)
-      if (w.isNotBlank()) weatherText = w
+      if (w.isNotBlank()) dashboard.weatherText = w
     }
   }
 
-  private fun text(sizeSp: Float, color: Int, light: Boolean): TextView {
-    val t = TextView(context)
-    t.textSize = sizeSp
-    t.setTextColor(color)
-    if (light) t.typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
-    t.setShadowLayer(8f, 0f, 2f, 0x99000000.toInt())
-    return t
-  }
+  private fun renderCalendar() = calendar.render()
 
   private fun intervalMs(): Long = PhotoFrameSchedule.intervalMs(settings.intervalSec, nightPhotoOn)
 
   /** Split glance: the clock panel replaces the face overlay; the calendar feeds "Next". */
   private fun startSplitGlance(root: FrameLayout) {
     faceRendererDelegate.value.view.visibility = View.GONE
-    if (this::calendarPanel.isInitialized) calendarPanel.visibility = View.GONE
+    calendar.hide()
     val panel = splitPanel ?: SplitGlancePanel(context).also { splitPanel = it }
     if (panel.view.parent == null) root.addView(panel.view, FrameLayout.LayoutParams(WRAP, WRAP))
     panel.setOrbitEnabled(settings.antiBurnIn)
@@ -2141,7 +1691,7 @@ class PhotoFrameController(
     val day = if (overlays.dayVisible) View.VISIBLE else View.GONE
     if (faceRendererDelegate.isInitialized() && overlays.faceFollows) faceRenderer.view.visibility = day
     splitPanel?.view?.visibility = day
-    if (overlays.rerenderCalendar) renderCalendar() else if (this::calendarPanel.isInitialized) calendarPanel.visibility = View.GONE
+    if (overlays.rerenderCalendar) renderCalendar() else calendar.hide()
     // Re-present the photo on screen so it warms (or returns to day) now, through the slow
     // night dissolve, instead of waiting for the next photo.
     if (PhotoFrameStagePolicy.representForNightPhoto(nativePhotoMode, stopped, nativeStage.photoCount)) nativeStage.currentPhoto?.let {
@@ -2230,10 +1780,7 @@ class PhotoFrameController(
 
   private fun measuredNativeOcclusions(): List<Rect> {
     val occupied = if (photosOnly) mutableListOf<Rect>() else faceRenderer.photoOcclusions().toMutableList()
-    if (this::calendarPanel.isInitialized && calendarPanel.visibility == View.VISIBLE && calendarPanel.width > 0) {
-      occupied.add(Rect(calendarPanel.left - dp(20), calendarPanel.top - dp(20),
-          calendarPanel.right + dp(20), calendarPanel.bottom + dp(20)))
-    }
+    calendar.occlusion { dp(PhotoFrameStagePolicy.CALENDAR_MARGIN_DP) }?.let(occupied::add)
     return occupied
   }
 
@@ -2249,12 +1796,8 @@ class PhotoFrameController(
         val clocks = if (photosOnly) emptyList() else faceRenderer.photoOcclusions().map { area ->
           SlideshowPresentationPolicy.Bounds(area.left, area.top, area.right, area.bottom)
         }
-        val calendar = if (this::calendarPanel.isInitialized &&
-            calendarPanel.visibility == View.VISIBLE && calendarPanel.width > 0) {
-          listOf(SlideshowPresentationPolicy.Bounds(calendarPanel.left - dp(20), calendarPanel.top - dp(20),
-              calendarPanel.right + dp(20), calendarPanel.bottom + dp(20)))
-        } else emptyList()
-        SlideshowPresentationPolicy.paperOcclusions(origin[0], origin[1], clocks, calendar).forEach { area ->
+        val calendarArea = listOfNotNull(calendar.bounds { dp(PhotoFrameStagePolicy.CALENDAR_MARGIN_DP) })
+        SlideshowPresentationPolicy.paperOcclusions(origin[0], origin[1], clocks, calendarArea).forEach { area ->
           bounds.put(JSONObject().put("left", area.left).put("top", area.top)
               .put("right", area.right).put("bottom", area.bottom))
         }
@@ -2361,12 +1904,12 @@ class PhotoFrameController(
             metaIo.execute {
               val events = CalendarFeed.fetch(url)
               ui.post {
-                calendarEvents = events
+                calendar.events = events
                 renderCalendar()
               }
             }
           } else {
-            calendarEvents = emptyList()
+            calendar.events = emptyList()
             renderCalendar()
           }
           ui.postDelayed(this, calendarRefreshMs)
@@ -3574,15 +3117,13 @@ class PhotoFrameController(
         .onFailure { prefetchRunning = false }
   }
 
-  private val MATCH = FrameLayout.LayoutParams.MATCH_PARENT
-  private val WRAP = FrameLayout.LayoutParams.WRAP_CONTENT
   // Ken Burns overscan: the photo is scaled to this at the zoomed end / throughout a pan, giving
   // pan styles room to travel without exposing the black background behind the image.
   private val BIG = 1.12f
   // Cap on consecutive shared-album re-resolves before yielding to the built-in feed (a real
   // sustained outage), reset on any successful photo. See [reresolveOrFallback].
   private val MAX_RERESOLVE = 3
-  private fun dp(v: Int): Int = (v * context.resources.displayMetrics.density).toInt()
+  private fun dp(v: Int): Int = views.dp(v)
 
   internal companion object {
     /**

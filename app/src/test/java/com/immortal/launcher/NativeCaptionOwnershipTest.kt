@@ -65,6 +65,7 @@ class NativeCaptionOwnershipTest {
     val photos = listOf(photo("generated-a"), photo("generated-b"))
 
     init {
+      PhotoFrameTestPorts.install(controller, Mockito.mock(android.content.Context::class.java))
       Mockito.`when`(face.photoOcclusions()).thenReturn(emptyList())
       set("ui", main)
       set("settings", ScreensaverConfig.Settings(mode = mode, intervalSec = 17))

@@ -24,7 +24,16 @@ internal object PhotoFrameTestPorts {
     set(controller, "decodePlan", PhotoFrameDecodePlan(ports))
     set(controller, "schedule", PhotoFrameSchedule(ports))
     set(controller, "webChain", PhotoFrameWebChain<android.graphics.Bitmap>(ports::wallMs, {}))
+    val views = PhotoFrameViews(context)
+    set(controller, "views", views)
+    set(controller, "calendar", PhotoFrameCalendarPanel(context, views, ports,
+        settings = { get(controller, "settings") as ScreensaverConfig.Settings }, testSource = { false },
+        featureOwnsScreen = { false }, splitPanel = { null }))
+    set(controller, "welcome", PhotoFrameWelcome(context, views, post = { _, _ -> }, remove = {}))
   }
+
+  private fun get(controller: PhotoFrameController, name: String): Any? =
+      PhotoFrameController::class.java.getDeclaredField(name).run { isAccessible = true; get(controller) }
 
   private fun set(controller: PhotoFrameController, name: String, value: Any) {
     PhotoFrameController::class.java.getDeclaredField(name).apply { isAccessible = true; set(controller, value) }
