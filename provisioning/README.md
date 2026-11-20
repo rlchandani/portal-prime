@@ -343,7 +343,12 @@ The backup command requires Python 3 (`PYTHON3=/path/to/python3` can select it).
 Each successful capture writes `backups/<serial>/<timestamp>-<unique-id>/` with `info.json`, `apps.json`
 (the installed-app list), `registry.json` (host/port/token), and every readable
 `shared_prefs/*.xml` — the agent runs *as* Immortal, so it reads its own
-`/data/data/.../shared_prefs` over `/fs/read`, no root or adb needed. **The
+`/data/data/.../shared_prefs` over `/fs/read`, no root or adb needed. Hearthpane
+1.274 and later refuse every read of the app's private data over `/fs/read`
+(preferences hold the household key, Home Assistant and music tokens and the phone
+sessions), so against those agents the backup stops at the preferences step and
+keeps the previous snapshot; `ls` and `push` (and so `fleet-restore.sh --prefs`
+from an older snapshot) still work. **The
 `backups/` tree holds tokens and cleartext credentials, so it is git-ignored —
 keep it private.** New backup directories use mode `0700` and new files are
 created under umask `077`. Existing backup parents must be directories owned by

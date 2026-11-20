@@ -675,7 +675,8 @@ class FleetRoutes(private val context: Context) {
   private fun fsRead(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val path = req.queryParam("path") ?: return resp(400, err("path_required"))
     val f = File(path)
-    if (FleetSecretPaths.isBlocked(f)) return resp(403, err("protected_path"))
+    // Reads also refuse the app's private data (prefs, keys, tokens, sessions) and /proc side doors.
+    if (FleetSecretPaths.isReadBlocked(f)) return resp(403, err("protected_path"))
     if (!f.isFile || !f.canRead()) return resp(404, err("not_a_readable_file"))
     return FleetFileRead.response(f)
   }
