@@ -432,3 +432,261 @@ crossfades one cell, and it produces 4–5 frames of 100–330 ms.
    the doodle tiling under motion.
 4. **Cold start:** prefs loads now overlap. Next is the ~390 ms first doFrame itself (measure 270 ms in round 4).
 5. **Mini survey** when it is on USB.
+
+---
+
+# Round 7 (perf-7)
+
+Family Portal+ (`<family>`), debloated, performance build plus its `.dm`. Before every run I checked `reason=install-dm`
+and the APK sha. Cold starts are real reboots with no force-stop, and the numbers come from untraced reboots. Attribution
+used perfetto (`gfx view wm am input dalvik binder_driver`, sched with wakeups and blocked reasons), simpleperf on a scratch
+`profileable` build, and Chromium tracing plus the DevTools LayerTree on a scratch debuggable build (screensaver test
+source only). The work started from 1.285; main moved to 1.286 during the round, perf-7 is merged with it, and the final
+table compares main 1.286 with the merged branch. The Mini was not on USB.
+
+## Fixes kept
+
+1. `perf: warm the five prefs files Home's first frame still waited on` (754bbeb9).
+   - The cold trace on 1.285 still had the main thread asleep on five SharedPreferences loaders inside Home's first
+     frame: 8 + 4 + 8 + 25 + 3 = 47 ms.
+   - A scratch probe that logged every `getSharedPreferences` call named the files: `immortal_display`,
+     `immortal_share_fresh`, `immortal_countdown`, `immortal_todos` and `immortal_crypto`. They are now on round 6's
+     warm-up list, in first-read order. A unit test pins them.
+2. `perf: create the RenderThread's EGL context while Home's first frame composes` (bdcdb95c).
+   - The RenderThread made its EGL context and opened Skia's shader disk cache only when Home's window gave it a
+     surface. That happened inside the first frame, after composition and layout: `setSurface` took 46 ms
+     (`Creating EGLContext` 19 ms, `initShaderDiskCache` 16 ms), and the main thread waited for it.
+   - `HomeActivity.onCreate` now hands the RenderThread a 1×1 `ImageReader` surface through the public
+     `HardwareRenderer` (API 29+). Nothing is drawn into it, so there is no frame and no pixel change. It is released
+     after 10 s.
+   - Traced cold boot: the warm-up's `setSurface` runs about 60 ms before Home's frame, in parallel with the
+     composition. Home's own `setSurface` falls to 1.3 ms, and no SharedPreferences wait is left in the first frame
+     (the frame's sleep time drops from 108 to 62 ms).
+
+## Cold start: before / after (median (range), ms)
+
+First A/B on 1.285 (3 reboots each; b0 = main, c1 = fix 1, c2 = fixes 1 + 2):
+
+| | 1.285 | + prefs | + prefs + EGL |
+|---|---|---|---|
+| Home `Displayed` | 1430 (1403–1619) | 1416 (1329–1417) | 1393 (1303–1425) |
+| First frame, gfxinfo | 412 (280–444) | 344 (343–363) | **299 (287–308)** |
+| Second frame | 484 (331–489) | 424 (402–530) | **374 (352–428)** |
+| First frame on screen, after process start | 1142 (1129–1303) | 1133 (1039–1245) | 1152 (1142–1159) |
+
+Final, on 1.286 (main vs perf-7 merged with 1.286, 3 reboots each):
+
+| | Before (1.286) | After (perf-7) |
+|---|---|---|
+| Home `Displayed` | 1515 (1499–1576) | **1416 (1397–1687)** |
+| First frame, gfxinfo | 383 (338–451) | **274 (240–421)** |
+| Second frame | 489 (387–519) | **309 (298–470)** |
+| First frame on screen, after process start | 1202 (1192–1259) | **1118 (1116–1403)** |
+
+- `Displayed` didn't get worse: it is lower in both A/Bs.
+- One f1 reboot was an outlier on every metric (421 ms first frame, 1687 ms `Displayed`). Rounds 5 and 6 saw the same
+  kind of outlier.
+
+Pixel diffs (main 1.286 vs perf-7 merged, Family):
+- Settings, Tools library, Reminders, library after Back, Reminders reopened: **100.0000 % identical**.
+- Music: identical outside the live sign-in code band (y 720–840), which changes on every open.
+
+All 8368 unit tests pass (910 classes, 1 skipped), and `:app:assemblePerformance` passes on the merged branch.
+
+What is left in the first frame (traced, after both fixes): about 300 ms, still mostly the first composition and
+measure. Runtime class verification on the main thread takes 19 ms (`androidx.compose.ui.text.AndroidParagraph`, a
+Compose text-input adapter, and media3's `Loader`, which means something builds an ExoPlayer object inside Home's first
+frame). Then the RenderThread's first `DrawFrame` (24–54 ms, mostly `flush commands`).
+
+## Home's Back-from-Calls frame: render-side attribution (1.285, 2 traced Backs + simpleperf on 3)
+
+Per-window gfxinfo, 6 visits: Home's first frame after Back is 50–71 ms (median 69), then 23–39 ms. The trace splits
+the 70 ms doFrame like this:
+
+| Part | ms | Where |
+|---|---|---|
+| `animation`: Compose recomposition on resume | 14–15 | main, running |
+| `relayoutWindow` (new surface, `createSurfaceControl`) | 7–21 | asleep; system_server waits on the WM lock, contended by the closing transition |
+| a second system_server call (`IDisplayManager` code 1, display info) | 4–6 | asleep, same lock contention |
+| `Record View#draw()`: the whole tree re-recorded | 11–28 | main, running |
+| waiting for the RenderThread to sync | 6–8 | asleep |
+| RenderThread `setSurface` + `DrawFrame` | 2 + 7–10 | RenderThread |
+
+- **The re-record is a platform cost.** On Android 10, an activity stop calls `ViewRootImpl.setWindowStopped(true)`.
+  That destroys every RenderNode's display list (`ThreadedRenderer.destroyHardwareResources`), so the first frame back
+  re-records all of Home. Calls is opaque, so Home always stops under it. Hidden tab pages are already `INVISIBLE` and are
+  not re-recorded.
+- **The surface work is a platform cost too.** Home's surface is recreated on every return, and how long it takes depends
+  on system_server's lock contention.
+- **App-side main-thread work.** Recomposition on resume is 19.5 ms per Back in simpleperf, spread over `GuestUi`,
+  `ApprovedLauncherTabs`, `Aurora` and the settings reads. This is the design that makes Home pick up Settings edits, and
+  round 6's structural-snapshot fix for it didn't move the frame. Outside the frame, per Back, there are also:
+  - `BarWatchService` → `ForegroundCandidate` → `getRoot` (11 ms);
+  - Compose accessibility `checkForSemanticsChanges` (9 ms).
+- No change kept. The only levers left would be drawing less on Home or not stopping Home under Calls. A translucent
+  Calls window would keep Home rendering under a live call and change the window animation, so it was not tried.
+
+## Home under Settings (1.285, 6 opens + 2 traced)
+
+- Home draws 2 frames, 16–86 ms. The first starts at `activityPause`, before Settings' window exists. On the main thread
+  it is small (doFrame 6–10 ms, record 3 ms). Its RenderThread `DrawFrame` is 19–24 ms, of which `flush commands` is
+  6–15 ms. This frame is the tile's press feedback.
+- Home and Settings share one main thread and one RenderThread. So Home's frames are queued among Settings' first
+  traversals (27–38 ms frames with a relayout and new-surface binder calls each) rather than being slow on their own.
+- No pixel-identical change was found. The frames draw the press feedback, which has to stay.
+
+## Continuous-motion screensaver modes: they run at 60 fps
+
+A new tool, `sflat.py`, reads SurfaceFlinger's present times for the screensaver layer. Over 45 s per mode (1.285, pinned,
+10 s beats, generated scenes):
+
+| Mode | Presented fps | Missed vsyncs | gfxinfo p50 latency | RenderThread issue p50 | Waiting for the RenderThread p50 |
+|---|---|---|---|---|---|
+| kenBurns | **59.8** | 0.4 % | 29 ms | 13.9 ms | 8.9 ms |
+| framed | **59.9** | 0.2 % | 27 ms | 13.5 ms | 7.4 ms |
+| memories | 54.8 | 8.6 % (one 1 s gap where nothing moves) | 28 ms | 13.2 ms | 8.1 ms |
+
+- **The ~29 ms is latency, not frame time.** It is IntendedVsync → FrameCompleted through a three-stage pipeline:
+  - about 3 ms on the main thread;
+  - about 8 ms waiting while the RenderThread finishes the previous frame;
+  - about 14 ms on the RenderThread;
+  - about 1.4 ms on the GPU.
+
+  A new frame still reaches the screen on every vsync.
+- **Round 6's ~34 fps reading was a sampling artifact.** `sspin.py` dedupes polled framestats, but the buffer holds only
+  about 2 s of frames, so polls lost frames. Its `n` undercounts by about 18 %.
+- **The cost is CPU work on the RenderThread, not GPU fill.**
+  - Chromium trace: `DrawFn_DrawGL` averages 5.5 ms on the RenderThread, and the in-process GPU thread is mostly idle.
+  - The page has 4 full-screen layers plus the hero: root, `#stage`, the Ken Burns matte with doodles, and the vignette,
+    plus one or two 2074×1354 hero layers while the scenes overlap.
+  - So the frame budget is about 85 % used. That leaves little headroom for the Mini.
+- No change kept. Cutting a full-screen layer, such as the vignette or the matte, is not pixel-identical. That decision
+  belongs to the owner.
+
+## Tried, not kept
+
+None measured. The candidate changes for the Calls Back and Settings frames were ruled out by attribution (above), not
+by A/B.
+
+## Next
+
+1. **Cold start:** about 300 ms of first composition and measure remain.
+   - Find what builds a media3 `Loader` inside Home's first frame. If it is an eager player, deferring it saves its
+     verification and construction.
+   - Check whether the RenderThread's first `DrawFrame` (`flush commands` 12–31 ms) is shader compilation that the
+     persisted cache misses.
+2. **Mini:** the screensaver's RenderThread runs at about 85 % of the frame budget on the Portal+, so check SF present
+   fps on the Mini first. The same `sflat.py` run works there.
+3. **Calls Back:** only app-side recomposition and the out-of-frame accessibility work remain. Both are design trade-offs
+   (refresh on resume, BarWatch).
+4. **Tooling:** use `sflat.py` (SurfaceFlinger present times) for smoothness, not polled gfxinfo counts.
+
+---
+
+# Round 8 (perf-8)
+
+Family Portal+ (`<family>`), debloated, performance build plus its `.dm`. Before every run I checked `reason=install-dm`
+and the APK sha. Cold starts are real reboots with no force-stop, and the numbers come from untraced reboots. Attribution
+used perfetto (round 7's cold config), simpleperf from process start on a scratch `profileable` build, `dexdump` of the
+APK against the device's own boot classpath, and the R8 mapping of each build. Base: main 1.287. The Mini was not on USB
+(checked at the start and again at the end of the round).
+
+## Fix kept
+
+`perf: keep Android-10-missing API code out of Home's first-frame classes` (3ff4be49).
+
+- **There is no media3 player in Home's first frame.** Round 7 read the runtime `VerifyClass` of media3's `Loader` as an
+  eager ExoPlayer, but no Home code builds one. The obfuscated class `zd2` takes `Loader`'s name in the mapping, yet it is an
+  R8 horizontal merge of about 40 classes behind an `int` class id. Its constructors are called from Compose's
+  `Recomposer.<init>` and `MeasureAndLayoutDelegate.<init>`. Music, follow-me and playback resume never touch media3, so
+  nothing needed deferring.
+- **Why those classes are verified at runtime.** ART verifies a class again at runtime only if the install-time verifier
+  soft-failed it. A new tool, `softfail.py`, lists the framework references in a dex class that don't resolve against the
+  device's boot classpath (pulled from Family). Each of the classes verified in the first frame names one API that
+  Android 10 lacks. R8 put that API there by merging or inlining:
+
+  | Class verified in the first frame (b0) | ms | Compose code inside | Code R8 merged or inlined in | Missing on API 29 |
+  |---|---|---|---|---|
+  | `zd2` | 6.4 | `DepthSortedSetsForDifferentPasses`, `CanvasDrawScope` parts | media3 `LoudnessCodecController` | `LoudnessCodecController` (API 35) |
+  | `pa` | 5.4 | `AndroidParagraph` | `AndroidLayoutApi34`, `Api34SegmentFinder` (inlined) | `SegmentFinder` (API 34) |
+  | `ia` | 2.1 | `animateValueAsState`'s coroutine group | `ComposeScrollCaptureCallback`'s lambda | `ScrollCaptureSession` (API 31) |
+  | `lx0` | 1.1 | `Latch` (Recomposer), `PrefetchHandleProvider` | `DefaultTrackSelector$SpatializerWrapperV32` | `Spatializer` (API 32) |
+
+- **The fix:** class-level `-keep,allowshrinking,allowobfuscation` rules in `portal-r8-rules.pro` for those five sources.
+  `allowoptimization` is deliberately left out: the app's own `allowoptimization` keeps still let R8 merge `GuestWifi$Network`
+  and `CcPlanStyle` into `lx0`. The API references now stay in their own classes, which Home never loads. A static check of
+  the c1 dex finds no Android-10-missing reference left in any of the startup classes.
+- **Traced cold boot:** runtime verification before the end of the first frame falls from 6 classes / 15.6 ms to
+  1.7 ms. Only an R8 API outline (0.2 ms) remains in the frame, plus a platform conscrypt class during `bindApplication`.
+- `StartupVerificationRulesTest` fails if a library update renames a class the rules name, or if `allowoptimization`
+  is added to them.
+
+## Cold start: before / after (Family, 6 reboots each in 2 interleaved rounds, median (range), ms)
+
+| | Before (1.287) | After (perf-8) |
+|---|---|---|
+| First frame, gfxinfo | 248 (227–348) | **222 (201–282)** |
+| Second frame | 308 (270–403) | **282 (262–418)** |
+| First frame on screen, after process start | 1235 (1188–1336) | 1232 (1154–1315) |
+| Home `Displayed` | 1498 (1420–1611) | 1541 (1286–1592) |
+
+- The first frame is lower in both rounds: 252 → 221 and 244 → 223.
+- `Displayed` is level or lower within each round (1441 / 1447, then 1609 / 1583). The pooled median is higher only because
+  each pooled side mixes the slower second round in with the first.
+
+Pixel diffs (main 1.287 vs perf-8, Family):
+- Settings, Tools library, Reminders, library after Back, Reminders reopened, and Calls: **100.0000 % identical**.
+- Music: identical outside the live sign-in code band (y 751–834).
+- Control Center (cc_debug dry-run plan, whole frame blurred): no pixel differs by more than 3/255 outside one live
+  bottom-right area. Two captures of the *same* build differ by up to 18/255 there, so it is live content.
+
+The perf-8 dex is byte-identical to the measured c1 build. All 8371 unit tests pass (911 classes, 1 skipped), and
+`:app:assemblePerformance` passes.
+
+## First RenderThread frame: is it shader compilation?
+
+Partly, but programs are already loaded from Skia's persisted cache, not compiled.
+
+- simpleperf (on-CPU, RenderThread, first two `CanvasContext::draw`s) splits the cost between three things:
+  - creating programs from the cache's binaries: `GrGLProgramBuilder::CreateProgram` → Adreno `loadProgramBinary` /
+    `QGPUCompiler`;
+  - FreeType glyph rasterization;
+  - texture uploads (`glTexSubImage2D`).
+
+  Each is a few ms. No source compiles showed up.
+- Android 10's HWUI already keeps the persistent program cache (`initShaderDiskCache`, moved off the frame path in round 7).
+  There is no further pipeline cache to add on these GL devices.
+- **The first `flush commands` swings 12–42 ms between boots of the same build** (b0 11.7, c1 42.0, round 7 31). So
+  "12–31 ms" is boot-to-boot variance as much as first-use cost.
+
+## Tried, not kept
+
+- **Drawing Compose's common primitives once into round 7's offscreen warm-up surface.** The primitives were AA rects and
+  round rects, a stroke, text at 4 sizes, a bitmap with and without a round clip, linear and radial gradients, and an elevated
+  child for the shadow program. The idea was that the RenderThread would load programs and glyphs while Home composes.
+  - In 2 traced boots, Home's first `DrawFrame` was 32.5 and 22.7 ms (flush 15.1 and 11.5), against 25.4 (11.7) on 1.287 and
+    64.7 (42.0) on c1. No measurable gain.
+  - It also costs something: `syncAndDraw` makes the main thread wait for the RenderThread's `setSurface` (29–32 ms of EGL
+    setup), which undoes round 7's parallel EGL warm-up.
+  - Patch: `scratch-tmp/perf8/not-kept-draw-warmup.patch`.
+
+## Findings without a change
+
+- **Binder calls in the first frame** take 11–26 ms per boot, depending on how busy system_server is just after boot. Most are
+  platform window work: `relayout` 8 ms, `getInTouchMode` 4 ms, `addToDisplay`, and the accessibility connection.
+  - The app-side one is `LauncherScreen`'s connectivity poll (`HomeLauncherScreen.kt`, `LaunchedEffect(appsRefreshKey)`). It
+    calls `ConnectivityManager.getActiveNetwork()` on the main thread: 6.4 ms in the profiled boot. It runs again on every
+    resume and every 15 s.
+  - Moving it to `Dispatchers.IO` would be safe, because `connected` starts as `null`. But the cost is below this round's
+    10 ms bar and 3 reboots can't resolve it, so it is listed under Next.
+- **The rest of the first doFrame** (240–350 ms) is composition (about 100 ms), `measure` (120–150 ms) and record
+  (22–27 ms), spread across the Home tree with no single item over 10 ms in the parts the profile captured.
+
+## Next
+
+1. **Cold start:** move the connectivity poll's binder call off the main thread, and measure it together with any other
+   resume-path binder work so the total is large enough for an A/B. The Calls Back frame may also benefit.
+2. **Guard against new soft failures:** after a Compose or media3 bump, run `softfail.py` over the classes that a cold trace
+   shows in `VerifyClass` slices. R8 merging can bring this cost back with any library update.
+3. **Mini:** the full survey in portrait and landscape, screensaver fps first (`sflat.py`), when it is on USB.
+4. **Calls Back / Settings:** unchanged from round 7; they need owner trade-offs.
