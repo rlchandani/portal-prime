@@ -83,23 +83,34 @@ Limits are the body cap and, for clients, the reply cap.
    (`CallingPhoneRoute`). It now logs a 4-character id prefix.
 8. **`CallMessageSender` silently truncated** an oversized ack. It is now refused.
 
-### Not changed (need a protocol or product decision)
+### Fixed in the follow-up (Portal and phone together, 2026-11-19)
 
-- **High: `GET /remote/sources` returns the plaintext Immich key and SMB/WebDAV passwords** to
-  any phone session. `*Configured` flags already exist. Removing the plaintext fields needs
-  the phone remote to stop round-tripping them first; otherwise older phones would wipe the
-  stored passwords on save.
-- **Medium: household-key share window.** For 10 minutes after any pairing, any valid session
-  (not only the new phone) can read or replace the household key via `/remote/household`.
-  Tying the window to the newly paired session changes the phone's pairing flow.
-- **Medium: sessions never expire,** and `RemoteRoutes.authed` doesn't check "remote enabled".
-  Nothing currently turns the remote off, so this is latent.
-- **Low: one global PIN guess counter.** A LAN client can burn every PIN shown and block pairing.
-  Brute force remains infeasible (5 guesses per PIN, 10^6 PINs).
-- **Low: `/remote/immich/albums` fetches a request-supplied URL** (session auth) and `/install
-  apkUrl` (fleet). These are LAN-appliance SSRF.
-- **Low: `/fs/write` has no size or free-space cap,** and the `/fs/read` blocklist doesn't cover
-  `shared_prefs`. Fleet token only; the fleet token is already full control.
+These were deferred above because the Portal and the phone app had to change together. They are
+fixed on the launcher branch `remote-security` (on top of 1.272) and Portal Toolkit branch
+`remote-security` (1.8.20). They ship together from Hearthpane 1.273.
+
+| # | Finding | Status | Fix |
+|---|---|---|---|
+| 1 | **High: `GET /remote/sources` returned plaintext secrets** | Fixed | The Immich key and SMB/WebDAV passwords never leave the Portal. A read puts a mask (`••••••••`) in each secret's slot, keeps the `has…`/`…Configured` flags, and adds `immichKeyHint` (last 2 characters, only for keys of 16+ characters; never for passwords). On save, a missing, blank or masked secret means "keep the saved one" (still only for the same server and account); only a typed value replaces it. The album picker resolves a masked key the same way. Toolkit shows "•••• saved" (or "••••XY saved"), never pre-fills a secret draft, and sends a secret only when typed. |
+| 2 | **Medium: household-key window open to any session** | Fixed | The window is a grant bound to the session minted by that PIN pairing: 10 minutes, one successful share or set, then spent. A refused set (bad key) doesn't spend it, a newer pairing moves it, and check-and-spend is atomic. Other sessions get `403 pair_again`. `GET` (fingerprint only) is unchanged. The current Toolkit already provisions with the session it just paired, so first pairing keeps working. |
+| 3 | **Medium: sessions never expired** | Fixed | A session expires after 180 days unused; every use refreshes it (stored at most hourly). No hard cap. At upgrade, every stored token gets a record stamped "now", so no pairing breaks and the clock starts then. Tokens stay in the same `sessions` list older builds read (records sit beside it in `session_records`, without tokens), so a downgrade keeps working. Settings › Phone Remote now lists **Paired phones** (label, last use, days left) with Remove. Phones send an optional `label` when pairing (the Toolkit sends the device model, the web page "Web browser"; older Portals ignore it). `RemoteRoutes.authed` now also requires the remote to be enabled. Toolkit shows a "Pair … again" card with a **Pair again** button on 401. |
+| 4 | **Low: anyone on the LAN could burn PIN attempts** | Fixed | `PairingThrottle`: 3 wrong guesses from one address make that address wait 30 s (doubling to 10 min). The code still burns after 5 wrong guesses from any mix of addresses (unchanged brute-force bound), and then every address waits 30 s (doubling to 5 min). Escalation is forgotten after 30 min of quiet or a successful pairing, so the owner is never locked out for good. `429 pair_rate_limited` with `retryAfterSec`, `scope` (`device`/`portal`) and `Retry-After`. The Portal card shows "Too many tries · Wait N s, then generate a new code" (it never auto-issues a code an attacker could keep burning); the Toolkit and web page show "Too many tries. Wait N s, then try again." |
+| 5 | **Low: request-supplied fetch URLs** | Fixed | `/remote/immich/albums`: the saved Immich server, or an http(s) host whose every resolved address is RFC 1918 or IPv6 ULA (never loopback, link-local, metadata or public; mixed answers refused); `400 immich_url_not_lan`. Redirects stay on the credential's origin, the reply is capped at 4 MiB, and the fetch runs one at a time within 20 s (`504 immich_timeout`). `/install apkUrl`: HTTPS on 443 to our GitHub release hosts, F-Droid, or a host the loaded catalog uses; `400 apk_url_not_allowed`. Every redirect hop is checked against the same list (catalog downloads: never https to http), at most 5 hops; APK downloads are capped at 512 MiB and 20 min. |
+| 6 | **Low: `/fs/write` had no size or free-space cap** | Fixed | Checked before a byte is read: at most 512 MiB (`413 body_too_large`) and 256 MiB must stay free after the write (`507 insufficient_storage`). |
+
+Operator verification hooks (fleet token, which already has full control):
+`phone_test_session` gains `{"householdGrant":true}` on `mint` (simulates a fresh PIN pairing),
+`{"op":"age","days":N}` (debug clock for test sessions), `{"op":"pin"}` (issues a live code whose
+session is a test session) and `{"op":"revoke_id","id":"…"}`.
+
+### Still open
+
+- **Low: the `/fs/read` blocklist doesn't cover `shared_prefs`.** Fleet token only; the fleet
+  token is already full control.
+- **Residual (finding 5):** the Immich check resolves the host and then connects, so a DNS answer
+  that changes between the two (rebinding) is not caught; and a private-LAN URL may name the
+  Portal's own LAN address. Both need a session and the request still carries only the key the
+  phone typed or the saved key for the saved server.
 - **Info: any household-key holder can claim any device id** (no per-device keys), point peer
   clients at any RFC 1918 host:port, wipe music history, or raise a forged leak alert. That is the
   household trust model; replies are still HMAC-verified and redirects are off.
