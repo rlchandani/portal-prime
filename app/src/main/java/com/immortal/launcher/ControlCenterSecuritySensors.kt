@@ -98,12 +98,12 @@ private fun GroupRow(sec: CcSecSection, line: String, open: Boolean, onToggle: (
   val count = sec.items.size
   val tag = sec.tag.takeIf { CcSecuritySummary.showsTag(sec) }
   Row(Modifier.fillMaxWidth().clip(CcStyle.Pill).clickable(role = Role.Button, onClick = onToggle)
-      .ccSpeak("${sec.group.title}, $count, $line${tag?.let { ", $it" } ?: ""}, ${if (open) "open" else "closed"}").padding(vertical = 16.dp),
+      .ccSpeak("${CcSecuritySummary.title(sec.group)}, $count, $line${tag?.let { ", $it" } ?: ""}, ${if (open) "open" else "closed"}").padding(vertical = 16.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(18.dp)) {
     CcIcon(sec.group.icon, c.text, 30.dp)
     Column(Modifier.weight(1f)) {
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(sec.group.title, color = c.text, fontSize = 22.sp, maxLines = 1)
+        Text(CcSecuritySummary.title(sec.group), color = c.text, fontSize = 22.sp, maxLines = 1)
         Text("$count", color = c.faint, fontSize = 19.sp, maxLines = 1)
       }
       Text(line, color = c.sec, fontSize = 18.sp, maxLines = if (open) 1 else 2, overflow = TextOverflow.Ellipsis)

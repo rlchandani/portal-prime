@@ -65,8 +65,22 @@ internal object CcSecuritySummary {
         "Open " + CcSecurityList.sinceLine(att[0].since, now, time, day) + unavailable(s)
       s.group == CcSecGroup.MOTION -> motion(s)
       s.group == CcSecGroup.DOORS && s.items.any(::isLock) && s.items.any { !isLock(it) } -> doors(s)
-      else -> s.summary
+      else -> oneRoom(s) ?: s.summary
     }
+  }
+
+  /** The card's group title: the mock's short words ("Motion"), else the list's own. */
+  fun title(g: CcSecGroup): String = if (g == CcSecGroup.MOTION) "Motion" else g.title
+
+  /**
+   * Several rows needing attention in one room read as "Office · 3 open" rather than "Office door,
+   * Office door 2, Office door 3"; one row, or rows in different rooms, keep their names.
+   */
+  private fun oneRoom(s: CcSecSection): String? {
+    val att = s.attention
+    if (att.size < 2) return null
+    val room = att.map { it.area?.trim().orEmpty() }.distinct().singleOrNull()?.takeIf { it.isNotEmpty() } ?: return null
+    return "$room · ${s.tag}" + unavailable(s)
   }
 
   private fun motion(s: CcSecSection): String {
@@ -81,7 +95,7 @@ internal object CcSecuritySummary {
 
   private fun doors(s: CcSecSection): String {
     val att = s.attention
-    if (att.isNotEmpty()) return att.joinToString(", ") { if (isLock(it)) "${it.name} unlocked" else it.name } + unavailable(s)
+    if (att.isNotEmpty()) return oneRoom(s) ?: (att.joinToString(", ") { if (isLock(it)) "${it.name} unlocked" else it.name } + unavailable(s))
     val live = s.items.count { !it.unavailable }
     return (if (live == 0) "${s.items.size} unavailable" else "All $live closed and locked" + unavailable(s))
   }
@@ -94,7 +108,7 @@ internal object CcSecuritySummary {
   fun showsTag(s: CcSecSection): Boolean = !(s.group == CcSecGroup.MOTION && s.items.none(CcSecurityList::active))
 
   /** "Alarm, Smoke, CO & leaks, Tamper" — what's behind the More row. */
-  fun moreLine(card: CcSecCard): String = card.more.joinToString(", ") { it.group.title }
+  fun moreLine(card: CcSecCard): String = card.more.joinToString(", ") { title(it.group) }
 
   /** The groups that start open: only safety groups that need attention. */
   fun startOpen(card: CcSecCard): Set<CcSecGroup> = card.primary.filter { it.group in SAFETY && it.ok == false }.map { it.group }.toSet()

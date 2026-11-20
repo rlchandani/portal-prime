@@ -164,6 +164,24 @@ class ControlCenterSecuritySummaryTest {
     assertFalse(c.more.any { it.group == CcSecGroup.HAZARDS })
   }
 
+  @Test fun severalOpenInOneRoomReadAsTheRoom() {
+    val tilt = (1..3).map { bs("tilt_$it", "on", "door", "Tilt Shock XS Sensor Window/door is open") }
+    val c = card(tilt + bs("main", "off", "door", "Main door"), tilt.associate { it.id to "Office" })
+    val doors = c.primary.single()
+    assertEquals(listOf("Office door", "Office door 2", "Office door 3"), doors.attention.map { it.name })
+    assertEquals("Office · 3 open", CcSecuritySummary.line(doors, 0L, { "t" }, { "d" }))
+    val split = card(listOf(bs("a", "on", "door", "A door"), bs("b", "on", "door", "B door")), mapOf("binary_sensor.a" to "Hall", "binary_sensor.b" to "Den"))
+    assertEquals("A door, B door", CcSecuritySummary.line(split.primary.single(), 0L, { "t" }, { "d" }))
+    val withLock = card(tilt + CcEntity("lock.office", "locked", mapOf("friendly_name" to "Office lock")), tilt.associate { it.id to "Office" })
+    assertEquals("Office · 3 open", CcSecuritySummary.line(withLock.primary.single(), 0L, { "t" }, { "d" }))
+  }
+
+  @Test fun theCardSaysMotion() {
+    assertEquals("Motion", CcSecuritySummary.title(CcSecGroup.MOTION))
+    assertEquals("Doors", CcSecuritySummary.title(CcSecGroup.DOORS))
+    assertEquals("Smoke, CO & leaks, Tamper, Alarm", CcSecuritySummary.moreLine(card(house, areas)))
+  }
+
   @Test fun anEmptyHouseHasAnEmptyCard() {
     assertTrue(card(emptyList()).isEmpty)
   }
