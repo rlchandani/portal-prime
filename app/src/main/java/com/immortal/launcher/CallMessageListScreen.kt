@@ -48,7 +48,7 @@ import java.util.Date
 @Composable
 internal fun CallMessagesTab() {
   val context = LocalContext.current
-  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context); CallMessageStore.prune(context) }
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoadedOffMain(context, prune = true) }
   val messages by CallMessageStore.messages.collectAsState()
   val history by CallingStore.history.collectAsState()
   val items = remember(messages, history) { CallInbox.items(messages, history) }

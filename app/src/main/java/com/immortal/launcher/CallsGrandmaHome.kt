@@ -92,7 +92,7 @@ internal fun CallsGrandmaHome() {
   val peers by CallingStore.peers.collectAsState()
   val phones by CallPhoneMailbox.phones.collectAsState()
   val history by CallingStore.history.collectAsState()
-  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context) }
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoadedOffMain(context) }
   val messages by CallMessageStore.messages.collectAsState()
   var inbox by remember { mutableStateOf(false) }
   val now = rememberCallClock(CLOCK_STEP_MS)

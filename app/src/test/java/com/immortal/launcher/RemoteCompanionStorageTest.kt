@@ -107,6 +107,33 @@ class RemoteCompanionStorageTest {
     assertEquals(id, RemoteCompanionStore.id(c))
     assertEquals(id, JSONObject(file.readText()).getString("deviceId"))
   }
+  @Test fun cachedIdReadsTheStoreOnceThenServesTheSameIdWithoutDisk() {
+    val id = "00000000-0000-0000-0000-000000000002"
+    withStore("{deviceId:'$id',operations:[{state:'succeeded'}]}".toByteArray()) { c, file ->
+      assertEquals(id, RemoteCompanionStore.cachedId(c))
+      file.writeText("{broken") // a later corruption is invisible to the memo...
+      assertEquals(id, RemoteCompanionStore.cachedId(c))
+      rejected(file) { RemoteCompanionStore.id(c) } // ...but the strict read still fails closed
+      RemoteCompanionStore.forgetCachedId() // a restore replaced the file
+      assertNull(RemoteCompanionStore.cachedId(c))
+      assertEquals("{broken", file.readText())
+    }
+  }
+  @Test fun cachedIdIsNullForAnUnreadableStoreAndNeverRewritesIt() {
+    withStore("{public:1}".toByteArray(), failRead = true) { c, file ->
+      assertNull(RemoteCompanionStore.cachedId(c))
+      assertEquals("{public:1}", file.readText())
+    }
+  }
+  @Test fun cachedIdOfAFreshStoreMatchesTheStrictIdAndIsPerOwningContext() {
+    var first = ""
+    withStore(null) { c, file ->
+      first = RemoteCompanionStore.cachedId(c)!!
+      assertEquals(first, RemoteCompanionStore.id(c))
+      assertEquals(first, JSONObject(file.readText()).getString("deviceId"))
+    }
+    withStore(null) { c, _ -> assertNotEquals(first, RemoteCompanionStore.cachedId(c)) }
+  }
   @Test fun normalLegacyRowsUnknownFieldsAndJsonWhitespaceRemainCompatible() {
     val id = "00000000-0000-0000-0000-000000000001"
     val raw = "{deviceId:'$id',scenes:[{id:'legacy'}],operations:[{state:'succeeded'}],future:{keep:'public'}} \t\r\n"

@@ -61,11 +61,27 @@ internal object RemoteCompanionStore {
   }
   /** Cached history cannot bypass the same disk-integrity gate used by mutations. */
   fun requireReadable(c: Context) = synchronized(mutationLock) { read(c); Unit }
+  /** Strict: re-reads (and integrity-checks) the store on every call. Routes and sync use this. */
   fun id(c: Context): String = synchronized(mutationLock) {
     val saved = read(c).optString("deviceId")
-    if (runCatching { UUID.fromString(saved).toString() == saved }.getOrDefault(false)) saved
+    val id = if (runCatching { UUID.fromString(saved).toString() == saved }.getOrDefault(false)) saved
     else UUID.randomUUID().toString().also { update(c, "deviceId", it) }
+    knownId.remember(owner(c), id)
+    id
   }
+  /**
+   * This Portal's id for hot, null-tolerant callers (bus sends, presence, call/timer/chore self
+   * checks), which used to parse the whole store — history included — on the main thread on every
+   * message. The id never changes once written, so after one strict read it is served from memory;
+   * a backup restore that rewrites the file calls [forgetCachedId]. Null while the store is unreadable.
+   */
+  fun cachedId(c: Context): String? =
+      knownId.get(owner(c)) ?: runCatching { id(c) }.getOrNull()
+  /** The store file was replaced behind this object (backup import). */
+  fun forgetCachedId() = knownId.clear()
+  private val knownId = OwnerMemo()
+  // Keyed by the application context, not the file path: resolving noBackupFilesDir is itself a stat.
+  private fun owner(c: Context): Any = c.applicationContext ?: c
   fun scenes(c: Context): JSONArray = synchronized(mutationLock) { read(c).optJSONArray("scenes") ?: JSONArray() }
   fun history(c: Context): JSONArray = synchronized(mutationLock) { read(c).optJSONArray("operations") ?: JSONArray() }
   fun update(c: Context, key: String, value: Any) = synchronized(mutationLock) {
@@ -75,6 +91,14 @@ internal object RemoteCompanionStore {
     try { stream.write(out.toString().toByteArray(Charsets.UTF_8)); f.finishWrite(stream) }
     catch (e: Exception) { f.failWrite(stream); throw e }
   }
+}
+
+/** One remembered value per owning context, compared by identity (the app has one; tests use many). */
+internal class OwnerMemo {
+  @Volatile private var entry: Pair<Any, String>? = null
+  fun get(owner: Any): String? = entry?.takeIf { it.first === owner }?.second
+  fun remember(owner: Any, value: String) { entry = owner to value }
+  fun clear() { entry = null }
 }
 
 internal class RemoteCompanionStoreUnavailable : IllegalStateException("Saved companion metadata is unavailable")

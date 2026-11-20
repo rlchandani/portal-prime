@@ -99,7 +99,7 @@ internal object HouseholdBus {
   private fun receive(context: Context, wire: String) {
     val key = HouseholdKey.get(context) ?: return
     val message = HouseholdMessage.decode(wire, key, System.currentTimeMillis(), replay) ?: return
-    val self = runCatching { RemoteCompanionStore.id(context) }.getOrNull()
+    val self = RemoteCompanionStore.cachedId(context)
     if (message.from == self) return
     if (message.type.startsWith(MUSIC_PREFIX)) Log.i(TAG, "received ${message.type}")
     val handler = handlers[message.type] ?: return Unit.also { Log.i(TAG, "no handler for ${message.type}") }
@@ -114,7 +114,7 @@ internal object HouseholdBus {
    */
   fun send(context: Context, type: String, body: JSONObject): Boolean {
     val key = HouseholdKey.get(context) ?: return false
-    val from = runCatching { RemoteCompanionStore.id(context) }.getOrNull() ?: return false
+    val from = RemoteCompanionStore.cachedId(context) ?: return false
     val nonce = ByteArray(12).also(random::nextBytes).let(HouseholdKey::toHex)
     val wire = HouseholdMessage.encodeOrNull(
         HouseholdMessage(type, from, System.currentTimeMillis(), nonce, body), key) ?: return false

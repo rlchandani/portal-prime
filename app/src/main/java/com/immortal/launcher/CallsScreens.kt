@@ -257,7 +257,7 @@ private fun EveryoneCard(onEveryone: () -> Unit) {
 internal fun CallsRecent(history: List<CallHistoryEntry>) {
   val context = LocalContext.current
   val p = LocalApprovedPalette.current
-  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context) }
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoadedOffMain(context) }
   val messages by CallMessageStore.messages.collectAsState()
   var filter by rememberSaveable { mutableStateOf(CallHistoryFilter.ALL) }
   var confirm by remember { mutableStateOf(false) }

@@ -77,7 +77,7 @@ internal object SharedTimers {
     HouseholdBus.send(app, SharedTimerWire.ASK, JSONObject())
   }
 
-  fun selfId(context: Context): String? = runCatching { RemoteCompanionStore.id(context) }.getOrNull()
+  fun selfId(context: Context): String? = RemoteCompanionStore.cachedId(context)
   fun selfName(context: Context): String = DinnerCall.selfName(context)
 
   fun snapshot(context: Context): List<SharedTimer> {

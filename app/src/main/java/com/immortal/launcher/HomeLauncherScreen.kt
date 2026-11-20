@@ -317,11 +317,8 @@ internal fun LauncherScreen(
   var connected by remember { mutableStateOf<Boolean?>(null) }
   LaunchedEffect(appsRefreshKey) {
     while (true) {
-      connected = runCatching {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
-        cm.activeNetwork != null
-      }.getOrDefault(false)
-      delay(15_000)
+      connected = HomeConnectivity.isConnected(context)
+      delay(HomeConnectivity.RECHECK_MS)
     }
   }
   // Always enabled: the launcher root consumes Back (Android 10 would finish it and show Meta's home).
