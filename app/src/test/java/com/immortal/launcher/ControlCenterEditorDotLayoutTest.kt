@@ -130,6 +130,35 @@ class ControlCenterEditorDotLayoutTest {
     }
   }
 
+  @Test fun aCrowdedRoomClustersRatherThanCoveringItsLabel() {
+    // Seen on device (Mini turned size): 27 devices in the Garage covered "Garage · 27 devices".
+    for (c in canvases) {
+      val s = spec(c)
+      val room = great.copy(devices = piled(80))
+      val label = 3f to 1.2f
+      val layout = CcEdDots.layout(floorOf(room), s, labels = mapOf("great" to label))
+      val cx = room.rect.x + room.rect.w / 2f
+      val cy = room.rect.y + room.rect.h / 2f
+      val drawn = layout.dots.map { it.gx to it.gy } + layout.clusters.map { it.gx to it.gy }
+      drawn.forEach { (x, y) ->
+        assertFalse("${c.name}: ($x, $y) covers the label",
+            kotlin.math.abs(x - cx) < label.first + s.radius && kotlin.math.abs(y - cy) < label.second + s.radius)
+      }
+      assertEquals(c.name, 80, layout.dots.size + layout.clusters.single().hidden.size)
+    }
+  }
+
+  @Test fun anOpenRingHasABackdropThatCoversItAndAClosedOneHasNone() {
+    val s = spec(canvases[2])
+    val floor = floorOf(kitchen.copy(devices = piled(40)))
+    assertEquals(0f, CcEdDots.layout(floor, s).clusters.single().backdrop, 0f)
+    val open = CcEdDots.layout(floor, s, "kitchen")
+    val cl = open.clusters.single()
+    open.dots.filter { it.ring }.forEach {
+      assertTrue(hypot(it.gx - cl.gx, it.gy - cl.gy) + s.radius <= cl.backdrop + eps)
+    }
+  }
+
   @Test fun earlierDevicesKeepTheirSpotAndEachLandsNearItsSavedPlace() {
     val s = spec(canvases[0])
     val a = CcPlaced("light.a", 0.1f, 0.1f)

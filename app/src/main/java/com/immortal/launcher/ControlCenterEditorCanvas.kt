@@ -199,7 +199,15 @@ private fun CcEditorDots(st: CcEdState, floor: CcFloor, layout: CcEdDotLayout, g
   }
   layout.dots.forEach { if (!it.ring) dot(it) }
   layout.clusters.forEach { cl ->
-    rooms[cl.roomId]?.let { room -> key("cluster:${cl.roomId}") { CcEditorCluster(cl, room.name, c.bg, c.accent, at(room, cl.fx, cl.fy)) } }
+    val room = rooms[cl.roomId] ?: return@forEach
+    // An open ring sits on a disc of the plan colour, so it reads apart from the room dots under it.
+    if (cl.backdrop > 0f) key("backdrop:${cl.roomId}") {
+      val d = with(density) { (cl.backdrop * 2f * geom.cell).toDp() }
+      val lift = with(density) { (cl.backdrop * geom.cell).toDp() - (DOT_DP / 2).dp }
+      Box(at(room, cl.fx, cl.fy).offset(-lift, -lift).size(d).clip(CircleShape).background(c.planBg.copy(alpha = BACKDROP_ALPHA))
+          .border(1.5.dp, c.accent.copy(alpha = BACKDROP_EDGE_ALPHA), CircleShape))
+    }
+    key("cluster:${cl.roomId}") { CcEditorCluster(cl, room.name, c.bg, c.accent, at(room, cl.fx, cl.fy)) }
   }
   layout.dots.forEach { if (it.ring) dot(it) }
 }
@@ -254,6 +262,8 @@ internal const val DOT_DP = 36
 /** Space between neighbouring dots (mock: 36 dp dots, 46 apart). */
 internal const val DOT_GAP_DP = 10
 private const val CLUSTER_SP = 15
+private const val BACKDROP_ALPHA = 0.94f
+private const val BACKDROP_EDGE_ALPHA = 0.35f
 /** Steps where a "+N" cluster opens on tap (in Rooms a tap selects the room). */
 private val CLUSTER_STEPS = setOf(CcEdStep.DEVICES, CcEdStep.OPENINGS)
 private const val FLY_DISTANCE_DP = 900

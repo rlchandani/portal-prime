@@ -37,10 +37,13 @@ internal data class CcEdDotSpec(val dotCells: Float, val gapCells: Float) {
 internal data class CcEdDot(val entityId: String, val roomId: String, val fx: Float, val fy: Float, val gx: Float, val gy: Float,
                             val ring: Boolean = false)
 
-/** "+N": the devices that don't fit in [roomId]. [expanded] shows them as a ring around it. */
+/**
+ * "+N": the devices that don't fit in [roomId]. [expanded] shows them as rings around it, over a
+ * backdrop of [backdrop] cells radius (0 while closed) that hides the room dots underneath.
+ */
 @Immutable
 internal data class CcEdCluster(val roomId: String, val fx: Float, val fy: Float, val gx: Float, val gy: Float, val hidden: List<String>,
-                                val expanded: Boolean) {
+                                val expanded: Boolean, val backdrop: Float = 0f) {
   val label: String get() = "+${hidden.size}"
 }
 
@@ -63,7 +66,7 @@ internal data class CcEdDotLayout(val dots: List<CcEdDot>, val clusters: List<Cc
 
 /**
  * Where the editor draws device dots. Each room gets a grid of slots one dot + gap apart, inside its
- * walls and clear of its centred label when there's room. Every device takes the free slot nearest
+ * walls and clear of its centred label (only a room too small for any clear slot uses the label's). Every device takes the free slot nearest
  * its saved spot (in placement order, so earlier devices keep theirs), so no two dots overlap. When
  * a room has more devices than slots, the last slot is a "+N" cluster; tapping it opens the rest as
  * rings around it. Display only: the saved fractions (and the live map) are untouched.
@@ -96,7 +99,8 @@ internal object CcEdDots {
     val r = room.rect
     val all = slots(r, spec, label)
     val n = room.devices.size
-    val usable = if (n <= all.clear) all.points.take(all.clear) else all.points
+    // A crowded room clusters rather than covering its own label.
+    val usable = if (all.clear > 0) all.points.take(all.clear) else all.points
     val overflow = n > usable.size
     // Overflow: the bottom-right slot is the cluster; the rest are filled nearest-first.
     val clusterSlot = if (overflow) usable.maxWith(compareBy<Pt>({ it.y }, { it.x })) else null
@@ -111,8 +115,10 @@ internal object CcEdDots {
     if (clusterSlot == null) return shown to null
     val hidden = room.devices.drop(shownCount).map { it.entityId }
     val cluster = CcEdCluster(room.id, clusterSlot.x / r.w, clusterSlot.y / r.h, r.x + clusterSlot.x, r.y + clusterSlot.y, hidden, expanded)
-    val ring = if (expanded) ring(cluster, room, spec) else emptyList()
-    return (shown + ring) to cluster
+    if (!expanded) return shown to cluster
+    val ring = ring(cluster, room, spec)
+    val reach = ring.maxOfOrNull { hypot(it.gx - cluster.gx, it.gy - cluster.gy) } ?: 0f
+    return (shown + ring) to cluster.copy(backdrop = reach + spec.radius + spec.gapCells)
   }
 
   /** Slots in room-local cells, row-major; the first [clear] stay off the label. */
