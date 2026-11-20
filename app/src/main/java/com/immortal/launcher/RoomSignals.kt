@@ -55,7 +55,7 @@ internal object RoomSignals {
     app = c
     HouseholdBus.register(RoomSeenWire.TYPE) { ctx, m ->
       val key = HouseholdKey.get(ctx) ?: return@register
-      RoomSeenWire.decode(m.body, key, m.from)?.let { seen -> main.post { onRemoteSeen(m.from, seen) } }
+      RoomSeenWire.decode(m.body, key, m.from)?.let { seen -> main.post(HouseholdBus.contained(m.type) { onRemoteSeen(m.from, seen) }) }
     }
     PresenceHub.addListener { s -> main.post { onSelfPresence(FollowMeArrival.local(s.presence, s.confident), s.sinceMs) } }
     scope.launch {

@@ -86,7 +86,7 @@ internal object HouseholdListSync {
     val signal = HouseholdListPeerAuth.parseSignal(message.body) ?: return
     flow.update { s ->
       val prior = s.peers[message.from]
-      s.copy(peers = s.peers + (message.from to HouseholdListSyncState.PeerInfo(prior?.name ?: "the other Portal", true, now)))
+      s.withPeer(message.from, HouseholdListSyncState.PeerInfo(prior?.name ?: "the other Portal", true, now))
     }
     if (signal.digest == HouseholdListStore.current(context).digest) { markUp(); return }
     exchangeLater(context, signal, message.from)
@@ -116,7 +116,7 @@ internal object HouseholdListSync {
   fun notePhone(name: String) = flow.update { it.copy(phones = it.phones + (name to now)) }
 
   fun noteExchangeFrom(peerId: String, name: String) = flow.update { s ->
-    s.copy(peers = s.peers + (peerId to HouseholdListSyncState.PeerInfo(name, true, now)), everExchanged = true)
+    s.withPeer(peerId, HouseholdListSyncState.PeerInfo(name, true, now)).copy(everExchanged = true)
   }
 
   fun showNotice(text: String) = flow.update { s ->
@@ -158,11 +158,7 @@ internal object HouseholdListSync {
       conn.setFixedLengthStreamingMode(bytes.size)
       conn.outputStream.use { it.write(bytes) }
       if (conn.responseCode != 200) return false
-      val text = conn.inputStream.use { input ->
-        val buf = input.readBytes()
-        if (buf.size > MAX_RESPONSE) return false
-        String(buf, Charsets.UTF_8)
-      }
+      val text = BoundedRead.reply(conn, MAX_RESPONSE) ?: return false
       val envelope = JSONObject(text)
       val payload = envelope.optString("payload")
       if (!HouseholdListPeerAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) return false

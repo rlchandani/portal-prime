@@ -67,11 +67,7 @@ internal object CallSignalClient {
       conn.outputStream.use { it.write(bytes) }
       if (conn.responseCode == HTTP_CONFLICT) return Result.NotYet
       if (conn.responseCode != HTTP_OK) { Log.i(TAG, "offer refused: ${conn.responseCode}"); return Result.Failed }
-      val text = conn.inputStream.use { input ->
-        val buf = input.readBytes()
-        if (buf.size > MAX_RESPONSE) return Result.Failed
-        String(buf, Charsets.UTF_8)
-      }
+      val text = BoundedRead.reply(conn, MAX_RESPONSE, READ_MS + BoundedRead.DEFAULT_BUDGET_MS) ?: return Result.Failed
       val envelope = JSONObject(text)
       val payload = envelope.optString("payload")
       if (!CallSignalAuth.verifyResponse(key, nonce, payload, envelope.optString("sig"))) { Log.w(TAG, "answer signature bad"); return Result.Failed }
@@ -98,6 +94,9 @@ internal object CallPeerRoute {
     if (req.method != "POST") return RemoteFeatureRoutes.json(405, RemoteFeatureRoutes.error("method_not_allowed"))
     if (req.contentLength !in 1..MAX_BODY) return RemoteFeatureRoutes.json(413, RemoteFeatureRoutes.error("body_too_large"))
     val key = HouseholdKey.get(context) ?: return RemoteFeatureRoutes.json(503, RemoteFeatureRoutes.error("no_household_key"))
+    // Header first: an unsigned or stale request never gets its body read.
+    if (!PeerRequestGate.admits(req.header(CallSignalAuth.HEADER), CallSignalAuth.REQUEST_TYPE, key, System.currentTimeMillis()))
+      return RemoteFeatureRoutes.json(401, RemoteFeatureRoutes.error("unauthorized"))
     val text = try { req.bodyText(MAX_BODY) } catch (e: Exception) {
       return FleetHttpServer.requestBodyError(e) ?: RemoteFeatureRoutes.json(400, RemoteFeatureRoutes.error("bad_body"))
     }

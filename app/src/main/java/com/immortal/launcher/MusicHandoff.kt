@@ -183,7 +183,7 @@ internal object MusicHandoff {
       val queue = runCatching { MusicHandoffNet.fetch(context, offer) }
           .onFailure { Log.i(TAG, "queue fetch failed: ${it.javaClass.simpleName}") }.getOrNull()
       if (queue == null) ack(context, offer.id, from, MusicHandoffStatus.FAILED)
-      else main.post { present(context, offer, from, queue) }
+      else main.post(HouseholdBus.contained(MusicHandoffWire.OFFER) { present(context, offer, from, queue) })
     }
   }
 

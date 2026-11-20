@@ -52,11 +52,15 @@ internal object MusicFollowMe {
     val c = context.applicationContext
     app = c
     HouseholdBus.register(FollowMeWire.PRESENCE) { _, m ->
-      FollowMeWire.decodePresence(m.body)?.let { n -> main.post { onRoomPresence(m.from, n); RoomSignals.onPeerPresence(m.from, n) } }
+      FollowMeWire.decodePresence(m.body)?.let { n ->
+        main.post(HouseholdBus.contained(m.type) { onRoomPresence(m.from, n); RoomSignals.onPeerPresence(m.from, n) })
+      }
     }
     HouseholdBus.register(FollowMeWire.LIVE) { _, m ->
       FollowMeWire.decodeLive(m.body)?.let { n ->
-        main.post { onRoomLive(m.from, n); RoomSignals.onPeerPresence(m.from, FollowMeWire.PresenceNote(n.presence, n.forMs, n.name)) }
+        main.post(HouseholdBus.contained(m.type) {
+          onRoomLive(m.from, n); RoomSignals.onPeerPresence(m.from, FollowMeWire.PresenceNote(n.presence, n.forMs, n.name))
+        })
       }
     }
     FollowMeBroadcaster.start(c)

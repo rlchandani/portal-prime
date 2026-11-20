@@ -162,11 +162,11 @@ internal object DinnerCall {
           fromLine = DinnerCopy.fromLine(call.message, call.senderName, call.senderIsPhone, DinnerCopy.timeLabel(clock(), zone(), use24)),
           statusLine = DinnerCopy.cardStatus(delivery, call.message.kind, policy, DinnerCopy.minuteLabel(chime.quietEndMin, use24)),
           replyLine = DinnerCopy.replyLine(call.senderName, call.senderIsPhone), quiet = delivery.status == DinnerStatus.QUIET)
-      main.post {
+      main.post(HouseholdBus.contained("dinner_call") {
         ScreenControl.wake(context)
         DinnerCardOverlay.show(card) { reply -> sendReply(context, call, reply) }
         if (delivery.chime) DinnerSpeaker.play(context, call.message.text, delivery.speak, loud = true)
-      }
+      })
     }
     if (call.replyTo == self) mutableBook.update { it.ack(call.sid, self, selfName(context), delivery.status) }
     else ack(context, call, delivery.status)
