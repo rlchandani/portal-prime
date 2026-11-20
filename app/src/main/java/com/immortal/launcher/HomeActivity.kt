@@ -15,56 +15,39 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MotionEvent
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.ui.input.key.key
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -81,44 +64,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.drawscope.scale
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.PathParser
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.zIndex
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.immortal.launcher.ui.components.GlassCard
-import com.immortal.launcher.ui.components.Glass
 import com.immortal.launcher.ui.components.OnResume
 import com.immortal.launcher.ui.components.launchSafely
-import com.immortal.launcher.ui.components.pollingState
 import com.immortal.launcher.ui.theme.LocalAdvancedSettings
-import com.immortal.launcher.ui.theme.ContentSecondary
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -1104,559 +1068,4 @@ private fun LauncherScreen(
     }
   }
 
-}
-
-@Composable
-private fun FadingDivider() {
-  Box(
-      modifier = Modifier
-          .fillMaxHeight()
-          .padding(horizontal = 10.dp),
-      contentAlignment = Alignment.Center
-  ) {
-    Box(
-        modifier = Modifier
-            .width(1.5.dp)
-            .fillMaxHeight()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color.Transparent,
-                        Color.White.copy(alpha = 0.30f),
-                        Color.Transparent
-                    )
-                )
-            )
-    )
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Liquid Glass composables
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Bare Liquid Glass surface — transparent glass, FLAT (no gradient): a single even translucent
- * DARK tint so the card reads a touch darker than the wallpaper (gives it body and makes the white
- * text pop), while still letting the wallpaper show through. A thin light border defines the glass
- * edge. No drop shadow (it bleeds through the translucent fill and muddies the centre), no gradient.
- */
-@Composable
-internal fun LiquidGlass(
-    modifier: Modifier = Modifier,
-    cornerRadius: Dp = Glass.Radius,
-    content: @Composable BoxScope.() -> Unit = {},
-) {
-  // Thin alias over the ONE shared glass surface (ui/components/Glass.kt) — colors/radius live
-  // there so every card in the app changes together.
-  GlassCard(
-      modifier = modifier, cornerRadius = cornerRadius, content = content)
-}
-
-/** Liquid Glass widget tile (rounded 22dp). */
-@Composable
-internal fun LiquidGlassWidget(
-    modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit,
-) {
-  LiquidGlass(modifier = modifier, cornerRadius = 22.dp, content = content)
-}
-
-/** App icon in the grid with scale animation on tap and reorderable drag handle. */
-@Composable
-private fun LiquidGlassAppIconContent(
-    app: AppEntry,
-    editMode: Boolean,
-    isDragging: Boolean,
-    dragHandleModifier: Modifier,
-    onClick: () -> Unit,
-    onLongPress: () -> Unit,
-    onRemove: () -> Unit,
-) {
-  val scale = remember { Animatable(1f) }
-
-  Box(
-      modifier = Modifier
-          .fillMaxWidth()
-          .jiggle(editMode && !isDragging, app.component.packageName.hashCode()),
-      contentAlignment = Alignment.Center
-  ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .zIndex(if (isDragging) 1f else 0f)
-            .graphicsLayer {
-              scaleX = if (isDragging) 1.05f else scale.value
-              scaleY = if (isDragging) 1.05f else scale.value
-              shadowElevation = if (isDragging) 16.dp.toPx() else 0f
-              shape = RoundedCornerShape(26.dp)
-              clip = false
-              // Disable Offscreen compositing while dragging for perf
-              compositingStrategy = if (isDragging) CompositingStrategy.Auto else CompositingStrategy.Offscreen
-            }
-            .then(dragHandleModifier)
-            .then(
-                if (!editMode) {
-                  // Non-edit mode: standard tap gestures with press-scale
-                  Modifier.pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                          scale.animateTo(0.96f, tween(90))
-                          tryAwaitRelease()
-                          scale.animateTo(1f, spring())
-                        },
-                        onTap = { onClick() },
-                        onLongPress = { onLongPress() },
-                    )
-                  }
-                } else {
-                  // In edit mode the drag handle owns the gesture; a plain tap does nothing.
-                  Modifier
-                }
-            ),
-    ) {
-      // Pad the wrapper so the minus badge sits at the tile's top-left corner and is FULLY
-      // visible (not clipped by the grid cell). The tile is inset by the overhang amount.
-      Box(modifier = Modifier.padding(top = 11.dp, start = 11.dp)) {
-        // iOS-style icon: rounded-squircle corners, soft drop shadow (3D depth), and a glossy
-        // top highlight sheen — applied uniformly so even square drawables read as premium
-        // rounded tiles.
-        val iconShape = RoundedCornerShape(26.dp)
-        Box(
-            modifier = Modifier
-                .size(110.dp)
-                .shadow(elevation = 8.dp, shape = iconShape, clip = false)
-                .clip(iconShape),
-            contentAlignment = Alignment.Center,
-        ) {
-          Image(
-              bitmap = app.icon,
-              contentDescription = app.label,
-              modifier = Modifier.size(110.dp),
-              filterQuality = FilterQuality.High,
-          )
-          // Glossy top-down sheen for the "candy"/3D finish.
-          Box(
-              modifier = Modifier.matchParentSize().background(
-                  Brush.verticalGradient(
-                      colors = listOf(Color(0x33FFFFFF), Color(0x0FFFFFFF), Color.Transparent),
-                      endY = 130f,
-                  )
-              )
-          )
-        }
-        if (editMode && app.uninstallable) {
-          // Badge sits at the tile's top-left corner, fully inside the padded wrapper (so it
-          // isn't clipped) — straddling the edge visually. Offset into the padding room.
-          MinusBadge(
-              modifier = Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = (-6).dp),
-          ) { onRemove() }
-        }
-      }
-      Spacer(Modifier.height(6.dp))
-      Text(
-          text = app.label,
-          color = Color.White.copy(alpha = 0.82f),
-          fontSize = 22.sp,
-          fontWeight = FontWeight.Medium,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-          textAlign = TextAlign.Center,
-          modifier = Modifier.widthIn(max = 110.dp),
-      )
-    }
-  }
-}
-
-private const val UPDATE_CHECK_INTERVAL_MS = 6L * 60 * 60 * 1000 // 6 hours
-
-// --- tile sizing ----------------------------------------------------------------
-// The grid's tile edge, provided once at the top of the tree so every tile
-// (apps, folders, built-ins, the drag ghost) follows the user's size setting.
-// Standard is the original 6-column/88dp look; Large is 5 columns of 110dp tiles,
-// closer to the stock Portal launcher.
-private val LocalTileDp = compositionLocalOf { 88.dp }
-
-private fun tileDpFor(size: String): Dp =
-    when (size) {
-      ImmortalSettings.SIZE_XL -> 140.dp
-      ImmortalSettings.SIZE_LARGE -> 110.dp
-      else -> 88.dp
-    }
-
-private fun gridColumnsFor(size: String): Int =
-    when (size) {
-      ImmortalSettings.SIZE_XL -> 4
-      ImmortalSettings.SIZE_LARGE -> 5
-      else -> 6
-    }
-
-@Composable
-private fun PortalHomeTile(onClick: () -> Unit) {
-  // Bridge to Meta's stock launcher — the only context allowed to open the
-  // trusted-caller apps (Contacts, Camera, Photos), so this is how the user
-  // reaches calling. Tapping Portal's home button returns to Immortal.
-  BuiltInTile(
-      label = "Calls",
-      background = Color(0xFF1FA463),
-      glyph = ICON_CALL,
-      onClick = onClick,
-  )
-}
-
-// Material-style glyph paths (24x24 viewport), rendered crisply as vectors.
-private const val ICON_CALL =
-    "M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
-private const val ICON_DOWNLOAD = "M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"
-private const val ICON_IMAGE =
-    "M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
-internal const val ICON_WIDGETS =
-    "M3 3h8v8H3V3zm10 0h8v5h-8V3zM3 13h5v8H3v-8zm7 0h11v8H10v-8z"
-private const val ICON_HELP =
-    "M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"
-private const val ICON_GEAR =
-    "M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
-
-/** A built-in launcher tile: a rounded colour tile with a centered white vector
- * glyph, styled to sit naturally beside real app icons. */
-@Composable
-private fun BuiltInTile(
-    label: String,
-    background: Color,
-    glyph: String,
-    onClick: () -> Unit,
-) {
-  val path = remember(glyph) { PathParser().parsePathString(glyph).toPath() }
-  val tileDp = LocalTileDp.current
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxWidth().padding(4.dp).tvFocusable(RoundedCornerShape(22.dp)) { onClick() },
-  ) {
-    GlassCard(
-        modifier = Modifier.size(tileDp),
-        cornerRadius = 20.dp,
-    ) {
-      Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Canvas(Modifier.size(46.dp * (tileDp / 88.dp))) {
-          val s = size.minDimension / 24f
-          scale(s, s, pivot = Offset.Zero) { drawPath(path, Color.White) }
-        }
-      }
-    }
-    Spacer(Modifier.size(8.dp))
-    Text(
-        label,
-        color = ContentSecondary,
-        style = MaterialTheme.typography.labelMedium,
-        maxLines = 1,
-        textAlign = TextAlign.Center,
-    )
-  }
-}
-
-
-
-@Composable
-private fun StoreTile(onClick: () -> Unit) {
-  BuiltInTile(
-      label = "App Store",
-      background = Color(0xFF2D6CDF),
-      glyph = ICON_DOWNLOAD,
-      onClick = onClick,
-  )
-}
-
-@Composable
-private fun ToolsTile(onClick: () -> Unit) {
-  BuiltInTile(
-      label = "Tools",
-      background = Color(0xFF5A5F6A),
-      glyph = ICON_WIDGETS,
-      onClick = onClick,
-  )
-}
-
-@Composable
-private fun WidgetTile(
-    widget: HomeWidgetStore.HomeWidget,
-    host: AppWidgetHost,
-    manager: AppWidgetManager,
-    editMode: Boolean,
-    tileDp: Dp,
-    modifier: Modifier = Modifier,
-    dimmed: Boolean = false,
-) {
-  val info = remember(widget.appWidgetId) {
-    if (widget.isAppWidget) manager.getAppWidgetInfo(widget.appWidgetId) else null
-  }
-  val height =
-      tileDp * widget.spanY.toFloat() +
-          20.dp * (widget.spanY - 1).coerceAtLeast(0).toFloat()
-
-  LaunchedEffect(widget, tileDp) {
-    if (widget.isAppWidget) updateWidgetSizeOptions(manager, widget, tileDp)
-  }
-
-  Box(modifier = modifier.fillMaxWidth().height(height).padding(4.dp)) {
-    Surface(
-        color = Color(0xFF252527),
-        shape = RoundedCornerShape(20.dp),
-        modifier =
-            Modifier.fillMaxSize()
-                .alpha(if (dimmed) 0.3f else 1f)
-                .jiggle(editMode && !dimmed, widget.key.hashCode()),
-    ) {
-      if (!widget.isAppWidget) {
-        ImmortalWidgetContent(widget = widget, modifier = Modifier.fillMaxSize())
-      } else if (info != null) {
-        AndroidView(
-            factory = {
-              host.createView(it, widget.appWidgetId, info).apply {
-                setAppWidget(widget.appWidgetId, info)
-                setPadding(0, 0, 0, 0)
-                isFocusable = true
-                isFocusableInTouchMode = true
-                descendantFocusability = ViewGroup.FOCUS_AFTER_DESCENDANTS
-              }
-            },
-            update = { view ->
-              view.setAppWidget(widget.appWidgetId, info)
-              view.isEnabled = !editMode
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
-      } else {
-        Box(
-            Modifier.fillMaxSize().background(Color(0xFF303033)),
-            contentAlignment = Alignment.Center,
-        ) {
-          Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            WidgetGlyph()
-            Text(
-                "Widget unavailable",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = 10.dp),
-            )
-            Text(
-                widget.providerPackage,
-                color = Color(0xFF9A9A9A),
-                fontSize = 13.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 2.dp, start = 18.dp, end = 18.dp),
-            )
-          }
-        }
-      }
-    }
-    if (editMode) {
-      // Dim/scrim only — the drag scrim and ✕ / resize controls are added by the enclosing
-      // WidgetCell so they layer correctly above the hosted widget's own touch handling.
-      Box(
-          Modifier.fillMaxSize()
-              .jiggle(!dimmed, widget.key.hashCode())
-              .clip(RoundedCornerShape(20.dp))
-              .background(Color(0x66000000)))
-    }
-  }
-}
-
-/**
- * Wraps a tile whose own content does NOT swallow touches (built-ins, folders, apps) with a
- * dragged-dim. The drag itself is handled by the stable container detector that wraps the pager, so
- * the gesture survives a page flip (letting a tile be dragged onto another page). Hosted widgets
- * still use their own in-page scrim handle (see [WidgetCell]), since their AndroidView swallows it.
- */
-@Composable
-private fun HomeTileFrame(
-    modifier: Modifier,
-    dragged: Boolean,
-    content: @Composable () -> Unit,
-) {
-  Box(modifier = modifier.fillMaxWidth().alpha(if (dragged) 0f else 1f)) { content() }
-}
-
-/** Widget tile + the ✕ remove badge in edit mode. Drag is handled by the stable container detector
- * (which grabs widgets via the pointer Initial pass), so widgets drag and move across pages like
- * apps. Widgets are not user-resizable — they keep the size their provider declares. */
-@Composable
-private fun WidgetCell(
-    widget: HomeWidgetStore.HomeWidget,
-    host: AppWidgetHost,
-    manager: AppWidgetManager,
-    editMode: Boolean,
-    tileDp: Dp,
-    dimmed: Boolean,
-    modifier: Modifier,
-    onRemove: () -> Unit,
-) {
-  Box(modifier = modifier) {
-    WidgetTile(
-        widget = widget,
-        host = host,
-        manager = manager,
-        editMode = editMode,
-        tileDp = tileDp,
-        dimmed = dimmed,
-    )
-    if (editMode) {
-      RemoveBadge(
-          size = 30.dp,
-          modifier = Modifier.align(Alignment.TopEnd).offset(x = 7.dp, y = (-7).dp),
-          onClick = onRemove,
-      )
-    }
-  }
-}
-
-@Composable
-private fun AppTile(
-    app: AppEntry,
-    editMode: Boolean,
-    modifier: Modifier = Modifier,
-    dimmed: Boolean = false,
-    onDelete: () -> Unit = {},
-    onLongPress: (() -> Unit)? = null,
-    onClick: () -> Unit,
-) {
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      // In Manage mode the body tap is inert (drag to reorder, ✕ to remove); the
-      // icon launches normally otherwise. A long-press enters Manage mode (iOS-style).
-      modifier =
-          modifier.fillMaxWidth().padding(4.dp).tvFocusable(
-              RoundedCornerShape(22.dp),
-              enabled = !editMode,
-              onLongClick = onLongPress,
-          ) {
-            onClick()
-          },
-  ) {
-    // The icon (and its delete badge) jiggle as a unit in Manage mode; the label stays still.
-    Box(modifier = Modifier.jiggle(editMode && !dimmed, app.component.packageName.hashCode())) {
-      Image(
-          bitmap = app.icon,
-          contentDescription = app.label,
-          modifier =
-              Modifier.size(LocalTileDp.current)
-                  .alpha(if (dimmed) 0.3f else 1f),
-      )
-      if (editMode) {
-        // Sits at the icon's outer top-right corner (nudged off the icon, iOS-style).
-        RemoveBadge(
-            size = 26.dp,
-            modifier = Modifier.align(Alignment.TopEnd).offset(x = 9.dp, y = (-9).dp),
-            onClick = onDelete,
-        )
-      }
-    }
-    Spacer(Modifier.size(8.dp))
-    Text(
-        app.label,
-        color = ContentSecondary,
-        style = MaterialTheme.typography.labelMedium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        textAlign = TextAlign.Center,
-    )
-  }
-}
-
-// --- data ---------------------------------------------------------------------
-
-/** A single day wash keeps chrome readable over every selected wallpaper; night is unchanged. */
-@Composable
-private fun ApprovedHomeBackground() {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  var wallpaper by remember { mutableStateOf(WallpaperConfig.load(context)) }
-  OnResume { wallpaper = WallpaperConfig.load(context) }
-  val palette = com.immortal.launcher.ui.theme.LocalApprovedPalette.current
-  Box(Modifier.fillMaxSize()) {
-    if (wallpaper.mode == WallpaperConfig.SKY) {
-      Box(Modifier.fillMaxSize()) {
-        ApprovedHomeSky()
-        ApprovedHomeBackgroundEffects(wallpaper.grain)
-      }
-    } else if (wallpaper.mode != WallpaperConfig.DUSK_AURORA) {
-      HomeBackground(Modifier.fillMaxSize())
-    } else {
-      // Frozen revision04 has a static teal-to-ember background, with no idle animation.
-      Box(Modifier.fillMaxSize().background(Brush.verticalGradient(
-          0f to Color(0xFF11212F), .7f to Color(0xFF213B42), 1f to Color(0xFF69453D)))) {
-        Canvas(Modifier.fillMaxSize()) {
-          drawRect(Brush.radialGradient(listOf(Color(0x5539646B), Color.Transparent),
-              center = Offset(size.width * .3f, size.height * .6f), radius = size.width * .55f))
-        }
-        ApprovedHomeBackgroundEffects(wallpaper.grain)
-      }
-    }
-    if (!palette.dark) Box(Modifier.matchParentSize().background(palette.background.copy(alpha = .92f)))
-  }
-}
-
-@Composable
-private fun ApprovedHomeBackgroundEffects(grain: Boolean) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  if (grain) {
-    val noise = remember {
-      val random = java.util.Random(4)
-      val bitmap = Bitmap.createBitmap(128, 128, Bitmap.Config.ARGB_8888)
-      val pixels = IntArray(128 * 128) {
-        val value = random.nextInt(256)
-        android.graphics.Color.argb(28, value, value, value)
-      }
-      bitmap.setPixels(pixels, 0, 128, 0, 0, 128, 128)
-      bitmap
-    }
-    Canvas(Modifier.fillMaxSize()) {
-      drawIntoCanvas { canvas ->
-        val paint = android.graphics.Paint().apply {
-          shader = android.graphics.BitmapShader(noise, android.graphics.Shader.TileMode.REPEAT,
-              android.graphics.Shader.TileMode.REPEAT)
-        }
-        canvas.nativeCanvas.drawRect(0f, 0f, size.width, size.height, paint)
-      }
-    }
-  }
-  val warmth = pollingState(refreshMs = 60_000, retryMs = 60_000) { DisplayControl.currentWarmAlpha(context) }
-  if ((warmth.value ?: 0f) > 0f)
-    Box(Modifier.fillMaxSize().background(Color(0xFFFFB46A).copy(alpha = warmth.value ?: 0f)))
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-private val FAVORITE_TILE_HEIGHT = 72.dp
-private val FAVORITE_ICON_SIZE = 46.dp
-/** Upright Mini: six ~112 dp tiles, so the label sits under the icon instead of beside it. */
-private val COMPACT_FAVORITE_TILE_HEIGHT = 88.dp
-
-private fun favoriteTileHeight(layout: LayoutClass): Dp =
-    if (layout.compactPortrait) COMPACT_FAVORITE_TILE_HEIGHT else FAVORITE_TILE_HEIGHT
-
-@Composable
-private fun ApprovedFavoriteTile(app: AppEntry, modifier: Modifier, onClick: () -> Unit, onLongClick: () -> Unit,
-                                 layout: LayoutClass = LayoutClass.LARGE) {
-  if (layout.compactPortrait) {
-    ApprovedHomeSurface(modifier.height(COMPACT_FAVORITE_TILE_HEIGHT), radius = 16.dp) {
-      Column(Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick)
-          .padding(horizontal = 6.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.Center) {
-        Image(app.icon, contentDescription = null, modifier = Modifier.size(40.dp))
-        Text(app.label, color = ApprovedHomePalette.Text, fontSize = 16.sp, lineHeight = 20.sp,
-            fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 6.dp))
-      }
-    }
-    return
-  }
-  ApprovedHomeSurface(modifier.height(FAVORITE_TILE_HEIGHT), radius = 16.dp) {
-    Row(Modifier.fillMaxSize().combinedClickable(onClick = onClick, onLongClick = onLongClick)
-        .padding(horizontal = 14.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-      Image(app.icon, contentDescription = null, modifier = Modifier.size(FAVORITE_ICON_SIZE))
-      Text(app.label, color = ApprovedHomePalette.Text, fontSize = if (layout.compactLandscape) 19.sp else 22.sp,
-          lineHeight = 30.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
-  }
 }
