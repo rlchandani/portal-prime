@@ -17,6 +17,8 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 /**
  * The Fleet Agent: a foreground service that runs [FleetHttpServer]/[FleetRoutes]
@@ -51,8 +53,16 @@ class FleetAgentService : Service() {
             .onFailure { Log.w(TAG, "fleet server failed to start on :$port", it) }
             .getOrNull()
     // Advertise this Portal + browse for peers, so the phone remote can list other devices.
-    runCatching { RemoteDiscovery.start(applicationContext, FleetConfig.name(this), port) }
-        .onFailure { Log.w(TAG, "remote discovery failed to start", it) }
+    // Off the main thread: NsdManager's first use waits for system_server's NSD service to
+    // connect (~220 ms on a cold boot), and this callback runs right after Home's first frame.
+    val app = applicationContext
+    val name = FleetConfig.name(this)
+    discovery.submitLogged("start") { RemoteDiscovery.start(app, name, port) }
+  }
+
+  private fun ExecutorService.submitLogged(what: String, block: () -> Unit) {
+    runCatching { execute { runCatching(block).onFailure { Log.w(TAG, "remote discovery $what failed", it) } } }
+        .onFailure { Log.w(TAG, "remote discovery $what not scheduled", it) }
   }
 
   /**
@@ -79,7 +89,7 @@ class FleetAgentService : Service() {
   override fun onDestroy() {
     runCatching { server?.stop() }
     server = null
-    runCatching { RemoteDiscovery.stop() }
+    discovery.submitLogged("stop") { RemoteDiscovery.stop() }
     runCatching { wifiLock?.release() }
     wifiLock = null
     super.onDestroy()
@@ -108,6 +118,13 @@ class FleetAgentService : Service() {
 
   companion object {
     private const val TAG = "ImmortalFleet"
+    /**
+     * One process-wide thread for [RemoteDiscovery]: start and stop stay in call order across
+     * service instances, so a quick destroy/recreate can't tear down the newer advert.
+     */
+    private val discovery: ExecutorService by lazy {
+      Executors.newSingleThreadExecutor { r -> Thread(r, "fleet-discovery").apply { isDaemon = true } }
+    }
     private const val CHANNEL = "fleet_agent"
     private const val NOTIF_ID = 4711
 
