@@ -7,7 +7,6 @@
 
 package com.immortal.launcher
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,9 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -117,58 +113,6 @@ internal fun ImmortalWorldClockWidget(modifier: Modifier = Modifier) {
 private fun worldClockCity(zoneId: String): String =
     zoneId.substringAfterLast('/').replace('_', ' ')
 
-/** The zone's local wall time, e.g. "12:42 AM" / "00:42". */
-private fun worldClockLocalTime(zoneId: String, now: Date, use24: Boolean): String {
-  val fmt = SimpleDateFormat(if (use24) "HH:mm" else "h:mm a", Locale.getDefault())
-  fmt.timeZone = TimeZone.getTimeZone(zoneId)
-  return fmt.format(now)
-}
-
-
-/** A small analog clock face for [zoneId], white by day / dark by night, with an orange seconds hand. */
-@Composable
-private fun AnalogClock(zoneId: String, now: Date, modifier: Modifier = Modifier) {
-  val cal = remember(zoneId) { java.util.Calendar.getInstance(TimeZone.getTimeZone(zoneId)) }
-  cal.time = now
-  val hour = cal.get(java.util.Calendar.HOUR)
-  val minute = cal.get(java.util.Calendar.MINUTE)
-  val second = cal.get(java.util.Calendar.SECOND)
-  val night = cal.get(java.util.Calendar.HOUR_OF_DAY) !in 6..18
-  val face = if (night) Color(0xFF1F1F22) else Color.White
-  val ink = if (night) Color.White else Color(0xFF1A1A1A)
-  val tick = if (night) Color(0x66FFFFFF) else Color(0x55000000)
-  Canvas(modifier) {
-    val r = size.minDimension / 2f
-    val c = Offset(size.width / 2f, size.height / 2f)
-    drawCircle(face, radius = r, center = c)
-    // Hour ticks.
-    for (i in 0 until 12) {
-      val a = Math.toRadians(i * 30.0)
-      val sin = kotlin.math.sin(a).toFloat()
-      val cos = kotlin.math.cos(a).toFloat()
-      drawLine(
-          tick,
-          start = Offset(c.x + sin * r * 0.82f, c.y - cos * r * 0.82f),
-          end = Offset(c.x + sin * r * 0.94f, c.y - cos * r * 0.94f),
-          strokeWidth = r * 0.05f,
-      )
-    }
-    fun hand(angleDeg: Double, length: Float, width: Float, color: Color) {
-      val a = Math.toRadians(angleDeg)
-      drawLine(
-          color,
-          start = c,
-          end = Offset(c.x + (kotlin.math.sin(a) * length).toFloat(), c.y - (kotlin.math.cos(a) * length).toFloat()),
-          strokeWidth = width,
-          cap = StrokeCap.Round,
-      )
-    }
-    hand((hour % 12 + minute / 60.0) * 30.0, r * 0.5f, r * 0.10f, ink)
-    hand((minute + second / 60.0) * 6.0, r * 0.78f, r * 0.07f, ink)
-    hand(second * 6.0, r * 0.85f, r * 0.03f, Color(0xFFFF9500))
-    drawCircle(Color(0xFFFF9500), radius = r * 0.06f, center = c)
-  }
-}
 
 /**
  * Home widget for the wake-up alarm ([AlarmConfig]). Shows the next fire time + label when armed,

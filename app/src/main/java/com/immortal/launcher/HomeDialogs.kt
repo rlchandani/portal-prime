@@ -11,28 +11,19 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -44,17 +35,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.math.roundToInt
-import com.immortal.launcher.ui.components.Glass
 import java.util.Locale
 
 @Composable
@@ -77,86 +61,6 @@ internal fun ApprovedHomeDialog(
         content()
       }
     }
-    }
-  }
-}
-
-/**
- * Full-screen "time's up" alarm overlay with an iOS-style slide-to-stop. Blocks touches from
- * reaching the grid beneath, so the only way out is the slider (or the 60s auto-silence).
- */
-@Composable
-private fun TimerAlarmOverlay(onStop: () -> Unit) {
-  val noRipple = remember { MutableInteractionSource() }
-  Box(
-      contentAlignment = Alignment.Center,
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Glass.Scrim)
-              // Swallow taps so nothing behind the alarm reacts.
-              .clickable(interactionSource = noRipple, indication = null) {},
-  ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-      Text("⏰", fontSize = 68.sp)
-      Spacer(Modifier.size(18.dp))
-      Text("Timer", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold)
-      Text(
-          "Time's up",
-          color = Color(0xFFBFBFBF),
-          fontSize = 18.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(44.dp))
-      SlideToStop(onStop = onStop)
-    }
-  }
-}
-
-/** A draggable thumb on a track; sliding it to the far end fires [onStop] (else it snaps back). */
-@Composable
-private fun SlideToStop(onStop: () -> Unit) {
-  val density = androidx.compose.ui.platform.LocalDensity.current
-  val trackWidth = 320.dp
-  val thumbSize = 56.dp
-  val inset = 4.dp
-  val maxOffset =
-      with(density) { (trackWidth - thumbSize - inset * 2).toPx() }.coerceAtLeast(0f)
-  val insetPx = with(density) { inset.roundToPx() }
-  var offsetX by remember { mutableStateOf(0f) }
-  Box(
-      modifier =
-          Modifier.width(trackWidth)
-              .height(64.dp)
-              .clip(RoundedCornerShape(32.dp))
-              .background(Color(0x33FFFFFF)),
-      contentAlignment = Alignment.CenterStart,
-  ) {
-    Text(
-        "Slide to stop",
-        color = Color(0xFFE8E8E8),
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Medium,
-        modifier = Modifier.align(Alignment.Center).alpha(1f - (offsetX / maxOffset).coerceIn(0f, 1f)),
-    )
-    Box(
-        modifier =
-            Modifier.offset { IntOffset(offsetX.roundToInt() + insetPx, 0) }
-                .size(thumbSize)
-                .clip(CircleShape)
-                .background(Color(0xFFE53935))
-                .pointerInput(Unit) {
-                  detectDragGestures(
-                      onDragEnd = { if (offsetX >= maxOffset * 0.9f) onStop() else offsetX = 0f },
-                      onDragCancel = { offsetX = 0f },
-                      onDrag = { change, dragAmount ->
-                        change.consume()
-                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, maxOffset)
-                      },
-                  )
-                },
-        contentAlignment = Alignment.Center,
-    ) {
-      Text("›", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
     }
   }
 }

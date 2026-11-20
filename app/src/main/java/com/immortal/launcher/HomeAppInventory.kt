@@ -91,10 +91,6 @@ internal val approvedIconInventoryRevision: StateFlow<Long>
 /** A dashboard address changes the shortcut inventory, without another package scan on each frame. */
 internal fun invalidateApprovedDashboardInventory() = ApprovedHomeInventory.invalidate()
 
-/** Home warms this inventory before Apps is opened; exclude Home's injected shortcuts. */
-internal fun peekApprovedInstalledApps(context: Context): List<AppEntry>? =
-    ApprovedHomeInventory.apps.peek()?.let { approvedInstalledEntries(context, it) }
-
 internal fun approvedInstalledEntries(context: Context, inventory: List<AppEntry>): List<AppEntry> =
     inventory.filter {
       it.component.packageName != context.packageName && it.component != CALLS_COMPONENT

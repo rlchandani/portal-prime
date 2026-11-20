@@ -17,8 +17,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -29,7 +27,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -124,38 +121,6 @@ internal fun RemoveBadge(size: Dp, modifier: Modifier = Modifier, onClick: () ->
           Color.White,
           Offset(cx - arm, cy + arm),
           Offset(cx + arm, cy - arm),
-          strokeWidth = stroke,
-          cap = StrokeCap.Round,
-      )
-    }
-  }
-}
-
-/**
- * Gray minus badge for iOS-style edit mode on app icons.
- */
-@Composable
-internal fun MinusBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
-  Surface(
-      color = Color(0xE6C7C7CC),
-      shape = CircleShape,
-      modifier = modifier
-          .size(32.dp)
-          .semantics { contentDescription = "Remove item" }
-          .clickable(
-              interactionSource = remember { MutableInteractionSource() },
-              indication = null
-          ) { onClick() },
-  ) {
-    Canvas(Modifier.fillMaxSize()) {
-      val cx = this.size.width / 2f
-      val cy = this.size.height / 2f
-      val armWidth = this.size.minDimension * 0.30f
-      val stroke = this.size.minDimension * 0.12f
-      drawLine(
-          Color.White,
-          Offset(cx - armWidth, cy),
-          Offset(cx + armWidth, cy),
           strokeWidth = stroke,
           cap = StrokeCap.Round,
       )
