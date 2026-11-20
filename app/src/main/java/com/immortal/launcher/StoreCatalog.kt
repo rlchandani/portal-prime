@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import java.io.File
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
@@ -35,6 +36,8 @@ data class CatalogApp(
     val homepage: String? = null,
     val submittedBy: String? = null,
     val devices: List<String> = emptyList(), // empty = every Portal
+    /** When set (a request-supplied URL), every download hop must be one of these hosts. */
+    val downloadHosts: Set<String>? = null,
 )
 
 /** Broadcast action the PackageInstaller session reports status to. */
@@ -257,7 +260,7 @@ object StoreCatalog {
         val url = resolveApkUrl(app)
         main.post { status(app.packageName, "Downloading…") }
         val apk = File(context.cacheDir, "${app.packageName}.apk")
-        download(url, apk)
+        download(url, apk, app.downloadHosts)
         main.post { status(app.packageName, "Installing…") }
         if (InstallDaemon.isAvailable(context)) {
           // Silent install via the provisioning daemon — no system dialog.
@@ -300,8 +303,27 @@ object StoreCatalog {
 
   /** Download [spec] to [dest]. Internal so the fleet agent's headless install can
    *  reuse the exact same fetch (resolve via [resolveApkUrl], then download). */
-  internal fun download(spec: String, dest: File) {
-    ApkDownloadHttp.download(open(spec), dest)
+  internal fun download(spec: String, dest: File, allowedHosts: Set<String>? = null) {
+    ApkDownloadHttp.download(openFollowing(spec, allowedHosts), dest)
+  }
+
+  /**
+   * Follows redirects by hand so each hop is checked: never https -> http, at most
+   * [ApkDownloadHttp.MAX_REDIRECTS] hops, and with [allowedHosts] every hop must be one of them.
+   */
+  private fun openFollowing(spec: String, allowedHosts: Set<String>?): HttpURLConnection {
+    if (allowedHosts != null && !ApkUrlPolicy.isAllowed(spec, allowedHosts)) throw IOException("APK host not allowed")
+    var current = spec
+    repeat(ApkDownloadHttp.MAX_REDIRECTS + 1) {
+      val c = open(current)
+      c.instanceFollowRedirects = false
+      val status = c.responseCode
+      if (status !in ApkDownloadHttp.REDIRECTS) return c
+      val location = c.getHeaderField("Location")
+      c.disconnect()
+      current = ApkDownloadHttp.nextHop(current, location, allowedHosts) ?: throw IOException("APK redirect refused")
+    }
+    throw IOException("APK redirect limit exceeded")
   }
 
   private fun open(spec: String): HttpURLConnection {

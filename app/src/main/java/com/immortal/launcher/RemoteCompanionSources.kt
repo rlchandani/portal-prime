@@ -13,7 +13,8 @@ import org.json.JSONObject
 /** Resolve omitted credentials before any settings mutation; never move a secret to a new peer. */
 internal object RemoteCompanionSources {
   data class Prepared(val body: JSONObject? = null, val error: String? = null)
-  private fun endpoint(value: String, immich: Boolean = false): String? = runCatching {
+  /** `scheme://host:port/path?query`, lower-cased host, or null when not a plain http(s) URL. */
+  internal fun endpoint(value: String, immich: Boolean = false): String? = runCatching {
     val normalized = if (immich) ImmichSource.normalizeBase(value) else value.trim().trimEnd('/')
     val uri = URI(normalized)
     if (uri.scheme?.lowercase(Locale.ROOT) !in setOf("http", "https") || uri.host.isNullOrBlank() || uri.userInfo != null || uri.fragment != null) return null
@@ -22,8 +23,13 @@ internal object RemoteCompanionSources {
     "$scheme://${uri.host.lowercase(Locale.ROOT)}:$port${uri.rawPath.orEmpty().trimEnd('/')}${uri.rawQuery?.let { "?$it" }.orEmpty()}"
   }.getOrNull()
 
+  /**
+   * The body to apply, with omitted credentials resolved from [stored]. A blank or masked secret
+   * ([SourceSecrets]) counts as omitted, so a phone that round-trips a masked read keeps the saved
+   * secret; the saved secret is reused only for the same endpoint (and account).
+   */
   fun prepare(input: JSONObject, stored: ScreensaverConfig.Settings): Prepared {
-    val out = JSONObject(input.toString())
+    val out = SourceSecrets.withoutKeptSecrets(input)
     if (out.has("albumUrl")) {
       val album = out.opt("albumUrl")
       if (album !is String) return Prepared(error = "invalid_source_field")

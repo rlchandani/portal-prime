@@ -33,12 +33,7 @@ internal object RemoteFeatureRoutes {
   }
 
   /** An opaque per-session key: the first 64 bits of SHA-256 over the token (safe to keep in memory). */
-  fun callerKey(token: String): String =
-      java.security.MessageDigest.getInstance("SHA-256").digest(token.toByteArray(Charsets.UTF_8))
-          .take(CALLER_BYTES).joinToString("") { "%02x".format(it.toInt() and BYTE_MASK) }
-
-  private const val CALLER_BYTES = 8
-  private const val BYTE_MASK = 0xff
+  fun callerKey(token: String): String = RemoteSessionPolicy.idOf(token)
 
   private val routes = ConcurrentHashMap<String, Route>()
 
@@ -53,14 +48,26 @@ internal object RemoteFeatureRoutes {
   fun error(code: String): JSONObject = JSONObject().put("ok", false).put("error", code)
   fun json(status: Int, body: JSONObject) = FleetHttpServer.Response(status, body.toString())
 
-  /** Contract route: the phone provisions the household key; read-back shows only a fingerprint. */
-  fun registerHouseholdKey() = register("/remote/household") { context, method, body ->
-    when (method) {
-      "GET" -> json(200, ok().put("configured", HouseholdKey.get(context) != null)
-          .put("fingerprint", HouseholdKey.get(context)?.let(HouseholdKey::fingerprint) ?: JSONObject.NULL))
-      // Reading or replacing the key needs a pairing done in person in the last 10 minutes.
-      "POST" -> if (!RemotePairing.householdWindowOpen()) json(403, error("pair_again"))
-      else if (body.optBoolean("share")) shareKey(context) else {
+  /**
+   * Contract route: the phone provisions the household key; read-back shows only a fingerprint.
+   * Reading or replacing the key is allowed only for the session the latest in-person PIN pairing
+   * created, within 10 minutes, and only once ([RemotePairing.householdWindowOpen]).
+   */
+  fun registerHouseholdKey() = register("/remote/household", householdKeyRoute)
+
+  internal val householdKeyRoute = object : CallerRoute {
+    override fun handleFrom(context: Context, method: String, body: JSONObject, caller: String): FleetHttpServer.Response =
+        when (method) {
+          "GET" -> json(200, ok().put("configured", HouseholdKey.get(context) != null)
+              .put("fingerprint", HouseholdKey.get(context)?.let(HouseholdKey::fingerprint) ?: JSONObject.NULL))
+          "POST" -> RemotePairing.withHouseholdGrant<FleetHttpServer.Response>(caller, succeeded = { it.status == 200 }) { householdPost(context, body) }
+              ?: json(403, error("pair_again"))
+          else -> json(405, error("method_not_allowed"))
+        }
+  }
+
+  private fun householdPost(context: Context, body: JSONObject): FleetHttpServer.Response =
+      if (body.optBoolean("share")) shareKey(context) else {
         val key = HouseholdKey.fromHex(body.optString("key"))
         if (!HouseholdKey.isValidKey(key) || !HouseholdKey.set(context, key!!)) json(400, error("invalid_key"))
         else {
@@ -68,9 +75,6 @@ internal object RemoteFeatureRoutes {
           json(200, ok().put("fingerprint", HouseholdKey.fingerprint(key)))
         }
       }
-      else -> json(405, error("method_not_allowed"))
-    }
-  }
 
   /**
    * A newly installed phone adopts the household's existing key instead of minting its own (which

@@ -113,7 +113,10 @@ class FleetScreensaverTest {
     val json = FleetScreensaver.sourcesJson(s)
     assertEquals("immich", json.getString("source"))
     assertEquals("https://immich.example", json.getString("immichUrl"))
-    assertEquals("secret-key", json.getString("immichKey"))
+    // The saved key never leaves the Portal: its slot holds the mask, short keys get no hint.
+    assertEquals(SourceSecrets.MASK, json.getString("immichKey"))
+    assertEquals("", json.getString("immichKeyHint"))
+    assertTrue(json.getBoolean("hasImmichKey"))
   }
 
   @Test
@@ -157,7 +160,7 @@ class FleetScreensaverTest {
     assertEquals("smb", json.getString("source"))
     assertEquals("nas.local", json.getString("smbHost"))
     assertEquals("photos", json.getString("smbShare"))
-    assertEquals("hunter2", json.getString("smbPass"))
+    assertEquals("the saved password is masked, never returned", SourceSecrets.MASK, json.getString("smbPass"))
   }
 
   @Test

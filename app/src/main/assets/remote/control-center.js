@@ -363,6 +363,12 @@ function toast(message, isError = false) {
 }
 function message(error) {
   const code = error?.code || error?.error || 'request_failed';
+  if (code === 'pair_rate_limited') {
+    const wait = Number(error?.data?.retryAfterSec);
+    return Number.isInteger(wait) && wait > 0
+      ? `Too many tries. Wait ${wait} s, then try again.`
+      : 'Too many tries. Wait a moment, then try again.';
+  }
   const messages = {
     unauthorized: 'Pairing expired or was revoked. Pair this Portal again with a fresh PIN.',
     bad_pin: 'That PIN expired or was already used. Show a fresh PIN on the Portal.',
@@ -390,6 +396,8 @@ function message(error) {
     invalid_source_field: 'Review the photo source fields and enter text values before saving.',
     invalid_immich_endpoint: 'Enter a complete http:// or https:// Immich server address.',
     immichKey_required: 'Enter an Immich API key for this server.',
+    immich_url_not_lan: 'Use your Immich server’s home-network address, or the server already saved on this Portal.',
+    immich_timeout: 'The Immich server took too long to list albums. Check it and retry.',
     smb_endpoint_required: 'Enter both the NAS address and share name.',
     smbPass_required: 'Enter the password for this NAS account.',
     invalid_dav_endpoint: 'Enter a complete http:// or https:// WebDAV folder address, including the server name.',
@@ -989,7 +997,7 @@ function pairDialog(address = location.origin, pinValue = '') {
       owner.discoveryController?.abort(); owner.discoveryController = null;
       controller = new AbortController(); owner.pairController = controller;
       error.className = 'detail'; error.textContent = 'Pairing…';
-      const response = await api({ base }, '/remote/pair', { body: { pin }, signal: controller.signal });
+      const response = await api({ base }, '/remote/pair', { body: { pin, label: 'Web browser' }, signal: controller.signal });
       if (!current() || owner.pairController !== controller) return;
       if (typeof response.token !== 'string' || !response.token) throw new ApiError('invalid_response');
       const paired = { base, token: response.token, name: response.name || 'Portal' };

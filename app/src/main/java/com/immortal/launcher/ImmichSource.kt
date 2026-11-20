@@ -70,9 +70,9 @@ object ImmichSource {
           .getOrDefault(false)
 
   /** List uniquely identified albums for the picker. Null on request or document failure. */
-  fun listAlbums(base: String, apiKey: String): List<Album>? =
+  fun listAlbums(base: String, apiKey: String, maxBytes: Int = PhotoSourceHttp.MAX_METADATA_BYTES): List<Album>? =
       runCatching {
-            val body = httpGet("${normalizeBase(base)}/api/albums", authHeaders(apiKey)) ?: return null
+            val body = httpGet("${normalizeBase(base)}/api/albums", authHeaders(apiKey), maxBytes) ?: return null
             val arr = JSONArray(body)
             buildList {
               val seen = HashSet<String>()
@@ -175,11 +175,15 @@ object ImmichSource {
   }
 
   // --- HTTP (mirrors the app's other best-effort fetchers) --------------------
-  private fun httpGet(spec: String, headers: Map<String, String>): String? {
+  private fun httpGet(
+      spec: String,
+      headers: Map<String, String>,
+      maxBytes: Int = PhotoSourceHttp.MAX_METADATA_BYTES,
+  ): String? {
     val c = PhotoSourceRedirects.open(spec, headers, readTimeoutMs = 10000,
         opened = { PhotoSourceWork.track(it) })
     try {
-      return if (c.responseCode in 200..299) PhotoSourceHttp.readText(c)
+      return if (c.responseCode in 200..299) PhotoSourceHttp.readText(c, maxBytes)
       else null.also { logHttpFailure("GET", spec, c) }
     } finally {
       runCatching { c.disconnect() }

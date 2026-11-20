@@ -104,6 +104,19 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
       }
     }
   }
+  // Too many wrong codes: show the wait, then let the owner generate a fresh code (never a
+  // permanent lockout, and never an automatic new code an attacker could keep burning).
+  var cooldownSec by remember { mutableStateOf(0L) }
+  LaunchedEffect(livePin) {
+    var remaining = RemotePairing.pairingCooldownRemainingMs()
+    if (remaining <= 0L) return@LaunchedEffect
+    while (remaining > 0L) {
+      cooldownSec = PairingThrottle.seconds(remaining)
+      delay(minOf(remaining, COOLDOWN_TICK_MS))
+      remaining = RemotePairing.pairingCooldownRemainingMs()
+    }
+    cooldownSec = 0L
+  }
   fun photoAccessGranted() = listOf(Manifest.permission.READ_EXTERNAL_STORAGE,
       Manifest.permission.WRITE_EXTERNAL_STORAGE).all {
     context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED
@@ -133,13 +146,13 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
           Text("Scan with your phone camera, or open the address below on the same Wi-Fi.",
               color = IosSecondary, fontSize = 24.sp, lineHeight = 36.sp)
           Text(displayedUrl, color = IosBlue, fontSize = 24.sp, lineHeight = 36.sp)
-          if (livePin != null) {
+          if (livePin != null && cooldownSec == 0L) {
             Text("This code works once and expires after 5 minutes.",
                 color = IosSecondary, fontSize = 22.sp, lineHeight = 32.sp)
           }
           TextButton(onClick = { issued = enableRemoteAndMintPin(context) },
-              modifier = Modifier.heightIn(min = 68.dp)) {
-            Text("Generate new code", color = IosBlue, fontSize = 22.sp)
+              enabled = cooldownSec == 0L, modifier = Modifier.heightIn(min = 68.dp)) {
+            Text("Generate new code", color = if (cooldownSec == 0L) IosBlue else IosSecondary, fontSize = 22.sp)
           }
           if (!photoAccess) {
             Text("To import photos from your phone, allow file access on this Portal.",
@@ -152,7 +165,8 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
         }
         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
           val current = livePin
-          if (current != null) {
+          // A code shown during the cooldown couldn't be used yet, so the wait wins.
+          if (current != null && cooldownSec == 0L) {
             val pairUrl = remember(displayedUrl, current) { "$displayedUrl#pin=$current" }
             // A replaced code gets a fresh bitmap state; never show an old QR beside new digits.
             key(pairUrl) {
@@ -170,6 +184,11 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
             Text(current, color = IosLabel, fontSize = 90.sp, lineHeight = 110.sp,
                 letterSpacing = 8.sp, fontWeight = FontWeight.Normal,
                 modifier = Modifier.padding(top = 18.dp))
+          } else if (cooldownSec > 0L) {
+            Text("Too many tries", color = IosLabel, fontSize = 32.sp, lineHeight = 42.sp,
+                fontWeight = FontWeight.Medium)
+            Text("Wait $cooldownSec s, then generate a new code.", color = IosSecondary,
+                fontSize = 22.sp, lineHeight = 32.sp, modifier = Modifier.padding(top = 18.dp))
           } else {
             Text("Code no longer valid", color = IosLabel, fontSize = 32.sp, lineHeight = 42.sp,
                 fontWeight = FontWeight.Medium)
@@ -181,6 +200,8 @@ fun RemotePairCard(url: String?, pin: String?, modifier: Modifier = Modifier) {
     }
   }
 }
+
+private const val COOLDOWN_TICK_MS = 1_000L
 
 /**
  * Compact, centred "Done" for the pairing surfaces (modal + [RemotePairActivity]). A wrap-content

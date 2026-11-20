@@ -70,4 +70,6 @@ internal fun PhonePairingContent() {
     Spacer(Modifier.size(18.dp))
     Card { NavRow("Hide pairing code") { issued = null } }
   }
+  Spacer(Modifier.size(28.dp))
+  PairedPhonesSection()
 }

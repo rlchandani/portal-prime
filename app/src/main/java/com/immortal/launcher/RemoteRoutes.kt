@@ -136,10 +136,25 @@ class RemoteRoutes internal constructor(
 
   // --- endpoints --------------------------------------------------------------
 
+  /**
+   * `{"pin":"123456","label":"Pixel 8"}` (label optional, shown in Settings › Phone Remote). Too
+   * many wrong codes give 429 `pair_rate_limited` with `retryAfterSec` (and `Retry-After`).
+   */
   private fun pair(req: FleetHttpServer.Request): FleetHttpServer.Response {
     val body = parseJson(req.bodyText()) ?: return json(400, err("bad_json"))
-    val token = RemotePairing.redeem(context, body.optString("pin")) ?: return json(401, err("bad_pin"))
-    return json(200, ok().put("token", token).put("name", FleetConfig.name(context)))
+    val label = body.optString("label").takeIf { body.opt("label") is String }
+    return when (val result = RemotePairing.redeem(context, body.optString("pin"), req.remoteAddress, label)) {
+      is RemotePairing.RedeemResult.Paired ->
+          json(200, ok().put("token", result.token).put("name", FleetConfig.name(context)))
+      RemotePairing.RedeemResult.BadPin -> json(401, err("bad_pin"))
+      is RemotePairing.RedeemResult.Limited -> rateLimited(result)
+    }
+  }
+
+  private fun rateLimited(result: RemotePairing.RedeemResult.Limited): FleetHttpServer.Response {
+    val seconds = PairingThrottle.seconds(result.retryAfterMs)
+    val body = err("pair_rate_limited").put("retryAfterSec", seconds).put("scope", if (result.global) "portal" else "device")
+    return FleetHttpServer.Response.json(429, body.toString(), mapOf("Retry-After" to seconds.toString()))
   }
 
   private fun apps(): FleetHttpServer.Response =
@@ -467,12 +482,19 @@ class RemoteRoutes internal constructor(
     val body = parseJson(req.bodyText()) ?: return json(400, err("bad_json"))
     val stored = ScreensaverConfig.load(context)
     val url = body.optString("url").ifBlank { stored.immichUrl ?: "" }
+    // A request-supplied server must be on the home network; the saved server is always allowed.
+    if (url.isBlank()) return json(400, err("immich_credentials_required"))
+    if (!LanUrlPolicy.immichAlbumsAllowed(url, stored.immichUrl)) return json(400, err("immich_url_not_lan"))
     val candidate = JSONObject().put("immichUrl", url)
     body.optString("key").takeIf { it.isNotBlank() }?.let { candidate.put("immichKey", it) }
     val prepared = RemoteCompanionSources.prepare(candidate, stored)
     if (prepared.error != null) return json(400, err("immich_credentials_required"))
     val key = prepared.body!!.getString("immichKey")
-    val albums = ImmichSource.listAlbums(url, key) ?: return json(502, err("immich_unreachable"))
+    val albums = when (val fetched = ImmichAlbumFetch.list(url, key)) {
+      ImmichAlbumFetch.Result.TimedOut -> return json(504, err("immich_timeout"))
+      ImmichAlbumFetch.Result.Failed -> return json(502, err("immich_unreachable"))
+      is ImmichAlbumFetch.Result.Albums -> fetched.albums
+    }
     return json(200, ok().put("albums", FleetScreensaver.albumsJson(albums)))
   }
 
@@ -630,7 +652,8 @@ class RemoteRoutes internal constructor(
 
   private fun authorized(req: FleetHttpServer.Request): Boolean {
     val token = bearer(req.header("authorization")) ?: return false
-    return RemotePairing.isValidSession(context, token) ||
+    // A phone session works only while the remote is on (it is turned on by showing a pairing code).
+    return RemotePairing.isEnabled(context) && RemotePairing.isValidSession(context, token) ||
         FleetRoutes.constantTimeEquals(token, FleetConfig.token(context))
   }
 

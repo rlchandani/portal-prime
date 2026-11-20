@@ -360,6 +360,54 @@ class ApkDownloadHttpTest {
     }
   }
 
+  @Test
+  fun declaredLengthOverTheCapIsRefusedBeforeReading() {
+    val destination = oldDestination()
+    val input = TrackedInput(ByteArrayInputStream(ByteArray(16)))
+    val connection = Connection(1_000L, input)
+    assertThrows(IOException::class.java) { ApkDownloadHttp.download(connection, destination, maxBytes = 100L) }
+    assertEquals("old", destination.readText())
+    assertEntries("cached.apk")
+  }
+
+  @Test
+  fun undeclaredBodyPastTheCapIsRefusedWhileStreaming() {
+    val destination = oldDestination()
+    val input = TrackedInput(ByteArrayInputStream(ByteArray(64 * 1024)))
+    val connection = Connection(-1L, input)
+    assertThrows(IOException::class.java) { ApkDownloadHttp.download(connection, destination, maxBytes = 10_000L) }
+    assertEquals("old", destination.readText())
+    assertEntries("cached.apk")
+  }
+
+  @Test
+  fun aDownloadPastItsTimeBudgetIsRefused() {
+    val destination = oldDestination()
+    var now = 0L
+    val slow = object : InputStream() {
+      override fun read(): Int = throw AssertionError("Bulk reads expected")
+      override fun read(buffer: ByteArray, offset: Int, count: Int): Int { now += 1_000L; buffer[offset] = 1; return 1 }
+    }
+    val connection = Connection(-1L, TrackedInput(slow))
+    assertThrows(IOException::class.java) {
+      ApkDownloadHttp.download(connection, destination, budgetMs = 5_000L, clock = { now })
+    }
+    assertEquals("old", destination.readText())
+  }
+
+  @Test
+  fun redirectHopsNeverDowngradeAndHonourAnAllowList() {
+    val github = "https://github.com/o/r/releases/download/v1/a.apk"
+    assertEquals("https://objects.githubusercontent.com/x", ApkDownloadHttp.nextHop(github, "https://objects.githubusercontent.com/x", null))
+    assertEquals(null, ApkDownloadHttp.nextHop(github, "http://objects.githubusercontent.com/x", null))
+    assertEquals(null, ApkDownloadHttp.nextHop(github, "", null))
+    assertEquals(null, ApkDownloadHttp.nextHop(github, "file:///etc/passwd", null))
+    val hosts = ApkUrlPolicy.BUILT_IN_HOSTS
+    assertEquals(null, ApkDownloadHttp.nextHop(github, "https://192.168.1.10/a.apk", hosts))
+    assertEquals("https://release-assets.githubusercontent.com/a",
+        ApkDownloadHttp.nextHop(github, "https://release-assets.githubusercontent.com/a", hosts))
+  }
+
   private fun oldDestination(): File =
     File(temporary.root, "cached.apk").apply { writeText("old") }
 

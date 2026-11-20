@@ -127,6 +127,6 @@ class CallAutoAnswerStrippedGroupTest {
   }
 
   @Test fun householdKeyWindowIsClosedUntilAPairing() {
-    assertFalse(RemotePairing.householdWindowOpen(System.currentTimeMillis()))
+    assertFalse(RemotePairing.householdWindowOpen("any-session", System.currentTimeMillis()))
   }
 }
