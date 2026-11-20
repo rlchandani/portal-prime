@@ -25,22 +25,22 @@ Severity: **High** = clearly not premium, or wrong. **Medium** = noticeable. **L
 | SS-4 | Screensaver · Digital clock (Classic / Bold / Neon / Retro LED) | Numerals 250 dp vs 333. The serif date was a tiny line (LED: a fixed 30 dp). LED digits weren't the mock's 230/250 ratio. | High | **Fixed** 536d156c | `sbs/ss-clocks.png` → `sbs/after-clocks.png` (mock · 1.288 · fixed) |
 | SS-5 | Screensaver · Flip face | No flip cards: the card halves were drawn with a transparent paint, so only bare digits and the seam showed. | High | **Fixed** b7a46546 | `sbs/after-clocks.png` row 5 |
 | SS-6 | Screensaver · Analog face | Dial 1.36× the mock (it was fit to the panel). | Medium | **Fixed** 536d156c | `sbs/after-clocks.png` row 6 |
-| SS-7 | Screensaver · Split glance at night | Mock: the split layout, dimmed. Shipped, with the household's settings (dark-room clock off) and forced night: a full-screen warm clock ("Friday, November 20"). This may be the test source's forced night rather than a real dark room. | Medium | Open (verify in a real dark room) | `sbs/ss-splitGlance--night-household.png` |
-| SS-8 | Screensaver · Analog | The mock has a sweeping amber second hand and no date. Shipped shows the date, and the second hand only with "show seconds". | Low | Open | `sbs/after-clocks.png` |
+| SS-7 | Screensaver · Split glance at night | Mock: the split layout, dimmed. Shipped, with the household's settings (dark-room clock off) and forced night: a full-screen warm clock ("Friday, November 20"). This may be the test source's forced night rather than a real dark room. | Medium | **Fixed** 051b8bb1 (round 2) | `sbs/ss-splitGlance--night-household.png` |
+| SS-8 | Screensaver · Analog | The mock has a sweeping amber second hand and no date. Shipped shows the date, and the second hand only with "show seconds". | Low | By design (follows Show seconds / Show date) | `sbs/after-clocks.png` |
 | SS-9 | Screensaver · dates | "Friday · November 20" vs the mock's "Friday · 20 November": the device's US locale. | Low | By design | — |
 | CC-1 | Control Center · Alerts | "Open 310 h 15 min · 2:33 pm" (hours never become days, and an old time reads as today) vs the mock's "Open 17 min · since 7:25 pm". | High | **Fixed** bd6616c2 | `sbs/cc-alerts.png` |
 | CC-2 | Control Center · Map scenes | Raw HA script names "[Ring]: Arm Away" / "Runs a script" vs the mock's "Good night" / "Walks the house". | Medium | **Fixed** 2b179979 | `sbs/cc-map.png` |
-| CC-3 | Control Center · HA unreachable | The mock's checklist (Portal Wi-Fi ✓, server ✗ no response, retry spinner) is missing; the sidebar and Ask Jarvis aren't dimmed. | Medium | Open | `sbs/cc-hadown.png` |
-| CC-4 | Control Center · Security | The mock summarises 4 groups (Doors OK, Windows 1 open, Garage, Motion). Shipped lists all 76 sensors with raw HA model names ("Tilt Shock XS Sensor Window/door is …"). The "2 things open" hint is missing. | Medium | Open | `sbs/cc-security.png` |
-| CC-5 | Control Center · Edit | Title "Edit floor" vs "Edit floor plan"; a large room's 22 devices crowd an icon grid. | Low | Open | `sbs/cc-edit.png` |
+| CC-3 | Control Center · HA unreachable | The mock's checklist (Portal Wi-Fi ✓, server ✗ no response, retry spinner) is missing; the sidebar and Ask Jarvis aren't dimmed. | Medium | **Fixed** c96f04a2 (round 2) | `sbs/cc-hadown.png` |
+| CC-4 | Control Center · Security | The mock summarises 4 groups (Doors OK, Windows 1 open, Garage, Motion). Shipped lists all 76 sensors with raw HA model names ("Tilt Shock XS Sensor Window/door is …"). The "2 things open" hint is missing. | Medium | **Fixed** 0a2508a8 (round 2) | `sbs/cc-security.png` |
+| CC-5 | Control Center · Edit | Title "Edit floor" vs "Edit floor plan"; a large room's 22 devices crowd an icon grid. | Low | Title: debug pill, as CC-6. Crowding: open | `sbs/cc-edit.png` |
 | CC-6 | Control Center · header | With the debug pill and the "HA unreachable" pill both showing, the "Home" title truncates to "I…". Debug-only. | Low | Open | `sbs/cc-hadown.png` |
-| CC-7 | Control Center · Alerts | The mock's "Preview a banner" card is absent. | Low | Open | `sbs/cc-alerts.png` |
+| CC-7 | Control Center · Alerts | The mock's "Preview a banner" card is absent. | Low | **Fixed** 0fc6b551 (round 2) | `sbs/cc-alerts.png` |
 | — | Control Center · Settings, map layout | Close match. | — | — | `sbs/cc-settings.png`, `sbs/cc-map.png` |
-| W-1 | Who's there · People & Recognition | The header icon is a film-strip glyph (mock: people), and the toggle row's icon reads as an emoji. | Medium | Open | `sbs/whos-settings-people.png` |
+| W-1 | Who's there · People & Recognition | The header icon is a film-strip glyph (mock: people), and the toggle row's icon reads as an emoji. | Medium | **Fixed** 42cf5f6d (round 2) | `sbs/whos-settings-people.png` |
 | W-2 | Who's there · Settings rows | Outlined cards vs the mock's filled rows (the shared Settings style). | Low | Open | same |
 | W-3 | Who's there · Enrolment | The flow differs. The mock starts on the phone (intro, consent) and the Portal opens on "Ready when you are" with an avatar; shipped opens on an Add-person form on the Portal. | Medium | Open (product flow) | `sbs/whos-e-ready.png` |
 | W-4 | Who's there · Home views | Not captured (rule: never capture Home). | — | Not audited | — |
-| CA-1 | Calling · Calls | Each room card carries greyed full-width "Not allowed" drop-in pills; the mock has compact round actions. They read as disabled clutter. | Medium | Open | `sbs/calling-contacts.png` |
+| CA-1 | Calling · Calls | Each room card carries greyed full-width "Not allowed" drop-in pills; the mock has compact round actions. They read as disabled clutter. | Medium | **Fixed** 474aa049 (round 2) | `sbs/calling-contacts.png` |
 | CA-2 | Calling · Calls | The tabs and contact model differ (Rooms / Recent / Messages vs Favourites / Households / Rooms). This is phase scope, not styling. | Low | By scope | same |
 | CA-3 | Calling · ring / in-call / ended | Not captured: a call needs a second Portal, and only Family was in scope. | — | Not audited | — |
 | J-1 | Floating Jarvis · typed | The mock has the keyboard inside the card and "Replies will also be spoken". Shipped uses the system IME. Size can't be compared: the mock's 1920 frame is a 1.4× upscale. The card belongs to the Jarvis app (com.portal.assistant), not this repo. | Medium | Open (Jarvis repo) | `sbs/jarvis-typed.png` |
@@ -90,3 +90,77 @@ Gates: all 8437 unit tests pass (922 classes, 1 skipped); `:app:assemblePerforma
 6. **SS-2:** typeface fidelity (an owner decision on bundling a wider book serif).
 7. **J-1:** the in-card keyboard, in the Jarvis repo.
 8. **Not audited:** the Mini (not on USB), calls with a second Portal, and the Who's there Home views.
+
+## Round 2 (fidelity-2, 2026-11-20)
+
+Branch `fidelity-2` from main 1.289, merged with main 1.290 (the main-thread sweep) before measuring. Mocks were
+re-rendered with the round-1 renderer and matched round 1's renders (Security, HA unreachable, Alerts and map at
+100 % / max 1/255). Images are under `portal-workspace/private-captures/fidelity-2/`: `mock/`, `ab/base` (official
+1.290), `ab/after` and `ab/after2` (fidelity-2 performance builds), and `sbs/` (mock · 1.290 · fidelity-2 strips).
+Person-named rooms, people, the HA address and cameras are blurred.
+
+### Fixes
+
+| Commit | Fix | Gap |
+|---|---|---|
+| 0a2508a8, 7b6d5bf1 | Security SENSORS card: the mock's four rows (Doors with locks, Windows, Garage, Motion), each with a count, a line and a tag, all starting closed. A tap still opens the exact rows with the inline Close / Lock. Alarm, smoke & CO and tamper go behind "More sensors" while calm, and lead the card already open when they need attention. Friendly names: a "[Ring]: " tag and a trailing "is open" are dropped, hardware names become "<room> door", "Pantry Door Sensor" becomes "Pantry door", and equal names are numbered. Several open rows in one room read "Office · 3 open". The "3 things open" note is visible again. The phone remote's list is unchanged. | CC-4 |
+| ea6a5f9b | Door alerts use the same friendly name ("Office door is open", not "Tilt Shock XS Sensor Window/door is open is open"). | CC-1 / CC-4 |
+| c96f04a2 | HA unreachable: the mock's checklist (Portal Wi-Fi ✓, the server address ✗ no response, a "Retrying in N s" spinner) and "Retry now" with its icon. While a state card covers the map, the rail and the Mini's bar keep only Home and Settings, and Ask Jarvis is dimmed, as in the mock. A refused token stays its own card. | CC-3 |
+| 474aa049 | Calls room cards show only the actions the room takes: drop-ins off leaves Video call and audio, with a quiet "Drop-ins off" line. Calls off shows no buttons. | CA-1 |
+| 42cf5f6d | People & Recognition uses the mock's two-person glyph (page header and sidebar), and the "Recognise people" switch uses the face-scan glyph instead of an emoji. | W-1 |
+| 051b8bb1 | Split glance in a dark room keeps the split layout, warm and dimmed (the mock's night veil as a colour matrix on the card and backdrop, and the mock's night ink on the panel), for every night colour. | SS-7 |
+| 0fc6b551 | Alerts: the mock's "Preview a banner on Portal home" card (Washer done, Garage open, Leak (critical)). Silent, no entity, gone after 8 s. | CC-7 |
+
+**SS-7, from the code.** The light sensor runs only when "Dark room clock" is on. The test source's forced night
+skips that check. With the household's settings (dark room clock off), a real dark room changed nothing, so round 1's
+full-screen warm clock came from the forced night. With dark room clock on, a real dark room showed the quiet clock
+(Warm / Red) or the full-bleed night photo (Photo). It now shows the dimmed split. A household with dark room clock off
+still sees the day split in the dark, because nothing senses the room.
+
+**Lows not changed.**
+- CC-5 title: the code already says "Edit floor plan". The serif title wraps at a word because the debug "Dry run ·
+  Test plan" pill takes its room, the same cause as CC-6 (skipped, debug only). The 22-device crowding was left: each
+  dot is a draggable device.
+- SS-8: the analog face already sweeps (50 ms) with Show seconds on and draws the date only with Show date on. The
+  mock's look is those two settings.
+
+### Performance (Family, official 1.290 vs fidelity-2 on 1.290, same session, `dumpsys gfxinfo`)
+
+| Screen | 1.290 | fidelity-2 |
+|---|---|---|
+| CC Security open (3) | janky 10 / 8 / 9, p90 250 / 38 / 32 ms | janky 9 / 10 / 6, p90 250 / 26 / 40 ms |
+| CC Alerts open (3) | janky 5 / 8 / 14, p90 26 / 26 / 30 ms | janky 8 / 7 / 17, p90 34 / 24 / 24 ms |
+| CC HA unreachable, 10 s | 603 frames, 11 janky, p90 12 / p99 17 ms | 603 frames, 27 janky, p90 14 / p99 20 ms |
+| Calls open (3) | janky 5 / 5 / 6, p90 150 / 105 / 97 ms | janky 6 / 6 / 6, p90 150 / 105 / 89 ms |
+| People & Recognition open (3) | janky 16 / 13 / 11, p90 77 / 44 / 61 ms | janky 16 / 11 / 14, p90 61 / 57 / 61 ms |
+| Split glance day, 40 s | 2130 frames, 2 janky, p99 13 ms | 2127 frames, 5 janky, p99 14 ms |
+| Split glance forced night, 40 s | 2 frames (static quiet clock) | 2126 frames, 4 janky, p90 12 / p99 14 ms |
+
+- The HA-unreachable state already drew at 60 fps on 1.290 (603 frames). The spinner adds a few janky frames
+  (p99 17 → 20 ms).
+- At night Split glance keeps its day drift, so it draws like the day split rather than a still clock.
+- Opens vary as much within a build as between builds. A later Security re-check (`ab/after2`) ran while another
+  agent was using Family, so its numbers are not comparable.
+
+**Untouched screens** (1.290 vs fidelity-2): Settings Display and Sounds are 100.0000 % identical. CC Settings is
+identical outside the header clock. The CC map and Settings › Clock Faces differ only at live values (header time,
+preview clock). The day Split glance panel matches outside its live time.
+
+**Mini compact layouts:** covered by unit tests only (the Mini is off USB). The Security card, room cards, rail and
+bar changes share one code path with the compact layouts. Nothing was measured on a Mini.
+
+Gates (merged 1.290 + fixes, final HEAD): 8488 unit tests pass (931 classes, 1 skipped); `:app:assemblePerformance` passes.
+
+### Remaining after round 2
+
+1. **CC-7 on device:** in the capture session, neither the washer nor the leak preview showed in the screencap.
+   The card and chips render. The cause (overlay host after a reinstall, or the tap) is not confirmed. Check it with
+   logcat (`HearthpaneBanner`) before relying on it.
+2. **SS-7 with dark room clock off:** Split glance can't dim in a dark room the Portal doesn't sense. Owner call:
+   use the light sensor for Split glance anyway, or the sunset-based evening warm dim the mock recommends
+   (`HearthNight.level` exists but isn't wired).
+3. **W-3** enrolment flow, **SS-2** typefaces, **J-1** the Jarvis in-card keyboard: owner or other-repo decisions.
+4. **CC-5** device crowding in a large room; **CC-6** the debug-pill title truncation.
+5. **CC-3 extra:** the mock's checklist doesn't check the token or the network. A refused token is a separate card
+   today.
+6. **Not audited:** the Mini on device, calls with a second Portal, the Who's there Home views.
