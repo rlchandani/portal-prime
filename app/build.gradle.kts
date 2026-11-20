@@ -45,8 +45,8 @@ android {
     applicationId = "com.immortal.launcher"
     minSdk = 24
     targetSdk = 36
-    versionCode = 276
-    versionName = "1.282"
+    versionCode = 277
+    versionName = "1.283"
     // AGP rewrites the test manifest's instrumentation name from this setting.
     // The opt-in runner uses framework APIs against optimized targets; app builds are unchanged.
     testInstrumentationRunner =
@@ -132,6 +132,10 @@ android {
     debug {
       // Lets a debug build install alongside a provisioned release for testing.
       applicationIdSuffix = ".debug"
+      // JVM unit-test coverage on demand (`-PjacocoReport=true`): instruments debug classes for
+      // testDebugUnitTest and enables createDebugUnitTestCoverageReport (HTML + XML under
+      // build/reports/coverage/test/debug). Off for normal builds, so they stay uninstrumented.
+      enableUnitTestCoverage = providers.gradleProperty("jacocoReport").orNull == "true"
       buildConfigField("boolean", "PORTAL_SCREENSAVER_TEST_SOURCE", "true")
     }
     // Family iteration uses the accepted native R8 rules with ordinary production
