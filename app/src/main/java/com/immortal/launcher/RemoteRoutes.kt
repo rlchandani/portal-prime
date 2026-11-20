@@ -484,13 +484,20 @@ class RemoteRoutes internal constructor(
     val url = body.optString("url").ifBlank { stored.immichUrl ?: "" }
     // A request-supplied server must be on the home network; the saved server is always allowed.
     if (url.isBlank()) return json(400, err("immich_credentials_required"))
-    if (!LanUrlPolicy.immichAlbumsAllowed(url, stored.immichUrl)) return json(400, err("immich_url_not_lan"))
+    // Resolved once: a request-supplied host is then reached only at the checked addresses.
+    val target = LanUrlPolicy.immichAlbumsTarget(url, stored.immichUrl) ?: return json(400, err("immich_url_not_lan"))
     val candidate = JSONObject().put("immichUrl", url)
     body.optString("key").takeIf { it.isNotBlank() }?.let { candidate.put("immichKey", it) }
     val prepared = RemoteCompanionSources.prepare(candidate, stored)
     if (prepared.error != null) return json(400, err("immich_credentials_required"))
     val key = prepared.body!!.getString("immichKey")
-    val albums = when (val fetched = ImmichAlbumFetch.list(url, key)) {
+    val fetched = when (target) {
+      LanUrlPolicy.Target.Saved -> ImmichAlbumFetch.list(url, key)
+      is LanUrlPolicy.Target.Pinned -> ImmichAlbumFetch.list(url, key) { u, k ->
+        ImmichPinnedFetch.listAlbums(u, k, target, ImmichAlbumFetch.MAX_BYTES, ImmichAlbumFetch.BUDGET_MS)
+      }
+    }
+    val albums = when (fetched) {
       ImmichAlbumFetch.Result.TimedOut -> return json(504, err("immich_timeout"))
       ImmichAlbumFetch.Result.Failed -> return json(502, err("immich_unreachable"))
       is ImmichAlbumFetch.Result.Albums -> fetched.albums
