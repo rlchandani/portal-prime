@@ -580,3 +580,113 @@ by A/B.
 3. **Calls Back:** only app-side recomposition and the out-of-frame accessibility work remain. Both are design trade-offs
    (refresh on resume, BarWatch).
 4. **Tooling:** use `sflat.py` (SurfaceFlinger present times) for smoothness, not polled gfxinfo counts.
+
+---
+
+# Round 8 (perf-8)
+
+Family Portal+ (`<family>`), debloated, performance build plus its `.dm`. Before every run I checked `reason=install-dm`
+and the APK sha. Cold starts are real reboots with no force-stop, and the numbers come from untraced reboots. Attribution
+used perfetto (round 7's cold config), simpleperf from process start on a scratch `profileable` build, `dexdump` of the
+APK against the device's own boot classpath, and the R8 mapping of each build. Base: main 1.287. The Mini was not on USB
+(checked at the start and again at the end of the round).
+
+## Fix kept
+
+`perf: keep Android-10-missing API code out of Home's first-frame classes` (3ff4be49).
+
+- **There is no media3 player in Home's first frame.** Round 7 read the runtime `VerifyClass` of media3's `Loader` as an
+  eager ExoPlayer, but no Home code builds one. The obfuscated class `zd2` takes `Loader`'s name in the mapping, yet it is an
+  R8 horizontal merge of about 40 classes behind an `int` class id. Its constructors are called from Compose's
+  `Recomposer.<init>` and `MeasureAndLayoutDelegate.<init>`. Music, follow-me and playback resume never touch media3, so
+  nothing needed deferring.
+- **Why those classes are verified at runtime.** ART verifies a class again at runtime only if the install-time verifier
+  soft-failed it. A new tool, `softfail.py`, lists the framework references in a dex class that don't resolve against the
+  device's boot classpath (pulled from Family). Each of the classes verified in the first frame names one API that
+  Android 10 lacks. R8 put that API there by merging or inlining:
+
+  | Class verified in the first frame (b0) | ms | Compose code inside | Code R8 merged or inlined in | Missing on API 29 |
+  |---|---|---|---|---|
+  | `zd2` | 6.4 | `DepthSortedSetsForDifferentPasses`, `CanvasDrawScope` parts | media3 `LoudnessCodecController` | `LoudnessCodecController` (API 35) |
+  | `pa` | 5.4 | `AndroidParagraph` | `AndroidLayoutApi34`, `Api34SegmentFinder` (inlined) | `SegmentFinder` (API 34) |
+  | `ia` | 2.1 | `animateValueAsState`'s coroutine group | `ComposeScrollCaptureCallback`'s lambda | `ScrollCaptureSession` (API 31) |
+  | `lx0` | 1.1 | `Latch` (Recomposer), `PrefetchHandleProvider` | `DefaultTrackSelector$SpatializerWrapperV32` | `Spatializer` (API 32) |
+
+- **The fix:** class-level `-keep,allowshrinking,allowobfuscation` rules in `portal-r8-rules.pro` for those five sources.
+  `allowoptimization` is deliberately left out: the app's own `allowoptimization` keeps still let R8 merge `GuestWifi$Network`
+  and `CcPlanStyle` into `lx0`. The API references now stay in their own classes, which Home never loads. A static check of
+  the c1 dex finds no Android-10-missing reference left in any of the startup classes.
+- **Traced cold boot:** runtime verification before the end of the first frame falls from 6 classes / 15.6 ms to
+  1.7 ms. Only an R8 API outline (0.2 ms) remains in the frame, plus a platform conscrypt class during `bindApplication`.
+- `StartupVerificationRulesTest` fails if a library update renames a class the rules name, or if `allowoptimization`
+  is added to them.
+
+## Cold start: before / after (Family, 6 reboots each in 2 interleaved rounds, median (range), ms)
+
+| | Before (1.287) | After (perf-8) |
+|---|---|---|
+| First frame, gfxinfo | 248 (227–348) | **222 (201–282)** |
+| Second frame | 308 (270–403) | **282 (262–418)** |
+| First frame on screen, after process start | 1235 (1188–1336) | 1232 (1154–1315) |
+| Home `Displayed` | 1498 (1420–1611) | 1541 (1286–1592) |
+
+- The first frame is lower in both rounds: 252 → 221 and 244 → 223.
+- `Displayed` is level or lower within each round (1441 / 1447, then 1609 / 1583). The pooled median is higher only because
+  each pooled side mixes the slower second round in with the first.
+
+Pixel diffs (main 1.287 vs perf-8, Family):
+- Settings, Tools library, Reminders, library after Back, Reminders reopened, and Calls: **100.0000 % identical**.
+- Music: identical outside the live sign-in code band (y 751–834).
+- Control Center (cc_debug dry-run plan, whole frame blurred): no pixel differs by more than 3/255 outside one live
+  bottom-right area. Two captures of the *same* build differ by up to 18/255 there, so it is live content.
+
+The perf-8 dex is byte-identical to the measured c1 build. All 8371 unit tests pass (911 classes, 1 skipped), and
+`:app:assemblePerformance` passes.
+
+## First RenderThread frame: is it shader compilation?
+
+Partly, but programs are already loaded from Skia's persisted cache, not compiled.
+
+- simpleperf (on-CPU, RenderThread, first two `CanvasContext::draw`s) splits the cost between three things:
+  - creating programs from the cache's binaries: `GrGLProgramBuilder::CreateProgram` → Adreno `loadProgramBinary` /
+    `QGPUCompiler`;
+  - FreeType glyph rasterization;
+  - texture uploads (`glTexSubImage2D`).
+
+  Each is a few ms. No source compiles showed up.
+- Android 10's HWUI already keeps the persistent program cache (`initShaderDiskCache`, moved off the frame path in round 7).
+  There is no further pipeline cache to add on these GL devices.
+- **The first `flush commands` swings 12–42 ms between boots of the same build** (b0 11.7, c1 42.0, round 7 31). So
+  "12–31 ms" is boot-to-boot variance as much as first-use cost.
+
+## Tried, not kept
+
+- **Drawing Compose's common primitives once into round 7's offscreen warm-up surface.** The primitives were AA rects and
+  round rects, a stroke, text at 4 sizes, a bitmap with and without a round clip, linear and radial gradients, and an elevated
+  child for the shadow program. The idea was that the RenderThread would load programs and glyphs while Home composes.
+  - In 2 traced boots, Home's first `DrawFrame` was 32.5 and 22.7 ms (flush 15.1 and 11.5), against 25.4 (11.7) on 1.287 and
+    64.7 (42.0) on c1. No measurable gain.
+  - It also costs something: `syncAndDraw` makes the main thread wait for the RenderThread's `setSurface` (29–32 ms of EGL
+    setup), which undoes round 7's parallel EGL warm-up.
+  - Patch: `scratch-tmp/perf8/not-kept-draw-warmup.patch`.
+
+## Findings without a change
+
+- **Binder calls in the first frame** take 11–26 ms per boot, depending on how busy system_server is just after boot. Most are
+  platform window work: `relayout` 8 ms, `getInTouchMode` 4 ms, `addToDisplay`, and the accessibility connection.
+  - The app-side one is `LauncherScreen`'s connectivity poll (`HomeLauncherScreen.kt`, `LaunchedEffect(appsRefreshKey)`). It
+    calls `ConnectivityManager.getActiveNetwork()` on the main thread: 6.4 ms in the profiled boot. It runs again on every
+    resume and every 15 s.
+  - Moving it to `Dispatchers.IO` would be safe, because `connected` starts as `null`. But the cost is below this round's
+    10 ms bar and 3 reboots can't resolve it, so it is listed under Next.
+- **The rest of the first doFrame** (240–350 ms) is composition (about 100 ms), `measure` (120–150 ms) and record
+  (22–27 ms), spread across the Home tree with no single item over 10 ms in the parts the profile captured.
+
+## Next
+
+1. **Cold start:** move the connectivity poll's binder call off the main thread, and measure it together with any other
+   resume-path binder work so the total is large enough for an A/B. The Calls Back frame may also benefit.
+2. **Guard against new soft failures:** after a Compose or media3 bump, run `softfail.py` over the classes that a cold trace
+   shows in `VerifyClass` slices. R8 merging can bring this cost back with any library update.
+3. **Mini:** the full survey in portrait and landscape, screensaver fps first (`sflat.py`), when it is on USB.
+4. **Calls Back / Settings:** unchanged from round 7; they need owner trade-offs.
