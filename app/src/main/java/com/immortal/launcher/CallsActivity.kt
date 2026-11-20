@@ -126,7 +126,8 @@ private fun CallsApp(start: CallsTab, onBack: () -> Unit) {
   var loopback by remember { mutableStateOf(false) }
   var testMessage by remember { mutableStateOf(false) }
   val history by CallingStore.history.collectAsState()
-  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context) }
+  // Index read + prune touch disk: off the main thread; the list fills in via the StateFlow.
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoadedOffMain(context) }
   val messages by CallMessageStore.messages.collectAsState()
   // While the app is open, ask the rooms who's around every 30 s (presence goes stale after 90 s).
   LaunchedEffect(Unit) {

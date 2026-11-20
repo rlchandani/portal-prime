@@ -32,6 +32,9 @@ class ImmortalApp : Application() {
 
   override fun onCreate() {
     super.onCreate()
+    // Scratch-build diagnostics only (always off in release/performance); installed before
+    // CrashGuard so its own startup I/O is observed too.
+    StrictModeDiagnostics.installIfEnabled()
     // Arm first, before any other init: as the home app, an uncaught crash makes Android drop our
     // default-home role (→ "Select Home app" chooser). This relaunches us straight back so the
     // user never sees it. Installed up front so a crash during the rest of onCreate is covered too.

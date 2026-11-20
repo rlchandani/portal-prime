@@ -37,7 +37,7 @@ internal object ChoresFeature {
     ChoreSync.signal(app)
   }
 
-  fun selfId(context: Context): String? = runCatching { RemoteCompanionStore.id(context) }.getOrNull()
+  fun selfId(context: Context): String? = RemoteCompanionStore.cachedId(context)
 
   fun newId(): String = ByteArray(ID_BYTES).also(random::nextBytes).let(HouseholdKey::toHex)
 

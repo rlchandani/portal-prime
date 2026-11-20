@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 @Composable
 internal fun CallMessagesSettingsBlock() {
   val context = LocalContext.current
-  LaunchedEffect(Unit) { CallMessageStore.ensureLoaded(context) }
+  LaunchedEffect(Unit) { CallMessageStore.ensureLoadedOffMain(context) }
   val messages by CallMessageStore.messages.collectAsState()
   var bytes by remember { mutableLongStateOf(0L) }
   var confirm by remember { mutableStateOf(false) }

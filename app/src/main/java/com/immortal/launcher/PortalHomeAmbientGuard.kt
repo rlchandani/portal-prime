@@ -60,32 +60,63 @@ internal fun decodePortalAmbient(encoded: String): SavedPortalAmbient? = when {
   else -> error("Invalid Portal ambient restoration token")
 }
 
+/**
+ * The guard is the token file's only writer, so after one read the token is known in memory and
+ * a Home resume ([PortalHomeAmbientGuard.restore] via `DreamPolicy.clearBridge`) costs no disk read.
+ * A failed write leaves both the file (AtomicFile) and the memo on the previous token; a read that
+ * fails is not remembered, so the next call retries the disk.
+ */
+internal class AmbientTokenMemo(
+    private val read: () -> SavedPortalAmbient?,
+    private val write: (String) -> Boolean,
+) {
+  private class Known(val token: SavedPortalAmbient?)
+  @Volatile private var known: Known? = null
+
+  fun saved(): SavedPortalAmbient? {
+    known?.let { return it.token }
+    return read().also { known = Known(it) }
+  }
+
+  fun persist(encoded: String): Boolean = write(encoded).also { if (it) known = Known(decodePortalAmbient(encoded)) }
+}
+
 /** Meta uses this secure setting to enter ambient Home and schedule its 400 ms dream bootstrap. */
 internal object PortalHomeAmbientGuard {
   private const val SETTING = "screensaver_activate_on_sleep"
 
+  @Volatile private var memo: AmbientTokenMemo? = null
+
+  private fun memo(app: Context): AmbientTokenMemo = memo ?: tokenFile(app).let { file ->
+    AmbientTokenMemo(read = {
+      try { decodePortalAmbient(file.readFully().toString(Charsets.UTF_8)) }
+      catch (_: FileNotFoundException) { null }
+    }, write = { encoded -> persist(file, encoded) }).also { memo = it }
+  }
+
+  private fun tokenFile(app: Context) = AtomicFile(File(app.filesDir, "portal_home_ambient_handoff"))
+
+  private fun persist(file: AtomicFile, encoded: String): Boolean = DreamBridgePersistence.commit {
+    var output: FileOutputStream? = null
+    try {
+      output = file.startWrite()
+      output.write(encoded.toByteArray(Charsets.UTF_8))
+      output.fd.sync() // Surface a failed durability flush before committing the atomic replacement.
+      file.finishWrite(output)
+      true
+    } catch (_: Exception) {
+      output?.let { file.failWrite(it) }
+      false
+    }
+    }
+
   private fun handoff(context: Context): PortalAmbientHandoff {
     val app = context.applicationContext ?: context
-    val file = AtomicFile(File(app.filesDir, "portal_home_ambient_handoff"))
-    fun persist(encoded: String): Boolean = DreamBridgePersistence.commit {
-      var output: FileOutputStream? = null
-      try {
-        output = file.startWrite()
-        output.write(encoded.toByteArray(Charsets.UTF_8))
-        output.fd.sync() // Surface a failed durability flush before committing the atomic replacement.
-        file.finishWrite(output)
-        true
-      } catch (_: Exception) {
-        output?.let { file.failWrite(it) }
-        false
-      }
-    }
+    val tokens = memo(app)
     return PortalAmbientHandoff(object : PortalAmbientBackend {
-      override fun saved(): SavedPortalAmbient? = try {
-        decodePortalAmbient(file.readFully().toString(Charsets.UTF_8))
-      } catch (_: FileNotFoundException) { null }
-      override fun save(original: String?): Boolean = persist(encodePortalAmbient(original))
-      override fun clear(): Boolean = persist("-")
+      override fun saved(): SavedPortalAmbient? = tokens.saved()
+      override fun save(original: String?): Boolean = tokens.persist(encodePortalAmbient(original))
+      override fun clear(): Boolean = tokens.persist("-")
       override fun current(): String? = Settings.Secure.getString(app.contentResolver, SETTING)
       override fun write(value: String?): Boolean = Settings.Secure.putString(app.contentResolver, SETTING, value)
     })
