@@ -6,6 +6,7 @@
  */
 package com.immortal.launcher
 
+import org.json.JSONArray
 import org.json.JSONObject
 import java.security.MessageDigest
 
@@ -34,16 +35,38 @@ internal object CallPhoneId {
  */
 internal object CallPhoneWire {
   const val GO = "call_go"
-  val SENDABLE = setOf(CallWire.RING, CallWire.REPLY, CallWire.END, CallWire.MEDIA)
+  /** Either way: "Move it back here" was tapped on the device the call moved away from. */
+  const val PULL = "call_pull"
+  /** Either way: the device a call moved to is connected to everyone; the old one may leave. */
+  const val MOVED = "call_moved"
+  val SENDABLE = setOf(CallWire.RING, CallWire.REPLY, CallWire.END, CallWire.MEDIA, CallWire.JOIN, MOVED, PULL)
   /** A phone may only say these about a ring: ringing there, declined, or busy. */
   private val PHONE_REPLIES = setOf(CallReply.RINGING, CallReply.DECLINED, CallReply.BUSY)
 
-  data class PhoneRing(val id: String, val to: String, val video: Boolean, val name: String)
+  /** [members]: the Portals already in the call (phase 2b group/move ring); [move]: "To Portal". */
+  data class PhoneRing(val id: String, val to: String, val video: Boolean, val name: String,
+                       val members: List<CallContact> = emptyList(), val move: Boolean = false)
 
-  fun encodeRing(id: String, to: String, video: Boolean, name: String): JSONObject =
-      JSONObject().put("i", id).put("to", to).put("k", CallKind.CALL.wire).put("v", video).put("fn", name)
+  /** Portal → phone ring. Group/move rings name the other Portals in the call (phones use their own sessions). */
+  fun encodeRing(id: String, to: String, video: Boolean, name: String, members: List<CallContact> = emptyList(),
+                 move: Boolean = false): JSONObject =
+      JSONObject().put("i", id).put("to", to).put("k", CallKind.CALL.wire).put("v", video).put("fn", name).apply {
+        val portals = members.filterNot { it.phone }
+        if (portals.isNotEmpty()) put("g", JSONArray(portals.map { JSONObject().put("d", it.deviceId).put("fn", it.name) }))
+        if (move) put("mv", true)
+      }
 
   fun encodeGo(id: String, to: String): JSONObject = JSONObject().put("i", id).put("to", to)
+  fun encodePull(id: String, to: String): JSONObject = JSONObject().put("i", id).put("to", to)
+  fun encodeMoved(id: String, to: String): JSONObject = JSONObject().put("i", id).put("to", to)
+
+  data class Moved(val id: String, val to: String)
+
+  fun decodeMoved(b: JSONObject): Moved? {
+    val id = b.optString("i").takeIf(CallWire::isCallId) ?: return null
+    val to = b.optString("to").takeIf(DinnerWire::isDeviceId) ?: return null
+    return Moved(id, to)
+  }
 
   fun decodeRing(b: JSONObject): PhoneRing? {
     val id = b.optString("i").takeIf(CallWire::isCallId) ?: return null
@@ -51,8 +74,43 @@ internal object CallPhoneWire {
     if (CallKind.fromWire(b.optString("k")) != CallKind.CALL) return null
     val video = b.opt("v") as? Boolean ?: return null
     val name = DinnerWire.cleanName(b.optString("fn")) ?: return null
-    return PhoneRing(id, to, video, name)
+    val members = decodePortals(b.optJSONArray("g"), to) ?: return null
+    return PhoneRing(id, to, video, name, members, b.optBoolean("mv", false))
   }
+
+  /** A phone's member list names Portals only (never a phone, never the recipient), at most the cap. */
+  private fun decodePortals(arr: JSONArray?, self: String): List<CallContact>? {
+    if (arr == null) return emptyList()
+    if (arr.length() > CallGroup.MAX_LEGS) return null
+    val out = (0 until arr.length()).map { i ->
+      val o = arr.optJSONObject(i) ?: return null
+      val d = o.optString("d").takeIf(DinnerWire::isDeviceId)?.takeUnless(CallPhoneId::isPhone)?.takeIf { it != self } ?: return null
+      CallContact(d, DinnerWire.cleanName(o.optString("fn")) ?: return null)
+    }
+    return out.takeIf { list -> list.map { it.deviceId }.toSet().size == list.size }
+  }
+
+  /** A phone vouching for the Portal it moved its call to: the newcomer is always a Portal. */
+  fun decodeJoin(b: JSONObject): CallWire.Join? = CallWire.decodeJoin(b)?.takeUnless { it.newcomer.phone }
+
+  /** What a phone's poll says about itself (phase 2b): its id on each paired Portal, ringing in the background, long-poll. */
+  data class PollInfo(val name: String, val aliases: Map<String, String>, val background: Boolean, val waitMs: Long)
+
+  fun pollInfo(body: JSONObject): PollInfo {
+    val aliases = LinkedHashMap<String, String>()
+    body.optJSONObject("pa")?.let { o ->
+      val keys = o.keys()
+      while (keys.hasNext() && aliases.size < MAX_ALIASES) {
+        val portal = keys.next()
+        val phone = o.optString(portal)
+        if (DinnerWire.isDeviceId(portal) && !CallPhoneId.isPhone(portal) && CallPhoneId.isPhone(phone)) aliases[portal] = phone
+      }
+    }
+    val wait = (body.opt("w") as? Number)?.toLong()?.coerceIn(0L, CallPhones.MAX_WAIT_MS) ?: 0L
+    return PollInfo(phoneName(body), aliases, body.optBoolean("bg", false), wait)
+  }
+
+  private const val MAX_ALIASES = 16
 
   /** A phone's reply, limited to what a phone can truthfully say. */
   fun decodeReply(b: JSONObject): CallWire.Reply? =

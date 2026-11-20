@@ -39,7 +39,11 @@ class FleetHttpServer(
     private val port: Int,
     private val handler: (Request) -> Response,
 ) {
-  private val pool = Executors.newFixedThreadPool(4)
+  /**
+   * Six threads: up to [CallPhones.MAX_PARKED] may be held by phones' background long-polls
+   * (Calling 2b), which still leaves four for everything else, as before.
+   */
+  private val pool = Executors.newFixedThreadPool(6)
   @Volatile private var server: ServerSocket? = null
   @Volatile private var running = false
   private var acceptThread: Thread? = null

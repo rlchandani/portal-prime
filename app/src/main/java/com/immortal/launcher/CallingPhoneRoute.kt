@@ -49,14 +49,21 @@ internal object CallPhoneRoute {
 
   private fun poll(context: Context, phoneId: String, body: JSONObject): JSONObject {
     val now = Calling.now()
-    val msgs = CallPhoneMailbox.poll(phoneId, CallPhoneWire.phoneName(body), now)
+    val info = CallPhoneWire.pollInfo(body)
+    // A background poll parks until a message (or a newly queued video message) arrives.
+    val polled = CallPhoneMailbox.poll(phoneId, info, now, Calling::now) {
+      CallPhoneOutbox.waiting(context, phoneId).any { it.atMs > now }
+    }
+    val msgs = polled.messages
     val config = CallingConfig.load(context)
     val portal = JSONObject().put("id", Calling.selfId(context)).put("name", Calling.selfName(context))
         .put("inCall", Calling.state.value.call != null)
         .put("quiet", DinnerQuiet.isQuiet(ChimeConfig.load(context), now, Calling.zone()))
         .put("acceptsPhones", config.who == CallWhoCanCall.HOME && config.phonesOn)
-    return JSONObject().put("ok", true).put("portal", portal).put("now", now)
+    val waiting = CallPhoneOutbox.waiting(context, phoneId)
+    return JSONObject().put("ok", true).put("portal", portal).put("now", Calling.now()).put("w", polled.grantedMs)
         .put("msgs", JSONArray(msgs.map { JSONObject().put("t", it.type).put("b", JSONObject(it.body)) }))
+        .apply { if (waiting.isNotEmpty()) put("vm", JSONArray(waiting.map(PhoneOutbox::announce))) }
   }
 
   /** A phone → Portal call message, dispatched exactly like the bus would; null when malformed. */
@@ -69,14 +76,20 @@ internal object CallPhoneRoute {
     val name = CallPhoneMailbox.phone(phoneId)?.name ?: CallPhoneWire.DEFAULT_NAME
     return when (type) {
       CallWire.RING -> CallPhoneWire.decodeRing(b)?.let { ring ->
-        val decision = Calling.onPhoneRing(context, CallContact(phoneId, ring.name, kind = CallContact.Kind.PHONE), ring.id, ring.video)
+        val decision = Calling.onPhoneRing(context, CallContact(phoneId, ring.name, kind = CallContact.Kind.PHONE), ring)
         JSONObject().put("ok", true).put("r", replyFor(decision).wire)
             .apply { if (decision == IncomingDecision.Reject(CallReply.QUIET)) put("qe", ChimeConfig.load(context).quietEndMin) }
       }
       CallWire.REPLY -> CallPhoneWire.decodeReply(b)?.let {
         Calling.dispatch(CallEvent.Replied(it.id, phoneId, it.reply, null, now)); ok()
       }
-      CallWire.END -> CallWire.decodeEnd(b)?.let { Calling.dispatch(CallEvent.RemoteEnded(it.id, phoneId, it.reason, now)); ok() }
+      CallWire.END -> CallWire.decodeEnd(b)?.let {
+        Calling.dispatch(CallEvent.RemoteEnded(it.id, phoneId, it.reason, now, it.movedTo)); ok()
+      }
+      // The phone vouches for the Portal it moved its call to (only a connected member's vouch counts).
+      CallWire.JOIN -> CallPhoneWire.decodeJoin(b)?.let { Calling.dispatch(CallEvent.RemoteJoin(it.id, phoneId, it.newcomer, now)); ok() }
+      CallPhoneWire.MOVED -> CallPhoneWire.decodeMoved(b)?.let { Calling.dispatch(CallEvent.RemoteMoved(it.id, phoneId, now)); ok() }
+      CallPhoneWire.PULL -> CallPhoneWire.decodeMoved(b)?.let { Calling.dispatch(CallEvent.RemotePull(it.id, phoneId, now)); ok() }
       CallWire.MEDIA -> CallWire.decodeMedia(b)?.let {
         Calling.dispatch(CallEvent.RemoteMedia(it.id, phoneId, it.cameraOn, it.micOn)); ok()
       }

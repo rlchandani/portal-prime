@@ -166,14 +166,14 @@ internal fun CallIncomingScreen(call: ActiveCall, motion: Boolean) {
     Column(Modifier.align(Alignment.Center).padding(bottom = 200.dp), horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(30.dp)) {
       CallRipple(280.dp, motion) { CallRoomAvatar(call.peer.name, 280.dp) }
-      CallHeadline(call.peer.name, CallingCopy.incomingSub(call.kind, call.video, call.peer.name), titleSize = 84.sp)
+      CallHeadline(call.peer.name, CallingCopy.incomingLine(call), titleSize = 84.sp)
       CallGlassChip(CallingCopy.ANSWER_PRIVACY, "lock")
     }
     Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 56.dp), horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(30.dp)) {
       Row(horizontalArrangement = Arrangement.spacedBy(120.dp)) {
         CallBigButton("end", "Decline", CallColors.Bad, onClick = Calling::decline)
-        CallBigButton(if (call.video) "video" else "phone", "Answer", CallColors.Ok, onClick = { Calling.accept(audioOnly = false) },
+        CallBigButton(if (call.move != null) "handoff" else if (call.video) "video" else "phone", CallingCopy.answerLabel(call), CallColors.Ok, onClick = { Calling.accept(audioOnly = false) },
             nudge = motion)
       }
       if (call.video) CallPill("Answer with audio only", { Calling.accept(audioOnly = true) }, icon = "phone",
@@ -204,7 +204,7 @@ private fun CallIncomingCompact(call: ActiveCall, motion: Boolean, layout: Layou
       Spacer(Modifier.weight(1f))
       CallRipple(r.incomingAvatar.dp, motion) { CallRoomAvatar(call.peer.name, r.incomingAvatar.dp) }
       Spacer(Modifier.height(r.gap.dp))
-      CallHeadline(call.peer.name, CallingCopy.incomingSub(call.kind, call.video, call.peer.name), titleSize = r.incomingTitle.sp, subSize = r.sub.sp)
+      CallHeadline(call.peer.name, CallingCopy.incomingLine(call), titleSize = r.incomingTitle.sp, subSize = r.sub.sp)
       if (!privacyOnTop) {
         Spacer(Modifier.height(r.gap.dp))
         CallGlassChip(CallingCopy.ANSWER_PRIVACY, "lock")
@@ -212,7 +212,7 @@ private fun CallIncomingCompact(call: ActiveCall, motion: Boolean, layout: Layou
       Spacer(Modifier.weight(1f))
       Row(horizontalArrangement = Arrangement.spacedBy(r.buttonsGap.dp)) {
         CallBigButton("end", "Decline", CallColors.Bad, onClick = Calling::decline, size = r.big.dp, iconSize = r.bigIcon.dp)
-        CallBigButton(if (call.video) "video" else "phone", "Answer", CallColors.Ok, onClick = { Calling.accept(audioOnly = false) },
+        CallBigButton(if (call.move != null) "handoff" else if (call.video) "video" else "phone", CallingCopy.answerLabel(call), CallColors.Ok, onClick = { Calling.accept(audioOnly = false) },
             nudge = motion, size = r.big.dp, iconSize = r.bigIcon.dp)
       }
       if (call.video) {

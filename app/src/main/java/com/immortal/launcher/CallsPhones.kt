@@ -24,8 +24,10 @@ import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.LocalApprovedPalette
 
 /**
- * A paired phone in the Calls app. Honest about phase 2a: a Portal can ring a phone only while
- * Portal Toolkit is open on it (no push yet), and phones are called, never dropped in on.
+ * A paired phone in the Calls app. Honest about reach: a Portal rings a phone while Portal Toolkit
+ * is open on it, or (phase 2b) while its opt-in "Ring when Portal Toolkit is closed" keeps a
+ * background poll here on the home Wi-Fi. Phones are called, never dropped in on. A message can
+ * always be left: it waits here until the phone collects it.
  */
 @Composable
 internal fun CallPhoneCard(phone: CallPhone, now: Long, compact: Boolean) {
@@ -41,13 +43,14 @@ internal fun CallPhoneCard(phone: CallPhone, now: Long, compact: Boolean) {
       Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(phone.name, color = p.text, fontSize = if (compact) 30.sp else 36.sp, fontWeight = FontWeight.Bold, maxLines = 1,
             overflow = TextOverflow.Ellipsis)
-        Text(if (open) OPEN else CLOSED, color = p.secondary, fontSize = if (compact) 21.sp else 24.sp, maxLines = 2)
+        Text(CallPhoneCopy.status(phone, now), color = p.secondary, fontSize = if (compact) 21.sp else 24.sp, maxLines = 2)
       }
     }
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       CallPill("Video call", { Calling.dial(context, phone.id, CallKind.CALL, video = true) }, icon = "video",
           style = CallButtonStyle.OK, enabled = open, surface = surface)
       CallRoundButton("phone", "Audio call", { if (open) Calling.dial(context, phone.id, CallKind.CALL, video = false) }, surface = surface)
+      CallRoundButton("msg", CallMessageCopy.LEAVE, { CallMessages.compose(context, phone.contact()) }, surface = surface)
     }
   }
 }
@@ -55,11 +58,20 @@ internal fun CallPhoneCard(phone: CallPhone, now: Long, compact: Boolean) {
 /** The line under the phones: what works today. */
 @Composable
 internal fun CallPhonesNote(modifier: Modifier = Modifier) {
-  Text("Phones call rooms. Only Portals can drop in. A Portal rings a phone while Portal Toolkit is open on it; " +
-      "ringing a phone in your pocket comes in a later update.", color = LocalApprovedPalette.current.secondary, fontSize = 21.sp,
+  Text("Phones call rooms and join group calls. Only Portals can drop in. A Portal rings a phone while Portal Toolkit is open on it, " +
+      "or when “Ring when Portal Toolkit is closed” is on there (home Wi-Fi only). Messages wait here until the phone collects them.",
+      color = LocalApprovedPalette.current.secondary, fontSize = 21.sp,
       modifier = modifier)
 }
 
-private const val OPEN = "Portal Toolkit is open · rings now"
-private const val CLOSED = "Open Portal Toolkit on the phone to ring it"
 private const val OFF_ALPHA = 0.72f
+
+/** The phone card's status line. Pure. */
+internal object CallPhoneCopy {
+  fun status(phone: CallPhone, now: Long): String = when {
+    phone.parkedUntilMs >= now || (phone.background && phone.reachable(now)) -> "Rings now · even with Portal Toolkit closed"
+    phone.reachable(now) -> "Portal Toolkit is open · rings now"
+    phone.background -> "Not on the home Wi-Fi right now"
+    else -> "Open Portal Toolkit on the phone to ring it"
+  }
+}

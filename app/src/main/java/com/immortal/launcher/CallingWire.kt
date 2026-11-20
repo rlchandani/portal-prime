@@ -33,9 +33,11 @@ internal object CallWire {
                   val host: String, val port: Int, val members: List<CallMemberRef> = emptyList())
   data class Join(val id: String, val to: String, val newcomer: CallContact)
   data class Reply(val id: String, val to: String, val reply: CallReply, val quietEndMin: Int?)
-  data class End(val id: String, val to: String, val reason: CallEndReason)
+  /** [movedTo]: the sender moved the call to that device (in the recipient's id space) rather than leaving. */
+  data class End(val id: String, val to: String, val reason: CallEndReason, val movedTo: String? = null)
   data class Keep(val id: String, val to: String, val capAtMs: Long)
-  data class Media(val id: String, val to: String, val cameraOn: Boolean, val micOn: Boolean)
+  /** [autoAnswered]: the sender answered by itself (Grandma mode), so this call is never widened or moved. */
+  data class Media(val id: String, val to: String, val cameraOn: Boolean, val micOn: Boolean, val autoAnswered: Boolean = false)
   data class Hello(val name: String, val ask: Boolean, val inCall: Boolean, val quiet: Boolean, val acceptsCalls: Boolean,
                    val dropInsOn: Boolean, val dropInPolicies: Map<String, DropInPolicy>,
                    val host: String? = null, val port: Int = 0)
@@ -46,13 +48,19 @@ internal object CallWire {
   fun encode(j: Join): JSONObject = JSONObject().put("i", j.id).put("to", j.to).put("n", j.newcomer.deviceId)
       .put("fn", j.newcomer.name)
 
+  /** A phone member (phase 2b) is marked `k:"p"` and has no address: it always offers to the others. */
   private fun encodeMember(m: CallMemberRef): JSONObject = JSONObject().put("d", m.contact.deviceId).put("fn", m.contact.name)
-      .apply { if (m.host != null && m.port in 1..65535) { put("h", m.host); put("p", m.port) } }
+      .apply {
+        if (m.contact.phone) put("k", PHONE_MEMBER)
+        else if (m.host != null && m.port in 1..65535) { put("h", m.host); put("p", m.port) }
+      }
   fun encode(r: Reply): JSONObject = JSONObject().put("i", r.id).put("to", r.to).put("r", r.reply.wire)
       .apply { r.quietEndMin?.let { put("qe", it) } }
   fun encode(e: End): JSONObject = JSONObject().put("i", e.id).put("to", e.to).put("e", e.reason.wire)
+      .apply { e.movedTo?.let { put("mv", it) } }
   fun encode(k: Keep): JSONObject = JSONObject().put("i", k.id).put("to", k.to).put("cap", k.capAtMs)
   fun encode(m: Media): JSONObject = JSONObject().put("i", m.id).put("to", m.to).put("cam", m.cameraOn).put("mic", m.micOn)
+      .apply { if (m.autoAnswered) put("aa", true) }
   fun encode(h: Hello): JSONObject = JSONObject().put("fn", h.name).put("ask", h.ask).put("c", h.inCall).put("q", h.quiet)
       .put("rc", h.acceptsCalls).put("di", h.dropInsOn).put("dp", DropInGrid.encode(h.dropInPolicies))
       .apply { if (h.host != null && h.port in 1..65535) { put("h", h.host); put("p", h.port) } }
@@ -69,27 +77,37 @@ internal object CallWire {
     return Ring(id, to, kind, video, name, host, port, members)
   }
 
-  /** A group ring's member list: null if malformed or over the cap; phones are never mesh members. */
+  /**
+   * A group ring's member list: null if malformed or over the cap. Phase 2b: at most one member may
+   * be a paired phone (`k:"p"`, a phone id, never an address); a phone id without the mark, or a
+   * mark on a Portal id, is malformed.
+   */
   private fun decodeMembers(arr: JSONArray?): List<CallMemberRef>? {
     if (arr == null) return emptyList()
     if (arr.length() > CallGroup.MAX_LEGS + 1) return null
     val out = (0 until arr.length()).map { i ->
       val o = arr.optJSONObject(i) ?: return null
-      val id = o.optString("d").takeIf(DinnerWire::isDeviceId)?.takeUnless(CallPhoneId::isPhone) ?: return null
+      val id = o.optString("d").takeIf(DinnerWire::isDeviceId) ?: return null
+      val phone = o.optString("k") == PHONE_MEMBER
+      if (phone != CallPhoneId.isPhone(id)) return null
       val name = DinnerWire.cleanName(o.optString("fn")) ?: return null
+      if (phone) return@map CallMemberRef(CallContact(id, name, kind = CallContact.Kind.PHONE), null, 0)
       val host = o.optString("h").takeIf(HouseholdListPeerAuth::isPrivateLan)
       val port = (o.opt("p") as? Number)?.toInt()?.takeIf { it in 1..65535 }
       CallMemberRef(CallContact(id, name), host.takeIf { port != null }, if (host != null) port ?: 0 else 0)
     }
+    if (out.count { it.contact.phone } > CallGroup.MAX_PHONES) return null
     return out.takeIf { list -> list.map { it.contact.deviceId }.toSet().size == list.size }
   }
 
   fun decodeJoin(b: JSONObject): Join? {
     val id = b.optString("i").takeIf(::isCallId) ?: return null
     val to = b.optString("to").takeIf(DinnerWire::isDeviceId) ?: return null
-    val newcomer = b.optString("n").takeIf(DinnerWire::isDeviceId)?.takeUnless(CallPhoneId::isPhone) ?: return null
+    val newcomer = b.optString("n").takeIf(DinnerWire::isDeviceId) ?: return null
     val name = DinnerWire.cleanName(b.optString("fn")) ?: return null
-    return Join(id, to, CallContact(newcomer, name))
+    // Phase 2b: the newcomer may be a paired phone (named by the recipient's own id for it).
+    val kind = if (CallPhoneId.isPhone(newcomer)) CallContact.Kind.PHONE else CallContact.Kind.ROOM
+    return Join(id, to, CallContact(newcomer, name, kind = kind))
   }
 
   fun decodeReply(b: JSONObject): Reply? {
@@ -103,8 +121,10 @@ internal object CallWire {
   fun decodeEnd(b: JSONObject): End? {
     val id = b.optString("i").takeIf(::isCallId) ?: return null
     val to = b.optString("to").takeIf(DinnerWire::isDeviceId) ?: return null
-    val reason = CallEndReason.fromWire(b.optString("e")) ?: return null
-    return End(id, to, reason)
+    // MOVED is local only: on the wire a move is a hang-up plus `mv`.
+    val reason = CallEndReason.fromWire(b.optString("e"))?.takeIf { it != CallEndReason.MOVED } ?: return null
+    val movedTo = b.optString("mv").takeIf(DinnerWire::isDeviceId)
+    return End(id, to, reason, movedTo)
   }
 
   fun decodeKeep(b: JSONObject): Keep? {
@@ -119,7 +139,7 @@ internal object CallWire {
     val to = b.optString("to").takeIf(DinnerWire::isDeviceId) ?: return null
     val cam = b.opt("cam") as? Boolean ?: return null
     val mic = b.opt("mic") as? Boolean ?: return null
-    return Media(id, to, cam, mic)
+    return Media(id, to, cam, mic, b.optBoolean("aa", false))
   }
 
   fun decodeHello(b: JSONObject): Hello? {
@@ -134,4 +154,5 @@ internal object CallWire {
   }
 
   private const val MINUTES_PER_DAY = 24 * 60
+  private const val PHONE_MEMBER = "p"
 }
