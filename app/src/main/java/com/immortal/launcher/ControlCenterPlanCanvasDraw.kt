@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.withTransform
 
 /**
  * Everything one plan frame needs, assembled at composition (strokes, dash effects and colours
@@ -118,10 +119,14 @@ internal class CcPlanDraw(
     }
   }
 
-  /** Layer 5 at clock [t]: pulses and the focus edge. */
-  fun drawAnimated(s: DrawScope, t: Float) {
-    drawPulses(s, t)
-    focusEdge(s, t)
+  /**
+   * Layer 5 at clock [t]: pulses and the focus edge, placed through [view] in screen space. In 3D
+   * a pulse is an axis-aligned oval and the edge four lines — never a circle or a stroked rect
+   * under a matrix, which the GPU would mask afresh every frame.
+   */
+  fun drawAnimated(s: DrawScope, t: Float, view: CcAffine = CcAffine.IDENTITY) {
+    drawPulses(s, t, view)
+    focusEdge(s, t, view)
   }
 
   private fun roomFill(s: DrawScope, v: CcRoomView, r: Rect) {
@@ -156,24 +161,49 @@ internal class CcPlanDraw(
     }
   }
 
-  private fun drawPulses(s: DrawScope, t: Float) {
+  private fun drawPulses(s: DrawScope, t: Float, view: CcAffine) {
+    val sx = view.rowX
+    val sy = view.rowY
     model.pulses.forEachIndexed { i, p ->
       val k = frac(t * PULSE_CYCLES + i * PULSE_STAGGER)
       val color = when (p.tone) { CcMapPulseTone.MOTION -> window; CcMapPulseTone.OPEN -> c.amber; CcMapPulseTone.LEAK -> c.red }
-      s.drawCircle(color, p.radius * px.fit.scale * (PULSE_FROM + PULSE_GROW * k), px.pt(p.x, p.y), alpha = PULSE_ALPHA * (1f - k))
+      val r = p.radius * px.fit.scale * (PULSE_FROM + PULSE_GROW * k)
+      val at = view.at(px.pt(p.x, p.y))
+      if (view.isIdentity) s.drawCircle(color, r, at, alpha = PULSE_ALPHA * (1f - k))
+      else s.drawOval(color, Offset(at.x - r * sx, at.y - r * sy), androidx.compose.ui.geometry.Size(2f * r * sx, 2f * r * sy),
+          alpha = PULSE_ALPHA * (1f - k))
     }
   }
 
+  /** [r]'s outline through [view]: a plain rect flat, four round-capped lines once tilted. */
+  private fun edge(s: DrawScope, r: Rect, view: CcAffine, alpha: Float, width: Float) {
+    if (view.isIdentity) {
+      s.drawRect(CcStyle.EmberLight, r.topLeft, r.size, alpha = alpha, style = Stroke(width, join = StrokeJoin.Round))
+      return
+    }
+    val a = view.at(r.topLeft)
+    val b = view.at(r.topRight)
+    val c2 = view.at(r.bottomRight)
+    val d = view.at(r.bottomLeft)
+    s.drawLine(CcStyle.EmberLight, a, b, width, StrokeCap.Round, alpha = alpha)
+    s.drawLine(CcStyle.EmberLight, b, c2, width, StrokeCap.Round, alpha = alpha)
+    s.drawLine(CcStyle.EmberLight, c2, d, width, StrokeCap.Round, alpha = alpha)
+    s.drawLine(CcStyle.EmberLight, d, a, width, StrokeCap.Round, alpha = alpha)
+  }
+
   /** Visited rooms rest dimmer; the soft light sits on (or glides to) the current room. */
-  fun drawWalk(s: DrawScope, rooms: List<String>, centres: List<CcMapPt?>, progress: Float) {
+  fun drawWalk(s: DrawScope, rooms: List<String>, centres: List<CcMapPt?>, progress: Float, view: CcAffine = CcAffine.IDENTITY) {
     val i = CcPlanGeo.walkIndex(rooms.size, progress)
     if (i < 0) return
     val done = if (progress >= 1f) rooms.size else i
-    for (k in 0 until done) px.rects[rooms[k]]?.let { s.drawRect(c.planBg, it.topLeft, it.size, alpha = WALK_VEIL) }
+    // Filled rects under any affine are plain GPU quads (no masks), so the veil can ride the matrix.
+    val veil: DrawScope.() -> Unit = { for (k in 0 until done) px.rects[rooms[k]]?.let { drawRect(c.planBg, it.topLeft, it.size, alpha = WALK_VEIL) } }
+    if (view.isIdentity) s.veil() else s.withTransform({ transform(view.toMatrix()) }, veil)
     if (progress >= 1f) return
-    px.rects[rooms[i]]?.let { s.drawRect(CcStyle.EmberLight, it.topLeft, it.size, style = focusStroke) }
+    px.rects[rooms[i]]?.let { edge(s, it, view, 1f, FOCUS_DP * dp) }
     CcPlanGeo.walkPoint(centres, progress)?.let { p ->
-      s.ccGlow(paint, px.pt(p), WALK_CELLS * px.fit.scale, 1f, paint.tint(WALK_RGB))
+      val r = WALK_CELLS * px.fit.scale
+      s.ccGlowOval(paint, view.at(px.pt(p)), r * view.rowX, r * view.rowY, 1f, paint.tint(WALK_RGB))
     }
   }
 
@@ -184,22 +214,19 @@ internal class CcPlanDraw(
   }
 
   /** …and the room gets a breathing ember edge. */
-  private fun focusEdge(s: DrawScope, t: Float) {
+  private fun focusEdge(s: DrawScope, t: Float, view: CcAffine) {
     val r = focus?.let(px.rects::get) ?: return
     val k = frac(t * FOCUS_CYCLES)
     val wave = 1f - kotlin.math.abs(k * 2f - 1f)
     val inset = FOCUS_INSET_CELLS * px.fit.scale
-    val topLeft = Offset(r.left + inset, r.top + inset)
-    val size = androidx.compose.ui.geometry.Size(r.width - inset * 2, r.height - inset * 2)
+    val inner = Rect(r.left + inset, r.top + inset, r.right - inset, r.bottom - inset)
     if (pulse) {
       // The mock's `hlp`: the ember edge swells to twice its width and softens, then settles.
       val swell = 1f - wave
-      s.drawRect(CcStyle.EmberLight, topLeft, size, alpha = 1f - PULSE_SOFTEN * swell,
-          style = Stroke(FOCUS_DP * dp * (1f + swell), join = StrokeJoin.Round))
+      edge(s, inner, view, 1f - PULSE_SOFTEN * swell, FOCUS_DP * dp * (1f + swell))
       return
     }
-    val breathe = FOCUS_ALPHA_MIN + (1f - FOCUS_ALPHA_MIN) * wave
-    s.drawRect(CcStyle.EmberLight, topLeft, size, alpha = breathe, style = focusStroke)
+    edge(s, inner, view, FOCUS_ALPHA_MIN + (1f - FOCUS_ALPHA_MIN) * wave, FOCUS_DP * dp)
   }
 
   /** True when [drawAnimated] draws anything at all (no pulses and no focused room: nothing moves). */

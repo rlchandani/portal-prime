@@ -132,4 +132,21 @@ class ControlCenterPlanIsoTest {
     assertEquals(ControlCenterConfig.PLAN_ISO, spec.coerce(ControlCenterConfig.PLAN_ISO))
     assertEquals(com.immortal.launcher.settings.SettingScope.DEVICE, spec.scope)
   }
+
+  @Test fun theLayerPartsComposeBackToTheBlend() {
+    for (e in listOf(0f, 0.3f, 0.75f, 1f)) {
+      val m = CcIso.blend(fit2, fit3, box.center, e)
+      val p = CcIso.parts(fit2, fit3, box.center, e)
+      val r = Math.toRadians(p.degrees.toDouble())
+      for ((x, y) in listOf(100f to 200f, 900f to 50f, 640f to 480f)) {
+        // inner: rotate about the pivot; outer: scale about the pivot, then translate (Android RenderNode order).
+        val rx = p.pivotX + ((x - p.pivotX) * Math.cos(r) - (y - p.pivotY) * Math.sin(r)).toFloat()
+        val ry = p.pivotY + ((x - p.pivotX) * Math.sin(r) + (y - p.pivotY) * Math.cos(r)).toFloat()
+        val sx = p.pivotX + (rx - p.pivotX) * p.scaleX + p.tx
+        val sy = p.pivotY + (ry - p.pivotY) * p.scaleY + p.ty
+        assertEquals(m.x(x, y), sx, 0.05f)
+        assertEquals(m.y(x, y), sy, 0.05f)
+      }
+    }
+  }
 }

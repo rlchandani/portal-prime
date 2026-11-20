@@ -33,6 +33,10 @@ internal data class CcAffine(val a: Float, val b: Float, val c: Float, val d: Fl
     return CcAffine(ia, ib, ic, id, -(ia * tx + ic * ty), -(ib * tx + id * ty))
   }
 
+  /** How far a unit step along any 2D direction can reach horizontally / vertically: a circle's oval radii. */
+  val rowX: Float get() = kotlin.math.hypot(a, c)
+  val rowY: Float get() = kotlin.math.hypot(b, d)
+
   /** How much a vertical extent of 2D pixels grows on screen (labels use it to decide what fits). */
   val verticalScale: Float get() = abs(b) + abs(d)
 
@@ -113,6 +117,23 @@ internal object CcIso {
     val toX = fromX + (fit3.x(centre.x, centre.y) - fromX) * t
     val toY = fromY + (fit3.y(centre.x, centre.y) - fromY) * t
     return CcAffine(a, b, c, d, toX - (a * fromX + c * fromY), toY - (b * fromX + d * fromY))
+  }
+
+  /**
+   * [blend] split into what two nested render-node layers can apply to an already rasterized
+   * texture: an inner rotation by [Parts.degrees] about the pivot, then an outer scale
+   * ([Parts.scaleX], [Parts.scaleY]) about the same pivot plus a translation. The switch moves the
+   * cached flat plan this way, so no vector is re-rasterized under a new matrix every frame.
+   */
+  data class Parts(val degrees: Float, val scaleX: Float, val scaleY: Float, val tx: Float, val ty: Float, val pivotX: Float, val pivotY: Float)
+
+  fun parts(fit2: CcPlanFit, fit3: CcIsoFit, centre: CcMapPt, e: Float): Parts {
+    val t = e.coerceIn(0f, 1f)
+    val k = 1f + (fit3.scale * K / fit2.scale - 1f) * t
+    val squash = 1f + (Q - 1f) * t
+    val fromX = fit2.x(centre.x)
+    val fromY = fit2.y(centre.y)
+    return Parts(TILT_DEG * t, k, k * squash, (fit3.x(centre.x, centre.y) - fromX) * t, (fit3.y(centre.x, centre.y) - fromY) * t, fromX, fromY)
   }
 
   /** A standing wall (or slab side) between two grid points, in cells. */

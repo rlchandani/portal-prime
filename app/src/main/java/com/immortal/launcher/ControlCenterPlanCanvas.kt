@@ -129,8 +129,16 @@ internal fun CcPlanCanvas(
     ccTrace("cc:speech") { CcSpeech.plan(CcOverviewText.shortFloor(model.floor.name), lens, model.views.map { it.room.name to CcOverviewText.caption(it, lens) }) }
   }
   val outline = remember(density) { CcIsoPx.outline(density.density) }
-  // Composition only learns whether the 3D upper texture exists, not every frame of the switch.
+  // Composition and the cached passes only learn whether the view left 2D / reached 3D, not every frame.
   val raised by remember(iso) { derivedStateOf { iso.value > 0f } }
+  val rest3dState = remember(iso) { derivedStateOf { iso.value >= 1f } }
+  val rest3d: State<Boolean> = rest3dState
+  // Mid-switch, the upper passes redraw every frame anyway: drawing them straight to the screen
+  // saves an offscreen pass per frame (their textures come back at rest).
+  val moving = remember(iso) { derivedStateOf { iso.value > 0f && iso.value < 1f } }
+  // Once this canvas has shown 3D (or is switching to it) its upper passes stay composed.
+  val shown3d = remember { mutableStateOf(false) }
+  SideEffect { if (raised) shown3d.value = true }
   val ready = size != IntSize.Zero && px.fit.scale > 0f
   Box(modifier.onSizeChanged { size = it }.ccSpeak(description)
       .pointerInput(Unit) {
@@ -148,24 +156,28 @@ internal fun CcPlanCanvas(
     // Layers 1-4 rasterize once into one GPU texture: an animation frame (or the sheet sliding
     // over the plan) then blits it instead of replaying every fill, glow and wall path.
     val strategy = if (parked) CompositingStrategy.Auto else CompositingStrategy.Offscreen
-    Box(Modifier.fillMaxSize().graphicsLayer(compositingStrategy = strategy)) {
+    // The slab hangs below the floors, in screen space.
+    PlanLayer {
+      val e = iso.value
+      if (e >= 1f) layers.draw(this, CcPassKey(CcPlanPass.SLAB3D, CcSame(base))) { iso3.value.drawSlab(this, c) }
+      else if (e > 0f) iso3.value.drawSlabLive(this, e, c)
+    }
+    // While the view switches, this texture is moved as it is (turned, squashed, scaled by the
+    // two layers' properties: no re-raster); at rest in 3D its passes are replayed projected.
+    Box(Modifier.fillMaxSize()
+        .graphicsLayer { isoOuter(iso3, iso.value) }
+        .graphicsLayer { isoInner(iso3, iso.value); compositingStrategy = strategy }) {
+      PlanLayer { flatAtRest(iso3, rest3d) { layers.draw(this, CcPassKey(CcPlanPass.FLOORS, CcSame(base))) { base.drawFloors(this) } } }
+      PlanLayer { flatAtRest(iso3, rest3d) { layers.draw(this, CcPassKey(CcPlanPass.UNDER, CcSame(ctx))) { ctx.drawUnder(this) } } }
+      fade?.let { (f, t) -> PlanLayer { flatAtRest(iso3, rest3d) { ctx.drawFade(this, f, t.value) } } }
+      PlanLayer { if (!raised) layers.draw(this, CcPassKey(CcPlanPass.WALLS, CcSame(base))) { base.drawWalls(this) } }
       PlanLayer {
-        val e = iso.value
-        if (e >= 1f) layers.draw(this, CcPassKey(CcPlanPass.SLAB3D, CcSame(base))) { iso3.value.drawSlab(this, c) }
-        else if (e > 0f) iso3.value.drawSlabLive(this, e, c)
-      }
-      PlanLayer { flat(iso3, iso.value) { layers.draw(this, CcPassKey(CcPlanPass.FLOORS, CcSame(base))) { base.drawFloors(this) } } }
-      PlanLayer { flat(iso3, iso.value) { layers.draw(this, CcPassKey(CcPlanPass.UNDER, CcSame(ctx))) { ctx.drawUnder(this) } } }
-      fade?.let { (f, t) -> PlanLayer { flat(iso3, iso.value) { ctx.drawFade(this, f, t.value) } } }
-      PlanLayer { if (iso.value <= 0f) layers.draw(this, CcPassKey(CcPlanPass.WALLS, CcSame(base))) { base.drawWalls(this) } }
-      PlanLayer {
-        val e = iso.value
-        if (e <= 0f) {
+        if (!raised) {
           layers.draw(this, CcPassKey(if (still) CcPlanPass.OVER_STILL else CcPlanPass.OVER, CcSame(ctx))) {
             ctx.drawOver(this)
             if (still) ctx.drawAnimated(this, STILL_T)
           }
-        } else flat(iso3, e) {
+        } else flatAtRest(iso3, rest3d) {
           layers.draw(this, CcPassKey(if (still) CcPlanPass.FLAT_STILL else CcPlanPass.FLAT, CcSame(ctx))) {
             ctx.drawOverFlat(this)
             if (still) ctx.drawAnimated(this, STILL_T)
@@ -174,9 +186,12 @@ internal fun CcPlanCanvas(
       }
     }
     if (motion && (loops || walk != null)) CcPlanAnimLayer(ctx, walk, model.floor, loops, iso, iso3)
-    if (raised) {
+    if (raised || shown3d.value) {
       // 3D: the standing walls cover the animation behind them; the markers stay upright on top.
-      Box(Modifier.fillMaxSize().graphicsLayer(compositingStrategy = strategy)) {
+      // Composed from the first 3D frame on (no nodes inserted when a switch starts); a texture only at rest in 3D.
+      Box(Modifier.fillMaxSize().graphicsLayer {
+        compositingStrategy = if (rest3d.value && !parked) strategy else CompositingStrategy.Auto
+      }) {
         PlanLayer {
           val e = iso.value
           if (e >= 1f) layers.draw(this, CcPassKey(CcPlanPass.WALLS3D, CcSame(base))) { iso3.value.drawWalls(this, c, outline) }
@@ -190,7 +205,7 @@ internal fun CcPlanCanvas(
       }
     }
     // Labels sit above the motion; their soft text shadows are blurs, so they get a texture too.
-    PlanLayer(cached = !parked) {
+    PlanLayer(cached = { !parked && !moving.value }) {
       val e = iso.value
       when {
         e <= 0f -> layers.draw(this, CcPassKey(CcPlanPass.TOP, CcSame(ctx))) { ctx.drawTop(this) }
@@ -201,9 +216,25 @@ internal fun CcPlanCanvas(
   }
 }
 
-/** Draws [block] flat (2D) or through the projection at switch progress [e]. */
-private inline fun DrawScope.flat(iso3: Lazy<CcIsoPx>, e: Float, crossinline block: DrawScope.() -> Unit) {
-  if (e <= 0f) block() else iso3.value.projected(this, e) { block() }
+/** Draws [block] as recorded (2D, or moving as a texture mid-switch), or projected once the view rests in 3D. */
+private inline fun DrawScope.flatAtRest(iso3: Lazy<CcIsoPx>, rest3d: State<Boolean>, crossinline block: DrawScope.() -> Unit) {
+  if (!rest3d.value) block() else iso3.value.projected(this, 1f) { block() }
+}
+
+/** Mid-switch only: the outer layer scales about the floor's centre and slides it toward its 3D spot. */
+private fun androidx.compose.ui.graphics.GraphicsLayerScope.isoOuter(iso3: Lazy<CcIsoPx>, e: Float) {
+  if (e <= 0f || e >= 1f) { scaleX = 1f; scaleY = 1f; translationX = 0f; translationY = 0f; return }
+  val p = iso3.value.parts(e)
+  scaleX = p.scaleX; scaleY = p.scaleY; translationX = p.tx; translationY = p.ty
+  if (size.width > 0f && size.height > 0f) transformOrigin = androidx.compose.ui.graphics.TransformOrigin(p.pivotX / size.width, p.pivotY / size.height)
+}
+
+/** Mid-switch only: the inner (cached) layer turns about the floor's centre. */
+private fun androidx.compose.ui.graphics.GraphicsLayerScope.isoInner(iso3: Lazy<CcIsoPx>, e: Float) {
+  if (e <= 0f || e >= 1f) { rotationZ = 0f; return }
+  val p = iso3.value.parts(e)
+  rotationZ = p.degrees
+  if (size.width > 0f && size.height > 0f) transformOrigin = androidx.compose.ui.graphics.TransformOrigin(p.pivotX / size.width, p.pivotY / size.height)
 }
 
 /**
@@ -234,8 +265,10 @@ private fun rememberLightFade(model: CcPlanModel, enabled: Boolean): Pair<CcLigh
  * those change. [cached] also keeps its pixels in an offscreen texture between re-records.
  */
 @Composable
-private fun PlanLayer(cached: Boolean = false, draw: DrawScope.() -> Unit) {
-  val layer = if (cached) Modifier.graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen) else Modifier.graphicsLayer()
+private fun PlanLayer(cached: (() -> Boolean)? = null, draw: DrawScope.() -> Unit) {
+  val layer = if (cached != null) {
+    Modifier.graphicsLayer { compositingStrategy = if (cached()) CompositingStrategy.Offscreen else CompositingStrategy.Auto }
+  } else Modifier.graphicsLayer()
   Spacer(Modifier.fillMaxSize().then(layer).drawBehind(draw))
 }
 
@@ -251,10 +284,11 @@ private fun CcPlanAnimLayer(ctx: CcPlanDraw, walk: CcWalkView?, floor: CcFloor, 
   } else null
   val centres = remember(walk?.rooms, floor) { walk?.rooms?.map { id -> floor.rooms.firstOrNull { it.id == id }?.rect?.let(CcPlanGeo::center) } }
   Spacer(Modifier.fillMaxSize().graphicsLayer().drawBehind {
-    flat(iso3, iso.value) {
-      clock?.let { ctx.drawAnimated(this, it.value) }
-      if (walk != null && centres != null) ctx.drawWalk(this, walk.rooms, centres, walk.progress.value)
-    }
+    // Screen space: pulses and edges are placed through the view, never drawn under a moving matrix.
+    val e = iso.value
+    val view = if (e > 0f) iso3.value.blend(e) else CcAffine.IDENTITY
+    clock?.let { ctx.drawAnimated(this, it.value, view) }
+    if (walk != null && centres != null) ctx.drawWalk(this, walk.rooms, centres, walk.progress.value, view)
   })
 }
 

@@ -189,24 +189,22 @@ internal class CcPlanStyle(val want3d: Boolean, val progress: androidx.compose.r
 
 @Composable
 private fun rememberPlanStyle(saved3d: Boolean, motion: Boolean): CcPlanStyle {
-  val context = LocalContext.current
   var want3d by remember { androidx.compose.runtime.mutableStateOf(saved3d) }
   // The saved style can change from elsewhere too (the settings page, the phone remote).
   LaunchedEffect(saved3d) { want3d = saved3d }
+  val context = LocalContext.current
   val progress = remember { Animatable(if (saved3d) 1f else 0f) }
+  val latestSaved by rememberUpdatedState(saved3d)
   LaunchedEffect(want3d, motion) {
     val target = if (want3d) 1f else 0f
     if (motion) progress.animateTo(target, tween(ISO_SWITCH_MS, easing = FastOutSlowInEasing)) else progress.snapTo(target)
+    // Saved once the house has landed: saving reloads the settings (a whole-screen recomposition),
+    // which mid-switch would cost the animation its first frames.
+    if (want3d != latestSaved) com.immortal.launcher.settings.ControlCenterSettings.set(context, "planStyle",
+        if (want3d) ControlCenterConfig.PLAN_ISO else ControlCenterConfig.PLAN_2D)
   }
   val rest = remember(want3d) { androidx.compose.runtime.mutableFloatStateOf(if (want3d) 1f else 0f) }
-  val onStyle = remember(context) {
-    { d3: Boolean ->
-      want3d = d3
-      com.immortal.launcher.settings.ControlCenterSettings.set(context, "planStyle",
-          if (d3) ControlCenterConfig.PLAN_ISO else ControlCenterConfig.PLAN_2D)
-      Unit
-    }
-  }
+  val onStyle = remember { { d3: Boolean -> want3d = d3 } }
   return CcPlanStyle(want3d, progress.asState(), rest, onStyle)
 }
 
