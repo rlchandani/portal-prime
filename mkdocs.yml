@@ -81,6 +81,7 @@ nav:
       - Home Assistant & MQTT setup: guides/home-assistant.md
       - Alexa & voice (first-gen): guides/voice-alexa.md
       - Keeping Portals in sync: guides/portal-sync.md
+      - Debloating Meta services (opt-in): guides/portal-debloat.md
   - Hardware limitations: limitations.md
   - For developers:
       - Releasing: releasing.md

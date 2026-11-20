@@ -23,6 +23,7 @@ value it should have.
 | `com.facebook.aloha.system.services` `SYSTEM_ALERT_WINDOW=ignore` | | Hides Meta's floating bug-report pill. |
 | Meta presence detector (`com.facebook.alohaservices.presence`) | Left **enabled** | Lets the device tell an empty room from an occupied one. Disabling it is opt-in (`DISABLE_PRESENCE`). |
 | Gen-1 installer overlays | Disabled on Android 9 only | Fixes the white-on-white installer dialog. |
+| Meta debloat (`DEBLOAT_PACKAGES`) | **Opt-in** (`--debloat`) | Disables five unused Meta background apps and frees about 120 MB of RAM. Per device: `--status` shows whether it is applied. See [Debloating Meta services](portal-debloat.md). |
 
 ## Hearthpane permissions applied by provisioning
 

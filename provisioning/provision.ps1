@@ -14,8 +14,10 @@
     powershell -ExecutionPolicy Bypass -File provision.ps1 -OverlayFix # fix Gen-1 installer dialog
     powershell -ExecutionPolicy Bypass -File provision.ps1 -Alexa      # restore the original Amazon Alexa app
     powershell -ExecutionPolicy Bypass -File provision.ps1 -UpdateHey  # refresh just the "hey" wake-word app (no ~115 MB falcon re-download)
+    powershell -ExecutionPolicy Bypass -File provision.ps1 -Debloat    # opt-in: disable unused Meta background apps (DEBLOAT_PACKAGES)
+    powershell -ExecutionPolicy Bypass -File provision.ps1 -Undebloat  # re-enable them (-Restore does this too)
 #>
-param([switch]$Restore, [switch]$Status, [switch]$CheckAccess, [switch]$Apps, [switch]$Shizuku, [switch]$OverlayFix, [switch]$Fleet, [switch]$WifiAdb, [switch]$Alexa, [switch]$UpdateHey)
+param([switch]$Restore, [switch]$Status, [switch]$CheckAccess, [switch]$Apps, [switch]$Shizuku, [switch]$OverlayFix, [switch]$Fleet, [switch]$WifiAdb, [switch]$Alexa, [switch]$UpdateHey, [switch]$Debloat, [switch]$Undebloat)
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -530,6 +532,48 @@ function Disable-Presence {
   A shell pm disable-user --user 0 $cfg["PRESENCE_PKG"] | Out-Null
   Ok "Presence detector disabled"
 }
+# OPT-IN (-Debloat / -Undebloat only, never part of a normal provision). Disables the Meta
+# background apps in DEBLOAT_PACKAGES with `pm disable-user` - reversible, no root, no
+# uninstall - to free RAM/CPU for Hearthpane. DEBLOAT_PROTECTED is a hard guard: those are
+# what camera, presence, Calls, key events, TTS and the stock home need. See
+# docs/guides/portal-debloat.md.
+$DebloatSaveWaitS = 15 # PackageManager writes package-restrictions after a ~10 s delay
+function Get-DebloatList($key) { @(("$($cfg[$key])" -split "\s+") | Where-Object { $_ }) }
+function Debloat-Meta {
+  $pkgs = Get-DebloatList "DEBLOAT_PACKAGES"
+  if (-not $pkgs) { Die "DEBLOAT_PACKAGES is empty in config.env" }
+  $protected = Get-DebloatList "DEBLOAT_PROTECTED"
+  Step "Disabling unused Meta background apps (undo: -Undebloat)"
+  $n = 0
+  foreach ($p in $pkgs) {
+    if ($protected -contains $p) { Warn "$p is protected (Hearthpane needs it) - skipped"; continue }
+    if (-not "$(A shell "pm path $p 2>/dev/null")".Trim()) { Warn "$p not on this Portal - skipped"; continue }
+    $out = "$(A shell "pm disable-user --user 0 $p 2>&1")".Trim()
+    if ($out -match "new state: disabled-user") { Ok "$p disabled"; $n++ }
+    else { Warn "${p}: $(if ($out) { $out } else { 'no response' })" }
+  }
+  # Android saves package state lazily (~10 s); an immediate reboot can silently undo it.
+  if ($n -gt 0) { Start-Sleep -Seconds $DebloatSaveWaitS; Ok "Saved" }
+  Ok "$n package(s) disabled. Reboot the Portal for a clean start: adb reboot"
+}
+function Undebloat-Meta {
+  Step "Re-enabling Meta background apps from the debloat list"
+  $n = 0
+  foreach ($p in (Get-DebloatList "DEBLOAT_PACKAGES")) {
+    if (-not "$(A shell "pm path $p 2>/dev/null")".Trim()) { continue }
+    $out = "$(A shell "pm enable --user 0 $p 2>&1")".Trim()
+    if ($out -match "new state: enabled") { Ok "$p enabled"; $n++ }
+    else { Warn "${p}: $(if ($out) { $out } else { 'no response' })" }
+  }
+  if ($n -gt 0) { Start-Sleep -Seconds $DebloatSaveWaitS; Ok "Saved" }
+  Ok "$n package(s) enabled. Reboot the Portal so Meta's services start cleanly: adb reboot"
+}
+function Show-DebloatStatus {
+  $pkgs = Get-DebloatList "DEBLOAT_PACKAGES"
+  $disabled = @(A shell pm list packages -d | ForEach-Object { "$_".Trim() })
+  $d = @($pkgs | Where-Object { $disabled -contains "package:$_" }).Count
+  Write-Host "  Meta debloat: $d of $($pkgs.Count) listed apps disabled"
+}
 function Set-Launcher {
   if ($cfg["SET_LAUNCHER"] -ne "true") { return }
   Step "Setting custom home launcher"
@@ -942,6 +986,16 @@ if ($UpdateHey) {
   exit 0
 }
 
+if ($Debloat) {
+  Wait-Device
+  Debloat-Meta
+  exit 0
+}
+if ($Undebloat) {
+  Wait-Device
+  Undebloat-Meta
+  exit 0
+}
 if ($Apps) {
   Wait-Device
   Install-Apps
@@ -970,6 +1024,7 @@ if ($Status) {
   Write-Host "  OS updates:  $(if ($ota) {'disabled'} else {'enabled'})"
   $client = "$(A shell pm list packages $cfg["PKG"])".Trim()
   Write-Host "  client:      $(if ($client) {'installed'} else {'not installed'})"
+  Show-DebloatStatus
   Check-CallsAccess | Out-Null
   exit 0
 }
@@ -1003,6 +1058,7 @@ if ($Restore) {
   Step "Re-enabling Meta's presence detector"
   A shell pm enable $cfg["PRESENCE_PKG"] | Out-Null
   Ok "Presence detector restored"
+  Undebloat-Meta
   Step "Removing Immortal's screen-off device admin"
   # Android refuses to let the shell force-remove a non-test device admin, so this
   # usually fails on a real device - don't claim success when it didn't. The active
