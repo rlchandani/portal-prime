@@ -28,9 +28,6 @@ internal object LanUrlPolicy {
     else -> false
   }
 
-  /** Every address the host resolves to must be private (no mixed public/private answers). */
-  fun resolvesPrivate(host: String, resolve: (String) -> List<InetAddress>): Boolean = privateAnswer(host, resolve) != null
-
   /** The host's one DNS answer when it is non-empty and wholly private, else null. */
   private fun privateAnswer(host: String, resolve: (String) -> List<InetAddress>): List<InetAddress>? =
       runCatching { resolve(host) }.getOrNull()?.takeIf { it.isNotEmpty() && it.all(::isPrivateLan) }

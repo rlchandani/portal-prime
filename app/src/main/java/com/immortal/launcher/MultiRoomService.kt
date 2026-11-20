@@ -358,10 +358,6 @@ class MultiRoomService : Service() {
     private const val PORT = 1705 // snapserver JSON-RPC control port
     private const val POLL_MA_MS = 4000L // how often to poll MA for the AirPlay-source track
 
-    /** The standalone Snapcast player that actually renders the synced audio. The
-     *  multi-room now-playing UI is gated on this being installed. */
-    const val SNAPCAST_PACKAGE = "de.badaix.snapcast"
-
     /** Start the relay if multi-room is enabled and a server is configured; else stop it. */
     fun sync(context: Context) {
       val on =

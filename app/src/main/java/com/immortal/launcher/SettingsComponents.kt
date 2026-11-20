@@ -30,8 +30,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -94,12 +92,8 @@ internal val IosSegmentInactive: Color @Composable get() = LocalApprovedPalette.
 /** Revision 04 measurements in dp/sp, at the Portal+'s native 1920 × 1280 dp viewport. */
 internal object Sizes {
     val titlePage = 40.sp
-    val panelTitle = 40.sp
-    val panelTitleTop = 12.dp
-    val panelTitleBottom = 34.dp
     val pageSubtitle = 23.sp
     val sectionLabel = 22.sp
-    val navLabel = 22.sp
     val rowTitle = 28.sp
     val rowSub = 20.sp
     val rowValue = 23.sp
@@ -221,20 +215,6 @@ internal fun IconBadge(color: Color, symbol: String, iconRes: Int? = null, image
 // ---------------------------------------------------------------------------
 
 /**
- * Compatibility colors for existing callers. [ApprovedSettingsSwitch] uses the reactive approved
- * palette by default; callers can also pass this existing Material3 color set.
- */
-@Composable
-internal fun iosSwitchColors() =
-    SwitchDefaults.colors(
-        checkedThumbColor = Color.White,
-        checkedTrackColor = IosGreen,
-        uncheckedThumbColor = Color.White,
-        uncheckedTrackColor = IosSegmentTrack,
-        uncheckedBorderColor = IosDivider,
-    )
-
-/**
  * The one iOS-style text-field color set for the light settings/editor surface. Every
  * [androidx.compose.material3.OutlinedTextField] / TextField on a light background MUST use this.
  *
@@ -258,30 +238,6 @@ internal fun iosTextFieldColors() =
         unfocusedPlaceholderColor = IosSecondary,
         focusedContainerColor = IosCard,
         unfocusedContainerColor = IosCard,
-    )
-
-/**
- * The filled-[androidx.compose.material3.TextField] equivalent of [iosTextFieldColors]. Filled
- * fields have a tinted container + a bottom indicator instead of a full border, so they need the
- * `TextFieldDefaults.colors(...)` slots rather than the outlined ones. Same reason: the dark theme
- * would otherwise paint white text on the light card.
- */
-@Composable
-internal fun iosFilledTextFieldColors() =
-    TextFieldDefaults.colors(
-        focusedTextColor = IosLabel,
-        unfocusedTextColor = IosLabel,
-        disabledTextColor = IosSecondary,
-        cursorColor = IosBlue,
-        focusedContainerColor = IosCard,
-        unfocusedContainerColor = IosCard,
-        disabledContainerColor = IosCard,
-        focusedIndicatorColor = IosBlue,
-        unfocusedIndicatorColor = IosDivider,
-        focusedLabelColor = IosBlue,
-        unfocusedLabelColor = IosSecondary,
-        focusedPlaceholderColor = IosSecondary,
-        unfocusedPlaceholderColor = IosSecondary,
     )
 
 /**
@@ -826,34 +782,5 @@ internal fun SetupStep(n: String, text: String) {
             modifier = Modifier.padding(end = 10.dp),
         )
         Text(text, color = IosSecondary, fontSize = Sizes.rowSub, lineHeight = 28.sp)
-    }
-}
-
-/** Card-header toggle: title + wrapping subtitle on the left, iOS switch right. */
-@Composable
-internal fun ToggleHeaderRow(
-    title: String,
-    subtitle: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(18.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(modifier = Modifier.weight(1f).padding(end = 24.dp)) {
-            Text(title, color = IosLabel, fontSize = Sizes.rowTitle)
-            Text(
-                subtitle,
-                color = IosSecondary,
-                fontSize = Sizes.rowSub,
-                modifier = Modifier.padding(top = 2.dp),
-            )
-        }
-        ApprovedSettingsSwitch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            modifier = Modifier.semantics { contentDescription = title },
-        )
     }
 }

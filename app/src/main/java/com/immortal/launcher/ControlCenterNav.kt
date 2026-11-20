@@ -55,7 +55,6 @@ internal data class CcNav(
     val pointing: Boolean = false,
 ) {
   val topSheet: CcSheet? get() = sheets.lastOrNull()
-  val openRoomId: String? get() = sheets.filterIsInstance<CcSheet.Room>().lastOrNull()?.roomId
 }
 
 /**

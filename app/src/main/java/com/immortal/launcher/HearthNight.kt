@@ -20,9 +20,6 @@ object HearthNight {
   private const val WARM_B = .478f
   private const val WARMTH = .34f
   private const val DIM = .42f
-  /** Fallback solar day when the location or forecast is unknown. */
-  const val FALLBACK_SUNRISE_MIN = 6 * 60 + 30
-  const val FALLBACK_SUNSET_MIN = 20 * 60
 
   /**
    * 0 (day) .. 1 (full night) for minutes-of-day, easing in over [DUSK_MINUTES] after sunset
@@ -64,9 +61,6 @@ object HearthOrbit {
   const val FACE_RADIUS_DP = 4f
   const val FACE_PERIOD_X_MS = 600_000L
   const val FACE_PERIOD_Y_MS = 760_000L
-  /** Night clock: +/-12 dp by +/-9 dp over 40 and 53 minute periods. */
-  const val NIGHT_RADIUS_X_DP = 12f
-  const val NIGHT_RADIUS_Y_DP = 9f
   const val NIGHT_PERIOD_X_MS = 2_400_000L
   const val NIGHT_PERIOD_Y_MS = 3_180_000L
 

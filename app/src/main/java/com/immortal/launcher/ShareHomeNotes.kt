@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -164,42 +163,5 @@ internal fun HomeNoteChimeBubble(modifier: Modifier = Modifier) {
   if (!visible) return
   Box(modifier.border(2.dp, ShareNoteAmber, RoundedCornerShape(36.dp)).padding(horizontal = 26.dp, vertical = 12.dp)) {
     Text("🔔  Soft chime", color = ApprovedHomePalette.Text, fontSize = 24.sp)
-  }
-}
-
-/** Tools → Shared from phones: notes that left Home, with "Put back on Home". */
-@Composable
-internal fun SharedFromPhonesPane(modifier: Modifier = Modifier) {
-  val context = LocalContext.current.applicationContext
-  val notes by remember { HomeNoteStore.notes(context) }.collectAsState()
-  val zone = remember { HomeNoteStore.zone() }
-  Column(modifier.padding(30.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-    Text("Shared from phones", color = ApprovedHomePalette.Text, fontSize = 32.sp, fontWeight = FontWeight.Medium)
-    if (notes.active.isEmpty() && notes.gone.isEmpty())
-      Text("Notes and links shared from Portal Toolkit show up here.", color = ApprovedHomePalette.Secondary, fontSize = 22.sp)
-    notes.active.forEach { NoteRow(it, "On Home · ${HomeNoteTime.byline(it, zone)}", null) }
-    notes.gone.forEach { gone ->
-      val why = when (gone.why) {
-        HomeNotes.CLEARED -> "Cleared overnight"
-        HomeNotes.RETRACTED -> "Taken back from the phone"
-        else -> "Dismissed"
-      }
-      NoteRow(gone.note, "$why · ${HomeNoteTime.clock(gone.at, zone)}") { ShareFeature.undo(context, gone.note.id) }
-    }
-  }
-}
-
-@Composable
-private fun NoteRow(note: HomeNote, line: String, putBack: (() -> Unit)?) {
-  ApprovedHomeSurface(Modifier.fillMaxWidth()) {
-    Row(Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
-      Column(Modifier.weight(1f)) {
-        Text(note.text ?: note.title ?: note.url.orEmpty(), color = ApprovedHomePalette.Text, fontSize = 24.sp,
-            maxLines = 2, overflow = TextOverflow.Ellipsis)
-        Spacer(Modifier.size(4.dp))
-        Text(line, color = ApprovedHomePalette.Secondary, fontSize = 20.sp)
-      }
-      putBack?.let { ApprovedHomeTextButton("Put back on Home", onClick = it) }
-    }
   }
 }

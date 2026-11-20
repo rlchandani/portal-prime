@@ -265,20 +265,6 @@ internal fun ApprovedHostedWidget(
   }
 }
 
-private fun List<HomeWidgetStore.HomeWidget>.filterLiveWidgets(
-    manager: AppWidgetManager,
-    host: AppWidgetHost,
-): List<HomeWidgetStore.HomeWidget> {
-  val live = filter { !it.isAppWidget || manager.getAppWidgetInfo(it.appWidgetId) != null }
-  if (live.size != size) {
-    val liveIds = live.map { it.appWidgetId }.toSet()
-    filter { it.isAppWidget && it.appWidgetId !in liveIds }.forEach {
-      runCatching { host.deleteAppWidgetId(it.appWidgetId) }
-    }
-  }
-  return live
-}
-
 internal fun updateWidgetSizeOptions(
     manager: AppWidgetManager,
     widget: HomeWidgetStore.HomeWidget,

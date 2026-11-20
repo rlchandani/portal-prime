@@ -91,8 +91,6 @@ internal object CcStyle {
   val ModalWidth = 820.dp
   /** Every touch target is at least this big (Hearthpane quality bar). */
   val MinTarget = 64.dp
-  /** Mock design canvas width; compact Portals render it at [COMPACT_SCALE]. */
-  const val DESIGN_WIDTH_DP = 1920
   const val COMPACT_BREAK_DP = 1700
   const val COMPACT_SCALE = 0.75f
   /** Person avatar colours, cycled by index (mock `.avs i`). */

@@ -12,13 +12,10 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.border
@@ -33,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -49,86 +45,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.immortal.launcher.ui.theme.PrimeBlue
-
-/**
- * Home-header mini-player: premium card with rounded album art, glass-style card background,
- * a subtle left PrimeBlue border indicating active playback, and refined typography.
- * The art area is the play/pause touch target. Driven by [NowPlayingHub].
- */
-/**
- * Left-column "Now Playing" card. Subscribes to [NowPlayingHub] and renders the current track with
- * a tap-to-play/pause art target; self-hides (renders nothing) when nothing is playing, matching the
- * other self-hiding dashboard cards. Replaces the old always-present "Tap to play" stub.
- */
-@Composable
-private fun NowPlayingCard(modifier: Modifier = Modifier) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  val mainHandler = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
-  var state by remember { mutableStateOf(NowPlayingHub.current) }
-  DisposableEffect(Unit) {
-    val l = NowPlayingHub.Listener { s -> mainHandler.post { state = s } }
-    NowPlayingHub.addListener(l) // replays current immediately
-    onDispose { NowPlayingHub.removeListener(l) }
-  }
-  val np = state ?: return // nothing playing → card hides entirely
-
-  var urlArt by remember(np.artUrl, np.artBitmap) { mutableStateOf<android.graphics.Bitmap?>(null) }
-  LaunchedEffect(np.artUrl, np.artBitmap) {
-    if (np.artBitmap == null && np.artUrl.isNotBlank()) {
-      MediaArt.deliverUri(context, np.artUrl) { urlArt = it }
-    } else urlArt = null
-  }
-  val cover = np.artBitmap ?: urlArt
-
-  LiquidGlassWidget(modifier = modifier.height(80.dp)) {
-    Row(
-        modifier = Modifier.fillMaxSize().padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-      LiquidGlass(
-          modifier = Modifier.size(48.dp).tvFocusable(RoundedCornerShape(8.dp)) {
-            NowPlayingHub.playPause()
-          },
-          cornerRadius = 8.dp,
-      ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-          if (cover != null) {
-            Image(
-                bitmap = cover.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
-          } else {
-            Text("♫", color = Color.White, fontSize = 18.sp)
-          }
-        }
-      }
-      Column(modifier = Modifier.weight(1f)) {
-        Text(
-            np.title.ifBlank { "Now Playing" },
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        if (np.artist.isNotBlank()) {
-          Text(
-              np.artist,
-              color = Color.White.copy(alpha = 0.55f),
-              fontSize = 11.sp,
-              fontWeight = FontWeight.Light,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis,
-          )
-        }
-      }
-    }
-  }
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

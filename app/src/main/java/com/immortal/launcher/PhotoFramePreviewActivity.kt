@@ -254,7 +254,5 @@ class PhotoFramePreviewActivity : ComponentActivity() {
      */
     const val EXTRA_LAUNCH_DISMISS_APP = "launch_dismiss_app"
 
-    // A soft glow for the overnight bedside clock — dim but still legible in a dark room.
-    const val NIGHT_BRIGHTNESS = 0.08f
   }
 }

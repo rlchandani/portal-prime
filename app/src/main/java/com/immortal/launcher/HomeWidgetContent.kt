@@ -8,11 +8,9 @@
 package com.immortal.launcher
 
 import android.content.Intent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -37,20 +35,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.components.OnResume
-import com.immortal.launcher.ui.components.launchSafely
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -148,54 +139,6 @@ internal fun ImmortalWidgetShell(
         if (scrollContent) Modifier.verticalScroll(rememberScrollState()) else Modifier)) { content() }
   }
 
-}
-
-/**
- * "On this day" photo-memory strip: a glass row with a small thumbnail from the user's screensaver
- * photo folder and a caption; tapping opens the full photo-frame. Only shown when a local photo
- * folder is configured and readable — otherwise it stays hidden (no empty chrome).
- */
-@Composable
-private fun PhotoMemoryStrip(modifier: Modifier = Modifier) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  val onOpen: () -> Unit = { context.launchSafely(PhotoFramePreviewActivity::class.java) }
-  val photo by
-      produceState<ImageBitmap?>(initialValue = null) {
-        value = withContext(Dispatchers.IO) {
-          runCatching {
-            val cfg = ScreensaverConfig.load(context)
-            val folder = cfg.folderPath
-            if (cfg.usesFolder && folder != null && LocalMedia.isAccessible(folder)) {
-              LocalMedia.enumerate(folder, includeVideo = false, max = 60)
-                  .filterNot { it.isVideo }
-                  .randomOrNull()
-                  ?.let { android.graphics.BitmapFactory.decodeFile(it.path)?.asImageBitmap() }
-            } else null
-          }.getOrNull()
-        }
-      }
-  val bmp = photo ?: return // no readable local photos → hide the strip entirely
-
-  // Bare content — the widget grid cell provides the glass surface.
-  Box(modifier = modifier) {
-    Row(
-        modifier = Modifier.fillMaxWidth().clickable { onOpen() }.padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-      Image(
-          bitmap = bmp,
-          contentDescription = null,
-          contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-          modifier = Modifier.size(56.dp).clip(RoundedCornerShape(12.dp)),
-      )
-      Column(Modifier.weight(1f)) {
-        Text("On this day", color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, fontWeight = FontWeight.Medium)
-        Text("A memory from your photos", color = Color.White.copy(alpha = 0.9f), fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      }
-      Text("›", color = Color.White.copy(alpha = 0.5f), fontSize = 24.sp)
-    }
-  }
 }
 
 /**

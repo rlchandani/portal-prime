@@ -20,13 +20,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-/** Legacy callers retain their frame; the Tools host owns its single workspace heading. */
-@Composable
-internal fun ApprovedToolsSpeedScreen(onBack: () -> Unit) {
-    if (LocalApprovedToolWorkspace.current) ToolsSpeedContent()
-    else ApprovedToolWorkspace("Speed test", onBack, scrollContent = false) { ToolsSpeedContent() }
-}
-
 private val speedResultSaver = listSaver<SpeedTest.Result, Any>(
     save = { listOf(it.server, it.pingMs, it.jitterMs, it.downMbps, it.upMbps) },
     restore = { values -> SpeedTest.Result().apply {

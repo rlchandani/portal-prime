@@ -10,20 +10,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
 
 
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 
 class StocksSettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,23 +99,4 @@ internal fun AlpacaCredentialsCard() {
             }
         }
     }
-}
-
-/** A full-width iOS blue primary action button, shared by the widget editors. */
-@Composable
-internal fun PrimaryButton(label: String, onClick: () -> Unit) {
-  Surface(
-      color = IosBlue,
-      shape = RoundedCornerShape(14.dp),
-      modifier = Modifier.fillMaxWidth().tvFocusable(RoundedCornerShape(14.dp), focusScale = 1f) { onClick() },
-  ) {
-    Text(
-        label,
-        color = Color.White,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(),
-    )
-  }
 }

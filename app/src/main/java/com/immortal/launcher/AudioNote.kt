@@ -131,12 +131,6 @@ class AudioNote(private val context: Context) {
     }
   }
 
-  /** Peak input level since the last poll, 0..32767. ~0 means the mic is hearing
-   *  near-silence (speaker too far from the device). Drives the UI meter. */
-  fun peakLevel(): Int = work.read(0) {
-    runCatching { recorder?.maxAmplitude ?: 0 }.getOrDefault(0)
-  }
-
   /** Blocking compatibility API; new UI uses [stopAsync]. */
   fun stopRecording(): Boolean {
     recording = false

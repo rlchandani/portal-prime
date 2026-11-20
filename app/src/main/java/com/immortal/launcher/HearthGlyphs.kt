@@ -8,11 +8,8 @@ package com.immortal.launcher
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.RectF
-import android.graphics.Shader
 import android.view.View
 
 /** Drawn weather conditions: the Hearth overlay never uses emoji glyphs. */
@@ -130,43 +127,5 @@ internal class HearthWeatherGlyph(context: Context) : View(context) {
     path.lineTo(x + s * .02f, y + s * .13f)
     path.close()
     canvas.drawPath(path, fill)
-  }
-}
-
-/** The Hearthpane ember mark (a flame-shaped drop with the brand gradient). */
-internal class HearthEmberGlyph(context: Context) : View(context) {
-  private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-  private val oval = RectF()
-
-  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-    paint.shader = LinearGradient(0f, 0f, 0f, h.toFloat(), EMBER_TOP, EMBER_BOTTOM, Shader.TileMode.CLAMP)
-  }
-
-  override fun onDraw(canvas: Canvas) {
-    val w = width.toFloat()
-    val h = height.toFloat()
-    if (w <= 0f || h <= 0f) return
-    // CSS border-radius 27% 27% 50% 50% / 23% 23% 50% 50%: a soft-topped drop.
-    oval.set(0f, 0f, w, h)
-    canvas.drawRoundRect(oval, w * .5f, h * .5f, paint)
-    oval.set(0f, 0f, w, h * .6f)
-    canvas.drawRoundRect(oval, w * .27f, h * .23f, paint)
-  }
-
-  private companion object {
-    const val EMBER_TOP = 0xFFF0A65A.toInt()
-    const val EMBER_BOTTOM = 0xFFD9773A.toInt()
-  }
-}
-
-/** A small filled circle in the photo accent. */
-internal class HearthDot(context: Context) : View(context) {
-  private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = HearthReadability.EMBER }
-  var color: Int
-    get() = paint.color
-    set(value) { if (paint.color != value) { paint.color = value; invalidate() } }
-
-  override fun onDraw(canvas: Canvas) {
-    canvas.drawCircle(width / 2f, height / 2f, minOf(width, height) / 2f, paint)
   }
 }

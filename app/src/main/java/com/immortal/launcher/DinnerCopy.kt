@@ -33,8 +33,6 @@ internal object DinnerCopy {
     else -> "Sent “${send.message.text}”"
   }
 
-  fun replyRow(roomName: String, reply: DinnerReply) = "$roomName replied: ${reply.label}"
-
   /** The line under the sheet title: who will hear it, who is quiet, or that we're offline. */
   fun toLine(targetNames: List<String>, quietNames: List<String>, offline: Boolean): String = when {
     offline -> "This Portal is offline. Reconnect to send."

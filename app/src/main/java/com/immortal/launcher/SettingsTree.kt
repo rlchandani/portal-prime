@@ -212,8 +212,6 @@ internal object SettingsTree {
 
     fun rootOf(id: String): String = chainOf(id).firstOrNull() ?: SettingsPageIds.DEFAULT
 
-    fun childrenOf(id: String): List<SettingsPageDef> = pages.filter { it.parent == id }
-
     /** Any page that needs Advanced, itself or through an ancestor. */
     fun needsAdvanced(id: String): Boolean = chainOf(id).any { page(it)?.advanced == true }
 }

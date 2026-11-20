@@ -44,18 +44,6 @@ object HaDashboardApi {
       val unit: String,             // sensor
   )
 
-  // Domains the dashboard renders — anything else is noise on a wall display (buttons, numbers,
-  // select, update, binary_sensor motion/window that flood large installs with 100+ entries).
-  // Sensors are kept but capped to the first 3 per room so sparklines don't bury the controls.
-  private val RENDERABLE_DOMAINS = setOf(
-      "light", "switch", "fan", "input_boolean", "lock", "cover",
-      "climate", "media_player", "sensor",
-  )
-  // Per-room cap: fetch at most this many entity details (one REST call each).
-  // Ordered by domain priority so lights/climate/media always make the cut.
-  private val DOMAIN_PRIORITY = listOf(
-      "climate", "media_player", "light", "switch", "fan", "cover", "lock", "input_boolean", "sensor"
-  )
   internal const val MAX_ENTITIES_PER_ROOM = 12
 
   // area_entities() returns plain entity_id strings — filter by matching the domain prefix,

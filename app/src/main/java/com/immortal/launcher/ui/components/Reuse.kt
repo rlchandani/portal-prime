@@ -9,14 +9,12 @@ package com.immortal.launcher.ui.components
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import kotlinx.coroutines.Dispatchers
@@ -95,10 +93,4 @@ fun <T> pollingState(
 /** Start [cls] with NEW_TASK, swallowing failures (the standard tile/widget tap-through). */
 fun Context.launchSafely(cls: Class<out Activity>) {
   runCatching { startActivity(Intent(this, cls).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
-}
-
-/** The muted empty/loading/connect placeholder line every widget shows. */
-@Composable
-fun WidgetPlaceholder(text: String) {
-  Text(text, color = Glass.TextMuted, fontSize = 14.sp)
 }

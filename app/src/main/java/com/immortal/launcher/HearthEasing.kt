@@ -69,12 +69,8 @@ object HearthEasing {
   val DRIFT = CubicEase(.33f, 0f, .15f, 1f)
   /** Text arriving (minute change, captions, clock emergence). */
   val OUT = CubicEase(.22f, 1f, .36f, 1f)
-  /** Walk-up expansion with a slight overshoot spring feel. */
-  val SPRING = CubicEase(.34f, 1.25f, .64f, 1f)
 
   const val DISSOLVE_MS = 1600L
   /** Settle motion: begins with the dissolve and is finished well before the next photo. */
   const val SETTLE_MS = 8000L
-  const val MINUTE_CHANGE_MS = 700L
-  const val CAPTION_MS = 900L
 }

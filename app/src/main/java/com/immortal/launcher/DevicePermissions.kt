@@ -101,9 +101,6 @@ object DevicePermissions {
     return Snapshot(checks, adminActive)
   }
 
-  /** Count of capabilities that aren't granted — 0 means a healthy device. */
-  fun issueCount(context: Context): Int = all(context).count { !it.granted }
-
   private fun canInstallApps(context: Context): Boolean =
       runCatching {
             if (Build.VERSION.SDK_INT >= 26) context.packageManager.canRequestPackageInstalls()

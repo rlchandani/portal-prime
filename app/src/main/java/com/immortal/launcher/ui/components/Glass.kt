@@ -30,8 +30,6 @@ object Glass {
   val Border = Color(0x24FFFFFF)
   /** Card corner radius — every top-level widget/card. */
   val Radius: Dp = 22.dp
-  /** Inner tile radius (sub-tiles inside a card: HA tiles, quick-control chips). */
-  val SubRadius: Dp = 14.dp
   /** Quiet inner-tile fill (sub-tiles that sit ON glass — lighter, additive white). */
   val SubTint = Color(0x17FFFFFF)
   /** Chrome-button fill (circular header buttons, slide tracks). */

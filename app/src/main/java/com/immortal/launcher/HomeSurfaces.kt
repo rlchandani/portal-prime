@@ -8,88 +8,35 @@
 package com.immortal.launcher
 
 import android.graphics.Bitmap
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.zIndex
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.immortal.launcher.ui.components.GlassCard
 import com.immortal.launcher.ui.components.Glass
 import com.immortal.launcher.ui.components.OnResume
 import com.immortal.launcher.ui.components.pollingState
 import kotlinx.coroutines.flow.drop
-
-@Composable
-private fun FadingDivider() {
-  Box(
-      modifier = Modifier
-          .fillMaxHeight()
-          .padding(horizontal = 10.dp),
-      contentAlignment = Alignment.Center
-  ) {
-    Box(
-        modifier = Modifier
-            .width(1.5.dp)
-            .fillMaxHeight()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color.Transparent,
-                        Color.White.copy(alpha = 0.30f),
-                        Color.Transparent
-                    )
-                )
-            )
-    )
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Liquid Glass composables
@@ -111,121 +58,6 @@ internal fun LiquidGlass(
   // there so every card in the app changes together.
   GlassCard(
       modifier = modifier, cornerRadius = cornerRadius, content = content)
-}
-
-/** Liquid Glass widget tile (rounded 22dp). */
-@Composable
-internal fun LiquidGlassWidget(
-    modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit,
-) {
-  LiquidGlass(modifier = modifier, cornerRadius = 22.dp, content = content)
-}
-
-/** App icon in the grid with scale animation on tap and reorderable drag handle. */
-@Composable
-private fun LiquidGlassAppIconContent(
-    app: AppEntry,
-    editMode: Boolean,
-    isDragging: Boolean,
-    dragHandleModifier: Modifier,
-    onClick: () -> Unit,
-    onLongPress: () -> Unit,
-    onRemove: () -> Unit,
-) {
-  val scale = remember { Animatable(1f) }
-
-  Box(
-      modifier = Modifier
-          .fillMaxWidth()
-          .jiggle(editMode && !isDragging, app.component.packageName.hashCode()),
-      contentAlignment = Alignment.Center
-  ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .zIndex(if (isDragging) 1f else 0f)
-            .graphicsLayer {
-              scaleX = if (isDragging) 1.05f else scale.value
-              scaleY = if (isDragging) 1.05f else scale.value
-              shadowElevation = if (isDragging) 16.dp.toPx() else 0f
-              shape = RoundedCornerShape(26.dp)
-              clip = false
-              // Disable Offscreen compositing while dragging for perf
-              compositingStrategy = if (isDragging) CompositingStrategy.Auto else CompositingStrategy.Offscreen
-            }
-            .then(dragHandleModifier)
-            .then(
-                if (!editMode) {
-                  // Non-edit mode: standard tap gestures with press-scale
-                  Modifier.pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                          scale.animateTo(0.96f, tween(90))
-                          tryAwaitRelease()
-                          scale.animateTo(1f, spring())
-                        },
-                        onTap = { onClick() },
-                        onLongPress = { onLongPress() },
-                    )
-                  }
-                } else {
-                  // In edit mode the drag handle owns the gesture; a plain tap does nothing.
-                  Modifier
-                }
-            ),
-    ) {
-      // Pad the wrapper so the minus badge sits at the tile's top-left corner and is FULLY
-      // visible (not clipped by the grid cell). The tile is inset by the overhang amount.
-      Box(modifier = Modifier.padding(top = 11.dp, start = 11.dp)) {
-        // iOS-style icon: rounded-squircle corners, soft drop shadow (3D depth), and a glossy
-        // top highlight sheen — applied uniformly so even square drawables read as premium
-        // rounded tiles.
-        val iconShape = RoundedCornerShape(26.dp)
-        Box(
-            modifier = Modifier
-                .size(110.dp)
-                .shadow(elevation = 8.dp, shape = iconShape, clip = false)
-                .clip(iconShape),
-            contentAlignment = Alignment.Center,
-        ) {
-          Image(
-              bitmap = app.icon,
-              contentDescription = app.label,
-              modifier = Modifier.size(110.dp),
-              filterQuality = FilterQuality.High,
-          )
-          // Glossy top-down sheen for the "candy"/3D finish.
-          Box(
-              modifier = Modifier.matchParentSize().background(
-                  Brush.verticalGradient(
-                      colors = listOf(Color(0x33FFFFFF), Color(0x0FFFFFFF), Color.Transparent),
-                      endY = 130f,
-                  )
-              )
-          )
-        }
-        if (editMode && app.uninstallable) {
-          // Badge sits at the tile's top-left corner, fully inside the padded wrapper (so it
-          // isn't clipped) — straddling the edge visually. Offset into the padding room.
-          MinusBadge(
-              modifier = Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = (-6).dp),
-          ) { onRemove() }
-        }
-      }
-      Spacer(Modifier.height(6.dp))
-      Text(
-          text = app.label,
-          color = Color.White.copy(alpha = 0.82f),
-          fontSize = 22.sp,
-          fontWeight = FontWeight.Medium,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-          textAlign = TextAlign.Center,
-          modifier = Modifier.widthIn(max = 110.dp),
-      )
-    }
-  }
 }
 
 /** A single day wash keeps chrome readable over every selected wallpaper; night is unchanged. */

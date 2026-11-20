@@ -54,7 +54,6 @@ internal class DigitalDreamFaceView(context: Context, private val settings: Digi
   private val segments = DigitalClockFaceSpec.SEGMENT_PATHS.mapValues { PathParser.createPathFromPathData(it.value) }
   private val segmentMatrix = Matrix()
   private val scratch = Path()
-  private val rect = RectF()
   private val camera = Camera()
   private val cameraMatrix = Matrix()
   private var shown = ""

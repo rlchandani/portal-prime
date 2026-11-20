@@ -12,28 +12,7 @@ import androidx.compose.ui.graphics.Color
 // ── Boilerplate removed ───────────────────────────────────────────────────────
 // All purple/teal Material defaults replaced with Portal Prime palette.
 
-// Primary accent — a cool indigo-blue that reads premium on dark backgrounds
-val PrimeBlue         = Color(0xFF4F8EF7)
-val PrimeBlueLight    = Color(0xFF82AAFF)
-val PrimeBlueDim      = Color(0xFF2D5BB5)
-val OnPrimeBlue       = Color(0xFFFFFFFF)
-
-// Backgrounds — deep near-black with slight warm undertone, not pure #000
-val BackgroundDark    = Color(0xFF0D0D10)
-val SurfaceDark       = Color(0xFF16161C)
-val SurfaceVariant    = Color(0xFF1E1E26)
-val SurfaceContainer  = Color(0xFF22222C)
-
-// Glass tile — translucent white overlay for frosted glass effect
-val GlassSurface      = Color(0x14FFFFFF)   // 8% white
 val GlassBorder       = Color(0x1FFFFFFF)   // 12% white
-val GlassHighlight    = Color(0x0AFFFFFF)   // 4% white (inner top edge)
-
-// Content
-val ContentPrimary    = Color(0xFFF0F0F5)
-val ContentSecondary  = Color(0xFFABABBD)
-val ContentTertiary   = Color(0xFF6B6B80)
-val ContentOnAccent   = Color(0xFFFFFFFF)
 
 // Clock faces
 val ClockPrimary      = Color(0xFFEEEEFF)   // near-white with blue tint

@@ -94,7 +94,7 @@ The Kotlin package is flat; files are grouped by name prefix:
 
 - **Launcher / home grid:** `HomeActivity`, `UserLayout`, `QuickBar*`, `AppSwitcherActivity`
 - **Screensaver / photo frame:** `PhotoDreamService`, `PhotoFrameController`, `Screensaver*`,
-  `Face*` / `ClockFaces` / `FlipWebClockFaceView`, `DreamPolicy`, `PresenceState`, `AntiBurnIn`;
+  `Face*` / `ClockFaces`, `DreamPolicy`, `PresenceState`, `AntiBurnIn`;
   digital-clock face `DigitalClock*`; welcome overlay `Welcome*`; Dream selection in `SettingsGuard`
 - **Photo sources:** `LocalMedia`, `ImmichSource`, `SmbSource`, `DavSource`, `RemoteAlbum`,
   `Weather`, `CalendarFeed`
