@@ -6,9 +6,6 @@
  */
 package com.immortal.launcher
 
-import android.app.Activity
-import android.content.ContextWrapper
-import android.view.WindowManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,7 +34,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -118,56 +113,3 @@ private fun MusicV3Header(onBack: () -> Unit, onCancel: (() -> Unit)?) {
 
 /** Whether the engine holds a queue; only changes when it empties or fills, not on every tick. */
 private fun derivedQueuePresence() = YouTubeMusicEngine.state.map { !it.queue.isEmpty }.distinctUntilChanged()
-
-/**
- * While music is on screen the soft keyboard overlays it (ADJUST_NOTHING) instead of panning the
- * launcher, so it rises from the bottom and stops below the player; restored on close. Changing the
- * mode relayouts the launcher's window (a binder round trip to the window manager, 3 ms to ~50 ms on
- * the Portal Mini), so it is applied when a Music text field takes focus (before its keyboard shows)
- * or once Music has opened ([MusicKeyboardPolicy.SETTLE_MS]), never inside the opening frame. It is
- * restored only if it was applied.
- */
-@Composable
-private fun rememberMusicV3KeyboardPolicy(): MusicKeyboardPolicy {
-  val view = LocalView.current
-  val policy = remember(view) {
-    val window = generateSequence(view.context) { (it as? ContextWrapper)?.baseContext }
-        .filterIsInstance<Activity>().firstOrNull()?.window
-    MusicKeyboardPolicy(window)
-  }
-  DisposableEffect(policy) {
-    val settle = Runnable { policy.ensure() }
-    view.postDelayed(settle, MusicKeyboardPolicy.SETTLE_MS)
-    onDispose {
-      view.removeCallbacks(settle)
-      policy.restore()
-    }
-  }
-  return policy
-}
-
-/** Applies Music's soft-keyboard mode to the launcher window at most once per visit; see [rememberMusicV3KeyboardPolicy]. */
-internal class MusicKeyboardPolicy(private val window: android.view.Window?) {
-  private var previous: Int? = null
-
-  fun ensure() {
-    val window = window ?: return
-    if (previous != null) return
-    previous = window.attributes.softInputMode
-    window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
-  }
-
-  fun restore() {
-    val mode = previous ?: return
-    previous = null
-    window?.setSoftInputMode(mode)
-  }
-
-  internal companion object {
-    /** After Music's opening work (about 1 s) and before Home goes inactive ([HomeMusicCover.SETTLE_MS]). */
-    const val SETTLE_MS = 2_000L
-  }
-}
-
-/** Music's keyboard policy, for its text fields to apply before their keyboard shows; null outside Music v3. */
-internal val LocalMusicKeyboardPolicy = androidx.compose.runtime.staticCompositionLocalOf<MusicKeyboardPolicy?> { null }
