@@ -244,8 +244,12 @@ class FleetRoutes(private val context: Context) {
 
     val pkg = body.optString("packageName").ifBlank { null } ?: return resp(400, err("packageName_required"))
     val apkUrl = body.optString("apkUrl").ifBlank { null }
+    // A request-supplied URL (and every redirect hop) must be on our release hosts, F-Droid, or a
+    // host the catalog itself uses: the Portal is not a fetch proxy for arbitrary LAN/web hosts.
+    val apkHosts = ApkUrlPolicy.allowedHosts(catalog)
+    if (apkUrl != null && !ApkUrlPolicy.isAllowed(apkUrl, apkHosts)) return resp(400, err("apk_url_not_allowed"))
     val app =
-        if (apkUrl != null) syntheticUrlApp(pkg, apkUrl)
+        if (apkUrl != null) syntheticUrlApp(pkg, apkUrl, apkHosts)
         else
             catalog.firstOrNull { it.packageName == pkg }
                 ?: return if (catalog.isEmpty()) resp(503, err("catalog_not_ready"))
@@ -413,11 +417,29 @@ class FleetRoutes(private val context: Context) {
         resp(200, JSONObject().put("ok", opened).put("action", "open_control_center"))
       }
       // Operator verification of phone routes: {"op":"mint"} returns a paired-phone session marked as a
-      // test; {"op":"revoke"} removes every test session (real pairings stay). The fleet token already
-      // has full control of this Portal, so this grants nothing new.
+      // test ({"householdGrant":true} also gives it the post-pairing household-key window, as a PIN
+      // pairing would); {"op":"age","days":N} moves test sessions' last use N days back (debug clock
+      // for expiry); {"op":"pin"} issues a live pairing code, as "Show pairing code" would, so the
+      // real /remote/pair path and its rate limit can be checked without the screen (the session it
+      // mints is a test session); {"op":"revoke_id","id":"…"} removes one paired phone; {"op":"revoke"}
+      // removes every test session (real pairings stay). The fleet token already has full control of
+      // this Portal (it can mint sessions directly), so none of this grants anything new.
       "phone_test_session" -> when (body.optString("op")) {
         "mint" -> resp(200, ok().put("action", "phone_test_session").put("remoteEnabled", RemotePairing.isEnabled(context))
-            .put("token", RemotePairing.mintTestSession(context)))
+            .put("token", RemotePairing.mintTestSession(context, householdGrant = body.optBoolean("householdGrant"))))
+        "pin" -> resp(200, ok().put("action", "phone_test_session").put("pin", RemotePairing.newPin(forTest = true)))
+        // Removes one paired phone by its record id (the 16-hex id Settings lists), test or real.
+        "revoke_id" -> {
+          val id = body.optString("id")
+          if (!id.matches(Regex("[0-9a-f]{16}"))) resp(400, err("bad_id"))
+          else resp(200, ok().put("action", "phone_test_session").put("removed", RemotePairing.revokeSession(context, id)))
+        }
+        "age" -> {
+          val days = body.optLong("days", -1L)
+          if (days !in 0..MAX_TEST_AGE_DAYS) resp(400, err("bad_days"))
+          else resp(200, ok().put("action", "phone_test_session")
+              .put("aged", RemotePairing.ageTestSessions(context, TimeUnit.DAYS.toMillis(days))))
+        }
         "revoke" -> resp(200, ok().put("action", "phone_test_session").put("revoked", RemotePairing.revokeTestSessions(context)))
         else -> resp(400, err("bad_op"))
       }
@@ -613,7 +635,7 @@ class FleetRoutes(private val context: Context) {
   private fun dialogInstall(app: CatalogApp): String {
     val apk = File(context.cacheDir, "${app.packageName}.fleet.apk")
     return try {
-      StoreCatalog.download(StoreCatalog.resolveApkUrl(app), apk)
+      StoreCatalog.download(StoreCatalog.resolveApkUrl(app), apk, app.downloadHosts)
       HeadlessInstaller.installForResult(context, apk, app.packageName).fleetResult()
     } catch (t: Throwable) {
       "failed"
@@ -636,7 +658,7 @@ class FleetRoutes(private val context: Context) {
     }
   }
 
-  private fun syntheticUrlApp(pkg: String, url: String) =
+  private fun syntheticUrlApp(pkg: String, url: String, hosts: Set<String>) =
       CatalogApp(
           name = pkg,
           packageName = pkg,
@@ -645,7 +667,8 @@ class FleetRoutes(private val context: Context) {
           apkUrl = url,
           versionCode = null,
           description = "",
-          category = "")
+          category = "",
+          downloadHosts = hosts)
 
   // --- files + logs -----------------------------------------------------------
 
@@ -661,12 +684,24 @@ class FleetRoutes(private val context: Context) {
     val path = req.queryParam("path") ?: return resp(400, err("path_required"))
     val f = File(path)
     if (FleetSecretPaths.isBlocked(f)) return resp(403, err("protected_path"))
+    // Checked before reading a byte: a size cap, and enough free space left after the write.
+    FsWritePolicy.refusal(req.contentLength.toLong(), usableSpaceFor(f))?.let {
+      return resp(if (it == "body_too_large") 413 else 507, err(it)
+          .put("maxBytes", FsWritePolicy.MAX_BYTES).put("minFreeAfterBytes", FsWritePolicy.MIN_FREE_AFTER_BYTES))
+    }
     return try {
       val written = FleetUploadWriter.write(f, req::streamBodyTo)
       resp(200, ok().put("path", f.absolutePath).put("bytes", written))
     } catch (t: Throwable) {
       resp(if (t is EOFException) 400 else 500, err("write_failed").put("detail", t.message ?: ""))
     }
+  }
+
+  /** Free bytes on the volume that will hold [f] (its nearest existing ancestor). */
+  private fun usableSpaceFor(f: File): Long {
+    var dir: File? = f.absoluteFile.parentFile
+    while (dir != null && !dir.exists()) dir = dir.parentFile
+    return dir?.usableSpace ?: 0L
   }
 
   private fun logcat(req: FleetHttpServer.Request): FleetHttpServer.Response {
@@ -751,6 +786,8 @@ class FleetRoutes(private val context: Context) {
 
   internal companion object {
     const val BUSY = "busy"
+    /** Upper bound for the `phone_test_session` debug clock (a little past the 1-year mark). */
+    const val MAX_TEST_AGE_DAYS = 400L
 
     /** Derive the install-mode label reported in /info and gating /install. Pure. */
     internal fun modeFor(daemonAvailable: Boolean, paused: Boolean): String =

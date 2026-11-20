@@ -43,9 +43,10 @@ object FleetScreensaver {
 
   /**
    * The photo-source setup the remote's Setup form reads to pre-fill — the active source type plus
-   * every source's stored fields (so editing round-trips). Served only to a paired remote on the
-   * LAN; the secret fields (Immich key, share/WebDAV passwords) are included for that pre-fill,
-   * matching the on-Portal connect screens.
+   * every source's non-secret fields (so editing round-trips). Served to paired phones, so the
+   * secrets (Immich key, share/WebDAV passwords) are never included: their slots hold
+   * [SourceSecrets.MASK] when saved, with `has…`/`…Configured` flags and an Immich key hint. A save
+   * that sends the mask back keeps the saved secret ([RemoteCompanionSources.prepare]).
    */
   fun sourcesJson(s: ScreensaverConfig.Settings): JSONObject =
       JSONObject()
@@ -57,18 +58,19 @@ object FleetScreensaver {
           .put("immichKeyConfigured", !s.immichKey.isNullOrBlank())
           .put("smbPassConfigured", !s.smbPass.isNullOrBlank())
           .put("davPassConfigured", !s.davPass.isNullOrBlank())
+          .put("immichKeyHint", SourceSecrets.hint(s.immichKey))
           .put("immichUrl", s.immichUrl ?: "")
-          .put("immichKey", s.immichKey ?: "")
+          .put("immichKey", SourceSecrets.masked(s.immichKey))
           .put("immichAlbumId", s.immichAlbumId ?: "")
           .put("immichAlbumName", s.immichAlbumName ?: "")
           .put("smbHost", s.smbHost ?: "")
           .put("smbShare", s.smbShare ?: "")
           .put("smbPath", s.smbPath ?: "")
           .put("smbUser", s.smbUser ?: "")
-          .put("smbPass", s.smbPass ?: "")
+          .put("smbPass", SourceSecrets.masked(s.smbPass))
           .put("davUrl", s.davUrl ?: "")
           .put("davUser", s.davUser ?: "")
-          .put("davPass", s.davPass ?: "")
+          .put("davPass", SourceSecrets.masked(s.davPass))
           .put("webUrl", s.webUrl ?: "")
           .put("albumUrl", s.albumUrl ?: "")
 

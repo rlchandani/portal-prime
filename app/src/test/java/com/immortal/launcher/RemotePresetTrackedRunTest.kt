@@ -52,6 +52,7 @@ class RemotePresetTrackedRunTest {
     val saved = mock(SharedPreferences::class.java)
     `when`(context.getSharedPreferences("remote_pairing", Context.MODE_PRIVATE)).thenReturn(pairing)
     `when`(pairing.getString("sessions", null)).thenReturn("public-session")
+    `when`(pairing.getBoolean("enabled", false)).thenReturn(true)
     `when`(context.getSharedPreferences("remote_presets", Context.MODE_PRIVATE)).thenReturn(saved)
     val routes = RemoteRoutes(context)
     val bytes = "{id:'missing'}".toByteArray()

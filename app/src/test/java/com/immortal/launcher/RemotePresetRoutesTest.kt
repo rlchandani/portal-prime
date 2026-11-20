@@ -77,6 +77,7 @@ class RemotePresetRoutesTest {
     init {
       `when`(context.getSharedPreferences("remote_pairing", Context.MODE_PRIVATE)).thenReturn(pairing)
       `when`(pairing.getString("sessions", null)).thenReturn("public-preset-session")
+      `when`(pairing.getBoolean("enabled", false)).thenReturn(true)
       `when`(context.getSharedPreferences("remote_presets", Context.MODE_PRIVATE)).thenReturn(preferences)
       `when`(preferences.contains("json")).thenAnswer { raw.get() != null }
       `when`(preferences.getString(eq("json"), nullable(String::class.java))).thenAnswer { raw.get() ?: it.getArgument<String?>(1) }

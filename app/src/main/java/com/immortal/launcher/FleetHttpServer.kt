@@ -61,6 +61,8 @@ class FleetHttpServer(
       val headers: Map<String, String>, // keys lower-cased
       private val input: InputStream,
       val contentLength: Int,
+      /** The peer's IP literal (empty in tests); used only for per-address rate limits. */
+      val remoteAddress: String = "",
       private val clock: () -> Long = ::monotonicMs,
   ) {
     private var consumed = 0
@@ -167,6 +169,10 @@ class FleetHttpServer(
           writer: (OutputStream) -> Unit,
       ) = Response(status, contentType, headers, null, length, writer, onClose)
 
+      /** A JSON reply with extra headers (e.g. `Retry-After`). */
+      fun json(status: Int, json: String, headers: Map<String, String>) =
+          Response(status, "application/json; charset=utf-8", headers, json.toByteArray(Charsets.UTF_8), -1, null)
+
       /** A 204 CORS preflight reply (empty body) for an OPTIONS request. */
       fun preflight() =
           Response(
@@ -255,7 +261,8 @@ class FleetHttpServer(
         runCatching { writeResponse(out, Response(413, """{"ok":false,"error":"body_too_large"}""")) }
         return
       }
-      val req = Request(head.method, head.path, head.query, head.headers, input, len ?: 0)
+      val req = Request(head.method, head.path, head.query, head.headers, input, len ?: 0,
+          remoteAddress = it.inetAddress?.hostAddress.orEmpty())
       // Honour Expect: 100-continue (curl sends it for larger uploads) so the
       // client actually sends the body before we try to read it.
       if (req.header("expect")?.contains("100-continue", ignoreCase = true) == true) {
@@ -376,6 +383,7 @@ class FleetHttpServer(
           500 -> "Internal Server Error"
           429 -> "Too Many Requests"
           503 -> "Service Unavailable"
+          507 -> "Insufficient Storage"
           else -> "OK"
         }
   }

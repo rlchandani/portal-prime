@@ -89,7 +89,7 @@ test('pairing uses native Enter submission with its sticky footer action', {
           await new Promise(resolve => setTimeout(resolve, 10));
         await settle();
         assert.equal(f.posts.length, count, 'native action must send exactly one pairing request');
-        assert.deepEqual(f.posts.at(-1), { path: '/remote/pair', body: { pin: '123456' } });
+        assert.deepEqual(f.posts.at(-1), { path: '/remote/pair', body: { pin: '123456', label: 'Web browser' } });
       };
       await run({ f, page, dialog, address, pin, action, settle, submitted });
     } finally {

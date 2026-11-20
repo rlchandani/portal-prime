@@ -8,10 +8,12 @@
 package com.immortal.launcher
 
 import android.content.Context
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 
@@ -52,37 +54,58 @@ class RemotePairingTest {
   // The failure path of redeem() never touches prefs, so a bare mock suffices for the lockout tests.
   private val ctx: Context = mock(Context::class.java)
 
+  @Before fun reset() = RemotePairing.resetForTest()
+
+  /** Wrong guesses spread over distinct addresses, so only the global per-code cap applies. */
+  private fun wrongFromMany(count: Int, now: Long, offset: Int = 0) = repeat(count) {
+    assertEquals(RemotePairing.RedeemResult.BadPin, RemotePairing.redeem(ctx, "000000", "10.0.0.${it + offset}", now = now))
+  }
+
   @Test
-  fun redeem_burnsPinAfterMaxWrongAttempts() {
+  fun redeem_burnsPinAfterMaxWrongAttemptsAndCoolsDown() {
     val pin = RemotePairing.newPin(now = 0L)
-    // MAX_PIN_ATTEMPTS wrong guesses, all within the window.
-    repeat(RemotePairing.MAX_PIN_ATTEMPTS) {
-      assertNull(RemotePairing.redeem(ctx, "000000", now = 1_000L))
-    }
-    // PIN is now burned: even the CORRECT pin no longer redeems, and it's no longer displayed.
-    assertNull("correct PIN must fail after lockout", RemotePairing.redeem(ctx, pin, now = 1_000L))
+    wrongFromMany(RemotePairing.MAX_PIN_ATTEMPTS, now = 1_000L)
+    // PIN is burned and every address waits, even one that never guessed.
+    val limited = RemotePairing.redeem(ctx, pin, "10.0.9.9", now = 1_000L)
+    assertTrue(limited is RemotePairing.RedeemResult.Limited && limited.global)
     assertNull("burned PIN must not display", RemotePairing.currentPin(now = 1_000L))
+    assertEquals(PairingThrottle.COOLDOWN_BASE_MS, RemotePairing.pairingCooldownRemainingMs(now = 1_000L))
   }
 
   @Test
   fun redeem_wrongGuessesBelowCapDoNotBurnPin() {
-    val pin = RemotePairing.newPin(now = 0L)
-    repeat(RemotePairing.MAX_PIN_ATTEMPTS - 1) {
-      assertNull(RemotePairing.redeem(ctx, "000000", now = 1_000L))
-    }
-    // Still live below the cap — the PIN is still displayable.
+    RemotePairing.newPin(now = 0L)
+    wrongFromMany(RemotePairing.MAX_PIN_ATTEMPTS - 1, now = 1_000L)
     assertNotNull("PIN must survive below the attempt cap", RemotePairing.currentPin(now = 1_000L))
+  }
+
+  @Test
+  fun redeem_oneNoisyAddressIsLimitedButCannotBurnTheCode() {
+    val pin = RemotePairing.newPin(now = 0L)
+    repeat(PairingThrottle.IP_FAILURES) { RemotePairing.redeem(ctx, "000000", "10.0.0.66", now = 1_000L) }
+    val limited = RemotePairing.redeem(ctx, "000000", "10.0.0.66", now = 1_000L)
+    assertTrue(limited is RemotePairing.RedeemResult.Limited && !limited.global)
+    // The owner on another address still sees and can use the live code.
+    assertEquals(pin, RemotePairing.currentPin(now = 1_000L))
+  }
+
+  @Test
+  fun redeem_afterCooldownAFreshCodeWorksAgain() {
+    RemotePairing.newPin(now = 0L)
+    wrongFromMany(RemotePairing.MAX_PIN_ATTEMPTS, now = 1_000L)
+    val later = 1_000L + PairingThrottle.COOLDOWN_BASE_MS
+    RemotePairing.newPin(now = later)
+    assertEquals(0L, RemotePairing.pairingCooldownRemainingMs(now = later))
+    assertEquals(RemotePairing.RedeemResult.BadPin, RemotePairing.redeem(ctx, "000000", "10.0.9.9", now = later))
   }
 
   @Test
   fun newPin_resetsTheAttemptCounter() {
     RemotePairing.newPin(now = 0L)
-    repeat(RemotePairing.MAX_PIN_ATTEMPTS - 1) { RemotePairing.redeem(ctx, "000000", now = 1_000L) }
+    wrongFromMany(RemotePairing.MAX_PIN_ATTEMPTS - 1, now = 1_000L)
     // A fresh PIN clears the counter, so it can absorb a full new run of wrong guesses.
     val fresh = RemotePairing.newPin(now = 2_000L)
-    repeat(RemotePairing.MAX_PIN_ATTEMPTS - 1) {
-      assertNull(RemotePairing.redeem(ctx, "000000", now = 3_000L))
-    }
+    wrongFromMany(RemotePairing.MAX_PIN_ATTEMPTS - 1, now = 3_000L, offset = 100)
     assertNotNull(RemotePairing.currentPin(now = 3_000L))
     assertTrue(fresh.length == 6)
   }
