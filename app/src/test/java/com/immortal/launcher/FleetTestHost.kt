@@ -128,12 +128,16 @@ internal class FleetTestHost : FleetDevice, FleetSettings, FleetPackages, FleetA
     return "dry=$dryRun"
   }
   override fun testSourceAvailable() = testSourceAvailable
-  override fun enableTestSource(minutes: Int, night: Boolean): Boolean { note("enableTestSource:$minutes:$night"); return testSourceApplied }
+  override fun enableTestSource(minutes: Int, night: Boolean, pin: ScreensaverTestSource.Pin?): Boolean {
+    note("enableTestSource:$minutes:$night" + (pin?.let { ":${it.mode}@${it.intervalSec}" } ?: ""))
+    return testSourceApplied
+  }
   override fun disableTestSource(): Boolean { note("disableTestSource"); return testSourceApplied }
   override fun reopenFrame(enabled: Boolean) = note("reopenFrame:$enabled")
   override fun testSourceActive() = true
   override fun testSourceNight() = false
   override fun testSourceUntil() = 42L
+  override fun testSourcePin(): String? = null
   override fun clockLook() = clock
   override fun isClockFace(id: String) = id in setOf("classic", "bold", "neon")
   override fun setClockStyle(style: String) { note("style:$style"); clock = clock.copy(style = style) }

@@ -116,13 +116,16 @@ internal interface FleetActions {
   fun revokeTestSessions(): Int
   fun ccDebug(dryRun: Boolean?, testPlan: String?, testAlert: String?, haUnreachable: Boolean?, fake: CcFakeState?): String
   fun testSourceAvailable(): Boolean
-  fun enableTestSource(minutes: Int, night: Boolean): Boolean
+  /** [pin] holds one screensaver mode at a fixed interval for the same span (performance A/B). */
+  fun enableTestSource(minutes: Int, night: Boolean, pin: ScreensaverTestSource.Pin? = null): Boolean
   fun disableTestSource(): Boolean
   /** Retire the frame on screen and, when [enabled], open a fresh one on the new source. */
   fun reopenFrame(enabled: Boolean)
   fun testSourceActive(): Boolean
   fun testSourceNight(): Boolean
   fun testSourceUntil(): Long
+  /** The active pin as "mode@<n>s", or null. */
+  fun testSourcePin(): String?
   fun clockLook(): FleetClockLook
   fun isClockFace(id: String): Boolean
   fun setClockStyle(style: String)

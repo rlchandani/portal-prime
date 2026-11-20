@@ -164,11 +164,13 @@ internal class FleetAndroidHost(private val context: Context) :
       ControlCenter.debug(context, dryRun, testPlan, testAlert, haUnreachable, fake)
 
   override fun testSourceAvailable() = ScreensaverTestSource.available()
-  override fun enableTestSource(minutes: Int, night: Boolean) = ScreensaverTestSource.enable(context, minutes, night = night)
+  override fun enableTestSource(minutes: Int, night: Boolean, pin: ScreensaverTestSource.Pin?) =
+      ScreensaverTestSource.enable(context, minutes, night = night, pin = pin)
   override fun disableTestSource() = ScreensaverTestSource.disable(context)
   override fun testSourceActive() = ScreensaverTestSource.active(context)
   override fun testSourceNight() = ScreensaverTestSource.forcedNight(context)
   override fun testSourceUntil() = ScreensaverTestSource.until(context)
+  override fun testSourcePin() = ScreensaverTestSource.pin(context)?.let { "${it.mode}@${it.intervalSec}s" }
 
   override fun reopenFrame(enabled: Boolean) {
     main.post { runCatching { ImmortalDreamNavigation.dismissForNavigation() } }

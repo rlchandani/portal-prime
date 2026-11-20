@@ -147,6 +147,19 @@ class FleetActionApiTest {
         "enableTestSource:30:false", "reopenFrame:true", "disableTestSource", "reopenFrame:false"), host.calls)
   }
 
+  @Test fun screensaverTestSourcePinsAKnownModeAtAValidInterval() {
+    assertEquals("400 bad_pin", FleetReq.outcome(act("screensaver_test_source", "enabled" to true, "mode" to "notAMode")))
+    assertEquals("400 bad_pin", FleetReq.outcome(act("screensaver_test_source", "enabled" to true, "mode" to "kenBurns", "intervalSec" to 4)))
+    assertEquals("400 bad_pin", FleetReq.outcome(act("screensaver_test_source", "enabled" to true, "mode" to "kenBurns", "intervalSec" to 601)))
+    assertTrue(host.calls.isEmpty())
+    act("screensaver_test_source", "enabled" to true, "minutes" to 5, "mode" to "galleryWall", "intervalSec" to 10)
+    act("screensaver_test_source", "enabled" to true, "mode" to "polaroid")
+    // Disabling ignores a pin.
+    act("screensaver_test_source", "enabled" to false, "mode" to "notAMode")
+    assertEquals(listOf("enableTestSource:5:false:galleryWall@10", "reopenFrame:true", "enableTestSource:30:false:polaroid@30",
+        "reopenFrame:true", "disableTestSource", "reopenFrame:false"), host.calls)
+  }
+
   @Test fun anUnappliedTestSourceLeavesTheFrameAlone() {
     host.testSourceApplied = false
     host.testSourceAvailable = false
