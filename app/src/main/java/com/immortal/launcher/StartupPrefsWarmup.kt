@@ -39,6 +39,8 @@ internal object StartupPrefsWarmup {
       // HomeActivity.onCreate and Home's first composition (default widgets included).
       "immortal_help", "immortal_wallpaper", "immortal_welcome", "fleet_agent", "immortal_layout",
       "immortal_home_widgets", "immortal_ha", "hearthpane_control_center", "immortal_share_notes",
+      // Also read inside Home's first frame; unwarmed they cost ~47 ms of main-thread waits there.
+      "immortal_display", "immortal_share_fresh", "immortal_countdown", "immortal_todos", "immortal_crypto",
       "immortal_home_dashboard",
   )
 
