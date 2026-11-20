@@ -103,9 +103,8 @@ internal object CcSecurityList {
     return CcSecItem(e.id, e.name, area, stateWord(e, group), e.lastChanged, attention, e.unavailable, action)
   }
 
-  /** Rows: attention first, then the ones that report, unavailable last; each by name. */
   private fun section(g: CcSecGroup, rows: List<CcSecItem>): CcSecSection {
-    val items = rows.sortedWith(compareBy({ if (it.attention) 0 else if (it.unavailable) 2 else 1 }, { it.name.lowercase() }, { it.id }))
+    val items = sortRows(rows)
     val n = items.count { it.attention }
     val (tag, ok) = when {
       g == CcSecGroup.MOTION -> items.count(::active).let { if (it == 0) "Quiet" to null else "$it active" to null }
@@ -116,7 +115,11 @@ internal object CcSecurityList {
     return CcSecSection(g, items, tag, ok)
   }
 
-  private fun active(i: CcSecItem) = i.state == "Motion" || i.state == "Occupied"
+  /** Attention first, then the ones that report, unavailable last; each by name. */
+  fun sortRows(rows: List<CcSecItem>): List<CcSecItem> =
+      rows.sortedWith(compareBy({ if (it.attention) 0 else if (it.unavailable) 2 else 1 }, { it.name.lowercase() }, { it.id }))
+
+  fun active(i: CcSecItem) = i.state == "Motion" || i.state == "Occupied"
 
   private fun problemWord(g: CcSecGroup, n: Int): String = when (g) {
     CcSecGroup.LOCKS -> "unlocked"

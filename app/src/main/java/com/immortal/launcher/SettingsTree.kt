@@ -134,7 +134,7 @@ internal object SettingsTree {
         SettingsPageDef(P.GREETING, "Welcome Greeting", "hand", C.ROSE, SettingsGroup.PERSONALIZE,
             lede = "The message shown when someone walks up to the Portal.",
             keywords = "greeting name morning evening night afternoon speak tts overlay"),
-        SettingsPageDef(P.PEOPLE, "People & Recognition", "camera", C.PURPLE, SettingsGroup.PERSONALIZE,
+        SettingsPageDef(P.PEOPLE, "People & Recognition", "users", C.PURPLE, SettingsGroup.PERSONALIZE,
             lede = "When someone who set this up walks up, this Portal shows their own Home. Off until an adult turns it on.",
             keywords = "who's there whos face recognition personal home people person add kid teen adult enrol camera template"),
         SettingsPageDef(P.HOME_ASSISTANT, "Home Assistant", "home", C.CYAN, SettingsGroup.CONNECTED_HOME,

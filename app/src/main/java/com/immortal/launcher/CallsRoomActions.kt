@@ -1,0 +1,36 @@
+/*
+ * Copyright (c) 2026 Starbright Lab.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+package com.immortal.launcher
+
+/** What a room card can do right now. */
+internal enum class CallRoomAction { VIDEO, DROP_IN, AUDIO }
+
+/**
+ * A room card shows only the actions that room will take (mock: compact round actions, no greyed
+ * "Not allowed" pill). Calls off means nothing to offer; drop-ins off leaves video and audio. The
+ * status note says why something is missing (pure, unit tested).
+ */
+internal object CallRoomActions {
+  fun of(acceptsCalls: Boolean, drop: DropInPolicy): List<CallRoomAction> = when {
+    !acceptsCalls -> emptyList()
+    drop == DropInPolicy.OFF -> listOf(CallRoomAction.VIDEO, CallRoomAction.AUDIO)
+    else -> listOf(CallRoomAction.VIDEO, CallRoomAction.DROP_IN, CallRoomAction.AUDIO)
+  }
+
+  /** The drop-in button's words for an allowed policy. */
+  fun dropInLabel(drop: DropInPolicy): String = if (drop == DropInPolicy.ASK) "Ask to join" else "Drop in"
+
+  /** The card's status note under the presence line. */
+  enum class Note(val text: String) { CALLS_OFF("Calls off"), DROP_INS_ON("Drop-ins on"), ASKS_FIRST("Asks first"), DROP_INS_OFF("Drop-ins off") }
+
+  fun note(acceptsCalls: Boolean, drop: DropInPolicy): Note = when {
+    !acceptsCalls -> Note.CALLS_OFF
+    drop == DropInPolicy.CHIME -> Note.DROP_INS_ON
+    drop == DropInPolicy.ASK -> Note.ASKS_FIRST
+    else -> Note.DROP_INS_OFF
+  }
+}

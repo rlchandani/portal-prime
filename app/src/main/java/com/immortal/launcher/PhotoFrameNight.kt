@@ -19,11 +19,19 @@ internal object PhotoFrameNight {
     NIGHT_PHOTO,
     /** Photos are suspended under the quiet clock (a finite cross-dissolve both ways). */
     QUIET_CLOCK,
+    /**
+     * Split glance keeps its layout, warm and dimmed (the approved mock's night state), whatever
+     * the night colour: it already is a clock, so neither the quiet clock nor the full-bleed night
+     * photo replaces it.
+     */
+    SPLIT_DIM,
   }
 
   /** The dark room turning [night] on or off, while it is [current]. */
-  fun ambient(night: Boolean, current: Boolean, stopped: Boolean, tone: String, nativePhotoMode: Boolean): Ambient = when {
+  fun ambient(night: Boolean, current: Boolean, stopped: Boolean, tone: String, nativePhotoMode: Boolean,
+              splitGlance: Boolean = false): Ambient = when {
     stopped || current == night -> Ambient.NONE
+    splitGlance && nativePhotoMode -> Ambient.SPLIT_DIM
     tone == ScreensaverConfig.NIGHT_TONE_PHOTO && nativePhotoMode -> Ambient.NIGHT_PHOTO
     else -> Ambient.QUIET_CLOCK
   }
@@ -55,6 +63,10 @@ internal object PhotoFrameNight {
   /** Log line for the quiet-clock dissolve. */
   fun quietClockLog(night: Boolean): String =
       if (night) "dark room: fading to clock; photos suspended" else "light returned: fading to retained photo"
+
+  /** Log line for Split glance's dark room. */
+  fun splitNightLog(night: Boolean): String =
+      if (night) "dark room: split glance dimmed" else "light returned: split glance day ink"
 
   /** Log line for the night photo veil. */
   fun nightPhotoLog(night: Boolean): String =

@@ -32,7 +32,8 @@ internal object PhotoFrameStagePolicy {
   /** Modes that show two photos side by side ask the loader for a partner. */
   fun pairs(mode: String): Boolean = mode == ScreensaverConfig.MODE_PORTRAITS || mode == ScreensaverConfig.MODE_GALLERY_SPREAD
 
-  fun presentation(settings: ScreensaverConfig.Settings, nightPhoto: Boolean, splitGlance: Boolean): Presentation =
+  fun presentation(settings: ScreensaverConfig.Settings, nightPhoto: Boolean, splitGlance: Boolean,
+                   splitNight: Boolean = false): Presentation =
       Presentation(
           fill = settings.fit == ScreensaverConfig.FIT_FILL && settings.mode != ScreensaverConfig.MODE_WHOLE,
           motion = settings.photoMotion && settings.mode != ScreensaverConfig.MODE_WHOLE,
@@ -40,6 +41,7 @@ internal object PhotoFrameStagePolicy {
           gallerySpread = settings.mode == ScreensaverConfig.MODE_GALLERY_SPREAD,
           feature = when {
             nightPhoto -> SlideshowStage.Feature.NIGHT_PHOTO
+            splitGlance && splitNight -> SlideshowStage.Feature.SPLIT_NIGHT
             splitGlance -> SlideshowStage.Feature.SPLIT
             else -> SlideshowStage.Feature.NONE
           },

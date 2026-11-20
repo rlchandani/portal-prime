@@ -42,7 +42,8 @@ internal fun WhosTherePeopleBlock() {
   var consent by remember { mutableStateOf(false) }
   val unavailable = (ui.indicator as? WhosThereIndicator.Unavailable)?.message
   Card {
-    ToggleRow("Recognise people on this Portal", settings.enabled, iconColor = SettingsTileColors.PURPLE.argb(), iconSymbol = "👤") { on ->
+    ToggleRow("Recognise people on this Portal", settings.enabled, iconColor = SettingsTileColors.PURPLE.argb(),
+        iconRes = approvedIconResource("face")) { on ->
       if (on) consent = true else WhosThereStore.updateSettings(context) { it.copy(enabled = false) }
     }
   }

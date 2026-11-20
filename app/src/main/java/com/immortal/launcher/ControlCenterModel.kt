@@ -163,7 +163,14 @@ internal val CcKind.controllable: Boolean
       CcKind.CLIMATE, CcKind.MEDIA, CcKind.VALVE, CcKind.ALARM, CcKind.APPLIANCE)
 
 /** Connection to Home Assistant as the screens show it (see the mock's States group). */
-internal enum class CcPhase { NOT_CONFIGURED, CONNECTING, LIVE, STALE, UNREACHABLE, AUTH_FAILED, OFFLINE }
+internal enum class CcPhase { NOT_CONFIGURED, CONNECTING, LIVE, STALE, UNREACHABLE, AUTH_FAILED, OFFLINE;
+
+  /**
+   * The phases that cover the map with a state card (mock `OFFLINE()` minus loading): the rail keeps
+   * only Home and Settings, and Ask Jarvis waits, as in the mock.
+   */
+  val blocksHome: Boolean get() = this == UNREACHABLE || this == AUTH_FAILED || this == OFFLINE || this == NOT_CONFIGURED
+}
 
 @Immutable
 internal data class CcConnection(
