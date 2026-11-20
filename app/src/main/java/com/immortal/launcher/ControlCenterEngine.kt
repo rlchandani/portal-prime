@@ -109,9 +109,16 @@ internal class CcEngine(
   /** The conversation's state goes with its socket; waiting calls and streams learn they failed. */
   private fun forgetConversation() {
     protocol = null; subscribed = null; parts = emptyMap(); planResolved = false
-    calls.values.forEach { it.onResult?.invoke(false, null) }
-    calls = emptyMap()
+    failCalls()
     failStreams()
+  }
+
+  /** Calls in flight die with their socket: show HA's state again (as for a refusal), then tell the caller. */
+  private fun failCalls() {
+    val waiting = calls.values.toList()
+    calls = emptyMap()
+    waiting.forEach { info -> info.call.entityId?.let { live = live.failed(it) } }
+    waiting.forEach { it.onResult?.invoke(false, null) }
   }
 
   private fun connect() {
@@ -146,8 +153,7 @@ internal class CcEngine(
     socket?.cancel(); socket = null
     protocol = null; subscribed = null; parts = emptyMap(); planResolved = false
     heartbeat?.cancel(); heartbeat = null
-    calls.values.forEach { it.onResult?.invoke(false, null) }
-    calls = emptyMap()
+    failCalls()
     failStreams()
   }
 
