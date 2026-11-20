@@ -48,23 +48,23 @@ class PhotoFrameControllerTest {
   @Test
   fun prefetchOrder_startsAfterCurrentAndWraps() {
     // Playing index 2 ("p2"): the playlist continues v3, v4, p0, v1 — videos only.
-    assertEquals(listOf("v3", "v4", "v1"), PhotoFrameController.prefetchOrder(urls, videos, 2))
+    assertEquals(listOf("v3", "v4", "v1"), PhotoFrameDeck.prefetchOrder(urls, videos, 2))
   }
 
   @Test
   fun prefetchOrder_skipsTheCurrentlyPlayingVideo() {
     // Playing v1: it's already streaming; downloading it again would double the bandwidth.
-    assertEquals(listOf("v3", "v4"), PhotoFrameController.prefetchOrder(urls, videos, 1))
+    assertEquals(listOf("v3", "v4"), PhotoFrameDeck.prefetchOrder(urls, videos, 1))
   }
 
   @Test
   fun prefetchOrder_beforeFirstAdvanceUsesPlaylistOrder() {
-    assertEquals(listOf("v1", "v3", "v4"), PhotoFrameController.prefetchOrder(urls, videos, -1))
+    assertEquals(listOf("v1", "v3", "v4"), PhotoFrameDeck.prefetchOrder(urls, videos, -1))
   }
 
   @Test
   fun prefetchOrder_emptyInputs() {
-    assertEquals(emptyList<String>(), PhotoFrameController.prefetchOrder(emptyList(), videos, 0))
-    assertEquals(emptyList<String>(), PhotoFrameController.prefetchOrder(urls, emptySet(), 0))
+    assertEquals(emptyList<String>(), PhotoFrameDeck.prefetchOrder(emptyList(), videos, 0))
+    assertEquals(emptyList<String>(), PhotoFrameDeck.prefetchOrder(urls, emptySet(), 0))
   }
 }

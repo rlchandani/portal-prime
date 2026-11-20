@@ -82,6 +82,7 @@ class ScreensaverTouchRecoveryTest {
     `when`(context.getSystemService(PowerManager::class.java)).thenReturn(power)
     `when`(context.applicationContext).thenReturn(context)
     val frame = Mockito.mock(PhotoFrameController::class.java, Mockito.CALLS_REAL_METHODS)
+    PhotoFrameTestPorts.install(frame, context)
     val renderer = Mockito.mock(FaceRenderer::class.java) { call ->
       if (call.method.name == "handleAlarmTouch") alarm else Mockito.RETURNS_DEFAULTS.answer(call)
     }
