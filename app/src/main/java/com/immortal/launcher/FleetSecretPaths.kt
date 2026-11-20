@@ -19,15 +19,15 @@ import java.io.File
  * `no_backup/hearthpane_vmsg` and `no_backup/hearthpane_vmsg_out`, the phone outbox, and Who's
  * there's face templates ([WhosThereStore]) under `no_backup/whos_there`.
  *
- * [isReadBlocked] (`/fs/read`) refuses more: the app's whole private data directory
- * (`shared_prefs`, `databases`, `files`, `no_backup`, `app_*`, `cache`), which holds the household
- * key, the Home Assistant and music tokens, the phone sessions and every other credential; the
- * fleet manifest on external storage (it carries the fleet token); and the `/proc` entries that
- * reach another file or the process memory by a side door (`fd`, `map_files`, `mem`, `root`,
- * `cwd`, ...). Everything the fleet tools read stays readable: `/sdcard`, the installed APK under
- * `/data/app`, and `/proc/self/maps` and `cmdline`. Listing and writing are unchanged, so
- * `fleet-restore.sh --prefs` can still push an older plaintext snapshot back. Preferences leave
- * the Portal only sealed to the operator's USB-confirmed backup key ([FleetBackupRoutes]).
+ * [isPrivate] (`/fs/list`, `/fs/read` and `/fs/write`) refuses more: the app's whole private data
+ * directory (`shared_prefs`, `databases`, `files`, `no_backup`, `app_*`, `cache`), which holds the
+ * household key, the Home Assistant and music tokens, the phone sessions and every other
+ * credential; the fleet manifest on external storage (it carries the fleet token); and the `/proc`
+ * entries that reach another file or the process memory by a side door (`fd`, `map_files`, `mem`,
+ * `root`, `cwd`, ...). Everything the fleet tools use stays open: `/sdcard` (reads, dev APK
+ * pushes, frames), the installed APK under `/data/app` and `/proc/self/maps` and `cmdline`.
+ * Preferences leave the Portal only sealed to the operator's USB-confirmed backup key and come
+ * back only through the sealed import ([FleetBackupRoutes]), which validates and scopes them.
  *
  * Checked on canonical paths, so `..` and symlinks can't reach a store, and without touching the
  * Android context (the read route is context-free by design).
@@ -65,17 +65,23 @@ internal object FleetSecretPaths {
     return protectedStores.any { store -> parts.windowed(store.size).any { it == store } }
   }
 
-  /** True when `/fs/read` must refuse [target] (see the class comment). */
-  fun isReadBlocked(target: File, canonicalize: (File) -> File = File::getCanonicalFile): Boolean {
+  /**
+   * True when a fleet file route must refuse [target] (see the class comment). Judged on the path
+   * as requested and on its canonical form, so `..`, symlinks and the `/data/data`,
+   * `/data/user/<n>`, `data_mirror` and `/proc/self/root` aliases all land on the same rule.
+   */
+  fun isPrivate(target: File, canonicalize: (File) -> File = File::getCanonicalFile): Boolean {
     if (isBlocked(target)) return true
     val resolved = runCatching { canonicalize(target) }.getOrNull() ?: return true
-    return isReadBlockedParts(partsOf(target.absoluteFile), partsOf(resolved))
+    return isPrivateParts(partsOf(target.absoluteFile), partsOf(resolved))
   }
 
-  /** The read rule on path parts: [raw] as requested (absolute) and [resolved] canonical. */
-  internal fun isReadBlockedParts(raw: List<String>, resolved: List<String>): Boolean =
-      isProcSideDoor(raw) || isProcSideDoor(resolved) ||
-          privateDataRoots.any { startsWith(resolved, it) } || containsPattern(resolved, fleetManifest)
+  /** The rule on path parts: [raw] as requested (absolute) and [resolved] canonical. */
+  internal fun isPrivateParts(raw: List<String>, resolved: List<String>): Boolean =
+      listOf(raw, resolved).any { parts ->
+        isProcSideDoor(parts) || privateDataRoots.any { startsWith(parts, it) } ||
+            containsPattern(parts, fleetManifest)
+      }
 
   private fun isProcSideDoor(parts: List<String>): Boolean =
       parts.firstOrNull() == "proc" && parts.drop(2).any { it in procSideDoors }
