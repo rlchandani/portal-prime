@@ -26,53 +26,32 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.StartOffset
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusGroup
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -103,14 +82,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -126,7 +102,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -134,7 +109,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import kotlin.math.roundToInt
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -146,7 +120,6 @@ import com.immortal.launcher.ui.components.pollingState
 import com.immortal.launcher.ui.theme.LocalAdvancedSettings
 import com.immortal.launcher.ui.theme.ContentSecondary
 import com.immortal.launcher.ui.theme.PortalPrimeTheme
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -424,30 +397,6 @@ class HomeActivity : ComponentActivity() {
    */
   private fun launchStockHome() {
     PortalHomeBridge.launch(this)
-  }
-}
-
-@Composable
-internal fun ApprovedHomeDialog(
-    title: String,
-    onDismiss: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-  if (!LocalApprovedLauncherPageActive.current || !LocalApprovedWidgetPageInput.current) return
-  androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss,
-      properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
-    CompositionLocalProvider(LocalApprovedHomePopup provides true) {
-    ApprovedHomeSurface(Modifier.widthIn(max = 880.dp).fillMaxWidth(.8f).heightIn(max = 1096.dp), radius = 28.dp) {
-      Column(Modifier.padding(36.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-          Text(title, color = ApprovedHomePalette.Text, fontSize = 32.sp, lineHeight = 42.sp,
-              fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-          ApprovedHomeTextButton("Close", onClick = onDismiss)
-        }
-        content()
-      }
-    }
-    }
   }
 }
 
@@ -1319,86 +1268,6 @@ private fun LiquidGlassAppIconContent(
   }
 }
 
-/**
- * Full-screen "time's up" alarm overlay with an iOS-style slide-to-stop. Blocks touches from
- * reaching the grid beneath, so the only way out is the slider (or the 60s auto-silence).
- */
-@Composable
-private fun TimerAlarmOverlay(onStop: () -> Unit) {
-  val noRipple = remember { MutableInteractionSource() }
-  Box(
-      contentAlignment = Alignment.Center,
-      modifier =
-          Modifier.fillMaxSize()
-              .background(Glass.Scrim)
-              // Swallow taps so nothing behind the alarm reacts.
-              .clickable(interactionSource = noRipple, indication = null) {},
-  ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-      Text("⏰", fontSize = 68.sp)
-      Spacer(Modifier.size(18.dp))
-      Text("Timer", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold)
-      Text(
-          "Time's up",
-          color = Color(0xFFBFBFBF),
-          fontSize = 18.sp,
-          modifier = Modifier.padding(top = 6.dp),
-      )
-      Spacer(Modifier.size(44.dp))
-      SlideToStop(onStop = onStop)
-    }
-  }
-}
-
-/** A draggable thumb on a track; sliding it to the far end fires [onStop] (else it snaps back). */
-@Composable
-private fun SlideToStop(onStop: () -> Unit) {
-  val density = androidx.compose.ui.platform.LocalDensity.current
-  val trackWidth = 320.dp
-  val thumbSize = 56.dp
-  val inset = 4.dp
-  val maxOffset =
-      with(density) { (trackWidth - thumbSize - inset * 2).toPx() }.coerceAtLeast(0f)
-  val insetPx = with(density) { inset.roundToPx() }
-  var offsetX by remember { mutableStateOf(0f) }
-  Box(
-      modifier =
-          Modifier.width(trackWidth)
-              .height(64.dp)
-              .clip(RoundedCornerShape(32.dp))
-              .background(Color(0x33FFFFFF)),
-      contentAlignment = Alignment.CenterStart,
-  ) {
-    Text(
-        "Slide to stop",
-        color = Color(0xFFE8E8E8),
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Medium,
-        modifier = Modifier.align(Alignment.Center).alpha(1f - (offsetX / maxOffset).coerceIn(0f, 1f)),
-    )
-    Box(
-        modifier =
-            Modifier.offset { IntOffset(offsetX.roundToInt() + insetPx, 0) }
-                .size(thumbSize)
-                .clip(CircleShape)
-                .background(Color(0xFFE53935))
-                .pointerInput(Unit) {
-                  detectDragGestures(
-                      onDragEnd = { if (offsetX >= maxOffset * 0.9f) onStop() else offsetX = 0f },
-                      onDragCancel = { offsetX = 0f },
-                      onDrag = { change, dragAmount ->
-                        change.consume()
-                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, maxOffset)
-                      },
-                  )
-                },
-        contentAlignment = Alignment.Center,
-    ) {
-      Text("›", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-    }
-  }
-}
-
 private const val UPDATE_CHECK_INTERVAL_MS = 6L * 60 * 60 * 1000 // 6 hours
 
 // --- tile sizing ----------------------------------------------------------------
@@ -1420,29 +1289,6 @@ private fun gridColumnsFor(size: String): Int =
       ImmortalSettings.SIZE_XL -> 4
       ImmortalSettings.SIZE_LARGE -> 5
       else -> 6
-    }
-
-internal fun customWidgetLabel(kind: String): String =
-    when (kind) {
-      HomeWidgetStore.KIND_WEATHER -> "Weather"
-      HomeWidgetStore.KIND_WORLD_CLOCK -> "World Clock"
-      HomeWidgetStore.KIND_TIMERS -> "Timers"
-      HomeWidgetStore.KIND_CALENDAR -> "Calendar"
-      HomeWidgetStore.KIND_ALARM -> "Alarm"
-      HomeWidgetStore.KIND_CRYPTO -> "Crypto"
-      HomeWidgetStore.KIND_TODO -> "Household list"
-      HomeWidgetStore.KIND_ROUTINES -> "Routines"
-      HomeWidgetStore.KIND_CHORES -> "Chores"
-      HomeWidgetStore.KIND_CALLS -> "Calls"
-      HomeWidgetStore.KIND_NEWS -> "News"
-      HomeWidgetStore.KIND_STOCKS -> "Stocks"
-      HomeWidgetStore.KIND_OPTIONS -> "Options"
-      HomeWidgetStore.KIND_HA -> "Home Assistant"
-      HomeWidgetStore.KIND_TODAY -> "Today"
-      HomeWidgetStore.KIND_QUICK_CONTROLS -> "Quick Controls"
-      HomeWidgetStore.KIND_PHOTO_MEMORY -> "Photo Memory"
-      HomeWidgetStore.KIND_WIFI -> "Wi-Fi"
-      else -> "Widget"
     }
 
 @Composable
@@ -1531,26 +1377,6 @@ private fun ToolsTile(onClick: () -> Unit) {
 }
 
 @Composable
-private fun AddWidgetButton(onClick: () -> Unit) {
-  Surface(
-      color = Color(0xFF5B6BC0),
-      shape = RoundedCornerShape(30.dp),
-      modifier = Modifier.width(124.dp).height(60.dp).tvFocusable(RoundedCornerShape(30.dp)) {
-        onClick()
-      },
-  ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 20.dp),
-    ) {
-      Text("+", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Light)
-      Text("Widget", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-    }
-  }
-}
-
-@Composable
 private fun WidgetTile(
     widget: HomeWidgetStore.HomeWidget,
     host: AppWidgetHost,
@@ -1633,441 +1459,6 @@ private fun WidgetTile(
               .jiggle(!dimmed, widget.key.hashCode())
               .clip(RoundedCornerShape(20.dp))
               .background(Color(0x66000000)))
-    }
-  }
-}
-
-/** Add-flow ring after Add, and the bottom area the place-and-size bar covers. */
-private const val ADD_RING_MS = 1_200L
-private val ADD_BAR_AREA = 206.dp
-
-/** Saves [widget] exactly at [slot] with [span] if the current saved layout still has room. */
-private fun addIntoSlot(context: Context, widget: HomeWidgetStore.HomeWidget, slot: HomeWidgetStore.Slot,
-    span: Pair<Int, Int>): Boolean = synchronized(RemoteCompanionStore.mutationLock) {
-  val current = HomeWidgetStore.load(context)
-  val updated = HomeSlots.addAt(current, widget, slot, span) ?: return@synchronized false
-  HomeWidgetStore.replaceIfUnchanged(context, current, updated)
-}
-
-/** A keyboard-free duration picker (±steppers, remote/touch friendly) for a custom timer. */
-@Composable
-internal fun CustomTimerDialog(onStart: (Long) -> Unit, onDismiss: () -> Unit) {
-  var minutes by remember { mutableStateOf(5) }
-  var seconds by remember { mutableStateOf(0) }
-  ApprovedHomeDialog("Custom timer", onDismiss) {
-      Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(18.dp),
-        ) {
-          DurationStepper("min", minutes, step = 1) { minutes = (minutes + it).coerceIn(0, 180) }
-          Text(":", color = ApprovedHomePalette.Text, fontSize = 48.sp, lineHeight = 60.sp)
-          DurationStepper("sec", seconds, step = 5) { seconds = (seconds + it + 60) % 60 }
-        }
-        Spacer(Modifier.size(28.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-          TimerChip("Cancel") { onDismiss() }
-          TimerChip("Start ${minutes}:%02d".format(seconds), enabled = minutes > 0 || seconds > 0) {
-            onStart((minutes * 60 + seconds) * 1000L)
-          }
-        }
-      }
-  }
-}
-
-@Composable
-private fun DurationStepper(label: String, value: Int, step: Int, onChange: (Int) -> Unit) {
-  Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    Text(label.uppercase(Locale.getDefault()), color = ApprovedHomePalette.Secondary,
-        fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium)
-    Spacer(Modifier.size(8.dp))
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-      StepButton("−") { onChange(-step) }
-      Text("%02d".format(value), color = ApprovedHomePalette.Text, fontSize = 48.sp,
-          lineHeight = 60.sp, fontWeight = FontWeight.Normal)
-      StepButton("+") { onChange(step) }
-    }
-  }
-}
-
-@Composable
-private fun StepButton(label: String, onClick: () -> Unit) {
-  Surface(
-      color = ApprovedHomePalette.Chrome,
-      shape = RoundedCornerShape(16.dp),
-      modifier = Modifier.size(68.dp).tvFocusable(RoundedCornerShape(16.dp)) { onClick() },
-  ) {
-    Box(contentAlignment = Alignment.Center) {
-      Text(label, color = ApprovedHomePalette.Accent, fontSize = 26.sp, lineHeight = 35.sp)
-    }
-  }
-}
-
-@Composable
-private fun TimerChip(label: String, enabled: Boolean = true, onClick: () -> Unit) {
-  Surface(
-      color = ApprovedHomePalette.Chrome,
-      shape = RoundedCornerShape(16.dp),
-      modifier = Modifier.heightIn(min = 52.dp)
-          .tvFocusable(RoundedCornerShape(16.dp), enabled = enabled) { onClick() },
-  ) {
-    Text(
-        label,
-        color = if (enabled) ApprovedHomePalette.Accent else ApprovedHomePalette.Secondary,
-        fontSize = 22.sp,
-        lineHeight = 30.sp,
-        fontWeight = FontWeight.Medium,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 11.dp),
-    )
-  }
-}
-
-@Composable
-private fun WidgetPickerOverlay(
-    providers: List<WidgetProviderEntry>,
-    status: String?,
-    onPick: (WidgetProviderEntry) -> Unit,
-    onDismiss: () -> Unit,
-) {
-  val noRipple = remember { MutableInteractionSource() }
-  BackHandler { onDismiss() }
-  val gridFocus = remember { FocusRequester() }
-  LaunchedEffect(providers) { runCatching { gridFocus.requestFocus() } }
-
-  Box(
-      contentAlignment = Alignment.Center,
-      modifier =
-          Modifier.fillMaxSize()
-              .onPreviewKeyEvent { e ->
-                if (e.key == Key.Back || e.key == Key.Escape) {
-                  if (e.type == KeyEventType.KeyUp) onDismiss()
-                  true
-                } else false
-              }
-              .background(Glass.Scrim)
-              .clickable(interactionSource = noRipple, indication = null) { onDismiss() },
-  ) {
-    com.immortal.launcher.ui.components.DarkDialogSurface(
-        modifier =
-            Modifier.widthIn(max = 920.dp)
-                .fillMaxWidth(0.78f)
-                .heightIn(max = 620.dp)
-                .clickable(interactionSource = noRipple, indication = null) {},
-    ) {
-      Column(modifier = Modifier.padding(28.dp)) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-          Column(modifier = Modifier.weight(1f)) {
-            Text("Add widget", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
-            Text(
-                "Choose a widget provider installed on this Portal.",
-                color = Color(0xFF9A9A9A),
-                fontSize = 14.sp,
-                modifier = Modifier.padding(top = 4.dp),
-            )
-          }
-          Surface(
-              color = Color(0x33FFFFFF),
-              shape = CircleShape,
-              modifier = Modifier.size(44.dp).tvFocusable(CircleShape) { onDismiss() },
-          ) {
-            Box(contentAlignment = Alignment.Center) { Text("✕", color = Color.White, fontSize = 20.sp) }
-          }
-        }
-        if (status != null) {
-          Text(
-              status,
-              color = Color(0xFF8AB4F8),
-              fontSize = 13.sp,
-              modifier = Modifier.padding(top = 14.dp),
-          )
-        }
-        Spacer(Modifier.size(20.dp))
-        if (providers.isEmpty()) {
-          Box(
-              modifier = Modifier.fillMaxWidth().height(220.dp),
-              contentAlignment = Alignment.Center,
-          ) {
-            Text(
-                "No widget providers are installed.",
-                color = Color(0xFFB8B8B8),
-                fontSize = 16.sp,
-            )
-          }
-        } else {
-          LazyVerticalGrid(
-              columns = GridCells.Fixed(3),
-              horizontalArrangement = Arrangement.spacedBy(14.dp),
-              verticalArrangement = Arrangement.spacedBy(14.dp),
-              modifier = Modifier.focusRequester(gridFocus).focusGroup(),
-          ) {
-            items(providers, key = { it.info?.provider?.flattenToString() ?: "custom:${it.customKind}" }) { provider ->
-              WidgetProviderTile(provider = provider, onClick = { onPick(provider) })
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-@Composable
-private fun WidgetProviderTile(provider: WidgetProviderEntry, onClick: () -> Unit) {
-  Surface(
-      color = Color(0xFF29292C),
-      shape = RoundedCornerShape(18.dp),
-      modifier = Modifier.tvFocusable(RoundedCornerShape(18.dp)) { onClick() },
-  ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Surface(
-          color = Color(0xFF38383C),
-          shape = RoundedCornerShape(14.dp),
-          modifier = Modifier.size(58.dp),
-      ) {
-        Box(contentAlignment = Alignment.Center) {
-          if (provider.icon != null) {
-            Image(
-                bitmap = provider.icon,
-                contentDescription = null,
-                modifier = Modifier.size(42.dp).clip(RoundedCornerShape(10.dp)),
-            )
-          } else if (provider.customKind != null) {
-            CustomWidgetGlyph(provider.customKind)
-          } else {
-            WidgetGlyph()
-          }
-        }
-      }
-      Column(modifier = Modifier.padding(start = 14.dp).weight(1f)) {
-        Text(
-            provider.label,
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Text(
-            provider.packageLabel,
-            color = Color(0xFF9A9A9A),
-            fontSize = 12.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 3.dp),
-        )
-        Text(
-            "${provider.spanX} x ${provider.spanY}",
-            color = Color(0xFF7C7C7C),
-            fontSize = 11.sp,
-            modifier = Modifier.padding(top = 5.dp),
-        )
-      }
-    }
-  }
-}
-
-@Composable
-private fun CustomWidgetGlyph(kind: String) {
-  val emoji =
-      when (kind) {
-        HomeWidgetStore.KIND_WEATHER -> "☁"
-        HomeWidgetStore.KIND_WORLD_CLOCK -> "◷"
-        HomeWidgetStore.KIND_TIMERS -> "⏱"
-        HomeWidgetStore.KIND_CRYPTO -> "₿"
-        HomeWidgetStore.KIND_TODO -> "✓"
-        HomeWidgetStore.KIND_ROUTINES -> "★"
-        HomeWidgetStore.KIND_CHORES -> "★"
-        HomeWidgetStore.KIND_CALLS -> "☎"
-        HomeWidgetStore.KIND_NEWS -> "📰"
-        HomeWidgetStore.KIND_STOCKS -> "📈"
-        HomeWidgetStore.KIND_OPTIONS -> "Δ"
-        HomeWidgetStore.KIND_HA -> "🏠"
-        HomeWidgetStore.KIND_WIFI -> "📶"
-        else -> "+"
-      }
-  Text(emoji, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
-}
-
-@Composable
-private fun WidgetGlyph() {
-  val path = remember { PathParser().parsePathString(ICON_WIDGETS).toPath() }
-  Canvas(Modifier.size(28.dp)) {
-    val s = size.minDimension / 24f
-    scale(s, s, pivot = Offset.Zero) { drawPath(path, Color.White) }
-  }
-}
-
-/**
- * iOS-style "jiggle": a gentle continuous wobble applied to editable tiles while Manage mode is on.
- * Each tile is given a [seed] so they fall slightly out of phase (rather than wobbling in lockstep).
- * The animation only exists while [enabled]; it leaves composition when Manage mode ends so the
- * long-lived launcher isn't animating in the background.
- */
-@Composable
-private fun Modifier.jiggle(enabled: Boolean, seed: Int): Modifier {
-  if (!enabled) return this
-  val transition = rememberInfiniteTransition(label = "jiggle")
-  val angle by
-      transition.animateFloat(
-          initialValue = -1.0f,
-          targetValue = 1.0f,
-          animationSpec =
-              infiniteRepeatable(
-                  animation = tween(durationMillis = 260, easing = FastOutSlowInEasing),
-                  repeatMode = RepeatMode.Reverse,
-                  initialStartOffset = StartOffset(0),
-              ),
-          label = "jiggle-angle",
-      )
-  val bob by
-      transition.animateFloat(
-          initialValue = -0.8f,
-          targetValue = 0.8f,
-          animationSpec =
-              infiniteRepeatable(
-                  animation = tween(durationMillis = 260, easing = FastOutSlowInEasing),
-                  repeatMode = RepeatMode.Reverse,
-                  initialStartOffset = StartOffset(0),
-              ),
-          label = "jiggle-bob",
-      )
-  return this.graphicsLayer {
-    rotationZ = angle
-    translationY = bob
-    compositingStrategy = CompositingStrategy.Offscreen
-  }
-}
-
-/**
- * Round red delete affordance with a crisply-drawn, perfectly-centered ✕ (the unicode glyph
- * isn't vertically centered inside its line box, so it's drawn as two crossing strokes instead).
- */
-@Composable
-private fun RemoveBadge(size: Dp, modifier: Modifier = Modifier, onClick: () -> Unit) {
-  Surface(
-      color = Color(0xFFE53935),
-      shape = CircleShape,
-      modifier = modifier.size(size).tvFocusable(CircleShape) { onClick() },
-  ) {
-    Canvas(Modifier.fillMaxSize()) {
-      val cx = this.size.width / 2f
-      val cy = this.size.height / 2f
-      val arm = this.size.minDimension * 0.21f
-      val stroke = this.size.minDimension * 0.11f
-      drawLine(
-          Color.White,
-          Offset(cx - arm, cy - arm),
-          Offset(cx + arm, cy + arm),
-          strokeWidth = stroke,
-          cap = StrokeCap.Round,
-      )
-      drawLine(
-          Color.White,
-          Offset(cx - arm, cy + arm),
-          Offset(cx + arm, cy - arm),
-          strokeWidth = stroke,
-          cap = StrokeCap.Round,
-      )
-    }
-  }
-}
-
-/**
- * Gray minus badge for iOS-style edit mode on app icons.
- */
-@Composable
-private fun MinusBadge(modifier: Modifier = Modifier, onClick: () -> Unit) {
-  Surface(
-      color = Color(0xE6C7C7CC),
-      shape = CircleShape,
-      modifier = modifier
-          .size(32.dp)
-          .semantics { contentDescription = "Remove item" }
-          .clickable(
-              interactionSource = remember { MutableInteractionSource() },
-              indication = null
-          ) { onClick() },
-  ) {
-    Canvas(Modifier.fillMaxSize()) {
-      val cx = this.size.width / 2f
-      val cy = this.size.height / 2f
-      val armWidth = this.size.minDimension * 0.30f
-      val stroke = this.size.minDimension * 0.12f
-      drawLine(
-          Color.White,
-          Offset(cx - armWidth, cy),
-          Offset(cx + armWidth, cy),
-          strokeWidth = stroke,
-          cap = StrokeCap.Round,
-      )
-    }
-  }
-}
-
-/**
- * Resize control for widgets: PRESS-AND-DRAG the bottom-right handle to resize (iOS/Android style).
- * Reports the accumulated drag delta continuously via [onResizeDrag]; the caller snaps to grid
- * sizes. [onResizeStart]/[onResizeEnd] bracket the gesture so the caller can capture the start span
- * and reset its accumulator. The drag consumes its pointer events so it never triggers the widget
- * body's reorder handle.
- */
-@Composable
-internal fun ResizeBadge(
-    modifier: Modifier = Modifier,
-    onResizeStart: () -> Unit,
-    onResizeDrag: (dragDelta: Offset) -> Unit,
-    onResizeEnd: () -> Unit,
-    onResizeCancel: () -> Unit,
-) {
-  // Keep latest callbacks so the long-lived pointerInput lambda always calls the current versions.
-  val startState = rememberUpdatedState(onResizeStart)
-  val dragState = rememberUpdatedState(onResizeDrag)
-  val endState = rememberUpdatedState(onResizeEnd)
-  val cancelState = rememberUpdatedState(onResizeCancel)
-  Surface(
-      color = Color(0xE6C7C7CC),
-      shape = CircleShape,
-      modifier = modifier
-          .size(48.dp)
-          .semantics { contentDescription = "Resize widget" }
-          .pointerInput(Unit) {
-            var resizing = false
-            try {
-              detectDragGestures(
-                  onDragStart = { resizing = true; startState.value() },
-                  onDragEnd = { resizing = false; endState.value() },
-                  onDragCancel = { resizing = false; cancelState.value() },
-              ) { change, dragAmount ->
-                // Consume so the reorderable grid's drag handle does not also react to this pointer.
-                change.consume()
-                dragState.value(dragAmount)
-              }
-            } finally {
-              if (resizing) cancelState.value()
-            }
-          },
-  ) {
-    Canvas(Modifier.fillMaxSize().padding(8.dp)) {
-      // Double-headed diagonal resize arrow (↖ ↘): a diagonal shaft with an arrowhead at each end.
-      val d = this.size.minDimension
-      val stroke = d * 0.09f
-      val m = d * 0.30f                 // arrow tip inset from edges
-      val tl = Offset(m, m)             // top-left tip
-      val br = Offset(d - m, d - m)     // bottom-right tip
-      val head = d * 0.14f              // arrowhead leg length
-      // shaft
-      drawLine(Color.White, tl, br, strokeWidth = stroke, cap = StrokeCap.Round)
-      // top-left arrowhead (two legs)
-      drawLine(Color.White, tl, Offset(tl.x + head, tl.y), strokeWidth = stroke, cap = StrokeCap.Round)
-      drawLine(Color.White, tl, Offset(tl.x, tl.y + head), strokeWidth = stroke, cap = StrokeCap.Round)
-      // bottom-right arrowhead (two legs)
-      drawLine(Color.White, br, Offset(br.x - head, br.y), strokeWidth = stroke, cap = StrokeCap.Round)
-      drawLine(Color.White, br, Offset(br.x, br.y - head), strokeWidth = stroke, cap = StrokeCap.Round)
     }
   }
 }
@@ -2268,121 +1659,4 @@ private fun ApprovedFavoriteTile(app: AppEntry, modifier: Modifier, onClick: () 
           lineHeight = 30.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
   }
-}
-
-@Composable
-private fun ApprovedAppActions(
-    app: AppEntry,
-    assignments: Map<String, String>,
-    favorite: Boolean,
-    onLaunch: () -> Unit,
-    onFavorite: () -> Unit,
-    onFolder: (String) -> Unit,
-    onUninstall: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-  val context = androidx.compose.ui.platform.LocalContext.current
-  var confirmUninstall by remember { mutableStateOf(false) }
-  var editingFolder by remember { mutableStateOf(false) }
-  var newFolder by remember { mutableStateOf("") }
-  ApprovedHomeDialog(app.label, onDismiss) {
-    if (confirmUninstall) {
-      Text("Uninstall ${app.label}? Android will ask you to confirm.", color = ApprovedHomePalette.Secondary, fontSize = 23.sp)
-      ApprovedHomeTextButton("Cancel") { confirmUninstall = false }
-      ApprovedHomeTextButton("Uninstall", onClick = onUninstall)
-    } else if (editingFolder) {
-      Text("Move to folder", color = ApprovedHomePalette.Text, fontSize = 26.sp)
-      (assignments.values + Curation.folders.values).filter { it.isNotBlank() }.distinct().sorted().forEach { name ->
-        ApprovedHomeTextButton(name, Modifier.fillMaxWidth()) { onFolder(name) }
-      }
-      androidx.compose.material3.OutlinedTextField(newFolder, { newFolder = it }, singleLine = true,
-          placeholder = { Text("New folder name") }, modifier = Modifier.fillMaxWidth())
-      ApprovedHomeTextButton("Create folder", enabled = newFolder.isNotBlank()) { onFolder(newFolder.trim()) }
-      ApprovedHomeTextButton("Remove from folder") { onFolder("") }
-    } else {
-      ApprovedHomeTextButton("Open", onClick = onLaunch)
-      ApprovedHomeTextButton(if (favorite) "Remove from favorites" else "Add to favorites", onClick = onFavorite)
-      ApprovedHomeTextButton("Move to folder") { editingFolder = true }
-      if (app.component.packageName != context.packageName) {
-        ApprovedHomeTextButton("App info") {
-          runCatching { context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-              Uri.parse("package:${app.component.packageName}"))) }; onDismiss()
-        }
-        ApprovedHomeTextButton("Close app") {
-          runCatching { (context.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager)
-              .killBackgroundProcesses(app.component.packageName) }; onDismiss()
-        }
-      }
-      if (app.uninstallable) ApprovedHomeTextButton("Uninstall") { confirmUninstall = true }
-    }
-  }
-}
-
-@Composable
-private fun ApprovedWidgetLibrary(
-    advanced: Boolean,
-    configured: List<HomeWidgetStore.HomeWidget>,
-    providers: List<WidgetProviderEntry>?,
-    room: String,
-    connected: Boolean?,
-    onAdd: (String) -> Unit,
-    onProvider: (WidgetProviderEntry) -> Unit,
-    onDismiss: () -> Unit,
-    onHome: () -> Unit,
-    onCustomize: () -> Unit,
-    onRefresh: () -> Unit,
-    onPair: () -> Unit,
-    onSleep: () -> Unit,
-    onSearch: () -> Unit,
-    onSettings: () -> Unit,
-) {
-  var showProviders by rememberSaveable { mutableStateOf(false) }
-  val kinds = remember(configured) { configured.map { it.kind }.toSet() }
-  val builtIns = remember {
-    listOf(
-        Triple(HomeWidgetStore.KIND_TODAY, "Today", "calendar"),
-        Triple(HomeWidgetStore.KIND_HA, "Home Assistant", "ha_widget"),
-        Triple(HomeWidgetStore.KIND_CALENDAR, "Calendar", "calendar"),
-        Triple(HomeWidgetStore.KIND_WEATHER, "Weather", "weather"),
-        Triple(HomeWidgetStore.KIND_ALARM, "Alarm", "alarm"),
-        Triple(HomeWidgetStore.KIND_WORLD_CLOCK, "World clock", "clock"),
-        Triple(HomeWidgetStore.KIND_CRYPTO, "Crypto", "calculator"),
-        Triple(HomeWidgetStore.KIND_QUICK_CONTROLS, "Quick controls", "tools"),
-        Triple(HomeWidgetStore.KIND_PHOTO_MEMORY, "Photo memory", "photo"),
-        Triple(HomeWidgetStore.KIND_TIMERS, "Timers", "timer"),
-        Triple(HomeWidgetStore.KIND_TODO, "Household list", "notes"),
-        Triple(HomeWidgetStore.KIND_WIFI, "Wi-Fi", "wifi"),
-        Triple(HomeWidgetStore.KIND_CHORES, "Chores", "tools"),
-        Triple(HomeWidgetStore.KIND_CALLS, "Calls", "calls"),
-        Triple(HomeWidgetStore.KIND_NEWS, "News", "globe"),
-        Triple(HomeWidgetStore.KIND_STOCKS, "Stocks", "calculator"),
-        Triple(HomeWidgetStore.KIND_OPTIONS, "Options", "calculator"),
-        Triple(HomeWidgetStore.KIND_APP_WIDGET, "Android app widget", "apps"),
-    )
-  }
-  val choices = remember(advanced, kinds, builtIns) {
-    builtIns.filter { advanced || it.first != HomeWidgetStore.KIND_OPTIONS }
-        .map { (kind, title, icon) ->
-          ApprovedHomeLibraryCard(kind, title, icon, if (kind in kinds) "On your home" else "Add to your home")
-        }
-  }
-  val providerByKey = remember(providers) {
-    providers.orEmpty().associateBy { it.info!!.provider.flattenToString() }
-  }
-  val providerCards = remember(providerByKey) {
-    providerByKey.map { (key, entry) ->
-      ApprovedHomeLibraryCard(key, entry.label, "apps", entry.packageLabel, entry.icon)
-    }
-  }
-  ApprovedHomeWidgetLibraryScreen(
-      room, connected, if (showProviders) providerCards else choices, showProviders, providers == null,
-      onSelect = { key ->
-        if (showProviders) providerByKey[key]?.let(onProvider)
-        else if (key == HomeWidgetStore.KIND_APP_WIDGET) showProviders = true
-        else onAdd(key)
-      },
-      onBack = { if (showProviders) showProviders = false else onDismiss() },
-      onHome = onHome, onCustomize = onCustomize, onRefresh = onRefresh,
-      onPair = onPair, onSleep = onSleep, onSearch = onSearch, onSettings = onSettings,
-  )
 }
