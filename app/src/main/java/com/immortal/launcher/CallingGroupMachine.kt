@@ -28,7 +28,8 @@ internal object CallGroupMachine {
     is CallEvent.RemoteMoved -> if (event.id == call.id && call.move?.to == event.from && targetLive(call))
       completeMove(state, call, event.now) else CallStep(state)
     // Only the phone we took the call over from may ask for it back; its tap there is the consent.
-    is CallEvent.RemotePull -> if (event.id == call.id && call.cameFrom == event.from && CallPhoneId.isPhone(event.from))
+    is CallEvent.RemotePull -> if (event.id == call.id && call.cameFrom == event.from && CallPhoneId.isPhone(event.from) &&
+        event.now - (call.cameFromMs ?: Long.MIN_VALUE / 2) in 0..CallTimings.PULL_WINDOW_MS)
       addPerson(state, call, CallContact(event.from, call.cameFromName ?: "Phone", kind = CallContact.Kind.PHONE), event.now, move = true)
     else CallStep(state)
     is CallEvent.RemoteJoin -> remoteJoin(state, call, event)
@@ -188,7 +189,8 @@ internal object CallGroupMachine {
     val next = call.copy(legs = call.legs - leg, notice = CallNotice(leg.peer.name, reason, now, to = to, move = moveOff),
         move = if (moveOff) null else call.move?.takeUnless { it.from == leg.peer.deviceId },
         cameFrom = if (call.move?.from == leg.peer.deviceId) leg.peer.deviceId else call.cameFrom,
-        cameFromName = if (call.move?.from == leg.peer.deviceId) leg.peer.name else call.cameFromName)
+        cameFromName = if (call.move?.from == leg.peer.deviceId) leg.peer.name else call.cameFromName,
+        cameFromMs = if (call.move?.from == leg.peer.deviceId) now else call.cameFromMs)
     val effects = buildList {
       if (tell) add(CallEffect.SendEnd(call.id, leg.peer.deviceId, reason))
       if (leg.phase != LegPhase.RINGING) add(CallEffect.ClosePeer(leg.peer.deviceId))
@@ -211,7 +213,8 @@ internal object CallGroupMachine {
         // The first member moved away from us, so the move (if we were its target) is complete for us.
         move = call.move?.takeUnless { it.from == call.peer.deviceId },
         cameFrom = if (call.move?.from == call.peer.deviceId) call.peer.deviceId else call.cameFrom,
-        cameFromName = if (call.move?.from == call.peer.deviceId) call.peer.name else call.cameFromName)
+        cameFromName = if (call.move?.from == call.peer.deviceId) call.peer.name else call.cameFromName,
+        cameFromMs = if (call.move?.from == call.peer.deviceId) now else call.cameFromMs)
     return CallStep(state.copy(call = next), listOfNotNull(first, CallEffect.ClosePeer(call.peer.deviceId)))
   }
 

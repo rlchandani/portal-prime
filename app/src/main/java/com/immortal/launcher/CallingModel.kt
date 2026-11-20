@@ -198,6 +198,8 @@ internal object CallTimings {
   const val MOVE_SETTLE_MS = 8_000L
   /** "Move it back here": the phone's move ring is taken without a second tap for this long. */
   const val PULL_BACK_MS = 20_000L
+  /** The phone a call moved from may ask for it back only this soon after the move. */
+  const val PULL_WINDOW_MS = 120_000L
   /** History is kept on this Portal for 30 days. */
   const val HISTORY_KEEP_MS = 30L * 24 * 60 * 60_000L
 }

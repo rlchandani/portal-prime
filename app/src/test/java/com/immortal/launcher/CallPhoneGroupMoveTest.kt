@@ -219,6 +219,7 @@ class CallPhoneGroupMoveTest {
     assertEquals(phone.deviceId, s.call!!.cameFrom)
     assertEquals(s, reduce(s, CallEvent.RemotePull(id, "phfedcba9876543210", t0 + 5_000)).state)
     assertEquals(s, reduce(s, CallEvent.RemotePull("ffffffffffffffff", phone.deviceId, t0 + 5_000)).state)
+    assertEquals("too late", s, reduce(s, CallEvent.RemotePull(id, phone.deviceId, t0 + 4_001 + CallTimings.PULL_WINDOW_MS)).state)
     val pulled = reduce(s, CallEvent.RemotePull(id, phone.deviceId, t0 + 5_000))
     val ringBack = pulled.effects.filterIsInstance<CallEffect.SendGroupRing>().single()
     assertTrue(ringBack.move)

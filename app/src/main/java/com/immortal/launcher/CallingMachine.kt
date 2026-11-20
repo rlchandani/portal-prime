@@ -56,6 +56,8 @@ internal data class ActiveCall(
     /** The phone this call moved here from: only it may ask for the call back ("Move it back here"). */
     val cameFrom: String? = null,
     val cameFromName: String? = null,
+    /** When it moved here: a pull is honoured only for [CallTimings.PULL_WINDOW_MS] after that. */
+    val cameFromMs: Long? = null,
 ) {
   /** Everyone else in (or being added to) this call, [peer] first. */
   val members: List<CallContact> get() = listOf(peer) + legs.map { it.peer }
