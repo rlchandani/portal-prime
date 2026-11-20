@@ -136,23 +136,10 @@ private fun RoomCardCompact(peer: CallPeer, self: String, now: Long) {
           { CallingStore.setFavourite(context, peer.id, !peer.favourite) }, surface = if (peer.favourite)
             surface.copy(fill = HearthpaneMark.EmberLight.copy(alpha = 0.3f), ink = HearthpaneMark.Ember) else surface, size = 72.dp)
     }
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      val plain = p.surface2
-      when {
-        !calls -> CallChip("Calls off", "bellOff", CallChipTone.RED, plain, p.secondary)
-        drop == DropInPolicy.CHIME -> CallChip("Drop-ins on", "door", CallChipTone.OK, plain, p.secondary)
-        drop == DropInPolicy.ASK -> CallChip("Asks first", "door", CallChipTone.PLAIN, plain, p.secondary)
-        else -> CallChip("Drop-ins off", "door", CallChipTone.PLAIN, plain, p.secondary)
-      }
-    }
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-      CallPill("Video call", { Calling.dial(context, peer.id, CallKind.CALL, video = true) },
-          Modifier.jarvisPulse(LocalJarvisPulse.current == ScreenContext.CALL_VIDEO_TARGET + peer.id, 48.dp), icon = "video",
-          style = CallButtonStyle.OK, enabled = calls, surface = surface, size = CallButtonSize.SM)
-      CallPill(when (drop) { DropInPolicy.CHIME -> "Drop in"; DropInPolicy.ASK -> "Ask to join"; DropInPolicy.OFF -> "Not allowed" },
-          { Calling.dial(context, peer.id, CallKind.DROP_IN, video = true) }, icon = "door", enabled = calls && drop != DropInPolicy.OFF,
-          surface = surface, size = CallButtonSize.SM)
-      CallRoundButton("phone", "Audio call", { Calling.dial(context, peer.id, CallKind.CALL, video = false) }, surface = surface, size = 72.dp)
+    RoomNote(CallRoomActions.note(calls, drop))
+    val actions = CallRoomActions.of(calls, drop)
+    if (actions.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+      RoomActions(peer, actions, drop, surface, compact = true)
     }
   }
 }
@@ -206,23 +193,46 @@ private fun RoomCard(peer: CallPeer, self: String, now: Long) {
           { CallingStore.setFavourite(context, peer.id, !peer.favourite) }, surface = if (peer.favourite)
             surface.copy(fill = HearthpaneMark.EmberLight.copy(alpha = 0.3f), ink = HearthpaneMark.Ember) else surface, size = 72.dp)
     }
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      val plain = p.surface2
-      when {
-        !calls -> CallChip("Calls off", "bellOff", CallChipTone.RED, plain, p.secondary)
-        drop == DropInPolicy.CHIME -> CallChip("Drop-ins on", "door", CallChipTone.OK, plain, p.secondary)
-        drop == DropInPolicy.ASK -> CallChip("Asks first", "door", CallChipTone.PLAIN, plain, p.secondary)
-        else -> CallChip("Drop-ins off", "door", CallChipTone.PLAIN, plain, p.secondary)
-      }
+    RoomNote(CallRoomActions.note(calls, drop))
+    val actions = CallRoomActions.of(calls, drop)
+    if (actions.isNotEmpty()) Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+      RoomActions(peer, actions, drop, surface, compact = false)
     }
-    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-      CallPill("Video call", { Calling.dial(context, peer.id, CallKind.CALL, video = true) },
+  }
+}
+
+/** Only what the room will take: video, drop-in (or ask), audio — never a greyed "Not allowed". */
+@Composable
+private fun RoomActions(peer: CallPeer, actions: List<CallRoomAction>, drop: DropInPolicy, surface: CallSurface, compact: Boolean) {
+  val context = LocalContext.current
+  val size = if (compact) CallButtonSize.SM else CallButtonSize.MD
+  actions.forEach { action ->
+    when (action) {
+      CallRoomAction.VIDEO -> CallPill("Video call", { Calling.dial(context, peer.id, CallKind.CALL, video = true) },
           Modifier.jarvisPulse(LocalJarvisPulse.current == ScreenContext.CALL_VIDEO_TARGET + peer.id, 48.dp), icon = "video",
-          style = CallButtonStyle.OK, enabled = calls, surface = surface)
-      CallPill(when (drop) { DropInPolicy.CHIME -> "Drop in"; DropInPolicy.ASK -> "Ask to join"; DropInPolicy.OFF -> "Not allowed" },
-          { Calling.dial(context, peer.id, CallKind.DROP_IN, video = true) }, icon = "door", enabled = calls && drop != DropInPolicy.OFF,
-          surface = surface)
-      CallRoundButton("phone", "Audio call", { Calling.dial(context, peer.id, CallKind.CALL, video = false) }, surface = surface)
+          style = CallButtonStyle.OK, surface = surface, size = size)
+      CallRoomAction.DROP_IN -> CallPill(CallRoomActions.dropInLabel(drop),
+          { Calling.dial(context, peer.id, CallKind.DROP_IN, video = true) }, icon = "door", surface = surface, size = size)
+      CallRoomAction.AUDIO -> if (compact) CallRoundButton("phone", "Audio call",
+          { Calling.dial(context, peer.id, CallKind.CALL, video = false) }, surface = surface, size = 72.dp)
+      else CallRoundButton("phone", "Audio call", { Calling.dial(context, peer.id, CallKind.CALL, video = false) }, surface = surface)
+    }
+  }
+}
+
+/** The room's drop-in status: a chip when it says something you can use, a quiet line when drop-ins are off. */
+@Composable
+private fun RoomNote(note: CallRoomActions.Note) {
+  val p = LocalApprovedPalette.current
+  val plain = p.surface2
+  when (note) {
+    CallRoomActions.Note.CALLS_OFF -> CallChip(note.text, "bellOff", CallChipTone.RED, plain, p.secondary)
+    CallRoomActions.Note.DROP_INS_ON -> CallChip(note.text, "door", CallChipTone.OK, plain, p.secondary)
+    CallRoomActions.Note.ASKS_FIRST -> CallChip(note.text, "door", CallChipTone.PLAIN, plain, p.secondary)
+    CallRoomActions.Note.DROP_INS_OFF -> Row(Modifier.height(56.dp), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+      CallIcon("door", p.secondary.copy(alpha = QUIET_NOTE_ALPHA), 24.dp)
+      Text(note.text, color = p.secondary.copy(alpha = QUIET_NOTE_ALPHA), fontSize = 21.sp, maxLines = 1)
     }
   }
 }
@@ -335,3 +345,5 @@ private fun RecentRow(item: RecentItem, compact: Boolean) {
 private const val COLUMNS = 2
 private const val PRESENCE_TICK_MS = 5_000L
 private val EMBER_TEXT = androidx.compose.ui.graphics.Color(0xFFB4561C)
+
+private const val QUIET_NOTE_ALPHA = .8f
