@@ -22,3 +22,15 @@
 # Hearthpane Calling: libwebrtc calls back into Java through JNI (@CalledByNative), by name.
 -keep class org.webrtc.** { *; }
 -dontwarn org.webrtc.**
+
+# Cold start: keep code that names classes missing on Android 10 (API 29) out of the classes Home's
+# first frame loads. R8 merged or inlined these into Compose startup classes (Recomposer's Latch,
+# MeasureAndLayoutDelegate's depth sets, AndroidParagraph, animateValueAsState's coroutine), so the
+# install-time verifier soft-failed them and ART re-verified them on the main thread in every cold
+# start's first frame (~15 ms on a Portal+). `allowoptimization` is deliberately absent: it allows merging.
+# StartupVerificationRulesTest checks that every class named here still exists.
+-keep,allowshrinking,allowobfuscation class androidx.media3.exoplayer.mediacodec.LoudnessCodecController
+-keep,allowshrinking,allowobfuscation class androidx.media3.exoplayer.trackselection.DefaultTrackSelector$SpatializerWrapperV32
+-keep,allowshrinking,allowobfuscation class androidx.compose.ui.scrollcapture.**
+-keep,allowshrinking,allowobfuscation class androidx.compose.ui.text.android.AndroidLayoutApi34 { <methods>; }
+-keep,allowshrinking,allowobfuscation class androidx.compose.ui.text.android.selection.Api34SegmentFinder { <methods>; }
