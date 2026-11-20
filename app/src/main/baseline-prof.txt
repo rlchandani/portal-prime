@@ -102,6 +102,12 @@ HPLcom/immortal/launcher/HomeGreetingKt;->**(**)**
 HPLcom/immortal/launcher/HomeGreetingKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeMusicCardKt;->**(**)**
 HPLcom/immortal/launcher/HomeMusicCardKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeWidgetGridKt;->**(**)**
+HPLcom/immortal/launcher/HomeWidgetGridKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeWidgetHostKt;->**(**)**
+HPLcom/immortal/launcher/HomeWidgetHostKt$**;->**(**)**
+HPLcom/immortal/launcher/HomeWidgetPagesKt;->**(**)**
+HPLcom/immortal/launcher/HomeWidgetPagesKt$**;->**(**)**
 HPLcom/immortal/launcher/HomeHeader*;->**(**)**
 HPLcom/immortal/launcher/HomeMusicCover*;->**(**)**
 HPLcom/immortal/launcher/MusicHome*;->**(**)**
