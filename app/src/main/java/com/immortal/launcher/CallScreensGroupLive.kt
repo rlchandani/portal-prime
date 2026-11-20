@@ -21,7 +21,8 @@ import androidx.compose.ui.unit.dp
 internal data class CallAddControl(val label: String, val look: ControlLook, val onClick: () -> Unit) {
   companion object {
     fun of(call: ActiveCall, context: Context, open: () -> Unit): CallAddControl {
-      val possible = call.kind == CallKind.CALL && !call.peer.phone && call.phase == CallPhase.LIVE &&
+      // Phase 2b: a call with a phone can grow too (one phone per call, never an auto-answered call).
+      val possible = call.kind == CallKind.CALL && call.phase == CallPhase.LIVE && !call.locked && call.move == null &&
           CallingConfig.load(context).groupsOn
       return when {
         !possible -> CallAddControl(ADD, ControlLook.DISABLED) {}
@@ -37,7 +38,8 @@ internal data class CallAddControl(val label: String, val look: ControlLook, val
 /** A group call on screen: tiles, the live bar with "N of 4", the same controls, volume. */
 @Composable
 internal fun CallGroupLive(call: ActiveCall, media: CallMedia?, motion: Boolean, layout: LayoutClass, volumeOpen: Boolean,
-                           onVolume: () -> Unit, add: CallAddControl, toast: CallToastState, probe: Boolean = false) {
+                           onVolume: () -> Unit, add: CallAddControl, toast: CallToastState, probe: Boolean = false,
+                           move: CallMoveAction) {
   val edge = (CallsCompactLayout.edge(layout) + TILE_INSET).dp
   val ctl = CallsCompactLayout.controls(layout)
   val framing = { toast.show("Portal frames you automatically", "follow") }
@@ -47,8 +49,8 @@ internal fun CallGroupLive(call: ActiveCall, media: CallMedia?, motion: Boolean,
         Modifier.align(Alignment.TopStart).padding(edge))
     if (volumeOpen) CallVolumePopover(Modifier.align(Alignment.BottomCenter).padding(bottom = (ctl.bottom + ctl.height).dp + POPOVER_GAP))
     val bottom = Modifier.align(Alignment.BottomCenter).padding(bottom = ctl.bottom.dp)
-    if (layout.compact) CompactCallControls(call, ctl, volumeOpen, onVolume, framing, add, bottom)
-    else CallControls(call, volumeOpen, onVolume, framing, add, bottom)
+    if (layout.compact) CompactCallControls(call, ctl, volumeOpen, onVolume, framing, add, move, bottom)
+    else CallControls(call, volumeOpen, onVolume, framing, add, move, bottom)
   }
 }
 

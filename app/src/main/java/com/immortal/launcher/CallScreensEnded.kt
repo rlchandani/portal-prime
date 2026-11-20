@@ -102,9 +102,13 @@ private fun androidx.compose.foundation.layout.BoxScope.EndedCompact(ended: Ende
   }
 }
 
-/** Mock `noanswerScr` / `callQuietScr`: an outgoing call to a Portal that nobody took can leave a video message. */
+/**
+ * Mock `noanswerScr` / `callQuietScr`: an outgoing call that nobody took can leave a video message.
+ * Phase 2b: phones too, including one whose Portal Toolkit was closed (it collects the message later).
+ */
 internal fun canLeaveMessage(ended: EndedCall): Boolean =
-    ended.direction == CallDirection.OUTGOING && ended.kind == CallKind.CALL && ended.reason in MESSAGE_REASONS &&
+    ended.direction == CallDirection.OUTGOING && ended.kind == CallKind.CALL &&
+        (ended.reason in MESSAGE_REASONS || (ended.peer.phone && ended.reason == CallEndReason.OFFLINE)) &&
         CallMessages.canSend(ended.peer)
 
 private fun leaveMessage(context: android.content.Context, ended: EndedCall, onDone: () -> Unit) {

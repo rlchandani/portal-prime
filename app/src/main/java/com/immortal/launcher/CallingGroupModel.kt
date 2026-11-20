@@ -21,6 +21,11 @@ internal object CallGroup {
   const val MAX_PEOPLE = 4
   /** Legs beyond the first other member. */
   const val MAX_LEGS = MAX_PEOPLE - 2
+  /**
+   * Phase 2b: at most one paired phone per call. A phone has no server and is always the WebRTC
+   * offerer, so two phones would have no way to reach each other inside the home.
+   */
+  const val MAX_PHONES = 1
 }
 
 internal enum class LegPhase {
@@ -53,8 +58,32 @@ internal data class CallLeg(
     val connectedMs: Long? = null,
     val remoteCameraOn: Boolean = true,
     val remoteMicOn: Boolean = true,
+    /** Phase 2b: this leg is where the call is moving to ("Move to phone"); we leave once it is in. */
+    val moving: Boolean = false,
+)
+
+/**
+ * A call being handed between this person's devices (phase 2b). [to]: the source side, the member
+ * the call is moving to; [from]: the target side, the device the call is moving away from.
+ */
+@Immutable
+internal data class CallMove(
+    val to: String? = null,
+    val from: String? = null,
+    /** Source: when the target's own link to us came up (the settle clock starts here). */
+    val targetLiveMs: Long? = null,
+    /** Target: `call_moved` has gone out (everyone is connected). */
+    val announced: Boolean = false,
 )
 
 /** Something worth a toast in a group call ("Priya is in quiet hours", "Walt left"). */
 @Immutable
-internal data class CallNotice(val name: String, val reason: CallEndReason, val atMs: Long)
+internal data class CallNotice(
+    val name: String,
+    val reason: CallEndReason,
+    val atMs: Long,
+    /** [CallEndReason.MOVED]: the device it moved to, when it is one of ours to name. */
+    val to: String? = null,
+    /** The ring was a move that didn't happen ("the call stays here"). */
+    val move: Boolean = false,
+)

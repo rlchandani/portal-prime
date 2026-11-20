@@ -144,7 +144,7 @@ private fun BoxScope.MemberTile(tile: CallTile.Member, media: CallMedia?, motion
     }
   }
   // Upright, the first tile's top edge is the live bar's: its name moves to the bottom corner.
-  TileLabel(tile.contact.name, layout, Modifier.align(if (first && layout.compactPortrait) Alignment.BottomEnd else Alignment.TopEnd),
+  TileLabel(CallingCopy.tileName(tile.contact), layout, Modifier.align(if (first && layout.compactPortrait) Alignment.BottomEnd else Alignment.TopEnd),
       bottom = first && layout.compactPortrait)
   if (!ringing && !tile.micOn) Box(Modifier.align(Alignment.BottomStart).padding(if (layout.compact) 16.dp else 24.dp)
       .size(if (layout.compact) 52.dp else 64.dp).background(CallColors.Bar, CircleShape), contentAlignment = Alignment.Center) {

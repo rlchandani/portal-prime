@@ -92,9 +92,10 @@ class CallPhoneAndGroupWireTest {
 
   @Test fun mailboxPollDrainsAndRecordsThePhone() {
     CallPhoneMailbox.post(phoneId, CallWire.RING, JSONObject().put("i", id), now)
-    val got = CallPhoneMailbox.poll(phoneId, "Sam", now + 500)
+    val sam = CallPhoneWire.PollInfo("Sam", emptyMap(), false, 0L)
+    val got = CallPhoneMailbox.poll(phoneId, sam, now + 500).messages
     assertEquals(listOf(CallWire.RING), got.map { it.type })
-    assertTrue(CallPhoneMailbox.poll(phoneId, "Sam", now + 600).isEmpty())
+    assertTrue(CallPhoneMailbox.poll(phoneId, sam, now + 600).messages.isEmpty())
     val phone = CallPhoneMailbox.phone(phoneId)!!
     assertTrue(phone.reachable(now + 600 + CallPhones.REACHABLE_MS))
     assertFalse(phone.reachable(now + 601 + CallPhones.REACHABLE_MS))
@@ -140,10 +141,11 @@ class CallPhoneAndGroupWireTest {
     assertTrue("drop-ins never carry a group", drop.members.isEmpty())
   }
 
-  @Test fun joinRoundTripsAndRefusesPhones() {
+  @Test fun joinRoundTripsAndMarksPhones() {
     val join = CallWire.Join(id, portal, den)
     assertEquals(join, CallWire.decodeJoin(CallWire.encode(join)))
-    assertNull(CallWire.decodeJoin(CallWire.encode(CallWire.Join(id, portal, CallContact(CallPhoneId.of("t"), "Phone")))))
+    // Phase 2b: a phone newcomer is allowed and decoded as a phone.
+    assertTrue(CallWire.decodeJoin(CallWire.encode(CallWire.Join(id, portal, CallContact(CallPhoneId.of("t"), "Phone"))))!!.newcomer.phone)
     assertNull(CallWire.decodeJoin(JSONObject().put("i", id).put("to", portal)))
   }
 

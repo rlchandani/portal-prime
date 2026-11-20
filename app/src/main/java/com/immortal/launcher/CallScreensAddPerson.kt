@@ -42,8 +42,9 @@ import androidx.compose.ui.unit.sp
 internal fun BoxScope.CallAddPersonSheet(call: ActiveCall, layout: LayoutClass, onClose: () -> Unit) {
   val context = LocalContext.current
   val peers by CallingStore.peers.collectAsState()
+  val phones by CallPhoneMailbox.phones.collectAsState()
   val now = rememberCallClock(SHEET_CLOCK_MS)
-  val rows = CallAddPeople.rows(call, peers, Calling.selfId(context), now)
+  val rows = CallAddPeople.rows(call, peers, Calling.selfId(context), now, phones)
   Box(Modifier.fillMaxSize().background(CallColors.Scrim).callClick("Close", true, onClose))
   val inset = if (layout.compact) 24.dp else 36.dp
   val sheet = if (layout.compactPortrait) Modifier.fillMaxWidth() else Modifier.width(if (layout.compact) 640.dp else 820.dp)
@@ -59,7 +60,7 @@ internal fun BoxScope.CallAddPersonSheet(call: ActiveCall, layout: LayoutClass, 
     }
     Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
       if (call.full) FullCard()
-      if (rows.isEmpty()) Text("No other Portals in this home yet. They appear here once they’re on the same Wi-Fi.",
+      if (rows.isEmpty()) Text("No other Portals or phones yet. Portals appear once they’re on the same Wi-Fi; phones once Portal Toolkit is open.",
           color = Color.White.copy(alpha = 0.75f), fontSize = 24.sp)
       rows.forEach { row -> PersonRow(row, now) { if (Calling.addPerson(context, row.peer.id)) onClose() } }
     }
@@ -83,13 +84,14 @@ private fun FullCard() {
 
 @Composable
 private fun PersonRow(row: CallAddPeople.Row, now: Long, onAdd: () -> Unit) {
-  val presence = CallPolicy.presence(row.peer, now)
+  val presence = if (!row.phone) CallPolicy.presence(row.peer, now)
+  else if (row.option == CallAddPeople.Option.ADD || row.option == CallAddPeople.Option.IN_CALL) CallPresence.AVAILABLE else CallPresence.OFFLINE
   Row(Modifier.fillMaxWidth().background(CallColors.ControlFill, RoundedCornerShape(28.dp)).padding(horizontal = 24.dp, vertical = 18.dp),
       verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(22.dp)) {
     CallRoomAvatar(row.peer.name, 88.dp, presence, ring = CallColors.Popover)
     Column(Modifier.weight(1f)) {
       Text(row.peer.name, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      Text(subtitle(row.option), color = Color.White.copy(alpha = 0.65f), fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      Text(if (row.phone) phoneSubtitle(row.option) else subtitle(row.option), color = Color.White.copy(alpha = 0.65f), fontSize = 21.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
     when (row.option) {
       CallAddPeople.Option.ADD -> CallPill("Add", onAdd, icon = "plus", style = CallButtonStyle.OK, size = CallButtonSize.SM)
@@ -99,6 +101,10 @@ private fun PersonRow(row: CallAddPeople.Row, now: Long, onAdd: () -> Unit) {
       CallAddPeople.Option.BUSY -> CallChip("In a call", tone = CallChipTone.WARN)
       CallAddPeople.Option.OFFLINE -> CallChip("Offline")
       CallAddPeople.Option.CALLS_OFF -> CallChip("Calls off")
+      CallAddPeople.Option.PHONE_CLOSED -> CallChip("Not open")
+      CallAddPeople.Option.NOT_PAIRED -> CallChip("Not paired")
+      CallAddPeople.Option.ONE_PHONE -> CallChip("One phone per call")
+      CallAddPeople.Option.LOCKED -> CallChip("Just you two")
     }
   }
 }
@@ -111,6 +117,19 @@ private fun subtitle(option: CallAddPeople.Option): String = when (option) {
   CallAddPeople.Option.BUSY -> "In another call"
   CallAddPeople.Option.OFFLINE -> "Not heard from lately"
   CallAddPeople.Option.CALLS_OFF -> "Doesn’t take calls"
+  CallAddPeople.Option.PHONE_CLOSED, CallAddPeople.Option.NOT_PAIRED, CallAddPeople.Option.ONE_PHONE -> "Portal in this home"
+  CallAddPeople.Option.LOCKED -> "Answered automatically · stays between you two"
+}
+
+/** Mock `addScr` "Priya · Phone · Available". */
+private fun phoneSubtitle(option: CallAddPeople.Option): String = when (option) {
+  CallAddPeople.Option.ADD -> "Phone · Available"
+  CallAddPeople.Option.IN_CALL, CallAddPeople.Option.FULL -> "Phone"
+  CallAddPeople.Option.PHONE_CLOSED -> "Phone · Portal Toolkit isn’t open"
+  CallAddPeople.Option.NOT_PAIRED -> "Phone · not paired with every Portal in this call"
+  CallAddPeople.Option.ONE_PHONE -> "Phone · a phone is already in this call"
+  CallAddPeople.Option.LOCKED -> "Answered automatically · stays between you two"
+  else -> "Phone"
 }
 
 private const val SHEET_CLOCK_MS = 5_000L

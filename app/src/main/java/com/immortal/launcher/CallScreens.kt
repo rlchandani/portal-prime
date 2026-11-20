@@ -54,6 +54,8 @@ internal fun CallApp(motion: Boolean, lowMemory: Int, onClose: () -> Unit, onNee
 
   Box(Modifier.fillMaxSize().background(CallColors.VideoBg)) {
     when {
+      call == null && ended != null && ended.reason == CallEndReason.MOVED ->
+        CallMovedScreen(ended, onDone = { Calling.dismissEnded(); onClose() })
       call == null && ended != null -> CallEndedScreen(ended, motion,
           onCallBack = { kind -> Calling.dismissEnded(); if (!Calling.dial(context, ended.peer.deviceId, kind, video = true)) onClose() },
           onDone = { Calling.dismissEnded(); onClose() })

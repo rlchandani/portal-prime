@@ -49,6 +49,10 @@ internal data class ActiveCall(
     val notice: CallNotice? = null,
     /** Grandma mode answered by itself: nobody else may be joined into this call. */
     val autoAnswered: Boolean = false,
+    /** The other side said it answered by itself (`call_media` `aa`): we may not add or move either. */
+    val remoteAutoAnswered: Boolean = false,
+    /** Phase 2b: this call is being handed to (or from) another of this person's devices. */
+    val move: CallMove? = null,
 ) {
   /** Everyone else in (or being added to) this call, [peer] first. */
   val members: List<CallContact> get() = listOf(peer) + legs.map { it.peer }
@@ -58,6 +62,10 @@ internal data class ActiveCall(
   val group: Boolean get() = legs.isNotEmpty()
   fun leg(id: String): CallLeg? = legs.firstOrNull { it.peer.deviceId == id }
   fun isMember(id: String): Boolean = peer.deviceId == id || leg(id) != null
+  /** Paired phones in (or being added to) this call; at most [CallGroup.MAX_PHONES]. */
+  val phones: Int get() = members.count { it.phone }
+  /** Grandma-mode calls on either side stay between the two of them: no add, no move. */
+  val locked: Boolean get() = autoAnswered || remoteAutoAnswered
 }
 
 /** How the last call ended, for the ended/error screens. */
@@ -72,6 +80,8 @@ internal data class EndedCall(
     val endedMs: Long,
     /** QUIET replies: minute of day the callee's quiet hours end, when it said. */
     val quietEndMin: Int? = null,
+    /** [CallEndReason.MOVED]: the device that carries the call on. */
+    val movedTo: CallContact? = null,
 ) {
   val durationMs: Long get() = connectedMs?.let { (endedMs - it).coerceAtLeast(0) } ?: 0L
 }
@@ -90,13 +100,17 @@ internal sealed interface CallEvent {
                       /** A group ring: who is already in the call (we join each of them on Accept). */
                       val members: List<CallMemberRef> = emptyList(),
                       /** The ring named other members (even if this Portal won't join groups): never auto-answer it. */
-                      val groupRing: Boolean = members.isNotEmpty()) : CallEvent
+                      val groupRing: Boolean = members.isNotEmpty(),
+                      /** Phase 2b: the caller is moving its call here ("To Portal"); it leaves once we're in. */
+                      val move: Boolean = false) : CallEvent
   data class Accept(val audioOnly: Boolean, val now: Long) : CallEvent
   data class Decline(val now: Long) : CallEvent
   data class HangUp(val now: Long) : CallEvent
   /** The call screen stopped (Back, Home, screen off). Privacy: everything closes. */
   data class Left(val now: Long) : CallEvent
-  data class RemoteEnded(val id: String, val from: String, val reason: CallEndReason, val now: Long) : CallEvent
+  /** [movedTo]: the member left because it moved the call to that device (in our id space). */
+  data class RemoteEnded(val id: String, val from: String, val reason: CallEndReason, val now: Long,
+                         val movedTo: String? = null) : CallEvent
   /** Caller side: the callee's signed offer arrived and verified. */
   data class RemoteAccepted(val id: String, val from: String, val now: Long) : CallEvent
   /** Media events name the member ([peer]); null means [ActiveCall.peer] (1:1 and the loopback). */
@@ -105,6 +119,10 @@ internal sealed interface CallEvent {
   data class MediaFailed(val id: String, val reason: CallEndReason, val now: Long, val peer: String? = null) : CallEvent
   /** Group: ring [peer] into this call (Add person). */
   data class AddPerson(val peer: CallContact, val now: Long) : CallEvent
+  /** Move the call to [target] (one of this person's devices): ring it in, then leave once it is connected. */
+  data class MoveTo(val target: CallContact, val now: Long) : CallEvent
+  /** The device we are moving to says it is connected to everyone (`call_moved`). */
+  data class RemoteMoved(val id: String, val from: String, val now: Long) : CallEvent
   /** Group: member [from] says [newcomer] joined; it will offer to us. */
   data class RemoteJoin(val id: String, val from: String, val newcomer: CallContact, val now: Long) : CallEvent
   data class Tick(val now: Long) : CallEvent
@@ -113,7 +131,8 @@ internal sealed interface CallEvent {
   data object ToggleMic : CallEvent
   data object ToggleCamera : CallEvent
   data class CameraProblem(val issue: CameraIssue) : CallEvent
-  data class RemoteMedia(val id: String, val from: String, val cameraOn: Boolean, val micOn: Boolean) : CallEvent
+  data class RemoteMedia(val id: String, val from: String, val cameraOn: Boolean, val micOn: Boolean,
+                         val autoAnswered: Boolean = false) : CallEvent
   data object DismissEnded : CallEvent
 }
 
@@ -121,9 +140,11 @@ internal sealed interface CallEvent {
 internal sealed interface CallEffect {
   data class SendRing(val call: ActiveCall) : CallEffect
   data class SendReply(val id: String, val to: String, val reply: CallReply) : CallEffect
-  data class SendEnd(val id: String, val to: String, val reason: CallEndReason) : CallEffect
+  /** [movedTo]: we are leaving because the call moved to that member (our id for it; the runtime translates). */
+  data class SendEnd(val id: String, val to: String, val reason: CallEndReason, val movedTo: String? = null) : CallEffect
   data class SendKeep(val id: String, val to: String, val capAtMs: Long) : CallEffect
-  data class SendMediaState(val id: String, val to: String, val cameraOn: Boolean, val micOn: Boolean) : CallEffect
+  data class SendMediaState(val id: String, val to: String, val cameraOn: Boolean, val micOn: Boolean,
+                            val autoAnswered: Boolean = false) : CallEffect
   /** Bring the call screen to the front and wake the screen (incoming over anything). */
   data object Present : CallEffect
   data class StartRing(val silent: Boolean) : CallEffect
@@ -144,7 +165,10 @@ internal sealed interface CallEffect {
   /** Tell the other rooms our presence changed (Available ↔ In a call). */
   data object AnnouncePresence : CallEffect
   /** Group: ring [to] into call [id]; the runtime adds each member's address from [members]. */
-  data class SendGroupRing(val id: String, val to: CallContact, val video: Boolean, val members: List<CallContact>) : CallEffect
+  data class SendGroupRing(val id: String, val to: CallContact, val video: Boolean, val members: List<CallContact>,
+                           val move: Boolean = false) : CallEffect
+  /** Move target: tell the device we are taking over from that everyone is connected. */
+  data class SendMoved(val id: String, val to: String) : CallEffect
   /** Group: tell member [to] that [newcomer] joined (it will offer to them). */
   data class SendJoin(val id: String, val to: String, val newcomer: CallContact) : CallEffect
   /** Group: we are the newcomer; offer to this member at its address. */
@@ -157,7 +181,9 @@ internal data class CallStep(val state: CallState, val effects: List<CallEffect>
 
 /** Pure call state machine: every rule about what a call may do next lives here. */
 internal object CallMachine {
-  fun reduce(state: CallState, event: CallEvent): CallStep {
+  fun reduce(state: CallState, event: CallEvent): CallStep = CallGroupMachine.settleMove(step(state, event))
+
+  private fun step(state: CallState, event: CallEvent): CallStep {
     val call = state.call
     return when (event) {
       is CallEvent.Dial -> dial(state, event)
@@ -204,7 +230,8 @@ internal object CallMachine {
       CallStep(state.copy(call = next), listOf(CallEffect.SetCamera(false), media(next)) + CallGroupMachine.mediaEffects(next))
     }
     is CallEvent.RemoteMedia -> if (matches(call, event.id, event.from))
-      CallStep(state.copy(call = call.copy(remoteCameraOn = event.cameraOn, remoteMicOn = event.micOn)))
+      CallStep(state.copy(call = call.copy(remoteCameraOn = event.cameraOn, remoteMicOn = event.micOn,
+          remoteAutoAnswered = call.remoteAutoAnswered || event.autoAnswered)))
     else CallStep(state)
     else -> CallStep(state)
   }
@@ -244,12 +271,13 @@ internal object CallMachine {
       })
       is IncomingDecision.Ring -> {
         val call = ActiveCall(e.id, e.peer, CallDirection.INCOMING, e.kind, e.video, CallPhase.RINGING, e.now, e.now,
-            cameraOn = e.video, silent = d.silent, peerHost = e.host, peerPort = e.port, invited = invited(e))
+            cameraOn = e.video, silent = d.silent, peerHost = e.host, peerPort = e.port, invited = invited(e),
+            move = if (e.move && e.kind == CallKind.CALL) CallMove(from = e.peer.deviceId) else null)
         CallStep(CallState(call = call), listOf(CallEffect.SendReply(e.id, e.peer.deviceId, CallReply.RINGING),
             CallEffect.Present, CallEffect.StartRing(d.silent), CallEffect.AnnouncePresence))
       }
       // A group ring never answers by itself: the countdown is for one chosen person, not their guests.
-      IncomingDecision.AutoAnswer -> if (e.groupRing) incoming(state, e.copy(decision = IncomingDecision.Ring(false))) else {
+      IncomingDecision.AutoAnswer -> if (e.groupRing || e.move) incoming(state, e.copy(decision = IncomingDecision.Ring(false))) else {
         val call = ActiveCall(e.id, e.peer, CallDirection.INCOMING, CallKind.CALL, e.video, CallPhase.RINGING, e.now, e.now,
             cameraOn = e.video, peerHost = e.host, peerPort = e.port, autoAnswerAtMs = e.now + CallTimings.AUTO_ANSWER_MS,
             invited = invited(e))
@@ -266,8 +294,14 @@ internal object CallMachine {
   }
 
   /** Members named in a group ring (never more than the cap, never the caller twice). */
-  private fun invited(e: CallEvent.Incoming): List<CallMemberRef> = if (e.kind != CallKind.CALL) emptyList()
-  else e.members.filter { it.contact.deviceId != e.peer.deviceId }.distinctBy { it.contact.deviceId }.take(CallGroup.MAX_LEGS)
+  private fun invited(e: CallEvent.Incoming): List<CallMemberRef> {
+    if (e.kind != CallKind.CALL) return emptyList()
+    val others = e.members.filter { it.contact.deviceId != e.peer.deviceId }.distinctBy { it.contact.deviceId }
+    // One phone per call, counting the caller.
+    val phoneRoom = CallGroup.MAX_PHONES - if (e.peer.phone) 1 else 0
+    val phones = others.filter { it.contact.phone }.take(phoneRoom.coerceAtLeast(0))
+    return others.filter { !it.contact.phone || it in phones }.take(CallGroup.MAX_LEGS)
+  }
 
   private fun replied(state: CallState, call: ActiveCall, e: CallEvent.Replied): CallStep {
     if (!matches(call, e.id, e.from) || call.direction != CallDirection.OUTGOING || !call.phase.beforeAnswer) return CallStep(state)
@@ -294,7 +328,9 @@ internal object CallMachine {
         call.copy(phase = CallPhase.CONNECTING, phaseSinceMs = now, cameraOn = call.video && !audioOnly, autoAnswerAtMs = null), now)
     // A phone has no server: it is always the offerer, so the Portal tells it to go and waits for the offer.
     val media = if (call.peer.phone) CallEffect.SendGo(call.id, call.peer.deviceId) else CallEffect.StartMedia(next)
-    return CallStep(state.copy(call = next), listOf(CallEffect.StopRing, media) + legs)
+    // Grandma mode: tell everyone at once that this call answered by itself, so nobody adds or moves it.
+    val locked = if (next.autoAnswered) listOf(media(next)) else emptyList()
+    return CallStep(state.copy(call = next), listOf(CallEffect.StopRing, media) + legs + locked)
   }
 
   private fun hangUp(state: CallState, call: ActiveCall, now: Long, left: Boolean): CallStep {
@@ -382,14 +418,18 @@ internal object CallMachine {
     return CallStep(state.copy(call = next), effects)
   }
 
-  private fun media(call: ActiveCall) = CallEffect.SendMediaState(call.id, call.peer.deviceId, call.cameraOn, call.micOn)
+  private fun media(call: ActiveCall) =
+      CallEffect.SendMediaState(call.id, call.peer.deviceId, call.cameraOn, call.micOn, call.autoAnswered)
 
-  private fun end(state: CallState, call: ActiveCall, reason: CallEndReason, now: Long, first: CallEffect? = null,
-                  quietEndMin: Int? = null): CallStep {
-    val ended = EndedCall(call.id, call.peer, call.direction, call.kind, reason, call.connectedMs, now, quietEndMin)
+  internal fun end(state: CallState, call: ActiveCall, reason: CallEndReason, now: Long, first: CallEffect? = null,
+                   quietEndMin: Int? = null): CallStep {
+    val movedTo = if (reason == CallEndReason.MOVED) call.move?.to else null
+    val ended = EndedCall(call.id, call.peer, call.direction, call.kind, reason, call.connectedMs, now, quietEndMin,
+        movedTo = movedTo?.let { id -> call.members.firstOrNull { it.deviceId == id } })
+    val wire = if (reason == CallEndReason.LEFT || reason == CallEndReason.MOVED) CallEndReason.HUNG_UP else reason
     val effects = buildList {
       first?.let(::add)
-      addAll(CallGroupMachine.endEffects(call, if (reason == CallEndReason.LEFT) CallEndReason.HUNG_UP else reason))
+      addAll(CallGroupMachine.endEffects(call, wire, movedTo))
       add(CallEffect.StopRing)
       add(CallEffect.StopMedia)
       add(CallEffect.Log(CallHistory.of(ended)))

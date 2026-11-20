@@ -15,13 +15,15 @@ internal object CallMessageCopy {
 
   fun title(name: String) = "Message for $name"
 
-  fun sub(phase: ComposePhase, failure: String?): String = when (phase) {
-    ComposePhase.READY -> "Up to 2 minutes · they’ll get it on their Portal"
+  /** [phone]: the recipient is a paired phone (phase 2b): the message waits here, sealed, until it collects it. */
+  fun sub(phase: ComposePhase, failure: String?, phone: Boolean = false): String = when (phase) {
+    ComposePhase.READY -> if (phone) "Up to 2 minutes · they’ll get it in Portal Toolkit" else "Up to 2 minutes · they’ll get it on their Portal"
     ComposePhase.RECORDING -> "Recording · camera and mic on"
     ComposePhase.REVIEW -> "Only you have seen this"
-    ComposePhase.SENDING -> "Sending over your home Wi-Fi…"
-    ComposePhase.SENT -> "Sent · it’s gone from this Portal"
-    ComposePhase.FAILED -> failure(failure)
+    ComposePhase.SENDING -> if (phone) "Sealing it for their phone…" else "Sending over your home Wi-Fi…"
+    ComposePhase.SENT -> if (phone) "Sent · their phone collects it on the home Wi-Fi" else "Sent · it’s gone from this Portal"
+    ComposePhase.FAILED -> if (phone && failure == CallMessageRefusal.FULL.code) "Too many messages are waiting for that phone already"
+    else failure(failure)
   }
 
   fun liveBar(phase: ComposePhase, cameraOn: Boolean): String = when {

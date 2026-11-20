@@ -123,6 +123,8 @@ class RemoteRoutes internal constructor(
         CallMessageWire.PATH -> CallMessageRoute.handle(context, req)
         // Phone ↔ Portal calls: a paired phone session *and* a household-signed header (CallPhoneRoute).
         in CallPhoneRoute.PATHS -> CallPhoneRoute.handle(context, req, bearer(req.header("authorization")))
+        // Phone ↔ Portal video messages (phase 2b): the same session + household-signed checks.
+        in CallPhoneMessageRoute.PATHS -> CallPhoneMessageRoute.handle(context, req, bearer(req.header("authorization")))
         // Feature-owned /remote/<name> routes go through the paired-session checks first.
         else -> if (RemoteFeatureRoutes.lookup(req.path) != null) companion.handle(req) else json(404, err("not_found"))
       }

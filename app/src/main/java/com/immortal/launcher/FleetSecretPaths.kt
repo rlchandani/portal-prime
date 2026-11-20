@@ -21,7 +21,9 @@ internal object FleetSecretPaths {
   private val protectedStores = listOf(listOf("no_backup", "youtube"), listOf("no_backup", GuestPasswordStore.DIR),
       listOf("no_backup", AutoAnswerRepository.DIR),
       // Video messages (sealed, with their wrapped key) and the sender's temp take.
-      listOf("no_backup", CallMessageStore.DIR), listOf("no_backup", CallMessageStore.OUT_DIR))
+      listOf("no_backup", CallMessageStore.DIR), listOf("no_backup", CallMessageStore.OUT_DIR),
+      // Messages waiting for a paired phone to collect them (transit-sealed).
+      listOf("no_backup", CallPhoneOutbox.DIR))
 
   fun isBlocked(target: File): Boolean {
     val resolved = runCatching { target.canonicalFile }.getOrNull() ?: return true

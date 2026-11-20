@@ -73,18 +73,45 @@ internal object CallTiles {
 
 /** Add person: what each room in this home offers in the sheet. Pure. */
 internal object CallAddPeople {
-  enum class Option { IN_CALL, QUIET, OFFLINE, BUSY, CALLS_OFF, FULL, ADD }
+  /**
+   * Phase 2b adds phones: [PHONE_CLOSED] Portal Toolkit isn't open (or ringing in the background)
+   * there; [NOT_PAIRED] the phone and a Portal in this call aren't paired, so they couldn't see each
+   * other; [ONE_PHONE] a phone is already in the call; [LOCKED] the call answered by itself.
+   */
+  enum class Option { IN_CALL, QUIET, OFFLINE, BUSY, CALLS_OFF, FULL, PHONE_CLOSED, NOT_PAIRED, ONE_PHONE, LOCKED, ADD }
 
+  /** [phone]: a paired phone rather than a Portal ([peer] then carries its id, name and last poll). */
   @Immutable
-  data class Row(val peer: CallPeer, val option: Option)
+  data class Row(val peer: CallPeer, val option: Option, val phone: Boolean = false)
 
-  fun rows(call: ActiveCall, peers: List<CallPeer>, selfId: String?, nowMs: Long): List<Row> =
-      peers.filter { it.id != selfId }.map { p -> Row(p, option(call, p, nowMs)) }
-          .sortedWith(compareBy<Row> { it.option != Option.ADD }.thenBy { it.peer.name.lowercase() })
+  fun rows(call: ActiveCall, peers: List<CallPeer>, selfId: String?, nowMs: Long, phones: List<CallPhone> = emptyList()): List<Row> {
+    val phoneInCall = call.members.firstOrNull { it.phone }?.let { m -> phones.firstOrNull { it.id == m.deviceId } }
+    val rooms = peers.filter { it.id != selfId }.map { p -> Row(p, roomOption(call, p, nowMs, phoneInCall)) }
+    val handsets = phones.map { ph -> Row(CallPeer(ph.id, ph.name, ph.seenMs), phoneOption(call, ph, selfId, nowMs), phone = true) }
+    return (rooms + handsets).sortedWith(compareBy<Row> { it.option != Option.ADD }.thenBy { it.phone }.thenBy { it.peer.name.lowercase() })
+  }
 
-  private fun option(call: ActiveCall, p: CallPeer, nowMs: Long): Option = when {
+  /** What a phone row offers: Add only when it rings now and is paired with every Portal in the call. */
+  fun phoneOption(call: ActiveCall, ph: CallPhone, selfId: String?, nowMs: Long): Option = when {
+    call.isMember(ph.id) -> Option.IN_CALL
+    call.full -> Option.FULL
+    call.locked -> Option.LOCKED
+    call.phones >= CallGroup.MAX_PHONES -> Option.ONE_PHONE
+    !ph.reachable(nowMs) -> Option.PHONE_CLOSED
+    unpaired(call, ph, selfId).isNotEmpty() -> Option.NOT_PAIRED
+    else -> Option.ADD
+  }
+
+  /** Portals in the call (other than this one) the phone has no session with. */
+  fun unpaired(call: ActiveCall, ph: CallPhone, selfId: String?): List<CallContact> =
+      call.members.filterNot { it.phone || it.deviceId == selfId || ph.pairedWith(it.deviceId) }
+
+  private fun roomOption(call: ActiveCall, p: CallPeer, nowMs: Long, phoneInCall: CallPhone?): Option = when {
     call.isMember(p.id) -> Option.IN_CALL
     call.full -> Option.FULL
+    call.locked -> Option.LOCKED
+    // The phone in this call must be able to reach the newcomer through its own session there.
+    phoneInCall != null && !phoneInCall.pairedWith(p.id) -> Option.NOT_PAIRED
     else -> when (CallPolicy.presence(p, nowMs)) {
       CallPresence.OFFLINE -> Option.OFFLINE
       CallPresence.QUIET -> Option.QUIET
@@ -99,7 +126,8 @@ internal object CallAddPeople {
       else "Up to ${CallGroup.MAX_PEOPLE} people · ${call.people} in the call now"
 
   /** Toast copy for a group event. */
-  fun notice(n: CallNotice): String = when (n.reason) {
+  fun notice(n: CallNotice): String = if (n.move) "${n.name} didn’t pick up · the call stays here" else when (n.reason) {
+    CallEndReason.MOVED -> if (n.to != null) "${n.name} moved the call to ${n.to}" else "${n.name} handed the call over"
     CallEndReason.QUIET -> "${n.name} is in quiet hours · we didn’t ring"
     CallEndReason.BUSY -> "${n.name} is in another call"
     CallEndReason.DECLINED -> "${n.name} can’t join right now"

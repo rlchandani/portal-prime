@@ -60,6 +60,19 @@ internal object CallMessageWire {
     return Verified(put, msg.from, msg.nonce)
   }
 
+  /**
+   * A paired phone's upload (`/remote/call/msg`, phase 2b): the same `vmsg_put` header, but it must
+   * come from [phoneId], the id this Portal derives from the phone's own session token.
+   */
+  fun verifyFromPhone(header: String?, key: ByteArray, nowMs: Long, replay: HouseholdMessage.ReplayGuard, self: String?,
+                      phoneId: String): Verified? {
+    if (header == null || self == null || !CallPhoneId.isPhone(phoneId)) return null
+    val msg = HouseholdMessage.decode(header, key, nowMs, replay) ?: return null
+    if (msg.type != TYPE || msg.from != phoneId) return null
+    val put = decode(msg.body)?.takeIf { it.to == self } ?: return null
+    return Verified(put, msg.from, msg.nonce)
+  }
+
   fun ackPayload(id: String): String = JSONObject().put("ok", true).put("i", id).toString()
 
   fun signAck(key: ByteArray, nonce: String, payload: String): String = hmacHex(key, "$ACK_DOMAIN|$nonce|$payload")
