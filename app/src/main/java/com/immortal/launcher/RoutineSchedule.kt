@@ -9,6 +9,7 @@ package com.immortal.launcher
 /** Pure scheduling: when routines start, when runs close, and the Home/sheet status copy. */
 internal object RoutineSchedule {
   private const val LOOKAHEAD_DAYS = 14
+  private const val DAYS_PER_WEEK = 7
 
   enum class Skip { OFF, DAY, DATE }
   enum class Tone { NORMAL, LIVE, DONE }
@@ -62,7 +63,10 @@ internal object RoutineSchedule {
 
   fun nextOccurrence(r: Routine, runs: Map<String, RoutineRun>, nowMs: Long): Occurrence? {
     val today = RoutineDates.day(nowMs)
-    for (d in 0 until LOOKAHEAD_DAYS) {
+    // Each skipped date can hide at most one week of a weekly routine, so today plus a week per skip
+    // always reaches the next real occurrence (a fixed window missed one behind a skipped week).
+    val horizon = maxOf(LOOKAHEAD_DAYS, DAYS_PER_WEEK * (r.skips.size + 1) + 1)
+    for (d in 0 until horizon) {
       val day = today + d
       if (skipReason(r, day) != null) continue
       if (d == 0 && (RoutineDates.minuteOfDay(nowMs) >= r.end || runs[r.id]?.day == day)) continue
