@@ -30,6 +30,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -48,11 +49,13 @@ import java.util.Locale
 /** What the rail shows; equal slices skip the rail entirely on HA updates. */
 @Immutable
 internal data class CcRailSlice(val screen: CcScreen, val alerts: Int, val kids: Boolean, val hideCameras: Boolean, val hideSecurity: Boolean,
-                                  val car: String = CcTeslaIds.DEFAULT_LABEL) {
+                                  val car: String = CcTeslaIds.DEFAULT_LABEL,
+                                  /** Home Assistant is down ([CcPhase.blocksHome]): only Home and Settings stay open. */
+                                  val blocked: Boolean = false) {
   companion object {
     fun of(s: CcUiState, screen: CcScreen) = CcRailSlice(screen, s.alerts().size, s.settings.kids,
         CcPolicy.screenHidden(CcScreen.CAMERAS, s.settings), CcPolicy.screenHidden(CcScreen.SECURITY, s.settings),
-        s.registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL)
+        s.registry?.tesla?.label ?: CcTeslaIds.DEFAULT_LABEL, s.connection.phase.blocksHome)
   }
 }
 
@@ -68,27 +71,28 @@ internal fun CcRail(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
       CcIcon("home", c.text, 34.dp)
     }
     Spacer(Modifier.height(10.dp))
+    val open = !r.blocked
     RailItem("map", "Home", r.screen == CcScreen.MAP) { ui.go(CcScreen.MAP) }
-    if (!r.hideCameras) RailItem("cam", "Cameras", r.screen == CcScreen.CAMERAS) { ui.go(CcScreen.CAMERAS) }
-    RailItem("car", r.car, r.screen == CcScreen.TESLA) { ui.go(CcScreen.TESLA) }
-    RailItem("bell", "Alerts", r.screen == CcScreen.ALERTS, badge = alerts) { ui.go(CcScreen.ALERTS) }
-    if (!r.hideSecurity) RailItem("shield", "Security", r.screen == CcScreen.SECURITY) { ui.go(CcScreen.SECURITY) }
+    if (!r.hideCameras) RailItem("cam", "Cameras", r.screen == CcScreen.CAMERAS, enabled = open) { ui.go(CcScreen.CAMERAS) }
+    RailItem("car", r.car, r.screen == CcScreen.TESLA, enabled = open) { ui.go(CcScreen.TESLA) }
+    RailItem("bell", "Alerts", r.screen == CcScreen.ALERTS, badge = alerts, enabled = open) { ui.go(CcScreen.ALERTS) }
+    if (!r.hideSecurity) RailItem("shield", "Security", r.screen == CcScreen.SECURITY, enabled = open) { ui.go(CcScreen.SECURITY) }
     Spacer(Modifier.weight(1f))
     if (r.kids) {
       RailItem("lock", "Leave kids", false) { ui.modal(CcModal.Pin(null, null, "Leave kids mode", "Enter the household PIN")) }
     } else {
-      RailItem("edit", "Edit plan", r.screen == CcScreen.EDIT) { ui.go(CcScreen.EDIT) }
+      RailItem("edit", "Edit plan", r.screen == CcScreen.EDIT, enabled = open) { ui.go(CcScreen.EDIT) }
       RailItem("gear", "Settings", r.screen == CcScreen.SETTINGS) { ui.go(CcScreen.SETTINGS) }
     }
   }
 }
 
 @Composable
-private fun RailItem(icon: String, label: String, on: Boolean, badge: Int = 0, onClick: () -> Unit) {
+private fun RailItem(icon: String, label: String, on: Boolean, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
   val c = LocalCc.current
-  Box(Modifier.size(104.dp, 96.dp)
+  Box(Modifier.size(104.dp, 96.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA)
       .then(if (on) Modifier.ccCard(RoundedCornerShape(24.dp)) else Modifier)
-      .clip(RoundedCornerShape(24.dp)).clickable(role = Role.Tab, onClick = onClick)
+      .clip(RoundedCornerShape(24.dp)).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
       .ccSpeak(if (badge > 0) "$label, $badge" else label, selected = on)) {
     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
       CcIcon(icon, if (on) c.text else c.sec, 38.dp)
@@ -151,8 +155,10 @@ internal fun CcHeader(h: CcHeaderSlice, ui: CcUi, onJarvis: () -> Unit) {
     }
     h.debug?.let { label -> CcPill(label) { CcIcon("warn", c.amber, 26.dp); Text(label, color = c.amber, fontSize = 22.sp) } }
     CcLivePill(h.phase)
-    Row(Modifier.height(72.dp).shadow(14.dp, CcStyle.Pill, ambientColor = CcStyle.Ember, spotColor = CcStyle.Ember)
-        .clip(CcStyle.Pill).background(CcStyle.JarvisBrush).clickable(role = Role.Button, onClick = onJarvis).ccSpeak("Ask Jarvis")
+    val jarvis = !h.phase.blocksHome
+    Row(Modifier.height(72.dp).alpha(if (jarvis) 1f else CC_DISABLED_ALPHA)
+        .then(if (jarvis) Modifier.shadow(14.dp, CcStyle.Pill, ambientColor = CcStyle.Ember, spotColor = CcStyle.Ember) else Modifier)
+        .clip(CcStyle.Pill).background(CcStyle.JarvisBrush).clickable(enabled = jarvis, role = Role.Button, onClick = onJarvis).ccSpeak("Ask Jarvis")
         .padding(start = 18.dp, end = 28.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       Box(Modifier.size(40.dp).clip(CircleShape).background(Brush.radialGradient(listOf(Color(0xFFFFF7EA), Color(0xFFFFD3A1), CcStyle.Ember))))
       Text("Ask Jarvis", color = CcStyle.EmberInk, fontSize = 23.sp, fontWeight = FontWeight.SemiBold)

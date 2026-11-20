@@ -7,10 +7,16 @@
 package com.immortal.launcher
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +29,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -31,6 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,7 +61,7 @@ internal fun CcConnectionOverlay(s: CcUiState, ui: CcUi) {
   val context = LocalContext.current
   if (ui.screen == CcScreen.SETTINGS) return
   val phase = s.connection.phase
-  if (phase !in setOf(CcPhase.UNREACHABLE, CcPhase.AUTH_FAILED, CcPhase.NOT_CONFIGURED, CcPhase.OFFLINE)) return
+  if (!phase.blocksHome) return
   val c = LocalCc.current
   // Portrait (Mini upright): the header is on top and the bar at the bottom instead of the rail.
   val inset = if (currentLayoutClass().compactPortrait)
@@ -58,11 +71,14 @@ internal fun CcConnectionOverlay(s: CcUiState, ui: CcUi) {
     val retry = rememberCountdown(s.connection.retryAt)
     val last = s.connection.lastLiveAt.takeIf { it > 0 }?.let { "Showing last known state from ${ccTime(it)}. " } ?: ""
     when (phase) {
-      CcPhase.UNREACHABLE -> CcCenteredMessage("warn", "Can't reach Home Assistant",
-          "The Portal is online but the Home Assistant server isn't answering. ${last}Locks, garage and alarm stay disabled until it's back." +
-              (if (retry > 0) "\n\nRetrying in $retry s (backs off to 60 s)." else ""),
-          primary = "Retry now" to { ControlCenter.retryNow(context) },
-          secondary = "Connection settings" to { context.openApprovedHomeSettings("ha") }, tone = CcTone.RED)
+      CcPhase.UNREACHABLE -> {
+        val server = remember(context) { HaConfig.baseUrl(context) }
+        CcCenteredMessage("warn", "Can't reach Home Assistant",
+            "The Portal is online but the Home Assistant server isn't answering. ${last}Locks, garage and alarm stay disabled until it's back.",
+            primary = "Retry now" to { ControlCenter.retryNow(context) }, primaryIcon = "refresh",
+            secondary = "Connection settings" to { context.openApprovedHomeSettings("ha") }, tone = CcTone.RED,
+            extra = { CcChecklist(CcUnreachable.lines(server, retry)) })
+      }
       CcPhase.AUTH_FAILED -> CcCenteredMessage("key", "Home Assistant token expired",
           "Home Assistant refused this Portal's token. Send a new long-lived token from Portal Toolkit on your phone, or enter one in Settings › Home Assistant. Nothing was changed in your home.",
           primary = "Connection settings" to { context.openApprovedHomeSettings("ha") },
@@ -74,6 +90,53 @@ internal fun CcConnectionOverlay(s: CcUiState, ui: CcUi) {
           "The Control Center shows your home live from Home Assistant. Add its address and a long-lived token first.",
           primary = "Set up Home Assistant" to { context.openApprovedHomeSettings("ha") })
     }
+  }
+}
+
+/** One line of a state card's checklist (mock `.cklist`): passed, failed, or still trying. */
+internal enum class CcCheckMark { OK, FAIL, WAIT }
+
+@Immutable
+internal data class CcStateCheck(val mark: CcCheckMark, val text: String)
+
+/** The unreachable card's checklist, as the mock: Portal Wi-Fi ✓, the server ✗ no response, the retry. Pure. */
+internal object CcUnreachable {
+  fun lines(baseUrl: String, retrySec: Long): List<CcStateCheck> = listOf(
+      CcStateCheck(CcCheckMark.OK, "Portal Wi-Fi"),
+      CcStateCheck(CcCheckMark.FAIL, "${server(baseUrl)} — no response"),
+      CcStateCheck(CcCheckMark.WAIT, if (retrySec > 0) "Retrying in $retrySec s (backs off to 60 s)" else "Retrying now"),
+  )
+
+  /** The saved address as typed (the mock shows the URL); "Home Assistant" when none is saved. */
+  fun server(baseUrl: String): String = baseUrl.trim().trimEnd('/').ifEmpty { "Home Assistant" }
+}
+
+/** ✓ / ✗ / spinner rows; the spinner turns in the draw phase only (no recomposition per frame). */
+@Composable
+private fun CcChecklist(lines: List<CcStateCheck>) {
+  val c = LocalCc.current
+  Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    lines.forEach { line ->
+      Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        when (line.mark) {
+          CcCheckMark.OK -> CcIcon("check", c.green, 28.dp)
+          CcCheckMark.FAIL -> CcIcon("x", c.red, 28.dp)
+          CcCheckMark.WAIT -> CcSpinner(c.sec, 28.dp)
+        }
+        Text(line.text, color = c.text, fontSize = 23.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      }
+    }
+  }
+}
+
+@Composable
+private fun CcSpinner(color: Color, size: Dp) {
+  val turn = rememberInfiniteTransition(label = "spin")
+  val angle by turn.animateFloat(0f, FULL_TURN, infiniteRepeatable(tween(SPIN_MS, easing = LinearEasing)), label = "angle")
+  Canvas(Modifier.size(size).padding(3.dp).graphicsLayer { rotationZ = angle }) {
+    val stroke = SPIN_STROKE.dp.toPx()
+    drawCircle(color.copy(alpha = SPIN_TRACK), style = Stroke(stroke))
+    drawArc(color, -90f, SPIN_SWEEP, useCenter = false, style = Stroke(stroke, cap = StrokeCap.Round))
   }
 }
 
@@ -116,4 +179,9 @@ internal fun CcToastHost(toast: CcToast?) {
 }
 
 private const val TICK_MS = 1_000L
+private const val FULL_TURN = 360f
+private const val SPIN_MS = 900
+private const val SPIN_SWEEP = 100f
+private const val SPIN_TRACK = .25f
+private const val SPIN_STROKE = 3
 private const val TOAST_MS = 5_000L

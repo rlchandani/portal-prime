@@ -147,7 +147,10 @@ internal fun CcCardBox(modifier: Modifier = Modifier, padding: Int = 24, content
 /** Centred state card used by empty/offline/not-configured screens. */
 @Composable
 internal fun BoxScope.CcCenteredMessage(icon: String, title: String, body: String, primary: Pair<String, () -> Unit>? = null,
-                                        secondary: Pair<String, () -> Unit>? = null, tone: CcTone = CcTone.NEUTRAL) {
+                                        secondary: Pair<String, () -> Unit>? = null, tone: CcTone = CcTone.NEUTRAL,
+                                        primaryIcon: String? = null,
+                                        /** Drawn between the body and the actions (the unreachable checklist). */
+                                        extra: (@Composable () -> Unit)? = null) {
   val c = LocalCc.current
   // Compact: kept off the screen edges (and scrolls if a short landscape window can't hold it).
   val frame = if (currentLayoutClass().compact) Modifier.align(Alignment.Center).padding(horizontal = 30.dp, vertical = 24.dp)
@@ -161,8 +164,9 @@ internal fun BoxScope.CcCenteredMessage(icon: String, title: String, body: Strin
     }
     Text(title, color = c.text, fontSize = 50.sp, fontFamily = CcStyle.Serif, lineHeight = 56.sp)
     Text(body, color = c.sec, fontSize = 25.sp, lineHeight = 34.sp)
+    extra?.invoke()
     if (primary != null || secondary != null) Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-      primary?.let { (l, f) -> CcButton(l, f, style = CcButtonStyle.PRIMARY) }
+      primary?.let { (l, f) -> CcButton(l, f, icon = primaryIcon, style = CcButtonStyle.PRIMARY) }
       secondary?.let { (l, f) -> CcButton(l, f) }
     }
   }

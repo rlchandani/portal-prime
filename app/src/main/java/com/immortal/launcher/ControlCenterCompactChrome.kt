@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -65,7 +66,7 @@ internal fun CcCompactHeader(h: CcHeaderSlice, ui: CcUi, onJarvis: () -> Unit) {
             lineHeight = 46.sp)
         Text(h.subtitle, color = c.sec, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
       }
-      CompactJarvis(onJarvis)
+      CompactJarvis(enabled = !h.phase.blocksHome, onJarvis)
     }
     Row(Modifier.fillMaxWidth().height(64.dp).horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -103,9 +104,10 @@ private fun HeaderPills(h: CcHeaderSlice, ui: CcUi) {
 }
 
 @Composable
-private fun CompactJarvis(onJarvis: () -> Unit) {
-  Row(Modifier.height(72.dp).shadow(14.dp, CcStyle.Pill, ambientColor = CcStyle.Ember, spotColor = CcStyle.Ember)
-      .clip(CcStyle.Pill).background(CcStyle.JarvisBrush).clickable(role = Role.Button, onClick = onJarvis).ccSpeak("Ask Jarvis")
+private fun CompactJarvis(enabled: Boolean, onJarvis: () -> Unit) {
+  Row(Modifier.height(72.dp).alpha(if (enabled) 1f else CC_DISABLED_ALPHA)
+      .then(if (enabled) Modifier.shadow(14.dp, CcStyle.Pill, ambientColor = CcStyle.Ember, spotColor = CcStyle.Ember) else Modifier)
+      .clip(CcStyle.Pill).background(CcStyle.JarvisBrush).clickable(enabled = enabled, role = Role.Button, onClick = onJarvis).ccSpeak("Ask Jarvis")
       .padding(start = 16.dp, end = 24.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
     Box(Modifier.size(40.dp).clip(CircleShape).background(Brush.radialGradient(listOf(Color(0xFFFFF7EA), Color(0xFFFFD3A1), CcStyle.Ember))))
     Text("Ask Jarvis", color = CcStyle.EmberInk, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
@@ -122,26 +124,27 @@ internal fun CcCompactNavBar(r: CcRailSlice, ui: CcUi, onHome: () -> Unit) {
         .semantics { contentDescription = "Back to Hearthpane home" }, contentAlignment = Alignment.Center) {
       CcIcon("home", c.text, 34.dp)
     }
+    val open = !r.blocked
     NavItem("map", "Home", r.screen == CcScreen.MAP) { ui.go(CcScreen.MAP) }
-    if (!r.hideCameras) NavItem("cam", "Cameras", r.screen == CcScreen.CAMERAS) { ui.go(CcScreen.CAMERAS) }
-    NavItem("car", r.car, r.screen == CcScreen.TESLA) { ui.go(CcScreen.TESLA) }
-    NavItem("bell", "Alerts", r.screen == CcScreen.ALERTS, badge = r.alerts) { ui.go(CcScreen.ALERTS) }
-    if (!r.hideSecurity) NavItem("shield", "Security", r.screen == CcScreen.SECURITY) { ui.go(CcScreen.SECURITY) }
+    if (!r.hideCameras) NavItem("cam", "Cameras", r.screen == CcScreen.CAMERAS, enabled = open) { ui.go(CcScreen.CAMERAS) }
+    NavItem("car", r.car, r.screen == CcScreen.TESLA, enabled = open) { ui.go(CcScreen.TESLA) }
+    NavItem("bell", "Alerts", r.screen == CcScreen.ALERTS, badge = r.alerts, enabled = open) { ui.go(CcScreen.ALERTS) }
+    if (!r.hideSecurity) NavItem("shield", "Security", r.screen == CcScreen.SECURITY, enabled = open) { ui.go(CcScreen.SECURITY) }
     if (r.kids) {
       NavItem("lock", "Leave kids", false) { ui.modal(CcModal.Pin(null, null, "Leave kids mode", "Enter the household PIN")) }
     } else {
-      NavItem("edit", "Edit plan", r.screen == CcScreen.EDIT) { ui.go(CcScreen.EDIT) }
+      NavItem("edit", "Edit plan", r.screen == CcScreen.EDIT, enabled = open) { ui.go(CcScreen.EDIT) }
       NavItem("gear", "Settings", r.screen == CcScreen.SETTINGS) { ui.go(CcScreen.SETTINGS) }
     }
   }
 }
 
 @Composable
-private fun RowScope.NavItem(icon: String, label: String, on: Boolean, badge: Int = 0, onClick: () -> Unit) {
+private fun RowScope.NavItem(icon: String, label: String, on: Boolean, badge: Int = 0, enabled: Boolean = true, onClick: () -> Unit) {
   val c = LocalCc.current
-  Box(Modifier.weight(1f).fillMaxHeight()
+  Box(Modifier.weight(1f).fillMaxHeight().alpha(if (enabled) 1f else CC_DISABLED_ALPHA)
       .then(if (on) Modifier.ccCard(NAV_ITEM) else Modifier)
-      .clip(NAV_ITEM).clickable(role = Role.Tab, onClick = onClick)
+      .clip(NAV_ITEM).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
       .ccSpeak(if (badge > 0) "$label, $badge" else label, selected = on)) {
     Column(Modifier.align(Alignment.Center).padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(5.dp)) {
